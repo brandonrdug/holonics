@@ -1,15 +1,29 @@
-use super::helpers::{native_bundle_identity, stage_native_deposit_batch, stage_thread_deposit};
+use super::helpers::{native_scaffold_identity, stage_native_deposit_batch, stage_thread_deposit};
 use super::refusal::NativeSpoolRefusal;
 use super::*;
 use crate::cuda_refine::{CudaRefineExecutor, ResidentComplexIncidence, ResidentNativeWord};
+
+pub const NATIVE_TRANSPORT_SCAFFOLD_SCHEMA: &str = "holonic-engine.native-transport-scaffold.v1";
+
+/// A compatible, source-neutral scaffold of reusable native winding/generator families.
+#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NativeTransportScaffold {
+    pub schema: String,
+    pub address: String,
+    pub spools: Vec<NativeSpool>,
+    pub compositions: Vec<NativeSpoolComposition>,
+    pub open_exterior: Vec<String>,
+}
+
 /// A non-owning, source-neutral view of one occurrence and its exact native carrying section.
 ///
-/// The view can only be founded through [`NativeSpoolBundle::addressed_section`].  Its incidence,
-/// Parametron cells, ordered generator word, and reconstruction fibre remain owned by the one
-/// mounted bundle; this type does not copy them into a second topology.
+/// The view can only be founded through [`NativeTransportScaffold::addressed_section`]. Its
+/// incidence, Parametron cells, ordered generator word, and reconstruction fibre remain owned by
+/// the one mounted scaffold; this type does not copy them into a second topology.
 #[derive(Debug)]
 pub struct NativeAddressedSection<'a> {
-    pub(crate) bundle: &'a NativeSpoolBundle,
+    pub(crate) scaffold: &'a NativeTransportScaffold,
     pub(crate) spool: &'a NativeSpool,
     pub(crate) thread: &'a NativeThread,
     pub(crate) occurrence: &'a NativeThreadOccurrence,
@@ -20,8 +34,8 @@ pub struct NativeAddressedSection<'a> {
 }
 
 impl<'a> NativeAddressedSection<'a> {
-    pub fn bundle_address(&self) -> &str {
-        &self.bundle.address
+    pub fn scaffold_address(&self) -> &str {
+        &self.scaffold.address
     }
 
     pub fn spool(&self) -> &'a NativeSpool {
@@ -57,9 +71,9 @@ impl<'a> NativeAddressedSection<'a> {
     }
 
     pub fn validate(&self) -> Result<(), NativeSpoolRefusal> {
-        self.bundle.validate()?;
+        self.scaffold.validate()?;
         let valid = self
-            .bundle
+            .scaffold
             .spools
             .iter()
             .any(|candidate| std::ptr::eq(candidate, self.spool))
@@ -101,12 +115,12 @@ impl<'a> NativeAddressedSection<'a> {
     }
 }
 
-impl NativeSpoolBundle {
+impl NativeTransportScaffold {
     pub fn read(bytes: &[u8]) -> Result<Self, NativeSpoolRefusal> {
-        let bundle: Self = serde_json::from_slice(bytes)
+        let scaffold: Self = serde_json::from_slice(bytes)
             .map_err(|error| NativeSpoolRefusal::Wire(error.to_string()))?;
-        bundle.validate()?;
-        Ok(bundle)
+        scaffold.validate()?;
+        Ok(scaffold)
     }
 
     pub fn canonical_bytes(&self) -> Result<Vec<u8>, NativeSpoolRefusal> {
@@ -115,11 +129,11 @@ impl NativeSpoolBundle {
     }
 
     pub fn validate(&self) -> Result<(), NativeSpoolRefusal> {
-        if self.schema != NATIVE_SPOOL_BUNDLE_SCHEMA {
+        if self.schema != NATIVE_TRANSPORT_SCAFFOLD_SCHEMA {
             return Err(NativeSpoolRefusal::Schema(self.schema.clone()));
         }
         if self.address.is_empty() || self.spools.is_empty() {
-            return Err(NativeSpoolRefusal::MalformedBundle(self.address.clone()));
+            return Err(NativeSpoolRefusal::MalformedScaffold(self.address.clone()));
         }
         let mut spools = BTreeMap::new();
         let mut thread_owner = BTreeMap::new();
@@ -145,10 +159,10 @@ impl NativeSpoolBundle {
         let mut composition_pairs = BTreeSet::new();
         for composition in &self.compositions {
             let Some(left) = spools.get(composition.left_spool.as_str()) else {
-                return Err(NativeSpoolRefusal::BundleComposition);
+                return Err(NativeSpoolRefusal::ScaffoldComposition);
             };
             let Some(right) = spools.get(composition.right_spool.as_str()) else {
-                return Err(NativeSpoolRefusal::BundleComposition);
+                return Err(NativeSpoolRefusal::ScaffoldComposition);
             };
             if composition.left_spool == composition.right_spool
                 || !composition_pairs.insert((
@@ -162,7 +176,7 @@ impl NativeSpoolBundle {
                 || thread_owner.get(composition.pullback.right_thread.as_str())
                     != Some(&right.address.as_str())
             {
-                return Err(NativeSpoolRefusal::BundleComposition);
+                return Err(NativeSpoolRefusal::ScaffoldComposition);
             }
             let pair = BTreeMap::from([
                 (
@@ -170,7 +184,7 @@ impl NativeSpoolBundle {
                     left.threads
                         .iter()
                         .find(|thread| thread.address == composition.pullback.left_thread)
-                        .ok_or(NativeSpoolRefusal::BundleComposition)?,
+                        .ok_or(NativeSpoolRefusal::ScaffoldComposition)?,
                 ),
                 (
                     composition.pullback.right_thread.as_str(),
@@ -178,7 +192,7 @@ impl NativeSpoolBundle {
                         .threads
                         .iter()
                         .find(|thread| thread.address == composition.pullback.right_thread)
-                        .ok_or(NativeSpoolRefusal::BundleComposition)?,
+                        .ok_or(NativeSpoolRefusal::ScaffoldComposition)?,
                 ),
             ]);
             validate_pullback(&composition.pullback, &pair)?;
@@ -192,7 +206,7 @@ impl NativeSpoolBundle {
                 .insert(composition.left_spool.as_str());
         }
         if !connected(&graph) {
-            return Err(NativeSpoolRefusal::DisconnectedBundle);
+            return Err(NativeSpoolRefusal::DisconnectedScaffold);
         }
         if self.open_exterior.iter().any(String::is_empty) {
             return Err(NativeSpoolRefusal::OpenExterior(self.address.clone()));
@@ -200,19 +214,20 @@ impl NativeSpoolBundle {
         Ok(())
     }
 
-    /// Atomically found the situated continuation by consuming this admitted native bundle and
-    /// one complete thread deposit.  The predecessor v2 bundle is not rewritten or aliased.
+    /// Atomically found the situated continuation by consuming this admitted native scaffold and
+    /// one complete thread deposit.  The predecessor v2 scaffold is not rewritten or aliased.
     pub fn deposit_thread(
         self,
         deposit: NativeThreadDeposit,
-    ) -> Result<(NativeSituatedSpoolBundle, NativeThreadDepositReceipt), NativeSpoolRefusal> {
+    ) -> Result<(SituatedNativeTransportScaffold, NativeThreadDepositReceipt), NativeSpoolRefusal>
+    {
         self.validate()?;
         stage_thread_deposit(
             self,
             Vec::new(),
             Vec::new(),
             deposit,
-            NativeSituatedPredecessorKind::NativeBundle,
+            SituatedNativeTransportPredecessorKind::NativeScaffold,
             None,
         )
     }
@@ -223,8 +238,13 @@ impl NativeSpoolBundle {
     pub fn deposit_threads(
         self,
         deposits: Vec<NativeThreadDeposit>,
-    ) -> Result<(NativeSituatedSpoolBundle, NativeThreadDepositBatchReceipt), NativeSpoolRefusal>
-    {
+    ) -> Result<
+        (
+            SituatedNativeTransportScaffold,
+            NativeThreadDepositBatchReceipt,
+        ),
+        NativeSpoolRefusal,
+    > {
         stage_native_deposit_batch(self, deposits)
     }
 
@@ -277,7 +297,7 @@ impl NativeSpoolBundle {
             })
             .ok_or(NativeSpoolRefusal::AddressedSection(occurrence.occurrence))?;
         let section = NativeAddressedSection {
-            bundle: self,
+            scaffold: self,
             spool,
             thread,
             occurrence,
@@ -553,7 +573,7 @@ impl NativeSpoolBundle {
     }
 
     /// Withdraw one addressed native thread and every dependent receipt as a staged local delta.
-    /// The continuing bundle is consumed, never cloned. Restoration consumes the delta and proves
+    /// The continuing scaffold is consumed, never cloned. Restoration consumes the delta and proves
     /// the original canonical identity.
     pub fn withdraw_thread(
         self,
@@ -561,7 +581,7 @@ impl NativeSpoolBundle {
         thread_address: &str,
     ) -> Result<(Self, NativeThreadWithdrawal), NativeSpoolRefusal> {
         self.validate()?;
-        let original_identity_sha256 = native_bundle_identity(&self)?;
+        let original_identity_sha256 = native_scaffold_identity(&self)?;
         let (rest, withdrawal) = self.withdraw_thread_from_admitted(
             &original_identity_sha256,
             spool_address,
@@ -738,7 +758,7 @@ impl NativeSpoolBundle {
             .flat_map(|thread| thread.native_support.iter().copied())
             .collect();
         self.validate()?;
-        if native_bundle_identity(&self)? != withdrawal.original_identity_sha256 {
+        if native_scaffold_identity(&self)? != withdrawal.original_identity_sha256 {
             return Err(NativeSpoolRefusal::Restoration);
         }
         Ok(self)

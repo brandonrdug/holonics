@@ -177,10 +177,10 @@ fn spool() -> NativeSpool {
     }
 }
 
-fn bundle() -> NativeSpoolBundle {
-    NativeSpoolBundle {
-        schema: NATIVE_SPOOL_BUNDLE_SCHEMA.to_owned(),
-        address: "bundle/native-turn".to_owned(),
+fn scaffold() -> NativeTransportScaffold {
+    NativeTransportScaffold {
+        schema: NATIVE_TRANSPORT_SCAFFOLD_SCHEMA.to_owned(),
+        address: "scaffold/native-turn".to_owned(),
         spools: vec![spool()],
         compositions: Vec::new(),
         open_exterior: vec!["another compatible spool".to_owned()],
@@ -412,11 +412,11 @@ fn rank_four_deposit_batch() -> Vec<NativeThreadDeposit> {
 }
 
 #[test]
-fn native_bundle_round_trips_without_ancestry_fields() {
-    let bundle = bundle();
-    let bytes = bundle.canonical_bytes().expect("valid bundle");
-    let remounted = NativeSpoolBundle::read(&bytes).expect("remount");
-    assert_eq!(remounted, bundle);
+fn native_scaffold_round_trips_without_ancestry_fields() {
+    let scaffold = scaffold();
+    let bytes = scaffold.canonical_bytes().expect("valid scaffold");
+    let remounted = NativeTransportScaffold::read(&bytes).expect("remount");
+    assert_eq!(remounted, scaffold);
     let text = String::from_utf8(bytes).expect("json").to_ascii_lowercase();
     for forbidden in [
         "soulkiller",
@@ -439,8 +439,8 @@ fn native_bundle_round_trips_without_ancestry_fields() {
 
 #[test]
 fn situated_deposit_withdrawal_and_redeposit_prove_both_identity_compositions() {
-    let predecessor = bundle();
-    let predecessor_identity = native_bundle_identity(&predecessor).expect("predecessor");
+    let predecessor = scaffold();
+    let predecessor_identity = native_scaffold_identity(&predecessor).expect("predecessor");
     let deposit = thread_deposit();
     let deposit_identity = native_deposit_identity(&deposit).expect("deposit");
     let (situated, receipt) = predecessor.deposit_thread(deposit).expect("atomic deposit");
@@ -463,7 +463,7 @@ fn situated_deposit_withdrawal_and_redeposit_prove_both_identity_compositions() 
         native_deposit_identity(&recovered).expect("recovered deposit"),
         deposit_identity
     );
-    let NativeSituatedSpoolPredecessor::Native(predecessor) = predecessor else {
+    let SituatedNativeTransportPredecessor::Native(predecessor) = predecessor else {
         panic!("first withdrawal must return the admitted native predecessor")
     };
     let (redeposited, second_receipt) = predecessor
@@ -478,8 +478,8 @@ fn situated_deposit_withdrawal_and_redeposit_prove_both_identity_compositions() 
 
 #[test]
 fn rank_four_batch_is_one_symmetric_body_and_round_trips_without_intermediate_rest() {
-    let predecessor = bundle();
-    let predecessor_identity = native_bundle_identity(&predecessor).expect("predecessor");
+    let predecessor = scaffold();
+    let predecessor_identity = native_scaffold_identity(&predecessor).expect("predecessor");
     let deposits = rank_four_deposit_batch();
     let (situated, receipt) = predecessor
         .deposit_threads(deposits)
@@ -499,7 +499,7 @@ fn rank_four_batch_is_one_symmetric_body_and_round_trips_without_intermediate_re
         .withdraw_deposit_batch(receipt.clone())
         .expect("complete batch inverse");
     assert_eq!(
-        native_bundle_identity(&predecessor).expect("recovered predecessor"),
+        native_scaffold_identity(&predecessor).expect("recovered predecessor"),
         predecessor_identity
     );
     assert_eq!(recovered.len(), 4);
@@ -524,14 +524,14 @@ fn rank_four_batch_refuses_the_alternating_six_as_a_symmetric_square() {
         .mixed_constitutive_families
         .retain(|family| family.left_thread != family.right_thread);
     assert!(matches!(
-        bundle().deposit_threads(deposits),
+        scaffold().deposit_threads(deposits),
         Err(NativeSpoolRefusal::ThreadDepositBatchReceipt)
     ));
 }
 
 #[test]
 fn arbitrary_situated_withdrawal_moves_every_incident_relation_and_restores() {
-    let (situated, _) = bundle()
+    let (situated, _) = scaffold()
         .deposit_thread(thread_deposit())
         .expect("atomic deposit");
     let identity = situated.identity_sha256().expect("identity");
@@ -572,7 +572,7 @@ fn receiver_radical_withdrawal_changes_the_fibre_and_restores_exact_identity() {
         .validate()
         .expect("the enlarged exact fibre is lawful");
 
-    let (situated, _) = bundle().deposit_thread(deposit).expect("atomic deposit");
+    let (situated, _) = scaffold().deposit_thread(deposit).expect("atomic deposit");
     let identity = situated.identity_sha256().expect("identity");
     let fibre_address = situated.exact_reconstruction_fibres()[0].address.clone();
     let returned_before = situated.exact_reconstruction_fibres()[0]
@@ -602,7 +602,7 @@ fn mixed_remainder_and_actual_carrying_pullback_are_firing_falsifiers() {
     let mut deposit = thread_deposit();
     deposit.mixed_constitutive_families[0].mixed_remainder = current(0, 0);
     assert!(matches!(
-        bundle().deposit_thread(deposit),
+        scaffold().deposit_thread(deposit),
         Err(NativeSpoolRefusal::MixedConstitutiveFamily(_))
     ));
 
@@ -611,20 +611,20 @@ fn mixed_remainder_and_actual_carrying_pullback_are_firing_falsifiers() {
         .carrying_pullback
         .left = EventId(1);
     assert!(matches!(
-        bundle().deposit_thread(deposit),
+        scaffold().deposit_thread(deposit),
         Err(NativeSpoolRefusal::ExactReconstructionFibre(_))
     ));
 }
 
 #[test]
 fn native_addressed_section_borrows_the_exact_occurrence_carrier() {
-    let bundle = bundle();
-    let section = bundle
+    let scaffold = scaffold();
+    let section = scaffold
         .addressed_section("spool/native-turn", "thread/turn-out", EventId(1))
         .expect("addressed section");
 
     section.validate().expect("validated borrowed view");
-    assert_eq!(section.bundle_address(), "bundle/native-turn");
+    assert_eq!(section.scaffold_address(), "scaffold/native-turn");
     assert_eq!(section.spool().address, "spool/native-turn");
     assert_eq!(section.thread().address, "thread/turn-out");
     assert_eq!(section.occurrence().occurrence, EventId(1));
@@ -640,8 +640,8 @@ fn native_addressed_section_borrows_the_exact_occurrence_carrier() {
 
 #[test]
 fn native_addressed_section_returns_exact_unsupported_families() {
-    let bundle = bundle();
-    let section = bundle
+    let scaffold = scaffold();
+    let section = scaffold
         .addressed_section("spool/native-turn", "thread/turn-out", EventId(1))
         .expect("addressed section");
 
@@ -762,13 +762,15 @@ fn insufficiency_exhibits_the_reopened_native_fibre() {
 
 #[test]
 fn intrinsic_profile_borrows_every_native_facet_and_keeps_dimensions_typed() {
-    let bundle = bundle();
-    let profile = bundle.intrinsic_holon_profile().expect("intrinsic profile");
-    assert_eq!(profile.bundle_address, bundle.address);
+    let scaffold = scaffold();
+    let profile = scaffold
+        .intrinsic_holon_profile()
+        .expect("intrinsic profile");
+    assert_eq!(profile.scaffold_address, scaffold.address);
     assert_eq!(profile.holons.len(), 2);
     assert!(std::ptr::eq(
         profile.holons[0].morphology,
-        &bundle.spools[0].threads[0]
+        &scaffold.spools[0].threads[0]
     ));
     let holon = &profile.holons[0];
     assert_eq!(
@@ -803,25 +805,28 @@ fn intrinsic_profile_borrows_every_native_facet_and_keeps_dimensions_typed() {
 
 #[test]
 fn neutral_rested_surface_round_trips_the_existing_native_owner() {
-    let bundle = bundle();
-    RestedTransportEcology::validate_rest(&bundle).expect("neutral validation");
-    let bytes = RestedTransportEcology::canonical_rest_bytes(&bundle).expect("neutral rest");
-    assert_eq!(bytes, bundle.canonical_bytes().expect("owner rest"));
-    assert_eq!(NativeSpoolBundle::read(&bytes).expect("remount"), bundle);
+    let scaffold = scaffold();
+    RestedTransportEcology::validate_rest(&scaffold).expect("neutral validation");
+    let bytes = RestedTransportEcology::canonical_rest_bytes(&scaffold).expect("neutral rest");
+    assert_eq!(bytes, scaffold.canonical_bytes().expect("owner rest"));
+    assert_eq!(
+        NativeTransportScaffold::read(&bytes).expect("remount"),
+        scaffold
+    );
 }
 
 #[test]
 #[ignore = "requires the resident CUDA native-word entry"]
 fn neutral_rested_surface_conducts_the_existing_resident_word() {
-    let bundle = bundle();
+    let scaffold = scaffold();
     let request = NativeTransportRequest {
         spool: "spool/native-turn".to_owned(),
         word: vec![InputId(7)],
         native_start: vec![NativeStateId(0), NativeStateId(1)],
         receiver: ReceiverId(9),
     };
-    let neutral = RestedTransportEcology::conduct(&bundle, &request).expect("neutral conduct");
-    let mut direct = bundle
+    let neutral = RestedTransportEcology::conduct(&scaffold, &request).expect("neutral conduct");
+    let mut direct = scaffold
         .mount_word(&request.spool, &request.word)
         .expect("direct mount");
     let direct = direct
@@ -833,8 +838,8 @@ fn neutral_rested_surface_conducts_the_existing_resident_word() {
 
 #[test]
 fn exterior_configuration_names_cannot_move_the_intrinsic_native_profile() {
-    let bundle = bundle();
-    let before = bundle
+    let scaffold = scaffold();
+    let before = scaffold
         .intrinsic_holon_profile()
         .expect("profile before exterior chart");
     let left = ForeignConfigurationChart::read(
@@ -849,20 +854,20 @@ fn exterior_configuration_names_cannot_move_the_intrinsic_native_profile() {
     )
     .expect("right chart");
     assert_ne!(left, right);
-    let after = bundle
+    let after = scaffold
         .intrinsic_holon_profile()
         .expect("profile after exterior chart");
     assert_eq!(before, after);
 }
 
 struct FixtureDismantlingReturn {
-    productive: NativeSpoolBundle,
+    productive: NativeTransportScaffold,
     cold: String,
     insufficiency: String,
 }
 
 impl DismantlingBoundaryReturn for FixtureDismantlingReturn {
-    type Productive = NativeSpoolBundle;
+    type Productive = NativeTransportScaffold;
     type ColdWitness = String;
     type Insufficiency = String;
 
@@ -882,7 +887,7 @@ impl DismantlingBoundaryReturn for FixtureDismantlingReturn {
 #[test]
 fn dismantling_profile_borrows_only_the_productive_native_lane() {
     let returned = FixtureDismantlingReturn {
-        productive: bundle(),
+        productive: scaffold(),
         cold: "foreign architecture testimony".to_owned(),
         insufficiency: "unexcited receiver family".to_owned(),
     };

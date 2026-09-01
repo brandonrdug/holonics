@@ -453,14 +453,14 @@ returns.
   actually exposed by the weights, excited by the new material, and separated by the declared
   receivers. Unexcited capability remains an open reconstruction fibre.
 - A Soulkiller claim requires excitation, intervention, native thread extraction, receiver/history
-  condensation, explicit insufficiency, a sealed source-neutral spool bundle, source-detached
+  factorization, explicit insufficiency, a sealed source-neutral native transport scaffold, source-detached
   remount, matched siblings, and targeted spool ablation. A renamed tensor container or equal
   output on one corpus does not grade it.
 - **Soulkiller is the one-way foreign-realization scrapyard boundary.** Any source-specific
   coordinate, operator factorization, state/cache convention, topology, identity, or execution law
   may be load-bearing only inside its intake, excitation, dissection, reconstruction, and
   matched controls. Its return is
-  `Soulkiller(F,R) -> (NativeSpoolBundle S_R, ExteriorSoulkillerWitness W_(F,R), ReceiverInsufficiency O_R)`.
+  `Soulkiller(F,R) -> (NativeTransportScaffold S_R, ExteriorSoulkillerWitness W_(F,R), ReceiverInsufficiency O_R)`.
   `S_R` owns only source-neutral native addressed threads, generator families, exact composition
   receipts, receiver/history factors, and complete fibres. `W` owns immutable ancestry and
   reconstruction testimony and is outside every Athena dependency closure. Soulkiller never
@@ -478,7 +478,7 @@ returns.
   topology before the remount control. If later current needs any of them, the scrapyard seal has
   not crossed its boundary. If a richer receiver reopens the retained fibre, Athena returns the exact
   `ReceiverInsufficiency`; only a separately scheduled later Soulkiller passage may consume that
-  obstruction and return another sealed native spool bundle. Eros alone may compose it into Athena.
+  obstruction and return another sealed native transport scaffold. Eros alone may compose it into Athena.
 - Plural native spools may fuse only after a successor-equivariant common transport subcomplex has
   been founded by addressed correspondence, natural generator squares and matched intervention.
   The fused ecology is the pushout through that subcomplex; apparent agreement remains a

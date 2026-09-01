@@ -20,10 +20,10 @@ use holonic_engine::{
     },
     native_spool::{
         NativeCollapsedFibre, NativeConstitutiveResponse, NativeIncidenceTerm,
-        NativePullbackOccurrence, NativeSituatedRadicalWithdrawal, NativeSituatedSpoolBundle,
-        NativeSituatedSpoolPredecessor, NativeSituatedThreadWithdrawal, NativeThreadDeposit,
-        NativeThreadDepositBatchReceipt, NativeThreadDepositReceipt, NativeThreadHand,
-        ReceiverInsufficiency,
+        NativePullbackOccurrence, NativeSituatedRadicalWithdrawal, NativeSituatedThreadWithdrawal,
+        NativeThreadDeposit, NativeThreadDepositBatchReceipt, NativeThreadDepositReceipt,
+        NativeThreadHand, ReceiverInsufficiency, SituatedNativeTransportPredecessor,
+        SituatedNativeTransportScaffold,
     },
     receiver_exact_compression::{
         compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
@@ -912,7 +912,7 @@ fn source_neutral_factor_hands(
 }
 
 fn source_neutral_emitting_thread_current(
-    ecology: &NativeSituatedSpoolBundle,
+    ecology: &SituatedNativeTransportScaffold,
     thread_address: &str,
 ) -> Result<ExactComplexWaveCurrent, SourceNeutralEcologyError> {
     let thread = ecology
@@ -952,7 +952,7 @@ fn source_neutral_emitting_thread_current(
 /// constitutive families, returned winding sections/orientations, and organ constitutions, while
 /// the radical remains reconstruction testimony beside that law.
 fn source_neutral_native_conduct_constitution_identity(
-    ecology: &NativeSituatedSpoolBundle,
+    ecology: &SituatedNativeTransportScaffold,
     branches: &[SourceNeutralCultivationBranch],
     returned_deposits: &[SourceNeutralReturnedDeposit],
     granular: &NativeGranularPotential,

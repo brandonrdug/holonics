@@ -1135,7 +1135,7 @@ impl MembraneStanding for AcousticProductRest {
         &self.identity_sha256
     }
 
-    fn membrane_ecology(&self) -> &holonic_engine::native_spool::NativeSituatedSpoolBundle {
+    fn membrane_ecology(&self) -> &holonic_engine::native_spool::SituatedNativeTransportScaffold {
         self.body.membrane_ecology()
     }
 

@@ -1,4 +1,4 @@
-use crate::native_spool::{NativeSpoolBundle, NativeSpoolConductReturn, NativeSpoolRefusal};
+use crate::native_spool::{NativeSpoolConductReturn, NativeSpoolRefusal, NativeTransportScaffold};
 use crate::receiver_exact_compression::{InputId, ReceiverId};
 use crate::receiver_history_compression::NativeStateId;
 
@@ -27,7 +27,7 @@ pub trait RestedTransportEcology {
     fn canonical_rest_bytes(&self) -> Result<Vec<u8>, Self::Error>;
 }
 
-impl RestedTransportEcology for NativeSpoolBundle {
+impl RestedTransportEcology for NativeTransportScaffold {
     type Error = NativeSpoolRefusal;
     type Request = NativeTransportRequest;
     type Return = NativeSpoolConductReturn;

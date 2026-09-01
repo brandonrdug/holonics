@@ -1,8 +1,9 @@
-//! Source-neutral addressed threads and reusable native spool complexes.
+//! Source-neutral addressed threads and inherited native transport scaffolds.
 //!
 //! The implementation is partitioned by owner: thread/core, deposits, situated withdrawal,
-//! bundle addressing, resident conduct, validation helpers, and refusal types. Re-exports keep
-//! the established `crate::native_spool::*` API intact.
+//! scaffold addressing, resident conduct, validation helpers, and refusal types. A `NativeSpool`
+//! remains one reusable winding/generator family; `NativeTransportScaffold` owns the complete
+//! compatible assembly.
 
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
@@ -17,19 +18,19 @@ use crate::{
     receiver_history_compression::{NativeStateId, ReceiverFactor},
 };
 
-mod bundle;
 mod deposits;
 mod helpers;
 mod refusal;
 mod resident;
+mod scaffold;
 mod situated;
 mod thread;
 
-pub use bundle::*;
 pub use deposits::*;
 pub(crate) use helpers::*;
 pub use refusal::*;
 pub use resident::*;
+pub use scaffold::*;
 pub use situated::*;
 pub use thread::*;
 

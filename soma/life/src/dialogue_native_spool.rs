@@ -10,9 +10,9 @@ use holonic_engine::{
     native_spool::{
         NativeCollapsedFibre, NativeConstitutiveResponse, NativeGeneratorDescent,
         NativeGeneratorStep, NativeIncidenceTerm, NativeParametronCell, NativePullbackOccurrence,
-        NativeReceiverConsequence, NativeSerialPullback, NativeSpool, NativeSpoolBundle,
-        NativeSpoolRefusal, NativeThread, NativeThreadHand, NativeThreadOccurrence,
-        NATIVE_SPOOL_BUNDLE_SCHEMA, NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA,
+        NativeReceiverConsequence, NativeSerialPullback, NativeSpool, NativeSpoolRefusal,
+        NativeThread, NativeThreadHand, NativeThreadOccurrence, NativeTransportScaffold,
+        NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA, NATIVE_TRANSPORT_SCAFFOLD_SCHEMA,
     },
     receiver_exact_compression::{InputId, Observation, ReceiverId},
     receiver_history_compression::{NativeStateId, ReceiverFactor},
@@ -40,7 +40,7 @@ pub struct DialogueNativeOccurrenceWitness {
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct DialogueNativeSpoolReturn {
-    pub native: NativeSpoolBundle,
+    pub native: NativeTransportScaffold,
     pub exterior: Vec<DialogueNativeOccurrenceWitness>,
 }
 
@@ -49,7 +49,7 @@ const GENERATOR: InputId = InputId(0);
 
 pub fn found_dialogue_native_spool(
     lineage: &ExactDialogueLineage,
-) -> Result<NativeSpoolBundle, NativeSpoolRefusal> {
+) -> Result<NativeTransportScaffold, NativeSpoolRefusal> {
     let occurrences = lineage
         .occurrences()
         .iter()
@@ -69,7 +69,7 @@ pub fn found_addressed_dialogue_native_spool(
     occurrences: &[AddressedDialogueOccurrence],
 ) -> Result<DialogueNativeSpoolReturn, NativeSpoolRefusal> {
     if occurrences.len() < 2 {
-        return Err(NativeSpoolRefusal::MalformedBundle(
+        return Err(NativeSpoolRefusal::MalformedScaffold(
             "dialogue/native-recurrence".to_owned(),
         ));
     }
@@ -247,16 +247,16 @@ pub fn found_addressed_dialogue_native_spool(
         open_exterior: vec!["later returned dialogue incidence".to_owned()],
     };
     spool.validate()?;
-    let bundle = NativeSpoolBundle {
-        schema: NATIVE_SPOOL_BUNDLE_SCHEMA.to_owned(),
-        address: "dialogue/native-bundle".to_owned(),
+    let scaffold = NativeTransportScaffold {
+        schema: NATIVE_TRANSPORT_SCAFFOLD_SCHEMA.to_owned(),
+        address: "dialogue/native-scaffold".to_owned(),
         spools: vec![spool],
         compositions: Vec::new(),
         open_exterior: vec!["additional compatible native organs".to_owned()],
     };
-    bundle.validate()?;
+    scaffold.validate()?;
     Ok(DialogueNativeSpoolReturn {
-        native: bundle,
+        native: scaffold,
         exterior: occurrences
             .iter()
             .zip(events)
@@ -390,13 +390,13 @@ mod tests {
         let lineage =
             ExactDialogueLineage::import_codex_rollout(&path, &CodexDialogueImportSpec::default())
                 .unwrap();
-        let bundle = found_dialogue_native_spool(&lineage).unwrap();
-        let wire = bundle.canonical_bytes().unwrap();
+        let scaffold = found_dialogue_native_spool(&lineage).unwrap();
+        let wire = scaffold.canonical_bytes().unwrap();
         assert!(!wire
             .windows("Unique source sentence.".len())
             .any(|window| window == b"Unique source sentence."));
         assert_eq!(
-            bundle.spools[0]
+            scaffold.spools[0]
                 .reconstruction_fibres
                 .iter()
                 .map(|fibre| fibre.occurrences.len())

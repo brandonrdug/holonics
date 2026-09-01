@@ -104,7 +104,7 @@ pub struct SourceNeutralReturnedDifferenceWithdrawal {
 #[serde(deny_unknown_fields)]
 pub struct SourceNeutralReturnedEcology {
     pub(super) schema: String,
-    pub(super) ecology: NativeSituatedSpoolBundle,
+    pub(super) ecology: SituatedNativeTransportScaffold,
     pub(super) branches: Vec<SourceNeutralCultivationBranch>,
     pub(super) predecessor_deposit_receipt: NativeThreadDepositBatchReceipt,
     pub(super) returned_deposits: Vec<SourceNeutralReturnedDeposit>,

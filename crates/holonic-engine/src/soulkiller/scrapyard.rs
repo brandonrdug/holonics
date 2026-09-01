@@ -18,12 +18,12 @@ use crate::{
     BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase, OccurrencePort,
     native_anatomy::NativeAnatomyRest,
     native_spool::{
-        NATIVE_SPOOL_BUNDLE_SCHEMA, NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA,
+        NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA, NATIVE_TRANSPORT_SCAFFOLD_SCHEMA,
         NativeCollapsedFibre, NativeConstitutiveResponse, NativeGeneratorDescent,
         NativeGeneratorStep, NativeIncidenceTerm, NativeMutualConstitutiveResponse,
         NativeParametronCell, NativePullbackOccurrence, NativeReceiverConsequence,
-        NativeSerialPullback, NativeSpool, NativeSpoolBundle, NativeSpoolRefusal, NativeThread,
-        NativeThreadHand, NativeThreadObstruction, NativeThreadOccurrence,
+        NativeSerialPullback, NativeSpool, NativeSpoolRefusal, NativeThread, NativeThreadHand,
+        NativeThreadObstruction, NativeThreadOccurrence, NativeTransportScaffold,
         RECEIVER_INSUFFICIENCY_SCHEMA, ReceiverInsufficiency, ReceiverInsufficiencyCause,
     },
     receiver_exact_compression::{InputId, Observation, ReceiverId},
@@ -45,7 +45,7 @@ use super::{
 /// The one-way boundary return. None of its members contains a callable exterior executor.
 #[derive(Debug, PartialEq, Eq)]
 pub struct SoulkillerScrapyardReturn {
-    pub native: NativeSpoolBundle,
+    pub native: NativeTransportScaffold,
     pub exterior: ExteriorSoulkillerWitness,
     pub insufficiency: ReceiverInsufficiency,
 }
@@ -53,7 +53,7 @@ pub struct SoulkillerScrapyardReturn {
 impl crate::native_ecology::holonic_intelligence::DismantlingBoundaryReturn
     for SoulkillerScrapyardReturn
 {
-    type Productive = NativeSpoolBundle;
+    type Productive = NativeTransportScaffold;
     type ColdWitness = ExteriorSoulkillerWitness;
     type Insufficiency = ReceiverInsufficiency;
 
@@ -95,7 +95,7 @@ pub fn admitted_receiver(section: &ForeignReachableSectionRest) -> ReceiverId {
     ))
 }
 
-/// Dismantle one admitted exterior section into an architecture-neutral native spool bundle.
+/// Dismantle one admitted exterior section into an architecture-neutral native transport scaffold.
 ///
 /// The two lanes arise from the exact two-member reconstruction fibre carried by every admitted
 /// native anatomy class in the present bounded realization. They are plural occurrence populations,
@@ -441,14 +441,14 @@ pub fn dismantle_reachable_section(
         interchanges: Vec::new(),
         open_exterior: vec!["receiver/history outside the dismantled section".to_owned()],
     };
-    let bundle = NativeSpoolBundle {
-        schema: NATIVE_SPOOL_BUNDLE_SCHEMA.to_owned(),
-        address: "native-spool-bundle/reachable-parametron-section".to_owned(),
+    let scaffold = NativeTransportScaffold {
+        schema: NATIVE_TRANSPORT_SCAFFOLD_SCHEMA.to_owned(),
+        address: "native-transport-scaffold/reachable-parametron-section".to_owned(),
         spools: vec![spool],
         compositions: Vec::new(),
         open_exterior: vec!["compatible native spools not yet admitted".to_owned()],
     };
-    bundle.validate()?;
+    scaffold.validate()?;
 
     let fragments = exterior_anatomy
         .occurrences
@@ -473,7 +473,7 @@ pub fn dismantle_reachable_section(
             interventions: occurrence.realization_addresses.clone(),
         })
         .collect::<Vec<_>>();
-    let thread_extractions = bundle.spools[0]
+    let thread_extractions = scaffold.spools[0]
         .threads
         .iter()
         .map(|thread| ThreadExtractionWitness {
@@ -520,7 +520,7 @@ pub fn dismantle_reachable_section(
     let mut reconstruction_fibre = founding_fragments;
     reconstruction_fibre.extend(unexcited_capability.iter().cloned());
     let exterior = ExteriorSoulkillerWitness::seal(
-        &bundle,
+        &scaffold,
         realization,
         execution,
         fragments,
@@ -531,9 +531,9 @@ pub fn dismantle_reachable_section(
         vec!["a later excitation may enlarge the admitted receiver family".to_owned()],
     )?;
 
-    let first_occurrence = bundle.spools[0].threads[0].occurrences[0].occurrence;
+    let first_occurrence = scaffold.spools[0].threads[0].occurrences[0].occurrence;
     let first_native = anatomy.native_population[0];
-    let retained_fibre = bundle.spools[0]
+    let retained_fibre = scaffold.spools[0]
         .threads
         .iter()
         .flat_map(|thread| &thread.occurrences)
@@ -557,7 +557,7 @@ pub fn dismantle_reachable_section(
     };
     insufficiency.validate()?;
     Ok(SoulkillerScrapyardReturn {
-        native: bundle,
+        native: scaffold,
         exterior,
         insufficiency,
     })

@@ -10,14 +10,14 @@ R0Q0--R0Q4 mechanisms retain their grades.
 
 ## Current frontier
 
-**Current frontier:** SCF1
+**Current frontier:** SCF2
 
-**SCF1 — WHOLE-OBJECT RUST SCAFFOLD MIGRATION — IS THE SOLE NEXT DEED.**
+**SCF2 — EXACT MULTIMODAL GEMMA LIFT INTO SCAFFOLD FACETS — IS THE SOLE NEXT DEED.**
 
-[definition] Replace the whole-object `NativeSpoolBundle` type, schema, field, method, and wire
-vocabulary with `NativeTransportScaffold` across Soulkiller, intrinsic profiles, resident
-inference, and Athena rest. Retain `NativeSpool` as one winding family and `NativeThread` as one
-addressed passage. Add no compatibility alias or decoder. The complete contract is
+[definition] Compose exact Gemma configuration, Safetensors, codeword, processor, and text/vision/
+video/audio excitation testimony into one cold multimodal transport chart. Found source-neutral
+scaffold facets only from declared active consequence/intervention passages; tensor paths and
+modality names remain exterior. The complete contract is
 [`blueprint/THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md`](blueprint/THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md).
 
 ## Admitted standing
@@ -25,6 +25,26 @@ addressed passage. Add no compatibility alias or decoder. The complete contract 
 [proved-derived; formal-checked; measured] SCF0 returned the neutral native transport scaffold,
 bounded dispersion separation, repeated emission-to-ingress circulation, and scaffold-withdrawal
 laws. The live Lean umbrella built 3,769 jobs; document law, epistemic tags, and source shape passed.
+
+[established-bounded; implemented-exact; source-inspected; measured] SCF1 replaced
+`NativeSpoolBundle` with `NativeTransportScaffold` and the situated continuation with
+`SituatedNativeTransportScaffold` without aliases or an old-schema decoder. Engine tests returned
+1,994 passed, zero failed, and 32 ignored; life returned 466 passed, zero failed, and 14 ignored.
+
+[established-bounded; implemented-exact; source-inspected; measured] SCF2's first cold chart
+reconciled the local Gemma 4 E4B configuration, processor, and all 2,130 BF16 Safetensors
+declarations into 719 language, 658 vision, 751 audio, and two projection entries with zero
+unclassified tensors. The chart verifies the 2,560-wide shared carrier and text-only output without
+executing the model. Cross-family excitation is refused.
+
+[open; source-inspected] SCF2 remains current for actual modality excitation/intervention return,
+complete codeword testimony at that aperture, and the source-neutral passage from returned foreign
+consequence into scaffold facets. The cold family chart cannot found native identity or conduct.
+
+[established-bounded; process-audit; measured] The named workspace test receiver returned 2,924
+passed, zero failed, and 50 ignored with every example type-checked. The formal umbrella built
+3,769 jobs and all eight non-test release receivers passed. These checks advance no SCF2 capability
+grade beyond the cold chart.
 
 [established-bounded; process-audit; measured] CONS0--CONS5 are complete. Coherent consolidation
 commit `9456a4ae` and authority return `0df0e87f` are pushed. The release tree returned 2,972
@@ -44,7 +64,7 @@ and authority receivers passed.
 
 [established-bounded; implemented-exact; measured] HIF1 returned distinct Rust dimension types,
 typed open faces, borrowed intrinsic native profiles, neutral lifecycle traits, and a
-`RestedTransportEcology` implementation on `NativeSpoolBundle` itself. Neutral profile/rest/remount
+`RestedTransportEcology` implementation on `NativeTransportScaffold` itself. Neutral profile/rest/remount
 controls and resident CUDA equality passed; the engine suite returned 1,984 passed, zero failed, 32
 ignored, dependent `life` type-checked, and source-shape remained green.
 

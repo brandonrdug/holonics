@@ -1,29 +1,32 @@
-use super::deposits::NativeSpoolBundle;
 use super::refusal::NativeSpoolRefusal;
+use super::scaffold::NativeTransportScaffold;
 use super::*;
-/// One source-neutral cultivated continuation of an admitted native spool bundle.
+
+pub const SITUATED_NATIVE_TRANSPORT_SCAFFOLD_SCHEMA: &str =
+    "holonic-engine.situated-native-transport-scaffold.v1";
+
+/// One source-neutral cultivated continuation of an admitted native transport scaffold.
 ///
-/// This is an explicit returned type transition: the admitted v2 native bundle remains readable
-/// unchanged, while the new owner move-owns it together with the exact mixed and reconstruction
-/// relations which the v2 wire did not claim to carry.
+/// This is an explicit returned type transition: the new owner move-owns the admitted scaffold
+/// together with the exact mixed and reconstruction relations founded by cultivation.
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct NativeSituatedSpoolBundle {
+pub struct SituatedNativeTransportScaffold {
     pub schema: String,
-    pub(crate) native: NativeSpoolBundle,
+    pub(crate) native: NativeTransportScaffold,
     pub(crate) mixed_constitutive_families: Vec<NativeMixedConstitutiveFamily>,
     pub(crate) exact_reconstruction_fibres: Vec<NativeExactReconstructionFibre>,
 }
 
 /// The exact predecessor returned when a situated deposit is withdrawn.  The first deposit
-/// crosses back to its admitted native bundle; later deposits remain in the situated owner.
+/// crosses back to its admitted native scaffold; later deposits remain in the situated owner.
 #[derive(Debug, PartialEq, Eq)]
-pub enum NativeSituatedSpoolPredecessor {
-    Native(NativeSpoolBundle),
-    Situated(NativeSituatedSpoolBundle),
+pub enum SituatedNativeTransportPredecessor {
+    Native(NativeTransportScaffold),
+    Situated(SituatedNativeTransportScaffold),
 }
 
-/// Recoverable ownership transfer for an arbitrary thread in a situated bundle.  Every compact
+/// Recoverable ownership transfer for an arbitrary thread in a situated scaffold.  Every compact
 /// mixed family and exact affine fibre incident to that thread travels with the native withdrawal.
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -49,16 +52,16 @@ pub struct NativeSituatedRadicalWithdrawal {
     pub direction: Vec<Rat>,
 }
 
-impl NativeSituatedSpoolPredecessor {
+impl SituatedNativeTransportPredecessor {
     pub fn identity_sha256(&self) -> Result<String, NativeSpoolRefusal> {
         match self {
-            Self::Native(bundle) => native_bundle_identity(bundle),
-            Self::Situated(bundle) => bundle.identity_sha256(),
+            Self::Native(scaffold) => native_scaffold_identity(scaffold),
+            Self::Situated(scaffold) => scaffold.identity_sha256(),
         }
     }
 }
 
-impl NativeSituatedSpoolBundle {
+impl SituatedNativeTransportScaffold {
     pub fn read(bytes: &[u8]) -> Result<Self, NativeSpoolRefusal> {
         let situated: Self = serde_json::from_slice(bytes)
             .map_err(|error| NativeSpoolRefusal::Wire(error.to_string()))?;
@@ -76,7 +79,7 @@ impl NativeSituatedSpoolBundle {
         Ok(sha256_bytes(&bytes))
     }
 
-    pub fn native(&self) -> &NativeSpoolBundle {
+    pub fn native(&self) -> &NativeTransportScaffold {
         &self.native
     }
 
@@ -89,7 +92,7 @@ impl NativeSituatedSpoolBundle {
     }
 
     pub fn validate(&self) -> Result<(), NativeSpoolRefusal> {
-        if self.schema != NATIVE_SITUATED_SPOOL_BUNDLE_SCHEMA {
+        if self.schema != SITUATED_NATIVE_TRANSPORT_SCAFFOLD_SCHEMA {
             return Err(NativeSpoolRefusal::Schema(self.schema.clone()));
         }
         self.native.validate()?;
@@ -111,7 +114,7 @@ impl NativeSituatedSpoolBundle {
             self.mixed_constitutive_families,
             self.exact_reconstruction_fibres,
             deposit,
-            NativeSituatedPredecessorKind::SituatedBundle,
+            SituatedNativeTransportPredecessorKind::SituatedScaffold,
             None,
         )
     }
@@ -137,7 +140,7 @@ impl NativeSituatedSpoolBundle {
             self.mixed_constitutive_families,
             self.exact_reconstruction_fibres,
             deposit,
-            NativeSituatedPredecessorKind::SituatedBundle,
+            SituatedNativeTransportPredecessorKind::SituatedScaffold,
             Some(admitted_predecessor_identity_sha256),
         )
     }
@@ -147,7 +150,7 @@ impl NativeSituatedSpoolBundle {
     pub fn withdraw_deposit(
         self,
         receipt: NativeThreadDepositReceipt,
-    ) -> Result<(NativeSituatedSpoolPredecessor, NativeThreadDeposit), NativeSpoolRefusal> {
+    ) -> Result<(SituatedNativeTransportPredecessor, NativeThreadDeposit), NativeSpoolRefusal> {
         withdraw_situated_deposit(self, receipt)
     }
 
@@ -158,7 +161,7 @@ impl NativeSituatedSpoolBundle {
         self,
         admitted_successor_identity_sha256: &str,
         receipt: NativeThreadDepositReceipt,
-    ) -> Result<(NativeSituatedSpoolPredecessor, NativeThreadDeposit), NativeSpoolRefusal> {
+    ) -> Result<(SituatedNativeTransportPredecessor, NativeThreadDeposit), NativeSpoolRefusal> {
         withdraw_situated_deposit_from_admitted(self, admitted_successor_identity_sha256, receipt)
     }
 
@@ -167,7 +170,7 @@ impl NativeSituatedSpoolBundle {
     pub fn withdraw_deposit_batch(
         self,
         receipt: NativeThreadDepositBatchReceipt,
-    ) -> Result<(NativeSpoolBundle, Vec<NativeThreadDeposit>), NativeSpoolRefusal> {
+    ) -> Result<(NativeTransportScaffold, Vec<NativeThreadDeposit>), NativeSpoolRefusal> {
         withdraw_native_deposit_batch(self, receipt)
     }
 
@@ -222,7 +225,7 @@ impl NativeSituatedSpoolBundle {
                 fibre.thread == thread_address
                     || !fibre.occurrences.is_disjoint(&incident_occurrences)
             });
-        let admitted_native_identity_sha256 = native_bundle_identity_from_admitted(&self.native)?;
+        let admitted_native_identity_sha256 = native_scaffold_identity_from_admitted(&self.native)?;
         let (native, withdrawal) = self.native.withdraw_thread_from_admitted(
             &admitted_native_identity_sha256,
             spool_address,

@@ -1,4 +1,4 @@
-//! Conduct one complete native bundle through the codec-neutral HIF3 circulation.
+//! Conduct one complete native scaffold through the codec-neutral HIF3 circulation.
 
 use std::{collections::BTreeSet, env, fs};
 
@@ -6,22 +6,23 @@ use holonic_engine::native_ecology::holonic_intelligence::{
     BinaryEmissionCodec, ExteriorEmissionCodec, InferenceCirculation, NativeInferenceRequest,
     Utf8InspectionCodec, conduct_native_inference,
 };
-use holonic_engine::native_spool::NativeSpoolBundle;
+use holonic_engine::native_spool::NativeTransportScaffold;
 use serde_json::json;
 
 fn main() -> Result<(), String> {
     let address = env::args()
         .nth(1)
         .ok_or("usage: inspect_native_inference_circulation_hif3 NATIVE_SPOOL_BUNDLE")?;
-    let bundle = NativeSpoolBundle::read(&fs::read(&address).map_err(display)?).map_err(display)?;
-    let caused_predecessors = bundle
+    let scaffold =
+        NativeTransportScaffold::read(&fs::read(&address).map_err(display)?).map_err(display)?;
+    let caused_predecessors = scaffold
         .spools
         .iter()
         .flat_map(|spool| &spool.threads)
         .flat_map(|thread| &thread.occurrences)
         .filter_map(|occurrence| occurrence.predecessor)
         .collect::<BTreeSet<_>>();
-    let (spool, thread, occurrence) = bundle
+    let (spool, thread, occurrence) = scaffold
         .spools
         .iter()
         .flat_map(|spool| {
@@ -34,7 +35,7 @@ fn main() -> Result<(), String> {
         })
         .find(|(_, _, occurrence)| caused_predecessors.contains(&occurrence.occurrence))
         .or_else(|| {
-            bundle.spools.iter().find_map(|spool| {
+            scaffold.spools.iter().find_map(|spool| {
                 spool.threads.iter().find_map(|thread| {
                     thread
                         .occurrences
@@ -49,7 +50,7 @@ fn main() -> Result<(), String> {
         .first()
         .ok_or("empty receiver family")?;
     let circulation = conduct_native_inference(
-        &bundle,
+        &scaffold,
         NativeInferenceRequest {
             spool: spool.address.clone(),
             thread: thread.address.clone(),
@@ -70,12 +71,12 @@ fn main() -> Result<(), String> {
         .successor_requests()
         .first()
         .cloned()
-        .map(|request| conduct_native_inference(&bundle, request).map_err(display))
+        .map(|request| conduct_native_inference(&scaffold, request).map_err(display))
         .transpose()?;
     let receipt = json!({
         "schema":"holonic-engine.native-inference-circulation-inspection.v1",
         "truth_status":"established-bounded; implemented-exact; measured",
-        "bundle":bundle.address,
+        "scaffold":scaffold.address,
         "entering_occurrence":circulation.entering_occurrence().occurrence.0,
         "receiver":circulation.receiver().0,
         "word_population":circulation.face().ordered_word.len(),

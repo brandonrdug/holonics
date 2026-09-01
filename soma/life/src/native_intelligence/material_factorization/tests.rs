@@ -322,7 +322,7 @@ impl MaterialFactorizationStanding for InsufficiencyStanding {
 
     fn material_standing_ecology(
         &self,
-    ) -> &holonic_engine::native_spool::NativeSituatedSpoolBundle {
+    ) -> &holonic_engine::native_spool::SituatedNativeTransportScaffold {
         unreachable!("an insufficient candidate family never enters situated support")
     }
 

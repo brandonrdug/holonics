@@ -6,8 +6,8 @@ use holonic_engine::{
     native_spool::{
         NativeConstitutiveResponse, NativeDepositFibreDelta, NativeExactReconstructionFibre,
         NativeIncidenceTerm, NativeMixedConstitutiveFamily, NativeParametronCell,
-        NativeReceiverConsequence, NativeSituatedSpoolBundle, NativeThread, NativeThreadDeposit,
-        NATIVE_THREAD_DEPOSIT_SCHEMA, NATIVE_THREAD_SCHEMA,
+        NativeReceiverConsequence, NativeThread, NativeThreadDeposit,
+        SituatedNativeTransportScaffold, NATIVE_THREAD_DEPOSIT_SCHEMA, NATIVE_THREAD_SCHEMA,
     },
     receiver_history_compression::NativeStateId,
     ExactComplexWaveCurrent, OccurrencePort,
@@ -38,7 +38,7 @@ pub(super) struct ReturnedDifferenceStaging {
 }
 
 pub(super) fn derive_returned_difference_deposit_from_history(
-    ecology: &NativeSituatedSpoolBundle,
+    ecology: &SituatedNativeTransportScaffold,
     branch_threads: &[String],
     prior_returns: &[(String, Vec<Rat>)],
     difference: &SituatedDifferenceSection,
@@ -360,7 +360,7 @@ fn returned_mixed_family(
 }
 
 fn emitting_thread_current(
-    ecology: &NativeSituatedSpoolBundle,
+    ecology: &SituatedNativeTransportScaffold,
     thread_address: &str,
 ) -> Result<ExactComplexWaveCurrent, ReturnedDifferenceError> {
     let thread = ecology
@@ -390,7 +390,7 @@ fn emitting_thread_current(
 }
 
 pub(super) fn common_spool_address_from_threads(
-    ecology: &NativeSituatedSpoolBundle,
+    ecology: &SituatedNativeTransportScaffold,
     branch_threads: &[String],
 ) -> Result<String, ReturnedDifferenceError> {
     let first = branch_threads.first().ok_or_else(|| {

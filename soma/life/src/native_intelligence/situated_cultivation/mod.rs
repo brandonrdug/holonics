@@ -19,9 +19,10 @@ use holonic_engine::{
         NativeConstitutiveResponse, NativeDepositFibreDelta, NativeExactReconstructionFibre,
         NativeIncidenceTerm, NativeMixedConstitutiveFamily, NativeParametronCell,
         NativePullbackOccurrence, NativeReceiverConsequence, NativeSituatedRadicalWithdrawal,
-        NativeSituatedSpoolBundle, NativeSituatedSpoolPredecessor, NativeSituatedThreadWithdrawal,
-        NativeThread, NativeThreadDeposit, NativeThreadDepositBatchReceipt,
-        NativeThreadDepositReceipt, NATIVE_THREAD_DEPOSIT_SCHEMA, NATIVE_THREAD_SCHEMA,
+        NativeSituatedThreadWithdrawal, NativeThread, NativeThreadDeposit,
+        NativeThreadDepositBatchReceipt, NativeThreadDepositReceipt,
+        SituatedNativeTransportPredecessor, SituatedNativeTransportScaffold,
+        NATIVE_THREAD_DEPOSIT_SCHEMA, NATIVE_THREAD_SCHEMA,
     },
     receiver_history_compression::NativeStateId,
     ExactComplexWaveCurrent, OccurrencePort,
@@ -64,14 +65,14 @@ pub struct SituatedCultivationBranch {
 }
 
 /// One continuing situated Athena ecology.  It does not wrap an unchanged predecessor: the K3
-/// bundle has moved into `ecology`, where the deposited threads and every incident exact relation
+/// scaffold has moved into `ecology`, where the deposited threads and every incident exact relation
 /// are part of the same singular owner.  `realization` is only its recomputed addressed view.
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SituatedCultivatedEcologyRest {
     schema: String,
     predecessor_wire_sha256: String,
-    ecology: NativeSituatedSpoolBundle,
+    ecology: SituatedNativeTransportScaffold,
     realization: ReceiverHistoryRealizationPassage,
     branches: Vec<SituatedCultivationBranch>,
     deposit_receipt: NativeThreadDepositBatchReceipt,
@@ -102,7 +103,7 @@ pub struct LaboratoryCultivatedRest {
     schema: String,
     predecessor_rest_identity_sha256: String,
     predecessor_wire_sha256: String,
-    ecology: NativeSituatedSpoolBundle,
+    ecology: SituatedNativeTransportScaffold,
     realization: ReceiverHistoryRealizationPassage,
     branches: Vec<SituatedCultivationBranch>,
     predecessor_deposit_receipt: NativeThreadDepositBatchReceipt,
@@ -124,7 +125,7 @@ pub struct RecurrentLaboratoryCultivatedRest {
     rest_identity_history: Vec<String>,
     origin_predecessor_rest_identity_sha256: String,
     predecessor_wire_sha256: String,
-    ecology: NativeSituatedSpoolBundle,
+    ecology: SituatedNativeTransportScaffold,
     realization: ReceiverHistoryRealizationPassage,
     branches: Vec<SituatedCultivationBranch>,
     predecessor_deposit_receipt: NativeThreadDepositBatchReceipt,

@@ -49,19 +49,19 @@ pub enum NativeSpoolRefusal {
     Separator(String),
     #[error("native spool {0} has a malformed interchange receipt")]
     Interchange(String),
-    #[error("native spool bundle {0} is empty or incomplete")]
-    MalformedBundle(String),
+    #[error("native transport scaffold {0} is empty or incomplete")]
+    MalformedScaffold(String),
     #[error("native spool address {0} is repeated")]
     DuplicateSpool(String),
-    #[error("native spool composition is missing, repeated, or names the wrong owner")]
-    BundleComposition,
-    #[error("native spool bundle has more than one disconnected component")]
-    DisconnectedBundle,
+    #[error("native scaffold composition is missing, repeated, or names the wrong owner")]
+    ScaffoldComposition,
+    #[error("native transport scaffold has more than one disconnected component")]
+    DisconnectedScaffold,
     #[error("receiver insufficiency is malformed or does not exhibit its retained fibre")]
     Insufficiency,
-    #[error("native spool {0} is absent from this bundle")]
+    #[error("native spool {0} is absent from this scaffold")]
     UnknownSpool(String),
-    #[error("native thread {0} is absent from this bundle")]
+    #[error("native thread {0} is absent from this scaffold")]
     UnknownThread(String),
     #[error("native occurrence {0:?} is absent from the addressed thread")]
     UnknownOccurrence(EventId),

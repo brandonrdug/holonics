@@ -271,21 +271,33 @@ forensic audit and exact HIF7 release receipt are in
 
 ## Active campaign — Native Transport Scaffold and repeated circulation
 
-**Current frontier:** SCF1
+**Current frontier:** SCF2
 
-**SCF1 — WHOLE-OBJECT RUST SCAFFOLD MIGRATION — IS THE SOLE NEXT DEED.**
+**SCF2 — EXACT MULTIMODAL GEMMA LIFT INTO SCAFFOLD FACETS — IS THE SOLE NEXT DEED.**
 
 [definition] Brandon's direct instruction of 2026-09-01 founds the ordered `SCF0--SCF6` campaign
 under
 [`THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md`](THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md).
-SCF0 returned the neutral Lean scaffold, bounded-dispersion control, repeated actual-successor
-circulation, and scaffold-release law. SCF1 now replaces the whole-object `NativeSpoolBundle`
-vocabulary with `NativeTransportScaffold` across Soulkiller, profiles, Athena rest, and conduct,
-without an alias or compatibility decoder.
+SCF0 returned the neutral formal laws. SCF1 replaced the whole-object Rust vocabulary with
+`NativeTransportScaffold` across Soulkiller, profiles, Athena rest, and conduct without an alias or
+compatibility decoder. SCF2 now composes exact Gemma configuration, Safetensors, codeword,
+processor, and modality-excitation testimony while keeping every source role cold.
 
 [proved-derived; formal-checked; measured] SCF0 passed. The live umbrella built 3,769 jobs; document
 law, epistemic tags, and source shape remained green. Its exact receipt is
 [`research/records/2026-09-01_SCF0_NATIVE_TRANSPORT_SCAFFOLD_REPEATED_CIRCULATION_AND_WITHDRAWAL_LAWS_RETURNED.md`](../research/records/2026-09-01_SCF0_NATIVE_TRANSPORT_SCAFFOLD_REPEATED_CIRCULATION_AND_WITHDRAWAL_LAWS_RETURNED.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] SCF1 passed. The engine
+library returned 1,994 passed, zero failed, and 32 ignored; life returned 466 passed, zero failed,
+and 14 ignored. Its exact receipt is
+[`research/records/2026-09-01_SCF1_NATIVE_TRANSPORT_SCAFFOLD_REPLACED_THE_WHOLE_OBJECT_SPOOL_BUNDLE.md`](../research/records/2026-09-01_SCF1_NATIVE_TRANSPORT_SCAFFOLD_REPLACED_THE_WHOLE_OBJECT_SPOOL_BUNDLE.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] SCF2's first unit reconciled
+the local Gemma 4 E4B configuration, processor, and all 2,130 BF16 Safetensors declarations into
+five complete cold transport families with zero unclassified tensors. It verified the 2,560-wide
+shared carrier and text-only output without executing the model. Its exact return and open
+excitation boundary are in
+[`research/records/2026-09-01_SCF2_GEMMA4_E4B_COLD_MULTIMODAL_CHART_RECONCILED_ALL_2130_TENSORS.md`](../research/records/2026-09-01_SCF2_GEMMA4_E4B_COLD_MULTIMODAL_CHART_RECONCILED_ALL_2130_TENSORS.md).
 
 [definition] The complete order is:
 

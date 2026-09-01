@@ -4,8 +4,8 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::native_spool::{
-    NativeAddressedSection, NativeCollapsedFibre, NativeShortestSeparator, NativeSpoolBundle,
-    NativeSpoolConductReturn, NativeSpoolRefusal,
+    NativeAddressedSection, NativeCollapsedFibre, NativeShortestSeparator,
+    NativeSpoolConductReturn, NativeSpoolRefusal, NativeTransportScaffold,
 };
 use crate::receiver_exact_compression::{InputId, Observation, ReceiverId};
 use crate::receiver_history_compression::NativeStateId;
@@ -114,7 +114,7 @@ impl ExteriorReturnAperture {
 /// One borrowed-rest inference circulation with one terminal resident return.
 #[derive(Debug)]
 pub struct NativeInferenceCirculation<'a> {
-    morphology: &'a NativeSpoolBundle,
+    morphology: &'a NativeTransportScaffold,
     entering: NativeAddressedSection<'a>,
     conducted: NativeSpoolConductReturn,
     face: NativeEmissionSection,
@@ -138,7 +138,7 @@ impl NativeInferenceCirculation<'_> {
 }
 
 impl<'a> InferenceCirculation for NativeInferenceCirculation<'a> {
-    type Morphology = NativeSpoolBundle;
+    type Morphology = NativeTransportScaffold;
     type EnteringOccurrence = crate::native_spool::NativeThreadOccurrence;
     type ActiveSection = NativeAddressedSection<'a>;
     type ConductedSection = NativeSpoolConductReturn;
@@ -195,7 +195,7 @@ impl<'a> InferenceCirculation for NativeInferenceCirculation<'a> {
 }
 
 pub fn conduct_native_inference(
-    morphology: &NativeSpoolBundle,
+    morphology: &NativeTransportScaffold,
     request: NativeInferenceRequest,
 ) -> Result<NativeInferenceCirculation<'_>, NativeInferenceError> {
     morphology.validate()?;
@@ -319,7 +319,7 @@ pub fn conduct_native_inference(
             .open_exterior
             .iter()
             .map(|testimony| OpenObligation {
-                scope: OpenScope::Bundle,
+                scope: OpenScope::Scaffold,
                 testimony,
             }),
     );

@@ -3,8 +3,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use crate::native_spool::{
     NativeCollapsedFibre, NativeConstitutiveResponse, NativeGeneratorDescent, NativeIncidenceTerm,
     NativeMutualConstitutiveResponse, NativeParametronCell, NativeReceiverConsequence,
-    NativeSerialPullback, NativeSpoolBundle, NativeSpoolComposition, NativeSpoolRefusal,
-    NativeThread, NativeThreadObstruction, NativeThreadOccurrence,
+    NativeSerialPullback, NativeSpoolComposition, NativeSpoolRefusal, NativeThread,
+    NativeThreadObstruction, NativeThreadOccurrence, NativeTransportScaffold,
 };
 use crate::receiver_history_compression::{NativeStateId, ReceiverFactor};
 use crate::{BoundaryId, EventId};
@@ -64,7 +64,7 @@ pub struct ReconstructionFacet<'a> {
 pub enum OpenScope {
     Thread,
     Spool,
-    Bundle,
+    Scaffold,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -73,7 +73,7 @@ pub struct OpenObligation<'a> {
     pub testimony: &'a str,
 }
 
-/// A borrowed intrinsic profile. Every load-bearing facet remains owned by the native bundle.
+/// A borrowed intrinsic profile. Every load-bearing facet remains owned by the native scaffold.
 #[derive(Debug, PartialEq, Eq)]
 pub struct IntrinsicNativeHolonProfile<'a> {
     pub spool_address: &'a str,
@@ -94,7 +94,7 @@ pub struct IntrinsicNativeHolonProfile<'a> {
 /// The complete borrowed profile of one native ecology owner.
 #[derive(Debug, PartialEq, Eq)]
 pub struct NativeEcologyProfile<'a> {
-    pub bundle_address: &'a str,
+    pub scaffold_address: &'a str,
     pub holons: Vec<IntrinsicNativeHolonProfile<'a>>,
     pub compositions: &'a [NativeSpoolComposition],
     pub open_obligations: Vec<OpenObligation<'a>>,
@@ -104,7 +104,7 @@ pub struct NativeEcologyProfile<'a> {
 #[derive(Debug)]
 pub struct ProfiledDismantlingReturn<'a, Return>
 where
-    Return: DismantlingBoundaryReturn<Productive = NativeSpoolBundle>,
+    Return: DismantlingBoundaryReturn<Productive = NativeTransportScaffold>,
 {
     pub returned: &'a Return,
     pub productive_profile: NativeEcologyProfile<'a>,
@@ -114,7 +114,7 @@ pub fn profile_dismantling_return<Return>(
     returned: &Return,
 ) -> Result<ProfiledDismantlingReturn<'_, Return>, NativeSpoolRefusal>
 where
-    Return: DismantlingBoundaryReturn<Productive = NativeSpoolBundle>,
+    Return: DismantlingBoundaryReturn<Productive = NativeTransportScaffold>,
 {
     Ok(ProfiledDismantlingReturn {
         productive_profile: returned.productive().intrinsic_holon_profile()?,
@@ -122,7 +122,7 @@ where
     })
 }
 
-impl NativeSpoolBundle {
+impl NativeTransportScaffold {
     pub fn intrinsic_holon_profile(&self) -> Result<NativeEcologyProfile<'_>, NativeSpoolRefusal> {
         self.validate()?;
         let mut holons = Vec::new();
@@ -185,7 +185,7 @@ impl NativeSpoolBundle {
                 }));
                 open_obligations.extend(self.open_exterior.iter().map(|testimony| {
                     OpenObligation {
-                        scope: OpenScope::Bundle,
+                        scope: OpenScope::Scaffold,
                         testimony: testimony.as_str(),
                     }
                 }));
@@ -234,12 +234,12 @@ impl NativeSpoolBundle {
             .open_exterior
             .iter()
             .map(|testimony| OpenObligation {
-                scope: OpenScope::Bundle,
+                scope: OpenScope::Scaffold,
                 testimony: testimony.as_str(),
             })
             .collect();
         Ok(NativeEcologyProfile {
-            bundle_address: &self.address,
+            scaffold_address: &self.address,
             holons,
             compositions: &self.compositions,
             open_obligations,

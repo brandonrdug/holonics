@@ -4,7 +4,7 @@
 **Date:** 2026-09-01
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** SCF1.
+**Current frontier:** SCF2.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md),
@@ -167,19 +167,32 @@ equal-supply/different-boundary control, exact emission-to-later-ingress joining
 load-bearing-then-withdrawable scaffold law. The live umbrella built 3,769 jobs. Its receipt is
 [`../research/records/2026-09-01_SCF0_NATIVE_TRANSPORT_SCAFFOLD_REPEATED_CIRCULATION_AND_WITHDRAWAL_LAWS_RETURNED.md`](../research/records/2026-09-01_SCF0_NATIVE_TRANSPORT_SCAFFOLD_REPEATED_CIRCULATION_AND_WITHDRAWAL_LAWS_RETURNED.md).
 
-### SCF1 — replace the whole-object spool-bundle name with native transport scaffold — CURRENT
+### SCF1 — replace the whole-object spool-bundle name with native transport scaffold — PASSED
 
 [definition] Replace `NativeSpoolBundle` and its whole-object wire vocabulary with
 `NativeTransportScaffold` without an alias or decoder. Retain `NativeSpool` for one winding family
 and `NativeThread` for one addressed section. Update Rust profiles, Soulkiller, Athena rest,
 resident conduct, and the universal catalog as one coherent owner migration.
 
-### SCF2 — exact multimodal Gemma lift into scaffold facets
+[established-bounded; implemented-exact; source-inspected; measured] SCF1 returned
+`NativeTransportScaffold` and `SituatedNativeTransportScaffold` without compatibility aliases.
+Engine tests returned 1,994 passed, zero failed, and 32 ignored; life returned 466 passed, zero
+failed, and 14 ignored. Its receipt is
+[`../research/records/2026-09-01_SCF1_NATIVE_TRANSPORT_SCAFFOLD_REPLACED_THE_WHOLE_OBJECT_SPOOL_BUNDLE.md`](../research/records/2026-09-01_SCF1_NATIVE_TRANSPORT_SCAFFOLD_REPLACED_THE_WHOLE_OBJECT_SPOOL_BUNDLE.md).
+
+### SCF2 — exact multimodal Gemma lift into scaffold facets — CURRENT
 
 [definition] Compose the exact foreign configuration/Safetensors/codeword owners with actual text,
 vision, video, and audio excitation. Return active sections, interventions, projection lineage,
 preimage fibres, unexcited capability, and modality-specific cold testimony. Do not infer a native
 section from a tensor name or projection weight alone.
+
+[established-bounded; implemented-exact; source-inspected; measured] The cold multimodal chart now
+reconciles all 2,130 local Gemma 4 E4B tensors into language, vision, audio, vision-projection, and
+audio-projection families; verifies configuration/processor carriers and text-only output; and
+refuses cross-family excitation. It executed no model and founded no native section. The current
+edge is actual modality excitation/intervention and returned consequence. Its receipt is
+[`../research/records/2026-09-01_SCF2_GEMMA4_E4B_COLD_MULTIMODAL_CHART_RECONCILED_ALL_2130_TENSORS.md`](../research/records/2026-09-01_SCF2_GEMMA4_E4B_COLD_MULTIMODAL_CHART_RECONCILED_ALL_2130_TENSORS.md).
 
 ### SCF3 — consume the productive scaffold into one Athena rest
 

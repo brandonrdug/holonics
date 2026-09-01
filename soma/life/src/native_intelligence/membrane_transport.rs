@@ -16,8 +16,8 @@ use holonic_engine::{
         ResidentQuadraticMomentReturn,
     },
     native_spool::{
-        NativeCollapsedFibre, NativeIncidenceTerm, NativeParametronCell, NativeSituatedSpoolBundle,
-        NativeThread, NativeThreadOccurrence,
+        NativeCollapsedFibre, NativeIncidenceTerm, NativeParametronCell, NativeThread,
+        NativeThreadOccurrence, SituatedNativeTransportScaffold,
     },
     quantity::Dimension,
     receiver_history_compression::{
@@ -53,7 +53,7 @@ pub const MEMBRANE_CROSSING_SCHEMA: &str = "soma-life.membrane-crossing.v1";
 pub trait MembraneStanding {
     fn validate_membrane_standing(&self) -> Result<(), String>;
     fn membrane_identity(&self) -> &str;
-    fn membrane_ecology(&self) -> &NativeSituatedSpoolBundle;
+    fn membrane_ecology(&self) -> &SituatedNativeTransportScaffold;
     fn membrane_realization(&self) -> &ReceiverHistoryRealizationPassage;
     fn membrane_branches(&self) -> &[SituatedCultivationBranch];
     fn membrane_correspondences(&self) -> &[LaboratoryFactorCycleCorrespondence];
@@ -125,7 +125,7 @@ impl<Standing: MembraneStanding> MembraneStanding for AdmittedMembraneStanding<S
     fn membrane_identity(&self) -> &str {
         self.standing.membrane_identity()
     }
-    fn membrane_ecology(&self) -> &NativeSituatedSpoolBundle {
+    fn membrane_ecology(&self) -> &SituatedNativeTransportScaffold {
         self.standing.membrane_ecology()
     }
     fn membrane_realization(&self) -> &ReceiverHistoryRealizationPassage {
@@ -1265,7 +1265,7 @@ struct NativeContactView<'a> {
 }
 
 /// Borrow an occurrence from a rest whose constructor already established its invariant.  This is
-/// deliberately not a second validator: replaying `NativeSpoolBundle::validate` at every hot
+/// deliberately not a second validator: replaying `NativeTransportScaffold::validate` at every hot
 /// contact was the measured whole-rest remount defect which the admitted-wire witness removes.
 fn native_contact_view<'a>(
     rest: &'a impl MembraneStanding,

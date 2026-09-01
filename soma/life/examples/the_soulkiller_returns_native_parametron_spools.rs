@@ -2,7 +2,7 @@
 //!
 //! Soulkiller receives already-returned causal testimony. It does not replay foreign inference and
 //! assumes no foreign operator factorization, retained-state convention, width, or model family. The child
-//! remount receives only the native bundle and conducts its addressed word/current on the card.
+//! remount receives only the native scaffold and conducts its addressed word/current on the card.
 
 use std::{
     collections::BTreeSet,
@@ -14,7 +14,7 @@ use std::{
 
 use holonic_engine::{
     native_anatomy::NativeAnatomyRest,
-    native_spool::{NativeSpoolBundle, ReceiverInsufficiencyCause},
+    native_spool::{NativeTransportScaffold, ReceiverInsufficiencyCause},
     soulkiller::{
         foreign_section_descent::ForeignReachableSectionRest,
         receiver_restricted_transport::ExteriorNativeAnatomyWitness,
@@ -49,9 +49,9 @@ const OUTPUT: &str = "output/the_soulkiller_returns_mutually_coupled_native_para
 fn main() -> Result<(), String> {
     let arguments = env::args().collect::<Vec<_>>();
     if arguments.get(1).map(String::as_str) == Some("--remount") {
-        let bundle = arguments.get(2).ok_or("missing native bundle")?;
+        let scaffold = arguments.get(2).ok_or("missing native scaffold")?;
         let output = arguments.get(3).ok_or("missing return directory")?;
-        return remount(Path::new(bundle), Path::new(output));
+        return remount(Path::new(scaffold), Path::new(output));
     }
 
     let output = PathBuf::from(OUTPUT);
@@ -116,7 +116,11 @@ fn main() -> Result<(), String> {
         .exterior
         .canonical_bytes(&returned.native)
         .map_err(display)?;
-    fs::write(native_dir.join("native-spool-bundle.rest"), &native_bytes).map_err(display)?;
+    fs::write(
+        native_dir.join("native-transport-scaffold.rest"),
+        &native_bytes,
+    )
+    .map_err(display)?;
     fs::write(
         exterior_dir.join("exterior-soulkiller.witness"),
         &exterior_bytes,
@@ -181,7 +185,10 @@ fn main() -> Result<(), String> {
     let both_identity_compositions =
         reverse_composition_exact && rerestored.canonical_bytes().map_err(display)? == native_bytes;
 
-    run_source_detached(&native_dir.join("native-spool-bundle.rest"), &detached_dir)?;
+    run_source_detached(
+        &native_dir.join("native-transport-scaffold.rest"),
+        &detached_dir,
+    )?;
     let detached_return: serde_json::Value =
         serde_json::from_slice(&fs::read(detached_dir.join("00-return.json")).map_err(display)?)
             .map_err(display)?;
@@ -200,8 +207,8 @@ fn main() -> Result<(), String> {
         "schema":"holonics.soulkiller-native-parametron-spool-grade.v2",
         "truth_status":"established-bounded; implemented-exact; measured",
         "passed":passed,
-        "native_bundle_identity_sha256":native_identity,
-        "native_bundle_octets":native_bytes.len(),
+        "native_scaffold_identity_sha256":native_identity,
+        "native_scaffold_octets":native_bytes.len(),
         "exterior_witness_octets":exterior_bytes.len(),
         "spool_population":rerestored.spools.len(),
         "thread_population":rerestored.spools.iter().map(|spool| spool.threads.len()).sum::<usize>(),
@@ -222,7 +229,7 @@ fn main() -> Result<(), String> {
     fs::write(
         output.join("INSPECTION.md"),
         format!(
-            "# Soulkiller returns native Parametron spools\n\n[established-bounded; implemented-exact; measured] Soulkiller dismantled one admitted exterior causal section into a source-neutral native spool bundle and physically separate witness. The bundle remounted alone, conducted its addressed word and exact Complex-Parametron incidence on the resident card, returned a real receiver separator after thread withdrawal, and satisfied both structural inverse compositions on restoration. No foreign operator factorization, source executor, or foreign replay entered native conduct.\n\n```json\n{}\n```\n",
+            "# Soulkiller returns native Parametron spools\n\n[established-bounded; implemented-exact; measured] Soulkiller dismantled one admitted exterior causal section into a source-neutral native transport scaffold and physically separate witness. The scaffold remounted alone, conducted its addressed word and exact Complex-Parametron incidence on the resident card, returned a real receiver separator after thread withdrawal, and satisfied both structural inverse compositions on restoration. No foreign operator factorization, source executor, or foreign replay entered native conduct.\n\n```json\n{}\n```\n",
             serde_json::to_string_pretty(&grade).map_err(display)?
         ),
     )
@@ -236,8 +243,9 @@ fn main() -> Result<(), String> {
     }
 }
 
-fn remount(bundle: &Path, output: &Path) -> Result<(), String> {
-    let native = NativeSpoolBundle::read(&fs::read(bundle).map_err(display)?).map_err(display)?;
+fn remount(scaffold: &Path, output: &Path) -> Result<(), String> {
+    let native =
+        NativeTransportScaffold::read(&fs::read(scaffold).map_err(display)?).map_err(display)?;
     let spool = &native.spools[0];
     let generator = spool.generator_descents[0].generator;
     let receiver = *spool
@@ -269,7 +277,7 @@ fn remount(bundle: &Path, output: &Path) -> Result<(), String> {
             "schema":"holonics.detached-native-parametron-spool-return.v1",
             "truth_status":"established-bounded; implemented-exact; measured",
             "passed":passed,
-            "mounted_paths":["/native-spool-bundle.rest"],
+            "mounted_paths":["/native-transport-scaffold.rest"],
             "exterior_witness_available":false,
             "foreign_realization_available":false,
             "foreign_executor_available":false,
@@ -279,9 +287,9 @@ fn remount(bundle: &Path, output: &Path) -> Result<(), String> {
     )
 }
 
-fn run_source_detached(bundle: &Path, output: &Path) -> Result<(), String> {
+fn run_source_detached(scaffold: &Path, output: &Path) -> Result<(), String> {
     let executable = fs::canonicalize(env::current_exe().map_err(display)?).map_err(display)?;
-    let bundle = fs::canonicalize(bundle).map_err(display)?;
+    let scaffold = fs::canonicalize(scaffold).map_err(display)?;
     let output = fs::canonicalize(output).map_err(display)?;
     let mut command = Command::new("bwrap");
     command
@@ -302,8 +310,8 @@ fn run_source_detached(bundle: &Path, output: &Path) -> Result<(), String> {
         .arg(executable)
         .arg("/native-spool-return")
         .arg("--ro-bind")
-        .arg(bundle)
-        .arg("/native-spool-bundle.rest")
+        .arg(scaffold)
+        .arg("/native-transport-scaffold.rest")
         .arg("--bind")
         .arg(output)
         .arg("/return")
@@ -313,7 +321,7 @@ fn run_source_detached(bundle: &Path, output: &Path) -> Result<(), String> {
             "--",
             "/native-spool-return",
             "--remount",
-            "/native-spool-bundle.rest",
+            "/native-transport-scaffold.rest",
             "/return",
         ])
         .status()

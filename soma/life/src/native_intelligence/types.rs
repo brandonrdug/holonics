@@ -4,8 +4,8 @@ use holonic_engine::{
     cuda_refine::ResidentComplexIncidenceReturn,
     native_spool::{
         NativeCollapsedFibre, NativeConstitutiveResponse, NativeIncidenceTerm,
-        NativeMutualConstitutiveResponse, NativeSpoolBundle, NativeSpoolConductReturn,
-        NativeThreadHand, ReceiverInsufficiency,
+        NativeMutualConstitutiveResponse, NativeSpoolConductReturn, NativeThreadHand,
+        NativeTransportScaffold, ReceiverInsufficiency,
     },
     receiver_exact_compression::{InputId, Observation, ReceiverId},
     receiver_history_compression::NativeStateId,
@@ -28,9 +28,9 @@ pub struct NativeSectionAddress {
     pub occurrence: EventId,
 }
 
-/// Structural realization of one spool bundle as a receiver-history ecology.
+/// Structural realization of one transport scaffold as a receiver-history ecology.
 ///
-/// This is not a second topology. Validation recomputes every member and root from the bundle and
+/// This is not a second topology. Validation recomputes every member and root from the scaffold and
 /// proves connectedness through the common native cells which its addressed occurrences carry.
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -48,14 +48,14 @@ pub struct ReceiverHistoryRealizationPassage {
     pub open_exterior: Vec<String>,
 }
 
-/// One connected native ecology. The bundle owns its topology and current; the realization is the
+/// One connected native ecology. The scaffold owns its topology and current; the realization is the
 /// exact conduct-bearing section atlas derived from that same owner. Foreign ancestry and source
 /// execution are unrepresentable here.
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct NativeEcologyRest {
     pub schema: String,
-    pub ecology: NativeSpoolBundle,
+    pub ecology: NativeTransportScaffold,
     pub realization: ReceiverHistoryRealizationPassage,
 }
 

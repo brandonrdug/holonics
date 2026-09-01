@@ -133,7 +133,7 @@ pub(crate) fn derive_recurrent_resident_coupling(
 }
 
 pub(super) fn derive_resident_coupling_from(
-    ecology: &NativeSituatedSpoolBundle,
+    ecology: &SituatedNativeTransportScaffold,
     primaries: &[(String, i64)],
 ) -> Result<ResidentCoupling, SituatedCultivationError> {
     let branch_population = primaries.len();
@@ -493,7 +493,7 @@ pub(super) fn derive_branch_deposit(
 }
 
 pub(super) fn derive_returned_difference_deposit(
-    ecology: &NativeSituatedSpoolBundle,
+    ecology: &SituatedNativeTransportScaffold,
     branches: &[SituatedCultivationBranch],
     prior_returns: &[SituatedReturnedDifferenceDeposit],
     difference: &SituatedDifferenceSection,

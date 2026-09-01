@@ -94,7 +94,7 @@ rested ecology --mount--> situated occurrence
 
 - `RestedTransportEcology`: one move-owned body, rested morphology, exact remount, typed ingress,
   native conduct, receiver family, reconstruction fibre, and open exterior;
-- `DismantlingReturn`: productive native bundle, physically separate cold reconstruction witness,
+- `DismantlingReturn`: productive native transport scaffold, physically separate cold reconstruction witness,
   and receiver insufficiency family;
 - `InferenceCirculationReturn`: entering occurrence, active continuation, emitted occurrence,
   receiver face, exact lineage, and unchanged reusable morphology at the inference cut;
@@ -250,7 +250,7 @@ and Rust catalog rows name the same carrier and open fibre; no compatibility ali
 ecology, digest identity, or second implementation is introduced.
 
 [established-bounded; implemented-exact; measured] HIF1 returned the neutral
-`native_ecology::holonic_intelligence` package. `NativeSpoolBundle` itself implements the rested
+`native_ecology::holonic_intelligence` package. `NativeTransportScaffold` itself implements the rested
 surface; borrowed profiles retain every native facet; neutral and direct resident word conduct are
 structurally equal. The engine suite returned 1,984 passed, zero failed, 32 ignored; `life`
 type-checked and source-shape remained green. The exact return is recorded in

@@ -10,11 +10,12 @@ use crate::generator_native_rest::{
 };
 use crate::native_ecology::recurrent_return::{RecurrentReturnRefusal, recurrence_trace};
 use crate::native_spool::{
-    NATIVE_SPOOL_BUNDLE_SCHEMA, NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA, NativeCollapsedFibre,
-    NativeConstitutiveResponse, NativeGeneratorDescent, NativeGeneratorStep, NativeIncidenceTerm,
-    NativeMutualConstitutiveResponse, NativeParametronCell, NativePullbackOccurrence,
-    NativeReceiverConsequence, NativeSerialPullback, NativeSpool, NativeSpoolBundle,
+    NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA, NATIVE_TRANSPORT_SCAFFOLD_SCHEMA,
+    NativeCollapsedFibre, NativeConstitutiveResponse, NativeGeneratorDescent, NativeGeneratorStep,
+    NativeIncidenceTerm, NativeMutualConstitutiveResponse, NativeParametronCell,
+    NativePullbackOccurrence, NativeReceiverConsequence, NativeSerialPullback, NativeSpool,
     NativeSpoolRefusal, NativeThread, NativeThreadHand, NativeThreadOccurrence,
+    NativeTransportScaffold,
 };
 use crate::receiver_exact_compression::{InputId, Observation, ReceiverId};
 use crate::receiver_history_compression::{NativeStateId, NativeTransport, ReceiverFactor};
@@ -118,7 +119,7 @@ fn thread(
 
 /// Construct one productive native cycle from intrinsic current/incidence values alone.
 /// No serialized predecessor, source corpus, foreign tensor chart, or historical output is read.
-pub fn direct_source_neutral_rest() -> Result<NativeSpoolBundle, NativeSpoolRefusal> {
+pub fn direct_source_neutral_rest() -> Result<NativeTransportScaffold, NativeSpoolRefusal> {
     let first = EventId(1);
     let second = EventId(2);
     let left = thread(
@@ -217,19 +218,19 @@ pub fn direct_source_neutral_rest() -> Result<NativeSpoolBundle, NativeSpoolRefu
         interchanges: Vec::new(),
         open_exterior: vec!["larger receiver histories remain open".to_owned()],
     };
-    let bundle = NativeSpoolBundle {
-        schema: NATIVE_SPOOL_BUNDLE_SCHEMA.to_owned(),
-        address: "bundle/direct-source-neutral".to_owned(),
+    let scaffold = NativeTransportScaffold {
+        schema: NATIVE_TRANSPORT_SCAFFOLD_SCHEMA.to_owned(),
+        address: "scaffold/direct-source-neutral".to_owned(),
         spools: vec![spool],
         compositions: Vec::new(),
         open_exterior: vec!["additional compatible native organs remain open".to_owned()],
     };
-    bundle.validate()?;
-    Ok(bundle)
+    scaffold.validate()?;
+    Ok(scaffold)
 }
 
 fn recurrent_projection(
-    rest: &NativeSpoolBundle,
+    rest: &NativeTransportScaffold,
 ) -> Result<(GeneratorNativeRest, InputId), SourceNeutralClosureError> {
     let spool = rest
         .spools
@@ -292,7 +293,7 @@ pub struct SourceNeutralResidentClosureReceipt {
 }
 
 pub struct SourceNeutralResidentClosure {
-    pub rest: NativeSpoolBundle,
+    pub rest: NativeTransportScaffold,
     pub cultivation: SourceNeutralCultivationClosure,
     pub receipt: SourceNeutralResidentClosureReceipt,
 }
@@ -302,7 +303,7 @@ pub fn close_direct_source_neutral_cycle()
 -> Result<SourceNeutralResidentClosure, SourceNeutralClosureError> {
     let rest = direct_source_neutral_rest()?;
     let rest_wire = rest.canonical_bytes()?;
-    let remounted = NativeSpoolBundle::read(&rest_wire)?;
+    let remounted = NativeTransportScaffold::read(&rest_wire)?;
     let request = NativeInferenceRequest {
         spool: "spool/direct-cycle".to_owned(),
         thread: "thread/outward".to_owned(),

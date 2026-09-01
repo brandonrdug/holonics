@@ -402,7 +402,7 @@ impl MaterialFactorizationStanding for OpticalProductRest {
 
     fn material_standing_ecology(
         &self,
-    ) -> &holonic_engine::native_spool::NativeSituatedSpoolBundle {
+    ) -> &holonic_engine::native_spool::SituatedNativeTransportScaffold {
         self.body().body().body().body().ecology()
     }
 

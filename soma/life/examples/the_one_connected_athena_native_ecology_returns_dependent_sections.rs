@@ -1,4 +1,4 @@
-//! K3 — Eros composes the sealed native spool bundle into one connected Athena ecology.
+//! K3 — Eros composes the sealed native transport scaffold into one connected Athena ecology.
 //!
 //! The detached child receives only the Athena rest. It conducts addressed generator transport
 //! and exact Complex-Parametron current on the card, and it returns a dependent receiver face or
@@ -12,7 +12,7 @@ use std::{
 };
 
 use holonic_engine::{
-    native_spool::{NativeSpoolBundle, ReceiverInsufficiencyCause},
+    native_spool::{NativeTransportScaffold, ReceiverInsufficiencyCause},
     receiver_exact_compression::ReceiverId,
     EventId,
 };
@@ -23,7 +23,7 @@ use sha2::{Digest, Sha256};
 
 const BUNDLE: &str = concat!(
     "output/the_complete_visible_exchange_founds_native_spool_r0q5/",
-    "native-spool-bundle.rest"
+    "native-transport-scaffold.rest"
 );
 const OUTPUT: &str = "output/the_one_connected_athena_native_ecology_returns_dependent_sections_k3";
 
@@ -56,8 +56,9 @@ fn main() -> Result<(), String> {
     }
     let started = Instant::now();
     fs::create_dir_all(output.join("detached-return")).map_err(display)?;
-    let bundle = NativeSpoolBundle::read(&fs::read(BUNDLE).map_err(display)?).map_err(display)?;
-    let rest = NativeEcologyRest::found(bundle).map_err(display)?;
+    let scaffold =
+        NativeTransportScaffold::read(&fs::read(BUNDLE).map_err(display)?).map_err(display)?;
+    let rest = NativeEcologyRest::found(scaffold).map_err(display)?;
     eprintln!(
         "k3-stage=rest-founded elapsed_ms={}",
         started.elapsed().as_millis()

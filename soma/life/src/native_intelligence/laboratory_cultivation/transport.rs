@@ -287,7 +287,7 @@ fn validate_correspondences(
 }
 
 fn validate_returned_correspondences(
-    ecology: &holonic_engine::native_spool::NativeSituatedSpoolBundle,
+    ecology: &holonic_engine::native_spool::SituatedNativeTransportScaffold,
     branches: &[SituatedCultivationBranch],
     potential: &NativeRelationalPotentialComplex,
     correspondences: &[LaboratoryFactorCycleCorrespondence],

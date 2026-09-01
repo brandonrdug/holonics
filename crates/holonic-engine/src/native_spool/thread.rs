@@ -22,14 +22,11 @@ use crate::{
 
 pub const NATIVE_THREAD_SCHEMA: &str = "holonic-engine.native-thread.v1";
 pub const NATIVE_SPOOL_SCHEMA: &str = "holonic-engine.native-spool.v2";
-pub const NATIVE_SPOOL_BUNDLE_SCHEMA: &str = "holonic-engine.native-spool-bundle.v2";
 pub const NATIVE_THREAD_DEPOSIT_SCHEMA: &str = "holonic-engine.native-thread-deposit.v1";
 pub const NATIVE_THREAD_DEPOSIT_RECEIPT_SCHEMA: &str =
     "holonic-engine.native-thread-deposit-receipt.v1";
 pub const NATIVE_THREAD_DEPOSIT_BATCH_RECEIPT_SCHEMA: &str =
     "holonic-engine.native-thread-deposit-batch-receipt.v1";
-pub const NATIVE_SITUATED_SPOOL_BUNDLE_SCHEMA: &str =
-    "holonic-engine.native-situated-spool-bundle.v1";
 pub const RECEIVER_INSUFFICIENCY_SCHEMA: &str = "holonic-engine.receiver-insufficiency.v1";
 
 /// One carrying occurrence in the population `W_f` of an addressed span.

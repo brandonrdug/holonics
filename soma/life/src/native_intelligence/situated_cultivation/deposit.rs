@@ -21,7 +21,7 @@ impl LaboratoryCultivatedRest {
         &self.predecessor_rest_identity_sha256
     }
 
-    pub fn ecology(&self) -> &NativeSituatedSpoolBundle {
+    pub fn ecology(&self) -> &SituatedNativeTransportScaffold {
         &self.ecology
     }
 
@@ -191,7 +191,7 @@ impl LaboratoryCultivatedRest {
         let (predecessor, native_deposit) = ecology
             .withdraw_deposit(returned_deposit.native_receipt.clone())
             .map_err(|error| SituatedCultivationError::Ecology(error.to_string()))?;
-        let NativeSituatedSpoolPredecessor::Situated(ecology) = predecessor else {
+        let SituatedNativeTransportPredecessor::Situated(ecology) = predecessor else {
             return Err(SituatedCultivationError::Ecology(
                 "the L5 inverse did not return its L2 situated predecessor".to_owned(),
             ));
@@ -391,7 +391,7 @@ impl RecurrentLaboratoryCultivatedRest {
         &self.origin_predecessor_rest_identity_sha256
     }
 
-    pub fn ecology(&self) -> &NativeSituatedSpoolBundle {
+    pub fn ecology(&self) -> &SituatedNativeTransportScaffold {
         &self.ecology
     }
 
@@ -623,7 +623,7 @@ impl RecurrentLaboratoryCultivatedRest {
                 returned_deposit.native_receipt.clone(),
             )
             .map_err(|error| SituatedCultivationError::Ecology(error.to_string()))?;
-        let NativeSituatedSpoolPredecessor::Situated(ecology) = predecessor else {
+        let SituatedNativeTransportPredecessor::Situated(ecology) = predecessor else {
             return Err(SituatedCultivationError::Ecology(
                 "a recurrent withdrawal escaped the situated body".to_owned(),
             ));

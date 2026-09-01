@@ -12,12 +12,12 @@ use sha2::{Digest, Sha256};
 use thiserror::Error;
 
 use crate::{
-    native_spool::{NativeSpoolBundle, NativeSpoolRefusal},
+    native_spool::{NativeSpoolRefusal, NativeTransportScaffold},
     receiver_exact_compression::{InputId, ReceiverId},
 };
 
 pub const EXTERIOR_SOULKILLER_WITNESS_SCHEMA: &str =
-    "holonic-engine.exterior-soulkiller-witness.v1";
+    "holonic-engine.exterior-soulkiller-witness.v2";
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -72,7 +72,7 @@ pub struct ForeignFragmentTestimony {
 }
 
 /// The exterior side of one extraction map.  Multiple fragments may found one native thread, but
-/// the native thread address is the only value crossing toward the neutral bundle.
+/// the native thread address is the only value crossing toward the neutral scaffold.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ThreadExtractionWitness {
@@ -104,8 +104,8 @@ pub struct SpoolCondensationWitness {
 
 /// Physically exterior ancestry and reconstruction testimony.
 ///
-/// The witness binds to the canonical native bundle bytes in one direction.  The bundle carries no
-/// reciprocal witness identity and therefore remains independently mountable.
+/// The witness binds to the canonical native scaffold bytes in one direction. The scaffold
+/// carries no reciprocal witness identity and therefore remains independently mountable.
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ExteriorSoulkillerWitness {
@@ -115,7 +115,7 @@ pub struct ExteriorSoulkillerWitness {
     pub fragments: Vec<ForeignFragmentTestimony>,
     pub thread_extractions: Vec<ThreadExtractionWitness>,
     pub spool_condensations: Vec<SpoolCondensationWitness>,
-    pub native_bundle_sha256: String,
+    pub native_scaffold_sha256: String,
     pub reconstruction_fibre: BTreeSet<String>,
     pub unexcited_capability: BTreeSet<String>,
     pub open_exterior: Vec<String>,
@@ -124,7 +124,7 @@ pub struct ExteriorSoulkillerWitness {
 impl ExteriorSoulkillerWitness {
     #[allow(clippy::too_many_arguments)]
     pub fn seal(
-        bundle: &NativeSpoolBundle,
+        scaffold: &NativeTransportScaffold,
         realization: ForeignRealizationTestimony,
         execution: ForeignExecutionTestimony,
         fragments: Vec<ForeignFragmentTestimony>,
@@ -134,7 +134,7 @@ impl ExteriorSoulkillerWitness {
         unexcited_capability: BTreeSet<String>,
         open_exterior: Vec<String>,
     ) -> Result<Self, ExteriorSoulkillerWitnessRefusal> {
-        let native_bundle_sha256 = bundle_identity(bundle)?;
+        let native_scaffold_sha256 = scaffold_identity(scaffold)?;
         let witness = Self {
             schema: EXTERIOR_SOULKILLER_WITNESS_SCHEMA.to_owned(),
             realization,
@@ -142,48 +142,48 @@ impl ExteriorSoulkillerWitness {
             fragments,
             thread_extractions,
             spool_condensations,
-            native_bundle_sha256,
+            native_scaffold_sha256,
             reconstruction_fibre,
             unexcited_capability,
             open_exterior,
         };
-        witness.validate(bundle)?;
+        witness.validate(scaffold)?;
         Ok(witness)
     }
 
     pub fn read(
         bytes: &[u8],
-        bundle: &NativeSpoolBundle,
+        scaffold: &NativeTransportScaffold,
     ) -> Result<Self, ExteriorSoulkillerWitnessRefusal> {
         let witness: Self = serde_json::from_slice(bytes)
             .map_err(|error| ExteriorSoulkillerWitnessRefusal::Wire(error.to_string()))?;
-        witness.validate(bundle)?;
+        witness.validate(scaffold)?;
         Ok(witness)
     }
 
     pub fn canonical_bytes(
         &self,
-        bundle: &NativeSpoolBundle,
+        scaffold: &NativeTransportScaffold,
     ) -> Result<Vec<u8>, ExteriorSoulkillerWitnessRefusal> {
-        self.validate(bundle)?;
+        self.validate(scaffold)?;
         serde_json::to_vec(self)
             .map_err(|error| ExteriorSoulkillerWitnessRefusal::Wire(error.to_string()))
     }
 
     pub fn validate(
         &self,
-        bundle: &NativeSpoolBundle,
+        scaffold: &NativeTransportScaffold,
     ) -> Result<(), ExteriorSoulkillerWitnessRefusal> {
         if self.schema != EXTERIOR_SOULKILLER_WITNESS_SCHEMA {
             return Err(ExteriorSoulkillerWitnessRefusal::Schema(
                 self.schema.clone(),
             ));
         }
-        bundle
+        scaffold
             .validate()
-            .map_err(ExteriorSoulkillerWitnessRefusal::NativeBundle)?;
-        if bundle_identity(bundle)? != self.native_bundle_sha256 {
-            return Err(ExteriorSoulkillerWitnessRefusal::NativeBundleIdentity);
+            .map_err(ExteriorSoulkillerWitnessRefusal::NativeScaffold)?;
+        if scaffold_identity(scaffold)? != self.native_scaffold_sha256 {
+            return Err(ExteriorSoulkillerWitnessRefusal::NativeScaffoldIdentity);
         }
         if self.realization.name.is_empty()
             || self.realization.format.is_empty()
@@ -226,12 +226,12 @@ impl ExteriorSoulkillerWitness {
             return Err(ExteriorSoulkillerWitnessRefusal::Fragment);
         }
 
-        let native_threads = bundle
+        let native_threads = scaffold
             .spools
             .iter()
             .flat_map(|spool| spool.threads.iter().map(|thread| thread.address.as_str()))
             .collect::<BTreeSet<_>>();
-        let native_spools = bundle
+        let native_spools = scaffold
             .spools
             .iter()
             .map(|spool| spool.address.as_str())
@@ -266,7 +266,7 @@ impl ExteriorSoulkillerWitness {
 
         let mut condensed_spools = BTreeSet::new();
         for condensation in &self.spool_condensations {
-            let Some(spool) = bundle
+            let Some(spool) = scaffold
                 .spools
                 .iter()
                 .find(|spool| spool.address == condensation.native_spool)
@@ -352,10 +352,12 @@ impl ExteriorSoulkillerWitness {
     }
 }
 
-fn bundle_identity(bundle: &NativeSpoolBundle) -> Result<String, ExteriorSoulkillerWitnessRefusal> {
-    let bytes = bundle
+fn scaffold_identity(
+    scaffold: &NativeTransportScaffold,
+) -> Result<String, ExteriorSoulkillerWitnessRefusal> {
+    let bytes = scaffold
         .canonical_bytes()
-        .map_err(ExteriorSoulkillerWitnessRefusal::NativeBundle)?;
+        .map_err(ExteriorSoulkillerWitnessRefusal::NativeScaffold)?;
     Ok(hex(&Sha256::digest(bytes)))
 }
 
@@ -373,19 +375,19 @@ pub enum ExteriorSoulkillerWitnessRefusal {
     Wire(String),
     #[error("unknown exterior Soulkiller witness schema {0}")]
     Schema(String),
-    #[error("native spool bundle refused: {0}")]
-    NativeBundle(#[source] NativeSpoolRefusal),
-    #[error("the exterior witness does not bind the supplied native bundle")]
-    NativeBundleIdentity,
+    #[error("native transport scaffold refused: {0}")]
+    NativeScaffold(#[source] NativeSpoolRefusal),
+    #[error("the exterior witness does not bind the supplied native scaffold")]
+    NativeScaffoldIdentity,
     #[error("foreign realization testimony is empty or malformed")]
     Realization,
     #[error("foreign execution testimony is empty, malformed, or still live")]
     Execution,
     #[error("foreign fragment testimony is empty, repeated, or malformed")]
     Fragment,
-    #[error("the exterior thread extraction does not cover the native bundle exactly")]
+    #[error("the exterior thread extraction does not cover the native scaffold exactly")]
     ThreadExtraction,
-    #[error("the exterior spool condensation does not cover the native bundle exactly")]
+    #[error("the exterior spool condensation does not cover the native scaffold exactly")]
     SpoolCondensation,
     #[error("the exterior reconstruction fibre is incomplete or malformed")]
     ReconstructionFibre,
@@ -397,17 +399,17 @@ mod tests {
     use crate::{
         BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase, OccurrencePort,
         native_spool::{
-            NATIVE_SPOOL_BUNDLE_SCHEMA, NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA,
+            NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA, NATIVE_TRANSPORT_SCAFFOLD_SCHEMA,
             NativeCollapsedFibre, NativeConstitutiveResponse, NativeGeneratorDescent,
             NativeGeneratorStep, NativeIncidenceTerm, NativeParametronCell,
-            NativeReceiverConsequence, NativeSpool, NativeSpoolBundle, NativeThread,
-            NativeThreadHand, NativeThreadOccurrence,
+            NativeReceiverConsequence, NativeSpool, NativeThread, NativeThreadHand,
+            NativeThreadOccurrence, NativeTransportScaffold,
         },
         receiver_exact_compression::Observation,
         receiver_history_compression::{NativeStateId, ReceiverFactor},
     };
 
-    fn bundle() -> NativeSpoolBundle {
+    fn scaffold() -> NativeTransportScaffold {
         let event = EventId(1);
         let native = NativeStateId(0);
         let receiver = ReceiverId(2);
@@ -458,9 +460,9 @@ mod tests {
             open_exterior: Vec::new(),
             reconstruction_fibre: BTreeSet::from([event]),
         };
-        NativeSpoolBundle {
-            schema: NATIVE_SPOOL_BUNDLE_SCHEMA.to_owned(),
-            address: "bundle/native-loop".to_owned(),
+        NativeTransportScaffold {
+            schema: NATIVE_TRANSPORT_SCAFFOLD_SCHEMA.to_owned(),
+            address: "scaffold/native-loop".to_owned(),
             spools: vec![NativeSpool {
                 schema: NATIVE_SPOOL_SCHEMA.to_owned(),
                 address: "spool/native-loop".to_owned(),
@@ -496,9 +498,9 @@ mod tests {
         }
     }
 
-    fn witness(bundle: &NativeSpoolBundle) -> ExteriorSoulkillerWitness {
+    fn witness(scaffold: &NativeTransportScaffold) -> ExteriorSoulkillerWitness {
         ExteriorSoulkillerWitness::seal(
-            bundle,
+            scaffold,
             ForeignRealizationTestimony {
                 name: "inherited-transformer".to_owned(),
                 format: "external-weight-container".to_owned(),
@@ -539,32 +541,33 @@ mod tests {
     }
 
     #[test]
-    fn witness_is_separate_and_binds_the_exact_native_bundle() {
-        let bundle = bundle();
-        let witness = witness(&bundle);
-        let bytes = witness.canonical_bytes(&bundle).expect("witness bytes");
-        let remounted = ExteriorSoulkillerWitness::read(&bytes, &bundle).expect("witness remount");
+    fn witness_is_separate_and_binds_the_exact_native_scaffold() {
+        let scaffold = scaffold();
+        let witness = witness(&scaffold);
+        let bytes = witness.canonical_bytes(&scaffold).expect("witness bytes");
+        let remounted =
+            ExteriorSoulkillerWitness::read(&bytes, &scaffold).expect("witness remount");
         assert_eq!(remounted, witness);
     }
 
     #[test]
     fn witness_refuses_an_unknown_native_thread() {
-        let bundle = bundle();
-        let mut witness = witness(&bundle);
-        witness.thread_extractions[0].native_thread = "thread/not-in-bundle".to_owned();
+        let scaffold = scaffold();
+        let mut witness = witness(&scaffold);
+        witness.thread_extractions[0].native_thread = "thread/not-in-scaffold".to_owned();
         assert!(matches!(
-            witness.validate(&bundle),
+            witness.validate(&scaffold),
             Err(ExteriorSoulkillerWitnessRefusal::ThreadExtraction)
         ));
     }
 
     #[test]
     fn witness_refuses_a_live_foreign_session() {
-        let bundle = bundle();
-        let mut witness = witness(&bundle);
+        let scaffold = scaffold();
+        let mut witness = witness(&scaffold);
         witness.execution.session_closed = false;
         assert!(matches!(
-            witness.validate(&bundle),
+            witness.validate(&scaffold),
             Err(ExteriorSoulkillerWitnessRefusal::Execution)
         ));
     }

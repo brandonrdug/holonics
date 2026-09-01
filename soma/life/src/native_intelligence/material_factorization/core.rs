@@ -689,8 +689,9 @@ pub trait MaterialFactorizationStanding {
     fn material_standing_branches(
         &self,
     ) -> &[crate::native_intelligence::SituatedCultivationBranch];
-    fn material_standing_ecology(&self)
-        -> &holonic_engine::native_spool::NativeSituatedSpoolBundle;
+    fn material_standing_ecology(
+        &self,
+    ) -> &holonic_engine::native_spool::SituatedNativeTransportScaffold;
     fn material_standing_realization(
         &self,
     ) -> &crate::native_intelligence::ReceiverHistoryRealizationPassage;
@@ -720,7 +721,7 @@ impl MaterialFactorizationStanding for SituatedCultivatedEcologyRest {
 
     fn material_standing_ecology(
         &self,
-    ) -> &holonic_engine::native_spool::NativeSituatedSpoolBundle {
+    ) -> &holonic_engine::native_spool::SituatedNativeTransportScaffold {
         self.ecology()
     }
 
@@ -748,7 +749,7 @@ impl MaterialFactorizationStanding for LaboratoryCultivatedRest {
 
     fn material_standing_ecology(
         &self,
-    ) -> &holonic_engine::native_spool::NativeSituatedSpoolBundle {
+    ) -> &holonic_engine::native_spool::SituatedNativeTransportScaffold {
         self.ecology()
     }
 

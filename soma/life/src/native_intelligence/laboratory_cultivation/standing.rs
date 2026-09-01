@@ -7,7 +7,7 @@ impl super::MembraneStanding for AffineLaboratoryCultivatedRest {
         self.identity()
     }
 
-    fn membrane_ecology(&self) -> &holonic_engine::native_spool::NativeSituatedSpoolBundle {
+    fn membrane_ecology(&self) -> &holonic_engine::native_spool::SituatedNativeTransportScaffold {
         self.body.ecology()
     }
 
@@ -37,7 +37,7 @@ impl super::MembraneStanding for ReturnedAffineLaboratoryRest {
         self.identity()
     }
 
-    fn membrane_ecology(&self) -> &holonic_engine::native_spool::NativeSituatedSpoolBundle {
+    fn membrane_ecology(&self) -> &holonic_engine::native_spool::SituatedNativeTransportScaffold {
         self.body.ecology()
     }
 
@@ -67,7 +67,7 @@ impl super::MembraneStanding for RecurrentReturnedAffineLaboratoryRest {
         self.identity()
     }
 
-    fn membrane_ecology(&self) -> &holonic_engine::native_spool::NativeSituatedSpoolBundle {
+    fn membrane_ecology(&self) -> &holonic_engine::native_spool::SituatedNativeTransportScaffold {
         self.body.ecology()
     }
 
@@ -103,7 +103,7 @@ impl MaterialFactorizationStanding for AffineLaboratoryCultivatedRest {
 
     fn material_standing_ecology(
         &self,
-    ) -> &holonic_engine::native_spool::NativeSituatedSpoolBundle {
+    ) -> &holonic_engine::native_spool::SituatedNativeTransportScaffold {
         self.body.ecology()
     }
 
@@ -143,7 +143,7 @@ impl MaterialFactorizationStanding for ReturnedAffineLaboratoryRest {
 
     fn material_standing_ecology(
         &self,
-    ) -> &holonic_engine::native_spool::NativeSituatedSpoolBundle {
+    ) -> &holonic_engine::native_spool::SituatedNativeTransportScaffold {
         self.body.ecology()
     }
 
@@ -181,7 +181,7 @@ impl MaterialFactorizationStanding for RecurrentReturnedAffineLaboratoryRest {
 
     fn material_standing_ecology(
         &self,
-    ) -> &holonic_engine::native_spool::NativeSituatedSpoolBundle {
+    ) -> &holonic_engine::native_spool::SituatedNativeTransportScaffold {
         self.body.ecology()
     }
 

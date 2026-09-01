@@ -1,7 +1,7 @@
 use super::*;
 impl SourceNeutralReturnedEcology {
     pub(crate) fn found(
-        ecology: NativeSituatedSpoolBundle,
+        ecology: SituatedNativeTransportScaffold,
         branches: Vec<SourceNeutralCultivationBranch>,
         predecessor_deposit_receipt: NativeThreadDepositBatchReceipt,
         returned_deposits: Vec<SourceNeutralReturnedDeposit>,
@@ -160,7 +160,7 @@ impl SourceNeutralReturnedEcology {
         &self.identity_sha256
     }
 
-    pub fn ecology(&self) -> &NativeSituatedSpoolBundle {
+    pub fn ecology(&self) -> &SituatedNativeTransportScaffold {
         &self.ecology
     }
 
@@ -489,7 +489,7 @@ impl SourceNeutralEcologyRest {
                 returned.native_receipt.clone(),
             )
             .map_err(|error| SourceNeutralEcologyError::Body(error.to_string()))?;
-        let NativeSituatedSpoolPredecessor::Situated(ecology) = predecessor else {
+        let SituatedNativeTransportPredecessor::Situated(ecology) = predecessor else {
             return Err(SourceNeutralEcologyError::Body(
                 "the returned source-neutral deposit escaped its situated ecology".to_owned(),
             ));

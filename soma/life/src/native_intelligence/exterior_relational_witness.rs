@@ -5,7 +5,7 @@
 //! it and no method accepts it during conduct.
 
 use holonic_engine::native_spool::{
-    NativeSituatedSpoolBundle, NativeThreadDepositBatchReceipt, NativeThreadDepositReceipt,
+    NativeThreadDepositBatchReceipt, NativeThreadDepositReceipt, SituatedNativeTransportScaffold,
 };
 use num_rational::BigRational as Rat;
 use serde::{Deserialize, Serialize};
@@ -200,7 +200,7 @@ struct DevelopmentalAffineRest {
 
 #[derive(Deserialize)]
 struct DevelopmentalReturnedEcology {
-    ecology: NativeSituatedSpoolBundle,
+    ecology: SituatedNativeTransportScaffold,
     branches: Vec<DevelopmentalCultivationBranch>,
     predecessor_deposit_receipt: NativeThreadDepositBatchReceipt,
     returned_deposits: Vec<DevelopmentalReturnedDeposit>,

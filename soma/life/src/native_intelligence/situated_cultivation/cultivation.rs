@@ -111,7 +111,7 @@ impl SituatedCultivatedEcologyRest {
         &self.predecessor_wire_sha256
     }
 
-    pub fn ecology(&self) -> &NativeSituatedSpoolBundle {
+    pub fn ecology(&self) -> &SituatedNativeTransportScaffold {
         &self.ecology
     }
 
@@ -417,7 +417,7 @@ impl SituatedCultivatedEcologyRest {
         Ok(self)
     }
 
-    /// Apply the atomic rank-four deposit inverse and recover the exact K3 predecessor bundle.
+    /// Apply the atomic rank-four deposit inverse and recover the exact K3 predecessor scaffold.
     pub fn withdraw_all(
         self,
     ) -> Result<CompleteSituatedCultivationWithdrawal, SituatedCultivationError> {
@@ -533,7 +533,7 @@ impl MembraneStanding for SituatedCultivatedEcologyRest {
         self.identity()
     }
 
-    fn membrane_ecology(&self) -> &NativeSituatedSpoolBundle {
+    fn membrane_ecology(&self) -> &SituatedNativeTransportScaffold {
         self.ecology()
     }
 

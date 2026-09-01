@@ -1,7 +1,7 @@
 //! Neutral executable surface for intrinsic holon profiles and intelligent circulation.
 //!
 //! This module packages existing native owners. It does not introduce another ecology, copy a
-//! spool bundle, or make a product/campaign name part of generic transport. Foreign format intake,
+//! transport scaffold, or make a product/campaign name part of generic transport. Foreign format intake,
 //! concrete inference circulation, and cultivation implementations enter in later HIF phases.
 
 #[path = "holonic_intelligence/circulation.rs"]
@@ -14,6 +14,8 @@ mod cultivation;
 mod dimensions;
 #[path = "holonic_intelligence/foreign_json.rs"]
 mod foreign_json;
+#[path = "holonic_intelligence/foreign_multimodal.rs"]
+mod foreign_multimodal;
 #[path = "holonic_intelligence/foreign_onnx.rs"]
 mod foreign_onnx;
 #[path = "holonic_intelligence/lifecycle.rs"]
@@ -32,6 +34,7 @@ pub use contact_chart::*;
 pub use cultivation::*;
 pub use dimensions::*;
 pub use foreign_json::*;
+pub use foreign_multimodal::*;
 pub use foreign_onnx::*;
 pub use lifecycle::*;
 pub use profile::*;

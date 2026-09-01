@@ -1,7 +1,7 @@
 use std::{collections::BTreeMap, error::Error, fs, ops::Range, path::PathBuf};
 
 use holonic_engine::{
-    native_spool::NativeSpoolBundle, receiver_exact_compression::ReceiverId,
+    native_spool::NativeTransportScaffold, receiver_exact_compression::ReceiverId,
     receiver_history_compression::NativeStateId,
 };
 use life::{
@@ -281,18 +281,18 @@ fn main() -> Result<(), Box<dyn Error>> {
     let returned = found_addressed_dialogue_native_spool(&occurrences)?;
     let wire = returned.native.canonical_bytes()?;
     let witness = serde_json::to_vec_pretty(&returned.exterior)?;
-    fs::write(output.join("native-spool-bundle.rest"), &wire)?;
+    fs::write(output.join("native-transport-scaffold.rest"), &wire)?;
     fs::write(output.join("exterior-dialogue-lineage.json"), witness)?;
     fs::write(
         output.join("continuation-aperture.json"),
         serde_json::to_vec_pretty(&aperture)?,
     )?;
 
-    let remounted = NativeSpoolBundle::read(&wire)?;
+    let remounted = NativeTransportScaffold::read(&wire)?;
     let spool = remounted
         .spools
         .first()
-        .ok_or("the native dialogue bundle has no spool")?;
+        .ok_or("the native dialogue scaffold has no spool")?;
     let generator = *spool
         .generator_family
         .first()

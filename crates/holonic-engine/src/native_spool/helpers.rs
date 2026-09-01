@@ -202,20 +202,20 @@ pub(crate) fn symmetric_constitutive_body(
 }
 
 pub(crate) fn native_situated_identity_parts(
-    native: &NativeSpoolBundle,
+    native: &NativeTransportScaffold,
     mixed: &[NativeMixedConstitutiveFamily],
     exact_fibres: &[NativeExactReconstructionFibre],
 ) -> Result<String, NativeSpoolRefusal> {
     #[derive(Serialize)]
     struct SituatedRef<'a> {
         schema: &'a str,
-        native: &'a NativeSpoolBundle,
+        native: &'a NativeTransportScaffold,
         mixed_constitutive_families: &'a [NativeMixedConstitutiveFamily],
         exact_reconstruction_fibres: &'a [NativeExactReconstructionFibre],
     }
     validate_situated_relations(native, mixed, exact_fibres)?;
     let bytes = serde_json::to_vec(&SituatedRef {
-        schema: NATIVE_SITUATED_SPOOL_BUNDLE_SCHEMA,
+        schema: SITUATED_NATIVE_TRANSPORT_SCAFFOLD_SCHEMA,
         native,
         mixed_constitutive_families: mixed,
         exact_reconstruction_fibres: exact_fibres,
@@ -225,7 +225,7 @@ pub(crate) fn native_situated_identity_parts(
 }
 
 pub(crate) fn validate_situated_relations(
-    native: &NativeSpoolBundle,
+    native: &NativeTransportScaffold,
     mixed: &[NativeMixedConstitutiveFamily],
     fibres: &[NativeExactReconstructionFibre],
 ) -> Result<(), NativeSpoolRefusal> {
@@ -291,7 +291,7 @@ pub(crate) fn validate_situated_relations(
 }
 
 pub(crate) fn validate_thread_deposit_against(
-    native: &NativeSpoolBundle,
+    native: &NativeTransportScaffold,
     existing_mixed: &[NativeMixedConstitutiveFamily],
     existing_fibres: &[NativeExactReconstructionFibre],
     deposit: &NativeThreadDeposit,
@@ -488,32 +488,32 @@ pub(crate) fn validate_thread_deposit_against(
 }
 
 pub(crate) fn stage_thread_deposit(
-    mut native: NativeSpoolBundle,
+    mut native: NativeTransportScaffold,
     mut mixed: Vec<NativeMixedConstitutiveFamily>,
     mut exact_fibres: Vec<NativeExactReconstructionFibre>,
     deposit: NativeThreadDeposit,
-    predecessor_kind: NativeSituatedPredecessorKind,
+    predecessor_kind: SituatedNativeTransportPredecessorKind,
     admitted_predecessor_identity_sha256: Option<&str>,
-) -> Result<(NativeSituatedSpoolBundle, NativeThreadDepositReceipt), NativeSpoolRefusal> {
+) -> Result<(SituatedNativeTransportScaffold, NativeThreadDepositReceipt), NativeSpoolRefusal> {
     if admitted_predecessor_identity_sha256.is_none() {
         native.validate()?;
         validate_situated_relations(&native, &mixed, &exact_fibres)?;
     }
     validate_thread_deposit_against(&native, &mixed, &exact_fibres, &deposit)?;
     let predecessor_identity_sha256 = if let Some(identity) = admitted_predecessor_identity_sha256 {
-        if predecessor_kind != NativeSituatedPredecessorKind::SituatedBundle {
+        if predecessor_kind != SituatedNativeTransportPredecessorKind::SituatedScaffold {
             return Err(NativeSpoolRefusal::ThreadDepositReceipt);
         }
         identity.to_owned()
     } else {
         match predecessor_kind {
-            NativeSituatedPredecessorKind::NativeBundle => {
+            SituatedNativeTransportPredecessorKind::NativeScaffold => {
                 if !mixed.is_empty() || !exact_fibres.is_empty() {
                     return Err(NativeSpoolRefusal::ThreadDepositReceipt);
                 }
-                native_bundle_identity(&native)?
+                native_scaffold_identity(&native)?
             }
-            NativeSituatedPredecessorKind::SituatedBundle => {
+            SituatedNativeTransportPredecessorKind::SituatedScaffold => {
                 native_situated_identity_parts(&native, &mixed, &exact_fibres)?
             }
         }
@@ -605,8 +605,8 @@ pub(crate) fn stage_thread_deposit(
     }
     mixed.extend(mixed_constitutive_families);
     exact_fibres.extend(exact_reconstruction_fibres);
-    let situated = NativeSituatedSpoolBundle {
-        schema: NATIVE_SITUATED_SPOOL_BUNDLE_SCHEMA.to_owned(),
+    let situated = SituatedNativeTransportScaffold {
+        schema: SITUATED_NATIVE_TRANSPORT_SCAFFOLD_SCHEMA.to_owned(),
         native,
         mixed_constitutive_families: mixed,
         exact_reconstruction_fibres: exact_fibres,
@@ -642,9 +642,15 @@ pub(crate) fn stage_thread_deposit(
 }
 
 pub(crate) fn stage_native_deposit_batch(
-    mut native: NativeSpoolBundle,
+    mut native: NativeTransportScaffold,
     mut deposits: Vec<NativeThreadDeposit>,
-) -> Result<(NativeSituatedSpoolBundle, NativeThreadDepositBatchReceipt), NativeSpoolRefusal> {
+) -> Result<
+    (
+        SituatedNativeTransportScaffold,
+        NativeThreadDepositBatchReceipt,
+    ),
+    NativeSpoolRefusal,
+> {
     native.validate()?;
     if deposits.is_empty() {
         return Err(NativeSpoolRefusal::ThreadDepositBatchReceipt);
@@ -664,7 +670,7 @@ pub(crate) fn stage_native_deposit_batch(
             "one atomic batch must enter one existing spool".to_owned(),
         ));
     }
-    let predecessor_identity_sha256 = native_bundle_identity(&native)?;
+    let predecessor_identity_sha256 = native_scaffold_identity(&native)?;
     let batch_identity_sha256 = native_deposit_batch_identity(&deposits)?;
     let symmetric_constitutive_body = symmetric_constitutive_body(&deposits)?;
 
@@ -845,8 +851,8 @@ pub(crate) fn stage_native_deposit_batch(
         placement.validate()?;
         placements.push(placement);
     }
-    let situated = NativeSituatedSpoolBundle {
-        schema: NATIVE_SITUATED_SPOOL_BUNDLE_SCHEMA.to_owned(),
+    let situated = SituatedNativeTransportScaffold {
+        schema: SITUATED_NATIVE_TRANSPORT_SCAFFOLD_SCHEMA.to_owned(),
         native,
         mixed_constitutive_families: mixed,
         exact_reconstruction_fibres: exact_fibres,
@@ -866,9 +872,9 @@ pub(crate) fn stage_native_deposit_batch(
 }
 
 pub(crate) fn withdraw_native_deposit_batch(
-    mut situated: NativeSituatedSpoolBundle,
+    mut situated: SituatedNativeTransportScaffold,
     receipt: NativeThreadDepositBatchReceipt,
-) -> Result<(NativeSpoolBundle, Vec<NativeThreadDeposit>), NativeSpoolRefusal> {
+) -> Result<(NativeTransportScaffold, Vec<NativeThreadDeposit>), NativeSpoolRefusal> {
     receipt.validate()?;
     if situated.identity_sha256()? != receipt.successor_identity_sha256 {
         return Err(NativeSpoolRefusal::ThreadDepositBatchReceipt);
@@ -982,7 +988,7 @@ pub(crate) fn withdraw_native_deposit_batch(
             .map(|descent| descent.generator)
             .collect();
     }
-    if native_bundle_identity(&situated.native)? != receipt.predecessor_identity_sha256
+    if native_scaffold_identity(&situated.native)? != receipt.predecessor_identity_sha256
         || native_deposit_batch_identity(&recovered)? != receipt.batch_identity_sha256
         || symmetric_constitutive_body(&recovered)? != receipt.symmetric_constitutive_body
     {
@@ -1023,19 +1029,19 @@ pub(crate) fn indexed_positions<T>(values: &[(usize, T)]) -> Vec<usize> {
 }
 
 pub(crate) fn withdraw_situated_deposit(
-    situated: NativeSituatedSpoolBundle,
+    situated: SituatedNativeTransportScaffold,
     receipt: NativeThreadDepositReceipt,
-) -> Result<(NativeSituatedSpoolPredecessor, NativeThreadDeposit), NativeSpoolRefusal> {
+) -> Result<(SituatedNativeTransportPredecessor, NativeThreadDeposit), NativeSpoolRefusal> {
     situated.validate()?;
-    let admitted_successor_identity_sha256 = situated_bundle_identity_from_admitted(&situated)?;
+    let admitted_successor_identity_sha256 = situated_scaffold_identity_from_admitted(&situated)?;
     withdraw_situated_deposit_from_admitted(situated, &admitted_successor_identity_sha256, receipt)
 }
 
 pub(crate) fn withdraw_situated_deposit_from_admitted(
-    situated: NativeSituatedSpoolBundle,
+    situated: SituatedNativeTransportScaffold,
     admitted_successor_identity_sha256: &str,
     receipt: NativeThreadDepositReceipt,
-) -> Result<(NativeSituatedSpoolPredecessor, NativeThreadDeposit), NativeSpoolRefusal> {
+) -> Result<(SituatedNativeTransportPredecessor, NativeThreadDeposit), NativeSpoolRefusal> {
     receipt.validate()?;
     if !is_sha256_identity(admitted_successor_identity_sha256)
         || admitted_successor_identity_sha256 != receipt.successor_identity_sha256
@@ -1146,24 +1152,24 @@ pub(crate) fn withdraw_situated_deposit_from_admitted(
         return Err(NativeSpoolRefusal::ThreadDepositReceipt);
     }
     let predecessor = match receipt.predecessor_kind {
-        NativeSituatedPredecessorKind::NativeBundle => {
+        SituatedNativeTransportPredecessorKind::NativeScaffold => {
             if !reduced.mixed_constitutive_families.is_empty()
                 || !reduced.exact_reconstruction_fibres.is_empty()
             {
                 return Err(NativeSpoolRefusal::ThreadDepositReceipt);
             }
-            NativeSituatedSpoolPredecessor::Native(reduced.native)
+            SituatedNativeTransportPredecessor::Native(reduced.native)
         }
-        NativeSituatedPredecessorKind::SituatedBundle => {
-            NativeSituatedSpoolPredecessor::Situated(reduced)
+        SituatedNativeTransportPredecessorKind::SituatedScaffold => {
+            SituatedNativeTransportPredecessor::Situated(reduced)
         }
     };
     let predecessor_identity_sha256 = match &predecessor {
-        NativeSituatedSpoolPredecessor::Native(bundle) => {
-            native_bundle_identity_from_admitted(bundle)?
+        SituatedNativeTransportPredecessor::Native(scaffold) => {
+            native_scaffold_identity_from_admitted(scaffold)?
         }
-        NativeSituatedSpoolPredecessor::Situated(bundle) => {
-            situated_bundle_identity_from_admitted(bundle)?
+        SituatedNativeTransportPredecessor::Situated(scaffold) => {
+            situated_scaffold_identity_from_admitted(scaffold)?
         }
     };
     if predecessor_identity_sha256 != receipt.predecessor_identity_sha256 {
@@ -1203,29 +1209,29 @@ pub(crate) fn restore_indexed<T>(
     Ok(())
 }
 
-pub(crate) fn native_bundle_identity(
-    bundle: &NativeSpoolBundle,
+pub(crate) fn native_scaffold_identity(
+    scaffold: &NativeTransportScaffold,
 ) -> Result<String, NativeSpoolRefusal> {
-    let bytes = bundle.canonical_bytes()?;
+    let bytes = scaffold.canonical_bytes()?;
     Ok(Sha256::digest(bytes)
         .iter()
         .map(|byte| format!("{byte:02x}"))
         .collect())
 }
 
-pub(crate) fn native_bundle_identity_from_admitted(
-    bundle: &NativeSpoolBundle,
+pub(crate) fn native_scaffold_identity_from_admitted(
+    scaffold: &NativeTransportScaffold,
 ) -> Result<String, NativeSpoolRefusal> {
-    let bytes =
-        serde_json::to_vec(bundle).map_err(|error| NativeSpoolRefusal::Wire(error.to_string()))?;
+    let bytes = serde_json::to_vec(scaffold)
+        .map_err(|error| NativeSpoolRefusal::Wire(error.to_string()))?;
     Ok(sha256_bytes(&bytes))
 }
 
-pub(crate) fn situated_bundle_identity_from_admitted(
-    bundle: &NativeSituatedSpoolBundle,
+pub(crate) fn situated_scaffold_identity_from_admitted(
+    scaffold: &SituatedNativeTransportScaffold,
 ) -> Result<String, NativeSpoolRefusal> {
-    let bytes =
-        serde_json::to_vec(bundle).map_err(|error| NativeSpoolRefusal::Wire(error.to_string()))?;
+    let bytes = serde_json::to_vec(scaffold)
+        .map_err(|error| NativeSpoolRefusal::Wire(error.to_string()))?;
     Ok(sha256_bytes(&bytes))
 }
 

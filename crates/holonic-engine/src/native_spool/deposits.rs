@@ -9,17 +9,6 @@ pub struct NativeSpoolComposition {
     pub pullback: NativeSerialPullback,
 }
 
-/// A compatible source-neutral complex of reusable native spools.
-#[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct NativeSpoolBundle {
-    pub schema: String,
-    pub address: String,
-    pub spools: Vec<NativeSpool>,
-    pub compositions: Vec<NativeSpoolComposition>,
-    pub open_exterior: Vec<String>,
-}
-
 /// The exact occurrence-fibre change carried by one novel native thread.
 ///
 /// These deltas must partition the deposited thread's complete occurrence population by its
@@ -197,7 +186,7 @@ impl NativeExactReconstructionFibre {
 ///
 /// The deposit carries the thread together with every incident relation which it introduces.  It
 /// deliberately has no source identity, semantic label, authored width, executor, or foreign
-/// coordinate.  `NativeSpoolBundle::deposit_thread` consumes this value, so the new morphology
+/// coordinate.  `NativeTransportScaffold::deposit_thread` consumes this value, so the new morphology
 /// cannot exist simultaneously inside and outside the continuing ecology.
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -302,14 +291,14 @@ pub struct NativeThreadDepositReceipt {
     pub interchange_positions: Vec<usize>,
     pub fibre_receipts: Vec<NativeDepositFibreReceipt>,
     pub exact_reconstruction_positions: Vec<usize>,
-    pub predecessor_kind: NativeSituatedPredecessorKind,
+    pub predecessor_kind: SituatedNativeTransportPredecessorKind,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
-pub enum NativeSituatedPredecessorKind {
-    NativeBundle,
-    SituatedBundle,
+pub enum SituatedNativeTransportPredecessorKind {
+    NativeScaffold,
+    SituatedScaffold,
 }
 
 impl NativeThreadDepositReceipt {

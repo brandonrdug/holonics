@@ -4,8 +4,8 @@ use holonic_engine::{
     native_ecology::holonic_intelligence::{
         NativeEcologyProfile, NativeTransportRequest, RestedTransportEcology,
     },
-    native_spool::NativeSpoolBundle,
     native_spool::NativeSpoolConductReturn,
+    native_spool::NativeTransportScaffold,
     receiver_exact_compression::{InputId, ReceiverId},
     receiver_history_compression::NativeStateId,
     BoundaryId, EventId,
@@ -18,7 +18,7 @@ use super::types::{
 };
 
 impl ReceiverHistoryRealizationPassage {
-    pub fn found(ecology: &NativeSpoolBundle) -> Result<Self, NativeEcologyError> {
+    pub fn found(ecology: &NativeTransportScaffold) -> Result<Self, NativeEcologyError> {
         ecology
             .validate()
             .map_err(|error| NativeEcologyError::Ecology(error.to_string()))?;
@@ -27,7 +27,7 @@ impl ReceiverHistoryRealizationPassage {
         Ok(passage)
     }
 
-    pub fn validate(&self, ecology: &NativeSpoolBundle) -> Result<(), NativeEcologyError> {
+    pub fn validate(&self, ecology: &NativeTransportScaffold) -> Result<(), NativeEcologyError> {
         ecology
             .validate()
             .map_err(|error| NativeEcologyError::Ecology(error.to_string()))?;
@@ -58,7 +58,7 @@ impl ReceiverHistoryRealizationPassage {
         Ok(())
     }
 
-    fn projection(ecology: &NativeSpoolBundle) -> Self {
+    fn projection(ecology: &NativeTransportScaffold) -> Self {
         let mut sections = Vec::new();
         let mut ingress_sections = Vec::new();
         let mut native_population = BTreeSet::<NativeStateId>::new();
@@ -114,7 +114,7 @@ impl ReceiverHistoryRealizationPassage {
 }
 
 impl NativeEcologyRest {
-    pub fn found(ecology: NativeSpoolBundle) -> Result<Self, NativeEcologyError> {
+    pub fn found(ecology: NativeTransportScaffold) -> Result<Self, NativeEcologyError> {
         let realization = ReceiverHistoryRealizationPassage::found(&ecology)?;
         let rest = Self {
             schema: NATIVE_ECOLOGY_REST_SCHEMA.to_owned(),
@@ -181,7 +181,7 @@ impl RestedTransportEcology for NativeEcologyRest {
 }
 
 fn components_through_native_cells(
-    ecology: &NativeSpoolBundle,
+    ecology: &NativeTransportScaffold,
     sections: &[NativeSectionAddress],
 ) -> Vec<Vec<NativeSectionAddress>> {
     let mut native_to_sections = BTreeMap::<NativeStateId, BTreeSet<usize>>::new();
