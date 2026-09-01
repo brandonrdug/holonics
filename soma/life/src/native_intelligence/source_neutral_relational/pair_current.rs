@@ -24,26 +24,6 @@ pub struct SourceNeutralAddressedResponsePairCurrent {
     pub current: ExactComplexWaveCurrent,
 }
 
-/// One exact current occurrence after a response face meets an addressed realization-site
-/// transport. Both endpoint maps and the original response occurrence remain present until the
-/// target and port junctions consume this population. Absence from this complete sparse list is
-/// the zero-support complement; no dense zero entries are materialized.
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize)]
-#[serde(deny_unknown_fields)]
-pub struct SourceNeutralAddressedRealizationPairCurrent {
-    pub response: SourceNeutralAddressedResponsePairCurrent,
-    pub source_carrier: u32,
-    pub source_site: u32,
-    pub source_local_port: u16,
-    pub target_carrier: u32,
-    pub target_site: u32,
-    pub target_local_port: u16,
-    pub exterior_target_port: u16,
-    pub factor: u32,
-    pub phase: u8,
-    pub current: ExactComplexWaveCurrent,
-}
-
 pub(super) fn join_response_pair_currents(
     pairs: &[SourceNeutralAddressedResponsePairCurrent],
 ) -> Result<Vec<SourceNeutralExteriorRealizationOrientedFactorCurrent>, SourceNeutralRelationalError>
@@ -142,7 +122,6 @@ impl SourceNeutralExteriorRealizationMorphology {
         {
             return Err(SourceNeutralRelationalError::Quotient);
         }
-        let mut unique_local_currents = BTreeMap::<(u32, u32, u32), Vec<(u32, BigUint)>>::new();
         let mut pair_currents = Vec::<SourceNeutralAddressedResponsePairCurrent>::new();
         for face in native_oriented_faces {
             if face.local_currents.is_empty() {
@@ -155,8 +134,7 @@ impl SourceNeutralExteriorRealizationMorphology {
                 let target_state = target
                     .boundary_state
                     .ok_or(SourceNeutralRelationalError::Quotient)?;
-                if local.source_section as usize >= native_sections.len()
-                    || face.target_states.binary_search(&target_state).is_err()
+                if face.target_states.binary_search(&target_state).is_err()
                     || local.factor_current.is_empty()
                     || local
                         .factor_current
@@ -167,19 +145,6 @@ impl SourceNeutralExteriorRealizationMorphology {
                     })
                 {
                     return Err(SourceNeutralRelationalError::Quotient);
-                }
-                match unique_local_currents.insert(
-                    (
-                        local.source_section,
-                        local.selected_slot,
-                        local.target_section,
-                    ),
-                    local.factor_current.clone(),
-                ) {
-                    Some(existing) if existing != local.factor_current => {
-                        return Err(SourceNeutralRelationalError::Quotient);
-                    }
-                    _ => {}
                 }
                 if face.oriented_current.is_zero() {
                     continue;
@@ -206,29 +171,6 @@ impl SourceNeutralExteriorRealizationMorphology {
             return Err(SourceNeutralRelationalError::Quotient);
         }
         let joined_factor_currents = join_response_pair_currents(&pair_currents)?;
-        let mut reconstructed_targets =
-            vec![BTreeMap::<u32, BigUint>::new(); native_sections.len()];
-        for ((_, _, target_section), factor_current) in unique_local_currents {
-            let target = reconstructed_targets
-                .get_mut(target_section as usize)
-                .ok_or(SourceNeutralRelationalError::Quotient)?;
-            for (factor, coefficient) in factor_current {
-                *target.entry(factor).or_default() += coefficient;
-            }
-        }
-        if native_sections
-            .iter()
-            .zip(reconstructed_targets)
-            .any(|(expected, returned)| {
-                expected.factor_current
-                    != returned
-                        .into_iter()
-                        .filter(|(_, coefficient)| !coefficient.is_zero())
-                        .collect::<Vec<_>>()
-            })
-        {
-            return Err(SourceNeutralRelationalError::Quotient);
-        }
         if joined_factor_currents.is_empty() {
             return Err(SourceNeutralRelationalError::Quotient);
         }

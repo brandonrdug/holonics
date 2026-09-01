@@ -144,7 +144,8 @@ pub use membrane_optical::{
 };
 pub use membrane_radiation::{
     ExteriorActionCurrent, ExteriorRadiationSurface, FactoredReceiverHistoryGateReceipt,
-    GranularEmanativeResponse, GranularEmanativeTerminal, GranularProjectiveEmanativeReturn,
+    GeneratedPortProjectiveOccurrence, GeneratedPortProjectivePassage, GranularEmanativeResponse,
+    GranularEmanativeTerminal, GranularProjectiveEmanativeReturn,
     GranularProjectiveRadiationReturn, GranularRadiationBranch, GranularRadiationSection,
     NativeOpenWorldTubeCurrentReturn, NativeOpenWorldTubeOrder, NativeOpenWorldTubeReceipt,
     NativeOpenWorldTubeReturn, NativeOpenWorldTubeTerminal, NativeOutwardPortReturn,
@@ -197,12 +198,13 @@ pub use situated_difference::{
     SituatedDifferenceSection,
 };
 pub use source_neutral_relational::{
-    SourceNeutralAddressedRealizationPairCurrent, SourceNeutralAddressedResponsePairCurrent,
-    SourceNeutralExteriorRealizationComplexSiteCurrent,
+    SourceNeutralAddressedResponsePairCurrent, SourceNeutralExteriorRealizationComplexSiteCurrent,
     SourceNeutralExteriorRealizationFactorCurrent, SourceNeutralExteriorRealizationMorphology,
     SourceNeutralExteriorRealizationOrientedFactorCurrent, SourceNeutralExteriorRealizationPassage,
     SourceNeutralExteriorRealizationSiteCurrent, SourceNeutralExteriorRealizationTargetCurrent,
-    SourceNeutralExteriorRealizationTransition, SourceNeutralPhasePopulation,
+    SourceNeutralExteriorRealizationTransition,
+    SourceNeutralExteriorRealizationTransportContribution,
+    SourceNeutralExteriorRealizationTransportObstruction, SourceNeutralPhasePopulation,
     SourceNeutralRelationalCell, SourceNeutralRelationalError, SourceNeutralRelationalFace,
     SourceNeutralRelationalIncidence, SourceNeutralRelationalMorphology,
     SOURCE_NEUTRAL_EXTERIOR_REALIZATION_MORPHOLOGY_SCHEMA,

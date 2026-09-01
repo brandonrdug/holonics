@@ -762,6 +762,7 @@ pub(super) fn complete_boundary_return(
         relational_current: None,
         receiver_coordinate_denominator: receiver_denominator.clone(),
         ports,
+        boundary_port_returns: port_returns.clone(),
         port_returns,
         entering_current: entering_current.clone(),
         total_returned_current,

@@ -920,15 +920,28 @@ impl ResidentSourceNeutralEcology {
                             .to_owned(),
                     )
                 })?;
-            vec![AddressedCurrentSection {
-                boundary_state: Some(terminal_state),
-                quadratic_weight: BigUint::from(1_u8),
-                factor_current: projective
-                    .integrated_factor_current
-                    .iter()
-                    .map(|coordinate| (coordinate.factor, coordinate.incidence.clone()))
-                    .collect(),
-            }]
+            projective
+                .contexts
+                .iter()
+                .map(|context| AddressedCurrentSection {
+                    boundary_state: Some(context.boundary_state),
+                    quadratic_weight: context.quadratic_weight.clone(),
+                    factor_current: context
+                        .factor_current
+                        .iter()
+                        .map(|coordinate| (coordinate.factor, coordinate.incidence.clone()))
+                        .collect(),
+                })
+                .chain(std::iter::once(AddressedCurrentSection {
+                    boundary_state: Some(terminal_state),
+                    quadratic_weight: BigUint::from(1_u8),
+                    factor_current: projective
+                        .integrated_factor_current
+                        .iter()
+                        .map(|coordinate| (coordinate.factor, coordinate.incidence.clone()))
+                        .collect(),
+                }))
+                .collect::<Vec<_>>()
         } else {
             // The host section is boundary/reconstruction testimony only.  The exact coefficient
             // carrier remains the already-addressed resident current and is never rebuilt here.

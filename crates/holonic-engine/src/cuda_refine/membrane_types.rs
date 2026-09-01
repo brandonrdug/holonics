@@ -459,6 +459,7 @@ pub struct ResidentGeneratedPortCurrentPassageReturn {
     /// junction.  `passage.occurrences` retains the complete population including radicals;
     /// these rows retain the productive face/slot-to-factor fibre without replaying generator
     /// transport or restriction on the host.
+    #[serde(skip_serializing)]
     pub local_currents: Vec<ResidentGeneratedPortLocalCurrent>,
     pub source_address: ResidentCurrentAddress,
     pub target_address: ResidentCurrentAddress,
@@ -733,7 +734,11 @@ pub struct ResidentQuadraticMomentReturn {
     /// rational image receiver from masquerading as an integral source-family reading.
     pub receiver_coordinate_denominator: BigInt,
     pub ports: Vec<ResidentQuadraticMomentPortReturn>,
+    /// Complete addressed receiver faces used by native continuation.
     pub port_returns: Vec<ResidentBoundaryChainPortReturn>,
+    /// Exact physical boundary-port quotient of `port_returns`; generator and source-state faces
+    /// remain in the complete addressed family above.
+    pub boundary_port_returns: Vec<ResidentBoundaryChainPortReturn>,
     pub entering_current: ExactComplexWaveCurrent,
     pub total_returned_current: ExactComplexWaveCurrent,
     pub stored_difference: ExactComplexWaveCurrent,

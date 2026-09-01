@@ -7,7 +7,7 @@ use holonic_engine::receiver_history_compression::{
 };
 use holonic_engine::AddressedCurrentSection;
 use sha2::{Digest, Sha256};
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use thiserror::Error;
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
 pub enum NativeRadiationError {
@@ -175,6 +175,131 @@ pub(super) fn projective_current_section(
             .collect(),
     )
     .map_err(|error| NativeRadiationError::RadiationDetail(error.to_string()))
+}
+
+pub(super) fn generated_port_projective_passage(
+    source: ProjectiveCurrentSection,
+    target: ProjectiveCurrentSection,
+    descent: &ResidentGeneratedPortCurrentPassageReturn,
+) -> Result<GeneratedPortProjectivePassage, NativeRadiationError> {
+    let passage = &descent.passage;
+    if passage.factor_population != source.factor_population
+        || passage.factor_population != target.factor_population
+        || passage.source.len() != source.reconstruction_fibre.len()
+        || passage.target.len() != target.reconstruction_fibre.len()
+    {
+        return Err(NativeRadiationError::Radiation);
+    }
+    let source_rays = source
+        .reconstruction_fibre
+        .iter()
+        .map(|factor| (factor.source_context, factor.ray))
+        .collect::<BTreeMap<_, _>>();
+    let target_rays = target
+        .reconstruction_fibre
+        .iter()
+        .map(|factor| (factor.source_context, factor.ray))
+        .collect::<BTreeMap<_, _>>();
+    let local_currents = descent
+        .local_currents
+        .iter()
+        .map(|local| {
+            (
+                (
+                    local.source_section,
+                    local.selected_slot,
+                    local.target_section,
+                ),
+                local.factor_current.as_slice(),
+            )
+        })
+        .collect::<BTreeMap<_, _>>();
+    if source_rays.len() != passage.source.len()
+        || target_rays.len() != passage.target.len()
+        || local_currents.len() != descent.local_currents.len()
+    {
+        return Err(NativeRadiationError::Radiation);
+    }
+    let local_projective = local_currents
+        .iter()
+        .map(|(address, local)| {
+            let local_section = ProjectiveCurrentSection::found(
+                passage.factor_population,
+                vec![(BigUint::from(1_u8), local.to_vec())],
+            )
+            .map_err(|error| NativeRadiationError::RadiationDetail(error.to_string()))?;
+            if local_section.rays.len() != 1 {
+                return Err(NativeRadiationError::Radiation);
+            }
+            let removed_scale = local_section
+                .reconstruction_fibre
+                .into_iter()
+                .next()
+                .ok_or(NativeRadiationError::Radiation)?
+                .removed_scale;
+            Ok((*address, removed_scale))
+        })
+        .collect::<Result<BTreeMap<_, _>, NativeRadiationError>>()?;
+    let mut productive_population = 0_usize;
+    let occurrences = passage
+        .occurrences
+        .iter()
+        .map(|occurrence| {
+            let slot = passage
+                .slots
+                .get(occurrence.selected_slot as usize)
+                .ok_or(NativeRadiationError::Radiation)?;
+            let source_ray = source_rays
+                .get(&occurrence.source_section)
+                .copied()
+                .ok_or(NativeRadiationError::Radiation)?;
+            let (target_ray, removed_scale) =
+                if let Some(target_context) = occurrence.target_section {
+                    let target_ray = target_rays
+                        .get(&target_context)
+                        .copied()
+                        .ok_or(NativeRadiationError::Radiation)?;
+                    let removed_scale = local_projective
+                        .get(&(
+                            occurrence.source_section,
+                            occurrence.selected_slot,
+                            target_context,
+                        ))
+                        .ok_or(NativeRadiationError::Radiation)?;
+                    productive_population += 1;
+                    (Some(target_ray), removed_scale.clone())
+                } else {
+                    (None, BigUint::from(0_u8))
+                };
+            Ok(GeneratedPortProjectiveOccurrence {
+                source_context: occurrence.source_section,
+                source_ray,
+                selected_slot: occurrence.selected_slot,
+                port: slot.port,
+                generator: slot.generator,
+                target_context: occurrence.target_section,
+                target_ray,
+                removed_scale,
+            })
+        })
+        .collect::<Result<Vec<_>, NativeRadiationError>>()?;
+    let complete_reconstruction_fibre_retained = occurrences.len() == passage.occurrences.len()
+        && productive_population == descent.local_currents.len();
+    if !complete_reconstruction_fibre_retained {
+        return Err(NativeRadiationError::Radiation);
+    }
+    Ok(GeneratedPortProjectivePassage {
+        schema: "soma-life.generated-port-projective-passage.v1".to_owned(),
+        factor_population: passage.factor_population,
+        port_population: passage.port_population,
+        generator_population: passage.generator_population,
+        generator_targets: passage.generator_targets.clone(),
+        slots: passage.slots.clone(),
+        source,
+        target,
+        occurrences,
+        complete_reconstruction_fibre_retained,
+    })
 }
 
 pub(super) fn exterior_current_quadratic_lift(

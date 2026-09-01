@@ -31,6 +31,7 @@ pub(super) struct MomentFrontPlan<'a> {
     pub(super) resident_context_state: Option<MomentResidentContextState>,
     pub(super) native_factors: usize,
     pub(super) factors: usize,
+    pub(super) port_population: usize,
     pub(super) generator_count: usize,
     pub(super) port_restriction_offsets: Vec<u64>,
     pub(super) context_count: usize,
@@ -332,7 +333,10 @@ impl<'a> MomentFrontAdmission<'a> {
             resident_rectangular_restrictions,
             restriction_count,
         } = self;
-        let post_target_observer = completed_step.is_some();
+        // Completion and relational comparison are different receiver events.  A lawful target
+        // can be observed without a separately mounted relational-current chart; in that case the
+        // ordinary resident contraction observes the completed factor-current section.
+        let post_target_observer = false;
         let native_factors = word.factors as usize;
         let generator_count = front.generator_count as usize;
 
@@ -1047,6 +1051,7 @@ impl<'a> MomentFrontAdmission<'a> {
             resident_context_state,
             native_factors,
             factors,
+            port_population,
             generator_count,
             port_restriction_offsets,
             context_count,

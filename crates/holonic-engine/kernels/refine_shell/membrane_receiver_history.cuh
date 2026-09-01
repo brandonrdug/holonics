@@ -893,6 +893,59 @@ extern "C" __global__ void gather_membrane_boundary_chain_radiation(
     }
 }
 
+/// Descend the addressed `(source-state,port,generator)` radiation faces to the declared physical
+/// boundary-port receiver.  The complete face section remains resident beside this quotient; this
+/// kernel performs only its exact finite direct sum and the corresponding existential phase-front
+/// projection.  One lane owns the ordered reduction so signed arbitrary-width addition is
+/// deterministic and no host reconstruction participates.
+extern "C" __global__ void aggregate_membrane_boundary_face_radiation_by_port(
+    const uint8_t *face_real_sign,
+    const uint32_t *face_real_limbs,
+    const uint8_t *face_imaginary_sign,
+    const uint32_t *face_imaginary_limbs,
+    const uint8_t *face_phase_locked,
+    uint8_t *port_real_sign,
+    uint32_t *port_real_limbs,
+    uint8_t *port_imaginary_sign,
+    uint32_t *port_imaginary_limbs,
+    uint8_t *port_phase_locked,
+    uint32_t face_count,
+    uint32_t port_count,
+    uint32_t local_face_count,
+    uint32_t generator_count,
+    uint32_t limb_count)
+{
+    if (blockIdx.x != 0U || threadIdx.x != 0U || port_count == 0U
+        || local_face_count == 0U || generator_count == 0U) return;
+    for (uint32_t port = 0U; port < port_count; ++port) {
+        port_real_sign[port] = 0U;
+        port_imaginary_sign[port] = 0U;
+        port_phase_locked[port] = 0U;
+        zero_unsigned_limbs(
+            port_real_limbs + (uint64_t)port * limb_count, limb_count);
+        zero_unsigned_limbs(
+            port_imaginary_limbs + (uint64_t)port * limb_count, limb_count);
+    }
+    for (uint32_t face = 0U; face < face_count; ++face) {
+        const uint32_t local_face = face % local_face_count;
+        const uint32_t port = local_face / generator_count;
+        if (port >= port_count) continue;
+        add_signed_magnitude(
+            port_real_sign + port,
+            port_real_limbs + (uint64_t)port * limb_count,
+            face_real_sign[face],
+            face_real_limbs + (uint64_t)face * limb_count,
+            limb_count);
+        add_signed_magnitude(
+            port_imaginary_sign + port,
+            port_imaginary_limbs + (uint64_t)port * limb_count,
+            face_imaginary_sign[face],
+            face_imaginary_limbs + (uint64_t)face * limb_count,
+            limb_count);
+        if (face_phase_locked[face] != 0U) port_phase_locked[port] = 1U;
+    }
+}
+
 extern "C" __global__ void prepare_membrane_factored_receiver_boundary_supports(
     const uint8_t *receiver_sign,
     const uint32_t *receiver_limbs,
@@ -1184,6 +1237,20 @@ extern "C" __global__ void form_membrane_factorized_relational_moment_partials(
     for (uint32_t limb = 0U; limb < output_limb_count; ++limb) {
         partial_target_norm[limb] = first[limb];
     }
+    multiply_unsigned_limbs(
+        dot_real, output_limb_count,
+        weight, weight_limb_count,
+        first, output_limb_count);
+    for (uint32_t limb = 0U; limb < output_limb_count; ++limb) {
+        dot_real[limb] = first[limb];
+    }
+    multiply_unsigned_limbs(
+        dot_imaginary, output_limb_count,
+        weight, weight_limb_count,
+        first, output_limb_count);
+    for (uint32_t limb = 0U; limb < output_limb_count; ++limb) {
+        dot_imaginary[limb] = first[limb];
+    }
 }
 
 extern "C" __global__ void form_membrane_factorized_relational_current_norms(
@@ -1342,4 +1409,59 @@ extern "C" __global__ void reduce_membrane_factorized_relational_moment_componen
     for (uint32_t limb = 0U; limb < limb_count; ++limb) norm[limb] = square[limb];
     compatibility_signs[component] =
         unsigned_limbs_are_zero(overlap, limb_count) ? 0U : 1U;
+}
+
+extern "C" __global__ void reduce_membrane_factorized_relational_oriented_components(
+    const uint8_t *partial_real_signs,
+    const uint32_t *partial_real_limbs,
+    const uint8_t *partial_imaginary_signs,
+    const uint32_t *partial_imaginary_limbs,
+    const uint8_t *context_state_present,
+    const uint32_t *context_states,
+    const uint32_t *boundary_states,
+    uint8_t *oriented_real_signs,
+    uint32_t *oriented_real_limbs,
+    uint8_t *oriented_imaginary_signs,
+    uint32_t *oriented_imaginary_limbs,
+    uint32_t face_count,
+    uint32_t context_count,
+    uint32_t port_count,
+    uint32_t generator_count,
+    uint32_t boundary_state_count,
+    uint32_t limb_count,
+    uint32_t descend_boundary_state_receiver)
+{
+    const uint32_t face = blockIdx.x * blockDim.x + threadIdx.x;
+    if (face >= face_count || generator_count == 0U || boundary_state_count == 0U) return;
+    const uint32_t local_face_count = port_count * generator_count;
+    if (local_face_count == 0U) return;
+    const uint32_t source_state_coordinate = face / local_face_count;
+    const uint32_t local_face = face % local_face_count;
+    const uint32_t response_state_count = descend_boundary_state_receiver != 0U
+        ? 1U : boundary_state_count;
+    if (source_state_coordinate >= response_state_count) return;
+    uint32_t *real = oriented_real_limbs + (uint64_t)face * limb_count;
+    uint32_t *imaginary = oriented_imaginary_limbs + (uint64_t)face * limb_count;
+    zero_unsigned_limbs(real, limb_count);
+    zero_unsigned_limbs(imaginary, limb_count);
+    oriented_real_signs[face] = 0U;
+    oriented_imaginary_signs[face] = 0U;
+    for (uint32_t context = 0U; context < context_count; ++context) {
+        if (context_state_present[context] == 0U) continue;
+        if (descend_boundary_state_receiver == 0U
+            && context_states[context] != boundary_states[source_state_coordinate]) continue;
+        const uint64_t partial = (uint64_t)context * local_face_count + local_face;
+        add_signed_magnitude(
+            oriented_real_signs + face,
+            real,
+            partial_real_signs[partial],
+            partial_real_limbs + partial * limb_count,
+            limb_count);
+        add_signed_magnitude(
+            oriented_imaginary_signs + face,
+            imaginary,
+            partial_imaginary_signs[partial],
+            partial_imaginary_limbs + partial * limb_count,
+            limb_count);
+    }
 }

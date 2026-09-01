@@ -19,6 +19,7 @@ use std::{collections::BTreeMap, io::Cursor};
 use holonic_engine::ExactComplexWaveCurrent;
 use image::{DynamicImage, ImageFormat, Rgb, RgbImage};
 use num_bigint::BigInt;
+use num_rational::BigRational as Rat;
 use num_traits::{Signed, ToPrimitive, Zero};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -388,6 +389,16 @@ impl NativeOpticalProductionMorphology {
                     x,
                     y,
                 ))?;
+                let current = ExactComplexWaveCurrent::new(
+                    Rat::new(
+                        returned.situated_receiver_coordinates[0].clone(),
+                        returned.situated_coordinate_denominator.clone(),
+                    ),
+                    Rat::new(
+                        returned.situated_receiver_coordinates[1].clone(),
+                        returned.situated_coordinate_denominator.clone(),
+                    ),
+                );
                 cells.push(NativeOpticalCell {
                     address_sha256,
                     causal_order: order.causal_order,
@@ -395,7 +406,7 @@ impl NativeOpticalProductionMorphology {
                     universal_port: returned.universal_port,
                     x,
                     y,
-                    current: returned.returned_response.clone(),
+                    current,
                     lies_in_outward_radical: returned.lies_in_outward_radical,
                 });
             }

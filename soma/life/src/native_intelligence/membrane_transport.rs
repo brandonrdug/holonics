@@ -690,7 +690,13 @@ impl<Standing: MembraneStanding> NativeCausalMembrane<Standing> {
                 .map(|correspondence| correspondence.factor)
                 .collect::<BTreeSet<_>>();
             let magnitude = admitted.incidence.coefficient.unsigned_abs();
-            if factors.is_empty() || magnitude == 0 {
+            // Inherited source-neutral sections outside the cultivated receiver-history factor
+            // chart remain in the ecology and its reconstruction fibre; they are not zero factor
+            // currents. This boundary projects only the admitted cultivated factor family.
+            if factors.is_empty() {
+                continue;
+            }
+            if magnitude == 0 {
                 return Err(MembraneInteriorError::MalformedStanding(format!(
                     "an admitted {boundary} occurrence has no nonzero affine factor current"
                 )));

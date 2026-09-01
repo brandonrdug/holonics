@@ -317,7 +317,18 @@ impl MorphologyDerivedInterior {
             .iter()
             .map(|branch| (branch.thread_address.as_str(), branch.branch))
             .collect::<BTreeMap<_, _>>();
-        let families = rest.membrane_ecology().mixed_constitutive_families();
+        let families = rest
+            .membrane_ecology()
+            .mixed_constitutive_families()
+            .iter()
+            .enumerate()
+            .filter(|(_, family)| {
+                family
+                    .dependent_receiver_support
+                    .iter()
+                    .all(|native| native_to_factor.contains_key(native))
+            })
+            .collect::<Vec<_>>();
         if families.is_empty() {
             return Err(MembraneInteriorError::MalformedStanding(
                 "the exact mixed constitutive family is absent".to_owned(),
@@ -338,7 +349,7 @@ impl MorphologyDerivedInterior {
             .collect::<BTreeMap<_, _>>();
         for thread in families
             .iter()
-            .flat_map(|family| [&family.left_thread, &family.right_thread])
+            .flat_map(|(_, family)| [&family.left_thread, &family.right_thread])
         {
             if thread_sections.contains_key(thread) {
                 continue;
@@ -361,7 +372,7 @@ impl MorphologyDerivedInterior {
         }
         let mut restrictions = Vec::new();
         let mut constitutive_cells = Vec::with_capacity(families.len());
-        for (family_at, family) in families.iter().enumerate() {
+        for (family_at, family) in &families {
             let left_coordinate = branch_coordinates.get(family.left_thread.as_str()).copied();
             let right_coordinate = branch_coordinates
                 .get(family.right_thread.as_str())
@@ -441,7 +452,7 @@ impl MorphologyDerivedInterior {
                 });
             }
             constitutive_cells.push(ConstitutiveCellAddress {
-                family_at,
+                family_at: *family_at,
                 cell: upper,
                 left_coordinate,
                 right_coordinate,
@@ -807,11 +818,11 @@ impl MorphologyDerivedInterior {
                     .push(family.factor_orientations.get(factor).copied().unwrap_or(0));
             }
         }
-        let family_currents = rest
-            .membrane_ecology()
-            .mixed_constitutive_families()
+        let families = rest.membrane_ecology().mixed_constitutive_families();
+        let family_currents = self
+            .constitutive_cells
             .iter()
-            .map(|family| family.returned_product.clone())
+            .map(|address| families[address.family_at].returned_product.clone())
             .collect::<Vec<_>>();
         ResidentMembraneInteriorWord::mount(
             CudaRefineExecutor::new()

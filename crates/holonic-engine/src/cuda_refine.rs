@@ -1616,7 +1616,15 @@ impl ResidentMembraneInteriorWord {
         completed_step: Option<ResidentCompletedTargetObservationAperture>,
     ) -> Result<ResidentQuadraticMomentReturn, CudaRefineError> {
         let resident_began = std::time::Instant::now();
-        let post_target_observer = completed_step.is_some();
+        // A completed target always re-enters the resident receiver.  The specialized
+        // relational observer is needed only when that ecology also mounted a distinct sparse
+        // relational-current chart; otherwise the completed factor current is observed by the
+        // ordinary resident contraction over its new boundary state.
+        // The generated-port junction has already returned the exact joined target current and,
+        // when present, its conditioned relational section.  Observe that resident target through
+        // the ordinary prospective face contraction; rematerializing every source candidate to
+        // recover the same target would duplicate the retained reconstruction fibre.
+        let post_target_observer = false;
         let admission = membrane_moment_plan::admit_moment_front(
             self,
             front,

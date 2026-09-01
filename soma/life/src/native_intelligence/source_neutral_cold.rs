@@ -327,7 +327,13 @@ fn found_realization(
     {
         return Err(SourceNeutralRelationalError::Developmental);
     }
-    let mut transition_population = HashMap::<(u32, u16, u16), u64>::new();
+    let face_root_states = (0..relational.face_population())
+        .map(|face| u32::try_from(face).map_err(|_| SourceNeutralRelationalError::Extent))
+        .collect::<Result<Vec<_>, _>>()?;
+    let mut realization_state_population =
+        u32::try_from(face_root_states.len()).map_err(|_| SourceNeutralRelationalError::Extent)?;
+    let mut path_edges = HashMap::<(u32, u32, u16, u16), Option<u32>>::new();
+    let mut transition_population = HashMap::<(u32, u32, u16, u16, Option<u32>), u64>::new();
     let mut developmental_transition_population = 0_u64;
     for face in codec.faces {
         let site = *face_classes
@@ -358,16 +364,36 @@ fn found_realization(
             ports.push(0_u16);
             ports.extend(surface.into_iter().map(|octet| u16::from(octet) + 1));
             ports.push(257_u16);
+            let mut state = *face_root_states
+                .get(site as usize)
+                .ok_or(SourceNeutralRelationalError::Developmental)?;
             for pair in ports.windows(2) {
                 developmental_transition_population = developmental_transition_population
                     .checked_add(1)
                     .ok_or(SourceNeutralRelationalError::Extent)?;
+                let edge = (site, state, pair[0], pair[1]);
+                let target_state = if pair[1] == 257 {
+                    None
+                } else if let Some(target) = path_edges.get(&edge).copied() {
+                    target
+                } else {
+                    let target = realization_state_population;
+                    realization_state_population = realization_state_population
+                        .checked_add(1)
+                        .ok_or(SourceNeutralRelationalError::Extent)?;
+                    path_edges.insert(edge, Some(target));
+                    Some(target)
+                };
+                path_edges.entry(edge).or_insert(target_state);
                 let entry = transition_population
-                    .entry((site, pair[0], pair[1]))
+                    .entry((site, state, pair[0], pair[1], target_state))
                     .or_default();
                 *entry = entry
                     .checked_add(1)
                     .ok_or(SourceNeutralRelationalError::Extent)?;
+                if let Some(target) = target_state {
+                    state = target;
+                }
             }
         }
     }
@@ -376,17 +402,27 @@ fn found_realization(
     }
     let mut transitions = transition_population
         .into_iter()
-        .map(|((site, source, target), occurrence_population)| {
-            SourceNeutralExteriorRealizationTransition {
-                face: site,
-                source,
-                target,
-                occurrence_population,
-            }
-        })
+        .map(
+            |((face, state, source, target, target_state), occurrence_population)| {
+                SourceNeutralExteriorRealizationTransition {
+                    face,
+                    state,
+                    source,
+                    target,
+                    target_state,
+                    occurrence_population,
+                }
+            },
+        )
         .collect::<Vec<_>>();
-    transitions
-        .sort_unstable_by_key(|transition| (transition.source, transition.face, transition.target));
+    transitions.sort_unstable_by_key(|transition| {
+        (
+            transition.source,
+            transition.state,
+            transition.face,
+            transition.target,
+        )
+    });
     let sites = founded_realization_sites(relational)?;
     let mut morphology = SourceNeutralExteriorRealizationMorphology {
         schema: SOURCE_NEUTRAL_EXTERIOR_REALIZATION_MORPHOLOGY_SCHEMA.to_owned(),
@@ -397,6 +433,8 @@ fn found_realization(
             .map_err(|_| SourceNeutralRelationalError::Extent)?,
         sites,
         factor_population,
+        face_root_states,
+        realization_state_population,
         transitions,
         developmental_transition_population,
         identity_sha256: String::new(),

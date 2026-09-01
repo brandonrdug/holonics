@@ -64,6 +64,11 @@ pub(super) struct MomentFrontWorkspace {
     pub(super) port_real_limbs: Buffer,
     pub(super) port_imaginary_sign: Buffer,
     pub(super) port_imaginary_limbs: Buffer,
+    pub(super) boundary_port_real_sign: Buffer,
+    pub(super) boundary_port_real_limbs: Buffer,
+    pub(super) boundary_port_imaginary_sign: Buffer,
+    pub(super) boundary_port_imaginary_limbs: Buffer,
+    pub(super) boundary_port_phase_locked: Buffer,
     pub(super) joint_real_sign: Buffer,
     pub(super) joint_real_limbs: Buffer,
     pub(super) joint_imaginary_sign: Buffer,
@@ -316,6 +321,17 @@ pub(super) fn allocate(
         plan.response_population,
         plan.radiation_limb_count,
     )?)?;
+    let boundary_port_real_sign = Buffer::alloc(plan.port_population)?;
+    let boundary_port_real_limbs = Buffer::alloc(buffer_octets(
+        plan.port_population,
+        plan.radiation_limb_count,
+    )?)?;
+    let boundary_port_imaginary_sign = Buffer::alloc(plan.port_population)?;
+    let boundary_port_imaginary_limbs = Buffer::alloc(buffer_octets(
+        plan.port_population,
+        plan.radiation_limb_count,
+    )?)?;
+    let boundary_port_phase_locked = Buffer::alloc(plan.port_population)?;
     let joint_real_sign = Buffer::alloc(1)?;
     let joint_real_limbs = Buffer::alloc(buffer_octets(1, plan.radiation_limb_count)?)?;
     let joint_imaginary_sign = Buffer::alloc(1)?;
@@ -461,9 +477,12 @@ pub(super) fn allocate(
                 .checked_mul(7)
                 .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?,
             face_limbs
-                .checked_mul(6)
+                .checked_mul(8)
                 .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?,
             partial_population
+                .checked_mul(2)
+                .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?,
+            plan.response_population
                 .checked_mul(2)
                 .ok_or(CudaRefineError::MembraneInteriorCurrentOutsideApparatus)?,
             std::mem::size_of::<u32>(),
@@ -489,6 +508,10 @@ pub(super) fn allocate(
             dot_real: Buffer::alloc(partial_limbs)?,
             dot_imaginary_signs: Buffer::alloc(partial_population)?,
             dot_imaginary: Buffer::alloc(partial_limbs)?,
+            oriented_real_signs: Buffer::alloc(plan.response_population)?,
+            oriented_real: Buffer::alloc(face_limbs)?,
+            oriented_imaginary_signs: Buffer::alloc(plan.response_population)?,
+            oriented_imaginary: Buffer::alloc(face_limbs)?,
             partial_first_scratch: Buffer::alloc(partial_limbs)?,
             partial_second_scratch: Buffer::alloc(partial_limbs)?,
             partial_third_scratch: Buffer::alloc(partial_limbs)?,
@@ -564,6 +587,11 @@ pub(super) fn allocate(
         port_real_limbs,
         port_imaginary_sign,
         port_imaginary_limbs,
+        boundary_port_real_sign,
+        boundary_port_real_limbs,
+        boundary_port_imaginary_sign,
+        boundary_port_imaginary_limbs,
+        boundary_port_phase_locked,
         joint_real_sign,
         joint_real_limbs,
         joint_imaginary_sign,

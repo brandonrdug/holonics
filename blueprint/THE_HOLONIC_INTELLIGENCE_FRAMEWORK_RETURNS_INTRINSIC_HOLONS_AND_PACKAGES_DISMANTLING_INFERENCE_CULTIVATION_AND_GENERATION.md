@@ -366,6 +366,13 @@ work are reported beside apparatus telemetry; richer receivers reopen every unla
 foreign formats interchange through Soulkiller without becoming native ontology; Git is clean,
 committed, pushed, and reproducible outputs are absent from the release tree.
 
+[counterexample; implemented-exact; source-inspected; measured] The resident radiation,
+acoustic/optical return, exact path-state, factorized realization, closure, and source-access
+controls returned, but direct inspection rejected the qualitative surface. The current exact
+obstruction is an absent cultivated prompt-to-response cross-occurrence passage, not a topology,
+hash, residency, or output-size proxy. Its evidence and firing boundary are recorded in
+[`../research/records/2026-09-01_HIF7_RETURNED_EXACT_RESIDENT_RADIATION_AND_PATH_STATE_BUT_QUALITATIVE_INFERENCE_REMAINS_AN_UNCULTIVATED_CROSS_OCCURRENCE.md`](../research/records/2026-09-01_HIF7_RETURNED_EXACT_RESIDENT_RADIATION_AND_PATH_STATE_BUT_QUALITATIVE_INFERENCE_REMAINS_AN_UNCULTIVATED_CROSS_OCCURRENCE.md).
+
 ## 9. Process law
 
 [definition] Every nontrivial process retains the 180-second outer boundary. Owner-local tests and

@@ -325,14 +325,40 @@ pub(super) fn native_oriented_realization_faces(
         || pairing.face_generators.len() != population
         || pairing.coordinate_denominator.is_zero()
         || pairing.coordinate_denominator.is_negative()
+        || pairing.front_faces.is_empty()
+        || pairing
+            .front_faces
+            .windows(2)
+            .any(|pair| pair[0] >= pair[1])
+        || pairing
+            .front_faces
+            .iter()
+            .any(|face| *face as usize >= population)
         || passage.generator_population == 0
     {
+        if holonic_engine::cuda_refine::trace_configuration().holonics_uar2_trace {
+            eprintln!(
+                "oriented-native-chart refusal real={} imaginary={} states={} ports={} generators={} denominator={} passage-generators={}",
+                population,
+                pairing.relational_oriented_imaginary_coordinates.len(),
+                pairing.face_source_states.len(),
+                pairing.face_ports.len(),
+                pairing.face_generators.len(),
+                pairing.coordinate_denominator,
+                passage.generator_population,
+            );
+        }
         return Err(SourceNeutralEcologyError::Apparatus(
             "the native oriented response chart is incomplete".to_owned(),
         ));
     }
     let mut faces = Vec::new();
-    for mode in 0..population {
+    for mode in pairing
+        .front_faces
+        .iter()
+        .copied()
+        .map(|mode| mode as usize)
+    {
         let source_state = (pairing.face_source_states[mode] != u32::MAX)
             .then_some(pairing.face_source_states[mode]);
         let native_port = pairing.face_ports[mode];
@@ -352,6 +378,11 @@ pub(super) fn native_oriented_realization_faces(
             .iter()
             .filter(|current| selected_slots.contains(&current.selected_slot))
             .map(|current| {
+                if current.source_section as usize >= passage.source.len() {
+                    return Err(SourceNeutralEcologyError::Apparatus(
+                        "the resident local current lost its addressed source boundary".to_owned(),
+                    ));
+                }
                 let target_state = passage
                     .target
                     .get(current.target_section as usize)
@@ -947,13 +978,19 @@ pub(super) struct SourceNeutralContinuationState {
     /// realization meets it.  It participates in continuation equality; the selected surface
     /// alone never does.
     pub(super) exterior_realization_target_current: Vec<(u16, num_rational::Ratio<BigUint>)>,
+    pub(super) exterior_realization_continuing_target_current:
+        Vec<(u16, num_rational::Ratio<BigUint>)>,
     /// Selected dependent complex section and its complete addressed response/source/target
     /// fibre. These coordinates prevent equal positive shadows with distinct quadrature from
     /// becoming one recurrent state.
     pub(super) returned_complex_realization_section:
         Vec<SourceNeutralExteriorRealizationComplexSiteCurrent>,
-    pub(super) returned_complex_realization_pairs:
-        Vec<SourceNeutralAddressedRealizationPairCurrent>,
+    pub(super) returned_complex_realization_contributions:
+        Vec<SourceNeutralExteriorRealizationTransportContribution>,
+    pub(super) realization_transport_obstructions:
+        Vec<SourceNeutralExteriorRealizationTransportObstruction>,
+    pub(super) returned_complex_response_factor_currents:
+        Vec<SourceNeutralExteriorRealizationOrientedFactorCurrent>,
     pub(super) reconstruction_dag: Vec<GranularReconstructionNode>,
     pub(super) local_balance_closes: bool,
 }
@@ -1124,13 +1161,22 @@ impl SourceNeutralContinuationState {
                 .iter()
                 .map(|target| (target.target_port, target.current.clone()))
                 .collect(),
-            returned_complex_realization_section: realization.returned_complex_site_current.clone(),
-            returned_complex_realization_pairs: realization
-                .pair_currents
+            exterior_realization_continuing_target_current: realization
+                .continuing_target_current
                 .iter()
-                .filter(|pair| pair.exterior_target_port == realization.selected_target_port)
+                .map(|target| (target.target_port, target.current.clone()))
+                .collect(),
+            returned_complex_realization_section: realization.returned_complex_site_current.clone(),
+            returned_complex_realization_contributions: realization
+                .transport_contributions
+                .iter()
+                .filter(|contribution| {
+                    contribution.exterior_target_port == realization.selected_target_port
+                })
                 .cloned()
                 .collect(),
+            realization_transport_obstructions: realization.transport_obstructions.clone(),
+            returned_complex_response_factor_currents: realization.oriented_factor_current.clone(),
             reconstruction_dag: section.reconstruction_dag.clone(),
             local_balance_closes: section.radiation.local_balance_closes,
         })
@@ -1312,8 +1358,17 @@ pub(super) fn found_continuation_receiver_history(
         exact_receiver_classes(&states, |state| &state.relational_projective_faces)?,
         exact_receiver_classes(&states, |state| &state.downstream_port_projection)?,
         exact_receiver_classes(&states, |state| &state.exterior_realization_target_current)?,
+        exact_receiver_classes(&states, |state| {
+            &state.exterior_realization_continuing_target_current
+        })?,
         exact_receiver_classes(&states, |state| &state.returned_complex_realization_section)?,
-        exact_receiver_classes(&states, |state| &state.returned_complex_realization_pairs)?,
+        exact_receiver_classes(&states, |state| {
+            &state.returned_complex_realization_contributions
+        })?,
+        exact_receiver_classes(&states, |state| &state.realization_transport_obstructions)?,
+        exact_receiver_classes(&states, |state| {
+            &state.returned_complex_response_factor_currents
+        })?,
         exact_receiver_classes(&states, |state| &state.reconstruction_dag)?,
         exact_receiver_classes(&states, |state| &state.local_balance_closes)?,
     ];
@@ -1376,10 +1431,33 @@ mod continuation_tests {
                 3,
                 num_rational::Ratio::from_integer(BigUint::from(1_u8)),
             )],
+            exterior_realization_continuing_target_current: vec![(
+                3,
+                num_rational::Ratio::from_integer(BigUint::from(1_u8)),
+            )],
             returned_complex_realization_section: Vec::new(),
-            returned_complex_realization_pairs: vec![
-                SourceNeutralAddressedRealizationPairCurrent {
-                    response: SourceNeutralAddressedResponsePairCurrent {
+            returned_complex_realization_contributions: vec![
+                SourceNeutralExteriorRealizationTransportContribution {
+                    exterior_target_port: 3,
+                    source_carrier: 0,
+                    source_site: 0,
+                    source_local_port: 0,
+                    source_realization_state: 0,
+                    target_carrier: 1,
+                    target_site: 1,
+                    target_local_source_port: 3,
+                    target_realization_state: Some(0),
+                    factor: 0,
+                    phase: 0,
+                    incidence_coefficient: num_rational::Ratio::from_integer(BigUint::from(1_u8)),
+                },
+            ],
+            realization_transport_obstructions: Vec::new(),
+            returned_complex_response_factor_currents: vec![
+                SourceNeutralExteriorRealizationOrientedFactorCurrent {
+                    factor: 0,
+                    current: current.clone(),
+                    pair_currents: vec![SourceNeutralAddressedResponsePairCurrent {
                         response_face: 0,
                         native_port: 0,
                         native_generator: 0,
@@ -1387,18 +1465,8 @@ mod continuation_tests {
                         selected_slot: 0,
                         target_section: 0,
                         factor: 0,
-                        current: current.clone(),
-                    },
-                    source_carrier: 0,
-                    source_site: 0,
-                    source_local_port: 0,
-                    target_carrier: 1,
-                    target_site: 1,
-                    target_local_port: 3,
-                    exterior_target_port: 3,
-                    factor: 0,
-                    phase: 0,
-                    current,
+                        current,
+                    }],
                 },
             ],
             reconstruction_dag: Vec::new(),
@@ -1414,16 +1482,16 @@ mod continuation_tests {
             Rat::from_integer(BigInt::from(1)),
         ));
         assert_eq!(
-            real.returned_complex_realization_pairs[0]
+            real.returned_complex_response_factor_currents[0]
                 .current
                 .norm_square(),
-            imaginary.returned_complex_realization_pairs[0]
+            imaginary.returned_complex_response_factor_currents[0]
                 .current
                 .norm_square()
         );
         assert_ne!(real, imaginary);
         let classes = exact_receiver_classes(&[real, imaginary], |state| {
-            &state.returned_complex_realization_pairs
+            &state.returned_complex_response_factor_currents
         })
         .expect("the full complex receiver separates the pair");
         assert_ne!(classes[0], classes[1]);

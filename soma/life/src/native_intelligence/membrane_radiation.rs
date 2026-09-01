@@ -7,12 +7,12 @@
 
 use holonic_engine::{
     cuda_refine::{
-        ResidentAddressedCurrentPassageReturn, ResidentFactoredMomentReceiverReturn,
-        ResidentFactoredReceiverHistoryReceipt, ResidentQuadraticMomentFront,
+        ResidentFactoredMomentReceiverReturn, ResidentFactoredReceiverHistoryReceipt,
+        ResidentGeneratedPortCurrentPassageReturn, ResidentQuadraticMomentFront,
         ResidentQuadraticMomentPortReturn, ResidentQuadraticMomentReturn,
     },
-    receiver_history_compression::ProjectiveCurrentPassage,
-    ExactComplexWaveCurrent,
+    receiver_history_compression::ProjectiveCurrentSection,
+    AddressedGeneratedPortSlot, ExactComplexWaveCurrent,
 };
 use num_bigint::{BigInt, BigUint};
 use num_rational::BigRational as Rat;
@@ -378,7 +378,7 @@ pub struct GranularProjectiveRadiationReturn {
     pub section: GranularRadiationSection,
 }
 
-pub const OPEN_WORLD_TUBE_RADIATION_SCHEMA: &str = "soma-life.open-world-tube-radiation.v1";
+pub const OPEN_WORLD_TUBE_RADIATION_SCHEMA: &str = "soma-life.open-world-tube-radiation.v2";
 
 /// One coordinate of the complete source-neutral outward factor receiver.  The unit incidence is
 /// the basis vector of the standing affine factor line, not a behavioral width or authored score.
@@ -388,8 +388,49 @@ pub struct NativeOutwardPortReturn {
     pub port: u32,
     pub universal_port: u32,
     pub returned_response: ExactComplexWaveCurrent,
+    /// Exact situated receiver coordinates over the generator faces carried by this physical
+    /// port, in native generator order (and source-state order when that fibre remains plural).
+    /// A later codec may declare a chart over these coordinates; their order is not an authored
+    /// semantic label.
+    pub situated_receiver_coordinates: Vec<BigInt>,
+    pub situated_coordinate_denominator: BigInt,
     pub lies_in_outward_radical: bool,
     pub lies_in_receiver_phase_front: bool,
+}
+
+/// One exact projective receiver occurrence of the completed generated-port junction.  The local
+/// ray and removed scale are absent exactly on a radical occurrence; source, selected slot, port,
+/// generator, target and both projective boundary maps remain explicit reconstruction testimony.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct GeneratedPortProjectiveOccurrence {
+    pub source_context: u32,
+    pub source_ray: u32,
+    pub selected_slot: u32,
+    pub port: u32,
+    pub generator: u32,
+    pub target_context: Option<u32>,
+    pub target_ray: Option<u32>,
+    pub removed_scale: BigUint,
+}
+
+/// Projective chart of a generated-port junction.  This is deliberately not a generator direct
+/// sum: restriction occurs before local currents meet linearly at their addressed target site.
+/// The complete occurrence fibre retains that difference and prevents the target-site sum from
+/// masquerading as an independent-ray transport.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct GeneratedPortProjectivePassage {
+    pub schema: String,
+    pub factor_population: u32,
+    pub port_population: u32,
+    pub generator_population: u32,
+    pub generator_targets: Vec<u32>,
+    pub slots: Vec<AddressedGeneratedPortSlot>,
+    pub source: ProjectiveCurrentSection,
+    pub target: ProjectiveCurrentSection,
+    pub occurrences: Vec<GeneratedPortProjectiveOccurrence>,
+    pub complete_reconstruction_fibre_retained: bool,
 }
 
 /// One causal order of the open native current.  The current is restricted on the card before its
@@ -401,10 +442,9 @@ pub struct NativeOpenWorldTubeOrder {
     pub causal_order: u64,
     pub resident_restriction: ResidentQuadraticMomentReturn,
     pub outward_port_returns: Vec<NativeOutwardPortReturn>,
-    pub generator_descent: ResidentAddressedCurrentPassageReturn,
     /// Exact dynamic quotient of the same scale-bearing descent.  Primitive rays are the rested
     /// state; removed scales, weights, edges, and source contexts remain its reconstruction fibre.
-    pub projective_descent: ProjectiveCurrentPassage,
+    pub projective_descent: GeneratedPortProjectivePassage,
     pub lawful_silence_population: usize,
     pub compulsory_radiation_population: usize,
     pub local_balance_closes: bool,
@@ -423,8 +463,8 @@ pub enum NativeOpenWorldTubeTerminal {
     },
     /// A nonstationary complete current front returned exactly.  It remains an open obstruction;
     /// no turn limit or host timeout is promoted into native closure.
-    RecurrentOpenFront {
-        first_seen_causal_order: u64,
+    OpenLaterFront {
+        returned_causal_order: u64,
         resident_current_identity_sha256: String,
         projective_ray_population: usize,
         scale_reconstruction_fibre_retained: bool,
@@ -445,7 +485,7 @@ pub struct ExteriorCurrentQuadraticLift {
 }
 
 /// One exact exterior-current section carried through the same resident body until dynamic rest
-/// or a structurally repeated open front returns.
+/// or the declared immediate-and-later receiver family returns an exact open front.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct NativeOpenWorldTubeCurrentReturn {
@@ -510,5 +550,5 @@ use receiver_projection::{
 pub use validation::NativeRadiationError;
 use validation::{
     canonical_projective_rays, digest, exterior_current_quadratic_lift, first_founded_contact,
-    found_aperture, hex_sha256, projective_current_section,
+    found_aperture, generated_port_projective_passage, hex_sha256, projective_current_section,
 };

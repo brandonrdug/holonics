@@ -48,9 +48,10 @@ use crate::native_intelligence::situated_difference::{
     CausalAdjointStepInput, SituatedDifferenceInput, SituatedDifferenceSection,
 };
 use crate::native_intelligence::source_neutral_relational::{
-    SourceNeutralAddressedRealizationPairCurrent,
     SourceNeutralExteriorRealizationComplexSiteCurrent, SourceNeutralExteriorRealizationMorphology,
-    SourceNeutralExteriorRealizationPassage, SourceNeutralExteriorSiteHistoryQuotient,
+    SourceNeutralExteriorRealizationOrientedFactorCurrent, SourceNeutralExteriorRealizationPassage,
+    SourceNeutralExteriorRealizationTransportContribution,
+    SourceNeutralExteriorRealizationTransportObstruction, SourceNeutralExteriorSiteHistoryQuotient,
     SourceNeutralNativeOrientedFace, SourceNeutralNativeOrientedLocalCurrent,
     SourceNeutralRelationalMorphology,
 };

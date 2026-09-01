@@ -284,7 +284,7 @@ pub fn sever_source_bearing_ecology(
     .map_err(|error| SourceNeutralSeveringError::Successor(error.to_string()))?;
 
     let granular =
-        NativeGranularPotential::read_developmental_predecessor(developmental.body.body.granular)
+        NativeGranularPotential::read_source_neutral_predecessor(developmental.body.body.granular)
             .map_err(|error| SourceNeutralSeveringError::Predecessor(error.to_string()))?;
     let inherited_granular_identity_sha256 = granular.identity().to_owned();
     let developmental_relational_potential = developmental.body.body.body.potential;

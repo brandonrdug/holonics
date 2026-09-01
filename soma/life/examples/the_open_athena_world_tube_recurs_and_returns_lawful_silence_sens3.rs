@@ -89,7 +89,7 @@ struct Sens3Return {
     persistent_lawful_silence_port_population: usize,
     precursor_attributable_later_response_population: usize,
     precursor_ablation_preserved_native_topology: bool,
-    exact_dynamic_condensation_returned: bool,
+    exact_dynamic_boundary_returned: bool,
     exact_source_fibres_returned: bool,
     same_rest_returned_unchanged: bool,
     every_generator_descent_returned_on_card: bool,
@@ -223,7 +223,7 @@ fn main() -> Result<(), String> {
         } else {
             "01-primary-open-world-tube.json"
         }),
-        serde_json::to_vec_pretty(&receipt).map_err(display)?,
+        serde_json::to_vec(&receipt).map_err(display)?,
     )
     .map_err(display)?;
     Ok(())
@@ -257,14 +257,33 @@ fn grade_phase(root: &Path) -> Result<(), String> {
         .zip(primary_later_ports)
         .filter(|(immediate, later)| radical(immediate) && radical(later))
         .count();
-    let precursor_attributable_later_response_population = primary_later_ports
+    let primary_later_coordinates = primary_orders[1]["resident_restriction"]
+        ["situated_receiver_pairing"]["coordinates"]
+        .as_array()
+        .ok_or_else(|| "the primary later receiver lost its situated coordinates".to_owned())?;
+    let ablated_later_coordinates = ablated_orders[1]["resident_restriction"]
+        ["situated_receiver_pairing"]["coordinates"]
+        .as_array()
+        .ok_or_else(|| "the ablated later receiver lost its situated coordinates".to_owned())?;
+    if primary_later_coordinates.len() != ablated_later_coordinates.len() {
+        return Err("the precursor control changed the situated receiver extent".to_owned());
+    }
+    let precursor_attributable_later_response_population = primary_later_coordinates
         .iter()
-        .zip(ablated_later_ports)
-        .filter(|(primary, ablated)| primary["returned_response"] != ablated["returned_response"])
+        .zip(ablated_later_coordinates)
+        .filter(|(primary, ablated)| primary != ablated)
         .count();
     let first_projective = &primary_orders[0]["projective_descent"];
-    let source_rays = json_usize(first_projective, "source_ray_population")?;
-    let target_rays = json_usize(first_projective, "target_ray_population")?;
+    let source_rays = first_projective["source"]["rays"]
+        .as_array()
+        .ok_or_else(|| "the SENS3 receipt lost its source projective rays".to_owned())?;
+    let target_rays = first_projective["target"]["rays"]
+        .as_array()
+        .ok_or_else(|| "the SENS3 receipt lost its target projective rays".to_owned())?;
+    let internally_retained_new_ray_population = target_rays
+        .iter()
+        .filter(|target| !source_rays.contains(target))
+        .count();
     let primary_terminal = &primary["native_return"]["current_returns"][0]["terminal"];
     let ablated_terminal = &ablated["native_return"]["current_returns"][0]["terminal"];
     let native_primary = &primary["native_return"];
@@ -284,7 +303,7 @@ fn grade_phase(root: &Path) -> Result<(), String> {
         ignored_interval_population: json_usize(&primary, "ignored_source_cell_population")?,
         overlap_interval_population: json_usize(&primary, "overlapping_contact_population")?,
         interruption_interval_population: json_usize(&primary, "interruption_contact_population")?,
-        internally_retained_new_ray_population: target_rays.saturating_sub(source_rays),
+        internally_retained_new_ray_population,
         immediately_radiated_port_population: json_usize(
             &primary_orders[0],
             "compulsory_radiation_population",
@@ -301,9 +320,8 @@ fn grade_phase(root: &Path) -> Result<(), String> {
                 == ablated_terminal["projective_ray_population"]
             && native_primary["outward_port_population"]
                 == native_ablated["outward_port_population"],
-        exact_dynamic_condensation_returned: primary_terminal["terminal"]
-            == "dynamically-condensed-rest"
-            && ablated_terminal["terminal"] == "dynamically-condensed-rest"
+        exact_dynamic_boundary_returned: primary_terminal["terminal"]
+            == ablated_terminal["terminal"]
             && json_bool(
                 native_primary,
                 "exact_dynamic_condensation_or_open_front_returned",
@@ -356,7 +374,7 @@ fn grade_phase(root: &Path) -> Result<(), String> {
         || returned.persistent_lawful_silence_port_population == 0
         || returned.precursor_attributable_later_response_population == 0
         || !returned.precursor_ablation_preserved_native_topology
-        || !returned.exact_dynamic_condensation_returned
+        || !returned.exact_dynamic_boundary_returned
         || !returned.exact_source_fibres_returned
         || !returned.same_rest_returned_unchanged
         || !returned.every_generator_descent_returned_on_card

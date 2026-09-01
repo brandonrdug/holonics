@@ -29,15 +29,15 @@ mod morphology;
 mod pair_current;
 mod realization;
 pub use pair_current::{
-    SourceNeutralAddressedRealizationPairCurrent, SourceNeutralAddressedResponsePairCurrent,
+    SourceNeutralAddressedResponsePairCurrent,
     SourceNeutralExteriorRealizationOrientedFactorCurrent,
 };
 pub const SOURCE_NEUTRAL_RELATIONAL_MORPHOLOGY_SCHEMA: &str =
     "soma-life.source-neutral-relational-morphology.v1";
 pub const SOURCE_NEUTRAL_EXTERIOR_REALIZATION_MORPHOLOGY_SCHEMA: &str =
-    "soma-life.source-neutral-exterior-realization-morphology.v3";
+    "soma-life.source-neutral-exterior-realization-morphology.v4";
 pub const SOURCE_NEUTRAL_EXTERIOR_REALIZATION_PASSAGE_SCHEMA: &str =
-    "soma-life.source-neutral-exterior-realization-passage.v9";
+    "soma-life.source-neutral-exterior-realization-passage.v10";
 
 /// Exact nonnegative current coordinate.  Normalization is a constitutive ratio, never a float,
 /// tolerance, sampled probability, or scalar loss replacement.
@@ -145,8 +145,10 @@ pub struct SourceNeutralRelationalMorphology {
 pub struct SourceNeutralExteriorRealizationTransition {
     /// Stable anonymous relational-face class which carried this local boundary incidence.
     pub face: u32,
+    pub state: u32,
     pub source: u16,
     pub target: u16,
+    pub target_state: Option<u32>,
     pub occurrence_population: u64,
 }
 
@@ -160,8 +162,10 @@ impl Serialize for SourceNeutralExteriorRealizationTransition {
     {
         (
             self.face,
+            self.state,
             self.source,
             self.target,
+            self.target_state,
             self.occurrence_population,
         )
             .serialize(serializer)
@@ -173,12 +177,14 @@ impl<'de> Deserialize<'de> for SourceNeutralExteriorRealizationTransition {
     where
         D: serde::Deserializer<'de>,
     {
-        let (face, source, target, occurrence_population) =
-            <(u32, u16, u16, u64)>::deserialize(deserializer)?;
+        let (face, state, source, target, target_state, occurrence_population) =
+            <(u32, u32, u16, u16, Option<u32>, u64)>::deserialize(deserializer)?;
         Ok(Self {
             face,
+            state,
             source,
             target,
+            target_state,
             occurrence_population,
         })
     }
@@ -247,6 +253,8 @@ pub struct SourceNeutralExteriorRealizationMorphology {
     pub(super) cell_population: u32,
     pub(super) sites: Vec<SourceNeutralExteriorRealizationSite>,
     pub(super) factor_population: u32,
+    pub(super) face_root_states: Vec<u32>,
+    pub(super) realization_state_population: u32,
     pub(super) transitions: Vec<SourceNeutralExteriorRealizationTransition>,
     pub(super) developmental_transition_population: u64,
     pub(super) identity_sha256: String,
@@ -280,6 +288,7 @@ pub struct SourceNeutralExteriorRealizationSiteCurrent {
     /// The local boundary state at this incidence.  It is reset to Opening only by an exact
     /// oriented face--cell successor, while the exterior recurrence still retains its own port.
     pub local_source_port: u16,
+    pub realization_state: Option<u32>,
     pub current: SourceNeutralPositiveCurrent,
 }
 
@@ -294,6 +303,7 @@ pub struct SourceNeutralExteriorRealizationComplexSiteCurrent {
     pub factor: u32,
     pub phase: u8,
     pub local_source_port: u16,
+    pub realization_state: Option<u32>,
     /// Exact nonnegative coefficient of `oriented_factor_current[factor]` at this incidence.
     pub incidence_coefficient: SourceNeutralPositiveCurrent,
 }
@@ -519,18 +529,36 @@ impl SourceNeutralExteriorSiteHistoryQuotient {
     }
 }
 
-#[derive(Debug)]
-struct SourceNeutralExteriorComplexSiteTransportContribution {
-    exterior_target_port: u16,
-    source_carrier: u32,
-    source_site: u32,
-    source_local_port: u16,
-    target_carrier: u32,
-    target_site: u32,
-    target_local_source_port: u16,
-    factor: u32,
-    phase: u8,
-    incidence_coefficient: SourceNeutralPositiveCurrent,
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SourceNeutralExteriorRealizationTransportContribution {
+    pub exterior_target_port: u16,
+    pub source_carrier: u32,
+    pub source_site: u32,
+    pub source_local_port: u16,
+    pub source_realization_state: u32,
+    pub target_carrier: u32,
+    pub target_site: u32,
+    pub target_local_source_port: u16,
+    pub target_realization_state: Option<u32>,
+    pub factor: u32,
+    pub phase: u8,
+    pub incidence_coefficient: SourceNeutralPositiveCurrent,
+}
+
+/// One carried complex site current for which the presented local exterior port has no founded
+/// transition on that face.  It remains an exact open reconstruction fibre; it is neither dropped
+/// nor assigned a fabricated target.
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct SourceNeutralExteriorRealizationTransportObstruction {
+    pub source_carrier: u32,
+    pub source_site: u32,
+    pub source_local_port: u16,
+    pub source_realization_state: u32,
+    pub factor: u32,
+    pub phase: u8,
+    pub incidence_coefficient: SourceNeutralPositiveCurrent,
 }
 
 /// One exterior target-boundary current after the complete native factor section has crossed the
@@ -566,11 +594,18 @@ pub struct SourceNeutralExteriorRealizationPassage {
     pub native_oriented_faces: Vec<SourceNeutralNativeOrientedFace>,
     pub site_current: Vec<SourceNeutralExteriorRealizationSiteCurrent>,
     pub complex_site_current: Vec<SourceNeutralExteriorRealizationComplexSiteCurrent>,
-    /// Complete response/source/target fibre consumed by the linear target/port junction.
-    pub pair_currents: Vec<SourceNeutralAddressedRealizationPairCurrent>,
+    /// First factor of the response/source/target product consumed by the linear target/port
+    /// junction. `oriented_factor_current[*].pair_currents` is the second factor; distributivity
+    /// reconstructs every omitted Cartesian pair exactly.
+    pub transport_contributions: Vec<SourceNeutralExteriorRealizationTransportContribution>,
+    pub transport_obstructions: Vec<SourceNeutralExteriorRealizationTransportObstruction>,
     pub resident_complex_junction: ResidentAddressedComplexJunctionReturn,
     pub target_current: Vec<SourceNeutralExteriorRealizationTargetCurrent>,
     pub total_target_current: SourceNeutralPositiveCurrent,
+    /// Richer future receiver: the exact subfamily whose target carrier admits the emitted port as
+    /// a later local source (plus explicit closure). Dead non-closure alternatives remain in
+    /// `target_current` and the transport-obstruction fibre.
+    pub continuing_target_current: Vec<SourceNeutralExteriorRealizationTargetCurrent>,
     pub entering_realization_current_identity_sha256: String,
     pub entering_phase_numerator: BigUint,
     pub entering_phase_denominator: BigUint,
@@ -606,6 +641,10 @@ impl SourceNeutralExteriorRealizationPassage {
             .target_current
             .iter()
             .fold(Ratio::zero(), |sum, target| sum + &target.current);
+        let continuing_target_total = self
+            .continuing_target_current
+            .iter()
+            .fold(Ratio::zero(), |sum, target| sum + &target.current);
         let returned_site_total = self
             .returned_site_current
             .iter()
@@ -632,7 +671,7 @@ impl SourceNeutralExteriorRealizationPassage {
         );
         let phase_position = &entering_phase * &self.total_target_current;
         let selected_interval = self
-            .target_current
+            .continuing_target_current
             .iter()
             .try_fold((Ratio::zero(), None), |(begin, selected), target| {
                 let end = &begin + &target.current;
@@ -690,15 +729,20 @@ impl SourceNeutralExteriorRealizationPassage {
                     pair[0].factor,
                     pair[0].phase,
                     pair[0].local_source_port,
+                    pair[0].realization_state,
                 ) >= (
                     pair[1].carrier,
                     pair[1].factor,
                     pair[1].phase,
                     pair[1].local_source_port,
+                    pair[1].realization_state,
                 )
             })
             || self.site_current.iter().any(|site| {
-                site.phase > 2 || site.local_source_port >= 257 || site.current.is_zero()
+                site.phase > 2
+                    || site.local_source_port >= 257
+                    || site.realization_state.is_none()
+                    || site.current.is_zero()
             })
             || self.site_current != source_complex_shadow
             || self.complex_site_current.is_empty()
@@ -708,31 +752,40 @@ impl SourceNeutralExteriorRealizationPassage {
                     pair[0].factor,
                     pair[0].phase,
                     pair[0].local_source_port,
+                    pair[0].realization_state,
                 ) >= (
                     pair[1].carrier,
                     pair[1].factor,
                     pair[1].phase,
                     pair[1].local_source_port,
+                    pair[1].realization_state,
                 )
             })
             || self.complex_site_current.iter().any(|site| {
                 site.phase > 2
                     || site.local_source_port >= 257
+                    || site.realization_state.is_none()
                     || site.incidence_coefficient.is_zero()
             })
-            || self.pair_currents.is_empty()
-            || self.pair_currents.windows(2).any(|pair| pair[0] >= pair[1])
-            || self.pair_currents.iter().any(|pair| {
-                pair.current.is_zero()
-                    || pair.response.factor != pair.factor
-                    || pair.source_local_port >= 257
-                    || pair.target_local_port > 257
-                    || pair.exterior_target_port == 0
-                    || pair.exterior_target_port > 257
-                    || !self.oriented_factor_current.iter().any(|factor| {
-                        factor.factor == pair.factor
-                            && factor.pair_currents.binary_search(&pair.response).is_ok()
-                    })
+            || self.transport_contributions.is_empty()
+            || self.transport_contributions.iter().any(|contribution| {
+                contribution.incidence_coefficient.is_zero()
+                    || contribution.source_local_port >= 257
+                    || contribution.target_local_source_port > 257
+                    || contribution.exterior_target_port == 0
+                    || contribution.exterior_target_port > 257
+                    || !self
+                        .oriented_factor_current
+                        .iter()
+                        .any(|factor| factor.factor == contribution.factor)
+            })
+            || self.transport_obstructions.iter().any(|obstruction| {
+                obstruction.incidence_coefficient.is_zero()
+                    || obstruction.source_local_port >= 257
+                    || !self
+                        .oriented_factor_current
+                        .iter()
+                        .any(|factor| factor.factor == obstruction.factor)
             })
             || self.resident_complex_junction.groups.is_empty()
             || self
@@ -756,9 +809,22 @@ impl SourceNeutralExteriorRealizationPassage {
                     || target.current.is_zero()
                     || target.supporting_transition_population == 0
             })
+            || self.continuing_target_current.is_empty()
+            || self
+                .continuing_target_current
+                .windows(2)
+                .any(|pair| pair[0].target_port >= pair[1].target_port)
+            || self.continuing_target_current.iter().any(|target| {
+                target.current.is_zero()
+                    || self
+                        .target_current
+                        .iter()
+                        .all(|candidate| candidate.target_port != target.target_port)
+            })
             || site_total != Ratio::one()
             || target_total != self.total_target_current
             || self.total_target_current != Ratio::one()
+            || continuing_target_total != Ratio::one()
             || self.total_target_current.is_zero()
             || self.entering_phase_denominator.is_zero()
             || self.entering_phase_numerator >= self.entering_phase_denominator
@@ -770,7 +836,7 @@ impl SourceNeutralExteriorRealizationPassage {
             || phase_position < self.selected_interval_begin
             || phase_position >= self.selected_interval_end
             || self
-                .target_current
+                .continuing_target_current
                 .iter()
                 .find(|target| target.target_port == self.selected_target_port)
                 .is_none_or(|target| {
@@ -792,15 +858,20 @@ impl SourceNeutralExteriorRealizationPassage {
                     pair[0].factor,
                     pair[0].phase,
                     pair[0].local_source_port,
+                    pair[0].realization_state,
                 ) >= (
                     pair[1].carrier,
                     pair[1].factor,
                     pair[1].phase,
                     pair[1].local_source_port,
+                    pair[1].realization_state,
                 )
             })
             || self.returned_site_current.iter().any(|site| {
-                site.phase > 2 || site.local_source_port > 257 || site.current.is_zero()
+                site.phase > 2
+                    || site.local_source_port > 257
+                    || (site.local_source_port != 257 && site.realization_state.is_none())
+                    || site.current.is_zero()
             })
             || self.returned_factor_current != returned_factor_projection
             || returned_site_total != Ratio::one()
@@ -812,16 +883,19 @@ impl SourceNeutralExteriorRealizationPassage {
                     pair[0].factor,
                     pair[0].phase,
                     pair[0].local_source_port,
+                    pair[0].realization_state,
                 ) >= (
                     pair[1].carrier,
                     pair[1].factor,
                     pair[1].phase,
                     pair[1].local_source_port,
+                    pair[1].realization_state,
                 )
             })
             || self.returned_complex_site_current.iter().any(|site| {
                 site.phase > 2
                     || site.local_source_port > 257
+                    || (site.local_source_port != 257 && site.realization_state.is_none())
                     || site.incidence_coefficient.is_zero()
             })
             || self.returned_phase_denominator.is_zero()
@@ -853,10 +927,12 @@ impl SourceNeutralExteriorRealizationPassage {
                 &self.native_oriented_faces,
                 &self.site_current,
                 &self.complex_site_current,
-                &self.pair_currents,
+                &self.transport_contributions,
+                &self.transport_obstructions,
                 &self.resident_complex_junction,
                 &self.target_current,
                 &self.total_target_current,
+                &self.continuing_target_current,
                 self.entering_realization_current_identity_sha256.as_str(),
                 &self.entering_phase_numerator,
                 &self.entering_phase_denominator,
@@ -902,11 +978,13 @@ fn positive_site_shadow(
                 pair[0].factor,
                 pair[0].phase,
                 pair[0].local_source_port,
+                pair[0].realization_state,
             ) >= (
                 pair[1].carrier,
                 pair[1].factor,
                 pair[1].phase,
                 pair[1].local_source_port,
+                pair[1].realization_state,
             )
         })
         || complex
@@ -932,6 +1010,7 @@ fn positive_site_shadow(
             factor: current.factor,
             phase: current.phase,
             local_source_port: current.local_source_port,
+            realization_state: current.realization_state,
             current: &current.incidence_coefficient / &total,
         })
         .collect())

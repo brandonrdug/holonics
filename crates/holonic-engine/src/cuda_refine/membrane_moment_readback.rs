@@ -52,6 +52,7 @@ pub(super) fn readback(
         native_factors,
         norm_limb_count,
         overlap_limb_count,
+        port_population,
         port_restriction_offsets,
         product_limb_count,
         quadratic_limb_count,
@@ -76,6 +77,11 @@ pub(super) fn readback(
         active_factor_chart,
         balance_scratch,
         boundary_states_device,
+        boundary_port_imaginary_limbs,
+        boundary_port_imaginary_sign,
+        boundary_port_phase_locked,
+        boundary_port_real_limbs,
+        boundary_port_real_sign,
         compatibility_limbs,
         compatibility_sign,
         complete_native_successor_front,
@@ -204,7 +210,9 @@ pub(super) fn readback(
         restriction_present.read(&mut present)?;
         if trace_configuration().holonics_uar2_trace {
             eprintln!(
-                "post-target-observer-restrictions present={present:?} boundary-state-count={}",
+                "post-target-observer-restrictions present={} total={} boundary-state-count={}",
+                present.iter().filter(|value| **value != 0).count(),
+                present.len(),
                 resident_boundary
                     .expect("the resident presentation was established")
                     .boundary_states
@@ -266,10 +274,15 @@ pub(super) fn readback(
     {
         return Err(CudaRefineError::MembraneInteriorWordShape);
     }
-    let mut port_real_sign_host = vec![0_u8; response_population];
-    let mut port_real_limbs_host = vec![0_u32; response_population * radiation_limb_count];
-    let mut port_imaginary_sign_host = vec![0_u8; response_population];
-    let mut port_imaginary_limbs_host = vec![0_u32; response_population * radiation_limb_count];
+    let mut face_real_sign_host = vec![0_u8; response_population];
+    let mut face_real_limbs_host = vec![0_u32; response_population * radiation_limb_count];
+    let mut face_imaginary_sign_host = vec![0_u8; response_population];
+    let mut face_imaginary_limbs_host = vec![0_u32; response_population * radiation_limb_count];
+    let mut boundary_real_sign_host = vec![0_u8; port_population];
+    let mut boundary_real_limbs_host = vec![0_u32; port_population * radiation_limb_count];
+    let mut boundary_imaginary_sign_host = vec![0_u8; port_population];
+    let mut boundary_imaginary_limbs_host = vec![0_u32; port_population * radiation_limb_count];
+    let mut boundary_port_phase_locked_host = vec![0_u8; port_population];
     let mut phase_locked_host = vec![0_u8; response_population];
     let mut situated_pairing_sign_host = vec![0_u8; response_population];
     let mut situated_pairing_limbs_host =
@@ -284,10 +297,15 @@ pub(super) fn readback(
     let mut stored_real_limbs_host = vec![0_u32; stored_limb_count];
     let mut stored_imaginary_sign_host = [0_u8; 1];
     let mut stored_imaginary_limbs_host = vec![0_u32; stored_limb_count];
-    port_real_sign.read(&mut port_real_sign_host)?;
-    port_real_limbs.read(&mut port_real_limbs_host)?;
-    port_imaginary_sign.read(&mut port_imaginary_sign_host)?;
-    port_imaginary_limbs.read(&mut port_imaginary_limbs_host)?;
+    port_real_sign.read(&mut face_real_sign_host)?;
+    port_real_limbs.read(&mut face_real_limbs_host)?;
+    port_imaginary_sign.read(&mut face_imaginary_sign_host)?;
+    port_imaginary_limbs.read(&mut face_imaginary_limbs_host)?;
+    boundary_port_real_sign.read(&mut boundary_real_sign_host)?;
+    boundary_port_real_limbs.read(&mut boundary_real_limbs_host)?;
+    boundary_port_imaginary_sign.read(&mut boundary_imaginary_sign_host)?;
+    boundary_port_imaginary_limbs.read(&mut boundary_imaginary_limbs_host)?;
+    boundary_port_phase_locked.read(&mut boundary_port_phase_locked_host)?;
     phase_locked.read(&mut phase_locked_host)?;
     situated_pairing_sign.read(&mut situated_pairing_sign_host)?;
     situated_pairing_limbs.read(&mut situated_pairing_limbs_host)?;
@@ -301,58 +319,81 @@ pub(super) fn readback(
     stored_real_limbs.read(&mut stored_real_limbs_host)?;
     stored_imaginary_sign.read(&mut stored_imaginary_sign_host)?;
     stored_imaginary_limbs.read(&mut stored_imaginary_limbs_host)?;
-    let factorized_relational_host =
-        if let Some(workspace) = factorized_relational_workspace.as_ref() {
-            let mut compatibility_sign_host = vec![0_u8; component_population];
-            let mut compatibility_limbs_host =
-                vec![0_u32; component_population * compatibility_limb_count];
-            let mut target_norm_host = vec![0_u32; response_population * workspace.limb_count];
-            let mut current_norm_host = vec![0_u32; response_population * workspace.limb_count];
-            let mut norm_product_host = vec![0_u32; response_population * workspace.limb_count];
-            let mut obstruction_host = [0_u32; 1];
-            compatibility_sign.read(&mut compatibility_sign_host)?;
-            compatibility_limbs.read(&mut compatibility_limbs_host)?;
-            workspace.reduce_first_scratch.read(&mut target_norm_host)?;
-            workspace.relational_norm.read(&mut current_norm_host)?;
-            workspace
-                .reduce_second_scratch
-                .read(&mut norm_product_host)?;
-            workspace.obstruction.read(&mut obstruction_host)?;
-            Some((
-                compatibility_sign_host,
-                compatibility_limbs_host,
-                target_norm_host,
-                current_norm_host,
-                norm_product_host,
-                obstruction_host[0],
-            ))
-        } else if let Some(workspace) = completed_target_observer_workspace.as_ref() {
-            let mut compatibility_sign_host = vec![0_u8; component_population];
-            let mut compatibility_limbs_host =
-                vec![0_u32; component_population * compatibility_limb_count];
-            let mut target_norm_host = vec![0_u32; response_population * workspace.limb_count];
-            let mut current_norm_host = vec![0_u32; response_population * workspace.limb_count];
-            let mut norm_product_host = vec![0_u32; response_population * workspace.limb_count];
-            let mut obstruction_host = [0_u32; 1];
-            compatibility_sign.read(&mut compatibility_sign_host)?;
-            compatibility_limbs.read(&mut compatibility_limbs_host)?;
-            workspace.target_norm_limbs.read(&mut target_norm_host)?;
-            workspace
-                .relational_norm_limbs
-                .read(&mut current_norm_host)?;
-            workspace.norm_product_limbs.read(&mut norm_product_host)?;
-            workspace.obstruction.read(&mut obstruction_host)?;
-            Some((
-                compatibility_sign_host,
-                compatibility_limbs_host,
-                target_norm_host,
-                current_norm_host,
-                norm_product_host,
-                obstruction_host[0],
-            ))
-        } else {
-            None
-        };
+    let factorized_relational_host = if let Some(workspace) =
+        factorized_relational_workspace.as_ref()
+    {
+        let mut compatibility_sign_host = vec![0_u8; component_population];
+        let mut compatibility_limbs_host =
+            vec![0_u32; component_population * compatibility_limb_count];
+        let mut target_norm_host = vec![0_u32; response_population * workspace.limb_count];
+        let mut current_norm_host = vec![0_u32; response_population * workspace.limb_count];
+        let mut norm_product_host = vec![0_u32; response_population * workspace.limb_count];
+        let mut obstruction_host = [0_u32; 1];
+        let mut oriented_real_signs = vec![0_u8; response_population];
+        let mut oriented_real_limbs = vec![0_u32; response_population * workspace.limb_count];
+        let mut oriented_imaginary_signs = vec![0_u8; response_population];
+        let mut oriented_imaginary_limbs = vec![0_u32; response_population * workspace.limb_count];
+        compatibility_sign.read(&mut compatibility_sign_host)?;
+        compatibility_limbs.read(&mut compatibility_limbs_host)?;
+        workspace.reduce_first_scratch.read(&mut target_norm_host)?;
+        workspace.relational_norm.read(&mut current_norm_host)?;
+        workspace
+            .reduce_second_scratch
+            .read(&mut norm_product_host)?;
+        workspace.obstruction.read(&mut obstruction_host)?;
+        workspace
+            .oriented_real_signs
+            .read(&mut oriented_real_signs)?;
+        workspace.oriented_real.read(&mut oriented_real_limbs)?;
+        workspace
+            .oriented_imaginary_signs
+            .read(&mut oriented_imaginary_signs)?;
+        workspace
+            .oriented_imaginary
+            .read(&mut oriented_imaginary_limbs)?;
+        Some((
+            compatibility_sign_host,
+            compatibility_limbs_host,
+            target_norm_host,
+            current_norm_host,
+            norm_product_host,
+            obstruction_host[0],
+            oriented_real_signs,
+            oriented_real_limbs,
+            oriented_imaginary_signs,
+            oriented_imaginary_limbs,
+        ))
+    } else if let Some(workspace) = completed_target_observer_workspace.as_ref() {
+        let mut compatibility_sign_host = vec![0_u8; component_population];
+        let mut compatibility_limbs_host =
+            vec![0_u32; component_population * compatibility_limb_count];
+        let mut target_norm_host = vec![0_u32; response_population * workspace.limb_count];
+        let mut current_norm_host = vec![0_u32; response_population * workspace.limb_count];
+        let mut norm_product_host = vec![0_u32; response_population * workspace.limb_count];
+        let mut obstruction_host = [0_u32; 1];
+        compatibility_sign.read(&mut compatibility_sign_host)?;
+        compatibility_limbs.read(&mut compatibility_limbs_host)?;
+        workspace.target_norm_limbs.read(&mut target_norm_host)?;
+        workspace
+            .relational_norm_limbs
+            .read(&mut current_norm_host)?;
+        workspace.norm_product_limbs.read(&mut norm_product_host)?;
+        workspace.obstruction.read(&mut obstruction_host)?;
+        Some((
+            compatibility_sign_host,
+            compatibility_limbs_host,
+            target_norm_host,
+            current_norm_host,
+            norm_product_host,
+            obstruction_host[0],
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+            Vec::new(),
+        ))
+    } else {
+        None
+    };
     let completed_oriented_relational_host =
         if let Some(workspace) = completed_target_observer_workspace.as_ref() {
             let mut real_signs = vec![0_u8; response_population];
@@ -390,7 +431,7 @@ pub(super) fn readback(
             .count();
         let phase_locked = phase_locked_host.iter().filter(|held| **held != 0).count();
         let invalid_relational = factorized_relational_host.as_ref().map(
-            |(signs, _, target_norms, current_norms, products, obstruction)| {
+            |(signs, _, target_norms, current_norms, products, obstruction, ..)| {
                 (
                     *obstruction,
                     signs.iter().filter(|sign| **sign != 0).count(),
@@ -422,11 +463,11 @@ pub(super) fn readback(
             .iter()
             .zip(&phase_locked_host)
             .any(|(situated, native)| *situated != 0 && *native == 0)
-        || factorized_relational_host
-            .as_ref()
-            .is_some_and(|(signs, _, _, _, _, obstruction)| {
+        || factorized_relational_host.as_ref().is_some_and(
+            |(signs, _, _, _, _, obstruction, ..)| {
                 *obstruction != 0 || signs.iter().any(|sign| *sign > 2)
-            })
+            },
+        )
         || completed_oriented_relational_host.as_ref().is_some_and(
             |(real_signs, _, imaginary_signs, _, _)| {
                 real_signs.iter().any(|sign| *sign > 2)
@@ -460,6 +501,10 @@ pub(super) fn readback(
         target_norm_host,
         current_norm_host,
         norm_product_host,
+        _,
+        _,
+        _,
+        _,
         _,
     )) = factorized_relational_host.as_ref()
     {
@@ -536,6 +581,44 @@ pub(super) fn readback(
             imaginary.push(imaginary_coordinate);
         }
         (real, imaginary, modulus_squared)
+    } else if let Some((
+        _,
+        _,
+        _,
+        _,
+        _,
+        _,
+        real_signs,
+        real_limbs,
+        imaginary_signs,
+        imaginary_limbs,
+    )) = factorized_relational_host.as_ref()
+    {
+        let limb_count = factorized_relational_workspace
+            .as_ref()
+            .map(|workspace| workspace.limb_count)
+            .ok_or(CudaRefineError::MembraneInteriorWordShape)?;
+        let mut real = Vec::with_capacity(response_population);
+        let mut imaginary = Vec::with_capacity(response_population);
+        for face in 0..response_population {
+            let begin = face * limb_count;
+            real.push(decode_integer(
+                real_signs[face],
+                &real_limbs[begin..begin + limb_count],
+            )?);
+            imaginary.push(decode_integer(
+                imaginary_signs[face],
+                &imaginary_limbs[begin..begin + limb_count],
+            )?);
+        }
+        (
+            real,
+            imaginary,
+            receiver_relational_coordinates
+                .iter()
+                .map(|coordinate| coordinate.magnitude().clone())
+                .collect(),
+        )
     } else {
         (
             Vec::new(),
@@ -607,16 +690,35 @@ pub(super) fn readback(
             let begin = port * radiation_limb_count;
             let end = begin + radiation_limb_count;
             let returned_response = decode_current(
-                port_real_sign_host[port],
-                &port_real_limbs_host[begin..end],
-                port_imaginary_sign_host[port],
-                &port_imaginary_limbs_host[begin..end],
+                face_real_sign_host[port],
+                &face_real_limbs_host[begin..end],
+                face_imaginary_sign_host[port],
+                &face_imaginary_limbs_host[begin..end],
                 &word.family_common_denominator,
             )?;
             Ok(ResidentBoundaryChainPortReturn {
                 port: port as u32,
                 lies_in_joint_port_kernel: returned_response.is_zero(),
                 lies_in_receiver_phase_front: phase_locked_host[port] != 0,
+                returned_response,
+            })
+        })
+        .collect::<Result<Vec<_>, CudaRefineError>>()?;
+    let boundary_port_returns = (0..port_population)
+        .map(|port| {
+            let begin = port * radiation_limb_count;
+            let end = begin + radiation_limb_count;
+            let returned_response = decode_current(
+                boundary_real_sign_host[port],
+                &boundary_real_limbs_host[begin..end],
+                boundary_imaginary_sign_host[port],
+                &boundary_imaginary_limbs_host[begin..end],
+                &word.family_common_denominator,
+            )?;
+            Ok(ResidentBoundaryChainPortReturn {
+                port: port as u32,
+                lies_in_joint_port_kernel: returned_response.is_zero(),
+                lies_in_receiver_phase_front: boundary_port_phase_locked_host[port] != 0,
                 returned_response,
             })
         })
@@ -636,7 +738,12 @@ pub(super) fn readback(
         &balance_denominator,
     )?;
     let local_balance_closes = stored_difference.add(&total_returned_current) == *entering_current;
-    if !local_balance_closes {
+    let boundary_sum = boundary_port_returns
+        .iter()
+        .fold(ExactComplexWaveCurrent::zero(), |total, returned| {
+            total.add(&returned.returned_response)
+        });
+    if !local_balance_closes || boundary_sum != total_returned_current {
         if trace_configuration().holonics_uar2_trace {
             eprintln!("post-target-observer-obstruction=local-current-balance");
         }
@@ -761,12 +868,33 @@ pub(super) fn readback(
     let relational_host_egress_octets = factorized_relational_host
         .as_ref()
         .and_then(
-            |(signs, coordinates, target_norms, current_norms, norm_products, _)| {
+            |(
+                signs,
+                coordinates,
+                target_norms,
+                current_norms,
+                norm_products,
+                _,
+                oriented_real_signs,
+                oriented_real,
+                oriented_imaginary_signs,
+                oriented_imaginary,
+            )| {
                 std::mem::size_of_val(&signs[..])
                     .checked_add(std::mem::size_of_val(&coordinates[..]))
                     .and_then(|held| held.checked_add(std::mem::size_of_val(&target_norms[..])))
                     .and_then(|held| held.checked_add(std::mem::size_of_val(&current_norms[..])))
                     .and_then(|held| held.checked_add(std::mem::size_of_val(&norm_products[..])))
+                    .and_then(|held| {
+                        held.checked_add(std::mem::size_of_val(&oriented_real_signs[..]))
+                    })
+                    .and_then(|held| held.checked_add(std::mem::size_of_val(&oriented_real[..])))
+                    .and_then(|held| {
+                        held.checked_add(std::mem::size_of_val(&oriented_imaginary_signs[..]))
+                    })
+                    .and_then(|held| {
+                        held.checked_add(std::mem::size_of_val(&oriented_imaginary[..]))
+                    })
                     .and_then(|held| held.checked_add(std::mem::size_of::<u32>()))
             },
         )
@@ -958,6 +1086,11 @@ pub(super) fn readback(
     drop(port_real_limbs);
     drop(port_imaginary_sign);
     drop(port_imaginary_limbs);
+    drop(boundary_port_real_sign);
+    drop(boundary_port_real_limbs);
+    drop(boundary_port_imaginary_sign);
+    drop(boundary_port_imaginary_limbs);
+    drop(boundary_port_phase_locked);
     drop(joint_real_sign);
     drop(joint_real_limbs);
     drop(joint_imaginary_sign);
@@ -1013,6 +1146,7 @@ pub(super) fn readback(
         receiver_coordinate_denominator: BigInt::one(),
         ports,
         port_returns,
+        boundary_port_returns,
         entering_current: entering_current.clone(),
         total_returned_current,
         stored_difference,

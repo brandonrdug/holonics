@@ -27,7 +27,7 @@ impl<Standing: GranularMembraneStanding> NativeCausalMembrane<Standing> {
         let frontier_current_fibre = self
             .complete_frontier_current_sections()
             .map_err(|error| NativeRadiationError::RadiationDetail(error.to_string()))?;
-        let frontier_contexts = frontier_current_fibre
+        let mut frontier_contexts = frontier_current_fibre
             .iter()
             .map(|section| section.current.clone())
             .collect::<Vec<_>>();
@@ -35,7 +35,7 @@ impl<Standing: GranularMembraneStanding> NativeCausalMembrane<Standing> {
             .iter()
             .flat_map(|section| section.factor_current.iter().map(|(factor, _)| *factor))
             .collect::<BTreeSet<_>>();
-        let (factor_population, outward_ports, outward_boundary) = {
+        let (factor_population, outward_ports, outward_boundary, context_boundary_states) = {
             let rest = self.rested_body();
             let factor_population = u32::try_from(rest.membrane_correspondences().len())
                 .map_err(|_| NativeRadiationError::Extent)?;
@@ -72,6 +72,37 @@ impl<Standing: GranularMembraneStanding> NativeCausalMembrane<Standing> {
                 })
                 .map(|port| u32::try_from(port).map_err(|_| NativeRadiationError::Extent))
                 .collect::<Result<Vec<_>, _>>()?;
+            let context_boundary_states = frontier_contexts
+                .iter()
+                .map(|context| {
+                    boundary_states
+                        .iter()
+                        .copied()
+                        .find(|state| {
+                            (0..ports).any(|port| {
+                                let transition =
+                                    atlas.state_port_transition[*state as usize * ports + port];
+                                if transition == u32::MAX {
+                                    return false;
+                                }
+                                let transition = transition as usize;
+                                let begin = atlas.transition_factor_offsets[transition] as usize;
+                                let end = atlas.transition_factor_offsets[transition + 1] as usize;
+                                atlas.transition_factors[begin..end].iter().any(|factor| {
+                                    context
+                                        .factor_current
+                                        .binary_search_by_key(factor, |(at, _)| *at)
+                                        .is_ok()
+                                })
+                            })
+                        })
+                        .ok_or_else(|| {
+                            NativeRadiationError::RadiationDetail(
+                                "one frontier current has no addressed boundary state".to_owned(),
+                            )
+                        })
+                })
+                .collect::<Result<Vec<_>, _>>()?;
             let outward_ports = universal_ports
                 .iter()
                 .copied()
@@ -89,8 +120,12 @@ impl<Standing: GranularMembraneStanding> NativeCausalMembrane<Standing> {
                     boundary_states,
                     universal_ports,
                 },
+                context_boundary_states,
             )
         };
+        for (context, state) in frontier_contexts.iter_mut().zip(context_boundary_states) {
+            context.boundary_state = Some(state);
+        }
         if factor_population == 0 || outward_ports.is_empty() {
             return Err(NativeRadiationError::RadiationDetail(
                 "the standing body has no complete outward boundary receiver".to_owned(),
@@ -152,8 +187,6 @@ impl<Standing: GranularMembraneStanding> NativeCausalMembrane<Standing> {
                 })
                 .collect::<Vec<_>>();
             let mut resident_source = None::<ResidentCurrentAddress>;
-            let entering_projective = projective_current_section(factor_population, &contexts)?;
-            let mut seen = vec![canonical_projective_rays(&entering_projective)];
             let mut orders = Vec::new();
             let mut causal_order = 0_u64;
             let terminal;
@@ -178,12 +211,13 @@ impl<Standing: GranularMembraneStanding> NativeCausalMembrane<Standing> {
                         false,
                     )
                     .map_err(|error| NativeRadiationError::RadiationDetail(error.to_string()))?;
-                let source_address = resident.resident_current.clone().ok_or_else(|| {
-                    NativeRadiationError::RadiationDetail(
-                        "the resident outward receiver did not retain its current".to_owned(),
-                    )
-                })?;
-                if resident.port_returns.len() != outward_ports.len()
+                let resident_target_address =
+                    resident.resident_current.clone().ok_or_else(|| {
+                        NativeRadiationError::RadiationDetail(
+                            "the resident outward receiver did not retain its current".to_owned(),
+                        )
+                    })?;
+                if resident.boundary_port_returns.len() != outward_ports.len()
                     || !resident.local_balance_closes
                 {
                     return Err(NativeRadiationError::RadiationDetail(
@@ -194,8 +228,21 @@ impl<Standing: GranularMembraneStanding> NativeCausalMembrane<Standing> {
                 let mut lawful_silence_population = 0_usize;
                 let mut compulsory_radiation_population = 0_usize;
                 let mut outward_port_returns = Vec::with_capacity(outward_ports.len());
+                let situated = resident.situated_receiver_pairing.as_ref().ok_or_else(|| {
+                    NativeRadiationError::RadiationDetail(
+                        "the resident outward receiver omitted its situated coordinate section"
+                            .to_owned(),
+                    )
+                })?;
+                if situated.face_ports.len() != situated.coordinates.len()
+                    || situated.coordinate_denominator <= BigInt::from(0)
+                {
+                    return Err(NativeRadiationError::RadiationDetail(
+                        "the situated outward coordinate section lost its port chart".to_owned(),
+                    ));
+                }
                 for ((port, universal_port), returned) in
-                    outward_ports.iter().zip(&resident.port_returns)
+                    outward_ports.iter().zip(&resident.boundary_port_returns)
                 {
                     if returned.port != *port
                         || returned.returned_response.is_zero()
@@ -210,10 +257,25 @@ impl<Standing: GranularMembraneStanding> NativeCausalMembrane<Standing> {
                     } else {
                         compulsory_radiation_population += 1;
                     }
+                    let situated_receiver_coordinates = situated
+                        .face_ports
+                        .iter()
+                        .zip(&situated.coordinates)
+                        .filter_map(|(face_port, coordinate)| {
+                            (*face_port == *port).then_some(coordinate.clone())
+                        })
+                        .collect::<Vec<_>>();
+                    if situated_receiver_coordinates.is_empty() {
+                        return Err(NativeRadiationError::RadiationDetail(
+                            "one outward port lost every situated generator coordinate".to_owned(),
+                        ));
+                    }
                     outward_port_returns.push(NativeOutwardPortReturn {
                         port: *port,
                         universal_port: *universal_port,
                         returned_response: returned.returned_response.clone(),
+                        situated_receiver_coordinates,
+                        situated_coordinate_denominator: situated.coordinate_denominator.clone(),
                         lies_in_outward_radical: returned.lies_in_joint_port_kernel,
                         lies_in_receiver_phase_front: returned.lies_in_receiver_phase_front,
                     });
@@ -222,18 +284,17 @@ impl<Standing: GranularMembraneStanding> NativeCausalMembrane<Standing> {
                 compulsory_nonradical_radiation_present |= compulsory_radiation_population != 0;
                 invariant_transport_reuploaded |= resident.invariant_transport_reuploaded;
                 cpu_semantic_replay_after_device |= resident.cpu_semantic_replay_after_device;
-                let descent = self
-                    .continue_resident_addressed_current_passage(
-                        &source_address,
-                        &contexts,
-                        &generator_targets,
-                        generator_count,
+                let descent = resident.conditioned_current.clone().ok_or_else(|| {
+                    NativeRadiationError::RadiationDetail(
+                        "the resident outward receiver did not return its completed generated-port passage"
+                            .to_owned(),
                     )
-                    .map_err(|error| NativeRadiationError::RadiationDetail(error.to_string()))?;
-                if descent.passage.source != contexts
+                })?;
+                if descent.target_address != resident_target_address
+                    || descent.passage.source != contexts
                     || descent.invariant_transport_reuploaded
                     || descent.cpu_semantic_replay_after_device
-                    || descent.intermediate_host_egress_octets != 0
+                    || descent.intermediate_semantic_egress_octets != 0
                 {
                     every_generator_descent_returned_on_card = false;
                 }
@@ -241,40 +302,27 @@ impl<Standing: GranularMembraneStanding> NativeCausalMembrane<Standing> {
                 cpu_semantic_replay_after_device |= descent.cpu_semantic_replay_after_device;
                 let target = descent.passage.target.clone();
                 let projective_source = projective_current_section(factor_population, &contexts)?;
-                let projective_descent = projective_source
-                    .transport_direct_sum(&generators)
-                    .map_err(|error| NativeRadiationError::RadiationDetail(error.to_string()))?;
                 let projective_target = projective_current_section(factor_population, &target)?;
-                if projective_descent.target.rays != projective_target.rays
-                    || projective_descent.target.weights != projective_target.weights
-                {
-                    return Err(NativeRadiationError::RadiationDetail(
-                        "the resident scale-bearing descent disagreed with its exact projective quotient"
-                            .to_owned(),
-                    ));
-                }
+                let projective_descent = generated_port_projective_passage(
+                    projective_source.clone(),
+                    projective_target.clone(),
+                    &descent,
+                )?;
                 let source_rays = canonical_projective_rays(&projective_source);
                 let target_rays = canonical_projective_rays(&projective_target);
                 let dynamically_closed = target_rays == source_rays;
-                let repeated_at = seen.iter().position(|prior| prior == &target_rays);
-                let scale_reconstruction_fibre_retained = projective_descent.edges.len()
-                    == projective_source
-                        .rays
-                        .len()
-                        .checked_mul(generators.len())
-                        .ok_or(NativeRadiationError::Extent)?
-                    && projective_descent.target.reconstruction_fibre.len()
-                        == projective_descent.edges.len();
+                let scale_reconstruction_fibre_retained =
+                    projective_descent.complete_reconstruction_fibre_retained;
                 let target_identity_sha256 = digest(&descent.target_address)?;
+                let next_resident_source = descent.target_address.clone();
                 if holonic_engine::cuda_refine::trace_configuration().holonics_phase_trace {
                     eprintln!(
-                        "open-world-tube order={causal_order} contexts={} rays={}->{} ports={} dynamically_closed={} repeated={:?} elapsed={:?}",
+                        "open-world-tube order={causal_order} contexts={} rays={}->{} ports={} dynamically_closed={} elapsed={:?}",
                         contexts.len(),
                         source_rays.len(),
                         target_rays.len(),
                         outward_port_returns.len(),
                         dynamically_closed,
-                        repeated_at,
                         order_started.elapsed(),
                     );
                 }
@@ -284,11 +332,11 @@ impl<Standing: GranularMembraneStanding> NativeCausalMembrane<Standing> {
                     complete_reconstruction_fibre_retained: descent.passage.occurrences.len()
                         == contexts
                             .len()
-                            .checked_mul(generator_count as usize)
+                            .checked_mul(port_population)
+                            .and_then(|population| population.checked_mul(generator_count as usize))
                             .ok_or(NativeRadiationError::Extent)?,
                     resident_restriction: resident,
                     outward_port_returns,
-                    generator_descent: descent,
                     projective_descent,
                     lawful_silence_population,
                     compulsory_radiation_population,
@@ -301,26 +349,21 @@ impl<Standing: GranularMembraneStanding> NativeCausalMembrane<Standing> {
                     };
                     break;
                 }
-                if let Some(first_seen) = repeated_at {
-                    terminal = NativeOpenWorldTubeTerminal::RecurrentOpenFront {
-                        first_seen_causal_order: u64::try_from(first_seen)
-                            .map_err(|_| NativeRadiationError::Extent)?,
+                // HIF7 declares the immediate section and one causally later re-entry as the
+                // receiver family.  Once both have returned, a nonstationary target is exact open
+                // testimony; extending until an accidental cycle would impose an unscheduled
+                // periodicity claim and an unbounded apparatus loop.
+                if causal_order != 0 {
+                    terminal = NativeOpenWorldTubeTerminal::OpenLaterFront {
+                        returned_causal_order: causal_order,
                         resident_current_identity_sha256: target_identity_sha256,
                         projective_ray_population: target_rays.len(),
                         scale_reconstruction_fibre_retained,
                     };
                     break;
                 }
-                seen.push(target_rays);
                 contexts = target;
-                resident_source = Some(
-                    orders
-                        .last()
-                        .expect("the current order was just returned")
-                        .generator_descent
-                        .target_address
-                        .clone(),
-                );
+                resident_source = Some(next_resident_source);
                 causal_order = causal_order
                     .checked_add(1)
                     .ok_or(NativeRadiationError::Extent)?;

@@ -486,63 +486,6 @@ impl ResidentMembraneInteriorWord {
             },
             "cuLaunchKernel(condition_membrane_active_factor_current_sections_by_generated_ports)",
         )?;
-        if trace_configuration().holonics_phase_trace && source_context_population <= 2 {
-            driver(
-                unsafe { cuCtxSynchronize() },
-                "cuCtxSynchronize(pre-junction generated-port trace)",
-            )?;
-            let mut transported_debug = vec![0_u32; transported_population];
-            let mut candidate_debug = vec![0_u32; candidate_population];
-            transported.read(&mut transported_debug)?;
-            candidates.read(&mut candidate_debug)?;
-            let transported_support = transported_debug
-                .chunks_exact(successor_factor_count * transported_limb_count)
-                .map(|row| {
-                    row.chunks_exact(transported_limb_count)
-                        .enumerate()
-                        .filter_map(|(local, limbs)| {
-                            limbs.iter().any(|limb| *limb != 0).then_some(
-                                successor_factors.get(local).copied().unwrap_or(u32::MAX),
-                            )
-                        })
-                        .collect::<Vec<_>>()
-                })
-                .collect::<Vec<_>>();
-            let candidate_support = candidate_debug
-                .chunks_exact(successor_factor_count * candidate_limb_count)
-                .map(|row| {
-                    row.chunks_exact(candidate_limb_count)
-                        .enumerate()
-                        .filter_map(|(local, limbs)| {
-                            limbs.iter().any(|limb| *limb != 0).then_some(
-                                successor_factors.get(local).copied().unwrap_or(u32::MAX),
-                            )
-                        })
-                        .collect::<Vec<_>>()
-                })
-                .collect::<Vec<_>>();
-            let mut mounted_generator_targets = vec![u32::MAX; generators.saturating_mul(factors)];
-            action
-                .native_generator_targets
-                .read(&mut mounted_generator_targets)?;
-            let active_generator_images = (0..generators)
-                .map(|generator| {
-                    source_active_factors
-                        .iter()
-                        .map(|source| {
-                            (
-                                *source,
-                                generator_targets[generator * factors + *source as usize],
-                                mounted_generator_targets[generator * factors + *source as usize],
-                            )
-                        })
-                        .collect::<Vec<_>>()
-                })
-                .collect::<Vec<_>>();
-            eprintln!(
-                "generated-port-pre-junction active-generator-images(host,mounted)={active_generator_images:?} transported-support={transported_support:?} candidate-support={candidate_support:?}"
-            );
-        }
         // The candidate rows are local incidences.  Index only their addressed target states and
         // retain each exact target fibre; row equality and projective scale are receiver shadows
         // and cannot found recurrence.

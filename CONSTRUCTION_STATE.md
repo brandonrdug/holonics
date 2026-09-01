@@ -95,25 +95,33 @@ reused by HIF owners; the interrupted H2N/UAR-specific factorization was unadmit
 
 ## Current obstruction
 
-[open; source-inspected] The bounded direct cycle now closes the lifecycle, but it does not establish
-the HIF7 qualitative receiver family. Fixed, hybrid, recurrent, and current-founded charts still
-need a common comparison return, and the unchanged UAR qualitative surfaces require direct
-inspection rather than a topology or telemetry proxy.
-
 [established-bounded; implemented-exact; measured] The HIF7 neutral contact comparison now returns
 fixed-window, periodic-hybrid, recurrent-linear, and current-founded edge families with active
 causal extent, exact pair work, reconstruction fibres, and richer-receiver reopenings. It advances
 no qualitative grade by itself.
 
-[counterexample; source-inspected; measured] The rich qualitative rebuild exposed and repaired two
-accidental products. The exchange mount now accepts an explicit content-blind chronology-cover
-octet aperture and returned 808 complete containers inside the process bound. H2N replaced 27,020
-linear address scans and 891 × 1,411 materialized candidate structs with one linear ingress
-projection, one common resident return, and a factorized product; the unchanged H2N receiver then
-passed in 8.165 seconds. L1 still materializes the native-fibre × K3-pullback local matrix family
-inside `ExchangeSituatedProduct::found` and crossed 180 seconds twice before returning the product.
-That factorization, followed by the unchanged qualitative surface inspection, is the current HIF7
-obstruction.
+[established-bounded; implemented-exact; source-inspected; measured] The rich HIF7 foundation now
+returns the complete visible-exchange product without its former Cartesian products; one physical
+kernel retains 1,403 lineages in its fibre and 888 native factors cross the situated product. The
+resident generated-port target, physical port quotient, two-order silence/radiation control,
+acoustic room return, optical return, source-detached remount, withdrawal, restoration, and
+generation-reentry controls return inside their process bounds.
+
+[counterexample; source-inspected; measured] Exact path state prevents corrupted per-character
+recombination and returns coherent closed text, but the unchanged qualitative receiver returned
+`direct Lean and 3 990 job target` for the compression question and did not answer it. Distinct
+compression and Brandon ingress currents previously collapsed to one emitted-surface identity.
+The exact prompt-path receiver reports no matching productive path; consulting exterior source
+text would establish lookup rather than native inference.
+
+[open; source-inspected] The shortest HIF7 obstruction is the absent cultivated cross-occurrence
+passage. The exterior `ContinuationAperture` retains 891 addressed user-to-assistant families, but
+the source-neutral rest has no returned transport from prompt factor/history current through those
+joins into reusable response morphology. HIF7 remains current until development/held-out/revisit/
+rebase/disjoint controls return that relation, it survives source-detached remount, targeted
+withdrawal removes its qualitative conduct, and direct inspection accepts all requested surfaces.
+The exact return is recorded in
+[`research/records/2026-09-01_HIF7_RETURNED_EXACT_RESIDENT_RADIATION_AND_PATH_STATE_BUT_QUALITATIVE_INFERENCE_REMAINS_AN_UNCULTIVATED_CROSS_OCCURRENCE.md`](research/records/2026-09-01_HIF7_RETURNED_EXACT_RESIDENT_RADIATION_AND_PATH_STATE_BUT_QUALITATIVE_INFERENCE_REMAINS_AN_UNCULTIVATED_CROSS_OCCURRENCE.md).
 
 [definition] `UNIVERSAL_CATALOG.md` remains the sole descriptive Lean--Rust--CUDA owner crosswalk.
 It schedules and grades nothing. Historical ledgers, checksum manifests, output chains, UAR

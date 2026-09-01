@@ -191,12 +191,11 @@ fn main() -> Result<(), Box<dyn Error>> {
                         break returned;
                     }
                     let returned = pending.acknowledge_delivery(format!(
-                        "uar2/release/{at}/delivery/{}",
+                        "hif7/release/{at}/delivery/{}",
                         emission.causal_order
                     ))?;
-                    // Delivery testimony is independently observable before the returned local
-                    // phase and factor section continue the boundary world-tube.  The emitted
-                    // byte is never remounted as semantic ingress.
+                    // Delivery testimony is independently observable while the already-returned
+                    // complex site current and local phase continue the realization world-line.
                     fs::write(
                         output.join(format!("return-{at}-{}.json", emission.causal_order)),
                         serde_json::to_vec_pretty(returned.returned())?,

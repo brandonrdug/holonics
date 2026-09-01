@@ -228,6 +228,16 @@ impl SourceNeutralExteriorCirculation {
                 0,
                 &conditioned_current.passage.target,
                 &native_oriented_faces,
+                &self
+                    .current_projective
+                    .ingress_port_chronology
+                    .iter()
+                    .map(|port| match port {
+                        GranularExteriorPort::Octet(octet) => u16::from(octet.to_owned()) + 1,
+                        GranularExteriorPort::Opening => 0,
+                        GranularExteriorPort::Closure => 257,
+                    })
+                    .collect::<Vec<_>>(),
                 &self.realization_current_identity_sha256,
                 self.realization_current.clone(),
             )

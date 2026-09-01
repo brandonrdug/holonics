@@ -254,6 +254,14 @@ cross-codec, generation-reentry, silence/radiation, withdrawal, restoration, and
 controls through the neutral package. Release only after direct qualitative inspection accepts the
 surfaces and richer receivers reopen every unlawful condensation.
 
+[counterexample; implemented-exact; source-inspected; measured] Exact contact comparison,
+factorized resident return, silence/radiation, acoustic and optical return, physical boundary-port
+descent, source-detached controls, and realization path state now return. Direct inspection rejects
+the qualitative surface. The source-neutral rest lacks a cultivated cross-occurrence transport from
+prompt factor/history current through the addressed continuation families into reusable response
+morphology. The shortest obstruction and forbidden lookup fallback are recorded in
+[`research/records/2026-09-01_HIF7_RETURNED_EXACT_RESIDENT_RADIATION_AND_PATH_STATE_BUT_QUALITATIVE_INFERENCE_REMAINS_AN_UNCULTIVATED_CROSS_OCCURRENCE.md`](../research/records/2026-09-01_HIF7_RETURNED_EXACT_RESIDENT_RADIATION_AND_PATH_STATE_BUT_QUALITATIVE_INFERENCE_REMAINS_AN_UNCULTIVATED_CROSS_OCCURRENCE.md).
+
 [proved-derived; formal-checked; measured] HIF0 passed. The four-file neutral formal closure built
 3,164 focused jobs and the live umbrella built 3,769 jobs without `sorryAx`. Its exact return is
 [`research/records/2026-08-31_HIF0_INTRINSIC_HOLON_PROFILES_AND_NEUTRAL_LIFECYCLE_CONTRACTS_RETURNED.md`](../research/records/2026-08-31_HIF0_INTRINSIC_HOLON_PROFILES_AND_NEUTRAL_LIFECYCLE_CONTRACTS_RETURNED.md).

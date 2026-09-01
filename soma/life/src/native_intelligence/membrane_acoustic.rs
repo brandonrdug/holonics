@@ -151,7 +151,7 @@ impl NativeAcousticRadiationInput {
                 scale_reconstruction_fibre_retained: true,
                 ..
             }
-            | NativeOpenWorldTubeTerminal::RecurrentOpenFront {
+            | NativeOpenWorldTubeTerminal::OpenLaterFront {
                 scale_reconstruction_fibre_retained: true,
                 ..
             } => {}
@@ -173,6 +173,8 @@ impl NativeAcousticRadiationInput {
                     .ok_or(NativeAcousticError::MalformedRadiation)?;
                 if (returned.port, returned.universal_port) != *expected
                     || returned.returned_response.is_zero() != returned.lies_in_outward_radical
+                    || returned.situated_receiver_coordinates.len() != 2
+                    || returned.situated_coordinate_denominator <= BigInt::from(0)
                 {
                     return Err(NativeAcousticError::MalformedRadiation);
                 }
@@ -850,9 +852,7 @@ impl AcousticProductRest {
         let mut denominator = BigInt::from(1);
         for order in &input.orders {
             for returned in &order.outward_port_returns {
-                denominator = lcm_positive(&denominator, returned.returned_response.real.denom());
-                denominator =
-                    lcm_positive(&denominator, returned.returned_response.imaginary.denom());
+                denominator = lcm_positive(&denominator, &returned.situated_coordinate_denominator);
             }
         }
         let denominator_uint = denominator
@@ -870,19 +870,28 @@ impl AcousticProductRest {
         let mut nonradical_population = 0_usize;
         for order in &input.orders {
             for returned in &order.outward_port_returns {
-                samples.push(clear_denominator(
-                    &returned.returned_response.real,
-                    &denominator,
-                ));
-                samples.push(clear_denominator(
-                    &returned.returned_response.imaginary,
-                    &denominator,
-                ));
+                let scale = &denominator / &returned.situated_coordinate_denominator;
+                samples.extend(
+                    returned
+                        .situated_receiver_coordinates
+                        .iter()
+                        .map(|coordinate| coordinate * &scale),
+                );
+                let situated_response = ExactComplexWaveCurrent::new(
+                    Rat::new(
+                        returned.situated_receiver_coordinates[0].clone(),
+                        returned.situated_coordinate_denominator.clone(),
+                    ),
+                    Rat::new(
+                        returned.situated_receiver_coordinates[1].clone(),
+                        returned.situated_coordinate_denominator.clone(),
+                    ),
+                );
                 fibre.push((
                     order.causal_order,
                     returned.port,
                     returned.universal_port,
-                    returned.returned_response.clone(),
+                    situated_response,
                 ));
                 if returned.lies_in_outward_radical {
                     outward_radical_population += 1;
@@ -1299,6 +1308,8 @@ mod tests {
                         port: 0,
                         universal_port: 7,
                         returned_response: ExactComplexWaveCurrent::zero(),
+                        situated_receiver_coordinates: vec![BigInt::from(0), BigInt::from(0)],
+                        situated_coordinate_denominator: BigInt::from(1),
                         lies_in_outward_radical: true,
                         lies_in_receiver_phase_front: false,
                     },
@@ -1306,6 +1317,8 @@ mod tests {
                         port: 1,
                         universal_port: 9,
                         returned_response: current(3, -2),
+                        situated_receiver_coordinates: vec![BigInt::from(3), BigInt::from(-2)],
+                        situated_coordinate_denominator: BigInt::from(1),
                         lies_in_outward_radical: false,
                         lies_in_receiver_phase_front: true,
                     },
@@ -1318,6 +1331,8 @@ mod tests {
                         port: 0,
                         universal_port: 7,
                         returned_response: ExactComplexWaveCurrent::zero(),
+                        situated_receiver_coordinates: vec![BigInt::from(0), BigInt::from(0)],
+                        situated_coordinate_denominator: BigInt::from(1),
                         lies_in_outward_radical: true,
                         lies_in_receiver_phase_front: false,
                     },
@@ -1325,6 +1340,8 @@ mod tests {
                         port: 1,
                         universal_port: 9,
                         returned_response: current(5, 1),
+                        situated_receiver_coordinates: vec![BigInt::from(5), BigInt::from(1)],
+                        situated_coordinate_denominator: BigInt::from(1),
                         lies_in_outward_radical: false,
                         lies_in_receiver_phase_front: true,
                     },

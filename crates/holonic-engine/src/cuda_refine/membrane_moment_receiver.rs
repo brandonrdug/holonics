@@ -24,6 +24,7 @@ pub(super) fn launch(
     let radiation_limb_count = plan.radiation_limb_count;
     let resident_boundary = plan.resident_boundary;
     let response_population = plan.response_population;
+    let local_response_population = plan.local_response_population;
     let situated_pairing_limb_count = plan.situated_pairing_limb_count;
     let square_limb_count = plan.square_limb_count;
     let stored_limb_count = plan.stored_limb_count;
@@ -54,6 +55,11 @@ pub(super) fn launch(
     let port_imaginary_sign = &workspace.port_imaginary_sign;
     let port_real_limbs = &workspace.port_real_limbs;
     let port_real_sign = &workspace.port_real_sign;
+    let boundary_port_real_sign = &workspace.boundary_port_real_sign;
+    let boundary_port_real_limbs = &workspace.boundary_port_real_limbs;
+    let boundary_port_imaginary_sign = &workspace.boundary_port_imaginary_sign;
+    let boundary_port_imaginary_limbs = &workspace.boundary_port_imaginary_limbs;
+    let boundary_port_phase_locked = &workspace.boundary_port_phase_locked;
     let port_receiver_limbs = &workspace.port_receiver_limbs;
     let port_receiver_norm_limbs = &workspace.port_receiver_norm_limbs;
     let port_receiver_norm_sign = &workspace.port_receiver_norm_sign;
@@ -331,7 +337,64 @@ pub(super) fn launch(
             },
             "cuLaunchKernel(reduce_membrane_factorized_relational_moment_components)",
         )?;
-        *factorized_relational_launches = factorized_relational_launches.saturating_add(1);
+        let mut relational_oriented_reduce = ptr::null_mut();
+        driver(
+            unsafe {
+                cuModuleGetFunction(
+                    &mut relational_oriented_reduce,
+                    word.card.module,
+                    c"reduce_membrane_factorized_relational_oriented_components".as_ptr(),
+                )
+            },
+            "cuModuleGetFunction(reduce_membrane_factorized_relational_oriented_components)",
+        )?;
+        let mut partial_real_sign_pointer = workspace.dot_real_signs.pointer;
+        let mut partial_real_pointer = workspace.dot_real.pointer;
+        let mut partial_imaginary_sign_pointer = workspace.dot_imaginary_signs.pointer;
+        let mut partial_imaginary_pointer = workspace.dot_imaginary.pointer;
+        let mut oriented_real_sign_pointer = workspace.oriented_real_signs.pointer;
+        let mut oriented_real_pointer = workspace.oriented_real.pointer;
+        let mut oriented_imaginary_sign_pointer = workspace.oriented_imaginary_signs.pointer;
+        let mut oriented_imaginary_pointer = workspace.oriented_imaginary.pointer;
+        let mut oriented_arguments: [*mut c_void; 18] = [
+            &mut partial_real_sign_pointer as *mut u64 as *mut c_void,
+            &mut partial_real_pointer as *mut u64 as *mut c_void,
+            &mut partial_imaginary_sign_pointer as *mut u64 as *mut c_void,
+            &mut partial_imaginary_pointer as *mut u64 as *mut c_void,
+            &mut context_state_present_pointer as *mut u64 as *mut c_void,
+            &mut context_states_pointer as *mut u64 as *mut c_void,
+            &mut relational_reduce_boundary_states_pointer as *mut u64 as *mut c_void,
+            &mut oriented_real_sign_pointer as *mut u64 as *mut c_void,
+            &mut oriented_real_pointer as *mut u64 as *mut c_void,
+            &mut oriented_imaginary_sign_pointer as *mut u64 as *mut c_void,
+            &mut oriented_imaginary_pointer as *mut u64 as *mut c_void,
+            &mut relational_face_count_wire as *mut u32 as *mut c_void,
+            &mut relational_context_count_wire as *mut u32 as *mut c_void,
+            &mut relational_port_count_wire as *mut u32 as *mut c_void,
+            &mut relational_generator_count_wire as *mut u32 as *mut c_void,
+            &mut relational_boundary_state_count_wire as *mut u32 as *mut c_void,
+            &mut relational_limb_count_wire as *mut u32 as *mut c_void,
+            &mut descend_relational_reduce_wire as *mut u32 as *mut c_void,
+        ];
+        driver(
+            unsafe {
+                cuLaunchKernel(
+                    relational_oriented_reduce,
+                    word.card.grid_for(response_population as u64)?,
+                    1,
+                    1,
+                    word.card.block_x,
+                    1,
+                    1,
+                    0,
+                    ptr::null_mut(),
+                    oriented_arguments.as_mut_ptr(),
+                    ptr::null_mut(),
+                )
+            },
+            "cuLaunchKernel(reduce_membrane_factorized_relational_oriented_components)",
+        )?;
+        *factorized_relational_launches = factorized_relational_launches.saturating_add(2);
     } else if let Some(workspace) = completed_target_observer_workspace.as_ref() {
         let mut append_relational = ptr::null_mut();
         driver(
@@ -711,6 +774,62 @@ pub(super) fn launch(
             "cuLaunchKernel(select_membrane_situated_output_pairing_front_direct)",
         )?;
     }
+
+    let mut aggregate_boundary_ports = ptr::null_mut();
+    driver(
+        unsafe {
+            cuModuleGetFunction(
+                &mut aggregate_boundary_ports,
+                word.card.module,
+                c"aggregate_membrane_boundary_face_radiation_by_port".as_ptr(),
+            )
+        },
+        "cuModuleGetFunction(aggregate_membrane_boundary_face_radiation_by_port)",
+    )?;
+    let mut boundary_port_real_sign_pointer = boundary_port_real_sign.pointer;
+    let mut boundary_port_real_limbs_pointer = boundary_port_real_limbs.pointer;
+    let mut boundary_port_imaginary_sign_pointer = boundary_port_imaginary_sign.pointer;
+    let mut boundary_port_imaginary_limbs_pointer = boundary_port_imaginary_limbs.pointer;
+    let mut boundary_port_phase_locked_pointer = boundary_port_phase_locked.pointer;
+    let mut face_count_wire = response_population as u32;
+    let mut boundary_port_count_wire = port_population as u32;
+    let mut local_face_count_wire = local_response_population as u32;
+    let mut generator_count_wire = generator_count as u32;
+    let mut boundary_port_arguments: [*mut c_void; 15] = [
+        &mut port_real_sign_pointer as *mut u64 as *mut c_void,
+        &mut port_real_limbs_pointer as *mut u64 as *mut c_void,
+        &mut port_imaginary_sign_pointer as *mut u64 as *mut c_void,
+        &mut port_imaginary_limbs_pointer as *mut u64 as *mut c_void,
+        &mut phase_locked_pointer as *mut u64 as *mut c_void,
+        &mut boundary_port_real_sign_pointer as *mut u64 as *mut c_void,
+        &mut boundary_port_real_limbs_pointer as *mut u64 as *mut c_void,
+        &mut boundary_port_imaginary_sign_pointer as *mut u64 as *mut c_void,
+        &mut boundary_port_imaginary_limbs_pointer as *mut u64 as *mut c_void,
+        &mut boundary_port_phase_locked_pointer as *mut u64 as *mut c_void,
+        &mut face_count_wire as *mut u32 as *mut c_void,
+        &mut boundary_port_count_wire as *mut u32 as *mut c_void,
+        &mut local_face_count_wire as *mut u32 as *mut c_void,
+        &mut generator_count_wire as *mut u32 as *mut c_void,
+        &mut radiation_limb_count_wire as *mut u32 as *mut c_void,
+    ];
+    driver(
+        unsafe {
+            cuLaunchKernel(
+                aggregate_boundary_ports,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                0,
+                ptr::null_mut(),
+                boundary_port_arguments.as_mut_ptr(),
+                ptr::null_mut(),
+            )
+        },
+        "cuLaunchKernel(aggregate_membrane_boundary_face_radiation_by_port)",
+    )?;
     let mut stored_real_sign_pointer = stored_real_sign.pointer;
     let mut stored_real_limbs_pointer = stored_real_limbs.pointer;
     let mut stored_imaginary_sign_pointer = stored_imaginary_sign.pointer;

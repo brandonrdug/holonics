@@ -1,129 +1,12 @@
 impl NativeGranularPotential {
-    /// Read the granular organ from the rejected pre-UAR0 wrapper and immediately quotient away
-    /// its developmental occurrence/action identities. This reader is reachable only from the
-    /// cold severing passage; the returned value validates under the source-neutral schema.
-    pub(super) fn read_developmental_predecessor(
+    /// Admit the already source-neutral granular organ carried inside a richer developmental
+    /// product. The outer cold severing passage removes that product; this inner owner is preserved
+    /// exactly and receives no compatibility decoder or source-chart reinterpretation.
+    pub(super) fn read_source_neutral_predecessor(
         value: serde_json::Value,
     ) -> Result<Self, NativeGranularPotentialError> {
-        #[derive(Deserialize)]
-        #[serde(deny_unknown_fields)]
-        struct DevelopmentalPortState {
-            #[serde(rename = "port")]
-            _port: Option<GranularExteriorPort>,
-            #[serde(rename = "restriction")]
-            _restriction: Option<u32>,
-            recurrence_multiplicity: u64,
-            support: u32,
-            transitions: Vec<GranularPortTransition>,
-        }
-
-        #[derive(Deserialize)]
-        #[serde(deny_unknown_fields)]
-        struct DevelopmentalWire {
-            schema: String,
-            supports: Vec<Vec<u32>>,
-            states: Vec<DevelopmentalPortState>,
-            factor_faces: Vec<GranularFactorFace>,
-            factor_generators: Vec<GranularFactorGenerator>,
-            #[serde(rename = "source_action_identity_sha256")]
-            _action_lineage: String,
-            #[serde(rename = "exposure_lineage")]
-            occurrence_lineage: Vec<GranularExposureLineage>,
-            #[serde(rename = "material_octet_population")]
-            _material_octet_population: u64,
-            #[serde(rename = "material_port_population")]
-            _material_port_population: u64,
-            identity_sha256: String,
-        }
-
-        let DevelopmentalWire {
-            schema,
-            supports: developmental_supports,
-            states,
-            mut factor_faces,
-            factor_generators,
-            _action_lineage: _,
-            occurrence_lineage,
-            _material_octet_population: _,
-            _material_port_population: _,
-            identity_sha256,
-        } = serde_json::from_value(value).map_err(|_| NativeGranularPotentialError::Wire)?;
-        if !schema.starts_with("soma-life.native-causal-boundary-potential.")
-            || occurrence_lineage.is_empty()
-            || !is_digest(&identity_sha256)
-        {
-            return Err(NativeGranularPotentialError::Wire);
-        }
-        for face in &mut factor_faces {
-            face.factor_address =
-                native_factor_address(face.factor, face.native, &face.receiver_factors);
-            let identity = factor_identity(&face.factor_address);
-            face.receiver_schema = identity.schema();
-            face.receiver_words = identity.words().to_vec();
-        }
-        let mut supports = Vec::<Vec<u32>>::new();
-        let mut support_lookup = BTreeMap::<Vec<u32>, u32>::new();
-        let state_population = states.len();
-        if state_population == 0 || state_population > u32::MAX as usize {
-            return Err(NativeGranularPotentialError::Wire);
-        }
-        // Preserve the complete causal-state incidence while severing the developmental state
-        // labels.  A state's predecessor port and restriction were source-chart coordinates;
-        // its support, multiplicity, outgoing addressed spans, and target joins are the native
-        // future-consequence structure required by later successor words.
-        let states = states
-            .into_iter()
-            .map(|state| {
-                let state_factors = developmental_supports
-                    .get(state.support as usize)
-                    .cloned()
-                    .ok_or(NativeGranularPotentialError::Wire)?;
-                let support = intern_support(state_factors, &mut supports, &mut support_lookup)?;
-                let transitions = state
-                    .transitions
-                    .into_iter()
-                    .map(|transition| {
-                        if transition.target as usize >= state_population {
-                            return Err(NativeGranularPotentialError::Wire);
-                        }
-                        let factors = developmental_supports
-                            .get(transition.support as usize)
-                            .cloned()
-                            .ok_or(NativeGranularPotentialError::Wire)?;
-                        let transition_support =
-                            intern_support(factors, &mut supports, &mut support_lookup)?;
-                        Ok(GranularPortTransition {
-                            port: transition.port,
-                            target: transition.target,
-                            recurrence_multiplicity: transition.recurrence_multiplicity,
-                            support: transition_support,
-                            factor_current: transition.factor_current,
-                        })
-                    })
-                    .collect::<Result<Vec<_>, NativeGranularPotentialError>>()?;
-                Ok(NativeGranularState {
-                    recurrence_multiplicity: state.recurrence_multiplicity,
-                    support,
-                    transitions,
-                })
-            })
-            .collect::<Result<Vec<_>, NativeGranularPotentialError>>()?;
-        let factor_generators = factor_generators
-            .into_iter()
-            .map(|generator| NativeGranularFactorGenerator {
-                generator: generator.generator,
-                targets: generator.targets,
-            })
-            .collect();
-        let mut potential = Self {
-            schema: NATIVE_GRANULAR_POTENTIAL_SCHEMA.to_owned(),
-            supports,
-            states,
-            factor_faces,
-            factor_generators,
-            identity_sha256: String::new(),
-        };
-        potential.identity_sha256 = potential.rederived_identity();
+        let potential: Self =
+            serde_json::from_value(value).map_err(|_| NativeGranularPotentialError::Wire)?;
         potential.validate()?;
         Ok(potential)
     }
@@ -880,10 +763,16 @@ impl GranularExteriorProjectiveCurrent {
         &self,
     ) -> Result<GranularNativeProjectiveCurrent, NativeGranularPotentialError> {
         let mut native = GranularNativeProjectiveCurrent {
-            schema: "soma-life.granular-native-projective-current.v7".to_owned(),
+            schema: "soma-life.granular-native-projective-current.v8".to_owned(),
             entered_octet_population: self.entered_octet_population,
             entering_current: self.entering_current.clone(),
             crossed_structural_ports: self.crossed_structural_ports.clone(),
+            ingress_port_chronology: self
+                .exact_source_fibre
+                .iter()
+                .copied()
+                .map(GranularExteriorPort::Octet)
+                .collect(),
             boundary_front: self.boundary_front.clone(),
             contexts: self.contexts.clone(),
             diagonal_chronology: self.diagonal_chronology.clone(),
@@ -901,9 +790,14 @@ impl GranularExteriorProjectiveCurrent {
 
 impl GranularNativeProjectiveCurrent {
     fn validate(&self) -> Result<(), NativeGranularPotentialError> {
-        if self.schema != "soma-life.granular-native-projective-current.v7"
+        if self.schema != "soma-life.granular-native-projective-current.v8"
             || (self.entered_octet_population == 0 && self.crossed_structural_ports.is_empty())
             || self.entering_current.is_zero()
+            || self.ingress_port_chronology.len() != self.entered_octet_population as usize
+            || self
+                .ingress_port_chronology
+                .iter()
+                .any(|port| !matches!(port, GranularExteriorPort::Octet(_)))
             || self.boundary_front.is_empty()
             || self
                 .boundary_front
@@ -958,10 +852,11 @@ impl GranularNativeProjectiveCurrent {
 
     fn rederived_identity(&self) -> Result<String, NativeGranularPotentialError> {
         serde_json::to_vec(&(
-            "soma-life.granular-native-projective-current.v7",
+            "soma-life.granular-native-projective-current.v8",
             self.entered_octet_population,
             &self.entering_current,
             &self.crossed_structural_ports,
+            &self.ingress_port_chronology,
             &self.boundary_front,
             &self.contexts,
             &self.diagonal_chronology,

@@ -399,8 +399,10 @@ pub struct GranularNativeProjectiveCurrent {
     /// receiver-history factor is not required to be a stored source Complex-Parametron cell.
     pub entering_current: ExactComplexWaveCurrent,
     pub crossed_structural_ports: Vec<GranularExteriorPort>,
-    /// The native ingress boundary is the universal membrane root.  Exterior byte-port states
-    /// belong to the cold transducer fibre and may not become continuation addresses.
+    /// Finest caused ingress chronology in the universal byte-port chart. These are transient
+    /// current occurrences, not rested lexical state or a tokenizer.
+    pub ingress_port_chronology: Vec<GranularExteriorPort>,
+    /// The native ingress boundary is the universal membrane root.
     pub boundary_front: Vec<u32>,
     /// Source-neutral terminal factor-current axes presented at the universal membrane root.
     /// Their weights retain the exact linear and quadratic fibres accumulated by chronology.

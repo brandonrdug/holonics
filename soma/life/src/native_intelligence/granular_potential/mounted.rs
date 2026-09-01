@@ -556,23 +556,28 @@ impl MountedNativeGranularPotential<'_> {
     ) -> Result<GranularBoundaryEmanation, NativeGranularPotentialError> {
         validate_resident_returned_face_boundary(self.states, self.factor_generators, returned)?;
         let passage = &transported.passage;
-        let source_matches = passage.source.len() == prior.current.contexts.len()
-            && passage
-                .source
-                .iter()
-                .zip(&prior.current.contexts)
-                .all(|(source, context)| {
-                    source.boundary_state == Some(context.state)
-                        && source.quadratic_weight == context.quadratic_weight
-                        && source.factor_current.len() == context.factor_current.len()
-                        && source
-                            .factor_current
-                            .iter()
-                            .zip(&context.factor_current)
-                            .all(|((factor, coefficient), coordinate)| {
-                                *factor == coordinate.factor && *coefficient == coordinate.incidence
-                            })
-                });
+        // The resident source may be the exact compact current founded from the prior raw context
+        // family rather than that family's materialized row list.  Its current address was checked
+        // by the resident passage owner before the target replaced it; this cold reconstruction
+        // seam therefore validates the retained causal-state boundary and current shape without
+        // reopening or equating the raw source rows.
+        let source_matches = !self.factor_generators.is_empty()
+            && !prior.current.boundary_front.is_empty()
+            && !passage.source.is_empty()
+            && passage.source.iter().all(|source| {
+                source.boundary_state.is_some_and(|state| {
+                    prior.current.boundary_front.binary_search(&state).is_ok()
+                }) && !source.quadratic_weight.is_zero()
+                    && !source.factor_current.is_empty()
+                    && !source
+                        .factor_current
+                        .windows(2)
+                        .any(|pair| pair[0].0 >= pair[1].0)
+                    && !source.factor_current.iter().any(|(factor, coefficient)| {
+                        *factor as usize >= self.factor_generators[0].targets.len()
+                            || coefficient.is_zero()
+                    })
+            });
         let expected_occurrence_population = passage
             .source
             .iter()
@@ -655,8 +660,20 @@ impl MountedNativeGranularPotential<'_> {
                                         && coordinate.incidence == *coefficient
                                 },
                             )
-                    })
-                    .ok_or(NativeGranularPotentialError::Wire)?;
+                    });
+                let Some(transition) = transition else {
+                    if holonic_engine::cuda_refine::trace_configuration().holonics_uar2_trace {
+                        eprintln!(
+                            "generated-port-slot-separator source-state={} port={:?} generator={} target-state={} restriction-factors={}",
+                            slot.source_boundary_state,
+                            face.port,
+                            slot.generator,
+                            slot.boundary_state,
+                            slot.restriction.len(),
+                        );
+                    }
+                    return Err(NativeGranularPotentialError::Wire);
+                };
                 let _ = transition;
                 Ok(face)
             })
@@ -692,7 +709,7 @@ impl MountedNativeGranularPotential<'_> {
             contexts: source_contexts,
             boundary_front: _,
             resident_image: _,
-            reconstruction_nodes,
+            mut reconstruction_nodes,
         } = prior.current;
         let expected_boundary = passage
             .target
@@ -709,6 +726,94 @@ impl MountedNativeGranularPotential<'_> {
             .collect::<Vec<_>>();
         if expected_boundary.is_empty() {
             return Err(NativeGranularPotentialError::Wire);
+        }
+        if passage.source.len() == source_contexts.len().saturating_add(1) {
+            // The final source row is the complementary occurrence-wide integrated current.  Its
+            // unit observer weight is founded by the resident target junction; multiplying every
+            // raw predecessor node by every selected slot would rematerialize the very source
+            // family that this row factors.  Retain the predecessor and higher-face populations as
+            // the two reconstruction factors of one joined node instead.
+            let predecessors = source_contexts
+                .iter()
+                .flat_map(|context| context.reconstruction_nodes.iter().copied())
+                .collect::<BTreeSet<_>>();
+            let returned_higher_faces = productive_faces.iter().cloned().collect::<Vec<_>>();
+            if predecessors.is_empty() || returned_higher_faces.is_empty() {
+                return Err(NativeGranularPotentialError::Wire);
+            }
+            let shortest_extent = predecessors
+                .iter()
+                .filter_map(|node| reconstruction_nodes.get(*node as usize))
+                .map(|node| node.shortest_extent)
+                .min()
+                .ok_or(NativeGranularPotentialError::Wire)?
+                .checked_add(1)
+                .ok_or(NativeGranularPotentialError::Extent)?;
+            let greatest_extent = predecessors
+                .iter()
+                .filter_map(|node| reconstruction_nodes.get(*node as usize))
+                .map(|node| node.greatest_extent)
+                .max()
+                .ok_or(NativeGranularPotentialError::Wire)?
+                .checked_add(1)
+                .ok_or(NativeGranularPotentialError::Extent)?;
+            let path_population = predecessors
+                .iter()
+                .filter_map(|node| reconstruction_nodes.get(*node as usize))
+                .fold(BigUint::from(0_u8), |sum, node| {
+                    sum + &node.path_population
+                });
+            let incoming = predecessors
+                .into_iter()
+                .map(|predecessor| GranularReconstructionEdge {
+                    predecessor: Some(predecessor),
+                    entering_port: None,
+                    returned_higher_faces: returned_higher_faces.clone(),
+                    transport_projective_scale: BigUint::from(1_u8),
+                })
+                .collect::<Vec<_>>();
+            let mut contexts = Vec::with_capacity(passage.target.len());
+            for target in &passage.target {
+                let state = target.boundary_state.ok_or(NativeGranularPotentialError::Wire)?;
+                let node = u32::try_from(reconstruction_nodes.len())
+                    .map_err(|_| NativeGranularPotentialError::Extent)?;
+                reconstruction_nodes.push(GranularReconstructionNode {
+                    node,
+                    quadratic_projective_mass: target.quadratic_weight.clone(),
+                    removed_common_quadratic_scale: BigUint::from(1_u8),
+                    shortest_extent,
+                    greatest_extent,
+                    path_population: path_population.clone(),
+                    incoming: incoming.clone(),
+                });
+                contexts.push(GranularCausalContext {
+                    state,
+                    factor_current: target
+                        .factor_current
+                        .iter()
+                        .map(|(factor, incidence)| GranularFactorCurrent {
+                            factor: *factor,
+                            incidence: incidence.clone(),
+                        })
+                        .collect(),
+                    quadratic_weight: target.quadratic_weight.clone(),
+                    reconstruction_nodes: vec![node],
+                });
+            }
+            let current = GranularPortCurrent {
+                contexts,
+                resident_image: None,
+                boundary_front: expected_boundary,
+                reconstruction_nodes,
+            };
+            let is_octet_position = ports
+                .iter()
+                .all(|port| matches!(port, GranularExteriorPort::Octet(_)));
+            let entered = usize::try_from(entered_octet_population)
+                .map_err(|_| NativeGranularPotentialError::Extent)?
+                .checked_add(usize::from(is_octet_position))
+                .ok_or(NativeGranularPotentialError::Extent)?;
+            return self.emanate_current(current, entered);
         }
         let mut target_keys = BTreeSet::new();
         let mut candidates = Vec::with_capacity(passage.target.len());
