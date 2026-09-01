@@ -10,15 +10,15 @@ grades.
 
 ## Current frontier
 
-**Current frontier:** AAC2
+**Current frontier:** AAC3
 
-**AAC0--AAC1 PASSED. AAC2 IS ACTIVE. AAC3--AAC6 FOLLOW ONLY AFTER THEIR PREDECESSORS PASS.**
+**AAC0--AAC2 PASSED. AAC3 IS ACTIVE. AAC4--AAC6 FOLLOW ONLY AFTER THEIR PREDECESSORS PASS.**
 
 [definition] Brandon's direct request of 2026-09-01 founds the active contract
 [`blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).
-AAC0 returned the formal laws. AAC1 returned the move-owned neutral Rust session and exact owned
-boundary. AAC2 now owns only parented commits, successive local cultivation, journal, and
-snapshot/remount storage.
+AAC0 returned the formal laws. AAC1 returned the move-owned neutral Rust session and owned
+boundary. AAC2 returned parented successive local commits, journal, withdrawal/replay, and exact
+snapshot/remount. AAC3 now owns only exact diffusion through the common boundary.
 
 [proved-derived; formal-checked; measured] AAC0 returned `LiveCirculationSession`, one common
 owned boundary, parented commit and decline, exact snapshot/remount conduct, and constituted
@@ -30,6 +30,12 @@ diffusion through that boundary. The focused closure built 3,187 jobs and the li
 non-cloneable package-owning session, complete owned future fibres, actual addressed continuation,
 stale/false refusal, and decline invariance. Three focused tests passed. The exact receipt is
 [`research/records/2026-09-01_AAC1_MOVE_OWNED_NATIVE_CIRCULATION_SESSION_RETURNED_COMPLETE_OWNED_BOUNDARIES.md`](research/records/2026-09-01_AAC1_MOVE_OWNED_NATIVE_CIRCULATION_SESSION_RETURNED_COMPLETE_OWNED_BOUNDARIES.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] AAC2 returned generations
+`0 -> 1 -> 2`, genuinely later local deposits, exact snapshot/remount, latest-delta withdrawal,
+replay, and mismatch refusal. The commit owner returned two passed tests; the standing cultivation
+owner returned two passed tests. The receipt is
+[`research/records/2026-09-01_AAC2_TWO_SUCCESSIVE_LOCAL_COMMITS_SNAPSHOT_WITHDRAWAL_AND_REPLAY_RETURNED.md`](research/records/2026-09-01_AAC2_TWO_SUCCESSIVE_LOCAL_COMMITS_SNAPSHOT_WITHDRAWAL_AND_REPLAY_RETURNED.md).
 
 ## Admitted standing
 

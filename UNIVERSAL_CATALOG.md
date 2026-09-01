@@ -80,7 +80,7 @@ test result never upgrades a correspondence.
 
 | Relation | Lean owner | Rust owner | ABI/application owner | Status and exact open fibre |
 |---|---|---|---|---|
-| Live session, parented commit, decline, snapshot/remount, and diffusive boundary | `Computation/HolonicCirculationSession.lean` | `native_intelligence/circulation_session.rs` over `holonic_intelligence/{circulation,repeated_circulation}.rs`; AAC2--AAC3 remain open over cultivation/package/diffusion | AAC4--AAC5 open | **partial:** AAC1 returns one move-owned package session, complete owned future fibres, actual addressed continuation, stale/false refusal, and decline invariance. Parented commit storage, diffusive conduct, ABI, and application remain AAC2--AAC5. |
+| Live session, parented commit, decline, snapshot/remount, and diffusive boundary | `Computation/HolonicCirculationSession.lean` | `native_intelligence/{circulation_session,morphology_commit,scaffold_cultivation,morphology_package}.rs`; AAC3 remains open over `diffusion.rs` | AAC4--AAC5 open | **partial:** AAC1--AAC2 return one move-owned session, complete owned future fibres, actual continuation, decline, successive parented local commits, exact snapshot/remount, withdrawal, and replay. Diffusive conduct, ABI, and application remain AAC3--AAC5. |
 
 ## Deprecated R0Q correspondence retained as standing
 

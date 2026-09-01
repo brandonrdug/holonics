@@ -17,10 +17,13 @@ use holonic_engine::{
     receiver_history_compression::NativeStateId,
     EventId, OccurrencePort,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use super::{InferenceConfigurationAddress, MorphologyPackageError, NativeMorphologyPackage};
+use super::{
+    InferenceConfigurationAddress, MorphologyPackageError, NativeMorphologyCommit,
+    NativeMorphologyPackage,
+};
 
 pub const NATIVE_CIRCULATION_SESSION_SCHEMA: &str = "soma-life.native-circulation-session.v1";
 
@@ -29,7 +32,7 @@ pub const NATIVE_CIRCULATION_SESSION_SCHEMA: &str = "soma-life.native-circulatio
 /// `address.occurrence` is the first ingress occurrence. Every returned boundary replaces only
 /// that coordinate with its actual cut occurrence. The remaining fields are receipt testimony;
 /// none is used as a registry key or behavior selector.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeCirculationConfiguration {
     pub schema: String,
     pub address: InferenceConfigurationAddress,
@@ -89,7 +92,7 @@ pub struct NativeOwnedOpenObligation {
     pub testimony: String,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeOwnedInferenceAddress {
     pub spool: String,
     pub thread: String,
@@ -107,7 +110,7 @@ impl From<&NativeInferenceAddress> for NativeOwnedInferenceAddress {
 }
 
 impl NativeOwnedInferenceAddress {
-    fn native(&self) -> NativeInferenceAddress {
+    pub(crate) fn native(&self) -> NativeInferenceAddress {
         NativeInferenceAddress {
             spool: self.spool.clone(),
             thread: self.thread.clone(),
@@ -132,7 +135,7 @@ impl From<&NativeInferenceRequest> for NativeOwnedInferenceRequest {
 }
 
 impl NativeOwnedInferenceRequest {
-    fn native(&self) -> NativeInferenceRequest {
+    pub(crate) fn native(&self) -> NativeInferenceRequest {
         NativeInferenceRequest {
             address: self.address.native(),
             receiver: self.receiver,
@@ -192,7 +195,10 @@ impl NativeCirculationBoundary {
         &self.emission.address
     }
 
-    fn validate_for(&self, session: &NativeCirculationSession) -> Result<(), NativeSessionError> {
+    pub(crate) fn validate_for(
+        &self,
+        session: &NativeCirculationSession,
+    ) -> Result<(), NativeSessionError> {
         if self.schema != NATIVE_CIRCULATION_SESSION_SCHEMA
             || self.generation != session.generation()
             || self.configuration.receiver != self.request.receiver
@@ -213,8 +219,9 @@ impl NativeCirculationBoundary {
 /// runtime object; snapshots belong to the package/storage boundary.
 #[derive(Debug)]
 pub struct NativeCirculationSession {
-    package: NativeMorphologyPackage,
-    configuration: NativeCirculationConfiguration,
+    pub(super) package: NativeMorphologyPackage,
+    pub(super) configuration: NativeCirculationConfiguration,
+    pub(super) commits: Vec<NativeMorphologyCommit>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -238,6 +245,12 @@ pub enum NativeSessionError {
     Boundary,
     #[error("the requested continuation is not an actual successor of this emission")]
     FalseSuccessor,
+    #[error("the exterior return is not a genuinely later consequence of this emission")]
+    Return,
+    #[error("the morphology commit refused: {0}")]
+    Commit(String),
+    #[error("the circulation snapshot or commit journal is malformed: {0}")]
+    Snapshot(String),
 }
 
 impl From<MorphologyPackageError> for NativeSessionError {
@@ -264,6 +277,7 @@ impl NativeCirculationSession {
         Ok(Self {
             package,
             configuration,
+            commits: Vec::new(),
         })
     }
 
@@ -277,6 +291,10 @@ impl NativeCirculationSession {
 
     pub fn configuration(&self) -> &NativeCirculationConfiguration {
         &self.configuration
+    }
+
+    pub fn commits(&self) -> &[NativeMorphologyCommit] {
+        &self.commits
     }
 
     pub fn conduct(

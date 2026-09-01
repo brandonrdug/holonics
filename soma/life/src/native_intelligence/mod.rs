@@ -22,6 +22,7 @@ mod membrane_interior;
 mod membrane_optical;
 mod membrane_radiation;
 mod membrane_transport;
+mod morphology_commit;
 mod morphology_evaluation;
 mod morphology_export;
 mod morphology_package;
@@ -170,6 +171,10 @@ pub use membrane_transport::{
     MembraneReturn, MembraneStanding, MembraneTransductionError, MorphologyDerivedCurrentSection,
     NativeCausalMembrane, NativeMembraneBindingInsufficiency, NativeMembraneDefect,
     NativeMembraneInsufficiency, ReturnedMembraneDifference, MEMBRANE_CROSSING_SCHEMA,
+};
+pub use morphology_commit::{
+    NativeCirculationSnapshot, NativeCultivationCandidate, NativeMorphologyCommit,
+    NATIVE_CIRCULATION_SNAPSHOT_SCHEMA, NATIVE_MORPHOLOGY_COMMIT_SCHEMA,
 };
 pub use morphology_evaluation::{
     evaluate_morphology_configuration, MorphologyEvaluationError, MorphologyExperimentInput,

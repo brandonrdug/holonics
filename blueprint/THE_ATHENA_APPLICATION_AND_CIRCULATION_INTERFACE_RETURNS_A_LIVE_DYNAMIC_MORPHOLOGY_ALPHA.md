@@ -3,7 +3,7 @@
 **Date:** 2026-09-01
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** AAC2.
+**Current frontier:** AAC3.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md),
@@ -239,7 +239,7 @@ false/stale refusal, and decline invariance. The focused owner returned three pa
 receipt is
 [`../research/records/2026-09-01_AAC1_MOVE_OWNED_NATIVE_CIRCULATION_SESSION_RETURNED_COMPLETE_OWNED_BOUNDARIES.md`](../research/records/2026-09-01_AAC1_MOVE_OWNED_NATIVE_CIRCULATION_SESSION_RETURNED_COMPLETE_OWNED_BOUNDARIES.md).
 
-### AAC2 — parented morphology commits and snapshot/remount storage
+### AAC2 — parented morphology commits and snapshot/remount storage — PASSED
 
 [definition] Return exact local commit artifacts, advance package lineage, retain the ordered
 delta journal, and remount the successor. Preserve package evaluation, reconstruction, apparatus,
@@ -249,6 +249,12 @@ and export lanes without making them route conduct.
 morphology; generations and event lineage join exactly; package remount preserves the successor;
 commit replay/withdrawal restores the predecessor relation; decline is structurally unchanged;
 and no digest is used as native identity.
+
+[established-bounded; implemented-exact; source-inspected; measured] AAC2 returned two successive
+local commits, parented generations, exact snapshot/remount, latest-delta withdrawal, exact replay,
+and mismatched-return/predecessor refusal. The focused commit owner returned two passed tests and
+the standing cultivation owner returned two passed tests. Its receipt is
+[`../research/records/2026-09-01_AAC2_TWO_SUCCESSIVE_LOCAL_COMMITS_SNAPSHOT_WITHDRAWAL_AND_REPLAY_RETURNED.md`](../research/records/2026-09-01_AAC2_TWO_SUCCESSIVE_LOCAL_COMMITS_SNAPSHOT_WITHDRAWAL_AND_REPLAY_RETURNED.md).
 
 ### AAC3 — discrete and exact diffusive generation share one boundary
 

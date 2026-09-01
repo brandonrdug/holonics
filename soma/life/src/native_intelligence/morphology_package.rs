@@ -346,6 +346,27 @@ impl NativeMorphologyPackage {
         )
     }
 
+    /// Repackage one already-native committed successor while preserving its physically separate
+    /// reconstruction lane. The caller supplies parented lineage; this function derives every
+    /// anatomy/capability field again from the moved hot morphology.
+    pub(crate) fn found_successor(
+        hot: RestedMorphology,
+        lineage: MorphologyLineage,
+        evaluation: Vec<ConfigurationEvaluationReceipt>,
+        apparatus: Vec<ApparatusRealization>,
+        exports: Vec<ExportRealization>,
+        departed_inherited_withdrawals: Vec<Vec<u8>>,
+    ) -> Result<Self, MorphologyPackageError> {
+        Self::found_parts(
+            hot,
+            lineage,
+            evaluation,
+            apparatus,
+            exports,
+            departed_inherited_withdrawals,
+        )
+    }
+
     fn found_parts(
         hot: RestedMorphology,
         lineage: MorphologyLineage,

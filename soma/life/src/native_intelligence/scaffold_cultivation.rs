@@ -160,7 +160,7 @@ impl ScaffoldCultivatedRest {
         let emitted = &returned.emitted;
         let causal_cone = returned.contact_support.clone();
         let outside_before = outside_cone_threads(&predecessor.ecology, &causal_cone)?;
-        let deposit = returned_current_deposit(&predecessor, &source, &returned)?;
+        let deposit = derive_returned_scaffold_deposit(&predecessor.ecology, &source, &returned)?;
         let cultivated_request = NativeInferenceRequest {
             address: NativeInferenceAddress {
                 spool: source.spool.clone(),
@@ -407,8 +407,8 @@ impl OutsideThreadSnapshot {
     }
 }
 
-fn returned_current_deposit(
-    predecessor: &NativeEcologyRest,
+pub(crate) fn derive_returned_scaffold_deposit(
+    predecessor: &NativeTransportScaffold,
     source: &NativeInferenceAddress,
     returned: &ReturnedScaffoldInteraction,
 ) -> Result<NativeThreadDeposit, ScaffoldCultivationError> {
@@ -418,7 +418,6 @@ fn returned_current_deposit(
         return Err(ScaffoldCultivationError::Return);
     }
     let section = predecessor
-        .ecology
         .addressed_section(&source.spool, &source.thread, source.occurrence)
         .map_err(|error| ScaffoldCultivationError::Predecessor(error.to_string()))?;
     if !section.spool().receiver_family.contains(&emitted.receiver)
@@ -453,13 +452,32 @@ fn returned_current_deposit(
         return Err(ScaffoldCultivationError::Return);
     }
 
+    // The addressed source thread is the contemporary local standing. Earlier inherited or
+    // cultivated threads may lawfully retain different historical current at the same native
+    // state; they cannot override the current which emitted this return. Only support absent from
+    // the source thread is reconstructed from the remaining ecology, where inconsistency still
+    // refuses.
     let mut cell_by_native = BTreeMap::<NativeStateId, NativeParametronCell>::new();
+    let source_states = section
+        .thread()
+        .parametrons
+        .iter()
+        .filter(|cell| causal_cone.contains(&cell.native))
+        .map(|cell| {
+            cell_by_native.insert(cell.native, cell.clone());
+            cell.native
+        })
+        .collect::<BTreeSet<_>>();
     for cell in spool
         .threads
         .iter()
+        .filter(|thread| thread.address != section.thread().address)
         .flat_map(|thread| &thread.parametrons)
         .filter(|cell| causal_cone.contains(&cell.native))
     {
+        if source_states.contains(&cell.native) {
+            continue;
+        }
         match cell_by_native.get(&cell.native) {
             Some(existing)
                 if existing.current != cell.current || existing.section != cell.section =>

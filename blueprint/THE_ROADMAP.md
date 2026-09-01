@@ -424,7 +424,7 @@ relations; it does not demote the exact SCF handoff/circulation/withdrawal mecha
 
 ## Active campaign — Athena Application and Circulation Interface
 
-**Current frontier:** AAC2
+**Current frontier:** AAC3
 
 **AAC0--AAC6 ARE ACTIVE IN THE ORDER BELOW.**
 
@@ -447,9 +447,13 @@ and false continuation, and declines without changing or cloning the package. It
 returned three passed tests. The receipt is
 [`research/records/2026-09-01_AAC1_MOVE_OWNED_NATIVE_CIRCULATION_SESSION_RETURNED_COMPLETE_OWNED_BOUNDARIES.md`](../research/records/2026-09-01_AAC1_MOVE_OWNED_NATIVE_CIRCULATION_SESSION_RETURNED_COMPLETE_OWNED_BOUNDARIES.md).
 
-[definition] The current deed is AAC2 only: parented morphology commits, successive local
-cultivation, commit journal, and exact snapshot/remount storage. Diffusion, ABI, application, and
-release remain unscheduled until their predecessors pass.
+[established-bounded; implemented-exact; source-inspected; measured] AAC2 passed. Two successive
+local returns advance one continuing morphology through generations `0 -> 1 -> 2`; exact snapshot,
+remount, latest-delta withdrawal, replay, and refusal controls pass. Its receipt is
+[`research/records/2026-09-01_AAC2_TWO_SUCCESSIVE_LOCAL_COMMITS_SNAPSHOT_WITHDRAWAL_AND_REPLAY_RETURNED.md`](../research/records/2026-09-01_AAC2_TWO_SUCCESSIVE_LOCAL_COMMITS_SNAPSHOT_WITHDRAWAL_AND_REPLAY_RETURNED.md).
+
+[definition] The current deed is AAC3 only: compose exact diffusion with the same owned session
+boundary. ABI, application, and release remain unavailable until their predecessors pass.
 
 [definition] The complete order is:
 
