@@ -16,7 +16,7 @@ use holonic_engine::{
     receiver_history_compression::ReceiverHistoryCompression, EventId,
 };
 use life::athena_native::{
-    AthenaNativeRest, ExchangeCandidateLineage, ExchangeProductMaterial, ExchangeSituatedProduct,
+    NativeEcologyRest, ExchangeCandidateLineage, ExchangeProductMaterial, ExchangeSituatedProduct,
     ReturnedExchangeSection,
 };
 use serde::Serialize;
@@ -47,7 +47,7 @@ fn main() -> Result<(), String> {
     let started = Instant::now();
 
     let rest =
-        AthenaNativeRest::read(&fs::read(root.join(K3_REST)).map_err(display)?).map_err(display)?;
+        NativeEcologyRest::read(&fs::read(root.join(K3_REST)).map_err(display)?).map_err(display)?;
     let material = read_exchange_material(&root.join(EXCHANGE_RETURN))?;
     eprintln!("L1 mount complete; founding the exchange/K3 dependent product");
     let product = ExchangeSituatedProduct::found(&rest, material).map_err(display)?;

@@ -9,32 +9,32 @@ use holonic_engine::{
 use sha2::{Digest, Sha256};
 
 use super::types::{
-    AthenaNativeError, AthenaNativeRest, NativeSectionAddress, ReceiverHistoryRealizationPassage,
-    ATHENA_NATIVE_REST_SCHEMA, RECEIVER_HISTORY_REALIZATION_SCHEMA,
+    NativeEcologyError, NativeEcologyRest, NativeSectionAddress, ReceiverHistoryRealizationPassage,
+    NATIVE_ECOLOGY_REST_SCHEMA, RECEIVER_HISTORY_REALIZATION_SCHEMA,
 };
 
 impl ReceiverHistoryRealizationPassage {
-    pub fn found(ecology: &NativeSpoolBundle) -> Result<Self, AthenaNativeError> {
+    pub fn found(ecology: &NativeSpoolBundle) -> Result<Self, NativeEcologyError> {
         ecology
             .validate()
-            .map_err(|error| AthenaNativeError::Ecology(error.to_string()))?;
+            .map_err(|error| NativeEcologyError::Ecology(error.to_string()))?;
         let passage = Self::projection(ecology);
         passage.validate(ecology)?;
         Ok(passage)
     }
 
-    pub fn validate(&self, ecology: &NativeSpoolBundle) -> Result<(), AthenaNativeError> {
+    pub fn validate(&self, ecology: &NativeSpoolBundle) -> Result<(), NativeEcologyError> {
         ecology
             .validate()
-            .map_err(|error| AthenaNativeError::Ecology(error.to_string()))?;
+            .map_err(|error| NativeEcologyError::Ecology(error.to_string()))?;
         if self.schema != RECEIVER_HISTORY_REALIZATION_SCHEMA {
-            return Err(AthenaNativeError::Realization(
+            return Err(NativeEcologyError::Realization(
                 "unknown receiver-history realization schema".to_owned(),
             ));
         }
         let expected = Self::projection(ecology);
         if self != &expected {
-            return Err(AthenaNativeError::Realization(
+            return Err(NativeEcologyError::Realization(
                 "the section atlas is not the exact projection of the owned ecology".to_owned(),
             ));
         }
@@ -47,7 +47,7 @@ impl ReceiverHistoryRealizationPassage {
             || self.connected_components.is_empty()
             || self.connected_components.iter().any(Vec::is_empty)
         {
-            return Err(AthenaNativeError::Realization(
+            return Err(NativeEcologyError::Realization(
                 "the addressed section population is empty or disconnected".to_owned(),
             ));
         }
@@ -109,11 +109,11 @@ impl ReceiverHistoryRealizationPassage {
     }
 }
 
-impl AthenaNativeRest {
-    pub fn found(ecology: NativeSpoolBundle) -> Result<Self, AthenaNativeError> {
+impl NativeEcologyRest {
+    pub fn found(ecology: NativeSpoolBundle) -> Result<Self, NativeEcologyError> {
         let realization = ReceiverHistoryRealizationPassage::found(&ecology)?;
         let rest = Self {
-            schema: ATHENA_NATIVE_REST_SCHEMA.to_owned(),
+            schema: NATIVE_ECOLOGY_REST_SCHEMA.to_owned(),
             ecology,
             realization,
         };
@@ -121,29 +121,29 @@ impl AthenaNativeRest {
         Ok(rest)
     }
 
-    pub fn read(bytes: &[u8]) -> Result<Self, AthenaNativeError> {
+    pub fn read(bytes: &[u8]) -> Result<Self, NativeEcologyError> {
         let rest: Self = serde_json::from_slice(bytes)
-            .map_err(|error| AthenaNativeError::Wire(error.to_string()))?;
+            .map_err(|error| NativeEcologyError::Wire(error.to_string()))?;
         rest.validate()?;
         Ok(rest)
     }
 
-    pub fn canonical_bytes(&self) -> Result<Vec<u8>, AthenaNativeError> {
+    pub fn canonical_bytes(&self) -> Result<Vec<u8>, NativeEcologyError> {
         self.validate()?;
-        serde_json::to_vec(self).map_err(|error| AthenaNativeError::Wire(error.to_string()))
+        serde_json::to_vec(self).map_err(|error| NativeEcologyError::Wire(error.to_string()))
     }
 
-    pub fn wire_sha256(&self) -> Result<String, AthenaNativeError> {
+    pub fn wire_sha256(&self) -> Result<String, NativeEcologyError> {
         Ok(Sha256::digest(self.canonical_bytes()?)
             .iter()
             .map(|byte| format!("{byte:02x}"))
             .collect())
     }
 
-    pub fn validate(&self) -> Result<(), AthenaNativeError> {
-        if self.schema != ATHENA_NATIVE_REST_SCHEMA {
-            return Err(AthenaNativeError::Wire(
-                "unknown Athena native rest schema".to_owned(),
+    pub fn validate(&self) -> Result<(), NativeEcologyError> {
+        if self.schema != NATIVE_ECOLOGY_REST_SCHEMA {
+            return Err(NativeEcologyError::Wire(
+                "unknown native ecology rest schema".to_owned(),
             ));
         }
         self.realization.validate(&self.ecology)
@@ -230,12 +230,7 @@ fn components_through_native_cells(
             }
         }
         unreached.retain(|at| !reached.contains(at));
-        components.push(
-            reached
-                .into_iter()
-                .map(|at| sections[at].clone())
-                .collect(),
-        );
+        components.push(reached.into_iter().map(|at| sections[at].clone()).collect());
     }
     components
 }
@@ -246,6 +241,6 @@ mod tests {
 
     #[test]
     fn wire_digest_is_testimony_not_the_structural_identity_operator() {
-        assert_ne!(ATHENA_NATIVE_REST_SCHEMA, "sha256");
+        assert_ne!(NATIVE_ECOLOGY_REST_SCHEMA, "sha256");
     }
 }

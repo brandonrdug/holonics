@@ -62,6 +62,12 @@ and a source-detached productive recurrence after cold testimony departed. Remou
 local sibling invariance, targeted withdrawal, and exact restoration passed; the engine suite
 returned 2,002 passed, zero failed, 32 ignored and every example type-checked.
 
+[established-bounded; implemented-exact; measured] The first HIF5 migration removed the generic
+`AthenaNative*` rest/passage/consequence/error family. All consumers now use neutral
+`NativeEcologyRest` and `NativeConduct*` owners with new neutral schemas and no compatibility
+aliases. Every `life` example type-checked; the library returned 491 passed, zero failed, 15 ignored
+and source-shape remained green.
+
 [established-bounded; implemented-exact; measured] R0Q0--R0Q4 retain addressed response/source/
 target pair current, ordinary off-diagonal transport, resident dependent complex contraction before
 the positive receiver, full-complex continuation equality, complete reconstruction fibres, and

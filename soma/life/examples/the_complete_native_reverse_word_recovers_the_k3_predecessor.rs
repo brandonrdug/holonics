@@ -3,7 +3,7 @@
 
 use std::{fs, path::PathBuf, time::Instant};
 
-use life::athena_native::{AthenaNativeRest, NativeCirculationRest};
+use life::athena_native::{NativeEcologyRest, NativeCirculationRest};
 use serde_json::json;
 use sha2::{Digest, Sha256};
 
@@ -50,7 +50,7 @@ fn main() -> Result<(), String> {
     let (recovered_k3, factor_withdrawal) = cultivated.withdraw().map_err(display)?;
     let recovered_k3_bytes = recovered_k3.canonical_bytes().map_err(display)?;
     let declared_k3_bytes = fs::read(K3_REST).map_err(display)?;
-    let declared_k3 = AthenaNativeRest::read(&declared_k3_bytes).map_err(display)?;
+    let declared_k3 = NativeEcologyRest::read(&declared_k3_bytes).map_err(display)?;
     let recovered_k3_wire_equal = recovered_k3_bytes == declared_k3_bytes;
     let recovered_k3_identity_equal = recovered_k3.wire_sha256().map_err(display)?
         == declared_k3.wire_sha256().map_err(display)?;

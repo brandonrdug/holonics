@@ -1,4 +1,4 @@
-//! One native Athena ecology composed and cultivated by Eros.
+//! Native ecology conduct, cultivation, membranes, and product-specific compositions.
 //!
 //! The owner composes the admitted native laboratory body, receiver-history quotient, anatomical
 //! quotient, and terminal potential through exact shared occurrence lineage. No foreign executor
@@ -233,8 +233,8 @@ pub use source_neutral_rest::{
     SourceNeutralWindingBranchFunctional, SourceNeutralWindingDifference,
 };
 pub use types::{
-    AthenaNativeBatchPassage, AthenaNativeConsequence, AthenaNativeError, AthenaNativePassage,
-    AthenaNativeRest, NativeBatchSectionAddress, NativeConductedSection, NativeSectionAddress,
+    NativeConductBatchPassage, NativeConductConsequence, NativeEcologyError, NativeConductPassage,
+    NativeEcologyRest, NativeBatchSectionAddress, NativeConductedSection, NativeSectionAddress,
     NativeThreadResidentBatchReturn, ReceiverHistoryRealizationPassage,
 };
 

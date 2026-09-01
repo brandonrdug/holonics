@@ -16,7 +16,7 @@ use holonic_engine::{
     receiver_exact_compression::ReceiverId,
     EventId,
 };
-use life::athena_native::{AthenaNativeConsequence, AthenaNativeRest};
+use life::athena_native::{NativeConductConsequence, NativeEcologyRest};
 use serde::Serialize;
 use serde_json::json;
 use sha2::{Digest, Sha256};
@@ -57,11 +57,11 @@ fn main() -> Result<(), String> {
     let started = Instant::now();
     fs::create_dir_all(output.join("detached-return")).map_err(display)?;
     let bundle = NativeSpoolBundle::read(&fs::read(BUNDLE).map_err(display)?).map_err(display)?;
-    let rest = AthenaNativeRest::found(bundle).map_err(display)?;
+    let rest = NativeEcologyRest::found(bundle).map_err(display)?;
     eprintln!("k3-stage=rest-founded elapsed_ms={}", started.elapsed().as_millis());
     let canonical = rest.canonical_bytes().map_err(display)?;
     let wire_sha256 = sha(&canonical);
-    let remounted = AthenaNativeRest::read(&canonical).map_err(display)?;
+    let remounted = NativeEcologyRest::read(&canonical).map_err(display)?;
     let structural_round_trip = remounted == rest;
     fs::write(output.join("athena-native.rest"), &canonical).map_err(display)?;
     eprintln!("k3-stage=round-trip elapsed_ms={}", started.elapsed().as_millis());
@@ -81,8 +81,8 @@ fn main() -> Result<(), String> {
         .find(|candidate| !rest.realization.receiver_family.contains(candidate))
         .ok_or("receiver family exhausted u64")?;
     let receiver_insufficiency = match rest.conduct(anchor, outside_receiver).map_err(display)? {
-        AthenaNativeConsequence::Insufficient(insufficiency) => insufficiency,
-        AthenaNativeConsequence::Returned(_) => {
+        NativeConductConsequence::Insufficient(insufficiency) => insufficiency,
+        NativeConductConsequence::Returned(_) => {
             return Err("outside receiver unexpectedly returned".to_owned());
         }
     };
@@ -98,8 +98,8 @@ fn main() -> Result<(), String> {
         .conduct_occurrence(outside_occurrence, receiver)
         .map_err(display)?
     {
-        AthenaNativeConsequence::Insufficient(insufficiency) => insufficiency,
-        AthenaNativeConsequence::Returned(_) => {
+        NativeConductConsequence::Insufficient(insufficiency) => insufficiency,
+        NativeConductConsequence::Returned(_) => {
             return Err("outside section unexpectedly returned".to_owned());
         }
     };
@@ -195,13 +195,13 @@ fn remount(
     occurrence: EventId,
     receiver: ReceiverId,
 ) -> Result<(), String> {
-    let rest = AthenaNativeRest::read(&fs::read(rest).map_err(display)?).map_err(display)?;
+    let rest = NativeEcologyRest::read(&fs::read(rest).map_err(display)?).map_err(display)?;
     let returned = rest
         .conduct_occurrence(occurrence, receiver)
         .map_err(display)?;
     let passed = matches!(
         &returned,
-        AthenaNativeConsequence::Returned(passage)
+        NativeConductConsequence::Returned(passage)
             if !passage.word_return.apparatus.invariant_transport_reuploaded
                 && !passage.current_return.invariant_transport_reuploaded
                 && !passage.current_return.cpu_semantic_replay_after_device

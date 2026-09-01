@@ -316,6 +316,12 @@ generic Athena-prefixed types and methods, merge duplicate rest/cultivation/gene
 remaining large foremen at founded relations, and delete superseded wrappers and drivers. Preserve
 exact completed consequences through the new owners, not through compatibility decoders.
 
+[established-bounded; implemented-exact; measured] The first HIF5 unit removed the generic
+`AthenaNative*` rest/passage/consequence/error family. Every consumer now uses neutral
+`NativeEcologyRest` and `NativeConduct*` names and schemas with no aliases. The affected examples
+type-check and `life` returns 491 passed, zero failed, 15 ignored. HIF5 remains current for the
+product/rest hierarchy and remaining campaign-qualified generic owners.
+
 **Pass HIF5:** Athena denotes a composed product/ecology rather than a generic type family; Eros
 denotes its composer/cultivator; Soulkiller denotes the one-way boundary; no live generic source
 owner is campaign-qualified; source-shape and public-owner review return no hotspot or redundant

@@ -21,7 +21,7 @@ use sha2::{Digest, Sha256};
 use crate::athena_receiver_history::{AthenaReceiverHistoryCongruence, CausalSectionAddress};
 
 use super::{
-    AthenaNativeConsequence, AthenaNativeError, AthenaNativePassage, AthenaNativeRest,
+    NativeConductConsequence, NativeConductPassage, NativeEcologyError, NativeEcologyRest,
     NativeSectionAddress,
 };
 
@@ -113,37 +113,39 @@ pub struct SealedNativeCandidateSection {
 pub struct SealedNativeCandidateFront {
     pub schema: String,
     pub predecessor_rest_wire_sha256: String,
-    pub ingress_template: Vec<AthenaNativePassage>,
+    pub ingress_template: Vec<NativeConductPassage>,
     pub sections: Vec<SealedNativeCandidateSection>,
     pub open_exterior: Vec<String>,
 }
 
 impl SealedNativeCandidateFront {
     pub fn seal(
-        rest: &AthenaNativeRest,
+        rest: &NativeEcologyRest,
         history: HistoryOnlyExchangeFront,
-    ) -> Result<Self, AthenaNativeError> {
-        history.validate().map_err(AthenaNativeError::Realization)?;
+    ) -> Result<Self, NativeEcologyError> {
+        history
+            .validate()
+            .map_err(NativeEcologyError::Realization)?;
         rest.validate()?;
         let receiver = *rest
             .realization
             .receiver_family
             .iter()
             .next()
-            .ok_or_else(|| AthenaNativeError::Realization("empty K3 receiver family".into()))?;
+            .ok_or_else(|| NativeEcologyError::Realization("empty K3 receiver family".into()))?;
         let mut ingress_template = Vec::with_capacity(rest.realization.ingress_sections.len());
         for address in &rest.realization.ingress_sections {
             match rest.conduct(address, receiver)? {
-                AthenaNativeConsequence::Returned(passage) => ingress_template.push(passage),
-                AthenaNativeConsequence::Insufficient(insufficiency) => {
-                    return Err(AthenaNativeError::Conduct(format!(
+                NativeConductConsequence::Returned(passage) => ingress_template.push(passage),
+                NativeConductConsequence::Insufficient(insufficiency) => {
+                    return Err(NativeEcologyError::Conduct(format!(
                         "an admitted K3 ingress returned {insufficiency:?}"
                     )));
                 }
             }
         }
         if ingress_template.is_empty() {
-            return Err(AthenaNativeError::Realization(
+            return Err(NativeEcologyError::Realization(
                 "the K3 predecessor returned no ingress potential".into(),
             ));
         }
@@ -168,7 +170,7 @@ impl SealedNativeCandidateFront {
         Ok(front)
     }
 
-    pub fn validate(&self) -> Result<(), AthenaNativeError> {
+    pub fn validate(&self) -> Result<(), NativeEcologyError> {
         if self.schema != SEALED_NATIVE_CANDIDATE_FRONT_SCHEMA
             || !is_digest(&self.predecessor_rest_wire_sha256)
             || self.ingress_template.is_empty()
@@ -176,7 +178,7 @@ impl SealedNativeCandidateFront {
             || self.open_exterior.is_empty()
             || self.open_exterior.iter().any(String::is_empty)
         {
-            return Err(AthenaNativeError::Realization(
+            return Err(NativeEcologyError::Realization(
                 "the sealed native candidate front is malformed".into(),
             ));
         }
@@ -200,7 +202,7 @@ impl SealedNativeCandidateFront {
                     })
                 || section.seal_sha256 != section_seal(&section.history, &section.product_states)?
             {
-                return Err(AthenaNativeError::Realization(
+                return Err(NativeEcologyError::Realization(
                     "a candidate section does not reconstruct from history-only material and K3 conduct"
                         .into(),
                 ));
@@ -275,9 +277,9 @@ impl CompleteExchangeNativeRealizationPassage {
                 OperationSpecies::Transport,
                 vec![history_boundary],
                 vec![emission_boundary],
-                Some("athena-native-rest".to_owned()),
+                Some("native-ecology-rest".to_owned()),
                 vec![SourceTestimony::RestedImplementation {
-                    symbol: "AthenaNativeRest::conduct".to_owned(),
+                    symbol: "NativeEcologyRest::conduct".to_owned(),
                 }],
             )
             .map_err(|error| error.to_string())?;
@@ -463,8 +465,8 @@ impl CompleteExchangeNativeRealizationPassage {
 
 fn seal_section(
     history: HistoryOnlyExchangeOccurrence,
-    template: &[AthenaNativePassage],
-) -> Result<SealedNativeCandidateSection, AthenaNativeError> {
+    template: &[NativeConductPassage],
+) -> Result<SealedNativeCandidateSection, NativeEcologyError> {
     let mut product_states = template_states(template)?;
     for state in &mut product_states {
         state.candidate_occurrence_sha256 = candidate_occurrence(&history, state);
@@ -478,13 +480,13 @@ fn seal_section(
 }
 
 fn template_states(
-    template: &[AthenaNativePassage],
-) -> Result<Vec<NativeCandidateProductState>, AthenaNativeError> {
+    template: &[NativeConductPassage],
+) -> Result<Vec<NativeCandidateProductState>, NativeEcologyError> {
     template
         .iter()
         .map(|passage| {
             if passage.source_fallback_permitted {
-                return Err(AthenaNativeError::Conduct(
+                return Err(NativeEcologyError::Conduct(
                     "the candidate template permits a foreign fallback".into(),
                 ));
             }
@@ -519,9 +521,9 @@ fn candidate_occurrence(
 fn section_seal(
     history: &HistoryOnlyExchangeOccurrence,
     states: &[NativeCandidateProductState],
-) -> Result<String, AthenaNativeError> {
+) -> Result<String, NativeEcologyError> {
     digest_json(&("sealed-native-candidate-section/v1", history, states))
-        .map_err(AthenaNativeError::Wire)
+        .map_err(NativeEcologyError::Wire)
 }
 
 fn digest_json(value: &impl Serialize) -> Result<String, String> {

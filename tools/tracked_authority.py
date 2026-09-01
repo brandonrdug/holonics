@@ -22,6 +22,7 @@ REQUIRED = [
     "research/records/2026-08-31_HIF2_EXACT_FOREIGN_CHARTS_LOW_PRECISION_WEIGHTS_AND_PROFILED_DISMANTLING_RETURNED.md",
     "research/records/2026-08-31_HIF3_ONE_NATIVE_INFERENCE_CIRCULATION_EMITTED_CODEC_NEUTRAL_PLURAL_FUTURES.md",
     "research/records/2026-08-31_HIF4_CAUSAL_ADJOINT_CULTIVATION_RETURNED_SOURCE_DETACHED_HEXIS.md",
+    "research/records/2026-08-31_HIF5_FIRST_MIGRATION_REMOVED_ATHENA_FROM_THE_GENERIC_NATIVE_REST_FAMILY.md",
     "crates/holonic-engine/src/addressed_current.rs",
     "crates/holonic-engine/src/factored_moment.rs",
     "soma/life/src/athena_native/source_neutral_relational.rs",

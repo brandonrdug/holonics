@@ -9,7 +9,7 @@ use std::{
 
 use life::{
     athena_native::{
-        AthenaNativeRest, CompleteExchangeCultivationCover,
+        NativeEcologyRest, CompleteExchangeCultivationCover,
         CompleteExchangeNativeRealizationPassage, ExchangeDefectBasisFace,
         HistoryOnlyExchangeFront, SealedNativeCandidateFront,
     },
@@ -41,7 +41,7 @@ fn main() -> Result<(), String> {
     let started = Instant::now();
     fs::create_dir_all(&output).map_err(display)?;
 
-    let rest = AthenaNativeRest::read(&fs::read(K3_REST).map_err(display)?).map_err(display)?;
+    let rest = NativeEcologyRest::read(&fs::read(K3_REST).map_err(display)?).map_err(display)?;
     let congruence =
         AthenaReceiverHistoryCongruence::read(&fs::read(CONGRUENCE).map_err(display)?)?;
     let history = HistoryOnlyExchangeFront::project(&congruence.sections)?;

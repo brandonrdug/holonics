@@ -11,7 +11,7 @@ use std::{
 };
 
 use life::athena_native::{
-    AthenaNativeConsequence, AthenaNativeRest, CompleteExchangeCultivationCover,
+    NativeConductConsequence, NativeEcologyRest, CompleteExchangeCultivationCover,
     CultivatedAthenaConsequence, CultivatedAthenaPassage, CultivatedAthenaRest,
     NativeCultivatedPotentialCoordinate, WithdrawnNativeFactor,
 };
@@ -52,7 +52,7 @@ fn found() -> Result<(), String> {
     }
     fs::create_dir_all(&output).map_err(display)?;
     let predecessor =
-        AthenaNativeRest::read(&fs::read(K3_REST).map_err(display)?).map_err(display)?;
+        NativeEcologyRest::read(&fs::read(K3_REST).map_err(display)?).map_err(display)?;
     let cover = CompleteExchangeCultivationCover::read(&fs::read(H2N_COVER).map_err(display)?)?;
     let cultivated = CultivatedAthenaRest::cultivate(predecessor, cover).map_err(display)?;
     let rest_bytes = cultivated.canonical_bytes().map_err(display)?;
@@ -397,11 +397,11 @@ fn resident_exact(passage: &CultivatedAthenaPassage) -> bool {
 }
 
 fn returned(
-    consequence: AthenaNativeConsequence,
-) -> Result<life::athena_native::AthenaNativePassage, String> {
+    consequence: NativeConductConsequence,
+) -> Result<life::athena_native::NativeConductPassage, String> {
     match consequence {
-        AthenaNativeConsequence::Returned(passage) => Ok(passage),
-        AthenaNativeConsequence::Insufficient(insufficiency) => {
+        NativeConductConsequence::Returned(passage) => Ok(passage),
+        NativeConductConsequence::Insufficient(insufficiency) => {
             Err(format!("native control returned {insufficiency:?}"))
         }
     }

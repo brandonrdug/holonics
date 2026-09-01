@@ -8,7 +8,7 @@ use std::{
 
 use life::{
     athena_native::{
-        AthenaNativeRest, CompleteExchangeNativeRealizationPassage, HistoryOnlyExchangeFront,
+        NativeEcologyRest, CompleteExchangeNativeRealizationPassage, HistoryOnlyExchangeFront,
     },
     athena_receiver_history::AthenaReceiverHistoryCongruence,
 };
@@ -37,7 +37,7 @@ fn main() -> Result<(), String> {
     }
     let started = Instant::now();
     fs::create_dir_all(&output).map_err(display)?;
-    let rest = AthenaNativeRest::read(&fs::read(K3_REST).map_err(display)?).map_err(display)?;
+    let rest = NativeEcologyRest::read(&fs::read(K3_REST).map_err(display)?).map_err(display)?;
     let congruence =
         AthenaReceiverHistoryCongruence::read(&fs::read(CONGRUENCE).map_err(display)?)?;
     let admitted_source_population = congruence.sections.len();

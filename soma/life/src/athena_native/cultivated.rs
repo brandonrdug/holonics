@@ -27,7 +27,7 @@ use sha2::{Digest, Sha256};
 use thiserror::Error;
 
 use super::{
-    AthenaNativeConsequence, AthenaNativeError, AthenaNativePassage, AthenaNativeRest,
+    NativeConductConsequence, NativeEcologyError, NativeConductPassage, NativeEcologyRest,
     CompleteExchangeCultivationCover, NativeCultivationMorphology, NativeFactorDeposit,
     NativeFactorReturnedLimb, NativeSectionAddress,
 };
@@ -64,7 +64,7 @@ pub struct NativeCultivatedPotentialComplex {
 #[serde(deny_unknown_fields)]
 pub struct CultivatedAthenaRest {
     schema: String,
-    predecessor: AthenaNativeRest,
+    predecessor: NativeEcologyRest,
     morphology: NativeCultivationMorphology,
     identity_sha256: String,
 }
@@ -106,7 +106,7 @@ pub struct AthenaCultivationWithdrawal {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 #[serde(deny_unknown_fields)]
 pub struct CultivatedAthenaPassage {
-    pub predecessor: AthenaNativePassage,
+    pub predecessor: NativeConductPassage,
     pub potential_complex: NativeCultivatedPotentialComplex,
     pub resident_return: ResidentComplexIncidenceReturn,
     pub cultivated_rest_identity_sha256: String,
@@ -141,7 +141,7 @@ pub enum CultivatedAthenaError {
 
 impl CultivatedAthenaRest {
     pub fn cultivate(
-        predecessor: AthenaNativeRest,
+        predecessor: NativeEcologyRest,
         reconstruction: CompleteExchangeCultivationCover,
     ) -> Result<Self, CultivatedAthenaError> {
         predecessor
@@ -181,7 +181,7 @@ impl CultivatedAthenaRest {
         &self.identity_sha256
     }
 
-    pub fn predecessor(&self) -> &AthenaNativeRest {
+    pub fn predecessor(&self) -> &NativeEcologyRest {
         &self.predecessor
     }
 
@@ -296,7 +296,7 @@ impl CultivatedAthenaRest {
 
     pub fn withdraw(
         mut self,
-    ) -> Result<(AthenaNativeRest, AthenaCultivationWithdrawal), CultivatedAthenaError> {
+    ) -> Result<(NativeEcologyRest, AthenaCultivationWithdrawal), CultivatedAthenaError> {
         self.validate()?;
         let cultivated_identity_sha256 = self.identity_sha256.clone();
         let declared = self.morphology.predecessor_wire_sha256.clone();
@@ -436,8 +436,8 @@ impl ResidentCultivatedAthena {
             .conduct(requested, receiver)
             .map_err(|error| CultivatedAthenaError::Predecessor(error.to_string()))?
         {
-            AthenaNativeConsequence::Returned(passage) => passage,
-            AthenaNativeConsequence::Insufficient(insufficiency) => {
+            NativeConductConsequence::Returned(passage) => passage,
+            NativeConductConsequence::Insufficient(insufficiency) => {
                 return Ok(CultivatedAthenaConsequence::Insufficient(insufficiency));
             }
         };
@@ -596,8 +596,8 @@ fn digest_json(value: &impl Serialize) -> Result<String, CultivatedAthenaError> 
         .collect())
 }
 
-impl From<AthenaNativeError> for CultivatedAthenaError {
-    fn from(error: AthenaNativeError) -> Self {
+impl From<NativeEcologyError> for CultivatedAthenaError {
+    fn from(error: NativeEcologyError) -> Self {
         Self::Predecessor(error.to_string())
     }
 }

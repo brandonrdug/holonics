@@ -12,7 +12,7 @@ use std::{
 };
 
 use life::athena_native::{
-    AthenaNativeRest, ExchangeSituatedProduct, SituatedCultivatedAthenaRest,
+    NativeEcologyRest, ExchangeSituatedProduct, SituatedCultivatedAthenaRest,
     SituatedCultivatedConductReturn,
 };
 use serde::Serialize;
@@ -43,7 +43,7 @@ fn main() -> Result<(), String> {
 
     let k3_bytes = fs::read(root.join(K3_REST)).map_err(display)?;
     let product_bytes = fs::read(root.join(L1_PRODUCT)).map_err(display)?;
-    let predecessor = AthenaNativeRest::read(&k3_bytes).map_err(display)?;
+    let predecessor = NativeEcologyRest::read(&k3_bytes).map_err(display)?;
     let predecessor_wire_sha256 = predecessor.wire_sha256().map_err(display)?;
     let predecessor_section_population = predecessor.realization.sections.len();
     let product = ExchangeSituatedProduct::read(&product_bytes).map_err(display)?;

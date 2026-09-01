@@ -40,7 +40,7 @@ use crate::athena_native::returned_difference_deposit::{
     derive_returned_difference_deposit_from_history, ReturnedDifferenceStaging,
 };
 use crate::athena_native::situated_difference::SituatedDifferenceSection;
-use crate::athena_native::types::{AthenaNativeRest, ReceiverHistoryRealizationPassage};
+use crate::athena_native::types::{NativeEcologyRest, ReceiverHistoryRealizationPassage};
 
 pub const SITUATED_CULTIVATED_ATHENA_REST_SCHEMA: &str =
     "soma-life.situated-cultivated-athena-rest.v1";
@@ -214,7 +214,7 @@ pub struct SituatedRadicalWithdrawal {
 /// Complete reverse return from the situated rest to its exact admitted K3 predecessor.
 #[derive(Debug, PartialEq, Eq)]
 pub struct CompleteSituatedCultivationWithdrawal {
-    pub restored_predecessor: AthenaNativeRest,
+    pub restored_predecessor: NativeEcologyRest,
     pub withdrawn_deposits: Vec<NativeThreadDeposit>,
     pub predecessor_wire_sha256: String,
     pub cultivated_identity_sha256: String,

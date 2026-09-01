@@ -5,23 +5,23 @@ use holonic_engine::{
 };
 
 use super::types::{
-    AthenaNativeBatchPassage, AthenaNativeConsequence, AthenaNativeError, AthenaNativePassage,
-    AthenaNativeRest, NativeBatchSectionAddress, NativeConductedSection, NativeSectionAddress,
-    NativeThreadResidentBatchReturn,
+    NativeBatchSectionAddress, NativeConductBatchPassage, NativeConductConsequence,
+    NativeConductPassage, NativeConductedSection, NativeEcologyError, NativeEcologyRest,
+    NativeSectionAddress, NativeThreadResidentBatchReturn,
 };
 
-impl AthenaNativeRest {
+impl NativeEcologyRest {
     pub fn conduct_population(
         &self,
         receiver: ReceiverId,
-    ) -> Result<AthenaNativeBatchPassage, AthenaNativeError> {
+    ) -> Result<NativeConductBatchPassage, NativeEcologyError> {
         self.validate()?;
         let mut reconstruction_fibres = Vec::new();
         let mut fibre_addresses = BTreeMap::new();
         for spool in &self.ecology.spools {
             for fibre in &spool.reconstruction_fibres {
                 let address = u32::try_from(reconstruction_fibres.len()).map_err(|_| {
-                    AthenaNativeError::Conduct("the fibre atlas exceeded its address".to_owned())
+                    NativeEcologyError::Conduct("the fibre atlas exceeded its address".to_owned())
                 })?;
                 fibre_addresses.insert((spool.address.as_str(), fibre.native), address);
                 reconstruction_fibres.push(fibre.clone());
@@ -50,14 +50,14 @@ impl AthenaNativeRest {
             .any(|(section, expected)| &section.section != expected)
             || sections.len() != self.realization.sections.len()
         {
-            return Err(AthenaNativeError::Conduct(
+            return Err(NativeEcologyError::Conduct(
                 "the batch section atlas departed from the admitted realization".to_owned(),
             ));
         }
         let mut resident_threads = Vec::new();
         for spool in &self.ecology.spools {
             if !spool.receiver_family.contains(&receiver) {
-                return Err(AthenaNativeError::Conduct(
+                return Err(NativeEcologyError::Conduct(
                     "the batch receiver is outside one spool family".to_owned(),
                 ));
             }
@@ -70,14 +70,14 @@ impl AthenaNativeRest {
                 let mut resident_word = self
                     .ecology
                     .mount_word(&spool.address, &thread.chronology)
-                    .map_err(|error| AthenaNativeError::Conduct(error.to_string()))?;
+                    .map_err(|error| NativeEcologyError::Conduct(error.to_string()))?;
                 let mut word_returns = Vec::new();
                 for native in entering {
                     let returned = resident_word
                         .conduct(&[native], receiver)
-                        .map_err(|error| AthenaNativeError::Conduct(error.to_string()))?;
+                        .map_err(|error| NativeEcologyError::Conduct(error.to_string()))?;
                     if returned.apparatus.invariant_transport_reuploaded {
-                        return Err(AthenaNativeError::Conduct(
+                        return Err(NativeEcologyError::Conduct(
                             "the batch word reuploaded invariant transport".to_owned(),
                         ));
                     }
@@ -86,15 +86,15 @@ impl AthenaNativeRest {
                 let mut current = self
                     .ecology
                     .mount_thread_current(&spool.address, &thread.address)
-                    .map_err(|error| AthenaNativeError::Conduct(error.to_string()))?;
+                    .map_err(|error| NativeEcologyError::Conduct(error.to_string()))?;
                 let current_return = current
                     .conduct()
-                    .map_err(|error| AthenaNativeError::Conduct(error.to_string()))?;
+                    .map_err(|error| NativeEcologyError::Conduct(error.to_string()))?;
                 if current_return.invariant_transport_reuploaded
                     || current_return.cpu_semantic_replay_after_device
                     || current_return.binary_receiver_taken
                 {
-                    return Err(AthenaNativeError::Conduct(
+                    return Err(NativeEcologyError::Conduct(
                         "the batch current left the resident pre-locking path".to_owned(),
                     ));
                 }
@@ -106,8 +106,8 @@ impl AthenaNativeRest {
                 });
             }
         }
-        Ok(AthenaNativeBatchPassage {
-            schema: "soma-life.athena-native-batch-passage.v1".to_owned(),
+        Ok(NativeConductBatchPassage {
+            schema: "soma-life.native-conduct-batch-passage.v1".to_owned(),
             rest_wire_sha256: self.wire_sha256()?,
             sections,
             reconstruction_fibres,
@@ -116,7 +116,6 @@ impl AthenaNativeRest {
         })
     }
 
-
     /// Conduct one addressed native occurrence through the single ecology. An admitted dependent
     /// receiver returns its exact face; an unsupported receiver or section returns a concrete
     /// retained fibre. No exterior realization, lexical route, or fallback is reachable.
@@ -124,10 +123,10 @@ impl AthenaNativeRest {
         &self,
         requested: &NativeSectionAddress,
         receiver: ReceiverId,
-    ) -> Result<AthenaNativeConsequence, AthenaNativeError> {
+    ) -> Result<NativeConductConsequence, NativeEcologyError> {
         self.validate()?;
         let Some(anchor_address) = self.realization.ingress_sections.first() else {
-            return Err(AthenaNativeError::Realization(
+            return Err(NativeEcologyError::Realization(
                 "the ecology has no ingress section".to_owned(),
             ));
         };
@@ -138,28 +137,28 @@ impl AthenaNativeRest {
                 &anchor_address.thread,
                 anchor_address.occurrence,
             )
-            .map_err(|error| AthenaNativeError::Realization(error.to_string()))?;
+            .map_err(|error| NativeEcologyError::Realization(error.to_string()))?;
         if !self.realization.sections.contains(requested) {
             return ReceiverInsufficiency::section_outside_family(
                 &anchor,
                 requested.occurrence,
-                vec!["the entering section is outside this Athena ecology".to_owned()],
+                vec!["the entering section is outside this native ecology".to_owned()],
             )
-            .map(AthenaNativeConsequence::Insufficient)
-            .map_err(|error| AthenaNativeError::Conduct(error.to_string()));
+            .map(NativeConductConsequence::Insufficient)
+            .map_err(|error| NativeEcologyError::Conduct(error.to_string()));
         }
         let section = self
             .ecology
             .addressed_section(&requested.spool, &requested.thread, requested.occurrence)
-            .map_err(|error| AthenaNativeError::Realization(error.to_string()))?;
+            .map_err(|error| NativeEcologyError::Realization(error.to_string()))?;
         if !section.spool().receiver_family.contains(&receiver) {
             return ReceiverInsufficiency::receiver_outside_family(
                 &section,
                 receiver,
                 vec!["the requested dependent receiver is outside this native family".to_owned()],
             )
-            .map(AthenaNativeConsequence::Insufficient)
-            .map_err(|error| AthenaNativeError::Conduct(error.to_string()));
+            .map(NativeConductConsequence::Insufficient)
+            .map_err(|error| NativeEcologyError::Conduct(error.to_string()));
         }
         let word = section.ordered_generator_word().to_vec();
         if word
@@ -171,8 +170,8 @@ impl AthenaNativeRest {
                 word,
                 vec!["the section's ordered successor leaves the admitted family".to_owned()],
             )
-            .map(AthenaNativeConsequence::Insufficient)
-            .map_err(|error| AthenaNativeError::Conduct(error.to_string()));
+            .map(NativeConductConsequence::Insufficient)
+            .map_err(|error| NativeEcologyError::Conduct(error.to_string()));
         }
 
         let occurrence = section.occurrence().clone();
@@ -188,7 +187,7 @@ impl AthenaNativeRest {
             })
             .cloned()
             .ok_or_else(|| {
-                AthenaNativeError::Conduct(
+                NativeEcologyError::Conduct(
                     "the admitted receiver has no constitutive response at the emitted native"
                         .to_owned(),
                 )
@@ -202,7 +201,7 @@ impl AthenaNativeRest {
             })
             .map(|consequence| consequence.observation)
             .ok_or_else(|| {
-                AthenaNativeError::Conduct(
+                NativeEcologyError::Conduct(
                     "the admitted receiver has no consequence at the emitted native".to_owned(),
                 )
             })?;
@@ -242,30 +241,30 @@ impl AthenaNativeRest {
         let mut resident_word = self
             .ecology
             .mount_word(&requested.spool, &word)
-            .map_err(|error| AthenaNativeError::Conduct(error.to_string()))?;
+            .map_err(|error| NativeEcologyError::Conduct(error.to_string()))?;
         let word_return = resident_word
             .conduct(&[occurrence.entering_native], receiver)
-            .map_err(|error| AthenaNativeError::Conduct(error.to_string()))?;
+            .map_err(|error| NativeEcologyError::Conduct(error.to_string()))?;
         if word_return.native_end.as_slice() != [occurrence.emitting_native]
             || word_return.observations.as_slice() != [observation]
             || word_return.apparatus.invariant_transport_reuploaded
         {
-            return Err(AthenaNativeError::Conduct(
+            return Err(NativeEcologyError::Conduct(
                 "the resident word did not return the addressed dependent face".to_owned(),
             ));
         }
         let mut resident_current = self
             .ecology
             .mount_thread_current(&requested.spool, &requested.thread)
-            .map_err(|error| AthenaNativeError::Conduct(error.to_string()))?;
+            .map_err(|error| NativeEcologyError::Conduct(error.to_string()))?;
         let current_return = resident_current
             .conduct()
-            .map_err(|error| AthenaNativeError::Conduct(error.to_string()))?;
+            .map_err(|error| NativeEcologyError::Conduct(error.to_string()))?;
         if current_return.invariant_transport_reuploaded
             || current_return.cpu_semantic_replay_after_device
             || current_return.binary_receiver_taken
         {
-            return Err(AthenaNativeError::Conduct(
+            return Err(NativeEcologyError::Conduct(
                 "the Complex-Parametron current left the resident pre-locking path".to_owned(),
             ));
         }
@@ -298,8 +297,8 @@ impl AthenaNativeRest {
             successor_sections: successors,
             open_exterior,
         };
-        Ok(AthenaNativeConsequence::Returned(AthenaNativePassage {
-            schema: "soma-life.athena-native-passage.v2".to_owned(),
+        Ok(NativeConductConsequence::Returned(NativeConductPassage {
+            schema: "soma-life.native-conduct-passage.v1".to_owned(),
             rest_wire_sha256: self.wire_sha256()?,
             section: conducted,
             word_return,
@@ -313,7 +312,7 @@ impl AthenaNativeRest {
         &self,
         occurrence: EventId,
         receiver: ReceiverId,
-    ) -> Result<AthenaNativeConsequence, AthenaNativeError> {
+    ) -> Result<NativeConductConsequence, NativeEcologyError> {
         let requested = self
             .realization
             .sections
@@ -329,11 +328,11 @@ impl AthenaNativeRest {
     }
 
     pub fn returns_insufficiency(
-        consequence: &AthenaNativeConsequence,
+        consequence: &NativeConductConsequence,
     ) -> Option<&ReceiverInsufficiencyCause> {
         match consequence {
-            AthenaNativeConsequence::Returned(_) => None,
-            AthenaNativeConsequence::Insufficient(insufficiency) => Some(&insufficiency.cause),
+            NativeConductConsequence::Returned(_) => None,
+            NativeConductConsequence::Insufficient(insufficiency) => Some(&insufficiency.cause),
         }
     }
 }

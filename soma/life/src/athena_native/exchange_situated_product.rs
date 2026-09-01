@@ -29,7 +29,7 @@ mod support;
 use support::{generator_receipts, mixed_interactions, situated_local, validate_mixed_interaction};
 
 use super::{
-    AthenaNativeConsequence, AthenaNativeRest, CausalAdjointStepInput,
+    NativeConductConsequence, NativeEcologyRest, CausalAdjointStepInput,
     CompleteExchangeNativeRealizationPassage, ComplexParametronDifference,
     DependentDifferenceChart, ExchangeDefectBasisFace, NativeConductedSection,
     NativeSectionAddress, ReturnedExchangeSection, SituatedDifferenceInput,
@@ -468,7 +468,7 @@ pub struct ExchangeSituatedProduct {
 
 impl ExchangeSituatedProduct {
     pub fn found(
-        rest: &AthenaNativeRest,
+        rest: &NativeEcologyRest,
         material: ExchangeProductMaterial,
     ) -> Result<Self, ExchangeSituatedProductError> {
         material
@@ -957,7 +957,7 @@ impl From<super::SituatedDifferenceError> for ExchangeSituatedProductError {
 }
 
 fn k3_pullback_branches(
-    rest: &AthenaNativeRest,
+    rest: &NativeEcologyRest,
 ) -> Result<Vec<K3PullbackBranch>, ExchangeSituatedProductError> {
     let receiver = *rest
         .realization
@@ -971,8 +971,8 @@ fn k3_pullback_branches(
             .conduct(ingress, receiver)
             .map_err(|error| ExchangeSituatedProductError::K3(error.to_string()))?
         {
-            AthenaNativeConsequence::Returned(passage) => passage.section,
-            AthenaNativeConsequence::Insufficient(insufficiency) => {
+            NativeConductConsequence::Returned(passage) => passage.section,
+            NativeConductConsequence::Insufficient(insufficiency) => {
                 return Err(ExchangeSituatedProductError::K3(format!(
                     "an admitted ingress returned {insufficiency:?}"
                 )));
@@ -988,8 +988,8 @@ fn k3_pullback_branches(
                 .conduct(successor, receiver)
                 .map_err(|error| ExchangeSituatedProductError::K3(error.to_string()))?
             {
-                AthenaNativeConsequence::Returned(passage) => passage.section,
-                AthenaNativeConsequence::Insufficient(insufficiency) => {
+                NativeConductConsequence::Returned(passage) => passage.section,
+                NativeConductConsequence::Insufficient(insufficiency) => {
                     return Err(ExchangeSituatedProductError::K3(format!(
                         "an admitted successor returned {insufficiency:?}"
                     )));

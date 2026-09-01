@@ -7,7 +7,7 @@ use crate::athena_native::membrane_transport::AthenaMembraneStanding;
 impl SituatedCultivatedAthenaRest {
     /// Consume the predecessor and complete L1 product into one source-neutral native rest.
     pub fn cultivate(
-        predecessor: AthenaNativeRest,
+        predecessor: NativeEcologyRest,
         product: ExchangeSituatedProduct,
     ) -> Result<Self, SituatedCultivationError> {
         predecessor
@@ -430,7 +430,7 @@ impl SituatedCultivatedAthenaRest {
             .ecology
             .withdraw_deposit_batch(self.deposit_receipt)
             .map_err(|error| SituatedCultivationError::Ecology(error.to_string()))?;
-        let restored_predecessor = AthenaNativeRest::found(predecessor)
+        let restored_predecessor = NativeEcologyRest::found(predecessor)
             .map_err(|error| SituatedCultivationError::Predecessor(error.to_string()))?;
         let restored_wire = restored_predecessor
             .wire_sha256()

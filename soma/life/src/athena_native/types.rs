@@ -16,7 +16,7 @@ use thiserror::Error;
 
 pub const RECEIVER_HISTORY_REALIZATION_SCHEMA: &str =
     "soma-life.receiver-history-realization-passage.v2";
-pub const ATHENA_NATIVE_REST_SCHEMA: &str = "soma-life.athena-native-rest.v3";
+pub const NATIVE_ECOLOGY_REST_SCHEMA: &str = "soma-life.native-ecology-rest.v1";
 
 /// The complete native address of one carrying occurrence. Equal endpoints, receiver values, or
 /// thread names cannot substitute for this three-part address.
@@ -28,7 +28,7 @@ pub struct NativeSectionAddress {
     pub occurrence: EventId,
 }
 
-/// Eros' structural realization of one spool bundle as a receiver-history ecology.
+/// Structural realization of one spool bundle as a receiver-history ecology.
 ///
 /// This is not a second topology. Validation recomputes every member and root from the bundle and
 /// proves connectedness through the common native cells which its addressed occurrences carry.
@@ -48,12 +48,12 @@ pub struct ReceiverHistoryRealizationPassage {
     pub open_exterior: Vec<String>,
 }
 
-/// One connected Athena ecology. The bundle owns its topology and current; the realization is the
+/// One connected native ecology. The bundle owns its topology and current; the realization is the
 /// exact conduct-bearing section atlas derived from that same owner. Foreign ancestry and source
 /// execution are unrepresentable here.
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct AthenaNativeRest {
+pub struct NativeEcologyRest {
     pub schema: String,
     pub ecology: NativeSpoolBundle,
     pub realization: ReceiverHistoryRealizationPassage,
@@ -93,7 +93,7 @@ pub struct NativeConductedSection {
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 #[serde(deny_unknown_fields)]
-pub struct AthenaNativePassage {
+pub struct NativeConductPassage {
     pub schema: String,
     /// A digest of the canonical rest wire is apparatus testimony, never native identity.
     pub rest_wire_sha256: String,
@@ -118,7 +118,7 @@ pub struct NativeThreadResidentBatchReturn {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
-pub struct AthenaNativeBatchPassage {
+pub struct NativeConductBatchPassage {
     pub schema: String,
     pub rest_wire_sha256: String,
     pub sections: Vec<NativeBatchSectionAddress>,
@@ -129,18 +129,18 @@ pub struct AthenaNativeBatchPassage {
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 #[serde(tag = "status", rename_all = "kebab-case")]
-pub enum AthenaNativeConsequence {
-    Returned(AthenaNativePassage),
+pub enum NativeConductConsequence {
+    Returned(NativeConductPassage),
     Insufficient(ReceiverInsufficiency),
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum AthenaNativeError {
+pub enum NativeEcologyError {
     #[error("native ecology refused: {0}")]
     Ecology(String),
     #[error("receiver-history realization refused: {0}")]
     Realization(String),
-    #[error("native Athena wire refused: {0}")]
+    #[error("native ecology wire refused: {0}")]
     Wire(String),
     #[error("resident native conduct disagreed with the addressed section: {0}")]
     Conduct(String),

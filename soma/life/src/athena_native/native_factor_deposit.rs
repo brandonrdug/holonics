@@ -18,7 +18,7 @@ use sha2::{Digest, Sha256};
 use thiserror::Error;
 
 use super::{
-    AthenaNativeRest, CompleteExchangeCultivationCover, ExchangeDefectBasisFace,
+    NativeEcologyRest, CompleteExchangeCultivationCover, ExchangeDefectBasisFace,
     NativeSectionAddress,
 };
 
@@ -102,7 +102,7 @@ struct NativeCandidateAtlasEntry {
 
 impl NativeCultivationMorphology {
     pub fn derive(
-        predecessor: &AthenaNativeRest,
+        predecessor: &NativeEcologyRest,
         cover: &CompleteExchangeCultivationCover,
     ) -> Result<Self, NativeFactorDepositError> {
         predecessor
@@ -203,7 +203,7 @@ impl NativeCultivationMorphology {
         Ok(morphology)
     }
 
-    pub fn validate(&self, predecessor: &AthenaNativeRest) -> Result<(), NativeFactorDepositError> {
+    pub fn validate(&self, predecessor: &NativeEcologyRest) -> Result<(), NativeFactorDepositError> {
         predecessor
             .validate()
             .map_err(|error| NativeFactorDepositError::Predecessor(error.to_string()))?;
@@ -238,7 +238,7 @@ impl NativeCultivationMorphology {
 }
 
 impl NativeFactorDeposit {
-    pub fn validate(&self, predecessor: &AthenaNativeRest) -> Result<(), NativeFactorDepositError> {
+    pub fn validate(&self, predecessor: &NativeEcologyRest) -> Result<(), NativeFactorDepositError> {
         predecessor
             .validate()
             .map_err(|error| NativeFactorDepositError::Predecessor(error.to_string()))?;
@@ -335,7 +335,7 @@ impl NativeFactorDeposit {
 }
 
 fn candidate_atlas(
-    predecessor: &AthenaNativeRest,
+    predecessor: &NativeEcologyRest,
 ) -> Result<BTreeMap<NativeSectionAddress, NativeCandidateAtlasEntry>, NativeFactorDepositError> {
     let mut atlas = BTreeMap::new();
     for address in &predecessor.realization.sections {
