@@ -10,15 +10,15 @@ grades.
 
 ## Current frontier
 
-**Current frontier:** AAC3
+**Current frontier:** AAC4
 
-**AAC0--AAC2 PASSED. AAC3 IS ACTIVE. AAC4--AAC6 FOLLOW ONLY AFTER THEIR PREDECESSORS PASS.**
+**AAC0--AAC3 PASSED. AAC4 IS ACTIVE. AAC5--AAC6 FOLLOW ONLY AFTER THEIR PREDECESSORS PASS.**
 
 [definition] Brandon's direct request of 2026-09-01 founds the active contract
 [`blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).
-AAC0 returned the formal laws. AAC1 returned the move-owned neutral Rust session and owned
-boundary. AAC2 returned parented successive local commits, journal, withdrawal/replay, and exact
-snapshot/remount. AAC3 now owns only exact diffusion through the common boundary.
+AAC0 returned the formal laws. AAC1 returned the move-owned session. AAC2 returned parented
+successive local commits and storage. AAC3 returned exact diffusion through the common event
+family. AAC4 now owns only the opaque stable exterior ABI.
 
 [proved-derived; formal-checked; measured] AAC0 returned `LiveCirculationSession`, one common
 owned boundary, parented commit and decline, exact snapshot/remount conduct, and constituted
@@ -36,6 +36,12 @@ stale/false refusal, and decline invariance. Three focused tests passed. The exa
 replay, and mismatch refusal. The commit owner returned two passed tests; the standing cultivation
 owner returned two passed tests. The receipt is
 [`research/records/2026-09-01_AAC2_TWO_SUCCESSIVE_LOCAL_COMMITS_SNAPSHOT_WITHDRAWAL_AND_REPLAY_RETURNED.md`](research/records/2026-09-01_AAC2_TWO_SUCCESSIVE_LOCAL_COMMITS_SNAPSHOT_WITHDRAWAL_AND_REPLAY_RETURNED.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] AAC3 returned native-founded
+exact diffusion, declared capacity/conductance validation, complete balance/boundary/reconstruction
+testimony, zero exact residuals, discrete/diffusive event unification, and factorization reuse. Two
+focused tests passed. The receipt is
+[`research/records/2026-09-01_AAC3_NATIVE_INCIDENCE_FOUNDED_EXACT_DIFFUSION_THROUGH_THE_COMMON_BOUNDARY.md`](research/records/2026-09-01_AAC3_NATIVE_INCIDENCE_FOUNDED_EXACT_DIFFUSION_THROUGH_THE_COMMON_BOUNDARY.md).
 
 ## Admitted standing
 

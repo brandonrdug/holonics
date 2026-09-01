@@ -3,7 +3,7 @@
 **Date:** 2026-09-01
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** AAC3.
+**Current frontier:** AAC4.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md),
@@ -256,7 +256,7 @@ and mismatched-return/predecessor refusal. The focused commit owner returned two
 the standing cultivation owner returned two passed tests. Its receipt is
 [`../research/records/2026-09-01_AAC2_TWO_SUCCESSIVE_LOCAL_COMMITS_SNAPSHOT_WITHDRAWAL_AND_REPLAY_RETURNED.md`](../research/records/2026-09-01_AAC2_TWO_SUCCESSIVE_LOCAL_COMMITS_SNAPSHOT_WITHDRAWAL_AND_REPLAY_RETURNED.md).
 
-### AAC3 — discrete and exact diffusive generation share one boundary
+### AAC3 — discrete and exact diffusive generation share one boundary — PASSED
 
 [definition] Compose `ExactDiffusionLaw` and the admitted native incidence/current with the live
 session boundary. Return exact balance, boundary, receiver, and reconstruction testimony.
@@ -265,6 +265,12 @@ session boundary. Return exact balance, boundary, receiver, and reconstruction t
 the diffusion receipt has zero exact balance/conservation residual in its declared closed control;
 the receiver boundary is causally downstream of ingress; and prior surface content cannot route
 the law.
+
+[established-bounded; implemented-exact; source-inspected; measured] AAC3 returned native-founded
+exact diffusion, complete lineage/reconstruction/balance testimony, discrete and diffusive members
+of one event family, zero residuals, factorization-reuse testimony, and malformed-law refusal. Two
+focused tests passed. Its receipt is
+[`../research/records/2026-09-01_AAC3_NATIVE_INCIDENCE_FOUNDED_EXACT_DIFFUSION_THROUGH_THE_COMMON_BOUNDARY.md`](../research/records/2026-09-01_AAC3_NATIVE_INCIDENCE_FOUNDED_EXACT_DIFFUSION_THROUGH_THE_COMMON_BOUNDARY.md).
 
 ### AAC4 — opaque stable circulation ABI
 

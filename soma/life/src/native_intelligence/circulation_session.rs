@@ -61,7 +61,7 @@ impl NativeCirculationConfiguration {
         Ok(())
     }
 
-    fn at(&self, occurrence: EventId) -> InferenceConfigurationAddress {
+    pub(crate) fn at(&self, occurrence: EventId) -> InferenceConfigurationAddress {
         let mut address = self.address.clone();
         address.occurrence = occurrence;
         address

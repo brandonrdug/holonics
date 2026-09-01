@@ -4,6 +4,7 @@
 //! quotient, and terminal potential through exact shared occurrence lineage. No foreign executor
 //! or source coordinate is present in its conduct closure.
 
+mod circulation_diffusion;
 mod circulation_session;
 mod conduct;
 mod cultivated;
@@ -41,6 +42,10 @@ mod source_neutral_relational;
 mod source_neutral_rest;
 mod types;
 
+pub use circulation_diffusion::{
+    NativeCirculationEvent, NativeDiffusionEmission, NativeDiffusionIngress, NativeDiffusionLaw,
+    NativeDiffusionStanding, NativeDiffusiveBoundary, NATIVE_DIFFUSIVE_CIRCULATION_SCHEMA,
+};
 pub use circulation_session::{
     NativeCirculationBoundary, NativeCirculationConfiguration, NativeCirculationSession,
     NativeDeclineReceipt, NativeOwnedFutureReconstruction, NativeOwnedInferenceAddress,

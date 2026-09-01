@@ -424,7 +424,7 @@ relations; it does not demote the exact SCF handoff/circulation/withdrawal mecha
 
 ## Active campaign — Athena Application and Circulation Interface
 
-**Current frontier:** AAC3
+**Current frontier:** AAC4
 
 **AAC0--AAC6 ARE ACTIVE IN THE ORDER BELOW.**
 
@@ -452,8 +452,14 @@ local returns advance one continuing morphology through generations `0 -> 1 -> 2
 remount, latest-delta withdrawal, replay, and refusal controls pass. Its receipt is
 [`research/records/2026-09-01_AAC2_TWO_SUCCESSIVE_LOCAL_COMMITS_SNAPSHOT_WITHDRAWAL_AND_REPLAY_RETURNED.md`](../research/records/2026-09-01_AAC2_TWO_SUCCESSIVE_LOCAL_COMMITS_SNAPSHOT_WITHDRAWAL_AND_REPLAY_RETURNED.md).
 
-[definition] The current deed is AAC3 only: compose exact diffusion with the same owned session
-boundary. ABI, application, and release remain unavailable until their predecessors pass.
+[established-bounded; implemented-exact; source-inspected; measured] AAC3 passed. Native incidence,
+declared capacities/conductances, exact diffusion, receiver boundary emission, zero residuals,
+complete lineage, and structural factorization reuse return through the common event family. Two
+focused tests passed. Its receipt is
+[`research/records/2026-09-01_AAC3_NATIVE_INCIDENCE_FOUNDED_EXACT_DIFFUSION_THROUGH_THE_COMMON_BOUNDARY.md`](../research/records/2026-09-01_AAC3_NATIVE_INCIDENCE_FOUNDED_EXACT_DIFFUSION_THROUGH_THE_COMMON_BOUNDARY.md).
+
+[definition] The current deed is AAC4 only: the opaque stable exterior circulation ABI. The Athena
+application and release remain unavailable until their predecessors pass.
 
 [definition] The complete order is:
 
