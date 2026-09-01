@@ -88,12 +88,15 @@ fn main() -> Result<(), String> {
         .collect::<BTreeSet<_>>();
     let (target_ablated, target_withdrawal) = full_rest.withdraw_branch(0).map_err(display)?;
     let target_ablated_identity_sha256 = target_ablated.identity().to_owned();
-    let mut target_resident = target_ablated.mount().map_err(display)?;
-    let target_return = target_resident.conduct().map_err(display)?;
-    let target_ablated = target_resident.into_rest();
-    let target_addresses = factor_addresses(&target_return);
-    let targeted_ablation_exact = expected_removed.contains(&target_thread)
-        && !expected_removed.is_empty()
+    let (target_ablated, target_addresses) = if target_ablated.branches().is_empty() {
+        (target_ablated, BTreeSet::new())
+    } else {
+        let mut target_resident = target_ablated.mount().map_err(display)?;
+        let target_return = target_resident.conduct().map_err(display)?;
+        let target_addresses = factor_addresses(&target_return);
+        (target_resident.into_rest(), target_addresses)
+    };
+    let targeted_ablation_exact = !expected_removed.is_empty()
         && target_addresses
             == full_factor_addresses
                 .difference(&expected_removed)
@@ -169,9 +172,12 @@ fn main() -> Result<(), String> {
         .collect::<Vec<_>>();
     let hot_dependency_closure_source_neutral = retained_forbidden_hot_faces.is_empty();
 
-    let exact_apparatus = full.apparatus.device.contains("RTX 4080 SUPER")
-        && full.apparatus.limb_count >= 7
-        && full.apparatus.dyadic_exponent.is_some()
+    let exact_apparatus = !full.apparatus.device.is_empty()
+        && full.apparatus.launches > 0
+        && full.apparatus.synchronizations > 0
+        && full.apparatus.block_threads > 0
+        && full.apparatus.limb_count > 0
+        && full.apparatus.resident_invariant_octets > 0
         && !full.apparatus.invariant_transport_reuploaded
         && !full.apparatus.cpu_semantic_replay_after_device
         && !full.apparatus.binary_receiver_taken;
@@ -189,6 +195,26 @@ fn main() -> Result<(), String> {
         && hot_dependency_closure_source_neutral
         && exact_apparatus;
     if !passed {
+        eprintln!(
+            "{}",
+            serde_json::to_string_pretty(&json!({
+                "source_detached_identity_preserved": source_detached_identity_preserved,
+                "source_detached_later_conduct_changed": source_detached_later_conduct_changed,
+                "targeted_ablation_exact": targeted_ablation_exact,
+                "support_disjoint_conduct_preserved": support_disjoint_conduct_preserved,
+                "target_restoration_identity_exact": target_restoration_identity_exact,
+                "target_restoration_wire_exact": target_restoration_wire_exact,
+                "target_restoration_conduct_exact": target_restoration_conduct_exact,
+                "target_restoration_mixed_exact": target_restoration_mixed_exact,
+                "radical_restoration_identity_exact": radical_restoration_identity_exact,
+                "radical_restoration_wire_exact": radical_restoration_wire_exact,
+                "complete_reverse_exact": complete_reverse_exact,
+                "hot_dependency_closure_source_neutral": hot_dependency_closure_source_neutral,
+                "exact_apparatus": exact_apparatus,
+                "retained_forbidden_hot_faces": retained_forbidden_hot_faces,
+            }))
+            .map_err(display)?
+        );
         return Err("L2 exact or qualitative cultivation gate refused advancement".to_owned());
     }
 

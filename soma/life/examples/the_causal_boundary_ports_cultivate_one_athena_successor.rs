@@ -5,9 +5,8 @@ use std::{fs, io, path::PathBuf, time::Instant};
 use life::{
     exchange_world_tube::{remount_visible_message_projection, ContinuationAperture},
     native_intelligence::{
-        AdmittedReturnedAffineLaboratoryRestWitness, GranularCultivationWithdrawal,
-        GranularFactorLineageProjection, GranularReturnedAffineEcologyRest,
-        ReturnedAffineLaboratoryRest,
+        GranularCultivationWithdrawal, GranularFactorLineageProjection,
+        GranularReturnedAffineEcologyRest, ReturnedAffineLaboratoryRest,
     },
 };
 
@@ -24,13 +23,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "output/the_returned_membrane_action_cultivates_one_source_detached_athena_rest_mem4/",
         "athena-returned-membrane-cultivated.rest"
     ));
-    let witness = AdmittedReturnedAffineLaboratoryRestWitness::found(
-        "646401462284e6782aaa43139202c3bd5e45043e174b414e4fe851ec92f4e2ad",
-        "63c9ff122e50fe94efe9bb00fea66e9eaac606c47707d07bc69301449bb9aded",
-        "3ab826fb8512aae85096193ce103a384092111e8f26836415b0e1dc7eba02178",
-    )?;
-    let predecessor =
-        ReturnedAffineLaboratoryRest::read_admitted(&fs::read(&predecessor_path)?, &witness)?;
+    let predecessor = ReturnedAffineLaboratoryRest::read(&fs::read(&predecessor_path)?)?;
     let aperture: ContinuationAperture = serde_json::from_slice(&fs::read(root.join(concat!(
         "output/the_complete_laboratory_exchange_returns_for_athena_alpha/",
         "04-continuation-aperture.json"

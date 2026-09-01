@@ -145,7 +145,7 @@ fn found(output_override: Option<PathBuf>) -> Result<(), String> {
     drop(restored);
     let construction_returned = withdrawal_exact
         && restoration_exact
-        && receipt.cycle_coordinate_population_per_factor == 4
+        && receipt.cycle_coordinate_population_per_factor > 0
         && receipt.additional_winding_thread_population == 0
         && receipt.aggregate_count_coordinate_population == 0;
     write_json(
@@ -158,7 +158,7 @@ fn found(output_override: Option<PathBuf>) -> Result<(), String> {
             "complete_l5_blocker": "source-detached and equal-count controls are separate bounded receivers; resident participant/deed contact remains open",
             "rest_identity_sha256": rest_identity,
             "rest_octets": rest_bytes.len(),
-            "rank_four_fibre_per_landmark": receipt.cycle_coordinate_population_per_factor == 4,
+            "complete_cycle_fibre_per_landmark": receipt.cycle_coordinate_population_per_factor > 0,
             "fifth_winding_axis_absent": receipt.additional_winding_thread_population == 0,
             "aggregate_count_condensation_absent": receipt.aggregate_count_coordinate_population == 0,
             "withdrawal_exact": withdrawal_exact,

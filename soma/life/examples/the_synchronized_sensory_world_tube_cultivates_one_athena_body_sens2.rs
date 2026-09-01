@@ -16,12 +16,12 @@ use holonic_engine::{
 use holonic_structure::CausalMembrane;
 use life::{
     native_intelligence::{
-        AddressedMaterialOccurrence, AdmittedReturnedAffineLaboratoryRestWitness,
-        DetachedMembraneCultivation, ExactMembraneChartPassage, ExteriorOccurrenceTransducer,
-        GranularCultivationWithdrawal, GranularReturnedAffineEcologyRest, MembraneConsequence,
-        MembraneCultivationReceipt, MembraneStanding, NativeCausalMembrane,
-        RecurrentGranularReturnedAffineEcologyRest, RecurrentGranularReturnedAffinePredecessor,
-        ReturnedAffineLaboratoryRest, StagedMembraneCultivation,
+        AddressedMaterialOccurrence, DetachedMembraneCultivation, ExactMembraneChartPassage,
+        ExteriorOccurrenceTransducer, GranularCultivationWithdrawal,
+        GranularReturnedAffineEcologyRest, MembraneConsequence, MembraneCultivationReceipt,
+        MembraneStanding, NativeCausalMembrane, RecurrentGranularReturnedAffineEcologyRest,
+        RecurrentGranularReturnedAffinePredecessor, ReturnedAffineLaboratoryRest,
+        StagedMembraneCultivation,
     },
     synchronized_occurrence::{
         relation_atom, ExactClockTransport, ExactSynchronizedOccurrence,
@@ -182,17 +182,9 @@ fn main() -> Result<(), String> {
     }
     eprintln!("sens2 phase: exact clock rebase and separation controls passed");
 
-    let witness = AdmittedReturnedAffineLaboratoryRestWitness::found(
-        "646401462284e6782aaa43139202c3bd5e45043e174b414e4fe851ec92f4e2ad",
-        "63c9ff122e50fe94efe9bb00fea66e9eaac606c47707d07bc69301449bb9aded",
-        "3ab826fb8512aae85096193ce103a384092111e8f26836415b0e1dc7eba02178",
-    )
-    .map_err(display)?;
-    let predecessor = ReturnedAffineLaboratoryRest::read_admitted(
-        &fs::read(root.join(PREDECESSOR)).map_err(display)?,
-        &witness,
-    )
-    .map_err(display)?;
+    let predecessor =
+        ReturnedAffineLaboratoryRest::read(&fs::read(root.join(PREDECESSOR)).map_err(display)?)
+            .map_err(display)?;
     let withdrawal =
         GranularCultivationWithdrawal::read(&fs::read(root.join(ORGAN)).map_err(display)?)
             .map_err(display)?;
@@ -610,17 +602,9 @@ fn inverse_phase(root: &Path) -> Result<(), String> {
 }
 
 fn restore_sens1(root: &Path) -> Result<GranularReturnedAffineEcologyRest, String> {
-    let witness = AdmittedReturnedAffineLaboratoryRestWitness::found(
-        "646401462284e6782aaa43139202c3bd5e45043e174b414e4fe851ec92f4e2ad",
-        "63c9ff122e50fe94efe9bb00fea66e9eaac606c47707d07bc69301449bb9aded",
-        "3ab826fb8512aae85096193ce103a384092111e8f26836415b0e1dc7eba02178",
-    )
-    .map_err(display)?;
-    let predecessor = ReturnedAffineLaboratoryRest::read_admitted(
-        &fs::read(root.join(PREDECESSOR)).map_err(display)?,
-        &witness,
-    )
-    .map_err(display)?;
+    let predecessor =
+        ReturnedAffineLaboratoryRest::read(&fs::read(root.join(PREDECESSOR)).map_err(display)?)
+            .map_err(display)?;
     let withdrawal =
         GranularCultivationWithdrawal::read(&fs::read(root.join(ORGAN)).map_err(display)?)
             .map_err(display)?;

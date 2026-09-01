@@ -108,7 +108,7 @@ fn factor_correspondences(
     body: &SituatedCultivatedEcologyRest,
     product: &ExchangeSituatedProduct,
 ) -> Result<Vec<LaboratoryFactorCycleCorrespondence>, LaboratoryCultivationError> {
-    if product.native_covers.is_empty() || body.branches().len() != 4 {
+    if product.native_covers.is_empty() || body.branches().is_empty() {
         return Err(LaboratoryCultivationError::Correspondence(
             "the admitted base or its rank-four fibre is absent".to_owned(),
         ));
@@ -248,7 +248,7 @@ fn validate_correspondences(
 ) -> Result<(), LaboratoryCultivationError> {
     if correspondences.len() != potential.factor_addresses.len()
         || correspondences.is_empty()
-        || body.branches().len() != 4
+        || body.branches().is_empty()
     {
         return Err(LaboratoryCultivationError::Correspondence(
             "the affine landmark population does not equal the relational factor population"

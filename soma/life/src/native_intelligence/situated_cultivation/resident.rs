@@ -328,12 +328,11 @@ pub(super) fn derive_branch_deposit(
         // lineage needed by later conduct and exact reconstruction.
         let occurrence_fibre =
             BTreeSet::from([local.situated.candidate_event, local.situated.return_event]);
-        let k3_native_support = BTreeSet::from([
-            k3.candidate.entering_native,
-            k3.candidate.emitting_native,
-            k3.returned.entering_native,
-            k3.returned.emitting_native,
-        ]);
+        // The physical K3 kernel is shared across its complete lineage fibre. The hot cultivated
+        // support is therefore the receiver-history factor carried by this exact local; raw K3
+        // state addresses remain recoverable from `k3.lineage_fibre` and must not masquerade as
+        // cultivated factor coordinates.
+        let k3_native_support = BTreeSet::from([cover.native]);
         exact_reconstruction_fibres.push(NativeExactReconstructionFibre {
             address: format!(
                 "native-situated-fibre/{branch_index}/{}",

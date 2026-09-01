@@ -136,6 +136,17 @@ pub struct K3PullbackBranch {
     pub candidate: NativeConductedSection,
     pub returned: NativeConductedSection,
     pub pullback: NativePullbackOccurrence,
+    /// Complete addressed branches condensed through this physical kernel. A richer receiver can
+    /// reopen any member without reconstructing it from a digest or endpoint count.
+    pub lineage_fibre: Vec<K3PullbackLineage>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct K3PullbackLineage {
+    pub candidate: NativeConductedSection,
+    pub returned: NativeConductedSection,
+    pub pullback: NativePullbackOccurrence,
 }
 
 /// The complete receiver constitutive form over the admitted K3 branch population.
@@ -485,6 +496,14 @@ impl ExchangeSituatedProduct {
         }
         let branches = k3_pullback_branches(rest)?;
         eprintln!("l1-stage=k3-branches branches={}", branches.len());
+        let lineage_population = branches
+            .iter()
+            .map(|branch| branch.lineage_fibre.len())
+            .sum::<usize>();
+        eprintln!(
+            "l1-stage=physical-kernels kernels={} lineages={lineage_population}",
+            branches.len()
+        );
         let constitutive_form = NativeReceiverConstitutiveForm::found(&branches)?;
         eprintln!("l1-stage=constitutive-form");
         let codomain_basis = codomain_basis(&material, &branches)?;
@@ -961,59 +980,70 @@ impl From<super::SituatedDifferenceError> for ExchangeSituatedProductError {
 fn k3_pullback_branches(
     rest: &NativeEcologyRest,
 ) -> Result<Vec<K3PullbackBranch>, ExchangeSituatedProductError> {
-    let receiver = *rest
+    let receivers = rest
         .realization
         .receiver_family
         .iter()
-        .next()
-        .ok_or_else(|| ExchangeSituatedProductError::K3("K3 has no receiver".to_owned()))?;
-    let projected = rest
-        .project_admitted_population(receiver)
-        .map_err(|error| ExchangeSituatedProductError::K3(error.to_string()))?;
+        .copied()
+        .collect::<Vec<_>>();
+    if receivers.is_empty() {
+        return Err(ExchangeSituatedProductError::K3(
+            "K3 has no receiver".to_owned(),
+        ));
+    }
     let mut branches = Vec::new();
-    for ingress in &rest.realization.ingress_sections {
-        let candidate = projected.get(ingress).cloned().ok_or_else(|| {
-            ExchangeSituatedProductError::K3(
-                "the projected population omitted an admitted ingress".to_owned(),
-            )
-        })?;
-        if candidate.successor_sections.is_empty() {
-            continue;
-        }
-        for successor in &candidate.successor_sections {
-            let returned = projected.get(successor).cloned().ok_or_else(|| {
+    for receiver in receivers {
+        let projected = rest
+            .project_admitted_population(receiver)
+            .map_err(|error| ExchangeSituatedProductError::K3(error.to_string()))?;
+        for ingress in &rest.realization.ingress_sections {
+            let candidate = projected.get(ingress).cloned().ok_or_else(|| {
                 ExchangeSituatedProductError::K3(
-                    "the projected population omitted an admitted successor".to_owned(),
+                    "the projected population omitted an admitted ingress".to_owned(),
                 )
             })?;
-            let pullback = rest
-                .ecology
-                .spools
-                .iter()
-                .flat_map(|spool| &spool.serial_pullbacks)
-                .flat_map(|serial| &serial.occurrences)
-                .find(|occurrence| {
-                    occurrence.left == candidate.address.occurrence
-                        && occurrence.right == returned.address.occurrence
-                })
-                .copied()
-                .ok_or_else(|| {
+            if candidate.successor_sections.is_empty() {
+                continue;
+            }
+            for successor in &candidate.successor_sections {
+                let returned = projected.get(successor).cloned().ok_or_else(|| {
                     ExchangeSituatedProductError::K3(
-                        "candidate and successor lack an actual K3 pullback occurrence".to_owned(),
+                        "the projected population omitted an admitted successor".to_owned(),
                     )
                 })?;
-            let address = digest_json(&(
-                "k3-pullback-branch/v1",
-                &candidate.address,
-                &returned.address,
-                pullback,
-            ))?;
-            branches.push(K3PullbackBranch {
-                address,
-                candidate: candidate.clone(),
-                returned,
-                pullback,
-            });
+                let pullback = rest
+                    .ecology
+                    .spools
+                    .iter()
+                    .flat_map(|spool| &spool.serial_pullbacks)
+                    .flat_map(|serial| &serial.occurrences)
+                    .find(|occurrence| {
+                        occurrence.left == candidate.address.occurrence
+                            && occurrence.right == returned.address.occurrence
+                    })
+                    .copied()
+                    .ok_or_else(|| {
+                        ExchangeSituatedProductError::K3(
+                            "candidate and successor lack an actual K3 pullback occurrence"
+                                .to_owned(),
+                        )
+                    })?;
+                let address = format!(
+                    "k3-lineage/{}/{}/{}",
+                    receiver.0, candidate.address.occurrence.0, returned.address.occurrence.0
+                );
+                branches.push(K3PullbackBranch {
+                    address,
+                    candidate: candidate.clone(),
+                    returned: returned.clone(),
+                    pullback,
+                    lineage_fibre: vec![K3PullbackLineage {
+                        candidate: candidate.clone(),
+                        returned,
+                        pullback,
+                    }],
+                });
+            }
         }
     }
     branches.sort_by(|left, right| left.address.cmp(&right.address));
@@ -1022,7 +1052,53 @@ fn k3_pullback_branches(
             "K3 returned no serial pullback branches".to_owned(),
         ));
     }
-    Ok(branches)
+    let mut classes = BTreeMap::<String, K3PullbackBranch>::new();
+    for branch in branches {
+        let key = physical_branch_key(&branch)?;
+        match classes.entry(key) {
+            std::collections::btree_map::Entry::Vacant(entry) => {
+                entry.insert(branch);
+            }
+            std::collections::btree_map::Entry::Occupied(mut entry) => {
+                entry.get_mut().lineage_fibre.extend(branch.lineage_fibre);
+            }
+        }
+    }
+    let mut kernels = classes
+        .into_values()
+        .enumerate()
+        .map(|(at, mut branch)| {
+            branch.address = format!("k3-physical-kernel/{at}");
+            branch.lineage_fibre.sort_by_key(|lineage| {
+                (
+                    lineage.candidate.address.clone(),
+                    lineage.returned.address.clone(),
+                )
+            });
+            branch
+        })
+        .collect::<Vec<_>>();
+    kernels.sort_by(|left, right| left.address.cmp(&right.address));
+    Ok(kernels)
+}
+
+fn physical_branch_key(branch: &K3PullbackBranch) -> Result<String, ExchangeSituatedProductError> {
+    serde_json::to_string(&(
+        &branch.candidate.entering_current,
+        &branch.candidate.emitting_current,
+        &branch.returned.entering_current,
+        &branch.returned.emitting_current,
+        (
+            branch.candidate.incidence.coefficient,
+            branch.returned.incidence.coefficient,
+            branch.candidate.receiver,
+            branch.candidate.hand,
+            branch.returned.hand,
+        ),
+        &branch.candidate.relative_phase,
+        &branch.returned.relative_phase,
+    ))
+    .map_err(|error| ExchangeSituatedProductError::Wire(error.to_string()))
 }
 
 fn codomain_basis(

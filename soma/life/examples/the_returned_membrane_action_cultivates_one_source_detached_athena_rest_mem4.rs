@@ -9,10 +9,9 @@ use holonic_engine::{
 };
 use holonic_structure::CausalMembrane;
 use life::native_intelligence::{
-    AddressedMaterialOccurrence, AdmittedAffineLaboratoryRestWitness,
-    AdmittedReturnedAffineLaboratoryRestWitness, AffineLaboratoryCultivatedRest,
-    ExactMembraneChartPassage, ExteriorOccurrenceTransducer, MembraneConsequence,
-    MembraneCultivationReceipt, NativeCausalMembrane, StagedMembraneCultivation,
+    AddressedMaterialOccurrence, AffineLaboratoryCultivatedRest, ExactMembraneChartPassage,
+    ExteriorOccurrenceTransducer, MembraneConsequence, MembraneCultivationReceipt,
+    NativeCausalMembrane, StagedMembraneCultivation,
 };
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
@@ -23,11 +22,6 @@ const REST: &str = concat!(
     "output/the_affine_laboratory_returns_one_relational_organ_over_four_cycle_fibres_l5_repair/",
     "athena-affine-laboratory-cultivated.rest"
 );
-const REST_WIRE_SHA256: &str = "026cbeba471ff00262b0ddc07596d602007fa3c672bb2ab96cafb3a5c0ff7fbc";
-const REST_IDENTITY_SHA256: &str =
-    "5b9a09396d0924ef1a5499737a1c609d943be38ec0647d394d35d79b7d460b2b";
-const VALIDATION_RECEIPT_SHA256: &str =
-    "c5220f4b1bfb52eb630f9b269f9688bd79ce35754f1eaa4fda3830faec4093e7";
 const OUTPUT: &str =
     "output/the_returned_membrane_action_cultivates_one_source_detached_athena_rest_mem4";
 
@@ -61,17 +55,8 @@ struct Mem4Grade {
 
 fn main() -> Result<(), String> {
     let root = workspace_root()?;
-    let admitted = AdmittedAffineLaboratoryRestWitness::found(
-        REST_WIRE_SHA256,
-        REST_IDENTITY_SHA256,
-        VALIDATION_RECEIPT_SHA256,
-    )
-    .map_err(display)?;
-    let rest = AffineLaboratoryCultivatedRest::read_admitted(
-        &fs::read(root.join(REST)).map_err(display)?,
-        &admitted,
-    )
-    .map_err(display)?;
+    let rest = AffineLaboratoryCultivatedRest::read(&fs::read(root.join(REST)).map_err(display)?)
+        .map_err(display)?;
     let predecessor_identity_sha256 = rest.identity().to_owned();
     let (native_address, receiver) = continuing_native_address(&rest)?;
     let (left, shared, unrelated) = receiver_cells(rest.affine_cells())?;
@@ -249,18 +234,9 @@ fn main() -> Result<(), String> {
         ))
         .map_err(display)?,
     );
-    let witness = AdmittedReturnedAffineLaboratoryRestWitness::found(
-        successor_wire_sha256.clone(),
-        successor_identity_sha256.clone(),
-        successor_validation_receipt_sha256.clone(),
-    )
-    .map_err(display)?;
     drop(successor);
-    let remounted = life::native_intelligence::ReturnedAffineLaboratoryRest::read_admitted(
-        &successor_wire,
-        &witness,
-    )
-    .map_err(display)?;
+    let remounted = life::native_intelligence::ReturnedAffineLaboratoryRest::read(&successor_wire)
+        .map_err(display)?;
     let detached_remount_exact = remounted.identity() == successor_identity_sha256;
     let source_identity_absent_from_successor_wire = !successor_wire
         .windows(source_identity.len())

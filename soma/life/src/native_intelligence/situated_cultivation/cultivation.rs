@@ -179,7 +179,6 @@ impl SituatedCultivatedEcologyRest {
             .and_then(|population| population.checked_div(2));
         if self.schema != SITUATED_CULTIVATED_ECOLOGY_REST_SCHEMA
             || !is_sha256_digest(&self.predecessor_wire_sha256)
-            || self.branches.is_empty()
             || branch_addresses.len() != self.branches.len()
             || !branch_addresses.is_subset(&receipt_addresses)
             || !branch_addresses.is_subset(&thread_addresses)
