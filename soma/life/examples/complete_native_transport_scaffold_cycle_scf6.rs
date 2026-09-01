@@ -1,4 +1,4 @@
-use std::{env, error::Error, path::PathBuf};
+use std::{collections::BTreeSet, env, error::Error, path::PathBuf};
 
 use holonic_engine::{
     native_ecology::holonic_intelligence::{
@@ -10,11 +10,13 @@ use holonic_engine::{
     },
     receiver_exact_compression::{Observation, ReceiverId},
     soulkiller::dismantle,
-    EventId,
+    BoundaryId, EventId, ExactComplexWaveCurrent,
 };
 use life::native_intelligence::{
-    consume_dismantling_return, ReturnedScaffoldCurrent, ScaffoldCultivatedRest,
+    consume_dismantling_return, ReturnedScaffoldInteraction, ScaffoldCultivatedRest,
 };
+use num_bigint::BigInt;
+use num_rational::BigRational as Rat;
 use serde::Serialize;
 use serde_json::json;
 
@@ -38,6 +40,8 @@ struct ExperimentReturn {
     variable_grain_population: usize,
     source_detached_consequence_preserved: bool,
     cultivated_ablation_removed_conduct: bool,
+    outside_cone_morphology_unchanged: bool,
+    causal_cone_population: usize,
     final_hot_thread_population: usize,
     departed_inherited_thread_population: usize,
     contact_chart_population: usize,
@@ -45,18 +49,30 @@ struct ExperimentReturn {
 }
 
 struct CultivateAtFirst {
-    returned: ReturnedScaffoldCurrent,
+    occurrence: EventId,
+    emitting_boundary: BoundaryId,
+    exterior_current: ExactComplexWaveCurrent,
+    storage: Rat,
 }
 
-impl NativeContinuationReceiver<ReturnedScaffoldCurrent> for CultivateAtFirst {
+impl NativeContinuationReceiver<ReturnedScaffoldInteraction> for CultivateAtFirst {
     fn receive(
         &self,
-        _emission: &NativeVariableGrainEmission,
+        emission: &NativeVariableGrainEmission,
         _successors: &[NativeInferenceRequest],
-    ) -> NativeContinuationDecision<ReturnedScaffoldCurrent> {
+    ) -> NativeContinuationDecision<ReturnedScaffoldInteraction> {
+        let returned = ReturnedScaffoldInteraction::found(
+            emission.address.clone(),
+            self.occurrence,
+            self.emitting_boundary,
+            self.exterior_current.clone(),
+            self.storage.clone(),
+            BTreeSet::new(),
+        )
+        .expect("the fixture supplies a nonzero later exterior interaction");
         NativeContinuationDecision::Cultivate {
-            returned_occurrence: self.returned.occurrence,
-            returned: self.returned.clone(),
+            returned_occurrence: returned.occurrence,
+            returned,
         }
     }
 }
@@ -149,36 +165,16 @@ fn run(
         thread: source_thread.address.clone(),
         occurrence: source_occurrence,
     };
-    let source_returned_native = source_thread.occurrences[0].emitting_native;
-    let source_returned_current = source_thread
-        .parametrons
-        .iter()
-        .find(|cell| cell.native == source_returned_native)
-        .ok_or("source returned current absent")?
-        .current
-        .clone();
-    let later_current = spool
-        .threads
-        .iter()
-        .skip(1)
-        .flat_map(|thread| &thread.parametrons)
-        .map(|cell| cell.current.clone())
-        .find(|current| current != &source_returned_current)
-        .ok_or("intervention-separated returned current did not differ")?;
-    let returned = ReturnedScaffoldCurrent {
-        occurrence: EventId(
-            spool
-                .threads
-                .iter()
-                .flat_map(|thread| &thread.occurrences)
-                .map(|occurrence| occurrence.occurrence.0)
-                .max()
-                .ok_or("native occurrence population absent")?
-                + 1,
-        ),
-        emitting_boundary: holonic_engine::BoundaryId(10_000 + ordinal),
-        current: later_current,
-    };
+    let returned_occurrence = EventId(
+        spool
+            .threads
+            .iter()
+            .flat_map(|thread| &thread.occurrences)
+            .map(|occurrence| occurrence.occurrence.0)
+            .max()
+            .ok_or("native occurrence population absent")?
+            + 1,
+    );
     let request = NativeInferenceRequest {
         address: source.clone(),
         receiver,
@@ -187,7 +183,13 @@ fn run(
         &lifted.native,
         request,
         &CultivateAtFirst {
-            returned: returned.clone(),
+            occurrence: returned_occurrence,
+            emitting_boundary: BoundaryId(10_000 + ordinal),
+            exterior_current: ExactComplexWaveCurrent::new(
+                Rat::from_integer(BigInt::from(ordinal + 1)),
+                Rat::from_integer(BigInt::from(1)),
+            ),
+            storage: Rat::from_integer(BigInt::from(1)),
         },
     )?;
     let circulation_cuts = repeated.cuts.len();
@@ -196,10 +198,8 @@ fn run(
         .iter()
         .map(|emission| emission.grains.len())
         .sum();
-    let (emitted, returned) = match repeated.dispositions.as_slice() {
-        [NativeCycleDisposition::Cultivate {
-            emitted, returned, ..
-        }] => (emitted.clone(), returned.clone()),
+    let returned = match repeated.dispositions.as_slice() {
+        [NativeCycleDisposition::Cultivate { returned, .. }] => returned.clone(),
         _ => return Err("the common public cycle did not return cultivation".into()),
     };
     drop(repeated);
@@ -237,7 +237,7 @@ fn run(
     )?;
 
     let (hot, departed) = consume_dismantling_return(lifted)?;
-    let cultivated = ScaffoldCultivatedRest::cultivate(hot, source, emitted, returned)?;
+    let cultivated = ScaffoldCultivatedRest::cultivate(hot, source, returned)?;
     let released = cultivated.release()?;
     Ok(ExperimentReturn {
         experiment,
@@ -248,6 +248,8 @@ fn run(
         variable_grain_population,
         source_detached_consequence_preserved: released.receipt.declared_consequence_preserved,
         cultivated_ablation_removed_conduct: released.receipt.cultivated_ablation_removed_conduct,
+        outside_cone_morphology_unchanged: released.receipt.outside_cone_morphology_unchanged,
+        causal_cone_population: released.receipt.causal_cone_population,
         final_hot_thread_population: released
             .hot
             .native()

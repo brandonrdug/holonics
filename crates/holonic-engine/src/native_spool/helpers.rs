@@ -1091,6 +1091,9 @@ pub(crate) fn withdraw_situated_deposit_from_admitted(
     {
         return Err(NativeSpoolRefusal::ThreadDepositReceipt);
     }
+    if !native.retained_generator_open_domain_deltas.is_empty() {
+        return Err(NativeSpoolRefusal::ThreadDepositReceipt);
+    }
 
     let NativeThreadWithdrawal {
         original_identity_sha256: _,
@@ -1099,6 +1102,7 @@ pub(crate) fn withdraw_situated_deposit_from_admitted(
         thread,
         serial_pullbacks,
         generator_descents,
+        retained_generator_open_domain_deltas: _,
         receiver_factors,
         mutual_constitutive_responses,
         shortest_separators,

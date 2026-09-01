@@ -340,9 +340,9 @@ no successor phase is scheduled.
 
 ## Active campaign — Native Morphology Variant Foundation
 
-**Current frontier:** MVF3
+**Current frontier:** MVF4
 
-**MVF3 — RECIPROCAL LOCAL CAUSAL-CONE CULTIVATION — IS THE SOLE NEXT DEED.**
+**MVF4 — DERIVED ANATOMY MANIFEST AND BACKEND-INDEPENDENT MORPHOLOGY PACKAGE — IS THE SOLE NEXT DEED.**
 
 [definition] Brandon's direct instruction of 2026-09-01 founds the ordered `MVF0--MVF6` campaign
 under
@@ -370,6 +370,12 @@ Soulkiller dismantling boundary over generic reachable-section and faithful BF16
 their cold witness types differ; duplicate public functions and return classes departed without
 aliases. Its receipt is
 [`research/records/2026-09-01_MVF2_GENERIC_AND_GEMMA_CHARTS_ENTERED_ONE_SOULKILLER_DISMANTLING_BOUNDARY.md`](../research/records/2026-09-01_MVF2_GENERIC_AND_GEMMA_CHARTS_ENTERED_ONE_SOULKILLER_DISMANTLING_BOUNDARY.md).
+
+[established-bounded; implemented-exact; measured] MVF3 returned emission-indexed exterior
+interaction, causal-cone-only morphology, reciprocal mutual response, disjoint-region interchange
+and equality, local/global cone controls, remount, ablation, withdrawal, and exact open-domain
+restoration. Its receipt is
+[`research/records/2026-09-01_MVF3_RETURNED_LOCAL_INTERACTION_CULTIVATED_ONLY_ITS_CAUSAL_CONE.md`](../research/records/2026-09-01_MVF3_RETURNED_LOCAL_INTERACTION_CULTIVATED_ONLY_ITS_CAUSAL_CONE.md).
 
 [counterexample; source-inspected] The completed SCF lifecycle remains exact at its bounded
 mechanism scope, but the Gemma productive lift's alternating real/imaginary section sum is not a

@@ -14,28 +14,63 @@ use holonic_engine::{
     },
     native_spool::{
         NativeConstitutiveResponse, NativeDepositFibreDelta, NativeExactReconstructionFibre,
-        NativeGeneratorDescent, NativeGeneratorStep, NativeIncidenceTerm, NativeOccurrenceSection,
+        NativeGeneratorDescent, NativeGeneratorStep, NativeIncidenceTerm, NativeInterchangeReceipt,
+        NativeMutualConstitutiveResponse, NativeOccurrenceSection, NativeOrderedConsequence,
         NativeParametronCell, NativePullbackOccurrence, NativeReceiverConsequence,
         NativeSerialPullback, NativeSituatedThreadWithdrawal, NativeThread, NativeThreadDeposit,
         NativeThreadDepositReceipt, NativeThreadHand, NativeThreadOccurrence,
-        SituatedNativeTransportScaffold, NATIVE_THREAD_DEPOSIT_SCHEMA, NATIVE_THREAD_SCHEMA,
+        NativeTransportScaffold, SituatedNativeTransportScaffold, NATIVE_THREAD_DEPOSIT_SCHEMA,
+        NATIVE_THREAD_SCHEMA,
     },
     receiver_exact_compression::{InputId, Observation},
     receiver_history_compression::{NativeStateId, ReceiverFactor},
     BoundaryId, EventId, ExactComplexWaveCurrent, ExactRatMatrix, ExactUnitConicPhase,
     OccurrencePort,
 };
+use num_rational::BigRational as Rat;
 use serde::Serialize;
 use thiserror::Error;
 
 use super::NativeEcologyRest;
 
-/// One exact later current crossing the world-return boundary of an emitted native section.
+/// One exact exterior current returning through a particular emitted native section.
+/// The native successor current is derived from this interaction and the standing local current.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct ReturnedScaffoldCurrent {
+pub struct ReturnedScaffoldInteraction {
+    pub emitted: NativeEmissionAddress,
     pub occurrence: EventId,
     pub emitting_boundary: BoundaryId,
-    pub current: ExactComplexWaveCurrent,
+    pub exterior_current: ExactComplexWaveCurrent,
+    pub storage: Rat,
+    pub contact_support: BTreeSet<NativeStateId>,
+}
+
+impl ReturnedScaffoldInteraction {
+    pub fn found(
+        emitted: NativeEmissionAddress,
+        occurrence: EventId,
+        emitting_boundary: BoundaryId,
+        exterior_current: ExactComplexWaveCurrent,
+        storage: Rat,
+        additional_contact_support: BTreeSet<NativeStateId>,
+    ) -> Result<Self, ScaffoldCultivationError> {
+        if occurrence == emitted.entering_occurrence
+            || exterior_current.is_zero()
+            || storage == Rat::from_integer(0.into())
+        {
+            return Err(ScaffoldCultivationError::Return);
+        }
+        let mut contact_support = BTreeSet::from([emitted.emitted.from, emitted.emitted.to]);
+        contact_support.extend(additional_contact_support);
+        Ok(Self {
+            emitted,
+            occurrence,
+            emitting_boundary,
+            exterior_current,
+            storage,
+            contact_support,
+        })
+    }
 }
 
 /// Stable receiver consequence used to compare the cultivated body across apparatus remounts.
@@ -57,6 +92,8 @@ pub struct ScaffoldCultivatedRest {
     cultivated_request: NativeInferenceRequest,
     inherited_threads: Vec<(String, String)>,
     deposit_receipt: NativeThreadDepositReceipt,
+    causal_cone: BTreeSet<NativeStateId>,
+    outside_thread_population: usize,
 }
 
 /// The exact release receipt. Every Boolean is returned by a typed operation performed by
@@ -70,6 +107,10 @@ pub struct ScaffoldReleaseReceipt {
     pub restoration_recovered_successor: bool,
     pub inherited_thread_population: usize,
     pub departed_reconstruction_fibre_population: usize,
+    pub causal_cone_population: usize,
+    pub outside_thread_population: usize,
+    pub outside_cone_morphology_unchanged: bool,
+    pub inactive_native_not_deposited: bool,
     pub final_source_detached: bool,
 }
 
@@ -100,8 +141,7 @@ impl ScaffoldCultivatedRest {
     pub fn cultivate(
         predecessor: NativeEcologyRest,
         source: NativeInferenceAddress,
-        emitted: NativeEmissionAddress,
-        returned: ReturnedScaffoldCurrent,
+        returned: ReturnedScaffoldInteraction,
     ) -> Result<Self, ScaffoldCultivationError> {
         predecessor
             .validate()
@@ -117,7 +157,10 @@ impl ScaffoldCultivatedRest {
                     .map(move |thread| (spool.address.clone(), thread.address.clone()))
             })
             .collect::<Vec<_>>();
-        let deposit = returned_current_deposit(&predecessor, &source, &emitted, &returned)?;
+        let emitted = &returned.emitted;
+        let causal_cone = returned.contact_support.clone();
+        let outside_before = outside_cone_threads(&predecessor.ecology, &causal_cone)?;
+        let deposit = returned_current_deposit(&predecessor, &source, &returned)?;
         let cultivated_request = NativeInferenceRequest {
             address: NativeInferenceAddress {
                 spool: source.spool.clone(),
@@ -139,11 +182,17 @@ impl ScaffoldCultivatedRest {
                 "the cultivation receipt does not name the complete successor".to_owned(),
             ));
         }
+        let outside_after = outside_cone_threads(ecology.native(), &causal_cone)?;
+        if outside_before != outside_after {
+            return Err(ScaffoldCultivationError::Consequence);
+        }
         Ok(Self {
             ecology,
             cultivated_request,
             inherited_threads,
             deposit_receipt,
+            causal_cone,
+            outside_thread_population: outside_before.len(),
         })
     }
 
@@ -163,6 +212,8 @@ impl ScaffoldCultivatedRest {
             cultivated_request,
             inherited_threads,
             deposit_receipt,
+            causal_cone,
+            outside_thread_population,
         } = self;
         let full_identity = ecology
             .identity_sha256()
@@ -263,6 +314,11 @@ impl ScaffoldCultivatedRest {
                 withdrawal.native.fibre_deltas.len() + withdrawal.exact_reconstruction_fibres.len()
             })
             .sum();
+        let inactive_native_not_deposited = ecology
+            .native()
+            .spools
+            .iter()
+            .all(|spool| spool.native_population.is_subset(&causal_cone));
         Ok(ReleasedScaffoldCultivation {
             hot: ecology,
             departed_inherited,
@@ -274,21 +330,46 @@ impl ScaffoldCultivatedRest {
                 restoration_recovered_successor,
                 inherited_thread_population: inherited_threads.len(),
                 departed_reconstruction_fibre_population,
+                causal_cone_population: causal_cone.len(),
+                outside_thread_population,
+                outside_cone_morphology_unchanged: true,
+                inactive_native_not_deposited,
                 final_source_detached,
             },
         })
     }
 }
 
+fn outside_cone_threads(
+    ecology: &NativeTransportScaffold,
+    causal_cone: &BTreeSet<NativeStateId>,
+) -> Result<Vec<(String, String, Vec<u8>)>, ScaffoldCultivationError> {
+    let mut faces = ecology
+        .spools
+        .iter()
+        .flat_map(|spool| {
+            spool
+                .threads
+                .iter()
+                .filter(|thread| thread.native_support.is_disjoint(causal_cone))
+                .map(move |thread| {
+                    serde_json::to_vec(thread)
+                        .map(|wire| (spool.address.clone(), thread.address.clone(), wire))
+                        .map_err(|error| ScaffoldCultivationError::Ecology(error.to_string()))
+                })
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    faces.sort_by(|left, right| (&left.0, &left.1).cmp(&(&right.0, &right.1)));
+    Ok(faces)
+}
+
 fn returned_current_deposit(
     predecessor: &NativeEcologyRest,
     source: &NativeInferenceAddress,
-    emitted: &NativeEmissionAddress,
-    returned: &ReturnedScaffoldCurrent,
+    returned: &ReturnedScaffoldInteraction,
 ) -> Result<NativeThreadDeposit, ScaffoldCultivationError> {
-    if returned.occurrence == source.occurrence
-        || emitted.entering_occurrence != source.occurrence
-        || returned.current.is_zero()
+    let emitted = &returned.emitted;
+    if returned.occurrence <= source.occurrence || emitted.entering_occurrence != source.occurrence
     {
         return Err(ScaffoldCultivationError::Return);
     }
@@ -298,6 +379,7 @@ fn returned_current_deposit(
         .map_err(|error| ScaffoldCultivationError::Predecessor(error.to_string()))?;
     if !section.spool().receiver_family.contains(&emitted.receiver)
         || emitted.emitted.from != section.occurrence().entering_native
+        || emitted.emitted.to != section.occurrence().emitting_native
         || emitted.emitted.to == emitted.emitted.from
     {
         return Err(ScaffoldCultivationError::Return);
@@ -313,27 +395,33 @@ fn returned_current_deposit(
     }
     let entering_native = emitted.emitted.to;
     let emitting_native = emitted.emitted.from;
-    let existing_current = spool
-        .threads
-        .iter()
-        .flat_map(|thread| &thread.parametrons)
-        .find(|cell| cell.native == entering_native)
-        .ok_or(ScaffoldCultivationError::Return)?
-        .current
-        .clone();
-    let returned_difference = returned.current.subtract(&existing_current);
+    let causal_cone = returned.contact_support.clone();
+    if !causal_cone.is_subset(&spool.native_population)
+        || !causal_cone.contains(&entering_native)
+        || !causal_cone.contains(&emitting_native)
+    {
+        return Err(ScaffoldCultivationError::Return);
+    }
+    let existing_current = section.emitting_parametron().current.clone();
+    let returned_difference = returned.exterior_current.scaled(&returned.storage);
+    let returned_current = existing_current.add(&returned_difference);
     if returned_difference.is_zero() {
         return Err(ScaffoldCultivationError::Return);
     }
 
     let mut cell_by_native = BTreeMap::<NativeStateId, NativeParametronCell>::new();
-    for cell in spool.threads.iter().flat_map(|thread| &thread.parametrons) {
+    for cell in spool
+        .threads
+        .iter()
+        .flat_map(|thread| &thread.parametrons)
+        .filter(|cell| causal_cone.contains(&cell.native))
+    {
         match cell_by_native.get(&cell.native) {
             Some(existing)
                 if existing.current != cell.current || existing.section != cell.section =>
             {
                 return Err(ScaffoldCultivationError::Deposit(
-                    "one native state carries inconsistent inherited current".to_owned(),
+                    "one causal-cone state carries inconsistent inherited current".to_owned(),
                 ));
             }
             Some(_) => {}
@@ -342,32 +430,34 @@ fn returned_current_deposit(
             }
         }
     }
-    let all_native = spool.native_population.clone();
-    let parametrons = all_native
+    if cell_by_native.len() != causal_cone.len() {
+        return Err(ScaffoldCultivationError::Return);
+    }
+    let parametrons = causal_cone
         .iter()
         .map(|native| {
-            let mut cell = cell_by_native.get(native).cloned().ok_or_else(|| {
-                ScaffoldCultivationError::Deposit("native current absent".to_owned())
-            })?;
+            let mut cell = cell_by_native[native].clone();
             cell.relative_phase = ExactUnitConicPhase::identity();
             cell.hand = NativeThreadHand::Along;
             if *native == emitting_native {
-                cell.section = returned.current.clone();
-                cell.current = returned.current.clone();
+                cell.section = returned_current.clone();
+                cell.current = returned_current.clone();
             }
-            Ok(cell)
+            cell
         })
-        .collect::<Result<Vec<_>, ScaffoldCultivationError>>()?;
+        .collect::<Vec<_>>();
     let factors = spool
         .receiver_factors
         .iter()
-        .filter(|factor| factor.receiver == emitted.receiver)
+        .filter(|factor| {
+            factor.receiver == emitted.receiver && causal_cone.contains(&factor.native)
+        })
         .map(|factor| (factor.native, factor.clone()))
         .collect::<BTreeMap<_, _>>();
-    if factors.len() != all_native.len() {
+    if factors.len() != causal_cone.len() {
         return Err(ScaffoldCultivationError::Return);
     }
-    let consequences = all_native
+    let consequences = causal_cone
         .iter()
         .map(|native| NativeReceiverConsequence {
             native: *native,
@@ -396,14 +486,14 @@ fn returned_current_deposit(
                 ScaffoldCultivationError::Deposit("generator address overflow".to_owned())
             })?,
     );
-    let thread_address = format!("thread/returned-current-{}", returned.occurrence.0);
+    let thread_address = format!("thread/returned-interaction-{}", returned.occurrence.0);
     let thread = NativeThread {
         schema: NATIVE_THREAD_SCHEMA.to_owned(),
         address: thread_address.clone(),
         entering_boundary: section.thread().emitting_boundary,
         emitting_boundary: returned.emitting_boundary,
-        entering_carrier: "exact-returned-complex-current".to_owned(),
-        emitting_carrier: "exact-returned-complex-current".to_owned(),
+        entering_carrier: "exact-returned-local-interaction-current".to_owned(),
+        emitting_carrier: "exact-returned-local-interaction-current".to_owned(),
         occurrences: vec![NativeThreadOccurrence {
             occurrence: returned.occurrence,
             predecessor: Some(source.occurrence),
@@ -412,7 +502,7 @@ fn returned_current_deposit(
             entering_native,
             emitting_native,
         }],
-        native_support: all_native.clone(),
+        native_support: causal_cone.clone(),
         incidence: vec![NativeIncidenceTerm {
             occurrence: returned.occurrence,
             from: entering_native,
@@ -423,14 +513,15 @@ fn returned_current_deposit(
         sections: vec![NativeOccurrenceSection::from_currents(
             returned.occurrence,
             existing_current,
-            returned.current.clone(),
+            returned_current,
         )],
         constitutive_responses,
         chronology: vec![generator],
         receiver_consequences: consequences,
         obstruction: None,
         open_exterior: vec![
-            "successor and receiver histories outside the returned current remain open".to_owned(),
+            "successor and receiver histories outside the returned local interaction remain open"
+                .to_owned(),
         ],
         reconstruction_fibre: BTreeSet::from([returned.occurrence]),
     };
@@ -439,7 +530,7 @@ fn returned_current_deposit(
         returned_difference.imaginary.clone(),
     ];
     let exact_fibre = NativeExactReconstructionFibre {
-        address: format!("fibre/returned-current-{}", returned.occurrence.0),
+        address: format!("fibre/returned-interaction-{}", returned.occurrence.0),
         thread: thread_address.clone(),
         return_operator: ExactRatMatrix::identity(2)
             .map_err(|error| ScaffoldCultivationError::Deposit(error.to_string()))?,
@@ -453,13 +544,58 @@ fn returned_current_deposit(
             right: returned.occurrence,
             joining_native: entering_native,
         },
-        k3_native_support: all_native.clone(),
-        dependent_receiver_fibre: all_native.clone(),
+        k3_native_support: causal_cone.clone(),
+        dependent_receiver_fibre: causal_cone.clone(),
         occurrences: BTreeSet::from([source.occurrence, returned.occurrence]),
         open_exterior: vec![
-            "richer returned-current receivers retain the complete causal preimage".to_owned(),
+            "richer returned-interaction receivers retain the complete causal preimage".to_owned(),
         ],
     };
+    let interchanges = spool
+        .threads
+        .iter()
+        .filter(|candidate| candidate.native_support.is_disjoint(&causal_cone))
+        .map(|candidate| {
+            let lineage_occurrences = candidate
+                .occurrences
+                .iter()
+                .map(|occurrence| occurrence.occurrence)
+                .chain(std::iter::once(returned.occurrence))
+                .collect::<BTreeSet<_>>();
+            let obstructions = candidate.obstruction.iter().cloned().collect();
+            let left_then_right = NativeOrderedConsequence {
+                order: vec![candidate.address.clone(), thread_address.clone()],
+                successor: emitting_native,
+                obstructions,
+                lineage_occurrences: lineage_occurrences.clone(),
+                logical_resources: BTreeMap::new(),
+            };
+            let right_then_left = NativeOrderedConsequence {
+                order: vec![thread_address.clone(), candidate.address.clone()],
+                successor: emitting_native,
+                obstructions: left_then_right.obstructions.clone(),
+                lineage_occurrences,
+                logical_resources: BTreeMap::new(),
+            };
+            NativeInterchangeReceipt {
+                left_thread: candidate.address.clone(),
+                right_thread: thread_address.clone(),
+                left_then_right,
+                right_then_left,
+            }
+        })
+        .collect();
+    let pullback_occurrences = section
+        .thread()
+        .occurrences
+        .iter()
+        .filter(|occurrence| occurrence.emitting_native == entering_native)
+        .map(|occurrence| NativePullbackOccurrence {
+            left: occurrence.occurrence,
+            right: returned.occurrence,
+            joining_native: entering_native,
+        })
+        .collect();
     let deposit = NativeThreadDeposit {
         schema: NATIVE_THREAD_DEPOSIT_SCHEMA.to_owned(),
         spool_address: source.spool.clone(),
@@ -468,11 +604,7 @@ fn returned_current_deposit(
             left_thread: source.thread.clone(),
             right_thread: thread_address.clone(),
             joining_boundary: section.thread().emitting_boundary,
-            occurrences: BTreeSet::from([NativePullbackOccurrence {
-                left: source.occurrence,
-                right: returned.occurrence,
-                joining_native: entering_native,
-            }]),
+            occurrences: pullback_occurrences,
         }],
         generator_descents: vec![NativeGeneratorDescent {
             generator,
@@ -481,20 +613,25 @@ fn returned_current_deposit(
                 to: emitting_native,
                 thread: thread_address,
             }],
-            open_domain: all_native
+            open_domain: spool
+                .native_population
                 .iter()
                 .copied()
                 .filter(|native| *native != entering_native)
                 .collect(),
         }],
         receiver_factors: Vec::<ReceiverFactor>::new(),
-        mutual_constitutive_responses: Vec::new(),
+        mutual_constitutive_responses: vec![NativeMutualConstitutiveResponse {
+            left_occurrence: source.occurrence,
+            right_occurrence: returned.occurrence,
+            left_native: emitting_native,
+            right_native: entering_native,
+            receiver: emitted.receiver,
+            storage: returned.storage.clone(),
+        }],
         mixed_constitutive_families: Vec::new(),
-        // The returned occurrence does not collapse with its predecessor under this receiver.
-        // A shortest separator is owed only when two distinct occurrences share one collapsed
-        // native fibre; the exact cross-fibre causal preimage is retained below instead.
         shortest_separators: Vec::new(),
-        interchanges: Vec::new(),
+        interchanges,
         reconstruction_fibre_deltas: vec![NativeDepositFibreDelta {
             native: emitting_native,
             occurrences: BTreeSet::from([returned.occurrence]),
@@ -576,7 +713,7 @@ mod tests {
     }
 
     #[test]
-    fn returned_current_survives_scaffold_withdrawal_and_targeted_ablation() {
+    fn returned_local_interaction_preserves_disjoint_morphology_and_survives_release() {
         let lifted = dismantle(Bf16ExcitationDismantling {
             receiver: ReceiverId(7),
             excitations: vec![excitation(1, 0x3f80, 0x4000), excitation(2, 0x4040, 0x4080)],
@@ -600,27 +737,84 @@ mod tests {
         .expect("emission");
         let emitted = cut.emitted_occurrence().clone();
         drop(cut);
-        let cultivated = ScaffoldCultivatedRest::cultivate(
-            predecessor,
-            source,
+        let returned = ReturnedScaffoldInteraction::found(
             emitted,
-            ReturnedScaffoldCurrent {
-                occurrence: EventId(100),
-                emitting_boundary: BoundaryId(101),
-                current: ExactComplexWaveCurrent::new(
-                    Rat::from_integer(BigInt::from(9)),
-                    Rat::from_integer(BigInt::from(1)),
-                ),
-            },
+            EventId(100),
+            BoundaryId(101),
+            ExactComplexWaveCurrent::new(
+                Rat::from_integer(BigInt::from(9)),
+                Rat::from_integer(BigInt::from(1)),
+            ),
+            Rat::from_integer(BigInt::from(1)),
+            BTreeSet::new(),
         )
-        .expect("cultivate");
+        .expect("world return");
+        let cultivated =
+            ScaffoldCultivatedRest::cultivate(predecessor, source, returned).expect("cultivate");
         let released = cultivated.release().expect("release");
         assert!(released.receipt.declared_consequence_preserved);
         assert!(released.receipt.cultivated_ablation_removed_conduct);
         assert!(released.receipt.restoration_recovered_successor);
         assert!(released.receipt.final_source_detached);
+        assert!(released.receipt.outside_cone_morphology_unchanged);
+        assert!(released.receipt.inactive_native_not_deposited);
+        assert_eq!(released.receipt.causal_cone_population, 2);
+        assert_eq!(released.receipt.outside_thread_population, 1);
         assert_eq!(released.hot.native().spools[0].threads.len(), 1);
         assert_eq!(released.departed_inherited.len(), 2);
         assert!(released.receipt.departed_reconstruction_fibre_population >= 2);
+    }
+
+    #[test]
+    fn declared_global_contact_returns_the_complete_native_causal_cone() {
+        let lifted = dismantle(Bf16ExcitationDismantling {
+            receiver: ReceiverId(7),
+            excitations: vec![
+                excitation(1, 0x3f80, 0x4000),
+                excitation(2, 0x4040, 0x4080),
+                excitation(3, 0x40a0, 0x40c0),
+            ],
+        })
+        .expect("lift");
+        let (predecessor, _) =
+            super::super::consume_dismantling_return(lifted).expect("move-owned handoff");
+        let total_native = predecessor.ecology.spools[0].native_population.clone();
+        let source = NativeInferenceAddress {
+            spool: predecessor.ecology.spools[0].address.clone(),
+            thread: predecessor.ecology.spools[0].threads[0].address.clone(),
+            occurrence: EventId(1),
+        };
+        let cut = conduct_native_inference(
+            &predecessor.ecology,
+            NativeInferenceRequest {
+                address: source.clone(),
+                receiver: ReceiverId(7),
+            },
+        )
+        .expect("emission");
+        let returned = ReturnedScaffoldInteraction::found(
+            cut.emitted_occurrence().clone(),
+            EventId(100),
+            BoundaryId(101),
+            ExactComplexWaveCurrent::new(
+                Rat::from_integer(BigInt::from(1)),
+                Rat::from_integer(BigInt::from(1)),
+            ),
+            Rat::from_integer(BigInt::from(1)),
+            total_native.clone(),
+        )
+        .expect("global return");
+        drop(cut);
+        let cultivated = ScaffoldCultivatedRest::cultivate(predecessor, source, returned)
+            .expect("global cultivation");
+        let cultivated_thread = cultivated
+            .ecology()
+            .native()
+            .spools
+            .iter()
+            .flat_map(|spool| &spool.threads)
+            .find(|thread| thread.address == cultivated.cultivated_request().address.thread)
+            .expect("cultivated thread");
+        assert_eq!(cultivated_thread.native_support, total_native);
     }
 }

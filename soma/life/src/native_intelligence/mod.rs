@@ -184,7 +184,7 @@ pub use product_receiver::{
 };
 pub use rest::{consume_dismantling_return, DepartedDismantlingLanes};
 pub use scaffold_cultivation::{
-    ReleasedScaffoldCultivation, ReturnedScaffoldCurrent, ScaffoldCultivatedConsequence,
+    ReleasedScaffoldCultivation, ReturnedScaffoldInteraction, ScaffoldCultivatedConsequence,
     ScaffoldCultivatedRest, ScaffoldCultivationError, ScaffoldReleaseReceipt,
 };
 pub use situated_cultivation::{

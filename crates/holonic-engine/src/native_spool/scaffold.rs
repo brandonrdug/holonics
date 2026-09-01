@@ -687,6 +687,22 @@ impl NativeTransportScaffold {
             .flat_map(|thread| thread.native_support.iter().copied())
             .collect();
         let retained_native_population = spool.native_population.clone();
+        let mut retained_generator_open_domain_deltas = Vec::new();
+        for (position, descent) in spool.generator_descents.iter_mut().enumerate() {
+            let departed = descent
+                .open_domain
+                .difference(&retained_native_population)
+                .copied()
+                .collect::<BTreeSet<_>>();
+            if !departed.is_empty() {
+                descent.open_domain = descent
+                    .open_domain
+                    .intersection(&retained_native_population)
+                    .copied()
+                    .collect();
+                retained_generator_open_domain_deltas.push((position, departed));
+            }
+        }
         let receiver_factors = extract_indexed(&mut spool.receiver_factors, |factor| {
             !retained_native_population.contains(&factor.native)
         });
@@ -700,6 +716,7 @@ impl NativeTransportScaffold {
                 thread,
                 serial_pullbacks,
                 generator_descents,
+                retained_generator_open_domain_deltas,
                 receiver_factors,
                 mutual_constitutive_responses,
                 shortest_separators,
@@ -731,6 +748,16 @@ impl NativeTransportScaffold {
             .threads
             .insert(withdrawal.thread_position, withdrawal.thread);
         restore_indexed(&mut spool.serial_pullbacks, withdrawal.serial_pullbacks)?;
+        for (position, departed) in withdrawal.retained_generator_open_domain_deltas {
+            let descent = spool
+                .generator_descents
+                .get_mut(position)
+                .ok_or(NativeSpoolRefusal::Restoration)?;
+            if !descent.open_domain.is_disjoint(&departed) {
+                return Err(NativeSpoolRefusal::Restoration);
+            }
+            descent.open_domain.extend(departed);
+        }
         for (_, descent) in &withdrawal.generator_descents {
             spool.generator_family.insert(descent.generator);
         }

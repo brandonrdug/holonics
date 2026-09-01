@@ -23,6 +23,9 @@ pub struct NativeThreadWithdrawal {
     pub thread: NativeThread,
     pub serial_pullbacks: Vec<(usize, NativeSerialPullback)>,
     pub generator_descents: Vec<(usize, NativeGeneratorDescent)>,
+    /// Open-domain members removed from retained generators when this thread's departure removes
+    /// their native states. Positions address the post-withdrawal retained descent population.
+    pub retained_generator_open_domain_deltas: Vec<(usize, BTreeSet<NativeStateId>)>,
     pub receiver_factors: Vec<(usize, ReceiverFactor)>,
     pub mutual_constitutive_responses: Vec<(usize, NativeMutualConstitutiveResponse)>,
     pub shortest_separators: Vec<(usize, NativeShortestSeparator)>,

@@ -4,7 +4,7 @@
 **Date:** 2026-09-01
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** MVF3.
+**Current frontier:** MVF4.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md),
@@ -253,7 +253,7 @@ aliases. Engine returned 2,006 passed with 32 ignored; life returned 468 passed 
 receipt is
 [`../research/records/2026-09-01_MVF2_GENERIC_AND_GEMMA_CHARTS_ENTERED_ONE_SOULKILLER_DISMANTLING_BOUNDARY.md`](../research/records/2026-09-01_MVF2_GENERIC_AND_GEMMA_CHARTS_ENTERED_ONE_SOULKILLER_DISMANTLING_BOUNDARY.md).
 
-### MVF3 — reciprocal local causal-cone cultivation — CURRENT
+### MVF3 — reciprocal local causal-cone cultivation — PASSED
 
 [definition] Replace the whole-population cultivated support control with an actual returned
 interaction whose delta is derived on the activated causal cone. Retain local and mutual
@@ -265,7 +265,14 @@ region exactly unchanged, performs no inactive-region work, survives source/scaf
 fails under targeted ablation, and restores exactly. A global receiver returns its larger cone
 rather than pretending constant locality.
 
-### MVF4 — derived anatomy manifest and backend-independent morphology package
+[established-bounded; implemented-exact; measured] MVF3 passed. Native current is now derived from
+an emission-indexed exterior interaction; cultivated support equals its returned causal cone;
+disjoint morphology remains exactly unchanged and receives interchange testimony; inactive states
+are not deposited; local open-domain withdrawal/restoration is exact; and a declared-global contact
+returns the complete larger cone. Its receipt is
+[`../research/records/2026-09-01_MVF3_RETURNED_LOCAL_INTERACTION_CULTIVATED_ONLY_ITS_CAUSAL_CONE.md`](../research/records/2026-09-01_MVF3_RETURNED_LOCAL_INTERACTION_CULTIVATED_ONLY_ITS_CAUSAL_CONE.md).
+
+### MVF4 — derived anatomy manifest and backend-independent morphology package — CURRENT
 
 [definition] Extend the intrinsic profile beyond hard-coded degree/rank faces and package one
 rested morphology into the physically separated lanes in §5. Derive all anatomical values from the

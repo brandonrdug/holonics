@@ -10,16 +10,17 @@ mechanisms retain their scoped grades.
 
 ## Current frontier
 
-**Current frontier:** MVF3
+**Current frontier:** MVF4
 
-**MVF3 — RECIPROCAL LOCAL CAUSAL-CONE CULTIVATION — IS THE SOLE NEXT DEED.**
+**MVF4 — DERIVED ANATOMY MANIFEST AND BACKEND-INDEPENDENT MORPHOLOGY PACKAGE — IS THE SOLE NEXT DEED.**
 
-[definition] Replace the whole-population returned-current cultivation control with an actual
-returned interaction whose morphology delta is supported on the activated causal cone under
+[definition] Derive complete variant anatomy from the one rested morphology and package the
+physically separated hot, reconstruction, evaluation, apparatus, and export lanes under
 [`blueprint/THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md`](blueprint/THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md).
-Retain reciprocal local/mutual constitutive response, the actual emission/world return, causal
-adjoint, outside-cone equality, independent-region interchange, remount, targeted ablation, and
-exact restoration. Inactive morphology may not be traversed or materialized.
+Remove hard-coded anatomy faces; separate wire schema, parented morphology lineage, receiver
+capability, and apparatus/export realization; prove apparatus/export changes cannot change native
+morphology; and make package round-trip recover the exact rest and open obligations without a cold
+executor in the hot lane.
 
 ## Admitted standing
 
@@ -98,6 +99,12 @@ returned 2,005 passed with 32 ignored and life returned 468 passed with 14 ignor
 reachable-section and BF16 excitation charts behind `soulkiller::dismantle`, one input trait, and
 one generic three-lane return. Duplicate public functions/classes departed without aliases. Engine
 returned 2,006 passed with 32 ignored; life returned 468 passed with 14 ignored.
+
+[established-bounded; implemented-exact; measured] MVF3 replaced driver-supplied native return
+current with emission-indexed exterior interaction and derived local current. Cultivation support
+equals the returned causal cone; disjoint threads remain exactly unchanged; inactive states are not
+deposited; local and declared-global cone controls, interchange, remount, ablation, withdrawal, and
+exact restoration passed. Life now returns 469 passed with 14 ignored.
 
 [established-bounded; process-audit; measured] The named workspace test receiver returned 2,924
 passed, zero failed, and 50 ignored with every example type-checked. The formal umbrella built
