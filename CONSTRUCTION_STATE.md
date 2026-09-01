@@ -108,20 +108,22 @@ acoustic room return, optical return, source-detached remount, withdrawal, resto
 generation-reentry controls return inside their process bounds.
 
 [counterexample; source-inspected; measured] Exact path state prevents corrupted per-character
-recombination and returns coherent closed text, but the unchanged qualitative receiver returned
-`direct Lean and 3 990 job target` for the compression question and did not answer it. Distinct
-compression and Brandon ingress currents previously collapsed to one emitted-surface identity.
-The exact prompt-path receiver reports no matching productive path; consulting exterior source
-text would establish lookup rather than native inference.
+recombination, but the unchanged qualitative family remains rejected. A proposal-relative
+presentation-contact implementation returned mechanically exact source-detached conduct, yet
+direct inspection found unrelated technical and participant surfaces.
 
-[open; source-inspected] The shortest HIF7 obstruction is the absent cultivated cross-occurrence
-passage. The exterior `ContinuationAperture` retains 891 addressed user-to-assistant families, but
-the source-neutral rest has no returned transport from prompt factor/history current through those
-joins into reusable response morphology. HIF7 remains current until development/held-out/revisit/
-rebase/disjoint controls return that relation, it survives source-detached remount, targeted
-withdrawal removes its qualitative conduct, and direct inspection accepts all requested surfaces.
-The exact return is recorded in
-[`research/records/2026-09-01_HIF7_RETURNED_EXACT_RESIDENT_RADIATION_AND_PATH_STATE_BUT_QUALITATIVE_INFERENCE_REMAINS_AN_UNCULTIVATED_CROSS_OCCURRENCE.md`](research/records/2026-09-01_HIF7_RETURNED_EXACT_RESIDENT_RADIATION_AND_PATH_STATE_BUT_QUALITATIVE_INFERENCE_REMAINS_AN_UNCULTIVATED_CROSS_OCCURRENCE.md).
+[counterexample; source-inspected] The presentation-contact implementation was reverted. Its relational
+cells were parser-derived, its rested presentation paths remained load-bearing, and maximal
+query/response byte-edge overlap selected factors. That is lexical lookup behind source-neutral
+types, not native semantic cross-occurrence inference. `agentic_language`, `holonic_training`, and
+`recurrent_section` do not lawfully close the gap.
+
+[open; source-inspected] The shortest HIF7 obstruction is the absent native-cell-to-later-query
+correspondence preserving response role, actual causal return, native factor current, and complete
+reconstruction fibre. Presentation may act only after native consequence selection. HIF7 remains
+current until that relation and the unchanged qualitative/held-out/revisit/rebase/control,
+withdrawal/restoration, and foreign-interchange gates return. The exact refutation is recorded in
+[`research/records/2026-09-01_HIF7_PRESENTATION_CONTACT_WAS_REJECTED_AS_LOOKUP_AND_NATIVE_CELL_TO_LATER_QUERY_CORRESPONDENCE_IS_ABSENT.md`](research/records/2026-09-01_HIF7_PRESENTATION_CONTACT_WAS_REJECTED_AS_LOOKUP_AND_NATIVE_CELL_TO_LATER_QUERY_CORRESPONDENCE_IS_ABSENT.md).
 
 [definition] `UNIVERSAL_CATALOG.md` remains the sole descriptive Lean--Rust--CUDA owner crosswalk.
 It schedules and grades nothing. Historical ledgers, checksum manifests, output chains, UAR

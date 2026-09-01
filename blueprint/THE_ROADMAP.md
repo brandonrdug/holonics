@@ -255,12 +255,12 @@ controls through the neutral package. Release only after direct qualitative insp
 surfaces and richer receivers reopen every unlawful condensation.
 
 [counterexample; implemented-exact; source-inspected; measured] Exact contact comparison,
-factorized resident return, silence/radiation, acoustic and optical return, physical boundary-port
-descent, source-detached controls, and realization path state now return. Direct inspection rejects
-the qualitative surface. The source-neutral rest lacks a cultivated cross-occurrence transport from
-prompt factor/history current through the addressed continuation families into reusable response
-morphology. The shortest obstruction and forbidden lookup fallback are recorded in
-[`research/records/2026-09-01_HIF7_RETURNED_EXACT_RESIDENT_RADIATION_AND_PATH_STATE_BUT_QUALITATIVE_INFERENCE_REMAINS_AN_UNCULTIVATED_CROSS_OCCURRENCE.md`](../research/records/2026-09-01_HIF7_RETURNED_EXACT_RESIDENT_RADIATION_AND_PATH_STATE_BUT_QUALITATIVE_INFERENCE_REMAINS_AN_UNCULTIVATED_CROSS_OCCURRENCE.md).
+factorized resident and sensory return, and source-detached realization mechanics return. A
+proposal-relative presentation-contact implementation was constructed, measured, and reverted:
+parser-derived cells plus maximal presentation overlap were lexical lookup rather than native
+semantic inference. The remaining type is a native-cell-to-later-query correspondence carrying
+response role, actual return, factor current, and reconstruction fibre. The exact refutation is in
+[`research/records/2026-09-01_HIF7_PRESENTATION_CONTACT_WAS_REJECTED_AS_LOOKUP_AND_NATIVE_CELL_TO_LATER_QUERY_CORRESPONDENCE_IS_ABSENT.md`](../research/records/2026-09-01_HIF7_PRESENTATION_CONTACT_WAS_REJECTED_AS_LOOKUP_AND_NATIVE_CELL_TO_LATER_QUERY_CORRESPONDENCE_IS_ABSENT.md).
 
 [proved-derived; formal-checked; measured] HIF0 passed. The four-file neutral formal closure built
 3,164 focused jobs and the live umbrella built 3,769 jobs without `sorryAx`. Its exact return is

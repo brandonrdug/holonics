@@ -366,12 +366,13 @@ work are reported beside apparatus telemetry; richer receivers reopen every unla
 foreign formats interchange through Soulkiller without becoming native ontology; Git is clean,
 committed, pushed, and reproducible outputs are absent from the release tree.
 
-[counterexample; implemented-exact; source-inspected; measured] The resident radiation,
-acoustic/optical return, exact path-state, factorized realization, closure, and source-access
-controls returned, but direct inspection rejected the qualitative surface. The current exact
-obstruction is an absent cultivated prompt-to-response cross-occurrence passage, not a topology,
-hash, residency, or output-size proxy. Its evidence and firing boundary are recorded in
-[`../research/records/2026-09-01_HIF7_RETURNED_EXACT_RESIDENT_RADIATION_AND_PATH_STATE_BUT_QUALITATIVE_INFERENCE_REMAINS_AN_UNCULTIVATED_CROSS_OCCURRENCE.md`](../research/records/2026-09-01_HIF7_RETURNED_EXACT_RESIDENT_RADIATION_AND_PATH_STATE_BUT_QUALITATIVE_INFERENCE_REMAINS_AN_UNCULTIVATED_CROSS_OCCURRENCE.md).
+[counterexample; implemented-exact; source-inspected; measured] Resident radiation, sensory
+return, factorized realization, and source-detached controls return, but direct inspection rejects
+the qualitative family. A proposal-relative presentation-contact route was reverted because its
+parser-derived cells and maximal byte-edge overlap were lexical lookup. The remaining exact
+obstruction is a native-cell-to-later-query correspondence carrying response role, actual causal
+return, factor current, and reconstruction fibre. Its evidence and firing boundary are recorded in
+[`../research/records/2026-09-01_HIF7_PRESENTATION_CONTACT_WAS_REJECTED_AS_LOOKUP_AND_NATIVE_CELL_TO_LATER_QUERY_CORRESPONDENCE_IS_ABSENT.md`](../research/records/2026-09-01_HIF7_PRESENTATION_CONTACT_WAS_REJECTED_AS_LOOKUP_AND_NATIVE_CELL_TO_LATER_QUERY_CORRESPONDENCE_IS_ABSENT.md).
 
 ## 9. Process law
 
