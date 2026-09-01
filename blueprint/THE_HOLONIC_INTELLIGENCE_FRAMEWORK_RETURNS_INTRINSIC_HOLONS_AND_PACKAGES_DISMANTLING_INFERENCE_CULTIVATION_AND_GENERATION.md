@@ -4,7 +4,7 @@
 **Date:** 2026-08-31
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** HIF3.
+**Current frontier:** HIF4.
 **Supersession:** this contract supersedes the unresolved scheduling authority of UAR/R0Q. Exact
 completed UAR/R0Q mechanisms retain their scoped grades as evidence and implementation standing;
 their unfinished intentions are obligations below, not a second campaign.
@@ -274,7 +274,7 @@ live GLM, DeepSeek, and Qwen resources parsed through one implementation. The en
 recorded in
 [`../research/records/2026-08-31_HIF2_EXACT_FOREIGN_CHARTS_LOW_PRECISION_WEIGHTS_AND_PROFILED_DISMANTLING_RETURNED.md`](../research/records/2026-08-31_HIF2_EXACT_FOREIGN_CHARTS_LOW_PRECISION_WEIGHTS_AND_PROFILED_DISMANTLING_RETURNED.md).
 
-### HIF3 — packaged Holonic Inference and generation — CURRENT
+### HIF3 — packaged Holonic Inference and generation — PASSED
 
 [definition] Compose mount, active continuation, transport/diffusion, contact/glue, receiver
 condensation, emission, exterior return aperture, and later-current continuation through one
@@ -284,7 +284,14 @@ move-owned circulation. Provide narrow codec adapters only at the boundary.
 plural futures, obstruction, complete fibres, and emitted lineage survive; no authored response
 length, lexical candidate selector, KV-cache owner, or CPU semantic choreography appears.
 
-### HIF4 — packaged cultivation and hexis
+[established-bounded; implemented-exact; measured] HIF3 returned one borrowed-rest native
+circulation, 27,020 plural future/fibre faces in one resident launch, actual-ingress emission,
+return aperture, exact text/binary codec projections, and one actual later-current successor through
+unchanged morphology. The engine suite returned 2,000 passed, zero failed, 32 ignored; dependent
+targets and source-shape passed. The exact return is recorded in
+[`../research/records/2026-08-31_HIF3_ONE_NATIVE_INFERENCE_CIRCULATION_EMITTED_CODEC_NEUTRAL_PLURAL_FUTURES.md`](../research/records/2026-08-31_HIF3_ONE_NATIVE_INFERENCE_CIRCULATION_EMITTED_CODEC_NEUTRAL_PLURAL_FUTURES.md).
+
+### HIF4 — packaged cultivation and hexis — CURRENT
 
 [definition] Compose complete returned difference, causal adjoint, staged morphology delta,
 commit/decline, source-detached remount, later conduct, targeted withdrawal, sibling invariance,

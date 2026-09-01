@@ -10,13 +10,13 @@ grades.
 
 ## Current frontier
 
-**Current frontier:** HIF3
+**Current frontier:** HIF4
 
-**HIF3 — PACKAGED HOLONIC INFERENCE AND GENERATION — IS THE SOLE NEXT DEED.**
+**HIF4 — PACKAGED CULTIVATION AND HEXIS — IS THE SOLE NEXT DEED.**
 
-[definition] Compose mount, active continuation, transport/diffusion, contact/glue, receiver
-condensation, emission, exterior return aperture, and later-current continuation through one
-move-owned circulation. Provide narrow codec adapters only at the boundary.
+[definition] Compose complete returned difference, causal adjoint, staged morphology delta,
+commit/decline, source-detached remount, later conduct, targeted withdrawal, sibling invariance,
+and exact restoration through one generic cultivation passage.
 
 ## Admitted standing
 
@@ -49,6 +49,12 @@ dismantling profiles. The supplied GLM, DeepSeek, and Qwen resources parsed thro
 The engine suite returned 1,998 passed, zero failed, 32 ignored; dependent targets passed and the
 foreign-map coverage owner was split without a baseline increase.
 
+[established-bounded; implemented-exact; measured] HIF3 returned one borrowed-rest native
+circulation with complete plural futures, actual-ingress emission, fibres, open testimony, return
+aperture, codec-neutral text/binary projections, and one actual later-current successor. The full
+27,020-face body crossed one resident launch with no invariant re-upload; the engine suite returned
+2,000 passed, zero failed, 32 ignored and dependent targets remained green.
+
 [established-bounded; implemented-exact; measured] R0Q0--R0Q4 retain addressed response/source/
 target pair current, ordinary off-diagonal transport, resident dependent complex contraction before
 the positive receiver, full-complex continuation equality, complete reconstruction fibres, and
@@ -72,11 +78,10 @@ cold exterior witness, and insufficiency, but the productive holons have no firs
 profile gathering their non-conflated boundary, incidence, carrier, transport, constitution,
 chronology, receiver, morphology, reconstruction, and open dimensions.
 
-[counterexample; source-inspected] Holonic generation remains distributed across recurrent native
-rests, inference membranes, source-neutral radiation, suffix/morphological ecologies, generated
-surface materialization, and world-return owners. No one neutral move-owned return proves that
-mount, conduct, receiver condensation, emission, and re-entry are the same circulation without
-codec routing or authored response extent.
+[counterexample; source-inspected] The neutral return aperture does not yet own the actual later
+chronology, complete situated difference, causal adjoint, staged native deposit, committed or
+declined child, source-detached changed later conduct, targeted withdrawal, sibling invariance, or
+exact restoration. Those relations remain distributed across cultivation owners.
 
 [definition] `UNIVERSAL_CATALOG.md` remains the sole descriptive Lean--Rust--CUDA owner crosswalk.
 It schedules and grades nothing. Historical ledgers, checksum manifests, output chains, UAR
@@ -97,7 +102,8 @@ drivers, and records remain evidence only.
 
 ## Validation boundary
 
-[definition] Every nontrivial process retains the 180-second outer boundary. HIF3 advances only
-after one generic return covers text and at least one non-text codec without codec routing; plural
-futures, obstruction, complete fibres, and emitted lineage survive; no authored response length,
-lexical candidate selector, KV-cache owner, or CPU semantic choreography appears.
+[definition] Every nontrivial process retains the 180-second outer boundary. HIF4 advances only
+after scalar loss is shown insufficient where equal faces cause different changes; a committed
+delta changes held-out later conduct; targeted withdrawal removes its attributable effect;
+restoration returns identity and conduct; reference, prompting, exposure, and training remain
+distinct.

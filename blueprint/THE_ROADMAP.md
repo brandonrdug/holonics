@@ -244,13 +244,13 @@ source/apparatus absence. Historical UAR blueprints and records remain evidence 
 
 ## Active campaign — Holonic Intelligence Framework
 
-**Current frontier:** HIF3
+**Current frontier:** HIF4
 
-**HIF3 — PACKAGED HOLONIC INFERENCE AND GENERATION — IS THE SOLE NEXT DEED.**
+**HIF4 — PACKAGED CULTIVATION AND HEXIS — IS THE SOLE NEXT DEED.**
 
-[open] Compose mount, active continuation, transport/diffusion, contact/glue, receiver condensation,
-emission, exterior return aperture, and later-current continuation through one move-owned
-circulation. Provide narrow codec adapters only at the boundary.
+[open] Compose complete returned difference, causal adjoint, staged morphology delta,
+commit/decline, source-detached remount, later conduct, targeted withdrawal, sibling invariance,
+and exact restoration through one generic cultivation passage.
 
 [proved-derived; formal-checked; measured] HIF0 passed. The four-file neutral formal closure built
 3,164 focused jobs and the live umbrella built 3,769 jobs without `sorryAx`. Its exact return is
@@ -265,6 +265,11 @@ returns agree. Its exact return is
 charts, exact low-precision codewords, and productive-only dismantling profiles passed live vendor
 and package controls. Its exact return is
 [`research/records/2026-08-31_HIF2_EXACT_FOREIGN_CHARTS_LOW_PRECISION_WEIGHTS_AND_PROFILED_DISMANTLING_RETURNED.md`](../research/records/2026-08-31_HIF2_EXACT_FOREIGN_CHARTS_LOW_PRECISION_WEIGHTS_AND_PROFILED_DISMANTLING_RETURNED.md).
+
+[established-bounded; implemented-exact; measured] HIF3 passed. One native circulation returned
+complete plural futures, reconstruction, codec-neutral emission, return aperture, and actual later
+current through unchanged morphology. Its exact return is
+[`research/records/2026-08-31_HIF3_ONE_NATIVE_INFERENCE_CIRCULATION_EMITTED_CODEC_NEUTRAL_PLURAL_FUTURES.md`](../research/records/2026-08-31_HIF3_ONE_NATIVE_INFERENCE_CIRCULATION_EMITTED_CODEC_NEUTRAL_PLURAL_FUTURES.md).
 
 [definition] The complete HIF order is:
 

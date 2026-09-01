@@ -4,6 +4,8 @@
 //! spool bundle, or make a product/campaign name part of generic transport. Foreign format intake,
 //! concrete inference circulation, and cultivation implementations enter in later HIF phases.
 
+#[path = "holonic_intelligence/circulation.rs"]
+mod circulation;
 #[path = "holonic_intelligence/dimensions.rs"]
 mod dimensions;
 #[path = "holonic_intelligence/foreign_json.rs"]
@@ -19,6 +21,7 @@ mod rested;
 #[path = "holonic_intelligence/weight.rs"]
 mod weight;
 
+pub use circulation::*;
 pub use dimensions::*;
 pub use foreign_json::*;
 pub use foreign_onnx::*;
