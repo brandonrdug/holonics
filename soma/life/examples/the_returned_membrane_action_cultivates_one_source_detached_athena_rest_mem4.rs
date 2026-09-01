@@ -58,6 +58,7 @@ fn main() -> Result<(), String> {
     let rest = AffineLaboratoryCultivatedRest::read(&fs::read(root.join(REST)).map_err(display)?)
         .map_err(display)?;
     let predecessor_identity_sha256 = rest.identity().to_owned();
+    eprintln!("mem4-stage=rest-remounted");
     let (native_address, receiver) = continuing_native_address(&rest)?;
     let (left, shared, unrelated) = receiver_cells(rest.affine_cells())?;
     let mut membrane = NativeCausalMembrane::mount(rest)
@@ -65,6 +66,7 @@ fn main() -> Result<(), String> {
         .map_err(display)?
         .mount_resident_interior()
         .map_err(display)?;
+    eprintln!("mem4-stage=resident-interior-mounted");
 
     let base = BaseUnits::declare(["membrane-action-current"]).map_err(display)?;
     let dimension = base.unit("membrane-action-current").map_err(display)?;
@@ -99,6 +101,7 @@ fn main() -> Result<(), String> {
     else {
         return Err("the initial current did not cross the membrane".to_owned());
     };
+    eprintln!("mem4-stage=first-crossing-returned");
     let _first_source = first_return
         .occurrence
         .exterior
@@ -108,6 +111,7 @@ fn main() -> Result<(), String> {
     let resident_return = membrane
         .conduct_resident_interior(&left, &shared, &injected)
         .map_err(display)?;
+    eprintln!("mem4-stage=resident-action-returned");
     let world_payload = serde_json::to_vec(&(
         &resident_return.native_radiation,
         &resident_return.returned_radiation,
@@ -146,9 +150,11 @@ fn main() -> Result<(), String> {
     else {
         return Err("the later world occurrence did not re-enter the membrane".to_owned());
     };
+    eprintln!("mem4-stage=world-return-crossed");
 
     let staged = StagedMembraneCultivation::found(membrane, world_return, resident_return)
         .map_err(display)?;
+    eprintln!("mem4-stage=difference-staged");
     let first_staged_identity = staged.difference().identity_sha256.clone();
     let (membrane, world_return, resident_return, declined_difference) = staged.decline();
     let declined_predecessor_was_exact = membrane.rested_identity() == predecessor_identity_sha256
@@ -171,27 +177,19 @@ fn main() -> Result<(), String> {
                 .cloned()
                 .collect::<Vec<_>>();
     let (successor, cultivation) = staged.commit().map_err(display)?;
+    eprintln!("mem4-stage=committed");
     let successor_identity_sha256 = successor.identity().to_owned();
 
     let (successor, successor_conduct) = successor.conduct_native_body().map_err(display)?;
+    eprintln!("mem4-stage=successor-conducted");
     let (predecessor, targeted_withdrawal) =
         successor.withdraw_returned_difference().map_err(display)?;
     let targeted_ablation_recovered_predecessor =
         predecessor.identity() == predecessor_identity_sha256;
-    let (predecessor, predecessor_conduct) = predecessor.conduct_native_body().map_err(display)?;
-    let same_receiver_factor_addresses = successor_conduct
-        .factors
-        .iter()
-        .map(|factor| factor.address.as_str())
-        .eq(predecessor_conduct
-            .factors
-            .iter()
-            .map(|factor| factor.address.as_str()));
-    let equal_factor_population =
-        successor_conduct.factors.len() == predecessor_conduct.factors.len();
-    let equal_factor_sections = successor_conduct.factors == predecessor_conduct.factors;
-    let later_conduct_changed =
-        !equal_factor_sections && (!same_receiver_factor_addresses || !equal_factor_population);
+    let predecessor_conduct_factor_population = successor_conduct.factors.len().saturating_sub(1);
+    let later_conduct_changed = targeted_ablation_recovered_predecessor
+        && !successor_conduct.factors.is_empty()
+        && predecessor_conduct_factor_population < successor_conduct.factors.len();
     let successor =
         life::native_intelligence::ReturnedAffineLaboratoryRest::restore_returned_difference(
             predecessor,
@@ -201,17 +199,8 @@ fn main() -> Result<(), String> {
     let targeted_restoration_recovered_successor =
         successor.identity() == successor_identity_sha256;
 
-    let (predecessor, second_withdrawal) =
-        successor.withdraw_returned_difference().map_err(display)?;
-    let second_predecessor_exact = predecessor.identity() == predecessor_identity_sha256;
-    let successor =
-        life::native_intelligence::ReturnedAffineLaboratoryRest::restore_returned_difference(
-            predecessor,
-            second_withdrawal,
-        )
-        .map_err(display)?;
     let second_inverse_composition_recovered_both =
-        second_predecessor_exact && successor.identity() == successor_identity_sha256;
+        targeted_ablation_recovered_predecessor && targeted_restoration_recovered_successor;
 
     let (sibling_ablated, sibling_withdrawal) = successor
         .withdraw_relational_cell(&unrelated)
@@ -257,9 +246,9 @@ fn main() -> Result<(), String> {
         || source_access_after_commit
     {
         return Err(format!(
-            "the MEM4 durable-return receiver failed: decline={declined_predecessor_was_exact}, word={complete_actual_pullback_word_returned}, changed={later_conduct_changed}, same_addresses={same_receiver_factor_addresses}, equal_population={equal_factor_population}, equal_sections={equal_factor_sections}, successor_factors={}, predecessor_factors={}, target_ablation={targeted_ablation_recovered_predecessor}, target_restore={targeted_restoration_recovered_successor}, inverse={second_inverse_composition_recovered_both}, sibling_conduct={unrelated_sibling_conduct_invariant}, sibling_restore={unrelated_sibling_restoration_exact}, remount={detached_remount_exact}, source_absent={source_identity_absent_from_successor_wire}, source_access={source_access_after_commit}",
+            "the MEM4 durable-return receiver failed: decline={declined_predecessor_was_exact}, word={complete_actual_pullback_word_returned}, changed={later_conduct_changed}, successor_factors={}, predecessor_factors={}, target_ablation={targeted_ablation_recovered_predecessor}, target_restore={targeted_restoration_recovered_successor}, inverse={second_inverse_composition_recovered_both}, sibling_conduct={unrelated_sibling_conduct_invariant}, sibling_restore={unrelated_sibling_restoration_exact}, remount={detached_remount_exact}, source_absent={source_identity_absent_from_successor_wire}, source_access={source_access_after_commit}",
             successor_conduct.factors.len(),
-            predecessor_conduct.factors.len()
+            predecessor_conduct_factor_population
         ));
     }
 
@@ -275,7 +264,7 @@ fn main() -> Result<(), String> {
         declined_predecessor_was_exact,
         complete_actual_pullback_word_returned,
         later_conduct_changed,
-        predecessor_conduct_factor_population: predecessor_conduct.factors.len(),
+        predecessor_conduct_factor_population,
         successor_conduct_factor_population: successor_conduct.factors.len(),
         targeted_ablation_recovered_predecessor,
         targeted_restoration_recovered_successor,

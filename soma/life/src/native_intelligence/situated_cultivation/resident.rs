@@ -296,14 +296,18 @@ pub(super) fn derive_branch_deposit(
     // The deposited occurrence is the actual later-return arm of the retained K3 pullback.  Its
     // predecessor retains the candidate event; the exact fibre below owns the complete join.
     // Replacing this with a direct candidate-start → return-end edge would lose a boundary map.
-    let entering_native = k3.returned.entering_native;
-    let emitting_native = k3.returned.emitting_native;
     let mut occurrences = Vec::with_capacity(locals.len());
     let mut incidence = Vec::with_capacity(locals.len());
     let mut reconstruction_fibre = BTreeSet::new();
+    let mut native_support = BTreeSet::new();
+    let mut parametrons = Vec::with_capacity(locals.len());
+    let mut constitutive_responses = Vec::with_capacity(locals.len());
+    let mut receiver_consequences = Vec::with_capacity(locals.len());
+    let mut reconstruction_fibre_deltas = Vec::with_capacity(locals.len());
     let mut exact_reconstruction_fibres = Vec::with_capacity(locals.len());
     for (ordinal, (cover, local)) in locals.iter().enumerate() {
         let occurrence = local.situated.return_event;
+        let native = cover.native;
         if !reconstruction_fibre.insert(occurrence) {
             return Err(SituatedCultivationError::Descent(
                 "two situated locals collapsed to one carrying occurrence".to_owned(),
@@ -314,14 +318,54 @@ pub(super) fn derive_branch_deposit(
             predecessor: Some(local.situated.candidate_event),
             entering_port: OccurrencePort::input(occurrence, ordinal),
             emitting_port: OccurrencePort::output(occurrence, ordinal),
-            entering_native,
-            emitting_native,
+            entering_native: native,
+            emitting_native: native,
         });
         incidence.push(NativeIncidenceTerm {
             occurrence,
-            from: entering_native,
-            to: emitting_native,
+            from: native,
+            to: native,
             coefficient,
+        });
+        native_support.insert(native);
+        let difference = &local.situated.complex_difference;
+        parametrons.push(NativeParametronCell {
+            native,
+            section: difference.emitting_section.clone(),
+            current: difference.emitting_current.clone(),
+            relative_phase: k3.returned.relative_phase.clone(),
+            hand: k3.returned.hand,
+        });
+        constitutive_responses.push(NativeConstitutiveResponse {
+            native,
+            receiver,
+            presented: difference.emitting_section.clone(),
+            stored: difference.emitting_current.clone(),
+        });
+        let observation = local
+            .returned_native
+            .members
+            .first()
+            .and_then(|member| {
+                member
+                    .receiver_faces
+                    .iter()
+                    .find(|face| face.receiver == receiver)
+            })
+            .map(|face| face.observation)
+            .ok_or_else(|| {
+                SituatedCultivationError::Descent(
+                    "one receiver-history factor lost its returned receiver face".to_owned(),
+                )
+            })?;
+        receiver_consequences.push(NativeReceiverConsequence {
+            native,
+            receiver,
+            observation,
+        });
+        reconstruction_fibre_deltas.push(NativeDepositFibreDelta {
+            native,
+            occurrences: BTreeSet::from([occurrence]),
         });
         // The hot rest retains the sealed candidate and actual return events, not the source
         // exchange's interior event population.  Their addressed pullback is the complete local
@@ -357,7 +401,7 @@ pub(super) fn derive_branch_deposit(
             carrying_pullback: NativePullbackOccurrence {
                 left: local.situated.candidate_event,
                 right: local.situated.return_event,
-                joining_native: k3.pullback.joining_native,
+                joining_native: native,
             },
             k3_native_support,
             dependent_receiver_fibre: BTreeSet::from([cover.native]),
@@ -369,8 +413,6 @@ pub(super) fn derive_branch_deposit(
         });
     }
 
-    let difference = &first.1.situated.complex_difference;
-    let native_support = BTreeSet::from([entering_native, emitting_native]);
     let thread = NativeThread {
         schema: NATIVE_THREAD_SCHEMA.to_owned(),
         address: thread_address.clone(),
@@ -381,49 +423,10 @@ pub(super) fn derive_branch_deposit(
         occurrences,
         native_support: native_support.clone(),
         incidence,
-        parametrons: vec![
-            NativeParametronCell {
-                native: entering_native,
-                section: difference.entering_section.clone(),
-                current: difference.entering_current.clone(),
-                relative_phase: k3.returned.relative_phase.clone(),
-                hand: k3.returned.hand,
-            },
-            NativeParametronCell {
-                native: emitting_native,
-                section: difference.emitting_section.clone(),
-                current: difference.emitting_current.clone(),
-                relative_phase: k3.returned.relative_phase.clone(),
-                hand: k3.returned.hand,
-            },
-        ],
-        constitutive_responses: vec![
-            NativeConstitutiveResponse {
-                native: entering_native,
-                receiver,
-                presented: difference.entering_section.clone(),
-                stored: difference.entering_current.clone(),
-            },
-            NativeConstitutiveResponse {
-                native: emitting_native,
-                receiver,
-                presented: difference.emitting_section.clone(),
-                stored: difference.emitting_current.clone(),
-            },
-        ],
+        parametrons,
+        constitutive_responses,
         chronology: k3.returned.ordered_word.clone(),
-        receiver_consequences: vec![
-            NativeReceiverConsequence {
-                native: entering_native,
-                receiver,
-                observation: k3.returned.observation,
-            },
-            NativeReceiverConsequence {
-                native: emitting_native,
-                receiver,
-                observation: k3.returned.observation,
-            },
-        ],
+        receiver_consequences,
         obstruction: None,
         open_exterior: vec![
             "future receiver histories beyond the cultivated family remain open".to_owned(),
@@ -454,10 +457,7 @@ pub(super) fn derive_branch_deposit(
         mixed_constitutive_families,
         shortest_separators: Vec::new(),
         interchanges: Vec::new(),
-        reconstruction_fibre_deltas: vec![NativeDepositFibreDelta {
-            native: emitting_native,
-            occurrences: reconstruction_fibre.clone(),
-        }],
+        reconstruction_fibre_deltas,
         exact_reconstruction_fibres,
     };
     deposit
