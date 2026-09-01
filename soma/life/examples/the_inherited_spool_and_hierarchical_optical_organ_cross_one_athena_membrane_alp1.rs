@@ -10,11 +10,11 @@ use holonic_engine::{
 };
 use holonic_structure::CausalMembrane;
 use life::{
-    athena_native::{
-        AthenaCausalMembrane, AthenaMembraneConsequence, ExactMembraneChartPassage,
-        ExteriorOccurrenceTransducer, NativeMembraneDefect, SituatedCultivatedAthenaRest,
-    },
     mathematical_source::{ExactOpticalOccurrence, HierarchicalOpticalPassage},
+    native_intelligence::{
+        ExactMembraneChartPassage, ExteriorOccurrenceTransducer, MembraneConsequence,
+        NativeCausalMembrane, NativeMembraneDefect, SituatedCultivatedEcologyRest,
+    },
 };
 use serde::Serialize;
 use serde_json::json;
@@ -43,7 +43,7 @@ fn main() -> Result<(), String> {
     }
     fs::create_dir_all(&output).map_err(display)?;
 
-    let rest = SituatedCultivatedAthenaRest::read(&fs::read(root.join(REST)).map_err(display)?)
+    let rest = SituatedCultivatedEcologyRest::read(&fs::read(root.join(REST)).map_err(display)?)
         .map_err(display)?;
     let original_identity = rest.identity().to_owned();
     eprintln!(
@@ -129,7 +129,7 @@ fn main() -> Result<(), String> {
     )
     .map_err(display)?;
 
-    let mut membrane = AthenaCausalMembrane::mount(rest);
+    let mut membrane = NativeCausalMembrane::mount(rest);
     let (first_crossing, optical) =
         cross_and_recover(&mut membrane, optical, &inherited_address, receiver)?;
     let rest = membrane.into_rest();
@@ -168,7 +168,7 @@ fn main() -> Result<(), String> {
 
     // The unchanged optical occurrence can no longer bind to the removed carrying section. The
     // complete moved source is returned by the insufficiency rather than dropped or rerouted.
-    let ablated_membrane = AthenaCausalMembrane::mount(ablated);
+    let ablated_membrane = NativeCausalMembrane::mount(ablated);
     let exterior = optical.into_exterior_fibre().map_err(display)?;
     let optical_boundary = BoundaryId(exterior.address().event_projection.0);
     let binding_defect = ablated_membrane
@@ -202,7 +202,7 @@ fn main() -> Result<(), String> {
         began.elapsed().as_secs_f64()
     );
 
-    let mut membrane = AthenaCausalMembrane::mount(rest);
+    let mut membrane = NativeCausalMembrane::mount(rest);
     let (second_crossing, recovered) =
         cross_and_recover(&mut membrane, optical, &inherited_address, receiver)?;
     recovered.validate().map_err(display)?;
@@ -295,13 +295,13 @@ fn chart() -> Result<ExactMembraneChartPassage, String> {
 }
 
 fn cross_and_recover(
-    membrane: &mut AthenaCausalMembrane<SituatedCultivatedAthenaRest>,
+    membrane: &mut NativeCausalMembrane<SituatedCultivatedEcologyRest>,
     source: ExactOpticalOccurrence,
-    address: &life::athena_native::NativeSectionAddress,
+    address: &life::native_intelligence::NativeSectionAddress,
     receiver: ReceiverId,
 ) -> Result<
     (
-        life::athena_native::AthenaMembraneCrossingReceipt,
+        life::native_intelligence::MembraneCrossingReceipt,
         ExactOpticalOccurrence,
     ),
     String,
@@ -311,7 +311,7 @@ fn cross_and_recover(
     let occurrence = membrane
         .bind_occurrence(exterior, boundary, address, receiver, chart()?, Vec::new())
         .map_err(|failure| format!("ALP1 membrane binding refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(returned) =
+    let MembraneConsequence::Returned(returned) =
         membrane.receive_occurrence(occurrence).map_err(display)?
     else {
         return Err("the ALP1 optical occurrence did not cross Athena's membrane".to_owned());

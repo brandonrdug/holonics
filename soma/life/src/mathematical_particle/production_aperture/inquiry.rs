@@ -1,14 +1,14 @@
 use serde::Serialize;
 
 use super::types::{
-    ProductionAthenaError, ProductionInquiry, ProductionInquiryFace, ProductionInquiryPresentation,
-    ProductionReceiver, ProductionWorldReturn,
+    ProductionEcologyError, ProductionInquiry, ProductionInquiryFace,
+    ProductionInquiryPresentation, ProductionReceiver, ProductionWorldReturn,
 };
 use super::wire::{digest, digest_text};
 use super::PRODUCTION_INQUIRY_SCHEMA;
 
 impl ProductionWorldReturn {
-    pub(super) fn validate(&self) -> Result<(), ProductionAthenaError> {
+    pub(super) fn validate(&self) -> Result<(), ProductionEcologyError> {
         if self.occurrence.is_empty()
             || self.receiver.is_empty()
             || !self.accepted
@@ -16,7 +16,7 @@ impl ProductionWorldReturn {
             || !digest_text(&self.emitted_product_sha256)
             || !digest_text(&self.returned_product_sha256)
         {
-            return Err(ProductionAthenaError::WorldReturn);
+            return Err(ProductionEcologyError::WorldReturn);
         }
         Ok(())
     }
@@ -30,7 +30,7 @@ impl ProductionInquiry {
         receiver_family: Vec<ProductionReceiver>,
         requested_face: ProductionInquiryFace,
         heldout_family: u32,
-    ) -> Result<Self, ProductionAthenaError> {
+    ) -> Result<Self, ProductionEcologyError> {
         let mut inquiry = Self {
             schema: PRODUCTION_INQUIRY_SCHEMA.to_owned(),
             occurrence: String::new(),
@@ -45,7 +45,7 @@ impl ProductionInquiry {
         Ok(inquiry)
     }
 
-    fn body_sha256(&self) -> Result<String, ProductionAthenaError> {
+    fn body_sha256(&self) -> Result<String, ProductionEcologyError> {
         #[derive(Serialize)]
         struct Body<'a> {
             schema: &'a str,
@@ -66,15 +66,15 @@ impl ProductionInquiry {
             heldout_family: self.heldout_family,
         })
         .map(|bytes| digest(&bytes))
-        .map_err(|error| ProductionAthenaError::Wire(error.to_string()))
+        .map_err(|error| ProductionEcologyError::Wire(error.to_string()))
     }
 
-    pub fn canonical_bytes(&self) -> Result<Vec<u8>, ProductionAthenaError> {
+    pub fn canonical_bytes(&self) -> Result<Vec<u8>, ProductionEcologyError> {
         self.validate_shape()?;
-        serde_json::to_vec(self).map_err(|error| ProductionAthenaError::Wire(error.to_string()))
+        serde_json::to_vec(self).map_err(|error| ProductionEcologyError::Wire(error.to_string()))
     }
 
-    pub(super) fn validate_shape(&self) -> Result<(), ProductionAthenaError> {
+    pub(super) fn validate_shape(&self) -> Result<(), ProductionEcologyError> {
         let mut receivers = self.receiver_family.clone();
         receivers.sort_by_key(|receiver| *receiver as u8);
         receivers.dedup();
@@ -93,7 +93,7 @@ impl ProductionInquiry {
             || self.requested_face.carrier.is_empty()
             || self.requested_face.unit.is_empty()
         {
-            return Err(ProductionAthenaError::Inquiry);
+            return Err(ProductionEcologyError::Inquiry);
         }
         Ok(())
     }

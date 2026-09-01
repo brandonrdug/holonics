@@ -8,11 +8,11 @@ use std::{
 };
 
 use life::{
-    athena_native::{
-        CompleteExchangeCultivationCover, CultivatedAthenaRest, NativeCirculationConsequence,
+    exchange_world_tube::{remount_visible_message_projection, ContinuationAperture},
+    native_intelligence::{
+        CompleteExchangeCultivationCover, CultivatedEcologyRest, NativeCirculationConsequence,
         NativeCirculationPassage, NativeCirculationRest,
     },
-    exchange_world_tube::{remount_visible_message_projection, ContinuationAperture},
 };
 use serde::Serialize;
 use serde_json::json;
@@ -141,7 +141,7 @@ fn main() -> Result<(), String> {
 fn cultivate_probe(rest_path: &Path) -> Result<(), String> {
     let started = Instant::now();
     let cultivated =
-        CultivatedAthenaRest::read(&fs::read(H3N_REST).map_err(display)?).map_err(display)?;
+        CultivatedEcologyRest::read(&fs::read(H3N_REST).map_err(display)?).map_err(display)?;
     let cover = CompleteExchangeCultivationCover::read(&fs::read(H2N_COVER).map_err(display)?)?;
     let aperture: ContinuationAperture = serde_json::from_slice(
         &fs::read(Path::new(EXCHANGE_ROOT).join("04-continuation-aperture.json"))
@@ -188,7 +188,7 @@ fn found() -> Result<(), String> {
     fs::create_dir_all(&output).map_err(display)?;
     let started = Instant::now();
     let cultivated =
-        CultivatedAthenaRest::read(&fs::read(H3N_REST).map_err(display)?).map_err(display)?;
+        CultivatedEcologyRest::read(&fs::read(H3N_REST).map_err(display)?).map_err(display)?;
     let cover = CompleteExchangeCultivationCover::read(&fs::read(H2N_COVER).map_err(display)?)?;
     let aperture: ContinuationAperture = serde_json::from_slice(
         &fs::read(Path::new(EXCHANGE_ROOT).join("04-continuation-aperture.json"))
@@ -214,7 +214,7 @@ fn found() -> Result<(), String> {
     fs::write(
         output.join("00-founding-receipt.json"),
         serde_json::to_vec_pretty(&json!({
-            "schema": "soma-life.athena-native-circulation-founding-receipt.v1",
+            "schema": "soma-life.native-circulation-founding-receipt.v1",
             "rest_identity_sha256": rest.identity(),
             "rest_octets": rest_bytes.len(),
             "factor_population": rest.cultivated().morphology().deposits.len(),
@@ -354,7 +354,7 @@ fn detached(output: &Path) -> Result<(), String> {
     fs::write(
         output.join("05-apparatus.json"),
         serde_json::to_vec_pretty(&json!({
-            "schema": "soma-life.athena-native-circulation-apparatus.v1",
+            "schema": "soma-life.native-circulation-apparatus.v1",
             "receiver_process_had_exchange_world": false,
             "receiver_process_had_continuation_aperture": false,
             "receiver_process_had_h2n_cover": false,
@@ -370,7 +370,7 @@ fn detached(output: &Path) -> Result<(), String> {
     fs::write(
         output.join("06-grade.json"),
         serde_json::to_vec_pretty(&json!({
-            "schema": "soma-life.athena-native-circulation-h4-grade.v1",
+            "schema": "soma-life.native-circulation-h4-grade.v1",
             "truth_status": if structural_passed { "implemented-exact-measured-candidate" } else { "counterexample" },
             "structural_passed": structural_passed,
             "qualitative_surface_requires_primary_agent_inspection": true,
@@ -437,7 +437,7 @@ fn write_manifest(output: &Path) -> Result<(), String> {
     fs::write(
         output.join("MANIFEST.json"),
         serde_json::to_vec_pretty(&json!({
-            "schema": "soma-life.athena-native-circulation-h4-manifest.v1",
+            "schema": "soma-life.native-circulation-h4-manifest.v1",
             "files": files,
         }))
         .map_err(display)?,

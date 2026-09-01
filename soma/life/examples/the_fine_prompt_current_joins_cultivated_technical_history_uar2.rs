@@ -3,8 +3,8 @@
 
 use std::{collections::BTreeSet, fs, path::PathBuf, time::Instant};
 
-use life::athena_native::{
-    EmanationDeed, EmanationParticipant, LaboratoryParticipantIngress, OpticalAthenaRest,
+use life::native_intelligence::{
+    EmanationDeed, EmanationParticipant, LaboratoryParticipantIngress, OpticalProductRest,
     PerspectiveChart, ProductTechnicalHistoryEmanation,
 };
 use serde::Serialize;
@@ -52,7 +52,7 @@ fn main() -> Result<(), String> {
     let started = Instant::now();
     eprintln!("UAR2 phase: read exact ALP5 wire");
     let wire = fs::read(root.join(REST)).map_err(display)?;
-    let rest = OpticalAthenaRest::read(&wire).map_err(display)?;
+    let rest = OpticalProductRest::read(&wire).map_err(display)?;
     eprintln!(
         "UAR2 phase: exact ALP5 rest returned in {} ms",
         started.elapsed().as_millis()
@@ -220,8 +220,8 @@ fn main() -> Result<(), String> {
             "truth_status": "established-bounded; implemented-exact; measured",
             "predecessor_rest_identity_sha256": predecessor_identity,
             "returned_rest_identity_sha256": returned_identity,
-            "raw_prompt_ingress": "NativeGranularPotential -> AthenaCausalMembrane",
-            "history_ingress": "ResidentAthenaProduct resident participant front",
+            "raw_prompt_ingress": "NativeGranularPotential -> NativeCausalMembrane",
+            "history_ingress": "ResidentProductEcology resident participant front",
             "join_law": "literal intersection of returned prompt factor current and cultivated affine landmark factors",
             "new_body_founded": false,
             "source_material_mounted": false,

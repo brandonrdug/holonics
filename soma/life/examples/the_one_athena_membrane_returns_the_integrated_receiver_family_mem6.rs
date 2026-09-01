@@ -18,18 +18,17 @@ use holonic_engine::{
 };
 use holonic_structure::CausalMembrane;
 use life::{
-    athena_native::{
-        compare_material_factorizations, realize_material_source, AddressedMaterialOccurrence,
-        AdmittedReturnedAffineLaboratoryRestWitness, AthenaCausalMembrane,
-        AthenaMembraneConsequence, AthenaMembraneCrossingReceipt, AthenaMembraneStanding,
-        CausalOperationWorldReturn, CausalResultCell, ExactMembraneChartPassage,
-        ExteriorActionCurrent, ExteriorOccurrenceTransducer, ExteriorRadiationSurface,
-        ExteriorWorldReturnTestimony, HierarchicalOpticalMaterialCandidates,
-        HierarchicalOpticalMaterialReturn, MaterialFactorizationAperture,
-        MaterialFactorizationReturn, MaterialSourceCodec, NativeRadiationAperture,
-        NativeRadiationSection, ReturnedAffineLaboratoryAthenaRest,
-    },
     mathematical_source::{ExactAcousticOccurrence, HierarchicalOpticalPassage},
+    native_intelligence::{
+        compare_material_factorizations, realize_material_source, AddressedMaterialOccurrence,
+        AdmittedReturnedAffineLaboratoryRestWitness, CausalOperationWorldReturn, CausalResultCell,
+        ExactMembraneChartPassage, ExteriorActionCurrent, ExteriorOccurrenceTransducer,
+        ExteriorRadiationSurface, ExteriorWorldReturnTestimony,
+        HierarchicalOpticalMaterialCandidates, HierarchicalOpticalMaterialReturn,
+        MaterialFactorizationAperture, MaterialFactorizationReturn, MaterialSourceCodec,
+        MembraneConsequence, MembraneCrossingReceipt, MembraneStanding, NativeCausalMembrane,
+        NativeRadiationAperture, NativeRadiationSection, ReturnedAffineLaboratoryRest,
+    },
 };
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
@@ -69,7 +68,7 @@ struct Mem6Grade {
     optical_return: Value,
     acoustic_return: Value,
     code_return: Value,
-    common_membrane_crossings: Vec<AthenaMembraneCrossingReceipt>,
+    common_membrane_crossings: Vec<MembraneCrossingReceipt>,
     shared_contact: holonic_engine::cuda_refine::ResidentMembraneInteriorReturn,
     disjoint_contact: holonic_engine::cuda_refine::ResidentMembraneInteriorReturn,
     participant_surfaces_distinct_and_receiver_faithful: bool,
@@ -108,8 +107,7 @@ fn main() -> Result<(), String> {
     fs::create_dir_all(&output).map_err(display)?;
     let wire = fs::read(root.join(REST)).map_err(display)?;
     let witness = admitted_witness()?;
-    let rest =
-        ReturnedAffineLaboratoryAthenaRest::read_admitted(&wire, &witness).map_err(display)?;
+    let rest = ReturnedAffineLaboratoryRest::read_admitted(&wire, &witness).map_err(display)?;
     let rested_identity_sha256 = rest.identity().to_owned();
 
     // Operation identity is returned from caused populations. Delivery spellings remain controls.
@@ -299,7 +297,7 @@ fn main() -> Result<(), String> {
         })?;
     let base = BaseUnits::declare(["athena-exterior-action"]).map_err(display)?;
     let dimension = base.unit("athena-exterior-action").map_err(display)?;
-    let mut membrane = AthenaCausalMembrane::mount(rest)
+    let mut membrane = NativeCausalMembrane::mount(rest)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()
@@ -351,7 +349,7 @@ fn main() -> Result<(), String> {
         ("mem6/request/revoice", "Revoice Brandon."),
     ];
     let mut refinement_recurrence = Vec::new();
-    membrane = AthenaCausalMembrane::mount(participant_rest)
+    membrane = NativeCausalMembrane::mount(participant_rest)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()
@@ -508,11 +506,9 @@ fn main() -> Result<(), String> {
     let targeted_ablation_changed_response = target_section.emitted_relational_cell_addresses
         != baseline_section.emitted_relational_cell_addresses
         || target_surface.text != baseline_surface.text;
-    let rest = ReturnedAffineLaboratoryAthenaRest::restore_relational_cell(
-        target_ablated,
-        target_withdrawal,
-    )
-    .map_err(display)?;
+    let rest =
+        ReturnedAffineLaboratoryRest::restore_relational_cell(target_ablated, target_withdrawal)
+            .map_err(display)?;
     let (sibling_ablated, sibling_withdrawal) = rest
         .withdraw_relational_cell(&unrelated_cell)
         .map_err(display)?;
@@ -525,14 +521,12 @@ fn main() -> Result<(), String> {
     let unrelated_ablation_preserved_response = sibling_section.emitted_relational_cell_addresses
         == baseline_section.emitted_relational_cell_addresses
         && sibling_surface.text == baseline_surface.text;
-    let rest = ReturnedAffineLaboratoryAthenaRest::restore_relational_cell(
-        sibling_ablated,
-        sibling_withdrawal,
-    )
-    .map_err(display)?;
+    let rest =
+        ReturnedAffineLaboratoryRest::restore_relational_cell(sibling_ablated, sibling_withdrawal)
+            .map_err(display)?;
     let restored_identity = rest.identity().to_owned();
     let remounted =
-        ReturnedAffineLaboratoryAthenaRest::read_admitted(&wire, &witness).map_err(display)?;
+        ReturnedAffineLaboratoryRest::read_admitted(&wire, &witness).map_err(display)?;
     let exact_restoration_and_source_detached_remount = restored_identity == rested_identity_sha256
         && remounted.identity() == rested_identity_sha256;
 
@@ -637,7 +631,7 @@ fn main() -> Result<(), String> {
 }
 
 fn infer_once(
-    rest: ReturnedAffineLaboratoryAthenaRest,
+    rest: ReturnedAffineLaboratoryRest,
     occurrence: &str,
     surface: &str,
     dimension: &Dimension,
@@ -645,13 +639,13 @@ fn infer_once(
     (
         NativeRadiationSection,
         ExteriorRadiationSurface,
-        ReturnedAffineLaboratoryAthenaRest,
+        ReturnedAffineLaboratoryRest,
     ),
     String,
 > {
     let aperture = NativeRadiationAperture::found(&rest).map_err(display)?;
     let (address, receiver) = continuing_native_address(&rest)?;
-    let mut membrane = AthenaCausalMembrane::mount(rest)
+    let mut membrane = NativeCausalMembrane::mount(rest)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()
@@ -672,10 +666,10 @@ fn infer_once(
     Ok((section, rendered, rest))
 }
 
-fn conduct_request<Standing: AthenaMembraneStanding>(
-    membrane: &mut AthenaCausalMembrane<Standing>,
+fn conduct_request<Standing: MembraneStanding>(
+    membrane: &mut NativeCausalMembrane<Standing>,
     aperture: &NativeRadiationAperture,
-    address: &life::athena_native::NativeSectionAddress,
+    address: &life::native_intelligence::NativeSectionAddress,
     receiver: ReceiverId,
     dimension: &Dimension,
     exterior: ExteriorActionCurrent,
@@ -705,7 +699,7 @@ fn conduct_request<Standing: AthenaMembraneStanding>(
             Vec::new(),
         )
         .map_err(|failure| format!("request binding refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(returned) =
+    let MembraneConsequence::Returned(returned) =
         membrane.receive_occurrence(occurrence).map_err(display)?
     else {
         return Err("the request did not cross the membrane".to_owned());
@@ -744,20 +738,20 @@ fn conduct_request<Standing: AthenaMembraneStanding>(
 }
 
 fn cross_source<T: ExteriorOccurrenceTransducer + Any + Send>(
-    membrane: &mut AthenaCausalMembrane<ReturnedAffineLaboratoryAthenaRest>,
+    membrane: &mut NativeCausalMembrane<ReturnedAffineLaboratoryRest>,
     source: T,
-    address: &life::athena_native::NativeSectionAddress,
+    address: &life::native_intelligence::NativeSectionAddress,
     receiver: ReceiverId,
-) -> Result<AthenaMembraneCrossingReceipt, String> {
+) -> Result<MembraneCrossingReceipt, String> {
     cross_source_recover(membrane, source, address, receiver).map(|(receipt, _)| receipt)
 }
 
 fn cross_source_recover<T: ExteriorOccurrenceTransducer + Any + Send>(
-    membrane: &mut AthenaCausalMembrane<ReturnedAffineLaboratoryAthenaRest>,
+    membrane: &mut NativeCausalMembrane<ReturnedAffineLaboratoryRest>,
     source: T,
-    address: &life::athena_native::NativeSectionAddress,
+    address: &life::native_intelligence::NativeSectionAddress,
     receiver: ReceiverId,
-) -> Result<(AthenaMembraneCrossingReceipt, T), String> {
+) -> Result<(MembraneCrossingReceipt, T), String> {
     let exterior = source.into_exterior_fibre().map_err(display)?;
     let boundary = BoundaryId(exterior.address().event_projection.0);
     let base = BaseUnits::declare(["mem6-common-mouth-current"]).map_err(display)?;
@@ -775,7 +769,7 @@ fn cross_source_recover<T: ExteriorOccurrenceTransducer + Any + Send>(
             Vec::new(),
         )
         .map_err(|failure| format!("common-mouth binding refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(returned) =
+    let MembraneConsequence::Returned(returned) =
         membrane.receive_occurrence(occurrence).map_err(display)?
     else {
         return Err("the exterior source did not cross the common mouth".to_owned());
@@ -790,8 +784,8 @@ fn cross_source_recover<T: ExteriorOccurrenceTransducer + Any + Send>(
 }
 
 fn continuing_native_address(
-    standing: &impl AthenaMembraneStanding,
-) -> Result<(life::athena_native::NativeSectionAddress, ReceiverId), String> {
+    standing: &impl MembraneStanding,
+) -> Result<(life::native_intelligence::NativeSectionAddress, ReceiverId), String> {
     for address in &standing.membrane_realization().sections {
         let addressed = standing
             .membrane_ecology()
@@ -809,7 +803,7 @@ fn continuing_native_address(
 }
 
 fn select_receiver_cells(
-    cells: &[life::athena_native::LaboratoryCellAffineSection],
+    cells: &[life::native_intelligence::LaboratoryCellAffineSection],
 ) -> Result<(String, String, String), String> {
     let left = cells
         .first()

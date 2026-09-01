@@ -20,21 +20,21 @@ use holonic_structure::CausalMembrane;
 use image::ImageReader;
 use life::{
     addressed_span::{AddressedMemorySpan, CompleteAddressedMemorySpan, MemorySpanFragment},
-    athena_native::{
-        AcousticAthenaRest, AddressedMaterialOccurrence, AthenaCausalMembrane,
-        AthenaMembraneConsequence, AthenaMembraneCrossingReceipt, AthenaMembraneStanding,
-        ExactMembraneChartPassage, ExteriorOccurrenceTransducer, GranularAthenaRest,
-        GranularSourceNeutralCompositionReceipt, MembraneCultivationReceipt,
-        NativeAcousticOrganCompositionReceipt, NativeAcousticPotentialComplex,
-        NativeAcousticRadiationInput, NativeAcousticReceiverChart, NativeOpenWorldTubeReceipt,
-        NativeOpticalOrganCompositionReceipt, NativeOpticalReceiverIntervention, OpticalAthenaRest,
-        RecurrentGranularReturnedAffineAthenaRest, RecurrentGranularReturnedAffinePredecessor,
-        RecurrentReturnedAffineLaboratoryAthenaRest, StagedMembraneCultivation,
-    },
     mathematical_source::{
         grow_optical_holons, recover_optical_passage, ExactAcousticOccurrence,
         ExactOpticalOccurrence, HierarchicalOpticalPassage, OpticalHolonIntervention,
         OpticalPassage,
+    },
+    native_intelligence::{
+        AcousticProductRest, AddressedMaterialOccurrence, ExactMembraneChartPassage,
+        ExteriorOccurrenceTransducer, GranularEcologyRest, GranularSourceNeutralCompositionReceipt,
+        MembraneConsequence, MembraneCrossingReceipt, MembraneCultivationReceipt, MembraneStanding,
+        NativeAcousticOrganCompositionReceipt, NativeAcousticPotentialComplex,
+        NativeAcousticRadiationInput, NativeAcousticReceiverChart, NativeCausalMembrane,
+        NativeOpenWorldTubeReceipt, NativeOpticalOrganCompositionReceipt,
+        NativeOpticalReceiverIntervention, OpticalProductRest,
+        RecurrentGranularReturnedAffineEcologyRest, RecurrentGranularReturnedAffinePredecessor,
+        RecurrentReturnedAffineLaboratoryRest, StagedMembraneCultivation,
     },
     synchronized_occurrence::{
         relation_atom, ExactClockTransport, ExactSynchronizedOccurrence,
@@ -332,7 +332,7 @@ fn alp4_prepare_phase(root: &Path) -> Result<(), String> {
 
     // Dismantle the prior sensory wrapper into its move-owned source-neutral organs. Its old
     // continuation body is deliberately dropped; neither it nor its source material enters ALP4.
-    let inherited = OpticalAthenaRest::read(&fs::read(root.join(SENS5_REST)).map_err(display)?)
+    let inherited = OpticalProductRest::read(&fs::read(root.join(SENS5_REST)).map_err(display)?)
         .map_err(display)?;
     let (inherited_acoustic, withdrawn_optical, _) =
         inherited.withdraw_production().map_err(display)?;
@@ -341,7 +341,7 @@ fn alp4_prepare_phase(root: &Path) -> Result<(), String> {
     let (retired_body, withdrawn_granular) = inherited_granular.withdraw().map_err(display)?;
     drop(retired_body);
 
-    let alp3 = RecurrentReturnedAffineLaboratoryAthenaRest::read(
+    let alp3 = RecurrentReturnedAffineLaboratoryRest::read(
         &fs::read(root.join(ALP3_REST)).map_err(display)?,
     )
     .map_err(display)?;
@@ -349,13 +349,13 @@ fn alp4_prepare_phase(root: &Path) -> Result<(), String> {
     let inherited_spool_identity_sha256 =
         alp3.membrane_ecology().identity_sha256().map_err(display)?;
     let (granular, granular_receipt) =
-        GranularAthenaRest::compose_source_neutral_organ(alp3, withdrawn_granular)
+        GranularEcologyRest::compose_source_neutral_organ(alp3, withdrawn_granular)
             .map_err(display)?;
     let (acoustic, acoustic_receipt) =
-        AcousticAthenaRest::compose_source_neutral_production(granular, withdrawn_acoustic)
+        AcousticProductRest::compose_source_neutral_production(granular, withdrawn_acoustic)
             .map_err(display)?;
     let (rest, optical_receipt) =
-        OpticalAthenaRest::compose_source_neutral_production(acoustic, withdrawn_optical)
+        OpticalProductRest::compose_source_neutral_production(acoustic, withdrawn_optical)
             .map_err(display)?;
     let composed_body_identity_sha256 = rest.identity().to_owned();
     let wire = rest.canonical_bytes().map_err(display)?;
@@ -391,7 +391,7 @@ fn compose_phase(root: &Path) -> Result<(), String> {
     }
 
     let rest_wire = fs::read(active_starting_rest(root)).map_err(display)?;
-    let rest = OpticalAthenaRest::read(&rest_wire).map_err(display)?;
+    let rest = OpticalProductRest::read(&rest_wire).map_err(display)?;
     let predecessor_rest_identity_sha256 = rest.identity().to_owned();
     let frame_length = rest.body().production().phase_extent;
     let frame_hop = frame_length
@@ -404,7 +404,7 @@ fn compose_phase(root: &Path) -> Result<(), String> {
         .map_err(display)?
         .unit("sens6-sensory-current")
         .map_err(display)?;
-    let mut membrane = AthenaCausalMembrane::mount(rest)
+    let mut membrane = NativeCausalMembrane::mount(rest)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()
@@ -931,7 +931,7 @@ fn return_phase(root: &Path) -> Result<(), String> {
     let began = std::time::Instant::now();
     let output = active_output(root);
     let compose: Sens6ComposeWitness = read_json(&output.join("11-compose-witness.json"))?;
-    let rest = OpticalAthenaRest::read(&fs::read(active_starting_rest(root)).map_err(display)?)
+    let rest = OpticalProductRest::read(&fs::read(active_starting_rest(root)).map_err(display)?)
         .map_err(display)?;
     if rest.identity() != compose.predecessor_rest_identity_sha256 {
         return Err("the SENS6 predecessor changed before physical return".to_owned());
@@ -979,7 +979,7 @@ fn return_phase(root: &Path) -> Result<(), String> {
         .map_err(display)?
         .unit("sens6-physical-return-current")
         .map_err(display)?;
-    let mut membrane = AthenaCausalMembrane::mount(rest)
+    let mut membrane = NativeCausalMembrane::mount(rest)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()
@@ -1051,7 +1051,7 @@ fn return_phase(root: &Path) -> Result<(), String> {
             Vec::new(),
         )
         .map_err(|failure| format!("the SENS6 world return was refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(world_return) =
+    let MembraneConsequence::Returned(world_return) =
         membrane.receive_occurrence(bound).map_err(display)?
     else {
         return Err("the SENS6 world consequence did not return".to_owned());
@@ -1075,7 +1075,7 @@ fn return_phase(root: &Path) -> Result<(), String> {
     let acoustic_and_optical_morphologies_preserved = successor.body().production().identity_sha256
         == acoustic_morphology
         && successor.production().identity_sha256 == optical_morphology;
-    let mut later = AthenaCausalMembrane::mount(successor)
+    let mut later = NativeCausalMembrane::mount(successor)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()
@@ -1126,7 +1126,7 @@ fn verify_phase(root: &Path) -> Result<(), String> {
     let compose: Sens6ComposeWitness = read_json(&output.join("11-compose-witness.json"))?;
     let returned: Sens6ReturnWitness = read_json(&output.join("20-return-witness.json"))?;
     let successor_wire = fs::read(output.join("athena-sens6-cultivated.rest")).map_err(display)?;
-    let successor = OpticalAthenaRest::read(&successor_wire).map_err(display)?;
+    let successor = OpticalProductRest::read(&successor_wire).map_err(display)?;
     let source_detached_remount_exact = successor.identity()
         == returned.successor_rest_identity_sha256
         && sha256(&successor_wire) == returned.successor_wire_sha256;
@@ -1227,7 +1227,7 @@ fn verify_phase(root: &Path) -> Result<(), String> {
         .map_err(display)?;
     let unrelated_acoustic_sibling_conduct_invariant = acoustic_after == acoustic_before;
     let (successor, _) =
-        OpticalAthenaRest::restore_production(acoustic, withdrawn_optical).map_err(display)?;
+        OpticalProductRest::restore_production(acoustic, withdrawn_optical).map_err(display)?;
     let optical_restoration_exact = successor.identity() == successor_identity;
     let (acoustic, withdrawn_optical, _) = successor.withdraw_production().map_err(display)?;
     let (body, withdrawn_acoustic, _) = acoustic.withdraw_production().map_err(display)?;
@@ -1235,7 +1235,7 @@ fn verify_phase(root: &Path) -> Result<(), String> {
         .withdraw_latest_returned_difference()
         .map_err(display)?;
     let targeted_latest_return_ablation_recovered_exact_sens5_body = predecessor.identity()
-        == OpticalAthenaRest::read(&fs::read(active_starting_rest(root)).map_err(display)?)
+        == OpticalProductRest::read(&fs::read(active_starting_rest(root)).map_err(display)?)
             .map_err(display)?
             .body()
             .body()
@@ -1243,7 +1243,7 @@ fn verify_phase(root: &Path) -> Result<(), String> {
     let (left, shared) = match predecessor {
         RecurrentGranularReturnedAffinePredecessor::Recurrent(body) => {
             let cells = receiver_cells(body.membrane_affine_cells())?;
-            let mut membrane = AthenaCausalMembrane::mount(body)
+            let mut membrane = NativeCausalMembrane::mount(body)
                 .constitute_interior()
                 .map_err(display)?
                 .mount_resident_interior()
@@ -1268,24 +1268,24 @@ fn verify_phase(root: &Path) -> Result<(), String> {
     let ablated_return = shared;
     let targeted_latest_return_ablation_changed_conduct =
         ablated_return != returned.resident_return;
-    let body = RecurrentGranularReturnedAffineAthenaRest::restore_latest_returned_difference(
+    let body = RecurrentGranularReturnedAffineEcologyRest::restore_latest_returned_difference(
         predecessor,
         withdrawn_difference,
     )
     .map_err(display)?;
     let (acoustic, _) =
-        AcousticAthenaRest::restore_production(body, withdrawn_acoustic).map_err(display)?;
+        AcousticProductRest::restore_production(body, withdrawn_acoustic).map_err(display)?;
     let (successor, _) =
-        OpticalAthenaRest::restore_production(acoustic, withdrawn_optical).map_err(display)?;
+        OpticalProductRest::restore_production(acoustic, withdrawn_optical).map_err(display)?;
     let targeted_latest_return_restoration_exact = successor.identity() == successor_identity;
     let (acoustic, withdrawn_optical, _) = successor.withdraw_production().map_err(display)?;
     let acoustic_identity = acoustic.identity().to_owned();
     let (body, withdrawn_acoustic, _) = acoustic.withdraw_production().map_err(display)?;
     let (acoustic, _) =
-        AcousticAthenaRest::restore_production(body, withdrawn_acoustic).map_err(display)?;
+        AcousticProductRest::restore_production(body, withdrawn_acoustic).map_err(display)?;
     let acoustic_withdrawal_and_restoration_exact = acoustic.identity() == acoustic_identity;
     let (successor, _) =
-        OpticalAthenaRest::restore_production(acoustic, withdrawn_optical).map_err(display)?;
+        OpticalProductRest::restore_production(acoustic, withdrawn_optical).map_err(display)?;
     let optical_restoration_exact =
         optical_restoration_exact && successor.identity() == successor_identity;
     let wire_text = String::from_utf8_lossy(&successor_wire);
@@ -1530,7 +1530,7 @@ fn alp4_grade_phase(root: &Path) -> Result<(), String> {
     Ok(())
 }
 
-fn summarize_crossing(receipt: &AthenaMembraneCrossingReceipt) -> CrossingSummary {
+fn summarize_crossing(receipt: &MembraneCrossingReceipt) -> CrossingSummary {
     CrossingSummary {
         exterior_occurrence: receipt.exterior_occurrence.clone(),
         native_word_population: receipt.native_ordered_word.len(),
@@ -1724,13 +1724,13 @@ fn timed_cell(
 }
 
 fn cross_and_recover<T: ExteriorOccurrenceTransducer + Any + Send>(
-    membrane: &mut AthenaCausalMembrane<OpticalAthenaRest>,
+    membrane: &mut NativeCausalMembrane<OpticalProductRest>,
     source: T,
-    address: &life::athena_native::NativeSectionAddress,
+    address: &life::native_intelligence::NativeSectionAddress,
     receiver: ReceiverId,
     dimension: holonic_engine::quantity::Dimension,
     current: ExactComplexWaveCurrent,
-) -> Result<(AthenaMembraneCrossingReceipt, T), String> {
+) -> Result<(MembraneCrossingReceipt, T), String> {
     let exterior = source.into_exterior_fibre().map_err(display)?;
     let boundary = BoundaryId(exterior.address().event_projection.0);
     let bound = membrane
@@ -1747,7 +1747,7 @@ fn cross_and_recover<T: ExteriorOccurrenceTransducer + Any + Send>(
             Vec::new(),
         )
         .map_err(|failure| format!("the SENS6 boundary refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(returned) =
+    let MembraneConsequence::Returned(returned) =
         membrane.receive_occurrence(bound).map_err(display)?
     else {
         return Err("the SENS6 source did not cross the common mouth".to_owned());
@@ -1858,8 +1858,8 @@ fn optical_receiver_current(
 }
 
 fn continuing_native_address(
-    rest: &impl AthenaMembraneStanding,
-) -> Result<(life::athena_native::NativeSectionAddress, ReceiverId), String> {
+    rest: &impl MembraneStanding,
+) -> Result<(life::native_intelligence::NativeSectionAddress, ReceiverId), String> {
     for address in &rest.membrane_realization().sections {
         let addressed = rest
             .membrane_ecology()
@@ -1877,7 +1877,7 @@ fn continuing_native_address(
 }
 
 fn receiver_cells(
-    cells: &[life::athena_native::LaboratoryCellAffineSection],
+    cells: &[life::native_intelligence::LaboratoryCellAffineSection],
 ) -> Result<(String, String), String> {
     let left = cells.first().ok_or("the affine organ has no cells")?;
     let support = left

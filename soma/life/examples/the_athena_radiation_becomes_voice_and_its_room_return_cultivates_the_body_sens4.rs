@@ -21,13 +21,13 @@ use holonic_engine::{
     WavePropagationSpec, WaveReceiverId, WaveReceiverSpec,
 };
 use holonic_structure::CausalMembrane;
-use life::athena_native::{
-    AcousticAthenaRest, AddressedMaterialOccurrence, AthenaCausalMembrane,
-    AthenaMembraneConsequence, AthenaMembraneStanding, ExactMembraneChartPassage,
-    ExteriorOccurrenceTransducer, MembraneCultivationReceipt, NativeAcousticCultivationReceipt,
-    NativeAcousticProductionSection, NativeAcousticRadiationInput, NativeAcousticRadiationOrder,
-    NativeAcousticReceiverCurrent, NativeAcousticStandingMutation, NativeOpenWorldTubeTerminal,
-    NativeOutwardPortReturn, RecurrentGranularReturnedAffineAthenaRest, StagedMembraneCultivation,
+use life::native_intelligence::{
+    AcousticProductRest, AddressedMaterialOccurrence, ExactMembraneChartPassage,
+    ExteriorOccurrenceTransducer, MembraneConsequence, MembraneCultivationReceipt,
+    MembraneStanding, NativeAcousticCultivationReceipt, NativeAcousticProductionSection,
+    NativeAcousticRadiationInput, NativeAcousticRadiationOrder, NativeAcousticReceiverCurrent,
+    NativeAcousticStandingMutation, NativeCausalMembrane, NativeOpenWorldTubeTerminal,
+    NativeOutwardPortReturn, RecurrentGranularReturnedAffineEcologyRest, StagedMembraneCultivation,
 };
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
@@ -265,12 +265,12 @@ fn foundation_phase(root: &Path) -> Result<(), String> {
             "the two native radiation sections do not share one rested boundary".to_owned(),
         );
     }
-    let body = RecurrentGranularReturnedAffineAthenaRest::read(
+    let body = RecurrentGranularReturnedAffineEcologyRest::read(
         &fs::read(root.join(PREDECESSOR)).map_err(display)?,
     )
     .map_err(display)?;
     let predecessor_identity_sha256 = body.identity().to_owned();
-    let (rest, cultivation) = AcousticAthenaRest::cultivate(body, &primary).map_err(display)?;
+    let (rest, cultivation) = AcousticProductRest::cultivate(body, &primary).map_err(display)?;
     eprintln!("sens4 foundation: source-neutral acoustic morphology cultivated");
 
     let step = Rat::new(BigInt::from(1), BigInt::from(SAMPLE_RATE));
@@ -289,7 +289,7 @@ fn foundation_phase(root: &Path) -> Result<(), String> {
         .map_err(display)?;
 
     let rest_wire = rest.canonical_bytes().map_err(display)?;
-    let remounted = AcousticAthenaRest::read(&rest_wire).map_err(display)?;
+    let remounted = AcousticProductRest::read(&rest_wire).map_err(display)?;
     let reproduced_primary = remounted
         .radiate(
             &primary,
@@ -309,7 +309,7 @@ fn foundation_phase(root: &Path) -> Result<(), String> {
     let targeted_withdrawal_removed_production_owner =
         body.identity() == predecessor_identity_sha256;
     let (restored, restoration) =
-        AcousticAthenaRest::restore_production(body, withdrawn).map_err(display)?;
+        AcousticProductRest::restore_production(body, withdrawn).map_err(display)?;
     let targeted_restoration_exact = restored.identity() == acoustic_rest_identity_sha256;
     if !source_detached_remount_reproduced_primary
         || !source_detached_remount_reproduced_held_out
@@ -392,7 +392,7 @@ fn room_phase(root: &Path) -> Result<(), String> {
     )
     .map_err(display)?;
     production.validate().map_err(display)?;
-    let pcm: life::athena_native::NativeAcousticPcm16Projection = serde_json::from_slice(
+    let pcm: life::native_intelligence::NativeAcousticPcm16Projection = serde_json::from_slice(
         &fs::read(output.join("05-primary-pcm-reconstruction.json")).map_err(display)?,
     )
     .map_err(display)?;
@@ -732,7 +732,7 @@ fn return_phase(root: &Path) -> Result<(), String> {
     let output = root.join(OUTPUT);
     let room_bytes = fs::read(output.join("13-full-duplex-room-witness.json")).map_err(display)?;
     let room: Sens4RoomWitness = serde_json::from_slice(&room_bytes).map_err(display)?;
-    let rest = AcousticAthenaRest::read(
+    let rest = AcousticProductRest::read(
         &fs::read(output.join("athena-acoustic-production.rest")).map_err(display)?,
     )
     .map_err(display)?;
@@ -773,7 +773,7 @@ fn return_phase(root: &Path) -> Result<(), String> {
         .unit("physical-acoustic-return-current")
         .map_err(display)?;
     let injected = room.resident_receiver_current.resident_current.clone();
-    let mut membrane = AthenaCausalMembrane::mount(rest)
+    let mut membrane = NativeCausalMembrane::mount(rest)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()
@@ -792,7 +792,7 @@ fn return_phase(root: &Path) -> Result<(), String> {
             Vec::new(),
         )
         .map_err(|failure| format!("the physical microphone binding refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(initial_return) =
+    let MembraneConsequence::Returned(initial_return) =
         membrane.receive_occurrence(bound).map_err(display)?
     else {
         return Err("the physical microphone return did not cross the Athena membrane".to_owned());
@@ -839,7 +839,7 @@ fn return_phase(root: &Path) -> Result<(), String> {
             Vec::new(),
         )
         .map_err(|failure| format!("the room world-return binding refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(world_return) =
+    let MembraneConsequence::Returned(world_return) =
         membrane.receive_occurrence(later).map_err(display)?
     else {
         return Err("the room world consequence did not return".to_owned());
@@ -863,7 +863,7 @@ fn return_phase(root: &Path) -> Result<(), String> {
         successor.production().identity_sha256 == production_morphology_identity_sha256;
     let returned_native_thread_population =
         successor.body().body().body().returned_deposits().len();
-    let mut later_membrane = AthenaCausalMembrane::mount(successor)
+    let mut later_membrane = NativeCausalMembrane::mount(successor)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()
@@ -928,7 +928,7 @@ fn verify_phase(root: &Path) -> Result<(), String> {
     .map_err(display)?;
     let successor_wire =
         fs::read(output.join("athena-acoustic-room-cultivated.rest")).map_err(display)?;
-    let successor = AcousticAthenaRest::read(&successor_wire).map_err(display)?;
+    let successor = AcousticProductRest::read(&successor_wire).map_err(display)?;
     let successor_remounted_exactly = successor.identity()
         == cultivated.successor_rest_identity_sha256
         && sha256(&successor_wire) == cultivated.successor_wire_sha256;
@@ -961,7 +961,7 @@ fn verify_phase(root: &Path) -> Result<(), String> {
     let targeted_production_withdrawal_removed_owner = body.identity() != successor_identity
         && body.identity() == cultivated.successor_body_identity_sha256;
     let (restored, _restoration) =
-        AcousticAthenaRest::restore_production(body, withdrawn).map_err(display)?;
+        AcousticProductRest::restore_production(body, withdrawn).map_err(display)?;
     let targeted_production_restoration_exact = restored.identity() == successor_identity;
     let production_morphology_identity_preserved = restored.production().identity_sha256
         == morphology
@@ -1271,8 +1271,8 @@ fn stable_u64(bytes: &[u8]) -> u64 {
 }
 
 fn continuing_native_address(
-    rest: &impl AthenaMembraneStanding,
-) -> Result<(life::athena_native::NativeSectionAddress, ReceiverId), String> {
+    rest: &impl MembraneStanding,
+) -> Result<(life::native_intelligence::NativeSectionAddress, ReceiverId), String> {
     for address in &rest.membrane_realization().sections {
         let addressed = rest
             .membrane_ecology()
@@ -1290,7 +1290,7 @@ fn continuing_native_address(
 }
 
 fn receiver_cells(
-    cells: &[life::athena_native::LaboratoryCellAffineSection],
+    cells: &[life::native_intelligence::LaboratoryCellAffineSection],
 ) -> Result<(String, String, String), String> {
     let left = cells
         .first()

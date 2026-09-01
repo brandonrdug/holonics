@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use super::laboratory_types::{LaboratoryAthenaRest, LaboratoryChronology};
+use super::laboratory_types::{LaboratoryChronology, LaboratoryProductionRest};
 use super::types::{ProductionInquiryPresentation, ProductionReceiver};
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -97,8 +97,8 @@ pub struct FamilyWithdrawalReceipt {
 
 /// L1's continuing ecology. It owns L0 and is intentionally neither `Clone` nor shared.
 #[derive(Debug, PartialEq, Eq)]
-pub struct FamilyCultivatedAthenaRest {
-    pub(super) predecessor: LaboratoryAthenaRest,
+pub struct FamilyCultivatedEcologyRest {
+    pub(super) predecessor: LaboratoryProductionRest,
     pub(super) chronology: LaboratoryChronology,
     pub(super) standing: FamilyCultivationStanding,
     pub(super) decoder: FamilyCultivationDecoder,

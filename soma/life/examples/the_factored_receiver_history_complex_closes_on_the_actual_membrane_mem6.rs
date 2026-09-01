@@ -6,10 +6,10 @@
 
 use std::{fs, path::PathBuf};
 
-use life::athena_native::{
-    AdmittedReturnedAffineLaboratoryRestWitness, AthenaCausalMembrane,
-    FactoredReceiverHistoryGateReceipt, GranularCultivationWithdrawal,
-    GranularReturnedAffineAthenaRest, ReturnedAffineLaboratoryAthenaRest,
+use life::native_intelligence::{
+    AdmittedReturnedAffineLaboratoryRestWitness, FactoredReceiverHistoryGateReceipt,
+    GranularCultivationWithdrawal, GranularReturnedAffineEcologyRest, NativeCausalMembrane,
+    ReturnedAffineLaboratoryRest,
 };
 use serde::Serialize;
 
@@ -42,14 +42,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "63c9ff122e50fe94efe9bb00fea66e9eaac606c47707d07bc69301449bb9aded",
         "3ab826fb8512aae85096193ce103a384092111e8f26836415b0e1dc7eba02178",
     )?;
-    let predecessor = ReturnedAffineLaboratoryAthenaRest::read_admitted(
-        &fs::read(root.join(PREDECESSOR))?,
-        &witness,
-    )?;
+    let predecessor =
+        ReturnedAffineLaboratoryRest::read_admitted(&fs::read(root.join(PREDECESSOR))?, &witness)?;
     let withdrawal = GranularCultivationWithdrawal::read(&fs::read(root.join(ORGAN))?)?;
-    let successor = GranularReturnedAffineAthenaRest::restore(predecessor, withdrawal)?;
+    let successor = GranularReturnedAffineEcologyRest::restore(predecessor, withdrawal)?;
     let successor_identity_sha256 = successor.identity().to_owned();
-    let mut membrane = AthenaCausalMembrane::mount(successor)
+    let mut membrane = NativeCausalMembrane::mount(successor)
         .constitute_interior()?
         .mount_resident_interior()?
         .mount_resident_factor_receiver_faces()?;

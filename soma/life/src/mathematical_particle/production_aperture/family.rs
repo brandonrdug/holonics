@@ -4,11 +4,11 @@ use serde::Serialize;
 use sha2::{Digest, Sha256};
 
 use super::family_types::{
-    FamilyCultivatedAthenaRest, FamilyCultivationDecoder, FamilyCultivationError,
+    FamilyCultivatedEcologyRest, FamilyCultivationDecoder, FamilyCultivationError,
     FamilyCultivationOccurrence, FamilyCultivationReconstruction, FamilyCultivationStanding,
     FamilyInquiry, FamilyWithdrawalReceipt, FamilyWorldReturn, FixedSectionPlate,
 };
-use super::laboratory_types::{LaboratoryAthenaRest, LaboratoryChronology};
+use super::laboratory_types::{LaboratoryChronology, LaboratoryProductionRest};
 use super::types::{ProductionInquiryPresentation, ProductionReceiver};
 use super::wire::{decode_components, digest, encode_components, hex};
 
@@ -153,9 +153,9 @@ impl FamilyInquiry {
     }
 }
 
-impl FamilyCultivatedAthenaRest {
+impl FamilyCultivatedEcologyRest {
     pub fn found(
-        predecessor: LaboratoryAthenaRest,
+        predecessor: LaboratoryProductionRest,
         chronology: LaboratoryChronology,
         genesis_decision_occurrence: String,
     ) -> Result<Self, FamilyCultivationError> {
@@ -245,7 +245,7 @@ impl FamilyCultivatedAthenaRest {
         let fibres = decode_components(FIBRES_MAGIC, fibres, 2)
             .map_err(|error| FamilyCultivationError::Wire(error.to_string()))?;
         let rest = Self {
-            predecessor: LaboratoryAthenaRest::read(&standing[0], &decoder[0], &fibres[0])
+            predecessor: LaboratoryProductionRest::read(&standing[0], &decoder[0], &fibres[0])
                 .map_err(|error| FamilyCultivationError::Predecessor(error.to_string()))?,
             chronology: serde_json::from_slice(&standing[1])
                 .map_err(|error| FamilyCultivationError::Wire(error.to_string()))?,

@@ -55,7 +55,7 @@ use body::carriage::{
 };
 use body::chart;
 use body::manifold::{
-    CARRIER_HEADER_WORDS, CarrierGrowth, CarrierStorage, ENCLOSURE_WORDS, ErosBody, EventEmanation,
+    CARRIER_HEADER_WORDS, CarrierGrowth, CarrierStorage, ENCLOSURE_WORDS, ContinuingBody, EventEmanation,
     EventIncidence, FACE_WORDS, Face, LiveBodyHeader, NODE_WORDS, Node, OWN_CELL_FORM,
     OWN_CELL_LIVE, OWN_CELL_WORDS, OWN_REGISTER_WORDS, SparseOwnCell, SparseOwnStorage,
     StandingQuery, directed_event_contact_over_standing, node_packed_word, own_cell_position,
@@ -3509,13 +3509,13 @@ unsafe fn enact_one_lineage(
         return;
     };
     let body = match header {
-        Some(header) => ErosBody::resume_standing_world_storage_from_live_header(
+        Some(header) => ContinuingBody::resume_standing_world_storage_from_live_header(
             &standing,
             &mut own,
             header,
             &mut carrier,
         ),
-        None => ErosBody::over_standing_world_storage_from_first_difference(
+        None => ContinuingBody::over_standing_world_storage_from_first_difference(
             &standing,
             &mut own,
             event.anchor(),

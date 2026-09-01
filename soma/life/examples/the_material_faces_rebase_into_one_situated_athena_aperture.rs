@@ -12,12 +12,12 @@ use holonic_engine::{
     image::{ExactRaster, ExactRgb, ImageExtent},
 };
 use life::{
-    athena_native::{
+    mathematical_source::{recover_optical_passage, OpticalPassage},
+    native_intelligence::{
         compare_material_factorizations, AddressedMaterialOccurrence, CausalOperationWorldReturn,
         CausalResultCell, ExteriorWorldReturnTestimony, MaterialFactorizationAperture,
-        MaterialFactorizationReturn, MaterialNativeFactorization, SituatedCultivatedAthenaRest,
+        MaterialFactorizationReturn, MaterialNativeFactorization, SituatedCultivatedEcologyRest,
     },
-    mathematical_source::{recover_optical_passage, OpticalPassage},
 };
 use serde::Serialize;
 use serde_json::json;
@@ -49,7 +49,7 @@ fn main() -> Result<(), String> {
     }
 
     let l2_bytes = fs::read(root.join(L2_REST)).map_err(|error| error.to_string())?;
-    let l2 = SituatedCultivatedAthenaRest::read(&l2_bytes).map_err(|error| error.to_string())?;
+    let l2 = SituatedCultivatedEcologyRest::read(&l2_bytes).map_err(|error| error.to_string())?;
     let l2_identity = l2.identity().to_owned();
     let aperture = MaterialFactorizationAperture::found(&l2).map_err(|error| error.to_string())?;
 
@@ -323,7 +323,7 @@ fn main() -> Result<(), String> {
             "one_continuing_body": l2_identity,
             "l2_wire_sha256": hex(&l2_bytes),
             "ingress_port": "addressed material occurrence plus caused incidence world return",
-            "hot_owner": "SituatedCultivatedAthenaRest rank-four receiver chart and exact symmetric constitutive body",
+            "hot_owner": "SituatedCultivatedEcologyRest rank-four receiver chart and exact symmetric constitutive body",
             "return_port": "NativeMathematicalComplex plus situated factor support or material receiver insufficiency",
             "requested_artifact": DEFAULT_OUT,
             "new_owner": "one material-native factorization relation",

@@ -5,7 +5,7 @@ use holonic_engine::{
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use super::types::{ProductionAthenaRest, ProductionInquiryPresentation, ProductionReceiver};
+use super::types::{ProductionEcologyRest, ProductionInquiryPresentation, ProductionReceiver};
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -159,8 +159,8 @@ pub struct LaboratoryWithdrawalReceipt {
 
 /// L0's continuing ecology.  It is intentionally neither `Clone` nor internally shared.
 #[derive(Debug, PartialEq, Eq)]
-pub struct LaboratoryAthenaRest {
-    pub production: ProductionAthenaRest,
+pub struct LaboratoryProductionRest {
+    pub production: ProductionEcologyRest,
     pub native: GeneratorNativeRest,
     pub cultivated_history: CultivatedReceiverHistoryRest,
     pub chronology: LaboratoryChronology,
@@ -170,7 +170,7 @@ pub struct LaboratoryAthenaRest {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum LaboratoryAthenaError {
+pub enum LaboratoryProductionError {
     #[error("the R6 production ecology refused: {0}")]
     Production(String),
     #[error("the M3 generator-native rest refused: {0}")]

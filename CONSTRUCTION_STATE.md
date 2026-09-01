@@ -10,14 +10,15 @@ grades.
 
 ## Current frontier
 
-**Current frontier:** HIF5
+**Current frontier:** HIF6
 
-**HIF5 — MIGRATE PRODUCTS AND REMOVE CAMPAIGN ONTOLOGY — IS THE SOLE NEXT DEED.**
+**HIF6 — RESIDENT AND SOURCE-NEUTRAL CLOSURE — IS THE SOLE NEXT DEED.**
 
-[definition] Migrate Eros and Athena implementations onto the neutral framework. Rename or remove
-generic Athena-prefixed types and methods, merge duplicate rest/cultivation/generation owners,
-split remaining large foremen at founded relations, and delete superseded wrappers and drivers.
-Preserve exact completed consequences through the new owners, not through compatibility decoders.
+[definition] Carry the neutral inference and cultivation lifecycle through the strongest lawful
+resident surface. Construct and remount the direct productive rest with historical outputs and
+foreign/source artifacts unavailable; return the actual emission/world-return difference,
+off-diagonal complex transport, reconstruction, source-detached later conduct, targeted
+withdrawal, and exact restoration without CPU semantic replay.
 
 ## Admitted standing
 
@@ -68,6 +69,14 @@ returned 2,002 passed, zero failed, 32 ignored and every example type-checked.
 aliases. Every `life` example type-checked; the library returned 491 passed, zero failed, 15 ignored
 and source-shape remained green.
 
+[established-bounded; implemented-exact; source-inspected; measured] HIF5 completed the migration.
+The live `native_intelligence` and `receiver_history` owners, generic type families, wire domains,
+formal receiver-history namespace, continuing body, and resident integrated front are neutral
+without compatibility aliases. Superseded lexical/atlas/Eros rest owners and drivers departed; the
+resident-section foreman split into owner-local files. Engine tests returned 1,991 passed, zero
+failed, 32 ignored; life returned 466 passed, zero failed, 14 ignored; the Lean umbrella built
+3,768 jobs.
+
 [established-bounded; implemented-exact; measured] R0Q0--R0Q4 retain addressed response/source/
 target pair current, ordinary off-diagonal transport, resident dependent complex contraction before
 the positive receiver, full-complex continuation equality, complete reconstruction fibres, and
@@ -80,22 +89,10 @@ reused by HIF owners; the interrupted H2N/UAR-specific factorization was unadmit
 
 ## Current obstruction
 
-[counterexample; source-inspected] The executable intelligence surface lacks one generic public
-lifecycle corresponding to the formal ecology. `soma/life/src/athena_native/` contains 74 Rust
-files and roughly 47,400 lines; Athena names generic rests, passages, membranes, cultivation,
-resident conduct, sensory products, and application variants. Several generation and cultivation
-families have no common neutral interface.
-
-[counterexample; source-inspected] Soulkiller returns the correct physical split of native bundle,
-cold exterior witness, and insufficiency, but the productive holons have no first-class intrinsic
-profile gathering their non-conflated boundary, incidence, carrier, transport, constitution,
-chronology, receiver, morphology, reconstruction, and open dimensions.
-
-[counterexample; source-inspected] Athena still qualifies dozens of generic Rust rests, passages,
-membranes, residents, receiver charts, and sensory/application wrappers. Generation and cultivation
-remain duplicated across campaign-era owners; several large source files and re-export surfaces
-hide those overlaps. Exact mechanisms must migrate to neutral owners before obsolete wrappers are
-deleted.
+[open; source-inspected] The strongest source-neutral ecology still enters through historical
+output-chain constructors. HIF6 must found the same productive native body directly, then prove
+remount, actual return, resident complex transport, reconstruction, withdrawal/restoration, and
+later conduct with those outputs and all foreign/source artifacts unavailable.
 
 [definition] `UNIVERSAL_CATALOG.md` remains the sole descriptive Lean--Rust--CUDA owner crosswalk.
 It schedules and grades nothing. Historical ledgers, checksum manifests, output chains, UAR
@@ -116,8 +113,8 @@ drivers, and records remain evidence only.
 
 ## Validation boundary
 
-[definition] Every nontrivial process retains the 180-second outer boundary. HIF5 advances only
-when Athena denotes a composed product/ecology rather than a generic type family; Eros denotes its
-composer/cultivator; Soulkiller denotes the one-way boundary; no live generic source owner is
-campaign-qualified; source-shape and public-owner review return no hotspot or redundant rest
-hierarchy.
+[definition] Every nontrivial process retains the 180-second outer boundary. HIF6 advances only
+when the direct productive rest constructs and remounts with historical outputs and foreign/source
+artifacts unavailable; all hot semantic work remains resident; the actual return causes the child;
+and withdrawal, restoration, reconstruction, and changed later conduct pass without host semantic
+replay.

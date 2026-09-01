@@ -1,7 +1,7 @@
 use std::{env, error::Error, fs, path::PathBuf, time::Instant};
 
-use life::athena_native::{
-    transduce_source_neutral_exterior, SituatedDifferenceSection, SourceNeutralAthenaRest,
+use life::native_intelligence::{
+    transduce_source_neutral_exterior, SituatedDifferenceSection, SourceNeutralEcologyRest,
     SourceNeutralReturnedDifferenceReceipt,
 };
 use serde::Serialize;
@@ -69,7 +69,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     }
 
     let parent_bytes = fs::read(root.join(PREDECESSOR))?;
-    let parent = SourceNeutralAthenaRest::read(&parent_bytes)?;
+    let parent = SourceNeutralEcologyRest::read(&parent_bytes)?;
     let _admitted_parent_identity_sha256 = parent.identity().to_owned();
     drop(parent_bytes);
     eprintln!("uar3-d2 parent {}ms", started.elapsed().as_millis());
@@ -102,7 +102,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let _rested_octets = child_bytes.len();
     fs::write(output.join("athena-uar3-child.rest"), &child_bytes)?;
     drop(child);
-    let remounted = SourceNeutralAthenaRest::read(&child_bytes)?;
+    let remounted = SourceNeutralEcologyRest::read(&child_bytes)?;
     drop(child_bytes);
     let remounted_rest_identity_sha256 = remounted.identity().to_owned();
     if remounted_rest_identity_sha256 != successor_rest_identity_sha256 {
@@ -125,7 +125,7 @@ fn verify_existing_child(root: &PathBuf, output: &PathBuf) -> Result<(), Box<dyn
     let started = Instant::now();
     let child_bytes = fs::read(output.join("athena-uar3-child.rest"))?;
     let rested_octets = child_bytes.len();
-    let remounted = SourceNeutralAthenaRest::read(&child_bytes)?;
+    let remounted = SourceNeutralEcologyRest::read(&child_bytes)?;
     drop(child_bytes);
     let deposit: SourceNeutralReturnedDifferenceReceipt =
         serde_json::from_slice(&fs::read(output.join("uar3-d2-deposit-receipt.json"))?)?;

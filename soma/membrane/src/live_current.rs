@@ -1,6 +1,6 @@
 //! The live-current membrane: one contemporary event in, one bounded radiation population out.
 //!
-//! This is the production lifetime owner of [`body::manifold::ErosBody`].  World material and
+//! This is the production lifetime owner of [`body::manifold::ContinuingBody`].  World material and
 //! hardware chunks remain outside.  A live lineage retains only its first-person body header,
 //! dynamic carrier, and a genuinely open dark tread.  Every current-local OWN surface lives for
 //! one complete event, every co-present current reads the same standing-before body, and their
@@ -317,7 +317,7 @@ use body::incidence::{
     OrientedIncidence,
 };
 use body::manifold::{
-    atom_node, compose_place, node_packed_word, DirectedEventContact, Enclosure, ErosBody,
+    atom_node, compose_place, node_packed_word, ContinuingBody, DirectedEventContact, Enclosure,
     EventEmanation, EventReceiver, FeltEmission, FeltEmissionTarget, LiveBodyHeader, Node,
     ENCLOSURE_WORDS, NODE_WORDS,
 };
@@ -3583,13 +3583,13 @@ fn enact_cpu_current(
 
     let (consequence, next_header) = {
         let body = match header {
-            Some(header) => ErosBody::resume_standing_world_ranked_storage_from_live_header(
+            Some(header) => ContinuingBody::resume_standing_world_ranked_storage_from_live_header(
                 standing,
                 &mut own,
                 header,
                 &mut carrier,
             ),
-            None => ErosBody::over_standing_world_ranked_storage_from_first_difference(
+            None => ContinuingBody::over_standing_world_ranked_storage_from_first_difference(
                 standing,
                 &mut own,
                 mount

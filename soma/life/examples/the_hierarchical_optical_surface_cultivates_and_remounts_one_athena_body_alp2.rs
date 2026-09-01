@@ -19,17 +19,17 @@ use holonic_engine::{
 use holonic_structure::CausalMembrane;
 use image::ImageReader;
 use life::{
-    athena_native::{
-        AddressedMaterialOccurrence, AdmittedAffineLaboratoryRestWitness,
-        AdmittedReturnedAffineLaboratoryRestWitness, AffineLaboratoryCultivatedAthenaRest,
-        AthenaCausalMembrane, AthenaMembraneConsequence, AthenaMembraneStanding,
-        ExactMembraneChartPassage, ExteriorOccurrenceTransducer, MembraneCultivationReceipt,
-        ReturnedAffineLaboratoryAthenaRest, ReturnedAffineLaboratoryDifferenceWithdrawal,
-        StagedMembraneCultivation,
-    },
     mathematical_source::{
         grow_optical_holons, recover_optical_passage, ExactOpticalOccurrence,
         HierarchicalOpticalPassage, OpticalHolonIntervention, OpticalPassage,
+    },
+    native_intelligence::{
+        AddressedMaterialOccurrence, AdmittedAffineLaboratoryRestWitness,
+        AdmittedReturnedAffineLaboratoryRestWitness, AffineLaboratoryCultivatedRest,
+        ExactMembraneChartPassage, ExteriorOccurrenceTransducer, MembraneConsequence,
+        MembraneCultivationReceipt, MembraneStanding, NativeCausalMembrane,
+        ReturnedAffineLaboratoryDifferenceWithdrawal, ReturnedAffineLaboratoryRest,
+        StagedMembraneCultivation,
     },
 };
 use num_bigint::BigInt;
@@ -144,7 +144,7 @@ fn physical_return(root: &Path) -> Result<(), String> {
         VALIDATION_RECEIPT_SHA256,
     )
     .map_err(display)?;
-    let predecessor = AffineLaboratoryCultivatedAthenaRest::read_admitted_membrane(
+    let predecessor = AffineLaboratoryCultivatedRest::read_admitted_membrane(
         &fs::read(root.join(REST)).map_err(display)?,
         &admitted,
     )
@@ -192,7 +192,7 @@ fn physical_return(root: &Path) -> Result<(), String> {
         .map_err(display)?
         .unit("alp2-hierarchical-optical-return-current")
         .map_err(display)?;
-    let mut membrane = AthenaCausalMembrane::mount(predecessor)
+    let mut membrane = NativeCausalMembrane::mount(predecessor)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()
@@ -214,7 +214,7 @@ fn physical_return(root: &Path) -> Result<(), String> {
             Vec::new(),
         )
         .map_err(|failure| format!("formed optical binding refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(initial_return) =
+    let MembraneConsequence::Returned(initial_return) =
         membrane.receive_occurrence(bound).map_err(display)?
     else {
         return Err("the formed optical occurrence did not cross Athena's membrane".to_owned());
@@ -267,7 +267,7 @@ fn physical_return(root: &Path) -> Result<(), String> {
             Vec::new(),
         )
         .map_err(|failure| format!("formed optical world return refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(world_return) =
+    let MembraneConsequence::Returned(world_return) =
         membrane.receive_occurrence(later).map_err(display)?
     else {
         return Err("the formed optical world consequence did not return".to_owned());
@@ -355,8 +355,8 @@ fn verify_conduct(root: &Path) -> Result<(), String> {
         &witness.complete_validation_receipt_sha256,
     )
     .map_err(display)?;
-    let successor = ReturnedAffineLaboratoryAthenaRest::read_admitted_membrane(&wire, &admitted)
-        .map_err(display)?;
+    let successor =
+        ReturnedAffineLaboratoryRest::read_admitted_membrane(&wire, &admitted).map_err(display)?;
     if trace {
         eprintln!("alp2-verify successor-admitted {:?}", began.elapsed());
     }
@@ -364,7 +364,7 @@ fn verify_conduct(root: &Path) -> Result<(), String> {
         == witness.successor_identity_sha256
         && sha(&wire) == witness.successor_wire_sha256;
     let (left, shared) = receiver_cells(successor.membrane_affine_cells())?;
-    let mut mounted = AthenaCausalMembrane::mount(successor)
+    let mut mounted = NativeCausalMembrane::mount(successor)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()
@@ -426,7 +426,7 @@ fn verify_withdrawal(root: &Path) -> Result<(), String> {
     )
     .map_err(display)?;
     let successor =
-        ReturnedAffineLaboratoryAthenaRest::read_admitted(&wire, &admitted).map_err(display)?;
+        ReturnedAffineLaboratoryRest::read_admitted(&wire, &admitted).map_err(display)?;
     let successor_identity = successor.identity().to_owned();
     let (predecessor, withdrawal) = successor.withdraw_returned_difference().map_err(display)?;
     let targeted_return_withdrawal_recovered_predecessor =
@@ -484,13 +484,13 @@ fn verify_restoration_and_grade(root: &Path) -> Result<(), String> {
         VALIDATION_RECEIPT_SHA256,
     )
     .map_err(display)?;
-    let predecessor = AffineLaboratoryCultivatedAthenaRest::read_admitted(
+    let predecessor = AffineLaboratoryCultivatedRest::read_admitted(
         &fs::read(root.join(REST)).map_err(display)?,
         &admitted,
     )
     .map_err(display)?;
     let restored =
-        ReturnedAffineLaboratoryAthenaRest::restore_returned_difference(predecessor, withdrawal)
+        ReturnedAffineLaboratoryRest::restore_returned_difference(predecessor, withdrawal)
             .map_err(display)?;
     let targeted_return_restoration_recovered_successor = restored.identity()
         == withdrawn.withdrawn_successor_identity_sha256
@@ -608,8 +608,8 @@ fn optical_receiver_current(
 }
 
 fn continuing_native_address(
-    rest: &impl AthenaMembraneStanding,
-) -> Result<(life::athena_native::NativeSectionAddress, ReceiverId), String> {
+    rest: &impl MembraneStanding,
+) -> Result<(life::native_intelligence::NativeSectionAddress, ReceiverId), String> {
     for address in &rest.membrane_realization().sections {
         let section = rest
             .membrane_ecology()
@@ -627,7 +627,7 @@ fn continuing_native_address(
 }
 
 fn receiver_cells(
-    cells: &[life::athena_native::LaboratoryCellAffineSection],
+    cells: &[life::native_intelligence::LaboratoryCellAffineSection],
 ) -> Result<(String, String), String> {
     let left = cells.first().ok_or("the affine organ has no cells")?;
     let support = left

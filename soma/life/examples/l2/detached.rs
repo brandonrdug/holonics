@@ -4,7 +4,7 @@ use std::process::Command;
 use std::time::Instant;
 
 use holonic_engine::cuda_refine::{CudaRefineExecutor, DeviceNativeFixedSectionFamilies};
-use life::mathematical_particle::{NativeHexisAthenaRest, NativeHexisInquiry};
+use life::mathematical_particle::{NativeHexisInquiry, NativeHexisRest};
 use serde_json::{json, Value};
 
 use super::{artifact, rest};
@@ -17,7 +17,7 @@ pub fn conduct(
     output: &Path,
 ) -> Result<(), String> {
     fs::create_dir_all(output).map_err(|error| error.to_string())?;
-    let rest = NativeHexisAthenaRest::read(
+    let rest = NativeHexisRest::read(
         &rest::read(standing)?,
         &rest::read(decoder)?,
         &rest::read(fibres)?,
@@ -208,7 +208,7 @@ fn device_json(returned: &DeviceNativeFixedSectionFamilies) -> Value {
 
 fn write_visuals(
     output: &Path,
-    rest: &NativeHexisAthenaRest,
+    rest: &NativeHexisRest,
     returned: &DeviceNativeFixedSectionFamilies,
 ) -> Result<Value, String> {
     let seam = if returned.selected_route == vec![2, 1] {

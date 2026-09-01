@@ -15,9 +15,9 @@ use std::{
 use holonic_engine::{quantity::BaseUnits, ExactComplexWaveCurrent};
 use life::{
     addressed_span::{AddressedMemorySpan, CompleteAddressedMemorySpan, MemorySpanFragment},
-    athena_native::{
-        AthenaCausalMembrane, ExactMembraneChartPassage, ExteriorOccurrenceTransducer,
-        NativeOpenWorldTubeReceipt, RecurrentGranularReturnedAffineAthenaRest,
+    native_intelligence::{
+        ExactMembraneChartPassage, ExteriorOccurrenceTransducer, NativeCausalMembrane,
+        NativeOpenWorldTubeReceipt, RecurrentGranularReturnedAffineEcologyRest,
     },
     synchronized_occurrence::{
         relation_atom, ExactClockTransport, ExactSynchronizedOccurrence,
@@ -166,12 +166,12 @@ fn main() -> Result<(), String> {
         presented_current.clone(),
     );
 
-    let rest = RecurrentGranularReturnedAffineAthenaRest::read(
+    let rest = RecurrentGranularReturnedAffineEcologyRest::read(
         &fs::read(root.join(PREDECESSOR)).map_err(display)?,
     )
     .map_err(display)?;
     let rested_identity = rest.identity().to_owned();
-    let mut membrane = AthenaCausalMembrane::mount(rest)
+    let mut membrane = NativeCausalMembrane::mount(rest)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()

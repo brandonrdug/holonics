@@ -1,4 +1,4 @@
-import ElementaryHolonics.Millennium.AthenaReceiverHistory
+import ElementaryHolonics.Millennium.ReceiverHistory
 import ElementaryHolonics.Millennium.HolonicPortResolvedBoundaryTransport
 import ElementaryHolonics.Millennium.HolonicTorusEntropyParametronEquivalence
 import ElementaryHolonics.Foundation.BoundaryScalePassage
@@ -35,7 +35,7 @@ noncomputable section
 namespace Soma.Holonics.Millennium.HolonicGranularBoundaryRadiation
 
 open scoped BigOperators
-open Soma.Holonics.Millennium.AthenaReceiverHistory
+open Soma.Holonics.Millennium.ReceiverHistory
 
 /-! ## One exact finite interior/boundary body -/
 

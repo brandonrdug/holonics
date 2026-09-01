@@ -18,17 +18,17 @@ use holonic_engine::{
 use holonic_structure::CausalMembrane;
 use image::ImageReader;
 use life::{
-    athena_native::{
-        AcousticAthenaRest, AddressedMaterialOccurrence, AthenaCausalMembrane,
-        AthenaMembraneConsequence, AthenaMembraneStanding, ExactMembraneChartPassage,
-        ExteriorOccurrenceTransducer, MembraneCultivationReceipt, NativeAcousticRadiationInput,
-        NativeOpticalCultivationReceipt, NativeOpticalRasterProjection,
-        NativeOpticalReceiverIntervention, NativeOpticalStandingMutation, OpticalAthenaRest,
-        StagedMembraneCultivation,
-    },
     mathematical_source::{
         grow_optical_holons, recover_optical_passage, ExactOpticalOccurrence,
         HierarchicalOpticalPassage, OpticalHolonIntervention, OpticalPassage,
+    },
+    native_intelligence::{
+        AcousticProductRest, AddressedMaterialOccurrence, ExactMembraneChartPassage,
+        ExteriorOccurrenceTransducer, MembraneConsequence, MembraneCultivationReceipt,
+        MembraneStanding, NativeAcousticRadiationInput, NativeCausalMembrane,
+        NativeOpticalCultivationReceipt, NativeOpticalRasterProjection,
+        NativeOpticalReceiverIntervention, NativeOpticalStandingMutation, OpticalProductRest,
+        StagedMembraneCultivation,
     },
 };
 use num_bigint::BigInt;
@@ -205,7 +205,7 @@ fn foundation_phase(root: &Path) -> Result<(), String> {
         &fs::read(root.join(SENS4).join("02-held-out-native-radiation.json")).map_err(display)?,
     )
     .map_err(display)?;
-    let acoustic = AcousticAthenaRest::read(
+    let acoustic = AcousticProductRest::read(
         &fs::read(
             root.join(SENS4)
                 .join("athena-acoustic-room-cultivated.rest"),
@@ -214,7 +214,7 @@ fn foundation_phase(root: &Path) -> Result<(), String> {
     )
     .map_err(display)?;
     let predecessor_rest_identity_sha256 = acoustic.identity().to_owned();
-    let (rest, cultivation) = OpticalAthenaRest::cultivate(acoustic, &primary).map_err(display)?;
+    let (rest, cultivation) = OpticalProductRest::cultivate(acoustic, &primary).map_err(display)?;
     let primary_field = rest.radiate(&primary).map_err(display)?;
     let held_out_field = rest.radiate(&held_out).map_err(display)?;
     let distinct_fields_before_rendering = primary_field != held_out_field;
@@ -350,7 +350,7 @@ fn foundation_phase(root: &Path) -> Result<(), String> {
 
 fn transduce_phase(root: &Path) -> Result<(), String> {
     let output = root.join(OUTPUT);
-    let rest = OpticalAthenaRest::read(
+    let rest = OpticalProductRest::read(
         &fs::read(output.join("athena-optical-production.rest")).map_err(display)?,
     )
     .map_err(display)?;
@@ -403,7 +403,7 @@ fn transduce_phase(root: &Path) -> Result<(), String> {
         .map_err(display)?
         .unit("physical-optical-return-current")
         .map_err(display)?;
-    let mut membrane = AthenaCausalMembrane::mount(rest);
+    let mut membrane = NativeCausalMembrane::mount(rest);
     let mut card = CudaRefineExecutor::new().map_err(display)?;
     let mut returns = Vec::new();
     for (ordinal, (name, path, projection)) in specifications.into_iter().enumerate() {
@@ -446,7 +446,7 @@ fn transduce_phase(root: &Path) -> Result<(), String> {
                 Vec::new(),
             )
             .map_err(|failure| format!("{name} optical binding refused: {failure:?}"))?;
-        let AthenaMembraneConsequence::Returned(returned) =
+        let MembraneConsequence::Returned(returned) =
             membrane.receive_occurrence(bound).map_err(display)?
         else {
             return Err(format!("{name} optical surface did not cross"));
@@ -527,7 +527,7 @@ fn return_phase(root: &Path) -> Result<(), String> {
         .returns
         .first()
         .ok_or("the primary optical return is absent")?;
-    let rest = OpticalAthenaRest::read(
+    let rest = OpticalProductRest::read(
         &fs::read(output.join("athena-optical-production.rest")).map_err(display)?,
     )
     .map_err(display)?;
@@ -556,7 +556,7 @@ fn return_phase(root: &Path) -> Result<(), String> {
         .unit("physical-optical-return-current")
         .map_err(display)?;
     let injected = primary.resident_receiver_current.clone();
-    let mut membrane = AthenaCausalMembrane::mount(rest)
+    let mut membrane = NativeCausalMembrane::mount(rest)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()
@@ -575,7 +575,7 @@ fn return_phase(root: &Path) -> Result<(), String> {
             Vec::new(),
         )
         .map_err(|failure| format!("physical optical binding refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(initial_return) =
+    let MembraneConsequence::Returned(initial_return) =
         membrane.receive_occurrence(bound).map_err(display)?
     else {
         return Err("the physical generated image did not cross".to_owned());
@@ -622,7 +622,7 @@ fn return_phase(root: &Path) -> Result<(), String> {
             Vec::new(),
         )
         .map_err(|failure| format!("optical world return binding refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(world_return) =
+    let MembraneConsequence::Returned(world_return) =
         membrane.receive_occurrence(later).map_err(display)?
     else {
         return Err("the optical world consequence did not return".to_owned());
@@ -643,7 +643,7 @@ fn return_phase(root: &Path) -> Result<(), String> {
         successor_rest_identity_sha256 != predecessor_rest_identity_sha256;
     let production_morphology_preserved_after_optical_return =
         successor.production().identity_sha256 == production_morphology_identity_sha256;
-    let mut later_membrane = AthenaCausalMembrane::mount(successor)
+    let mut later_membrane = NativeCausalMembrane::mount(successor)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()
@@ -706,7 +706,7 @@ fn verify_phase(root: &Path) -> Result<(), String> {
     .map_err(display)?;
     let successor_wire =
         fs::read(output.join("athena-optical-world-cultivated.rest")).map_err(display)?;
-    let successor = OpticalAthenaRest::read(&successor_wire).map_err(display)?;
+    let successor = OpticalProductRest::read(&successor_wire).map_err(display)?;
     let successor_remounted_exactly = successor.identity()
         == cultivated.successor_rest_identity_sha256
         && sha256(&successor_wire) == cultivated.successor_wire_sha256;
@@ -745,10 +745,10 @@ fn verify_phase(root: &Path) -> Result<(), String> {
     let acoustic_identity = acoustic.identity().to_owned();
     let (underlying, withdrawn_acoustic, _) = acoustic.withdraw_production().map_err(display)?;
     let (acoustic, _) =
-        AcousticAthenaRest::restore_production(underlying, withdrawn_acoustic).map_err(display)?;
+        AcousticProductRest::restore_production(underlying, withdrawn_acoustic).map_err(display)?;
     let unrelated_acoustic_withdrawal_restored_exactly = acoustic.identity() == acoustic_identity;
     let (restored, _) =
-        OpticalAthenaRest::restore_production(acoustic, withdrawn_optical).map_err(display)?;
+        OpticalProductRest::restore_production(acoustic, withdrawn_optical).map_err(display)?;
     let targeted_optical_restoration_exact = restored.identity() == successor_identity;
     let restored_primary = restored.radiate(&primary).map_err(display)?;
     let unrelated_acoustic_sibling_did_not_change_optical_conduct = restored_primary
@@ -969,8 +969,8 @@ fn optical_receiver_current(
 }
 
 fn continuing_native_address(
-    rest: &impl AthenaMembraneStanding,
-) -> Result<(life::athena_native::NativeSectionAddress, ReceiverId), String> {
+    rest: &impl MembraneStanding,
+) -> Result<(life::native_intelligence::NativeSectionAddress, ReceiverId), String> {
     for address in &rest.membrane_realization().sections {
         let addressed = rest
             .membrane_ecology()
@@ -988,7 +988,7 @@ fn continuing_native_address(
 }
 
 fn receiver_cells(
-    cells: &[life::athena_native::LaboratoryCellAffineSection],
+    cells: &[life::native_intelligence::LaboratoryCellAffineSection],
 ) -> Result<(String, String), String> {
     let left = cells.first().ok_or("the affine organ has no cells")?;
     let support = left

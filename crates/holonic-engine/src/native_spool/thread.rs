@@ -184,8 +184,7 @@ impl NativeThread {
 
         let mut incidence_occurrences = BTreeSet::new();
         for incidence in &self.incidence {
-            let Some(occurrence) = occurrence_by_id.get(&incidence.occurrence).copied()
-            else {
+            let Some(occurrence) = occurrence_by_id.get(&incidence.occurrence).copied() else {
                 return Err(NativeSpoolRefusal::Incidence(self.address.clone()));
             };
             if incidence.coefficient == 0

@@ -650,7 +650,7 @@ fn packed_varints(
                     address,
                     field.encoded.start,
                     &format!("{name} has the wrong wire type"),
-                )
+                );
             }
         }
     }

@@ -55,11 +55,11 @@ use num_bigint::BigUint;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_value::ieee754::{
-    decode_bfloat16_bits, decode_binary32_bits, decode_binary64_bits, BinaryFloatDatum,
-    BinaryFloatSpecies,
-};
 use crate::exact_value::ExactValueError;
+use crate::exact_value::ieee754::{
+    BinaryFloatDatum, BinaryFloatSpecies, decode_bfloat16_bits, decode_binary32_bits,
+    decode_binary64_bits,
+};
 
 /// What a foreign container declares an element to be.
 ///

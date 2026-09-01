@@ -812,13 +812,11 @@ impl CausalLanguageEcology {
     ///
     /// The route rest was sealable since this module was written and the whole ecology was not, so
     /// a conditioned language body could be **described** across a seam and never **resumed** across
-    /// one. Measured 2026-08-18: no file in this workspace named both `ErosRest` and
-    /// `CausalLanguageEcology` — the intersection of the two greps was empty — so the organ that
-    /// holds a whole body and the organ that produces language had never met.
+    /// one.
     ///
     /// **What crosses is every carrier's exact words, never a digest**, for the reason
-    /// [`crate::eros_rest`] already states: a digest cannot exhibit which word moved, and which word
-    /// moved is the whole of the conditioning control.
+    /// A digest cannot exhibit which word moved, and which word moved is the whole of the
+    /// conditioning control.
     ///
     /// The counters cross too. They are **derived faces** of the material and are re-checked at the
     /// mount against what the sealed structures actually carry, so a wire whose counters disagree

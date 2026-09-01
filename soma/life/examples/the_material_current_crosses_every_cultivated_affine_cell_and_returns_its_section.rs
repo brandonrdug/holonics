@@ -4,9 +4,9 @@
 
 use std::{fs, path::PathBuf, time::Instant};
 
-use life::athena_native::{
+use life::native_intelligence::{
     compare_material_factorizations, AddressedEmanationIngress, AddressedEmanationWorldReturn,
-    AddressedMaterialOccurrence, AffineLaboratoryCultivatedAthenaRest, CausalOperationWorldReturn,
+    AddressedMaterialOccurrence, AffineLaboratoryCultivatedRest, CausalOperationWorldReturn,
     CausalResultCell, EmanationDeed, EmanationParticipant, ExteriorWorldReturnTestimony,
     MaterialFactorizationAperture, PerspectiveChart, SituatedEmanationPassage,
 };
@@ -29,9 +29,8 @@ fn main() -> Result<(), String> {
         ));
     }
     let started = Instant::now();
-    let rest =
-        AffineLaboratoryCultivatedAthenaRest::read(&fs::read(root.join(REST)).map_err(display)?)
-            .map_err(display)?;
+    let rest = AffineLaboratoryCultivatedRest::read(&fs::read(root.join(REST)).map_err(display)?)
+        .map_err(display)?;
     let cultivated_identity = rest.identity().to_owned();
     let expected_landmarks = rest.correspondences().len();
     let expected_cells = rest.affine_cells().len();
@@ -159,7 +158,7 @@ fn main() -> Result<(), String> {
     let targeted_withdrawal_removes_field = predecessor_factorization
         .cultivated_affine_transport
         .is_none();
-    let restored = AffineLaboratoryCultivatedAthenaRest::restore_relational_organ(body, withdrawal)
+    let restored = AffineLaboratoryCultivatedRest::restore_relational_organ(body, withdrawal)
         .map_err(display)?;
     let exact_restoration = restored.identity() == cultivated_identity;
 

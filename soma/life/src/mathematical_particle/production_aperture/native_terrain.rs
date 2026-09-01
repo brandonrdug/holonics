@@ -5,13 +5,13 @@ use sha2::{Digest, Sha256};
 
 use super::native_family::returned_section;
 use super::native_family_types::{
-    FactorizationStatus, NativeCarrierChart, NativeGeneratorRelation, NativeHexisAthenaRest,
+    FactorizationStatus, NativeCarrierChart, NativeGeneratorRelation, NativeHexisRest,
     NativeNaturalityReceipt, NativeShortestSeparator, NativeSuccessorHistory,
     ReceiverHistoryFactorization,
 };
 use super::native_terrain_types::{
-    NativeTerrainAthenaRest, NativeTerrainCultivation, NativeTerrainDecoder, NativeTerrainError,
-    NativeTerrainInquiry, NativeTerrainReconstruction, NativeTerrainStanding,
+    NativeTerrainCultivation, NativeTerrainDecoder, NativeTerrainError, NativeTerrainInquiry,
+    NativeTerrainReconstruction, NativeTerrainRest, NativeTerrainStanding,
     NativeTerrainWithdrawalReceipt, NativeTerrainWorldReturn,
 };
 use super::types::{ProductionInquiryPresentation, ProductionReceiver};
@@ -67,7 +67,7 @@ fn added_histories(family: u32) -> Vec<NativeSuccessorHistory> {
 }
 
 fn chart_support(
-    predecessor: &NativeHexisAthenaRest,
+    predecessor: &NativeHexisRest,
     occurrence: &str,
 ) -> Result<Vec<u32>, NativeTerrainError> {
     let occupied = predecessor
@@ -94,7 +94,7 @@ fn chart_support(
     Ok(support.into_iter().collect())
 }
 
-fn generator_action(predecessor: &NativeHexisAthenaRest) -> Vec<i64> {
+fn generator_action(predecessor: &NativeHexisRest) -> Vec<i64> {
     let generator = &predecessor.standing().generator;
     let dimension = generator.dimension as usize;
     (0..dimension)
@@ -108,12 +108,12 @@ fn generator_action(predecessor: &NativeHexisAthenaRest) -> Vec<i64> {
         .collect()
 }
 
-impl NativeTerrainAthenaRest {
+impl NativeTerrainRest {
     /// A genuine exterior return adds one carrier chart to the already-rested generator.  The L2
     /// predecessor is moved into this continuing owner; no source corpus or proof passage remains
     /// available to later current.
     pub fn cultivate(
-        predecessor: NativeHexisAthenaRest,
+        predecessor: NativeHexisRest,
         world_return: NativeTerrainWorldReturn,
         modulus: i64,
     ) -> Result<Self, NativeTerrainError> {
@@ -356,7 +356,7 @@ impl NativeTerrainAthenaRest {
             .map_err(|error| NativeTerrainError::Wire(error.to_string()))?;
         let fibres = decode_components(FIBRES_MAGIC, fibres, 2)
             .map_err(|error| NativeTerrainError::Wire(error.to_string()))?;
-        let predecessor = NativeHexisAthenaRest::read(&standing[0], &decoder[0], &fibres[0])
+        let predecessor = NativeHexisRest::read(&standing[0], &decoder[0], &fibres[0])
             .map_err(|error| NativeTerrainError::Predecessor(error.to_string()))?;
         let rest = Self {
             predecessor,
@@ -551,7 +551,7 @@ impl NativeTerrainAthenaRest {
         &self.reconstruction
     }
 
-    pub fn predecessor(&self) -> &NativeHexisAthenaRest {
+    pub fn predecessor(&self) -> &NativeHexisRest {
         &self.predecessor
     }
 
@@ -561,7 +561,7 @@ impl NativeTerrainAthenaRest {
 
     pub fn withdraw(
         self,
-    ) -> Result<(NativeHexisAthenaRest, NativeTerrainWithdrawalReceipt), NativeTerrainError> {
+    ) -> Result<(NativeHexisRest, NativeTerrainWithdrawalReceipt), NativeTerrainError> {
         let cultivated_identity = self.canonical_identity()?;
         let restored_identity = self
             .predecessor

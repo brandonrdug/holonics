@@ -15,15 +15,15 @@ use holonic_engine::{
 };
 use holonic_structure::CausalMembrane;
 use life::{
-    athena_native::{
-        AddressedMaterialOccurrence, AdmittedReturnedAffineLaboratoryRestWitness,
-        AthenaCausalMembrane, AthenaMembraneConsequence, AthenaMembraneStanding,
-        ExactMembraneChartPassage, ExteriorOccurrenceTransducer, MembraneCultivationReceipt,
-        NativeAcousticPotentialComplex, NativeAcousticProductionSection,
-        NativeAcousticReceiverChart, RecurrentReturnedAffineLaboratoryAthenaRest,
-        ReturnedAffineLaboratoryAthenaRest, StagedMembraneCultivation,
-    },
     mathematical_source::ExactAcousticOccurrence,
+    native_intelligence::{
+        AddressedMaterialOccurrence, AdmittedReturnedAffineLaboratoryRestWitness,
+        ExactMembraneChartPassage, ExteriorOccurrenceTransducer, MembraneConsequence,
+        MembraneCultivationReceipt, MembraneStanding, NativeAcousticPotentialComplex,
+        NativeAcousticProductionSection, NativeAcousticReceiverChart, NativeCausalMembrane,
+        RecurrentReturnedAffineLaboratoryRest, ReturnedAffineLaboratoryRest,
+        StagedMembraneCultivation,
+    },
 };
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
@@ -299,9 +299,8 @@ fn return_phase(root: &Path) -> Result<(), String> {
         alp2_validation,
     )
     .map_err(display)?;
-    let predecessor =
-        ReturnedAffineLaboratoryAthenaRest::read_admitted_membrane(&alp2_wire, &admitted)
-            .map_err(display)?;
+    let predecessor = ReturnedAffineLaboratoryRest::read_admitted_membrane(&alp2_wire, &admitted)
+        .map_err(display)?;
     let predecessor_identity = predecessor.membrane_identity().to_owned();
     let (native_address, receiver) = continuing_native_address(&predecessor)?;
     let (left, shared) = receiver_cells(predecessor.membrane_affine_cells())?;
@@ -338,7 +337,7 @@ fn return_phase(root: &Path) -> Result<(), String> {
         .map_err(display)?
         .unit("alp3-native-acoustic-return-current")
         .map_err(display)?;
-    let mut membrane = AthenaCausalMembrane::mount(predecessor)
+    let mut membrane = NativeCausalMembrane::mount(predecessor)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()
@@ -357,7 +356,7 @@ fn return_phase(root: &Path) -> Result<(), String> {
             Vec::new(),
         )
         .map_err(|failure| format!("the acoustic formation binding refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(initial_return) =
+    let MembraneConsequence::Returned(initial_return) =
         membrane.receive_occurrence(bound).map_err(display)?
     else {
         return Err("the acoustic formation did not cross Athena's membrane".to_owned());
@@ -405,7 +404,7 @@ fn return_phase(root: &Path) -> Result<(), String> {
             Vec::new(),
         )
         .map_err(|failure| format!("the acoustic world return refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(world_return) =
+    let MembraneConsequence::Returned(world_return) =
         membrane.receive_occurrence(later).map_err(display)?
     else {
         return Err("the acoustic world consequence did not return".to_owned());
@@ -467,12 +466,12 @@ fn verify_conduct(root: &Path) -> Result<(), String> {
     let output = root.join(OUTPUT);
     let witness: ReturnWitness = read_json(&output.join("08-physical-return-witness.json"))?;
     let wire = fs::read(output.join("athena-acoustic-return-cultivated.rest")).map_err(display)?;
-    let successor = RecurrentReturnedAffineLaboratoryAthenaRest::read(&wire).map_err(display)?;
+    let successor = RecurrentReturnedAffineLaboratoryRest::read(&wire).map_err(display)?;
     let successor_remounted_exactly = successor.membrane_identity()
         == witness.successor_identity_sha256
         && sha(&wire) == witness.successor_wire_sha256;
     let (left, shared) = receiver_cells(successor.membrane_affine_cells())?;
-    let mut mounted = AthenaCausalMembrane::mount(successor)
+    let mut mounted = NativeCausalMembrane::mount(successor)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()
@@ -512,7 +511,7 @@ fn verify_inverse(root: &Path) -> Result<(), String> {
     let output = root.join(OUTPUT);
     let witness: ReturnWitness = read_json(&output.join("08-physical-return-witness.json"))?;
     let wire = fs::read(output.join("athena-acoustic-return-cultivated.rest")).map_err(display)?;
-    let successor = RecurrentReturnedAffineLaboratoryAthenaRest::read(&wire).map_err(display)?;
+    let successor = RecurrentReturnedAffineLaboratoryRest::read(&wire).map_err(display)?;
     let successor_identity = successor.identity().to_owned();
     let (predecessor, withdrawal) = successor
         .withdraw_latest_returned_difference()
@@ -521,7 +520,7 @@ fn verify_inverse(root: &Path) -> Result<(), String> {
     if !targeted {
         return Err("the acoustic return inverse did not recover ALP2".to_owned());
     }
-    let restored = RecurrentReturnedAffineLaboratoryAthenaRest::restore_latest_returned_difference(
+    let restored = RecurrentReturnedAffineLaboratoryRest::restore_latest_returned_difference(
         predecessor,
         withdrawal,
     )
@@ -564,8 +563,8 @@ fn verify_restoration_and_grade(root: &Path) -> Result<(), String> {
         field(&alp2, "complete_validation_receipt_sha256")?,
     )
     .map_err(display)?;
-    let predecessor = ReturnedAffineLaboratoryAthenaRest::read_admitted(&alp2_wire, &admitted)
-        .map_err(display)?;
+    let predecessor =
+        ReturnedAffineLaboratoryRest::read_admitted(&alp2_wire, &admitted).map_err(display)?;
     let alp2_optical_body_preserved_as_predecessor =
         predecessor.identity() == return_witness.predecessor_identity_sha256;
     let passed = formation.exact_sections_distinct
@@ -636,8 +635,8 @@ fn acoustic_receiver_current(
 }
 
 fn continuing_native_address(
-    rest: &impl AthenaMembraneStanding,
-) -> Result<(life::athena_native::NativeSectionAddress, ReceiverId), String> {
+    rest: &impl MembraneStanding,
+) -> Result<(life::native_intelligence::NativeSectionAddress, ReceiverId), String> {
     for address in &rest.membrane_realization().sections {
         let section = rest
             .membrane_ecology()
@@ -655,7 +654,7 @@ fn continuing_native_address(
 }
 
 fn receiver_cells(
-    sections: &[life::athena_native::LaboratoryCellAffineSection],
+    sections: &[life::native_intelligence::LaboratoryCellAffineSection],
 ) -> Result<(String, String), String> {
     let left = sections.first().ok_or("the affine organ has no cells")?;
     let support = left

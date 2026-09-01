@@ -8,11 +8,11 @@ use holonic_engine::{
     ExactComplexWaveCurrent,
 };
 use holonic_structure::CausalMembrane;
-use life::athena_native::{
+use life::native_intelligence::{
     AddressedMaterialOccurrence, AdmittedAffineLaboratoryRestWitness,
-    AdmittedReturnedAffineLaboratoryRestWitness, AffineLaboratoryCultivatedAthenaRest,
-    AthenaCausalMembrane, AthenaMembraneConsequence, ExactMembraneChartPassage,
-    ExteriorOccurrenceTransducer, MembraneCultivationReceipt, StagedMembraneCultivation,
+    AdmittedReturnedAffineLaboratoryRestWitness, AffineLaboratoryCultivatedRest,
+    ExactMembraneChartPassage, ExteriorOccurrenceTransducer, MembraneConsequence,
+    MembraneCultivationReceipt, NativeCausalMembrane, StagedMembraneCultivation,
 };
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
@@ -67,7 +67,7 @@ fn main() -> Result<(), String> {
         VALIDATION_RECEIPT_SHA256,
     )
     .map_err(display)?;
-    let rest = AffineLaboratoryCultivatedAthenaRest::read_admitted(
+    let rest = AffineLaboratoryCultivatedRest::read_admitted(
         &fs::read(root.join(REST)).map_err(display)?,
         &admitted,
     )
@@ -75,7 +75,7 @@ fn main() -> Result<(), String> {
     let predecessor_identity_sha256 = rest.identity().to_owned();
     let (native_address, receiver) = continuing_native_address(&rest)?;
     let (left, shared, unrelated) = receiver_cells(rest.affine_cells())?;
-    let mut membrane = AthenaCausalMembrane::mount(rest)
+    let mut membrane = NativeCausalMembrane::mount(rest)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()
@@ -108,7 +108,7 @@ fn main() -> Result<(), String> {
             Vec::new(),
         )
         .map_err(|failure| format!("initial binding refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(first_return) = membrane
+    let MembraneConsequence::Returned(first_return) = membrane
         .receive_occurrence(first_occurrence)
         .map_err(display)?
     else {
@@ -155,7 +155,7 @@ fn main() -> Result<(), String> {
             Vec::new(),
         )
         .map_err(|failure| format!("world-return binding refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(world_return) = membrane
+    let MembraneConsequence::Returned(world_return) = membrane
         .receive_occurrence(later_occurrence)
         .map_err(display)?
     else {
@@ -208,7 +208,7 @@ fn main() -> Result<(), String> {
     let later_conduct_changed =
         !equal_factor_sections && (!same_receiver_factor_addresses || !equal_factor_population);
     let successor =
-        life::athena_native::ReturnedAffineLaboratoryAthenaRest::restore_returned_difference(
+        life::native_intelligence::ReturnedAffineLaboratoryRest::restore_returned_difference(
             predecessor,
             targeted_withdrawal,
         )
@@ -220,7 +220,7 @@ fn main() -> Result<(), String> {
         successor.withdraw_returned_difference().map_err(display)?;
     let second_predecessor_exact = predecessor.identity() == predecessor_identity_sha256;
     let successor =
-        life::athena_native::ReturnedAffineLaboratoryAthenaRest::restore_returned_difference(
+        life::native_intelligence::ReturnedAffineLaboratoryRest::restore_returned_difference(
             predecessor,
             second_withdrawal,
         )
@@ -256,7 +256,7 @@ fn main() -> Result<(), String> {
     )
     .map_err(display)?;
     drop(successor);
-    let remounted = life::athena_native::ReturnedAffineLaboratoryAthenaRest::read_admitted(
+    let remounted = life::native_intelligence::ReturnedAffineLaboratoryRest::read_admitted(
         &successor_wire,
         &witness,
     )
@@ -333,8 +333,8 @@ fn main() -> Result<(), String> {
 }
 
 fn continuing_native_address(
-    rest: &AffineLaboratoryCultivatedAthenaRest,
-) -> Result<(life::athena_native::NativeSectionAddress, ReceiverId), String> {
+    rest: &AffineLaboratoryCultivatedRest,
+) -> Result<(life::native_intelligence::NativeSectionAddress, ReceiverId), String> {
     for address in &rest.body().realization().sections {
         let addressed = rest
             .body()
@@ -353,7 +353,7 @@ fn continuing_native_address(
 }
 
 fn receiver_cells(
-    cells: &[life::athena_native::LaboratoryCellAffineSection],
+    cells: &[life::native_intelligence::LaboratoryCellAffineSection],
 ) -> Result<(String, String, String), String> {
     let left = cells
         .first()

@@ -4,7 +4,7 @@ use std::process::{Command, Stdio};
 
 use holonic_engine::cuda_refine::{CudaRefineExecutor, DeviceFixedSectionFamilies};
 use life::mathematical_particle::{
-    FamilyCultivatedAthenaRest, FamilyInquiry, FamilyWorldReturn, FixedSectionPlate,
+    FamilyCultivatedEcologyRest, FamilyInquiry, FamilyWorldReturn, FixedSectionPlate,
     ProductionInquiryPresentation, ProductionReceiver,
 };
 use serde_json::{json, Value};
@@ -290,7 +290,7 @@ fn plate(
 }
 
 fn inquiry(
-    rest: &FamilyCultivatedAthenaRest,
+    rest: &FamilyCultivatedEcologyRest,
     predecessor: String,
     sections: Vec<Vec<i64>>,
     language: &str,

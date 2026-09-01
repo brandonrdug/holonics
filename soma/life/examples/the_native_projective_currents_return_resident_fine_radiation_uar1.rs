@@ -1,7 +1,7 @@
 use std::{error::Error, fs, path::PathBuf};
 
-use life::athena_native::{
-    transduce_source_neutral_exterior, SourceNeutralAthenaRest,
+use life::native_intelligence::{
+    transduce_source_neutral_exterior, SourceNeutralEcologyRest,
     SourceNeutralResidentRadiationSection,
 };
 use serde::Serialize;
@@ -56,7 +56,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let output = root.join(OUTPUT);
     fs::create_dir_all(&output)?;
     let rest_wire = fs::read(root.join(PREDECESSOR))?;
-    let rest = SourceNeutralAthenaRest::read(&rest_wire)?;
+    let rest = SourceNeutralEcologyRest::read(&rest_wire)?;
     let rested_identity_sha256 = rest.identity().to_owned();
     let acoustic_identity_sha256 = rest.acoustic().identity().to_owned();
     let optical_identity_sha256 = rest.optical().identity().to_owned();

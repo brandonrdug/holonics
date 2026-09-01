@@ -9,7 +9,6 @@ import ElementaryHolonics.Computation.HolonicInformationTheory
 import ElementaryHolonics.Computation.HolonicAdjointNormalization
 import ElementaryHolonics.Computation.HolonicArchitectureCharts
 import ElementaryHolonics.Computation.HolonicDiffusionCharts
-import ElementaryHolonics.Computation.ErosAthenaNeuralObjects
 import ElementaryHolonics.Computation.HolonicCultivationCharts
 import ElementaryHolonics.Computation.HolonicIntelligenceFramework
 

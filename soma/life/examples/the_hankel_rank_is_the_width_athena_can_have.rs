@@ -25,7 +25,7 @@ use std::collections::BTreeSet;
 
 use body::num::Cog;
 use life::causal_language::{
-    CausalLanguageEcology, CausalLanguagePassage, lexical_tokens, token_germs_public,
+    lexical_tokens, token_germs_public, CausalLanguageEcology, CausalLanguagePassage,
 };
 use life::suffix_ecology::ExactSuffixEcology;
 use soma_abi::active::ActionCurrent;

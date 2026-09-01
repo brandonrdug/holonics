@@ -10,10 +10,10 @@ use std::{
     time::Instant,
 };
 
-use life::athena_native::{
-    NativeConductConsequence, NativeEcologyRest, CompleteExchangeCultivationCover,
-    CultivatedAthenaConsequence, CultivatedAthenaPassage, CultivatedAthenaRest,
-    NativeCultivatedPotentialCoordinate, WithdrawnNativeFactor,
+use life::native_intelligence::{
+    CompleteExchangeCultivationCover, CultivatedConductConsequence, CultivatedConductPassage,
+    CultivatedEcologyRest, NativeConductConsequence, NativeCultivatedPotentialCoordinate,
+    NativeEcologyRest, WithdrawnNativeFactor,
 };
 use serde::Serialize;
 use serde_json::{json, Value};
@@ -54,7 +54,7 @@ fn found() -> Result<(), String> {
     let predecessor =
         NativeEcologyRest::read(&fs::read(K3_REST).map_err(display)?).map_err(display)?;
     let cover = CompleteExchangeCultivationCover::read(&fs::read(H2N_COVER).map_err(display)?)?;
-    let cultivated = CultivatedAthenaRest::cultivate(predecessor, cover).map_err(display)?;
+    let cultivated = CultivatedEcologyRest::cultivate(predecessor, cover).map_err(display)?;
     let rest_bytes = cultivated.canonical_bytes().map_err(display)?;
     fs::write(output.join("athena-cultivated.rest"), &rest_bytes).map_err(display)?;
     drop(cultivated);
@@ -82,7 +82,7 @@ fn detached(output: &Path) -> Result<(), String> {
     }
     let started = Instant::now();
     let full_rest_bytes = fs::read(output.join("athena-cultivated.rest")).map_err(display)?;
-    let full_rest = CultivatedAthenaRest::read(&full_rest_bytes).map_err(display)?;
+    let full_rest = CultivatedEcologyRest::read(&full_rest_bytes).map_err(display)?;
     let full_identity = full_rest.identity().to_owned();
     let ingress = full_rest
         .predecessor()
@@ -157,7 +157,7 @@ fn detached(output: &Path) -> Result<(), String> {
     drop(ablated);
     drop(withdrawn);
 
-    let mut ablated_resident = CultivatedAthenaRest::read(&ablated_rest_bytes)
+    let mut ablated_resident = CultivatedEcologyRest::read(&ablated_rest_bytes)
         .map_err(display)?
         .mount()
         .map_err(display)?;
@@ -183,7 +183,7 @@ fn detached(output: &Path) -> Result<(), String> {
         &restored_rest_bytes,
     )
     .map_err(display)?;
-    let mut restored_resident = CultivatedAthenaRest::read(&restored_rest_bytes)
+    let mut restored_resident = CultivatedEcologyRest::read(&restored_rest_bytes)
         .map_err(display)?
         .mount()
         .map_err(display)?;
@@ -359,7 +359,7 @@ fn detached(output: &Path) -> Result<(), String> {
 }
 
 fn coordinate_map<'a>(
-    passage: &'a CultivatedAthenaPassage,
+    passage: &'a CultivatedConductPassage,
 ) -> Result<BTreeMap<&'a str, &'a NativeCultivatedPotentialCoordinate>, String> {
     let map = passage
         .potential_complex
@@ -373,7 +373,7 @@ fn coordinate_map<'a>(
     Ok(map)
 }
 
-fn resident_exact(passage: &CultivatedAthenaPassage) -> bool {
+fn resident_exact(passage: &CultivatedConductPassage) -> bool {
     passage.resident_return.device.contains("NVIDIA")
         && passage.resident_return.launches == 1
         && passage.resident_return.synchronizations == 1
@@ -398,7 +398,7 @@ fn resident_exact(passage: &CultivatedAthenaPassage) -> bool {
 
 fn returned(
     consequence: NativeConductConsequence,
-) -> Result<life::athena_native::NativeConductPassage, String> {
+) -> Result<life::native_intelligence::NativeConductPassage, String> {
     match consequence {
         NativeConductConsequence::Returned(passage) => Ok(passage),
         NativeConductConsequence::Insufficient(insufficiency) => {
@@ -408,11 +408,11 @@ fn returned(
 }
 
 fn cultivated_return(
-    consequence: CultivatedAthenaConsequence,
-) -> Result<CultivatedAthenaPassage, String> {
+    consequence: CultivatedConductConsequence,
+) -> Result<CultivatedConductPassage, String> {
     match consequence {
-        CultivatedAthenaConsequence::Returned(passage) => Ok(passage),
-        CultivatedAthenaConsequence::Insufficient(insufficiency) => {
+        CultivatedConductConsequence::Returned(passage) => Ok(passage),
+        CultivatedConductConsequence::Insufficient(insufficiency) => {
             Err(format!("cultivated control returned {insufficiency:?}"))
         }
     }

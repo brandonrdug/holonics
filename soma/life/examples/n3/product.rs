@@ -6,7 +6,7 @@ use std::{
 };
 
 use holonic_engine::cuda_refine::CudaRefineExecutor;
-use life::mathematical_particle::{NativeCodec, NativeHexisAthenaRest, NativeSuccessorHistory};
+use life::mathematical_particle::{NativeCodec, NativeHexisRest, NativeSuccessorHistory};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
@@ -82,7 +82,7 @@ pub fn construct(root: &Path, out: &Path) -> Result<(), String> {
     let predecessor_standing = artifact::read(predecessor_directory.join("standing.bin"))?;
     let predecessor_decoder = artifact::read(predecessor_directory.join("decoder.bin"))?;
     let predecessor_fibres = artifact::read(predecessor_directory.join("fibres.bin"))?;
-    let predecessor = NativeHexisAthenaRest::read(
+    let predecessor = NativeHexisRest::read(
         &predecessor_standing,
         &predecessor_decoder,
         &predecessor_fibres,

@@ -1,5 +1,5 @@
 import ElementaryHolonics.Computation.DependentMachineLearningCarrier
-import ElementaryHolonics.Millennium.AthenaReceiverHistory
+import ElementaryHolonics.Millennium.ReceiverHistory
 import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 
 /-!

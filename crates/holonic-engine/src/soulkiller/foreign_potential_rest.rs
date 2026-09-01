@@ -386,7 +386,7 @@ impl ForeignPotentialComplexRest {
         let (lower, upper) = self.cultivated_receiver_incidence()?;
         let resident = ResidentIntervalPotentialReceiver::mount(
             card,
-            "athena-alpha/terminal-potential-receiver",
+            "native/terminal-potential-receiver",
             self.receiver_rows.len(),
             self.history_addresses.len(),
             &self.receiver_rows,

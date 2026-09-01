@@ -43,9 +43,8 @@ pub use cuda_executor::CudaRefineExecutor;
 mod partition_refinement;
 pub use partition_refinement::{DeviceCorpus, ReadingIdentities};
 
-mod affine_barycentric_transport;
 mod addressed_complex_junction;
-mod athena_integrated_front;
+mod affine_barycentric_transport;
 mod complex_parametron;
 mod cuda_driver;
 mod device_contact;
@@ -54,6 +53,7 @@ mod device_fixed_sections;
 mod device_inference_world;
 mod device_media;
 mod device_recurrence;
+mod integrated_front;
 mod interval_potential;
 mod membrane_addressed_current;
 mod membrane_boundary_interval;
@@ -92,16 +92,12 @@ mod participant_causal_front;
 mod tests;
 mod trace_config;
 use crate::is_sha256_digest as is_digest;
-pub use affine_barycentric_transport::{
-    ResidentAffineBarycentricTransport, ResidentAffineBarycentricTransportReturn,
-};
 pub use addressed_complex_junction::{
     ResidentAddressedComplexJunctionGroup, ResidentAddressedComplexJunctionReturn,
     ResidentAddressedComplexJunctionTerm,
 };
-pub use athena_integrated_front::{
-    ResidentAthenaIntegratedFront, ResidentAthenaIntegratedReturn,
-    ResidentSituatedCurrentCausalFrontReturn,
+pub use affine_barycentric_transport::{
+    ResidentAffineBarycentricTransport, ResidentAffineBarycentricTransportReturn,
 };
 #[cfg(test)]
 use complex_parametron::derive_coupled_limb_chart;
@@ -111,10 +107,9 @@ pub use complex_parametron::{
     ResidentCoupledComplexParametronReturn, ResidentNativeWord, ResidentNativeWordReturn,
 };
 use complex_parametron::{
-    common_complex_denominator, common_real_denominator, decode_component,
-    decode_signed_magnitude, derive_word_prime_family, derive_word_prime_rank_witness,
-    encode_component, encode_integer, encode_integral_form_factors,
-    factored_moment_section_identity, lcm_positive,
+    common_complex_denominator, common_real_denominator, decode_component, decode_signed_magnitude,
+    derive_word_prime_family, derive_word_prime_rank_witness, encode_component, encode_integer,
+    encode_integral_form_factors, factored_moment_section_identity, lcm_positive,
 };
 pub use device_ecology_types::{
     DeviceCondensedRecurrences, DeviceContactPassage, DeviceDynamicMorphology,
@@ -123,6 +118,10 @@ pub use device_ecology_types::{
     DeviceNativeFixedSectionFamilies, DeviceNativeTrace, DeviceOpticalIncidencePassage,
     DeviceProductionAperture, DeviceQuadraticSectionTransport, DeviceRaggedNativeTrace,
     DeviceReturnedRecurrences, DeviceSaturation, Quotient, QuotientCarrier, quotient_on_cpu,
+};
+pub use integrated_front::{
+    ResidentIntegratedFront, ResidentIntegratedFrontReturn,
+    ResidentSituatedCurrentCausalFrontReturn,
 };
 pub use interval_potential::{ResidentIntervalPotentialReceiver, ResidentIntervalPotentialReturn};
 use membrane_boundary_plan::BoundaryCompletionPlan;

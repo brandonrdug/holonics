@@ -902,7 +902,7 @@ fn stations() {
         (
             "seal",
             "unwired",
-            "ErosRest over the whole body, with its three controls",
+            "one move-owned ecology rest over the whole body, with its three controls",
         ),
         (
             "resume",

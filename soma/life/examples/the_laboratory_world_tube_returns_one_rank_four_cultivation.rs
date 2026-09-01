@@ -20,14 +20,14 @@ use holonic_engine::{
     EventId, ExactComplexWaveCurrent, ExactRatMatrix, OccurrencePort,
 };
 use life::{
-    athena_native::{
-        AddressedMaterialOccurrence, CausalOperationWorldReturn, CausalResultCell,
-        ExteriorWorldReturnTestimony, LaboratoryCultivatedAthenaRest,
-        MaterialFactorizationAperture, MaterialFactorizationStanding, MaterialNativeFactorization,
-        NativeConductedSection, NativeSectionAddress, SituatedCultivatedAthenaRest,
-        SituatedDifferenceInput, SituatedDifferenceSection,
-    },
     exchange_world_tube::ContinuationAperture,
+    native_intelligence::{
+        AddressedMaterialOccurrence, CausalOperationWorldReturn, CausalResultCell,
+        ExteriorWorldReturnTestimony, LaboratoryCultivatedRest, MaterialFactorizationAperture,
+        MaterialFactorizationStanding, MaterialNativeFactorization, NativeConductedSection,
+        NativeSectionAddress, SituatedCultivatedEcologyRest, SituatedDifferenceInput,
+        SituatedDifferenceSection,
+    },
 };
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
@@ -106,7 +106,7 @@ fn found() -> Result<(), String> {
     write_json(output.join("00-complete-laboratory-mount.json"), &mount)?;
 
     let l2_bytes = fs::read(L2_REST).map_err(display)?;
-    let predecessor = SituatedCultivatedAthenaRest::read(&l2_bytes).map_err(display)?;
+    let predecessor = SituatedCultivatedEcologyRest::read(&l2_bytes).map_err(display)?;
     let predecessor_identity = predecessor.identity().to_owned();
     let predecessor_return = predecessor
         .mount()
@@ -114,7 +114,7 @@ fn found() -> Result<(), String> {
         .conduct()
         .map_err(display)?;
 
-    let predecessor = SituatedCultivatedAthenaRest::read(&l2_bytes).map_err(display)?;
+    let predecessor = SituatedCultivatedEcologyRest::read(&l2_bytes).map_err(display)?;
     let material_factorizations = factor_cross_codec_material(&predecessor)?;
     let common_operation = material_factorizations
         .first()
@@ -168,7 +168,7 @@ fn found() -> Result<(), String> {
     // Target/name controls are founded only after cultivation.  The constructor has no such
     // input.  Repeating the same caused return beside differently named later controls must yield
     // byte-identical rest.
-    let control_predecessor = SituatedCultivatedAthenaRest::read(&l2_bytes).map_err(display)?;
+    let control_predecessor = SituatedCultivatedEcologyRest::read(&l2_bytes).map_err(display)?;
     let control_rest = control_predecessor
         .deposit_returned_difference(difference)
         .map_err(display)?;
@@ -203,17 +203,16 @@ fn found() -> Result<(), String> {
 
     // Targeted withdrawal returns the exact L2 type state.  Its conduct lacks the new primary and
     // all five incident symmetric terms; restoration consumes the moved deposit and recovers wire.
-    let rest = LaboratoryCultivatedAthenaRest::read(&rest_bytes).map_err(display)?;
+    let rest = LaboratoryCultivatedRest::read(&rest_bytes).map_err(display)?;
     let (predecessor, withdrawal) = rest.withdraw_returned_difference().map_err(display)?;
     let ablated_return = predecessor
         .mount()
         .map_err(display)?
         .conduct()
         .map_err(display)?;
-    let predecessor = SituatedCultivatedAthenaRest::read(&l2_bytes).map_err(display)?;
-    let restored =
-        LaboratoryCultivatedAthenaRest::restore_returned_difference(predecessor, withdrawal)
-            .map_err(display)?;
+    let predecessor = SituatedCultivatedEcologyRest::read(&l2_bytes).map_err(display)?;
+    let restored = LaboratoryCultivatedRest::restore_returned_difference(predecessor, withdrawal)
+        .map_err(display)?;
     let restored_bytes = restored.canonical_bytes().map_err(display)?;
     let mut restored_resident = restored.mount().map_err(display)?;
     let restored_return = restored_resident.conduct().map_err(display)?;
@@ -333,7 +332,7 @@ fn found() -> Result<(), String> {
 
 fn detached(rest_path: &Path, output_path: &Path) -> Result<(), String> {
     let rest_bytes = fs::read(rest_path).map_err(display)?;
-    let rest = LaboratoryCultivatedAthenaRest::read(&rest_bytes).map_err(display)?;
+    let rest = LaboratoryCultivatedRest::read(&rest_bytes).map_err(display)?;
     let identity = rest.identity().to_owned();
     let returned_thread = rest.returned_deposit().thread_address.clone();
     let mut resident = rest.mount().map_err(display)?;
@@ -532,7 +531,7 @@ fn independent_product_return(
 }
 
 fn returned_difference(
-    rest: &SituatedCultivatedAthenaRest,
+    rest: &SituatedCultivatedEcologyRest,
     winding: Vec<Rat>,
 ) -> Result<SituatedDifferenceSection, String> {
     let branch = rest
@@ -702,7 +701,7 @@ fn returned_difference(
         target_chart: ExactRatMatrix::identity(4).map_err(display)?,
         candidate_coordinates: vec![q(0), q(0), q(0), q(0)],
         returned_coordinates: winding.clone(),
-        adjoint_steps: vec![life::athena_native::CausalAdjointStepInput {
+        adjoint_steps: vec![life::native_intelligence::CausalAdjointStepInput {
             name: "complete-laboratory-return-through-standing-winding-chart".to_owned(),
             forward: ExactRatMatrix::identity(4).map_err(display)?,
             domain_metric: metric.clone(),
@@ -755,7 +754,7 @@ fn observation(
 }
 
 fn fresh_event(
-    rest: &SituatedCultivatedAthenaRest,
+    rest: &SituatedCultivatedEcologyRest,
     winding: &[Rat],
     hand: &[u8],
     distinct_from: Option<EventId>,

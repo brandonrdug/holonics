@@ -36,7 +36,7 @@
 
 use std::path::{Path, PathBuf};
 
-use body::manifold::{atom_node, ErosBody, ENCLOSURE_WORDS};
+use body::manifold::{atom_node, ContinuingBody, ENCLOSURE_WORDS};
 
 const AXIS: i64 = 1 << 8;
 const SEED: &[u8] = b"the thoughts are returned as text";
@@ -104,7 +104,7 @@ fn segment(material: &[u8], grain: usize) -> (Vec<Thought>, usize, Totals) {
         at_capacity: 0,
     };
 
-    let mut eyes = ErosBody::over(&standing, &mut own, AXIS, SEED, 1 << 20, &mut carrier);
+    let mut eyes = ContinuingBody::over(&standing, &mut own, AXIS, SEED, 1 << 20, &mut carrier);
 
     if grain == 0 {
         for (at, pair) in material.windows(2).enumerate() {

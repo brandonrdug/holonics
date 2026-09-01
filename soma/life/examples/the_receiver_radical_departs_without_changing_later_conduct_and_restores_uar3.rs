@@ -1,6 +1,6 @@
 use std::{env, error::Error, fs, path::PathBuf, time::Instant};
 
-use life::athena_native::{transduce_source_neutral_exterior, SourceNeutralAthenaRest};
+use life::native_intelligence::{transduce_source_neutral_exterior, SourceNeutralEcologyRest};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -85,7 +85,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         return verify_existing_restoration(&root, &output);
     }
 
-    let child = SourceNeutralAthenaRest::read(&fs::read(root.join(CHILD))?)?;
+    let child = SourceNeutralEcologyRest::read(&fs::read(root.join(CHILD))?)?;
     let child_rest_identity_sha256 = child.identity().to_owned();
     let d1: serde_json::Value = serde_json::from_slice(&fs::read(root.join(D1_RECEIPT))?)?;
     let selected_reconstruction_fibre_address = d1
@@ -213,7 +213,7 @@ fn verify_existing_restoration(root: &PathBuf, output: &PathBuf) -> Result<(), B
     {
         return Err("the detached UAR3-D3 verifier received an invalid radical stage".into());
     }
-    let restored = SourceNeutralAthenaRest::read(&fs::read(root.join(CHILD))?)?;
+    let restored = SourceNeutralEcologyRest::read(&fs::read(root.join(CHILD))?)?;
     if restored.identity() != stage.exact_restoration_identity_sha256
         || restored.identity() != stage.child_rest_identity_sha256
     {
@@ -299,7 +299,7 @@ fn verify_existing_restoration(root: &PathBuf, output: &PathBuf) -> Result<(), B
 }
 
 fn native_consequence_value(
-    section: &life::athena_native::SourceNeutralResidentRadiationSection,
+    section: &life::native_intelligence::SourceNeutralResidentRadiationSection,
 ) -> Value {
     serde_json::json!({
         "ingress_current_identity_sha256": section.ingress_current_identity_sha256,

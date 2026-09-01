@@ -4,7 +4,7 @@ use std::process::{Command, Stdio};
 
 use holonic_engine::cuda_refine::{CudaRefineExecutor, DeviceNativeFixedSectionFamilies};
 use life::mathematical_particle::{
-    NativeHexisAthenaRest, NativeSuccessorHistory, NativeTerrainAthenaRest, NativeTerrainInquiry,
+    NativeHexisRest, NativeSuccessorHistory, NativeTerrainInquiry, NativeTerrainRest,
     NativeTerrainWorldReturn, ProductionInquiryPresentation, ProductionReceiver,
 };
 use serde_json::{json, Value};
@@ -79,7 +79,7 @@ pub fn construct(root: &Path) -> Result<(), String> {
             .as_bytes()
         )
     );
-    let terrain = NativeTerrainAthenaRest::cultivate(
+    let terrain = NativeTerrainRest::cultivate(
         predecessor,
         NativeTerrainWorldReturn {
             occurrence,
@@ -213,7 +213,7 @@ pub fn construct(root: &Path) -> Result<(), String> {
         return Err("the L3 later/ablation family moved outside its exact aperture".to_owned());
     }
 
-    let reopened_for_withdrawal = NativeTerrainAthenaRest::read(
+    let reopened_for_withdrawal = NativeTerrainRest::read(
         &rest::read(&standing)?,
         &rest::read(&decoder)?,
         &rest::read(&fibres)?,
@@ -309,7 +309,7 @@ pub fn construct(root: &Path) -> Result<(), String> {
 }
 
 fn provisional_development(
-    predecessor: &NativeHexisAthenaRest,
+    predecessor: &NativeHexisRest,
 ) -> Result<DeviceNativeFixedSectionFamilies, String> {
     let mut card = CudaRefineExecutor::new().map_err(|error| error.to_string())?;
     card.conduct_native_fixed_section_families_on_device(
@@ -327,7 +327,7 @@ fn development_proof() -> &'static str {
 }
 
 fn inquiry(
-    terrain: &NativeTerrainAthenaRest,
+    terrain: &NativeTerrainRest,
     sections: &[i64],
     history: &[String],
     revisited: Vec<NativeSuccessorHistory>,
@@ -474,7 +474,7 @@ fn device_json(returned: &DeviceNativeFixedSectionFamilies) -> Value {
 }
 
 fn grade(
-    terrain: &NativeTerrainAthenaRest,
+    terrain: &NativeTerrainRest,
     heldout: &Value,
     carrier: &Value,
     ablated: &Value,

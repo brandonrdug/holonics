@@ -11,7 +11,7 @@
 //! counts are noise, the content discriminates.
 #![cfg(test)]
 
-use crate::manifold::{locate, ErosBody, TermCounts};
+use crate::manifold::{locate, ContinuingBody, TermCounts};
 use crate::medium::{RegionalForm, FORM_WORDS};
 
 const AXIS: i64 = 1 << 11; // 4M cells — the real-diet scale needs spread (the W3 collision finding, live)
@@ -93,7 +93,7 @@ fn ingest(
 ) -> (TermCounts, TermCounts, std::vec::Vec<bool>) {
     let dictionary_terms = {
         let mut carrier = std::vec![0u32; 8 * crate::manifold::ENCLOSURE_WORDS];
-        let mut eyes = ErosBody::over(standing, own, AXIS, b" d", 1 << 20, &mut carrier);
+        let mut eyes = ContinuingBody::over(standing, own, AXIS, b" d", 1 << 20, &mut carrier);
         for &w in dict_stream {
             eyes.perceive(w, 100);
         }
@@ -104,7 +104,7 @@ fn ingest(
     own.fill(0);
 
     let mut carrier = std::vec![0u32; 8 * crate::manifold::ENCLOSURE_WORDS];
-    let mut eyes = ErosBody::over(standing, own, AXIS, b" u", 1 << 20, &mut carrier);
+    let mut eyes = ContinuingBody::over(standing, own, AXIS, b" u", 1 << 20, &mut carrier);
     let cuts: std::vec::Vec<bool> = usage
         .iter()
         .map(|&w| eyes.perceive(w, 100).thought_completed)

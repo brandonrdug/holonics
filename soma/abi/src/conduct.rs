@@ -5,7 +5,7 @@
 //! reports every accepted body deed through a caller-owned output target.  Allocation, launch
 //! shape, journal storage, directed-incidence indexing, and world interpretation remain outside.
 
-use body::manifold::{AtomEvent, ErosBody, FeltEmission, FeltEmissionTarget};
+use body::manifold::{AtomEvent, ContinuingBody, FeltEmission, FeltEmissionTarget};
 use body::num::Cog;
 
 use crate::active::{relation_span_node, ValidationError, View};
@@ -51,7 +51,11 @@ pub trait ConductTarget {
 
     fn begin_current(&mut self, current: u64, event_offset: u64) -> Result<(), Self::Error>;
 
-    fn before_event(&mut self, event: u64, body: &mut ErosBody<'_>) -> Result<(), Self::Error>;
+    fn before_event(
+        &mut self,
+        event: u64,
+        body: &mut ContinuingBody<'_>,
+    ) -> Result<(), Self::Error>;
 
     fn emit(
         &mut self,
@@ -106,7 +110,7 @@ fn add_count<E>(slot: &mut u64, value: u64) -> Result<(), ConductError<E>> {
 pub fn conduct_current<T: ConductTarget>(
     active: &View<'_>,
     current_ordinal: u64,
-    body: &mut ErosBody<'_>,
+    body: &mut ContinuingBody<'_>,
     target: &mut T,
 ) -> Result<CurrentConduct, ConductError<T::Error>> {
     active.validate().map_err(ConductError::Structural)?;

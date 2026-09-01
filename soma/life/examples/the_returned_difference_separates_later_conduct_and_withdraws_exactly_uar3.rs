@@ -1,6 +1,6 @@
 use std::{collections::BTreeSet, env, error::Error, fs, path::PathBuf, time::Instant};
 
-use life::athena_native::{transduce_source_neutral_exterior, SourceNeutralAthenaRest};
+use life::native_intelligence::{transduce_source_neutral_exterior, SourceNeutralEcologyRest};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -76,7 +76,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .and_then(Value::as_str)
         .ok_or("the UAR0 audit lost its successor identity")?
         .to_owned();
-    let child = SourceNeutralAthenaRest::read(&fs::read(root.join(CHILD))?)?;
+    let child = SourceNeutralEcologyRest::read(&fs::read(root.join(CHILD))?)?;
     let child_rest_identity_sha256 = child.identity().to_owned();
     let (parent, targeted_withdrawal) = child.withdraw_latest_returned_difference()?;
     let parent_rest_identity_sha256 = parent.identity().to_owned();
@@ -104,7 +104,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         started.elapsed().as_millis()
     );
 
-    let child = SourceNeutralAthenaRest::restore_returned_difference(parent, targeted_withdrawal)?;
+    let child = SourceNeutralEcologyRest::restore_returned_difference(parent, targeted_withdrawal)?;
     let targeted_restoration_successor_identity_sha256 = child.identity().to_owned();
     let targeted_restoration_recovers_exact_child =
         targeted_restoration_successor_identity_sha256 == child_rest_identity_sha256;
@@ -156,7 +156,7 @@ fn verify_existing_child(root: &PathBuf, output: &PathBuf) -> Result<(), Box<dyn
     {
         return Err("the detached UAR3-D3 verifier received an invalid parent stage".into());
     }
-    let child = SourceNeutralAthenaRest::read(&fs::read(root.join(CHILD))?)?;
+    let child = SourceNeutralEcologyRest::read(&fs::read(root.join(CHILD))?)?;
     if child.identity() != stage.child_rest_identity_sha256 {
         return Err("the detached UAR3-D3 verifier received a different child".into());
     }
@@ -229,7 +229,7 @@ fn verify_existing_child(root: &PathBuf, output: &PathBuf) -> Result<(), Box<dyn
 }
 
 fn native_consequence_value(
-    section: &life::athena_native::SourceNeutralResidentRadiationSection,
+    section: &life::native_intelligence::SourceNeutralResidentRadiationSection,
 ) -> Result<Value, Box<dyn Error>> {
     Ok(serde_json::json!({
         "ingress_current_identity_sha256": section.ingress_current_identity_sha256,

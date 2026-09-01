@@ -147,7 +147,7 @@ pub struct NativeHexisInquiry {
 /// L2 replaces the cultivated source shape with a local generator-native rest.  It deliberately
 /// owns no L1 source body and is neither `Clone` nor an inverse of its quotient.
 #[derive(Debug, PartialEq, Eq)]
-pub struct NativeHexisAthenaRest {
+pub struct NativeHexisRest {
     pub(super) standing: NativeHexisStanding,
     pub(super) decoder: NativeHexisDecoder,
     pub(super) reconstruction: NativeHexisReconstruction,

@@ -21,7 +21,7 @@ use holonic_engine::algebraic::{
     CausalCellId, CausalChain, ComparativeMultiplicity, GradedCausalComplex,
 };
 use holonic_engine::causal::EventId;
-use holonic_engine::conditioned_derivation::{ConditionedBody, expose};
+use holonic_engine::conditioned_derivation::{expose, ConditionedBody};
 use holonic_engine::graded_complex_form::encode_native_bytes;
 use life::conditioned_rest::ConditionedRest;
 use life::holonic_training::{FaceAddress, SourceFace, TrainingEcology};
@@ -33,16 +33,16 @@ use soma_membrane::{
 
 use crate::census::Census;
 use crate::deed::DEED_HEAD_OCTETS;
-use crate::plate::{self, HEAD_OCTETS, PlateRefusal, SEAL_OCTETS, SchemaTag};
+use crate::plate::{self, PlateRefusal, SchemaTag, HEAD_OCTETS, SEAL_OCTETS};
 use crate::registry::{deposit, inspect, redeposit, resume};
-use crate::schema::{LitBody, PlateSchema, ResumeRefusal, present_and_require_change};
+use crate::schema::{present_and_require_change, LitBody, PlateSchema, ResumeRefusal};
 use crate::schemas::conditioned::{CONDITIONED_SCHEMA_VERSION, CONDITIONED_TAG};
-use crate::schemas::current::{CURRENT_SCHEMA_VERSION, CURRENT_TAG, CurrentDeed};
+use crate::schemas::current::{CurrentDeed, CURRENT_SCHEMA_VERSION, CURRENT_TAG};
 use crate::schemas::rebase::{
-    BoundaryTerm, REBASE_SCHEMA_VERSION, REBASE_TAG, RebaseBody, RebaseDeed, decode_euler,
-    encode_euler,
+    decode_euler, encode_euler, BoundaryTerm, RebaseBody, RebaseDeed, REBASE_SCHEMA_VERSION,
+    REBASE_TAG,
 };
-use crate::schemas::training::{TRAINING_SCHEMA_VERSION, TRAINING_TAG, TrainingDeed};
+use crate::schemas::training::{TrainingDeed, TRAINING_SCHEMA_VERSION, TRAINING_TAG};
 
 // ---------------------------------------------------------------------------------------------
 // two real bodies, driven by their own machines, no fixtures
@@ -591,11 +591,9 @@ fn an_unheld_schema_refuses_rather_than_guessing() {
 
     // The form is a real, mountable HTEC form. A reader that guessed would succeed here, which is
     // exactly the failure being refused.
-    assert!(
-        crate::schemas::training::TrainingSchema
-            .relight(&form)
-            .is_ok()
-    );
+    assert!(crate::schemas::training::TrainingSchema
+        .relight(&form)
+        .is_ok());
 
     let refusal = resume(&plate).expect_err("an unheld schema must refuse");
     let ResumeRefusal::SchemaUnheld { tag, version, held } = &refusal else {
@@ -866,11 +864,9 @@ fn an_inert_body_that_changes_nothing_is_refused() {
     };
     assert_eq!(*deed_octets, training_deed().len());
     assert_eq!(*form_octets, inert.form.len());
-    assert!(
-        refusal
-            .to_string()
-            .contains("a law that returns zero proves nothing about itself")
-    );
+    assert!(refusal
+        .to_string()
+        .contains("a law that returns zero proves nothing about itself"));
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1030,13 +1026,12 @@ fn the_torsion_reading_is_provably_nonzero_and_comes_back_whole() {
         field(&flat.census().expect("a reading"), "torsion_factors"),
         0
     );
-    assert!(
-        flat.reading()
-            .expect("a reading")
-            .invariants
-            .total_torsion()
-            .is_empty()
-    );
+    assert!(flat
+        .reading()
+        .expect("a reading")
+        .invariants
+        .total_torsion()
+        .is_empty());
 }
 
 /// `i64 -> u64` is a declared bijection, never a cast.
@@ -1464,7 +1459,7 @@ fn the_three_rule_cross_check_runs_over_three_genuinely_different_pivot_walks() 
 /// the agreement independently rather than trusting the schema's own loop.
 #[test]
 fn the_pivot_rule_does_not_reach_the_rbin_census() {
-    use holonic_engine::rebase_invariants::{PivotRule, invariants_agree, rebase_invariants};
+    use holonic_engine::rebase_invariants::{invariants_agree, rebase_invariants, PivotRule};
 
     for complex in [
         hollow_triangle(),

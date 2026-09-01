@@ -92,7 +92,7 @@ pub fn decode_low_precision(
         other => {
             return Err(ExactLowPrecisionError::Unsupported(
                 other.declared().to_owned(),
-            ))
+            ));
         }
     };
     Ok(ExactLowPrecisionDatum {

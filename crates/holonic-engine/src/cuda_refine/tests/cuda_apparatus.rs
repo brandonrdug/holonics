@@ -277,7 +277,7 @@ fn the_coupled_limb_chart_derives_only_the_carry_width_the_exact_sum_requires() 
 #[ignore = "requires the RTX CUDA device"]
 fn the_integrated_athena_front_keeps_three_leaf_laws_on_one_context() {
     let card = CudaRefineExecutor::new().expect("the card mounts once");
-    let integrated = ResidentAthenaIntegratedFront::mount(
+    let integrated = ResidentIntegratedFront::mount(
         card,
         "test/integrated-athena",
         CausalAdjointPulledIncidence::found(vec![vec![1, 0], vec![0, 1]])

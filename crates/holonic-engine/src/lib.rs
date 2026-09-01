@@ -67,7 +67,6 @@ pub mod atmospheric_inverse;
 // ATHENA -- the chart transition from a holonic atlas to a tensor container. The suffix-link tree
 // labels by depth-first interval, containment becomes the light-cone order of 1+1 Minkowski space,
 // and every emitted float carries the exact rational residual its rounding cost.
-pub mod athena;
 pub mod basin;
 pub mod bit_causal;
 pub mod category;
@@ -376,7 +375,6 @@ pub mod native_anatomical_potential;
 pub mod native_anatomy;
 /// Source-neutral native recurrence, receiver condensation, and conserved ecology junctions.
 pub mod native_ecology;
-pub mod native_law;
 pub mod native_occurrence;
 pub mod native_rest;
 /// Source-neutral addressed threads, reusable generator spools, and exact receiver insufficiency.

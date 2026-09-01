@@ -5,15 +5,15 @@ use holonic_engine::{
     generator_native_rest::GeneratorNativeRest,
     receiver_history_cultivation::CultivatedReceiverHistoryRest,
 };
-use life::mathematical_particle::{LaboratoryAthenaRest, ProductionAthenaRest};
+use life::mathematical_particle::{LaboratoryProductionRest, ProductionEcologyRest};
 
 use super::source;
 
 pub const OUTPUT_NAME: &str = "the_laboratory_chronology_cultivates_the_athena_mathematics_ecology";
 
-pub fn found(root: &Path) -> Result<LaboratoryAthenaRest, String> {
+pub fn found(root: &Path) -> Result<LaboratoryProductionRest, String> {
     let r6 = root.join("output/the_bounded_athena_mathematics_physics_ecology_freezes/native-rest");
-    let production = ProductionAthenaRest::read(
+    let production = ProductionEcologyRest::read(
         &read(r6.join("standing.bin"))?,
         &read(r6.join("decoder.bin"))?,
         &read(r6.join("fibres.bin"))?,
@@ -30,7 +30,7 @@ pub fn found(root: &Path) -> Result<LaboratoryAthenaRest, String> {
         serde_json::from_slice(&cultivated_bytes).map_err(|error| error.to_string())?;
     CultivatedReceiverHistoryRest::mount(&cultivated_bytes, &native_bytes)
         .map_err(|error| error.to_string())?;
-    LaboratoryAthenaRest::found(
+    LaboratoryProductionRest::found(
         production,
         native,
         cultivated_history,
@@ -41,7 +41,7 @@ pub fn found(root: &Path) -> Result<LaboratoryAthenaRest, String> {
 }
 
 pub fn write(
-    rest: &LaboratoryAthenaRest,
+    rest: &LaboratoryProductionRest,
     directory: &Path,
 ) -> Result<(PathBuf, PathBuf, PathBuf), String> {
     fs::create_dir_all(directory).map_err(|error| error.to_string())?;
@@ -63,8 +63,9 @@ pub fn write(
         rest.fibre_bytes().map_err(|error| error.to_string())?,
     )
     .map_err(|error| error.to_string())?;
-    let reopened = LaboratoryAthenaRest::read(&read(&standing)?, &read(&decoder)?, &read(&fibres)?)
-        .map_err(|error| error.to_string())?;
+    let reopened =
+        LaboratoryProductionRest::read(&read(&standing)?, &read(&decoder)?, &read(&fibres)?)
+            .map_err(|error| error.to_string())?;
     if reopened
         .canonical_identity()
         .map_err(|error| error.to_string())?

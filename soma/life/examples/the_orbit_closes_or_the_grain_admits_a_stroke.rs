@@ -41,7 +41,7 @@
 //!    the orbit      distinct places reached          does it SATURATE — a new arrival reaching no new place
 //!    the partition  receiver_exact_compression       causal-state blocks, collapsed pairs, memory order
 //!    the lattice    winding_inertia::lattice_admits_order
-//!    the conduct    ErosBody                         thoughts completed, standing enclosures, deposited winding
+//!    the conduct    ContinuingBody                         thoughts completed, standing enclosures, deposited winding
 //! ```
 //!
 //! **Saturation is structural, not a threshold.** A new arrival reaching no new place *is* the orbit
@@ -82,7 +82,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
-use body::manifold::{locate, ErosBody, Node, ENCLOSURE_WORDS};
+use body::manifold::{locate, ContinuingBody, Node, ENCLOSURE_WORDS};
 use holonic_engine::receiver_exact_compression::{
     compress, InputId, ItemId, Observation, ObservedSystem, ReceiverId,
 };
@@ -270,7 +270,7 @@ fn drive_atom(material: &[u8]) -> Rung {
     let mut previous: Option<u64> = None;
 
     let (standing_open, winding) = {
-        let mut eyes = ErosBody::over(&standing, &mut own, AXIS, SEED, 1 << 20, &mut carrier);
+        let mut eyes = ContinuingBody::over(&standing, &mut own, AXIS, SEED, 1 << 20, &mut carrier);
         for pair in material.windows(2) {
             let relation = body::boundary::difference(pair[1], pair[0]);
             if relation.mag == 0 {
@@ -389,7 +389,7 @@ fn drive(material: &[u8], grain: usize) -> Rung {
     let mut previous: Option<u64> = None;
 
     {
-        let mut eyes = ErosBody::over(&standing, &mut own, AXIS, SEED, 1 << 20, &mut carrier);
+        let mut eyes = ContinuingBody::over(&standing, &mut own, AXIS, SEED, 1 << 20, &mut carrier);
         for span in &spans {
             let node = locate(span);
             seen.insert(place_of(node));

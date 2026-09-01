@@ -28,7 +28,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use body::channel::DepositCensus;
-use body::manifold::{ErosBody, ENCLOSURE_WORDS};
+use body::manifold::{ContinuingBody, ENCLOSURE_WORDS};
 
 /// Small enough to mount several bodies in one process; the axis is a declared receiver coordinate
 /// and every reading below is a ratio against another reading in the SAME axis, so it cancels.
@@ -131,7 +131,7 @@ fn walk(material: &[Vec<u8>], seed: &[u8], axis: i64) -> (Vec<Rung>, Option<usiz
     let standing = vec![0u32; cells];
     let mut own = vec![0u32; cells];
     let mut carrier = vec![0u32; 64 * ENCLOSURE_WORDS];
-    let mut eyes = ErosBody::over(&standing, &mut own, axis, seed, 1 << 20, &mut carrier);
+    let mut eyes = ContinuingBody::over(&standing, &mut own, axis, seed, 1 << 20, &mut carrier);
 
     let mut ladder = Vec::new();
     let mut next_rung = 1usize;

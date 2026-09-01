@@ -3,9 +3,9 @@ use std::fs;
 use std::path::Path;
 
 use life::mathematical_source::{
+    correspond, correspondence_demand, derive_layout, exact_decimal, layout_demand,
     ArtifactIdentity, CoTestimonyFiber, ExactBox, ExactExtent, PlacedCarrier,
-    SourceLayoutTestimony, SourceLayoutWorkCover, TestimonyChart, correspond,
-    correspondence_demand, derive_layout, exact_decimal, layout_demand,
+    SourceLayoutTestimony, SourceLayoutWorkCover, TestimonyChart,
 };
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;

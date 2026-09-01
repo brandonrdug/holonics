@@ -64,7 +64,7 @@
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 
-use body::manifold::{atom_node, ErosBody, ENCLOSURE_WORDS};
+use body::manifold::{atom_node, ContinuingBody, ENCLOSURE_WORDS};
 use body::num::Cog;
 
 const AXIS: i64 = 1 << 8;
@@ -132,7 +132,7 @@ fn at_word_grain(material: &[u8]) -> Reading {
     let carrier_genesis = carrier.clone();
     let mut reading = Reading::default();
     {
-        let mut eyes = ErosBody::over(&standing, &mut own, AXIS, SEED, 1 << 20, &mut carrier);
+        let mut eyes = ContinuingBody::over(&standing, &mut own, AXIS, SEED, 1 << 20, &mut carrier);
         for word in material.split(|byte| byte.is_ascii_whitespace()) {
             if word.is_empty() {
                 continue;
@@ -175,7 +175,7 @@ fn at_atom_grain(material: &[u8]) -> Reading {
     let carrier_genesis = carrier.clone();
     let mut reading = Reading::default();
     {
-        let mut eyes = ErosBody::over(&standing, &mut own, AXIS, SEED, 1 << 20, &mut carrier);
+        let mut eyes = ContinuingBody::over(&standing, &mut own, AXIS, SEED, 1 << 20, &mut carrier);
         for pair in material.windows(2) {
             // The membrane's own relation shape: the signed difference of two adjacent packets,
             // carried as a `Cog` and located by `atom_node`. Nothing is invented here.
@@ -243,7 +243,7 @@ fn at_atom_grain_monotone(extent: usize) -> Reading {
     let carrier_genesis = carrier.clone();
     let mut reading = Reading::default();
     {
-        let mut eyes = ErosBody::over(&standing, &mut own, AXIS, SEED, 1 << 20, &mut carrier);
+        let mut eyes = ContinuingBody::over(&standing, &mut own, AXIS, SEED, 1 << 20, &mut carrier);
         for step in 0..extent {
             // Every relation the same hand. Magnitudes vary so the stream is not one repeated atom
             // — a repeated atom would be dark by the body's own equal-packet law — but the SIGN

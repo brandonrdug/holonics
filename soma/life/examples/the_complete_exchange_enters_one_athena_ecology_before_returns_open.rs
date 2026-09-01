@@ -7,10 +7,10 @@ use std::{
 };
 
 use life::{
-    athena_native::{
-        NativeEcologyRest, CompleteExchangeNativeRealizationPassage, HistoryOnlyExchangeFront,
+    native_intelligence::{
+        CompleteExchangeNativeRealizationPassage, HistoryOnlyExchangeFront, NativeEcologyRest,
     },
-    athena_receiver_history::AthenaReceiverHistoryCongruence,
+    receiver_history::ReceiverHistoryCongruence,
 };
 use serde::Serialize;
 use serde_json::json;
@@ -38,8 +38,7 @@ fn main() -> Result<(), String> {
     let started = Instant::now();
     fs::create_dir_all(&output).map_err(display)?;
     let rest = NativeEcologyRest::read(&fs::read(K3_REST).map_err(display)?).map_err(display)?;
-    let congruence =
-        AthenaReceiverHistoryCongruence::read(&fs::read(CONGRUENCE).map_err(display)?)?;
+    let congruence = ReceiverHistoryCongruence::read(&fs::read(CONGRUENCE).map_err(display)?)?;
     let admitted_source_population = congruence.sections.len();
     let admitted_native_population = congruence.native.native_population.len();
     let admitted_receiver_population = congruence
@@ -51,8 +50,8 @@ fn main() -> Result<(), String> {
         .len();
     let admitted_generator_population = congruence.native.generators.len();
     let history = HistoryOnlyExchangeFront::project(&congruence.sections)?;
-    let candidate =
-        life::athena_native::SealedNativeCandidateFront::seal(&rest, history).map_err(display)?;
+    let candidate = life::native_intelligence::SealedNativeCandidateFront::seal(&rest, history)
+        .map_err(display)?;
     let passage = CompleteExchangeNativeRealizationPassage::found(candidate, congruence)?;
 
     let source_population = passage.native.source_population.len();

@@ -833,11 +833,8 @@ impl ExactSuffixEcology {
 
     /// ★ **MOUNT A STANDING ECOLOGY FROM THE ARRAYS IT EMITTED — the container's return edge.**
     ///
-    /// **Added 2026-08-20 for Deed P4.** [`crate::atlas_cultivation::emit_rest`] takes a standing
-    /// ecology to a container; nothing took a container back to a standing ecology, so an
-    /// application handed a sealed rest could conduct it and could not deposit into it. Cultivating
-    /// therefore required the corpus — the P3 driver rebuilds the predecessor from its eight
-    /// documents — which is exactly the source lookup a frozen runtime may not perform.
+    /// A sealed rest must return to its standing ecology without consulting the source material.
+    /// Otherwise an application could conduct the rest but could not lawfully deposit into it.
     ///
     /// # What the container has to carry for this to be exact, and what it does not
     ///

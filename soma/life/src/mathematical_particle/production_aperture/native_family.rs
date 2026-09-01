@@ -3,13 +3,12 @@ use std::collections::BTreeSet;
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 
-use super::family_types::{FamilyCultivatedAthenaRest, FixedSectionPlate};
+use super::family_types::{FamilyCultivatedEcologyRest, FixedSectionPlate};
 use super::native_family_types::{
     FactorizationStatus, NativeCarrierChart, NativeCollapsedPopulation, NativeGeneratorRelation,
-    NativeHexisAthenaRest, NativeHexisDecoder, NativeHexisError, NativeHexisInquiry,
-    NativeHexisReconstruction, NativeHexisStanding, NativeNaturalityReceipt,
-    NativeOrientedGenerator, NativeShortestSeparator, NativeSuccessorHistory,
-    ReceiverHistoryFactorization,
+    NativeHexisDecoder, NativeHexisError, NativeHexisInquiry, NativeHexisReconstruction,
+    NativeHexisRest, NativeHexisStanding, NativeNaturalityReceipt, NativeOrientedGenerator,
+    NativeShortestSeparator, NativeSuccessorHistory, ReceiverHistoryFactorization,
 };
 use super::types::{ProductionInquiryPresentation, ProductionReceiver};
 use super::wire::{digest, hex};
@@ -179,10 +178,10 @@ fn exact_relation(
     Ok(())
 }
 
-impl NativeHexisAthenaRest {
+impl NativeHexisRest {
     /// Consume the cultivated source shape and return only the shared generator-native relation,
     /// plural carrier charts, exact receiver factors and complete reconstruction addresses.
-    pub fn condense(source: FamilyCultivatedAthenaRest) -> Result<Self, NativeHexisError> {
+    pub fn condense(source: FamilyCultivatedEcologyRest) -> Result<Self, NativeHexisError> {
         source
             .validate()
             .map_err(|error| NativeHexisError::CultivatedPredecessor(error.to_string()))?;

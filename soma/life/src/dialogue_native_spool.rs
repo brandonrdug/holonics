@@ -7,16 +7,16 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::{
-    BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase, OccurrencePort,
     native_spool::{
-        NATIVE_SPOOL_BUNDLE_SCHEMA, NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA,
         NativeCollapsedFibre, NativeConstitutiveResponse, NativeGeneratorDescent,
-        NativeGeneratorStep, NativeIncidenceTerm, NativeParametronCell, NativeReceiverConsequence,
-        NativePullbackOccurrence, NativeSerialPullback, NativeSpool, NativeSpoolBundle,
+        NativeGeneratorStep, NativeIncidenceTerm, NativeParametronCell, NativePullbackOccurrence,
+        NativeReceiverConsequence, NativeSerialPullback, NativeSpool, NativeSpoolBundle,
         NativeSpoolRefusal, NativeThread, NativeThreadHand, NativeThreadOccurrence,
+        NATIVE_SPOOL_BUNDLE_SCHEMA, NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA,
     },
     receiver_exact_compression::{InputId, Observation, ReceiverId},
     receiver_history_compression::{NativeStateId, ReceiverFactor},
+    BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase, OccurrencePort,
 };
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
@@ -92,7 +92,11 @@ pub fn found_addressed_dialogue_native_spool(
             .and_then(|predecessor| by_identity.get(predecessor).copied())
         {
             Some(predecessor) if predecessor < at => depth[predecessor] + 1,
-            Some(_) => return Err(NativeSpoolRefusal::Occurrence("dialogue/native-recurrence".to_owned())),
+            Some(_) => {
+                return Err(NativeSpoolRefusal::Occurrence(
+                    "dialogue/native-recurrence".to_owned(),
+                ))
+            }
             None => 0,
         };
     }
@@ -102,7 +106,13 @@ pub fn found_addressed_dialogue_native_spool(
     let phases = depth.iter().map(|depth| depth % 2).collect::<Vec<_>>();
     let mut grouped = BTreeMap::<
         (usize, usize),
-        Vec<(usize, EventId, NativeStateId, NativeStateId, Option<EventId>)>,
+        Vec<(
+            usize,
+            EventId,
+            NativeStateId,
+            NativeStateId,
+            Option<EventId>,
+        )>,
     >::new();
     let predecessor = occurrences
         .iter()
@@ -117,7 +127,9 @@ pub fn found_addressed_dialogue_native_spool(
     for (at, predecessor) in predecessor.iter().copied().enumerate() {
         if let Some(predecessor) = predecessor {
             if successor[predecessor].replace(at).is_some() {
-                return Err(NativeSpoolRefusal::Occurrence("dialogue/native-branch".to_owned()));
+                return Err(NativeSpoolRefusal::Occurrence(
+                    "dialogue/native-branch".to_owned(),
+                ));
             }
         }
     }
@@ -131,19 +143,20 @@ pub fn found_addressed_dialogue_native_spool(
         .collect::<Vec<_>>();
     for at in 0..occurrences.len() {
         let target = successor[at].unwrap_or(root[at]);
-        grouped.entry((phases[at], phases[target])).or_default().push((
-            at,
-            events[at],
-            states[at],
-            states[target],
-            predecessor[at].map(|prior| events[prior]),
-        ));
+        grouped
+            .entry((phases[at], phases[target]))
+            .or_default()
+            .push((
+                at,
+                events[at],
+                states[at],
+                states[target],
+                predecessor[at].map(|prior| events[prior]),
+            ));
     }
     let mut threads = grouped
         .into_iter()
-        .map(|((from_phase, to_phase), members)| {
-            thread(from_phase, to_phase, members, &phases)
-        })
+        .map(|((from_phase, to_phase), members)| thread(from_phase, to_phase, members, &phases))
         .collect::<Result<Vec<_>, _>>()?;
     threads.sort_by(|left, right| left.address.cmp(&right.address));
     let mut serial_pullbacks = Vec::new();
@@ -161,13 +174,13 @@ pub fn found_addressed_dialogue_native_spool(
                 .occurrences
                 .iter()
                 .filter_map(|occurrence| {
-                    right_by_native.get(&occurrence.emitting_native).map(|right| {
-                        NativePullbackOccurrence {
+                    right_by_native
+                        .get(&occurrence.emitting_native)
+                        .map(|right| NativePullbackOccurrence {
                             left: occurrence.occurrence,
                             right: *right,
                             joining_native: occurrence.emitting_native,
-                        }
-                    })
+                        })
                 })
                 .collect::<BTreeSet<_>>();
             if !pullback.is_empty() {
@@ -272,14 +285,16 @@ fn thread(
     let address = format!("dialogue/native-{from_phase}-{to_phase}");
     let occurrences = members
         .iter()
-        .map(|(_at, occurrence, from, to, predecessor)| NativeThreadOccurrence {
-            occurrence: *occurrence,
-            predecessor: *predecessor,
-            entering_port: OccurrencePort::input(*occurrence, 0),
-            emitting_port: OccurrencePort::output(*occurrence, 0),
-            entering_native: *from,
-            emitting_native: *to,
-        })
+        .map(
+            |(_at, occurrence, from, to, predecessor)| NativeThreadOccurrence {
+                occurrence: *occurrence,
+                predecessor: *predecessor,
+                entering_port: OccurrencePort::input(*occurrence, 0),
+                emitting_port: OccurrencePort::output(*occurrence, 0),
+                entering_native: *from,
+                emitting_native: *to,
+            },
+        )
         .collect::<Vec<_>>();
     let native_support = occurrences
         .iter()
@@ -365,33 +380,76 @@ mod tests {
 
     #[test]
     fn visible_text_founds_lineage_but_not_native_state_or_wire_content() {
-        let path = std::env::temp_dir().join(format!("dialogue-native-{}.jsonl", std::process::id()));
+        let path =
+            std::env::temp_dir().join(format!("dialogue-native-{}.jsonl", std::process::id()));
         let material = concat!(
             "{\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"user\",\"id\":\"u\",\"content\":[{\"type\":\"input_text\",\"text\":\"Unique source sentence.\"}]}}\n",
             "{\"type\":\"response_item\",\"payload\":{\"type\":\"message\",\"role\":\"assistant\",\"phase\":\"final_answer\",\"id\":\"a\",\"content\":[{\"type\":\"output_text\",\"text\":\"Unique returned sentence.\"}]}}\n"
         );
         std::fs::write(&path, material).unwrap();
-        let lineage = ExactDialogueLineage::import_codex_rollout(&path, &CodexDialogueImportSpec::default()).unwrap();
+        let lineage =
+            ExactDialogueLineage::import_codex_rollout(&path, &CodexDialogueImportSpec::default())
+                .unwrap();
         let bundle = found_dialogue_native_spool(&lineage).unwrap();
         let wire = bundle.canonical_bytes().unwrap();
-        assert!(!wire.windows("Unique source sentence.".len()).any(|window| window == b"Unique source sentence."));
-        assert_eq!(bundle.spools[0].reconstruction_fibres.iter().map(|fibre| fibre.occurrences.len()).sum::<usize>(), 2);
+        assert!(!wire
+            .windows("Unique source sentence.".len())
+            .any(|window| window == b"Unique source sentence."));
+        assert_eq!(
+            bundle.spools[0]
+                .reconstruction_fibres
+                .iter()
+                .map(|fibre| fibre.occurrences.len())
+                .sum::<usize>(),
+            2
+        );
         std::fs::remove_file(path).unwrap();
     }
 
     #[test]
     fn disjoint_container_chronologies_each_retain_ingress_and_total_transport() {
         let occurrences = vec![
-            AddressedDialogueOccurrence { address: "a/0".to_owned(), predecessor: None, caused_by: BTreeSet::new() },
-            AddressedDialogueOccurrence { address: "a/1".to_owned(), predecessor: Some("a/0".to_owned()), caused_by: BTreeSet::from(["a/0".to_owned()]) },
-            AddressedDialogueOccurrence { address: "b/0".to_owned(), predecessor: None, caused_by: BTreeSet::new() },
-            AddressedDialogueOccurrence { address: "b/1".to_owned(), predecessor: Some("b/0".to_owned()), caused_by: BTreeSet::from(["b/0".to_owned()]) },
+            AddressedDialogueOccurrence {
+                address: "a/0".to_owned(),
+                predecessor: None,
+                caused_by: BTreeSet::new(),
+            },
+            AddressedDialogueOccurrence {
+                address: "a/1".to_owned(),
+                predecessor: Some("a/0".to_owned()),
+                caused_by: BTreeSet::from(["a/0".to_owned()]),
+            },
+            AddressedDialogueOccurrence {
+                address: "b/0".to_owned(),
+                predecessor: None,
+                caused_by: BTreeSet::new(),
+            },
+            AddressedDialogueOccurrence {
+                address: "b/1".to_owned(),
+                predecessor: Some("b/0".to_owned()),
+                caused_by: BTreeSet::from(["b/0".to_owned()]),
+            },
         ];
         let returned = found_addressed_dialogue_native_spool(&occurrences).unwrap();
         let spool = &returned.native.spools[0];
         assert_eq!(spool.native_population.len(), 4);
         assert_eq!(spool.generator_descents[0].steps.len(), 4);
-        assert_eq!(spool.serial_pullbacks.iter().map(|pullback| pullback.occurrences.len()).sum::<usize>(), 4);
-        assert_eq!(spool.threads.iter().flat_map(|thread| &thread.occurrences).filter(|occurrence| occurrence.predecessor.is_none()).count(), 2);
+        assert_eq!(
+            spool
+                .serial_pullbacks
+                .iter()
+                .map(|pullback| pullback.occurrences.len())
+                .sum::<usize>(),
+            4
+        );
+        assert_eq!(
+            spool
+                .threads
+                .iter()
+                .flat_map(|thread| &thread.occurrences)
+                .filter(|occurrence| occurrence.predecessor.is_none())
+                .count(),
+            2
+        );
     }
 }

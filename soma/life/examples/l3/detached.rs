@@ -4,7 +4,7 @@ use std::process::Command;
 use std::time::Instant;
 
 use holonic_engine::cuda_refine::{CudaRefineExecutor, DeviceNativeFixedSectionFamilies};
-use life::mathematical_particle::{NativeTerrainAthenaRest, NativeTerrainInquiry};
+use life::mathematical_particle::{NativeTerrainInquiry, NativeTerrainRest};
 use serde_json::{json, Value};
 
 use super::{artifact, rest};
@@ -17,7 +17,7 @@ pub fn conduct(
     output: &Path,
 ) -> Result<(), String> {
     fs::create_dir_all(output).map_err(|error| error.to_string())?;
-    let terrain = NativeTerrainAthenaRest::read(
+    let terrain = NativeTerrainRest::read(
         &rest::read(standing)?,
         &rest::read(decoder)?,
         &rest::read(fibres)?,
@@ -220,7 +220,7 @@ fn device_json(returned: &DeviceNativeFixedSectionFamilies) -> Value {
 
 fn write_visuals(
     output: &Path,
-    terrain: &NativeTerrainAthenaRest,
+    terrain: &NativeTerrainRest,
     returned: &DeviceNativeFixedSectionFamilies,
 ) -> Result<Value, String> {
     let svg = format!(

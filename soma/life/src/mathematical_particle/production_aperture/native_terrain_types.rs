@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use super::native_family_types::{
-    NativeCarrierChart, NativeGeneratorRelation, NativeHexisAthenaRest, NativeNaturalityReceipt,
+    NativeCarrierChart, NativeGeneratorRelation, NativeHexisRest, NativeNaturalityReceipt,
     NativeShortestSeparator, NativeSuccessorHistory, ReceiverHistoryFactorization,
 };
 use super::types::{ProductionInquiryPresentation, ProductionReceiver};
@@ -72,8 +72,8 @@ pub struct NativeTerrainInquiry {
 /// L3's continuing ecology. It consumes the L2 rest, owns one returned local delta, and is neither
 /// `Clone` nor shared. Exact withdrawal transfers the owned L2 predecessor back to the caller.
 #[derive(Debug, PartialEq, Eq)]
-pub struct NativeTerrainAthenaRest {
-    pub(super) predecessor: NativeHexisAthenaRest,
+pub struct NativeTerrainRest {
+    pub(super) predecessor: NativeHexisRest,
     pub(super) standing: NativeTerrainStanding,
     pub(super) decoder: NativeTerrainDecoder,
     pub(super) reconstruction: NativeTerrainReconstruction,

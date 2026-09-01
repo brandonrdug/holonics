@@ -4,14 +4,14 @@ use std::path::{Path, PathBuf};
 use holonic_engine::native_ecology::inference_ecology::InferenceEcologyRest;
 use life::mathematical_particle::{
     DynamicMorphologyRest, LongHorizonRetainedBoundary, MultimodalTransportRest,
-    ProductionAthenaRest,
+    ProductionEcologyRest,
 };
 
 use super::artifact;
 
 pub const OUTPUT_NAME: &str = "the_bounded_athena_mathematics_physics_ecology_freezes";
 
-pub fn found(root: &Path) -> Result<ProductionAthenaRest, String> {
+pub fn found(root: &Path) -> Result<ProductionEcologyRest, String> {
     let i5 = root.join("output/the_athena_gemma_ecology_infers_returns_and_remounts/native-rest");
     let inference = InferenceEcologyRest::read(
         &read(i5.join("recurrent-standing.json"))?,
@@ -43,7 +43,7 @@ pub fn found(root: &Path) -> Result<ProductionAthenaRest, String> {
         &read(r5.join("fibres.json"))?,
     )
     .map_err(|error| error.to_string())?;
-    ProductionAthenaRest::found(
+    ProductionEcologyRest::found(
         inference,
         morphology,
         retained,
@@ -55,7 +55,7 @@ pub fn found(root: &Path) -> Result<ProductionAthenaRest, String> {
 }
 
 pub fn write(
-    rest: &ProductionAthenaRest,
+    rest: &ProductionEcologyRest,
     directory: &Path,
 ) -> Result<(PathBuf, PathBuf, PathBuf), String> {
     fs::create_dir_all(directory).map_err(|error| error.to_string())?;
@@ -77,8 +77,9 @@ pub fn write(
         rest.fibre_bytes().map_err(|error| error.to_string())?,
     )
     .map_err(|error| error.to_string())?;
-    let reopened = ProductionAthenaRest::read(&read(&standing)?, &read(&decoder)?, &read(&fibres)?)
-        .map_err(|error| error.to_string())?;
+    let reopened =
+        ProductionEcologyRest::read(&read(&standing)?, &read(&decoder)?, &read(&fibres)?)
+            .map_err(|error| error.to_string())?;
     if reopened
         .canonical_identity()
         .map_err(|error| error.to_string())?

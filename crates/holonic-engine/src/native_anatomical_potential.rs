@@ -217,7 +217,7 @@ impl NativeAnatomicalPotentialRest {
         self.validate()?;
         let resident = ResidentIntervalPotentialReceiver::mount(
             card,
-            "athena/native-anatomical-potential-receiver",
+            "native/anatomical-potential-receiver",
             self.receiver_rows.len(),
             self.native_population.len(),
             &self.receiver_rows,

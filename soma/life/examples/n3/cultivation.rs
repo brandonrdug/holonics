@@ -1,13 +1,13 @@
 //! Native mathematical cultivation after a separately addressed world return.
 //!
-//! This owner moves one `NativeHexisAthenaRest` into continuing standing and stores only a local
+//! This owner moves one `NativeHexisRest` into continuing standing and stores only a local
 //! returned cultivation face beside it. The same resident fixed-section law receives either the
 //! predecessor or cultivated bits. No checker status, theorem syntax, subject label, or file kind
 //! participates. Withdrawal consumes the wrapper and returns the exact predecessor owner.
 
 use holonic_engine::cuda_refine::{CudaRefineExecutor, DeviceNativeFixedSectionFamilies};
 use life::mathematical_particle::{
-    NativeHexisAthenaRest, NativeMathematicalConsequence, NativeMathematicalInquiry,
+    NativeHexisRest, NativeMathematicalConsequence, NativeMathematicalInquiry,
 };
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -54,7 +54,7 @@ pub struct NativeCultivationStanding {
 /// One continuing native mathematical ecology; intentionally not `Clone`.
 #[derive(Debug, PartialEq, Eq)]
 pub struct NativeCultivatedMathematicalRest {
-    predecessor: NativeHexisAthenaRest,
+    predecessor: NativeHexisRest,
     standing: NativeCultivationStanding,
 }
 
@@ -89,7 +89,7 @@ pub struct NativeCultivationWithdrawal {
 impl NativeCultivatedMathematicalRest {
     #[allow(clippy::too_many_arguments)]
     pub fn cultivate(
-        predecessor: NativeHexisAthenaRest,
+        predecessor: NativeHexisRest,
         world_return: NativeMathematicalWorldReturn,
         developmental_family_occurrences: Vec<String>,
         held_out_family_occurrences: Vec<String>,
@@ -166,7 +166,7 @@ impl NativeCultivatedMathematicalRest {
         predecessor_fibres: &[u8],
         cultivation_standing: &[u8],
     ) -> Result<Self, String> {
-        let predecessor = NativeHexisAthenaRest::read(
+        let predecessor = NativeHexisRest::read(
             predecessor_standing,
             predecessor_decoder,
             predecessor_fibres,
@@ -207,7 +207,7 @@ impl NativeCultivatedMathematicalRest {
         Ok(hex(digest.finalize()))
     }
 
-    pub fn predecessor(&self) -> &NativeHexisAthenaRest {
+    pub fn predecessor(&self) -> &NativeHexisRest {
         &self.predecessor
     }
 
@@ -241,7 +241,7 @@ impl NativeCultivatedMathematicalRest {
             .map_err(|error| error.to_string())
     }
 
-    pub fn withdraw(self) -> Result<(NativeHexisAthenaRest, NativeCultivationWithdrawal), String> {
+    pub fn withdraw(self) -> Result<(NativeHexisRest, NativeCultivationWithdrawal), String> {
         self.validate()?;
         let cultivated_rest_sha256 = self.canonical_identity()?;
         let restored_rest_sha256 = self

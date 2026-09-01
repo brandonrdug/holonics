@@ -244,7 +244,7 @@ mod tests {
     fn write_rest(path: &std::path::Path, statement: &str, dtype: &str, rows: usize) {
         let payload: Vec<u8> = vec![1, 0, 0, 0, 2, 0, 0, 0];
         let header = format!(
-            "{{\"__metadata__\":{{\"law.walk\":\"{statement}\"}},\"athena.class.suffix\":{{\"dtype\":\"{dtype}\",\"shape\":[{rows},1],\"data_offsets\":[0,8]}}}}"
+            "{{\"__metadata__\":{{\"law.walk\":\"{statement}\"}},\"native.class.suffix\":{{\"dtype\":\"{dtype}\",\"shape\":[{rows},1],\"data_offsets\":[0,8]}}}}"
         );
         let mut header = header.into_bytes();
         while header.len() % 8 != 0 {
@@ -262,7 +262,7 @@ mod tests {
         let out = complex.port("landed class");
         complex
             .bind_operation(
-                "athena walk",
+                "native atlas walk",
                 OperationSpecies::Construction,
                 vec![],
                 vec![out],
@@ -281,15 +281,15 @@ mod tests {
         assert_eq!(rest.witness(), "native rest");
         assert!(rest.declares("the walk falls along the suffix link"));
         assert!(!rest.declares("some other statement"));
-        assert!(rest.identifies("athena.class.suffix"));
-        assert_eq!(rest.shape_of("athena.class.suffix"), Some(&[2usize, 1][..]));
+        assert!(rest.identifies("native.class.suffix"));
+        assert_eq!(rest.shape_of("native.class.suffix"), Some(&[2usize, 1][..]));
 
         let declared = complex(vec![
             SourceTestimony::AuthoritativeDescription {
                 statement: "the walk falls along the suffix link".to_owned(),
             },
             SourceTestimony::DeclaredShape {
-                population: "athena.class.suffix".to_owned(),
+                population: "native.class.suffix".to_owned(),
                 shape: vec![2, 1],
             },
         ]);
@@ -307,7 +307,7 @@ mod tests {
                 statement: "a law the rest never declared".to_owned(),
             },
             SourceTestimony::DeclaredShape {
-                population: "athena.class.suffix".to_owned(),
+                population: "native.class.suffix".to_owned(),
                 shape: vec![2, 1],
             },
         ]);
@@ -320,7 +320,7 @@ mod tests {
 
         // a population the rest does not identify, and a shape that disagrees, both refuse
         let absent = complex(vec![SourceTestimony::DeclaredShape {
-            population: "athena.class.standing".to_owned(),
+            population: "native.class.standing".to_owned(),
             shape: vec![2, 1],
         }]);
         assert!(matches!(
@@ -330,7 +330,7 @@ mod tests {
             ))
         ));
         let drifted = complex(vec![SourceTestimony::DeclaredShape {
-            population: "athena.class.suffix".to_owned(),
+            population: "native.class.suffix".to_owned(),
             shape: vec![3, 1],
         }]);
         assert!(matches!(
@@ -371,7 +371,7 @@ mod tests {
         write_rest(&path, "the walk falls along the suffix link", "BF16", 4);
         let rest = NativeOccurrence::read(path.to_str().expect("path")).expect("read");
         let declared = complex(vec![SourceTestimony::DeclaredShape {
-            population: "athena.class.suffix".to_owned(),
+            population: "native.class.suffix".to_owned(),
             shape: vec![4, 1],
         }]);
         assert!(matches!(

@@ -4,7 +4,9 @@ use std::process::Command;
 use std::time::Instant;
 
 use holonic_engine::cuda_refine::{CudaRefineExecutor, DeviceProductionAperture};
-use life::mathematical_particle::{MathematicalMediaPort, ProductionAthenaRest, ProductionInquiry};
+use life::mathematical_particle::{
+    MathematicalMediaPort, ProductionEcologyRest, ProductionInquiry,
+};
 use serde_json::{json, Value};
 
 use super::{artifact, render};
@@ -17,7 +19,7 @@ pub fn conduct(
     output: &Path,
 ) -> Result<(), String> {
     fs::create_dir_all(output).map_err(|error| error.to_string())?;
-    let rest = ProductionAthenaRest::read(&read(standing)?, &read(decoder)?, &read(fibres)?)
+    let rest = ProductionEcologyRest::read(&read(standing)?, &read(decoder)?, &read(fibres)?)
         .map_err(|error| error.to_string())?;
     let inquiry: ProductionInquiry = serde_json::from_slice(&read(inquiry)?)
         .map_err(|error| format!("read production inquiry: {error}"))?;
@@ -177,7 +179,7 @@ pub fn conduct(
 }
 
 fn verify_terminal(
-    rest: &ProductionAthenaRest,
+    rest: &ProductionEcologyRest,
     returned: &DeviceProductionAperture,
 ) -> Result<(), String> {
     let expected = rest.media.standing.heldout_anchor_sections.iter().fold(
@@ -209,7 +211,7 @@ fn verify_terminal(
 }
 
 fn dissection(
-    rest: &ProductionAthenaRest,
+    rest: &ProductionEcologyRest,
     returned: &DeviceProductionAperture,
 ) -> Result<Value, String> {
     Ok(json!({

@@ -56,7 +56,7 @@
 
 use std::path::{Path, PathBuf};
 
-use body::manifold::{ErosBody, ENCLOSURE_WORDS};
+use body::manifold::{ContinuingBody, ENCLOSURE_WORDS};
 use holonic_engine::traversible_chain::CountedCrossing;
 
 const AXIS: i64 = 1 << 8;
@@ -158,7 +158,7 @@ fn main() {
     let mut boundaries: Vec<Boundary> = Vec::new();
 
     {
-        let mut eyes = ErosBody::over(
+        let mut eyes = ContinuingBody::over(
             &standing_surface,
             &mut own,
             AXIS,

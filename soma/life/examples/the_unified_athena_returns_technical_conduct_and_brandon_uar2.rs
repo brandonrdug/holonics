@@ -4,8 +4,8 @@
 
 use std::{collections::BTreeSet, fs, path::PathBuf, time::Instant};
 
-use life::athena_native::{
-    EmanationDeed, EmanationParticipant, LaboratoryParticipantIngress, OpticalAthenaRest,
+use life::native_intelligence::{
+    EmanationDeed, EmanationParticipant, LaboratoryParticipantIngress, OpticalProductRest,
     PerspectiveChart, ProductSituatedCurrentEmanation,
 };
 use serde::Serialize;
@@ -65,7 +65,7 @@ fn main() -> Result<(), String> {
     fs::create_dir_all(&output).map_err(display)?;
     let began = Instant::now();
     let rest =
-        OpticalAthenaRest::read(&fs::read(root.join(REST)).map_err(display)?).map_err(display)?;
+        OpticalProductRest::read(&fs::read(root.join(REST)).map_err(display)?).map_err(display)?;
     if rest.identity() != EXPECTED_REST {
         return Err("UAR2 did not receive the exact ALP5 rest".to_owned());
     }

@@ -8,12 +8,12 @@ use serde::Serialize;
 use sha2::{Digest, Sha256};
 
 use super::laboratory_types::{
-    LaboratoryAthenaError, LaboratoryAthenaRest, LaboratoryChronology, LaboratoryComponentIdentity,
-    LaboratoryDecision, LaboratoryInquiry, LaboratoryMorphologyDelta, LaboratoryPartitionKind,
-    LaboratoryReconstructionBoundary, LaboratoryRouteDecoder, LaboratoryStandingJunction,
-    LaboratoryWithdrawalReceipt, LaboratoryWorldReturn,
+    LaboratoryChronology, LaboratoryComponentIdentity, LaboratoryDecision, LaboratoryInquiry,
+    LaboratoryMorphologyDelta, LaboratoryPartitionKind, LaboratoryProductionError,
+    LaboratoryProductionRest, LaboratoryReconstructionBoundary, LaboratoryRouteDecoder,
+    LaboratoryStandingJunction, LaboratoryWithdrawalReceipt, LaboratoryWorldReturn,
 };
-use super::types::{ProductionAthenaRest, ProductionInquiryPresentation, ProductionReceiver};
+use super::types::{ProductionEcologyRest, ProductionInquiryPresentation, ProductionReceiver};
 use super::wire::{decode_components, digest, encode_components, hex};
 
 pub const LABORATORY_CHRONOLOGY_SCHEMA: &str = "holonics.l0.laboratory-chronology.v1";
@@ -39,50 +39,50 @@ fn component(role: &str, bytes: &[u8]) -> LaboratoryComponentIdentity {
 }
 
 fn identities(
-    production: &ProductionAthenaRest,
+    production: &ProductionEcologyRest,
     native: &GeneratorNativeRest,
     cultivated: &CultivatedReceiverHistoryRest,
     chronology: &LaboratoryChronology,
-) -> Result<Vec<LaboratoryComponentIdentity>, LaboratoryAthenaError> {
+) -> Result<Vec<LaboratoryComponentIdentity>, LaboratoryProductionError> {
     let chronology_bytes = serde_json::to_vec(chronology)
-        .map_err(|error| LaboratoryAthenaError::Wire(error.to_string()))?;
+        .map_err(|error| LaboratoryProductionError::Wire(error.to_string()))?;
     Ok(vec![
         component(
             "r6-production-standing",
             &production
                 .standing_bytes()
-                .map_err(|error| LaboratoryAthenaError::Production(error.to_string()))?,
+                .map_err(|error| LaboratoryProductionError::Production(error.to_string()))?,
         ),
         component(
             "r6-production-decoder",
             &production
                 .decoder_bytes()
-                .map_err(|error| LaboratoryAthenaError::Production(error.to_string()))?,
+                .map_err(|error| LaboratoryProductionError::Production(error.to_string()))?,
         ),
         component(
             "r6-production-fibres",
             &production
                 .fibre_bytes()
-                .map_err(|error| LaboratoryAthenaError::Production(error.to_string()))?,
+                .map_err(|error| LaboratoryProductionError::Production(error.to_string()))?,
         ),
         component(
             "m3-generator-native-rest",
             &native
                 .canonical_bytes()
-                .map_err(|error| LaboratoryAthenaError::Native(error.to_string()))?,
+                .map_err(|error| LaboratoryProductionError::Native(error.to_string()))?,
         ),
         component(
             "m4-cultivated-history-rest",
             &cultivated
                 .canonical_bytes()
-                .map_err(|error| LaboratoryAthenaError::Cultivated(error.to_string()))?,
+                .map_err(|error| LaboratoryProductionError::Cultivated(error.to_string()))?,
         ),
         component("laboratory-chronology", &chronology_bytes),
     ])
 }
 
 impl LaboratoryChronology {
-    pub fn validate(&self) -> Result<(), LaboratoryAthenaError> {
+    pub fn validate(&self) -> Result<(), LaboratoryProductionError> {
         if self.schema != LABORATORY_CHRONOLOGY_SCHEMA
             || !is_hex(&self.predecessor_commit, 40)
             || !is_hex(&self.prefix_commit, 40)
@@ -100,7 +100,7 @@ impl LaboratoryChronology {
             || self.occurrences.last().map(|commit| commit.tree.as_str())
                 != Some(self.prefix_tree.as_str())
         {
-            return Err(LaboratoryAthenaError::Chronology);
+            return Err(LaboratoryProductionError::Chronology);
         }
         let mut previous = self.predecessor_commit.as_str();
         let mut addresses = BTreeSet::new();
@@ -115,7 +115,7 @@ impl LaboratoryChronology {
                 || occurrence.changes.is_empty()
                 || !addresses.insert(occurrence.occurrence.clone())
             {
-                return Err(LaboratoryAthenaError::Chronology);
+                return Err(LaboratoryProductionError::Chronology);
             }
             for change in &occurrence.changes {
                 if change.occurrence.is_empty()
@@ -124,16 +124,16 @@ impl LaboratoryChronology {
                     || !is_hex(&change.blob_sha256, 64)
                     || !addresses.insert(change.occurrence.clone())
                 {
-                    return Err(LaboratoryAthenaError::Chronology);
+                    return Err(LaboratoryProductionError::Chronology);
                 }
                 mounted = mounted
                     .checked_add(change.octets)
-                    .ok_or(LaboratoryAthenaError::Chronology)?;
+                    .ok_or(LaboratoryProductionError::Chronology)?;
             }
             previous = &occurrence.commit;
         }
         if mounted != self.incrementally_mounted_octets || self.partitions.len() != 7 {
-            return Err(LaboratoryAthenaError::Chronology);
+            return Err(LaboratoryProductionError::Chronology);
         }
         let expected = [
             LaboratoryPartitionKind::Development,
@@ -160,7 +160,7 @@ impl LaboratoryChronology {
                         .any(|occurrence| !addresses.contains(occurrence))
             })
         {
-            return Err(LaboratoryAthenaError::Chronology);
+            return Err(LaboratoryProductionError::Chronology);
         }
         Ok(())
     }
@@ -174,7 +174,7 @@ impl LaboratoryInquiry {
         quadratic_section: [i64; 3],
         chart_map: [i64; 4],
         prior_history_occurrences: Vec<String>,
-    ) -> Result<Self, LaboratoryAthenaError> {
+    ) -> Result<Self, LaboratoryProductionError> {
         let mut inquiry = Self {
             schema: LABORATORY_INQUIRY_SCHEMA.to_owned(),
             occurrence: String::new(),
@@ -190,7 +190,7 @@ impl LaboratoryInquiry {
         Ok(inquiry)
     }
 
-    fn body_sha256(&self) -> Result<String, LaboratoryAthenaError> {
+    fn body_sha256(&self) -> Result<String, LaboratoryProductionError> {
         #[derive(Serialize)]
         struct Body<'a> {
             schema: &'a str,
@@ -211,15 +211,15 @@ impl LaboratoryInquiry {
             prior_history_occurrences: &self.prior_history_occurrences,
         })
         .map(|bytes| digest(&bytes))
-        .map_err(|error| LaboratoryAthenaError::Wire(error.to_string()))
+        .map_err(|error| LaboratoryProductionError::Wire(error.to_string()))
     }
 
-    pub fn canonical_bytes(&self) -> Result<Vec<u8>, LaboratoryAthenaError> {
+    pub fn canonical_bytes(&self) -> Result<Vec<u8>, LaboratoryProductionError> {
         self.validate_shape()?;
-        serde_json::to_vec(self).map_err(|error| LaboratoryAthenaError::Wire(error.to_string()))
+        serde_json::to_vec(self).map_err(|error| LaboratoryProductionError::Wire(error.to_string()))
     }
 
-    fn validate_shape(&self) -> Result<(), LaboratoryAthenaError> {
+    fn validate_shape(&self) -> Result<(), LaboratoryProductionError> {
         let mut receivers = self.receiver_family.clone();
         receivers.sort_by_key(|receiver| *receiver as u8);
         receivers.dedup();
@@ -241,34 +241,34 @@ impl LaboratoryInquiry {
             || self.prior_history_occurrences.is_empty()
             || determinant.is_none_or(|value| value == 0)
         {
-            return Err(LaboratoryAthenaError::Inquiry);
+            return Err(LaboratoryProductionError::Inquiry);
         }
         Ok(())
     }
 }
 
-impl LaboratoryAthenaRest {
+impl LaboratoryProductionRest {
     pub fn found(
-        production: ProductionAthenaRest,
+        production: ProductionEcologyRest,
         native: GeneratorNativeRest,
         cultivated_history: CultivatedReceiverHistoryRest,
         chronology: LaboratoryChronology,
         decision_occurrence: String,
-    ) -> Result<Self, LaboratoryAthenaError> {
+    ) -> Result<Self, LaboratoryProductionError> {
         production
             .validate()
-            .map_err(|error| LaboratoryAthenaError::Production(error.to_string()))?;
+            .map_err(|error| LaboratoryProductionError::Production(error.to_string()))?;
         chronology.validate()?;
         let native_bytes = native
             .canonical_bytes()
-            .map_err(|error| LaboratoryAthenaError::Native(error.to_string()))?;
+            .map_err(|error| LaboratoryProductionError::Native(error.to_string()))?;
         let cultivated_bytes = cultivated_history
             .canonical_bytes()
-            .map_err(|error| LaboratoryAthenaError::Cultivated(error.to_string()))?;
+            .map_err(|error| LaboratoryProductionError::Cultivated(error.to_string()))?;
         CultivatedReceiverHistoryRest::mount(&cultivated_bytes, &native_bytes)
-            .map_err(|error| LaboratoryAthenaError::Cultivated(error.to_string()))?;
+            .map_err(|error| LaboratoryProductionError::Cultivated(error.to_string()))?;
         if decision_occurrence.is_empty() {
-            return Err(LaboratoryAthenaError::Decision);
+            return Err(LaboratoryProductionError::Decision);
         }
         let component_identities =
             identities(&production, &native, &cultivated_history, &chronology)?;
@@ -341,90 +341,90 @@ impl LaboratoryAthenaRest {
         standing: &[u8],
         decoder: &[u8],
         fibres: &[u8],
-    ) -> Result<Self, LaboratoryAthenaError> {
+    ) -> Result<Self, LaboratoryProductionError> {
         let standing = decode_components(STANDING_MAGIC, standing, 5)?;
         let decoder = decode_components(DECODER_MAGIC, decoder, 2)?;
         let fibres = decode_components(FIBRES_MAGIC, fibres, 2)?;
-        let production = ProductionAthenaRest::read(&standing[0], &decoder[0], &fibres[0])
-            .map_err(|error| LaboratoryAthenaError::Production(error.to_string()))?;
+        let production = ProductionEcologyRest::read(&standing[0], &decoder[0], &fibres[0])
+            .map_err(|error| LaboratoryProductionError::Production(error.to_string()))?;
         let native = GeneratorNativeRest::read(&standing[1])
-            .map_err(|error| LaboratoryAthenaError::Native(error.to_string()))?;
+            .map_err(|error| LaboratoryProductionError::Native(error.to_string()))?;
         let cultivated_history: CultivatedReceiverHistoryRest =
             serde_json::from_slice(&standing[2])
-                .map_err(|error| LaboratoryAthenaError::Wire(error.to_string()))?;
+                .map_err(|error| LaboratoryProductionError::Wire(error.to_string()))?;
         CultivatedReceiverHistoryRest::mount(&standing[2], &standing[1])
-            .map_err(|error| LaboratoryAthenaError::Cultivated(error.to_string()))?;
+            .map_err(|error| LaboratoryProductionError::Cultivated(error.to_string()))?;
         let rest = Self {
             production,
             native,
             cultivated_history,
             chronology: serde_json::from_slice(&standing[3])
-                .map_err(|error| LaboratoryAthenaError::Wire(error.to_string()))?,
+                .map_err(|error| LaboratoryProductionError::Wire(error.to_string()))?,
             junction: serde_json::from_slice(&standing[4])
-                .map_err(|error| LaboratoryAthenaError::Wire(error.to_string()))?,
+                .map_err(|error| LaboratoryProductionError::Wire(error.to_string()))?,
             decoder: serde_json::from_slice(&decoder[1])
-                .map_err(|error| LaboratoryAthenaError::Wire(error.to_string()))?,
+                .map_err(|error| LaboratoryProductionError::Wire(error.to_string()))?,
             reconstruction: serde_json::from_slice(&fibres[1])
-                .map_err(|error| LaboratoryAthenaError::Wire(error.to_string()))?,
+                .map_err(|error| LaboratoryProductionError::Wire(error.to_string()))?,
         };
         rest.validate()?;
         Ok(rest)
     }
 
-    pub fn standing_bytes(&self) -> Result<Vec<u8>, LaboratoryAthenaError> {
+    pub fn standing_bytes(&self) -> Result<Vec<u8>, LaboratoryProductionError> {
         self.validate()?;
         encode_components(
             STANDING_MAGIC,
             &[
                 self.production
                     .standing_bytes()
-                    .map_err(|error| LaboratoryAthenaError::Production(error.to_string()))?,
+                    .map_err(|error| LaboratoryProductionError::Production(error.to_string()))?,
                 self.native
                     .canonical_bytes()
-                    .map_err(|error| LaboratoryAthenaError::Native(error.to_string()))?,
+                    .map_err(|error| LaboratoryProductionError::Native(error.to_string()))?,
                 self.cultivated_history
                     .canonical_bytes()
-                    .map_err(|error| LaboratoryAthenaError::Cultivated(error.to_string()))?,
+                    .map_err(|error| LaboratoryProductionError::Cultivated(error.to_string()))?,
                 serde_json::to_vec(&self.chronology)
-                    .map_err(|error| LaboratoryAthenaError::Wire(error.to_string()))?,
+                    .map_err(|error| LaboratoryProductionError::Wire(error.to_string()))?,
                 serde_json::to_vec(&self.junction)
-                    .map_err(|error| LaboratoryAthenaError::Wire(error.to_string()))?,
+                    .map_err(|error| LaboratoryProductionError::Wire(error.to_string()))?,
             ],
         )
         .map_err(Into::into)
     }
 
-    pub fn decoder_bytes(&self) -> Result<Vec<u8>, LaboratoryAthenaError> {
+    pub fn decoder_bytes(&self) -> Result<Vec<u8>, LaboratoryProductionError> {
         self.validate()?;
         encode_components(
             DECODER_MAGIC,
             &[
                 self.production
                     .decoder_bytes()
-                    .map_err(|error| LaboratoryAthenaError::Production(error.to_string()))?,
+                    .map_err(|error| LaboratoryProductionError::Production(error.to_string()))?,
                 serde_json::to_vec(&self.decoder)
-                    .map_err(|error| LaboratoryAthenaError::Wire(error.to_string()))?,
+                    .map_err(|error| LaboratoryProductionError::Wire(error.to_string()))?,
             ],
         )
         .map_err(Into::into)
     }
 
-    pub fn fibre_bytes(&self) -> Result<Vec<u8>, LaboratoryAthenaError> {
+    pub fn fibre_bytes(&self) -> Result<Vec<u8>, LaboratoryProductionError> {
         self.validate()?;
         encode_components(
             FIBRES_MAGIC,
             &[
                 self.production
                     .fibre_bytes()
-                    .map_err(|error| LaboratoryAthenaError::Production(error.to_string()))?,
+                    .map_err(|error| LaboratoryProductionError::Production(error.to_string()))?,
                 serde_json::to_vec(&self.reconstruction)
-                    .map_err(|error| LaboratoryAthenaError::Wire(error.to_string()))?,
+                    .map_err(|error| LaboratoryProductionError::Wire(error.to_string()))?,
             ],
         )
         .map_err(Into::into)
     }
 
-    pub fn canonical_identity(&self) -> Result<String, LaboratoryAthenaError> {
+    pub fn canonical_identity(&self) -> Result<String, LaboratoryProductionError> {
         let mut hasher = Sha256::new();
         for bytes in [
             self.standing_bytes()?,
@@ -441,7 +441,10 @@ impl LaboratoryAthenaRest {
         self.junction.decision == LaboratoryDecision::Committed
     }
 
-    pub fn admit_inquiry(&self, inquiry: &LaboratoryInquiry) -> Result<(), LaboratoryAthenaError> {
+    pub fn admit_inquiry(
+        &self,
+        inquiry: &LaboratoryInquiry,
+    ) -> Result<(), LaboratoryProductionError> {
         inquiry.validate_shape()?;
         if inquiry.predecessor_rest_sha256 != self.canonical_identity()?
             || self
@@ -450,7 +453,7 @@ impl LaboratoryAthenaRest {
                 .binary_search(&digest(inquiry.occurrence.as_bytes()))
                 .is_ok()
         {
-            return Err(LaboratoryAthenaError::Inquiry);
+            return Err(LaboratoryProductionError::Inquiry);
         }
         Ok(())
     }
@@ -478,7 +481,7 @@ impl LaboratoryAthenaRest {
         world_return: LaboratoryWorldReturn,
         morphology_delta: LaboratoryMorphologyDelta,
         decision_occurrence: String,
-    ) -> Result<Self, LaboratoryAthenaError> {
+    ) -> Result<Self, LaboratoryProductionError> {
         self.validate()?;
         if self.committed()
             || decision_occurrence.is_empty()
@@ -496,7 +499,7 @@ impl LaboratoryAthenaRest {
             || !morphology_delta.metric_adjoint_held
             || morphology_delta.exact_rank == 0
         {
-            return Err(LaboratoryAthenaError::WorldReturn);
+            return Err(LaboratoryProductionError::WorldReturn);
         }
         let predecessor_identity = self.canonical_identity()?;
         self.junction.decision = LaboratoryDecision::Committed;
@@ -510,17 +513,17 @@ impl LaboratoryAthenaRest {
 
     pub fn withdraw(
         mut self,
-    ) -> Result<(Self, LaboratoryWithdrawalReceipt), LaboratoryAthenaError> {
+    ) -> Result<(Self, LaboratoryWithdrawalReceipt), LaboratoryProductionError> {
         self.validate()?;
         if !self.committed() {
-            return Err(LaboratoryAthenaError::Decision);
+            return Err(LaboratoryProductionError::Decision);
         }
         let committed_identity = self.canonical_identity()?;
         let predecessor_identity = self
             .junction
             .predecessor_identity
             .take()
-            .ok_or(LaboratoryAthenaError::Decision)?;
+            .ok_or(LaboratoryProductionError::Decision)?;
         self.junction.decision = LaboratoryDecision::Declined;
         self.junction.decision_occurrence = self.junction.genesis_decision_occurrence.clone();
         self.junction.world_return = None;
@@ -534,29 +537,29 @@ impl LaboratoryAthenaRest {
             exact_predecessor_restored: predecessor_identity == restored_identity,
         };
         if !receipt.exact_predecessor_restored {
-            return Err(LaboratoryAthenaError::Withdrawal);
+            return Err(LaboratoryProductionError::Withdrawal);
         }
         Ok((self, receipt))
     }
 
-    pub fn validate(&self) -> Result<(), LaboratoryAthenaError> {
+    pub fn validate(&self) -> Result<(), LaboratoryProductionError> {
         self.production
             .validate()
-            .map_err(|error| LaboratoryAthenaError::Production(error.to_string()))?;
+            .map_err(|error| LaboratoryProductionError::Production(error.to_string()))?;
         self.chronology.validate()?;
         self.native
             .validate()
-            .map_err(|error| LaboratoryAthenaError::Native(error.to_string()))?;
+            .map_err(|error| LaboratoryProductionError::Native(error.to_string()))?;
         let native_bytes = self
             .native
             .canonical_bytes()
-            .map_err(|error| LaboratoryAthenaError::Native(error.to_string()))?;
+            .map_err(|error| LaboratoryProductionError::Native(error.to_string()))?;
         let cultivated_bytes = self
             .cultivated_history
             .canonical_bytes()
-            .map_err(|error| LaboratoryAthenaError::Cultivated(error.to_string()))?;
+            .map_err(|error| LaboratoryProductionError::Cultivated(error.to_string()))?;
         CultivatedReceiverHistoryRest::mount(&cultivated_bytes, &native_bytes)
-            .map_err(|error| LaboratoryAthenaError::Cultivated(error.to_string()))?;
+            .map_err(|error| LaboratoryProductionError::Cultivated(error.to_string()))?;
         if self.junction.schema != LABORATORY_JUNCTION_SCHEMA
             || self.junction.component_identities
                 != identities(
@@ -588,7 +591,7 @@ impl LaboratoryAthenaRest {
             || self.reconstruction.shortest_separating_receivers.is_empty()
             || self.reconstruction.open_alternatives.is_empty()
         {
-            return Err(LaboratoryAthenaError::Chronology);
+            return Err(LaboratoryProductionError::Chronology);
         }
         match (
             self.junction.decision,
@@ -598,7 +601,7 @@ impl LaboratoryAthenaRest {
         ) {
             (LaboratoryDecision::Declined, None, None, None) => {
                 if self.junction.decision_occurrence != self.junction.genesis_decision_occurrence {
-                    return Err(LaboratoryAthenaError::Decision);
+                    return Err(LaboratoryProductionError::Decision);
                 }
             }
             (LaboratoryDecision::Committed, Some(predecessor), Some(returned), Some(delta)) => {
@@ -614,17 +617,17 @@ impl LaboratoryAthenaRest {
                     || self.junction.decision_occurrence
                         == self.junction.genesis_decision_occurrence
                 {
-                    return Err(LaboratoryAthenaError::Decision);
+                    return Err(LaboratoryProductionError::Decision);
                 }
             }
-            _ => return Err(LaboratoryAthenaError::Decision),
+            _ => return Err(LaboratoryProductionError::Decision),
         }
         Ok(())
     }
 }
 
-impl From<super::types::ProductionAthenaError> for LaboratoryAthenaError {
-    fn from(error: super::types::ProductionAthenaError) -> Self {
-        LaboratoryAthenaError::Wire(error.to_string())
+impl From<super::types::ProductionEcologyError> for LaboratoryProductionError {
+    fn from(error: super::types::ProductionEcologyError) -> Self {
+        LaboratoryProductionError::Wire(error.to_string())
     }
 }

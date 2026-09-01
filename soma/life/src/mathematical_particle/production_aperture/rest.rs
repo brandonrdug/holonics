@@ -4,7 +4,7 @@ use sha2::{Digest, Sha256};
 use super::super::{DynamicMorphologyRest, LongHorizonRetainedBoundary, MultimodalTransportRest};
 use super::components::component_identities;
 use super::types::{
-    ProductionAthenaError, ProductionAthenaRest, ProductionDecision, ProductionFibreBinding,
+    ProductionDecision, ProductionEcologyError, ProductionEcologyRest, ProductionFibreBinding,
     ProductionInquiry, ProductionReconstructionBoundary, ProductionStandingJunction,
     ProductionWithdrawalReceipt, ProductionWorldReturn,
 };
@@ -14,7 +14,7 @@ use super::{
     STANDING_MAGIC,
 };
 
-impl ProductionAthenaRest {
+impl ProductionEcologyRest {
     pub fn found(
         inference: InferenceEcologyRest,
         morphology: DynamicMorphologyRest,
@@ -22,9 +22,9 @@ impl ProductionAthenaRest {
         media: MultimodalTransportRest,
         development_occurrences: Vec<String>,
         decision_occurrence: String,
-    ) -> Result<Self, ProductionAthenaError> {
+    ) -> Result<Self, ProductionEcologyError> {
         if development_occurrences.is_empty() || decision_occurrence.is_empty() {
-            return Err(ProductionAthenaError::Lineage);
+            return Err(ProductionEcologyError::Lineage);
         }
         let component_identities =
             component_identities(&inference, &morphology, &retained_boundary, &media)?;
@@ -39,14 +39,14 @@ impl ProductionAthenaRest {
             let identity = component_identities
                 .iter()
                 .find(|identity| identity.role == role)
-                .ok_or(ProductionAthenaError::Lineage)?;
+                .ok_or(ProductionEcologyError::Lineage)?;
             Ok(ProductionFibreBinding {
                 role: role.to_owned(),
                 component_sha256: identity.sha256.clone(),
                 complete_reconstruction_component: true,
             })
         })
-        .collect::<Result<Vec<_>, ProductionAthenaError>>()?;
+        .collect::<Result<Vec<_>, ProductionEcologyError>>()?;
         let mut development_occurrence_sha256 = development_occurrences
             .iter()
             .map(|occurrence| digest(occurrence.as_bytes()))
@@ -116,7 +116,7 @@ impl ProductionAthenaRest {
         standing: &[u8],
         decoder: &[u8],
         fibres: &[u8],
-    ) -> Result<Self, ProductionAthenaError> {
+    ) -> Result<Self, ProductionEcologyError> {
         let standing = decode_components(STANDING_MAGIC, standing, 7)?;
         let decoder = decode_components(DECODER_MAGIC, decoder, 4)?;
         let fibres = decode_components(FIBRES_MAGIC, fibres, 5)?;
@@ -130,27 +130,27 @@ impl ProductionAthenaRest {
                 &fibres[1],
                 &standing[2],
             )
-            .map_err(|error| ProductionAthenaError::Inference(error.to_string()))?,
+            .map_err(|error| ProductionEcologyError::Inference(error.to_string()))?,
             morphology: DynamicMorphologyRest::read(&standing[3])
-                .map_err(|error| ProductionAthenaError::Morphology(error.to_string()))?,
+                .map_err(|error| ProductionEcologyError::Morphology(error.to_string()))?,
             retained_boundary: LongHorizonRetainedBoundary::read(
                 &standing[4],
                 &decoder[2],
                 &fibres[2],
             )
-            .map_err(|error| ProductionAthenaError::Boundary(error.to_string()))?,
+            .map_err(|error| ProductionEcologyError::Boundary(error.to_string()))?,
             media: MultimodalTransportRest::read(&standing[5], &decoder[3], &fibres[3])
-                .map_err(|error| ProductionAthenaError::Media(error.to_string()))?,
+                .map_err(|error| ProductionEcologyError::Media(error.to_string()))?,
             junction: serde_json::from_slice(&standing[6])
-                .map_err(|error| ProductionAthenaError::Wire(error.to_string()))?,
+                .map_err(|error| ProductionEcologyError::Wire(error.to_string()))?,
             reconstruction: serde_json::from_slice(&fibres[4])
-                .map_err(|error| ProductionAthenaError::Wire(error.to_string()))?,
+                .map_err(|error| ProductionEcologyError::Wire(error.to_string()))?,
         };
         rest.validate()?;
         Ok(rest)
     }
 
-    pub fn standing_bytes(&self) -> Result<Vec<u8>, ProductionAthenaError> {
+    pub fn standing_bytes(&self) -> Result<Vec<u8>, ProductionEcologyError> {
         self.validate()?;
         encode_components(
             STANDING_MAGIC,
@@ -158,30 +158,30 @@ impl ProductionAthenaRest {
                 self.inference
                     .recurrent
                     .standing_bytes()
-                    .map_err(|error| ProductionAthenaError::Inference(error.to_string()))?,
+                    .map_err(|error| ProductionEcologyError::Inference(error.to_string()))?,
                 self.inference
                     .heterogeneous
                     .standing_bytes()
-                    .map_err(|error| ProductionAthenaError::Inference(error.to_string()))?,
+                    .map_err(|error| ProductionEcologyError::Inference(error.to_string()))?,
                 self.inference
                     .junction_bytes()
-                    .map_err(|error| ProductionAthenaError::Inference(error.to_string()))?,
+                    .map_err(|error| ProductionEcologyError::Inference(error.to_string()))?,
                 self.morphology
                     .canonical_bytes()
-                    .map_err(|error| ProductionAthenaError::Morphology(error.to_string()))?,
+                    .map_err(|error| ProductionEcologyError::Morphology(error.to_string()))?,
                 self.retained_boundary
                     .standing_bytes()
-                    .map_err(|error| ProductionAthenaError::Boundary(error.to_string()))?,
+                    .map_err(|error| ProductionEcologyError::Boundary(error.to_string()))?,
                 self.media
                     .standing_bytes()
-                    .map_err(|error| ProductionAthenaError::Media(error.to_string()))?,
+                    .map_err(|error| ProductionEcologyError::Media(error.to_string()))?,
                 serde_json::to_vec(&self.junction)
-                    .map_err(|error| ProductionAthenaError::Wire(error.to_string()))?,
+                    .map_err(|error| ProductionEcologyError::Wire(error.to_string()))?,
             ],
         )
     }
 
-    pub fn decoder_bytes(&self) -> Result<Vec<u8>, ProductionAthenaError> {
+    pub fn decoder_bytes(&self) -> Result<Vec<u8>, ProductionEcologyError> {
         self.validate()?;
         encode_components(
             DECODER_MAGIC,
@@ -189,22 +189,22 @@ impl ProductionAthenaRest {
                 self.inference
                     .recurrent
                     .decoder_bytes()
-                    .map_err(|error| ProductionAthenaError::Inference(error.to_string()))?,
+                    .map_err(|error| ProductionEcologyError::Inference(error.to_string()))?,
                 self.inference
                     .heterogeneous
                     .decoder_bytes()
-                    .map_err(|error| ProductionAthenaError::Inference(error.to_string()))?,
+                    .map_err(|error| ProductionEcologyError::Inference(error.to_string()))?,
                 self.retained_boundary
                     .decoder_bytes()
-                    .map_err(|error| ProductionAthenaError::Boundary(error.to_string()))?,
+                    .map_err(|error| ProductionEcologyError::Boundary(error.to_string()))?,
                 self.media
                     .decoder_bytes()
-                    .map_err(|error| ProductionAthenaError::Media(error.to_string()))?,
+                    .map_err(|error| ProductionEcologyError::Media(error.to_string()))?,
             ],
         )
     }
 
-    pub fn fibre_bytes(&self) -> Result<Vec<u8>, ProductionAthenaError> {
+    pub fn fibre_bytes(&self) -> Result<Vec<u8>, ProductionEcologyError> {
         self.validate()?;
         encode_components(
             FIBRES_MAGIC,
@@ -212,24 +212,24 @@ impl ProductionAthenaRest {
                 self.inference
                     .recurrent
                     .fibre_bytes()
-                    .map_err(|error| ProductionAthenaError::Inference(error.to_string()))?,
+                    .map_err(|error| ProductionEcologyError::Inference(error.to_string()))?,
                 self.inference
                     .heterogeneous
                     .fibre_bytes()
-                    .map_err(|error| ProductionAthenaError::Inference(error.to_string()))?,
+                    .map_err(|error| ProductionEcologyError::Inference(error.to_string()))?,
                 self.retained_boundary
                     .fibre_bytes()
-                    .map_err(|error| ProductionAthenaError::Boundary(error.to_string()))?,
+                    .map_err(|error| ProductionEcologyError::Boundary(error.to_string()))?,
                 self.media
                     .fibre_bytes()
-                    .map_err(|error| ProductionAthenaError::Media(error.to_string()))?,
+                    .map_err(|error| ProductionEcologyError::Media(error.to_string()))?,
                 serde_json::to_vec(&self.reconstruction)
-                    .map_err(|error| ProductionAthenaError::Wire(error.to_string()))?,
+                    .map_err(|error| ProductionEcologyError::Wire(error.to_string()))?,
             ],
         )
     }
 
-    pub fn canonical_identity(&self) -> Result<String, ProductionAthenaError> {
+    pub fn canonical_identity(&self) -> Result<String, ProductionEcologyError> {
         let mut hasher = Sha256::new();
         for bytes in [
             self.standing_bytes()?,
@@ -246,7 +246,7 @@ impl ProductionAthenaRest {
         self.junction.decision == ProductionDecision::Committed
     }
 
-    pub fn admit_inquiry(&self, inquiry: &ProductionInquiry) -> Result<(), ProductionAthenaError> {
+    pub fn admit_inquiry(&self, inquiry: &ProductionInquiry) -> Result<(), ProductionEcologyError> {
         inquiry.validate_shape()?;
         let admitted_predecessor = self
             .junction
@@ -269,7 +269,7 @@ impl ProductionAthenaRest {
                 .binary_search(&digest(inquiry.occurrence.as_bytes()))
                 .is_ok()
         {
-            return Err(ProductionAthenaError::Inquiry);
+            return Err(ProductionEcologyError::Inquiry);
         }
         Ok(())
     }
@@ -278,14 +278,14 @@ impl ProductionAthenaRest {
         mut self,
         world_return: ProductionWorldReturn,
         decision_occurrence: String,
-    ) -> Result<Self, ProductionAthenaError> {
+    ) -> Result<Self, ProductionEcologyError> {
         self.validate()?;
         world_return.validate()?;
         if self.committed()
             || decision_occurrence.is_empty()
             || decision_occurrence == self.junction.decision_occurrence
         {
-            return Err(ProductionAthenaError::Decision);
+            return Err(ProductionEcologyError::Decision);
         }
         let predecessor_identity = self.canonical_identity()?;
         self.junction.decision = ProductionDecision::Committed;
@@ -298,17 +298,17 @@ impl ProductionAthenaRest {
 
     pub fn withdraw(
         mut self,
-    ) -> Result<(Self, ProductionWithdrawalReceipt), ProductionAthenaError> {
+    ) -> Result<(Self, ProductionWithdrawalReceipt), ProductionEcologyError> {
         self.validate()?;
         if !self.committed() {
-            return Err(ProductionAthenaError::Decision);
+            return Err(ProductionEcologyError::Decision);
         }
         let committed_identity = self.canonical_identity()?;
         let predecessor_identity = self
             .junction
             .predecessor_identity
             .take()
-            .ok_or(ProductionAthenaError::Decision)?;
+            .ok_or(ProductionEcologyError::Decision)?;
         self.junction.decision = ProductionDecision::Declined;
         self.junction.decision_occurrence = self.junction.genesis_decision_occurrence.clone();
         self.junction.world_return = None;
@@ -321,7 +321,7 @@ impl ProductionAthenaRest {
             exact_predecessor_restored: restored_identity == predecessor_identity,
         };
         if !receipt.exact_predecessor_restored {
-            return Err(ProductionAthenaError::Withdrawal);
+            return Err(ProductionEcologyError::Withdrawal);
         }
         Ok((self, receipt))
     }
@@ -331,12 +331,12 @@ impl ProductionAthenaRest {
             / self.retained_boundary.standing.native_states.len()
     }
 
-    pub fn context_starts(&self) -> Result<Vec<u32>, ProductionAthenaError> {
+    pub fn context_starts(&self) -> Result<Vec<u32>, ProductionEcologyError> {
         self.retained_boundary
             .standing
             .native_states
             .iter()
-            .map(|state| u32::try_from(state.0).map_err(|_| ProductionAthenaError::Extent))
+            .map(|state| u32::try_from(state.0).map_err(|_| ProductionEcologyError::Extent))
             .collect()
     }
 
@@ -356,19 +356,19 @@ impl ProductionAthenaRest {
             .collect()
     }
 
-    pub fn validate(&self) -> Result<(), ProductionAthenaError> {
+    pub fn validate(&self) -> Result<(), ProductionEcologyError> {
         self.inference
             .validate()
-            .map_err(|error| ProductionAthenaError::Inference(error.to_string()))?;
+            .map_err(|error| ProductionEcologyError::Inference(error.to_string()))?;
         self.morphology
             .canonical_bytes()
-            .map_err(|error| ProductionAthenaError::Morphology(error.to_string()))?;
+            .map_err(|error| ProductionEcologyError::Morphology(error.to_string()))?;
         self.retained_boundary
             .validate()
-            .map_err(|error| ProductionAthenaError::Boundary(error.to_string()))?;
+            .map_err(|error| ProductionEcologyError::Boundary(error.to_string()))?;
         self.media
             .standing_bytes()
-            .map_err(|error| ProductionAthenaError::Media(error.to_string()))?;
+            .map_err(|error| ProductionEcologyError::Media(error.to_string()))?;
         let expected = component_identities(
             &self.inference,
             &self.morphology,
@@ -402,7 +402,7 @@ impl ProductionAthenaRest {
                 != self.morphology.successor_action().len()
             || self.media.standing.heldout_anchor_sections.is_empty()
         {
-            return Err(ProductionAthenaError::Lineage);
+            return Err(ProductionEcologyError::Lineage);
         }
         match (
             self.junction.decision,
@@ -411,7 +411,7 @@ impl ProductionAthenaRest {
         ) {
             (ProductionDecision::Declined, None, None) => {
                 if self.junction.decision_occurrence != self.junction.genesis_decision_occurrence {
-                    return Err(ProductionAthenaError::Decision);
+                    return Err(ProductionEcologyError::Decision);
                 }
             }
             (ProductionDecision::Committed, Some(predecessor), Some(world_return)) => {
@@ -419,19 +419,19 @@ impl ProductionAthenaRest {
                     || self.junction.decision_occurrence
                         == self.junction.genesis_decision_occurrence
                 {
-                    return Err(ProductionAthenaError::Decision);
+                    return Err(ProductionEcologyError::Decision);
                 }
                 world_return.validate()?;
             }
-            _ => return Err(ProductionAthenaError::Decision),
+            _ => return Err(ProductionEcologyError::Decision),
         }
         for binding in &self.reconstruction.component_fibres {
             let identity = expected
                 .iter()
                 .find(|identity| identity.role == binding.role)
-                .ok_or(ProductionAthenaError::Lineage)?;
+                .ok_or(ProductionEcologyError::Lineage)?;
             if identity.sha256 != binding.component_sha256 {
-                return Err(ProductionAthenaError::Lineage);
+                return Err(ProductionEcologyError::Lineage);
             }
         }
         Ok(())

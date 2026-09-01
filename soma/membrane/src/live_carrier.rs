@@ -391,7 +391,7 @@ impl From<CarrierGrowth> for LiveCarrierError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use body::manifold::{atom_node, ErosBody};
+    use body::manifold::{atom_node, ContinuingBody};
     use body::num::Cog;
 
     #[test]
@@ -404,7 +404,7 @@ mod tests {
         let mut carrier = GrowingCarrier::with_depth(1).unwrap();
         let header;
         {
-            let mut body = ErosBody::over_standing_world_storage_from_first_difference(
+            let mut body = ContinuingBody::over_standing_world_storage_from_first_difference(
                 &standing,
                 &mut own,
                 arrivals[0].place,
@@ -428,7 +428,7 @@ mod tests {
             let mut own = crate::GrowingSparseOwn::new();
             let (header, own_cells);
             {
-                let mut body = ErosBody::resume_standing_world_storage_from_live_header(
+                let mut body = ContinuingBody::resume_standing_world_storage_from_live_header(
                     &standing,
                     &mut own,
                     snapshot.header(),

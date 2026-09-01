@@ -15,8 +15,8 @@ use holonic_engine::{
     derived_factor_cover::OverlapKind, receiver_exact_compression::ItemId,
     receiver_history_compression::ReceiverHistoryCompression, EventId,
 };
-use life::athena_native::{
-    NativeEcologyRest, ExchangeCandidateLineage, ExchangeProductMaterial, ExchangeSituatedProduct,
+use life::native_intelligence::{
+    ExchangeCandidateLineage, ExchangeProductMaterial, ExchangeSituatedProduct, NativeEcologyRest,
     ReturnedExchangeSection,
 };
 use serde::Serialize;
@@ -46,8 +46,8 @@ fn main() -> Result<(), String> {
     fs::create_dir_all(&output).map_err(display)?;
     let started = Instant::now();
 
-    let rest =
-        NativeEcologyRest::read(&fs::read(root.join(K3_REST)).map_err(display)?).map_err(display)?;
+    let rest = NativeEcologyRest::read(&fs::read(root.join(K3_REST)).map_err(display)?)
+        .map_err(display)?;
     let material = read_exchange_material(&root.join(EXCHANGE_RETURN))?;
     eprintln!("L1 mount complete; founding the exchange/K3 dependent product");
     let product = ExchangeSituatedProduct::found(&rest, material).map_err(display)?;

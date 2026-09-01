@@ -15,15 +15,15 @@ use life::{
     addressed_span::{
         AddressedMemorySpan, AddressedSpanDefect, CompleteAddressedMemorySpan, MemorySpanFragment,
     },
-    athena_native::{
-        AdmittedReturnedAffineLaboratoryRestWitness, AthenaCausalMembrane,
-        AthenaMembraneConsequence, AthenaMembraneCrossingReceipt, AthenaMembraneStanding,
-        ExactMembraneChartPassage, ExteriorOccurrenceTransducer, GranularCultivationWithdrawal,
-        GranularReturnedAffineAthenaRest, ReturnedAffineLaboratoryAthenaRest,
-    },
     current_world::StreamedOctetOrgan,
     mathematical_source::{
         ExactAcousticOccurrence, ExactOpticalOccurrence, HierarchicalOpticalPassage,
+    },
+    native_intelligence::{
+        AdmittedReturnedAffineLaboratoryRestWitness, ExactMembraneChartPassage,
+        ExteriorOccurrenceTransducer, GranularCultivationWithdrawal,
+        GranularReturnedAffineEcologyRest, MembraneConsequence, MembraneCrossingReceipt,
+        MembraneStanding, NativeCausalMembrane, ReturnedAffineLaboratoryRest,
     },
 };
 use serde::Serialize;
@@ -88,7 +88,7 @@ struct SpanPresentationReceipt {
     join_population: u64,
     largest_fragment_octets: u64,
     complete_source_fibre_sha256: String,
-    crossing: AthenaMembraneCrossingReceipt,
+    crossing: MembraneCrossingReceipt,
 }
 
 #[derive(Serialize)]
@@ -133,7 +133,7 @@ fn main() -> Result<(), String> {
         "3ab826fb8512aae85096193ce103a384092111e8f26836415b0e1dc7eba02178",
     )
     .map_err(display)?;
-    let predecessor = ReturnedAffineLaboratoryAthenaRest::read_admitted(
+    let predecessor = ReturnedAffineLaboratoryRest::read_admitted(
         &fs::read(root.join(PREDECESSOR)).map_err(display)?,
         &witness,
     )
@@ -142,10 +142,10 @@ fn main() -> Result<(), String> {
         GranularCultivationWithdrawal::read(&fs::read(root.join(ORGAN)).map_err(display)?)
             .map_err(display)?;
     let rest =
-        GranularReturnedAffineAthenaRest::restore(predecessor, withdrawal).map_err(display)?;
+        GranularReturnedAffineEcologyRest::restore(predecessor, withdrawal).map_err(display)?;
     let rested_identity_sha256 = rest.identity().to_owned();
     let (address, receiver) = continuing_native_address(&rest)?;
-    let mut membrane = AthenaCausalMembrane::mount(rest);
+    let mut membrane = NativeCausalMembrane::mount(rest);
 
     let acoustic_body = fs::read(root.join(ACOUSTIC)).map_err(display)?;
     let optical_body = fs::read(root.join(OPTICAL_RASTER)).map_err(display)?;
@@ -489,11 +489,11 @@ fn span_stats(span: &CompleteAddressedMemorySpan) -> (u64, u64, u64) {
 }
 
 fn cross_and_recover<T: ExteriorOccurrenceTransducer + Any + Send>(
-    membrane: &mut AthenaCausalMembrane<GranularReturnedAffineAthenaRest>,
+    membrane: &mut NativeCausalMembrane<GranularReturnedAffineEcologyRest>,
     source: T,
-    address: &life::athena_native::NativeSectionAddress,
+    address: &life::native_intelligence::NativeSectionAddress,
     receiver: ReceiverId,
-) -> Result<(AthenaMembraneCrossingReceipt, T), String> {
+) -> Result<(MembraneCrossingReceipt, T), String> {
     let exterior = source.into_exterior_fibre().map_err(display)?;
     let boundary = BoundaryId(exterior.address().event_projection.0);
     let base = BaseUnits::declare(["sens1-common-mouth-current"]).map_err(display)?;
@@ -511,7 +511,7 @@ fn cross_and_recover<T: ExteriorOccurrenceTransducer + Any + Send>(
             Vec::new(),
         )
         .map_err(|failure| format!("SENS1 binding refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(returned) =
+    let MembraneConsequence::Returned(returned) =
         membrane.receive_occurrence(occurrence).map_err(display)?
     else {
         return Err("the SENS1 source did not cross the common Athena mouth".to_owned());
@@ -526,8 +526,8 @@ fn cross_and_recover<T: ExteriorOccurrenceTransducer + Any + Send>(
 }
 
 fn continuing_native_address(
-    standing: &impl AthenaMembraneStanding,
-) -> Result<(life::athena_native::NativeSectionAddress, ReceiverId), String> {
+    standing: &impl MembraneStanding,
+) -> Result<(life::native_intelligence::NativeSectionAddress, ReceiverId), String> {
     for address in &standing.membrane_realization().sections {
         let addressed = standing
             .membrane_ecology()

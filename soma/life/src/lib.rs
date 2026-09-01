@@ -10,17 +10,11 @@ pub mod addressed_span;
 pub mod agentic_language;
 pub mod agentic_research;
 pub mod algorithmic_material;
-/// Athena-alpha's receiver-relative condensation of complete exchange returns into recurring
-/// proper continuation generators. The developmental world owns the source passages; this owner
-/// returns only parented local morphology and its open reconstruction fibres.
-pub mod athena_alpha;
-// Athena alpha's corrected native state: a receiver/history quotient of addressed causal
-// sections. The superseded trigram condensation remains isolated in `athena_alpha` as a measured
-// counterexample fixture; this owner never imports its global partition or token-window law.
-pub mod athena_native;
-pub mod athena_receiver_history;
-pub mod atlas_cultivation;
+// Receiver/history quotients of addressed causal sections. No fixed lexical condensation or
+// campaign product owns the quotient.
 pub mod causal_language;
+pub mod native_intelligence;
+pub mod receiver_history;
 // Carrier-neutral operation sections: oriented incidence plus exact consequence histories, read
 // through receiver-exact compression. Codec/material names remain lineage and never route conduct.
 // `canon/TABLET_THE_REASONING_CYCLE.md` §8.
@@ -43,7 +37,6 @@ pub mod exact_world;
 // recovers a tokenizer from an oracle it may call; this recovers one from octets that merely
 // happened, with `occurs` and `recurs` as the only contact. It lives here because it assembles
 // `holonic-engine`'s `RecoveredCodec` carrier around material that only `life` has a mouth for.
-pub mod eros_rest;
 // The provider-neutral record-incidence owner for Athena's exchange world-tube. JSONL and visible
 // dialogue are exterior codec faces; occurrence identity, ordered tree incidence, exact scalar
 // contact classes, chronology receivers, and the source-detached rest are the live construction.
@@ -76,9 +69,9 @@ pub mod mathematical_particle;
 // derives their generic serial/spatial incidence without accepting caller-authored links.
 pub mod mathematical_source;
 pub mod morphological_language;
-// Deed P4: the rest is mounted alone — conducted, deposited into, and re-sealed — with the
-// corpus and the source absent from the path. It composes `atlas_cultivation`'s law with
-// `suffix_ecology`'s new return edge and founds no organ of its own.
+// The rest is mounted alone — conducted, deposited into, and re-sealed — with the corpus and the
+// source absent from the path. It composes the standing suffix ecology with its returned edge and
+// founds no organ of its own.
 pub mod presentation_quotient;
 pub mod relational_language;
 // The receiver-relative preimage population of a presented token occurrence. It lives here because

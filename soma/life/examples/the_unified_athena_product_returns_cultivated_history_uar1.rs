@@ -3,9 +3,9 @@
 
 use std::{collections::BTreeSet, fs, path::PathBuf, time::Instant};
 
-use life::athena_native::{
+use life::native_intelligence::{
     EmanationDeed, EmanationParticipant, LaboratoryParticipantEmanation,
-    LaboratoryParticipantIngress, OpticalAthenaRest, PerspectiveChart,
+    LaboratoryParticipantIngress, OpticalProductRest, PerspectiveChart,
 };
 use serde::Serialize;
 use serde_json::json;
@@ -49,7 +49,7 @@ fn main() -> Result<(), String> {
     fs::create_dir_all(&output).map_err(display)?;
     let started = Instant::now();
     let wire = fs::read(root.join(REST)).map_err(display)?;
-    let rest = OpticalAthenaRest::read(&wire).map_err(display)?;
+    let rest = OpticalProductRest::read(&wire).map_err(display)?;
     if rest.identity() != EXPECTED_ALP5_IDENTITY {
         return Err("UAR1 did not receive the exact ALP5 body".to_owned());
     }

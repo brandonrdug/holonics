@@ -6,8 +6,8 @@ use std::{
     time::Instant,
 };
 
-use life::athena_native::{
-    AffineLaboratoryCultivatedAthenaRest, EmanationDeed, EmanationParticipant,
+use life::native_intelligence::{
+    AffineLaboratoryCultivatedRest, EmanationDeed, EmanationParticipant,
     LaboratoryParticipantEmanation, LaboratoryParticipantIngress, PerspectiveChart,
 };
 use serde::Serialize;
@@ -37,7 +37,7 @@ fn main() -> Result<(), String> {
     fs::create_dir_all(&output).map_err(display)?;
     let started = Instant::now();
     let rest_bytes = fs::read(root.join(REST)).map_err(display)?;
-    let rest = AffineLaboratoryCultivatedAthenaRest::read(&rest_bytes).map_err(display)?;
+    let rest = AffineLaboratoryCultivatedRest::read(&rest_bytes).map_err(display)?;
     let rest_identity = rest.identity().to_owned();
     let mut resident = rest.mount().map_err(display)?;
     let participant = EmanationParticipant {

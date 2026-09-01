@@ -10,18 +10,17 @@ use std::{
 };
 
 use life::{
-    athena_native::{
+    mathematical_source::HierarchicalOpticalPassage,
+    native_intelligence::{
         compare_material_factorizations, realize_material_source, AddressedEmanationIngress,
-        AddressedEmanationWorldReturn, AddressedMaterialOccurrence,
-        AffineLaboratoryCultivatedAthenaRest, CausalOperationWorldReturn, CausalResultCell,
-        EmanationDeed, EmanationParticipant, EmanationSurface, EmanationVoice,
-        ExteriorWorldReturnTestimony, HierarchicalOpticalMaterialCandidates,
-        HierarchicalOpticalMaterialReturn, LaboratoryParticipantIngress,
-        MaterialFactorizationAperture, MaterialFactorizationReturn,
+        AddressedEmanationWorldReturn, AddressedMaterialOccurrence, AffineLaboratoryCultivatedRest,
+        CausalOperationWorldReturn, CausalResultCell, EmanationDeed, EmanationParticipant,
+        EmanationSurface, EmanationVoice, ExteriorWorldReturnTestimony,
+        HierarchicalOpticalMaterialCandidates, HierarchicalOpticalMaterialReturn,
+        LaboratoryParticipantIngress, MaterialFactorizationAperture, MaterialFactorizationReturn,
         MaterialSourceBoundaryWorldReturn, MaterialSourceCodec, NativePotentialCellKind,
         PerspectiveChart, SituatedEmanationDifference, SituatedEmanationPassage,
     },
-    mathematical_source::HierarchicalOpticalPassage,
 };
 use serde::Serialize;
 use serde_json::{json, Value};
@@ -54,7 +53,7 @@ fn main() -> Result<(), String> {
     let started = Instant::now();
 
     let rested_wire = fs::read(root.join(REST)).map_err(display)?;
-    let rest = AffineLaboratoryCultivatedAthenaRest::read(&rested_wire).map_err(display)?;
+    let rest = AffineLaboratoryCultivatedRest::read(&rested_wire).map_err(display)?;
     let canonical_rest_identity = rest.identity().to_owned();
     let ablation_atlas = rest.ablation_atlas().map_err(display)?;
 
@@ -464,11 +463,9 @@ fn main() -> Result<(), String> {
         )
         .map_err(display)?;
     let target_ablated = target_resident.into_rest().map_err(display)?;
-    let rest = AffineLaboratoryCultivatedAthenaRest::restore_relational_cell(
-        target_ablated,
-        target_withdrawal,
-    )
-    .map_err(display)?;
+    let rest =
+        AffineLaboratoryCultivatedRest::restore_relational_cell(target_ablated, target_withdrawal)
+            .map_err(display)?;
     let target_attributable = !target_return.selected_cell_addresses.contains(&target_cell)
         && target_return.text != baseline_describe.text;
 
@@ -488,7 +485,7 @@ fn main() -> Result<(), String> {
         )
         .map_err(display)?;
     let sibling_ablated = sibling_resident.into_rest().map_err(display)?;
-    let rest = AffineLaboratoryCultivatedAthenaRest::restore_relational_cell(
+    let rest = AffineLaboratoryCultivatedRest::restore_relational_cell(
         sibling_ablated,
         sibling_withdrawal,
     )
@@ -509,13 +506,11 @@ fn main() -> Result<(), String> {
         .is_none();
     drop(predecessor_aperture);
     drop(predecessor_factorization);
-    let rest = AffineLaboratoryCultivatedAthenaRest::restore_relational_organ(
-        predecessor,
-        organ_withdrawal,
-    )
-    .map_err(display)?;
+    let rest =
+        AffineLaboratoryCultivatedRest::restore_relational_organ(predecessor, organ_withdrawal)
+            .map_err(display)?;
     let restored_exact = rest.identity() == canonical_rest_identity;
-    let remounted = AffineLaboratoryCultivatedAthenaRest::read(&rested_wire).map_err(display)?;
+    let remounted = AffineLaboratoryCultivatedRest::read(&rested_wire).map_err(display)?;
     let source_detached_remount_exact = remounted.identity() == canonical_rest_identity;
 
     let participant_signatures = participant_returns
@@ -690,7 +685,7 @@ fn main() -> Result<(), String> {
 
 #[allow(clippy::too_many_arguments)]
 fn emit_and_return(
-    passage: &mut SituatedEmanationPassage<AffineLaboratoryCultivatedAthenaRest>,
+    passage: &mut SituatedEmanationPassage<AffineLaboratoryCultivatedRest>,
     surfaces: &mut Vec<EmanationSurface>,
     differences: &mut Vec<SituatedEmanationDifference>,
     suffix: &str,

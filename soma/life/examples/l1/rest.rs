@@ -1,23 +1,23 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use life::mathematical_particle::{FamilyCultivatedAthenaRest, LaboratoryAthenaRest};
+use life::mathematical_particle::{FamilyCultivatedEcologyRest, LaboratoryProductionRest};
 
 use super::source;
 
 pub const OUTPUT_NAME: &str = "returned_theorem_families_cultivate_the_continuing_laboratory_rest";
 
-pub fn found(root: &Path) -> Result<FamilyCultivatedAthenaRest, String> {
+pub fn found(root: &Path) -> Result<FamilyCultivatedEcologyRest, String> {
     let l0 = root.join(
         "output/the_laboratory_chronology_cultivates_the_athena_mathematics_ecology/native-rest",
     );
-    let predecessor = LaboratoryAthenaRest::read(
+    let predecessor = LaboratoryProductionRest::read(
         &read(l0.join("standing.bin"))?,
         &read(l0.join("decoder.bin"))?,
         &read(l0.join("fibres.bin"))?,
     )
     .map_err(|error| error.to_string())?;
-    FamilyCultivatedAthenaRest::found(
+    FamilyCultivatedEcologyRest::found(
         predecessor,
         source::mount(root)?,
         "l1/family-junction/no-returned-plates".to_owned(),
@@ -26,7 +26,7 @@ pub fn found(root: &Path) -> Result<FamilyCultivatedAthenaRest, String> {
 }
 
 pub fn write(
-    rest: &FamilyCultivatedAthenaRest,
+    rest: &FamilyCultivatedEcologyRest,
     directory: &Path,
 ) -> Result<(PathBuf, PathBuf, PathBuf), String> {
     fs::create_dir_all(directory).map_err(|error| error.to_string())?;
@@ -49,7 +49,7 @@ pub fn write(
     )
     .map_err(|error| error.to_string())?;
     let reopened =
-        FamilyCultivatedAthenaRest::read(&read(&standing)?, &read(&decoder)?, &read(&fibres)?)
+        FamilyCultivatedEcologyRest::read(&read(&standing)?, &read(&decoder)?, &read(&fibres)?)
             .map_err(|error| error.to_string())?;
     if reopened
         .canonical_identity()

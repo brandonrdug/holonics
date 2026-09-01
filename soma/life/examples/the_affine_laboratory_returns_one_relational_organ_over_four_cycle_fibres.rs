@@ -12,12 +12,12 @@ use std::{
 };
 
 use life::{
-    athena_native::{
-        AffineLaboratoryCultivatedAthenaRest, ExchangeSituatedProduct, SituatedCultivatedAthenaRest,
-    },
     exchange_world_tube::{
         remount_visible_message_projection, ContinuationAperture, Digest32, MessageAddress,
         VisibleMessageProjection,
+    },
+    native_intelligence::{
+        AffineLaboratoryCultivatedRest, ExchangeSituatedProduct, SituatedCultivatedEcologyRest,
     },
 };
 use serde::Serialize;
@@ -98,12 +98,12 @@ fn found(output_override: Option<PathBuf>) -> Result<(), String> {
     eprintln!("repair L5: reading L2 rest and L1 fibre correspondence");
     let l2_bytes = fs::read(root.join(L2_REST)).map_err(display)?;
     let product_bytes = fs::read(root.join(L1_PRODUCT)).map_err(display)?;
-    let predecessor = SituatedCultivatedAthenaRest::read(&l2_bytes).map_err(display)?;
+    let predecessor = SituatedCultivatedEcologyRest::read(&l2_bytes).map_err(display)?;
     let predecessor_identity = predecessor.identity().to_owned();
     let product = ExchangeSituatedProduct::read(&product_bytes).map_err(display)?;
     eprintln!("repair L5: cultivating one affine relational organ");
     let (rest, receipt) =
-        AffineLaboratoryCultivatedAthenaRest::cultivate(predecessor, product, &aperture, &world)
+        AffineLaboratoryCultivatedRest::cultivate(predecessor, product, &aperture, &world)
             .map_err(display)?;
     eprintln!("repair L5: serializing returned source-detached rest");
     let rest_identity = rest.identity().to_owned();
@@ -138,7 +138,7 @@ fn found(output_override: Option<PathBuf>) -> Result<(), String> {
     let (returned_l2, withdrawal) = rest.withdraw_relational_organ().map_err(display)?;
     let withdrawal_exact = returned_l2.identity() == predecessor_identity;
     let restored =
-        AffineLaboratoryCultivatedAthenaRest::restore_relational_organ(returned_l2, withdrawal)
+        AffineLaboratoryCultivatedRest::restore_relational_organ(returned_l2, withdrawal)
             .map_err(display)?;
     let restoration_exact = restored.identity() == rest_identity
         && restored.canonical_bytes().map_err(display)? == rest_bytes;
@@ -186,9 +186,8 @@ fn intervention(baseline_path: &Path, output_path: &Path) -> Result<(), String> 
         .to_path_buf();
     let started = Instant::now();
     eprintln!("repair L5 control: reading baseline affine rest");
-    let baseline =
-        AffineLaboratoryCultivatedAthenaRest::read(&fs::read(baseline_path).map_err(display)?)
-            .map_err(display)?;
+    let baseline = AffineLaboratoryCultivatedRest::read(&fs::read(baseline_path).map_err(display)?)
+        .map_err(display)?;
     let baseline_identity = baseline.identity().to_owned();
     let baseline_cell_addresses = baseline
         .affine_cells()
@@ -206,12 +205,12 @@ fn intervention(baseline_path: &Path, output_path: &Path) -> Result<(), String> 
     let (intervened_aperture, intervened_world, source_intervention) =
         equal_count_source_intervention(&aperture, &world)?;
     let predecessor =
-        SituatedCultivatedAthenaRest::read(&fs::read(root.join(L2_REST)).map_err(display)?)
+        SituatedCultivatedEcologyRest::read(&fs::read(root.join(L2_REST)).map_err(display)?)
             .map_err(display)?;
     let product = ExchangeSituatedProduct::read(&fs::read(root.join(L1_PRODUCT)).map_err(display)?)
         .map_err(display)?;
     eprintln!("repair L5 control: cultivating intervened affine rest");
-    let (intervened, receipt) = AffineLaboratoryCultivatedAthenaRest::cultivate(
+    let (intervened, receipt) = AffineLaboratoryCultivatedRest::cultivate(
         predecessor,
         product,
         &intervened_aperture,
@@ -255,7 +254,7 @@ fn intervention(baseline_path: &Path, output_path: &Path) -> Result<(), String> 
 
 fn detached(rest_path: &Path, output_path: &Path) -> Result<(), String> {
     let bytes = fs::read(rest_path).map_err(display)?;
-    let rest = AffineLaboratoryCultivatedAthenaRest::read(&bytes).map_err(display)?;
+    let rest = AffineLaboratoryCultivatedRest::read(&bytes).map_err(display)?;
     let identity = rest.identity().to_owned();
     let factor_population = rest.correspondences().len();
     let affine_cell_population = rest.affine_cells().len();
@@ -265,7 +264,7 @@ fn detached(rest_path: &Path, output_path: &Path) -> Result<(), String> {
     let mut resident = body.mount().map_err(display)?;
     let returned = resident.conduct().map_err(display)?;
     let body = resident.into_rest();
-    let restored = AffineLaboratoryCultivatedAthenaRest::restore_relational_organ(body, withdrawal)
+    let restored = AffineLaboratoryCultivatedRest::restore_relational_organ(body, withdrawal)
         .map_err(display)?;
     let exact_gpu_l2_conduct = returned.rest_identity_sha256 == restored.body().identity()
         && !returned.apparatus.invariant_transport_reuploaded

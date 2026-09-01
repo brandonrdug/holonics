@@ -59,9 +59,9 @@ impl ResidentMembraneInteriorWord {
     ) -> Result<ResidentAddressedComplexJunctionReturn, CudaRefineError> {
         if terms.is_empty()
             || terms.len() > u32::MAX as usize
-            || terms.iter().any(|term| {
-                term.exterior_port == 0 || term.current.is_zero()
-            })
+            || terms
+                .iter()
+                .any(|term| term.exterior_port == 0 || term.current.is_zero())
         {
             return Err(CudaRefineError::ComplexCurrentShape);
         }
@@ -97,9 +97,8 @@ impl ResidentMembraneInteriorWord {
             let key = (term.exterior_port, term.factor);
             if current_key != Some(key) {
                 if current_key.is_some() {
-                    group_offsets.push(
-                        u64::try_from(at).map_err(|_| CudaRefineError::ComplexCurrentShape)?,
-                    );
+                    group_offsets
+                        .push(u64::try_from(at).map_err(|_| CudaRefineError::ComplexCurrentShape)?);
                 }
                 current_key = Some(key);
                 group_keys.push(key);
@@ -113,7 +112,10 @@ impl ResidentMembraneInteriorWord {
             let targets = group_target_sections
                 .last_mut()
                 .ok_or(CudaRefineError::ComplexCurrentShape)?;
-            if targets.last().is_none_or(|(target, _)| *target != term.target_site) {
+            if targets
+                .last()
+                .is_none_or(|(target, _)| *target != term.target_site)
+            {
                 targets.push((term.target_site, Vec::new()));
             }
             targets
@@ -128,9 +130,8 @@ impl ResidentMembraneInteriorWord {
                 greatest_group_mass += magnitude;
             }
         }
-        group_offsets.push(
-            u64::try_from(ordered.len()).map_err(|_| CudaRefineError::ComplexCurrentShape)?,
-        );
+        group_offsets
+            .push(u64::try_from(ordered.len()).map_err(|_| CudaRefineError::ComplexCurrentShape)?);
         if group_keys.is_empty() || group_keys.len() > u32::MAX as usize {
             return Err(CudaRefineError::ComplexCurrentShape);
         }
@@ -175,13 +176,10 @@ impl ResidentMembraneInteriorWord {
         let imaginary = Buffer::of(&imaginary_limbs)?;
         let group_count = group_keys.len();
         let joined_real_sign = Buffer::alloc(group_count)?;
-        let joined_real = Buffer::alloc(
-            group_count * joined_limbs * std::mem::size_of::<u32>(),
-        )?;
+        let joined_real = Buffer::alloc(group_count * joined_limbs * std::mem::size_of::<u32>())?;
         let joined_imaginary_sign = Buffer::alloc(group_count)?;
-        let joined_imaginary = Buffer::alloc(
-            group_count * joined_limbs * std::mem::size_of::<u32>(),
-        )?;
+        let joined_imaginary =
+            Buffer::alloc(group_count * joined_limbs * std::mem::size_of::<u32>())?;
         let positive = Buffer::alloc(group_count * norm_limbs * std::mem::size_of::<u32>())?;
         let positive_scratch =
             Buffer::alloc(group_count * norm_limbs * std::mem::size_of::<u32>())?;
@@ -274,9 +272,7 @@ impl ResidentMembraneInteriorWord {
                 })
             })
             .collect::<Result<Vec<_>, CudaRefineError>>()?;
-        let positive_denominator = common_denominator
-            .magnitude()
-            .pow(2_u32);
+        let positive_denominator = common_denominator.magnitude().pow(2_u32);
         let host_ingress_octets = [
             std::mem::size_of_val(group_offsets.as_slice()),
             std::mem::size_of_val(real_signs.as_slice()),

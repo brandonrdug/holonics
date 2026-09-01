@@ -5,9 +5,9 @@ use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::generator_native_rest::GeneratorNativeRest;
 use crate::native_ecology::recurrent::BoundaryDecoder;
 use crate::native_ecology::recurrent_return::{
-    action_matrix, local_delta, recurrence_trace, ExteriorToolReturn, LocalGeneratorDelta,
-    RecurrentReturnRefusal, RecurrentSemanticWork, ReturnCommitEvent, ReturnedCausalAdjoint,
-    ReturnedRecurrentRest, RevisitHolonomy,
+    ExteriorToolReturn, LocalGeneratorDelta, RecurrentReturnRefusal, RecurrentSemanticWork,
+    ReturnCommitEvent, ReturnedCausalAdjoint, ReturnedRecurrentRest, RevisitHolonomy,
+    action_matrix, local_delta, recurrence_trace,
 };
 use crate::receiver_history_compression::NativeStateId;
 

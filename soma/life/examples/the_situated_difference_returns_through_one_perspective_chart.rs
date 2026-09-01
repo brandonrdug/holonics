@@ -11,7 +11,7 @@ use holonic_engine::{
     native_spool::{NativeCollapsedFibre, NativePullbackOccurrence},
     EventId, ExactComplexWaveCurrent, ExactRatMatrix,
 };
-use life::athena_native::{
+use life::native_intelligence::{
     CausalAdjointStepInput, NativeConductedSection, SituatedDifferenceError,
     SituatedDifferenceInput, SituatedDifferenceSection,
 };

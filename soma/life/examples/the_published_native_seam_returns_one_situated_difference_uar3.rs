@@ -1,7 +1,7 @@
 use std::{env, error::Error, fs, path::PathBuf, time::Instant};
 
-use life::athena_native::{
-    transduce_source_neutral_exterior, SourceNeutralAthenaRest, SourceNeutralExteriorStep,
+use life::native_intelligence::{
+    transduce_source_neutral_exterior, SourceNeutralEcologyRest, SourceNeutralExteriorStep,
 };
 use num_traits::Zero;
 use serde::Serialize;
@@ -65,7 +65,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let bytes = fs::read(root.join(PREDECESSOR))?;
     eprintln!("uar3-d1 read-bytes {}ms", started.elapsed().as_millis());
-    let rest = SourceNeutralAthenaRest::read(&bytes)?;
+    let rest = SourceNeutralEcologyRest::read(&bytes)?;
     drop(bytes);
     eprintln!("uar3-d1 read-rest {}ms", started.elapsed().as_millis());
     let parent_rest_identity_sha256 = rest.identity().to_owned();

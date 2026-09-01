@@ -3970,7 +3970,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the mat";
             words: std::vec![0u32; manifold::OWN_CELL_WORDS],
         };
         let mut cpu_enclosures = std::vec![0u32; DEPTH * manifold::ENCLOSURE_WORDS];
-        let mut cpu = manifold::ErosBody::over_register(
+        let mut cpu = manifold::ContinuingBody::over_register(
             &standing,
             &mut cpu_chart,
             AXIS as i64,
@@ -4302,7 +4302,7 @@ now the cat sat on the mat again and the dog ran to see the old cat by the matt"
                         let mut legacy_carrier = exact_carrier.clone();
                         let legacy_resume =
                             std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                                let _ = manifold::ErosBody::resume(
+                                let _ = manifold::ContinuingBody::resume(
                                     &standing,
                                     &mut legacy_own,
                                     AXIS as i64,

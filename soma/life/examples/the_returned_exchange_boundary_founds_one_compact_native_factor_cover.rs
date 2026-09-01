@@ -8,12 +8,12 @@ use std::{
 };
 
 use life::{
-    athena_native::{
-        NativeEcologyRest, CompleteExchangeCultivationCover,
-        CompleteExchangeNativeRealizationPassage, ExchangeDefectBasisFace,
-        HistoryOnlyExchangeFront, SealedNativeCandidateFront,
+    native_intelligence::{
+        CompleteExchangeCultivationCover, CompleteExchangeNativeRealizationPassage,
+        ExchangeDefectBasisFace, HistoryOnlyExchangeFront, NativeEcologyRest,
+        SealedNativeCandidateFront,
     },
-    athena_receiver_history::AthenaReceiverHistoryCongruence,
+    receiver_history::ReceiverHistoryCongruence,
 };
 use serde::Serialize;
 use serde_json::json;
@@ -42,8 +42,7 @@ fn main() -> Result<(), String> {
     fs::create_dir_all(&output).map_err(display)?;
 
     let rest = NativeEcologyRest::read(&fs::read(K3_REST).map_err(display)?).map_err(display)?;
-    let congruence =
-        AthenaReceiverHistoryCongruence::read(&fs::read(CONGRUENCE).map_err(display)?)?;
+    let congruence = ReceiverHistoryCongruence::read(&fs::read(CONGRUENCE).map_err(display)?)?;
     let history = HistoryOnlyExchangeFront::project(&congruence.sections)?;
     let candidate = SealedNativeCandidateFront::seal(&rest, history).map_err(display)?;
     let passage = CompleteExchangeNativeRealizationPassage::found(candidate, congruence)?;

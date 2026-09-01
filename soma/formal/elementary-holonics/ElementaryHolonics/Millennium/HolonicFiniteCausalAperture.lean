@@ -1,7 +1,7 @@
 import ElementaryHolonics.Foundation.CoordinateSubsetReceiver
 import ElementaryHolonics.Foundation.OrderedWordChain
 import ElementaryHolonics.Millennium.Aperture
-import ElementaryHolonics.Millennium.AthenaReceiverHistory
+import ElementaryHolonics.Millennium.ReceiverHistory
 import Mathlib.Data.Fintype.Powerset
 import Mathlib.Tactic
 
@@ -36,7 +36,7 @@ noncomputable section
 namespace Soma.Holonics.Millennium.HolonicFiniteCausalAperture
 
 open Soma.Holonics
-open Soma.Holonics.Millennium.AthenaReceiverHistory
+open Soma.Holonics.Millennium.ReceiverHistory
 open Soma.Holonics.Millennium.Chronology
 open Soma.Holonics.Millennium.LineageCompression
 

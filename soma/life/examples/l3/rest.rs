@@ -1,15 +1,15 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use life::mathematical_particle::{NativeHexisAthenaRest, NativeTerrainAthenaRest};
+use life::mathematical_particle::{NativeHexisRest, NativeTerrainRest};
 
 pub const OUTPUT_NAME: &str =
     "the_athena_holonics_mathematics_ecology_works_from_its_own_rested_terrain";
 
-pub fn mount_l2(root: &Path) -> Result<NativeHexisAthenaRest, String> {
+pub fn mount_l2(root: &Path) -> Result<NativeHexisRest, String> {
     let directory =
         root.join("output/recurring_laboratory_transport_condenses_into_native_hexis/native-rest");
-    NativeHexisAthenaRest::read(
+    NativeHexisRest::read(
         &read(directory.join("standing.bin"))?,
         &read(directory.join("decoder.bin"))?,
         &read(directory.join("fibres.bin"))?,
@@ -18,7 +18,7 @@ pub fn mount_l2(root: &Path) -> Result<NativeHexisAthenaRest, String> {
 }
 
 pub fn write(
-    rest: &NativeTerrainAthenaRest,
+    rest: &NativeTerrainRest,
     directory: &Path,
 ) -> Result<(PathBuf, PathBuf, PathBuf), String> {
     fs::create_dir_all(directory).map_err(|error| error.to_string())?;
@@ -40,9 +40,8 @@ pub fn write(
         rest.fibre_bytes().map_err(|error| error.to_string())?,
     )
     .map_err(|error| error.to_string())?;
-    let reopened =
-        NativeTerrainAthenaRest::read(&read(&standing)?, &read(&decoder)?, &read(&fibres)?)
-            .map_err(|error| error.to_string())?;
+    let reopened = NativeTerrainRest::read(&read(&standing)?, &read(&decoder)?, &read(&fibres)?)
+        .map_err(|error| error.to_string())?;
     if reopened
         .canonical_identity()
         .map_err(|error| error.to_string())?

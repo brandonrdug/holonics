@@ -10,25 +10,24 @@ use std::{
 };
 
 use holonic_engine::{
-    BoundaryId, ExactComplexWaveCurrent, cuda_refine::ResidentMembraneInteriorReturn,
-    quantity::BaseUnits, receiver_exact_compression::ReceiverId,
+    cuda_refine::ResidentMembraneInteriorReturn, quantity::BaseUnits,
+    receiver_exact_compression::ReceiverId, BoundaryId, ExactComplexWaveCurrent,
 };
 use holonic_structure::CausalMembrane;
 use life::{
-    athena_native::{
+    native_intelligence::{
         AddressedMaterialOccurrence, AdmittedReturnedAffineLaboratoryRestWitness,
-        AthenaCausalMembrane, AthenaMembraneConsequence, AthenaMembraneStanding,
         DetachedMembraneCultivation, ExactMembraneChartPassage, ExteriorOccurrenceTransducer,
-        GranularCultivationWithdrawal, GranularReturnedAffineAthenaRest,
-        MembraneCultivationReceipt, RecurrentGranularReturnedAffineAthenaRest,
-        RecurrentGranularReturnedAffinePredecessor, ReturnedAffineLaboratoryAthenaRest,
-        StagedMembraneCultivation,
+        GranularCultivationWithdrawal, GranularReturnedAffineEcologyRest, MembraneConsequence,
+        MembraneCultivationReceipt, MembraneStanding, NativeCausalMembrane,
+        RecurrentGranularReturnedAffineEcologyRest, RecurrentGranularReturnedAffinePredecessor,
+        ReturnedAffineLaboratoryRest, StagedMembraneCultivation,
     },
     synchronized_occurrence::{
-        ExactClockTransport, ExactSynchronizedOccurrence, ExactSynchronizedOccurrenceFibre,
-        SynchronizedCellId, SynchronizedCellOrigin, SynchronizedInteraction,
-        SynchronizedOccurrenceChart, SynchronizedReceiverId, SynchronizedReceiverSection,
-        TimedReceiverCell, relation_atom,
+        relation_atom, ExactClockTransport, ExactSynchronizedOccurrence,
+        ExactSynchronizedOccurrenceFibre, SynchronizedCellId, SynchronizedCellOrigin,
+        SynchronizedInteraction, SynchronizedOccurrenceChart, SynchronizedReceiverId,
+        SynchronizedReceiverSection, TimedReceiverCell,
     },
 };
 use num_bigint::BigInt;
@@ -189,7 +188,7 @@ fn main() -> Result<(), String> {
         "3ab826fb8512aae85096193ce103a384092111e8f26836415b0e1dc7eba02178",
     )
     .map_err(display)?;
-    let predecessor = ReturnedAffineLaboratoryAthenaRest::read_admitted(
+    let predecessor = ReturnedAffineLaboratoryRest::read_admitted(
         &fs::read(root.join(PREDECESSOR)).map_err(display)?,
         &witness,
     )
@@ -198,7 +197,7 @@ fn main() -> Result<(), String> {
         GranularCultivationWithdrawal::read(&fs::read(root.join(ORGAN)).map_err(display)?)
             .map_err(display)?;
     let rest =
-        GranularReturnedAffineAthenaRest::restore(predecessor, withdrawal).map_err(display)?;
+        GranularReturnedAffineEcologyRest::restore(predecessor, withdrawal).map_err(display)?;
     let predecessor_identity_sha256 = rest.identity().to_owned();
     eprintln!("sens2 phase: exact SENS1 predecessor restored");
     let (native_address, receiver) = continuing_native_address(&rest)?;
@@ -223,7 +222,7 @@ fn main() -> Result<(), String> {
         rat(i64::try_from(contacts.len()).map_err(display)?),
         rat(i64::try_from(FRAME_COUNT).map_err(display)?),
     );
-    let mut membrane = AthenaCausalMembrane::mount(rest)
+    let mut membrane = NativeCausalMembrane::mount(rest)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()
@@ -242,7 +241,7 @@ fn main() -> Result<(), String> {
             Vec::new(),
         )
         .map_err(|failure| format!("synchronized binding refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(initial_return) =
+    let MembraneConsequence::Returned(initial_return) =
         membrane.receive_occurrence(bound).map_err(display)?
     else {
         return Err("the synchronized source did not cross the Athena mouth".to_owned());
@@ -293,7 +292,7 @@ fn main() -> Result<(), String> {
             Vec::new(),
         )
         .map_err(|failure| format!("synchronized world-return binding refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(world_return) =
+    let MembraneConsequence::Returned(world_return) =
         membrane.receive_occurrence(later).map_err(display)?
     else {
         return Err("the synchronized world consequence did not return".to_owned());
@@ -400,7 +399,7 @@ fn verify_phase(root: &Path) -> Result<(), String> {
         return Err("the SENS2 successor wire changed before verification".to_owned());
     }
     let remounted =
-        RecurrentGranularReturnedAffineAthenaRest::read(&successor_wire).map_err(display)?;
+        RecurrentGranularReturnedAffineEcologyRest::read(&successor_wire).map_err(display)?;
     let source_detached_remount_exact = remounted.identity() == commit.successor_identity_sha256;
     let source = fs::read(GRID).map_err(display)?;
     let complete_source_absent_from_successor_rest = !successor_wire
@@ -414,7 +413,7 @@ fn verify_phase(root: &Path) -> Result<(), String> {
         rat(i64::try_from(commit.stage.synchronized_contact_population).map_err(display)?),
         rat(i64::try_from(commit.stage.decoded_video_frame_population).map_err(display)?),
     );
-    let mut membrane = AthenaCausalMembrane::mount(remounted)
+    let mut membrane = NativeCausalMembrane::mount(remounted)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()
@@ -444,7 +443,7 @@ fn sibling_phase(root: &Path) -> Result<(), String> {
         &fs::read(output.join("02-cultivated-synchronized-witness.json")).map_err(display)?,
     )
     .map_err(display)?;
-    let successor = RecurrentGranularReturnedAffineAthenaRest::read(
+    let successor = RecurrentGranularReturnedAffineEcologyRest::read(
         &fs::read(output.join("athena-synchronized-sensory.rest")).map_err(display)?,
     )
     .map_err(display)?;
@@ -505,7 +504,7 @@ fn inverse_phase(root: &Path) -> Result<(), String> {
         &fs::read(output.join("04-sibling-ablation-witness.json")).map_err(display)?,
     )
     .map_err(display)?;
-    let successor = RecurrentGranularReturnedAffineAthenaRest::read(
+    let successor = RecurrentGranularReturnedAffineEcologyRest::read(
         &fs::read(output.join("athena-synchronized-sensory.rest")).map_err(display)?,
     )
     .map_err(display)?;
@@ -518,7 +517,7 @@ fn inverse_phase(root: &Path) -> Result<(), String> {
             if rest.identity() == commit.stage.predecessor_identity_sha256
     );
     let successor =
-        RecurrentGranularReturnedAffineAthenaRest::restore_latest_returned_difference_from_admitted(
+        RecurrentGranularReturnedAffineEcologyRest::restore_latest_returned_difference_from_admitted(
             predecessor,
             latest_withdrawal,
         )
@@ -610,14 +609,14 @@ fn inverse_phase(root: &Path) -> Result<(), String> {
     Ok(())
 }
 
-fn restore_sens1(root: &Path) -> Result<GranularReturnedAffineAthenaRest, String> {
+fn restore_sens1(root: &Path) -> Result<GranularReturnedAffineEcologyRest, String> {
     let witness = AdmittedReturnedAffineLaboratoryRestWitness::found(
         "646401462284e6782aaa43139202c3bd5e45043e174b414e4fe851ec92f4e2ad",
         "63c9ff122e50fe94efe9bb00fea66e9eaac606c47707d07bc69301449bb9aded",
         "3ab826fb8512aae85096193ce103a384092111e8f26836415b0e1dc7eba02178",
     )
     .map_err(display)?;
-    let predecessor = ReturnedAffineLaboratoryAthenaRest::read_admitted(
+    let predecessor = ReturnedAffineLaboratoryRest::read_admitted(
         &fs::read(root.join(PREDECESSOR)).map_err(display)?,
         &witness,
     )
@@ -625,7 +624,7 @@ fn restore_sens1(root: &Path) -> Result<GranularReturnedAffineAthenaRest, String
     let withdrawal =
         GranularCultivationWithdrawal::read(&fs::read(root.join(ORGAN)).map_err(display)?)
             .map_err(display)?;
-    GranularReturnedAffineAthenaRest::restore(predecessor, withdrawal).map_err(display)
+    GranularReturnedAffineEcologyRest::restore(predecessor, withdrawal).map_err(display)
 }
 
 fn synchronized_occurrence(
@@ -746,8 +745,8 @@ fn decode_video(path: &Path) -> Result<Vec<u8>, String> {
 }
 
 fn continuing_native_address(
-    rest: &impl AthenaMembraneStanding,
-) -> Result<(life::athena_native::NativeSectionAddress, ReceiverId), String> {
+    rest: &impl MembraneStanding,
+) -> Result<(life::native_intelligence::NativeSectionAddress, ReceiverId), String> {
     for address in &rest.membrane_realization().sections {
         let addressed = rest
             .membrane_ecology()
@@ -765,7 +764,7 @@ fn continuing_native_address(
 }
 
 fn receiver_cells(
-    cells: &[life::athena_native::LaboratoryCellAffineSection],
+    cells: &[life::native_intelligence::LaboratoryCellAffineSection],
 ) -> Result<(String, String, String), String> {
     let left = cells
         .first()

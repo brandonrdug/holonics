@@ -28,9 +28,11 @@ fn main() -> Result<(), String> {
                 .and_then(|bytes| ShardedWeightIndexChart::read(address, bytes).map_err(display))
         })
         .transpose()?;
-    let onnx_address = arguments
-        .get(2)
-        .or_else(|| arguments.get(1).filter(|address| address.ends_with(".onnx")));
+    let onnx_address = arguments.get(2).or_else(|| {
+        arguments
+            .get(1)
+            .filter(|address| address.ends_with(".onnx"))
+    });
     let onnx = onnx_address
         .map(|address| {
             fs::read(address)

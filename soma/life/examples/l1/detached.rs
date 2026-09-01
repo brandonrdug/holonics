@@ -4,7 +4,7 @@ use std::process::Command;
 use std::time::Instant;
 
 use holonic_engine::cuda_refine::{CudaRefineExecutor, DeviceFixedSectionFamilies};
-use life::mathematical_particle::{FamilyCultivatedAthenaRest, FamilyInquiry};
+use life::mathematical_particle::{FamilyCultivatedEcologyRest, FamilyInquiry};
 use serde_json::{json, Value};
 
 use super::artifact;
@@ -17,7 +17,7 @@ pub fn conduct(
     output: &Path,
 ) -> Result<(), String> {
     fs::create_dir_all(output).map_err(|error| error.to_string())?;
-    let rest = FamilyCultivatedAthenaRest::read(&read(standing)?, &read(decoder)?, &read(fibres)?)
+    let rest = FamilyCultivatedEcologyRest::read(&read(standing)?, &read(decoder)?, &read(fibres)?)
         .map_err(|error| error.to_string())?;
     let inquiry: FamilyInquiry = serde_json::from_slice(&read(inquiry)?)
         .map_err(|error| format!("read L1 inquiry: {error}"))?;
@@ -213,7 +213,7 @@ fn device_json(returned: &DeviceFixedSectionFamilies) -> Value {
 
 fn write_visuals(
     output: &Path,
-    rest: &FamilyCultivatedAthenaRest,
+    rest: &FamilyCultivatedEcologyRest,
     returned: &DeviceFixedSectionFamilies,
 ) -> Result<Value, String> {
     let (bridge_stroke, bridge_dash, bridge_label) = if returned.joint_cultivated {

@@ -1,15 +1,15 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use life::mathematical_particle::{FamilyCultivatedAthenaRest, NativeHexisAthenaRest};
+use life::mathematical_particle::{FamilyCultivatedEcologyRest, NativeHexisRest};
 
 pub const OUTPUT_NAME: &str = "recurring_laboratory_transport_condenses_into_native_hexis";
 
-pub fn mount_l1(root: &Path) -> Result<FamilyCultivatedAthenaRest, String> {
+pub fn mount_l1(root: &Path) -> Result<FamilyCultivatedEcologyRest, String> {
     let rest = root.join(
         "output/returned_theorem_families_cultivate_the_continuing_laboratory_rest/native-rest",
     );
-    FamilyCultivatedAthenaRest::read(
+    FamilyCultivatedEcologyRest::read(
         &read(rest.join("standing.bin"))?,
         &read(rest.join("decoder.bin"))?,
         &read(rest.join("fibres.bin"))?,
@@ -18,7 +18,7 @@ pub fn mount_l1(root: &Path) -> Result<FamilyCultivatedAthenaRest, String> {
 }
 
 pub fn write(
-    rest: &NativeHexisAthenaRest,
+    rest: &NativeHexisRest,
     directory: &Path,
 ) -> Result<(PathBuf, PathBuf, PathBuf), String> {
     fs::create_dir_all(directory).map_err(|error| error.to_string())?;
@@ -40,9 +40,8 @@ pub fn write(
         rest.fibre_bytes().map_err(|error| error.to_string())?,
     )
     .map_err(|error| error.to_string())?;
-    let reopened =
-        NativeHexisAthenaRest::read(&read(&standing)?, &read(&decoder)?, &read(&fibres)?)
-            .map_err(|error| error.to_string())?;
+    let reopened = NativeHexisRest::read(&read(&standing)?, &read(&decoder)?, &read(&fibres)?)
+        .map_err(|error| error.to_string())?;
     if reopened
         .canonical_identity()
         .map_err(|error| error.to_string())?

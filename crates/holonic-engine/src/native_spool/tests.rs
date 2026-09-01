@@ -1,11 +1,11 @@
 use super::*;
 use crate::{
-    native_ecology::holonic_intelligence::{
-        profile_dismantling_return, CarrierRank, CycleRank, DimensionFace, DimensionObstruction,
-        DismantlingBoundaryReturn, ForeignConfigurationChart, IncidenceNullity, IncidenceRank,
-        NativeTransportRequest, RestedTransportEcology,
-    },
     BoundaryId, ExactUnitConicPhase, OccurrencePort,
+    native_ecology::holonic_intelligence::{
+        CarrierRank, CycleRank, DimensionFace, DimensionObstruction, DismantlingBoundaryReturn,
+        ForeignConfigurationChart, IncidenceNullity, IncidenceRank, NativeTransportRequest,
+        RestedTransportEcology, profile_dismantling_return,
+    },
 };
 use num_bigint::BigInt;
 use relational_geometry::Rat;

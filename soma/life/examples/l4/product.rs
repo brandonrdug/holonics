@@ -6,8 +6,8 @@ use holonic_engine::cuda_refine::{
     CudaRefineExecutor, DeviceFixedSectionFamilies, DeviceNativeFixedSectionFamilies,
 };
 use life::mathematical_particle::{
-    NativeSuccessorHistory, NativeTerrainAthenaRest, NativeTerrainInquiry,
-    ProductionInquiryPresentation, ProductionReceiver,
+    NativeSuccessorHistory, NativeTerrainInquiry, NativeTerrainRest, ProductionInquiryPresentation,
+    ProductionReceiver,
 };
 use serde_json::{json, Value};
 
@@ -327,7 +327,7 @@ pub fn construct(root: &Path) -> Result<(), String> {
     Ok(())
 }
 
-fn mount_l3(root: &Path) -> Result<NativeTerrainAthenaRest, String> {
+fn mount_l3(root: &Path) -> Result<NativeTerrainRest, String> {
     let directory = root.join(
         "output/the_athena_holonics_mathematics_ecology_works_from_its_own_rested_terrain/native-rest",
     );
@@ -342,8 +342,8 @@ fn mount_written(
     standing: &Path,
     decoder: &Path,
     fibres: &Path,
-) -> Result<NativeTerrainAthenaRest, String> {
-    NativeTerrainAthenaRest::read(
+) -> Result<NativeTerrainRest, String> {
+    NativeTerrainRest::read(
         &rest::read(standing)?,
         &rest::read(decoder)?,
         &rest::read(fibres)?,
@@ -352,7 +352,7 @@ fn mount_written(
 }
 
 fn inquiry(
-    terrain: &NativeTerrainAthenaRest,
+    terrain: &NativeTerrainRest,
     sections: &[i64],
     history: &[String],
     revisited: Vec<NativeSuccessorHistory>,
@@ -619,7 +619,7 @@ fn rasterize_visual(output: &Path) -> Result<Value, String> {
 }
 
 fn complete_taxonomy(
-    terrain: &NativeTerrainAthenaRest,
+    terrain: &NativeTerrainRest,
     heldout: &Value,
     rebase: &Value,
     separator: &Value,
@@ -708,7 +708,7 @@ fn capability_report(identity: &str, cost: &Value) -> String {
 
 #[allow(clippy::too_many_arguments)]
 fn grade(
-    terrain: &NativeTerrainAthenaRest,
+    terrain: &NativeTerrainRest,
     heldout: &Value,
     chronology: &Value,
     rebase: &Value,
@@ -750,7 +750,7 @@ fn grade(
     }))
 }
 
-fn all_charts(terrain: &NativeTerrainAthenaRest) -> Value {
+fn all_charts(terrain: &NativeTerrainRest) -> Value {
     json!({
         "inherited": terrain.predecessor().standing().carrier_charts,
         "returned": terrain.standing().cultivation.carrier_chart,

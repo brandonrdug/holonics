@@ -8,13 +8,13 @@ use holonic_engine::{
 };
 use holonic_structure::CausalMembrane;
 use life::{
-    athena_native::{
-        AddressedMaterialOccurrence, AdmittedAffineLaboratoryRestWitness,
-        AffineLaboratoryCultivatedAthenaRest, AthenaCausalMembrane, AthenaMembraneConsequence,
-        AthenaMembraneCrossingReceipt, ExactMembraneChartPassage, ExteriorOccurrenceTransducer,
-        MaterialSourceCodec, MaterialSourceRealization, MATERIAL_SOURCE_REALIZATION_SCHEMA,
-    },
     mathematical_source::{ExactAcousticOccurrence, HierarchicalOpticalPassage},
+    native_intelligence::{
+        AddressedMaterialOccurrence, AdmittedAffineLaboratoryRestWitness,
+        AffineLaboratoryCultivatedRest, ExactMembraneChartPassage, ExteriorOccurrenceTransducer,
+        MaterialSourceCodec, MaterialSourceRealization, MembraneConsequence,
+        MembraneCrossingReceipt, NativeCausalMembrane, MATERIAL_SOURCE_REALIZATION_SCHEMA,
+    },
 };
 use serde::Serialize;
 use sha2::{Digest, Sha256};
@@ -39,7 +39,7 @@ struct MembraneGrade {
     truth_status: &'static str,
     admission_witness: AdmittedAffineLaboratoryRestWitness,
     rest_identity_sha256: String,
-    crossing_receipts: Vec<AthenaMembraneCrossingReceipt>,
+    crossing_receipts: Vec<MembraneCrossingReceipt>,
     exact_source_fibres_recovered: bool,
     one_public_mouth: bool,
     native_contact_derived_from_standing: bool,
@@ -56,7 +56,7 @@ fn main() -> Result<(), String> {
         VALIDATION_RECEIPT_SHA256,
     )
     .map_err(display)?;
-    let rest = AffineLaboratoryCultivatedAthenaRest::read_admitted(
+    let rest = AffineLaboratoryCultivatedRest::read_admitted(
         &fs::read(root.join(REST)).map_err(display)?,
         &witness,
     )
@@ -82,7 +82,7 @@ fn main() -> Result<(), String> {
         .next()
         .copied()
         .ok_or_else(|| "the addressed spool has no dependent receiver".to_owned())?;
-    let mut membrane = AthenaCausalMembrane::mount(rest);
+    let mut membrane = NativeCausalMembrane::mount(rest);
 
     let material = AddressedMaterialOccurrence::found(
         "mem1/exterior/material",
@@ -174,11 +174,11 @@ fn main() -> Result<(), String> {
 }
 
 fn cross<T: ExteriorOccurrenceTransducer + Any + Send>(
-    membrane: &mut AthenaCausalMembrane,
+    membrane: &mut NativeCausalMembrane,
     source: T,
-    address: &life::athena_native::NativeSectionAddress,
+    address: &life::native_intelligence::NativeSectionAddress,
     receiver: ReceiverId,
-) -> Result<AthenaMembraneCrossingReceipt, String> {
+) -> Result<MembraneCrossingReceipt, String> {
     let exterior = source.into_exterior_fibre().map_err(display)?;
     let exterior_boundary = BoundaryId(exterior.address().event_projection.0);
     let base = BaseUnits::declare(["membrane-current"]).map_err(display)?;
@@ -198,7 +198,7 @@ fn cross<T: ExteriorOccurrenceTransducer + Any + Send>(
         )
         .map_err(|insufficiency| format!("binding insufficiency: {insufficiency:?}"))?;
     let returned = membrane.receive_occurrence(occurrence).map_err(display)?;
-    let AthenaMembraneConsequence::Returned(returned) = returned else {
+    let MembraneConsequence::Returned(returned) = returned else {
         return Err(format!("crossing insufficiency: {returned:?}"));
     };
     let receipt = returned.receipt;

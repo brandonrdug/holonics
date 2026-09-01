@@ -6,10 +6,10 @@
 
 use std::{fs, path::PathBuf, time::Instant};
 
-use life::athena_native::{
-    AdmittedReturnedAffineLaboratoryRestWitness, AthenaCausalMembrane,
-    GranularCultivationWithdrawal, GranularEmanativeTerminal, GranularReturnedAffineAthenaRest,
-    ReturnedAffineLaboratoryAthenaRest,
+use life::native_intelligence::{
+    AdmittedReturnedAffineLaboratoryRestWitness, GranularCultivationWithdrawal,
+    GranularEmanativeTerminal, GranularReturnedAffineEcologyRest, NativeCausalMembrane,
+    ReturnedAffineLaboratoryRest,
 };
 use serde::Serialize;
 
@@ -44,13 +44,13 @@ struct ReceiverReturn {
 #[serde(deny_unknown_fields)]
 struct ResponseReceipt {
     exterior_occurrence: String,
-    returned_higher_face_strata: Vec<Vec<life::athena_native::GranularHigherBoundaryFace>>,
-    exact_exterior_passage: Option<Vec<life::athena_native::GranularExteriorPort>>,
+    returned_higher_face_strata: Vec<Vec<life::native_intelligence::GranularHigherBoundaryFace>>,
+    exact_exterior_passage: Option<Vec<life::native_intelligence::GranularExteriorPort>>,
     emitted_octets: Vec<u8>,
     exterior_utf8: Option<String>,
     section_population: usize,
     boundary_closure_reached: bool,
-    terminal_visible_higher_faces: Vec<life::athena_native::GranularHigherBoundaryFace>,
+    terminal_visible_higher_faces: Vec<life::native_intelligence::GranularHigherBoundaryFace>,
     terminal_distinct_action_moment_sections: usize,
     terminal_distinct_receiver_moment_sections: usize,
     terminal_distinct_constitutive_sections: usize,
@@ -69,15 +69,15 @@ struct SectionReceipt {
     reached_state: u32,
     reached_matched_length: u32,
     greatest_productive_matched_length: Option<u32>,
-    crossed_structural_ports: Vec<life::athena_native::GranularExteriorPort>,
+    crossed_structural_ports: Vec<life::native_intelligence::GranularExteriorPort>,
     branch_population: usize,
-    visible_higher_faces: Vec<life::athena_native::GranularHigherBoundaryFace>,
-    visible_ports: Vec<life::athena_native::GranularExteriorPort>,
-    visible_passages: Vec<Vec<life::athena_native::GranularExteriorPort>>,
-    kernel_ports: Vec<life::athena_native::GranularExteriorPort>,
-    exact_decoded_higher_face: Option<life::athena_native::GranularHigherBoundaryFace>,
-    exact_decoded_port: Option<life::athena_native::GranularExteriorPort>,
-    exact_decoded_passage: Option<Vec<life::athena_native::GranularExteriorPort>>,
+    visible_higher_faces: Vec<life::native_intelligence::GranularHigherBoundaryFace>,
+    visible_ports: Vec<life::native_intelligence::GranularExteriorPort>,
+    visible_passages: Vec<Vec<life::native_intelligence::GranularExteriorPort>>,
+    kernel_ports: Vec<life::native_intelligence::GranularExteriorPort>,
+    exact_decoded_higher_face: Option<life::native_intelligence::GranularHigherBoundaryFace>,
+    exact_decoded_port: Option<life::native_intelligence::GranularExteriorPort>,
+    exact_decoded_passage: Option<Vec<life::native_intelligence::GranularExteriorPort>>,
     plural_receiver_insufficiency: bool,
     distinct_returned_port_currents: usize,
     greatest_equal_port_current_fibre: usize,
@@ -103,14 +103,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "63c9ff122e50fe94efe9bb00fea66e9eaac606c47707d07bc69301449bb9aded",
         "3ab826fb8512aae85096193ce103a384092111e8f26836415b0e1dc7eba02178",
     )?;
-    let predecessor = ReturnedAffineLaboratoryAthenaRest::read_admitted(
-        &fs::read(root.join(PREDECESSOR))?,
-        &witness,
-    )?;
+    let predecessor =
+        ReturnedAffineLaboratoryRest::read_admitted(&fs::read(root.join(PREDECESSOR))?, &witness)?;
     let withdrawal = GranularCultivationWithdrawal::read(&fs::read(root.join(ORGAN))?)?;
-    let successor = GranularReturnedAffineAthenaRest::restore(predecessor, withdrawal)?;
+    let successor = GranularReturnedAffineEcologyRest::restore(predecessor, withdrawal)?;
     let successor_identity_sha256 = successor.identity().to_owned();
-    let mut membrane = AthenaCausalMembrane::mount(successor)
+    let mut membrane = NativeCausalMembrane::mount(successor)
         .constitute_interior()?
         .mount_resident_interior()?
         .mount_resident_factor_receiver_faces()?;

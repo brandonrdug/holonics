@@ -15,15 +15,16 @@ use sha2::{Digest, Sha256};
 use thiserror::Error;
 
 use crate::{
+    BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase, OccurrencePort,
     native_anatomy::NativeAnatomyRest,
     native_spool::{
+        NATIVE_SPOOL_BUNDLE_SCHEMA, NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA,
         NativeCollapsedFibre, NativeConstitutiveResponse, NativeGeneratorDescent,
         NativeGeneratorStep, NativeIncidenceTerm, NativeMutualConstitutiveResponse,
         NativeParametronCell, NativePullbackOccurrence, NativeReceiverConsequence,
         NativeSerialPullback, NativeSpool, NativeSpoolBundle, NativeSpoolRefusal, NativeThread,
-        NativeThreadHand, NativeThreadObstruction, NativeThreadOccurrence, ReceiverInsufficiency,
-        ReceiverInsufficiencyCause, NATIVE_SPOOL_BUNDLE_SCHEMA, NATIVE_SPOOL_SCHEMA,
-        NATIVE_THREAD_SCHEMA, RECEIVER_INSUFFICIENCY_SCHEMA,
+        NativeThreadHand, NativeThreadObstruction, NativeThreadOccurrence,
+        RECEIVER_INSUFFICIENCY_SCHEMA, ReceiverInsufficiency, ReceiverInsufficiencyCause,
     },
     receiver_exact_compression::{InputId, Observation, ReceiverId},
     receiver_history_compression::{NativeStateId, ReceiverFactor},
@@ -32,7 +33,6 @@ use crate::{
         ForeignFragmentTestimony, ForeignRealizationTestimony, ForeignShortestSeparator,
         SpoolCondensationWitness, ThreadExtractionWitness,
     },
-    BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase, OccurrencePort,
 };
 
 use super::{
@@ -350,7 +350,7 @@ pub fn dismantle_reachable_section(
                     retained_native_fibre: obstructed,
                 }),
                 open_exterior: vec![
-                    "successor outside the admitted receiver/history family".to_owned()
+                    "successor outside the admitted receiver/history family".to_owned(),
                 ],
                 reconstruction_fibre,
             });

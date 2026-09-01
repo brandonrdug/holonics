@@ -1,4 +1,4 @@
-import ElementaryHolonics.Computation.ErosAthenaNeuralObjects
+import ElementaryHolonics.Computation.HolonicAdjointNormalization
 
 /-!
 # Industry cultivation mechanisms as bounded charts of returned morphology

@@ -17,14 +17,14 @@ use holonic_engine::{
 use holonic_structure::CausalMembrane;
 use image::ImageReader;
 use life::{
-    athena_native::{
-        AthenaCausalMembrane, AthenaMembraneConsequence, AthenaMembraneStanding,
-        ExactMembraneChartPassage, ExteriorOccurrenceTransducer, NativeOpticalPotentialField,
-        SituatedCultivatedAthenaRest,
-    },
     mathematical_source::{
         grow_optical_holons, recover_optical_passage, ExactOpticalOccurrence,
         HierarchicalOpticalPassage, OpticalHolonIntervention,
+    },
+    native_intelligence::{
+        ExactMembraneChartPassage, ExteriorOccurrenceTransducer, MembraneConsequence,
+        MembraneStanding, NativeCausalMembrane, NativeOpticalPotentialField,
+        SituatedCultivatedEcologyRest,
     },
 };
 use serde::Serialize;
@@ -127,7 +127,7 @@ fn main() -> Result<(), String> {
     let expected_source = returned.source_sha256.clone();
     let expected_hierarchy = sha(&returned.hierarchy.canonical_bytes().map_err(display)?);
 
-    let rest = SituatedCultivatedAthenaRest::read(&fs::read(root.join(REST)).map_err(display)?)
+    let rest = SituatedCultivatedEcologyRest::read(&fs::read(root.join(REST)).map_err(display)?)
         .map_err(display)?;
     let rested_identity = rest.identity().to_owned();
     let (address, receiver) = continuing_native_address(&rest)?;
@@ -137,7 +137,7 @@ fn main() -> Result<(), String> {
         .map_err(display)?
         .unit("alp2-returned-optical-current")
         .map_err(display)?;
-    let mut membrane = AthenaCausalMembrane::mount(rest);
+    let mut membrane = NativeCausalMembrane::mount(rest);
     let occurrence = membrane
         .bind_occurrence(
             exterior,
@@ -152,7 +152,7 @@ fn main() -> Result<(), String> {
             Vec::new(),
         )
         .map_err(|failure| format!("ALP2 returned optical binding refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(returned) =
+    let MembraneConsequence::Returned(returned) =
         membrane.receive_occurrence(occurrence).map_err(display)?
     else {
         return Err(
@@ -287,8 +287,8 @@ fn recover_hierarchy(
 }
 
 fn continuing_native_address(
-    rest: &impl AthenaMembraneStanding,
-) -> Result<(life::athena_native::NativeSectionAddress, ReceiverId), String> {
+    rest: &impl MembraneStanding,
+) -> Result<(life::native_intelligence::NativeSectionAddress, ReceiverId), String> {
     for address in &rest.membrane_realization().sections {
         let addressed = rest
             .membrane_ecology()

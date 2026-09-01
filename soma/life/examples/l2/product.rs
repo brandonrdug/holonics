@@ -4,7 +4,7 @@ use std::process::{Command, Stdio};
 
 use holonic_engine::cuda_refine::{CudaRefineExecutor, DeviceFixedSectionFamilies};
 use life::mathematical_particle::{
-    FamilyCultivatedAthenaRest, NativeHexisAthenaRest, NativeHexisInquiry,
+    FamilyCultivatedEcologyRest, NativeHexisInquiry, NativeHexisRest,
     ProductionInquiryPresentation, ProductionReceiver,
 };
 use serde_json::{json, Value};
@@ -60,7 +60,7 @@ pub fn construct(root: &Path) -> Result<(), String> {
         }),
     )?;
 
-    let native = NativeHexisAthenaRest::condense(cultivated).map_err(|error| error.to_string())?;
+    let native = NativeHexisRest::condense(cultivated).map_err(|error| error.to_string())?;
     let native_identity = native
         .canonical_identity()
         .map_err(|error| error.to_string())?;
@@ -222,7 +222,7 @@ pub fn construct(root: &Path) -> Result<(), String> {
 }
 
 fn source_passage(
-    rest: &FamilyCultivatedAthenaRest,
+    rest: &FamilyCultivatedEcologyRest,
     sections: &[i64],
     card: &mut CudaRefineExecutor,
 ) -> Result<DeviceFixedSectionFamilies, String> {
@@ -255,7 +255,7 @@ fn source_receipt(control: &str, returned: &DeviceFixedSectionFamilies) -> Value
 }
 
 fn inquiry(
-    rest: &NativeHexisAthenaRest,
+    rest: &NativeHexisRest,
     sections: &[i64],
     history: &[String],
     language: &str,
@@ -507,7 +507,7 @@ fn capability_report(identity: &str, cost: &Value) -> String {
 }
 
 fn grade(
-    native: &NativeHexisAthenaRest,
+    native: &NativeHexisRest,
     heldout: &Value,
     residual: &Value,
     carrier: &Value,

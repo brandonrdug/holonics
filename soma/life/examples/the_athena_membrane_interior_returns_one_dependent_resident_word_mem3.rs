@@ -4,10 +4,9 @@
 use std::{collections::BTreeSet, env, fs, path::PathBuf};
 
 use holonic_engine::ExactComplexWaveCurrent;
-use life::athena_native::{
-    AdmittedAffineLaboratoryRestWitness, AffineLaboratoryCultivatedAthenaRest,
-    AthenaCausalMembrane, FoundedInteriorContact, InteriorContactConsequence,
-    SharedSupportObstruction,
+use life::native_intelligence::{
+    AdmittedAffineLaboratoryRestWitness, AffineLaboratoryCultivatedRest, FoundedInteriorContact,
+    InteriorContactConsequence, NativeCausalMembrane, SharedSupportObstruction,
 };
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
@@ -53,14 +52,14 @@ fn main() -> Result<(), String> {
         VALIDATION_RECEIPT_SHA256,
     )
     .map_err(display)?;
-    let rest = AffineLaboratoryCultivatedAthenaRest::read_admitted(
+    let rest = AffineLaboratoryCultivatedRest::read_admitted(
         &fs::read(root.join(REST)).map_err(display)?,
         &witness,
     )
     .map_err(display)?;
     let rested_identity = rest.identity().to_owned();
     let (left, shared, disjoint) = select_receiver_cells(rest.affine_cells())?;
-    let mut membrane = AthenaCausalMembrane::mount(rest)
+    let mut membrane = NativeCausalMembrane::mount(rest)
         .constitute_interior()
         .map_err(display)?;
     let InteriorContactConsequence::Founded(exact_host_receiver) = membrane
@@ -160,7 +159,7 @@ fn main() -> Result<(), String> {
 }
 
 fn select_receiver_cells(
-    cells: &[life::athena_native::LaboratoryCellAffineSection],
+    cells: &[life::native_intelligence::LaboratoryCellAffineSection],
 ) -> Result<(String, String, String), String> {
     let left = cells
         .first()

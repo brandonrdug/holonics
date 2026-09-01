@@ -3,8 +3,8 @@
 use std::{collections::BTreeSet, env, fs};
 
 use holonic_engine::native_ecology::holonic_intelligence::{
-    conduct_native_inference, BinaryEmissionCodec, ExteriorEmissionCodec, InferenceCirculation,
-    NativeInferenceRequest, Utf8InspectionCodec,
+    BinaryEmissionCodec, ExteriorEmissionCodec, InferenceCirculation, NativeInferenceRequest,
+    Utf8InspectionCodec, conduct_native_inference,
 };
 use holonic_engine::native_spool::NativeSpoolBundle;
 use serde_json::json;

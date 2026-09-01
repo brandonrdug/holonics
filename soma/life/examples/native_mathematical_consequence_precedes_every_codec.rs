@@ -7,7 +7,7 @@ use std::process::{Command, Stdio};
 
 use holonic_engine::cuda_refine::CudaRefineExecutor;
 use life::mathematical_particle::{
-    NativeCodec, NativeHexisAthenaRest, NativeMathematicalInquiry, NativeSuccessorHistory,
+    NativeCodec, NativeHexisRest, NativeMathematicalInquiry, NativeSuccessorHistory,
 };
 use serde::Serialize;
 use serde_json::{json, Value};
@@ -240,7 +240,7 @@ fn infer(
     output: &Path,
 ) -> Result<(), String> {
     fs::create_dir_all(output).map_err(|error| error.to_string())?;
-    let rest = NativeHexisAthenaRest::read(&read(standing)?, &read(decoder)?, &read(fibres)?)
+    let rest = NativeHexisRest::read(&read(standing)?, &read(decoder)?, &read(fibres)?)
         .map_err(|error| error.to_string())?;
     let inquiry: NativeMathematicalInquiry = serde_json::from_slice(&read(inquiry)?)
         .map_err(|error| format!("read native inquiry: {error}"))?;
@@ -309,8 +309,8 @@ fn infer(
     Ok(())
 }
 
-fn read_rest(directory: &Path) -> Result<NativeHexisAthenaRest, String> {
-    NativeHexisAthenaRest::read(
+fn read_rest(directory: &Path) -> Result<NativeHexisRest, String> {
+    NativeHexisRest::read(
         &read(directory.join("standing.bin"))?,
         &read(directory.join("decoder.bin"))?,
         &read(directory.join("fibres.bin"))?,

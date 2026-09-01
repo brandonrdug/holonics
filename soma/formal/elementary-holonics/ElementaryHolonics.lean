@@ -69,7 +69,7 @@ import ElementaryHolonics.Millennium.SwingBridges
 import ElementaryHolonics.Millennium.Chronology
 import ElementaryHolonics.Millennium.LineageCompression
 import ElementaryHolonics.Millennium.ValuationDivisorLatticeAtlas
-import ElementaryHolonics.Millennium.AthenaReceiverHistory
+import ElementaryHolonics.Millennium.ReceiverHistory
 import ElementaryHolonics.Millennium.PhysicalRealization
 import ElementaryHolonics.Millennium.DependentConnectedRealization
 import ElementaryHolonics.Millennium.SituatedReturnedDifference

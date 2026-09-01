@@ -3,7 +3,7 @@
 
 use std::{fs, path::PathBuf, time::Instant};
 
-use life::athena_native::{EmanationDeed, OpticalAthenaRest};
+use life::native_intelligence::{EmanationDeed, OpticalProductRest};
 
 const REST: &str = concat!(
     "output/the_one_athena_alpha_body_circulates_every_admitted_organ_and_cultivates_alp4/",
@@ -15,7 +15,7 @@ const EXPECTED_ALP5_IDENTITY: &str =
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let began = Instant::now();
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
-    let rest = OpticalAthenaRest::read(&fs::read(root.join(REST))?)?;
+    let rest = OpticalProductRest::read(&fs::read(root.join(REST))?)?;
     if rest.identity() != EXPECTED_ALP5_IDENTITY {
         return Err("the probe did not receive the admitted ALP5 body".into());
     }

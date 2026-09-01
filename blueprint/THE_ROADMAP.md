@@ -244,14 +244,15 @@ source/apparatus absence. Historical UAR blueprints and records remain evidence 
 
 ## Active campaign — Holonic Intelligence Framework
 
-**Current frontier:** HIF5
+**Current frontier:** HIF6
 
-**HIF5 — MIGRATE PRODUCTS AND REMOVE CAMPAIGN ONTOLOGY — IS THE SOLE NEXT DEED.**
+**HIF6 — RESIDENT AND SOURCE-NEUTRAL CLOSURE — IS THE SOLE NEXT DEED.**
 
-[open] Migrate Eros and Athena implementations onto the neutral framework. Rename or remove generic
-Athena-prefixed types and methods, merge duplicate rest/cultivation/generation owners, split
-remaining large foremen at founded relations, and delete superseded wrappers and drivers. Preserve
-exact completed consequences through the new owners, not through compatibility decoders.
+[open] Carry the neutral inference and cultivation lifecycle through the strongest lawful resident
+surface. Construct and remount the direct productive rest without historical output dependencies;
+return the actual emission/world-return difference, off-diagonal complex transport,
+reconstruction, source-detached later conduct, targeted withdrawal, and exact restoration without
+CPU semantic replay.
 
 [proved-derived; formal-checked; measured] HIF0 passed. The four-file neutral formal closure built
 3,164 focused jobs and the live umbrella built 3,769 jobs without `sorryAx`. Its exact return is
@@ -277,6 +278,12 @@ returns later chronology, complete difference, adjoint delta, cold/productive sp
 source-detached remount, changed held-out conduct, sibling invariance, withdrawal, and restoration.
 Its exact return is
 [`research/records/2026-08-31_HIF4_CAUSAL_ADJOINT_CULTIVATION_RETURNED_SOURCE_DETACHED_HEXIS.md`](../research/records/2026-08-31_HIF4_CAUSAL_ADJOINT_CULTIVATION_RETURNED_SOURCE_DETACHED_HEXIS.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] HIF5 passed. Products and
+generic owners now meet the naming boundary without aliases; obsolete duplicate owners and drivers
+departed; the receiver-history formal owner and resident front are neutral; and the resident-section
+foreman was split at founded apparatus relations. Its exact return is
+[`research/records/2026-08-31_HIF5_PRODUCTS_MOVED_TO_NEUTRAL_OWNERS_AND_CAMPAIGN_ONTOLOGY_DEPARTED.md`](../research/records/2026-08-31_HIF5_PRODUCTS_MOVED_TO_NEUTRAL_OWNERS_AND_CAMPAIGN_ONTOLOGY_DEPARTED.md).
 
 [definition] The complete HIF order is:
 

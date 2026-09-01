@@ -1,10 +1,10 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use life::mathematical_particle::NativeTerrainAthenaRest;
+use life::mathematical_particle::NativeTerrainRest;
 
 pub fn write(
-    rest: &NativeTerrainAthenaRest,
+    rest: &NativeTerrainRest,
     directory: &Path,
 ) -> Result<(PathBuf, PathBuf, PathBuf), String> {
     fs::create_dir_all(directory).map_err(|error| error.to_string())?;
@@ -26,9 +26,8 @@ pub fn write(
         rest.fibre_bytes().map_err(|error| error.to_string())?,
     )
     .map_err(|error| error.to_string())?;
-    let reopened =
-        NativeTerrainAthenaRest::read(&read(&standing)?, &read(&decoder)?, &read(&fibres)?)
-            .map_err(|error| error.to_string())?;
+    let reopened = NativeTerrainRest::read(&read(&standing)?, &read(&decoder)?, &read(&fibres)?)
+        .map_err(|error| error.to_string())?;
     if reopened
         .canonical_identity()
         .map_err(|error| error.to_string())?

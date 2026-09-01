@@ -223,27 +223,28 @@ fn stream_mount(
         .map(|local| {
             let offset = (record_from, node_from, field_from);
             record_from = record_from
-                .checked_add(u64::try_from(local.records.len()).map_err(|_| {
-                    ExchangeMountError::Extent("record population".to_owned())
-                })?)
+                .checked_add(
+                    u64::try_from(local.records.len())
+                        .map_err(|_| ExchangeMountError::Extent("record population".to_owned()))?,
+                )
                 .ok_or_else(|| ExchangeMountError::Extent("record population".to_owned()))?;
             node_from = node_from
-                .checked_add(u64::try_from(local.nodes.len()).map_err(|_| {
-                    ExchangeMountError::Extent("node population".to_owned())
-                })?)
+                .checked_add(
+                    u64::try_from(local.nodes.len())
+                        .map_err(|_| ExchangeMountError::Extent("node population".to_owned()))?,
+                )
                 .ok_or_else(|| ExchangeMountError::Extent("node population".to_owned()))?;
             field_from = field_from
-                .checked_add(u64::try_from(local.fields.len()).map_err(|_| {
-                    ExchangeMountError::Extent("field population".to_owned())
-                })?)
+                .checked_add(
+                    u64::try_from(local.fields.len())
+                        .map_err(|_| ExchangeMountError::Extent("field population".to_owned()))?,
+                )
                 .ok_or_else(|| ExchangeMountError::Extent("field population".to_owned()))?;
             Ok(offset)
         })
         .collect::<Result<Vec<_>, ExchangeMountError>>()?;
-    staged
-        .par_iter_mut()
-        .zip(offsets.par_iter())
-        .for_each(|(local, (record_from, node_from, field_from))| {
+    staged.par_iter_mut().zip(offsets.par_iter()).for_each(
+        |(local, (record_from, node_from, field_from))| {
             let record_from = *record_from;
             let node_from = *node_from;
             let field_from = *field_from;
@@ -262,7 +263,8 @@ fn stream_mount(
                 .scalar_nodes
                 .iter_mut()
                 .for_each(|node| *node += node_from);
-        });
+        },
+    );
 
     for local in staged {
         blank_records = blank_records
@@ -329,7 +331,9 @@ fn stream_container(
                 path: spec.locator.display().to_string(),
                 message: error.to_string(),
             })?;
-        if read == 0 { break; }
+        if read == 0 {
+            break;
+        }
         prefix.update(&raw);
         let raw_end = raw_at
             .checked_add(read as u64)
@@ -347,13 +351,15 @@ fn stream_container(
                     raw_at = raw_end;
                     break;
                 }
-                Err(message) => return Err(ExchangeMountError::Parse {
-                    path: spec.locator.display().to_string(),
-                    record: records.len() as u64,
-                    from: raw_at,
-                    to: raw_end,
-                    message,
-                }),
+                Err(message) => {
+                    return Err(ExchangeMountError::Parse {
+                        path: spec.locator.display().to_string(),
+                        record: records.len() as u64,
+                        from: raw_at,
+                        to: raw_end,
+                        message,
+                    })
+                }
             };
             let record = records.len() as u64;
             let node_from = nodes.len() as u64;
@@ -363,9 +369,17 @@ fn stream_container(
                 if parsed.scalar_nodes.binary_search(&(local as u32)).is_ok() {
                     scalar_nodes.push(global_node);
                 }
-                nodes.push(GlobalNode { record, local: node });
+                nodes.push(GlobalNode {
+                    record,
+                    local: node,
+                });
             }
-            fields.extend(parsed.fields.into_iter().map(|local| GlobalFieldFace { record, local }));
+            fields.extend(
+                parsed
+                    .fields
+                    .into_iter()
+                    .map(|local| GlobalFieldFace { record, local }),
+            );
             records.push(ExchangeRecord {
                 container,
                 ordinal: record,
@@ -376,8 +390,9 @@ fn stream_container(
                 node_extent: u32::try_from(nodes.len() as u64 - node_from)
                     .map_err(|_| ExchangeMountError::Extent("record node population".to_owned()))?,
                 field_from,
-                field_extent: u32::try_from(fields.len() as u64 - field_from)
-                    .map_err(|_| ExchangeMountError::Extent("record field population".to_owned()))?,
+                field_extent: u32::try_from(fields.len() as u64 - field_from).map_err(|_| {
+                    ExchangeMountError::Extent("record field population".to_owned())
+                })?,
             });
         }
         raw_at = raw_end;

@@ -283,7 +283,7 @@ fn inquiry(
     chart: [i64; 4],
     language: &str,
     notation: &str,
-    ecology: &life::mathematical_particle::LaboratoryAthenaRest,
+    ecology: &life::mathematical_particle::LaboratoryProductionRest,
 ) -> Result<LaboratoryInquiry, String> {
     let history = ecology
         .chronology
@@ -585,7 +585,7 @@ fn grade(
     }))
 }
 
-fn ecology_prefix(restored: &life::mathematical_particle::LaboratoryAthenaRest) -> Value {
+fn ecology_prefix(restored: &life::mathematical_particle::LaboratoryProductionRest) -> Value {
     json!({
         "exact": restored.chronology.prefix_commit == super::source::PREFIX_COMMIT
             && restored.chronology.prefix_tree == super::source::PREFIX_TREE,

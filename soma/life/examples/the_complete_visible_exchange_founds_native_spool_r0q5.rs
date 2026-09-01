@@ -1,8 +1,7 @@
 use std::{collections::BTreeMap, error::Error, fs, ops::Range, path::PathBuf};
 
 use holonic_engine::{
-    native_spool::NativeSpoolBundle,
-    receiver_exact_compression::ReceiverId,
+    native_spool::NativeSpoolBundle, receiver_exact_compression::ReceiverId,
     receiver_history_compression::NativeStateId,
 };
 use life::{
@@ -10,9 +9,7 @@ use life::{
         import_claude_visible_prefix, CodexDialogueImportSpec, DialoguePhase, DialogueSpeaker,
         ExactDialogueLineage,
     },
-    dialogue_native_spool::{
-        found_addressed_dialogue_native_spool, AddressedDialogueOccurrence,
-    },
+    dialogue_native_spool::{found_addressed_dialogue_native_spool, AddressedDialogueOccurrence},
     exchange_world_tube::{
         derive_continuation_aperture, discover_complete_exchange_aperture, ContainerLineageFaces,
         CorrespondenceFibres, DeviceContactReceipt, Digest32, ExchangeContainer, ExchangeRecord,
@@ -157,9 +154,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                     .enumerate()
                     .map(|(at, address)| AddressedDialogueOccurrence {
                         address: address.clone(),
-                        predecessor: at
-                            .checked_sub(1)
-                            .map(|prior| addresses[prior].clone()),
+                        predecessor: at.checked_sub(1).map(|prior| addresses[prior].clone()),
                         caused_by: at
                             .checked_sub(1)
                             .map(|prior| [addresses[prior].clone()].into_iter().collect())
@@ -304,10 +299,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .ok_or("the native dialogue spool has no generator")?;
     let mut word = remounted.mount_word(&spool.address, &[generator])?;
     let word_return = word.conduct(&[NativeStateId(0), NativeStateId(1)], ReceiverId(0))?;
-    let mut current = remounted.mount_thread_current(
-        &spool.address,
-        &spool.threads[0].address,
-    )?;
+    let mut current = remounted.mount_thread_current(&spool.address, &spool.threads[0].address)?;
     let current_return = current.conduct()?;
     let receipt = FoundingReceipt {
         truth_status: "established-bounded",

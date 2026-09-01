@@ -15,17 +15,18 @@ use holonic_engine::{
 };
 use holonic_structure::CausalMembrane;
 use life::{
-    athena_native::{
+    mathematical_source::HierarchicalOpticalPassage,
+    native_intelligence::{
         compare_material_factorizations, realize_material_source, AddressedEmanationIngress,
-        AddressedEmanationWorldReturn, AddressedMaterialOccurrence, AthenaCausalMembrane,
-        AthenaMembraneConsequence, AthenaMembraneStanding, CausalOperationWorldReturn,
+        AddressedEmanationWorldReturn, AddressedMaterialOccurrence, CausalOperationWorldReturn,
         CausalResultCell, EmanationDeed, EmanationParticipant, EmanationSurface, EmanationVoice,
         ExactMembraneChartPassage, ExteriorOccurrenceTransducer, ExteriorWorldReturnTestimony,
         MaterialFactorizationAperture, MaterialSourceBoundaryWorldReturn, MaterialSourceCodec,
-        NativeAcousticPotentialComplex, NativeAcousticRadiationInput, NativeAcousticReceiverChart,
-        OpticalAthenaRest, PerspectiveChart, SituatedEmanationDifference, SituatedEmanationPassage,
+        MembraneConsequence, MembraneStanding, NativeAcousticPotentialComplex,
+        NativeAcousticRadiationInput, NativeAcousticReceiverChart, NativeCausalMembrane,
+        OpticalProductRest, PerspectiveChart, SituatedEmanationDifference,
+        SituatedEmanationPassage,
     },
-    mathematical_source::HierarchicalOpticalPassage,
 };
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
@@ -58,7 +59,7 @@ fn main() -> Result<(), String> {
     let started = Instant::now();
 
     let rested_wire = fs::read(root.join(REST)).map_err(display)?;
-    let rest = OpticalAthenaRest::read(&rested_wire).map_err(display)?;
+    let rest = OpticalProductRest::read(&rested_wire).map_err(display)?;
     if rest.identity() != EXPECTED_ALP4_IDENTITY {
         return Err("ALP5 did not receive the exact ALP4 successor".to_owned());
     }
@@ -112,7 +113,8 @@ fn main() -> Result<(), String> {
     let math_notation_world =
         population_return(&math_notation, "alp5/math-notation-return", false, 2, 3)?;
     let repository_bytes =
-        fs::read(root.join("soma/life/src/athena_native/product_receiver.rs")).map_err(display)?;
+        fs::read(root.join("soma/life/src/native_intelligence/product_receiver.rs"))
+            .map_err(display)?;
     let code_material = material(
         "alp5/request/repository-code",
         &repository_bytes,
@@ -372,7 +374,7 @@ fn main() -> Result<(), String> {
         .unit("athena-alpha-product-current")
         .map_err(display)?;
     let (address, receiver) = continuing_native_address(&rest)?;
-    let mut membrane = AthenaCausalMembrane::mount(rest)
+    let mut membrane = NativeCausalMembrane::mount(rest)
         .constitute_interior()
         .map_err(display)?
         .mount_resident_interior()
@@ -395,7 +397,7 @@ fn main() -> Result<(), String> {
             vec!["the generated surface returns as later current".to_owned()],
         )
         .map_err(|failure| format!("generated surface boundary refused: {failure:?}"))?;
-    let AthenaMembraneConsequence::Returned(generated_return) =
+    let MembraneConsequence::Returned(generated_return) =
         membrane.receive_occurrence(bound).map_err(display)?
     else {
         return Err("the generated surface returned an unresolved membrane binding".to_owned());
@@ -587,7 +589,7 @@ fn main() -> Result<(), String> {
     let targeted_ablation_attributable = ablated_surface.text != baseline_text;
     let exact_restoration = rest.identity() == initial_identity;
     let canonical = rest.canonical_bytes().map_err(display)?;
-    let remounted = OpticalAthenaRest::read(&canonical).map_err(display)?;
+    let remounted = OpticalProductRest::read(&canonical).map_err(display)?;
     let source_detached_remount =
         remounted.identity() == initial_identity && canonical == rested_wire;
 
@@ -657,13 +659,13 @@ fn main() -> Result<(), String> {
         "truth_status": "established-bounded",
         "rest_identity_sha256": initial_identity,
         "ingress": {
-            "owner": "ExteriorOccurrenceTransducer -> AthenaCausalMembrane",
+            "owner": "ExteriorOccurrenceTransducer -> NativeCausalMembrane",
             "accepted_faces": ["addressed occurrence", "exact acoustic span", "hierarchical optical span", "synchronized span", "material source realization"],
             "packetization": "arbitrary complete addressed spans",
             "chronology": "source-owned addressed lineage and exact local clocks"
         },
         "conduct": {
-            "owner": "ResidentAthenaProduct",
+            "owner": "ResidentProductEcology",
             "hot_surface": integrated_apparatus.device,
             "one_context": integrated_apparatus.one_underlying_context,
             "launches": integrated_apparatus.launches,
@@ -769,7 +771,7 @@ fn main() -> Result<(), String> {
 }
 
 fn emit_return(
-    passage: &mut SituatedEmanationPassage<OpticalAthenaRest>,
+    passage: &mut SituatedEmanationPassage<OpticalProductRest>,
     surfaces: &mut Vec<EmanationSurface>,
     differences: &mut Vec<SituatedEmanationDifference>,
     suffix: &str,
@@ -894,8 +896,8 @@ fn byte_current(bytes: &[u8]) -> Result<ExactComplexWaveCurrent, String> {
 }
 
 fn continuing_native_address(
-    rest: &impl AthenaMembraneStanding,
-) -> Result<(life::athena_native::NativeSectionAddress, ReceiverId), String> {
+    rest: &impl MembraneStanding,
+) -> Result<(life::native_intelligence::NativeSectionAddress, ReceiverId), String> {
     for address in &rest.membrane_realization().sections {
         let addressed = rest
             .membrane_ecology()

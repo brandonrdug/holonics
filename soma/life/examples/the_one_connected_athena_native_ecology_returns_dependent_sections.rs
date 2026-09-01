@@ -16,7 +16,7 @@ use holonic_engine::{
     receiver_exact_compression::ReceiverId,
     EventId,
 };
-use life::athena_native::{NativeConductConsequence, NativeEcologyRest};
+use life::native_intelligence::{NativeConductConsequence, NativeEcologyRest};
 use serde::Serialize;
 use serde_json::json;
 use sha2::{Digest, Sha256};
@@ -58,13 +58,19 @@ fn main() -> Result<(), String> {
     fs::create_dir_all(output.join("detached-return")).map_err(display)?;
     let bundle = NativeSpoolBundle::read(&fs::read(BUNDLE).map_err(display)?).map_err(display)?;
     let rest = NativeEcologyRest::found(bundle).map_err(display)?;
-    eprintln!("k3-stage=rest-founded elapsed_ms={}", started.elapsed().as_millis());
+    eprintln!(
+        "k3-stage=rest-founded elapsed_ms={}",
+        started.elapsed().as_millis()
+    );
     let canonical = rest.canonical_bytes().map_err(display)?;
     let wire_sha256 = sha(&canonical);
     let remounted = NativeEcologyRest::read(&canonical).map_err(display)?;
     let structural_round_trip = remounted == rest;
     fs::write(output.join("athena-native.rest"), &canonical).map_err(display)?;
-    eprintln!("k3-stage=round-trip elapsed_ms={}", started.elapsed().as_millis());
+    eprintln!(
+        "k3-stage=round-trip elapsed_ms={}",
+        started.elapsed().as_millis()
+    );
 
     let receiver = *rest
         .realization
@@ -74,7 +80,10 @@ fn main() -> Result<(), String> {
         .ok_or("empty dependent receiver family")?;
     let addresses = rest.realization.sections.clone();
     let batch = rest.conduct_population(receiver).map_err(display)?;
-    eprintln!("k3-stage=batch-conduct elapsed_ms={}", started.elapsed().as_millis());
+    eprintln!(
+        "k3-stage=batch-conduct elapsed_ms={}",
+        started.elapsed().as_millis()
+    );
     let anchor = addresses.first().ok_or("empty section atlas")?;
     let outside_receiver = (0..u64::MAX)
         .map(ReceiverId)
@@ -103,7 +112,10 @@ fn main() -> Result<(), String> {
             return Err("outside section unexpectedly returned".to_owned());
         }
     };
-    eprintln!("k3-stage=insufficiency-controls elapsed_ms={}", started.elapsed().as_millis());
+    eprintln!(
+        "k3-stage=insufficiency-controls elapsed_ms={}",
+        started.elapsed().as_millis()
+    );
 
     run_detached(
         &output.join("athena-native.rest"),
@@ -111,7 +123,10 @@ fn main() -> Result<(), String> {
         anchor.occurrence,
         receiver,
     )?;
-    eprintln!("k3-stage=detached-return elapsed_ms={}", started.elapsed().as_millis());
+    eprintln!(
+        "k3-stage=detached-return elapsed_ms={}",
+        started.elapsed().as_millis()
+    );
     let detached: serde_json::Value = serde_json::from_slice(
         &fs::read(output.join("detached-return/00-return.json")).map_err(display)?,
     )
@@ -120,8 +135,7 @@ fn main() -> Result<(), String> {
         thread.word_returns.iter().all(|returned| {
             !returned.apparatus.invariant_transport_reuploaded
                 && returned.device == "NVIDIA GeForce RTX 4080 SUPER"
-        })
-            && !thread.current_return.invariant_transport_reuploaded
+        }) && !thread.current_return.invariant_transport_reuploaded
             && !thread.current_return.cpu_semantic_replay_after_device
             && !thread.current_return.binary_receiver_taken
             && thread.current_return.device == "NVIDIA GeForce RTX 4080 SUPER"

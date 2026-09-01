@@ -3,12 +3,12 @@
 use std::{fs, io, path::PathBuf, time::Instant};
 
 use life::{
-    athena_native::{
-        AdmittedReturnedAffineLaboratoryRestWitness, GranularCultivationWithdrawal,
-        GranularFactorLineageProjection, GranularReturnedAffineAthenaRest,
-        ReturnedAffineLaboratoryAthenaRest,
-    },
     exchange_world_tube::{remount_visible_message_projection, ContinuationAperture},
+    native_intelligence::{
+        AdmittedReturnedAffineLaboratoryRestWitness, GranularCultivationWithdrawal,
+        GranularFactorLineageProjection, GranularReturnedAffineEcologyRest,
+        ReturnedAffineLaboratoryRest,
+    },
 };
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -30,7 +30,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "3ab826fb8512aae85096193ce103a384092111e8f26836415b0e1dc7eba02178",
     )?;
     let predecessor =
-        ReturnedAffineLaboratoryAthenaRest::read_admitted(&fs::read(&predecessor_path)?, &witness)?;
+        ReturnedAffineLaboratoryRest::read_admitted(&fs::read(&predecessor_path)?, &witness)?;
     let aperture: ContinuationAperture = serde_json::from_slice(&fs::read(root.join(concat!(
         "output/the_complete_laboratory_exchange_returns_for_athena_alpha/",
         "04-continuation-aperture.json"
@@ -44,7 +44,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "exchange-world-tube.ewtb"
     )))
     .map_err(io::Error::other)?;
-    let (successor, receipt) = GranularReturnedAffineAthenaRest::cultivate_returned(
+    let (successor, receipt) = GranularReturnedAffineEcologyRest::cultivate_returned(
         predecessor,
         &aperture,
         &world,
@@ -62,7 +62,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         serde_json::to_vec_pretty(&receipt)?,
     )?;
     let remounted = GranularCultivationWithdrawal::read(&organ_bytes)?;
-    let restored = GranularReturnedAffineAthenaRest::restore(predecessor, remounted)?;
+    let restored = GranularReturnedAffineEcologyRest::restore(predecessor, remounted)?;
     if restored.identity() != successor_identity {
         return Err(io::Error::other("the sealed successor did not restore").into());
     }

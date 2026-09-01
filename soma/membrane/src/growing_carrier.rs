@@ -173,7 +173,7 @@ impl CarrierStorage for GrowingCarrier {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use body::manifold::{atom_node, Enclosure, ErosBody};
+    use body::manifold::{atom_node, ContinuingBody, Enclosure};
     use body::num::Cog;
     use body::register::REGISTER;
 
@@ -199,7 +199,7 @@ mod tests {
         ];
         let state;
         {
-            let mut body = ErosBody::over_sparse_world_storage_from_first_difference(
+            let mut body = ContinuingBody::over_sparse_world_storage_from_first_difference(
                 standing.flat_cells().unwrap(),
                 &mut own,
                 standing.flat_axis().unwrap() as i64,
@@ -254,7 +254,7 @@ mod tests {
         let mut carrier = GrowingCarrier::with_depth(1).unwrap();
         let header;
         {
-            let mut body = ErosBody::over_standing_world_storage_from_first_difference(
+            let mut body = ContinuingBody::over_standing_world_storage_from_first_difference(
                 &standing,
                 &mut own,
                 arrivals[0].place,
@@ -285,7 +285,7 @@ mod tests {
         let exact_faces;
         {
             let mut exact_own = crate::GrowingSparseOwn::new();
-            let mut exact = ErosBody::resume_standing_world_storage_from_live_header(
+            let mut exact = ContinuingBody::resume_standing_world_storage_from_live_header(
                 &standing,
                 &mut exact_own,
                 header,

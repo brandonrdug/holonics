@@ -4,7 +4,7 @@ use std::process::Command;
 use std::time::Instant;
 
 use holonic_engine::cuda_refine::CudaRefineExecutor;
-use life::mathematical_particle::{LaboratoryAthenaRest, LaboratoryInquiry};
+use life::mathematical_particle::{LaboratoryInquiry, LaboratoryProductionRest};
 use serde_json::{json, Value};
 
 use super::{artifact, render};
@@ -17,7 +17,7 @@ pub fn conduct(
     output: &Path,
 ) -> Result<(), String> {
     fs::create_dir_all(output).map_err(|error| error.to_string())?;
-    let rest = LaboratoryAthenaRest::read(&read(standing)?, &read(decoder)?, &read(fibres)?)
+    let rest = LaboratoryProductionRest::read(&read(standing)?, &read(decoder)?, &read(fibres)?)
         .map_err(|error| error.to_string())?;
     let inquiry: LaboratoryInquiry = serde_json::from_slice(&read(inquiry)?)
         .map_err(|error| format!("read laboratory inquiry: {error}"))?;
@@ -253,7 +253,9 @@ pub fn conduct(
     Ok(())
 }
 
-fn native_passage(rest: &LaboratoryAthenaRest) -> Result<(Vec<u32>, Vec<u32>, Vec<u32>), String> {
+fn native_passage(
+    rest: &LaboratoryProductionRest,
+) -> Result<(Vec<u32>, Vec<u32>, Vec<u32>), String> {
     if rest
         .native
         .native_population
@@ -294,7 +296,7 @@ fn native_passage(rest: &LaboratoryAthenaRest) -> Result<(Vec<u32>, Vec<u32>, Ve
 }
 
 fn dissection(
-    rest: &LaboratoryAthenaRest,
+    rest: &LaboratoryProductionRest,
     production: &holonic_engine::cuda_refine::DeviceProductionAperture,
     native_end: &[u32],
     quadratic: &holonic_engine::cuda_refine::DeviceQuadraticSectionTransport,

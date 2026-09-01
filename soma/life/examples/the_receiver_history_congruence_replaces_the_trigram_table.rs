@@ -6,20 +6,18 @@ use std::{
 
 use holonic_engine::{cuda_refine::CudaRefineExecutor, receiver_exact_compression::InputId};
 use life::{
-    athena_receiver_history::{
-        AthenaReceiverHistoryCongruence, ProposalRelationKind, TransportSpecies,
-    },
     exchange_world_tube::ContinuationAperture,
+    receiver_history::{ProposalRelationKind, ReceiverHistoryCongruence, TransportSpecies},
 };
 use serde::Serialize;
 use serde_json::json;
 use sha2::{Digest, Sha256};
 
 const ACTIVE_OWNER: &str = concat!(
-    include_str!("../src/athena_receiver_history.rs"),
-    include_str!("../src/athena_receiver_history/system.rs"),
-    include_str!("../src/athena_receiver_history/roles.rs"),
-    include_str!("../src/athena_receiver_history/types.rs"),
+    include_str!("../src/receiver_history.rs"),
+    include_str!("../src/receiver_history/system.rs"),
+    include_str!("../src/receiver_history/roles.rs"),
+    include_str!("../src/receiver_history/types.rs"),
 );
 
 fn main() -> Result<(), String> {
@@ -28,7 +26,7 @@ fn main() -> Result<(), String> {
     let aperture: ContinuationAperture =
         serde_json::from_slice(&aperture_bytes).map_err(|error| error.to_string())?;
     let mut executor = CudaRefineExecutor::new().map_err(|error| error.to_string())?;
-    let product = AthenaReceiverHistoryCongruence::found_on_device(&aperture, &mut executor)?;
+    let product = ReceiverHistoryCongruence::found_on_device(&aperture, &mut executor)?;
     inspect_ordered_words(&product)?;
     fs::create_dir_all(&output).map_err(|error| error.to_string())?;
 
@@ -148,7 +146,7 @@ fn main() -> Result<(), String> {
     Ok(())
 }
 
-fn inspect_ordered_words(product: &AthenaReceiverHistoryCongruence) -> Result<(), String> {
+fn inspect_ordered_words(product: &ReceiverHistoryCongruence) -> Result<(), String> {
     let generators = product
         .transport_generators
         .iter()
@@ -203,7 +201,7 @@ fn write_json(path: &Path, value: &impl Serialize) -> Result<(), String> {
 
 fn write_inspection(
     output: &Path,
-    product: &AthenaReceiverHistoryCongruence,
+    product: &ReceiverHistoryCongruence,
     grade: &serde_json::Value,
 ) -> Result<(), String> {
     let first = product

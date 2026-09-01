@@ -3,7 +3,7 @@
 
 use std::{fs, path::PathBuf, time::Instant};
 
-use life::athena_native::{NativeEcologyRest, NativeCirculationRest};
+use life::native_intelligence::{NativeCirculationRest, NativeEcologyRest};
 use serde_json::json;
 use sha2::{Digest, Sha256};
 

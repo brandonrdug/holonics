@@ -4,7 +4,7 @@
 **Date:** 2026-08-31
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** HIF5.
+**Current frontier:** HIF6.
 **Supersession:** this contract supersedes the unresolved scheduling authority of UAR/R0Q. Exact
 completed UAR/R0Q mechanisms retain their scoped grades as evidence and implementation standing;
 their unfinished intentions are obligations below, not a second campaign.
@@ -309,7 +309,7 @@ invariance, withdrawal, and restoration pass. The engine suite returned 2,002 pa
 32 ignored; engine examples and source-shape passed. The exact return is recorded in
 [`../research/records/2026-08-31_HIF4_CAUSAL_ADJOINT_CULTIVATION_RETURNED_SOURCE_DETACHED_HEXIS.md`](../research/records/2026-08-31_HIF4_CAUSAL_ADJOINT_CULTIVATION_RETURNED_SOURCE_DETACHED_HEXIS.md).
 
-### HIF5 — migrate products and remove campaign ontology — CURRENT
+### HIF5 — migrate products and remove campaign ontology — PASSED
 
 [definition] Migrate Eros and Athena implementations onto the neutral framework. Rename or remove
 generic Athena-prefixed types and methods, merge duplicate rest/cultivation/generation owners, split
@@ -322,12 +322,21 @@ exact completed consequences through the new owners, not through compatibility d
 type-check and `life` returns 491 passed, zero failed, 15 ignored. HIF5 remains current for the
 product/rest hierarchy and remaining campaign-qualified generic owners.
 
+[established-bounded; implemented-exact; source-inspected; measured] HIF5 passed. The live package,
+generic type families, wire domains, low-level continuing body, receiver-history formal owner, and
+resident integrated front now carry neutral names without aliases. Superseded lexical/atlas/Eros
+rest owners, resident atlas laws and kernels, and their sole-purpose drivers were deleted. The
+resident-section foreman was split at founded apparatus relations. Engine tests returned 1,991
+passed, zero failed, 32 ignored; life returned 466 passed, zero failed, 14 ignored; the Lean
+umbrella built 3,768 jobs. The exact return is
+[`../research/records/2026-08-31_HIF5_PRODUCTS_MOVED_TO_NEUTRAL_OWNERS_AND_CAMPAIGN_ONTOLOGY_DEPARTED.md`](../research/records/2026-08-31_HIF5_PRODUCTS_MOVED_TO_NEUTRAL_OWNERS_AND_CAMPAIGN_ONTOLOGY_DEPARTED.md).
+
 **Pass HIF5:** Athena denotes a composed product/ecology rather than a generic type family; Eros
 denotes its composer/cultivator; Soulkiller denotes the one-way boundary; no live generic source
 owner is campaign-qualified; source-shape and public-owner review return no hotspot or redundant
 rest hierarchy.
 
-### HIF6 — resident and source-neutral closure
+### HIF6 — resident and source-neutral closure — CURRENT
 
 [definition] Carry the neutral inference and cultivation lifecycle through the strongest lawful
 resident surface. Revalidate actual emission/world-return identities, off-diagonal complex

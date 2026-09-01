@@ -39,7 +39,7 @@
 //! nor causal invertibility and carries no authority as an engine gate (`FORMULA §VIII`, contamination ruling).
 //!
 //! **Θ — the worldline discipline.** Θ is a body's OWN accumulated turn: one count per relating the body
-//! itself makes — its proper time. It lives with the driven body (`manifold::ErosBody`), NEVER in the pool
+//! itself makes — its proper time. It lives with the driven body (`manifold::ContinuingBody`), NEVER in the pool
 //! and NEVER as a stamp on another body's events (Ledger U).
 
 /// live manifold cell words: `[arc]` — the one packed number (flow ⊕ sweep). One word, one quantity.

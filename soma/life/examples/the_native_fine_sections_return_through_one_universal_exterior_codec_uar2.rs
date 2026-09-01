@@ -7,8 +7,8 @@ use std::{
     time::{Duration, Instant},
 };
 
-use life::athena_native::{
-    transduce_source_neutral_exterior, SourceNeutralAthenaRest, SourceNeutralExteriorRadiation,
+use life::native_intelligence::{
+    transduce_source_neutral_exterior, SourceNeutralEcologyRest, SourceNeutralExteriorRadiation,
     SourceNeutralExteriorRadiationTerminal, SourceNeutralExteriorStep,
 };
 use serde::Serialize;
@@ -94,7 +94,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let rest_path = env::var_os("HOLONICS_UAR2_REST")
         .map(PathBuf::from)
         .unwrap_or_else(|| root.join(PREDECESSOR));
-    let rest = SourceNeutralAthenaRest::read(&fs::read(rest_path)?)?;
+    let rest = SourceNeutralEcologyRest::read(&fs::read(rest_path)?)?;
     let rest_identity_sha256 = rest.identity().to_owned();
     let supplied = std::env::args().skip(1).collect::<Vec<_>>();
     let questions = if supplied.is_empty() {

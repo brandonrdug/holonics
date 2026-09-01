@@ -118,7 +118,7 @@ pub struct ProductionWithdrawalReceipt {
 
 /// One continuing product ecology. It is intentionally neither `Clone` nor internally shared.
 #[derive(Debug, PartialEq, Eq)]
-pub struct ProductionAthenaRest {
+pub struct ProductionEcologyRest {
     pub inference: InferenceEcologyRest,
     pub morphology: DynamicMorphologyRest,
     pub retained_boundary: LongHorizonRetainedBoundary,
@@ -128,7 +128,7 @@ pub struct ProductionAthenaRest {
 }
 
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
-pub enum ProductionAthenaError {
+pub enum ProductionEcologyError {
     #[error("the I5 inference ecology refused: {0}")]
     Inference(String),
     #[error("the R3 morphology refused: {0}")]

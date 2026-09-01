@@ -21,10 +21,10 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use body::num::Cog;
 use life::causal_language::{
-    CausalLanguageEcology, CausalLanguagePassage, fiber_bytes, lexical_tokens,
+    fiber_bytes, lexical_tokens, CausalLanguageEcology, CausalLanguagePassage,
 };
 use life::presentation_quotient::{
-    PresentationGround, PresentationReceiver, PresentedCandidate, divide_junction,
+    divide_junction, PresentationGround, PresentationReceiver, PresentedCandidate,
 };
 use life::suffix_ecology::ExactSuffixEcology;
 use soma_abi::active::ActionCurrent;

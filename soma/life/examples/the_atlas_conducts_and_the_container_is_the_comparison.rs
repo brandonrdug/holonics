@@ -277,7 +277,7 @@ fn containers(atlas: &ExactSuffixEcology, sealed: usize) -> Result<(), String> {
     );
     println!("                               Lose it and the rows address nothing.");
     println!();
-    println!("  THE ATLAS CONTAINER  (one ErosRest organ)");
+    println!("  THE ATLAS CONTAINER  (one rested organ)");
     println!("    sealed octets              {sealed}");
     println!("    classes                    {}", atlas.state_count());
     println!(

@@ -7,11 +7,11 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use life::athena_native::{
+use life::native_intelligence::{
     AddressedEmanationIngress, AddressedEmanationWorldReturn, AddressedMaterialOccurrence,
     CausalOperationWorldReturn, CausalResultCell, EmanationDeed, EmanationParticipant,
     EmanationSurface, EmanationVoice, ExteriorWorldReturnTestimony, MaterialFactorizationAperture,
-    NativePotentialCellKind, PerspectiveChart, SituatedCultivatedAthenaRest,
+    NativePotentialCellKind, PerspectiveChart, SituatedCultivatedEcologyRest,
     SituatedEmanationDifference, SituatedEmanationPassage,
 };
 use serde::Serialize;
@@ -41,7 +41,7 @@ fn main() -> Result<(), String> {
 
     let rest_bytes = fs::read(root.join(L2_REST)).map_err(|error| error.to_string())?;
     let rest =
-        SituatedCultivatedAthenaRest::read(&rest_bytes).map_err(|error| error.to_string())?;
+        SituatedCultivatedEcologyRest::read(&rest_bytes).map_err(|error| error.to_string())?;
     let rest_identity = rest.identity().to_owned();
     let material = AddressedMaterialOccurrence::found(
         "l4/material/ordinary-prose/addition",

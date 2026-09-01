@@ -11,9 +11,9 @@ use std::{
     time::Instant,
 };
 
-use life::athena_native::{
-    NativeEcologyRest, ExchangeSituatedProduct, SituatedCultivatedAthenaRest,
-    SituatedCultivatedConductReturn,
+use life::native_intelligence::{
+    ExchangeSituatedProduct, NativeEcologyRest, SituatedCultivatedConductReturn,
+    SituatedCultivatedEcologyRest,
 };
 use serde::Serialize;
 use serde_json::json;
@@ -49,7 +49,7 @@ fn main() -> Result<(), String> {
     let product = ExchangeSituatedProduct::read(&product_bytes).map_err(display)?;
     eprintln!("L2 admitted K3 and L1; cultivating the complete returned population");
     let cultivated =
-        SituatedCultivatedAthenaRest::cultivate(predecessor, product).map_err(display)?;
+        SituatedCultivatedEcologyRest::cultivate(predecessor, product).map_err(display)?;
     let cultivated_identity_sha256 = cultivated.identity().to_owned();
     let cultivated_bytes = cultivated.canonical_bytes().map_err(display)?;
     let cultivated_wire_sha256 = sha256(&cultivated_bytes);
@@ -62,7 +62,7 @@ fn main() -> Result<(), String> {
     drop(product_bytes);
 
     // The only input to the hot continuation from here onward is the sealed native wire.
-    let remounted = SituatedCultivatedAthenaRest::read(&cultivated_bytes).map_err(display)?;
+    let remounted = SituatedCultivatedEcologyRest::read(&cultivated_bytes).map_err(display)?;
     let source_detached_identity_preserved = remounted.identity() == cultivated_identity_sha256;
     let mut resident = remounted.mount().map_err(display)?;
     let full = resident.conduct().map_err(display)?;

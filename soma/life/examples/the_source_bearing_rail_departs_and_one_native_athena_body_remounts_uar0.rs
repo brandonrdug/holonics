@@ -1,7 +1,7 @@
 use std::{error::Error, fs, path::PathBuf};
 
-use life::athena_native::{
-    sever_source_bearing_athena_rest, transduce_source_neutral_exterior, SourceNeutralAthenaRest,
+use life::native_intelligence::{
+    sever_source_bearing_ecology, transduce_source_neutral_exterior, SourceNeutralEcologyRest,
     SourceNeutralSeveringReceipt,
 };
 use serde::Serialize;
@@ -59,7 +59,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         predecessor_wire.len()
     );
     let predecessor_wire_octets = u64::try_from(predecessor_wire.len())?;
-    let (successor, witness, receipt) = sever_source_bearing_athena_rest(&predecessor_wire)?;
+    let (successor, witness, receipt) = sever_source_bearing_ecology(&predecessor_wire)?;
     eprintln!("uar0-stage=source-severed");
     let predecessor_identity_sha256 = receipt.predecessor_rest_identity_sha256.clone();
     let successor_wire = successor.canonical_bytes()?;
@@ -83,7 +83,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     // The cold witness and contaminated predecessor are not supplied to this remount.
     drop(predecessor_wire);
     drop(witness);
-    let remounted = SourceNeutralAthenaRest::read(&successor_wire)?;
+    let remounted = SourceNeutralEcologyRest::read(&successor_wire)?;
     eprintln!("uar0-stage=successor-remounted");
     let forbidden = [
         "Brandon",
@@ -181,7 +181,7 @@ fn verify_existing_successor(root: &PathBuf, output: &PathBuf) -> Result<(), Box
     )?)?;
     let predecessor_wire_octets = fs::metadata(root.join(PREDECESSOR))?.len();
     let predecessor_identity_sha256 = receipt.predecessor_rest_identity_sha256.clone();
-    let remounted = SourceNeutralAthenaRest::read(&successor_wire)?;
+    let remounted = SourceNeutralEcologyRest::read(&successor_wire)?;
     let successor_identity_sha256 = remounted.identity().to_owned();
     if successor_identity_sha256 != receipt.native_successor_identity_sha256 {
         return Err("the written UAR0 successor escaped its severing receipt".into());

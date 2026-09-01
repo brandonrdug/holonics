@@ -1,6 +1,6 @@
 use std::{env, error::Error, fs, path::PathBuf};
 
-use life::athena_native::SourceNeutralAthenaRest;
+use life::native_intelligence::SourceNeutralEcologyRest;
 use serde::Serialize;
 
 const PREDECESSOR: &str = concat!(
@@ -40,7 +40,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .unwrap_or_else(|| root.join(OUTPUT));
     fs::create_dir_all(&output)?;
 
-    let rest = SourceNeutralAthenaRest::read(&fs::read(root.join(PREDECESSOR))?)?;
+    let rest = SourceNeutralEcologyRest::read(&fs::read(root.join(PREDECESSOR))?)?;
     let rest_identity_sha256 = rest.identity().to_owned();
     let resident = rest.mount_resident()?;
     let chart = resident.factor_winding_constitutive_chart()?;

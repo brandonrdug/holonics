@@ -1,6 +1,6 @@
 //! N0's native mathematical application boundary.
 //!
-//! Source owners are [`NativeHexisAthenaRest`] and CUDA's fixed-section family passage. The
+//! Source owners are [`NativeHexisRest`] and CUDA's fixed-section family passage. The
 //! entering port is an addressed recovered operation/constraint/geometry occurrence; its
 //! predecessor is the canonical generator-native rest. The constitutive law remains
 //! `T = I + L*C`. The resident card returns transport, successor route, constraint, shared
@@ -24,7 +24,7 @@ use super::native_consequence_types::{
     NativeMathematicalInquiry, NativeMathematicalPort, NativeMathematicalReceiver,
     NativeOperationCell, NativeReturnedObstruction,
 };
-use super::native_family_types::{NativeHexisAthenaRest, NativeSuccessorHistory};
+use super::native_family_types::{NativeHexisRest, NativeSuccessorHistory};
 
 pub const NATIVE_MATHEMATICAL_INQUIRY_SCHEMA: &str = "holonics.n0.native-mathematical-inquiry.v1";
 pub const NATIVE_MATHEMATICAL_CONSEQUENCE_SCHEMA: &str =
@@ -52,7 +52,7 @@ fn receiver_family() -> Vec<NativeMathematicalReceiver> {
     ]
 }
 
-impl NativeHexisAthenaRest {
+impl NativeHexisRest {
     pub fn found_native_mathematical_inquiry(
         &self,
         source_occurrences: Vec<String>,
@@ -443,7 +443,7 @@ fn inquiry_body(inquiry: &NativeMathematicalInquiry) -> InquiryBody<'_> {
 }
 
 fn word_for_route(
-    rest: &NativeHexisAthenaRest,
+    rest: &NativeHexisRest,
     route: u32,
 ) -> Result<Vec<u32>, NativeMathematicalConsequenceError> {
     match route {
