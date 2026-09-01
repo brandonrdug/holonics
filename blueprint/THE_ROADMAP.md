@@ -340,9 +340,9 @@ no successor phase is scheduled.
 
 ## Active campaign — Native Morphology Variant Foundation
 
-**Current frontier:** MVF4
+**Current frontier:** MVF5
 
-**MVF4 — DERIVED ANATOMY MANIFEST AND BACKEND-INDEPENDENT MORPHOLOGY PACKAGE — IS THE SOLE NEXT DEED.**
+**MVF5 — SAFETENSORS AND ONNX EXPORT LENSES — IS THE SOLE NEXT DEED.**
 
 [definition] Brandon's direct instruction of 2026-09-01 founds the ordered `MVF0--MVF6` campaign
 under
@@ -376,6 +376,12 @@ interaction, causal-cone-only morphology, reciprocal mutual response, disjoint-r
 and equality, local/global cone controls, remount, ablation, withdrawal, and exact open-domain
 restoration. Its receipt is
 [`research/records/2026-09-01_MVF3_RETURNED_LOCAL_INTERACTION_CULTIVATED_ONLY_ITS_CAUSAL_CONE.md`](../research/records/2026-09-01_MVF3_RETURNED_LOCAL_INTERACTION_CULTIVATED_ONLY_ITS_CAUSAL_CONE.md).
+
+[established-bounded; implemented-exact; measured] MVF4 returned derived variant anatomy,
+separated schema/lineage/capability/realization axes, base and situated hot package owners,
+reconstruction/evaluation/apparatus/export lanes, exact package round-trip, and apparatus/export
+replacement invariance. Its receipt is
+[`research/records/2026-09-01_MVF4_DERIVED_VARIANT_ANATOMY_AND_BACKEND_INDEPENDENT_MORPHOLOGY_PACKAGE_RETURNED.md`](../research/records/2026-09-01_MVF4_DERIVED_VARIANT_ANATOMY_AND_BACKEND_INDEPENDENT_MORPHOLOGY_PACKAGE_RETURNED.md).
 
 [counterexample; source-inspected] The completed SCF lifecycle remains exact at its bounded
 mechanism scope, but the Gemma productive lift's alternating real/imaginary section sum is not a

@@ -91,6 +91,13 @@ impl ReceiverHistoryRealizationPassage {
     }
 
     fn projection(ecology: &NativeTransportScaffold) -> Self {
+        let owned_occurrences = ecology
+            .spools
+            .iter()
+            .flat_map(|spool| &spool.threads)
+            .flat_map(|thread| &thread.occurrences)
+            .map(|occurrence| occurrence.occurrence)
+            .collect::<BTreeSet<_>>();
         let mut sections = Vec::new();
         let mut ingress_sections = Vec::new();
         let mut native_population = BTreeSet::<NativeStateId>::new();
@@ -113,7 +120,10 @@ impl ReceiverHistoryRealizationPassage {
                         thread: thread.address.clone(),
                         occurrence: occurrence.occurrence,
                     };
-                    if occurrence.predecessor.is_none() {
+                    if occurrence
+                        .predecessor
+                        .is_none_or(|predecessor| !owned_occurrences.contains(&predecessor))
+                    {
                         ingress_sections.push(address.clone());
                     }
                     sections.push(address);

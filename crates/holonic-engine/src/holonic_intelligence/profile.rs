@@ -251,6 +251,23 @@ impl NativeTransportScaffold {
 
 fn dimensions(thread: &NativeThread) -> IntrinsicHolonDimensions {
     let (incidence_rank, incidence_nullity, cycle_rank) = graph_dimensions(thread);
+    let topological_degree = usize::from(!thread.incidence.is_empty());
+    let exterior_degree = usize::from(thread.entering_boundary != thread.emitting_boundary);
+    let representation_rank = thread
+        .sections
+        .iter()
+        .flat_map(|section| {
+            [
+                section.entering.coordinate_population,
+                section.returned.coordinate_population,
+            ]
+        })
+        .map(|population| {
+            usize::try_from(population)
+                .expect("validated factorized-section population originates in a Rust extent")
+        })
+        .max()
+        .unwrap_or(0);
     let receiver_extent = thread
         .receiver_consequences
         .iter()
@@ -258,13 +275,13 @@ fn dimensions(thread: &NativeThread) -> IntrinsicHolonDimensions {
         .collect::<BTreeSet<_>>()
         .len();
     IntrinsicHolonDimensions {
-        topological_degree: DimensionFace::Exact(TopologicalDegree(1)),
+        topological_degree: DimensionFace::Exact(TopologicalDegree(topological_degree)),
         incidence_rank: DimensionFace::Exact(IncidenceRank(incidence_rank)),
         incidence_nullity: DimensionFace::Exact(IncidenceNullity(incidence_nullity)),
         cycle_rank: DimensionFace::Exact(CycleRank(cycle_rank)),
         carrier_rank: DimensionFace::Exact(CarrierRank(thread.native_support.len())),
-        exterior_degree: DimensionFace::Exact(ExteriorDegree(1)),
-        representation_rank: DimensionFace::Exact(RepresentationRank(2)),
+        exterior_degree: DimensionFace::Exact(ExteriorDegree(exterior_degree)),
+        representation_rank: DimensionFace::Exact(RepresentationRank(representation_rank)),
         generator_extent: DimensionFace::Exact(GeneratorExtent(thread.chronology.len())),
         receiver_extent: DimensionFace::Exact(ReceiverExtent(receiver_extent)),
         reconstruction_extent: DimensionFace::Exact(ReconstructionExtent(

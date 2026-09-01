@@ -15,8 +15,8 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 pub const RECEIVER_HISTORY_REALIZATION_SCHEMA: &str =
-    "soma-life.receiver-history-realization-passage.v2";
-pub const NATIVE_ECOLOGY_REST_SCHEMA: &str = "soma-life.native-ecology-rest.v2";
+    "soma-life.receiver-history-realization-passage.v3";
+pub const NATIVE_ECOLOGY_REST_SCHEMA: &str = "soma-life.native-ecology-rest.v3";
 
 /// The complete native address of one carrying occurrence. Equal endpoints, receiver values, or
 /// thread names cannot substitute for this three-part address.

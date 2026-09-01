@@ -10,17 +10,17 @@ mechanisms retain their scoped grades.
 
 ## Current frontier
 
-**Current frontier:** MVF4
+**Current frontier:** MVF5
 
-**MVF4 — DERIVED ANATOMY MANIFEST AND BACKEND-INDEPENDENT MORPHOLOGY PACKAGE — IS THE SOLE NEXT DEED.**
+**MVF5 — SAFETENSORS AND ONNX EXPORT LENSES — IS THE SOLE NEXT DEED.**
 
-[definition] Derive complete variant anatomy from the one rested morphology and package the
-physically separated hot, reconstruction, evaluation, apparatus, and export lanes under
+[definition] Implement exterior Safetensors and ONNX projections over the neutral morphology
+package under
 [`blueprint/THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md`](blueprint/THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md).
-Remove hard-coded anatomy faces; separate wire schema, parented morphology lineage, receiver
-capability, and apparatus/export realization; prove apparatus/export changes cannot change native
-morphology; and make package round-trip recover the exact rest and open obligations without a cold
-executor in the hot lane.
+Safetensors must use an explicit holonic tensor/companion schema; ONNX must declare IR, opset,
+domain, fixed receiver/boundary, and custom operations where required. Exact controls round-trip;
+projected controls retain full fibres and separators; cultivation/world-return export requests
+refuse; and no digest becomes a capability or route.
 
 ## Admitted standing
 
@@ -105,6 +105,12 @@ current with emission-indexed exterior interaction and derived local current. Cu
 equals the returned causal cone; disjoint threads remain exactly unchanged; inactive states are not
 deposited; local and declared-global cone controls, interchange, remount, ablation, withdrawal, and
 exact restoration passed. Life now returns 469 passed with 14 ignored.
+
+[established-bounded; implemented-exact; measured] MVF4 returned derived representation/topology
+anatomy, separate version axes, native/situated hot packages, reconstruction/evaluation/apparatus/
+export lanes, exact base and cultivated package round-trip, departed-withdrawal retention, and
+apparatus/export invariance. Engine returned 2,007 passed with 32 ignored; life returned 473 passed
+with 14 ignored.
 
 [established-bounded; process-audit; measured] The named workspace test receiver returned 2,924
 passed, zero failed, and 50 ignored with every example type-checked. The formal umbrella built

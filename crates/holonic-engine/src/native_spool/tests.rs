@@ -35,6 +35,40 @@ fn factorized_section_block_grouping_does_not_change_coordinates_or_current() {
     );
 }
 
+#[test]
+fn intrinsic_representation_rank_is_derived_from_the_complete_section() {
+    let mut body = scaffold();
+    let thread = &mut body.spools[0].threads[0];
+    thread.sections[0].entering = NativeFactorizedSection::from_values(
+        vec![
+            Rat::from_integer(BigInt::from(0)),
+            Rat::from_integer(BigInt::from(1)),
+            Rat::from_integer(BigInt::from(0)),
+            Rat::from_integer(BigInt::from(0)),
+        ],
+        2,
+    )
+    .expect("entering section");
+    thread.sections[0].returned = NativeFactorizedSection::from_values(
+        vec![
+            Rat::from_integer(BigInt::from(-1)),
+            Rat::from_integer(BigInt::from(0)),
+            Rat::from_integer(BigInt::from(0)),
+            Rat::from_integer(BigInt::from(0)),
+        ],
+        3,
+    )
+    .expect("returned section");
+    body.validate().expect("derived body");
+    let profile = body.intrinsic_holon_profile().expect("profile");
+    assert_eq!(
+        profile.holons[0].dimensions.representation_rank,
+        crate::native_ecology::holonic_intelligence::DimensionFace::Exact(
+            crate::native_ecology::holonic_intelligence::RepresentationRank(4)
+        )
+    );
+}
+
 fn thread(
     address: &str,
     event: u64,

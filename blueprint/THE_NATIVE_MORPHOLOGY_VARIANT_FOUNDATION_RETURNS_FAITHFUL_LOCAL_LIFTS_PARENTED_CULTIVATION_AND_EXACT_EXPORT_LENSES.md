@@ -4,7 +4,7 @@
 **Date:** 2026-09-01
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** MVF4.
+**Current frontier:** MVF5.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md),
@@ -272,7 +272,7 @@ are not deposited; local open-domain withdrawal/restoration is exact; and a decl
 returns the complete larger cone. Its receipt is
 [`../research/records/2026-09-01_MVF3_RETURNED_LOCAL_INTERACTION_CULTIVATED_ONLY_ITS_CAUSAL_CONE.md`](../research/records/2026-09-01_MVF3_RETURNED_LOCAL_INTERACTION_CULTIVATED_ONLY_ITS_CAUSAL_CONE.md).
 
-### MVF4 — derived anatomy manifest and backend-independent morphology package — CURRENT
+### MVF4 — derived anatomy manifest and backend-independent morphology package — PASSED
 
 [definition] Extend the intrinsic profile beyond hard-coded degree/rank faces and package one
 rested morphology into the physically separated lanes in §5. Derive all anatomical values from the
@@ -284,7 +284,14 @@ profiles without a caller architecture enum; changing apparatus or export does n
 morphology; changing a version string does not change capability; hot load excludes cold executor;
 and package round-trip recovers the exact rested morphology and open obligations.
 
-### MVF5 — Safetensors and ONNX export lenses
+[established-bounded; implemented-exact; measured] MVF4 passed. Anatomy and representation rank
+are derived; wire, lineage, capability, and realization axes are separate; native and situated hot
+rests package without cold execution; departed inherited reconstruction remains separate; changing
+apparatus/export leaves hot morphology and capability equal; and base/cultivated package
+round-trips are exact. Its receipt is
+[`../research/records/2026-09-01_MVF4_DERIVED_VARIANT_ANATOMY_AND_BACKEND_INDEPENDENT_MORPHOLOGY_PACKAGE_RETURNED.md`](../research/records/2026-09-01_MVF4_DERIVED_VARIANT_ANATOMY_AND_BACKEND_INDEPENDENT_MORPHOLOGY_PACKAGE_RETURNED.md).
+
+### MVF5 — Safetensors and ONNX export lenses — CURRENT
 
 [definition] Implement exterior Safetensors and ONNX projections over the package. Safetensors
 uses a declared holonic tensor schema and companion manifest. ONNX uses standard operators where
