@@ -4,19 +4,27 @@
 [`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) is the sole ordered construction
 authority. Historical phase detail remains in Git and the dated records named there.
 
-**Currency:** 2026-09-01, after HIF7's invalid qualitative-probe gate was removed and the exact
-Holonic Intelligence Framework release closed. CONS0--CONS5, QLT1--QLT6, CDB1, HIF0--HIF7, and
-the exact bounded R0Q0--R0Q4 mechanisms retain their grades.
+**Currency:** 2026-09-01, after Brandon founded the Native Transport Scaffold and repeated
+circulation campaign. CONS0--CONS5, QLT1--QLT6, CDB1, HIF0--HIF7, and the exact bounded
+R0Q0--R0Q4 mechanisms retain their grades.
 
 ## Current frontier
 
-**Current frontier:** NONE
+**Current frontier:** SCF1
 
-[established-bounded] No construction deed is active. HIF0--HIF7 are complete at their declared
-scopes. A later direct user request, not a preserved experiment or historical status sentence,
-founds the next deed.
+**SCF1 — WHOLE-OBJECT RUST SCAFFOLD MIGRATION — IS THE SOLE NEXT DEED.**
+
+[definition] Replace the whole-object `NativeSpoolBundle` type, schema, field, method, and wire
+vocabulary with `NativeTransportScaffold` across Soulkiller, intrinsic profiles, resident
+inference, and Athena rest. Retain `NativeSpool` as one winding family and `NativeThread` as one
+addressed passage. Add no compatibility alias or decoder. The complete contract is
+[`blueprint/THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md`](blueprint/THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md).
 
 ## Admitted standing
+
+[proved-derived; formal-checked; measured] SCF0 returned the neutral native transport scaffold,
+bounded dispersion separation, repeated emission-to-ingress circulation, and scaffold-withdrawal
+laws. The live Lean umbrella built 3,769 jobs; document law, epistemic tags, and source shape passed.
 
 [established-bounded; process-audit; measured] CONS0--CONS5 are complete. Coherent consolidation
 commit `9456a4ae` and authority return `0df0e87f` are pushed. The release tree returned 2,972
@@ -143,6 +151,10 @@ drivers, and records remain evidence only.
 6. HIF5 — migrate products and remove campaign ontology;
 7. HIF6 — resident and source-neutral closure; and
 8. HIF7 — exact contact/interoperability framework release.
+
+[definition] The active scaffold campaign order is SCF0 formal foundation, SCF1 Rust owner
+migration, SCF2 exact Gemma multimodal lift, SCF3 productive Athena handoff, SCF4 repeated
+circulation, SCF5 native condensation/scaffold withdrawal, and SCF6 comparative experiment/release.
 
 ## Validation boundary
 

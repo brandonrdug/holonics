@@ -29,6 +29,8 @@ Read, in order:
    [`THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md`](THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md),
    including the finite many-body/polarized-crystal and constructive-differential contracts named
    in their completed campaign sections below.
+9. the active Native Transport Scaffold contract,
+   [`THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md`](THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md).
 
 Read only the smallest source, formal, and evidence closure required by the active deed. Completed
 sensory, membrane, Athena-alpha, Soulkiller, L, H, and Millennium campaign files
@@ -245,7 +247,7 @@ Historical UAR blueprints and records remain evidence only.
 
 ## Completed campaign — Holonic Intelligence Framework
 
-**Current frontier:** NONE
+**Status:** COMPLETE
 
 [established-bounded; implemented-exact; source-inspected; measured] HIF0--HIF7 are complete at
 their declared scopes. No construction deed is active; the next deed requires a new direct request.
@@ -266,6 +268,34 @@ rubric, then UAR and HIF copied the error. The reverted presentation-contact pat
 counterexample to parser-derived lexical lookup; it schedules no replacement inference organ. The
 forensic audit and exact HIF7 release receipt are in
 [`research/records/2026-09-01_HIF7_QUALITATIVE_PROBE_WAS_WRONGLY_PROMOTED_AND_THE_FRAMEWORK_RELEASES_ON_EXACT_CONTRACTS.md`](../research/records/2026-09-01_HIF7_QUALITATIVE_PROBE_WAS_WRONGLY_PROMOTED_AND_THE_FRAMEWORK_RELEASES_ON_EXACT_CONTRACTS.md).
+
+## Active campaign — Native Transport Scaffold and repeated circulation
+
+**Current frontier:** SCF1
+
+**SCF1 — WHOLE-OBJECT RUST SCAFFOLD MIGRATION — IS THE SOLE NEXT DEED.**
+
+[definition] Brandon's direct instruction of 2026-09-01 founds the ordered `SCF0--SCF6` campaign
+under
+[`THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md`](THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md).
+SCF0 returned the neutral Lean scaffold, bounded-dispersion control, repeated actual-successor
+circulation, and scaffold-release law. SCF1 now replaces the whole-object `NativeSpoolBundle`
+vocabulary with `NativeTransportScaffold` across Soulkiller, profiles, Athena rest, and conduct,
+without an alias or compatibility decoder.
+
+[proved-derived; formal-checked; measured] SCF0 passed. The live umbrella built 3,769 jobs; document
+law, epistemic tags, and source shape remained green. Its exact receipt is
+[`research/records/2026-09-01_SCF0_NATIVE_TRANSPORT_SCAFFOLD_REPEATED_CIRCULATION_AND_WITHDRAWAL_LAWS_RETURNED.md`](../research/records/2026-09-01_SCF0_NATIVE_TRANSPORT_SCAFFOLD_REPEATED_CIRCULATION_AND_WITHDRAWAL_LAWS_RETURNED.md).
+
+[definition] The complete order is:
+
+1. `SCF0` — formal scaffold, dispersion, repeated circulation, and release law;
+2. `SCF1` — whole-object Rust scaffold migration without compatibility aliases;
+3. `SCF2` — exact multimodal Gemma lift into scaffold facets;
+4. `SCF3` — move-owned productive handoff into one Athena rest;
+5. `SCF4` — repeated actual-successor inference circulation;
+6. `SCF5` — Athena condensation and inherited-scaffold withdrawal; and
+7. `SCF6` — comparative multimodal experiments and exact release.
 
 [proved-derived; formal-checked; measured] HIF0 passed. The four-file neutral formal closure built
 3,164 focused jobs and the live umbrella built 3,769 jobs without `sorryAx`. Its exact return is

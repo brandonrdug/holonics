@@ -30,15 +30,16 @@ messages are evidence or testimony and never schedule work.
 
 ## Current courtesy summary
 
-**Current frontier:** NONE
+**Current frontier:** SCF1
 
 [established-bounded] CONS0--CONS5, QLT1--QLT6, CDB1, and HIF0--HIF7 are complete at their declared
 scopes. UAR/R0Q are deprecated as campaigns; R0Q0--R0Q4 retain their exact bounded mechanisms.
 `CONSTRUCTION_STATE.md` and `blueprint/THE_ROADMAP.md` carry the complete current receipt.
 
-[definition] No construction phase is active after HIF7. “Describe Brandon” and the related frozen
-language questions are exterior experiments, not release gates or standing capability debts. This
-summary schedules nothing; a later direct request founds the next deed.
+[definition] SCF0 returned the formal scaffold and repeated-circulation laws. SCF1 replaces the
+whole-object Rust `NativeSpoolBundle` vocabulary with `NativeTransportScaffold` while retaining
+`NativeSpool` as one winding family and adding no alias or compatibility decoder. The roadmap and
+construction state own its exact order.
 
 ## Claude-specific conduct
 

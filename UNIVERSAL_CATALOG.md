@@ -54,6 +54,15 @@ test result never upgrades a correspondence.
 | Contact schedule comparison | `IntrinsicHolonProfile.ContactScheduleChart` | `native_ecology/holonic_intelligence/contact_chart.rs` | apparatus telemetry remains beside the chart return | **exact** for fixed-window, periodic-hybrid, recurrent-linear, and current-founded edge families over one declared native population; richer receiver faces explicitly reopen coarse fibres |
 | Source-neutral realization path | `HolonicIntelligenceLifecycle.InferenceCirculationReturn`; `MachineLearningChart.DynamicReceiverChart.everyOrderedWordExact` | `soma/life/src/native_intelligence/source_neutral_relational/realization.rs`; `source_neutral_rest/conduct.rs` | `cuda_refine/membrane_moment_*`; `addressed_complex_junction.rs` | **exact-bounded:** resident physical current, path-state continuation, closure/open return, and source-detached controls return for the declared receiver family; natural-language answer quality was an exterior probe and carries no framework grade |
 
+## Native Transport Scaffold and repeated circulation
+
+| Relation | Lean owner | Rust owner | CUDA owner | Status and exact open fibre |
+|---|---|---|---|---|
+| Inherited native transport scaffold | `Computation/NativeTransportScaffold.lean::NativeTransportScaffold` | current owner pending SCF1 migration from `native_spool::NativeSpoolBundle` | existing spool/current apparatus remains owner-local | **formal-checked:** profiled holons, winding families, compositions, open obligations, and cold-witness-independent admission; Rust whole-object vocabulary is SCF1 |
+| Equal supply does not identify boundary return | `NativeTransportScaffold.lean::BoundaryDispersionPassage`; `EqualSupplyBoundarySeparation` | — | — | **formal-only:** exact additive balance and finite equal-supply/different-boundary control; no thermodynamic or biological identity is claimed |
+| Repeated inference circulation | `NativeTransportScaffold.lean::RepeatedInferenceCirculation`; `EmissionIngressJoined` | current single-cut owner: `holonic_intelligence/circulation.rs` | `ResidentNativeWord`; `ResidentComplexIncidence` | **formal-checked; partial:** adjacent emission equals actual later ingress in Lean; Rust currently returns successor requests without owning repeated circulation |
+| Scaffold withdrawal after cultivation | `NativeTransportScaffold.lean::ScaffoldReleasePassage` | current cultivation and withdrawal owners remain separate | resident recurrence/cultivation controls | **formal-checked; partial:** declared conduct survives scaffold withdrawal and source-detached remount in the formal contract; one Rust continuing ecology is SCF5 |
+
 ## Deprecated R0Q correspondence retained as standing
 
 | Formal relation | Lean theorem owner | Rust/CUDA realization | Current status |
