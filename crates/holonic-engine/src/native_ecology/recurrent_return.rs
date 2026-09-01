@@ -370,6 +370,35 @@ impl ReturnedRecurrentRest {
         Ok(text)
     }
 
+    /// Complete predecessor recurrence at one native probe.
+    pub fn predecessor_trace(
+        &self,
+        start: NativeStateId,
+    ) -> Result<Vec<NativeStateId>, RecurrentReturnRefusal> {
+        recurrence_trace(&self.base, self.delta.generator, start, None)
+    }
+
+    /// Complete successor recurrence after the returned local delta.
+    pub fn successor_trace(
+        &self,
+        start: NativeStateId,
+    ) -> Result<Vec<NativeStateId>, RecurrentReturnRefusal> {
+        recurrence_trace(
+            &self.base,
+            self.delta.generator,
+            start,
+            Some((self.delta.from, self.delta.successor_to)),
+        )
+    }
+
+    /// Targeted withdrawal removes the same local delta and therefore returns the predecessor.
+    pub fn withdrawn_trace(
+        &self,
+        start: NativeStateId,
+    ) -> Result<Vec<NativeStateId>, RecurrentReturnRefusal> {
+        self.predecessor_trace(start)
+    }
+
     fn canonical_bytes_without_successor(&self) -> Result<Vec<u8>, RecurrentReturnRefusal> {
         let mut copy = self.clone();
         copy.decision.successor_sha256 = None;
@@ -475,7 +504,72 @@ impl ReturnedRecurrentRest {
     }
 }
 
-fn local_delta(
+impl crate::native_ecology::holonic_intelligence::CultivationLifecycle for ReturnedRecurrentRest {
+    type Morphology = ExactRatMatrix;
+    type Occurrence = String;
+    type Difference = LocalGeneratorDelta;
+    type Delta = ExactRatMatrix;
+    type Probe = NativeStateId;
+    type Face = NativeStateId;
+    type RestIdentity = String;
+
+    fn predecessor(&self) -> &Self::Morphology {
+        &self.holonomy.predecessor_action
+    }
+
+    fn emitted_occurrence(&self) -> &Self::Occurrence {
+        &self.exterior.emitted_occurrence
+    }
+
+    fn returned_occurrence(&self) -> &Self::Occurrence {
+        &self.exterior.return_occurrence
+    }
+
+    fn returned_difference(&self) -> &Self::Difference {
+        &self.delta
+    }
+
+    fn proposed_delta(&self) -> &Self::Delta {
+        &self.delta.delta
+    }
+
+    fn successor(&self) -> &Self::Morphology {
+        &self.holonomy.successor_action
+    }
+
+    fn witness_probe(&self) -> &Self::Probe {
+        &self.delta.from
+    }
+
+    fn predecessor_face(&self) -> &Self::Face {
+        &self.delta.predecessor_to
+    }
+
+    fn successor_face(&self) -> &Self::Face {
+        &self.delta.successor_to
+    }
+
+    fn successor_rest(&self) -> &Self::RestIdentity {
+        self.decision
+            .successor_sha256
+            .as_ref()
+            .expect("validated committed return has successor rest")
+    }
+
+    fn precedes(&self, left: &Self::Occurrence, right: &Self::Occurrence) -> bool {
+        left == &self.exterior.emitted_occurrence && right == &self.exterior.return_occurrence
+    }
+
+    fn remounted_successor(&self) -> &Self::Morphology {
+        &self.holonomy.successor_action
+    }
+
+    fn withdrawn_predecessor(&self) -> &Self::Morphology {
+        &self.holonomy.predecessor_action
+    }
+}
+
+pub(crate) fn local_delta(
     dimension: usize,
     from: NativeStateId,
     predecessor_to: NativeStateId,
@@ -504,7 +598,7 @@ fn local_delta(
     Ok((delta, left, right))
 }
 
-fn action_matrix(
+pub(crate) fn action_matrix(
     base: &GeneratorNativeRest,
     generator: InputId,
 ) -> Result<ExactRatMatrix, RecurrentReturnRefusal> {
@@ -519,7 +613,7 @@ fn action_matrix(
     Ok(ExactRatMatrix::new(rows)?)
 }
 
-fn next(
+pub(crate) fn next(
     base: &GeneratorNativeRest,
     generator: InputId,
     state: NativeStateId,
@@ -538,7 +632,7 @@ fn next(
         .ok_or(RecurrentReturnRefusal::Carrier)
 }
 
-fn recurrence_trace(
+pub(crate) fn recurrence_trace(
     base: &GeneratorNativeRest,
     generator: InputId,
     start: NativeStateId,
@@ -653,6 +747,7 @@ impl From<ExactLinearError> for RecurrentReturnRefusal {
 mod tests {
     use super::*;
     use crate::generator_native_rest::NativeGenerator;
+    use crate::native_ecology::holonic_intelligence::CultivationLifecycle;
     use crate::native_ecology::recurrent::{
         BoundaryFace, ClosureDerivation, RetainedContinuationRest,
     };
@@ -769,7 +864,80 @@ mod tests {
             ]
         );
         let bytes = rest.canonical_bytes().expect("bytes");
-        assert_eq!(ReturnedRecurrentRest::read(&bytes).expect("read"), rest);
+        let remounted = ReturnedRecurrentRest::read(&bytes).expect("read");
+        assert_eq!(remounted, rest);
+        assert!(rest.return_is_later());
+        assert!(rest.morphology_changed());
+        assert!(rest.later_conduct_changed());
+        assert!(rest.remount_is_exact());
+        assert!(rest.withdrawal_is_exact());
+        let predecessor = rest
+            .predecessor_trace(rest.held_out_start)
+            .expect("predecessor trace");
+        let successor = rest
+            .successor_trace(rest.held_out_start)
+            .expect("successor trace");
+        let withdrawn = rest
+            .withdrawn_trace(rest.held_out_start)
+            .expect("withdrawn trace");
+        assert_ne!(successor, predecessor);
+        assert_eq!(withdrawn, predecessor);
+        assert_eq!(
+            remounted
+                .successor_trace(remounted.held_out_start)
+                .expect("remounted successor trace"),
+            successor
+        );
+        let (detached, cold) = remounted.depart_source().expect("source departure");
+        let detached_bytes = detached.canonical_bytes().expect("detached bytes");
+        let detached_text = String::from_utf8(detached_bytes.clone()).expect("JSON");
+        for forbidden in [
+            "\"emitted_occurrence\":",
+            "\"return_occurrence\":",
+            "\"source_surface\":",
+            "\"exterior\":",
+            "\"decoder\":",
+        ] {
+            assert!(!detached_text.contains(forbidden), "retained {forbidden}");
+        }
+        assert_eq!(cold.exterior.return_occurrence, "return");
+        let detached_remount =
+            crate::native_ecology::holonic_intelligence::SourceDetachedCultivatedRecurrence::read(
+                &detached_bytes,
+            )
+            .expect("detached remount");
+        assert_eq!(detached_remount, detached);
+        assert_ne!(
+            detached
+                .successor_trace(detached.held_out_start())
+                .expect("detached successor"),
+            detached
+                .predecessor_trace(detached.held_out_start())
+                .expect("detached predecessor")
+        );
+        assert_eq!(
+            detached
+                .withdrawn_trace(detached.held_out_start())
+                .expect("detached withdrawal"),
+            detached
+                .predecessor_trace(detached.held_out_start())
+                .expect("detached predecessor")
+        );
+        assert_eq!(detached.withdrawn_action(), detached.predecessor_action());
+        assert_eq!(
+            detached
+                .restored_successor_action()
+                .expect("restored action"),
+            *detached.successor_action()
+        );
+        assert_eq!(
+            detached
+                .successor_step(detached.control_start())
+                .expect("control successor step"),
+            detached
+                .predecessor_step(detached.control_start())
+                .expect("control predecessor step")
+        );
     }
 
     #[test]

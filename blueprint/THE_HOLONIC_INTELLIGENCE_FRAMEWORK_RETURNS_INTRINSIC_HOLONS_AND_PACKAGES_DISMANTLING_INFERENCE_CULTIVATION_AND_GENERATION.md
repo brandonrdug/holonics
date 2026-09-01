@@ -4,7 +4,7 @@
 **Date:** 2026-08-31
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** HIF4.
+**Current frontier:** HIF5.
 **Supersession:** this contract supersedes the unresolved scheduling authority of UAR/R0Q. Exact
 completed UAR/R0Q mechanisms retain their scoped grades as evidence and implementation standing;
 their unfinished intentions are obligations below, not a second campaign.
@@ -291,7 +291,7 @@ unchanged morphology. The engine suite returned 2,000 passed, zero failed, 32 ig
 targets and source-shape passed. The exact return is recorded in
 [`../research/records/2026-08-31_HIF3_ONE_NATIVE_INFERENCE_CIRCULATION_EMITTED_CODEC_NEUTRAL_PLURAL_FUTURES.md`](../research/records/2026-08-31_HIF3_ONE_NATIVE_INFERENCE_CIRCULATION_EMITTED_CODEC_NEUTRAL_PLURAL_FUTURES.md).
 
-### HIF4 — packaged cultivation and hexis — CURRENT
+### HIF4 — packaged cultivation and hexis — PASSED
 
 [definition] Compose complete returned difference, causal adjoint, staged morphology delta,
 commit/decline, source-detached remount, later conduct, targeted withdrawal, sibling invariance,
@@ -302,7 +302,14 @@ committed delta changes held-out later conduct; targeted withdrawal removes its 
 effect; restoration returns identity and conduct; reference, prompting, exposure, and training
 remain distinct.
 
-### HIF5 — migrate products and remove campaign ontology
+[established-bounded; implemented-exact; measured] HIF4 returned generic lifecycle types and an
+implementation over the exact recurrent causal-adjoint owner. Consuming the boundary passage
+separates cold testimony from productive hexis; source-detached remount, held-out change, sibling
+invariance, withdrawal, and restoration pass. The engine suite returned 2,002 passed, zero failed,
+32 ignored; engine examples and source-shape passed. The exact return is recorded in
+[`../research/records/2026-08-31_HIF4_CAUSAL_ADJOINT_CULTIVATION_RETURNED_SOURCE_DETACHED_HEXIS.md`](../research/records/2026-08-31_HIF4_CAUSAL_ADJOINT_CULTIVATION_RETURNED_SOURCE_DETACHED_HEXIS.md).
+
+### HIF5 — migrate products and remove campaign ontology — CURRENT
 
 [definition] Migrate Eros and Athena implementations onto the neutral framework. Rename or remove
 generic Athena-prefixed types and methods, merge duplicate rest/cultivation/generation owners, split

@@ -10,13 +10,14 @@ grades.
 
 ## Current frontier
 
-**Current frontier:** HIF4
+**Current frontier:** HIF5
 
-**HIF4 — PACKAGED CULTIVATION AND HEXIS — IS THE SOLE NEXT DEED.**
+**HIF5 — MIGRATE PRODUCTS AND REMOVE CAMPAIGN ONTOLOGY — IS THE SOLE NEXT DEED.**
 
-[definition] Compose complete returned difference, causal adjoint, staged morphology delta,
-commit/decline, source-detached remount, later conduct, targeted withdrawal, sibling invariance,
-and exact restoration through one generic cultivation passage.
+[definition] Migrate Eros and Athena implementations onto the neutral framework. Rename or remove
+generic Athena-prefixed types and methods, merge duplicate rest/cultivation/generation owners,
+split remaining large foremen at founded relations, and delete superseded wrappers and drivers.
+Preserve exact completed consequences through the new owners, not through compatibility decoders.
 
 ## Admitted standing
 
@@ -55,6 +56,12 @@ aperture, codec-neutral text/binary projections, and one actual later-current su
 27,020-face body crossed one resident launch with no invariant re-upload; the engine suite returned
 2,000 passed, zero failed, 32 ignored and dependent targets remained green.
 
+[established-bounded; implemented-exact; measured] HIF4 returned distinct exposure/reference/
+mount/cultivation types, complete difference beside scalar loss, the neutral cultivation lifecycle,
+and a source-detached productive recurrence after cold testimony departed. Remount, held-out change,
+local sibling invariance, targeted withdrawal, and exact restoration passed; the engine suite
+returned 2,002 passed, zero failed, 32 ignored and every example type-checked.
+
 [established-bounded; implemented-exact; measured] R0Q0--R0Q4 retain addressed response/source/
 target pair current, ordinary off-diagonal transport, resident dependent complex contraction before
 the positive receiver, full-complex continuation equality, complete reconstruction fibres, and
@@ -78,10 +85,11 @@ cold exterior witness, and insufficiency, but the productive holons have no firs
 profile gathering their non-conflated boundary, incidence, carrier, transport, constitution,
 chronology, receiver, morphology, reconstruction, and open dimensions.
 
-[counterexample; source-inspected] The neutral return aperture does not yet own the actual later
-chronology, complete situated difference, causal adjoint, staged native deposit, committed or
-declined child, source-detached changed later conduct, targeted withdrawal, sibling invariance, or
-exact restoration. Those relations remain distributed across cultivation owners.
+[counterexample; source-inspected] Athena still qualifies dozens of generic Rust rests, passages,
+membranes, residents, receiver charts, and sensory/application wrappers. Generation and cultivation
+remain duplicated across campaign-era owners; several large source files and re-export surfaces
+hide those overlaps. Exact mechanisms must migrate to neutral owners before obsolete wrappers are
+deleted.
 
 [definition] `UNIVERSAL_CATALOG.md` remains the sole descriptive Lean--Rust--CUDA owner crosswalk.
 It schedules and grades nothing. Historical ledgers, checksum manifests, output chains, UAR
@@ -102,8 +110,8 @@ drivers, and records remain evidence only.
 
 ## Validation boundary
 
-[definition] Every nontrivial process retains the 180-second outer boundary. HIF4 advances only
-after scalar loss is shown insufficient where equal faces cause different changes; a committed
-delta changes held-out later conduct; targeted withdrawal removes its attributable effect;
-restoration returns identity and conduct; reference, prompting, exposure, and training remain
-distinct.
+[definition] Every nontrivial process retains the 180-second outer boundary. HIF5 advances only
+when Athena denotes a composed product/ecology rather than a generic type family; Eros denotes its
+composer/cultivator; Soulkiller denotes the one-way boundary; no live generic source owner is
+campaign-qualified; source-shape and public-owner review return no hotspot or redundant rest
+hierarchy.

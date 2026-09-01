@@ -244,13 +244,14 @@ source/apparatus absence. Historical UAR blueprints and records remain evidence 
 
 ## Active campaign — Holonic Intelligence Framework
 
-**Current frontier:** HIF4
+**Current frontier:** HIF5
 
-**HIF4 — PACKAGED CULTIVATION AND HEXIS — IS THE SOLE NEXT DEED.**
+**HIF5 — MIGRATE PRODUCTS AND REMOVE CAMPAIGN ONTOLOGY — IS THE SOLE NEXT DEED.**
 
-[open] Compose complete returned difference, causal adjoint, staged morphology delta,
-commit/decline, source-detached remount, later conduct, targeted withdrawal, sibling invariance,
-and exact restoration through one generic cultivation passage.
+[open] Migrate Eros and Athena implementations onto the neutral framework. Rename or remove generic
+Athena-prefixed types and methods, merge duplicate rest/cultivation/generation owners, split
+remaining large foremen at founded relations, and delete superseded wrappers and drivers. Preserve
+exact completed consequences through the new owners, not through compatibility decoders.
 
 [proved-derived; formal-checked; measured] HIF0 passed. The four-file neutral formal closure built
 3,164 focused jobs and the live umbrella built 3,769 jobs without `sorryAx`. Its exact return is
@@ -270,6 +271,12 @@ and package controls. Its exact return is
 complete plural futures, reconstruction, codec-neutral emission, return aperture, and actual later
 current through unchanged morphology. Its exact return is
 [`research/records/2026-08-31_HIF3_ONE_NATIVE_INFERENCE_CIRCULATION_EMITTED_CODEC_NEUTRAL_PLURAL_FUTURES.md`](../research/records/2026-08-31_HIF3_ONE_NATIVE_INFERENCE_CIRCULATION_EMITTED_CODEC_NEUTRAL_PLURAL_FUTURES.md).
+
+[established-bounded; implemented-exact; measured] HIF4 passed. The neutral cultivation lifecycle
+returns later chronology, complete difference, adjoint delta, cold/productive split,
+source-detached remount, changed held-out conduct, sibling invariance, withdrawal, and restoration.
+Its exact return is
+[`research/records/2026-08-31_HIF4_CAUSAL_ADJOINT_CULTIVATION_RETURNED_SOURCE_DETACHED_HEXIS.md`](../research/records/2026-08-31_HIF4_CAUSAL_ADJOINT_CULTIVATION_RETURNED_SOURCE_DETACHED_HEXIS.md).
 
 [definition] The complete HIF order is:
 

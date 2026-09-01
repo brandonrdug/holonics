@@ -6,6 +6,8 @@
 
 #[path = "holonic_intelligence/circulation.rs"]
 mod circulation;
+#[path = "holonic_intelligence/cultivation.rs"]
+mod cultivation;
 #[path = "holonic_intelligence/dimensions.rs"]
 mod dimensions;
 #[path = "holonic_intelligence/foreign_json.rs"]
@@ -22,6 +24,7 @@ mod rested;
 mod weight;
 
 pub use circulation::*;
+pub use cultivation::*;
 pub use dimensions::*;
 pub use foreign_json::*;
 pub use foreign_onnx::*;
