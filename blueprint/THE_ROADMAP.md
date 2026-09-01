@@ -33,6 +33,8 @@ Read, in order:
    [`THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md`](THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md); and
 10. the completed Native Morphology Variant Foundation contract,
     [`THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md`](THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md).
+11. the active Athena Application and Circulation Interface contract,
+    [`THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).
 
 Read only the smallest source, formal, and evidence closure required by the active deed. Completed
 sensory, membrane, Athena-alpha, Soulkiller, L, H, and Millennium campaign files
@@ -340,7 +342,7 @@ no successor phase is scheduled.
 
 ## Completed campaign — Native Morphology Variant Foundation
 
-**Current frontier:** NONE
+**Completed MVF frontier:** NONE
 
 **MVF0--MVF6 ARE COMPLETE. NO CONSTRUCTION DEED IS ACTIVE.**
 
@@ -419,6 +421,39 @@ relations; it does not demote the exact SCF handoff/circulation/withdrawal mecha
 5. `MVF4` — derived anatomy manifest and backend-independent morphology package;
 6. `MVF5` — Safetensors and ONNX export lenses; and
 7. `MVF6` — multimodal configuration matrix and exact foundry release.
+
+## Active campaign — Athena Application and Circulation Interface
+
+**Current frontier:** AAC1
+
+**AAC0--AAC6 ARE ACTIVE IN THE ORDER BELOW.**
+
+[definition] Brandon's direct instruction of 2026-09-01 founds the ordered `AAC0--AAC6` campaign
+under
+[`THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).
+It composes the completed neutral lifecycle, repeated circulation, local cultivation, morphology
+package, and exact diffusion owners into a live resumable session, parented commit storage,
+discrete/diffusive boundary protocol, opaque ABI, and one thin Athena-alpha application package.
+
+[proved-derived; formal-checked; measured] AAC0 passed. The neutral formal owner returns fixed
+inference boundaries, genuinely later parented commits, exact decline, snapshot/remount conduct,
+and constituted diffusion through the common boundary. The focused closure built 3,187 jobs and
+the live umbrella built 3,771 jobs. Its receipt is
+[`research/records/2026-09-01_AAC0_LIVE_CIRCULATION_COMMIT_REMOUNT_AND_DIFFUSIVE_BOUNDARY_LAWS_RETURNED.md`](../research/records/2026-09-01_AAC0_LIVE_CIRCULATION_COMMIT_REMOUNT_AND_DIFFUSIVE_BOUNDARY_LAWS_RETURNED.md).
+
+[definition] The current deed is AAC1 only: the move-owned neutral Rust circulation-session API.
+No parented storage, diffusion adapter, ABI, application, or later phase receives a grade until
+AAC1 returns its exact boundary and ownership controls.
+
+[definition] The complete order is:
+
+1. `AAC0` — formal live-session, commit, remount, and diffusive-circulation laws;
+2. `AAC1` — neutral Rust circulation-session API;
+3. `AAC2` — parented morphology commits and snapshot/remount storage;
+4. `AAC3` — discrete and exact diffusive generation through one boundary;
+5. `AAC4` — opaque stable circulation ABI;
+6. `AAC5` — first Athena-alpha application package; and
+7. `AAC6` — exact alpha matrix and coherent release.
 
 [proved-derived; formal-checked; measured] HIF0 passed. The four-file neutral formal closure built
 3,164 focused jobs and the live umbrella built 3,769 jobs without `sorryAx`. Its exact return is

@@ -28,6 +28,7 @@ import ElementaryHolonics.Computation.SituatedMachineLearning
 import ElementaryHolonics.Computation.DependentMachineLearningCarrier
 import ElementaryHolonics.Computation.CslibExecutionReceiver
 import ElementaryHolonics.Computation.HolonicMachineLearning
+import ElementaryHolonics.Computation.HolonicCirculationSession
 import ElementaryHolonics.Algorithm.Transition
 import ElementaryHolonics.Algorithm.Rebase
 import ElementaryHolonics.Geometry.Telescoping

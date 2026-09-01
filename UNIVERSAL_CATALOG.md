@@ -76,6 +76,12 @@ test result never upgrades a correspondence.
 | Safetensors and ONNX export lenses | `NativeMorphologyVariant.lean::{ExactExportLens,ProjectedExportWitness,ExportDisposition}` | `native_intelligence/morphology_export/` over `NativeMorphologyPackage`; lossless `ForeignOnnxChart` import | no native apparatus identity; custom ONNX domain is exterior | **exact-bounded:** valid Safetensors package/anatomy tensors and ONNX IR 14 `org.holonics` opset 1 round-trip complete packages; anatomy-only projections retain both packages and a configuration separator; unsupported receiver/cultivation/world requests refuse |
 | Configuration-indexed multimodal evaluation | `NativeMorphologyVariant.lean::{InferenceConfigurationClaim,CrossCodecResonance}` | `native_intelligence/morphology_evaluation.rs`; `evaluate_native_morphology_matrix_mvf6.rs` | resident word/current apparatus remains one configuration coordinate | **exact-bounded:** matched text/image/audio/temporal-video/mixed apertures preserve supplied chronology, return scoped termination/cultivation/current/fibre/anatomy receipts, and keep surfaces non-routing; all ten actual cross-configuration pairs remained separated, while identical-configuration repetition is a distinct control |
 
+## Athena Application and Circulation Interface
+
+| Relation | Lean owner | Rust owner | ABI/application owner | Status and exact open fibre |
+|---|---|---|---|---|
+| Live session, parented commit, decline, snapshot/remount, and diffusive boundary | `Computation/HolonicCirculationSession.lean` | AAC1--AAC3 current open boundary over `holonic_intelligence/{circulation,repeated_circulation}.rs`, `native_intelligence/{scaffold_cultivation,morphology_package}.rs`, and `diffusion.rs` | AAC4--AAC5 open | **formal-only:** inference fixes morphology; a genuinely later commit parents the next cut; decline preserves owner/generation; remount preserves conduct; constituted diffusion returns exact balance through the common boundary. Move-owned Rust session, commit storage, ABI, and application remain AAC1--AAC5. |
+
 ## Deprecated R0Q correspondence retained as standing
 
 | Formal relation | Lean theorem owner | Rust/CUDA realization | Current status |

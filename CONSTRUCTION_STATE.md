@@ -4,18 +4,26 @@
 [`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) is the sole ordered construction
 authority. Historical phase detail remains in Git and the dated records named there.
 
-**Currency:** 2026-09-01, after MVF0--MVF6 completed. SCF0--SCF6, CONS0--CONS5,
+**Currency:** 2026-09-01, after AAC0--AAC6 were directly founded. MVF0--MVF6, SCF0--SCF6, CONS0--CONS5,
 QLT1--QLT6, CDB1, HIF0--HIF7, and the exact bounded R0Q0--R0Q4 mechanisms retain their scoped
 grades.
 
 ## Current frontier
 
-**Current frontier:** NONE
+**Current frontier:** AAC1
 
-**MVF0--MVF6 ARE COMPLETE. NO CONSTRUCTION DEED IS ACTIVE.**
+**AAC0 PASSED. AAC1 IS ACTIVE. AAC2--AAC6 FOLLOW ONLY AFTER THEIR PREDECESSORS PASS.**
 
-[definition] A later construction deed requires a new direct request. The completed contract is
-[`blueprint/THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md`](blueprint/THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md).
+[definition] Brandon's direct request of 2026-09-01 founds the active contract
+[`blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).
+AAC0 returned the live-session, commit/decline, parented successor, snapshot/remount, and exact
+diffusive-circulation laws. AAC1 now owns only the move-owned neutral Rust circulation-session API.
+
+[proved-derived; formal-checked; measured] AAC0 returned `LiveCirculationSession`, one common
+owned boundary, parented commit and decline, exact snapshot/remount conduct, and constituted
+diffusion through that boundary. The focused closure built 3,187 jobs and the live umbrella built
+3,771 jobs. The exact receipt is
+[`research/records/2026-09-01_AAC0_LIVE_CIRCULATION_COMMIT_REMOUNT_AND_DIFFUSIVE_BOUNDARY_LAWS_RETURNED.md`](research/records/2026-09-01_AAC0_LIVE_CIRCULATION_COMMIT_REMOUNT_AND_DIFFUSIVE_BOUNDARY_LAWS_RETURNED.md).
 
 ## Admitted standing
 
