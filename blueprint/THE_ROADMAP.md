@@ -244,15 +244,15 @@ source/apparatus absence. Historical UAR blueprints and records remain evidence 
 
 ## Active campaign — Holonic Intelligence Framework
 
-**Current frontier:** HIF6
+**Current frontier:** HIF7
 
-**HIF6 — RESIDENT AND SOURCE-NEUTRAL CLOSURE — IS THE SOLE NEXT DEED.**
+**HIF7 — INTEROPERABILITY AND QUALITATIVE FRAMEWORK RELEASE — IS THE SOLE NEXT DEED.**
 
-[open] Carry the neutral inference and cultivation lifecycle through the strongest lawful resident
-surface. Construct and remount the direct productive rest without historical output dependencies;
-return the actual emission/world-return difference, off-diagonal complex transport,
-reconstruction, source-detached later conduct, targeted withdrawal, and exact restoration without
-CPU semantic replay.
+[open] Compare fixed-window, periodic-hybrid, recurrent/linear, and current-founded contact charts
+over declared receiver families. Run the unchanged qualitative receivers plus held-out technical,
+cross-codec, generation-reentry, silence/radiation, withdrawal, restoration, and source-access
+controls through the neutral package. Release only after direct qualitative inspection accepts the
+surfaces and richer receivers reopen every unlawful condensation.
 
 [proved-derived; formal-checked; measured] HIF0 passed. The four-file neutral formal closure built
 3,164 focused jobs and the live umbrella built 3,769 jobs without `sorryAx`. Its exact return is
@@ -284,6 +284,12 @@ generic owners now meet the naming boundary without aliases; obsolete duplicate 
 departed; the receiver-history formal owner and resident front are neutral; and the resident-section
 foreman was split at founded apparatus relations. Its exact return is
 [`research/records/2026-08-31_HIF5_PRODUCTS_MOVED_TO_NEUTRAL_OWNERS_AND_CAMPAIGN_ONTOLOGY_DEPARTED.md`](../research/records/2026-08-31_HIF5_PRODUCTS_MOVED_TO_NEUTRAL_OWNERS_AND_CAMPAIGN_ONTOLOGY_DEPARTED.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] HIF6 passed. A direct native
+cycle constructed and remounted without source, foreign, environment, filesystem, or historical
+output intake; resident quadrature/off-diagonal transport, actual return, source-detached hexis,
+held-out change, withdrawal, and restoration passed. Its exact return is
+[`research/records/2026-08-31_HIF6_DIRECT_SOURCE_NEUTRAL_REST_CLOSED_ONE_RESIDENT_RETURN_AND_CULTIVATION_CYCLE.md`](../research/records/2026-08-31_HIF6_DIRECT_SOURCE_NEUTRAL_REST_CLOSED_ONE_RESIDENT_RETURN_AND_CULTIVATION_CYCLE.md).
 
 [definition] The complete HIF order is:
 

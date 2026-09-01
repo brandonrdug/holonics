@@ -4,7 +4,7 @@
 **Date:** 2026-08-31
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** HIF6.
+**Current frontier:** HIF7.
 **Supersession:** this contract supersedes the unresolved scheduling authority of UAR/R0Q. Exact
 completed UAR/R0Q mechanisms retain their scoped grades as evidence and implementation standing;
 their unfinished intentions are obligations below, not a second campaign.
@@ -336,7 +336,7 @@ denotes its composer/cultivator; Soulkiller denotes the one-way boundary; no liv
 owner is campaign-qualified; source-shape and public-owner review return no hotspot or redundant
 rest hierarchy.
 
-### HIF6 — resident and source-neutral closure — CURRENT
+### HIF6 — resident and source-neutral closure — PASSED
 
 [definition] Carry the neutral inference and cultivation lifecycle through the strongest lawful
 resident surface. Revalidate actual emission/world-return identities, off-diagonal complex
@@ -347,7 +347,14 @@ historical output dependencies.
 all hot semantic work remains resident; the actual return, not a representative, causes the child;
 withdrawal/restoration and later conduct pass; removed historical outputs change no consequence.
 
-### HIF7 — interoperability and qualitative framework release
+[established-bounded; implemented-exact; source-inspected; measured] HIF6 passed on the direct
+finite native cycle. The canonical rest remounted without filesystem, environment, source, foreign,
+or historical-output intake; one resident complex launch retained quadrature and off-diagonal
+contact; the actual emission and later return founded source-detached hexis; held-out conduct,
+withdrawal, and restoration passed. The exact return is
+[`../research/records/2026-08-31_HIF6_DIRECT_SOURCE_NEUTRAL_REST_CLOSED_ONE_RESIDENT_RETURN_AND_CULTIVATION_CYCLE.md`](../research/records/2026-08-31_HIF6_DIRECT_SOURCE_NEUTRAL_REST_CLOSED_ONE_RESIDENT_RETURN_AND_CULTIVATION_CYCLE.md).
+
+### HIF7 — interoperability and qualitative framework release — CURRENT
 
 [definition] Compare fixed-window, periodic-hybrid, recurrent/linear, and current-founded contact
 charts over declared receiver families. Run the unchanged qualitative receivers inherited from UAR

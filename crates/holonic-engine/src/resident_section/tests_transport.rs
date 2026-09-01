@@ -1,4 +1,3 @@
-
 use super::*;
 fn surface() -> Option<(&'static ResidentReadout, &'static ResidentSurface<'static>)> {
     let readout = match ResidentReadout::new() {

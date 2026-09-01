@@ -20,6 +20,8 @@ mod lifecycle;
 mod profile;
 #[path = "holonic_intelligence/rested.rs"]
 mod rested;
+#[path = "holonic_intelligence/source_neutral.rs"]
+mod source_neutral;
 #[path = "holonic_intelligence/weight.rs"]
 mod weight;
 
@@ -31,4 +33,5 @@ pub use foreign_onnx::*;
 pub use lifecycle::*;
 pub use profile::*;
 pub use rested::*;
+pub use source_neutral::*;
 pub use weight::*;

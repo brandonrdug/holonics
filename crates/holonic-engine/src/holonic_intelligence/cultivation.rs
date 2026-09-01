@@ -7,8 +7,9 @@ use crate::native_ecology::recurrent::BoundaryDecoder;
 use crate::native_ecology::recurrent_return::{
     ExteriorToolReturn, LocalGeneratorDelta, RecurrentReturnRefusal, RecurrentSemanticWork,
     ReturnCommitEvent, ReturnedCausalAdjoint, ReturnedRecurrentRest, RevisitHolonomy,
-    action_matrix, local_delta, recurrence_trace,
+    action_matrix, local_delta, next, recurrence_trace, semantic_work,
 };
+use crate::receiver_exact_compression::InputId;
 use crate::receiver_history_compression::NativeStateId;
 
 /// Material crossing without a durable morphology claim.
@@ -73,6 +74,22 @@ pub struct SourceDetachedCultivatedRecurrence {
     open_fibres: Vec<String>,
 }
 
+/// Exterior chronology retained beside, never inside, the productive cultivated recurrence.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SourceNeutralReturnWitness {
+    pub emitted_occurrence: String,
+    pub returned_occurrence: String,
+    pub returned_content: u64,
+}
+
+/// The physically separated return of one direct source-neutral cultivation.
+#[derive(Debug, PartialEq, Eq)]
+pub struct SourceNeutralCultivationClosure {
+    pub productive: SourceDetachedCultivatedRecurrence,
+    pub exterior: SourceNeutralReturnWitness,
+}
+
 impl ReturnedRecurrentRest {
     /// Consume the boundary passage and physically split cold testimony from productive hexis.
     pub fn depart_source(
@@ -110,6 +127,129 @@ impl ReturnedRecurrentRest {
 }
 
 impl SourceDetachedCultivatedRecurrence {
+    /// Found productive hexis directly from one total native recurrence and an actual later
+    /// exterior return. No decoder, source surface, predecessor output file, or foreign executor
+    /// enters the productive value.
+    pub fn found_from_native_return(
+        base: GeneratorNativeRest,
+        generator: InputId,
+        forward_lineage: Vec<NativeStateId>,
+        emitted_occurrence: String,
+        returned_occurrence: String,
+        returned_content: u64,
+    ) -> Result<SourceNeutralCultivationClosure, CultivationPackagingError> {
+        base.validate()
+            .map_err(|error| CultivationPackagingError::Native(error.to_string()))?;
+        if emitted_occurrence.is_empty()
+            || returned_occurrence.is_empty()
+            || emitted_occurrence == returned_occurrence
+            || returned_content == 0
+            || forward_lineage.len() < 3
+        {
+            return Err(CultivationPackagingError::Malformed);
+        }
+        for pair in forward_lineage.windows(2) {
+            if next(&base, generator, pair[0], None)? != pair[1] {
+                return Err(CultivationPackagingError::Malformed);
+            }
+        }
+        let predecessor_to = *forward_lineage
+            .last()
+            .ok_or(CultivationPackagingError::Malformed)?;
+        if !forward_lineage[..forward_lineage.len() - 1].contains(&predecessor_to) {
+            return Err(CultivationPackagingError::Malformed);
+        }
+        let from = forward_lineage[forward_lineage.len() - 2];
+        if from == predecessor_to {
+            return Err(CultivationPackagingError::Malformed);
+        }
+        let successor_to = from;
+        let dimension = base.native_population.len();
+        let (delta, left_factor, right_factor) =
+            local_delta(dimension, from, predecessor_to, successor_to)?;
+        let predecessor_action = action_matrix(&base, generator)?;
+        let successor_action = predecessor_action.add(&delta)?;
+        let receiver_metric = ExactRatMatrix::identity(dimension)?;
+        let metric_adjoint = delta.metric_adjoint(&receiver_metric, &receiver_metric)?;
+        if metric_adjoint != delta.transpose()? || delta.rank()? != 1 {
+            return Err(CultivationPackagingError::Malformed);
+        }
+        let commutator = predecessor_action
+            .multiply(&delta)?
+            .subtract(&delta.multiply(&predecessor_action)?)?;
+        let commutator_rank = commutator.rank()?;
+        if commutator_rank == 0 {
+            return Err(CultivationPackagingError::Malformed);
+        }
+        let recurrence_starts = base.native_population.clone();
+        let main_start = forward_lineage[0];
+        let held_out_start = recurrence_starts
+            .iter()
+            .copied()
+            .filter(|state| *state != main_start)
+            .find(|state| {
+                recurrence_trace(&base, generator, *state, None)
+                    != recurrence_trace(&base, generator, *state, Some((from, successor_to)))
+            })
+            .ok_or(CultivationPackagingError::Malformed)?;
+        let control_from = recurrence_starts
+            .iter()
+            .copied()
+            .find(|state| {
+                *state != from
+                    && next(&base, generator, *state, None)
+                        == next(&base, generator, *state, Some((from, successor_to)))
+            })
+            .ok_or(CultivationPackagingError::Malformed)?;
+        let semantic_work =
+            semantic_work(&base, generator, &recurrence_starts, (from, successor_to))?;
+        let productive = Self {
+            schema: SOURCE_DETACHED_CULTIVATION_SCHEMA.to_owned(),
+            base,
+            delta: LocalGeneratorDelta {
+                generator,
+                from,
+                predecessor_to,
+                successor_to,
+                left_factor,
+                right_factor,
+                delta: delta.clone(),
+            },
+            causal_adjoint: ReturnedCausalAdjoint {
+                forward_lineage: forward_lineage.clone(),
+                return_lineage: forward_lineage.iter().copied().rev().collect(),
+                receiver_metric,
+                metric_adjoint,
+                measured_delta_rank: 1,
+                returned_content,
+                primitive_orientation: 1,
+            },
+            holonomy: RevisitHolonomy {
+                predecessor_action,
+                successor_action,
+                commutator,
+                commutator_rank,
+            },
+            recurrence_starts,
+            main_start,
+            held_out_start,
+            control_from,
+            semantic_work,
+            open_fibres: vec![
+                "receiver families outside the admitted native recurrence remain open".to_owned(),
+            ],
+        };
+        productive.validate()?;
+        Ok(SourceNeutralCultivationClosure {
+            productive,
+            exterior: SourceNeutralReturnWitness {
+                emitted_occurrence,
+                returned_occurrence,
+                returned_content,
+            },
+        })
+    }
+
     pub fn read(bytes: &[u8]) -> Result<Self, CultivationPackagingError> {
         let rest: Self = serde_json::from_slice(bytes)
             .map_err(|error| CultivationPackagingError::Wire(error.to_string()))?;

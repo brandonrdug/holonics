@@ -151,7 +151,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (449 deposits of 741)
+## 4 · The 2026-08 record line (450 deposits of 742)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -604,6 +604,7 @@ sentence — so this table is the month's claims, not a file listing. Full chron
 | `2026-08-31_HIF4_CAUSAL_ADJOINT_CULTIVATION_RETURNED_SOURCE_DETACHED_HEXIS.md` | HIF4 causal-adjoint cultivation returned source-detached hexis |
 | `2026-08-31_HIF5_FIRST_MIGRATION_REMOVED_ATHENA_FROM_THE_GENERIC_NATIVE_REST_FAMILY.md` | HIF5 first migration removed Athena from the generic native rest family |
 | `2026-08-31_HIF5_PRODUCTS_MOVED_TO_NEUTRAL_OWNERS_AND_CAMPAIGN_ONTOLOGY_DEPARTED.md` | HIF5 products moved to neutral owners and campaign ontology departed |
+| `2026-08-31_HIF6_DIRECT_SOURCE_NEUTRAL_REST_CLOSED_ONE_RESIDENT_RETURN_AND_CULTIVATION_CYCLE.md` | HIF6 direct source-neutral rest closed one resident return and cultivation cycle |
 | `2026-08-31_HOLONIC_INTELLIGENCE_REQUIRES_INTRINSIC_PROFILES_AND_NEUTRAL_LIFECYCLE_INTERFACES.md` | Holonic intelligence requires intrinsic profiles and neutral lifecycle interfaces |
 | `2026-08-31_THE_COMPLETE_VISIBLE_EXCHANGE_FOUNDED_THE_LIVE_NATIVE_SPOOL_AND_K3_RETURNED_EVERY_SECTION_ONCE.md` | The complete visible exchange founded the live native spool and K3 returned every section once |
 | `2026-08-31_THE_GENERATED_CATALOG_APPARATUS_DEPARTED_AND_THE_ORDINARY_REALIZATION_CURRENT_CROSSED_ITS_ADDRESSED_INCIDENCE.md` | The generated catalog apparatus departed and the ordinary realization current crossed its addressed incidence |

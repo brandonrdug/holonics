@@ -651,7 +651,7 @@ pub(crate) fn recurrence_trace(
     Err(RecurrentReturnRefusal::Recurrence)
 }
 
-fn semantic_work(
+pub(crate) fn semantic_work(
     base: &GeneratorNativeRest,
     generator: InputId,
     starts: &[NativeStateId],

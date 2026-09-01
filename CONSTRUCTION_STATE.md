@@ -10,15 +10,15 @@ grades.
 
 ## Current frontier
 
-**Current frontier:** HIF6
+**Current frontier:** HIF7
 
-**HIF6 — RESIDENT AND SOURCE-NEUTRAL CLOSURE — IS THE SOLE NEXT DEED.**
+**HIF7 — INTEROPERABILITY AND QUALITATIVE FRAMEWORK RELEASE — IS THE SOLE NEXT DEED.**
 
-[definition] Carry the neutral inference and cultivation lifecycle through the strongest lawful
-resident surface. Construct and remount the direct productive rest with historical outputs and
-foreign/source artifacts unavailable; return the actual emission/world-return difference,
-off-diagonal complex transport, reconstruction, source-detached later conduct, targeted
-withdrawal, and exact restoration without CPU semantic replay.
+[definition] Compare fixed-window, periodic-hybrid, recurrent/linear, and current-founded contact
+charts over declared receiver families. Run the unchanged qualitative receivers plus held-out
+technical, cross-codec, generation-reentry, silence/radiation, withdrawal, restoration, and
+source-access controls through the neutral package. Release only after direct qualitative
+inspection accepts the surfaces and richer receivers reopen every unlawful condensation.
 
 ## Admitted standing
 
@@ -77,6 +77,12 @@ resident-section foreman split into owner-local files. Engine tests returned 1,9
 failed, 32 ignored; life returned 466 passed, zero failed, 14 ignored; the Lean umbrella built
 3,768 jobs.
 
+[established-bounded; implemented-exact; source-inspected; measured] HIF6 returned a direct finite
+native rest with no filesystem, environment, source, foreign, or historical-output intake. It
+remounted exactly; one resident launch retained quadrature and off-diagonal contact; the actual
+emission and later world return founded source-detached hexis; held-out later conduct, targeted
+withdrawal, and exact restoration passed. The engine returned 1,993 passed, zero failed, 32 ignored.
+
 [established-bounded; implemented-exact; measured] R0Q0--R0Q4 retain addressed response/source/
 target pair current, ordinary off-diagonal transport, resident dependent complex contraction before
 the positive receiver, full-complex continuation equality, complete reconstruction fibres, and
@@ -89,10 +95,10 @@ reused by HIF owners; the interrupted H2N/UAR-specific factorization was unadmit
 
 ## Current obstruction
 
-[open; source-inspected] The strongest source-neutral ecology still enters through historical
-output-chain constructors. HIF6 must found the same productive native body directly, then prove
-remount, actual return, resident complex transport, reconstruction, withdrawal/restoration, and
-later conduct with those outputs and all foreign/source artifacts unavailable.
+[open; source-inspected] The bounded direct cycle now closes the lifecycle, but it does not establish
+the HIF7 qualitative receiver family. Fixed, hybrid, recurrent, and current-founded charts still
+need a common comparison return, and the unchanged UAR qualitative surfaces require direct
+inspection rather than a topology or telemetry proxy.
 
 [definition] `UNIVERSAL_CATALOG.md` remains the sole descriptive Lean--Rust--CUDA owner crosswalk.
 It schedules and grades nothing. Historical ledgers, checksum manifests, output chains, UAR
@@ -113,8 +119,8 @@ drivers, and records remain evidence only.
 
 ## Validation boundary
 
-[definition] Every nontrivial process retains the 180-second outer boundary. HIF6 advances only
-when the direct productive rest constructs and remounts with historical outputs and foreign/source
-artifacts unavailable; all hot semantic work remains resident; the actual return causes the child;
-and withdrawal, restoration, reconstruction, and changed later conduct pass without host semantic
-replay.
+[definition] Every nontrivial process retains the 180-second outer boundary. HIF7 advances only
+when direct inspection accepts the qualitative surfaces; every contact chart reports active causal
+extent and exact work beside apparatus telemetry; richer receivers reopen unlawful condensations;
+foreign formats interchange without becoming native ontology; Git is clean and pushed; and
+reproducible outputs are absent from the release tree.
