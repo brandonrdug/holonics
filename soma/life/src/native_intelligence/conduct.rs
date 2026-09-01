@@ -333,6 +333,168 @@ impl NativeEcologyRest {
         successors
     }
 
+    /// Project the complete admitted population in one traversal. This is the owner used by
+    /// factorized product construction; it prevents one address lookup and one successor scan per
+    /// section while returning exactly the same structural sections as the scalar projector.
+    pub fn project_admitted_population(
+        &self,
+        receiver: ReceiverId,
+    ) -> Result<BTreeMap<NativeSectionAddress, NativeConductedSection>, NativeEcologyError> {
+        self.validate()?;
+        let mut successors = BTreeMap::<EventId, Vec<NativeSectionAddress>>::new();
+        for spool in &self.ecology.spools {
+            for thread in &spool.threads {
+                for occurrence in &thread.occurrences {
+                    if let Some(predecessor) = occurrence.predecessor {
+                        successors
+                            .entry(predecessor)
+                            .or_default()
+                            .push(NativeSectionAddress {
+                                spool: spool.address.clone(),
+                                thread: thread.address.clone(),
+                                occurrence: occurrence.occurrence,
+                            });
+                    }
+                }
+            }
+        }
+        for sections in successors.values_mut() {
+            sections.sort();
+        }
+        let mut projected = BTreeMap::new();
+        for spool in &self.ecology.spools {
+            if !spool.receiver_family.contains(&receiver) {
+                return Err(NativeEcologyError::Conduct(
+                    "the projected population receiver is outside one spool family".to_owned(),
+                ));
+            }
+            for thread in &spool.threads {
+                let incidence = thread
+                    .incidence
+                    .iter()
+                    .map(|term| (term.occurrence, term))
+                    .collect::<BTreeMap<_, _>>();
+                let parametrons = thread
+                    .parametrons
+                    .iter()
+                    .map(|cell| (cell.native, cell))
+                    .collect::<BTreeMap<_, _>>();
+                for occurrence in &thread.occurrences {
+                    let address = NativeSectionAddress {
+                        spool: spool.address.clone(),
+                        thread: thread.address.clone(),
+                        occurrence: occurrence.occurrence,
+                    };
+                    let entering =
+                        parametrons
+                            .get(&occurrence.entering_native)
+                            .ok_or_else(|| {
+                                NativeEcologyError::Conduct(
+                                    "the projected population lost an entering parametron"
+                                        .to_owned(),
+                                )
+                            })?;
+                    let emitting =
+                        parametrons
+                            .get(&occurrence.emitting_native)
+                            .ok_or_else(|| {
+                                NativeEcologyError::Conduct(
+                                    "the projected population lost an emitting parametron"
+                                        .to_owned(),
+                                )
+                            })?;
+                    let constitutive_response = thread
+                        .constitutive_responses
+                        .iter()
+                        .find(|response| {
+                            response.native == occurrence.emitting_native
+                                && response.receiver == receiver
+                        })
+                        .cloned()
+                        .ok_or_else(|| {
+                            NativeEcologyError::Conduct(
+                                "the projected population lost a constitutive response".to_owned(),
+                            )
+                        })?;
+                    let observation = thread
+                        .receiver_consequences
+                        .iter()
+                        .find(|face| {
+                            face.native == occurrence.emitting_native && face.receiver == receiver
+                        })
+                        .map(|face| face.observation)
+                        .ok_or_else(|| {
+                            NativeEcologyError::Conduct(
+                                "the projected population lost a receiver consequence".to_owned(),
+                            )
+                        })?;
+                    let fibre = spool
+                        .reconstruction_fibres
+                        .iter()
+                        .find(|fibre| fibre.native == occurrence.emitting_native)
+                        .ok_or_else(|| {
+                            NativeEcologyError::Conduct(
+                                "the projected population lost a reconstruction fibre".to_owned(),
+                            )
+                        })?;
+                    let mut mutual = spool
+                        .mutual_constitutive_responses
+                        .iter()
+                        .filter(|response| {
+                            response.left_occurrence == occurrence.occurrence
+                                || response.right_occurrence == occurrence.occurrence
+                        })
+                        .cloned()
+                        .collect::<Vec<_>>();
+                    mutual.sort_by_key(|response| {
+                        (response.left_occurrence, response.right_occurrence)
+                    });
+                    let mut open_exterior = thread.open_exterior.clone();
+                    open_exterior.extend(self.realization.open_exterior.iter().cloned());
+                    open_exterior.sort();
+                    open_exterior.dedup();
+                    projected.insert(
+                        address.clone(),
+                        NativeConductedSection {
+                            address,
+                            predecessor: occurrence.predecessor,
+                            entering_boundary: thread.entering_boundary,
+                            emitting_boundary: thread.emitting_boundary,
+                            entering_port: occurrence.entering_port,
+                            emitting_port: occurrence.emitting_port,
+                            entering_native: occurrence.entering_native,
+                            emitting_native: occurrence.emitting_native,
+                            incidence: (*incidence[&occurrence.occurrence]).clone(),
+                            entering_section: entering.section.clone(),
+                            entering_current: entering.current.clone(),
+                            emitting_section: emitting.section.clone(),
+                            emitting_current: emitting.current.clone(),
+                            relative_phase: emitting.relative_phase.clone(),
+                            hand: emitting.hand,
+                            constitutive_response,
+                            mutual_constitutive_responses: mutual,
+                            ordered_word: thread.chronology.clone(),
+                            receiver,
+                            observation,
+                            reconstruction_fibre: fibre.occurrences.clone(),
+                            successor_sections: successors
+                                .get(&occurrence.occurrence)
+                                .cloned()
+                                .unwrap_or_default(),
+                            open_exterior,
+                        },
+                    );
+                }
+            }
+        }
+        if projected.keys().ne(self.realization.sections.iter()) {
+            return Err(NativeEcologyError::Realization(
+                "the one-pass projection departed from the admitted section atlas".to_owned(),
+            ));
+        }
+        Ok(projected)
+    }
+
     /// Ask the open boundary about an occurrence without inventing a state for absent material.
     pub fn conduct_occurrence(
         &self,

@@ -484,8 +484,11 @@ impl ExchangeSituatedProduct {
             ));
         }
         let branches = k3_pullback_branches(rest)?;
+        eprintln!("l1-stage=k3-branches branches={}", branches.len());
         let constitutive_form = NativeReceiverConstitutiveForm::found(&branches)?;
+        eprintln!("l1-stage=constitutive-form");
         let codomain_basis = codomain_basis(&material, &branches)?;
+        eprintln!("l1-stage=codomain-basis rows={}", codomain_basis.len());
         let basis_index = codomain_basis
             .iter()
             .enumerate()
@@ -964,39 +967,25 @@ fn k3_pullback_branches(
         .iter()
         .next()
         .ok_or_else(|| ExchangeSituatedProductError::K3("K3 has no receiver".to_owned()))?;
-    let mut successors_by_occurrence = BTreeMap::<EventId, Vec<NativeSectionAddress>>::new();
-    for spool in &rest.ecology.spools {
-        for thread in &spool.threads {
-            for occurrence in &thread.occurrences {
-                if let Some(predecessor) = occurrence.predecessor {
-                    successors_by_occurrence
-                        .entry(predecessor)
-                        .or_default()
-                        .push(NativeSectionAddress {
-                            spool: spool.address.clone(),
-                            thread: thread.address.clone(),
-                            occurrence: occurrence.occurrence,
-                        });
-                }
-            }
-        }
-    }
-    for successors in successors_by_occurrence.values_mut() {
-        successors.sort();
-    }
+    let projected = rest
+        .project_admitted_population(receiver)
+        .map_err(|error| ExchangeSituatedProductError::K3(error.to_string()))?;
     let mut branches = Vec::new();
     for ingress in &rest.realization.ingress_sections {
-        let mut candidate = rest
-            .project_admitted_section(ingress, receiver)
-            .map_err(|error| ExchangeSituatedProductError::K3(error.to_string()))?;
-        let Some(successors) = successors_by_occurrence.get(&ingress.occurrence) else {
+        let candidate = projected.get(ingress).cloned().ok_or_else(|| {
+            ExchangeSituatedProductError::K3(
+                "the projected population omitted an admitted ingress".to_owned(),
+            )
+        })?;
+        if candidate.successor_sections.is_empty() {
             continue;
-        };
-        candidate.successor_sections = successors.clone();
-        for successor in successors {
-            let returned = rest
-                .project_admitted_section(successor, receiver)
-                .map_err(|error| ExchangeSituatedProductError::K3(error.to_string()))?;
+        }
+        for successor in &candidate.successor_sections {
+            let returned = projected.get(successor).cloned().ok_or_else(|| {
+                ExchangeSituatedProductError::K3(
+                    "the projected population omitted an admitted successor".to_owned(),
+                )
+            })?;
             let pullback = rest
                 .ecology
                 .spools
