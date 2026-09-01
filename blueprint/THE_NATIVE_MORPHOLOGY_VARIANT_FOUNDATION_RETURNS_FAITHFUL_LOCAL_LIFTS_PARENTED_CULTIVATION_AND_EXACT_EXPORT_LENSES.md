@@ -4,7 +4,7 @@
 **Date:** 2026-09-01
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** MVF6.
+**Current frontier:** NONE.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md),
@@ -309,7 +309,7 @@ refuse. The Safetensors artifact opened in the official runtime; ONNX returned I
 `org.holonics` opset 1 through the lossless parser. Its receipt is
 [`../research/records/2026-09-01_MVF5_EXACT_AND_PROJECTED_SAFETENSORS_ONNX_EXPORT_LENSES_RETURNED.md`](../research/records/2026-09-01_MVF5_EXACT_AND_PROJECTED_SAFETENSORS_ONNX_EXPORT_LENSES_RETURNED.md).
 
-### MVF6 — multimodal configuration matrix and foundry release — CURRENT
+### MVF6 — multimodal configuration matrix and foundry release — PASSED
 
 [definition] Run matched proposition families through text, rendered-image, spoken-audio, actual
 temporal-video, and mixed chronological apertures. Vary continuation receiver and emission codec
@@ -328,8 +328,12 @@ disjoint exterior; and all ten cross-configuration receiver/history pairs remain
 Surfaces routed nothing and were not graded. Its experiment receipt is
 [`../research/records/2026-09-01_MVF6_MATCHED_MULTIMODAL_CONFIGURATIONS_REMAINED_TEN_SEPARATED_RECEIVER_HISTORY_PAIRS.md`](../research/records/2026-09-01_MVF6_MATCHED_MULTIMODAL_CONFIGURATIONS_REMAINED_TEN_SEPARATED_RECEIVER_HISTORY_PAIRS.md).
 
-[open; process-audit] MVF6 remains current only for the complete release receiver, terminal
-authority return, pushed clean identity, and reproducible artifact removal.
+[established-bounded; implemented-exact; formal-checked; source-inspected; process-audit; measured]
+MVF6 passed. The coherent release returned 2,946 tests passed, zero failed, and 50 ignored; every
+example type-checked; the Lean umbrella built 3,770 jobs; and all nine release gates passed.
+Implementation commit `a4438192` is pushed. The 39 GiB reproducible `target/`, root `output/`, and
+all MVF actual/export temporary outputs are absent. No eighth phase or successor campaign was
+invented.
 
 ## 8. Scope and process boundary
 

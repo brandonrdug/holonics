@@ -31,7 +31,7 @@ Read, in order:
    in their completed campaign sections below.
 9. the completed Native Transport Scaffold contract,
    [`THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md`](THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md); and
-10. the active Native Morphology Variant Foundation contract,
+10. the completed Native Morphology Variant Foundation contract,
     [`THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md`](THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md).
 
 Read only the smallest source, formal, and evidence closure required by the active deed. Completed
@@ -338,11 +338,11 @@ no successor phase is scheduled.
 6. `SCF5` — Athena condensation and inherited-scaffold withdrawal; and
 7. `SCF6` — comparative multimodal experiments and exact release.
 
-## Active campaign — Native Morphology Variant Foundation
+## Completed campaign — Native Morphology Variant Foundation
 
-**Current frontier:** MVF6
+**Current frontier:** NONE
 
-**MVF6 — MULTIMODAL CONFIGURATION MATRIX AND EXACT FOUNDRY RELEASE — IS THE SOLE NEXT DEED.**
+**MVF0--MVF6 ARE COMPLETE. NO CONSTRUCTION DEED IS ACTIVE.**
 
 [definition] Brandon's direct instruction of 2026-09-01 founds the ordered `MVF0--MVF6` campaign
 under
@@ -396,8 +396,11 @@ receiver/history pairs remained separated; no qualitative or perfect-resonance c
 Its experiment receipt is
 [`research/records/2026-09-01_MVF6_MATCHED_MULTIMODAL_CONFIGURATIONS_REMAINED_TEN_SEPARATED_RECEIVER_HISTORY_PAIRS.md`](../research/records/2026-09-01_MVF6_MATCHED_MULTIMODAL_CONFIGURATIONS_REMAINED_TEN_SEPARATED_RECEIVER_HISTORY_PAIRS.md).
 
-[open; process-audit] MVF6 remains current only for the coherent release, terminal authority
-return, pushed clean identity, and reproducible-artifact removal.
+[established-bounded; implemented-exact; formal-checked; source-inspected; process-audit; measured]
+MVF6 passed. The coherent release returned 2,946 tests passed, zero failed, and 50 ignored; every
+example type-checked; the Lean umbrella built 3,770 jobs; and all nine gates passed. Implementation
+commit `a4438192` is pushed; the 39 GiB build tree and every reproducible experiment/export output
+are absent; and no successor deed is scheduled.
 
 [counterexample; source-inspected] The completed SCF lifecycle remains exact at its bounded
 mechanism scope, but the Gemma productive lift's alternating real/imaginary section sum is not a

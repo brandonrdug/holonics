@@ -4,23 +4,18 @@
 [`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) is the sole ordered construction
 authority. Historical phase detail remains in Git and the dated records named there.
 
-**Currency:** 2026-09-01, after Brandon founded the Native Morphology Variant Foundation.
-SCF0--SCF6, CONS0--CONS5, QLT1--QLT6, CDB1, HIF0--HIF7, and the exact bounded R0Q0--R0Q4
-mechanisms retain their scoped grades.
+**Currency:** 2026-09-01, after MVF0--MVF6 completed. SCF0--SCF6, CONS0--CONS5,
+QLT1--QLT6, CDB1, HIF0--HIF7, and the exact bounded R0Q0--R0Q4 mechanisms retain their scoped
+grades.
 
 ## Current frontier
 
-**Current frontier:** MVF6
+**Current frontier:** NONE
 
-**MVF6 — MULTIMODAL CONFIGURATION MATRIX AND EXACT FOUNDRY RELEASE — IS THE SOLE NEXT DEED.**
+**MVF0--MVF6 ARE COMPLETE. NO CONSTRUCTION DEED IS ACTIVE.**
 
-[definition] Run matched proposition families through distinct text, rendered-image, spoken-audio,
-actual temporal-video, and mixed chronological apertures under
+[definition] A later construction deed requires a new direct request. The completed contract is
 [`blueprint/THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md`](blueprint/THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md).
-Every claim must name complete configuration; same-config repetition and cross-config comparison
-remain distinct; cross-codec equivalence requires every declared receiver/history; route/current/
-fibre/anatomy differences precede qualitative surfaces. Close the package/export controls, complete
-release, pushed clean identity, and reproducible-output removal without inventing another phase.
 
 ## Admitted standing
 
@@ -125,8 +120,11 @@ cultivation each used one cut; each local cone preserved disjoint morphology and
 thread; surfaces were non-routing probes; and all ten cross-configuration receiver/history pairs
 remained separated. No qualitative or perfect-resonance grade was claimed.
 
-[open; process-audit] MVF6 remains current only for the complete release receiver, terminal
-authority return, pushed clean identity, and reproducible `target/`/experiment-output removal.
+[established-bounded; implemented-exact; formal-checked; source-inspected; process-audit; measured]
+MVF6 passed. The release returned 2,946 tests passed, zero failed, and 50 ignored over 29 result
+lines; every example type-checked; the Lean umbrella built 3,770 jobs; and all nine gates passed.
+Implementation commit `a4438192` is pushed. The 39 GiB reproducible `target/`, root `output/`, and
+all MVF experiment/export temporary outputs are absent. No successor phase was invented.
 
 [established-bounded; process-audit; measured] The named workspace test receiver returned 2,924
 passed, zero failed, and 50 ignored with every example type-checked. The formal umbrella built

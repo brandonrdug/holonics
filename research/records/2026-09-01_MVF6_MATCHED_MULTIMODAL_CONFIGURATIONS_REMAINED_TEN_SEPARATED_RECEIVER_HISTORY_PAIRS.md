@@ -35,3 +35,9 @@ not multiply calls merely to manufacture confidence: repetition and cross-config
 remain distinct receipts. Qualitative surfaces were not graded. MVF4 package and MVF5 exact/
 projected/refused export controls remained separate release obligations rather than being rerun
 inside every large actual configuration.
+
+[established-bounded; implemented-exact; formal-checked; source-inspected; process-audit; measured]
+The coherent MVF release returned 2,946 tests passed, zero failed, and 50 ignored over 29 result
+lines; every example type-checked; the Lean umbrella built 3,770 jobs; and all nine repository gates
+passed. Implementation commit `a4438192` was pushed before terminal authority closure. The 39 GiB
+reproducible build tree, root output tree, and all actual/export temporary artifacts were removed.

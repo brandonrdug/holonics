@@ -30,7 +30,7 @@ messages are evidence or testimony and never schedule work.
 
 ## Current courtesy summary
 
-**Current frontier:** MVF6
+**Current frontier:** NONE
 
 [established-bounded] CONS0--CONS5, QLT1--QLT6, CDB1, and HIF0--HIF7 are complete at their declared
 scopes. UAR/R0Q are deprecated as campaigns; R0Q0--R0Q4 retain their exact bounded mechanisms.
@@ -47,8 +47,8 @@ index evaluation by complete inference configuration. MVF0 returned its exact Le
 MVF1 returned the faithful factorized lift and SCF evidence correction; MVF2 returned one neutral
 Soulkiller dismantling boundary; MVF3 returned reciprocal local cultivation; MVF4 returned derived
 variant anatomy and backend-independent package storage; MVF5 returned exact/projected/refused
-Safetensors and ONNX export lenses. MVF6 configuration-indexed multimodal foundry release is the
-sole next deed.
+Safetensors and ONNX export lenses; and MVF6 returned the configuration-indexed matched multimodal
+matrix and coherent release. The frontier is `NONE`; no successor deed is scheduled.
 
 ## Claude-specific conduct
 
