@@ -1,4 +1,5 @@
 import ElementaryHolonics.RH.WeilPositivity
+import ElementaryHolonics.RH.WeightedArgumentPrinciple
 
 /-!
 # The global Weil finish line for the Riemann hypothesis
@@ -39,14 +40,16 @@ structure CofinalXiContours where
 
 /-- [project-postulate] The complete global explicit-formula return for one declared Weil test.
 The three convergence fields retain the actual cofinal populations; `limitPassage` is the
-remaining passage through those limits, rather than a silently totalized infinite sum. -/
+remaining passage through those limits, rather than a silently totalized infinite sum.
+
+[proved-derived; formal-checked] The weighted argument principle is no longer a field of this
+certificate: `RH.WeightedArgumentPrinciple.hasWeightedArgumentPrinciple` proves it on every
+admissible contour, so the admissibility retained in `contours` already supplies it. -/
 structure GlobalExplicitFormulaWitness (T : WeilTestFunction) (value : ℂ) where
   contours : CofinalXiContours
   primeCutoff : ℕ → ℕ
   primeCofinal : ∀ N : ℕ, ∃ n, N ≤ primeCutoff n
   boundary : ℕ → ℂ
-  argumentPrinciple : ∀ n,
-    HasWeightedArgumentPrinciple T 0 (contours.radius n)
   residualIdentity : ∀ n,
     HasArchimedeanResidualIdentity T 0 (contours.radius n) (primeCutoff n) (boundary n)
   primeLimit : ℂ
@@ -66,7 +69,8 @@ theorem GlobalExplicitFormulaWitness.truncatedFormula
       polarReceiver T - truncatedPrimeReceiver T (w.primeCutoff n) -
         archimedeanReceiver T + w.boundary n :=
   truncatedExplicitFormula_of_archimedeanPorts
-    (w.argumentPrinciple n) (w.residualIdentity n)
+    (WeightedArgumentPrinciple.hasWeightedArgumentPrinciple T (w.contours.admissible n))
+    (w.residualIdentity n)
 
 /-- [project-postulate] One canonical global receiver value for every admitted Weil test,
 together with its complete cofinal explicit-formula reconstruction fibre. -/
