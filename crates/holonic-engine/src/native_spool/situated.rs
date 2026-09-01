@@ -3,7 +3,7 @@ use super::scaffold::NativeTransportScaffold;
 use super::*;
 
 pub const SITUATED_NATIVE_TRANSPORT_SCAFFOLD_SCHEMA: &str =
-    "holonic-engine.situated-native-transport-scaffold.v1";
+    "holonic-engine.situated-native-transport-scaffold.v2";
 
 /// One source-neutral cultivated continuation of an admitted native transport scaffold.
 ///

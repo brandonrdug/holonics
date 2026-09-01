@@ -10,15 +10,15 @@ mechanisms retain their scoped grades.
 
 ## Current frontier
 
-**Current frontier:** MVF1
+**Current frontier:** MVF2
 
-**MVF1 — FAITHFUL FACTORIZED GEMMA SECTION LIFT AND SCF EVIDENCE CORRECTION — IS THE SOLE NEXT DEED.**
+**MVF2 — ONE ARCHITECTURE-NEUTRAL SOULKILLER DISMANTLING BOUNDARY — IS THE SOLE NEXT DEED.**
 
-[definition] Replace the coarse productive section projection under
+[definition] Compose the generic reachable-section scrapyard and faithful Gemma excitation lift
+behind one architecture-neutral dismantling return under
 [`blueprint/THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md`](blueprint/THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md).
-Retain exact factorized codeword/block incidence and receiver-history fibres without dense
-whole-checkpoint residency; make boundaries occurrence-founded; retain actual chronology; refuse
-non-temporal video and false interleaving; and narrow SCF status prose to the returned artifact.
+Only cold input charts may differ. The hot rest must be unable to name or execute either source,
+and duplicated lift policy must depart without compatibility aliases.
 
 ## Admitted standing
 
@@ -86,6 +86,12 @@ item is scheduled by this campaign.
 `LocalCausalConeCultivation`, `MorphologyVariantManifest`, `VariantPackageSeparation`, exact and
 projected export lenses, complete inference configurations, and cross-codec resonance. The focused
 owner and live machine-learning closure built 3,186 jobs without `sorryAx` or a new axiom.
+
+[established-bounded; implemented-exact; source-inspected; measured] MVF1 replaced alternating-sum
+endpoint identity with complete exact factorized sections, retained exact cold reconstruction,
+preserved supplied occurrence order, founded boundaries from occurrences, and left non-temporal
+video open. A fresh actual text/vision/audio lift retained 976,896 coordinates in 248 blocks; engine
+returned 2,005 passed with 32 ignored and life returned 468 passed with 14 ignored.
 
 [established-bounded; process-audit; measured] The named workspace test receiver returned 2,924
 passed, zero failed, and 50 ignored with every example type-checked. The formal umbrella built

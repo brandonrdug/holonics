@@ -5,8 +5,8 @@ use std::collections::BTreeSet;
 use holonic_engine::{
     native_spool::{
         NativeConstitutiveResponse, NativeDepositFibreDelta, NativeExactReconstructionFibre,
-        NativeIncidenceTerm, NativeMixedConstitutiveFamily, NativeParametronCell,
-        NativeReceiverConsequence, NativeThread, NativeThreadDeposit,
+        NativeIncidenceTerm, NativeMixedConstitutiveFamily, NativeOccurrenceSection,
+        NativeParametronCell, NativeReceiverConsequence, NativeThread, NativeThreadDeposit,
         SituatedNativeTransportScaffold, NATIVE_THREAD_DEPOSIT_SCHEMA, NATIVE_THREAD_SCHEMA,
     },
     receiver_history_compression::NativeStateId,
@@ -121,6 +121,11 @@ pub(super) fn derive_returned_difference_deposit_from_history(
                 hand: difference.returned.hand,
             },
         ],
+        sections: vec![NativeOccurrenceSection::from_currents(
+            occurrence,
+            difference.complex_difference.entering_current.clone(),
+            difference.complex_difference.emitting_current.clone(),
+        )],
         constitutive_responses: vec![
             NativeConstitutiveResponse {
                 native: entering_native,

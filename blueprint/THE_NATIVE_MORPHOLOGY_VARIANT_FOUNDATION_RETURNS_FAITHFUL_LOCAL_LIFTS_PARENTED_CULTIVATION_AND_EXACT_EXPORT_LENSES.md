@@ -4,7 +4,7 @@
 **Date:** 2026-09-01
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** MVF1.
+**Current frontier:** MVF2.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md),
@@ -216,7 +216,7 @@ The focused owner and live machine-learning closure built 3,186 jobs without `so
 axiom. Its exact receipt is
 [`../research/records/2026-09-01_MVF0_FAITHFUL_LOCAL_LIFT_CAUSAL_CONE_VARIANT_PACKAGE_EXPORT_AND_CONFIGURATION_LAWS_RETURNED.md`](../research/records/2026-09-01_MVF0_FAITHFUL_LOCAL_LIFT_CAUSAL_CONE_VARIANT_PACKAGE_EXPORT_AND_CONFIGURATION_LAWS_RETURNED.md).
 
-### MVF1 — replace the coarse Gemma section projection with a faithful factorized lift — CURRENT
+### MVF1 — replace the coarse Gemma section projection with a faithful factorized lift — PASSED
 
 [definition] Remove the alternating-sum productive projection. Retain exact local foreign-section
 incidence and factorized codeword blocks without requiring dense whole-checkpoint residency. Make
@@ -229,7 +229,14 @@ sum remain separated or return their complete receiver fibre; codeword/block rec
 exact; label and family regrouping do not alter native law; chronology survives intake; and the
 lift remains sparse/open outside its measured local support.
 
-### MVF2 — one Soulkiller dismantling boundary
+[established-bounded; implemented-exact; source-inspected; measured] MVF1 passed. Native endpoint
+identity now retains complete exact factorized section coordinates; a firing control separates an
+old alternating-sum collision; cold BF16 reconstruction is exact; occurrence order and
+occurrence-founded boundaries survive; non-temporal video remains open; and SCF evidence was
+narrowed. A fresh actual lift retained 976,896 coordinates in 248 blocks. Its receipt is
+[`../research/records/2026-09-01_MVF1_COMPLETE_FACTORIZED_GEMMA_SECTIONS_REPLACED_THE_ALTERNATING_SUM_IDENTITY.md`](../research/records/2026-09-01_MVF1_COMPLETE_FACTORIZED_GEMMA_SECTIONS_REPLACED_THE_ALTERNATING_SUM_IDENTITY.md).
+
+### MVF2 — one Soulkiller dismantling boundary — CURRENT
 
 [definition] Compose the generic reachable-section scrapyard and Gemma excitation path behind one
 architecture-neutral dismantling return. Delete duplicated lift policy. The returned type remains

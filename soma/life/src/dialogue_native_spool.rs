@@ -9,10 +9,11 @@ use std::collections::{BTreeMap, BTreeSet};
 use holonic_engine::{
     native_spool::{
         NativeCollapsedFibre, NativeConstitutiveResponse, NativeGeneratorDescent,
-        NativeGeneratorStep, NativeIncidenceTerm, NativeParametronCell, NativePullbackOccurrence,
-        NativeReceiverConsequence, NativeSerialPullback, NativeSpool, NativeSpoolRefusal,
-        NativeThread, NativeThreadHand, NativeThreadOccurrence, NativeTransportScaffold,
-        NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA, NATIVE_TRANSPORT_SCAFFOLD_SCHEMA,
+        NativeGeneratorStep, NativeIncidenceTerm, NativeOccurrenceSection, NativeParametronCell,
+        NativePullbackOccurrence, NativeReceiverConsequence, NativeSerialPullback, NativeSpool,
+        NativeSpoolRefusal, NativeThread, NativeThreadHand, NativeThreadOccurrence,
+        NativeTransportScaffold, NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA,
+        NATIVE_TRANSPORT_SCAFFOLD_SCHEMA,
     },
     receiver_exact_compression::{InputId, Observation, ReceiverId},
     receiver_history_compression::{NativeStateId, ReceiverFactor},
@@ -329,6 +330,20 @@ fn thread(
             }
         })
         .collect::<Vec<_>>();
+    let cell_by_native = parametrons
+        .iter()
+        .map(|cell| (cell.native, cell))
+        .collect::<BTreeMap<_, _>>();
+    let sections = occurrences
+        .iter()
+        .map(|occurrence| {
+            NativeOccurrenceSection::from_currents(
+                occurrence.occurrence,
+                cell_by_native[&occurrence.entering_native].current.clone(),
+                cell_by_native[&occurrence.emitting_native].current.clone(),
+            )
+        })
+        .collect();
     let thread = NativeThread {
         schema: NATIVE_THREAD_SCHEMA.to_owned(),
         address,
@@ -348,6 +363,7 @@ fn thread(
         occurrences,
         native_support,
         parametrons: parametrons.clone(),
+        sections,
         constitutive_responses: parametrons
             .iter()
             .map(|cell| NativeConstitutiveResponse {

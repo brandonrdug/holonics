@@ -15,6 +15,8 @@ pub enum NativeSpoolRefusal {
     Incidence(String),
     #[error("native thread {0} has malformed, incomplete, or empty Parametron current")]
     Parametron(String),
+    #[error("native thread has a malformed or incomplete factorized exact section")]
+    FactorizedSection,
     #[error("native thread {0} has a malformed receiver consequence")]
     ReceiverConsequence(String),
     #[error("native thread {0} has a malformed constitutive response")]

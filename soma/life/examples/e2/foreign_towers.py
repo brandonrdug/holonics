@@ -355,6 +355,7 @@ def video_from_vision(vision: dict) -> dict:
     frame_hashes = [returned["returned_sha256"] for returned in vision["returns"]]
     return {
         "organ": "sampled-video-through-inherited-vision-organ",
+        "temporal_frame_lineage": False,
         "source_lineage": "Gemma4VisionModel",
         "tensor_count": vision["tensor_count"],
         "complete_layer_count": vision["complete_layer_count"],

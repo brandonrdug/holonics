@@ -20,13 +20,13 @@ use crate::{
     receiver_history_compression::{NativeStateId, ReceiverFactor},
 };
 
-pub const NATIVE_THREAD_SCHEMA: &str = "holonic-engine.native-thread.v1";
-pub const NATIVE_SPOOL_SCHEMA: &str = "holonic-engine.native-spool.v3";
-pub const NATIVE_THREAD_DEPOSIT_SCHEMA: &str = "holonic-engine.native-thread-deposit.v1";
+pub const NATIVE_THREAD_SCHEMA: &str = "holonic-engine.native-thread.v2";
+pub const NATIVE_SPOOL_SCHEMA: &str = "holonic-engine.native-spool.v4";
+pub const NATIVE_THREAD_DEPOSIT_SCHEMA: &str = "holonic-engine.native-thread-deposit.v2";
 pub const NATIVE_THREAD_DEPOSIT_RECEIPT_SCHEMA: &str =
-    "holonic-engine.native-thread-deposit-receipt.v1";
+    "holonic-engine.native-thread-deposit-receipt.v2";
 pub const NATIVE_THREAD_DEPOSIT_BATCH_RECEIPT_SCHEMA: &str =
-    "holonic-engine.native-thread-deposit-batch-receipt.v1";
+    "holonic-engine.native-thread-deposit-batch-receipt.v2";
 pub const RECEIVER_INSUFFICIENCY_SCHEMA: &str = "holonic-engine.receiver-insufficiency.v1";
 
 /// One carrying occurrence in the population `W_f` of an addressed span.
@@ -70,6 +70,152 @@ pub struct NativeParametronCell {
     pub current: ExactComplexWaveCurrent,
     pub relative_phase: ExactUnitConicPhase,
     pub hand: NativeThreadHand,
+}
+
+/// One apparatus-sized block of a complete exact local section.
+///
+/// Block boundaries enable incremental residency and serialization; they do not found native
+/// equality. `coordinate_start` and the flattened exact values retain the complete ordered local
+/// section independently of how an exterior reader groups the blocks.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NativeSectionBlock {
+    pub block_ordinal: u64,
+    pub coordinate_start: u64,
+    pub values: Vec<Rat>,
+}
+
+/// One complete factorized section and its two-coordinate current receiver.
+///
+/// `receiver_current` is a declared quotient of the complete coordinate population. It is never
+/// the identity of that population; collision-safe lift identity uses the flattened values.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NativeFactorizedSection {
+    pub coordinate_population: u64,
+    pub blocks: Vec<NativeSectionBlock>,
+    pub receiver_current: ExactComplexWaveCurrent,
+}
+
+impl NativeFactorizedSection {
+    pub fn from_values(values: Vec<Rat>, block_extent: usize) -> Result<Self, NativeSpoolRefusal> {
+        if values.is_empty() || block_extent == 0 {
+            return Err(NativeSpoolRefusal::FactorizedSection);
+        }
+        let coordinate_population =
+            u64::try_from(values.len()).map_err(|_| NativeSpoolRefusal::FactorizedSection)?;
+        let receiver_current = section_current(&values);
+        let mut coordinate_start = 0u64;
+        let mut blocks = Vec::with_capacity(values.len().div_ceil(block_extent));
+        for (block_ordinal, block) in values.chunks(block_extent).enumerate() {
+            blocks.push(NativeSectionBlock {
+                block_ordinal: u64::try_from(block_ordinal)
+                    .map_err(|_| NativeSpoolRefusal::FactorizedSection)?,
+                coordinate_start,
+                values: block.to_vec(),
+            });
+            coordinate_start = coordinate_start
+                .checked_add(
+                    u64::try_from(block.len())
+                        .map_err(|_| NativeSpoolRefusal::FactorizedSection)?,
+                )
+                .ok_or(NativeSpoolRefusal::FactorizedSection)?;
+        }
+        let section = Self {
+            coordinate_population,
+            blocks,
+            receiver_current,
+        };
+        section.validate()?;
+        Ok(section)
+    }
+
+    pub fn from_current(current: ExactComplexWaveCurrent) -> Self {
+        Self {
+            coordinate_population: 2,
+            blocks: vec![NativeSectionBlock {
+                block_ordinal: 0,
+                coordinate_start: 0,
+                values: vec![current.real.clone(), current.imaginary.clone()],
+            }],
+            receiver_current: current,
+        }
+    }
+
+    pub fn coordinate_values(&self) -> impl Iterator<Item = &Rat> {
+        self.blocks.iter().flat_map(|block| block.values.iter())
+    }
+
+    pub fn validate(&self) -> Result<(), NativeSpoolRefusal> {
+        if self.coordinate_population == 0 || self.blocks.is_empty() {
+            return Err(NativeSpoolRefusal::FactorizedSection);
+        }
+        let mut coordinate_start = 0u64;
+        for (ordinal, block) in self.blocks.iter().enumerate() {
+            if block.block_ordinal
+                != u64::try_from(ordinal).map_err(|_| NativeSpoolRefusal::FactorizedSection)?
+                || block.coordinate_start != coordinate_start
+                || block.values.is_empty()
+            {
+                return Err(NativeSpoolRefusal::FactorizedSection);
+            }
+            coordinate_start = coordinate_start
+                .checked_add(
+                    u64::try_from(block.values.len())
+                        .map_err(|_| NativeSpoolRefusal::FactorizedSection)?,
+                )
+                .ok_or(NativeSpoolRefusal::FactorizedSection)?;
+        }
+        let values = self.coordinate_values().cloned().collect::<Vec<_>>();
+        if coordinate_start != self.coordinate_population
+            || section_current(&values) != self.receiver_current
+        {
+            return Err(NativeSpoolRefusal::FactorizedSection);
+        }
+        Ok(())
+    }
+}
+
+/// Complete entering and returned section populations carried by one native occurrence.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NativeOccurrenceSection {
+    pub occurrence: EventId,
+    pub entering: NativeFactorizedSection,
+    pub returned: NativeFactorizedSection,
+}
+
+impl NativeOccurrenceSection {
+    pub fn from_currents(
+        occurrence: EventId,
+        entering: ExactComplexWaveCurrent,
+        returned: ExactComplexWaveCurrent,
+    ) -> Self {
+        Self {
+            occurrence,
+            entering: NativeFactorizedSection::from_current(entering),
+            returned: NativeFactorizedSection::from_current(returned),
+        }
+    }
+
+    pub fn validate(&self) -> Result<(), NativeSpoolRefusal> {
+        self.entering.validate()?;
+        self.returned.validate()
+    }
+}
+
+fn section_current(values: &[Rat]) -> ExactComplexWaveCurrent {
+    let zero = Rat::from_integer(0.into());
+    let mut real = zero.clone();
+    let mut imaginary = zero;
+    for (coordinate, value) in values.iter().enumerate() {
+        if coordinate % 2 == 0 {
+            real += value;
+        } else {
+            imaginary += value;
+        }
+    }
+    ExactComplexWaveCurrent::new(real, imaginary)
 }
 
 /// One receiver-indexed constitutive response.  The relation is retained as an exact presented
@@ -129,6 +275,7 @@ pub struct NativeThread {
     pub native_support: BTreeSet<NativeStateId>,
     pub incidence: Vec<NativeIncidenceTerm>,
     pub parametrons: Vec<NativeParametronCell>,
+    pub sections: Vec<NativeOccurrenceSection>,
     pub constitutive_responses: Vec<NativeConstitutiveResponse>,
     pub chronology: Vec<InputId>,
     pub receiver_consequences: Vec<NativeReceiverConsequence>,
@@ -149,6 +296,7 @@ impl NativeThread {
             || self.native_support.is_empty()
             || self.incidence.is_empty()
             || self.parametrons.is_empty()
+            || self.sections.is_empty()
             || self.constitutive_responses.is_empty()
             || self.chronology.is_empty()
             || self.receiver_consequences.is_empty()
@@ -209,6 +357,32 @@ impl NativeThread {
         }
         if parametron_states != self.native_support || (!productive && self.obstruction.is_none()) {
             return Err(NativeSpoolRefusal::Parametron(self.address.clone()));
+        }
+
+        let cells = self
+            .parametrons
+            .iter()
+            .map(|cell| (cell.native, cell))
+            .collect::<BTreeMap<_, _>>();
+        let mut section_occurrences = BTreeSet::new();
+        for section in &self.sections {
+            section.validate()?;
+            let Some(occurrence) = occurrence_by_id.get(&section.occurrence).copied() else {
+                return Err(NativeSpoolRefusal::FactorizedSection);
+            };
+            if !section_occurrences.insert(section.occurrence)
+                || cells
+                    .get(&occurrence.entering_native)
+                    .is_none_or(|cell| cell.current != section.entering.receiver_current)
+                || cells
+                    .get(&occurrence.emitting_native)
+                    .is_none_or(|cell| cell.current != section.returned.receiver_current)
+            {
+                return Err(NativeSpoolRefusal::FactorizedSection);
+            }
+        }
+        if section_occurrences != occurrence_ids {
+            return Err(NativeSpoolRefusal::FactorizedSection);
         }
 
         let mut consequences = BTreeMap::new();

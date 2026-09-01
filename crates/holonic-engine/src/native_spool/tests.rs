@@ -17,6 +17,24 @@ fn current(real: i64, imaginary: i64) -> ExactComplexWaveCurrent {
     )
 }
 
+#[test]
+fn factorized_section_block_grouping_does_not_change_coordinates_or_current() {
+    let values = (0..7)
+        .map(|value| Rat::from_integer(BigInt::from(value)))
+        .collect::<Vec<_>>();
+    let pairs = NativeFactorizedSection::from_values(values.clone(), 2).expect("pair blocks");
+    let triples = NativeFactorizedSection::from_values(values, 3).expect("triple blocks");
+    assert_eq!(
+        pairs.coordinate_values().collect::<Vec<_>>(),
+        triples.coordinate_values().collect::<Vec<_>>()
+    );
+    assert_eq!(pairs.receiver_current, triples.receiver_current);
+    assert_ne!(
+        pairs.blocks, triples.blocks,
+        "block extent is apparatus testimony"
+    );
+}
+
 fn thread(
     address: &str,
     event: u64,
@@ -68,6 +86,11 @@ fn thread(
                 hand: NativeThreadHand::Along,
             },
         ],
+        sections: vec![NativeOccurrenceSection::from_currents(
+            occurrence,
+            current(0, 1),
+            current(-1, 0),
+        )],
         constitutive_responses: vec![
             NativeConstitutiveResponse {
                 native: from,
@@ -341,6 +364,7 @@ fn thread_deposit_at(address: &str, event: u64) -> NativeThreadDeposit {
     deposit.thread.occurrences[0].entering_port = OccurrencePort::input(event, 0);
     deposit.thread.occurrences[0].emitting_port = OccurrencePort::output(event, 0);
     deposit.thread.incidence[0].occurrence = event;
+    deposit.thread.sections[0].occurrence = event;
     deposit.thread.reconstruction_fibre = BTreeSet::from([event]);
     deposit.serial_pullbacks[0].right_thread = address.to_owned();
     deposit.serial_pullbacks[0].occurrences = BTreeSet::from([NativePullbackOccurrence {

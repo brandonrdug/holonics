@@ -1,22 +1,20 @@
 use std::collections::{BTreeMap, BTreeSet};
 
-use num_bigint::BigInt;
-use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::exact_value::ieee754::decode_bfloat16_bits;
 use crate::native_spool::{
     NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA, NATIVE_TRANSPORT_SCAFFOLD_SCHEMA,
-    NativeCollapsedFibre, NativeConstitutiveResponse, NativeGeneratorDescent, NativeGeneratorStep,
-    NativeIncidenceTerm, NativeParametronCell, NativeReceiverConsequence, NativeSpool,
-    NativeSpoolRefusal, NativeThread, NativeThreadHand, NativeThreadOccurrence,
-    NativeTransportScaffold, RECEIVER_INSUFFICIENCY_SCHEMA, ReceiverInsufficiency,
-    ReceiverInsufficiencyCause,
+    NativeCollapsedFibre, NativeConstitutiveResponse, NativeFactorizedSection,
+    NativeGeneratorDescent, NativeGeneratorStep, NativeIncidenceTerm, NativeOccurrenceSection,
+    NativeParametronCell, NativeReceiverConsequence, NativeSpool, NativeSpoolRefusal, NativeThread,
+    NativeThreadHand, NativeThreadOccurrence, NativeTransportScaffold,
+    RECEIVER_INSUFFICIENCY_SCHEMA, ReceiverInsufficiency, ReceiverInsufficiencyCause,
 };
 use crate::receiver_exact_compression::{InputId, Observation, ReceiverId};
 use crate::receiver_history_compression::{NativeStateId, ReceiverFactor};
-use crate::{BoundaryId, EventId, ExactComplexWaveCurrent, ExactUnitConicPhase, OccurrencePort};
+use crate::{BoundaryId, EventId, ExactUnitConicPhase, OccurrencePort};
 
 use super::{DismantlingBoundaryReturn, ExteriorModality, IntoDismantlingBoundaryReturn};
 
@@ -74,6 +72,33 @@ impl IntoDismantlingBoundaryReturn for MultimodalScaffoldLiftReturn {
     }
 }
 
+impl MultimodalScaffoldLiftReturn {
+    /// Reconstruct every productive factorized section from the exact cold BF16 codeword lane.
+    ///
+    /// The cold codewords remain source-codec testimony; the hot lane retains their exact decoded
+    /// local values and block incidence. This receipt proves the two physical lanes still join at
+    /// every occurrence without making BF16 a native state type.
+    pub fn validate_section_reconstruction(&self) -> Result<(), ScaffoldLiftError> {
+        self.native.validate()?;
+        for excitation in &self.exterior.excitations {
+            let section = self
+                .native
+                .spools
+                .iter()
+                .flat_map(|spool| &spool.threads)
+                .flat_map(|thread| &thread.sections)
+                .find(|section| section.occurrence == excitation.event)
+                .ok_or(ScaffoldLiftError::Excitation)?;
+            if section.entering != factorize_bf16(&excitation.entering_codewords)?
+                || section.returned != factorize_bf16(&excitation.returned_codewords)?
+            {
+                return Err(ScaffoldLiftError::Excitation);
+            }
+        }
+        Ok(())
+    }
+}
+
 #[derive(Clone, Debug, Error, PartialEq, Eq)]
 pub enum ScaffoldLiftError {
     #[error("the BF16 excitation family is empty, repeated, or malformed")]
@@ -92,9 +117,11 @@ struct NativeExcitation {
     predecessor: Option<EventId>,
     entering_boundary: BoundaryId,
     emitting_boundary: BoundaryId,
-    entering: ExactComplexWaveCurrent,
-    returned: ExactComplexWaveCurrent,
+    entering: NativeFactorizedSection,
+    returned: NativeFactorizedSection,
 }
+
+const NATIVE_SECTION_BLOCK_WORDS: usize = 4096;
 
 pub fn lift_bf16_excitations(
     receiver: ReceiverId,
@@ -121,8 +148,8 @@ pub fn lift_bf16_excitations(
             predecessor: excitation.predecessor,
             entering_boundary: excitation.entering_boundary,
             emitting_boundary: excitation.emitting_boundary,
-            entering: aggregate_bf16(&excitation.entering_codewords)?,
-            returned: aggregate_bf16(&excitation.returned_codewords)?,
+            entering: factorize_bf16(&excitation.entering_codewords)?,
+            returned: factorize_bf16(&excitation.returned_codewords)?,
         });
     }
     if native_excitations.iter().any(|excitation| {
@@ -132,18 +159,16 @@ pub fn lift_bf16_excitations(
     }) {
         return Err(ScaffoldLiftError::Excitation);
     }
-    native_excitations.sort_by_key(|excitation| excitation.event);
-
-    let mut current_by_key = BTreeMap::new();
+    let mut section_by_key = BTreeMap::new();
     for excitation in &native_excitations {
-        current_by_key
-            .entry(current_key(&excitation.entering))
+        section_by_key
+            .entry(section_key(&excitation.entering))
             .or_insert_with(|| excitation.entering.clone());
-        current_by_key
-            .entry(current_key(&excitation.returned))
+        section_by_key
+            .entry(section_key(&excitation.returned))
             .or_insert_with(|| excitation.returned.clone());
     }
-    let state_by_key = current_by_key
+    let state_by_key = section_by_key
         .keys()
         .enumerate()
         .map(|(at, key)| (key.clone(), NativeStateId(at as u64)))
@@ -162,19 +187,20 @@ pub fn lift_bf16_excitations(
     let mut emitted_by_event = BTreeMap::new();
     let mut entering_by_event = BTreeMap::new();
     for excitation in &native_excitations {
-        let from = state_by_key[&current_key(&excitation.entering)];
-        let to = state_by_key[&current_key(&excitation.returned)];
+        let from = state_by_key[&section_key(&excitation.entering)];
+        let to = state_by_key[&section_key(&excitation.returned)];
         entering_by_event.insert(excitation.event, from);
         emitted_by_event.insert(excitation.event, to);
         let support = BTreeSet::from([from, to]);
         let parametrons = support
             .iter()
             .map(|state| {
-                let current = current_by_key
+                let section = section_by_key
                     .iter()
-                    .find_map(|(key, current)| (state_by_key[key] == *state).then_some(current))
+                    .find_map(|(key, section)| (state_by_key[key] == *state).then_some(section))
                     .expect("every native state has one exact current")
                     .clone();
+                let current = section.receiver_current;
                 NativeParametronCell {
                     native: *state,
                     section: current.clone(),
@@ -225,6 +251,11 @@ pub fn lift_bf16_excitations(
                 coefficient: 1,
             }],
             parametrons,
+            sections: vec![NativeOccurrenceSection {
+                occurrence: excitation.event,
+                entering: excitation.entering.clone(),
+                returned: excitation.returned.clone(),
+            }],
             constitutive_responses,
             chronology: vec![generator],
             receiver_consequences,
@@ -322,7 +353,7 @@ pub fn lift_bf16_excitations(
         open_exterior: vec!["a richer receiver must return another excitation".to_owned()],
     };
     insufficiency.validate()?;
-    Ok(MultimodalScaffoldLiftReturn {
+    let returned = MultimodalScaffoldLiftReturn {
         native,
         exterior: Bf16ExcitationColdWitness {
             schema: "holonic-engine.bf16-excitation-cold-witness.v1".to_owned(),
@@ -330,27 +361,29 @@ pub fn lift_bf16_excitations(
             open_exterior: vec!["source modalities and tensor coordinates remain cold".to_owned()],
         },
         insufficiency,
-    })
+    };
+    returned.validate_section_reconstruction()?;
+    Ok(returned)
 }
 
-fn aggregate_bf16(words: &[u16]) -> Result<ExactComplexWaveCurrent, ScaffoldLiftError> {
-    let mut real = Rat::from_integer(BigInt::from(0));
-    let mut imaginary = Rat::from_integer(BigInt::from(0));
-    for (at, word) in words.iter().enumerate() {
-        let value = decode_bfloat16_bits(*word)
-            .map_err(|_| ScaffoldLiftError::Codeword)?
-            .value();
-        if at % 2 == 0 {
-            real += value;
-        } else {
-            imaginary += value;
-        }
-    }
-    Ok(ExactComplexWaveCurrent::new(real, imaginary))
+fn factorize_bf16(words: &[u16]) -> Result<NativeFactorizedSection, ScaffoldLiftError> {
+    let values = words
+        .iter()
+        .map(|word| {
+            decode_bfloat16_bits(*word)
+                .map_err(|_| ScaffoldLiftError::Codeword)
+                .map(|decoded| decoded.value())
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    NativeFactorizedSection::from_values(values, NATIVE_SECTION_BLOCK_WORDS)
+        .map_err(ScaffoldLiftError::Scaffold)
 }
 
-fn current_key(current: &ExactComplexWaveCurrent) -> (String, String) {
-    (current.real.to_string(), current.imaginary.to_string())
+fn section_key(section: &NativeFactorizedSection) -> Vec<String> {
+    section
+        .coordinate_values()
+        .map(ToString::to_string)
+        .collect()
 }
 
 #[cfg(test)]
@@ -430,5 +463,53 @@ mod tests {
             ],
         );
         assert_eq!(false_join, Err(ScaffoldLiftError::Pullback));
+    }
+
+    #[test]
+    fn complete_sections_separate_an_old_alternating_sum_collision() {
+        let left = excitation(
+            1,
+            ExteriorModality::Text,
+            vec![0x3f80, 0x0000, 0x0000, 0x3f80],
+            vec![0x4000],
+        );
+        let right = excitation(
+            2,
+            ExteriorModality::Image,
+            vec![0x0000, 0x3f80, 0x3f80, 0x0000],
+            vec![0x4040],
+        );
+        let returned = lift_bf16_excitations(ReceiverId(7), vec![left, right]).expect("lift");
+        let left = &returned.native.spools[0].threads[0];
+        let right = &returned.native.spools[0].threads[1];
+        assert_eq!(
+            left.sections[0].entering.receiver_current, right.sections[0].entering.receiver_current,
+            "the former scalar face really collides"
+        );
+        assert_ne!(
+            left.occurrences[0].entering_native, right.occurrences[0].entering_native,
+            "complete factorized sections must not inherit the scalar collision"
+        );
+        assert_ne!(
+            section_key(&left.sections[0].entering),
+            section_key(&right.sections[0].entering)
+        );
+    }
+
+    #[test]
+    fn exterior_occurrence_order_survives_without_event_resorting() {
+        let returned = lift_bf16_excitations(
+            ReceiverId(7),
+            vec![
+                excitation(20, ExteriorModality::Audio, vec![0x3f80], vec![0x4000]),
+                excitation(10, ExteriorModality::Text, vec![0x4040], vec![0x4080]),
+            ],
+        )
+        .expect("lift");
+        let threads = &returned.native.spools[0].threads;
+        assert_eq!(threads[0].occurrences[0].occurrence, EventId(20));
+        assert_eq!(threads[1].occurrences[0].occurrence, EventId(10));
+        assert_eq!(threads[0].chronology, vec![InputId(0)]);
+        assert_eq!(threads[1].chronology, vec![InputId(1)]);
     }
 }

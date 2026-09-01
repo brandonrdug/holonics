@@ -4,6 +4,14 @@
 **Phase:** SCF2  
 **Truth status:** established-bounded; implemented-exact; source-inspected; measured
 
+[counterexample; source-inspected] MVF1 review narrows the native-lift interpretation in this
+record. The SCF2 implementation retained every raw BF16 codeword in its cold witness, but its hot
+native endpoint identity used one alternating real/imaginary sum per complete section. Exact
+codeword retention therefore did not establish receiver-exact reconstruction of the complete
+foreign token/patch/channel/frequency incidence. The execution measurements and bounded lifecycle
+return below remain valid; MVF1 replaces the productive projection with complete factorized local
+sections and a collision control.
+
 [established-bounded; implemented-exact; source-inspected; measured] The complete local Gemma 4
 E4B realization returned two text occurrences through all 42 language layers, four image
 restrictions through all 16 vision layers, four sampled-video frames through that same declared
@@ -17,7 +25,8 @@ intervention-separated entering/returned BF16 codeword populations. `scaffold_li
 exact finite codewords, founded 20 exact-current native states, 14 addressed threads and generator
 descents, and retained 266 open generator faces. The productive scaffold wire was 29,315 octets and
 contained none of the modality, tensor, source, intervention, or consequence strings retained by
-the physically separate cold witness.
+the physically separate cold witness. This string-absence result did not prove absence of all
+delivery-family structure: the exterior reader assigned family-specific nominal boundaries.
 
 [definition] Each bounded foreign excitation is a partial generator action. Native spool schema
 v3 therefore retains its realized steps and exact open domain; resident conduct refuses an open

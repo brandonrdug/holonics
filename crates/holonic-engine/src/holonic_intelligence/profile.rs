@@ -2,9 +2,9 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use crate::native_spool::{
     NativeCollapsedFibre, NativeConstitutiveResponse, NativeGeneratorDescent, NativeIncidenceTerm,
-    NativeMutualConstitutiveResponse, NativeParametronCell, NativeReceiverConsequence,
-    NativeSerialPullback, NativeSpoolComposition, NativeSpoolRefusal, NativeThread,
-    NativeThreadObstruction, NativeThreadOccurrence, NativeTransportScaffold,
+    NativeMutualConstitutiveResponse, NativeOccurrenceSection, NativeParametronCell,
+    NativeReceiverConsequence, NativeSerialPullback, NativeSpoolComposition, NativeSpoolRefusal,
+    NativeThread, NativeThreadObstruction, NativeThreadOccurrence, NativeTransportScaffold,
 };
 use crate::receiver_history_compression::{NativeStateId, ReceiverFactor};
 use crate::{BoundaryId, EventId};
@@ -32,6 +32,7 @@ pub struct IncidenceFacet<'a> {
 pub struct CarrierFacet<'a> {
     pub native_support: &'a BTreeSet<NativeStateId>,
     pub parametrons: &'a [NativeParametronCell],
+    pub sections: &'a [NativeOccurrenceSection],
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -205,6 +206,7 @@ impl NativeTransportScaffold {
                     carrier: CarrierFacet {
                         native_support: &thread.native_support,
                         parametrons: &thread.parametrons,
+                        sections: &thread.sections,
                     },
                     transport: TransportFacet {
                         occurrences: &thread.occurrences,

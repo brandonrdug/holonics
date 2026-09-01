@@ -12,10 +12,10 @@ use crate::native_ecology::recurrent_return::{RecurrentReturnRefusal, recurrence
 use crate::native_spool::{
     NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA, NATIVE_TRANSPORT_SCAFFOLD_SCHEMA,
     NativeCollapsedFibre, NativeConstitutiveResponse, NativeGeneratorDescent, NativeGeneratorStep,
-    NativeIncidenceTerm, NativeMutualConstitutiveResponse, NativeParametronCell,
-    NativePullbackOccurrence, NativeReceiverConsequence, NativeSerialPullback, NativeSpool,
-    NativeSpoolRefusal, NativeThread, NativeThreadHand, NativeThreadOccurrence,
-    NativeTransportScaffold,
+    NativeIncidenceTerm, NativeMutualConstitutiveResponse, NativeOccurrenceSection,
+    NativeParametronCell, NativePullbackOccurrence, NativeReceiverConsequence,
+    NativeSerialPullback, NativeSpool, NativeSpoolRefusal, NativeThread, NativeThreadHand,
+    NativeThreadOccurrence, NativeTransportScaffold,
 };
 use crate::receiver_exact_compression::{InputId, Observation, ReceiverId};
 use crate::receiver_history_compression::{NativeStateId, NativeTransport, ReceiverFactor};
@@ -84,6 +84,11 @@ fn thread(
                 hand: NativeThreadHand::Along,
             },
         ],
+        sections: vec![NativeOccurrenceSection::from_currents(
+            event,
+            current(0, 1),
+            current(-1, 0),
+        )],
         constitutive_responses: vec![
             NativeConstitutiveResponse {
                 native: from,

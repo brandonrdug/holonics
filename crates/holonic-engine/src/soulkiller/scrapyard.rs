@@ -21,10 +21,11 @@ use crate::{
         NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA, NATIVE_TRANSPORT_SCAFFOLD_SCHEMA,
         NativeCollapsedFibre, NativeConstitutiveResponse, NativeGeneratorDescent,
         NativeGeneratorStep, NativeIncidenceTerm, NativeMutualConstitutiveResponse,
-        NativeParametronCell, NativePullbackOccurrence, NativeReceiverConsequence,
-        NativeSerialPullback, NativeSpool, NativeSpoolRefusal, NativeThread, NativeThreadHand,
-        NativeThreadObstruction, NativeThreadOccurrence, NativeTransportScaffold,
-        RECEIVER_INSUFFICIENCY_SCHEMA, ReceiverInsufficiency, ReceiverInsufficiencyCause,
+        NativeOccurrenceSection, NativeParametronCell, NativePullbackOccurrence,
+        NativeReceiverConsequence, NativeSerialPullback, NativeSpool, NativeSpoolRefusal,
+        NativeThread, NativeThreadHand, NativeThreadObstruction, NativeThreadOccurrence,
+        NativeTransportScaffold, RECEIVER_INSUFFICIENCY_SCHEMA, ReceiverInsufficiency,
+        ReceiverInsufficiencyCause,
     },
     receiver_exact_compression::{InputId, Observation, ReceiverId},
     receiver_history_compression::{NativeStateId, ReceiverFactor},
@@ -335,6 +336,20 @@ pub fn dismantle_reachable_section(
                 });
             }
 
+            let cell_by_native = parametrons
+                .iter()
+                .map(|cell| (cell.native, cell))
+                .collect::<BTreeMap<_, _>>();
+            let sections = occurrences
+                .iter()
+                .map(|occurrence| {
+                    NativeOccurrenceSection::from_currents(
+                        occurrence.occurrence,
+                        cell_by_native[&occurrence.entering_native].current.clone(),
+                        cell_by_native[&occurrence.emitting_native].current.clone(),
+                    )
+                })
+                .collect();
             let thread_position = threads.len();
             threads.push(NativeThread {
                 schema: NATIVE_THREAD_SCHEMA.to_owned(),
@@ -347,6 +362,7 @@ pub fn dismantle_reachable_section(
                 native_support: support,
                 incidence,
                 parametrons,
+                sections,
                 constitutive_responses,
                 chronology: vec![generator],
                 receiver_consequences,

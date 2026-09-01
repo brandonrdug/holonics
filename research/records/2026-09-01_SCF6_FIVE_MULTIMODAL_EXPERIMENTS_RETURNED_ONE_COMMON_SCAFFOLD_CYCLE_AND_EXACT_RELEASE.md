@@ -4,6 +4,15 @@
 **Phase:** SCF6  
 **Truth status:** established-bounded; implemented-exact; source-inspected; measured
 
+[counterexample; source-inspected] MVF review narrows “sampled-video,” “interleaved,” and training
+in this record. The video family reused four still-image restrictions rather than distinct temporal
+frame occurrences. The exterior interleaving helper reordered a vector which the lift subsequently
+resorted by event address. Every actual excitation had no predecessor and each experiment
+cultivated after one cut. The selected cultivation current already belonged to another lifted
+thread. The common lifecycle, contact-chart, label-string, withdrawal, and apparatus controls below
+remain exact; temporal video, native mixed chronology, independent world return, and qualitative
+multimodal capability remained unproved.
+
 [established-bounded; implemented-exact; source-inspected; measured] Text-to-text,
 image-to-text, audio-to-text, sampled-video-to-text, and interleaved text/image/audio/video-to-text
 experiments passed through the same public exact receipt, lift, move-owned handoff, repeated

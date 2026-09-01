@@ -340,9 +340,9 @@ no successor phase is scheduled.
 
 ## Active campaign — Native Morphology Variant Foundation
 
-**Current frontier:** MVF1
+**Current frontier:** MVF2
 
-**MVF1 — FAITHFUL FACTORIZED GEMMA SECTION LIFT AND SCF EVIDENCE CORRECTION — IS THE SOLE NEXT DEED.**
+**MVF2 — ONE ARCHITECTURE-NEUTRAL SOULKILLER DISMANTLING BOUNDARY — IS THE SOLE NEXT DEED.**
 
 [definition] Brandon's direct instruction of 2026-09-01 founds the ordered `MVF0--MVF6` campaign
 under
@@ -357,6 +357,13 @@ cultivation, descriptive version/variant/package, exact/projected/refused export
 configuration, and cross-codec resonance laws. The focused owner and machine-learning closure built
 3,186 jobs without `sorryAx` or a new axiom. Its receipt is
 [`research/records/2026-09-01_MVF0_FAITHFUL_LOCAL_LIFT_CAUSAL_CONE_VARIANT_PACKAGE_EXPORT_AND_CONFIGURATION_LAWS_RETURNED.md`](../research/records/2026-09-01_MVF0_FAITHFUL_LOCAL_LIFT_CAUSAL_CONE_VARIANT_PACKAGE_EXPORT_AND_CONFIGURATION_LAWS_RETURNED.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] MVF1 replaced scalar endpoint
+identity with complete factorized exact sections, retained cold-codeword reconstruction, preserved
+supplied occurrence order, founded boundaries from occurrences, left non-temporal video open, and
+narrowed SCF evidence. A fresh actual text/vision/audio lift retained 976,896 exact coordinates in
+248 blocks. Its receipt is
+[`research/records/2026-09-01_MVF1_COMPLETE_FACTORIZED_GEMMA_SECTIONS_REPLACED_THE_ALTERNATING_SUM_IDENTITY.md`](../research/records/2026-09-01_MVF1_COMPLETE_FACTORIZED_GEMMA_SECTIONS_REPLACED_THE_ALTERNATING_SUM_IDENTITY.md).
 
 [counterexample; source-inspected] The completed SCF lifecycle remains exact at its bounded
 mechanism scope, but the Gemma productive lift's alternating real/imaginary section sum is not a

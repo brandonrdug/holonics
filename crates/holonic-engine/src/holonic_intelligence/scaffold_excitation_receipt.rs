@@ -25,6 +25,7 @@ pub struct Gemma4ExcitationFamily {
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CompleteGemma4ExcitationReceipt {
     pub families: Vec<Gemma4ExcitationFamily>,
+    pub open_exterior: Vec<String>,
 }
 
 impl CompleteGemma4ExcitationReceipt {
@@ -86,10 +87,13 @@ struct WireReturn {
     returned_bf16: String,
     returned_sha256: String,
     complete_layer_count: usize,
+    #[serde(default)]
+    frame_ordinal: Option<u64>,
 }
 
 #[derive(Deserialize)]
 struct WireVideoOrgan {
+    temporal_frame_lineage: bool,
     frame_returns: Vec<WireReturn>,
 }
 
@@ -101,76 +105,90 @@ pub fn read_complete_gemma4_excitation_receipt(
         return Err(CompleteExcitationReceiptError::Schema);
     }
     let mut event = 1u64;
-    let families = [
-        (
-            ExteriorModality::Text,
-            BoundaryId(10),
-            BoundaryId(11),
-            receipt.text.returns,
-        ),
-        (
-            ExteriorModality::Image,
-            BoundaryId(20),
-            BoundaryId(21),
-            receipt.vision.returns,
-        ),
-        (
-            ExteriorModality::Audio,
-            BoundaryId(30),
-            BoundaryId(31),
-            receipt.audio.returns,
-        ),
-        (
-            ExteriorModality::Video,
-            BoundaryId(40),
-            BoundaryId(41),
-            receipt.video.frame_returns,
-        ),
-    ]
-    .into_iter()
-    .map(|(modality, entering, emitting, returns)| {
-        let excitations = returns
-            .into_iter()
-            .map(|returned| {
-                let current_event = EventId(event);
-                event = event
-                    .checked_add(1)
-                    .ok_or(CompleteExcitationReceiptError::ForeignReturn)?;
-                let entering_bytes = fs::read(root.join(&returned.entering_bf16))?;
-                let returned_bytes = fs::read(root.join(&returned.returned_bf16))?;
-                if returned.complete_layer_count == 0
-                    || digest(&entering_bytes) != returned.entering_sha256
-                    || digest(&returned_bytes) != returned.returned_sha256
-                {
-                    return Err(CompleteExcitationReceiptError::ForeignReturn);
-                }
-                Ok(ForeignBf16Excitation {
-                    event: current_event,
-                    predecessor: None,
-                    entering_boundary: entering,
-                    emitting_boundary: emitting,
-                    source_occurrence: returned.occurrence,
-                    exterior_modality: modality,
-                    entering_codewords: words(&entering_bytes)?,
-                    returned_codewords: words(&returned_bytes)?,
-                    interventions: BTreeSet::from([
-                        format!("withdraw-excitation/{}", current_event.0),
-                        format!("source-sha256/{}", returned.source_sha256),
-                    ]),
-                    receiver_consequences: BTreeSet::from([returned.returned_sha256]),
+    let mut wire_families = vec![
+        (ExteriorModality::Text, receipt.text.returns),
+        (ExteriorModality::Image, receipt.vision.returns),
+        (ExteriorModality::Audio, receipt.audio.returns),
+    ];
+    let mut open_exterior = Vec::new();
+    if receipt.video.temporal_frame_lineage {
+        wire_families.push((ExteriorModality::Video, receipt.video.frame_returns));
+    } else {
+        open_exterior.push(
+            "sampled-video remains open until distinct temporally ordered frame occurrences return"
+                .to_owned(),
+        );
+    }
+    let families = wire_families
+        .into_iter()
+        .map(|(modality, returns)| {
+            let excitations = returns
+                .into_iter()
+                .enumerate()
+                .map(|(family_ordinal, returned)| {
+                    let current_event = EventId(event);
+                    event = event
+                        .checked_add(1)
+                        .ok_or(CompleteExcitationReceiptError::ForeignReturn)?;
+                    if modality == ExteriorModality::Video
+                        && returned.frame_ordinal
+                            != Some(
+                                u64::try_from(family_ordinal)
+                                    .map_err(|_| CompleteExcitationReceiptError::ForeignReturn)?,
+                            )
+                    {
+                        return Err(CompleteExcitationReceiptError::ForeignReturn);
+                    }
+                    let entering_boundary = BoundaryId(
+                        current_event
+                            .0
+                            .checked_mul(2)
+                            .ok_or(CompleteExcitationReceiptError::ForeignReturn)?,
+                    );
+                    let emitting_boundary = BoundaryId(
+                        entering_boundary
+                            .0
+                            .checked_add(1)
+                            .ok_or(CompleteExcitationReceiptError::ForeignReturn)?,
+                    );
+                    let entering_bytes = fs::read(root.join(&returned.entering_bf16))?;
+                    let returned_bytes = fs::read(root.join(&returned.returned_bf16))?;
+                    if returned.complete_layer_count == 0
+                        || digest(&entering_bytes) != returned.entering_sha256
+                        || digest(&returned_bytes) != returned.returned_sha256
+                    {
+                        return Err(CompleteExcitationReceiptError::ForeignReturn);
+                    }
+                    Ok(ForeignBf16Excitation {
+                        event: current_event,
+                        predecessor: None,
+                        entering_boundary,
+                        emitting_boundary,
+                        source_occurrence: returned.occurrence,
+                        exterior_modality: modality,
+                        entering_codewords: words(&entering_bytes)?,
+                        returned_codewords: words(&returned_bytes)?,
+                        interventions: BTreeSet::from([
+                            format!("withdraw-excitation/{}", current_event.0),
+                            format!("source-sha256/{}", returned.source_sha256),
+                        ]),
+                        receiver_consequences: BTreeSet::from([returned.returned_sha256]),
+                    })
                 })
+                .collect::<Result<Vec<_>, _>>()?;
+            if excitations.is_empty() {
+                return Err(CompleteExcitationReceiptError::ForeignReturn);
+            }
+            Ok(Gemma4ExcitationFamily {
+                modality,
+                excitations,
             })
-            .collect::<Result<Vec<_>, _>>()?;
-        if excitations.is_empty() {
-            return Err(CompleteExcitationReceiptError::ForeignReturn);
-        }
-        Ok(Gemma4ExcitationFamily {
-            modality,
-            excitations,
         })
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(CompleteGemma4ExcitationReceipt {
+        families,
+        open_exterior,
     })
-    .collect::<Result<Vec<_>, _>>()?;
-    Ok(CompleteGemma4ExcitationReceipt { families })
 }
 
 fn words(bytes: &[u8]) -> Result<Vec<u16>, CompleteExcitationReceiptError> {
@@ -188,4 +206,72 @@ fn digest(bytes: &[u8]) -> String {
         .iter()
         .map(|octet| format!("{octet:02x}"))
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    fn returned(name: &str, identity: &str) -> serde_json::Value {
+        json!({
+            "occurrence": name,
+            "source_sha256": identity,
+            "entering_bf16": format!("{name}-in.bf16"),
+            "entering_sha256": identity,
+            "returned_bf16": format!("{name}-out.bf16"),
+            "returned_sha256": identity,
+            "complete_layer_count": 1
+        })
+    }
+
+    #[test]
+    fn boundaries_follow_occurrences_and_non_temporal_video_remains_open() {
+        let root = std::env::temp_dir().join(format!(
+            "complete-gemma4-receipt-{}-{}",
+            std::process::id(),
+            std::thread::current().name().unwrap_or("receipt")
+        ));
+        std::fs::create_dir_all(&root).expect("root");
+        let bytes = 0x3f80u16.to_le_bytes();
+        let identity = digest(&bytes);
+        for name in ["text", "vision", "audio"] {
+            std::fs::write(root.join(format!("{name}-in.bf16")), bytes).expect("entering");
+            std::fs::write(root.join(format!("{name}-out.bf16")), bytes).expect("returned");
+        }
+        let receipt = json!({
+            "schema": COMPLETE_GEMMA4_EXCITATION_SCHEMA,
+            "text": {"returns": [returned("text", &identity)]},
+            "vision": {"returns": [returned("vision", &identity)]},
+            "audio": {"returns": [returned("audio", &identity)]},
+            "video": {"temporal_frame_lineage": false, "frame_returns": []}
+        });
+        std::fs::write(
+            root.join("receipt.json"),
+            serde_json::to_vec(&receipt).expect("receipt bytes"),
+        )
+        .expect("receipt");
+        let admitted = read_complete_gemma4_excitation_receipt(&root).expect("admitted");
+        assert_eq!(admitted.families.len(), 3);
+        let boundaries = admitted
+            .families
+            .iter()
+            .flat_map(|family| &family.excitations)
+            .map(|excitation| {
+                (
+                    excitation.entering_boundary.0,
+                    excitation.emitting_boundary.0,
+                )
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(boundaries, vec![(2, 3), (4, 5), (6, 7)]);
+        assert!(
+            admitted
+                .families
+                .iter()
+                .all(|family| family.modality != ExteriorModality::Video)
+        );
+        assert_eq!(admitted.open_exterior.len(), 1);
+        std::fs::remove_dir_all(root).expect("cleanup");
+    }
 }

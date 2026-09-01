@@ -4,6 +4,12 @@
 **Phase:** SCF5  
 **Truth status:** established-bounded; implemented-exact; measured
 
+[counterexample; source-inspected] MVF review narrows this result to a structural cultivation
+control. The SCF6 driver selected a distinct current already present in the lifted scaffold and
+assigned it a fresh occurrence; it did not receive an independent world consequence caused by the
+first emission. The move-owned deposit, remount, withdrawal, ablation, and restoration mechanisms
+remain exact. No qualitative training or multimodal learning claim follows from this control.
+
 [established-bounded; implemented-exact; measured] `scaffold_cultivation.rs` consumes one SCF3 hot
 rest, the typed source address and actual SCF4 emission, and one genuinely new returned exact
 Complex-Parametron current. It computes the nonzero returned difference and deposits one

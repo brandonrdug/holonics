@@ -17,7 +17,7 @@ use crate::{
 };
 
 pub const EXTERIOR_SOULKILLER_WITNESS_SCHEMA: &str =
-    "holonic-engine.exterior-soulkiller-witness.v2";
+    "holonic-engine.exterior-soulkiller-witness.v3";
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -401,9 +401,9 @@ mod tests {
         native_spool::{
             NATIVE_SPOOL_SCHEMA, NATIVE_THREAD_SCHEMA, NATIVE_TRANSPORT_SCAFFOLD_SCHEMA,
             NativeCollapsedFibre, NativeConstitutiveResponse, NativeGeneratorDescent,
-            NativeGeneratorStep, NativeIncidenceTerm, NativeParametronCell,
-            NativeReceiverConsequence, NativeSpool, NativeThread, NativeThreadHand,
-            NativeThreadOccurrence, NativeTransportScaffold,
+            NativeGeneratorStep, NativeIncidenceTerm, NativeOccurrenceSection,
+            NativeParametronCell, NativeReceiverConsequence, NativeSpool, NativeThread,
+            NativeThreadHand, NativeThreadOccurrence, NativeTransportScaffold,
         },
         receiver_exact_compression::Observation,
         receiver_history_compression::{NativeStateId, ReceiverFactor},
@@ -444,6 +444,11 @@ mod tests {
                 relative_phase: ExactUnitConicPhase::identity(),
                 hand: NativeThreadHand::Along,
             }],
+            sections: vec![NativeOccurrenceSection::from_currents(
+                event,
+                one.clone(),
+                one.clone(),
+            )],
             constitutive_responses: vec![NativeConstitutiveResponse {
                 native,
                 receiver,

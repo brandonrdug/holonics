@@ -413,6 +413,20 @@ pub(super) fn derive_branch_deposit(
         });
     }
 
+    let cell_by_native = parametrons
+        .iter()
+        .map(|cell| (cell.native, cell))
+        .collect::<BTreeMap<_, _>>();
+    let sections = occurrences
+        .iter()
+        .map(|occurrence| {
+            NativeOccurrenceSection::from_currents(
+                occurrence.occurrence,
+                cell_by_native[&occurrence.entering_native].current.clone(),
+                cell_by_native[&occurrence.emitting_native].current.clone(),
+            )
+        })
+        .collect();
     let thread = NativeThread {
         schema: NATIVE_THREAD_SCHEMA.to_owned(),
         address: thread_address.clone(),
@@ -424,6 +438,7 @@ pub(super) fn derive_branch_deposit(
         native_support: native_support.clone(),
         incidence,
         parametrons,
+        sections,
         constitutive_responses,
         chronology: k3.returned.ordered_word.clone(),
         receiver_consequences,

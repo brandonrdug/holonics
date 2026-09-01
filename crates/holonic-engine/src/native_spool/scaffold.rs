@@ -3,7 +3,7 @@ use super::refusal::NativeSpoolRefusal;
 use super::*;
 use crate::cuda_refine::{CudaRefineExecutor, ResidentComplexIncidence, ResidentNativeWord};
 
-pub const NATIVE_TRANSPORT_SCAFFOLD_SCHEMA: &str = "holonic-engine.native-transport-scaffold.v1";
+pub const NATIVE_TRANSPORT_SCAFFOLD_SCHEMA: &str = "holonic-engine.native-transport-scaffold.v2";
 
 /// A compatible, source-neutral scaffold of reusable native winding/generator families.
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]

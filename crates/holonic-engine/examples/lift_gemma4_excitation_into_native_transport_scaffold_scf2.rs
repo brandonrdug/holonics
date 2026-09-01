@@ -14,6 +14,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         .map(PathBuf::from)
         .ok_or("usage: lift_gemma4_excitation_into_native_transport_scaffold_scf2 RETURN_DIR")?;
     let receipt = read_complete_gemma4_excitation_receipt(&root)?;
+    let open_exterior = receipt.open_exterior.clone();
     let excitations = receipt
         .families
         .into_iter()
@@ -35,10 +36,13 @@ fn main() -> Result<(), Box<dyn Error>> {
             "native_population": returned.native.spools.iter().map(|spool| spool.native_population.len()).sum::<usize>(),
             "winding_population": returned.native.spools.iter().map(|spool| spool.generator_family.len()).sum::<usize>(),
             "open_generator_faces": returned.native.spools.iter().flat_map(|spool| &spool.generator_descents).map(|descent| descent.open_domain.len()).sum::<usize>(),
+            "factorized_section_blocks": returned.native.spools.iter().flat_map(|spool| &spool.threads).flat_map(|thread| &thread.sections).map(|section| section.entering.blocks.len() + section.returned.blocks.len()).sum::<usize>(),
+            "factorized_section_coordinates": returned.native.spools.iter().flat_map(|spool| &spool.threads).flat_map(|thread| &thread.sections).map(|section| section.entering.coordinate_population + section.returned.coordinate_population).sum::<u64>(),
             "profiled_holons": profile.productive_profile.holons.len(),
             "cold_excitation_population": returned.exterior.excitations.len(),
             "cold_coordinates_absent_from_native_wire": cold_coordinates_absent,
             "insufficiency_retained_fibre": returned.insufficiency.retained_fibre.len(),
+            "open_exterior": open_exterior,
         }))?
     );
     Ok(())
