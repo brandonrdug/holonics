@@ -244,14 +244,13 @@ source/apparatus absence. Historical UAR blueprints and records remain evidence 
 
 ## Active campaign — Holonic Intelligence Framework
 
-**Current frontier:** HIF2
+**Current frontier:** HIF3
 
-**HIF2 — EXACT FOREIGN CHARTS AND PROFILED DISMANTLING RETURN — IS THE SOLE NEXT DEED.**
+**HIF3 — PACKAGED HOLONIC INFERENCE AND GENERATION — IS THE SOLE NEXT DEED.**
 
-[open] Consolidate Safetensors manifestation, shard-index/config intake, exact dtype/shape
-conversion, and ONNX model graph intake behind lossless exterior charts. Compose them with actual
-excitation/intervention testimony and return profiled native holons through the one-way dismantling
-boundary.
+[open] Compose mount, active continuation, transport/diffusion, contact/glue, receiver condensation,
+emission, exterior return aperture, and later-current continuation through one move-owned
+circulation. Provide narrow codec adapters only at the boundary.
 
 [proved-derived; formal-checked; measured] HIF0 passed. The four-file neutral formal closure built
 3,164 focused jobs and the live umbrella built 3,769 jobs without `sorryAx`. Its exact return is
@@ -261,6 +260,11 @@ boundary.
 surface conducts the existing native owner without a wrapper or clone; direct and neutral resident
 returns agree. Its exact return is
 [`research/records/2026-08-31_HIF1_GENERIC_RUST_PROFILE_AND_RESTED_TRANSPORT_SURFACE_RETURNED.md`](../research/records/2026-08-31_HIF1_GENERIC_RUST_PROFILE_AND_RESTED_TRANSPORT_SURFACE_RETURNED.md).
+
+[established-bounded; implemented-exact; measured] HIF2 passed. Lossless configuration/index/ONNX
+charts, exact low-precision codewords, and productive-only dismantling profiles passed live vendor
+and package controls. Its exact return is
+[`research/records/2026-08-31_HIF2_EXACT_FOREIGN_CHARTS_LOW_PRECISION_WEIGHTS_AND_PROFILED_DISMANTLING_RETURNED.md`](../research/records/2026-08-31_HIF2_EXACT_FOREIGN_CHARTS_LOW_PRECISION_WEIGHTS_AND_PROFILED_DISMANTLING_RETURNED.md).
 
 [definition] The complete HIF order is:
 

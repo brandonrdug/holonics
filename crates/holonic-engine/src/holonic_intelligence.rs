@@ -6,14 +6,23 @@
 
 #[path = "holonic_intelligence/dimensions.rs"]
 mod dimensions;
+#[path = "holonic_intelligence/foreign_json.rs"]
+mod foreign_json;
+#[path = "holonic_intelligence/foreign_onnx.rs"]
+mod foreign_onnx;
 #[path = "holonic_intelligence/lifecycle.rs"]
 mod lifecycle;
 #[path = "holonic_intelligence/profile.rs"]
 mod profile;
 #[path = "holonic_intelligence/rested.rs"]
 mod rested;
+#[path = "holonic_intelligence/weight.rs"]
+mod weight;
 
 pub use dimensions::*;
+pub use foreign_json::*;
+pub use foreign_onnx::*;
 pub use lifecycle::*;
 pub use profile::*;
 pub use rested::*;
+pub use weight::*;

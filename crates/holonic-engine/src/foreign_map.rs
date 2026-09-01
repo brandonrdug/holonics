@@ -47,7 +47,7 @@
 //! frame**: it says which byte occurrence was read, so a later reader can tell that the frame moved.
 //! It is not an identity and nothing is keyed by it.
 
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 
@@ -55,11 +55,11 @@ use num_bigint::BigUint;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
-use crate::exact_value::ExactValueError;
 use crate::exact_value::ieee754::{
-    BinaryFloatDatum, BinaryFloatSpecies, decode_bfloat16_bits, decode_binary32_bits,
-    decode_binary64_bits,
+    decode_bfloat16_bits, decode_binary32_bits, decode_binary64_bits, BinaryFloatDatum,
+    BinaryFloatSpecies,
 };
+use crate::exact_value::ExactValueError;
 
 /// What a foreign container declares an element to be.
 ///
@@ -72,6 +72,19 @@ pub enum ForeignDtype {
     F16,
     F32,
     F64,
+    F8E4M3,
+    F8E4M3Fnuz,
+    F8E5M2,
+    F8E5M2Fnuz,
+    F8E8M0,
+    F6E2M3,
+    F6E3M2,
+    F4,
+    C64,
+    I4,
+    U4,
+    I2,
+    U2,
     I8,
     I16,
     I32,
@@ -91,6 +104,19 @@ impl ForeignDtype {
             "F16" => Self::F16,
             "F32" => Self::F32,
             "F64" => Self::F64,
+            "F8_E4M3" | "F8E4M3" => Self::F8E4M3,
+            "F8_E4M3FNUZ" | "F8E4M3FNUZ" => Self::F8E4M3Fnuz,
+            "F8_E5M2" | "F8E5M2" => Self::F8E5M2,
+            "F8_E5M2FNUZ" | "F8E5M2FNUZ" => Self::F8E5M2Fnuz,
+            "F8_E8M0" | "F8E8M0" => Self::F8E8M0,
+            "F6_E2M3" | "F6E2M3" => Self::F6E2M3,
+            "F6_E3M2" | "F6E3M2" => Self::F6E3M2,
+            "F4" | "F4_E2M1" | "F4E2M1" => Self::F4,
+            "C64" => Self::C64,
+            "I4" => Self::I4,
+            "U4" => Self::U4,
+            "I2" => Self::I2,
+            "U2" => Self::U2,
             "I8" => Self::I8,
             "I16" => Self::I16,
             "I32" => Self::I32,
@@ -110,6 +136,19 @@ impl ForeignDtype {
             Self::F16 => "F16",
             Self::F32 => "F32",
             Self::F64 => "F64",
+            Self::F8E4M3 => "F8_E4M3",
+            Self::F8E4M3Fnuz => "F8_E4M3FNUZ",
+            Self::F8E5M2 => "F8_E5M2",
+            Self::F8E5M2Fnuz => "F8_E5M2FNUZ",
+            Self::F8E8M0 => "F8_E8M0",
+            Self::F6E2M3 => "F6_E2M3",
+            Self::F6E3M2 => "F6_E3M2",
+            Self::F4 => "F4",
+            Self::C64 => "C64",
+            Self::I4 => "I4",
+            Self::U4 => "U4",
+            Self::I2 => "I2",
+            Self::U2 => "U2",
             Self::I8 => "I8",
             Self::I16 => "I16",
             Self::I32 => "I32",
@@ -123,15 +162,32 @@ impl ForeignDtype {
         }
     }
 
-    /// Octets one element occupies, or `None` where the width is not known to this mouth.
-    pub fn octets(&self) -> Option<u64> {
+    /// Bits one element occupies, including packed sub-octet formats.
+    pub fn bits(&self) -> Option<u64> {
         Some(match self {
-            Self::Bool | Self::I8 | Self::U8 => 1,
-            Self::Bf16 | Self::F16 | Self::I16 | Self::U16 => 2,
-            Self::F32 | Self::I32 | Self::U32 => 4,
-            Self::F64 | Self::I64 | Self::U64 => 8,
+            Self::I2 | Self::U2 => 2,
+            Self::F4 | Self::I4 | Self::U4 => 4,
+            Self::F6E2M3 | Self::F6E3M2 => 6,
+            Self::Bool
+            | Self::I8
+            | Self::U8
+            | Self::F8E4M3
+            | Self::F8E4M3Fnuz
+            | Self::F8E5M2
+            | Self::F8E5M2Fnuz
+            | Self::F8E8M0 => 8,
+            Self::Bf16 | Self::F16 | Self::I16 | Self::U16 => 16,
+            Self::F32 | Self::I32 | Self::U32 => 32,
+            Self::F64 | Self::C64 | Self::I64 | Self::U64 => 64,
             Self::Other(_) => return None,
         })
+    }
+
+    /// Whole octets per element, absent when elements are bit-packed.
+    pub fn octets(&self) -> Option<u64> {
+        self.bits()
+            .filter(|bits| bits % 8 == 0)
+            .map(|bits| bits / 8)
     }
 
     /// Whether this mouth can turn one stored codeword into an exact value with no remainder.
@@ -188,10 +244,14 @@ impl ForeignTensor {
 
     /// Whether the declared byte extent equals `elements x element width`.
     pub fn extent_agrees(&self) -> Option<bool> {
-        self.dtype
-            .octets()
-            .and_then(|width| self.elements()?.checked_mul(width))
+        self.implied_octets()
             .map(|implied| implied == self.declared_octets())
+    }
+
+    /// Packed byte extent implied by element population and declared bit width.
+    pub fn implied_octets(&self) -> Option<u64> {
+        let bits = self.elements()?.checked_mul(self.dtype.bits()?)?;
+        bits.checked_add(7)?.checked_div(8)
     }
 }
 
@@ -223,163 +283,9 @@ pub enum ManifestRefusal {
     MalformedRow { missing: String },
 }
 
-/// How far the source mouth itself carried one declared population.
-///
-/// This is deliberately separate from [`TransportClass`]. Decoding a stored codeword does not
-/// recover a transport, and manifesting a matrix does not make it a potential pathway.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-pub enum AdmissionClass {
-    /// The container declared the population and the mouth has not decoded it.
-    ManifestedOnly,
-    /// Decoded at its own codeword grain with no remainder. This is source admission, not a lift.
-    DecodedExact,
-    /// Decoded into a certified enclosure carrying its remainder.
-    DecodedBounded,
-    /// The mouth refused it by name.
-    UnreadRefused,
-}
-
-impl AdmissionClass {
-    pub fn name(self) -> &'static str {
-        match self {
-            Self::ManifestedOnly => "manifested only",
-            Self::DecodedExact => "decoded exactly",
-            Self::DecodedBounded => "decoded boundedly",
-            Self::UnreadRefused => "unread/refused",
-        }
-    }
-}
-
-/// How far an admitted population has participated in a recovered transport.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
-pub enum TransportClass {
-    /// No typed predecessor, successor, constitutive law, or receiver has yet been posed.
-    Unposed,
-    /// A transport candidate exists and no caused material has crossed it.
-    PotentialOnly,
-    /// Caused material crossed it and current, successor and residual returned.
-    StimulatedActively,
-    /// Reachable, and the declared material never excited it.
-    Unexcited,
-}
-
-impl TransportClass {
-    pub fn name(self) -> &'static str {
-        match self {
-            Self::Unposed => "unposed",
-            Self::PotentialOnly => "potential-only",
-            Self::StimulatedActively => "stimulated actively",
-            Self::Unexcited => "unexcited",
-        }
-    }
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct CoverageState {
-    pub admission: AdmissionClass,
-    pub transport: TransportClass,
-}
-
-/// The coverage ledger, on three axes because two of them disagree.
-#[derive(Clone, Debug, Default, Serialize, Deserialize)]
-pub struct CoverageLedger {
-    state: BTreeMap<String, CoverageState>,
-    load_bearing: BTreeSet<String>,
-}
-
-impl CoverageLedger {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    pub fn manifest(
-        &mut self,
-        name: impl Into<String>,
-        admission: AdmissionClass,
-    ) -> Option<CoverageState> {
-        self.state.insert(
-            name.into(),
-            CoverageState {
-                admission,
-                transport: TransportClass::Unposed,
-            },
-        )
-    }
-
-    /// Move only the mouth/admission axis and return its prior class.
-    pub fn place_admission(
-        &mut self,
-        name: &str,
-        admission: AdmissionClass,
-    ) -> Option<AdmissionClass> {
-        let state = self.state.get_mut(name)?;
-        Some(std::mem::replace(&mut state.admission, admission))
-    }
-
-    /// Move only the transport/excitation axis and return its prior class.
-    pub fn place_transport(
-        &mut self,
-        name: &str,
-        transport: TransportClass,
-    ) -> Option<TransportClass> {
-        let state = self.state.get_mut(name)?;
-        Some(std::mem::replace(&mut state.transport, transport))
-    }
-
-    /// Declare that the transport cannot be enacted without this population.
-    ///
-    /// This is the axis neither a rank census nor a byte census carries. A `1,856`-octet population
-    /// of clip bounds and a `5.64` GB table are the same size on this axis if the pathway needs
-    /// both.
-    pub fn declare_load_bearing(&mut self, name: &str) -> bool {
-        self.state.contains_key(name) && self.load_bearing.insert(name.to_owned())
-    }
-
-    pub fn state_of(&self, name: &str) -> Option<CoverageState> {
-        self.state.get(name).copied()
-    }
-
-    pub fn is_load_bearing(&self, name: &str) -> bool {
-        self.load_bearing.contains(name)
-    }
-
-    pub fn admission_census(&self) -> BTreeMap<AdmissionClass, usize> {
-        let mut census = BTreeMap::new();
-        for state in self.state.values() {
-            *census.entry(state.admission).or_insert(0) += 1;
-        }
-        census
-    }
-
-    pub fn transport_census(&self) -> BTreeMap<TransportClass, usize> {
-        let mut census = BTreeMap::new();
-        for state in self.state.values() {
-            *census.entry(state.transport).or_insert(0) += 1;
-        }
-        census
-    }
-
-    /// Load-bearing populations that are not yet actively stimulated, by name.
-    ///
-    /// **This is the station's own falsifier and it returns a list rather than a count.** A pathway
-    /// claiming to have executed while this is non-empty has not executed.
-    pub fn load_bearing_not_stimulated(&self) -> Vec<&str> {
-        self.load_bearing
-            .iter()
-            .filter(|name| {
-                !matches!(
-                    self.state.get(name.as_str()).map(|state| state.transport),
-                    Some(TransportClass::StimulatedActively)
-                )
-            })
-            .map(String::as_str)
-            .collect()
-    }
-
-    pub fn declared(&self) -> usize {
-        self.state.len()
-    }
-}
+#[path = "foreign_map/coverage.rs"]
+mod coverage;
+pub use coverage::*;
 
 /// The class of one `bfloat16` codeword, read through the one float mouth once per distinct word.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -744,7 +650,7 @@ pub fn manifest_safetensors(address: &str) -> Result<(File, ForeignContainer), F
             start: offsets[0],
             end: offsets[1],
         };
-        let Some(width) = dtype.octets() else {
+        if dtype.bits().is_none() {
             refused.push((
                 name,
                 ManifestRefusal::WidthUnknown {
@@ -752,7 +658,7 @@ pub fn manifest_safetensors(address: &str) -> Result<(File, ForeignContainer), F
                 },
             ));
             continue;
-        };
+        }
         if tensor.end < tensor.start {
             refused.push((
                 name,
@@ -762,10 +668,7 @@ pub fn manifest_safetensors(address: &str) -> Result<(File, ForeignContainer), F
             ));
             continue;
         }
-        let Some(implied) = tensor
-            .elements()
-            .and_then(|elements| elements.checked_mul(width))
-        else {
+        let Some(implied) = tensor.implied_octets() else {
             refused.push((name, ManifestRefusal::ElementExtentOverflow));
             continue;
         };
@@ -1651,5 +1554,38 @@ mod tests {
         };
         assert_eq!(tensor.elements(), None);
         assert_eq!(tensor.extent_agrees(), None);
+    }
+
+    #[test]
+    fn packed_fp8_and_fp4_regions_manifest_without_becoming_native_roles() {
+        let path = scratch("packed_low_precision");
+        let payload = [1u8, 2, 3, 4, 0x21, 0x03];
+        write_container(
+            &path,
+            r#"{"dense.weight":{"dtype":"F8_E4M3","shape":[4],"data_offsets":[0,4]},"expert.weight":{"dtype":"F4","shape":[3],"data_offsets":[4,6]}}"#,
+            &payload,
+        );
+        let (mut file, container) =
+            manifest_safetensors(path.to_str().expect("path")).expect("manifest");
+        assert!(container.refused.is_empty());
+        let dense = container.tensor("dense.weight").expect("dense");
+        assert_eq!(dense.dtype, ForeignDtype::F8E4M3);
+        assert_eq!(dense.dtype.bits(), Some(8));
+        assert_eq!(dense.implied_octets(), Some(4));
+        assert_eq!(
+            container
+                .read_elements(&mut file, "dense.weight", 0, 4)
+                .expect("byte aligned"),
+            payload[..4]
+        );
+        let expert = container.tensor("expert.weight").expect("expert");
+        assert_eq!(expert.dtype, ForeignDtype::F4);
+        assert_eq!(expert.dtype.bits(), Some(4));
+        assert_eq!(expert.implied_octets(), Some(2));
+        assert!(matches!(
+            container.read_elements(&mut file, "expert.weight", 0, 1),
+            Err(ForeignMapError::DtypeRefused { .. })
+        ));
+        let _ = std::fs::remove_file(path);
     }
 }

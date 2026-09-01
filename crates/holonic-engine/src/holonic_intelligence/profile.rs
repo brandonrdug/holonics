@@ -10,9 +10,9 @@ use crate::receiver_history_compression::{NativeStateId, ReceiverFactor};
 use crate::{BoundaryId, EventId};
 
 use super::{
-    CarrierRank, CycleRank, DimensionFace, DimensionObstruction, ExteriorDegree, GeneratorExtent,
-    IncidenceNullity, IncidenceRank, IntrinsicHolonDimensions, ReceiverExtent,
-    ReconstructionExtent, RepresentationRank, TopologicalDegree,
+    CarrierRank, CycleRank, DimensionFace, DimensionObstruction, DismantlingBoundaryReturn,
+    ExteriorDegree, GeneratorExtent, IncidenceNullity, IncidenceRank, IntrinsicHolonDimensions,
+    ReceiverExtent, ReconstructionExtent, RepresentationRank, TopologicalDegree,
 };
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -98,6 +98,28 @@ pub struct NativeEcologyProfile<'a> {
     pub holons: Vec<IntrinsicNativeHolonProfile<'a>>,
     pub compositions: &'a [NativeSpoolComposition],
     pub open_obligations: Vec<OpenObligation<'a>>,
+}
+
+/// One dismantling return with its productive native holons profiled in place.
+#[derive(Debug)]
+pub struct ProfiledDismantlingReturn<'a, Return>
+where
+    Return: DismantlingBoundaryReturn<Productive = NativeSpoolBundle>,
+{
+    pub returned: &'a Return,
+    pub productive_profile: NativeEcologyProfile<'a>,
+}
+
+pub fn profile_dismantling_return<Return>(
+    returned: &Return,
+) -> Result<ProfiledDismantlingReturn<'_, Return>, NativeSpoolRefusal>
+where
+    Return: DismantlingBoundaryReturn<Productive = NativeSpoolBundle>,
+{
+    Ok(ProfiledDismantlingReturn {
+        productive_profile: returned.productive().intrinsic_holon_profile()?,
+        returned,
+    })
 }
 
 impl NativeSpoolBundle {

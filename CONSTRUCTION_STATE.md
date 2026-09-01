@@ -10,14 +10,13 @@ grades.
 
 ## Current frontier
 
-**Current frontier:** HIF2
+**Current frontier:** HIF3
 
-**HIF2 — EXACT FOREIGN CHARTS AND PROFILED DISMANTLING RETURN — IS THE SOLE NEXT DEED.**
+**HIF3 — PACKAGED HOLONIC INFERENCE AND GENERATION — IS THE SOLE NEXT DEED.**
 
-[definition] Consolidate Safetensors manifestation, shard-index/config intake, exact dtype/shape
-conversion, and ONNX model graph intake behind lossless exterior charts. Compose them with actual
-excitation/intervention testimony and return profiled native holons through the one-way dismantling
-boundary.
+[definition] Compose mount, active continuation, transport/diffusion, contact/glue, receiver
+condensation, emission, exterior return aperture, and later-current continuation through one
+move-owned circulation. Provide narrow codec adapters only at the boundary.
 
 ## Admitted standing
 
@@ -43,6 +42,13 @@ typed open faces, borrowed intrinsic native profiles, neutral lifecycle traits, 
 controls and resident CUDA equality passed; the engine suite returned 1,984 passed, zero failed, 32
 ignored, dependent `life` type-checked, and source-shape remained green.
 
+[established-bounded; implemented-exact; source-inspected; measured] HIF2 returned lossless
+configuration, shard-index, and ONNX exterior charts; packed FP4/FP6/FP8/sub-byte manifestation;
+exact dyadic codewords with witnessed residual or open preimage; and productive-lane-only
+dismantling profiles. The supplied GLM, DeepSeek, and Qwen resources parsed through one surface.
+The engine suite returned 1,998 passed, zero failed, 32 ignored; dependent targets passed and the
+foreign-map coverage owner was split without a baseline increase.
+
 [established-bounded; implemented-exact; measured] R0Q0--R0Q4 retain addressed response/source/
 target pair current, ordinary off-diagonal transport, resident dependent complex contraction before
 the positive receiver, full-complex continuation equality, complete reconstruction fibres, and
@@ -66,10 +72,11 @@ cold exterior witness, and insufficiency, but the productive holons have no firs
 profile gathering their non-conflated boundary, incidence, carrier, transport, constitution,
 chronology, receiver, morphology, reconstruction, and open dimensions.
 
-[counterexample; source-inspected] Safetensors manifestation, secondary BF16 intake, hand-written
-container emission, vendor configuration/shard indexes, and foreign operation graphs have no one
-lossless exterior chart. ONNX intake is absent, tensor path names could be mistaken for intrinsic
-roles, and the productive dismantling return does not yet carry its derived intrinsic profile.
+[counterexample; source-inspected] Holonic generation remains distributed across recurrent native
+rests, inference membranes, source-neutral radiation, suffix/morphological ecologies, generated
+surface materialization, and world-return owners. No one neutral move-owned return proves that
+mount, conduct, receiver condensation, emission, and re-entry are the same circulation without
+codec routing or authored response extent.
 
 [definition] `UNIVERSAL_CATALOG.md` remains the sole descriptive Lean--Rust--CUDA owner crosswalk.
 It schedules and grades nothing. Historical ledgers, checksum manifests, output chains, UAR
@@ -90,7 +97,7 @@ drivers, and records remain evidence only.
 
 ## Validation boundary
 
-[definition] Every nontrivial process retains the 180-second outer boundary. HIF2 advances only
-after representative dense, sparse/MoE, hybrid-contact, quantized, and ONNX controls retain complete
-exterior reconstruction while source names cannot change native profile or conduct; the productive
-hot closure has no foreign executor or source topology.
+[definition] Every nontrivial process retains the 180-second outer boundary. HIF3 advances only
+after one generic return covers text and at least one non-text codec without codec routing; plural
+futures, obstruction, complete fibres, and emitted lineage survive; no authored response length,
+lexical candidate selector, KV-cache owner, or CPU semantic choreography appears.

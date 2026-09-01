@@ -19,6 +19,7 @@ REQUIRED = [
     "research/records/2026-08-31_HOLONIC_INTELLIGENCE_REQUIRES_INTRINSIC_PROFILES_AND_NEUTRAL_LIFECYCLE_INTERFACES.md",
     "research/records/2026-08-31_HIF0_INTRINSIC_HOLON_PROFILES_AND_NEUTRAL_LIFECYCLE_CONTRACTS_RETURNED.md",
     "research/records/2026-08-31_HIF1_GENERIC_RUST_PROFILE_AND_RESTED_TRANSPORT_SURFACE_RETURNED.md",
+    "research/records/2026-08-31_HIF2_EXACT_FOREIGN_CHARTS_LOW_PRECISION_WEIGHTS_AND_PROFILED_DISMANTLING_RETURNED.md",
     "crates/holonic-engine/src/addressed_current.rs",
     "crates/holonic-engine/src/factored_moment.rs",
     "soma/life/src/athena_native/source_neutral_relational.rs",
@@ -33,6 +34,11 @@ REQUIRED = [
     "crates/holonic-engine/src/holonic_intelligence/lifecycle.rs",
     "crates/holonic-engine/src/holonic_intelligence/profile.rs",
     "crates/holonic-engine/src/holonic_intelligence/rested.rs",
+    "crates/holonic-engine/src/holonic_intelligence/foreign_json.rs",
+    "crates/holonic-engine/src/holonic_intelligence/foreign_onnx.rs",
+    "crates/holonic-engine/src/holonic_intelligence/weight.rs",
+    "crates/holonic-engine/src/foreign_map/coverage.rs",
+    "crates/holonic-engine/examples/inspect_foreign_model_charts_hif2.rs",
     "soma/formal/elementary-holonics/ElementaryHolonics/Computation/HolonicOrientedSiteTransport.lean",
 ]
 

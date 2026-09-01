@@ -1,8 +1,9 @@
 use super::*;
 use crate::{
     native_ecology::holonic_intelligence::{
-        CarrierRank, CycleRank, DimensionFace, DimensionObstruction, IncidenceNullity,
-        IncidenceRank, NativeTransportRequest, RestedTransportEcology,
+        profile_dismantling_return, CarrierRank, CycleRank, DimensionFace, DimensionObstruction,
+        DismantlingBoundaryReturn, ForeignConfigurationChart, IncidenceNullity, IncidenceRank,
+        NativeTransportRequest, RestedTransportEcology,
     },
     BoundaryId, ExactUnitConicPhase, OccurrencePort,
 };
@@ -828,4 +829,75 @@ fn neutral_rested_surface_conducts_the_existing_resident_word() {
         .expect("direct conduct");
     assert_eq!(neutral, direct);
     assert!(!neutral.apparatus.invariant_transport_reuploaded);
+}
+
+#[test]
+fn exterior_configuration_names_cannot_move_the_intrinsic_native_profile() {
+    let bundle = bundle();
+    let before = bundle
+        .intrinsic_holon_profile()
+        .expect("profile before exterior chart");
+    let left = ForeignConfigurationChart::read(
+        "left/config.json",
+        br#"{"layer_types":["linear","full"],"n_routed_experts":288,"fmt":"e4m3"}"#.to_vec(),
+    )
+    .expect("left chart");
+    let right = ForeignConfigurationChart::read(
+        "right/config.json",
+        br#"{"transport_kinds":["local","global"],"branch_population":288,"grain":"e4m3"}"#
+            .to_vec(),
+    )
+    .expect("right chart");
+    assert_ne!(left, right);
+    let after = bundle
+        .intrinsic_holon_profile()
+        .expect("profile after exterior chart");
+    assert_eq!(before, after);
+}
+
+struct FixtureDismantlingReturn {
+    productive: NativeSpoolBundle,
+    cold: String,
+    insufficiency: String,
+}
+
+impl DismantlingBoundaryReturn for FixtureDismantlingReturn {
+    type Productive = NativeSpoolBundle;
+    type ColdWitness = String;
+    type Insufficiency = String;
+
+    fn productive(&self) -> &Self::Productive {
+        &self.productive
+    }
+
+    fn cold_witness(&self) -> &Self::ColdWitness {
+        &self.cold
+    }
+
+    fn insufficiency(&self) -> &Self::Insufficiency {
+        &self.insufficiency
+    }
+}
+
+#[test]
+fn dismantling_profile_borrows_only_the_productive_native_lane() {
+    let returned = FixtureDismantlingReturn {
+        productive: bundle(),
+        cold: "foreign architecture testimony".to_owned(),
+        insufficiency: "unexcited receiver family".to_owned(),
+    };
+    let profiled = profile_dismantling_return(&returned).expect("profiled return");
+    assert_eq!(profiled.productive_profile.holons.len(), 2);
+    assert_eq!(
+        profiled.returned.cold_witness().as_str(),
+        returned.cold.as_str()
+    );
+    assert_eq!(
+        profiled.returned.insufficiency().as_str(),
+        returned.insufficiency.as_str()
+    );
+    assert!(std::ptr::eq(
+        profiled.productive_profile.holons[0].morphology,
+        &returned.productive.spools[0].threads[0]
+    ));
 }

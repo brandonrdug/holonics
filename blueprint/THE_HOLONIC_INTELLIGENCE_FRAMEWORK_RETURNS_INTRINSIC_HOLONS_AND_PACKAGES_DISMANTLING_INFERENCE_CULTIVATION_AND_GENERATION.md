@@ -4,7 +4,7 @@
 **Date:** 2026-08-31
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** HIF2.
+**Current frontier:** HIF3.
 **Supersession:** this contract supersedes the unresolved scheduling authority of UAR/R0Q. Exact
 completed UAR/R0Q mechanisms retain their scoped grades as evidence and implementation standing;
 their unfinished intentions are obligations below, not a second campaign.
@@ -256,7 +256,7 @@ structurally equal. The engine suite returned 1,984 passed, zero failed, 32 igno
 type-checked and source-shape remained green. The exact return is recorded in
 [`../research/records/2026-08-31_HIF1_GENERIC_RUST_PROFILE_AND_RESTED_TRANSPORT_SURFACE_RETURNED.md`](../research/records/2026-08-31_HIF1_GENERIC_RUST_PROFILE_AND_RESTED_TRANSPORT_SURFACE_RETURNED.md).
 
-### HIF2 — exact foreign charts and profiled Soulkiller return — CURRENT
+### HIF2 — exact foreign charts and profiled Soulkiller return — PASSED
 
 [definition] Consolidate Safetensors manifestation, shard-index/config intake, exact dtype/shape
 conversion, and ONNX model graph intake behind lossless exterior charts. Compose them with actual
@@ -266,7 +266,15 @@ excitation/intervention testimony and return profiled native holons through Soul
 retain complete exterior reconstruction while source names cannot change native profile or conduct;
 the productive hot closure has no foreign executor or source topology.
 
-### HIF3 — packaged Holonic Inference and generation
+[established-bounded; implemented-exact; source-inspected; measured] HIF2 returned lossless vendor
+configuration, shard-index, and ONNX charts; exact packed FP4/FP6/FP8/sub-byte intake; explicit
+nonfinite and open quantization-preimage faces; and productive-lane-only dismantling profiles. The
+live GLM, DeepSeek, and Qwen resources parsed through one implementation. The engine suite returned
+1,998 passed, zero failed, 32 ignored; dependent targets and source-shape passed. The exact return is
+recorded in
+[`../research/records/2026-08-31_HIF2_EXACT_FOREIGN_CHARTS_LOW_PRECISION_WEIGHTS_AND_PROFILED_DISMANTLING_RETURNED.md`](../research/records/2026-08-31_HIF2_EXACT_FOREIGN_CHARTS_LOW_PRECISION_WEIGHTS_AND_PROFILED_DISMANTLING_RETURNED.md).
+
+### HIF3 — packaged Holonic Inference and generation — CURRENT
 
 [definition] Compose mount, active continuation, transport/diffusion, contact/glue, receiver
 condensation, emission, exterior return aperture, and later-current continuation through one
