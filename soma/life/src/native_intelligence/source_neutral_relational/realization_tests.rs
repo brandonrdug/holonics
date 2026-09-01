@@ -56,7 +56,6 @@ fn bounded_transport_fixture() -> (
         ],
         factor_population: 1,
         face_root_states: vec![0, 1],
-        presentation_roots: vec![(0, 0), (1, 1)],
         realization_state_population: 5,
         transitions: vec![
             SourceNeutralExteriorRealizationTransition {
@@ -162,7 +161,6 @@ fn ordinary_port_law_retains_diagonal_and_off_diagonal_pair_fibres() {
         factor: 0,
         current: ExactComplexWaveCurrent::one(),
         pair_currents: vec![response.clone()],
-        ingress_face_currents: Vec::new(),
     }];
     assert_eq!(oriented[0].pair_currents, vec![response]);
     let realized = contributions

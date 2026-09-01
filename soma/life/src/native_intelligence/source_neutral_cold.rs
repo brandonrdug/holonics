@@ -307,23 +307,6 @@ pub(super) fn read_developmental_predecessor(
     Ok((morphology, realization, refinement_order))
 }
 
-pub(super) fn source_neutralize_native_relational(
-    potential: &super::native_relational_potential::NativeRelationalPotentialComplex,
-    codec: &super::native_relational_potential::NativeRelationalCodec,
-) -> Result<
-    (
-        SourceNeutralRelationalMorphology,
-        SourceNeutralExteriorRealizationMorphology,
-        u64,
-    ),
-    SourceNeutralRelationalError,
-> {
-    read_developmental_predecessor(
-        serde_json::to_value(potential).map_err(|_| SourceNeutralRelationalError::Developmental)?,
-        serde_json::to_value(codec).map_err(|_| SourceNeutralRelationalError::Developmental)?,
-    )
-}
-
 fn found_realization(
     codec: ColdCodec,
     faces: &[ColdFace],
@@ -349,9 +332,8 @@ fn found_realization(
         .collect::<Result<Vec<_>, _>>()?;
     let mut realization_state_population =
         u32::try_from(face_root_states.len()).map_err(|_| SourceNeutralRelationalError::Extent)?;
+    let mut path_edges = HashMap::<(u32, u32, u16, u16), Option<u32>>::new();
     let mut transition_population = HashMap::<(u32, u32, u16, u16, Option<u32>), u64>::new();
-    let mut presentation_roots = Vec::<(u32, u32)>::new();
-    let mut first_presentation = BTreeSet::<u32>::new();
     let mut developmental_transition_population = 0_u64;
     for face in codec.faces {
         let site = *face_classes
@@ -364,85 +346,58 @@ fn found_realization(
         if invalid_support(support, factor_population) {
             return Err(SourceNeutralRelationalError::Developmental);
         }
-        if face.surface_variants.is_empty()
-            || face
-                .surface_variants
-                .iter()
-                .any(|variant| variant.is_empty() || variant.iter().any(String::is_empty))
-        {
-            return Err(SourceNeutralRelationalError::Developmental);
-        }
-        let variant = face
-            .surface_variants
-            .into_iter()
-            .min_by(|left, right| {
-                let extent = |variant: &Vec<String>| {
-                    variant
-                        .iter()
-                        .map(String::len)
-                        .sum::<usize>()
-                        .saturating_add(variant.len().saturating_sub(1))
-                };
-                extent(left)
-                    .cmp(&extent(right))
-                    .then_with(|| left.cmp(right))
-            })
-            .ok_or(SourceNeutralRelationalError::Developmental)?;
-        let mut surface = Vec::new();
-        for (at, part) in variant.iter().enumerate() {
-            if at != 0 {
-                surface.push(b' ');
+        for variant in face.surface_variants {
+            if variant.is_empty() || variant.iter().any(String::is_empty) {
+                return Err(SourceNeutralRelationalError::Developmental);
             }
-            surface.extend_from_slice(part.as_bytes());
-        }
-        if surface.is_empty() {
-            return Err(SourceNeutralRelationalError::Developmental);
-        }
-        let mut ports = Vec::with_capacity(surface.len().saturating_add(2));
-        ports.push(0_u16);
-        ports.extend(surface.into_iter().map(|octet| u16::from(octet) + 1));
-        ports.push(257_u16);
-        let mut state = if first_presentation.insert(site) {
-            *face_root_states
+            let mut surface = Vec::new();
+            for (at, part) in variant.iter().enumerate() {
+                if at != 0 {
+                    surface.push(b' ');
+                }
+                surface.extend_from_slice(part.as_bytes());
+            }
+            if surface.is_empty() {
+                return Err(SourceNeutralRelationalError::Developmental);
+            }
+            let mut ports = Vec::with_capacity(surface.len().saturating_add(2));
+            ports.push(0_u16);
+            ports.extend(surface.into_iter().map(|octet| u16::from(octet) + 1));
+            ports.push(257_u16);
+            let mut state = *face_root_states
                 .get(site as usize)
-                .ok_or(SourceNeutralRelationalError::Developmental)?
-        } else {
-            let root = realization_state_population;
-            realization_state_population = realization_state_population
-                .checked_add(1)
-                .ok_or(SourceNeutralRelationalError::Extent)?;
-            root
-        };
-        presentation_roots.push((site, state));
-        for pair in ports.windows(2) {
-            developmental_transition_population = developmental_transition_population
-                .checked_add(1)
-                .ok_or(SourceNeutralRelationalError::Extent)?;
-            let target_state = if pair[1] == 257 {
-                None
-            } else {
-                let target = realization_state_population;
-                realization_state_population = realization_state_population
+                .ok_or(SourceNeutralRelationalError::Developmental)?;
+            for pair in ports.windows(2) {
+                developmental_transition_population = developmental_transition_population
                     .checked_add(1)
                     .ok_or(SourceNeutralRelationalError::Extent)?;
-                Some(target)
-            };
-            let entry = transition_population
-                .entry((site, state, pair[0], pair[1], target_state))
-                .or_default();
-            *entry = entry
-                .checked_add(1)
-                .ok_or(SourceNeutralRelationalError::Extent)?;
-            if let Some(target) = target_state {
-                state = target;
+                let edge = (site, state, pair[0], pair[1]);
+                let target_state = if pair[1] == 257 {
+                    None
+                } else if let Some(target) = path_edges.get(&edge).copied() {
+                    target
+                } else {
+                    let target = realization_state_population;
+                    realization_state_population = realization_state_population
+                        .checked_add(1)
+                        .ok_or(SourceNeutralRelationalError::Extent)?;
+                    path_edges.insert(edge, Some(target));
+                    Some(target)
+                };
+                path_edges.entry(edge).or_insert(target_state);
+                let entry = transition_population
+                    .entry((site, state, pair[0], pair[1], target_state))
+                    .or_default();
+                *entry = entry
+                    .checked_add(1)
+                    .ok_or(SourceNeutralRelationalError::Extent)?;
+                if let Some(target) = target_state {
+                    state = target;
+                }
             }
         }
     }
     if developmental_transition_population == 0 || transition_population.is_empty() {
-        return Err(SourceNeutralRelationalError::Developmental);
-    }
-    presentation_roots.sort_unstable();
-    if presentation_roots.windows(2).any(|pair| pair[0] >= pair[1]) {
         return Err(SourceNeutralRelationalError::Developmental);
     }
     let mut transitions = transition_population
@@ -479,7 +434,6 @@ fn found_realization(
         sites,
         factor_population,
         face_root_states,
-        presentation_roots,
         realization_state_population,
         transitions,
         developmental_transition_population,

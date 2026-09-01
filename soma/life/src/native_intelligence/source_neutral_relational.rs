@@ -28,16 +28,14 @@ use thiserror::Error;
 mod morphology;
 mod pair_current;
 mod realization;
-mod realization_contact;
 pub use pair_current::{
     SourceNeutralAddressedResponsePairCurrent,
-    SourceNeutralExteriorRealizationOrientedFactorCurrent, SourceNeutralIngressFaceFactorCurrent,
+    SourceNeutralExteriorRealizationOrientedFactorCurrent,
 };
-use realization_contact::PhaseFaceContactCurrent;
 pub const SOURCE_NEUTRAL_RELATIONAL_MORPHOLOGY_SCHEMA: &str =
     "soma-life.source-neutral-relational-morphology.v1";
 pub const SOURCE_NEUTRAL_EXTERIOR_REALIZATION_MORPHOLOGY_SCHEMA: &str =
-    "soma-life.source-neutral-exterior-realization-morphology.v7";
+    "soma-life.source-neutral-exterior-realization-morphology.v4";
 pub const SOURCE_NEUTRAL_EXTERIOR_REALIZATION_PASSAGE_SCHEMA: &str =
     "soma-life.source-neutral-exterior-realization-passage.v10";
 
@@ -256,9 +254,6 @@ pub struct SourceNeutralExteriorRealizationMorphology {
     pub(super) sites: Vec<SourceNeutralExteriorRealizationSite>,
     pub(super) factor_population: u32,
     pub(super) face_root_states: Vec<u32>,
-    /// Exterior presentation roots over anonymous native faces. Several roots may render one
-    /// face; they remain reconstruction fibre and never split native face equality.
-    pub(super) presentation_roots: Vec<(u32, u32)>,
     pub(super) realization_state_population: u32,
     pub(super) transitions: Vec<SourceNeutralExteriorRealizationTransition>,
     pub(super) developmental_transition_population: u64,

@@ -255,12 +255,12 @@ controls through the neutral package. Release only after direct qualitative insp
 surfaces and richer receivers reopen every unlawful condensation.
 
 [counterexample; implemented-exact; source-inspected; measured] Exact contact comparison,
-factorized resident and sensory return, and proposal-relative cross-occurrence cultivation now
-return through one source-detached rest. Query sections retain ingress/response lineage and cross
-only response-bearing factors. Direct inspection still rejects both participant and technical
-surfaces: the current relational clause morphology returns causally valid but qualitatively
-irrelevant consequence. The shortest obstruction and firing boundary are recorded in
-[`research/records/2026-09-01_HIF7_PROPOSAL_RELATIVE_RECULTIVATION_RETURNED_EXACT_CONTACT_BUT_QUALITATIVE_SURFACES_REMAINED_UNFOUNDED.md`](../research/records/2026-09-01_HIF7_PROPOSAL_RELATIVE_RECULTIVATION_RETURNED_EXACT_CONTACT_BUT_QUALITATIVE_SURFACES_REMAINED_UNFOUNDED.md).
+factorized resident return, silence/radiation, acoustic and optical return, physical boundary-port
+descent, source-detached controls, and realization path state now return. Direct inspection rejects
+the qualitative surface. The source-neutral rest lacks a cultivated cross-occurrence transport from
+prompt factor/history current through the addressed continuation families into reusable response
+morphology. The shortest obstruction and forbidden lookup fallback are recorded in
+[`research/records/2026-09-01_HIF7_RETURNED_EXACT_RESIDENT_RADIATION_AND_PATH_STATE_BUT_QUALITATIVE_INFERENCE_REMAINS_AN_UNCULTIVATED_CROSS_OCCURRENCE.md`](../research/records/2026-09-01_HIF7_RETURNED_EXACT_RESIDENT_RADIATION_AND_PATH_STATE_BUT_QUALITATIVE_INFERENCE_REMAINS_AN_UNCULTIVATED_CROSS_OCCURRENCE.md).
 
 [proved-derived; formal-checked; measured] HIF0 passed. The four-file neutral formal closure built
 3,164 focused jobs and the live umbrella built 3,769 jobs without `sorryAx`. Its exact return is

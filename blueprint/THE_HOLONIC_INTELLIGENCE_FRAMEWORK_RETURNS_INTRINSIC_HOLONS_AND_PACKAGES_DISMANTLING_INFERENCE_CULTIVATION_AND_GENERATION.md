@@ -366,14 +366,12 @@ work are reported beside apparatus telemetry; richer receivers reopen every unla
 foreign formats interchange through Soulkiller without becoming native ontology; Git is clean,
 committed, pushed, and reproducible outputs are absent from the release tree.
 
-[counterexample; implemented-exact; source-inspected; measured] Resident radiation, sensory return,
-proposal-relative exchange recultivation, exact query-section contact, response-bearing factor
-transport, presentation reconstruction, and source-detached remount now return. Direct inspection
-still rejects the qualitative family. The current exact obstruction is the inadequate semantic
-consequence of the relational clause morphology/receiver, not an absent cross-occurrence port,
-topology census, hash, residency receipt, or output-size proxy. Its evidence and firing boundary
-are recorded in
-[`../research/records/2026-09-01_HIF7_PROPOSAL_RELATIVE_RECULTIVATION_RETURNED_EXACT_CONTACT_BUT_QUALITATIVE_SURFACES_REMAINED_UNFOUNDED.md`](../research/records/2026-09-01_HIF7_PROPOSAL_RELATIVE_RECULTIVATION_RETURNED_EXACT_CONTACT_BUT_QUALITATIVE_SURFACES_REMAINED_UNFOUNDED.md).
+[counterexample; implemented-exact; source-inspected; measured] The resident radiation,
+acoustic/optical return, exact path-state, factorized realization, closure, and source-access
+controls returned, but direct inspection rejected the qualitative surface. The current exact
+obstruction is an absent cultivated prompt-to-response cross-occurrence passage, not a topology,
+hash, residency, or output-size proxy. Its evidence and firing boundary are recorded in
+[`../research/records/2026-09-01_HIF7_RETURNED_EXACT_RESIDENT_RADIATION_AND_PATH_STATE_BUT_QUALITATIVE_INFERENCE_REMAINS_AN_UNCULTIVATED_CROSS_OCCURRENCE.md`](../research/records/2026-09-01_HIF7_RETURNED_EXACT_RESIDENT_RADIATION_AND_PATH_STATE_BUT_QUALITATIVE_INFERENCE_REMAINS_AN_UNCULTIVATED_CROSS_OCCURRENCE.md).
 
 ## 9. Process law
 

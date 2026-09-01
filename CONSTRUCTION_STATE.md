@@ -107,25 +107,21 @@ resident generated-port target, physical port quotient, two-order silence/radiat
 acoustic room return, optical return, source-detached remount, withdrawal, restoration, and
 generation-reentry controls return inside their process bounds.
 
-[counterexample; implemented-exact; source-inspected; measured] Proposal-relative
-cross-occurrence cultivation now returns. All 891 exchange families re-found one source-detached
-relational/realization organ over 888 factors; assistant thought/final returns are emanation, tools
-remain exterior, exact query-section lineage crosses ingress and response contact, and the resident
-physical off-diagonal current remains separate from the exterior presentation cursor. The rest
-remounted at `92810222d5eff55be2cfe80e3f0a1fd5040cc0959365cdf6aa953c5c786da91c`.
+[counterexample; source-inspected; measured] Exact path state prevents corrupted per-character
+recombination and returns coherent closed text, but the unchanged qualitative receiver returned
+`direct Lean and 3 990 job target` for the compression question and did not answer it. Distinct
+compression and Brandon ingress currents previously collapsed to one emitted-surface identity.
+The exact prompt-path receiver reports no matching productive path; consulting exterior source
+text would establish lookup rather than native inference.
 
-[counterexample; measured] Direct qualitative inspection still rejects the result. The unchanged
-compression question opened on an unrelated encoder fragment, while `Describe Brandon.` closed on
-a provenance/path clause rather than a description. A rejected standalone order-one response
-model collapsed all six questions to `Itint` and has been removed.
-
-[open; source-inspected] The shortest HIF7 obstruction is now the relational clause
-morphology/receiver itself: exact local query-section contact and response-bearing factor transport
-do not yet found an adequate semantic cross-occurrence consequence. HIF7 remains current until the
-unchanged qualitative family is accepted directly, held-out/revisit/rebase/control relations
-return, targeted withdrawal and exact restoration pass, and foreign interchange closes. The exact
-return is recorded in
-[`research/records/2026-09-01_HIF7_PROPOSAL_RELATIVE_RECULTIVATION_RETURNED_EXACT_CONTACT_BUT_QUALITATIVE_SURFACES_REMAINED_UNFOUNDED.md`](research/records/2026-09-01_HIF7_PROPOSAL_RELATIVE_RECULTIVATION_RETURNED_EXACT_CONTACT_BUT_QUALITATIVE_SURFACES_REMAINED_UNFOUNDED.md).
+[open; source-inspected] The shortest HIF7 obstruction is the absent cultivated cross-occurrence
+passage. The exterior `ContinuationAperture` retains 891 addressed user-to-assistant families, but
+the source-neutral rest has no returned transport from prompt factor/history current through those
+joins into reusable response morphology. HIF7 remains current until development/held-out/revisit/
+rebase/disjoint controls return that relation, it survives source-detached remount, targeted
+withdrawal removes its qualitative conduct, and direct inspection accepts all requested surfaces.
+The exact return is recorded in
+[`research/records/2026-09-01_HIF7_RETURNED_EXACT_RESIDENT_RADIATION_AND_PATH_STATE_BUT_QUALITATIVE_INFERENCE_REMAINS_AN_UNCULTIVATED_CROSS_OCCURRENCE.md`](research/records/2026-09-01_HIF7_RETURNED_EXACT_RESIDENT_RADIATION_AND_PATH_STATE_BUT_QUALITATIVE_INFERENCE_REMAINS_AN_UNCULTIVATED_CROSS_OCCURRENCE.md).
 
 [definition] `UNIVERSAL_CATALOG.md` remains the sole descriptive Lean--Rust--CUDA owner crosswalk.
 It schedules and grades nothing. Historical ledgers, checksum manifests, output chains, UAR

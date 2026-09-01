@@ -1467,7 +1467,6 @@ mod continuation_tests {
                         factor: 0,
                         current,
                     }],
-                    ingress_face_currents: Vec::new(),
                 },
             ],
             reconstruction_dag: Vec::new(),
