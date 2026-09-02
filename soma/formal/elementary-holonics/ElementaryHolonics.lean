@@ -559,6 +559,7 @@ import ElementaryHolonics.Millennium.SeventeenObstruction
 import ElementaryHolonics.Millennium.BirchSwinnertonDyer
 import ElementaryHolonics.Millennium.BirchSwinnertonDyerParity
 import ElementaryHolonics.Millennium.BirchSwinnertonDyerSignLaw
+import ElementaryHolonics.Millennium.BirchSwinnertonDyerAlgebraicParity
 import ElementaryHolonics.Millennium.HeckeTheta
 import ElementaryHolonics.Millennium.HeckeEuler
 import ElementaryHolonics.Millennium.HeckeWitness
