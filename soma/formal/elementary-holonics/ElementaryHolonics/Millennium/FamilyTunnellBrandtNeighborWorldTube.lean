@@ -27,7 +27,10 @@ variable {p : ℕ} [Fact p.Prime]
 inductive BrandtClass
   | first
   | second
-  deriving DecidableEq, Fintype
+  deriving DecidableEq
+
+instance : Fintype BrandtClass :=
+  ⟨{BrandtClass.first, BrandtClass.second}, fun x => by cases x <;> simp⟩
 
 /-- First-class projective directions use the diagonal `32` chart. -/
 abbrev FirstBrandtDirection :=

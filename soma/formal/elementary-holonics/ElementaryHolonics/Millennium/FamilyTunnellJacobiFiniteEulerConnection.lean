@@ -48,15 +48,21 @@ theorem powerSeriesEulerCurrent_finiteEulerFactor (d : ℕ) :
   intro n
   rw [coeff_powerSeriesEulerCurrent]
   simp only [finiteEulerFactor, finiteEulerFactorCurrent, map_sub,
-    PowerSeries.coeff_one, PowerSeries.coeff_X_pow, map_smul]
+    PowerSeries.coeff_one, PowerSeries.coeff_X_pow, PowerSeries.coeff_smul, map_smul, map_zsmul]
   by_cases hn : n = d
   · subst n
-    simp [hd]
+    first
+      | simp [hd]
+      | (rw [← map_natCast (PowerSeries.C ℤ), PowerSeries.coeff_C_mul]; simp [hd])
+      | (rw [← map_natCast PowerSeries.C, PowerSeries.coeff_C_mul]; simp [hd])
   · rw [if_neg hn]
     by_cases hn0 : n = 0
     · subst n
-      simp
-    · simp [hn0]
+      simp [hd]
+    · first
+        | simp [hn0, hn]
+        | (rw [← map_natCast (PowerSeries.C ℤ), PowerSeries.coeff_C_mul]; simp [hn0, hn])
+        | (rw [← map_natCast PowerSeries.C, PowerSeries.coeff_C_mul]; simp [hn0, hn])
 
 /-- A positive-degree Euler factor retains the unit constant occurrence. -/
 @[simp] theorem constantCoeff_finiteEulerFactor {d : ℕ} (hd : d ≠ 0) :
@@ -155,7 +161,7 @@ theorem coeff_finiteEulerFactorConnection
   rw [finiteEulerFactorConnection,
     invOfUnit_finiteEulerFactor_eq_geometricFiber hd]
   rw [finiteEulerFactorCurrent, smul_mul_assoc]
-  simp only [map_smul,
+  simp only [PowerSeries.coeff_smul, map_smul, map_zsmul,
     PowerSeries.coeff_X_pow_mul']
   by_cases hle : d ≤ n
   · rw [if_pos hle]

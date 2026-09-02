@@ -158,8 +158,7 @@ def occurrenceOfSource {p : ℕ} (hp : 0 < p) {q : HamiltonInt}
   sourceNorm := (mem_firstHopfSourcePopulation_iff hp q).mp hq |>.1
   windingCloses := by
     have hdiv := (mem_firstHopfSourcePopulation_iff hp q).mp hq |>.2
-    unfold hopfWindingDifference
-    simpa [mul_comm] using (Int.ediv_mul_cancel hdiv).symm
+    simpa [hopfWindingDifference, mul_comm] using (Int.ediv_mul_cancel hdiv).symm
 
 @[simp] theorem occurrenceOfSource_source {p : ℕ} (hp : 0 < p)
     {q : HamiltonInt} (hq : q ∈ firstHopfSourcePopulation p) :

@@ -53,7 +53,7 @@ private theorem squareRoot_mem_box {n : ℕ} {m : ℤ}
 /-- The finite support of one Jacobi source coefficient is exactly its
 integral square-root carrier. -/
 theorem support_coeff_rhs_eq_squareRootPopulation (n : ℕ) :
-    (PowerSeries.coeff n rhs).support = squareRootPopulation n := by
+    (AddMonoidAlgebra.coeff (PowerSeries.coeff n rhs)).support = squareRootPopulation n := by
   ext m
   simp only [Finsupp.mem_support_iff, squareRootPopulation,
     Finset.mem_filter]
@@ -261,7 +261,7 @@ theorem coeff_unitSquareTheta_neg_one (n : ℕ) :
   calc
     (∑ a ∈ squareRootPopulation n,
         (fun m c => c * (((-1 : ℤˣ) ^ m).val : ℤ)) a
-          (PowerSeries.coeff n rhs a)) =
+          (AddMonoidAlgebra.coeff (PowerSeries.coeff n rhs) a)) =
         ∑ m ∈ squareRootPopulation n,
           (((-1 : ℤˣ) ^ m).val : ℤ) := by
             apply Finset.sum_congr rfl

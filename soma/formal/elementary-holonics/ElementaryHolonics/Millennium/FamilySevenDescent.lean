@@ -286,7 +286,7 @@ theorem theSlotClassesCollapseOnTheSevenModEightBranch
       omega
     have hppow : ((p : ℚ)) ^ k ≠ 0 := pow_ne_zero _ hpq0
     have hvpow : padicValRat p (((p : ℕ) : ℚ) ^ k) = k := by
-      rw [padicValRat.pow hpq0, hvp]
+      rw [padicValRat.pow _, hvp]
       ring
     set x₁ : ℚ := x * ((p : ℕ) : ℚ) ^ k with hx₁
     set x₂ : ℚ := (x - ((p : ℕ) : ℚ)) * ((p : ℕ) : ℚ) ^ k with hx₂
@@ -326,14 +326,14 @@ theorem theSlotClassesCollapseOnTheSevenModEightBranch
       have hd : x₁ - x₂ = ((p : ℕ) : ℚ) ^ (k + 1) := by
         rw [hx₁, hx₂]
         ring
-      rw [hd, padicValRat.pow hpq0, hvp]
+      rw [hd, padicValRat.pow _, hvp]
       omega
     have hc₁₃ : chiRead p x₁ = chiRead p x₃ := by
       refine chiRead_congr hx₁0 hx₃0 hvx₁ hvx₃ ?_
       have hd : x₁ - x₃ = -((p : ℕ) : ℚ) ^ (k + 1) := by
         rw [hx₁, hx₃]
         ring
-      rw [hd, padicValRat.neg, padicValRat.pow hpq0, hvp]
+      rw [hd, padicValRat.neg, padicValRat.pow _, hvp]
       omega
     have hmul : quadraticChar (ZMod p) (((d₁ * d₂ : ℤ)) : ZMod p)
         = quadraticChar (ZMod p) ((d₁ : ZMod p)) *
@@ -957,10 +957,10 @@ theorem theAlgebraicRankIsBoundedOnTheSevenModEightBranch (r : ℕ)
       intro hc
       nlinarith [hc, hnq]
   set T : Fin 3 → (FamilyFace.E (((p : ℕ) : ℚ))).Point :=
-    ![0, Point.some h00, Point.some hn0] with hT
+    ![0, Point.some _ _ h00, Point.some _ _ hn0] with hT
   have hT0 : T 0 = 0 := rfl
-  have hT1 : T 1 = Point.some h00 := rfl
-  have hT2 : T 2 = Point.some hn0 := rfl
+  have hT1 : T 1 = Point.some _ _ h00 := rfl
+  have hT2 : T 2 = Point.some _ _ hn0 := rfl
   have htrio2 : ∀ b : Fin 3, T b + T b = 0 := by
     intro b
     rcases FamilyRankFin3.fin3_cases b with rfl | rfl | rfl

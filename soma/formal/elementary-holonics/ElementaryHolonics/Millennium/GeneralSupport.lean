@@ -103,7 +103,7 @@ lemma classFromEvenValuations {K : ℕ} (hK : K ≠ 0) {x : ℚ} (hx : x ≠ 0)
           omega
       · rw [Nat.factorization_eq_zero_of_not_dvd hdvd]
         omega
-    · rw [Nat.factorization_eq_zero_of_non_prime _ hℓp]
+    · rw [Nat.factorization_eq_zero_of_not_prime _ hℓp]
       omega
   -- assemble the signed class
   rcases lt_trichotomy (x.num * (x.den : ℤ)) 0 with hs | hs | hs
@@ -324,7 +324,7 @@ theorem theSlotClassesAreSupportedOnEveryFullTwoTorsionCurve
     exact hdAB
   rcases P with _ | @⟨x, y, h⟩
   · exact ⟨1, 1, one_ne_zero, one_ne_zero, by simpa using one_dvd K, by simpa using one_dvd K,
-      by simpa using Descent.sqClsRefl (1 : ℚ), by simpa using Descent.sqClsRefl (1 : ℚ)⟩
+      Descent.sqClsRefl _, Descent.sqClsRefl _⟩
   · by_cases hy : y = 0
     · -- the three two-torsion points, with their convention classes
       have hcurve := onCurve h

@@ -43,7 +43,7 @@ theorem fourDilate_continuous :
     letI : TopologicalSpace (PowerSeries ℤ) := integerSeriesPiTop
     Continuous fourDilate := by
   letI : TopologicalSpace (PowerSeries ℤ) := integerSeriesPiTop
-  rw [continuous_pi_iff]
+  refine continuous_pi_iff.mpr ?_
   intro i
   change Continuous (fun F : PowerSeries ℤ => fourDilate F i)
   have heval : (fun F : PowerSeries ℤ => fourDilate F i) =
@@ -59,9 +59,9 @@ theorem fourDilate_continuous :
   by_cases h : 4 ∣ i ()
   · have hc :=
       PowerSeries.WithPiTopology.continuous_coeff ℤ ((i ()) / 4)
-    convert hc using 1
-    funext F
-    rw [coeff_fourDilate, if_pos h]
+    convert hc using 1 <;> first
+      | rfl
+      | (funext F; rw [coeff_fourDilate, if_pos h])
   · have hz : (fun F : PowerSeries ℤ =>
         PowerSeries.coeff (i ()) (fourDilate F)) = fun _ => 0 := by
       funext F
@@ -307,7 +307,7 @@ private theorem evenQuarter_empty_of_not_four_dvd {n : ℕ}
   apply h4
   refine ⟨k.natAbs ^ 2, ?_⟩
   have hsquare' := hsquare
-  simp at hsquare'
+  try simp at hsquare'
   have hcast : (((4 * k.natAbs ^ 2 : ℕ) : ℤ)) = (2 * k) ^ 2 := by
     push_cast
     simp
@@ -510,7 +510,7 @@ theorem fourDilate_infiniteEvenEulerProduct_eq_scaleEight :
         (PowerSeries.X ^ 8) := by
   letI : TopologicalSpace (PowerSeries ℤ) := integerSeriesPiTop
   unfold infiniteEvenEulerProduct
-  rw [fourDilate_qPochhammerInf _ _
+  erw [fourDilate_qPochhammerInf _ _
     integerEvenEulerFactors_multipliable]
   simp only [map_pow, fourDilate_X]
   have hpow : ((PowerSeries.X : PowerSeries ℤ) ^ 4) ^ 2 =

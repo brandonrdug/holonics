@@ -47,10 +47,10 @@ theorem theTwoAdicReceiverSeparatesEqualClasses {a x d : ℚ}
   -- the two slots have equal valuation, so the ratio is a unit
   have hvc : padicValRat 2 c = padicValRat 2 c' := by
     have e1 : (0 : ℤ) = 2 * padicValRat 2 c + padicValRat 2 d := by
-      rw [← hvx, hxv, padicValRat.mul (pow_ne_zero 2 hc) hd0, padicValRat.pow hc]
+      rw [← hvx, hxv, padicValRat.mul (pow_ne_zero 2 hc) hd0, padicValRat.pow _]
       ring
     have e2 : (0 : ℤ) = 2 * padicValRat 2 c' + padicValRat 2 d := by
-      rw [← hvxa, hxav, padicValRat.mul (pow_ne_zero 2 hc') hd0, padicValRat.pow hc']
+      rw [← hvxa, hxav, padicValRat.mul (pow_ne_zero 2 hc') hd0, padicValRat.pow _]
       ring
     omega
   have hvt : padicValRat 2 t = 0 := by

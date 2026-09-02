@@ -110,7 +110,7 @@ theorem firstPivotNeighborHom_eq_zero_iff
         (m := firstPivotKernelPoint (p := p) A B C u.1 u.2.1 u.2.2.1)
         (v := v) (a := u.2.2.2)
       · exact hvnonzero
-      · simpa [firstPivotNeighborHom] using hzero
+      · simpa [firstPivotNeighborHom, firstPivotNeighborPoint, Prod.mk_zero_zero] using hzero
     obtain ⟨k, hk⟩ := hdvd
     have hpQ : (p : ℚ) ≠ 0 := by
       exact_mod_cast (Fact.out : p.Prime).ne_zero
@@ -243,7 +243,7 @@ theorem secondPivotNeighborHom_eq_zero_iff
         (m := secondPivotKernelPoint (p := p) B C u.1 u.2.1 u.2.2.1)
         (v := v) (a := u.2.2.2)
       · exact hvnonzero
-      · simpa [secondPivotNeighborHom] using hzero
+      · simpa [secondPivotNeighborHom, secondPivotNeighborPoint, Prod.mk_zero_zero] using hzero
     obtain ⟨k, hk⟩ := hdvd
     have hpQ : (p : ℚ) ≠ 0 := by
       exact_mod_cast (Fact.out : p.Prime).ne_zero
@@ -446,7 +446,7 @@ theorem firstBrandtNeighbor_relationGenerator_exists (hp2 : p ≠ 2)
   | inl yz =>
       have hvx : (v.1 : ZMod p) = 1 := by
         have h := congrArg Prod.fst hreduce
-        simpa [v, projectiveDirectionVector] using h
+        simpa [v, projectiveDirectionVector, reduceTriple] using h
       have hA : ((4 * v.1 : ℤ) : ZMod p) ≠ 0 := by
         push_cast
         rw [hvx]
@@ -462,10 +462,10 @@ theorem firstBrandtNeighbor_relationGenerator_exists (hp2 : p ≠ 2)
   | inr z =>
       have hvx : (v.1 : ZMod p) = 0 := by
         have h := congrArg Prod.fst hreduce
-        simpa [v, projectiveDirectionVector] using h
+        simpa [v, projectiveDirectionVector, reduceTriple] using h
       have hvy : (v.2.1 : ZMod p) = 1 := by
         have h := congrArg (fun w => w.2.1) hreduce
-        simpa [v, projectiveDirectionVector] using h
+        simpa [v, reduceTriple, projectiveDirectionVector] using h
       have hA : ((4 * v.1 : ℤ) : ZMod p) = 0 := by
         push_cast
         rw [hvx]
@@ -505,7 +505,7 @@ theorem secondBrandtNeighbor_relationGenerator_exists (hp2 : p ≠ 2)
   | inl yz =>
       have hvx : (v.1 : ZMod p) = 1 := by
         have h := congrArg Prod.fst hreduce
-        simpa [v, brandtSecondDirectionVector, thinToBrandtSecondMod,
+        simpa [v, reduceTriple, brandtSecondDirectionVector, thinToBrandtSecondMod,
           projectiveDirectionVector] using h
       have hA : (A : ZMod p) ≠ 0 := by
         dsimp [A]
@@ -523,7 +523,7 @@ theorem secondBrandtNeighbor_relationGenerator_exists (hp2 : p ≠ 2)
   | inr z =>
       have hvx : (v.1 : ZMod p) = 0 := by
         have h := congrArg Prod.fst hreduce
-        simpa [v, brandtSecondDirectionVector, thinToBrandtSecondMod,
+        simpa [v, reduceTriple, brandtSecondDirectionVector, thinToBrandtSecondMod,
           projectiveDirectionVector] using h
       have hA : (A : ZMod p) = 0 := by
         dsimp [A]

@@ -33,20 +33,20 @@ variable {a b : ℚ}
 /-- A point is killed by two exactly when it is the identity or its ordinate
 vanishes. -/
 theorem theTwoTorsionIsTheVanishingOrdinate (P : (E a b).Point) :
-    P + P = 0 ↔ (P = 0 ∨ ∃ (x : ℚ) (h : (E a b).Nonsingular x 0), P = Point.some h) := by
+    P + P = 0 ↔ (P = 0 ∨ ∃ (x : ℚ) (h : (E a b).Nonsingular x 0), P = Point.some _ _ h) := by
   constructor
   · intro h
     rcases P with _ | @⟨x, y, hns⟩
     · exact Or.inl rfl
     · right
-      have hneg : (Point.some hns : (E a b).Point) = -Point.some hns := by
+      have hneg : (Point.some _ _ hns : (E a b).Point) = -Point.some _ _ hns := by
         rw [eq_neg_iff_add_eq_zero]
         exact h
       rw [Point.neg_some] at hneg
       have hy : y = (E a b).negY x y := by
         have := congrArg (fun P => match P with
           | Point.zero => (0 : ℚ)
-          | Point.some (y := yy) _ => yy) hneg
+          | Point.some _ (y := yy) _ => yy) hneg
         simpa using this
       simp only [negY, E] at hy
       have hy0 : y = 0 := by linarith
@@ -64,9 +64,9 @@ descent's reach. -/
 theorem theTwoTorsionIsExactlyTheFourPoints (ha : a ≠ 0) (hb : b ≠ 0)
     (hab : a - b ≠ 0) (P : (E a b).Point) :
     P + P = 0 ↔ (P = 0 ∨
-      (∃ h : (E a b).Nonsingular 0 0, P = Point.some h) ∨
-      (∃ h : (E a b).Nonsingular a 0, P = Point.some h) ∨
-      (∃ h : (E a b).Nonsingular b 0, P = Point.some h)) := by
+      (∃ h : (E a b).Nonsingular 0 0, P = Point.some _ _ h) ∨
+      (∃ h : (E a b).Nonsingular a 0, P = Point.some _ _ h) ∨
+      (∃ h : (E a b).Nonsingular b 0, P = Point.some _ _ h)) := by
   rw [theTwoTorsionIsTheVanishingOrdinate]
   constructor
   · rintro (rfl | ⟨x, hns, rfl⟩)

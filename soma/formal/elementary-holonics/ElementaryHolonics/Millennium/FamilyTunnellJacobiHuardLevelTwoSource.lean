@@ -638,7 +638,8 @@ theorem huardDiagonal_eq_boundary
             Finset.mem_product.mpr
               ⟨Finset.mem_Icc.mpr ⟨by omega, by omega⟩,
                 Finset.mem_Icc.mpr ⟨htpos, by omega⟩⟩
-          simpa only [q] using Finset.mem_product.mpr ⟨habMem, hxyMem⟩
+          simp only [q]
+          exact Finset.mem_product.mpr ⟨habMem, hxyMem⟩
         · change n / d * (d - t) + n / d * t = n
           have hmul : n / d * d = n := Nat.div_mul_cancel hdvd
           calc

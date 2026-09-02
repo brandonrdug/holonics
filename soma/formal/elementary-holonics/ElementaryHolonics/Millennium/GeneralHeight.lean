@@ -412,7 +412,7 @@ theorem theDuplicationGrowsTheHeightOnEveryFullTwoTorsionCurve
   -- the cancellation divides the certificate constant
   have hcop : IsCoprime p q := by
     rw [hpdef, hqdef]
-    exact Int.isCoprime_iff_gcd_eq_one.mpr (by simpa using u.reduced)
+    exact Int.isCoprime_iff_gcd_eq_one.mpr u.reduced
   have hdvd : (d : ℤ) ∣ 2 ^ 2 * (a * b) ^ 2 * (a - b) ^ 2 := by
     refine theCancellationIsExactlyBounded a b p q hcop _ ?_ ?_
     · rw [hddef]; exact Int.gcd_dvd_left _ _

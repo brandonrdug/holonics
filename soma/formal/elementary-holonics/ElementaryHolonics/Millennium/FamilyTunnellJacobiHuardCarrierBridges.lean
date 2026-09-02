@@ -89,7 +89,7 @@ private theorem carrierSigma_sum (n : ℕ)
     (Sigma.mk (q.1.1 * q.2.1)
       (Sigma.mk q.1.1 q.1.2))) ?_ ?_ ?_ ?_
   · intro q hq
-    dsimp
+    try dsimp
     rw [carrierSigma, Finset.mem_sigma]
     rw [Finset.mem_range]
     have hq' := mem_huardPositiveQuadruples.mp hq

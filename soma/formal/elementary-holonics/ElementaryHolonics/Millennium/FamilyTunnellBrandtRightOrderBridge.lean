@@ -24,8 +24,8 @@ abbrev HamiltonInt := ℍ[ℤ]
 /-- The eight norm-one Lipschitz integral units, retained as an addressed
 population rather than collapsed to the numeral eight. -/
 def lipschitzUnit : Fin 8 → HamiltonInt :=
-  ![⟨1, 0, 0, 0⟩, ⟨-1, 0, 0, 0⟩, ⟨0, 1, 0, 0⟩, ⟨0, -1, 0, 0⟩,
-    ⟨0, 0, 1, 0⟩, ⟨0, 0, -1, 0⟩, ⟨0, 0, 0, 1⟩, ⟨0, 0, 0, -1⟩]
+  ![hmk (1) (0) (0) (0), hmk (-1) (0) (0) (0), hmk (0) (1) (0) (0), hmk (0) (-1) (0) (0),
+    hmk (0) (0) (1) (0), hmk (0) (0) (-1) (0), hmk (0) (0) (0) (1), hmk (0) (0) (0) (-1)]
 
 theorem lipschitzUnit_injective : Function.Injective lipschitzUnit := by
   intro i j h

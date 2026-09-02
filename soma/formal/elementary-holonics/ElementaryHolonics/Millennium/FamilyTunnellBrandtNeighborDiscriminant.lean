@@ -177,7 +177,7 @@ theorem occurrenceFullGram_det_eq_512_iff_covolume_sq_one (hp2 : p ≠ 2)
     have h := occurrenceFullGram_det_eq_source_det_mul_covolume_sq hp2 occurrence
     rw [hdet] at h
     apply mul_left_cancel₀ (show (512 : ℚ) ≠ 0 by norm_num)
-    simpa only [mul_one] using h.symm
+    simpa [mul_one] using h.symm
   · exact occurrenceFullGram_det_of_covolume_sq_one hp2 occurrence
 
 #print axioms occurrenceSourceFullGram_det

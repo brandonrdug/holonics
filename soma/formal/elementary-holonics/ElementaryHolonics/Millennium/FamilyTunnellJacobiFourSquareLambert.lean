@@ -52,6 +52,8 @@ private def timesFourEmbedding : ℕ ↪ ℕ where
     intro a b h
     exact mul_left_cancel₀ (by norm_num : (4 : ℕ) ≠ 0) h
 
+@[simp] private theorem timesFourEmbedding_apply (d : ℕ) : timesFourEmbedding d = 4 * d := rfl
+
 /-- Multiplication by four is an exact address equivalence from the complete divisor population of
 `m` onto the four-divisible divisor fibre of `4m`. -/
 theorem fourDivisibleDivisorCurrent_four_mul (m : ℕ) :
@@ -74,7 +76,7 @@ theorem fourDivisibleDivisorCurrent_four_mul (m : ℕ) :
       refine ⟨⟨?_, hfourm⟩, dvd_mul_right 4 e⟩
       exact mul_dvd_mul_left 4 he
   rw [fourDivisibleDivisorCurrent, hfibre, ordinaryDivisorCurrent]
-  simp [timesFourEmbedding, Finset.mul_sum]
+  simp [timesFourEmbedding_apply, Finset.mul_sum]
 
 /-- At a divisible address the deleted receiver fibre is four times the ordinary divisor current
 at the exactly rebased address. -/

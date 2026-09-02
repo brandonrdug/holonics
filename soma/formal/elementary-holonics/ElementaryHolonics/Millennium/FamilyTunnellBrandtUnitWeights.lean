@@ -279,7 +279,7 @@ private theorem q₁_image_first_or_four (A : LatticeTransport q₁)
         rw [hc] at hq'
         norm_num at hq'
         nlinarith
-      simpa using (sq_eq_zero_iff.mp hz)
+      simpa [e₀] using (sq_eq_zero_iff.mp hz)
   · right
     apply vec_ext
     · exact hx
@@ -288,7 +288,7 @@ private theorem q₁_image_first_or_four (A : LatticeTransport q₁)
         rw [hc] at hq'
         norm_num at hq'
         nlinarith
-      simpa using (sq_eq_zero_iff.mp hz)
+      simpa [e₀] using (sq_eq_zero_iff.mp hz)
 
 private theorem q₁_image_third_classification (A : LatticeTransport q₁)
     (hmiddle : A e₁ = e₁ ∨ A e₁ = -e₁)
@@ -724,11 +724,11 @@ private theorem q₂_basis_transport (A : LatticeTransport q₂)
     · refine ⟨true, true, true, q₂_transport_of_basis A true true true ?_ ?_ ?_⟩
       · simpa [q₂Map, e₀, sgn] using h0
       · simpa [q₂Map, e₁, sgn] using h1
-      · simpa [q₂Map, e₂, sgn] using h2
+      · simpa [q₂Map, e₂, e₁, sgn] using h2
     · refine ⟨false, true, true, q₂_transport_of_basis A false true true ?_ ?_ ?_⟩
       · simpa [q₂Map, e₀, sgn] using h0
       · simpa [q₂Map, e₁, sgn] using h1
-      · simpa [q₂Map, e₂, sgn] using h2
+      · simpa [q₂Map, e₂, e₁, sgn] using h2
   · rcases hfirst with h0 | h0
     · refine ⟨true, false, false, q₂_transport_of_basis A true false false ?_ ?_ ?_⟩
       · simpa [q₂Map, e₀, sgn] using h0
@@ -742,11 +742,11 @@ private theorem q₂_basis_transport (A : LatticeTransport q₂)
     · refine ⟨true, false, true, q₂_transport_of_basis A true false true ?_ ?_ ?_⟩
       · simpa [q₂Map, e₀, sgn] using h0
       · simpa [q₂Map, e₁, sgn] using h1
-      · simpa [q₂Map, e₂, sgn] using h2
+      · simpa [q₂Map, e₂, e₁, sgn] using h2
     · refine ⟨false, false, true, q₂_transport_of_basis A false false true ?_ ?_ ?_⟩
       · simpa [q₂Map, e₀, sgn] using h0
       · simpa [q₂Map, e₁, sgn] using h1
-      · simpa [q₂Map, e₂, sgn] using h2
+      · simpa [q₂Map, e₂, e₁, sgn] using h2
 
 theorem q₂_exhaustive_unit_classification :
     ∀ A : LatticeTransport q₂, A ∈ q₂UnitTransports := by

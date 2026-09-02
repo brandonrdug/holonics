@@ -205,7 +205,7 @@ theorem canonicalSignedTernaryCount_eq_tunnellThetaCoefficient (p : ℕ) :
   unfold canonicalSignedTernaryCount tunnellThetaCoefficient thickThetaCoefficient
     thinThetaCoefficient
   rw [hcard]
-  simpa [canonicalThinPopulation, canonicalEvenSlicePopulation] using hsum
+  simpa [SFr, canonicalThinPopulation, canonicalEvenSlicePopulation] using hsum
 
 /-- The orbit-normalized branch count is the coefficient difference divided by four. -/
 theorem canonicalBranchCount_eq_tunnellThetaCoefficient_div_four (p : ℕ) :

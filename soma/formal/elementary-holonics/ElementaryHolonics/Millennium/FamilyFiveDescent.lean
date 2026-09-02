@@ -206,7 +206,7 @@ theorem theSlotClassesCollapseOnTheFiveModEightBranch
       omega
     have hppow : ((p : ℚ)) ^ k ≠ 0 := pow_ne_zero _ hpq0
     have hvpow : padicValRat p (((p : ℕ) : ℚ) ^ k) = k := by
-      rw [padicValRat.pow hpq0, hvp]
+      rw [padicValRat.pow _, hvp]
       ring
     set x₁ : ℚ := x * ((p : ℕ) : ℚ) ^ k with hx₁
     set x₂ : ℚ := (x - ((p : ℕ) : ℚ)) * ((p : ℕ) : ℚ) ^ k with hx₂
@@ -246,14 +246,14 @@ theorem theSlotClassesCollapseOnTheFiveModEightBranch
       have hd : x₁ - x₂ = ((p : ℕ) : ℚ) ^ (k + 1) := by
         rw [hx₁, hx₂]
         ring
-      rw [hd, padicValRat.pow hpq0, hvp]
+      rw [hd, padicValRat.pow _, hvp]
       omega
     have hc₁₃ : chiRead p x₁ = chiRead p x₃ := by
       refine chiRead_congr hx₁0 hx₃0 hvx₁ hvx₃ ?_
       have hd : x₁ - x₃ = -((p : ℕ) : ℚ) ^ (k + 1) := by
         rw [hx₁, hx₃]
         ring
-      rw [hd, padicValRat.neg, padicValRat.pow hpq0, hvp]
+      rw [hd, padicValRat.neg, padicValRat.pow _, hvp]
       omega
     have hmul : quadraticChar (ZMod p) (((d₁ * d₂ : ℤ)) : ZMod p)
         = quadraticChar (ZMod p) ((d₁ : ZMod p)) *
@@ -798,7 +798,7 @@ lemma vp_neg_psq :
   have hp : p.Prime := Fact.out
   have hpq0 : (((p : ℕ) : ℚ)) ≠ 0 := by exact_mod_cast hp.pos.ne'
   rw [show (-(((p : ℕ) : ℚ)) ^ 2) = -((((p : ℕ) : ℚ)) ^ 2) from by ring,
-    padicValRat.neg, padicValRat.pow hpq0, val_p hp]
+    padicValRat.neg, padicValRat.pow _, val_p hp]
   ring
 
 lemma v2_neg_psq (hp2' : p ≠ 2) :
@@ -807,7 +807,7 @@ lemma v2_neg_psq (hp2' : p ≠ 2) :
   have hp : p.Prime := Fact.out
   have hpq0 : (((p : ℕ) : ℚ)) ≠ 0 := by exact_mod_cast hp.pos.ne'
   rw [show (-(((p : ℕ) : ℚ)) ^ 2) = -((((p : ℕ) : ℚ)) ^ 2) from by ring,
-    padicValRat.neg, padicValRat.pow hpq0, val2_p hp2']
+    padicValRat.neg, padicValRat.pow _, val2_p hp2']
   ring
 
 lemma vp_two_psq (hp2' : p ≠ 2) :
@@ -824,7 +824,7 @@ lemma vp_two_psq (hp2' : p ≠ 2) :
     push_cast at this ⊢
     exact this
   rw [padicValRat.mul (by norm_num) (pow_ne_zero 2 hpq0), hv2,
-    padicValRat.pow hpq0, val_p hp]
+    padicValRat.pow _, val_p hp]
   ring
 
 lemma v2_two_psq (hp2' : p ≠ 2) :
@@ -833,7 +833,7 @@ lemma v2_two_psq (hp2' : p ≠ 2) :
   have hp : p.Prime := Fact.out
   have hpq0 : (((p : ℕ) : ℚ)) ≠ 0 := by exact_mod_cast hp.pos.ne'
   rw [padicValRat.mul (by norm_num) (pow_ne_zero 2 hpq0), val2_two,
-    padicValRat.pow hpq0, val2_p hp2']
+    padicValRat.pow _, val2_p hp2']
   ring
 
 lemma vp_neg_p : padicValRat p (-((p : ℕ) : ℚ)) = 1 := by
@@ -1253,10 +1253,10 @@ theorem theAlgebraicRankIsBoundedOnTheFiveModEightBranch (r : ℕ)
       intro hc
       nlinarith [hc, hnq]
   set T : Fin 3 → (FamilyFace.E (((p : ℕ) : ℚ))).Point :=
-    ![0, Point.some h00, Point.some hn0] with hT
+    ![0, Point.some _ _ h00, Point.some _ _ hn0] with hT
   have hT0 : T 0 = 0 := rfl
-  have hT1 : T 1 = Point.some h00 := rfl
-  have hT2 : T 2 = Point.some hn0 := rfl
+  have hT1 : T 1 = Point.some _ _ h00 := rfl
+  have hT2 : T 2 = Point.some _ _ hn0 := rfl
   have htrio2 : ∀ b : Fin 3, T b + T b = 0 := by
     intro b
     rcases FamilyRankFin3.fin3_cases b with rfl | rfl | rfl

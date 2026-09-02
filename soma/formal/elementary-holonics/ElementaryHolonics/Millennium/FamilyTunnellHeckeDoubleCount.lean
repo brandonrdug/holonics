@@ -215,7 +215,7 @@ theorem thinUpperScaledPoint_mem_integralNeighbor (hp2 : p ≠ 2) (n : ℕ)
     simpa [a, haCast] using haF
   · have hrecon := scale_normalizeProjectiveDirection (eight_ne_zero hp2) v
     have haCast : (aF.val : ZMod p) = aF := ZMod.natCast_zmod_val aF
-    simpa [thinUpperDirection, v, aF, a, haCast] using hrecon.symm
+    simpa [thinUpperDirection, thinUpperIsotropicVector, v, aF, a, haCast] using hrecon.symm
   · have hm' : m.1 ∈ canonicalThinPopulation (p ^ 2 * n) := by
       have hm' : m.1 ∈ canonicalThinPopulation (p ^ 2 * n) ∧
           reduceTriple (p := p) m.1 ≠ 0 := by
@@ -243,7 +243,7 @@ theorem thickUpperScaledPoint_mem_integralNeighbor (hp2 : p ≠ 2) (n : ℕ)
     simpa [a, haCast] using haF
   · have hrecon := scale_normalizeProjectiveDirection (thirtyTwo_ne_zero hp2) v
     have haCast : (aF.val : ZMod p) = aF := ZMod.natCast_zmod_val aF
-    simpa [thickUpperDirection, v, aF, a, haCast] using hrecon.symm
+    simpa [thickUpperDirection, thickUpperIsotropicVector, v, aF, a, haCast] using hrecon.symm
   · have hm' : m.1 ∈ canonicalThickPopulation (p ^ 2 * n) := by
       have hm' : m.1 ∈ canonicalThickPopulation (p ^ 2 * n) ∧
           reduceTriple (p := p) m.1 ≠ 0 := by

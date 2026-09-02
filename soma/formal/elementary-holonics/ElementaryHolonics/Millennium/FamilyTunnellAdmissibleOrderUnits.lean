@@ -18,13 +18,15 @@ open scoped Quaternion
 open Soma.Holonics.Millennium.FamilyTunnellQuaternionicBridge
 open Soma.Holonics.Millennium.FamilyTunnellAdmissibleOrder
 
-def hamiltonI : HamiltonInt := ⟨0, 1, 0, 0⟩
+def hamiltonI : HamiltonInt := hmk 0 1 0 0
 
 theorem hamiltonI_mem : hamiltonI ∈ tunnellAdmissibleOrder := by
-  simp [hamiltonI, tunnellAdmissibleOrder, InTunnellOrder]
+  rw [mem_tunnellAdmissibleOrder_iff]
+  simp [hamiltonI, InTunnellOrder]
 
 theorem neg_hamiltonI_mem : -hamiltonI ∈ tunnellAdmissibleOrder := by
-  simp [hamiltonI, tunnellAdmissibleOrder, InTunnellOrder]
+  rw [mem_tunnellAdmissibleOrder_iff]
+  simp [hamiltonI, InTunnellOrder]
 
 /-- The actual `i`-unit inside the constructed admissible order. -/
 def admissibleI : Units tunnellAdmissibleOrder where
@@ -32,10 +34,10 @@ def admissibleI : Units tunnellAdmissibleOrder where
   inv := ⟨-hamiltonI, neg_hamiltonI_mem⟩
   val_inv := by
     apply Subtype.ext
-    apply Quaternion.ext <;> norm_num [hamiltonI]
+    apply Quaternion.ext <;> simp [hamiltonI]
   inv_val := by
     apply Subtype.ext
-    apply Quaternion.ext <;> norm_num [hamiltonI]
+    apply Quaternion.ext <;> simp [hamiltonI]
 
 /-- A norm-one occurrence of the admissible order has exactly one of the four
 allowed signed axial coordinate forms. -/
@@ -44,52 +46,39 @@ theorem normSq_one_mem_admissibleOrder_iff (q : HamiltonInt) :
       q = 1 ∨ q = -1 ∨ q = hamiltonI ∨ q = -hamiltonI := by
   constructor
   · rintro ⟨hnorm, hmem⟩
-    rcases q with ⟨a, b, c, d⟩
     rw [Quaternion.normSq_def'] at hnorm
-    change (2 : ℤ) ∣ d ∧ (4 : ℤ) ∣ c - d at hmem
-    have ha0 : -1 ≤ a := by
-      nlinarith [sq_nonneg a, sq_nonneg b, sq_nonneg c, sq_nonneg d]
-    have ha1 : a ≤ 1 := by
-      nlinarith [sq_nonneg a, sq_nonneg b, sq_nonneg c, sq_nonneg d]
-    have hb0 : -1 ≤ b := by
-      nlinarith [sq_nonneg a, sq_nonneg b, sq_nonneg c, sq_nonneg d]
-    have hb1 : b ≤ 1 := by
-      nlinarith [sq_nonneg a, sq_nonneg b, sq_nonneg c, sq_nonneg d]
-    have hc0 : -1 ≤ c := by
-      nlinarith [sq_nonneg a, sq_nonneg b, sq_nonneg c, sq_nonneg d]
-    have hc1 : c ≤ 1 := by
-      nlinarith [sq_nonneg a, sq_nonneg b, sq_nonneg c, sq_nonneg d]
-    have hd0 : -1 ≤ d := by
-      nlinarith [sq_nonneg a, sq_nonneg b, sq_nonneg c, sq_nonneg d]
-    have hd1 : d ≤ 1 := by
-      nlinarith [sq_nonneg a, sq_nonneg b, sq_nonneg c, sq_nonneg d]
-    rcases hmem.1 with ⟨kd, hkd⟩
-    rcases hmem.2 with ⟨kc, hkc⟩
-    have hkd0 : kd = 0 := by omega
-    have hd : d = 0 := by omega
-    have hkc0 : kc = 0 := by omega
-    have hc : c = 0 := by omega
-    subst kd
-    subst kc
-    subst d
-    subst c
-    have ha : a = -1 ∨ a = 0 ∨ a = 1 := by omega
-    have hb : b = -1 ∨ b = 0 ∨ b = 1 := by omega
-    rcases ha with ha | ha | ha <;>
-      rcases hb with hb | hb | hb <;>
-      subst a <;> subst b <;> norm_num at hnorm
-    all_goals simp [hamiltonI]
-    case mp.inl.inr.inl =>
-      exact Or.inr (Or.inl (by apply Quaternion.ext <;> norm_num))
-    case mp.inr.inl.inl =>
-      exact Or.inr (Or.inr (Or.inr
-        (by apply Quaternion.ext <;> norm_num [hamiltonI])))
-    case mp.inr.inr.inr.inl =>
-      exact Or.inl (by apply Quaternion.ext <;> norm_num)
+    have hmem' : (2 : ℤ) ∣ q.imK ∧ (4 : ℤ) ∣ q.imJ - q.imK := hmem
+    obtain ⟨⟨kd, hkd⟩, ⟨kc, hkc⟩⟩ := hmem'
+    have ha0 : -1 ≤ q.re := by
+      nlinarith [sq_nonneg q.re, sq_nonneg q.imI, sq_nonneg q.imJ, sq_nonneg q.imK]
+    have ha1 : q.re ≤ 1 := by
+      nlinarith [sq_nonneg q.re, sq_nonneg q.imI, sq_nonneg q.imJ, sq_nonneg q.imK]
+    have hb0 : -1 ≤ q.imI := by
+      nlinarith [sq_nonneg q.re, sq_nonneg q.imI, sq_nonneg q.imJ, sq_nonneg q.imK]
+    have hb1 : q.imI ≤ 1 := by
+      nlinarith [sq_nonneg q.re, sq_nonneg q.imI, sq_nonneg q.imJ, sq_nonneg q.imK]
+    have hc0 : -1 ≤ q.imJ := by
+      nlinarith [sq_nonneg q.re, sq_nonneg q.imI, sq_nonneg q.imJ, sq_nonneg q.imK]
+    have hc1 : q.imJ ≤ 1 := by
+      nlinarith [sq_nonneg q.re, sq_nonneg q.imI, sq_nonneg q.imJ, sq_nonneg q.imK]
+    have hd0 : -1 ≤ q.imK := by
+      nlinarith [sq_nonneg q.re, sq_nonneg q.imI, sq_nonneg q.imJ, sq_nonneg q.imK]
+    have hd1 : q.imK ≤ 1 := by
+      nlinarith [sq_nonneg q.re, sq_nonneg q.imI, sq_nonneg q.imJ, sq_nonneg q.imK]
+    have hd : q.imK = 0 := by omega
+    have hc : q.imJ = 0 := by omega
+    have ha : q.re = -1 ∨ q.re = 0 ∨ q.re = 1 := by omega
+    have hb : q.imI = -1 ∨ q.imI = 0 ∨ q.imI = 1 := by omega
+    rw [hc, hd] at hnorm
+    rcases ha with ha | ha | ha <;> rcases hb with hb | hb | hb <;> rw [ha, hb] at hnorm <;>
+      norm_num at hnorm
+    · exact Or.inr (Or.inl (by apply Quaternion.ext <;> simp [ha, hb, hc, hd]))
+    · exact Or.inr (Or.inr (Or.inr (by apply Quaternion.ext <;> simp [ha, hb, hc, hd, hamiltonI])))
+    · exact Or.inr (Or.inr (Or.inl (by apply Quaternion.ext <;> simp [ha, hb, hc, hd, hamiltonI])))
+    · exact Or.inl (by apply Quaternion.ext <;> simp [ha, hb, hc, hd])
   · rintro (rfl | rfl | rfl | rfl) <;>
-      constructor <;>
-      simp [hamiltonI, tunnellAdmissibleOrder, InTunnellOrder,
-        Quaternion.normSq_def']
+      refine ⟨?_, ?_⟩ <;>
+      simp [hamiltonI, mem_tunnellAdmissibleOrder_iff, InTunnellOrder, Quaternion.normSq_def']
 
 theorem admissibleUnit_normSq (u : Units tunnellAdmissibleOrder) :
     Quaternion.normSq (u.1.1 : HamiltonInt) = 1 := by

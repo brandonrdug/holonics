@@ -55,11 +55,10 @@ def hopfTransverseK (α : HamiltonInt) : ℤ :=
 
 /-- The integral Hopf return `α i ᾱ`, retained in pure quaternion coordinates. -/
 def hopfPivotReturn (α : HamiltonInt) : HamiltonInt :=
-  ⟨0, hopfLongitudinal α, 2 * hopfTransverseJ α,
-    2 * hopfTransverseK α⟩
+  hmk 0 (hopfLongitudinal α) (2 * hopfTransverseJ α) (2 * hopfTransverseK α)
 
 /-- The fixed quaternionic pivot. -/
-def hopfPivot : HamiltonInt := ⟨0, 1, 0, 0⟩
+def hopfPivot : HamiltonInt := hmk 0 1 0 0
 
 /-- The coordinate return really is quaternionic conjugation of the pivot. -/
 theorem hopfPivotReturn_eq_mul (α : HamiltonInt) :
@@ -136,7 +135,7 @@ theorem returnedTriple_mem_firstPrimeSquarePopulation
 
 /-- Right multiplication by `i` in coordinates. -/
 def hopfPhaseTurnSource (α : HamiltonInt) : HamiltonInt :=
-  ⟨-α.imI, α.re, α.imK, -α.imJ⟩
+  hmk (-α.imI) α.re α.imK (-α.imJ)
 
 /-- The phase turn is exactly the quaternion product `α i`. -/
 theorem hopfPhaseTurnSource_eq_mul (α : HamiltonInt) :
@@ -201,8 +200,9 @@ theorem FirstHopfOccurrence.phaseTurn_four {p : ℕ}
     occurrence.phaseTurn.phaseTurn.phaseTurn.phaseTurn = occurrence := by
   cases occurrence with
   | mk source winding sourceNorm windingCloses =>
-      apply FirstHopfOccurrence.ext <;>
-        simp [FirstHopfOccurrence.phaseTurn, hopfPhaseTurnSource]
+      apply FirstHopfOccurrence.ext
+      · apply Quaternion.ext <;> simp [FirstHopfOccurrence.phaseTurn, hopfPhaseTurnSource]
+      · simp [FirstHopfOccurrence.phaseTurn, hopfPhaseTurnSource]
 
 /-- At positive norm, the phase swing has no fixed source. -/
 theorem FirstHopfOccurrence.phaseTurn_ne_self
@@ -679,7 +679,7 @@ theorem source_eq_phase_of_same_primitive_return
       left.source * u = ((p : ℤ) : HamiltonInt) * right.source := by
     change left.source * hopfRelative left.source right.source = _
     rw [source_mul_hopfRelative, left.sourceNorm]
-  let q : HamiltonInt := ⟨r, s, 0, 0⟩
+  let q : HamiltonInt := hmk r s 0 0
   have hu : u = ((p : ℤ) : HamiltonInt) * q := by
     apply Quaternion.ext <;> simp [q, hr, hs, huJ, huK]
   have hpQ : ((p : ℤ) : HamiltonInt) ≠ 0 := by

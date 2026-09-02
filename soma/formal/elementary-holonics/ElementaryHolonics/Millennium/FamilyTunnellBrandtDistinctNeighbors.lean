@@ -74,10 +74,10 @@ private theorem adjusted_lifts_proportional_mod_p
         reduceTriple (p := p) (adjustedDirectionLift C d) := hrd.symm
     _ = (a : ZMod p) • reduceTriple (p := p) (adjustedDirectionLift C e) := by
       apply Prod.ext
-      · simpa [smul_eq_mul] using hxmod
+      · simpa [smul_eq_mul, reduceTriple] using hxmod
       · apply Prod.ext
-        · simpa [smul_eq_mul] using hymod
-        · simpa [smul_eq_mul] using hzmod
+        · simpa [smul_eq_mul, reduceTriple] using hymod
+        · simpa [smul_eq_mul, reduceTriple] using hzmod
     _ = (a : ZMod p) • projectiveDirectionVector e.1 := by rw [hre]
 
 theorem integralNeighbor_eq_iff_projectiveDirection_eq
@@ -181,10 +181,10 @@ private theorem adjusted_second_lifts_proportional_mod_p
     _ = (a : ZMod p) •
         reduceTriple (p := p) (adjustedBrandtSecondDirectionLift hp2 e) := by
       apply Prod.ext
-      · simpa [smul_eq_mul] using hxmod
+      · simpa [smul_eq_mul, reduceTriple] using hxmod
       · apply Prod.ext
-        · simpa [smul_eq_mul] using hymod
-        · simpa [smul_eq_mul] using hzmod
+        · simpa [smul_eq_mul, reduceTriple] using hymod
+        · simpa [smul_eq_mul, reduceTriple] using hzmod
     _ = (a : ZMod p) • brandtSecondDirectionVector hp2 e := by rw [hre]
 
 private theorem brandtSecondToThinMod_smul (a : ZMod p)

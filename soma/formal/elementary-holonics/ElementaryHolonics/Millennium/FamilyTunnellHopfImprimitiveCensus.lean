@@ -34,10 +34,10 @@ def imprimitiveFirstHopfSourcePopulation : Finset HamiltonInt :=
     reduceTriple (p := p) (hopfReturnedTriple q) = (0, 0, 0)
 
 def upperGaussianSource (q : ℤ × ℤ) : HamiltonInt :=
-  ⟨q.1, q.2, 0, 0⟩
+  hmk q.1 q.2 0 0
 
 def lowerGaussianSource (q : ℤ × ℤ) : HamiltonInt :=
-  ⟨0, 0, q.1, q.2⟩
+  hmk 0 0 q.1 q.2
 
 private theorem upperGaussianSource_injective :
     Function.Injective upperGaussianSource := by

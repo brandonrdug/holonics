@@ -33,7 +33,7 @@ def jacobiUnitReceiver (ε : ℤˣ) : BivariateSeries →+* IntegerSeries :=
 /-- The coefficient topology on the returned integer power series.  Naming it
 keeps the continuity witness stable when the Jacobi kernel's Laurent
 coefficient topology is active at the same time. -/
-noncomputable def integerSeriesPiTop : TopologicalSpace IntegerSeries :=
+noncomputable abbrev integerSeriesPiTop : TopologicalSpace IntegerSeries :=
   PowerSeries.WithPiTopology.instTopologicalSpace ℤ
 
 /-- The unit receiver is continuous for the coefficient topologies.  This is

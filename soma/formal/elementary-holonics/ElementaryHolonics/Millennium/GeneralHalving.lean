@@ -113,8 +113,8 @@ set_option maxHeartbeats 1000000 in
 theorem theHalfPointDoublesBack {u v w : ℚ} (ha0 : a ≠ 0) (hb0 : b ≠ 0)
     (hab0 : a - b ≠ 0) (ha : a = u ^ 2 - v ^ 2) (hb : b = u ^ 2 - w ^ 2)
     (hP : (E a b).Nonsingular (u ^ 2) (u * v * w)) :
-    (Point.some (half_nonsingular ha0 hb0 hab0 ha hb) : (E a b).Point)
-      + Point.some (half_nonsingular ha0 hb0 hab0 ha hb) = Point.some hP := by
+    (Point.some _ _ (half_nonsingular ha0 hb0 hab0 ha hb) : (E a b).Point)
+      + Point.some _ _ (half_nonsingular ha0 hb0 hab0 ha hb) = Point.some _ _ hP := by
   obtain ⟨h1, h2, h3⟩ := half_sums_ne ha0 hb0 hab0 ha hb
   set X : ℚ := halfAbscissa u v w with hX
   set Y : ℚ := halfOrdinate u v w with hY
@@ -165,8 +165,8 @@ conventions at the two-torsion points are what make this uniform: at `(0,0)` the
 square forces `a−b` square. -/
 theorem theThreeRootsExist (ha0 : a ≠ 0) (hb0 : b ≠ 0) (hab0 : a - b ≠ 0)
     {x y : ℚ} (hns : (E a b).Nonsingular x y)
-    (h1 : Descent.SqCls (slotOne a b (Point.some hns)) 1)
-    (h2 : Descent.SqCls (slotTwo a b (Point.some hns)) 1) :
+    (h1 : Descent.SqCls (slotOne a b (Point.some _ _ hns)) 1)
+    (h2 : Descent.SqCls (slotTwo a b (Point.some _ _ hns)) 1) :
     ∃ u v w : ℚ, u ^ 2 = x ∧ v ^ 2 = x - a ∧ w ^ 2 = x - b ∧ u * v * w = y := by
   have hcurve := onCurve hns
   obtain ⟨c₁, hc₁, hv₁⟩ := h1
@@ -250,7 +250,7 @@ theorem theKernelIsTheDoublesOnEveryFullTwoTorsionCurve
     subst huvw
     have ha' : a = u ^ 2 - v ^ 2 := by linarith [hv]
     have hb' : b = u ^ 2 - w ^ 2 := by linarith [hw]
-    exact ⟨Point.some (half_nonsingular ha0 hb0 hab0 ha' hb'),
+    exact ⟨Point.some _ _ (half_nonsingular ha0 hb0 hab0 ha' hb'),
       theHalfPointDoublesBack ha0 hb0 hab0 ha' hb' hns⟩
 
 /-- **THE TWO-DESCENT IS EXACT ON EVERY FULL-TWO-TORSION CURVE**: the kernel of the

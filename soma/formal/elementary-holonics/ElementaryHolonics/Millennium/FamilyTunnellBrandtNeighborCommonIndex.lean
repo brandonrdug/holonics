@@ -354,7 +354,7 @@ theorem firstPivot_completeTurn_returns_kernel
     exact ⟨u.1, rfl⟩
   refine ⟨m, ?_, ?_⟩
   · convert dvd_add hm₀ (hv.mul_left k) using 1 <;>
-      simp [m] <;> ring
+      first | rfl | (simp [m]; done) | (simp [m]; ring) | ring
   · have hpQ : (p : ℚ) ≠ 0 := by
       exact_mod_cast (Fact.out : p.Prime).ne_zero
     have hratio : (u.2.2.2 : ℚ) / (p : ℚ) = (k : ℚ) := by
@@ -387,7 +387,7 @@ theorem secondPivot_completeTurn_returns_kernel
     exact ⟨u.2.1, rfl⟩
   refine ⟨m, ?_, ?_⟩
   · convert dvd_add hm₀ (hv.mul_left k) using 1 <;>
-      simp [m] <;> ring
+      first | rfl | (simp [m]; done) | (simp [m]; ring) | ring
   · have hpQ : (p : ℚ) ≠ 0 := by
       exact_mod_cast (Fact.out : p.Prime).ne_zero
     have hratio : (u.2.2.2 : ℚ) / (p : ℚ) = (k : ℚ) := by
@@ -864,9 +864,14 @@ theorem ratTripleBasis_repr_apply (x : RatTriple) (i : Fin 3) :
 
 @[simp] theorem intTripleInclusion_intTripleBasis (i : Fin 3) :
     intTripleInclusion (intTripleBasis i) = ratTripleBasis i := by
-  fin_cases i <;>
-    simp [intTripleInclusion, intTripleBasis, ratTripleBasis,
-      intTripleToRat, Module.Basis.ofEquivFun]
+  fin_cases i <;> first
+    | rfl
+    | (simp [intTripleInclusion, intTripleBasis, ratTripleBasis, intTripleToRat,
+        Module.Basis.ofEquivFun]; done)
+    | (simp [intTripleInclusion, intTripleBasis, ratTripleBasis, intTripleToRat,
+        Module.Basis.ofEquivFun]; rfl)
+    | (simp [intTripleInclusion, intTripleBasis, ratTripleBasis, intTripleToRat,
+        Module.Basis.ofEquivFun]; decide)
 
 theorem sourcePolarCore_scaled_basis_mem (hp2 : p ≠ 2)
     (occurrence : BrandtNeighborOccurrence (p := p)) (i : Fin 3) :
@@ -885,6 +890,11 @@ theorem neighbor_scaled_basis_mem (hp2 : p ≠ 2)
     (p : ℚ) • ratTripleBasis i ∈ occurrenceNeighborSubgroup hp2 occurrence := by
   have h := BrandtNeighborOccurrence.scaled_integral_mem hp2 occurrence
     (intTripleBasis i)
+  have hsmul : ((p : ℚ) • ratTripleBasis i : RatTriple) =
+      ((p : ℚ) * (ratTripleBasis i).1, (p : ℚ) * (ratTripleBasis i).2.1,
+        (p : ℚ) * (ratTripleBasis i).2.2) := by
+    refine Prod.ext ?_ (Prod.ext ?_ ?_) <;> simp [smul_eq_mul]
+  rw [hsmul]
   simpa [ratTripleScaleP, intTripleInclusion_intTripleBasis, ratTripleScale] using h
 
 /-- A full-rank integral lattice containing the `p`-scaled coordinate basis

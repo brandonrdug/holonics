@@ -409,7 +409,7 @@ private theorem second_ne_zero_of_first_eq_zero {c : ZMod p} (hc : c ≠ 0)
     simpa [reducedTunnellQuadratic, hx, hy] using hq
   have hzsq : v.1.2.2 ^ 2 = 0 := (mul_eq_zero.mp hcz).resolve_left hc
   have hz : v.1.2.2 = 0 := by
-    exact pow_eq_zero hzsq
+    exact eq_zero_of_pow_eq_zero hzsq
   apply v.2.2
   apply Prod.ext
   · simpa using hx

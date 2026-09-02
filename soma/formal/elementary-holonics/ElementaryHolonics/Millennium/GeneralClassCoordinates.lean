@@ -111,7 +111,7 @@ theorem thePrimeCoordinateIsSquareInvariant {p : ℕ} [Fact p.Prime] {d e : ℤ}
   -- the rational valuations differ by twice the scaling factor's
   have hvd : padicValRat p ((d : ℤ) : ℚ)
       = 2 * padicValRat p c + padicValRat p ((e : ℤ) : ℚ) := by
-    rw [hval, padicValRat.mul (pow_ne_zero 2 hc) heq, padicValRat.pow hc]
+    rw [hval, padicValRat.mul (pow_ne_zero 2 hc) heq, padicValRat.pow _]
     norm_num
   -- and integer valuations are the rational ones
   have hid : padicValRat p ((d : ℤ) : ℚ) = (padicValInt p d : ℤ) := by

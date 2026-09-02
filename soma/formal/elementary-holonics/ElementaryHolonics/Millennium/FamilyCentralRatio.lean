@@ -48,7 +48,12 @@ theorem theWitnessCentralValueHasExactThetaNormalization
       linarith)
   have htheta := FamilyRatio.theCentralValueIsThePlainThetaIntegral p hp2
   rw [← htheta]
-  simpa [completed, centralArchimedeanFactor] using hproduct
+  have hL : (FamilyWitness.theWitnessAtEveryOddPrime p hp2).L 1 =
+      FamilyWitness.pLOdd p hp2 1 := rfl
+  rw [hL, ← hproduct]
+  simp only [completed, centralArchimedeanFactor, Complex.cpow_one, Complex.Gamma_one, mul_one]
+  push_cast
+  ring
 
 /-- **THE CENTRAL RATIO IS EXACTLY A THETA-INTEGRAL IDENTITY.**
 No analytic statement is assumed: this is a two-way normalization bridge.  It
@@ -108,8 +113,7 @@ theorem theCentralThetaIntegralIsTwiceTheTail
   have hC : IntegrableOn (fun t : ℝ => ((thetaP p t : ℝ) : ℂ)) (Ioi 0) :=
     hconv.congr_fun hEq measurableSet_Ioi
   have hR : IntegrableOn (thetaP p) (Ioi 0) := by
-    have hre := hC.re
-    simpa using hre
+    exact hC.re
   have hsign :
       ((-1 : ℝ)) ^ ((p - 1) / 2) * ((XP p 2 : ℤ) : ℝ) = 1 := by
     exact_mod_cast theRootNumberIsPositiveOnTheThreeModEightBranch hp8

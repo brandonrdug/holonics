@@ -68,7 +68,8 @@ private theorem binaryAffineZeros_card_eq_squareRoots (hp2 : p ≠ 2)
     linear_combination 4 * C * ht'
   · intro u hu
     have hu' : u ^ 2 = B ^ 2 - 4 * A * C := by
-      simpa [binaryDiscriminant] using hu
+      have h := (Finset.mem_filter.mp (Finset.mem_coe.mp hu)).2
+      simpa [binaryDiscriminant] using h
     rw [Finset.mem_coe]
     simp only [binaryAffineZeros, Finset.mem_filter, Finset.mem_univ, true_and,
       completeSquareInverse]

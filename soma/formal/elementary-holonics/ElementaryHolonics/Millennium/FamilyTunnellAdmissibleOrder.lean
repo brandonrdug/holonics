@@ -51,15 +51,24 @@ private theorem inTunnellOrder_add {q r : HamiltonInt}
   rcases hr with ⟨hrk, hrd⟩
   constructor
   · simpa using dvd_add hqk hrk
-  · convert dvd_add hqd hrd using 1 <;> simp <;> ring
+  · have h := dvd_add hqd hrd
+    have e : (q + r).imJ - (q + r).imK = (q.imJ - q.imK) + (r.imJ - r.imK) := by
+      change (q.imJ + r.imJ) - (q.imK + r.imK) = _
+      ring
+    rw [e]
+    exact h
 
 private theorem inTunnellOrder_neg {q : HamiltonInt}
     (hq : InTunnellOrder q) : InTunnellOrder (-q) := by
   rcases hq with ⟨hqk, hqd⟩
   constructor
   · simpa using dvd_neg.mpr hqk
-  · have := dvd_neg.mpr hqd
-    convert this using 1 <;> simp <;> ring
+  · have h := dvd_neg.mpr hqd
+    have e : (-q).imJ - (-q).imK = -(q.imJ - q.imK) := by
+      change -q.imJ - -q.imK = _
+      ring
+    rw [e]
+    exact h
 
 /-- Closure under Hamilton multiplication.  The witness calculation is the
 order's local holonomy law: the two congruent transverse coordinates remain

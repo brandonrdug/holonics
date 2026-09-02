@@ -47,10 +47,10 @@ private theorem coeffMulOfTruncOne
     PowerSeries.coeff m (f * g) = PowerSeries.coeff m f := by
   rw [PowerSeries.coeff_mul]
   rw [Finset.sum_eq_single_of_mem (m, 0)
-    (Finset.mem_antidiagonal.mpr (add_zero m))]
+    (Finset.HasAntidiagonal.mem_antidiagonal.mpr (add_zero m))]
   · simp [hg 0 (Nat.zero_le m)]
   · intro b hb hne
-    have hbSum := Finset.mem_antidiagonal.mp hb
+    have hbSum := Finset.HasAntidiagonal.mem_antidiagonal.mp hb
     rw [hg b.2 (by omega), if_neg]
     · simp
     · intro hb0
@@ -592,7 +592,8 @@ theorem hasEulerConnection_fullFourSquareTheta :
     unfold thetaUnitConnection
     apply PowerSeries.ext
     intro n
-    simp only [map_smul, map_sub, PowerSeries.coeff_C_mul]
+    simp only [map_smul, map_zsmul, map_nsmul, map_sub, PowerSeries.coeff_C_mul]
+    simp only [smul_eq_mul, zsmul_eq_mul, nsmul_eq_mul, Int.cast_ofNat, Nat.cast_ofNat]
     ring
   rw [← hconnection]
   exact hpow

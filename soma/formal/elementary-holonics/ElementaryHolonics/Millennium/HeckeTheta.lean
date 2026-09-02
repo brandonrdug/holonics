@@ -1254,7 +1254,10 @@ eigenvalue stream of the congruent-number curve at one. -/
 
 /-- The norm-`m` shell of the positive quartic class, as a computable finset. -/
 def heckeShell (m : ℕ) : Finset (ℤ × ℤ) :=
-  ((Finset.Icc (-(m : ℤ)) (m : ℤ)) ×ˢ (Finset.Icc (-(m : ℤ)) (m : ℤ))).filter
+  ((@Finset.Icc ℤ (@PartialOrder.toPreorder ℤ (@LinearOrder.toPartialOrder ℤ Int.instLinearOrder))
+      Int.instLocallyFiniteOrder (-(m : ℤ)) (m : ℤ)) ×ˢ
+    (@Finset.Icc ℤ (@PartialOrder.toPreorder ℤ (@LinearOrder.toPartialOrder ℤ Int.instLinearOrder))
+      Int.instLocallyFiniteOrder (-(m : ℤ)) (m : ℤ))).filter
     (fun p => p.1 ^ 2 + p.2 ^ 2 = (m : ℤ) ∧ (p.1 + p.2) % 4 = 1 ∧ p.2 % 2 = 0)
 
 /-- The `m`-th Hecke coefficient: the weight sum over the norm-`m` shell. -/

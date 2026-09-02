@@ -465,7 +465,7 @@ theorem oddSecondThinNumeratorPoint_mem_integralNeighbor (hp2 : p ≠ 2) (n : �
         simpa [oddSecondThinNeighborPopulation] using hq
       rcases Finset.mem_image.mp hu with ⟨m, hm, hmu⟩
       subst upper
-      simpa [oddSecondThinNumeratorPoint, oddSecondThinNumeratorDirection] using
+      simpa [oddSecondThinNumeratorPoint, oddSecondThinNumeratorDirection, oddSecondThinUpperAsThin] using
         thinUpperScaledPoint_mem_integralNeighbor hp2 n
           (oddSecondThinUpperAsThin n m)
   | inr lower =>
@@ -483,7 +483,7 @@ theorem oddSecondThickNumeratorPoint_mem_integralNeighbor (hp2 : p ≠ 2) (n : �
         simpa [oddSecondThickNeighborPopulation] using hq
       rcases Finset.mem_image.mp hu with ⟨m, hm, hmu⟩
       subst upper
-      simpa [oddSecondThickNumeratorPoint, oddSecondThickNumeratorDirection] using
+      simpa [oddSecondThickNumeratorPoint, oddSecondThickNumeratorDirection, oddSecondThickUpperAsThick] using
         thickUpperScaledPoint_mem_integralNeighbor hp2 n
           (oddSecondThickUpperAsThick n m)
   | inr lower =>

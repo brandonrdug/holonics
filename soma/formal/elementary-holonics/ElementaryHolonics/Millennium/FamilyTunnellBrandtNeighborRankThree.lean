@@ -243,6 +243,22 @@ def intTripleBasis : Module.Basis (Fin 3) ℤ IntTriple :=
         funext i
         fin_cases i <;> rfl }
 
+@[simp] theorem intTripleBasis_zero : intTripleBasis 0 = ((1 : ℤ), (0 : ℤ), (0 : ℤ)) := by
+  simp only [intTripleBasis, Module.Basis.coe_ofEquivFun]
+  rw [LinearEquiv.symm_apply_eq]
+  ext i
+  fin_cases i <;> first | rfl | decide | simp
+@[simp] theorem intTripleBasis_one : intTripleBasis 1 = ((0 : ℤ), (1 : ℤ), (0 : ℤ)) := by
+  simp only [intTripleBasis, Module.Basis.coe_ofEquivFun]
+  rw [LinearEquiv.symm_apply_eq]
+  ext i
+  fin_cases i <;> first | rfl | decide | simp
+@[simp] theorem intTripleBasis_two : intTripleBasis 2 = ((0 : ℤ), (0 : ℤ), (1 : ℤ)) := by
+  simp only [intTripleBasis, Module.Basis.coe_ofEquivFun]
+  rw [LinearEquiv.symm_apply_eq]
+  ext i
+  fin_cases i <;> first | rfl | decide | simp
+
 theorem intTriple_finrank : Module.finrank ℤ IntTriple = 3 := by
   simpa using Module.finrank_eq_card_basis intTripleBasis
 
@@ -264,7 +280,7 @@ theorem BrandtNeighborOccurrence.finite_free_rank_three (hp2 : p ≠ 2)
     intro r hr x y hxy
     apply BrandtNeighborOccurrence.neighborToIntegral_injective hp2 occurrence
     apply Module.IsTorsionFree.isSMulRegular hr
-    simpa only [map_smul] using congrArg toInt hxy
+    simpa only [map_smul, toInt, AddMonoidHom.coe_toIntLinearMap] using congrArg toInt hxy
   letI : Module.Free ℤ (occurrenceNeighborSubgroup hp2 occurrence) := inferInstance
   have hupper :
       Module.finrank ℤ (occurrenceNeighborSubgroup hp2 occurrence) ≤ 3 := by

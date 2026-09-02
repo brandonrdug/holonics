@@ -66,7 +66,7 @@ theorem theRealPlaceCutsTheFirstSlot (h0a : 0 < a) (hab : a < b) {x y : ℚ}
 included.  At `(0,0)` the convention is `ab`, positive under the ordering. -/
 theorem theFirstSlotIsPositive (h0a : 0 < a) (hab : a < b) {x y : ℚ}
     (hns : (E a b).Nonsingular x y) :
-    0 < slotOne a b (Point.some hns) := by
+    0 < slotOne a b (Point.some _ _ hns) := by
   rw [slotOne_some]
   split_ifs with hx0
   · have hb0 : 0 < b := by linarith

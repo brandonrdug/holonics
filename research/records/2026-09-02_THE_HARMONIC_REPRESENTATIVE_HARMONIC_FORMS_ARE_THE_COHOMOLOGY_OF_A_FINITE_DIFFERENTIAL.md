@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-02
 **Truth status:** `proved-derived`
-**Evidence:** `formal-checked` (Lean `v4.33.0`, printed axiom audits below); `measured` (`lake` job count below:  jobs)
+**Evidence:** `formal-checked` (Lean `v4.33.0`, printed axiom audits below); `measured` (`lake` job count below: 2393 jobs for the owner cone; the root module was red at that commit and is repaired in the following commit)
 **Provenance:** Assistant, under Brandon's standing loop of 2026-09-02, articulating the harmonic receiver of each cohomology class on the Hodge line. Assistant derivation for the proofs.
 **Band:** CLOSED = ker d / EXACT = range d / CLOSED = HARMONIC ⊔ EXACT / HARMONIC ⊓ EXACT = ⊥ / IsCompl INSIDE THE CLOSED FORMS / HARMONIC ≃ₗ CLOSED ⧸ EXACT / finrank HARMONIC = finrank COHOMOLOGY / EXACTLY ONE HARMONIC REPRESENTATIVE PER CLASS / NO CONJECTURE CLOSED / RUST SOURCE UNCHANGED / CONSTRUCTION STATE UNCHANGED / COMMITTED ON MAIN
 

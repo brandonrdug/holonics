@@ -38,6 +38,10 @@ open scoped PowerSeries.WithPiTopology
 
 abbrev LaurentBody := LaurentPolynomial ℤ
 abbrev PolynomialBody := Polynomial LaurentBody
+
+/-- Laurent bodies act as coefficient functions, as they did before `AddMonoidAlgebra` became a
+structure. -/
+instance : CoeFun LaurentBody (fun _ => ℤ → ℤ) := ⟨fun f => AddMonoidAlgebra.coeff f⟩
 abbrev BivariateSeries := PowerSeries LaurentBody
 
 /-! ## The positive finite diagonal -/
@@ -116,9 +120,9 @@ theorem positiveFiniteDiagonalHom_apply (p : PolynomialBody) (d : ℤ) :
       (LaurentPolynomial.T 1) p) d = _
   rw [Polynomial.eval₂_eq_sum]
   unfold Polynomial.sum
-  change (Finsupp.applyAddHom d)
-      (∑ n ∈ p.support, p.coeff n * LaurentPolynomial.T 1 ^ n) = _
-  simp only [map_sum]
+  change AddMonoidAlgebra.coeff
+      (∑ n ∈ p.support, p.coeff n * LaurentPolynomial.T 1 ^ n) d = _
+  rw [AddMonoidAlgebra.coeff_sum, Finsupp.finset_sum_apply]
   apply Finset.sum_congr rfl
   intro n _hn
   rw [LaurentPolynomial.T_pow]
@@ -129,8 +133,9 @@ theorem positiveFiniteDiagonalHom_apply (p : PolynomialBody) (d : ℤ) :
         AddMonoidAlgebra.single (n : ℤ) 1 := by
       simpa using
         (LaurentPolynomial.single_eq_C_mul_T (R := ℤ) 1 (n : ℤ)).symm
-    rw [mul_comm, hT, AddMonoidAlgebra.single_mul_apply]
-    simp [sub_eq_add_neg, add_comm]
+    rw [mul_comm, hT,
+      AddMonoidAlgebra.coeff_single_mul_eq_mul_coeff (d - (n : ℤ)) (fun m' _ => by omega)]
+    simp
   simpa using hshift
 
 private def polynomialDiagonalSupport (p : PolynomialBody) (d : ℕ) : Finset ℕ :=
@@ -850,14 +855,14 @@ private theorem integerQpochSplit (A Q : PowerSeries ℤ) (n k : ℕ) :
 private theorem integerAntidiagSumEq
     (f g : PowerSeries ℤ) (m : ℕ)
     (hg : ∀ j ≤ m, PowerSeries.coeff j g = if j = 0 then 1 else 0) :
-    ∑ p ∈ Finset.antidiagonal m,
+    ∑ p ∈ Finset.HasAntidiagonal.antidiagonal m,
         PowerSeries.coeff p.1 f * PowerSeries.coeff p.2 g =
       PowerSeries.coeff m f := by
   rw [Finset.sum_eq_single_of_mem (m, 0)
-    (Finset.mem_antidiagonal.mpr (add_zero m))
+    (Finset.HasAntidiagonal.mem_antidiagonal.mpr (add_zero m))
     (fun b hb hne => ?_)]
   · simp [hg 0 (Nat.zero_le m)]
-  · have hbSum := Finset.mem_antidiagonal.mp hb
+  · have hbSum := Finset.HasAntidiagonal.mem_antidiagonal.mp hb
     rw [hg b.2 (by omega), if_neg (fun h => hne (by ext <;> simp_all)), mul_zero]
 
 private theorem integerCoeffMulOfTruncOne
@@ -1042,7 +1047,7 @@ theorem coeff_distinctPochhammerInf_eq_finite
       PowerSeries.coeff d
         (qPoch (-(PowerSeries.X : PowerSeries ℤ)) PowerSeries.X N) := by
   letI : TopologicalSpace (PowerSeries ℤ) := integerSeriesPiTop
-  rw [integer_qPochhammerInf_eq_tprod _ _ distinctFactorsMultipliable]
+  erw [integer_qPochhammerInf_eq_tprod _ _ distinctFactorsMultipliable]
   exact coeffDistinctTprodEqFinite d N h
 
 theorem coeff_oddPochhammerInf_eq_finite
@@ -1052,7 +1057,7 @@ theorem coeff_oddPochhammerInf_eq_finite
       PowerSeries.coeff d
         (qPoch (PowerSeries.X : PowerSeries ℤ) (PowerSeries.X ^ 2) N) := by
   letI : TopologicalSpace (PowerSeries ℤ) := integerSeriesPiTop
-  rw [integer_qPochhammerInf_eq_tprod _ _ oddFactorsMultipliable]
+  erw [integer_qPochhammerInf_eq_tprod _ _ oddFactorsMultipliable]
   exact coeffOddTprodEqFinite d N h
 
 /-- The completed distinct/odd Euler cancellation body. -/
@@ -1089,7 +1094,7 @@ theorem twoDilate_continuous :
     letI : TopologicalSpace (PowerSeries ℤ) := integerSeriesPiTop
     Continuous twoDilate := by
   letI : TopologicalSpace (PowerSeries ℤ) := integerSeriesPiTop
-  rw [continuous_pi_iff]
+  refine continuous_pi_iff.mpr ?_
   intro i
   change Continuous (fun F : PowerSeries ℤ => twoDilate F i)
   have heval : (fun F : PowerSeries ℤ => twoDilate F i) =
@@ -1144,7 +1149,7 @@ theorem eightDilate_qPochhammerInf (A Q : PowerSeries ℤ)
   have hmTarget : Multipliable (fun n =>
       1 - eightDilate A * eightDilate Q ^ n) := by
     exact (hm.map eightDilate eightDilate_continuous).congr hterm
-  rw [integer_qPochhammerInf_eq_tprod A Q hm,
+  erw [integer_qPochhammerInf_eq_tprod A Q hm,
     integer_qPochhammerInf_eq_tprod _ _ hmTarget]
   calc
     eightDilate (∏' n, (1 - A * Q ^ n)) =
@@ -1301,7 +1306,7 @@ theorem positiveNegativeUnitPochhammer_pair :
           (PowerSeries.X ^ 2) =
       qPochhammerInf (PowerSeries.X ^ 2) (PowerSeries.X ^ 4) := by
   letI : TopologicalSpace (PowerSeries ℤ) := integerSeriesPiTop
-  rw [integer_qPochhammerInf_eq_tprod _ _ positiveOddFactorsMultipliable,
+  erw [integer_qPochhammerInf_eq_tprod _ _ positiveOddFactorsMultipliable,
     integer_qPochhammerInf_eq_tprod _ _ oddFactorsMultipliable,
     integer_qPochhammerInf_eq_tprod _ _ pairedUnitFactorsMultipliable,
     ← positiveOddFactorsMultipliable.tprod_mul oddFactorsMultipliable]
@@ -1341,7 +1346,7 @@ theorem scaleFourUnitPochhammer_pair :
   letI : TopologicalSpace (PowerSeries ℤ) := integerSeriesPiTop
   have h := congrArg fourDilate positiveNegativeUnitPochhammer_pair
   simp only [map_mul] at h
-  rw [fourDilate_qPochhammerInf _ _ positiveOddFactorsMultipliable,
+  erw [fourDilate_qPochhammerInf _ _ positiveOddFactorsMultipliable,
     fourDilate_qPochhammerInf _ _ oddFactorsMultipliable,
     fourDilate_qPochhammerInf _ _ pairedUnitFactorsMultipliable] at h
   simp only [map_neg, map_pow, fourDilate_X] at h
@@ -1359,7 +1364,7 @@ theorem fourDilate_infinitePositiveEvenEulerProduct_eq_scaleEight :
         (PowerSeries.X ^ 8) := by
   letI : TopologicalSpace (PowerSeries ℤ) := integerSeriesPiTop
   unfold infinitePositiveEvenEulerProduct
-  rw [fourDilate_qPochhammerInf _ _ integerPositiveEvenFactors_multipliable]
+  erw [fourDilate_qPochhammerInf _ _ integerPositiveEvenFactors_multipliable]
   simp only [map_neg, map_pow, fourDilate_X]
   have h8 : ((PowerSeries.X : PowerSeries ℤ) ^ 4) ^ 2 =
       PowerSeries.X ^ 8 := by ring

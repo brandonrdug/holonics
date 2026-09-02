@@ -36,13 +36,13 @@ variable {a b : ℤ}
 /-- The height of a point: the height of its abscissa, with the identity at zero. -/
 def pheight (a b : ℤ) : (E ((a : ℚ)) ((b : ℚ))).Point → ℕ
   | .zero => 0
-  | .some (x := x) _ => hgt x
+  | .some x _ _ => hgt x
 
 @[simp]
 lemma pheight_zero : pheight a b 0 = 0 := rfl
 
 lemma pheight_some {x y : ℚ} (h : (E ((a : ℚ)) ((b : ℚ))).Nonsingular x y) :
-    pheight a b (.some h) = hgt x := rfl
+    pheight a b (.some _ _ h) = hgt x := rfl
 
 /-! ## 2. The torsion abscissae are short -/
 
@@ -84,7 +84,7 @@ lemma torsion_abscissa_short {x y : ℚ}
 
 lemma double_height {x y : ℚ} (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0)
     (h : (E ((a : ℚ)) ((b : ℚ))).Nonsingular x y) (hy : y ≠ 0) :
-    pheight a b ((Point.some h : (E ((a : ℚ)) ((b : ℚ))).Point) + Point.some h)
+    pheight a b ((Point.some _ _ h : (E ((a : ℚ)) ((b : ℚ))).Point) + Point.some _ _ h)
       = hgt ((x ^ 2 - (a : ℚ) * (b : ℚ)) ^ 2
           / (2 ^ 2 * (x * (x - (a : ℚ)) * (x - (b : ℚ))))) := by
   have hyne : y ≠ (E ((a : ℚ)) ((b : ℚ))).negY x y := by
@@ -227,7 +227,7 @@ theorem theContraction (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0)
   · by_cases hv : v = 0
     · -- the two-torsion fibre
       have hshort := torsion_abscissa_short hQ hv
-      have hp : pheight a b (Point.some hQ) = hgt u := rfl
+      have hp : pheight a b (Point.some _ _ hQ) = hgt u := rfl
       rw [hp]
       have h1 : hgt u ≤ GeneralHeight.sizeOf a b + (a * b).natAbs + 1 := by omega
       have h2 : hgt u ^ 4 ≤ (GeneralHeight.sizeOf a b + (a * b).natAbs + 1) ^ 4 :=
@@ -256,7 +256,7 @@ theorem theContraction (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0)
           push_cast
           linarith [hnum]
         have hshort := rational_sqrt_short hsq
-        have hp : pheight a b (Point.some hQ) = hgt u := rfl
+        have hp : pheight a b (Point.some _ _ hQ) = hgt u := rfl
         rw [hp]
         have h1 : hgt u ≤ GeneralHeight.sizeOf a b + (a * b).natAbs + 1 := by omega
         have h2 : hgt u ^ 4 ≤ (GeneralHeight.sizeOf a b + (a * b).natAbs + 1) ^ 4 :=
@@ -294,10 +294,10 @@ theorem theContraction (ha : a ≠ 0) (hb : b ≠ 0) (hab : a - b ≠ 0)
           hAne hBne
         have hlink : hgt (((numA a b u.num (u.den : ℤ) : ℤ) : ℚ)
             / ((denB a b u.num (u.den : ℤ) : ℤ) : ℚ))
-            = pheight a b (Point.some hQ + Point.some hQ) := by
+            = pheight a b (Point.some _ _ hQ + Point.some _ _ hQ) := by
           rw [double_height ha hb hab hQ hv, ← certified_quotient_eq hu0 hua hub]
         rw [hlink] at hdup
-        have hp : pheight a b (Point.some hQ) = hgt u := rfl
+        have hp : pheight a b (Point.some _ _ hQ) = hgt u := rfl
         rw [hp]
         have hchain : hgt u ^ 4
             ≤ 2 ^ 7 * GeneralHeight.sizeOf a b ^ 10 * B := by
@@ -314,7 +314,7 @@ abscissae would give equal heights. -/
 
 lemma neg_some_point {x y : ℚ} (h : (E ((a : ℚ)) ((b : ℚ))).Nonsingular x y)
     (h' : (E ((a : ℚ)) ((b : ℚ))).Nonsingular x (-y)) :
-    -(Point.some h : (E ((a : ℚ)) ((b : ℚ))).Point) = Point.some h' := by
+    -(Point.some _ _ h : (E ((a : ℚ)) ((b : ℚ))).Point) = Point.some _ _ h' := by
   rw [Point.neg_some]
   congr 1
   simp only [negY, E]
@@ -327,7 +327,7 @@ curve. -/
 theorem theTranslateIsBoundedQuadratically (a b : ℤ) {xR yR : ℚ}
     (hR : (E ((a : ℚ)) ((b : ℚ))).Nonsingular xR yR)
     (X : (E ((a : ℚ)) ((b : ℚ))).Point) (hbig : hgt xR < pheight a b X) :
-    pheight a b (X - Point.some hR)
+    pheight a b (X - Point.some _ _ hR)
       ≤ 2 ^ 4 * GeneralHeight.pointSize a b xR.num (xR.den : ℤ) ^ 6
           * pheight a b X ^ 2 := by
   rcases X with _ | @⟨x, y, hX⟩
@@ -336,7 +336,7 @@ theorem theTranslateIsBoundedQuadratically (a b : ℤ) {xR yR : ℚ}
     have hpos := hgt_pos xR
     rw [← Point.zero_def] at hbig
     omega
-  · have hpx : pheight a b (Point.some hX) = hgt x := rfl
+  · have hpx : pheight a b (Point.some _ _ hX) = hgt x := rfl
     have hxne : x ≠ xR := by
       intro hc
       rw [hpx] at hbig
@@ -348,8 +348,8 @@ theorem theTranslateIsBoundedQuadratically (a b : ℤ) {xR yR : ℚ}
       have he : (E ((a : ℚ)) ((b : ℚ))).negY xR yR = -yR := by
         simp only [negY, E]; ring
       rwa [he] at h
-    have hsub : (Point.some hX : (E ((a : ℚ)) ((b : ℚ))).Point) - Point.some hR
-        = Point.some hX + Point.some hNk := by
+    have hsub : (Point.some _ _ hX : (E ((a : ℚ)) ((b : ℚ))).Point) - Point.some _ _ hR
+        = Point.some _ _ hX + Point.some _ _ hNk := by
       rw [sub_eq_add_neg, neg_some_point hR hNk]
     rw [hsub, Point.add_of_X_ne hxne]
     show hgt ((E ((a : ℚ)) ((b : ℚ))).addX x xR
@@ -561,7 +561,7 @@ private def coords : (E ((a : ℚ)) ((b : ℚ))).Point → Option (ℚ × ℚ)
 private lemma someEqPt {x₁ y₁ x₂ y₂ : ℚ} (hx : x₁ = x₂) (hy : y₁ = y₂)
     {h₁ : (E ((a : ℚ)) ((b : ℚ))).Nonsingular x₁ y₁}
     {h₂ : (E ((a : ℚ)) ((b : ℚ))).Nonsingular x₂ y₂} :
-    (Point.some h₁ : (E ((a : ℚ)) ((b : ℚ))).Point) = Point.some h₂ := by
+    (Point.some _ _ h₁ : (E ((a : ℚ)) ((b : ℚ))).Point) = Point.some _ _ h₂ := by
   subst hx; subst hy; rfl
 
 private lemma coords_injective : Function.Injective (coords (a := a) (b := b)) := by

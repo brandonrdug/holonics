@@ -462,8 +462,7 @@ theorem occurrenceQuotientHalfPolar_zsmul_left (hp2 : p ≠ 2)
     (a : ℤ) (x y : OccurrenceQuotient hp2 occurrence) :
     occurrenceQuotientHalfPolar hp2 occurrence (a • x) y =
       a * occurrenceQuotientHalfPolar hp2 occurrence x y := by
-  simpa only [smul_eq_mul] using
-    map_zsmul (occurrenceQuotientHalfPolarLeft hp2 occurrence y) a x
+  exact map_zsmul (occurrenceQuotientHalfPolarLeft hp2 occurrence y) a x
 
 theorem occurrenceQuotientHalfPolar_add_right (hp2 : p ≠ 2)
     (occurrence : BrandtNeighborOccurrence (p := p))
@@ -612,7 +611,11 @@ theorem occurrenceJonesPallCoordinateEquiv_apply (hp2 : p ≠ 2)
     x • b 0 + y • b 1 + z • b 2
   rw [show (x, y, z) =
       x • intTripleBasis 0 + y • intTripleBasis 1 + z • intTripleBasis 2 by
-    ext <;> simp [intTripleBasis]]
+    simp only [FamilyTunnellBrandtNeighborRankThree.intTripleBasis_zero,
+      FamilyTunnellBrandtNeighborRankThree.intTripleBasis_one,
+      FamilyTunnellBrandtNeighborRankThree.intTripleBasis_two, Prod.smul_mk, Prod.mk_add_mk,
+      smul_eq_mul]
+    ext <;> simp]
   simp only [map_add, map_zsmul, Module.Basis.equiv_apply, Equiv.refl_apply]
 
 /-- The coefficient-level depth-four receiver used by the finite reduction. -/

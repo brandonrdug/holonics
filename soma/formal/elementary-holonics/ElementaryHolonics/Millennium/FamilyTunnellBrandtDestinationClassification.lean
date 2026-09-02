@@ -371,13 +371,13 @@ theorem firstBrandtNeighborHom_zero_fourthCoordinate_dvd (hp2 : p ≠ 2)
         (m := firstPivotKernelPoint (p := p) (4 * v.1) (2 * v.2.1)
           (64 * v.2.2) u.1 u.2.1 u.2.2.1)
         (v := v) (a := u.2.2.2) hv
-      simpa [firstBrandtNeighborHom, firstPivotNeighborHom] using hzero
+      simpa [firstBrandtNeighborHom, firstPivotNeighborHom, firstPivotNeighborPoint, v, Prod.mk_zero_zero] using hzero
   | inr z =>
       apply fourthCoordinate_dvd_of_fractionalPoint_eq_zero (p := p)
         (m := secondPivotKernelPoint (p := p) (2 * v.2.1) (64 * v.2.2)
           u.1 u.2.1 u.2.2.1)
         (v := v) (a := u.2.2.2) hv
-      simpa [firstBrandtNeighborHom, secondPivotNeighborHom] using hzero
+      simpa [firstBrandtNeighborHom, secondPivotNeighborHom, secondPivotNeighborPoint, v, Prod.mk_zero_zero] using hzero
 
 /-- Every zero fibre of an actual second-class additive neighbor chart has the
 same exact divisibility. -/
@@ -398,14 +398,14 @@ theorem secondBrandtNeighborHom_zero_fourthCoordinate_dvd (hp2 : p ≠ 2)
       apply fourthCoordinate_dvd_of_fractionalPoint_eq_zero (p := p)
         (m := firstPivotKernelPoint (p := p) A B C u.1 u.2.1 u.2.2.1)
         (v := v) (a := u.2.2.2) hv
-      simpa [secondBrandtNeighborHom, firstPivotNeighborHom, A, B, C] using hzero
+      simpa [secondBrandtNeighborHom, firstPivotNeighborHom, firstPivotNeighborPoint, v, A, B, C, Prod.mk_zero_zero] using hzero
   | inr z =>
       let B := 8 * v.2.1 + 4 * v.2.2
       let C := 4 * v.2.1 + 18 * v.2.2
       apply fourthCoordinate_dvd_of_fractionalPoint_eq_zero (p := p)
         (m := secondPivotKernelPoint (p := p) B C u.1 u.2.1 u.2.2.1)
         (v := v) (a := u.2.2.2) hv
-      simpa [secondBrandtNeighborHom, secondPivotNeighborHom, B, C] using hzero
+      simpa [secondBrandtNeighborHom, secondPivotNeighborHom, secondPivotNeighborPoint, v, B, C, Prod.mk_zero_zero] using hzero
 
 private theorem two_ne_zero (hp2 : p ≠ 2) : (2 : ZMod p) ≠ 0 := by
   apply Ring.two_ne_zero
@@ -429,7 +429,7 @@ theorem mem_firstBrandtNeighbor_iff_coordinates (hp2 : p ≠ 2)
   | inl yz =>
       have hvx : (v.1 : ZMod p) = 1 := by
         have h := congrArg Prod.fst hreduce
-        simpa [v, projectiveDirectionVector] using h
+        simpa [v, projectiveDirectionVector, reduceTriple] using h
       have hA : ((4 * v.1 : ℤ) : ZMod p) ≠ 0 := by
         push_cast
         rw [hvx]
@@ -461,10 +461,10 @@ theorem mem_firstBrandtNeighbor_iff_coordinates (hp2 : p ≠ 2)
   | inr z =>
       have hvx : (v.1 : ZMod p) = 0 := by
         have h := congrArg Prod.fst hreduce
-        simpa [v, projectiveDirectionVector] using h
+        simpa [v, projectiveDirectionVector, reduceTriple] using h
       have hvy : (v.2.1 : ZMod p) = 1 := by
         have h := congrArg (fun w => w.2.1) hreduce
-        simpa [v, projectiveDirectionVector] using h
+        simpa [v, reduceTriple, projectiveDirectionVector] using h
       have hA : ((4 * v.1 : ℤ) : ZMod p) = 0 := by
         push_cast
         rw [hvx]
@@ -518,7 +518,7 @@ theorem mem_secondBrandtNeighbor_iff_coordinates (hp2 : p ≠ 2)
   | inl yz =>
       have hvx : (v.1 : ZMod p) = 1 := by
         have h := congrArg Prod.fst hreduce
-        simpa [v, brandtSecondDirectionVector, thinToBrandtSecondMod,
+        simpa [v, reduceTriple, brandtSecondDirectionVector, thinToBrandtSecondMod,
           projectiveDirectionVector] using h
       have hA : (A : ZMod p) ≠ 0 := by
         dsimp [A]
@@ -550,7 +550,7 @@ theorem mem_secondBrandtNeighbor_iff_coordinates (hp2 : p ≠ 2)
   | inr z =>
       have hvx : (v.1 : ZMod p) = 0 := by
         have h := congrArg Prod.fst hreduce
-        simpa [v, brandtSecondDirectionVector, thinToBrandtSecondMod,
+        simpa [v, reduceTriple, brandtSecondDirectionVector, thinToBrandtSecondMod,
           projectiveDirectionVector] using h
       have hA : (A : ZMod p) = 0 := by
         dsimp [A]

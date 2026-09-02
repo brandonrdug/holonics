@@ -86,7 +86,7 @@ theorem powerSeriesEulerCurrent_exactDilate
   apply PowerSeries.ext
   intro n
   rw [coeff_powerSeriesEulerCurrent, coeff_exactDilate]
-  simp only [map_smul, coeff_exactDilate]
+  simp only [PowerSeries.coeff_smul, map_zsmul, map_smul, smul_eq_mul, coeff_exactDilate]
   by_cases hdiv : k ∣ n
   · rw [if_pos hdiv, if_pos hdiv]
     obtain ⟨j, rfl⟩ := hdiv
@@ -203,7 +203,7 @@ theorem powerSeriesEuler_ode_unique
         · rw [hfirst, connection_zero, zero_mul, zero_mul]
         · congr 1
           apply ih address.2
-          have hsum := Finset.mem_antidiagonal.mp haddress
+          have hsum := Finset.HasAntidiagonal.mem_antidiagonal.mp haddress
           omega
       have hscaled :
           (n : ℤ) * PowerSeries.coeff n source =

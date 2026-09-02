@@ -44,6 +44,9 @@ def middleZeroRootEmbedding : ZMod p ↪ ((ZMod p × ZMod p) ⊕ ZMod p) where
     intro z w h
     simpa using h
 
+@[simp] theorem middleZeroRootEmbedding_apply (z : ZMod p) :
+    middleZeroRootEmbedding z = Sum.inl (0, z) := rfl
+
 private theorem two_ne_zero (hp2 : p ≠ 2) : (2 : ZMod p) ≠ 0 := by
   apply Ring.two_ne_zero
   rw [ZMod.ringChar_zmod_n]
@@ -71,9 +74,9 @@ theorem middleZeroDirections_eq_root_map (hp2 : p ≠ 2) :
           Sum.inl (y, z) ∈
               (middleZeroRootPopulation (p := p)).map middleZeroRootEmbedding ↔
             y = 0 ∧ z ^ 2 = (-1 : ZMod p) / 16 := by
-        simp [middleZeroRootPopulation, middleZeroRootEmbedding, eq_comm, and_comm]
-      simp only [middleZeroDirections, Finset.mem_filter,
-        projectiveDirectionVector, hleft, hright]
+        simp [middleZeroRootPopulation, eq_comm, and_comm]
+      rw [middleZeroDirections, Finset.mem_filter, hleft, hright]
+      simp only [projectiveDirectionVector]
       constructor
       · rintro ⟨hiso, hy⟩
         refine ⟨hy, ?_⟩
