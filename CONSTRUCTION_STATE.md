@@ -4,15 +4,26 @@
 [`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) is the sole ordered construction
 authority. Historical phase detail remains in Git and the dated records named there.
 
-**Currency:** 2026-09-01, after AAC0--AAC6 completed. MVF0--MVF6, SCF0--SCF6, CONS0--CONS5,
+**Currency:** 2026-09-01, after WB0--WB4 were directly founded. AAC0--AAC6, MVF0--MVF6, SCF0--SCF6, CONS0--CONS5,
 QLT1--QLT6, CDB1, HIF0--HIF7, and the exact bounded R0Q0--R0Q4 mechanisms retain their scoped
 grades.
 
 ## Current frontier
 
-**Current frontier:** NONE
+**Current frontier:** WB1
 
-**AAC0--AAC6 ARE COMPLETE. NO CONSTRUCTION DEED IS ACTIVE.**
+**WB0 PASSED. WB1 IS ACTIVE. WB2--WB4 FOLLOW ONLY AFTER THEIR PREDECESSORS PASS.**
+
+[definition] Brandon's direct request of 2026-09-01 founds the exterior application contract
+[`applications/holonics-workbench/WORKBENCH.md`](applications/holonics-workbench/WORKBENCH.md).
+WB0 returned the shared typed command/event protocol and application architecture. WB1 owns only
+Athena named sessions, live operations, snapshot/remount, diffusion demo, and export. The completed
+AAC0--AAC6 foundation retains its exact standing below.
+
+[established-bounded; implemented-exact; source-inspected; measured] WB0 returned one typed
+command/event family for CLI and TUI, nested parsing, human/JSONL rendering, exact negative rational
+arguments, and malformed-input refusal. Two focused tests passed. The receipt is
+[`research/records/2026-09-01_WB0_HOLONICS_WORKBENCH_SHARED_COMMAND_EVENT_PROTOCOL_RETURNED.md`](research/records/2026-09-01_WB0_HOLONICS_WORKBENCH_SHARED_COMMAND_EVENT_PROTOCOL_RETURNED.md).
 
 [definition] Brandon's direct request of 2026-09-01 founds the active contract
 [`blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).

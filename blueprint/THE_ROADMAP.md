@@ -35,6 +35,8 @@ Read, in order:
     [`THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md`](THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md).
 11. the active Athena Application and Circulation Interface contract,
     [`THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).
+12. the active exterior Holonics Workbench application contract,
+    [`../applications/holonics-workbench/WORKBENCH.md`](../applications/holonics-workbench/WORKBENCH.md).
 
 Read only the smallest source, formal, and evidence closure required by the active deed. Completed
 sensory, membrane, Athena-alpha, Soulkiller, L, H, and Millennium campaign files
@@ -424,7 +426,7 @@ relations; it does not demote the exact SCF handoff/circulation/withdrawal mecha
 
 ## Completed campaign — Athena Application and Circulation Interface
 
-**Current frontier:** NONE
+**Completed AAC frontier:** NONE
 
 **AAC0--AAC6 ARE COMPLETE. NO CONSTRUCTION DEED IS ACTIVE.**
 
@@ -534,6 +536,33 @@ held-out change, withdrawal, and restoration passed. Its exact return is
 6. `HIF5` — migrate products and remove campaign ontology;
 7. `HIF6` — resident and source-neutral closure; and
 8. `HIF7` — exact contact/interoperability framework release.
+
+## Active application — Holonics Workbench
+
+**Current frontier:** WB1
+
+**WB0--WB4 ARE ACTIVE IN THE ORDER BELOW.**
+
+[definition] Brandon's direct instruction of 2026-09-01 founds the exterior application contract
+[`../applications/holonics-workbench/WORKBENCH.md`](../applications/holonics-workbench/WORKBENCH.md).
+It composes public Athena, Eros, Soulkiller, morphology/export, diffusion, and engine inspection
+owners behind one typed command/event runtime used directly by both Clap CLI and Ratatui TUI.
+
+[established-bounded; implemented-exact; source-inspected; measured] WB0 passed. The independent
+application crate returns one serializable command/event protocol, nested parser, human/JSONL
+rendering, and malformed-input refusal. Two focused tests passed. Its receipt is
+[`research/records/2026-09-01_WB0_HOLONICS_WORKBENCH_SHARED_COMMAND_EVENT_PROTOCOL_RETURNED.md`](../research/records/2026-09-01_WB0_HOLONICS_WORKBENCH_SHARED_COMMAND_EVENT_PROTOCOL_RETURNED.md).
+
+[definition] The current deed is WB1 only: Athena named sessions, exact live operations,
+snapshot/remount paths, diffusion demo, and package export.
+
+[definition] The complete order is:
+
+1. `WB0` — shared typed protocol and application architecture;
+2. `WB1` — Athena sessions, store, diffusion, snapshot, and export;
+3. `WB2` — Eros, Soulkiller, engine adapters and CLI;
+4. `WB3` — Ratatui terminal interface over the same runtime; and
+5. `WB4` — operator documentation and coherent application release.
 
 ## Standing and history
 

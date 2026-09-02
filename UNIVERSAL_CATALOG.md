@@ -101,6 +101,12 @@ test result never upgrades a correspondence.
 | Simulation assurance and eigenpair residuals | `Computation/HolonicSimulationCertificate.lean` | nearest bounded owner: `exact_owner_testimony.rs` | — | **formal-only correspondence:** external producer/checker boundary remains explicit |
 | Constructive differential boundary calculus | `Computation/HolonicConstructiveDifferentialBoundary.lean` | partial: `exact_linear.rs`; `running_integral.rs`; `soma/life/src/reconstruction_fiber.rs` | — | **partial:** no Rust owner for the square-zero jet and complete standard/residue receiver |
 
+## Exterior operator applications
+
+| Application relation | Shared command owner | Engine/application owners | Status and exact open fibre |
+|---|---|---|---|
+| Holonics Workbench CLI/TUI protocol | `applications/holonics-workbench/src/{command,event,cli,render}.rs` | commands name the existing Athena, Eros, Soulkiller, morphology/export, diffusion and engine owners; Ratatui/Clap remain exterior | **partial:** WB0 returns the typed serializable command/event seam and parser. Athena execution, Eros/Soulkiller/engine adapters, CLI deeds and TUI remain WB1--WB3. |
+
 ## Maintenance law
 
 Update a row in the same coherent change that moves, adds, or removes one of its owners. Do not
