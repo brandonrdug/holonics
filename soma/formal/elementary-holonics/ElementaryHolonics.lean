@@ -91,6 +91,7 @@ import ElementaryHolonics.RH.PrimeSideConverges
 import ElementaryHolonics.RH.PairPopulation
 import ElementaryHolonics.RH.TrivialZeros
 import ElementaryHolonics.RH.HeatFlowOfPolynomials
+import ElementaryHolonics.RH.PairDescent
 import ElementaryHolonics.RH.WeightedArgumentPrinciple
 import ElementaryHolonics.RH.Balance
 import ElementaryHolonics.Millennium.Gluing
