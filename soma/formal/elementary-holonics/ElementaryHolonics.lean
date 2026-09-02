@@ -82,6 +82,7 @@ import ElementaryHolonics.RH.ZeroGap
 import ElementaryHolonics.RH.XiLowerBoundOnLineTwo
 import ElementaryHolonics.RH.LandauAtHeight
 import ElementaryHolonics.RH.HorizontalEdgeBound
+import ElementaryHolonics.RH.FactorizationMultiplicity
 import ElementaryHolonics.RH.WeightedArgumentPrinciple
 import ElementaryHolonics.RH.Balance
 import ElementaryHolonics.Millennium.Gluing
