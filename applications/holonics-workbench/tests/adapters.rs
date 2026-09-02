@@ -1,9 +1,10 @@
 use std::fs;
-use std::process::Command;
+use std::io::Write;
+use std::process::{Command, Stdio};
 
 use holonics_workbench::{
     AthenaCommand, EngineCommand, ErosCommand, EventLevel, ExportCodecArgument, SoulkillerCommand,
-    WorkbenchCommand, WorkbenchEvent, WorkbenchRuntime,
+    WorkbenchCommand, WorkbenchEvent, WorkbenchRequest, WorkbenchResponse, WorkbenchRuntime,
 };
 use tempfile::tempdir;
 
@@ -75,7 +76,7 @@ fn eros_soulkiller_engine_and_cli_return_shared_structured_events() {
         runtime.execute(WorkbenchCommand::Status)
     };
     let output = Command::new(env!("CARGO_BIN_EXE_holonics"))
-        .args(["--json", "status"])
+        .args(["--format", "jsonl", "status"])
         .output()
         .expect("CLI status");
     assert!(output.status.success());
@@ -97,10 +98,81 @@ fn eros_soulkiller_engine_and_cli_return_shared_structured_events() {
         "soulkiller",
         "engine",
         "capabilities",
+        "demo",
+        "discover",
+        "run",
         "tui",
     ] {
         assert!(help.contains(command), "help omitted {command}");
     }
+}
+
+#[test]
+fn cli_shorthand_and_structured_stdin_share_one_response_envelope() {
+    let binary = env!("CARGO_BIN_EXE_holonics");
+    let direct = Command::new(binary)
+        .args(["--format", "json", "status"])
+        .output()
+        .expect("direct status");
+    assert!(direct.status.success());
+    let direct: WorkbenchResponse =
+        serde_json::from_slice(&direct.stdout).expect("direct response");
+
+    let mut child = Command::new(binary)
+        .args(["--format", "json", "run", "-"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .expect("structured status");
+    child
+        .stdin
+        .take()
+        .expect("stdin")
+        .write_all(
+            &serde_json::to_vec(&WorkbenchRequest::new(WorkbenchCommand::Status))
+                .expect("request wire"),
+        )
+        .expect("request input");
+    let structured = child.wait_with_output().expect("structured output");
+    assert!(structured.status.success());
+    let structured: WorkbenchResponse =
+        serde_json::from_slice(&structured.stdout).expect("structured response");
+    assert_eq!(structured, direct);
+
+    let mut invalid = Command::new(binary)
+        .args(["--format", "json", "run", "-"])
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .spawn()
+        .expect("invalid request");
+    invalid
+        .stdin
+        .take()
+        .expect("stdin")
+        .write_all(b"{not-json")
+        .expect("invalid input");
+    let invalid = invalid.wait_with_output().expect("invalid output");
+    assert_eq!(invalid.status.code(), Some(2));
+    let invalid: WorkbenchResponse =
+        serde_json::from_slice(&invalid.stdout).expect("invalid response");
+    assert!(invalid.obstructed());
+
+    let malformed_cli = Command::new(binary)
+        .args(["--format", "json", "athena", "not-a-command"])
+        .output()
+        .expect("malformed CLI");
+    assert_eq!(malformed_cli.status.code(), Some(2));
+    let malformed_cli: WorkbenchResponse =
+        serde_json::from_slice(&malformed_cli.stdout).expect("malformed CLI response");
+    assert!(malformed_cli.obstructed());
+
+    let demo = Command::new(binary)
+        .args(["--format", "json", "demo"])
+        .output()
+        .expect("demo");
+    assert!(demo.status.success());
+    let demo: WorkbenchResponse = serde_json::from_slice(&demo.stdout).expect("demo response");
+    assert!(demo.events.len() >= 5);
 }
 
 #[test]

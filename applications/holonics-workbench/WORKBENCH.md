@@ -14,12 +14,15 @@ owners and presents their exact returns through one typed interface.
 [definition] The operational invariant is:
 
 ```text
-WorkbenchCommand -> WorkbenchRuntime -> List WorkbenchEvent.
+operator selection -> context-valid action -> WorkbenchCommand
+                   -> WorkbenchRuntime -> List WorkbenchEvent -> WorkbenchResponse.
 ```
 
-The CLI parses arguments into `WorkbenchCommand`. The Ratatui terminal UI edits and submits the
-same command values and renders the same event values. Neither presentation shells to the other,
-invokes historical examples as implementation, or carries hidden inference logic.
+The CLI parses direct arguments or a versioned `WorkbenchRequest` into `WorkbenchCommand`. The
+Ratatui terminal UI derives selectable actions from the selected filesystem resource or live
+session, then submits the same command values and renders the same event values. Neither
+presentation shells to the other, invokes historical examples as implementation, or carries hidden
+inference logic. Raw command syntax is not a TUI interaction model.
 
 [definition] Application categories are navigation only:
 
@@ -43,11 +46,20 @@ contains severity, subject, summary, and an optional structured JSON payload. Ev
 within one application run and may be written as JSON Lines. Human rendering is a projection of
 the event; it cannot change the command consequence.
 
+[definition] `WorkbenchRequest` and `WorkbenchResponse` are the versioned structured I/O envelopes.
+A response echoes its typed command and has one disposition and one ordered event population.
+Direct CLI shorthand and JSON
+request input which construct the same command return equal responses. Invalid structured input and
+runtime refusal retain the same response shape and differ by exit code.
+
 [definition] Commands initially admitted are:
 
 ```text
 status
 capabilities
+demo
+discover [ROOT]
+run REQUEST|-
 
 athena demo-open SESSION
 athena open SESSION SNAPSHOT
@@ -66,6 +78,7 @@ eros atlas DIRECTORY EXTENSION OCTET_BUDGET
 soulkiller config PATH
 soulkiller index PATH
 soulkiller onnx PATH
+soulkiller inspect PATH
 
 engine package PATH
 engine export PACKAGE {onnx|safetensors} PATH.
@@ -75,6 +88,11 @@ engine export PACKAGE {onnx|safetensors} PATH.
 capacity/conductance realization. Demo material never becomes a capability gate and cannot be
 mistaken for unrestricted Soulkiller or physical diffusion.
 
+[definition] Top-level `demo` is a complete zero-required-parameter application scenario. It opens
+the bounded excitation fixture, derives an admitted ingress and receiver from the returned package,
+conducts, commits one explicitly bounded later return, and conducts the changed generation. It may
+not require the operator to copy a value from one payload into the next command.
+
 ## 2. Runtime and persistence
 
 [definition] One `WorkbenchRuntime` owns live named Athena applications and the latest returned
@@ -82,43 +100,54 @@ boundary per session. Session names are operator handles only. Conduct uses expl
 addresses. Continue accepts only an actual successor returned by the preceding boundary. Return
 uses that exact emission. Commit and decline consume and replace the session owner atomically.
 
-[definition] Persistent artifacts are explicit paths supplied by the operator:
+[definition] Persistent artifacts use either an explicitly selected path or a complete generated
+destination displayed in the action before execution:
 
 - native morphology package wire;
 - circulation snapshot wire;
 - exact export artifact; and
 - optional JSONL event transcript.
 
-Paths are exterior carriage and lineage, not native identity. No content-addressed store, checksum
-registry, workspace census, or hidden default corpus is introduced. Parent directories may be
-created only for an explicit output path.
+Paths are exterior carriage and lineage, not native identity. Generated destinations live under the
+user-local Workbench data directory, include session and generation, and never overwrite an existing
+artifact. No content-addressed store, checksum registry, workspace census, or hidden default corpus
+is introduced. Parent directories may be created only after the displayed action is executed.
 
 ## 3. CLI
 
 [definition] The `holonics` binary uses Clap only to parse operator input. With a subcommand it
-executes one command and prints human or JSON output. With `tui` or no subcommand on an interactive
-terminal it enters the terminal UI. CLI help is generated from the same admitted command family;
-unsupported engine owners are displayed as open, not stubbed with plausible output.
+executes one command and prints human, single-envelope JSON, or event-stream JSONL output. `run`
+reads the same command from a versioned JSON request file or standard input. With `tui` or no
+subcommand on an interactive terminal it enters the terminal UI. CLI help is generated from the
+same admitted command family; unsupported engine owners are displayed as open, not stubbed with
+plausible output.
 
 [definition] One-shot CLI invocations are naturally stateless. Long-lived multi-step Athena
 interaction is available in the TUI, or through explicit snapshot/open commands across invocations.
 
-## 4. Ratatui terminal interface
+## 4. Ratatui guided terminal interface
 
 [definition] Ratatui 0.30.2 is an immediate-mode renderer. Crossterm supplies terminal events. The
-TUI owns only presentation state:
+TUI owns only presentation and ephemeral discovery state:
 
 ```text
-top      category tabs and active sessions
-left     command catalogue
-center   event summaries and causal chronology
-right    selected structured payload / package anatomy / boundary fibres
-bottom   command palette, status, and key help.
+top      current directory and active sessions
+left     guided start, live sessions, directories, and recognized resources
+center   only actions valid for the selected resource/session state
+right    selected resource/action/event exact detail
+bottom   returned event chronology, operation state, and key help.
 ```
 
-[definition] `:` focuses the command palette; `Enter` parses and executes through the shared
-runtime; `Tab` changes panes; arrows move selection; `Esc` clears/closes overlays; `q` exits only
-when the palette is not editing. Terminal restoration occurs on ordinary exit and error.
+[definition] Folder traversal, workspace/home roots, recognized artifact filtering, session
+selection, selectable ingress/receiver pairs, every actual-successor choice, an exact returned-
+interaction form, and non-overwriting artifact destinations remove path and parameter
+transcription. `Enter` opens or executes, `Tab`/arrows move
+focus, `Backspace` ascends, `w`/`h` move to known roots, and `d` runs the complete bounded demo.
+Terminal restoration occurs on ordinary exit and error.
+
+[definition] A potentially slow operation temporarily owns the one `WorkbenchRuntime` on a worker
+thread. Rendering and inspection continue; a second mutation is refused until ownership returns.
+This is application responsiveness, not parallel engine conduct.
 
 [definition] Rendering is pure over `WorkbenchView`. A headless `TestBackend` control proves the
 same view can render without a real terminal and that command execution is independent of frame
@@ -219,3 +248,17 @@ replicable files (38.8 GiB); root `output/` was absent. Its receipt is
 complete unrestricted Soulkiller dismantling, refound Eros, add a general engine plugin registry,
 schedule UI/web work, or promote a qualitative output. A callable owner absent from this first
 surface remains an explicit future application extension, not a missing engine organ.
+
+### WB5 — interaction and I/O correction
+
+[definition] Replace the static command-string catalogue, decorative category tabs, and embedded
+command editor. Return typed filesystem/resource navigation, runtime-derived valid actions, a
+zero-parameter complete demo, automatic Eros material selection, non-overwriting artifact paths,
+responsive operation ownership, and versioned request/response CLI I/O.
+
+**Pass WB5:** [definition] no TUI command template or unresolved placeholder remains; common work
+requires no path transcription; session actions derive from live ingress, receivers, boundary, and
+actual successors; demo requires zero arguments and returns generation-1 conduct after a local
+commit; direct/structured CLI responses agree; malformed input is structured; 80-column and wide
+render controls pass; a real pseudo-terminal deed returns and restores; and the coherent release
+passes.

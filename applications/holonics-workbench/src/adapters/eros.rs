@@ -10,6 +10,7 @@ use life::material_incidence::{
 use serde_json::json;
 
 use crate::adapters::AdapterReturn;
+use crate::discovery::dominant_source_extension;
 use crate::runtime::WorkbenchError;
 use crate::ErosCommand;
 
@@ -32,11 +33,14 @@ pub fn execute(command: ErosCommand) -> Result<AdapterReturn, WorkbenchError> {
 
 fn mouth(
     directory: PathBuf,
-    extension: String,
+    mut extension: String,
     radius: usize,
     scales: usize,
     octet_budget: usize,
 ) -> Result<AdapterReturn, WorkbenchError> {
+    if extension == "auto" {
+        extension = dominant_source_extension(&directory)?;
+    }
     let files = read_files(&directory, &extension)?;
     let mut carried = 0usize;
     let exposures = files
@@ -110,9 +114,12 @@ fn mouth(
 
 fn atlas(
     directory: PathBuf,
-    extension: String,
+    mut extension: String,
     octet_budget: usize,
 ) -> Result<AdapterReturn, WorkbenchError> {
+    if extension == "auto" {
+        extension = dominant_source_extension(&directory)?;
+    }
     let atlas = atlas_of(&directory, &extension, octet_budget)?;
     let (heights, storage, top) = atlas.heights();
     let quotient = face_quotient(&atlas);

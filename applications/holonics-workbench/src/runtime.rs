@@ -26,6 +26,7 @@ use serde_json::{json, Value};
 use thiserror::Error;
 
 use crate::adapters;
+use crate::discovery;
 use crate::store;
 use crate::{AthenaCommand, EventLevel, ExportCodecArgument, WorkbenchCommand, WorkbenchEvent};
 
@@ -33,6 +34,7 @@ use crate::{AthenaCommand, EventLevel, ExportCodecArgument, WorkbenchCommand, Wo
 struct SessionEntry {
     application: AthenaAlphaApplication,
     boundary: Option<NativeCirculationBoundary>,
+    bounded_demo: bool,
 }
 
 #[derive(Debug, Default)]
@@ -40,6 +42,33 @@ pub struct WorkbenchRuntime {
     sessions: BTreeMap<String, SessionEntry>,
     history: Vec<WorkbenchEvent>,
     next_sequence: u64,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct WorkbenchIngressView {
+    pub spool: String,
+    pub thread: String,
+    pub occurrence: u64,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct WorkbenchSessionView {
+    pub name: String,
+    pub generation: u64,
+    pub ingress: Vec<WorkbenchIngressView>,
+    pub receivers: Vec<u64>,
+    pub has_boundary: bool,
+    pub actual_successors: Vec<WorkbenchSuccessorView>,
+    pub bounded_demo: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct WorkbenchSuccessorView {
+    pub index: usize,
+    pub spool: String,
+    pub thread: String,
+    pub occurrence: u64,
+    pub receiver: u64,
 }
 
 #[derive(Debug, Error)]
@@ -62,6 +91,21 @@ pub enum WorkbenchError {
     Unwired(String),
 }
 
+impl WorkbenchError {
+    pub fn code(&self) -> &'static str {
+        match self {
+            Self::MissingSession(_) => "missing-session",
+            Self::ExistingSession(_) => "existing-session",
+            Self::MissingBoundary(_) => "missing-boundary",
+            Self::Successor { .. } => "invalid-successor",
+            Self::Rational(_) => "invalid-rational",
+            Self::Io { .. } => "io-refusal",
+            Self::Owner(_) => "owner-refusal",
+            Self::Unwired(_) => "unwired-command",
+        }
+    }
+}
+
 impl WorkbenchRuntime {
     pub fn new() -> Self {
         Self::default()
@@ -75,8 +119,214 @@ impl WorkbenchRuntime {
         self.sessions.keys().map(String::as_str).collect()
     }
 
+    pub fn session_views(&self) -> Vec<WorkbenchSessionView> {
+        self.sessions
+            .iter()
+            .map(|(name, entry)| {
+                let package = entry.application.package();
+                WorkbenchSessionView {
+                    name: name.clone(),
+                    generation: entry.application.generation(),
+                    ingress: package
+                        .hot()
+                        .realization()
+                        .ingress_sections
+                        .iter()
+                        .map(|address| WorkbenchIngressView {
+                            spool: address.spool.clone(),
+                            thread: address.thread.clone(),
+                            occurrence: address.occurrence.0,
+                        })
+                        .collect(),
+                    receivers: package
+                        .manifest
+                        .receiver_capability
+                        .native_receiver_family
+                        .iter()
+                        .map(|receiver| receiver.0)
+                        .collect(),
+                    has_boundary: entry.boundary.is_some(),
+                    actual_successors: entry
+                        .boundary
+                        .as_ref()
+                        .map(|boundary| {
+                            boundary
+                                .actual_successors
+                                .iter()
+                                .enumerate()
+                                .map(|(index, successor)| WorkbenchSuccessorView {
+                                    index,
+                                    spool: successor.address.spool.clone(),
+                                    thread: successor.address.thread.clone(),
+                                    occurrence: successor.address.occurrence.0,
+                                    receiver: successor.receiver.0,
+                                })
+                                .collect()
+                        })
+                        .unwrap_or_default(),
+                    bounded_demo: entry.bounded_demo,
+                }
+            })
+            .collect()
+    }
+
+    pub fn next_session_name(&self, prefix: &str) -> String {
+        if !self.sessions.contains_key(prefix) {
+            return prefix.to_owned();
+        }
+        (2u64..)
+            .map(|ordinal| format!("{prefix}-{ordinal}"))
+            .find(|candidate| !self.sessions.contains_key(candidate))
+            .expect("the finite session map cannot exhaust u64 names")
+    }
+
+    pub fn recommended_conduct_command(
+        &self,
+        session: &str,
+    ) -> Result<WorkbenchCommand, WorkbenchError> {
+        let entry = self.session(session)?;
+        let package = entry.application.package();
+        let address = package
+            .hot()
+            .realization()
+            .ingress_sections
+            .first()
+            .ok_or_else(|| WorkbenchError::Owner("session has no ingress section".to_owned()))?;
+        let receiver = package
+            .manifest
+            .receiver_capability
+            .native_receiver_family
+            .first()
+            .ok_or_else(|| WorkbenchError::Owner("session has no native receiver".to_owned()))?;
+        Ok(WorkbenchCommand::Athena(AthenaCommand::Conduct {
+            session: session.to_owned(),
+            spool: address.spool.clone(),
+            thread: address.thread.clone(),
+            occurrence: address.occurrence.0,
+            receiver: receiver.0,
+        }))
+    }
+
+    pub fn recommended_continue_command(
+        &self,
+        session: &str,
+    ) -> Result<WorkbenchCommand, WorkbenchError> {
+        let boundary = self
+            .session(session)?
+            .boundary
+            .as_ref()
+            .ok_or_else(|| WorkbenchError::MissingBoundary(session.to_owned()))?;
+        if boundary.actual_successors.is_empty() {
+            return Err(WorkbenchError::Owner(
+                "the current boundary has no actual successor".to_owned(),
+            ));
+        }
+        Ok(WorkbenchCommand::Athena(AthenaCommand::Continue {
+            session: session.to_owned(),
+            successor: 0,
+        }))
+    }
+
+    pub fn recommended_demo_return_command(
+        &self,
+        session: &str,
+    ) -> Result<WorkbenchCommand, WorkbenchError> {
+        if !self.session(session)?.bounded_demo {
+            return Err(WorkbenchError::Owner(
+                "only a bounded demo session supplies an application-authored demo return aperture"
+                    .to_owned(),
+            ));
+        }
+        let boundary = self
+            .session(session)?
+            .boundary
+            .as_ref()
+            .ok_or_else(|| WorkbenchError::MissingBoundary(session.to_owned()))?;
+        let latest = std::iter::once(boundary.request.address.occurrence.0)
+            .chain(
+                boundary
+                    .emission
+                    .grains
+                    .iter()
+                    .flat_map(|grain| grain.occurrences.iter().map(|occurrence| occurrence.0)),
+            )
+            .chain(
+                boundary
+                    .actual_successors
+                    .iter()
+                    .map(|successor| successor.address.occurrence.0),
+            )
+            .max()
+            .unwrap_or(0);
+        // The bounded demo dismantling owns occurrences 1..=3. Keep its returned world event in
+        // the explicitly separated demo aperture used by the alpha matrix while still moving
+        // past any later boundary the operator may have continued into.
+        let occurrence = latest
+            .saturating_add(1)
+            .max(100u64.saturating_add(boundary.generation.saturating_mul(100)));
+        Ok(WorkbenchCommand::Athena(AthenaCommand::Return {
+            session: session.to_owned(),
+            occurrence,
+            boundary: occurrence.saturating_mul(2),
+            real: "1".to_owned(),
+            imaginary: "1/2".to_owned(),
+            storage: "1".to_owned(),
+        }))
+    }
+
+    pub fn suggested_artifact_path(
+        &self,
+        session: &str,
+        suffix: &str,
+    ) -> Result<PathBuf, WorkbenchError> {
+        let generation = self.session(session)?.application.generation();
+        let safe_session = session
+            .chars()
+            .map(|character| {
+                if character.is_ascii_alphanumeric() || matches!(character, '-' | '_') {
+                    character
+                } else {
+                    '_'
+                }
+            })
+            .collect::<String>();
+        let directory = discovery::artifact_root()?.join(&safe_session);
+        let stem = format!("generation-{generation}");
+        let candidate = directory.join(format!("{stem}.{suffix}"));
+        if !candidate.exists() {
+            return Ok(candidate);
+        }
+        Ok((2u64..)
+            .map(|ordinal| directory.join(format!("{stem}-{ordinal}.{suffix}")))
+            .find(|path| !path.exists())
+            .expect("the filesystem cannot exhaust u64 artifact names"))
+    }
+
+    pub fn obstruction(
+        &mut self,
+        subject: impl Into<String>,
+        summary: impl Into<String>,
+    ) -> WorkbenchEvent {
+        self.obstruction_with_code(subject, "operation-refusal", summary)
+    }
+
+    pub fn obstruction_with_code(
+        &mut self,
+        subject: impl Into<String>,
+        code: impl Into<String>,
+        summary: impl Into<String>,
+    ) -> WorkbenchEvent {
+        let event = self
+            .event(EventLevel::Obstruction, subject, summary, None)
+            .with_code(code);
+        self.history.push(event.clone());
+        event
+    }
+
     pub fn execute(&mut self, command: WorkbenchCommand) -> Vec<WorkbenchEvent> {
         let result = match command {
+            WorkbenchCommand::Demo => self.execute_demo(),
+            WorkbenchCommand::Discover { root } => self.execute_discover(root),
             WorkbenchCommand::Athena(command) => self.execute_athena(command),
             WorkbenchCommand::Status => Ok(vec![self.adapter(adapters::engine::status())]),
             WorkbenchCommand::Capabilities => {
@@ -94,15 +344,70 @@ impl WorkbenchRuntime {
         };
         let events = match result {
             Ok(events) => events,
-            Err(error) => vec![self.event(
-                EventLevel::Obstruction,
-                "workbench",
-                error.to_string(),
-                None,
-            )],
+            Err(error) => {
+                let code = error.code();
+                vec![self
+                    .event(
+                        EventLevel::Obstruction,
+                        "workbench",
+                        error.to_string(),
+                        None,
+                    )
+                    .with_code(code)]
+            }
         };
         self.history.extend(events.iter().cloned());
         events
+    }
+
+    fn execute_demo(&mut self) -> Result<Vec<WorkbenchEvent>, WorkbenchError> {
+        let session = self.next_session_name("alpha");
+        let mut events = self.athena_demo_open(session.clone())?;
+        let WorkbenchCommand::Athena(conduct) = self.recommended_conduct_command(&session)? else {
+            unreachable!("recommended conduct is an Athena command")
+        };
+        events.extend(self.execute_athena(conduct)?);
+        let WorkbenchCommand::Athena(returned) = self.recommended_demo_return_command(&session)?
+        else {
+            unreachable!("recommended return is an Athena command")
+        };
+        events.extend(self.execute_athena(returned)?);
+        let WorkbenchCommand::Athena(conduct) = self.recommended_conduct_command(&session)? else {
+            unreachable!("recommended conduct is an Athena command")
+        };
+        events.extend(self.execute_athena(conduct)?);
+        events.push(self.event(
+            EventLevel::Information,
+            format!("athena/{session}/demo"),
+            "bounded demo completed one returned local cultivation and left generation 1 at a live conduct boundary",
+            Some(json!({
+                "session": session,
+                "generation": 1,
+                "next_actions": ["continue an actual successor", "decline the boundary", "commit another explicit return", "snapshot", "export"]
+            })),
+        ));
+        Ok(events)
+    }
+
+    fn execute_discover(
+        &mut self,
+        root: Option<PathBuf>,
+    ) -> Result<Vec<WorkbenchEvent>, WorkbenchError> {
+        let start = root.unwrap_or_else(|| {
+            let current = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+            discovery::workspace_root(&current)
+        });
+        let discovered = discovery::discover(&start)?;
+        Ok(vec![self.event(
+            EventLevel::Information,
+            "workbench/discovery",
+            format!(
+                "found {} actionable resource(s) under {}",
+                discovered.resources.len(),
+                discovered.root.display()
+            ),
+            Some(to_value(&discovered)?),
+        )])
     }
 
     fn execute_athena(
@@ -178,6 +483,7 @@ impl WorkbenchRuntime {
             SessionEntry {
                 application: admission.application,
                 boundary: None,
+                bounded_demo: true,
             },
         );
         Ok(vec![self.event(
@@ -205,6 +511,7 @@ impl WorkbenchRuntime {
             SessionEntry {
                 application,
                 boundary: None,
+                bounded_demo: false,
             },
         );
         Ok(vec![self.event(
@@ -337,6 +644,7 @@ impl WorkbenchRuntime {
                     SessionEntry {
                         application,
                         boundary: None,
+                        bounded_demo: entry.bounded_demo,
                     },
                 );
                 Ok(vec![self.event(
@@ -357,6 +665,7 @@ impl WorkbenchRuntime {
                     SessionEntry {
                         application,
                         boundary: Some(boundary),
+                        bounded_demo: entry.bounded_demo,
                     },
                 );
                 Err(error)
@@ -382,6 +691,7 @@ impl WorkbenchRuntime {
             SessionEntry {
                 application,
                 boundary: None,
+                bounded_demo: entry.bounded_demo,
             },
         );
         Ok(vec![self.event(

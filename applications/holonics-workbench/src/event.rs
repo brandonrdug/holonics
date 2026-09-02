@@ -17,6 +17,7 @@ pub struct WorkbenchEvent {
     pub schema: String,
     pub sequence: u64,
     pub level: EventLevel,
+    pub code: Option<String>,
     pub subject: String,
     pub summary: String,
     pub payload: Option<Value>,
@@ -34,9 +35,15 @@ impl WorkbenchEvent {
             schema: WORKBENCH_SCHEMA.to_owned(),
             sequence,
             level,
+            code: None,
             subject: subject.into(),
             summary: summary.into(),
             payload,
         }
+    }
+
+    pub fn with_code(mut self, code: impl Into<String>) -> Self {
+        self.code = Some(code.into());
+        self
     }
 }

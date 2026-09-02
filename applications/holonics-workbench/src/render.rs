@@ -1,4 +1,4 @@
-use crate::{EventLevel, WorkbenchEvent};
+use crate::{EventLevel, WorkbenchEvent, WorkbenchResponse};
 
 pub fn render_human(events: &[WorkbenchEvent]) -> String {
     events
@@ -9,14 +9,18 @@ pub fn render_human(events: &[WorkbenchEvent]) -> String {
                 EventLevel::Consequence => "→",
                 EventLevel::Obstruction => "!",
             };
+            let subject = match &event.code {
+                Some(code) => format!("{} [{code}]", event.subject),
+                None => event.subject.clone(),
+            };
             match &event.payload {
                 Some(payload) => format!(
                     "{marker} {} — {}\n{}",
-                    event.subject,
+                    subject,
                     event.summary,
                     serde_json::to_string_pretty(payload).unwrap_or_else(|_| "null".to_owned())
                 ),
-                None => format!("{marker} {} — {}", event.subject, event.summary),
+                None => format!("{marker} {subject} — {}", event.summary),
             }
         })
         .collect::<Vec<_>>()
@@ -29,4 +33,8 @@ pub fn render_json_lines(events: &[WorkbenchEvent]) -> Result<String, serde_json
         .map(serde_json::to_string)
         .collect::<Result<Vec<_>, _>>()
         .map(|lines| lines.join("\n"))
+}
+
+pub fn render_json(response: &WorkbenchResponse) -> Result<String, serde_json::Error> {
+    serde_json::to_string_pretty(response)
 }

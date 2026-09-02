@@ -5,6 +5,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "domain", content = "command", rename_all = "kebab-case")]
 pub enum WorkbenchCommand {
+    Demo,
+    Discover { root: Option<PathBuf> },
     Status,
     Capabilities,
     Athena(AthenaCommand),
@@ -84,6 +86,7 @@ pub enum ErosCommand {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "action", rename_all = "kebab-case")]
 pub enum SoulkillerCommand {
+    Inspect { path: PathBuf },
     Config { path: PathBuf },
     Index { path: PathBuf },
     Onnx { path: PathBuf },

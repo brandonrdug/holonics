@@ -11,9 +11,9 @@ use crate::{
 #[derive(Clone, Debug, Parser)]
 #[command(name = "holonics", version, about = "Holonics operator workbench")]
 pub struct Cli {
-    /// Emit newline-delimited structured events.
-    #[arg(long, global = true)]
-    pub json: bool,
+    /// Select human, one-envelope JSON, or event-stream JSONL output.
+    #[arg(long, global = true, value_enum, default_value_t = OutputFormat::Human)]
+    pub format: OutputFormat,
     #[command(subcommand)]
     pub command: Option<CliCommand>,
 }
@@ -22,6 +22,17 @@ pub struct Cli {
 pub enum CliCommand {
     /// Open the interactive Ratatui workbench.
     Tui,
+    /// Run the complete bounded Athena demonstration without required parameters.
+    Demo,
+    /// Discover actionable source, model, snapshot, package, and ONNX resources.
+    Discover {
+        root: Option<PathBuf>,
+    },
+    /// Execute one versioned Workbench request from a JSON file or standard input (`-`).
+    Run {
+        #[arg(default_value = "-")]
+        input: String,
+    },
     Status,
     Capabilities,
     Athena {
@@ -97,8 +108,9 @@ pub struct SessionName {
 #[derive(Clone, Debug, Subcommand)]
 pub enum ErosCli {
     Mouth {
+        #[arg(default_value = ".")]
         directory: PathBuf,
-        #[arg(long, default_value = "md")]
+        #[arg(long, default_value = "auto")]
         extension: String,
         #[arg(long, default_value_t = 3)]
         radius: usize,
@@ -108,8 +120,9 @@ pub enum ErosCli {
         octet_budget: usize,
     },
     Atlas {
+        #[arg(default_value = ".")]
         directory: PathBuf,
-        #[arg(long, default_value = "md")]
+        #[arg(long, default_value = "auto")]
         extension: String,
         #[arg(long, default_value_t = 3_000_000)]
         octet_budget: usize,
@@ -118,6 +131,7 @@ pub enum ErosCli {
 
 #[derive(Clone, Debug, Subcommand)]
 pub enum SoulkillerCli {
+    Inspect { path: PathBuf },
     Config { path: PathBuf },
     Index { path: PathBuf },
     Onnx { path: PathBuf },
@@ -141,6 +155,14 @@ pub enum CodecCli {
     Safetensors,
 }
 
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, ValueEnum)]
+pub enum OutputFormat {
+    #[default]
+    Human,
+    Json,
+    Jsonl,
+}
+
 impl From<CodecCli> for ExportCodecArgument {
     fn from(codec: CodecCli) -> Self {
         match codec {
@@ -152,34 +174,43 @@ impl From<CodecCli> for ExportCodecArgument {
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct WorkbenchInvocation {
-    pub json: bool,
+    pub format: OutputFormat,
     pub tui: bool,
     pub command: Option<WorkbenchCommand>,
+    pub request_input: Option<String>,
 }
 
 impl Cli {
     pub fn invocation(self) -> WorkbenchInvocation {
-        let (tui, command) = match self.command {
-            None | Some(CliCommand::Tui) => (true, None),
-            Some(CliCommand::Status) => (false, Some(WorkbenchCommand::Status)),
-            Some(CliCommand::Capabilities) => (false, Some(WorkbenchCommand::Capabilities)),
+        let (tui, command, request_input) = match self.command {
+            None | Some(CliCommand::Tui) => (true, None, None),
+            Some(CliCommand::Demo) => (false, Some(WorkbenchCommand::Demo), None),
+            Some(CliCommand::Discover { root }) => {
+                (false, Some(WorkbenchCommand::Discover { root }), None)
+            }
+            Some(CliCommand::Run { input }) => (false, None, Some(input)),
+            Some(CliCommand::Status) => (false, Some(WorkbenchCommand::Status), None),
+            Some(CliCommand::Capabilities) => (false, Some(WorkbenchCommand::Capabilities), None),
             Some(CliCommand::Athena { command }) => {
-                (false, Some(WorkbenchCommand::Athena(command.into())))
+                (false, Some(WorkbenchCommand::Athena(command.into())), None)
             }
             Some(CliCommand::Eros { command }) => {
-                (false, Some(WorkbenchCommand::Eros(command.into())))
+                (false, Some(WorkbenchCommand::Eros(command.into())), None)
             }
-            Some(CliCommand::Soulkiller { command }) => {
-                (false, Some(WorkbenchCommand::Soulkiller(command.into())))
-            }
+            Some(CliCommand::Soulkiller { command }) => (
+                false,
+                Some(WorkbenchCommand::Soulkiller(command.into())),
+                None,
+            ),
             Some(CliCommand::Engine { command }) => {
-                (false, Some(WorkbenchCommand::Engine(command.into())))
+                (false, Some(WorkbenchCommand::Engine(command.into())), None)
             }
         };
         WorkbenchInvocation {
-            json: self.json,
+            format: self.format,
             tui,
             command,
+            request_input,
         }
     }
 }
@@ -289,6 +320,7 @@ impl From<ErosCli> for ErosCommand {
 impl From<SoulkillerCli> for SoulkillerCommand {
     fn from(command: SoulkillerCli) -> Self {
         match command {
+            SoulkillerCli::Inspect { path } => Self::Inspect { path },
             SoulkillerCli::Config { path } => Self::Config { path },
             SoulkillerCli::Index { path } => Self::Index { path },
             SoulkillerCli::Onnx { path } => Self::Onnx { path },

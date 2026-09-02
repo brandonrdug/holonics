@@ -42,11 +42,12 @@ pub fn capabilities() -> AdapterReturn {
         summary: "returned the callable workbench surface and explicit open fibres".to_owned(),
         payload: Some(json!({
             "implemented": {
+                "workbench": ["demo", "discover", "structured-request", "resource-browser", "context-actions"],
                 "athena": ["demo-open", "open", "inspect", "conduct", "continue", "return", "decline", "diffuse-demo", "snapshot", "export"],
                 "eros": ["mouth", "atlas"],
-                "soulkiller": ["config", "index", "onnx"],
+                "soulkiller": ["inspect", "config", "index", "onnx"],
                 "engine": ["status", "capabilities", "package", "export"],
-                "presentation": ["cli-human", "cli-jsonl", "ratatui"]
+                "presentation": ["cli-human", "cli-json-envelope", "cli-jsonl-events", "ratatui-guided"]
             },
             "open": [
                 "unrestricted Soulkiller dismantling from arbitrary model directories",

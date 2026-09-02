@@ -1,97 +1,132 @@
-use ratatui::layout::{Constraint, Direction, Layout};
+use ratatui::layout::{Constraint, Direction, Layout, Rect};
 use ratatui::style::{Color, Modifier, Style, Stylize};
 use ratatui::text::Line;
-use ratatui::widgets::{Block, List, ListItem, Paragraph, Tabs, Wrap};
+use ratatui::widgets::{Block, List, ListItem, ListState, Paragraph, Wrap};
 use ratatui::Frame;
 
-use crate::tui::{ActivePane, WorkbenchTui, COMMAND_CATALOGUE};
+use crate::tui::{ActivePane, WorkbenchTui};
 use crate::EventLevel;
 
 pub fn render(frame: &mut Frame<'_>, app: &WorkbenchTui) {
     let rows = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
-            Constraint::Length(3),
-            Constraint::Min(8),
-            Constraint::Length(3),
-            Constraint::Length(1),
+            Constraint::Length(2),
+            Constraint::Min(10),
+            Constraint::Length(7),
+            Constraint::Length(2),
         ])
         .split(frame.area());
-    let tabs = Tabs::new(["Workbench", "Athena", "Eros", "Soulkiller", "Engine"])
-        .block(Block::bordered().title(" Holonics "))
-        .highlight_style(
-            Style::default()
-                .fg(Color::Cyan)
-                .add_modifier(Modifier::BOLD),
-        )
-        .select(0);
-    frame.render_widget(tabs, rows[0]);
 
-    let columns = Layout::default()
-        .direction(Direction::Horizontal)
-        .constraints([
-            Constraint::Percentage(28),
-            Constraint::Percentage(38),
-            Constraint::Percentage(34),
-        ])
-        .split(rows[1]);
-    render_catalogue(frame, app, columns[0]);
-    render_events(frame, app, columns[1]);
-    render_inspector(frame, app, columns[2]);
-
-    let title = if app.editing() {
-        " Command · Enter execute · Esc cancel "
+    render_header(frame, app, rows[0]);
+    if frame.area().width >= 100 {
+        let columns = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([
+                Constraint::Percentage(34),
+                Constraint::Percentage(32),
+                Constraint::Percentage(34),
+            ])
+            .split(rows[1]);
+        render_resources(frame, app, columns[0]);
+        render_actions(frame, app, columns[1]);
+        render_detail(frame, app, columns[2]);
     } else {
-        " Command · : edit · Tab pane · ↑↓ select · q quit "
-    };
-    let input = Paragraph::new(format!(":{}", app.input()))
-        .block(Block::bordered().title(title))
-        .style(if app.editing() {
-            Style::default().fg(Color::Yellow)
-        } else {
-            Style::default().fg(Color::DarkGray)
-        });
-    frame.render_widget(input, rows[2]);
-    frame.render_widget(
-        Paragraph::new(format!(
-            "{} · sessions [{}]",
-            app.status(),
-            app.sessions().join(", ")
-        ))
-        .style(Style::default().fg(Color::Gray)),
-        rows[3],
-    );
+        let body = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints([Constraint::Min(6), Constraint::Length(6)])
+            .split(rows[1]);
+        let columns = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints([Constraint::Percentage(50), Constraint::Percentage(50)])
+            .split(body[0]);
+        render_resources(frame, app, columns[0]);
+        render_actions(frame, app, columns[1]);
+        render_detail(frame, app, body[1]);
+    }
+    render_events(frame, app, rows[2]);
+    render_footer(frame, app, rows[3]);
 }
 
-fn render_catalogue(frame: &mut Frame<'_>, app: &WorkbenchTui, area: ratatui::layout::Rect) {
-    let items = COMMAND_CATALOGUE
-        .iter()
-        .enumerate()
-        .map(|(at, command)| {
-            let style = if at == app.selected_command() && app.active() == ActivePane::Catalogue {
-                Style::default()
-                    .fg(Color::Black)
-                    .bg(Color::Cyan)
-                    .add_modifier(Modifier::BOLD)
-            } else {
-                Style::default()
-            };
-            ListItem::new(*command).style(style)
-        })
-        .collect::<Vec<_>>();
+fn render_header(frame: &mut Frame<'_>, app: &WorkbenchTui, area: Rect) {
+    let sessions = if app.sessions().is_empty() {
+        "no live session".to_owned()
+    } else {
+        format!("sessions {}", app.sessions().join(", "))
+    };
     frame.render_widget(
-        List::new(items).block(
-            Block::bordered().title(if app.active() == ActivePane::Catalogue {
-                " Commands ● "
-            } else {
-                " Commands "
-            }),
-        ),
+        Paragraph::new(vec![
+            Line::from(vec![
+                "HOLONICS WORKBENCH".bold().fg(Color::Cyan),
+                "  select → act → inspect".dark_gray(),
+            ]),
+            Line::from(format!("{}  ·  {sessions}", app.directory().display())).dark_gray(),
+        ]),
         area,
     );
 }
 
-fn render_events(frame: &mut Frame<'_>, app: &WorkbenchTui, area: ratatui::layout::Rect) {
+fn render_resources(frame: &mut Frame<'_>, app: &WorkbenchTui, area: Rect) {
+    let items = app
+        .resources()
+        .iter()
+        .enumerate()
+        .map(|(at, resource)| {
+            ListItem::new(resource.label()).style(selected_style(
+                at == app.selected_resource() && app.active() == ActivePane::Resources,
+            ))
+        })
+        .collect::<Vec<_>>();
+    let mut state = ListState::default().with_selected(Some(app.selected_resource()));
+    frame.render_stateful_widget(
+        List::new(items).block(pane_block(
+            " Resources ",
+            app.active() == ActivePane::Resources,
+        )),
+        area,
+        &mut state,
+    );
+}
+
+fn render_actions(frame: &mut Frame<'_>, app: &WorkbenchTui, area: Rect) {
+    let items = app
+        .actions()
+        .iter()
+        .enumerate()
+        .map(|(at, action)| {
+            ListItem::new(vec![
+                Line::from(action.label.clone()).bold(),
+                Line::from(action.description.clone()).dark_gray(),
+            ])
+            .style(selected_style(
+                at == app.selected_action() && app.active() == ActivePane::Actions,
+            ))
+        })
+        .collect::<Vec<_>>();
+    let mut state = ListState::default().with_selected(Some(app.selected_action()));
+    frame.render_stateful_widget(
+        List::new(items).block(pane_block(
+            " Valid actions ",
+            app.active() == ActivePane::Actions,
+        )),
+        area,
+        &mut state,
+    );
+}
+
+fn render_detail(frame: &mut Frame<'_>, app: &WorkbenchTui, area: Rect) {
+    frame.render_widget(
+        Paragraph::new(app.selected_detail())
+            .block(pane_block(
+                " Exact detail ",
+                app.active() == ActivePane::Inspector,
+            ))
+            .wrap(Wrap { trim: false }),
+        area,
+    );
+}
+
+fn render_events(frame: &mut Frame<'_>, app: &WorkbenchTui, area: Rect) {
     let items = app
         .events()
         .iter()
@@ -108,57 +143,82 @@ fn render_events(frame: &mut Frame<'_>, app: &WorkbenchTui, area: ratatui::layou
                 format!("{marker} ").fg(color),
                 format!("#{} ", event.sequence).dark_gray(),
                 event.subject.clone().bold(),
-                format!(" — {}", event.summary).into(),
+                event
+                    .code
+                    .as_ref()
+                    .map(|code| format!(" [{code}]").red())
+                    .unwrap_or_else(|| "".into()),
+                format!("  {}", event.summary).into(),
             ]))
-            .style(if selected {
-                Style::default().bg(Color::DarkGray)
-            } else {
-                Style::default()
-            })
+            .style(selected_style(selected))
         })
         .collect::<Vec<_>>();
+    let mut state = ListState::default().with_selected(app.selected_event());
+    frame.render_stateful_widget(
+        List::new(items).block(pane_block(
+            " Returned events ",
+            app.active() == ActivePane::Events,
+        )),
+        area,
+        &mut state,
+    );
+}
+
+fn render_footer(frame: &mut Frame<'_>, app: &WorkbenchTui, area: Rect) {
+    let status = if app.busy() {
+        format!("WORKING  {}", app.status())
+    } else {
+        app.status().to_owned()
+    };
     frame.render_widget(
-        List::new(items).block(
-            Block::bordered().title(if app.active() == ActivePane::Events {
-                " Causal events ● "
+        Paragraph::new(vec![
+            Line::from(
+                "↑↓ choose  Enter open/run  Tab pane  ⌫ parent  w root  h home  d demo  q quit",
+            )
+            .dark_gray(),
+            Line::from(status).fg(if app.busy() {
+                Color::Yellow
             } else {
-                " Causal events "
+                Color::Gray
             }),
-        ),
+        ]),
         area,
     );
 }
 
-fn render_inspector(frame: &mut Frame<'_>, app: &WorkbenchTui, area: ratatui::layout::Rect) {
-    let text = app.selected_payload().unwrap_or_else(|| {
-        "Select an event carrying structured testimony.\n\nThe inspector is a cold receiver; it cannot route conduct.".to_owned()
-    });
-    frame.render_widget(
-        Paragraph::new(text)
-            .block(
-                Block::bordered().title(if app.active() == ActivePane::Inspector {
-                    " Inspector ● "
-                } else {
-                    " Inspector "
-                }),
-            )
-            .wrap(Wrap { trim: false }),
-        area,
-    );
+fn pane_block(title: &'static str, active: bool) -> Block<'static> {
+    Block::bordered().title(if active {
+        Line::from(title).fg(Color::Cyan).bold()
+    } else {
+        Line::from(title).fg(Color::Gray)
+    })
+}
+
+fn selected_style(selected: bool) -> Style {
+    if selected {
+        Style::default()
+            .fg(Color::Black)
+            .bg(Color::Cyan)
+            .add_modifier(Modifier::BOLD)
+    } else {
+        Style::default()
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use ratatui::backend::TestBackend;
     use ratatui::Terminal;
+    use tempfile::tempdir;
 
     use super::*;
 
     #[test]
-    fn headless_view_renders_small_and_large_terminals() {
-        let mut app = WorkbenchTui::new();
-        app.submit_line("capabilities");
-        for (width, height) in [(60, 16), (120, 36)] {
+    fn guided_view_renders_at_eighty_columns_and_wide_without_command_placeholders() {
+        let temporary = tempdir().expect("temporary");
+        let mut app = WorkbenchTui::at(temporary.path().to_path_buf());
+        app.execute_command(crate::WorkbenchCommand::Demo);
+        for (width, height) in [(80, 24), (120, 36)] {
             let backend = TestBackend::new(width, height);
             let mut terminal = Terminal::new(backend).expect("terminal");
             terminal.draw(|frame| render(frame, &app)).expect("render");
@@ -169,8 +229,10 @@ mod tests {
                 .iter()
                 .map(|cell| cell.symbol())
                 .collect::<String>();
-            assert!(rendered.contains("Holonics"));
-            assert!(rendered.contains("capabilities"));
+            assert!(rendered.contains("HOLONICS WORKBENCH"));
+            assert!(rendered.contains("Guided start"));
+            assert!(rendered.contains("Valid actions"));
+            assert!(!rendered.contains("<spool>"));
         }
     }
 }
