@@ -79,6 +79,7 @@ import ElementaryHolonics.RH.RectangleArgumentPrinciple
 import ElementaryHolonics.RH.XiEdgeDecomposition
 import ElementaryHolonics.RH.ExplicitFormulaFiniteHeight
 import ElementaryHolonics.RH.ZeroGap
+import ElementaryHolonics.RH.XiLowerBoundOnLineTwo
 import ElementaryHolonics.RH.WeightedArgumentPrinciple
 import ElementaryHolonics.RH.Balance
 import ElementaryHolonics.Millennium.Gluing
