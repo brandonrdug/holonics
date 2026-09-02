@@ -541,7 +541,7 @@ held-out change, withdrawal, and restoration passed. Its exact return is
 
 **Current frontier:** NONE
 
-**WB0--WB5 PASSED. NO APPLICATION DEED REMAINS SCHEDULED.**
+**WB0--WB6 PASSED. NO APPLICATION DEED REMAINS SCHEDULED.**
 
 [definition] Brandon's direct instruction of 2026-09-01 founds the exterior application contract
 [`../applications/holonics-workbench/WORKBENCH.md`](../applications/holonics-workbench/WORKBENCH.md).
@@ -587,6 +587,17 @@ returned 2,970 passed, zero failed, 50 ignored, all examples, 3,771 Lean jobs, a
 Its receipt is
 [`research/records/2026-09-01_WB5_WORKBENCH_RETURNED_GUIDED_RESOURCES_CONTEXT_ACTIONS_AND_STANDARD_IO.md`](../research/records/2026-09-01_WB5_WORKBENCH_RETURNED_GUIDED_RESOURCES_CONTEXT_ACTIONS_AND_STANDARD_IO.md).
 
+[established-bounded; implemented-exact; source-inspected; process-audit; measured] WB6 passed.
+Direct screenshot and source review rejected WB5's permanent file browser, unscrollable raw JSON,
+equal-pane composition, and diffusion ambiguity. Version 0.3.0 deletes generic discovery and returns
+a session-first lifecycle instrument, functional four-mode forms/actions, typed Summary/Structure
+receivers, secondary Exact wire, independent wrapped scrolling, scrollbars and complete navigation.
+The closed unit-law diffusion probe now names its non-mutating status and renders law, topology,
+total/nonzero currents, balances, standing, energy, and conservation. Recoverable return/decline and
+non-TTY invocation were repaired. Fifteen focused tests, 2,972 release tests, all examples, 3,771
+Lean jobs and all nine gates passed. Its receipt is
+[`research/records/2026-09-01_WB6_WORKBENCH_RETURNED_SESSION_FIRST_TYPED_RECEIPTS_AND_SCROLLABLE_DIFFUSION.md`](../research/records/2026-09-01_WB6_WORKBENCH_RETURNED_SESSION_FIRST_TYPED_RECEIPTS_AND_SCROLLABLE_DIFFUSION.md).
+
 [definition] The complete order is:
 
 1. `WB0` — shared typed protocol and application architecture;
@@ -594,7 +605,8 @@ Its receipt is
 3. `WB2` — Eros, Soulkiller, engine adapters and CLI;
 4. `WB3` — Ratatui terminal interface over the same runtime; and
 5. `WB4` — operator documentation and coherent application release; and
-6. `WB5` — guided resource/action interaction and standardized I/O correction.
+6. `WB5` — guided resource/action interaction and standardized I/O correction; and
+7. `WB6` — session-first typed receipts, scrollable exact views, and honest diffusion projection.
 
 ## Standing and history
 

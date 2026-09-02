@@ -4,7 +4,7 @@
 [`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) is the sole ordered construction
 authority. Historical phase detail remains in Git and the dated records named there.
 
-**Currency:** 2026-09-01, after WB0--WB5 were directly founded. AAC0--AAC6, MVF0--MVF6, SCF0--SCF6, CONS0--CONS5,
+**Currency:** 2026-09-01, after WB0--WB6 were directly founded. AAC0--AAC6, MVF0--MVF6, SCF0--SCF6, CONS0--CONS5,
 QLT1--QLT6, CDB1, HIF0--HIF7, and the exact bounded R0Q0--R0Q4 mechanisms retain their scoped
 grades.
 
@@ -12,14 +12,16 @@ grades.
 
 **Current frontier:** NONE
 
-**WB0--WB5 PASSED. NO APPLICATION DEED REMAINS SCHEDULED.**
+**WB0--WB6 PASSED. NO APPLICATION DEED REMAINS SCHEDULED.**
 
 [definition] Brandon's direct request of 2026-09-01 founds the exterior application contract
 [`applications/holonics-workbench/WORKBENCH.md`](applications/holonics-workbench/WORKBENCH.md).
 WB0 returned the shared protocol. WB1 returned Athena operations. WB2 returned Eros, Soulkiller,
 engine and CLI surfaces. WB3 returned the first Ratatui surface. WB4 returned documentation,
 walkthroughs, release and cleanup. Brandon's direct review found that surface CLI-shaped and
-operator-hostile; WB5 returned the guided correction. AAC0--AAC6 retains its exact standing below.
+operator-hostile; WB5 returned a guided correction. Direct screenshot review then found WB5 still
+filesystem-dominant, semantically raw, unscrollable, and diffusion-ambiguous; WB6 returned the
+session-first typed-receipt correction. AAC0--AAC6 retains its exact standing below.
 
 [established-bounded; implemented-exact; source-inspected; measured] WB0 returned one typed
 command/event family for CLI and TUI, nested parsing, human/JSONL rendering, exact negative rational
@@ -60,6 +62,19 @@ passed, zero failed, 50 ignored; all examples type-checked; the live Lean umbrel
 all nine gates passed. The installed binary and real 80-column TUI demo/restore returned. Cleanup
 removed 17,507 replicable files (39.0 GiB); root `target/` and `output/` are absent. The receipt is
 [`research/records/2026-09-01_WB5_WORKBENCH_RETURNED_GUIDED_RESOURCES_CONTEXT_ACTIONS_AND_STANDARD_IO.md`](research/records/2026-09-01_WB5_WORKBENCH_RETURNED_GUIDED_RESOURCES_CONTEXT_ACTIONS_AND_STANDARD_IO.md).
+
+[established-bounded; implemented-exact; source-inspected; process-audit; measured] WB6 deleted the
+generic discovery command/module and filesystem-first TUI. Workbench 0.3.0 is session-first, with
+functional four-mode actions, an Athena lifecycle, typed Summary/Structure projections, secondary
+Exact wire, independent wrapped-line scrolling and scrollbars, exact rational rendering, typed forms
+and human CLI output. The diffusion action is explicitly a closed one-step non-mutating unit-law
+probe and renders exact current, balance, standing, energy and conservation testimony. Recoverable
+return/decline refusal and non-TTY invocation were repaired. Fifteen focused tests passed. The
+complete release returned 2,972 tests passed, zero failed, 50 ignored; all examples type-checked;
+the live Lean umbrella built 3,771 jobs; all nine gates passed. The installed narrow/wide TUI and
+CLI returned. Cleanup removed 19,277 replicable files (42.4 GiB); root `target/` and `output/` are
+absent. The receipt is
+[`research/records/2026-09-01_WB6_WORKBENCH_RETURNED_SESSION_FIRST_TYPED_RECEIPTS_AND_SCROLLABLE_DIFFUSION.md`](research/records/2026-09-01_WB6_WORKBENCH_RETURNED_SESSION_FIRST_TYPED_RECEIPTS_AND_SCROLLABLE_DIFFUSION.md).
 
 [definition] Brandon's direct request of 2026-09-01 founds the active contract
 [`blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).

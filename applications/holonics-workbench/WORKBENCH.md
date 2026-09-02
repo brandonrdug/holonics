@@ -281,7 +281,7 @@ review found the generic file explorer compositionally dominant, raw JSON semant
 detail output unreachable below the viewport, and the diffusion summary materially incomplete.
 WB6 corrects those application claims without demoting the exact underlying owners.
 
-### WB6 — session-first typed receipt correction
+### WB6 — session-first typed receipt correction — PASSED
 
 [definition] Delete the generic discovery subsystem and permanent file explorer. Recompose the TUI
 around functional operation modes, current Athena session and lifecycle, grouped valid actions,
@@ -297,3 +297,14 @@ distinguishes total branches from nonzero current; Structure renders exact ratio
 node-balance tables; functional mode switches expose Athena/Eros/Soulkiller/Engine operations;
 80x28, 120x36, and 180x48 controls pass without a filesystem surface; real wide and narrow terminal
 deeds return and restore; and the coherent release passes.
+
+[established-bounded; implemented-exact; source-inspected; process-audit; measured] WB6 deleted the
+generic discovery module/command and permanent filesystem surface. Version 0.3.0 returns functional
+Athena/Eros/Soulkiller/Engine modes, one dominant session/lifecycle receipt, grouped action forms,
+typed Summary and Structure projections, cold Exact payloads, independently retained tab scroll,
+wrapped-line bounds, scrollbars, page/home/end/help navigation, typed human CLI output, and
+noninteractive-terminal refusal. The diffusion probe now reports its declared law, unchanged session,
+total/nonzero branches, exact currents, balances, standing, energy and residual. Failed return and
+decline preserve the session atomically. Fifteen focused controls, real narrow/wide terminal deeds,
+the installed binary, and all nine coherent release gates passed. Its receipt is
+[`../../research/records/2026-09-01_WB6_WORKBENCH_RETURNED_SESSION_FIRST_TYPED_RECEIPTS_AND_SCROLLABLE_DIFFUSION.md`](../../research/records/2026-09-01_WB6_WORKBENCH_RETURNED_SESSION_FIRST_TYPED_RECEIPTS_AND_SCROLLABLE_DIFFUSION.md).
