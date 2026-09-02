@@ -1,9 +1,9 @@
 # The Athena application and circulation interface returns a live dynamic morphology alpha
 
 **Date:** 2026-09-01
-**Kind:** active construction contract composed by
+**Kind:** completed construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** AAC6.
+**Current frontier:** NONE.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md),
@@ -305,7 +305,7 @@ snapshot/remount, and one inspected structural receipt. The real deed returned e
 is
 [`../research/records/2026-09-01_AAC5_FIRST_ATHENA_ALPHA_APPLICATION_COMMITTED_REMOUNTED_AND_CONDUCTED.md`](../research/records/2026-09-01_AAC5_FIRST_ATHENA_ALPHA_APPLICATION_COMMITTED_REMOUNTED_AND_CONDUCTED.md).
 
-### AAC6 — exact alpha matrix and coherent release
+### AAC6 — exact alpha matrix and coherent release — PASSED
 
 [definition] Run the twelve exact controls in §6 across direct Rust and ABI surfaces, including
 successive cultivation, decline, discrete conduct, exact diffusion, snapshot/remount, ablation,
@@ -315,6 +315,13 @@ and restoration. Record configuration-indexed structural consequences before app
 return inside the 180-second process aperture; the universal catalog names the new common formal,
 Rust, ABI, and application boundaries; the completion record carries commands and scopes; Git is
 clean and pushed; and reproducible `target/`, `output/`, and experiment scratch are absent.
+
+[established-bounded; implemented-exact; formal-checked; source-inspected; process-audit; measured]
+AAC6 passed. The twelve-control matrix returned one pass. After two firing timeout controls exposed
+and narrowed the release foreman, the repaired clean release returned 2,957 tests passed, zero
+failed, 50 ignored; every example type-checked; the Lean umbrella built 3,771 jobs; and all nine
+gates passed. `cargo clean` removed 14,947 files and 50.0 GiB. The complete receipt is
+[`../research/records/2026-09-01_AAC6_FIRST_DYNAMIC_ATHENA_ALPHA_AND_THE_COMPLETE_CIRCULATION_INTERFACE_RELEASED.md`](../research/records/2026-09-01_AAC6_FIRST_DYNAMIC_ATHENA_ALPHA_AND_THE_COMPLETE_CIRCULATION_INTERFACE_RELEASED.md).
 
 ## 8. Scope and process boundary
 

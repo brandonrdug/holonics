@@ -4,22 +4,22 @@
 [`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) is the sole ordered construction
 authority. Historical phase detail remains in Git and the dated records named there.
 
-**Currency:** 2026-09-01, after AAC0--AAC6 were directly founded. MVF0--MVF6, SCF0--SCF6, CONS0--CONS5,
+**Currency:** 2026-09-01, after AAC0--AAC6 completed. MVF0--MVF6, SCF0--SCF6, CONS0--CONS5,
 QLT1--QLT6, CDB1, HIF0--HIF7, and the exact bounded R0Q0--R0Q4 mechanisms retain their scoped
 grades.
 
 ## Current frontier
 
-**Current frontier:** AAC6
+**Current frontier:** NONE
 
-**AAC0--AAC5 PASSED. AAC6 IS THE ACTIVE TERMINAL RELEASE DEED.**
+**AAC0--AAC6 ARE COMPLETE. NO CONSTRUCTION DEED IS ACTIVE.**
 
 [definition] Brandon's direct request of 2026-09-01 founds the active contract
 [`blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).
 AAC0 returned the formal laws. AAC1 returned the move-owned session. AAC2 returned parented
 successive local commits and storage. AAC3 returned exact diffusion through the common event
-family. AAC4 returned the opaque stable exterior ABI. AAC5 now owns only the first Athena-alpha
-application package and returned it. AAC6 now owns only the exact matrix and coherent release.
+family. AAC4 returned the opaque stable exterior ABI. AAC5 returned the first Athena-alpha
+application package. AAC6 returned the exact matrix and coherent release.
 
 [proved-derived; formal-checked; measured] AAC0 returned `LiveCirculationSession`, one common
 owned boundary, parented commit and decline, exact snapshot/remount conduct, and constituted
@@ -56,6 +56,13 @@ local return, conducted generation 1, snapshotted/remounted, and returned a 12,5
 with one commit and one reconstruction fibre. No foreign executor or qualitative gate entered the
 runtime. The receipt is
 [`research/records/2026-09-01_AAC5_FIRST_ATHENA_ALPHA_APPLICATION_COMMITTED_REMOUNTED_AND_CONDUCTED.md`](research/records/2026-09-01_AAC5_FIRST_ATHENA_ALPHA_APPLICATION_COMMITTED_REMOUNTED_AND_CONDUCTED.md).
+
+[established-bounded; implemented-exact; formal-checked; source-inspected; process-audit; measured]
+AAC6 returned the twelve-control matrix and the repaired coherent release at `ca5701f7`: 2,957
+tests passed, zero failed, 50 ignored; every example type-checked; the live Lean umbrella built
+3,771 jobs; and all nine release gates passed. `cargo clean` removed 14,947 files and 50.0 GiB; root
+`output/` was absent. The exact completion receipt is
+[`research/records/2026-09-01_AAC6_FIRST_DYNAMIC_ATHENA_ALPHA_AND_THE_COMPLETE_CIRCULATION_INTERFACE_RELEASED.md`](research/records/2026-09-01_AAC6_FIRST_DYNAMIC_ATHENA_ALPHA_AND_THE_COMPLETE_CIRCULATION_INTERFACE_RELEASED.md).
 
 ## Admitted standing
 

@@ -422,11 +422,11 @@ relations; it does not demote the exact SCF handoff/circulation/withdrawal mecha
 6. `MVF5` — Safetensors and ONNX export lenses; and
 7. `MVF6` — multimodal configuration matrix and exact foundry release.
 
-## Active campaign — Athena Application and Circulation Interface
+## Completed campaign — Athena Application and Circulation Interface
 
-**Current frontier:** AAC6
+**Current frontier:** NONE
 
-**AAC0--AAC6 ARE ACTIVE IN THE ORDER BELOW.**
+**AAC0--AAC6 ARE COMPLETE. NO CONSTRUCTION DEED IS ACTIVE.**
 
 [definition] Brandon's direct instruction of 2026-09-01 founds the ordered `AAC0--AAC6` campaign
 under
@@ -470,8 +470,12 @@ a genuinely later local return, conducted generation 1, snapshotted, remounted, 
 exact structural receipt without foreign execution or qualitative grading. Its receipt is
 [`research/records/2026-09-01_AAC5_FIRST_ATHENA_ALPHA_APPLICATION_COMMITTED_REMOUNTED_AND_CONDUCTED.md`](../research/records/2026-09-01_AAC5_FIRST_ATHENA_ALPHA_APPLICATION_COMMITTED_REMOUNTED_AND_CONDUCTED.md).
 
-[definition] The current and terminal deed is AAC6 only: run the exact alpha matrix and one coherent
-release, close the catalog/authority/evidence, push clean Git, and remove reproducible output.
+[established-bounded; implemented-exact; formal-checked; source-inspected; process-audit; measured]
+AAC6 passed. The twelve-control matrix returned one pass. The repaired complete release at
+`ca5701f7` returned 2,957 tests passed, zero failed, 50 ignored; every example type-checked; the
+Lean umbrella built 3,771 jobs; and all nine gates passed. The 50.0-GiB reproducible Cargo tree was
+removed. Its receipt is
+[`research/records/2026-09-01_AAC6_FIRST_DYNAMIC_ATHENA_ALPHA_AND_THE_COMPLETE_CIRCULATION_INTERFACE_RELEASED.md`](../research/records/2026-09-01_AAC6_FIRST_DYNAMIC_ATHENA_ALPHA_AND_THE_COMPLETE_CIRCULATION_INTERFACE_RELEASED.md).
 
 [definition] The complete order is:
 
