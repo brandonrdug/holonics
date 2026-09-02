@@ -4,7 +4,7 @@
 [`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) is the sole ordered construction
 authority. Historical phase detail remains in Git and the dated records named there.
 
-**Currency:** 2026-09-01, after WB0--WB4 were directly founded. AAC0--AAC6, MVF0--MVF6, SCF0--SCF6, CONS0--CONS5,
+**Currency:** 2026-09-01, after WB0--WB5 were directly founded. AAC0--AAC6, MVF0--MVF6, SCF0--SCF6, CONS0--CONS5,
 QLT1--QLT6, CDB1, HIF0--HIF7, and the exact bounded R0Q0--R0Q4 mechanisms retain their scoped
 grades.
 
@@ -12,13 +12,14 @@ grades.
 
 **Current frontier:** NONE
 
-**WB0--WB4 PASSED. NO APPLICATION DEED REMAINS SCHEDULED.**
+**WB0--WB5 PASSED. NO APPLICATION DEED REMAINS SCHEDULED.**
 
 [definition] Brandon's direct request of 2026-09-01 founds the exterior application contract
 [`applications/holonics-workbench/WORKBENCH.md`](applications/holonics-workbench/WORKBENCH.md).
 WB0 returned the shared protocol. WB1 returned Athena operations. WB2 returned Eros, Soulkiller,
-engine and CLI surfaces. WB3 returned Ratatui over the same runtime. WB4 returned documentation,
-real walkthroughs, release and cleanup. AAC0--AAC6 retains its exact standing below.
+engine and CLI surfaces. WB3 returned the first Ratatui surface. WB4 returned documentation,
+walkthroughs, release and cleanup. Brandon's direct review found that surface CLI-shaped and
+operator-hostile; WB5 returned the guided correction. AAC0--AAC6 retains its exact standing below.
 
 [established-bounded; implemented-exact; source-inspected; measured] WB0 returned one typed
 command/event family for CLI and TUI, nested parsing, human/JSONL rendering, exact negative rational
@@ -48,6 +49,17 @@ and the complete coherent release: 2,966 tests passed, zero failed, 50 ignored; 
 type-checked; the live Lean umbrella built 3,771 jobs; all nine gates passed. `cargo clean` removed
 15,274 replicable files (38.8 GiB) and root `output/` was absent. The receipt is
 [`research/records/2026-09-01_WB4_HOLONICS_WORKBENCH_CLI_RATATUI_RELEASED.md`](research/records/2026-09-01_WB4_HOLONICS_WORKBENCH_CLI_RATATUI_RELEASED.md).
+
+[established-bounded; implemented-exact; source-inspected; process-audit; measured] WB5 removed the
+static command catalogue, decorative tabs and embedded command parser. Version 0.2.0 returns
+keyboard resource browsing, contextual live-session actions, selectable ingress/receiver and every
+actual successor, typed exact-return editing, automatic Eros material selection, non-overwriting
+outputs, responsive operation ownership, a zero-parameter five-event demo, and versioned structured
+request/response I/O. Thirteen focused tests passed. The complete release returned 2,970 tests
+passed, zero failed, 50 ignored; all examples type-checked; the live Lean umbrella built 3,771 jobs;
+all nine gates passed. The installed binary and real 80-column TUI demo/restore returned. Cleanup
+removed 17,507 replicable files (39.0 GiB); root `target/` and `output/` are absent. The receipt is
+[`research/records/2026-09-01_WB5_WORKBENCH_RETURNED_GUIDED_RESOURCES_CONTEXT_ACTIONS_AND_STANDARD_IO.md`](research/records/2026-09-01_WB5_WORKBENCH_RETURNED_GUIDED_RESOURCES_CONTEXT_ACTIONS_AND_STANDARD_IO.md).
 
 [definition] Brandon's direct request of 2026-09-01 founds the active contract
 [`blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).

@@ -244,12 +244,12 @@ replicable files (38.8 GiB); root `output/` was absent. Its receipt is
 
 ## 6. Scope
 
-[definition] WB0--WB4 build operator convenience only. They do not widen Athena capability,
+[definition] WB0--WB5 build operator convenience only. They do not widen Athena capability,
 complete unrestricted Soulkiller dismantling, refound Eros, add a general engine plugin registry,
 schedule UI/web work, or promote a qualitative output. A callable owner absent from this first
 surface remains an explicit future application extension, not a missing engine organ.
 
-### WB5 — interaction and I/O correction
+### WB5 — interaction and I/O correction — PASSED
 
 [definition] Replace the static command-string catalogue, decorative category tabs, and embedded
 command editor. Return typed filesystem/resource navigation, runtime-derived valid actions, a
@@ -262,3 +262,12 @@ actual successors; demo requires zero arguments and returns generation-1 conduct
 commit; direct/structured CLI responses agree; malformed input is structured; 80-column and wide
 render controls pass; a real pseudo-terminal deed returns and restores; and the coherent release
 passes.
+
+[established-bounded; implemented-exact; source-inspected; process-audit; measured] WB5 removed the
+static command catalogue, decorative tabs, and raw TUI command editor. It returned keyboard
+filesystem navigation, recognized resources, live-session action derivation, every actual successor,
+an editable exact-return form, non-overwriting outputs, a zero-parameter five-event demo,
+responsive runtime ownership, event-v2 codes, and versioned request/response I/O. Thirteen focused
+tests and the real installed CLI/TUI deeds passed; the coherent release returned all nine gates.
+Its receipt is
+[`../../research/records/2026-09-01_WB5_WORKBENCH_RETURNED_GUIDED_RESOURCES_CONTEXT_ACTIONS_AND_STANDARD_IO.md`](../../research/records/2026-09-01_WB5_WORKBENCH_RETURNED_GUIDED_RESOURCES_CONTEXT_ACTIONS_AND_STANDARD_IO.md).

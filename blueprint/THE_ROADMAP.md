@@ -35,7 +35,7 @@ Read, in order:
     [`THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md`](THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md).
 11. the active Athena Application and Circulation Interface contract,
     [`THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).
-12. the active exterior Holonics Workbench application contract,
+12. the completed exterior Holonics Workbench application contract,
     [`../applications/holonics-workbench/WORKBENCH.md`](../applications/holonics-workbench/WORKBENCH.md).
 
 Read only the smallest source, formal, and evidence closure required by the active deed. Completed
@@ -541,7 +541,7 @@ held-out change, withdrawal, and restoration passed. Its exact return is
 
 **Current frontier:** NONE
 
-**WB0--WB4 PASSED. NO APPLICATION DEED REMAINS SCHEDULED.**
+**WB0--WB5 PASSED. NO APPLICATION DEED REMAINS SCHEDULED.**
 
 [definition] Brandon's direct instruction of 2026-09-01 founds the exterior application contract
 [`../applications/holonics-workbench/WORKBENCH.md`](../applications/holonics-workbench/WORKBENCH.md).
@@ -576,13 +576,25 @@ zero failed and 50 ignored; examples type-checked; the live Lean umbrella built 
 `cargo clean` removed 15,274 replicable files (38.8 GiB) and root `output/` was absent. Its receipt is
 [`research/records/2026-09-01_WB4_HOLONICS_WORKBENCH_CLI_RATATUI_RELEASED.md`](../research/records/2026-09-01_WB4_HOLONICS_WORKBENCH_CLI_RATATUI_RELEASED.md).
 
+[established-bounded; implemented-exact; source-inspected; process-audit; measured] WB5 passed.
+Brandon's direct review rejected the first TUI as a CLI-shaped pane split and the CLI I/O as
+unstandardized. Version 0.2.0 replaces command templates with filesystem/resource selection and
+context-valid actions; derives ingress/receiver and every actual successor from live state; returns
+an editable exact-return form, automatic Eros material choice, non-overwriting destinations,
+responsive runtime ownership, and a complete zero-parameter demo; and standardizes direct and JSON
+request input through one response envelope. Thirteen focused tests passed. The coherent release
+returned 2,970 passed, zero failed, 50 ignored, all examples, 3,771 Lean jobs, and all nine gates.
+Its receipt is
+[`research/records/2026-09-01_WB5_WORKBENCH_RETURNED_GUIDED_RESOURCES_CONTEXT_ACTIONS_AND_STANDARD_IO.md`](../research/records/2026-09-01_WB5_WORKBENCH_RETURNED_GUIDED_RESOURCES_CONTEXT_ACTIONS_AND_STANDARD_IO.md).
+
 [definition] The complete order is:
 
 1. `WB0` — shared typed protocol and application architecture;
 2. `WB1` — Athena sessions, store, diffusion, snapshot, and export;
 3. `WB2` — Eros, Soulkiller, engine adapters and CLI;
 4. `WB3` — Ratatui terminal interface over the same runtime; and
-5. `WB4` — operator documentation and coherent application release.
+5. `WB4` — operator documentation and coherent application release; and
+6. `WB5` — guided resource/action interaction and standardized I/O correction.
 
 ## Standing and history
 
