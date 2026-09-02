@@ -75,6 +75,7 @@ import ElementaryHolonics.RH.LandauXi
 import ElementaryHolonics.RH.JensenCountsTheComb
 import ElementaryHolonics.RH.PrimeSideVertical
 import ElementaryHolonics.RH.RectangleCauchy
+import ElementaryHolonics.RH.RectangleArgumentPrinciple
 import ElementaryHolonics.RH.WeightedArgumentPrinciple
 import ElementaryHolonics.RH.Balance
 import ElementaryHolonics.Millennium.Gluing

@@ -19,7 +19,7 @@ theorem, the derivative of the principal logarithm off the slit, and the two arg
 open Complex Set MeasureTheory intervalIntegral Metric Filter Topology
 open scoped Interval
 
-namespace ElementaryHolonics.RH.RectangleCauchy
+namespace Soma.Holonics.RH.RectangleCauchy
 
 /-- The positively oriented boundary integral of `f` around the rectangle with corners `z` and
 `w`, in the exact shape of Mathlib's `integral_boundary_rect_*` conclusions. -/
@@ -338,4 +338,4 @@ theorem rectIntegral_div_sub {g : ℂ → ℂ} {z w ρ : ℂ} (hzw : z.re < w.re
     zero_add]
   ring
 
-end ElementaryHolonics.RH.RectangleCauchy
+end Soma.Holonics.RH.RectangleCauchy
