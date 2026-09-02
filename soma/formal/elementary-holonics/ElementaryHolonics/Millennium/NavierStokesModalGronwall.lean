@@ -6,16 +6,17 @@ import ElementaryHolonics.Millennium.NavierStokesModalRiccati
 The modal Riccati inequality is put into its arithmetic-geometric form,
 
 ```text
-E_k' ≤ −ν lam_k E_k + 243 · B_N² / ν,
+E_k' ≤ −ν λ_k E_k + 3⁵ · B_N² / ν,
 ```
 
 and integrated.  If the shell-step cost stays below `M` on a terminal tail `[s, T)`, then every
-tail mode's energy stays below `max (E_k(s), 243 M² / (ν² lam_k))` on that tail.  The bound decays
+tail mode's energy stays below `max (E_k(s), 3⁵ M² / (ν² λ_k))` on that tail.  The bound decays
 with the Stokes eigenvalue: a mode farther out is held closer to its equilibrium
-`243 M² / (ν² lam_k)` by its own dissipation.
+`3⁵ M² / (ν² λ_k)` by its own dissipation.  The `3⁵` is five coordinate comparisons on `Fin 3`,
+and nothing else.
 
 The integration is the weighted maximum principle already used for transported scalars: the
-weighted excess `(E_k − c) · e^{ν lam_k (τ − s)}` has nonpositive derivative once `B_N ≤ M`, so it
+weighted excess `(E_k − c) · e^{ν λ_k (τ − s)}` has nonpositive derivative once `B_N ≤ M`, so it
 is antitone.
 
 This is a bounded-cost theorem, not a closure.  It converts the open obligation from "the tail
@@ -82,20 +83,23 @@ theorem torusStokesEigenvalue_pos_of_not_mem {radius : ℕ} {k : SpatialFrequenc
 
 /-! ## The arithmetic-geometric form -/
 
+/-- The arithmetic-geometric step.  \`2 · 3²\` is the derivative's \`2\` times the two coordinate
+comparisons of the source bound; the weight \`ν/3\` is the \`ℓ¹\`-to-energy comparison; the return
+\`3⁵/ν\` is \`(2·3²)² · 3 / (2² ν)\`: five coordinate comparisons, the \`2\`s cancel. -/
 theorem amgm_step (hnu : 0 < nu) (x y : ℝ) :
-    18 * x * y ≤ nu / 3 * x ^ 2 + 243 / nu * y ^ 2 := by
-  have hrewrite : nu / 3 * x ^ 2 + 243 / nu * y ^ 2 =
-      (nu ^ 2 / 3 * x ^ 2 + 243 * y ^ 2) / nu := by
+    2 * 3 ^ 2 * x * y ≤ nu / 3 * x ^ 2 + 3 ^ 5 / nu * y ^ 2 := by
+  have hrewrite : nu / 3 * x ^ 2 + 3 ^ 5 / nu * y ^ 2 =
+      (nu ^ 2 / 3 * x ^ 2 + 3 ^ 5 * y ^ 2) / nu := by
     field_simp
   rw [hrewrite, le_div_iff₀ hnu]
-  nlinarith [sq_nonneg (nu * x - 27 * y)]
+  nlinarith [sq_nonneg (nu * x - 3 ^ 3 * y)]
 
 /-- **The modal Riccati inequality in arithmetic-geometric form.** -/
 theorem modalEnergy_riccati_amgm (hnu : 0 < nu) (t : Ioo 0 T) {radius : ℕ}
     {k : SpatialFrequency} (hk : k ∉ frequencyCube (2 * radius)) :
     ∃ D : ℝ, HasDerivAt (modalEnergy (velocity := velocity) k) D t.1 ∧
       D ≤ -(nu * torusStokesEigenvalue k) * modalEnergy (velocity := velocity) k t.1 +
-        243 / nu * feedBound solution t radius ^ 2 := by
+        3 ^ 5 / nu * feedBound solution t radius ^ 2 := by
   obtain ⟨D, hD, hle⟩ := modalEnergy_riccati solution hnu.le t hk
   refine ⟨D, hD, hle.trans ?_⟩
   set lam := torusStokesEigenvalue k with hlam
@@ -107,7 +111,7 @@ theorem modalEnergy_riccati_amgm (hnu : 0 < nu) (t : Ioo 0 T) {radius : ℕ}
   have hstep := amgm_step hnu (L * Real.sqrt lam) B
   have hsqrt : (L * Real.sqrt lam) ^ 2 = L ^ 2 * lam := by
     rw [mul_pow, Real.sq_sqrt hlam0]
-  have hcross : 2 * L * (9 * Real.sqrt lam * B) = 18 * (L * Real.sqrt lam) * B := by ring
+  have hcross : 2 * L * (3 ^ 2 * Real.sqrt lam * B) = 2 * 3 ^ 2 * (L * Real.sqrt lam) * B := by ring
   rw [hcross]
   have hmid : nu / 3 * (L * Real.sqrt lam) ^ 2 ≤ nu * lam * E := by
     rw [hsqrt]
@@ -128,19 +132,19 @@ theorem feedBound_nonneg (t : Ioo 0 T) (radius : ℕ) : 0 ≤ feedBound solution
 
 /-- **A bounded shell-step cost keeps a tail mode bounded.**  On \`[s, T)\`, if the cost at radius
 \`N\` never exceeds \`M\`, every mode outside the cube of radius \`2N\` keeps its energy below
-\`max (E_k(s), 243 M² / (ν² lam_k))\`. -/
+\`max (E_k(s), 3⁵ M² / (ν² λ_k))\`. -/
 theorem modalEnergy_le_of_feedBound_le (hnu : 0 < nu) {radius : ℕ} {k : SpatialFrequency}
     (hk : k ∉ frequencyCube (2 * radius)) {s : ℝ} (hs : s ∈ Ioo 0 T) {M : ℝ}
     (hM : ∀ σ (hσ : σ ∈ Ioo 0 T), s ≤ σ → feedBound solution ⟨σ, hσ⟩ radius ≤ M)
     {τ : ℝ} (hτ : τ ∈ Ico s T) :
     modalEnergy (velocity := velocity) k τ ≤
       max (modalEnergy (velocity := velocity) k s)
-        (243 * M ^ 2 / (nu ^ 2 * torusStokesEigenvalue k)) := by
+        (3 ^ 5 * M ^ 2 / (nu ^ 2 * torusStokesEigenvalue k)) := by
   set lam := torusStokesEigenvalue k with hlam
   have hlampos : 0 < lam := torusStokesEigenvalue_pos_of_not_mem hk
-  set c : ℝ := 243 * M ^ 2 / (nu ^ 2 * lam) with hc
+  set c : ℝ := 3 ^ 5 * M ^ 2 / (nu ^ 2 * lam) with hc
   set E := modalEnergy (velocity := velocity) k with hE
-  have hc_eq : nu * lam * c = 243 / nu * M ^ 2 := by
+  have hc_eq : nu * lam * c = 3 ^ 5 / nu * M ^ 2 := by
     rw [hc]
     field_simp
   -- the weighted excess and its derivative
@@ -160,17 +164,17 @@ theorem modalEnergy_le_of_feedBound_le (hnu : 0 < nu) {radius : ℕ} {k : Spatia
     have hB := hM σ hσT hσ.1
     have hB0 := feedBound_nonneg solution ⟨σ, hσT⟩ radius
     have hB2 : feedBound solution ⟨σ, hσT⟩ radius ^ 2 ≤ M ^ 2 := pow_le_pow_left₀ hB0 hB 2
-    have hD' : D ≤ -(nu * lam) * E σ + 243 / nu * M ^ 2 := by
-      have h243 : 0 ≤ 243 / nu := by positivity
-      have := mul_le_mul_of_nonneg_left hB2 h243
+    have hD' : D ≤ -(nu * lam) * E σ + 3 ^ 5 / nu * M ^ 2 := by
+      have hcost : 0 ≤ 3 ^ 5 / nu := by positivity
+      have := mul_le_mul_of_nonneg_left hB2 hcost
       linarith
     refine ⟨D * Real.exp (nu * lam * (σ - s)) + (E σ - c) * (nu * lam * Real.exp (nu * lam * (σ - s))),
       (hD.sub_const c).mul (hexp σ), ?_⟩
     have hepos : 0 < Real.exp (nu * lam * (σ - s)) := Real.exp_pos _
     have hkey : D + (E σ - c) * (nu * lam) ≤ 0 := by
       calc D + (E σ - c) * (nu * lam)
-          ≤ (-(nu * lam) * E σ + 243 / nu * M ^ 2) + (E σ - c) * (nu * lam) := by linarith
-        _ = 243 / nu * M ^ 2 - nu * lam * c := by ring
+          ≤ (-(nu * lam) * E σ + 3 ^ 5 / nu * M ^ 2) + (E σ - c) * (nu * lam) := by linarith
+        _ = 3 ^ 5 / nu * M ^ 2 - nu * lam * c := by ring
         _ = 0 := by rw [hc_eq]; ring
     have : D * Real.exp (nu * lam * (σ - s)) + (E σ - c) * (nu * lam * Real.exp (nu * lam * (σ - s))) =
         (D + (E σ - c) * (nu * lam)) * Real.exp (nu * lam * (σ - s)) := by ring

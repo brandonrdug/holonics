@@ -15,7 +15,7 @@ with `N_k` the curl of the advection coefficient.  This owner differentiates the
 outside the cube of radius `2N`:
 
 ```text
-E_k' ≤ −2 ν λ_k E_k + 2 · ℓ¹(ω̂_k) · 9 √λ_k · B_N,      ℓ¹(ω̂_k)² ≤ 3 E_k,
+E_k' ≤ −2 ν λ_k E_k + 2 · ℓ¹(ω̂_k) · 3² √λ_k · B_N,      ℓ¹(ω̂_k)² ≤ 3 E_k,
 ```
 
 where `B_N = (2N+1)³ · 3√(2E(0)) · tailJ(N) + velocityTail(N) · totalJ` is the shell-step cost
@@ -133,7 +133,7 @@ theorem complexVectorL1_frequencyCurlMultiplier_le (k : SpatialFrequency) (v : C
 theorem complexVectorL1_vorticityNonlinearMode_le (hnu : 0 ≤ nu) (t : Ioo 0 T)
     {radius : ℕ} {k : SpatialFrequency} (hk : k ∉ frequencyCube (2 * radius)) :
     complexVectorL1 (vorticityNonlinearMode solution t k) ≤
-      9 * Real.sqrt (torusStokesEigenvalue k) * feedBound solution t radius := by
+      3 ^ 2 * Real.sqrt (torusStokesEigenvalue k) * feedBound solution t radius := by
   unfold vorticityNonlinearMode
   have hneg : complexVectorL1 (-frequencyCurlMultiplier k (openAdvectionMode solution t k)) =
       complexVectorL1 (frequencyCurlMultiplier k (openAdvectionMode solution t k)) := by
@@ -150,7 +150,7 @@ theorem complexVectorL1_vorticityNonlinearMode_le (hnu : 0 ≤ nu) (t : Ioo 0 T)
   calc 3 * Real.sqrt (torusStokesEigenvalue k) * complexVectorL1 (openAdvectionMode solution t k)
       ≤ 3 * Real.sqrt (torusStokesEigenvalue k) * (3 * feedBound solution t radius) :=
         mul_le_mul_of_nonneg_left hadv (mul_nonneg (by norm_num) (Real.sqrt_nonneg _))
-    _ = 9 * Real.sqrt (torusStokesEigenvalue k) * feedBound solution t radius := by ring
+    _ = 3 ^ 2 * Real.sqrt (torusStokesEigenvalue k) * feedBound solution t radius := by ring
 
 /-! ## The modal Riccati inequality -/
 
@@ -162,7 +162,7 @@ theorem modalEnergy_riccati (hnu : 0 ≤ nu) (t : Ioo 0 T) {radius : ℕ} {k : S
     ∃ D : ℝ, HasDerivAt (modalEnergy (velocity := velocity) k) D t.1 ∧
       D ≤ -2 * nu * torusStokesEigenvalue k * modalEnergy (velocity := velocity) k t.1 +
         2 * complexVectorL1 (vorticityModeCurve (velocity := velocity) k t.1) *
-          (9 * Real.sqrt (torusStokesEigenvalue k) * feedBound solution t radius) := by
+          (3 ^ 2 * Real.sqrt (torusStokesEigenvalue k) * feedBound solution t radius) := by
   have hmode := openPeriodicSolutionOn_hasDerivAt_vorticityMode_stokes solution t k
   set N := vorticityNonlinearMode solution t k with hN
   set w := vorticityModeCurve (velocity := velocity) k t.1 with hw
@@ -221,7 +221,7 @@ theorem modalEnergy_riccati (hnu : 0 ≤ nu) (t : Ioo 0 T) {radius : ℕ} {k : S
     _ ≤ -2 * nu * torusStokesEigenvalue k *
             (∑ component : Fin 3, inner ℝ (w component) (w component)) +
           2 * complexVectorL1 w *
-            (9 * Real.sqrt (torusStokesEigenvalue k) * feedBound solution t radius) := by
+            (3 ^ 2 * Real.sqrt (torusStokesEigenvalue k) * feedBound solution t radius) := by
         have := mul_le_mul_of_nonneg_left hNle hw_nonneg
         linarith
 
