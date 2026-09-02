@@ -7,12 +7,13 @@ Suppose `f = P · unit` on a disc of radius `r`, where `P` is the monic polynomi
 `f` in the half disc (with multiplicity, total count `N`) and `unit` is analytic and nonvanishing
 on the disc.  If `‖f‖ ≤ ‖f z₀‖ e^M` on the disc, the maximum principle transfers the bound to the
 unit on the three-quarter disc at the cost of `2^N` (each zero factor loses at most one halving
-of the radius), and Landau's remainder bound then gives, on the `3r/16` disc off the zeros,
+of the radius), and Landau's remainder bound then gives, on the `r/8` disc off the zeros,
 
-    ‖ f′/f (z) − Σ_ρ m_ρ /(z − ρ) ‖ ≤ 32 (M + N log 2) / (3 r).
+    ‖ f′/f (z) − Σ_ρ m_ρ /(z − ρ) ‖ ≤ 16 (M + N log 2) / r.
 
 The log-derivative of `f` is the Coulomb flux of its zero comb plus a bounded background.
-The constants are the product expansions `32 = 2⁵` and `3 = 3`, from `8 · (4/3)`.
+The constant is the product expansion `16 = 2⁴`, from `8 · 2`.  The unit need only avoid
+zero on the half disc, so zeros of `f` in the outer annulus may stay inside the unit.
 -/
 
 noncomputable section
@@ -31,7 +32,7 @@ structure ZeroFactorization (f : ℂ → ℂ) (z₀ : ℂ) (r : ℝ) where
   zeros_mem : ∀ ρ ∈ zeros, ρ ∈ closedBall z₀ (r / 2)
   mult_pos : ∀ ρ ∈ zeros, 0 < mult ρ
   unit_diff : DifferentiableOn ℂ unit (ball z₀ r)
-  unit_ne : ∀ z ∈ ball z₀ r, unit z ≠ 0
+  unit_ne : ∀ z ∈ ball z₀ (r / 2), unit z ≠ 0
   factor : ∀ z ∈ ball z₀ r, f z = (∏ ρ ∈ zeros, (z - ρ) ^ mult ρ) * unit z
 
 namespace ZeroFactorization
@@ -135,13 +136,13 @@ theorem norm_unit_le (hr : 0 < r) (hf₀ : f z₀ ≠ 0)
     exact hsphere w hw
   exact Complex.norm_le_of_forall_mem_frontier_norm_le hbdd hdc hfront (subset_closure hz)
 
-/-- **Landau's lemma given the factorization.** Off the zeros, on the `3r/16` disc, the
-log-derivative of `f` is the Coulomb flux of the zero comb up to `32 (M + N log 2) / (3r)`. -/
+/-- **Landau's lemma given the factorization.** Off the zeros, on the `r/8` disc, the
+log-derivative of `f` is the Coulomb flux of the zero comb up to `16 (M + N log 2) / r`. -/
 theorem norm_logDeriv_sub_flux_le (hr : 0 < r) (hM : 0 < M) (hf₀ : f z₀ ≠ 0)
     (hf : ∀ z ∈ ball z₀ r, ‖f z‖ ≤ ‖f z₀‖ * Real.exp M)
-    {z : ℂ} (hz : z ∈ closedBall z₀ (3 * r / 16)) (hfz : f z ≠ 0) :
+    {z : ℂ} (hz : z ∈ closedBall z₀ (r / 8)) (hfz : f z ≠ 0) :
     ‖logDeriv f z - ∑ ρ ∈ Z.zeros, (Z.mult ρ : ℂ) / (z - ρ)‖ ≤
-      32 * (M + Z.count * Real.log 2) / (3 * r) := by
+      16 * (M + Z.count * Real.log 2) / r := by
   have hz' : z ∈ ball z₀ r := by
     rw [mem_closedBall_iff_norm] at hz
     rw [mem_ball_iff_norm]
@@ -150,17 +151,16 @@ theorem norm_logDeriv_sub_flux_le (hr : 0 < r) (hM : 0 < M) (hf₀ : f z₀ ≠ 
   have hM' : 0 < M + Z.count * Real.log 2 := by
     have : 0 ≤ (Z.count : ℝ) * Real.log 2 := by positivity
     linarith
-  have hunit_bound : ∀ w ∈ ball z₀ (3 * r / 4),
+  have hunit_bound : ∀ w ∈ ball z₀ (r / 2),
       ‖Z.unit w‖ ≤ ‖Z.unit z₀‖ * Real.exp (M + Z.count * Real.log 2) :=
-    fun w hw => Z.norm_unit_le hr hf₀ hf hw
-  have hunit_diff : DifferentiableOn ℂ Z.unit (ball z₀ (3 * r / 4)) :=
+    fun w hw => Z.norm_unit_le hr hf₀ hf (ball_subset_ball (by linarith) hw)
+  have hunit_diff : DifferentiableOn ℂ Z.unit (ball z₀ (r / 2)) :=
     Z.unit_diff.mono (ball_subset_ball (by linarith))
-  have hunit_ne : ∀ w ∈ ball z₀ (3 * r / 4), Z.unit w ≠ 0 :=
-    fun w hw => Z.unit_ne w (ball_subset_ball (by linarith) hw)
-  have hzq : z ∈ closedBall z₀ ((3 * r / 4) / 4) := by
+  have hunit_ne : ∀ w ∈ ball z₀ (r / 2), Z.unit w ≠ 0 := fun w hw => Z.unit_ne w hw
+  have hzq : z ∈ closedBall z₀ ((r / 2) / 4) := by
     rw [mem_closedBall_iff_norm] at hz ⊢
     linarith
-  have hrem := norm_logDeriv_le (by positivity : 0 < 3 * r / 4) hM' hunit_diff hunit_ne
+  have hrem := norm_logDeriv_le (by positivity : 0 < r / 2) hM' hunit_diff hunit_ne
     hunit_bound hzq
   -- the log-derivative of f splits as flux plus unit
   have hfeq : f =ᶠ[nhds z] fun w => Z.poly w * Z.unit w := by
@@ -181,7 +181,10 @@ theorem norm_logDeriv_sub_flux_le (hr : 0 < r) (hM : 0 < M) (hf₀ : f z₀ ≠ 
     unfold poly
     exact DifferentiableAt.fun_finsetProd fun ρ _ => (differentiableAt_id.sub_const ρ).pow _
   rw [(logDeriv_congr_nhds hfeq).eq_of_nhds,
-    logDeriv_mul z hpolyz (Z.unit_ne z hz') hpoly_diff
+    logDeriv_mul z hpolyz (Z.unit_ne z (by
+      rw [mem_closedBall_iff_norm] at hz
+      rw [mem_ball_iff_norm]
+      linarith)) hpoly_diff
       (Z.unit_diff.differentiableAt (isOpen_ball.mem_nhds hz'))]
   have hpoly : logDeriv Z.poly z = ∑ ρ ∈ Z.zeros, (Z.mult ρ : ℂ) / (z - ρ) := by
     unfold poly
@@ -195,8 +198,8 @@ theorem norm_logDeriv_sub_flux_le (hr : 0 < r) (hM : 0 < M) (hf₀ : f z₀ ≠ 
       deriv_id'']
     ring
   rw [hpoly, add_sub_cancel_left, logDeriv_apply]
-  calc ‖deriv Z.unit z / Z.unit z‖ ≤ 8 * (M + Z.count * Real.log 2) / (3 * r / 4) := hrem
-    _ = 32 * (M + Z.count * Real.log 2) / (3 * r) := by
+  calc ‖deriv Z.unit z / Z.unit z‖ ≤ 8 * (M + Z.count * Real.log 2) / (r / 2) := hrem
+    _ = 16 * (M + Z.count * Real.log 2) / r := by
         field_simp
         ring
 
