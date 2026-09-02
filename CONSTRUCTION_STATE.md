@@ -10,15 +10,16 @@ grades.
 
 ## Current frontier
 
-**Current frontier:** AAC4
+**Current frontier:** AAC5
 
-**AAC0--AAC3 PASSED. AAC4 IS ACTIVE. AAC5--AAC6 FOLLOW ONLY AFTER THEIR PREDECESSORS PASS.**
+**AAC0--AAC4 PASSED. AAC5 IS ACTIVE. AAC6 FOLLOWS ONLY AFTER AAC5 PASSES.**
 
 [definition] Brandon's direct request of 2026-09-01 founds the active contract
 [`blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).
 AAC0 returned the formal laws. AAC1 returned the move-owned session. AAC2 returned parented
 successive local commits and storage. AAC3 returned exact diffusion through the common event
-family. AAC4 now owns only the opaque stable exterior ABI.
+family. AAC4 returned the opaque stable exterior ABI. AAC5 now owns only the first Athena-alpha
+application package.
 
 [proved-derived; formal-checked; measured] AAC0 returned `LiveCirculationSession`, one common
 owned boundary, parented commit and decline, exact snapshot/remount conduct, and constituted
@@ -42,6 +43,12 @@ exact diffusion, declared capacity/conductance validation, complete balance/boun
 testimony, zero exact residuals, discrete/diffusive event unification, and factorization reuse. Two
 focused tests passed. The receipt is
 [`research/records/2026-09-01_AAC3_NATIVE_INCIDENCE_FOUNDED_EXACT_DIFFUSION_THROUGH_THE_COMMON_BOUNDARY.md`](research/records/2026-09-01_AAC3_NATIVE_INCIDENCE_FOUNDED_EXACT_DIFFUSION_THROUGH_THE_COMMON_BOUNDARY.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] AAC4 returned the opaque
+versioned length-delimited ABI, recoverable commit/decline mutations, open/remount, conduct,
+continue, return, commit, decline, snapshot, diffusion, close, direct equality, and invalid-handle
+refusal. Three focused tests passed. The receipt is
+[`research/records/2026-09-01_AAC4_OPAQUE_VERSIONED_CIRCULATION_ABI_RETURNED_DIRECT_AND_DIFFUSIVE_EQUALITY.md`](research/records/2026-09-01_AAC4_OPAQUE_VERSIONED_CIRCULATION_ABI_RETURNED_DIRECT_AND_DIFFUSIVE_EQUALITY.md).
 
 ## Admitted standing
 

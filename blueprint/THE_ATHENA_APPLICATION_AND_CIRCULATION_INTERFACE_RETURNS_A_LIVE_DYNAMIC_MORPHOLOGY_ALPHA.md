@@ -3,7 +3,7 @@
 **Date:** 2026-09-01
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** AAC4.
+**Current frontier:** AAC5.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md),
@@ -272,7 +272,7 @@ of one event family, zero residuals, factorization-reuse testimony, and malforme
 focused tests passed. Its receipt is
 [`../research/records/2026-09-01_AAC3_NATIVE_INCIDENCE_FOUNDED_EXACT_DIFFUSION_THROUGH_THE_COMMON_BOUNDARY.md`](../research/records/2026-09-01_AAC3_NATIVE_INCIDENCE_FOUNDED_EXACT_DIFFUSION_THROUGH_THE_COMMON_BOUNDARY.md).
 
-### AAC4 — opaque stable circulation ABI
+### AAC4 — opaque stable circulation ABI — PASSED
 
 [definition] Add the exterior ABI crate and exact wire schemas over the neutral Rust API.
 
@@ -280,6 +280,12 @@ focused tests passed. Its receipt is
 round-trips one live session; invalid handles and stale generations refuse; ABI/direct receipts are
 equal; Rust layout and foreign executors are absent from the wire; and no compatibility decoder is
 introduced.
+
+[established-bounded; implemented-exact; source-inspected; measured] AAC4 returned the versioned
+length-delimited message ABI, opaque handles, recoverable consuming mutations, direct/ABI equality
+for conduct, continuation and diffusion, complete dynamic lifecycle, invalid-handle refusal, and
+exported allocation/free controls. Three focused tests passed. Its receipt is
+[`../research/records/2026-09-01_AAC4_OPAQUE_VERSIONED_CIRCULATION_ABI_RETURNED_DIRECT_AND_DIFFUSIVE_EQUALITY.md`](../research/records/2026-09-01_AAC4_OPAQUE_VERSIONED_CIRCULATION_ABI_RETURNED_DIRECT_AND_DIFFUSIVE_EQUALITY.md).
 
 ### AAC5 — first Athena-alpha application package
 

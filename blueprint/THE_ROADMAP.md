@@ -424,7 +424,7 @@ relations; it does not demote the exact SCF handoff/circulation/withdrawal mecha
 
 ## Active campaign — Athena Application and Circulation Interface
 
-**Current frontier:** AAC4
+**Current frontier:** AAC5
 
 **AAC0--AAC6 ARE ACTIVE IN THE ORDER BELOW.**
 
@@ -458,8 +458,14 @@ complete lineage, and structural factorization reuse return through the common e
 focused tests passed. Its receipt is
 [`research/records/2026-09-01_AAC3_NATIVE_INCIDENCE_FOUNDED_EXACT_DIFFUSION_THROUGH_THE_COMMON_BOUNDARY.md`](../research/records/2026-09-01_AAC3_NATIVE_INCIDENCE_FOUNDED_EXACT_DIFFUSION_THROUGH_THE_COMMON_BOUNDARY.md).
 
-[definition] The current deed is AAC4 only: the opaque stable exterior circulation ABI. The Athena
-application and release remain unavailable until their predecessors pass.
+[established-bounded; implemented-exact; source-inspected; measured] AAC4 passed. The opaque
+versioned ABI returns open/remount, conduct/continue, return/commit/decline, snapshot, diffusion,
+close, recoverable refusal, direct equality, and exact exported allocation/free. Three focused
+tests passed. Its receipt is
+[`research/records/2026-09-01_AAC4_OPAQUE_VERSIONED_CIRCULATION_ABI_RETURNED_DIRECT_AND_DIFFUSIVE_EQUALITY.md`](../research/records/2026-09-01_AAC4_OPAQUE_VERSIONED_CIRCULATION_ABI_RETURNED_DIRECT_AND_DIFFUSIVE_EQUALITY.md).
+
+[definition] The current deed is AAC5 only: construct the first independent Athena-alpha
+application package over the neutral API/ABI. The exact release remains AAC6.
 
 [definition] The complete order is:
 

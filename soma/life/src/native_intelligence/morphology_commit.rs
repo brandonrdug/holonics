@@ -26,7 +26,7 @@ pub const NATIVE_CIRCULATION_SNAPSHOT_SCHEMA: &str = "soma-life.native-circulati
 
 /// One staged exterior return. It borrows no morphology and cannot be committed against another
 /// generation or emission.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeCultivationCandidate {
     pub boundary: NativeCirculationBoundary,
     pub returned: ReturnedScaffoldInteraction,

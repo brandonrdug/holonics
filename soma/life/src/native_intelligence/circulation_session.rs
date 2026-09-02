@@ -68,7 +68,7 @@ impl NativeCirculationConfiguration {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum NativeOwnedOpenScope {
     Thread,
@@ -86,7 +86,7 @@ impl From<OpenScope> for NativeOwnedOpenScope {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeOwnedOpenObligation {
     pub scope: NativeOwnedOpenScope,
     pub testimony: String,
@@ -119,7 +119,7 @@ impl NativeOwnedInferenceAddress {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeOwnedInferenceRequest {
     pub address: NativeOwnedInferenceAddress,
     pub receiver: ReceiverId,
@@ -143,7 +143,7 @@ impl NativeOwnedInferenceRequest {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeOwnedInferenceLineage {
     pub entering_occurrence: EventId,
     pub predecessor: Option<EventId>,
@@ -169,14 +169,14 @@ impl From<&NativeInferenceLineage> for NativeOwnedInferenceLineage {
 }
 
 /// The complete owned reconstruction population for one plural future.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeOwnedFutureReconstruction {
     pub future: NativeFutureFace,
     pub fibres: Vec<NativeCollapsedFibre>,
 }
 
 /// One owned conduct boundary. Surfaces may render this object but cannot alter it.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeCirculationBoundary {
     pub schema: String,
     pub generation: u64,
@@ -224,7 +224,7 @@ pub struct NativeCirculationSession {
     pub(super) commits: Vec<NativeMorphologyCommit>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeDeclineReceipt {
     pub schema: String,
     pub generation_before: u64,

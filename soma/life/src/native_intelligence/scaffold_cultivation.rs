@@ -28,14 +28,14 @@ use holonic_engine::{
     OccurrencePort,
 };
 use num_rational::BigRational as Rat;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use super::NativeEcologyRest;
 
 /// One exact exterior current returning through a particular emitted native section.
 /// The native successor current is derived from this interaction and the standing local current.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ReturnedScaffoldInteraction {
     pub emitted: NativeEmissionAddress,
     pub occurrence: EventId,

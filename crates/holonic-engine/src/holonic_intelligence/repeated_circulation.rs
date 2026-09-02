@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::native_spool::NativeTransportScaffold;
@@ -12,13 +12,13 @@ use super::{
     conduct_native_inference,
 };
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeEmissionGrain {
     pub future: NativeFutureFace,
     pub occurrences: BTreeSet<EventId>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeVariableGrainEmission {
     pub address: NativeEmissionAddress,
     pub grains: Vec<NativeEmissionGrain>,

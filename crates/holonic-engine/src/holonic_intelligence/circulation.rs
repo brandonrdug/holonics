@@ -13,14 +13,14 @@ use crate::{EventId, OccurrencePort};
 
 use super::{InferenceCirculation, OpenObligation, OpenScope};
 
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct NativeInferenceAddress {
     pub spool: String,
     pub thread: String,
     pub occurrence: EventId,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeInferenceRequest {
     pub address: NativeInferenceAddress,
     pub receiver: ReceiverId,
@@ -74,7 +74,7 @@ pub struct NativeEmissionAddress {
     pub emitted: NativeFutureFace,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeInferenceLineage {
     pub entering_occurrence: EventId,
     pub predecessor: Option<EventId>,
@@ -91,7 +91,7 @@ pub struct NativeFutureReconstruction<'a> {
     pub shortest_separators: &'a [NativeShortestSeparator],
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ExteriorReturnAperture {
     pub emitted: NativeEmissionAddress,
     pub reconstruction_fibre_population: usize,

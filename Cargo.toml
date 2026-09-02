@@ -23,6 +23,7 @@ members = [
   "crates/holonic-engine",
   "soma/body",
   "soma/abi",
+  "soma/circulation-abi",
   "soma/membrane",
   "soma/surface",
   "soma/life",

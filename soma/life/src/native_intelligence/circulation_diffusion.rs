@@ -19,7 +19,7 @@ use holonic_engine::{
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
 use num_traits::{Signed, Zero};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use super::{
     InferenceConfigurationAddress, NativeCirculationBoundary, NativeCirculationSession,
@@ -40,19 +40,19 @@ pub struct NativeDiffusionLaw {
     law: ExactDiffusionLaw,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeDiffusionStanding {
     pub content: BTreeMap<NativeStateId, Rat>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeDiffusionIngress {
     pub occurrence: EventId,
     pub interval: Rat,
     pub source: BTreeMap<NativeStateId, Rat>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeDiffusionEmission {
     pub occurrence: EventId,
     pub receiver: ReceiverId,
@@ -60,7 +60,7 @@ pub struct NativeDiffusionEmission {
     pub boundary_potential: BTreeMap<NativeStateId, Rat>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeDiffusiveBoundary {
     pub schema: String,
     pub generation: u64,
@@ -78,7 +78,7 @@ pub struct NativeDiffusiveBoundary {
 
 /// The common runtime boundary family. Both members are fixed-morphology conduct; only a later
 /// returned interaction may cultivate the package.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "transport", rename_all = "kebab-case")]
 pub enum NativeCirculationEvent {
     AddressedSuccessor(NativeCirculationBoundary),
