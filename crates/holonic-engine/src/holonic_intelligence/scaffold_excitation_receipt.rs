@@ -4,7 +4,11 @@
 //! reader verifies the actual returned files and yields typed excitation families; only the
 //! separate scaffold lift may found source-neutral native current from them.
 
-use std::{collections::BTreeSet, fs, path::Path};
+use std::{
+    collections::BTreeSet,
+    fs,
+    path::{Component, Path},
+};
 
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
@@ -65,6 +69,7 @@ pub enum CompleteExcitationReceiptError {
 }
 
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct WireReceipt {
     schema: String,
     text: WireOrgan,
@@ -74,11 +79,13 @@ struct WireReceipt {
 }
 
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct WireOrgan {
     returns: Vec<WireReturn>,
 }
 
 #[derive(Clone, Deserialize)]
+#[serde(deny_unknown_fields)]
 struct WireReturn {
     occurrence: String,
     source_sha256: String,
@@ -92,6 +99,7 @@ struct WireReturn {
 }
 
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 struct WireVideoOrgan {
     temporal_frame_lineage: bool,
     frame_returns: Vec<WireReturn>,
@@ -151,8 +159,8 @@ pub fn read_complete_gemma4_excitation_receipt(
                             .checked_add(1)
                             .ok_or(CompleteExcitationReceiptError::ForeignReturn)?,
                     );
-                    let entering_bytes = fs::read(root.join(&returned.entering_bf16))?;
-                    let returned_bytes = fs::read(root.join(&returned.returned_bf16))?;
+                    let entering_bytes = read_contained(root, Path::new(&returned.entering_bf16))?;
+                    let returned_bytes = read_contained(root, Path::new(&returned.returned_bf16))?;
                     if returned.complete_layer_count == 0
                         || digest(&entering_bytes) != returned.entering_sha256
                         || digest(&returned_bytes) != returned.returned_sha256
@@ -189,6 +197,20 @@ pub fn read_complete_gemma4_excitation_receipt(
         families,
         open_exterior,
     })
+}
+
+fn read_contained(root: &Path, relative: &Path) -> Result<Vec<u8>, std::io::Error> {
+    if relative.is_absolute()
+        || relative
+            .components()
+            .any(|component| !matches!(component, Component::Normal(_)))
+    {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "the excitation artifact path leaves its receipt root",
+        ));
+    }
+    fs::read(root.join(relative))
 }
 
 fn words(bytes: &[u8]) -> Result<Vec<u16>, CompleteExcitationReceiptError> {
@@ -272,6 +294,44 @@ mod tests {
                 .all(|family| family.modality != ExteriorModality::Video)
         );
         assert_eq!(admitted.open_exterior.len(), 1);
+        std::fs::remove_dir_all(root).expect("cleanup");
+    }
+
+    #[test]
+    fn unknown_fields_and_paths_outside_the_receipt_root_refuse() {
+        let root = std::env::temp_dir().join(format!(
+            "complete-gemma4-receipt-refusal-{}",
+            std::process::id()
+        ));
+        std::fs::create_dir_all(&root).expect("root");
+        let bytes = 0x3f80u16.to_le_bytes();
+        let identity = digest(&bytes);
+        for name in ["text", "vision", "audio"] {
+            std::fs::write(root.join(format!("{name}-in.bf16")), bytes).expect("entering");
+            std::fs::write(root.join(format!("{name}-out.bf16")), bytes).expect("returned");
+        }
+        let mut receipt = json!({
+            "schema": COMPLETE_GEMMA4_EXCITATION_SCHEMA,
+            "text": {"returns": [returned("text", &identity)]},
+            "vision": {"returns": [returned("vision", &identity)]},
+            "audio": {"returns": [returned("audio", &identity)]},
+            "video": {"temporal_frame_lineage": false, "frame_returns": []},
+            "unknown": true
+        });
+        std::fs::write(
+            root.join("receipt.json"),
+            serde_json::to_vec(&receipt).expect("wire"),
+        )
+        .expect("receipt");
+        assert!(read_complete_gemma4_excitation_receipt(&root).is_err());
+        receipt.as_object_mut().expect("object").remove("unknown");
+        receipt["text"]["returns"][0]["entering_bf16"] = json!("../outside.bf16");
+        std::fs::write(
+            root.join("receipt.json"),
+            serde_json::to_vec(&receipt).expect("wire"),
+        )
+        .expect("receipt");
+        assert!(read_complete_gemma4_excitation_receipt(&root).is_err());
         std::fs::remove_dir_all(root).expect("cleanup");
     }
 }

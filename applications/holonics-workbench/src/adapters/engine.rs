@@ -42,18 +42,20 @@ pub fn capabilities() -> AdapterReturn {
         summary: "returned the callable workbench surface and explicit open fibres".to_owned(),
         payload: Some(json!({
             "implemented": {
-                "workbench": ["demo", "structured-request", "session-lifecycle", "typed-receipts"],
-                "athena": ["demo-open", "open", "inspect", "conduct", "continue", "return", "decline", "diffuse-demo", "snapshot", "export"],
-                "eros": ["mouth", "atlas"],
-                "soulkiller": ["inspect", "config", "index", "onnx"],
-                "engine": ["status", "capabilities", "package", "export"],
-                "presentation": ["cli-human", "cli-json-envelope", "cli-jsonl-events", "ratatui-guided"]
+                "variant_workspace": ["create", "inspect", "lift-gemma-receipt", "import-snapshot", "define-experiment", "conduct", "continue", "stage-return", "commit", "decline", "evaluate", "export"],
+                "diagnostic": {
+                    "athena": ["demo-open", "open", "inspect", "conduct", "continue", "return", "decline", "diffuse-demo", "snapshot", "export"],
+                    "eros": ["mouth", "atlas"],
+                    "soulkiller": ["inspect", "config", "index", "onnx"],
+                    "engine": ["status", "capabilities", "package", "export"]
+                },
+                "presentation": ["cli-human", "cli-json-envelope", "cli-jsonl-events"]
             },
             "open": [
-                "unrestricted Soulkiller dismantling from arbitrary model directories",
-                "qualitative language/image/audio generation",
-                "general engine plugin discovery",
-                "multi-instance distributed ecology control"
+                "raw-model-directory-lift-open",
+                "qualitative-emission-codec-open",
+                "persistent-configurable-diffusion-open",
+                "multi-instance-distributed-ecology-open"
             ]
         })),
     }

@@ -1,11 +1,11 @@
 use std::ffi::OsString;
 use std::fs;
-use std::io::{self, IsTerminal, Read};
+use std::io::{self, Read};
 
-use clap::{error::ErrorKind, Parser};
+use clap::{error::ErrorKind, CommandFactory, Parser};
 use holonics_workbench::{
-    render_human, render_json, render_json_lines, run_tui, Cli, EventLevel, OutputFormat,
-    WorkbenchEvent, WorkbenchRequest, WorkbenchResponse, WorkbenchRuntime,
+    render_human, render_json, render_json_lines, Cli, EventLevel, OutputFormat, WorkbenchEvent,
+    WorkbenchRequest, WorkbenchResponse, WorkbenchRuntime,
 };
 
 fn main() {
@@ -30,23 +30,6 @@ fn run(arguments: Vec<OsString>) -> i32 {
         }
     };
 
-    if invocation.tui {
-        if !io::stdin().is_terminal() || !io::stdout().is_terminal() {
-            return emit_input_obstruction(
-                invocation.format,
-                "no command was supplied and the Workbench TUI requires an interactive terminal"
-                    .to_owned(),
-            );
-        }
-        return match run_tui() {
-            Ok(()) => 0,
-            Err(error) => {
-                eprintln!("holonics: {error}");
-                1
-            }
-        };
-    }
-
     let command = if let Some(command) = invocation.command {
         command
     } else if let Some(input) = invocation.request_input {
@@ -55,10 +38,13 @@ fn run(arguments: Vec<OsString>) -> i32 {
             Err(error) => return emit_input_obstruction(invocation.format, error),
         }
     } else {
-        return emit_input_obstruction(
-            invocation.format,
-            "no command or structured request was supplied".to_owned(),
-        );
+        let mut command = Cli::command();
+        if let Err(error) = command.print_help() {
+            eprintln!("holonics: {error}");
+            return 1;
+        }
+        println!();
+        return 0;
     };
 
     let events = WorkbenchRuntime::new().execute(command.clone());

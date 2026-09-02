@@ -27,7 +27,10 @@ use thiserror::Error;
 
 use crate::adapters;
 use crate::store;
-use crate::{AthenaCommand, EventLevel, ExportCodecArgument, WorkbenchCommand, WorkbenchEvent};
+use crate::{
+    AthenaCommand, DiagnosticCommand, EventLevel, ExportCodecArgument, WorkbenchCommand,
+    WorkbenchEvent,
+};
 
 #[derive(Debug)]
 struct SessionEntry {
@@ -41,33 +44,6 @@ pub struct WorkbenchRuntime {
     sessions: BTreeMap<String, SessionEntry>,
     history: Vec<WorkbenchEvent>,
     next_sequence: u64,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
-pub struct WorkbenchIngressView {
-    pub spool: String,
-    pub thread: String,
-    pub occurrence: u64,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
-pub struct WorkbenchSessionView {
-    pub name: String,
-    pub generation: u64,
-    pub ingress: Vec<WorkbenchIngressView>,
-    pub receivers: Vec<u64>,
-    pub has_boundary: bool,
-    pub actual_successors: Vec<WorkbenchSuccessorView>,
-    pub bounded_demo: bool,
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
-pub struct WorkbenchSuccessorView {
-    pub index: usize,
-    pub spool: String,
-    pub thread: String,
-    pub occurrence: u64,
-    pub receiver: u64,
 }
 
 #[derive(Debug, Error)]
@@ -118,57 +94,6 @@ impl WorkbenchRuntime {
         self.sessions.keys().map(String::as_str).collect()
     }
 
-    pub fn session_views(&self) -> Vec<WorkbenchSessionView> {
-        self.sessions
-            .iter()
-            .map(|(name, entry)| {
-                let package = entry.application.package();
-                WorkbenchSessionView {
-                    name: name.clone(),
-                    generation: entry.application.generation(),
-                    ingress: package
-                        .hot()
-                        .realization()
-                        .ingress_sections
-                        .iter()
-                        .map(|address| WorkbenchIngressView {
-                            spool: address.spool.clone(),
-                            thread: address.thread.clone(),
-                            occurrence: address.occurrence.0,
-                        })
-                        .collect(),
-                    receivers: package
-                        .manifest
-                        .receiver_capability
-                        .native_receiver_family
-                        .iter()
-                        .map(|receiver| receiver.0)
-                        .collect(),
-                    has_boundary: entry.boundary.is_some(),
-                    actual_successors: entry
-                        .boundary
-                        .as_ref()
-                        .map(|boundary| {
-                            boundary
-                                .actual_successors
-                                .iter()
-                                .enumerate()
-                                .map(|(index, successor)| WorkbenchSuccessorView {
-                                    index,
-                                    spool: successor.address.spool.clone(),
-                                    thread: successor.address.thread.clone(),
-                                    occurrence: successor.address.occurrence.0,
-                                    receiver: successor.receiver.0,
-                                })
-                                .collect()
-                        })
-                        .unwrap_or_default(),
-                    bounded_demo: entry.bounded_demo,
-                }
-            })
-            .collect()
-    }
-
     pub fn next_session_name(&self, prefix: &str) -> String {
         if !self.sessions.contains_key(prefix) {
             return prefix.to_owned();
@@ -197,33 +122,15 @@ impl WorkbenchRuntime {
             .native_receiver_family
             .first()
             .ok_or_else(|| WorkbenchError::Owner("session has no native receiver".to_owned()))?;
-        Ok(WorkbenchCommand::Athena(AthenaCommand::Conduct {
-            session: session.to_owned(),
-            spool: address.spool.clone(),
-            thread: address.thread.clone(),
-            occurrence: address.occurrence.0,
-            receiver: receiver.0,
-        }))
-    }
-
-    pub fn recommended_continue_command(
-        &self,
-        session: &str,
-    ) -> Result<WorkbenchCommand, WorkbenchError> {
-        let boundary = self
-            .session(session)?
-            .boundary
-            .as_ref()
-            .ok_or_else(|| WorkbenchError::MissingBoundary(session.to_owned()))?;
-        if boundary.actual_successors.is_empty() {
-            return Err(WorkbenchError::Owner(
-                "the current boundary has no actual successor".to_owned(),
-            ));
-        }
-        Ok(WorkbenchCommand::Athena(AthenaCommand::Continue {
-            session: session.to_owned(),
-            successor: 0,
-        }))
+        Ok(WorkbenchCommand::Diagnostic(DiagnosticCommand::Athena(
+            AthenaCommand::Conduct {
+                session: session.to_owned(),
+                spool: address.spool.clone(),
+                thread: address.thread.clone(),
+                occurrence: address.occurrence.0,
+                receiver: receiver.0,
+            },
+        )))
     }
 
     pub fn recommended_demo_return_command(
@@ -263,82 +170,24 @@ impl WorkbenchRuntime {
         let occurrence = latest
             .saturating_add(1)
             .max(100u64.saturating_add(boundary.generation.saturating_mul(100)));
-        Ok(WorkbenchCommand::Athena(AthenaCommand::Return {
-            session: session.to_owned(),
-            occurrence,
-            boundary: occurrence.saturating_mul(2),
-            real: "1".to_owned(),
-            imaginary: "1/2".to_owned(),
-            storage: "1".to_owned(),
-        }))
-    }
-
-    pub fn suggested_artifact_path(
-        &self,
-        session: &str,
-        suffix: &str,
-    ) -> Result<PathBuf, WorkbenchError> {
-        let generation = self.session(session)?.application.generation();
-        let safe_session = session
-            .chars()
-            .map(|character| {
-                if character.is_ascii_alphanumeric() || matches!(character, '-' | '_') {
-                    character
-                } else {
-                    '_'
-                }
-            })
-            .collect::<String>();
-        let directory = store::artifact_root()?.join(&safe_session);
-        let stem = format!("generation-{generation}");
-        let candidate = directory.join(format!("{stem}.{suffix}"));
-        if !candidate.exists() {
-            return Ok(candidate);
-        }
-        Ok((2u64..)
-            .map(|ordinal| directory.join(format!("{stem}-{ordinal}.{suffix}")))
-            .find(|path| !path.exists())
-            .expect("the filesystem cannot exhaust u64 artifact names"))
-    }
-
-    pub fn obstruction(
-        &mut self,
-        subject: impl Into<String>,
-        summary: impl Into<String>,
-    ) -> WorkbenchEvent {
-        self.obstruction_with_code(subject, "operation-refusal", summary)
-    }
-
-    pub fn obstruction_with_code(
-        &mut self,
-        subject: impl Into<String>,
-        code: impl Into<String>,
-        summary: impl Into<String>,
-    ) -> WorkbenchEvent {
-        let event = self
-            .event(EventLevel::Obstruction, subject, summary, None)
-            .with_code(code);
-        self.history.push(event.clone());
-        event
+        Ok(WorkbenchCommand::Diagnostic(DiagnosticCommand::Athena(
+            AthenaCommand::Return {
+                session: session.to_owned(),
+                occurrence,
+                boundary: occurrence.saturating_mul(2),
+                real: "1".to_owned(),
+                imaginary: "1/2".to_owned(),
+                storage: "1".to_owned(),
+            },
+        )))
     }
 
     pub fn execute(&mut self, command: WorkbenchCommand) -> Vec<WorkbenchEvent> {
         let result = match command {
-            WorkbenchCommand::Demo => self.execute_demo(),
-            WorkbenchCommand::Athena(command) => self.execute_athena(command),
-            WorkbenchCommand::Status => Ok(vec![self.adapter(adapters::engine::status())]),
-            WorkbenchCommand::Capabilities => {
-                Ok(vec![self.adapter(adapters::engine::capabilities())])
+            WorkbenchCommand::Workspace(command) => {
+                adapters::workspace::execute(command).map(|returned| vec![self.adapter(returned)])
             }
-            WorkbenchCommand::Eros(command) => {
-                adapters::eros::execute(command).map(|returned| vec![self.adapter(returned)])
-            }
-            WorkbenchCommand::Soulkiller(command) => {
-                adapters::soulkiller::execute(command).map(|returned| vec![self.adapter(returned)])
-            }
-            WorkbenchCommand::Engine(command) => {
-                adapters::engine::execute(command).map(|returned| vec![self.adapter(returned)])
-            }
+            WorkbenchCommand::Diagnostic(command) => self.execute_diagnostic(command),
         };
         let events = match result {
             Ok(events) => events,
@@ -358,19 +207,47 @@ impl WorkbenchRuntime {
         events
     }
 
+    fn execute_diagnostic(
+        &mut self,
+        command: DiagnosticCommand,
+    ) -> Result<Vec<WorkbenchEvent>, WorkbenchError> {
+        match command {
+            DiagnosticCommand::Demo => self.execute_demo(),
+            DiagnosticCommand::Athena(command) => self.execute_athena(command),
+            DiagnosticCommand::Status => Ok(vec![self.adapter(adapters::engine::status())]),
+            DiagnosticCommand::Capabilities => {
+                Ok(vec![self.adapter(adapters::engine::capabilities())])
+            }
+            DiagnosticCommand::Eros(command) => {
+                adapters::eros::execute(command).map(|returned| vec![self.adapter(returned)])
+            }
+            DiagnosticCommand::Soulkiller(command) => {
+                adapters::soulkiller::execute(command).map(|returned| vec![self.adapter(returned)])
+            }
+            DiagnosticCommand::Engine(command) => {
+                adapters::engine::execute(command).map(|returned| vec![self.adapter(returned)])
+            }
+        }
+    }
+
     fn execute_demo(&mut self) -> Result<Vec<WorkbenchEvent>, WorkbenchError> {
         let session = self.next_session_name("alpha");
         let mut events = self.athena_demo_open(session.clone())?;
-        let WorkbenchCommand::Athena(conduct) = self.recommended_conduct_command(&session)? else {
+        let WorkbenchCommand::Diagnostic(DiagnosticCommand::Athena(conduct)) =
+            self.recommended_conduct_command(&session)?
+        else {
             unreachable!("recommended conduct is an Athena command")
         };
         events.extend(self.execute_athena(conduct)?);
-        let WorkbenchCommand::Athena(returned) = self.recommended_demo_return_command(&session)?
+        let WorkbenchCommand::Diagnostic(DiagnosticCommand::Athena(returned)) =
+            self.recommended_demo_return_command(&session)?
         else {
             unreachable!("recommended return is an Athena command")
         };
         events.extend(self.execute_athena(returned)?);
-        let WorkbenchCommand::Athena(conduct) = self.recommended_conduct_command(&session)? else {
+        let WorkbenchCommand::Diagnostic(DiagnosticCommand::Athena(conduct)) =
+            self.recommended_conduct_command(&session)?
+        else {
             unreachable!("recommended conduct is an Athena command")
         };
         events.extend(self.execute_athena(conduct)?);
@@ -963,7 +840,7 @@ fn demo_excitation(
     }
 }
 
-fn parse_rat(text: &str) -> Result<Rat, WorkbenchError> {
+pub(crate) fn parse_rat(text: &str) -> Result<Rat, WorkbenchError> {
     if let Some((numerator, denominator)) = text.split_once('/') {
         let numerator =
             BigInt::from_str(numerator).map_err(|_| WorkbenchError::Rational(text.to_owned()))?;
@@ -997,7 +874,9 @@ mod tests {
     use tempfile::tempdir;
 
     fn command(runtime: &mut WorkbenchRuntime, command: AthenaCommand) -> Vec<WorkbenchEvent> {
-        runtime.execute(WorkbenchCommand::Athena(command))
+        runtime.execute(WorkbenchCommand::Diagnostic(DiagnosticCommand::Athena(
+            command,
+        )))
     }
 
     #[test]

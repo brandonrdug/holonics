@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::{EventLevel, WorkbenchCommand, WorkbenchEvent};
 
-pub const WORKBENCH_REQUEST_SCHEMA: &str = "org.holonics.workbench.request.v2";
-pub const WORKBENCH_RESPONSE_SCHEMA: &str = "org.holonics.workbench.response.v2";
+pub const WORKBENCH_REQUEST_SCHEMA: &str = "org.holonics.workbench.request.v3";
+pub const WORKBENCH_RESPONSE_SCHEMA: &str = "org.holonics.workbench.response.v3";
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -86,11 +86,13 @@ mod tests {
 
     #[test]
     fn request_and_response_are_one_versioned_io_envelope() {
-        let request = WorkbenchRequest::new(WorkbenchCommand::Status);
+        let request = WorkbenchRequest::new(WorkbenchCommand::Diagnostic(
+            crate::DiagnosticCommand::Status,
+        ));
         let wire = serde_json::to_vec(&request).expect("request wire");
         assert_eq!(WorkbenchRequest::read(&wire).expect("request"), request);
         let response = WorkbenchResponse::new(
-            WorkbenchCommand::Status,
+            WorkbenchCommand::Diagnostic(crate::DiagnosticCommand::Status),
             vec![WorkbenchEvent::new(
                 0,
                 EventLevel::Consequence,

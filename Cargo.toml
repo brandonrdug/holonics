@@ -18,6 +18,7 @@
 resolver = "2"
 members = [
   "applications/athena-alpha",
+  "applications/holonics-application",
   "applications/holonics-workbench",
   "crates/holonic-structure",
   "crates/holonic-language",

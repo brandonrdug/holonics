@@ -4,7 +4,7 @@
 [`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) is the sole ordered construction
 authority. Historical phase detail remains in Git and the dated records named there.
 
-**Currency:** 2026-09-01, after WB0--WB6 were directly founded. AAC0--AAC6, MVF0--MVF6, SCF0--SCF6, CONS0--CONS5,
+**Currency:** 2026-09-01, after VWS0--VWS6 returned. AAC0--AAC6, MVF0--MVF6, SCF0--SCF6, CONS0--CONS5,
 QLT1--QLT6, CDB1, HIF0--HIF7, and the exact bounded R0Q0--R0Q4 mechanisms retain their scoped
 grades.
 
@@ -12,7 +12,37 @@ grades.
 
 **Current frontier:** NONE
 
-**WB0--WB6 PASSED. NO APPLICATION DEED REMAINS SCHEDULED.**
+**VWS0--VWS6 PASSED. NO DEED IS CURRENT.**
+
+[definition] Brandon's direct correction of 2026-09-01 founds
+[`blueprint/THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md`](blueprint/THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md).
+The prior Workbench supplied low-level diagnostics but no model-building application. VWS0--VWS6
+construct the explicit-root receipt-lift, variant, experiment, circulation, staged cultivation,
+evaluation and artifact lifecycle. Raw model-directory dismantling and qualitative generation remain
+open rather than being replaced by the demo or metadata inspection.
+
+[established-bounded; implemented-exact; source-inspected; process-audit; measured] VWS0 returned
+complete Gemma excitation-receipt admission into source-neutral generation-0 Athena, separate cold
+witness/insufficiency, unknown-field refusal and artifact-root containment. Three focused controls
+passed. The receipt is
+[`research/records/2026-09-01_VWS0_ACTUAL_GEMMA_RECEIPT_ENTERED_ATHENA_WITHOUT_FOREIGN_EXECUTION.md`](research/records/2026-09-01_VWS0_ACTUAL_GEMMA_RECEIPT_ENTERED_ATHENA_WITHOUT_FOREIGN_EXECUTION.md).
+
+[established-bounded; implemented-exact; source-inspected; process-audit; measured] VWS1--VWS5
+returned the independent explicit-root application crate, atomic artifact/manifest boundary, actual
+Gemma receipt lift, native snapshot import, resolved experiments, persisted conduct/actual continue,
+separate candidate, generation-1 commit, byte-identical decline, current-withdrawn-restored
+evaluation and exact ONNX/Safetensors export. Four application controls plus the high-level separate-
+process CLI lifecycle passed. The receipt is
+[`research/records/2026-09-01_VWS1_VWS5_EXPLICIT_VARIANT_WORKSPACE_RETURNED_PERSISTENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPORT.md`](research/records/2026-09-01_VWS1_VWS5_EXPLICIT_VARIANT_WORKSPACE_RETURNED_PERSISTENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPORT.md).
+
+[established-bounded; implemented-exact; source-inspected; process-audit; measured] VWS6 returned
+the `holonics` 0.4.0 high-level workspace CLI, current-directory operation after one explicit
+creation root, complete conduct/continue boundary returns, typed human variant receipts,
+subordinate diagnostics, and deletion of the rejected Ratatui body and hidden store. Seventeen
+focused controls passed. The coherent release returned 2,973 tests passed, zero failed and 50
+ignored; examples type-checked; the live Lean umbrella built 3,771 jobs; all nine gates passed; and
+the installed binary returned help/create/inspect. The receipt is
+[`research/records/2026-09-01_VWS6_HOLONICS_RETURNED_THE_PERSISTENT_VARIANT_WORKSPACE_APPLICATION.md`](research/records/2026-09-01_VWS6_HOLONICS_RETURNED_THE_PERSISTENT_VARIANT_WORKSPACE_APPLICATION.md).
 
 [definition] Brandon's direct request of 2026-09-01 founds the exterior application contract
 [`applications/holonics-workbench/WORKBENCH.md`](applications/holonics-workbench/WORKBENCH.md).

@@ -1,119 +1,143 @@
-# Holonics Workbench
+# Holonics command application
 
-Holonics Workbench is the local session and receipt instrument for Athena, Eros, Soulkiller, and
-the Holonic Engine. Version 0.3 is session-first: it renders returned causal structure and exact
-domain receipts. It is not a file manager or a JSON viewer.
+`holonics` operates persistent, explicit-root morphology-variant workspaces. The model lifecycle is
+the primary CLI. Low-level transport probes remain under `diagnostic`; the premature Ratatui surface
+has been removed.
 
-## Install and open
+## Install
 
 ```bash
 cargo install --path applications/holonics-workbench --locked
-holonics
+holonics --help
 ```
 
-The default Athena surface starts with two actions. Press `Enter` on **Run bounded alpha cycle** to
-open source-neutral demo morphology, conduct generation 0, commit one bounded return, and conduct
-generation 1. No parameter is required.
+Running `holonics` without arguments prints the high-level command help and exits successfully.
 
-## Surface anatomy
+## Actual inherited-receipt workflow
 
-The header contains four functional modes:
-
-- `1` Athena: mounted session, lifecycle, successors, exact return, fixed-morphology probes, and
-  persistence.
-- `2` Eros: typed incidence-atlas and exposure-mouth operations.
-- `3` Soulkiller: typed foreign-chart inspection without foreign execution.
-- `4` Engine: apparatus, package anatomy, and exact export operations.
-
-Athena shows the current session and circulation stage:
-
-```text
-MOUNT → CONDUCT → EMIT → WORLD RETURN → COMMIT
-```
-
-The main receipt surface has three projections:
-
-- **Summary**: the consequence, principal state, totals, open fibres, and state effect.
-- **Structure**: domain-specific relations and exact tables.
-- **Exact**: the complete serialized payload, available as a secondary cold view.
-
-All three views scroll independently from event selection. Scrollbars appear when content exceeds
-the viewport. The bottom timeline selects the causal occurrence whose receipt is displayed.
-
-## Keys
-
-- `1`–`4`: switch the actual Athena/Eros/Soulkiller/Engine action surface.
-- `[` / `]`: switch mounted Athena sessions.
-- `Tab` / `Shift-Tab`: move between actions, receipt, and event timeline.
-- `Up` / `Down`: select or scroll one row.
-- `PageUp` / `PageDown`: move ten rows.
-- `Home` / `End`: first or last row.
-- `Left` / `Right`: switch Summary, Structure, and Exact receipt projections.
-- `s`, `v`, `x`: jump directly to Summary, Structure, or Exact.
-- `Enter`: execute the selected action or open the selected event.
-- `?`: contextual help.
-- `q`: exit when no operation owns the runtime.
-
-Paths are ordinary typed fields inside open, inspect, atlas, package, and export operations. They do
-not occupy a permanent browser or trigger a workspace discovery scan.
-
-## Diffusion presentation
-
-The current diffusion action is deliberately named **Closed unit-law diffusion probe**. It is one
-exact source-free fixed-morphology event with:
-
-- the first native spool;
-- unit capacity at every native state;
-- unit conductance at every incidence occurrence;
-- unit content at the first native state;
-- the entire native population as the declared receiver boundary;
-- empty source; and
-- interval `1`.
-
-It does not change the Athena session. Summary reports this explicitly and distinguishes total
-incidence branches from nonzero currents. Structure renders oriented branch currents, integrated
-transfers, node balances, standing before/after, exact residuals, and exact rational values. A
-persistent configurable diffusion simulation is a separate construction, not implied by this
-probe.
-
-## CLI and structured I/O
-
-The CLI remains the scriptable face:
+The admitted inherited input is a complete Gemma excitation-return directory, not an arbitrary raw
+model directory. It contains `receipt.json` plus every entering/returned BF16 artifact named by that
+receipt.
 
 ```bash
-holonics demo
-holonics eros atlas .
-holonics soulkiller inspect /path/to/config.json
-holonics engine package /path/to/snapshot.json
-holonics --format json status
+holonics workspace create /data/athena/first first-athena
+cd /data/athena/first
+
+holonics workspace lift-gemma-receipt \
+  /data/gemma4-excitation-return \
+  --receiver 7
+
+holonics workspace define-experiment \
+  primary \
+  --ingress 0
+
+holonics workspace conduct primary
+
+holonics workspace stage-return \
+  100 200 1 1/2 1
+
+holonics workspace commit
+holonics workspace evaluate primary
+holonics workspace export onnx
+holonics workspace export safetensors
+holonics workspace inspect
 ```
 
-Human output uses the same typed Summary projections as the TUI. Machine input uses:
+Each command is a separate process. Active boundaries and staged candidates persist in the
+workspace, so conduct, return, commit, evaluation, and export survive process exit. One workspace
+owns at most one active run. Commands after `create` use the current directory by default; use
+`--root /data/athena/first` when invoking them from elsewhere.
+
+`continue` accepts only an actual successor returned by the active boundary:
+
+```bash
+holonics workspace continue 0
+```
+
+A complete Gemma receipt currently retains no predecessor chronology, so it may return no actual
+successor. Native snapshots carrying an admitted predecessor relation can continue through this
+command. A false successor refuses without changing the active run.
+
+## Where artifacts go
+
+There is no hidden artifact root. Everything is beneath the root supplied to `workspace create`:
+
+```text
+/data/athena/first/
+  workspace.json
+  lifts/lift-1/cold-witness.json
+  lifts/lift-1/insufficiency.json
+  lifts/lift-1/lift-receipt.json
+  snapshots/generation-0-lift-1.snapshot.json
+  experiments/primary.json
+  runs/run-N/boundary-0.json
+  runs/run-N/candidate.json
+  runs/run-N/commit.json or decline.json
+  snapshots/generation-1-run-N.snapshot.json
+  evaluations/evaluation-N.json
+  exports/export-N.onnx or export-N.safetensors
+  exports/export-N.receipt.json
+```
+
+Every successful response prints:
+
+- `workspace_root` as an absolute path;
+- `current_snapshot` as an absolute path; and
+- `written_artifacts` as absolute paths.
+
+Immutable artifacts use create-new writes. `workspace.json` and an active `run.json` use
+same-directory atomic replacement. Relative references and symlinks may not escape the explicit
+root.
+
+## Structured I/O
+
+Human output is a typed projection of the same response returned by JSON:
+
+```bash
+holonics --format human workspace inspect
+holonics --format json workspace inspect
+```
+
+The versioned request form is:
 
 ```json
 {
-  "schema": "org.holonics.workbench.request.v2",
-  "command": { "domain": "status" }
+  "schema": "org.holonics.workbench.request.v3",
+  "command": {
+    "domain": "workspace",
+    "command": {
+      "action": "inspect",
+      "root": "/data/athena/first"
+    }
+  }
 }
 ```
 
-Execute it with:
+Execute a request with `holonics --format json run request.json`. Responses use
+`org.holonics.workbench.response.v3`; streamed events use
+`org.holonics.workbench.event.v4`.
+
+## Diagnostic boundary
+
+The old bounded mechanisms remain explicitly subordinate:
 
 ```bash
-holonics --format json run request.json
+holonics diagnostic status
+holonics diagnostic demo
+holonics diagnostic eros atlas .
+holonics diagnostic soulkiller inspect /path/to/config.json
 ```
 
-Output modes:
+They inspect or exercise low-level owners. They do not create a persistent model workspace.
 
-- `--format human`: typed domain summaries;
-- `--format json`: one `org.holonics.workbench.response.v2` envelope;
-- `--format jsonl`: ordered `org.holonics.workbench.event.v3` events.
+## Honest open capabilities
 
-Runtime refusal exits `1`. Invalid CLI or request input exits `2`. JSON success and refusal remain
-the same response shape.
+Every workspace names these as open:
 
-## Capability boundary
+- `raw-model-directory-lift-open`;
+- `qualitative-emission-codec-open`; and
+- `persistent-configurable-diffusion-open`.
 
-The Workbench presents existing owners. It does not implement a second inference, cultivation, or
-diffusion law. The bounded alpha cycle and unit-law diffusion probe are apparatus demonstrations,
-not qualitative generation or physical calibration claims.
+The current application produces a real source-neutral, persistently cultivated and evaluable
+morphology variant from already-returned excitation evidence. It does not yet accept a text prompt
+or emit a useful natural-language answer.

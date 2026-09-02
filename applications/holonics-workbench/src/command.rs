@@ -5,6 +5,13 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "domain", content = "command", rename_all = "kebab-case")]
 pub enum WorkbenchCommand {
+    Workspace(WorkspaceCommand),
+    Diagnostic(DiagnosticCommand),
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "action", rename_all = "kebab-case")]
+pub enum DiagnosticCommand {
     Demo,
     Status,
     Capabilities,
@@ -12,6 +19,63 @@ pub enum WorkbenchCommand {
     Eros(ErosCommand),
     Soulkiller(SoulkillerCommand),
     Engine(EngineCommand),
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "action", rename_all = "kebab-case")]
+pub enum WorkspaceCommand {
+    Create {
+        root: PathBuf,
+        label: String,
+    },
+    Inspect {
+        root: PathBuf,
+    },
+    LiftGemmaReceipt {
+        root: PathBuf,
+        receipt: PathBuf,
+        receiver: u64,
+    },
+    ImportSnapshot {
+        root: PathBuf,
+        snapshot: PathBuf,
+    },
+    DefineExperiment {
+        root: PathBuf,
+        name: String,
+        ingress: usize,
+        receiver: Option<u64>,
+    },
+    Conduct {
+        root: PathBuf,
+        experiment: String,
+    },
+    Continue {
+        root: PathBuf,
+        successor: usize,
+    },
+    StageReturn {
+        root: PathBuf,
+        occurrence: u64,
+        boundary: u64,
+        real: String,
+        imaginary: String,
+        storage: String,
+    },
+    Commit {
+        root: PathBuf,
+    },
+    Decline {
+        root: PathBuf,
+    },
+    Evaluate {
+        root: PathBuf,
+        experiment: String,
+    },
+    Export {
+        root: PathBuf,
+        codec: ExportCodecArgument,
+    },
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

@@ -37,6 +37,8 @@ Read, in order:
     [`THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).
 12. the completed exterior Holonics Workbench application contract,
     [`../applications/holonics-workbench/WORKBENCH.md`](../applications/holonics-workbench/WORKBENCH.md).
+13. the active explicit-root variant workspace application contract,
+    [`THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md`](THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md).
 
 Read only the smallest source, formal, and evidence closure required by the active deed. Completed
 sensory, membrane, Athena-alpha, Soulkiller, L, H, and Millennium campaign files
@@ -539,7 +541,7 @@ held-out change, withdrawal, and restoration passed. Its exact return is
 
 ## Completed application — Holonics Workbench
 
-**Current frontier:** NONE
+**Disposition:** completed; no current deed.
 
 **WB0--WB6 PASSED. NO APPLICATION DEED REMAINS SCHEDULED.**
 
@@ -607,6 +609,47 @@ Lean jobs and all nine gates passed. Its receipt is
 5. `WB4` — operator documentation and coherent application release; and
 6. `WB5` — guided resource/action interaction and standardized I/O correction; and
 7. `WB6` — session-first typed receipts, scrollable exact views, and honest diffusion projection.
+
+## Completed application — explicit-root variant workspace
+
+**Current frontier:** NONE
+
+**VWS0--VWS6 ARE COMPLETE.**
+
+[definition] Brandon's direct correction of 2026-09-01 founds
+[`THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md`](THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md).
+It replaces the premature low-level Workbench interpretation with a persistent application lifecycle
+over existing neutral owners. VWS0--VWS6 passed and no deed in this campaign remains current.
+
+[established-bounded; implemented-exact; source-inspected; process-audit; measured] VWS0 passed.
+The complete Gemma excitation receipt now enters Athena through the sole Soulkiller boundary;
+unknown fields and root-escaping paths refuse; generation-0, cold witness and insufficiency controls
+returned. Its receipt is
+[`research/records/2026-09-01_VWS0_ACTUAL_GEMMA_RECEIPT_ENTERED_ATHENA_WITHOUT_FOREIGN_EXECUTION.md`](../research/records/2026-09-01_VWS0_ACTUAL_GEMMA_RECEIPT_ENTERED_ATHENA_WITHOUT_FOREIGN_EXECUTION.md).
+
+[established-bounded; implemented-exact; source-inspected; process-audit; measured] VWS1--VWS5
+passed. The independent explicit-root application returns actual receipt/native import, immutable
+snapshot and separated lift artifacts, stored experiment, persisted conduct/continue/candidate,
+atomic commit/decline, current-withdrawn-restored evaluation and exact exports. The receipt is
+[`research/records/2026-09-01_VWS1_VWS5_EXPLICIT_VARIANT_WORKSPACE_RETURNED_PERSISTENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPORT.md`](../research/records/2026-09-01_VWS1_VWS5_EXPLICIT_VARIANT_WORKSPACE_RETURNED_PERSISTENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPORT.md).
+
+[established-bounded; implemented-exact; source-inspected; process-audit; measured] VWS6 passed.
+The `holonics` 0.4.0 primary interface now operates the persistent workspace from its current
+directory or `--root`, returns complete active boundaries and typed human receipts, retains old
+mechanisms only beneath `diagnostic`, and contains no released Ratatui body or hidden artifact root.
+The actual separate-process lifecycle, installation and coherent nine-gate release returned. Its
+receipt is
+[`research/records/2026-09-01_VWS6_HOLONICS_RETURNED_THE_PERSISTENT_VARIANT_WORKSPACE_APPLICATION.md`](../research/records/2026-09-01_VWS6_HOLONICS_RETURNED_THE_PERSISTENT_VARIANT_WORKSPACE_APPLICATION.md).
+
+[definition] The complete order is:
+
+1. `VWS0` — application contract and admitted receipt source boundary;
+2. `VWS1` — explicit-root workspace and atomic artifacts;
+3. `VWS2` — actual Gemma receipt lift and variant founding;
+4. `VWS3` — experiment definition and persisted conduct/continue;
+5. `VWS4` — staged return, commit, decline and successor artifacts;
+6. `VWS5` — withdrawal/restoration evaluation and exact export; and
+7. `VWS6` — high-level CLI, premature-presentation removal and coherent release.
 
 ## Standing and history
 

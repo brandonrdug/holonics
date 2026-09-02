@@ -4,6 +4,9 @@ use serde_json::Value;
 use crate::{EventLevel, WorkbenchEvent};
 
 pub fn summary(event: &WorkbenchEvent) -> String {
+    if event.subject.starts_with("workspace/") {
+        return workspace_summary(event);
+    }
     if event.subject.ends_with("/diffusion") {
         return diffusion_summary(event);
     }
@@ -11,6 +14,8 @@ pub fn summary(event: &WorkbenchEvent) -> String {
     if let Some(payload) = &event.payload {
         for key in [
             "session",
+            "workspace_root",
+            "current_snapshot",
             "generation",
             "path",
             "octets",
@@ -22,6 +27,20 @@ pub fn summary(event: &WorkbenchEvent) -> String {
         ] {
             if let Some(value) = payload.get(key).filter(|value| scalar(value)) {
                 lines.push(format!("{:<20} {}", humanize(key), exact_value(value)));
+            }
+        }
+        if let Some(written) = payload.get("written_artifacts").and_then(Value::as_array) {
+            if !written.is_empty() {
+                lines.push(String::new());
+                lines.push("WRITTEN ARTIFACTS".to_owned());
+                lines.extend(written.iter().map(exact_value));
+            }
+        }
+        if let Some(value) = payload.get("value") {
+            for key in ["generation", "ordinal", "experiment", "foreign_execution"] {
+                if let Some(field) = value.get(key).filter(|field| scalar(field)) {
+                    lines.push(format!("{:<20} {}", humanize(key), exact_value(field)));
+                }
             }
         }
         if let Some(anatomy) = payload.get("anatomy") {
@@ -49,6 +68,361 @@ pub fn summary(event: &WorkbenchEvent) -> String {
         }
     }
     lines.join("\n")
+}
+
+fn workspace_summary(event: &WorkbenchEvent) -> String {
+    let mut lines = event_heading(event);
+    let Some(payload) = event.payload.as_ref() else {
+        return lines.join("\n");
+    };
+    lines.push(String::new());
+    lines.push("WORKSPACE".to_owned());
+    push_field(&mut lines, "Root", payload.get("workspace_root"));
+    push_field(
+        &mut lines,
+        "Current snapshot",
+        payload.get("current_snapshot"),
+    );
+    let value = payload.get("value").unwrap_or(&Value::Null);
+    match event.subject.as_str() {
+        "workspace/create" | "workspace/inspect" => {
+            let manifest = value.get("manifest").unwrap_or(value);
+            workspace_manifest(&mut lines, manifest);
+            if let Some(active) = value.get("active").filter(|item| !item.is_null()) {
+                circulation_summary(&mut lines, active);
+            }
+        }
+        "workspace/lift-gemma-receipt" => lift_summary(&mut lines, value),
+        "workspace/import-snapshot" => import_summary(&mut lines, value),
+        "workspace/define-experiment" => experiment_summary(&mut lines, value),
+        "workspace/conduct" | "workspace/continue" => circulation_summary(&mut lines, value),
+        "workspace/stage-return" => candidate_summary(&mut lines, value),
+        "workspace/commit" => commit_summary(&mut lines, value),
+        "workspace/decline" => decline_summary(&mut lines, value),
+        "workspace/evaluate" => evaluation_summary(&mut lines, value),
+        "workspace/export" => export_summary(&mut lines, value),
+        _ => {}
+    }
+    if let Some(written) = payload.get("written_artifacts").and_then(Value::as_array) {
+        if !written.is_empty() {
+            lines.push(String::new());
+            lines.push("WRITTEN ARTIFACTS".to_owned());
+            lines.extend(
+                written
+                    .iter()
+                    .map(|item| format!("  {}", exact_value(item))),
+            );
+        }
+    }
+    lines.join("\n")
+}
+
+fn workspace_manifest(lines: &mut Vec<String>, manifest: &Value) {
+    lines.push(String::new());
+    lines.push("VARIANT STATE".to_owned());
+    push_field(lines, "Label", manifest.get("label"));
+    if let Some(current) = manifest.get("current").filter(|item| !item.is_null()) {
+        push_field(lines, "Generation", current.get("generation"));
+        push_field(
+            lines,
+            "Native population",
+            current
+                .get("morphology")
+                .and_then(|item| item.get("anatomy"))
+                .and_then(|item| item.get("native_population")),
+        );
+    } else {
+        lines.push(format!("{:<34} {}", "State", "empty, lift or import next"));
+    }
+    push_names(lines, "Experiments", manifest.get("experiments"), "name");
+    if let Some(active) = manifest.get("active_run").filter(|item| !item.is_null()) {
+        push_field(lines, "Active run", active.get("ordinal"));
+    } else {
+        lines.push(format!("{:<34} {}", "Active run", "none"));
+    }
+    push_population(lines, "Completed runs", manifest.get("completed_runs"));
+    push_population(lines, "Evaluations", manifest.get("evaluations"));
+    push_population(lines, "Export artifacts", manifest.get("exports"));
+    push_list(
+        lines,
+        "Open capabilities",
+        manifest.get("open_capabilities"),
+    );
+}
+
+fn lift_summary(lines: &mut Vec<String>, value: &Value) {
+    lines.push(String::new());
+    lines.push("LIFT".to_owned());
+    push_field(lines, "Source", value.get("source_address"));
+    push_field(lines, "Generation", value.get("generation"));
+    push_field(lines, "Receiver", value.get("receiver"));
+    push_field(
+        lines,
+        "Excitations",
+        value.get("cold_excitation_population"),
+    );
+    push_field(lines, "Foreign execution", value.get("foreign_execution"));
+    push_map(lines, "Modalities", value.get("modality_occurrences"));
+    push_list(lines, "Open exterior", value.get("open_exterior"));
+}
+
+fn import_summary(lines: &mut Vec<String>, value: &Value) {
+    lines.push(String::new());
+    lines.push("IMPORTED VARIANT".to_owned());
+    push_field(lines, "Generation", value.get("generation"));
+    push_field(
+        lines,
+        "Snapshot",
+        value
+            .get("snapshot")
+            .and_then(|item| item.get("relative_path")),
+    );
+}
+
+fn experiment_summary(lines: &mut Vec<String>, value: &Value) {
+    lines.push(String::new());
+    lines.push("EXPERIMENT".to_owned());
+    push_field(lines, "Name", value.get("name"));
+    push_address(lines, "Ingress", value.get("ingress"));
+    push_field(lines, "Receiver", value.get("receiver"));
+}
+
+fn circulation_summary(lines: &mut Vec<String>, value: &Value) {
+    lines.push(String::new());
+    lines.push("ACTIVE CIRCULATION".to_owned());
+    let run = &value["run"];
+    let boundary = &value["boundary"];
+    push_field(lines, "Run", run.get("ordinal"));
+    push_field(lines, "Experiment", run.get("experiment"));
+    push_field(lines, "Run state", run.get("state"));
+    push_field(lines, "Generation", boundary.get("generation"));
+    push_address(
+        lines,
+        "Emission",
+        boundary
+            .get("emission")
+            .and_then(|item| item.get("address")),
+    );
+    push_population(lines, "Future grains", boundary.get("futures"));
+    push_population(lines, "Open obligations", boundary.get("open_obligations"));
+    push_successors(lines, boundary.get("actual_successors"));
+}
+
+fn candidate_summary(lines: &mut Vec<String>, value: &Value) {
+    lines.push(String::new());
+    lines.push("STAGED CANDIDATE".to_owned());
+    push_field(
+        lines,
+        "Generation",
+        value
+            .get("boundary")
+            .and_then(|item| item.get("generation")),
+    );
+    push_field(
+        lines,
+        "Returned occurrence",
+        value
+            .get("returned")
+            .and_then(|item| item.get("occurrence")),
+    );
+    push_field(
+        lines,
+        "Returned boundary",
+        value
+            .get("returned")
+            .and_then(|item| item.get("emitting_boundary")),
+    );
+    push_field(
+        lines,
+        "Exterior current",
+        value
+            .get("returned")
+            .and_then(|item| item.get("exterior_current")),
+    );
+    push_field(
+        lines,
+        "Returned storage",
+        value.get("returned").and_then(|item| item.get("storage")),
+    );
+    push_population(
+        lines,
+        "Contact support",
+        value
+            .get("returned")
+            .and_then(|item| item.get("contact_support")),
+    );
+}
+
+fn commit_summary(lines: &mut Vec<String>, value: &Value) {
+    lines.push(String::new());
+    lines.push("COMMITTED MORPHOLOGY".to_owned());
+    push_field(
+        lines,
+        "Generation",
+        value
+            .get("successor_lineage")
+            .and_then(|lineage| lineage.get("generation")),
+    );
+    push_field(
+        lines,
+        "Parent generation",
+        value
+            .get("predecessor_lineage")
+            .and_then(|lineage| lineage.get("generation")),
+    );
+}
+
+fn decline_summary(lines: &mut Vec<String>, value: &Value) {
+    lines.push(String::new());
+    lines.push("DECLINED RETURN".to_owned());
+    push_field(lines, "Generation before", value.get("generation_before"));
+    push_field(lines, "Generation after", value.get("generation_after"));
+    push_field(
+        lines,
+        "Morphology unchanged",
+        value.get("morphology_unchanged"),
+    );
+}
+
+fn evaluation_summary(lines: &mut Vec<String>, value: &Value) {
+    lines.push(String::new());
+    lines.push("CULTIVATION EVALUATION".to_owned());
+    push_field(lines, "Experiment", value.get("experiment"));
+    push_field(
+        lines,
+        "Current generation",
+        value.get("current").and_then(|item| item.get("generation")),
+    );
+    push_field(
+        lines,
+        "Current differs from withdrawn",
+        value.get("cultivation_separates_current_from_withdrawn"),
+    );
+    push_field(
+        lines,
+        "Replay restored exactly",
+        value.get("restoration_exact"),
+    );
+    push_field(
+        lines,
+        "Current snapshot unchanged",
+        value.get("current_snapshot_unchanged"),
+    );
+    push_list(lines, "Open", value.get("open"));
+}
+
+fn export_summary(lines: &mut Vec<String>, value: &Value) {
+    lines.push(String::new());
+    lines.push("EXACT EXPORT".to_owned());
+    push_field(lines, "Codec", value.get("codec"));
+    push_field(lines, "Generation", value.get("generation"));
+    push_field(lines, "Media type", value.get("media_type"));
+    push_field(
+        lines,
+        "Complete package round trip",
+        value.get("complete_package_round_trip"),
+    );
+    push_field(
+        lines,
+        "Artifact",
+        value
+            .get("artifact")
+            .and_then(|item| item.get("relative_path")),
+    );
+}
+
+fn push_field(lines: &mut Vec<String>, label: &str, value: Option<&Value>) {
+    if let Some(value) = value {
+        lines.push(format!("{label:<34} {}", exact_value(value)));
+    }
+}
+
+fn push_population(lines: &mut Vec<String>, label: &str, value: Option<&Value>) {
+    if let Some(values) = value.and_then(Value::as_array) {
+        lines.push(format!("{label:<34} {}", values.len()));
+    }
+}
+
+fn push_names(lines: &mut Vec<String>, label: &str, value: Option<&Value>, key: &str) {
+    let Some(values) = value.and_then(Value::as_array) else {
+        return;
+    };
+    let names = values
+        .iter()
+        .filter_map(|item| item.get(key))
+        .map(exact_value)
+        .collect::<Vec<_>>();
+    lines.push(format!(
+        "{label:<34} {}",
+        if names.is_empty() {
+            "none".to_owned()
+        } else {
+            names.join(", ")
+        }
+    ));
+}
+
+fn push_list(lines: &mut Vec<String>, label: &str, value: Option<&Value>) {
+    let Some(values) = value.and_then(Value::as_array) else {
+        return;
+    };
+    if values.is_empty() {
+        return;
+    }
+    lines.push(label.to_owned());
+    lines.extend(values.iter().map(|item| format!("  {}", exact_value(item))));
+}
+
+fn push_map(lines: &mut Vec<String>, label: &str, value: Option<&Value>) {
+    let Some(values) = value.and_then(Value::as_object) else {
+        return;
+    };
+    if values.is_empty() {
+        return;
+    }
+    lines.push(label.to_owned());
+    lines.extend(
+        values
+            .iter()
+            .map(|(key, value)| format!("  {key:<28} {}", exact_value(value))),
+    );
+}
+
+fn push_address(lines: &mut Vec<String>, label: &str, value: Option<&Value>) {
+    let Some(value) = value else {
+        return;
+    };
+    let spool = value
+        .get("spool")
+        .map(exact_value)
+        .unwrap_or_else(|| "?".to_owned());
+    let thread = value
+        .get("thread")
+        .map(exact_value)
+        .unwrap_or_else(|| "?".to_owned());
+    let occurrence = value
+        .get("occurrence")
+        .or_else(|| value.get("entering_occurrence"))
+        .map(exact_value)
+        .unwrap_or_else(|| "?".to_owned());
+    lines.push(format!("{label:<34} {spool}/{thread} @ {occurrence}"));
+}
+
+fn push_successors(lines: &mut Vec<String>, value: Option<&Value>) {
+    let Some(successors) = value.and_then(Value::as_array) else {
+        return;
+    };
+    lines.push(format!("{:<34} {}", "Actual successors", successors.len()));
+    for (ordinal, successor) in successors.iter().enumerate() {
+        let address = &successor["address"];
+        lines.push(format!(
+            "  #{ordinal:<4} {}/{} @ {}  receiver {}",
+            exact_value(&address["spool"]),
+            exact_value(&address["thread"]),
+            exact_value(&address["occurrence"]),
+            exact_value(&successor["receiver"]),
+        ));
+    }
 }
 
 pub fn structure(event: &WorkbenchEvent) -> String {

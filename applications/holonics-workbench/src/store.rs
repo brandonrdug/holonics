@@ -3,16 +3,6 @@ use std::path::Path;
 
 use crate::runtime::WorkbenchError;
 
-pub fn artifact_root() -> Result<std::path::PathBuf, WorkbenchError> {
-    let home = std::env::var_os("HOME").ok_or_else(|| {
-        WorkbenchError::Owner(
-            "the operating environment supplied no home directory for Workbench artifacts"
-                .to_owned(),
-        )
-    })?;
-    Ok(std::path::PathBuf::from(home).join(".local/share/holonics-workbench"))
-}
-
 pub fn read(path: &Path) -> Result<Vec<u8>, WorkbenchError> {
     fs::read(path).map_err(|error| WorkbenchError::Io {
         path: path.to_path_buf(),

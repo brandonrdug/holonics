@@ -3,8 +3,9 @@ use std::io::Write;
 use std::process::{Command, Stdio};
 
 use holonics_workbench::{
-    AthenaCommand, EngineCommand, ErosCommand, EventLevel, ExportCodecArgument, SoulkillerCommand,
-    WorkbenchCommand, WorkbenchEvent, WorkbenchRequest, WorkbenchResponse, WorkbenchRuntime,
+    AthenaCommand, DiagnosticCommand, EngineCommand, ErosCommand, EventLevel, ExportCodecArgument,
+    SoulkillerCommand, WorkbenchCommand, WorkbenchEvent, WorkbenchRequest, WorkbenchResponse,
+    WorkbenchRuntime,
 };
 use tempfile::tempdir;
 
@@ -32,38 +33,44 @@ fn eros_soulkiller_engine_and_cli_return_shared_structured_events() {
 
     let mut runtime = WorkbenchRuntime::new();
     for command in [
-        WorkbenchCommand::Status,
-        WorkbenchCommand::Capabilities,
-        WorkbenchCommand::Eros(ErosCommand::Mouth {
+        diagnostic(DiagnosticCommand::Status),
+        diagnostic(DiagnosticCommand::Capabilities),
+        diagnostic(DiagnosticCommand::Eros(ErosCommand::Mouth {
             directory: material.clone(),
             extension: "md".to_owned(),
             radius: 2,
             scales: 2,
             octet_budget: 1_000,
-        }),
-        WorkbenchCommand::Eros(ErosCommand::Atlas {
+        })),
+        diagnostic(DiagnosticCommand::Eros(ErosCommand::Atlas {
             directory: material,
             extension: "md".to_owned(),
             octet_budget: 1_000,
-        }),
-        WorkbenchCommand::Soulkiller(SoulkillerCommand::Config { path: config }),
-        WorkbenchCommand::Soulkiller(SoulkillerCommand::Index { path: index }),
-        WorkbenchCommand::Athena(AthenaCommand::DemoOpen {
+        })),
+        diagnostic(DiagnosticCommand::Soulkiller(SoulkillerCommand::Config {
+            path: config,
+        })),
+        diagnostic(DiagnosticCommand::Soulkiller(SoulkillerCommand::Index {
+            path: index,
+        })),
+        diagnostic(DiagnosticCommand::Athena(AthenaCommand::DemoOpen {
             session: "alpha".to_owned(),
-        }),
-        WorkbenchCommand::Athena(AthenaCommand::Snapshot {
+        })),
+        diagnostic(DiagnosticCommand::Athena(AthenaCommand::Snapshot {
             session: "alpha".to_owned(),
             path: snapshot.clone(),
-        }),
-        WorkbenchCommand::Engine(EngineCommand::Package {
+        })),
+        diagnostic(DiagnosticCommand::Engine(EngineCommand::Package {
             path: snapshot.clone(),
-        }),
-        WorkbenchCommand::Engine(EngineCommand::Export {
+        })),
+        diagnostic(DiagnosticCommand::Engine(EngineCommand::Export {
             package: snapshot,
             codec: ExportCodecArgument::Onnx,
             path: onnx.clone(),
-        }),
-        WorkbenchCommand::Soulkiller(SoulkillerCommand::Onnx { path: onnx }),
+        })),
+        diagnostic(DiagnosticCommand::Soulkiller(SoulkillerCommand::Onnx {
+            path: onnx,
+        })),
     ] {
         let events = runtime.execute(command);
         assert_eq!(events.len(), 1);
@@ -73,10 +80,10 @@ fn eros_soulkiller_engine_and_cli_return_shared_structured_events() {
 
     let direct = {
         let mut runtime = WorkbenchRuntime::new();
-        runtime.execute(WorkbenchCommand::Status)
+        runtime.execute(diagnostic(DiagnosticCommand::Status))
     };
     let output = Command::new(env!("CARGO_BIN_EXE_holonics"))
-        .args(["--format", "jsonl", "status"])
+        .args(["--format", "jsonl", "diagnostic", "status"])
         .output()
         .expect("CLI status");
     assert!(output.status.success());
@@ -92,16 +99,7 @@ fn eros_soulkiller_engine_and_cli_return_shared_structured_events() {
         .output()
         .expect("CLI help");
     let help = String::from_utf8(help.stdout).expect("help UTF-8");
-    for command in [
-        "athena",
-        "eros",
-        "soulkiller",
-        "engine",
-        "capabilities",
-        "demo",
-        "run",
-        "tui",
-    ] {
+    for command in ["workspace", "diagnostic", "run"] {
         assert!(help.contains(command), "help omitted {command}");
     }
 }
@@ -110,7 +108,7 @@ fn eros_soulkiller_engine_and_cli_return_shared_structured_events() {
 fn cli_shorthand_and_structured_stdin_share_one_response_envelope() {
     let binary = env!("CARGO_BIN_EXE_holonics");
     let direct = Command::new(binary)
-        .args(["--format", "json", "status"])
+        .args(["--format", "json", "diagnostic", "status"])
         .output()
         .expect("direct status");
     assert!(direct.status.success());
@@ -128,8 +126,10 @@ fn cli_shorthand_and_structured_stdin_share_one_response_envelope() {
         .take()
         .expect("stdin")
         .write_all(
-            &serde_json::to_vec(&WorkbenchRequest::new(WorkbenchCommand::Status))
-                .expect("request wire"),
+            &serde_json::to_vec(&WorkbenchRequest::new(diagnostic(
+                DiagnosticCommand::Status,
+            )))
+            .expect("request wire"),
         )
         .expect("request input");
     let structured = child.wait_with_output().expect("structured output");
@@ -157,7 +157,7 @@ fn cli_shorthand_and_structured_stdin_share_one_response_envelope() {
     assert!(invalid.obstructed());
 
     let malformed_cli = Command::new(binary)
-        .args(["--format", "json", "athena", "not-a-command"])
+        .args(["--format", "json", "diagnostic", "athena", "not-a-command"])
         .output()
         .expect("malformed CLI");
     assert_eq!(malformed_cli.status.code(), Some(2));
@@ -166,7 +166,7 @@ fn cli_shorthand_and_structured_stdin_share_one_response_envelope() {
     assert!(malformed_cli.obstructed());
 
     let demo = Command::new(binary)
-        .args(["--format", "json", "demo"])
+        .args(["--format", "json", "diagnostic", "demo"])
         .output()
         .expect("demo");
     assert!(demo.status.success());
@@ -174,7 +174,7 @@ fn cli_shorthand_and_structured_stdin_share_one_response_envelope() {
     assert!(demo.events.len() >= 5);
 
     let human_demo = Command::new(binary)
-        .arg("demo")
+        .args(["diagnostic", "demo"])
         .output()
         .expect("human demo");
     assert!(human_demo.status.success());
@@ -186,9 +186,8 @@ fn cli_shorthand_and_structured_stdin_share_one_response_envelope() {
         .stdin(Stdio::null())
         .output()
         .expect("noninteractive no-command control");
-    assert_eq!(noninteractive.status.code(), Some(2));
-    assert!(String::from_utf8_lossy(&noninteractive.stdout)
-        .contains("TUI requires an interactive terminal"));
+    assert!(noninteractive.status.success());
+    assert!(String::from_utf8_lossy(&noninteractive.stdout).contains("workspace"));
     assert!(!String::from_utf8_lossy(&noninteractive.stderr).contains("panicked"));
 }
 
@@ -199,17 +198,23 @@ fn missing_and_malformed_exterior_material_refuses_without_execution() {
     fs::write(&malformed, b"{not-json").expect("malformed");
     let mut runtime = WorkbenchRuntime::new();
     for command in [
-        WorkbenchCommand::Soulkiller(SoulkillerCommand::Config { path: malformed }),
-        WorkbenchCommand::Soulkiller(SoulkillerCommand::Onnx {
+        diagnostic(DiagnosticCommand::Soulkiller(SoulkillerCommand::Config {
+            path: malformed,
+        })),
+        diagnostic(DiagnosticCommand::Soulkiller(SoulkillerCommand::Onnx {
             path: temporary.path().join("absent.onnx"),
-        }),
-        WorkbenchCommand::Eros(ErosCommand::Atlas {
+        })),
+        diagnostic(DiagnosticCommand::Eros(ErosCommand::Atlas {
             directory: temporary.path().join("absent"),
             extension: "md".to_owned(),
             octet_budget: 10,
-        }),
+        })),
     ] {
         let event = runtime.execute(command).remove(0);
         assert_eq!(event.level, EventLevel::Obstruction);
     }
+}
+
+fn diagnostic(command: DiagnosticCommand) -> WorkbenchCommand {
+    WorkbenchCommand::Diagnostic(command)
 }

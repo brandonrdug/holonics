@@ -150,11 +150,12 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/THE_TRAVERSIBLE_CHAIN.md` | **The traversible chain** — This one covers the carriers, and sits more immediately **under** `THE_METHOD_ATLAS.md` — the atlas states what a row is; this states what a row is *made of*. |
 | `blueprint/THE_TYPED_TRANSPORT_ATLAS.md` | **The typed transport atlas** — **All six movements returned 2026-08-14. It is a FLOOR, not an endpoint** — the review that says so, with the four standing owners the deed bypassed, is… |
 | `blueprint/THE_UNIFIED_ATHENA_BODY_RETURNS_TECHNICAL_CONDUCT_AND_BRANDON_THROUGH_COMPLETE_CULTIVATED_HISTORY.md` | **The unified Athena body returns technical conduct and Brandon through complete cultivated history** — Let `m` address a native response face, `f` its dependent factor line, `z,z'` realization sites, and `p` an exterior port. |
+| `blueprint/THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md` | **The variant workspace application returns actual lifts, experiment circulation, cultivation,** — **Governing doctrine:** `../canon/TABLET_THE_REASONING_CYCLE.md`, `../canon/TABLET_THE_HEXIS.md`,… |
 | `blueprint/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md` | **The work vector, the hand's polarity, and the committed step** — Every absence below carries the command that measured it and its date. |
 
 ---
 
-## 4 · The 2026-08 record line (450 deposits of 826)
+## 4 · The 2026-08 record line (450 deposits of 829)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:

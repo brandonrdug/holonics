@@ -1,6 +1,7 @@
 pub mod engine;
 pub mod eros;
 pub mod soulkiller;
+pub mod workspace;
 
 use serde_json::Value;
 

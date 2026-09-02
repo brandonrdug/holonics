@@ -1,7 +1,7 @@
 //! Holonics Workbench shared command/event application.
 //!
-//! CLI and Ratatui are two exterior presentations over the same `WorkbenchRuntime`. Product and
-//! navigation names in this crate never select native engine conduct.
+//! The high-level CLI composes `holonics-application`; low-level diagnostic commands retain the
+//! bounded Workbench event protocol without becoming the model-building interface.
 
 mod adapters;
 pub mod cli;
@@ -12,12 +12,11 @@ pub mod protocol;
 pub mod render;
 pub mod runtime;
 mod store;
-pub mod tui;
 
 pub use cli::{parse_cli, Cli, OutputFormat, WorkbenchInvocation};
 pub use command::{
-    AthenaCommand, EngineCommand, ErosCommand, ExportCodecArgument, SoulkillerCommand,
-    WorkbenchCommand,
+    AthenaCommand, DiagnosticCommand, EngineCommand, ErosCommand, ExportCodecArgument,
+    SoulkillerCommand, WorkbenchCommand, WorkspaceCommand,
 };
 pub use event::{EventLevel, WorkbenchEvent};
 pub use protocol::{
@@ -25,10 +24,6 @@ pub use protocol::{
     WORKBENCH_RESPONSE_SCHEMA,
 };
 pub use render::{render_human, render_json, render_json_lines};
-pub use runtime::{
-    WorkbenchError, WorkbenchIngressView, WorkbenchRuntime, WorkbenchSessionView,
-    WorkbenchSuccessorView,
-};
-pub use tui::{run_tui, WorkbenchTui};
+pub use runtime::{WorkbenchError, WorkbenchRuntime};
 
-pub const WORKBENCH_SCHEMA: &str = "org.holonics.workbench.event.v3";
+pub const WORKBENCH_SCHEMA: &str = "org.holonics.workbench.event.v4";
