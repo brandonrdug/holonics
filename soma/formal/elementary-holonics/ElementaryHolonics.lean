@@ -98,6 +98,7 @@ import ElementaryHolonics.RH.ForwardPreservation
 import ElementaryHolonics.RH.HeatSemigroup
 import ElementaryHolonics.RH.DeBruijnNewmanPolynomial
 import ElementaryHolonics.RH.EntireDerivativeGrowth
+import ElementaryHolonics.RH.HeatFlowEntire
 import ElementaryHolonics.RH.WeightedArgumentPrinciple
 import ElementaryHolonics.RH.Balance
 import ElementaryHolonics.Millennium.Gluing
