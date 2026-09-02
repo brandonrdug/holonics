@@ -225,12 +225,18 @@ def incoherentConstant : ℝ := 3 ^ 3 * (2 * Real.pi) ^ 2 * 3 * 2 ^ 3
 theorem incoherentConstant_nonneg : 0 ≤ incoherentConstant := by
   unfold incoherentConstant; positivity
 
-theorem sum_sup_sq_l1_nonlinear_sq_le_of_incoherent (F : Finset SpatialFrequency)
-    (hsum : Summable (eleventhMoment (velocity := velocity) t.1))
-    (hinc : ∀ k ∈ F, IncoherentAt solution t k) :
+/-- The defect constant `(1 + κ) · c`. -/
+def defectConstant (κ : ℝ) : ℝ := (1 + κ) * incoherentConstant
+
+theorem defectConstant_nonneg {κ : ℝ} (hκ : 0 ≤ κ) : 0 ≤ defectConstant κ :=
+  mul_nonneg (by linarith) incoherentConstant_nonneg
+
+theorem sum_sup_sq_l1_nonlinear_sq_le_of_defect (F : Finset SpatialFrequency)
+    (hsum : Summable (eleventhMoment (velocity := velocity) t.1)) {κ : ℝ} (hκ : 0 ≤ κ)
+    (hinc : ∀ k ∈ F, CoherenceDefectAt solution t κ k) :
     ∑ k ∈ F, ((frequencySup k : ℕ) : ℝ) ^ 2 *
         complexVectorL1 (vorticityNonlinearMode solution t k) ^ 2 ≤
-      incoherentConstant * (velocityMass solution t * moment (velocity := velocity) 4 t.1 +
+      defectConstant κ * (velocityMass solution t * moment (velocity := velocity) 4 t.1 +
         moment (velocity := velocity) 0 t.1 * moment (velocity := velocity) 2 t.1 /
           (2 * Real.pi) ^ 2) := by
   calc ∑ k ∈ F, ((frequencySup k : ℕ) : ℝ) ^ 2 *
@@ -242,35 +248,35 @@ theorem sum_sup_sq_l1_nonlinear_sq_le_of_incoherent (F : Finset SpatialFrequency
           ∑ output : Fin 3, ‖openActualAdvectionMode solution t k output‖ ^ 2 := by
         rw [Finset.mul_sum]
         exact Finset.sum_congr rfl fun k _ ↦ by ring
-    _ ≤ 3 ^ 3 * (2 * Real.pi) ^ 2 * (3 * 2 ^ 3 *
+    _ ≤ 3 ^ 3 * (2 * Real.pi) ^ 2 * ((1 + κ) * (3 * 2 ^ 3 *
           (velocityMass solution t * moment (velocity := velocity) 4 t.1 +
             moment (velocity := velocity) 0 t.1 * moment (velocity := velocity) 2 t.1 /
-              (2 * Real.pi) ^ 2)) :=
-        mul_le_mul_of_nonneg_left (sum_pow_four_adv_sq_le_of_incoherent solution t F hsum hinc)
+              (2 * Real.pi) ^ 2))) :=
+        mul_le_mul_of_nonneg_left (sum_pow_four_adv_sq_le_of_defect solution t F hsum hκ hinc)
           (by positivity)
-    _ = _ := by unfold incoherentConstant; ring
+    _ = _ := by unfold defectConstant incoherentConstant; ring
 
 /-- **The weight-two Riccati on incoherent receivers.** -/
 theorem momentEnergy_riccati_incoherent (hnu : 0 < nu) {F : Finset SpatialFrequency}
     (hF : ∀ k ∈ F, 1 ≤ frequencySup k) (hsum : Summable (eleventhMoment (velocity := velocity) t.1))
-    (hinc : ∀ k ∈ F, IncoherentAt solution t k) :
+    {κ : ℝ} (hκ : 0 ≤ κ) (hinc : ∀ k ∈ F, CoherenceDefectAt solution t κ k) :
     ∃ D : ℝ, HasDerivAt (momentEnergy (velocity := velocity) 2 F) D t.1 ∧
       D ≤ -2 * nu * (2 * Real.pi) ^ 2 * momentEnergy (velocity := velocity) 4 F t.1 +
         3 / 2 * (nu * (2 * Real.pi) ^ 2) * moment (velocity := velocity) 4 t.1 +
-        3 * incoherentConstant * velocityMass solution t / (nu * (2 * Real.pi) ^ 2) *
+        3 * defectConstant κ * velocityMass solution t / (nu * (2 * Real.pi) ^ 2) *
           momentEnergy (velocity := velocity) 2 F t.1 +
-        18 * incoherentConstant * velocityMass solution t / (nu * (2 * Real.pi) ^ 2) *
+        18 * defectConstant κ * velocityMass solution t / (nu * (2 * Real.pi) ^ 2) *
           moment (velocity := velocity) 2 t.1 := by
   obtain ⟨D, hD, hle⟩ := momentEnergy_riccati_gen solution t 2 hnu hF
   simp only [Nat.reduceAdd] at hle
   refine ⟨D, hD, hle.trans ?_⟩
-  have hSle := sum_sup_sq_l1_nonlinear_sq_le_of_incoherent solution t F hsum hinc
+  have hSle := sum_sup_sq_l1_nonlinear_sq_le_of_defect solution t F hsum hκ hinc
   have hM2W2 : momentEnergy (velocity := velocity) 2 F t.1 ≤ moment (velocity := velocity) 2 t.1 :=
     (summable_momentPop (w := 2) (by norm_num) (by norm_num) t.1 hsum).sum_le_tsum F
       fun q _ ↦ momentPop_nonneg _ _ _
   have hint1 := moment_two_sq_le solution t hsum
   have hint0 := moment_zero_sq_le solution t hsum
-  set c : ℝ := incoherentConstant with hc
+  set c : ℝ := defectConstant κ with hc
   set V : ℝ := velocityMass solution t with hV
   set M2 : ℝ := momentEnergy (velocity := velocity) 2 F t.1 with hM2
   set M4 : ℝ := momentEnergy (velocity := velocity) 4 F t.1 with hM4
@@ -280,7 +286,7 @@ theorem momentEnergy_riccati_incoherent (hnu : 0 < nu) {F : Finset SpatialFreque
   set S : ℝ := ∑ k ∈ F, ((frequencySup k : ℕ) : ℝ) ^ 2 *
     complexVectorL1 (vorticityNonlinearMode solution t k) ^ 2 with hS
   have hPpos : 0 < nu * (2 * Real.pi) ^ 2 := by positivity
-  have hc0 : 0 ≤ c := incoherentConstant_nonneg
+  have hc0 : 0 ≤ c := defectConstant_nonneg hκ
   have hV0 : 0 ≤ V := velocityMass_nonneg solution t
   have hM20 : 0 ≤ M2 := momentEnergy_nonneg 2 F t.1
   have hM40 : 0 ≤ M4 := momentEnergy_nonneg 4 F t.1
@@ -419,24 +425,24 @@ theorem moment_le_cubeFamily {w d : ℕ} (hw : 1 ≤ w) (hwd : w + d = 11) (N : 
 
 /-- **The cube-family Riccati on incoherent receivers with vanishing forcing.** -/
 theorem momentEnergy_cubeFamily_riccati_incoherent (hnu : 0 < nu) (N : ℕ)
-    (hsum : Summable (eleventhMoment (velocity := velocity) t.1))
-    (hinc : ∀ k : SpatialFrequency, k ≠ 0 → IncoherentAt solution t k) {V₀ : ℝ}
+    (hsum : Summable (eleventhMoment (velocity := velocity) t.1)) {κ : ℝ} (hκ : 0 ≤ κ)
+    (hinc : ∀ k : SpatialFrequency, k ≠ 0 → CoherenceDefectAt solution t κ k) {V₀ : ℝ}
     (hV : velocityMass solution t ≤ V₀) :
     ∃ D : ℝ, HasDerivAt (momentEnergy (velocity := velocity) 2 (cubeFamily N)) D t.1 ∧
-      D ≤ 21 * incoherentConstant * V₀ / (nu * (2 * Real.pi) ^ 2) *
+      D ≤ 21 * defectConstant κ * V₀ / (nu * (2 * Real.pi) ^ 2) *
           momentEnergy (velocity := velocity) 2 (cubeFamily N) t.1 +
         (3 / 2 * (nu * (2 * Real.pi) ^ 2) +
-          18 * incoherentConstant * V₀ / (nu * (2 * Real.pi) ^ 2)) *
+          18 * defectConstant κ * V₀ / (nu * (2 * Real.pi) ^ 2)) *
           (moment (velocity := velocity) 11 t.1 / ((N : ℝ) + 1) ^ 7) := by
   obtain ⟨D, hD, hle⟩ := momentEnergy_riccati_incoherent solution t hnu
-    (fun k hk ↦ one_le_frequencySup_of_mem_cubeFamily hk) hsum
+    (fun k hk ↦ one_le_frequencySup_of_mem_cubeFamily hk) hsum hκ
     (fun k hk ↦ hinc k (Finset.ne_of_mem_erase hk))
   refine ⟨D, hD, hle.trans ?_⟩
   have hW4 := moment_le_cubeFamily (velocity := velocity) (w := 4) (d := 7) (by norm_num) (by norm_num)
     N t.1 hsum
   have hW2 := moment_le_cubeFamily (velocity := velocity) (w := 2) (d := 9) (by norm_num) (by norm_num)
     N t.1 hsum
-  set c : ℝ := incoherentConstant with hc
+  set c : ℝ := defectConstant κ with hc
   set V : ℝ := velocityMass solution t with hV'
   set M2 : ℝ := momentEnergy (velocity := velocity) 2 (cubeFamily N) t.1 with hM2
   set M4 : ℝ := momentEnergy (velocity := velocity) 4 (cubeFamily N) t.1 with hM4
@@ -445,7 +451,7 @@ theorem momentEnergy_cubeFamily_riccati_incoherent (hnu : 0 < nu) (N : ℕ)
   set R7 : ℝ := moment (velocity := velocity) 11 t.1 / ((N : ℝ) + 1) ^ 7 with hR7
   set R9 : ℝ := moment (velocity := velocity) 11 t.1 / ((N : ℝ) + 1) ^ 9 with hR9
   have hPpos : 0 < nu * (2 * Real.pi) ^ 2 := by positivity
-  have hc0 : 0 ≤ c := incoherentConstant_nonneg
+  have hc0 : 0 ≤ c := defectConstant_nonneg hκ
   have hV0 : 0 ≤ V := velocityMass_nonneg solution t
   have hV₀0 : 0 ≤ V₀ := hV0.trans hV
   have hM20 : 0 ≤ M2 := momentEnergy_nonneg _ _ _
@@ -477,35 +483,35 @@ theorem momentEnergy_cubeFamily_riccati_incoherent (hnu : 0 < nu) (N : ℕ)
 
 /-- **Grönwall on the cube family under incoherence.** -/
 theorem momentEnergy_cubeFamily_le_incoherent (hnu : 0 < nu) (N : ℕ) {s τ : ℝ} (hs : s ∈ Ioo 0 T)
-    (hτ : τ ∈ Ioo 0 T) (hsτ : s ≤ τ) {V₀ B : ℝ} (hV₀ : 0 ≤ V₀) (hB : 0 ≤ B)
+    (hτ : τ ∈ Ioo 0 T) (hsτ : s ≤ τ) {κ V₀ B : ℝ} (hκ : 0 ≤ κ) (hV₀ : 0 ≤ V₀) (hB : 0 ≤ B)
     (hσ : ∀ σ (hσ : σ ∈ Ioo 0 T), σ ∈ Icc s τ →
       Summable (eleventhMoment (velocity := velocity) σ) ∧
         velocityMass solution ⟨σ, hσ⟩ ≤ V₀ ∧
-        (∀ k : SpatialFrequency, k ≠ 0 → IncoherentAt solution ⟨σ, hσ⟩ k) ∧
+        (∀ k : SpatialFrequency, k ≠ 0 → CoherenceDefectAt solution ⟨σ, hσ⟩ κ k) ∧
         moment (velocity := velocity) 11 σ ≤ B) :
     momentEnergy (velocity := velocity) 2 (cubeFamily N) τ ≤
       (momentEnergy (velocity := velocity) 2 (cubeFamily N) s +
         (3 / 2 * (nu * (2 * Real.pi) ^ 2) +
-          18 * incoherentConstant * V₀ / (nu * (2 * Real.pi) ^ 2)) * B / ((N : ℝ) + 1) ^ 7 *
+          18 * defectConstant κ * V₀ / (nu * (2 * Real.pi) ^ 2)) * B / ((N : ℝ) + 1) ^ 7 *
           (τ - s)) *
-        Real.exp (21 * incoherentConstant * V₀ / (nu * (2 * Real.pi) ^ 2) * (τ - s)) := by
-  have hc0 := incoherentConstant_nonneg
+        Real.exp (21 * defectConstant κ * V₀ / (nu * (2 * Real.pi) ^ 2) * (τ - s)) := by
+  have hc0 := defectConstant_nonneg hκ
   refine le_exp_of_hasDerivAt_le (by positivity) (by positivity) hsτ ?_
   intro σ hσI
   have hσT : σ ∈ Ioo 0 T := ⟨hs.1.trans_le hσI.1, hσI.2.trans_lt hτ.2⟩
   obtain ⟨hsum, hV, hinc, h11⟩ := hσ σ hσT hσI
   obtain ⟨D, hD, hle⟩ :=
-    momentEnergy_cubeFamily_riccati_incoherent solution ⟨σ, hσT⟩ hnu N hsum hinc hV
+    momentEnergy_cubeFamily_riccati_incoherent solution ⟨σ, hσT⟩ hnu N hsum hκ hinc hV
   dsimp only at hD hle
   refine ⟨D, hD, hle.trans ?_⟩
   have hA : 0 ≤ 3 / 2 * (nu * (2 * Real.pi) ^ 2) +
-      18 * incoherentConstant * V₀ / (nu * (2 * Real.pi) ^ 2) := by positivity
+      18 * defectConstant κ * V₀ / (nu * (2 * Real.pi) ^ 2) := by positivity
   have hR : moment (velocity := velocity) 11 σ / ((N : ℝ) + 1) ^ 7 ≤ B / ((N : ℝ) + 1) ^ 7 :=
     div_le_div_of_nonneg_right h11 (by positivity)
-  calc _ ≤ 21 * incoherentConstant * V₀ / (nu * (2 * Real.pi) ^ 2) *
+  calc _ ≤ 21 * defectConstant κ * V₀ / (nu * (2 * Real.pi) ^ 2) *
         momentEnergy (velocity := velocity) 2 (cubeFamily N) σ +
         (3 / 2 * (nu * (2 * Real.pi) ^ 2) +
-          18 * incoherentConstant * V₀ / (nu * (2 * Real.pi) ^ 2)) * (B / ((N : ℝ) + 1) ^ 7) :=
+          18 * defectConstant κ * V₀ / (nu * (2 * Real.pi) ^ 2)) * (B / ((N : ℝ) + 1) ^ 7) :=
         add_le_add le_rfl (mul_le_mul_of_nonneg_left hR hA)
     _ = _ := by ring
 
@@ -566,38 +572,38 @@ theorem moment_le_of_cubeFamily_le {w d : ℕ} (hw : 1 ≤ w) (hd : d ≠ 0) {s 
 
 /-- **The second moment along a terminal tail on incoherent feeds.** -/
 theorem moment_two_le (hnu : 0 < nu) {s τ : ℝ} (hs : s ∈ Ioo 0 T) (hτ : τ ∈ Ioo 0 T) (hsτ : s ≤ τ)
-    {V₀ B : ℝ} (hV₀ : 0 ≤ V₀) (hB : 0 ≤ B)
+    {κ V₀ B : ℝ} (hκ : 0 ≤ κ) (hV₀ : 0 ≤ V₀) (hB : 0 ≤ B)
     (hσ : ∀ σ (hσ : σ ∈ Ioo 0 T), σ ∈ Icc s τ →
       Summable (eleventhMoment (velocity := velocity) σ) ∧
         velocityMass solution ⟨σ, hσ⟩ ≤ V₀ ∧
-        (∀ k : SpatialFrequency, k ≠ 0 → IncoherentAt solution ⟨σ, hσ⟩ k) ∧
+        (∀ k : SpatialFrequency, k ≠ 0 → CoherenceDefectAt solution ⟨σ, hσ⟩ κ k) ∧
         moment (velocity := velocity) 11 σ ≤ B) :
     moment (velocity := velocity) 2 τ ≤ moment (velocity := velocity) 2 s *
-      Real.exp (21 * incoherentConstant * V₀ / (nu * (2 * Real.pi) ^ 2) * (τ - s)) := by
+      Real.exp (21 * defectConstant κ * V₀ / (nu * (2 * Real.pi) ^ 2) * (τ - s)) := by
   obtain ⟨hsums, -, -, -⟩ := hσ s hs ⟨le_rfl, hsτ⟩
-  have hc0 := incoherentConstant_nonneg
+  have hc0 := defectConstant_nonneg hκ
   refine moment_le_of_cubeFamily_le (velocity := velocity) (w := 2) (d := 7) (by norm_num)
     (by norm_num) hsτ (summable_momentPop (w := 2) (by norm_num) (by norm_num) s hsums)
-    (b := 21 * incoherentConstant * V₀ / (nu * (2 * Real.pi) ^ 2))
+    (b := 21 * defectConstant κ * V₀ / (nu * (2 * Real.pi) ^ 2))
     (C := (3 / 2 * (nu * (2 * Real.pi) ^ 2) +
-      18 * incoherentConstant * V₀ / (nu * (2 * Real.pi) ^ 2)) * B)
+      18 * defectConstant κ * V₀ / (nu * (2 * Real.pi) ^ 2)) * B)
     (by positivity) (by positivity) fun N ↦ ?_
-  exact momentEnergy_cubeFamily_le_incoherent solution hnu N hs hτ hsτ hV₀ hB hσ
+  exact momentEnergy_cubeFamily_le_incoherent solution hnu N hs hτ hsτ hκ hV₀ hB hσ
 
 /-! ## The closure statement -/
 
-/-- **Incoherence control.**  Along a terminal tail `[s, T)`: the eleventh moment is finite, the
-velocity mass is at most `V₀`, every nonzero receiver is incoherent, and the eleventh moment is
-bounded on every compact `[s, τ]`, `τ < T`. -/
-def IncoherentControl : Prop :=
+/-- **Coherence-defect control.**  Along a terminal tail `[s, T)`: the eleventh moment is finite,
+the velocity mass is at most `V₀`, every nonzero receiver has coherence defect at most `κ`, and the
+eleventh moment is bounded on every compact `[s, τ]`, `τ < T`. -/
+def CoherenceDefectControl : Prop :=
   ∀ {T nu : ℝ} {initial : InitialVelocity} {velocity : VelocityField} {pressure : PressureField},
     0 < nu →
     (solution : OpenPeriodicSolutionOn T nu initial (0 : VelocityField) velocity pressure) →
-      ∃ (s V₀ : ℝ), 0 < s ∧ s < T ∧ 0 ≤ V₀ ∧
+      ∃ (s V₀ κ : ℝ), 0 < s ∧ s < T ∧ 0 ≤ V₀ ∧ 0 ≤ κ ∧
         (∀ σ (hσ : σ ∈ Ioo 0 T), s ≤ σ →
           Summable (eleventhMoment (velocity := velocity) σ) ∧
             velocityMass solution ⟨σ, hσ⟩ ≤ V₀ ∧
-            ∀ k : SpatialFrequency, k ≠ 0 → IncoherentAt solution ⟨σ, hσ⟩ k) ∧
+            ∀ k : SpatialFrequency, k ≠ 0 → CoherenceDefectAt solution ⟨σ, hσ⟩ κ k) ∧
         (∀ τ ∈ Ioo s T, ∃ B : ℝ, ∀ σ ∈ Icc s τ, moment (velocity := velocity) 11 σ ≤ B)
 
 theorem l1Pop_zero_le_sqrt {V₀ : ℝ} (hV : velocityMass solution t ≤ V₀) :
@@ -638,12 +644,12 @@ theorem closureDrive_le_closureBound (hnu : 0 < nu) {V₀ W : ℝ} (_hW0 : 0 ≤
     (mul_le_mul_of_nonneg_left (Real.sqrt_le_sqrt hW) (Real.sqrt_nonneg _))
 
 /-- **Incoherence control returns closure-drive control.** -/
-theorem closureDrive_of_incoherent (h : IncoherentControl) : ClosureDriveControl := by
+theorem closureDrive_of_coherenceDefect (h : CoherenceDefectControl) : ClosureDriveControl := by
   intro T nu initial velocity pressure hnu solution
-  obtain ⟨s, V₀, hs0, hsT, hV₀, htail, hcompact⟩ := h hnu solution
+  obtain ⟨s, V₀, κ, hs0, hsT, hV₀, hκ, htail, hcompact⟩ := h hnu solution
   have hs : s ∈ Ioo 0 T := ⟨hs0, hsT⟩
-  have hc0 := incoherentConstant_nonneg
-  set b : ℝ := 21 * incoherentConstant * V₀ / (nu * (2 * Real.pi) ^ 2) with hb
+  have hc0 := defectConstant_nonneg hκ
+  set b : ℝ := 21 * defectConstant κ * V₀ / (nu * (2 * Real.pi) ^ 2) with hb
   have hb0 : 0 ≤ b := by positivity
   set Wstar : ℝ := moment (velocity := velocity) 2 s * Real.exp (b * (T - s)) with hWstar
   have hW2s := moment_nonneg (velocity := velocity) 2 s
@@ -664,13 +670,13 @@ theorem closureDrive_of_incoherent (h : IncoherentControl) : ClosureDriveControl
       have hσ' : ∀ ρ (hρ : ρ ∈ Ioo 0 T), ρ ∈ Icc s σ →
           Summable (eleventhMoment (velocity := velocity) ρ) ∧
             velocityMass solution ⟨ρ, hρ⟩ ≤ V₀ ∧
-            (∀ k : SpatialFrequency, k ≠ 0 → IncoherentAt solution ⟨ρ, hρ⟩ k) ∧
+            (∀ k : SpatialFrequency, k ≠ 0 → CoherenceDefectAt solution ⟨ρ, hρ⟩ κ k) ∧
             moment (velocity := velocity) 11 ρ ≤ B' :=
         fun ρ hρT hρI ↦ ⟨(htail ρ hρT hρI.1).1, (htail ρ hρT hρI.1).2.1,
           (htail ρ hρT hρI.1).2.2, hB' ρ hρI⟩
       calc moment (velocity := velocity) 2 σ
           ≤ moment (velocity := velocity) 2 s * Real.exp (b * (σ - s)) :=
-            moment_two_le solution hnu hs hσ hsσ hV₀ hB'0 hσ'
+            moment_two_le solution hnu hs hσ hsσ hκ hV₀ hB'0 hσ'
         _ ≤ Wstar := mul_le_mul_of_nonneg_left hexp hW2s
   refine ⟨s, 3 * closureBound V₀ Wstar / (nu * (2 * Real.pi) ^ 2), hs0, hsT, ?_, ?_, hcompact⟩
   · have := closureBound_nonneg hV₀ hWstar0
@@ -680,12 +686,12 @@ theorem closureDrive_of_incoherent (h : IncoherentControl) : ClosureDriveControl
       (htail σ hσ hsσ).2.1 (hW2 σ hσ hsσ)⟩
 
 /-- **Incoherence control returns Statement B.** -/
-theorem statementB_of_incoherence (h : IncoherentControl) : StatementB :=
-  statementB_of_closureDrive (closureDrive_of_incoherent h)
+theorem statementB_of_coherenceDefect (h : CoherenceDefectControl) : StatementB :=
+  statementB_of_closureDrive (closureDrive_of_coherenceDefect h)
 
-theorem officialProblem_of_incoherence (h : IncoherentControl) :
+theorem officialProblem_of_coherenceDefect (h : CoherenceDefectControl) :
     TheOfficialNavierStokesProblem :=
-  officialProblem_of_closureDrive (closureDrive_of_incoherent h)
+  officialProblem_of_closureDrive (closureDrive_of_coherenceDefect h)
 
 section Audit
 
@@ -693,7 +699,7 @@ section Audit
 #print axioms moment_zero_sq_le
 #print axioms momentEnergy_riccati_incoherent
 #print axioms moment_two_le
-#print axioms statementB_of_incoherence
+#print axioms statementB_of_coherenceDefect
 
 end Audit
 

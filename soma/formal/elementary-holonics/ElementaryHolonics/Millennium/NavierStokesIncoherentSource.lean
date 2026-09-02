@@ -398,28 +398,42 @@ theorem summable_sq_feedTerm (hsum : Summable (eleventhMoment (velocity := veloc
       (by simpa [mul_assoc] using sum_sq_feedTerm_le solution t k p))
     ((summable_velPop_mul_energy solution t hsum k).mul_left 3)
 
-/-! ## Incoherence -/
+/-! ## Incoherence and the coherence defect -/
 
-/-- **Incoherence at a receiver**: the advection mode is at most the diagonal of its feed comb. -/
-def IncoherentAt (k : SpatialFrequency) : Prop :=
+/-- **The coherence defect at a receiver**: the advection mode exceeds the diagonal of its feed
+comb by the factor `1 + κ` at most. -/
+def CoherenceDefectAt (κ : ℝ) (k : SpatialFrequency) : Prop :=
   ∀ output : Fin 3, ‖openActualAdvectionMode solution t k output‖ ^ 2 ≤
-    ∑' p, ‖feedTerm solution t k p output‖ ^ 2
+    (1 + κ) * ∑' p, ‖feedTerm solution t k p output‖ ^ 2
 
-theorem sum_sq_adv_le_of_incoherent (hsum : Summable (eleventhMoment (velocity := velocity) t.1))
-    {k : SpatialFrequency} (hk : IncoherentAt solution t k) :
-    ∑ output : Fin 3, ‖openActualAdvectionMode solution t k output‖ ^ 2 ≤
+/-- **Incoherence at a receiver**: defect zero, the advection mode is at most the diagonal of its
+feed comb. -/
+abbrev IncoherentAt (k : SpatialFrequency) : Prop := CoherenceDefectAt solution t 0 k
+
+theorem sum_tsum_sq_feedTerm_le (hsum : Summable (eleventhMoment (velocity := velocity) t.1))
+    (k : SpatialFrequency) :
+    ∑ output : Fin 3, ∑' p, ‖feedTerm solution t k p output‖ ^ 2 ≤
       3 * ∑' p, velPop solution t p * modalEnergy (velocity := velocity) (k - p) t.1 := by
   have hs : ∀ o ∈ (Finset.univ : Finset (Fin 3)), Summable fun p ↦ ‖feedTerm solution t k p o‖ ^ 2 :=
     fun o _ ↦ summable_sq_feedTerm solution t hsum k o
-  calc ∑ output : Fin 3, ‖openActualAdvectionMode solution t k output‖ ^ 2
-      ≤ ∑ output : Fin 3, ∑' p, ‖feedTerm solution t k p output‖ ^ 2 :=
-        Finset.sum_le_sum fun o _ ↦ hk o
-    _ = ∑' p, ∑ output : Fin 3, ‖feedTerm solution t k p output‖ ^ 2 :=
+  calc ∑ output : Fin 3, ∑' p, ‖feedTerm solution t k p output‖ ^ 2
+      = ∑' p, ∑ output : Fin 3, ‖feedTerm solution t k p output‖ ^ 2 :=
         (Summable.tsum_finsetSum hs).symm
     _ ≤ ∑' p, 3 * (velPop solution t p * modalEnergy (velocity := velocity) (k - p) t.1) :=
         Summable.tsum_le_tsum (fun p ↦ by rw [← mul_assoc]; exact sum_sq_feedTerm_le solution t k p)
           (summable_sum hs) ((summable_velPop_mul_energy solution t hsum k).mul_left 3)
     _ = _ := tsum_mul_left
+
+theorem sum_sq_adv_le_of_defect (hsum : Summable (eleventhMoment (velocity := velocity) t.1))
+    {κ : ℝ} (hκ : 0 ≤ κ) {k : SpatialFrequency} (hk : CoherenceDefectAt solution t κ k) :
+    ∑ output : Fin 3, ‖openActualAdvectionMode solution t k output‖ ^ 2 ≤
+      (1 + κ) * (3 * ∑' p, velPop solution t p * modalEnergy (velocity := velocity) (k - p) t.1) := by
+  calc ∑ output : Fin 3, ‖openActualAdvectionMode solution t k output‖ ^ 2
+      ≤ ∑ output : Fin 3, (1 + κ) * ∑' p, ‖feedTerm solution t k p output‖ ^ 2 :=
+        Finset.sum_le_sum fun o _ ↦ hk o
+    _ = (1 + κ) * ∑ output : Fin 3, ∑' p, ‖feedTerm solution t k p output‖ ^ 2 := by
+        rw [Finset.mul_sum]
+    _ ≤ _ := mul_le_mul_of_nonneg_left (sum_tsum_sq_feedTerm_le solution t hsum k) (by linarith)
 
 /-! ## The weight-four incoherent source -/
 
@@ -450,13 +464,13 @@ theorem sum_shift_le_moment {w : ℕ} (hsummable : Summable (momentPop (velocity
     _ ≤ _ := hsummable.sum_le_tsum _ fun q _ ↦ momentPop_nonneg w t.1 q
 
 /-- **The weight-four source of the advection on incoherent receivers is paid by moments.** -/
-theorem sum_pow_four_adv_sq_le_of_incoherent (F : Finset SpatialFrequency)
-    (hsum : Summable (eleventhMoment (velocity := velocity) t.1))
-    (hinc : ∀ k ∈ F, IncoherentAt solution t k) :
+theorem sum_pow_four_adv_sq_le_of_defect (F : Finset SpatialFrequency)
+    (hsum : Summable (eleventhMoment (velocity := velocity) t.1)) {κ : ℝ} (hκ : 0 ≤ κ)
+    (hinc : ∀ k ∈ F, CoherenceDefectAt solution t κ k) :
     ∑ k ∈ F, ((frequencySup k : ℕ) : ℝ) ^ 4 *
         ∑ output : Fin 3, ‖openActualAdvectionMode solution t k output‖ ^ 2 ≤
-      3 * 2 ^ 3 * (velocityMass solution t * moment (velocity := velocity) 4 t.1 +
-        moment (velocity := velocity) 0 t.1 * moment (velocity := velocity) 2 t.1 / (2 * Real.pi) ^ 2) := by
+      (1 + κ) * (3 * 2 ^ 3 * (velocityMass solution t * moment (velocity := velocity) 4 t.1 +
+        moment (velocity := velocity) 0 t.1 * moment (velocity := velocity) 2 t.1 / (2 * Real.pi) ^ 2)) := by
   have hsum4 := summable_momentPop (velocity := velocity) (by norm_num : 1 ≤ 4) (by norm_num) t.1 hsum
   have hsum2 := summable_momentPop (velocity := velocity) (by norm_num : 1 ≤ 2) (by norm_num) t.1 hsum
   have hsum0 := summable_momentPop_zero solution t hsum
@@ -476,8 +490,8 @@ theorem sum_pow_four_adv_sq_le_of_incoherent (F : Finset SpatialFrequency)
         (modalEnergy_le_moment_one solution t hsum (k - p)) (modalEnergy_nonneg _ _)
         (by have := momentPop_nonneg (velocity := velocity) 2 t.1 p; positivity))
       ((hsum2.div_const _).mul_right _)
-  have hk : ∀ k ∈ F, ((frequencySup k : ℕ) : ℝ) ^ 4 *
-      ∑ output : Fin 3, ‖openActualAdvectionMode solution t k output‖ ^ 2 ≤
+  have hcore : ∀ k ∈ F, ((frequencySup k : ℕ) : ℝ) ^ 4 *
+      (3 * ∑' p, velPop solution t p * modalEnergy (velocity := velocity) (k - p) t.1) ≤
       3 * 2 ^ 3 * ((∑' p, momentPop (velocity := velocity) 4 t.1 (k - p) * velPop solution t p) +
         ∑' p, ((frequencySup p : ℕ) : ℝ) ^ 4 * velPop solution t p *
           modalEnergy (velocity := velocity) (k - p) t.1) := by
@@ -490,11 +504,8 @@ theorem sum_pow_four_adv_sq_le_of_incoherent (F : Finset SpatialFrequency)
         (velPop solution t p * modalEnergy (velocity := velocity) (k - p) t.1) :=
       (((hA k hkF).add (hB k hkF)).mul_left (2 ^ 3)).congr fun p ↦ by unfold momentPop; ring
     calc ((frequencySup k : ℕ) : ℝ) ^ 4 *
-          ∑ output : Fin 3, ‖openActualAdvectionMode solution t k output‖ ^ 2
-        ≤ ((frequencySup k : ℕ) : ℝ) ^ 4 *
-          (3 * ∑' p, velPop solution t p * modalEnergy (velocity := velocity) (k - p) t.1) :=
-          mul_le_mul_of_nonneg_left (sum_sq_adv_le_of_incoherent solution t hsum (hinc k hkF)) hw
-      _ = 3 * ∑' p, ((frequencySup k : ℕ) : ℝ) ^ 4 *
+          (3 * ∑' p, velPop solution t p * modalEnergy (velocity := velocity) (k - p) t.1)
+        = 3 * ∑' p, ((frequencySup k : ℕ) : ℝ) ^ 4 *
           (velPop solution t p * modalEnergy (velocity := velocity) (k - p) t.1) := by
           rw [mul_left_comm, ← tsum_mul_left]
       _ ≤ 3 * ∑' p, 2 ^ 3 * (((frequencySup (k - p) : ℕ) : ℝ) ^ 4 + ((frequencySup p : ℕ) : ℝ) ^ 4) *
@@ -509,8 +520,24 @@ theorem sum_pow_four_adv_sq_le_of_incoherent (F : Finset SpatialFrequency)
           congr 1
           exact tsum_congr fun p ↦ by unfold momentPop; ring
       _ = _ := by rw [(hA k hkF).tsum_add (hB k hkF)]
+  have hk : ∀ k ∈ F, ((frequencySup k : ℕ) : ℝ) ^ 4 *
+      ∑ output : Fin 3, ‖openActualAdvectionMode solution t k output‖ ^ 2 ≤
+      (1 + κ) * (3 * 2 ^ 3 * ((∑' p, momentPop (velocity := velocity) 4 t.1 (k - p) * velPop solution t p) +
+        ∑' p, ((frequencySup p : ℕ) : ℝ) ^ 4 * velPop solution t p *
+          modalEnergy (velocity := velocity) (k - p) t.1)) := by
+    intro k hkF
+    have hw : (0 : ℝ) ≤ ((frequencySup k : ℕ) : ℝ) ^ 4 := by positivity
+    calc ((frequencySup k : ℕ) : ℝ) ^ 4 *
+          ∑ output : Fin 3, ‖openActualAdvectionMode solution t k output‖ ^ 2
+        ≤ ((frequencySup k : ℕ) : ℝ) ^ 4 * ((1 + κ) *
+          (3 * ∑' p, velPop solution t p * modalEnergy (velocity := velocity) (k - p) t.1)) :=
+          mul_le_mul_of_nonneg_left (sum_sq_adv_le_of_defect solution t hsum hκ (hinc k hkF)) hw
+      _ = (1 + κ) * (((frequencySup k : ℕ) : ℝ) ^ 4 *
+          (3 * ∑' p, velPop solution t p * modalEnergy (velocity := velocity) (k - p) t.1)) := by
+          ring
+      _ ≤ _ := mul_le_mul_of_nonneg_left (hcore k hkF) (by linarith)
   refine (Finset.sum_le_sum hk).trans ?_
-  rw [← Finset.mul_sum, Finset.sum_add_distrib]
+  rw [← Finset.mul_sum, ← Finset.mul_sum, Finset.sum_add_distrib]
   -- leg A
   have hlegA : ∑ k ∈ F, ∑' p, momentPop (velocity := velocity) 4 t.1 (k - p) * velPop solution t p ≤
       velocityMass solution t * moment (velocity := velocity) 4 t.1 := by
@@ -550,17 +577,13 @@ theorem sum_pow_four_adv_sq_le_of_incoherent (F : Finset SpatialFrequency)
           rw [tsum_mul_right, tsum_div_const]
       _ = _ := by unfold moment; ring
   have h0 : (0 : ℝ) ≤ 3 * 2 ^ 3 := by norm_num
-  calc 3 * 2 ^ 3 * ((∑ k ∈ F, ∑' p, momentPop (velocity := velocity) 4 t.1 (k - p) * velPop solution t p) +
-        ∑ k ∈ F, ∑' p, ((frequencySup p : ℕ) : ℝ) ^ 4 * velPop solution t p *
-          modalEnergy (velocity := velocity) (k - p) t.1)
-      ≤ 3 * 2 ^ 3 * (velocityMass solution t * moment (velocity := velocity) 4 t.1 +
-          moment (velocity := velocity) 0 t.1 * moment (velocity := velocity) 2 t.1 / (2 * Real.pi) ^ 2) :=
-        mul_le_mul_of_nonneg_left (add_le_add hlegA hlegB) h0
+  exact mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left (add_le_add hlegA hlegB) h0)
+    (by linarith)
 
 section Audit
 
 #print axioms momentEnergy_riccati_gen
-#print axioms sum_pow_four_adv_sq_le_of_incoherent
+#print axioms sum_pow_four_adv_sq_le_of_defect
 
 end Audit
 

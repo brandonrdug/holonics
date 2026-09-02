@@ -6,7 +6,7 @@ import ElementaryHolonics.Millennium.NavierStokesIncoherentClosure
 Parseval on each component of the velocity slice identifies the velocity mass with the cube
 integral of the velocity square, `V(t) = Σ_c ∫ (u_c)² ≤ 3 · 2 · E_kin(t)`, and the unforced
 energy--dissipation identity on the open lifespan makes the kinetic energy nonincreasing.  So the
-velocity-mass premise of `IncoherentControl` is discharged by `V₀ = 3 · 2 · E_kin(s)`, and
+velocity-mass premise of `CoherenceDefectControl` is discharged by `V₀ = 3 · 2 · E_kin(s)`, and
 `StatementB` follows from incoherence and interior finiteness alone.
 -/
 
@@ -131,22 +131,23 @@ theorem velocityMass_le_of_le (hnu : 0 ≤ nu) {s : ℝ} (hs : 0 < s) (σ : Ioo 
 
 /-! ## The closure statement without the velocity-mass premise -/
 
-/-- **Incoherent tail control.**  Along a terminal tail `[s, T)` every nonzero receiver is
-incoherent and the eleventh moment is finite, with a bound on every compact `[s, τ]`, `τ < T`. -/
-def IncoherentTailControl : Prop :=
+/-- **Coherence-defect tail control.**  Along a terminal tail `[s, T)` every nonzero receiver has
+coherence defect at most `κ` and the eleventh moment is finite, with a bound on every compact
+`[s, τ]`, `τ < T`. -/
+def CoherenceDefectTailControl : Prop :=
   ∀ {T nu : ℝ} {initial : InitialVelocity} {velocity : VelocityField} {pressure : PressureField},
     0 < nu →
     (solution : OpenPeriodicSolutionOn T nu initial (0 : VelocityField) velocity pressure) →
-      ∃ s : ℝ, 0 < s ∧ s < T ∧
+      ∃ (s κ : ℝ), 0 < s ∧ s < T ∧ 0 ≤ κ ∧
         (∀ σ (hσ : σ ∈ Ioo 0 T), s ≤ σ →
           Summable (eleventhMoment (velocity := velocity) σ) ∧
-            ∀ k : SpatialFrequency, k ≠ 0 → IncoherentAt solution ⟨σ, hσ⟩ k) ∧
+            ∀ k : SpatialFrequency, k ≠ 0 → CoherenceDefectAt solution ⟨σ, hσ⟩ κ k) ∧
         (∀ τ ∈ Ioo s T, ∃ B : ℝ, ∀ σ ∈ Icc s τ, moment (velocity := velocity) 11 σ ≤ B)
 
-theorem incoherentControl_of_tail (h : IncoherentTailControl) : IncoherentControl := by
+theorem coherenceDefectControl_of_tail (h : CoherenceDefectTailControl) : CoherenceDefectControl := by
   intro T nu initial velocity pressure hnu solution
-  obtain ⟨s, hs0, hsT, htail, hcompact⟩ := h hnu solution
-  refine ⟨s, 3 * (2 * periodicKineticEnergy velocity s), hs0, hsT, ?_, ?_, hcompact⟩
+  obtain ⟨s, κ, hs0, hsT, hκ, htail, hcompact⟩ := h hnu solution
+  refine ⟨s, 3 * (2 * periodicKineticEnergy velocity s), κ, hs0, hsT, ?_, hκ, ?_, hcompact⟩
   · have := periodicKineticEnergy_nonneg velocity s
     positivity
   · intro σ hσ hsσ
@@ -155,33 +156,34 @@ theorem incoherentControl_of_tail (h : IncoherentTailControl) : IncoherentContro
 
 /-- **The second moment along a terminal tail on incoherent feeds, in the kinetic energy.** -/
 theorem moment_two_le_kineticEnergy (hnu : 0 < nu) {s τ : ℝ} (hs : s ∈ Ioo 0 T) (hτ : τ ∈ Ioo 0 T)
-    (hsτ : s ≤ τ) {B : ℝ} (hB : 0 ≤ B)
+    (hsτ : s ≤ τ) {κ B : ℝ} (hκ : 0 ≤ κ) (hB : 0 ≤ B)
     (hσ : ∀ σ (hσ : σ ∈ Ioo 0 T), σ ∈ Icc s τ →
       Summable (eleventhMoment (velocity := velocity) σ) ∧
-        (∀ k : SpatialFrequency, k ≠ 0 → IncoherentAt solution ⟨σ, hσ⟩ k) ∧
+        (∀ k : SpatialFrequency, k ≠ 0 → CoherenceDefectAt solution ⟨σ, hσ⟩ κ k) ∧
         moment (velocity := velocity) 11 σ ≤ B) :
     moment (velocity := velocity) 2 τ ≤ moment (velocity := velocity) 2 s *
-      Real.exp (21 * incoherentConstant * (3 * (2 * periodicKineticEnergy velocity s)) /
+      Real.exp (21 * defectConstant κ * (3 * (2 * periodicKineticEnergy velocity s)) /
         (nu * (2 * Real.pi) ^ 2) * (τ - s)) := by
   have hE := periodicKineticEnergy_nonneg velocity s
-  refine moment_two_le solution hnu hs hτ hsτ (by positivity) hB fun σ hσT hσI ↦ ?_
+  have hc0 := defectConstant_nonneg hκ
+  refine moment_two_le solution hnu hs hτ hsτ hκ (by positivity) hB fun σ hσT hσI ↦ ?_
   exact ⟨(hσ σ hσT hσI).1, velocityMass_le_of_le solution hnu.le hs.1 ⟨σ, hσT⟩ hσI.1,
     (hσ σ hσT hσI).2.1, (hσ σ hσT hσI).2.2⟩
 
 /-- **Incoherent tail control returns Statement B.** -/
-theorem statementB_of_incoherentTail (h : IncoherentTailControl) : StatementB :=
-  statementB_of_incoherence (incoherentControl_of_tail h)
+theorem statementB_of_coherenceDefectTail (h : CoherenceDefectTailControl) : StatementB :=
+  statementB_of_coherenceDefect (coherenceDefectControl_of_tail h)
 
-theorem officialProblem_of_incoherentTail (h : IncoherentTailControl) :
+theorem officialProblem_of_coherenceDefectTail (h : CoherenceDefectTailControl) :
     TheOfficialNavierStokesProblem :=
-  officialProblem_of_incoherence (incoherentControl_of_tail h)
+  officialProblem_of_coherenceDefect (coherenceDefectControl_of_tail h)
 
 section Audit
 
 #print axioms velocityMass_le_kineticEnergy
 #print axioms periodicKineticEnergy_le_of_le
 #print axioms moment_two_le_kineticEnergy
-#print axioms statementB_of_incoherentTail
+#print axioms statementB_of_coherenceDefectTail
 
 end Audit
 
