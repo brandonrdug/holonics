@@ -69,9 +69,33 @@ It adds no trainer, decoder cabinet, semantic router, or second body.
 5. `WRD4` — the first world, later current, and the falsifier; and
 6. `WRD5` — records, release, commit, and push.
 
-[established-bounded] All six passed on 2026-09-02 at their declared scopes; the grades and the
-open fibre (the emitter is the standing template render) are in `CONSTRUCTION_STATE.md` and the
-dated WRD records. No successor campaign is scheduled.
+[established-bounded] All six passed on 2026-09-02 at their declared scopes. The same day Brandon
+retracted the campaign's language binding: the mouth, the template emitter, the face adapter, and
+the driver named Lean inside the interior, which his ruling forbids for every language, modality,
+and field. The junction, deposit, and termination laws, the Lean owner, and the measured faces
+stand. The retraction is
+[`2026-09-02_THE_LEAN_BINDING_OF_THE_WORLD_RETURN_IS_RETRACTED_AND_LANGUAGES_ARE_APPLICATIONS.md`](../research/records/2026-09-02_THE_LEAN_BINDING_OF_THE_WORLD_RETURN_IS_RETRACTED_AND_LANGUAGES_ARE_APPLICATIONS.md).
+
+## Founded campaign — the world return is modality-neutral and every language is an application
+
+**Founded WRN frontier:** NONE
+
+[definition] Brandon's ruling of 2026-09-02 founds the ordered `WRN0--WRN5` campaign under
+[`THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md`](THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md),
+which supersedes the WRD blueprint at every seam that named a language. It states the mouth as a
+population and a reference relation, the face as admitted or reflected with carried states and an
+octet diagnostic, the emission as the machine's own emission section rendered at the ABI, and
+every language, format, modality, and field as an application outside the interior. Construction
+begins on Brandon's direct instruction.
+
+[definition] The complete order is:
+
+1. `WRN0` — the neutral mouth;
+2. `WRN1` — the face and the ABI;
+3. `WRN2` — the emission crosses out, the template emitter deleted;
+4. `WRN3` — the applications exit the interior;
+5. `WRN4` — two worlds of different modality through one interior; and
+6. `WRN5` — records, release, commit, and push.
 
 ## Completed campaign — finite many-body and polarized crystal transport
 

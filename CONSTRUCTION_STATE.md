@@ -4,7 +4,7 @@
 [`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) is the sole ordered construction
 authority. Historical phase detail remains in Git and the dated records named there.
 
-**Currency:** 2026-09-02, after WRD0--WRD5 passed. VWS0--VWS6, AAC0--AAC6, MVF0--MVF6,
+**Currency:** 2026-09-02, after WRD0--WRD5 passed and their language binding was retracted. VWS0--VWS6, AAC0--AAC6, MVF0--MVF6,
 SCF0--SCF6, CONS0--CONS5, QLT1--QLT6, CDB1, HIF0--HIF7, and the exact bounded R0Q0--R0Q4
 mechanisms retain their scoped grades.
 
@@ -36,6 +36,13 @@ the crossing that deposited, on current and replayed morphology and not after wi
 second target's own route returned the exact obstruction; no matched boundary appeared; 112
 seconds. WRD5 released: records, catalog rows, and the complete gate sequence recorded in the
 WRD5 record.
+
+[established-bounded] Retracted the same day by Brandon's ruling: WRD1's mouth, WRD2's template
+emitter, WRD3's face adapter, and WRD4's driver named a language inside the interior. The laws,
+the Lean owner, and the measured faces stand; the binding does not. The WRN0--WRN5 campaign is
+founded under
+[`blueprint/THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md`](blueprint/THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md)
+and awaits Brandon's direct instruction to build.
 
 **VWS0--VWS6 PASSED.**
 

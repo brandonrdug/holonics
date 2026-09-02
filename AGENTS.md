@@ -101,6 +101,11 @@ retraction is a contamination. Dates are record dates under `research/records/`.
   a contiguous inherited span (`canon/THE_RECOVERED_LAW.md` §6).
 - 2026-08-11: production emitted two-token prefixes of corpus sentence openings
   (`2026-08-11_THE_TAPE_HAS_NO_VERTEX_AND_PRODUCTION_IS_RECEPTION_AT_THE_OTHER_HAND.md`).
+- 2026-08-17: `statement_grammar.rs` was superseded as an authored grammar; the codec is recovered
+  from exposure at every scale and the faces are a return
+  (`2026-08-17_THE_LADDER_CLIMBS_AND_THE_CODEC_ENDS_AT_THE_CHARACTER.md`,
+  `blueprint/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md`). Any parser,
+  grammar, or renderer authored per language is the same class.
 - 2026-08-18: the verbatim emission was a longest-match filter in `causal_language.rs`
   (`2026-08-18_THE_GATE_WAS_THE_MECHANISM_AND_THE_EMISSION_COMPOSES_ONCE_IT_IS_A_COORDINATE.md`).
 - 2026-08-20: the Phoenix P1 lift covered 64 of 2,560 hidden coordinates and P3's held-out change
@@ -123,6 +128,14 @@ retraction is a contamination. Dates are record dates under `research/records/`.
 - 2026-08-30: the source-neutral UAR body emitted `' 1` for "Describe Brandon." and a 61-octet
   salad on the conserved port current
   (`2026-08-30_THE_NATIVE_SECTION_FOUNDED_ONE_SOURCE_NEUTRAL_BOUNDARY_CURRENT_BUT_FACTORWISE_ADJACENCY_COULD_NOT_CARRY_THE_CAUSAL_SURFACE.md`).
+- 2026-09-02: the WRD campaign's Lean binding is retracted. `lean_mathematics::lattice_mouth`
+  (a mouth typed on a Lean parser), `lean_mathematics::candidates` (a per-language template
+  emitter, moved from the July `ecology.rs` render), the Lean-typed face adapter in
+  `route_return.rs`, and the WRD4 driver's Lean-file product were contamination under the ruling
+  above and under the 2026-08-17 supersession of authored grammars. The junction, route-deposit,
+  and termination laws, `HolonicWorldReturnDeposit.lean`, and the measured kernel faces stand.
+  The July `lean_mathematics` parser and kernel caller exit the interior as an application
+  (`2026-09-02_THE_LEAN_BINDING_OF_THE_WORLD_RETURN_IS_RETRACTED_AND_LANGUAGES_ARE_APPLICATIONS.md`).
 - 2026-09-01: the "Describe Brandon" probe was never a gate and its promotion through H4, UAR, and
   HIF7 was an error
   (`2026-09-01_HIF7_QUALITATIVE_PROBE_WAS_WRONGLY_PROMOTED_AND_THE_FRAMEWORK_RELEASES_ON_EXACT_CONTRACTS.md`);
@@ -274,6 +287,14 @@ returns.
   phase, or accelerator phase from its terms.
 - A surface language, proof assistant, instruction set, image format, sensor stream, database, and
   serialized file are codecs or apparatus faces. They do not determine internal topology.
+- **Brandon, 2026-09-02, ruling.** No programming language, proof assistant, modality, format, or
+  field is referenced inside Eros or Athena. They are applications. Their files are data at most:
+  octets crossing the mouth. Athena is never catered toward emitting any specific output format;
+  an emitter shaped by a format (a template builder, a grammar renderer, a per-language candidate
+  family, a hand-wired kernel call) is contamination, not standing reuse. What an application
+  returns is format-free: whether an emission was admitted, which carriers it carried, and its
+  diagnostic as octets. The interior derives the returned interaction from those faces; an
+  application never types it.
 - The machine owns no semantic distinction between “data” and “program.” Both are caused structure
   crossing declared ports and capable of changing later conduct.
 - Algorithms are physically enacted causal geometries. Do not separate computer science from

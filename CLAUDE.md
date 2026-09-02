@@ -47,7 +47,9 @@ Item 6 and the shared atlas in `AGENTS.md` exist so that cannot recur.
 AAC0--AAC6, WB0--WB6, and VWS0--VWS6 are complete at their declared scopes. UAR/R0Q are deprecated
 as campaigns; R0Q0--R0Q4 retain their exact bounded mechanisms. WRD0--WRD5, the world-return
 deposit campaign founded by Brandon's direct instruction of 2026-09-02, passed the same day at
-their declared scopes. `CONSTRUCTION_STATE.md` and `blueprint/THE_ROADMAP.md` carry the position
+their declared scopes, and their language binding was retracted the same day by his ruling that
+no language, modality, or field is referenced inside Eros or Athena; WRN0--WRN5 is founded and
+awaits his instruction. `CONSTRUCTION_STATE.md` and `blueprint/THE_ROADMAP.md` carry the position
 and the complete receipt.
 
 [definition] The completed campaigns return exact lifecycle apparatus: receipt lift through the
@@ -78,7 +80,11 @@ record in `AGENTS.md` states.
 8. Sub-agents are permitted under the responsibility and integration boundary in `AGENTS.md`.
    The primary session reads governing files and owns the integrated result. Sub-agent reports are
    testimony and must be integrated against the governing files, not relayed.
-9. Apply the jurisdiction test before any proposal: a ban governs Soma's interior or a mechanism
+9. Apply the jurisdiction test before any proposal, and Brandon's 2026-09-02 ruling: no
+    language, format, modality, field, kernel, compiler, or tower is referenced inside Eros or
+    Athena; they are applications; their files are octets; the interior is never catered toward
+    any output format, and a template, grammar, renderer, or per-format candidate family is
+    contamination, not standing reuse: a ban governs Soma's interior or a mechanism
    offered as its explanation. Worlds may contain compilers, provers, scores, and clocks; observers
    may use tokenizers, statistics, and parsers. Never recommend an industry mechanism as the
    interior's law, never place a foreign realization as the emitter with Athena as bookkeeping, and

@@ -153,10 +153,11 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md` | **The variant workspace application returns actual lifts, experiment circulation, cultivation,** — **Governing doctrine:** `../canon/TABLET_THE_REASONING_CYCLE.md`, `../canon/TABLET_THE_HEXIS.md`,… |
 | `blueprint/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md` | **The work vector, the hand's polarity, and the committed step** — Every absence below carries the command that measured it and its date. |
 | `blueprint/THE_WORLD_RETURN_DEPOSITS_ON_THE_ROUTE_IT_CROSSED_AND_THE_LEAN_KERNEL_IS_THE_FIRST_WORLD.md` | **The world return deposits on the route it crossed, and the Lean kernel is the first world** — **Campaign:** `WRD0--WRD5`. |
+| `blueprint/THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md` | **The world return is modality-neutral, and every language is an application** — It sits under `THE_ROADMAP.md`, which with `CONSTRUCTION_STATE.md` remains the only construction authority; nothing here overrides either. |
 
 ---
 
-## 4 · The 2026-08 record line (450 deposits of 882)
+## 4 · The 2026-08 record line (450 deposits of 883)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:

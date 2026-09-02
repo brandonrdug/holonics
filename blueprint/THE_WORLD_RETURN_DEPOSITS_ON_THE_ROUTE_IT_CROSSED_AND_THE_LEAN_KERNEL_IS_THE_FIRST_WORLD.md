@@ -15,6 +15,15 @@
 [`THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md`](THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md)
 §3.
 
+
+**SUPERSEDED 2026-09-02 at every seam that names a language.** Brandon's ruling of the same day:
+no language, modality, format, or field is referenced inside Eros or Athena; they are
+applications. The successor is
+[`THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md`](THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md).
+The junction, route-deposit, and termination laws, the Lean owner, and the measured WRD4 faces
+stand; the mouth, the template emitter, the face adapter, and the driver are retracted
+(`research/records/2026-09-02_THE_LEAN_BINDING_OF_THE_WORLD_RETURN_IS_RETRACTED_AND_LANGUAGES_ARE_APPLICATIONS.md`).
+
 ## 0. Verdict and correction
 
 [counterexample; source-inspected] Brandon's direct request of 2026-09-01 was one Athena variant
