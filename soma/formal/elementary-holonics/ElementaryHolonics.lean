@@ -96,6 +96,7 @@ import ElementaryHolonics.RH.PolyaStep
 import ElementaryHolonics.RH.HurwitzPolynomial
 import ElementaryHolonics.RH.ForwardPreservation
 import ElementaryHolonics.RH.HeatSemigroup
+import ElementaryHolonics.RH.DeBruijnNewmanPolynomial
 import ElementaryHolonics.RH.WeightedArgumentPrinciple
 import ElementaryHolonics.RH.Balance
 import ElementaryHolonics.Millennium.Gluing
