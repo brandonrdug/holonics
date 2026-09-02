@@ -107,6 +107,7 @@ import ElementaryHolonics.RH.ConjugationEntire
 import ElementaryHolonics.RH.HeatFlowContinuity
 import ElementaryHolonics.RH.RectangleWindingContinuity
 import ElementaryHolonics.RH.RectangleCountStable
+import ElementaryHolonics.RH.SimpleZeroPersists
 import ElementaryHolonics.RH.WeightedArgumentPrinciple
 import ElementaryHolonics.RH.Balance
 import ElementaryHolonics.Millennium.Gluing
