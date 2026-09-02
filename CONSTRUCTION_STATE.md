@@ -4,15 +4,40 @@
 [`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) is the sole ordered construction
 authority. Historical phase detail remains in Git and the dated records named there.
 
-**Currency:** 2026-09-01, after VWS0--VWS6 returned. AAC0--AAC6, MVF0--MVF6, SCF0--SCF6, CONS0--CONS5,
-QLT1--QLT6, CDB1, HIF0--HIF7, and the exact bounded R0Q0--R0Q4 mechanisms retain their scoped
-grades.
+**Currency:** 2026-09-02, after WRD0--WRD5 passed. VWS0--VWS6, AAC0--AAC6, MVF0--MVF6,
+SCF0--SCF6, CONS0--CONS5, QLT1--QLT6, CDB1, HIF0--HIF7, and the exact bounded R0Q0--R0Q4
+mechanisms retain their scoped grades.
 
 ## Current frontier
 
 **Current frontier:** NONE
 
-**VWS0--VWS6 PASSED. NO DEED IS CURRENT.**
+[definition] Brandon's direct instruction of 2026-09-02 founds
+[`blueprint/THE_WORLD_RETURN_DEPOSITS_ON_THE_ROUTE_IT_CROSSED_AND_THE_LEAN_KERNEL_IS_THE_FIRST_WORLD.md`](blueprint/THE_WORLD_RETURN_DEPOSITS_ON_THE_ROUTE_IT_CROSSED_AND_THE_LEAN_KERNEL_IS_THE_FIRST_WORLD.md).
+**WRD0--WRD5 PASSED.**
+
+[proved-derived; formal-checked] WRD0 returned `HolonicWorldReturnDeposit.lean`: `T + Γ² = 1`,
+`Γ = 0` exactly at a match, service rounds `ceil(1/T)` with at least two when unmatched, the
+two-end telescoping of a route deposit, a three-site route cultivation resting outside its cone,
+and equal kernel faces with different reflections; umbrella 3,772 jobs, no `sorry`, no new axiom.
+
+[established-bounded] WRD1 returned `lattice_mouth.rs`: the Lean declaration lattice as a
+carrier population with a cold witness beside it; on `Foundation/` 217 carriers, 147 threads,
+427 occurrences, mounted and conducted on the resident apparatus. WRD2 returned
+`candidates.rs`: the standing render as a function of the supplied route. WRD3 returned
+`route_return.rs`: the junction counts emissions; matched deposits storage one and halts,
+partial deposits `(T, Γ)` with storage `1/rounds` on what the admitted emissions carried,
+terminus deposits nothing and founds the next entering occurrence; withdrawal exact.
+
+[established-bounded] WRD4 returned the driver receipt: on `Foundation/`
+`card_coordinateFaces_three` had 3 of 16 emissions admitted, committed generation 1 with storage
+`1/2` on a two-carrier cone; later current reached the deposited thread only by re-entering at
+the crossing that deposited, on current and replayed morphology and not after withdrawal; the
+second target's own route returned the exact obstruction; no matched boundary appeared; 112
+seconds. WRD5 released: records, catalog rows, and the complete gate sequence recorded in the
+WRD5 record.
+
+**VWS0--VWS6 PASSED.**
 
 [definition] Brandon's direct correction of 2026-09-01 founds
 [`blueprint/THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md`](blueprint/THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md).

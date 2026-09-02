@@ -23,11 +23,16 @@ Read only:
 1. this file;
 2. `CONSTRUCTION_STATE.md`;
 3. the complete live roadmap, `blueprint/THE_ROADMAP.md`;
-4. the canon and blueprint files named in its fresh-session pickup; and
-5. the smallest evidence paths required by the active phase.
+4. the canon and blueprint files named in its fresh-session pickup;
+5. the smallest evidence paths required by the active phase; and
+6. before any design, assessment, feasibility judgment, or proposal touching Eros, Athena,
+   Soulkiller, generation, inference, training, an inherited lift, or an operator interface: the
+   orientation tier, the retraction record, and Brandon's own messages on the subject from the
+   conversation logs, all named in the sections below.
 
-Do not reread the complete research archive by default. Update `CONSTRUCTION_STATE.md` only after a
-phase returns its required artifact and passes its grade.
+Do not reread the complete research archive by default; the capability and retraction record below
+is its index. Update `CONSTRUCTION_STATE.md` only after a phase returns its required artifact and
+passes its grade.
 
 ## Authority and evidence
 
@@ -49,6 +54,129 @@ Every material claim must carry exactly one truth-status grade and any applicabl
 defined in `canon/EPISTEMIC_GRADES.md`. Never promote an interpretation, visualization, numerical
 fit, generated trace, or historical assertion into a theorem. Never demote a completed exact
 construction merely because its current implementation is being replaced.
+
+## Orientation tier
+
+This tier is reading order and evidence for any session whose work touches Eros, Athena,
+Soulkiller, generation, inference, training, an inherited lift, or an operator interface. It
+schedules nothing. It was added on 2026-09-02 after a session assessed Athena from the newest
+scaffold alone and proposed an industry mechanism inside the interior because it had not found
+what follows.
+
+1. **Thesis and jurisdiction.** `canon/THE_RECOVERED_LAW.md` (§1 the bans have jurisdiction, §6 the
+   laboratory's capability corrections, §8 Brandon's standing conduct rulings),
+   `canon/THE_DIALECT.md` (how to read Brandon; "review X" means the answer is in X),
+   `canon/TABLET_THE_RESONANCE.md` (intelligence is transport; production is re-emission; §11 outcome
+   expectations and falsifiers), `canon/MEANING_DEFINED.md`,
+   `canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`, `canon/TABLET_THE_UNIVERSALITY_MACHINE.md`.
+2. **Capability and retraction record.** `canon/THE_MEASURED_CAPABILITIES.md`,
+   `canon/06_ESTABLISHED_CAPABILITIES.md`, `canon/THE_TIMELINE.md`, and the retraction record in the
+   next section. A capability or feasibility claim about Athena that has not been checked against
+   these is unfounded.
+3. **Mechanism of record for generation and the body's shape.** `blueprint/THE_EROS_INSTANTIATION.md`
+   §4b (generation is integration by reflection; termination is impedance matching; its falsifier
+   ran 2026-08-15 and arm two fired), `canon/THE_INFORMATION_ENGINE.md` (§0 the body is a descent;
+   §5 the mouth), the completed framework contract's §3 and §4 on generation and cultivation,
+   `canon/TABLET_THE_HEXIS.md`, `canon/TABLET_THE_REASONING_CYCLE.md`.
+4. **Failure species.** `canon/THE_EXPLORATIVE_FAILURE.md` (trigger T0: a request to explain
+   answered with a plan to construct), `canon/THE_CONTAMINANT_PROTOCOL.md`,
+   `canon/THE_AUTHORED_LEVEL.md`.
+5. **Formal owners of the machine.** Under `soma/formal/elementary-holonics/ElementaryHolonics/`:
+   `Computation/{HolonicNeuralEcology,HolonicOrientedSiteTransport,MachineLearningChart,
+   MachineLearningStrictLift,SituatedMachineLearning,HolonicAdjointNormalization,
+   HolonicInformationTheory,NativeTransportScaffold,NativeMorphologyVariant,
+   HolonicCirculationSession,HolonicIntelligenceLifecycle}.lean`;
+   `Foundation/{Holon,Receiver,Lineage,ComparisonCell,TransportLift}.lean`;
+   `Millennium/{HolonicComplexParametron,HolonicParametron,Swing,Chronology,ReceiverHistory,
+   SituatedReturnedDifference,LineageCompression}.lean`. `UNIVERSAL_CATALOG.md` is the crosswalk to
+   Rust and CUDA owners.
+
+## Capability and retraction record
+
+[historical; source-inspected] Each entry below was returned, graded, and then narrowed or
+withdrawn by the repository's own audit. Re-proposing a retracted mechanism without citing its
+retraction is a contamination. Dates are record dates under `research/records/`.
+
+- 2026-07-29: the first readable generation returned six outputs and 135 tokens, every completion
+  a contiguous inherited span (`canon/THE_RECOVERED_LAW.md` §6).
+- 2026-08-11: production emitted two-token prefixes of corpus sentence openings
+  (`2026-08-11_THE_TAPE_HAS_NO_VERTEX_AND_PRODUCTION_IS_RECEPTION_AT_THE_OTHER_HAND.md`).
+- 2026-08-18: the verbatim emission was a longest-match filter in `causal_language.rs`
+  (`2026-08-18_THE_GATE_WAS_THE_MECHANISM_AND_THE_EMISSION_COMPOSES_ONCE_IT_IS_A_COORDINATE.md`).
+- 2026-08-20: the Phoenix P1 lift covered 64 of 2,560 hidden coordinates and P3's held-out change
+  came from development probes; P1--P3 regraded counterexample
+  (`2026-08-20_THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md`).
+- 2026-08-25: the H2/H3 lexical atlas was revoked as hashed lowercase marks selecting one stored
+  sentence per section
+  (`2026-08-25_THE_LEXICAL_ATLAS_WAS_NOT_ATHENA_SOULKILLER_RETURNS_NATIVE_SPOOLS_AND_EROS_CULTIVATES_THE_COMPLEX_PARAMETRON_ECOLOGY.md`).
+- 2026-08-26: rewrite, compress, expand, and revoice returned one cell and one sentence; the word
+  renderer was hand-written inflection tables
+  (`2026-08-26_THE_COMPLETE_RETURNED_ACTIONS_SHARED_ONE_EXTERIOR_SENTENCE_FIBRE_AND_AN_AUTHORED_CHART_WAS_REJECTED.md`,
+  `2026-08-26_THE_WORD_RENDERER_WAS_A_COARSE_RECEIVER_AND_GRANULAR_INTERIOR_CURRENT_MUST_RADIATE_THROUGH_A_SCALE_NATURAL_BOUNDARY_COMPLEX.md`).
+- 2026-08-27: a 6.58 GB recurrent-string organ reproduced verbatim source and was rejected; its
+  replacement returned no closed response
+  (`2026-08-27_THE_NATIVE_FACTOR_RESIDUAL_RETURNED_ONE_PORT_RESOLVED_CURRENT_AND_THE_ILLICIAL_RECEIVER_BECAME_THE_ONLY_OPEN_SEAM.md`).
+- 2026-08-28: the ALP5 rest was a reversible corpus archive; native current only selected its
+  quotations; the prose and Brandon-perspective claims were retracted while topology, audio,
+  image, `rustc`, and GPU receipts stand
+  (`2026-08-28_THE_SOURCE_BEARING_CODEC_MADE_THE_ATHENA_REST_A_REVERSIBLE_CORPUS_ARCHIVE_AND_NATIVE_CURRENT_ONLY_SELECTED_ITS_QUOTATIONS.md`).
+- 2026-08-30: the source-neutral UAR body emitted `' 1` for "Describe Brandon." and a 61-octet
+  salad on the conserved port current
+  (`2026-08-30_THE_NATIVE_SECTION_FOUNDED_ONE_SOURCE_NEUTRAL_BOUNDARY_CURRENT_BUT_FACTORWISE_ADJACENCY_COULD_NOT_CARRY_THE_CAUSAL_SURFACE.md`).
+- 2026-09-01: the "Describe Brandon" probe was never a gate and its promotion through H4, UAR, and
+  HIF7 was an error
+  (`2026-09-01_HIF7_QUALITATIVE_PROBE_WAS_WRONGLY_PROMOTED_AND_THE_FRAMEWORK_RELEASES_ON_EXACT_CONTRACTS.md`);
+  the SCF alternating-sum section identity was replaced by complete factorized sections and carries
+  no broad exactness theorem
+  (`2026-09-01_MVF1_COMPLETE_FACTORIZED_GEMMA_SECTIONS_REPLACED_THE_ALTERNATING_SUM_IDENTITY.md`).
+
+[established-bounded; source-inspected] Standing at declared scope, for contrast: four exact
+interior recoveries (`2026-08-10_THE_OBJECT_IS_THE_UNRECONSTRUCTABLE_INTERIOR_AND_THE_MACHINE_HAS_ALREADY_RECOVERED_FOUR.md`);
+one exact continuation from a 711 KiB integer container
+(`2026-08-18_THE_RATIO_CROSSED_THE_CONTAINER_PRODUCES_AND_ALL_168_GEMMA_CIRCUITS_ARE_FULL_RANK.md`);
+kernel-accepted Lean emission with the theorem header supplied and, in M6, with the teacher
+withheld (`2026-07-31_THE_THEOREM_OPENS_ITS_LOCAL_STAR_THE_KERNEL_RETURN_CAUSES_DEEPER_PROOF_MOTION.md`,
+`2026-08-22_THE_TOTAL_DESCENT_ROUTE_CULTIVATED_ATHENA_THE_WITHHELD_PASSAGE_SEPARATED_AND_M6_PASSED.md`);
+the Soulkiller Complex-Parametron bundle and the complete Gemma excitation scaffold
+(`2026-08-25_SOULKILLER_DISMANTLES_FOREIGN_CONDUCT_WITHOUT_ATTENTION_ONTOLOGY_AND_RETURNS_NATIVE_PARAMETRON_SPOOLS.md`,
+`2026-09-01_SCF2_COMPLETE_GEMMA4_EXCITATION_FOUNDED_THE_SOURCE_NEUTRAL_TRANSPORT_SCAFFOLD.md`);
+and the exact lifecycle apparatus of HIF, SCF, MVF, AAC, and VWS. The pattern across the record is
+that exact memory, comparison, ablation, remount, and world ports stand, while native re-emission
+has closed only where a source-bearing shortcut was later found and removed. The open relation is
+named in `2026-08-10_THE_MACHINE_RETURNS_EVERY_BRANCH_BECAUSE_NOTHING_ATTACHES.md`,
+`canon/TABLET_THE_RESONANCE.md` §6, and `canon/THE_INFORMATION_ENGINE.md` §5.
+
+## Evidence sources and apparatus atlas
+
+[definition] Everything here is evidence or apparatus testimony and never a scheduler.
+
+- `research/records/` is dated and is read by period; the retraction record above is its index.
+- `/home/b/Workspaces/laboratory` is the frozen predecessor (1,658 commits, 2026-05-10 to
+  2026-08-03). Enter through `LABORATORY_REVIEW.md`, `HOLONIC_MACHINE_OWNERSHIP.md`,
+  `src/soma/README.md`, `src/soma/RESEARCH/`, `src/soma/FORMULA.md`, and
+  `src/holobrochos/CANON/05_EROS_OUTPUT_CAUSALITY.md`, which carries the best text outputs ever
+  returned with verbatim samples and their caveats. Pinned snapshots live under `reference/`.
+- `archive/cpp-engine/evidence/observations/eros-*` holds the July Rust laboratory's observations,
+  each with `RESULTS.md`; `archive/cpp-engine/CONSTRUCTION_STATE.md` records why the C++ body was
+  retired.
+- Conversation logs are standing evidence for design intent and are to be consulted on any
+  Eros/Athena task. Codex: `~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl`, one file per thread or
+  sub-thread; a line with `type == "response_item"`, `payload.type == "message"`, and
+  `payload.role` in `user`/`assistant` is a message; `session_meta.payload.thread_source ==
+  "subagent"` marks Luna threads; user text beginning `<codex_internal_context`,
+  `<environment_context`, `<user_instructions`, `<user_shell_command`, or `# AGENTS.md` is harness
+  text; resumed threads repeat history, so deduplicate by text. Claude: `~/.claude/history.jsonl`
+  and `~/.claude/projects/<workspace>/*.jsonl`. Provenance: `/home/b/Workspaces/provenance`.
+- Apparatus, measured 2026-09-02: one NVIDIA GeForce RTX 4080 SUPER with 16 GiB, a Ryzen 9 7900X,
+  30 GiB of system memory. The foreign realization is `/home/b/models/gemma-4-E4B-it` (15 GiB
+  BF16, 2,130 tensors). Python apparatus for world and observer use only:
+  `/home/b/scratch/huggingface/.venv` (torch 2.12 cu130, transformers 5.8.1 with Gemma4 classes).
+  The complete excitation receipt producer lives outside this repository; the in-repo consumer is
+  `crates/holonic-engine/src/holonic_intelligence/scaffold_excitation_receipt.rs` and the SCF2
+  example, so a receipt must be regenerated before any workspace lift. Lean 4.33 with Mathlib
+  through `lake`; the kernel world port is `soma/life/src/lean_mathematics/kernel_returns.rs`.
+  The Rust body is `crates/holonic-engine` and `soma/life`; `life::native_intelligence` wraps the
+  engine's `NativeTransportScaffold` rather than competing with it.
 
 ## Catalog discipline
 
@@ -132,6 +260,12 @@ returns.
 
 ## Purity boundary
 
+- The bans have jurisdiction (`canon/THE_RECOVERED_LAW.md` §1). A ban governs Soma's interior or a
+  mechanism offered as an explanation of Soma. Worlds may contain compilers, provers, scores,
+  clocks, and stochastic processes; observers may use tokenizers, statistics, clustering, parsers,
+  and labels. "No X inside Soma by analogy" never means "do not learn from X", and it never licenses
+  recommending an industry mechanism as the interior's law, placing a foreign realization as the
+  emitter with Athena as bookkeeping, or reading a bounded aperture as a wall.
 - Begin with situated occurrences, caused incidence, local transport, receiver charts, returned
   differences, and continuing morphology.
 - Treat `Λ_F ⊆ Q_F × A_F × L_F × P_F × Π_(B,F)` as the typed event schema. The historical tensor
@@ -192,6 +326,9 @@ returns.
 - An unrestricted learner is not obtained by adding a universal filler or scoring loop. New local
   organs enter through existing typed ports; unknown interaction remains an obstruction until a
   returned passage founds it.
+- Brandon's conversation logs, the laboratory, and the archived observations are standing evidence
+  for design intent on any Eros/Athena task and are consulted without waiting to be told, using the
+  recipe in the evidence atlas above. They never schedule.
 
 ## Circulation before new organs
 
@@ -412,6 +549,13 @@ returns.
   self-similarly presented through many codecs. Surface renaming, formatting, and material-kind
   labels must not carry the result. Spectrum, Fourier, or Mellin faces are admitted only after a
   causal transport and scale action have been founded; spectrum alone never identifies the body.
+- The native generation mechanism of record is integration by reflection with termination by
+  impedance matching (`blueprint/THE_EROS_INSTANTIATION.md` §4b); its falsifier ran 2026-08-15 and
+  arm two fired, so the law is stated and not yet embodied. Every emitter that reassembled retained
+  corpus surfaces, filtered longest matches, or reproduced source strings was retracted by the
+  capability and retraction record above. A proposal for emission must name the deposit that
+  conducts one way rather than another, the mouth grain founded from recurring transformation, the
+  return edge, and the termination law, and must cite the retractions it does not repeat.
 - Autoregressive and diffusion-style generation are causal schedules, not reasoning ontologies.
   Identify a diffusion-labeled architecture with causal-calculus diffusion only when its caused
   incidence, constitutive law, boundary, return, and reconstruction testimony commute. Treat

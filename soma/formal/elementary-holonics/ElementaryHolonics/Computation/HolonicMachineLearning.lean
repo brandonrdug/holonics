@@ -13,6 +13,7 @@ import ElementaryHolonics.Computation.HolonicCultivationCharts
 import ElementaryHolonics.Computation.HolonicIntelligenceFramework
 import ElementaryHolonics.Computation.NativeMorphologyVariant
 import ElementaryHolonics.Computation.HolonicCirculationSession
+import ElementaryHolonics.Computation.HolonicWorldReturnDeposit
 
 /-!
 # Formal holonic machine-learning closure

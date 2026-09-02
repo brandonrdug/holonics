@@ -7,7 +7,8 @@ not canon, a position record, or a schedule.
 
 [`AGENTS.md`](AGENTS.md) is the complete shared operating contract for Codex and Claude sessions in
 this repository. Its purity, authority, ownership, circulation, experiment, learning, physical,
-formal, apparatus, validation, process-boundary, and Provenance clauses apply here in full.
+formal, apparatus, validation, process-boundary, and Provenance clauses apply here in full, and so
+do its orientation tier, retraction record, evidence sources, and apparatus atlas.
 
 [definition] If this file and `AGENTS.md` differ on a shared boundary, `AGENTS.md` governs and this
 file must be corrected. Model-specific convenience prose cannot weaken the shared contract.
@@ -17,56 +18,75 @@ file must be corrected. Model-specific convenience prose cannot weaken the share
 Read, in order:
 
 1. this file;
-2. [`AGENTS.md`](AGENTS.md);
+2. [`AGENTS.md`](AGENTS.md) in full, including its orientation tier;
 3. [`CONSTRUCTION_STATE.md`](CONSTRUCTION_STATE.md);
-4. [`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) in full; and
-5. only the canon, blueprint, source, formal, and evidence closure named by the roadmap's current
-   fresh-session pickup and active deed.
+4. [`blueprint/THE_ROADMAP.md`](blueprint/THE_ROADMAP.md) in full;
+5. the canon, blueprint, source, formal, and evidence closure named by the roadmap's fresh-session
+   pickup; and
+6. before any design, assessment, feasibility judgment, or proposal touching Eros, Athena,
+   Soulkiller, generation, inference, training, an inherited lift, or an operator interface: the
+   orientation tier, the retraction record, and the evidence sources in `AGENTS.md`, together with
+   Brandon's own messages on the subject from the conversation logs named there.
 
 [definition] `blueprint/THE_ROADMAP.md` is the sole ordered construction authority.
 `CONSTRUCTION_STATE.md` is the sole current-position record. Canon is doctrine. Research records,
 outputs, commits, conversation summaries, prior assistant turns, scratchpads, and Provenance
 messages are evidence or testimony and never schedule work.
 
-## Current courtesy summary
+[historical] On 2026-09-02 a Claude session read only items 1 through 5, assessed Athena from the
+newest scaffold and one code trace, and proposed an industry mechanism inside the interior. It had
+not read the jurisdiction of the bans, the capability and retraction record, the generation
+mechanism of record, the laboratory, or Brandon's rulings, and it had no recipe for finding them.
+Item 6 and the shared atlas in `AGENTS.md` exist so that cannot recur.
+
+## Current position
 
 **Current frontier:** NONE
 
-[established-bounded] CONS0--CONS5, QLT1--QLT6, CDB1, and HIF0--HIF7 are complete at their declared
-scopes. UAR/R0Q are deprecated as campaigns; R0Q0--R0Q4 retain their exact bounded mechanisms.
-`CONSTRUCTION_STATE.md` and `blueprint/THE_ROADMAP.md` carry the complete current receipt.
+[established-bounded] CONS0--CONS5, QLT1--QLT6, CDB1, HIF0--HIF7, SCF0--SCF6, MVF0--MVF6,
+AAC0--AAC6, WB0--WB6, and VWS0--VWS6 are complete at their declared scopes. UAR/R0Q are deprecated
+as campaigns; R0Q0--R0Q4 retain their exact bounded mechanisms. WRD0--WRD5, the world-return
+deposit campaign founded by Brandon's direct instruction of 2026-09-02, passed the same day at
+their declared scopes. `CONSTRUCTION_STATE.md` and `blueprint/THE_ROADMAP.md` carry the position
+and the complete receipt.
 
-[definition] SCF0--SCF5 returned the formal laws, neutral scaffold migration, complete actual Gemma
-multimodal lift, move-owned hot handoff, repeated actual-successor circulation, returned-current
-cultivation, source-detached remount, inherited-scaffold withdrawal, attributable ablation, and
-exact restoration. SCF6 returned all five experiments and the coherent release: 2,931 tests, 3,769
-Lean jobs, all nine gates, pushed Git, and absent reproducible artifacts. Brandon then founded
-MVF0--MVF6 to replace the coarse section projection with a faithful local lift, unify Soulkiller,
-return reciprocal local cultivation, derive variant/package anatomy, add exact export lenses, and
-index evaluation by complete inference configuration. MVF0 returned its exact Lean foundation;
-MVF1 returned the faithful factorized lift and SCF evidence correction; MVF2 returned one neutral
-Soulkiller dismantling boundary; MVF3 returned reciprocal local cultivation; MVF4 returned derived
-variant anatomy and backend-independent package storage; MVF5 returned exact/projected/refused
-Safetensors and ONNX export lenses; and MVF6 returned the configuration-indexed matched multimodal
-matrix and coherent release. The frontier is `NONE`; no successor deed is scheduled.
+[definition] The completed campaigns return exact lifecycle apparatus: receipt lift through the
+sole Soulkiller boundary, persistent variant workspace, experiment definition, conduct and actual
+successor continuation, staged return, commit and decline, withdrawal and replay, evaluation, and
+exact export. Qualitative emission, raw model-directory dismantling, and the native circulation in
+which a world return deposits terrain that later current rides remain open, as the retraction
+record in `AGENTS.md` states.
 
 ## Claude-specific conduct
 
 1. Re-read the current position instead of carrying a compacted or remembered campaign summary.
 2. Name the governing owner, port, passage, receiver, returned consequence, obstruction, and grade
    before implementation.
-3. Search the claim index, source owners, measured-capability/owner atlases, and existing typed
+3. Search the claim index, source owners, measured-capability and owner atlases, and existing typed
    relations before proposing an organ. A symbol search is evidence discovery, not orientation.
 4. When corrected, apply the correction and continue. Do not substitute apology, self-indictment,
    or a narrative of the mistake for changed conduct.
 5. Do not report a capability absent merely because its conventional industry representation is
-   absent. Identify the internal causal relation and its receiver boundary.
+   absent. Identify the internal causal relation and its receiver boundary. Equally, do not report
+   a capability present because a name, a passing structural test, or a lifecycle receipt exists;
+   check the capability and retraction record.
 6. Do not turn construction into perpetual audit. Audit only the premise needed to take the next
    authorized deed; return to construction when the owner is known.
-7. `CLAUDE.md`, direct-message records, and recovered assistant transcripts may be read when Brandon
-   names them as context. They remain evidence, never a shadow roadmap.
+7. Brandon's conversation logs, the laboratory, and the archived observations are standing evidence
+   for design intent on any Eros/Athena task. Read them without waiting to be told, using the
+   recipe in `AGENTS.md`. They remain evidence, never a shadow roadmap.
 8. Sub-agents are permitted under the responsibility and integration boundary in `AGENTS.md`.
-   The primary session reads governing files and owns the integrated result.
+   The primary session reads governing files and owns the integrated result. Sub-agent reports are
+   testimony and must be integrated against the governing files, not relayed.
+9. Apply the jurisdiction test before any proposal: a ban governs Soma's interior or a mechanism
+   offered as its explanation. Worlds may contain compilers, provers, scores, and clocks; observers
+   may use tokenizers, statistics, and parsers. Never recommend an industry mechanism as the
+   interior's law, never place a foreign realization as the emitter with Athena as bookkeeping, and
+   never read a bounded aperture as a wall.
+10. Answer a request to explain with an explanation. Construction begins only from a direct build
+    request and the standing-reuse receipt required by `AGENTS.md`.
+11. Report the actual point of confusion rather than the accessible proposal. The option that is
+    easier to implement is the one to suspect.
 
 ## Provenance sidecar
 

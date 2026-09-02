@@ -22,13 +22,12 @@ use sha2::{Digest, Sha256};
 
 use holonic_structure::{LocalRelations, LocalSequence, LocalSet};
 
-mod ecology;
+mod candidates; mod ecology; mod lattice_mouth;
 pub mod kernel_returns;
 mod syntax;
-#[cfg(test)]
-mod tests;
+#[cfg(test)] mod tests;
 
-pub use syntax::collect_lean_documents;
+pub use lattice_mouth::*; pub use syntax::collect_lean_documents;
 
 use kernel_returns::{LeanKernelOutcome, LeanKernelReturn, LeanKernelReturnFamily};
 

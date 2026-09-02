@@ -37,12 +37,41 @@ Read, in order:
     [`THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).
 12. the completed exterior Holonics Workbench application contract,
     [`../applications/holonics-workbench/WORKBENCH.md`](../applications/holonics-workbench/WORKBENCH.md).
-13. the active explicit-root variant workspace application contract,
+13. the completed explicit-root variant workspace application contract,
     [`THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md`](THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md).
+14. the active world-return deposit contract,
+    [`THE_WORLD_RETURN_DEPOSITS_ON_THE_ROUTE_IT_CROSSED_AND_THE_LEAN_KERNEL_IS_THE_FIRST_WORLD.md`](THE_WORLD_RETURN_DEPOSITS_ON_THE_ROUTE_IT_CROSSED_AND_THE_LEAN_KERNEL_IS_THE_FIRST_WORLD.md),
+    together with the orientation tier, retraction record, and evidence atlas in
+    [`../AGENTS.md`](../AGENTS.md).
 
 Read only the smallest source, formal, and evidence closure required by the active deed. Completed
 sensory, membrane, Athena-alpha, Soulkiller, L, H, and Millennium campaign files
 are provenance, not pickup obligations.
+
+## Completed campaign — the world return deposits on the route it crossed
+
+**Current frontier:** NONE
+
+[definition] Brandon's direct instruction of 2026-09-02 founds the ordered `WRD0--WRD5` campaign
+under
+[`THE_WORLD_RETURN_DEPOSITS_ON_THE_ROUTE_IT_CROSSED_AND_THE_LEAN_KERNEL_IS_THE_FIRST_WORLD.md`](THE_WORLD_RETURN_DEPOSITS_ON_THE_ROUTE_IT_CROSSED_AND_THE_LEAN_KERNEL_IS_THE_FIRST_WORLD.md).
+It composes the standing Lean material chart, kernel world, carrier population, conduct,
+session, staged return, commit, withdrawal, and replay owners into the constitutive passage from
+an actual kernel return to a local morphology deposit, with termination read from the junction.
+It adds no trainer, decoder cabinet, semantic router, or second body.
+
+[definition] The complete order is:
+
+1. `WRD0` — formal junction, route-return, locality, and many-receiver laws;
+2. `WRD1` — the Lean material mouth into the carrier population;
+3. `WRD2` — candidate render from the emitted route;
+4. `WRD3` — the constitutive map and termination;
+5. `WRD4` — the first world, later current, and the falsifier; and
+6. `WRD5` — records, release, commit, and push.
+
+[established-bounded] All six passed on 2026-09-02 at their declared scopes; the grades and the
+open fibre (the emitter is the standing template render) are in `CONSTRUCTION_STATE.md` and the
+dated WRD records. No successor campaign is scheduled.
 
 ## Completed campaign — finite many-body and polarized crystal transport
 
@@ -612,7 +641,7 @@ Lean jobs and all nine gates passed. Its receipt is
 
 ## Completed application — explicit-root variant workspace
 
-**Current frontier:** NONE
+**Completed VWS frontier:** NONE
 
 **VWS0--VWS6 ARE COMPLETE.**
 
