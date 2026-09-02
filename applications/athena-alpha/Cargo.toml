@@ -12,6 +12,10 @@ serde_json = "1"
 num-rational = { workspace = true }
 thiserror = { workspace = true }
 
+[dev-dependencies]
+holonics-circulation-abi = { path = "../../soma/circulation-abi" }
+num-traits = "0.2"
+
 [[example]]
 name = "alpha-cycle"
 path = "examples/alpha_cycle.rs"

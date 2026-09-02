@@ -1,0 +1,314 @@
+use std::collections::{BTreeMap, BTreeSet};
+
+use athena_alpha::{
+    addressed_ingress, declared_diffusion_law, returned_local_interaction, AthenaAlphaApplication,
+    BASE_CONFIGURATION,
+};
+use holonic_engine::{
+    native_ecology::holonic_intelligence::{
+        Bf16ExcitationDismantling, ExteriorModality, ForeignBf16Excitation, NativeInferenceRequest,
+    },
+    receiver_exact_compression::ReceiverId,
+    soulkiller::dismantle,
+    BoundaryId, EventId, ExactComplexWaveCurrent,
+};
+use holonics_circulation_abi::{
+    dispatch_bytes, AbiCommand, AbiDisposition, AbiEnvelope, AbiResponse,
+    HOLONICS_CIRCULATION_ABI_SCHEMA,
+};
+use life::native_intelligence::{
+    NativeCirculationConfiguration, NativeCirculationEvent, NativeCirculationSession,
+    NativeDiffusionIngress, NativeDiffusionStanding, NativeMorphologyPackage,
+};
+use num_rational::BigRational as Rat;
+use num_traits::{One, Zero};
+
+fn excitation(
+    event: u64,
+    predecessor: Option<u64>,
+    entering: u16,
+    returned: u16,
+) -> ForeignBf16Excitation {
+    ForeignBf16Excitation {
+        event: EventId(event),
+        predecessor: predecessor.map(EventId),
+        entering_boundary: BoundaryId(event * 2),
+        emitting_boundary: BoundaryId(event * 2 + 1),
+        source_occurrence: format!("cold/{event}"),
+        exterior_modality: ExteriorModality::Text,
+        entering_codewords: vec![entering],
+        returned_codewords: vec![returned],
+        interventions: BTreeSet::from([format!("intervention/{event}")]),
+        receiver_consequences: BTreeSet::from([format!("consequence/{event}")]),
+    }
+}
+
+fn application() -> AthenaAlphaApplication {
+    let configuration: NativeCirculationConfiguration =
+        serde_json::from_str(BASE_CONFIGURATION).expect("configuration");
+    let returned = dismantle(Bf16ExcitationDismantling {
+        receiver: ReceiverId(7),
+        excitations: vec![
+            excitation(1, None, 0x3f80, 0x4000),
+            excitation(2, Some(1), 0x4000, 0x4040),
+            excitation(3, None, 0x4080, 0x40a0),
+        ],
+    })
+    .expect("dismantle");
+    AthenaAlphaApplication::from_dismantling_return(returned, configuration)
+        .expect("admission")
+        .application
+}
+
+fn request(application: &AthenaAlphaApplication, occurrence: EventId) -> NativeInferenceRequest {
+    let native = application.package().hot().native();
+    let (spool, thread) = native
+        .spools
+        .iter()
+        .flat_map(|spool| spool.threads.iter().map(move |thread| (spool, thread)))
+        .find(|(_, thread)| {
+            thread
+                .occurrences
+                .iter()
+                .any(|candidate| candidate.occurrence == occurrence)
+        })
+        .expect("addressed occurrence");
+    addressed_ingress(
+        spool.address.clone(),
+        thread.address.clone(),
+        occurrence,
+        ReceiverId(7),
+    )
+}
+
+fn dispatch(request_id: u64, command: AbiCommand) -> AbiResponse {
+    let envelope = AbiEnvelope {
+        schema: HOLONICS_CIRCULATION_ABI_SCHEMA.to_owned(),
+        request_id,
+        command,
+    };
+    serde_json::from_slice(&dispatch_bytes(
+        &serde_json::to_vec(&envelope).expect("request wire"),
+    ))
+    .expect("response wire")
+}
+
+#[test]
+fn exact_alpha_matrix_returns_the_complete_dynamic_lifecycle() {
+    let application = application();
+    let base_snapshot = application.snapshot().expect("base snapshot");
+    let base_package = base_snapshot.package_wire.clone();
+
+    // 1--3. One package boundary, plural ingress, and exact actual-successor lineage.
+    let first_request = request(&application, EventId(1));
+    let first = application
+        .conduct(first_request.clone())
+        .expect("first boundary");
+    assert_eq!(first.actual_successors.len(), 1);
+    assert_eq!(first.actual_successors[0].address.occurrence, EventId(2));
+    let second = application
+        .continue_from(&first, &first.actual_successors[0].address)
+        .expect("actual continuation");
+    assert_eq!(second.lineage.predecessor, Some(EventId(1)));
+    let independent_before = application
+        .conduct(request(&application, EventId(3)))
+        .expect("independent before");
+
+    // 7. Decline is exact and leaves the same package owner.
+    let before_decline = application
+        .package()
+        .canonical_bytes()
+        .expect("before decline");
+    let (application, declined) = application.decline(&first).expect("decline");
+    assert!(declined.morphology_unchanged);
+    assert_eq!(
+        application
+            .package()
+            .canonical_bytes()
+            .expect("after decline"),
+        before_decline
+    );
+
+    // 4--5. A genuinely later return changes only its causal cone and survives remount.
+    let first = application
+        .conduct(request(&application, EventId(1)))
+        .expect("commit boundary");
+    let returned = returned_local_interaction(
+        first.emission.address.clone(),
+        EventId(100),
+        BoundaryId(200),
+        ExactComplexWaveCurrent::new(Rat::one(), Rat::one()),
+        Rat::one(),
+        BTreeSet::new(),
+    )
+    .expect("returned interaction");
+    let candidate = application
+        .stage_return(&first, returned)
+        .expect("candidate");
+    let (application, commit) = application.commit(candidate).expect("commit");
+    assert_eq!(commit.predecessor_lineage.generation, 0);
+    assert_eq!(commit.successor_lineage.generation, 1);
+    assert_eq!(commit.returned_occurrence, EventId(100));
+    assert!(!commit.causal_cone.is_empty());
+    assert!(commit.interchange_population > 0);
+    let independent_after = application
+        .conduct(request(&application, EventId(3)))
+        .expect("independent after");
+    assert_eq!(independent_after.emission, independent_before.emission);
+    assert_eq!(independent_after.lineage, independent_before.lineage);
+    assert_eq!(independent_after.futures, independent_before.futures);
+
+    let later_request = request(&application, EventId(100));
+    let later = application
+        .conduct(later_request.clone())
+        .expect("later cultivated conduct");
+    let generation_one = application
+        .package()
+        .canonical_bytes()
+        .expect("generation one");
+    let snapshot = application.snapshot().expect("snapshot");
+    let remounted = AthenaAlphaApplication::remount(
+        life::native_intelligence::NativeCirculationSnapshot::read(
+            &snapshot.canonical_bytes().expect("snapshot wire"),
+        )
+        .expect("snapshot read"),
+    )
+    .expect("remount");
+    assert_eq!(remounted.generation(), 1);
+    assert_eq!(
+        remounted.conduct(later_request).expect("remounted conduct"),
+        later
+    );
+
+    // 8. Discrete and exact diffusive conduct share the neutral event family.
+    let native = remounted.package().hot().native();
+    let spool = &native.spools[0];
+    let diffusion = declared_diffusion_law(
+        native,
+        &spool.address,
+        spool
+            .native_population
+            .iter()
+            .map(|native| (*native, Rat::one()))
+            .collect(),
+        spool
+            .threads
+            .iter()
+            .flat_map(|thread| &thread.incidence)
+            .map(|term| (term.occurrence, Rat::one()))
+            .collect(),
+        spool.native_population.clone(),
+    )
+    .expect("diffusion law");
+    let first_native = *spool.native_population.iter().next().expect("native");
+    let standing = NativeDiffusionStanding {
+        content: spool
+            .native_population
+            .iter()
+            .map(|native| {
+                (
+                    *native,
+                    if *native == first_native {
+                        Rat::one()
+                    } else {
+                        Rat::zero()
+                    },
+                )
+            })
+            .collect(),
+    };
+    let NativeCirculationEvent::ConstitutedDiffusion(diffusive) = remounted
+        .diffuse(
+            &diffusion,
+            &standing,
+            NativeDiffusionIngress {
+                occurrence: EventId(200),
+                interval: Rat::one(),
+                source: BTreeMap::new(),
+            },
+        )
+        .expect("diffusive event")
+    else {
+        panic!("diffusive event kind");
+    };
+    assert!(diffusive.receipt.conservation_residual.is_zero());
+    assert!(diffusive
+        .receipt
+        .balances
+        .iter()
+        .all(|balance| balance.exact_residual.is_zero()));
+    assert!(matches!(
+        remounted
+            .conduct_event(request(&remounted, EventId(3)))
+            .expect("addressed event"),
+        NativeCirculationEvent::AddressedSuccessor(_)
+    ));
+
+    // 6 and 9. Exact withdrawal/replay and snapshot/remount preserve both generations.
+    let (predecessor, replayable) = remounted.withdraw_last_commit().expect("withdraw commit");
+    assert_eq!(predecessor.generation(), 0);
+    assert_eq!(
+        predecessor
+            .package()
+            .canonical_bytes()
+            .expect("withdrawn package"),
+        base_package
+    );
+    let replayed = predecessor
+        .replay_commit(replayable)
+        .expect("replay commit");
+    assert_eq!(
+        replayed
+            .package()
+            .canonical_bytes()
+            .expect("replayed package"),
+        generation_one
+    );
+
+    // 10--11. Direct and ABI conduct agree at the complete configuration.
+    let direct = NativeCirculationSession::mount(
+        NativeMorphologyPackage::read(&base_snapshot.package_wire).expect("direct package"),
+        base_snapshot.configuration.clone(),
+    )
+    .expect("direct session");
+    let direct_boundary = direct
+        .conduct(first_request.clone())
+        .expect("direct boundary");
+    let AbiDisposition::Opened { handle, .. } = dispatch(
+        1,
+        AbiCommand::Open {
+            package_wire: base_snapshot.package_wire,
+            configuration: base_snapshot.configuration,
+        },
+    )
+    .disposition
+    else {
+        panic!("ABI open");
+    };
+    let AbiDisposition::Boundary { boundary } = dispatch(
+        2,
+        AbiCommand::Conduct {
+            handle,
+            request: first_request,
+        },
+    )
+    .disposition
+    else {
+        panic!("ABI boundary");
+    };
+    assert_eq!(boundary, direct_boundary);
+    assert!(!boundary.configuration.ingress_aperture.is_empty());
+    assert!(!boundary.configuration.continuation_receiver.is_empty());
+    assert!(!boundary.configuration.world_return_law.is_empty());
+    assert!(!boundary.configuration.emission_codec.is_empty());
+    assert!(!boundary.configuration.apparatus.is_empty());
+    assert!(matches!(
+        dispatch(3, AbiCommand::Close { handle }).disposition,
+        AbiDisposition::Closed { .. }
+    ));
+
+    // 12. Structural grades are attached to caused returns, not an expected surface.
+    assert_eq!(commit.causal_cone.len(), 2);
+    assert_eq!(commit.reconstruction_fibre_population, 1);
+    assert!(!later.futures.is_empty());
+}

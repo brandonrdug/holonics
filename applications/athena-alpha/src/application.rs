@@ -94,6 +94,13 @@ impl AthenaAlphaApplication {
         Ok(self.session.conduct(request)?)
     }
 
+    pub fn conduct_event(
+        &self,
+        request: NativeInferenceRequest,
+    ) -> Result<NativeCirculationEvent, AthenaAlphaError> {
+        Ok(self.session.conduct_event(request)?)
+    }
+
     pub fn continue_from(
         &self,
         boundary: &NativeCirculationBoundary,
@@ -142,6 +149,17 @@ impl AthenaAlphaApplication {
     pub fn remount(snapshot: NativeCirculationSnapshot) -> Result<Self, AthenaAlphaError> {
         Ok(Self {
             session: NativeCirculationSession::remount(snapshot)?,
+        })
+    }
+
+    pub fn withdraw_last_commit(self) -> Result<(Self, NativeMorphologyCommit), AthenaAlphaError> {
+        let (session, commit) = self.session.withdraw_last_commit()?;
+        Ok((Self { session }, commit))
+    }
+
+    pub fn replay_commit(self, commit: NativeMorphologyCommit) -> Result<Self, AthenaAlphaError> {
+        Ok(Self {
+            session: self.session.replay_commit(commit)?,
         })
     }
 }
