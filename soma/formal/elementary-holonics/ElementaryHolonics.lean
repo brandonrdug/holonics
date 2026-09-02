@@ -103,6 +103,7 @@ import ElementaryHolonics.RH.GammaGrowth
 import ElementaryHolonics.RH.XiGrowth
 import ElementaryHolonics.RH.HeatEquationEntire
 import ElementaryHolonics.RH.ZeroDynamicsEntire
+import ElementaryHolonics.RH.ConjugationEntire
 import ElementaryHolonics.RH.WeightedArgumentPrinciple
 import ElementaryHolonics.RH.Balance
 import ElementaryHolonics.Millennium.Gluing
