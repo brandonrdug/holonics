@@ -105,7 +105,7 @@ test result never upgrades a correspondence.
 
 | Application relation | Shared command owner | Engine/application owners | Status and exact open fibre |
 |---|---|---|---|
-| Holonics Workbench CLI/TUI protocol | `applications/holonics-workbench/src/{command,event,cli,render}.rs` | commands name the existing Athena, Eros, Soulkiller, morphology/export, diffusion and engine owners; Ratatui/Clap remain exterior | **partial:** WB0 returns the typed serializable command/event seam and parser. Athena execution, Eros/Soulkiller/engine adapters, CLI deeds and TUI remain WB1--WB3. |
+| Holonics Workbench CLI/TUI protocol | `applications/holonics-workbench/src/{command,event,cli,render,runtime,store,adapters/*,tui/*}.rs` | Athena composes alpha/session; Eros calls exposure/incidence; Soulkiller calls lossless charts; engine calls CUDA/package/export; Clap and Ratatui/Crossterm share one runtime | **exact-bounded operator surface:** WB0--WB3 return the typed protocol, Athena/Eros/Soulkiller/engine commands, CLI and Ratatui with direct event equality. Operator documentation and release remain WB4. |
 
 ## Maintenance law
 

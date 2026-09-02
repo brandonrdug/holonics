@@ -3,10 +3,14 @@
 //! CLI and Ratatui are two exterior presentations over the same `WorkbenchRuntime`. Product and
 //! navigation names in this crate never select native engine conduct.
 
+mod adapters;
 pub mod cli;
 pub mod command;
 pub mod event;
 pub mod render;
+pub mod runtime;
+mod store;
+pub mod tui;
 
 pub use cli::{parse_cli, Cli, WorkbenchInvocation};
 pub use command::{
@@ -15,5 +19,7 @@ pub use command::{
 };
 pub use event::{EventLevel, WorkbenchEvent};
 pub use render::{render_human, render_json_lines};
+pub use runtime::{WorkbenchError, WorkbenchRuntime};
+pub use tui::{run_tui, WorkbenchTui};
 
 pub const WORKBENCH_SCHEMA: &str = "org.holonics.workbench.v1";

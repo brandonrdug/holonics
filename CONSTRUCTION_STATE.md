@@ -10,20 +10,37 @@ grades.
 
 ## Current frontier
 
-**Current frontier:** WB1
+**Current frontier:** WB4
 
-**WB0 PASSED. WB1 IS ACTIVE. WB2--WB4 FOLLOW ONLY AFTER THEIR PREDECESSORS PASS.**
+**WB0--WB3 PASSED. WB4 IS THE ACTIVE TERMINAL APPLICATION DEED.**
 
 [definition] Brandon's direct request of 2026-09-01 founds the exterior application contract
 [`applications/holonics-workbench/WORKBENCH.md`](applications/holonics-workbench/WORKBENCH.md).
-WB0 returned the shared typed command/event protocol and application architecture. WB1 owns only
-Athena named sessions, live operations, snapshot/remount, diffusion demo, and export. The completed
-AAC0--AAC6 foundation retains its exact standing below.
+WB0 returned the shared protocol. WB1 returned Athena operations. WB2 returned Eros, Soulkiller,
+engine and CLI surfaces. WB3 returned Ratatui over the same runtime. WB4 owns only documentation,
+real walkthroughs, release and cleanup. AAC0--AAC6 retains its exact standing below.
 
 [established-bounded; implemented-exact; source-inspected; measured] WB0 returned one typed
 command/event family for CLI and TUI, nested parsing, human/JSONL rendering, exact negative rational
 arguments, and malformed-input refusal. Two focused tests passed. The receipt is
 [`research/records/2026-09-01_WB0_HOLONICS_WORKBENCH_SHARED_COMMAND_EVENT_PROTOCOL_RETURNED.md`](research/records/2026-09-01_WB0_HOLONICS_WORKBENCH_SHARED_COMMAND_EVENT_PROTOCOL_RETURNED.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] WB1 returned named live
+Athena sessions, inspect/conduct/continue, recoverable return/commit, decline, exact diffusion demo,
+snapshot/open and exact ONNX/Safetensors export. Two focused tests passed. The receipt is
+[`research/records/2026-09-01_WB1_WORKBENCH_ATHENA_SESSIONS_COMMIT_DIFFUSION_SNAPSHOT_AND_EXPORT_RETURNED.md`](research/records/2026-09-01_WB1_WORKBENCH_ATHENA_SESSIONS_COMMIT_DIFFUSION_SNAPSHOT_AND_EXPORT_RETURNED.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] WB2 returned Eros mouth/atlas,
+lossless Soulkiller config/index/ONNX inspection, engine status/capabilities/package/export, and
+actual CLI human/JSONL output. Direct runtime and CLI status agree; two integration tests passed.
+The receipt is
+[`research/records/2026-09-01_WB2_EROS_SOULKILLER_ENGINE_AND_CLI_RETURNED_ONE_EVENT_SURFACE.md`](research/records/2026-09-01_WB2_EROS_SOULKILLER_ENGINE_AND_CLI_RETURNED_ONE_EVENT_SURFACE.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] WB3 returned the Ratatui
+catalogue, timeline, inspector, palette, session/status view and Crossterm event loop over the shared
+runtime. Direct/TUI equality, key updates and headless rendering returned three passed tests. The
+receipt is
+[`research/records/2026-09-01_WB3_RATATUI_RENDERED_THE_SAME_WORKBENCH_COMMAND_EVENTS.md`](research/records/2026-09-01_WB3_RATATUI_RENDERED_THE_SAME_WORKBENCH_COMMAND_EVENTS.md).
 
 [definition] Brandon's direct request of 2026-09-01 founds the active contract
 [`blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).

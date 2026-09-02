@@ -3,7 +3,7 @@
 **Date:** 2026-09-01
 **Kind:** active application contract composed by
 [`../../blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md).
-**Current position:** WB1.
+**Current position:** WB4.
 
 ## 0. Product boundary
 
@@ -146,7 +146,7 @@ renderers, negative exact-rational handling, round-trip and malformed-input cont
 tests passed. Its receipt is
 [`../../research/records/2026-09-01_WB0_HOLONICS_WORKBENCH_SHARED_COMMAND_EVENT_PROTOCOL_RETURNED.md`](../../research/records/2026-09-01_WB0_HOLONICS_WORKBENCH_SHARED_COMMAND_EVENT_PROTOCOL_RETURNED.md).
 
-### WB1 — Athena runtime, sessions, store, and export
+### WB1 — Athena runtime, sessions, store, and export — PASSED
 
 [definition] Compose the released Athena-alpha API into named live sessions and explicit
 snapshot/package/export paths.
@@ -156,7 +156,13 @@ decline, exact diffusion demo, snapshot/open, and exact ONNX/Safetensors export 
 one multi-step runtime control remounts and continues; false successor, missing boundary, missing
 session, and unsupported export refuse.
 
-### WB2 — Eros, Soulkiller, engine adapters and CLI
+[established-bounded; implemented-exact; source-inspected; measured] WB1 returned named live
+sessions, explicit conduct/continue, recoverable return/commit, decline, uniform exact diffusion
+demo, snapshot/open, anatomy inspection, and exact export. The positive and refusal controls
+returned two passed tests. Its receipt is
+[`../../research/records/2026-09-01_WB1_WORKBENCH_ATHENA_SESSIONS_COMMIT_DIFFUSION_SNAPSHOT_AND_EXPORT_RETURNED.md`](../../research/records/2026-09-01_WB1_WORKBENCH_ATHENA_SESSIONS_COMMIT_DIFFUSION_SNAPSHOT_AND_EXPORT_RETURNED.md).
+
+### WB2 — Eros, Soulkiller, engine adapters and CLI — PASSED
 
 [definition] Add read-only Eros material mouth/atlas summaries, lossless Soulkiller exterior-chart
 inspection, engine status/capability/package/export surfaces, and the Clap command tree.
@@ -166,7 +172,13 @@ incidence owners; Soulkiller inspection retains unknown/raw material and execute
 engine package/export round-trips exactly; `holonics --help` exposes the complete admitted surface;
 and CLI JSON equals direct runtime events.
 
-### WB3 — Ratatui interface over the same runtime
+[established-bounded; implemented-exact; source-inspected; measured] WB2 returned Eros mouth/atlas,
+lossless Soulkiller config/index/ONNX inspection, engine status/capabilities/package/export, and
+actual human/JSONL CLI execution. Direct and CLI status events agree; two focused integration tests
+passed. Its receipt is
+[`../../research/records/2026-09-01_WB2_EROS_SOULKILLER_ENGINE_AND_CLI_RETURNED_ONE_EVENT_SURFACE.md`](../../research/records/2026-09-01_WB2_EROS_SOULKILLER_ENGINE_AND_CLI_RETURNED_ONE_EVENT_SURFACE.md).
+
+### WB3 — Ratatui interface over the same runtime — PASSED
 
 [definition] Add the interactive terminal loop, catalogue, event timeline, payload inspector,
 command palette, session status, help, and deterministic headless rendering.
@@ -175,6 +187,12 @@ command palette, session status, help, and deterministic headless rendering.
 subprocess or duplicate command switch exists; terminal restoration is guaranteed; headless render
 and key/update controls pass; a scripted TUI command sequence returns the same events as direct
 runtime execution.
+
+[established-bounded; implemented-exact; source-inspected; measured] WB3 returned the Ratatui
+layout, command palette, event timeline, payload inspector, session/status surface, Crossterm
+updates and auto-restoring event loop. Direct/TUI equality, key/update, and two headless terminal
+sizes returned three passed tests. Its receipt is
+[`../../research/records/2026-09-01_WB3_RATATUI_RENDERED_THE_SAME_WORKBENCH_COMMAND_EVENTS.md`](../../research/records/2026-09-01_WB3_RATATUI_RENDERED_THE_SAME_WORKBENCH_COMMAND_EVENTS.md).
 
 ### WB4 — operator documentation and coherent application release
 

@@ -1,14 +1,34 @@
 use clap::Parser;
-use holonics_workbench::Cli;
+use holonics_workbench::{
+    render_human, render_json_lines, run_tui, Cli, EventLevel, WorkbenchRuntime,
+};
 
 fn main() {
+    if let Err(error) = run() {
+        eprintln!("holonics: {error}");
+        std::process::exit(1);
+    }
+}
+
+fn run() -> Result<(), Box<dyn std::error::Error>> {
     let invocation = Cli::parse().invocation();
     if invocation.tui {
-        println!("Holonics Workbench TUI is being constructed under WB3.");
+        run_tui()?;
     } else if let Some(command) = invocation.command {
-        println!(
-            "{}",
-            serde_json::to_string_pretty(&command).expect("command wire")
-        );
+        let mut runtime = WorkbenchRuntime::new();
+        let events = runtime.execute(command);
+        let rendered = if invocation.json {
+            render_json_lines(&events).expect("event JSON")
+        } else {
+            render_human(&events)
+        };
+        println!("{rendered}");
+        if events
+            .iter()
+            .any(|event| event.level == EventLevel::Obstruction)
+        {
+            std::process::exit(1);
+        }
     }
+    Ok(())
 }

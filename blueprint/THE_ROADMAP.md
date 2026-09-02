@@ -539,7 +539,7 @@ held-out change, withdrawal, and restoration passed. Its exact return is
 
 ## Active application — Holonics Workbench
 
-**Current frontier:** WB1
+**Current frontier:** WB4
 
 **WB0--WB4 ARE ACTIVE IN THE ORDER BELOW.**
 
@@ -553,8 +553,24 @@ application crate returns one serializable command/event protocol, nested parser
 rendering, and malformed-input refusal. Two focused tests passed. Its receipt is
 [`research/records/2026-09-01_WB0_HOLONICS_WORKBENCH_SHARED_COMMAND_EVENT_PROTOCOL_RETURNED.md`](../research/records/2026-09-01_WB0_HOLONICS_WORKBENCH_SHARED_COMMAND_EVENT_PROTOCOL_RETURNED.md).
 
-[definition] The current deed is WB1 only: Athena named sessions, exact live operations,
-snapshot/remount paths, diffusion demo, and package export.
+[established-bounded; implemented-exact; source-inspected; measured] WB1 passed. Named Athena
+sessions now inspect, conduct, continue, return/commit, decline, diffuse, snapshot/open, and export
+through public owners with recoverable refusal. Two focused tests passed. Its receipt is
+[`research/records/2026-09-01_WB1_WORKBENCH_ATHENA_SESSIONS_COMMIT_DIFFUSION_SNAPSHOT_AND_EXPORT_RETURNED.md`](../research/records/2026-09-01_WB1_WORKBENCH_ATHENA_SESSIONS_COMMIT_DIFFUSION_SNAPSHOT_AND_EXPORT_RETURNED.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] WB2 passed. Eros material
+operations, lossless Soulkiller chart inspection, engine status/capability/package/export, and
+actual CLI human/JSONL output return one event surface. Two focused tests passed. Its receipt is
+[`research/records/2026-09-01_WB2_EROS_SOULKILLER_ENGINE_AND_CLI_RETURNED_ONE_EVENT_SURFACE.md`](../research/records/2026-09-01_WB2_EROS_SOULKILLER_ENGINE_AND_CLI_RETURNED_ONE_EVENT_SURFACE.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] WB3 passed. Ratatui and
+Crossterm return the catalogue, timeline, inspector, palette, sessions/status and restoring event
+loop over the same runtime. Direct/TUI equality and headless rendering returned three passed tests.
+Its receipt is
+[`research/records/2026-09-01_WB3_RATATUI_RENDERED_THE_SAME_WORKBENCH_COMMAND_EVENTS.md`](../research/records/2026-09-01_WB3_RATATUI_RENDERED_THE_SAME_WORKBENCH_COMMAND_EVENTS.md).
+
+[definition] The current and terminal deed is WB4 only: operator documentation, real CLI and
+pseudo-terminal walkthroughs, complete workbench tests, coherent release, cleanup, and final state.
 
 [definition] The complete order is:
 
