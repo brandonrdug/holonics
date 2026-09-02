@@ -16,6 +16,13 @@ cargo build -p holonics-workbench
 ./target/debug/holonics --help
 ```
 
+To put the command on your user `PATH`:
+
+```bash
+cargo install --path applications/holonics-workbench --locked
+holonics --help
+```
+
 Open the terminal UI:
 
 ```bash

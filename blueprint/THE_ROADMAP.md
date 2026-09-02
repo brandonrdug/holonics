@@ -537,11 +537,11 @@ held-out change, withdrawal, and restoration passed. Its exact return is
 7. `HIF6` — resident and source-neutral closure; and
 8. `HIF7` — exact contact/interoperability framework release.
 
-## Active application — Holonics Workbench
+## Completed application — Holonics Workbench
 
-**Current frontier:** WB4
+**Current frontier:** NONE
 
-**WB0--WB4 ARE ACTIVE IN THE ORDER BELOW.**
+**WB0--WB4 PASSED. NO APPLICATION DEED REMAINS SCHEDULED.**
 
 [definition] Brandon's direct instruction of 2026-09-01 founds the exterior application contract
 [`../applications/holonics-workbench/WORKBENCH.md`](../applications/holonics-workbench/WORKBENCH.md).
@@ -569,8 +569,12 @@ loop over the same runtime. Direct/TUI equality and headless rendering returned 
 Its receipt is
 [`research/records/2026-09-01_WB3_RATATUI_RENDERED_THE_SAME_WORKBENCH_COMMAND_EVENTS.md`](../research/records/2026-09-01_WB3_RATATUI_RENDERED_THE_SAME_WORKBENCH_COMMAND_EVENTS.md).
 
-[definition] The current and terminal deed is WB4 only: operator documentation, real CLI and
-pseudo-terminal walkthroughs, complete workbench tests, coherent release, cleanup, and final state.
+[established-bounded; implemented-exact; source-inspected; process-audit; measured] WB4 passed.
+The operator guide, real CLI and pseudo-terminal Ratatui walkthroughs, nine focused Workbench tests,
+and complete coherent release returned. The release passed all nine gates with 2,966 tests passed,
+zero failed and 50 ignored; examples type-checked; the live Lean umbrella built 3,771 jobs.
+`cargo clean` removed 15,274 replicable files (38.8 GiB) and root `output/` was absent. Its receipt is
+[`research/records/2026-09-01_WB4_HOLONICS_WORKBENCH_CLI_RATATUI_RELEASED.md`](../research/records/2026-09-01_WB4_HOLONICS_WORKBENCH_CLI_RATATUI_RELEASED.md).
 
 [definition] The complete order is:
 

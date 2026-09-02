@@ -10,14 +10,14 @@ grades.
 
 ## Current frontier
 
-**Current frontier:** WB4
+**Current frontier:** NONE
 
-**WB0--WB3 PASSED. WB4 IS THE ACTIVE TERMINAL APPLICATION DEED.**
+**WB0--WB4 PASSED. NO APPLICATION DEED REMAINS SCHEDULED.**
 
 [definition] Brandon's direct request of 2026-09-01 founds the exterior application contract
 [`applications/holonics-workbench/WORKBENCH.md`](applications/holonics-workbench/WORKBENCH.md).
 WB0 returned the shared protocol. WB1 returned Athena operations. WB2 returned Eros, Soulkiller,
-engine and CLI surfaces. WB3 returned Ratatui over the same runtime. WB4 owns only documentation,
+engine and CLI surfaces. WB3 returned Ratatui over the same runtime. WB4 returned documentation,
 real walkthroughs, release and cleanup. AAC0--AAC6 retains its exact standing below.
 
 [established-bounded; implemented-exact; source-inspected; measured] WB0 returned one typed
@@ -41,6 +41,13 @@ catalogue, timeline, inspector, palette, session/status view and Crossterm event
 runtime. Direct/TUI equality, key updates and headless rendering returned three passed tests. The
 receipt is
 [`research/records/2026-09-01_WB3_RATATUI_RENDERED_THE_SAME_WORKBENCH_COMMAND_EVENTS.md`](research/records/2026-09-01_WB3_RATATUI_RENDERED_THE_SAME_WORKBENCH_COMMAND_EVENTS.md).
+
+[established-bounded; implemented-exact; source-inspected; process-audit; measured] WB4 returned
+the operator guide, real CLI and pseudo-terminal TUI walkthroughs, nine focused Workbench tests,
+and the complete coherent release: 2,966 tests passed, zero failed, 50 ignored; examples
+type-checked; the live Lean umbrella built 3,771 jobs; all nine gates passed. `cargo clean` removed
+15,274 replicable files (38.8 GiB) and root `output/` was absent. The receipt is
+[`research/records/2026-09-01_WB4_HOLONICS_WORKBENCH_CLI_RATATUI_RELEASED.md`](research/records/2026-09-01_WB4_HOLONICS_WORKBENCH_CLI_RATATUI_RELEASED.md).
 
 [definition] Brandon's direct request of 2026-09-01 founds the active contract
 [`blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).

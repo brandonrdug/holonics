@@ -105,7 +105,7 @@ test result never upgrades a correspondence.
 
 | Application relation | Shared command owner | Engine/application owners | Status and exact open fibre |
 |---|---|---|---|
-| Holonics Workbench CLI/TUI protocol | `applications/holonics-workbench/src/{command,event,cli,render,runtime,store,adapters/*,tui/*}.rs` | Athena composes alpha/session; Eros calls exposure/incidence; Soulkiller calls lossless charts; engine calls CUDA/package/export; Clap and Ratatui/Crossterm share one runtime | **exact-bounded operator surface:** WB0--WB3 return the typed protocol, Athena/Eros/Soulkiller/engine commands, CLI and Ratatui with direct event equality. Operator documentation and release remain WB4. |
+| Holonics Workbench CLI/TUI protocol | `applications/holonics-workbench/src/{command,event,cli,render,runtime,store,adapters/*,tui/*}.rs` | Athena composes alpha/session; Eros calls exposure/incidence; Soulkiller calls lossless charts; engine calls CUDA/package/export; Clap and Ratatui/Crossterm share one runtime | **exact-bounded operator surface:** WB0--WB4 return the typed protocol, Athena/Eros/Soulkiller/engine commands, direct CLI/TUI event equality, operator guide, real walkthroughs, and coherent release. Open fibres remain unrestricted foreign dismantling, qualitative multimodal generation, general owner discovery, and distributed ecology control. |
 
 ## Maintenance law
 

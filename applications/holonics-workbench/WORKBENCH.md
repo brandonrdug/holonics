@@ -1,9 +1,9 @@
 # Holonics Workbench — one operator surface for the engine ecology
 
 **Date:** 2026-09-01
-**Kind:** active application contract composed by
+**Kind:** completed application contract composed by
 [`../../blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md).
-**Current position:** WB4.
+**Current position:** NONE.
 
 ## 0. Product boundary
 
@@ -194,7 +194,7 @@ updates and auto-restoring event loop. Direct/TUI equality, key/update, and two 
 sizes returned three passed tests. Its receipt is
 [`../../research/records/2026-09-01_WB3_RATATUI_RENDERED_THE_SAME_WORKBENCH_COMMAND_EVENTS.md`](../../research/records/2026-09-01_WB3_RATATUI_RENDERED_THE_SAME_WORKBENCH_COMMAND_EVENTS.md).
 
-### WB4 — operator documentation and coherent application release
+### WB4 — operator documentation and coherent application release — PASSED
 
 [definition] Document install/build, CLI and TUI entry, first-session walkthrough, artifact
 locations, commands, controls, hardware expectations, and exact capability boundaries. Run the
@@ -205,6 +205,13 @@ release receivers.
 Soulkiller and engine walkthroughs return; CLI/TUI share exact command consequences; no generated
 surface is graded; the release passes within 180 seconds; Git is clean and pushed; and reproducible
 `target/`/`output/` material is absent.
+
+[established-bounded; implemented-exact; source-inspected; process-audit; measured] WB4 returned
+the install/build and operating guide, documented first Athena session and all four command
+families, real human/JSON CLI walkthroughs, a pseudo-terminal Ratatui command/restore deed, nine
+focused Workbench tests, and the coherent nine-gate release. `cargo clean` then removed 15,274
+replicable files (38.8 GiB); root `output/` was absent. Its receipt is
+[`../../research/records/2026-09-01_WB4_HOLONICS_WORKBENCH_CLI_RATATUI_RELEASED.md`](../../research/records/2026-09-01_WB4_HOLONICS_WORKBENCH_CLI_RATATUI_RELEASED.md).
 
 ## 6. Scope
 
