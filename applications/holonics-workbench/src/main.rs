@@ -1,6 +1,6 @@
 use std::ffi::OsString;
 use std::fs;
-use std::io::{self, Read};
+use std::io::{self, IsTerminal, Read};
 
 use clap::{error::ErrorKind, Parser};
 use holonics_workbench::{
@@ -31,6 +31,13 @@ fn run(arguments: Vec<OsString>) -> i32 {
     };
 
     if invocation.tui {
+        if !io::stdin().is_terminal() || !io::stdout().is_terminal() {
+            return emit_input_obstruction(
+                invocation.format,
+                "no command was supplied and the Workbench TUI requires an interactive terminal"
+                    .to_owned(),
+            );
+        }
         return match run_tui() {
             Ok(()) => 0,
             Err(error) => {

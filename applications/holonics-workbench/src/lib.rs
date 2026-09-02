@@ -6,8 +6,8 @@
 mod adapters;
 pub mod cli;
 pub mod command;
-pub mod discovery;
 pub mod event;
+pub mod presentation;
 pub mod protocol;
 pub mod render;
 pub mod runtime;
@@ -19,7 +19,6 @@ pub use command::{
     AthenaCommand, EngineCommand, ErosCommand, ExportCodecArgument, SoulkillerCommand,
     WorkbenchCommand,
 };
-pub use discovery::{WorkbenchDiscovery, WorkbenchResource, WorkbenchResourceKind};
 pub use event::{EventLevel, WorkbenchEvent};
 pub use protocol::{
     WorkbenchDisposition, WorkbenchRequest, WorkbenchResponse, WORKBENCH_REQUEST_SCHEMA,
@@ -32,4 +31,4 @@ pub use runtime::{
 };
 pub use tui::{run_tui, WorkbenchTui};
 
-pub const WORKBENCH_SCHEMA: &str = "org.holonics.workbench.event.v2";
+pub const WORKBENCH_SCHEMA: &str = "org.holonics.workbench.event.v3";

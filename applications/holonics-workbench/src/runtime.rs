@@ -26,7 +26,6 @@ use serde_json::{json, Value};
 use thiserror::Error;
 
 use crate::adapters;
-use crate::discovery;
 use crate::store;
 use crate::{AthenaCommand, EventLevel, ExportCodecArgument, WorkbenchCommand, WorkbenchEvent};
 
@@ -290,7 +289,7 @@ impl WorkbenchRuntime {
                 }
             })
             .collect::<String>();
-        let directory = discovery::artifact_root()?.join(&safe_session);
+        let directory = store::artifact_root()?.join(&safe_session);
         let stem = format!("generation-{generation}");
         let candidate = directory.join(format!("{stem}.{suffix}"));
         if !candidate.exists() {
@@ -326,7 +325,6 @@ impl WorkbenchRuntime {
     pub fn execute(&mut self, command: WorkbenchCommand) -> Vec<WorkbenchEvent> {
         let result = match command {
             WorkbenchCommand::Demo => self.execute_demo(),
-            WorkbenchCommand::Discover { root } => self.execute_discover(root),
             WorkbenchCommand::Athena(command) => self.execute_athena(command),
             WorkbenchCommand::Status => Ok(vec![self.adapter(adapters::engine::status())]),
             WorkbenchCommand::Capabilities => {
@@ -387,27 +385,6 @@ impl WorkbenchRuntime {
             })),
         ));
         Ok(events)
-    }
-
-    fn execute_discover(
-        &mut self,
-        root: Option<PathBuf>,
-    ) -> Result<Vec<WorkbenchEvent>, WorkbenchError> {
-        let start = root.unwrap_or_else(|| {
-            let current = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
-            discovery::workspace_root(&current)
-        });
-        let discovered = discovery::discover(&start)?;
-        Ok(vec![self.event(
-            EventLevel::Information,
-            "workbench/discovery",
-            format!(
-                "found {} actionable resource(s) under {}",
-                discovered.resources.len(),
-                discovered.root.display()
-            ),
-            Some(to_value(&discovered)?),
-        )])
     }
 
     fn execute_athena(
@@ -605,18 +582,19 @@ impl WorkbenchRuntime {
         imaginary: Rat,
         storage: Rat,
     ) -> Result<Vec<WorkbenchEvent>, WorkbenchError> {
-        let mut entry = self
-            .sessions
-            .remove(session)
-            .ok_or_else(|| WorkbenchError::MissingSession(session.to_owned()))?;
-        let recovery = entry
+        let standing = self.session(session)?;
+        let recovery = standing
             .application
             .snapshot()
             .map_err(|error| WorkbenchError::Owner(error.to_string()))?;
-        let boundary = entry
+        let boundary = standing
             .boundary
-            .take()
+            .clone()
             .ok_or_else(|| WorkbenchError::MissingBoundary(session.to_owned()))?;
+        let entry = self
+            .sessions
+            .remove(session)
+            .expect("session and boundary checked before ownership transfer");
         let result = (|| {
             let returned = returned_local_interaction(
                 boundary.emission.address.clone(),
@@ -674,32 +652,50 @@ impl WorkbenchRuntime {
     }
 
     fn athena_decline(&mut self, session: &str) -> Result<Vec<WorkbenchEvent>, WorkbenchError> {
-        let mut entry = self
+        let standing = self.session(session)?;
+        let recovery = standing
+            .application
+            .snapshot()
+            .map_err(|error| WorkbenchError::Owner(error.to_string()))?;
+        let boundary = standing
+            .boundary
+            .clone()
+            .ok_or_else(|| WorkbenchError::MissingBoundary(session.to_owned()))?;
+        let entry = self
             .sessions
             .remove(session)
-            .ok_or_else(|| WorkbenchError::MissingSession(session.to_owned()))?;
-        let boundary = entry
-            .boundary
-            .take()
-            .ok_or_else(|| WorkbenchError::MissingBoundary(session.to_owned()))?;
-        let (application, receipt) = entry
-            .application
-            .decline(&boundary)
-            .map_err(|error| WorkbenchError::Owner(error.to_string()))?;
-        self.sessions.insert(
-            session.to_owned(),
-            SessionEntry {
-                application,
-                boundary: None,
-                bounded_demo: entry.bounded_demo,
-            },
-        );
-        Ok(vec![self.event(
-            EventLevel::Consequence,
-            format!("athena/{session}/decline"),
-            "declined the current boundary without changing morphology",
-            Some(to_value(&receipt)?),
-        )])
+            .expect("session and boundary checked before ownership transfer");
+        match entry.application.decline(&boundary) {
+            Ok((application, receipt)) => {
+                self.sessions.insert(
+                    session.to_owned(),
+                    SessionEntry {
+                        application,
+                        boundary: None,
+                        bounded_demo: entry.bounded_demo,
+                    },
+                );
+                Ok(vec![self.event(
+                    EventLevel::Consequence,
+                    format!("athena/{session}/decline"),
+                    "declined the current boundary without changing morphology",
+                    Some(to_value(&receipt)?),
+                )])
+            }
+            Err(error) => {
+                let application = AthenaAlphaApplication::remount(recovery)
+                    .map_err(|restore| WorkbenchError::Owner(restore.to_string()))?;
+                self.sessions.insert(
+                    session.to_owned(),
+                    SessionEntry {
+                        application,
+                        boundary: Some(boundary),
+                        bounded_demo: entry.bounded_demo,
+                    },
+                );
+                Err(WorkbenchError::Owner(error.to_string()))
+            }
+        }
     }
 
     fn athena_diffuse_demo(
@@ -769,15 +765,51 @@ impl WorkbenchRuntime {
                 "diffusion returned another event species".to_owned(),
             ));
         };
+        let nonzero_currents = boundary
+            .receipt
+            .currents
+            .iter()
+            .filter(|current| !current.current.is_zero())
+            .count();
+        let certificate = &boundary.receipt.transfer.certificate;
         Ok(vec![self.event(
             EventLevel::Consequence,
             format!("athena/{session}/diffusion"),
             format!(
-                "diffused {} current branch(es) with conservation residual {}",
+                "closed unit-law diffusion probe returned {nonzero_currents}/{} nonzero branch current(s); session state unchanged",
                 boundary.receipt.currents.len(),
-                boundary.receipt.conservation_residual
             ),
-            Some(to_value(&event)?),
+            Some(json!({
+                "view": {
+                    "kind": "closed-unit-diffusion-probe",
+                    "session_state_changed": false,
+                    "generation": boundary.generation,
+                    "law": {
+                        "capacity": "unit at every native state",
+                        "conductance": "unit at every incidence occurrence",
+                        "source": "none",
+                        "initial_standing": "unit content at the first native state",
+                    },
+                    "topology": {
+                        "native_nodes": boundary.native_to_node.len(),
+                        "incidence_branches": boundary.receipt.currents.len(),
+                        "nonzero_currents": nonzero_currents,
+                        "boundary_nodes": certificate.boundary.len(),
+                        "interior_nodes": certificate.interior.len(),
+                    },
+                    "interval": boundary.ingress.interval,
+                    "receiver": boundary.emission.receiver,
+                    "total_before": boundary.receipt.total_before,
+                    "total_source": boundary.receipt.total_source,
+                    "total_after": boundary.receipt.total_after,
+                    "conservation_residual": boundary.receipt.conservation_residual,
+                    "stored_energy_before": boundary.receipt.stored_energy_before,
+                    "stored_energy_after": boundary.receipt.stored_energy_after,
+                    "energy_departed": boundary.receipt.energy_departed,
+                    "factorization_reused": boundary.receipt.transfer.reused_factorization,
+                },
+                "exact": event,
+            })),
         )])
     }
 
@@ -1018,18 +1050,51 @@ mod tests {
             },
         );
         assert!(committed[0].summary.contains("generation 1"));
-        assert_eq!(
-            command(
-                &mut runtime,
-                AthenaCommand::DiffuseDemo {
-                    session: "alpha".to_owned(),
-                    occurrence: 200,
-                    interval: "1".to_owned(),
-                }
-            )[0]
-            .level,
-            EventLevel::Consequence
+        let before_diffusion = runtime
+            .session("alpha")
+            .expect("session")
+            .application
+            .snapshot()
+            .expect("snapshot")
+            .canonical_bytes()
+            .expect("snapshot wire");
+        let diffusion = command(
+            &mut runtime,
+            AthenaCommand::DiffuseDemo {
+                session: "alpha".to_owned(),
+                occurrence: 200,
+                interval: "1".to_owned(),
+            },
         );
+        assert_eq!(diffusion[0].level, EventLevel::Consequence);
+        let view = &diffusion[0].payload.as_ref().expect("diffusion payload")["view"];
+        assert_eq!(view["kind"], "closed-unit-diffusion-probe");
+        assert_eq!(view["session_state_changed"], false);
+        assert_eq!(view["topology"]["native_nodes"], 5);
+        assert_eq!(view["topology"]["incidence_branches"], 4);
+        assert_eq!(view["topology"]["nonzero_currents"], 3);
+        assert_eq!(
+            view["total_before"],
+            serde_json::json!([[1, [1]], [1, [1]]])
+        );
+        assert_eq!(view["total_after"], serde_json::json!([[1, [1]], [1, [1]]]));
+        assert_eq!(
+            view["conservation_residual"],
+            serde_json::json!([[0, []], [1, [1]]])
+        );
+        assert!(
+            crate::presentation::summary(&diffusion[0]).contains("Session state         unchanged")
+        );
+        assert!(crate::presentation::structure(&diffusion[0]).contains("NODE BALANCES"));
+        let after_diffusion = runtime
+            .session("alpha")
+            .expect("session")
+            .application
+            .snapshot()
+            .expect("snapshot")
+            .canonical_bytes()
+            .expect("snapshot wire");
+        assert_eq!(after_diffusion, before_diffusion);
         assert_eq!(
             command(
                 &mut runtime,
@@ -1082,6 +1147,7 @@ mod tests {
             .level,
             EventLevel::Obstruction
         );
+        assert!(runtime.session_names().is_empty());
         command(
             &mut runtime,
             AthenaCommand::DemoOpen {
@@ -1106,6 +1172,43 @@ mod tests {
                     session: "alpha".to_owned(),
                     occurrence: 100,
                     boundary: 200,
+                    real: "1".to_owned(),
+                    imaginary: "0".to_owned(),
+                    storage: "1".to_owned(),
+                }
+            )[0]
+            .level,
+            EventLevel::Obstruction
+        );
+        assert_eq!(runtime.session_names(), vec!["alpha"]);
+        assert_eq!(
+            command(
+                &mut runtime,
+                AthenaCommand::Decline {
+                    session: "alpha".to_owned(),
+                }
+            )[0]
+            .level,
+            EventLevel::Obstruction
+        );
+        assert_eq!(runtime.session_names(), vec!["alpha"]);
+        assert_eq!(
+            command(
+                &mut runtime,
+                AthenaCommand::Inspect {
+                    session: "alpha".to_owned(),
+                }
+            )[0]
+            .level,
+            EventLevel::Information
+        );
+        assert_eq!(
+            command(
+                &mut runtime,
+                AthenaCommand::Return {
+                    session: "alpha".to_owned(),
+                    occurrence: 100,
+                    boundary: 200,
                     real: "not-rational".to_owned(),
                     imaginary: "0".to_owned(),
                     storage: "1".to_owned(),
@@ -1114,5 +1217,6 @@ mod tests {
             .level,
             EventLevel::Obstruction
         );
+        assert_eq!(runtime.session_names(), vec!["alpha"]);
     }
 }

@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 #[serde(tag = "domain", content = "command", rename_all = "kebab-case")]
 pub enum WorkbenchCommand {
     Demo,
-    Discover { root: Option<PathBuf> },
     Status,
     Capabilities,
     Athena(AthenaCommand),

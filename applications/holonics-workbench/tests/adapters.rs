@@ -99,7 +99,6 @@ fn eros_soulkiller_engine_and_cli_return_shared_structured_events() {
         "engine",
         "capabilities",
         "demo",
-        "discover",
         "run",
         "tui",
     ] {
@@ -173,6 +172,24 @@ fn cli_shorthand_and_structured_stdin_share_one_response_envelope() {
     assert!(demo.status.success());
     let demo: WorkbenchResponse = serde_json::from_slice(&demo.stdout).expect("demo response");
     assert!(demo.events.len() >= 5);
+
+    let human_demo = Command::new(binary)
+        .arg("demo")
+        .output()
+        .expect("human demo");
+    assert!(human_demo.status.success());
+    let human_demo = String::from_utf8(human_demo.stdout).expect("human demo UTF-8");
+    assert!(human_demo.contains("MORPHOLOGY"));
+    assert!(!human_demo.contains("\"anatomy\""));
+
+    let noninteractive = Command::new(binary)
+        .stdin(Stdio::null())
+        .output()
+        .expect("noninteractive no-command control");
+    assert_eq!(noninteractive.status.code(), Some(2));
+    assert!(String::from_utf8_lossy(&noninteractive.stdout)
+        .contains("TUI requires an interactive terminal"));
+    assert!(!String::from_utf8_lossy(&noninteractive.stderr).contains("panicked"));
 }
 
 #[test]

@@ -42,7 +42,7 @@ pub fn capabilities() -> AdapterReturn {
         summary: "returned the callable workbench surface and explicit open fibres".to_owned(),
         payload: Some(json!({
             "implemented": {
-                "workbench": ["demo", "discover", "structured-request", "resource-browser", "context-actions"],
+                "workbench": ["demo", "structured-request", "session-lifecycle", "typed-receipts"],
                 "athena": ["demo-open", "open", "inspect", "conduct", "continue", "return", "decline", "diffuse-demo", "snapshot", "export"],
                 "eros": ["mouth", "atlas"],
                 "soulkiller": ["inspect", "config", "index", "onnx"],

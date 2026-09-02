@@ -9,7 +9,7 @@ pub fn run_tui() -> std::io::Result<()> {
         let mut app = WorkbenchTui::new();
         while !app.should_quit() {
             app.poll_operation();
-            terminal.draw(|frame| render(frame, &app))?;
+            terminal.draw(|frame| render(frame, &mut app))?;
             if event::poll(Duration::from_millis(100))? {
                 if let Event::Key(key) = event::read()? {
                     app.handle_key(key);

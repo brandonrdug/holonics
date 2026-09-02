@@ -19,8 +19,8 @@ operator selection -> context-valid action -> WorkbenchCommand
 ```
 
 The CLI parses direct arguments or a versioned `WorkbenchRequest` into `WorkbenchCommand`. The
-Ratatui terminal UI derives selectable actions from the selected filesystem resource or live
-session, then submits the same command values and renders the same event values. Neither
+Ratatui terminal UI derives selectable actions from the active mode and live session, then submits
+the same command values and renders typed receiver projections over the same event values. Neither
 presentation shells to the other, invokes historical examples as implementation, or carries hidden
 inference logic. Raw command syntax is not a TUI interaction model.
 
@@ -58,7 +58,6 @@ runtime refusal retain the same response shape and differ by exit code.
 status
 capabilities
 demo
-discover [ROOT]
 run REQUEST|-
 
 athena demo-open SESSION
@@ -125,25 +124,29 @@ plausible output.
 [definition] One-shot CLI invocations are naturally stateless. Long-lived multi-step Athena
 interaction is available in the TUI, or through explicit snapshot/open commands across invocations.
 
-## 4. Ratatui guided terminal interface
+## 4. Ratatui session and receipt instrument
 
 [definition] Ratatui 0.30.2 is an immediate-mode renderer. Crossterm supplies terminal events. The
-TUI owns only presentation and ephemeral discovery state:
+TUI owns only presentation, forms, scroll position, selected session/event, and transient operation
+state:
 
 ```text
-top      current directory and active sessions
-left     guided start, live sessions, directories, and recognized resources
-center   only actions valid for the selected resource/session state
-right    selected resource/action/event exact detail
-bottom   returned event chronology, operation state, and key help.
+top      functional Athena/Eros/Soulkiller/Engine modes, current session, and circulation stage
+main     typed Summary/Structure/Exact receiver projection over the selected event
+right    grouped actions valid for the active mode and live session state
+bottom   causal return timeline, operation state, and contextual key help.
 ```
 
-[definition] Folder traversal, workspace/home roots, recognized artifact filtering, session
-selection, selectable ingress/receiver pairs, every actual-successor choice, an exact returned-
-interaction form, and non-overwriting artifact destinations remove path and parameter
-transcription. `Enter` opens or executes, `Tab`/arrows move
-focus, `Backspace` ascends, `w`/`h` move to known roots, and `d` runs the complete bounded demo.
-Terminal restoration occurs on ordinary exit and error.
+[definition] No filesystem listing, generic discovery scan, or standing resource browser enters the
+primary surface. A path is an exact typed field inside the Eros, Soulkiller, package, open, or export
+operation that requires it. Session selection, selectable ingress/receiver pairs, every actual
+successor, exact-return forms, and non-overwriting destinations remain available without creating a
+second repository navigator.
+
+[definition] Summary is a compact domain consequence. Structure renders founded relations, exact
+tables, currents, balances, and morphology anatomy. Exact is the complete cold serialized payload.
+Each projection has its own scroll position and visible scrollbar; changing its scroll never changes
+the selected causal event. Human CLI output uses Summary rather than dumping JSON.
 
 [definition] A potentially slow operation temporarily owns the one `WorkbenchRuntime` on a worker
 thread. Rendering and inspection continue; a second mutation is refused until ownership returns.
@@ -244,7 +247,7 @@ replicable files (38.8 GiB); root `output/` was absent. Its receipt is
 
 ## 6. Scope
 
-[definition] WB0--WB5 build operator convenience only. They do not widen Athena capability,
+[definition] WB0--WB6 build operator convenience only. They do not widen Athena capability,
 complete unrestricted Soulkiller dismantling, refound Eros, add a general engine plugin registry,
 schedule UI/web work, or promote a qualitative output. A callable owner absent from this first
 surface remains an explicit future application extension, not a missing engine organ.
@@ -271,3 +274,26 @@ responsive runtime ownership, event-v2 codes, and versioned request/response I/O
 tests and the real installed CLI/TUI deeds passed; the coherent release returned all nine gates.
 Its receipt is
 [`../../research/records/2026-09-01_WB5_WORKBENCH_RETURNED_GUIDED_RESOURCES_CONTEXT_ACTIONS_AND_STANDARD_IO.md`](../../research/records/2026-09-01_WB5_WORKBENCH_RETURNED_GUIDED_RESOURCES_CONTEXT_ACTIONS_AND_STANDARD_IO.md).
+
+[established-bounded; source-inspected; process-audit] WB5's typed command/event/runtime mechanisms
+retain their grades. Its interpretation as a convenient finished TUI does not: direct screenshot
+review found the generic file explorer compositionally dominant, raw JSON semantically unrendered,
+detail output unreachable below the viewport, and the diffusion summary materially incomplete.
+WB6 corrects those application claims without demoting the exact underlying owners.
+
+### WB6 — session-first typed receipt correction
+
+[definition] Delete the generic discovery subsystem and permanent file explorer. Recompose the TUI
+around functional operation modes, current Athena session and lifecycle, grouped valid actions,
+causal event selection, independently scrollable Summary/Structure/Exact views, typed domain
+receipt renderers, and responsive height/width behavior. Reclassify the current diffusion action as
+a closed non-mutating unit-law probe and return its law, topology, nonzero currents, balances,
+standing transport, energy, and state effect before its exact wire.
+
+**Pass WB6:** [definition] no generic discovery command/module or filesystem pane remains; Summary
+is the default and raw JSON is secondary; selected event and detail scroll are independent;
+Page/arrow/Home/End navigation and scrollbars return; diffusion says session unchanged and
+distinguishes total branches from nonzero current; Structure renders exact rational current and
+node-balance tables; functional mode switches expose Athena/Eros/Soulkiller/Engine operations;
+80x28, 120x36, and 180x48 controls pass without a filesystem surface; real wide and narrow terminal
+deeds return and restore; and the coherent release passes.

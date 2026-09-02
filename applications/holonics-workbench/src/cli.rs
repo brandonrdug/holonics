@@ -24,10 +24,6 @@ pub enum CliCommand {
     Tui,
     /// Run the complete bounded Athena demonstration without required parameters.
     Demo,
-    /// Discover actionable source, model, snapshot, package, and ONNX resources.
-    Discover {
-        root: Option<PathBuf>,
-    },
     /// Execute one versioned Workbench request from a JSON file or standard input (`-`).
     Run {
         #[arg(default_value = "-")]
@@ -185,9 +181,6 @@ impl Cli {
         let (tui, command, request_input) = match self.command {
             None | Some(CliCommand::Tui) => (true, None, None),
             Some(CliCommand::Demo) => (false, Some(WorkbenchCommand::Demo), None),
-            Some(CliCommand::Discover { root }) => {
-                (false, Some(WorkbenchCommand::Discover { root }), None)
-            }
             Some(CliCommand::Run { input }) => (false, None, Some(input)),
             Some(CliCommand::Status) => (false, Some(WorkbenchCommand::Status), None),
             Some(CliCommand::Capabilities) => (false, Some(WorkbenchCommand::Capabilities), None),

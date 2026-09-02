@@ -10,7 +10,6 @@ use life::material_incidence::{
 use serde_json::json;
 
 use crate::adapters::AdapterReturn;
-use crate::discovery::dominant_source_extension;
 use crate::runtime::WorkbenchError;
 use crate::ErosCommand;
 
@@ -263,4 +262,54 @@ fn atlas_of(root: &Path, extension: &str, budget: usize) -> Result<MaterialAtlas
                 .map_err(|error| WorkbenchError::Owner(format!("{error:?}")))
         }
     }
+}
+
+fn dominant_source_extension(root: &Path) -> Result<String, WorkbenchError> {
+    let mut counts = BTreeMap::<&'static str, usize>::new();
+    let mut pending = vec![root.to_path_buf()];
+    let mut visited = 0usize;
+    while let Some(directory) = pending.pop() {
+        let listing = fs::read_dir(&directory).map_err(|error| WorkbenchError::Io {
+            path: directory.clone(),
+            reason: error.to_string(),
+        })?;
+        for entry in listing.flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                let hidden = path
+                    .file_name()
+                    .and_then(|name| name.to_str())
+                    .is_some_and(|name| {
+                        name.starts_with('.')
+                            || matches!(name, "target" | "output" | "node_modules")
+                    });
+                if !hidden {
+                    pending.push(path);
+                }
+            } else {
+                visited = visited.saturating_add(1);
+                if visited > 20_000 {
+                    break;
+                }
+                if let Some(extension) = match path.extension().and_then(|value| value.to_str()) {
+                    Some("rs") => Some("rs"),
+                    Some("lean") => Some("lean"),
+                    Some("md") => Some("md"),
+                    _ => None,
+                } {
+                    *counts.entry(extension).or_default() += 1;
+                }
+            }
+        }
+    }
+    counts
+        .into_iter()
+        .max_by_key(|(_, count)| *count)
+        .map(|(extension, _)| extension.to_owned())
+        .ok_or_else(|| {
+            WorkbenchError::Owner(format!(
+                "no Rust, Lean, or Markdown source material under {}",
+                root.display()
+            ))
+        })
 }

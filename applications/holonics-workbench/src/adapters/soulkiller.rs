@@ -4,26 +4,31 @@ use holonic_engine::native_ecology::holonic_intelligence::{
 use serde_json::json;
 
 use crate::adapters::AdapterReturn;
-use crate::discovery::{classify_file, WorkbenchResourceKind};
 use crate::runtime::WorkbenchError;
 use crate::store;
 use crate::SoulkillerCommand;
 
 pub fn execute(command: SoulkillerCommand) -> Result<AdapterReturn, WorkbenchError> {
     match command {
-        SoulkillerCommand::Inspect { path } => match classify_file(&path) {
-            Some(WorkbenchResourceKind::ModelConfiguration) => {
-                execute(SoulkillerCommand::Config { path })
-            }
-            Some(WorkbenchResourceKind::ShardedWeightIndex) => {
+        SoulkillerCommand::Inspect { path } => {
+            let name = path
+                .file_name()
+                .and_then(|name| name.to_str())
+                .unwrap_or_default()
+                .to_lowercase();
+            if name.ends_with(".safetensors.index.json") {
                 execute(SoulkillerCommand::Index { path })
+            } else if name.ends_with(".onnx") {
+                execute(SoulkillerCommand::Onnx { path })
+            } else if name == "config.json" || name.ends_with(".config.json") {
+                execute(SoulkillerCommand::Config { path })
+            } else {
+                Err(WorkbenchError::Owner(format!(
+                    "{} is not a configuration, Safetensors index, or ONNX chart",
+                    path.display()
+                )))
             }
-            Some(WorkbenchResourceKind::Onnx) => execute(SoulkillerCommand::Onnx { path }),
-            other => Err(WorkbenchError::Owner(format!(
-                "{} is not a recognized Soulkiller configuration, shard index, or ONNX chart ({other:?})",
-                path.display()
-            ))),
-        },
+        }
         SoulkillerCommand::Config { path } => {
             let raw = store::read(&path)?;
             let chart = ForeignConfigurationChart::read(path.display().to_string(), raw)

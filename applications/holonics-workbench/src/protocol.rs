@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 
 use crate::{EventLevel, WorkbenchCommand, WorkbenchEvent};
 
-pub const WORKBENCH_REQUEST_SCHEMA: &str = "org.holonics.workbench.request.v1";
-pub const WORKBENCH_RESPONSE_SCHEMA: &str = "org.holonics.workbench.response.v1";
+pub const WORKBENCH_REQUEST_SCHEMA: &str = "org.holonics.workbench.request.v2";
+pub const WORKBENCH_RESPONSE_SCHEMA: &str = "org.holonics.workbench.response.v2";
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

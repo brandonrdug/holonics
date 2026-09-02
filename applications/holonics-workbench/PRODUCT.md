@@ -13,7 +13,7 @@ filesystem paths, session addresses, or demo fixtures in order to inspect and ex
 ## Product Purpose
 
 Holonics Workbench makes the existing Athena, Eros, Soulkiller, and Holonic Engine surfaces easy to
-discover, configure, run, compare, and inspect. Success means the terminal application removes
+configure, run, compare, and inspect. Success means the terminal application removes
 repetitive typing and parameter lookup, maintains useful working context, proposes valid choices
 from live repository and runtime state, and returns uniform inspectable receipts. The CLI remains a
 scriptable projection of the same operations rather than the interaction model imposed on the TUI.
@@ -34,11 +34,13 @@ dense where the information is useful, quiet where it is not, and explicit about
 
 ## Design Principles
 
-1. Start from things the application can discover, then offer operations valid for the selection.
+1. Start from the active holonic session and its returned causal state; request paths only inside a
+   named operation that genuinely needs one.
 2. Prefer selection, defaults, history, and completion over memorized syntax.
 3. Keep exact values visible and editable without making raw syntax the primary interaction.
 4. Return one consistent event/receipt envelope across CLI, TUI, success, refusal, and long work.
-5. Make the first useful deed executable immediately from an empty state.
+5. Make the first useful deed executable immediately from an empty state, then present its domain
+   consequence before its serialized wire.
 
 ## Accessibility & Inclusion
 
