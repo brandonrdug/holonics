@@ -52,9 +52,11 @@ theorem eq_of_codiscreteWithin {f g : ℂ → ℂ} {U : Set ℂ} (hU : IsOpen U)
     (hg.tendsto.mono_left nhdsWithin_le_nhds) hev
 
 /-- **Existence of the zero factorization** for an entire function not vanishing at the
-centre. -/
-theorem exists_zeroFactorization {f : ℂ → ℂ} (hf : Differentiable ℂ f) {z₀ : ℂ} {r : ℝ}
-    (hr : 0 < r) (hf₀ : f z₀ ≠ 0) : Nonempty (ZeroFactorization f z₀ r) := by
+centre, with the total multiplicity equal to the divisor mass of the closed half disc. -/
+theorem exists_zeroFactorization_count {f : ℂ → ℂ} (hf : Differentiable ℂ f) {z₀ : ℂ} {r : ℝ}
+    (hr : 0 < r) (hf₀ : f z₀ ≠ 0) :
+    ∃ Z : ZeroFactorization f z₀ r,
+      (Z.count : ℤ) = ∑ᶠ u, MeromorphicOn.divisor f (closedBall z₀ (r / 2)) u := by
   classical
   set U : Set ℂ := ball z₀ r with hUdef
   have hUo : IsOpen U := isOpen_ball
@@ -115,7 +117,7 @@ theorem exists_zeroFactorization {f : ℂ → ℂ} (hf : Differentiable ℂ f) {
             mult_pos := ?_
             unit_diff := ?_
             unit_ne := ?_
-            factor := ?_ }⟩
+            factor := ?_ }, ?_⟩
   · intro ρ hρ
     exact (Finset.mem_filter.mp hρ).2
   · intro ρ hρ
@@ -142,5 +144,34 @@ theorem exists_zeroFactorization {f : ℂ → ℂ} (hf : Differentiable ℂ f) {
   · intro z hz
     rw [hpt z hz, ← Finset.prod_filter_mul_prod_filter_not S (fun ρ => ρ ∈ closedBall z₀ (r / 2))]
     ring
+  · -- the count is the divisor mass of the closed half disc
+    set D' := MeromorphicOn.divisor f (closedBall z₀ (r / 2)) with hD'def
+    have hmer' : MeromorphicOn f (closedBall z₀ (r / 2)) :=
+      fun u _ => (hf.analyticAt u).meromorphicAt
+    have hsub : closedBall z₀ (r / 2) ⊆ U := closedBall_subset_ball (by linarith)
+    have hagree : ∀ u ∈ closedBall z₀ (r / 2), D' u = D u := by
+      intro u hu
+      rw [hD'def, hDdef, MeromorphicOn.divisor_apply hmer' hu,
+        MeromorphicOn.divisor_apply hmer (hsub hu)]
+    have hsupp : Function.support D' ⊆ ↑(S.filter (fun ρ => ρ ∈ closedBall z₀ (r / 2))) := by
+      intro u hu
+      rw [Function.mem_support] at hu
+      have huC : u ∈ closedBall z₀ (r / 2) := D'.supportWithinDomain hu
+      rw [Finset.mem_coe, Finset.mem_filter, hSdef, Set.Finite.mem_toFinset, Function.mem_support]
+      refine ⟨?_, huC⟩
+      rw [← hagree u huC]
+      exact hu
+    show ((∑ ρ ∈ S.filter (fun ρ => ρ ∈ closedBall z₀ (r / 2)), (D ρ).toNat : ℕ) : ℤ) =
+      ∑ᶠ u, D' u
+    rw [finsum_eq_sum_of_support_subset D' hsupp, Nat.cast_sum]
+    apply Finset.sum_congr rfl
+    intro ρ hρ
+    rw [hagree ρ (Finset.mem_filter.mp hρ).2, Int.toNat_of_nonneg (hDnn ρ)]
+
+/-- **Existence of the zero factorization** for an entire function not vanishing at the
+centre. -/
+theorem exists_zeroFactorization {f : ℂ → ℂ} (hf : Differentiable ℂ f) {z₀ : ℂ} {r : ℝ}
+    (hr : 0 < r) (hf₀ : f z₀ ≠ 0) : Nonempty (ZeroFactorization f z₀ r) :=
+  ⟨(exists_zeroFactorization_count hf hr hf₀).choose⟩
 
 end Soma.Holonics.RH.ZeroFactorizationExists
