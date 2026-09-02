@@ -10,16 +10,16 @@ grades.
 
 ## Current frontier
 
-**Current frontier:** AAC5
+**Current frontier:** AAC6
 
-**AAC0--AAC4 PASSED. AAC5 IS ACTIVE. AAC6 FOLLOWS ONLY AFTER AAC5 PASSES.**
+**AAC0--AAC5 PASSED. AAC6 IS THE ACTIVE TERMINAL RELEASE DEED.**
 
 [definition] Brandon's direct request of 2026-09-01 founds the active contract
 [`blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](blueprint/THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).
 AAC0 returned the formal laws. AAC1 returned the move-owned session. AAC2 returned parented
 successive local commits and storage. AAC3 returned exact diffusion through the common event
 family. AAC4 returned the opaque stable exterior ABI. AAC5 now owns only the first Athena-alpha
-application package.
+application package and returned it. AAC6 now owns only the exact matrix and coherent release.
 
 [proved-derived; formal-checked; measured] AAC0 returned `LiveCirculationSession`, one common
 owned boundary, parented commit and decline, exact snapshot/remount conduct, and constituted
@@ -49,6 +49,13 @@ versioned length-delimited ABI, recoverable commit/decline mutations, open/remou
 continue, return, commit, decline, snapshot, diffusion, close, direct equality, and invalid-handle
 refusal. Three focused tests passed. The receipt is
 [`research/records/2026-09-01_AAC4_OPAQUE_VERSIONED_CIRCULATION_ABI_RETURNED_DIRECT_AND_DIFFUSIVE_EQUALITY.md`](research/records/2026-09-01_AAC4_OPAQUE_VERSIONED_CIRCULATION_ABI_RETURNED_DIRECT_AND_DIFFUSIVE_EQUALITY.md).
+
+[established-bounded; implemented-exact; source-inspected; measured] AAC5 returned one independent
+thin Athena-alpha application. It conducted generation 0, committed a genuinely later two-state
+local return, conducted generation 1, snapshotted/remounted, and returned a 12,588-octet package
+with one commit and one reconstruction fibre. No foreign executor or qualitative gate entered the
+runtime. The receipt is
+[`research/records/2026-09-01_AAC5_FIRST_ATHENA_ALPHA_APPLICATION_COMMITTED_REMOUNTED_AND_CONDUCTED.md`](research/records/2026-09-01_AAC5_FIRST_ATHENA_ALPHA_APPLICATION_COMMITTED_REMOUNTED_AND_CONDUCTED.md).
 
 ## Admitted standing
 

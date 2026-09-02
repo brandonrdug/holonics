@@ -80,7 +80,7 @@ test result never upgrades a correspondence.
 
 | Relation | Lean owner | Rust owner | ABI/application owner | Status and exact open fibre |
 |---|---|---|---|---|
-| Live session, parented commit, decline, snapshot/remount, and diffusive boundary | `Computation/HolonicCirculationSession.lean` | `native_intelligence/{circulation_session,morphology_commit,circulation_diffusion,scaffold_cultivation,morphology_package}.rs` over `diffusion.rs` | `soma/circulation-abi`; AAC5 application open | **exact-bounded API/ABI lifecycle:** move-owned session, complete futures, actual continuation, decline, successive commits, snapshot/remount, withdrawal/replay, exact diffusion, opaque handles, recoverable refusal, and direct/ABI equality return. The named Athena application remains AAC5. |
+| Live session, parented commit, decline, snapshot/remount, and diffusive boundary | `Computation/HolonicCirculationSession.lean` | `native_intelligence/{circulation_session,morphology_commit,circulation_diffusion,scaffold_cultivation,morphology_package}.rs` over `diffusion.rs` | `soma/circulation-abi`; `applications/athena-alpha` | **exact-bounded API/ABI/application lifecycle:** the neutral API/ABI return the complete dynamic lifecycle; the thin Athena application admits native/Soulkiller packages, commits a later local return, conducts the child, snapshots, remounts, and retains source-neutral runtime. Broader qualitative capability remains open. |
 
 ## Deprecated R0Q correspondence retained as standing
 

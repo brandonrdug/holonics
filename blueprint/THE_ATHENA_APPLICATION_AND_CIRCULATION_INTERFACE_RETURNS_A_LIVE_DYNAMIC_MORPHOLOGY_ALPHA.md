@@ -3,7 +3,7 @@
 **Date:** 2026-09-01
 **Kind:** active construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
-**Current frontier:** AAC5.
+**Current frontier:** AAC6.
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md),
@@ -287,7 +287,7 @@ for conduct, continuation and diffusion, complete dynamic lifecycle, invalid-han
 exported allocation/free controls. Three focused tests passed. Its receipt is
 [`../research/records/2026-09-01_AAC4_OPAQUE_VERSIONED_CIRCULATION_ABI_RETURNED_DIRECT_AND_DIFFUSIVE_EQUALITY.md`](../research/records/2026-09-01_AAC4_OPAQUE_VERSIONED_CIRCULATION_ABI_RETURNED_DIRECT_AND_DIFFUSIVE_EQUALITY.md).
 
-### AAC5 — first Athena-alpha application package
+### AAC5 — first Athena-alpha application package — PASSED
 
 [definition] Add the independent application crate, configurations, thin executable entries, and
 exact experiment apparatus. It may begin from a direct native origin or a Soulkiller-derived
@@ -297,6 +297,13 @@ package; both enter the same neutral API.
 artifact handling, and receiver inspection; no example-local routing/scoring/morphology exists;
 the named Athena product is source-neutral at runtime; and one application process returns a
 parented, resumable, dynamically cultivated package.
+
+[established-bounded; implemented-exact; source-inspected; measured] AAC5 returned the independent
+Athena-alpha crate, thin application ports, base exterior configuration, Soulkiller/native package
+admission, one generation-0 emission, genuinely later local commit, generation-1 later conduct,
+snapshot/remount, and one inspected structural receipt. The real deed returned exit `0`. Its receipt
+is
+[`../research/records/2026-09-01_AAC5_FIRST_ATHENA_ALPHA_APPLICATION_COMMITTED_REMOUNTED_AND_CONDUCTED.md`](../research/records/2026-09-01_AAC5_FIRST_ATHENA_ALPHA_APPLICATION_COMMITTED_REMOUNTED_AND_CONDUCTED.md).
 
 ### AAC6 — exact alpha matrix and coherent release
 

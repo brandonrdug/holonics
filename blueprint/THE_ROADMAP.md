@@ -424,7 +424,7 @@ relations; it does not demote the exact SCF handoff/circulation/withdrawal mecha
 
 ## Active campaign — Athena Application and Circulation Interface
 
-**Current frontier:** AAC5
+**Current frontier:** AAC6
 
 **AAC0--AAC6 ARE ACTIVE IN THE ORDER BELOW.**
 
@@ -464,8 +464,14 @@ close, recoverable refusal, direct equality, and exact exported allocation/free.
 tests passed. Its receipt is
 [`research/records/2026-09-01_AAC4_OPAQUE_VERSIONED_CIRCULATION_ABI_RETURNED_DIRECT_AND_DIFFUSIVE_EQUALITY.md`](../research/records/2026-09-01_AAC4_OPAQUE_VERSIONED_CIRCULATION_ABI_RETURNED_DIRECT_AND_DIFFUSIVE_EQUALITY.md).
 
-[definition] The current deed is AAC5 only: construct the first independent Athena-alpha
-application package over the neutral API/ABI. The exact release remains AAC6.
+[established-bounded; implemented-exact; source-inspected; measured] AAC5 passed. The independent
+Athena-alpha crate admitted a source-neutral productive scaffold, conducted generation 0, committed
+a genuinely later local return, conducted generation 1, snapshotted, remounted, and emitted one
+exact structural receipt without foreign execution or qualitative grading. Its receipt is
+[`research/records/2026-09-01_AAC5_FIRST_ATHENA_ALPHA_APPLICATION_COMMITTED_REMOUNTED_AND_CONDUCTED.md`](../research/records/2026-09-01_AAC5_FIRST_ATHENA_ALPHA_APPLICATION_COMMITTED_REMOUNTED_AND_CONDUCTED.md).
+
+[definition] The current and terminal deed is AAC6 only: run the exact alpha matrix and one coherent
+release, close the catalog/authority/evidence, push clean Git, and remove reproducible output.
 
 [definition] The complete order is:
 

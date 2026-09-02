@@ -17,6 +17,7 @@
 [workspace]
 resolver = "2"
 members = [
+  "applications/athena-alpha",
   "crates/holonic-structure",
   "crates/holonic-language",
   "crates/relational-geometry",

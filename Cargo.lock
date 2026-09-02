@@ -62,6 +62,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "athena-alpha"
+version = "0.1.0"
+dependencies = [
+ "holonic-engine",
+ "life",
+ "num-rational",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.19",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
