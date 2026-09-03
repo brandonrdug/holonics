@@ -28,40 +28,39 @@ use holonic_engine::{
     OccurrencePort,
 };
 use num_rational::BigRational as Rat;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use thiserror::Error;
 
 use super::NativeEcologyRest;
 
 /// One exact exterior current returning through a particular emitted native section.
 /// The native successor current is derived from this interaction and the standing local current.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ReturnedScaffoldInteraction {
-    pub emitted: NativeEmissionAddress,
-    pub occurrence: EventId,
-    pub emitting_boundary: BoundaryId,
-    pub exterior_current: ExactComplexWaveCurrent,
-    pub storage: Rat,
-    pub contact_support: BTreeSet<NativeStateId>,
+    pub(crate) emitted: NativeEmissionAddress,
+    pub(crate) occurrence: EventId,
+    pub(crate) emitting_boundary: BoundaryId,
+    pub(crate) exterior_current: ExactComplexWaveCurrent,
+    pub(crate) storage: Rat,
+    pub(crate) contact_support: BTreeSet<NativeStateId>,
 }
 
 impl ReturnedScaffoldInteraction {
-    pub fn found(
+    pub(crate) fn constituted(
         emitted: NativeEmissionAddress,
         occurrence: EventId,
         emitting_boundary: BoundaryId,
         exterior_current: ExactComplexWaveCurrent,
         storage: Rat,
-        additional_contact_support: BTreeSet<NativeStateId>,
+        contact_support: BTreeSet<NativeStateId>,
     ) -> Result<Self, ScaffoldCultivationError> {
         if occurrence == emitted.entering_occurrence
             || exterior_current.is_zero()
             || storage == Rat::from_integer(0.into())
+            || contact_support.is_empty()
         {
             return Err(ScaffoldCultivationError::Return);
         }
-        let mut contact_support = BTreeSet::from([emitted.emitted.from, emitted.emitted.to]);
-        contact_support.extend(additional_contact_support);
         Ok(Self {
             emitted,
             occurrence,
@@ -798,8 +797,9 @@ mod tests {
         )
         .expect("emission");
         let emitted = cut.emitted_occurrence().clone();
+        let support = BTreeSet::from([emitted.emitted.from, emitted.emitted.to]);
         drop(cut);
-        let returned = ReturnedScaffoldInteraction::found(
+        let returned = ReturnedScaffoldInteraction::constituted(
             emitted,
             EventId(100),
             BoundaryId(101),
@@ -808,7 +808,7 @@ mod tests {
                 Rat::from_integer(BigInt::from(1)),
             ),
             Rat::from_integer(BigInt::from(1)),
-            BTreeSet::new(),
+            support,
         )
         .expect("world return");
         let cultivated =
@@ -854,7 +854,7 @@ mod tests {
             },
         )
         .expect("emission");
-        let returned = ReturnedScaffoldInteraction::found(
+        let returned = ReturnedScaffoldInteraction::constituted(
             cut.emitted_occurrence().clone(),
             EventId(100),
             BoundaryId(101),

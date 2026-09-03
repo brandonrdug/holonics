@@ -1,7 +1,7 @@
 use holonic_engine::native_ecology::holonic_intelligence::ForeignOnnxChart;
 
 use super::{MorphologyExportArtifact, MorphologyExportError};
-use crate::native_intelligence::{ExportCodecKind, NativeMorphologyPackage};
+use crate::native_intelligence::{ExportCodecKind, NativeMorphologyArtifact};
 
 const DOMAIN: &str = "org.holonics";
 const OPSET: u64 = 1;
@@ -12,20 +12,20 @@ const PACKAGE_TENSOR: &str = "holonics.package.bytes";
 const ANATOMY_TENSOR: &str = "holonics.anatomy.bytes";
 
 pub(super) fn exact(
-    package: &NativeMorphologyPackage,
+    package: &NativeMorphologyArtifact,
 ) -> Result<MorphologyExportArtifact, MorphologyExportError> {
     let package_bytes = package.canonical_bytes()?;
     let anatomy = serde_json::to_vec(&package.manifest.anatomy)
         .map_err(|error| MorphologyExportError::Wire(error.to_string()))?;
     Ok(artifact(model(
-        "RestedMorphology",
+        "NativeHolonMorphology",
         vec![(PACKAGE_TENSOR, package_bytes), (ANATOMY_TENSOR, anatomy)],
         "exact",
     )?))
 }
 
 pub(super) fn anatomy(
-    package: &NativeMorphologyPackage,
+    package: &NativeMorphologyArtifact,
 ) -> Result<MorphologyExportArtifact, MorphologyExportError> {
     let anatomy = serde_json::to_vec(&package.manifest.anatomy)
         .map_err(|error| MorphologyExportError::Wire(error.to_string()))?;
@@ -38,7 +38,7 @@ pub(super) fn anatomy(
 
 pub(super) fn import_exact(
     artifact: &MorphologyExportArtifact,
-) -> Result<NativeMorphologyPackage, MorphologyExportError> {
+) -> Result<NativeMorphologyArtifact, MorphologyExportError> {
     if artifact.media_type != MEDIA_TYPE || artifact.schema_or_opset != SCHEMA {
         return Err(MorphologyExportError::Wire(
             "unknown ONNX morphology schema".to_owned(),
@@ -74,7 +74,7 @@ pub(super) fn import_exact(
         .raw_data
         .clone()
         .ok_or_else(|| MorphologyExportError::Wire("ONNX package data absent".to_owned()))?;
-    NativeMorphologyPackage::read(&chart.raw[range]).map_err(MorphologyExportError::Package)
+    NativeMorphologyArtifact::read(&chart.raw[range]).map_err(MorphologyExportError::Package)
 }
 
 fn artifact(bytes: Vec<u8>) -> MorphologyExportArtifact {

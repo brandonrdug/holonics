@@ -2,23 +2,20 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use athena_alpha::{
-    addressed_ingress, returned_local_interaction, AthenaAlphaApplication, BASE_CONFIGURATION,
-};
+use athena_alpha::{addressed_ingress, AthenaAlphaApplication, BASE_CONFIGURATION};
 use holonic_engine::{
     native_ecology::holonic_intelligence::{
         ExteriorModality, NativeInferenceAddress, NativeInferenceRequest,
     },
     receiver_exact_compression::ReceiverId,
-    BoundaryId, EventId, ExactComplexWaveCurrent,
+    EventId,
 };
 use life::native_intelligence::{
     export_morphology, ExportCodecKind, ExportPurpose, MorphologyExportRequest,
     MorphologyExportReturn, NativeCirculationBoundary, NativeCirculationConfiguration,
     NativeCirculationSnapshot, NativeCultivationCandidate, NativeDeclineReceipt,
-    NativeMorphologyCommit, NativeMorphologyPackage,
+    NativeMorphologyCommit, NativeMorphologyArtifact, NativeWorldFace, NativeWorldStage,
 };
-use num_rational::BigRational as Rat;
 use serde::{Deserialize, Serialize};
 
 use crate::artifact::{ArtifactStore, MANIFEST_FILE};
@@ -259,7 +256,7 @@ impl VariantWorkspace {
         }
         if let Some(current) = &manifest.current {
             let snapshot = read_snapshot(&store, &current.snapshot)?;
-            let package = NativeMorphologyPackage::read(&snapshot.package_wire).map_err(owner)?;
+            let package = NativeMorphologyArtifact::read(&snapshot.package_wire).map_err(owner)?;
             if !package
                 .manifest
                 .receiver_capability
@@ -594,13 +591,12 @@ impl VariantWorkspace {
         )
     }
 
-    pub fn stage_return(
+    pub fn stage_world_return(
         &mut self,
         occurrence: EventId,
-        boundary_address: BoundaryId,
-        current: ExactComplexWaveCurrent,
-        storage: Rat,
-    ) -> Result<WorkspaceReturn<NativeCultivationCandidate>, ApplicationError> {
+        admitted: bool,
+        diagnostic: Vec<u8>,
+    ) -> Result<WorkspaceReturn<NativeWorldStage>, ApplicationError> {
         let (run_reference, mut run) = self.active_run()?;
         if !matches!(run.state, VariantRunState::Boundary { .. }) {
             return Err(ApplicationError::Workspace(
@@ -609,19 +605,26 @@ impl VariantWorkspace {
         }
         self.require_run_predecessor(&run)?;
         let boundary = self.read_boundary(run.current_boundary()?)?;
-        let returned = returned_local_interaction(
-            boundary.emission.address.clone(),
-            occurrence,
-            boundary_address,
-            current,
-            storage,
-            BTreeSet::new(),
-        )
-        .map_err(owner)?;
-        let candidate = self
+        let faces = boundary
+            .issued_world_faces()
+            .into_iter()
+            .map(|issued| {
+                NativeWorldFace::report(
+                    issued.clone(),
+                    admitted,
+                    issued.support().clone(),
+                    diagnostic.clone(),
+                )
+                .map_err(owner)
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let stage = self
             .current_application()?
-            .stage_return(&boundary, returned)
+            .stage_world_return(&boundary, faces, occurrence)
             .map_err(owner)?;
+        let NativeWorldStage::Candidate { candidate, .. } = &stage else {
+            return self.returned(Vec::new(), stage);
+        };
         let candidate_reference = artifact(
             ArtifactKind::Candidate,
             format!("runs/run-{}/candidate.json", run.ordinal),
@@ -638,7 +641,7 @@ impl VariantWorkspace {
             .replace_json(&run_reference.relative_path, &run)?;
         self.returned(
             vec![path, self.store.absolute(&run_reference.relative_path)?],
-            candidate,
+            stage,
         )
     }
 
@@ -789,7 +792,7 @@ impl VariantWorkspace {
         codec: ExportCodecKind,
     ) -> Result<WorkspaceReturn<WorkspaceExportReceipt>, ApplicationError> {
         let snapshot = self.current_snapshot()?;
-        let package = NativeMorphologyPackage::read(&snapshot.package_wire).map_err(owner)?;
+        let package = NativeMorphologyArtifact::read(&snapshot.package_wire).map_err(owner)?;
         let returned = export_morphology(
             &package,
             MorphologyExportRequest {

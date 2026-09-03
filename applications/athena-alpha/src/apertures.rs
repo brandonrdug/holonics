@@ -1,7 +1,7 @@
 use holonic_engine::{
+    EventId,
     native_ecology::holonic_intelligence::{NativeInferenceAddress, NativeInferenceRequest},
     receiver_exact_compression::ReceiverId,
-    EventId,
 };
 
 /// Construct one explicit addressed ingress. No label, surface, or collection position is

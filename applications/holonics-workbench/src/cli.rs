@@ -105,21 +105,16 @@ pub enum WorkspaceCli {
         #[arg(long, default_value = ".", value_name = "PATH")]
         root: PathBuf,
     },
-    /// Persist a genuine exterior return as a candidate without committing it.
+    /// Report one complete world-face family without authoring native current or storage.
     StageReturn {
         /// Returned exterior occurrence identifier.
         occurrence: u64,
-        /// Returned exterior boundary identifier.
-        boundary: u64,
-        /// Exact real component, written as an integer or rational.
-        #[arg(allow_hyphen_values = true)]
-        real: String,
-        /// Exact imaginary component, written as an integer or rational.
-        #[arg(allow_hyphen_values = true)]
-        imaginary: String,
-        /// Exact returned storage, written as an integer or rational.
-        #[arg(allow_hyphen_values = true)]
-        storage: String,
+        /// Whether the exterior world admitted every issued grain.
+        #[arg(long)]
+        admitted: bool,
+        /// Exact diagnostic octets, supplied here as UTF-8 command input.
+        #[arg(long, default_value = "")]
+        diagnostic: String,
         /// Workspace root; defaults to the current directory.
         #[arg(long, default_value = ".", value_name = "PATH")]
         root: PathBuf,
@@ -199,13 +194,10 @@ pub enum AthenaCli {
     Return {
         session: String,
         occurrence: u64,
-        boundary: u64,
-        #[arg(allow_hyphen_values = true)]
-        real: String,
-        #[arg(allow_hyphen_values = true)]
-        imaginary: String,
-        #[arg(allow_hyphen_values = true)]
-        storage: String,
+        #[arg(long)]
+        admitted: bool,
+        #[arg(long, default_value = "")]
+        diagnostic: String,
     },
     Decline(SessionName),
     DiffuseDemo {
@@ -364,17 +356,13 @@ impl From<WorkspaceCli> for WorkspaceCommand {
             WorkspaceCli::StageReturn {
                 root,
                 occurrence,
-                boundary,
-                real,
-                imaginary,
-                storage,
+                admitted,
+                diagnostic,
             } => Self::StageReturn {
                 root,
                 occurrence,
-                boundary,
-                real,
-                imaginary,
-                storage,
+                admitted,
+                diagnostic,
             },
             WorkspaceCli::Commit { root } => Self::Commit { root },
             WorkspaceCli::Decline { root } => Self::Decline { root },
@@ -428,17 +416,13 @@ impl From<AthenaCli> for AthenaCommand {
             AthenaCli::Return {
                 session,
                 occurrence,
-                boundary,
-                real,
-                imaginary,
-                storage,
+                admitted,
+                diagnostic,
             } => Self::Return {
                 session,
                 occurrence,
-                boundary,
-                real,
-                imaginary,
-                storage,
+                admitted,
+                diagnostic,
             },
             AthenaCli::Decline(value) => Self::Decline {
                 session: value.session,
@@ -534,10 +518,9 @@ mod tests {
             "workspace",
             "stage-return",
             "100",
-            "200",
-            "3/2",
-            "-1/4",
-            "2",
+            "--admitted",
+            "--diagnostic",
+            "world-admitted",
         ])
         .expect("workspace parse");
         assert!(matches!(

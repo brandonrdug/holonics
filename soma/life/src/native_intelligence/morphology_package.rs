@@ -30,12 +30,12 @@ use super::{
     ReleasedScaffoldCultivation,
 };
 
-pub const NATIVE_MORPHOLOGY_PACKAGE_SCHEMA: &str = "soma-life.native-morphology-package.v1";
+pub const NATIVE_MORPHOLOGY_ARTIFACT_SCHEMA: &str = "soma-life.native-morphology-artifact.v1";
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct MorphologyWireSchemas {
-    pub package: String,
+    pub artifact: String,
     pub rest: String,
     pub scaffold: String,
     pub situated_scaffold: String,
@@ -60,7 +60,7 @@ impl MorphologyLineage {
         }
     }
 
-    fn validate(&self, hot_occurrences: &BTreeSet<EventId>) -> Result<(), MorphologyPackageError> {
+    fn validate(&self, hot_occurrences: &BTreeSet<EventId>) -> Result<(), MorphologyArtifactError> {
         let origin = self.generation == 0
             && self.parent_occurrences.is_empty()
             && self.returned_occurrences.is_empty();
@@ -72,7 +72,7 @@ impl MorphologyLineage {
                 .parent_occurrences
                 .is_disjoint(&self.returned_occurrences);
         if !origin && !cultivated {
-            return Err(MorphologyPackageError::Lineage);
+            return Err(MorphologyArtifactError::Lineage);
         }
         Ok(())
     }
@@ -124,7 +124,7 @@ pub struct ConfigurationEvaluationReceipt {
 }
 
 impl ConfigurationEvaluationReceipt {
-    fn validate(&self) -> Result<(), MorphologyPackageError> {
+    fn validate(&self) -> Result<(), MorphologyArtifactError> {
         let configuration = &self.configuration;
         if configuration.ingress_aperture.is_empty()
             || configuration.continuation_receiver.is_empty()
@@ -134,7 +134,7 @@ impl ConfigurationEvaluationReceipt {
             || self.observations.is_empty()
             || !self.qualitative_surface_is_probe
         {
-            return Err(MorphologyPackageError::Evaluation);
+            return Err(MorphologyArtifactError::Evaluation);
         }
         Ok(())
     }
@@ -188,7 +188,7 @@ pub struct MorphologyVariantManifest {
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct MorphologyReconstructionLane {
+pub struct MorphologyTestimonyLane {
     pub collapsed_fibres: Vec<NativeCollapsedFibre>,
     pub shortest_separators: Vec<NativeShortestSeparator>,
     pub mixed_constitutive_families: Vec<NativeMixedConstitutiveFamily>,
@@ -201,7 +201,7 @@ pub struct MorphologyReconstructionLane {
 /// same singular native scaffold; neither variant can contain a foreign executor.
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "rest_kind", rename_all = "kebab-case")]
-pub enum RestedMorphology {
+pub enum NativeHolonMorphology {
     Native(NativeEcologyRest),
     Situated {
         ecology: SituatedNativeTransportScaffold,
@@ -209,16 +209,16 @@ pub enum RestedMorphology {
     },
 }
 
-impl From<NativeEcologyRest> for RestedMorphology {
+impl From<NativeEcologyRest> for NativeHolonMorphology {
     fn from(rest: NativeEcologyRest) -> Self {
         Self::Native(rest)
     }
 }
 
-impl RestedMorphology {
+impl NativeHolonMorphology {
     pub fn situated(
         ecology: SituatedNativeTransportScaffold,
-    ) -> Result<Self, MorphologyPackageError> {
+    ) -> Result<Self, MorphologyArtifactError> {
         ecology.validate()?;
         let realization = ReceiverHistoryRealizationPassage::found(ecology.native())?;
         Ok(Self::Situated {
@@ -241,7 +241,7 @@ impl RestedMorphology {
         }
     }
 
-    pub fn validate(&self) -> Result<(), MorphologyPackageError> {
+    pub fn validate(&self) -> Result<(), MorphologyArtifactError> {
         match self {
             Self::Native(rest) => rest.validate()?,
             Self::Situated {
@@ -255,25 +255,25 @@ impl RestedMorphology {
         Ok(())
     }
 
-    pub fn canonical_bytes(&self) -> Result<Vec<u8>, MorphologyPackageError> {
+    pub fn canonical_bytes(&self) -> Result<Vec<u8>, MorphologyArtifactError> {
         self.validate()?;
-        serde_json::to_vec(self).map_err(|error| MorphologyPackageError::Wire(error.to_string()))
+        serde_json::to_vec(self).map_err(|error| MorphologyArtifactError::Wire(error.to_string()))
     }
 }
 
 /// One exterior package. `hot` is the sole conduct owner; every other field is testimony.
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct NativeMorphologyPackage {
+pub struct NativeMorphologyArtifact {
     pub schema: String,
     pub manifest: MorphologyVariantManifest,
-    hot: RestedMorphology,
-    pub reconstruction: MorphologyReconstructionLane,
+    hot: NativeHolonMorphology,
+    pub testimony: MorphologyTestimonyLane,
     pub evaluation: Vec<ConfigurationEvaluationReceipt>,
 }
 
 #[derive(Debug, Error)]
-pub enum MorphologyPackageError {
+pub enum MorphologyArtifactError {
     #[error("the hot native rest refused packaging: {0}")]
     Hot(String),
     #[error("the morphology lineage is malformed")]
@@ -288,28 +288,28 @@ pub enum MorphologyPackageError {
     Wire(String),
 }
 
-impl From<NativeEcologyError> for MorphologyPackageError {
+impl From<NativeEcologyError> for MorphologyArtifactError {
     fn from(error: NativeEcologyError) -> Self {
         Self::Hot(error.to_string())
     }
 }
 
-impl From<NativeSpoolRefusal> for MorphologyPackageError {
+impl From<NativeSpoolRefusal> for MorphologyArtifactError {
     fn from(error: NativeSpoolRefusal) -> Self {
         Self::Hot(error.to_string())
     }
 }
 
-impl NativeMorphologyPackage {
+impl NativeMorphologyArtifact {
     pub fn found<Hot>(
         hot: Hot,
         lineage: MorphologyLineage,
         evaluation: Vec<ConfigurationEvaluationReceipt>,
         apparatus: Vec<ApparatusRealization>,
         exports: Vec<ExportRealization>,
-    ) -> Result<Self, MorphologyPackageError>
+    ) -> Result<Self, MorphologyArtifactError>
     where
-        Hot: Into<RestedMorphology>,
+        Hot: Into<NativeHolonMorphology>,
     {
         Self::found_parts(
             hot.into(),
@@ -327,17 +327,17 @@ impl NativeMorphologyPackage {
         evaluation: Vec<ConfigurationEvaluationReceipt>,
         apparatus: Vec<ApparatusRealization>,
         exports: Vec<ExportRealization>,
-    ) -> Result<Self, MorphologyPackageError> {
+    ) -> Result<Self, MorphologyArtifactError> {
         let departed = released
             .departed_inherited
             .iter()
             .map(|withdrawal| {
                 serde_json::to_vec(withdrawal)
-                    .map_err(|error| MorphologyPackageError::Wire(error.to_string()))
+                    .map_err(|error| MorphologyArtifactError::Wire(error.to_string()))
             })
             .collect::<Result<Vec<_>, _>>()?;
         Self::found_parts(
-            RestedMorphology::situated(released.hot)?,
+            NativeHolonMorphology::situated(released.hot)?,
             lineage,
             evaluation,
             apparatus,
@@ -350,13 +350,13 @@ impl NativeMorphologyPackage {
     /// reconstruction lane. The caller supplies parented lineage; this function derives every
     /// anatomy/capability field again from the moved hot morphology.
     pub(crate) fn found_successor(
-        hot: RestedMorphology,
+        hot: NativeHolonMorphology,
         lineage: MorphologyLineage,
         evaluation: Vec<ConfigurationEvaluationReceipt>,
         apparatus: Vec<ApparatusRealization>,
         exports: Vec<ExportRealization>,
         departed_inherited_withdrawals: Vec<Vec<u8>>,
-    ) -> Result<Self, MorphologyPackageError> {
+    ) -> Result<Self, MorphologyArtifactError> {
         Self::found_parts(
             hot,
             lineage,
@@ -368,49 +368,49 @@ impl NativeMorphologyPackage {
     }
 
     fn found_parts(
-        hot: RestedMorphology,
+        hot: NativeHolonMorphology,
         lineage: MorphologyLineage,
         evaluation: Vec<ConfigurationEvaluationReceipt>,
         apparatus: Vec<ApparatusRealization>,
         exports: Vec<ExportRealization>,
         departed_inherited_withdrawals: Vec<Vec<u8>>,
-    ) -> Result<Self, MorphologyPackageError> {
+    ) -> Result<Self, MorphologyArtifactError> {
         hot.validate()?;
         validate_evaluation(&evaluation)?;
         validate_realizations(&apparatus, &exports)?;
         let hot_occurrences = hot_occurrences(&hot);
         lineage.validate(&hot_occurrences)?;
         validate_departed(&departed_inherited_withdrawals)?;
-        let reconstruction = reconstruction_projection(&hot, departed_inherited_withdrawals);
+        let testimony = morphology_testimony_from_hot(&hot, departed_inherited_withdrawals);
         let manifest = manifest_projection(&hot, lineage, &evaluation, apparatus, exports)?;
         let package = Self {
-            schema: NATIVE_MORPHOLOGY_PACKAGE_SCHEMA.to_owned(),
+            schema: NATIVE_MORPHOLOGY_ARTIFACT_SCHEMA.to_owned(),
             manifest,
             hot,
-            reconstruction,
+            testimony,
             evaluation,
         };
         package.validate()?;
         Ok(package)
     }
 
-    pub fn read(bytes: &[u8]) -> Result<Self, MorphologyPackageError> {
+    pub fn read(bytes: &[u8]) -> Result<Self, MorphologyArtifactError> {
         let package: Self = serde_json::from_slice(bytes)
-            .map_err(|error| MorphologyPackageError::Wire(error.to_string()))?;
+            .map_err(|error| MorphologyArtifactError::Wire(error.to_string()))?;
         package.validate()?;
         Ok(package)
     }
 
-    pub fn canonical_bytes(&self) -> Result<Vec<u8>, MorphologyPackageError> {
+    pub fn canonical_bytes(&self) -> Result<Vec<u8>, MorphologyArtifactError> {
         self.validate()?;
-        serde_json::to_vec(self).map_err(|error| MorphologyPackageError::Wire(error.to_string()))
+        serde_json::to_vec(self).map_err(|error| MorphologyArtifactError::Wire(error.to_string()))
     }
 
-    pub fn hot(&self) -> &RestedMorphology {
+    pub fn hot(&self) -> &NativeHolonMorphology {
         &self.hot
     }
 
-    pub fn into_hot(self) -> RestedMorphology {
+    pub fn into_hot(self) -> NativeHolonMorphology {
         self.hot
     }
 
@@ -418,17 +418,17 @@ impl NativeMorphologyPackage {
         mut self,
         apparatus: Vec<ApparatusRealization>,
         exports: Vec<ExportRealization>,
-    ) -> Result<Self, MorphologyPackageError> {
+    ) -> Result<Self, MorphologyArtifactError> {
         validate_realizations(&apparatus, &exports)?;
         self.manifest.realization = RealizationManifest { apparatus, exports };
         self.validate()?;
         Ok(self)
     }
 
-    pub fn validate(&self) -> Result<(), MorphologyPackageError> {
-        if self.schema != NATIVE_MORPHOLOGY_PACKAGE_SCHEMA {
-            return Err(MorphologyPackageError::Wire(
-                "unknown morphology package schema".to_owned(),
+    pub fn validate(&self) -> Result<(), MorphologyArtifactError> {
+        if self.schema != NATIVE_MORPHOLOGY_ARTIFACT_SCHEMA {
+            return Err(MorphologyArtifactError::Wire(
+                "unknown morphology artifact schema".to_owned(),
             ));
         }
         self.hot.validate()?;
@@ -437,7 +437,7 @@ impl NativeMorphologyPackage {
             &self.manifest.realization.apparatus,
             &self.manifest.realization.exports,
         )?;
-        validate_departed(&self.reconstruction.departed_inherited_withdrawals)?;
+        validate_departed(&self.testimony.departed_inherited_withdrawals)?;
         self.manifest
             .lineage
             .validate(&hot_occurrences(&self.hot))?;
@@ -449,19 +449,19 @@ impl NativeMorphologyPackage {
             self.manifest.realization.exports.clone(),
         )?;
         if self.manifest != expected_manifest
-            || self.reconstruction
-                != reconstruction_projection(
+            || self.testimony
+                != morphology_testimony_from_hot(
                     &self.hot,
-                    self.reconstruction.departed_inherited_withdrawals.clone(),
+                    self.testimony.departed_inherited_withdrawals.clone(),
                 )
         {
-            return Err(MorphologyPackageError::Manifest);
+            return Err(MorphologyArtifactError::Manifest);
         }
         Ok(())
     }
 }
 
-fn hot_occurrences(hot: &RestedMorphology) -> BTreeSet<EventId> {
+fn hot_occurrences(hot: &NativeHolonMorphology) -> BTreeSet<EventId> {
     hot.native()
         .spools
         .iter()
@@ -472,15 +472,15 @@ fn hot_occurrences(hot: &RestedMorphology) -> BTreeSet<EventId> {
 }
 
 fn manifest_projection(
-    hot: &RestedMorphology,
+    hot: &NativeHolonMorphology,
     lineage: MorphologyLineage,
     evaluation: &[ConfigurationEvaluationReceipt],
     apparatus: Vec<ApparatusRealization>,
     exports: Vec<ExportRealization>,
-) -> Result<MorphologyVariantManifest, MorphologyPackageError> {
+) -> Result<MorphologyVariantManifest, MorphologyArtifactError> {
     Ok(MorphologyVariantManifest {
         wire_schemas: MorphologyWireSchemas {
-            package: NATIVE_MORPHOLOGY_PACKAGE_SCHEMA.to_owned(),
+            artifact: NATIVE_MORPHOLOGY_ARTIFACT_SCHEMA.to_owned(),
             rest: NATIVE_ECOLOGY_REST_SCHEMA.to_owned(),
             scaffold: NATIVE_TRANSPORT_SCAFFOLD_SCHEMA.to_owned(),
             situated_scaffold: SITUATED_NATIVE_TRANSPORT_SCAFFOLD_SCHEMA.to_owned(),
@@ -506,8 +506,8 @@ fn manifest_projection(
 }
 
 fn anatomy_projection(
-    hot: &RestedMorphology,
-) -> Result<MorphologyAnatomyManifest, MorphologyPackageError> {
+    hot: &NativeHolonMorphology,
+) -> Result<MorphologyAnatomyManifest, MorphologyArtifactError> {
     let profile = hot.native().intrinsic_holon_profile()?;
     let threads = hot
         .native()
@@ -612,8 +612,8 @@ fn anatomy_projection(
 }
 
 pub fn derive_morphology_anatomy(
-    hot: &RestedMorphology,
-) -> Result<MorphologyAnatomyManifest, MorphologyPackageError> {
+    hot: &NativeHolonMorphology,
+) -> Result<MorphologyAnatomyManifest, MorphologyArtifactError> {
     hot.validate()?;
     anatomy_projection(hot)
 }
@@ -662,21 +662,21 @@ fn exact_incidence_nullity(face: &DimensionFace<IncidenceNullity>) -> usize {
     }
 }
 
-fn reconstruction_projection(
-    hot: &RestedMorphology,
+fn morphology_testimony_from_hot(
+    hot: &NativeHolonMorphology,
     departed_inherited_withdrawals: Vec<Vec<u8>>,
-) -> MorphologyReconstructionLane {
+) -> MorphologyTestimonyLane {
     let mut open_obligations = hot.realization().open_exterior.clone();
     open_obligations.sort();
     open_obligations.dedup();
     let (mixed_constitutive_families, exact_reconstruction_fibres) = match hot {
-        RestedMorphology::Native(_) => (Vec::new(), Vec::new()),
-        RestedMorphology::Situated { ecology, .. } => (
+        NativeHolonMorphology::Native(_) => (Vec::new(), Vec::new()),
+        NativeHolonMorphology::Situated { ecology, .. } => (
             ecology.mixed_constitutive_families().to_vec(),
             ecology.exact_reconstruction_fibres().to_vec(),
         ),
     };
-    MorphologyReconstructionLane {
+    MorphologyTestimonyLane {
         collapsed_fibres: hot
             .native()
             .spools
@@ -696,10 +696,10 @@ fn reconstruction_projection(
     }
 }
 
-fn validate_departed(departed: &[Vec<u8>]) -> Result<(), MorphologyPackageError> {
+fn validate_departed(departed: &[Vec<u8>]) -> Result<(), MorphologyArtifactError> {
     for wire in departed {
         let withdrawal: NativeSituatedThreadWithdrawal = serde_json::from_slice(wire)
-            .map_err(|error| MorphologyPackageError::Wire(error.to_string()))?;
+            .map_err(|error| MorphologyArtifactError::Wire(error.to_string()))?;
         withdrawal.native.thread.validate()?;
         for (_, family) in &withdrawal.mixed_constitutive_families {
             family.validate()?;
@@ -713,14 +713,14 @@ fn validate_departed(departed: &[Vec<u8>]) -> Result<(), MorphologyPackageError>
 
 fn validate_evaluation(
     evaluation: &[ConfigurationEvaluationReceipt],
-) -> Result<(), MorphologyPackageError> {
+) -> Result<(), MorphologyArtifactError> {
     let mut configurations = BTreeSet::new();
     for receipt in evaluation {
         receipt.validate()?;
         let wire = serde_json::to_vec(&receipt.configuration)
-            .map_err(|error| MorphologyPackageError::Wire(error.to_string()))?;
+            .map_err(|error| MorphologyArtifactError::Wire(error.to_string()))?;
         if !configurations.insert(wire) {
-            return Err(MorphologyPackageError::Evaluation);
+            return Err(MorphologyArtifactError::Evaluation);
         }
     }
     Ok(())
@@ -729,13 +729,13 @@ fn validate_evaluation(
 fn validate_realizations(
     apparatus: &[ApparatusRealization],
     exports: &[ExportRealization],
-) -> Result<(), MorphologyPackageError> {
+) -> Result<(), MorphologyArtifactError> {
     if apparatus.iter().any(|realization| {
         realization.apparatus_family.is_empty() || realization.realization_version.is_empty()
     }) || exports.iter().any(|realization| {
         realization.schema_or_opset.is_empty() || realization.receiver_family.is_empty()
     }) {
-        return Err(MorphologyPackageError::Realization);
+        return Err(MorphologyArtifactError::Realization);
     }
     Ok(())
 }
@@ -758,9 +758,8 @@ mod tests {
     use num_rational::BigRational as Rat;
 
     use super::*;
-    use crate::native_intelligence::{
-        consume_dismantling_return, ReturnedScaffoldInteraction, ScaffoldCultivatedRest,
-    };
+    use crate::native_intelligence::{consume_dismantling_return, ScaffoldCultivatedRest};
+    use crate::native_intelligence::scaffold_cultivation::ReturnedScaffoldInteraction;
 
     fn rest(excitations: usize) -> NativeEcologyRest {
         let excitations = (0..excitations)
@@ -787,7 +786,7 @@ mod tests {
 
     #[test]
     fn package_round_trip_recovers_hot_rest_and_open_reconstruction() {
-        let package = NativeMorphologyPackage::found(
+        let package = NativeMorphologyArtifact::found(
             rest(2),
             MorphologyLineage::origin(),
             Vec::new(),
@@ -799,21 +798,21 @@ mod tests {
         )
         .expect("package");
         let hot = package.hot().canonical_bytes().expect("hot bytes");
-        let open = package.reconstruction.open_obligations.clone();
+        let open = package.testimony.open_obligations.clone();
         let bytes = package.canonical_bytes().expect("package bytes");
         let text = String::from_utf8(bytes.clone())
             .expect("JSON")
             .to_ascii_lowercase();
         assert!(!text.contains("source_occurrence"));
         assert!(!text.contains("foreign executor"));
-        let recovered = NativeMorphologyPackage::read(&bytes).expect("package read");
+        let recovered = NativeMorphologyArtifact::read(&bytes).expect("package read");
         assert_eq!(recovered.hot().canonical_bytes().expect("recovered"), hot);
-        assert_eq!(recovered.reconstruction.open_obligations, open);
+        assert_eq!(recovered.testimony.open_obligations, open);
     }
 
     #[test]
     fn apparatus_and_export_replacement_preserve_hot_morphology_and_capability() {
-        let package = NativeMorphologyPackage::found(
+        let package = NativeMorphologyArtifact::found(
             rest(1),
             MorphologyLineage::origin(),
             Vec::new(),
@@ -842,7 +841,7 @@ mod tests {
 
     #[test]
     fn anatomically_distinct_bodies_receive_distinct_derived_manifests() {
-        let one = NativeMorphologyPackage::found(
+        let one = NativeMorphologyArtifact::found(
             rest(1),
             MorphologyLineage::origin(),
             Vec::new(),
@@ -850,7 +849,7 @@ mod tests {
             Vec::new(),
         )
         .expect("one");
-        let two = NativeMorphologyPackage::found(
+        let two = NativeMorphologyArtifact::found(
             rest(2),
             MorphologyLineage::origin(),
             Vec::new(),
@@ -879,8 +878,10 @@ mod tests {
             },
         )
         .expect("emission");
-        let returned = ReturnedScaffoldInteraction::found(
-            cut.emitted_occurrence().clone(),
+        let emitted = cut.emitted_occurrence().clone();
+        let support = BTreeSet::from([emitted.emitted.from, emitted.emitted.to]);
+        let returned = ReturnedScaffoldInteraction::constituted(
+            emitted,
             EventId(100),
             BoundaryId(101),
             ExactComplexWaveCurrent::new(
@@ -888,7 +889,7 @@ mod tests {
                 Rat::from_integer(BigInt::from(1)),
             ),
             Rat::from_integer(BigInt::from(1)),
-            BTreeSet::new(),
+            support,
         )
         .expect("return");
         drop(cut);
@@ -896,7 +897,7 @@ mod tests {
             .expect("cultivate")
             .release()
             .expect("release");
-        let package = NativeMorphologyPackage::found_released(
+        let package = NativeMorphologyArtifact::found_released(
             released,
             MorphologyLineage {
                 generation: 1,
@@ -908,13 +909,13 @@ mod tests {
             Vec::new(),
         )
         .expect("released package");
-        assert!(matches!(package.hot(), RestedMorphology::Situated { .. }));
+        assert!(matches!(package.hot(), NativeHolonMorphology::Situated { .. }));
         assert_eq!(
-            package.reconstruction.departed_inherited_withdrawals.len(),
+            package.testimony.departed_inherited_withdrawals.len(),
             2
         );
         let bytes = package.canonical_bytes().expect("package bytes");
-        let recovered = NativeMorphologyPackage::read(&bytes).expect("package read");
+        let recovered = NativeMorphologyArtifact::read(&bytes).expect("package read");
         assert_eq!(recovered.canonical_bytes().expect("recovered bytes"), bytes);
     }
 }

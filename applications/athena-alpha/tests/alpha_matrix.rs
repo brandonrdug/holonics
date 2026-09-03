@@ -1,8 +1,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use athena_alpha::{
-    addressed_ingress, declared_diffusion_law, returned_local_interaction, AthenaAlphaApplication,
-    BASE_CONFIGURATION,
+    addressed_ingress, declared_diffusion_law, AthenaAlphaApplication, BASE_CONFIGURATION,
 };
 use holonic_engine::{
     native_ecology::holonic_intelligence::{
@@ -10,7 +9,7 @@ use holonic_engine::{
     },
     receiver_exact_compression::ReceiverId,
     soulkiller::dismantle,
-    BoundaryId, EventId, ExactComplexWaveCurrent,
+    BoundaryId, EventId,
 };
 use holonics_circulation_abi::{
     dispatch_bytes, AbiCommand, AbiDisposition, AbiEnvelope, AbiResponse,
@@ -18,7 +17,8 @@ use holonics_circulation_abi::{
 };
 use life::native_intelligence::{
     NativeCirculationConfiguration, NativeCirculationEvent, NativeCirculationSession,
-    NativeDiffusionIngress, NativeDiffusionStanding, NativeMorphologyPackage,
+    NativeDiffusionIngress, NativeDiffusionStanding, NativeMorphologyArtifact, NativeWorldFace,
+    NativeWorldStage,
 };
 use num_rational::BigRational as Rat;
 use num_traits::{One, Zero};
@@ -133,18 +133,25 @@ fn exact_alpha_matrix_returns_the_complete_dynamic_lifecycle() {
     let first = application
         .conduct(request(&application, EventId(1)))
         .expect("commit boundary");
-    let returned = returned_local_interaction(
-        first.emission.address.clone(),
-        EventId(100),
-        BoundaryId(200),
-        ExactComplexWaveCurrent::new(Rat::one(), Rat::one()),
-        Rat::one(),
-        BTreeSet::new(),
-    )
-    .expect("returned interaction");
-    let candidate = application
-        .stage_return(&first, returned)
-        .expect("candidate");
+    let faces = first
+        .issued_world_faces()
+        .into_iter()
+        .map(|issued| {
+            NativeWorldFace::report(
+                issued.clone(),
+                true,
+                issued.support().clone(),
+                b"alpha-matrix-world-admitted".to_vec(),
+            )
+            .expect("world face")
+        })
+        .collect();
+    let NativeWorldStage::Candidate { candidate, .. } = application
+        .stage_world_return(&first, faces, EventId(100))
+        .expect("world stage")
+    else {
+        panic!("the complete admitted family must stage a candidate")
+    };
     let (application, commit) = application.commit(candidate).expect("commit");
     assert_eq!(commit.predecessor_lineage.generation, 0);
     assert_eq!(commit.successor_lineage.generation, 1);
@@ -267,7 +274,7 @@ fn exact_alpha_matrix_returns_the_complete_dynamic_lifecycle() {
 
     // 10--11. Direct and ABI conduct agree at the complete configuration.
     let direct = NativeCirculationSession::mount(
-        NativeMorphologyPackage::read(&base_snapshot.package_wire).expect("direct package"),
+        NativeMorphologyArtifact::read(&base_snapshot.package_wire).expect("direct package"),
         base_snapshot.configuration.clone(),
     )
     .expect("direct session");

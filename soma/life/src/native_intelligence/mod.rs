@@ -17,6 +17,8 @@ mod granular_potential;
 mod laboratory_cultivation;
 mod material_factorization;
 mod material_source_realization;
+mod material_ingress;
+mod material_emission;
 mod membrane_acoustic;
 mod membrane_cultivation;
 mod membrane_interior;
@@ -24,7 +26,6 @@ mod membrane_optical;
 mod membrane_radiation;
 mod membrane_transport;
 mod morphology_commit;
-mod morphology_evaluation;
 mod morphology_export;
 mod morphology_package;
 mod native_factor_deposit;
@@ -32,8 +33,8 @@ mod native_material_circulation;
 mod native_relational_potential;
 mod perspective_emanation;
 mod product_receiver;
-mod rest; mod returned_difference_deposit;
-pub mod route_return;
+mod rest;
+mod returned_difference_deposit;
 mod scaffold_cultivation;
 mod situated_cultivation;
 mod situated_difference;
@@ -41,6 +42,7 @@ mod source_neutral_cold;
 mod source_neutral_relational;
 mod source_neutral_rest;
 mod types;
+mod world_return;
 
 pub use circulation_diffusion::{
     NativeCirculationEvent, NativeDiffusionEmission, NativeDiffusionIngress, NativeDiffusionLaw,
@@ -129,6 +131,10 @@ pub use material_source_realization::{
     MaterialSourceCodec, MaterialSourceRealization, MaterialSourceRealizationError,
     MaterialSourceRevisionReceipt, MATERIAL_SOURCE_REALIZATION_SCHEMA,
 };
+pub use material_ingress::{NativeMaterialColdPreimage, NativeMaterialIngress};
+pub use material_emission::{
+    NativeMaterialEmissionBoundary, NativeMaterialEmissionOccurrence,
+};
 pub use membrane_acoustic::{
     AcousticProductRest, AcousticRelationalCellWithdrawal, NativeAcousticAudibleProjection,
     NativeAcousticCultivationReceipt, NativeAcousticOrganCompositionReceipt,
@@ -179,11 +185,8 @@ pub use membrane_transport::{
 };
 pub use morphology_commit::{
     NativeCirculationSnapshot, NativeCultivationCandidate, NativeMorphologyCommit,
-    NATIVE_CIRCULATION_SNAPSHOT_SCHEMA, NATIVE_MORPHOLOGY_COMMIT_SCHEMA,
-};
-pub use morphology_evaluation::{
-    evaluate_morphology_configuration, MorphologyEvaluationError, MorphologyExperimentInput,
-    MorphologyExperimentReceipt, StableMorphologyExperimentConsequence,
+    NATIVE_CIRCULATION_SNAPSHOT_SCHEMA, NATIVE_CULTIVATION_CANDIDATE_SCHEMA,
+    NATIVE_MORPHOLOGY_COMMIT_SCHEMA,
 };
 pub use morphology_export::{
     export_morphology, import_exact_export, project_common_anatomy, ConfigurationSeparator,
@@ -194,9 +197,9 @@ pub use morphology_export::{
 pub use morphology_package::{
     derive_morphology_anatomy, ApparatusRealization, ConfigurationEvaluationReceipt,
     ExportCodecKind, ExportRealization, InferenceConfigurationAddress, MorphologyAnatomyManifest,
-    MorphologyLineage, MorphologyPackageError, MorphologyReconstructionLane,
-    MorphologyVariantManifest, MorphologyWireSchemas, NativeMorphologyPackage, RealizationManifest,
-    ReceiverCapabilityManifest, RestedMorphology, NATIVE_MORPHOLOGY_PACKAGE_SCHEMA,
+    MorphologyLineage, MorphologyArtifactError, MorphologyTestimonyLane,
+    MorphologyVariantManifest, MorphologyWireSchemas, NativeMorphologyArtifact, RealizationManifest,
+    ReceiverCapabilityManifest, NativeHolonMorphology, NATIVE_MORPHOLOGY_ARTIFACT_SCHEMA,
 };
 pub use native_factor_deposit::{
     NativeCultivationMorphology, NativeFactorCandidateLimb, NativeFactorDeposit,
@@ -273,6 +276,10 @@ pub use source_neutral_rest::{
     SourceNeutralReturnedExteriorCirculation, SourceNeutralSituatedDifferenceReceipt,
     SourceNeutralWindingBranchFunctional, SourceNeutralWindingDifference,
     SOURCE_NEUTRAL_ECOLOGY_REST_SCHEMA,
+};
+pub use world_return::{
+    NativeIssuedWorldFace, NativeWorldFace, NativeWorldJunction, NativeWorldObstruction,
+    NativeWorldObstructionKind, NativeWorldStage, NATIVE_WORLD_FACE_SCHEMA,
 };
 pub use types::{
     NativeBatchSectionAddress, NativeConductBatchPassage, NativeConductConsequence,

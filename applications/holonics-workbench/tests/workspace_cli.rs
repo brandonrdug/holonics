@@ -104,7 +104,14 @@ fn cli_returns_the_complete_actual_receipt_to_successor_artifact_lifecycle() {
     assert!(conduct_human.contains("WRITTEN ARTIFACTS"));
     run(
         Some(&workspace),
-        &["workspace", "stage-return", "100", "200", "1", "1/2", "1"],
+        &[
+            "workspace",
+            "stage-return",
+            "100",
+            "--admitted",
+            "--diagnostic",
+            "workspace-world-admitted",
+        ],
     );
     let commit = run(Some(&workspace), &["workspace", "commit"]);
     let current = commit.events[0].payload.as_ref().expect("payload")["current_snapshot"]

@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use holonic_engine::{
-    native_spool::NativeTransportScaffold, receiver_history_compression::NativeStateId, EventId,
+    EventId, native_spool::NativeTransportScaffold, receiver_history_compression::NativeStateId,
 };
 use life::native_intelligence::{NativeDiffusionLaw, NativeSessionError};
 use num_rational::BigRational as Rat;

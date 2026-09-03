@@ -361,7 +361,7 @@ mod tests {
 
     use crate::native_intelligence::{
         consume_dismantling_return, MorphologyLineage, NativeCirculationConfiguration,
-        NativeMorphologyPackage,
+        NativeMorphologyArtifact,
     };
 
     fn session() -> NativeCirculationSession {
@@ -383,7 +383,7 @@ mod tests {
         })
         .expect("dismantle");
         let (hot, _) = consume_dismantling_return(returned).expect("hot");
-        let package = NativeMorphologyPackage::found(
+        let package = NativeMorphologyArtifact::found(
             hot,
             MorphologyLineage::origin(),
             Vec::new(),

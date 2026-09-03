@@ -1,4 +1,4 @@
-//! Move-owned live circulation over one native morphology package.
+//! Move-owned live circulation over one native morphology artifact.
 //!
 //! The session owns one package and returns owned boundary testimony. Conduct borrows the hot
 //! morphology; continuation is admitted only through an actual addressed successor returned by
@@ -15,17 +15,17 @@ use holonic_engine::{
     native_spool::{NativeCollapsedFibre, NativeShortestSeparator},
     receiver_exact_compression::{InputId, ReceiverId},
     receiver_history_compression::NativeStateId,
-    EventId, OccurrencePort,
+    BoundaryId, EventId, OccurrencePort,
 };
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use super::{
-    InferenceConfigurationAddress, MorphologyPackageError, NativeMorphologyCommit,
-    NativeMorphologyPackage,
+    InferenceConfigurationAddress, MorphologyArtifactError, NativeMorphologyCommit,
+    NativeMorphologyArtifact,
 };
 
-pub const NATIVE_CIRCULATION_SESSION_SCHEMA: &str = "soma-life.native-circulation-session.v1";
+pub const NATIVE_CIRCULATION_SESSION_SCHEMA: &str = "soma-life.native-circulation-session.v2";
 
 /// Exterior configuration of one mounted circulation family.
 ///
@@ -182,6 +182,7 @@ pub struct NativeCirculationBoundary {
     pub generation: u64,
     pub request: NativeOwnedInferenceRequest,
     pub configuration: InferenceConfigurationAddress,
+    pub emitting_boundary: BoundaryId,
     pub emission: NativeVariableGrainEmission,
     pub lineage: NativeOwnedInferenceLineage,
     pub futures: Vec<NativeOwnedFutureReconstruction>,
@@ -195,7 +196,7 @@ impl NativeCirculationBoundary {
         &self.emission.address
     }
 
-    pub(crate) fn validate_for(
+    fn validate_shape(
         &self,
         session: &NativeCirculationSession,
     ) -> Result<(), NativeSessionError> {
@@ -204,11 +205,24 @@ impl NativeCirculationBoundary {
             || self.configuration.receiver != self.request.receiver
             || self.configuration.occurrence != self.request.address.occurrence
             || self.emission.address.entering_occurrence != self.request.address.occurrence
+            || self.emitting_boundary.0 == 0
             || self.futures.is_empty()
             || self.emission.grains.len() != self.futures.len()
             || self.emission.selected_grain >= self.emission.grains.len()
             || self.futures.iter().any(|future| future.fibres.is_empty())
         {
+            return Err(NativeSessionError::Boundary);
+        }
+        Ok(())
+    }
+
+    pub(crate) fn validate_for(
+        &self,
+        session: &NativeCirculationSession,
+    ) -> Result<(), NativeSessionError> {
+        self.validate_shape(session)?;
+        let expected = session.boundary_for(self.request.native())?;
+        if self != &expected {
             return Err(NativeSessionError::Boundary);
         }
         Ok(())
@@ -219,7 +233,7 @@ impl NativeCirculationBoundary {
 /// runtime object; snapshots belong to the package/storage boundary.
 #[derive(Debug)]
 pub struct NativeCirculationSession {
-    pub(super) package: NativeMorphologyPackage,
+    pub(super) package: NativeMorphologyArtifact,
     pub(super) configuration: NativeCirculationConfiguration,
     pub(super) commits: Vec<NativeMorphologyCommit>,
 }
@@ -235,7 +249,7 @@ pub struct NativeDeclineReceipt {
 
 #[derive(Debug, Error)]
 pub enum NativeSessionError {
-    #[error("the native morphology package refused the live session: {0}")]
+    #[error("the native morphology artifact refused the live session: {0}")]
     Package(String),
     #[error("the circulation configuration is malformed or outside the package receiver family")]
     Configuration,
@@ -247,21 +261,25 @@ pub enum NativeSessionError {
     FalseSuccessor,
     #[error("the exterior return is not a genuinely later consequence of this emission")]
     Return,
+    #[error("the exterior world-face family is incomplete, stale, duplicated, or outside its issued support")]
+    WorldFace,
+    #[error("the source-neutral material ingress refused: {0}")]
+    Ingress(String),
     #[error("the morphology commit refused: {0}")]
     Commit(String),
     #[error("the circulation snapshot or commit journal is malformed: {0}")]
     Snapshot(String),
 }
 
-impl From<MorphologyPackageError> for NativeSessionError {
-    fn from(error: MorphologyPackageError) -> Self {
+impl From<MorphologyArtifactError> for NativeSessionError {
+    fn from(error: MorphologyArtifactError) -> Self {
         Self::Package(error.to_string())
     }
 }
 
 impl NativeCirculationSession {
     pub fn mount(
-        package: NativeMorphologyPackage,
+        package: NativeMorphologyArtifact,
         configuration: NativeCirculationConfiguration,
     ) -> Result<Self, NativeSessionError> {
         package.validate()?;
@@ -285,7 +303,7 @@ impl NativeCirculationSession {
         self.package.manifest.lineage.generation
     }
 
-    pub fn package(&self) -> &NativeMorphologyPackage {
+    pub fn package(&self) -> &NativeMorphologyArtifact {
         &self.package
     }
 
@@ -298,6 +316,13 @@ impl NativeCirculationSession {
     }
 
     pub fn conduct(
+        &self,
+        request: NativeInferenceRequest,
+    ) -> Result<NativeCirculationBoundary, NativeSessionError> {
+        self.boundary_for(request)
+    }
+
+    pub(crate) fn boundary_for(
         &self,
         request: NativeInferenceRequest,
     ) -> Result<NativeCirculationBoundary, NativeSessionError> {
@@ -342,6 +367,7 @@ impl NativeCirculationSession {
             generation: self.generation(),
             request: (&request).into(),
             configuration: self.configuration.at(request.address.occurrence),
+            emitting_boundary: cut.active_section().thread().emitting_boundary,
             emission: NativeVariableGrainEmission {
                 address: cut.emitted_occurrence().clone(),
                 grains,
@@ -360,7 +386,7 @@ impl NativeCirculationSession {
                 })
                 .collect(),
         };
-        boundary.validate_for(self)?;
+        boundary.validate_shape(self)?;
         Ok(boundary)
     }
 
@@ -402,7 +428,7 @@ impl NativeCirculationSession {
         ))
     }
 
-    pub fn into_package(self) -> NativeMorphologyPackage {
+    pub fn into_package(self) -> NativeMorphologyArtifact {
         self.package
     }
 }
@@ -454,7 +480,7 @@ mod tests {
         })
         .expect("dismantle");
         let (hot, _) = consume_dismantling_return(returned).expect("hot");
-        let package = NativeMorphologyPackage::found(
+        let package = NativeMorphologyArtifact::found(
             hot,
             MorphologyLineage::origin(),
             Vec::new(),

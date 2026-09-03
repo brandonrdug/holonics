@@ -1,7 +1,7 @@
 use holonic_engine::cuda_refine::CudaRefineExecutor;
 use life::native_intelligence::{
     export_morphology, ExportCodecKind, ExportPurpose, MorphologyExportRequest,
-    MorphologyExportReturn, NativeCirculationSnapshot, NativeMorphologyPackage,
+    MorphologyExportReturn, NativeCirculationSnapshot, NativeMorphologyArtifact,
 };
 use serde_json::json;
 
@@ -118,14 +118,14 @@ pub fn execute(command: EngineCommand) -> Result<AdapterReturn, WorkbenchError> 
     }
 }
 
-fn read_package(path: &std::path::Path) -> Result<NativeMorphologyPackage, WorkbenchError> {
+fn read_package(path: &std::path::Path) -> Result<NativeMorphologyArtifact, WorkbenchError> {
     let bytes = store::read(path)?;
-    if let Ok(package) = NativeMorphologyPackage::read(&bytes) {
+    if let Ok(package) = NativeMorphologyArtifact::read(&bytes) {
         return Ok(package);
     }
     let snapshot = NativeCirculationSnapshot::read(&bytes)
         .map_err(|error| WorkbenchError::Owner(error.to_string()))?;
-    NativeMorphologyPackage::read(&snapshot.package_wire)
+    NativeMorphologyArtifact::read(&snapshot.package_wire)
         .map_err(|error| WorkbenchError::Owner(error.to_string()))
 }
 

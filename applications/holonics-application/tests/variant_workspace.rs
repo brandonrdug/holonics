@@ -9,12 +9,10 @@ use holonic_engine::{
     },
     receiver_exact_compression::ReceiverId,
     soulkiller::dismantle,
-    BoundaryId, EventId, ExactComplexWaveCurrent,
+    BoundaryId, EventId,
 };
 use holonics_application::{ArtifactKind, VariantWorkspace};
 use life::native_intelligence::{ExportCodecKind, NativeCirculationConfiguration};
-use num_rational::BigRational as Rat;
-use num_traits::One;
 use serde_json::json;
 use sha2::{Digest, Sha256};
 use tempfile::tempdir;
@@ -101,12 +99,7 @@ fn actual_receipt_workspace_reopens_runs_commits_evaluates_and_exports() {
     assert!(workspace.continue_active(99).is_err());
     assert!(workspace.manifest().active_run.is_some());
     let staged = workspace
-        .stage_return(
-            EventId(100),
-            BoundaryId(200),
-            ExactComplexWaveCurrent::new(Rat::one(), Rat::new(1.into(), 2.into())),
-            Rat::one(),
-        )
+        .stage_world_return(EventId(100), true, b"test-world-admitted".to_vec())
         .expect("stage return");
     assert!(staged
         .written_artifacts

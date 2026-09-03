@@ -1,18 +1,19 @@
 use holonic_engine::{
     native_ecology::holonic_intelligence::{
-        read_complete_gemma4_excitation_receipt, Bf16ExcitationColdWitness,
-        Bf16ExcitationDismantling, IntoDismantlingBoundaryReturn, NativeInferenceRequest,
+        Bf16ExcitationColdWitness, Bf16ExcitationDismantling, IntoDismantlingBoundaryReturn,
+        NativeInferenceRequest, read_complete_gemma4_excitation_receipt,
     },
     native_spool::{NativeTransportScaffold, ReceiverInsufficiency},
     soulkiller::dismantle,
 };
 use life::native_intelligence::{
-    consume_dismantling_return, ApparatusRealization, DepartedDismantlingLanes, MorphologyLineage,
-    NativeCirculationBoundary, NativeCirculationConfiguration, NativeCirculationEvent,
-    NativeCirculationSession, NativeCirculationSnapshot, NativeCultivationCandidate,
-    NativeDeclineReceipt, NativeDiffusionIngress, NativeDiffusionLaw, NativeDiffusionStanding,
-    NativeMorphologyCommit, NativeMorphologyPackage, NativeOwnedInferenceAddress,
-    NativeSessionError, ReturnedScaffoldInteraction,
+    ApparatusRealization, DepartedDismantlingLanes, MorphologyLineage, NativeCirculationBoundary,
+    NativeCirculationConfiguration, NativeCirculationEvent, NativeCirculationSession,
+    NativeCirculationSnapshot, NativeCultivationCandidate, NativeDeclineReceipt,
+    NativeDiffusionIngress, NativeDiffusionLaw, NativeDiffusionStanding,
+    NativeMaterialEmissionBoundary, NativeMaterialIngress, NativeMorphologyArtifact,
+    NativeMorphologyCommit, NativeOwnedInferenceAddress, NativeSessionError, NativeWorldFace,
+    NativeWorldStage, consume_dismantling_return,
 };
 use std::path::Path;
 use thiserror::Error;
@@ -74,7 +75,7 @@ impl AthenaAlphaApplication {
     }
 
     pub fn mount(
-        package: NativeMorphologyPackage,
+        package: NativeMorphologyArtifact,
         configuration: NativeCirculationConfiguration,
     ) -> Result<Self, AthenaAlphaError> {
         Ok(Self {
@@ -94,7 +95,7 @@ impl AthenaAlphaApplication {
     {
         let (hot, departed) = consume_dismantling_return(returned)
             .map_err(|error| AthenaAlphaError::Admission(error.to_string()))?;
-        let package = NativeMorphologyPackage::found(
+        let package = NativeMorphologyArtifact::found(
             hot,
             MorphologyLineage::origin(),
             Vec::new(),
@@ -115,7 +116,7 @@ impl AthenaAlphaApplication {
         self.session.generation()
     }
 
-    pub fn package(&self) -> &NativeMorphologyPackage {
+    pub fn package(&self) -> &NativeMorphologyArtifact {
         self.session.package()
     }
 
@@ -133,6 +134,24 @@ impl AthenaAlphaApplication {
         Ok(self.session.conduct_event(request)?)
     }
 
+    pub fn ingress_octets(
+        &self,
+        request: NativeInferenceRequest,
+        exterior_occurrence: impl Into<String>,
+        octets: &[u8],
+    ) -> Result<NativeMaterialIngress, AthenaAlphaError> {
+        Ok(self
+            .session
+            .ingress_octets(request, exterior_occurrence, octets)?)
+    }
+
+    pub fn conduct_material(
+        &self,
+        ingress: NativeMaterialIngress,
+    ) -> Result<NativeMaterialEmissionBoundary, AthenaAlphaError> {
+        Ok(self.session.conduct_material(ingress)?)
+    }
+
     pub fn continue_from(
         &self,
         boundary: &NativeCirculationBoundary,
@@ -141,12 +160,15 @@ impl AthenaAlphaApplication {
         Ok(self.session.continue_from(boundary, successor)?)
     }
 
-    pub fn stage_return(
+    pub fn stage_world_return(
         &self,
         boundary: &NativeCirculationBoundary,
-        returned: ReturnedScaffoldInteraction,
-    ) -> Result<NativeCultivationCandidate, AthenaAlphaError> {
-        Ok(self.session.stage_return(boundary, returned)?)
+        faces: Vec<NativeWorldFace>,
+        returned_occurrence: holonic_engine::EventId,
+    ) -> Result<NativeWorldStage, AthenaAlphaError> {
+        Ok(self
+            .session
+            .stage_world_return(boundary, faces, returned_occurrence)?)
     }
 
     pub fn commit(

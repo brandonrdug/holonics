@@ -19,13 +19,13 @@ use life::native_intelligence::{
     NativeCirculationBoundary, NativeCirculationConfiguration, NativeCirculationEvent,
     NativeCirculationSession, NativeCirculationSnapshot, NativeCultivationCandidate,
     NativeDeclineReceipt, NativeDiffusionIngress, NativeDiffusionLaw, NativeDiffusionStanding,
-    NativeMorphologyCommit, NativeMorphologyPackage, NativeOwnedInferenceAddress,
-    NativeSessionError, ReturnedScaffoldInteraction,
+    NativeMorphologyCommit, NativeMorphologyArtifact, NativeOwnedInferenceAddress,
+    NativeSessionError, NativeWorldFace, NativeWorldObstruction, NativeWorldStage,
 };
 use num_rational::BigRational as Rat;
 use serde::{Deserialize, Serialize};
 
-pub const HOLONICS_CIRCULATION_ABI_SCHEMA: &str = "org.holonics.circulation-abi.v1";
+pub const HOLONICS_CIRCULATION_ABI_SCHEMA: &str = "org.holonics.circulation-abi.v2";
 
 static NEXT_HANDLE: AtomicU64 = AtomicU64::new(1);
 static SESSIONS: OnceLock<Mutex<BTreeMap<u64, NativeCirculationSession>>> = OnceLock::new();
@@ -64,7 +64,8 @@ pub enum AbiCommand {
     Return {
         handle: u64,
         boundary: NativeCirculationBoundary,
-        returned: ReturnedScaffoldInteraction,
+        faces: Vec<NativeWorldFace>,
+        returned_occurrence: EventId,
     },
     Commit {
         handle: u64,
@@ -132,6 +133,9 @@ pub enum AbiDisposition {
     Candidate {
         candidate: NativeCultivationCandidate,
     },
+    WorldObstruction {
+        obstruction: NativeWorldObstruction,
+    },
     Committed {
         handle: u64,
         generation: u64,
@@ -164,6 +168,8 @@ pub enum AbiRefusalCode {
     Configuration,
     Conduct,
     StaleBoundary,
+    WorldFace,
+    Ingress,
     FalseSuccessor,
     NonlaterReturn,
     Commit,
@@ -275,7 +281,7 @@ pub fn dispatch_bytes(input: &[u8]) -> Vec<u8> {
         },
     };
     serde_json::to_vec(&response).unwrap_or_else(|_| {
-        br#"{"schema":"org.holonics.circulation-abi.v1","request_id":0,"disposition":"refused","code":"malformed-message","detail":"response serialization failed"}"#.to_vec()
+        br#"{"schema":"org.holonics.circulation-abi.v2","request_id":0,"disposition":"refused","code":"malformed-message","detail":"response serialization failed"}"#.to_vec()
     })
 }
 
@@ -310,7 +316,7 @@ fn dispatch_command(command: AbiCommand) -> Result<AbiDisposition, (AbiRefusalCo
             package_wire,
             configuration,
         } => {
-            let package = NativeMorphologyPackage::read(&package_wire)
+            let package = NativeMorphologyArtifact::read(&package_wire)
                 .map_err(NativeSessionError::from)
                 .map_err(session_error)?;
             let session =
@@ -338,11 +344,19 @@ fn dispatch_command(command: AbiCommand) -> Result<AbiDisposition, (AbiRefusalCo
         AbiCommand::Return {
             handle,
             boundary,
-            returned,
+            faces,
+            returned_occurrence,
         } => with_session(handle, |session| {
             session
-                .stage_return(&boundary, returned)
-                .map(|candidate| AbiDisposition::Candidate { candidate })
+                .stage_world_return(&boundary, faces, returned_occurrence)
+                .map(|stage| match stage {
+                    NativeWorldStage::Candidate { candidate, .. } => {
+                        AbiDisposition::Candidate { candidate }
+                    }
+                    NativeWorldStage::Obstructed(obstruction) => {
+                        AbiDisposition::WorldObstruction { obstruction }
+                    }
+                })
         }),
         AbiCommand::Commit { handle, candidate } => mutate_session(handle, |session| {
             session.commit(candidate).map(|(session, commit)| {
@@ -469,6 +483,8 @@ fn session_error(error: NativeSessionError) -> (AbiRefusalCode, String) {
         NativeSessionError::Configuration => AbiRefusalCode::Configuration,
         NativeSessionError::Conduct(_) => AbiRefusalCode::Conduct,
         NativeSessionError::Boundary => AbiRefusalCode::StaleBoundary,
+        NativeSessionError::WorldFace => AbiRefusalCode::WorldFace,
+        NativeSessionError::Ingress(_) => AbiRefusalCode::Ingress,
         NativeSessionError::FalseSuccessor => AbiRefusalCode::FalseSuccessor,
         NativeSessionError::Return => AbiRefusalCode::NonlaterReturn,
         NativeSessionError::Commit(_) => AbiRefusalCode::Commit,
@@ -582,7 +598,7 @@ mod tests {
         },
         receiver_exact_compression::ReceiverId,
         soulkiller::dismantle,
-        BoundaryId, ExactComplexWaveCurrent,
+        BoundaryId,
     };
     use life::native_intelligence::{
         consume_dismantling_return, InferenceConfigurationAddress, MorphologyLineage,
@@ -625,7 +641,7 @@ mod tests {
         })
         .expect("dismantle");
         let (hot, _) = consume_dismantling_return(returned).expect("hot");
-        let package = NativeMorphologyPackage::found(
+        let package = NativeMorphologyArtifact::found(
             hot,
             MorphologyLineage::origin(),
             Vec::new(),
@@ -676,7 +692,7 @@ mod tests {
     fn abi_and_direct_conduct_return_the_same_owned_boundary() {
         let (package_wire, configuration, request) = fixture();
         let direct_session = NativeCirculationSession::mount(
-            NativeMorphologyPackage::read(&package_wire).expect("direct package"),
+            NativeMorphologyArtifact::read(&package_wire).expect("direct package"),
             configuration.clone(),
         )
         .expect("direct session");
@@ -818,21 +834,26 @@ mod tests {
         else {
             panic!("boundary response");
         };
-        let returned = ReturnedScaffoldInteraction::found(
-            boundary.emission.address.clone(),
-            EventId(100),
-            BoundaryId(200),
-            ExactComplexWaveCurrent::new(Rat::from_integer(1.into()), Rat::from_integer(1.into())),
-            Rat::from_integer(1.into()),
-            BTreeSet::new(),
-        )
-        .expect("return");
+        let faces = boundary
+            .issued_world_faces()
+            .into_iter()
+            .map(|issued| {
+                NativeWorldFace::report(
+                    issued.clone(),
+                    true,
+                    issued.support().clone(),
+                    b"abi-world-admitted".to_vec(),
+                )
+                .expect("world face")
+            })
+            .collect();
         let AbiDisposition::Candidate { candidate } = dispatch(
             12,
             AbiCommand::Return {
                 handle,
                 boundary: boundary.clone(),
-                returned,
+                faces,
+                returned_occurrence: EventId(100),
             },
         )
         .disposition

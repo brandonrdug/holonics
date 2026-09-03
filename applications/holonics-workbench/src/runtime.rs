@@ -3,8 +3,7 @@ use std::path::PathBuf;
 use std::str::FromStr;
 
 use athena_alpha::{
-    addressed_ingress, declared_diffusion_law, returned_local_interaction, AthenaAlphaApplication,
-    BASE_CONFIGURATION,
+    addressed_ingress, declared_diffusion_law, AthenaAlphaApplication, BASE_CONFIGURATION,
 };
 use holonic_engine::{
     native_ecology::holonic_intelligence::{
@@ -12,12 +11,13 @@ use holonic_engine::{
     },
     receiver_exact_compression::ReceiverId,
     soulkiller::dismantle,
-    BoundaryId, EventId, ExactComplexWaveCurrent,
+    BoundaryId, EventId,
 };
 use life::native_intelligence::{
     export_morphology, ExportCodecKind, ExportPurpose, MorphologyExportRequest,
     MorphologyExportReturn, NativeCirculationBoundary, NativeCirculationConfiguration,
     NativeCirculationEvent, NativeDiffusionIngress, NativeDiffusionStanding,
+    NativeWorldFace, NativeWorldStage,
 };
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
@@ -174,10 +174,8 @@ impl WorkbenchRuntime {
             AthenaCommand::Return {
                 session: session.to_owned(),
                 occurrence,
-                boundary: occurrence.saturating_mul(2),
-                real: "1".to_owned(),
-                imaginary: "1/2".to_owned(),
-                storage: "1".to_owned(),
+                admitted: true,
+                diagnostic: "bounded-demo-world-admitted".to_owned(),
             },
         )))
     }
@@ -288,18 +286,9 @@ impl WorkbenchRuntime {
             AthenaCommand::Return {
                 session,
                 occurrence,
-                boundary,
-                real,
-                imaginary,
-                storage,
-            } => self.athena_return(
-                &session,
-                EventId(occurrence),
-                BoundaryId(boundary),
-                parse_rat(&real)?,
-                parse_rat(&imaginary)?,
-                parse_rat(&storage)?,
-            ),
+                admitted,
+                diagnostic,
+            } => self.athena_return(&session, EventId(occurrence), admitted, diagnostic.into_bytes()),
             AthenaCommand::Decline { session } => self.athena_decline(&session),
             AthenaCommand::DiffuseDemo {
                 session,
@@ -454,10 +443,8 @@ impl WorkbenchRuntime {
         &mut self,
         session: &str,
         occurrence: EventId,
-        boundary_address: BoundaryId,
-        real: Rat,
-        imaginary: Rat,
-        storage: Rat,
+        admitted: bool,
+        diagnostic: Vec<u8>,
     ) -> Result<Vec<WorkbenchEvent>, WorkbenchError> {
         let standing = self.session(session)?;
         let recovery = standing
@@ -472,34 +459,43 @@ impl WorkbenchRuntime {
             .sessions
             .remove(session)
             .expect("session and boundary checked before ownership transfer");
-        let result = (|| {
-            let returned = returned_local_interaction(
-                boundary.emission.address.clone(),
-                occurrence,
-                boundary_address,
-                ExactComplexWaveCurrent::new(real, imaginary),
-                storage,
-                BTreeSet::new(),
-            )
-            .map_err(|error| WorkbenchError::Owner(error.to_string()))?;
-            let candidate = entry
-                .application
-                .stage_return(&boundary, returned)
-                .map_err(|error| WorkbenchError::Owner(error.to_string()))?;
-            entry
-                .application
-                .commit(candidate)
+        let bounded_demo = entry.bounded_demo;
+        let faces = boundary
+            .issued_world_faces()
+            .into_iter()
+            .map(|issued| {
+                NativeWorldFace::report(
+                    issued.clone(),
+                    admitted,
+                    issued.support().clone(),
+                    diagnostic.clone(),
+                )
                 .map_err(|error| WorkbenchError::Owner(error.to_string()))
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        let result = (|| {
+            let stage = entry
+                .application
+                .stage_world_return(&boundary, faces, occurrence)
+                .map_err(|error| WorkbenchError::Owner(error.to_string()))?;
+            match stage {
+                NativeWorldStage::Candidate { candidate, .. } => entry
+                    .application
+                    .commit(candidate)
+                    .map(Some)
+                    .map_err(|error| WorkbenchError::Owner(error.to_string())),
+                NativeWorldStage::Obstructed(_obstruction) => Ok(None),
+            }
         })();
         match result {
-            Ok((application, commit)) => {
+            Ok(Some((application, commit))) => {
                 let generation = application.generation();
                 self.sessions.insert(
                     session.to_owned(),
                     SessionEntry {
                         application,
                         boundary: None,
-                        bounded_demo: entry.bounded_demo,
+                        bounded_demo,
                     },
                 );
                 Ok(vec![self.event(
@@ -512,6 +508,24 @@ impl WorkbenchRuntime {
                     Some(to_value(&commit)?),
                 )])
             }
+            Ok(None) => {
+                let application = AthenaAlphaApplication::remount(recovery)
+                    .map_err(|restore| WorkbenchError::Owner(restore.to_string()))?;
+                self.sessions.insert(
+                    session.to_owned(),
+                    SessionEntry {
+                        application,
+                        boundary: Some(boundary),
+                        bounded_demo,
+                    },
+                );
+                Ok(vec![self.event(
+                    EventLevel::Obstruction,
+                    format!("athena/{session}/world-return"),
+                    "the complete world-face family founded no local cultivation candidate",
+                    None,
+                )])
+            }
             Err(error) => {
                 let application = AthenaAlphaApplication::remount(recovery)
                     .map_err(|restore| WorkbenchError::Owner(restore.to_string()))?;
@@ -520,7 +534,7 @@ impl WorkbenchRuntime {
                     SessionEntry {
                         application,
                         boundary: Some(boundary),
-                        bounded_demo: entry.bounded_demo,
+                        bounded_demo,
                     },
                 );
                 Err(error)
@@ -816,7 +830,7 @@ fn session_payload(session: &str, application: &AthenaAlphaApplication) -> Value
         "anatomy": package.manifest.anatomy,
         "receivers": package.manifest.receiver_capability.native_receiver_family,
         "ingress": ingress,
-        "open_obligations": package.reconstruction.open_obligations,
+        "open_obligations": package.testimony.open_obligations,
     })
 }
 
@@ -922,10 +936,8 @@ mod tests {
             AthenaCommand::Return {
                 session: "alpha".to_owned(),
                 occurrence: 100,
-                boundary: 200,
-                real: "1".to_owned(),
-                imaginary: "1/2".to_owned(),
-                storage: "1".to_owned(),
+                admitted: true,
+                diagnostic: "bounded-test-world-admitted".to_owned(),
             },
         );
         assert!(committed[0].summary.contains("generation 1"));
@@ -1050,10 +1062,8 @@ mod tests {
                 AthenaCommand::Return {
                     session: "alpha".to_owned(),
                     occurrence: 100,
-                    boundary: 200,
-                    real: "1".to_owned(),
-                    imaginary: "0".to_owned(),
-                    storage: "1".to_owned(),
+                    admitted: true,
+                    diagnostic: "no-boundary".to_owned(),
                 }
             )[0]
             .level,
@@ -1087,10 +1097,8 @@ mod tests {
                 AthenaCommand::Return {
                     session: "alpha".to_owned(),
                     occurrence: 100,
-                    boundary: 200,
-                    real: "not-rational".to_owned(),
-                    imaginary: "0".to_owned(),
-                    storage: "1".to_owned(),
+                    admitted: true,
+                    diagnostic: "still-no-boundary".to_owned(),
                 }
             )[0]
             .level,

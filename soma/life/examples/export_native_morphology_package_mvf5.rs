@@ -11,7 +11,7 @@ use holonic_engine::{
 use life::native_intelligence::{
     consume_dismantling_return, export_morphology, ExactMorphologyExport, ExportCodecKind,
     ExportPurpose, MorphologyExportRequest, MorphologyExportReturn, MorphologyLineage,
-    NativeMorphologyPackage,
+    NativeMorphologyArtifact,
 };
 use serde_json::json;
 
@@ -37,7 +37,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         }],
     })?;
     let hot = consume_dismantling_return(returned)?.0;
-    let package = NativeMorphologyPackage::found(
+    let package = NativeMorphologyArtifact::found(
         hot,
         MorphologyLineage::origin(),
         Vec::new(),
@@ -85,7 +85,7 @@ fn main() -> Result<(), Box<dyn Error>> {
 }
 
 fn exact(
-    package: &NativeMorphologyPackage,
+    package: &NativeMorphologyArtifact,
     codec: ExportCodecKind,
 ) -> Result<ExactMorphologyExport, Box<dyn Error>> {
     match export_morphology(

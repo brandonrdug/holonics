@@ -12,10 +12,10 @@ use holonic_engine::{
 use super::*;
 use crate::native_intelligence::{
     consume_dismantling_return, ConfigurationEvaluationReceipt, InferenceConfigurationAddress,
-    MorphologyLineage, NativeMorphologyPackage,
+    MorphologyLineage, NativeMorphologyArtifact,
 };
 
-fn package(observation: Option<u64>) -> NativeMorphologyPackage {
+fn package(observation: Option<u64>) -> NativeMorphologyArtifact {
     let returned = dismantle(Bf16ExcitationDismantling {
         receiver: ReceiverId(7),
         excitations: vec![ForeignBf16Excitation {
@@ -50,7 +50,7 @@ fn package(observation: Option<u64>) -> NativeMorphologyPackage {
         })
         .into_iter()
         .collect();
-    NativeMorphologyPackage::found(
+    NativeMorphologyArtifact::found(
         hot,
         MorphologyLineage::origin(),
         evaluation,
@@ -100,7 +100,7 @@ fn anatomy_projection_retains_both_packages_and_a_configuration_separator() {
                 assert_eq!(projected.separator.left_observations, vec![Observation(1)]);
                 assert_eq!(projected.separator.right_observations, vec![Observation(2)]);
                 assert_eq!(
-                    NativeMorphologyPackage::read(&projected.collapsed_package_fibre[0])
+                    NativeMorphologyArtifact::read(&projected.collapsed_package_fibre[0])
                         .expect("left fibre")
                         .canonical_bytes()
                         .expect("left bytes"),

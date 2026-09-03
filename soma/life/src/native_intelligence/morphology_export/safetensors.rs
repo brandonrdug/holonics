@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use serde_json::{json, Map, Value};
 
 use super::{MorphologyExportArtifact, MorphologyExportError};
-use crate::native_intelligence::{ExportCodecKind, NativeMorphologyPackage};
+use crate::native_intelligence::{ExportCodecKind, NativeMorphologyArtifact};
 
 const SCHEMA: &str = "holonics.native-morphology.safetensors.v1";
 const MEDIA_TYPE: &str = "application/x-safetensors";
@@ -16,7 +16,7 @@ struct Tensor {
 }
 
 pub(super) fn exact(
-    package: &NativeMorphologyPackage,
+    package: &NativeMorphologyArtifact,
 ) -> Result<MorphologyExportArtifact, MorphologyExportError> {
     let tensors = BTreeMap::from([
         (
@@ -32,7 +32,7 @@ pub(super) fn exact(
 }
 
 pub(super) fn anatomy(
-    package: &NativeMorphologyPackage,
+    package: &NativeMorphologyArtifact,
 ) -> Result<MorphologyExportArtifact, MorphologyExportError> {
     Ok(artifact(encode(
         BTreeMap::from([(ANATOMY_TENSOR.to_owned(), anatomy_tensor(package)?)]),
@@ -42,17 +42,17 @@ pub(super) fn anatomy(
 
 pub(super) fn import_exact(
     artifact: &MorphologyExportArtifact,
-) -> Result<NativeMorphologyPackage, MorphologyExportError> {
+) -> Result<NativeMorphologyArtifact, MorphologyExportError> {
     if artifact.media_type != MEDIA_TYPE || artifact.schema_or_opset != SCHEMA {
         return Err(MorphologyExportError::Wire(
             "unknown Safetensors morphology schema".to_owned(),
         ));
     }
     let package = tensor(&artifact.bytes, PACKAGE_TENSOR)?;
-    NativeMorphologyPackage::read(package).map_err(MorphologyExportError::Package)
+    NativeMorphologyArtifact::read(package).map_err(MorphologyExportError::Package)
 }
 
-fn anatomy_tensor(package: &NativeMorphologyPackage) -> Result<Tensor, MorphologyExportError> {
+fn anatomy_tensor(package: &NativeMorphologyArtifact) -> Result<Tensor, MorphologyExportError> {
     let data = serde_json::to_vec(&package.manifest.anatomy)
         .map_err(|error| MorphologyExportError::Wire(error.to_string()))?;
     Ok(Tensor {
@@ -133,7 +133,7 @@ fn tensor<'a>(bytes: &'a [u8], name: &str) -> Result<&'a [u8], MorphologyExportE
         .ok_or_else(|| MorphologyExportError::Wire(format!("Safetensors tensor {name} absent")))?;
     if tensor.get("dtype").and_then(Value::as_str) != Some("U8") {
         return Err(MorphologyExportError::Wire(
-            "morphology package tensor is not U8".to_owned(),
+            "morphology artifact tensor is not U8".to_owned(),
         ));
     }
     let offsets = tensor

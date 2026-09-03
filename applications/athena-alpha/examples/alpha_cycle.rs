@@ -1,18 +1,17 @@
 use std::collections::BTreeSet;
 
-use athena_alpha::{
-    addressed_ingress, inspect_cycle, returned_local_interaction, BASE_CONFIGURATION,
-};
+use athena_alpha::{addressed_ingress, inspect_cycle, BASE_CONFIGURATION};
 use holonic_engine::{
     native_ecology::holonic_intelligence::{
         Bf16ExcitationDismantling, ExteriorModality, ForeignBf16Excitation,
     },
     receiver_exact_compression::ReceiverId,
     soulkiller::dismantle,
-    BoundaryId, EventId, ExactComplexWaveCurrent,
+    BoundaryId, EventId,
 };
-use life::native_intelligence::NativeCirculationConfiguration;
-use num_rational::BigRational as Rat;
+use life::native_intelligence::{
+    NativeCirculationConfiguration, NativeWorldFace, NativeWorldStage,
+};
 
 fn excitation(event: u64, entering: u16, returned: u16) -> ForeignBf16Excitation {
     ForeignBf16Excitation {
@@ -46,15 +45,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ReceiverId(7),
     );
     let boundary = application.conduct(request)?;
-    let returned = returned_local_interaction(
-        boundary.emission.address.clone(),
-        EventId(100),
-        BoundaryId(200),
-        ExactComplexWaveCurrent::new(Rat::from_integer(1.into()), Rat::from_integer(1.into())),
-        Rat::from_integer(1.into()),
-        BTreeSet::new(),
-    )?;
-    let candidate = application.stage_return(&boundary, returned)?;
+    let faces = boundary
+        .issued_world_faces()
+        .into_iter()
+        .map(|issued| {
+            NativeWorldFace::report(
+                issued.clone(),
+                true,
+                issued.support().clone(),
+                b"alpha-cycle-world-admitted".to_vec(),
+            )
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    let NativeWorldStage::Candidate { candidate, .. } =
+        application.stage_world_return(&boundary, faces, EventId(100))?
+    else {
+        return Err("the alpha-cycle world return was obstructed".into());
+    };
     let (application, commit) = application.commit(candidate)?;
     let later = addressed_ingress(
         commit.source.spool.clone(),

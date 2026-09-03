@@ -1,11 +1,11 @@
 {
-  "schema": "soma-life.native-circulation-session.v1",
+  "schema": "soma-life.native-circulation-session.v2",
   "address": {
     "ingress_aperture": "native-addressed-occurrence",
     "occurrence": 1,
     "receiver": 7,
-    "continuation_receiver": "exterior-receiver-decision",
-    "world_return_law": "genuinely-later-return",
+    "continuation_receiver": "issued-world-face-family",
+    "world_return_law": "session-constituted-return",
     "emission_codec": "owned-structural-boundary",
     "apparatus": "resident-native-word-and-exact-diffusion",
     "stochastic_current": null

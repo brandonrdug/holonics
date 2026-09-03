@@ -15,21 +15,41 @@ use holonic_engine::{
 use serde::{Deserialize, Serialize};
 
 use super::scaffold_cultivation::derive_returned_scaffold_deposit;
+use super::world_return::constitute_world_interaction;
 use super::{
     MorphologyLineage, NativeCirculationBoundary, NativeCirculationConfiguration,
-    NativeCirculationSession, NativeEcologyRest, NativeMorphologyPackage,
-    NativeOwnedInferenceAddress, NativeSessionError, RestedMorphology, ReturnedScaffoldInteraction,
+    NativeCirculationSession, NativeEcologyRest, NativeMorphologyArtifact,
+    NativeOwnedInferenceAddress, NativeSessionError, NativeWorldFace, NativeHolonMorphology,
 };
 
 pub const NATIVE_MORPHOLOGY_COMMIT_SCHEMA: &str = "soma-life.native-morphology-commit.v1";
 pub const NATIVE_CIRCULATION_SNAPSHOT_SCHEMA: &str = "soma-life.native-circulation-snapshot.v1";
+pub const NATIVE_CULTIVATION_CANDIDATE_SCHEMA: &str =
+    "soma-life.native-cultivation-candidate.v2";
 
 /// One staged exterior return. It borrows no morphology and cannot be committed against another
 /// generation or emission.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct NativeCultivationCandidate {
-    pub boundary: NativeCirculationBoundary,
-    pub returned: ReturnedScaffoldInteraction,
+    pub(super) schema: String,
+    pub(super) boundary: NativeCirculationBoundary,
+    pub(super) faces: Vec<NativeWorldFace>,
+    pub(super) returned_occurrence: EventId,
+}
+
+impl NativeCultivationCandidate {
+    pub fn boundary(&self) -> &NativeCirculationBoundary {
+        &self.boundary
+    }
+
+    pub fn faces(&self) -> &[NativeWorldFace] {
+        &self.faces
+    }
+
+    pub fn returned_occurrence(&self) -> EventId {
+        self.returned_occurrence
+    }
 }
 
 /// Exact parented testimony for one local morphology commit.
@@ -124,7 +144,7 @@ impl NativeCirculationSnapshot {
             ));
         }
         self.configuration.validate()?;
-        let package = NativeMorphologyPackage::read(&self.package_wire)?;
+        let package = NativeMorphologyArtifact::read(&self.package_wire)?;
         let mut previous = None;
         for commit in &self.commits {
             commit.validate()?;
@@ -147,31 +167,24 @@ impl NativeCirculationSnapshot {
 }
 
 impl NativeCirculationSession {
-    pub fn stage_return(
-        &self,
-        boundary: &NativeCirculationBoundary,
-        returned: ReturnedScaffoldInteraction,
-    ) -> Result<NativeCultivationCandidate, NativeSessionError> {
-        boundary.validate_for(self)?;
-        if returned.emitted != boundary.emission.address
-            || returned.occurrence <= boundary.request.address.occurrence
-        {
-            return Err(NativeSessionError::Return);
-        }
-        Ok(NativeCultivationCandidate {
-            boundary: boundary.clone(),
-            returned,
-        })
-    }
-
     /// Consume this generation and return its single committed successor.
     pub fn commit(
         self,
         candidate: NativeCultivationCandidate,
     ) -> Result<(Self, NativeMorphologyCommit), NativeSessionError> {
         candidate.boundary.validate_for(&self)?;
-        if candidate.returned.emitted != candidate.boundary.emission.address
-            || candidate.returned.occurrence <= candidate.boundary.request.address.occurrence
+        if candidate.schema != NATIVE_CULTIVATION_CANDIDATE_SCHEMA {
+            return Err(NativeSessionError::Return);
+        }
+        let constituted = constitute_world_interaction(
+            &candidate.boundary,
+            &candidate.faces,
+            candidate.returned_occurrence,
+        )?
+        .map_err(|_| NativeSessionError::Return)?;
+        let returned = constituted.interaction;
+        if returned.emitted != candidate.boundary.emission.address
+            || returned.occurrence <= candidate.boundary.request.address.occurrence
         {
             return Err(NativeSessionError::Return);
         }
@@ -186,13 +199,13 @@ impl NativeCirculationSession {
         let apparatus = package.manifest.realization.apparatus.clone();
         let exports = package.manifest.realization.exports.clone();
         let departed = package
-            .reconstruction
+            .testimony
             .departed_inherited_withdrawals
             .clone();
         let hot = package.into_hot();
         let parent_occurrences = hot_occurrences(&hot);
         let source = candidate.boundary.request.address.native();
-        let deposit = derive_returned_scaffold_deposit(hot.native(), &source, &candidate.returned)
+        let deposit = derive_returned_scaffold_deposit(hot.native(), &source, &returned)
             .map_err(|error| NativeSessionError::Commit(error.to_string()))?;
         let deposit_wire = serde_json::to_vec(&deposit)
             .map_err(|error| NativeSessionError::Commit(error.to_string()))?;
@@ -206,9 +219,9 @@ impl NativeCirculationSession {
                 .checked_add(1)
                 .ok_or_else(|| NativeSessionError::Commit("generation overflow".to_owned()))?,
             parent_occurrences,
-            returned_occurrences: BTreeSet::from([candidate.returned.occurrence]),
+            returned_occurrences: BTreeSet::from([returned.occurrence]),
         };
-        let package = NativeMorphologyPackage::found_successor(
+        let package = NativeMorphologyArtifact::found_successor(
             hot,
             successor_lineage.clone(),
             evaluation,
@@ -222,7 +235,7 @@ impl NativeCirculationSession {
             successor_lineage,
             source: candidate.boundary.request.address,
             emission: candidate.boundary.emission.address,
-            returned_occurrence: candidate.returned.occurrence,
+            returned_occurrence: returned.occurrence,
             causal_cone,
             deposit_wire,
             deposit_receipt,
@@ -254,7 +267,7 @@ impl NativeCirculationSession {
 
     pub fn remount(snapshot: NativeCirculationSnapshot) -> Result<Self, NativeSessionError> {
         snapshot.validate()?;
-        let package = NativeMorphologyPackage::read(&snapshot.package_wire)?;
+        let package = NativeMorphologyArtifact::read(&snapshot.package_wire)?;
         let session = Self {
             package,
             configuration: snapshot.configuration,
@@ -293,11 +306,11 @@ impl NativeCirculationSession {
         let apparatus = package.manifest.realization.apparatus.clone();
         let exports = package.manifest.realization.exports.clone();
         let departed = package
-            .reconstruction
+            .testimony
             .departed_inherited_withdrawals
             .clone();
         let hot = package.into_hot();
-        let RestedMorphology::Situated { ecology, .. } = hot else {
+        let NativeHolonMorphology::Situated { ecology, .. } = hot else {
             return Err(NativeSessionError::Commit(
                 "a committed successor is not situated morphology".to_owned(),
             ));
@@ -311,7 +324,7 @@ impl NativeCirculationSession {
             ));
         }
         let hot = predecessor_hot(predecessor)?;
-        let package = NativeMorphologyPackage::found_successor(
+        let package = NativeMorphologyArtifact::found_successor(
             hot,
             commit.predecessor_lineage.clone(),
             evaluation,
@@ -346,7 +359,7 @@ impl NativeCirculationSession {
         let apparatus = package.manifest.realization.apparatus.clone();
         let exports = package.manifest.realization.exports.clone();
         let departed = package
-            .reconstruction
+            .testimony
             .departed_inherited_withdrawals
             .clone();
         let hot = package.into_hot();
@@ -356,7 +369,7 @@ impl NativeCirculationSession {
                 "replay returned a different inverse placement receipt".to_owned(),
             ));
         }
-        let package = NativeMorphologyPackage::found_successor(
+        let package = NativeMorphologyArtifact::found_successor(
             hot,
             commit.successor_lineage.clone(),
             evaluation,
@@ -373,7 +386,7 @@ impl NativeCirculationSession {
     }
 }
 
-fn hot_occurrences(hot: &RestedMorphology) -> BTreeSet<EventId> {
+fn hot_occurrences(hot: &NativeHolonMorphology) -> BTreeSet<EventId> {
     hot.native()
         .spools
         .iter()
@@ -384,31 +397,31 @@ fn hot_occurrences(hot: &RestedMorphology) -> BTreeSet<EventId> {
 }
 
 fn apply_deposit(
-    hot: RestedMorphology,
+    hot: NativeHolonMorphology,
     deposit: NativeThreadDeposit,
-) -> Result<(RestedMorphology, NativeThreadDepositReceipt), NativeSessionError> {
+) -> Result<(NativeHolonMorphology, NativeThreadDepositReceipt), NativeSessionError> {
     let (situated, receipt) = match hot {
-        RestedMorphology::Native(rest) => rest
+        NativeHolonMorphology::Native(rest) => rest
             .ecology
             .deposit_thread(deposit)
             .map_err(|error| NativeSessionError::Commit(error.to_string()))?,
-        RestedMorphology::Situated { ecology, .. } => ecology
+        NativeHolonMorphology::Situated { ecology, .. } => ecology
             .deposit_thread(deposit)
             .map_err(|error| NativeSessionError::Commit(error.to_string()))?,
     };
-    Ok((RestedMorphology::situated(situated)?, receipt))
+    Ok((NativeHolonMorphology::situated(situated)?, receipt))
 }
 
 fn predecessor_hot(
     predecessor: SituatedNativeTransportPredecessor,
-) -> Result<RestedMorphology, NativeSessionError> {
+) -> Result<NativeHolonMorphology, NativeSessionError> {
     match predecessor {
-        SituatedNativeTransportPredecessor::Native(native) => Ok(RestedMorphology::Native(
+        SituatedNativeTransportPredecessor::Native(native) => Ok(NativeHolonMorphology::Native(
             NativeEcologyRest::found(native)
                 .map_err(|error| NativeSessionError::Commit(error.to_string()))?,
         )),
         SituatedNativeTransportPredecessor::Situated(situated) => {
-            RestedMorphology::situated(situated).map_err(Into::into)
+            NativeHolonMorphology::situated(situated).map_err(Into::into)
         }
     }
 }
@@ -423,12 +436,13 @@ mod tests {
         },
         receiver_exact_compression::ReceiverId,
         soulkiller::dismantle,
-        BoundaryId, ExactComplexWaveCurrent,
+        BoundaryId,
     };
-    use num_bigint::BigInt;
-    use num_rational::BigRational as Rat;
 
-    use crate::native_intelligence::{consume_dismantling_return, InferenceConfigurationAddress};
+    use crate::native_intelligence::{
+        consume_dismantling_return, InferenceConfigurationAddress, NativeWorldFace,
+        NativeWorldStage,
+    };
 
     fn excitation(event: u64, entering: u16, returned: u16) -> ForeignBf16Excitation {
         ForeignBf16Excitation {
@@ -452,7 +466,7 @@ mod tests {
         })
         .expect("dismantle");
         let (hot, _) = consume_dismantling_return(returned).expect("hot");
-        let package = NativeMorphologyPackage::found(
+        let package = NativeMorphologyArtifact::found(
             hot,
             MorphologyLineage::origin(),
             Vec::new(),
@@ -500,22 +514,33 @@ mod tests {
         }
     }
 
-    fn returned(
+    fn candidate(
+        session: &NativeCirculationSession,
         boundary: &NativeCirculationBoundary,
         occurrence: u64,
-    ) -> ReturnedScaffoldInteraction {
-        ReturnedScaffoldInteraction::found(
-            boundary.emission.address.clone(),
-            EventId(occurrence),
-            BoundaryId(occurrence * 2),
-            ExactComplexWaveCurrent::new(
-                Rat::from_integer(BigInt::from(1)),
-                Rat::from_integer(BigInt::from(1)),
-            ),
-            Rat::from_integer(BigInt::from(1)),
-            BTreeSet::new(),
-        )
-        .expect("returned interaction")
+    ) -> NativeCultivationCandidate {
+        let faces = boundary
+            .issued_world_faces()
+            .into_iter()
+            .map(|issued| {
+                NativeWorldFace::report(
+                    issued.clone(),
+                    true,
+                    issued.support().clone(),
+                    b"admitted".to_vec(),
+                )
+                .expect("world face")
+            })
+            .collect();
+        match session
+            .stage_world_return(boundary, faces, EventId(occurrence))
+            .expect("world return")
+        {
+            NativeWorldStage::Candidate { candidate, .. } => candidate,
+            NativeWorldStage::Obstructed(obstruction) => {
+                panic!("unexpected obstruction {obstruction:?}")
+            }
+        }
     }
 
     #[test]
@@ -524,9 +549,7 @@ mod tests {
         let first_boundary = session
             .conduct(request(&session, EventId(1)))
             .expect("first cut");
-        let first_candidate = session
-            .stage_return(&first_boundary, returned(&first_boundary, 100))
-            .expect("first candidate");
+        let first_candidate = candidate(&session, &first_boundary, 100);
         let (session, first_commit) = session.commit(first_candidate).expect("first commit");
         assert_eq!(session.generation(), 1);
         assert_eq!(first_commit.predecessor_lineage.generation, 0);
@@ -536,9 +559,7 @@ mod tests {
         let second_boundary = session
             .conduct(request(&session, EventId(100)))
             .expect("second cut");
-        let second_candidate = session
-            .stage_return(&second_boundary, returned(&second_boundary, 101))
-            .expect("second candidate");
+        let second_candidate = candidate(&session, &second_boundary, 101);
         let (session, _) = session.commit(second_candidate).expect("second commit");
         assert_eq!(session.generation(), 2);
         assert_eq!(session.commits().len(), 2);
@@ -589,19 +610,29 @@ mod tests {
     }
 
     #[test]
-    fn mismatched_return_and_replay_predecessor_refuse() {
+    fn incomplete_world_face_family_and_replay_predecessor_refuse() {
         let session = session();
         let boundary = session.conduct(request(&session, EventId(1))).expect("cut");
-        let mut wrong = returned(&boundary, 100);
-        wrong.emitted.entering_occurrence = EventId(2);
+        let mut incomplete = boundary
+            .issued_world_faces()
+            .into_iter()
+            .map(|issued| {
+                NativeWorldFace::report(
+                    issued.clone(),
+                    true,
+                    issued.support().clone(),
+                    Vec::new(),
+                )
+                .expect("face")
+            })
+            .collect::<Vec<_>>();
+        incomplete.pop();
         assert!(matches!(
-            session.stage_return(&boundary, wrong),
-            Err(NativeSessionError::Return)
+            session.stage_world_return(&boundary, incomplete, EventId(100)),
+            Err(NativeSessionError::WorldFace)
         ));
 
-        let candidate = session
-            .stage_return(&boundary, returned(&boundary, 100))
-            .expect("candidate");
+        let candidate = candidate(&session, &boundary, 100);
         let (successor, commit) = session.commit(candidate).expect("commit");
         assert!(matches!(
             successor.replay_commit(commit),

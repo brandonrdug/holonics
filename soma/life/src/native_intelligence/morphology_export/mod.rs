@@ -1,4 +1,4 @@
-//! Exact and projected exterior export lenses for native morphology packages.
+//! Exact and projected exterior export lenses for native morphology artifacts.
 
 mod onnx;
 mod safetensors;
@@ -11,7 +11,7 @@ use thiserror::Error;
 
 use super::{
     ConfigurationEvaluationReceipt, ExportCodecKind, InferenceConfigurationAddress,
-    MorphologyPackageError, NativeMorphologyPackage,
+    MorphologyArtifactError, NativeMorphologyArtifact,
 };
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -84,14 +84,14 @@ pub enum MorphologyExportReturn {
 
 #[derive(Debug, Error)]
 pub enum MorphologyExportError {
-    #[error("the morphology package refused export: {0}")]
-    Package(#[from] MorphologyPackageError),
+    #[error("the morphology artifact refused export: {0}")]
+    Package(#[from] MorphologyArtifactError),
     #[error("the exterior export wire is malformed: {0}")]
     Wire(String),
 }
 
 pub fn export_morphology(
-    package: &NativeMorphologyPackage,
+    package: &NativeMorphologyArtifact,
     request: MorphologyExportRequest,
 ) -> Result<MorphologyExportReturn, MorphologyExportError> {
     package.validate()?;
@@ -137,7 +137,7 @@ pub fn export_morphology(
 
 pub fn import_exact_export(
     artifact: &MorphologyExportArtifact,
-) -> Result<NativeMorphologyPackage, MorphologyExportError> {
+) -> Result<NativeMorphologyArtifact, MorphologyExportError> {
     match artifact.codec {
         ExportCodecKind::Safetensors => safetensors::import_exact(artifact),
         ExportCodecKind::Onnx => onnx::import_exact(artifact),
@@ -147,8 +147,8 @@ pub fn import_exact_export(
 /// Export the common anatomy of two variants while retaining the complete collapsed package fibre
 /// and the first configuration which distinguishes their receiver consequences.
 pub fn project_common_anatomy(
-    left: &NativeMorphologyPackage,
-    right: &NativeMorphologyPackage,
+    left: &NativeMorphologyArtifact,
+    right: &NativeMorphologyArtifact,
     codec: ExportCodecKind,
 ) -> Result<MorphologyExportReturn, MorphologyExportError> {
     left.validate()?;

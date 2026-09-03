@@ -1,12 +1,10 @@
-use holonic_engine::{
-    receiver_exact_compression::ReceiverId, BoundaryId, EventId, ExactComplexWaveCurrent,
-};
+use holonic_engine::{receiver_exact_compression::ReceiverId, EventId};
 use holonics_application::{VariantWorkspace, WorkspaceReturn};
 use life::native_intelligence::ExportCodecKind;
 use serde::Serialize;
 
 use crate::adapters::AdapterReturn;
-use crate::runtime::{parse_rat, WorkbenchError};
+use crate::runtime::WorkbenchError;
 use crate::{ExportCodecArgument, WorkspaceCommand};
 
 pub fn execute(command: WorkspaceCommand) -> Result<AdapterReturn, WorkbenchError> {
@@ -83,21 +81,18 @@ pub fn execute(command: WorkspaceCommand) -> Result<AdapterReturn, WorkbenchErro
         WorkspaceCommand::StageReturn {
             root,
             occurrence,
-            boundary,
-            real,
-            imaginary,
-            storage,
+            admitted,
+            diagnostic,
         } => {
             let mut workspace = VariantWorkspace::open(&root).map_err(owner)?;
             returned(
                 "workspace/stage-return",
                 "persisted one explicit genuinely later return as an uncommitted cultivation candidate",
                 workspace
-                    .stage_return(
+                    .stage_world_return(
                         EventId(occurrence),
-                        BoundaryId(boundary),
-                        ExactComplexWaveCurrent::new(parse_rat(&real)?, parse_rat(&imaginary)?),
-                        parse_rat(&storage)?,
+                        admitted,
+                        diagnostic.into_bytes(),
                     )
                     .map_err(owner)?,
             )

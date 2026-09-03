@@ -57,10 +57,8 @@ pub enum WorkspaceCommand {
     StageReturn {
         root: PathBuf,
         occurrence: u64,
-        boundary: u64,
-        real: String,
-        imaginary: String,
-        storage: String,
+        admitted: bool,
+        diagnostic: String,
     },
     Commit {
         root: PathBuf,
@@ -105,10 +103,8 @@ pub enum AthenaCommand {
     Return {
         session: String,
         occurrence: u64,
-        boundary: u64,
-        real: String,
-        imaginary: String,
-        storage: String,
+        admitted: bool,
+        diagnostic: String,
     },
     Decline {
         session: String,
