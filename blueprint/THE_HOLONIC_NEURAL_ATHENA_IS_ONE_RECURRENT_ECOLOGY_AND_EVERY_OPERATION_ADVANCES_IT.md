@@ -336,12 +336,25 @@ successor operation; no exterior status, expected answer, target label, loss sca
 return constructor determines the change. No claim requires source detachment, ablation, or later
 held-out behavior unless that narrower claim is explicitly being graded.
 
-[established-bounded; implemented-exact; measured] **HNA4 PASSED.** Operation 41 derived a positive
-exact presented/reacted alignment, changed the ecology's local conductance factor from one to two,
-and returned it in the successor. Operation 42 consumed that carrier through the same `advance` API
-and reported factor two in its own trace. The earlier caller-authored ordinal factor draft is
-counterexample evidence, not the result. The receipt is
-[`2026-09-02_HNA4_LOCAL_ALIGNMENT_CHANGED_MORPHOLOGY_INSIDE_THE_RECURRENT_OPERATION.md`](../research/records/2026-09-02_HNA4_LOCAL_ALIGNMENT_CHANGED_MORPHOLOGY_INSIDE_THE_RECURRENT_OPERATION.md).
+[definition] The local law of morphology advance, reconciled with the formal owners on
+2026-09-02: `advanceMorphology W o x y` takes the next ordinary occurrence `o` as the comparison at
+the emission receiver, returns the differential of the declared receiver through the adjoint of the
+local current word, and deposits a factorized overlay on the causal cone of the return. No verdict,
+reward, label, status, or caller-supplied factor enters.
+
+[counterexample; source-inspected] The first HNA4 receipt
+([`2026-09-02_HNA4_LOCAL_ALIGNMENT_CHANGED_MORPHOLOGY_INSIDE_THE_RECURRENT_OPERATION.md`](../research/records/2026-09-02_HNA4_LOCAL_ALIGNMENT_CHANGED_MORPHOLOGY_INSIDE_THE_RECURRENT_OPERATION.md))
+is withdrawn: its factor was carried on the occurrence, gated by a sign that cannot refuse a
+positive scale, and applied as one global scalar
+([`the reconciliation`](../research/records/2026-09-02_THE_HNA4_MORPHOLOGY_FACTOR_IS_OCCURRENCE_CARRIED_AND_THE_FORMAL_OWNERS_REQUIRE_A_CAUSAL_CONE_ADJOINT_RETURN.md)).
+
+[established-bounded; implemented-exact; measured] **HNA4 PASSED at the tied cross-section.** A
+continuing occurrence met the retained emitted face; the normalized-exponential differential
+returned through the terminal reactions; a rank-5 factorized overlay was deposited on the tied
+`262,144 x 2,560` cross-section and the next cycle's contraction applied it. The control without
+apertures differs at every emitted word of the second cycle. The pullback to the other 718
+populations is open. The receipt is
+[`2026-09-02_HNA4_THE_RETURN_DEPOSITED_A_FACTORIZED_OVERLAY_ON_THE_TIED_CROSS_SECTION_AND_THE_NEXT_CYCLE_APPLIED_IT.md`](../research/records/2026-09-02_HNA4_THE_RETURN_DEPOSITED_A_FACTORIZED_OVERLAY_ON_THE_TIED_CROSS_SECTION_AND_THE_NEXT_CYCLE_APPLIED_IT.md).
 
 ### HNA5 -- application matrix and honest release
 

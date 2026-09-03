@@ -222,12 +222,17 @@ inspected emissions were `The`, so the grade is recurrence rather than qualitati
 receipt is
 [`the complete HNA3 recurrence return`](../research/records/2026-09-02_HNA3_TWO_COMPLETE_NATIVE_CYCLES_USED_ONE_RETURNED_SUCCESSOR_ECOLOGY.md).
 
-[established-bounded; implemented-exact; measured] HNA4 returned an operation-owned morphology
-change. Operation 41 derived positive exact alignment between its presented and reacted carriers,
-composed the admitted local conductance from one to two, and returned that morphology in its
-successor. Operation 42 consumed the carrier and reported factor two through the same `advance` API.
-The earlier caller-authored ordinal factor draft is counterexample evidence. The receipt is
-[`the HNA4 local morphology return`](../research/records/2026-09-02_HNA4_LOCAL_ALIGNMENT_CHANGED_MORPHOLOGY_INSIDE_THE_RECURRENT_OPERATION.md).
+[counterexample; source-inspected] The first HNA4 return (an occurrence-carried factor gated by a
+sign and applied as one global scalar) is withdrawn under
+[`the reconciliation`](../research/records/2026-09-02_THE_HNA4_MORPHOLOGY_FACTOR_IS_OCCURRENCE_CARRIED_AND_THE_FORMAL_OWNERS_REQUIRE_A_CAUSAL_CONE_ADJOINT_RETURN.md).
+
+[established-bounded; implemented-exact; measured] HNA4, corrected: a continuing occurrence meets
+the retained emitted face, the normalized-exponential differential returns through the terminal
+reactions, a rank-5 factorized overlay is deposited on the tied cross-section, and the next cycle's
+contraction applies it beside the base. The driver carries no morphology field; the control without
+apertures differs at every emitted word of the second cycle. The pullback to earlier cross-sections
+remains open. The receipt is
+[`the HNA4 return deposit`](../research/records/2026-09-02_HNA4_THE_RETURN_DEPOSITED_A_FACTORIZED_OVERLAY_ON_THE_TIED_CROSS_SECTION_AND_THE_NEXT_CYCLE_APPLIED_IT.md).
 
 [counterexample; implemented-exact; measured] The bounded token recurrence emitted `pit` then
 ` capitalist`; the text/coding/mathematics matrix emitted ` northward`, ` Wonderland`, and `пок`.

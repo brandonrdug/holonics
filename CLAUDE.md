@@ -51,11 +51,12 @@ operative populations, and 54 explicit shared-K/V obstructions. One complete res
 section agreed exactly with the independent serial chart. HNA2 then advanced the full ecology
 through two lookups, a reshape, and the complete per-layer model contraction. HNA3 completed two
 full 1,275-operation cycles, including the tiled tied boundary, on the exact returned successor.
-HNA4 derived an aligned local-conductance morphology change inside operation 41 and operation 42
-read it from the returned successor. HNA5 then crossed one ecology through text, coding, and
-mathematics applications at generation 3,825 and released the actual faces ` Explain`, ` i`, and
-` :=` without a qualitative claim. The corrected HNA0--HNA5 campaign is complete; no later deed is
-admitted.
+HNA4, corrected on 2026-09-02, returns the normalized-exponential differential of a continuing
+occurrence through the terminal reactions as a factorized overlay on the tied cross-section that
+the next cycle applies; the pullback to earlier cross-sections is open. HNA5 crossed one ecology
+through text, coding, and mathematics applications at generation 3,825 and released the actual
+faces ` Explain`, ` i`, and ` :=` without a qualitative claim. The corrected HNA0--HNA5 campaign
+is complete; no later deed is admitted.
 
 [counterexample; source-inspected] WRD0--WRD5, WRN0--WRN6, and the first engine HNA0--HNA5
 world-return sequence have no live phase grade. Their exact algebra, application, persistence, and
@@ -66,8 +67,8 @@ commit does not constitute HNA recurrence.
 [established-bounded; source-inspected] The reusable standing includes exact activation-section
 intake, resident incidence contraction, rational/current arithmetic, move-owned carriers,
 lineage, rest/remount encoding, application process invocation, and formal receiver/tensor owners.
-The complete operable local-current/reaction ecology now stands; its full recurrent successor operation remains to
-be constructed under HNA0--HNA5.
+The complete operable local-current/reaction ecology and its recurrent successor operation stand
+at their bounded HNA0--HNA5 scopes.
 
 ## Claude-specific conduct
 

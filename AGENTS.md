@@ -154,6 +154,13 @@ retraction is a contamination. Dates are record dates under `research/records/`.
   and application scopes; the old records are counterexamples
   (`2026-09-02_THE_HNA_WORLD_RETURN_SPLIT_IS_RETRACTED_AND_INFERENCE_IS_ONE_RECURRENT_ECOLOGY.md`,
   `2026-09-02_HNA5_ONE_NATIVE_RECURRENCE_CROSSED_THREE_APPLICATIONS_AND_RELEASED_WITHOUT_A_QUALITATIVE_CLAIM.md`).
+- 2026-09-02: the first HNA4 morphology change was an occurrence-carried factor gated by a sign
+  that cannot refuse a positive scale and applied as one global scalar. It is replaced by the
+  receiver return: the next ordinary occurrence is the comparison, its differential returns through
+  the adjoint of the local current word, and a factorized overlay is deposited on the causal cone,
+  so far at the tied cross-section only
+  (`2026-09-02_THE_HNA4_MORPHOLOGY_FACTOR_IS_OCCURRENCE_CARRIED_AND_THE_FORMAL_OWNERS_REQUIRE_A_CAUSAL_CONE_ADJOINT_RETURN.md`,
+  `2026-09-02_HNA4_THE_RETURN_DEPOSITED_A_FACTORIZED_OVERLAY_ON_THE_TIED_CROSS_SECTION_AND_THE_NEXT_CYCLE_APPLIED_IT.md`).
 
 [established-bounded; source-inspected] Standing at declared scope, for contrast: four exact
 interior recoveries (`2026-08-10_THE_OBJECT_IS_THE_UNRECONSTRUCTABLE_INTERIOR_AND_THE_MACHINE_HAS_ALREADY_RECOVERED_FOUR.md`);

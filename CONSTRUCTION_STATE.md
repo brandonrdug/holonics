@@ -56,12 +56,20 @@ occurrences were rejected. Both inspected emissions were `The`, so HNA3 claims r
 than qualitative language. The receipt is
 [`research/records/2026-09-02_HNA3_TWO_COMPLETE_NATIVE_CYCLES_USED_ONE_RETURNED_SUCCESSOR_ECOLOGY.md`](research/records/2026-09-02_HNA3_TWO_COMPLETE_NATIVE_CYCLES_USED_ONE_RETURNED_SUCCESSOR_ECOLOGY.md).
 
-[established-bounded; implemented-exact; measured] HNA4 derived morphology inside operation 41
-from positive exact alignment of its presented and reacted carriers, changed the local conductance
-factor from one to two, and returned it in the successor. Operation 42 consumed that carrier and
-reported factor two through the same `advance` API. The prior caller-authored ordinal factor draft
-was rejected and carries no grade. The receipt is
-[`research/records/2026-09-02_HNA4_LOCAL_ALIGNMENT_CHANGED_MORPHOLOGY_INSIDE_THE_RECURRENT_OPERATION.md`](research/records/2026-09-02_HNA4_LOCAL_ALIGNMENT_CHANGED_MORPHOLOGY_INSIDE_THE_RECURRENT_OPERATION.md).
+[counterexample; source-inspected] The first HNA4 receipt is withdrawn: its conductance factor was
+carried on the occurrence by the driver, gated by a sign that cannot refuse a positive scale, and
+applied as one global scalar to every later operation
+([`the reconciliation`](research/records/2026-09-02_THE_HNA4_MORPHOLOGY_FACTOR_IS_OCCURRENCE_CARRIED_AND_THE_FORMAL_OWNERS_REQUIRE_A_CAUSAL_CONE_ADJOINT_RETURN.md)).
+
+[established-bounded; implemented-exact; measured] HNA4, corrected under Brandon's direct request:
+a continuing occurrence meets the retained emitted face row by row; the differential of the
+normalized exponential receiver returns through the terminal reactions and deposits a rank-5
+factorized overlay on the tied `262,144 x 2,560` cross-section; the next cycle's contraction
+applies `W x + u (v x)`. The driver carries no morphology field. Beside a control without
+apertures, the second cycle's emitted words differ at every position while the maximum did not
+flip at one step of `2^-16`; the HNA5 matrix regression is unchanged. The pullback to the other
+718 populations is not implemented. The receipt is
+[`research/records/2026-09-02_HNA4_THE_RETURN_DEPOSITED_A_FACTORIZED_OVERLAY_ON_THE_TIED_CROSS_SECTION_AND_THE_NEXT_CYCLE_APPLIED_IT.md`](research/records/2026-09-02_HNA4_THE_RETURN_DEPOSITED_A_FACTORIZED_OVERLAY_ON_THE_TIED_CROSS_SECTION_AND_THE_NEXT_CYCLE_APPLIED_IT.md).
 
 [established-bounded; implemented-exact; source-inspected; measured] HNA5 advanced that same
 resident ecology through text, coding, and mathematics application occurrences at exact generations
