@@ -282,21 +282,17 @@ pub(super) fn deposit_from_material<'chart>(
     ))
 }
 
-/// Enact the return on the resident surface: one passage of four occurrences — the receiver
-/// return, its midpoint seal, the carry of the presented carrier, and its seal — and the overlay
-/// atom the successor retains.
 /// The returned differential at the tied contraction's output, for the return through the body.
 pub(super) struct ReturnedDifferential<'chart> {
     pub section: ResidentSection<'chart>,
     pub octaves: u32,
 }
 
-pub(super) fn enact_return<'chart>(
+/// The tile table of the terminal face: `tiles[4t..4t+4] = e_lo, e_hi, t_lo, t_hi`, uploaded once.
+fn terminal_tile_table<'chart>(
     surface: &'chart ResidentSurface<'chart>,
-    material: ReturnMaterial<'_, 'chart>,
-    next: &[u32],
-    aperture: NativeReturnAperture,
-) -> Result<(OverlayAtom<'chart>, NativeMorphologyDeposit, ReturnedDifferential<'chart>), ResidentRefusal> {
+    material: &ReturnMaterial<'_, 'chart>,
+) -> Result<(CountedOctets<'chart>, usize), ResidentRefusal> {
     let refuse = |what: String| ResidentRefusal::Declaration {
         operation: "receiver-return",
         what,
@@ -304,11 +300,10 @@ pub(super) fn enact_return<'chart>(
     let tile_count = material.emission.len();
     if tile_count == 0
         || material.reacted.len() != tile_count
-        || next.len() != material.rows
         || material.presented.rows() != material.rows
     {
         return Err(refuse(
-            "the emission, reacted, presented, and next-occurrence populations disagree".to_owned(),
+            "the emission, reacted, and presented populations disagree".to_owned(),
         ));
     }
     let tile_width = material.emission[0].width();
@@ -335,11 +330,93 @@ pub(super) fn enact_return<'chart>(
     if tile_count * tile_width != material.width {
         return Err(refuse("the tiles do not cover the emitted face exactly".to_owned()));
     }
+    Ok((CountedOctets::upload(surface, &addresses)?, tile_width))
+}
+
+/// The receiver differential alone, without a deposit: the emitted face meets `next` row by row
+/// and `p − [o = next]` returns through the terminal reactions onto the tied contraction's
+/// output.  The dissection's excitation.
+pub(super) fn receiver_differential<'chart>(
+    surface: &'chart ResidentSurface<'chart>,
+    material: ReturnMaterial<'_, 'chart>,
+    next: &[u32],
+    terms: SeriesAperture,
+) -> Result<ReturnedDifferential<'chart>, ResidentRefusal> {
+    if next.len() != material.rows {
+        return Err(ResidentRefusal::Declaration {
+            operation: "receiver-return",
+            what: "the next-occurrence population disagrees with the rows".to_owned(),
+        });
+    }
+    let (tiles, tile_width) = terminal_tile_table(surface, &material)?;
     let mut next_bytes: Vec<u8> = Vec::with_capacity(next.len() * 4);
     for address in next {
         next_bytes.extend_from_slice(&address.to_le_bytes());
     }
-    let tiles = CountedOctets::upload(surface, &addresses)?;
+    let next_resident = CountedOctets::upload(surface, &next_bytes)?;
+    let return_shape =
+        surface.shape_receiver_return(material.rows, material.width, tile_width, material.grain, terms)?;
+    let u = surface.fresh_section(material.width, material.rows, material.grain)?;
+    let differential = surface.fresh_section(material.rows, material.width, material.grain)?;
+    let mut builder: PassageBuilder<'chart> = surface.begin_passage(&[vec![]])?;
+    {
+        let lane = builder.open(0, &[])?;
+        surface.record_receiver_return(
+            &lane,
+            tiles.device_ptr(),
+            (material.width / tile_width) as u32,
+            tile_width as u32,
+            material.rows as u32,
+            material.width as u32,
+            next_resident.device_ptr(),
+            material.grain,
+            terms,
+            0,
+            &return_shape,
+            &u,
+            &differential,
+        )?;
+    }
+    builder.close(0, &u, return_shape.needed)?;
+    let reading = builder.finish()?.launch()?;
+    if !reading.obstruction.is_empty() {
+        return Err(ResidentRefusal::Declaration {
+            operation: "receiver-return",
+            what: format!("the excitation refused with flags {:#x}", reading.obstruction.joined_flags()),
+        });
+    }
+    drop(u);
+    drop(tiles);
+    drop(next_resident);
+    Ok(ReturnedDifferential {
+        section: differential,
+        octaves: return_shape.needed,
+    })
+}
+
+/// Enact the return on the resident surface: one passage of four occurrences — the receiver
+/// return, its midpoint seal, the carry of the presented carrier, and its seal — and the overlay
+/// atom the successor retains.
+
+pub(super) fn enact_return<'chart>(
+    surface: &'chart ResidentSurface<'chart>,
+    material: ReturnMaterial<'_, 'chart>,
+    next: &[u32],
+    aperture: NativeReturnAperture,
+) -> Result<(OverlayAtom<'chart>, NativeMorphologyDeposit, ReturnedDifferential<'chart>), ResidentRefusal> {
+    let refuse = |what: String| ResidentRefusal::Declaration {
+        operation: "receiver-return",
+        what,
+    };
+    if next.len() != material.rows {
+        return Err(refuse("the next-occurrence population disagrees with the rows".to_owned()));
+    }
+    let (tiles, tile_width) = terminal_tile_table(surface, &material)?;
+    let tile_count = material.width / tile_width;
+    let mut next_bytes: Vec<u8> = Vec::with_capacity(next.len() * 4);
+    for address in next {
+        next_bytes.extend_from_slice(&address.to_le_bytes());
+    }
     let next_resident = CountedOctets::upload(surface, &next_bytes)?;
     let terms = SeriesAperture(aperture.series_terms);
     let (u_shift, v_shift) = factor_shifts(

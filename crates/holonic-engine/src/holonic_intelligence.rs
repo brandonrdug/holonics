@@ -38,6 +38,12 @@ mod operative_backward;
 mod operative_return;
 #[path = "holonic_intelligence/operative_session.rs"]
 mod operative_session;
+#[path = "holonic_intelligence/operative_terminal.rs"]
+mod operative_terminal;
+#[path = "holonic_intelligence/operative_scalars.rs"]
+mod operative_scalars;
+#[path = "holonic_intelligence/operative_intervention.rs"]
+mod operative_intervention;
 #[path = "holonic_intelligence/profile.rs"]
 mod profile;
 #[path = "holonic_intelligence/repeated_circulation.rs"]
@@ -70,6 +76,7 @@ pub use operative_backward::*;
 pub use operative_return::*;
 pub use operative_residence::*;
 pub use operative_session::*;
+pub use operative_intervention::*;
 pub use profile::*;
 pub use repeated_circulation::*;
 pub use rested::*;

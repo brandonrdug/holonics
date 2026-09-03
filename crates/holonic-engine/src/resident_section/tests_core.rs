@@ -1394,3 +1394,56 @@ fn a_contract_tiled_return_is_bit_equal_to_the_scalar_owner_and_the_reversed_tre
         assert_eq!(reading.slots[at].refused, reading.slots[1].refused);
     }
 }
+
+#[test]
+fn a_declared_site_population_is_withdrawn_at_every_row_out_of_place() {
+    let Some((_, surface)) = surface() else {
+        return;
+    };
+    let grain = ResidentGrain(20);
+    let rest = ResidentSectionRest::found(
+        2,
+        4,
+        grain,
+        4,
+        vec![(1, 1), (2, 2), (-3, -3), (4, 5), (5, 5), (-6, -6), (7, 7), (8, 8)],
+    )
+    .expect("rest");
+    let input = surface.mount_section_rest(&rest).expect("mount");
+    let withdraw = |mask: &SiteMask<'static>, offset: usize| {
+        let shape = surface.shape_withdraw_sites(2, 4, 4).expect("shape");
+        let out = surface.fresh_section(2, 4, grain).expect("section");
+        let mut builder = surface.begin_passage(&[vec![]]).expect("begin");
+        let lane = builder.open(0, &[]).expect("open");
+        surface
+            .record_withdraw_sites(&lane, &input, mask, offset, &out)
+            .expect("record");
+        builder.close(0, &out, shape.needed).expect("close");
+        let reading = builder.finish().expect("finish").launch().expect("launch");
+        assert!(reading.obstruction.is_empty());
+        surface.read_out(&out).expect("read")
+    };
+    let mask = surface
+        .mount_site_mask(&[false, true, false, true])
+        .expect("mask");
+    assert_eq!(mask.withdrawn(), 2);
+    assert_eq!(
+        withdraw(&mask, 0),
+        vec![(1, 1), (0, 0), (-3, -3), (0, 0), (5, 5), (0, 0), (7, 7), (0, 0)]
+    );
+    // The predecessor is untouched: the intervention is out of place.
+    assert_eq!(surface.read_out(&input).expect("read"), rest.intervals);
+    // A tile reads its own span of one wider mask through an offset.
+    let wide = surface
+        .mount_site_mask(&[true, true, false, false, true, false])
+        .expect("mask");
+    assert_eq!(
+        withdraw(&wide, 2),
+        vec![(1, 1), (2, 2), (0, 0), (4, 5), (5, 5), (-6, -6), (0, 0), (8, 8)]
+    );
+    // A span past the mask's sites is refused before anything is recorded.
+    let out = surface.fresh_section(2, 4, grain).expect("section");
+    let mut builder = surface.begin_passage(&[vec![]]).expect("begin");
+    let lane = builder.open(0, &[]).expect("open");
+    assert!(surface.record_withdraw_sites(&lane, &input, &mask, 1, &out).is_err());
+}

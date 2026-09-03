@@ -20,7 +20,8 @@ use super::{
     NativeFullOperationOccurrence, NativeFullOperatorSession, NativeMorphologyDeposit,
     NativeOperationPrimitive, NativeOperatorNode, NativeReturnAperture, NativeScaleConstraint,
     NativeTensorOrdinal, adjoint_contract, differential_support,
-    full_operation::{ContemporaryCarrier, binary64_projection, operation_bound, scale_enclosure},
+    full_operation::ContemporaryCarrier,
+    operative_scalars::{binary64_projection, operation_bound, scale_enclosure},
     operative_adjoint::deposit_on_cross_section,
     operative_return::ReturnedDifferential,
 };
@@ -59,6 +60,15 @@ pub struct NativeAdjointReturnTrace {
     pub elapsed_milliseconds: u128,
 }
 
+/// What the return does at every contraction it reaches: deposit (cultivation) or record the
+/// support per site (dissection, with the tied contraction's own output at the receiver row
+/// carried in, since the terminal branch does not keep it among the carriers).
+#[derive(Clone, PartialEq, Eq)]
+pub(super) enum ReturnDeed {
+    Cultivate(NativeReturnAperture),
+    Dissect(Vec<(i64, i64)>),
+}
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Segment {
     Prologue,
@@ -71,7 +81,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     pub(super) fn adjoint_return(
         &mut self,
         differential: ReturnedDifferential<'chart>,
-        aperture: NativeReturnAperture,
+        deed: ReturnDeed,
     ) -> Result<NativeAdjointReturnTrace, NativeFullOperationError> {
         let started = std::time::Instant::now();
         let operations = self.ecology.operations.len();
@@ -109,6 +119,9 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         )
         .map_err(|error| NativeFullOperationError::Adjoint(error.to_string()))?;
         trace.supports.push(self.support_of(&tied, &differential.section, differential.octaves)?);
+        if let ReturnDeed::Dissect(tied_output) = &deed {
+            self.record_site_support(tied_population, &tied, &differential.section, Some(tied_output))?;
+        }
         drop(differential);
         let sealed = self.seal_returned(
             ContemporaryCarrier {
@@ -137,7 +150,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             }
             trace.supports.push(self.support_of(&operation, &dy.section, dy.bound_octaves)?);
             let dy_octaves = dy.bound_octaves;
-            self.return_through(&operation, dy, &mut adjoint, aperture, &mut trace)
+            self.return_through(&operation, dy, &mut adjoint, &deed, &mut trace)
                 .map_err(|error| {
                     let recent: Vec<String> = trace
                         .supports
@@ -224,6 +237,8 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                 },
             };
             let outcome = self.enact_operation(&operation, &occurrence)?;
+            // The forward's own successor projection, so the replay is the cycle's carrier.
+            let (outcome, _) = self.project_successor(operation.ordinal, outcome)?;
             self.carriers.insert(
                 operation.output,
                 ContemporaryCarrier {
@@ -325,7 +340,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         operation: &NativeOperatorNode,
         dy: ContemporaryCarrier<'chart>,
         adjoint: &mut BTreeMap<NativeCarrierOrdinal, ContemporaryCarrier<'chart>>,
-        aperture: NativeReturnAperture,
+        deed: &ReturnDeed,
         trace: &mut NativeAdjointReturnTrace,
     ) -> Result<(), NativeFullOperationError> {
         let ordinal = operation.ordinal;
@@ -363,39 +378,42 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             NativeOperationPrimitive::Contract => {
                 let input = operation.inputs[0];
                 let population = operation.coefficients[0];
-                let (deposit, returned) = {
-                    let presented = self.presented(input)?;
-                    let surface = self.residence.surface();
-                    let (atom, mut deposit) = deposit_on_cross_section(
-                        surface,
-                        &dy.section,
-                        dy.bound_octaves,
-                        &presented.section,
-                        presented.bound_octaves,
-                        self.grain,
-                        aperture,
-                    )?;
-                    deposit.population = population.0;
-                    let returned = adjoint_contract(
-                        self.residence,
-                        population,
-                        &dy.section,
-                        dy.bound_octaves,
-                    )
-                    .map_err(|error| NativeFullOperationError::Adjoint(error.to_string()))?;
-                    self.overlay.entry(population).or_default().push(atom);
-                    (
-                        deposit,
-                        ContemporaryCarrier {
-                            section: returned.section,
-                            bound_octaves: returned.bound_octaves,
-                        },
-                    )
-                };
-                trace.deposits.push(deposit);
-                if !trace.populations_deposited.contains(&population.0) {
-                    trace.populations_deposited.push(population.0);
+                match deed {
+                    ReturnDeed::Cultivate(aperture) => {
+                        let (atom, mut deposit) = {
+                            let presented = self.presented(input)?;
+                            deposit_on_cross_section(
+                                self.residence.surface(),
+                                &dy.section,
+                                dy.bound_octaves,
+                                &presented.section,
+                                presented.bound_octaves,
+                                self.grain,
+                                *aperture,
+                            )?
+                        };
+                        deposit.population = population.0;
+                        self.overlay.entry(population).or_default().push(atom);
+                        trace.deposits.push(deposit);
+                        if !trace.populations_deposited.contains(&population.0) {
+                            trace.populations_deposited.push(population.0);
+                        }
+                    }
+                    ReturnDeed::Dissect(_) => {
+                        self.record_site_support(population, operation, &dy.section, None)?;
+                    }
                 }
+                let returned = adjoint_contract(
+                    self.residence,
+                    population,
+                    &dy.section,
+                    dy.bound_octaves,
+                )
+                .map_err(|error| NativeFullOperationError::Adjoint(error.to_string()))?;
+                let returned = ContemporaryCarrier {
+                    section: returned.section,
+                    bound_octaves: returned.bound_octaves,
+                };
                 self.accumulate(adjoint, input, returned, ordinal)
             }
             NativeOperationPrimitive::RmsRebase {

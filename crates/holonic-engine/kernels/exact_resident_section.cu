@@ -1480,6 +1480,9 @@ extern "C" __global__ void section_midpoint_seal(
 // the deposit seal live in their own unit beside this one and share these helpers.
 #include "exact_resident_adjoint.cuh"
 
+// The intervention on the excited current: a declared site population withdrawn, out of place.
+#include "exact_resident_intervention.cuh"
+
 // ---------------------------------------------------------------------------------------------
 // the arithmetic control: the helpers exposed for a serial-chart exact reference to refute
 // ---------------------------------------------------------------------------------------------

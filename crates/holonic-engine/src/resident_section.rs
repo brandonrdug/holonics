@@ -89,12 +89,15 @@ mod surface_mount;
 mod surface_passage;
 #[path = "resident_section/surface_adjoint.rs"]
 mod surface_adjoint;
+#[path = "resident_section/surface_intervention.rs"]
+mod surface_intervention;
 #[path = "resident_section/surface_shapes.rs"]
 mod surface_shapes;
 #[path = "resident_section/surface_tiled.rs"]
 mod surface_tiled;
 
 pub use geometry::*;
+pub use surface_intervention::SiteMask;
 
 const PTX: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/exact_resident_section.ptx"));
 /// The exact accumulator the kernels carry, read off `__int128`; one octave is the hand.
@@ -127,7 +130,8 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 45] = [
+pub const KERNELS: [&str; 46] = [
+    "section_withdraw_sites",
     "section_from_bfloat16",
     "section_carry",
     "section_terminal_row",
