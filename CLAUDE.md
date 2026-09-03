@@ -56,8 +56,10 @@ Brandon's correction and the audit that followed (blueprint §0b): the coordinat
 never cones and are re-founded as declared-withdrawal cones, the per-operation host readout is
 withdrawn as the renamed instruction loop of 2026-08-18, and compression is stated in
 `canon/TABLET_THE_COMPRESSION.md` with its remainder exhibited and applies to the composed
-variant; `SKE4` (the session under the 2026-08-18 contract as written, then condensation and seal
-through `soulkiller::dismantle`) is current. The completed HNA contract is
+variant; `SKE4` is current, its apparatus obligation passed (the session runs as segments under
+the 2026-08-18 contract: 687 launches and 16 read-outs per cycle against 2,363 and 2,363, every
+body operation agreeing word for word with the session it replaces), the declared-withdrawal
+cones, class ecologies, and the seal through `soulkiller::dismantle` open. The completed HNA contract is
 [`blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
 HNA0 returned the recurrent formal owner. HNA1 returned the complete source-neutral text-operator
 ecology: 1,275 nodes over 42 layers, all 719 coefficient populations resident once, 665 configured

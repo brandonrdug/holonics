@@ -1,0 +1,13 @@
+{
+  "baseline": "the committed per-operation session, one cycle, 2026-09-03 before the refit",
+  "addresses": 14,
+  "operations": 1275,
+  "deed_launches": 2363,
+  "synchronizations": 2363,
+  "section_read_outs": 2363,
+  "allocations": 9450,
+  "egress_section_octets": 2060000000,
+  "cycle_milliseconds": 1915,
+  "face": "7",
+  "note": "the egress and allocation figures are as measured before the refit and rounded as recorded in the session log; the exact JSON was lost with the scratchpad at the reboot"
+}

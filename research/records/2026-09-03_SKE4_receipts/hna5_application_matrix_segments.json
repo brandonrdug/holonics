@@ -1,0 +1,44 @@
+{
+  "operation_population_per_application": 1275,
+  "applications": [
+    {
+      "application": "text",
+      "entering_occurrences": 5,
+      "selected": 42085,
+      "equal_maxima": 1,
+      "rendered": " Explain",
+      "collapsed_intervals": 0,
+      "predecessor_generation": 0,
+      "successor_generation": 1275
+    },
+    {
+      "application": "coding",
+      "entering_occurrences": 20,
+      "selected": 858,
+      "equal_maxima": 1,
+      "rendered": " i",
+      "collapsed_intervals": 0,
+      "predecessor_generation": 1275,
+      "successor_generation": 2550
+    },
+    {
+      "application": "mathematics",
+      "entering_occurrences": 18,
+      "selected": 4558,
+      "equal_maxima": 1,
+      "rendered": " :=",
+      "collapsed_intervals": 0,
+      "predecessor_generation": 2550,
+      "successor_generation": 3825
+    }
+  ],
+  "final_generation": 3825,
+  "every_application_used_same_recurrence": true,
+  "every_application_face_was_inspected": true,
+  "hot_ecology_has_no_language_or_format_branch": true,
+  "application_driver_does_not_inspect_operation_kinds": true,
+  "application_opened_no_coefficient_container": true,
+  "counterexample_return_paths_absent_from_productive_imports": true,
+  "qualitative_capability_claimed": false,
+  "release_receiver_passed": true
+}

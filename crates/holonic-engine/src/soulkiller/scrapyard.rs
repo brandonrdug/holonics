@@ -71,10 +71,17 @@ pub struct ReachableSectionDismantling<'a> {
 }
 
 impl SoulkillerDismantlingInput for ReachableSectionDismantling<'_> {
+    type Productive = NativeTransportScaffold;
     type ColdWitness = ExteriorSoulkillerWitness;
+    type Insufficiency = ReceiverInsufficiency;
     type Error = SoulkillerScrapyardRefusal;
 
-    fn dismantle(self) -> Result<SoulkillerDismantlingReturn<Self::ColdWitness>, Self::Error> {
+    fn dismantle(
+        self,
+    ) -> Result<
+        SoulkillerDismantlingReturn<Self::Productive, Self::ColdWitness, Self::Insufficiency>,
+        Self::Error,
+    > {
         dismantle_reachable_section(
             self.section,
             self.anatomy,
@@ -108,7 +115,10 @@ fn dismantle_reachable_section(
     realization: ForeignRealizationTestimony,
     execution: ForeignExecutionTestimony,
     unexcited_capability: BTreeSet<String>,
-) -> Result<SoulkillerDismantlingReturn<ExteriorSoulkillerWitness>, SoulkillerScrapyardRefusal> {
+) -> Result<
+    SoulkillerDismantlingReturn<NativeTransportScaffold, ExteriorSoulkillerWitness, ReceiverInsufficiency>,
+    SoulkillerScrapyardRefusal,
+> {
     section
         .validate()
         .map_err(|error| SoulkillerScrapyardRefusal::Section(error.to_string()))?;

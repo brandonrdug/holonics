@@ -2,35 +2,33 @@
 //!
 //! This owner begins at the first operation of the full HNA1 graph.  It consumes ordinary row
 //! addresses at the occurrence port, gathers those coefficient rows without leaving the device,
-//! enacts the graph's lookup law, and returns its emission, exact trace, and move-owned successor
-//! ecology together.  No exterior verdict, stored activation, candidate, or commit intervenes.
+//! enacts the graph's laws, and returns its emission, trace, and move-owned successor ecology
+//! together.  No exterior verdict, stored activation, candidate, or commit intervenes.
+//!
+//! Under the contract of 2026-08-18 the cycle runs as segments (`operative_segment.rs`): each
+//! segment is one passage bound whole, launched once, and read once through its census; the
+//! successor projection is a midpoint seal fused into the graph; no section crosses to the host
+//! but the terminal face at the declared receiver.
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use relational_geometry::Rat;
 use serde::Serialize;
 use thiserror::Error;
 
-use crate::{
-    resident_section::{
-        Dyadic, Positions, ResidentGrain, ResidentRefusal, ResidentSection,
-        SeriesAperture, TransferCensus,
-    },
+use crate::resident_section::{
+    Positions, ResidentGrain, ResidentRefusal, ResidentSection, TransferCensus,
 };
 
 use super::{
-    NativeCarrierAxis, NativeCarrierOrdinal, NativeCausalReach, NativeFullOperatorEcology,
-    NativeMorphologyDeposit, NativeOperationPrimitive, NativeOperatorNode,
-    NativeOperatorResidence, NativeOperatorResidenceError, NativeReturnAperture,
-    NativeScaleConstraint, NativeTensorOrdinal,
+    NativeCarrierOrdinal, NativeFullOperatorEcology, NativeMorphologyDeposit,
+    NativeOperationPrimitive, NativeOperatorNode, NativeOperatorResidence,
+    NativeOperatorResidenceError, NativeReturnAperture, NativeTensorOrdinal,
     operative_backward::{NativeAdjointReturnTrace, ReturnDeed},
     operative_intervention::DissectionStanding,
-    operative_scalars::{binary64_projection, operation_bound, projected_scale, scale_enclosure},
+    operative_return::{OverlayAtom, ReturnMaterial, continuation_next_occurrences, enact_return},
+    operative_scalars::projected_scale,
+    operative_segment::{SegmentSite, SegmentWithdrawal, enact_segment, segments},
     operative_terminal::{TiledCarrier, stitch_intervals},
-    operative_return::{
-        OverlayAtom, ReturnMaterial, contract_tile_with_overlay, continuation_next_occurrences,
-        enact_return,
-    },
 };
 
 pub const NATIVE_FULL_OPERATION_STEP_SCHEMA: &str = "holonic-engine.native-full-operation-step.v1";
@@ -41,6 +39,9 @@ pub struct NativeFullOperationOccurrence {
     pub row_addresses: Vec<u32>,
 }
 
+/// An emission: the terminal face carries its intervals, read once at the declared receiver; an
+/// intermediate operation's emission names its carrier and carries no words, because no section
+/// crosses to the host between two operations.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct NativeFullOperationEmission {
     pub generation: u64,
@@ -64,6 +65,9 @@ pub struct NativeFullOperationTrace {
     pub morphology_transition: NativeMorphologyTransition,
     /// The total rank of the factorized overlay the ecology carries at this operation.
     pub morphology_overlay_rank: usize,
+    /// The a-priori octave bound the operation was admitted under.
+    pub admitted_octaves: u32,
+    /// The measured octave bound of the successor carrier, from the segment's census.
     pub successor_bound_octaves: u32,
     pub resident_coefficient_octets: u64,
     pub census_before: TransferCensus,
@@ -96,13 +100,12 @@ pub(super) struct ContemporaryCarrier<'chart> {
     pub(super) bound_octaves: u32,
 }
 
-pub(super) struct OperationOutcome<'chart> {
-    pub(super) section: ResidentSection<'chart>,
+/// One operation's step inside a run: what the trace records of it.
+pub(super) struct RunStep {
+    pub(super) operation: NativeOperatorNode,
+    pub(super) admitted_octaves: u32,
     pub(super) bound_octaves: u32,
-    pub(super) rows: usize,
-    pub(super) width: usize,
-    pub(super) grain: ResidentGrain,
-    pub(super) intervals: Vec<(i64, i64)>,
+    pub(super) projection: NativeSuccessorProjection,
     pub(super) census_before: TransferCensus,
     pub(super) census_after: TransferCensus,
 }
@@ -130,8 +133,7 @@ pub struct NativeFullOperatorSession<'residence, 'chart> {
     /// The reacted carrier of the tied boundary (`tanh`) and the carrier presented to the tied
     /// contraction, retained for the return.
     pub(super) terminal_reacted: Option<TiledCarrier<'chart>>,
-    /// The tied contraction's own output, retained for dissection: the excitation's first-order
-    /// contribution at the vocabulary sites reads it.
+    /// The tied contraction's own output at the receiver row, read to the host under dissection.
     pub(super) terminal_contracted: Option<Vec<(i64, i64)>>,
     pub(super) terminal_presented: Option<ContemporaryCarrier<'chart>>,
     /// The row addresses of the last cycle: the line the emitted face continued.
@@ -281,9 +283,14 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         self.overlay.values().flatten().map(OverlayAtom::rank).sum()
     }
 
-
     pub fn return_aperture(&self) -> Option<NativeReturnAperture> {
         self.aperture
+    }
+
+    /// The surface's transfer census now: what has crossed between host and device since the
+    /// surface was mounted, including the terminal face's egress.
+    pub fn census(&self) -> TransferCensus {
+        self.residence.surface().census()
     }
 
     /// The return: if `entering` continues the last cycle's line, the retained emitted face meets
@@ -340,80 +347,134 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         })
     }
 
-    /// Enact one operation of the graph on the contemporary carriers, without advancing the
-    /// chronology: the forward law, used by `advance` and by the return's replay alike.
-    pub(super) fn enact_operation(
-        &mut self,
-        operation: &NativeOperatorNode,
-        occurrence: &NativeFullOperationOccurrence,
-    ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
-        let outcome = match &operation.primitive {
-            NativeOperationPrimitive::Lookup { scale } => {
-                self.execute_lookup(operation, occurrence, scale)?
-            }
-            NativeOperationPrimitive::Reshape => self.execute_reshape(operation, occurrence)?,
-            NativeOperationPrimitive::Select { axis, at } => {
-                self.execute_select(operation, occurrence, *axis, *at)?
-            }
-            NativeOperationPrimitive::Contract => self.execute_contract(operation, occurrence)?,
-            NativeOperationPrimitive::RmsRebase {
-                group,
-                epsilon,
-                has_gain,
-            } => self.execute_rms(operation, occurrence, *group, epsilon, *has_gain)?,
-            NativeOperationPrimitive::GeluTanh => self.execute_gelu(operation, occurrence)?,
-            NativeOperationPrimitive::Tanh => self.execute_tanh(operation, occurrence)?,
-            NativeOperationPrimitive::Hadamard => {
-                self.execute_binary(operation, occurrence, false)?
-            }
-            NativeOperationPrimitive::Add => self.execute_binary(operation, occurrence, true)?,
-            NativeOperationPrimitive::Scale { by }
-                if !matches!(by, NativeScaleConstraint::Coefficient) =>
-            {
-                self.execute_scale(operation, occurrence, by)?
-            }
-            NativeOperationPrimitive::Scale {
-                by: NativeScaleConstraint::Coefficient,
-            } => self.execute_coefficient_scale(operation, occurrence)?,
-            NativeOperationPrimitive::RotaryChronology {
-                theta,
-                head_width,
-                rotated_width,
-            } => self.execute_chronology(
-                operation,
-                occurrence,
-                *theta,
-                *head_width,
-                *rotated_width,
-            )?,
-            NativeOperationPrimitive::CausalContact {
-                heads,
-                kv_heads,
-                head_width,
-                reach,
-                series_terms,
-            } => self.execute_contact(
-                operation,
-                occurrence,
-                *heads,
-                *kv_heads,
-                *head_width,
-                reach,
-                *series_terms,
-            )?,
-            NativeOperationPrimitive::Emit => self.execute_reshape(operation, occurrence)?,
-            _ => {
-                return Err(NativeFullOperationError::PrimitiveOpen {
-                    operation: operation.ordinal,
-                });
-            }
-        };
-        Ok(outcome)
+    /// Clear the previous cycle's standing when a new occurrence enters at operation zero.
+    fn enter_cycle(&mut self, entering: &[u32]) -> Result<NativeMorphologyTransition, NativeFullOperationError> {
+        let transition = self.return_on_continuation(entering)?;
+        self.carriers.clear();
+        self.checkpoints.clear();
+        self.positions = None;
+        self.row_population = None;
+        self.terminal_carrier = None;
+        self.terminal_reacted = None;
+        self.terminal_contracted = None;
+        self.terminal_presented = None;
+        self.cycle_complete = false;
+        if let Some(standing) = self.dissection.as_mut() {
+            standing.clear();
+        }
+        Ok(transition)
     }
 
-    /// Enact the graph's current mathematical operation.  HNA2 begins with the complete graph's
-    /// actual lookup operation; later primitive species are added to this same match in graph order,
-    /// never selected by an application driver.
+    /// Enact the operations `[from, to)` of the graph by segments on the contemporary carriers,
+    /// each segment one passage.  With `retain_all` every produced carrier stays (the return's
+    /// replay); otherwise a carrier no later operation reads is released, into the checkpoints
+    /// when it crosses layers.  `withdrawals` intervene on named operations' outputs.
+    pub(super) fn enact_run(
+        &mut self,
+        from: usize,
+        to: usize,
+        row_addresses: &[u32],
+        withdrawals: &BTreeMap<u32, SegmentWithdrawal<'_, 'chart>>,
+        retain_all: bool,
+    ) -> Result<Vec<RunStep>, NativeFullOperationError> {
+        let mut steps = Vec::with_capacity(to.saturating_sub(from));
+        if from >= to {
+            return Ok(steps);
+        }
+        if !row_addresses.is_empty() {
+            self.ensure_row_population(row_addresses.len())?;
+        }
+        let operations: Vec<NativeOperatorNode> = self.ecology.operations[from..to].to_vec();
+        for (start, end) in segments(&operations) {
+            let mut cursor = start;
+            while cursor < end {
+            let run = &operations[cursor..end];
+            let (outcomes, reading) = {
+                let site = SegmentSite {
+                    residence: self.residence,
+                    ecology: self.ecology,
+                    carriers: &self.carriers,
+                    checkpoints: &self.checkpoints,
+                    positions: self.positions.as_ref(),
+                    overlay: &self.overlay,
+                    grain: self.grain,
+                    row_addresses,
+                    withdrawals,
+                    tile_window: None,
+                };
+                enact_segment(&site, run)?
+            };
+            if outcomes.is_empty() {
+                return Err(NativeFullOperationError::Operation);
+            }
+            cursor += outcomes.len();
+            for (outcome, operation) in outcomes.into_iter().zip(run) {
+                let bound_octaves = outcome.carrier.bound_octaves;
+                self.carriers.insert(outcome.output, outcome.carrier);
+                steps.push(RunStep {
+                    operation: operation.clone(),
+                    admitted_octaves: outcome.admitted_octaves,
+                    bound_octaves,
+                    projection: outcome.projection,
+                    census_before: reading.census_before.clone(),
+                    census_after: reading.census_after.clone(),
+                });
+                if retain_all {
+                    continue;
+                }
+                let absolute = self
+                    .ecology
+                    .operations
+                    .iter()
+                    .position(|candidate| candidate.ordinal == operation.ordinal)
+                    .ok_or(NativeFullOperationError::Operation)?;
+                for input in &operation.inputs {
+                    if *input != operation.output
+                        && !self.ecology.operations[absolute + 1..]
+                            .iter()
+                            .any(|later| later.inputs.contains(input))
+                    {
+                        if let Some(carrier) = self.carriers.remove(input) {
+                            if self.cross_layer.contains(input) {
+                                self.checkpoints.insert(*input, carrier);
+                            }
+                        }
+                    }
+                }
+            }
+            }
+        }
+        Ok(steps)
+    }
+
+    fn trace_of(
+        &self,
+        step: &RunStep,
+        occurrence: &NativeFullOperationOccurrence,
+        morphology_transition: NativeMorphologyTransition,
+        successor_generation: u64,
+    ) -> NativeFullOperationTrace {
+        NativeFullOperationTrace {
+            schema: NATIVE_FULL_OPERATION_STEP_SCHEMA.to_owned(),
+            predecessor_generation: successor_generation - 1,
+            successor_generation,
+            occurrence: occurrence.ordinal,
+            row_addresses: occurrence.row_addresses.clone(),
+            operation: step.operation.clone(),
+            successor_projection: step.projection.clone(),
+            morphology_transition,
+            morphology_overlay_rank: self.morphology_overlay_rank(),
+            admitted_octaves: step.admitted_octaves,
+            successor_bound_octaves: step.bound_octaves,
+            resident_coefficient_octets: self.residence.receipt().raw_coefficient_octets,
+            census_before: step.census_before.clone(),
+            census_after: step.census_after.clone(),
+        }
+    }
+
+    /// Enact the graph's current mathematical operation as a one-operation segment.  The
+    /// emission names the successor carrier and carries no words: an intermediate section does
+    /// not cross to the host.  The cycle owner (`advance_cycle`) runs whole segments.
     pub fn advance(
         mut self,
         occurrence: NativeFullOperationOccurrence,
@@ -426,96 +487,56 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             if self.operation_at != 0 || occurrence.row_addresses.is_empty() {
                 return Err(NativeFullOperationError::Occurrence);
             }
-            morphology_transition = self.return_on_continuation(&occurrence.row_addresses)?;
-            self.carriers.clear();
-            self.checkpoints.clear();
-            self.positions = None;
-            self.row_population = None;
-            self.terminal_carrier = None;
-            self.terminal_reacted = None;
-            self.terminal_contracted = None;
-            self.terminal_presented = None;
-            self.cycle_complete = false;
-            if let Some(standing) = self.dissection.as_mut() {
-                standing.clear();
-            }
+            morphology_transition = self.enter_cycle(&occurrence.row_addresses)?;
         }
+        let at = self.operation_at;
         let operation = self
             .ecology
             .operations
-            .get(self.operation_at)
+            .get(at)
             .cloned()
             .ok_or(NativeFullOperationError::Operation)?;
         if matches!(operation.primitive, NativeOperationPrimitive::Lookup { .. }) {
             self.previous_context = Some(occurrence.row_addresses.clone());
         }
-        let outcome = self.enact_operation(&operation, &occurrence)?;
-        let (outcome, successor_projection) = self.project_successor(operation.ordinal, outcome)?;
-        let morphology_overlay_rank = self.morphology_overlay_rank();
+        let steps = self.enact_run(at, at + 1, &occurrence.row_addresses, &BTreeMap::new(), false)?;
+        let step = steps.into_iter().next().ok_or(NativeFullOperationError::Operation)?;
         let successor_generation = self
             .generation
             .checked_add(1)
             .ok_or(NativeFullOperationError::Generation)?;
         self.chronology.push(self.generation);
-        self.carriers.insert(
-            operation.output,
-            ContemporaryCarrier {
-                section: outcome.section,
-                bound_octaves: outcome.bound_octaves,
-            },
-        );
         self.operation_at += 1;
-        for input in &operation.inputs {
-            if *input != operation.output
-                && !self.ecology.operations[self.operation_at..]
-                    .iter()
-                    .any(|later| later.inputs.contains(input))
-            {
-                if let Some(carrier) = self.carriers.remove(input) {
-                    if self.cross_layer.contains(input) {
-                        self.checkpoints.insert(*input, carrier);
-                    }
-                }
-            }
-        }
         if self.operation_at == self.ecology.operations.len() {
             self.operation_at = 0;
             self.cycle_complete = true;
         }
         self.generation = successor_generation;
-        let resident_coefficient_octets = self.residence.receipt().raw_coefficient_octets;
+        let carrier = self
+            .carriers
+            .get(&operation.output)
+            .ok_or(NativeFullOperationError::Carrier)?;
+        let emission = NativeFullOperationEmission {
+            generation: successor_generation,
+            operation: operation.ordinal,
+            carrier: operation.output,
+            rows: carrier.section.rows(),
+            width: carrier.section.width(),
+            grain: carrier.section.grain().0,
+            intervals: Vec::new(),
+        };
+        let trace = self.trace_of(&step, &occurrence, morphology_transition, successor_generation);
         Ok(NativeFullOperationStep {
-            emission: NativeFullOperationEmission {
-                generation: successor_generation,
-                operation: operation.ordinal,
-                carrier: operation.output,
-                rows: outcome.rows,
-                width: outcome.width,
-                grain: outcome.grain.0,
-                intervals: outcome.intervals,
-            },
-            trace: NativeFullOperationTrace {
-                schema: NATIVE_FULL_OPERATION_STEP_SCHEMA.to_owned(),
-                predecessor_generation: successor_generation - 1,
-                successor_generation,
-                occurrence: occurrence.ordinal,
-                row_addresses: occurrence.row_addresses,
-                operation,
-                successor_projection,
-                morphology_transition,
-                morphology_overlay_rank,
-                successor_bound_octaves: outcome.bound_octaves,
-                resident_coefficient_octets,
-                census_before: outcome.census_before,
-                census_after: outcome.census_after,
-            },
+            emission,
+            trace,
             successor: self,
         })
     }
 
-    /// Complete one whole operator recurrence from ordinary addressed occurrences. The ecology's
-    /// operation word decides which nodes consume the row population; an application cannot inspect
-    /// or schedule internal primitive species.
+    /// Complete one whole operator recurrence from ordinary addressed occurrences, by segments,
+    /// through the tiled terminal boundary.  The ecology's operation word decides which nodes
+    /// consume the row population; an application cannot inspect or schedule internal primitive
+    /// species.
     pub fn advance_cycle(
         mut self,
         row_addresses: &[u32],
@@ -523,30 +544,28 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         if row_addresses.is_empty() || (self.operation_at != 0 && !self.cycle_complete) {
             return Err(NativeFullOperationError::Occurrence);
         }
+        let mut morphology_transition = NativeMorphologyTransition::Unchanged;
+        if self.cycle_complete {
+            morphology_transition = self.enter_cycle(row_addresses)?;
+        }
         let terminal_start = self.ecology.operations.len().saturating_sub(5);
+        self.previous_context = Some(row_addresses.to_vec());
+        let occurrence = NativeFullOperationOccurrence {
+            ordinal: self.generation,
+            row_addresses: row_addresses.to_vec(),
+        };
+        let steps = self.enact_run(0, terminal_start, row_addresses, &BTreeMap::new(), false)?;
         let mut traces = Vec::with_capacity(self.ecology.operations.len());
-        while self.operation_at < terminal_start {
-            let current = self
-                .ecology
-                .operations
-                .get(if self.cycle_complete {
-                    0
-                } else {
-                    self.operation_at
-                })
-                .ok_or(NativeFullOperationError::Operation)?;
-            let rows = if matches!(current.primitive, NativeOperationPrimitive::Lookup { .. }) {
-                row_addresses.to_vec()
-            } else {
-                Vec::new()
-            };
-            let ordinal = self.generation;
-            let step = self.advance(NativeFullOperationOccurrence {
-                ordinal,
-                row_addresses: rows,
-            })?;
-            traces.push(step.trace);
-            self = step.successor;
+        for step in &steps {
+            let successor_generation = self
+                .generation
+                .checked_add(1)
+                .ok_or(NativeFullOperationError::Generation)?;
+            let transition = std::mem::replace(&mut morphology_transition, NativeMorphologyTransition::Unchanged);
+            traces.push(self.trace_of(step, &occurrence, transition, successor_generation));
+            self.chronology.push(self.generation);
+            self.generation = successor_generation;
+            self.operation_at += 1;
         }
         let ordinal = self.generation;
         let mut terminal = self.advance_terminal(NativeFullOperationOccurrence {
@@ -565,745 +584,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         })
     }
 
-    pub(super) fn project_successor(
-        &self,
-        operation: u32,
-        outcome: OperationOutcome<'chart>,
-    ) -> Result<(OperationOutcome<'chart>, NativeSuccessorProjection), NativeFullOperationError>
-    {
-        let nonpoint_coordinates = outcome
-            .intervals
-            .iter()
-            .filter(|(lower, upper)| lower != upper)
-            .count();
-        if nonpoint_coordinates == 0 {
-            return Ok((outcome, NativeSuccessorProjection::Exact));
-        }
-        let widest_interval = outcome
-            .intervals
-            .iter()
-            .map(|(lower, upper)| lower.abs_diff(*upper))
-            .max()
-            .unwrap_or(0);
-        let surface = self.residence.surface();
-        let shape =
-            surface.shape_collapse_control(outcome.rows, outcome.width, outcome.bound_octaves)?;
-        let successor = surface.fresh_section(outcome.rows, outcome.width, outcome.grain)?;
-        let mut builder = surface.begin_passage(&[vec![]])?;
-        let lane = builder.open(0, &[])?;
-        surface.record_collapse_control(&lane, &outcome.section, &successor)?;
-        builder.close(0, &successor, shape.needed)?;
-        let reading = builder.finish()?.launch()?;
-        let bound_octaves = operation_bound(operation, &reading)?;
-        let intervals = surface.read_out(&successor)?;
-        if intervals.iter().any(|(lower, upper)| lower != upper) {
-            return Err(NativeFullOperationError::Projection);
-        }
-        let census_after = surface.census();
-        Ok((
-            OperationOutcome {
-                section: successor,
-                bound_octaves,
-                rows: outcome.rows,
-                width: outcome.width,
-                grain: outcome.grain,
-                intervals,
-                census_before: outcome.census_before,
-                census_after,
-            },
-            NativeSuccessorProjection::Midpoint {
-                nonpoint_coordinates,
-                widest_interval,
-            },
-        ))
-    }
-
-    fn execute_lookup(
-        &mut self,
-        operation: &NativeOperatorNode,
-        occurrence: &NativeFullOperationOccurrence,
-        scale: &NativeScaleConstraint,
-    ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
-        if occurrence.row_addresses.is_empty()
-            || !operation.inputs.is_empty()
-            || operation.coefficients.len() != 1
-        {
-            return Err(NativeFullOperationError::Occurrence);
-        }
-        let coefficient = operation.coefficients[0];
-        let population = self
-            .ecology
-            .coefficient_populations
-            .get(coefficient.0 as usize)
-            .ok_or(NativeFullOperationError::Operation)?;
-        let [_, width] = population.shape.as_slice() else {
-            return Err(NativeFullOperationError::Operation);
-        };
-        let output = self.output(operation)?;
-        if output.axes
-            != [
-                NativeCarrierAxis::Occurrence,
-                NativeCarrierAxis::Fixed(*width),
-            ]
-        {
-            return Err(NativeFullOperationError::Operation);
-        }
-        let scale = projected_scale(scale)?;
-        self.ensure_row_population(occurrence.row_addresses.len())?;
-        let selection = self
-            .residence
-            .gather_rows(coefficient, &occurrence.row_addresses)?;
-        if selection.width != *width || selection.rows != occurrence.row_addresses.len() {
-            return Err(NativeFullOperationError::Operation);
-        }
-        let exact_frame = selection
-            .frame
-            .exponent
-            .checked_add(scale.exponent)
-            .ok_or(NativeFullOperationError::Grain)?;
-        if exact_frame + (self.grain.0 as i32) < 0 {
-            return Err(NativeFullOperationError::Grain);
-        }
-        let grain = self.grain;
-        let surface = self.residence.surface();
-        let shape = surface.shape_enter_resident_bfloat16(
-            selection.rows,
-            selection.width,
-            scale,
-            grain,
-            selection.frame.exponent,
-            selection.entry_octaves,
-        )?;
-        let successor = surface.fresh_section(selection.rows, selection.width, grain)?;
-        let census_before = surface.census();
-        let mut builder = surface.begin_passage(&[vec![]])?;
-        let lane = builder.open(0, &[])?;
-        surface.record_enter_resident_bfloat16(
-            &lane,
-            selection.address,
-            selection.rows,
-            selection.width,
-            scale,
-            &successor,
-        )?;
-        builder.close(0, &successor, shape.needed)?;
-        let reading = builder.finish()?.launch()?;
-        let bound_octaves = operation_bound(operation.ordinal, &reading)?;
-        let intervals = surface.read_out(&successor)?;
-        let census_after = surface.census();
-        Ok(OperationOutcome {
-            section: successor,
-            bound_octaves,
-            rows: selection.rows,
-            width: selection.width,
-            grain,
-            intervals,
-            census_before,
-            census_after,
-        })
-    }
-
-    fn execute_reshape(
-        &mut self,
-        operation: &NativeOperatorNode,
-        occurrence: &NativeFullOperationOccurrence,
-    ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
-        require_internal_occurrence(operation, occurrence, 1, 0)?;
-        self.output(operation)?;
-        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
-            .ok_or(NativeFullOperationError::Carrier)?;
-        let surface = self.residence.surface();
-        let shape = surface.shape_carry(
-            input.section.rows(),
-            input.section.width(),
-            input.bound_octaves,
-        )?;
-        let successor = surface.fresh_section(
-            input.section.rows(),
-            input.section.width(),
-            input.section.grain(),
-        )?;
-        let census_before = surface.census();
-        let mut builder = surface.begin_passage(&[vec![]])?;
-        let lane = builder.open(0, &[])?;
-        surface.record_carry(&lane, &input.section, &successor)?;
-        builder.close(0, &successor, shape.needed)?;
-        let reading = builder.finish()?.launch()?;
-        let bound_octaves = operation_bound(operation.ordinal, &reading)?;
-        let intervals = surface.read_out(&successor)?;
-        let census_after = surface.census();
-        Ok(OperationOutcome {
-            rows: successor.rows(),
-            width: successor.width(),
-            grain: successor.grain(),
-            section: successor,
-            bound_octaves,
-            intervals,
-            census_before,
-            census_after,
-        })
-    }
-
-    fn execute_contract(
-        &mut self,
-        operation: &NativeOperatorNode,
-        occurrence: &NativeFullOperationOccurrence,
-    ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
-        if !occurrence.row_addresses.is_empty()
-            || operation.inputs.len() != 1
-            || operation.coefficients.len() != 1
-        {
-            return Err(NativeFullOperationError::Operation);
-        }
-        self.output(operation)?;
-        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
-            .ok_or(NativeFullOperationError::Carrier)?;
-        let coefficient = operation.coefficients[0];
-        let population = self
-            .ecology
-            .coefficient_populations
-            .get(coefficient.0 as usize)
-            .ok_or(NativeFullOperationError::Operation)?;
-        let [rows, dim] = population.shape.as_slice() else {
-            return Err(NativeFullOperationError::Operation);
-        };
-        if input.section.width() != *dim {
-            return Err(NativeFullOperationError::Operation);
-        }
-        let surface = self.residence.surface();
-        let atoms = self.overlay.get(&coefficient).map(Vec::as_slice).unwrap_or(&[]);
-        let tile = self.residence.align_tile(coefficient, 0, *rows)?;
-        let census_before = surface.census();
-        let (successor, reading) = contract_tile_with_overlay(
-            surface,
-            &input.section,
-            input.bound_octaves,
-            &tile.mounted.readout,
-            atoms,
-            0,
-            *rows,
-        )?;
-        let bound_octaves = operation_bound(operation.ordinal, &reading)?;
-        let intervals = surface.read_out(&successor)?;
-        let census_after = surface.census();
-        drop(tile);
-        Ok(OperationOutcome {
-            rows: successor.rows(),
-            width: successor.width(),
-            grain: successor.grain(),
-            section: successor,
-            bound_octaves,
-            intervals,
-            census_before,
-            census_after,
-        })
-    }
-
-    fn execute_rms(
-        &mut self,
-        operation: &NativeOperatorNode,
-        occurrence: &NativeFullOperationOccurrence,
-        group: usize,
-        epsilon: &Rat,
-        has_gain: bool,
-    ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
-        require_internal_occurrence(operation, occurrence, 1, usize::from(has_gain))?;
-        self.output(operation)?;
-        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
-            .ok_or(NativeFullOperationError::Carrier)?;
-        let surface = self.residence.surface();
-        let gain = if has_gain {
-            Some(self.residence.align_tile(operation.coefficients[0], 0, 1)?)
-        } else {
-            None
-        };
-        let gain_readout = gain.as_ref().map(|tile| &tile.mounted.readout);
-        let shape = surface.shape_rms_rebase(
-            input.section.rows(),
-            input.section.width(),
-            group,
-            input.bound_octaves,
-            gain_readout,
-        )?;
-        let successor = surface.fresh_section(
-            input.section.rows(),
-            input.section.width(),
-            input.section.grain(),
-        )?;
-        let eps = binary64_projection(epsilon)?;
-        let census_before = surface.census();
-        let mut builder = surface.begin_passage(&[vec![]])?;
-        let lane = builder.open(0, &[])?;
-        surface.record_rms_rebase(
-            &lane,
-            &input.section,
-            group,
-            gain_readout,
-            eps,
-            &shape,
-            &successor,
-        )?;
-        builder.close(0, &successor, shape.needed)?;
-        let reading = builder.finish()?.launch()?;
-        let bound_octaves = operation_bound(operation.ordinal, &reading)?;
-        let intervals = surface.read_out(&successor)?;
-        let census_after = surface.census();
-        drop(gain);
-        Ok(OperationOutcome {
-            rows: successor.rows(),
-            width: successor.width(),
-            grain: successor.grain(),
-            section: successor,
-            bound_octaves,
-            intervals,
-            census_before,
-            census_after,
-        })
-    }
-
-    fn execute_tanh(
-        &mut self,
-        operation: &NativeOperatorNode,
-        occurrence: &NativeFullOperationOccurrence,
-    ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
-        require_internal_occurrence(operation, occurrence, 1, 0)?;
-        self.output(operation)?;
-        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
-            .ok_or(NativeFullOperationError::Carrier)?;
-        let surface = self.residence.surface();
-        let terms = SeriesAperture(14);
-        let shape = surface.shape_tanh(
-            input.section.rows(),
-            input.section.width(),
-            input.bound_octaves,
-            input.section.grain(),
-            terms,
-        )?;
-        let successor = surface.fresh_section(
-            input.section.rows(),
-            input.section.width(),
-            input.section.grain(),
-        )?;
-        let census_before = surface.census();
-        let mut builder = surface.begin_passage(&[vec![]])?;
-        let lane = builder.open(0, &[])?;
-        surface.record_tanh(&lane, &input.section, terms, &successor)?;
-        builder.close(0, &successor, shape.needed)?;
-        let reading = builder.finish()?.launch()?;
-        let bound_octaves = operation_bound(operation.ordinal, &reading)?;
-        let intervals = surface.read_out(&successor)?;
-        let census_after = surface.census();
-        Ok(OperationOutcome {
-            rows: successor.rows(),
-            width: successor.width(),
-            grain: successor.grain(),
-            section: successor,
-            bound_octaves,
-            intervals,
-            census_before,
-            census_after,
-        })
-    }
-
-    fn execute_gelu(
-        &mut self,
-        operation: &NativeOperatorNode,
-        occurrence: &NativeFullOperationOccurrence,
-    ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
-        require_internal_occurrence(operation, occurrence, 1, 0)?;
-        self.output(operation)?;
-        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
-            .ok_or(NativeFullOperationError::Carrier)?;
-        let surface = self.residence.surface();
-        let c1 = Dyadic::of_binary64_bits(0x3fe9_8845_33d4_3651)?;
-        let c2 = Dyadic::of_binary64_bits(0x3fa6_e4e2_6d48_01f7)?;
-        let terms = SeriesAperture(14);
-        let shape = surface.shape_gelu_tanh(
-            input.section.rows(),
-            input.section.width(),
-            input.bound_octaves,
-            input.section.grain(),
-            c1,
-            c2,
-            terms,
-        )?;
-        let successor = surface.fresh_section(
-            input.section.rows(),
-            input.section.width(),
-            input.section.grain(),
-        )?;
-        let census_before = surface.census();
-        let mut builder = surface.begin_passage(&[vec![]])?;
-        let lane = builder.open(0, &[])?;
-        surface.record_gelu_tanh(&lane, &input.section, c1, c2, terms, &successor)?;
-        builder.close(0, &successor, shape.needed)?;
-        let reading = builder.finish()?.launch()?;
-        let bound_octaves = operation_bound(operation.ordinal, &reading)?;
-        let intervals = surface.read_out(&successor)?;
-        let census_after = surface.census();
-        Ok(OperationOutcome {
-            rows: successor.rows(),
-            width: successor.width(),
-            grain: successor.grain(),
-            section: successor,
-            bound_octaves,
-            intervals,
-            census_before,
-            census_after,
-        })
-    }
-
-    fn execute_binary(
-        &mut self,
-        operation: &NativeOperatorNode,
-        occurrence: &NativeFullOperationOccurrence,
-        additive: bool,
-    ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
-        require_internal_occurrence(operation, occurrence, 2, 0)?;
-        self.output(operation)?;
-        let left = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
-            .ok_or(NativeFullOperationError::Carrier)?;
-        let right = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[1])
-            .ok_or(NativeFullOperationError::Carrier)?;
-        if left.section.rows() != right.section.rows()
-            || left.section.width() != right.section.width()
-            || left.section.grain() != right.section.grain()
-        {
-            return Err(NativeFullOperationError::Operation);
-        }
-        let surface = self.residence.surface();
-        let shape = if additive {
-            surface.shape_re_entry(
-                left.section.rows(),
-                left.section.width(),
-                left.bound_octaves,
-                right.bound_octaves,
-            )?
-        } else {
-            surface.shape_hadamard(
-                left.section.rows(),
-                left.section.width(),
-                left.bound_octaves,
-                right.bound_octaves,
-            )?
-        };
-        let successor = surface.fresh_section(
-            left.section.rows(),
-            left.section.width(),
-            left.section.grain(),
-        )?;
-        let census_before = surface.census();
-        let mut builder = surface.begin_passage(&[vec![]])?;
-        let lane = builder.open(0, &[])?;
-        if additive {
-            surface.record_re_entry(&lane, &left.section, &right.section, &successor)?;
-        } else {
-            surface.record_hadamard(&lane, &left.section, &right.section, &successor)?;
-        }
-        builder.close(0, &successor, shape.needed)?;
-        let reading = builder.finish()?.launch()?;
-        let bound_octaves = operation_bound(operation.ordinal, &reading)?;
-        let intervals = surface.read_out(&successor)?;
-        let census_after = surface.census();
-        Ok(OperationOutcome {
-            rows: successor.rows(),
-            width: successor.width(),
-            grain: successor.grain(),
-            section: successor,
-            bound_octaves,
-            intervals,
-            census_before,
-            census_after,
-        })
-    }
-
-    fn execute_scale(
-        &mut self,
-        operation: &NativeOperatorNode,
-        occurrence: &NativeFullOperationOccurrence,
-        constraint: &NativeScaleConstraint,
-    ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
-        require_internal_occurrence(operation, occurrence, 1, 0)?;
-        self.output(operation)?;
-        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
-            .ok_or(NativeFullOperationError::Carrier)?;
-        let by = scale_enclosure(constraint)?;
-        let surface = self.residence.surface();
-        let shape = surface.shape_scale(
-            input.section.rows(),
-            input.section.width(),
-            input.bound_octaves,
-            by,
-        )?;
-        let successor = surface.fresh_section(
-            input.section.rows(),
-            input.section.width(),
-            input.section.grain(),
-        )?;
-        let census_before = surface.census();
-        let mut builder = surface.begin_passage(&[vec![]])?;
-        let lane = builder.open(0, &[])?;
-        surface.record_scale(&lane, &input.section, by, &successor)?;
-        builder.close(0, &successor, shape.needed)?;
-        let reading = builder.finish()?.launch()?;
-        let bound_octaves = operation_bound(operation.ordinal, &reading)?;
-        let intervals = surface.read_out(&successor)?;
-        let census_after = surface.census();
-        Ok(OperationOutcome {
-            rows: successor.rows(),
-            width: successor.width(),
-            grain: successor.grain(),
-            section: successor,
-            bound_octaves,
-            intervals,
-            census_before,
-            census_after,
-        })
-    }
-
-    fn execute_coefficient_scale(
-        &mut self,
-        operation: &NativeOperatorNode,
-        occurrence: &NativeFullOperationOccurrence,
-    ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
-        require_internal_occurrence(operation, occurrence, 1, 1)?;
-        self.output(operation)?;
-        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
-            .ok_or(NativeFullOperationError::Carrier)?;
-        let surface = self.residence.surface();
-        let coefficient = self.residence.align_tile(operation.coefficients[0], 0, 1)?;
-        let shape = surface.shape_scale_by_aligned(
-            input.section.rows(),
-            input.section.width(),
-            input.bound_octaves,
-            &coefficient.mounted.readout,
-        )?;
-        let successor = surface.fresh_section(
-            input.section.rows(),
-            input.section.width(),
-            input.section.grain(),
-        )?;
-        let census_before = surface.census();
-        let mut builder = surface.begin_passage(&[vec![]])?;
-        let lane = builder.open(0, &[])?;
-        surface.record_scale_by_aligned(
-            &lane,
-            &input.section,
-            &coefficient.mounted.readout,
-            &successor,
-        )?;
-        builder.close(0, &successor, shape.needed)?;
-        let reading = builder.finish()?.launch()?;
-        let bound_octaves = operation_bound(operation.ordinal, &reading)?;
-        drop(coefficient);
-        let intervals = surface.read_out(&successor)?;
-        let census_after = surface.census();
-        Ok(OperationOutcome {
-            rows: successor.rows(),
-            width: successor.width(),
-            grain: successor.grain(),
-            section: successor,
-            bound_octaves,
-            intervals,
-            census_before,
-            census_after,
-        })
-    }
-
-    fn execute_select(
-        &mut self,
-        operation: &NativeOperatorNode,
-        occurrence: &NativeFullOperationOccurrence,
-        axis: usize,
-        at: usize,
-    ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
-        require_internal_occurrence(operation, occurrence, 1, 0)?;
-        if axis != 1 {
-            return Err(NativeFullOperationError::Operation);
-        }
-        let output = self.output(operation)?;
-        let span = match output.axes.last() {
-            Some(NativeCarrierAxis::Fixed(span)) => *span,
-            _ => return Err(NativeFullOperationError::Operation),
-        };
-        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
-            .ok_or(NativeFullOperationError::Carrier)?;
-        let from = at
-            .checked_mul(span)
-            .ok_or(NativeFullOperationError::Operation)?;
-        let surface = self.residence.surface();
-        let shape = surface.shape_select_columns(
-            input.section.rows(),
-            input.section.width(),
-            from,
-            span,
-            input.bound_octaves,
-        )?;
-        let successor = surface.fresh_section(input.section.rows(), span, input.section.grain())?;
-        let census_before = surface.census();
-        let mut builder = surface.begin_passage(&[vec![]])?;
-        let lane = builder.open(0, &[])?;
-        surface.record_select_columns(&lane, &input.section, from, span, &successor)?;
-        builder.close(0, &successor, shape.needed)?;
-        let reading = builder.finish()?.launch()?;
-        let bound_octaves = operation_bound(operation.ordinal, &reading)?;
-        let intervals = surface.read_out(&successor)?;
-        let census_after = surface.census();
-        Ok(OperationOutcome {
-            rows: successor.rows(),
-            width: successor.width(),
-            grain: successor.grain(),
-            section: successor,
-            bound_octaves,
-            intervals,
-            census_before,
-            census_after,
-        })
-    }
-
-    fn execute_contact(
-        &mut self,
-        operation: &NativeOperatorNode,
-        occurrence: &NativeFullOperationOccurrence,
-        heads: usize,
-        kv_heads: usize,
-        head_width: usize,
-        reach: &NativeCausalReach,
-        series_terms: u32,
-    ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
-        require_internal_occurrence(operation, occurrence, 3, 0)?;
-        self.output(operation)?;
-        let q = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
-            .ok_or(NativeFullOperationError::Carrier)?;
-        let k = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[1])
-            .ok_or(NativeFullOperationError::Carrier)?;
-        let v = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[2])
-            .ok_or(NativeFullOperationError::Carrier)?;
-        if q.section.rows() != k.section.rows()
-            || q.section.rows() != v.section.rows()
-            || q.section.grain() != k.section.grain()
-            || q.section.grain() != v.section.grain()
-        {
-            return Err(NativeFullOperationError::Operation);
-        }
-        let window = match reach {
-            NativeCausalReach::Window(window) if *window > 0 => *window,
-            NativeCausalReach::Complete => q.section.rows(),
-            _ => return Err(NativeFullOperationError::Operation),
-        };
-        let terms = SeriesAperture(series_terms);
-        let surface = self.residence.surface();
-        let shape = surface.shape_contact(
-            q.section.rows(),
-            q.section.width(),
-            k.section.width(),
-            v.section.width(),
-            heads,
-            kv_heads,
-            head_width,
-            window,
-            terms,
-            q.section.grain(),
-            q.bound_octaves,
-            k.bound_octaves,
-            v.bound_octaves,
-        )?;
-        let successor =
-            surface.fresh_section(q.section.rows(), heads * head_width, q.section.grain())?;
-        let census_before = surface.census();
-        let mut builder = surface.begin_passage(&[vec![]])?;
-        let lane = builder.open(0, &[])?;
-        surface.record_contact(
-            &lane, &q.section, &k.section, &v.section, heads, kv_heads, head_width, window, terms,
-            None, &shape, &successor,
-        )?;
-        builder.close(0, &successor, shape.needed)?;
-        let reading = builder.finish()?.launch()?;
-        let bound_octaves = operation_bound(operation.ordinal, &reading)?;
-        let intervals = surface.read_out(&successor)?;
-        let census_after = surface.census();
-        Ok(OperationOutcome {
-            rows: successor.rows(),
-            width: successor.width(),
-            grain: successor.grain(),
-            section: successor,
-            bound_octaves,
-            intervals,
-            census_before,
-            census_after,
-        })
-    }
-
-    fn execute_chronology(
-        &mut self,
-        operation: &NativeOperatorNode,
-        occurrence: &NativeFullOperationOccurrence,
-        theta: u64,
-        head_width: usize,
-        rotated_width: usize,
-    ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
-        require_internal_occurrence(operation, occurrence, 1, 0)?;
-        self.output(operation)?;
-        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
-            .ok_or(NativeFullOperationError::Carrier)?;
-        if input.section.width() % head_width != 0 {
-            return Err(NativeFullOperationError::Operation);
-        }
-        let heads = input.section.width() / head_width;
-        let positions = self
-            .positions
-            .as_ref()
-            .ok_or(NativeFullOperationError::Occurrence)?;
-        let bands = self
-            .residence
-            .chronology(theta, head_width, rotated_width)?;
-        let surface = self.residence.surface();
-        let shape = surface.shape_chronology(
-            input.section.rows(),
-            input.section.width(),
-            heads,
-            head_width,
-            input.bound_octaves,
-            bands,
-            positions,
-            u32::try_from(input.section.rows().saturating_sub(1))
-                .map_err(|_| NativeFullOperationError::Operation)?,
-        )?;
-        let successor = surface.fresh_section(
-            input.section.rows(),
-            input.section.width(),
-            input.section.grain(),
-        )?;
-        let census_before = surface.census();
-        let mut builder = surface.begin_passage(&[vec![]])?;
-        let lane = builder.open(0, &[])?;
-        surface.record_chronology(
-            &lane,
-            &input.section,
-            heads,
-            head_width,
-            bands,
-            positions,
-            &successor,
-        )?;
-        builder.close(0, &successor, shape.needed)?;
-        let reading = builder.finish()?.launch()?;
-        let bound_octaves = operation_bound(operation.ordinal, &reading)?;
-        let intervals = surface.read_out(&successor)?;
-        let census_after = surface.census();
-        Ok(OperationOutcome {
-            rows: successor.rows(),
-            width: successor.width(),
-            grain: successor.grain(),
-            section: successor,
-            bound_octaves,
-            intervals,
-            census_before,
-            census_after,
-        })
-    }
-
-    fn ensure_row_population(&mut self, rows: usize) -> Result<(), NativeFullOperationError> {
+    pub(super) fn ensure_row_population(&mut self, rows: usize) -> Result<(), NativeFullOperationError> {
         match self.row_population {
             Some(held) if held == rows => Ok(()),
             Some(_) => Err(NativeFullOperationError::Occurrence),
@@ -1320,16 +601,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         }
     }
 
-    fn output(
-        &self,
-        operation: &NativeOperatorNode,
-    ) -> Result<&super::NativeCarrierChart, NativeFullOperationError> {
-        self.ecology
-            .carriers
-            .get(operation.output.0 as usize)
-            .ok_or(NativeFullOperationError::Operation)
-    }
-
+    /// The terminal receiver's copy: the one place a carrier crosses to the serial chart.
     pub fn carrier_intervals(
         &self,
         carrier: NativeCarrierOrdinal,
@@ -1392,20 +664,4 @@ pub(super) fn carrier_of<'a, 'chart>(
     ordinal: &NativeCarrierOrdinal,
 ) -> Option<&'a ContemporaryCarrier<'chart>> {
     carriers.get(ordinal).or_else(|| checkpoints.get(ordinal))
-}
-
-fn require_internal_occurrence(
-    operation: &NativeOperatorNode,
-    occurrence: &NativeFullOperationOccurrence,
-    inputs: usize,
-    coefficients: usize,
-) -> Result<(), NativeFullOperationError> {
-    if !occurrence.row_addresses.is_empty()
-        || operation.inputs.len() != inputs
-        || operation.coefficients.len() != coefficients
-    {
-        Err(NativeFullOperationError::Operation)
-    } else {
-        Ok(())
-    }
 }

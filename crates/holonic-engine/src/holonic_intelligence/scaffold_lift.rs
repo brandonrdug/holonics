@@ -48,7 +48,7 @@ pub struct Bf16ExcitationColdWitness {
 /// local values and block incidence. This receipt proves the two physical lanes still join at
 /// every occurrence without making BF16 a native state type.
 pub fn validate_bf16_section_reconstruction(
-    returned: &SoulkillerDismantlingReturn<Bf16ExcitationColdWitness>,
+    returned: &SoulkillerDismantlingReturn<NativeTransportScaffold, Bf16ExcitationColdWitness, ReceiverInsufficiency>,
 ) -> Result<(), ScaffoldLiftError> {
     returned.native.validate()?;
     for excitation in &returned.exterior.excitations {
@@ -87,10 +87,17 @@ pub struct Bf16ExcitationDismantling {
 }
 
 impl SoulkillerDismantlingInput for Bf16ExcitationDismantling {
+    type Productive = NativeTransportScaffold;
     type ColdWitness = Bf16ExcitationColdWitness;
+    type Insufficiency = ReceiverInsufficiency;
     type Error = ScaffoldLiftError;
 
-    fn dismantle(self) -> Result<SoulkillerDismantlingReturn<Self::ColdWitness>, Self::Error> {
+    fn dismantle(
+        self,
+    ) -> Result<
+        SoulkillerDismantlingReturn<Self::Productive, Self::ColdWitness, Self::Insufficiency>,
+        Self::Error,
+    > {
         dismantle_bf16_excitations(self.receiver, self.excitations)
     }
 }
@@ -110,7 +117,10 @@ const NATIVE_SECTION_BLOCK_WORDS: usize = 4096;
 fn dismantle_bf16_excitations(
     receiver: ReceiverId,
     excitations: Vec<ForeignBf16Excitation>,
-) -> Result<SoulkillerDismantlingReturn<Bf16ExcitationColdWitness>, ScaffoldLiftError> {
+) -> Result<
+    SoulkillerDismantlingReturn<NativeTransportScaffold, Bf16ExcitationColdWitness, ReceiverInsufficiency>,
+    ScaffoldLiftError,
+> {
     if excitations.is_empty() {
         return Err(ScaffoldLiftError::Excitation);
     }
@@ -377,7 +387,7 @@ mod tests {
     fn lift(
         receiver: ReceiverId,
         excitations: Vec<ForeignBf16Excitation>,
-    ) -> Result<SoulkillerDismantlingReturn<Bf16ExcitationColdWitness>, ScaffoldLiftError> {
+    ) -> Result<SoulkillerDismantlingReturn<NativeTransportScaffold, Bf16ExcitationColdWitness, ReceiverInsufficiency>, ScaffoldLiftError> {
         crate::soulkiller::dismantle(Bf16ExcitationDismantling {
             receiver,
             excitations,

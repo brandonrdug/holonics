@@ -141,13 +141,31 @@ against an absolute volume); "near one readout per cycle" where the contract say
 attribution to Sol; the grading of the lens by the compression law; and the falsifier that one
 withdrawal founds a cone.
 
-[counterexample; formal-checked] Open obligations in the SKE0 owner, found by the audit and not
-discharged: `FaithfulLocalSectionLift` is inhabited by the identity, so "a manifestation does not
-inhabit it" is unproved (what is owed is the decoder cost the tree's own docstring names:
-"a codec compression additionally owes an exterior presentation and decoder cost");
-`ExcitationFoundedReturn` mentions neither the family, `IsCone`, `extent`, nor `insufficiency`;
-the control proves one state under two histories, not two occurrences. `ReconstructionFiber` is
-retracted for `PreimageFibre` (2026-09-02) and this contract uses the latter.
+[proved-derived; formal-checked] The obligations the audit found in the SKE0 owner were revised
+on 2026-09-03 in `Computation/HolonicExcitationFoundedQuotient.lean`. `IsCone`'s monotonicity and
+union-composition are now theorems (`isCone_mono`, `isCone_union`), so the union was never in
+doubt and a refuted union refutes its members. The declared-withdrawal cone is a named owner:
+`IsConeUnder` quantifies over a declared population of withdrawals, `IsCone` implies it for every
+declaration, it is monotone in the cone and antitone in the declaration, and `FoundedCone` — the
+union of the declared populations whose withdrawal changes the face — is `IsConeUnder` with no
+hypothesis at all (`isConeUnder_foundedCone`; the declared populations need not be pairwise
+disjoint, because a declared population that both changes the face and is disjoint from the
+founded cone is empty). `ExcitationFoundedReturn` now carries the declared family, the declared
+withdrawals, the cone assignment, the soundness of every cone under those withdrawals, and the
+equation that the productive lane's quotient is the family's signature quotient
+(`classes_embed_in_native`). The control's docstring states what it proves: one presented state
+under two histories. `Saturated` is stated as an identification law over an enlargement, with no
+count.
+
+[counterexample; formal-checked] What remains open and is now exhibited rather than asserted:
+`FaithfulLocalSectionLift` is inhabited by the identity (`identityLift`), and
+`ExcitationFoundedReturn` is inhabited by a manifestation over any family that separates its own
+occurrences (`manifestationReturn`, whose extent is empty and whose insufficiency is the whole
+site population). The tie to the family does refuse an identity lane over a family with a
+nontrivial class, so the type is necessary and not sufficient. What is owed is the decoder cost
+the tree's own docstring names: "a codec compression additionally owes an exterior presentation
+and decoder cost". `ReconstructionFiber` is retracted for `PreimageFibre` (2026-09-02) and this
+contract uses the latter.
 
 ## 1. The formal object
 
@@ -160,10 +178,11 @@ The excitation-founded quotient identifies two occurrences exactly when their si
 withdrawal changes the receiver face. It is founded by intervention on the excited current, never
 by a magnitude threshold: two occurrences may have equal magnitudes and different cones. Outside
 the cone the withdrawal leaves the face unchanged; that is `IsCone`, a universal over
-every disjoint population, which the card discharges only over the declared withdrawals
-(`LocalCausalConeCultivation.outsideUnchanged` is a different obligation on a returned morphology
-difference and is not this law). On the resident operator the sites
-are a declared grain and the withdrawals are the family's declared environments; the cone is what
+every disjoint population, which the card discharges only over the declared withdrawals —
+`IsConeUnder` and `FoundedCone` in `Computation/HolonicExcitationFoundedQuotient.lean` are the
+owners of that bounded law (`LocalCausalConeCultivation.outsideUnchanged` is a different
+obligation on a returned morphology difference and is not this law). On the resident operator
+the sites are a declared grain and the withdrawals are the family's declared environments; the cone is what
 they found, at every grain, and a coordinate face is never its identity (§0b).
 
 [definition] The extent of a lift is the union of the cones the family excited. Every receiver
@@ -234,14 +253,22 @@ productive-lane obligation.
 
 **Pass SKE0:** [definition] identified occurrences have equal faces on every declared receiver and
 history, and a separating history reopens the identification; withdrawal outside a cone leaves
-every declared face unchanged; a control exhibits two occurrences with equal magnitude and
-different cones; the extent and insufficiency of a family are stated as the union of cones and
-its complement; a `DismantlingReturn` type whose productive lane is a `FaithfulLocalSectionLift` on
-the family is defined, and a manifestation without that lane does not inhabit it; the live
-umbrella builds with no `sorry` or new axiom.
+every declared face unchanged, both as the `IsCone` universal and as the declared-withdrawal law
+`IsConeUnder`, with `FoundedCone` sound under the withdrawals that founded it; a control exhibits
+one presented state whose equal magnitudes have different cones under two declared histories, and
+a second control separates `IsConeUnder` from `IsCone`; the extent and insufficiency of a family
+are stated as the union of cones and its complement; a `DismantlingReturn` type whose productive
+lane is a `FaithfulLocalSectionLift` on the family is defined, carrying the family, the declared
+withdrawals, the cone assignment, its soundness, and the equation that the lane's quotient is the
+family's signature quotient; whether a manifestation inhabits it is stated as a theorem either
+way; the live umbrella builds with no `sorry` or new axiom.
 
-[proved-derived; formal-checked] **SKE0 PASSED.** `Computation/HolonicExcitationFoundedQuotient.lean`
-is imported by both umbrellas; the live umbrella built 3,775 jobs. The receipt is
+[proved-derived; formal-checked] **SKE0 PASSED**, and was revised on 2026-09-03 under the audit
+(§0b): the declared-withdrawal cone, the monotonicity and union laws, the tie of the productive
+lane to the family, the saturation identification, the corrected control docstring, and
+`identityLift`/`manifestationReturn` exhibiting that the type does not refuse a manifestation.
+`Computation/HolonicExcitationFoundedQuotient.lean` is imported by both umbrellas; the live
+umbrella built 9,786 jobs on 2026-09-03 with no `sorry` and no new axiom. The receipt is
 [`the SKE0 return`](../research/records/2026-09-03_SKE0_THE_EXCITATION_FOUNDED_QUOTIENT_RETURNED_SIGNATURE_IDENTITY_INTERVENTION_CONES_AND_THE_FAITHFUL_PRODUCTIVE_LANE.md).
 
 ### SKE1 -- the adjoint return through every reaction
@@ -359,6 +386,24 @@ class body test, and a coordinate bisection over fifteen exposures) is withdrawn
 boundary's generic productive type and the mount from a productive lane are apparatus the
 corrected construction may keep, and everything founded on coordinates or on a census standing
 in for a remainder departs.
+
+[established-bounded; implemented-exact; measured] **SKE4, the apparatus obligation, PASSED**
+on 2026-09-03. The session runs as segments (`operative_segment.rs`): a segment is a run of
+operations sharing at most one use of the alignment slot or one gather, enacted as one passage
+bound whole with the successor projection fused as a midpoint seal after every widening
+operation, launched once and read once through its census; the terminal is enacted tile by tile
+in one passage per tile and only the tiles a successor needs are retained. One cycle on 14
+addresses: 687 launches, 672 passages, 16 section read-outs (the terminal face's tiles, once, at
+the declared receiver, 58,720,256 octets), nothing else crossing, 1,412 ms; the per-operation
+session it replaces took 2,363 launches, 2,363 read-outs, about 2.06 GB of egress, and 1,915 ms.
+All 1,270 body operations agree word for word with the committed per-operation session as
+one-operation segments; the HNA5 matrix and the SKE2 cone of occurrence 0 reproduce. A
+consumer inside a multi-operation segment is admitted under its producer's a-priori bound, and
+whether any law's enclosure differs under that admission beyond the observed agreement of the
+face is recorded open. The receipt is
+[`the SKE4 session record`](../research/records/2026-09-03_SKE4_THE_SESSION_RUNS_AS_SEGMENTS_UNDER_THE_2026-08-18_CONTRACT_AND_THE_FACE_ALONE_CROSSES_TO_THE_HOST.md).
+The rest of SKE4 (declared-withdrawal cones, the class ecologies with their collapsed pairs, the
+seal through `soulkiller::dismantle`) is open and runs on this session.
 
 ### SKE5 -- Eros composes the classes and the recurrence runs on them
 

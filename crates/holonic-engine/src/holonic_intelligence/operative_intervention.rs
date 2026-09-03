@@ -29,17 +29,16 @@ use std::collections::BTreeMap;
 
 use serde::Serialize;
 
-use crate::resident_section::{ResidentSection, SeriesAperture, SiteMask};
+use crate::resident_section::{ResidentSection, SeriesAperture};
 
 use super::{
-    NativeFullOperationError, NativeFullOperationOccurrence, NativeFullOperatorEcology,
-    NativeFullOperatorSession, NativeOperationPrimitive, NativeOperatorNode,
-    NativeOperatorResidence, NativeTensorOrdinal,
-    full_operation::ContemporaryCarrier,
+    NativeFullOperationError, NativeFullOperatorEcology, NativeFullOperatorSession,
+    NativeOperationPrimitive, NativeOperatorNode, NativeOperatorResidence, NativeTensorOrdinal,
     operative_backward::ReturnDeed,
     operative_return::{ReturnMaterial, ReturnedDifferential, receiver_differential},
-    operative_scalars::{operation_bound, scale_enclosure},
-    operative_terminal::{TiledCarrier, TiledUnary},
+    operative_scalars::operation_bound,
+    operative_segment::SegmentWithdrawal,
+    operative_terminal::TiledCarrier,
 };
 
 /// The declared aperture of a dissection: only the certified exponential's series aperture.
@@ -164,6 +163,34 @@ impl NativeSiteSelection {
         self.offsets
             .get(&population)
             .map(|(offset, count)| &self.withdrawn[*offset..offset + count])
+    }
+
+    /// Withdraw every site another selection over the same populations withdraws.
+    pub fn absorb(&mut self, other: &NativeSiteSelection) {
+        for (population, (offset, count)) in &other.offsets {
+            if let Some((own, own_count)) = self.offsets.get(population) {
+                let span = (*count).min(*own_count);
+                for site in 0..span {
+                    if other.withdrawn[offset + site] {
+                        self.withdrawn[own + site] = true;
+                    }
+                }
+            }
+        }
+    }
+
+    /// The selection withdrawing every site of these populations that `kept` does not keep.
+    pub fn complement_of(sizes: &BTreeMap<NativeTensorOrdinal, usize>, kept: &BTreeMap<u32, Vec<bool>>) -> Self {
+        let mut selection = Self::founded(sizes);
+        for (population, count) in sizes {
+            let keep = kept.get(&population.0);
+            for site in 0..*count {
+                if !keep.and_then(|k| k.get(site).copied()).unwrap_or(false) {
+                    selection.withdraw(*population, site);
+                }
+            }
+        }
+        selection
     }
 
     fn touches(&self, population: NativeTensorOrdinal) -> bool {
@@ -697,40 +724,23 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             }
         };
         self.carriers.clear();
-        let mut enacted = 0usize;
-        for index in start..terminal_start {
-            let operation = self.ecology.operations[index].clone();
-            let occurrence = NativeFullOperationOccurrence {
-                ordinal: 0,
-                row_addresses: if matches!(operation.primitive, NativeOperationPrimitive::Lookup { .. }) {
-                    rows.clone()
-                } else {
-                    Vec::new()
-                },
-            };
-            let outcome = self.enact_operation(&operation, &occurrence)?;
-            let (outcome, _) = self.project_successor(operation.ordinal, outcome)?;
-            let carrier = match targets.get(&index).and_then(|population| selection.offset_of(*population)) {
-                Some(offset) => {
-                    self.withdraw_sites(outcome.section, outcome.bound_octaves, &mask, offset, operation.ordinal)?
-                }
-                None => ContemporaryCarrier {
-                    section: outcome.section,
-                    bound_octaves: outcome.bound_octaves,
-                },
-            };
-            self.carriers.insert(operation.output, carrier);
-            enacted += 1;
-            for input in &operation.inputs {
-                if *input != operation.output
-                    && !self.ecology.operations[index + 1..]
-                        .iter()
-                        .any(|later| later.inputs.contains(input))
-                {
-                    self.carriers.remove(input);
-                }
+        // The withdrawals, keyed by the ordinal of the contraction whose output they intervene on,
+        // recorded inside the segments: no section crosses to the host for them.
+        let mut withdrawals: BTreeMap<u32, SegmentWithdrawal<'_, 'chart>> = BTreeMap::new();
+        for (index, population) in &targets {
+            if *index >= terminal_start {
+                continue;
+            }
+            if let Some(offset) = selection.offset_of(*population) {
+                withdrawals.insert(
+                    self.ecology.operations[*index].ordinal,
+                    SegmentWithdrawal { mask: &mask, offset },
+                );
             }
         }
+        let steps = self.enact_run(start, terminal_start, &rows, &withdrawals, false)?;
+        drop(withdrawals);
+        let mut enacted = steps.len();
         let boundary = self.ecology.operations[terminal_start..].to_vec();
         // When nothing before the boundary is enacted, the tied contraction reads the carrier the
         // cycle presented, which the successor holds apart from the checkpoints: lend it.
@@ -749,7 +759,9 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         let tied_offset = targets
             .get(&terminal_start)
             .and_then(|population| selection.offset_of(*population));
-        let outcome = self.terminal_face(&boundary, tied_offset, &mask);
+        let tied_withdrawal = tied_offset.map(|offset| SegmentWithdrawal { mask: &mask, offset });
+        let outcome = self.terminal_face(&boundary, tied_withdrawal.as_ref());
+        drop(tied_withdrawal);
         if lent {
             self.terminal_presented = self.carriers.remove(&tied_input);
         }
@@ -808,18 +820,54 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         })
     }
 
-    /// The cone by joint intervention.  Every site of every contraction population is ordered by
-    /// its first-order contribution; the search finds the largest prefix whose joint withdrawal
-    /// leaves the selected face unchanged, and the cone is the remaining suffix.  The complement
-    /// withdrawn and the cone withdrawn close it; the boundary site is withdrawn alone as the
-    /// load-bearing control; the restriction to every population carries its exact support and
-    /// magnitude control.
+    /// Read the completed cycle's face into the dissection standing without a return: what a
+    /// probe under a withdrawal compares against.  The supports are cleared.
+    pub fn read_face(&mut self) -> Result<NativeReceiverFace, NativeFullOperationError> {
+        if !self.cycle_complete {
+            return Err(NativeFullOperationError::Occurrence);
+        }
+        let face = {
+            let emission = self.terminal_carrier.as_ref().ok_or(NativeFullOperationError::Occurrence)?;
+            let last_row = self.tiled_last_row(emission)?;
+            face_of_last_row(&last_row, 1, emission.width).ok_or(NativeFullOperationError::Operation)?
+        };
+        let standing = self.dissection.as_mut().ok_or(NativeFullOperationError::Occurrence)?;
+        standing.clear();
+        standing.face = Some(face.clone());
+        Ok(face)
+    }
+
+    /// The site counts of every contraction population the excitation read.
+    pub fn site_sizes(&self) -> BTreeMap<NativeTensorOrdinal, usize> {
+        self.dissection
+            .as_ref()
+            .map(|standing| {
+                standing
+                    .supports
+                    .iter()
+                    .map(|(population, support)| (*population, support.sites))
+                    .collect()
+            })
+            .unwrap_or_default()
+    }
+
+    /// The first-order contribution of every site the excitation read, per population.
+    pub fn site_contributions(&self) -> BTreeMap<NativeTensorOrdinal, Vec<u128>> {
+        self.dissection
+            .as_ref()
+            .map(|standing| {
+                standing
+                    .supports
+                    .iter()
+                    .map(|(population, support)| (*population, support.contributions.clone()))
+                    .collect()
+            })
+            .unwrap_or_default()
+    }
+
+    /// The cone by joint intervention along the excitation's own order: every site of every
+    /// contraction population ordered by its first-order contribution.
     pub fn cone_by_intervention(&mut self) -> Result<NativeConeReturn, NativeFullOperationError> {
-        let started = std::time::Instant::now();
-        let face = self
-            .excited_face()
-            .cloned()
-            .ok_or(NativeFullOperationError::Occurrence)?;
         let (sizes, mut order) = {
             let standing = self
                 .dissection
@@ -836,11 +884,39 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             (sizes, order)
         };
         order.sort_unstable();
+        let order: Vec<(NativeTensorOrdinal, u32)> = order
+            .into_iter()
+            .map(|(_, population, site)| (NativeTensorOrdinal(population), site))
+            .collect();
+        self.cone_along_order(&order, &sizes, None)
+    }
+
+    /// The cone by joint intervention along a declared order of sites, with a fixed population
+    /// withdrawn in every probe.  The search finds the largest prefix of the order whose joint
+    /// withdrawal (with the fixed population) leaves the selected face unchanged; the cone is
+    /// the remaining suffix.  The complement withdrawn and the cone withdrawn close it; the
+    /// boundary site is withdrawn alone; the restriction to every population carries its exact
+    /// sites and magnitude control (magnitudes are those of the standing when the excitation was
+    /// read, zero when only the face was read).
+    pub fn cone_along_order(
+        &mut self,
+        order: &[(NativeTensorOrdinal, u32)],
+        sizes: &BTreeMap<NativeTensorOrdinal, usize>,
+        fixed: Option<&NativeSiteSelection>,
+    ) -> Result<NativeConeReturn, NativeFullOperationError> {
+        let started = std::time::Instant::now();
+        let face = self
+            .excited_face()
+            .cloned()
+            .ok_or(NativeFullOperationError::Occurrence)?;
         let total = order.len();
         let selection_of = |from: usize, to: usize| {
-            let mut selection = NativeSiteSelection::founded(&sizes);
-            for (_, population, site) in &order[from..to] {
-                selection.withdraw(NativeTensorOrdinal(*population), *site as usize);
+            let mut selection = NativeSiteSelection::founded(sizes);
+            if let Some(fixed) = fixed {
+                selection.absorb(fixed);
+            }
+            for (population, site) in &order[from..to] {
+                selection.withdraw(*population, *site as usize);
             }
             selection
         };
@@ -877,15 +953,28 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                 .all(|right| left.withdrawn >= right.withdrawn || left.selected_unchanged || !right.selected_unchanged)
         });
         let complement_withdrawn = self.face_under_withdrawals(&selection_of(0, lo))?;
-        let cone_withdrawn = self.face_under_withdrawals(&selection_of(lo, total))?;
+        let cone_only = {
+            let mut selection = NativeSiteSelection::founded(sizes);
+            for (population, site) in &order[lo..total] {
+                selection.withdraw(*population, *site as usize);
+            }
+            selection
+        };
+        let cone_withdrawn = self.face_under_withdrawals(&cone_only)?;
         let boundary = if carried && lo < total {
-            let (contribution, population, site) = order[lo];
-            let population = NativeTensorOrdinal(population);
-            let magnitude = self
+            let (population, site) = order[lo];
+            let (contribution, magnitude) = self
                 .site_support(population)
-                .and_then(|support| support.magnitudes.get(site as usize).copied())
-                .unwrap_or(0);
-            let alone = self.face_under_withdrawals(&selection_of(lo, lo + 1))?;
+                .map(|support| {
+                    (
+                        support.contributions.get(site as usize).copied().unwrap_or(0),
+                        support.magnitudes.get(site as usize).copied().unwrap_or(0),
+                    )
+                })
+                .unwrap_or((0, 0));
+            let mut alone = NativeSiteSelection::founded(sizes);
+            alone.withdraw(population, site as usize);
+            let alone = self.face_under_withdrawals(&alone)?;
             Some(NativeConeBoundary {
                 population: population.0,
                 site,
@@ -896,32 +985,26 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         } else {
             None
         };
-        let cone = selection_of(lo, total);
-        let restrictions = self
-            .dissection
-            .as_ref()
-            .map(|standing| {
-                standing
-                    .supports
-                    .values()
-                    .map(|support| {
-                        let cone: Vec<bool> = cone
-                            .withdrawn_of(NativeTensorOrdinal(support.population))
-                            .map(<[bool]>::to_vec)
-                            .unwrap_or_else(|| vec![false; support.sites]);
-                        NativeConeRestriction {
-                            population: support.population,
-                            operation: support.operation,
-                            layer: support.layer,
-                            sites: support.sites,
-                            cone_population: cone.iter().filter(|site| **site).count(),
-                            magnitude: magnitude_control(&cone, &support.magnitudes),
-                            cone,
-                        }
-                    })
-                    .collect()
-            })
-            .unwrap_or_default();
+        let mut restrictions = Vec::with_capacity(sizes.len());
+        for (population, sites) in sizes {
+            let cone: Vec<bool> = cone_only
+                .withdrawn_of(*population)
+                .map(<[bool]>::to_vec)
+                .unwrap_or_else(|| vec![false; *sites]);
+            let (operation, layer, magnitudes) = self
+                .site_support(*population)
+                .map(|support| (support.operation, support.layer, support.magnitudes.clone()))
+                .unwrap_or((u32::MAX, None, vec![0u64; *sites]));
+            restrictions.push(NativeConeRestriction {
+                population: population.0,
+                operation,
+                layer,
+                sites: *sites,
+                cone_population: cone.iter().filter(|site| **site).count(),
+                magnitude: magnitude_control(&cone, &magnitudes),
+                cone,
+            });
+        }
         Ok(NativeConeReturn {
             face,
             sites: total,
@@ -938,90 +1021,22 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         })
     }
 
-    /// The terminal boundary of a counterfactual: the tied contraction (withdrawn at `tied_offset`
-    /// of the mask when the tied population is touched), the soft-cap reactions, the emission,
-    /// and the face of its last row.
+    /// The terminal boundary of a counterfactual, tile by tile in one passage each: the tied
+    /// contraction (withdrawn inside the passage when the tied population is touched), the
+    /// soft-cap reactions, the emission, and the face of its last row, read once.
     fn terminal_face(
         &mut self,
         boundary: &[NativeOperatorNode],
-        tied_offset: Option<usize>,
-        mask: &SiteMask<'chart>,
+        tied_withdrawal: Option<&SegmentWithdrawal<'_, 'chart>>,
     ) -> Result<NativeReceiverFace, NativeFullOperationError> {
-        let mut contracted = self.execute_tiled_boundary(&boundary[0])?;
-        if let Some(offset) = tied_offset {
-            contracted.carrier = self.withdraw_tiled(contracted.carrier, mask, offset, boundary[0].ordinal)?;
-        }
-        let first_scale = match &boundary[1].primitive {
-            NativeOperationPrimitive::Scale { by } => scale_enclosure(by)?,
-            _ => return Err(NativeFullOperationError::Operation),
-        };
-        let second_scale = match &boundary[3].primitive {
-            NativeOperationPrimitive::Scale { by } => scale_enclosure(by)?,
-            _ => return Err(NativeFullOperationError::Operation),
-        };
-        let scaled = self.execute_tiled_unary(&boundary[1], &contracted.carrier, TiledUnary::Scale(first_scale))?;
-        drop(contracted);
-        let reacted = self.execute_tiled_unary(&boundary[2], &scaled.carrier, TiledUnary::Tanh(SeriesAperture(14)))?;
-        drop(scaled);
-        let scaled_back =
-            self.execute_tiled_unary(&boundary[3], &reacted.carrier, TiledUnary::Scale(second_scale))?;
-        drop(reacted);
-        let emitted = self.execute_tiled_unary(&boundary[4], &scaled_back.carrier, TiledUnary::Carry)?;
-        drop(scaled_back);
-        face_of_last_row(&emitted.intervals, emitted.carrier.rows, emitted.carrier.width)
-            .ok_or(NativeFullOperationError::Operation)
-    }
-
-    fn withdraw_sites(
-        &self,
-        section: ResidentSection<'chart>,
-        bound_octaves: u32,
-        mask: &SiteMask<'chart>,
-        offset: usize,
-        ordinal: u32,
-    ) -> Result<ContemporaryCarrier<'chart>, NativeFullOperationError> {
-        let surface = self.residence.surface();
-        let shape = surface.shape_withdraw_sites(section.rows(), section.width(), bound_octaves)?;
-        let out = surface.fresh_section(section.rows(), section.width(), section.grain())?;
-        let mut builder = surface.begin_passage(&[vec![]])?;
-        {
-            let lane = builder.open(0, &[])?;
-            surface.record_withdraw_sites(&lane, &section, mask, offset, &out)?;
-        }
-        builder.close(0, &out, shape.needed)?;
-        let reading = builder.finish()?.launch()?;
-        let bound_octaves = operation_bound(ordinal, &reading)?;
-        Ok(ContemporaryCarrier {
-            section: out,
-            bound_octaves,
-        })
-    }
-
-    fn withdraw_tiled(
-        &self,
-        carrier: TiledCarrier<'chart>,
-        mask: &SiteMask<'chart>,
-        offset: usize,
-        ordinal: u32,
-    ) -> Result<TiledCarrier<'chart>, NativeFullOperationError> {
-        let mut sections = Vec::with_capacity(carrier.sections.len());
-        let mut bounds = Vec::with_capacity(carrier.bounds.len());
-        let mut first_row = 0usize;
-        for (section, bound) in carrier.sections.into_iter().zip(carrier.bounds) {
-            let width = section.width();
-            let withdrawn = self.withdraw_sites(section, bound, mask, offset + first_row, ordinal)?;
-            sections.push(withdrawn.section);
-            bounds.push(withdrawn.bound_octaves);
-            first_row += width;
-        }
-        Ok(TiledCarrier {
-            sections,
-            bounds,
-            rows: carrier.rows,
-            width: carrier.width,
-            grain: carrier.grain,
-            carrier: carrier.carrier,
-        })
+        let run = self.enact_terminal(boundary, tied_withdrawal, [false, false, false, false, true])?;
+        let emitted = run
+            .carriers
+            .last()
+            .and_then(Option::as_ref)
+            .ok_or(NativeFullOperationError::Operation)?;
+        let last_row = self.tiled_last_row(emitted)?;
+        face_of_last_row(&last_row, 1, emitted.width).ok_or(NativeFullOperationError::Operation)
     }
 }
 

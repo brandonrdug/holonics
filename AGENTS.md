@@ -171,7 +171,8 @@ retraction is a contamination. Dates are record dates under `research/records/`.
   `IsCone` is universal and monotone, unions of genuine cones compose at every grain, and the
   card's refutation of the union proved the verification (finitely many sufficient withdrawals
   graded as a universal) false; coarsening the grain repairs nothing. The HNA session's
-  per-operation passage and host readout (about 2,100 per cycle, never measured) is the renamed
+  per-operation passage and host readout (measured the same day at 2,363 launches and 2,363
+  section read-outs per cycle, then replaced by the segment session at 687 and 16) is the renamed
   instruction loop of 2026-08-18, a Claude injection, and grades nothing; the SKE4 construction
   at the coordinate grain and the first draft of the blueprint's §0b (a census standing in for
   a remainder, "locking" and "reach per retained octet", "never over coordinates", a permanent

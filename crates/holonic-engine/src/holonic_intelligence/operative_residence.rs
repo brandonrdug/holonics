@@ -5,7 +5,7 @@
 //! tensor's frame.  The aligned tile is an arithmetic representation, never morphology identity.
 
 use std::{
-    collections::BTreeMap, fs::File, marker::PhantomData, os::unix::fs::FileExt, path::Path,
+    collections::BTreeMap, fs::File, os::unix::fs::FileExt, path::Path,
 };
 
 use mount::DeviceBuffer;
@@ -103,6 +103,10 @@ pub struct NativeOperatorResidence<'chart> {
     chronologies: BTreeMap<(u64, usize, usize), BandElements<'chart>>,
     populations: Vec<ResidentNativeOperatorPopulation>,
     receipt: NativeOperatorResidenceReceipt,
+    /// The single alignment slot's occupancy: one aligned tile at a time, refused at runtime
+    /// rather than by a mutable borrow, so a segment may hold its tile while it reads bands and
+    /// positions.
+    slot_in_use: std::cell::Cell<bool>,
 }
 
 pub struct NativeAlignedOperatorTile<'residence, 'chart> {
@@ -110,7 +114,13 @@ pub struct NativeAlignedOperatorTile<'residence, 'chart> {
     pub first_row: usize,
     pub rows: usize,
     pub mounted: PooledReadout<'chart>,
-    _exclusive_pool: PhantomData<&'residence mut NativeOperatorResidence<'chart>>,
+    residence: &'residence NativeOperatorResidence<'chart>,
+}
+
+impl Drop for NativeAlignedOperatorTile<'_, '_> {
+    fn drop(&mut self) {
+        self.residence.slot_in_use.set(false);
+    }
 }
 
 pub(crate) struct ResidentBfloat16Selection {
@@ -119,6 +129,72 @@ pub(crate) struct ResidentBfloat16Selection {
     pub width: usize,
     pub frame: ResidentBfloat16Frame,
     pub entry_octaves: u32,
+}
+
+/// Where the packed coefficients come from at mount: the source container through the cold
+/// witness, or a productive lane that carries the codewords itself.  Every population's octets
+/// are delivered in ascending offset order, and their count must equal the ecology's.
+pub trait NativeCoefficientIntake {
+    fn populations(&self) -> usize;
+    fn population_octets(&self, ordinal: usize) -> Result<u64, NativeOperatorResidenceError>;
+    fn deliver(
+        &mut self,
+        ordinal: usize,
+        sink: &mut dyn FnMut(usize, &[u8]) -> Result<(), NativeOperatorResidenceError>,
+    ) -> Result<(), NativeOperatorResidenceError>;
+}
+
+/// The source container read through the cold witness's byte ranges, in chunks.
+struct SourceIntake<'a> {
+    witness: &'a NativeFullOperatorColdWitness,
+    source: File,
+    chunk: Vec<u8>,
+}
+
+impl NativeCoefficientIntake for SourceIntake<'_> {
+    fn populations(&self) -> usize {
+        self.witness.populations.len()
+    }
+
+    fn population_octets(&self, ordinal: usize) -> Result<u64, NativeOperatorResidenceError> {
+        let population = self
+            .witness
+            .populations
+            .get(ordinal)
+            .ok_or(NativeOperatorResidenceError::Witness)?;
+        if population.ordinal != NativeTensorOrdinal(ordinal as u32)
+            || population.source_end < population.source_start
+        {
+            return Err(NativeOperatorResidenceError::Witness);
+        }
+        Ok(population.source_end - population.source_start)
+    }
+
+    fn deliver(
+        &mut self,
+        ordinal: usize,
+        sink: &mut dyn FnMut(usize, &[u8]) -> Result<(), NativeOperatorResidenceError>,
+    ) -> Result<(), NativeOperatorResidenceError> {
+        let population = &self.witness.populations[ordinal];
+        let span = usize::try_from(population.source_end - population.source_start)
+            .map_err(|_| NativeOperatorResidenceError::Extent)?;
+        let mut copied = 0usize;
+        while copied < span {
+            let take = (span - copied).min(self.chunk.len());
+            let source_at = self
+                .witness
+                .payload_base
+                .checked_add(population.source_start)
+                .and_then(|value| value.checked_add(copied as u64))
+                .ok_or(NativeOperatorResidenceError::Extent)?;
+            self.source
+                .read_exact_at(&mut self.chunk[..take], source_at)
+                .map_err(|error| NativeOperatorResidenceError::Io(error.to_string()))?;
+            sink(copied, &self.chunk[..take])?;
+            copied += take;
+        }
+        Ok(())
+    }
 }
 
 impl<'chart> NativeOperatorResidence<'chart> {
@@ -136,21 +212,35 @@ impl<'chart> NativeOperatorResidence<'chart> {
         witness: &NativeFullOperatorColdWitness,
         chunk_octets: usize,
     ) -> Result<Self, NativeOperatorResidenceError> {
-        ecology.validate()?;
-        if chunk_octets == 0
-            || witness.populations.len() != ecology.coefficient_populations.len()
-            || witness
-                .populations
-                .iter()
-                .enumerate()
-                .any(|(at, population)| {
-                    population.ordinal != NativeTensorOrdinal(at as u32)
-                        || population.source_end < population.source_start
-                        || population.source_end - population.source_start
-                            != ecology.coefficient_populations[at].coefficient_population * 2
-                })
-        {
+        if chunk_octets == 0 {
             return Err(NativeOperatorResidenceError::Witness);
+        }
+        let source = File::open(Path::new(&witness.source_container))
+            .map_err(|error| NativeOperatorResidenceError::Io(error.to_string()))?;
+        let raw_octets = ecology.coefficient_octets()?;
+        let mut intake = SourceIntake {
+            witness,
+            source,
+            chunk: vec![0u8; chunk_octets.min(usize::try_from(raw_octets).unwrap_or(chunk_octets))],
+        };
+        Self::mount_from_intake(surface, ecology, &mut intake)
+    }
+
+    /// Mount from any coefficient intake: the packed residency is the same whatever delivered
+    /// the codewords.
+    pub fn mount_from_intake(
+        surface: &'chart ResidentSurface<'chart>,
+        ecology: &NativeFullOperatorEcology,
+        intake: &mut dyn NativeCoefficientIntake,
+    ) -> Result<Self, NativeOperatorResidenceError> {
+        ecology.validate()?;
+        if intake.populations() != ecology.coefficient_populations.len() {
+            return Err(NativeOperatorResidenceError::Witness);
+        }
+        for (at, population) in ecology.coefficient_populations.iter().enumerate() {
+            if intake.population_octets(at)? != population.coefficient_population * 2 {
+                return Err(NativeOperatorResidenceError::Witness);
+            }
         }
         let raw_octets = ecology.coefficient_octets()?;
         let widest_dim = ecology
@@ -249,28 +339,19 @@ impl<'chart> NativeOperatorResidence<'chart> {
                 u64::try_from(pool_octets).map_err(|_| NativeOperatorResidenceError::Extent)?,
             )
             .ok_or(NativeOperatorResidenceError::Extent)?;
-        let source = File::open(Path::new(&witness.source_container))
-            .map_err(|error| NativeOperatorResidenceError::Io(error.to_string()))?;
-        let mut chunk =
-            vec![0u8; chunk_octets.min(usize::try_from(raw_octets).unwrap_or(chunk_octets))];
         let mut resident_offset = 0usize;
-        for population in &witness.populations {
-            let span = usize::try_from(population.source_end - population.source_start)
+        for at in 0..ecology.coefficient_populations.len() {
+            let span = usize::try_from(intake.population_octets(at)?)
                 .map_err(|_| NativeOperatorResidenceError::Extent)?;
-            let mut copied = 0usize;
-            while copied < span {
-                let take = (span - copied).min(chunk.len());
-                let source_at = witness
-                    .payload_base
-                    .checked_add(population.source_start)
-                    .and_then(|value| value.checked_add(copied as u64))
-                    .ok_or(NativeOperatorResidenceError::Extent)?;
-                source
-                    .read_exact_at(&mut chunk[..take], source_at)
-                    .map_err(|error| NativeOperatorResidenceError::Io(error.to_string()))?;
-                surface.copy_octets(&raw.buffer, resident_offset + copied, &chunk[..take])?;
-                copied += take;
-            }
+            let base = resident_offset;
+            intake.deliver(at, &mut |offset, octets| {
+                if offset + octets.len() > span {
+                    return Err(NativeOperatorResidenceError::Witness);
+                }
+                surface
+                    .copy_octets(&raw.buffer, base + offset, octets)
+                    .map_err(NativeOperatorResidenceError::from)
+            })?;
             resident_offset = resident_offset
                 .checked_add(span)
                 .ok_or(NativeOperatorResidenceError::Extent)?;
@@ -375,6 +456,7 @@ impl<'chart> NativeOperatorResidence<'chart> {
             chronologies,
             populations,
             receipt,
+            slot_in_use: std::cell::Cell::new(false),
         })
     }
 
@@ -429,7 +511,7 @@ impl<'chart> NativeOperatorResidence<'chart> {
     /// fixed-frame mouth for the selected population's exact aligned octave bound.  The gathered
     /// BF16 codewords remain on the card and are the source consumed by the lookup operation.
     pub(crate) fn gather_rows(
-        &mut self,
+        &self,
         population: NativeTensorOrdinal,
         addresses: &[u32],
     ) -> Result<ResidentBfloat16Selection, NativeOperatorResidenceError> {
@@ -510,11 +592,14 @@ impl<'chart> NativeOperatorResidence<'chart> {
     /// Align one complete-row tile under the population's device-derived complete frame.  The
     /// mutable borrow makes the single alignment pool exclusive until the returned tile is dropped.
     pub fn align_tile<'residence>(
-        &'residence mut self,
+        &'residence self,
         population: NativeTensorOrdinal,
         first_row: usize,
         rows: usize,
     ) -> Result<NativeAlignedOperatorTile<'residence, 'chart>, NativeOperatorResidenceError> {
+        if self.slot_in_use.get() {
+            return Err(NativeOperatorResidenceError::Tile);
+        }
         let descriptor = self
             .populations
             .get(population.0 as usize)
@@ -560,12 +645,13 @@ impl<'chart> NativeOperatorResidence<'chart> {
         .into_iter()
         .next()
         .ok_or(NativeOperatorResidenceError::Tile)?;
+        self.slot_in_use.set(true);
         Ok(NativeAlignedOperatorTile {
             population,
             first_row,
             rows,
             mounted,
-            _exclusive_pool: PhantomData,
+            residence: self,
         })
     }
 }

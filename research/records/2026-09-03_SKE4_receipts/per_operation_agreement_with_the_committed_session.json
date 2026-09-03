@@ -1,0 +1,14 @@
+{
+  "comparison": "every body operation enacted as a one-operation segment on the segment session against the committed per-operation session (main at 40eaef2d), digest per carrier: sum of lower words, sum of upper words, widest interval, nonpoint coordinates",
+  "material": "7 + 5 =",
+  "operations_compared": 1270,
+  "operations_agreeing_exactly": 1270,
+  "first_divergence_before_the_two_defects": {
+    "operation": 30,
+    "cause": "the product's rounding was not sealed"
+  },
+  "first_divergence_in_multi_operation_segments_before_the_gain_defect": {
+    "operation": 20,
+    "cause": "a rebase without a gain read the segment's contraction tile as its gain"
+  }
+}

@@ -46,6 +46,8 @@ mod operative_scalars;
 mod operative_intervention;
 #[path = "holonic_intelligence/operative_identification.rs"]
 mod operative_identification;
+#[path = "holonic_intelligence/operative_segment.rs"]
+mod operative_segment;
 #[path = "holonic_intelligence/profile.rs"]
 mod profile;
 #[path = "holonic_intelligence/repeated_circulation.rs"]

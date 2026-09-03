@@ -231,8 +231,9 @@ The order is fixed:
 3. `SKE2` -- excitation and the cone by intervention -- **PASSED** at its corrected scope;
 4. `SKE3` -- identification: the signature quotient of a declared family -- **PASSED**;
 5. `SKE4` -- condensation and seal through `soulkiller::dismantle`, re-founded on 2026-09-03 with
-   the session's 2026-08-18 contract restored first and cones as declared-withdrawal cones --
-   **CURRENT**; and
+   the session's 2026-08-18 contract restored first (**the apparatus obligation PASSED**:
+   687 launches and 16 read-outs per cycle against 2,363 and 2,363) and cones as
+   declared-withdrawal cones -- **CURRENT**; and
 6. `SKE5` -- Eros composes the classes and the recurrence runs on them.
 
 [definition] Soulkiller is founded by excitation. The resident exact realization is the
@@ -276,6 +277,16 @@ per-operation host readout of the HNA session is the renamed instruction loop of
 grades nothing; compression is `canon/TABLET_THE_COMPRESSION.md`'s codec pivot with its remainder
 exhibited, applied to the composed variant in SKE5. SKE4 is current; its coordinate-grain
 construction and the first draft of §0b are withdrawn.
+
+[established-bounded; implemented-exact; measured] SKE4's apparatus obligation passed on
+2026-09-03: the session runs as segments under the 2026-08-18 contract, each segment one passage
+bound whole, launched once, and read once through its census, the terminal one passage per tile;
+one cycle of 1,275 operations in 687 launches and 672 passages with the face's 16 tiles the only
+section read-outs, every body operation agreeing word for word with the per-operation session
+it replaces, HNA5 and the SKE2 cone of occurrence 0 reproducing
+([`the SKE4 session record`](../research/records/2026-09-03_SKE4_THE_SESSION_RUNS_AS_SEGMENTS_UNDER_THE_2026-08-18_CONTRACT_AND_THE_FACE_ALONE_CROSSES_TO_THE_HOST.md)).
+The declared-withdrawal cones, the class ecologies with their collapsed pairs, and the seal
+through `soulkiller::dismantle` remain open on this session.
 
 [counterexample; source-inspected] The audit
 [`2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](../research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md)

@@ -17,7 +17,7 @@ use crate::resident_section::{Dyadic, ResidentGrain, ResidentSection, SeriesAper
 
 use super::{
     NativeCarrierOrdinal, NativeCausalReach, NativeFullOperationError,
-    NativeFullOperationOccurrence, NativeFullOperatorSession, NativeMorphologyDeposit,
+    NativeFullOperatorSession, NativeMorphologyDeposit,
     NativeOperationPrimitive, NativeOperatorNode, NativeReturnAperture, NativeScaleConstraint,
     NativeTensorOrdinal, adjoint_contract, differential_support,
     full_operation::ContemporaryCarrier,
@@ -226,27 +226,15 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                 }
             })
             .collect();
-        for index in ordinals {
-            let operation = self.ecology.operations[index].clone();
-            let occurrence = NativeFullOperationOccurrence {
-                ordinal: 0,
-                row_addresses: if matches!(operation.primitive, NativeOperationPrimitive::Lookup { .. }) {
-                    rows.clone()
-                } else {
-                    Vec::new()
-                },
-            };
-            let outcome = self.enact_operation(&operation, &occurrence)?;
-            // The forward's own successor projection, so the replay is the cycle's carrier.
-            let (outcome, _) = self.project_successor(operation.ordinal, outcome)?;
-            self.carriers.insert(
-                operation.output,
-                ContemporaryCarrier {
-                    section: outcome.section,
-                    bound_octaves: outcome.bound_octaves,
-                },
-            );
+        let (Some(first), Some(last)) = (ordinals.first().copied(), ordinals.last().copied()) else {
+            return Ok(());
+        };
+        if last + 1 - first != ordinals.len() {
+            return Err(NativeFullOperationError::Operation);
         }
+        // Enacted by segments with the forward's own successor projection, so the replay is the
+        // cycle's carrier; every produced carrier is retained for the return.
+        self.enact_run(first, last + 1, &rows, &BTreeMap::new(), true)?;
         Ok(())
     }
 

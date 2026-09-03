@@ -1,19 +1,21 @@
 //! The tiled terminal boundary of the recurrent operator: the tied contraction over the
-//! sixteen vocabulary tiles, the soft-cap reactions, and the emission.  The engine owns their
-//! order; an application receives the emissions and exact traces and cannot insert a score loop
-//! or replace a successor.  The boundary is one owner so the ordinary cycle and a counterfactual
-//! forward under an intervention enact the same tiles.
+//! vocabulary tiles, the soft-cap reactions, and the emission.  The engine owns their order; an
+//! application receives the emissions and traces and cannot insert a score loop or replace a
+//! successor.  Each tile is one segment, one passage: the contraction, its seal, the two scales,
+//! the reaction and its seal, and the carry, bound whole and launched once; the emitted tiles are
+//! read out once, as the terminal face at the declared receiver.
 
-use crate::resident_section::{DyadicEnclosure, ResidentGrain, ResidentSection, SeriesAperture, TransferCensus};
+use std::collections::BTreeMap;
+
+use crate::resident_section::{ResidentGrain, ResidentSection, TransferCensus};
 
 use super::{
     NATIVE_FULL_OPERATION_STEP_SCHEMA, NativeCarrierOrdinal, NativeFullOperationEmission,
     NativeFullOperationError, NativeFullOperationOccurrence, NativeFullOperationTrace,
     NativeFullOperatorSession, NativeFullTerminalBranch, NativeMorphologyTransition,
     NativeOperationPrimitive, NativeOperatorNode, NativeSuccessorProjection,
-    full_operation::{OperationOutcome, carrier_of},
-    operative_return::contract_tile_with_overlay,
-    operative_scalars::{operation_bound, scale_enclosure},
+    full_operation::carrier_of,
+    operative_segment::{SegmentSite, SegmentWithdrawal, enact_segment},
 };
 
 pub(super) struct TiledCarrier<'chart> {
@@ -25,48 +27,33 @@ pub(super) struct TiledCarrier<'chart> {
     pub(super) carrier: NativeCarrierOrdinal,
 }
 
-pub(super) struct TiledOperationOutcome<'chart> {
-    pub(super) carrier: TiledCarrier<'chart>,
-    pub(super) intervals: Vec<(i64, i64)>,
-    pub(super) projection: NativeSuccessorProjection,
+/// The five terminal operations enacted tile by tile: every tile's sections per operation, the
+/// projections and bounds per operation joined over the tiles, and the census of the run.
+pub(super) struct TerminalRun<'chart> {
+    /// One tiled carrier per retained operation; an operation not retained is released tile by
+    /// tile as soon as its consumer in the same passage has read it.
+    pub(super) carriers: Vec<Option<TiledCarrier<'chart>>>,
+    pub(super) projections: Vec<NativeSuccessorProjection>,
+    pub(super) admitted: Vec<u32>,
+    /// The measured bound of each operation's carrier, joined over the tiles.
+    pub(super) bounds: Vec<u32>,
+    pub(super) rows: usize,
+    pub(super) width: usize,
+    pub(super) grain: ResidentGrain,
     pub(super) census_before: TransferCensus,
     pub(super) census_after: TransferCensus,
 }
 
-#[derive(Clone, Copy)]
-pub(super) enum TiledUnary {
-    Scale(DyadicEnclosure),
-    Tanh(SeriesAperture),
-    Carry,
-}
-
 impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
-    /// Complete the mutually-exclusive tiled boundary as the final five operations of the graph.
-    /// The engine owns their order; the application receives the five emissions and exact joining
-    /// traces but cannot insert a score loop or replace a successor.
-    pub fn advance_terminal(
-        mut self,
-        occurrence: NativeFullOperationOccurrence,
-    ) -> Result<NativeFullTerminalBranch<'residence, 'chart>, NativeFullOperationError> {
+    /// The terminal boundary's five operations, in the engine's order.
+    pub(super) fn terminal_operations(&self) -> Result<Vec<NativeOperatorNode>, NativeFullOperationError> {
         let start = self.ecology.operations.len().saturating_sub(5);
-        if self.operation_at != start
-            || occurrence.ordinal != self.generation
-            || !occurrence.row_addresses.is_empty()
-        {
-            return Err(NativeFullOperationError::Occurrence);
-        }
         let operations = self.ecology.operations[start..].to_vec();
         if operations.len() != 5
             || !matches!(operations[0].primitive, NativeOperationPrimitive::Contract)
-            || !matches!(
-                operations[1].primitive,
-                NativeOperationPrimitive::Scale { .. }
-            )
+            || !matches!(operations[1].primitive, NativeOperationPrimitive::Scale { .. })
             || !matches!(operations[2].primitive, NativeOperationPrimitive::Tanh)
-            || !matches!(
-                operations[3].primitive,
-                NativeOperationPrimitive::Scale { .. }
-            )
+            || !matches!(operations[3].primitive, NativeOperationPrimitive::Scale { .. })
             || !matches!(operations[4].primitive, NativeOperationPrimitive::Emit)
             || operations
                 .windows(2)
@@ -74,85 +61,21 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         {
             return Err(NativeFullOperationError::Operation);
         }
-        let mut emissions = Vec::with_capacity(5);
-        let mut traces = Vec::with_capacity(5);
-        let first = self.execute_tiled_boundary(&operations[0])?;
-        let contracted =
-            self.record_tiled_outcome(operations[0].clone(), first, &mut emissions, &mut traces)?;
-        let first_scale = match &operations[1].primitive {
-            NativeOperationPrimitive::Scale { by } => scale_enclosure(by)?,
-            _ => return Err(NativeFullOperationError::Operation),
-        };
-        let scaled =
-            self.execute_tiled_unary(&operations[1], &contracted, TiledUnary::Scale(first_scale))?;
-        if self.dissection.is_some() {
-            // The last row alone, read to the host: the excitation's contribution at the
-            // vocabulary sites reads it, and the tiles need not stay resident.
-            self.terminal_contracted = Some(self.tiled_last_row(&contracted)?);
-        }
-        drop(contracted);
-        let scaled_carrier =
-            self.record_tiled_outcome(operations[1].clone(), scaled, &mut emissions, &mut traces)?;
-        let reacted = self.execute_tiled_unary(
-            &operations[2],
-            &scaled_carrier,
-            TiledUnary::Tanh(SeriesAperture(14)),
-        )?;
-        drop(scaled_carrier);
-        let reacted_carrier =
-            self.record_tiled_outcome(operations[2].clone(), reacted, &mut emissions, &mut traces)?;
-        let second_scale = match &operations[3].primitive {
-            NativeOperationPrimitive::Scale { by } => scale_enclosure(by)?,
-            _ => return Err(NativeFullOperationError::Operation),
-        };
-        let scaled_back = self.execute_tiled_unary(
-            &operations[3],
-            &reacted_carrier,
-            TiledUnary::Scale(second_scale),
-        )?;
-        let scaled_back_carrier = self.record_tiled_outcome(
-            operations[3].clone(),
-            scaled_back,
-            &mut emissions,
-            &mut traces,
-        )?;
-        let emitted =
-            self.execute_tiled_unary(&operations[4], &scaled_back_carrier, TiledUnary::Carry)?;
-        drop(scaled_back_carrier);
-        let emitted_carrier =
-            self.record_tiled_outcome(operations[4].clone(), emitted, &mut emissions, &mut traces)?;
-        // The carrier presented to the tied contraction and the reacted carrier stay with the
-        // successor when a return is declared: they are what the next occurrence meets.
-        let presented = self.carriers.remove(&operations[0].inputs[0]);
-        self.carriers.clear();
-        self.operation_at = 0;
-        self.cycle_complete = true;
-        self.terminal_carrier = Some(emitted_carrier);
-        if self.aperture.is_some() || self.dissection.is_some() {
-            self.terminal_reacted = Some(reacted_carrier);
-            self.terminal_presented = presented;
-        } else {
-            self.terminal_reacted = None;
-            self.terminal_presented = None;
-            self.checkpoints.clear();
-        }
-        Ok(NativeFullTerminalBranch {
-            emissions,
-            traces,
-            successor: self,
-        })
+        Ok(operations)
     }
 
-    pub(super) fn execute_tiled_boundary(
-        &mut self,
-        operation: &NativeOperatorNode,
-    ) -> Result<TiledOperationOutcome<'chart>, NativeFullOperationError> {
-        if operation.inputs.len() != 1 || operation.coefficients.len() != 1 {
-            return Err(NativeFullOperationError::Operation);
-        }
-        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
+    /// Enact the terminal boundary tile by tile on the contemporary carriers, each tile one
+    /// passage.  `tied_withdrawal` intervenes on the tied contraction's output at the sites the
+    /// mask names, offset by each tile's first row.
+    pub(super) fn enact_terminal(
+        &self,
+        operations: &[NativeOperatorNode],
+        tied_withdrawal: Option<&SegmentWithdrawal<'_, 'chart>>,
+        retain: [bool; 5],
+    ) -> Result<TerminalRun<'chart>, NativeFullOperationError> {
+        let input = carrier_of(&self.carriers, &self.checkpoints, &operations[0].inputs[0])
             .ok_or(NativeFullOperationError::Carrier)?;
-        let coefficient = operation.coefficients[0];
+        let coefficient = operations[0].coefficients[0];
         let population = self
             .ecology
             .coefficient_populations
@@ -168,184 +91,233 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         if capacity == 0 {
             return Err(NativeFullOperationError::Operation);
         }
-        let surface = self.residence.surface();
-        let census_before = surface.census();
-        let mut sections = Vec::new();
-        let mut bounds = Vec::new();
-        let mut tile_intervals = Vec::new();
-        let mut projections = Vec::new();
+        let rows = input.section.rows();
+        let grain = input.section.grain();
+        let mut per_operation: Vec<Vec<ResidentSection<'chart>>> = (0..5).map(|_| Vec::new()).collect();
+        let mut per_bounds: Vec<Vec<u32>> = (0..5).map(|_| Vec::new()).collect();
+        let mut projections: Vec<(usize, u64)> = vec![(0, 0); 5];
+        let mut admitted = vec![0u32; 5];
+        let mut census_before = None;
+        let mut census_after = self.residence.surface().census();
         let mut first_row = 0usize;
         while first_row < *total_width {
-            let rows = (*total_width - first_row).min(capacity);
-            let atoms = self.overlay.get(&coefficient).map(Vec::as_slice).unwrap_or(&[]);
-            let tile = self.residence.align_tile(coefficient, first_row, rows)?;
-            let tile_before = surface.census();
-            let (joined, reading) = contract_tile_with_overlay(
-                surface,
-                &input.section,
-                input.bound_octaves,
-                &tile.mounted.readout,
-                atoms,
-                first_row,
-                rows,
-            )?;
-            let bound_octaves = operation_bound(operation.ordinal, &reading)?;
-            let intervals = surface.read_out(&joined)?;
-            let tile_after = surface.census();
-            drop(tile);
-            let outcome = OperationOutcome {
-                section: joined,
-                bound_octaves,
-                rows: input.section.rows(),
-                width: rows,
-                grain: input.section.grain(),
-                intervals,
-                census_before: tile_before,
-                census_after: tile_after,
+            let tile_rows = (*total_width - first_row).min(capacity);
+            let withdrawals: BTreeMap<u32, SegmentWithdrawal<'_, 'chart>> = match tied_withdrawal {
+                Some(withdrawal) => BTreeMap::from([(
+                    operations[0].ordinal,
+                    SegmentWithdrawal {
+                        mask: withdrawal.mask,
+                        offset: withdrawal.offset + first_row,
+                    },
+                )]),
+                None => BTreeMap::new(),
             };
-            let (outcome, projection) = self.project_successor(operation.ordinal, outcome)?;
-            sections.push(outcome.section);
-            bounds.push(outcome.bound_octaves);
-            tile_intervals.push(outcome.intervals);
-            projections.push(projection);
-            first_row += rows;
-        }
-        let intervals = stitch_intervals(input.section.rows(), &tile_intervals)?;
-        Ok(TiledOperationOutcome {
-            carrier: TiledCarrier {
-                sections,
-                bounds,
-                rows: input.section.rows(),
-                width: *total_width,
-                grain: input.section.grain(),
-                carrier: operation.output,
-            },
-            intervals,
-            projection: combine_projections(&projections),
-            census_before,
-            census_after: surface.census(),
-        })
-    }
-
-    pub(super) fn execute_tiled_unary(
-        &self,
-        operation: &NativeOperatorNode,
-        input: &TiledCarrier<'chart>,
-        primitive: TiledUnary,
-    ) -> Result<TiledOperationOutcome<'chart>, NativeFullOperationError> {
-        if operation.inputs.as_slice() != [input.carrier] || !operation.coefficients.is_empty() {
-            return Err(NativeFullOperationError::Operation);
-        }
-        let surface = self.residence.surface();
-        let census_before = surface.census();
-        let mut sections = Vec::with_capacity(input.sections.len());
-        let mut bounds = Vec::with_capacity(input.bounds.len());
-        let mut tile_intervals = Vec::with_capacity(input.sections.len());
-        let mut projections = Vec::with_capacity(input.sections.len());
-        for (section, bound) in input.sections.iter().zip(input.bounds.iter().copied()) {
-            let shape = match primitive {
-                TiledUnary::Scale(by) => {
-                    surface.shape_scale(section.rows(), section.width(), bound, by)?
+            // A tile is one passage: the five operations bound whole.  Should a later tile
+            // operation's obligation exceed the a-priori bounds, the tile continues in a second
+            // passage on the measured bounds; the tile's sections stay resident between them.
+            let mut tile_carriers: BTreeMap<_, _> = BTreeMap::new();
+            let mut outcomes = Vec::with_capacity(5);
+            let mut cursor = 0usize;
+            while cursor < operations.len() {
+                let (produced, reading) = {
+                    let carriers = if cursor == 0 { &self.carriers } else { &tile_carriers };
+                    let site = SegmentSite {
+                        residence: self.residence,
+                        ecology: self.ecology,
+                        carriers,
+                        checkpoints: &self.checkpoints,
+                        positions: self.positions.as_ref(),
+                        overlay: &self.overlay,
+                        grain: self.grain,
+                        row_addresses: &[],
+                        withdrawals: &withdrawals,
+                        tile_window: Some((first_row, tile_rows)),
+                    };
+                    enact_segment(&site, &operations[cursor..])?
+                };
+                if produced.is_empty() {
+                    return Err(NativeFullOperationError::Operation);
                 }
-                TiledUnary::Tanh(terms) => surface.shape_tanh(
-                    section.rows(),
-                    section.width(),
-                    bound,
-                    section.grain(),
-                    terms,
-                )?,
-                TiledUnary::Carry => surface.shape_carry(section.rows(), section.width(), bound)?,
-            };
-            let successor =
-                surface.fresh_section(section.rows(), section.width(), section.grain())?;
-            let tile_before = surface.census();
-            let mut builder = surface.begin_passage(&[vec![]])?;
-            let lane = builder.open(0, &[])?;
-            match primitive {
-                TiledUnary::Scale(by) => surface.record_scale(&lane, section, by, &successor)?,
-                TiledUnary::Tanh(terms) => {
-                    surface.record_tanh(&lane, section, terms, &successor)?
+                if census_before.is_none() {
+                    census_before = Some(reading.census_before.clone());
                 }
-                TiledUnary::Carry => surface.record_carry(&lane, section, &successor)?,
+                census_after = reading.census_after.clone();
+                cursor += produced.len();
+                for outcome in produced {
+                    outcomes.push((outcome.output, outcome.admitted_octaves, outcome.projection));
+                    tile_carriers.insert(outcome.output, outcome.carrier);
+                }
             }
-            builder.close(0, &successor, shape.needed)?;
-            let reading = builder.finish()?.launch()?;
-            let bound_octaves = operation_bound(operation.ordinal, &reading)?;
-            let intervals = surface.read_out(&successor)?;
-            let tile_after = surface.census();
-            let outcome = OperationOutcome {
-                section: successor,
-                bound_octaves,
-                rows: section.rows(),
-                width: section.width(),
-                grain: section.grain(),
-                intervals,
-                census_before: tile_before,
-                census_after: tile_after,
-            };
-            let (outcome, projection) = self.project_successor(operation.ordinal, outcome)?;
-            sections.push(outcome.section);
-            bounds.push(outcome.bound_octaves);
-            tile_intervals.push(outcome.intervals);
-            projections.push(projection);
+            for (at, (output, admitted_octaves, projection)) in outcomes.into_iter().enumerate() {
+                if let NativeSuccessorProjection::Midpoint {
+                    nonpoint_coordinates,
+                    widest_interval,
+                } = projection
+                {
+                    projections[at].0 += nonpoint_coordinates;
+                    projections[at].1 = projections[at].1.max(widest_interval);
+                }
+                admitted[at] = admitted[at].max(admitted_octaves);
+                let carrier = tile_carriers
+                    .remove(&output)
+                    .ok_or(NativeFullOperationError::Carrier)?;
+                per_bounds[at].push(carrier.bound_octaves);
+                if retain[at] {
+                    per_operation[at].push(carrier.section);
+                }
+            }
+            first_row += tile_rows;
         }
-        let intervals = stitch_intervals(input.rows, &tile_intervals)?;
-        Ok(TiledOperationOutcome {
-            carrier: TiledCarrier {
-                sections,
-                bounds,
-                rows: input.rows,
-                width: input.width,
-                grain: input.grain,
-                carrier: operation.output,
-            },
-            intervals,
-            projection: combine_projections(&projections),
-            census_before,
-            census_after: surface.census(),
+        let bounds: Vec<u32> = per_bounds.iter().map(|b| b.iter().copied().max().unwrap_or(1)).collect();
+        let carriers = per_operation
+            .into_iter()
+            .zip(per_bounds)
+            .zip(operations)
+            .zip(retain)
+            .map(|(((sections, bounds), operation), retained)| {
+                retained.then_some(TiledCarrier {
+                    sections,
+                    bounds,
+                    rows,
+                    width: *total_width,
+                    grain,
+                    carrier: operation.output,
+                })
+            })
+            .collect();
+        Ok(TerminalRun {
+            carriers,
+            bounds,
+            rows,
+            width: *total_width,
+            grain,
+            projections: projections
+                .into_iter()
+                .map(|(nonpoint_coordinates, widest_interval)| {
+                    if nonpoint_coordinates == 0 {
+                        NativeSuccessorProjection::Exact
+                    } else {
+                        NativeSuccessorProjection::Midpoint {
+                            nonpoint_coordinates,
+                            widest_interval,
+                        }
+                    }
+                })
+                .collect(),
+            admitted,
+            census_before: census_before.unwrap_or_else(|| census_after.clone()),
+            census_after,
         })
     }
 
-    fn record_tiled_outcome(
-        &mut self,
-        operation: NativeOperatorNode,
-        outcome: TiledOperationOutcome<'chart>,
-        emissions: &mut Vec<NativeFullOperationEmission>,
-        traces: &mut Vec<NativeFullOperationTrace>,
-    ) -> Result<TiledCarrier<'chart>, NativeFullOperationError> {
-        let predecessor_generation = self.generation;
-        let successor_generation = predecessor_generation
-            .checked_add(1)
-            .ok_or(NativeFullOperationError::Generation)?;
-        let bound = outcome.carrier.bounds.iter().copied().max().unwrap_or(1);
-        emissions.push(NativeFullOperationEmission {
-            generation: successor_generation,
-            operation: operation.ordinal,
-            carrier: operation.output,
-            rows: outcome.carrier.rows,
-            width: outcome.carrier.width,
-            grain: outcome.carrier.grain.0,
-            intervals: outcome.intervals,
-        });
-        traces.push(NativeFullOperationTrace {
-            schema: NATIVE_FULL_OPERATION_STEP_SCHEMA.to_owned(),
-            predecessor_generation,
-            successor_generation,
-            occurrence: predecessor_generation,
-            row_addresses: Vec::new(),
-            operation,
-            successor_projection: outcome.projection,
-            morphology_transition: NativeMorphologyTransition::Unchanged,
-            morphology_overlay_rank: self.morphology_overlay_rank(),
-            successor_bound_octaves: bound,
-            resident_coefficient_octets: self.residence.receipt().raw_coefficient_octets,
-            census_before: outcome.census_before,
-            census_after: outcome.census_after,
-        });
-        self.chronology.push(predecessor_generation);
-        self.generation = successor_generation;
-        self.operation_at += 1;
-        Ok(outcome.carrier)
+    /// Complete the mutually-exclusive tiled boundary as the final five operations of the graph.
+    pub fn advance_terminal(
+        mut self,
+        occurrence: NativeFullOperationOccurrence,
+    ) -> Result<NativeFullTerminalBranch<'residence, 'chart>, NativeFullOperationError> {
+        let start = self.ecology.operations.len().saturating_sub(5);
+        if self.operation_at != start
+            || occurrence.ordinal != self.generation
+            || !occurrence.row_addresses.is_empty()
+        {
+            return Err(NativeFullOperationError::Occurrence);
+        }
+        let operations = self.terminal_operations()?;
+        let dissecting = self.dissection.is_some();
+        let returning = self.aperture.is_some() || dissecting;
+        let mut run = self.enact_terminal(&operations, None, [dissecting, false, returning, false, true])?;
+        let mut emissions = Vec::with_capacity(5);
+        let mut traces = Vec::with_capacity(5);
+        let emitted_intervals = {
+            let emitted = run
+                .carriers
+                .last()
+                .and_then(Option::as_ref)
+                .ok_or(NativeFullOperationError::Operation)?;
+            let tiles = emitted
+                .sections
+                .iter()
+                .map(|section| self.residence.surface().read_out(section))
+                .collect::<Result<Vec<_>, _>>()?;
+            stitch_intervals(emitted.rows, &tiles)?
+        };
+        for (at, operation) in operations.iter().enumerate() {
+            let predecessor_generation = self.generation;
+            let successor_generation = predecessor_generation
+                .checked_add(1)
+                .ok_or(NativeFullOperationError::Generation)?;
+            let (rows, width, grain, bound) = match &run.carriers[at] {
+                Some(carrier) => (
+                    carrier.rows,
+                    carrier.width,
+                    carrier.grain.0,
+                    carrier.bounds.iter().copied().max().unwrap_or(1),
+                ),
+                None => (run.rows, run.width, run.grain.0, run.bounds[at]),
+            };
+            emissions.push(NativeFullOperationEmission {
+                generation: successor_generation,
+                operation: operation.ordinal,
+                carrier: operation.output,
+                rows,
+                width,
+                grain,
+                intervals: if at == 4 { emitted_intervals.clone() } else { Vec::new() },
+            });
+            traces.push(NativeFullOperationTrace {
+                schema: NATIVE_FULL_OPERATION_STEP_SCHEMA.to_owned(),
+                predecessor_generation,
+                successor_generation,
+                occurrence: predecessor_generation,
+                row_addresses: Vec::new(),
+                operation: operation.clone(),
+                successor_projection: run.projections[at].clone(),
+                morphology_transition: NativeMorphologyTransition::Unchanged,
+                morphology_overlay_rank: self.morphology_overlay_rank(),
+                admitted_octaves: run.admitted[at],
+                successor_bound_octaves: bound,
+                resident_coefficient_octets: self.residence.receipt().raw_coefficient_octets,
+                census_before: run.census_before.clone(),
+                census_after: run.census_after.clone(),
+            });
+            self.chronology.push(predecessor_generation);
+            self.generation = successor_generation;
+            self.operation_at += 1;
+        }
+        // The carrier presented to the tied contraction, the reacted carrier, and the tied
+        // contraction's own row stay with the successor when a return or a dissection is
+        // declared: they are what the next occurrence meets.
+        let presented = self.carriers.remove(&operations[0].inputs[0]);
+        self.carriers.clear();
+        self.operation_at = 0;
+        self.cycle_complete = true;
+        let emitted = run
+            .carriers
+            .pop()
+            .flatten()
+            .ok_or(NativeFullOperationError::Operation)?;
+        let _scaled_back = run.carriers.pop();
+        let reacted = run.carriers.pop().flatten();
+        let _scaled = run.carriers.pop();
+        let contracted = run.carriers.pop().flatten();
+        self.terminal_carrier = Some(emitted);
+        if returning {
+            self.terminal_reacted = Some(reacted.ok_or(NativeFullOperationError::Operation)?);
+            self.terminal_presented = presented;
+        } else {
+            self.terminal_reacted = None;
+            self.terminal_presented = None;
+            self.checkpoints.clear();
+        }
+        if dissecting {
+            let contracted = contracted.ok_or(NativeFullOperationError::Operation)?;
+            self.terminal_contracted = Some(self.tiled_last_row(&contracted)?);
+        }
+        Ok(NativeFullTerminalBranch {
+            emissions,
+            traces,
+            successor: self,
+        })
     }
 }
 
@@ -372,29 +344,6 @@ pub(super) fn stitch_intervals(
     Ok(stitched)
 }
 
-fn combine_projections(projections: &[NativeSuccessorProjection]) -> NativeSuccessorProjection {
-    let mut nonpoint_coordinates = 0usize;
-    let mut widest_interval = 0u64;
-    for projection in projections {
-        if let NativeSuccessorProjection::Midpoint {
-            nonpoint_coordinates: count,
-            widest_interval: widest,
-        } = projection
-        {
-            nonpoint_coordinates += count;
-            widest_interval = widest_interval.max(*widest);
-        }
-    }
-    if nonpoint_coordinates == 0 {
-        NativeSuccessorProjection::Exact
-    } else {
-        NativeSuccessorProjection::Midpoint {
-            nonpoint_coordinates,
-            widest_interval,
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -405,16 +354,7 @@ mod tests {
         let right = vec![(3, 3), (4, 4), (7, 7), (8, 8)];
         assert_eq!(
             stitch_intervals(2, &[left, right]).unwrap(),
-            vec![
-                (1, 1),
-                (2, 2),
-                (3, 3),
-                (4, 4),
-                (5, 5),
-                (6, 6),
-                (7, 7),
-                (8, 8),
-            ]
+            vec![(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (7, 7), (8, 8)]
         );
     }
 }
