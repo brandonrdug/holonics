@@ -35,9 +35,10 @@ holonics diagnostic ...
 
 ## 1. Primary variant-workspace surface
 
-[definition] The primary commands are `workspace create`, `inspect`, `lift-gemma-receipt`,
-`import-snapshot`, `define-experiment`, `conduct`, `continue`, `stage-return`, `commit`, `decline`,
-`evaluate`, and `export`. Every mutating command reopens the same explicit root, validates its
+[definition] The primary commands are `workspace create`, `inspect`, `import-snapshot`,
+`define-experiment`, `conduct`, `continue`, `stage-return`, `commit`, `decline`,
+`evaluate`, and `export`. [2026-09-03: the per-event construction departed without alias under
+SKE4 and `lift-gemma-receipt` went with it.] Every mutating command reopens the same explicit root, validates its
 manifest and referenced artifacts, performs one owner composition, persists the complete return,
 and advances `workspace.json` only after the new immutable artifacts exist.
 
@@ -79,9 +80,11 @@ exits successfully; it never opens a terminal UI.
 
 ## 3. Diagnostic boundary
 
-[definition] `diagnostic status`, `capabilities`, `demo`, `athena`, `eros`, `soulkiller`, and
+[definition] `diagnostic status`, `capabilities`, `athena`, `eros`, `soulkiller`, and
 `engine` expose bounded owner inspection and mechanism probes. Diagnostic Athena sessions are
-process-memory fixtures. Diagnostic Soulkiller inspection reads exterior configuration/index/ONNX
+process-memory fixtures opened from an existing snapshot. [2026-09-03: the per-event construction
+departed without alias under SKE4 and the workbench demo went with it; `diagnostic demo` and
+`athena demo-open` are absent.] Diagnostic Soulkiller inspection reads exterior configuration/index/ONNX
 charts. Diagnostic Eros constructs bounded material mouths/atlases. None of these creates or
 refines a persistent variant workspace.
 
@@ -92,15 +95,17 @@ the direct user request or live roadmap explicitly says so.
 ## 4. Honest capability boundary
 
 [established-bounded; implemented-exact; source-inspected; measured] The released application can
-found a source-neutral Athena morphology from a complete returned Gemma excitation receipt or an
-existing native snapshot; persist experiment circulation and staged cultivation across processes;
+found a source-neutral Athena morphology from an existing native snapshot [2026-09-03: the complete
+returned Gemma excitation receipt path departed with the per-event construction under SKE4];
+persist experiment circulation and staged cultivation across processes;
 commit, decline, withdraw, replay, and compare structural conduct; and round-trip exact
 rested-inference ONNX and Safetensors exports.
 
 [open; source-inspected] Direct arbitrary model-directory execution/lift, qualitative
 text/image/audio emission, and persistently configurable diffusion experiments remain open. The
-bounded diagnostic demo, configuration inspection, and exact structural evaluation do not stand in
-for those capabilities.
+bounded diagnostic probes, configuration inspection, and exact structural evaluation do not stand in
+for those capabilities. [2026-09-03: the bounded diagnostic demo departed with the per-event
+construction under SKE4.]
 
 ## 5. Historical WB receipts and disposition
 

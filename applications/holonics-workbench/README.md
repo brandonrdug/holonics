@@ -13,19 +13,18 @@ holonics --help
 
 Running `holonics` without arguments prints the high-level command help and exits successfully.
 
-## Actual inherited-receipt workflow
+## Actual inherited-snapshot workflow
 
-The admitted inherited input is a complete Gemma excitation-return directory, not an arbitrary raw
-model directory. It contains `receipt.json` plus every entering/returned BF16 artifact named by that
-receipt.
+[2026-09-03: the per-event construction departed without alias under SKE4 and
+`lift-gemma-receipt` went with it. The admitted inherited input is an already valid native
+circulation snapshot, not an excitation-return directory and not an arbitrary raw model directory.]
 
 ```bash
 holonics workspace create /data/athena/first first-athena
 cd /data/athena/first
 
-holonics workspace lift-gemma-receipt \
-  /data/gemma4-excitation-return \
-  --receiver 7
+holonics workspace import-snapshot \
+  /data/athena/generation-0.snapshot.json
 
 holonics workspace define-experiment \
   primary \
@@ -54,9 +53,9 @@ owns at most one active run. Commands after `create` use the current directory b
 holonics workspace continue 0
 ```
 
-A complete Gemma receipt currently retains no predecessor chronology, so it may return no actual
-successor. Native snapshots carrying an admitted predecessor relation can continue through this
-command. A false successor refuses without changing the active run.
+Native snapshots carrying an admitted predecessor relation can continue through this
+command; a snapshot whose occurrences carry no predecessor returns no actual successor. A false
+successor refuses without changing the active run.
 
 ## Where artifacts go
 
@@ -65,10 +64,7 @@ There is no hidden artifact root. Everything is beneath the root supplied to `wo
 ```text
 /data/athena/first/
   workspace.json
-  lifts/lift-1/cold-witness.json
-  lifts/lift-1/insufficiency.json
-  lifts/lift-1/lift-receipt.json
-  snapshots/generation-0-lift-1.snapshot.json
+  snapshots/generation-0-import-1.snapshot.json
   experiments/primary.json
   runs/run-N/boundary-0.json
   runs/run-N/candidate.json
@@ -123,12 +119,14 @@ The old bounded mechanisms remain explicitly subordinate:
 
 ```bash
 holonics diagnostic status
-holonics diagnostic demo
+holonics diagnostic athena open alpha /data/athena/generation-0.snapshot.json
 holonics diagnostic eros atlas .
 holonics diagnostic soulkiller inspect /path/to/config.json
 ```
 
 They inspect or exercise low-level owners. They do not create a persistent model workspace.
+[2026-09-03: the per-event construction departed without alias under SKE4 and the workbench demo
+went with it; `diagnostic demo` and `athena demo-open` are absent.]
 
 ## Honest open capabilities
 
@@ -139,5 +137,5 @@ Every workspace names these as open:
 - `persistent-configurable-diffusion-open`.
 
 The current application produces a real source-neutral, persistently cultivated and evaluable
-morphology variant from already-returned excitation evidence. It does not yet accept a text prompt
+morphology variant from an admitted native snapshot. It does not yet accept a text prompt
 or emit a useful natural-language answer.

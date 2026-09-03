@@ -41,7 +41,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .ordinal;
     let readout = ResidentReadout::new()?;
     let surface = mount_operator_surface(&readout)?;
-    let mut residence =
+    let residence =
         NativeOperatorResidence::mount(&surface, &returned.native, &returned.exterior)?;
     let requested_rows = residence.receipt().tile_rows;
     let (first_address, first_rows, first_width, first_frame) = {

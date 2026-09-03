@@ -1,12 +1,9 @@
 use std::collections::BTreeSet;
 
 use holonic_engine::{
-    native_ecology::holonic_intelligence::{
-        Bf16ExcitationDismantling, ExteriorModality, ForeignBf16Excitation,
-    },
+    native_spool::fixture,
     receiver_exact_compression::{Observation, ReceiverId},
-    soulkiller::dismantle,
-    BoundaryId, EventId,
+    EventId,
 };
 
 use super::*;
@@ -16,29 +13,15 @@ use crate::native_intelligence::{
 };
 
 fn package(observation: Option<u64>) -> NativeMorphologyArtifact {
-    let returned = dismantle(Bf16ExcitationDismantling {
-        receiver: ReceiverId(7),
-        excitations: vec![ForeignBf16Excitation {
-            event: EventId(1),
-            predecessor: None,
-            entering_boundary: BoundaryId(1),
-            emitting_boundary: BoundaryId(2),
-            source_occurrence: "cold/source".to_owned(),
-            exterior_modality: ExteriorModality::Text,
-            entering_codewords: vec![0x3f80],
-            returned_codewords: vec![0x4000],
-            interventions: BTreeSet::from(["intervention".to_owned()]),
-            receiver_consequences: BTreeSet::from(["consequence".to_owned()]),
-        }],
-    })
-    .expect("dismantle");
-    let hot = consume_dismantling_return(returned).expect("handoff").0;
+    let hot = consume_dismantling_return(fixture::returned())
+        .expect("handoff")
+        .0;
     let evaluation = observation
         .map(|observation| ConfigurationEvaluationReceipt {
             configuration: InferenceConfigurationAddress {
                 ingress_aperture: "declared-aperture".to_owned(),
                 occurrence: EventId(1),
-                receiver: ReceiverId(7),
+                receiver: fixture::FIXTURE_RECEIVER,
                 continuation_receiver: "unique-actual-successor".to_owned(),
                 world_return_law: "declared-local-return".to_owned(),
                 emission_codec: "inspection".to_owned(),
@@ -68,7 +51,7 @@ fn exact_safetensors_and_onnx_exports_round_trip_the_complete_package() {
             &package,
             MorphologyExportRequest {
                 codec,
-                receiver_family: BTreeSet::from([ReceiverId(7)]),
+                receiver_family: BTreeSet::from([fixture::FIXTURE_RECEIVER]),
                 purpose: ExportPurpose::RestedInference,
             },
         )
@@ -118,12 +101,12 @@ fn cultivation_world_return_and_unsupported_receiver_exports_refuse() {
     let controls = [
         (
             ExportPurpose::Cultivation,
-            BTreeSet::from([ReceiverId(7)]),
+            BTreeSet::from([fixture::FIXTURE_RECEIVER]),
             MorphologyExportRefusal::CultivationIsNotRestedInference,
         ),
         (
             ExportPurpose::WorldReturn,
-            BTreeSet::from([ReceiverId(7)]),
+            BTreeSet::from([fixture::FIXTURE_RECEIVER]),
             MorphologyExportRefusal::WorldReturnIsNotRestedInference,
         ),
         (

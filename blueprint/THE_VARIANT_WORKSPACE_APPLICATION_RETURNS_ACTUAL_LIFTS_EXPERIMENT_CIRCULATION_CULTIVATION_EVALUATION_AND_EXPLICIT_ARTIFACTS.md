@@ -54,7 +54,12 @@ explicit workspace root
 
 ## 1. Honest admitted source boundary
 
-[established-bounded; source-inspected] The existing bounded inherited path is:
+[2026-09-03] The per-event generator construction departed without alias under SKE4, and
+`lift-gemma-receipt` went with it. The symbol chain below is historical: `read_complete_gemma4_excitation_receipt`,
+`CompleteGemma4ExcitationReceipt`, and `Bf16ExcitationDismantling` no longer exist. The workspace's
+admitted source boundary is now `import-snapshot` over an already valid `NativeCirculationSnapshot`.
+
+[established-bounded; source-inspected] The historical bounded inherited path was:
 
 ```text
 read_complete_gemma4_excitation_receipt
@@ -66,7 +71,7 @@ read_complete_gemma4_excitation_receipt
   -> generation-0 NativeCirculationSnapshot.
 ```
 
-[definition] `lift-gemma-receipt` admits that path and no stronger one. It receives a directory
+[historical; 2026-09-03] `lift-gemma-receipt` admitted that path and no stronger one. It received a directory
 already containing actual entering/returned BF16 excitation files and their complete receipt. It
 stores source-neutral productive morphology, physically separate cold witness, insufficiency and
 open exterior. It executes no foreign model.
@@ -157,7 +162,7 @@ applications/holonics-application/
 ```
 
 [definition] The `holonics` executable composes this library. Its primary commands are `workspace
-create`, `inspect`, `lift-gemma-receipt`, `import-snapshot`, `define-experiment`,
+create`, `inspect`, `import-snapshot`, `define-experiment`,
 `conduct/continue`, `stage-return`, `commit/decline`, `evaluate`, and `export`. Creation names the
 root once; subsequent commands resolve `--root PATH` or the current directory. Every success prints
 the absolute workspace root, current snapshot and newly written artifact paths. The current
@@ -174,7 +179,9 @@ state, artifact, lift, experiment or cultivation laws.
 
 [definition] Deposit this contract, update roadmap/state, add the smallest Athena-alpha convenience
 admission from `CompleteGemma4ExcitationReceipt`, and return a firing containment/unknown-field
-control for receipt paths and wire.
+control for receipt paths and wire. [2026-09-03: the per-event construction departed without alias
+under SKE4, so this deed is not reproducible; its containment/unknown-field controls departed with
+their reader.]
 
 **Pass VWS0:** [definition] the direct receipt-to-generation-0 path returns in a focused test; cold
 witness and insufficiency remain separate; hot package contains no source/modality routing labels;

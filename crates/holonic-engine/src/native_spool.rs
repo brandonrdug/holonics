@@ -19,6 +19,7 @@ use crate::{
 };
 
 mod deposits;
+pub mod fixture;
 mod helpers;
 mod refusal;
 mod resident;

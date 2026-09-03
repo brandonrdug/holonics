@@ -592,13 +592,7 @@ pub unsafe extern "C" fn holonics_circulation_bytes_free(bytes: HolonicsAbiBytes
 mod tests {
     use super::*;
     use holonic_engine::{
-        native_ecology::holonic_intelligence::{
-            Bf16ExcitationDismantling, ExteriorModality, ForeignBf16Excitation,
-            NativeInferenceAddress,
-        },
-        receiver_exact_compression::ReceiverId,
-        soulkiller::dismantle,
-        BoundaryId,
+        native_ecology::holonic_intelligence::NativeInferenceAddress, native_spool::fixture,
     };
     use life::native_intelligence::{
         consume_dismantling_return, InferenceConfigurationAddress, MorphologyLineage,
@@ -611,36 +605,7 @@ mod tests {
         NativeCirculationConfiguration,
         NativeInferenceRequest,
     ) {
-        let excitation = ForeignBf16Excitation {
-            event: EventId(1),
-            predecessor: None,
-            entering_boundary: BoundaryId(1),
-            emitting_boundary: BoundaryId(2),
-            source_occurrence: "cold/1".to_owned(),
-            exterior_modality: ExteriorModality::Text,
-            entering_codewords: vec![0x3f80],
-            returned_codewords: vec![0x4000],
-            interventions: BTreeSet::from(["withdraw/1".to_owned()]),
-            receiver_consequences: BTreeSet::from(["return/1".to_owned()]),
-        };
-        let successor = ForeignBf16Excitation {
-            event: EventId(2),
-            predecessor: Some(EventId(1)),
-            entering_boundary: BoundaryId(2),
-            emitting_boundary: BoundaryId(3),
-            source_occurrence: "cold/2".to_owned(),
-            exterior_modality: ExteriorModality::Text,
-            entering_codewords: vec![0x4000],
-            returned_codewords: vec![0x4040],
-            interventions: BTreeSet::from(["withdraw/2".to_owned()]),
-            receiver_consequences: BTreeSet::from(["return/2".to_owned()]),
-        };
-        let returned = dismantle(Bf16ExcitationDismantling {
-            receiver: ReceiverId(7),
-            excitations: vec![excitation, successor],
-        })
-        .expect("dismantle");
-        let (hot, _) = consume_dismantling_return(returned).expect("hot");
+        let (hot, _) = consume_dismantling_return(fixture::returned()).expect("hot");
         let package = NativeMorphologyArtifact::found(
             hot,
             MorphologyLineage::origin(),
@@ -656,12 +621,12 @@ mod tests {
                 thread: native.spools[0].threads[0].address.clone(),
                 occurrence: EventId(1),
             },
-            receiver: ReceiverId(7),
+            receiver: fixture::FIXTURE_RECEIVER,
         };
         let configuration = NativeCirculationConfiguration::found(InferenceConfigurationAddress {
             ingress_aperture: "native-addressed-occurrence".to_owned(),
             occurrence: EventId(1),
-            receiver: ReceiverId(7),
+            receiver: fixture::FIXTURE_RECEIVER,
             continuation_receiver: "exterior-receiver-decision".to_owned(),
             world_return_law: "genuinely-later-return".to_owned(),
             emission_codec: "owned-structural-boundary".to_owned(),
@@ -890,7 +855,7 @@ mod tests {
                         thread: "thread/returned-interaction-100".to_owned(),
                         occurrence: EventId(100),
                     },
-                    receiver: ReceiverId(7),
+                    receiver: fixture::FIXTURE_RECEIVER,
                 },
             },
         )

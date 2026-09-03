@@ -311,14 +311,7 @@ fn components_through_native_cells(
 mod tests {
     use super::*;
 
-    use holonic_engine::{
-        native_ecology::holonic_intelligence::{
-            Bf16ExcitationDismantling, ExteriorModality, ForeignBf16Excitation,
-        },
-        receiver_exact_compression::ReceiverId,
-        soulkiller::dismantle,
-        BoundaryId, EventId,
-    };
+    use holonic_engine::native_spool::fixture;
 
     #[test]
     fn wire_digest_is_testimony_not_the_structural_identity_operator() {
@@ -326,38 +319,24 @@ mod tests {
     }
 
     #[test]
-    fn dismantling_handoff_consumes_productive_scaffold_and_keeps_cold_testimony_outside_hot_rest()
+    fn dismantling_handoff_consumes_productive_scaffold_and_keeps_departed_testimony_outside_hot_rest()
     {
-        let returned = dismantle(Bf16ExcitationDismantling {
-            receiver: ReceiverId(7),
-            excitations: vec![ForeignBf16Excitation {
-                event: EventId(1),
-                predecessor: None,
-                entering_boundary: BoundaryId(10),
-                emitting_boundary: BoundaryId(11),
-                source_occurrence: "cold/source/text".to_owned(),
-                exterior_modality: ExteriorModality::Text,
-                entering_codewords: vec![0x3f80],
-                returned_codewords: vec![0x4000],
-                interventions: BTreeSet::from(["cold/intervention".to_owned()]),
-                receiver_consequences: BTreeSet::from(["cold/consequence".to_owned()]),
-            }],
-        })
-        .expect("lift");
+        let returned = fixture::returned();
+        let insufficiency_testimony = returned.insufficiency.open_exterior.clone();
         let (hot, departed) = consume_dismantling_return(returned).expect("handoff");
         hot.validate().expect("hot rest");
         let wire = String::from_utf8(hot.canonical_bytes().expect("wire"))
             .expect("JSON")
             .to_ascii_lowercase();
-        for cold in [
-            "cold/source",
-            "cold/intervention",
-            "cold/consequence",
-            "text",
-        ] {
-            assert!(!wire.contains(cold));
+        for testimony in &insufficiency_testimony {
+            assert!(!wire.contains(&testimony.to_ascii_lowercase()));
         }
-        assert_eq!(departed.cold_witness.excitations.len(), 1);
+        assert!(!wire.contains("insufficiency"));
+        assert_eq!(departed.cold_witness, ());
         assert_eq!(departed.insufficiency.retained_fibre.len(), 1);
+        assert_eq!(
+            departed.insufficiency.retained_fibre,
+            BTreeSet::from([EventId(1)])
+        );
     }
 }

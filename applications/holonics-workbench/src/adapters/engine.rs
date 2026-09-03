@@ -42,9 +42,9 @@ pub fn capabilities() -> AdapterReturn {
         summary: "returned the callable workbench surface and explicit open fibres".to_owned(),
         payload: Some(json!({
             "implemented": {
-                "variant_workspace": ["create", "inspect", "lift-gemma-receipt", "import-snapshot", "define-experiment", "conduct", "continue", "stage-return", "commit", "decline", "evaluate", "export"],
+                "variant_workspace": ["create", "inspect", "import-snapshot", "define-experiment", "conduct", "continue", "stage-return", "commit", "decline", "evaluate", "export"],
                 "diagnostic": {
-                    "athena": ["demo-open", "open", "inspect", "conduct", "continue", "return", "decline", "diffuse-demo", "snapshot", "export"],
+                    "athena": ["open", "inspect", "conduct", "continue", "return", "decline", "diffuse-demo", "snapshot", "export"],
                     "eros": ["mouth", "atlas"],
                     "soulkiller": ["inspect", "config", "index", "onnx"],
                     "engine": ["status", "capabilities", "package", "export"]

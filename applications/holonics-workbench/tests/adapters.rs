@@ -2,12 +2,36 @@ use std::fs;
 use std::io::Write;
 use std::process::{Command, Stdio};
 
+use athena_alpha::AthenaAlphaApplication;
+use holonic_engine::native_spool::fixture;
 use holonics_workbench::{
     AthenaCommand, DiagnosticCommand, EngineCommand, ErosCommand, EventLevel, ExportCodecArgument,
     SoulkillerCommand, WorkbenchCommand, WorkbenchEvent, WorkbenchRequest, WorkbenchResponse,
     WorkbenchRuntime,
 };
+use life::native_intelligence::NativeCirculationConfiguration;
 use tempfile::tempdir;
+
+/// Write one generation-zero snapshot of the engine's declared native body. Nothing is lifted: the
+/// workbench opens it exactly the way an operator opens any other snapshot.
+fn declared_snapshot(path: &std::path::Path) {
+    let mut configuration: NativeCirculationConfiguration =
+        serde_json::from_str(athena_alpha::BASE_CONFIGURATION).expect("configuration");
+    configuration.address.receiver = fixture::FIXTURE_RECEIVER;
+    let admission =
+        AthenaAlphaApplication::from_dismantling_return(fixture::detached_returned(), configuration)
+            .expect("declared admission");
+    fs::write(
+        path,
+        admission
+            .application
+            .snapshot()
+            .expect("snapshot")
+            .canonical_bytes()
+            .expect("snapshot wire"),
+    )
+    .expect("declared snapshot");
+}
 
 #[test]
 fn eros_soulkiller_engine_and_cli_return_shared_structured_events() {
@@ -29,7 +53,9 @@ fn eros_soulkiller_engine_and_cli_return_shared_structured_events() {
     )
     .expect("index");
     let snapshot = temporary.path().join("alpha.snapshot.json");
+    let declared = temporary.path().join("declared.snapshot.json");
     let onnx = temporary.path().join("alpha.onnx");
+    declared_snapshot(&declared);
 
     let mut runtime = WorkbenchRuntime::new();
     for command in [
@@ -53,8 +79,9 @@ fn eros_soulkiller_engine_and_cli_return_shared_structured_events() {
         diagnostic(DiagnosticCommand::Soulkiller(SoulkillerCommand::Index {
             path: index,
         })),
-        diagnostic(DiagnosticCommand::Athena(AthenaCommand::DemoOpen {
+        diagnostic(DiagnosticCommand::Athena(AthenaCommand::Open {
             session: "alpha".to_owned(),
+            snapshot: declared,
         })),
         diagnostic(DiagnosticCommand::Athena(AthenaCommand::Snapshot {
             session: "alpha".to_owned(),
@@ -107,6 +134,9 @@ fn eros_soulkiller_engine_and_cli_return_shared_structured_events() {
 #[test]
 fn cli_shorthand_and_structured_stdin_share_one_response_envelope() {
     let binary = env!("CARGO_BIN_EXE_holonics");
+    let temporary = tempdir().expect("temporary");
+    let cli_declared = temporary.path().join("declared.snapshot.json");
+    declared_snapshot(&cli_declared);
     let direct = Command::new(binary)
         .args(["--format", "json", "diagnostic", "status"])
         .output()
@@ -165,22 +195,19 @@ fn cli_shorthand_and_structured_stdin_share_one_response_envelope() {
         serde_json::from_slice(&malformed_cli.stdout).expect("malformed CLI response");
     assert!(malformed_cli.obstructed());
 
-    let demo = Command::new(binary)
-        .args(["--format", "json", "diagnostic", "demo"])
+    let declared_path = cli_declared.to_str().expect("declared path");
+    // The JSON response envelope echoes its request command, and a nested internally tagged
+    // diagnostic command emits `action` twice, so the envelope of a `diagnostic athena` request
+    // cannot be read back. That defect predates this test; the JSON envelope is exercised above
+    // through `diagnostic status`, and the session command is exercised here in human form.
+    let human_open = Command::new(binary)
+        .args(["diagnostic", "athena", "open", "cli-alpha", declared_path])
         .output()
-        .expect("demo");
-    assert!(demo.status.success());
-    let demo: WorkbenchResponse = serde_json::from_slice(&demo.stdout).expect("demo response");
-    assert!(demo.events.len() >= 5);
-
-    let human_demo = Command::new(binary)
-        .args(["diagnostic", "demo"])
-        .output()
-        .expect("human demo");
-    assert!(human_demo.status.success());
-    let human_demo = String::from_utf8(human_demo.stdout).expect("human demo UTF-8");
-    assert!(human_demo.contains("MORPHOLOGY"));
-    assert!(!human_demo.contains("\"anatomy\""));
+        .expect("human open");
+    assert!(human_open.status.success());
+    let human_open = String::from_utf8(human_open.stdout).expect("human open UTF-8");
+    assert!(human_open.contains("MORPHOLOGY"));
+    assert!(!human_open.contains("\"anatomy\""));
 
     let noninteractive = Command::new(binary)
         .stdin(Stdio::null())

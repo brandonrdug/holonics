@@ -1019,9 +1019,11 @@ It replaces the premature low-level Workbench interpretation with a persistent a
 over existing neutral owners. VWS0--VWS6 passed and no deed in this campaign remains current.
 
 [established-bounded; implemented-exact; source-inspected; process-audit; measured] VWS0 passed.
-The complete Gemma excitation receipt now enters Athena through the sole Soulkiller boundary;
-unknown fields and root-escaping paths refuse; generation-0, cold witness and insufficiency controls
-returned. Its receipt is
+The complete Gemma excitation receipt entered Athena through the sole Soulkiller boundary;
+unknown fields and root-escaping paths refused; generation-0, cold witness and insufficiency controls
+returned. [2026-09-03: the per-event generator construction departed without alias under SKE4 and
+the workbench demo went with it, so this deed is no longer reproducible; its dependents are
+re-founded on the declared native body `native_spool::fixture` and on `import-snapshot`.] Its receipt is
 [`research/records/2026-09-01_VWS0_ACTUAL_GEMMA_RECEIPT_ENTERED_ATHENA_WITHOUT_FOREIGN_EXECUTION.md`](../research/records/2026-09-01_VWS0_ACTUAL_GEMMA_RECEIPT_ENTERED_ATHENA_WITHOUT_FOREIGN_EXECUTION.md).
 
 [established-bounded; implemented-exact; source-inspected; process-audit; measured] VWS1--VWS5

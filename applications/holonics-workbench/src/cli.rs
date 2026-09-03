@@ -56,17 +56,6 @@ pub enum WorkspaceCli {
         #[arg(long, default_value = ".", value_name = "PATH")]
         root: PathBuf,
     },
-    /// Found generation 0 from an already-returned complete Gemma excitation receipt.
-    LiftGemmaReceipt {
-        /// Directory containing `receipt.json` and its returned BF16 artifacts.
-        receipt: PathBuf,
-        /// Workspace root; defaults to the current directory.
-        #[arg(long, default_value = ".", value_name = "PATH")]
-        root: PathBuf,
-        /// Native receiver admitted for the lifted morphology.
-        #[arg(long, default_value_t = 7)]
-        receiver: u64,
-    },
     /// Found the workspace from an existing valid native circulation snapshot.
     ImportSnapshot {
         /// Existing native circulation snapshot.
@@ -151,7 +140,6 @@ pub enum WorkspaceCli {
 
 #[derive(Clone, Debug, Subcommand)]
 pub enum DiagnosticCli {
-    Demo,
     Status,
     Capabilities,
     Athena {
@@ -174,7 +162,6 @@ pub enum DiagnosticCli {
 
 #[derive(Clone, Debug, Subcommand)]
 pub enum AthenaCli {
-    DemoOpen(SessionName),
     Open {
         session: String,
         snapshot: PathBuf,
@@ -328,15 +315,6 @@ impl From<WorkspaceCli> for WorkspaceCommand {
         match command {
             WorkspaceCli::Create { root, label } => Self::Create { root, label },
             WorkspaceCli::Inspect { root } => Self::Inspect { root },
-            WorkspaceCli::LiftGemmaReceipt {
-                root,
-                receipt,
-                receiver,
-            } => Self::LiftGemmaReceipt {
-                root,
-                receipt,
-                receiver,
-            },
             WorkspaceCli::ImportSnapshot { root, snapshot } => {
                 Self::ImportSnapshot { root, snapshot }
             }
@@ -378,7 +356,6 @@ impl From<WorkspaceCli> for WorkspaceCommand {
 impl From<DiagnosticCli> for DiagnosticCommand {
     fn from(command: DiagnosticCli) -> Self {
         match command {
-            DiagnosticCli::Demo => Self::Demo,
             DiagnosticCli::Status => Self::Status,
             DiagnosticCli::Capabilities => Self::Capabilities,
             DiagnosticCli::Athena { command } => Self::Athena(command.into()),
@@ -392,9 +369,6 @@ impl From<DiagnosticCli> for DiagnosticCommand {
 impl From<AthenaCli> for AthenaCommand {
     fn from(command: AthenaCli) -> Self {
         match command {
-            AthenaCli::DemoOpen(value) => Self::DemoOpen {
-                session: value.session,
-            },
             AthenaCli::Open { session, snapshot } => Self::Open { session, snapshot },
             AthenaCli::Inspect(value) => Self::Inspect {
                 session: value.session,

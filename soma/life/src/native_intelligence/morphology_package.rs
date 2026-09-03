@@ -746,12 +746,11 @@ mod tests {
 
     use holonic_engine::{
         native_ecology::holonic_intelligence::{
-            conduct_native_inference, Bf16ExcitationDismantling, ExteriorModality,
-            ForeignBf16Excitation, InferenceCirculation, NativeInferenceAddress,
+            conduct_native_inference, InferenceCirculation, NativeInferenceAddress,
             NativeInferenceRequest,
         },
-        receiver_exact_compression::ReceiverId,
-        soulkiller::dismantle,
+        native_spool::fixture,
+        receiver_history_compression::NativeStateId,
         BoundaryId, EventId, ExactComplexWaveCurrent,
     };
     use num_bigint::BigInt;
@@ -761,33 +760,46 @@ mod tests {
     use crate::native_intelligence::{consume_dismantling_return, ScaffoldCultivatedRest};
     use crate::native_intelligence::scaffold_cultivation::ReturnedScaffoldInteraction;
 
-    fn rest(excitations: usize) -> NativeEcologyRest {
-        let excitations = (0..excitations)
-            .map(|at| ForeignBf16Excitation {
-                event: EventId(at as u64 + 1),
-                predecessor: None,
-                entering_boundary: BoundaryId(at as u64 * 2 + 1),
-                emitting_boundary: BoundaryId(at as u64 * 2 + 2),
-                source_occurrence: format!("cold/{at}"),
-                exterior_modality: ExteriorModality::Text,
-                entering_codewords: vec![0x3f80 + at as u16],
-                returned_codewords: vec![0x4000 + at as u16],
-                interventions: BTreeSet::from([format!("intervention/{at}")]),
-                receiver_consequences: BTreeSet::from([format!("consequence/{at}")]),
-            })
-            .collect();
-        let returned = dismantle(Bf16ExcitationDismantling {
-            receiver: ReceiverId(7),
-            excitations,
-        })
-        .expect("dismantle");
+    fn rest() -> NativeEcologyRest {
+        consume_dismantling_return(fixture::returned())
+            .expect("handoff")
+            .0
+    }
+
+    /// The declared body carrying one further thread, so a second anatomy is available without
+    /// borrowing any founding claim.
+    fn extended_rest() -> NativeEcologyRest {
+        let mut body = fixture::scaffold();
+        let spool = &mut body.spools[0];
+        spool.threads.push(fixture::thread(
+            "thread/turn-branch",
+            3,
+            Some(1),
+            11,
+            10,
+            1,
+            0,
+            7,
+        ));
+        spool
+            .reconstruction_fibres
+            .iter_mut()
+            .find(|fibre| fibre.native == NativeStateId(0))
+            .expect("the emitted native state carries a fibre")
+            .occurrences
+            .insert(EventId(3));
+        let returned = holonic_engine::soulkiller::SoulkillerDismantlingReturn {
+            native: body,
+            exterior: (),
+            insufficiency: fixture::insufficiency(),
+        };
         consume_dismantling_return(returned).expect("handoff").0
     }
 
     #[test]
     fn package_round_trip_recovers_hot_rest_and_open_reconstruction() {
         let package = NativeMorphologyArtifact::found(
-            rest(2),
+            rest(),
             MorphologyLineage::origin(),
             Vec::new(),
             vec![ApparatusRealization {
@@ -813,7 +825,7 @@ mod tests {
     #[test]
     fn apparatus_and_export_replacement_preserve_hot_morphology_and_capability() {
         let package = NativeMorphologyArtifact::found(
-            rest(1),
+            rest(),
             MorphologyLineage::origin(),
             Vec::new(),
             Vec::new(),
@@ -831,7 +843,7 @@ mod tests {
                 vec![ExportRealization {
                     codec: ExportCodecKind::Safetensors,
                     schema_or_opset: "holonics-v1".to_owned(),
-                    receiver_family: BTreeSet::from([ReceiverId(7)]),
+                    receiver_family: BTreeSet::from([fixture::FIXTURE_RECEIVER]),
                 }],
             )
             .expect("replace realization");
@@ -842,7 +854,7 @@ mod tests {
     #[test]
     fn anatomically_distinct_bodies_receive_distinct_derived_manifests() {
         let one = NativeMorphologyArtifact::found(
-            rest(1),
+            rest(),
             MorphologyLineage::origin(),
             Vec::new(),
             Vec::new(),
@@ -850,7 +862,7 @@ mod tests {
         )
         .expect("one");
         let two = NativeMorphologyArtifact::found(
-            rest(2),
+            extended_rest(),
             MorphologyLineage::origin(),
             Vec::new(),
             Vec::new(),
@@ -858,13 +870,15 @@ mod tests {
         )
         .expect("two");
         assert_ne!(one.manifest.anatomy, two.manifest.anatomy);
-        assert_eq!(one.manifest.anatomy.thread_population, 1);
-        assert_eq!(two.manifest.anatomy.thread_population, 2);
+        assert_eq!(one.manifest.anatomy.thread_population, 2);
+        assert_eq!(two.manifest.anatomy.thread_population, 3);
     }
 
     #[test]
     fn released_cultivation_packages_situated_hot_and_departed_reconstruction_separately() {
-        let predecessor = rest(2);
+        let predecessor = consume_dismantling_return(fixture::detached_returned())
+            .expect("handoff")
+            .0;
         let source = NativeInferenceAddress {
             spool: predecessor.ecology.spools[0].address.clone(),
             thread: predecessor.ecology.spools[0].threads[0].address.clone(),
@@ -874,7 +888,7 @@ mod tests {
             &predecessor.ecology,
             NativeInferenceRequest {
                 address: source.clone(),
-                receiver: ReceiverId(7),
+                receiver: fixture::FIXTURE_RECEIVER,
             },
         )
         .expect("emission");
@@ -901,7 +915,7 @@ mod tests {
             released,
             MorphologyLineage {
                 generation: 1,
-                parent_occurrences: BTreeSet::from([EventId(1), EventId(2)]),
+                parent_occurrences: BTreeSet::from([EventId(1), EventId(3)]),
                 returned_occurrences: BTreeSet::from([EventId(100)]),
             },
             Vec::new(),
@@ -910,10 +924,7 @@ mod tests {
         )
         .expect("released package");
         assert!(matches!(package.hot(), NativeHolonMorphology::Situated { .. }));
-        assert_eq!(
-            package.testimony.departed_inherited_withdrawals.len(),
-            2
-        );
+        assert_eq!(package.testimony.departed_inherited_withdrawals.len(), 3);
         let bytes = package.canonical_bytes().expect("package bytes");
         let recovered = NativeMorphologyArtifact::read(&bytes).expect("package read");
         assert_eq!(recovered.canonical_bytes().expect("recovered bytes"), bytes);

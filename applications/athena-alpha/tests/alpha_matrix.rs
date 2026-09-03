@@ -1,15 +1,12 @@
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 
 use athena_alpha::{
     addressed_ingress, declared_diffusion_law, AthenaAlphaApplication, BASE_CONFIGURATION,
 };
 use holonic_engine::{
-    native_ecology::holonic_intelligence::{
-        Bf16ExcitationDismantling, ExteriorModality, ForeignBf16Excitation, NativeInferenceRequest,
-    },
-    receiver_exact_compression::ReceiverId,
-    soulkiller::dismantle,
-    BoundaryId, EventId,
+    native_ecology::holonic_intelligence::NativeInferenceRequest,
+    native_spool::fixture,
+    EventId,
 };
 use holonics_circulation_abi::{
     dispatch_bytes, AbiCommand, AbiDisposition, AbiEnvelope, AbiResponse,
@@ -23,39 +20,11 @@ use life::native_intelligence::{
 use num_rational::BigRational as Rat;
 use num_traits::{One, Zero};
 
-fn excitation(
-    event: u64,
-    predecessor: Option<u64>,
-    entering: u16,
-    returned: u16,
-) -> ForeignBf16Excitation {
-    ForeignBf16Excitation {
-        event: EventId(event),
-        predecessor: predecessor.map(EventId),
-        entering_boundary: BoundaryId(event * 2),
-        emitting_boundary: BoundaryId(event * 2 + 1),
-        source_occurrence: format!("cold/{event}"),
-        exterior_modality: ExteriorModality::Text,
-        entering_codewords: vec![entering],
-        returned_codewords: vec![returned],
-        interventions: BTreeSet::from([format!("intervention/{event}")]),
-        receiver_consequences: BTreeSet::from([format!("consequence/{event}")]),
-    }
-}
-
 fn application() -> AthenaAlphaApplication {
-    let configuration: NativeCirculationConfiguration =
+    let mut configuration: NativeCirculationConfiguration =
         serde_json::from_str(BASE_CONFIGURATION).expect("configuration");
-    let returned = dismantle(Bf16ExcitationDismantling {
-        receiver: ReceiverId(7),
-        excitations: vec![
-            excitation(1, None, 0x3f80, 0x4000),
-            excitation(2, Some(1), 0x4000, 0x4040),
-            excitation(3, None, 0x4080, 0x40a0),
-        ],
-    })
-    .expect("dismantle");
-    AthenaAlphaApplication::from_dismantling_return(returned, configuration)
+    configuration.address.receiver = fixture::FIXTURE_RECEIVER;
+    AthenaAlphaApplication::from_dismantling_return(fixture::detached_returned(), configuration)
         .expect("admission")
         .application
 }
@@ -77,7 +46,7 @@ fn request(application: &AthenaAlphaApplication, occurrence: EventId) -> NativeI
         spool.address.clone(),
         thread.address.clone(),
         occurrence,
-        ReceiverId(7),
+        fixture::FIXTURE_RECEIVER,
     )
 }
 
@@ -314,8 +283,10 @@ fn exact_alpha_matrix_returns_the_complete_dynamic_lifecycle() {
         AbiDisposition::Closed { .. }
     ));
 
-    // 12. Structural grades are attached to caused returns, not an expected surface.
-    assert_eq!(commit.causal_cone.len(), 2);
+    // 12. Structural grades are attached to caused returns, not an expected surface. The declared
+    // body's shared generator is active at states 0 and 1, so the admitted face family reaches
+    // states 0, 1 and 4; the detached winding over states 2 and 3 stays outside the cone.
+    assert_eq!(commit.causal_cone.len(), 3);
     assert_eq!(commit.reconstruction_fibre_population, 1);
     assert!(!later.futures.is_empty());
 }

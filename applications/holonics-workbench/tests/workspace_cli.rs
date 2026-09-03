@@ -2,56 +2,31 @@ use std::fs;
 use std::path::Path;
 use std::process::Command;
 
-use holonic_engine::native_ecology::holonic_intelligence::COMPLETE_GEMMA4_EXCITATION_SCHEMA;
+use athena_alpha::AthenaAlphaApplication;
+use holonic_engine::native_spool::fixture;
 use holonics_workbench::{render_human, WorkbenchResponse};
-use serde_json::json;
-use sha2::{Digest, Sha256};
+use life::native_intelligence::NativeCirculationConfiguration;
 use tempfile::tempdir;
 
-fn digest(bytes: &[u8]) -> String {
-    Sha256::digest(bytes)
-        .iter()
-        .map(|octet| format!("{octet:02x}"))
-        .collect()
-}
-
-fn returned(name: &str, entering: &[u8], returned: &[u8]) -> serde_json::Value {
-    json!({
-        "occurrence": format!("cli-return/{name}"),
-        "source_sha256": digest(entering),
-        "entering_bf16": format!("{name}-in.bf16"),
-        "entering_sha256": digest(entering),
-        "returned_bf16": format!("{name}-out.bf16"),
-        "returned_sha256": digest(returned),
-        "complete_layer_count": 1
-    })
-}
-
-fn fixture(root: &Path) {
-    let mut returns = Vec::new();
-    for (name, entering, returned_word) in [
-        ("text", 0x3f80u16, 0x4000u16),
-        ("vision", 0x4000u16, 0x4040u16),
-        ("audio", 0x4080u16, 0x40a0u16),
-    ] {
-        let entering = entering.to_le_bytes();
-        let returned_bytes = returned_word.to_le_bytes();
-        fs::write(root.join(format!("{name}-in.bf16")), entering).expect("entering");
-        fs::write(root.join(format!("{name}-out.bf16")), returned_bytes).expect("returned");
-        returns.push(returned(name, &entering, &returned_bytes));
-    }
+/// Write one generation-zero snapshot of the engine's declared native body. Nothing is lifted: the
+/// shipped `workspace import-snapshot` command founds the workspace from it.
+fn declared_snapshot(path: &Path) {
+    let mut configuration: NativeCirculationConfiguration =
+        serde_json::from_str(athena_alpha::BASE_CONFIGURATION).expect("configuration");
+    configuration.address.receiver = fixture::FIXTURE_RECEIVER;
+    let admission =
+        AthenaAlphaApplication::from_dismantling_return(fixture::detached_returned(), configuration)
+            .expect("declared admission");
     fs::write(
-        root.join("receipt.json"),
-        serde_json::to_vec(&json!({
-            "schema": COMPLETE_GEMMA4_EXCITATION_SCHEMA,
-            "text": {"returns": [returns[0].clone()]},
-            "vision": {"returns": [returns[1].clone()]},
-            "audio": {"returns": [returns[2].clone()]},
-            "video": {"temporal_frame_lineage": false, "frame_returns": []}
-        }))
-        .expect("receipt"),
+        path,
+        admission
+            .application
+            .snapshot()
+            .expect("snapshot")
+            .canonical_bytes()
+            .expect("snapshot wire"),
     )
-    .expect("receipt file");
+    .expect("declared snapshot");
 }
 
 fn run(current_dir: Option<&Path>, arguments: &[&str]) -> WorkbenchResponse {
@@ -75,23 +50,22 @@ fn run(current_dir: Option<&Path>, arguments: &[&str]) -> WorkbenchResponse {
 }
 
 #[test]
-fn cli_returns_the_complete_actual_receipt_to_successor_artifact_lifecycle() {
+fn cli_returns_the_complete_snapshot_to_successor_artifact_lifecycle() {
     let temporary = tempdir().expect("temporary");
-    let receipt = temporary.path().join("receipt");
+    let source = temporary.path().join("declared.snapshot.json");
     let workspace = temporary.path().join("workspace");
-    fs::create_dir(&receipt).expect("receipt root");
-    fixture(&receipt);
+    declared_snapshot(&source);
     let root = workspace.to_str().expect("root");
-    let receipt = receipt.to_str().expect("receipt");
+    let source = source.to_str().expect("snapshot");
 
     run(None, &["workspace", "create", root, "first-athena"]);
-    let lift = run(
+    let imported = run(
         Some(&workspace),
-        &["workspace", "lift-gemma-receipt", receipt],
+        &["workspace", "import-snapshot", source],
     );
     assert_eq!(
-        lift.events[0].payload.as_ref().expect("payload")["value"]["foreign_execution"],
-        false
+        imported.events[0].payload.as_ref().expect("payload")["value"]["generation"],
+        0
     );
     run(
         Some(&workspace),

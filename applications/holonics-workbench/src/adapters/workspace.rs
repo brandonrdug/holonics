@@ -25,20 +25,6 @@ pub fn execute(command: WorkspaceCommand) -> Result<AdapterReturn, WorkbenchErro
                 workspace.inspect().map_err(owner)?,
             )
         }
-        WorkspaceCommand::LiftGemmaReceipt {
-            root,
-            receipt,
-            receiver,
-        } => {
-            let mut workspace = VariantWorkspace::open(&root).map_err(owner)?;
-            returned(
-                "workspace/lift-gemma-receipt",
-                "lifted an actual complete excitation receipt through Soulkiller and founded generation 0 without foreign execution",
-                workspace
-                    .lift_gemma_receipt(&receipt, ReceiverId(receiver))
-                    .map_err(owner)?,
-            )
-        }
         WorkspaceCommand::ImportSnapshot { root, snapshot } => {
             let mut workspace = VariantWorkspace::open(&root).map_err(owner)?;
             returned(

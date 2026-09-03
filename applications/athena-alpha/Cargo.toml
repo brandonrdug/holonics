@@ -18,7 +18,3 @@ tokenizers = "0.21.4"
 holonics-circulation-abi = { path = "../../soma/circulation-abi" }
 num-traits = "0.2"
 sha2 = "0.10"
-
-[[example]]
-name = "alpha-cycle"
-path = "examples/alpha_cycle.rs"

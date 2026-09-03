@@ -1,22 +1,12 @@
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 use std::path::PathBuf;
 use std::str::FromStr;
 
-use athena_alpha::{
-    addressed_ingress, declared_diffusion_law, AthenaAlphaApplication, BASE_CONFIGURATION,
-};
-use holonic_engine::{
-    native_ecology::holonic_intelligence::{
-        Bf16ExcitationDismantling, ExteriorModality, ForeignBf16Excitation,
-    },
-    receiver_exact_compression::ReceiverId,
-    soulkiller::dismantle,
-    BoundaryId, EventId,
-};
+use athena_alpha::{addressed_ingress, declared_diffusion_law, AthenaAlphaApplication};
+use holonic_engine::{receiver_exact_compression::ReceiverId, EventId};
 use life::native_intelligence::{
     export_morphology, ExportCodecKind, ExportPurpose, MorphologyExportRequest,
-    MorphologyExportReturn, NativeCirculationBoundary, NativeCirculationConfiguration,
-    NativeCirculationEvent, NativeDiffusionIngress, NativeDiffusionStanding,
+    MorphologyExportReturn, NativeCirculationBoundary, NativeCirculationEvent, NativeDiffusionIngress, NativeDiffusionStanding,
     NativeWorldFace, NativeWorldStage,
 };
 use num_bigint::BigInt;
@@ -36,7 +26,6 @@ use crate::{
 struct SessionEntry {
     application: AthenaAlphaApplication,
     boundary: Option<NativeCirculationBoundary>,
-    bounded_demo: bool,
 }
 
 #[derive(Debug, Default)]
@@ -133,53 +122,6 @@ impl WorkbenchRuntime {
         )))
     }
 
-    pub fn recommended_demo_return_command(
-        &self,
-        session: &str,
-    ) -> Result<WorkbenchCommand, WorkbenchError> {
-        if !self.session(session)?.bounded_demo {
-            return Err(WorkbenchError::Owner(
-                "only a bounded demo session supplies an application-authored demo return aperture"
-                    .to_owned(),
-            ));
-        }
-        let boundary = self
-            .session(session)?
-            .boundary
-            .as_ref()
-            .ok_or_else(|| WorkbenchError::MissingBoundary(session.to_owned()))?;
-        let latest = std::iter::once(boundary.request.address.occurrence.0)
-            .chain(
-                boundary
-                    .emission
-                    .grains
-                    .iter()
-                    .flat_map(|grain| grain.occurrences.iter().map(|occurrence| occurrence.0)),
-            )
-            .chain(
-                boundary
-                    .actual_successors
-                    .iter()
-                    .map(|successor| successor.address.occurrence.0),
-            )
-            .max()
-            .unwrap_or(0);
-        // The bounded demo dismantling owns occurrences 1..=3. Keep its returned world event in
-        // the explicitly separated demo aperture used by the alpha matrix while still moving
-        // past any later boundary the operator may have continued into.
-        let occurrence = latest
-            .saturating_add(1)
-            .max(100u64.saturating_add(boundary.generation.saturating_mul(100)));
-        Ok(WorkbenchCommand::Diagnostic(DiagnosticCommand::Athena(
-            AthenaCommand::Return {
-                session: session.to_owned(),
-                occurrence,
-                admitted: true,
-                diagnostic: "bounded-demo-world-admitted".to_owned(),
-            },
-        )))
-    }
-
     pub fn execute(&mut self, command: WorkbenchCommand) -> Vec<WorkbenchEvent> {
         let result = match command {
             WorkbenchCommand::Workspace(command) => {
@@ -210,7 +152,6 @@ impl WorkbenchRuntime {
         command: DiagnosticCommand,
     ) -> Result<Vec<WorkbenchEvent>, WorkbenchError> {
         match command {
-            DiagnosticCommand::Demo => self.execute_demo(),
             DiagnosticCommand::Athena(command) => self.execute_athena(command),
             DiagnosticCommand::Status => Ok(vec![self.adapter(adapters::engine::status())]),
             DiagnosticCommand::Capabilities => {
@@ -228,46 +169,11 @@ impl WorkbenchRuntime {
         }
     }
 
-    fn execute_demo(&mut self) -> Result<Vec<WorkbenchEvent>, WorkbenchError> {
-        let session = self.next_session_name("alpha");
-        let mut events = self.athena_demo_open(session.clone())?;
-        let WorkbenchCommand::Diagnostic(DiagnosticCommand::Athena(conduct)) =
-            self.recommended_conduct_command(&session)?
-        else {
-            unreachable!("recommended conduct is an Athena command")
-        };
-        events.extend(self.execute_athena(conduct)?);
-        let WorkbenchCommand::Diagnostic(DiagnosticCommand::Athena(returned)) =
-            self.recommended_demo_return_command(&session)?
-        else {
-            unreachable!("recommended return is an Athena command")
-        };
-        events.extend(self.execute_athena(returned)?);
-        let WorkbenchCommand::Diagnostic(DiagnosticCommand::Athena(conduct)) =
-            self.recommended_conduct_command(&session)?
-        else {
-            unreachable!("recommended conduct is an Athena command")
-        };
-        events.extend(self.execute_athena(conduct)?);
-        events.push(self.event(
-            EventLevel::Information,
-            format!("athena/{session}/demo"),
-            "bounded demo completed one returned local cultivation and left generation 1 at a live conduct boundary",
-            Some(json!({
-                "session": session,
-                "generation": 1,
-                "next_actions": ["continue an actual successor", "decline the boundary", "commit another explicit return", "snapshot", "export"]
-            })),
-        ));
-        Ok(events)
-    }
-
     fn execute_athena(
         &mut self,
         command: AthenaCommand,
     ) -> Result<Vec<WorkbenchEvent>, WorkbenchError> {
         match command {
-            AthenaCommand::DemoOpen { session } => self.athena_demo_open(session),
             AthenaCommand::Open { session, snapshot } => self.athena_open(session, snapshot),
             AthenaCommand::Inspect { session } => self.athena_inspect(&session),
             AthenaCommand::Conduct {
@@ -304,39 +210,6 @@ impl WorkbenchRuntime {
         }
     }
 
-    fn athena_demo_open(&mut self, session: String) -> Result<Vec<WorkbenchEvent>, WorkbenchError> {
-        self.require_new_session(&session)?;
-        let configuration: NativeCirculationConfiguration =
-            serde_json::from_str(BASE_CONFIGURATION)
-                .map_err(|error| WorkbenchError::Owner(error.to_string()))?;
-        let returned = dismantle(Bf16ExcitationDismantling {
-            receiver: ReceiverId(7),
-            excitations: vec![
-                demo_excitation(1, None, 0x3f80, 0x4000),
-                demo_excitation(2, Some(1), 0x4000, 0x4040),
-                demo_excitation(3, None, 0x4080, 0x40a0),
-            ],
-        })
-        .map_err(|error| WorkbenchError::Owner(error.to_string()))?;
-        let admission = AthenaAlphaApplication::from_dismantling_return(returned, configuration)
-            .map_err(|error| WorkbenchError::Owner(error.to_string()))?;
-        let payload = session_payload(&session, &admission.application);
-        self.sessions.insert(
-            session.clone(),
-            SessionEntry {
-                application: admission.application,
-                boundary: None,
-                bounded_demo: true,
-            },
-        );
-        Ok(vec![self.event(
-            EventLevel::Consequence,
-            format!("athena/{session}"),
-            "opened bounded source-neutral demo morphology at generation 0",
-            Some(payload),
-        )])
-    }
-
     fn athena_open(
         &mut self,
         session: String,
@@ -354,7 +227,6 @@ impl WorkbenchRuntime {
             SessionEntry {
                 application,
                 boundary: None,
-                bounded_demo: false,
             },
         );
         Ok(vec![self.event(
@@ -459,7 +331,6 @@ impl WorkbenchRuntime {
             .sessions
             .remove(session)
             .expect("session and boundary checked before ownership transfer");
-        let bounded_demo = entry.bounded_demo;
         let faces = boundary
             .issued_world_faces()
             .into_iter()
@@ -495,7 +366,6 @@ impl WorkbenchRuntime {
                     SessionEntry {
                         application,
                         boundary: None,
-                        bounded_demo,
                     },
                 );
                 Ok(vec![self.event(
@@ -516,7 +386,6 @@ impl WorkbenchRuntime {
                     SessionEntry {
                         application,
                         boundary: Some(boundary),
-                        bounded_demo,
                     },
                 );
                 Ok(vec![self.event(
@@ -534,7 +403,6 @@ impl WorkbenchRuntime {
                     SessionEntry {
                         application,
                         boundary: Some(boundary),
-                        bounded_demo,
                     },
                 );
                 Err(error)
@@ -563,7 +431,6 @@ impl WorkbenchRuntime {
                     SessionEntry {
                         application,
                         boundary: None,
-                        bounded_demo: entry.bounded_demo,
                     },
                 );
                 Ok(vec![self.event(
@@ -581,7 +448,6 @@ impl WorkbenchRuntime {
                     SessionEntry {
                         application,
                         boundary: Some(boundary),
-                        bounded_demo: entry.bounded_demo,
                     },
                 );
                 Err(WorkbenchError::Owner(error.to_string()))
@@ -834,26 +700,6 @@ fn session_payload(session: &str, application: &AthenaAlphaApplication) -> Value
     })
 }
 
-fn demo_excitation(
-    event: u64,
-    predecessor: Option<u64>,
-    entering: u16,
-    returned: u16,
-) -> ForeignBf16Excitation {
-    ForeignBf16Excitation {
-        event: EventId(event),
-        predecessor: predecessor.map(EventId),
-        entering_boundary: BoundaryId(event * 2),
-        emitting_boundary: BoundaryId(event * 2 + 1),
-        source_occurrence: format!("workbench-demo/{event}"),
-        exterior_modality: ExteriorModality::Text,
-        entering_codewords: vec![entering],
-        returned_codewords: vec![returned],
-        interventions: BTreeSet::from([format!("workbench-demo-intervention/{event}")]),
-        receiver_consequences: BTreeSet::from([format!("workbench-demo-consequence/{event}")]),
-    }
-}
-
 pub(crate) fn parse_rat(text: &str) -> Result<Rat, WorkbenchError> {
     if let Some((numerator, denominator)) = text.split_once('/') {
         let numerator =
@@ -884,8 +730,13 @@ fn to_value<T: serde::Serialize>(value: &T) -> Result<Value, WorkbenchError> {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use std::path::Path;
+
+    use holonic_engine::native_spool::fixture;
+    use life::native_intelligence::NativeCirculationConfiguration;
     use tempfile::tempdir;
+
+    use super::*;
 
     fn command(runtime: &mut WorkbenchRuntime, command: AthenaCommand) -> Vec<WorkbenchEvent> {
         runtime.execute(WorkbenchCommand::Diagnostic(DiagnosticCommand::Athena(
@@ -893,21 +744,50 @@ mod tests {
         )))
     }
 
+    /// Write one generation-zero snapshot of the declared native body so a session can be opened
+    /// the same way an operator opens any other snapshot.
+    fn declared_snapshot(path: &Path) {
+        let mut configuration: NativeCirculationConfiguration =
+            serde_json::from_str(athena_alpha::BASE_CONFIGURATION).expect("configuration");
+        configuration.address.receiver = fixture::FIXTURE_RECEIVER;
+        let admission = AthenaAlphaApplication::from_dismantling_return(
+            fixture::detached_returned(),
+            configuration,
+        )
+        .expect("declared admission");
+        std::fs::write(
+            path,
+            admission
+                .application
+                .snapshot()
+                .expect("snapshot")
+                .canonical_bytes()
+                .expect("snapshot wire"),
+        )
+        .expect("snapshot file");
+    }
+
+    fn open_declared(runtime: &mut WorkbenchRuntime, session: &str, path: &Path) -> Vec<WorkbenchEvent> {
+        declared_snapshot(path);
+        command(
+            runtime,
+            AthenaCommand::Open {
+                session: session.to_owned(),
+                snapshot: path.to_path_buf(),
+            },
+        )
+    }
+
     #[test]
     fn named_session_conducts_commits_snapshots_remounts_diffuses_and_exports() {
         let temporary = tempdir().expect("temporary");
+        let declared = temporary.path().join("declared.snapshot.json");
         let snapshot = temporary.path().join("alpha.snapshot.json");
         let export = temporary.path().join("alpha.safetensors");
         let mut runtime = WorkbenchRuntime::new();
 
         assert_eq!(
-            command(
-                &mut runtime,
-                AthenaCommand::DemoOpen {
-                    session: "alpha".to_owned(),
-                }
-            )[0]
-            .level,
+            open_declared(&mut runtime, "alpha", &declared)[0].level,
             EventLevel::Consequence
         );
         let inspect = command(
@@ -927,7 +807,7 @@ mod tests {
                 spool: first["spool"].as_str().expect("spool").to_owned(),
                 thread: first["thread"].as_str().expect("thread").to_owned(),
                 occurrence: first["occurrence"].as_u64().expect("occurrence"),
-                receiver: 7,
+                receiver: fixture::FIXTURE_RECEIVER.0,
             },
         );
         assert_eq!(conduct[0].level, EventLevel::Consequence);
@@ -963,7 +843,7 @@ mod tests {
         assert_eq!(view["session_state_changed"], false);
         assert_eq!(view["topology"]["native_nodes"], 5);
         assert_eq!(view["topology"]["incidence_branches"], 4);
-        assert_eq!(view["topology"]["nonzero_currents"], 3);
+        assert_eq!(view["topology"]["nonzero_currents"], 2);
         assert_eq!(
             view["total_before"],
             serde_json::json!([[1, [1]], [1, [1]]])
@@ -1027,6 +907,8 @@ mod tests {
 
     #[test]
     fn missing_session_boundary_false_successor_and_invalid_rational_refuse() {
+        let temporary = tempdir().expect("temporary");
+        let declared = temporary.path().join("declared.snapshot.json");
         let mut runtime = WorkbenchRuntime::new();
         assert_eq!(
             command(
@@ -1039,12 +921,7 @@ mod tests {
             EventLevel::Obstruction
         );
         assert!(runtime.session_names().is_empty());
-        command(
-            &mut runtime,
-            AthenaCommand::DemoOpen {
-                session: "alpha".to_owned(),
-            },
-        );
+        open_declared(&mut runtime, "alpha", &declared);
         assert_eq!(
             command(
                 &mut runtime,

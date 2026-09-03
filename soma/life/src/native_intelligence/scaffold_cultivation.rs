@@ -748,41 +748,17 @@ fn cultivated_consequence(
 mod tests {
     use super::*;
     use holonic_engine::{
-        native_ecology::holonic_intelligence::{
-            conduct_native_inference, Bf16ExcitationDismantling, ExteriorModality,
-            ForeignBf16Excitation,
-        },
-        receiver_exact_compression::ReceiverId,
-        soulkiller::dismantle,
+        native_ecology::holonic_intelligence::conduct_native_inference, native_spool::fixture,
     };
     use num_bigint::BigInt;
     use relational_geometry::Rat;
 
-    fn excitation(event: u64, entering: u16, returned: u16) -> ForeignBf16Excitation {
-        ForeignBf16Excitation {
-            event: EventId(event),
-            predecessor: None,
-            entering_boundary: BoundaryId(event),
-            emitting_boundary: BoundaryId(event + 10),
-            source_occurrence: format!("cold/{event}"),
-            exterior_modality: ExteriorModality::Text,
-            entering_codewords: vec![entering],
-            returned_codewords: vec![returned],
-            interventions: BTreeSet::from([format!("intervention/{event}")]),
-            receiver_consequences: BTreeSet::from([format!("consequence/{event}")]),
-        }
-    }
-
     #[test]
     fn returned_local_interaction_preserves_disjoint_morphology_and_survives_release() {
-        let lifted = dismantle(Bf16ExcitationDismantling {
-            receiver: ReceiverId(7),
-            excitations: vec![excitation(1, 0x3f80, 0x4000), excitation(2, 0x4040, 0x4080)],
-        })
-        .expect("lift");
         let (predecessor, departed) =
-            super::super::consume_dismantling_return(lifted).expect("move-owned handoff");
-        assert_eq!(departed.cold_witness.excitations.len(), 2);
+            super::super::consume_dismantling_return(fixture::detached_returned())
+                .expect("move-owned handoff");
+        assert_eq!(departed.cold_witness, ());
         let source = NativeInferenceAddress {
             spool: predecessor.ecology.spools[0].address.clone(),
             thread: predecessor.ecology.spools[0].threads[0].address.clone(),
@@ -792,7 +768,7 @@ mod tests {
             &predecessor.ecology,
             NativeInferenceRequest {
                 address: source.clone(),
-                receiver: ReceiverId(7),
+                receiver: fixture::FIXTURE_RECEIVER,
             },
         )
         .expect("emission");
@@ -823,23 +799,15 @@ mod tests {
         assert_eq!(released.receipt.causal_cone_population, 2);
         assert_eq!(released.receipt.outside_thread_population, 1);
         assert_eq!(released.hot.native().spools[0].threads.len(), 1);
-        assert_eq!(released.departed_inherited.len(), 2);
+        assert_eq!(released.departed_inherited.len(), 3);
         assert!(released.receipt.departed_reconstruction_fibre_population >= 2);
     }
 
     #[test]
     fn declared_global_contact_returns_the_complete_native_causal_cone() {
-        let lifted = dismantle(Bf16ExcitationDismantling {
-            receiver: ReceiverId(7),
-            excitations: vec![
-                excitation(1, 0x3f80, 0x4000),
-                excitation(2, 0x4040, 0x4080),
-                excitation(3, 0x40a0, 0x40c0),
-            ],
-        })
-        .expect("lift");
         let (predecessor, _) =
-            super::super::consume_dismantling_return(lifted).expect("move-owned handoff");
+            super::super::consume_dismantling_return(fixture::detached_returned())
+                .expect("move-owned handoff");
         let total_native = predecessor.ecology.spools[0].native_population.clone();
         let source = NativeInferenceAddress {
             spool: predecessor.ecology.spools[0].address.clone(),
@@ -850,7 +818,7 @@ mod tests {
             &predecessor.ecology,
             NativeInferenceRequest {
                 address: source.clone(),
-                receiver: ReceiverId(7),
+                receiver: fixture::FIXTURE_RECEIVER,
             },
         )
         .expect("emission");

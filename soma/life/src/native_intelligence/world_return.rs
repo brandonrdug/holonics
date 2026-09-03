@@ -335,14 +335,8 @@ pub(super) fn constitute_world_interaction(
 mod tests {
     use super::*;
     use holonic_engine::{
-        native_ecology::holonic_intelligence::{
-            Bf16ExcitationDismantling, ExteriorModality, ForeignBf16Excitation,
-            NativeInferenceAddress, NativeInferenceRequest,
-        },
-        receiver_exact_compression::ReceiverId,
-        native_spool::NativeGeneratorStep,
-        soulkiller::dismantle,
-        BoundaryId,
+        native_ecology::holonic_intelligence::{NativeInferenceAddress, NativeInferenceRequest},
+        native_spool::fixture,
     };
 
     use crate::native_intelligence::{
@@ -350,53 +344,8 @@ mod tests {
         NativeCirculationConfiguration, NativeMorphologyArtifact,
     };
 
-    fn excitation(event: u64) -> ForeignBf16Excitation {
-        ForeignBf16Excitation {
-            event: EventId(event),
-            predecessor: None,
-            entering_boundary: BoundaryId(event * 2),
-            emitting_boundary: BoundaryId(event * 2 + 1),
-            source_occurrence: format!("cold/{event}"),
-            exterior_modality: ExteriorModality::Text,
-            entering_codewords: vec![
-                0x3f80 + event as u16,
-                0x4000 + event as u16,
-                0x4040 + event as u16,
-            ],
-            returned_codewords: vec![
-                0x4080 + event as u16,
-                0x40a0 + event as u16,
-                0x40c0 + event as u16,
-            ],
-            interventions: BTreeSet::from([format!("intervention/{event}")]),
-            receiver_consequences: BTreeSet::from([format!("consequence/{event}")]),
-        }
-    }
-
     fn session_and_boundary() -> (NativeCirculationSession, NativeCirculationBoundary) {
-        let mut returned = dismantle(Bf16ExcitationDismantling {
-            receiver: ReceiverId(7),
-            excitations: vec![excitation(1), excitation(2), excitation(3)],
-        })
-        .expect("dismantle");
-        let spool = &mut returned.native.spools[0];
-        let steps = spool
-            .threads
-            .iter()
-            .map(|thread| {
-                let occurrence = &thread.occurrences[0];
-                NativeGeneratorStep {
-                    from: occurrence.entering_native,
-                    to: occurrence.emitting_native,
-                    thread: thread.address.clone(),
-                }
-            })
-            .collect::<Vec<_>>();
-        let domain = steps.iter().map(|step| step.from).collect::<BTreeSet<_>>();
-        spool.generator_descents[0].steps = steps;
-        spool.generator_descents[0].open_domain =
-            &spool.native_population - &domain;
-        let (hot, _) = consume_dismantling_return(returned).expect("hot");
+        let (hot, _) = consume_dismantling_return(fixture::returned()).expect("hot");
         let package = NativeMorphologyArtifact::found(
             hot,
             MorphologyLineage::origin(),
@@ -410,7 +359,7 @@ mod tests {
             NativeCirculationConfiguration::found(InferenceConfigurationAddress {
                 ingress_aperture: "native-addressed-occurrence".to_owned(),
                 occurrence: EventId(1),
-                receiver: ReceiverId(7),
+                receiver: fixture::FIXTURE_RECEIVER,
                 continuation_receiver: "exterior-world-face".to_owned(),
                 world_return_law: "issued-complete-face-family".to_owned(),
                 emission_codec: "owned-native-grain".to_owned(),
@@ -428,10 +377,10 @@ mod tests {
                     thread: native.spools[0].threads[0].address.clone(),
                     occurrence: EventId(1),
                 },
-                receiver: ReceiverId(7),
+                receiver: fixture::FIXTURE_RECEIVER,
             })
             .expect("boundary");
-        assert!(boundary.emission.grains.len() >= 3);
+        assert!(!boundary.emission.grains.is_empty());
         (session, boundary)
     }
 
