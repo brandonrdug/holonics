@@ -16,12 +16,37 @@ mechanisms retain their scoped grades.
 
 ## Current frontier
 
-**Current frontier:** COMPLETE
+**Current frontier:** SKE1
 
-[definition] The active contract is
+[definition] Brandon's direct request of 2026-09-03 activates the fixed `SKE0--SKE5` Soulkiller
+campaign under
+[`blueprint/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md`](blueprint/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md).
+Soulkiller is founded by excitation: the resident exact realization returned by HNA1 is the
+manifestation grade and the apparatus, not the return. The return is the quotient of a declared
+family of occurrences by equality of complete causal signatures, each class condensed to the
+local-current ecology restricted to the cone the family made load-bearing, sealed with the
+insufficiency. The adjoint return through every reaction (`SKE1`) is one instrument for
+cultivation and dissection. `SKE1` is current: the adjoint return through every reaction. The
+audit is
+[`research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md).
+
+[proved-derived; formal-checked] SKE0 returned `HolonicExcitationFoundedQuotient.lean`: the
+signature, the all-history quotient as a `CompleteReceiverHistoryQuotient` with its theorems
+inherited, the declared family and its exact `Compression`, cones by withdrawal with every
+load-bearing site in every cone, extent and insufficiency with the insufficiency law, the
+`ExcitationFoundedReturn` whose productive lane is a `FaithfulLocalSectionLift`, and the
+equal-magnitude/different-cone control. The live umbrella built 3,775 jobs without `sorry` or a
+new axiom. The receipt is
+[`research/records/2026-09-03_SKE0_THE_EXCITATION_FOUNDED_QUOTIENT_RETURNED_SIGNATURE_IDENTITY_INTERVENTION_CONES_AND_THE_FAITHFUL_PRODUCTIVE_LANE.md`](research/records/2026-09-03_SKE0_THE_EXCITATION_FOUNDED_QUOTIENT_RETURNED_SIGNATURE_IDENTITY_INTERVENTION_CONES_AND_THE_FAITHFUL_PRODUCTIVE_LANE.md).
+
+[counterexample; source-inspected] The HNA1 receipt's phrase "one actual Soulkiller return" is
+withdrawn: the graph port excites nothing, carries no insufficiency, and never crosses the
+Soulkiller boundary. Its residency, exactness, and recurrence claims stand.
+
+[definition] The completed HNA contract is
 [`blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
-[established-bounded] The corrected HNA0--HNA5 campaign is complete. No later HNA phase or next
-roadmap deed is admitted. The bounded release is the complete native operator/recurrent ecology,
+[established-bounded] The corrected HNA0--HNA5 campaign is complete at its bounded scopes. No
+later HNA phase is admitted; the SKE campaign above is the current construction. The bounded release is the complete native operator/recurrent ecology,
 its operation-owned local-alignment morphology law, its codec-only autoregressive application, and
 the exact application faces recorded below; it is not a qualitative answer capability.
 

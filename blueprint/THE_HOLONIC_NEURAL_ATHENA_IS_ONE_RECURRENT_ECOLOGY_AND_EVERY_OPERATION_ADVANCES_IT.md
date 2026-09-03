@@ -283,6 +283,10 @@ returned all 256 resident exact scores equal to the independent serial exact cha
 recorded in
 [`2026-09-02_HNA1_THE_COMPLETE_TEXT_OPERATOR_BECAME_ONE_RESIDENT_NATIVE_ECOLOGY.md`](../research/records/2026-09-02_HNA1_THE_COMPLETE_TEXT_OPERATOR_BECAME_ONE_RESIDENT_NATIVE_ECOLOGY.md).
 
+[counterexample; source-inspected] The HNA1 return is the manifestation grade, not a Soulkiller
+return: it excites nothing and carries no insufficiency. It is the apparatus the Soulkiller
+campaign excites (`SKE0--SKE5`); its residency, exactness, and recurrence claims stand.
+
 ### HNA2 -- one native operation advances one ecology
 
 [definition] Implement a move-owned `NativeOperationStep` which consumes the current ecology and one

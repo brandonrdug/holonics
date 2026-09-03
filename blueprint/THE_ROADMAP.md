@@ -45,7 +45,11 @@ Read, in order:
     [`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md),
     together with its bounded formal prerequisite receipt,
     [`2026-09-02_THE_CAUSAL_TAIL_FORMAL_PREREQUISITE_RETURNED_BEFORE_THE_ENGINE_HNA_CAMPAIGN.md`](../research/records/2026-09-02_THE_CAUSAL_TAIL_FORMAL_PREREQUISITE_RETURNED_BEFORE_THE_ENGINE_HNA_CAMPAIGN.md).
-16. the corrected modality-neutral application-boundary dependency audit,
+16. the current Soulkiller excitation contract,
+    [`THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md`](THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md),
+    together with the audit that founds it,
+    [`2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](../research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md).
+17. the corrected modality-neutral application-boundary dependency audit,
     [`THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md`](THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md),
     together with the superseded WRD contract, the orientation and retraction tiers in
     [`../AGENTS.md`](../AGENTS.md), the
@@ -59,7 +63,11 @@ are provenance, not pickup obligations.
 
 ## Current position
 
-**Current frontier:** COMPLETE
+**Current frontier:** SKE1
+
+[definition] Brandon's direct request of 2026-09-03 activates the fixed `SKE0--SKE5` Soulkiller
+campaign, ordered below. It follows the completed HNA campaign and consumes its resident exact
+realization as apparatus.
 
 [definition] Brandon's direct instruction of 2026-09-02 activates `HTP0--HTP6` under
 [`THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md`](THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md).
@@ -165,7 +173,39 @@ bounded basin transport, harmonic exclusion, and a lower-or-upper characteristic
 dichotomy. Coefficient-specific branch selection and a certified decimal are parked research and
 schedule nothing.
 
-## Active ordered campaign -- Holonic Neural Athena recurrent ecology
+## Active ordered campaign -- Soulkiller excitation and the receiver-family quotient
+
+[definition] Brandon's direct request of 2026-09-03 activates the engine and formal `SKE0--SKE5`
+campaign under
+[`THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md`](THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md).
+The order is fixed:
+
+1. `SKE0` -- the excitation-founded quotient, formally -- **PASSED**;
+2. `SKE1` -- the adjoint return through every reaction (the cone instrument; completes HNA4) --
+   **CURRENT**;
+3. `SKE2` -- excitation and the cone by intervention;
+4. `SKE3` -- identification: the signature quotient of a declared family;
+5. `SKE4` -- condensation and seal through `soulkiller::dismantle`; and
+6. `SKE5` -- Eros composes the classes and the recurrence runs on them.
+
+[definition] Soulkiller is founded by excitation. The resident exact realization is the
+manifestation grade and the apparatus; the return is the signature quotient of a declared family,
+each class a cone-restricted local-current ecology with its insufficiency. A magnitude threshold, a
+per-event table, or the realization itself as the productive lane is a falsifier.
+
+[proved-derived; formal-checked] SKE0 returned the excitation-founded quotient owner: signature,
+all-history quotient with inherited signature theorems, declared family and its exact compression,
+intervention cones with the load-bearing law, extent and insufficiency with the insufficiency law,
+the faithful productive lane, and the equal-magnitude/different-cone control; the live umbrella
+built 3,775 jobs. Its receipt is
+[`the SKE0 return`](../research/records/2026-09-03_SKE0_THE_EXCITATION_FOUNDED_QUOTIENT_RETURNED_SIGNATURE_IDENTITY_INTERVENTION_CONES_AND_THE_FAITHFUL_PRODUCTIVE_LANE.md).
+
+[counterexample; source-inspected] The audit
+[`2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](../research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md)
+found no lineage that is a Soulkiller return and no formal owner founding structure from
+excitation; the HNA1 phrase "one actual Soulkiller return" is withdrawn.
+
+## Completed ordered campaign -- Holonic Neural Athena recurrent ecology
 
 [definition] Brandon's latest correction activates the engine `HNA0--HNA5` campaign under
 [`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
@@ -250,8 +290,8 @@ qualitative answer claim. The codec-only application source did not inspect inte
 or import a retracted return path, and the coherent release receiver passed. The receipt is
 [`the HNA5 bounded release`](../research/records/2026-09-02_HNA5_ONE_NATIVE_RECURRENCE_CROSSED_THREE_APPLICATIONS_AND_RELEASED_WITHOUT_A_QUALITATIVE_CLAIM.md).
 
-[established-bounded] **The corrected HNA0--HNA5 campaign is complete.** No later HNA phase or next
-roadmap deed is admitted.
+[established-bounded] **The corrected HNA0--HNA5 campaign is complete at its bounded scopes.** No
+later HNA phase is admitted; the SKE campaign is the current construction.
 
 [counterexample; source-inspected] The old HNA records preserve the rejected implementation: byte
 differences named current, repeated observation IDs, uniform process-status faces, counted

@@ -161,6 +161,12 @@ retraction is a contamination. Dates are record dates under `research/records/`.
   so far at the tied cross-section only
   (`2026-09-02_THE_HNA4_MORPHOLOGY_FACTOR_IS_OCCURRENCE_CARRIED_AND_THE_FORMAL_OWNERS_REQUIRE_A_CAUSAL_CONE_ADJOINT_RETURN.md`,
   `2026-09-02_HNA4_THE_RETURN_DEPOSITED_A_FACTORIZED_OVERLAY_ON_THE_TIED_CROSS_SECTION_AND_THE_NEXT_CYCLE_APPLIED_IT.md`).
+- 2026-09-02: the HNA1 "Soulkiller return" is a manifestation: the resident exact foreign
+  operator with its names removed, exciting nothing, carrying no insufficiency, never crossing
+  the Soulkiller boundary. Soulkiller is founded by excitation and returns the signature
+  quotient of a declared family as cone-restricted ecologies; the resident realization is its
+  apparatus
+  (`2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`).
 
 [established-bounded; source-inspected] Standing at declared scope, for contrast: four exact
 interior recoveries (`2026-08-10_THE_OBJECT_IS_THE_UNRECONSTRUCTABLE_INTERIOR_AND_THE_MACHINE_HAS_ALREADY_RECOVERED_FOUR.md`);
