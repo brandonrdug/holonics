@@ -854,6 +854,80 @@ fn the_gelu_derivative_encloses_one_half_at_zero_and_a_finer_grain_nests() {
     }
 }
 
+#[test]
+fn the_rms_adjoint_encloses_the_exact_derivative_and_a_finer_grain_nests() {
+    let Some((_, surface)) = surface() else {
+        return;
+    };
+    let eps = Dyadic {
+        significand: 1,
+        exponent: -30,
+    };
+    // x = (3, 4), dy = (1, 0), no gain, n = 2:  rad = 25/2 + eps,  r = rad^{-1/2},
+    //   dx_0 = r (1 − 9/2 / rad) = r · (rad − 9/2) / rad,   dx_1 = −6 r / rad.
+    let radicand = rat(25, 2) + eps.value();
+    let c0 = (&radicand - rat(9, 2)) / &radicand;
+    let m1 = rat(6, 1) / &radicand;
+    let mut runs = Vec::new();
+    for grain in [ResidentGrain(24), ResidentGrain(40)] {
+        let unit = 1i64 << grain.0;
+        let x = surface
+            .mount_section_rest(&ResidentSectionRest {
+                rows: 1,
+                width: 2,
+                grain,
+                bound_octaves: grain.0 + 3,
+                intervals: vec![(3 * unit, 3 * unit), (4 * unit, 4 * unit)],
+            })
+            .expect("x");
+        let dy = surface
+            .mount_section_rest(&ResidentSectionRest {
+                rows: 1,
+                width: 2,
+                grain,
+                bound_octaves: grain.0 + 1,
+                intervals: vec![(unit, unit), (0, 0)],
+            })
+            .expect("dy");
+        let shape = surface
+            .shape_rms_rebase_adjoint(1, 2, 2, grain.0 + 3, grain.0 + 1, None)
+            .expect("shape");
+        let dx = surface.fresh_section(1, 2, grain).expect("dx");
+        let mut builder = surface.begin_passage(&[vec![]]).expect("begin");
+        let lane = builder.open(0, &[]).expect("open");
+        surface
+            .record_rms_rebase_adjoint(&lane, &x, &dy, 2, None, eps, &shape, &dx)
+            .expect("record");
+        builder.close(0, &dx, shape.needed).expect("close");
+        let reading = builder.finish().expect("finish").launch().expect("launch");
+        assert!(reading.obstruction.is_empty(), "{:?}", reading.slots);
+        let out = surface.read_out(&dx).expect("read");
+        let zero = Rat::from_integer(BigInt::from(0));
+        // dx_0 = r · c0 > 0:  lo ≤ r c0  ⟺  lo² · rad ≤ c0²  (lo ≥ 0), and hi² · rad ≥ c0².
+        let (lo, hi) = (word_value(out[0].0, grain), word_value(out[0].1, grain));
+        assert!(lo >= zero, "dx_0 lower endpoint negative: {:?}", out[0]);
+        assert!(&lo * &lo * &radicand <= &c0 * &c0, "dx_0 lower bound above the value");
+        assert!(&hi * &hi * &radicand >= &c0 * &c0, "dx_0 upper bound below the value");
+        // dx_1 = −m1 r < 0:  (−lo)² · rad ≥ m1², and if hi ≤ 0 then (−hi)² · rad ≤ m1².
+        let (lo, hi) = (word_value(out[1].0, grain), word_value(out[1].1, grain));
+        let neg_lo = -lo;
+        assert!(neg_lo >= zero, "dx_1 lower endpoint positive: {:?}", out[1]);
+        assert!(&neg_lo * &neg_lo * &radicand >= &m1 * &m1, "dx_1 lower bound above the value");
+        if hi <= zero {
+            let neg_hi = -hi;
+            assert!(&neg_hi * &neg_hi * &radicand <= &m1 * &m1, "dx_1 upper bound below the value");
+        }
+        runs.push(
+            out.into_iter()
+                .map(|(l, h)| (word_value(l, grain), word_value(h, grain)))
+                .collect::<Vec<_>>(),
+        );
+    }
+    for ((cl, ch), (fl, fh)) in runs[0].iter().zip(&runs[1]) {
+        assert!(cl <= fl && fh <= ch, "finer grain must nest");
+    }
+}
+
 fn candidate(
     tile: TileGeometry,
     registers: u32,

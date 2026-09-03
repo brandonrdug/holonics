@@ -467,6 +467,62 @@ impl<'chart> ResidentSurface<'chart> {
         )
     }
 
+    /// The adjoint of the RMS rebase over the presented carrier and the returning differential.
+    #[allow(clippy::too_many_arguments)]
+    pub fn record_rms_rebase_adjoint(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        presented: &ResidentSection<'chart>,
+        differential: &ResidentSection<'chart>,
+        group: usize,
+        gain: Option<&MountedReadout<'chart>>,
+        eps: Dyadic,
+        shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        if presented.rows != differential.rows
+            || presented.width != differential.width
+            || out.rows() != presented.rows
+            || out.width() != presented.width
+        {
+            return Err(ResidentRefusal::RowsDisagree {
+                operation: "rms-rebase-adjoint",
+                left: presented.rows * presented.width,
+                right: differential.rows * differential.width,
+            });
+        }
+        let mut params = Params::new();
+        params
+            .ptr(presented.lo.device_ptr())
+            .ptr(presented.hi.device_ptr())
+            .ptr(differential.lo.device_ptr())
+            .ptr(differential.hi.device_ptr())
+            .u32(presented.rows as u32)
+            .u32(presented.width as u32)
+            .u32(group as u32)
+            .ptr(gain.map(MountedReadout::raw_resident).unwrap_or(0))
+            .i32(gain.map(MountedReadout::exponent).unwrap_or(0))
+            .i64(eps.significand)
+            .i32(eps.exponent)
+            .i32(out.grain.0 as i32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        let blocks = presented.rows * (presented.width / group);
+        self.record_blocks(
+            lane,
+            "section_rms_rebase_adjoint",
+            blocks,
+            shape.block,
+            shape.shared_octets,
+            &mut params,
+            "rms-rebase-adjoint",
+        )
+    }
+
     /// The transposed midpoint seal: `out[o, t] = −mid(input[t, o]) · 2^-shift` as a point.
     pub fn record_transpose_seal(
         &self,

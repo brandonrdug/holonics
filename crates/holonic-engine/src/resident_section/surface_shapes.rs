@@ -280,6 +280,47 @@ impl<'chart> ResidentSurface<'chart> {
         self.flat_shape(OPERATION, rows, out_width, input_octaves.max(1), work, Vec::new())
     }
 
+    /// The adjoint of the RMS rebase: the forward's admission with the differential beside the
+    /// presented carrier, and a second named barrier (the sum `Σ g x dy`) in the same block.
+    pub fn shape_rms_rebase_adjoint(
+        &self,
+        rows: usize,
+        width: usize,
+        group: usize,
+        presented_octaves: u32,
+        differential_octaves: u32,
+        gain: Option<&MountedReadout<'chart>>,
+    ) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "rms-rebase-adjoint";
+        let base = self.shape_rms_rebase(
+            rows,
+            width,
+            group,
+            presented_octaves.max(differential_octaves),
+            gain,
+        )?;
+        let gain_octaves = gain.map(MountedReadout::entry_octaves).unwrap_or(0);
+        let sums = presented_octaves + differential_octaves + gain_octaves + ceil_log2(group) + 2;
+        let needed = base.needed.max(sums.min(Self::carrier_octaves()));
+        Self::admit_octaves(OPERATION, needed)?;
+        let count = (rows * width) as u64;
+        let mut work = base.predicted;
+        work.multiplied(count * 14);
+        work.added(count * 6);
+        work.divided(count * 2);
+        Ok(LawShape {
+            operation: OPERATION,
+            rows,
+            width,
+            needed,
+            predicted: work,
+            couplings: base.couplings,
+            launches: base.launches,
+            shared_octets: base.shared_octets,
+            block: base.block,
+        })
+    }
+
     /// The transposed midpoint seal of a returning differential into a deposit factor: one read
     /// pair and one write per coordinate, the bound the input's.
     pub fn shape_transpose_seal(

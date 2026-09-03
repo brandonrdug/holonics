@@ -1805,6 +1805,192 @@ extern "C" __global__ void section_place_columns(
     }
 }
 
+// The product of two enclosures placed at `2^-k`, each corner through the 256-bit product with
+// directed rounding: the enclosure product where `corners` would leave the wide carrier.
+__device__ __forceinline__ void interval_product_shift(
+    wide al, wide ah, wide bl, wide bh, int k, wide *lo, wide *hi, uint32_t *refused
+) {
+    wide c1 = product_shift(al, bl, k, 0, refused), c2 = product_shift(al, bh, k, 0, refused);
+    wide c3 = product_shift(ah, bl, k, 0, refused), c4 = product_shift(ah, bh, k, 0, refused);
+    wide l = c1; if (c2 < l) l = c2; if (c3 < l) l = c3; if (c4 < l) l = c4;
+    wide d1 = product_shift(al, bl, k, 1, refused), d2 = product_shift(al, bh, k, 1, refused);
+    wide d3 = product_shift(ah, bl, k, 1, refused), d4 = product_shift(ah, bh, k, 1, refused);
+    wide h = d1; if (d2 > h) h = d2; if (d3 > h) h = d3; if (d4 > h) h = d4;
+    *lo = l; *hi = h;
+}
+
+// The adjoint of the RMS rebase.  With `r = (mean(x²) + eps)^{-1/2}` over the group of `n`,
+//
+//   dx_j = r · g_j · dy_j  −  (r³ / n) · x_j · Σ_i g_i x_i dy_i.
+//
+// One block per `(row, group)`, as the forward.  The root is re-derived exactly as the forward
+// derives it (its own shift and grain from the group's census); the sum `Σ g x dy` is a second
+// named barrier realized as a block reduction; `r²` and `r³` are placed at the root's grain; every
+// product is directed and every enclosure is placed back at the section's grain.
+extern "C" __global__ void section_rms_rebase_adjoint(
+    const int64_t *lo, const int64_t *hi, const int64_t *d_lo, const int64_t *d_hi,
+    uint32_t rows, uint32_t width, uint32_t group,
+    const int64_t *gain, int32_t gain_e, int64_t eps_m, int32_t eps_e, int32_t grain,
+    int64_t *out_lo, int64_t *out_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    extern __shared__ unsigned char shared_raw[];
+    wide *sum_lo = (wide *)shared_raw;
+    wide *sum_hi = sum_lo + blockDim.x;
+    uint32_t *oct = (uint32_t *)(sum_hi + blockDim.x);
+    __shared__ wide r_lo, r_hi, c_lo, c_hi, r3_lo, r3_hi;
+    __shared__ int32_t square_shift_s, rg_s, sum_shift_s;
+
+    uint32_t groups_per_row = width / group;
+    uint32_t row = blockIdx.x / groups_per_row;
+    uint32_t which = blockIdx.x % groups_per_row;
+    if (row >= rows) return;
+    if (threadIdx.x == 0 && upstream_refused(census, lineage, lineage_count, refused)) { square_shift_s = -1; }
+    else if (threadIdx.x == 0) { square_shift_s = 0; }
+    __syncthreads();
+    if (square_shift_s < 0) return;
+    size_t base = (size_t)row * (size_t)width + (size_t)which * (size_t)group;
+
+    // (a) the widest octave over the presented carrier, the differential, and the gain.
+    uint32_t widest = 0, widest_gain = 0;
+    for (uint32_t i = threadIdx.x; i < group; i += blockDim.x) {
+        uwide ma = magnitude((wide)lo[base + i]), mb = magnitude((wide)hi[base + i]);
+        uwide mc = magnitude((wide)d_lo[base + i]), md = magnitude((wide)d_hi[base + i]);
+        uint32_t o = octaves_of(ma > mb ? ma : mb);
+        uint32_t od = octaves_of(mc > md ? mc : md);
+        if (o > widest) widest = o;
+        if (od > widest) widest = od;
+        if (gain != NULL) {
+            uint32_t og = octaves_of(magnitude((wide)gain[i]));
+            if (og > widest_gain) widest_gain = og;
+        }
+    }
+    oct[threadIdx.x] = (widest << 8) | (widest_gain & 0xffu);
+    __syncthreads();
+    for (uint32_t stride = blockDim.x / 2; stride > 0; stride >>= 1) {
+        if (threadIdx.x < stride) {
+            uint32_t a = oct[threadIdx.x], b = oct[threadIdx.x + stride];
+            uint32_t w = (a >> 8) > (b >> 8) ? (a >> 8) : (b >> 8);
+            uint32_t g = (a & 0xffu) > (b & 0xffu) ? (a & 0xffu) : (b & 0xffu);
+            oct[threadIdx.x] = (w << 8) | g;
+        }
+        __syncthreads();
+    }
+    if (threadIdx.x == 0) {
+        uint32_t o = oct[0] >> 8, og = oct[0] & 0xffu;
+        uint32_t lg = 0; while ((1u << lg) < group) ++lg;
+        uint32_t squares = 2 * o + lg + 1;
+        int32_t s = squares > 126u ? (int32_t)((squares - 126u + 1u) / 2u) : 0;
+        // the sum Σ g x dy needs the gain's octaves beside two carrier octaves
+        uint32_t sums = 2 * o + og + lg + 2;
+        int32_t s2 = sums > 126u ? (int32_t)((sums - 126u + 1u) / 2u) : 0;
+        if (s >= grain || s2 >= grain) { atomicOr(refused, REFUSED_CARRIER); s = -1; }
+        square_shift_s = s;
+        sum_shift_s = s2;
+        int32_t f_prime = grain - (s < 0 ? 0 : s);
+        int32_t rg = 126 - f_prime; if (rg > 60) rg = 60; if (rg < 0) rg = 0;
+        rg_s = rg;
+    }
+    __syncthreads();
+    int32_t square_shift = square_shift_s;
+    if (square_shift < 0) return;
+    int32_t rg = rg_s;
+    int32_t sum_shift = sum_shift_s;
+    int f_prime = grain - square_shift;
+
+    // (b) the root, exactly as the forward derives it.
+    wide part_lo = 0, part_hi = 0;
+    for (uint32_t i = threadIdx.x; i < group; i += blockDim.x) {
+        wide a = lo[base + i], b = hi[base + i];
+        uwide least, greatest;
+        if (a <= 0 && b >= 0) { least = 0; greatest = magnitude(a) > magnitude(b) ? magnitude(a) : magnitude(b); }
+        else if (a > 0) { least = (uwide)a; greatest = (uwide)b; }
+        else { least = magnitude(b); greatest = magnitude(a); }
+        uwide ls = least >> square_shift;
+        uwide gs = (greatest + (((uwide)1 << square_shift) - 1)) >> square_shift;
+        part_lo += (wide)(ls * ls); part_hi += (wide)(gs * gs);
+    }
+    sum_lo[threadIdx.x] = part_lo; sum_hi[threadIdx.x] = part_hi;
+    __syncthreads();
+    for (uint32_t stride = blockDim.x / 2; stride > 0; stride >>= 1) {
+        if (threadIdx.x < stride) { sum_lo[threadIdx.x] += sum_lo[threadIdx.x + stride]; sum_hi[threadIdx.x] += sum_hi[threadIdx.x + stride]; }
+        __syncthreads();
+    }
+    if (threadIdx.x == 0) {
+        wide mean_lo = div_floor(sum_lo[0], (wide)group, refused);
+        wide mean_hi = div_ceil(sum_hi[0], (wide)group, refused);
+        wide eps_lo = shift_floor((wide)eps_m, eps_e + 2 * f_prime, refused);
+        wide eps_hi = shift_ceil((wide)eps_m, eps_e + 2 * f_prime, refused);
+        wide a_lo = mean_lo + eps_lo, a_hi = mean_hi + eps_hi;
+        if (a_lo <= 0) { atomicOr(refused, REFUSED_MALFORMED); a_lo = 1; if (a_hi < a_lo) a_hi = a_lo; }
+        wide scale = (wide)1 << (f_prime + rg);
+        r_lo = div_floor(scale, isqrt_ceil(a_hi), refused);
+        r_hi = div_ceil(scale, isqrt_floor(a_lo), refused);
+        // r² and r³ at the root's own grain, directed; r ≥ 0 so the endpoints are monotone.
+        wide r2_lo = product_shift(r_lo, r_lo, rg, 0, refused), r2_hi = product_shift(r_hi, r_hi, rg, 1, refused);
+        r3_lo = product_shift(r2_lo, r_lo, rg, 0, refused);
+        r3_hi = product_shift(r2_hi, r_hi, rg, 1, refused);
+    }
+    __syncthreads();
+
+    // (c) the second barrier: S = Σ_i g_i x_i dy_i at 2^-(2 f'' − gain_e), f'' = F − sum_shift.
+    part_lo = 0; part_hi = 0;
+    for (uint32_t i = threadIdx.x; i < group; i += blockDim.x) {
+        wide xl = shift_floor(lo[base + i], -sum_shift, refused), xh = shift_ceil(hi[base + i], -sum_shift, refused);
+        wide dl = shift_floor(d_lo[base + i], -sum_shift, refused), dh = shift_ceil(d_hi[base + i], -sum_shift, refused);
+        wide gl = xl, gh = xh;
+        if (gain != NULL) {
+            wide g = gain[i];
+            if (g >= 0) { gl = product_checked(xl, g, refused); gh = product_checked(xh, g, refused); }
+            else { gl = product_checked(xh, g, refused); gh = product_checked(xl, g, refused); }
+        }
+        wide pl, ph;
+        corners(gl, gh, dl, dh, &pl, &ph, refused);
+        part_lo += pl; part_hi += ph;
+    }
+    sum_lo[threadIdx.x] = part_lo; sum_hi[threadIdx.x] = part_hi;
+    __syncthreads();
+    for (uint32_t stride = blockDim.x / 2; stride > 0; stride >>= 1) {
+        if (threadIdx.x < stride) { sum_lo[threadIdx.x] += sum_lo[threadIdx.x + stride]; sum_hi[threadIdx.x] += sum_hi[threadIdx.x + stride]; }
+        __syncthreads();
+    }
+    if (threadIdx.x == 0) {
+        c_lo = div_floor(sum_lo[0], (wide)group, refused);
+        c_hi = div_ceil(sum_hi[0], (wide)group, refused);
+    }
+    __syncthreads();
+    wide rl = r_lo, rh = r_hi, r3l = r3_lo, r3h = r3_hi, cl = c_lo, ch = c_hi;
+    int f2 = grain - sum_shift;
+
+    // (d) per coordinate: A = r · g_j · dy_j and B = r³ · x_j · c, both placed at 2^-F.
+    for (uint32_t i = threadIdx.x; i < group; i += blockDim.x) {
+        wide dl = d_lo[base + i], dh = d_hi[base + i];
+        wide xg_lo = dl, xg_hi = dh;
+        int shift = rg;
+        if (gain != NULL) {
+            wide g = gain[i];
+            if (g >= 0) { xg_lo = product_checked(dl, g, refused); xg_hi = product_checked(dh, g, refused); }
+            else { xg_lo = product_checked(dh, g, refused); xg_hi = product_checked(dl, g, refused); }
+            shift = rg - gain_e;
+        }
+        wide A_lo, A_hi;
+        if (xg_lo >= 0) { A_lo = product_shift(xg_lo, rl, shift, 0, refused); A_hi = product_shift(xg_hi, rh, shift, 1, refused); }
+        else if (xg_hi <= 0) { A_lo = product_shift(xg_lo, rh, shift, 0, refused); A_hi = product_shift(xg_hi, rl, shift, 1, refused); }
+        else { A_lo = product_shift(xg_lo, rh, shift, 0, refused); A_hi = product_shift(xg_hi, rh, shift, 1, refused); }
+        // t = x_j · c placed at 2^-F: x at 2^-F times c at 2^-(2 f2 − gain_e) shifted by 2 f2 − gain_e.
+        wide t_lo, t_hi;
+        interval_product_shift((wide)lo[base + i], (wide)hi[base + i], cl, ch, 2 * f2 - gain_e, &t_lo, &t_hi, refused);
+        // B = t · r³ placed at 2^-F: r³ at 2^-rg, r³ ≥ 0.
+        wide B_lo, B_hi;
+        if (t_lo >= 0) { B_lo = product_shift(t_lo, r3l, rg, 0, refused); B_hi = product_shift(t_hi, r3h, rg, 1, refused); }
+        else if (t_hi <= 0) { B_lo = product_shift(t_lo, r3h, rg, 0, refused); B_hi = product_shift(t_hi, r3l, rg, 1, refused); }
+        else { B_lo = product_shift(t_lo, r3h, rg, 0, refused); B_hi = product_shift(t_hi, r3h, rg, 1, refused); }
+        wide y_lo = A_lo - B_hi, y_hi = A_hi - B_lo;
+        if (y_lo > y_hi) atomicOr(refused, REFUSED_INVERTED);
+        out_lo[base + i] = to_word(y_lo, refused);
+        out_hi[base + i] = to_word(y_hi, refused);
+    }
+}
+
 // ---------------------------------------------------------------------------------------------
 // the arithmetic control: the helpers exposed for a serial-chart exact reference to refute
 // ---------------------------------------------------------------------------------------------
