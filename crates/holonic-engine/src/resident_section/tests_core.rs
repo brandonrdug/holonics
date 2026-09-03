@@ -928,6 +928,78 @@ fn the_rms_adjoint_encloses_the_exact_derivative_and_a_finer_grain_nests() {
     }
 }
 
+#[test]
+fn the_contact_adjoint_returns_exact_dyadics_when_the_weights_are_exact() {
+    let Some((_, surface)) = surface() else {
+        return;
+    };
+    // Two rows, one head of width two, complete reach.  Equal keys make row one's two scores
+    // equal, so its weights are exactly ½ each and every adjoint is an exact dyadic:
+    //   dw_10 = ⟨do_1, v_0⟩ = 2, dw_11 = 0, M_1 = 1, ds_10 = ½, ds_11 = −½,
+    //   dq_1 = ½ k_0 − ½ k_1 = 0, dk_0 = ½ q_1 = (½, 0), dk_1 = (−½, 0),
+    //   dv_0 = w_00 do_0 + w_10 do_1 = (½, 0), dv_1 = (½, 0); row zero returns nothing.
+    let grain = ResidentGrain(24);
+    let unit = 1i64 << grain.0;
+    let point = |values: &[i64]| -> Vec<(i64, i64)> {
+        values.iter().map(|value| (value * unit, value * unit)).collect()
+    };
+    let mount = |values: &[i64]| {
+        surface
+            .mount_section_rest(&ResidentSectionRest {
+                rows: 2,
+                width: 2,
+                grain,
+                bound_octaves: grain.0 + 2,
+                intervals: point(values),
+            })
+            .expect("mount")
+    };
+    let q = mount(&[0, 0, 1, 0]);
+    let k = mount(&[1, 1, 1, 1]);
+    let v = mount(&[2, 0, 0, 2]);
+    let d = mount(&[0, 0, 1, 0]);
+    let terms = SeriesAperture(14);
+    let shape = surface
+        .shape_contact_adjoint_queries(2, 1, 1, 2, 2, terms, grain, grain.0 + 2, grain.0 + 2, grain.0 + 2, grain.0 + 2)
+        .expect("shape");
+    let family = surface
+        .shape_contact_adjoint_family(2, 1, 1, 2, 2, grain, grain.0 + 2, grain.0 + 2)
+        .expect("shape");
+    let dq = surface.fresh_section(2, 2, grain).expect("dq");
+    let dk = surface.fresh_section(2, 2, grain).expect("dk");
+    let dv = surface.fresh_section(2, 2, grain).expect("dv");
+    let weights = surface.fresh_section(2, 2, grain).expect("w");
+    let differentials = surface.fresh_section(2, 2, grain).expect("ds");
+    let mut builder = surface.begin_passage(&[vec![], vec![0], vec![0]]).expect("begin");
+    let lane = builder.open(0, &[]).expect("open");
+    surface
+        .record_contact_adjoint_queries(&lane, &q, &k, &v, &d, 1, 1, 2, 2, terms, &shape, &dq, &weights, &differentials)
+        .expect("queries");
+    builder.close(0, &dq, shape.needed).expect("close");
+    let lane = builder.open(1, &[0]).expect("open");
+    surface
+        .record_contact_adjoint_family(&lane, &q, &differentials, 1, 1, 2, 2, false, &dk)
+        .expect("keys");
+    builder.close(1, &dk, family.needed).expect("close");
+    let lane = builder.open(2, &[0]).expect("open");
+    surface
+        .record_contact_adjoint_family(&lane, &d, &weights, 1, 1, 2, 2, true, &dv)
+        .expect("values");
+    builder.close(2, &dv, family.needed).expect("close");
+    let reading = builder.finish().expect("finish").launch().expect("launch");
+    assert!(reading.obstruction.is_empty(), "{:?}", reading.slots);
+    let half = unit / 2;
+    let contains = |enclosure: (i64, i64), value: i64| enclosure.0 <= value && value <= enclosure.1 && enclosure.1 - enclosure.0 <= 8;
+    let dq = surface.read_out(&dq).expect("dq");
+    assert!(dq.iter().all(|enclosure| contains(*enclosure, 0)), "{dq:?}");
+    let dk = surface.read_out(&dk).expect("dk");
+    assert!(contains(dk[0], half) && contains(dk[1], 0), "{dk:?}");
+    assert!(contains(dk[2], -half) && contains(dk[3], 0), "{dk:?}");
+    let dv = surface.read_out(&dv).expect("dv");
+    assert!(contains(dv[0], half) && contains(dv[1], 0), "{dv:?}");
+    assert!(contains(dv[2], half) && contains(dv[3], 0), "{dv:?}");
+}
+
 fn candidate(
     tile: TileGeometry,
     registers: u32,

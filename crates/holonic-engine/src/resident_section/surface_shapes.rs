@@ -321,6 +321,109 @@ impl<'chart> ResidentSurface<'chart> {
         })
     }
 
+    /// The adjoint of the contact at the queries: the contact's own admission with the returning
+    /// differential beside the values, one block per `(row, head)`, and shared storage for the
+    /// two reductions plus the reach's weights and differentials.
+    #[allow(clippy::too_many_arguments)]
+    pub fn shape_contact_adjoint_queries(
+        &self,
+        rows: usize,
+        heads: usize,
+        kv_heads: usize,
+        head_width: usize,
+        window: usize,
+        terms: SeriesAperture,
+        grain: ResidentGrain,
+        q_octaves: u32,
+        k_octaves: u32,
+        v_octaves: u32,
+        differential_octaves: u32,
+    ) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "contact-adjoint-queries";
+        let reach = rows.min(window.max(1));
+        let reach_sum: u64 = (0..rows).map(|at| (at + 1).min(window.max(1)) as u64).sum();
+        let base = self.shape_contact_with_declared_reach(
+            rows,
+            heads * head_width,
+            kv_heads * head_width,
+            kv_heads * head_width,
+            heads,
+            kv_heads,
+            head_width,
+            reach,
+            reach_sum,
+            terms,
+            grain,
+            q_octaves,
+            k_octaves,
+            v_octaves.max(differential_octaves),
+        )?;
+        let f = grain.0;
+        let needed = base
+            .needed
+            .max(differential_octaves + v_octaves + ceil_log2(head_width) + 1)
+            .max(f + differential_octaves + v_octaves + ceil_log2(head_width) + ceil_log2(reach) + 2)
+            .min(Self::carrier_octaves());
+        Self::admit_octaves(OPERATION, needed)?;
+        let shared = 2 * base.block * 16 + 4 * (reach as u32) * 16;
+        if shared > self.max_shared_octets {
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: format!(
+                    "a block of {} with a reach of {reach} needs {shared} shared octets; the device admits {}",
+                    base.block, self.max_shared_octets
+                ),
+            });
+        }
+        let mut work = base.predicted;
+        let carried = reach_sum * heads as u64 * head_width as u64;
+        work.multiplied(8 * carried);
+        work.added(4 * carried);
+        Ok(LawShape {
+            operation: OPERATION,
+            rows,
+            width: heads * head_width,
+            needed,
+            predicted: work,
+            couplings: base.couplings,
+            launches: base.launches,
+            shared_octets: shared,
+            block: base.block,
+        })
+    }
+
+    /// The adjoint of the contact at the keys or values: one thread per output coordinate over
+    /// the rows and heads that reach it.
+    #[allow(clippy::too_many_arguments)]
+    pub fn shape_contact_adjoint_family(
+        &self,
+        rows: usize,
+        heads: usize,
+        kv_heads: usize,
+        head_width: usize,
+        window: usize,
+        grain: ResidentGrain,
+        left_octaves: u32,
+        right_octaves: u32,
+    ) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "contact-adjoint-family";
+        let reach = rows.min(window.max(1));
+        let group = heads / kv_heads.max(1);
+        let needed = (left_octaves + right_octaves + ceil_log2(reach * group.max(1)) + 2)
+            .min(Self::carrier_octaves())
+            .max(grain.0 + 2);
+        Self::admit_octaves(OPERATION, needed)?;
+        let count = (rows * kv_heads * head_width) as u64;
+        let mut work = ExactWork::nothing();
+        work.multiplied(4 * count * reach as u64 * group as u64);
+        work.added(2 * count * reach as u64 * group as u64);
+        work.entries_written = BigUint::from(2 * count);
+        work.resident(2 * count);
+        work.peak_bits = BigUint::from(u64::from(needed));
+        work.cumulative_bits = BigUint::from(2 * count * u64::from(grain.0 + 1));
+        self.flat_shape(OPERATION, rows, kv_heads * head_width, needed, work, Vec::new())
+    }
+
     /// The transposed midpoint seal of a returning differential into a deposit factor: one read
     /// pair and one write per coordinate, the bound the input's.
     pub fn shape_transpose_seal(

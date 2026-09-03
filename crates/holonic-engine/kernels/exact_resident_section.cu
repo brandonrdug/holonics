@@ -1992,6 +1992,242 @@ extern "C" __global__ void section_rms_rebase_adjoint(
 }
 
 // ---------------------------------------------------------------------------------------------
+// the adjoint of the contact: the returning differential of the carried construction meets the
+// same null, partition, and certified ratio family, and returns to the queries, keys, and values
+// ---------------------------------------------------------------------------------------------
+//
+// With `w_tj = exp(s_tj − null_t) / Z_t` the founded weights and `o_t = Σ_j w_tj v_j`,
+//
+//   dw_tj = ⟨do_t, v_j⟩,   M_t = Σ_j w_tj dw_tj,   ds_tj = w_tj (dw_tj − M_t),
+//   dq_t = Σ_j ds_tj k_j,  dk_j = Σ_t ds_tj q_t,   dv_j = Σ_t w_tj do_t.
+//
+// The queries kernel re-founds the weights exactly as the contact does (one block per `(t, h)`,
+// the same bracket shift, null, partition, and ratio), writes `w_tj` and `ds_tj` at the grain
+// into two resident scratch sections indexed `(t·heads + h)·reach_max + (j − start_t)`, and
+// returns `dq_t`. The key and value kernels read those weights and return `dk_j` and `dv_j`
+// with one thread per output coordinate: no atomic ever joins two occurrences.
+extern "C" __global__ void section_contact_adjoint_queries(
+    const int64_t *q_lo, const int64_t *q_hi, const int64_t *k_lo, const int64_t *k_hi,
+    const int64_t *v_lo, const int64_t *v_hi, const int64_t *do_lo, const int64_t *do_hi,
+    uint32_t rows, uint32_t heads, uint32_t kv_heads, uint32_t head_width, uint32_t window, uint32_t reach_max,
+    int32_t grain, uint32_t terms,
+    int64_t *dq_lo, int64_t *dq_hi, int64_t *w_lo, int64_t *w_hi, int64_t *ds_lo, int64_t *ds_hi,
+    uint32_t *refused, uint32_t *reach_census, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    extern __shared__ unsigned char shared_raw[];
+    wide *scratch_lo = (wide *)shared_raw;
+    wide *scratch_hi = scratch_lo + blockDim.x;
+    wide *wl = scratch_hi + blockDim.x;
+    wide *wh = wl + reach_max;
+    wide *dsl = wh + reach_max;
+    wide *dsh = dsl + reach_max;
+    __shared__ int stopped;
+    __shared__ wide null_value, total_lo, total_hi, m_lo, m_hi;
+    __shared__ uint32_t oct_s[1024];
+    __shared__ int bracket_shift;
+    uint32_t t = blockIdx.x / heads;
+    uint32_t h = blockIdx.x % heads;
+    if (t >= rows) return;
+    if (threadIdx.x == 0) stopped = upstream_refused(census, lineage, lineage_count, refused);
+    __syncthreads();
+    if (stopped) return;
+    uint32_t group = heads / kv_heads;
+    uint32_t g = h / group;
+    uint32_t start = (t + 1 > window) ? (t + 1 - window) : 0;
+    uint32_t reach = t - start + 1;
+    if (reach > reach_max) { if (threadIdx.x == 0) atomicOr(refused, REFUSED_MALFORMED); return; }
+    wide unit = (wide)1 << grain;
+    size_t q_base = ((size_t)t * heads + h) * head_width;
+    size_t do_base = q_base;
+    // (a0) the bracket shift, as the contact derives it.
+    {
+        uint32_t widest = 0;
+        for (uint32_t d = threadIdx.x; d < head_width; d += blockDim.x) {
+            uwide a = magnitude((wide)q_lo[q_base + d]), b = magnitude((wide)q_hi[q_base + d]);
+            uint32_t o = octaves_of(a > b ? a : b);
+            if (o > widest) widest = o;
+        }
+        for (uint32_t r = 0; r < reach; ++r) {
+            size_t k_base = ((size_t)(start + r) * kv_heads + g) * head_width;
+            for (uint32_t d = threadIdx.x; d < head_width; d += blockDim.x) {
+                uwide a = magnitude((wide)k_lo[k_base + d]), b = magnitude((wide)k_hi[k_base + d]);
+                uint32_t o = octaves_of(a > b ? a : b);
+                if (o > widest) widest = o;
+            }
+        }
+        oct_s[threadIdx.x] = widest;
+        __syncthreads();
+        for (uint32_t stride = blockDim.x / 2; stride > 0; stride >>= 1) {
+            if (threadIdx.x < stride && oct_s[threadIdx.x + stride] > oct_s[threadIdx.x]) oct_s[threadIdx.x] = oct_s[threadIdx.x + stride];
+            __syncthreads();
+        }
+        if (threadIdx.x == 0) {
+            uint32_t lg = 0; while ((1u << lg) < head_width) ++lg;
+            uint32_t need = 2 * oct_s[0] + lg + 2;
+            bracket_shift = need > 126u ? (int)((need - 126u + 1u) / 2u) : 0;
+        }
+        __syncthreads();
+    }
+    int bs = bracket_shift;
+    // (a) the null.
+    wide local_null = -(((wide)1) << 126);
+    for (uint32_t r = threadIdx.x; r < reach; r += blockDim.x) {
+        size_t k_base = ((size_t)(start + r) * kv_heads + g) * head_width;
+        wide sl, sh;
+        contact_bracket(q_lo, q_hi, k_lo, k_hi, q_base, k_base, head_width, bs, grain, &sl, &sh, refused);
+        if (sh > local_null) local_null = sh;
+    }
+    scratch_hi[threadIdx.x] = local_null;
+    __syncthreads();
+    for (uint32_t stride = blockDim.x / 2; stride > 0; stride >>= 1) {
+        if (threadIdx.x < stride && scratch_hi[threadIdx.x + stride] > scratch_hi[threadIdx.x]) scratch_hi[threadIdx.x] = scratch_hi[threadIdx.x + stride];
+        __syncthreads();
+    }
+    if (threadIdx.x == 0) { null_value = scratch_hi[0]; atomicMax(reach_census, reach); }
+    __syncthreads();
+    // (b) the exponentials into the weight scratch and the partition.
+    wide part_lo = 0, part_hi = 0;
+    for (uint32_t r = threadIdx.x; r < reach; r += blockDim.x) {
+        size_t k_base = ((size_t)(start + r) * kv_heads + g) * head_width;
+        wide sl, sh;
+        contact_bracket(q_lo, q_hi, k_lo, k_hi, q_base, k_base, head_width, bs, grain, &sl, &sh, refused);
+        wide lo_arg = sl - null_value, hi_arg = sh - null_value;
+        if (hi_arg > 0) hi_arg = 0;
+        if (lo_arg > 0) lo_arg = 0;
+        wide e_lo_lo, e_lo_hi, e_hi_lo, e_hi_hi;
+        exp_nonpositive(lo_arg, grain, terms, &e_lo_lo, &e_lo_hi, refused);
+        exp_nonpositive(hi_arg, grain, terms, &e_hi_lo, &e_hi_hi, refused);
+        wl[r] = e_lo_lo; wh[r] = e_hi_hi;
+        part_lo += e_lo_lo; part_hi += e_hi_hi;
+    }
+    scratch_lo[threadIdx.x] = part_lo; scratch_hi[threadIdx.x] = part_hi;
+    __syncthreads();
+    for (uint32_t stride = blockDim.x / 2; stride > 0; stride >>= 1) {
+        if (threadIdx.x < stride) { scratch_lo[threadIdx.x] += scratch_lo[threadIdx.x + stride]; scratch_hi[threadIdx.x] += scratch_hi[threadIdx.x + stride]; }
+        __syncthreads();
+    }
+    if (threadIdx.x == 0) { total_lo = scratch_lo[0]; total_hi = scratch_hi[0]; }
+    __syncthreads();
+    wide zl = total_lo, zh = total_hi;
+    if (zl <= 0) { if (threadIdx.x == 0) atomicOr(refused, REFUSED_MALFORMED); return; }
+    // (c) the weights and the carried differentials dw, and the sum M = Σ w dw.
+    part_lo = 0; part_hi = 0;
+    for (uint32_t r = threadIdx.x; r < reach; r += blockDim.x) {
+        wide w_l, w_h;
+        interval_quotient(wl[r], wh[r], zl, zh, grain, &w_l, &w_h, refused);
+        if (w_l < 0) w_l = 0;
+        if (w_h > unit) w_h = unit;
+        wl[r] = w_l; wh[r] = w_h;
+        size_t v_base = ((size_t)(start + r) * kv_heads + g) * head_width;
+        wide acc_lo = 0, acc_hi = 0;
+        for (uint32_t d = 0; d < head_width; ++d) {
+            wide pl, ph;
+            corners((wide)do_lo[do_base + d], (wide)do_hi[do_base + d], (wide)v_lo[v_base + d], (wide)v_hi[v_base + d], &pl, &ph, refused);
+            acc_lo += pl; acc_hi += ph;
+        }
+        wide dw_l = shift_floor(acc_lo, -grain, refused), dw_h = shift_ceil(acc_hi, -grain, refused);
+        dsl[r] = dw_l; dsh[r] = dw_h;
+        wide pl, ph;
+        corners(w_l, w_h, dw_l, dw_h, &pl, &ph, refused);
+        part_lo += shift_floor(pl, -grain, refused); part_hi += shift_ceil(ph, -grain, refused);
+    }
+    scratch_lo[threadIdx.x] = part_lo; scratch_hi[threadIdx.x] = part_hi;
+    __syncthreads();
+    for (uint32_t stride = blockDim.x / 2; stride > 0; stride >>= 1) {
+        if (threadIdx.x < stride) { scratch_lo[threadIdx.x] += scratch_lo[threadIdx.x + stride]; scratch_hi[threadIdx.x] += scratch_hi[threadIdx.x + stride]; }
+        __syncthreads();
+    }
+    if (threadIdx.x == 0) { m_lo = scratch_lo[0]; m_hi = scratch_hi[0]; }
+    __syncthreads();
+    wide ml = m_lo, mh = m_hi;
+    // (d) ds = w (dw − M), written beside w into the resident scratch.
+    for (uint32_t r = threadIdx.x; r < reach; r += blockDim.x) {
+        wide diff_l = dsl[r] - mh, diff_h = dsh[r] - ml;
+        wide pl, ph;
+        corners(wl[r], wh[r], diff_l, diff_h, &pl, &ph, refused);
+        dsl[r] = shift_floor(pl, -grain, refused); dsh[r] = shift_ceil(ph, -grain, refused);
+        size_t at = ((size_t)t * heads + h) * reach_max + r;
+        w_lo[at] = to_word(wl[r], refused); w_hi[at] = to_word(wh[r], refused);
+        ds_lo[at] = to_word(dsl[r], refused); ds_hi[at] = to_word(dsh[r], refused);
+    }
+    __syncthreads();
+    // (e) dq_t = Σ_j ds_tj k_j, one thread per coordinate of the query.
+    for (uint32_t d = threadIdx.x; d < head_width; d += blockDim.x) {
+        wide acc_lo = 0, acc_hi = 0;
+        for (uint32_t r = 0; r < reach; ++r) {
+            size_t k_at = ((size_t)(start + r) * kv_heads + g) * head_width + d;
+            wide pl, ph;
+            corners(dsl[r], dsh[r], (wide)k_lo[k_at], (wide)k_hi[k_at], &pl, &ph, refused);
+            acc_lo += pl; acc_hi += ph;
+        }
+        dq_lo[q_base + d] = to_word(shift_floor(acc_lo, -grain, refused), refused);
+        dq_hi[q_base + d] = to_word(shift_ceil(acc_hi, -grain, refused), refused);
+    }
+}
+
+// `dk_j = Σ_{t ≥ j, h ∈ g} ds_tj q_t`: one thread per coordinate of the key.
+extern "C" __global__ void section_contact_adjoint_keys(
+    const int64_t *q_lo, const int64_t *q_hi, const int64_t *ds_lo, const int64_t *ds_hi,
+    uint32_t rows, uint32_t heads, uint32_t kv_heads, uint32_t head_width, uint32_t window, uint32_t reach_max,
+    int32_t grain, int64_t *dk_lo, int64_t *dk_hi,
+    uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    uint32_t flat = blockIdx.x * blockDim.x + threadIdx.x;
+    if (flat >= rows * kv_heads * head_width) return;
+    if (upstream_refused(census, lineage, lineage_count, refused)) return;
+    uint32_t j = flat / (kv_heads * head_width);
+    uint32_t g = (flat / head_width) % kv_heads;
+    uint32_t d = flat % head_width;
+    uint32_t group = heads / kv_heads;
+    uint32_t t_end = (j + window < rows) ? (j + window) : rows;
+    wide acc_lo = 0, acc_hi = 0;
+    for (uint32_t t = j; t < t_end; ++t) {
+        uint32_t start = (t + 1 > window) ? (t + 1 - window) : 0;
+        if (j < start) continue;
+        for (uint32_t h = g * group; h < (g + 1) * group; ++h) {
+            size_t at = ((size_t)t * heads + h) * reach_max + (j - start);
+            size_t q_at = ((size_t)t * heads + h) * head_width + d;
+            wide pl, ph;
+            corners((wide)ds_lo[at], (wide)ds_hi[at], (wide)q_lo[q_at], (wide)q_hi[q_at], &pl, &ph, refused);
+            acc_lo += pl; acc_hi += ph;
+        }
+    }
+    dk_lo[flat] = to_word(shift_floor(acc_lo, -grain, refused), refused);
+    dk_hi[flat] = to_word(shift_ceil(acc_hi, -grain, refused), refused);
+}
+
+// `dv_j = Σ_{t ≥ j, h ∈ g} w_tj do_t`: one thread per coordinate of the value.
+extern "C" __global__ void section_contact_adjoint_values(
+    const int64_t *do_lo, const int64_t *do_hi, const int64_t *w_lo, const int64_t *w_hi,
+    uint32_t rows, uint32_t heads, uint32_t kv_heads, uint32_t head_width, uint32_t window, uint32_t reach_max,
+    int32_t grain, int64_t *dv_lo, int64_t *dv_hi,
+    uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    uint32_t flat = blockIdx.x * blockDim.x + threadIdx.x;
+    if (flat >= rows * kv_heads * head_width) return;
+    if (upstream_refused(census, lineage, lineage_count, refused)) return;
+    uint32_t j = flat / (kv_heads * head_width);
+    uint32_t g = (flat / head_width) % kv_heads;
+    uint32_t d = flat % head_width;
+    uint32_t group = heads / kv_heads;
+    uint32_t t_end = (j + window < rows) ? (j + window) : rows;
+    wide acc_lo = 0, acc_hi = 0;
+    for (uint32_t t = j; t < t_end; ++t) {
+        uint32_t start = (t + 1 > window) ? (t + 1 - window) : 0;
+        if (j < start) continue;
+        for (uint32_t h = g * group; h < (g + 1) * group; ++h) {
+            size_t at = ((size_t)t * heads + h) * reach_max + (j - start);
+            size_t do_at = ((size_t)t * heads + h) * head_width + d;
+            wide pl, ph;
+            corners((wide)w_lo[at], (wide)w_hi[at], (wide)do_lo[do_at], (wide)do_hi[do_at], &pl, &ph, refused);
+            acc_lo += pl; acc_hi += ph;
+        }
+    }
+    dv_lo[flat] = to_word(shift_floor(acc_lo, -grain, refused), refused);
+    dv_hi[flat] = to_word(shift_ceil(acc_hi, -grain, refused), refused);
+}
+
+// ---------------------------------------------------------------------------------------------
 // the arithmetic control: the helpers exposed for a serial-chart exact reference to refute
 // ---------------------------------------------------------------------------------------------
 

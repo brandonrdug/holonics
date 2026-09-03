@@ -523,6 +523,137 @@ impl<'chart> ResidentSurface<'chart> {
         )
     }
 
+    /// The adjoint of the contact at the queries.  Writes `dq` and the weight and differential
+    /// scratch sections (`rows · heads` by `reach_max`), which the key and value adjoints read.
+    #[allow(clippy::too_many_arguments)]
+    pub fn record_contact_adjoint_queries(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        q: &ResidentSection<'chart>,
+        k: &ResidentSection<'chart>,
+        v: &ResidentSection<'chart>,
+        differential: &ResidentSection<'chart>,
+        heads: usize,
+        kv_heads: usize,
+        head_width: usize,
+        window: usize,
+        terms: SeriesAperture,
+        shape: &LawShape,
+        dq: &ResidentSection<'chart>,
+        weights: &ResidentSection<'chart>,
+        differentials: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let reach_max = q.rows.min(window.max(1));
+        if weights.rows() != q.rows * heads
+            || weights.width() != reach_max
+            || differentials.rows() != q.rows * heads
+            || differentials.width() != reach_max
+            || differential.rows != q.rows
+            || differential.width != q.width
+            || dq.rows() != q.rows
+            || dq.width() != q.width
+        {
+            return Err(ResidentRefusal::RowsDisagree {
+                operation: "contact-adjoint-queries",
+                left: q.rows * q.width,
+                right: dq.rows() * dq.width(),
+            });
+        }
+        let mut params = Params::new();
+        params
+            .ptr(q.lo.device_ptr())
+            .ptr(q.hi.device_ptr())
+            .ptr(k.lo.device_ptr())
+            .ptr(k.hi.device_ptr())
+            .ptr(v.lo.device_ptr())
+            .ptr(v.hi.device_ptr())
+            .ptr(differential.lo.device_ptr())
+            .ptr(differential.hi.device_ptr())
+            .u32(q.rows as u32)
+            .u32(heads as u32)
+            .u32(kv_heads as u32)
+            .u32(head_width as u32)
+            .u32(window.max(1) as u32)
+            .u32(reach_max as u32)
+            .i32(dq.grain.0 as i32)
+            .u32(terms.0)
+            .ptr(dq.lo.device_ptr())
+            .ptr(dq.hi.device_ptr())
+            .ptr(weights.lo.device_ptr())
+            .ptr(weights.hi.device_ptr())
+            .ptr(differentials.lo.device_ptr())
+            .ptr(differentials.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.slot + 4)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_contact_adjoint_queries",
+            q.rows * heads,
+            shape.block,
+            shape.shared_octets,
+            &mut params,
+            "contact-adjoint-queries",
+        )
+    }
+
+    /// The adjoint of the contact at the keys (`family = false`) or values (`family = true`), read
+    /// from the scratch the query adjoint wrote.
+    #[allow(clippy::too_many_arguments)]
+    pub fn record_contact_adjoint_family(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        left: &ResidentSection<'chart>,
+        scratch: &ResidentSection<'chart>,
+        heads: usize,
+        kv_heads: usize,
+        head_width: usize,
+        window: usize,
+        values: bool,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let reach_max = left.rows.min(window.max(1));
+        if scratch.rows() != left.rows * heads
+            || scratch.width() != reach_max
+            || out.rows() != left.rows
+            || out.width() != kv_heads * head_width
+        {
+            return Err(ResidentRefusal::RowsDisagree {
+                operation: "contact-adjoint-family",
+                left: left.rows * left.width,
+                right: out.rows() * out.width(),
+            });
+        }
+        let mut params = Params::new();
+        params
+            .ptr(left.lo.device_ptr())
+            .ptr(left.hi.device_ptr())
+            .ptr(scratch.lo.device_ptr())
+            .ptr(scratch.hi.device_ptr())
+            .u32(left.rows as u32)
+            .u32(heads as u32)
+            .u32(kv_heads as u32)
+            .u32(head_width as u32)
+            .u32(window.max(1) as u32)
+            .u32(reach_max as u32)
+            .i32(out.grain.0 as i32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            if values { "section_contact_adjoint_values" } else { "section_contact_adjoint_keys" },
+            out.count(),
+            &mut params,
+            "contact-adjoint-family",
+        )
+    }
+
     /// The transposed midpoint seal: `out[o, t] = −mid(input[t, o]) · 2^-shift` as a point.
     pub fn record_transpose_seal(
         &self,

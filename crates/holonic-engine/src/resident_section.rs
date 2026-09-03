@@ -125,7 +125,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 42] = [
+pub const KERNELS: [&str; 45] = [
     "section_from_bfloat16",
     "section_carry",
     "section_terminal_row",
@@ -169,6 +169,9 @@ pub const KERNELS: [&str; 42] = [
     "section_gelu_tanh_derivative",
     "section_place_columns",
     "section_rms_rebase_adjoint",
+    "section_contact_adjoint_queries",
+    "section_contact_adjoint_keys",
+    "section_contact_adjoint_values",
     "section_arithmetic_control",
     // The tiled contraction's emitted family. Every wrapper is named here so the module-wide block
     // derivation inspects every instantiation rather than one; each carries `__launch_bounds__(512)`
