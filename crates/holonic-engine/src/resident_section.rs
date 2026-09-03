@@ -87,6 +87,8 @@ mod geometry;
 mod surface_mount;
 #[path = "resident_section/surface_passage.rs"]
 mod surface_passage;
+#[path = "resident_section/surface_adjoint.rs"]
+mod surface_adjoint;
 #[path = "resident_section/surface_shapes.rs"]
 mod surface_shapes;
 #[path = "resident_section/surface_tiled.rs"]

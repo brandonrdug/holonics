@@ -228,6 +228,23 @@ impl<'chart> ResidentSurface<'chart> {
         })
     }
 
+    /// Release one retained partial standing once its join has returned.  The slot keeps its
+    /// index so every other standing's address stays valid; it holds an empty buffer thereafter.
+    pub fn release_partials(&self, standing: &PartialStanding) -> Result<(), ResidentRefusal> {
+        let mut held = self.partials.borrow_mut();
+        let slot = held
+            .get_mut(standing.index)
+            .ok_or_else(|| ResidentRefusal::Declaration {
+                operation: "contract-split-k",
+                what: "a partial standing this surface does not hold".to_owned(),
+            })?;
+        let released = std::mem::replace(slot, DeviceBuffer::<i64>::alloc(1)?);
+        let octets = (released.len() * std::mem::size_of::<i64>()) as u64;
+        drop(released);
+        self.released_octets(octets);
+        Ok(())
+    }
+
     /// Zero one retained partial standing, so slots no tile writes fold as exact zeros.
     pub fn zero_partials(&self, standing: &PartialStanding) -> Result<(), ResidentRefusal> {
         let held = self.partials.borrow();

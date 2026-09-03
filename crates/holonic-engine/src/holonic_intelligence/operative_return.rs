@@ -39,6 +39,8 @@ pub struct NativeReturnAperture {
 /// The testimony of one deposit, carried in the trace of the operation that enacted it.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct NativeMorphologyDeposit {
+    /// The coefficient population deposited on.
+    pub population: u32,
     pub rank: usize,
     pub cross_section_rows: usize,
     pub cross_section_width: usize,
@@ -131,8 +133,8 @@ impl Drop for CountedOctets<'_> {
 /// The factor grains of a deposit, derived from the carrier budget of the consuming factorized
 /// contraction: its stages are admitted in causal order without crediting a negative exponent, so
 /// the presented octaves, the inner reduction, the two directed hands, the rank join, and a margin
-/// of four octaves for the next cycle's input are fixed, and what remains is split between the two
-/// factors.  Returns `(u_shift, v_shift)`.
+/// of ten octaves for the next cycle's wider input are fixed, and what remains is split between
+/// the two factors.  Returns `(u_shift, v_shift)`.
 pub(super) fn factor_shifts(
     presented_octaves: u32,
     inner: usize,
@@ -144,7 +146,7 @@ pub(super) fn factor_shifts(
         .saturating_add(ceil_log2(inner))
         .saturating_add(2)
         .saturating_add(ceil_log2(rank))
-        .saturating_add(4);
+        .saturating_add(10);
     let available = ResidentSurface::carrier_octaves()
         .checked_sub(fixed)
         .filter(|available| *available >= 8)
@@ -251,6 +253,7 @@ pub(super) fn deposit_from_material<'chart>(
         .and_then(|shift| shift.checked_sub(grain))
         .ok_or_else(|| refuse("the presented exponent overflowed".to_owned()))?;
     let deposit = NativeMorphologyDeposit {
+        population: u32::MAX,
         rank: rows,
         cross_section_rows: out_rows,
         cross_section_width: inner,
@@ -282,12 +285,18 @@ pub(super) fn deposit_from_material<'chart>(
 /// Enact the return on the resident surface: one passage of four occurrences — the receiver
 /// return, its midpoint seal, the carry of the presented carrier, and its seal — and the overlay
 /// atom the successor retains.
+/// The returned differential at the tied contraction's output, for the return through the body.
+pub(super) struct ReturnedDifferential<'chart> {
+    pub section: ResidentSection<'chart>,
+    pub octaves: u32,
+}
+
 pub(super) fn enact_return<'chart>(
     surface: &'chart ResidentSurface<'chart>,
     material: ReturnMaterial<'_, 'chart>,
     next: &[u32],
     aperture: NativeReturnAperture,
-) -> Result<(OverlayAtom<'chart>, NativeMorphologyDeposit), ResidentRefusal> {
+) -> Result<(OverlayAtom<'chart>, NativeMorphologyDeposit, ReturnedDifferential<'chart>), ResidentRefusal> {
     let refuse = |what: String| ResidentRefusal::Declaration {
         operation: "receiver-return",
         what,
@@ -362,6 +371,7 @@ pub(super) fn enact_return<'chart>(
     };
     let u = surface.fresh_section(material.width, material.rows, material.grain)?;
     let v = surface.fresh_section(material.rows, material.presented.width(), material.grain)?;
+    let differential = surface.fresh_section(material.rows, material.width, material.grain)?;
     let mut builder: PassageBuilder<'chart> =
         surface.begin_passage(&[vec![], vec![0], vec![], vec![2]])?;
     {
@@ -379,6 +389,7 @@ pub(super) fn enact_return<'chart>(
             u_shift,
             &return_shape,
             &u,
+            &differential,
         )?;
     }
     builder.close(0, &u, return_shape.needed)?;
@@ -425,6 +436,7 @@ pub(super) fn enact_return<'chart>(
         .and_then(|shift| shift.checked_sub(grain))
         .ok_or_else(|| refuse("the presented exponent overflowed".to_owned()))?;
     let deposit = NativeMorphologyDeposit {
+        population: u32::MAX,
         rank: material.rows,
         cross_section_rows: material.width,
         cross_section_width: material.presented.width(),
@@ -452,6 +464,10 @@ pub(super) fn enact_return<'chart>(
             v_octaves,
         },
         deposit,
+        ReturnedDifferential {
+            section: differential,
+            octaves: return_shape.needed,
+        },
     ))
 }
 

@@ -32,6 +32,8 @@ mod operative_morphology;
 mod operative_residence;
 #[path = "holonic_intelligence/operative_adjoint.rs"]
 mod operative_adjoint;
+#[path = "holonic_intelligence/operative_backward.rs"]
+mod operative_backward;
 #[path = "holonic_intelligence/operative_return.rs"]
 mod operative_return;
 #[path = "holonic_intelligence/operative_session.rs"]
@@ -64,6 +66,7 @@ pub use material_ingress::*;
 pub use operative_atlas::*;
 pub use operative_morphology::*;
 pub use operative_adjoint::*;
+pub use operative_backward::*;
 pub use operative_return::*;
 pub use operative_residence::*;
 pub use operative_session::*;

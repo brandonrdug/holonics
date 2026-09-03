@@ -5,7 +5,7 @@
 //! enacts the graph's lookup law, and returns its emission, exact trace, and move-owned successor
 //! ecology together.  No exterior verdict, stored activation, candidate, or commit intervenes.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use num_bigint::BigInt;
 use relational_geometry::Rat;
@@ -26,6 +26,7 @@ use super::{
     NativeMorphologyDeposit, NativeOperationPrimitive, NativeOperatorNode,
     NativeOperatorResidence, NativeOperatorResidenceError, NativeReturnAperture,
     NativeScaleConstraint, NativeTensorOrdinal,
+    operative_backward::NativeAdjointReturnTrace,
     operative_return::{
         OverlayAtom, ReturnMaterial, contract_tile_with_overlay, continuation_next_occurrences,
         enact_return,
@@ -76,6 +77,7 @@ pub enum NativeMorphologyTransition {
     Changed {
         operation: u32,
         deposit: NativeMorphologyDeposit,
+        adjoint: NativeAdjointReturnTrace,
     },
 }
 
@@ -89,20 +91,20 @@ pub enum NativeSuccessorProjection {
     },
 }
 
-struct ContemporaryCarrier<'chart> {
-    section: ResidentSection<'chart>,
-    bound_octaves: u32,
+pub(super) struct ContemporaryCarrier<'chart> {
+    pub(super) section: ResidentSection<'chart>,
+    pub(super) bound_octaves: u32,
 }
 
-struct OperationOutcome<'chart> {
-    section: ResidentSection<'chart>,
-    bound_octaves: u32,
-    rows: usize,
-    width: usize,
-    grain: ResidentGrain,
-    intervals: Vec<(i64, i64)>,
-    census_before: TransferCensus,
-    census_after: TransferCensus,
+pub(super) struct OperationOutcome<'chart> {
+    pub(super) section: ResidentSection<'chart>,
+    pub(super) bound_octaves: u32,
+    pub(super) rows: usize,
+    pub(super) width: usize,
+    pub(super) grain: ResidentGrain,
+    pub(super) intervals: Vec<(i64, i64)>,
+    pub(super) census_before: TransferCensus,
+    pub(super) census_after: TransferCensus,
 }
 
 struct TiledCarrier<'chart> {
@@ -132,30 +134,34 @@ enum TiledUnary {
 /// The move-owned contemporary ecology.  The coefficient morphology is one borrowed resident
 /// standing; every produced carrier and the chronology belong to this successor line alone.
 pub struct NativeFullOperatorSession<'residence, 'chart> {
-    ecology: &'residence NativeFullOperatorEcology,
-    residence: &'residence mut NativeOperatorResidence<'chart>,
-    carriers: BTreeMap<NativeCarrierOrdinal, ContemporaryCarrier<'chart>>,
+    pub(super) ecology: &'residence NativeFullOperatorEcology,
+    pub(super) residence: &'residence mut NativeOperatorResidence<'chart>,
+    pub(super) carriers: BTreeMap<NativeCarrierOrdinal, ContemporaryCarrier<'chart>>,
     operation_at: usize,
     generation: u64,
     chronology: Vec<u64>,
-    grain: ResidentGrain,
-    positions: Option<Positions<'chart>>,
+    pub(super) grain: ResidentGrain,
+    pub(super) positions: Option<Positions<'chart>>,
     row_population: Option<usize>,
     cycle_complete: bool,
+    /// Carriers produced in one layer (or the prologue) and consumed in another: retained through
+    /// the cycle as the checkpoints the return replays each layer from.
+    pub(super) cross_layer: BTreeSet<NativeCarrierOrdinal>,
+    pub(super) checkpoints: BTreeMap<NativeCarrierOrdinal, ContemporaryCarrier<'chart>>,
     /// The complete emitted face of the last cycle, retained by the successor until the next
     /// occurrence enters.
     terminal_carrier: Option<TiledCarrier<'chart>>,
     /// The reacted carrier of the tied boundary (`tanh`) and the carrier presented to the tied
     /// contraction, retained for the return.
     terminal_reacted: Option<TiledCarrier<'chart>>,
-    terminal_presented: Option<ContemporaryCarrier<'chart>>,
+    pub(super) terminal_presented: Option<ContemporaryCarrier<'chart>>,
     /// The row addresses of the last cycle: the line the emitted face continued.
-    previous_context: Option<Vec<u32>>,
+    pub(super) previous_context: Option<Vec<u32>>,
     /// The factorized overlay atoms deposited on each cross-section, keyed by its coefficient
     /// population, in deposit order.
-    overlay: BTreeMap<NativeTensorOrdinal, Vec<OverlayAtom<'chart>>>,
+    pub(super) overlay: BTreeMap<NativeTensorOrdinal, Vec<OverlayAtom<'chart>>>,
     /// The declared return apertures; `None` enacts no return.
-    aperture: Option<NativeReturnAperture>,
+    pub(super) aperture: Option<NativeReturnAperture>,
 }
 
 pub struct NativeFullOperationStep<'residence, 'chart> {
@@ -200,6 +206,20 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         aperture: Option<NativeReturnAperture>,
     ) -> Result<Self, NativeFullOperationError> {
         ecology.validate()?;
+        let mut producer: BTreeMap<NativeCarrierOrdinal, Option<u16>> = BTreeMap::new();
+        for operation in &ecology.operations {
+            producer.insert(operation.output, operation.layer);
+        }
+        let mut cross_layer = BTreeSet::new();
+        for operation in &ecology.operations {
+            for input in &operation.inputs {
+                if producer.get(input).copied().flatten() != operation.layer
+                    || producer.get(input).is_some_and(|layer| layer.is_none())
+                {
+                    cross_layer.insert(*input);
+                }
+            }
+        }
         let mut grain = 0u32;
         for operation in &ecology.operations {
             if let NativeOperationPrimitive::Lookup { scale } = &operation.primitive {
@@ -227,6 +247,8 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             positions: None,
             row_population: None,
             cycle_complete: false,
+            cross_layer,
+            checkpoints: BTreeMap::new(),
             terminal_carrier: None,
             terminal_reacted: None,
             terminal_presented: None,
@@ -311,7 +333,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             .and_then(|operation| operation.coefficients.first().copied())
             .ok_or(NativeFullOperationError::Operation)?;
         let surface = self.residence.surface();
-        let (atom, deposit) = enact_return(
+        let (atom, mut deposit, differential) = enact_return(
             surface,
             ReturnMaterial {
                 emission: &emission.sections,
@@ -325,11 +347,85 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             &next,
             aperture,
         )?;
+        deposit.population = tied.0;
         self.overlay.entry(tied).or_default().push(atom);
+        let adjoint = self.adjoint_return(differential, aperture)?;
         Ok(NativeMorphologyTransition::Changed {
             operation: 0,
             deposit,
+            adjoint,
         })
+    }
+
+    /// Enact one operation of the graph on the contemporary carriers, without advancing the
+    /// chronology: the forward law, used by `advance` and by the return's replay alike.
+    pub(super) fn enact_operation(
+        &mut self,
+        operation: &NativeOperatorNode,
+        occurrence: &NativeFullOperationOccurrence,
+    ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
+        let outcome = match &operation.primitive {
+            NativeOperationPrimitive::Lookup { scale } => {
+                self.execute_lookup(operation, occurrence, scale)?
+            }
+            NativeOperationPrimitive::Reshape => self.execute_reshape(operation, occurrence)?,
+            NativeOperationPrimitive::Select { axis, at } => {
+                self.execute_select(operation, occurrence, *axis, *at)?
+            }
+            NativeOperationPrimitive::Contract => self.execute_contract(operation, occurrence)?,
+            NativeOperationPrimitive::RmsRebase {
+                group,
+                epsilon,
+                has_gain,
+            } => self.execute_rms(operation, occurrence, *group, epsilon, *has_gain)?,
+            NativeOperationPrimitive::GeluTanh => self.execute_gelu(operation, occurrence)?,
+            NativeOperationPrimitive::Tanh => self.execute_tanh(operation, occurrence)?,
+            NativeOperationPrimitive::Hadamard => {
+                self.execute_binary(operation, occurrence, false)?
+            }
+            NativeOperationPrimitive::Add => self.execute_binary(operation, occurrence, true)?,
+            NativeOperationPrimitive::Scale { by }
+                if !matches!(by, NativeScaleConstraint::Coefficient) =>
+            {
+                self.execute_scale(operation, occurrence, by)?
+            }
+            NativeOperationPrimitive::Scale {
+                by: NativeScaleConstraint::Coefficient,
+            } => self.execute_coefficient_scale(operation, occurrence)?,
+            NativeOperationPrimitive::RotaryChronology {
+                theta,
+                head_width,
+                rotated_width,
+            } => self.execute_chronology(
+                operation,
+                occurrence,
+                *theta,
+                *head_width,
+                *rotated_width,
+            )?,
+            NativeOperationPrimitive::CausalContact {
+                heads,
+                kv_heads,
+                head_width,
+                reach,
+                series_terms,
+            } => self.execute_contact(
+                operation,
+                occurrence,
+                *heads,
+                *kv_heads,
+                *head_width,
+                reach,
+                *series_terms,
+            )?,
+            NativeOperationPrimitive::Emit => self.execute_reshape(operation, occurrence)?,
+            _ => {
+                return Err(NativeFullOperationError::PrimitiveOpen {
+                    operation: operation.ordinal,
+                });
+            }
+        };
+        Ok(outcome)
     }
 
     /// Enact the graph's current mathematical operation.  HNA2 begins with the complete graph's
@@ -349,6 +445,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             }
             morphology_transition = self.return_on_continuation(&occurrence.row_addresses)?;
             self.carriers.clear();
+            self.checkpoints.clear();
             self.positions = None;
             self.row_population = None;
             self.terminal_carrier = None;
@@ -365,67 +462,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         if matches!(operation.primitive, NativeOperationPrimitive::Lookup { .. }) {
             self.previous_context = Some(occurrence.row_addresses.clone());
         }
-        let outcome = match &operation.primitive {
-            NativeOperationPrimitive::Lookup { scale } => {
-                self.execute_lookup(&operation, &occurrence, scale)?
-            }
-            NativeOperationPrimitive::Reshape => self.execute_reshape(&operation, &occurrence)?,
-            NativeOperationPrimitive::Select { axis, at } => {
-                self.execute_select(&operation, &occurrence, *axis, *at)?
-            }
-            NativeOperationPrimitive::Contract => self.execute_contract(&operation, &occurrence)?,
-            NativeOperationPrimitive::RmsRebase {
-                group,
-                epsilon,
-                has_gain,
-            } => self.execute_rms(&operation, &occurrence, *group, epsilon, *has_gain)?,
-            NativeOperationPrimitive::GeluTanh => self.execute_gelu(&operation, &occurrence)?,
-            NativeOperationPrimitive::Tanh => self.execute_tanh(&operation, &occurrence)?,
-            NativeOperationPrimitive::Hadamard => {
-                self.execute_binary(&operation, &occurrence, false)?
-            }
-            NativeOperationPrimitive::Add => self.execute_binary(&operation, &occurrence, true)?,
-            NativeOperationPrimitive::Scale { by }
-                if !matches!(by, NativeScaleConstraint::Coefficient) =>
-            {
-                self.execute_scale(&operation, &occurrence, by)?
-            }
-            NativeOperationPrimitive::Scale {
-                by: NativeScaleConstraint::Coefficient,
-            } => self.execute_coefficient_scale(&operation, &occurrence)?,
-            NativeOperationPrimitive::RotaryChronology {
-                theta,
-                head_width,
-                rotated_width,
-            } => self.execute_chronology(
-                &operation,
-                &occurrence,
-                *theta,
-                *head_width,
-                *rotated_width,
-            )?,
-            NativeOperationPrimitive::CausalContact {
-                heads,
-                kv_heads,
-                head_width,
-                reach,
-                series_terms,
-            } => self.execute_contact(
-                &operation,
-                &occurrence,
-                *heads,
-                *kv_heads,
-                *head_width,
-                reach,
-                *series_terms,
-            )?,
-            NativeOperationPrimitive::Emit => self.execute_reshape(&operation, &occurrence)?,
-            _ => {
-                return Err(NativeFullOperationError::PrimitiveOpen {
-                    operation: operation.ordinal,
-                });
-            }
-        };
+        let outcome = self.enact_operation(&operation, &occurrence)?;
         let (outcome, successor_projection) = self.project_successor(operation.ordinal, outcome)?;
         let morphology_overlay_rank = self.morphology_overlay_rank();
         let successor_generation = self
@@ -447,7 +484,11 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                     .iter()
                     .any(|later| later.inputs.contains(input))
             {
-                self.carriers.remove(input);
+                if let Some(carrier) = self.carriers.remove(input) {
+                    if self.cross_layer.contains(input) {
+                        self.checkpoints.insert(*input, carrier);
+                    }
+                }
             }
         }
         if self.operation_at == self.ecology.operations.len() {
@@ -529,6 +570,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         };
         let scaled =
             self.execute_tiled_unary(&operations[1], &contracted, TiledUnary::Scale(first_scale))?;
+        drop(contracted);
         let scaled_carrier =
             self.record_tiled_outcome(operations[1].clone(), scaled, &mut emissions, &mut traces)?;
         let reacted = self.execute_tiled_unary(
@@ -536,6 +578,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             &scaled_carrier,
             TiledUnary::Tanh(SeriesAperture(14)),
         )?;
+        drop(scaled_carrier);
         let reacted_carrier =
             self.record_tiled_outcome(operations[2].clone(), reacted, &mut emissions, &mut traces)?;
         let second_scale = match &operations[3].primitive {
@@ -555,17 +598,24 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         )?;
         let emitted =
             self.execute_tiled_unary(&operations[4], &scaled_back_carrier, TiledUnary::Carry)?;
+        drop(scaled_back_carrier);
         let emitted_carrier =
             self.record_tiled_outcome(operations[4].clone(), emitted, &mut emissions, &mut traces)?;
         // The carrier presented to the tied contraction and the reacted carrier stay with the
-        // successor: they are what the next occurrence meets.
+        // successor when a return is declared: they are what the next occurrence meets.
         let presented = self.carriers.remove(&operations[0].inputs[0]);
         self.carriers.clear();
         self.operation_at = 0;
         self.cycle_complete = true;
         self.terminal_carrier = Some(emitted_carrier);
-        self.terminal_reacted = Some(reacted_carrier);
-        self.terminal_presented = presented;
+        if self.aperture.is_some() {
+            self.terminal_reacted = Some(reacted_carrier);
+            self.terminal_presented = presented;
+        } else {
+            self.terminal_reacted = None;
+            self.terminal_presented = None;
+            self.checkpoints.clear();
+        }
         Ok(NativeFullTerminalBranch {
             emissions,
             traces,
@@ -632,9 +682,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         if operation.inputs.len() != 1 || operation.coefficients.len() != 1 {
             return Err(NativeFullOperationError::Operation);
         }
-        let input = self
-            .carriers
-            .get(&operation.inputs[0])
+        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
             .ok_or(NativeFullOperationError::Carrier)?;
         let coefficient = operation.coefficients[0];
         let population = self
@@ -977,9 +1025,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
         require_internal_occurrence(operation, occurrence, 1, 0)?;
         self.output(operation)?;
-        let input = self
-            .carriers
-            .get(&operation.inputs[0])
+        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
             .ok_or(NativeFullOperationError::Carrier)?;
         let surface = self.residence.surface();
         let shape = surface.shape_carry(
@@ -1025,9 +1071,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             return Err(NativeFullOperationError::Operation);
         }
         self.output(operation)?;
-        let input = self
-            .carriers
-            .get(&operation.inputs[0])
+        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
             .ok_or(NativeFullOperationError::Carrier)?;
         let coefficient = operation.coefficients[0];
         let population = self
@@ -1080,9 +1124,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
         require_internal_occurrence(operation, occurrence, 1, usize::from(has_gain))?;
         self.output(operation)?;
-        let input = self
-            .carriers
-            .get(&operation.inputs[0])
+        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
             .ok_or(NativeFullOperationError::Carrier)?;
         let surface = self.residence.surface();
         let gain = if has_gain {
@@ -1141,9 +1183,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
         require_internal_occurrence(operation, occurrence, 1, 0)?;
         self.output(operation)?;
-        let input = self
-            .carriers
-            .get(&operation.inputs[0])
+        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
             .ok_or(NativeFullOperationError::Carrier)?;
         let surface = self.residence.surface();
         let terms = SeriesAperture(14);
@@ -1187,9 +1227,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
         require_internal_occurrence(operation, occurrence, 1, 0)?;
         self.output(operation)?;
-        let input = self
-            .carriers
-            .get(&operation.inputs[0])
+        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
             .ok_or(NativeFullOperationError::Carrier)?;
         let surface = self.residence.surface();
         let c1 = Dyadic::of_binary64_bits(0x3fe9_8845_33d4_3651)?;
@@ -1238,13 +1276,9 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
         require_internal_occurrence(operation, occurrence, 2, 0)?;
         self.output(operation)?;
-        let left = self
-            .carriers
-            .get(&operation.inputs[0])
+        let left = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
             .ok_or(NativeFullOperationError::Carrier)?;
-        let right = self
-            .carriers
-            .get(&operation.inputs[1])
+        let right = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[1])
             .ok_or(NativeFullOperationError::Carrier)?;
         if left.section.rows() != right.section.rows()
             || left.section.width() != right.section.width()
@@ -1306,9 +1340,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
         require_internal_occurrence(operation, occurrence, 1, 0)?;
         self.output(operation)?;
-        let input = self
-            .carriers
-            .get(&operation.inputs[0])
+        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
             .ok_or(NativeFullOperationError::Carrier)?;
         let by = scale_enclosure(constraint)?;
         let surface = self.residence.surface();
@@ -1351,9 +1383,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
         require_internal_occurrence(operation, occurrence, 1, 1)?;
         self.output(operation)?;
-        let input = self
-            .carriers
-            .get(&operation.inputs[0])
+        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
             .ok_or(NativeFullOperationError::Carrier)?;
         let surface = self.residence.surface();
         let coefficient = self.residence.align_tile(operation.coefficients[0], 0, 1)?;
@@ -1411,9 +1441,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             Some(NativeCarrierAxis::Fixed(span)) => *span,
             _ => return Err(NativeFullOperationError::Operation),
         };
-        let input = self
-            .carriers
-            .get(&operation.inputs[0])
+        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
             .ok_or(NativeFullOperationError::Carrier)?;
         let from = at
             .checked_mul(span)
@@ -1460,17 +1488,11 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
         require_internal_occurrence(operation, occurrence, 3, 0)?;
         self.output(operation)?;
-        let q = self
-            .carriers
-            .get(&operation.inputs[0])
+        let q = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
             .ok_or(NativeFullOperationError::Carrier)?;
-        let k = self
-            .carriers
-            .get(&operation.inputs[1])
+        let k = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[1])
             .ok_or(NativeFullOperationError::Carrier)?;
-        let v = self
-            .carriers
-            .get(&operation.inputs[2])
+        let v = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[2])
             .ok_or(NativeFullOperationError::Carrier)?;
         if q.section.rows() != k.section.rows()
             || q.section.rows() != v.section.rows()
@@ -1537,9 +1559,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     ) -> Result<OperationOutcome<'chart>, NativeFullOperationError> {
         require_internal_occurrence(operation, occurrence, 1, 0)?;
         self.output(operation)?;
-        let input = self
-            .carriers
-            .get(&operation.inputs[0])
+        let input = carrier_of(&self.carriers, &self.checkpoints, &operation.inputs[0])
             .ok_or(NativeFullOperationError::Carrier)?;
         if input.section.width() % head_width != 0 {
             return Err(NativeFullOperationError::Operation);
@@ -1676,6 +1696,17 @@ pub enum NativeFullOperationError {
     Projection,
     #[error("the local morphology current is malformed or does not enter this operation")]
     Morphology,
+    #[error("the return through the body refused: {0}")]
+    Adjoint(String),
+}
+
+/// A contemporary carrier: produced in this cycle or replay, or retained as a checkpoint.
+pub(super) fn carrier_of<'a, 'chart>(
+    carriers: &'a BTreeMap<NativeCarrierOrdinal, ContemporaryCarrier<'chart>>,
+    checkpoints: &'a BTreeMap<NativeCarrierOrdinal, ContemporaryCarrier<'chart>>,
+    ordinal: &NativeCarrierOrdinal,
+) -> Option<&'a ContemporaryCarrier<'chart>> {
+    carriers.get(ordinal).or_else(|| checkpoints.get(ordinal))
 }
 
 fn require_internal_occurrence(
@@ -1740,7 +1771,7 @@ fn combine_projections(projections: &[NativeSuccessorProjection]) -> NativeSucce
     }
 }
 
-fn binary64_projection(value: &Rat) -> Result<Dyadic, NativeFullOperationError> {
+pub(super) fn binary64_projection(value: &Rat) -> Result<Dyadic, NativeFullOperationError> {
     let (datum, _) = round_into(value, BinaryFloatSpecies::Binary64)
         .map_err(|_| NativeFullOperationError::Operation)?;
     let magnitude =
@@ -1755,7 +1786,7 @@ fn binary64_projection(value: &Rat) -> Result<Dyadic, NativeFullOperationError> 
     })
 }
 
-fn scale_enclosure(
+pub(super) fn scale_enclosure(
     constraint: &NativeScaleConstraint,
 ) -> Result<DyadicEnclosure, NativeFullOperationError> {
     let interval = match constraint {
@@ -1778,7 +1809,7 @@ fn scale_enclosure(
     finest_enclosure(&interval)
 }
 
-fn finest_enclosure(interval: &ExactInterval) -> Result<DyadicEnclosure, NativeFullOperationError> {
+pub(super) fn finest_enclosure(interval: &ExactInterval) -> Result<DyadicEnclosure, NativeFullOperationError> {
     for grain in (0..=60).rev() {
         if let Ok(enclosure) = DyadicEnclosure::of_interval(&interval, grain) {
             return Ok(enclosure);
@@ -1787,7 +1818,7 @@ fn finest_enclosure(interval: &ExactInterval) -> Result<DyadicEnclosure, NativeF
     Err(NativeFullOperationError::Operation)
 }
 
-fn projected_scale(constraint: &NativeScaleConstraint) -> Result<Dyadic, NativeFullOperationError> {
+pub(super) fn projected_scale(constraint: &NativeScaleConstraint) -> Result<Dyadic, NativeFullOperationError> {
     let NativeScaleConstraint::Bfloat16NearestSquareRootOf(value) = constraint else {
         return Err(NativeFullOperationError::Operation);
     };
@@ -1832,7 +1863,7 @@ fn nearest_bfloat16_square_root(value: u32) -> Result<Dyadic, NativeFullOperatio
     Dyadic::of_bfloat16_bits(word).map_err(NativeFullOperationError::Resident)
 }
 
-fn operation_bound(
+pub(super) fn operation_bound(
     operation: u32,
     reading: &crate::resident_section::PassageReading,
 ) -> Result<u32, NativeFullOperationError> {

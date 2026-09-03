@@ -161,6 +161,7 @@ pub fn adjoint_contract<'chart>(
     builder.close(0, &section, join_needed)?;
     let reading = builder.finish()?.launch()?;
     let bound_octaves = bound_of(&reading)?;
+    surface.release_partials(&standing)?;
     Ok(NativeAdjointContraction {
         section,
         bound_octaves,

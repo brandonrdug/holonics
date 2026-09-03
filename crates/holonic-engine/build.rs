@@ -49,6 +49,7 @@ fn declared_architecture() -> String {
 }
 
 fn main() {
+    println!("cargo:rerun-if-changed=kernels/exact_resident_adjoint.cuh");
     println!("cargo:rerun-if-changed=kernels/exact_conic_support.cu");
     println!("cargo:rerun-if-changed=kernels/exact_relation_support.cu");
     println!("cargo:rerun-if-changed=kernels/refine_shell.cu");
