@@ -60,6 +60,19 @@ outside the family by construction.
 (`12`, `12`, `13`, `7`, `16`): the same face `1` for four occurrences, whose cones differ by up to
 a factor of four. The face is the signature's coordinate; the cone is what carried it.
 
+## Correction of 2026-09-03, under SKE4
+
+[counterexample; measured] The class cones reported above as unions of the members' cones over
+every exposure are not cones. On the card, withdrawing the complement of class 0's union
+(961,417 sites, a subset of each exposure's own complement) changed two of its three faces
+(`**` for `7` under the empty history, `7` for `5` under `The second operand is `), both on the
+resident apparatus by joint withdrawal and on the class body mounted from the productive lane.
+A cone verified by withdrawing its whole complement is one sufficient population; `IsCone` is
+universal over sub-populations, and unions of such cones do not inherit it. The unions stand
+here only as testimony of what each exposure's own complement withdrawal returned; the class
+cones and the extent are founded jointly in SKE4, and its receipt supersedes the extent and
+insufficiency populations stated above.
+
 ## Verification
 
 [process-audit; measured] Host tests of the identification owner pass; the fifteen exposures and

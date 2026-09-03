@@ -185,7 +185,8 @@ The order is fixed:
    **PASSED**;
 3. `SKE2` -- excitation and the cone by intervention -- **PASSED** at its corrected scope;
 4. `SKE3` -- identification: the signature quotient of a declared family -- **PASSED**;
-5. `SKE4` -- condensation and seal through `soulkiller::dismantle` -- **CURRENT**; and
+5. `SKE4` -- condensation and seal through `soulkiller::dismantle`, re-founded on 2026-09-03 at
+   the flux-group grain with the session's 2026-08-18 contract restored first -- **CURRENT**; and
 6. `SKE5` -- Eros composes the classes and the recurrence runs on them.
 
 [definition] Soulkiller is founded by excitation. The resident exact realization is the
@@ -220,6 +221,12 @@ declared family over three declared histories: two variants identified under the
 and reopened by a declared history, five classes under every history, class cones as unions, and
 the extent and insufficiency as site populations. Its receipt is
 [`the SKE3 return`](../research/records/2026-09-03_SKE3_THE_SIGNATURE_QUOTIENT_IDENTIFIED_TWO_VARIANTS_UNDER_THE_EMPTY_HISTORY_AND_A_DECLARED_HISTORY_REOPENED_THEM.md).
+
+[counterexample; measured] On 2026-09-03 Brandon's correction re-founded the grain of the campaign
+(the blueprint's §0b): the SKE2 and SKE3 coordinate cones are withdrawn as cones, the per-operation
+host readout of the HNA session is the renamed instruction loop of 2026-08-18, and compression is
+the trichotomy with its remainder, measured as locking and reach. SKE4 is current at the corrected
+grain; its coordinate-grain construction is withdrawn as the deed.
 
 [counterexample; source-inspected] The audit
 [`2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](../research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md)

@@ -26,9 +26,18 @@ manifestation grade and the apparatus, not the return. The return is the quotien
 family of occurrences by equality of complete causal signatures, each class condensed to the
 local-current ecology restricted to the cone the family made load-bearing, sealed with the
 insufficiency. The adjoint return through every reaction (`SKE1`) is one instrument for
-cultivation and dissection; `SKE2` founded the cone by joint intervention; `SKE3` returned the
-signature quotient of the declared family with its extent and insufficiency. `SKE4` is current:
-condensation and seal through `soulkiller::dismantle`. The audit is
+cultivation and dissection; `SKE2` founded the joint-withdrawal instrument; `SKE3` returned the
+signature quotient of the declared family. On 2026-09-03 Brandon's correction re-founded the
+campaign's grain (the blueprint's §0b): cones, signatures, extents, and compression are stated
+over flux groups read through the passage census, never over coordinates; the per-operation
+passage and host readout of the HNA session is the renamed instruction loop of 2026-08-18 and
+grades nothing; compression is the trichotomy with its remainder, measured as locking and reach.
+The coordinate cones of SKE2 and SKE3 and the coordinate-grain SKE4 construction are withdrawn;
+`SKE4` is current at the corrected grain, beginning with the session brought back under the
+2026-08-18 contract. The engine changes of the withdrawn SKE4 construction (the generic
+productive lane at the boundary, the coefficient intake and mount from a productive lane, the
+condensation and extent owners, the SKE4 deed) are uncommitted in the working tree pending the
+group-grain construction, which may keep the boundary and the intake. The audit is
 [`research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md).
 
 [proved-derived; formal-checked] SKE0 returned `HolonicExcitationFoundedQuotient.lean`: the

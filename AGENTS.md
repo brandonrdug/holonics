@@ -167,6 +167,13 @@ retraction is a contamination. Dates are record dates under `research/records/`.
   quotient of a declared family as cone-restricted ecologies; the resident realization is its
   apparatus
   (`2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`).
+- 2026-09-03: the SKE2 and SKE3 cones over the 1,595,392 output coordinates are withdrawn as
+  cones (the union of two was refuted on the card, and the grain itself is droplet tracing);
+  the HNA session's per-operation passage and host readout is the renamed instruction loop of
+  2026-08-18 and grades nothing; the SKE4 construction at the coordinate grain is withdrawn as
+  the deed. The joint-withdrawal instrument, the replay and magnitude controls, the quotient by
+  faces with its separating history, and the exposure receipts stand as testimony
+  (`blueprint/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md` §0b).
 
 [established-bounded; source-inspected] Standing at declared scope, for contrast: four exact
 interior recoveries (`2026-08-10_THE_OBJECT_IS_THE_UNRECONSTRUCTABLE_INTERIOR_AND_THE_MACHINE_HAS_ALREADY_RECOVERED_FOUR.md`);
@@ -320,6 +327,14 @@ returns.
   returns is format-free: whether an emission was admitted, which carriers it carried, and its
   diagnostic as octets. The interior derives the returned interaction from those faces; an
   application never types it.
+- **Brandon, 2026-09-03, ruling.** Holonics is stated over group characteristics of flux, never
+  over absolute positions or exact relational details at one grain: nobody has the liberty of
+  tracing every droplet that carved the canyon, and nobody asked for it. Certifying and reading
+  every operation to the host is not the apparatus's discipline; it is an injection (the renamed
+  instruction loop refused on 2026-08-18), and a cone, signature, extent, or compression stated
+  over coordinates is droplet tracing. Compression is the trichotomy of
+  `canon/TABLET_THE_OPERATIONS.md` §5.2 with its remainder exhibited, measured as locking and
+  reach; a row subset of codewords is not a lift.
 - The machine owns no semantic distinction between “data” and “program.” Both are caused structure
   crossing declared ports and capable of changing later conduct.
 - Algorithms are physically enacted causal geometries. Do not separate computer science from
