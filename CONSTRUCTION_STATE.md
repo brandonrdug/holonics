@@ -203,6 +203,21 @@ is
 de Bruijn--Newman time is `t = -4u` after `s = 1/2 + i z/2`. Its Lean theorems stand, but the direct
 standard-`H_t` interpretation is retracted pending the RH0/RH1 bridge.
 
+**RH line position:** FT1
+
+[definition] Brandon's direct instruction of 2026-09-03 activates the `FT0--FT6` Foster-tank and
+threshold campaign on the RH line under
+[`blueprint/THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](blueprint/THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md),
+target `Λ_DN = 0`, beside the engine frontier above; the lines share no owner.
+
+[proved-derived; formal-checked] FT0 passed: `RH/FosterTanks.lean` returned the tank algebra
+(the pair identity, the parallel-LC identity, positivity iff on the seam, the seam resonance
+`(LC)^{−1/2} = γ`), the symmetric zero factorization at `½`, the paired flux identity, and the
+paired finite Foster form with Landau's remainder, every theorem on `propext`, `Classical.choice`,
+`Quot.sound`; `ξ(½) ≠ 0` is carried as a named hypothesis and is FT1's first item. The receipt is
+[`research/records/2026-09-03_FT0_THE_ZEROS_ARE_FOSTER_TANKS_AND_THE_PAIRED_LANDAU_FORM_CARRIES_THE_REMAINDER.md`](research/records/2026-09-03_FT0_THE_ZEROS_ARE_FOSTER_TANKS_AND_THE_PAIRED_LANDAU_FORM_CARRIES_THE_REMAINDER.md).
+`FT1` is current: the centre value, the count `N(R) ≤ C R log R`, and the exponent of convergence.
+
 [definition] Use `c_CD` for the Copson--de Bruijn sharp coefficient and reserve `Λ_DN` for the
 coordinate-corrected de Bruijn--Newman threshold. The correction record is
 [`research/records/2026-09-02_THE_RH_ENTIRE_HEAT_FLOW_REQUIRES_THE_CRITICAL_COORDINATE_AND_REVERSES_STANDARD_TIME.md`](research/records/2026-09-02_THE_RH_ENTIRE_HEAT_FLOW_REQUIRES_THE_CRITICAL_COORDINATE_AND_REVERSES_STANDARD_TIME.md).

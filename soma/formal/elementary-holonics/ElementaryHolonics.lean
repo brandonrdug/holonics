@@ -88,6 +88,7 @@ import ElementaryHolonics.RH.OffLineJensen
 import ElementaryHolonics.RH.PhaseFlowLedger
 import ElementaryHolonics.RH.HeatFlowBinding
 import ElementaryHolonics.RH.HeatFlowStackedSeam
+import ElementaryHolonics.RH.FosterTanks
 import ElementaryHolonics.RH.LogDerivativeRemainder
 import ElementaryHolonics.RH.LandauLemma
 import ElementaryHolonics.RH.ZeroFactorizationExists

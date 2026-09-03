@@ -56,6 +56,9 @@ Read, in order:
     [`Lean-binding retraction`](../research/records/2026-09-02_THE_LEAN_BINDING_OF_THE_WORLD_RETURN_IS_RETRACTED_AND_LANGUAGES_ARE_APPLICATIONS.md),
     and the interpretation-grade
     [`flux/morphology terminology report`](../research/records/2026-09-02_WEIGHT_MATRICES_ARE_FLUX_CROSS_SECTIONS_IN_MOTION_AND_MORPHOLOGY_PACKAGES_ARE_MORPHOLOGY_HOLONS.md).
+18. for the RH line, the directed Foster-tank and threshold contract,
+    [`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md),
+    with the two records of 2026-09-03 that founded it.
 
 Read only the smallest source, formal, and evidence closure required by the active deed. Completed
 sensory, membrane, Athena-alpha, Soulkiller, L, H, and Millennium campaign files
@@ -85,6 +88,33 @@ moving-root drift, basin transport, harmonic exclusion, and a lower-or-upper cha
 convergence dichotomy. Coefficient-specific branch selection and a certified decimal are parked
 research and schedule nothing. Brandon's direct correction of 2026-09-02 closes HTP at this bounded
 handoff and activates the engine HNA campaign.
+
+**RH line position:** FT1
+
+[proved-derived; formal-checked] FT0 passed: `RH/FosterTanks.lean` returned the tank algebra
+(pair identity, parallel-LC identity, positivity iff on the seam, seam resonance `(LC)^{−1/2} = γ`),
+the symmetric zero factorization at the seam's centre, the paired flux identity, and the paired
+finite Foster form with Landau's remainder, carrying `ξ(½) ≠ 0` as a named hypothesis for FT1. The
+receipt is
+[`the FT0 record`](../research/records/2026-09-03_FT0_THE_ZEROS_ARE_FOSTER_TANKS_AND_THE_PAIRED_LANDAU_FORM_CARRIES_THE_REMAINDER.md).
+
+[definition] Brandon's direct instruction of 2026-09-03, *"I am directing that campaign,"*
+activates the ordered `FT0--FT6` Foster-tank and threshold campaign on the RH line under
+[`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md).
+Its target is `Λ_DN = 0`. The engine frontier above is unchanged; the two lines share no owner
+and each advances on its own gate. The order is fixed:
+
+1. `FT0` -- the paired finite Foster form with Landau's remainder, the tank data, and the
+   positivity/seam equivalence -- **PASSED**;
+2. `FT1` -- the centre value `ξ(½) ≠ 0`, the count `N(R) ≤ C R log R`, and the exponent of
+   convergence -- **CURRENT**;
+3. `FT2` -- the paired canonical product for the entire growth class;
+4. `FT3` -- Hadamard, the full Foster form, and the entire-face thread law (discharging the
+   `RodgersTaoZeroDynamics` port);
+5. `FT4` -- the entire-face flow, `Λ_DN` defined, and `RH ⟺ Λ_DN ≤ 0` against the anchor;
+6. `FT5` -- the flowed explicit formula: the bound integer comb against the divisor of
+   `heatE t ξ`; and
+7. `FT6` -- `Λ_DN ≥ 0` and the target, or the first exact missing inequality with its falsifier.
 
 [definition] The de Bruijn--Newman/RH line remains independent: use `c_CD` for the
 Copson--de Bruijn coefficient and `Λ_DN` for the coordinate-corrected heat-flow threshold. The

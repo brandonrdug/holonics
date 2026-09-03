@@ -125,6 +125,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/THE_EROS_INFORMATION_ENGINE.md` | **The Eros cycle as an Information Engine** — **Sits under:** `blueprint/THE_ROADMAP.md`, which remains the single active roadmap. |
 | `blueprint/THE_EROS_INSTANTIATION.md` | **The Eros instantiation — what a model IS, what conditioning IS, what production IS** — **HNA correction, 2026-09-02:** §2's one-passage law governs. |
 | `blueprint/THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md` | **The finite many-body and polarized crystal transport foundation** — A receiver covector or positive effect `rho` acts only after the surface junction. |
+| `blueprint/THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md` | **The flow carries the zeros as Foster tanks, and the threshold is the target** — **Founded:** 2026-09-03, by Brandon's direct instruction: *"I am directing that campaign."* **Authority:** this is a subordinate contract. |
 | `blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md` | **The Gemma map is dissected, condensed, cultivated, and reborn as a frozen native model** — **Truth status:** construction contract. |
 | `blueprint/THE_HOLONIC_INFERENCE_CIRCULATION_RETAINS_THE_CAUSAL_BOUNDARY_AND_HETEROGENEOUS_TRANSPORT_FUSES.md` | **The Holonic Inference circulation retains the causal boundary, and heterogeneous transport fuses** — **Truth statuses:** `definition` for the inference, realization, retained-section, dissection, and fusion contracts; `established-bounded` for the cited M3--M6, A1--A3 and I0--I5 evidence;… |
 | `blueprint/THE_HOLONIC_INTELLIGENCE_FRAMEWORK_RETURNS_INTRINSIC_HOLONS_AND_PACKAGES_DISMANTLING_INFERENCE_CULTIVATION_AND_GENERATION.md` | **The Holonic Intelligence Framework returns intrinsic holons and packages dismantling, inference,** — **Governing doctrine:** `../canon/TABLET_THE_REASONING_CYCLE.md`, `../canon/TABLET_THE_HEXIS.md`,… |
@@ -160,7 +161,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (450 deposits of 934)
+## 4 · The 2026-08 record line (450 deposits of 935)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
