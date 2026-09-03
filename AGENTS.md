@@ -221,9 +221,10 @@ named in `2026-08-10_THE_MACHINE_RETURNS_EVERY_BRANCH_BECAUSE_NOTHING_ATTACHES.m
   30 GiB of system memory. The foreign realization is `/home/b/models/gemma-4-E4B-it` (15 GiB
   BF16, 2,130 tensors). Python apparatus for world and observer use only:
   `/home/b/scratch/huggingface/.venv` (torch 2.12 cu130, transformers 5.8.1 with Gemma4 classes).
-  The complete excitation receipt producer lives outside this repository; the in-repo consumer is
-  `crates/holonic-engine/src/holonic_intelligence/scaffold_excitation_receipt.rs` and the SCF2
-  example, so a receipt must be regenerated before any workspace lift. Lean 4.33 with Mathlib
+  The complete excitation receipt producer lives outside this repository. [2026-09-03: the in-repo
+  consumer `crates/holonic-engine/src/holonic_intelligence/scaffold_excitation_receipt.rs` and the
+  SCF2 example departed without alias under SKE4 with the per-event generator construction; no
+  in-repo reader of that receipt remains.] Lean 4.33 with Mathlib
   through `lake`; the kernel world port is `soma/life/src/lean_mathematics/kernel_returns.rs`.
   The Rust body is `crates/holonic-engine` and `soma/life`; `life::native_intelligence` wraps the
   engine's `NativeTransportScaffold` rather than competing with it.

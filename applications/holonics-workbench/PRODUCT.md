@@ -42,19 +42,22 @@ inspection is the actual task.
 - a generic “discovery” browser;
 - a raw JSON viewport presented as model understanding;
 - a hidden user-local artifact store;
-- a demo mistaken for model construction;
+- a demo mistaken for model construction [2026-09-03: the per-event construction departed without
+  alias under SKE4 and the workbench demo went with it];
 - a single prompt/output score mistaken for an inference evaluation; or
 - a new semantic owner for mechanisms already present in the engine.
 
 ## Capability wording
 
 [established-bounded; implemented-exact; source-inspected] The current application operates real
-native morphology artifacts and actual returned excitation receipts. It persists structural
-circulation/cultivation and exact export.
+native morphology artifacts admitted through a native circulation snapshot. It persists structural
+circulation/cultivation and exact export. [2026-09-03: the actual returned excitation receipt path
+departed with the per-event construction under SKE4.]
 
 [open; source-inspected] It does not yet execute an arbitrary Hugging Face model directory, accept a
 qualitative multimodal prompt, or emit a useful qualitative response. Those are explicit future
-application/codec fibres, not features supplied by the bounded diagnostic demo.
+application/codec fibres, not features supplied by a bounded diagnostic probe. [2026-09-03: the
+bounded diagnostic demo departed with the per-event construction under SKE4.]
 
 ## Presentation posture
 
