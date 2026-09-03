@@ -430,13 +430,8 @@ fn predecessor_hot(
 mod tests {
     use super::*;
     use holonic_engine::{
-        native_ecology::holonic_intelligence::{
-            Bf16ExcitationDismantling, ExteriorModality, ForeignBf16Excitation,
-            NativeInferenceAddress, NativeInferenceRequest,
-        },
-        receiver_exact_compression::ReceiverId,
-        soulkiller::dismantle,
-        BoundaryId,
+        native_ecology::holonic_intelligence::{NativeInferenceAddress, NativeInferenceRequest},
+        native_spool::fixture,
     };
 
     use crate::native_intelligence::{
@@ -444,28 +439,8 @@ mod tests {
         NativeWorldStage,
     };
 
-    fn excitation(event: u64, entering: u16, returned: u16) -> ForeignBf16Excitation {
-        ForeignBf16Excitation {
-            event: EventId(event),
-            predecessor: None,
-            entering_boundary: BoundaryId(event * 2),
-            emitting_boundary: BoundaryId(event * 2 + 1),
-            source_occurrence: format!("cold/{event}"),
-            exterior_modality: ExteriorModality::Text,
-            entering_codewords: vec![entering],
-            returned_codewords: vec![returned],
-            interventions: BTreeSet::from([format!("intervention/{event}")]),
-            receiver_consequences: BTreeSet::from([format!("consequence/{event}")]),
-        }
-    }
-
     fn session() -> NativeCirculationSession {
-        let returned = dismantle(Bf16ExcitationDismantling {
-            receiver: ReceiverId(7),
-            excitations: vec![excitation(1, 0x3f80, 0x4000), excitation(2, 0x4040, 0x4080)],
-        })
-        .expect("dismantle");
-        let (hot, _) = consume_dismantling_return(returned).expect("hot");
+        let (hot, _) = consume_dismantling_return(fixture::returned()).expect("hot");
         let package = NativeMorphologyArtifact::found(
             hot,
             MorphologyLineage::origin(),
@@ -479,7 +454,7 @@ mod tests {
             NativeCirculationConfiguration::found(InferenceConfigurationAddress {
                 ingress_aperture: "native-addressed-occurrence".to_owned(),
                 occurrence: EventId(1),
-                receiver: ReceiverId(7),
+                receiver: fixture::FIXTURE_RECEIVER,
                 continuation_receiver: "exterior-receiver-decision".to_owned(),
                 world_return_law: "genuinely-later-return".to_owned(),
                 emission_codec: "owned-structural-boundary".to_owned(),
@@ -510,7 +485,7 @@ mod tests {
                 thread: thread.address.clone(),
                 occurrence,
             },
-            receiver: ReceiverId(7),
+            receiver: fixture::FIXTURE_RECEIVER,
         }
     }
 
