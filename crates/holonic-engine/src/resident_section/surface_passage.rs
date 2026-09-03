@@ -887,6 +887,61 @@ impl<'chart> ResidentSurface<'chart> {
     }
 
     /// Record the carry of a resident standing into `out`.
+    /// The receiver return over the resident emission and reacted tiles named by `tiles` (a
+    /// resident table of `4 · tile_count` addresses: `e_lo, e_hi, t_lo, t_hi` per tile) against the
+    /// resident next-occurrence addresses `next` (one per row). Writes the deposit enclosure into
+    /// `out`, a `[width x rows]` section in the factorized map's `u` layout.
+    #[allow(clippy::too_many_arguments)]
+    pub fn record_receiver_return(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        tiles: u64,
+        tile_count: u32,
+        tile_width: u32,
+        rows: u32,
+        width: u32,
+        next: u64,
+        grain: ResidentGrain,
+        terms: SeriesAperture,
+        deposit_shift: u32,
+        shape: &LawShape,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        if out.rows() != width as usize || out.width() != rows as usize {
+            return Err(ResidentRefusal::RowsDisagree {
+                operation: "receiver-return",
+                left: out.rows() * out.width(),
+                right: width as usize * rows as usize,
+            });
+        }
+        let mut params = Params::new();
+        params
+            .ptr(tiles)
+            .u32(tile_count)
+            .u32(tile_width)
+            .u32(rows)
+            .u32(width)
+            .ptr(next)
+            .i32(grain.0 as i32)
+            .u32(terms.0)
+            .u32(deposit_shift)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_receiver_return",
+            rows as usize,
+            shape.block,
+            shape.shared_octets,
+            &mut params,
+            "receiver-return",
+        )
+    }
+
     pub fn record_carry(
         &self,
         lane: &Lane<'_, 'chart>,

@@ -43,7 +43,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let first = session.advance(NativeFullOperationOccurrence {
         ordinal: 0,
         row_addresses: vec![818, 18_740],
-        morphology_current: None,
     })?;
     let distinct_occurrences_return_distinct_native_carriers = first.emission.intervals
         [..first.emission.width]
@@ -51,17 +50,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let second = first.successor.advance(NativeFullOperationOccurrence {
         ordinal: 1,
         row_addresses: vec![818, 18_740],
-        morphology_current: None,
     })?;
     let reshaped = second.successor.advance(NativeFullOperationOccurrence {
         ordinal: 2,
         row_addresses: Vec::new(),
-        morphology_current: None,
     })?;
     let step = reshaped.successor.advance(NativeFullOperationOccurrence {
         ordinal: 3,
         row_addresses: Vec::new(),
-        morphology_current: None,
     })?;
     let trace = serde_json::to_vec(&step.trace)?;
     let carries = |needle: &[u8]| trace.windows(needle.len()).any(|window| window == needle);

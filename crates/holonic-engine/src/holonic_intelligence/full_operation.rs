@@ -23,8 +23,13 @@ use crate::{
 
 use super::{
     NativeCarrierAxis, NativeCarrierOrdinal, NativeCausalReach, NativeFullOperatorEcology,
-    NativeOperationPrimitive, NativeOperatorNode, NativeOperatorResidence,
-    NativeOperatorResidenceError, NativeScaleConstraint,
+    NativeMorphologyDeposit, NativeOperationPrimitive, NativeOperatorNode,
+    NativeOperatorResidence, NativeOperatorResidenceError, NativeReturnAperture,
+    NativeScaleConstraint,
+    operative_return::{
+        OverlayAtom, ReturnMaterial, continuation_next_occurrences, enact_return, overlay_tile,
+        record_overlay_contribution,
+    },
 };
 
 pub const NATIVE_FULL_OPERATION_STEP_SCHEMA: &str = "holonic-engine.native-full-operation-step.v1";
@@ -33,56 +38,6 @@ pub const NATIVE_FULL_OPERATION_STEP_SCHEMA: &str = "holonic-engine.native-full-
 pub struct NativeFullOperationOccurrence {
     pub ordinal: u64,
     pub row_addresses: Vec<u32>,
-    pub morphology_current: Option<NativeLocalMorphologyCurrent>,
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
-pub struct NativeLocalMorphologyCurrent {
-    pub significand: i64,
-    pub exponent: i32,
-}
-
-impl NativeLocalMorphologyCurrent {
-    pub const IDENTITY: Self = Self {
-        significand: 1,
-        exponent: 0,
-    };
-
-    fn validate(self) -> Result<(), NativeFullOperationError> {
-        if self.significand <= 0 {
-            Err(NativeFullOperationError::Morphology)
-        } else {
-            Ok(())
-        }
-    }
-
-    fn compose(self, current: Self) -> Result<Self, NativeFullOperationError> {
-        self.validate()?;
-        current.validate()?;
-        Ok(Self {
-            significand: self
-                .significand
-                .checked_mul(current.significand)
-                .ok_or(NativeFullOperationError::Morphology)?,
-            exponent: self
-                .exponent
-                .checked_add(current.exponent)
-                .ok_or(NativeFullOperationError::Morphology)?,
-        })
-    }
-
-    fn enclosure(self) -> Result<DyadicEnclosure, NativeFullOperationError> {
-        self.validate()?;
-        let value = if self.exponent >= 0 {
-            Rat::from_integer(BigInt::from(self.significand) << self.exponent as usize)
-        } else {
-            Rat::new(
-                BigInt::from(self.significand),
-                BigInt::from(1) << (-self.exponent) as usize,
-            )
-        };
-        finest_enclosure(&ExactInterval::point(value))
-    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -106,7 +61,8 @@ pub struct NativeFullOperationTrace {
     pub operation: NativeOperatorNode,
     pub successor_projection: NativeSuccessorProjection,
     pub morphology_transition: NativeMorphologyTransition,
-    pub morphology_factor: NativeLocalMorphologyCurrent,
+    /// The total rank of the factorized overlay the ecology carries at this operation.
+    pub morphology_overlay_rank: usize,
     pub successor_bound_octaves: u32,
     pub resident_coefficient_octets: u64,
     pub census_before: TransferCensus,
@@ -119,8 +75,7 @@ pub enum NativeMorphologyTransition {
     Unchanged,
     Changed {
         operation: u32,
-        before: NativeLocalMorphologyCurrent,
-        after: NativeLocalMorphologyCurrent,
+        deposit: NativeMorphologyDeposit,
     },
 }
 
@@ -187,8 +142,19 @@ pub struct NativeFullOperatorSession<'residence, 'chart> {
     positions: Option<Positions<'chart>>,
     row_population: Option<usize>,
     cycle_complete: bool,
+    /// The complete emitted face of the last cycle, retained by the successor until the next
+    /// occurrence enters.
     terminal_carrier: Option<TiledCarrier<'chart>>,
-    morphology: NativeLocalMorphologyCurrent,
+    /// The reacted carrier of the tied boundary (`tanh`) and the carrier presented to the tied
+    /// contraction, retained for the return.
+    terminal_reacted: Option<TiledCarrier<'chart>>,
+    terminal_presented: Option<ContemporaryCarrier<'chart>>,
+    /// The row addresses of the last cycle: the line the emitted face continued.
+    previous_context: Option<Vec<u32>>,
+    /// The factorized overlay atoms deposited on the tied cross-section, in deposit order.
+    overlay: Vec<OverlayAtom<'chart>>,
+    /// The declared return apertures; `None` enacts no return.
+    aperture: Option<NativeReturnAperture>,
 }
 
 pub struct NativeFullOperationStep<'residence, 'chart> {
@@ -213,6 +179,24 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     pub fn found(
         ecology: &'residence NativeFullOperatorEcology,
         residence: &'residence mut NativeOperatorResidence<'chart>,
+    ) -> Result<Self, NativeFullOperationError> {
+        Self::found_with(ecology, residence, None)
+    }
+
+    /// Found the ecology with the declared return apertures: a continuing occurrence then meets
+    /// the retained emission and deposits on the tied cross-section.
+    pub fn found_with_return(
+        ecology: &'residence NativeFullOperatorEcology,
+        residence: &'residence mut NativeOperatorResidence<'chart>,
+        aperture: NativeReturnAperture,
+    ) -> Result<Self, NativeFullOperationError> {
+        Self::found_with(ecology, residence, Some(aperture))
+    }
+
+    fn found_with(
+        ecology: &'residence NativeFullOperatorEcology,
+        residence: &'residence mut NativeOperatorResidence<'chart>,
+        aperture: Option<NativeReturnAperture>,
     ) -> Result<Self, NativeFullOperationError> {
         ecology.validate()?;
         let mut grain = 0u32;
@@ -243,7 +227,11 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             row_population: None,
             cycle_complete: false,
             terminal_carrier: None,
-            morphology: NativeLocalMorphologyCurrent::IDENTITY,
+            terminal_reacted: None,
+            terminal_presented: None,
+            previous_context: None,
+            overlay: Vec::new(),
+            aperture,
         })
     }
 
@@ -277,21 +265,61 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             self.operation_at
         };
         self.ecology.operations.get(at).is_some_and(|operation| {
-            let row_shape = matches!(operation.primitive, NativeOperationPrimitive::Lookup { .. })
-                == !occurrence.row_addresses.is_empty();
-            let morphology_shape = occurrence.morphology_current.is_none()
-                || matches!(
-                    operation.primitive,
-                    NativeOperationPrimitive::Scale {
-                        by: NativeScaleConstraint::Coefficient
-                    }
-                );
-            row_shape && morphology_shape
+            matches!(operation.primitive, NativeOperationPrimitive::Lookup { .. })
+                == !occurrence.row_addresses.is_empty()
         })
     }
 
-    pub fn morphology_factor(&self) -> NativeLocalMorphologyCurrent {
-        self.morphology
+    /// The total rank of the factorized overlay the ecology carries.
+    pub fn morphology_overlay_rank(&self) -> usize {
+        self.overlay.iter().map(OverlayAtom::rank).sum()
+    }
+
+    pub fn return_aperture(&self) -> Option<NativeReturnAperture> {
+        self.aperture
+    }
+
+    /// The return: if `entering` continues the last cycle's line, the retained emitted face meets
+    /// the address that followed each of its rows and the deposit joins the overlay. Any other
+    /// occurrence has no comparison and changes no morphology.
+    fn return_on_continuation(
+        &mut self,
+        entering: &[u32],
+    ) -> Result<NativeMorphologyTransition, NativeFullOperationError> {
+        let Some(aperture) = self.aperture else {
+            return Ok(NativeMorphologyTransition::Unchanged);
+        };
+        let (Some(previous), Some(emission), Some(reacted), Some(presented)) = (
+            self.previous_context.as_deref(),
+            self.terminal_carrier.as_ref(),
+            self.terminal_reacted.as_ref(),
+            self.terminal_presented.as_ref(),
+        ) else {
+            return Ok(NativeMorphologyTransition::Unchanged);
+        };
+        let Some(next) = continuation_next_occurrences(previous, entering) else {
+            return Ok(NativeMorphologyTransition::Unchanged);
+        };
+        let surface = self.residence.surface();
+        let (atom, deposit) = enact_return(
+            surface,
+            ReturnMaterial {
+                emission: &emission.sections,
+                reacted: &reacted.sections,
+                presented: &presented.section,
+                presented_octaves: presented.bound_octaves,
+                rows: emission.rows,
+                width: emission.width,
+                grain: emission.grain,
+            },
+            &next,
+            aperture,
+        )?;
+        self.overlay.push(atom);
+        Ok(NativeMorphologyTransition::Changed {
+            operation: 0,
+            deposit,
+        })
     }
 
     /// Enact the graph's current mathematical operation.  HNA2 begins with the complete graph's
@@ -304,14 +332,18 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         if occurrence.ordinal != self.generation {
             return Err(NativeFullOperationError::Occurrence);
         }
+        let mut morphology_transition = NativeMorphologyTransition::Unchanged;
         if self.cycle_complete {
             if self.operation_at != 0 || occurrence.row_addresses.is_empty() {
                 return Err(NativeFullOperationError::Occurrence);
             }
+            morphology_transition = self.return_on_continuation(&occurrence.row_addresses)?;
             self.carriers.clear();
             self.positions = None;
             self.row_population = None;
             self.terminal_carrier = None;
+            self.terminal_reacted = None;
+            self.terminal_presented = None;
             self.cycle_complete = false;
         }
         let operation = self
@@ -320,17 +352,9 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             .get(self.operation_at)
             .cloned()
             .ok_or(NativeFullOperationError::Operation)?;
-        if occurrence.morphology_current.is_some()
-            && !matches!(
-                operation.primitive,
-                NativeOperationPrimitive::Scale {
-                    by: NativeScaleConstraint::Coefficient
-                }
-            )
-        {
-            return Err(NativeFullOperationError::Morphology);
+        if matches!(operation.primitive, NativeOperationPrimitive::Lookup { .. }) {
+            self.previous_context = Some(occurrence.row_addresses.clone());
         }
-        let morphology_before = self.morphology;
         let outcome = match &operation.primitive {
             NativeOperationPrimitive::Lookup { scale } => {
                 self.execute_lookup(&operation, &occurrence, scale)?
@@ -392,31 +416,8 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                 });
             }
         };
-        let (outcome, first_projection) = self.project_successor(operation.ordinal, outcome)?;
-        if let Some(current) = occurrence.morphology_current {
-            let input = operation
-                .inputs
-                .first()
-                .and_then(|input| self.carriers.get(input))
-                .ok_or(NativeFullOperationError::Morphology)?;
-            let presented = self.residence.surface().read_out(&input.section)?;
-            if alignment(&presented, &outcome.intervals)? <= BigInt::from(0) {
-                return Err(NativeFullOperationError::Morphology);
-            }
-            self.morphology = self.morphology.compose(current)?;
-        }
-        let (outcome, morphology_projection) = self.apply_morphology(operation.ordinal, outcome)?;
-        let successor_projection = combine_projections(&[first_projection, morphology_projection]);
-        let morphology_after = self.morphology;
-        let morphology_transition = if morphology_before == morphology_after {
-            NativeMorphologyTransition::Unchanged
-        } else {
-            NativeMorphologyTransition::Changed {
-                operation: operation.ordinal,
-                before: morphology_before,
-                after: morphology_after,
-            }
-        };
+        let (outcome, successor_projection) = self.project_successor(operation.ordinal, outcome)?;
+        let morphology_overlay_rank = self.morphology_overlay_rank();
         let successor_generation = self
             .generation
             .checked_add(1)
@@ -464,7 +465,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                 operation,
                 successor_projection,
                 morphology_transition,
-                morphology_factor: morphology_after,
+                morphology_overlay_rank,
                 successor_bound_octaves: outcome.bound_octaves,
                 resident_coefficient_octets,
                 census_before: outcome.census_before,
@@ -485,7 +486,6 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         if self.operation_at != start
             || occurrence.ordinal != self.generation
             || !occurrence.row_addresses.is_empty()
-            || occurrence.morphology_current.is_some()
         {
             return Err(NativeFullOperationError::Occurrence);
         }
@@ -511,38 +511,51 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         let mut emissions = Vec::with_capacity(5);
         let mut traces = Vec::with_capacity(5);
         let first = self.execute_tiled_boundary(&operations[0])?;
-        let mut carrier =
+        let contracted =
             self.record_tiled_outcome(operations[0].clone(), first, &mut emissions, &mut traces)?;
         let first_scale = match &operations[1].primitive {
             NativeOperationPrimitive::Scale { by } => scale_enclosure(by)?,
             _ => return Err(NativeFullOperationError::Operation),
         };
         let scaled =
-            self.execute_tiled_unary(&operations[1], carrier, TiledUnary::Scale(first_scale))?;
-        carrier =
+            self.execute_tiled_unary(&operations[1], &contracted, TiledUnary::Scale(first_scale))?;
+        let scaled_carrier =
             self.record_tiled_outcome(operations[1].clone(), scaled, &mut emissions, &mut traces)?;
         let reacted = self.execute_tiled_unary(
             &operations[2],
-            carrier,
+            &scaled_carrier,
             TiledUnary::Tanh(SeriesAperture(14)),
         )?;
-        carrier =
+        let reacted_carrier =
             self.record_tiled_outcome(operations[2].clone(), reacted, &mut emissions, &mut traces)?;
         let second_scale = match &operations[3].primitive {
             NativeOperationPrimitive::Scale { by } => scale_enclosure(by)?,
             _ => return Err(NativeFullOperationError::Operation),
         };
-        let scaled =
-            self.execute_tiled_unary(&operations[3], carrier, TiledUnary::Scale(second_scale))?;
-        carrier =
-            self.record_tiled_outcome(operations[3].clone(), scaled, &mut emissions, &mut traces)?;
-        let emitted = self.execute_tiled_unary(&operations[4], carrier, TiledUnary::Carry)?;
-        carrier =
+        let scaled_back = self.execute_tiled_unary(
+            &operations[3],
+            &reacted_carrier,
+            TiledUnary::Scale(second_scale),
+        )?;
+        let scaled_back_carrier = self.record_tiled_outcome(
+            operations[3].clone(),
+            scaled_back,
+            &mut emissions,
+            &mut traces,
+        )?;
+        let emitted =
+            self.execute_tiled_unary(&operations[4], &scaled_back_carrier, TiledUnary::Carry)?;
+        let emitted_carrier =
             self.record_tiled_outcome(operations[4].clone(), emitted, &mut emissions, &mut traces)?;
+        // The carrier presented to the tied contraction and the reacted carrier stay with the
+        // successor: they are what the next occurrence meets.
+        let presented = self.carriers.remove(&operations[0].inputs[0]);
         self.carriers.clear();
         self.operation_at = 0;
         self.cycle_complete = true;
-        self.terminal_carrier = Some(carrier);
+        self.terminal_carrier = Some(emitted_carrier);
+        self.terminal_reacted = Some(reacted_carrier);
+        self.terminal_presented = presented;
         Ok(NativeFullTerminalBranch {
             emissions,
             traces,
@@ -581,7 +594,6 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             let step = self.advance(NativeFullOperationOccurrence {
                 ordinal,
                 row_addresses: rows,
-                morphology_current: None,
             })?;
             traces.push(step.trace);
             self = step.successor;
@@ -590,7 +602,6 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         let mut terminal = self.advance_terminal(NativeFullOperationOccurrence {
             ordinal,
             row_addresses: Vec::new(),
-            morphology_current: None,
         })?;
         traces.append(&mut terminal.traces);
         let final_emission = terminal
@@ -650,17 +661,86 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             let successor =
                 surface.fresh_section(input.section.rows(), rows, input.section.grain())?;
             let tile_before = surface.census();
-            let mut builder = surface.begin_passage(&[vec![]])?;
-            let lane = builder.open(0, &[])?;
-            surface.record_contract(&lane, &input.section, &tile.mounted.readout, &successor)?;
+            // One passage: the base contraction, one contribution per overlay atom, and the
+            // re-entry joins in deposit order. Every shape and section is founded before the
+            // capture opens; every section stays alive until the launch returns.
+            let atoms = self.overlay.len();
+            let mut overlay_tiles = Vec::with_capacity(atoms);
+            let mut contributions = Vec::with_capacity(atoms);
+            let mut joins = Vec::with_capacity(atoms);
+            let mut join_shapes = Vec::with_capacity(atoms);
+            let mut carrier_octaves = shape.needed;
+            for atom in &self.overlay {
+                let overlay = overlay_tile(
+                    surface,
+                    atom,
+                    &input.section,
+                    input.bound_octaves,
+                    first_row,
+                    rows,
+                )?;
+                let join = surface.shape_re_entry(
+                    input.section.rows(),
+                    rows,
+                    carrier_octaves,
+                    overlay.needed(),
+                )?;
+                carrier_octaves = join.needed;
+                contributions.push(surface.fresh_section(
+                    input.section.rows(),
+                    rows,
+                    input.section.grain(),
+                )?);
+                joins.push(surface.fresh_section(input.section.rows(), rows, input.section.grain())?);
+                overlay_tiles.push(overlay);
+                join_shapes.push(join);
+            }
+            let mut lineage: Vec<Vec<usize>> = Vec::with_capacity(1 + 2 * atoms);
+            lineage.push(Vec::new());
+            lineage.extend((0..atoms).map(|_| Vec::new()));
+            lineage.extend((0..atoms).map(|at| {
+                let previous = if at == 0 { 0 } else { atoms + at };
+                vec![previous, 1 + at]
+            }));
+            let mut builder = surface.begin_passage(&lineage)?;
+            {
+                let lane = builder.open(0, &[])?;
+                surface.record_contract(&lane, &input.section, &tile.mounted.readout, &successor)?;
+            }
             builder.close(0, &successor, shape.needed)?;
+            for (at, overlay) in overlay_tiles.iter().enumerate() {
+                record_overlay_contribution(
+                    surface,
+                    &mut builder,
+                    1 + at,
+                    overlay,
+                    &input.section,
+                    &contributions[at],
+                )?;
+            }
+            for at in 0..atoms {
+                let index = atoms + 1 + at;
+                let previous = if at == 0 { 0 } else { atoms + at };
+                let carrier = if at == 0 { &successor } else { &joins[at - 1] };
+                {
+                    let lane = builder.open(index, &[previous, 1 + at])?;
+                    surface.record_re_entry(&lane, carrier, &contributions[at], &joins[at])?;
+                }
+                builder.close(index, &joins[at], join_shapes[at].needed)?;
+            }
+            let mut chain: Vec<(ResidentSection<'chart>, u32)> = vec![(successor, shape.needed)];
+            chain.extend(joins.into_iter().zip(join_shapes.iter().map(|join| join.needed)));
             let reading = builder.finish()?.launch()?;
             let bound_octaves = operation_bound(operation.ordinal, &reading)?;
-            let intervals = surface.read_out(&successor)?;
+            let (joined, _) = chain.pop().ok_or(NativeFullOperationError::Operation)?;
+            drop(chain);
+            drop(contributions);
+            drop(overlay_tiles);
+            let intervals = surface.read_out(&joined)?;
             let tile_after = surface.census();
             drop(tile);
             let outcome = OperationOutcome {
-                section: successor,
+                section: joined,
                 bound_octaves,
                 rows: input.section.rows(),
                 width: rows,
@@ -670,12 +750,10 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                 census_after: tile_after,
             };
             let (outcome, projection) = self.project_successor(operation.ordinal, outcome)?;
-            let (outcome, morphology_projection) =
-                self.apply_morphology(operation.ordinal, outcome)?;
             sections.push(outcome.section);
             bounds.push(outcome.bound_octaves);
             tile_intervals.push(outcome.intervals);
-            projections.push(combine_projections(&[projection, morphology_projection]));
+            projections.push(projection);
             first_row += rows;
         }
         let intervals = stitch_intervals(input.section.rows(), &tile_intervals)?;
@@ -698,7 +776,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     fn execute_tiled_unary(
         &self,
         operation: &NativeOperatorNode,
-        input: TiledCarrier<'chart>,
+        input: &TiledCarrier<'chart>,
         primitive: TiledUnary,
     ) -> Result<TiledOperationOutcome<'chart>, NativeFullOperationError> {
         if operation.inputs.as_slice() != [input.carrier] || !operation.coefficients.is_empty() {
@@ -710,7 +788,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         let mut bounds = Vec::with_capacity(input.bounds.len());
         let mut tile_intervals = Vec::with_capacity(input.sections.len());
         let mut projections = Vec::with_capacity(input.sections.len());
-        for (section, bound) in input.sections.into_iter().zip(input.bounds) {
+        for (section, bound) in input.sections.iter().zip(input.bounds.iter().copied()) {
             let shape = match primitive {
                 TiledUnary::Scale(by) => {
                     surface.shape_scale(section.rows(), section.width(), bound, by)?
@@ -730,11 +808,11 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             let mut builder = surface.begin_passage(&[vec![]])?;
             let lane = builder.open(0, &[])?;
             match primitive {
-                TiledUnary::Scale(by) => surface.record_scale(&lane, &section, by, &successor)?,
+                TiledUnary::Scale(by) => surface.record_scale(&lane, section, by, &successor)?,
                 TiledUnary::Tanh(terms) => {
-                    surface.record_tanh(&lane, &section, terms, &successor)?
+                    surface.record_tanh(&lane, section, terms, &successor)?
                 }
-                TiledUnary::Carry => surface.record_carry(&lane, &section, &successor)?,
+                TiledUnary::Carry => surface.record_carry(&lane, section, &successor)?,
             }
             builder.close(0, &successor, shape.needed)?;
             let reading = builder.finish()?.launch()?;
@@ -752,12 +830,10 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                 census_after: tile_after,
             };
             let (outcome, projection) = self.project_successor(operation.ordinal, outcome)?;
-            let (outcome, morphology_projection) =
-                self.apply_morphology(operation.ordinal, outcome)?;
             sections.push(outcome.section);
             bounds.push(outcome.bound_octaves);
             tile_intervals.push(outcome.intervals);
-            projections.push(combine_projections(&[projection, morphology_projection]));
+            projections.push(projection);
         }
         let intervals = stitch_intervals(input.rows, &tile_intervals)?;
         Ok(TiledOperationOutcome {
@@ -806,7 +882,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             operation,
             successor_projection: outcome.projection,
             morphology_transition: NativeMorphologyTransition::Unchanged,
-            morphology_factor: self.morphology,
+            morphology_overlay_rank: self.morphology_overlay_rank(),
             successor_bound_octaves: bound,
             resident_coefficient_octets: self.residence.receipt().raw_coefficient_octets,
             census_before: outcome.census_before,
@@ -816,39 +892,6 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         self.generation = successor_generation;
         self.operation_at += 1;
         Ok(outcome.carrier)
-    }
-
-    fn apply_morphology(
-        &self,
-        operation: u32,
-        outcome: OperationOutcome<'chart>,
-    ) -> Result<(OperationOutcome<'chart>, NativeSuccessorProjection), NativeFullOperationError>
-    {
-        if self.morphology == NativeLocalMorphologyCurrent::IDENTITY {
-            return Ok((outcome, NativeSuccessorProjection::Exact));
-        }
-        let surface = self.residence.surface();
-        let by = self.morphology.enclosure()?;
-        let shape = surface.shape_scale(outcome.rows, outcome.width, outcome.bound_octaves, by)?;
-        let successor = surface.fresh_section(outcome.rows, outcome.width, outcome.grain)?;
-        let mut builder = surface.begin_passage(&[vec![]])?;
-        let lane = builder.open(0, &[])?;
-        surface.record_scale(&lane, &outcome.section, by, &successor)?;
-        builder.close(0, &successor, shape.needed)?;
-        let reading = builder.finish()?.launch()?;
-        let bound_octaves = operation_bound(operation, &reading)?;
-        let intervals = surface.read_out(&successor)?;
-        let scaled = OperationOutcome {
-            section: successor,
-            bound_octaves,
-            rows: outcome.rows,
-            width: outcome.width,
-            grain: outcome.grain,
-            intervals,
-            census_before: outcome.census_before,
-            census_after: surface.census(),
-        };
-        self.project_successor(operation, scaled)
     }
 
     fn project_successor(
@@ -1742,23 +1785,6 @@ fn stitch_intervals(
     Ok(stitched)
 }
 
-fn alignment(
-    presented: &[(i64, i64)],
-    reacted: &[(i64, i64)],
-) -> Result<BigInt, NativeFullOperationError> {
-    if presented.is_empty() || presented.len() != reacted.len() {
-        return Err(NativeFullOperationError::Morphology);
-    }
-    Ok(presented
-        .iter()
-        .zip(reacted)
-        .fold(BigInt::from(0), |sum, ((pl, ph), (rl, rh))| {
-            let presented_center_twice = BigInt::from(*pl) + BigInt::from(*ph);
-            let reacted_center_twice = BigInt::from(*rl) + BigInt::from(*rh);
-            sum + presented_center_twice * reacted_center_twice
-        }))
-}
-
 fn combine_projections(projections: &[NativeSuccessorProjection]) -> NativeSuccessorProjection {
     let mut nonpoint_coordinates = 0usize;
     let mut widest_interval = 0u64;
@@ -1896,34 +1922,6 @@ fn exact_bound(reading: &crate::resident_section::PassageReading) -> Result<u32,
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn local_morphology_requires_positive_exact_conductance_and_composes() {
-        let two = NativeLocalMorphologyCurrent {
-            significand: 2,
-            exponent: 0,
-        };
-        assert_eq!(
-            NativeLocalMorphologyCurrent::IDENTITY
-                .compose(two)
-                .expect("positive current"),
-            two
-        );
-        assert!(
-            NativeLocalMorphologyCurrent {
-                significand: 0,
-                exponent: 0
-            }
-            .validate()
-            .is_err()
-        );
-    }
-
-    #[test]
-    fn presented_reacted_alignment_is_exact_and_can_refuse() {
-        assert!(alignment(&[(1, 1), (2, 2)], &[(3, 3), (4, 4)]).unwrap() > BigInt::from(0));
-        assert!(alignment(&[(1, 1)], &[(-1, -1)]).unwrap() < BigInt::from(0));
-    }
 
     #[test]
     fn tiled_faces_stitch_in_row_major_order() {

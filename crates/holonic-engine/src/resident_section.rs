@@ -125,7 +125,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 34] = [
+pub const KERNELS: [&str; 35] = [
     "section_from_bfloat16",
     "section_carry",
     "section_terminal_row",
@@ -155,6 +155,9 @@ pub const KERNELS: [&str; 34] = [
     // rewritten in place. Declared per occurrence; the passage refuses it unless the predecessor's
     // only consumer is the quotient and no receiver declared the predecessor's face.
     "section_midpoint_seal",
+    // The receiver return: the emitted face meets its next occurrence and the differential of the
+    // normalized exponential receiver returns through the terminal reactions as a deposit word.
+    "section_receiver_return",
     "section_arithmetic_control",
     // The tiled contraction's emitted family. Every wrapper is named here so the module-wide block
     // derivation inspects every instantiation rather than one; each carries `__launch_bounds__(512)`
@@ -568,6 +571,14 @@ impl ResidentSection<'_> {
     }
     pub fn grain(&self) -> ResidentGrain {
         self.grain
+    }
+    /// The resident address of the lower endpoint population, for a sibling owner in this crate
+    /// mounting a sealed section (`lo == hi`) as an aligned readout inside the same context.
+    pub(crate) fn lo_device_ptr(&self) -> u64 {
+        self.lo.device_ptr()
+    }
+    pub(crate) fn hi_device_ptr(&self) -> u64 {
+        self.hi.device_ptr()
     }
     pub fn resident_octets(&self) -> u64 {
         self.octets

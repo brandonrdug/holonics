@@ -30,6 +30,8 @@ mod operative_atlas;
 mod operative_morphology;
 #[path = "holonic_intelligence/operative_residence.rs"]
 mod operative_residence;
+#[path = "holonic_intelligence/operative_return.rs"]
+mod operative_return;
 #[path = "holonic_intelligence/operative_session.rs"]
 mod operative_session;
 #[path = "holonic_intelligence/profile.rs"]
@@ -59,6 +61,7 @@ pub use lifecycle::*;
 pub use material_ingress::*;
 pub use operative_atlas::*;
 pub use operative_morphology::*;
+pub use operative_return::*;
 pub use operative_residence::*;
 pub use operative_session::*;
 pub use profile::*;

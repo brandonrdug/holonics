@@ -54,7 +54,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .advance(NativeFullOperationOccurrence {
                 ordinal: at as u64,
                 row_addresses: addresses,
-                morphology_current: None,
             })
             .map_err(|error| {
                 format!(

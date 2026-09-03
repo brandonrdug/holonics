@@ -1051,6 +1051,77 @@ impl<'chart> ResidentSurface<'chart> {
 
     /// The carry of a resident standing into this passage: one read and one write per coordinate,
     /// no arithmetic, the octave bound unchanged.
+    /// **The receiver return**: per emitted row, the null, the partition of the certified
+    /// exponential over the complete face, and per coordinate the differential of the normalized
+    /// exponential receiver against the next occurrence, its adjoint through the terminal
+    /// reactions, and the deposit word. One block per row; the two reductions are named barriers
+    /// realized in shared storage. The deposit is at most one unit at the grain, so its bound is
+    /// the grain plus the directed hand.
+    pub fn shape_receiver_return(
+        &self,
+        rows: usize,
+        width: usize,
+        tile_width: usize,
+        grain: ResidentGrain,
+        terms: SeriesAperture,
+    ) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "receiver-return";
+        if rows == 0 || tile_width == 0 || width % tile_width != 0 {
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: format!(
+                    "the face is {rows} x {width} in tiles of {tile_width}; the tiles must cover it exactly"
+                ),
+            });
+        }
+        let needed = grain.0 + 2;
+        Self::admit_octaves(OPERATION, needed)?;
+        let count = (rows * width) as u64;
+        let series = 2 * (u64::from(terms.0) + 1);
+        let mut work = ExactWork::nothing();
+        work.multiplied(count * (4 * series + 8));
+        work.added(count * (2 * series + 8));
+        work.divided(count * (2 * series + 2));
+        work.entries_written = BigUint::from(2 * count);
+        work.resident(2 * count);
+        work.peak_bits = BigUint::from(u64::from(2 * grain.0 + 2));
+        work.cumulative_bits = BigUint::from(2 * count * u64::from(grain.0 + 2));
+        work.dependency_span = BigUint::from(2u64 + u64::from(terms.0));
+        let block = self.reduction_block.max(self.launch.warp);
+        let shared_u64 = 2u64.saturating_mul(u64::from(block)).saturating_mul(16);
+        let shared = u32::try_from(shared_u64).map_err(|_| ResidentRefusal::Declaration {
+            operation: OPERATION,
+            what: format!("the reduction block {block} has no representable shared extent"),
+        })?;
+        if shared > self.max_shared_octets {
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: format!(
+                    "a reduction block of {block} needs {shared} shared octets; the device admits {}",
+                    self.max_shared_octets
+                ),
+            });
+        }
+        if rows > self.launch.max_grid_x as usize {
+            return Err(ResidentRefusal::GridAperture {
+                operation: OPERATION,
+                rows,
+                width,
+            });
+        }
+        Ok(LawShape {
+            operation: OPERATION,
+            rows,
+            width,
+            needed,
+            predicted: work,
+            couplings: Vec::new(),
+            launches: 2,
+            shared_octets: shared,
+            block,
+        })
+    }
+
     pub fn shape_carry(
         &self,
         rows: usize,

@@ -1449,6 +1449,143 @@ extern "C" __global__ void section_midpoint_seal(
 }
 
 // ---------------------------------------------------------------------------------------------
+// the receiver return: the emitted face meets its next occurrence, and the differential of the
+// normalized exponential receiver returns through the terminal reactions onto the cross-section
+// ---------------------------------------------------------------------------------------------
+//
+// One block per emitted row `j`. The emission `e` and the reacted carrier `t = tanh(c/30)` are
+// read from their resident tiles through a pointer table `tiles[4t..4t+4] = e_lo, e_hi, t_lo, t_hi`
+// of `tile_count` tiles each `tile_width` wide, so no wide copy of the face is ever made. Three
+// exact passes over the row: the null (the row's greatest upper endpoint, as the contact's), the
+// partition `Z = Σ exp(e − null)`, and per coordinate
+//
+//   p   = exp(e − null) / Z                      the normalized exponential receiver face
+//   d   = p − [o = next_j]                       its differential against the next occurrence
+//   g   = 1 − t²                                 the adjoint of scale · tanh · scale (30 · 1/30)
+//   u   = −(d · g)                               the deposit word, at grain 2^-F; the declared
+//                                                learning shift enters only as the exponent of
+//                                                the readout the host mounts over these words
+//
+// Written as an enclosure `[u_lo, u_hi]` into a `[width × rows]` section in the factorized
+// map's `u[o · rank + j]` layout; the passage seals it to its midpoint under its own census.
+extern "C" __global__ void section_receiver_return(
+    const uint64_t *tiles, uint32_t tile_count, uint32_t tile_width,
+    uint32_t rows, uint32_t width, const uint32_t *next,
+    int32_t grain, uint32_t terms, uint32_t deposit_shift,
+    int64_t *u_lo, int64_t *u_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    extern __shared__ unsigned char shared_raw[];
+    wide *scratch_lo = (wide *)shared_raw;
+    wide *scratch_hi = scratch_lo + blockDim.x;
+    __shared__ int stopped;
+    __shared__ wide null_value, total_lo, total_hi;
+    uint32_t j = blockIdx.x;
+    if (j >= rows) return;
+    if (threadIdx.x == 0) stopped = upstream_refused(census, lineage, lineage_count, refused);
+    __syncthreads();
+    if (stopped) return;
+    if (tile_width == 0 || (uint64_t)tile_count * (uint64_t)tile_width != (uint64_t)width || next[j] >= width) {
+        if (threadIdx.x == 0) atomicOr(refused, REFUSED_MALFORMED);
+        return;
+    }
+    wide unit = (wide)1 << grain;
+    // (a) the null: the row's greatest upper endpoint, one exact maximum reduction.
+    wide local_null = -(((wide)1) << 126);
+    for (uint32_t o = threadIdx.x; o < width; o += blockDim.x) {
+        uint32_t tile = o / tile_width, within = o % tile_width;
+        const int64_t *e_hi = (const int64_t *)tiles[4 * tile + 1];
+        wide h = (wide)e_hi[(size_t)j * tile_width + within];
+        if (h > local_null) local_null = h;
+    }
+    scratch_hi[threadIdx.x] = local_null;
+    __syncthreads();
+    for (uint32_t stride = blockDim.x / 2; stride > 0; stride >>= 1) {
+        if (threadIdx.x < stride && scratch_hi[threadIdx.x + stride] > scratch_hi[threadIdx.x]) {
+            scratch_hi[threadIdx.x] = scratch_hi[threadIdx.x + stride];
+        }
+        __syncthreads();
+    }
+    if (threadIdx.x == 0) null_value = scratch_hi[0];
+    __syncthreads();
+    // (b) the partition: every exponential enclosure contributes once, directed at both ends.
+    wide part_lo = 0, part_hi = 0;
+    for (uint32_t o = threadIdx.x; o < width; o += blockDim.x) {
+        uint32_t tile = o / tile_width, within = o % tile_width;
+        const int64_t *e_lo = (const int64_t *)tiles[4 * tile];
+        const int64_t *e_hi = (const int64_t *)tiles[4 * tile + 1];
+        size_t at = (size_t)j * tile_width + within;
+        wide a_lo = (wide)e_lo[at] - null_value, a_hi = (wide)e_hi[at] - null_value;
+        if (a_lo > 0) a_lo = 0;
+        if (a_hi > 0) a_hi = 0;
+        wide x_lo_lo, x_lo_hi, x_hi_lo, x_hi_hi;
+        exp_nonpositive(a_lo, grain, terms, &x_lo_lo, &x_lo_hi, refused);
+        exp_nonpositive(a_hi, grain, terms, &x_hi_lo, &x_hi_hi, refused);
+        part_lo += x_lo_lo;
+        part_hi += x_hi_hi;
+    }
+    scratch_lo[threadIdx.x] = part_lo;
+    scratch_hi[threadIdx.x] = part_hi;
+    __syncthreads();
+    for (uint32_t stride = blockDim.x / 2; stride > 0; stride >>= 1) {
+        if (threadIdx.x < stride) {
+            scratch_lo[threadIdx.x] += scratch_lo[threadIdx.x + stride];
+            scratch_hi[threadIdx.x] += scratch_hi[threadIdx.x + stride];
+        }
+        __syncthreads();
+    }
+    if (threadIdx.x == 0) { total_lo = scratch_lo[0]; total_hi = scratch_hi[0]; }
+    __syncthreads();
+    wide z_lo = total_lo, z_hi = total_hi;
+    if (z_lo <= 0) {
+        if (threadIdx.x == 0) atomicOr(refused, REFUSED_MALFORMED);
+        return;
+    }
+    // (c) the differential, its adjoint through the terminal reactions, and the deposit word.
+    uint32_t target = next[j];
+    for (uint32_t o = threadIdx.x; o < width; o += blockDim.x) {
+        uint32_t tile = o / tile_width, within = o % tile_width;
+        const int64_t *e_lo = (const int64_t *)tiles[4 * tile];
+        const int64_t *e_hi = (const int64_t *)tiles[4 * tile + 1];
+        const int64_t *t_lo = (const int64_t *)tiles[4 * tile + 2];
+        const int64_t *t_hi = (const int64_t *)tiles[4 * tile + 3];
+        size_t at = (size_t)j * tile_width + within;
+        wide a_lo = (wide)e_lo[at] - null_value, a_hi = (wide)e_hi[at] - null_value;
+        if (a_lo > 0) a_lo = 0;
+        if (a_hi > 0) a_hi = 0;
+        wide x_lo_lo, x_lo_hi, x_hi_lo, x_hi_hi;
+        exp_nonpositive(a_lo, grain, terms, &x_lo_lo, &x_lo_hi, refused);
+        exp_nonpositive(a_hi, grain, terms, &x_hi_lo, &x_hi_hi, refused);
+        // the face: the numerator at 2^-F lifted by F over the partition at 2^-F is p at 2^-F
+        wide p_lo, p_hi;
+        interval_quotient(x_lo_lo, x_hi_hi, z_lo, z_hi, grain, &p_lo, &p_hi, refused);
+        if (p_hi > unit) p_hi = unit;
+        if (p_lo < 0) p_lo = 0;
+        wide d_lo = p_lo, d_hi = p_hi;
+        if (o == target) { d_lo -= unit; d_hi -= unit; }
+        // the adjoint factor g = 1 − t², the square taken as a square, not as four corners
+        wide tl = (wide)t_lo[at], th = (wide)t_hi[at];
+        wide sq_lo, sq_hi;
+        if (tl >= 0)      { sq_lo = tl * tl; sq_hi = th * th; }
+        else if (th <= 0) { sq_lo = th * th; sq_hi = tl * tl; }
+        else              { wide a = tl * tl, b = th * th; sq_lo = 0; sq_hi = a > b ? a : b; }
+        sq_lo = shift_floor(sq_lo, -grain, refused);
+        sq_hi = shift_ceil(sq_hi, -grain, refused);
+        wide g_lo = unit - sq_hi, g_hi = unit - sq_lo;
+        if (g_lo < 0) g_lo = 0;
+        if (g_hi > unit) g_hi = unit;
+        wide dg_lo, dg_hi;
+        corners(d_lo, d_hi, g_lo, g_hi, &dg_lo, &dg_hi, refused);
+        dg_lo = shift_floor(dg_lo, -grain, refused);
+        dg_hi = shift_ceil(dg_hi, -grain, refused);
+        // the deposit word is −d·g at the grain coarsened by the derived deposit shift; the
+        // learning shift is the mounted exponent, not a product here
+        size_t out_at = (size_t)o * (size_t)rows + (size_t)j;
+        u_lo[out_at] = to_word(shift_floor(-dg_hi, -(int)deposit_shift, refused), refused);
+        u_hi[out_at] = to_word(shift_ceil(-dg_lo, -(int)deposit_shift, refused), refused);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
 // the arithmetic control: the helpers exposed for a serial-chart exact reference to refute
 // ---------------------------------------------------------------------------------------------
 

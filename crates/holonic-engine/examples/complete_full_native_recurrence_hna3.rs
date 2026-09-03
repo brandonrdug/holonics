@@ -53,14 +53,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .advance(NativeFullOperationOccurrence {
                 ordinal: at as u64,
                 row_addresses,
-                morphology_current: None,
             })?
             .successor;
     }
     let terminal = session.advance_terminal(NativeFullOperationOccurrence {
         ordinal: terminal_start as u64,
         row_addresses: Vec::new(),
-        morphology_current: None,
     })?;
     let final_emission = terminal.emissions.last().ok_or("no final emission")?;
     let successor_face = terminal
@@ -89,7 +87,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let second = terminal.successor.advance(NativeFullOperationOccurrence {
         ordinal: first_cycle_generation,
         row_addresses: vec![18_740],
-        morphology_current: None,
     })?;
     println!(
         "{}",

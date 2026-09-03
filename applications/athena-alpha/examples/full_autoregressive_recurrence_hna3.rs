@@ -59,7 +59,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .accepts_occurrence(&NativeFullOperationOccurrence {
                 ordinal: first_generation - 1,
                 row_addresses: vec![first_face.selected],
-                morphology_current: None,
             });
     let independently_rebuilt_generation_rejected =
         !first
@@ -67,7 +66,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .accepts_occurrence(&NativeFullOperationOccurrence {
                 ordinal: 0,
                 row_addresses: vec![first_face.selected],
-                morphology_current: None,
             });
     let mut second_context = prompt_tokens.clone();
     second_context.push(first_face.selected);

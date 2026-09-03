@@ -1458,6 +1458,32 @@ pub struct MountedReadout<'chart> {
     owned: bool,
 }
 
+impl<'chart> MountedReadout<'chart> {
+    /// **A borrowed readout over aligned words another owner keeps resident**: a sealed section's
+    /// endpoint population, or a slice of one, read as a map. The handle owns nothing and frees
+    /// nothing; the words' owner outlives every launch that names them.
+    pub(crate) fn borrowed(
+        chart: &'chart ResidentReadout,
+        resident: u64,
+        rows: usize,
+        dim: usize,
+        entry_octaves: u32,
+        exponent: i32,
+    ) -> Self {
+        MountedReadout {
+            chart,
+            resident,
+            rows,
+            dim,
+            entry_octaves,
+            exponent,
+            octets: rows * dim * std::mem::size_of::<i64>(),
+            exact_matrix_sha256: None,
+            owned: false,
+        }
+    }
+}
+
 impl MountedReadout<'_> {
     pub fn exact_matrix_sha256(&self) -> Option<&str> {
         self.exact_matrix_sha256.as_deref()
