@@ -764,6 +764,96 @@ fn the_rms_rebase_encloses_the_exact_value_and_a_finer_grain_nests() {
     }
 }
 
+#[test]
+fn the_tanh_adjoint_factor_encloses_one_minus_the_square_and_the_placement_is_exact() {
+    let Some((_, surface)) = surface() else {
+        return;
+    };
+    let grain = ResidentGrain(24);
+    // t = 3/4 exactly: 1 − t² = 7/16.
+    let unit = 1i64 << grain.0;
+    let t = surface
+        .mount_section_rest(&ResidentSectionRest {
+            rows: 1,
+            width: 2,
+            grain,
+            bound_octaves: grain.0 + 1,
+            intervals: vec![(3 * unit / 4, 3 * unit / 4), (-unit / 2, -unit / 2)],
+        })
+        .expect("mount");
+    let shape = surface
+        .shape_one_minus_square(1, 2, grain.0 + 1, grain)
+        .expect("shape");
+    let g = surface.fresh_section(1, 2, grain).expect("g");
+    let placed = surface.fresh_section(1, 5, grain).expect("placed");
+    let place = surface
+        .shape_place_columns(1, 2, 5, 2, grain.0 + 1)
+        .expect("shape");
+    let mut builder = surface.begin_passage(&[vec![], vec![0]]).expect("begin");
+    let lane = builder.open(0, &[]).expect("open");
+    surface.record_one_minus_square(&lane, &t, &g).expect("record");
+    builder.close(0, &g, shape.needed).expect("close");
+    let lane = builder.open(1, &[0]).expect("open");
+    surface.record_place_columns(&lane, &g, 2, &placed).expect("place");
+    builder.close(1, &placed, place.needed).expect("close");
+    let reading = builder.finish().expect("finish").launch().expect("launch");
+    assert!(reading.obstruction.is_empty(), "{:?}", reading.slots);
+    let out = surface.read_out(&g).expect("read");
+    assert_eq!(out[0], (7 * unit / 16, 7 * unit / 16));
+    assert_eq!(out[1], (3 * unit / 4, 3 * unit / 4));
+    let placed = surface.read_out(&placed).expect("read");
+    assert_eq!(placed, vec![(0, 0), (0, 0), out[0], out[1], (0, 0)]);
+}
+
+#[test]
+fn the_gelu_derivative_encloses_one_half_at_zero_and_a_finer_grain_nests() {
+    let Some((_, surface)) = surface() else {
+        return;
+    };
+    let c1 = Dyadic::of_binary64_bits(0x3fe9_8845_33d4_3651).expect("c1");
+    let c2 = Dyadic::of_binary64_bits(0x3fa6_e4e2_6d48_01f7).expect("c2");
+    let terms = SeriesAperture(14);
+    let mut runs = Vec::new();
+    for grain in [ResidentGrain(24), ResidentGrain(40)] {
+        let unit = 1i64 << grain.0;
+        let x = surface
+            .mount_section_rest(&ResidentSectionRest {
+                rows: 1,
+                width: 2,
+                grain,
+                bound_octaves: grain.0 + 1,
+                intervals: vec![(0, 0), (unit, unit)],
+            })
+            .expect("mount");
+        let shape = surface
+            .shape_gelu_tanh_derivative(1, 2, grain.0 + 1, grain, c1, c2, terms)
+            .expect("shape");
+        let y = surface.fresh_section(1, 2, grain).expect("y");
+        let mut builder = surface.begin_passage(&[vec![]]).expect("begin");
+        let lane = builder.open(0, &[]).expect("open");
+        surface
+            .record_gelu_tanh_derivative(&lane, &x, c1, c2, terms, &y)
+            .expect("record");
+        builder.close(0, &y, shape.needed).expect("close");
+        let reading = builder.finish().expect("finish").launch().expect("launch");
+        assert!(reading.obstruction.is_empty(), "{:?}", reading.slots);
+        let out = surface.read_out(&y).expect("read");
+        // y'(0) = ½ exactly.
+        assert!(out[0].0 <= unit / 2 && unit / 2 <= out[0].1, "{:?}", out[0]);
+        assert!(out[0].1 - out[0].0 <= 4, "{:?}", out[0]);
+        // y'(1) lies in (1.08, 1.09).
+        assert!(out[1].0 > unit + unit / 13 && out[1].1 < unit + unit / 11, "{:?}", out[1]);
+        runs.push(
+            out.into_iter()
+                .map(|(l, h)| (word_value(l, grain), word_value(h, grain)))
+                .collect::<Vec<_>>(),
+        );
+    }
+    for ((cl, ch), (fl, fh)) in runs[0].iter().zip(&runs[1]) {
+        assert!(cl <= fl && fh <= ch, "finer grain must nest");
+    }
+}
+
 fn candidate(
     tile: TileGeometry,
     registers: u32,

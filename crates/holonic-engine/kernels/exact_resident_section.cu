@@ -602,10 +602,10 @@ __device__ __forceinline__ void rotate_compose(
 
 // One thread per `(row, head, band)`. `R_b^p` by binary powering of the band's enclosed element,
 // then the pair `(x[b], x[b + D/2])` is turned — the source's `rotate_half` pairing.
-extern "C" __global__ void section_chronology(
+__device__ __forceinline__ void chronology_body(
     const int64_t *lo, const int64_t *hi, uint32_t rows, uint32_t heads, uint32_t head_width,
     const int64_t *cos_lo, const int64_t *cos_hi, const int64_t *sin_lo, const int64_t *sin_hi,
-    int32_t rotation_grain, const uint32_t *positions, int32_t grain,
+    int32_t rotation_grain, const uint32_t *positions, int32_t grain, int sign,
     int64_t *out_lo, int64_t *out_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
 ) {
     uint32_t bands = head_width / 2;
@@ -618,7 +618,11 @@ extern "C" __global__ void section_chronology(
     uint32_t p = positions[row];
 
     wide cl = (wide)1 << rotation_grain, ch = cl, sl = 0, sh = 0;
-    wide bl = cos_lo[band], bh = cos_hi[band], tl = sin_lo[band], th = sin_hi[band];
+    // The adjoint of a rotation is the rotation by the opposite angle: the band's sine enclosure
+    // is negated (and its endpoints exchanged) under `sign < 0`.
+    wide bl = cos_lo[band], bh = cos_hi[band];
+    wide tl = sign < 0 ? -(wide)sin_hi[band] : (wide)sin_lo[band];
+    wide th = sign < 0 ? -(wide)sin_lo[band] : (wide)sin_hi[band];
     uint32_t e = p;
     while (e > 0) {
         if (e & 1u) {
@@ -649,6 +653,28 @@ extern "C" __global__ void section_chronology(
     out_lo[first] = to_word(o1_lo, refused);  out_hi[first] = to_word(o1_hi, refused);
     out_lo[second] = to_word(o2_lo, refused); out_hi[second] = to_word(o2_hi, refused);
     (void)grain;
+}
+
+extern "C" __global__ void section_chronology(
+    const int64_t *lo, const int64_t *hi, uint32_t rows, uint32_t heads, uint32_t head_width,
+    const int64_t *cos_lo, const int64_t *cos_hi, const int64_t *sin_lo, const int64_t *sin_hi,
+    int32_t rotation_grain, const uint32_t *positions, int32_t grain,
+    int64_t *out_lo, int64_t *out_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    chronology_body(lo, hi, rows, heads, head_width, cos_lo, cos_hi, sin_lo, sin_hi, rotation_grain,
+                    positions, grain, 1, out_lo, out_hi, refused, census, lineage, lineage_count);
+}
+
+// The adjoint of the chronology: the same band elements raised to the same positions, turned the
+// other way. The returning differential of a rotated pair is the pair rotated back.
+extern "C" __global__ void section_chronology_adjoint(
+    const int64_t *lo, const int64_t *hi, uint32_t rows, uint32_t heads, uint32_t head_width,
+    const int64_t *cos_lo, const int64_t *cos_hi, const int64_t *sin_lo, const int64_t *sin_hi,
+    int32_t rotation_grain, const uint32_t *positions, int32_t grain,
+    int64_t *out_lo, int64_t *out_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    chronology_body(lo, hi, rows, heads, head_width, cos_lo, cos_hi, sin_lo, sin_hi, rotation_grain,
+                    positions, grain, -1, out_lo, out_hi, refused, census, lineage, lineage_count);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -1645,6 +1671,138 @@ extern "C" __global__ void section_transpose_seal(
     size_t at = (size_t)o * (size_t)rows + (size_t)t;
     out_lo[at] = to_word(word, refused);
     out_hi[at] = to_word(word, refused);
+}
+
+// ---------------------------------------------------------------------------------------------
+// the adjoints of the reactions: derivative factors as certified enclosures at the grain
+// ---------------------------------------------------------------------------------------------
+
+// The square of an enclosure taken as a square: `[lo,hi]²` is `[0, max²]` across zero and the
+// ordered endpoint squares otherwise.
+__device__ __forceinline__ void square_enclosure(wide a, wide b, wide *lo, wide *hi, uint32_t *refused) {
+    wide aa = product_checked(a, a, refused), bb = product_checked(b, b, refused);
+    if (a <= 0 && b >= 0) { *lo = 0; *hi = aa > bb ? aa : bb; }
+    else { *lo = aa < bb ? aa : bb; *hi = aa > bb ? aa : bb; }
+}
+
+// `g = 1 − t²` for a reacted carrier `t = tanh(·)` at the grain: the adjoint factor of the
+// hyperbolic-tangent reaction, clamped to `[0, 1]` because `|tanh| ≤ 1` holds of the value.
+extern "C" __global__ void section_one_minus_square(
+    const int64_t *lo, const int64_t *hi, uint32_t count, int32_t grain,
+    int64_t *out_lo, int64_t *out_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at >= count) return;
+    if (upstream_refused(census, lineage, lineage_count, refused)) return;
+    wide unit = (wide)1 << grain;
+    wide sq_lo, sq_hi;
+    square_enclosure((wide)lo[at], (wide)hi[at], &sq_lo, &sq_hi, refused);
+    sq_lo = shift_floor(sq_lo, -grain, refused);
+    sq_hi = shift_ceil(sq_hi, -grain, refused);
+    wide g_lo = unit - sq_hi, g_hi = unit - sq_lo;
+    if (g_lo < 0) g_lo = 0;
+    if (g_hi > unit) g_hi = unit;
+    if (g_hi < 0) g_hi = 0;
+    if (g_lo > g_hi) g_lo = g_hi;
+    out_lo[at] = to_word(g_lo, refused);
+    out_hi[at] = to_word(g_hi, refused);
+}
+
+// The derivative of the source's `gelu_pytorch_tanh`:
+//   y  = ½ x (1 + tanh u),  u = c1 (x + c2 x³)
+//   y' = ½ (1 + tanh u) + ½ x (1 − tanh² u) c1 (1 + 3 c2 x²)
+// Every factor is a certified enclosure at the grain, composed through corners with directed
+// placement; the constants are the exact dyadic values of the source's binary64 words.
+extern "C" __global__ void section_gelu_tanh_derivative(
+    const int64_t *lo, const int64_t *hi, uint32_t count,
+    int64_t c1_m, int32_t c1_e, int64_t c2_m, int32_t c2_e, int32_t grain, uint32_t terms,
+    int64_t *out_lo, int64_t *out_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at >= count) return;
+    if (upstream_refused(census, lineage, lineage_count, refused)) return;
+    wide unit = (wide)1 << grain;
+    wide a = lo[at], b = hi[at];
+    // x² and x³ exactly as the forward forms them.
+    wide sq_lo, sq_hi;
+    square_enclosure(a, b, &sq_lo, &sq_hi, refused);
+    sq_lo = shift_floor(sq_lo, -grain, refused); sq_hi = shift_ceil(sq_hi, -grain, refused);
+    uint32_t oa = octaves_of(magnitude(a) > magnitude(b) ? magnitude(a) : magnitude(b));
+    uint32_t osq = octaves_of(magnitude(sq_lo) > magnitude(sq_hi) ? magnitude(sq_lo) : magnitude(sq_hi));
+    int s = (oa + osq + 1 > 126u) ? (int)(oa + osq + 1 - 126u) : 0;
+    wide sqs_lo = shift_floor(sq_lo, -s, refused), sqs_hi = shift_ceil(sq_hi, -s, refused);
+    wide cube_lo, cube_hi;
+    corners(a, b, sqs_lo, sqs_hi, &cube_lo, &cube_hi, refused);
+    cube_lo = shift_floor(cube_lo, -(grain - s), refused); cube_hi = shift_ceil(cube_hi, -(grain - s), refused);
+    wide tll, tlh, thl, thh;
+    dyadic_scale(cube_lo, c2_m, c2_e, &tll, &tlh, refused);
+    dyadic_scale(cube_hi, c2_m, c2_e, &thl, &thh, refused);
+    wide t_lo = tll < thl ? tll : thl, t_hi = tlh > thh ? tlh : thh;
+    wide in_lo = a + t_lo, in_hi = b + t_hi;
+    wide ull, ulh, uhl, uhh;
+    dyadic_scale(in_lo, c1_m, c1_e, &ull, &ulh, refused);
+    dyadic_scale(in_hi, c1_m, c1_e, &uhl, &uhh, refused);
+    wide u_lo = ull < uhl ? ull : uhl, u_hi = ulh > uhh ? ulh : uhh;
+    // tanh u as an enclosure, monotone in u.
+    wide th_lo, th_hi, d_lo, d_hi;
+    if (u_lo >= 0) { tanh_nonnegative(u_lo, grain, terms, &th_lo, &d_hi, refused); }
+    else { wide l, h; tanh_nonnegative(-u_lo, grain, terms, &l, &h, refused); th_lo = -h; }
+    if (u_hi >= 0) { tanh_nonnegative(u_hi, grain, terms, &d_lo, &th_hi, refused); }
+    else { wide l, h; tanh_nonnegative(-u_hi, grain, terms, &l, &h, refused); th_hi = -l; }
+    (void)d_lo; (void)d_hi;
+    // A = ½ (1 + tanh u) ∈ [0, 1]
+    wide A_lo = shift_floor(unit + th_lo, -1, refused), A_hi = shift_ceil(unit + th_hi, -1, refused);
+    if (A_lo < 0) A_lo = 0;
+    if (A_hi > unit) A_hi = unit;
+    // G = 1 − tanh² u ∈ [0, 1]
+    wide thsq_lo, thsq_hi;
+    square_enclosure(th_lo, th_hi, &thsq_lo, &thsq_hi, refused);
+    thsq_lo = shift_floor(thsq_lo, -grain, refused); thsq_hi = shift_ceil(thsq_hi, -grain, refused);
+    wide G_lo = unit - thsq_hi, G_hi = unit - thsq_lo;
+    if (G_lo < 0) G_lo = 0;
+    if (G_hi > unit) G_hi = unit;
+    // P = 1 + 3 c2 x²: `3 c2` is the dyadic `3 c2_m · 2^c2_e`.
+    wide pll, plh, phl, phh;
+    dyadic_scale(sq_lo, 3 * c2_m, c2_e, &pll, &plh, refused);
+    dyadic_scale(sq_hi, 3 * c2_m, c2_e, &phl, &phh, refused);
+    wide P_lo = unit + (pll < phl ? pll : phl), P_hi = unit + (plh > phh ? plh : phh);
+    // B = ½ · x · G · c1 · P, every product placed back at the grain.
+    wide xg_lo, xg_hi;
+    corners(a, b, G_lo, G_hi, &xg_lo, &xg_hi, refused);
+    xg_lo = shift_floor(xg_lo, -grain, refused); xg_hi = shift_ceil(xg_hi, -grain, refused);
+    wide xgp_lo, xgp_hi;
+    corners(xg_lo, xg_hi, P_lo, P_hi, &xgp_lo, &xgp_hi, refused);
+    xgp_lo = shift_floor(xgp_lo, -grain, refused); xgp_hi = shift_ceil(xgp_hi, -grain, refused);
+    wide bll, blh, bhl, bhh;
+    dyadic_scale(xgp_lo, c1_m, c1_e, &bll, &blh, refused);
+    dyadic_scale(xgp_hi, c1_m, c1_e, &bhl, &bhh, refused);
+    wide B_lo = shift_floor(bll < bhl ? bll : bhl, -1, refused);
+    wide B_hi = shift_ceil(blh > bhh ? blh : bhh, -1, refused);
+    wide y_lo = A_lo + B_lo, y_hi = A_hi + B_hi;
+    if (y_lo > y_hi) atomicOr(refused, REFUSED_INVERTED);
+    out_lo[at] = to_word(y_lo, refused);
+    out_hi[at] = to_word(y_hi, refused);
+}
+
+// Place one contiguous face of every row into a wider zero section: the adjoint of
+// `section_select_columns`. Every coordinate of the output is written — the placed face or zero —
+// so nothing is read from an unfounded word.
+extern "C" __global__ void section_place_columns(
+    const int64_t *lo, const int64_t *hi, uint32_t rows, uint32_t span, uint32_t out_width, uint32_t at,
+    int64_t *out_lo, int64_t *out_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    uint32_t flat = blockIdx.x * blockDim.x + threadIdx.x;
+    if (flat >= rows * out_width) return;
+    if (upstream_refused(census, lineage, lineage_count, refused)) return;
+    uint32_t row = flat / out_width, column = flat % out_width;
+    if (column >= at && column < at + span) {
+        size_t source = (size_t)row * (size_t)span + (size_t)(column - at);
+        out_lo[flat] = lo[source];
+        out_hi[flat] = hi[source];
+    } else {
+        out_lo[flat] = 0;
+        out_hi[flat] = 0;
+    }
 }
 
 // ---------------------------------------------------------------------------------------------

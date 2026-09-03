@@ -364,6 +364,109 @@ impl<'chart> ResidentSurface<'chart> {
         )
     }
 
+    /// The adjoint factor of the hyperbolic tangent: `g = 1 − t²` of the reacted carrier.
+    pub fn record_one_minus_square(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        reacted: &ResidentSection<'chart>,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let mut params = Params::new();
+        params
+            .ptr(reacted.lo.device_ptr())
+            .ptr(reacted.hi.device_ptr())
+            .u32(reacted.count() as u32)
+            .i32(out.grain.0 as i32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_one_minus_square",
+            reacted.count(),
+            &mut params,
+            "one-minus-square",
+        )
+    }
+
+    /// The derivative of the source's `gelu_pytorch_tanh` at the presented carrier.
+    pub fn record_gelu_tanh_derivative(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        presented: &ResidentSection<'chart>,
+        c1: Dyadic,
+        c2: Dyadic,
+        terms: SeriesAperture,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let mut params = Params::new();
+        params
+            .ptr(presented.lo.device_ptr())
+            .ptr(presented.hi.device_ptr())
+            .u32(presented.count() as u32)
+            .i64(c1.significand)
+            .i32(c1.exponent)
+            .i64(c2.significand)
+            .i32(c2.exponent)
+            .i32(out.grain.0 as i32)
+            .u32(terms.0)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_gelu_tanh_derivative",
+            presented.count(),
+            &mut params,
+            "gelu-tanh-derivative",
+        )
+    }
+
+    /// Place a face of `span` columns at column `at` of every row of `out`, zero elsewhere: the
+    /// adjoint of the column selection.
+    pub fn record_place_columns(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        face: &ResidentSection<'chart>,
+        at: usize,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        if face.rows != out.rows() || at + face.width > out.width() {
+            return Err(ResidentRefusal::RowsDisagree {
+                operation: "place-columns",
+                left: face.rows * face.width,
+                right: out.rows() * out.width(),
+            });
+        }
+        let mut params = Params::new();
+        params
+            .ptr(face.lo.device_ptr())
+            .ptr(face.hi.device_ptr())
+            .u32(face.rows as u32)
+            .u32(face.width as u32)
+            .u32(out.width() as u32)
+            .u32(at as u32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_place_columns",
+            out.count(),
+            &mut params,
+            "place-columns",
+        )
+    }
+
     /// The transposed midpoint seal: `out[o, t] = −mid(input[t, o]) · 2^-shift` as a point.
     pub fn record_transpose_seal(
         &self,
@@ -521,6 +624,47 @@ impl<'chart> ResidentSurface<'chart> {
             input.rows * heads * (head_width / 2),
             &mut params,
             "chronology",
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    /// The adjoint of the chronology: the same bands and positions, turned the other way.
+    pub fn record_chronology_adjoint(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        heads: usize,
+        head_width: usize,
+        bands: &BandElements<'chart>,
+        positions: &Positions<'chart>,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let mut params = Params::new();
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.rows as u32)
+            .u32(heads as u32)
+            .u32(head_width as u32)
+            .ptr(bands.cos_lo.device_ptr())
+            .ptr(bands.cos_hi.device_ptr())
+            .ptr(bands.sin_lo.device_ptr())
+            .ptr(bands.sin_hi.device_ptr())
+            .i32(bands.grain as i32)
+            .ptr(positions.buffer.device_ptr())
+            .i32(out.grain.0 as i32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_chronology_adjoint",
+            input.rows * heads * (head_width / 2),
+            &mut params,
+            "chronology-adjoint",
         )
     }
 

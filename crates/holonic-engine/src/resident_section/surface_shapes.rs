@@ -194,6 +194,92 @@ impl<'chart> ResidentSurface<'chart> {
         )
     }
 
+    /// The adjoint factor of the hyperbolic tangent, `1 − t²`, at the grain: two words square,
+    /// one subtraction, clamped to the unit.
+    pub fn shape_one_minus_square(
+        &self,
+        rows: usize,
+        width: usize,
+        input_octaves: u32,
+        grain: ResidentGrain,
+    ) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "one-minus-square";
+        let needed = (2 * input_octaves + 1).max(grain.0 + 2);
+        Self::admit_octaves(OPERATION, needed)?;
+        let count = (rows * width) as u64;
+        let mut work = ExactWork::nothing();
+        work.multiplied(2 * count);
+        work.added(2 * count);
+        work.entries_written = BigUint::from(2 * count);
+        work.resident(2 * count);
+        work.peak_bits = BigUint::from(u64::from(needed));
+        work.cumulative_bits = BigUint::from(2 * count * u64::from(grain.0 + 1));
+        work.stepped();
+        self.flat_shape(OPERATION, rows, width, grain.0 + 1, work, Vec::new())
+    }
+
+    /// The derivative of `gelu_pytorch_tanh`: the forward's admission, since it forms the same
+    /// square, cube, and series and then one more product family placed at the grain.
+    pub fn shape_gelu_tanh_derivative(
+        &self,
+        rows: usize,
+        width: usize,
+        input_octaves: u32,
+        grain: ResidentGrain,
+        c1: Dyadic,
+        c2: Dyadic,
+        terms: SeriesAperture,
+    ) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "gelu-tanh-derivative";
+        let f = i64::from(grain.0);
+        let oct = i64::from(input_octaves);
+        let _ = (c1, c2);
+        let needed = (2 * oct).max(oct + f + 2).max(2 * f + 4);
+        let needed = u32::try_from(needed.max(0)).unwrap_or(u32::MAX);
+        Self::admit_octaves(OPERATION, needed)?;
+        let count = (rows * width) as u64;
+        let series = 2 * (u64::from(terms.0) + 1);
+        let mut work = ExactWork::nothing();
+        work.multiplied(count * (20 + 2 * series));
+        work.added(count * (12 + series));
+        work.divided(count * (4 + series));
+        work.entries_written = BigUint::from(2 * count);
+        work.resident(2 * count);
+        work.peak_bits = BigUint::from(u64::from(3 * input_octaves + 53));
+        work.cumulative_bits = BigUint::from(2 * count * u64::from(input_octaves));
+        work.dependency_span = BigUint::from(8u64 + u64::from(terms.0));
+        // The derivative is bounded by a small constant in value; its admitted octaves at the
+        // grain are the grain plus the hand and a little headroom.
+        self.flat_shape(OPERATION, rows, width, needed.max(grain.0 + 3), work, Vec::new())
+    }
+
+    /// Place a `span`-wide face at column `at` of an `out_width`-wide zero section: the adjoint
+    /// of the column selection.  One write per output coordinate, the bound the face's.
+    pub fn shape_place_columns(
+        &self,
+        rows: usize,
+        span: usize,
+        out_width: usize,
+        at: usize,
+        input_octaves: u32,
+    ) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "place-columns";
+        if span == 0 || at + span > out_width {
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: format!("a face of {span} at column {at} does not fit a width of {out_width}"),
+            });
+        }
+        let count = (rows * out_width) as u64;
+        let mut work = ExactWork::nothing();
+        work.entries_written = BigUint::from(2 * count);
+        work.resident(2 * count);
+        work.peak_bits = BigUint::from(u64::from(input_octaves));
+        work.cumulative_bits = BigUint::from(2 * count * u64::from(input_octaves.max(1)));
+        work.stepped();
+        self.flat_shape(OPERATION, rows, out_width, input_octaves.max(1), work, Vec::new())
+    }
+
     /// The transposed midpoint seal of a returning differential into a deposit factor: one read
     /// pair and one write per coordinate, the bound the input's.
     pub fn shape_transpose_seal(

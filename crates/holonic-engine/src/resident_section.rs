@@ -125,7 +125,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 37] = [
+pub const KERNELS: [&str; 41] = [
     "section_from_bfloat16",
     "section_carry",
     "section_terminal_row",
@@ -162,6 +162,12 @@ pub const KERNELS: [&str; 37] = [
     // makes a returning differential the `u` factor of a deposit.
     "section_contract_transposed_partial",
     "section_transpose_seal",
+    // The adjoints of the reactions: the chronology turned back, the tanh and GELU derivative
+    // factors, and the placement that is the adjoint of a column selection.
+    "section_chronology_adjoint",
+    "section_one_minus_square",
+    "section_gelu_tanh_derivative",
+    "section_place_columns",
     "section_arithmetic_control",
     // The tiled contraction's emitted family. Every wrapper is named here so the module-wide block
     // derivation inspects every instantiation rather than one; each carries `__launch_bounds__(512)`
