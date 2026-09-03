@@ -1,0 +1,47 @@
+== A. heat_{1/2} X^n = He_n; Stieltjes gradient == 0 at its zeros; self-similar dilation ==
+  n=2: heat_(1/2) x^n == He_n exactly; grad[sum x_j^2/4 - sum_{j<k} log|x_j-x_k|] == 0 at all roots; heat_t x^n == (2t)^(n/2) He_n(x/sqrt(2t))
+  n=3: heat_(1/2) x^n == He_n exactly; grad[sum x_j^2/4 - sum_{j<k} log|x_j-x_k|] == 0 at all roots; heat_t x^n == (2t)^(n/2) He_n(x/sqrt(2t))
+  n=4: heat_(1/2) x^n == He_n exactly; grad[sum x_j^2/4 - sum_{j<k} log|x_j-x_k|] == 0 at all roots; heat_t x^n == (2t)^(n/2) He_n(x/sqrt(2t))
+  n=5: heat_(1/2) x^n == He_n exactly; grad[sum x_j^2/4 - sum_{j<k} log|x_j-x_k|] == 0 at all roots; heat_t x^n == (2t)^(n/2) He_n(x/sqrt(2t))
+== B. binding defect, running abscissa, and the kernel as translates (symbolic, exact) ==
+  exp(t log(mk)^2) = exp(t log m^2) exp(t log k^2) exp(2 t log m log k)
+  exp(t(v-log n)^2) = exp(t v^2) n^(-2tv) exp(t log n^2)
+  Phi_n(u) = n^(-1/2) phi(u + log n): the de Bruijn kernel is one profile translated to the integer events
+== C. polynomial thresholds by exact bisection (Sturm counts over Q) ==
+  p=x^2+1 ; q=(x-3)^2+1   [0.1s]
+     lambda(p) in (1073741823/2147483648, 2147483649/4294967296]  ~0.50000000 ; lambda(q) in (1073741823/2147483648, 2147483649/4294967296]  ~0.50000000 ; lambda(pq) in (941687211/2147483648, 1883374425/4294967296]  ~0.43850728
+     lambda(pq) < max(lambda p, lambda q)   [the composite lands earlier than the slower constituent]
+  p=x^2+1 ; q=x^2+4   [0.0s]
+     lambda(p) in (1073741823/2147483648, 2147483649/4294967296]  ~0.50000000 ; lambda(q) in (1073741823/536870912, 8589934593/4294967296]  ~2.0000000 ; lambda(pq) in (3003314931/4294967296, 750828735/1073741824]  ~0.69926375
+     lambda(pq) < max(lambda p, lambda q)   [the composite lands earlier than the slower constituent]
+  p=(x^2+1)(x^2-4) ; q=(x^2+1)(x^2-4)   [0.1s]
+     lambda(p) in (1628449173/4294967296, 203556147/536870912]  ~0.37915287 ; lambda(q) in (1628449173/4294967296, 203556147/536870912]  ~0.37915287 ; lambda(pq) in (494154291/2147483648, 988308585/4294967296]  ~0.23010852
+     lambda(pq) < max(lambda p, lambda q)   [the composite lands earlier than the slower constituent]
+  p=x^2+1 ; q=((x-2)^2+4)(x^2-1)(x^2-9)   [0.2s]
+     lambda(p) in (1073741823/2147483648, 2147483649/4294967296]  ~0.50000000 ; lambda(q) in (3225376161/4294967296, 1612688085/2147483648]  ~0.75096641 ; lambda(pq) in (634308417/1073741824, 2537233677/4294967296]  ~0.59074575
+     lambda(pq) < max(lambda p, lambda q)   [the composite lands earlier than the slower constituent]
+  p=x^2+1 ; q=(x^2+4)(x^2-9)(x^2-16)   [0.1s]
+     lambda(p) in (1073741823/2147483648, 2147483649/4294967296]  ~0.50000000 ; lambda(q) in (4782009357/4294967296, 2391004683/2147483648]  ~1.1133983 ; lambda(pq) in (8777241/16777216, 2246973705/4294967296]  ~0.52316433
+     lambda(pq) < max(lambda p, lambda q)   [the composite lands earlier than the slower constituent]
+  p=x^2+1 ; q=(x^2+9)(x^2-1)(x^2-4)(x^2-9)   [0.2s]
+     lambda(p) in (1073741823/2147483648, 2147483649/4294967296]  ~0.50000000 ; lambda(q) in (4119238399/4294967296, 2059619209/2147483648]  ~0.95908493 ; lambda(pq) in (158236199/268435456, 2531779203/4294967296]  ~0.58947578
+     lambda(pq) < max(lambda p, lambda q)   [the composite lands earlier than the slower constituent]
+  p=x^2+1 ; q=x^2+(11/10)^2  [pairs nearly level: maximal lift]   [0.0s]
+     lambda(p) in (1073741823/2147483648, 2147483649/4294967296]  ~0.50000000 ; lambda(q) in (649613803/1073741824, 162403451/268435456]  ~0.60500000 ; lambda(pq) in (394151199/1073741824, 12317225/33554432]  ~0.36708191
+     lambda(pq) < max(lambda p, lambda q)   [the composite lands earlier than the slower constituent]
+  p=x^2+1 ; q=(x-1/2)^2+(11/10)^2  [nearly level, offset]   [0.1s]
+     lambda(p) in (1073741823/2147483648, 2147483649/4294967296]  ~0.50000000 ; lambda(q) in (649613803/1073741824, 162403451/268435456]  ~0.60500000 ; lambda(pq) in (417318781/1073741824, 208659391/536870912]  ~0.38865840
+     lambda(pq) < max(lambda p, lambda q)   [the composite lands earlier than the slower constituent]
+  p=x^2+1 ; q=(x^2+(11/10)^2)(x^2-4)(x^2-9)  [level pair, reals lower q's own threshold]   [0.2s]
+     lambda(p) in (1073741823/2147483648, 2147483649/4294967296]  ~0.50000000 ; lambda(q) in (207047615/536870912, 414095231/1073741824]  ~0.38565624 ; lambda(pq) in (143973435/536870912, 287946871/1073741824]  ~0.26817142
+     lambda(pq) < max(lambda p, lambda q)   [the composite lands earlier than the slower constituent]
+  p=x^2+1 ; q=(x^2+(6/5)^2)(x^2-1/4)^2  [close reals lower q's threshold below p's]   [0.2s]
+     lambda(p) in (1073741823/2147483648, 2147483649/4294967296]  ~0.50000000 ; lambda(q) in (95975169/536870912, 191950339/1073741824]  ~0.17876768 ; lambda(pq) in (69250095/536870912, 138500191/1073741824]  ~0.12898835
+     lambda(pq) < max(lambda p, lambda q)   [the composite lands earlier than the slower constituent]
+  p=(x^2+1)(x^2-1/4)^3 ; q=(x^2+(6/5)^2)(x^2-1/4)^3   [0.5s]
+     lambda(p) in (405512541/4294967296, 12672267/134217728]  ~0.094415747 ; lambda(q) in (135090395/1073741824, 33772599/268435456]  ~0.12581274 ; lambda(pq) in (7184077/134217728, 57472617/1073741824]  ~0.053525546
+     lambda(pq) < max(lambda p, lambda q)   [the composite lands earlier than the slower constituent]
+  p=x^2+1 ; q=(x^2+4)(x^2-1/4)^4  [high pair, dense close reals]   [0.3s]
+     lambda(p) in (1073741823/2147483648, 2147483649/4294967296]  ~0.50000000 ; lambda(q) in (1023933159/4294967296, 63995823/268435456]  ~0.23840302 ; lambda(pq) in (741333789/4294967296, 370666899/2147483648]  ~0.17260523
+     lambda(pq) < max(lambda p, lambda q)   [the composite lands earlier than the slower constituent]
+total 5.7s

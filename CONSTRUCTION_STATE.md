@@ -208,7 +208,16 @@ coordinate-corrected de Bruijn--Newman threshold. The correction record is
 [`research/records/2026-09-02_THE_RH_ENTIRE_HEAT_FLOW_REQUIRES_THE_CRITICAL_COORDINATE_AND_REVERSES_STANDARD_TIME.md`](research/records/2026-09-02_THE_RH_ENTIRE_HEAT_FLOW_REQUIRES_THE_CRITICAL_COORDINATE_AND_REVERSES_STANDARD_TIME.md).
 The exterior fleet instruction is
 [`research/GEMINI_3_8_FLASH_SWARM_INSTRUCTIONS.md`](research/GEMINI_3_8_FLASH_SWARM_INSTRUCTIONS.md);
-it schedules no work in the primary tree. The two constants' shared critical-threshold reading
+it schedules no work in the primary tree.
+
+[proved-derived; formal-checked] On 2026-09-03, under Brandon's direct request, the RH flow line
+gained `RH/HeatFlowBinding.lean` (the heat deformation's integer-event weight is multiplicative
+only at time zero; the composite binding defect `e^{2t log m log k}` is one iff `t = 0` or a unit)
+and the ledger's `RodgersTaoZeroDynamics` port now states the RT3 principal-value comb flux
+instead of `True`; the root umbrella built 9,786 jobs. The dynamic reading, the missing-half and
+Hodge elaborations, and twelve exact product-threshold brackets are recorded in
+[`research/records/2026-09-03_THE_SEAMS_ARE_LOCAL_OPTIMA_OF_THE_THREAD_ENERGY_THE_PRIMES_ARE_THE_MISSING_HALF_AND_THE_FLOW_BINDS_THE_INTEGER_EVENTS.md`](research/records/2026-09-03_THE_SEAMS_ARE_LOCAL_OPTIMA_OF_THE_THREAD_ENERGY_THE_PRIMES_ARE_THE_MISSING_HALF_AND_THE_FLOW_BINDS_THE_INTEGER_EVENTS.md).
+The RH line remains independent of the SKE frontier and that record schedules nothing. The two constants' shared critical-threshold reading
 remains interpretation, not a cross-theorem. The WRN dependency contract, now absorbed into HNA,
 distinguishes
 `MorphologyTensorLens` from `MorphologyTensorFace`, defines `NativeMorphologyArtifact` as a

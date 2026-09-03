@@ -177,9 +177,22 @@ theorem two_mul_le_sq {N : ℕ} (a y : ℝ → ℝ) (x : ℝ → Fin N → ℝ) 
   have := sq_add_two_mul_le a y x hT hy hpos
   nlinarith [sq_nonneg (y T)]
 
-/-- [project-postulate] The Rodgers--Tao zero dynamics: the zeros of `H_t` follow the comb flux.
-A named port; no theorem of this owner consumes it. -/
+/-- [open; project-postulate] **The Rodgers--Tao zero dynamics at the entire face**, the RT3 port.
+Along every `C¹` curve `z` of zeros of `H s` that is simple at time `t`, the velocity is the
+principal-value comb flux: twice the limit, over centred discs of growing radius, of the
+multiplicity-weighted sum of `1/(z − w)` over the other zeros `w` of `H t` in the disc.  At the
+polynomial face this is the theorem `HeatFlowOfPolynomials.zero_curve_flux`; at the entire face
+`ZeroDynamicsEntire.zero_curve_velocity` returns `ż = H″/H′`, and the expansion of `H″/H′` over the
+other zeros in principal-value order (the Hadamard product) is the open half this port names.  No
+theorem of this owner consumes it.  Falsifier: a computed velocity of a simple zero of `H t` that
+disagrees with the finite comb flux on a declared truncation.  Until 2026-09-03 this port's only
+field was `True`; it now states the law it was named for. -/
 structure RodgersTaoZeroDynamics (H : ℝ → ℂ → ℂ) : Prop where
-  flux : ∀ t z, H t z = 0 → True
+  flux : ∀ (t : ℝ) (z z' : ℝ → ℂ), (∀ s, HasDerivAt z (z' s) s) → (∀ s, H s (z s) = 0) →
+    deriv (H t) (z t) ≠ 0 →
+    Filter.Tendsto
+      (fun R : ℝ => 2 * ∑ᶠ u, if u = z t then (0 : ℂ) else
+        (MeromorphicOn.divisor (H t) (Metric.closedBall 0 R) u : ℂ) / (z t - u))
+      Filter.atTop (nhds (z' t))
 
 end Soma.Holonics.RH.PhaseFlowLedger

@@ -148,6 +148,37 @@ structure relevant to the stated receiver.
   function: <https://dlmf.nist.gov/20> and <https://dlmf.nist.gov/25>.
 - Clay Mathematics Institute, official RH problem statement:
   <https://www.claymath.org/millennium/riemann-hypothesis/>.
+- Brad Rodgers and Terence Tao, “The de Bruijn–Newman constant is non-negative,” arXiv:1801.05914
+  — the backward-heat zero dynamics, the time-zero energy control, and the pair-correlation
+  contradiction: <https://arxiv.org/abs/1801.05914>. The repository's flow owners under
+  `soma/formal/elementary-holonics/ElementaryHolonics/RH/` cite it; the sign of the threshold is
+  its separate theorem and is not reproved here.
+- Youness Lamzouri, “A new proof that more than 2/3 of the zeros of the Riemann zeta function are
+  simple and on the critical line,” arXiv:2609.02882 (2026) — a Hilbert-space inequality on any
+  finite conjugation-invariant multiset, then the unconditional pair-correlation formula:
+  <https://arxiv.org/abs/2609.02882>. Its finite proposition is a frame-potential bound on the
+  zero realizers; the percentage is the liminf of a ratio of counts. Formal certificates for the
+  statements, under the Riemann–von Mangoldt and pair-correlation hypotheses, are at
+  <https://github.com/AxiomMath/ZetaZeros>.
+- Levent Alpöge and Ralph Furman, “More than two thirds of the zeta zeros are simple and on the
+  critical line,” arXiv:2608.13637 (2026) — the earlier proof through a finite compression of
+  Weil's Hermitian form, a rank–trace inequality, and Sylvester's law of inertia:
+  <https://arxiv.org/abs/2608.13637>.
+- Daniel A. Goldston and Hugh L. Montgomery, “Pair correlation of zeros and primes in short
+  intervals,” in *Analytic Number Theory and Diophantine Problems* (1987) — the equivalence between
+  the pair correlation of zeros and the variance of primes in short intervals, the reason the zero
+  threads and the prime-pair threads are one population.
+- Julia Stadlmann, “Bounded gaps between primes,” arXiv:2608.31126 (2026) — `H₁ ≤ 240` from
+  Bombieri–Vinogradov with equidistribution for smooth moduli: <https://arxiv.org/abs/2608.31126>.
+  A liminf of extremes on the prime-pair face; its exact object is the admissible tuple.
+- John J. Benedetto and Matthew Fickus, “Finite normalized tight frames,” *Adv. Comput. Math.* 18
+  (2003) — the frame potential `Σ |⟨f_i, f_j⟩|²`, its frame-force reading, and tight frames as its
+  minimizers; the object Lamzouri's second moment is.
+- Michael I. Ivanitskiy, John Jasper, Emily J. King, and Dustin G. Mixon, “Towards a mathematical
+  theory of superposition,” arXiv:2608.27540 (2026) — recovery through the Gram `WᵀW`, the exact
+  equiangular-tight-frame threshold in terms of coherence, and the sign distribution of the Gram:
+  <https://arxiv.org/abs/2608.27540>. An exterior observer chart; no feature, dictionary, or
+  rectifier enters the interior.
 
 The project's RH papers contain conditional reductions, counterexamples to overly strong routes,
 and explicit positivity/naturality obstructions. None of these external or internal references is

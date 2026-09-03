@@ -86,6 +86,7 @@ import ElementaryHolonics.RH.ZeroCountParity
 import ElementaryHolonics.RH.LeftMassReceiver
 import ElementaryHolonics.RH.OffLineJensen
 import ElementaryHolonics.RH.PhaseFlowLedger
+import ElementaryHolonics.RH.HeatFlowBinding
 import ElementaryHolonics.RH.LogDerivativeRemainder
 import ElementaryHolonics.RH.LandauLemma
 import ElementaryHolonics.RH.ZeroFactorizationExists
