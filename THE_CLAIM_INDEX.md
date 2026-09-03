@@ -159,7 +159,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (450 deposits of 924)
+## 4 · The 2026-08 record line (450 deposits of 925)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -632,8 +632,8 @@ outside `tools/` that names the verifier — not declared.
 | `tools/document_law.py` | Three laws the corpus states about its own governing documents, made executable. | `canon/THE_CONTAMINANT_PROTOCOL.md`, `research/records/2026-08-24_DIVISION_RETURNED_AS_A_TRANSPORT_FIBRE_PARTITIONS_RETAINED_THEIR_BOUNDARIES_AND_DIVISORS_BECAME_SIGNED_CHART_LEDGERS.md` |
 | `tools/epistemic_tags.py` | Verify paragraph-leading epistemic brackets on live HIF authority and formal prerequisites. | **nothing names it** |
 | `tools/equation_atlas.py` | Validate the exterior equation atlas as stored material. | `research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` |
-| `tools/gates.sh` | The release gate sequence. | `AGENTS.md`, `blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`, `blueprint/THE_ATHENA_ALPHA_CULTIVATES_THE_COMPLETE_LABORATORY_EXCHANGE_AND_RETURNED_DIFFERENCES_COMPACTIFY_INTO_NATIVE_HEXIS.md`, and 77 more |
-| `tools/lean_check.sh` | Build one declared live Lean umbrella from source under the pinned project toolchain. | `blueprint/THE_CONSTRUCTIVE_DIFFERENTIAL_BOUNDARY_AND_RECEIVER_CALCULUS.md`, `blueprint/THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md`, `blueprint/THE_ROADMAP.md`, and 8 more |
+| `tools/gates.sh` | The release gate sequence. | `AGENTS.md`, `blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`, `blueprint/THE_ATHENA_ALPHA_CULTIVATES_THE_COMPLETE_LABORATORY_EXCHANGE_AND_RETURNED_DIFFERENCES_COMPACTIFY_INTO_NATIVE_HEXIS.md`, and 78 more |
+| `tools/lean_check.sh` | Build one declared live Lean umbrella from source under the pinned project toolchain. | `blueprint/THE_CONSTRUCTIVE_DIFFERENTIAL_BOUNDARY_AND_RECEIVER_CALCULUS.md`, `blueprint/THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md`, `blueprint/THE_ROADMAP.md`, and 10 more |
 | `tools/profile_scalar_path.py` | Derive the apparatus-telemetry faces of Deed H0 from an Nsight Systems sqlite export, | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`, `research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md` |
 | `tools/profile_streamed_circulation.py` | Derive Deed H4's profile faces from one Nsight Systems export. | `research/records/2026-08-19_THE_TOWER_IS_A_STREAMED_CIRCULATION_THE_SINGLE_GRAPH_RETURNS_ITS_THREE_CUTS_AND_THE_TRANSFERS_CROSS_UNDER_THE_KERNELS.md` |
 | `tools/source_shape.py` | Rust/CUDA source-shape gate. | `research/records/2026-08-31_CONS3_REMOVED_THE_MOMENT_FRONT_FOREMAN_AND_THE_RESIDENT_RECEIVER_NOW_OBSERVES_THE_COMMITTED_TARGET.md`, `research/records/2026-08-31_HIF5_PRODUCTS_MOVED_TO_NEUTRAL_OWNERS_AND_CAMPAIGN_ONTOLOGY_DEPARTED.md` |
