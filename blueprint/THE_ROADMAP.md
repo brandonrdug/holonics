@@ -89,7 +89,15 @@ convergence dichotomy. Coefficient-specific branch selection and a certified dec
 research and schedule nothing. Brandon's direct correction of 2026-09-02 closes HTP at this bounded
 handoff and activates the engine HNA campaign.
 
-**RH line position:** FT1
+**RH line position:** FT2
+
+[proved-derived; formal-checked] FT1 passed: `RH/XiCentre.lean` returned `ξ(½) > 0` through the
+folded Mellin integral of Mathlib's modified theta kernel at the symmetric point, bounded by the
+theta tail `θ(t) − 1 ≤ 4 e^{−πt}`; `RH/FosterCount.lean` returned the global multiplicity, the
+count `N(R) ≤ K R log R` for `R ≥ 3` with `K` exhibited from the envelope's fixed constant, and
+`Σ_ρ m_ρ |ρ − ½|^{−2} < ∞` by dyadic shells; FT0's existence theorems are restated
+unconditionally. The receipt is
+[`the FT1 record`](../research/records/2026-09-03_FT1_THE_CENTRE_IS_POSITIVE_THE_COUNT_IS_R_LOG_R_AND_THE_INVERSE_SQUARES_CONVERGE.md).
 
 [proved-derived; formal-checked] FT0 passed: `RH/FosterTanks.lean` returned the tank algebra
 (pair identity, parallel-LC identity, positivity iff on the seam, seam resonance `(LC)^{−1/2} = γ`),
@@ -107,8 +115,8 @@ and each advances on its own gate. The order is fixed:
 1. `FT0` -- the paired finite Foster form with Landau's remainder, the tank data, and the
    positivity/seam equivalence -- **PASSED**;
 2. `FT1` -- the centre value `ξ(½) ≠ 0`, the count `N(R) ≤ C R log R`, and the exponent of
-   convergence -- **CURRENT**;
-3. `FT2` -- the paired canonical product for the entire growth class;
+   convergence -- **PASSED**;
+3. `FT2` -- the paired canonical product for the entire growth class -- **CURRENT**;
 4. `FT3` -- Hadamard, the full Foster form, and the entire-face thread law (discharging the
    `RodgersTaoZeroDynamics` port);
 5. `FT4` -- the entire-face flow, `Λ_DN` defined, and `RH ⟺ Λ_DN ≤ 0` against the anchor;
