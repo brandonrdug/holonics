@@ -92,7 +92,6 @@ fn workspace_summary(event: &WorkbenchEvent) -> String {
                 circulation_summary(&mut lines, active);
             }
         }
-        "workspace/lift-gemma-receipt" => lift_summary(&mut lines, value),
         "workspace/import-snapshot" => import_summary(&mut lines, value),
         "workspace/define-experiment" => experiment_summary(&mut lines, value),
         "workspace/conduct" | "workspace/continue" => circulation_summary(&mut lines, value),
@@ -148,22 +147,6 @@ fn workspace_manifest(lines: &mut Vec<String>, manifest: &Value) {
         "Open capabilities",
         manifest.get("open_capabilities"),
     );
-}
-
-fn lift_summary(lines: &mut Vec<String>, value: &Value) {
-    lines.push(String::new());
-    lines.push("LIFT".to_owned());
-    push_field(lines, "Source", value.get("source_address"));
-    push_field(lines, "Generation", value.get("generation"));
-    push_field(lines, "Receiver", value.get("receiver"));
-    push_field(
-        lines,
-        "Excitations",
-        value.get("cold_excitation_population"),
-    );
-    push_field(lines, "Foreign execution", value.get("foreign_execution"));
-    push_map(lines, "Modalities", value.get("modality_occurrences"));
-    push_list(lines, "Open exterior", value.get("open_exterior"));
 }
 
 fn import_summary(lines: &mut Vec<String>, value: &Value) {
@@ -373,20 +356,7 @@ fn push_list(lines: &mut Vec<String>, label: &str, value: Option<&Value>) {
     lines.extend(values.iter().map(|item| format!("  {}", exact_value(item))));
 }
 
-fn push_map(lines: &mut Vec<String>, label: &str, value: Option<&Value>) {
-    let Some(values) = value.and_then(Value::as_object) else {
-        return;
-    };
-    if values.is_empty() {
-        return;
-    }
-    lines.push(label.to_owned());
-    lines.extend(
-        values
-            .iter()
-            .map(|(key, value)| format!("  {key:<28} {}", exact_value(value))),
-    );
-}
+
 
 fn push_address(lines: &mut Vec<String>, label: &str, value: Option<&Value>) {
     let Some(value) = value else {

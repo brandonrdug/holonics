@@ -12,7 +12,6 @@ pub enum WorkbenchCommand {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "action", rename_all = "kebab-case")]
 pub enum DiagnosticCommand {
-    Demo,
     Status,
     Capabilities,
     Athena(AthenaCommand),
@@ -30,11 +29,6 @@ pub enum WorkspaceCommand {
     },
     Inspect {
         root: PathBuf,
-    },
-    LiftGemmaReceipt {
-        root: PathBuf,
-        receipt: PathBuf,
-        receiver: u64,
     },
     ImportSnapshot {
         root: PathBuf,
@@ -79,9 +73,6 @@ pub enum WorkspaceCommand {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "action", rename_all = "kebab-case")]
 pub enum AthenaCommand {
-    DemoOpen {
-        session: String,
-    },
     Open {
         session: String,
         snapshot: PathBuf,
