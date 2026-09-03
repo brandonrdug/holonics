@@ -1,18 +1,18 @@
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use athena_alpha::{addressed_ingress, AthenaAlphaApplication, BASE_CONFIGURATION};
+use athena_alpha::{addressed_ingress, AthenaAlphaApplication};
 use holonic_engine::{
     native_ecology::holonic_intelligence::{
-        ExteriorModality, NativeInferenceAddress, NativeInferenceRequest,
+        NativeInferenceAddress, NativeInferenceRequest,
     },
     receiver_exact_compression::ReceiverId,
     EventId,
 };
 use life::native_intelligence::{
     export_morphology, ExportCodecKind, ExportPurpose, MorphologyExportRequest,
-    MorphologyExportReturn, NativeCirculationBoundary, NativeCirculationConfiguration,
+    MorphologyExportReturn, NativeCirculationBoundary,
     NativeCirculationSnapshot, NativeCultivationCandidate, NativeDeclineReceipt,
     NativeMorphologyCommit, NativeMorphologyArtifact, NativeWorldFace, NativeWorldStage,
 };
@@ -22,13 +22,12 @@ use crate::artifact::{ArtifactStore, MANIFEST_FILE};
 use crate::evaluation::{evaluate_snapshot, VariantEvaluationReceipt};
 use crate::manifest::{
     ArtifactKind, ArtifactReference, CompletedRunReference, CurrentVariant, ExperimentReference,
-    LiftReference, RunReference, VariantWorkspaceManifest,
+    RunReference, VariantWorkspaceManifest,
 };
 use crate::ApplicationError;
 
 pub const VARIANT_EXPERIMENT_SCHEMA: &str = "org.holonics.variant-experiment.v1";
 pub const VARIANT_RUN_SCHEMA: &str = "org.holonics.variant-run.v1";
-pub const GEMMA_RECEIPT_LIFT_SCHEMA: &str = "org.holonics.gemma-receipt-lift.v1";
 pub const WORKSPACE_EXPORT_SCHEMA: &str = "org.holonics.workspace-export.v1";
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -154,23 +153,6 @@ impl VariantRunRecord {
         }
         artifacts
     }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct GemmaReceiptLiftReceipt {
-    pub schema: String,
-    pub ordinal: u64,
-    pub source_address: String,
-    pub receiver: ReceiverId,
-    pub modality_occurrences: BTreeMap<ExteriorModality, usize>,
-    pub cold_excitation_population: usize,
-    pub open_exterior: Vec<String>,
-    pub generation: u64,
-    pub snapshot: ArtifactReference,
-    pub cold_witness: ArtifactReference,
-    pub insufficiency: ArtifactReference,
-    pub foreign_execution: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -330,97 +312,6 @@ impl VariantWorkspace {
         next.current = Some(current.clone());
         self.replace_manifest(next)?;
         self.returned(vec![path], current)
-    }
-
-    pub fn lift_gemma_receipt(
-        &mut self,
-        receipt_root: &Path,
-        receiver: ReceiverId,
-    ) -> Result<WorkspaceReturn<GemmaReceiptLiftReceipt>, ApplicationError> {
-        self.require_unfounded()?;
-        let source = receipt_root
-            .canonicalize()
-            .map_err(|error| ApplicationError::Io {
-                path: receipt_root.to_path_buf(),
-                reason: error.to_string(),
-            })?;
-        let mut configuration: NativeCirculationConfiguration =
-            serde_json::from_str(BASE_CONFIGURATION)
-                .map_err(|error| ApplicationError::Wire(error.to_string()))?;
-        configuration.address.receiver = receiver;
-        let admission =
-            AthenaAlphaApplication::from_complete_gemma4_receipt(&source, configuration)
-                .map_err(owner)?;
-        let snapshot = admission.application.snapshot().map_err(owner)?;
-        let mut next = self.manifest.clone();
-        let ordinal = next.allocate()?;
-        let base = format!("lifts/lift-{ordinal}");
-        let cold = artifact(
-            ArtifactKind::ColdWitness,
-            format!("{base}/cold-witness.json"),
-        );
-        let insufficiency = artifact(
-            ArtifactKind::Insufficiency,
-            format!("{base}/insufficiency.json"),
-        );
-        let lift_artifact = artifact(
-            ArtifactKind::LiftReceipt,
-            format!("{base}/lift-receipt.json"),
-        );
-        let snapshot_artifact = artifact(
-            ArtifactKind::Snapshot,
-            format!("snapshots/generation-0-lift-{ordinal}.snapshot.json"),
-        );
-        let mut modality_occurrences = BTreeMap::new();
-        for excitation in &admission.departed.cold_witness.excitations {
-            *modality_occurrences
-                .entry(excitation.exterior_modality)
-                .or_default() += 1;
-        }
-        let receipt = GemmaReceiptLiftReceipt {
-            schema: GEMMA_RECEIPT_LIFT_SCHEMA.to_owned(),
-            ordinal,
-            source_address: source.display().to_string(),
-            receiver,
-            modality_occurrences,
-            cold_excitation_population: admission.departed.cold_witness.excitations.len(),
-            open_exterior: admission.departed.cold_witness.open_exterior.clone(),
-            generation: 0,
-            snapshot: snapshot_artifact.clone(),
-            cold_witness: cold.clone(),
-            insufficiency: insufficiency.clone(),
-            foreign_execution: false,
-        };
-        let written = vec![
-            self.store
-                .write_json_new(&cold.relative_path, &admission.departed.cold_witness)?,
-            self.store.write_json_new(
-                &insufficiency.relative_path,
-                &admission.departed.insufficiency,
-            )?,
-            self.store.write_new(
-                &snapshot_artifact.relative_path,
-                &snapshot.canonical_bytes().map_err(owner)?,
-            )?,
-            self.store
-                .write_json_new(&lift_artifact.relative_path, &receipt)?,
-        ];
-        let current = CurrentVariant {
-            generation: 0,
-            snapshot: snapshot_artifact,
-            morphology: admission.application.package().manifest.clone(),
-        };
-        next.current = Some(current);
-        next.lifts.push(LiftReference {
-            ordinal,
-            source_kind: "complete-gemma4-excitation-receipt".to_owned(),
-            source_address: source.display().to_string(),
-            cold_witness: cold,
-            insufficiency,
-            receipt: lift_artifact,
-        });
-        self.replace_manifest(next)?;
-        self.returned(written, receipt)
     }
 
     pub fn define_experiment(

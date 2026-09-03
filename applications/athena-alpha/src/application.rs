@@ -1,10 +1,6 @@
 use holonic_engine::{
-    native_ecology::holonic_intelligence::{
-        Bf16ExcitationColdWitness, Bf16ExcitationDismantling, IntoDismantlingBoundaryReturn,
-        NativeInferenceRequest, read_complete_gemma4_excitation_receipt,
-    },
-    native_spool::{NativeTransportScaffold, ReceiverInsufficiency},
-    soulkiller::dismantle,
+    native_ecology::holonic_intelligence::{IntoDismantlingBoundaryReturn, NativeInferenceRequest},
+    native_spool::NativeTransportScaffold,
 };
 use life::native_intelligence::{
     ApparatusRealization, DepartedDismantlingLanes, MorphologyLineage, NativeCirculationBoundary,
@@ -15,7 +11,6 @@ use life::native_intelligence::{
     NativeMorphologyCommit, NativeOwnedInferenceAddress, NativeSessionError, NativeWorldFace,
     NativeWorldStage, consume_dismantling_return,
 };
-use std::path::Path;
 use thiserror::Error;
 
 /// One admitted Athena application and the physically separate cold/insufficiency lanes which do
@@ -47,33 +42,6 @@ impl From<NativeSessionError> for AthenaAlphaError {
 }
 
 impl AthenaAlphaApplication {
-    /// Admit one already-returned complete Gemma excitation family through the sole Soulkiller
-    /// boundary. This reads no raw model and executes no foreign realization.
-    pub fn from_complete_gemma4_receipt(
-        root: &Path,
-        configuration: NativeCirculationConfiguration,
-    ) -> Result<
-        AthenaAlphaAdmission<Bf16ExcitationColdWitness, ReceiverInsufficiency>,
-        AthenaAlphaError,
-    > {
-        let receipt = read_complete_gemma4_excitation_receipt(root)
-            .map_err(|error| AthenaAlphaError::Admission(error.to_string()))?;
-        let mut returned = dismantle(Bf16ExcitationDismantling {
-            receiver: configuration.address.receiver,
-            excitations: receipt
-                .families
-                .into_iter()
-                .flat_map(|family| family.excitations)
-                .collect(),
-        })
-        .map_err(|error| AthenaAlphaError::Admission(error.to_string()))?;
-        returned
-            .exterior
-            .open_exterior
-            .extend(receipt.open_exterior);
-        Self::from_dismantling_return(returned, configuration)
-    }
-
     pub fn mount(
         package: NativeMorphologyArtifact,
         configuration: NativeCirculationConfiguration,
