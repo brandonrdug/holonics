@@ -18,8 +18,20 @@ mod foreign_json;
 mod foreign_multimodal;
 #[path = "holonic_intelligence/foreign_onnx.rs"]
 mod foreign_onnx;
+#[path = "holonic_intelligence/full_operation.rs"]
+mod full_operation;
 #[path = "holonic_intelligence/lifecycle.rs"]
 mod lifecycle;
+#[path = "holonic_intelligence/material_ingress.rs"]
+mod material_ingress;
+#[path = "holonic_intelligence/operative_atlas.rs"]
+mod operative_atlas;
+#[path = "holonic_intelligence/operative_morphology.rs"]
+mod operative_morphology;
+#[path = "holonic_intelligence/operative_residence.rs"]
+mod operative_residence;
+#[path = "holonic_intelligence/operative_session.rs"]
+mod operative_session;
 #[path = "holonic_intelligence/profile.rs"]
 mod profile;
 #[path = "holonic_intelligence/repeated_circulation.rs"]
@@ -42,7 +54,13 @@ pub use dimensions::*;
 pub use foreign_json::*;
 pub use foreign_multimodal::*;
 pub use foreign_onnx::*;
+pub use full_operation::*;
 pub use lifecycle::*;
+pub use material_ingress::*;
+pub use operative_atlas::*;
+pub use operative_morphology::*;
+pub use operative_residence::*;
+pub use operative_session::*;
 pub use profile::*;
 pub use repeated_circulation::*;
 pub use rested::*;

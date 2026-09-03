@@ -125,7 +125,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 31] = [
+pub const KERNELS: [&str; 34] = [
     "section_from_bfloat16",
     "section_carry",
     "section_terminal_row",
@@ -139,9 +139,12 @@ pub const KERNELS: [&str; 31] = [
     "section_chronology",
     "section_contact",
     "section_gelu_tanh",
+    "section_tanh",
     "section_hadamard",
     "section_re_entry",
     "section_scale",
+    "section_scale_by_aligned",
+    "section_select_columns",
     "section_withdraw_columns",
     "section_collapse_control",
     "section_census",

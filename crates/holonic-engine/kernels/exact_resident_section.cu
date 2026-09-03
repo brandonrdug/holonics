@@ -963,6 +963,26 @@ extern "C" __global__ void section_gelu_tanh(
     out_hi[at] = to_word(y_hi, refused);
 }
 
+// The monotone hyperbolic-tangent reaction as one certified interval operation at the section's
+// grain. It shares the same exponential owner as contact and GELU but does not smuggle either law.
+extern "C" __global__ void section_tanh(
+    const int64_t *lo, const int64_t *hi, uint32_t count, int32_t grain, uint32_t terms,
+    int64_t *out_lo, int64_t *out_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at >= count) return;
+    if (upstream_refused(census, lineage, lineage_count, refused)) return;
+    wide lower, upper, discard_low = 0, discard_high = 0;
+    if (lo[at] >= 0) tanh_nonnegative((wide)lo[at], grain, terms, &lower, &discard_high, refused);
+    else { wide l, h; tanh_nonnegative(-(wide)lo[at], grain, terms, &l, &h, refused); lower = -h; }
+    if (hi[at] >= 0) tanh_nonnegative((wide)hi[at], grain, terms, &discard_low, &upper, refused);
+    else { wide l, h; tanh_nonnegative(-(wide)hi[at], grain, terms, &l, &h, refused); upper = -l; }
+    (void)discard_low; (void)discard_high;
+    if (lower > upper) atomicOr(refused, REFUSED_INVERTED);
+    out_lo[at] = to_word(lower, refused);
+    out_hi[at] = to_word(upper, refused);
+}
+
 // ---------------------------------------------------------------------------------------------
 // elementwise transports: Hadamard, re-entry, an enclosed algebraic scale, a withdrawal, a control
 // ---------------------------------------------------------------------------------------------
@@ -1004,6 +1024,38 @@ extern "C" __global__ void section_scale(
     corners(lo[at], hi[at], s_lo, s_hi, &l, &h, refused);
     out_lo[at] = to_word(shift_floor(l, -scale_grain, refused), refused);
     out_hi[at] = to_word(shift_ceil(h, -scale_grain, refused), refused);
+}
+
+// `x · s` where `s` is one exact aligned resident coefficient, `s[0] · 2^s_e`. The coefficient
+// stays on the resident chart; only its address and complete-population frame enter the law.
+extern "C" __global__ void section_scale_by_aligned(
+    const int64_t *lo, const int64_t *hi, uint32_t count, const int64_t *s, int32_t s_e,
+    int64_t *out_lo, int64_t *out_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    uint32_t at = blockIdx.x * blockDim.x + threadIdx.x;
+    if (at >= count) return;
+    if (upstream_refused(census, lineage, lineage_count, refused)) return;
+    wide scalar = (wide)s[0];
+    wide lower = scalar >= 0 ? scalar * (wide)lo[at] : scalar * (wide)hi[at];
+    wide upper = scalar >= 0 ? scalar * (wide)hi[at] : scalar * (wide)lo[at];
+    out_lo[at] = to_word(shift_floor(lower, s_e, refused), refused);
+    out_hi[at] = to_word(shift_ceil(upper, s_e, refused), refused);
+}
+
+// Select one contiguous coordinate face from every row. The source section remains intact; the
+// output is the addressed face itself, with its row lineage and grain unchanged.
+extern "C" __global__ void section_select_columns(
+    const int64_t *lo, const int64_t *hi, uint32_t rows, uint32_t width, uint32_t from, uint32_t span,
+    int64_t *out_lo, int64_t *out_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    uint32_t flat = blockIdx.x * blockDim.x + threadIdx.x;
+    if (flat >= rows * span) return;
+    if (upstream_refused(census, lineage, lineage_count, refused)) return;
+    uint32_t row = flat / span;
+    uint32_t column = flat % span;
+    size_t source = (size_t)row * (size_t)width + (size_t)from + column;
+    out_lo[flat] = lo[source];
+    out_hi[flat] = hi[source];
 }
 
 // A declared span of columns withdrawn — the matched-sibling intervention — OUT OF PLACE: the

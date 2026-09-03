@@ -174,6 +174,37 @@ impl<'chart> ResidentSurface<'chart> {
         self.alloc::<u8>(octets)
     }
 
+    /// Copy one exact octet subspan into a caller-owned resident pool and count the crossing.
+    /// The pool remains opaque outside this crate; this is the bounded intake used when one
+    /// coefficient atlas is too large to stage as a single serial allocation.
+    pub(crate) fn copy_octets(
+        &self,
+        destination: &DeviceBuffer<u8>,
+        offset: usize,
+        octets: &[u8],
+    ) -> Result<(), ResidentRefusal> {
+        self.context.make_current()?;
+        destination.copy_range_from_slice(offset, octets)?;
+        self.census.borrow_mut().ingress_octets += octets.len() as u64;
+        Ok(())
+    }
+
+    /// Copy one exact octet subspan between caller-owned resident pools and count the internal
+    /// transport.  No octet crosses to the serial chart.
+    pub(crate) fn copy_resident_octets(
+        &self,
+        destination: &DeviceBuffer<u8>,
+        destination_offset: usize,
+        source: &DeviceBuffer<u8>,
+        source_offset: usize,
+        octets: usize,
+    ) -> Result<(), ResidentRefusal> {
+        self.context.make_current()?;
+        destination.copy_range_from_buffer(destination_offset, source, source_offset, octets)?;
+        self.census.borrow_mut().device_to_device_octets += octets as u64;
+        Ok(())
+    }
+
     /// Release a pooled allocation's octets from the resident census. The buffer's own `Drop`
     /// frees the card; this is the census half, which a `DeviceBuffer` cannot do for itself
     /// because it does not know the surface.

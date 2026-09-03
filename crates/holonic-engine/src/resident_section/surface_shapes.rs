@@ -45,6 +45,38 @@ impl<'chart> ResidentSurface<'chart> {
         self.flat_shape(OPERATION, rows, width, needed, work, Vec::new())
     }
 
+    /// Shape an entering BF16 population which is already resident and whose complete-population
+    /// frame and widest aligned entry were returned by the exact BF16 mouth.  This is the same bound
+    /// as [`shape_enter`](Self::shape_enter), expressed without copying the words back to the serial
+    /// chart merely to read their magnitude.
+    pub(crate) fn shape_enter_resident_bfloat16(
+        &self,
+        rows: usize,
+        width: usize,
+        scale: Dyadic,
+        grain: ResidentGrain,
+        frame_exponent: i32,
+        entry_octaves: u32,
+    ) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "enter-resident-bfloat16";
+        let shifted = i64::from(entry_octaves)
+            + i64::from(scale.octaves())
+            + i64::from(frame_exponent)
+            + i64::from(scale.exponent)
+            + i64::from(grain.0);
+        let needed = u32::try_from(shifted + 1).unwrap_or(1).max(1);
+        Self::admit_octaves(OPERATION, needed)?;
+        let count = (rows * width) as u64;
+        let mut work = ExactWork::nothing();
+        work.multiplied(count);
+        work.entries_written = BigUint::from(2 * count);
+        work.peak_bits = BigUint::from(u64::from(grain.0) + 16);
+        work.cumulative_bits = BigUint::from(2 * count * (u64::from(grain.0) + 16));
+        work.resident(2 * count);
+        work.stepped();
+        self.flat_shape(OPERATION, rows, width, needed, work, Vec::new())
+    }
+
     pub(super) fn flat_shape(
         &self,
         operation: &'static str,
@@ -618,6 +650,32 @@ impl<'chart> ResidentSurface<'chart> {
         self.flat_shape(OPERATION, rows, width, needed, work, Vec::new())
     }
 
+    /// Certified elementwise hyperbolic tangent at the section's own grain.
+    pub fn shape_tanh(
+        &self,
+        rows: usize,
+        width: usize,
+        input_octaves: u32,
+        grain: ResidentGrain,
+        terms: SeriesAperture,
+    ) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "tanh";
+        let needed = input_octaves.max(2 * grain.0 + 4);
+        Self::admit_octaves(OPERATION, needed)?;
+        let count = (rows * width) as u64;
+        let series = 2 * (u64::from(terms.0) + 1);
+        let mut work = ExactWork::nothing();
+        work.multiplied(count * 2 * series);
+        work.added(count * series);
+        work.divided(count * (4 + series));
+        work.entries_written = BigUint::from(2 * count);
+        work.resident(2 * count);
+        work.peak_bits = BigUint::from(u64::from(needed));
+        work.cumulative_bits = BigUint::from(2 * count * u64::from(grain.0 + 2));
+        work.dependency_span = BigUint::from(2u64 + u64::from(terms.0));
+        self.flat_shape(OPERATION, rows, width, needed, work, Vec::new())
+    }
+
     /// The pointwise product of two standings.
     pub fn shape_hadamard(
         &self,
@@ -683,6 +741,65 @@ impl<'chart> ResidentSurface<'chart> {
         work.cumulative_bits = BigUint::from(2 * count * u64::from(input_octaves));
         work.stepped();
         self.flat_shape(OPERATION, rows, width, needed, work, Vec::new())
+    }
+
+    /// Product with one exact aligned resident coefficient.
+    pub fn shape_scale_by_aligned(
+        &self,
+        rows: usize,
+        width: usize,
+        input_octaves: u32,
+        coefficient: &MountedReadout<'chart>,
+    ) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "scale-by-aligned";
+        if coefficient.rows() * coefficient.dim() != 1 {
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: "the coefficient population is not scalar".to_owned(),
+            });
+        }
+        let needed = input_octaves + coefficient.entry_octaves() + 1;
+        Self::admit_octaves(OPERATION, needed)?;
+        let count = (rows * width) as u64;
+        let mut work = ExactWork::nothing();
+        work.multiplied(2 * count);
+        work.entries_written = BigUint::from(2 * count);
+        work.resident(2 * count);
+        work.peak_bits = BigUint::from(u64::from(needed));
+        work.cumulative_bits = BigUint::from(2 * count * u64::from(needed));
+        work.stepped();
+        self.flat_shape(OPERATION, rows, width, needed, work, Vec::new())
+    }
+
+    /// One addressed contiguous coordinate face from every row, retaining the input grain and
+    /// octave bound exactly.
+    pub fn shape_select_columns(
+        &self,
+        rows: usize,
+        width: usize,
+        from: usize,
+        span: usize,
+        input_octaves: u32,
+    ) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "select-columns";
+        if span == 0 || from.checked_add(span).is_none_or(|end| end > width) {
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION,
+                what: format!(
+                    "face {from}..{} leaves width {width}",
+                    from.saturating_add(span)
+                ),
+            });
+        }
+        Self::admit_octaves(OPERATION, input_octaves)?;
+        let count = (rows * span) as u64;
+        let mut work = ExactWork::nothing();
+        work.entries_written = BigUint::from(2 * count);
+        work.resident(2 * count);
+        work.peak_bits = BigUint::from(u64::from(input_octaves));
+        work.cumulative_bits = BigUint::from(2 * count * u64::from(input_octaves));
+        work.stepped();
+        self.flat_shape(OPERATION, rows, span, input_octaves, work, Vec::new())
     }
 
     /// The matched-sibling intervention: a declared span of columns withdrawn, out of place.

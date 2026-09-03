@@ -863,6 +863,38 @@ pub struct PooledMount {
     pub dim: usize,
 }
 
+/// One complete resident BF16 population whose common exact frame is to be read once.
+///
+/// This is deliberately smaller than [`PooledMount`]: no aligned destination is needed while the
+/// complete population's least exponent is being reduced.  A caller may then align mutually
+/// exclusive tiles of that population through [`FixedFramePooledMount`] without letting each tile
+/// invent a different frame.
+#[derive(Clone, Copy, Debug)]
+pub struct ResidentBfloat16Population {
+    /// The complete stored BF16 codeword population, already resident.
+    pub stored: CuDevicePtr,
+    pub count: u32,
+}
+
+/// The exact common frame returned from one complete resident BF16 population.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize)]
+pub struct ResidentBfloat16Frame {
+    pub exponent: i32,
+}
+
+/// One mutually-exclusive tile aligned into a caller-owned pool under its complete population's
+/// already-returned frame.  Nothing here allocates and nothing recomputes the exponent.
+#[derive(Clone, Copy, Debug)]
+pub struct FixedFramePooledMount {
+    pub stored: CuDevicePtr,
+    pub aligned: CuDevicePtr,
+    pub mass: CuDevicePtr,
+    pub count: u32,
+    pub rows: usize,
+    pub dim: usize,
+    pub frame: ResidentBfloat16Frame,
+}
+
 /// What a batched mount returned for one map: the readout borrowing the pool, and the octaves of
 /// its widest row absolute mass **as a value**.
 pub struct PooledReadout<'chart> {
@@ -871,6 +903,281 @@ pub struct PooledReadout<'chart> {
 }
 
 impl ResidentReadout {
+    /// Read the common exact BF16 frame of every complete resident population in one reduction
+    /// batch.  This is the first half of [`mount_bfloat16_pooled`](Self::mount_bfloat16_pooled),
+    /// separated because a population wider than the apparatus may be aligned tile by tile while
+    /// retaining one frame for the whole population.
+    ///
+    /// `scratch` names `4 * populations.len()` resident `u32` words.  The call synchronizes only
+    /// the supplied stream and returns no aligned representation.
+    ///
+    /// # Safety
+    ///
+    /// `stream` must be live in this readout's context.  Every `stored` address must carry the
+    /// declared complete BF16 population and remain immutable until this call returns; `scratch`
+    /// must be exclusively writable for the declared extent.
+    pub unsafe fn resident_bfloat16_frames(
+        &self,
+        stream: *mut c_void,
+        scratch: CuDevicePtr,
+        populations: &[ResidentBfloat16Population],
+    ) -> Result<Vec<ResidentBfloat16Frame>, FiberError> {
+        if populations.is_empty() {
+            return Ok(Vec::new());
+        }
+        let block = self.launch.block_x;
+        let mut grids = Vec::with_capacity(populations.len());
+        for population in populations {
+            grids.push(self.launch.grid_for(population.count).map_err(|_| {
+                FiberError::ExtentOverflow {
+                    rows: population.count as usize,
+                }
+            })?);
+        }
+        unsafe {
+            checked(cuCtxSetCurrent(self.context), "cuCtxSetCurrent")?;
+            let mut seed = vec![0u32; 4 * populations.len()];
+            for which in 0..populations.len() {
+                seed[4 * which] = i32::MAX as u32;
+            }
+            checked(
+                cuMemcpyHtoD_v2(scratch, seed.as_ptr().cast(), seed.len() * 4),
+                "cuMemcpy(resident frame scratch seed)",
+            )?;
+            for (which, population) in populations.iter().enumerate() {
+                let mut stored = population.stored;
+                let mut count = population.count;
+                let lowest_slot = scratch + (16 * which) as u64;
+                let refused_slot = scratch + (16 * which + 12) as u64;
+                let mut parameters: [*mut c_void; 4] = [
+                    (&raw mut stored).cast(),
+                    (&raw mut count).cast(),
+                    (&raw const lowest_slot as *mut CuDevicePtr).cast(),
+                    (&raw const refused_slot as *mut CuDevicePtr).cast(),
+                ];
+                checked(
+                    cuLaunchKernel(
+                        self.lowest_exponent,
+                        grids[which],
+                        1,
+                        1,
+                        block,
+                        1,
+                        1,
+                        0,
+                        stream,
+                        parameters.as_mut_ptr(),
+                        std::ptr::null_mut(),
+                    ),
+                    "cuLaunchKernel(bfloat16_lowest_exponent)",
+                )?;
+            }
+            checked(
+                cuStreamSynchronize(stream),
+                "cuStreamSynchronize(resident BF16 frames)",
+            )?;
+            let mut words = vec![0u32; 4 * populations.len()];
+            checked(
+                cuMemcpyDtoH_v2(words.as_mut_ptr().cast(), scratch, words.len() * 4),
+                "cuMemcpy(resident frame scratch back)",
+            )?;
+            let mut frames = Vec::with_capacity(populations.len());
+            for which in 0..populations.len() {
+                if words[4 * which + 3] & 1 != 0 {
+                    return Err(FiberError::MouthRefused {
+                        reason: format!(
+                            "resident population {which} carries a pattern that is not a finite BF16 value"
+                        ),
+                    });
+                }
+                let exponent = words[4 * which] as i32;
+                frames.push(ResidentBfloat16Frame {
+                    exponent: if exponent == i32::MAX { 0 } else { exponent },
+                });
+            }
+            Ok(frames)
+        }
+    }
+
+    /// Align complete-population tiles under already-returned frames and compute each tile's exact
+    /// row masses.  Unlike [`mount_bfloat16_pooled`](Self::mount_bfloat16_pooled), this performs no
+    /// exponent reduction: the caller supplies the frame read from the complete population.
+    ///
+    /// One alignment pool can therefore be reused serially for a population that cannot exist as
+    /// one simultaneous aligned image.  Each returned readout borrows that pool and is valid only
+    /// until the caller overwrites it with the next tile.
+    ///
+    /// `scratch` names `4 * requests.len()` resident `u32` words.
+    ///
+    /// # Safety
+    ///
+    /// `stream` must be live in this readout's context.  Every source and destination address must
+    /// be valid for its declared extent, and no other current may read or write the aligned, mass,
+    /// or scratch populations until this call and every use of its borrowed readouts have returned.
+    pub unsafe fn mount_bfloat16_pooled_fixed_frame<'chart>(
+        &'chart self,
+        stream: *mut c_void,
+        scratch: CuDevicePtr,
+        requests: &[FixedFramePooledMount],
+    ) -> Result<Vec<PooledReadout<'chart>>, FiberError> {
+        if requests.is_empty() {
+            return Ok(Vec::new());
+        }
+        let block = self.launch.block_x;
+        let mut grids = Vec::with_capacity(requests.len());
+        for request in requests {
+            if request.dim == 0
+                || request.count as usize % request.dim != 0
+                || request.rows != request.count as usize / request.dim
+            {
+                return Err(FiberError::RaggedReadout {
+                    words: request.count as usize,
+                    dim: request.dim,
+                });
+            }
+            grids.push(
+                self.launch
+                    .grid_for(request.count)
+                    .map_err(|_| FiberError::ExtentOverflow { rows: request.rows })?,
+            );
+        }
+        unsafe {
+            checked(cuCtxSetCurrent(self.context), "cuCtxSetCurrent")?;
+            let seed = vec![0u32; 4 * requests.len()];
+            checked(
+                cuMemcpyHtoD_v2(scratch, seed.as_ptr().cast(), seed.len() * 4),
+                "cuMemcpy(fixed-frame scratch seed)",
+            )?;
+            for (which, request) in requests.iter().enumerate() {
+                let mut stored = request.stored;
+                let mut count = request.count;
+                let mut exponent = request.frame.exponent;
+                let mut aligned = request.aligned;
+                let octaves_slot = scratch + (16 * which + 4) as u64;
+                let negatives_slot = scratch + (16 * which + 8) as u64;
+                let refused_slot = scratch + (16 * which + 12) as u64;
+                let mut parameters: [*mut c_void; 7] = [
+                    (&raw mut stored).cast(),
+                    (&raw mut count).cast(),
+                    (&raw mut exponent).cast(),
+                    (&raw mut aligned).cast(),
+                    (&raw const octaves_slot as *mut CuDevicePtr).cast(),
+                    (&raw const negatives_slot as *mut CuDevicePtr).cast(),
+                    (&raw const refused_slot as *mut CuDevicePtr).cast(),
+                ];
+                checked(
+                    cuLaunchKernel(
+                        self.align,
+                        grids[which],
+                        1,
+                        1,
+                        block,
+                        1,
+                        1,
+                        0,
+                        stream,
+                        parameters.as_mut_ptr(),
+                        std::ptr::null_mut(),
+                    ),
+                    "cuLaunchKernel(bfloat16_align fixed frame)",
+                )?;
+                if request.rows == 0 {
+                    continue;
+                }
+                let rows = u32::try_from(request.rows)
+                    .map_err(|_| FiberError::ExtentOverflow { rows: request.rows })?;
+                let mass_grid = self
+                    .launch
+                    .grid_for(rows)
+                    .map_err(|_| FiberError::ExtentOverflow { rows: request.rows })?;
+                let mut mass_resident = request.aligned;
+                let mut rows_arg = rows;
+                let mut dim = u32::try_from(request.dim)
+                    .map_err(|_| FiberError::ExtentOverflow { rows: request.rows })?;
+                let mut low = request.mass;
+                let mut high = request.mass + (request.rows * 8) as u64;
+                let mut mass_parameters: [*mut c_void; 5] = [
+                    (&raw mut mass_resident).cast(),
+                    (&raw mut rows_arg).cast(),
+                    (&raw mut dim).cast(),
+                    (&raw mut low).cast(),
+                    (&raw mut high).cast(),
+                ];
+                checked(
+                    cuLaunchKernel(
+                        self.row_mass,
+                        mass_grid,
+                        1,
+                        1,
+                        block,
+                        1,
+                        1,
+                        0,
+                        stream,
+                        mass_parameters.as_mut_ptr(),
+                        std::ptr::null_mut(),
+                    ),
+                    "cuLaunchKernel(exact_row_absolute_mass fixed frame)",
+                )?;
+            }
+            checked(
+                cuStreamSynchronize(stream),
+                "cuStreamSynchronize(fixed-frame pooled mount)",
+            )?;
+            let mut words = vec![0u32; 4 * requests.len()];
+            checked(
+                cuMemcpyDtoH_v2(words.as_mut_ptr().cast(), scratch, words.len() * 4),
+                "cuMemcpy(fixed-frame scratch back)",
+            )?;
+            let mut mounted = Vec::with_capacity(requests.len());
+            for (which, request) in requests.iter().enumerate() {
+                if words[4 * which + 3] & 2 != 0 {
+                    return Err(FiberError::AlignmentSpread { spread: u32::MAX });
+                }
+                let mut low = vec![0u64; request.rows];
+                let mut high = vec![0i64; request.rows];
+                checked(
+                    cuMemcpyDtoH_v2(low.as_mut_ptr().cast(), request.mass, request.rows * 8),
+                    "cuMemcpy(fixed-frame mass low)",
+                )?;
+                checked(
+                    cuMemcpyDtoH_v2(
+                        high.as_mut_ptr().cast(),
+                        request.mass + (request.rows * 8) as u64,
+                        request.rows * 8,
+                    ),
+                    "cuMemcpy(fixed-frame mass high)",
+                )?;
+                let widest = low
+                    .iter()
+                    .zip(&high)
+                    .map(|(low, high)| {
+                        (((*high as i128) << 64) | (*low as i128 & 0xFFFF_FFFF_FFFF_FFFF))
+                            .unsigned_abs()
+                    })
+                    .max()
+                    .unwrap_or(0);
+                let mass_octaves =
+                    i64::from(128 - widest.leading_zeros()) + i64::from(request.frame.exponent);
+                mounted.push(PooledReadout {
+                    readout: MountedReadout {
+                        chart: self,
+                        resident: request.aligned,
+                        rows: request.rows,
+                        dim: request.dim,
+                        entry_octaves: words[4 * which + 1],
+                        exponent: request.frame.exponent,
+                        octets: request.count as usize * std::mem::size_of::<i64>(),
+                        exact_matrix_sha256: None,
+                        owned: false,
+                    },
+                    mass_value_octaves: u32::try_from(mass_octaves.max(0)).unwrap_or(0),
+                });
+            }
+            Ok(mounted)
+        }
+    }
+
     /// ★ **MOUNT A WHOLE LAYER'S MAPS AT ONCE, INTO THE CALLER'S POOL, ON THE CALLER'S STREAM.**
     ///
     /// [`mount_bfloat16`] is one map's mount and pays for it three times: it allocates, launches

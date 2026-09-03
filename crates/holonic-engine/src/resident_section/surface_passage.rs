@@ -184,7 +184,29 @@ impl<'chart> ResidentSurface<'chart> {
         scale: Dyadic,
         out: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
-        let count = staged.rows * staged.width;
+        self.record_enter_resident_bfloat16(
+            lane,
+            staged.buffer.device_ptr(),
+            staged.rows,
+            staged.width,
+            scale,
+            out,
+        )
+    }
+
+    /// Record the ordinary BF16 entering law from a coefficient population that is already
+    /// resident.  The address is crate-private apparatus testimony; callers outside the engine
+    /// cannot manufacture a resident source pointer.
+    pub(crate) fn record_enter_resident_bfloat16(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        resident_words: u64,
+        rows: usize,
+        width: usize,
+        scale: Dyadic,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let count = rows * width;
         if count != out.count() {
             return Err(ResidentRefusal::Ragged {
                 operation: "enter",
@@ -195,7 +217,7 @@ impl<'chart> ResidentSurface<'chart> {
         }
         let mut params = Params::new();
         params
-            .ptr(staged.buffer.device_ptr())
+            .ptr(resident_words)
             .u32(count as u32)
             .i64(scale.significand)
             .i32(scale.exponent)
@@ -458,6 +480,29 @@ impl<'chart> ResidentSurface<'chart> {
         )
     }
 
+    pub fn record_tanh(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        terms: SeriesAperture,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let mut params = Params::new();
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.count() as u32)
+            .i32(out.grain.0 as i32)
+            .u32(terms.0)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(lane, "section_tanh", input.count(), &mut params, "tanh")
+    }
+
     pub fn record_hadamard(
         &self,
         lane: &Lane<'_, 'chart>,
@@ -527,6 +572,72 @@ impl<'chart> ResidentSurface<'chart> {
             .ptr(lane.lineage)
             .u32(lane.lineage_count);
         self.record_flat(lane, "section_scale", input.count(), &mut params, "scale")
+    }
+
+    pub fn record_scale_by_aligned(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        coefficient: &MountedReadout<'chart>,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let mut params = Params::new();
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.count() as u32)
+            .ptr(coefficient.raw_resident())
+            .i32(coefficient.exponent())
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_scale_by_aligned",
+            input.count(),
+            &mut params,
+            "scale-by-aligned",
+        )
+    }
+
+    pub fn record_select_columns(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        from: usize,
+        span: usize,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        if out.rows != input.rows || out.width != span {
+            return Err(ResidentRefusal::Declaration {
+                operation: "select-columns",
+                what: "the output does not carry the declared coordinate face".to_owned(),
+            });
+        }
+        let mut params = Params::new();
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.rows as u32)
+            .u32(input.width as u32)
+            .u32(from as u32)
+            .u32(span as u32)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_select_columns",
+            input.rows * span,
+            &mut params,
+            "select-columns",
+        )
     }
 
     pub fn record_withdraw_columns(
