@@ -6,6 +6,7 @@ import ElementaryHolonics.RH.ZeroFactorizationExists
 import ElementaryHolonics.RH.LandauXi
 import ElementaryHolonics.RH.JensenCountsTheComb
 import ElementaryHolonics.RH.RiemannXiGrowth
+import ElementaryHolonics.RH.XiCentre
 
 /-!
 # FT0: the zeros are Foster tanks, and the finite Foster form carries Landau's remainder
@@ -448,5 +449,28 @@ theorem exists_paired_foster_form {r : ℝ} (hr : 0 < r) (hξ : riemannXi (1 / 2
   have hlog2 : 0 ≤ Real.log 2 := Real.log_nonneg (by norm_num)
   have := mul_le_mul_of_nonneg_right hN hlog2
   linarith
+
+/-! ## FT1 (i): the carried hypothesis discharged -/
+
+/-- **The symmetric factorization exists unconditionally**, the centre value being positive by
+`XiCentre.riemannXi_one_half_ne_zero`. -/
+theorem exists_symmetricZeroFactorization_count' {r : ℝ} (hr : 0 < r) :
+    ∃ Z : SymmetricZeroFactorization r,
+      (Z.count : ℤ) = ∑ᶠ u, MeromorphicOn.divisor riemannXi (closedBall (1 / 2 : ℂ) (r / 2)) u :=
+  exists_symmetricZeroFactorization_count hr XiCentre.riemannXi_one_half_ne_zero
+
+/-- **FT0 unconditionally: the paired finite Foster form with Landau's remainder.** -/
+theorem exists_paired_foster_form' {r : ℝ} (hr : 0 < r) :
+    ∃ (C : ℝ) (Z : SymmetricZeroFactorization r), 0 < C ∧
+      (Z.count : ℝ) ≤ Real.log (jensenCeiling C (1 / 2) r / ‖riemannXi (1 / 2)‖) /
+        Real.log (3 / 2) ∧
+      ∀ z ∈ closedBall (1 / 2 : ℂ) (r / 8), riemannXi z ≠ 0 →
+        ‖logDeriv riemannXi z -
+            ∑ ρ ∈ Z.zeros, (Z.mult ρ : ℂ) *
+              ((z - 1 / 2) / ((z - 1 / 2) ^ 2 - (ρ - 1 / 2) ^ 2))‖ ≤
+          16 * (xiBudget C (1 / 2) r +
+            Real.log (jensenCeiling C (1 / 2) r / ‖riemannXi (1 / 2)‖) / Real.log (3 / 2) *
+              Real.log 2) / r :=
+  exists_paired_foster_form hr XiCentre.riemannXi_one_half_ne_zero
 
 end Soma.Holonics.RH.FosterTanks
