@@ -186,6 +186,14 @@ and the union of cones.
 separating history reopens one class into two; every class and its cone are returned with their
 occurrence populations retained; the extent and insufficiency are returned as populations.
 
+[established-bounded; implemented-exact; measured] **SKE3 PASSED.** The five variants exposed to
+three declared histories on the resident operator, every exposure's cone founded as in SKE2:
+under the empty history `7 + 5 =` and `7 + 6 =` are one class, the declared history `The second
+operand is ` reopens it (`5` against `6`), and under all three histories the family is five
+classes; class cones are unions over exposures; the extent is 1,316,260 of 1,595,392 sites and
+the insufficiency 279,132, returned per population. The receipt is
+[`the SKE3 return`](../research/records/2026-09-03_SKE3_THE_SIGNATURE_QUOTIENT_IDENTIFIED_TWO_VARIANTS_UNDER_THE_EMPTY_HISTORY_AND_A_DECLARED_HISTORY_REOPENED_THEM.md).
+
 ### SKE4 -- condensation and seal
 
 [definition] Each class returns one local-current ecology restricted to its cone, with the exact

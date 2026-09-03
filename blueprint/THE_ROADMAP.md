@@ -63,7 +63,7 @@ are provenance, not pickup obligations.
 
 ## Current position
 
-**Current frontier:** SKE3
+**Current frontier:** SKE4
 
 [definition] Brandon's direct request of 2026-09-03 activates the fixed `SKE0--SKE5` Soulkiller
 campaign, ordered below. It follows the completed HNA campaign and consumes its resident exact
@@ -184,8 +184,8 @@ The order is fixed:
 2. `SKE1` -- the adjoint return through every reaction (the cone instrument; completes HNA4) --
    **PASSED**;
 3. `SKE2` -- excitation and the cone by intervention -- **PASSED** at its corrected scope;
-4. `SKE3` -- identification: the signature quotient of a declared family -- **CURRENT**;
-5. `SKE4` -- condensation and seal through `soulkiller::dismantle`; and
+4. `SKE3` -- identification: the signature quotient of a declared family -- **PASSED**;
+5. `SKE4` -- condensation and seal through `soulkiller::dismantle` -- **CURRENT**; and
 6. `SKE5` -- Eros composes the classes and the recurrence runs on them.
 
 [definition] Soulkiller is founded by excitation. The resident exact realization is the
@@ -214,6 +214,12 @@ leaves the face and the cone withdrawn changes it on all five occurrences of a d
 and no magnitude threshold determines the cone. The per-population support of the first letter
 was refuted and the phase corrected in place. Its receipt is
 [`the SKE2 return`](../research/records/2026-09-03_SKE2_THE_CONE_IS_FOUNDED_BY_JOINT_WITHDRAWAL_ALONG_THE_EXCITATION_AND_A_PER_POPULATION_SUPPORT_IS_NOT_A_CONE.md).
+
+[established-bounded; implemented-exact; measured] SKE3 returned the signature quotient of the
+declared family over three declared histories: two variants identified under the empty history
+and reopened by a declared history, five classes under every history, class cones as unions, and
+the extent and insufficiency as site populations. Its receipt is
+[`the SKE3 return`](../research/records/2026-09-03_SKE3_THE_SIGNATURE_QUOTIENT_IDENTIFIED_TWO_VARIANTS_UNDER_THE_EMPTY_HISTORY_AND_A_DECLARED_HISTORY_REOPENED_THEM.md).
 
 [counterexample; source-inspected] The audit
 [`2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](../research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md)
