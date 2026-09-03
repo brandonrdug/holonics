@@ -52,10 +52,6 @@ mod profile;
 mod repeated_circulation;
 #[path = "holonic_intelligence/rested.rs"]
 mod rested;
-#[path = "holonic_intelligence/scaffold_excitation_receipt.rs"]
-mod scaffold_excitation_receipt;
-#[path = "holonic_intelligence/scaffold_lift.rs"]
-mod scaffold_lift;
 #[path = "holonic_intelligence/source_neutral.rs"]
 mod source_neutral;
 #[path = "holonic_intelligence/weight.rs"]
@@ -83,7 +79,5 @@ pub use operative_identification::*;
 pub use profile::*;
 pub use repeated_circulation::*;
 pub use rested::*;
-pub use scaffold_excitation_receipt::*;
-pub use scaffold_lift::*;
 pub use source_neutral::*;
 pub use weight::*;

@@ -251,64 +251,53 @@ fn variable_grain(
 
 #[cfg(test)]
 mod tests {
-    use std::collections::BTreeSet;
-
-    use crate::BoundaryId;
-    use crate::native_ecology::holonic_intelligence::{
-        Bf16ExcitationDismantling, ExteriorModality, ForeignBf16Excitation,
-    };
-    use crate::receiver_exact_compression::ReceiverId;
-    use crate::soulkiller::dismantle;
+    use crate::native_spool::NativeTransportScaffold;
+    use crate::native_spool::fixture;
+    use crate::receiver_history_compression::NativeStateId;
 
     use super::*;
 
-    fn excitation(
-        event: u64,
-        predecessor: Option<u64>,
-        entering: u16,
-        returned: u16,
-    ) -> ForeignBf16Excitation {
-        ForeignBf16Excitation {
-            event: EventId(event),
-            predecessor: predecessor.map(EventId),
-            entering_boundary: BoundaryId(event),
-            emitting_boundary: BoundaryId(event + 1),
-            source_occurrence: format!("cold/{event}"),
-            exterior_modality: ExteriorModality::Text,
-            entering_codewords: vec![entering],
-            returned_codewords: vec![returned],
-            interventions: BTreeSet::from([format!("withdraw/{event}")]),
-            receiver_consequences: BTreeSet::from([format!("return/{event}")]),
+    fn first_request(body: &NativeTransportScaffold) -> NativeInferenceRequest {
+        NativeInferenceRequest {
+            address: NativeInferenceAddress {
+                spool: body.spools[0].address.clone(),
+                thread: body.spools[0].threads[0].address.clone(),
+                occurrence: EventId(1),
+            },
+            receiver: fixture::FIXTURE_RECEIVER,
         }
+    }
+
+    /// The declared body with one further thread whose occurrence shares the predecessor of the
+    /// declared successor, so exactly one entering occurrence carries two actual successors.
+    fn branching_body() -> NativeTransportScaffold {
+        let mut body = fixture::scaffold();
+        let spool = &mut body.spools[0];
+        spool
+            .threads
+            .push(fixture::thread("thread/turn-branch", 3, Some(1), 11, 10, 1, 0, 7));
+        spool
+            .reconstruction_fibres
+            .iter_mut()
+            .find(|fibre| fibre.native == NativeStateId(0))
+            .expect("the emitted native state carries a fibre")
+            .occurrences
+            .insert(EventId(3));
+        body.validate().expect("the branching declared body is valid");
+        body
     }
 
     #[test]
     fn actual_successors_form_a_repeated_variable_grain_circulation() {
-        let returned = dismantle(Bf16ExcitationDismantling {
-            receiver: ReceiverId(7),
-            excitations: vec![
-                excitation(1, None, 0x3f80, 0x4000),
-                excitation(2, Some(1), 0x4000, 0x4040),
-                excitation(3, Some(2), 0x4040, 0x4080),
-            ],
-        })
-        .expect("lift");
-        let first = NativeInferenceRequest {
-            address: NativeInferenceAddress {
-                spool: returned.native.spools[0].address.clone(),
-                thread: returned.native.spools[0].threads[0].address.clone(),
-                occurrence: EventId(1),
-            },
-            receiver: ReceiverId(7),
-        };
+        let body = fixture::scaffold();
         let repeated = conduct_repeated_inference::<(), _>(
-            &returned.native,
-            first,
+            &body,
+            first_request(&body),
             &UniqueActualSuccessorReceiver,
         )
         .expect("repeated circulation");
-        assert_eq!(repeated.cuts.len(), 3);
-        assert_eq!(repeated.emissions.len(), 3);
+        assert_eq!(repeated.cuts.len(), 2);
+        assert_eq!(repeated.emissions.len(), 2);
         assert!(matches!(
             repeated.dispositions.last(),
             Some(NativeCycleDisposition::Terminate {
@@ -344,21 +333,10 @@ mod tests {
 
     #[test]
     fn receiver_can_return_cultivation_without_a_length_or_surface_gate() {
-        let returned = dismantle(Bf16ExcitationDismantling {
-            receiver: ReceiverId(7),
-            excitations: vec![excitation(1, None, 0x3f80, 0x4000)],
-        })
-        .expect("lift");
-        let first = NativeInferenceRequest {
-            address: NativeInferenceAddress {
-                spool: returned.native.spools[0].address.clone(),
-                thread: returned.native.spools[0].threads[0].address.clone(),
-                occurrence: EventId(1),
-            },
-            receiver: ReceiverId(7),
-        };
-        let repeated = conduct_repeated_inference(&returned.native, first, &CultivationReceiver)
-            .expect("cultivation disposition");
+        let body = fixture::scaffold();
+        let repeated =
+            conduct_repeated_inference(&body, first_request(&body), &CultivationReceiver)
+                .expect("cultivation disposition");
         assert!(matches!(
             repeated.dispositions.as_slice(),
             [NativeCycleDisposition::Cultivate { returned: 9, .. }]
@@ -367,26 +345,10 @@ mod tests {
 
     #[test]
     fn a_plural_actual_successor_family_obstructs_without_selecting_a_surface_branch() {
-        let returned = dismantle(Bf16ExcitationDismantling {
-            receiver: ReceiverId(7),
-            excitations: vec![
-                excitation(1, None, 0x3f80, 0x4000),
-                excitation(2, Some(1), 0x4000, 0x4040),
-                excitation(3, Some(1), 0x4000, 0x4080),
-            ],
-        })
-        .expect("branch lift");
-        let first = NativeInferenceRequest {
-            address: NativeInferenceAddress {
-                spool: returned.native.spools[0].address.clone(),
-                thread: returned.native.spools[0].threads[0].address.clone(),
-                occurrence: EventId(1),
-            },
-            receiver: ReceiverId(7),
-        };
+        let body = branching_body();
         let repeated = conduct_repeated_inference::<(), _>(
-            &returned.native,
-            first,
+            &body,
+            first_request(&body),
             &UniqueActualSuccessorReceiver,
         )
         .expect("plural obstruction");

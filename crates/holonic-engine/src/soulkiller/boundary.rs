@@ -60,14 +60,25 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::native_ecology::holonic_intelligence::Bf16ExcitationDismantling;
+    use crate::native_spool::fixture;
     use crate::soulkiller::scrapyard::ReachableSectionDismantling;
 
     fn admitted<Input: SoulkillerDismantlingInput>() {}
 
     #[test]
-    fn generic_reachable_and_bf16_charts_enter_one_public_boundary() {
-        admitted::<Bf16ExcitationDismantling>();
+    fn the_generic_reachable_chart_enters_one_public_boundary() {
         admitted::<ReachableSectionDismantling<'static>>();
+    }
+
+    #[test]
+    fn a_declared_native_body_presents_the_same_three_physical_lanes() {
+        let returned = fixture::returned();
+        assert_eq!(returned.productive(), &fixture::scaffold());
+        assert_eq!(returned.cold_witness(), &());
+        assert_eq!(returned.insufficiency(), &fixture::insufficiency());
+        let (native, exterior, insufficiency) = returned.into_lanes();
+        native.validate().expect("productive lane");
+        assert_eq!(exterior, ());
+        insufficiency.validate().expect("insufficiency lane");
     }
 }
