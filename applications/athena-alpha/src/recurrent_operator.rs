@@ -218,6 +218,36 @@ impl AthenaTokenApplication {
     ) -> Result<AthenaRenderedTokenFace, AthenaRecurrentApplicationError> {
         render_complete_emission(&self.tokenizer, emission)
     }
+
+    /// Encode one user turn and the opening of the model's turn through the tokenizer's own
+    /// turn markers, so the emitted face is the first address of the answer.
+    pub fn encode_turn(&self, material: &str) -> Result<Vec<u32>, AthenaRecurrentApplicationError> {
+        let special = |token: &str| {
+            self.tokenizer
+                .token_to_id(token)
+                .ok_or_else(|| AthenaRecurrentApplicationError::Tokenizer(format!("no {token} marker")))
+        };
+        let plain = |text: &str| {
+            self.tokenizer
+                .encode(text, false)
+                .map(|encoding| encoding.get_ids().to_vec())
+                .map_err(|error| AthenaRecurrentApplicationError::Tokenizer(error.to_string()))
+        };
+        let mut addresses = vec![special("<bos>")?, special("<|turn>")?];
+        addresses.extend(plain(&format!("user\n{material}"))?);
+        addresses.push(special("<turn|>")?);
+        addresses.extend(plain("\n")?);
+        addresses.push(special("<|turn>")?);
+        addresses.extend(plain("model\n")?);
+        Ok(addresses)
+    }
+
+    /// Render one selected address as the application would emit it.
+    pub fn render_address(&self, address: u32) -> Result<String, AthenaRecurrentApplicationError> {
+        self.tokenizer
+            .decode(&[address], false)
+            .map_err(|error| AthenaRecurrentApplicationError::Tokenizer(error.to_string()))
+    }
 }
 
 fn render_complete_emission(
