@@ -63,7 +63,7 @@ are provenance, not pickup obligations.
 
 ## Current position
 
-**Current frontier:** SKE1
+**Current frontier:** SKE2
 
 [definition] Brandon's direct request of 2026-09-03 activates the fixed `SKE0--SKE5` Soulkiller
 campaign, ordered below. It follows the completed HNA campaign and consumes its resident exact
@@ -182,8 +182,8 @@ The order is fixed:
 
 1. `SKE0` -- the excitation-founded quotient, formally -- **PASSED**;
 2. `SKE1` -- the adjoint return through every reaction (the cone instrument; completes HNA4) --
-   **CURRENT**;
-3. `SKE2` -- excitation and the cone by intervention;
+   **PASSED**;
+3. `SKE2` -- excitation and the cone by intervention -- **CURRENT**;
 4. `SKE3` -- identification: the signature quotient of a declared family;
 5. `SKE4` -- condensation and seal through `soulkiller::dismantle`; and
 6. `SKE5` -- Eros composes the classes and the recurrence runs on them.
@@ -199,6 +199,12 @@ intervention cones with the load-bearing law, extent and insufficiency with the 
 the faithful productive lane, and the equal-magnitude/different-cone control; the live umbrella
 built 3,775 jobs. Its receipt is
 [`the SKE0 return`](../research/records/2026-09-03_SKE0_THE_EXCITATION_FOUNDED_QUOTIENT_RETURNED_SIGNATURE_IDENTITY_INTERVENTION_CONES_AND_THE_FAITHFUL_PRODUCTIVE_LANE.md).
+
+[established-bounded; implemented-exact; measured] SKE1 returned the differential through every
+operation of the cycle on the resident operator in 3.3 s, with every reaction's adjoint as a
+certified enclosure and a card control for each, deposited on 344 cross-sections, and the next
+cycle's face differs from the control. Its receipt is
+[`the SKE1 return`](../research/records/2026-09-03_SKE1_THE_RETURN_CROSSED_EVERY_REACTION_OF_THE_CYCLE_AND_DEPOSITED_ON_EVERY_CROSS_SECTION.md).
 
 [counterexample; source-inspected] The audit
 [`2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](../research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md)

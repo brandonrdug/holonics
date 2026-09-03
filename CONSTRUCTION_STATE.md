@@ -16,7 +16,7 @@ mechanisms retain their scoped grades.
 
 ## Current frontier
 
-**Current frontier:** SKE1
+**Current frontier:** SKE2
 
 [definition] Brandon's direct request of 2026-09-03 activates the fixed `SKE0--SKE5` Soulkiller
 campaign under
@@ -26,7 +26,7 @@ manifestation grade and the apparatus, not the return. The return is the quotien
 family of occurrences by equality of complete causal signatures, each class condensed to the
 local-current ecology restricted to the cone the family made load-bearing, sealed with the
 insufficiency. The adjoint return through every reaction (`SKE1`) is one instrument for
-cultivation and dissection. `SKE1` is current: the adjoint return through every reaction. The
+cultivation and dissection. `SKE2` is current: excitation and the cone by intervention. The
 audit is
 [`research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md).
 
@@ -38,6 +38,16 @@ load-bearing site in every cone, extent and insufficiency with the insufficiency
 equal-magnitude/different-cone control. The live umbrella built 3,775 jobs without `sorry` or a
 new axiom. The receipt is
 [`research/records/2026-09-03_SKE0_THE_EXCITATION_FOUNDED_QUOTIENT_RETURNED_SIGNATURE_IDENTITY_INTERVENTION_CONES_AND_THE_FAITHFUL_PRODUCTIVE_LANE.md`](research/records/2026-09-03_SKE0_THE_EXCITATION_FOUNDED_QUOTIENT_RETURNED_SIGNATURE_IDENTITY_INTERVENTION_CONES_AND_THE_FAITHFUL_PRODUCTIVE_LANE.md).
+
+[established-bounded; implemented-exact; measured] SKE1 returned the instrument: at a continuing
+occurrence the receiver differential returns through all 1,271 operations of the cycle in 3.3 s,
+replaying each layer from retained cross-layer checkpoints, with the adjoint of every reaction
+(contraction through the wide split-K standing rounded once, RMS, GELU, tanh, chronology, causal
+contact, selection, and the carries) as certified enclosures sealed by the forward's own midpoint
+projection; 344 cross-sections received rank-5 deposits (overlay rank 1,720) and the next cycle's
+emitted words differ from the control and from the tied-only deposit. Gains, scalars, and embedding
+rows receive no deposit yet. The receipt is
+[`research/records/2026-09-03_SKE1_THE_RETURN_CROSSED_EVERY_REACTION_OF_THE_CYCLE_AND_DEPOSITED_ON_EVERY_CROSS_SECTION.md`](research/records/2026-09-03_SKE1_THE_RETURN_CROSSED_EVERY_REACTION_OF_THE_CYCLE_AND_DEPOSITED_ON_EVERY_CROSS_SECTION.md).
 
 [counterexample; source-inspected] The HNA1 receipt's phrase "one actual Soulkiller return" is
 withdrawn: the graph port excites nothing, carries no insufficiency, and never crosses the

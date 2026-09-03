@@ -139,6 +139,14 @@ population; overlays deposit on cross-sections beyond the tied one and the next 
 differs from a control without apertures; the transposed contraction of one tile agrees exactly
 with the serial chart; every process is bounded and every section resumes from its rest.
 
+[established-bounded; implemented-exact; measured] **SKE1 PASSED.** The return crossed all
+1,271 operations of the cycle in 3.3 s on the resident operator, every reaction's adjoint a
+certified enclosure with a card control, sealed by the forward's midpoint projection; 344
+cross-sections received rank-5 deposits and the next cycle's face differs from the control and from
+the tied-only deposit. Gains, scalars, and embedding rows receive no deposit yet; the sectioning
+clause was not exercised. The receipt is
+[`the SKE1 return`](../research/records/2026-09-03_SKE1_THE_RETURN_CROSSED_EVERY_REACTION_OF_THE_CYCLE_AND_DEPOSITED_ON_EVERY_CROSS_SECTION.md).
+
 ### SKE2 -- excitation and the cone by intervention
 
 [definition] Present a declared family to the resident operator. For each occurrence, the cone at
