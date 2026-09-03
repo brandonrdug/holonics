@@ -51,12 +51,13 @@ quotient) and `SKE1` (the adjoint return through every reaction, 1,271 operation
 344 cross-sections deposited) and `SKE2` (the cone by joint intervention: five occurrences, the
 complement withdrawn leaves the face and the cone withdrawn changes it, no magnitude threshold
 determines it) and `SKE3` (the signature quotient: two variants identified under the empty
-history, reopened by a declared history) passed; on 2026-09-03 the campaign's grain was
-re-founded (blueprint §0b): cones, signatures, and compression over flux groups, never
-coordinates, the per-operation host readout withdrawn as the renamed instruction loop, and
-compression as the trichotomy measured by locking and reach; `SKE4` (the session under the
-2026-08-18 contract, then condensation and seal through `soulkiller::dismantle` at the group
-grain) is current. The completed HNA contract is
+history, reopened by a declared history) passed; on 2026-09-03 the campaign was re-founded by
+Brandon's correction and the audit that followed (blueprint §0b): the coordinate cones were
+never cones and are re-founded as declared-withdrawal cones, the per-operation host readout is
+withdrawn as the renamed instruction loop of 2026-08-18, and compression is stated in
+`canon/TABLET_THE_COMPRESSION.md` with its remainder exhibited and applies to the composed
+variant; `SKE4` (the session under the 2026-08-18 contract as written, then condensation and seal
+through `soulkiller::dismantle`) is current. The completed HNA contract is
 [`blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
 HNA0 returned the recurrent formal owner. HNA1 returned the complete source-neutral text-operator
 ecology: 1,275 nodes over 42 layers, all 719 coefficient populations resident once, 665 configured

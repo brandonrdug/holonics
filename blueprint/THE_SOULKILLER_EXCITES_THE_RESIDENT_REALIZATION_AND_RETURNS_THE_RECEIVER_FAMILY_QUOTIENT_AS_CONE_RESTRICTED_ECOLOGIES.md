@@ -1,7 +1,8 @@
 # Soulkiller excites the resident realization and returns the receiver-family quotient as cone-restricted ecologies
 
 **Date:** 2026-09-03, revised the same day under Brandon's correction on the grain of the cone and the
-session's contract (§0b).  
+session's contract, and rewritten that evening against the audited owners (§0b; the audit is
+[`the SKE audit`](../research/records/2026-09-03_SKE_AUDIT_THE_COORDINATE_GRAIN_THE_HOST_READOUT_AND_THE_COMPRESSION_CLAUSE_WERE_INJECTIONS_AND_THE_CANON_ALREADY_OWNS_THE_ANSWERS.md)).  
 **Status:** CURRENT under [`THE_ROADMAP.md`](THE_ROADMAP.md), which alone orders the construction.  
 **Campaign:** `SKE0--SKE5`.  
 **Authority:** Brandon's direct request of 2026-09-03 to proceed with the deed outlined by the
@@ -37,43 +38,116 @@ generator per recorded event, which is replay; the Parametron scrapyard executes
 tree cannot refuse a manifestation presented as a return because nothing requires the productive
 lane to satisfy `FaithfulLocalSectionLift`.
 
-## 0b. The second correction: the grain, the certificate, and the session's contract
+## 0b. The second correction: the grain, the remainder, the session's contract, and where the compression law applies
 
-[definition] Holonics is stated over group characteristics of flux, never over absolute positions or
-exact relational details at one grain. A cone, a signature, a condensation, and a compression in
-this campaign are stated over currents: coefficient populations, contact heads, layers, and
-cross-layer carriers as flux groups, read through what the passage census already returns (the
-widest octave and enclosure width of a carrier, its bound octave, its mass and dilation), not over
-coordinates. Tracing which coordinate carried a face is tracing which droplet carved the canyon.
+[definition] Brandon's rulings of 2026-09-03: "we care about group characteristics of flux, we
+cannot do anything with absolute positions and exact relational details on one grain", and,
+the same day, "Holonics deals in exact and deterministic relationship coupling". Read with his
+correction of 2026-08-16 ("coordinates are emergent … not somehow lost or forgotten just because
+we don't store absolute positions") and the commitments of `canon/00_PURE_HOLONICS.md` (local
+exact transport, with approximation lawful only as a named receiver quotient carrying a
+remainder certificate; holonic relativity, whole/part and local/global as roles at a declared
+grain and cut; no privileged chart): a coordinate face is never the identity of a cone, a
+signature, an extent, or a compression, and no claim of this campaign rests on one grain;
+coordinates remain a lawful chart of the exact transport. "Group characteristics" is the familial
+classification of a flux, in his words the invariants of the acting family, the differences
+between singularities as orbits, the terrain a flux altered read back as evidence, "wavelength
+matching or Fourier analysis" (2026-08-21), and on 2026-09-01 "not a naive linear string of
+layers/tensors"; it is not a coarser partition of the carrier, and the foreign layer, head, and
+tensor coordinates are not native topology (`research/records/2026-08-22_HOLONIC_INFERENCE_RECOMBINES_LOCAL_TRANSPORTS_UNDER_ONE_MORPHOLOGY_AND_THE_LOCAL_LAW_IS_DYNAMICAL.md`).
+What is read at that grain the corpus already names: the phase/current atlas of
+`canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md` (propagating fronts, modes, collapsed and reopened
+fibres, reconvergences, loop holonomy, higher-cell fillings, boundary radiation, retained
+obstructions), the crystal emission of `canon/TABLET_THE_HEXIS.md` (lattice, phase transport,
+spectrum, bands, boundary response), the collapsed pair with its shortest separating word
+(`crates/holonic-engine/src/receiver_exact_compression.rs`), the octave and width census of
+every passage (`SlotReading`), congestion dilation, and holonomy.
 
-[counterexample; measured] SKE2 and SKE3 as first built founded cones over the 1,595,392 output
-coordinates by bisection along a first-order order, 22 full cycles per exposure, and on
-2026-09-03 the union of two such cones was refuted as a cone on the card. The coordinate cone is
-withdrawn as the definition of the cone. What those phases returned stands as testimony of the
-instrument: the joint withdrawal, the replay control, the magnitude control, the quotient by faces
-and its separating history, and the per-exposure receipts.
+[counterexample; measured; formal-checked] The SKE2 and SKE3 cones over the 1,595,392 output
+coordinates were verified by one complement withdrawal and twenty-two nested probes. `IsCone`
+(`Computation/HolonicExcitationFoundedQuotient.lean`) is universal over every population disjoint
+from the cone and monotone upward, so a superset of a cone is a cone and unions of genuine cones
+compose at every grain; the card's refutation of the class-0 union on 2026-09-03 proved that the
+measured cones were never cones. The defect is the verification, finitely many sufficient
+withdrawals graded as a universal, not the grain; coarsening the sites weakens the claim and
+repairs nothing. The tree's idiom quantifies obligations over declared finite families, and the
+cone is re-founded so: the family declares the withdrawals it exposes its occurrences to (its
+environments), the cone at a declared receiver is what those withdrawals found, extent and
+insufficiency inherit that bound, and every reading carries the receiver and class extent it was
+taken at (`crates/holonic-engine/src/placement.rs`: what is forbidden is not being able to tell).
+A structural cone, from a locality law on `FiniteLocalCurrentEcology` under which the backward
+closure of the receiver's read-set is provably a cone with no withdrawal at all, is the Lean
+obligation it would cost, recorded and not assumed.
 
-[counterexample; source-inspected] The HNA session enacts each of the 1,275 operations as its own
-passage with a host readout of the whole carrier and decides the midpoint projection on the host
-from those words: the renamed instruction loop that the contract of 2026-08-18
+[counterexample; source-inspected] The contract of 2026-08-18
 (`research/records/2026-08-18_THE_SECTION_MUST_STAY_ON_THE_CARD_THE_CONTRACT_BEFORE_THE_RESIDENT_LAYER.md`)
-refused, and `TransferCensus.section_read_outs` measures it at about 1,275 per cycle. Certifying
-and reading every operation was never asked for; it is an injection, and it is why a cycle costs
-seconds at fourteen rows. No later phase of this campaign is graded on that session. SKE4 restores
-the contract as its apparatus obligation: one passage per segment, one readout at the terminal
-face, the successor projection decided on the card from the census, `section_read_outs` near one
-per cycle.
+requires the passage bound whole before launch, launched once, read once, no operation returning
+a host vector, and zero intermediate device-to-host section transfers. The HNA session opens one
+passage per operation (about 2,100 per cycle counting the widening projections and the thirty-two
+tiles of each terminal node; never measured, `section_read_outs` never aggregated), reads every
+carrier to the host, decides the successor projection on the host from those words with the
+kernel the tree labels an unsound control rather than the declared `MidpointQuotient`, and takes
+each next bound from the measured census because it never uses the a-priori octave law of
+`resident_law.rs::bound_octaves` and `front_passage.rs`, under which Station C bound a whole
+layer into one graph and conducted the 42-layer tower at 43 launches on 2026-08-19. Brandon asked
+for one thing on 08-18 (the GPU owns the continuing section) and one on 09-02 (the successor is
+the consequence); the per-operation trace and readout were rendered by Claude sessions, and
+HNA0's Lean asks for no observation but the terminal face. Certifying and reading every operation
+to the host was never asked for. No phase of this campaign is graded on that session. SKE4's
+apparatus obligation is the contract as written: zero intermediate section transfers, the
+terminal face and the census once per cycle, the projection as an occurrence inside the graph
+censused on the card, the single alignment slot honoured by segments between contractions, the
+a-priori octave law reinstated, and the alignment's own host crossing counted or moved.
 
-[definition] Compression is the trichotomy of `canon/TABLET_THE_OPERATIONS.md` §5.2 and nothing
-looser: a rebase (zero remainder), a condensation (certified remainder, invertible up to it), or a
-quotient (collapsed population exhibited). A class body is a condensation only with its certified
-remainder, the terminal census of width and octave under the restriction; a restriction reported
-with argmax equality alone is a quotient whose loss is hidden, and a row subset of the codewords is
-neither. Holonic compression is measured as locking and reach: the marginal standing a body must
-retain per added exposure, falling toward zero as the family's relations lock (the crystal of
-`canon/TABLET_THE_FLOW.md` §7.5), and how far along a generation the body reproduces the operator
-per retained octet (the codec's reach, `canon/02_INFORMATION_PHYSICS.md`: form deposited as a
-receiver-exact factorization, never a second copy).
+[definition] Compression is stated in the tablet that owns the word,
+`canon/TABLET_THE_COMPRESSION.md`, which Brandon cites by name with its definition: a codec pivot
+carrying a declared decoder, never the shrinking of one entity, the decoder half of the object;
+three species differing only by remainder (`H.0420`: rebase zero, condensation certified,
+compression the collapsed population relative to a declared family; `H.0016`: a quotient through
+which every declared receiver factors, invalidated by enlarging the family); the remainder a
+witness and never a number, exhibited as the collapsed pair with its shortest separating word,
+a distortion scalar in its place convicted; a size on disk an absolute volume, a ratio the
+frame-dependent quantity, the invariance additive. Refraction is the codec law already in canon
+(`canon/THE_TRAFFIC_SYSTEM.md`: the medium is the codec, propagation the pivot, the traffic law
+the declared decoder). Decompression over time is the series
+(`exact_value.rs::SeriesTailCertificate`; the laboratory's coil). Compression is prediction is a
+theorem and compression is intelligence a thesis carried with its hedge; its derivation as
+navigation is `research/records/2026-08-14_THE_MAP_IS_PRIOR_TO_THE_SHORTCUT_TOLERANCE_IS_WHERE_THE_ARC_STOPS_REACHING_AND_A_DIRECTION_COSTS_LOG_LOG.md`.
+Where relations lock the corpus says what to emit (the crystal) and names the limit:
+`Saturation` (`blueprint/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md`:
+another lawful crossing adds no class, generator, relation, separator, obstruction, higher cell,
+support-visible morphology, or newly reachable consequence, and an unchanged scalar score is not
+it), which answers Brandon's question of 2026-08-23, when the inference cycle starts showing only
+marginal lifted structures relative to the standing Athena variant. Exceptional holonic
+compression is the strict fall of the complete consequence-preserving product (native standing,
+executable decoder, retained fibres, semantic work, span, residency, transfer) under the declared
+receiver/history family, never one scalar. Where the law applies: on 2026-09-01 Brandon ruled
+the Soulkiller returns are lenses and shortcut paths, training wheels, "we don't expect the spool
+as a sort-of lens to become compressed … the compression we'd actually capitalize off of happens
+in Athena". SKE4 grades the class ecology as a lift with its remainder exhibited; SKE5 measures
+the composed Athena variant by the compression law.
+
+[counterexample; source-inspected] Withdrawn from the first draft of this section, all of it
+reacting rather than reading: "never over coordinates"; the site type "population, head, layer,
+cross-layer carrier"; "so cones compose under union"; the identification of `IsCone` with
+`LocalCausalConeCultivation.outsideUnchanged` (a supplied obligation on the support of a returned
+morphology difference, a different withdrawal on a different object); the certified remainder as
+a terminal census of width and octave (a bound, not an exhibited population; the 2026-08-18
+contract's own remainder is the interval width per coordinate at the terminal face, and
+Brandon's rule of 2026-08-19 is that a midpoint plus a discarded or sidewise interval width is not
+certified conduct); "compression is the trichotomy" (the genus is the pivot; compression is a
+species); "locking" and "reach per retained octet" (a duplicate of `Saturation` and a ratio
+against an absolute volume); "near one readout per cycle" where the contract says zero; the
+attribution to Sol; the grading of the lens by the compression law; and the falsifier that one
+withdrawal founds a cone.
+
+[counterexample; formal-checked] Open obligations in the SKE0 owner, found by the audit and not
+discharged: `FaithfulLocalSectionLift` is inhabited by the identity, so "a manifestation does not
+inhabit it" is unproved (what is owed is the decoder cost the tree's own docstring names:
+"a codec compression additionally owes an exterior presentation and decoder cost");
+`ExcitationFoundedReturn` mentions neither the family, `IsCone`, `extent`, nor `insufficiency`;
+the control proves one state under two histories, not two occurrences. `ReconstructionFiber` is
+retracted for `PreimageFibre` (2026-09-02) and this contract uses the latter.
 
 ## 1. The formal object
 
@@ -85,10 +159,12 @@ The excitation-founded quotient identifies two occurrences exactly when their si
 [definition] The cone of an occurrence at a declared receiver is the population of sites whose
 withdrawal changes the receiver face. It is founded by intervention on the excited current, never
 by a magnitude threshold: two occurrences may have equal magnitudes and different cones. Outside
-the cone the withdrawal leaves the face unchanged; that is the `outsideUnchanged` law of
-`LocalCausalConeCultivation` read at the dismantling boundary. On the resident operator a site is
-a flux group (a population, a head, a layer, a cross-layer carrier), never a coordinate, so cones
-compose under union and a family's extent is a union of groups (§0b).
+the cone the withdrawal leaves the face unchanged; that is `IsCone`, a universal over
+every disjoint population, which the card discharges only over the declared withdrawals
+(`LocalCausalConeCultivation.outsideUnchanged` is a different obligation on a returned morphology
+difference and is not this law). On the resident operator the sites
+are a declared grain and the withdrawals are the family's declared environments; the cone is what
+they found, at every grain, and a coordinate face is never its identity (§0b).
 
 [definition] The extent of a lift is the union of the cones the family excited. Every receiver
 and history outside the family is returned as insufficiency, not as a fabricated face.
@@ -103,10 +179,9 @@ refused the name.
 
 [definition] The adjoint return of a receiver differential through every operation of the cycle
 is one instrument for two deeds. For cultivation it deposits on every cross-section it reaches
-(the open HNA4 section). For dismantling its return at every flux group, read as a group
-characteristic (the octave and mass of the returned current per population and head), orders
-which groups are tried; the cone is what withdrawal founds. The instrument is built once, in
-`SKE1`, and both deeds consume it.
+(the open HNA4 section). For dismantling its return is testimony that orders what the declared
+withdrawals try; the cone is what withdrawal founds, and no reading of the return is a cone. The
+instrument is built once, in `SKE1`, and both deeds consume it.
 
 ## 3. What Soulkiller returns
 
@@ -122,9 +197,10 @@ Soulkiller(resident realization R, declared family F)
 
 The productive lane crosses `soulkiller::dismantle` with the resident realization admitted as a
 `SoulkillerDismantlingInput`. No foreign name, executor, or the resident realization itself is in
-the productive lane. Every class ecology carries its certified remainder, and the return states
-its trichotomy class (§0b); a productive lane without a remainder is a quotient with its loss
-hidden and is refused the name.
+the productive lane. Every class ecology carries its remainder exhibited as collapsed pairs with
+separating words against the full operator over the declared exposures, and the return states
+its species by that remainder (§0b); a productive lane whose loss is a number, or hidden, is
+refused the name.
 
 ## 4. Application boundary
 
@@ -217,8 +293,8 @@ application's turn markers; every occurrence's null withdrawal reproduced the fa
 coordinate cones of 1.85 % to 82.12 % of the 1,595,392 sites, each closed by the complement
 withdrawn (unchanged) and the cone withdrawn (changed) over 22 monotone probes, in 73 to 79 s per
 occurrence; no magnitude threshold determines them; two occurrences with equal faces have cones of
-29,588 and 1,310,213 sites. The instrument and the controls stand; the coordinate grain does not.
-The receipt is
+29,588 and 1,310,213 sites. The instrument and the controls stand; the cones do not, because the
+verification was finitely many sufficient withdrawals graded as a universal (§0b). The receipt is
 [`the SKE2 return`](../research/records/2026-09-03_SKE2_THE_CONE_IS_FOUNDED_BY_JOINT_WITHDRAWAL_ALONG_THE_EXCITATION_AND_A_PER_POPULATION_SUPPORT_IS_NOT_A_CONE.md).
 
 ### SKE3 -- identification
@@ -237,59 +313,72 @@ under the empty history `7 + 5 =` and `7 + 6 =` are one class, the declared hist
 operand is ` reopens it (`5` against `6`), and under all three histories the family is five
 classes; class cones were returned as unions over exposures and the extent as 1,316,260 of
 1,595,392 sites. The union was refuted on the card as a cone (a subset of one exposure's
-complement changed its face); under §0b the coordinate cones and their unions are withdrawn, and
-the quotient, the separating history, and the exposure receipts stand. From SKE4 the declared
-receivers include the flux receiver, the terminal census profile across the populations, beside
-the selected face, so that identification reads a group characteristic. The receipt is
+complement changed its face), which proved the exposure cones were never cones (§0b); they and
+their unions are withdrawn, and the quotient (a `Compression` in the formal sense, receiver-exact
+over the declared exposures), the separating history, and the exposure receipts stand. The
+receipt is
 [`the SKE3 return`](../research/records/2026-09-03_SKE3_THE_SIGNATURE_QUOTIENT_IDENTIFIED_TWO_VARIANTS_UNDER_THE_EMPTY_HISTORY_AND_A_DECLARED_HISTORY_REOPENED_THEM.md).
 
 ### SKE4 -- condensation and seal
 
-[definition] First the apparatus: the session is brought back under the contract of 2026-08-18
-(§0b), one passage per segment, one terminal readout, projection on the card, before any cone is
-founded. Then the cones over flux groups: for every exposure the return's group characteristic
-orders the populations, heads, and cross-layer carriers, and the cone is founded by withdrawal at
-that grain, jointly over the class's exposures and over the family's; unions of group cones are
-group cones. Each class returns one local-current ecology restricted to its group cone, with the
-exact dyadic cross-sections of those groups, its receiver-indexed response (its faces and flux
-profiles at every declared exposure), its preimage fibre, and its certified remainder: the
-terminal census of width and octave of the restricted body against the full operator on the
-class's exposures. The return states its trichotomy class. The insufficiency is the family's
-complement in groups. The resident realization is admitted as a `SoulkillerDismantlingInput`; the
-return crosses `soulkiller::dismantle`; the return type carries the insufficiency lane; the
-per-event generator construction departs without alias, its dependents (the `soma/life`
-lifecycle tests, the workbench demo, the AAC5 deed) departing or re-founding with it as Brandon
-rules.
+[definition] First the apparatus: the session is brought under the contract of 2026-08-18 as
+written (§0b) before any cone is founded. Then the cones as declared-withdrawal cones: the family
+declares the withdrawals it exposes each occurrence to, at grains declared as roles, and for every
+exposure the cone at the declared receiver is what those withdrawals found, jointly over the
+class's exposures and the family's, each reading carrying the receiver and class extent it was
+taken at. Each class returns one local-current ecology restricted to its cone with the exact
+dyadic cross-sections so restricted, its preimage fibre (the occurrences it retains), its
+receiver-indexed response (its faces at every declared exposure), and its remainder exhibited:
+the collapsed pairs, with their shortest separating words, between the class body and the full
+operator over the declared exposures, and the interval width per coordinate at the terminal face
+as the apparatus's propagated remainder. The return states its species by that remainder
+(`H.0420`); the class ecology is a lens and shortcut, not the compression, and is graded as a
+lift: its quotient is the stored presentation, every declared generator word and receiver
+history descends exactly, and a receiver outside the family obstructs descent. The insufficiency
+is the family's complement under the declared withdrawals. The resident realization is admitted
+as a `SoulkillerDismantlingInput`; the return crosses `soulkiller::dismantle`; the return type
+carries the insufficiency lane; the per-event generator construction is not a Soulkiller return
+and its inhabitation of the boundary departs; its dependents (the `soma/life` and
+`circulation-abi` lifecycle tests, the workbench's demo-open and lift-gemma-receipt commands, the
+AAC5 and MVF5 deeds, the VWS receipts) depart or are re-founded on a native fixture as Brandon
+rules, that decision being his.
 
-**Pass SKE4:** [definition] the session's `section_read_outs` is near one per cycle and a cycle
-costs what the tiled contraction costs; every class's ecology reproduces the full operator's
-declared receiver faces on its occurrences on the card and carries the certified remainder that
-bounds its flux profile against the operator's; the class cones and the family cone are group
-cones that compose; a receiver outside the family returns the insufficiency, not a face; the cold
-witness carries every source ordinal and the excitation and intervention testimony; the SKE0
-productive-lane obligation is discharged for the family; the retired constructions are absent from
-the productive closure.
+**Pass SKE4:** [definition] the session's census shows zero intermediate section transfers per
+cycle and a cycle costs what the tiled contraction costs; every class's ecology reproduces the
+full operator's declared receiver faces on its occurrences on the card and carries its collapsed
+pairs with separating words and its per-coordinate terminal remainder; the cones are declared-
+withdrawal cones whose readings carry their extents; a receiver outside the family returns the
+insufficiency, not a face; the cold witness carries every source ordinal and the excitation and
+intervention testimony; the productive-lane obligations are discharged for the family on the
+card, and the Lean non-triviality obligation of §0b is either discharged or recorded open; the
+retired construction no longer inhabits the boundary.
 
 [counterexample; source-inspected] The SKE4 construction of 2026-09-03 at the coordinate grain
-(a generic productive lane at the boundary, a restricted mount from that lane, a class body test,
-and a coordinate bisection over fifteen exposures) is withdrawn as the deed; the boundary's
-generic productive type and the mount from a productive lane are apparatus that the group-grain
-construction may keep, and everything founded on coordinates departs.
+(a generic productive lane at the boundary, a coefficient intake and mount from that lane, a
+class body test, and a coordinate bisection over fifteen exposures) is withdrawn as the deed; the
+boundary's generic productive type and the mount from a productive lane are apparatus the
+corrected construction may keep, and everything founded on coordinates or on a census standing
+in for a remainder departs.
 
 ### SKE5 -- Eros composes the classes and the recurrence runs on them
 
 [definition] Eros composes the class ecologies into one Athena variant; the HNA recurrence runs
-on that body. The family's faces agree with the full operator; a non-family occurrence returns the
-insufficiency. The body is measured as a codec (§0b): its locking, the marginal standing retained
-per exposure added to the family, and its reach, how far along a generation it reproduces the
-operator per retained octet, are returned as the compression receipts; reach beyond the declared
-family is testimony of the codec and never a face the return claims.
+on that body. The family's faces agree with the full operator; a non-family occurrence returns
+the insufficiency. The composed variant is where the compression law applies (§0b): its species
+is stated by its remainder exhibited (the collapsed pairs and separating words against the full
+operator over the declared family), its decoder is declared and its invariance stated as a
+difference and never a ratio, its consequence-preserving product (native standing, executable
+decoder, retained fibres, semantic work, span, residency, transfer) is returned as the vector it
+is, and its `Saturation` under the growing family is returned structurally: what each added
+exposure adds in classes, generators, relations, separators, obstructions, and reachable
+consequences, until another lawful crossing adds nothing.
 
 **Pass SKE5:** [definition] one session over the composed body completes cycles on family
 occurrences with faces equal to the full operator's; a non-family occurrence returns the
-insufficiency rather than a fabricated face; the locking and reach receipts are returned with
-their trichotomy class and remainder; focused tests and one complete release receiver pass;
-capability claims are limited to the family that ran.
+insufficiency rather than a fabricated face; the species, the exhibited remainder, the declared
+decoder, the product vector, and the saturation receipt are returned, no scalar standing in for
+any of them; focused tests and one complete release receiver pass; capability claims are limited
+to the family that ran.
 
 ## 7. Falsifiers
 
@@ -300,8 +389,9 @@ capability claims are limited to the family that ran.
 [counterexample] If the productive lane is the resident realization or any manifestation, the
 return is a copy.
 
-[counterexample] If a cone is reported without a withdrawal that changes the face inside it and
-leaves it unchanged outside, the cone is not founded.
+[counterexample] If a cone is graded as a universal from finitely many withdrawals, or reported
+without the declared withdrawals that founded it and the extent its reading was taken at, the
+cone is not founded.
 
 [counterexample] If two occurrences are identified by one terminal surface rather than the
 complete signature over the declared histories, the class is a lexical quotient.
@@ -309,12 +399,12 @@ complete signature over the declared histories, the class is a lexical quotient.
 [counterexample] If an application names the family's answers or selects among classes, the
 dissection is contaminated.
 
-[counterexample] If a cone, a signature, or an extent is stated over coordinates rather than flux
-groups, it is droplet tracing and is not founded.
+[counterexample] If a coordinate face is the identity of a cone, a signature, an extent, or a
+compression, or a claim rests on one grain, it is droplet tracing and is not founded.
 
-[counterexample] If a session reads every operation to the host, it is the renamed instruction
-loop of 2026-08-18 and grades nothing.
+[counterexample] If a session transfers any intermediate section to the host or decides a
+projection there, it is the renamed instruction loop of 2026-08-18 and grades nothing.
 
-[counterexample] If a restriction is called a compression without its trichotomy class and
-certified remainder, or a row subset of codewords is called a lift, the return is a quotient with
-its loss hidden.
+[counterexample] If a remainder is reported as a number, a compression as a ratio or without its
+decoder, a restriction as a condensation without its collapsed pairs, or a row subset of
+codewords as a lift or a lens, the return is a quotient with its loss hidden.

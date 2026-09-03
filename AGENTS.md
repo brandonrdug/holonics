@@ -167,13 +167,18 @@ retraction is a contamination. Dates are record dates under `research/records/`.
   quotient of a declared family as cone-restricted ecologies; the resident realization is its
   apparatus
   (`2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`).
-- 2026-09-03: the SKE2 and SKE3 cones over the 1,595,392 output coordinates are withdrawn as
-  cones (the union of two was refuted on the card, and the grain itself is droplet tracing);
-  the HNA session's per-operation passage and host readout is the renamed instruction loop of
-  2026-08-18 and grades nothing; the SKE4 construction at the coordinate grain is withdrawn as
-  the deed. The joint-withdrawal instrument, the replay and magnitude controls, the quotient by
-  faces with its separating history, and the exposure receipts stand as testimony
-  (`blueprint/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md` §0b).
+- 2026-09-03: the SKE2 and SKE3 cones over the 1,595,392 output coordinates were never cones:
+  `IsCone` is universal and monotone, unions of genuine cones compose at every grain, and the
+  card's refutation of the union proved the verification (finitely many sufficient withdrawals
+  graded as a universal) false; coarsening the grain repairs nothing. The HNA session's
+  per-operation passage and host readout (about 2,100 per cycle, never measured) is the renamed
+  instruction loop of 2026-08-18, a Claude injection, and grades nothing; the SKE4 construction
+  at the coordinate grain and the first draft of the blueprint's §0b (a census standing in for
+  a remainder, "locking" and "reach per retained octet", "never over coordinates", a permanent
+  layer/head grain, the lens graded by the compression law) are withdrawn. The joint-withdrawal
+  instrument, the controls, the quotient by faces with its separating history, and the exposure
+  receipts stand as testimony
+  (`research/records/2026-09-03_SKE_AUDIT_THE_COORDINATE_GRAIN_THE_HOST_READOUT_AND_THE_COMPRESSION_CLAUSE_WERE_INJECTIONS_AND_THE_CANON_ALREADY_OWNS_THE_ANSWERS.md`).
 
 [established-bounded; source-inspected] Standing at declared scope, for contrast: four exact
 interior recoveries (`2026-08-10_THE_OBJECT_IS_THE_UNRECONSTRUCTABLE_INTERIOR_AND_THE_MACHINE_HAS_ALREADY_RECOVERED_FOUR.md`);
@@ -327,24 +332,22 @@ returns.
   returns is format-free: whether an emission was admitted, which carriers it carried, and its
   diagnostic as octets. The interior derives the returned interaction from those faces; an
   application never types it.
-- **Brandon, 2026-09-03, ruling.** Holonics is stated over group characteristics of flux, never
-  over absolute positions or exact relational details at one grain: nobody has the liberty of
-  tracing every droplet that carved the canyon, and nobody asked for it. Certifying and reading
-  every operation to the host is not the apparatus's discipline; it is an injection (the renamed
-  instruction loop refused on 2026-08-18), and a cone, signature, extent, or compression stated
-  over coordinates is droplet tracing. Compression is the trichotomy of
-  `canon/TABLET_THE_OPERATIONS.md` §5.2 with its remainder exhibited, measured as locking and
-  reach; a row subset of codewords is not a lift.
-- The machine owns no semantic distinction between “data” and “program.” Both are caused structure
-  crossing declared ports and capable of changing later conduct.
-- Algorithms are physically enacted causal geometries. Do not separate computer science from
-  information transport, resource/current physics, receiver locality, or apparatus. Conversely,
-  do not identify a software relation with a physical law unless its typed transport and receiver
-  hypotheses are explicit.
-- Do not introduce backwards compatibility. Rejected standing remains in Git history or the
-  provenance archive; it does not receive a decoder, adapter, alias, fallback, or dual schema.
-- Do not preserve dead code. If a needed relation is absent, derive and build the smallest owner
-  that closes the declared consequence.
+- **Brandon, 2026-09-03, ruling.** "We care about group characteristics of flux, we cannot do
+  anything with absolute positions and exact relational details on one grain"; "Holonics deals
+  in exact and deterministic relationship coupling." Read with his 2026-08-16 correction
+  (coordinates are emergent and not lost because absolute positions are not stored) and
+  `canon/00_PURE_HOLONICS.md`: a coordinate face is never the identity of a cone, signature,
+  extent, or compression, no claim rests on one grain, and coordinates remain a lawful chart of
+  exact transport. "Certifying and reading every operation is not a part of the apparatus's
+  discipline … I have literally never once asked either of you for our apparatus to
+  computationally transport exacts like that": the per-operation passage and host readout of the
+  HNA session is the renamed instruction loop refused on 2026-08-18 and grades nothing.
+  "Holonic compression needs to be incorporated in the holonic sense": the sense is
+  `canon/TABLET_THE_COMPRESSION.md`, a codec pivot carrying a declared decoder, species by
+  remainder (`H.0420`), the remainder a witness and never a number, the invariance additive and
+  never a ratio, the limit `Saturation`, and the law applied to Athena, not to the lens Soulkiller
+  returns (his 2026-09-01). Audit:
+  `research/records/2026-09-03_SKE_AUDIT_THE_COORDINATE_GRAIN_THE_HOST_READOUT_AND_THE_COMPRESSION_CLAUSE_WERE_INJECTIONS_AND_THE_CANON_ALREADY_OWNS_THE_ANSWERS.md`.
 
 ## Ownership and composition
 

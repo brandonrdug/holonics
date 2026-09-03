@@ -27,17 +27,19 @@ family of occurrences by equality of complete causal signatures, each class cond
 local-current ecology restricted to the cone the family made load-bearing, sealed with the
 insufficiency. The adjoint return through every reaction (`SKE1`) is one instrument for
 cultivation and dissection; `SKE2` founded the joint-withdrawal instrument; `SKE3` returned the
-signature quotient of the declared family. On 2026-09-03 Brandon's correction re-founded the
-campaign's grain (the blueprint's §0b): cones, signatures, extents, and compression are stated
-over flux groups read through the passage census, never over coordinates; the per-operation
-passage and host readout of the HNA session is the renamed instruction loop of 2026-08-18 and
-grades nothing; compression is the trichotomy with its remainder, measured as locking and reach.
-The coordinate cones of SKE2 and SKE3 and the coordinate-grain SKE4 construction are withdrawn;
-`SKE4` is current at the corrected grain, beginning with the session brought back under the
-2026-08-18 contract. The engine changes of the withdrawn SKE4 construction (the generic
-productive lane at the boundary, the coefficient intake and mount from a productive lane, the
-condensation and extent owners, the SKE4 deed) are uncommitted in the working tree pending the
-group-grain construction, which may keep the boundary and the intake. The audit is
+signature quotient of the declared family. On 2026-09-03 Brandon's correction and the audit
+that followed it re-founded the campaign (the blueprint's §0b, the audit record
+[`2026-09-03_SKE_AUDIT_…`](research/records/2026-09-03_SKE_AUDIT_THE_COORDINATE_GRAIN_THE_HOST_READOUT_AND_THE_COMPRESSION_CLAUSE_WERE_INJECTIONS_AND_THE_CANON_ALREADY_OWNS_THE_ANSWERS.md)):
+the SKE2 and SKE3 cones were never cones, the verification and not the grain being the defect,
+and cones are re-founded as declared-withdrawal cones; the HNA session's per-operation passage
+and host readout is the renamed instruction loop of 2026-08-18, a Claude injection, and grades
+nothing; compression is stated in `canon/TABLET_THE_COMPRESSION.md` (a codec pivot with a
+declared decoder, species by remainder, the remainder exhibited and never a number, the limit
+`Saturation`) and applies to the composed Athena variant in SKE5, the Soulkiller return being a
+lens. `SKE4` is current, beginning with the session brought under the 2026-08-18 contract as
+written. The engine changes of the withdrawn coordinate-grain SKE4 construction are uncommitted
+in the working tree; the boundary's generic productive lane and the mount from a productive lane
+may be kept. The Soulkiller audit is
 [`research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md).
 
 [proved-derived; formal-checked] SKE0 returned `HolonicExcitationFoundedQuotient.lean`: the
