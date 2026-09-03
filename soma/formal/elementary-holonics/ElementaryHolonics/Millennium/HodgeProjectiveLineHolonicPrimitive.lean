@@ -10,7 +10,7 @@ primitive face is its intersection-orthogonal complement, and the Hodge--Riemann
 negative orientation of the primitive square.
 
 Every nonzero primitive receiver occurrence is detected by its own explicitly reconstructed
-ruling cycle.  Thus the `Holon.ReconstructionFibre` formulation, signed polarization, primitive
+ruling cycle.  Thus the `Holon.PreimageFibre` formulation, signed polarization, primitive
 decomposition, and source return all compose on the existing geometric validation family.
 -/
 
@@ -221,7 +221,7 @@ def signedPrimitivePolarization :
 /-! ## Occupied primitive fibres -/
 
 /-- [proved-derived; formal-checked] Every nonzero primitive direction is detected by its own
-returned ruling cycle.  The occurrence retains that source lift inside the reconstruction fibre. -/
+returned ruling cycle.  The occurrence retains that source lift inside the preimage fibre. -/
 theorem detectsEveryNonzero : DetectsEveryNonzero signedPrimitivePolarization := by
   intro primitive hprimitive
   let sourceLift : CycleLiftFibre datum

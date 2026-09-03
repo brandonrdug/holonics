@@ -164,15 +164,15 @@ def receiverFace {Reading : Type*}
   receiver (history.storage steps - history.storage 0)
 
 /-- The complete population of port-resolved histories collapsed by one receiver reading. -/
-def reconstructionFiber {Reading : Type*}
+def preimageFibre {Reading : Type*}
     (receiver : Quantity → Reading) (steps : ℕ) (reading : Reading) :
     Set (PortResolvedBoundaryHistory Port Quantity) :=
   {history | history.receiverFace receiver steps = reading}
 
-@[simp] theorem mem_reconstructionFiber_iff {Reading : Type*}
+@[simp] theorem mem_preimageFibre_iff {Reading : Type*}
     (receiver : Quantity → Reading) (steps : ℕ) (reading : Reading)
     (history : PortResolvedBoundaryHistory Port Quantity) :
-    history ∈ reconstructionFiber receiver steps reading ↔
+    history ∈ preimageFibre receiver steps reading ↔
       history.receiverFace receiver steps = reading := Iff.rfl
 
 end PortResolvedBoundaryHistory

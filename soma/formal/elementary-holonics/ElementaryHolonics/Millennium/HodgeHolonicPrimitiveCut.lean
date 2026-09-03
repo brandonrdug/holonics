@@ -5,7 +5,7 @@ import ElementaryHolonics.Millennium.HodgeSmoothProjectiveReceiver
 # The Hodge primitive cut as an elementary holonic interaction
 
 `CycleLiftFibre` already retains every algebraic-cycle source over one rational Hodge receiver
-face.  This file identifies that fibre with the reconstruction fibre of an actual `Holon`, then
+face.  This file identifies that fibre with the preimage fibre of an actual `Holon`, then
 uses the Hodge--Riemann sign as a polarized axis rather than storing reflexivity and
 nondegeneracy as independent detector assumptions.
 
@@ -39,12 +39,12 @@ def cycleClassHolon (D : Datum) :
   receive cycle :=
     ⟨D.cycleClass.hom cycle, D.cycleClassesAreHodge ⟨cycle, rfl⟩⟩
 
-/-- [proved-derived; formal-checked] A `CycleLiftFibre` is exactly the reconstruction fibre of
+/-- [proved-derived; formal-checked] A `CycleLiftFibre` is exactly the preimage fibre of
 the cycle-class holon.  Thus algebraicity is occupation of a source-bearing receiver fibre, not
 mere membership in a range shadow. -/
-def cycleClassHolonReconstructionFibreEquiv (D : Datum)
+def cycleClassHolonPreimageFibreEquiv (D : Datum)
     (hodgeClass : D.rationalHodgeClasses) :
-    (cycleClassHolon D).ReconstructionFibre hodgeClass ≃
+    (cycleClassHolon D).PreimageFibre hodgeClass ≃
       CycleLiftFibre D hodgeClass where
   toFun carried :=
     ⟨carried.1, congrArg Subtype.val carried.2⟩
@@ -177,7 +177,7 @@ def DetectsEveryNonzero {lower upper : Datum}
     {step : PrimitiveHodgeStep lower upper}
     (polarization : SignedDefinitePrimitivePolarization step) : Prop :=
   ∀ primitive : step.Primitive, primitive ≠ 0 →
-    Nonempty ((primitiveDetectionHolon polarization).ReconstructionFibre primitive)
+    Nonempty ((primitiveDetectionHolon polarization).PreimageFibre primitive)
 
 namespace SignedDefinitePrimitivePolarization
 
@@ -289,7 +289,7 @@ theorem theHodgeConjecture_of_holonicPrimitiveDetection
 
 section Audit
 
-#print axioms cycleClassHolonReconstructionFibreEquiv
+#print axioms cycleClassHolonPreimageFibreEquiv
 #print axioms SignedDefinitePrimitivePolarization.selfPairing_ne_zero
 #print axioms SignedDefinitePrimitivePolarization.restrict_nondegenerate
 #print axioms SignedDefinitePrimitivePolarization.sourcePrimitiveAlgebraicInteraction

@@ -11,7 +11,7 @@ the exact shifted Leibniz law.  Its primary return is a list of occurrence-level
 commuting and binomial formulas are quotients of that list, not its definition.
 
 The reciprocal theorem assumes an inverse only on the complete successor window actually visited
-by the word.  Noncommuting words, chart rebase, and receiver reconstruction fibres remain visible.
+by the word.  Noncommuting words, chart rebase, and receiver preimage fibres remain visible.
 Nothing in this file is specific to a fluid equation or a frequency lattice.
 -/
 
@@ -430,15 +430,15 @@ theorem differenceWord_rebase [CommRing R]
         generatorExact generator state]
 
 /-- The complete source population retained behind one quotient face. -/
-def reconstructionFibre {Quotient : Type x}
+def preimageFibre {Quotient : Type x}
     (compression : Compression (List Generator) State Quotient R) (quotient : Quotient) : Type _ :=
   { state : State // compression.quotient state = quotient }
 
-/-- Equal quotient faces place both source occurrences in one retained reconstruction fibre. -/
-theorem quotientEq_places_in_reconstructionFibre {Quotient : Type x}
+/-- Equal quotient faces place both source occurrences in one retained preimage fibre. -/
+theorem quotientEq_places_in_preimageFibre {Quotient : Type x}
     (compression : Compression (List Generator) State Quotient R) {left right : State}
     (h : compression.quotient left = compression.quotient right) :
-    ∃ leftIn rightIn : reconstructionFibre compression (compression.quotient left),
+    ∃ leftIn rightIn : preimageFibre compression (compression.quotient left),
       leftIn.1 = left ∧ rightIn.1 = right :=
   ⟨⟨left, rfl⟩, ⟨right, h.symm⟩, rfl, rfl⟩
 

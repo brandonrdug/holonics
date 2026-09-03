@@ -105,7 +105,7 @@ def sourceHolon (comparison : FiniteRankPrimitiveSource step Source) :
 fibre before any rank completion is used. -/
 theorem sourceHolon_fibre_occupied
     (comparison : FiniteRankPrimitiveSource step Source) (source : Source) :
-    Nonempty (comparison.sourceHolon.ReconstructionFibre
+    Nonempty (comparison.sourceHolon.PreimageFibre
       (comparison.primitiveClass source)) :=
   ⟨⟨source, rfl⟩⟩
 

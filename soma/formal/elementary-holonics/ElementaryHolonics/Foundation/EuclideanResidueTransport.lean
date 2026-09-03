@@ -11,7 +11,7 @@ import Mathlib.Tactic
 This file separates four objects which the overloaded word `modulus` can otherwise collapse:
 
 * a lossless Euclidean chart, carrying both a residue face and a quotient/winding coordinate;
-* the residue receiver quotient, whose complete reconstruction fibre retains that winding;
+* the residue receiver quotient, whose complete preimage fibre retains that winding;
 * equality in `ZMod modulus`, which is equality after the residue receiver; and
 * scalar divisibility, which is the zero-residue fibre and hence a specialized multiplication
   lift rather than division of an arbitrary holon, matrix, tensor, or geometric body.
@@ -58,11 +58,11 @@ def firstProjectionQuotient {Source : Type u} {Residue : Type v} {Winding : Type
 
 /-- [proved-derived; formal-checked] The complete predecessor fibre of the projected residue is
 equivalent to the winding carrier.  The quotient did not destroy the coordinate; it moved it into
-the reconstruction fibre. -/
-def firstProjectionReconstructionFibreEquiv
+the preimage fibre. -/
+def firstProjectionPreimageFibreEquiv
     {Source : Type u} {Residue : Type v} {Winding : Type w}
     (chart : Source ≃ Residue × Winding) (residue : Residue) :
-    reconstructionFibre (firstProjectionQuotient chart) residue ≃ Winding where
+    preimageFibre (firstProjectionQuotient chart) residue ≃ Winding where
   toFun source := (chart source.1).2
   invFun winding :=
     ⟨chart.symm (residue, winding),
@@ -96,10 +96,10 @@ def natResidueQuotient (modulus : ℕ) [NeZero modulus] :
 
 /-- [proved-derived; formal-checked] One natural residue fibre reconstructs exactly as the
 nonnegative quotient/winding coordinate. -/
-def natResidueReconstructionFibreEquiv (modulus : ℕ) [NeZero modulus]
+def natResiduePreimageFibreEquiv (modulus : ℕ) [NeZero modulus]
     (residue : ZMod modulus) :
-    reconstructionFibre (natResidueQuotient modulus) residue ≃ ℕ :=
-  firstProjectionReconstructionFibreEquiv (natEuclideanChart modulus) residue
+    preimageFibre (natResidueQuotient modulus) residue ≃ ℕ :=
+  firstProjectionPreimageFibreEquiv (natEuclideanChart modulus) residue
 
 /-- [proved-derived; formal-checked] Equality at the residue receiver is precisely natural
 congruence modulo the declared scalar face. -/
@@ -160,10 +160,10 @@ def intResidueQuotient (modulus : ℕ) [NeZero modulus] :
 
 /-- [proved-derived; formal-checked] One integer residue fibre reconstructs exactly as a signed
 winding axis. -/
-def intResidueReconstructionFibreEquiv (modulus : ℕ) [NeZero modulus]
+def intResiduePreimageFibreEquiv (modulus : ℕ) [NeZero modulus]
     (residue : ZMod modulus) :
-    reconstructionFibre (intResidueQuotient modulus) residue ≃ ℤ :=
-  firstProjectionReconstructionFibreEquiv (intEuclideanChart modulus) residue
+    preimageFibre (intResidueQuotient modulus) residue ≃ ℤ :=
+  firstProjectionPreimageFibreEquiv (intEuclideanChart modulus) residue
 
 /-- [proved-derived; formal-checked] Equality at the oriented residue receiver is exactly the
 statement that the returned difference is a whole signed winding of the modulus. -/
@@ -326,12 +326,12 @@ theorem negativeThree_modEight_crossSection_rebase :
 
 section Audit
 
-#print axioms firstProjectionReconstructionFibreEquiv
-#print axioms natResidueReconstructionFibreEquiv
+#print axioms firstProjectionPreimageFibreEquiv
+#print axioms natResiduePreimageFibreEquiv
 #print axioms natResidue_eq_iff_modEq
 #print axioms natZeroResidue_iff_factorWitness
 #print axioms intEuclideanChart
-#print axioms intResidueReconstructionFibreEquiv
+#print axioms intResiduePreimageFibreEquiv
 #print axioms intResidue_eq_iff_dvd_difference
 #print axioms orientedSource_forward
 #print axioms orientedSource_reverse

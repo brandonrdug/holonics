@@ -80,14 +80,14 @@ def phaseResidue (span : ClockRulerSpan ClockAddress RulerAddress) (clockTicks :
   (span.targetState clockTicks).residue
 
 /-- [definition] Every clock-crossing population which returns one complete ruler state. -/
-def ReconstructionFibre (span : ClockRulerSpan ClockAddress RulerAddress)
+def PreimageFibre (span : ClockRulerSpan ClockAddress RulerAddress)
     (state : RationalClockPassage.PhaseState span.passage) : Type :=
   TransportLift span.targetState state
 
-/-- [definition] Every supplied clock population inhabits the exact reconstruction fibre of its
+/-- [definition] Every supplied clock population inhabits the exact preimage fibre of its
 returned ruler state. -/
 def reconstructionLift (span : ClockRulerSpan ClockAddress RulerAddress) (clockTicks : ℕ) :
-    span.ReconstructionFibre (span.targetState clockTicks) :=
+    span.PreimageFibre (span.targetState clockTicks) :=
   ofSource span.targetState clockTicks
 
 /-- [proved-derived; formal-checked] The target state reconstructs the complete scaled potential,
@@ -117,12 +117,12 @@ theorem targetState_injective (span : ClockRulerSpan ClockAddress RulerAddress) 
     Nat.add_left_cancel equalPotential
   exact mul_left_cancel₀ (Nat.ne_of_gt span.passage.numerator_pos) equalScaled
 
-/-- [proved-derived; formal-checked] Every ruler-state reconstruction fibre contains at most one
+/-- [proved-derived; formal-checked] Every ruler-state preimage fibre contains at most one
 source crossing population. -/
-theorem reconstructionFibre_subsingleton
+theorem preimageFibre_subsingleton
     (span : ClockRulerSpan ClockAddress RulerAddress)
     (state : RationalClockPassage.PhaseState span.passage) :
-    Subsingleton (span.ReconstructionFibre state) := by
+    Subsingleton (span.PreimageFibre state) := by
   exact (subsingleton_iff_unique_source span.targetState state).2
     (fun left right leftExact rightExact =>
       span.targetState_injective (leftExact.trans rightExact.symm))
@@ -229,15 +229,15 @@ def serialRulerState
     RationalClockPassage.PhaseState tower.clockRuler.passage :=
   tower.clockRuler.targetState (tower.serialClockLength joined)
 
-/-- [proved-derived; formal-checked] The serial receiver reconstruction fibre is exactly the two
+/-- [proved-derived; formal-checked] The serial receiver preimage fibre is exactly the two
 component fibres plus their joining equality.  No continuing-history condensation is involved. -/
-def serialReconstructionFibreEquiv
+def serialPreimageFibreEquiv
     (tower : Tower History State BoundaryAddress ClockAddress RulerAddress Receiver Resource)
     (face : Receiver × Receiver) :
-    tower.serialHolon.ReconstructionFibre face ≃
-      Holon.CompositeReconstructionFibre
+    tower.serialHolon.PreimageFibre face ≃
+      Holon.CompositePreimageFibre
         tower.history.toHolon tower.history.toHolon face :=
-  tower.history.toHolon.compReconstructionFibreEquiv tower.history.toHolon face
+  tower.history.toHolon.compPreimageFibreEquiv tower.history.toHolon face
 
 /-- [proved-derived; formal-checked] Rebracketing three serial histories preserves the exact
 three occurrences, both joining equalities, and the exterior source and target. -/
@@ -247,7 +247,7 @@ def serialAssociator
     tower.history.toHolon.toPassage tower.history.toHolon.toPassage
 
 /-- [proved-derived; formal-checked] The serial associator also preserves every complete
-source--target reconstruction fibre; it is not merely an endpoint-count equality. -/
+source--target preimage fibre; it is not merely an endpoint-count equality. -/
 def serialAssociatorFibreEquiv
     (tower : Tower History State BoundaryAddress ClockAddress RulerAddress Receiver Resource)
     (source target : State) :
@@ -276,7 +276,7 @@ def BoundaryIndexedPotentialFamily
     tower.CausalPotentialFibre state.1
 
 /-- [definition] The unresolved continuation population behind one returned receiver face. -/
-def ReceiverReconstructionFibre
+def ReceiverPreimageFibre
     (tower : Tower History State BoundaryAddress ClockAddress RulerAddress Receiver Resource)
     (source : State) (face : Receiver) : Type _ :=
   { potential : tower.CausalPotentialFibre source //
@@ -308,24 +308,24 @@ def clockExtent
   ⟨tower.clockAddress, tower.clockLength history⟩
 
 /-- [definition] Addressed completed ruler-cell passage extent.  The retained phase remains in
-`rulerState` and is part of its reconstruction fibre. -/
+`rulerState` and is part of its preimage fibre. -/
 def rulerExtent
     (tower : Tower History State BoundaryAddress ClockAddress RulerAddress Receiver Resource)
     (history : History) : PassageExtent RulerAddress :=
   ⟨tower.rulerAddress, tower.rulerLength history⟩
 
 /-- [definition] The exact clock population behind one ruler state. -/
-def ClockRulerReconstructionFibre
+def ClockRulerPreimageFibre
     (tower : Tower History State BoundaryAddress ClockAddress RulerAddress Receiver Resource)
     (state : RationalClockPassage.PhaseState tower.clockRuler.passage) : Type :=
-  tower.clockRuler.ReconstructionFibre state
+  tower.clockRuler.PreimageFibre state
 
 /-- [proved-derived; formal-checked] The clock population of every history inhabits the complete
 fibre behind its returned ruler state. -/
 def clockRulerReconstructionLift
     (tower : Tower History State BoundaryAddress ClockAddress RulerAddress Receiver Resource)
     (history : History) :
-    tower.ClockRulerReconstructionFibre (tower.rulerState history) :=
+    tower.ClockRulerPreimageFibre (tower.rulerState history) :=
   tower.clockRuler.reconstructionLift (tower.clockLength history)
 
 /-- [definition] The stationary history is the zero-length causal potential at its boundary. -/
@@ -457,16 +457,16 @@ theorem clockLength_eq_max
       Obstruction LogicalResourceState obstruction logicalResourceState) :
     receipt.clockLength = max (tower.clockLength left) (tower.clockLength right) := rfl
 
-/-- [proved-derived; formal-checked] The complete paired receiver reconstruction fibre is exactly
+/-- [proved-derived; formal-checked] The complete paired receiver preimage fibre is exactly
 the product of the component fibres; parallel projection does not merge their histories. -/
-def reconstructionFibreEquiv
+def preimageFibreEquiv
     (_receipt : ParallelInterchangeReceipt tower left right
       Obstruction LogicalResourceState obstruction logicalResourceState)
     (face : Receiver × Receiver) :
-    tower.history.cartesian.ReconstructionFibre face ≃
-      tower.history.toHolon.ReconstructionFibre face.1 ×
-        tower.history.toHolon.ReconstructionFibre face.2 :=
-  tower.history.toHolon.cartesianReconstructionFibreEquiv tower.history.toHolon face
+    tower.history.cartesian.PreimageFibre face ≃
+      tower.history.toHolon.PreimageFibre face.1 ×
+        tower.history.toHolon.PreimageFibre face.2 :=
+  tower.history.toHolon.cartesianPreimageFibreEquiv tower.history.toHolon face
 
 /-- [proved-derived; formal-checked] The supplied capacity partition carries the complete summed
 work through the admitted parallel span. -/
@@ -702,20 +702,20 @@ def transportSerialPotential (passage : ScaleRebase fine coarse) {source : FineS
     exact congrArg passage.stateTransport potential.2⟩
 
 /-- [definition] The complete fine-history population behind one coarse history. -/
-def ReconstructionFibre (passage : ScaleRebase fine coarse)
+def PreimageFibre (passage : ScaleRebase fine coarse)
     (coarseHistory : CoarseHistory) : Type _ :=
   TransportLift passage.historyTransport coarseHistory
 
-/-- [definition] Every transported fine history inhabits its exact coarse reconstruction fibre. -/
+/-- [definition] Every transported fine history inhabits its exact coarse preimage fibre. -/
 def reconstructionLift (passage : ScaleRebase fine coarse)
     (fineHistory : FineHistory) :
-    passage.ReconstructionFibre (passage.historyTransport fineHistory) :=
+    passage.PreimageFibre (passage.historyTransport fineHistory) :=
   ofSource passage.historyTransport fineHistory
 
 /-- [proved-derived; formal-checked] Reconstruction through two scales is the complete dependent
 sum of an intermediate lift and a fine lift.  Composition therefore retains every collapsed
 middle and fine history instead of choosing a decoder. -/
-def compReconstructionFibreEquiv
+def compPreimageFibreEquiv
     {MiddleHistory MiddleState MiddleBoundaryAddress MiddleClockAddress MiddleRulerAddress
       MiddleReceiver MiddleResource : Type*}
     {middle : Tower MiddleHistory MiddleState MiddleBoundaryAddress MiddleClockAddress
@@ -723,9 +723,9 @@ def compReconstructionFibreEquiv
     (fineToMiddle : ScaleRebase fine middle)
     (middleToCoarse : ScaleRebase middle coarse)
     (coarseHistory : CoarseHistory) :
-    (fineToMiddle.comp middleToCoarse).ReconstructionFibre coarseHistory ≃
-      Σ middleHistory : middleToCoarse.ReconstructionFibre coarseHistory,
-        fineToMiddle.ReconstructionFibre middleHistory.1 where
+    (fineToMiddle.comp middleToCoarse).PreimageFibre coarseHistory ≃
+      Σ middleHistory : middleToCoarse.PreimageFibre coarseHistory,
+        fineToMiddle.PreimageFibre middleHistory.1 where
   toFun fineHistory :=
     ⟨⟨fineToMiddle.historyTransport fineHistory.1, fineHistory.2⟩,
       ⟨fineHistory.1, rfl⟩⟩
@@ -751,11 +751,11 @@ def transportPotential (passage : ScaleRebase fine coarse) {source : FineState}
     rw [passage.source_natural, potential.2]⟩
 
 /-- [proved-derived; formal-checked] A transported receiver potential lands in the corresponding
-coarse receiver reconstruction fibre. -/
+coarse receiver preimage fibre. -/
 def transportReceiverPotential (passage : ScaleRebase fine coarse)
     {source : FineState} {face : FineReceiver}
-    (potential : fine.ReceiverReconstructionFibre source face) :
-    coarse.ReceiverReconstructionFibre
+    (potential : fine.ReceiverPreimageFibre source face) :
+    coarse.ReceiverPreimageFibre
       (passage.stateTransport source) (passage.receiverTransport face) :=
   ⟨⟨passage.historyTransport potential.1.1, by
       rw [passage.source_natural, potential.1.2]⟩,
@@ -1117,22 +1117,22 @@ section Audit
 #print axioms ClockRulerSpan.targetState_potential
 #print axioms ClockRulerSpan.targetState_add
 #print axioms ClockRulerSpan.targetState_injective
-#print axioms ClockRulerSpan.reconstructionFibre_subsingleton
+#print axioms ClockRulerSpan.preimageFibre_subsingleton
 #print axioms ClockRulerSpan.denominator_mul_rulerCells_add_phase
 #print axioms Tower.clockLength_serial
 #print axioms Tower.rulerState_serial
 #print axioms Tower.resourceWork_serial
-#print axioms Tower.serialReconstructionFibreEquiv
+#print axioms Tower.serialPreimageFibreEquiv
 #print axioms Tower.serialAssociator
 #print axioms Tower.serialAssociatorFibreEquiv
 #print axioms Tower.ParallelInterchangeReceipt.clockLength_eq_max
-#print axioms Tower.ParallelInterchangeReceipt.reconstructionFibreEquiv
+#print axioms Tower.ParallelInterchangeReceipt.preimageFibreEquiv
 #print axioms Tower.ParallelInterchangeReceipt.resourceWork_le_capacity_mul_clockLength
 #print axioms Tower.ParallelInterchangeReceipt.no_receipt_of_no_commuting_cell
 #print axioms ScaleRebase.identity
 #print axioms ScaleRebase.comp
 #print axioms ScaleRebase.transportInteraction
-#print axioms ScaleRebase.compReconstructionFibreEquiv
+#print axioms ScaleRebase.compPreimageFibreEquiv
 #print axioms ScaleRebase.transportPotential
 #print axioms ScaleRebase.transportReceiverPotential
 #print axioms FiniteControl.firstThenSecond_clockLength

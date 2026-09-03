@@ -6,7 +6,7 @@ import ElementaryHolonics.Foundation.TransportLift
 
 This file composes the existing static receiver-exact `Compression` owner with the transport-lift
 owner.  A quotient face is therefore never assigned an invented inverse: its inverse image is a
-typed reconstruction fibre, and a chosen section is additional structure.
+typed preimage fibre, and a chosen section is additional structure.
 
 The final section does not introduce a new softmax model.  It places the existing holonic binary
 exponential adaptation from `MeasuredDifferenceReceiver` into the receiver-quotient owner.  The
@@ -28,17 +28,17 @@ abbrev ReceiverQuotient (Receiver : Type u) (Source : Type v)
   Compression Receiver Source Quotient Face
 
 /-- [definition] The complete predecessor population behind one quotient face. -/
-def reconstructionFibre {Receiver : Type u} {Source : Type v}
+def preimageFibre {Receiver : Type u} {Source : Type v}
     {Quotient : Type w} {Face : Type x}
     (C : ReceiverQuotient Receiver Source Quotient Face) (quotient : Quotient) : Type v :=
   TransportLift C.quotient quotient
 
-/-- Equal quotient faces exhibit both sources inside one complete reconstruction fibre. -/
+/-- Equal quotient faces exhibit both sources inside one complete preimage fibre. -/
 def quotient_eq_places_both_in_one_fibre
     {Receiver : Type u} {Source : Type v} {Quotient : Type w} {Face : Type x}
     (C : ReceiverQuotient Receiver Source Quotient Face) {left right : Source}
     (same : C.quotient left = C.quotient right) :
-    reconstructionFibre C (C.quotient left) × reconstructionFibre C (C.quotient left) :=
+    preimageFibre C (C.quotient left) × preimageFibre C (C.quotient left) :=
   (⟨left, rfl⟩, ⟨right, same.symm⟩)
 
 /-- [definition] A section is extra structure selecting one source in every quotient fibre. -/
@@ -54,7 +54,7 @@ def QuotientSection.lift
     {Receiver : Type u} {Source : Type v} {Quotient : Type w} {Face : Type x}
     {C : ReceiverQuotient Receiver Source Quotient Face}
     (chosen : QuotientSection C) (quotient : Quotient) :
-    reconstructionFibre C quotient :=
+    preimageFibre C quotient :=
   ⟨chosen.choice quotient, chosen.rightInverse quotient⟩
 
 /-! ## The established binary exponential chart as a receiver quotient -/
@@ -86,10 +86,10 @@ theorem binaryExponentialReceiver_common_shift
   exact binaryExponentialQuotient.receiver_eq_of_quotient_eq
     (binaryExponentialQuotient_common_shift first second common) ()
 
-/-- Both shifted potential pairs are returned in one explicit reconstruction fibre. -/
+/-- Both shifted potential pairs are returned in one explicit preimage fibre. -/
 def binaryCommonShiftFibre (first second common : ℝ) :
-    reconstructionFibre binaryExponentialQuotient (second - first) ×
-      reconstructionFibre binaryExponentialQuotient (second - first) :=
+    preimageFibre binaryExponentialQuotient (second - first) ×
+      preimageFibre binaryExponentialQuotient (second - first) :=
   (⟨(first, second), rfl⟩,
    ⟨(first + common, second + common), by
       dsimp [binaryExponentialQuotient]

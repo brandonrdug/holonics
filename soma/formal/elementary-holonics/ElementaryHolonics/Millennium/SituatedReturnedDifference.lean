@@ -9,7 +9,7 @@ A returned difference belongs to its target fibre.  Rebasing it therefore requir
 and a commuting connection square; it is not a subtraction of ambient, context-free scalars.
 
 For a two-step addressed word, the linearized return travels in reverse order.  The occurrence
-word is retained as an actual pullback join, while the radical and every reconstruction fibre are
+word is retained as an actual pullback join, while the radical and every preimage fibre are
 carried by the same continuous-linear-map equality.  No inverse or injectivity hypothesis is used.
 -/
 
@@ -124,14 +124,14 @@ def addressedTwoStepReverseRadical (word : AddressedTwoStepWord first second) :
     Submodule ℝ Target :=
   (addressedTwoStepReverseAdjoint first second word).ker
 
-/-- The complete affine reconstruction fibre over a returned source-fibre value. -/
-def addressedTwoStepAdjointReconstructionFibre
+/-- The complete affine preimage fibre over a returned source-fibre value. -/
+def addressedTwoStepAdjointPreimageFibre
     (word : AddressedTwoStepWord first second) (returned : Source) : Type uTarget :=
   { target : Target //
     (addressedTwoStepDifferential first second word).adjoint target = returned }
 
-/-- The same reconstruction fibre read through the explicit reverse-order adjoint word. -/
-def addressedTwoStepReverseReconstructionFibre
+/-- The same preimage fibre read through the explicit reverse-order adjoint word. -/
+def addressedTwoStepReversePreimageFibre
     (word : AddressedTwoStepWord first second) (returned : Source) : Type uTarget :=
   { target : Target //
     addressedTwoStepReverseAdjoint first second word target = returned }
@@ -144,13 +144,13 @@ theorem addressedTwoStep_adjointRadical_reverseOrder
   unfold addressedTwoStepAdjointRadical addressedTwoStepReverseRadical
   rw [addressedTwoStep_adjoint_reverseOrder]
 
-/-- Reverse-order adjoint composition retains every complete reconstruction fibre. -/
-theorem addressedTwoStep_adjointReconstructionFibre_reverseOrder
+/-- Reverse-order adjoint composition retains every complete preimage fibre. -/
+theorem addressedTwoStep_adjointPreimageFibre_reverseOrder
     (word : AddressedTwoStepWord first second) (returned : Source) :
-    addressedTwoStepAdjointReconstructionFibre first second word returned =
-      addressedTwoStepReverseReconstructionFibre first second word returned := by
-  unfold addressedTwoStepAdjointReconstructionFibre
-    addressedTwoStepReverseReconstructionFibre
+    addressedTwoStepAdjointPreimageFibre first second word returned =
+      addressedTwoStepReversePreimageFibre first second word returned := by
+  unfold addressedTwoStepAdjointPreimageFibre
+    addressedTwoStepReversePreimageFibre
   rw [addressedTwoStep_adjoint_reverseOrder]
 
 end AddressedAdjoint
@@ -158,6 +158,6 @@ end AddressedAdjoint
 #print axioms dependentReturnedDifference_rebase
 #print axioms addressedTwoStep_adjoint_reverseOrder
 #print axioms addressedTwoStep_adjointRadical_reverseOrder
-#print axioms addressedTwoStep_adjointReconstructionFibre_reverseOrder
+#print axioms addressedTwoStep_adjointPreimageFibre_reverseOrder
 
 end Soma.Holonics.Millennium.SituatedReturnedDifference

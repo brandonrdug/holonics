@@ -71,13 +71,13 @@ independently of the one-step passage clock. -/
 
 /-- [proved-derived; formal-checked] The measured tower retains exactly the complete population of
 algebraic-cycle lifts behind one rational Hodge receiver face. -/
-def cycleClassTowerReconstructionFibreEquiv (D : Datum)
+def cycleClassTowerPreimageFibreEquiv (D : Datum)
     (hodgeClass : D.rationalHodgeClasses) :
-    (cycleClassTower D).history.toHolon.ReconstructionFibre (some hodgeClass) ≃
+    (cycleClassTower D).history.toHolon.PreimageFibre (some hodgeClass) ≃
       CycleLiftFibre D hodgeClass :=
-  (enactedReconstructionFibreEquiv (cycleClassHolon D)
+  (enactedPreimageFibreEquiv (cycleClassHolon D)
     (cycleClassBoundaryLength D) hodgeClass).trans
-      (cycleClassHolonReconstructionFibreEquiv D hodgeClass)
+      (cycleClassHolonPreimageFibreEquiv D hodgeClass)
 
 /-! ## The primitive detector swing -/
 
@@ -99,13 +99,13 @@ def primitiveDetectionTower {lower upper : Datum}
 
 /-- [proved-derived; formal-checked] Every measured primitive receiver fibre is exactly its
 original source-bearing detector fibre. -/
-def primitiveDetectionTowerReconstructionFibreEquiv {lower upper : Datum}
+def primitiveDetectionTowerPreimageFibreEquiv {lower upper : Datum}
     {step : PrimitiveHodgeStep lower upper}
     (polarization : SignedDefinitePrimitivePolarization step)
     (primitive : step.Primitive) :
-    (primitiveDetectionTower polarization).history.toHolon.ReconstructionFibre (some primitive) ≃
-      (primitiveDetectionHolon polarization).ReconstructionFibre primitive :=
-  enactedReconstructionFibreEquiv (primitiveDetectionHolon polarization)
+    (primitiveDetectionTower polarization).history.toHolon.PreimageFibre (some primitive) ≃
+      (primitiveDetectionHolon polarization).PreimageFibre primitive :=
+  enactedPreimageFibreEquiv (primitiveDetectionHolon polarization)
     (primitiveDetectionBoundaryLength polarization) primitive
 
 /-- [proved-derived; formal-checked] The conjectural detector law is unchanged by measuring its
@@ -116,16 +116,16 @@ theorem detectsEveryNonzero_iff_towerFibreOccupied {lower upper : Datum}
     DetectsEveryNonzero polarization ↔
       ∀ primitive : step.Primitive, primitive ≠ 0 →
         Nonempty
-          ((primitiveDetectionTower polarization).history.toHolon.ReconstructionFibre
+          ((primitiveDetectionTower polarization).history.toHolon.PreimageFibre
             (some primitive)) := by
   constructor
   · intro detects primitive hprimitive
     exact Nonempty.map
-      (primitiveDetectionTowerReconstructionFibreEquiv polarization primitive).symm
+      (primitiveDetectionTowerPreimageFibreEquiv polarization primitive).symm
       (detects primitive hprimitive)
   · intro occupied primitive hprimitive
     exact Nonempty.map
-      (primitiveDetectionTowerReconstructionFibreEquiv polarization primitive)
+      (primitiveDetectionTowerPreimageFibreEquiv polarization primitive)
       (occupied primitive hprimitive)
 
 /-- [proved-derived; formal-checked] Under signed Hodge--Riemann definiteness, complete occupation
@@ -135,7 +135,7 @@ theorem towerFibreOccupation_iff_primitiveLiftable {lower upper : Datum}
     (polarization : SignedDefinitePrimitivePolarization step) :
     (∀ primitive : step.Primitive, primitive ≠ 0 →
       Nonempty
-        ((primitiveDetectionTower polarization).history.toHolon.ReconstructionFibre
+        ((primitiveDetectionTower polarization).history.toHolon.PreimageFibre
           (some primitive))) ↔ step.PrimitiveLiftable :=
   (detectsEveryNonzero_iff_towerFibreOccupied polarization).symm.trans
     polarization.detectsEveryNonzero_iff_primitiveLiftable
@@ -149,7 +149,7 @@ missing Hodge class.  Signed polarization and a finite one-tick scale do not cre
 cycle source. -/
 theorem missingCycleClassTowerFibre_empty :
     ¬ Nonempty
-      ((cycleClassTower upperDatum).history.toHolon.ReconstructionFibre
+      ((cycleClassTower upperDatum).history.toHolon.PreimageFibre
         (some missingHodgeClass)) := by
   exact enactedFibre_empty_of_sourceFibre_empty
     (cycleClassHolon upperDatum) (cycleClassBoundaryLength upperDatum) missingHodgeClass
@@ -161,8 +161,8 @@ section Audit
 #print axioms cycleClassHistory_target
 #print axioms cycleClassHistory_clockLength
 #print axioms cycleClassBoundaryLength_exact
-#print axioms cycleClassTowerReconstructionFibreEquiv
-#print axioms primitiveDetectionTowerReconstructionFibreEquiv
+#print axioms cycleClassTowerPreimageFibreEquiv
+#print axioms primitiveDetectionTowerPreimageFibreEquiv
 #print axioms detectsEveryNonzero_iff_towerFibreOccupied
 #print axioms towerFibreOccupation_iff_primitiveLiftable
 #print axioms missingCycleClassTowerFibre_empty

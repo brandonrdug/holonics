@@ -26,7 +26,7 @@ or conservation beyond the declared constitutive law.
 
 namespace Soma.Holonics
 
-universe u v w x
+universe u v w x u' v' w' x'
 
 /-- An addressed occurrence population together with the current returned by its receiver. -/
 structure Holon (Source : Type u) (Target : Type v) (Face : Type w) where
@@ -51,8 +51,51 @@ def toPassage (holon : Holon Source Target LeftFace) : AddressedPassage Source T
   target := holon.target
 
 /-- Every occurrence retained behind one returned receiver face. -/
-def ReconstructionFibre (holon : Holon Source Target LeftFace) (face : LeftFace) : Type _ :=
+def PreimageFibre (holon : Holon Source Target LeftFace) (face : LeftFace) : Type _ :=
   { occurrence : holon.Occurrence // holon.receive occurrence = face }
+
+/--
+An equivalence of complete holon diagrams.  Reindexing the receiver face alone is insufficient:
+the occurrence population and both addressed ports must travel through commuting squares.
+-/
+structure Rebase
+    {Source : Type u} {Target : Type v} {Face : Type w}
+    {Source' : Type u'} {Target' : Type v'} {Face' : Type w'}
+    (left : Holon.{u, v, w, x} Source Target Face)
+    (right : Holon.{u', v', w', x'} Source' Target' Face') where
+  occurrenceEquiv : left.Occurrence ≃ right.Occurrence
+  sourceEquiv : Source ≃ Source'
+  targetEquiv : Target ≃ Target'
+  faceEquiv : Face ≃ Face'
+  source_natural : ∀ occurrence,
+    sourceEquiv (left.source occurrence) = right.source (occurrenceEquiv occurrence)
+  target_natural : ∀ occurrence,
+    targetEquiv (left.target occurrence) = right.target (occurrenceEquiv occurrence)
+  receive_natural : ∀ occurrence,
+    faceEquiv (left.receive occurrence) = right.receive (occurrenceEquiv occurrence)
+
+/-- A natural rebase transports the complete preimage fibre, not only its displayed face. -/
+def Rebase.preimageFibreEquiv
+    {Source : Type u} {Target : Type v} {Face : Type w}
+    {Source' : Type u'} {Target' : Type v'} {Face' : Type w'}
+    {left : Holon.{u, v, w, x} Source Target Face}
+    {right : Holon.{u', v', w', x'} Source' Target' Face'}
+    (rebase : Rebase left right) (face : Face) :
+    left.PreimageFibre face ≃ right.PreimageFibre (rebase.faceEquiv face) where
+  toFun occurrence :=
+    ⟨rebase.occurrenceEquiv occurrence.1, by
+      rw [← rebase.receive_natural occurrence.1, occurrence.2]⟩
+  invFun occurrence :=
+    ⟨rebase.occurrenceEquiv.symm occurrence.1, by
+      apply rebase.faceEquiv.injective
+      rw [rebase.receive_natural]
+      simpa using occurrence.2⟩
+  left_inv occurrence := by
+    apply Subtype.ext
+    exact rebase.occurrenceEquiv.symm_apply_apply occurrence.1
+  right_inv occurrence := by
+    apply Subtype.ext
+    exact rebase.occurrenceEquiv.apply_symm_apply occurrence.1
 
 /-- Contact between serial holons is the exact pullback witness, not co-presence. -/
 abbrev Interaction (left : Holon Source Middle LeftFace)
@@ -83,14 +126,14 @@ def cartesian
   target pair := (left.target pair.1, right.target pair.2)
   receive pair := (left.receive pair.1, right.receive pair.2)
 
-/-- The reconstruction fibre of a Cartesian interaction retains both component fibres exactly. -/
-def cartesianReconstructionFibreEquiv
+/-- The preimage fibre of a Cartesian interaction retains both component fibres exactly. -/
+def cartesianPreimageFibreEquiv
     {Source' Target' Face' : Type*}
     (left : Holon Source Target LeftFace)
     (right : Holon Source' Target' Face')
     (face : LeftFace × Face') :
-    (cartesian left right).ReconstructionFibre face ≃
-      left.ReconstructionFibre face.1 × right.ReconstructionFibre face.2 where
+    (cartesian left right).PreimageFibre face ≃
+      left.PreimageFibre face.1 × right.PreimageFibre face.2 where
   toFun occurrence :=
     (⟨occurrence.1.1, congrArg Prod.fst occurrence.2⟩,
       ⟨occurrence.1.2, congrArg Prod.snd occurrence.2⟩)
@@ -131,25 +174,25 @@ def offDiagonal (holon : Holon Source Target LeftFace) :
   receive occurrence :=
     (holon.receive occurrence.1.1, holon.receive occurrence.1.2)
 
-/-- The fully reconstructed fibre of a paired composite receiver. -/
-def CompositeReconstructionFibre
+/-- The complete preimage fibre of a paired composite receiver. -/
+def CompositePreimageFibre
     (right : Holon Middle Target RightFace)
     (left : Holon Source Middle LeftFace)
     (face : LeftFace × RightFace) : Type _ :=
-  Σ leftOccurrence : left.ReconstructionFibre face.1,
-    { rightOccurrence : right.ReconstructionFibre face.2 //
+  Σ leftOccurrence : left.PreimageFibre face.1,
+    { rightOccurrence : right.PreimageFibre face.2 //
       left.target leftOccurrence.1 = right.source rightOccurrence.1 }
 
 /--
 The paired receiver of a serial composite retains exactly both component fibres and the boundary
 equality by which they interact.
 -/
-def compReconstructionFibreEquiv
+def compPreimageFibreEquiv
     (right : Holon Middle Target RightFace)
     (left : Holon Source Middle LeftFace)
     (face : LeftFace × RightFace) :
-    (comp right left).ReconstructionFibre face ≃
-      CompositeReconstructionFibre right left face where
+    (comp right left).PreimageFibre face ≃
+      CompositePreimageFibre right left face where
   toFun carried :=
     ⟨⟨carried.1.left, congrArg Prod.fst carried.2⟩,
       ⟨⟨carried.1.right, congrArg Prod.snd carried.2⟩, carried.1.joins⟩⟩
@@ -279,8 +322,9 @@ end Soma.Holonics
 
 section Audit
 open Soma.Holonics
-#print axioms Holon.compReconstructionFibreEquiv
-#print axioms Holon.cartesianReconstructionFibreEquiv
+#print axioms Holon.compPreimageFibreEquiv
+#print axioms Holon.cartesianPreimageFibreEquiv
+#print axioms Holon.Rebase.preimageFibreEquiv
 #print axioms Holon.interaction_middle_boundary
 #print axioms BoundaryHolon.comp
 #print axioms BoundaryHolon.map

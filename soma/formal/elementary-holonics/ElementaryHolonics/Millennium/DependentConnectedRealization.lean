@@ -105,7 +105,7 @@ theorem quotientNe_returnsSeparatingReceiverHistory {left right : State}
   exact noSeparator ⟨receiver, word, separated⟩
 
 /-- The complete source population behind one quotient state. -/
-def reconstructionFibre (quotient : Quotient) : Type uS :=
+def preimageFibre (quotient : Quotient) : Type uS :=
   { state : State // C.quotient state = quotient }
 
 end CompleteDependentReceiverHistoryQuotient

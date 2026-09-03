@@ -87,7 +87,7 @@ def sectionHolon : Holon SectionCombination SectionCombination SectionCombinatio
 /-- [proved-derived; formal-checked] Every section direction has an occupied exact reconstruction
 fibre, with no choice of inverse and no source deletion. -/
 theorem sectionHolon_fibre_occupied (combination : SectionCombination) :
-    Nonempty (sectionHolon.ReconstructionFibre combination) :=
+    Nonempty (sectionHolon.PreimageFibre combination) :=
   ⟨⟨combination, rfl⟩⟩
 
 /-- [definition] One source section combination detecting one receiver direction through the
@@ -109,7 +109,7 @@ def sectionDetectionHolon :
 actual section source occurrence: take its self-interaction and use anisotropy. -/
 theorem every_nonzero_section_direction_detected
     (combination : SectionCombination) (hcombination : combination ≠ 0) :
-    Nonempty (sectionDetectionHolon.ReconstructionFibre combination) :=
+    Nonempty (sectionDetectionHolon.PreimageFibre combination) :=
   ⟨⟨⟨combination, combination,
     heightPairing_self_ne_zero combination hcombination⟩, rfl⟩⟩
 

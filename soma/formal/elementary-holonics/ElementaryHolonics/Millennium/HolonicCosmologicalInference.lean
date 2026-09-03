@@ -9,7 +9,7 @@ Within a constant-`Λ` expansion chart it is the nonlinear receiver
 `Λ = 3 * Ω_Λ * H₀² / c²`.
 
 This file retains the two expansion-rate occurrences in the dimension ledger, constructs the
-nonlinear reconstruction fibre of this receiver, and proves that the receiver is not injective.
+nonlinear preimage fibre of this receiver, and proves that the receiver is not injective.
 It also gives an exact finite pushforward for rationally weighted parameter populations: total
 weight is conserved before a later summary collapses the returned `Λ` population to a centre and
 band.
@@ -95,7 +95,7 @@ The nonzero light-speed coordinate is supplied by the surrounding calibrated cha
 def lambdaReceiver (lightSpeed : ℚ) (parameters : ExpansionParameters) : ℚ :=
   3 * parameters.2 * parameters.1 ^ 2 / lightSpeed ^ 2
 
-abbrev LambdaReconstructionFibre (lightSpeed reading : ℚ) :=
+abbrev LambdaPreimageFibre (lightSpeed reading : ℚ) :=
   {parameters : ExpansionParameters // lambdaReceiver lightSpeed parameters = reading}
 
 def omegaLambdaFromLambda (lightSpeed hubble lambda : ℚ) : ℚ :=
@@ -111,7 +111,7 @@ theorem omegaLambdaFromLambda_lambdaReceiver
   field_simp [hLight]
 
 /-- Scaling the rate by `scale` and the density fraction by `scale⁻²` stays in one exact
-`Λ` reconstruction fibre. -/
+`Λ` preimage fibre. -/
 theorem lambdaReceiver_scale_fibre
     (lightSpeed hubble omegaLambda scale : ℚ) (hScale : scale ≠ 0) :
     lambdaReceiver lightSpeed (scale * hubble, omegaLambda / scale ^ 2) =

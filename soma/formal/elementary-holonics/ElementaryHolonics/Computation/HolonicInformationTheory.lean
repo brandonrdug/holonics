@@ -77,15 +77,15 @@ receiver fibre while retaining every native occurrence in that fibre. -/
 structure ProbabilityReceiver (Native : Type uN) where
   observe : Native → PositiveProbabilitySection Index
 
-def ProbabilityReceiver.reconstructionFibre {Native : Type uN}
+def ProbabilityReceiver.preimageFibre {Native : Type uN}
     (receiver : ProbabilityReceiver (Index := Index) Native) (face : Index → ℝ) : Set Native :=
   {native | (receiver.observe native).mass = face}
 
 theorem ProbabilityReceiver.sameFibre_of_equalSection {Native : Type uN}
     (receiver : ProbabilityReceiver (Index := Index) Native) {left right : Native}
     (equalSection : (receiver.observe left).mass = (receiver.observe right).mass) :
-    left ∈ receiver.reconstructionFibre (receiver.observe left).mass ∧
-      right ∈ receiver.reconstructionFibre (receiver.observe left).mass := by
+    left ∈ receiver.preimageFibre (receiver.observe left).mass ∧
+      right ∈ receiver.preimageFibre (receiver.observe left).mass := by
   exact ⟨rfl, equalSection.symm⟩
 
 end PositiveProbabilitySection

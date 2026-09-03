@@ -139,7 +139,7 @@ theorem differential_scale {steps : ℕ}
 
 end ExactPath
 
-/-! ## 3. A lower-dimensional face retains its complete reconstruction fibre -/
+/-! ## 3. A lower-dimensional face retains its complete preimage fibre -/
 
 section ReceiverFibre
 
@@ -153,7 +153,7 @@ structure HigherDimensionalReceiver where
   shadow : Ambient →ₗ[R] Face
 
 /-- All occurrences which the declared face alone cannot distinguish. -/
-def HigherDimensionalReceiver.ReconstructionFibre
+def HigherDimensionalReceiver.PreimageFibre
     (receiver : HigherDimensionalReceiver (R := R) (Ambient := Ambient) (Face := Face))
     (face : Face) :=
   {occurrence : Ambient // receiver.shadow occurrence = face}

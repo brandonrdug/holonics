@@ -126,7 +126,7 @@ def logarithmicWindingHolon : Soma.Holonics.Holon ℤ ℤ ℂ where
 
 /-- Every integer logarithmic branch is retained behind the single returned face `i`. -/
 def logarithmicWindingReconstruction :
-    logarithmicWindingHolon.ReconstructionFibre Complex.I ≃ ℤ where
+    logarithmicWindingHolon.PreimageFibre Complex.I ≃ ℤ where
   toFun occurrence := occurrence.1
   invFun n := ⟨n, exp_windingLogI n⟩
   left_inv occurrence := by

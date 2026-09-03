@@ -10,7 +10,7 @@ import Mathlib.Tactic
 
 This owner is the neutral MVF0 foundation.  It does not make a foreign tensor architecture, file
 format, version label, or inference configuration into native topology.  A productive local lift
-owes incidence, generator, receiver, and reconstruction-fibre exactness.  Cultivation is supported
+owes incidence, generator, receiver, and preimage-fibre exactness.  Cultivation is supported
 on a returned causal cone.  Variant manifests are derived testimony.  Export is exact only for the
 receiver/history family whose conduct round-trips.
 -/
@@ -47,12 +47,12 @@ variable {Source Code Native Generator Receiver Face : Type*} [AddCommGroup Nati
     (lift : FaithfulLocalSectionLift Source Code Native Generator Receiver Face)
 
 /-- The complete source population collapsed to one native presentation. -/
-def reconstructionFibre (native : Native) : Type _ :=
-  lift.history.reconstructionFibre native
+def preimageFibre (native : Native) : Type _ :=
+  lift.history.preimageFibre native
 
 /-- Every source occurrence remains in the fibre of its own presented native state. -/
-theorem source_mem_reconstructionFibre (source : Source) :
-    ∃ retained : lift.reconstructionFibre (lift.history.present.quotient source),
+theorem source_mem_preimageFibre (source : Source) :
+    ∃ retained : lift.preimageFibre (lift.history.present.quotient source),
       retained.1 = source :=
   ⟨⟨source, rfl⟩, rfl⟩
 
@@ -212,38 +212,38 @@ end MorphologyVariantManifest
 
 /-- Exterior package lanes over one hot morphology.  They do not become the runtime topology. -/
 structure VariantPackageSeparation
-    (Manifest Hot Reconstruction Evaluation Apparatus Export : Type*) where
+    (Manifest Hot Testimony Evaluation Apparatus Export : Type*) where
   manifest : Manifest
   hot : Hot
-  reconstruction : Reconstruction
+  testimony : Testimony
   evaluation : Evaluation
   apparatus : Apparatus
   exports : List Export
 
 namespace VariantPackageSeparation
 
-variable {Manifest Hot Reconstruction Evaluation Apparatus Export : Type*}
+variable {Manifest Hot Testimony Evaluation Apparatus Export : Type*}
 
 def replaceApparatus
-    (package : VariantPackageSeparation Manifest Hot Reconstruction Evaluation Apparatus Export)
+    (package : VariantPackageSeparation Manifest Hot Testimony Evaluation Apparatus Export)
     (apparatus : Apparatus) (exports : List Export) :
-    VariantPackageSeparation Manifest Hot Reconstruction Evaluation Apparatus Export where
+    VariantPackageSeparation Manifest Hot Testimony Evaluation Apparatus Export where
   manifest := package.manifest
   hot := package.hot
-  reconstruction := package.reconstruction
+  testimony := package.testimony
   evaluation := package.evaluation
   apparatus := apparatus
   exports := exports
 
 @[simp] theorem replaceApparatus_hot
-    (package : VariantPackageSeparation Manifest Hot Reconstruction Evaluation Apparatus Export)
+    (package : VariantPackageSeparation Manifest Hot Testimony Evaluation Apparatus Export)
     (apparatus : Apparatus) (exports : List Export) :
     (package.replaceApparatus apparatus exports).hot = package.hot := rfl
 
-@[simp] theorem replaceApparatus_reconstruction
-    (package : VariantPackageSeparation Manifest Hot Reconstruction Evaluation Apparatus Export)
+@[simp] theorem replaceApparatus_testimony
+    (package : VariantPackageSeparation Manifest Hot Testimony Evaluation Apparatus Export)
     (apparatus : Apparatus) (exports : List Export) :
-    (package.replaceApparatus apparatus exports).reconstruction = package.reconstruction := rfl
+    (package.replaceApparatus apparatus exports).testimony = package.testimony := rfl
 
 end VariantPackageSeparation
 

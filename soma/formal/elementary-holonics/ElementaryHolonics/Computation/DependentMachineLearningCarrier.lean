@@ -76,8 +76,8 @@ theorem separatedReconfiguration_obstructsEveryFixedDescent
   apply differentFuture
   rw [descends, descends, samePresent]
 
-/-- The complete dependent reconstruction fibre behind one fixed classical face. -/
-def reconstructionFibre
+/-- The complete dependent preimage fibre behind one fixed classical face. -/
+def preimageFibre
     {Classical : Type uR} (quotient : TotalState Carrier → Classical) (face : Classical) :
     Type (max uS uC) :=
   { state : TotalState Carrier // quotient state = face }

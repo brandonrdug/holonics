@@ -10,7 +10,7 @@ occurrences leave through `Sum.inr`, and neither port is identified with the oth
 
 [definition] `StagedHistory` adds only the stationary histories required by the tower.  Their
 receiver is `none`; an enacted source holon occurrence returns `some face` and has one clock tick.
-Consequently the `some face` reconstruction fibre is exactly the original holon fibre.  The clock
+Consequently the `some face` preimage fibre is exactly the original holon fibre.  The clock
 does not manufacture a source occurrence, collapse a receiver fibre, or reinterpret a boundary
 degree as elapsed time.
 
@@ -144,12 +144,12 @@ def oneStepTower (holon : Holon Source Target Face)
   stay_clockLength := fun _ => rfl
   stay_resourceWork := fun _ _ => rfl
 
-/-- [proved-derived; formal-checked] The enacted receiver reconstruction fibre is exactly the
+/-- [proved-derived; formal-checked] The enacted receiver preimage fibre is exactly the
 original source-holon fibre.  The added stationary histories cannot inhabit a `some` face. -/
-def enactedReconstructionFibreEquiv (holon : Holon Source Target Face)
+def enactedPreimageFibreEquiv (holon : Holon Source Target Face)
     (boundaryLength : Source ⊕ Target → ℕ) (face : Face) :
-    (oneStepTower holon boundaryLength).history.toHolon.ReconstructionFibre (some face) ≃
-      holon.ReconstructionFibre face where
+    (oneStepTower holon boundaryLength).history.toHolon.PreimageFibre (some face) ≃
+      holon.PreimageFibre face where
   toFun carried := by
     rcases carried with ⟨history, receiverExact⟩
     change StagedHistory.receive holon history = some face at receiverExact
@@ -172,9 +172,9 @@ def enactedReconstructionFibreEquiv (holon : Holon Source Target Face)
 
 /-- [proved-derived; formal-checked] The `none` fibre contains exactly the stationary stage
 population.  It is disjoint from every enacted receiver fibre. -/
-def stationaryReconstructionFibreEquiv (holon : Holon Source Target Face)
+def stationaryPreimageFibreEquiv (holon : Holon Source Target Face)
     (boundaryLength : Source ⊕ Target → ℕ) :
-    (oneStepTower holon boundaryLength).history.toHolon.ReconstructionFibre none ≃
+    (oneStepTower holon boundaryLength).history.toHolon.PreimageFibre none ≃
       Source ⊕ Target where
   toFun carried := by
     rcases carried with ⟨history, receiverExact⟩
@@ -204,16 +204,16 @@ theorem enacted_clockLength (holon : Holon Source Target Face)
 attached.  Causal length can measure an occurrence; it cannot create one. -/
 theorem enactedFibre_empty_of_sourceFibre_empty (holon : Holon Source Target Face)
     (boundaryLength : Source ⊕ Target → ℕ) (face : Face)
-    (sourceEmpty : ¬ Nonempty (holon.ReconstructionFibre face)) :
+    (sourceEmpty : ¬ Nonempty (holon.PreimageFibre face)) :
     ¬ Nonempty
-      ((oneStepTower holon boundaryLength).history.toHolon.ReconstructionFibre (some face)) := by
+      ((oneStepTower holon boundaryLength).history.toHolon.PreimageFibre (some face)) := by
   rintro ⟨carried⟩
-  exact sourceEmpty ⟨enactedReconstructionFibreEquiv holon boundaryLength face carried⟩
+  exact sourceEmpty ⟨enactedPreimageFibreEquiv holon boundaryLength face carried⟩
 
 section Audit
 
-#print axioms enactedReconstructionFibreEquiv
-#print axioms stationaryReconstructionFibreEquiv
+#print axioms enactedPreimageFibreEquiv
+#print axioms stationaryPreimageFibreEquiv
 #print axioms enacted_clockLength
 #print axioms enactedFibre_empty_of_sourceFibre_empty
 

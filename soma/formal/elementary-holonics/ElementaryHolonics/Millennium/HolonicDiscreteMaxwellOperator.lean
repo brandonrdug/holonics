@@ -13,7 +13,7 @@ boundary of every face.  `cellularCoCurl` is constructed from the transpose of t
 incidence coefficients.  Their finite coordinate pairings are exactly adjoint, so both resulting
 curl--curl actions are sums of squares.
 
-The construction also returns the complete reconstruction fibres.  In particular every exact
+The construction also returns the complete preimage fibres.  In particular every exact
 nodal drop lies in the curl kernel, so a face-circulation reading cannot silently reconstruct a
 unique edge antecedent.  A concrete cellular Maxwell history then inherits the exact wave law and
 the coefficient `c² = (permeability * permittivity)⁻¹` from the common propagation owner.
@@ -914,7 +914,7 @@ theorem edgeCurlCurl_pairing_nonneg (electric : EdgeSection grain) :
   rw [edgeCurlCurl_pairing_self]
   exact Finset.sum_nonneg fun _ _ ↦ sq_nonneg _
 
-/-! ## Reconstruction fibres -/
+/-! ## Preimage fibres -/
 
 def cellularCurlAddHom (grain : ℕ) : EdgeSection grain →+ FaceSection grain :=
   { toFun := cellularCurl grain
@@ -927,10 +927,10 @@ def cellularCoCurlAddHom (grain : ℕ) : FaceSection grain →+ EdgeSection grai
     map_add' := (cellularCoCurl grain).map_add }
 
 abbrev CurlFibre (grain : ℕ) (reading : FaceSection grain) :=
-  Lift.ReconstructionFibre (cellularCurlAddHom grain) reading
+  Lift.PreimageFibre (cellularCurlAddHom grain) reading
 
 abbrev CoCurlFibre (grain : ℕ) (reading : EdgeSection grain) :=
-  Lift.ReconstructionFibre (cellularCoCurlAddHom grain) reading
+  Lift.PreimageFibre (cellularCoCurlAddHom grain) reading
 
 /-- Every exact nodal drop is an explicit direction in the curl receiver's radical. -/
 theorem exactDrop_mem_cellularCurl_kernel (state : NodeSection grain) :

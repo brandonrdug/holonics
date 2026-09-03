@@ -154,14 +154,14 @@ theorem towerBoundaryLength_eq_encodedLength (anchor : TowerTM2Anchor tower fami
   rw [anchor.boundary_exact, family.boundaryExtent_encode]
 
 /-- [definition] Every exterior output whose declared receiver face equals one returned face. -/
-def OutputReconstructionFibre (anchor : TowerTM2Anchor tower family)
+def OutputPreimageFibre (anchor : TowerTM2Anchor tower family)
     (face : Receiver) : Type :=
   Soma.Holonics.Foundation.Lift.TransportLift anchor.outputFace face
 
 /-- [proved-derived; formal-checked] The computed function output inhabits the complete exterior
 output fibre behind the tower's returned receiver face. -/
 def outputReconstructionLift (anchor : TowerTM2Anchor tower family) (input : Input) :
-    anchor.OutputReconstructionFibre
+    anchor.OutputPreimageFibre
       (tower.history.receive (anchor.executionHistory input)) :=
   ⟨function input, (anchor.receiver_exact input).symm⟩
 

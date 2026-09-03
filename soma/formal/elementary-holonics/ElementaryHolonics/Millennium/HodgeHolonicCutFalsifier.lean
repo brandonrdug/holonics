@@ -7,7 +7,7 @@ The holonic primitive cut deliberately leaves one source law open.  This file pr
 cannot be obtained from signed definiteness, finite dimensionality, or complete reconstruction
 fibres alone.  A two-direction rational Hodge carrier is given a negative-definite intersection
 form, while its cycle-class holon reaches only the first direction.  The second direction is
-nonzero, has nonzero polarized self-interaction, and has an empty cycle-class reconstruction fibre.
+nonzero, has nonzero polarized self-interaction, and has an empty cycle-class preimage fibre.
 
 This is a firing counterexample to an implication between the admitted abstract laws.  It is not a
 counterexample to the classical Hodge conjecture: the datum is a receiver-level linear model, not
@@ -194,13 +194,13 @@ theorem missingCycleLiftFibre_empty :
   rw [Pi.smul_apply, hsource, smul_zero, hmissing] at hcoordinate
   exact zero_ne_one hcoordinate
 
-/-- [counterexample; formal-checked] The equivalent elementary-holon reconstruction fibre is
+/-- [counterexample; formal-checked] The equivalent elementary-holon preimage fibre is
 empty as well. -/
 theorem missingHolonFibre_empty :
-    ¬ Nonempty ((cycleClassHolon upperDatum).ReconstructionFibre missingHodgeClass) := by
+    ¬ Nonempty ((cycleClassHolon upperDatum).PreimageFibre missingHodgeClass) := by
   rintro ⟨carried⟩
   exact missingCycleLiftFibre_empty
-    ⟨(cycleClassHolonReconstructionFibreEquiv upperDatum missingHodgeClass)
+    ⟨(cycleClassHolonPreimageFibreEquiv upperDatum missingHodgeClass)
       carried⟩
 
 /-- [counterexample; formal-checked] Signed Hodge--Riemann definiteness, finite dimensionality,

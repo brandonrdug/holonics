@@ -2,7 +2,7 @@
 
 These sources inform the research but do not govern the internal ontology. Each bridge into
 holonics must state its typed translation and evidence grade. Initial atlas accessed 2026-08-03;
-current through the multisensory additions accessed 2026-08-23.
+current through the biological and continuous-transport additions accessed 2026-09-02.
 
 The complete authored bibliographies remain scoped in `papers/source/**/references.bib` (seven
 files, roughly 180 entries, 121 URL-field occurrences, and 120 normalized distinct URLs).
@@ -152,6 +152,44 @@ structure relevant to the stated receiver.
 The project's RH papers contain conditional reductions, counterexamples to overly strong routes,
 and explicit positivity/naturality obstructions. None of these external or internal references is
 listed as a completed RH proof.
+
+## Biological morphology, protein folding, and continuous transport
+
+- Ken A. Dill et al., “The Protein Folding Problem,” *Annu. Rev. Biophys.* 37 (2008) — folding code,
+  energy funnels, zipping and assembly, contact order, and lattice models:
+  <https://pmc.ncbi.nlm.nih.gov/articles/PMC2443096/>.
+- Tomáš Babej, Christopher Ing, and Mark Fingerhuth, “Coarse-grained lattice protein folding on a
+  quantum annealer,” arXiv:1811.00713 — Ising/QUBO lattice encodings, self-avoidance, and quasilinear
+  turn-reduction: <https://arxiv.org/abs/1811.00713>.
+- Apple Inc., “SimpleFold: Folding Proteins is Simpler than You Think,” arXiv:2509.18480 — generative
+  flow matching with standard transformers for protein ensembles without domain-specific pair/triangle
+  modules: <https://arxiv.org/abs/2509.18480>; code: <https://github.com/apple/ml-simplefold>.
+- AlphaFold Protein Structure Database — predicted structures and relative-frame Predicted Aligned
+  Error (PAE) matrices: <https://alphafold.ebi.ac.uk/>.
+- CATH Database — hierarchical Class, Architecture, Topology, and Homology domain classification:
+  <https://www.cathdb.info/download>.
+- Donald J. Jacobs et al., “Protein flexibility predictions using graph theory,” *Proteins* 44(2)
+  (2001) — body-bar-hinge frameworks and the Pebble Game algorithm for generic rigidity percolation:
+  <https://doi.org/10.1002/prot.1081>.
+- Walter Whiteley, “Counting out to the flexibility of molecules,” *Phys. Biol.* 2(4) (2005) —
+  rigidity theory, constraint independence, and infinitesimal motion spaces:
+  <https://doi.org/10.1088/1478-3967/2/4/S06>.
+- Joey Bose et al., “FoldFlow: Incompressible Flow Matching on SE(3) for Protein Backbone
+  Generation,” ICML 2024 / arXiv:2310.02391 — continuous Lie-group flow matching on SE(3):
+  <https://arxiv.org/abs/2310.02391>.
+- Jeremy L. England, “Statistical physics of self-replication,” *J. Chem. Phys.* 139 (2013) —
+  dissipative adaptation and non-equilibrium self-organization: <https://doi.org/10.1063/1.4818538>.
+- H. N. Motlagh et al., “The ensemble nature of allostery,” *Nature* 508 (2014) — thermodynamic
+  partition-function redistribution over pre-existing conformational ensembles:
+  <https://doi.org/10.1038/nature13001>.
+- Peter Røgen and Boris Fain, “Automatic classification of protein fold images by Gauss integrals,”
+  *PNAS* 100(1) (2003) — coordinate-free knot and writhe invariants:
+  <https://doi.org/10.1073/pnas.2627981100>.
+- William R. Taylor, “A deeply knotted protein structure and how it might fold,” *Nature* 406
+  (2000) — topological knotting and entropic barriers in protein folding:
+  <https://doi.org/10.1038/35022623>.
+- Detailed synthesis and repository owner crosswalk:
+  [`research/records/2026-09-02_PROTEIN_FOLDING_IS_A_STRATIFIED_CONSTRAINT_ECOLOGY_AND_GENERATIVE_FLOW_MATCHING_CROSSES_THE_HOLONIC_LATTICE.md`](../research/records/2026-09-02_PROTEIN_FOLDING_IS_A_STRATIFIED_CONSTRAINT_ECOLOGY_AND_GENERATIVE_FLOW_MATCHING_CROSSES_THE_HOLONIC_LATTICE.md).
 
 ## Third-party papers retained by link only
 

@@ -164,17 +164,17 @@ variable {body : SemanticEventBody Source Target Face Obstruction SemanticOccurr
 variable {MicroOccurrence Worker ClockDomain : Type*}
 variable [DecidableEq SemanticOccurrence] [Fintype MicroOccurrence] [DecidableEq MicroOccurrence]
 
-/-- [definition] Every semantic event's complete apparatus reconstruction fibre. -/
-def ReconstructionFibre
+/-- [definition] Every semantic event's complete apparatus preimage fibre. -/
+def PreimageFibre
     (realization : ApparatusRealization body MicroOccurrence Worker ClockDomain)
     (semantic : SemanticOccurrence) : Type _ :=
   { micro : MicroOccurrence // realization.projection micro = semantic }
 
 /-- [proved-derived; formal-checked] Every semantic event has a nonempty apparatus fibre. -/
-theorem reconstructionFibre_nonempty
+theorem preimageFibre_nonempty
     (realization : ApparatusRealization body MicroOccurrence Worker ClockDomain)
     (semantic : SemanticOccurrence) :
-    Nonempty (realization.ReconstructionFibre semantic) := by
+    Nonempty (realization.PreimageFibre semantic) := by
   obtain ⟨micro, exact⟩ := realization.covers semantic
   exact ⟨⟨micro, exact⟩⟩
 
@@ -286,7 +286,7 @@ section Audit
 
 #print axioms ApparatusPlacement.face_card_le_worker_card
 #print axioms ApparatusPlacement.ModularCounterSample.start_add_elapsedTicks
-#print axioms ApparatusRealization.reconstructionFibre_nonempty
+#print axioms ApparatusRealization.preimageFibre_nonempty
 #print axioms ApparatusRealization.receiver_preserved
 #print axioms apparatus_receiver_agreement
 #print axioms finiteTerminalFace_does_not_bound_work

@@ -48,7 +48,7 @@ abbrev Cokernel (receipt : LatticeIndexReceipt Source Target) :=
   Target ⧸ receipt.image
 
 /-- The complete predecessor population behind one target. -/
-def reconstructionFibre (receipt : LatticeIndexReceipt Source Target) (target : Target) : Type u :=
+def preimageFibre (receipt : LatticeIndexReceipt Source Target) (target : Target) : Type u :=
   TransportLift receipt.transport target
 
 /-- The unresolved cokernel class of one target. -/
@@ -62,9 +62,9 @@ noncomputable def index (receipt : LatticeIndexReceipt Source Target) : ℕ := b
   exact Nat.card receipt.Cokernel
 
 /-- [proved-derived; formal-checked] A target has a lift exactly when it lies in the image. -/
-theorem nonempty_reconstructionFibre_iff_mem_image
+theorem nonempty_preimageFibre_iff_mem_image
     (receipt : LatticeIndexReceipt Source Target) (target : Target) :
-    Nonempty (receipt.reconstructionFibre target) ↔ target ∈ receipt.image := by
+    Nonempty (receipt.preimageFibre target) ↔ target ∈ receipt.image := by
   constructor
   · rintro ⟨lift⟩
     exact ⟨lift.1, lift.2⟩
@@ -73,10 +73,10 @@ theorem nonempty_reconstructionFibre_iff_mem_image
 
 /-- [proved-derived; formal-checked] The lifting obstruction is exactly the nonzero cokernel
 class. -/
-theorem nonempty_reconstructionFibre_iff_cokernelClass_eq_zero
+theorem nonempty_preimageFibre_iff_cokernelClass_eq_zero
     (receipt : LatticeIndexReceipt Source Target) (target : Target) :
-    Nonempty (receipt.reconstructionFibre target) ↔ receipt.cokernelClass target = 0 := by
-  rw [receipt.nonempty_reconstructionFibre_iff_mem_image]
+    Nonempty (receipt.preimageFibre target) ↔ receipt.cokernelClass target = 0 := by
+  rw [receipt.nonempty_preimageFibre_iff_mem_image]
   exact (Submodule.Quotient.mk_eq_zero receipt.image).symm
 
 /-- [definition] The torsion population of the cokernel, retained as an actual submodule. -/
@@ -148,8 +148,8 @@ theorem cokernel_torsionWitness_vanishes_of_saturated
 
 section Audit
 
-#print axioms nonempty_reconstructionFibre_iff_mem_image
-#print axioms nonempty_reconstructionFibre_iff_cokernelClass_eq_zero
+#print axioms nonempty_preimageFibre_iff_mem_image
+#print axioms nonempty_preimageFibre_iff_cokernelClass_eq_zero
 #print axioms saturated_iff_cokernelClass_has_torsionWitness
 #print axioms cokernelClass_mem_torsion_iff_saturated
 #print axioms cokernel_torsionWitness_vanishes_of_saturated

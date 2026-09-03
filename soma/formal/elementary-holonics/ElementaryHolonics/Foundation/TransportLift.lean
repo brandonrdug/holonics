@@ -23,8 +23,8 @@ def TransportLift {Source : Type u} {Target : Type v}
     (transport : Source → Target) (target : Target) : Type u :=
   {source : Source // transport source = target}
 
-/-- [definition] `TransportLift` is the reconstruction fibre of the transport receiver. -/
-abbrev ReconstructionFibre {Source : Type u} {Target : Type v}
+/-- [definition] `TransportLift` is the preimage fibre of the transport receiver. -/
+abbrev PreimageFibre {Source : Type u} {Target : Type v}
     (transport : Source → Target) (target : Target) :=
   TransportLift transport target
 
@@ -89,7 +89,7 @@ def translateByKernel (transport : Source →+ Target) {target : Target}
   ⟨base.1 + direction.1, by
     rw [map_add, base.2, direction.2, add_zero]⟩
 
-/-- [proved-derived; formal-checked] Once one lift exists, the complete reconstruction fibre is
+/-- [proved-derived; formal-checked] Once one lift exists, the complete preimage fibre is
 equivalent to the kernel—not merely counted by it. -/
 def fibreEquivKernel (transport : Source →+ Target) {target : Target}
     (base : TransportLift transport target) :

@@ -20,10 +20,10 @@ Format of every row: `Name — fields — meaning — path:line`. Meanings are t
 | `AdditiveFace X := X →₀ ℤ`; `incoming/outgoing/additive/joinedMiddleBoundary` | — | oriented ±1 endpoint faces | `L/Foundation/AddressedBoundary.lean:23-39` |
 | `boundary_join`, `boundary_comp`, `boundary_compAssociator`, `boundary_passageEquiv`, `additiveBoundary_shadow_forgets_the_carrier` (thms) | — | pullback cancels the joined middle face (Stokes-type); outer faces kept; `Rel.comp` is the forgetful shadow | `AddressedBoundary.lean:44-76` |
 | `Holon Source Target Face` | `Occurrence : Type`, `source`, `target`, `receive : Occurrence → Face` | addressed occurrence population + receiver current per occurrence | `L/Foundation/Holon.lean:32` |
-| `Holon.toPassage`, `.ReconstructionFibre face` (`{o // receive o = face}`), `.Interaction` (= `Join`), `.comp`, `.cartesian`, `.diagonal`, `.offDiagonal` (`{p // p.1 ≠ p.2}`), `.CompositeReconstructionFibre`; thms `compReconstructionFibreEquiv`, `cartesianReconstructionFibreEquiv`, `interaction_middle_boundary` | — | serial/Cartesian/diagonal bodies; composite fibres retain both component fibres; joined middle face = 0 | `Holon.lean:48-173` |
+| `Holon.toPassage`, `.PreimageFibre face` (`{o // receive o = face}`), `.Interaction` (= `Join`), `.comp`, `.cartesian`, `.diagonal`, `.offDiagonal` (`{p // p.1 ≠ p.2}`), `.CompositePreimageFibre`; thms `compPreimageFibreEquiv`, `cartesianPreimageFibreEquiv`, `interaction_middle_boundary` | — | serial/Cartesian/diagonal bodies; composite fibres retain both component fibres; joined middle face = 0 | `Holon.lean:48-216` |
 | `BoundaryHolon Chain Current` | `Occurrence`, `source target : Occurrence → Chain`, `receive : Occurrence → Current`, `boundary : Current →+ Chain`, `returnsBoundary : ∀ o, boundary (receive o) = target o − source o` | holon whose current has an additive boundary realizing `target − source`; `.map/.toHolon/.comp/.totalCurrent` | `Holon.lean:182-263` |
 | `BoundaryHolon.boundary_totalCurrent` (thm) | `boundary totalCurrent = totalTarget − totalSource` | exact finite local-to-global law | `Holon.lean:268` |
-| `TransportLift`/`ReconstructionFibre transport target`; `LiftObstruction {outsideRange}` | `{s // transport s = target}` | complete lift population; proof the fibre is empty | `L/Foundation/TransportLift.lean:21,27,49` |
+| `TransportLift`/`PreimageFibre transport target`; `LiftObstruction {outsideRange}` | `{s // transport s = target}` | complete lift population; proof the fibre is empty | `L/Foundation/TransportLift.lean:21,27,49` |
 | `LatticeIndexReceipt Source Target` | `transport : Source →ₗ[ℤ] Target`, `finiteCokernel : Finite (Target ⧸ range)`; `.kernel/.image/.Cokernel/.index/.cokernelTorsion/.SaturatedByImage` | integer-lattice transport; lift exists ⇔ in image ⇔ cokernel class 0 (`:65,76`); saturation ⇔ torsion witness (`:100`) | `L/Foundation/LatticeTransport.lean:29-135` |
 | `Compression ι X Q Y` | `quotient : X → Q`, `receiver : ι → X → Y`, `factor : ι → Q → Y` | receiver-exact quotient | `L/Foundation/Receiver.lean:90` |
 | `ReceiverTransformer`; `ReceiverInsufficiency`; `ReceiverCondensation` | `transform : Set.range entering → Returned`; `left right, sameEntering, differentReturned`; `left right, distinctEntering, sameReturned` | functional transformer on presented faces; insufficiency witness; lawful many-to-one | `Receiver.lean:123,163,181` |
@@ -50,7 +50,7 @@ Foundation files (26, 7744 lines): AddressedBoundary, BoundaryReceiver, Boundary
 | `spinFace : Bool → ℝ` | `false ↦ 1`, `true ↦ −1` | sign receiver of a locked phase (locked-state quotient face) | 73 |
 | `windingLogI n : ℂ` | `(π/2 + 2πn)·I` | `n`-th logarithmic winding above `i` | 96 |
 | `logarithmicWindingHolon : Holon ℤ ℤ ℂ` | `Occurrence := ℤ`, `source n := n`, `target n := n+1`, `receive n := exp(windingLogI n)` | winding index / next turn / returned face `i` | 117 |
-| `logarithmicWindingReconstruction` | `ReconstructionFibre I ≃ ℤ` | every branch retained behind the one face | 128 |
+| `logarithmicWindingReconstruction` | `PreimageFibre I ≃ ℤ` | every branch retained behind the one face | 128 |
 | `structure IPowerReceiverFace` | `logarithmicCurrent : ℂ`, `exponentialFace : ℂ`, `powerCurrent : ℂ` | branch-resolved complex winding current | 176 |
 | `iPowerIChartHolon : Holon ℤ ℤ IPowerReceiverFace`, `iPowerIHolon : Holon ℤ ℤ ℂ` | as above with `windingIPowerI n` | exact winding lift of `i^i` | 182, 201 |
 | `phaseCoupling w φ₁ φ₂` | `−w·cos(φ₁−φ₂)` | cosine lattice coupling | 219 |
@@ -110,9 +110,9 @@ Theorems: `measuredCapacitance_mul_voltageDifference` (56), `measuredInverseIndu
 | Name | Fields | Meaning | Line |
 |---|---|---|---|
 | `structure AddressedMembraneContact Occ ExtB IntB ExtP IntP Current` | `occurrence`, `exteriorBoundary`, `interiorBoundary`, `exteriorPotential`, `interiorPotential`, `transport : ExtP →+ IntP`, `admittance : IntP →+ Current` | one caused crossing from exterior to interior boundary occurrence | 41 |
-| `.returnedPotential` (`interior − transport exterior`), `.returnedCurrent` (`admittance returnedPotential`), `.receiverFace receiver`, `.reconstructionFiber receiver reading : Set Contact` | — | drop in the interior target fibre; constitutive current; reading fibre | 63-83 |
+| `.returnedPotential` (`interior − transport exterior`), `.returnedCurrent` (`admittance returnedPotential`), `.receiverFace receiver`, `.preimageFibre receiver reading : Set Contact` | — | drop in the interior target fibre; constitutive current; reading fibre | 63-83 |
 | `finiteCrossEntropy reference emitted` | `−∑ ref·log emitted` | scalar receiver | 157 |
-| `structure FiniteCrossEntropyReceiver Action Index` | `reference`, `emitted : Action → Index → ℝ`, nonneg/normalized/positive proofs | probability chart for one action population; `.face`, `.reconstructionFiber` | 163-180 |
+| `structure FiniteCrossEntropyReceiver Action Index` | `reference`, `emitted : Action → Index → ℝ`, nonneg/normalized/positive proofs | probability chart for one action population; `.face`, `.preimageFibre` | 163-180 |
 
 Theorems: `receiverFace_factors_through_returnedCurrent` (90), `membraneCurrent_rebase` (104), `localMembraneMixing_reorient` (131), `localMembraneMixing_zero_of_couplingRow_zero` (142), `same_fibre_of_equal_face` (189), `no_successor_factor_of_equal_face` (198), `distinct_sections_equal_crossEntropy` (228), `tailCrossEntropyReceiver_equalFace` (271), `tailCrossEntropyReceiver_no_identitySuccessorFactor` (277), `binaryNormalizedExponential_commonShift` (285).
 
@@ -128,7 +128,7 @@ Cell carrier (`Millennium/HolonicPolygonalTorusCarrier.lean`): `MajorIndex m := 
 | `BranchSection := Branch → ℝ` | — | | 163 |
 | `crossSectionCurrent cut current`, `crossSectionCurrentLinear/AddHom` | `∑ e, current e · dualCrossSectionCut cut e` | exact current through one declared cut | 167-283 |
 | `fluxLinkage winding flux`, `fluxLinkageLinear/AddHom` | `∑ e, flux e · chainDrive winding e` | linkage against a retained winding chain | 216-291 |
-| `crossSectionCurrentFibreEquivKernel`, `fluxLinkageFibreEquivKernel` | `ReconstructionFibre … ≃ ker` | fibre is a kernel translate; no inverse selected | 300, 312 |
+| `crossSectionCurrentFibreEquivKernel`, `fluxLinkageFibreEquivKernel` | `PreimageFibre … ≃ ker` | fibre is a kernel translate; no inverse selected | 300, 312 |
 | `CurrentFluxOccurrence := BranchSection × BranchSection`; `currentFluxReceiver`, `currentFluxPassage` | pairs `(cut current, linkage)` | paired receiver as an addressed passage | 326-338 |
 | `branchProbe probe : BranchSection` | indicator | one addressed branch probe | 352 |
 | `crossSectionCurrentInsufficiency cut i : ReceiverInsufficiency …` | `left := 0`, `right := meridianWindingChain i` | cut current alone identifies zero and a meridian | 407 |
@@ -170,19 +170,19 @@ Theorems: `cellularCurl_adjoint` (153), `PositiveCellHodge.adjoint` (253), `…C
 |---|---|---|---|
 | `structure GranularBoundaryBody Scalar Cell Face Ridge Port` | `constitutive : Matrix Cell Cell`, `innerBoundary : Matrix Face Cell`, `outerBoundary : Matrix Ridge Face`, `portTrace : Matrix Port Face`, `boundary_boundary : outer * inner = 0` | finite granular body with interior constitutive response, two successive boundaries, port family | 45 |
 | `.interiorCurrent`, `.boundaryRadiation`, `.outerReturn`, `.reflectedBoundaryPotential`, `.reflectedActionPotential`, `.portRadiation`, `.jointPortKernel` | — | radiation = cycle; transpose incidence = reflected pullback | 61-168 |
-| `reconstructionFiber receiver face : Set Source` | | | 197 |
-| `structure CausalGrain Source Index Face` | `signature : Source → Index → Face` | particle identity = complete receiver-history signature; `.signatureSetoid`, `.Particle` (quotient), `.particle`, `.reconstructionFiber` | 248-287 |
+| `preimageFibre receiver face : Set Source` | | | 197 |
+| `structure CausalGrain Source Index Face` | `signature : Source → Index → Face` | particle identity = complete receiver-history signature; `.signatureSetoid`, `.Particle` (quotient), `.particle`, `.preimageFibre` | 248-287 |
 | `structure CausalGrain.Passage fine coarse` | `respects : fine.signature l = r → coarse.signature l = r` | coarsening exists only by factorization; `.map`, `.comp` | 294-317 |
 | `completeReceiverHistoryGrain`, `restrictedReceiverHistoryGrain`, `completeToRestrictedPassage` | | | 341-378 |
 | `structure CausalBoundaryGranulation …` | `causal : Passage`, `boundary : BoundaryScalePassage`, `realizeFine`, `realizeCoarse`, `realization_natural` | causally founded granulation commuting with boundary | 415 |
 
-Theorems: `outerReturn_eq_zero` (79), `boundary_pairing_eq_reflected_interior_pairing` (108, finite Stokes), `same_portRadiation_iff_difference_mem_jointPortKernel` (175), `separated_surface_cannot_factor_through_coarse_receiver` (203), `particle_eq_iff_signature_eq` (275), `map_comp` (322), `coarse_grain_equality_with_fine_separation_returns_reconstructionFiber` (391), `radiation_natural` (448).
+Theorems: `outerReturn_eq_zero` (79), `boundary_pairing_eq_reflected_interior_pairing` (108, finite Stokes), `same_portRadiation_iff_difference_mem_jointPortKernel` (175), `separated_surface_cannot_factor_through_coarse_receiver` (203), `particle_eq_iff_signature_eq` (275), `map_comp` (322), `coarse_grain_equality_with_fine_separation_returns_preimageFibre` (391), `radiation_natural` (448).
 
 ### A.11 `Millennium/HolonicTorusEntropyParametronEquivalence.lean` (108) and `HolonicTorusMonodromyReceiver.lean` (178)
 
 `realizedWindingCurrent g cycle : ParametronBranch g → ℝ` (30); `windingLatticeEquivRealizedParametronCurrent g : Lattice ≃ {current // ∈ range}` (55). Theorems: `fourAxisCurrentReceiver_realizedWindingCurrent` (36), `realizedWindingCurrent_injective` (43), `entropyAxisCrossCurrent_realizedWindingCurrent` (63), `all_realizedEntropyAxisCrossCurrents_zero_iff_aligned` (80).
 
-`cyclePairing probe cycle : ℤ := dotProduct` (27), `cyclePairingAddHom` (31), `latticeActionAddHom/Equiv` (38, 44), `T1/T2/T0CycleEquiv : Lattice ≃+ Lattice` (89-101), `receiverFibreCovariance sourceTarget sourceProbe targetProbe natural value : ReconstructionFibre … ≃ ReconstructionFibre …` (108), `T1/T2/T0ReceiverFibreEquiv` (141-157). Theorems: `cyclePairing_covariant_of_inverseTranspose` (62), `cyclePairing_T1_A1/T2_A2/T0_M0` (71-83).
+`cyclePairing probe cycle : ℤ := dotProduct` (27), `cyclePairingAddHom` (31), `latticeActionAddHom/Equiv` (38, 44), `T1/T2/T0CycleEquiv : Lattice ≃+ Lattice` (89-101), `receiverFibreCovariance sourceTarget sourceProbe targetProbe natural value : PreimageFibre … ≃ PreimageFibre …` (108), `T1/T2/T0ReceiverFibreEquiv` (141-157). Theorems: `cyclePairing_covariant_of_inverseTranspose` (62), `cyclePairing_T1_A1/T2_A2/T0_M0` (71-83).
 
 ### A.12 Computation
 

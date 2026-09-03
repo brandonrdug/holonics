@@ -38,7 +38,7 @@ universe u v
 
 /-- [definition] All cycle combinations returning one addressed rational Hodge class. -/
 abbrev CycleLiftFibre (D : Datum) (hodgeClass : D.rationalHodgeClasses) :=
-  Lift.ReconstructionFibre D.cycleClass.hom.toAddMonoidHom (hodgeClass : D.Cohomology)
+  Lift.PreimageFibre D.cycleClass.hom.toAddMonoidHom (hodgeClass : D.Cohomology)
 
 /-- [proved-derived; formal-checked] A cycle lift exists exactly when the class is algebraic.
 The left side retains the antecedent population; the right side is its range receiver. -/

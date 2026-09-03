@@ -187,12 +187,12 @@ def forcedSectionHolon (centres : Fin 6 → ℚ) (completedSquare : FamilyPolyno
   target label := forcedSection centres completedSquare label
   receive label := forcedSection centres completedSquare label
 
-/-- [proved-derived; formal-checked] Every forced graph has an occupied reconstruction fibre whose
+/-- [proved-derived; formal-checked] Every forced graph has an occupied preimage fibre whose
 witness retains the centre and the sign which produced it. -/
 theorem forcedSectionHolon_fibre_occupied
     (centres : Fin 6 → ℚ) (completedSquare : FamilyPolynomial)
     (label : ForcedSectionLabel) :
-    Nonempty ((forcedSectionHolon centres completedSquare).ReconstructionFibre
+    Nonempty ((forcedSectionHolon centres completedSquare).PreimageFibre
       (forcedSection centres completedSquare label)) :=
   ⟨⟨label, rfl⟩⟩
 

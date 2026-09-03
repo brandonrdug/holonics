@@ -15,7 +15,7 @@ Thus the typed source of `length / time^2` is
 
 and the ordinary exponent `-2` is its returned conventional coordinate.  The receiver is not
 injective: the nonzero difference `sourceTime - receiverTime` lies in its kernel, and every
-inhabited dimensional reconstruction fibre is therefore a translate of that retained kernel.
+inhabited dimensional preimage fibre is therefore a translate of that retained kernel.
 
 The same calculus returns `[cosmological constant] = length⁻²` and checks the complete typed
 Einstein equation:
@@ -194,7 +194,7 @@ theorem symmetrizeDimension_not_injective :
   simpa using symmetrize_timeOriginDifference
 
 abbrev DimensionFibre (reading : Ellipse.Dim) :=
-  Lift.ReconstructionFibre symmetrizeDimension reading
+  Lift.PreimageFibre symmetrizeDimension reading
 
 def dimensionFibreEquivKernel {reading : Ellipse.Dim}
     (base : DimensionFibre reading) :

@@ -9,7 +9,7 @@ owned by `NavierStokesPhysicalH2ProjectiveClockPayment`, put `z = w • Ω`.  It
 makes the Euclidean square of `z` exactly constant.  The statement includes the zero-mode chart
 and makes no existence claim for the integrating scalar `w`.
 
-The complete reconstruction fibre retains every factorization `z = w • Ω`.  When `w ≠ 0`
+The complete preimage fibre retains every factorization `z = w • Ω`.  When `w ≠ 0`
 the mode is reconstructed by reciprocal scalar transport.  When `w = 0`, the transported target
 is necessarily zero while the original mode is unrestricted; a constructor for every original
 mode records this singular fibre explicitly.
@@ -234,23 +234,23 @@ theorem projectiveTransportEuclideanSquare_eq_one
   unfold projectiveTransportEuclideanHalfLengthSquare at hhalf
   linarith
 
-/-! ## Complete reconstruction fibre -/
+/-! ## Complete preimage fibre -/
 
 /-- Every scalar/mode factorization of one transported carrier. -/
-def ProjectiveTransportReconstructionFiber
+def ProjectiveTransportPreimageFibre
     (transported : ComplexVector) :=
   { occurrence : ℂ × ComplexVector // occurrence.1 • occurrence.2 = transported }
 
 /-- The literal scalar and original mode inhabit the complete fibre over their transported mode. -/
-def projectiveTransportReconstructionOccurrence
+def projectiveTransportPreimageOccurrence
     (transport : ℂ) (mode : ComplexVector) :
-    ProjectiveTransportReconstructionFiber (transport • mode) :=
+    ProjectiveTransportPreimageFibre (transport • mode) :=
   ⟨(transport, mode), rfl⟩
 
 /-- On a regular scalar chart, the fibre reconstructs its original mode by reciprocal transport. -/
-theorem ProjectiveTransportReconstructionFiber.mode_eq_inv_smul
+theorem ProjectiveTransportPreimageFibre.mode_eq_inv_smul
     {transported : ComplexVector}
-    (occurrence : ProjectiveTransportReconstructionFiber transported)
+    (occurrence : ProjectiveTransportPreimageFibre transported)
     (htransport : occurrence.1.1 ≠ 0) :
     occurrence.1.2 = occurrence.1.1⁻¹ • transported := by
   calc
@@ -261,28 +261,28 @@ theorem ProjectiveTransportReconstructionFiber.mode_eq_inv_smul
     _ = occurrence.1.1⁻¹ • transported := by
       rw [occurrence.property]
 
-/-- If a reconstruction occurrence has zero scalar, its transported target is forced to zero. -/
-theorem ProjectiveTransportReconstructionFiber.target_eq_zero_of_transport_eq_zero
+/-- If a preimage occurrence has zero scalar, its transported target is forced to zero. -/
+theorem ProjectiveTransportPreimageFibre.target_eq_zero_of_transport_eq_zero
     {transported : ComplexVector}
-    (occurrence : ProjectiveTransportReconstructionFiber transported)
+    (occurrence : ProjectiveTransportPreimageFibre transported)
     (htransport : occurrence.1.1 = 0) :
     transported = 0 := by
   rw [← occurrence.property, htransport, zero_smul]
 
 /-- Every original mode, without restriction, survives as a distinct occurrence in the singular
-zero-scalar reconstruction fibre. -/
-def singularProjectiveTransportReconstructionOccurrence
-    (mode : ComplexVector) : ProjectiveTransportReconstructionFiber 0 :=
+zero-scalar preimage fibre. -/
+def singularProjectiveTransportPreimageOccurrence
+    (mode : ComplexVector) : ProjectiveTransportPreimageFibre 0 :=
   ⟨(0, mode), by simp⟩
 
 @[simp]
-theorem singularProjectiveTransportReconstructionOccurrence_transport
+theorem singularProjectiveTransportPreimageOccurrence_transport
     (mode : ComplexVector) :
-    (singularProjectiveTransportReconstructionOccurrence mode).1.1 = 0 := rfl
+    (singularProjectiveTransportPreimageOccurrence mode).1.1 = 0 := rfl
 
 @[simp]
-theorem singularProjectiveTransportReconstructionOccurrence_mode
+theorem singularProjectiveTransportPreimageOccurrence_mode
     (mode : ComplexVector) :
-    (singularProjectiveTransportReconstructionOccurrence mode).1.2 = mode := rfl
+    (singularProjectiveTransportPreimageOccurrence mode).1.2 = mode := rfl
 
 end Soma.Holonics.Millennium.NavierStokesPhysicalH2ProjectiveTransportLength

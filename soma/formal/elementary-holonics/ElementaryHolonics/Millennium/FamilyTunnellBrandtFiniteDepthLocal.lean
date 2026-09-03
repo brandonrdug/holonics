@@ -104,29 +104,29 @@ def neighborFiniteDepthReceiver (hp2 : p ≠ 2) (n : ℕ)
   finiteDepthReduce n
     (BrandtNeighborOccurrence.integralPScale hp2 occurrence x)
 
-/-- The source reconstruction fiber at a finite receiver depth. -/
-def sourceReconstructionFiber (n : ℕ)
+/-- The source preimage fibre at a finite receiver depth. -/
+def sourcePreimageFibre (n : ℕ)
     (occurrence : BrandtNeighborOccurrence (p := p))
     (y : LocalDepthTriple (p := p) n) :=
   {v : IntTriple // sourceFiniteDepthReceiver n occurrence v = y}
 
-/-- The neighbor reconstruction fiber at a finite receiver depth. -/
-def neighborReconstructionFiber (hp2 : p ≠ 2) (n : ℕ)
+/-- The neighbor preimage fibre at a finite receiver depth. -/
+def neighborPreimageFibre (hp2 : p ≠ 2) (n : ℕ)
     (occurrence : BrandtNeighborOccurrence (p := p))
     (y : LocalDepthTriple (p := p) n) :=
   {x : occurrenceNeighborSubgroup hp2 occurrence //
     neighborFiniteDepthReceiver hp2 n occurrence x = y}
 
-theorem sourceReconstructionFiber_mem (n : ℕ)
+theorem sourcePreimageFibre_mem (n : ℕ)
     (occurrence : BrandtNeighborOccurrence (p := p))
     (y : LocalDepthTriple (p := p) n)
-    (v : sourceReconstructionFiber n occurrence y) :
+    (v : sourcePreimageFibre n occurrence y) :
     sourceFiniteDepthReceiver n occurrence v.1 = y := v.2
 
-theorem neighborReconstructionFiber_mem (hp2 : p ≠ 2) (n : ℕ)
+theorem neighborPreimageFibre_mem (hp2 : p ≠ 2) (n : ℕ)
     (occurrence : BrandtNeighborOccurrence (p := p))
     (y : LocalDepthTriple (p := p) n)
-    (x : neighborReconstructionFiber hp2 n occurrence y) :
+    (x : neighborPreimageFibre hp2 n occurrence y) :
     neighborFiniteDepthReceiver hp2 n occurrence x.1 = y := x.2
 
 /-! The remaining defining-prime passage is now typed: it must supply an
@@ -137,7 +137,7 @@ with the restriction maps and the quadratic receiver. -/
 #print axioms finiteDepthRestriction_reduce
 #print axioms finiteDepthQuadratic_cast
 #print axioms finiteDepthQuadratic_restriction
-#print axioms sourceReconstructionFiber_mem
-#print axioms neighborReconstructionFiber_mem
+#print axioms sourcePreimageFibre_mem
+#print axioms neighborPreimageFibre_mem
 
 end Soma.Holonics.Millennium.FamilyTunnellBrandtFiniteDepthLocal

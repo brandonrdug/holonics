@@ -72,7 +72,7 @@ theorem quotientNe_returnsSeparatingReceiverHistory {left right : Source}
 /-- Literal source occurrences remain plural even when their native state is equal. -/
 theorem quotientEqualityRetainsBothOccurrences {left right : Source}
     (h : C.present.quotient left = C.present.quotient right) :
-    ∃ leftIn rightIn : C.toReceiverHistoryCompression.reconstructionFibre
+    ∃ leftIn rightIn : C.toReceiverHistoryCompression.preimageFibre
         (C.present.quotient left),
       leftIn.1 = left ∧ rightIn.1 = right :=
   C.toReceiverHistoryCompression.quotientEqPlacesBothOccurrencesInOneFibre h

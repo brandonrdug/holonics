@@ -194,7 +194,7 @@ end GranularBoundaryBody
 /-! ## The exact coarse-receiver obstruction -/
 
 /-- The complete population collapsed by one exterior receiver face. -/
-def reconstructionFiber {Source Face : Type*}
+def preimageFibre {Source Face : Type*}
     (receiver : Source → Face) (face : Face) : Set Source :=
   {source | receiver source = face}
 
@@ -284,7 +284,7 @@ theorem particle_eq_iff_signature_eq
     exact equality
 
 /-- Every particle retains the complete source population which the receiver identified. -/
-def reconstructionFiber
+def preimageFibre
     (grain : CausalGrain Source FineIndex FineFace) (face : grain.Particle) : Set Source :=
   {source | grain.particle source = face}
 
@@ -388,7 +388,7 @@ def completeToRestrictedPassage
 
 /-- If a coarse grain identifies two sources which the complete grain separates, the exact
 reconstruction fibre has reopened.  No cold decoder may invent the missing distinction. -/
-theorem coarse_grain_equality_with_fine_separation_returns_reconstructionFiber
+theorem coarse_grain_equality_with_fine_separation_returns_preimageFibre
     (compression : CompleteReceiverHistoryQuotient
       Generator Receiver Source Quotient Face)
     (select : CoarseReceiver → Receiver) (read : Face → CoarseFace)
@@ -399,9 +399,9 @@ theorem coarse_grain_equality_with_fine_separation_returns_reconstructionFiber
     (fineDifferent :
       (completeReceiverHistoryGrain compression).particle left ≠
         (completeReceiverHistoryGrain compression).particle right) :
-    left ∈ (restrictedReceiverHistoryGrain compression select read).reconstructionFiber
+    left ∈ (restrictedReceiverHistoryGrain compression select read).preimageFibre
         ((restrictedReceiverHistoryGrain compression select read).particle left) ∧
-      right ∈ (restrictedReceiverHistoryGrain compression select read).reconstructionFiber
+      right ∈ (restrictedReceiverHistoryGrain compression select read).preimageFibre
         ((restrictedReceiverHistoryGrain compression select read).particle left) ∧
       (completeReceiverHistoryGrain compression).particle left ≠
         (completeReceiverHistoryGrain compression).particle right := by
@@ -471,7 +471,7 @@ section Audit
 #print axioms CausalGrain.particle_eq_iff_signature_eq
 #print axioms CausalGrain.Passage.map_comp
 #print axioms completeReceiverHistoryGrain_particle_eq_iff_present_quotient_eq
-#print axioms coarse_grain_equality_with_fine_separation_returns_reconstructionFiber
+#print axioms coarse_grain_equality_with_fine_separation_returns_preimageFibre
 #print axioms CausalBoundaryGranulation.radiation_natural
 
 end Audit

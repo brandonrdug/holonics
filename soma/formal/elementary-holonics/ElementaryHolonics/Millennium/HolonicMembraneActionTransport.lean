@@ -80,7 +80,7 @@ def receiverFace
   receiver contact.returnedCurrent
 
 /-- The complete contact population retained by one receiver reading. -/
-def reconstructionFiber
+def preimageFibre
     {Reading : Type*}
     (receiver : Current → Reading) (reading : Reading) :
     Set (AddressedMembraneContact Occurrence ExteriorBoundary InteriorBoundary
@@ -177,20 +177,20 @@ def face (receiver : FiniteCrossEntropyReceiver Action Index) (action : Action) 
   finiteCrossEntropy receiver.reference (receiver.emitted action)
 
 /-- The complete population of actions one scalar cross-entropy reading cannot distinguish. -/
-def reconstructionFiber (receiver : FiniteCrossEntropyReceiver Action Index) (reading : ℝ) :
+def preimageFibre (receiver : FiniteCrossEntropyReceiver Action Index) (reading : ℝ) :
     Set Action :=
   {action | receiver.face action = reading}
 
-@[simp] theorem mem_reconstructionFiber_iff
+@[simp] theorem mem_preimageFibre_iff
     (receiver : FiniteCrossEntropyReceiver Action Index) (reading : ℝ) (action : Action) :
-    action ∈ receiver.reconstructionFiber reading ↔ receiver.face action = reading := Iff.rfl
+    action ∈ receiver.preimageFibre reading ↔ receiver.face action = reading := Iff.rfl
 
 /-- Equal cross-entropy puts two actions in one receiver fibre; it does not identify them. -/
 theorem same_fibre_of_equal_face
     (receiver : FiniteCrossEntropyReceiver Action Index) {left right : Action}
     (equalFace : receiver.face left = receiver.face right) :
-    left ∈ receiver.reconstructionFiber (receiver.face left) ∧
-      right ∈ receiver.reconstructionFiber (receiver.face left) := by
+    left ∈ receiver.preimageFibre (receiver.face left) ∧
+      right ∈ receiver.preimageFibre (receiver.face left) := by
   exact ⟨rfl, equalFace.symm⟩
 
 /-- If a later receiver separates two equal-cross-entropy actions, that successor cannot factor

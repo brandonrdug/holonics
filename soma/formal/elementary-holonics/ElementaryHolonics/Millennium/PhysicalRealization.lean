@@ -18,7 +18,7 @@ linear charts the existing exact-matrix owner strengthens this union law to its 
 
 Occurrence identity, addressed-passage equivalence, receiver-history equivalence, rebase, and
 compression are distinct types below.  Equal endpoints therefore never erase lineage, and a
-non-injective compression returns its full reconstruction fibre rather than acquiring an inverse.
+non-injective compression returns its full preimage fibre rather than acquiring an inverse.
 
 Every theorem is discharged and none depends on `sorryAx`.  This file proves no statement about a
 named Millennium problem and does not claim that a supplied realization was recovered from
@@ -209,7 +209,7 @@ noncomputable def comp (Q : RealizationPassage B C) (P : RealizationPassage A B)
         Q.generatorExact generator (P.span.chart source)
 
 /-- The complete predecessor population behind one target face. -/
-def reconstructionFibre (P : RealizationPassage A B) (target : Middle) : Type _ :=
+def preimageFibre (P : RealizationPassage A B) (target : Middle) : Type _ :=
   { source : Source // P.span.chart source = target }
 
 /-- A proposed affect class is reopened by one receiver and ordered history. -/
@@ -231,10 +231,10 @@ structure Compression (P : RealizationPassage A B) where
   distinct : left ≠ right
   sameTarget : P.span.chart left = P.span.chart right
 
-/-- A compression witness places both distinct sources in one complete reconstruction fibre. -/
+/-- A compression witness places both distinct sources in one complete preimage fibre. -/
 def Compression.bothInOneFibre (P : RealizationPassage A B) (K : P.Compression) :
-    P.reconstructionFibre (P.span.chart K.left) ×
-      P.reconstructionFibre (P.span.chart K.left) :=
+    P.preimageFibre (P.span.chart K.left) ×
+      P.preimageFibre (P.span.chart K.left) :=
   (⟨K.left, rfl⟩, ⟨K.right, K.sameTarget.symm⟩)
 
 end RealizationPassage

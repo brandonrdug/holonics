@@ -279,7 +279,7 @@ theorem longitudeChainDrive_not_mem_crossSectionCurrentLinear_ker
   rw [hzero] at hone
   norm_num at hone
 
-/-- Additive form of the cross-section receiver, used by the common reconstruction-fibre owner. -/
+/-- Additive form of the cross-section receiver, used by the common preimage-fibre owner. -/
 def crossSectionCurrentAddHom (cut : MajorIndex major) :
     BranchSection major minor →+ ℝ where
   toFun := crossSectionCurrent cut
@@ -287,7 +287,7 @@ def crossSectionCurrentAddHom (cut : MajorIndex major) :
   map_add' left right := by
     simp [crossSectionCurrent, add_mul, Finset.sum_add_distrib]
 
-/-- Additive form of the flux-linkage receiver, used by the common reconstruction-fibre owner. -/
+/-- Additive form of the flux-linkage receiver, used by the common preimage-fibre owner. -/
 def fluxLinkageAddHom (winding : Chain (ParametronBranch major minor)) :
     BranchSection major minor →+ ℝ where
   toFun := fluxLinkage winding
@@ -295,25 +295,25 @@ def fluxLinkageAddHom (winding : Chain (ParametronBranch major minor)) :
   map_add' left right := by
     simp [fluxLinkage, add_mul, Finset.sum_add_distrib]
 
-/-- Once one cross-section-current lift is supplied, its complete reconstruction fibre is exactly
+/-- Once one cross-section-current lift is supplied, its complete preimage fibre is exactly
 a translate of the receiver kernel.  No inverse current field is selected. -/
 def crossSectionCurrentFibreEquivKernel
     (cut : MajorIndex major) (value : ℝ)
-    (base : Soma.Holonics.Foundation.Lift.ReconstructionFibre
+    (base : Soma.Holonics.Foundation.Lift.PreimageFibre
       (crossSectionCurrentAddHom (minor := minor) cut) value) :
-    Soma.Holonics.Foundation.Lift.ReconstructionFibre
+    Soma.Holonics.Foundation.Lift.PreimageFibre
         (crossSectionCurrentAddHom (minor := minor) cut) value ≃
       (crossSectionCurrentAddHom (minor := minor) cut).ker :=
   Soma.Holonics.Foundation.Lift.fibreEquivKernel
     (crossSectionCurrentAddHom (minor := minor) cut) base
 
-/-- Once one flux-linkage lift is supplied, its complete reconstruction fibre is exactly a
+/-- Once one flux-linkage lift is supplied, its complete preimage fibre is exactly a
 translate of the linkage kernel. -/
 def fluxLinkageFibreEquivKernel
     (winding : Chain (ParametronBranch major minor)) (value : ℝ)
-    (base : Soma.Holonics.Foundation.Lift.ReconstructionFibre
+    (base : Soma.Holonics.Foundation.Lift.PreimageFibre
       (fluxLinkageAddHom winding) value) :
-    Soma.Holonics.Foundation.Lift.ReconstructionFibre
+    Soma.Holonics.Foundation.Lift.PreimageFibre
         (fluxLinkageAddHom winding) value ≃
       (fluxLinkageAddHom winding).ker :=
   Soma.Holonics.Foundation.Lift.fibreEquivKernel

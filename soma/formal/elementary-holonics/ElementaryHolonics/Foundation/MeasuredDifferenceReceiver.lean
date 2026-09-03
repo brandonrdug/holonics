@@ -54,12 +54,12 @@ theorem face_factors_through_returnedDifference
   simp [returnedDifference]
 
 /-- The complete population of addressed pairs which one receiver scalar cannot distinguish. -/
-def reconstructionFiber (receiver : DifferenceReceiver X A S) (value : S) : Set (X × X) :=
+def preimageFibre (receiver : DifferenceReceiver X A S) (value : S) : Set (X × X) :=
   {pair | receiver.face pair.1 pair.2 = value}
 
-@[simp] theorem pair_mem_reconstructionFiber_iff
+@[simp] theorem pair_mem_preimageFibre_iff
     (receiver : DifferenceReceiver X A S) (value : S) (source target : X) :
-    (source, target) ∈ receiver.reconstructionFiber value ↔
+    (source, target) ∈ receiver.preimageFibre value ↔
       receiver.face source target = value := Iff.rfl
 
 /-- An injective reading retains the complete chart difference, though not necessarily the source

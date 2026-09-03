@@ -53,13 +53,13 @@ variable {Generator : Type u} {Receiver : Type v}
   (C : ReceiverHistoryCompression Generator Receiver Source Quotient Face)
 
 /-- The complete predecessor population retained behind one quotient face. -/
-def reconstructionFibre (quotient : Quotient) : Type _ :=
+def preimageFibre (quotient : Quotient) : Type _ :=
   { source : Source // C.present.quotient source = quotient }
 
-/-- Equal quotient faces place two occurrences in one retained reconstruction fibre. -/
+/-- Equal quotient faces place two occurrences in one retained preimage fibre. -/
 theorem quotientEqPlacesBothOccurrencesInOneFibre {left right : Source}
     (h : C.present.quotient left = C.present.quotient right) :
-    ∃ leftIn rightIn : C.reconstructionFibre (C.present.quotient left),
+    ∃ leftIn rightIn : C.preimageFibre (C.present.quotient left),
       leftIn.1 = left ∧ rightIn.1 = right :=
   ⟨⟨left, rfl⟩, ⟨right, h.symm⟩, rfl, rfl⟩
 

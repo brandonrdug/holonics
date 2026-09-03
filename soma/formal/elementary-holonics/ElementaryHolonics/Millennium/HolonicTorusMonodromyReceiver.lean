@@ -8,7 +8,7 @@ import ElementaryHolonics.Foundation.TransportLift
 The complex two-torus family carries a rank-four integral lattice.  Its displayed monodromies act
 on primal cycles by `T1`, `T2`, and `T0`, while the inverse-transpose matrices `A1`, `A2`, and `M0`
 act on dual receiver probes.  This file proves that their integer pairing is unchanged and, more
-strongly, that the complete reconstruction fibre of every fixed receiver value is transported by
+strongly, that the complete preimage fibre of every fixed receiver value is transported by
 an explicit equivalence.
 
 This is the algebraic monodromy edge required by Gate L2.  It does not yet identify the rank-four
@@ -104,14 +104,14 @@ def T0CycleEquiv : Lattice ≃+ Lattice :=
     (transpose_product_eq_one _ _ M0_isInverseTranspose.2)
 
 /-- A natural receiver square transports not merely its value but every source occurrence in the
-complete reconstruction fibre. -/
+complete preimage fibre. -/
 def receiverFibreCovariance
     (sourceTarget : Lattice ≃+ Lattice) (sourceProbe targetProbe : Lattice)
     (natural : ∀ cycle,
       cyclePairing targetProbe (sourceTarget cycle) = cyclePairing sourceProbe cycle)
     (value : ℤ) :
-    ReconstructionFibre (cyclePairingAddHom sourceProbe) value ≃
-      ReconstructionFibre (cyclePairingAddHom targetProbe) value where
+    PreimageFibre (cyclePairingAddHom sourceProbe) value ≃
+      PreimageFibre (cyclePairingAddHom targetProbe) value where
   toFun source := ⟨sourceTarget source.1, by
     change cyclePairing targetProbe (sourceTarget source.1) = value
     rw [natural]
@@ -139,24 +139,24 @@ def receiverFibreCovariance
 /-- Every order-three receiver fibre is carried exactly to the corresponding transported-probe
 fibre. -/
 def T1ReceiverFibreEquiv (probe : Lattice) (value : ℤ) :
-    ReconstructionFibre (cyclePairingAddHom probe) value ≃
-      ReconstructionFibre (cyclePairingAddHom (A1.mulVec probe)) value :=
+    PreimageFibre (cyclePairingAddHom probe) value ≃
+      PreimageFibre (cyclePairingAddHom (A1.mulVec probe)) value :=
   receiverFibreCovariance T1CycleEquiv probe (A1.mulVec probe)
     (cyclePairing_T1_A1 probe) value
 
 /-- Every order-four receiver fibre is carried exactly to the corresponding transported-probe
 fibre. -/
 def T2ReceiverFibreEquiv (probe : Lattice) (value : ℤ) :
-    ReconstructionFibre (cyclePairingAddHom probe) value ≃
-      ReconstructionFibre (cyclePairingAddHom (A2.mulVec probe)) value :=
+    PreimageFibre (cyclePairingAddHom probe) value ≃
+      PreimageFibre (cyclePairingAddHom (A2.mulVec probe)) value :=
   receiverFibreCovariance T2CycleEquiv probe (A2.mulVec probe)
     (cyclePairing_T2_A2 probe) value
 
 /-- Every unipotent-cusp receiver fibre is carried exactly to the corresponding transported-probe
 fibre. -/
 def T0ReceiverFibreEquiv (probe : Lattice) (value : ℤ) :
-    ReconstructionFibre (cyclePairingAddHom probe) value ≃
-      ReconstructionFibre (cyclePairingAddHom (M0.mulVec probe)) value :=
+    PreimageFibre (cyclePairingAddHom probe) value ≃
+      PreimageFibre (cyclePairingAddHom (M0.mulVec probe)) value :=
   receiverFibreCovariance T0CycleEquiv probe (M0.mulVec probe)
     (cyclePairing_T0_M0 probe) value
 

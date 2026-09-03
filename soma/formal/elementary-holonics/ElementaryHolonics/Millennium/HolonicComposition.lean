@@ -537,7 +537,7 @@ def firstCoordinateHistoryCompression :
 
 /-- Two distinct occurrences inhabit the complete retained quotient fibre. -/
 theorem firstCoordinate_completeFibre_retains_collapsed_pair :
-    ∃ left right : firstCoordinateHistoryCompression.reconstructionFibre false,
+    ∃ left right : firstCoordinateHistoryCompression.preimageFibre false,
       left.1 = (false, false) ∧ right.1 = (false, true) := by
   exact ⟨⟨(false, false), rfl⟩, ⟨(false, true), rfl⟩, rfl, rfl⟩
 

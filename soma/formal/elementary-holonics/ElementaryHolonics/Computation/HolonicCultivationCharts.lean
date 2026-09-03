@@ -26,7 +26,7 @@ namespace ScalarObjective
 
 variable {Native : Type uNative} (objective : ScalarObjective Native)
 
-def reconstructionFibre (reading : ℝ) : Set Native :=
+def preimageFibre (reading : ℝ) : Set Native :=
   {native | objective.face native = reading}
 
 theorem no_complete_descent_of_separator
@@ -69,7 +69,7 @@ theorem candidate_is_metric_raised_return (morphology : Morphology) :
 
 end GradientProposal
 
-/-! ## Autoencoding is a quotient with an explicit reconstruction fibre -/
+/-! ## Autoencoding is a quotient with an explicit preimage fibre -/
 
 structure AutoencodingChart (Native : Type uNative) (Latent : Type uLatent) where
   encode : Native → Latent
@@ -80,7 +80,7 @@ namespace AutoencodingChart
 variable {Native : Type uNative} {Latent : Type uLatent}
   (chart : AutoencodingChart Native Latent)
 
-def reconstructionFibre (latent : Latent) : Set Native :=
+def preimageFibre (latent : Latent) : Set Native :=
   {native | chart.encode native = latent}
 
 def ExactOn (region : Set Native) : Prop :=

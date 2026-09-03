@@ -127,7 +127,7 @@ structure ReceiverTransformer {X : Type u} {Entering : Type v} {Returned : Type 
     transform ⟨entering occurrence, ⟨occurrence, rfl⟩⟩ = returned occurrence
 
 /-- The complete situated population behind one actually presented entering face. -/
-def receiverReconstructionFibre {X : Type u} {Entering : Type v}
+def receiverPreimageFibre {X : Type u} {Entering : Type v}
     (entering : X → Entering) (face : Set.range entering) : Type u :=
   { occurrence : X // entering occurrence = face.1 }
 
