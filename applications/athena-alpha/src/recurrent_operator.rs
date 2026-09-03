@@ -242,6 +242,14 @@ impl AthenaTokenApplication {
         Ok(addresses)
     }
 
+    /// Encode a generator word alone, without the beginning-of-sequence marker.
+    pub fn encode_plain(&self, material: &str) -> Result<Vec<u32>, AthenaRecurrentApplicationError> {
+        self.tokenizer
+            .encode(material, false)
+            .map(|encoding| encoding.get_ids().to_vec())
+            .map_err(|error| AthenaRecurrentApplicationError::Tokenizer(error.to_string()))
+    }
+
     /// Render one selected address as the application would emit it.
     pub fn render_address(&self, address: u32) -> Result<String, AthenaRecurrentApplicationError> {
         self.tokenizer

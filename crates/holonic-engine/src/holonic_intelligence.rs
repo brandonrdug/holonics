@@ -44,6 +44,8 @@ mod operative_terminal;
 mod operative_scalars;
 #[path = "holonic_intelligence/operative_intervention.rs"]
 mod operative_intervention;
+#[path = "holonic_intelligence/operative_identification.rs"]
+mod operative_identification;
 #[path = "holonic_intelligence/profile.rs"]
 mod profile;
 #[path = "holonic_intelligence/repeated_circulation.rs"]
@@ -77,6 +79,7 @@ pub use operative_return::*;
 pub use operative_residence::*;
 pub use operative_session::*;
 pub use operative_intervention::*;
+pub use operative_identification::*;
 pub use profile::*;
 pub use repeated_circulation::*;
 pub use rested::*;
