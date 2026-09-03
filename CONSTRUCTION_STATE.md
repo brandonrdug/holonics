@@ -217,7 +217,10 @@ and the ledger's `RodgersTaoZeroDynamics` port now states the RT3 principal-valu
 instead of `True`; the root umbrella built 9,786 jobs. The dynamic reading, the missing-half and
 Hodge elaborations, and twelve exact product-threshold brackets are recorded in
 [`research/records/2026-09-03_THE_SEAMS_ARE_LOCAL_OPTIMA_OF_THE_THREAD_ENERGY_THE_PRIMES_ARE_THE_MISSING_HALF_AND_THE_FLOW_BINDS_THE_INTEGER_EVENTS.md`](research/records/2026-09-03_THE_SEAMS_ARE_LOCAL_OPTIMA_OF_THE_THREAD_ENERGY_THE_PRIMES_ARE_THE_MISSING_HALF_AND_THE_FLOW_BINDS_THE_INTEGER_EVENTS.md).
-The RH line remains independent of the SKE frontier and that record schedules nothing. The two constants' shared critical-threshold reading
+The RH line remains independent of the SKE frontier and that record schedules nothing. The same
+day `RH/HeatFlowStackedSeam.lean` returned the flow's commutation past `X`, `heat (1/2) (X^n) =
+He_n`, and the kernel's length `√(4πt)`, recorded with the compound reading in
+[`research/records/2026-09-03_THE_SEAM_IS_THE_GEOMETRIC_MEAN_OF_THE_DUAL_CHARTS_THE_KERNEL_CHAINS_AND_ROTATES_AND_THE_SQUARE_TELESCOPES_AGAINST_THE_CHAIN.md`](research/records/2026-09-03_THE_SEAM_IS_THE_GEOMETRIC_MEAN_OF_THE_DUAL_CHARTS_THE_KERNEL_CHAINS_AND_ROTATES_AND_THE_SQUARE_TELESCOPES_AGAINST_THE_CHAIN.md). The two constants' shared critical-threshold reading
 remains interpretation, not a cross-theorem. The WRN dependency contract, now absorbed into HNA,
 distinguishes
 `MorphologyTensorLens` from `MorphologyTensorFace`, defines `NativeMorphologyArtifact` as a
