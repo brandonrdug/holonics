@@ -125,7 +125,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 35] = [
+pub const KERNELS: [&str; 37] = [
     "section_from_bfloat16",
     "section_carry",
     "section_terminal_row",
@@ -158,6 +158,10 @@ pub const KERNELS: [&str; 35] = [
     // The receiver return: the emitted face meets its next occurrence and the differential of the
     // normalized exponential receiver returns through the terminal reactions as a deposit word.
     "section_receiver_return",
+    // The adjoint of the contraction over one aligned tile, and the transposed midpoint seal that
+    // makes a returning differential the `u` factor of a deposit.
+    "section_contract_transposed_partial",
+    "section_transpose_seal",
     "section_arithmetic_control",
     // The tiled contraction's emitted family. Every wrapper is named here so the module-wide block
     // derivation inspects every instantiation rather than one; each carries `__launch_bounds__(512)`

@@ -25,10 +25,10 @@ use super::{
     NativeCarrierAxis, NativeCarrierOrdinal, NativeCausalReach, NativeFullOperatorEcology,
     NativeMorphologyDeposit, NativeOperationPrimitive, NativeOperatorNode,
     NativeOperatorResidence, NativeOperatorResidenceError, NativeReturnAperture,
-    NativeScaleConstraint,
+    NativeScaleConstraint, NativeTensorOrdinal,
     operative_return::{
-        OverlayAtom, ReturnMaterial, continuation_next_occurrences, enact_return, overlay_tile,
-        record_overlay_contribution,
+        OverlayAtom, ReturnMaterial, contract_tile_with_overlay, continuation_next_occurrences,
+        enact_return,
     },
 };
 
@@ -151,8 +151,9 @@ pub struct NativeFullOperatorSession<'residence, 'chart> {
     terminal_presented: Option<ContemporaryCarrier<'chart>>,
     /// The row addresses of the last cycle: the line the emitted face continued.
     previous_context: Option<Vec<u32>>,
-    /// The factorized overlay atoms deposited on the tied cross-section, in deposit order.
-    overlay: Vec<OverlayAtom<'chart>>,
+    /// The factorized overlay atoms deposited on each cross-section, keyed by its coefficient
+    /// population, in deposit order.
+    overlay: BTreeMap<NativeTensorOrdinal, Vec<OverlayAtom<'chart>>>,
     /// The declared return apertures; `None` enacts no return.
     aperture: Option<NativeReturnAperture>,
 }
@@ -230,7 +231,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             terminal_reacted: None,
             terminal_presented: None,
             previous_context: None,
-            overlay: Vec::new(),
+            overlay: BTreeMap::new(),
             aperture,
         })
     }
@@ -272,8 +273,9 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
 
     /// The total rank of the factorized overlay the ecology carries.
     pub fn morphology_overlay_rank(&self) -> usize {
-        self.overlay.iter().map(OverlayAtom::rank).sum()
+        self.overlay.values().flatten().map(OverlayAtom::rank).sum()
     }
+
 
     pub fn return_aperture(&self) -> Option<NativeReturnAperture> {
         self.aperture
@@ -300,6 +302,14 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         let Some(next) = continuation_next_occurrences(previous, entering) else {
             return Ok(NativeMorphologyTransition::Unchanged);
         };
+        let tied = self
+            .ecology
+            .operations
+            .len()
+            .checked_sub(5)
+            .and_then(|at| self.ecology.operations.get(at))
+            .and_then(|operation| operation.coefficients.first().copied())
+            .ok_or(NativeFullOperationError::Operation)?;
         let surface = self.residence.surface();
         let (atom, deposit) = enact_return(
             surface,
@@ -315,7 +325,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             &next,
             aperture,
         )?;
-        self.overlay.push(atom);
+        self.overlay.entry(tied).or_default().push(atom);
         Ok(NativeMorphologyTransition::Changed {
             operation: 0,
             deposit,
@@ -651,91 +661,19 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         let mut first_row = 0usize;
         while first_row < *total_width {
             let rows = (*total_width - first_row).min(capacity);
+            let atoms = self.overlay.get(&coefficient).map(Vec::as_slice).unwrap_or(&[]);
             let tile = self.residence.align_tile(coefficient, first_row, rows)?;
-            let shape = surface.shape_contract(
-                input.section.rows(),
-                input.section.width(),
+            let tile_before = surface.census();
+            let (joined, reading) = contract_tile_with_overlay(
+                surface,
+                &input.section,
                 input.bound_octaves,
                 &tile.mounted.readout,
+                atoms,
+                first_row,
+                rows,
             )?;
-            let successor =
-                surface.fresh_section(input.section.rows(), rows, input.section.grain())?;
-            let tile_before = surface.census();
-            // One passage: the base contraction, one contribution per overlay atom, and the
-            // re-entry joins in deposit order. Every shape and section is founded before the
-            // capture opens; every section stays alive until the launch returns.
-            let atoms = self.overlay.len();
-            let mut overlay_tiles = Vec::with_capacity(atoms);
-            let mut contributions = Vec::with_capacity(atoms);
-            let mut joins = Vec::with_capacity(atoms);
-            let mut join_shapes = Vec::with_capacity(atoms);
-            let mut carrier_octaves = shape.needed;
-            for atom in &self.overlay {
-                let overlay = overlay_tile(
-                    surface,
-                    atom,
-                    &input.section,
-                    input.bound_octaves,
-                    first_row,
-                    rows,
-                )?;
-                let join = surface.shape_re_entry(
-                    input.section.rows(),
-                    rows,
-                    carrier_octaves,
-                    overlay.needed(),
-                )?;
-                carrier_octaves = join.needed;
-                contributions.push(surface.fresh_section(
-                    input.section.rows(),
-                    rows,
-                    input.section.grain(),
-                )?);
-                joins.push(surface.fresh_section(input.section.rows(), rows, input.section.grain())?);
-                overlay_tiles.push(overlay);
-                join_shapes.push(join);
-            }
-            let mut lineage: Vec<Vec<usize>> = Vec::with_capacity(1 + 2 * atoms);
-            lineage.push(Vec::new());
-            lineage.extend((0..atoms).map(|_| Vec::new()));
-            lineage.extend((0..atoms).map(|at| {
-                let previous = if at == 0 { 0 } else { atoms + at };
-                vec![previous, 1 + at]
-            }));
-            let mut builder = surface.begin_passage(&lineage)?;
-            {
-                let lane = builder.open(0, &[])?;
-                surface.record_contract(&lane, &input.section, &tile.mounted.readout, &successor)?;
-            }
-            builder.close(0, &successor, shape.needed)?;
-            for (at, overlay) in overlay_tiles.iter().enumerate() {
-                record_overlay_contribution(
-                    surface,
-                    &mut builder,
-                    1 + at,
-                    overlay,
-                    &input.section,
-                    &contributions[at],
-                )?;
-            }
-            for at in 0..atoms {
-                let index = atoms + 1 + at;
-                let previous = if at == 0 { 0 } else { atoms + at };
-                let carrier = if at == 0 { &successor } else { &joins[at - 1] };
-                {
-                    let lane = builder.open(index, &[previous, 1 + at])?;
-                    surface.record_re_entry(&lane, carrier, &contributions[at], &joins[at])?;
-                }
-                builder.close(index, &joins[at], join_shapes[at].needed)?;
-            }
-            let mut chain: Vec<(ResidentSection<'chart>, u32)> = vec![(successor, shape.needed)];
-            chain.extend(joins.into_iter().zip(join_shapes.iter().map(|join| join.needed)));
-            let reading = builder.finish()?.launch()?;
             let bound_octaves = operation_bound(operation.ordinal, &reading)?;
-            let (joined, _) = chain.pop().ok_or(NativeFullOperationError::Operation)?;
-            drop(chain);
-            drop(contributions);
-            drop(overlay_tiles);
             let intervals = surface.read_out(&joined)?;
             let tile_after = surface.census();
             drop(tile);
@@ -1104,24 +1042,18 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             return Err(NativeFullOperationError::Operation);
         }
         let surface = self.residence.surface();
+        let atoms = self.overlay.get(&coefficient).map(Vec::as_slice).unwrap_or(&[]);
         let tile = self.residence.align_tile(coefficient, 0, *rows)?;
-        let shape = surface.shape_contract(
-            input.section.rows(),
-            input.section.width(),
+        let census_before = surface.census();
+        let (successor, reading) = contract_tile_with_overlay(
+            surface,
+            &input.section,
             input.bound_octaves,
             &tile.mounted.readout,
+            atoms,
+            0,
+            *rows,
         )?;
-        let successor = surface.fresh_section(
-            input.section.rows(),
-            tile.mounted.readout.rows(),
-            input.section.grain(),
-        )?;
-        let census_before = surface.census();
-        let mut builder = surface.begin_passage(&[vec![]])?;
-        let lane = builder.open(0, &[])?;
-        surface.record_contract(&lane, &input.section, &tile.mounted.readout, &successor)?;
-        builder.close(0, &successor, shape.needed)?;
-        let reading = builder.finish()?.launch()?;
         let bound_octaves = operation_bound(operation.ordinal, &reading)?;
         let intervals = surface.read_out(&successor)?;
         let census_after = surface.census();

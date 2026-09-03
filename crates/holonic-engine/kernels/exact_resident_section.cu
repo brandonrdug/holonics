@@ -306,6 +306,8 @@ __device__ __forceinline__ int upstream_refused(const uint32_t *census, const ui
     return 1;
 }
 
+__device__ __forceinline__ void node_aperture(wide l, wide h, uint32_t admitted, uint32_t *slot);
+
 // ---------------------------------------------------------------------------------------------
 // the BF16 mouth into a section: exact decode, exact dyadic scale, directed placement at the grain
 // ---------------------------------------------------------------------------------------------
@@ -1583,6 +1585,66 @@ extern "C" __global__ void section_receiver_return(
         u_lo[out_at] = to_word(shift_floor(-dg_hi, -(int)deposit_shift, refused), refused);
         u_hi[out_at] = to_word(shift_ceil(-dg_lo, -(int)deposit_shift, refused), refused);
     }
+}
+
+// ---------------------------------------------------------------------------------------------
+// the adjoint of the contraction: the returning differential crosses the map transposed
+// ---------------------------------------------------------------------------------------------
+
+// `partial[slot_base + a][t, i] = Σ_{o ∈ split a} map[o,i] · d[t,o]` over one aligned tile of
+// `tile_rows` map rows, the tile's rows divided into `sub_splits` equal spans: the exact transpose
+// of the contraction, kept as WIDE PARTIALS in the split-K standing (four words per coordinate,
+// nothing rounded) so that `section_contract_join` folds every tile's and every split's partial
+// under one fixed tree and rounds ONCE.  The partial standing's layout is the join's:
+// `((slot · rows) + t) · inner + i`.
+extern "C" __global__ void section_contract_transposed_partial(
+    const int64_t *lo, const int64_t *hi, uint32_t rows, uint32_t tile_rows,
+    const int64_t *map, uint32_t inner, uint32_t sub_splits, uint32_t slot_base,
+    int64_t *partial, uint32_t admitted_node_octaves,
+    uint32_t *slot, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    uint32_t flat = blockIdx.x * blockDim.x + threadIdx.x;
+    uint32_t per_split = rows * inner;
+    if (flat >= per_split * sub_splits) return;
+    if (upstream_refused(census, lineage, lineage_count, slot)) return;
+    uint32_t a = flat / per_split, within = flat % per_split;
+    uint32_t t = within / inner, i = within % inner;
+    uint32_t span = (tile_rows + sub_splits - 1u) / sub_splits;
+    uint32_t o0 = a * span;
+    uint32_t o1 = (o0 + span) < tile_rows ? (o0 + span) : tile_rows;
+    const int64_t *dlo = lo + (size_t)t * (size_t)tile_rows;
+    const int64_t *dhi = hi + (size_t)t * (size_t)tile_rows;
+    wide acc_lo = 0, acc_hi = 0;
+    for (uint32_t o = o0; o < o1; ++o) {
+        wide w = map[(size_t)o * (size_t)inner + i];
+        if (w >= 0) { acc_lo += w * (wide)dlo[o]; acc_hi += w * (wide)dhi[o]; }
+        else        { acc_lo += w * (wide)dhi[o]; acc_hi += w * (wide)dlo[o]; }
+    }
+    node_aperture(acc_lo, acc_hi, admitted_node_octaves, slot);
+    size_t p = (((size_t)(slot_base + a) * (size_t)rows) + (size_t)t) * (size_t)inner + (size_t)i;
+    partial[4 * p + 0] = (int64_t)(uint64_t)((uwide)acc_lo);
+    partial[4 * p + 1] = (int64_t)(uint64_t)((uwide)acc_lo >> 64);
+    partial[4 * p + 2] = (int64_t)(uint64_t)((uwide)acc_hi);
+    partial[4 * p + 3] = (int64_t)(uint64_t)((uwide)acc_hi >> 64);
+}
+
+// The deposit factor of a differential: `u[o,t] = −mid(d[t,o]) · 2^-shift`, the returning
+// differential transposed into the factorized map's `u` layout, sealed to its midpoint and
+// coarsened by the derived shift. Written as a point enclosure; the learning shift is the mounted
+// exponent, never a product here.
+extern "C" __global__ void section_transpose_seal(
+    const int64_t *lo, const int64_t *hi, uint32_t rows, uint32_t width, uint32_t shift,
+    int64_t *out_lo, int64_t *out_hi, uint32_t *refused, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    uint32_t flat = blockIdx.x * blockDim.x + threadIdx.x;
+    if (flat >= rows * width) return;
+    if (upstream_refused(census, lineage, lineage_count, refused)) return;
+    uint32_t t = flat / width, o = flat % width;
+    wide m = shift_floor(-((wide)lo[flat] + (wide)hi[flat]), -1, refused);
+    wide word = shift_floor(m, -(int)shift, refused);
+    size_t at = (size_t)o * (size_t)rows + (size_t)t;
+    out_lo[at] = to_word(word, refused);
+    out_hi[at] = to_word(word, refused);
 }
 
 // ---------------------------------------------------------------------------------------------

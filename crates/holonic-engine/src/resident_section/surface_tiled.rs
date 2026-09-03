@@ -228,6 +228,21 @@ impl<'chart> ResidentSurface<'chart> {
         })
     }
 
+    /// Zero one retained partial standing, so slots no tile writes fold as exact zeros.
+    pub fn zero_partials(&self, standing: &PartialStanding) -> Result<(), ResidentRefusal> {
+        let held = self.partials.borrow();
+        let buffer = held
+            .get(standing.index)
+            .ok_or_else(|| ResidentRefusal::Declaration {
+                operation: "contract-split-k",
+                what: "a partial standing this surface does not hold".to_owned(),
+            })?;
+        let zeros = vec![0i64; standing.words];
+        buffer.copy_from_slice(&zeros)?;
+        self.census.borrow_mut().ingress_octets += (standing.words * 8) as u64;
+        Ok(())
+    }
+
     /// Read one retained partial standing back as its exact 128-bit accumulations, indexed
     /// `((a * rows) + row) * out_width + column`. The CPU-side replay of the declared join tree
     /// runs on exactly these words.

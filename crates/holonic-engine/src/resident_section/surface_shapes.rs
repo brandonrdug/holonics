@@ -148,6 +148,72 @@ impl<'chart> ResidentSurface<'chart> {
         self.flat_shape(OPERATION, rows, out_width, needed, work, Vec::new())
     }
 
+    /// The adjoint of the contraction over one aligned tile into the split-K partial standing:
+    /// the returning differential `d` (`rows × tile_rows`) crossing the tile's rows transposed onto
+    /// its `inner` columns, in `sub_splits` spans, each partial kept wide.  `admitted_node_octaves`
+    /// is the bound every wide node is held to, derived from the complete population.
+    pub fn shape_contract_transposed_partial(
+        &self,
+        rows: usize,
+        tile_rows: usize,
+        input_octaves: u32,
+        map: &MountedReadout<'chart>,
+        sub_splits: u32,
+        admitted_node_octaves: u32,
+    ) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "contract-transposed-partial";
+        if tile_rows != map.rows() || tile_rows == 0 || sub_splits == 0 {
+            return Err(ResidentRefusal::WidthDisagrees {
+                operation: OPERATION,
+                left: tile_rows,
+                right: map.rows(),
+            });
+        }
+        let inner = map.dim();
+        let needed = input_octaves + map.entry_octaves() + ceil_log2(tile_rows) + 1;
+        Self::admit_octaves(OPERATION, needed)?;
+        Self::admit_octaves(OPERATION, admitted_node_octaves)?;
+        let mut work = ExactWork::predicted_product(
+            rows,
+            tile_rows,
+            inner,
+            u64::from(input_octaves.max(map.entry_octaves())),
+        );
+        work.entries_written = BigUint::from(4 * (rows * inner) as u64 * u64::from(sub_splits));
+        work.resident(4 * (rows * inner) as u64 * u64::from(sub_splits));
+        work.peak_bits = BigUint::from(u64::from(admitted_node_octaves));
+        work.cumulative_bits =
+            BigUint::from(4 * (rows * inner) as u64 * u64::from(admitted_node_octaves));
+        self.flat_shape(
+            OPERATION,
+            rows,
+            inner * sub_splits as usize,
+            needed.max(admitted_node_octaves),
+            work,
+            Vec::new(),
+        )
+    }
+
+    /// The transposed midpoint seal of a returning differential into a deposit factor: one read
+    /// pair and one write per coordinate, the bound the input's.
+    pub fn shape_transpose_seal(
+        &self,
+        rows: usize,
+        width: usize,
+        input_octaves: u32,
+    ) -> Result<LawShape, ResidentRefusal> {
+        const OPERATION: &str = "transpose-seal";
+        let count = (rows * width) as u64;
+        let mut work = ExactWork::nothing();
+        work.added(count);
+        work.entries_written = BigUint::from(2 * count);
+        work.resident(2 * count);
+        work.peak_bits = BigUint::from(u64::from(input_octaves + 1));
+        work.cumulative_bits = BigUint::from(2 * count * u64::from(input_octaves.max(1)));
+        work.stepped();
+        self.flat_shape(OPERATION, rows, width, input_octaves.max(1), work, Vec::new())
+    }
+
     /// The resident derived-rank contraction `h ↦ U(Vh)`.  Its rank is witnessed against the
     /// mounted junction extent, never used as padding or accepted as a caller aperture.  Rank one
     /// remains the original atom.  Higher rank is enacted as that exact atom population inside one

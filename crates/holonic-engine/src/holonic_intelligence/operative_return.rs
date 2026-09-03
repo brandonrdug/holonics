@@ -128,6 +128,157 @@ impl Drop for CountedOctets<'_> {
     }
 }
 
+/// The factor grains of a deposit, derived from the carrier budget of the consuming factorized
+/// contraction: its stages are admitted in causal order without crediting a negative exponent, so
+/// the presented octaves, the inner reduction, the two directed hands, the rank join, and a margin
+/// of four octaves for the next cycle's input are fixed, and what remains is split between the two
+/// factors.  Returns `(u_shift, v_shift)`.
+pub(super) fn factor_shifts(
+    presented_octaves: u32,
+    inner: usize,
+    rank: usize,
+    differential_octaves: u32,
+) -> Result<(u32, u32), ResidentRefusal> {
+    let ceil_log2 = |n: usize| n.max(1).next_power_of_two().ilog2();
+    let fixed = presented_octaves
+        .saturating_add(ceil_log2(inner))
+        .saturating_add(2)
+        .saturating_add(ceil_log2(rank))
+        .saturating_add(4);
+    let available = ResidentSurface::carrier_octaves()
+        .checked_sub(fixed)
+        .filter(|available| *available >= 8)
+        .ok_or_else(|| ResidentRefusal::Declaration {
+            operation: "deposit",
+            what: format!(
+                "the carrier admits no overlay beside a presented carrier of {presented_octaves} octaves"
+            ),
+        })?;
+    let v_target = available / 2;
+    let u_target = available - v_target;
+    Ok((
+        differential_octaves.saturating_sub(u_target),
+        presented_octaves.saturating_sub(v_target),
+    ))
+}
+
+/// The material of a deposit on one cross-section: the differential that returned to its output
+/// and the carrier it was presented, at one grain.
+pub(super) struct DepositMaterial<'a, 'chart> {
+    pub differential: &'a ResidentSection<'chart>,
+    pub differential_octaves: u32,
+    pub presented: &'a ResidentSection<'chart>,
+    pub presented_octaves: u32,
+    pub grain: ResidentGrain,
+}
+
+/// Deposit one overlay atom `u · v` with `u = −η · dᵀ` and `v = x`: one passage of three
+/// occurrences — the transposed seal of the differential, the carry or coarsening of the
+/// presented carrier, and its midpoint seal.
+pub(super) fn deposit_from_material<'chart>(
+    surface: &'chart ResidentSurface<'chart>,
+    material: DepositMaterial<'_, 'chart>,
+    aperture: NativeReturnAperture,
+) -> Result<(OverlayAtom<'chart>, NativeMorphologyDeposit), ResidentRefusal> {
+    let refuse = |what: String| ResidentRefusal::Declaration {
+        operation: "deposit",
+        what,
+    };
+    let rows = material.differential.rows();
+    if rows == 0
+        || material.presented.rows() != rows
+        || material.differential.grain() != material.grain
+        || material.presented.grain() != material.grain
+    {
+        return Err(refuse("the differential and presented carriers disagree".to_owned()));
+    }
+    let out_rows = material.differential.width();
+    let inner = material.presented.width();
+    let (u_shift, v_shift) =
+        factor_shifts(material.presented_octaves, inner, rows, material.differential_octaves)?;
+    let seal_shape = surface.shape_transpose_seal(rows, out_rows, material.differential_octaves)?;
+    let v_scale = crate::resident_section::DyadicEnclosure {
+        lo: 1,
+        hi: 1,
+        grain: v_shift,
+    };
+    let carry_shape = if v_shift == 0 {
+        surface.shape_carry(rows, inner, material.presented_octaves)?
+    } else {
+        surface.shape_scale(rows, inner, material.presented_octaves, v_scale)?
+    };
+    let u = surface.fresh_section(out_rows, rows, material.grain)?;
+    let v = surface.fresh_section(rows, inner, material.grain)?;
+    let mut builder: PassageBuilder<'chart> = surface.begin_passage(&[vec![], vec![], vec![1]])?;
+    {
+        let lane = builder.open(0, &[])?;
+        surface.record_transpose_seal(&lane, material.differential, u_shift, &u)?;
+    }
+    builder.close(0, &u, seal_shape.needed)?;
+    {
+        let lane = builder.open(1, &[])?;
+        if v_shift == 0 {
+            surface.record_carry(&lane, material.presented, &v)?;
+        } else {
+            surface.record_scale(&lane, material.presented, v_scale, &v)?;
+        }
+    }
+    builder.close(1, &v, carry_shape.needed)?;
+    {
+        let lane = builder.open(2, &[1])?;
+        surface.record_midpoint_seal(&lane, &v, carry_shape.needed)?;
+    }
+    builder.close_fused(2)?;
+    let reading = builder.finish()?.launch()?;
+    if !reading.obstruction.is_empty() {
+        return Err(refuse(format!(
+            "the deposit refused with flags {:#x}",
+            reading.obstruction.joined_flags()
+        )));
+    }
+    let u_octaves = reading.slots.first().map(|slot| slot.max_octave.max(1)).unwrap_or(1);
+    let v_octaves = reading.slots.get(1).map(|slot| slot.max_octave.max(1)).unwrap_or(1);
+    let grain = i32::try_from(material.grain.0).map_err(|_| refuse("the grain overflowed".to_owned()))?;
+    let shift = i32::try_from(aperture.learning_shift)
+        .map_err(|_| refuse("the learning shift overflowed".to_owned()))?;
+    let u_exponent = grain
+        .checked_add(shift)
+        .and_then(i32::checked_neg)
+        .and_then(|exponent| exponent.checked_add(i32::try_from(u_shift).ok()?))
+        .ok_or_else(|| refuse("the deposit exponent overflowed".to_owned()))?;
+    let v_exponent = i32::try_from(v_shift)
+        .ok()
+        .and_then(|shift| shift.checked_sub(grain))
+        .ok_or_else(|| refuse("the presented exponent overflowed".to_owned()))?;
+    let deposit = NativeMorphologyDeposit {
+        rank: rows,
+        cross_section_rows: out_rows,
+        cross_section_width: inner,
+        learning_shift: aperture.learning_shift,
+        series_terms: aperture.series_terms,
+        u_exponent,
+        v_exponent,
+        u_octaves,
+        v_octaves,
+        u_shift,
+        v_shift,
+        differential_widest_interval: reading.slots.first().map(|slot| slot.max_width).unwrap_or(0),
+        next_occurrences: Vec::new(),
+    };
+    Ok((
+        OverlayAtom {
+            u,
+            v,
+            rank: rows,
+            u_exponent,
+            v_exponent,
+            u_octaves,
+            v_octaves,
+        },
+        deposit,
+    ))
+}
+
 /// Enact the return on the resident surface: one passage of four occurrences — the receiver
 /// return, its midpoint seal, the carry of the presented carrier, and its seal — and the overlay
 /// atom the successor retains.
@@ -182,26 +333,12 @@ pub(super) fn enact_return<'chart>(
     let tiles = CountedOctets::upload(surface, &addresses)?;
     let next_resident = CountedOctets::upload(surface, &next_bytes)?;
     let terms = SeriesAperture(aperture.series_terms);
-    // The factor grains are derived from the carrier budget of the consuming factorized
-    // contraction (its stages are admitted in causal order without crediting a negative exponent):
-    // the presented octaves, the inner reduction, the two directed hands, the rank join, and a
-    // margin of four octaves for the next cycle's input are fixed; what remains is split between
-    // the two factors.
-    let ceil_log2 = |n: usize| n.max(1).next_power_of_two().ilog2();
-    let fixed = material
-        .presented_octaves
-        .saturating_add(ceil_log2(material.presented.width()))
-        .saturating_add(2)
-        .saturating_add(ceil_log2(material.rows))
-        .saturating_add(4);
-    let available = ResidentSurface::carrier_octaves()
-        .checked_sub(fixed)
-        .filter(|available| *available >= 8)
-        .ok_or_else(|| refuse(format!("the carrier admits no overlay beside a presented carrier of {} octaves", material.presented_octaves)))?;
-    let v_target = available / 2;
-    let u_target = available - v_target;
-    let v_shift = material.presented_octaves.saturating_sub(v_target);
-    let u_shift = (material.grain.0 + 2).saturating_sub(u_target);
+    let (u_shift, v_shift) = factor_shifts(
+        material.presented_octaves,
+        material.presented.width(),
+        material.rows,
+        material.grain.0 + 2,
+    )?;
     let return_shape =
         surface.shape_receiver_return(material.rows, material.width, tile_width, material.grain, terms)?;
     let v_scale = crate::resident_section::DyadicEnclosure {
@@ -393,6 +530,73 @@ pub(super) fn record_overlay_contribution<'chart>(
         surface.record_factorized_contract(&lane, input, &tile.u_tile, &tile.v, &tile.shape, out)?;
     }
     builder.close(index, out, tile.shape.needed)
+}
+
+/// One tile of a contraction beside its overlay atoms, in one passage: the base contraction, one
+/// contribution per atom, and the re-entry joins in deposit order.  Every shape and section is
+/// founded before the capture opens and every section stays alive until the launch returns.
+/// Returns the joined section and the passage reading; the caller reads out and grades.
+pub(super) fn contract_tile_with_overlay<'chart>(
+    surface: &'chart ResidentSurface<'chart>,
+    input: &ResidentSection<'chart>,
+    input_octaves: u32,
+    readout: &MountedReadout<'chart>,
+    atoms: &[OverlayAtom<'chart>],
+    first_row: usize,
+    tile_rows: usize,
+) -> Result<(ResidentSection<'chart>, crate::resident_section::PassageReading), ResidentRefusal> {
+    let shape = surface.shape_contract(input.rows(), input.width(), input_octaves, readout)?;
+    let successor = surface.fresh_section(input.rows(), tile_rows, input.grain())?;
+    let count = atoms.len();
+    let mut overlay_tiles = Vec::with_capacity(count);
+    let mut contributions = Vec::with_capacity(count);
+    let mut joins = Vec::with_capacity(count);
+    let mut join_shapes = Vec::with_capacity(count);
+    let mut carrier_octaves = shape.needed;
+    for atom in atoms {
+        let overlay = overlay_tile(surface, atom, input, input_octaves, first_row, tile_rows)?;
+        let join = surface.shape_re_entry(input.rows(), tile_rows, carrier_octaves, overlay.needed())?;
+        carrier_octaves = join.needed;
+        contributions.push(surface.fresh_section(input.rows(), tile_rows, input.grain())?);
+        joins.push(surface.fresh_section(input.rows(), tile_rows, input.grain())?);
+        overlay_tiles.push(overlay);
+        join_shapes.push(join);
+    }
+    let mut lineage: Vec<Vec<usize>> = Vec::with_capacity(1 + 2 * count);
+    lineage.push(Vec::new());
+    lineage.extend((0..count).map(|_| Vec::new()));
+    lineage.extend((0..count).map(|at| {
+        let previous = if at == 0 { 0 } else { count + at };
+        vec![previous, 1 + at]
+    }));
+    let mut builder = surface.begin_passage(&lineage)?;
+    {
+        let lane = builder.open(0, &[])?;
+        surface.record_contract(&lane, input, readout, &successor)?;
+    }
+    builder.close(0, &successor, shape.needed)?;
+    for (at, overlay) in overlay_tiles.iter().enumerate() {
+        record_overlay_contribution(surface, &mut builder, 1 + at, overlay, input, &contributions[at])?;
+    }
+    for at in 0..count {
+        let index = count + 1 + at;
+        let previous = if at == 0 { 0 } else { count + at };
+        let carrier = if at == 0 { &successor } else { &joins[at - 1] };
+        {
+            let lane = builder.open(index, &[previous, 1 + at])?;
+            surface.record_re_entry(&lane, carrier, &contributions[at], &joins[at])?;
+        }
+        builder.close(index, &joins[at], join_shapes[at].needed)?;
+    }
+    let reading = builder.finish()?.launch()?;
+    let joined = match joins.pop() {
+        Some(last) => last,
+        None => successor,
+    };
+    drop(joins);
+    drop(contributions);
+    drop(overlay_tiles);
+    Ok((joined, reading))
 }
 
 #[cfg(test)]

@@ -263,6 +263,144 @@ impl<'chart> ResidentSurface<'chart> {
         )
     }
 
+    /// The adjoint of the contraction over one aligned tile into slots
+    /// `slot_base .. slot_base + sub_splits` of a retained partial standing.
+    #[allow(clippy::too_many_arguments)]
+    pub fn record_contract_transposed_partial(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        map: &MountedReadout<'chart>,
+        standing: &PartialStanding,
+        slot_base: u32,
+        sub_splits: u32,
+        admitted_node_octaves: u32,
+    ) -> Result<(), ResidentRefusal> {
+        if input.width != map.rows()
+            || standing.rows != input.rows
+            || standing.out_width != map.dim()
+            || slot_base + sub_splits > standing.splits
+        {
+            return Err(ResidentRefusal::Declaration {
+                operation: "contract-transposed-partial",
+                what: format!(
+                    "the differential is {}x{}, the tile {} rows x {}, the standing {}x{}x{}, slots {}..{}",
+                    input.rows,
+                    input.width,
+                    map.rows(),
+                    map.dim(),
+                    standing.splits,
+                    standing.rows,
+                    standing.out_width,
+                    slot_base,
+                    slot_base + sub_splits
+                ),
+            });
+        }
+        let mut params = Params::new();
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.rows as u32)
+            .u32(input.width as u32)
+            .ptr(map.raw_resident())
+            .u32(map.dim() as u32)
+            .u32(sub_splits)
+            .u32(slot_base)
+            .ptr(standing.pointer)
+            .u32(admitted_node_octaves)
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_contract_transposed_partial",
+            input.rows * map.dim() * sub_splits as usize,
+            &mut params,
+            "contract-transposed-partial",
+        )
+    }
+
+    /// The single-rounding join of a retained partial standing into `out`, under the fixed
+    /// ascending tree.  `map_e` is the exponent every partial was accumulated at.
+    pub fn record_partial_join(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        standing: &PartialStanding,
+        map_e: i32,
+        admitted_node_octaves: u32,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        if out.rows() != standing.rows || out.width() != standing.out_width {
+            return Err(ResidentRefusal::RowsDisagree {
+                operation: "partial-join",
+                left: standing.rows * standing.out_width,
+                right: out.rows() * out.width(),
+            });
+        }
+        let mut params = Params::new();
+        params
+            .ptr(standing.pointer)
+            .u32(standing.splits)
+            .u32(standing.rows as u32)
+            .u32(standing.out_width as u32)
+            .i32(map_e)
+            .i32(out.grain.0 as i32)
+            .u32(admitted_node_octaves)
+            .u32(LaneTree::Descending.word())
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_contract_join",
+            standing.rows * standing.out_width,
+            &mut params,
+            "partial-join",
+        )
+    }
+
+    /// The transposed midpoint seal: `out[o, t] = −mid(input[t, o]) · 2^-shift` as a point.
+    pub fn record_transpose_seal(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        input: &ResidentSection<'chart>,
+        shift: u32,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        if out.rows() != input.width || out.width() != input.rows {
+            return Err(ResidentRefusal::RowsDisagree {
+                operation: "transpose-seal",
+                left: input.rows * input.width,
+                right: out.rows() * out.width(),
+            });
+        }
+        let mut params = Params::new();
+        params
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(input.rows as u32)
+            .u32(input.width as u32)
+            .u32(shift)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_transpose_seal",
+            input.rows * input.width,
+            &mut params,
+            "transpose-seal",
+        )
+    }
+
     /// Record the rank-one junction as one device kernel.  The parameter order mirrors the
     /// kernel's two resident maps and keeps both factor ranges in the footprint certificate.
     pub fn record_factorized_contract(
