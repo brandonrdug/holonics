@@ -149,13 +149,32 @@ clause was not exercised. The receipt is
 
 ### SKE2 -- excitation and the cone by intervention
 
-[definition] Present a declared family to the resident operator. For each occurrence, the cone at
-the declared receiver is the support returned by SKE1, verified by withdrawal: withdrawing outside
-the cone leaves the receiver face unchanged; withdrawing a cone population changes it.
+[definition] Present a declared family to the resident operator. For each occurrence, the sites
+are the output coordinates of every contraction population at once, and the cone at the declared
+receiver is founded by joint withdrawal: the SKE1 return read per site (support, magnitude,
+first-order contribution) orders what is tried, and the cone is the smallest suffix of that order
+whose complement, withdrawn as one population, leaves the receiver face unchanged. Withdrawing the
+complement leaves the face; withdrawing the cone changes it.
+
+[counterexample; measured] The first letter of this phase read the cone at a population as the
+SKE1 support at that population verified by withdrawing that population alone. On the resident
+operator the sealed support is the whole operator (1,595,187 of 1,595,392 sites) and withdrawing
+any one population's support alone leaves the face unchanged: the load is joint, and `IsCone` is
+a law over withdrawals of any population of the ecology's sites. The phase was corrected in place
+on 2026-09-03 before it passed; the per-population control is retained as the counterexample.
 
 **Pass SKE2:** [definition] for every occurrence of the family both withdrawal controls return on
 the card; a magnitude ranking is exhibited that does not determine the cone; the cones are
 reported per population with their exact supports.
+
+[established-bounded; implemented-exact; measured] **SKE2 PASSED at its corrected scope.** Five
+variants of one algebraic problem through the application's turn markers; every occurrence's
+null withdrawal reproduced the face and exact row; cones of 1.85 % to 82.12 % of the 1,595,392
+sites, each closed by the complement withdrawn (unchanged) and the cone withdrawn (changed) over 22
+monotone probes, in 73 to 79 s per occurrence; no magnitude threshold determines the cone except in
+a handful of populations; two occurrences with equal faces have cones of 29,588 and 1,310,213
+sites. The receipt is
+[`the SKE2 return`](../research/records/2026-09-03_SKE2_THE_CONE_IS_FOUNDED_BY_JOINT_WITHDRAWAL_ALONG_THE_EXCITATION_AND_A_PER_POPULATION_SUPPORT_IS_NOT_A_CONE.md).
 
 ### SKE3 -- identification
 

@@ -41,14 +41,16 @@ Item 6 and the shared atlas in `AGENTS.md` exist so that cannot recur.
 
 ## Current position
 
-**Current frontier:** SKE2
+**Current frontier:** SKE3
 
 [definition] The active scheduler is the Soulkiller excitation contract,
 [`blueprint/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md`](blueprint/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md):
 the resident exact realization is apparatus, the return is the signature quotient of a declared
 family as cone-restricted ecologies with insufficiency; `SKE0` (the formal excitation-founded
 quotient) and `SKE1` (the adjoint return through every reaction, 1,271 operations in 3.3 s,
-344 cross-sections deposited) passed; `SKE2` (excitation and the cone by intervention) is current. The completed HNA contract is
+344 cross-sections deposited) and `SKE2` (the cone by joint intervention: five occurrences, the
+complement withdrawn leaves the face and the cone withdrawn changes it, no magnitude threshold
+determines it) passed; `SKE3` (identification, the signature quotient) is current. The completed HNA contract is
 [`blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
 HNA0 returned the recurrent formal owner. HNA1 returned the complete source-neutral text-operator
 ecology: 1,275 nodes over 42 layers, all 719 coefficient populations resident once, 665 configured

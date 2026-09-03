@@ -63,7 +63,7 @@ are provenance, not pickup obligations.
 
 ## Current position
 
-**Current frontier:** SKE2
+**Current frontier:** SKE3
 
 [definition] Brandon's direct request of 2026-09-03 activates the fixed `SKE0--SKE5` Soulkiller
 campaign, ordered below. It follows the completed HNA campaign and consumes its resident exact
@@ -183,8 +183,8 @@ The order is fixed:
 1. `SKE0` -- the excitation-founded quotient, formally -- **PASSED**;
 2. `SKE1` -- the adjoint return through every reaction (the cone instrument; completes HNA4) --
    **PASSED**;
-3. `SKE2` -- excitation and the cone by intervention -- **CURRENT**;
-4. `SKE3` -- identification: the signature quotient of a declared family;
+3. `SKE2` -- excitation and the cone by intervention -- **PASSED** at its corrected scope;
+4. `SKE3` -- identification: the signature quotient of a declared family -- **CURRENT**;
 5. `SKE4` -- condensation and seal through `soulkiller::dismantle`; and
 6. `SKE5` -- Eros composes the classes and the recurrence runs on them.
 
@@ -205,6 +205,15 @@ operation of the cycle on the resident operator in 3.3 s, with every reaction's 
 certified enclosure and a card control for each, deposited on 344 cross-sections, and the next
 cycle's face differs from the control. Its receipt is
 [`the SKE1 return`](../research/records/2026-09-03_SKE1_THE_RETURN_CROSSED_EVERY_REACTION_OF_THE_CYCLE_AND_DEPOSITED_ON_EVERY_CROSS_SECTION.md).
+
+[established-bounded; implemented-exact; measured] SKE2 founded the cone by joint intervention on
+the resident operator: a declared site population across all 344 contraction populations is
+withdrawn on the card and the cycle re-enacted from the checkpoints; the excitation orders a
+bisection whose every exclusion is a withdrawal returned unchanged; the complement withdrawn
+leaves the face and the cone withdrawn changes it on all five occurrences of a declared family,
+and no magnitude threshold determines the cone. The per-population support of the first letter
+was refuted and the phase corrected in place. Its receipt is
+[`the SKE2 return`](../research/records/2026-09-03_SKE2_THE_CONE_IS_FOUNDED_BY_JOINT_WITHDRAWAL_ALONG_THE_EXCITATION_AND_A_PER_POPULATION_SUPPORT_IS_NOT_A_CONE.md).
 
 [counterexample; source-inspected] The audit
 [`2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](../research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md)

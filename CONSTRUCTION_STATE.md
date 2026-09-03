@@ -16,7 +16,7 @@ mechanisms retain their scoped grades.
 
 ## Current frontier
 
-**Current frontier:** SKE2
+**Current frontier:** SKE3
 
 [definition] Brandon's direct request of 2026-09-03 activates the fixed `SKE0--SKE5` Soulkiller
 campaign under
@@ -26,8 +26,8 @@ manifestation grade and the apparatus, not the return. The return is the quotien
 family of occurrences by equality of complete causal signatures, each class condensed to the
 local-current ecology restricted to the cone the family made load-bearing, sealed with the
 insufficiency. The adjoint return through every reaction (`SKE1`) is one instrument for
-cultivation and dissection. `SKE2` is current: excitation and the cone by intervention. The
-audit is
+cultivation and dissection; `SKE2` founded the cone by joint intervention. `SKE3` is current:
+identification, the signature quotient of the declared family. The audit is
 [`research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md).
 
 [proved-derived; formal-checked] SKE0 returned `HolonicExcitationFoundedQuotient.lean`: the
@@ -48,6 +48,18 @@ projection; 344 cross-sections received rank-5 deposits (overlay rank 1,720) and
 emitted words differ from the control and from the tied-only deposit. Gains, scalars, and embedding
 rows receive no deposit yet. The receipt is
 [`research/records/2026-09-03_SKE1_THE_RETURN_CROSSED_EVERY_REACTION_OF_THE_CYCLE_AND_DEPOSITED_ON_EVERY_CROSS_SECTION.md`](research/records/2026-09-03_SKE1_THE_RETURN_CROSSED_EVERY_REACTION_OF_THE_CYCLE_AND_DEPOSITED_ON_EVERY_CROSS_SECTION.md).
+
+[established-bounded; implemented-exact; measured] SKE2 returned the cone by joint intervention:
+sites are the output coordinates of all 344 contraction populations (1,595,392); a declared site
+population is withdrawn on the card and the cycle re-enacted from the retained checkpoints; the
+excitation of the selected face is read per site (support, magnitude, first-order contribution)
+and orders a bisection whose every exclusion is a withdrawal returned unchanged; the complement
+withdrawn leaves the face and the cone withdrawn changes it on all five occurrences of a declared
+family (cones of 1.85 % to 82.12 % of the sites, 73 to 79 s per occurrence), no magnitude
+threshold determines the cone, and two equal faces have cones of 29,588 and 1,310,213 sites. The
+blueprint's first letter (a per-population support verified alone) was refuted on the card and
+corrected in place. The receipt is
+[`research/records/2026-09-03_SKE2_THE_CONE_IS_FOUNDED_BY_JOINT_WITHDRAWAL_ALONG_THE_EXCITATION_AND_A_PER_POPULATION_SUPPORT_IS_NOT_A_CONE.md`](research/records/2026-09-03_SKE2_THE_CONE_IS_FOUNDED_BY_JOINT_WITHDRAWAL_ALONG_THE_EXCITATION_AND_A_PER_POPULATION_SUPPORT_IS_NOT_A_CONE.md).
 
 [counterexample; source-inspected] The HNA1 receipt's phrase "one actual Soulkiller return" is
 withdrawn: the graph port excites nothing, carries no insufficiency, and never crosses the
