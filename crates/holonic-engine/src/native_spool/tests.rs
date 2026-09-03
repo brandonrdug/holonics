@@ -1,21 +1,15 @@
 use super::*;
 use crate::{
-    BoundaryId, ExactUnitConicPhase, OccurrencePort,
+    BoundaryId, OccurrencePort,
     native_ecology::holonic_intelligence::{
         CarrierRank, CycleRank, DimensionFace, DimensionObstruction, DismantlingBoundaryReturn,
         ForeignConfigurationChart, IncidenceNullity, IncidenceRank, NativeTransportRequest,
         RestedTransportEcology, profile_dismantling_return,
     },
 };
+use super::fixture::{current, scaffold, spool, thread};
 use num_bigint::BigInt;
 use relational_geometry::Rat;
-
-fn current(real: i64, imaginary: i64) -> ExactComplexWaveCurrent {
-    ExactComplexWaveCurrent::new(
-        Rat::from_integer(BigInt::from(real)),
-        Rat::from_integer(BigInt::from(imaginary)),
-    )
-}
 
 #[test]
 fn factorized_section_block_grouping_does_not_change_coordinates_or_current() {
@@ -69,182 +63,6 @@ fn intrinsic_representation_rank_is_derived_from_the_complete_section() {
     );
 }
 
-fn thread(
-    address: &str,
-    event: u64,
-    entering_boundary: u64,
-    emitting_boundary: u64,
-    from: u64,
-    to: u64,
-    generator: u64,
-) -> NativeThread {
-    let occurrence = EventId(event);
-    let from = NativeStateId(from);
-    let to = NativeStateId(to);
-    let receiver = ReceiverId(9);
-    NativeThread {
-        schema: NATIVE_THREAD_SCHEMA.to_owned(),
-        address: address.to_owned(),
-        entering_boundary: BoundaryId(entering_boundary),
-        emitting_boundary: BoundaryId(emitting_boundary),
-        entering_carrier: "native-complex-section".to_owned(),
-        emitting_carrier: "native-complex-section".to_owned(),
-        occurrences: vec![NativeThreadOccurrence {
-            occurrence,
-            predecessor: None,
-            entering_port: OccurrencePort::input(occurrence, 0),
-            emitting_port: OccurrencePort::output(occurrence, 0),
-            entering_native: from,
-            emitting_native: to,
-        }],
-        native_support: BTreeSet::from([from, to]),
-        incidence: vec![NativeIncidenceTerm {
-            occurrence,
-            from,
-            to,
-            coefficient: 1,
-        }],
-        parametrons: vec![
-            NativeParametronCell {
-                native: from,
-                section: current(1, 0),
-                current: current(0, 1),
-                relative_phase: ExactUnitConicPhase::identity(),
-                hand: NativeThreadHand::Along,
-            },
-            NativeParametronCell {
-                native: to,
-                section: current(0, 1),
-                current: current(-1, 0),
-                relative_phase: ExactUnitConicPhase::identity(),
-                hand: NativeThreadHand::Along,
-            },
-        ],
-        sections: vec![NativeOccurrenceSection::from_currents(
-            occurrence,
-            current(0, 1),
-            current(-1, 0),
-        )],
-        constitutive_responses: vec![
-            NativeConstitutiveResponse {
-                native: from,
-                receiver,
-                presented: current(1, 0),
-                stored: current(0, 1),
-            },
-            NativeConstitutiveResponse {
-                native: to,
-                receiver,
-                presented: current(0, 1),
-                stored: current(-1, 0),
-            },
-        ],
-        chronology: vec![InputId(generator)],
-        receiver_consequences: vec![
-            NativeReceiverConsequence {
-                native: from,
-                receiver,
-                observation: Observation(from.0 + 100),
-            },
-            NativeReceiverConsequence {
-                native: to,
-                receiver,
-                observation: Observation(to.0 + 100),
-            },
-        ],
-        obstruction: None,
-        open_exterior: vec!["receiver/history outside the admitted family".to_owned()],
-        reconstruction_fibre: BTreeSet::from([occurrence]),
-    }
-}
-
-fn spool() -> NativeSpool {
-    let left = thread("thread/turn-out", 1, 10, 11, 0, 1, 7);
-    let right = thread("thread/turn-back", 2, 11, 10, 1, 0, 7);
-    NativeSpool {
-        schema: NATIVE_SPOOL_SCHEMA.to_owned(),
-        address: "spool/native-turn".to_owned(),
-        native_population: BTreeSet::from([NativeStateId(0), NativeStateId(1)]),
-        receiver_family: BTreeSet::from([ReceiverId(9)]),
-        generator_family: BTreeSet::from([InputId(7)]),
-        threads: vec![left, right],
-        serial_pullbacks: vec![
-            NativeSerialPullback {
-                left_thread: "thread/turn-out".to_owned(),
-                right_thread: "thread/turn-back".to_owned(),
-                joining_boundary: BoundaryId(11),
-                occurrences: BTreeSet::from([NativePullbackOccurrence {
-                    left: EventId(1),
-                    right: EventId(2),
-                    joining_native: NativeStateId(1),
-                }]),
-            },
-            NativeSerialPullback {
-                left_thread: "thread/turn-back".to_owned(),
-                right_thread: "thread/turn-out".to_owned(),
-                joining_boundary: BoundaryId(10),
-                occurrences: BTreeSet::from([NativePullbackOccurrence {
-                    left: EventId(2),
-                    right: EventId(1),
-                    joining_native: NativeStateId(0),
-                }]),
-            },
-        ],
-        generator_descents: vec![NativeGeneratorDescent {
-            generator: InputId(7),
-            steps: vec![
-                NativeGeneratorStep {
-                    from: NativeStateId(0),
-                    to: NativeStateId(1),
-                    thread: "thread/turn-out".to_owned(),
-                },
-                NativeGeneratorStep {
-                    from: NativeStateId(1),
-                    to: NativeStateId(0),
-                    thread: "thread/turn-back".to_owned(),
-                },
-            ],
-            open_domain: BTreeSet::new(),
-        }],
-        receiver_factors: vec![
-            ReceiverFactor {
-                native: NativeStateId(0),
-                receiver: ReceiverId(9),
-                observation: Observation(100),
-            },
-            ReceiverFactor {
-                native: NativeStateId(1),
-                receiver: ReceiverId(9),
-                observation: Observation(101),
-            },
-        ],
-        mutual_constitutive_responses: Vec::new(),
-        reconstruction_fibres: vec![
-            NativeCollapsedFibre {
-                native: NativeStateId(0),
-                occurrences: BTreeSet::from([EventId(2)]),
-            },
-            NativeCollapsedFibre {
-                native: NativeStateId(1),
-                occurrences: BTreeSet::from([EventId(1)]),
-            },
-        ],
-        shortest_separators: Vec::new(),
-        interchanges: Vec::new(),
-        open_exterior: vec!["larger receiver family".to_owned()],
-    }
-}
-
-fn scaffold() -> NativeTransportScaffold {
-    NativeTransportScaffold {
-        schema: NATIVE_TRANSPORT_SCAFFOLD_SCHEMA.to_owned(),
-        address: "scaffold/native-turn".to_owned(),
-        spools: vec![spool()],
-        compositions: Vec::new(),
-        open_exterior: vec!["another compatible spool".to_owned()],
-    }
-}
-
 fn ordered_consequence(
     order: Vec<String>,
     successor: NativeStateId,
@@ -260,8 +78,7 @@ fn ordered_consequence(
 }
 
 fn thread_deposit() -> NativeThreadDeposit {
-    let mut deposited_thread = thread("thread/cultivated-return", 3, 10, 11, 0, 1, 7);
-    deposited_thread.occurrences[0].predecessor = Some(EventId(2));
+    let deposited_thread = thread("thread/cultivated-return", 3, Some(2), 10, 11, 0, 1, 7);
     let candidate_left = current(1, 0);
     let candidate_right = current(1, 0);
     let returned_left = current(2, 0);
@@ -786,7 +603,7 @@ fn serial_receipt_must_retain_the_complete_pullback_population() {
 
 #[test]
 fn an_unobstructed_all_zero_thread_is_not_productive() {
-    let mut thread = thread("thread/zero", 4, 20, 21, 0, 1, 7);
+    let mut thread = thread("thread/zero", 4, None, 20, 21, 0, 1, 7);
     for cell in &mut thread.parametrons {
         cell.section = ExactComplexWaveCurrent::zero();
         cell.current = ExactComplexWaveCurrent::zero();
