@@ -203,7 +203,7 @@ is
 de Bruijn--Newman time is `t = -4u` after `s = 1/2 + i z/2`. Its Lean theorems stand, but the direct
 standard-`H_t` interpretation is retracted pending the RH0/RH1 bridge.
 
-**RH line position:** FT2
+**RH line position:** FT3
 
 [definition] Brandon's direct instruction of 2026-09-03 activates the `FT0--FT6` Foster-tank and
 threshold campaign on the RH line under
@@ -221,7 +221,12 @@ Mellin integral of the modified theta kernel at `¼`, bounded by the theta tail)
 `RH/FosterCount.lean` returned the global multiplicity, `N(R) ≤ K R log R` for `R ≥ 3` with `K`
 exhibited, and `Σ_ρ m_ρ |ρ − ½|^{−2} < ∞`; FT0 is restated unconditionally. The receipt is
 [`research/records/2026-09-03_FT1_THE_CENTRE_IS_POSITIVE_THE_COUNT_IS_R_LOG_R_AND_THE_INVERSE_SQUARES_CONVERGE.md`](research/records/2026-09-03_FT1_THE_CENTRE_IS_POSITIVE_THE_COUNT_IS_R_LOG_R_AND_THE_INVERSE_SQUARES_CONVERGE.md).
-`FT2` is current: the paired canonical product for the entire growth class.
+[proved-derived; formal-checked] FT2 passed: `RH/FosterProduct.lean` returned the paired
+canonical product over the zeros repeated by multiplicity, entire, reflection symmetric, vanishing
+exactly on the zeros of `ξ`, with the Foster series as its log-derivative off the zeros. The
+receipt is
+[`research/records/2026-09-03_FT2_THE_PAIRED_CANONICAL_PRODUCT_IS_ENTIRE_AND_ITS_LOG_DERIVATIVE_IS_THE_FOSTER_SERIES.md`](research/records/2026-09-03_FT2_THE_PAIRED_CANONICAL_PRODUCT_IS_ENTIRE_AND_ITS_LOG_DERIVATIVE_IS_THE_FOSTER_SERIES.md).
+`FT3` is current: `ξ² = ξ(½)² P` and the entire-face thread law.
 
 [definition] Use `c_CD` for the Copson--de Bruijn sharp coefficient and reserve `Λ_DN` for the
 coordinate-corrected de Bruijn--Newman threshold. The correction record is

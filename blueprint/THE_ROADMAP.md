@@ -89,7 +89,14 @@ convergence dichotomy. Coefficient-specific branch selection and a certified dec
 research and schedule nothing. Brandon's direct correction of 2026-09-02 closes HTP at this bounded
 handoff and activates the engine HNA campaign.
 
-**RH line position:** FT2
+**RH line position:** FT3
+
+[proved-derived; formal-checked] FT2 passed: `RH/FosterProduct.lean` returned the paired canonical
+product over the zeros repeated by multiplicity, entire and reflection symmetric, vanishing exactly
+on the zeros of `ξ`, with `P′/P` the Foster series `Σ_u m_u · 2(z − ½)/((z − ½)² − (u − ½)²)` off
+the zeros; the contract's FT2 envelope is withdrawn in place and the order `2 m_u` moves to FT3.
+The receipt is
+[`the FT2 record`](../research/records/2026-09-03_FT2_THE_PAIRED_CANONICAL_PRODUCT_IS_ENTIRE_AND_ITS_LOG_DERIVATIVE_IS_THE_FOSTER_SERIES.md).
 
 [proved-derived; formal-checked] FT1 passed: `RH/XiCentre.lean` returned `ξ(½) > 0` through the
 folded Mellin integral of Mathlib's modified theta kernel at the symmetric point, bounded by the
@@ -116,9 +123,9 @@ and each advances on its own gate. The order is fixed:
    positivity/seam equivalence -- **PASSED**;
 2. `FT1` -- the centre value `ξ(½) ≠ 0`, the count `N(R) ≤ C R log R`, and the exponent of
    convergence -- **PASSED**;
-3. `FT2` -- the paired canonical product for the entire growth class -- **CURRENT**;
+3. `FT2` -- the paired canonical product for the entire growth class -- **PASSED**;
 4. `FT3` -- Hadamard, the full Foster form, and the entire-face thread law (discharging the
-   `RodgersTaoZeroDynamics` port);
+   `RodgersTaoZeroDynamics` port) -- **CURRENT**;
 5. `FT4` -- the entire-face flow, `Λ_DN` defined, and `RH ⟺ Λ_DN ≤ 0` against the anchor;
 6. `FT5` -- the flowed explicit formula: the bound integer comb against the divisor of
    `heatE t ξ`; and

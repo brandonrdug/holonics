@@ -90,21 +90,28 @@ already computes.
 
 ### FT2 — the paired canonical product
 
-For the growth class `HasGrowth f A B ρ` with `ρ < 2` already used by the entire flow, and for an
-even `f` with `f 0 ≠ 0`, return the paired product `P(z) = Π_ρ′ (1 − z²/ρ′²)` as an entire
-function with the divisor of `f`, locally uniformly convergent by FT1, with its own order-one
-envelope.
+Return the product `P(z) = Π_{i} (1 − ((z − ½)/(u_i − ½))²)` over the zeros of `ξ` repeated by
+multiplicity, locally uniformly convergent on every centred disc by FT1: `P` entire, `P`
+reflection symmetric, the zero set of `P` equal to the zero set of `ξ`, and off the zeros
+`P′/P = Σ_u m_u · 2(z − ½)/((z − ½)² − (u − ½)²)`, the Foster series over all zeros. Each pair
+contributes twice, so `P` is the paired product squared; FT3 compares it with `ξ²`.
+*Corrected in place 2026-09-03:* the envelope of `P` first asked for here is not needed by FT3's
+route and is withdrawn; the order `2 m_u` of `P` at each zero is established in FT3 where it is used.
 
-**Pass FT2:** `P` entire, `P` even, divisor equality on every disc, envelope proved.  
-**Falsifier:** a disc on which the divisor of `P` and the divisor of `f` differ.
+**Pass FT2:** `P` entire, `P` symmetric, zero sets equal, the log-derivative series proved.  
+**Falsifier:** a disc on which the zero set of `P` and the zero set of `ξ` differ.
 
 ### FT3 — Hadamard, and the entire-face thread law
 
-Return `f = f(0) · P` for the class of FT2, by the quotient's nonvanishing, evenness, and the
-Borel--Carathéodory control of `LogDerivativeRemainder` on growing discs; hence the full Foster
-form as a convergent series, and the principal-value comb flux at the entire face. Discharge the
-port `PhaseFlowLedger.RodgersTaoZeroDynamics` for `heatE t ξ` at every `t` for which
-`HeatFlowEntire` returns an entire function of the class.
+Return `ξ² = ξ(½)² · P` by the finite/tail split of `P` on every centred disc (the finite part is
+the square of the symmetric factorization's polynomial up to a constant, the tail nonvanishing),
+so that `ξ²/P` is entire and nonvanishing; its log-derivative `2ξ′/ξ − P′/P` is bounded by
+`O(log(|z| + 2))` through Landau's remainder (FT0) and the tail of the Foster series (FT1), hence
+constant by Cauchy's estimate, hence zero by the reflection symmetry. Hence the full Foster form
+as a convergent series, `ξ′/ξ = Σ_u m_u (z − ½)/((z − ½)² − (u − ½)²)`, and the principal-value
+comb flux at the entire face. Discharge the port `PhaseFlowLedger.RodgersTaoZeroDynamics` for
+`heatE t ξ` at every `t` for which `HeatFlowEntire` returns an entire function of the class, the
+same argument running on `heatE t ξ` once its Landau bound and count are returned.
 
 **Pass FT3:** `RodgersTaoZeroDynamics (fun t => heatE t riemannXi)` is a theorem, not a port; the
 docstring of `ZeroDynamicsEntire` no longer names its second half open.  

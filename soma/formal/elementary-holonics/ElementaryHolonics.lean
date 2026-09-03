@@ -91,6 +91,7 @@ import ElementaryHolonics.RH.HeatFlowStackedSeam
 import ElementaryHolonics.RH.XiCentre
 import ElementaryHolonics.RH.FosterTanks
 import ElementaryHolonics.RH.FosterCount
+import ElementaryHolonics.RH.FosterProduct
 import ElementaryHolonics.RH.LogDerivativeRemainder
 import ElementaryHolonics.RH.LandauLemma
 import ElementaryHolonics.RH.ZeroFactorizationExists
