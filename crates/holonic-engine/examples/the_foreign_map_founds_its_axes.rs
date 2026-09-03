@@ -331,7 +331,7 @@ struct Transport {
     /// crosses the frame boundary above. A bare count over 163,840 entries and one over 327,680 are
     /// not comparable — the horizon law: magnitudes do not cross, only a `Ratio` does. Each block's
     /// population divides the sweep's common denominator exactly, so this rebase has **zero
-    /// remainder**; it is `H.0104`, not a normalisation.
+    /// remainder**; it is `H.0106`, not a normalisation (id corrected 2026-09-03; `H.0104` is Lambda).
     negatives_rebased: u64,
     /// The octave count of the widest entry — the material's own span in doublings.
     octaves: u64,
@@ -719,7 +719,7 @@ fn main() -> Result<(), String> {
     // Clearing one common power of two makes the carrier integral:  Phi = 2^-k M.  Then
     //     char_M(t) = 2^(nk) * char_Phi(2^-k t)
     // so every eigenvalue of Phi is one of M's divided by 2^k. Invertible, remainder ZERO -- a
-    // rebase (H.0104), not a compression.
+    // rebase (H.0106; citation corrected 2026-09-03, H.0104 is Lambda), not a compression.
     let mut shift = 0i64;
     for r in &phi {
         for e in r {

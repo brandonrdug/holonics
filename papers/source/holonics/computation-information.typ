@@ -499,7 +499,7 @@
     kind: "Theorem",
     grade: "proved-derived",
     title: [Loss is non-commutation; recovery adjoins a channel; the three species differ only by remainder],
-    depends: ("H.0012", "H.0016", "H.0104", "H.0210", "H.0219", "H.0411"),
+    depends: ("H.0012", "H.0016", "H.0106", "H.0210", "H.0219", "H.0411"),
     statement: [
       For a compression $q:X arrow.r Q$ and receiver $rho:X arrow.r Y$, H.0016's
       factorization $rho=overline(rho) compose q$ *is* commutativity of the
@@ -520,7 +520,7 @@
     ],
     transformations: [
       Three species of change of form differ only in what remainder they carry,
-      and the corpus already types all three: *rebase* (H.0104) is an invertible
+      and the corpus already types all three: *rebase* (H.0106) is an invertible
       conjugacy with **zero** remainder; *condensation* replaces a far population
       by a compact realizer with a **certified** remainder; *compression*
       (H.0016) is a quotient whose remainder is the collapsed population,
@@ -546,7 +546,7 @@
     kind: "Equivalence",
     grade: "proved-derived",
     title: [The kernel is the collapsed-pair population, and the compression trichotomy classifies reversibility],
-    depends: ("H.0016", "H.0104", "H.0262", "H.0420"),
+    depends: ("H.0016", "H.0106", "H.0262", "H.0420"),
     statement: [
       For a linear receiver $A$: $A x = A y$ exactly when $x - y in ker(A)$,
       so the kernel is the collapsed-pair population and rank plus nullity

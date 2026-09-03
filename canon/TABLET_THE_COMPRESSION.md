@@ -26,9 +26,13 @@ entities, and the chart is arbitrary.*
 
 `H.0420` already types them and this tablet does not restate them:
 
+[Citation corrected 2026-09-03: `H.0104` is Λ, the boundary correspondence
+(`papers/source/holonics/algorithms.typ:128`); the rebase claim is `H.0106`, "Invertible
+rebase is execution conjugacy" (`algorithms.typ:202`).]
+
 | species | remainder |
 |---|---|
-| **rebase** — invertible conjugacy (`H.0104`) | **zero** |
+| **rebase** — invertible conjugacy (`H.0106`) | **zero** |
 | **condensation** — far population → compact realizer | **certified** |
 | **compression** — quotient by a declared family (`H.0016`) | the **collapsed population**, family-relative |
 

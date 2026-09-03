@@ -843,7 +843,7 @@ pub struct SeparationComplex {
 // exactly two, `d(d−1)/2 = C(d,2)`. Group-theoretically that is the point-stabilizer decomposition
 // of the pair space, and it is an atlas rather than an approximation. So a caller who cannot hold
 // the pair chart does not lose anything: it reads the same object through [`pair_atlas`], `d`
-// charts of degree one. **That is a rebase — `H.0104`, invertible, remainder zero — not a loss.**
+// charts of degree one. **That is a rebase — `H.0106` (id corrected 2026-09-03; `H.0104` is Lambda), invertible, remainder zero — not a loss.**
 
 /// Which chart of one surface's separation object a caller is reading in.
 ///

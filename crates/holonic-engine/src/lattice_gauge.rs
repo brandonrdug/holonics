@@ -986,7 +986,7 @@ pub fn characteristic_polynomial(
 /// interval, and no search. `Z/p` has `p` elements; the question is answered by looking at all of
 /// them.
 ///
-/// This is `H.0104`'s rebase and nothing more: an invertible change of chart with **zero remainder**,
+/// This is `H.0106`'s rebase and nothing more (id corrected 2026-09-03; `H.0104` is Lambda): an invertible change of chart with **zero remainder**,
 /// the free stroke. Without it, `rational_root_census` bounds its search by the Cauchy bound
 /// `max |coefficient| + 1` and runs Sturm sequences across it. On a real transport read off a
 /// pretrained map that interval was measured at half-width `2^770` — because a degree-8 polynomial

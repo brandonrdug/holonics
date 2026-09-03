@@ -70,11 +70,15 @@ mount -> differentiate -> conduct/diffuse -> interact/glue
 `open`: the bounded owners have not yet returned this whole cycle as one continuing resident
 ecology without CPU semantic phase choreography.
 
-## 4. Compression retains the reconstruction fiber
+## 4. Compression retains the preimage fibre
+
+[Renamed 2026-09-02: `ReconstructionFiber` is retracted as a misnomer for a literal inverse
+image; the object and the law are unchanged
+(`research/records/2026-09-02_TENSOR_LENSES_RETURN_TENSOR_FACES_AND_CAUSAL_NATURAL_HOLONS_RETAIN_PREIMAGE_FIBRES.md`).]
 
 `project-postulate`: compression follows declared consequence. A condensation is exact only when
 every admitted receiver and successor history factors through it. The inverse image remains the
-`ReconstructionFiber`; a richer return may refine or reopen it. Misspellings, surface gauges,
+`PreimageFibre`; a richer return may refine or reopen it. Misspellings, surface gauges,
 compressed images, and unknown code faces all retain plural compatible predecessors until a
 declared later consequence separates them.
 

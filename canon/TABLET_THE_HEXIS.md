@@ -119,7 +119,10 @@ rho Phi_Y T_gamma = rho S_gamma Phi_X
 ```
 
 for every admitted `rho` and successor history `gamma`. Otherwise `chi`, the collapsed population,
-and shortest separating histories remain in the `ReconstructionFiber`.
+and shortest separating histories remain in the `PreimageFibre`.
+[Renamed 2026-09-02: `ReconstructionFiber` is retracted as a misnomer for a literal inverse
+image; the object and the law are unchanged
+(`research/records/2026-09-02_TENSOR_LENSES_RETURN_TENSOR_FACES_AND_CAUSAL_NATURAL_HOLONS_RETAIN_PREIMAGE_FIBRES.md`).]
 
 `interpretation`: `teacher` and `student` are an exterior pedagogical chart. Source and candidate
 need not differ in size, architecture, modality, or global identity. A distillation may condense an

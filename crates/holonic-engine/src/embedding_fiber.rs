@@ -221,7 +221,7 @@ fn checked(code: i32, operation: &'static str) -> Result<(), FiberError> {
 ///
 /// The entries are exact integers and the common exponent is retained, so the original values are
 /// `entry * 2^exponent` **exactly** — the alignment is a rebase with zero remainder, not a
-/// normalisation, and `H.0104` is the law it runs under.
+/// normalisation, and `H.0106` is the law it runs under (id corrected 2026-09-03; `H.0104` is Lambda).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct AlignedMaterial {
     pub entries: Vec<i64>,

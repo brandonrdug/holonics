@@ -220,7 +220,12 @@ appears anywhere in the sentence. The full rebased statement is
 
 ---
 
-## 5. Reversibility: the kernel is the collapsed-pair population (`H.0479`, `H.0480`)
+## 5. Reversibility: the kernel is the collapsed-pair population (`H.0480`)
+
+[Citation corrected 2026-09-03: this section previously cited `H.0479`, which is the geometric
+product and Clifford construction (`papers/source/holonics/algebra-combinatorics.typ:617`).
+`H.0480` (`papers/source/holonics/computation-information.typ:545`) is the kernel and
+reversibility claim this section states.]
 
 **Brandon:** *"time parity and chronology are not the same as reversibility, reversibility is never
 guaranteed, it is happenstance to be able to reverse, where the goal is likely often to attain the
@@ -239,9 +244,13 @@ vocabulary).
 
 ### 5.2 The compression trichotomy is the reversibility classification
 
+[Citation corrected 2026-09-03: `H.0104` is Λ, the boundary correspondence
+(`papers/source/holonics/algorithms.typ:128`); the rebase claim is `H.0106`, "Invertible
+rebase is execution conjugacy" (`algorithms.typ:202`).]
+
 | species | remainder | reversibility |
 |---|---|---|
-| **rebase** (`H.0104`) | zero | invertible — the "happenstance" case, named |
+| **rebase** (`H.0106`) | zero | invertible — the "happenstance" case, named |
 | **condensation** | certified | invertible up to the certified remainder |
 | **quotient** (`H.0016`) | the collapsed population, family-relative | irreversible, with the loss exhibited |
 
@@ -263,7 +272,11 @@ likely to have come from"* is `Q` against `Π` exactly (`CLAUDE.md` §13 rule 2)
 trajectory happened one way; the reconstruction distribution is the receiver's quotient over
 interiors no longer reachable.
 
-### 5.4 ReconstructionFiber: the preimage of a stable receiver quotient
+### 5.4 PreimageFibre: the preimage of a stable receiver quotient
+
+[Renamed 2026-09-02: `ReconstructionFiber` is retracted as a misnomer for a literal inverse
+image; the object, its formula, and its record are unchanged
+(`research/records/2026-09-02_TENSOR_LENSES_RETURN_TENSOR_FACES_AND_CAUSAL_NATURAL_HOLONS_RETAIN_PREIMAGE_FIBRES.md`).]
 
 **Record:**
 `research/records/2026-08-12_THE_RECONSTRUCTION_REMAINS_A_FIBER_THE_CONTEXT_RETURNS_BY_DIFFUSION_AND_THE_CIRCUIT_GROWS_IN_HIGHER_CELLS.md`.
@@ -272,19 +285,19 @@ Let `D_K : X_K -> Y` be one deterministic presentation law under candidate struc
 `q_R^*` be the stable successor-conduct quotient for a declared receiver family `R`.
 
 ```text
-    RF(D_K, R; [y]) = (q_R^* o D_K)^-1([y]).
+    PF(D_K, R; [y]) = (q_R^* o D_K)^-1([y]).
 ```
 
-**`definition`: ReconstructionFiber is the lineage-bearing population of predecessor occurrences
+**`definition`: PreimageFibre is the lineage-bearing population of predecessor occurrences
 compatible with one observed future-behavior class.** Where `K` itself is unresolved, the object is
 the disjoint union of these fibers over every admitted candidate codec/incidence structure. It is
 not a probability, nearest-neighbour result, edit-distance winner, or selected representative.
 
-This makes compression and reconstruction the two hands of one exact object:
+This makes compression and its preimage the two hands of one exact object:
 
 ```text
     compression       q_R^* : X -> X / ~_R
-    reconstruction    RF_R([x]) = (q_R^*)^-1([x]).
+    preimage fibre    PF_R([x]) = (q_R^*)^-1([x]).
 ```
 
 Adding a receiver or successor history refines the quotient, so on fixed standing the later fiber
@@ -306,7 +319,7 @@ At the complete declared finite carrier, positive `C` makes this operator algebr
 and the owner returns inverse residuals (`established-bounded [implemented-exact]`). Irreversibility
 therefore belongs to an actual receiver quotient, omitted aperture, or separately declared
 continuum limit—not to the word “diffusion” by itself. A diffusion current cannot select a member of
-a reconstruction fiber.
+a preimage fibre.
 
 The first bounded textual owner is `soma/life/src/reconstruction_fiber.rs`. It composes
 `CorpusCensus`, `ConductAtlas`, `receiver_exact_compression`, and an optional caller-declared exact
@@ -358,7 +371,7 @@ exact rational remainder interval. Floats are not needed and are not real here.
 
 ## What this does not establish
 
-Except for the bounded textual ReconstructionFiber named in §5.4, this tablet builds nothing; its
+Except for the bounded textual `PreimageFibre` owner named in §5.4, this tablet builds nothing; its
 other owners predate it. That owner does not select intended meaning or establish a general
 cross-modal reconstruction engine. This tablet does not claim the geometric product replaces the
 tree's carriers — `multiquadratic` is already the construction, and the claim is recognition, not

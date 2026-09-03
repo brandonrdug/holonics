@@ -40,7 +40,7 @@
 //! intake was reading its own bookkeeping.
 //!
 //! Ranks are **densified**: the sorted distinct owner heights are re-indexed to `0..n`. That is a
-//! rebase — order-preserving, invertible, zero remainder (`H.0104`) — and it is required because
+//! rebase — order-preserving, invertible, zero remainder (`H.0106`; id corrected 2026-09-03, `H.0104` is Lambda) — and it is required because
 //! longest path over a chain cannot skip a rank.
 //!
 //! [`MaterialAtlas::faithfulness`] then reads the founded complex back and requires every declared
