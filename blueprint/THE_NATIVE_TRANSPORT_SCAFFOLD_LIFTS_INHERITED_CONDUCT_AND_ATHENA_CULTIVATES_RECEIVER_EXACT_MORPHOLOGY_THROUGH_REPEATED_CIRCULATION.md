@@ -2,9 +2,16 @@
 # morphology through repeated circulation
 
 **Date:** 2026-09-01
-**Kind:** active construction contract composed by
+**Kind:** completed construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
 **Terminal frontier:** NONE.
+
+[counterexample; source-inspected] HNA's 2026-09-02 recurrence audit narrows this completed
+campaign. The activation-example scaffold, exact conduct, deposit, withdrawal, and remount
+mechanisms remain bounded evidence; they do not constitute an operable neural morphology or a
+separate cultivation return. Source detachment and ablation are optional receivers for
+source-independence/attribution claims. The active replacement is
+[`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md),

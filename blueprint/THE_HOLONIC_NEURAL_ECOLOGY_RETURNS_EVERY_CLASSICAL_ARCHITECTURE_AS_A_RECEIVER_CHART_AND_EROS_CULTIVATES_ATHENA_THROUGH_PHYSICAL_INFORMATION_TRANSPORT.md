@@ -4,7 +4,14 @@
 
 **Status:** COMPLETED FORMAL EVIDENCE. HNN0--HNN7 RETURNED THEIR LEAN ARTIFACTS AND ENGINE
 CONFORMANCE MAP. Every reference below to resuming UAR describes the historical 2026-08-29
-boundary. UAR was deprecated on 2026-08-31; only the active HIF roadmap schedules work.
+boundary. UAR was deprecated on 2026-08-31; only the live roadmap and its active HNA contract
+schedule work.
+
+[counterexample] The 2026-09-02 HNA audit retracts this document's inference/special-world-return
+split as the primitive Eros/Athena lifecycle. The compiled abstract owners remain formal evidence,
+but HNA0 must replace their fixed-morphology inference and genuinely-later cultivation assumptions
+with one recurrent successor ecology. The active correction is
+[`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
 
 [definition] This campaign is `HNN0--HNN7`. It extends the completed HML receiver-quotient bridge
 into the architecture-neutral formal theory historically required before UAR2 resumed. It neither creates
@@ -43,19 +50,17 @@ where:
 - `F` is the complete reconstruction fibre and shortest separating future;
 - `O` is the open exterior and obstruction population.
 
-[definition] A complete productive occurrence has the typed form
+[definition] Under the corrected HNA reading, a complete productive occurrence has the typed form
 
 ```text
-(Lambda_t, x_t, i_t)
-  -> (x_(t+1), e_t)
-  -> world consequence r_(t+1)
-  -> (Delta_t, Lambda_(t+1)).
+(E_t, o_t)
+  -> (emission_t, trace_t, E_(t+1)),
 ```
 
-Inference fixes `Lambda_t` during the conducting occurrence. Cultivation requires a genuinely
-returned difference and changes reusable morphology. Training, tuning, and learning are therefore
-returned morphology passages, not aliases for exposure, prompt mounting, loss evaluation, or
-foreign execution.
+and the next operation consumes `E_(t+1)`. The morphology projection may remain fixed while current,
+activation, chronology, and lineage advance, or may itself change through the same operation.
+Inference, generation, cultivation, training, and tuning are receiver/persistence views over this
+one recurrence, not different engine modes separated by an exterior world verdict.
 
 [definition] The finest common finite transport chart is local current aggregation followed by a
 constitutive reaction:
@@ -185,13 +190,15 @@ apparatus disturbance remain distinct.
 [definition] Autoregression and diffusive refinement are schedules over the same ecology:
 
 ```text
-autoregressive : conduct -> emit one boundary face -> remount -> conduct
-diffusive      : retain plural field -> transport returned difference -> refine -> repeat.
+autoregressive : operate ecology -> emit -> next occurrence -> operate successor ecology
+diffusive      : operate plural field -> successor field/ecology -> repeat.
 ```
 
-Neither schedule defines reasoning. A sampler is an exterior receiver/apparatus which consumes a
-probability face and additional random current; deterministic decoding is another collapse. The
-native plural future and its reconstruction fibre precede both.
+The corrected autoregressive form is `operate(E_t,o_t) -> emission_t + E_(t+1) -> next occurrence ->
+operate(E_(t+1),o_(t+1))`; remount is optional storage rather than a required micro-cycle. Neither
+schedule defines reasoning. A sampler is an exterior receiver/apparatus which consumes a probability
+face and additional random current; deterministic decoding is another collapse. The native plural
+future and its preimage fibre precede both.
 
 ## Information, probability, loss, and gradients
 
@@ -243,17 +250,18 @@ Argmax, top-k, quantization, and sampling are later quotients.
 
 ## Eros and Athena
 
-[definition] Eros is the cultivation passage over the common ecology: it admits implemented,
-Soulkiller-returned, and previously cultivated native organs through typed ports; conducts caused
-material; receives genuine exterior consequence; returns the complete situated difference through
-the causal adjoint; and produces a parented morphology successor with reconstruction and ablation
-testimony.
+[definition] Eros is the common operation/advance law and its repeated composition. It admits
+implemented, Soulkiller-returned, and previously cultivated native organs through typed ports,
+conducts an occurrence through local current and reaction, and returns the successor ecology. An
+exterior consequence may supply a later ordinary occurrence; it does not activate a second
+cultivation law.
 
-[definition] Athena is one rested, source-neutral realization of that ecology together with its
-typed membrane, native incidence/current/constitutive morphology, declared receivers, open
-exterior, and source-detached remount law. Athena is not Gemma, a transformer, a checkpoint, a
-conversation store, or a collection of modality modules. Prose, mathematics, code, optics, and
-acoustics are exterior codec and organ lineages crossing the same native operation complex.
+[definition] Athena is one continuing realization of that ecology together with its typed membrane,
+native incidence/current/constitutive morphology, declared receivers, chronology, and open exterior.
+A rest is an optional artifact of a chosen successor. Athena is not Gemma, a transformer, a
+checkpoint, a conversation store, or a collection of modality modules. Prose, mathematics, code,
+optics, and acoustics are exterior codec and organ lineages crossing the same native operation
+complex.
 
 [definition] Soulkiller ends at source-neutral spools, cold witness, and receiver insufficiency.
 Architecture-specific coordinates may be used inside dismantling controls but do not survive as
@@ -340,8 +348,8 @@ instantiate.
 - A stochastic kernel which does not preserve mass is rejected.
 - A reverse diffusion called an inverse without a reconstruction law is rejected.
 - Equal scalar loss with different returned morphology rejects loss-governed cultivation.
-- A training claim without source-detached remount, changed later conduct, and attributable
-  ablation is rejected.
+- A source-independent compression or attribution claim without its separately declared
+  source-access, remount, or ablation receiver is rejected; those receivers do not define training.
 - A named architecture, codec, modality, or apparatus coordinate governing Athena's native
   incidence is rejected.
 

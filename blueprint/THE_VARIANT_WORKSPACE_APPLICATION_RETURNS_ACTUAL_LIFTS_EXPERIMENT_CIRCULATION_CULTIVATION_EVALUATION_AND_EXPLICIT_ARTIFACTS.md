@@ -2,8 +2,14 @@
 # evaluation, and explicit artifacts
 
 **Date:** 2026-09-01
-**Kind:** active application contract composed by [`THE_ROADMAP.md`](THE_ROADMAP.md).
+**Kind:** completed application contract composed by [`THE_ROADMAP.md`](THE_ROADMAP.md).
 **Current frontier:** NONE.
+
+[counterexample; source-inspected] HNA's 2026-09-02 recurrence audit retains this campaign's
+workspace, artifact, snapshot, export, and process-boundary behavior as application apparatus. Its
+staged-return/candidate/commit lifecycle does not establish HNA inference, cultivation, or learning.
+The active recurrent engine contract is
+[`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md),

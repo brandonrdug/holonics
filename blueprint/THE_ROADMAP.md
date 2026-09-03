@@ -33,32 +33,233 @@ Read, in order:
    [`THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md`](THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md); and
 10. the completed Native Morphology Variant Foundation contract,
     [`THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md`](THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md).
-11. the active Athena Application and Circulation Interface contract,
+11. the completed Athena Application and Circulation Interface contract,
     [`THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).
 12. the completed exterior Holonics Workbench application contract,
     [`../applications/holonics-workbench/WORKBENCH.md`](../applications/holonics-workbench/WORKBENCH.md).
 13. the completed explicit-root variant workspace application contract,
     [`THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md`](THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md).
-14. the active world-return deposit contract,
-    [`THE_WORLD_RETURN_DEPOSITS_ON_THE_ROUTE_IT_CROSSED_AND_THE_LEAN_KERNEL_IS_THE_FIRST_WORLD.md`](THE_WORLD_RETURN_DEPOSITS_ON_THE_ROUTE_IT_CROSSED_AND_THE_LEAN_KERNEL_IS_THE_FIRST_WORLD.md),
-    together with the orientation tier, retraction record, and evidence atlas in
-    [`../AGENTS.md`](../AGENTS.md).
+14. the active causal-natural holon, tensor-lens/face, preimage, and Copson--de Bruijn contract,
+    [`THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md`](THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md).
+15. the active post-HTP engine Eros/Athena contract,
+    [`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md),
+    together with its bounded formal prerequisite receipt,
+    [`2026-09-02_THE_CAUSAL_TAIL_FORMAL_PREREQUISITE_RETURNED_BEFORE_THE_ENGINE_HNA_CAMPAIGN.md`](../research/records/2026-09-02_THE_CAUSAL_TAIL_FORMAL_PREREQUISITE_RETURNED_BEFORE_THE_ENGINE_HNA_CAMPAIGN.md).
+16. the corrected modality-neutral application-boundary dependency audit,
+    [`THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md`](THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md),
+    together with the superseded WRD contract, the orientation and retraction tiers in
+    [`../AGENTS.md`](../AGENTS.md), the
+    [`Lean-binding retraction`](../research/records/2026-09-02_THE_LEAN_BINDING_OF_THE_WORLD_RETURN_IS_RETRACTED_AND_LANGUAGES_ARE_APPLICATIONS.md),
+    and the interpretation-grade
+    [`flux/morphology terminology report`](../research/records/2026-09-02_WEIGHT_MATRICES_ARE_FLUX_CROSS_SECTIONS_IN_MOTION_AND_MORPHOLOGY_PACKAGES_ARE_MORPHOLOGY_HOLONS.md).
 
 Read only the smallest source, formal, and evidence closure required by the active deed. Completed
 sensory, membrane, Athena-alpha, Soulkiller, L, H, and Millennium campaign files
 are provenance, not pickup obligations.
 
-## Completed campaign — the world return deposits on the route it crossed
+## Current position
 
-**Current frontier:** NONE
+**Current frontier:** COMPLETE
 
-[definition] Brandon's direct instruction of 2026-09-02 founds the ordered `WRD0--WRD5` campaign
+[definition] Brandon's direct instruction of 2026-09-02 activates `HTP0--HTP6` under
+[`THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md`](THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md).
+HTP0--HTP5 passed: literal inverse-image owners now use `PreimageFibre` without aliases;
+`Holon.Rebase`, addressed `CausalNaturalHolon`, dependent `TensorLens`/`TensorFace`, homogeneous
+slot-permutation preimage transport, and `MorphologyArtifactPassage` returned; and the independent
+finite Copson--de Bruijn tail receiver returned exact suffix balance
+and homogeneity. The continuous positive tail surface now attains its mass-one minimum, whose
+reciprocal is the proved optimal finite coefficient. HTP5 returned zero-extension invariance,
+monotone finite coefficients, the direct `ℝ≥0∞` infinite functional for `ℕ -> ℝ≥0`, its control by
+`c∞ := ⨆ N, (finiteSharpCoefficient N : ℝ≥0∞)`, exact finite-support reflection, and the
+least-controlling-coefficient equivalence. HTP6 then returned a bounded verified body: the finite
+Euler/de Bruijn recurrence, dependent infinite admissibility and threshold equality, normalized
+moving-root drift, basin transport, harmonic exclusion, and a lower-or-upper characteristic-root
+convergence dichotomy. Coefficient-specific branch selection and a certified decimal are parked
+research and schedule nothing. Brandon's direct correction of 2026-09-02 closes HTP at this bounded
+handoff and activates the engine HNA campaign.
+
+[definition] The de Bruijn--Newman/RH line remains independent: use `c_CD` for the
+Copson--de Bruijn coefficient and `Λ_DN` for the coordinate-corrected heat-flow threshold. The
+current `heatE(u, xi, s)` line has standard time `t = -4u` after
+`s = 1/2 + i z/2`; its Lean theorems stand, while its direct standard-`H_t` interpretation is
+retracted pending the RH0/RH1 bridge in
+[`the coordinate correction record`](../research/records/2026-09-02_THE_RH_ENTIRE_HEAT_FLOW_REQUIRES_THE_CRITICAL_COORDINATE_AND_REVERSES_STANDARD_TIME.md)
+and
+[`the fleet instruction`](../research/GEMINI_3_8_FLASH_SWARM_INSTRUCTIONS.md).
+The two constants' only admitted common lens is the interpretation-grade lower boundary of an
+upper admissibility set. The fleet instruction is exterior work coordination and schedules no
+primary construction.
+
+[proved-derived; formal-checked] The bounded HTP handoff's causal-tail/HNN continuation has already
+returned as formal prerequisite law: addressed current remains behind its energy face, silent
+aperture padding preserves the old receiver, complete pair-current tensor faces do not descend
+through magnitude, cultivation reopens stale projections, and successor charts transport only
+through exact naturality. Those results retain no HNA phase labels and advance no runtime grade.
+
+[definition] Brandon's latest correction activates the fixed `HNA0--HNA5` Holonic Neural Athena
+campaign under
+[`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
+The primitive is one `OperationStep`: an occurrence operates on the contemporary ecology and
+returns an emission, exact trace, and successor ecology. The next operation consumes that
+successor. Self-reentry, next-token/reprompt recurrence, and an application-produced occurrence use
+the same operation owner. A world verdict, returned-interaction constructor, candidate/commit,
+source-detached remount, and ablation are not prerequisites for inference or learning.
+
+[counterexample; source-inspected] The former engine HNA plan and its `HNA0--HNA5` grades are
+withdrawn. It authored octet boundary differences as current, duplicated one observation into
+`eee`, copied one process status over every world face, derived current/storage from counts, treated
+filesystem readback as a world, and authored a one-edge deposit. Its records are counterexample
+evidence only under
+[`the HNA recurrence correction`](../research/records/2026-09-02_THE_HNA_WORLD_RETURN_SPLIT_IS_RETRACTED_AND_INFERENCE_IS_ONE_RECURRENT_ECOLOGY.md).
+
+[definition] `WRN0--WRN6` schedules nothing. The corrected WRN document retains only the neutral
+occurrence/application boundary, format separation, and terminology audit. Its special world-face,
+counted-return, deposit, and terminal sequence does not enter HNA.
+
+## Closed bounded campaign -- causal-natural holons, tensor lenses/faces, and Copson--de Bruijn tails
+
+[definition] The complete order is:
+
+1. `HTP0` -- rename literal inverse-image fibres in Lean without aliases -- **PASSED**;
+2. `HTP1` -- causal-natural holon families and complete diagram rebases -- **PASSED**;
+3. `HTP2` -- tensor lenses, tensor faces, and natural reindex transport -- **PASSED**;
+4. `HTP3` -- finite Copson--de Bruijn tail receiver, balance, and homogeneity -- **PASSED**;
+5. `HTP4` -- compact-simplex attainment and the finite sharp coefficient -- **PASSED**;
+6. `HTP5` -- zero-extension monotonicity and the infinite `ℝ≥0∞` boundary -- **PASSED**; and
+7. `HTP6` -- bounded recurrence/threshold/two-root development and HNA handoff -- **CLOSED
+   BOUNDED**.
+
+[proved-derived; formal-checked] HTP0--HTP2 replaced every Lean identifier definitionally naming
+an inverse image, extended `Holon` with full-diagram `Rebase`, returned a functorial
+`CausalNaturalHolon` whose arbitrary arrows map preimages forward, and returned `TensorLens`,
+dependent `TensorFace`, heterogeneous axis reindexing, and homogeneous slot-permutation naturality
+whose reindex transports the complete preimage fibre. `MorphologyArtifactPassage` now names the
+validation and exact-remount law required before a serializable morphology carrier earns the
+artifact name.
+Actual inverse transforms, remounts, homotopies, and recovery procedures retain reconstruction
+terminology.
+
+[proved-derived; formal-checked] HTP3 returned
+`Mathematics/CopsonDeBruijnFiniteTail.lean`: finite nonnegative sections, every suffix energy,
+one-based inverse-square-root weight, tail radius, mass, surface, `FiniteTailFace`, its holon and
+preimage, adjacent-tail balance, zero laws, and exact degree-one/two homogeneity. It imports through
+the main Lean umbrella before `RH` and imports no RH or Millennium owner.
+
+[proved-derived; formal-checked] HTP4 returned
+`Mathematics/CopsonDeBruijnFiniteSharp.lean`: continuity and strict positivity of the tail surface,
+compact attainment on the nonnegative mass-one simplex, a positive minimum, its reciprocal finite
+sharp coefficient, the homogeneous inequality for every finite section, equality at the chosen
+minimizer, and optimality against every universal controlling coefficient.
+
+[proved-derived; formal-checked] HTP5 returned
+`Mathematics/CopsonDeBruijnInfiniteBoundary.lean`: exact silent extension, old-suffix/mass/surface
+preservation, monotone finite sharp coefficients, direct extended-nonnegative infinite mass, suffix
+energy, radius and surface, the supremal boundary's universal control, exact reflection of every
+finite-support section, and the equivalence between bounding that supremum and controlling every
+infinite nonnegative section.
+
+[proved-derived; formal-checked] HTP6 returned the bounded formal body recorded in
+[`2026-09-02_HTP6_RETURNED_A_BOUNDED_RECURRENCE_THRESHOLD_AND_TWO_ROOT_DICHOTOMY.md`](../research/records/2026-09-02_HTP6_RETURNED_A_BOUNDED_RECURRENCE_THRESHOLD_AND_TWO_ROOT_DICHOTOMY.md):
+the finite recurrence, dependent threshold and obstructions, normalized drift and moving roots,
+bounded basin transport, harmonic exclusion, and a lower-or-upper characteristic-root `Tendsto`
+dichotomy. Coefficient-specific branch selection and a certified decimal are parked research and
+schedule nothing.
+
+## Active ordered campaign -- Holonic Neural Athena recurrent ecology
+
+[definition] Brandon's latest correction activates the engine `HNA0--HNA5` campaign under
+[`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
+The order is fixed:
+
+1. `HNA0` -- formal recurrent ecology and lifecycle correction -- **PASSED**;
+2. `HNA1` -- actual native operable morphology -- **PASSED**;
+3. `HNA2` -- one native operation advances one ecology -- **PASSED**;
+4. `HNA3` -- recurrent inference and generation -- **PASSED**;
+5. `HNA4` -- Eros refinement and optional rest -- **PASSED**; and
+6. `HNA5` -- application matrix and honest release -- **PASSED**.
+
+[definition] An HNA operation consumes the contemporary ecology and one occurrence and returns an
+emission, exact trace, and successor ecology. The successor is the next operation's predecessor.
+Inference, generation, self-reentry, application interaction, cultivation, training, and rest are
+receiver or persistence views over this one sequence; they are not separate semantic modes.
+
+[definition] `HNA0` first corrects the formal lifecycle. The existing fixed-morphology
+`InferenceCirculationReturn` and genuinely-later `CultivationPassage` may remain specialized
+objects, but they no longer define HNA. The new owner must admit both fixed-morphology and
+morphology-changing operations, preserve distinct causal occurrences behind equal receiver faces,
+and join self-emitted and application-produced next occurrences through the same recurrence.
+
+[proved-derived; formal-checked] HNA0 returned the complete formal owner and the 9,784-job umbrella
+built. Its receipt is
+[`2026-09-02_HNA0_ONE_OPERATION_RETURNED_ITS_SUCCESSOR_ECOLOGY_AND_THE_NEXT_OPERATION_USES_IT.md`](../research/records/2026-09-02_HNA0_ONE_OPERATION_RETURNED_ITS_SUCCESSOR_ECOLOGY_AND_THE_NEXT_OPERATION_USES_IT.md).
+
+[definition] `HNA1--HNA4` then return the actual engine: Soulkiller must provide an operable generic
+local-current/reaction morphology rather than an activation-example transition archive; one
+move-owned resident operation returns its actual successor ecology; repeated operations use that
+successor directly; and developmental recurrence may change local morphology through the same
+operation without a world verdict, reward, candidate, or commit API. Rest/remount is optional
+storage testimony.
+
+[established-bounded; implemented-exact; source-inspected; measured] HNA1 returned the complete
+source-neutral text-operator ecology: 1,275 operation nodes over 42 layers, 719 packed resident
+coefficient populations, 665 used by the configured operation, and 54 explicit shared-K/V
+obstructions. Every complete tensor frame returned, one fixed-frame pool was reused, and one
+complete resident matrix section agreed exactly with the independent serial chart. Its receipt is
+[`the complete HNA1 operator return`](../research/records/2026-09-02_HNA1_THE_COMPLETE_TEXT_OPERATOR_BECAME_ONE_RESIDENT_NATIVE_ECOLOGY.md).
+
+[established-bounded; implemented-exact; measured] HNA2 returned the first four full-ecology
+operation steps on one move-owned successor line: two lookups, a chart reshape, and the complete
+per-layer model contraction. Two entering occurrence rows remained distinct through the
+constitutive contraction, and the emitted face equalled the carrier retained by the successor. Its
+receipt is
+[`the HNA2 full operation return`](../research/records/2026-09-02_HNA2_ONE_FULL_NATIVE_OPERATION_RETURNED_ITS_SUCCESSOR_ECOLOGY.md).
+
+[established-bounded; implemented-exact; measured] HNA3 returned two complete 1,275-operation
+cycles on one successor line. The first native tiled vocabulary face selected/rendered `The`; that
+ordinary occurrence expanded the application context and the exact returned ecology advanced from
+generation 1,275 to 2,550. Predecessor and rebuilt-generation occurrences were rejected. Both
+inspected emissions were `The`, so the grade is recurrence rather than qualitative language. Its
+receipt is
+[`the complete HNA3 recurrence return`](../research/records/2026-09-02_HNA3_TWO_COMPLETE_NATIVE_CYCLES_USED_ONE_RETURNED_SUCCESSOR_ECOLOGY.md).
+
+[established-bounded; implemented-exact; measured] HNA4 returned an operation-owned morphology
+change. Operation 41 derived positive exact alignment between its presented and reacted carriers,
+composed the admitted local conductance from one to two, and returned that morphology in its
+successor. Operation 42 consumed the carrier and reported factor two through the same `advance` API.
+The earlier caller-authored ordinal factor draft is counterexample evidence. The receipt is
+[`the HNA4 local morphology return`](../research/records/2026-09-02_HNA4_LOCAL_ALIGNMENT_CHANGED_MORPHOLOGY_INSIDE_THE_RECURRENT_OPERATION.md).
+
+[counterexample; implemented-exact; measured] The bounded token recurrence emitted `pit` then
+` capitalist`; the text/coding/mathematics matrix emitted ` northward`, ` Wonderland`, and `пок`.
+These inspected application faces reject a qualitative HNA claim and remain controls for HNA5.
+
+[definition] `HNA5` exercises text, coding, and mathematics as exterior application
+occurrence/receiver configurations. A compiler, runtime, proof kernel, sensor, or person may supply
+another ordinary occurrence. No application result implicitly updates Athena, and no internal
+owner names a language, format, expected answer, or template.
+
+[established-bounded; implemented-exact; source-inspected; measured] HNA5 advanced one resident
+ecology through text, coding, and mathematics application occurrences at generations
+`0 -> 1,275 -> 2,550 -> 3,825`. The actual faces were ` Explain`, ` i`, and ` :=`; they carry no
+qualitative answer claim. The codec-only application source did not inspect internal operation kinds
+or import a retracted return path, and the coherent release receiver passed. The receipt is
+[`the HNA5 bounded release`](../research/records/2026-09-02_HNA5_ONE_NATIVE_RECURRENCE_CROSSED_THREE_APPLICATIONS_AND_RELEASED_WITHOUT_A_QUALITATIVE_CLAIM.md).
+
+[established-bounded] **The corrected HNA0--HNA5 campaign is complete.** No later HNA phase or next
+roadmap deed is admitted.
+
+[counterexample; source-inspected] The old HNA records preserve the rejected implementation: byte
+differences named current, repeated observation IDs, uniform process-status faces, counted
+current/storage, exact-readback echo, and an authored one-edge deposit. They schedule nothing and
+cannot satisfy any phase above.
+
+## Retracted campaign — the world return deposits on the route it crossed
+
+[historical] The ordered `WRD0--WRD5` campaign was constructed on 2026-09-02 under
 under
 [`THE_WORLD_RETURN_DEPOSITS_ON_THE_ROUTE_IT_CROSSED_AND_THE_LEAN_KERNEL_IS_THE_FIRST_WORLD.md`](THE_WORLD_RETURN_DEPOSITS_ON_THE_ROUTE_IT_CROSSED_AND_THE_LEAN_KERNEL_IS_THE_FIRST_WORLD.md).
-It composes the standing Lean material chart, kernel world, carrier population, conduct,
-session, staged return, commit, withdrawal, and replay owners into the constitutive passage from
-an actual kernel return to a local morphology deposit, with termination read from the junction.
-It adds no trainer, decoder cabinet, semantic router, or second body.
+It attempted to compose the Lean material chart, kernel world, carrier population, conduct,
+staged return, commit, withdrawal, and replay into a constitutive passage.
 
 [definition] The complete order is:
 
@@ -69,33 +270,42 @@ It adds no trainer, decoder cabinet, semantic router, or second body.
 5. `WRD4` — the first world, later current, and the falsifier; and
 6. `WRD5` — records, release, commit, and push.
 
-[established-bounded] All six passed on 2026-09-02 at their declared scopes. The same day Brandon
-retracted the campaign's language binding: the mouth, the template emitter, the face adapter, and
-the driver named Lean inside the interior, which his ruling forbids for every language, modality,
-and field. The junction, deposit, and termination laws, the Lean owner, and the measured faces
-stand. The retraction is
+[counterexample; source-inspected] None of these labels remains passed. The first audit retracted
+the Lean mouth, template emitter, face adapter, and driver. The HNA audit then found that the neutral
+replacement still elevated an exterior verdict into a privileged return and used admission counts
+to author current, storage, and deposit. The exact junction/telescoping algebra and measured kernel
+faces remain evidence at their own scopes; the world-return/cultivation interpretation does not.
+The first retraction is
 [`2026-09-02_THE_LEAN_BINDING_OF_THE_WORLD_RETURN_IS_RETRACTED_AND_LANGUAGES_ARE_APPLICATIONS.md`](../research/records/2026-09-02_THE_LEAN_BINDING_OF_THE_WORLD_RETURN_IS_RETRACTED_AND_LANGUAGES_ARE_APPLICATIONS.md).
 
-## Founded campaign — the world return is modality-neutral and every language is an application
+## Corrected dependency audit — every language and world is an application
 
-**Founded WRN frontier:** NONE
-
-[definition] Brandon's ruling of 2026-09-02 founds the ordered `WRN0--WRN5` campaign under
+[definition] Brandon's rulings of 2026-09-02 and the subsequent source/terminology audits retain
 [`THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md`](THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md),
-which supersedes the WRD blueprint at every seam that named a language. It states the mouth as a
-population and a reference relation, the face as admitted or reflected with carried states and an
-octet diagnostic, the emission as the machine's own emission section rendered at the ABI, and
-every language, format, modality, and field as an application outside the interior. Construction
-begins on Brandon's direct instruction.
+as a non-scheduling dependency audit. Its surviving law places languages, formats, modalities,
+compilers, kernels, sensors, and worlds on the application side of an ordinary occurrence/emission
+boundary. An application may produce the next occurrence; it never returns a privileged learning
+signal or authors native morphology.
 
-[definition] The complete order is:
+[counterexample; source-inspected] The WRN world-face family, counted current/storage, staged
+candidate/commit, terminal bridge, and two-world release sequence are withdrawn. Their promotion of
+application testimony into a constitutive return repeated the reafference split corrected by HNA.
+`CountedCrossing` and the Lean junction/deposit owners retain only their exact algebraic grades.
 
-1. `WRN0` — the neutral mouth;
-2. `WRN1` — the face and the ABI;
-3. `WRN2` — the emission crosses out, the template emitter deleted;
-4. `WRN3` — the applications exit the interior;
-5. `WRN4` — two worlds of different modality through one interior; and
-6. `WRN5` — records, release, commit, and push.
+[definition] Its terminology contract keeps `NativeTransportScaffold` for the inherited
+source-neutral handoff; names the singular continuing hot owner `NativeHolonMorphology`; names its
+durable exterior carrier `NativeMorphologyArtifact` only after a validated exact rest/remount
+passage returns; names the broad separated lane
+`MorphologyTestimonyLane`; reserves `MorphologyTensorLens` for an actual application-side
+coordinate map and `MorphologyTensorFace` for its returned value; and gates
+`NativePreimageFibre` on proof that its radical spans the complete kernel. In a declared linear
+chart, `W` may present a
+constitutive flux cross-section while `W x` is the local current. These definitions do not promote
+the report's fluid, vorticity, attention, storage, or tensor-export interpretations into theorems.
+
+[definition] `WRN0--WRN6` are withdrawn labels and never schedule construction. HNA owns the
+recurrent operation order. The application-format separation and terminology distinctions remain
+constraints on every HNA phase, not another campaign.
 
 ## Completed campaign — finite many-body and polarized crystal transport
 
@@ -149,7 +359,7 @@ formal gate and receipt, the roadmap returns immediately to the exact parked CON
 
 [proved-derived; formal-checked] `HolonicConstructiveDifferentialBoundary.lean` returned the typed
 square-zero jet, complete standard/residue receiver, exact differential path and finite FTC,
-receiver-kernel reconstruction fibre, zero-faced nonzero infinitesimal, pointwise-zero but
+receiver-kernel preimage fibre, zero-faced nonzero infinitesimal, pointwise-zero but
 integrated-one radix control, MVT witness, and residue-retaining squeeze certificate.
 
 [established-bounded; formal-checked; measured] The live `HolonicQuantumTransport.lean` umbrella
@@ -256,7 +466,7 @@ typed owners; structural equality remains primary; and no remaining production e
 is a multi-thousand-line foreman. The contraction/readback split preserves operand order and typed
 scale; it joins the complete local current before refinement condensation; and neither a zero
 positive/standard receiver face nor a pointwise-small cell authorizes deletion of a nonzero
-dependent complex current or its reconstruction fibre.
+dependent complex current or its preimage fibre.
 
 ### CONS4 — consolidate the live Lean line — PASSED
 
@@ -297,14 +507,14 @@ commit `9456a4ae` was pushed to `origin/main`.
 [definition] Brandon's direct instruction of 2026-08-31 deprecates UAR/R0Q as a construction
 campaign. R0Q0--R0Q4 retain their exact bounded grades: addressed source/target current,
 off-diagonal transport, resident complex contraction before the positive receiver, full-complex
-recurrence, complete reconstruction fibre, and semantic-replay telemetry remain implementation
+recurrence, complete preimage fibre, and semantic-replay telemetry remain implementation
 standing. UAR3, R0Q5, R0Q6, and the UAR4 release no longer schedule work.
 
-[definition] The completed HIF contract folded every unfinished UAR intention into neutral lifecycle
-gates: direct source-neutral construction, actual emission/world-return difference, source-detached
-remount, targeted withdrawal, exact restoration, contact-chart comparison, and productive
-source/apparatus absence. The inherited Brandon language family remains an exterior experiment.
-Historical UAR blueprints and records remain evidence only.
+[historical] The HIF contract folded unfinished UAR intentions into neutral lifecycle gates:
+source-neutral construction, emission/return separation, remount, withdrawal, restoration,
+contact-chart comparison, and source/apparatus absence. The 2026-09-02 HNA audit reclassifies those
+as formal, persistence, and attribution apparatus; their fixed-inference/special-return split does
+not define the active recurrent ecology. Historical UAR blueprints and records remain evidence only.
 
 ## Completed campaign — Holonic Intelligence Framework
 
@@ -316,8 +526,9 @@ their declared scopes. No construction deed is active; the next deed requires a 
 [established-bounded; implemented-exact; measured] HIF7 returned fixed-window, periodic-hybrid,
 recurrent-linear, and current-founded contact charts over one native population, with active causal
 extent, exact pair work, complete coarse receiver fibres, and explicit richer-receiver reopenings.
-HIF2 supplies the lossless cold foreign-chart boundary and HIF6 supplies the direct source-neutral
-resident inference/cultivation, remount, withdrawal, and restoration boundary.
+HIF2 supplies the lossless cold foreign-chart boundary. HIF6 supplies an exact synthetic
+conduct/deposit/remount/withdrawal/restoration control; its caller-supplied or authored return does
+not supply the active HNA operation or a learning grade.
 
 [established-bounded; process-audit; measured] The coherent release returned 2,922 tests passed,
 zero failed, and 50 ignored; every Cargo example type-checked; the Lean umbrella built 3,768 jobs;

@@ -73,11 +73,13 @@ what follows.
    `canon/06_ESTABLISHED_CAPABILITIES.md`, `canon/THE_TIMELINE.md`, and the retraction record in the
    next section. A capability or feasibility claim about Athena that has not been checked against
    these is unfounded.
-3. **Mechanism of record for generation and the body's shape.** `blueprint/THE_EROS_INSTANTIATION.md`
-   §4b (generation is integration by reflection; termination is impedance matching; its falsifier
-   ran 2026-08-15 and arm two fired), `canon/THE_INFORMATION_ENGINE.md` (§0 the body is a descent;
-   §5 the mouth), the completed framework contract's §3 and §4 on generation and cultivation,
-   `canon/TABLET_THE_HEXIS.md`, `canon/TABLET_THE_REASONING_CYCLE.md`.
+3. **Mechanism of record for generation and the body's shape.** The active HNA recurrent-ecology
+   blueprint; `blueprint/THE_EROS_INSTANTIATION.md` §2 (training and inference are one passage) and
+   its 2026-09-02 correction; §4b only as an interpretation when native admittances have actually
+   been founded; `canon/THE_INFORMATION_ENGINE.md` (§5 the mouth), the framework contract's neutral
+   interfaces at their exact grades, `canon/TABLET_THE_HEXIS.md`, and
+   `canon/TABLET_THE_REASONING_CYCLE.md`. A fixed inference cut followed by a privileged exterior
+   cultivation return does not define HNA.
 4. **Failure species.** `canon/THE_EXPLORATIVE_FAILURE.md` (trigger T0: a request to explain
    answered with a plan to construct), `canon/THE_CONTAMINANT_PROTOCOL.md`,
    `canon/THE_AUTHORED_LEVEL.md`.
@@ -142,6 +144,16 @@ retraction is a contamination. Dates are record dates under `research/records/`.
   the SCF alternating-sum section identity was replaced by complete factorized sections and carries
   no broad exactness theorem
   (`2026-09-01_MVF1_COMPLETE_FACTORIZED_GEMMA_SECTIONS_REPLACED_THE_ALTERNATING_SUM_IDENTITY.md`).
+- 2026-09-02: the first engine HNA campaign's reafference-shaped lifecycle is retracted. Adjacent
+  byte differences are not native current; an application-supplied admission/status face does not
+  derive current, storage, or morphology; exact file readback is not a world interaction; and an
+  authored one-edge deposit is not learning. More fundamentally, an HNA operation already returns
+  the successor ecology used by the next inference cycle. Self-reentry and an exterior response are
+  ordinary sources of the next occurrence, not separate recurrence and privileged-return laws.
+  `HNA0--HNA5` restarted under the recurrent-ecology contract and completed at its bounded engine
+  and application scopes; the old records are counterexamples
+  (`2026-09-02_THE_HNA_WORLD_RETURN_SPLIT_IS_RETRACTED_AND_INFERENCE_IS_ONE_RECURRENT_ECOLOGY.md`,
+  `2026-09-02_HNA5_ONE_NATIVE_RECURRENCE_CROSSED_THREE_APPLICATIONS_AND_RELEASED_WITHOUT_A_QUALITATIVE_CLAIM.md`).
 
 [established-bounded; source-inspected] Standing at declared scope, for contrast: four exact
 interior recoveries (`2026-08-10_THE_OBJECT_IS_THE_UNRECONSTRUCTABLE_INTERIOR_AND_THE_MACHINE_HAS_ALREADY_RECOVERED_FOUR.md`);
@@ -334,19 +346,20 @@ returns.
 
 ## Learning and information
 
-- Mounting supplies an inherited organ. Exposure supplies crossing material. Training is a
-  returned passage that changes reusable morphology. Reference consults separately retained
-  testimony. Never conflate these events.
-- A training claim requires same-body behavioral change under a declared receiver projection,
-  source-detached rest/remount, and a source-access audit that excludes retained lookup or lossless
-  corpus encoding as the alleged native conduct.
+- Mounting supplies an inherited organ. Exposure supplies an occurrence. One operation returns the
+  successor ecology used by the next operation. Training/refinement is developmental recurrence
+  whose successor is retained; inference is a receiver reading of recurrence. They are not separate
+  engine modes divided by a privileged exterior return.
+- Source-detached remount, source-access audit, ablation, and later behavioral comparison are
+  optional receivers required only for the narrower claims they answer: storage fidelity,
+  non-lookup compression, or causal attribution. They do not define learning or inference.
 - Information is primarily a caused receiver-indexed change in a continuation fiber, with its
   lineage, transport, obstruction, morphology, and resource testimony. Entropy, loss, probability,
   accuracy, latency, and energy are declared receiver quotients, never replacements for that
   causal object.
 - An unrestricted learner is not obtained by adding a universal filler or scoring loop. New local
-  organs enter through existing typed ports; unknown interaction remains an obstruction until a
-  returned passage founds it.
+  organs enter through existing typed ports; an unknown operation remains an obstruction until its
+  local current, reaction, and successor formation are founded.
 - Brandon's conversation logs, the laboratory, and the archived observations are standing evidence
   for design intent on any Eros/Athena task and are consulted without waiting to be told, using the
   recipe in the evidence atlas above. They never schedule.
@@ -367,11 +380,12 @@ returns.
   shadows of plural continuation, recurrence, nested boundary transport, retained standing, local
   current, and causal world-lines. Do not create `Schedule`, `ControlFlow`, `Interpreter`, `Planner`,
   or equivalent semantic owners merely because one exterior chart uses those nouns.
-- One intelligent deed is one continuing circulation:
-  `mount -> differentiate -> conduct/diffuse -> interact/glue -> radiate -> exterior return ->
-  reflect/deposit -> later current`. Emission and return are distinct caused occurrences joined by
-  addressed lineage. A private echo, host callback, or host-authored semantic invocation sequence
-  does not close the loop.
+- One intelligent deed is one continuing recurrence:
+  `occurrence -> local current -> reaction -> emission + successor ecology -> next occurrence`.
+  The next operation consumes that exact successor ecology. Its next occurrence may be self-emitted
+  or application-produced; the provenance difference does not create a second learning law. A
+  private echo, host callback, or host-authored semantic invocation sequence still cannot substitute
+  for the native operation.
 - “Treat information like heat and energy” only through declared incidence, capacity, constitutive
   response, boundary, chronology, and receiver. Exact diffusion is not generic smoothing;
   irreversibility requires a named quotient, aperture, departure, or physical law. Compression
@@ -459,10 +473,10 @@ returns.
   physical information current, interact through local incidence, deposit morphology, diffuse, and
   form higher coherence. A claimed emulation still owes its constitutive law, boundary, scale,
   current, receiver, and rebase; the umbrella term does not waive a typed return.
-- The deposited map is not passive knowledge consulted by a separate reasoner. It is the continuing
-  terrain through which later current moves. Training is a lineage pivot only when a return changes
-  that map, the change survives source-detached remount, later current rides it, and structural
-  ablation removes its attributable conduct.
+- The deposited map is not passive knowledge consulted by a separate reasoner. It is one morphology
+  projection of the continuing ecology. A developmental operation may change it, and that changed
+  projection is already part of the successor used by the next operation. Remount and ablation are
+  narrower storage/attribution receivers, not the definition of training.
 - Treat an example as an archetype posing a family, never as permission to shrink the scientific
   question to that fixture. Before running an experiment, ensure the apparatus can return the
   requested qualitative relation. Never report a result excluded by the declaration as a machine
@@ -529,12 +543,11 @@ returns.
   same typed tensor line. [project-postulate] Moving `Λ` to a vacuum-energy or mass-density chart
   requires the declared gravitational coupling; winding, nullity, or a degree-four notation alone
   does not determine its value or dynamics.
-- [established-bounded; implemented-exact; measured] Eros and Athena have returned productive
-  bounded consequences from the same incidence, transport, receiver, fibre, holonomy, compression,
-  and returned-morphology discipline. Treat that success as positive internal evidence for
-  prioritizing these laws and for designing sharper experiments and theorem passages. Physical
-  calibration still enters through the sector-specific ports above, rather than through a second
-  ontology.
+- [established-bounded; implemented-exact; measured] The historical Eros/Athena lines returned
+  bounded incidence, transport, receiver, fibre, holonomy, compression, persistence, and application
+  mechanisms. The 2026-09-02 audit withdrew their promotion into an operable recurrent HNA where
+  current or morphology was supplied, count-derived, or selected from stored testimony. Treat the
+  exact mechanisms as components, not as evidence that the recurrent neural operation exists.
 - [project-postulate] A newer direct articulation which supplies stricter types, preserved diagrams,
   exact derivations, or firing falsifiers narrows stale interpretation prose. Preserve every exact
   earlier theorem, record counterexamples and reconstruction fibres, and retire only the overclaim;
@@ -545,9 +558,9 @@ returns.
 
 - `canon/TABLET_THE_REASONING_CYCLE.md` governs the model ontology. Inside Soulkiller, a pretrained
   realization is inherited transport testimony and scrapyard material. Soulkiller returns only
-  source-neutral native spools plus separate cold witness and insufficiency; Eros composes spools
-  and returned consequences into Athena. The productive model is the complete recurrence of mount,
-  conduct, emission, world consequence, genuine return, reflection, and changed continuation.
+  source-neutral native spools plus separate cold witness and insufficiency; Eros composes operable
+  native morphology into Athena. The productive model is the recurrent operation from occurrence
+  and contemporary ecology to emission, exact trace, and successor ecology.
 - When a foreign realization exposes any factorization into a receiver-like probe, presented
   contact orientation, and transported construction, the typed Dirac reading may analyze that
   particular foreign chart. No such factorization is presumed to define a transformer, Soulkiller,
@@ -556,7 +569,7 @@ returns.
   identity.
 - `attention`, `token`, `embedding`, `layer`, `expert`, `router`, `reasoner`, and `conversation` are
   exterior implementation or application charts. Admit an internal phase or organ only when
-  intervention, transport, and returned consequence exhibit it.
+  intervention, local transport, reaction, and successor formation exhibit it.
 - Conversation is a recurrence fixture, not the target invariant. Reasoning is current through
   causal sections; an English thought trace is one optional codec projection.
 - Corpus labels such as prose, arithmetic, LaTeX, Typst, Rust, Lean, and Python are delivery lineage
@@ -591,13 +604,14 @@ returns.
   adapters, LoRA, distillation, logits, autoregression, autograd, multimodal alignment, diffusion
   training, or an inherited model lift. Read it before design; the complete derivation is
   `research/records/2026-08-18_HEXIS_IS_RESTED_CONDITIONAL_TRANSPORT_TUNING_DEFORMS_IT_AND_DISTILLATION_CONDENSES_FAMILIES.md`.
-- Hexis is rested, reusable conditional transport evidenced by changed later conduct after
-  source-detached remount and attributable ablation. It is not synonymous with weights, a
-  checkpoint, topic, token population, prompt, retrieval result, or training counter.
-- Keep curation/exposure, reference, prompting, training return, and world consequence distinct.
-  Curation shapes which developmental current enters; fine-tuning is cultivation relative to an
-  inherited rest; prompting and retrieval are mounted standing unless a return changes durable
-  morphology.
+- Hexis is rested, reusable conditional transport. Exact remount establishes persistence; a
+  source-access audit or ablation is additionally owed only when claiming source independence or
+  causal attribution. Hexis is not synonymous with weights, a checkpoint, topic, token population,
+  prompt, retrieval result, or training counter.
+- Keep curation/exposure, reference, prompting, operation, application consequence, and rest
+  distinct. Curation shapes which developmental occurrences enter; fine-tuning is recurrent
+  operation from inherited hexis followed by retaining a successor; prompting and retrieval are
+  ordinary occurrences or mounted standing, not a special return species.
 - Treat LoRA as a factorized candidate morphology overlay, never an elementwise mask or an intrinsic
   rank law. Semantic rank and state dimension are founded from receiver-visible transport and its
   reconstruction fibre; caller-chosen ranks remain apparatus apertures or experimental controls.
@@ -651,8 +665,9 @@ returns.
   no foreign hot path.
 - Dialogue and agent rollouts are addressed world-tubes, not prompt/answer tables. Visible text is
   one codec face beside tool deeds, world returns, branches, later corrections, code/artifact
-  closure and open exterior. Provider identity never crowns a candidate; cultivation follows a
-  declared receiver defect through retained lineage and survives detached remount and ablation.
+  closure and open exterior. Provider identity never crowns a candidate. Every new message or tool
+  result is an ordinary occurrence applied to the successor ecology; detached remount and ablation
+  are optional receivers for narrower persistence or attribution claims.
 - For every inherited-model pathway, read `canon/TABLET_THE_OPERATIONS.md`,
   `canon/TABLET_THE_MANIFOLD.md`, and `canon/THE_SURFACES_ARE_PATHS.md`. The computational holon is
   the live operation complex—incidence, ordered transport words, event readings, and open exterior—

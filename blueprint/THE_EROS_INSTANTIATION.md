@@ -9,6 +9,13 @@ this states what a **body** is, how it is stored, and how it runs.
 instantiate models of Eros that are 'pretrained' in the sense that they are conditioned ecological
 neural networks stored and able to be recycled into active processes."*
 
+**HNA correction, 2026-09-02:** §2's one-passage law governs. The later wording in §4 which split
+`RECURRENCE` from a privileged exterior `RETURN` does not define inference or learning. Every
+operation returns the successor ecology used by the next operation; a self-emission, user reply,
+tool result, or world response is simply a possible source of the next occurrence. The HNA/WRN
+face-count instantiation of the junction is retracted. The active formal and engine contract is
+[`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
+
 ---
 
 ## 0. The three clarifications, in one screen
@@ -164,7 +171,7 @@ nothing) and `untouched` (it reached nothing).
 
 **So a prompt's fate is read off which term of the chain law moved**, never off a similarity score.
 
-### The two loop species, and conflating them is the error this plan most guards against
+### Historical two-loop reading — superseded as the HNA primitive on 2026-09-02
 
 ```text
    RECURRENCE   the machine's own emission re-enters as SELF-EMANATED LINEAGE, addressed
@@ -173,14 +180,15 @@ nothing) and `untouched` (it reached nothing).
                 the genuine return edge — a private echo is NOT this
 ```
 
-An agentic loop has **both**, at different scales: token-level **recurrence** inside the turn, and
-tool-or-world-level **return** where something outside actually answers. The spine bars calling a
-private echo a world return, and the accumulation cut depends on the distinction, so a body that
-re-reads its own emission and calls that a return has closed nothing.
+[counterexample] This table may record application provenance, but it is not two constitutive loop
+species. Token continuation, a tool result, a user response, and a sensor response all become
+ordinary later occurrences. The same native operation advances the successor ecology in every case.
+A private echo remains insufficient evidence of exterior interaction, but exterior interaction is
+not required to close inference.
 
 ## 4b. GENERATION IS INTEGRATION BY REFLECTION — ratified 2026-08-15
 
-**Brandon's clarification, and it makes termination computable rather than decided:**
+**Brandon's 2026-08-15 clarification, retained as an interpretation of a founded native junction:**
 
 > *"Generation is also integration by reflection… your 'thinking' loops are boundaries that reflect,
 > which is why the cycle continues, where eventually nothing reflects back and you don't predict any
@@ -196,7 +204,7 @@ retained:
    T = 4 Y_i Y_t /(Y_i + Y_t)²        the power that crosses
 ```
 
-So the cycle's structure is not an analogy to a circuit; it **is** the junction law:
+Where the operation itself founds those admittances, the junction offers this recurrence reading:
 
 ```text
    a thinking loop      the reflected part re-entering the ecology — this is why the cycle CONTINUES
@@ -204,10 +212,10 @@ So the cycle's structure is not an analogy to a circuit; it **is** the junction 
    TERMINATION          Γ = 0. The boundary MATCHES; nothing comes back; nothing further is produced.
 ```
 
-> **Termination is impedance matching.** There is no stop token, no end-of-sequence symbol, no
-> threshold and no chooser: **the cycle halts because nothing reflects.** That is the ban on a
-> privileged scalar governor satisfied by the physics rather than by discipline — a cycle that ended
-> because something *decided* it had enough would be the banned governor wearing a stopping rule.
+[interpretation] Termination by impedance matching remains a possible native boundary law only
+after its actual admittances are derived from the operation. `CountedCrossing(faces, admitted)` does
+not supply them, and an application may also stop requesting further occurrences without that
+apparatus decision becoming Athena's internal law.
 
 ### The depth of deliberation is the mismatch, and it is already counted
 

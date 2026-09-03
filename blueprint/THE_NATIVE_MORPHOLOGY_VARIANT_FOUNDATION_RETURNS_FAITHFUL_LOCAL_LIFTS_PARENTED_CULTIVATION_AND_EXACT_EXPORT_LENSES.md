@@ -2,9 +2,15 @@
 # and exact export lenses
 
 **Date:** 2026-09-01
-**Kind:** active construction contract composed by
+**Kind:** completed construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
 **Current frontier:** NONE.
+
+[counterexample; source-inspected] HNA's 2026-09-02 recurrence audit retains this campaign's exact
+factorized sections, packaging, export, and persistence mechanisms but withdraws their promotion
+through a parented special-return lifecycle. `NativeMorphologyArtifact` is a storage classification,
+not a learning grade. The active HNA operation is governed by
+[`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
 
 **Governing doctrine:**
 [`../canon/TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md),

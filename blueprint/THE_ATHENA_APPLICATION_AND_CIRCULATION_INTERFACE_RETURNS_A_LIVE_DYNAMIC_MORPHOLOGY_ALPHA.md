@@ -5,6 +5,12 @@
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
 **Current frontier:** NONE.
 
+[counterexample; source-inspected] HNA's 2026-09-02 recurrence audit reclassifies this campaign as
+exact application, ABI, persistence, and reversible-deposit apparatus. Its fixed-morphology
+conduct, genuinely-later exterior return, candidate, and commit sequence does not define Athena
+inference or learning. The active replacement is
+[`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
+
 **Governing doctrine:**
 [`../canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md),
 [`../canon/TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md),

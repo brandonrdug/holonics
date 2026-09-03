@@ -5,6 +5,11 @@
 **Kind:** completed construction contract composed by
 [`THE_ROADMAP.md`](THE_ROADMAP.md).
 **Current frontier:** none.
+[counterexample; source-inspected] HNA's 2026-09-02 recurrence audit retains this campaign's exact
+interfaces, charts, persistence, and apparatus mechanisms but withdraws their use as proof of an
+operable neural lifecycle. Fixed-morphology inference followed by a genuinely-later cultivation
+return is a specialized formalization, not HNA's primitive. The active replacement is
+[`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
 **Supersession:** this contract supersedes the unresolved scheduling authority of UAR/R0Q. Exact
 completed UAR/R0Q mechanisms retain their scoped grades as evidence and implementation standing;
 their unfinished intentions are obligations below, not a second campaign.

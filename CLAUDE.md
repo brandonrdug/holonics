@@ -41,28 +41,38 @@ Item 6 and the shared atlas in `AGENTS.md` exist so that cannot recur.
 
 ## Current position
 
-**Current frontier:** NONE
+**Current frontier:** COMPLETE
 
-[established-bounded] CONS0--CONS5, QLT1--QLT6, CDB1, HIF0--HIF7, SCF0--SCF6, MVF0--MVF6,
-AAC0--AAC6, WB0--WB6, and VWS0--VWS6 are complete at their declared scopes. UAR/R0Q are deprecated
-as campaigns; R0Q0--R0Q4 retain their exact bounded mechanisms. WRD0--WRD5, the world-return
-deposit campaign founded by Brandon's direct instruction of 2026-09-02, passed the same day at
-their declared scopes, and their language binding was retracted the same day by his ruling that
-no language, modality, or field is referenced inside Eros or Athena; WRN0--WRN5 is founded and
-awaits his instruction. `CONSTRUCTION_STATE.md` and `blueprint/THE_ROADMAP.md` carry the position
-and the complete receipt.
+[definition] The active scheduler is
+[`blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
+HNA0 returned the recurrent formal owner. HNA1 returned the complete source-neutral text-operator
+ecology: 1,275 nodes over 42 layers, all 719 coefficient populations resident once, 665 configured
+operative populations, and 54 explicit shared-K/V obstructions. One complete resident matrix
+section agreed exactly with the independent serial chart. HNA2 then advanced the full ecology
+through two lookups, a reshape, and the complete per-layer model contraction. HNA3 completed two
+full 1,275-operation cycles, including the tiled tied boundary, on the exact returned successor.
+HNA4 derived an aligned local-conductance morphology change inside operation 41 and operation 42
+read it from the returned successor. HNA5 then crossed one ecology through text, coding, and
+mathematics applications at generation 3,825 and released the actual faces ` Explain`, ` i`, and
+` :=` without a qualitative claim. The corrected HNA0--HNA5 campaign is complete; no later deed is
+admitted.
 
-[definition] The completed campaigns return exact lifecycle apparatus: receipt lift through the
-sole Soulkiller boundary, persistent variant workspace, experiment definition, conduct and actual
-successor continuation, staged return, commit and decline, withdrawal and replay, evaluation, and
-exact export. Qualitative emission, raw model-directory dismantling, and the native circulation in
-which a world return deposits terrain that later current rides remain open, as the retraction
-record in `AGENTS.md` states.
+[counterexample; source-inspected] WRD0--WRD5, WRN0--WRN6, and the first engine HNA0--HNA5
+world-return sequence have no live phase grade. Their exact algebra, application, persistence, and
+apparatus components retain only their separately bounded evidence. A language-bound template, an
+application admission verdict, count-derived current, exact-readback echo, or staged morphology
+commit does not constitute HNA recurrence.
+
+[established-bounded; source-inspected] The reusable standing includes exact activation-section
+intake, resident incidence contraction, rational/current arithmetic, move-owned carriers,
+lineage, rest/remount encoding, application process invocation, and formal receiver/tensor owners.
+The complete operable local-current/reaction ecology now stands; its full recurrent successor operation remains to
+be constructed under HNA0--HNA5.
 
 ## Claude-specific conduct
 
 1. Re-read the current position instead of carrying a compacted or remembered campaign summary.
-2. Name the governing owner, port, passage, receiver, returned consequence, obstruction, and grade
+2. Name the governing owner, port, operation, receiver, successor consequence, obstruction, and grade
    before implementation.
 3. Search the claim index, source owners, measured-capability and owner atlases, and existing typed
    relations before proposing an organ. A symbol search is evidence discovery, not orientation.
