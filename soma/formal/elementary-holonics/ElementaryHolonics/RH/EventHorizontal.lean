@@ -176,4 +176,142 @@ theorem norm_f_horizontal_le {t : ℝ} (ht : 0 < t) {X : ℝ} (hX0 : 0 ≤ X) {s
   rw [this, show X + h + 2 + 1 = ξ + 1 by rw [hξ], show X + h + 2 = ξ by rw [hξ]]
   gcongr
 
+/-! ## The pieces of `R'` -/
+
+/-- **The horizontal pieces**: `‖H‖ ≤ 2 M_H (X + h + 2)`. -/
+theorem norm_Hpiece_le {t : ℝ} (ht : 0 < t) {X : ℝ} (hX0 : 0 ≤ X) {s : ℂ} (hX : |s.re| ≤ X)
+    (hs : 2 ≤ ‖s‖) {h : ℝ} (hh : 0 ≤ h) {Y : ℝ} (hYt : t * π ≤ Y) (hsec : X + h + 2 ≤ s.im - Y)
+    (hy2 : 2 ≤ s.im - Y) :
+    ‖Hpiece t s h Y‖ ≤
+      2 * MH t X h Y s.im (2 * X + 2 * h + 2 + t * (Real.log ‖s‖ + 6)) * (X + h + 2) := by
+  set M := MH t X h Y s.im (2 * X + 2 * h + 2 + t * (Real.log ‖s‖ + 6)) with hM
+  have hY0 : 0 ≤ Y := le_trans (by positivity) hYt
+  have hZ0 : 0 ≤ X + h + 2 + s.im + Y := by linarith
+  have hM0 : 0 ≤ M := by
+    rw [hM]
+    unfold MH
+    apply mul_nonneg (Real.exp_pos _).le
+    apply mul_nonneg (Real.exp_pos _).le
+    apply mul_nonneg (mul_nonneg (mul_nonneg (by positivity) (sq_nonneg _))
+      (Real.rpow_nonneg hZ0 _)) (Real.rpow_nonneg (by positivity) _)
+  have hlen : |2 - (s.re + h)| ≤ X + h + 2 := by
+    calc |2 - (s.re + h)| ≤ |(2 : ℝ)| + |s.re + h| := abs_sub _ _
+      _ ≤ 2 + (|s.re| + |h|) := by
+          rw [abs_two]
+          gcongr
+          exact abs_add_le _ _
+      _ ≤ 2 + (X + h) := by
+          rw [abs_of_nonneg hh]
+          gcongr
+      _ = X + h + 2 := by ring
+  have hplus : ‖∫ x in (s.re + h)..(2 : ℝ), f t (J t s + h) ((x : ℂ) + ((s.im + Y : ℝ) : ℂ) * Complex.I)‖ ≤
+      M * |2 - (s.re + h)| := by
+    apply norm_horizontal_le
+    intro x hx
+    have := norm_f_horizontal_le ht hX0 hX hs hh hYt hsec hy2 hx (σ := 1) (Or.inl rfl)
+    simpa using this
+  have hminus : ‖∫ x in (s.re + h)..(2 : ℝ), f t (J t s + h) ((x : ℂ) + ((s.im - Y : ℝ) : ℂ) * Complex.I)‖ ≤
+      M * |2 - (s.re + h)| := by
+    apply norm_horizontal_le
+    intro x hx
+    have := norm_f_horizontal_le ht hX0 hX hs hh hYt hsec hy2 hx (σ := -1) (Or.inr rfl)
+    rw [show s.im + (-1) * Y = s.im - Y by ring] at this
+    exact this
+  unfold Hpiece
+  calc ‖(∫ x in (s.re + h)..(2 : ℝ), f t (J t s + h) ((x : ℂ) + ((s.im + Y : ℝ) : ℂ) * Complex.I)) -
+        ∫ x in (s.re + h)..(2 : ℝ), f t (J t s + h) ((x : ℂ) + ((s.im - Y : ℝ) : ℂ) * Complex.I)‖
+      ≤ M * |2 - (s.re + h)| + M * |2 - (s.re + h)| :=
+        (norm_sub_le _ _).trans (add_le_add hplus hminus)
+    _ ≤ M * (X + h + 2) + M * (X + h + 2) := by gcongr
+    _ = 2 * M * (X + h + 2) := by ring
+
+/-- **The tails**: `‖T‖ ≤ β_T`. -/
+theorem norm_Tpiece_le {t : ℝ} (ht : 0 < t) {X : ℝ} (hX0 : 0 ≤ X) {s : ℂ} (hX : |s.re| ≤ X)
+    (hs : 2 ≤ ‖s‖) {h : ℝ} (hh : 0 ≤ h) {Y : ℝ} (hY2 : 2 * t * π ≤ Y) :
+    ‖Tpiece t s h Y‖ ≤
+      2 * (Real.exp ((2 * X + 2 * h + 2 + t * (Real.log ‖s‖ + 6)) ^ 2 / (4 * t)) / (2 * π)) *
+        (1 + |s.im| + 4 * √t) * √(64 * π * t) * Real.exp (-(Y ^ 2 / (64 * t))) := by
+  set w : ℂ := J t s + h with hw
+  have him_w : |w.im - s.im| ≤ t * π := by
+    rw [hw, Complex.add_im, J_im, Complex.ofReal_im, add_zero]
+    rw [show s.im + t * (Λs s).im - s.im = t * (Λs s).im by ring, abs_mul, abs_of_pos ht]
+    exact mul_le_mul_of_nonneg_left (abs_Λ_im_le s) ht.le
+  have hre_w : |2 - w.re| ≤ 2 * X + 2 * h + 2 + t * (Real.log ‖s‖ + 6) := by
+    rw [hw, Complex.add_re, J_re, Complex.ofReal_re]
+    have h1 := abs_Λ_re_le hs
+    calc |2 - (s.re + t * (Λs s).re + h)| ≤ |(2 : ℝ)| + |s.re + t * (Λs s).re + h| := abs_sub _ _
+      _ ≤ 2 + (|s.re| + t * |(Λs s).re| + h) := by
+          rw [abs_two]
+          gcongr
+          calc |s.re + t * (Λs s).re + h| ≤ |s.re + t * (Λs s).re| + |h| := abs_add_le _ _
+            _ ≤ (|s.re| + |t * (Λs s).re|) + h := by
+                rw [abs_of_nonneg hh]
+                gcongr
+                exact abs_add_le _ _
+            _ = |s.re| + t * |(Λs s).re| + h := by rw [abs_mul, abs_of_pos ht]
+      _ ≤ 2 + (X + t * (Real.log ‖s‖ + 6) + h) := by gcongr
+      _ ≤ 2 * X + 2 * h + 2 + t * (Real.log ‖s‖ + 6) := by linarith
+  have htail := norm_tail_le ht w hY2 him_w
+  have hexp : Real.exp ((2 - w.re) ^ 2 / (4 * t)) ≤
+      Real.exp ((2 * X + 2 * h + 2 + t * (Real.log ‖s‖ + 6)) ^ 2 / (4 * t)) := by
+    apply Real.exp_le_exp.mpr
+    apply div_le_div_of_nonneg_right _ (by positivity)
+    rw [← sq_abs (2 - w.re)]
+    exact pow_le_pow_left₀ (abs_nonneg _) hre_w 2
+  unfold Tpiece
+  refine htail.trans ?_
+  gcongr
+
+/-- The lower bound of the main term, `γ_low`. -/
+def γlow (t X : ℝ) (s : ℂ) : ℝ :=
+  cg X * ‖s‖ ^ 2 * ‖s‖ ^ (-((X + 1) / 2)) * Real.exp (-(π * ‖s‖ / 2)) * Real.exp (-(t * π ^ 2 / 4))
+
+theorem γlow_pos {t X : ℝ} {s : ℂ} (hs : 0 < ‖s‖) : 0 < γlow t X s := by
+  unfold γlow
+  have := cg_pos X
+  have := Real.rpow_pos_of_pos hs (-((X + 1) / 2))
+  positivity
+
+/-- **The piece `R'` of the defect.** -/
+theorem norm_Rpiece_le {t : ℝ} (ht : 0 < t) {X : ℝ} (hX0 : 0 ≤ X) {s : ℂ} (hX : |s.re| ≤ X)
+    (hs2π : 2 * π ≤ ‖s‖) {L : ℝ} (hL : 0 ≤ L) {Y : ℝ} (hY2 : 2 * t * π ≤ Y)
+    (hsec : X + 2 * t * L + 2 ≤ s.im - Y) (hy2 : 2 ≤ s.im - Y) :
+    ‖Complex.exp (-(t : ℂ) * Λs s * L) * ((√(4 * π * t) : ℝ) : ℂ)⁻¹ *
+      (-Complex.I * Hpiece t s (2 * t * L) Y + Tpiece t s (2 * t * L) Y) / γt' t s‖ ≤
+      (2 * MH t X (2 * t * L) Y s.im (2 * X + 2 * (2 * t * L) + 2 + t * (Real.log ‖s‖ + 6)) *
+          (X + 2 * t * L + 2) +
+        2 * (Real.exp ((2 * X + 2 * (2 * t * L) + 2 + t * (Real.log ‖s‖ + 6)) ^ 2 / (4 * t)) /
+          (2 * π)) * (1 + |s.im| + 4 * √t) * √(64 * π * t) * Real.exp (-(Y ^ 2 / (64 * t)))) *
+        (√(4 * π * t))⁻¹ / γlow t X s := by
+  have hs : 2 ≤ ‖s‖ := by linarith [Real.pi_gt_three]
+  have hs0 : 0 < ‖s‖ := by linarith
+  have hh : 0 ≤ 2 * t * L := by positivity
+  have hYt : t * π ≤ Y := by nlinarith [Real.pi_pos]
+  have hH := norm_Hpiece_le ht hX0 hX hs hh hYt hsec hy2
+  have hT := norm_Tpiece_le ht hX0 hX hs hh hY2
+  have hc := norm_exp_neg_tΛ_le hs2π ht.le hL
+  have hγ := norm_γt'_ge ht.le hX0 hX hs
+  have hγlow : 0 < γlow t X s := γlow_pos hs0
+  have hσ : ‖((√(4 * π * t) : ℝ) : ℂ)⁻¹‖ = (√(4 * π * t))⁻¹ := by
+    rw [norm_inv, Complex.norm_real, Real.norm_eq_abs, abs_of_pos (Real.sqrt_pos.mpr (by positivity))]
+  have hHT : ‖-Complex.I * Hpiece t s (2 * t * L) Y + Tpiece t s (2 * t * L) Y‖ ≤
+      ‖Hpiece t s (2 * t * L) Y‖ + ‖Tpiece t s (2 * t * L) Y‖ := by
+    refine (norm_add_le _ _).trans ?_
+    rw [norm_mul, norm_neg, Complex.norm_I, one_mul]
+  rw [norm_div, norm_mul, norm_mul, hσ]
+  have hγn : γlow t X s ≤ ‖γt' t s‖ := hγ
+  calc ‖Complex.exp (-(t : ℂ) * Λs s * L)‖ * (√(4 * π * t))⁻¹ *
+        ‖-Complex.I * Hpiece t s (2 * t * L) Y + Tpiece t s (2 * t * L) Y‖ / ‖γt' t s‖
+      ≤ 1 * (√(4 * π * t))⁻¹ *
+        (‖Hpiece t s (2 * t * L) Y‖ + ‖Tpiece t s (2 * t * L) Y‖) / γlow t X s := by
+        gcongr
+    _ ≤ 1 * (√(4 * π * t))⁻¹ *
+        ((2 * MH t X (2 * t * L) Y s.im (2 * X + 2 * (2 * t * L) + 2 + t * (Real.log ‖s‖ + 6)) *
+            (X + 2 * t * L + 2)) +
+          (2 * (Real.exp ((2 * X + 2 * (2 * t * L) + 2 + t * (Real.log ‖s‖ + 6)) ^ 2 / (4 * t)) /
+            (2 * π)) * (1 + |s.im| + 4 * √t) * √(64 * π * t) * Real.exp (-(Y ^ 2 / (64 * t))))) /
+        γlow t X s := by
+        gcongr
+    _ = _ := by ring
+
 end Soma.Holonics.RH.EventHorizontal
