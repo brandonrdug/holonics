@@ -95,6 +95,15 @@ import ElementaryHolonics.RH.FosterProduct
 import ElementaryHolonics.RH.FosterSplit
 import ElementaryHolonics.RH.FosterHadamard
 import ElementaryHolonics.RH.CombFlux
+import ElementaryHolonics.RH.FosterClassLandau
+import ElementaryHolonics.RH.FosterClassCount
+import ElementaryHolonics.RH.FosterClassProduct
+import ElementaryHolonics.RH.FosterClassSplit
+import ElementaryHolonics.RH.FosterClassHadamard
+import ElementaryHolonics.RH.FosterClassFlux
+import ElementaryHolonics.RH.FosterClassHeat
+import ElementaryHolonics.RH.HeatKernelPhi
+import ElementaryHolonics.RH.FosterClassHeatFlow
 import ElementaryHolonics.RH.LogDerivativeRemainder
 import ElementaryHolonics.RH.LandauLemma
 import ElementaryHolonics.RH.ZeroFactorizationExists

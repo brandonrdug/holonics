@@ -241,8 +241,16 @@ the radius, Cauchy's estimate on the connected nonzero set, hence `2 ξ′/ξ = 
 is a theorem. The discharge for `heatE t ξ` needs the centre value at every `t`, which `Φ` returns,
 and is FT4 (i). The receipt is
 [`research/records/2026-09-03_FT3_HADAMARD_HOLDS_THE_FOSTER_FORM_IS_THE_LOG_DERIVATIVE_AND_THE_COMB_FLUX_IS_THE_VELOCITY_AT_A_SIMPLE_ZERO.md`](research/records/2026-09-03_FT3_HADAMARD_HOLDS_THE_FOSTER_FORM_IS_THE_LOG_DERIVATIVE_AND_THE_COMB_FLUX_IS_THE_VELOCITY_AT_A_SIMPLE_ZERO.md).
-`FT4` is current: the Foster class and the port discharged for `heatE t ξ`, the entire-face flow,
-`Λ_DN`, and `RH ⟺ Λ_DN ≤ 0`.
+[proved-derived; formal-checked] FT4 (i)–(ii) returned: the Foster class carries FT0–FT3 for
+every symmetric entire function of finite order below two with a centre value, with exhibited
+constants; `ξ` and every `heatE t ξ` are members; `RH/HeatKernelPhi.lean` returned the kernel
+`Φ`, even and positive, `ξ(s) = ∫ e^{(s − ½)u} Φ(u) du` for every `s`, the flow identity
+`heatE t ξ (z) = ∫ e^{−t u²} e^{(z − ½)u} Φ(u) du`, and `heatE t ξ (½) ≠ 0` at every `t`;
+`RH/FosterClassHeatFlow.lean` discharged `RodgersTaoZeroDynamics (fun t => heatE t ξ)`. The
+receipt is
+[`research/records/2026-09-03_FT4_THE_FOSTER_CLASS_HOLDS_EVERY_FLOWED_XI_THE_KERNEL_IS_POSITIVE_AND_THE_PORT_IS_A_THEOREM.md`](research/records/2026-09-03_FT4_THE_FOSTER_CLASS_HOLDS_EVERY_FLOWED_XI_THE_KERNEL_IS_POSITIVE_AND_THE_PORT_IS_A_THEOREM.md).
+`FT4` remains current: forward preservation at the entire face, the real-zero times as a closed
+up-set, `Λ_DN`, de Bruijn's bound, and `RH ⟺ Λ_DN ≤ 0`.
 
 [definition] Use `c_CD` for the Copson--de Bruijn sharp coefficient and reserve `Λ_DN` for the
 coordinate-corrected de Bruijn--Newman threshold. The correction record is

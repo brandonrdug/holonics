@@ -141,6 +141,17 @@ preservation (the flow never creates a pair), the real-zero times as a nonempty 
 `Millennium/Seam.lean`. This absorbs the labels `RH6`--`RH9` of the fleet document as the primary
 line's own.
 
+*Returned 2026-09-03 (i)–(ii):* the Foster class (`FosterClassLandau` … `FosterClassFlux`),
+`ξ` and every `heatE t ξ` as members (`FosterClassHeat`, `FosterClassHeatFlow`), the kernel
+`Φ(u) = e^{u/2} Ψ(e^{2u})` with `Φ > 0`, `Φ` even, the representation
+`ξ(s) = ∫ e^{(s − ½)u} Φ(u) du`, the flow identity
+`heatE t ξ (z) = ∫ e^{−t u²} e^{(z − ½)u} Φ(u) du` in the corrected coordinate, the centre value at
+every time, and the port `RodgersTaoZeroDynamics (fun t => heatE t ξ)` as a theorem
+(`HeatKernelPhi`); receipt
+[`the FT4 (i)–(ii) record`](../research/records/2026-09-03_FT4_THE_FOSTER_CLASS_HOLDS_EVERY_FLOWED_XI_THE_KERNEL_IS_POSITIVE_AND_THE_PORT_IS_A_THEOREM.md).
+Forward preservation, the real-zero times, `Λ_DN`, de Bruijn's bound, and the equivalence are
+FT4's remaining items.
+
 **Pass FT4:** the port is a theorem; the equivalence is formal-checked with `Λ_DN` defined from
 the actual `Φ`, never from a polynomial shortcut; de Bruijn's `Λ_DN ≤ ½` returns from
 `PairDescent` transported to the entire face.  

@@ -91,6 +91,19 @@ handoff and activates the engine HNA campaign.
 
 **RH line position:** FT4
 
+[proved-derived; formal-checked] FT4 (i)–(ii) returned: the Foster class
+(`RH/FosterClassLandau.lean` through `RH/FosterClassFlux.lean`) carries FT0–FT3 for every
+symmetric entire function of finite order below two with a centre value, by instance resolution
+with exhibited constants; `ξ` and every `heatE t ξ` are members; `RH/HeatKernelPhi.lean` returned
+the kernel `Φ(u) = e^{u/2}(2x² θ″ + 3x θ′)(e^{2u})`, even and positive by the differentiated theta
+functional equation, the representation `ξ(s) = ∫ e^{(s − ½)u} Φ(u) du` for every `s` through the
+Gamma integrals and the identity theorem, the flow identity
+`heatE t ξ (z) = ∫ e^{−t u²} e^{(z − ½)u} Φ(u) du`, and `heatE t ξ (½) ≠ 0` at every `t`;
+`RH/FosterClassHeatFlow.lean` discharged the port `RodgersTaoZeroDynamics (fun t => heatE t ξ)`.
+FT4's forward preservation, real-zero times, `Λ_DN`, and the equivalence remain current. The
+receipt is
+[`the FT4 (i)–(ii) record`](../research/records/2026-09-03_FT4_THE_FOSTER_CLASS_HOLDS_EVERY_FLOWED_XI_THE_KERNEL_IS_POSITIVE_AND_THE_PORT_IS_A_THEOREM.md).
+
 [proved-derived; formal-checked] FT3 passed: `RH/FosterSplit.lean`, `RH/FosterHadamard.lean`, and
 `RH/CombFlux.lean` returned the finite/tail split of `P` on every centred disc, Landau's remainder
 logarithmic in the radius, the vanishing of the tail of the inverse squares, Cauchy's estimate and
@@ -138,8 +151,9 @@ and each advances on its own gate. The order is fixed:
 3. `FT2` -- the paired canonical product for the entire growth class -- **PASSED**;
 4. `FT3` -- Hadamard, the full Foster form, and the comb flux at every simple zero of `ξ`; the
    port amended to centre `½` with its time-zero field -- **PASSED** at the corrected scope;
-5. `FT4` -- the Foster class and the port discharged for `heatE t ξ` from `Φ`'s centre value, the
-   entire-face flow, `Λ_DN` defined, and `RH ⟺ Λ_DN ≤ 0` against the anchor -- **CURRENT**;
+5. `FT4` -- the Foster class and the port discharged for `heatE t ξ` from `Φ`'s centre value
+   (returned 2026-09-03), the entire-face flow, `Λ_DN` defined, and `RH ⟺ Λ_DN ≤ 0` against the
+   anchor -- **CURRENT**;
 6. `FT5` -- the flowed explicit formula: the bound integer comb against the divisor of
    `heatE t ξ`; and
 7. `FT6` -- `Λ_DN ≥ 0` and the target, or the first exact missing inequality with its falsifier.

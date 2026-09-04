@@ -8,8 +8,10 @@ Along a `C¹` curve `z(s)` the composite `s ↦ heatE s f (z s)` is differentiab
 the curve consists of zeros of `H_s` and the zero at `t₀` is simple, then
 `z′(t₀) = ∂_z² H_{t₀}(z t₀) / ∂_z H_{t₀}(z t₀)`: the velocity of a simple zero is the second
 logarithmic derivative, exactly the first half of `zero_curve_flux` at the polynomial face.  The
-second half, the expansion of `H″/H′` as a sum over the other zeros, is the Hadamard product and
-remains open at the entire face.
+second half, the expansion of `H″/H′` as a sum over the other zeros, is the Hadamard product; it
+was returned on 2026-09-03 by `FosterClassFlux.flux` for every member of the Foster class and, for
+`heatE t ξ` at every `t`, by `FosterClassHeatFlow.rodgersTaoZeroDynamics_heatE`, which discharges
+the port `PhaseFlowLedger.RodgersTaoZeroDynamics`.
 -/
 
 open Complex Metric Filter Topology Set
