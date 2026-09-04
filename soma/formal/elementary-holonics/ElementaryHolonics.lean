@@ -115,6 +115,9 @@ import ElementaryHolonics.RH.FlowedExplicitFormula
 import ElementaryHolonics.RH.ThresholdReturn
 import ElementaryHolonics.RH.DescentComb
 import ElementaryHolonics.RH.GammaStirling
+import ElementaryHolonics.RH.FlowedGamma
+import ElementaryHolonics.RH.GammaPhase
+import ElementaryHolonics.RH.FlowedGammaContour
 import ElementaryHolonics.RH.LogDerivativeRemainder
 import ElementaryHolonics.RH.LandauLemma
 import ElementaryHolonics.RH.ZeroFactorizationExists
