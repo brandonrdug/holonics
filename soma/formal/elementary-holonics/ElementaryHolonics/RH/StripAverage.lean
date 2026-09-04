@@ -231,4 +231,123 @@ theorem prod_le_margin (hc : ConjSymm f) {Δ μ : ℝ} (hμ : 0 < μ)
         ∏ i ∈ t.erase i₀, (‖1 + a (i : Idx f) (ζ - μ)‖ *
           ‖1 + a ((σ' hc i : ↥(upper f)) : Idx f) (ζ - μ)‖)) := by ring
 
+/-! ## The limit, and the strip theorem -/
+
+/-- `ζ − μ` is not a zero of `f` when `ζ` lies left of the shrunken strip. -/
+theorem sub_ne_zero_of_left {Δ μ : ℝ} (hΔ0 : 0 ≤ Δ) (hμ : 0 < μ)
+    (hΔ : ∀ z, f z = 0 → |z.re - 1 / 2| ≤ Δ) {ζ : ℂ} (hζ : ζ.re < 1 / 2)
+    (hs : Δ ^ 2 - μ ^ 2 < (ζ.re - 1 / 2) ^ 2) : f (ζ - μ) ≠ 0 := by
+  intro h
+  have hb := abs_le.mp (hΔ _ h)
+  rw [Complex.sub_re, Complex.ofReal_re] at hb
+  have hp : 0 < 1 / 2 - ζ.re := by linarith
+  have h1 : Δ < 1 / 2 - ζ.re + μ := by
+    by_contra hle
+    push_neg at hle
+    have := pow_le_pow_left₀ (by positivity) hle 2
+    nlinarith
+  linarith [hb.1]
+
+/-- **The strict contraction for `f`**, left of the seam: `‖f(ζ + μ)‖ < ‖f(ζ − μ)‖`. -/
+theorem norm_translate_lt (hc : ConjSymm f) (hnr : NoRealZero f) {Δ μ : ℝ} (hΔ0 : 0 ≤ Δ)
+    (hμ : 0 < μ) (hΔ : ∀ z, f z = 0 → |z.re - 1 / 2| ≤ Δ) {ζ : ℂ} (hζ : ζ.re < 1 / 2)
+    (hs : Δ ^ 2 - μ ^ 2 < (ζ.re - 1 / 2) ^ 2) (i₀ : ↥(upper f)) :
+    ‖f (ζ + μ)‖ < ‖f (ζ - μ)‖ := by
+  set Gp : ℝ := ‖1 + a (i₀ : Idx f) (ζ + μ)‖ *
+    ‖1 + a ((σ' hc i₀ : ↥(upper f)) : Idx f) (ζ + μ)‖ with hGp
+  set Gm : ℝ := ‖1 + a (i₀ : Idx f) (ζ - μ)‖ *
+    ‖1 + a ((σ' hc i₀ : ↥(upper f)) : Idx f) (ζ - μ)‖ with hGm
+  have hGlt : Gp < Gm := pair_lt hc hμ hΔ i₀ hζ hs
+  have hGp0 : 0 ≤ Gp := by positivity
+  have hGm0 : 0 < Gm := lt_of_le_of_lt hGp0 hGlt
+  set ρ : ℝ := Real.sqrt (Gp / Gm) with hρdef
+  have hρ0 : 0 ≤ ρ := Real.sqrt_nonneg _
+  have hρ2 : ρ ^ 2 = Gp / Gm := Real.sq_sqrt (by positivity)
+  have hρ1 : ρ < 1 := by
+    rw [hρdef, Real.sqrt_lt' one_pos, one_pow]
+    exact (div_lt_one hGm0).mpr hGlt
+  have hρ : Gp ≤ ρ ^ 2 * Gm := by
+    rw [hρ2, div_mul_cancel₀ _ hGm0.ne']
+  have hfin : ∀ s : Finset ↥(upper f), i₀ ∈ s →
+      ∏ i ∈ sym hc s, ‖1 + a (i : Idx f) (ζ + μ)‖ ≤
+        ρ * ∏ i ∈ sym hc s, ‖1 + a (i : Idx f) (ζ - μ)‖ :=
+    fun s hs' => prod_le_margin hc hμ hΔ hζ hs.le i₀ (sym_invariant hc s) (subset_sym hc s hs')
+      hρ0 hρ
+  have hp : Tendsto (fun s : Finset ↥(upper f) => ‖∏ i ∈ sym hc s, (1 + a (i : Idx f) (ζ + μ))‖)
+      atTop (𝓝 ‖Qplus f (ζ + μ)‖) :=
+    (Filter.Tendsto.comp (hasProd_upper (f := f) (ζ + μ)) (tendsto_sym hc)).norm
+  have hm : Tendsto (fun s : Finset ↥(upper f) => ‖∏ i ∈ sym hc s, (1 + a (i : Idx f) (ζ - μ))‖)
+      atTop (𝓝 ‖Qplus f (ζ - μ)‖) :=
+    (Filter.Tendsto.comp (hasProd_upper (f := f) (ζ - μ)) (tendsto_sym hc)).norm
+  have hlim : ‖Qplus f (ζ + μ)‖ ≤ ρ * ‖Qplus f (ζ - μ)‖ := by
+    apply le_of_tendsto_of_tendsto hp (hm.const_mul ρ)
+    filter_upwards [Filter.eventually_ge_atTop ({i₀} : Finset ↥(upper f))] with s hs'
+    have hi : i₀ ∈ s := hs' (Finset.mem_singleton_self i₀)
+    rw [norm_prod, norm_prod]
+    exact hfin s hi
+  have hfz : ∀ z, f z = f (1 / 2) * Qplus f z := fun z => congrFun (eq_centre_mul_Qplus' hnr) z
+  have hne := sub_ne_zero_of_left (f := f) hΔ0 hμ hΔ hζ hs
+  have hQm : 0 < ‖Qplus f (ζ - μ)‖ := by
+    rw [hfz] at hne
+    exact norm_pos_iff.mpr (right_ne_zero_of_mul hne)
+  have hc0 : 0 < ‖f (1 / 2 : ℂ)‖ := norm_pos_iff.mpr hf.centre
+  rw [hfz (ζ + μ), hfz (ζ - μ), norm_mul, norm_mul]
+  calc ‖f (1 / 2)‖ * ‖Qplus f (ζ + μ)‖ ≤ ‖f (1 / 2)‖ * (ρ * ‖Qplus f (ζ - μ)‖) :=
+        mul_le_mul_of_nonneg_left hlim hc0.le
+    _ < ‖f (1 / 2)‖ * ‖Qplus f (ζ - μ)‖ := by
+        have := mul_pos hc0 hQm
+        nlinarith
+
+/-- A member with no upper zero is constant. -/
+theorem eq_centre_of_isEmpty (hnr : NoRealZero f) (h : IsEmpty ↥(upper f)) (z : ℂ) :
+    f z = f (1 / 2) := by
+  rw [congrFun (eq_centre_mul_Qplus' hnr) z]
+  unfold Qplus
+  rw [tprod_empty, mul_one]
+
+/-- **Theorem 8 (de Bruijn), in the tree's coordinate.** For a member with conjugation symmetry
+and no real zero, whose zeros lie in `|Re z − ½| ≤ Δ`, every zero of `avg μ f` has
+`(Re − ½)² ≤ max(Δ² − μ², 0)`. -/
+theorem re_sq_le_of_avg_eq_zero (hc : ConjSymm f) (hnr : NoRealZero f) {Δ μ : ℝ} (hΔ0 : 0 ≤ Δ)
+    (hμ : 0 < μ) (hΔ : ∀ z, f z = 0 → |z.re - 1 / 2| ≤ Δ) {ζ : ℂ} (h0 : avg μ f ζ = 0) :
+    (ζ.re - 1 / 2) ^ 2 ≤ max (Δ ^ 2 - μ ^ 2) 0 := by
+  by_contra hcon
+  push_neg at hcon
+  have hpos : 0 < (ζ.re - 1 / 2) ^ 2 := lt_of_le_of_lt (le_max_right _ _) hcon
+  have hs : Δ ^ 2 - μ ^ 2 < (ζ.re - 1 / 2) ^ 2 := lt_of_le_of_lt (le_max_left _ _) hcon
+  have hsum : ∀ w, avg μ f w = 0 → ‖f (w + μ)‖ = ‖f (w - μ)‖ := by
+    intro w hw
+    unfold avg at hw
+    have h1 : f (w + μ) + f (w - μ) = 0 := by
+      rcases div_eq_zero_iff.mp hw with h | h
+      · exact h
+      · norm_num at h
+    rw [eq_neg_of_add_eq_zero_left h1, norm_neg]
+  rcases isEmpty_or_nonempty ↥(upper f) with hE | hne'
+  · have hconst := eq_centre_of_isEmpty (f := f) hnr hE
+    unfold avg at h0
+    rw [hconst (ζ + μ), hconst (ζ - μ)] at h0
+    apply hf.centre
+    rcases div_eq_zero_iff.mp h0 with h | h
+    · have h2 : (2 : ℂ) * f (1 / 2) = 0 := by linear_combination h
+      exact (mul_eq_zero.mp h2).resolve_left two_ne_zero
+    · norm_num at h
+  · obtain ⟨i₀⟩ := hne'
+    have hne : ζ.re ≠ 1 / 2 := by
+      intro h
+      rw [h] at hpos
+      simp at hpos
+    rcases lt_or_gt_of_ne hne with hlt | hgt
+    · exact absurd (hsum ζ h0) (ne_of_lt (norm_translate_lt hc hnr hΔ0 hμ hΔ hlt hs i₀))
+    · have h0' : avg μ f (1 - ζ) = 0 := by
+        rw [avg_one_sub hf.symm]
+        exact h0
+      have hlt' : (1 - ζ).re < 1 / 2 := by
+        rw [Complex.sub_re, Complex.one_re]
+        linarith
+      have hs' : Δ ^ 2 - μ ^ 2 < ((1 - ζ).re - 1 / 2) ^ 2 := by
+        rw [Complex.sub_re, Complex.one_re]
+        nlinarith
+      exact absurd (hsum _ h0') (ne_of_lt (norm_translate_lt hc hnr hΔ0 hμ hΔ hlt' hs' i₀))
+
 end Soma.Holonics.RH.StripAverage
