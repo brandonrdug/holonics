@@ -204,6 +204,87 @@ theorem seg_facts {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖ / 8
       have h6 : ‖w‖ / 4 ≤ |w.im + τ * ζ.im| := by linarith
       linarith
 
+/-- The segment facts as a predicate on the base point and the direction. -/
+def GoodSeg (w ζ : ℂ) : Prop := ∀ τ : ℝ, |τ| ≤ 2 →
+  (w + τ * ζ) ∈ Complex.slitPlane ∧ w + τ * ζ ≠ 1 ∧ 3 * ‖w‖ / 4 ≤ ‖w + τ * ζ‖ ∧
+    ‖w‖ / 4 ≤ ‖w + τ * ζ - 1‖ ∧ (w + τ * ζ) / 2 ∈ Sector
+
+theorem goodSeg_of_re {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖ / 8) : GoodSeg w ζ :=
+  fun τ hτ => seg_facts hw hζ hτ
+
+/-- High in the strip (`4|Re w| ≤ Im w`, `Im w ≥ 2`) the segment facts hold as well. -/
+theorem goodSeg_of_im {w ζ : ℂ} (hw : 4 * |w.re| ≤ w.im) (hw2 : 2 ≤ w.im) (hζ : ‖ζ‖ ≤ ‖w‖ / 8) :
+    GoodSeg w ζ := by
+  intro τ hτ
+  have hτζ : ‖(τ : ℂ) * ζ‖ ≤ ‖w‖ / 4 := by
+    rw [norm_mul, Complex.norm_real, Real.norm_eq_abs]
+    calc |τ| * ‖ζ‖ ≤ 2 * (‖w‖ / 8) := by gcongr
+      _ = ‖w‖ / 4 := by ring
+  have hre : (w + τ * ζ).re = w.re + τ * ζ.re := by simp
+  have him : (w + τ * ζ).im = w.im + τ * ζ.im := by simp
+  have hreζ : |τ * ζ.re| ≤ ‖w‖ / 4 := by
+    calc |τ * ζ.re| = |((τ : ℂ) * ζ).re| := by simp
+      _ ≤ ‖(τ : ℂ) * ζ‖ := Complex.abs_re_le_norm _
+      _ ≤ ‖w‖ / 4 := hτζ
+  have himζ : |τ * ζ.im| ≤ ‖w‖ / 4 := by
+    calc |τ * ζ.im| = |((τ : ℂ) * ζ).im| := by simp
+      _ ≤ ‖(τ : ℂ) * ζ‖ := Complex.abs_im_le_norm _
+      _ ≤ ‖w‖ / 4 := hτζ
+  have hnw : ‖w‖ ^ 2 = w.re ^ 2 + w.im ^ 2 := by
+    rw [Complex.sq_norm, Complex.normSq_apply]
+    ring
+  -- `‖w‖ ≤ (17/16) Im w`
+  have hre2 : w.re ^ 2 ≤ w.im ^ 2 / 16 := by
+    have h1 : |w.re| ≤ w.im / 4 := by linarith
+    have h2 : |w.re| ^ 2 ≤ (w.im / 4) ^ 2 :=
+      pow_le_pow_left₀ (abs_nonneg _) h1 2
+    rw [sq_abs] at h2
+    linarith
+  have hnorm_le : ‖w‖ ≤ 17 / 16 * w.im := by
+    have h1 : ‖w‖ ^ 2 ≤ (17 / 16 * w.im) ^ 2 := by nlinarith
+    exact (pow_le_pow_iff_left₀ (norm_nonneg _) (by linarith) two_ne_zero).mp h1
+  have hw2' : 2 ≤ ‖w‖ := le_trans hw2 (Complex.im_le_norm w)
+  have himp : 47 / 64 * w.im ≤ w.im + τ * ζ.im := by
+    linarith [neg_abs_le (τ * ζ.im)]
+  have himp0 : 0 < w.im + τ * ζ.im := by linarith
+  have hnorm : 3 * ‖w‖ / 4 ≤ ‖w + τ * ζ‖ := by
+    have := norm_sub_norm_le w (-(τ * ζ))
+    rw [sub_neg_eq_add, norm_neg] at this
+    linarith
+  have hnorm1 : ‖w‖ / 4 ≤ ‖w + τ * ζ - 1‖ := by
+    have := norm_sub_norm_le (w + τ * ζ) 1
+    rw [norm_one] at this
+    linarith
+  have hslit : (w + τ * ζ) ∈ Complex.slitPlane := by
+    rw [Complex.mem_slitPlane_iff, him]
+    exact Or.inr himp0.ne'
+  have hne1 : w + τ * ζ ≠ 1 := by
+    intro h
+    have : (w + τ * ζ).im = 0 := by rw [h]; simp
+    rw [him] at this
+    linarith
+  refine ⟨hslit, hne1, hnorm, hnorm1, ?_, ?_⟩
+  · intro h
+    have : w + τ * ζ = 0 := by
+      have h2 : (w + τ * ζ) = 2 * ((w + τ * ζ) / 2) := by ring
+      rw [h2, h, mul_zero]
+    have := congrArg Complex.im this
+    rw [him] at this
+    simp at this
+    linarith
+  · right
+    simp only [Complex.div_ofNat_re, Complex.div_ofNat_im, abs_div, Nat.abs_ofNat]
+    rw [hre, him]
+    have h1 : |w.re + τ * ζ.re| ≤ 33 / 64 * w.im := by
+      calc |w.re + τ * ζ.re| ≤ |w.re| + |τ * ζ.re| := abs_add_le _ _
+        _ ≤ w.im / 4 + ‖w‖ / 4 := by gcongr; linarith
+        _ ≤ 33 / 64 * w.im := by linarith
+    have h2 : |w.im + τ * ζ.im| = w.im + τ * ζ.im := abs_of_pos himp0
+    rw [h2]
+    have := himp
+    apply div_le_div_of_nonneg_right _ (by norm_num)
+    linarith
+
 /-! ## The expansion along a segment -/
 
 theorem hasDerivAt_curve (w ζ : ℂ) (τ : ℝ) : HasDerivAt (fun τ : ℝ => w + (τ : ℂ) * ζ) ζ τ := by
@@ -211,37 +292,37 @@ theorem hasDerivAt_curve (w ζ : ℂ) (τ : ℝ) : HasDerivAt (fun τ : ℝ => w
     simpa using ((hasDerivAt_id (τ : ℂ)).mul_const ζ).const_add w
   exact h.comp_ofReal
 
-theorem hasDerivAt_g_curve {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖ / 8) {τ : ℝ} (hτ : |τ| ≤ 2) :
+theorem hasDerivAt_g_curve {w ζ : ℂ} (h : GoodSeg w ζ) {τ : ℝ} (hτ : |τ| ≤ 2) :
     HasDerivAt (fun τ : ℝ => g (w + τ * ζ)) (g (w + τ * ζ) * ℓ (w + τ * ζ) * ζ) τ := by
-  obtain ⟨hs, h1, -, -, -⟩ := seg_facts hw hζ hτ
+  obtain ⟨hs, h1, -, -, -⟩ := h τ hτ
   have hc : HasDerivAt (fun y : ℂ => w + y * ζ) ζ (τ : ℂ) := by
     simpa using ((hasDerivAt_id (τ : ℂ)).mul_const ζ).const_add w
   have h := ((hasDerivAt_g hs h1).comp (τ : ℂ) hc).comp_ofReal
   exact h
 
-theorem hasDerivAt_ℓ_curve {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖ / 8) {τ : ℝ} (hτ : |τ| ≤ 2) :
+theorem hasDerivAt_ℓ_curve {w ζ : ℂ} (h : GoodSeg w ζ) {τ : ℝ} (hτ : |τ| ≤ 2) :
     HasDerivAt (fun τ : ℝ => ℓ (w + τ * ζ)) (ℓ' (w + τ * ζ) * ζ) τ := by
-  obtain ⟨hs, h1, -, -, -⟩ := seg_facts hw hζ hτ
+  obtain ⟨hs, h1, -, -, -⟩ := h τ hτ
   have hc : HasDerivAt (fun y : ℂ => w + y * ζ) ζ (τ : ℂ) := by
     simpa using ((hasDerivAt_id (τ : ℂ)).mul_const ζ).const_add w
   have h := ((hasDerivAt_ℓ hs h1).comp (τ : ℂ) hc).comp_ofReal
   exact h
 
-theorem continuousOn_ℓ_curve {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖ / 8) :
+theorem continuousOn_ℓ_curve {w ζ : ℂ} (h : GoodSeg w ζ) :
     ContinuousOn (fun τ : ℝ => ℓ (w + τ * ζ)) (Ioo (-2) 2) := by
   intro τ hτ
   have : |τ| ≤ 2 := by
     rw [abs_le]
     exact ⟨hτ.1.le, hτ.2.le⟩
-  exact (hasDerivAt_ℓ_curve hw hζ this).continuousAt.continuousWithinAt
+  exact (hasDerivAt_ℓ_curve h this).continuousAt.continuousWithinAt
 
-theorem continuousOn_ℓ'_curve {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖ / 8) :
+theorem continuousOn_ℓ'_curve {w ζ : ℂ} (h : GoodSeg w ζ) :
     ContinuousOn (fun τ : ℝ => ℓ' (w + τ * ζ)) (Ioo (-2) 2) := by
   intro τ hτ
   have hτ' : |τ| ≤ 2 := by
     rw [abs_le]
     exact ⟨hτ.1.le, hτ.2.le⟩
-  obtain ⟨hs, h1, -, -, -⟩ := seg_facts hw hζ hτ'
+  obtain ⟨hs, h1, -, -, -⟩ := h τ hτ'
   have hs0 : w + τ * ζ ≠ 0 := ne_zero_of_slit hs
   have hs1 : w + τ * ζ - 1 ≠ 0 := sub_ne_zero.mpr h1
   apply ContinuousAt.continuousWithinAt
@@ -260,9 +341,9 @@ theorem mem_Ioo_of_uIcc {τ σ : ℝ} (hσ : σ ∈ Icc (0 : ℝ) 1) (hτ : τ �
 /-- The integrated phase `Λ(τ) = ∫_0^τ ℓ(w + σζ) dσ`. -/
 def Λ (w ζ : ℂ) (τ : ℝ) : ℂ := ∫ σ in (0 : ℝ)..τ, ℓ (w + σ * ζ)
 
-theorem hasDerivAt_Λ {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖ / 8) {τ : ℝ}
+theorem hasDerivAt_Λ {w ζ : ℂ} (h : GoodSeg w ζ) {τ : ℝ}
     (hτ : τ ∈ Icc (0 : ℝ) 1) : HasDerivAt (Λ w ζ) (ℓ (w + τ * ζ)) τ := by
-  have hcont := continuousOn_ℓ_curve hw hζ
+  have hcont := continuousOn_ℓ_curve h
   have hτ' : τ ∈ Ioo (-2 : ℝ) 2 := ⟨by linarith [hτ.1], by linarith [hτ.2]⟩
   apply integral_hasDerivAt_right
   · apply ContinuousOn.intervalIntegrable
@@ -271,15 +352,15 @@ theorem hasDerivAt_Λ {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖
   · exact hcont.continuousAt (isOpen_Ioo.mem_nhds hτ')
 
 /-- **`g` along the segment**: `g(w + ζ) = g(w) exp(ζ Λ(1))`. -/
-theorem g_add_eq {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖ / 8) :
+theorem g_add_eq {w ζ : ℂ} (h : GoodSeg w ζ) :
     g (w + ζ) = g w * Complex.exp (ζ * Λ w ζ 1) := by
   set q : ℝ → ℂ := fun τ => g (w + τ * ζ) * Complex.exp (-(ζ * Λ w ζ τ)) with hq
   have hderiv : ∀ τ ∈ uIcc (0 : ℝ) 1, HasDerivAt q 0 τ := by
     intro τ hτ
     rw [uIcc_of_le zero_le_one] at hτ
-    have h1 := hasDerivAt_g_curve hw hζ (τ := τ)
+    have h1 := hasDerivAt_g_curve h (τ := τ)
       (by rw [abs_le]; exact ⟨by linarith [hτ.1], by linarith [hτ.2]⟩)
-    have h2 := ((hasDerivAt_Λ hw hζ hτ).const_mul ζ).neg.cexp
+    have h2 := ((hasDerivAt_Λ h hτ).const_mul ζ).neg.cexp
     have h := h1.mul h2
     refine h.congr_deriv ?_
     ring
@@ -305,28 +386,27 @@ theorem g_add_eq {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖ / 8)
         rw [this]
 
 /-- **`ℓ` along the segment**: `ℓ(w + σζ) = ℓ(w) + ∫_0^σ ℓ'(w + ηζ) ζ dη`. -/
-theorem ℓ_add_eq {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖ / 8) {σ : ℝ} (hσ : σ ∈ Icc (0 : ℝ) 1) :
+theorem ℓ_add_eq {w ζ : ℂ} (h : GoodSeg w ζ) {σ : ℝ} (hσ : σ ∈ Icc (0 : ℝ) 1) :
     ℓ (w + σ * ζ) = ℓ w + ∫ η in (0 : ℝ)..σ, ℓ' (w + η * ζ) * ζ := by
   have hderiv : ∀ η ∈ uIcc (0 : ℝ) σ, HasDerivAt (fun η : ℝ => ℓ (w + η * ζ)) (ℓ' (w + η * ζ) * ζ) η := by
     intro η hη
     have := mem_Ioo_of_uIcc hσ hη
-    exact hasDerivAt_ℓ_curve hw hζ (by rw [abs_le]; exact ⟨this.1.le, this.2.le⟩)
+    exact hasDerivAt_ℓ_curve h (by rw [abs_le]; exact ⟨this.1.le, this.2.le⟩)
   have hint : IntervalIntegrable (fun η : ℝ => ℓ' (w + η * ζ) * ζ) volume 0 σ := by
     apply ContinuousOn.intervalIntegrable
-    exact ((continuousOn_ℓ'_curve hw hζ).mono fun x hx => mem_Ioo_of_uIcc hσ hx).mul continuousOn_const
+    exact ((continuousOn_ℓ'_curve h).mono fun x hx => mem_Ioo_of_uIcc hσ hx).mul continuousOn_const
   have h := integral_eq_sub_of_hasDerivAt hderiv hint
   rw [h]
   simp
 
 /-- The difference of `ℓ'` along the segment. -/
-theorem norm_ℓ'_sub_le {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖ / 8) {η : ℝ}
+theorem norm_ℓ'_sub_le {w ζ : ℂ} (h : GoodSeg w ζ) (hw2 : 2 ≤ ‖w‖) (hζ : ‖ζ‖ ≤ ‖w‖ / 8) {η : ℝ}
     (hη : η ∈ Icc (0 : ℝ) 1) : ‖ℓ' (w + η * ζ) - ℓ' w‖ ≤ 402 * ‖ζ‖ / ‖w‖ ^ 2 := by
-  obtain ⟨hs, h1, hn, hn1, -⟩ := seg_facts hw hζ (τ := η)
+  obtain ⟨hs, h1, hn, hn1, -⟩ := h η
     (by rw [abs_le]; exact ⟨by linarith [hη.1], by linarith [hη.2]⟩)
-  obtain ⟨hs0', h10', -, hn10, -⟩ := seg_facts hw hζ (τ := 0) (by simp)
+  obtain ⟨hs0', h10', -, hn10, -⟩ := h 0 (by simp)
   simp only [Complex.ofReal_zero, zero_mul, add_zero] at hs0' h10' hn10
   set p : ℂ := w + η * ζ with hp
-  have hw2 : 2 ≤ ‖w‖ := le_trans hw (Complex.re_le_norm w)
   have hw0 : 0 < ‖w‖ := by linarith
   have hp0 : p ≠ 0 := ne_zero_of_slit hs
   have hw0' : w ≠ 0 := ne_zero_of_slit hs0'
@@ -415,10 +495,9 @@ theorem norm_ℓ'_sub_le {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w
 
 /-- **The expansion of `g` along a segment**:
 `g(w + ζ) = g(w) exp(ζ ℓ(w) + ζ² ℓ'(w)/2 + R)` with `‖R‖ ≤ 402 ‖ζ‖³/‖w‖²`. -/
-theorem g_expansion {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖ / 8) :
+theorem g_expansion {w ζ : ℂ} (h : GoodSeg w ζ) (hw2 : 2 ≤ ‖w‖) (hζ : ‖ζ‖ ≤ ‖w‖ / 8) :
     ∃ R : ℂ, g (w + ζ) = g w * Complex.exp (ζ * ℓ w + ζ ^ 2 * ℓ' w / 2 + R) ∧
       ‖R‖ ≤ 402 * ‖ζ‖ ^ 3 / ‖w‖ ^ 2 := by
-  have hw2 : 2 ≤ ‖w‖ := le_trans hw (Complex.re_le_norm w)
   -- the double integral of the difference
   set D : ℝ → ℂ := fun σ => ∫ η in (0 : ℝ)..σ, (ℓ' (w + η * ζ) - ℓ' w) * ζ with hD
   have hDbound : ∀ σ ∈ Icc (0 : ℝ) 1, ‖D σ‖ ≤ 402 * ‖ζ‖ ^ 2 / ‖w‖ ^ 2 := by
@@ -431,7 +510,7 @@ theorem g_expansion {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖ /
         intro η hη
         rw [uIoc_of_le hσ.1] at hη
         rw [norm_mul]
-        exact mul_le_mul_of_nonneg_right (norm_ℓ'_sub_le hw hζ ⟨hη.1.le, hη.2.trans hσ.2⟩)
+        exact mul_le_mul_of_nonneg_right (norm_ℓ'_sub_le h hw2 hζ ⟨hη.1.le, hη.2.trans hσ.2⟩)
           (norm_nonneg _))
     calc ‖∫ η in (0 : ℝ)..σ, (ℓ' (w + η * ζ) - ℓ' w) * ζ‖ ≤ 402 * ‖ζ‖ / ‖w‖ ^ 2 * ‖ζ‖ * |σ - 0| :=
           this
@@ -443,16 +522,16 @@ theorem g_expansion {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖ /
   -- ℓ on the segment, with the difference isolated
   have hℓ : ∀ σ ∈ Icc (0 : ℝ) 1, ℓ (w + σ * ζ) = ℓ w + σ * (ℓ' w * ζ) + D σ := by
     intro σ hσ
-    rw [ℓ_add_eq hw hζ hσ, hD]
+    rw [ℓ_add_eq h hσ, hD]
     simp only
     have hint1 : IntervalIntegrable (fun η : ℝ => ℓ' (w + η * ζ) * ζ) volume 0 σ := by
       apply ContinuousOn.intervalIntegrable
-      exact ((continuousOn_ℓ'_curve hw hζ).mono fun x hx => mem_Ioo_of_uIcc hσ hx).mul
+      exact ((continuousOn_ℓ'_curve h).mono fun x hx => mem_Ioo_of_uIcc hσ hx).mul
         continuousOn_const
     have hint2 : IntervalIntegrable (fun _ : ℝ => ℓ' w * ζ) volume 0 σ := intervalIntegrable_const
     have hint3 : IntervalIntegrable (fun η : ℝ => (ℓ' (w + η * ζ) - ℓ' w) * ζ) volume 0 σ := by
       apply ContinuousOn.intervalIntegrable
-      exact (((continuousOn_ℓ'_curve hw hζ).mono fun x hx => mem_Ioo_of_uIcc hσ hx).sub
+      exact (((continuousOn_ℓ'_curve h).mono fun x hx => mem_Ioo_of_uIcc hσ hx).sub
         continuousOn_const).mul continuousOn_const
     have : ∫ η in (0 : ℝ)..σ, ℓ' (w + η * ζ) * ζ =
         (∫ η in (0 : ℝ)..σ, ℓ' w * ζ) + ∫ η in (0 : ℝ)..σ, (ℓ' (w + η * ζ) - ℓ' w) * ζ := by
@@ -470,13 +549,13 @@ theorem g_expansion {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖ /
       rw [hD]
       apply integral_hasDerivAt_right
       · apply ContinuousOn.intervalIntegrable
-        exact (((continuousOn_ℓ'_curve hw hζ).mono fun x hx => mem_Ioo_of_uIcc hσ hx).sub
+        exact (((continuousOn_ℓ'_curve h).mono fun x hx => mem_Ioo_of_uIcc hσ hx).sub
           continuousOn_const).mul continuousOn_const
       · have hτ' : σ ∈ Ioo (-2 : ℝ) 2 := ⟨by linarith [hσ.1], by linarith [hσ.2]⟩
-        exact (((continuousOn_ℓ'_curve hw hζ).sub continuousOn_const).mul
+        exact (((continuousOn_ℓ'_curve h).sub continuousOn_const).mul
           continuousOn_const).stronglyMeasurableAtFilter isOpen_Ioo σ hτ'
       · have hτ' : σ ∈ Ioo (-2 : ℝ) 2 := ⟨by linarith [hσ.1], by linarith [hσ.2]⟩
-        exact (((continuousOn_ℓ'_curve hw hζ).sub continuousOn_const).mul
+        exact (((continuousOn_ℓ'_curve h).sub continuousOn_const).mul
           continuousOn_const).continuousAt (isOpen_Ioo.mem_nhds hτ')
     exact hderiv.continuousAt.continuousWithinAt
   have hΛ : Λ w ζ 1 = ℓ w + ℓ' w * ζ / 2 + ∫ σ in (0 : ℝ)..1, D σ := by
@@ -500,7 +579,7 @@ theorem g_expansion {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖ /
     rw [this]
     ring
   refine ⟨ζ * ∫ σ in (0 : ℝ)..1, D σ, ?_, ?_⟩
-  · rw [g_add_eq hw hζ, hΛ]
+  · rw [g_add_eq h, hΛ]
     congr 1
     congr 1
     ring
@@ -513,5 +592,17 @@ theorem g_expansion {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖ /
     simp only [sub_zero, abs_one, mul_one] at this
     calc ‖ζ‖ * ‖∫ σ in (0 : ℝ)..1, D σ‖ ≤ ‖ζ‖ * (402 * ‖ζ‖ ^ 2 / ‖w‖ ^ 2) := by gcongr
       _ = 402 * ‖ζ‖ ^ 3 / ‖w‖ ^ 2 := by ring
+
+/-- The expansion at a base point with `Re w ≥ 2`. -/
+theorem g_expansion_re {w ζ : ℂ} (hw : 2 ≤ w.re) (hζ : ‖ζ‖ ≤ ‖w‖ / 8) :
+    ∃ R : ℂ, g (w + ζ) = g w * Complex.exp (ζ * ℓ w + ζ ^ 2 * ℓ' w / 2 + R) ∧
+      ‖R‖ ≤ 402 * ‖ζ‖ ^ 3 / ‖w‖ ^ 2 :=
+  g_expansion (goodSeg_of_re hw hζ) (le_trans hw (Complex.re_le_norm w)) hζ
+
+/-- The expansion at a base point high in the strip (`4|Re w| ≤ Im w`, `Im w ≥ 2`). -/
+theorem g_expansion_im {w ζ : ℂ} (hw : 4 * |w.re| ≤ w.im) (hw2 : 2 ≤ w.im) (hζ : ‖ζ‖ ≤ ‖w‖ / 8) :
+    ∃ R : ℂ, g (w + ζ) = g w * Complex.exp (ζ * ℓ w + ζ ^ 2 * ℓ' w / 2 + R) ∧
+      ‖R‖ ≤ 402 * ‖ζ‖ ^ 3 / ‖w‖ ^ 2 :=
+  g_expansion (goodSeg_of_im hw hw2 hζ) (le_trans hw2 (Complex.im_le_norm w)) hζ
 
 end Soma.Holonics.RH.GammaPhase
