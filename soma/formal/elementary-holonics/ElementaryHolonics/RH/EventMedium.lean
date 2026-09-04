@@ -738,4 +738,205 @@ theorem tendsto_Dmed {t : ℝ} (ht : 0 < t) : Tendsto (fun w => Dmed t w) atTop 
   have h := ((tendsto_β₃maj t).add h4).const_mul (Real.exp 1 / √(2 * π * t))
   simpa [Dmed] using h
 
+/-! ## The threshold and the medium-range event theorem -/
+
+/-- The nonnegative part of the medium-range threshold. -/
+def w₁' (t X : ℝ) : ℝ :=
+  4 * X + 160 * t + 2 * (X + 2 * t + 2) + 16 * t + 40 * t + (3 + 6 * t) +
+    2 * t * (3 + 6 * t) ^ 2 + 6 * t
+/-- The threshold in `w` beyond which every side condition of the medium range holds. -/
+def w₁ (t X : ℝ) : ℝ := 2 + w₁' t X
+
+theorem w₁'_nonneg {t X : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) : 0 ≤ w₁' t X := by
+  unfold w₁'; positivity
+
+theorem side_sec_med {t X w L : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) (hw : 1 ≤ w) (hL : 0 ≤ L)
+    (hLw : L ≤ w ^ 7) (h : 2 * (X + 2 * t + 2) ≤ w) :
+    X + 2 * t * L + 2 ≤ w ^ 12 - w ^ 8 / 20 := by
+  have hξ := ξ_le_med ht.le hX0 hw hL hLw
+  have hw0 : 0 ≤ w := by linarith
+  have h7 : w ^ 7 ≤ w ^ 12 := pow_le_pow_right₀ hw (by norm_num)
+  have h8 : w ^ 8 ≤ w ^ 12 := pow_le_pow_right₀ hw (by norm_num)
+  have h5 : w ≤ w ^ 5 := by
+    calc w = w ^ 1 := (pow_one w).symm
+      _ ≤ w ^ 5 := pow_le_pow_right₀ hw (by norm_num)
+  have hcξ : 0 ≤ cξ t X := by unfold cξ; positivity
+  have e1 : cξ t X * w ^ 7 ≤ w ^ 12 / 2 := by
+    have : 2 * cξ t X ≤ w ^ 5 := by unfold cξ; linarith
+    have := mul_le_mul_of_nonneg_left this (pow_nonneg hw0 7)
+    nlinarith [pow_nonneg hw0 7]
+  linarith
+
+theorem side_ζY_med {t w L : ℝ} (ht : 0 < t) (hw : 1 ≤ w) (hL : 0 ≤ L) (hLw : L ≤ w ^ 7)
+    (h : 16 * t + 1 ≤ w) : 2 * t * L + w ^ 8 / 20 ≤ w ^ 12 / 8 := by
+  have hw0 : 0 ≤ w := by linarith
+  have h78 : w ^ 7 ≤ w ^ 8 := pow_le_pow_right₀ hw (by norm_num)
+  have h4 : w ≤ w ^ 4 := by
+    calc w = w ^ 1 := (pow_one w).symm
+      _ ≤ w ^ 4 := pow_le_pow_right₀ hw (by norm_num)
+  have e1 : 2 * t * L ≤ 2 * t * w ^ 8 :=
+    mul_le_mul_of_nonneg_left (hLw.trans h78) (by positivity)
+  have e2 : (2 * t + 1 / 20) * w ^ 8 ≤ w ^ 12 / 8 := by
+    have : 16 * t + 1 ≤ w ^ 4 := h.trans h4
+    have := mul_le_mul_of_nonneg_left this (pow_nonneg hw0 8)
+    nlinarith [pow_nonneg hw0 8]
+  linarith
+
+theorem side_small_med {t w L : ℝ} {s : ℂ} (ht : 0 < t) (hw : 2 ≤ w) (hL : 0 ≤ L)
+    (hLw : L ≤ w ^ 7) (h : 40 * t ≤ w) (hsu : w ^ 12 ≤ ‖s‖) :
+    402 * (2 * t * L + w ^ 8 / 20) ^ 3 / ‖s‖ ^ 2 + 2 * π / (3 * ‖s‖) ≤ 1 := by
+  have hw1 : 1 ≤ w := by linarith
+  have hw0 : 0 < w := by linarith
+  have e1 : 2 * t * L + w ^ 8 / 20 ≤ w ^ 8 / 10 := by
+    have : 2 * t * L ≤ 2 * t * w ^ 7 := mul_le_mul_of_nonneg_left hLw (by positivity)
+    have : 40 * t * w ^ 7 ≤ w * w ^ 7 := mul_le_mul_of_nonneg_right h (by positivity)
+    nlinarith
+  have e2 : (2 * t * L + w ^ 8 / 20) ^ 3 ≤ (w ^ 8 / 10) ^ 3 :=
+    pow_le_pow_left₀ (by positivity) e1 3
+  have e3 : (w ^ 12) ^ 2 ≤ ‖s‖ ^ 2 := pow_le_pow_left₀ (by positivity) hsu 2
+  have hw16 : 16 ≤ w ^ 12 := by
+    have := pow_le_pow_left₀ (by norm_num) hw 12
+    norm_num at this
+    linarith
+  have e4 : 402 * (2 * t * L + w ^ 8 / 20) ^ 3 / ‖s‖ ^ 2 ≤ 402 / 1000 := by
+    calc 402 * (2 * t * L + w ^ 8 / 20) ^ 3 / ‖s‖ ^ 2 ≤ 402 * (w ^ 8 / 10) ^ 3 / (w ^ 12) ^ 2 := by
+          gcongr
+      _ = 402 / 1000 := by
+          field_simp
+          first | done | ring
+  have e5 : 2 * π / (3 * ‖s‖) ≤ 2 * π / (3 * 16) := by
+    apply div_le_div_of_nonneg_left (by positivity) (by norm_num)
+    linarith
+  have e6 : 2 * π / (3 * 16) ≤ 1 / 6 := by
+    rw [div_le_div_iff₀ (by norm_num) (by norm_num)]
+    nlinarith [Real.pi_le_four]
+  linarith
+
+/-- **The medium-range event theorem.** Eventually in `w`, for `s = x + i w¹²` with `|x| ≤ X`
+and every `n ≠ 0` with `log |n| ≤ w⁷`,
+`‖event‖ ≤ 12 ‖γ_t(s)‖ e^{−x log|n|} e^{−(t/2) log²|n|}`. -/
+theorem event_medium {t X : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) :
+    ∀ᶠ w in atTop, ∀ s : ℂ, |s.re| ≤ X → s.im = w ^ 12 → ∀ n : ℤ, n ≠ 0 →
+      Real.log |(n : ℝ)| ≤ w ^ 7 →
+      ‖∫ v : ℝ, flowedTerm t (J t s) n v‖ ≤
+        12 * ‖γt' t s‖ * Real.exp (-s.re * Real.log |(n : ℝ)|) *
+          Real.exp (-(t / 2) * Real.log |(n : ℝ)| ^ 2) := by
+  have hb := (tendsto_order.1 (tendsto_Bmaj' t)).2 1 one_pos
+  have hd := (tendsto_order.1 (tendsto_Dmed ht)).2 1 one_pos
+  have he := (tendsto_order.1 (tendsto_Emed ht hX0)).2 1 one_pos
+  filter_upwards [eventually_ge_atTop (w₁ t X), hb, hd, he] with w hw hb1 hd1 he1
+  intro s hX hy n hn hLw
+  set L : ℝ := Real.log |(n : ℝ)| with hLdef
+  have hL0 : 0 ≤ L := by
+    apply Real.log_nonneg
+    have := Int.one_le_abs hn
+    exact_mod_cast this
+  have hw₁ := w₁'_nonneg ht hX0
+  unfold w₁ at hw
+  unfold w₁' at hw₁ hw
+  have ht2 : 0 ≤ t * (3 + 6 * t) ^ 2 := by positivity
+  have hw2 : 2 ≤ w := by linarith
+  have hw1 : 1 ≤ w := by linarith
+  have hw0 : 0 < w := by linarith
+  have hw4 : 1 ≤ w ^ 4 := one_le_pow₀ hw1
+  have h1_3 : w ≤ w ^ 3 := u_le_cube hw1
+  have h1_4 : w ≤ w ^ 4 := by
+    calc w = w ^ 1 := (pow_one w).symm
+      _ ≤ w ^ 4 := pow_le_pow_right₀ hw1 (by norm_num)
+  have h1_5 : w ≤ w ^ 5 := by
+    calc w = w ^ 1 := (pow_one w).symm
+      _ ≤ w ^ 5 := pow_le_pow_right₀ hw1 (by norm_num)
+  have h3_12 : w ^ 3 ≤ w ^ 12 := pow_le_pow_right₀ hw1 (by norm_num)
+  have h4_12 : w ^ 4 ≤ w ^ 12 := pow_le_pow_right₀ hw1 (by norm_num)
+  have h5_12 : w ^ 5 ≤ w ^ 12 := pow_le_pow_right₀ hw1 (by norm_num)
+  have h8_12 : w ^ 8 ≤ w ^ 12 := pow_le_pow_right₀ hw1 (by norm_num)
+  have h1_8 : w ≤ w ^ 8 := by
+    calc w = w ^ 1 := (pow_one w).symm
+      _ ≤ w ^ 8 := pow_le_pow_right₀ hw1 (by norm_num)
+  have hw16 : 16 ≤ w ^ 4 := by
+    have := pow_le_pow_left₀ (by norm_num) hw2 4
+    norm_num at this
+    linarith
+  have hy' : s.im = (w ^ 4) ^ 3 := by rw [hy]; ring
+  have hXw : X ≤ w ^ 12 := by linarith
+  have hXw' : X ≤ (w ^ 4) ^ 3 := by rw [show (w ^ 4) ^ 3 = w ^ 12 by ring]; exact hXw
+  have hsu : w ^ 12 ≤ ‖s‖ := by
+    have := norm_s_ge hy' (by positivity)
+    rw [show (w ^ 4) ^ 3 = w ^ 12 by ring] at this
+    exact this
+  have hs2u : ‖s‖ ≤ 2 * w ^ 12 := by
+    have := norm_s_le hX hy' hXw' (by positivity)
+    rw [show (w ^ 4) ^ 3 = w ^ 12 by ring] at this
+    exact this
+  have hs2 : 2 ≤ ‖s‖ := by linarith
+  have hs2π : 2 * π ≤ ‖s‖ := by linarith [Real.pi_le_four]
+  have hst : 12 * t ≤ ‖s‖ := by linarith
+  have hstrip : 4 * |s.re| ≤ s.im := by rw [hy]; linarith
+  have hy2' : 2 ≤ s.im := by rw [hy]; linarith
+  have hY : 0 < w ^ 8 / 20 := by positivity
+  have hY2 : 2 * t * π ≤ w ^ 8 / 20 := by nlinarith [Real.pi_le_four]
+  have hsec : X + 2 * t * L + 2 ≤ s.im - w ^ 8 / 20 := by
+    rw [hy]; exact side_sec_med ht hX0 hw1 hL0 hLw (by linarith)
+  have hy2 : 2 ≤ s.im - w ^ 8 / 20 := by
+    rw [hy]
+    have := side_sec_med ht hX0 hw1 hL0 hLw (by linarith)
+    linarith
+  have hζY : 2 * t * L + w ^ 8 / 20 ≤ ‖s‖ / 8 := by
+    have := side_ζY_med ht hw1 hL0 hLw (by linarith)
+    linarith
+  have hsmall := side_small_med ht hw2 hL0 hLw (by linarith) hsu
+  have hqu : ‖q s (2 * t * L)‖ ≤ (3 + 6 * t) / w ^ 2 := by
+    refine (norm_q_le hs2 (by positivity)).trans ?_
+    have e1 : 3 + 3 * (2 * t * L) ≤ (3 + 6 * t) * w ^ 7 := by
+      have := mul_le_mul_of_nonneg_left hLw (by positivity : (0 : ℝ) ≤ 6 * t)
+      have : 1 ≤ w ^ 7 := one_le_pow₀ hw1
+      nlinarith
+    calc (3 + 3 * (2 * t * L)) / ‖s‖ ≤ ((3 + 6 * t) * w ^ 7) / w ^ 12 := by gcongr
+      _ = (3 + 6 * t) / w ^ 5 := by
+          field_simp
+          first | done | ring
+      _ ≤ (3 + 6 * t) / w ^ 2 := by
+          apply div_le_div_of_nonneg_left (by positivity) (by positivity)
+          exact pow_le_pow_right₀ hw1 (by norm_num)
+  have hq : ‖q s (2 * t * L)‖ ≤ 1 := by
+    refine hqu.trans ?_
+    rw [div_le_one (by positivity)]
+    have : w ≤ w ^ 2 := by nlinarith
+    linarith
+  have hq2 := side_q2 ht hw1 hqu (by linarith)
+  have hL6 : 6 * t * L ≤ ‖s‖ := by
+    have : 6 * t * L ≤ 6 * t * w ^ 7 := mul_le_mul_of_nonneg_left hLw (by positivity)
+    have : 6 * t * w ^ 7 ≤ w ^ 5 * w ^ 7 := mul_le_mul_of_nonneg_right (by linarith) (by positivity)
+    have : w ^ 5 * w ^ 7 = w ^ 12 := by ring
+    linarith
+  have hg : g s ≠ 0 := g_ne_zero_of hX0 hX hs2
+  have hyY : w ^ 8 / 20 < s.im := by
+    rw [hy]
+    have := pow_pos hw0 8
+    linarith
+  -- the pieces
+  have hsu3 : w ^ 3 ≤ ‖s‖ := h3_12.trans hsu
+  have hbb := b_le_Bmaj' ht hw1 hsu3 hqu
+  have hdd := d_le_Dmed ht hw1 hL0 hLw hsu hq2
+  have hee := epiece_le_Emed ht hX0 hX hw1 hy hXw hL0 hLw hY2
+  have hone : ‖1 + rdef t s L (w ^ 8 / 20)‖ ≤ ‖F₁ t s L‖ * 4 + 1 := by
+    have h := norm_one_add_rdef_le_explicit ht hX0 hX hs2π hst hstrip hy2' hL0 hY hY2 hsec hy2
+      hζY hsmall hq hq2
+    refine h.trans ?_
+    have hb0 : 0 ≤ 36 * t / ‖s‖ + 4 * t * ‖q s (2 * t * L)‖ ^ 2 := by positivity
+    have hd0 : 0 ≤ (β₃ t s (2 * t * L) + β₄ t (w ^ 8 / 20)) /
+        (√(2 * π * t) * Real.exp (-(2 * t * ‖q s (2 * t * L)‖ ^ 2))) := by
+      unfold β₃ β₄; positivity
+    have hF0 := norm_nonneg (F₁ t s L)
+    have hb1' : 36 * t / ‖s‖ + 4 * t * ‖q s (2 * t * L)‖ ^ 2 ≤ 1 := hbb.trans hb1.le
+    have hd1' : (β₃ t s (2 * t * L) + β₄ t (w ^ 8 / 20)) /
+        (√(2 * π * t) * Real.exp (-(2 * t * ‖q s (2 * t * L)‖ ^ 2))) ≤ 1 := hdd.trans hd1.le
+    have he1' : epiece t X s L (w ^ 8 / 20) ≤ 1 := hee.trans he1.le
+    have : ‖F₁ t s L‖ * (1 + (36 * t / ‖s‖ + 4 * t * ‖q s (2 * t * L)‖ ^ 2)) *
+        (1 + (β₃ t s (2 * t * L) + β₄ t (w ^ 8 / 20)) /
+          (√(2 * π * t) * Real.exp (-(2 * t * ‖q s (2 * t * L)‖ ^ 2)))) ≤ ‖F₁ t s L‖ * 2 * 2 := by
+      gcongr <;> linarith
+    linarith
+  exact norm_event_le_medium ht hg hs2 hst hn hY hyY hL6 hone
+
 end Soma.Holonics.RH.EventMedium
