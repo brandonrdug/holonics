@@ -14,6 +14,8 @@ namespace Soma.Holonics.RH.EventMainRange
 
 open Real Set Filter Topology MeasureTheory
 open Soma.Holonics.RH.GammaStirling
+open Soma.Holonics.RH.FlowedExplicitFormula
+open Soma.Holonics.RH.FlowedGamma
 open Soma.Holonics.RH.GammaPhase
 open Soma.Holonics.RH.EventMain
 open Soma.Holonics.RH.EventBounds
@@ -685,5 +687,160 @@ theorem tendsto_Bmaj {t X : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) :
   have h1 : Tendsto (fun _ : ℝ => (1 : ℝ)) atTop (𝓝 1) := tendsto_const_nhds
   have h := ((((hA.mul (h1.add hB)).add hB).mul (h1.add hD)).add hD).add hE
   simpa [Bmaj] using h
+
+/-! ## The threshold and the main-range event theorem -/
+
+/-- The threshold in `u` beyond which every side condition of the main-range bound holds. -/
+def u₀ (t X : ℝ) : ℝ :=
+  3 + 4 * X + 160 * t + 2 * (X + 2 * t + 2) + 16 * t + 40 * t + (3 + 6 * t) +
+    2 * t * (3 + 6 * t) ^ 2 + (6 * t + 6 * t ^ 2)
+
+theorem u₀_pos {t X : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) : 3 ≤ u₀ t X := by
+  unfold u₀
+  have := sq_nonneg (3 + 6 * t)
+  nlinarith [mul_nonneg ht.le (sq_nonneg (3 + 6 * t)), mul_nonneg ht.le ht.le]
+
+theorem side_sec {t X u L : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) (hu1 : 1 ≤ u) (hL0 : 0 ≤ L)
+    (hLu : L ≤ u) (h : 2 * (X + 2 * t + 2) ≤ u) : X + 2 * t * L + 2 ≤ u ^ 3 - u ^ 2 / 20 := by
+  have e1 : 2 * t * L ≤ 2 * t * u := by nlinarith
+  have e2 : X + 2 * t * u + 2 ≤ (X + 2 * t + 2) * u := by nlinarith
+  have hu0 : 0 ≤ u := by linarith
+  have e3 : (X + 2 * t + 2) * u ≤ u ^ 3 / 2 := by
+    nlinarith [mul_le_mul_of_nonneg_left h hu0, mul_le_mul_of_nonneg_left hu1 (sq_nonneg u)]
+  have e4 : u ^ 2 / 20 ≤ u ^ 3 / 2 := by
+    nlinarith [mul_le_mul_of_nonneg_left hu1 (sq_nonneg u)]
+  linarith
+
+theorem side_ζY {t u L : ℝ} (ht : 0 < t) (hu1 : 1 ≤ u) (hL0 : 0 ≤ L) (hLu : L ≤ u)
+    (h : 16 * t + 1 ≤ u) : 2 * t * L + u ^ 2 / 20 ≤ u ^ 3 / 8 := by
+  have hu0 : 0 ≤ u := by linarith
+  have huu : u ≤ u ^ 2 := by nlinarith [mul_le_mul_of_nonneg_left hu1 hu0]
+  have e1 : 2 * t * L ≤ 2 * t * u ^ 2 :=
+    mul_le_mul_of_nonneg_left (hLu.trans huu) (by positivity)
+  have e2 : (2 * t + 1 / 20) * u ^ 2 ≤ u ^ 3 / 8 := by
+    nlinarith [mul_le_mul_of_nonneg_left h (sq_nonneg u)]
+  linarith
+
+theorem side_small {t u L : ℝ} {s : ℂ} (ht : 0 < t) (hu3 : 3 ≤ u) (hL0 : 0 ≤ L) (hLu : L ≤ u)
+    (h : 40 * t ≤ u) (hsu : u ^ 3 ≤ ‖s‖) :
+    402 * (2 * t * L + u ^ 2 / 20) ^ 3 / ‖s‖ ^ 2 + 2 * π / (3 * ‖s‖) ≤ 1 := by
+  have hu0 : 0 < u := by linarith
+  have e1 : 2 * t * L + u ^ 2 / 20 ≤ u ^ 2 / 10 := by
+    have : 2 * t * L ≤ 2 * t * u := by nlinarith
+    nlinarith
+  have e2 : (2 * t * L + u ^ 2 / 20) ^ 3 ≤ (u ^ 2 / 10) ^ 3 :=
+    pow_le_pow_left₀ (by positivity) e1 3
+  have e3 : (u ^ 3) ^ 2 ≤ ‖s‖ ^ 2 := pow_le_pow_left₀ (by positivity) hsu 2
+  have hu27 : 27 ≤ u ^ 3 := by nlinarith [pow_le_pow_left₀ (by norm_num) hu3 3]
+  have e4 : 402 * (2 * t * L + u ^ 2 / 20) ^ 3 / ‖s‖ ^ 2 ≤ 402 / 1000 := by
+    calc 402 * (2 * t * L + u ^ 2 / 20) ^ 3 / ‖s‖ ^ 2 ≤ 402 * (u ^ 2 / 10) ^ 3 / (u ^ 3) ^ 2 := by
+          gcongr
+      _ = 402 / 1000 := by
+          field_simp
+          first | done | ring
+  have e5 : 2 * π / (3 * ‖s‖) ≤ 2 * π / (3 * 27) := by
+    apply div_le_div_of_nonneg_left (by positivity) (by norm_num)
+    linarith
+  have e6 : 2 * π / (3 * 27) ≤ 1 / 10 := by
+    rw [div_le_div_iff₀ (by norm_num) (by norm_num)]
+    nlinarith [Real.pi_le_four]
+  linarith
+
+theorem side_q2 {t u : ℝ} {s : ℂ} {L : ℝ} (ht : 0 < t) (hu1 : 1 ≤ u)
+    (hqu : ‖q s (2 * t * L)‖ ≤ (3 + 6 * t) / u ^ 2) (h : 2 * t * (3 + 6 * t) ^ 2 ≤ u) :
+    2 * t * ‖q s (2 * t * L)‖ ^ 2 ≤ 1 := by
+  have hu0 : 0 < u := by linarith
+  have e1 : ‖q s (2 * t * L)‖ ^ 2 ≤ ((3 + 6 * t) / u ^ 2) ^ 2 :=
+    pow_le_pow_left₀ (norm_nonneg _) hqu 2
+  have e2 : ((3 + 6 * t) / u ^ 2) ^ 2 ≤ (3 + 6 * t) ^ 2 / u := by
+    rw [div_pow, div_le_div_iff₀ (by positivity) hu0]
+    have huu : u ≤ u ^ 2 := by nlinarith [mul_le_mul_of_nonneg_left hu1 hu0.le]
+    have h2 : u ^ 2 ≤ (u ^ 2) ^ 2 := by
+      nlinarith [mul_le_mul_of_nonneg_left (hu1.trans huu) (sq_nonneg u)]
+    nlinarith [sq_nonneg (3 + 6 * t)]
+  have e3 : 2 * t * ((3 + 6 * t) ^ 2 / u) ≤ 1 := by
+    rw [← mul_div_assoc, div_le_one hu0]
+    linarith
+  calc 2 * t * ‖q s (2 * t * L)‖ ^ 2 ≤ 2 * t * ((3 + 6 * t) ^ 2 / u) := by
+        gcongr
+        exact e1.trans e2
+    _ ≤ 1 := e3
+
+theorem side_Y2 {t u : ℝ} (ht : 0 < t) (hu1 : 1 ≤ u) (h : 160 * t ≤ u) :
+    2 * t * π ≤ u ^ 2 / 20 := by
+  nlinarith [Real.pi_le_four, mul_le_mul_of_nonneg_left hu1 ht.le]
+
+theorem g_ne_zero_of {X : ℝ} (hX0 : 0 ≤ X) {s : ℂ} (hX : |s.re| ≤ X) (hs2 : 2 ≤ ‖s‖) :
+    g s ≠ 0 := by
+  have hs0 : 0 < ‖s‖ := by linarith
+  have hlow := norm_g_ge hX0 hX hs2
+  have hpos : 0 < cg X * ‖s‖ ^ 2 * ‖s‖ ^ (-((X + 1) / 2)) * Real.exp (-(π * ‖s‖ / 2)) :=
+    mul_pos (mul_pos (mul_pos (cg_pos X) (by positivity)) (Real.rpow_pos_of_pos hs0 _))
+      (Real.exp_pos _)
+  exact norm_pos_iff.mp (hpos.trans_le hlow)
+
+/-- **The main-range event theorem.** For `u ≥ u₀ t X`, `s = x + i u³` with `|x| ≤ X`, and every
+`n ≠ 0` with `log |n| ≤ u`, the flowed event at `J_t(s)` equals the steepest-descent main term
+times `1 + r` with `‖r‖ ≤ Bmaj t X u`, and `Bmaj t X u → 0`. -/
+theorem event_main {t X : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) {u : ℝ} (hu : u₀ t X ≤ u) {s : ℂ}
+    (hX : |s.re| ≤ X) (hy : s.im = u ^ 3) {n : ℤ} (hn : n ≠ 0) (hLu : Real.log |(n : ℝ)| ≤ u) :
+    (∫ v : ℝ, flowedTerm t (J t s) n v) =
+      γt' t s * Complex.exp (-s * ((Real.log |(n : ℝ)| : ℝ) : ℂ)) *
+        Complex.exp (-(t : ℂ) * ((Real.log |(n : ℝ)| : ℝ) : ℂ) ^ 2) *
+        (1 + rdef t s (Real.log |(n : ℝ)|) (u ^ 2 / 20)) ∧
+      ‖rdef t s (Real.log |(n : ℝ)|) (u ^ 2 / 20)‖ ≤ Bmaj t X u := by
+  set L : ℝ := Real.log |(n : ℝ)| with hLdef
+  have hL0 : 0 ≤ L := by
+    apply Real.log_nonneg
+    have := Int.one_le_abs hn
+    exact_mod_cast this
+  have hu3 : 3 ≤ u := (u₀_pos ht hX0).trans hu
+  have hu1 : 1 ≤ u := by linarith
+  have hu0 : 0 < u := by linarith
+  have hu₀ : u₀ t X ≤ u := hu
+  unfold u₀ at hu₀
+  have ht2 : 0 ≤ t * (3 + 6 * t) ^ 2 := by positivity
+  have ht3 : 0 ≤ t ^ 2 := sq_nonneg t
+  have hucube := u_le_cube hu1
+  have huu : u ≤ u ^ 2 := by nlinarith [mul_le_mul_of_nonneg_left hu1 hu0.le]
+  have hu23 : u ^ 2 ≤ u ^ 3 := by nlinarith [mul_le_mul_of_nonneg_left hu1 (sq_nonneg u)]
+  have hXu : X ≤ u ^ 3 := by linarith
+  have hsu := norm_s_ge hy hu0.le
+  have hs2 : 2 ≤ ‖s‖ := by linarith
+  have hs2π : 2 * π ≤ ‖s‖ := by linarith [Real.pi_le_four]
+  have hst : 12 * t ≤ ‖s‖ := by linarith
+  have hstrip : 4 * |s.re| ≤ s.im := by rw [hy]; linarith
+  have hy2' : 2 ≤ s.im := by rw [hy]; linarith
+  have hY2 : 2 * t * π ≤ u ^ 2 / 20 := side_Y2 ht hu1 (by linarith)
+  have hsec : X + 2 * t * L + 2 ≤ s.im - u ^ 2 / 20 := by
+    rw [hy]; exact side_sec ht hX0 hu1 hL0 hLu (by linarith)
+  have hy2 : 2 ≤ s.im - u ^ 2 / 20 := by
+    rw [hy]
+    have := side_sec ht hX0 hu1 hL0 hLu (by linarith)
+    linarith
+  have hζY : 2 * t * L + u ^ 2 / 20 ≤ ‖s‖ / 8 := by
+    have := side_ζY ht hu1 hL0 hLu (by linarith)
+    linarith
+  have hsmall := side_small ht hu3 hL0 hLu (by linarith) hsu
+  have hqu := norm_q_le_u ht hs2 hu1 hy hL0 hLu
+  have hq : ‖q s (2 * t * L)‖ ≤ 1 := by
+    refine hqu.trans ?_
+    rw [div_le_one (by positivity)]
+    linarith
+  have hq2 := side_q2 ht hu1 hqu (by linarith)
+  have hF : (6 * t * L + 6 * t ^ 2 * L ^ 2) / ‖s‖ ≤ 1 := by
+    have h := a_le_Amaj ht hu1 hsu hL0 hLu
+    unfold Amaj at h
+    have : (12 * t + 12 * t ^ 2) / u ≤ 2 := by
+      rw [div_le_iff₀ hu0]; linarith
+    linarith
+  have hg : g s ≠ 0 := g_ne_zero_of hX0 hX hs2
+  have hY : 0 < u ^ 2 / 20 := by positivity
+  have hyY : u ^ 2 / 20 < s.im := by
+    rw [hy]
+    linarith [pow_pos hu0 2]
+  refine ⟨event_eq_main_mul ht hg hs2 hst hn hY hyY, ?_⟩
+  exact norm_rdef_le_Bmaj ht hX0 hX hu1 hy hXu hL0 hLu hs2π hst hstrip hy2' hY2 hsec hy2 hζY
+    hsmall hq hq2 hF
 
 end Soma.Holonics.RH.EventMainRange
