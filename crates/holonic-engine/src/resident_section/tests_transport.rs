@@ -1,4 +1,22 @@
 use super::*;
+
+#[test]
+#[ignore = "requires CUDA; explicit partial-standing lifetime regression"]
+fn releasing_partial_standings_keeps_no_replacement_allocation() {
+    let readout = ResidentReadout::new().expect("CUDA readout");
+    let surface = ResidentSurface::on(&readout).expect("resident surface");
+    let before = surface.census().resident_octets_now;
+    for _ in 0..64 {
+        let standing = surface.retain_partials(2, 3, 16).expect("partial standing");
+        surface.zero_partials(&standing).expect("zero standing");
+        surface.release_partials(&standing).expect("release without allocating");
+        assert!(surface.partials.borrow()[standing.index].is_none());
+        assert!(surface.release_partials(&standing).is_err());
+        assert!(surface.zero_partials(&standing).is_err());
+        assert_eq!(surface.census().resident_octets_now, before);
+    }
+}
+
 fn surface() -> Option<(&'static ResidentReadout, &'static ResidentSurface<'static>)> {
     let readout = match ResidentReadout::new() {
         Ok(readout) => Box::leak(Box::new(readout)),

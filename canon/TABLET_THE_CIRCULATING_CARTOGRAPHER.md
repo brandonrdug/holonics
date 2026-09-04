@@ -60,15 +60,16 @@ capacity, constitutive response, boundary, chronology, and receiver are declared
 an untyped smoothing metaphor. A complete finite carrier may retain exact inverse testimony;
 irreversibility requires a named quotient, aperture, departure, or constitutive hypothesis.
 
-The engine cycle is
+The current engine recurrence, under the 2026-09-02 HNA correction, is
 
 ```text
-mount -> differentiate -> conduct/diffuse -> interact/glue
-      -> radiate -> exterior return -> reflect/deposit -> later current.
+occurrence -> local current -> reaction -> emission + successor ecology -> next occurrence.
 ```
 
-`open`: the bounded owners have not yet returned this whole cycle as one continuing resident
-ecology without CPU semantic phase choreography.
+`established-bounded`: HNA returned a continuing resident recurrence, and SKE extended its
+adjoint and excitation-founded class bodies at their declared scopes. The contemporary
+operation owns its successor; exterior return is one source of a later occurrence, not a
+separate learning law. Consult `CONSTRUCTION_STATE.md` for current implementation scope.
 
 ## 4. Compression retains the preimage fibre
 

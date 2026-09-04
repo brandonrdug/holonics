@@ -53,8 +53,11 @@ discipline, conversational conduct, Brandon's direct rulings quoted verbatim wit
 grade that no research record carries. A capability sentence in a contract is a *citation* of a
 graded record, never the grade itself.
 
-`CLAUDE.md` is Claude-facing and authoritative here. `AGENTS.md` is Codex-facing and is not
-authority here — the same split the laboratory ran, ruled by Brandon directly on 2026-08-05.
+`AGENTS.md` is the shared operating contract. `CLAUDE.md` is its Claude-facing pointer and
+carries no copied current position or competing boundary. This replaces the historical split
+between model-specific contracts. Brandon's latest direct ruling takes precedence over either;
+his 2026-09-04 instruction requires agents to reconcile verified drift and complete in-scope
+repairs instead of returning minor inconsistencies for the sole human operator to adjudicate.
 
 ### 1.2 Canon — `canon/`
 

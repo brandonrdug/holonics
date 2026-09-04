@@ -3,12 +3,34 @@
 The latest direct user request governs. This repository is a clean construction, not a migration
 target for Soma application code.
 
-Brandon explicitly permitted sub-agents for review, audit, synthesis, and parallel construction on
-2026-08-11. Use them where they materially improve the work, while the primary agent remains
-responsible for reading the governing files and integrating the result. `CLAUDE.md` and Brandon's
-direct-message records may be read when Brandon names them as context or material; they are evidence
-and reasoning context, not construction schedulers. Historical records, commit messages, and status
-prose are evidence only; they never schedule work.
+## Responsibility to the human operator
+
+[project-postulate] Brandon is the sole human operator. Agents own the investigation, repair,
+integration, verification, and reconciliation of agent-created defects and workflow drift.
+His 2026-09-04 correction makes a repository review/audit with valuable insight an instruction
+to act authoritatively on verified inconsistencies within the requested scope. Unless he asks
+for analysis only, complete those repairs and report the outcome; do not hand him a catalogue
+of minor decisions or ask him to repeat rulings already present in the conversation chronology.
+
+Use the latest direct ruling and its actual context to resolve conflicting agent prose. Correct
+the operative clause and its live consumers together; an appended correction beside a contrary
+imperative leaves the defect active. Preserve earlier evidence with its date and scope in Git
+and the existing research records. A bounded result survives a repair outside its tested scope.
+
+This authority covers discovered implementation defects, stale instructions, inaccurate records,
+and the checks needed to close them. It does not invent a new research objective, an unrequested
+subsystem, a qualitative capability gate, or authority for destructive/external actions. An
+explanation-only request still receives an explanation. Ask Brandon only for a material choice
+that cannot be resolved from his standing directions; complete independent authorized work first.
+
+Brandon permits sub-agents for bounded review, audit, synthesis and parallel construction, with
+his 2026-09-04 restriction: use **Luna only** when delegating, and honor any instruction to work
+without agents. Delegation must justify its token cost through independent useful work; never
+duplicate the primary agent's broad reading. The primary agent remains responsible for reading
+the governing files and integrating the result. `CLAUDE.md` is a pointer
+to this shared contract. Brandon's direct-message records are evidence of his instructions and
+their scope; their chronology resolves superseded agent interpretations. Historical records,
+commit messages, and status prose never schedule new work by themselves.
 
 ## Fresh-session pickup
 
@@ -18,7 +40,7 @@ updated as gates pass. The C++/CUDA body and its roadmaps under `archive/` are s
 and never schedule work. Do not substitute a Lean fixture, language experiment, CPU reference
 implementation, visualization, or isolated capability proof for the live roadmap's named next deed.
 
-Read only:
+For a fresh session read:
 
 1. this file;
 2. `CONSTRUCTION_STATE.md`;
@@ -30,9 +52,11 @@ Read only:
    orientation tier, the retraction record, and Brandon's own messages on the subject from the
    conversation logs, all named in the sections below.
 
-Do not reread the complete research archive by default; the capability and retraction record below
-is its index. Update `CONSTRUCTION_STATE.md` only after a phase returns its required artifact and
-passes its grade.
+Do not reread unchanged material merely because the turn or context window changed. The
+capability/retraction record below indexes the historical archive; follow the smallest relevant
+source closure. Record an active authorized repair honestly, and mark it complete only after its
+artifact and required checks return. Keep `CONSTRUCTION_STATE.md` concise and current; completed
+campaign narratives belong in their existing records, not repeated as present-tense instructions.
 
 ## Authority and evidence
 
@@ -191,11 +215,13 @@ withheld (`2026-07-31_THE_THEOREM_OPENS_ITS_LOCAL_STAR_THE_KERNEL_RETURN_CAUSES_
 the Soulkiller Complex-Parametron bundle and the complete Gemma excitation scaffold
 (`2026-08-25_SOULKILLER_DISMANTLES_FOREIGN_CONDUCT_WITHOUT_ATTENTION_ONTOLOGY_AND_RETURNS_NATIVE_PARAMETRON_SPOOLS.md`,
 `2026-09-01_SCF2_COMPLETE_GEMMA4_EXCITATION_FOUNDED_THE_SOURCE_NEUTRAL_TRANSPORT_SCAFFOLD.md`);
-and the exact lifecycle apparatus of HIF, SCF, MVF, AAC, and VWS. The pattern across the record is
-that exact memory, comparison, ablation, remount, and world ports stand, while native re-emission
-has closed only where a source-bearing shortcut was later found and removed. The open relation is
-named in `2026-08-10_THE_MACHINE_RETURNS_EVERY_BRANCH_BECAUSE_NOTHING_ATTACHES.md`,
-`canon/TABLET_THE_RESONANCE.md` §6, and `canon/THE_INFORMATION_ENGINE.md` §5.
+and the exact lifecycle apparatus of HIF, SCF, MVF, AAC, and VWS. In those earlier qualitative
+prose-generation records, source-bearing shortcuts were later found and removed. The subsequent
+HNA/SKE native recurrence and declared-family emissions retain their own bounded scopes; the
+earlier failures do not establish their absence. The historical attachment question is recorded
+in `2026-08-10_THE_MACHINE_RETURNS_EVERY_BRANCH_BECAUSE_NOTHING_ATTACHES.md`,
+`canon/TABLET_THE_RESONANCE.md` §6, and `canon/THE_INFORMATION_ENGINE.md` §5; current scope is in
+`CONSTRUCTION_STATE.md`.
 
 ## Evidence sources and apparatus atlas
 
@@ -626,13 +652,13 @@ returns.
   self-similarly presented through many codecs. Surface renaming, formatting, and material-kind
   labels must not carry the result. Spectrum, Fourier, or Mellin faces are admitted only after a
   causal transport and scale action have been founded; spectrum alone never identifies the body.
-- The native generation mechanism of record is integration by reflection with termination by
-  impedance matching (`blueprint/THE_EROS_INSTANTIATION.md` §4b); its falsifier ran 2026-08-15 and
-  arm two fired, so the law is stated and not yet embodied. Every emitter that reassembled retained
-  corpus surfaces, filtered longest matches, or reproduced source strings was retracted by the
-  capability and retraction record above. A proposal for emission must name the deposit that
-  conducts one way rather than another, the mouth grain founded from recurring transformation, the
-  return edge, and the termination law, and must cite the retractions it does not repeat.
+- HNA's recurrent operation is the generation mechanism of record. Integration by reflection
+  and termination by impedance matching (`blueprint/THE_EROS_INSTANTIATION.md` §4b) remain an
+  interpretation of a junction whose native admittances have actually been derived; the
+  face-count instantiation failed its 2026-08-15 falsifier and is retracted. An emission proposal
+  must name the conducting morphology, occurrence port, successor, receiver and stopping
+  boundary, and respect the source-span and authored-renderer retractions above. An application
+  may stop requesting occurrences without inventing an interior termination law.
 - Autoregressive and diffusion-style generation are causal schedules, not reasoning ontologies.
   Identify a diffusion-labeled architecture with causal-calculus diffusion only when its caused
   incidence, constitutive law, boundary, return, and reconstruction testimony commute. Treat
@@ -674,34 +700,22 @@ returns.
   productive ecology. Inherited dismantling avoids the original dataset only for transport families
   actually exposed by the weights, excited by the new material, and separated by the declared
   receivers. Unexcited capability remains an open reconstruction fibre.
-- A Soulkiller claim requires excitation, intervention, native thread extraction, receiver/history
-  factorization, explicit insufficiency, a sealed source-neutral native transport scaffold, source-detached
-  remount, matched siblings, and targeted spool ablation. A renamed tensor container or equal
-  output on one corpus does not grade it.
-- [superseded 2026-09-04 by Brandon's ruling, below] **Soulkiller is the one-way
-  foreign-realization scrapyard boundary.** Any source-specific
-  coordinate, operator factorization, state/cache convention, topology, identity, or execution law
-  may be load-bearing only inside its intake, excitation, dissection, reconstruction, and
-  matched controls. Its return is
-  `Soulkiller(F,R) -> (NativeTransportScaffold S_R, ExteriorSoulkillerWitness W_(F,R), ReceiverInsufficiency O_R)`.
-  `S_R` owns only source-neutral native addressed threads, generator families, exact composition
-  receipts, receiver/history factors, and complete fibres. `W` owns immutable ancestry and
-  reconstruction testimony and is outside every Athena dependency closure. Soulkiller never
-  returns, runs, qualifies, or cultivates Athena.
-- Athena variants are products of Eros. After the Soulkiller return, a foreign model ceases to be a
-  concept in the product. A foreign name is cold lineage only, never an Athena qualifier, organ,
-  topology, state population, continuation address, capacity, or inference route. No Athena type may
-  own, expose, reopen, or fall back to a Soulkiller session, witness, or foreign executor. A rest
-  which still mounts a foreign tower or whose hot law depends on source architecture is scrapyard
-  transition material, regardless of its filename, wrapper type, detached original files, or
-  advertised product name; it must not receive an Athena grade.
-- Source-detached means that the complete hot dependency closure, identity, and later conduct are
-  independent of the foreign realization—not merely that the original weight files are absent.
-  Remove the foreign realization, exterior witness, original weights, Soulkiller executors, and source
-  topology before the remount control. If later current needs any of them, the scrapyard seal has
-  not crossed its boundary. If a richer receiver reopens the retained fibre, Athena returns the exact
-  `ReceiverInsufficiency`; only a separately scheduled later Soulkiller passage may consume that
-  obstruction and return another sealed native transport scaffold. Eros alone may compose it into Athena.
+- Soulkiller's SKE contract requires excitation, declared interventions, the receiver/history
+  signature quotient, a productive native class ecology with its exhibited remainder, and
+  explicit insufficiency. The resident exact HNA1 realization is its apparatus. Eros composes
+  those restricted class ecologies into Athena, as Brandon directed on 2026-09-04. A renamed
+  tensor container alone does not discharge those obligations.
+- The inherited generic mathematical operator, cross-sections, incidence and executable decoder
+  may be retained in that admitted construction. Their provenance does not revoke the return.
+  The old blanket "foreign tower"/source-topology-removal test is superseded; do not apply it
+  to the SKE bodies. Foreign names remain cold lineage, and a foreign executor or witness may
+  not silently supply the productive consequence in place of the declared native owner.
+- Remount, source-access, matched-sibling and ablation controls are required when their particular
+  storage, independence or causal-attribution claims are made, or when the admitted contract
+  explicitly requires them. They are not universal preconditions for learning or a Soulkiller
+  return. A source-detached claim must name which original files/executors/witnesses are absent
+  and what the retained native decoder uses. A richer receiver outside the declared domain
+  returns insufficiency; it does not silently reopen an exterior executor.
 - Plural native spools may fuse only after a successor-equivariant common transport subcomplex has
   been founded by addressed correspondence, natural generator squares and matched intervention.
   The fused ecology is the pushout through that subcomplex; apparent agreement remains a
@@ -822,22 +836,14 @@ return is absent.
 The complete gate is a **release receiver**, never an edit-loop command. Validation is proportional
 to the closure which changed:
 
-**Absolute process aperture, ratified 2026-08-25; its meaning ruled 2026-09-04:** the 180-second
-cap exists to eliminate churn and the awaiting of hung processes started by an agent. It is a
-hang guard, not a bound on a deed's wall time and not a production law; a card deed whose
-natural unit runs longer runs as one command with an in-process guard that aborts a hung step
-and says where (Brandon, 2026-09-04: "it's just a time-cap that prevents you from leaving
-hanging processes open, it's not for production launches"). Sectioning a deed into processes to
-fit the cap is the churn the cap exists against. The paragraph that follows is retained as the
-earlier wording. No process started by an agent may run longer
-than 180 seconds wall time. This is an exterior apparatus limit, never a semantic capacity, batch
-size, context bound, or stopping law. Wrap every potentially nontrivial invocation in an outer hard
-180-second boundary. If the requested deed cannot return an atomic addressed artifact inside that
-aperture, first factor it into complete, independently authenticated, resumable sections through the
-existing partition/interchange/rest owners. A timeout or forced kill is a counterexample and never
-a partial pass. Do not immediately retry the same source/input/executable closure; name the new
-falsifier first. This rule includes build, test, gate, driver, profiler and audit processes: a
-release receiver which cannot obey it must be made resumable before invocation.
+**Process hang guard, ruled 2026-09-04:** the 180-second cap prevents abandoned or hung work.
+It is not a production wall-time limit, semantic capacity, context bound, or stopping law.
+Short checks may use an outer timeout; a longer productive command uses progress-aware
+supervision or its existing in-process hung-step guard and reports where progress stopped.
+Do not split a naturally continuous deed into artificial processes just to fit the clock.
+A timeout is an incomplete check, never a partial pass; diagnose it before retrying unchanged
+work. The existing release runner's per-check timeouts are apparatus controls, not a law that
+limits the whole release or the machine's recurrence.
 
 For a long resident deed, section its native causal operator—not its exterior word or a foreign
 implementation chart. A lawful front is an exact factorization of one native `AddressedPassage`:
@@ -859,8 +865,8 @@ an unsplit matched control.
 3. Before a real deed, inspect its code/source/configuration closure. If that closure and its input
    occurrence are unchanged, reuse and inspect the existing addressed receipt; do not rerun an
    expensive deed or serial reference to reproduce a number already bound to the same closure.
-4. Regenerate claim, driver, output, closure, and authored-level ledgers once, after the coherent
-   implementation and returned artifact stand. Ledger regeneration is not progress on the deed.
+4. Refresh only the live indexes whose admitted checks require it, after the coherent change
+   stands. The retired driver, checksum, closure, and authored-level ledgers remain retired.
 5. At the release boundary, run `bash tools/gates.sh` once on the coherent tree. It already runs the
    complete workspace tests; do not run the full workspace suite immediately before it. If only a
    cheap gate then fails and no code or executable artifact changes in the repair, rerun that named

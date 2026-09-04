@@ -187,9 +187,13 @@ Rest / Remount                    -- optional storage operations
 An application-specific `Emission -> Occurrence` adapter may close an autoregressive or tool loop.
 It remains outside the native operation and its output enters the next ordinary `Operation`.
 
-## 5. Standing source audit
+## 5. Historical founding source audit (2026-09-02)
 
-[counterexample; source-inspected] The current Rust scaffold does not instantiate the formal
+[historical] This section records the pre-HNA source that the completed campaign replaced.
+It does not describe the current operator or reopen those construction phases. The roadmap and
+construction state carry the later SKE extension and current repair.
+
+[counterexample; source-inspected] The pre-HNA Rust scaffold did not instantiate the formal
 ecology. `NativeInferenceRequest` supplies an address and receiver but no contemporary carrier
 field. The Soulkiller lift makes each complete recorded activation section a state key, makes each
 excitation event a generator, and makes the observation the state identifier. Resident conduct then
@@ -207,11 +211,14 @@ removed or rewritten by the ordered construction below.
 [established-bounded; source-inspected] The exact activation-section reader, rational/current
 arithmetic, CUDA incidence contraction, move-owned ecology carrier, occurrence lineage, tensor
 lenses/faces, application process adapters, and rest/remount encoding remain available at their
-bounded scopes. They are components, not proof that the recurrent neural operation exists.
+bounded scopes. At that founding revision they were components; HNA1--HNA5 below subsequently
+returned the actual bounded recurrent operation.
 
 ## 6. Fixed construction order
 
-No HNA subphase may be added. A phase either returns its named operation or remains current.
+[historical] The following is the completed HNA order and its original acceptance conditions.
+Its source audits and measurements are dated. Later SKE refinements retain their own scopes;
+these old imperatives schedule no new construction.
 
 ### HNA0 -- formal recurrent ecology and lifecycle correction
 
@@ -356,8 +363,9 @@ positive scale, and applied as one global scalar
 continuing occurrence met the retained emitted face; the normalized-exponential differential
 returned through the terminal reactions; a rank-5 factorized overlay was deposited on the tied
 `262,144 x 2,560` cross-section and the next cycle's contraction applied it. The control without
-apertures differs at every emitted word of the second cycle. The pullback to the other 718
-populations is open. The receipt is
+apertures differs at every emitted word of the second cycle. This was the tied-only HNA4
+scope; SKE1 subsequently returned the pullback through the cycle and deposits on 344
+cross-sections. Gains, scalars and embedding rows remain outside that deposit scope. The receipt is
 [`2026-09-02_HNA4_THE_RETURN_DEPOSITED_A_FACTORIZED_OVERLAY_ON_THE_TIED_CROSS_SECTION_AND_THE_NEXT_CYCLE_APPLIED_IT.md`](../research/records/2026-09-02_HNA4_THE_RETURN_DEPOSITED_A_FACTORIZED_OVERLAY_ON_THE_TIED_CROSS_SECTION_AND_THE_NEXT_CYCLE_APPLIED_IT.md).
 
 ### HNA5 -- application matrix and honest release

@@ -541,7 +541,7 @@ pub struct ResidentSurface<'chart> {
     /// section: it carries the exact 128-bit accumulation of one K slice and never a coordinate at
     /// the grain. It is retained for the surface's life because the kernel that writes it and the
     /// kernel that reads it are recorded into one graph before either runs.
-    partials: RefCell<Vec<DeviceBuffer<i64>>>,
+    partials: RefCell<Vec<Option<DeviceBuffer<i64>>>>,
     census: RefCell<TransferCensus>,
 }
 
@@ -613,6 +613,49 @@ impl ResidentSection<'_> {
             (self.lo.device_ptr(), self.lo.device_ptr() + octets),
             (self.hi.device_ptr(), self.hi.device_ptr() + octets),
         ]
+    }
+}
+
+/// One immutable endpoint population, moved out of an interval section without copying it.
+/// A sealed coefficient producer uses this after its two endpoints have become identical.
+pub(crate) struct ResidentEndpoint<'chart> {
+    surface: &'chart ResidentSurface<'chart>,
+    words: DeviceBuffer<i64>,
+    rows: usize,
+    width: usize,
+}
+
+impl<'chart> ResidentSection<'chart> {
+    /// Retain the lower endpoint and release the upper allocation. This is an explicit
+    /// endpoint projection, not a claim that an arbitrary interval has zero width. Overlay
+    /// producers call it only after a successful resident seal; both consumers already read
+    /// that exact lower population. No allocation, transfer, or numerical change occurs.
+    pub(crate) fn into_lower_endpoint(self) -> ResidentEndpoint<'chart> {
+        let section = std::mem::ManuallyDrop::new(self);
+        let _ = section.surface.context.make_current();
+        // SAFETY: ManuallyDrop suppresses the section's destructor. Each owning buffer is
+        // moved exactly once: lo into the endpoint, hi into its destructor. The surface and
+        // dimensions are borrowed/Copy; census ownership is split with those two buffers.
+        let (words, upper) = unsafe {
+            (std::ptr::read(&section.lo), std::ptr::read(&section.hi))
+        };
+        let retained_octets = (words.len() * std::mem::size_of::<i64>()) as u64;
+        drop(upper);
+        section.surface.released_octets(section.octets - retained_octets);
+        ResidentEndpoint { surface: section.surface, words, rows: section.rows, width: section.width }
+    }
+}
+
+impl ResidentEndpoint<'_> {
+    pub(crate) fn lo_device_ptr(&self) -> u64 { self.words.device_ptr() }
+    pub(crate) fn rows(&self) -> usize { self.rows }
+    pub(crate) fn width(&self) -> usize { self.width }
+}
+
+impl Drop for ResidentEndpoint<'_> {
+    fn drop(&mut self) {
+        let _ = self.surface.context.make_current();
+        self.surface.released_octets((self.words.len() * std::mem::size_of::<i64>()) as u64);
     }
 }
 

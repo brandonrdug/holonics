@@ -1,1269 +1,142 @@
 # The roadmap
 
-**This is the sole ordered construction authority.** Historical campaign prose, status paragraphs,
-commit messages, outputs, and research records provide evidence; they do not schedule work.
+**This is the sole ordered construction authority.** Brandon's latest direct instruction governs.
+[CONSTRUCTION_STATE.md](../CONSTRUCTION_STATE.md) is the sole current-position record. Dated
+contracts and records preserve their completed scope; their old imperatives schedule no new work.
 
 ## Fresh-session pickup
 
-Read, in order:
-
-1. [`AGENTS.md`](../AGENTS.md);
-2. [`CONSTRUCTION_STATE.md`](../CONSTRUCTION_STATE.md);
-3. this file in full;
-4. [`canon/THE_HOLOBROCHOS_SPINE.md`](../canon/THE_HOLOBROCHOS_SPINE.md) and
-   [`canon/EPISTEMIC_GRADES.md`](../canon/EPISTEMIC_GRADES.md);
-5. [`UNIVERSAL_CATALOG.md`](../UNIVERSAL_CATALOG.md), the descriptive Lean–Rust–CUDA owner
-   crosswalk;
-6. [`canon/TABLET_THE_REASONING_CYCLE.md`](../canon/TABLET_THE_REASONING_CYCLE.md),
-   [`canon/TABLET_THE_HEXIS.md`](../canon/TABLET_THE_HEXIS.md),
-   [`canon/TABLET_THE_OPERATIONS.md`](../canon/TABLET_THE_OPERATIONS.md),
-   [`canon/TABLET_THE_MANIFOLD.md`](../canon/TABLET_THE_MANIFOLD.md), and
-   [`canon/THE_SURFACES_ARE_PATHS.md`](../canon/THE_SURFACES_ARE_PATHS.md);
-7. the completed Holonic Intelligence Framework contract,
-   [`THE_HOLONIC_INTELLIGENCE_FRAMEWORK_RETURNS_INTRINSIC_HOLONS_AND_PACKAGES_DISMANTLING_INFERENCE_CULTIVATION_AND_GENERATION.md`](THE_HOLONIC_INTELLIGENCE_FRAMEWORK_RETURNS_INTRINSIC_HOLONS_AND_PACKAGES_DISMANTLING_INFERENCE_CULTIVATION_AND_GENERATION.md),
-   and its derivation,
-   [`research/records/2026-08-31_HOLONIC_INTELLIGENCE_REQUIRES_INTRINSIC_PROFILES_AND_NEUTRAL_LIFECYCLE_INTERFACES.md`](../research/records/2026-08-31_HOLONIC_INTELLIGENCE_REQUIRES_INTRINSIC_PROFILES_AND_NEUTRAL_LIFECYCLE_INTERFACES.md); and
-8. the completed formal prerequisites,
-   [`THE_HOLONIC_NEURAL_ECOLOGY_RETURNS_EVERY_CLASSICAL_ARCHITECTURE_AS_A_RECEIVER_CHART_AND_EROS_CULTIVATES_ATHENA_THROUGH_PHYSICAL_INFORMATION_TRANSPORT.md`](THE_HOLONIC_NEURAL_ECOLOGY_RETURNS_EVERY_CLASSICAL_ARCHITECTURE_AS_A_RECEIVER_CHART_AND_EROS_CULTIVATES_ATHENA_THROUGH_PHYSICAL_INFORMATION_TRANSPORT.md)
-   and
-   [`THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md`](THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md),
-   including the finite many-body/polarized-crystal and constructive-differential contracts named
-   in their completed campaign sections below.
-9. the completed Native Transport Scaffold contract,
-   [`THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md`](THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md); and
-10. the completed Native Morphology Variant Foundation contract,
-    [`THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md`](THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md).
-11. the completed Athena Application and Circulation Interface contract,
-    [`THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).
-12. the completed exterior Holonics Workbench application contract,
-    [`../applications/holonics-workbench/WORKBENCH.md`](../applications/holonics-workbench/WORKBENCH.md).
-13. the completed explicit-root variant workspace application contract,
-    [`THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md`](THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md).
-14. the active causal-natural holon, tensor-lens/face, preimage, and Copson--de Bruijn contract,
-    [`THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md`](THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md).
-15. the active post-HTP engine Eros/Athena contract,
-    [`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md),
-    together with its bounded formal prerequisite receipt,
-    [`2026-09-02_THE_CAUSAL_TAIL_FORMAL_PREREQUISITE_RETURNED_BEFORE_THE_ENGINE_HNA_CAMPAIGN.md`](../research/records/2026-09-02_THE_CAUSAL_TAIL_FORMAL_PREREQUISITE_RETURNED_BEFORE_THE_ENGINE_HNA_CAMPAIGN.md).
-16. the current Soulkiller excitation contract,
-    [`THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md`](THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md),
-    together with the audit that founds it,
-    [`2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](../research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md).
-17. the corrected modality-neutral application-boundary dependency audit,
-    [`THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md`](THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md),
-    together with the superseded WRD contract, the orientation and retraction tiers in
-    [`../AGENTS.md`](../AGENTS.md), the
-    [`Lean-binding retraction`](../research/records/2026-09-02_THE_LEAN_BINDING_OF_THE_WORLD_RETURN_IS_RETRACTED_AND_LANGUAGES_ARE_APPLICATIONS.md),
-    and the interpretation-grade
-    [`flux/morphology terminology report`](../research/records/2026-09-02_WEIGHT_MATRICES_ARE_FLUX_CROSS_SECTIONS_IN_MOTION_AND_MORPHOLOGY_PACKAGES_ARE_MORPHOLOGY_HOLONS.md).
-18. for the RH line, the directed Foster-tank and threshold contract,
-    [`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md),
-    with the two records of 2026-09-03 that founded it.
-19. for the RH line's current campaign, the descent-route RT contract,
-    [`THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md`](THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md),
-    with its RT0 record.
-
-Read only the smallest source, formal, and evidence closure required by the active deed. Completed
-sensory, membrane, Athena-alpha, Soulkiller, L, H, and Millennium campaign files
-are provenance, not pickup obligations.
-
-## Current position
-
-**Current frontier:** SKE5
-
-[definition] Brandon's direct request of 2026-09-03 activates the fixed `SKE0--SKE5` Soulkiller
-campaign, ordered below. It follows the completed HNA campaign and consumes its resident exact
-realization as apparatus.
-
-[definition] Brandon's direct instruction of 2026-09-02 activates `HTP0--HTP6` under
-[`THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md`](THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md).
-HTP0--HTP5 passed: literal inverse-image owners now use `PreimageFibre` without aliases;
-`Holon.Rebase`, addressed `CausalNaturalHolon`, dependent `TensorLens`/`TensorFace`, homogeneous
-slot-permutation preimage transport, and `MorphologyArtifactPassage` returned; and the independent
-finite Copson--de Bruijn tail receiver returned exact suffix balance
-and homogeneity. The continuous positive tail surface now attains its mass-one minimum, whose
-reciprocal is the proved optimal finite coefficient. HTP5 returned zero-extension invariance,
-monotone finite coefficients, the direct `ℝ≥0∞` infinite functional for `ℕ -> ℝ≥0`, its control by
-`c∞ := ⨆ N, (finiteSharpCoefficient N : ℝ≥0∞)`, exact finite-support reflection, and the
-least-controlling-coefficient equivalence. HTP6 then returned a bounded verified body: the finite
-Euler/de Bruijn recurrence, dependent infinite admissibility and threshold equality, normalized
-moving-root drift, basin transport, harmonic exclusion, and a lower-or-upper characteristic-root
-convergence dichotomy. Coefficient-specific branch selection and a certified decimal are parked
-research and schedule nothing. Brandon's direct correction of 2026-09-02 closes HTP at this bounded
-handoff and activates the engine HNA campaign.
-
-**RH line position:** DB complete (the de Bruijn campaign; DB0–DB5 passed;
-`RiemannHypothesis ↔ Λ_DN = 0` holds with no port, `Λ_DN ∈ [0, 1/8]`, `Λstd = 4 Λ_DN ∈ [0, ½]`,
-the RH0/RH1 bridge is in Lean; the first exact missing inequality of the RH line is `Λ_DN ≤ 0`,
-which is RH; no later RH deed is scheduled)
-
-[proved-derived; formal-checked] DB5 passed: `RH/DeBruijnSeal.lean` returned `deBruijnBound`,
-`Λ_DN ∈ [0, 1/8]`, and `riemannHypothesis_iff_Λ_DN_eq` with no hypothesis; `RH/CriticalChart.lean`
-returned `Hstd_eq : H_t(z) = ⅛ · heatE(−t/4, ξ, ½ + iz/2)`, `Λstd = 4 Λ_DN ∈ [0, ½]`, and
-`RiemannHypothesis ↔ Λstd = 0`; every theorem on the three axioms; root umbrella 9,843 jobs. The
-receipt is
-[`the DB5 record`](../research/records/2026-09-03_DB5_THE_LAST_PORT_IS_DISCHARGED_RH_IS_LAMBDA_DN_EQUALS_ZERO_WITH_NO_PORT_AND_THE_TREE_TIME_IS_THE_STANDARD_TIME_OVER_FOUR.md).
-DB4 passed: `DeBruijnLimit.eighth_mem_seamTimes`, receipt
-[`the DB4 record`](../research/records/2026-09-03_DB4_THE_GAUSSIAN_IS_THE_LIMIT_OF_THE_COSH_POWERS_AND_ONE_EIGHTH_IS_A_SEAM_TIME.md).
-DB0–DB3 passed: the strip of `ξ`, the
-polynomial average, and `DeBruijnIterate.onSeam_xiIter` — `N²` averages with `μ = 1/(2N)` put
-every zero of `ξ` on the seam; receipt
-[`the DB3 record`](../research/records/2026-09-03_DB3_THE_AVERAGE_CONTRACTS_THE_STRIP_OF_EVERY_MEMBER_AND_N_SQUARED_AVERAGES_PUT_THE_ZEROS_OF_XI_ON_THE_SEAM.md))
-
-[definition] Brandon's direct request of 2026-09-03 ("Proceed with the scoping") activates the
-ordered `DB0--DB5` de Bruijn campaign on the RH line under
-[`THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md`](THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md):
-target the discharge of the last port `DeBruijnBound` from the actual kernel by de Bruijn's own
-chain (the strip of `ξ`, the translation average on real polynomials, its transport to the class
-by approximants and Hurwitz, the Gaussian as the limit of `cosh(u/(2N))^{N²}`), returning
-`1/8 ∈ seamTimes`, `Λ_DN ∈ [0, 1/8]`, `RiemannHypothesis ↔ Λ_DN = 0` with no port, and the
-RH0/RH1 coordinate bridge in Lean. DB0 passed with the deposit. The order is DB1 (the strip),
-DB2 (the polynomial average), DB3 (the class transport and the iteration), DB4 (the Gaussian
-limit), DB5 (the seal and the bridge).
-
-[proved-derived; formal-checked] RT complete: RT0–RT6 passed; `0 ≤ Λ_DN` is a theorem on the
-three axioms.
-
-[proved-derived; formal-checked] RT6 passed: `RH/DescentZeros.lean` returned, for every
-repository `t > 0`, a zero of `heatE t ξ` off the seam (`exists_offSeam_zero`, by the
-minimum-modulus transfer of RT5's zero of `F_t` along an almost period onto
-`heatE t ξ ∘ J_t / γ_t'`, with `Re J_t ≥ 1` at the height), hence `seamTimes ⊆ Ici 0` and
-**`Λ_DN_nonneg : 0 ≤ Λ_DN`**; `RH/ThresholdReturn.lean` is re-stated with the single port
-`DeBruijnBound` (`riemannHypothesis_iff_Λ_DN_eq_of_deBruijn`, `Λ_DN_mem_Icc`); every theorem
-on `propext`, `Classical.choice`, `Quot.sound`; root umbrella 9,834 jobs. The receipt is
-[`the RT6 record`](../research/records/2026-09-03_RT6_EVERY_NEGATIVE_TIME_HAS_AN_OFF_SEAM_ZERO_AND_THE_THRESHOLD_IS_NONNEGATIVE_ON_THE_THREE_AXIOMS.md).
-
-[proved-derived; formal-checked] RT5 passed: `RH/BohrZeros.lean` returned that `F_t` is entire
-and has a zero for every `t > 0` (the harmonic logarithm, Borel–Carathéodory, and Cauchy's
-estimate make a zero-free `F_t` the exponential of a quadratic, which the real axis refutes),
-Bohr almost periods of every size on every strip by simultaneous Dirichlet approximation, the
-minimum-modulus principle, and zeros of `F_t` at unbounded heights in a fixed strip
-(`exists_zero_Ft_above`); every theorem on the three axioms. The receipt is
-[`the RT5 record`](../research/records/2026-09-03_RT5_THE_MAIN_SERIES_HAS_A_ZERO_BY_THE_HARMONIC_LOGARITHM_AND_ZEROS_AT_EVERY_HEIGHT_BY_BOHR_ALMOST_PERIODS.md).
-
-[proved-derived; formal-checked] RT4 passed: `RH/DescentApproximation.lean` returned, for
-repository `t > 0` and each fixed strip `|Re s| ≤ X`, eventually in the height,
-`γ_t'(s) ≠ 0` and `heatE t ξ (J_t s) = γ_t'(s) (F_t(s) + R_t(s))` with
-`F_t(s) = Σ_{n ≠ 0} e^{−t log²|n|} |n|^{−s}` absolutely convergent and `‖R_t(s)‖ ≤ ρ(w) → 0`
-(`descent_approximation`, `tendsto_ρ`; rate `O(y^{−1/3})`), by summing RT3's three ranges
-against RT1's absolutely convergent comb; every theorem on `propext`, `Classical.choice`,
-`Quot.sound`; root umbrella 9,832 jobs. The receipt is
-[`the RT4 record`](../research/records/2026-09-03_RT4_THE_FLOWED_XI_AFTER_THE_SHIFT_IS_GAMMA_TIMES_THE_MAIN_SERIES_PLUS_A_REMAINDER_THAT_VANISHES_UNIFORMLY_ON_EVERY_STRIP.md).
-
-[proved-derived; formal-checked] RT3 passed: the `RH/Event*` family returned, for repository
-`t > 0`, the exact per-event decomposition
-`∫ flowedTerm t (J_t s) n = γ_t'(s) e^{−sL} e^{−tL²} (1 + r)` after the shift
-`J_t(s) = s + t(Log(s/2) − log π)`, by the saddle contour `Re z = Re s + 2tL`, the rectangle
-exchange to `Re z = 2`, and the phase expansion of RT2's Stirling; on the main range
-`L ≤ y^{1/3}` the defect obeys `‖r‖ ≤ Bmaj t X u → 0` beyond an explicit threshold
-(`EventMainRange.event_main`, rate `O(y^{−1/3})`), on the medium range `L ≤ y^{7/12}` the event
-is at most `12 ‖γ_t'(s)‖ e^{−xL} e^{−tL²/2}` (`EventMedium.event_medium`), and on the large
-range it is at most `‖γ_t'(s)‖ e^{−xL} e^{−(c/2)L²}` with `c = min(t,1)/8`
-(`EventLarge.event_large`); uniform on `|x| ≤ X` for each fixed `X`; every theorem on
-`propext`, `Classical.choice`, `Quot.sound`; root umbrella 9,831 jobs. The receipt is
-[`the RT3 record`](../research/records/2026-09-03_RT3_EVERY_FLOWED_INTEGER_EVENT_IS_ITS_STEEPEST_DESCENT_MAIN_TERM_ON_THREE_RANGES_WITH_THE_DEFECT_EXHIBITED.md).
-
-[proved-derived; formal-checked] RT2 passed: `RH/GammaStirling.lean` returned Stirling with a
-remainder on the sector `{w ≠ 0 : 0 ≤ Re w ∨ |Re w| ≤ |Im w|}`,
-`Γ(w) = √(2π) exp((w − ½) Log w − w − μ(w))` with `‖μ(w)‖ ≤ π/(4‖w‖)` and the multiplicative form
-with `‖ρ(w)‖ ≤ π/(2‖w‖)` for `‖w‖ ≥ 1`, through Euler's limit, the trapezoid identity on unit
-intervals, and Mathlib's real Stirling, with no logarithm of `Γ` taken; every theorem on
-`propext`, `Classical.choice`, `Quot.sound`; root umbrella 9,814 jobs. The receipt is
-[`the RT2 record`](../research/records/2026-09-03_RT2_STIRLING_HOLDS_ON_THE_SECTOR_WITH_THE_REMAINDER_EXHIBITED_AND_NO_LOGARITHM_OF_GAMMA_IS_TAKEN.md).
-
-[proved-derived; formal-checked] RT1 passed: `RH/DescentComb.lean` returned, for every repository
-`t > 0` and every `z`, `Σ_n ∫ flowedTerm t z n = heatE t ξ (z)` with absolute convergence, the
-event bound `K(t,z)|n|^{−3/2}`, and the Gaussian weight `K₂(t,z) e^{−(min(t,1)/8)(log|n|)²}`, from
-the profile bounds `|φ(v)| ≤ (2π²+3π)e^{−|v|}` and `|φ(v)| ≤ (2π²+3π)e^{−v}e^{−e^{2v}/2}` on `v ≥ 0`;
-every theorem on `propext`, `Classical.choice`, `Quot.sound`; root umbrella 9,813 jobs. The
-receipt is
-[`the RT1 record`](../research/records/2026-09-03_RT1_THE_DESCENT_COMB_CONVERGES_ABSOLUTELY_AT_EVERY_POINT_AND_EACH_EVENT_CARRIES_A_GAUSSIAN_WEIGHT_IN_N.md).
-
-[definition] Brandon's direct request of 2026-09-03, *"I would indeed like to move towards RT, but I
-need you to further scope what will be required and constructed more critically, and formally
-deposit the RT plans,"* activates the ordered `RT0--RT6` descent-route campaign on the RH line
-under
-[`THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md`](THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md).
-Its target is the discharge of the port `RodgersTaoNonneg`: `0 ≤ Λ_DN` as a theorem, by exhibiting
-a zero of `heatE t ξ` off the seam at every repository `t > 0` (standard `τ < 0`) along Dobner's
-route, founded on FT5's flowed integer events. The target was returned on 2026-09-03
-(`DescentZeros.Λ_DN_nonneg`; the RT6 paragraph above). The order is fixed:
-
-1. `RT0` -- the manifest of both published proofs against owners and the route -- **PASSED**,
-   receipt
-   [`the RT0 record`](../research/records/2026-09-03_RT0_THE_TWO_PUBLISHED_PROOFS_ARE_MAPPED_TO_OWNERS_AND_THE_DESCENT_ROUTE_IS_FOUNDED_ON_THE_FLOWED_INTEGER_EVENTS.md);
-2. `RT1` -- the descent comb everywhere: absolute convergence and equality with `heatE t ξ` at
-   every `z` for `t > 0`, with the Gaussian weight in `n` -- **PASSED**, receipt
-   [`the RT1 record`](../research/records/2026-09-03_RT1_THE_DESCENT_COMB_CONVERGES_ABSOLUTELY_AT_EVERY_POINT_AND_EACH_EVENT_CARRIES_A_GAUSSIAN_WEIGHT_IN_N.md);
-3. `RT2` -- Stirling with a remainder, the one owner both routes need -- **PASSED** on the sector
-   `{0 ≤ Re w ∨ |Re w| ≤ |Im w|}`, receipt
-   [`the RT2 record`](../research/records/2026-09-03_RT2_STIRLING_HOLDS_ON_THE_SECTOR_WITH_THE_REMAINDER_EXHIBITED_AND_NO_LOGARITHM_OF_GAMMA_IS_TAKEN.md);
-4. `RT3` -- each flowed event by steepest descent after the shift `J_t`, with its remainder;
-5. `RT4` -- the approximation theorem `heatE t ξ (J_t s) = γ_t(s)(F_t(s) + R_t(s))` uniformly
-   in the window;
-6. `RT5` -- the Dirichlet series `F_t` has a zero in every window of a fixed strip (Bohr); and
-7. `RT6` -- the Rouché transfer, the zero off the seam at every `t > 0`, `Λ_DN_nonneg`, and
-   `ThresholdReturn` with the single port `DeBruijnBound`.
-
-The Rodgers--Tao route is kept as `RTa1--RTa6` in the contract's §2 with its obstructions (the
-saddle-point asymptotics, and the pair-correlation input CGGGH-B 1985 on Montgomery's method) and
-is not scheduled. De Bruijn's bound and the conjecture remain open as the contract's §3 states.
-
-[proved-derived; formal-checked] FT5 passed at the kernel scope: `RH/FlowedExplicitFormula.lean`
-returned the integer events `Φ(u) = Σ_n |n|^{−1/2} φ(u + log |n|)` with the flow weight split of
-`HeatFlowBinding`, the identity `Σ_n ∫ (flowed event) = heatE t ξ (z)` for repository `t ≥ 0`,
-`Re z > 1`, the zero side as the Foster form of `heatE t ξ`, and the exact divergence of every
-flowed event for `t < 0`. FT6 passed at the deposited-inequality scope:
-`RH/ThresholdReturn.lean` returned `RH ⟺ Λ_DN = 0` given the two named standing theorems as
-ports (de Bruijn's `½ ∈ seamTimes`, Rodgers–Tao's `0 ≤ Λ_DN`), and deposited the first exact
-missing inequality, `Λ_DN ≤ 0` with the null falsifier of the conjecture. The FT campaign is
-closed; the standing open theorems of the line are de Bruijn's bound, Rodgers–Tao's
-nonnegativity, and the conjecture. The receipts are
-[`the FT5 record`](../research/records/2026-09-03_FT5_THE_FLOWED_INTEGER_EVENTS_SUM_TO_THE_FLOW_ON_ONE_SIDE_AND_DIVERGE_ON_THE_DESCENT_SIDE.md)
-and
-[`the FT6 record`](../research/records/2026-09-03_FT6_THE_THRESHOLD_IS_RH_GIVEN_THE_TWO_STANDING_THEOREMS_AND_THE_MISSING_INEQUALITY_IS_THE_CONJECTURE.md).
-
-[proved-derived; formal-checked] FT4 (iii)–(v) returned: `RH/KernelFlow.lean` (admissible kernels,
-`heatE t (T_K) = T_{e^{−t u²} K}`, the semigroup `heatE s (heatE t ξ) = heatE (s + t) ξ`),
-`RH/HurwitzLine.lean` (zeros of locally uniform limits on rectangles), `RH/PolyaLine.lean`,
-`RH/LineApproximation.lean`, `RH/EulerIterates.lean` (the Pólya step at the entire face:
-seam-zeroed members are limits of real-rooted seam polynomials whose Euler iterates converge to
-the flow), and `RH/RealZeroTimes.lean`, `RH/LinePreservation.lean`: in the standard coordinate
-`τ = −t` the seam times are a closed up-set, `0 ∈ seamTimes ↔ RH`, `Λ_DN := sInf seamTimes`, and
-`seamTimes.Nonempty → (RH ⟺ Λ_DN ≤ 0)`. FT4's remaining item is the nonemptiness of the seam
-times (de Bruijn's bound), named as the first exact missing item with its obstruction. The receipt
-is
-[`the FT4 (iii)–(v) record`](../research/records/2026-09-03_FT4_THE_FLOW_NEVER_CREATES_A_PAIR_THE_SEAM_TIMES_ARE_A_CLOSED_UP_SET_AND_RH_IS_THE_THRESHOLD_GIVEN_ONE_SEAM_TIME.md).
-
-[proved-derived; formal-checked] FT4 (i)–(ii) returned: the Foster class
-(`RH/FosterClassLandau.lean` through `RH/FosterClassFlux.lean`) carries FT0–FT3 for every
-symmetric entire function of finite order below two with a centre value, by instance resolution
-with exhibited constants; `ξ` and every `heatE t ξ` are members; `RH/HeatKernelPhi.lean` returned
-the kernel `Φ(u) = e^{u/2}(2x² θ″ + 3x θ′)(e^{2u})`, even and positive by the differentiated theta
-functional equation, the representation `ξ(s) = ∫ e^{(s − ½)u} Φ(u) du` for every `s` through the
-Gamma integrals and the identity theorem, the flow identity
-`heatE t ξ (z) = ∫ e^{−t u²} e^{(z − ½)u} Φ(u) du`, and `heatE t ξ (½) ≠ 0` at every `t`;
-`RH/FosterClassHeatFlow.lean` discharged the port `RodgersTaoZeroDynamics (fun t => heatE t ξ)`.
-FT4's forward preservation, real-zero times, `Λ_DN`, and the equivalence remain current. The
-receipt is
-[`the FT4 (i)–(ii) record`](../research/records/2026-09-03_FT4_THE_FOSTER_CLASS_HOLDS_EVERY_FLOWED_XI_THE_KERNEL_IS_POSITIVE_AND_THE_PORT_IS_A_THEOREM.md).
-
-[proved-derived; formal-checked] FT3 passed: `RH/FosterSplit.lean`, `RH/FosterHadamard.lean`, and
-`RH/CombFlux.lean` returned the finite/tail split of `P` on every centred disc, Landau's remainder
-logarithmic in the radius, the vanishing of the tail of the inverse squares, Cauchy's estimate and
-the connectedness of the nonzero set, hence `2 ξ′/ξ = P′/P`, **`ξ² = ξ(½)² P`**, the full Foster
-form `ξ′/ξ = Σ_u m_u (z − ½)/((z − ½)² − (u − ½)²)`, and the principal-value comb flux
-`2 Σ_{u ∈ D(½,R), u ≠ z₀} m_u/(z₀ − u) → ξ″(z₀)/ξ′(z₀)` at every simple zero; the port
-`RodgersTaoZeroDynamics` is amended to discs centred at `½` on `C¹` curves and its time-zero field
-is a theorem. The contract is corrected in place: the discharge for `heatE t ξ` needs the centre
-value `heatE t ξ (½) ≠ 0` at every `t`, which the kernel `Φ` returns, so it is FT4 (i). The receipt
-is
-[`the FT3 record`](../research/records/2026-09-03_FT3_HADAMARD_HOLDS_THE_FOSTER_FORM_IS_THE_LOG_DERIVATIVE_AND_THE_COMB_FLUX_IS_THE_VELOCITY_AT_A_SIMPLE_ZERO.md).
-
-[proved-derived; formal-checked] FT2 passed: `RH/FosterProduct.lean` returned the paired canonical
-product over the zeros repeated by multiplicity, entire and reflection symmetric, vanishing exactly
-on the zeros of `ξ`, with `P′/P` the Foster series `Σ_u m_u · 2(z − ½)/((z − ½)² − (u − ½)²)` off
-the zeros; the contract's FT2 envelope is withdrawn in place and the order `2 m_u` moves to FT3.
-The receipt is
-[`the FT2 record`](../research/records/2026-09-03_FT2_THE_PAIRED_CANONICAL_PRODUCT_IS_ENTIRE_AND_ITS_LOG_DERIVATIVE_IS_THE_FOSTER_SERIES.md).
-
-[proved-derived; formal-checked] FT1 passed: `RH/XiCentre.lean` returned `ξ(½) > 0` through the
-folded Mellin integral of Mathlib's modified theta kernel at the symmetric point, bounded by the
-theta tail `θ(t) − 1 ≤ 4 e^{−πt}`; `RH/FosterCount.lean` returned the global multiplicity, the
-count `N(R) ≤ K R log R` for `R ≥ 3` with `K` exhibited from the envelope's fixed constant, and
-`Σ_ρ m_ρ |ρ − ½|^{−2} < ∞` by dyadic shells; FT0's existence theorems are restated
-unconditionally. The receipt is
-[`the FT1 record`](../research/records/2026-09-03_FT1_THE_CENTRE_IS_POSITIVE_THE_COUNT_IS_R_LOG_R_AND_THE_INVERSE_SQUARES_CONVERGE.md).
-
-[proved-derived; formal-checked] FT0 passed: `RH/FosterTanks.lean` returned the tank algebra
-(pair identity, parallel-LC identity, positivity iff on the seam, seam resonance `(LC)^{−1/2} = γ`),
-the symmetric zero factorization at the seam's centre, the paired flux identity, and the paired
-finite Foster form with Landau's remainder, carrying `ξ(½) ≠ 0` as a named hypothesis for FT1. The
-receipt is
-[`the FT0 record`](../research/records/2026-09-03_FT0_THE_ZEROS_ARE_FOSTER_TANKS_AND_THE_PAIRED_LANDAU_FORM_CARRIES_THE_REMAINDER.md).
-
-[definition] Brandon's direct instruction of 2026-09-03, *"I am directing that campaign,"*
-activates the ordered `FT0--FT6` Foster-tank and threshold campaign on the RH line under
-[`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md).
-Its target is `Λ_DN = 0`. The engine frontier above is unchanged; the two lines share no owner
-and each advances on its own gate. The order is fixed:
-
-1. `FT0` -- the paired finite Foster form with Landau's remainder, the tank data, and the
-   positivity/seam equivalence -- **PASSED**;
-2. `FT1` -- the centre value `ξ(½) ≠ 0`, the count `N(R) ≤ C R log R`, and the exponent of
-   convergence -- **PASSED**;
-3. `FT2` -- the paired canonical product for the entire growth class -- **PASSED**;
-4. `FT3` -- Hadamard, the full Foster form, and the comb flux at every simple zero of `ξ`; the
-   port amended to centre `½` with its time-zero field -- **PASSED** at the corrected scope;
-5. `FT4` -- the Foster class and the port discharged for `heatE t ξ` from `Φ`'s centre value,
-   the entire-face flow, `Λ_DN` defined, and `RH ⟺ Λ_DN ≤ 0` against the anchor (all returned
-   2026-09-03, the equivalence under the explicit hypothesis that a seam time exists); the
-   nonemptiness of the seam times, de Bruijn's bound, carried as a named port -- **PASSED** at
-   that scope;
-6. `FT5` -- the flowed explicit formula: the bound integer comb against the divisor of
-   `heatE t ξ` -- **PASSED** at the kernel scope (termwise on `t ≥ 0`, divergent on `t < 0`);
-   and
-7. `FT6` -- `Λ_DN ≥ 0` and the target, or the first exact missing inequality with its falsifier
-   -- **PASSED** at the deposited-inequality scope; the campaign is closed.
-
-[definition] The de Bruijn--Newman/RH line remains independent: use `c_CD` for the
-Copson--de Bruijn coefficient and `Λ_DN` for the coordinate-corrected heat-flow threshold. The
-current `heatE(u, xi, s)` line has standard time `t = -4u` after
-`s = 1/2 + i z/2`; its Lean theorems stand, while its direct standard-`H_t` interpretation is
-retracted pending the RH0/RH1 bridge in
-[`the coordinate correction record`](../research/records/2026-09-02_THE_RH_ENTIRE_HEAT_FLOW_REQUIRES_THE_CRITICAL_COORDINATE_AND_REVERSES_STANDARD_TIME.md)
-and
-[`the fleet instruction`](../research/GEMINI_3_8_FLASH_SWARM_INSTRUCTIONS.md).
-The two constants' only admitted common lens is the interpretation-grade lower boundary of an
-upper admissibility set. The fleet instruction is exterior work coordination and schedules no
-primary construction.
-
-[proved-derived; formal-checked] The bounded HTP handoff's causal-tail/HNN continuation has already
-returned as formal prerequisite law: addressed current remains behind its energy face, silent
-aperture padding preserves the old receiver, complete pair-current tensor faces do not descend
-through magnitude, cultivation reopens stale projections, and successor charts transport only
-through exact naturality. Those results retain no HNA phase labels and advance no runtime grade.
-
-[definition] Brandon's latest correction activates the fixed `HNA0--HNA5` Holonic Neural Athena
-campaign under
-[`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
-The primitive is one `OperationStep`: an occurrence operates on the contemporary ecology and
-returns an emission, exact trace, and successor ecology. The next operation consumes that
-successor. Self-reentry, next-token/reprompt recurrence, and an application-produced occurrence use
-the same operation owner. A world verdict, returned-interaction constructor, candidate/commit,
-source-detached remount, and ablation are not prerequisites for inference or learning.
-
-[counterexample; source-inspected] The former engine HNA plan and its `HNA0--HNA5` grades are
-withdrawn. It authored octet boundary differences as current, duplicated one observation into
-`eee`, copied one process status over every world face, derived current/storage from counts, treated
-filesystem readback as a world, and authored a one-edge deposit. Its records are counterexample
-evidence only under
-[`the HNA recurrence correction`](../research/records/2026-09-02_THE_HNA_WORLD_RETURN_SPLIT_IS_RETRACTED_AND_INFERENCE_IS_ONE_RECURRENT_ECOLOGY.md).
-
-[definition] `WRN0--WRN6` schedules nothing. The corrected WRN document retains only the neutral
-occurrence/application boundary, format separation, and terminology audit. Its special world-face,
-counted-return, deposit, and terminal sequence does not enter HNA.
-
-## Closed bounded campaign -- causal-natural holons, tensor lenses/faces, and Copson--de Bruijn tails
-
-[definition] The complete order is:
-
-1. `HTP0` -- rename literal inverse-image fibres in Lean without aliases -- **PASSED**;
-2. `HTP1` -- causal-natural holon families and complete diagram rebases -- **PASSED**;
-3. `HTP2` -- tensor lenses, tensor faces, and natural reindex transport -- **PASSED**;
-4. `HTP3` -- finite Copson--de Bruijn tail receiver, balance, and homogeneity -- **PASSED**;
-5. `HTP4` -- compact-simplex attainment and the finite sharp coefficient -- **PASSED**;
-6. `HTP5` -- zero-extension monotonicity and the infinite `ℝ≥0∞` boundary -- **PASSED**; and
-7. `HTP6` -- bounded recurrence/threshold/two-root development and HNA handoff -- **CLOSED
-   BOUNDED**.
-
-[proved-derived; formal-checked] HTP0--HTP2 replaced every Lean identifier definitionally naming
-an inverse image, extended `Holon` with full-diagram `Rebase`, returned a functorial
-`CausalNaturalHolon` whose arbitrary arrows map preimages forward, and returned `TensorLens`,
-dependent `TensorFace`, heterogeneous axis reindexing, and homogeneous slot-permutation naturality
-whose reindex transports the complete preimage fibre. `MorphologyArtifactPassage` now names the
-validation and exact-remount law required before a serializable morphology carrier earns the
-artifact name.
-Actual inverse transforms, remounts, homotopies, and recovery procedures retain reconstruction
-terminology.
-
-[proved-derived; formal-checked] HTP3 returned
-`Mathematics/CopsonDeBruijnFiniteTail.lean`: finite nonnegative sections, every suffix energy,
-one-based inverse-square-root weight, tail radius, mass, surface, `FiniteTailFace`, its holon and
-preimage, adjacent-tail balance, zero laws, and exact degree-one/two homogeneity. It imports through
-the main Lean umbrella before `RH` and imports no RH or Millennium owner.
-
-[proved-derived; formal-checked] HTP4 returned
-`Mathematics/CopsonDeBruijnFiniteSharp.lean`: continuity and strict positivity of the tail surface,
-compact attainment on the nonnegative mass-one simplex, a positive minimum, its reciprocal finite
-sharp coefficient, the homogeneous inequality for every finite section, equality at the chosen
-minimizer, and optimality against every universal controlling coefficient.
-
-[proved-derived; formal-checked] HTP5 returned
-`Mathematics/CopsonDeBruijnInfiniteBoundary.lean`: exact silent extension, old-suffix/mass/surface
-preservation, monotone finite sharp coefficients, direct extended-nonnegative infinite mass, suffix
-energy, radius and surface, the supremal boundary's universal control, exact reflection of every
-finite-support section, and the equivalence between bounding that supremum and controlling every
-infinite nonnegative section.
-
-[proved-derived; formal-checked] HTP6 returned the bounded formal body recorded in
-[`2026-09-02_HTP6_RETURNED_A_BOUNDED_RECURRENCE_THRESHOLD_AND_TWO_ROOT_DICHOTOMY.md`](../research/records/2026-09-02_HTP6_RETURNED_A_BOUNDED_RECURRENCE_THRESHOLD_AND_TWO_ROOT_DICHOTOMY.md):
-the finite recurrence, dependent threshold and obstructions, normalized drift and moving roots,
-bounded basin transport, harmonic exclusion, and a lower-or-upper characteristic-root `Tendsto`
-dichotomy. Coefficient-specific branch selection and a certified decimal are parked research and
-schedule nothing.
-
-## Active ordered campaign -- Soulkiller excitation and the receiver-family quotient
-
-[definition] Brandon's direct request of 2026-09-03 activates the engine and formal `SKE0--SKE5`
-campaign under
-[`THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md`](THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md).
-The order is fixed:
-
-1. `SKE0` -- the excitation-founded quotient, formally -- **PASSED**;
-2. `SKE1` -- the adjoint return through every reaction (the cone instrument; completes HNA4) --
-   **PASSED**;
-3. `SKE2` -- excitation and the cone by intervention -- **PASSED** at its corrected scope;
-4. `SKE3` -- identification: the signature quotient of a declared family -- **PASSED**;
-5. `SKE4` -- condensation and seal through `soulkiller::dismantle`, re-founded on 2026-09-03 with
-   the session's 2026-08-18 contract restored first and cones as declared-withdrawal cones --
-   **RETURNED** (the apparatus obligation passed; the role cones founded and verified; the
-   return crossed the boundary with every class stating its species by its remainder); and
-6. `SKE5` -- Eros composes the classes and the recurrence runs on them -- **RETURNED** on
-   2026-09-04 after Sol's review: one continuing session, 15 of 15 family faces, condensation
-   on the domain by exhibited remainder, the decoder and product declared, saturation as the
-   formal object (not yet), the release receiver passed. The campaign is complete.
-
-[definition] Soulkiller is founded by excitation. The resident exact realization is the
-manifestation grade and the apparatus; the return is the signature quotient of a declared family,
-each class a cone-restricted local-current ecology with its insufficiency. A magnitude threshold, a
-per-event table, or the realization itself as the productive lane is a falsifier.
-
-[proved-derived; formal-checked] SKE0 returned the excitation-founded quotient owner: signature,
-all-history quotient with inherited signature theorems, declared family and its exact compression,
-intervention cones with the load-bearing law, extent and insufficiency with the insufficiency law,
-the faithful productive lane, and the equal-magnitude/different-cone control; the live umbrella
-built 3,775 jobs. Its receipt is
-[`the SKE0 return`](../research/records/2026-09-03_SKE0_THE_EXCITATION_FOUNDED_QUOTIENT_RETURNED_SIGNATURE_IDENTITY_INTERVENTION_CONES_AND_THE_FAITHFUL_PRODUCTIVE_LANE.md).
-
-[established-bounded; implemented-exact; measured] SKE1 returned the differential through every
-operation of the cycle on the resident operator in 3.3 s, with every reaction's adjoint as a
-certified enclosure and a card control for each, deposited on 344 cross-sections, and the next
-cycle's face differs from the control. Its receipt is
-[`the SKE1 return`](../research/records/2026-09-03_SKE1_THE_RETURN_CROSSED_EVERY_REACTION_OF_THE_CYCLE_AND_DEPOSITED_ON_EVERY_CROSS_SECTION.md).
-
-[established-bounded; implemented-exact; measured] SKE2 founded the cone by joint intervention on
-the resident operator: a declared site population across all 344 contraction populations is
-withdrawn on the card and the cycle re-enacted from the checkpoints; the excitation orders a
-bisection whose every exclusion is a withdrawal returned unchanged; the complement withdrawn
-leaves the face and the cone withdrawn changes it on all five occurrences of a declared family,
-and no magnitude threshold determines the cone. The per-population support of the first letter
-was refuted and the phase corrected in place. Its receipt is
-[`the SKE2 return`](../research/records/2026-09-03_SKE2_THE_CONE_IS_FOUNDED_BY_JOINT_WITHDRAWAL_ALONG_THE_EXCITATION_AND_A_PER_POPULATION_SUPPORT_IS_NOT_A_CONE.md).
-
-[established-bounded; implemented-exact; measured] SKE3 returned the signature quotient of the
-declared family over three declared histories: two variants identified under the empty history
-and reopened by a declared history, five classes under every history, class cones as unions, and
-the extent and insufficiency as site populations. Its receipt is
-[`the SKE3 return`](../research/records/2026-09-03_SKE3_THE_SIGNATURE_QUOTIENT_IDENTIFIED_TWO_VARIANTS_UNDER_THE_EMPTY_HISTORY_AND_A_DECLARED_HISTORY_REOPENED_THEM.md).
-
-[counterexample; measured] On 2026-09-03 Brandon's correction and the audit that followed
-re-founded the campaign (the blueprint's §0b;
-[`the SKE audit`](../research/records/2026-09-03_SKE_AUDIT_THE_COORDINATE_GRAIN_THE_HOST_READOUT_AND_THE_COMPRESSION_CLAUSE_WERE_INJECTIONS_AND_THE_CANON_ALREADY_OWNS_THE_ANSWERS.md)):
-the SKE2 and SKE3 cones were never cones and are re-founded as declared-withdrawal cones; the
-per-operation host readout of the HNA session is the renamed instruction loop of 2026-08-18 and
-grades nothing; compression is `canon/TABLET_THE_COMPRESSION.md`'s codec pivot with its remainder
-exhibited, applied to the composed variant in SKE5. SKE4 is current; its coordinate-grain
-construction and the first draft of §0b are withdrawn.
-
-[established-bounded; implemented-exact; measured] SKE4's apparatus obligation passed on
-2026-09-03: the session runs as segments under the 2026-08-18 contract, each segment one passage
-bound whole, launched once, and read once through its census, the terminal one passage per tile;
-one cycle of 1,275 operations in 687 launches and 672 passages with the face's 16 tiles the only
-section read-outs, every body operation agreeing word for word with the per-operation session
-it replaces, HNA5 and the SKE2 cone of occurrence 0 reproducing
-([`the SKE4 session record`](../research/records/2026-09-03_SKE4_THE_SESSION_RUNS_AS_SEGMENTS_UNDER_THE_2026-08-18_CONTRACT_AND_THE_FACE_ALONE_CROSSES_TO_THE_HOST.md)).
-The declared-withdrawal cones, the class ecologies with their collapsed pairs, and the seal
-through `soulkiller::dismantle` remain open on this session.
-
-[established-bounded; implemented-exact; measured] SKE4 returned on 2026-09-03 at the
-layer-block role grain: 127 declared withdrawals, class cones of 99 to 115 roles
-founded jointly over each class's exposures and verified under every lens, the family cone of
-117 roles, the return through `soulkiller::dismantle` with 2 class bodies stating
-condensation and 3 compression by their exhibited remainders, and the rest mounting every
-class body from the stored presentation alone
-([`the SKE4 return`](../research/records/2026-09-03_SKE4_THE_DECLARED_WITHDRAWALS_FOUND_ROLE_CONES_THE_CLASS_BODIES_CARRY_THEIR_REMAINDER_AND_THE_RETURN_CROSSES_THE_BOUNDARY.md)).
-
-[established-bounded; implemented-exact; measured] SKE5 returned on 2026-09-03: the composed
-variant (the extent mounted from the rest alone) ran the recurrence on the family with 15 of 15
-faces equal to the full operator's and refused an outside occurrence and an undeclared history;
-it states condensation by its exhibited remainder, declares its decoder with its cost, states
-its invariance as differences, returns its product as a vector, and returns a saturation
-receipt that says not yet ([`the SKE5 return`](../research/records/2026-09-03_SKE5_THE_COMPOSED_VARIANT_RUNS_THE_RECURRENCE_ON_THE_FAMILY_STATES_CONDENSATION_BY_ITS_REMAINDER_AND_IS_NOT_SATURATED.md)).
-Withdrawn on 2026-09-04 by Sol's review ([`the review`](../research/records/2026-09-04_SOL_REVIEW_OF_THE_SKE_CAMPAIGN_THE_CONES_ARE_NOT_FOUNDED_CONES_THE_SPECIES_ARE_OFF_DOMAIN_AND_THE_PASSES_ARE_WITHDRAWN.md)):
-the role sets are not founded cones, the species are off their domain, the SKE5 width
-differences cross grains, one session was not run, and no release receiver ran. All were
-corrected in the tree the same day and SKE5 returned with its release receiver passed
-([`the SKE5 return`](../research/records/2026-09-03_SKE5_THE_COMPOSED_VARIANT_RUNS_THE_RECURRENCE_ON_THE_FAMILY_STATES_CONDENSATION_BY_ITS_REMAINDER_AND_IS_NOT_SATURATED.md));
-Brandon's ruling of 2026-09-04 (`AGENTS.md`) answers the review's jurisdiction and process
-points. The SKE campaign is complete at the scopes its records state; no later deed is admitted.
-
-[counterexample; source-inspected] The audit
-[`2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](../research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md)
-found no lineage that is a Soulkiller return and no formal owner founding structure from
-excitation; the HNA1 phrase "one actual Soulkiller return" is withdrawn.
-
-## Completed ordered campaign -- Holonic Neural Athena recurrent ecology
-
-[definition] Brandon's latest correction activates the engine `HNA0--HNA5` campaign under
-[`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
-The order is fixed:
-
-1. `HNA0` -- formal recurrent ecology and lifecycle correction -- **PASSED**;
-2. `HNA1` -- actual native operable morphology -- **PASSED**;
-3. `HNA2` -- one native operation advances one ecology -- **PASSED**;
-4. `HNA3` -- recurrent inference and generation -- **PASSED**;
-5. `HNA4` -- Eros refinement and optional rest -- **PASSED**; and
-6. `HNA5` -- application matrix and honest release -- **PASSED**.
-
-[definition] An HNA operation consumes the contemporary ecology and one occurrence and returns an
-emission, exact trace, and successor ecology. The successor is the next operation's predecessor.
-Inference, generation, self-reentry, application interaction, cultivation, training, and rest are
-receiver or persistence views over this one sequence; they are not separate semantic modes.
-
-[definition] `HNA0` first corrects the formal lifecycle. The existing fixed-morphology
-`InferenceCirculationReturn` and genuinely-later `CultivationPassage` may remain specialized
-objects, but they no longer define HNA. The new owner must admit both fixed-morphology and
-morphology-changing operations, preserve distinct causal occurrences behind equal receiver faces,
-and join self-emitted and application-produced next occurrences through the same recurrence.
-
-[proved-derived; formal-checked] HNA0 returned the complete formal owner and the 9,784-job umbrella
-built. Its receipt is
-[`2026-09-02_HNA0_ONE_OPERATION_RETURNED_ITS_SUCCESSOR_ECOLOGY_AND_THE_NEXT_OPERATION_USES_IT.md`](../research/records/2026-09-02_HNA0_ONE_OPERATION_RETURNED_ITS_SUCCESSOR_ECOLOGY_AND_THE_NEXT_OPERATION_USES_IT.md).
-
-[definition] `HNA1--HNA4` then return the actual engine: Soulkiller must provide an operable generic
-local-current/reaction morphology rather than an activation-example transition archive; one
-move-owned resident operation returns its actual successor ecology; repeated operations use that
-successor directly; and developmental recurrence may change local morphology through the same
-operation without a world verdict, reward, candidate, or commit API. Rest/remount is optional
-storage testimony.
-
-[established-bounded; implemented-exact; source-inspected; measured] HNA1 returned the complete
-source-neutral text-operator ecology: 1,275 operation nodes over 42 layers, 719 packed resident
-coefficient populations, 665 used by the configured operation, and 54 explicit shared-K/V
-obstructions. Every complete tensor frame returned, one fixed-frame pool was reused, and one
-complete resident matrix section agreed exactly with the independent serial chart. Its receipt is
-[`the complete HNA1 operator return`](../research/records/2026-09-02_HNA1_THE_COMPLETE_TEXT_OPERATOR_BECAME_ONE_RESIDENT_NATIVE_ECOLOGY.md).
-
-[established-bounded; implemented-exact; measured] HNA2 returned the first four full-ecology
-operation steps on one move-owned successor line: two lookups, a chart reshape, and the complete
-per-layer model contraction. Two entering occurrence rows remained distinct through the
-constitutive contraction, and the emitted face equalled the carrier retained by the successor. Its
-receipt is
-[`the HNA2 full operation return`](../research/records/2026-09-02_HNA2_ONE_FULL_NATIVE_OPERATION_RETURNED_ITS_SUCCESSOR_ECOLOGY.md).
-
-[established-bounded; implemented-exact; measured] HNA3 returned two complete 1,275-operation
-cycles on one successor line. The first native tiled vocabulary face selected/rendered `The`; that
-ordinary occurrence expanded the application context and the exact returned ecology advanced from
-generation 1,275 to 2,550. Predecessor and rebuilt-generation occurrences were rejected. Both
-inspected emissions were `The`, so the grade is recurrence rather than qualitative language. Its
-receipt is
-[`the complete HNA3 recurrence return`](../research/records/2026-09-02_HNA3_TWO_COMPLETE_NATIVE_CYCLES_USED_ONE_RETURNED_SUCCESSOR_ECOLOGY.md).
-
-[counterexample; source-inspected] The first HNA4 return (an occurrence-carried factor gated by a
-sign and applied as one global scalar) is withdrawn under
-[`the reconciliation`](../research/records/2026-09-02_THE_HNA4_MORPHOLOGY_FACTOR_IS_OCCURRENCE_CARRIED_AND_THE_FORMAL_OWNERS_REQUIRE_A_CAUSAL_CONE_ADJOINT_RETURN.md).
-
-[established-bounded; implemented-exact; measured] HNA4, corrected: a continuing occurrence meets
-the retained emitted face, the normalized-exponential differential returns through the terminal
-reactions, a rank-5 factorized overlay is deposited on the tied cross-section, and the next cycle's
-contraction applies it beside the base. The driver carries no morphology field; the control without
-apertures differs at every emitted word of the second cycle. The pullback to earlier cross-sections
-remains open. The receipt is
-[`the HNA4 return deposit`](../research/records/2026-09-02_HNA4_THE_RETURN_DEPOSITED_A_FACTORIZED_OVERLAY_ON_THE_TIED_CROSS_SECTION_AND_THE_NEXT_CYCLE_APPLIED_IT.md).
-
-[counterexample; implemented-exact; measured] The bounded token recurrence emitted `pit` then
-` capitalist`; the text/coding/mathematics matrix emitted ` northward`, ` Wonderland`, and `пок`.
-These inspected application faces reject a qualitative HNA claim and remain controls for HNA5.
-
-[definition] `HNA5` exercises text, coding, and mathematics as exterior application
-occurrence/receiver configurations. A compiler, runtime, proof kernel, sensor, or person may supply
-another ordinary occurrence. No application result implicitly updates Athena, and no internal
-owner names a language, format, expected answer, or template.
-
-[established-bounded; implemented-exact; source-inspected; measured] HNA5 advanced one resident
-ecology through text, coding, and mathematics application occurrences at generations
-`0 -> 1,275 -> 2,550 -> 3,825`. The actual faces were ` Explain`, ` i`, and ` :=`; they carry no
-qualitative answer claim. The codec-only application source did not inspect internal operation kinds
-or import a retracted return path, and the coherent release receiver passed. The receipt is
-[`the HNA5 bounded release`](../research/records/2026-09-02_HNA5_ONE_NATIVE_RECURRENCE_CROSSED_THREE_APPLICATIONS_AND_RELEASED_WITHOUT_A_QUALITATIVE_CLAIM.md).
-
-[established-bounded] **The corrected HNA0--HNA5 campaign is complete at its bounded scopes.** No
-later HNA phase is admitted; the SKE campaign is the current construction.
-
-[counterexample; source-inspected] The old HNA records preserve the rejected implementation: byte
-differences named current, repeated observation IDs, uniform process-status faces, counted
-current/storage, exact-readback echo, and an authored one-edge deposit. They schedule nothing and
-cannot satisfy any phase above.
-
-## Retracted campaign — the world return deposits on the route it crossed
-
-[historical] The ordered `WRD0--WRD5` campaign was constructed on 2026-09-02 under
-under
-[`THE_WORLD_RETURN_DEPOSITS_ON_THE_ROUTE_IT_CROSSED_AND_THE_LEAN_KERNEL_IS_THE_FIRST_WORLD.md`](THE_WORLD_RETURN_DEPOSITS_ON_THE_ROUTE_IT_CROSSED_AND_THE_LEAN_KERNEL_IS_THE_FIRST_WORLD.md).
-It attempted to compose the Lean material chart, kernel world, carrier population, conduct,
-staged return, commit, withdrawal, and replay into a constitutive passage.
-
-[definition] The complete order is:
-
-1. `WRD0` — formal junction, route-return, locality, and many-receiver laws;
-2. `WRD1` — the Lean material mouth into the carrier population;
-3. `WRD2` — candidate render from the emitted route;
-4. `WRD3` — the constitutive map and termination;
-5. `WRD4` — the first world, later current, and the falsifier; and
-6. `WRD5` — records, release, commit, and push.
-
-[counterexample; source-inspected] None of these labels remains passed. The first audit retracted
-the Lean mouth, template emitter, face adapter, and driver. The HNA audit then found that the neutral
-replacement still elevated an exterior verdict into a privileged return and used admission counts
-to author current, storage, and deposit. The exact junction/telescoping algebra and measured kernel
-faces remain evidence at their own scopes; the world-return/cultivation interpretation does not.
-The first retraction is
-[`2026-09-02_THE_LEAN_BINDING_OF_THE_WORLD_RETURN_IS_RETRACTED_AND_LANGUAGES_ARE_APPLICATIONS.md`](../research/records/2026-09-02_THE_LEAN_BINDING_OF_THE_WORLD_RETURN_IS_RETRACTED_AND_LANGUAGES_ARE_APPLICATIONS.md).
-
-## Corrected dependency audit — every language and world is an application
-
-[definition] Brandon's rulings of 2026-09-02 and the subsequent source/terminology audits retain
-[`THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md`](THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md),
-as a non-scheduling dependency audit. Its surviving law places languages, formats, modalities,
-compilers, kernels, sensors, and worlds on the application side of an ordinary occurrence/emission
-boundary. An application may produce the next occurrence; it never returns a privileged learning
-signal or authors native morphology.
-
-[counterexample; source-inspected] The WRN world-face family, counted current/storage, staged
-candidate/commit, terminal bridge, and two-world release sequence are withdrawn. Their promotion of
-application testimony into a constitutive return repeated the reafference split corrected by HNA.
-`CountedCrossing` and the Lean junction/deposit owners retain only their exact algebraic grades.
-
-[definition] Its terminology contract keeps `NativeTransportScaffold` for the inherited
-source-neutral handoff; names the singular continuing hot owner `NativeHolonMorphology`; names its
-durable exterior carrier `NativeMorphologyArtifact` only after a validated exact rest/remount
-passage returns; names the broad separated lane
-`MorphologyTestimonyLane`; reserves `MorphologyTensorLens` for an actual application-side
-coordinate map and `MorphologyTensorFace` for its returned value; and gates
-`NativePreimageFibre` on proof that its radical spans the complete kernel. In a declared linear
-chart, `W` may present a
-constitutive flux cross-section while `W x` is the local current. These definitions do not promote
-the report's fluid, vorticity, attention, storage, or tensor-export interpretations into theorems.
-
-[definition] `WRN0--WRN6` are withdrawn labels and never schedule construction. HNA owns the
-recurrent operation order. The application-format separation and terminology distinctions remain
-constraints on every HNA phase, not another campaign.
-
-## Completed campaign — finite many-body and polarized crystal transport
-
-[definition] Brandon's direct instruction of 2026-08-31 places the ordered `QLT1--QLT6` campaign
-before further engine work. Its complete contract is
-[`THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md`](THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md).
-
-[proved-derived; formal-checked] QLT1 returned `HolonicFermionicOccupation.lean`: the power-set
-occupation carrier, signed complex-linear creation and annihilation, vacuum and number grading, all
-three CAR laws, their linear-map forms, conjugate-transpose matrix relation, and a two-mode control.
-The live `HolonicQuantumTransport` umbrella built 3,167 jobs under Lean `v4.33.0`; its axiom audit
-contains no `sorryAx` or new axiom.
-
-[proved-derived; formal-checked] QLT2 returned `HolonicFermiHubbard.lean`: directed hopping,
-adjoint-paired bonds, number and double-occupation receivers, an exact finite Fermi--Hubbard matrix,
-Hermiticity, exact particle-number-sector preservation, and a nontrivial two-site hopping/interaction
-control. The campaign umbrella built 3,171 jobs without `sorry` or a new axiom.
-
-[proved-derived; formal-checked] QLT3 returned `HolonicPolarizedCrystalTransport.lean`: retained
-path boundary fibres, coherent surface sections, polarization transport, analyzer and intensity
-receivers, ordered path composition, exact basis covariance, crystalline phase, orthogonal analyzer
-separation, and two-path cancellation/reinforcement. `AngleExcess.lean` delegates its diffraction
-definitions to the common owner, and the campaign umbrella built 3,172 jobs.
-
-[proved-derived; formal-checked] QLT4 returned `HolonicEvolutionKinds.lean`: Physlib finite-target
-real-time norm conservation and group composition, a separate imaginary-time exponential semigroup,
-fermionic worldline/diagram histories, Markov mass preservation, physical boundary balance, and a
-separate open-system carrier. The campaign umbrella built 3,745 jobs.
-
-[proved-derived; formal-checked] QLT5 returned `HolonicSimulationCertificate.lean`: typed method and
-assurance layers, decomposed error budgets, Hermitian finite eigenpair certificates, and exact plus
-bounded controls over the same observable with residual masses `0` and `1/16`. The external
-producer and Lean checker remain distinct; the campaign umbrella built 3,746 jobs.
-
-[established-bounded; formal-checked; process-audit] QLT6 made
-`HolonicQuantumTransport.lean` the single live/default Lean umbrella, including the prior HNN/HML
-surface. `bash tools/lean_check.sh` built 3,762 jobs under the 180-second boundary; document law,
-epistemic tags, named paths, and source shape passed. The exact conformance and return are recorded
-in
-[`research/records/2026-08-31_FINITE_MANY_BODY_POLARIZED_CRYSTAL_AND_DIFFUSION_LEAN_FOUNDATION_RETURNED_TO_THE_ENGINE.md`](../research/records/2026-08-31_FINITE_MANY_BODY_POLARIZED_CRYSTAL_AND_DIFFUSION_LEAN_FOUNDATION_RETURNED_TO_THE_ENGINE.md).
-
-## Completed campaign — constructive differential boundary supplement
-
-### CDB1 — return typed differentials, boundary integration, and receiver-safe refinement — PASSED
-
-[definition] Brandon's direct instruction of 2026-08-31 founds one bounded formal supplement under
-[`THE_CONSTRUCTIVE_DIFFERENTIAL_BOUNDARY_AND_RECEIVER_CALCULUS.md`](THE_CONSTRUCTIVE_DIFFERENTIAL_BOUNDARY_AND_RECEIVER_CALCULUS.md).
-CDB1 composes Mathlib's square-zero extensions with the standing finite-FTC, chronology, and
-receiver owners. It adds no independent solver, alternate calculus, or engine cabinet. After its
-formal gate and receipt, the roadmap returns immediately to the exact parked CONS3 residual.
-
-[proved-derived; formal-checked] `HolonicConstructiveDifferentialBoundary.lean` returned the typed
-square-zero jet, complete standard/residue receiver, exact differential path and finite FTC,
-receiver-kernel preimage fibre, zero-faced nonzero infinitesimal, pointwise-zero but
-integrated-one radix control, MVT witness, and residue-retaining squeeze certificate.
-
-[established-bounded; formal-checked; measured] The live `HolonicQuantumTransport.lean` umbrella
-built 3,765 jobs under Lean `v4.33.0`. The new owner has no `sorry` or new axiom. Its critical
-review and construction receipt are in
-[`research/records/2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md`](../research/records/2026-08-31_CONSTRUCTIVE_DIFFERENTIALS_KEEP_DX_TYPED_AND_REFINEMENT_DOES_NOT_ERASE_THE_POTENTIAL_FIBRE.md).
-
-## Completed campaign — repository consolidation
-
-[definition] CONS0--CONS5 retain their passed grades. QLT and CDB1 advanced no Athena capability
-grade during the consolidation interval.
-
-[definition] Brandon directly authorized this consolidation and the destructive removal of ignored
-`target/` and `output/` storage on 2026-08-30. The campaign is `CONS0--CONS5`. It changes no Athena
-capability grade by itself.
-
-### CONS0 — preserve the dirty population and remove authorized ignored storage — PASSED
-
-[definition] Preserve the complete non-ignored working population recoverably before any deletion.
-Then remove only the exact ignored storage roots Brandon authorized.
-
-[established-bounded; measured] Git stash `stash@{0}` / object
-`1c73eaed51ab43be612c40a1592fdca312151dc0` contains all 841 formerly untracked files and the
-complete tracked diff under label `pre-consolidation-2026-08-30-uar-housekeeping`. The stash was
-applied without dropping it, restoring the working population.
-
-[established-bounded; measured] `/home/b/Workspaces/holonics/target` and
-`/home/b/Workspaces/holonics/output` were deleted under the direct authorization. Filesystem free
-space increased from 199 GiB to 522 GiB. Neither path was tracked.
-
-### CONS1 — partition and restore one durable authority — PASSED
-
-[definition] Classify every remaining modified and untracked path as active implementation,
-admitted formal work, governance/evidence, historical archive material, or disposable generated
-scratch. Preserve exact evidence before destructive disposition. Do not commit the dirty tree
-wholesale.
-
-**Pass CONS1:**
-
-- every remaining path has one explicit disposition;
-- generated `.lake` artifacts and root scratch cannot enter Git;
-- `CONSTRUCTION_STATE.md` contains only the current position;
-- this roadmap contains exactly one unresolved frontier;
-- the then-current UAR checkout obstruction is preserved as historical evidence;
-- historical campaign detail is reachable through records or archived blueprints, not duplicated
-  as live schedule; and
-- coherent commit groups are identified before staging.
-
-[established-bounded; measured] The complete restored source/evidence population is tracked by
-commit `c905404`; ignored build/output material is absent; the pre-consolidation stash remains
-recoverable; document law reports one frontier and no subordinate scheduler.
-
-### CONS2 — repair the validation and closure apparatus — PASSED
-
-[definition] Make the repository reject the failure modes exposed by the audit rather than merely
-describe them.
-
-**Pass CONS2:**
-
-- a clean-index and clean-clone receiver proves the live authority and source owners are tracked;
-- document law enforces exactly one unresolved roadmap frontier and no subordinate scheduling
-  clause in the position record;
-- file, function, public-API, and CUDA-kernel size ratchets stop hidden foremen;
-- Rust warnings, knowingly dead live paths, and unreferenced CUDA entries are dispositioned;
-- example targets derive from Cargo metadata rather than recursive filename census;
-- closure hashes include `Cargo.toml`, `Cargo.lock`, build scripts, CUDA sources, toolchain, and
-  every source actually consumed;
-- orphan closures require explicit historical or live disposition;
-- the Lean receiver builds one declared umbrella from the live tree without archive fallback; and
-- every invoked nontrivial process carries its own 180-second outer boundary.
-
-[established-bounded; measured] Source-shape, authored-level, named-path, line-citation,
-epistemic-tag, claim-index, equation-atlas, driver-catalog, output/closure-manifest,
-boundary-artifact, Typst, architecture, document-law, and tracked-authority receivers are green.
-CUDA symbol parity traverses both the CUDA include closure and the owner-local Rust module tree.
-
-[historical] The driver census, registry-incidence ledger, standing-deposit verifier, and
-checksum-manifest gates were retired after CONS5 by Brandon's direct correction. Their old receipts
-remain historical evidence; they are not current repository policy or active prerequisites.
-
-### CONS3 — split and simplify existing Rust/CUDA owners — PASSED
-
-[definition] Preserve one non-cloneable CUDA context and one continuing ecology while separating
-source files along already-founded owners:
-
-1. CUDA driver/context/module and buffer apparatus;
-2. exact arbitrary-width signed arithmetic;
-3. factored-moment transport and reconstruction;
-4. membrane current and receiver-history transport;
-5. realization-site transport and dependent complex contraction;
-6. terminal receiver projection and telemetry; and
-7. owner-local tests.
-
-[definition] Remove or archive source paths which explicitly declare themselves superseded, have no
-caller, preserve compatibility aliases, duplicate receiver equality in drivers, or keep a kernel
-handle which is never launched. Move substantial example-local algorithms to an admitted library
-owner or archive the example and retain its evidence.
-
-**Pass CONS3:** focused owner tests and exact dense/factorized equality pass; the resident receiver
-observes and distinguishes its committed target from the pre-transition diagnostic; after the committed
-restoration snapshot establishes the newly tracked owners, the architecture gate is green without
-any later baseline increase; trace configuration is read once; digest syntax and wire hashing have
-typed owners; structural equality remains primary; and no remaining production execution method
-is a multi-thousand-line foreman. The contraction/readback split preserves operand order and typed
-scale; it joins the complete local current before refinement condensation; and neither a zero
-positive/standard receiver face nor a pointwise-small cell authorizes deletion of a nonzero
-dependent complex current or its preimage fibre.
-
-### CONS4 — consolidate the live Lean line — PASSED
-
-[definition] Retain exact theorems while separating the live imported closure from independent
-Millennium/RH work and temporary Scratch experiments. Every retained production theorem belongs to
-one import path from a declared umbrella. Scratch material is either promoted with dependencies and
-grade, moved to an explicit historical/scratch archive outside the production import tree, or
-deleted as reproducible debris.
-
-**Pass CONS4:** a clean live `lake build` returns the then-declared HNN/HML/UAR production umbrella under
-the pinned toolchain; no archived `.olean` can satisfy a missing live import;
-no `sorry` or ungraded new axiom enters; generated `.lake` material remains ignored.
-
-[established-bounded; formal-checked; measured] QLT6 made `HolonicQuantumTransport.lean` the one
-default/live umbrella and CDB1 extended it without archive fallback, `sorry`, or a new axiom. The
-umbrella built 3,765 jobs under Lean `v4.33.0`; generated `.lake` material is ignored.
-
-### CONS5 — coherent release, commit, and push — PASSED
-
-[definition] Run owner-local checks first, then one complete `bash tools/gates.sh` invocation on the
-coherent tree. Inspect the actual gate outputs; do not regenerate red ledgers until their producers
-and dispositions are correct.
-
-**Pass CONS5:** all required Rust, CUDA, Lean, document, closure, ownership, and artifact receivers
-return inside their process bounds; Git is clean; commits are separated by coherent owner; the
-branch is pushed; Provenance carries the exact completion/handoff. CONS5 advanced no engine
-capability grade.
-
-[established-bounded; process-audit; measured] The release receiver now derives Cargo package and
-target-kind populations and gives each package its own 180-second boundary. One complete
-`bash tools/gates.sh` invocation returned all 17 gates passed: 2,972 Rust tests passed, zero failed,
-49 ignored; every workspace example type-checked; the live Lean umbrella built 3,765 jobs; source
-shape, architecture, manifests, Typst, authority, and document law were green. The coherent owner
-commit `9456a4ae` was pushed to `origin/main`.
-
-## Deprecated campaign — UAR/R0Q
-
-[definition] Brandon's direct instruction of 2026-08-31 deprecates UAR/R0Q as a construction
-campaign. R0Q0--R0Q4 retain their exact bounded grades: addressed source/target current,
-off-diagonal transport, resident complex contraction before the positive receiver, full-complex
-recurrence, complete preimage fibre, and semantic-replay telemetry remain implementation
-standing. UAR3, R0Q5, R0Q6, and the UAR4 release no longer schedule work.
-
-[historical] The HIF contract folded unfinished UAR intentions into neutral lifecycle gates:
-source-neutral construction, emission/return separation, remount, withdrawal, restoration,
-contact-chart comparison, and source/apparatus absence. The 2026-09-02 HNA audit reclassifies those
-as formal, persistence, and attribution apparatus; their fixed-inference/special-return split does
-not define the active recurrent ecology. Historical UAR blueprints and records remain evidence only.
-
-## Completed campaign — Holonic Intelligence Framework
-
-**Status:** COMPLETE
-
-[established-bounded; implemented-exact; source-inspected; measured] HIF0--HIF7 are complete at
-their declared scopes. No construction deed is active; the next deed requires a new direct request.
-
-[established-bounded; implemented-exact; measured] HIF7 returned fixed-window, periodic-hybrid,
-recurrent-linear, and current-founded contact charts over one native population, with active causal
-extent, exact pair work, complete coarse receiver fibres, and explicit richer-receiver reopenings.
-HIF2 supplies the lossless cold foreign-chart boundary. HIF6 supplies an exact synthetic
-conduct/deposit/remount/withdrawal/restoration control; its caller-supplied or authored return does
-not supply the active HNA operation or a learning grade.
-
-[established-bounded; process-audit; measured] The coherent release returned 2,922 tests passed,
-zero failed, and 50 ignored; every Cargo example type-checked; the Lean umbrella built 3,768 jobs;
-and all nine repository release gates passed inside the 180-second outer boundary.
-
-[historical; source-inspected; process-audit] “Describe Brandon” and the inherited natural-language
-questions were experiments, not HIF7 gates. The agent-authored H4 contract promoted them without a
-rubric, then UAR and HIF copied the error. The reverted presentation-contact path remains a valid
-counterexample to parser-derived lexical lookup; it schedules no replacement inference organ. The
-forensic audit and exact HIF7 release receipt are in
-[`research/records/2026-09-01_HIF7_QUALITATIVE_PROBE_WAS_WRONGLY_PROMOTED_AND_THE_FRAMEWORK_RELEASES_ON_EXACT_CONTRACTS.md`](../research/records/2026-09-01_HIF7_QUALITATIVE_PROBE_WAS_WRONGLY_PROMOTED_AND_THE_FRAMEWORK_RELEASES_ON_EXACT_CONTRACTS.md).
-
-## Completed campaign — Native Transport Scaffold and repeated circulation
-
-**Terminal frontier:** NONE
-
-**SCF0--SCF6 ARE COMPLETE. NO CONSTRUCTION DEED IS ACTIVE.**
-
-[definition] Brandon's direct instruction of 2026-09-01 founds the ordered `SCF0--SCF6` campaign
-under
-[`THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md`](THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md).
-SCF0 returned the neutral formal laws. SCF1 replaced the whole-object Rust vocabulary with
-`NativeTransportScaffold` across Soulkiller, profiles, Athena rest, and conduct without an alias or
-compatibility decoder. SCF2 returned complete actual Gemma excitation and a source-neutral lift;
-SCF3 moved that productive lane into one hot rest; SCF4 returned repeated actual-successor
-circulation; and SCF5 returned source-detached cultivation and inherited-scaffold withdrawal.
-SCF6 returned all five actual experiments and the coherent pushed release.
-
-[proved-derived; formal-checked; measured] SCF0 passed. The live umbrella built 3,769 jobs; document
-law, epistemic tags, and source shape remained green. Its exact receipt is
-[`research/records/2026-09-01_SCF0_NATIVE_TRANSPORT_SCAFFOLD_REPEATED_CIRCULATION_AND_WITHDRAWAL_LAWS_RETURNED.md`](../research/records/2026-09-01_SCF0_NATIVE_TRANSPORT_SCAFFOLD_REPEATED_CIRCULATION_AND_WITHDRAWAL_LAWS_RETURNED.md).
-
-[established-bounded; implemented-exact; source-inspected; measured] SCF1 passed. The engine
-library returned 1,994 passed, zero failed, and 32 ignored; life returned 466 passed, zero failed,
-and 14 ignored. Its exact receipt is
-[`research/records/2026-09-01_SCF1_NATIVE_TRANSPORT_SCAFFOLD_REPLACED_THE_WHOLE_OBJECT_SPOOL_BUNDLE.md`](../research/records/2026-09-01_SCF1_NATIVE_TRANSPORT_SCAFFOLD_REPLACED_THE_WHOLE_OBJECT_SPOOL_BUNDLE.md).
-
-[established-bounded; implemented-exact; source-inspected; measured] SCF2's first unit reconciled
-the local Gemma 4 E4B configuration, processor, and all 2,130 BF16 Safetensors declarations into
-five complete cold transport families with zero unclassified tensors. It verified the 2,560-wide
-shared carrier and text-only output without executing the model. Its exact return and open
-excitation boundary are in
-[`research/records/2026-09-01_SCF2_GEMMA4_E4B_COLD_MULTIMODAL_CHART_RECONCILED_ALL_2130_TENSORS.md`](../research/records/2026-09-01_SCF2_GEMMA4_E4B_COLD_MULTIMODAL_CHART_RECONCILED_ALL_2130_TENSORS.md).
-
-[established-bounded; implemented-exact; source-inspected; measured] SCF2 completed actual text,
-vision, sampled-video, and audio excitation; exact BF16 return admission; and the source-neutral
-scaffold lift. Its completion receipt is
-[`research/records/2026-09-01_SCF2_COMPLETE_GEMMA4_EXCITATION_FOUNDED_THE_SOURCE_NEUTRAL_TRANSPORT_SCAFFOLD.md`](../research/records/2026-09-01_SCF2_COMPLETE_GEMMA4_EXCITATION_FOUNDED_THE_SOURCE_NEUTRAL_TRANSPORT_SCAFFOLD.md).
-
-[established-bounded; implemented-exact; measured] SCF3--SCF5 returned the move-owned hot handoff,
-typed repeated circulation, actual returned-current cultivation, source-detached remount,
-inherited-scaffold withdrawal, attributable ablation, and exact restoration. Their receipts are
-[`research/records/2026-09-01_SCF3_THE_PRODUCTIVE_SCAFFOLD_MOVED_INTO_ONE_HOT_NATIVE_ECOLOGY_REST.md`](../research/records/2026-09-01_SCF3_THE_PRODUCTIVE_SCAFFOLD_MOVED_INTO_ONE_HOT_NATIVE_ECOLOGY_REST.md),
-[`research/records/2026-09-01_SCF4_ACTUAL_ADDRESSED_SUCCESSORS_RETURNED_REPEATED_VARIABLE_GRAIN_CIRCULATION.md`](../research/records/2026-09-01_SCF4_ACTUAL_ADDRESSED_SUCCESSORS_RETURNED_REPEATED_VARIABLE_GRAIN_CIRCULATION.md),
-and
-[`research/records/2026-09-01_SCF5_RETURNED_CURRENT_SURVIVED_SOURCE_DETACHED_REMOUNT_AND_INHERITED_SCAFFOLD_WITHDRAWAL.md`](../research/records/2026-09-01_SCF5_RETURNED_CURRENT_SURVIVED_SOURCE_DETACHED_REMOUNT_AND_INHERITED_SCAFFOLD_WITHDRAWAL.md).
-
-[established-bounded; implemented-exact; source-inspected; measured] SCF6's five experiment
-families passed one public lifecycle; cold label mutation did not change native routing; every
-source-detached body retained one cultivated thread; and all five exterior contact charts returned
-complete fibres and richer reopenings. Its experiment receipt is
-[`research/records/2026-09-01_SCF6_FIVE_MULTIMODAL_EXPERIMENTS_RETURNED_ONE_COMMON_SCAFFOLD_CYCLE_AND_EXACT_RELEASE.md`](../research/records/2026-09-01_SCF6_FIVE_MULTIMODAL_EXPERIMENTS_RETURNED_ONE_COMMON_SCAFFOLD_CYCLE_AND_EXACT_RELEASE.md).
-
-[established-bounded; implemented-exact; formal-checked; source-inspected; process-audit; measured]
-SCF6 passed. The coherent release returned 2,931 tests passed, zero failed, and 50 ignored; every
-example type-checked; the Lean umbrella built 3,769 jobs; and all nine release gates passed. Commit
-`d49c55c1` is pushed, the 33 GiB reproducible `target/` tree and experiment output are absent, and
-no successor phase is scheduled.
-
-[definition] The complete order is:
-
-1. `SCF0` — formal scaffold, dispersion, repeated circulation, and release law;
-2. `SCF1` — whole-object Rust scaffold migration without compatibility aliases;
-3. `SCF2` — exact multimodal Gemma lift into scaffold facets;
-4. `SCF3` — move-owned productive handoff into one Athena rest;
-5. `SCF4` — repeated actual-successor inference circulation;
-6. `SCF5` — Athena condensation and inherited-scaffold withdrawal; and
-7. `SCF6` — comparative multimodal experiments and exact release.
-
-## Completed campaign — Native Morphology Variant Foundation
-
-**Completed MVF frontier:** NONE
-
-**MVF0--MVF6 ARE COMPLETE. NO CONSTRUCTION DEED IS ACTIVE.**
-
-[definition] Brandon's direct instruction of 2026-09-01 founds the ordered `MVF0--MVF6` campaign
-under
-[`THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md`](THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md).
-MVF0 formalizes the exact foundation before engine revision. The remaining order is faithful local
-section lift, one Soulkiller dismantling boundary, reciprocal causal-cone cultivation, derived
-variant anatomy and package storage, ONNX/Safetensors export lenses, and a configuration-indexed
-multimodal release.
-
-[proved-derived; formal-checked; measured] MVF0 returned faithful local lift, causal-cone
-cultivation, descriptive version/variant/package, exact/projected/refused export, complete
-configuration, and cross-codec resonance laws. The focused owner and machine-learning closure built
-3,186 jobs without `sorryAx` or a new axiom. Its receipt is
-[`research/records/2026-09-01_MVF0_FAITHFUL_LOCAL_LIFT_CAUSAL_CONE_VARIANT_PACKAGE_EXPORT_AND_CONFIGURATION_LAWS_RETURNED.md`](../research/records/2026-09-01_MVF0_FAITHFUL_LOCAL_LIFT_CAUSAL_CONE_VARIANT_PACKAGE_EXPORT_AND_CONFIGURATION_LAWS_RETURNED.md).
-
-[established-bounded; implemented-exact; source-inspected; measured] MVF1 replaced scalar endpoint
-identity with complete factorized exact sections, retained cold-codeword reconstruction, preserved
-supplied occurrence order, founded boundaries from occurrences, left non-temporal video open, and
-narrowed SCF evidence. A fresh actual text/vision/audio lift retained 976,896 exact coordinates in
-248 blocks. Its receipt is
-[`research/records/2026-09-01_MVF1_COMPLETE_FACTORIZED_GEMMA_SECTIONS_REPLACED_THE_ALTERNATING_SUM_IDENTITY.md`](../research/records/2026-09-01_MVF1_COMPLETE_FACTORIZED_GEMMA_SECTIONS_REPLACED_THE_ALTERNATING_SUM_IDENTITY.md).
-
-[established-bounded; implemented-exact; source-inspected; measured] MVF2 returned one public
-Soulkiller dismantling boundary over generic reachable-section and faithful BF16 input charts. Only
-their cold witness types differ; duplicate public functions and return classes departed without
-aliases. Its receipt is
-[`research/records/2026-09-01_MVF2_GENERIC_AND_GEMMA_CHARTS_ENTERED_ONE_SOULKILLER_DISMANTLING_BOUNDARY.md`](../research/records/2026-09-01_MVF2_GENERIC_AND_GEMMA_CHARTS_ENTERED_ONE_SOULKILLER_DISMANTLING_BOUNDARY.md).
-
-[established-bounded; implemented-exact; measured] MVF3 returned emission-indexed exterior
-interaction, causal-cone-only morphology, reciprocal mutual response, disjoint-region interchange
-and equality, local/global cone controls, remount, ablation, withdrawal, and exact open-domain
-restoration. Its receipt is
-[`research/records/2026-09-01_MVF3_RETURNED_LOCAL_INTERACTION_CULTIVATED_ONLY_ITS_CAUSAL_CONE.md`](../research/records/2026-09-01_MVF3_RETURNED_LOCAL_INTERACTION_CULTIVATED_ONLY_ITS_CAUSAL_CONE.md).
-
-[established-bounded; implemented-exact; measured] MVF4 returned derived variant anatomy,
-separated schema/lineage/capability/realization axes, base and situated hot package owners,
-reconstruction/evaluation/apparatus/export lanes, exact package round-trip, and apparatus/export
-replacement invariance. Its receipt is
-[`research/records/2026-09-01_MVF4_DERIVED_VARIANT_ANATOMY_AND_BACKEND_INDEPENDENT_MORPHOLOGY_PACKAGE_RETURNED.md`](../research/records/2026-09-01_MVF4_DERIVED_VARIANT_ANATOMY_AND_BACKEND_INDEPENDENT_MORPHOLOGY_PACKAGE_RETURNED.md).
-
-[established-bounded; implemented-exact; source-inspected; measured] MVF5 returned exact and
-projected Safetensors/ONNX lenses, complete package round-trip, common-anatomy fibre/separator
-returns, and explicit receiver/cultivation/world refusals. Official Safetensors 0.7.0 opened the
-artifact; ONNX IR/domain/opset testimony passed the lossless parser. Its receipt is
-[`research/records/2026-09-01_MVF5_EXACT_AND_PROJECTED_SAFETENSORS_ONNX_EXPORT_LENSES_RETURNED.md`](../research/records/2026-09-01_MVF5_EXACT_AND_PROJECTED_SAFETENSORS_ONNX_EXPORT_LENSES_RETURNED.md).
-
-[established-bounded; implemented-exact; source-inspected; measured] MVF6's matched proposition
-returned five complete configurations with preserved chronology, local cultivation, disjoint
-invariance, source-detached hot conduct, and non-routing surface probes. All ten cross-configuration
-receiver/history pairs remained separated; no qualitative or perfect-resonance claim was promoted.
-Its experiment receipt is
-[`research/records/2026-09-01_MVF6_MATCHED_MULTIMODAL_CONFIGURATIONS_REMAINED_TEN_SEPARATED_RECEIVER_HISTORY_PAIRS.md`](../research/records/2026-09-01_MVF6_MATCHED_MULTIMODAL_CONFIGURATIONS_REMAINED_TEN_SEPARATED_RECEIVER_HISTORY_PAIRS.md).
-
-[established-bounded; implemented-exact; formal-checked; source-inspected; process-audit; measured]
-MVF6 passed. The coherent release returned 2,946 tests passed, zero failed, and 50 ignored; every
-example type-checked; the Lean umbrella built 3,770 jobs; and all nine gates passed. Implementation
-commit `a4438192` is pushed; the 39 GiB build tree and every reproducible experiment/export output
-are absent; and no successor deed is scheduled.
-
-[counterexample; source-inspected] The completed SCF lifecycle remains exact at its bounded
-mechanism scope, but the Gemma productive lift's alternating real/imaginary section sum is not a
-proved receiver-exact reconstruction of foreign tensor incidence. Nominal modality boundaries,
-one-cut actual experiments, still-image video reuse, event resorting after exterior interleaving,
-and a driver-selected already-lifted cultivation current cannot carry broader multimodal training
-or qualitative capability claims. MVF narrows those interpretations and repairs the owning
-relations; it does not demote the exact SCF handoff/circulation/withdrawal mechanisms.
-
-[definition] The complete order is:
-
-1. `MVF0` — formal faithful lift, local cultivation, variant, export, and evaluation laws;
-2. `MVF1` — faithful factorized Gemma section lift and SCF evidence correction;
-3. `MVF2` — one architecture-neutral Soulkiller dismantling boundary;
-4. `MVF3` — reciprocal local causal-cone cultivation;
-5. `MVF4` — derived anatomy manifest and backend-independent morphology package;
-6. `MVF5` — Safetensors and ONNX export lenses; and
-7. `MVF6` — multimodal configuration matrix and exact foundry release.
-
-## Completed campaign — Athena Application and Circulation Interface
-
-**Completed AAC frontier:** NONE
-
-**AAC0--AAC6 ARE COMPLETE. NO CONSTRUCTION DEED IS ACTIVE.**
-
-[definition] Brandon's direct instruction of 2026-09-01 founds the ordered `AAC0--AAC6` campaign
-under
-[`THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md`](THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md).
-It composes the completed neutral lifecycle, repeated circulation, local cultivation, morphology
-package, and exact diffusion owners into a live resumable session, parented commit storage,
-discrete/diffusive boundary protocol, opaque ABI, and one thin Athena-alpha application package.
-
-[proved-derived; formal-checked; measured] AAC0 passed. The neutral formal owner returns fixed
-inference boundaries, genuinely later parented commits, exact decline, snapshot/remount conduct,
-and constituted diffusion through the common boundary. The focused closure built 3,187 jobs and
-the live umbrella built 3,771 jobs. Its receipt is
-[`research/records/2026-09-01_AAC0_LIVE_CIRCULATION_COMMIT_REMOUNT_AND_DIFFUSIVE_BOUNDARY_LAWS_RETURNED.md`](../research/records/2026-09-01_AAC0_LIVE_CIRCULATION_COMMIT_REMOUNT_AND_DIFFUSIVE_BOUNDARY_LAWS_RETURNED.md).
-
-[established-bounded; implemented-exact; source-inspected; measured] AAC1 passed. One move-owned
-session returns complete owned future fibres, exact lineage and actual successors, refuses stale
-and false continuation, and declines without changing or cloning the package. Its focused owner
-returned three passed tests. The receipt is
-[`research/records/2026-09-01_AAC1_MOVE_OWNED_NATIVE_CIRCULATION_SESSION_RETURNED_COMPLETE_OWNED_BOUNDARIES.md`](../research/records/2026-09-01_AAC1_MOVE_OWNED_NATIVE_CIRCULATION_SESSION_RETURNED_COMPLETE_OWNED_BOUNDARIES.md).
-
-[established-bounded; implemented-exact; source-inspected; measured] AAC2 passed. Two successive
-local returns advance one continuing morphology through generations `0 -> 1 -> 2`; exact snapshot,
-remount, latest-delta withdrawal, replay, and refusal controls pass. Its receipt is
-[`research/records/2026-09-01_AAC2_TWO_SUCCESSIVE_LOCAL_COMMITS_SNAPSHOT_WITHDRAWAL_AND_REPLAY_RETURNED.md`](../research/records/2026-09-01_AAC2_TWO_SUCCESSIVE_LOCAL_COMMITS_SNAPSHOT_WITHDRAWAL_AND_REPLAY_RETURNED.md).
-
-[established-bounded; implemented-exact; source-inspected; measured] AAC3 passed. Native incidence,
-declared capacities/conductances, exact diffusion, receiver boundary emission, zero residuals,
-complete lineage, and structural factorization reuse return through the common event family. Two
-focused tests passed. Its receipt is
-[`research/records/2026-09-01_AAC3_NATIVE_INCIDENCE_FOUNDED_EXACT_DIFFUSION_THROUGH_THE_COMMON_BOUNDARY.md`](../research/records/2026-09-01_AAC3_NATIVE_INCIDENCE_FOUNDED_EXACT_DIFFUSION_THROUGH_THE_COMMON_BOUNDARY.md).
-
-[established-bounded; implemented-exact; source-inspected; measured] AAC4 passed. The opaque
-versioned ABI returns open/remount, conduct/continue, return/commit/decline, snapshot, diffusion,
-close, recoverable refusal, direct equality, and exact exported allocation/free. Three focused
-tests passed. Its receipt is
-[`research/records/2026-09-01_AAC4_OPAQUE_VERSIONED_CIRCULATION_ABI_RETURNED_DIRECT_AND_DIFFUSIVE_EQUALITY.md`](../research/records/2026-09-01_AAC4_OPAQUE_VERSIONED_CIRCULATION_ABI_RETURNED_DIRECT_AND_DIFFUSIVE_EQUALITY.md).
-
-[established-bounded; implemented-exact; source-inspected; measured] AAC5 passed. The independent
-Athena-alpha crate admitted a source-neutral productive scaffold, conducted generation 0, committed
-a genuinely later local return, conducted generation 1, snapshotted, remounted, and emitted one
-exact structural receipt without foreign execution or qualitative grading. Its receipt is
-[`research/records/2026-09-01_AAC5_FIRST_ATHENA_ALPHA_APPLICATION_COMMITTED_REMOUNTED_AND_CONDUCTED.md`](../research/records/2026-09-01_AAC5_FIRST_ATHENA_ALPHA_APPLICATION_COMMITTED_REMOUNTED_AND_CONDUCTED.md).
-
-[established-bounded; implemented-exact; formal-checked; source-inspected; process-audit; measured]
-AAC6 passed. The twelve-control matrix returned one pass. The repaired complete release at
-`ca5701f7` returned 2,957 tests passed, zero failed, 50 ignored; every example type-checked; the
-Lean umbrella built 3,771 jobs; and all nine gates passed. The 50.0-GiB reproducible Cargo tree was
-removed. Its receipt is
-[`research/records/2026-09-01_AAC6_FIRST_DYNAMIC_ATHENA_ALPHA_AND_THE_COMPLETE_CIRCULATION_INTERFACE_RELEASED.md`](../research/records/2026-09-01_AAC6_FIRST_DYNAMIC_ATHENA_ALPHA_AND_THE_COMPLETE_CIRCULATION_INTERFACE_RELEASED.md).
-
-[definition] The complete order is:
-
-1. `AAC0` — formal live-session, commit, remount, and diffusive-circulation laws;
-2. `AAC1` — neutral Rust circulation-session API;
-3. `AAC2` — parented morphology commits and snapshot/remount storage;
-4. `AAC3` — discrete and exact diffusive generation through one boundary;
-5. `AAC4` — opaque stable circulation ABI;
-6. `AAC5` — first Athena-alpha application package; and
-7. `AAC6` — exact alpha matrix and coherent release.
-
-[proved-derived; formal-checked; measured] HIF0 passed. The four-file neutral formal closure built
-3,164 focused jobs and the live umbrella built 3,769 jobs without `sorryAx`. Its exact return is
-[`research/records/2026-08-31_HIF0_INTRINSIC_HOLON_PROFILES_AND_NEUTRAL_LIFECYCLE_CONTRACTS_RETURNED.md`](../research/records/2026-08-31_HIF0_INTRINSIC_HOLON_PROFILES_AND_NEUTRAL_LIFECYCLE_CONTRACTS_RETURNED.md).
-
-[established-bounded; implemented-exact; measured] HIF1 passed. The neutral Rust profile/rested
-surface conducts the existing native owner without a wrapper or clone; direct and neutral resident
-returns agree. Its exact return is
-[`research/records/2026-08-31_HIF1_GENERIC_RUST_PROFILE_AND_RESTED_TRANSPORT_SURFACE_RETURNED.md`](../research/records/2026-08-31_HIF1_GENERIC_RUST_PROFILE_AND_RESTED_TRANSPORT_SURFACE_RETURNED.md).
-
-[established-bounded; implemented-exact; measured] HIF2 passed. Lossless configuration/index/ONNX
-charts, exact low-precision codewords, and productive-only dismantling profiles passed live vendor
-and package controls. Its exact return is
-[`research/records/2026-08-31_HIF2_EXACT_FOREIGN_CHARTS_LOW_PRECISION_WEIGHTS_AND_PROFILED_DISMANTLING_RETURNED.md`](../research/records/2026-08-31_HIF2_EXACT_FOREIGN_CHARTS_LOW_PRECISION_WEIGHTS_AND_PROFILED_DISMANTLING_RETURNED.md).
-
-[established-bounded; implemented-exact; measured] HIF3 passed. One native circulation returned
-complete plural futures, reconstruction, codec-neutral emission, return aperture, and actual later
-current through unchanged morphology. Its exact return is
-[`research/records/2026-08-31_HIF3_ONE_NATIVE_INFERENCE_CIRCULATION_EMITTED_CODEC_NEUTRAL_PLURAL_FUTURES.md`](../research/records/2026-08-31_HIF3_ONE_NATIVE_INFERENCE_CIRCULATION_EMITTED_CODEC_NEUTRAL_PLURAL_FUTURES.md).
-
-[established-bounded; implemented-exact; measured] HIF4 passed. The neutral cultivation lifecycle
-returns later chronology, complete difference, adjoint delta, cold/productive split,
-source-detached remount, changed held-out conduct, sibling invariance, withdrawal, and restoration.
-Its exact return is
-[`research/records/2026-08-31_HIF4_CAUSAL_ADJOINT_CULTIVATION_RETURNED_SOURCE_DETACHED_HEXIS.md`](../research/records/2026-08-31_HIF4_CAUSAL_ADJOINT_CULTIVATION_RETURNED_SOURCE_DETACHED_HEXIS.md).
-
-[established-bounded; implemented-exact; source-inspected; measured] HIF5 passed. Products and
-generic owners now meet the naming boundary without aliases; obsolete duplicate owners and drivers
-departed; the receiver-history formal owner and resident front are neutral; and the resident-section
-foreman was split at founded apparatus relations. Its exact return is
-[`research/records/2026-08-31_HIF5_PRODUCTS_MOVED_TO_NEUTRAL_OWNERS_AND_CAMPAIGN_ONTOLOGY_DEPARTED.md`](../research/records/2026-08-31_HIF5_PRODUCTS_MOVED_TO_NEUTRAL_OWNERS_AND_CAMPAIGN_ONTOLOGY_DEPARTED.md).
-
-[established-bounded; implemented-exact; source-inspected; measured] HIF6 passed. A direct native
-cycle constructed and remounted without source, foreign, environment, filesystem, or historical
-output intake; resident quadrature/off-diagonal transport, actual return, source-detached hexis,
-held-out change, withdrawal, and restoration passed. Its exact return is
-[`research/records/2026-08-31_HIF6_DIRECT_SOURCE_NEUTRAL_REST_CLOSED_ONE_RESIDENT_RETURN_AND_CULTIVATION_CYCLE.md`](../research/records/2026-08-31_HIF6_DIRECT_SOURCE_NEUTRAL_REST_CLOSED_ONE_RESIDENT_RETURN_AND_CULTIVATION_CYCLE.md).
-
-[definition] The complete HIF order is:
-
-1. `HIF0` — formal intrinsic profiles and lifecycle contracts;
-2. `HIF1` — generic Rust carriers and package surface;
-3. `HIF2` — exact foreign charts and profiled Soulkiller return;
-4. `HIF3` — packaged Holonic Inference and generation;
-5. `HIF4` — packaged cultivation and hexis;
-6. `HIF5` — migrate products and remove campaign ontology;
-7. `HIF6` — resident and source-neutral closure; and
-8. `HIF7` — exact contact/interoperability framework release.
-
-## Completed application — Holonics Workbench
-
-**Disposition:** completed; no current deed.
-
-**WB0--WB6 PASSED. NO APPLICATION DEED REMAINS SCHEDULED.**
-
-[definition] Brandon's direct instruction of 2026-09-01 founds the exterior application contract
-[`../applications/holonics-workbench/WORKBENCH.md`](../applications/holonics-workbench/WORKBENCH.md).
-It composes public Athena, Eros, Soulkiller, morphology/export, diffusion, and engine inspection
-owners behind one typed command/event runtime used directly by both Clap CLI and Ratatui TUI.
-
-[established-bounded; implemented-exact; source-inspected; measured] WB0 passed. The independent
-application crate returns one serializable command/event protocol, nested parser, human/JSONL
-rendering, and malformed-input refusal. Two focused tests passed. Its receipt is
-[`research/records/2026-09-01_WB0_HOLONICS_WORKBENCH_SHARED_COMMAND_EVENT_PROTOCOL_RETURNED.md`](../research/records/2026-09-01_WB0_HOLONICS_WORKBENCH_SHARED_COMMAND_EVENT_PROTOCOL_RETURNED.md).
-
-[established-bounded; implemented-exact; source-inspected; measured] WB1 passed. Named Athena
-sessions now inspect, conduct, continue, return/commit, decline, diffuse, snapshot/open, and export
-through public owners with recoverable refusal. Two focused tests passed. Its receipt is
-[`research/records/2026-09-01_WB1_WORKBENCH_ATHENA_SESSIONS_COMMIT_DIFFUSION_SNAPSHOT_AND_EXPORT_RETURNED.md`](../research/records/2026-09-01_WB1_WORKBENCH_ATHENA_SESSIONS_COMMIT_DIFFUSION_SNAPSHOT_AND_EXPORT_RETURNED.md).
-
-[established-bounded; implemented-exact; source-inspected; measured] WB2 passed. Eros material
-operations, lossless Soulkiller chart inspection, engine status/capability/package/export, and
-actual CLI human/JSONL output return one event surface. Two focused tests passed. Its receipt is
-[`research/records/2026-09-01_WB2_EROS_SOULKILLER_ENGINE_AND_CLI_RETURNED_ONE_EVENT_SURFACE.md`](../research/records/2026-09-01_WB2_EROS_SOULKILLER_ENGINE_AND_CLI_RETURNED_ONE_EVENT_SURFACE.md).
-
-[established-bounded; implemented-exact; source-inspected; measured] WB3 passed. Ratatui and
-Crossterm return the catalogue, timeline, inspector, palette, sessions/status and restoring event
-loop over the same runtime. Direct/TUI equality and headless rendering returned three passed tests.
-Its receipt is
-[`research/records/2026-09-01_WB3_RATATUI_RENDERED_THE_SAME_WORKBENCH_COMMAND_EVENTS.md`](../research/records/2026-09-01_WB3_RATATUI_RENDERED_THE_SAME_WORKBENCH_COMMAND_EVENTS.md).
-
-[established-bounded; implemented-exact; source-inspected; process-audit; measured] WB4 passed.
-The operator guide, real CLI and pseudo-terminal Ratatui walkthroughs, nine focused Workbench tests,
-and complete coherent release returned. The release passed all nine gates with 2,966 tests passed,
-zero failed and 50 ignored; examples type-checked; the live Lean umbrella built 3,771 jobs.
-`cargo clean` removed 15,274 replicable files (38.8 GiB) and root `output/` was absent. Its receipt is
-[`research/records/2026-09-01_WB4_HOLONICS_WORKBENCH_CLI_RATATUI_RELEASED.md`](../research/records/2026-09-01_WB4_HOLONICS_WORKBENCH_CLI_RATATUI_RELEASED.md).
-
-[established-bounded; implemented-exact; source-inspected; process-audit; measured] WB5 passed.
-Brandon's direct review rejected the first TUI as a CLI-shaped pane split and the CLI I/O as
-unstandardized. Version 0.2.0 replaces command templates with filesystem/resource selection and
-context-valid actions; derives ingress/receiver and every actual successor from live state; returns
-an editable exact-return form, automatic Eros material choice, non-overwriting destinations,
-responsive runtime ownership, and a complete zero-parameter demo; and standardizes direct and JSON
-request input through one response envelope. Thirteen focused tests passed. The coherent release
-returned 2,970 passed, zero failed, 50 ignored, all examples, 3,771 Lean jobs, and all nine gates.
-Its receipt is
-[`research/records/2026-09-01_WB5_WORKBENCH_RETURNED_GUIDED_RESOURCES_CONTEXT_ACTIONS_AND_STANDARD_IO.md`](../research/records/2026-09-01_WB5_WORKBENCH_RETURNED_GUIDED_RESOURCES_CONTEXT_ACTIONS_AND_STANDARD_IO.md).
-
-[established-bounded; implemented-exact; source-inspected; process-audit; measured] WB6 passed.
-Direct screenshot and source review rejected WB5's permanent file browser, unscrollable raw JSON,
-equal-pane composition, and diffusion ambiguity. Version 0.3.0 deletes generic discovery and returns
-a session-first lifecycle instrument, functional four-mode forms/actions, typed Summary/Structure
-receivers, secondary Exact wire, independent wrapped scrolling, scrollbars and complete navigation.
-The closed unit-law diffusion probe now names its non-mutating status and renders law, topology,
-total/nonzero currents, balances, standing, energy, and conservation. Recoverable return/decline and
-non-TTY invocation were repaired. Fifteen focused tests, 2,972 release tests, all examples, 3,771
-Lean jobs and all nine gates passed. Its receipt is
-[`research/records/2026-09-01_WB6_WORKBENCH_RETURNED_SESSION_FIRST_TYPED_RECEIPTS_AND_SCROLLABLE_DIFFUSION.md`](../research/records/2026-09-01_WB6_WORKBENCH_RETURNED_SESSION_FIRST_TYPED_RECEIPTS_AND_SCROLLABLE_DIFFUSION.md).
-
-[definition] The complete order is:
-
-1. `WB0` — shared typed protocol and application architecture;
-2. `WB1` — Athena sessions, store, diffusion, snapshot, and export;
-3. `WB2` — Eros, Soulkiller, engine adapters and CLI;
-4. `WB3` — Ratatui terminal interface over the same runtime; and
-5. `WB4` — operator documentation and coherent application release; and
-6. `WB5` — guided resource/action interaction and standardized I/O correction; and
-7. `WB6` — session-first typed receipts, scrollable exact views, and honest diffusion projection.
-
-## Completed application — explicit-root variant workspace
-
-**Completed VWS frontier:** NONE
-
-**VWS0--VWS6 ARE COMPLETE.**
-
-[definition] Brandon's direct correction of 2026-09-01 founds
-[`THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md`](THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md).
-It replaces the premature low-level Workbench interpretation with a persistent application lifecycle
-over existing neutral owners. VWS0--VWS6 passed and no deed in this campaign remains current.
-
-[established-bounded; implemented-exact; source-inspected; process-audit; measured] VWS0 passed.
-The complete Gemma excitation receipt entered Athena through the sole Soulkiller boundary;
-unknown fields and root-escaping paths refused; generation-0, cold witness and insufficiency controls
-returned. [2026-09-03: the per-event generator construction departed without alias under SKE4 and
-the workbench demo went with it, so this deed is no longer reproducible; its dependents are
-re-founded on the declared native body `native_spool::fixture` and on `import-snapshot`.] Its receipt is
-[`research/records/2026-09-01_VWS0_ACTUAL_GEMMA_RECEIPT_ENTERED_ATHENA_WITHOUT_FOREIGN_EXECUTION.md`](../research/records/2026-09-01_VWS0_ACTUAL_GEMMA_RECEIPT_ENTERED_ATHENA_WITHOUT_FOREIGN_EXECUTION.md).
-
-[established-bounded; implemented-exact; source-inspected; process-audit; measured] VWS1--VWS5
-passed. The independent explicit-root application returns actual receipt/native import, immutable
-snapshot and separated lift artifacts, stored experiment, persisted conduct/continue/candidate,
-atomic commit/decline, current-withdrawn-restored evaluation and exact exports. The receipt is
-[`research/records/2026-09-01_VWS1_VWS5_EXPLICIT_VARIANT_WORKSPACE_RETURNED_PERSISTENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPORT.md`](../research/records/2026-09-01_VWS1_VWS5_EXPLICIT_VARIANT_WORKSPACE_RETURNED_PERSISTENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPORT.md).
-
-[established-bounded; implemented-exact; source-inspected; process-audit; measured] VWS6 passed.
-The `holonics` 0.4.0 primary interface now operates the persistent workspace from its current
-directory or `--root`, returns complete active boundaries and typed human receipts, retains old
-mechanisms only beneath `diagnostic`, and contains no released Ratatui body or hidden artifact root.
-The actual separate-process lifecycle, installation and coherent nine-gate release returned. Its
-receipt is
-[`research/records/2026-09-01_VWS6_HOLONICS_RETURNED_THE_PERSISTENT_VARIANT_WORKSPACE_APPLICATION.md`](../research/records/2026-09-01_VWS6_HOLONICS_RETURNED_THE_PERSISTENT_VARIANT_WORKSPACE_APPLICATION.md).
-
-[definition] The complete order is:
-
-1. `VWS0` — application contract and admitted receipt source boundary;
-2. `VWS1` — explicit-root workspace and atomic artifacts;
-3. `VWS2` — actual Gemma receipt lift and variant founding;
-4. `VWS3` — experiment definition and persisted conduct/continue;
-5. `VWS4` — staged return, commit, decline and successor artifacts;
-6. `VWS5` — withdrawal/restoration evaluation and exact export; and
-7. `VWS6` — high-level CLI, premature-presentation removal and coherent release.
-
-## Standing and history
-
-[established-bounded] Exact earlier constructions retain the scoped grades in their source records.
-They are not demoted merely because implementation is being consolidated, and they are not promoted
-by hashes, prose, or old outputs. The retired C++ body under `archive/` remains provenance only.
-
-[definition] Completed campaign blueprints may remain as bounded contracts or move under an
-explicit archive banner. They never re-enter this roadmap as an unresolved phase. A new direct user
-request may refine this order; historical text may not.
-
-## Validation cadence
-
-[definition] Every nontrivial process has an outer hard limit of 180 seconds. During an admitted
-construction run only the affected package checks, focused owner/apparatus tests, the exact formal
-target, and named cheap catalog/document gates. Run one complete exact release receiver at the
-declared release boundary. A timeout is a counterexample, never a partial pass or permission to
-widen a magic bound. A probe schedules nothing unless Brandon directly promotes it.
+1. Read [AGENTS.md](../AGENTS.md), [CONSTRUCTION_STATE.md](../CONSTRUCTION_STATE.md), and this
+   roadmap. [CLAUDE.md](../CLAUDE.md) points to the same shared contract.
+2. Read [epistemic grades](../canon/EPISTEMIC_GRADES.md) and consult the
+   [universal owner catalog](../UNIVERSAL_CATALOG.md).
+3. For Eros/Athena/Soulkiller, use AGENTS.md's orientation/retraction tier, the relevant latest
+   direct messages, and the HNA and SKE contracts below. Read the exact source owners being changed.
+   The spine, reasoning-cycle, hexis, operations, manifold and surface-path tablets supply
+   doctrine; their dated capability and world-return prose is subject to the recorded corrections.
+4. For the RH line, use the FT, RT and DB contracts below and their named formal owners. Keep
+   repository heat time, repository seam time and standard de Bruijn–Newman time distinct.
+5. Follow a completed prerequisite only when the active source or proof depends on it. Do not
+   reread every completed campaign, rerun unchanged expensive receipts, or reconstruct historical
+   capability just to start the next authorized repair.
+
+## Current position and completed correction
+
+**Current frontier:** NONE
+
+[definition] Brandon's direct instruction of 2026-09-04 authorizes completing the defects and
+workflow inconsistencies identified in the repository audit. This is repair of the existing
+owners, not a new intelligence or RH research campaign. The completed order was:
+
+1. Replace conflicting operating instructions with Brandon's latest rulings; make the position
+   record concise, keep completed history in its existing contracts/records, and reconcile the
+   affected catalog and formal documentation.
+2. Repair the recurrent adjoint over retained morphology with new deposits staged until the
+   return closes; reject conflicting duplicate signature observations; distinguish preservation
+   of identification from growth in observed consequences; reconcile the existing SKE5 receipt
+   and its prose without manufacturing new measurements.
+3. Run the affected owner tests and exact resident regressions, then one complete
+   `bash tools/gates.sh` release on the coherent tree. Record the real results, update the
+   position to `NONE` only after required checks pass, and commit/push the integrated repair.
+
+[established-bounded; implemented-exact; process-audit] The repairs and direct CUDA regressions
+passed. All nine release checks passed across the full run and resumed test gate (3,014 tests,
+zero failures, 52 ignored; examples type-checked; 3,775 formal jobs). The
+[September 4 repair record](../research/records/2026-09-04_THE_AUDIT_REPAIRS_THE_RECURRENT_ADJOINT_AND_RECONCILES_THE_OPERATING_CONTRACT.md)
+retains the actual returned evidence. No successor campaign is scheduled.
+
+[definition] These repairs preserve the admitted bounded HNA/SKE and RT/DB results. They do not
+schedule a proof of RH, qualitative generation, a new user interface, or a replacement machine.
+No new census, checksum system, or release gate is introduced.
+
+## Eros, Athena and Soulkiller: completed construction contracts
+
+[definition] The current recurrence is
+`occurrence -> local current -> reaction -> emission + successor ecology -> next occurrence`.
+An application response and a self-emission use the same occurrence port. Inference reads the
+recurrence; developmental recurrence retains its successor. Rest/remount and ablation answer
+their particular persistence and attribution questions.
+
+[established-bounded; source-inspected] HNA0--HNA5 completed the full resident native operator,
+move-owned successor recurrence and a bounded application matrix. SKE0--SKE5 then supplied the
+excitation-founded quotient and restricted class bodies composed into one Athena variant.
+The September 4 repairs address subsequent cultivation and receipt/claim correspondence; the
+first-deposit and declared-family results keep their scopes.
+
+| Contract | Returned scope and decisive evidence |
+|---|---|
+| [HNA recurrent ecology](THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md) | The resident HNA1 operator is apparatus; HNA3 returns complete successive cycles; HNA4 supplies the initial tied deposit; [HNA5](../research/records/2026-09-02_HNA5_ONE_NATIVE_RECURRENCE_CROSSED_THREE_APPLICATIONS_AND_RELEASED_WITHOUT_A_QUALITATIVE_CLAIM.md) returns the application matrix without a qualitative answer claim. |
+| [SKE excitation and quotient](THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md) | The declared family fixes the receiver/history scope; intervention bounds the class cones; the productive return crosses `soulkiller::dismantle` with explicit insufficiency. |
+| [SKE1 adjoint return](../research/records/2026-09-03_SKE1_THE_RETURN_CROSSED_EVERY_REACTION_OF_THE_CYCLE_AND_DEPOSITED_ON_EVERY_CROSS_SECTION.md) | The first return crossed the cycle and deposited on 344 cross-sections. Gains, scalars and embedding rows received no deposit. Subsequent returns must include previously retained overlays. |
+| [SKE4 corrected seal](../research/records/2026-09-03_SKE4_THE_DECLARED_WITHDRAWALS_FOUND_ROLE_CONES_THE_CLASS_BODIES_CARRY_THEIR_REMAINDER_AND_THE_RETURN_CROSSES_THE_BOUNDARY.md) | Class sets are sound under the declared withdrawal of their complements; extent is their union. Each class is condensation on its own admitted domain. The earlier universal/founded-cone and off-domain species claims are retracted. |
+| [SKE5 composed variant](../research/records/2026-09-03_SKE5_THE_COMPOSED_VARIANT_RUNS_THE_RECURRENCE_ON_THE_FAMILY_STATES_CONDENSATION_BY_ITS_REMAINDER_AND_IS_NOT_SATURATED.md) | One session advances through 15 declared selected-face comparisons. The last enlargement preserves identification while adding an observed consequence. Stored-presentation condensation does not claim reduced resident allocation or qualitative generation. |
+
+[definition] Brandon's 2026-09-04 ruling admits the resident source-neutral HNA1 realization as
+apparatus and the restricted SKE class bodies as Athena material. The old blanket foreign-tower
+test cannot revoke them. Source names and witness lanes remain exterior testimony.
+
+[historical; source-inspected] The retracted WRD/WRN world-verdict construction and first HNA
+implementation remain counterexamples. Their separately proved algebra and application/storage
+mechanisms retain bounded grades. See the
+[recurrence correction](../research/records/2026-09-02_THE_HNA_WORLD_RETURN_SPLIT_IS_RETRACTED_AND_INFERENCE_IS_ONE_RECURRENT_ECOLOGY.md)
+and [modality-neutral boundary audit](THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md).
+Integration by reflection is an interpretation requiring founded native admittances, as stated
+in [the corrected Eros instantiation](THE_EROS_INSTANTIATION.md).
+
+## RH line: FT, RT and DB complete
+
+**RH line position:** DB complete. The remaining research inequality is `Λ_DN ≤ 0`, equivalent
+to RH. No new RH proof campaign is scheduled.
+
+[proved-derived; formal-checked] The formal endpoints are:
+`0 ≤ Λ_DN ≤ 1/8`, `seamTimes = Ici Λ_DN`, and
+`RiemannHypothesis ↔ Λ_DN = 0`, with both formerly named ports discharged.
+`CriticalChart.Hstd_eq` proves
+`Hstd t z = (1/8) * heatE (-t/4) ξ (1/2 + i*z/2)`;
+`Λstd = 4*Λ_DN ∈ [0,1/2]`.
+These refer to Mathlib's actual Riemann hypothesis and depend on
+`propext`, `Classical.choice`, and `Quot.sound`.
+
+| Completed contract | Formal return |
+|---|---|
+| [FT0--FT6: Foster tanks and threshold](THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md) | The positive kernel, entire heat flow, Foster product/flux, seam preservation and threshold reduction. Its former ports were discharged by RT and DB. |
+| [RT0--RT6: descent route](THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md) | Dobner's route specialized to `ξ`: the flowed integer comb, Stirling remainder, descent approximation, zeros at unbounded heights, and `DescentZeros.Λ_DN_nonneg`. The original Rodgers--Tao pair-correlation route remains unscheduled provenance. |
+| [DB0--DB5: de Bruijn and coordinate bridge](THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md) | Strip contraction, iterated translation averages, the Gaussian limit and `1/8 ∈ seamTimes`; the unconditional seal and standard-coordinate bridge. |
+
+[proved-derived; formal-checked] The decisive completion receipts are
+[RT6](../research/records/2026-09-03_RT6_EVERY_NEGATIVE_TIME_HAS_AN_OFF_SEAM_ZERO_AND_THE_THRESHOLD_IS_NONNEGATIVE_ON_THE_THREE_AXIOMS.md),
+[DB4](../research/records/2026-09-03_DB4_THE_GAUSSIAN_IS_THE_LIMIT_OF_THE_COSH_POWERS_AND_ONE_EIGHTH_IS_A_SEAM_TIME.md),
+and [DB5](../research/records/2026-09-03_DB5_THE_LAST_PORT_IS_DISCHARGED_RH_IS_LAMBDA_DN_EQUALS_ZERO_WITH_NO_PORT_AND_THE_TREE_TIME_IS_THE_STANDARD_TIME_OVER_FOUR.md).
+RT5 proves unbounded heights; relative density is not part of its returned scope.
+
+[open] `Λ_DN ≤ 0` remains unproved. A zero of `ξ` off the critical line would refute it.
+The Copson--de Bruijn coefficient `c_CD` is a different constant; their shared threshold
+interpretation supplies no theorem identifying them.
+
+## Completed prerequisites and application standing
+
+[historical] These contracts are retained for their exact owner dependencies and bounded returns.
+They do not reopen an old order or overwrite the current position.
+
+| Contract | Scope |
+|---|---|
+| [HTP0--HTP6](THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md) | Causal-natural holons, tensor lenses/faces, preimages, finite/infinite Copson--de Bruijn bounds and the two-root dichotomy. Branch selection and a certified decimal remain parked research. |
+| [HIF0--HIF7](THE_HOLONIC_INTELLIGENCE_FRAMEWORK_RETURNS_INTRINSIC_HOLONS_AND_PACKAGES_DISMANTLING_INFERENCE_CULTIVATION_AND_GENERATION.md) | Neutral profiles, lifecycle interfaces and bounded mechanism controls; the fixed-inference/special-return shape does not define HNA. |
+| [Neural ecology foundation](THE_HOLONIC_NEURAL_ECOLOGY_RETURNS_EVERY_CLASSICAL_ARCHITECTURE_AS_A_RECEIVER_CHART_AND_EROS_CULTIVATES_ATHENA_THROUGH_PHYSICAL_INFORMATION_TRANSPORT.md) and [machine-learning chart foundation](THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md) | Formal local-current, receiver and naturality owners. |
+| [SCF0--SCF6](THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md) | Historical scaffold/lifecycle apparatus. The per-event generator lift was removed under SKE4. |
+| [MVF0--MVF6](THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md) | Faithful-lift laws, specialized cultivation, packages and export lenses at their declared scopes. |
+| [AAC0--AAC6](THE_ATHENA_APPLICATION_AND_CIRCULATION_INTERFACE_RETURNS_A_LIVE_DYNAMIC_MORPHOLOGY_ALPHA.md) | Specialized circulation/commit/snapshot and ABI apparatus. |
+| [Workbench](../applications/holonics-workbench/WORKBENCH.md) and [VWS0--VWS6](THE_VARIANT_WORKSPACE_APPLICATION_RETURNS_ACTUAL_LIFTS_EXPERIMENT_CIRCULATION_CULTIVATION_EVALUATION_AND_EXPLICIT_ARTIFACTS.md) | Existing workspace imports snapshots through the earlier circulation interface. SKE's full-operator examples have their own declared application scope; a workbench integration is not claimed. |
+| [QLT1--QLT6](THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md) and [CDB1](THE_CONSTRUCTIVE_DIFFERENTIAL_BOUNDARY_AND_RECEIVER_CALCULUS.md) | Finite quantum/crystal transport and constructive differential formal owners. |
+
+[established-bounded; source-inspected] CONS0--CONS5, the exact R0Q0--R0Q4 mechanisms and earlier
+constructions retain the scopes of their records. The retired C++ body remains provenance under
+`archive/`. Existing records and Git carry the detailed historical orders and measurements.
+
+## Validation
+
+[definition] Use AGENTS.md's proportionate validation and hang-guard discipline. Run focused
+owner tests during repair, the real resident regression when changing resident conduct, and
+the existing complete release receiver once after integration. A deed receipt, a focused test
+and the complete release are separate evidence scopes. Repair a failing required check rather
+than presenting selected successes as a complete pass. Add no new gate or ledger for this work.

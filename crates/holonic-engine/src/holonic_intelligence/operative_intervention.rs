@@ -564,7 +564,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             standing.clear();
             standing.face = Some(face.clone());
         }
-        let trace = self.adjoint_return(differential, ReturnDeed::Dissect(tied_output))?;
+        let (trace, _) = self.adjoint_return(differential, ReturnDeed::Dissect(tied_output))?;
         let supports = self
             .dissection
             .as_ref()

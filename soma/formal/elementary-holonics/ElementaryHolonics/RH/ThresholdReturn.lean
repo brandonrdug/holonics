@@ -7,7 +7,7 @@ import ElementaryHolonics.RH.DescentZeros
 
 The campaign's exact form of the target is `RH ⟺ Λ_DN = 0` with `Λ_DN = sInf seamTimes` from the
 actual kernel. Two standing theorems of the literature were carried here as named ports, neither
-the target nor implying it: de Bruijn's bound (`½` is a seam time) and Rodgers–Tao's
+the target nor implying it: the weak de Bruijn port (`½` is a tree seam time) and Rodgers–Tao's
 `0 ≤ Λ_DN`. Both are now theorems of the tree: Rodgers–Tao's by the descent-route campaign
 (`DescentZeros.Λ_DN_nonneg`, `rodgersTaoNonneg` below), de Bruijn's by the de Bruijn campaign
 (`DeBruijnLimit.eighth_mem_seamTimes`, `DeBruijnSeal.deBruijnBound`, which imports this file), so
@@ -25,8 +25,10 @@ open Soma.Holonics.RH.RealZeroTimes
 open Soma.Holonics.RH.LinePreservation
 open Soma.Holonics.RH.DescentZeros
 
-/-- [open; project-postulate] **de Bruijn's bound**: `½` is a seam time (every zero of `H_{1/2}`
-lies on the seam). Not the target and not an implication to it. -/
+/-- [definition] **The original weak de Bruijn port**: `½` is a seam time in the tree's
+coordinate, corresponding to standard time `2`. `DeBruijnSeal.deBruijnBound` discharges this
+port from the stronger `1/8 ∈ seamTimes`, which corresponds to de Bruijn's standard `1/2`
+bound. The structure alone does not imply the Riemann Hypothesis. -/
 structure DeBruijnBound : Prop where
   half_mem : (1 / 2 : ℝ) ∈ seamTimes
 

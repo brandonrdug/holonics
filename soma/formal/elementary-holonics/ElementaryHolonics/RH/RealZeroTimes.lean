@@ -9,8 +9,10 @@ import ElementaryHolonics.RH.ConjugationEntire
 /-!
 # FT4 (iv): the seam times are closed, and the threshold
 
-In the standard coordinate `τ = −t`, `H_τ = heatE (−τ) ξ`. The *seam times* are the `τ` at which
-every zero of `H_τ` lies on the seam `Re z = ½`. `0` is a seam time iff the Riemann Hypothesis
+In the tree's seam-time coordinate `τ = −t`, consider `heatE (−τ) ξ`. The *seam times* are the
+`τ` at which every zero lies on the seam `Re z = ½`. Standard de Bruijn–Newman time is `4τ`;
+`CriticalChart.Hstd_eq` supplies the spatial chart and normalization. `0` is a seam time iff
+the Riemann Hypothesis
 (`TrivialZeros.riemannHypothesis_iff_xi`). The flow is jointly continuous, so it converges locally
 uniformly along every convergent sequence of times, and Hurwitz (`HurwitzLine.zeros_on_seam`) makes
 the seam times closed. `Λ_DN` is their infimum; given that they are a nonempty up-set (forward
@@ -31,8 +33,8 @@ open Soma.Holonics.RH.ConjugationEntire
 open Soma.Holonics.RH.TrivialZeros
 open Soma.Holonics.RH.HeatKernelPhi
 
-/-- **The seam times**, in the standard coordinate `τ = −t`: every zero of `H_τ = heatE (−τ) ξ`
-lies on the seam. -/
+/-- **The seam times**, in the tree's coordinate `τ = −t`: every zero of `heatE (−τ) ξ`
+lies on the seam. Standard de Bruijn–Newman time is `4τ`. -/
 def seamTimes : Set ℝ := {τ | ∀ z, heatE (-τ) riemannXi z = 0 → z.re = 1 / 2}
 
 /-- **`0` is a seam time iff the Riemann Hypothesis.** -/
@@ -71,8 +73,8 @@ theorem isClosed_seamTimes : IsClosed seamTimes := by
     (differentiable_heatE_riemannXi _) (tendstoLocallyUniformly_heatE hlim.neg)
     ⟨1 / 2, heatE_riemannXi_half_ne_zero _⟩ (Eventually.of_forall hτn) z hz
 
-/-- **The de Bruijn–Newman threshold** in the standard coordinate: the infimum of the seam
-times. -/
+/-- **The de Bruijn–Newman threshold in the tree's coordinate**: the infimum of the seam
+times. The standard threshold is `4 * Λ_DN` (`CriticalChart.Λstd_eq`). -/
 def Λ_DN : ℝ := sInf seamTimes
 
 /-- **`RH ⟺ Λ_DN ≤ 0`**, given that the seam times are a nonempty up-set. -/

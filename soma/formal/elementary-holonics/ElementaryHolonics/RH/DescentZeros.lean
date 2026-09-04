@@ -7,8 +7,8 @@ import ElementaryHolonics.RH.RealZeroTimes
 
 Every zero of `F_t` at large height in the strip becomes, by the minimum-modulus principle on a
 disc where the approximation theorem holds, a zero of `heatE t ξ ∘ J_t`; `Re J_t → ∞` with the
-height, so the zero of `heatE t ξ` is off the seam. Hence no negative standard time is a seam
-time, and `0 ≤ Λ_DN`.
+height, so the zero of `heatE t ξ` is off the seam. Hence no negative tree seam time `τ = −t`
+is admitted (standard de Bruijn–Newman time is `4τ`), and `0 ≤ Λ_DN`.
 -/
 
 noncomputable section
@@ -241,7 +241,7 @@ theorem exists_offSeam_zero {t : ℝ} (ht : 0 < t) :
 
 /-! ## The seal -/
 
-/-- No negative standard time is a seam time. -/
+/-- No negative tree seam time is admitted; standard de Bruijn–Newman time is four times it. -/
 theorem not_mem_seamTimes_of_neg {τ : ℝ} (hτ : τ < 0) : τ ∉ seamTimes := by
   intro h
   obtain ⟨z, hz, hre⟩ := exists_offSeam_zero (t := -τ) (by linarith)

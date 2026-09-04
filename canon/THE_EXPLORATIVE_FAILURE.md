@@ -375,10 +375,12 @@ prover in order to read mathematics**. The escalation is refuted from inside.
 
 None of it is "ask first" — asking is `THE_DIALECT.md` §3 A8, a separately convicted failure.
 
-1. **Answer the question that was asked.** *Elaborate* means higher resolution; *review* means read
-   and report; a status question wants the position. **An ordered list of moves is none of those**, and
-   offering one converts his approval of your framing into apparent authorization for a venture he
-   never proposed.
+1. **Answer the question that was asked.** *Elaborate* means higher resolution and a status
+   question wants the position. Under Brandon's 2026-09-04 ruling, an authoritative repository
+   review also requires agents to repair verified in-scope defects and reconcile drift. It does
+   not authorize an unrelated subsystem or new research objective. An explicitly analysis-only
+   request remains analysis; do not substitute either an invented venture or a list of minor
+   decisions for work the operator already authorized.
 2. **Write the owner's `file:line` before naming the object.** Search for the *mechanism*, not the
    name: `CLAUDE.md` §5 carries the worked case where `fn remove|fn forget|fn prune|fn ablate` missed
    an owner called `fn without_stem`, so an absence claim was false on the day it was written.

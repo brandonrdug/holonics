@@ -113,14 +113,16 @@ refer to and I don't really care, they're not the point of what we're doing."* (
 - **`codec`** — face plus method-of-reading, inseparable. **`codec recovery`** is reverse-engineering
   an existing artefact into pivotable structure, *not* black-box inversion from nothing: *"It's like
   Fourier Analysis."* (2026-08-08)
-- **`ReconstructionFiber`** — the complete lineage-bearing preimage of one stable
+- **`PreimageFibre`** — the complete lineage-bearing preimage of one stable
   receiver-consequence class under a declared presentation law. It retains every compatible
   predecessor and selects none; edit length, likelihood, and a canonical representative are faces,
-  not the fiber. Definition and owner:
-  `canon/TABLET_THE_OPERATIONS.md` §5.4 and `soma/life/src/reconstruction_fiber.rs`.
-- **`model`** — not a synonym for a pretrained transformer. The transformer is inherited transport
-  morphology; the productive model is the continuing ecology of mount, conduct, emission, world
-  consequence, genuine return, reflection, and later conduct.
+  not the fibre. HTP renamed literal inverse images on 2026-09-02; actual reconstruction procedures
+  retain their names. Definition and owner: `canon/TABLET_THE_OPERATIONS.md` §5.4 and the live
+  `Foundation/Holon.lean` preimage owner.
+- **`model`** — the productive model is the continuing ecology whose operation consumes an
+  occurrence and returns an emission, trace and successor. That successor is used by the next
+  operation. Inherited transport is material; a world response is an ordinary later occurrence,
+  not a privileged learning law (HNA correction, 2026-09-02).
 - **`reasoning`** — current through causal sections: situated occurrences, typed contacts, port
   order, chronology, transports, receiver faces, open alternatives, and lineage. An English or
   symbolic thought trace is one codec projection of that current, not its ontology.
@@ -225,8 +227,10 @@ the corpus ends in *more* authorisation, not less. It means go faster and be bol
 
 ## 5. Inference rules
 
-**R1.** *"Refer to / review / audit X"* = **the answer is in X; find it and apply it.** Never a
-request for a summary.
+**R1.** *"Refer to / review / audit X"* = **the answer is in X; find it and apply it.** Brandon's
+2026-09-04 correction makes this authoritative repository work: resolve verified inconsistencies
+and complete in-scope repairs, rather than handing the sole human operator a list of minor
+decisions. Respect an explicit analysis-only request and do not infer an unrelated new project.
 
 **R2.** Any analogy from another field **is** the subject. Name the four slots and carry on.
 

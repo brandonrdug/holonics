@@ -22,7 +22,7 @@ use serde::Serialize;
 use crate::{
     embedding_fiber::MountedReadout,
     resident_section::{
-        PassageBuilder, ResidentGrain, ResidentRefusal, ResidentSection, ResidentSurface,
+        PassageBuilder, ResidentEndpoint, ResidentGrain, ResidentRefusal, ResidentSection, ResidentSurface,
         SeriesAperture,
     },
 };
@@ -60,8 +60,8 @@ pub struct NativeMorphologyDeposit {
 
 /// One factorized overlay atom retained by the successor ecology: sealed resident words.
 pub(super) struct OverlayAtom<'chart> {
-    u: ResidentSection<'chart>,
-    v: ResidentSection<'chart>,
+    u: ResidentEndpoint<'chart>,
+    v: ResidentEndpoint<'chart>,
     rank: usize,
     u_exponent: i32,
     v_exponent: i32,
@@ -69,9 +69,21 @@ pub(super) struct OverlayAtom<'chart> {
     v_octaves: u32,
 }
 
-impl OverlayAtom<'_> {
+impl<'chart> OverlayAtom<'chart> {
     pub(super) fn rank(&self) -> usize {
         self.rank
+    }
+
+    /// Borrow the two resident coefficient factors without copying the held morphology.
+    /// The forward uses `U(Vx)`; its return crosses these same factors in reverse order.
+    pub(super) fn readouts(
+        &self,
+        surface: &'chart ResidentSurface<'chart>,
+    ) -> (MountedReadout<'chart>, MountedReadout<'chart>) {
+        (
+            MountedReadout::borrowed(surface.readout(), self.u.lo_device_ptr(), self.u.rows(), self.rank, self.u_octaves, self.u_exponent),
+            MountedReadout::borrowed(surface.readout(), self.v.lo_device_ptr(), self.rank, self.v.width(), self.v_octaves, self.v_exponent),
+        )
     }
 }
 
@@ -270,8 +282,8 @@ pub(super) fn deposit_from_material<'chart>(
     };
     Ok((
         OverlayAtom {
-            u,
-            v,
+            u: u.into_lower_endpoint(),
+            v: v.into_lower_endpoint(),
             rank: rows,
             u_exponent,
             v_exponent,
@@ -532,8 +544,8 @@ pub(super) fn enact_return<'chart>(
     drop(next_resident);
     Ok((
         OverlayAtom {
-            u,
-            v,
+            u: u.into_lower_endpoint(),
+            v: v.into_lower_endpoint(),
             rank: material.rows,
             u_exponent,
             v_exponent,
@@ -625,6 +637,10 @@ pub(super) fn record_overlay_contribution<'chart>(
     builder.close(index, out, tile.shape.needed)
 }
 
+
+#[cfg(test)]
+#[path = "operative_adjoint_tests.rs"]
+mod adjoint_tests;
 
 #[cfg(test)]
 mod tests {

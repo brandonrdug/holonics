@@ -13,7 +13,8 @@ For a member `f` of the Foster class with its zeros on the seam, the Euler itera
 polynomial approximants have seam zeros (`PolyaLine`), converge to the Euler iterates of `f`
 (derivatives of locally uniform limits), which therefore have seam zeros by Hurwitz, and converge
 to `heatE (−λ) f` (`EulerIterates`), which therefore has seam zeros by Hurwitz: **the flow never
-creates a pair** — in the standard coordinate `τ = −t`, the seam times are an up-set. With their
+creates a pair** — in the tree's coordinate `τ = −t`, the seam times are an up-set (standard
+de Bruijn–Newman time is `4τ`). With their
 closedness (`RealZeroTimes`) this gives `RH ⟺ Λ_DN ≤ 0` whenever a seam time exists. Every
 theorem is discharged with no `sorryAx`.
 -/
@@ -187,7 +188,7 @@ theorem onSeam_heatE_neg (hs : OnSeam f) {lam : ℝ} (hlam : 0 ≤ lam)
 /-! ## The flow of `ξ`: the seam times are an up-set -/
 
 omit hf in
-/-- **The flow never creates a pair**: the seam times are an up-set in the standard coordinate. -/
+/-- **The flow never creates a pair**: the seam times are an up-set in the tree's coordinate. -/
 theorem seamTimes_upset {τ τ' : ℝ} (hτ : τ ∈ seamTimes) (h : τ ≤ τ') : τ' ∈ seamTimes := by
   have hsemi : heatE (-τ') riemannXi = heatE (-(τ' - τ)) (heatE (-τ) riemannXi) := by
     rw [heatE_heatE_riemannXi]

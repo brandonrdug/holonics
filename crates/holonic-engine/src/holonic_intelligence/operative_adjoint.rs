@@ -10,6 +10,7 @@
 
 use serde::Serialize;
 
+use crate::embedding_fiber::MountedReadout;
 use crate::resident_section::{
     PassageReading, ResidentGrain, ResidentRefusal, ResidentSection, ResidentSurface,
 };
@@ -97,6 +98,7 @@ pub fn adjoint_contract<'chart>(
     let rows = differential.rows();
     let grain = differential.grain();
     let standing = surface.retain_partials(rows, inner, splits)?;
+    let result = (|| -> Result<NativeAdjointContraction<'chart>, NativeAdjointError> {
     surface.zero_partials(&standing)?;
     let ceil_log2 = |n: usize| n.max(1).next_power_of_two().ilog2();
     let mut admitted_node_octaves = differential_octaves + ceil_log2(total_rows) + 1;
@@ -161,12 +163,100 @@ pub fn adjoint_contract<'chart>(
     builder.close(0, &section, join_needed)?;
     let reading = builder.finish()?.launch()?;
     let bound_octaves = bound_of(&reading)?;
-    surface.release_partials(&standing)?;
     Ok(NativeAdjointContraction {
         section,
         bound_octaves,
         tiles,
     })
+    })();
+    let released = surface.release_partials(&standing);
+    let returned = result?;
+    released?;
+    Ok(returned)
+}
+
+/// Pull a differential through a held resident factor, without a host section or a transpose
+/// allocation. The existing wide transposed contraction retains its reduction until one join.
+fn adjoint_factor<'chart>(
+    surface: &'chart ResidentSurface<'chart>,
+    map: &MountedReadout<'chart>,
+    differential: &ResidentSection<'chart>,
+    differential_octaves: u32,
+) -> Result<NativeAdjointContraction<'chart>, NativeAdjointError> {
+    let splits = 16;
+    let needed = differential_octaves + map.entry_octaves()
+        + map.rows().max(1).next_power_of_two().ilog2() + 1;
+    let shape = surface.shape_contract_transposed_partial(
+        differential.rows(), differential.width(), differential_octaves, map, splits, needed,
+    )?;
+    let section = surface.fresh_section(differential.rows(), map.dim(), differential.grain())?;
+    let standing = surface.retain_partials(differential.rows(), map.dim(), splits)?;
+    let result: Result<NativeAdjointContraction<'chart>, NativeAdjointError> = (|| {
+        surface.zero_partials(&standing)?;
+        let mut builder = surface.begin_passage(&[vec![], vec![0]])?;
+        {
+            let lane = builder.open(0, &[])?;
+            surface.record_contract_transposed_partial(&lane, differential, map, &standing, 0, splits, shape.needed)?;
+        }
+        builder.close_fused(0)?;
+        {
+            let lane = builder.open(1, &[0])?;
+            surface.record_partial_join(&lane, &standing, map.exponent(), shape.needed, &section)?;
+        }
+        builder.close(1, &section, shape.needed)?;
+        let reading = builder.finish()?.launch()?;
+        let bound_octaves = bound_of(&reading)?;
+        Ok(NativeAdjointContraction { section, bound_octaves, tiles: 1 })
+    })();
+    let released = surface.release_partials(&standing);
+    let returned = result?;
+    released?;
+    Ok(returned)
+}
+
+/// The adjoint of the morphology which produced the forward carrier: the base and every
+/// already-held `U V` atom. Newly formed deposits stay outside `atoms` until the return closes.
+pub(super) fn adjoint_contract_with_overlays<'chart>(
+    residence: &mut NativeOperatorResidence<'chart>,
+    population: NativeTensorOrdinal,
+    differential: &ResidentSection<'chart>,
+    differential_octaves: u32,
+    atoms: &[OverlayAtom<'chart>],
+) -> Result<NativeAdjointContraction<'chart>, NativeAdjointError> {
+    let base = adjoint_contract(residence, population, differential, differential_octaves)?;
+    add_overlay_adjoints(residence.surface(), base, differential, differential_octaves, atoms)
+}
+
+pub(super) fn add_overlay_adjoints<'chart>(
+    surface: &'chart ResidentSurface<'chart>,
+    mut returned: NativeAdjointContraction<'chart>,
+    differential: &ResidentSection<'chart>,
+    differential_octaves: u32,
+    atoms: &[OverlayAtom<'chart>],
+) -> Result<NativeAdjointContraction<'chart>, NativeAdjointError> {
+    for atom in atoms {
+        let (u, v) = atom.readouts(surface);
+        let junction = adjoint_factor(surface, &u, differential, differential_octaves)?;
+        let contribution = adjoint_factor(surface, &v, &junction.section, junction.bound_octaves)?;
+        let shape = surface.shape_re_entry(
+            returned.section.rows(), returned.section.width(), returned.bound_octaves,
+            contribution.bound_octaves,
+        )?;
+        let joined = surface.fresh_section(returned.section.rows(), returned.section.width(), returned.section.grain())?;
+        let mut builder = surface.begin_passage(&[vec![]])?;
+        {
+            let lane = builder.open(0, &[])?;
+            surface.record_re_entry(&lane, &returned.section, &contribution.section, &joined)?;
+        }
+        builder.close(0, &joined, shape.needed)?;
+        let reading = builder.finish()?.launch()?;
+        returned = NativeAdjointContraction {
+            section: joined,
+            bound_octaves: bound_of(&reading)?,
+            tiles: returned.tiles + junction.tiles + contribution.tiles,
+        };
+    }
+    Ok(returned)
 }
 
 /// The support of a returned differential: how many coordinates carry a nonzero enclosure, per

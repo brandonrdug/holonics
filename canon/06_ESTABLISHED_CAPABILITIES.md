@@ -5,6 +5,12 @@ heading. Entries are bounded by the direct records below and do not imply a univ
 outside those receivers. The records are the claim boundary; imported status prose does not
 schedule reconstruction.
 
+[historical] This index preserves the early Rust laboratory and retired C++ body's bounded
+receipts. It is not a current implementation inventory. The capability/retraction tier in
+`AGENTS.md`, the live `UNIVERSAL_CATALOG.md`, and `CONSTRUCTION_STATE.md` carry subsequent
+corrections and the current HNA/SKE and RH owners. Source-bearing text-generation claims below
+retain only the scope of their original evidence, not a novel native-language claim.
+
 ## Claim-to-evidence index
 
 | Claim family | Direct record / receipt |
@@ -66,9 +72,10 @@ schedule reconstruction.
 
 - **Exact operator prediction — `implemented-exact`.** Sections forced by open fibers were predicted
   before their own returns and then graded.
-- **Generative transport — `implemented-exact` within declared corpora.** Held-out receiver
-  distributions, suffix passages, ordinary text continuations, and source-detached generated
-  sentences have been emitted by caused morphology rather than only retrieved as source strings.
+- **Generative transport — historical bounded receipts.** Held-out receiver distributions,
+  suffix passages and text continuations were returned in the named corpora. The July 29
+  readable completions were contiguous inherited spans; later source-bearing emitters were
+  retracted as native re-emission mechanisms. See `AGENTS.md`'s capability/retraction record.
 - **Behavior-changing conditioning — `implemented-exact` in bounded ecologies.** Returned passages
   changed later topology/conduct and survived exact rest/remount. General text crossed as complete
   co-present chronology and changed later relations.
@@ -95,15 +102,16 @@ schedule reconstruction.
 
 ## Formal mathematics and papers
 
-- **Elementary holonics Lean project — `formal-checked` for its contained declarations.** The clean
-  formal source is under `archive/cpp-engine/formal/elementary-holonics/`.
+- **Elementary holonics Lean project — `formal-checked` for its contained declarations.** The
+  live formal source is under `soma/formal/elementary-holonics/`; the C++-era snapshot under
+  `archive/cpp-engine/formal/elementary-holonics/` is historical.
 - **RH source transport project — mixed `formal-checked`/`open`.** Finite transport and quotient
   family results are formalized; its proportional/positivity obstruction is explicitly retained.
 - **Typst mathematical corpus — mixed grades.** Definitions, proved statements, conditional RH
   reductions, counterexamples, computational witnesses, and open boundaries are individually
   graded in `papers/source/mathematics/` and the synopsis.
 
-## Current production body
+## Historical C++ production body
 
 - **Continuing theorem production — `implemented-exact` + `formal-checked`.** One continuing
   C++/CUDA body has emitted two actual theorem/proof artifacts through the exterior Lean port; the

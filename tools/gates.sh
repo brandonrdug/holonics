@@ -116,20 +116,27 @@ sum_test_results() {
 gate_tests() {
     local out="$WORK/tests.out"
     local examples="$WORK/examples.out"
+    local build="$WORK/test-build.out"
     # Unit/integration/bin tests are the executable guard population. The example targets are
     # an evidence-driver corpus and are marked `test=false`; linking every one into the test profile
     # made a local library repair pay hundreds of binaries. Keep their release-boundary coverage by
     # type-checking them once, without linking or executing them all. Real deeds are still built and
     # executed explicitly by their owning phase.
-    # The former package-by-package loop gave every child its own bound while leaving the release
-    # receiver itself unbounded; AAC6 measured the outer process crossing 180 seconds before the
-    # first gate returned. Cargo already owns the exact workspace dependency DAG and test target
-    # population. One bounded invocation avoids repeated package planning/link traversal and makes
-    # the complete test population one atomic release section again.
+    # Compilation is productive work, not a hung test. The invoking agent supervises its progress
+    # under AGENTS.md's September 4 ruling. Build the workspace test targets once, then apply the
+    # existing runtime guard to their execution; a cold build must not spend that execution budget.
+    flock "$CARGO_LOCK" env PATH="$CARGO_PATH" \
+        cargo test --workspace --lib --bins --tests --no-run -j "$CARGO_JOBS" >"$build" 2>&1
+    local build_status=$?
+    if [ "$build_status" -ne 0 ]; then
+        SUMMARY="workspace test compilation failed (exit $build_status)"
+        tail -60 "$build"
+        return "$build_status"
+    fi
     "${PROCESS_BOUND[@]}" flock "$CARGO_LOCK" env PATH="$CARGO_PATH" \
         cargo test --workspace --lib --bins --tests --no-fail-fast -j "$CARGO_JOBS" >"$out" 2>&1
     local tests_status=$?
-    "${PROCESS_BOUND[@]}" flock "$CARGO_LOCK" env PATH="$CARGO_PATH" \
+    flock "$CARGO_LOCK" env PATH="$CARGO_PATH" \
         cargo check --workspace --examples -j "$CARGO_JOBS" >"$examples" 2>&1
     local examples_status=$?
     local status=0
@@ -138,6 +145,7 @@ gate_tests() {
     # What is shown on failure is decided by the material: the lines cargo itself marks, plus
     # every result line. A fixed line budget would elide the one failure in a 30,000-line log.
     if [ "$status" -ne 0 ]; then
+        printf 'test execution exit %s; example check exit %s\n' "$tests_status" "$examples_status"
         grep -E '^(error|failures:|---- |test result:)|FAILED|panicked' "$out"
         grep -E '^(error|warning:)|could not compile' "$examples"
     fi

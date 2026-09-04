@@ -26,7 +26,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 | file | what it is |
 |---|---|
-| `CLAUDE.md` | **CLAUDE.md — Holonics operating contract (Claude-facing)** — **Brandon's latest direct request governs.** This file is a model-facing operating pointer. |
+| `CLAUDE.md` | **CLAUDE.md — Holonics operating pointer** — Brandon's latest direct request governs. |
 | `canon/THE_HOLOBROCHOS_SPINE.md` | **THE SPINE — the closed cycle, and where every organ sits on it** — It states the spine the roadmap is ordered by. |
 | `canon/THE_DOCUMENT_LAW.md` | **The document law** — **Why this file exists.** `canon/THE_RECOVERED_LAW.md` states the mechanism: *"Agent reports and source reads lived only in conversation, were compressed away at compaction, and were… |
 | `canon/THE_DIALECT.md` | **The dialect — how to read Brandon** — **Evidence:** `measured` — 8,935 genuine messages, 3.29 MB, 2026-05-11 → 2026-08-08, continuous. |
@@ -34,8 +34,8 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `canon/THE_EXPLORATIVE_FAILURE.md` | **The explorative failure** — It states the condition that identifies one recurring assistant failure, the trigger that precedes it, its measured instances, the ontology in this project's own words that refutes it, and… |
 | `canon/THE_MEASURED_CAPABILITIES.md` | **THE MEASURED CAPABILITIES — what the machine has actually done** — **Why this file exists, restated by Brandon on 2026-08-13 because it was being read as the wrong kind of object:** |
 | `canon/THE_TIMELINE.md` | **The timeline — every day of this repository, what was asked, what returned, and what was lost** — **Evidence:** `measured`. 259 commits `be93ed3` (2026-08-03 15:38) → `1921b86` (2026-08-12 19:08); **368 records in `research/records/`, all tracked** — of which 63 are dated 08-03 or later… |
-| `blueprint/THE_ROADMAP.md` | **The roadmap** — **This is the sole ordered construction authority.** Historical campaign prose, status paragraphs, commit messages, outputs, and research records provide evidence; they do not schedule work. |
-| `CONSTRUCTION_STATE.md` | **Construction state** — **The position record. One file, no historical campaign diary.** `blueprint/THE_ROADMAP.md` is the sole ordered construction authority. |
+| `blueprint/THE_ROADMAP.md` | **The roadmap** — **This is the sole ordered construction authority.** Brandon's latest direct instruction governs. |
+| `CONSTRUCTION_STATE.md` | **Construction state** — This is the sole current-position record. |
 | `THE_CLAIM_INDEX.md` | **The claim index** — **What it is for.** Four partial indexes existed and none knew about the others: `CLAUDE.md` §0's pickup order, `THE_MATHEMATICS_TABLET` §3's tablet list, `research/README.md` (records… |
 | `canon/THE_CORRESPONDENCE_ATLAS.md` | **The correspondence atlas: what other fields call the same face** — **What this is, and what it is not.** `canon/THE_DIALECT.md` maps *his* language. |
 | `canon/THE_MILLENNIUM_FRAME.md` | **The Millennium frame: six receiver questions, and which organ each one lands on** — **Why this file exists rather than six scattered sections.** `CLAUDE.md` §3 framed two. |
@@ -150,7 +150,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md` | **The seam has a first time by de Bruijn, and the threshold is RH with no port** — **Line:** RH, beside the engine frontier; the lines share no owner. |
 | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md` | **SUPERSEDED — The single-card passage carries Phoenix and the mathematics codec** — **Status:** active construction contract when named by the roadmap. |
 | `blueprint/THE_SITUATED_DIFFERENCE_RETURNS_THROUGH_PERSPECTIVE_CHARTS_AND_ATHENA_CULTIVATES_PROSE_MATHEMATICS_AND_CODE_AS_ONE_CAUSAL_ECOLOGY.md` | **The situated difference returns through perspective charts, and Athena cultivates prose, mathematics, and code as one causal ecology** — A scalar or probability may be emitted only afterward as a receiver face with its fibre. |
-| `blueprint/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md` | **Soulkiller excites the resident realization and returns the receiver-family quotient as cone-restricted ecologies** — **Status:** CURRENT under `THE_ROADMAP.md`, which alone orders the construction. |
+| `blueprint/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md` | **Soulkiller excites the resident realization and returns the receiver-family quotient as cone-restricted ecologies** — **Status:** COMPLETED at the bounded SKE0--SKE5 scopes below. |
 | `blueprint/THE_SOULKILLER_RETURNS_NATIVE_PARAMETRON_SPOOLS_AND_EROS_CULTIVATES_ONE_CONNECTED_ATHENA_ECOLOGY.md` | **Soulkiller returns native Parametron spools, and Eros cultivates one connected Athena ecology** — **Supersession:** retires Phoenix as a live lifecycle and supersedes the prior complete-exchange blueprint. |
 | `blueprint/THE_STATEMENT_IS_A_CROSSING_WORD_AND_THE_SEPARATOR_IS_ORIENTED.md` | **The statement is a crossing word and the separator is oriented** — **Evidence:** `measured` — every figure was taken on this machine today, and the two that are outside-instrument analyses say so by name. |
 | `blueprint/THE_TRAVERSIBLE_CHAIN.md` | **The traversible chain** — This one covers the carriers, and sits more immediately **under** `THE_METHOD_ATLAS.md` — the atlas states what a row is; this states what a row is *made of*. |
@@ -163,7 +163,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (450 deposits of 957)
+## 4 · The 2026-08 record line (450 deposits of 958)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:
@@ -636,8 +636,8 @@ outside `tools/` that names the verifier — not declared.
 | `tools/document_law.py` | Three laws the corpus states about its own governing documents, made executable. | `canon/THE_CONTAMINANT_PROTOCOL.md`, `research/records/2026-08-24_DIVISION_RETURNED_AS_A_TRANSPORT_FIBRE_PARTITIONS_RETAINED_THEIR_BOUNDARIES_AND_DIVISORS_BECAME_SIGNED_CHART_LEDGERS.md` |
 | `tools/epistemic_tags.py` | Verify paragraph-leading epistemic brackets on live HIF authority and formal prerequisites. | **nothing names it** |
 | `tools/equation_atlas.py` | Validate the exterior equation atlas as stored material. | `research/records/2026-08-21_THE_PROOF_TERMS_SURVIVED_THE_CONNECTIVE_TISSUE_COOLED_AND_M0_BEGINS_FROM_TWO_SOURCE_FAMILIES.md` |
-| `tools/gates.sh` | The release gate sequence. | `AGENTS.md`, `blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`, `blueprint/THE_ATHENA_ALPHA_CULTIVATES_THE_COMPLETE_LABORATORY_EXCHANGE_AND_RETURNED_DIFFERENCES_COMPACTIFY_INTO_NATIVE_HEXIS.md`, and 78 more |
-| `tools/lean_check.sh` | Build one declared live Lean umbrella from source under the pinned project toolchain. | `blueprint/THE_CONSTRUCTIVE_DIFFERENTIAL_BOUNDARY_AND_RECEIVER_CALCULUS.md`, `blueprint/THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md`, `blueprint/THE_ROADMAP.md`, and 10 more |
+| `tools/gates.sh` | The release gate sequence. | `AGENTS.md`, `blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`, `blueprint/THE_ATHENA_ALPHA_CULTIVATES_THE_COMPLETE_LABORATORY_EXCHANGE_AND_RETURNED_DIFFERENCES_COMPACTIFY_INTO_NATIVE_HEXIS.md`, and 80 more |
+| `tools/lean_check.sh` | Build one declared live Lean umbrella from source under the pinned project toolchain. | `blueprint/THE_CONSTRUCTIVE_DIFFERENTIAL_BOUNDARY_AND_RECEIVER_CALCULUS.md`, `blueprint/THE_FINITE_MANY_BODY_AND_POLARIZED_CRYSTAL_TRANSPORT_FOUNDATION.md`, `canon/THE_EXPLORATIVE_FAILURE.md`, and 9 more |
 | `tools/profile_scalar_path.py` | Derive the apparatus-telemetry faces of Deed H0 from an Nsight Systems sqlite export, | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`, `research/records/2026-08-19_THE_SCALAR_PATH_RETURNS_ITS_PROFILE_THE_CARD_IS_BUSY_ONE_TENTH_OF_THE_SPAN_AND_EVERY_SECTION_KERNEL_IS_BELOW_ONE_WAVE.md` |
 | `tools/profile_streamed_circulation.py` | Derive Deed H4's profile faces from one Nsight Systems export. | `research/records/2026-08-19_THE_TOWER_IS_A_STREAMED_CIRCULATION_THE_SINGLE_GRAPH_RETURNS_ITS_THREE_CUTS_AND_THE_TRANSFERS_CROSS_UNDER_THE_KERNELS.md` |
 | `tools/source_shape.py` | Rust/CUDA source-shape gate. | `research/records/2026-08-31_CONS3_REMOVED_THE_MOMENT_FRONT_FOREMAN_AND_THE_RESIDENT_RECEIVER_NOW_OBSERVES_THE_COMMITTED_TARGET.md`, `research/records/2026-08-31_HIF5_PRODUCTS_MOVED_TO_NEUTRAL_OWNERS_AND_CAMPAIGN_ONTOLOGY_DEPARTED.md` |

@@ -1,20 +1,24 @@
 # The seam has a first time by de Bruijn, and the threshold is RH with no port
 
+**Status:** COMPLETED — DB0–DB5 passed on 2026-09-03. This bounded contract preserves the
+construction and its receipts; it schedules no further deed.
+
 **Deposited:** 2026-09-03, on Brandon's direct request ("Proceed with the scoping"), after the
 descent-route RT campaign returned `0 ≤ Λ_DN`
 ([`THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md`](THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md)).  
 **Line:** RH, beside the engine frontier; the lines share no owner.  
-**Scheduler:** [`THE_ROADMAP.md`](THE_ROADMAP.md) carries the position as `**RH line position:** DBn`.
+**Scheduler:** [`THE_ROADMAP.md`](THE_ROADMAP.md) records `**RH line position:** DB complete`.
 This contract schedules nothing by itself.
 
 ## 0. The target
 
-[definition] After RT6 the RH line holds, on `propext`, `Classical.choice`, `Quot.sound`:
+[historical; source-inspected] At the campaign's founding, after RT6, the RH line held, on
+`propext`, `Classical.choice`, `Quot.sound`:
 `RiemannHypothesis ↔ 0 ∈ seamTimes` (`RealZeroTimes.zero_mem_iff`); `seamTimes` is a closed
 up-set (`LinePreservation.seamTimes_upset`, `RealZeroTimes.isClosed_seamTimes`); and
-`seamTimes ⊆ Ici 0` (`DescentZeros.Λ_DN_nonneg`). One port remains: `DeBruijnBound`, that
-`½ ∈ seamTimes`. Without a seam time `Λ_DN = sInf ∅ = 0` vacuously, so the port is what makes
-`Λ_DN = 0` a statement about `ξ`.
+`seamTimes ⊆ Ici 0` (`DescentZeros.seamTimes_subset_Ici`). One port remained: `DeBruijnBound`, that
+`½ ∈ seamTimes`; DB4–DB5 below discharged it. Without a seam time `Λ_DN = sInf ∅ = 0`
+vacuously, so existence makes `Λ_DN = 0` a statement about `ξ`.
 
 [definition] **The target of this campaign** is the port discharged from the actual kernel:
 
@@ -60,7 +64,8 @@ extremal pair, or a bound on the zeros of `ζ` beyond the Euler product:
    `∫ F e^{izt}` lie in `|Im z| ≤ Δ`, the roots of `g(z) = ∫ F(t) e^{½λ²t²} e^{izt} dt` lie in
    `|Im z| ≤ {max(Δ² − λ², 0)}^{½}`: by Theorem 12 the roots of
    `g_N(z) = ∫ F(t) (cosh(λt/N))^{N²} e^{izt} dt` lie in that strip, `(cosh(λt/N))^{N²} → e^{½λ²t²}`
-   uniformly on `ℝ` since `cosh y ≤ e^{½y²}` (his (3.9)), and Theorem 7 passes the strip to the
+   pointwise with domination by `e^{½λ²t²}` since `cosh y ≤ e^{½y²}` (his (3.9)); the weighted
+   transforms converge locally uniformly, and Theorem 7 passes the strip to the
    limit. With `F = φ`, `Δ = λ = ¼`: `∫ φ(t) e^{t²/32} e^{izt} dt` has real roots only; in the
    variable `u = t/4` of Rodgers–Tao this is `H_{½}`, i.e. `Λ ≤ ½`.
 
@@ -90,7 +95,8 @@ not exist at the entire face. De Bruijn's Theorem 3 has no extremal pair: Lemma 
 every quadratic factor at once, and the passage to entire functions is by approximation and
 Hurwitz, not by descent on a pair. Nothing in the chain uses the zeros of `ζ` beyond the strip.
 
-[established-bounded; source-inspected] **What the tree already holds, per step.**
+[historical; source-inspected] **The owner map and open items at the campaign's founding.**
+The returned paragraphs in §1 record the completed owners and the discharged items.
 
 | Step | Source | Owner in the tree | Missing |
 |---|---|---|---|
@@ -146,7 +152,7 @@ replaced by "no real zero"), each is a seam-type polynomial with zeros in the st
 (`approx_eq_seamPoly` generalized), DB2 applies to each, and Hurwitz in the closed strip
 (`HurwitzLine` generalized) passes the shrunken strip to `A_μ f`. Then: the class is closed under
 `A_μ` (differentiable, symmetric, growth of order `3/2`), the iterates `A_μ^k ξ` have
-`A_μ^k ξ (½) = ∫ e^{μu} cosh(μu)^k Φ(u) du > 0`, and by induction the `N²`-fold average with
+`A_μ^k ξ (½) = ∫ cosh(μu)^k Φ(u) du > 0`, and by induction the `N²`-fold average with
 `μ = 1/(2N)` has all its zeros on the seam. Owners `RH/StripApproximation.lean`,
 `RH/StripHurwitz.lean`, `RH/StripAverage.lean`.
 
@@ -216,7 +222,10 @@ returns the three axioms; root umbrella green under 180 s per owner; records dep
   large height; not needed. Parked.
 - **`PairDescent`**: obstructed (FT4 record); superseded by the factorwise Lemma 1.
 
-## 3. Open items and risks, named before construction
+## 3. Historical risks named before construction
+
+[historical; source-inspected] The following list records the pre-construction alternatives.
+The DB3 and DB4 returns above resolve them; no item here schedules further work.
 
 - DB3's approximation needs one representative per pair `{u, 1 − u}`; the seam version used
   `Im u ≠ 0`. For the strip the split is by `Im u > 0` against `Im u < 0` after excluding real

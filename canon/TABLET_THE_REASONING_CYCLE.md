@@ -35,12 +35,11 @@ which remains foreign inside Athena. Soulkiller returns a source-neutral native 
 separate cold exterior witness, and explicit receiver insufficiency. Eros alone composes admitted
 spools and returned consequences into Athena; foreign model identity and execution have ended.
 
-The productive reasoning machine is the returning ecology in which mounted material, native
-morphology, exterior ports, world consequences, reflection, and later conduct form one continuing
-causal cycle:
+The productive reasoning machine is the recurrent ecology in which one occurrence operates on
+the contemporary morphology and returns its emission, trace and successor:
 
 ```text
-mount -> conduct -> radiate -> world -> return -> reflect -> changed continuation
+occurrence -> local current -> reaction -> emission + successor -> next occurrence
 ```
 
 The transition commonly narrated as *autocomplete to conversation or agency* is therefore not the
@@ -48,7 +47,9 @@ birth of a separate faculty. A continuation organ has been closed inside a recur
 emissions can change an exterior and whose genuinely later returns can alter the same continuing
 body. Conversation is a useful fixture for that recurrence. English dialogue is not the invariant.
 
-A full recurrence may be typed as
+The HNA correction of 2026-09-02 makes self-emitted and application-produced occurrences use
+the same operation. The following older world-interaction chart is one specialized composition,
+not a mandatory inference/learning split:
 
 ```text
 |c_t>       = Mount(B_t, |i_t>)
@@ -155,10 +156,11 @@ accuracy are receiver faces.
 grad_G L = G^-1 dL.
 ```
 
-Backpropagation is the adjoint return of this covector through retained forward lineage. An update
-apparatus turns that testimony into `Delta Lambda`; training stands only when the same body later
-conducts differently through that change, survives source-detached rest/remount, and loses the
-conduct under an attributable ablation. Pretraining is conditioning at scale, not a lossless
+Backpropagation is the adjoint return of this covector through the morphology and lineage that
+produced the retained forward carriers, including any previously learned overlays. New deposits
+belong to the successor and must not enter the pullback of that earlier passage. Training is
+developmental recurrence retaining that successor; remount and ablation are narrower persistence
+and attribution receivers, not prerequisites for every operation. Pretraining is conditioning at scale, not a lossless
 archive and not intrinsically lossy without a receiver whose distinction failed to survive.
 
 ## 5. Compression, reconstruction, and diffusion
@@ -504,10 +506,11 @@ required consequence through the existing typed owners and exhibit the exact mis
 constitutive relation, or return if that composition refuses. A CPU-authored invocation sequence
 does not close the reasoning cycle.
 
-Any later construction must use mixed material without material-kind routing;
-retain codec names only as lineage and controls; compare operation families over varied operands,
-nesting, carriers, and presentations; include same-value/different-law controls; return shortest
-separating interventions; and survive source-detached remount and attributable ablation.
+Any later construction must keep material-kind routing out of the interior, retain codec names
+as lineage and controls, and grade operation families against their declared receivers and
+histories. Same-value/different-law controls and separating histories test identification;
+source-detached remount and ablation test the particular independence or attribution claims
+that require them. They do not add a second learning law to HNA.
 
 The doctrine is falsified as a construction claim if the alleged invariant disappears under symbol
 renaming, is predicted solely by a source label, collapses addition and multiplication from one

@@ -1,0 +1,6 @@
+adjoint return: starting
+adjoint return: mounting coefficients
+adjoint return: first cycle
+adjoint return: first return and second cycle
+adjoint return: second return through retained overlays and third cycle
+Error: Adjoint("operation 328 (Contract) with a differential of 48 octaves: the return through the body refused: resident apparatus: CUDA cuMemAlloc_v2 returned 2 (CUDA_ERROR_OUT_OF_MEMORY): out of memory; resident octets 16372724368; recent returns: op 328 layer Some(9) 11x2560 bound 48 nonzero 28160 widest 0 | op 329 layer Some(9) 11x2560 bound 54 nonzero 28160 widest 0 | op 330 layer Some(9) 11x2560 bound 54 nonzero 28160 widest 0 | op 331 layer Some(9) 11x256 bound 46 nonzero 2816 widest 0 | op 332 layer Some(9) 11x256 bound 47 nonzero 2816 widest 0 | op 333 layer Some(9) 11x256 bound 46 nonzero 2816 widest 0")

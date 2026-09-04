@@ -1,5 +1,10 @@
 {
-  "schema": "athena-alpha.composed-variant.v1",
+  "schema": "athena-alpha.composed-variant.v2",
+  "derivation": {
+    "source_revision": "9b0c98b1f99180e9ced0b6020f6e162736e78b8e",
+    "method": "Exact identified-pair relations and observed consequence growth re-read from the existing faces in the recorded exposure order; deed fields and retained residual-file lengths checked. All measurement fields and the prior cone-union apparatus testimony are unchanged. This is not a new repository release or GPU run.",
+    "new_gpu_run": false
+  },
   "classes": [
     0,
     1,
@@ -2289,7 +2294,8 @@
         "added_separations": 0,
         "removed_relations": 0,
         "added_reachable_faces": 4,
-        "added_anything": true
+        "identification_preserved": null,
+        "observed_consequences_changed": true
       },
       {
         "occurrence": 5,
@@ -2315,7 +2321,8 @@
         "added_separations": 1,
         "removed_relations": 1,
         "added_reachable_faces": 3,
-        "added_anything": true
+        "identification_preserved": false,
+        "observed_consequences_changed": true
       },
       {
         "occurrence": 5,
@@ -2340,11 +2347,14 @@
         "added_separations": 0,
         "removed_relations": 0,
         "added_reachable_faces": 1,
-        "added_anything": true
+        "identification_preserved": true,
+        "observed_consequences_changed": true
       }
     ],
-    "trailing_crossings_that_added_nothing": 0,
-    "last_crossing_added_nothing": false
+    "trailing_identification_preserving_enlargements": 1,
+    "last_enlargement_identification_saturated": true,
+    "trailing_enlargements_without_observed_consequence_change": 0,
+    "last_enlargement_added_no_observed_consequences": false
   },
   "session_generations": [
     [
@@ -2409,6 +2419,7 @@
     ]
   ],
   "release": {
+    "scope": "declared-family-deed-only",
     "one_session_over_the_family": true,
     "every_family_face_equal": true,
     "outside_occurrence_refused": true,

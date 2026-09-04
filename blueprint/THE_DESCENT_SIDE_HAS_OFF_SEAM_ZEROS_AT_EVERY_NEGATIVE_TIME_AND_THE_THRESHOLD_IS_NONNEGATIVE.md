@@ -1,5 +1,8 @@
 # The descent side has off-seam zeros at every negative time, and the threshold is nonnegative
 
+**Status:** COMPLETED — RT0–RT6 passed on 2026-09-03 at the returned scopes below. The later
+DB campaign discharged the remaining de Bruijn port; neither campaign schedules further work.
+
 **Founded:** 2026-09-03, by Brandon's direct request: *"I would indeed like to move towards RT,
 but I need you to further scope what will be required and constructed more critically, and
 formally deposit the RT plans."*  
@@ -13,9 +16,9 @@ itself.
 ([`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md))
 at the deposited-inequality scope, whose FT6 return carries two ports, `DeBruijnBound :
 ½ ∈ seamTimes` and `RodgersTaoNonneg : 0 ≤ Λ_DN`, and Brandon's question that followed: whether
-Rodgers--Tao's result is available as a formalization. It is available as two published proofs
-and as no formal artifact anywhere (Mathlib holds nothing on the de Bruijn--Newman constant;
-searches of 2026-09-03 found no Lean development). The receipt of the scoping is
+Rodgers--Tao's result was available as a formalization. The pre-campaign searches of 2026-09-03
+found two published proofs and no Lean development of the de Bruijn--Newman constant. RT6 below
+returned the formal nonnegativity theorem by the descent route. The receipt of the scoping is
 [`the RT0 record`](../research/records/2026-09-03_RT0_THE_TWO_PUBLISHED_PROOFS_ARE_MAPPED_TO_OWNERS_AND_THE_DESCENT_ROUTE_IS_FOUNDED_ON_THE_FLOWED_INTEGER_EVENTS.md).
 
 ---
@@ -25,11 +28,12 @@ searches of 2026-09-03 found no Lean development). The receipt of the scoping is
 [definition] The target is the discharge of the port `RodgersTaoNonneg`: the theorem
 `0 ≤ Λ_DN` on `propext`, `Classical.choice`, `Quot.sound` alone, so that
 `ThresholdReturn.riemannHypothesis_iff_Λ_DN_eq` rests on de Bruijn's bound alone. In the flow's
-coordinate the statement is: **for every standard time `τ < 0`, that is every repository time
-`t = −τ > 0`, `heatE t ξ` has a zero off the seam `Re z = ½`.** Then `seamTimes ⊆ Set.Ici 0`, and
+coordinate the statement is: **for every tree seam time `τ < 0`, that is every repository time
+`t = −τ > 0` and standard de Bruijn–Newman time `4τ < 0`, `heatE t ξ` has a zero off the seam
+`Re z = ½`.** Then `seamTimes ⊆ Set.Ici 0`, and
 `Λ_DN = sInf seamTimes ≥ 0` (Mathlib's `Real.sInf_empty` gives `sInf ∅ = 0`, so this inequality
-needs no nonemptiness; nonemptiness remains de Bruijn's port and is needed only for
-`Λ_DN ≤ 0 ⇒ RH`).
+needs no nonemptiness; nonemptiness was de Bruijn's port and is needed for
+`Λ_DN ≤ 0 ⇒ RH`; DB4–DB5 subsequently discharged it).
 
 [definition] The prohibition of the Foster contract binds in full: no phase returns a structure
 whose field is the target or an implication to it; no numerical enclosure substitutes for a
@@ -185,8 +189,9 @@ rate replaces `C y^{−1/5} e^{(10/t) min(x,−2)²}`, which is what RT5 and RT6
 ### RT5 — the Dirichlet series has zeros at every height
 
 `F_t` is an absolutely convergent Dirichlet series, not a monomial; it has a zero (Dobner's
-Lemma 3), and by Bohr's almost periodicity a zero within a bounded distance of every height in a
-fixed strip. Bohr's theorem is simultaneous Diophantine approximation of finitely many
+Lemma 3), and the almost-period construction returns zeros at unbounded heights in a fixed
+strip. The original request for a uniformly bounded distance from every height was narrowed
+by the RT5 return below. The construction uses simultaneous Diophantine approximation of finitely many
 `log p` multiples by pigeonhole, then the tail; Mathlib holds only the one-dimensional Dirichlet
 theorem (`Real.exists_int_int_abs_mul_sub_le`). Owner `RH/BohrZeros.lean`.
 
@@ -200,9 +205,9 @@ relatively dense form of the almost periods was not needed and is not claimed; r
 [`the RT5 record`](../research/records/2026-09-03_RT5_THE_MAIN_SERIES_HAS_A_ZERO_BY_THE_HARMONIC_LOGARITHM_AND_ZEROS_AT_EVERY_HEIGHT_BY_BOHR_ALMOST_PERIODS.md).
 **RT5 passes** at the corrected scope.
 
-**Pass RT5:** for every `t > 0` a strip and a bound `L` with a zero of `F_t` in every window of
-height `L`, formal-checked.  
-**Falsifier:** a window of height `L` in the strip with no zero.
+**Pass RT5:** for every `t > 0` a fixed strip and, for every height `T₀`, a zero of `F_t` in
+that strip with imaginary part at least `T₀`, formal-checked.
+**Falsifier:** a `t > 0` and a height above which the returned strip has no zero of `F_t`.
 
 ### RT6 — the transfer and the seal
 
@@ -244,12 +249,13 @@ fire against the published theorem, so a firing is a construction error of RT1--
 6. `RTa6` (energy at time zero, Propositions 26--28, and §9): untouched; its external input is
    CGGGH-B 1985 on Montgomery's pair-correlation method, a second contract of its own.
 
-## 3. What stays open after this campaign
+## 3. The later de Bruijn return and the remaining conjecture
 
-[open; project-postulate] de Bruijn's bound `½ ∈ seamTimes` (Ki--Kim--Lee 2009 sharpen it to
-`Λ < ½`). It is not needed for `0 ≤ Λ_DN`. Its route is Pólya's universal-factor theorem at the
-entire face, which the tree's forward preservation already is, plus de Bruijn's real-rooted
-starting family (Pólya 1927): a separate contract when directed.
+[proved-derived; formal-checked] The later DB campaign returned `1/8 ∈ seamTimes` and
+`DeBruijnSeal.deBruijnBound`, discharging the original weak port `½ ∈ seamTimes`. The bridge
+`CriticalChart.Λstd_eq` gives the standard bound `Λstd ≤ ½` from the tree's `Λ_DN ≤ 1/8`.
+The completed contract is
+[`THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md`](THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md).
 
 [open] The conjecture `Λ_DN ≤ 0`, with its null falsifier, unchanged.
 

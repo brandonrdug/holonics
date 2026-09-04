@@ -9,6 +9,15 @@ its source.**
 
 ---
 
+## Current reading boundary
+
+[historical] The source and capability readings below are dated laboratory and early-Rust
+evidence. Their world-mediated-return and private-self-loop distinctions describe those
+experiments; they do not define the current HNA recurrence. The 2026-09-02 correction makes
+each operation return the successor used by the next, whether its occurrence is self-emitted
+or application-produced. Current capability and position are in `CONSTRUCTION_STATE.md`;
+historical absence statements in this spine do not reopen completed HNA/SKE construction.
+
 ## 0 · The authority chain, and the correction that produced this file
 
 **Soma is the rigorous source.** `MATHEMATICAL_HOLONICS.md` states its own position, verbatim:

@@ -21,9 +21,8 @@
 //!   what the full operator returns, per exposure and per face coordinate;
 //! - the **consequence-preserving product** as the vector it is: native standing, executable
 //!   decoder, retained fibres, semantic work, span, residency, transfer; no scalar summarizes it;
-//! - **saturation** under the growing family, structurally: what each added exposure adds in
-//!   classes, separations, extent, insufficiency, and reachable faces, and whether the last
-//!   lawful crossings added nothing.
+//! - **identification saturation** inside each observed enlargement: exact equality of its
+//!   identified occurrence pairs, independently of changes in reachable receiver faces.
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -33,7 +32,8 @@ use holonic_engine::native_ecology::holonic_intelligence::{
 };
 use serde::{Deserialize, Serialize};
 
-pub const COMPOSED_VARIANT_SCHEMA: &str = "athena-alpha.composed-variant.v1";
+pub const COMPOSED_VARIANT_SCHEMA: &str = "athena-alpha.composed-variant.v2";
+pub const COMPOSED_DEED_SCOPE: &str = "declared-family-deed-only";
 
 /// The declared decoder: the executable that turns the rest into faces, named by its owners,
 /// with the cost it was measured at.  The cost is reported as what was measured, not as a ratio
@@ -114,24 +114,37 @@ pub struct SaturationStep {
     pub added_separations: usize,
     pub removed_relations: usize,
     pub added_reachable_faces: usize,
-    pub added_anything: bool,
+    /// Exact equality of the identified-pair relations before and after this enlargement.
+    /// The initial declaration has no preceding family and therefore returns `None`.
+    pub identification_preserved: Option<bool>,
+    /// Broader observed growth, including a newly reachable face even when no class reopens.
+    pub observed_consequences_changed: bool,
 }
 
-/// Saturation under the growing family, structurally: the steps, and how many of the last
-/// crossings added nothing.
+/// Finite observed enlargements only; no claim about any unobserved future family.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SaturationReceipt {
     pub steps: Vec<SaturationStep>,
-    pub trailing_crossings_that_added_nothing: usize,
-    /// Saturation is stated only when the last crossing added nothing; it is never inferred from
-    /// exhaustion of the declared family.
-    pub last_crossing_added_nothing: bool,
+    pub trailing_identification_preserving_enlargements: usize,
+    pub last_enlargement_identification_saturated: Option<bool>,
+    pub trailing_enlargements_without_observed_consequence_change: usize,
+    pub last_enlargement_added_no_observed_consequences: Option<bool>,
+}
+
+/// A correction projected from previously deposited observations, not a new card measurement.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ReceiptDerivation {
+    pub source_revision: String,
+    pub method: String,
+    pub new_gpu_run: bool,
 }
 
 /// The composed variant's return.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ComposedVariant {
     pub schema: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub derivation: Option<ReceiptDerivation>,
     pub classes: Vec<usize>,
     pub class_cone_roles: Vec<usize>,
     pub extent_roles: usize,
@@ -153,13 +166,14 @@ pub struct ComposedVariant {
     pub saturation: SaturationReceipt,
     /// One continuing session: the generations the family's cycles ran through.
     pub session_generations: Vec<(u64, u64)>,
-    /// The release receiver: every pass condition of the blueprint, read on the card.
+    /// The declared-family deed checks only; this is not the repository release-gate result.
     pub release: ReleaseReceipt,
 }
 
-/// The release receiver for SKE5: each condition the blueprint's pass names, as read.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+/// Checks of the deposited SKE5 deed fields. Repository release gates are outside this scope.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ReleaseReceipt {
+    pub scope: String,
     pub one_session_over_the_family: bool,
     pub every_family_face_equal: bool,
     pub outside_occurrence_refused: bool,
@@ -173,55 +187,251 @@ pub struct ReleaseReceipt {
     pub passed: bool,
 }
 
+impl ComposedVariant {
+    /// Re-read the deed's actual fields. File availability and the validated cone union are
+    /// supplied by their owning apparatus checks; neither stands in for repository gates.
+    pub fn assess_deed(
+        &self,
+        residual_files_present: bool,
+        extent_is_union: bool,
+    ) -> ReleaseReceipt {
+        let cycles = self.faces.len();
+        let keys: BTreeSet<_> = self
+            .faces
+            .iter()
+            .map(|f| (f.occurrence, &f.exposure))
+            .collect();
+        let occurrences: BTreeSet<_> = self.faces.iter().map(|f| f.occurrence).collect();
+        let exposures: BTreeSet<_> = self.faces.iter().map(|f| &f.exposure).collect();
+        let family_complete = cycles > 0
+            && keys.len() == cycles
+            && occurrences.len().checked_mul(exposures.len()) == Some(cycles);
+        let decoder = &self.product.decoder;
+        let decoder_declared = family_complete
+            && [&decoder.mount, &decoder.recurrence, &decoder.receiver]
+                .iter()
+                .all(|owner| !owner.trim().is_empty())
+            && decoder.cycle_milliseconds.len() == cycles
+            && decoder.launches_per_cycle.len() == cycles
+            && decoder.passages_per_cycle.len() == cycles
+            && decoder.launches_per_cycle.iter().all(|n| *n > 0)
+            && decoder.passages_per_cycle.iter().all(|n| *n > 0);
+        let retained: BTreeSet<_> = self.product.retained_fibres.iter().map(|f| f.0).collect();
+        let product_vector_returned = family_complete
+            && self.product.exposures == cycles
+            && self.product.occurrences == occurrences.len()
+            && self.product.histories == exposures.len()
+            && self.product.rest_octets > 0
+            && !self.product.retained_rows.is_empty()
+            && self.product.retained_rows.values().all(|rows| *rows > 0)
+            && retained == occurrences
+            && retained.len() == self.product.retained_fibres.len()
+            && self
+                .product
+                .retained_fibres
+                .iter()
+                .all(|(_, addresses)| !addresses.is_empty())
+            && self.product.operations_per_cycle > 0
+            && self.product.deed_launches_per_cycle > 0
+            && self.product.section_read_outs_per_cycle > 0
+            && self.product.composed_resident_octets > 0
+            && self.product.full_coefficient_octets > 0
+            && self
+                .product
+                .full_resident_octets
+                .is_none_or(|octets| octets > 0)
+            && self.product.ingress_octets_per_cycle > 0
+            && self.product.egress_section_octets_per_cycle > 0;
+        let one_session_over_the_family = family_complete
+            && self.session_generations.len() == cycles
+            && self
+                .session_generations
+                .first()
+                .is_some_and(|(before, _)| *before == 0)
+            && self.session_generations.iter().all(|(before, after)| {
+                before.checked_add(self.product.operations_per_cycle as u64) == Some(*after)
+            })
+            && self
+                .session_generations
+                .windows(2)
+                .all(|w| w[0].1 == w[1].0);
+        let (collapsed, species) = species_over_family(&self.faces);
+        let remainder_keys: BTreeSet<_> = self
+            .propagated
+            .iter()
+            .map(|r| (r.occurrence, &r.exposure))
+            .collect();
+        let remainder_exhibited = residual_files_present
+            && family_complete
+            && self.residual_files.len() == cycles
+            && self.residual_files.iter().collect::<BTreeSet<_>>().len() == cycles
+            && self.propagated.len() == cycles
+            && remainder_keys == keys
+            && self.propagated.iter().all(|r| {
+                r.coordinates > 0
+                    && r.widths.iter().map(|(_, count)| count).sum::<usize>() == r.coordinates
+            });
+        let exposures_in_order: Vec<_> = self
+            .saturation
+            .steps
+            .iter()
+            .map(|s| s.exposure.clone())
+            .collect();
+        let observed: Vec<_> = self
+            .faces
+            .iter()
+            .map(|f| NativeExposureFace {
+                occurrence: f.occurrence,
+                exposure: f.exposure.clone(),
+                face: f.full_face,
+                exact_digest: String::new(),
+                cones: BTreeMap::new(),
+            })
+            .collect();
+        let saturation_receipt_returned = saturation(
+            &observed,
+            &exposures_in_order,
+            self.extent_roles,
+            self.roles,
+            usize::from(self.refused_outside_family.is_some())
+                + usize::from(self.refused_undeclared_history.is_some()),
+        )
+        .is_ok_and(|receipt| receipt == self.saturation);
+        let mut receipt = ReleaseReceipt {
+            scope: COMPOSED_DEED_SCOPE.into(),
+            one_session_over_the_family,
+            every_family_face_equal: family_complete
+                && self
+                    .faces
+                    .iter()
+                    .all(|f| f.equal && f.full_face == f.composed_face),
+            outside_occurrence_refused: self
+                .refused_outside_family
+                .as_ref()
+                .is_some_and(|r| !r.is_empty()),
+            undeclared_history_refused: self
+                .refused_undeclared_history
+                .as_ref()
+                .is_some_and(|r| !r.is_empty()),
+            species_stated: family_complete
+                && species.is_some()
+                && species == self.species
+                && collapsed == self.collapsed,
+            remainder_exhibited,
+            decoder_declared,
+            product_vector_returned,
+            saturation_receipt_returned,
+            extent_is_union_of_class_cones: extent_is_union && self.extent_roles <= self.roles,
+            passed: false,
+        };
+        receipt.passed = receipt.one_session_over_the_family
+            && receipt.every_family_face_equal
+            && receipt.outside_occurrence_refused
+            && receipt.undeclared_history_refused
+            && receipt.species_stated
+            && receipt.remainder_exhibited
+            && receipt.decoder_declared
+            && receipt.product_vector_returned
+            && receipt.saturation_receipt_returned
+            && receipt.extent_is_union_of_class_cones;
+        receipt
+    }
+}
+
 /// The histogram of per-coordinate width differences (composed minus full), in grains of the
 /// finer of the two grains: each width is rebased to that grain before the subtraction, so two
 /// readings at different grains are never subtracted as bare counts.
-pub fn width_difference(full: &[u32], full_grain: u32, composed: &[u32], composed_grain: u32) -> (Vec<(i64, usize)>, u32) {
+pub fn width_difference(
+    full: &[u32],
+    full_grain: u32,
+    composed: &[u32],
+    composed_grain: u32,
+) -> (Vec<(i64, usize)>, u32) {
     let grain = full_grain.max(composed_grain);
     let scale = |width: u32, own: u32| -> i64 { i64::from(width) << (grain - own) };
     let mut histogram: BTreeMap<i64, usize> = BTreeMap::new();
     for (f, c) in full.iter().zip(composed) {
-        *histogram.entry(scale(*c, composed_grain) - scale(*f, full_grain)).or_default() += 1;
+        *histogram
+            .entry(scale(*c, composed_grain) - scale(*f, full_grain))
+            .or_default() += 1;
     }
     (histogram.into_iter().collect(), grain)
 }
 
 /// The collapsed pairs of the composed body against the full operator over the family, and the
 /// species they state on that domain; a face that does not descend refuses a species.
-pub fn species_over_family(faces: &[ComposedFace]) -> (Vec<NativeCollapsedPair>, Option<NativeRemainderSpecies>) {
+pub fn species_over_family(
+    faces: &[ComposedFace],
+) -> (Vec<NativeCollapsedPair>, Option<NativeRemainderSpecies>) {
     let domain: Vec<(usize, NativeExposure, u32, u32)> = faces
         .iter()
-        .map(|f| (f.occurrence, f.exposure.clone(), f.composed_face, f.full_face))
+        .map(|f| {
+            (
+                f.occurrence,
+                f.exposure.clone(),
+                f.composed_face,
+                f.full_face,
+            )
+        })
         .collect();
     let collapsed = NativeClassRemainder::collapsed_pairs(&domain);
-    let failures = faces.iter().filter(|f| !f.equal).count();
+    let failures = faces
+        .iter()
+        .filter(|f| f.full_face != f.composed_face)
+        .count();
     let species = NativeClassRemainder::species_of(&collapsed, failures);
     (collapsed, species)
 }
 
-/// Saturation as the formal `Saturated` reads it: the occurrences stay fixed and the declared
-/// exposures (receiver and history) are enlarged one at a time in declared order; after each
-/// enlargement the signature quotient, its separations, the generators (the histories
-/// declared), the relations (the pairs identified), the separators (the histories that reopened
-/// an identification), the obstructions (refusals), and the reachable consequences (the
-/// distinct faces) are read again.  The extent is that of the classes, which the enlargement
-/// can only separate, never merge.
+/// The formal `DeclaredFamily.Saturated` compares identified-pair relations over fixed
+/// occurrences. New reachable faces and additional separating testimony are recorded separately.
+/// The retained extent and refusals are testimony supplied for this family, not reconstructed
+/// from the number of classes. Every declared prefix must expose the same occurrence population.
 pub fn saturation(
     faces: &[NativeExposureFace],
     exposures_in_order: &[NativeExposure],
-    class_cone_roles_by_occurrence: &BTreeMap<usize, BTreeSet<u32>>,
+    extent_roles: usize,
     roles: usize,
     refusals: usize,
 ) -> Result<SaturationReceipt, String> {
     let occurrences: BTreeSet<usize> = faces.iter().map(|f| f.occurrence).collect();
+    if occurrences.is_empty() || exposures_in_order.is_empty() || extent_roles > roles {
+        return Err(
+            "saturation needs a nonempty family, exposures, and an admitted role extent".into(),
+        );
+    }
+    if exposures_in_order.iter().collect::<BTreeSet<_>>().len() != exposures_in_order.len() {
+        return Err("the exposure enlargement contains a duplicate declaration".into());
+    }
     let mut steps = Vec::with_capacity(exposures_in_order.len());
-    let (mut classes, mut separations, mut relations, mut reachable) = (0usize, 0usize, 0usize, 0usize);
-    let extent_roles: BTreeSet<u32> = class_cone_roles_by_occurrence.values().flatten().copied().collect();
+    let (mut classes, mut separations, mut relations, mut reachable) =
+        (0usize, 0usize, 0usize, 0usize);
+    let mut previous_pairs: Option<BTreeSet<(usize, usize)>> = None;
     for at in 0..exposures_in_order.len() {
         let declared = &exposures_in_order[..=at];
-        let restricted: Vec<NativeExposureFace> = faces.iter().filter(|f| declared.contains(&f.exposure)).cloned().collect();
+        let restricted: Vec<NativeExposureFace> = faces
+            .iter()
+            .filter(|f| declared.contains(&f.exposure))
+            .cloned()
+            .collect();
         let quotient = NativeSignatureQuotient::found(&restricted).map_err(|e| e.to_string())?;
-        let relation_count: usize = quotient.classes.iter().map(|c| c.occurrences.len() * c.occurrences.len().saturating_sub(1) / 2).sum();
+        if quotient.occurrences != occurrences.len() || quotient.exposures.len() != declared.len() {
+            return Err(
+                "an enlargement changed the occurrence population or lacks an exposure".into(),
+            );
+        }
+        let pairs: BTreeSet<(usize, usize)> = quotient
+            .classes
+            .iter()
+            .flat_map(|class| {
+                class.occurrences.iter().enumerate().flat_map(|(at, left)| {
+                    class.occurrences[at + 1..]
+                        .iter()
+                        .map(move |right| (*left, *right))
+                })
+            })
+            .collect();
+        let relation_count = pairs.len();
         let reachable_faces: BTreeSet<u32> = restricted.iter().map(|f| f.face).collect();
         let step = SaturationStep {
             occurrence: occurrences.len(),
@@ -231,14 +441,15 @@ pub fn saturation(
             generators: declared.len(),
             relations: relation_count,
             obstructions: refusals,
-            extent_roles: extent_roles.len(),
-            insufficiency_roles: roles.saturating_sub(extent_roles.len()),
+            extent_roles,
+            insufficiency_roles: roles - extent_roles,
             reachable_faces: reachable_faces.len(),
             added_classes: quotient.classes.len().saturating_sub(classes),
             added_separations: quotient.separations.len().saturating_sub(separations),
             removed_relations: relations.saturating_sub(relation_count),
             added_reachable_faces: reachable_faces.len().saturating_sub(reachable),
-            added_anything: at == 0
+            identification_preserved: previous_pairs.as_ref().map(|previous| previous == &pairs),
+            observed_consequences_changed: at == 0
                 || quotient.classes.len() != classes
                 || quotient.separations.len() != separations
                 || relation_count != relations
@@ -248,12 +459,29 @@ pub fn saturation(
         separations = quotient.separations.len();
         relations = relation_count;
         reachable = reachable_faces.len();
+        previous_pairs = Some(pairs);
         steps.push(step);
     }
-    let trailing = steps.iter().rev().take_while(|s| !s.added_anything).count();
     Ok(SaturationReceipt {
-        last_crossing_added_nothing: steps.last().is_some_and(|s| !s.added_anything),
-        trailing_crossings_that_added_nothing: trailing,
+        last_enlargement_identification_saturated: steps
+            .last()
+            .and_then(|s| s.identification_preserved),
+        trailing_identification_preserving_enlargements: steps
+            .iter()
+            .rev()
+            .take_while(|s| s.identification_preserved == Some(true))
+            .count(),
+        last_enlargement_added_no_observed_consequences: steps.last().and_then(|s| {
+            s.identification_preserved
+                .map(|_| !s.observed_consequences_changed)
+        }),
+        trailing_enlargements_without_observed_consequence_change: steps
+            .iter()
+            .rev()
+            .take_while(|s| {
+                s.identification_preserved.is_some() && !s.observed_consequences_changed
+            })
+            .count(),
         steps,
     })
 }
@@ -276,7 +504,8 @@ pub fn class_cone_roles(
                         .get(&m.population)
                         .map(|mask| {
                             let sites = mask.to_sites();
-                            (m.first..m.first + m.sites).all(|site| sites.get(site).copied().unwrap_or(false))
+                            (m.first..m.first + m.sites)
+                                .all(|site| sites.get(site).copied().unwrap_or(false))
                         })
                         .unwrap_or(false)
                 })
@@ -322,11 +551,34 @@ mod tests {
     #[test]
     fn equal_faces_over_the_family_collapse_nothing_and_state_condensation() {
         let faces = vec![
-            ComposedFace { occurrence: 0, exposure: NativeExposure { receiver: "r".into(), history: vec![] }, full_face: 7, composed_face: 7, equal: true, width_difference: vec![] },
-            ComposedFace { occurrence: 1, exposure: NativeExposure { receiver: "r".into(), history: vec![] }, full_face: 9, composed_face: 9, equal: true, width_difference: vec![] },
+            ComposedFace {
+                occurrence: 0,
+                exposure: NativeExposure {
+                    receiver: "r".into(),
+                    history: vec![],
+                },
+                full_face: 7,
+                composed_face: 7,
+                equal: true,
+                width_difference: vec![],
+            },
+            ComposedFace {
+                occurrence: 1,
+                exposure: NativeExposure {
+                    receiver: "r".into(),
+                    history: vec![],
+                },
+                full_face: 9,
+                composed_face: 9,
+                equal: true,
+                width_difference: vec![],
+            },
         ];
         let propagated = vec![NativeTerminalRemainder {
-            exposure: NativeExposure { receiver: "r".into(), history: vec![] },
+            exposure: NativeExposure {
+                receiver: "r".into(),
+                history: vec![],
+            },
             occurrence: 0,
             coordinates: 2,
             nonpoint_coordinates: 2,
@@ -345,25 +597,120 @@ mod tests {
         // Three occurrences; the empty history identifies 0 and 2; the second history separates
         // them; a third history adds nothing.
         let faces = vec![
-            face(0, &[], 7), face(1, &[], 9), face(2, &[], 7),
-            face(0, &[5], 5), face(1, &[5], 3), face(2, &[5], 6),
-            face(0, &[8], 7), face(1, &[8], 9), face(2, &[8], 7),
+            face(0, &[], 7),
+            face(1, &[], 9),
+            face(2, &[], 7),
+            face(0, &[5], 5),
+            face(1, &[5], 3),
+            face(2, &[5], 6),
+            face(0, &[8], 7),
+            face(1, &[8], 9),
+            face(2, &[8], 7),
         ];
         let exposures: Vec<NativeExposure> = [vec![], vec![5u32], vec![8u32]]
             .into_iter()
-            .map(|history| NativeExposure { receiver: "terminal-face".to_owned(), history })
+            .map(|history| NativeExposure {
+                receiver: "terminal-face".to_owned(),
+                history,
+            })
             .collect();
-        let cones = BTreeMap::from([(0usize, BTreeSet::from([0u32, 1])), (1, BTreeSet::from([1, 2])), (2, BTreeSet::from([0, 1]))]);
-        let receipt = saturation(&faces, &exposures, &cones, 4, 0).unwrap();
+        let receipt = saturation(&faces, &exposures, 3, 4, 0).unwrap();
         assert_eq!(receipt.steps.len(), 3);
         assert_eq!(receipt.steps[0].classes, 2);
         assert_eq!(receipt.steps[0].relations, 1);
         assert_eq!(receipt.steps[1].classes, 3);
         assert_eq!(receipt.steps[1].removed_relations, 1);
-        assert!(receipt.steps[1].added_anything);
-        assert!(!receipt.steps[2].added_anything);
-        assert!(receipt.last_crossing_added_nothing);
-        assert_eq!(receipt.trailing_crossings_that_added_nothing, 1);
+        assert_eq!(receipt.steps[0].identification_preserved, None);
+        assert_eq!(receipt.steps[1].identification_preserved, Some(false));
+        assert!(receipt.steps[1].observed_consequences_changed);
+        assert!(!receipt.steps[2].observed_consequences_changed);
+        assert_eq!(
+            receipt.last_enlargement_identification_saturated,
+            Some(true)
+        );
+        assert_eq!(
+            receipt.last_enlargement_added_no_observed_consequences,
+            Some(true)
+        );
+        assert_eq!(receipt.trailing_identification_preserving_enlargements, 1);
         assert_eq!(receipt.steps[2].extent_roles, 3);
+    }
+
+    #[test]
+    fn a_singleton_new_face_preserves_identification_but_adds_a_consequence() {
+        let faces = vec![face(0, &[], 7), face(0, &[1], 9)];
+        let exposures: Vec<_> = faces.iter().map(|f| f.exposure.clone()).collect();
+        let receipt = saturation(&faces, &exposures, 0, 0, 0).unwrap();
+        assert_eq!(
+            receipt.last_enlargement_identification_saturated,
+            Some(true)
+        );
+        assert_eq!(
+            receipt.last_enlargement_added_no_observed_consequences,
+            Some(false)
+        );
+        assert_eq!(receipt.steps[1].added_reachable_faces, 1);
+        assert_eq!(receipt.steps[1].removed_relations, 0);
+    }
+
+    #[test]
+    fn saturation_refuses_a_changing_occurrence_population_or_repeated_exposure() {
+        let faces = vec![face(0, &[], 7), face(0, &[1], 9), face(1, &[1], 8)];
+        let exposures = vec![faces[0].exposure.clone(), faces[1].exposure.clone()];
+        assert!(saturation(&faces, &exposures, 0, 0, 0).is_err());
+        assert!(saturation(
+            &faces[..1],
+            &[exposures[0].clone(), exposures[0].clone()],
+            0,
+            0,
+            0
+        )
+        .is_err());
+    }
+
+    fn recorded_deed() -> ComposedVariant {
+        serde_json::from_str(include_str!(
+            "../../../research/records/2026-09-03_SKE5_receipts/ske5_composed_variant.json"
+        ))
+        .unwrap()
+    }
+
+    #[test]
+    fn deposited_deed_validates_without_inventing_its_missing_baseline() {
+        let variant = recorded_deed();
+        let receipt = variant.assess_deed(true, true);
+        assert_eq!(receipt.scope, COMPOSED_DEED_SCOPE);
+        assert!(receipt.passed);
+        assert_eq!(variant.product.full_resident_octets, None);
+        assert_eq!(
+            variant.saturation.last_enlargement_identification_saturated,
+            Some(true)
+        );
+        assert_eq!(
+            variant
+                .saturation
+                .last_enlargement_added_no_observed_consequences,
+            Some(false)
+        );
+    }
+
+    #[test]
+    fn missing_decoder_or_product_or_false_session_cannot_pass_the_deed() {
+        let original = recorded_deed();
+        let mut variant = original.clone();
+        variant.product.decoder.recurrence.clear();
+        assert!(!variant.assess_deed(true, true).passed);
+        variant = original.clone();
+        variant.product.exposures += 1;
+        assert!(!variant.assess_deed(true, true).passed);
+        variant = original.clone();
+        variant.session_generations[1].0 = 0;
+        assert!(!variant.assess_deed(true, true).passed);
+        variant = original.clone();
+        variant.faces[0].composed_face += 1; // Its stale `equal` flag remains true.
+        assert!(!variant.assess_deed(true, true).passed);
+        variant = original;
+        variant.saturation.last_enlargement_identification_saturated = Some(false);
+        assert!(!variant.assess_deed(true, true).passed);
     }
 }

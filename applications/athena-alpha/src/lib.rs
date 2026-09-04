@@ -15,15 +15,15 @@ mod world_application;
 pub use apertures::addressed_ingress;
 pub use application::{AthenaAlphaAdmission, AthenaAlphaApplication, AthenaAlphaError};
 pub use composed_variant::{
-    COMPOSED_VARIANT_SCHEMA, ComposedFace, ComposedVariant, DeclaredDecoder, ProductVector,
-    ReleaseReceipt, SaturationReceipt, SaturationStep, class_cone_roles, saturation,
-    species_over_family, width_difference,
+    class_cone_roles, saturation, species_over_family, width_difference, ComposedFace,
+    ComposedVariant, DeclaredDecoder, ProductVector, ReceiptDerivation, ReleaseReceipt,
+    SaturationReceipt, SaturationStep, COMPOSED_DEED_SCOPE, COMPOSED_VARIANT_SCHEMA,
 };
 pub use diffusion::declared_diffusion_law;
 pub use material_codec::{
-    AthenaMaterialArtifact, AthenaMaterialCodecError, render_material_artifact,
+    render_material_artifact, AthenaMaterialArtifact, AthenaMaterialCodecError,
 };
-pub use receivers::{AthenaAlphaCycleReceipt, inspect_cycle};
+pub use receivers::{inspect_cycle, AthenaAlphaCycleReceipt};
 pub use recurrent_operator::{
     AthenaRecurrentApplicationError, AthenaRenderedTokenFace, AthenaTextOccurrenceApplication,
     AthenaTokenApplication, AthenaVocabularyFace,

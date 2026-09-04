@@ -217,7 +217,7 @@ impl<'chart> ResidentSurface<'chart> {
         let buffer = self.alloc::<i64>(words)?;
         let pointer = buffer.device_ptr();
         let mut held = self.partials.borrow_mut();
-        held.push(buffer);
+        held.push(Some(buffer));
         Ok(PartialStanding {
             index: held.len() - 1,
             pointer,
@@ -229,7 +229,8 @@ impl<'chart> ResidentSurface<'chart> {
     }
 
     /// Release one retained partial standing once its join has returned.  The slot keeps its
-    /// index so every other standing's address stays valid; it holds an empty buffer thereafter.
+    /// index so every other standing's address stays valid; it owns no allocation thereafter.
+    /// Releasing storage must not allocate, especially while handling an allocation refusal.
     pub fn release_partials(&self, standing: &PartialStanding) -> Result<(), ResidentRefusal> {
         let mut held = self.partials.borrow_mut();
         let slot = held
@@ -238,7 +239,10 @@ impl<'chart> ResidentSurface<'chart> {
                 operation: "contract-split-k",
                 what: "a partial standing this surface does not hold".to_owned(),
             })?;
-        let released = std::mem::replace(slot, DeviceBuffer::<i64>::alloc(1)?);
+        let released = slot.take().ok_or_else(|| ResidentRefusal::Declaration {
+            operation: "contract-split-k",
+            what: "the partial standing was already released".to_owned(),
+        })?;
         let octets = (released.len() * std::mem::size_of::<i64>()) as u64;
         drop(released);
         self.released_octets(octets);
@@ -250,6 +254,7 @@ impl<'chart> ResidentSurface<'chart> {
         let held = self.partials.borrow();
         let buffer = held
             .get(standing.index)
+            .and_then(Option::as_ref)
             .ok_or_else(|| ResidentRefusal::Declaration {
                 operation: "contract-split-k",
                 what: "a partial standing this surface does not hold".to_owned(),
@@ -270,6 +275,7 @@ impl<'chart> ResidentSurface<'chart> {
         let held = self.partials.borrow();
         let buffer = held
             .get(standing.index)
+            .and_then(Option::as_ref)
             .ok_or_else(|| ResidentRefusal::Declaration {
                 operation: "contract-split-k",
                 what: "a partial standing this surface does not hold".to_owned(),

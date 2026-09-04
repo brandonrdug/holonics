@@ -19,11 +19,11 @@ use super::{
     NativeCarrierOrdinal, NativeCausalReach, NativeFullOperationError,
     NativeFullOperatorSession, NativeMorphologyDeposit,
     NativeOperationPrimitive, NativeOperatorNode, NativeReturnAperture, NativeScaleConstraint,
-    NativeTensorOrdinal, adjoint_contract, differential_support,
+    NativeTensorOrdinal, differential_support,
     full_operation::ContemporaryCarrier,
     operative_scalars::{binary64_projection, operation_bound, scale_enclosure},
-    operative_adjoint::deposit_on_cross_section,
-    operative_return::ReturnedDifferential,
+    operative_adjoint::{adjoint_contract_with_overlays, deposit_on_cross_section},
+    operative_return::{OverlayAtom, ReturnedDifferential},
 };
 
 /// The support of the differential returned to one operation's output.
@@ -51,6 +51,9 @@ pub struct NativeLookupReach {
 /// The complete testimony of one return through the body.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct NativeAdjointReturnTrace {
+    /// The already-held morphology used by replay and every pullback, excluding this return's
+    /// staged deposits.
+    pub held_overlay_rank: usize,
     pub operations_returned: usize,
     pub layers_replayed: usize,
     pub deposits: Vec<NativeMorphologyDeposit>,
@@ -82,7 +85,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         &mut self,
         differential: ReturnedDifferential<'chart>,
         deed: ReturnDeed,
-    ) -> Result<NativeAdjointReturnTrace, NativeFullOperationError> {
+    ) -> Result<(NativeAdjointReturnTrace, BTreeMap<NativeTensorOrdinal, Vec<OverlayAtom<'chart>>>), NativeFullOperationError> {
         let started = std::time::Instant::now();
         let operations = self.ecology.operations.len();
         let terminal_start = operations
@@ -101,7 +104,11 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             .ok_or(NativeFullOperationError::Operation)?;
         let mut adjoint: BTreeMap<NativeCarrierOrdinal, ContemporaryCarrier<'chart>> =
             BTreeMap::new();
+        // Replay and pullback must see exactly the morphology that made the forward carriers.
+        // These move-owned deltas are published only after the complete return succeeds.
+        let mut deposits = BTreeMap::new();
         let mut trace = NativeAdjointReturnTrace {
+            held_overlay_rank: self.morphology_overlay_rank(),
             operations_returned: 0,
             layers_replayed: 0,
             deposits: Vec::new(),
@@ -111,11 +118,12 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             elapsed_milliseconds: 0,
         };
         // The tied contraction: its deposit was enacted with the differential; here it returns.
-        let returned = adjoint_contract(
+        let returned = adjoint_contract_with_overlays(
             self.residence,
             tied_population,
             &differential.section,
             differential.octaves,
+            self.overlay.get(&tied_population).map(Vec::as_slice).unwrap_or(&[]),
         )
         .map_err(|error| NativeFullOperationError::Adjoint(error.to_string()))?;
         trace.supports.push(self.support_of(&tied, &differential.section, differential.octaves)?);
@@ -150,7 +158,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             }
             trace.supports.push(self.support_of(&operation, &dy.section, dy.bound_octaves)?);
             let dy_octaves = dy.bound_octaves;
-            self.return_through(&operation, dy, &mut adjoint, &deed, &mut trace)
+            self.return_through(&operation, dy, &mut adjoint, &deed, &mut trace, &mut deposits)
                 .map_err(|error| {
                     let recent: Vec<String> = trace
                         .supports
@@ -171,18 +179,26 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                         })
                         .collect();
                     NativeFullOperationError::Adjoint(format!(
-                        "operation {} ({:?}) with a differential of {} octaves: {error}; recent returns: {}",
+                        "operation {} ({:?}) with a differential of {} octaves: {error}; resident octets {}; recent returns: {}",
                         operation.ordinal,
                         operation.primitive,
                         dy_octaves,
+                        self.census().resident_octets_now,
                         recent.join(" | ")
                     ))
                 })?;
             trace.operations_returned += 1;
+            // The reverse traversal has crossed this carrier's producer. No earlier producer
+            // can depend on its output in the admitted DAG, so its replay storage has no further
+            // use. Dissection keeps checkpoints for subsequent counterfactual probes.
+            self.carriers.remove(&operation.output);
+            if matches!(deed, ReturnDeed::Cultivate(_)) {
+                self.checkpoints.remove(&operation.output);
+            }
         }
         self.carriers.clear();
         trace.elapsed_milliseconds = started.elapsed().as_millis();
-        Ok(trace)
+        Ok((trace, deposits))
     }
 
     fn support_of(
@@ -330,6 +346,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         adjoint: &mut BTreeMap<NativeCarrierOrdinal, ContemporaryCarrier<'chart>>,
         deed: &ReturnDeed,
         trace: &mut NativeAdjointReturnTrace,
+        deposits: &mut BTreeMap<NativeTensorOrdinal, Vec<OverlayAtom<'chart>>>,
     ) -> Result<(), NativeFullOperationError> {
         let ordinal = operation.ordinal;
         match &operation.primitive {
@@ -381,7 +398,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                             )?
                         };
                         deposit.population = population.0;
-                        self.overlay.entry(population).or_default().push(atom);
+                        deposits.entry(population).or_default().push(atom);
                         trace.deposits.push(deposit);
                         if !trace.populations_deposited.contains(&population.0) {
                             trace.populations_deposited.push(population.0);
@@ -391,11 +408,12 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                         self.record_site_support(population, operation, &dy.section, None)?;
                     }
                 }
-                let returned = adjoint_contract(
+                let returned = adjoint_contract_with_overlays(
                     self.residence,
                     population,
                     &dy.section,
                     dy.bound_octaves,
+                    self.overlay.get(&population).map(Vec::as_slice).unwrap_or(&[]),
                 )
                 .map_err(|error| NativeFullOperationError::Adjoint(error.to_string()))?;
                 let returned = ContemporaryCarrier {

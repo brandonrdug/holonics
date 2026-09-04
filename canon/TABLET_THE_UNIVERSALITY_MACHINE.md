@@ -89,9 +89,10 @@ under another it is learned morphology, causal trajectory, neural network, or na
 <rho|T_gamma|x>
 ```
 
-reads one continuation face of situated construction `|x>` after history `gamma`. Training is a
-lineage pivot when a returned passage changes available transports `T_gamma`, that change survives
-source-detached rest/remount, and later current rides it. The same constituents recovered from
+reads one continuation face of situated construction `|x>` after history `gamma`. Training is
+developmental recurrence whose changed transports `T_gamma` are retained in the successor used
+by later current. Source-detached remount is a separate persistence/independence receiver when
+that claim is made, as the 2026-09-02 HNA correction states. The same constituents recovered from
 earlier mathematics or algorithms can then participate in later production because they are
 terrain, not retrieved descriptions.
 

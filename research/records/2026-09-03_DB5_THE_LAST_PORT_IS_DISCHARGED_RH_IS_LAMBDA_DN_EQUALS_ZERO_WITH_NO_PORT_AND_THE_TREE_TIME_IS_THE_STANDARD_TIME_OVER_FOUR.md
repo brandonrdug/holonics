@@ -1,6 +1,6 @@
 # DB5: the last port is discharged, RH is Λ_DN = 0 with no port, and the tree's time is the standard time over four
 
-**Date:** 2026-09-03  
+**Date:** 2026-09-03; falsifier wording corrected 2026-09-04  
 **Truth status:** `proved-derived`  
 **Evidence:** `formal-checked`, `source-inspected`  
 **Campaign:** DB5 under
@@ -42,7 +42,7 @@ incremental, each under the 180 s limit.
 
 ## The position of the RH line after this record
 
-[definition] Every theorem of the RH line is now unconditional: `RiemannHypothesis ↔ Λ_DN = 0`
+[proved-derived; formal-checked] The threshold characterization is now unconditional: `RiemannHypothesis ↔ Λ_DN = 0`
 with `Λ_DN ∈ [0, 1/8]` in the tree's coordinate, equivalently `Λstd ∈ [0, ½]` in the standard
 one. The first exact missing inequality is `Λ_DN ≤ 0`, which is RH; its falsifier is a zero of
 `ξ` off the seam. No route to it is known, and no later RH deed is scheduled by this record.
@@ -51,8 +51,13 @@ one. The first exact missing inequality is `Λ_DN ≤ 0`, which is RH; its falsi
 
 `#print axioms` deposited on the three axioms, root umbrella green under 180 s per owner, the
 port discharged, the bridge in Lean. **DB5 passes. The campaign is complete.** Falsifier: a
-standard time `t < ½` with `t/4 ∉ seamTimes` would contradict `Λstd_mem_Icc` only through
-`Λ_DN_le_eighth`, whose falsifier is a zero of `heatE (−1/8) ξ` off the seam.
+zero of `heatE (−1/8) ξ` off the seam, equivalently a nonreal zero of standard `H_{1/2}`,
+would contradict the proved seam-time membership. The up-set law excludes such a zero at
+every later standard time as well.
+
+[counterexample; formal-checked] The earlier wording used `t < ½` with `t/4 ∉ seamTimes` as
+a falsifier of the upper bound. It is withdrawn: `t = −1` already satisfies that condition by
+`DescentZeros.not_mem_seamTimes_of_neg`, consistently with `Λstd ∈ [0, ½]`.
 
 ## Boundaries
 

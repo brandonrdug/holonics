@@ -5,8 +5,9 @@
 //! generator word appended to the occurrence's addresses before the cycle; the signature of an
 //! occurrence is its face at every declared exposure (receiver, history).  Two occurrences are
 //! one class exactly when their signatures agree (`DeclaredFamily.Identified`); one separating
-//! exposure reopens a proposed class (`separatingExposure_reopens`).  Each exposure's cone is
-//! founded by joint intervention (SKE2); a class's cone is the union of its members' cones over
+//! exposure reopens a proposed class (`separatingExposure_reopens`). Each exposure carries
+//! supplied intervention masks; this quotient does not certify universal cone soundness.
+//! A class's mask is the union of its members' masks over
 //! every exposure, the extent of the family is the union of every cone (`DeclaredFamily.extent`),
 //! and the insufficiency is its complement together with every exposure the family did not
 //! declare (`DeclaredFamily.insufficiency`).  Nothing here selects an answer: the faces are the
@@ -26,7 +27,7 @@ pub struct NativeExposure {
     pub history: Vec<u32>,
 }
 
-/// One occurrence's face at one exposure with the cone the exposure founded, per population.
+/// One occurrence's face at one exposure with its supplied intervention mask, per population.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeExposureFace {
     pub occurrence: usize,
@@ -137,6 +138,11 @@ pub struct NativeSignatureQuotient {
 pub enum NativeIdentificationError {
     #[error("occurrence {occurrence} lacks its face at a declared exposure")]
     ExposureMissing { occurrence: usize },
+    #[error("occurrence {occurrence} has conflicting records at exposure {exposure:?}")]
+    ExposureConflict {
+        occurrence: usize,
+        exposure: NativeExposure,
+    },
     #[error("the cones of population {population} disagree in site count")]
     Sites { population: u32 },
     #[error("the family declares no exposure")]
@@ -146,7 +152,21 @@ pub enum NativeIdentificationError {
 impl NativeSignatureQuotient {
     /// Form the quotient from every (occurrence, exposure) face the card returned.  The
     /// exposures declared are exactly those present; every occurrence must carry every one.
+    /// Repeated testimony is accepted only when its complete stored record agrees; the
+    /// signature itself remains receiver-face equality, independent of testimony digests.
     pub fn found(faces: &[NativeExposureFace]) -> Result<Self, NativeIdentificationError> {
+        let mut observations = BTreeMap::new();
+        for face in faces {
+            let key = (face.occurrence, face.exposure.clone());
+            if let Some(previous) = observations.insert(key, face) {
+                if previous != face {
+                    return Err(NativeIdentificationError::ExposureConflict {
+                        occurrence: face.occurrence,
+                        exposure: face.exposure.clone(),
+                    });
+                }
+            }
+        }
         let mut exposures: Vec<NativeExposure> = faces.iter().map(|f| f.exposure.clone()).collect();
         exposures.sort();
         exposures.dedup();
@@ -157,25 +177,27 @@ impl NativeSignatureQuotient {
         occurrences.sort_unstable();
         occurrences.dedup();
         let face_of = |occurrence: usize, exposure: &NativeExposure| {
-            faces
-                .iter()
-                .find(|f| f.occurrence == occurrence && &f.exposure == exposure)
+            observations.get(&(occurrence, exposure.clone())).copied()
         };
         let mut signatures: Vec<(usize, NativeSignature)> = Vec::new();
         for occurrence in &occurrences {
             let mut signature = Vec::with_capacity(exposures.len());
             for exposure in &exposures {
-                let face = face_of(*occurrence, exposure)
-                    .ok_or(NativeIdentificationError::ExposureMissing {
+                let face = face_of(*occurrence, exposure).ok_or(
+                    NativeIdentificationError::ExposureMissing {
                         occurrence: *occurrence,
-                    })?;
+                    },
+                )?;
                 signature.push((exposure.clone(), face.face));
             }
             signatures.push((*occurrence, NativeSignature { faces: signature }));
         }
         let mut classes: Vec<NativeSignatureClass> = Vec::new();
         for (occurrence, signature) in &signatures {
-            match classes.iter_mut().find(|class| &class.signature == signature) {
+            match classes
+                .iter_mut()
+                .find(|class| &class.signature == signature)
+            {
                 Some(class) => class.occurrences.push(*occurrence),
                 None => classes.push(NativeSignatureClass {
                     ordinal: classes.len(),
@@ -192,10 +214,11 @@ impl NativeSignatureQuotient {
             let mut cone: BTreeMap<u32, NativeSiteBitmask> = BTreeMap::new();
             for occurrence in &class.occurrences {
                 for exposure in &exposures {
-                    let face = face_of(*occurrence, exposure)
-                        .ok_or(NativeIdentificationError::ExposureMissing {
+                    let face = face_of(*occurrence, exposure).ok_or(
+                        NativeIdentificationError::ExposureMissing {
                             occurrence: *occurrence,
-                        })?;
+                        },
+                    )?;
                     for (population, mask) in &face.cones {
                         join(&mut cone, *population, mask)?;
                     }
@@ -213,7 +236,8 @@ impl NativeSignatureQuotient {
         let extent_population: usize = extent.values().map(NativeSiteBitmask::population).sum();
         // The classes under the empty history alone, and every declared history that separates
         // two occurrences the empty history identified.
-        let empty: Vec<&NativeExposure> = exposures.iter().filter(|e| e.history.is_empty()).collect();
+        let empty: Vec<&NativeExposure> =
+            exposures.iter().filter(|e| e.history.is_empty()).collect();
         let mut coarse: Vec<Vec<usize>> = Vec::new();
         for (occurrence, signature) in &signatures {
             let key: Vec<u32> = signature
@@ -250,7 +274,9 @@ impl NativeSignatureQuotient {
                         if exposure.history.is_empty() {
                             continue;
                         }
-                        let (Some(a), Some(b)) = (face_of(*left, exposure), face_of(*right, exposure)) else {
+                        let (Some(a), Some(b)) =
+                            (face_of(*left, exposure), face_of(*right, exposure))
+                        else {
                             continue;
                         };
                         if a.face != b.face {
@@ -328,8 +354,13 @@ mod tests {
         assert_eq!(mask.to_sites(), sites);
         assert_eq!(mask.population(), 3);
         let other = NativeSiteBitmask::from_sites(&[false, true, false, false, true]);
-        assert_eq!(mask.union(&other).unwrap().to_sites(), [true, true, false, true, true]);
-        assert!(mask.union(&NativeSiteBitmask::from_sites(&[true])).is_none());
+        assert_eq!(
+            mask.union(&other).unwrap().to_sites(),
+            [true, true, false, true, true]
+        );
+        assert!(mask
+            .union(&NativeSiteBitmask::from_sites(&[true]))
+            .is_none());
     }
 
     #[test]
@@ -352,7 +383,10 @@ mod tests {
         assert_eq!(quotient.extent_population, 4);
         assert_eq!(quotient.insufficiency_population, 0);
         // Without the separating history the two are one class with the union cone.
-        let coarse: Vec<NativeExposureFace> = faces.into_iter().filter(|f| f.exposure.history.is_empty()).collect();
+        let coarse: Vec<NativeExposureFace> = faces
+            .into_iter()
+            .filter(|f| f.exposure.history.is_empty())
+            .collect();
         let quotient = NativeSignatureQuotient::found(&coarse).unwrap();
         assert_eq!(quotient.classes.len(), 2);
         assert_eq!(quotient.classes[0].occurrences, vec![0, 1]);
@@ -362,10 +396,48 @@ mod tests {
 
     #[test]
     fn a_missing_exposure_refuses() {
-        let faces = vec![face(0, &[], 7, &[true]), face(1, &[], 7, &[true]), face(0, &[1], 2, &[true])];
+        let faces = vec![
+            face(0, &[], 7, &[true]),
+            face(1, &[], 7, &[true]),
+            face(0, &[1], 2, &[true]),
+        ];
         assert_eq!(
             NativeSignatureQuotient::found(&faces),
             Err(NativeIdentificationError::ExposureMissing { occurrence: 1 })
+        );
+    }
+
+    #[test]
+    fn conflicting_duplicate_exposure_refuses_in_either_order() {
+        let first = face(0, &[], 7, &[true, false]);
+        let conflicts = [
+            face(0, &[], 9, &[true, false]),
+            face(0, &[], 7, &[false, true]),
+            NativeExposureFace {
+                exact_digest: "different testimony".into(),
+                ..first.clone()
+            },
+        ];
+        for conflict in conflicts {
+            for records in [[first.clone(), conflict.clone()], [conflict, first.clone()]] {
+                assert_eq!(
+                    NativeSignatureQuotient::found(&records),
+                    Err(NativeIdentificationError::ExposureConflict {
+                        occurrence: 0,
+                        exposure: exposure(&[]),
+                    })
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn identical_duplicate_testimony_preserves_the_quotient() {
+        let record = face(0, &[], 7, &[true, false]);
+        let other = face(1, &[], 9, &[false, true]);
+        assert_eq!(
+            NativeSignatureQuotient::found(&[record.clone(), other.clone(), record.clone()]),
+            NativeSignatureQuotient::found(&[other, record]),
         );
     }
 }

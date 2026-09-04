@@ -1,0 +1,314 @@
+{
+  "mode": "repeat",
+  "aperture": {
+    "learning_shift": 16,
+    "series_terms": 14
+  },
+  "context": [
+    155122,
+    4790,
+    76615,
+    21485,
+    236761
+  ],
+  "entering": [
+    155122,
+    4790,
+    76615,
+    21485,
+    236761,
+    5677,
+    76615,
+    563,
+    506,
+    2748,
+    529
+  ],
+  "first_face_selected": 42085,
+  "first_face_rendered": " Explain",
+  "first_cycle_milliseconds": 1221,
+  "transition_changed": true,
+  "operations_returned": 1271,
+  "layers_replayed": 43,
+  "deposits": 343,
+  "populations_deposited": 343,
+  "deposit_ranks_all_equal_context": true,
+  "lookups_reached": 2,
+  "supports_by_layer": [
+    {
+      "layer": null,
+      "operations": 11,
+      "nonzero_coordinates": 1766361,
+      "widest_interval": 233792
+    },
+    {
+      "layer": 41,
+      "operations": 26,
+      "nonzero_coordinates": 473183,
+      "widest_interval": 0
+    },
+    {
+      "layer": 40,
+      "operations": 26,
+      "nonzero_coordinates": 417064,
+      "widest_interval": 0
+    },
+    {
+      "layer": 39,
+      "operations": 26,
+      "nonzero_coordinates": 417267,
+      "widest_interval": 0
+    },
+    {
+      "layer": 38,
+      "operations": 26,
+      "nonzero_coordinates": 417269,
+      "widest_interval": 0
+    },
+    {
+      "layer": 37,
+      "operations": 26,
+      "nonzero_coordinates": 416951,
+      "widest_interval": 0
+    },
+    {
+      "layer": 36,
+      "operations": 26,
+      "nonzero_coordinates": 416782,
+      "widest_interval": 0
+    },
+    {
+      "layer": 35,
+      "operations": 26,
+      "nonzero_coordinates": 470832,
+      "widest_interval": 0
+    },
+    {
+      "layer": 34,
+      "operations": 26,
+      "nonzero_coordinates": 416753,
+      "widest_interval": 0
+    },
+    {
+      "layer": 33,
+      "operations": 26,
+      "nonzero_coordinates": 417357,
+      "widest_interval": 0
+    },
+    {
+      "layer": 32,
+      "operations": 26,
+      "nonzero_coordinates": 416389,
+      "widest_interval": 0
+    },
+    {
+      "layer": 31,
+      "operations": 26,
+      "nonzero_coordinates": 416707,
+      "widest_interval": 0
+    },
+    {
+      "layer": 30,
+      "operations": 26,
+      "nonzero_coordinates": 416368,
+      "widest_interval": 0
+    },
+    {
+      "layer": 29,
+      "operations": 26,
+      "nonzero_coordinates": 471297,
+      "widest_interval": 0
+    },
+    {
+      "layer": 28,
+      "operations": 26,
+      "nonzero_coordinates": 416778,
+      "widest_interval": 0
+    },
+    {
+      "layer": 27,
+      "operations": 26,
+      "nonzero_coordinates": 416031,
+      "widest_interval": 0
+    },
+    {
+      "layer": 26,
+      "operations": 26,
+      "nonzero_coordinates": 417096,
+      "widest_interval": 0
+    },
+    {
+      "layer": 25,
+      "operations": 26,
+      "nonzero_coordinates": 416367,
+      "widest_interval": 0
+    },
+    {
+      "layer": 24,
+      "operations": 26,
+      "nonzero_coordinates": 416003,
+      "widest_interval": 0
+    },
+    {
+      "layer": 23,
+      "operations": 33,
+      "nonzero_coordinates": 505856,
+      "widest_interval": 0
+    },
+    {
+      "layer": 22,
+      "operations": 33,
+      "nonzero_coordinates": 440312,
+      "widest_interval": 0
+    },
+    {
+      "layer": 21,
+      "operations": 33,
+      "nonzero_coordinates": 439092,
+      "widest_interval": 0
+    },
+    {
+      "layer": 20,
+      "operations": 33,
+      "nonzero_coordinates": 437604,
+      "widest_interval": 0
+    },
+    {
+      "layer": 19,
+      "operations": 33,
+      "nonzero_coordinates": 436306,
+      "widest_interval": 0
+    },
+    {
+      "layer": 18,
+      "operations": 33,
+      "nonzero_coordinates": 436862,
+      "widest_interval": 0
+    },
+    {
+      "layer": 17,
+      "operations": 33,
+      "nonzero_coordinates": 511172,
+      "widest_interval": 0
+    },
+    {
+      "layer": 16,
+      "operations": 33,
+      "nonzero_coordinates": 436264,
+      "widest_interval": 0
+    },
+    {
+      "layer": 15,
+      "operations": 33,
+      "nonzero_coordinates": 437198,
+      "widest_interval": 0
+    },
+    {
+      "layer": 14,
+      "operations": 33,
+      "nonzero_coordinates": 437418,
+      "widest_interval": 0
+    },
+    {
+      "layer": 13,
+      "operations": 33,
+      "nonzero_coordinates": 437142,
+      "widest_interval": 0
+    },
+    {
+      "layer": 12,
+      "operations": 33,
+      "nonzero_coordinates": 435806,
+      "widest_interval": 0
+    },
+    {
+      "layer": 11,
+      "operations": 33,
+      "nonzero_coordinates": 510688,
+      "widest_interval": 0
+    },
+    {
+      "layer": 10,
+      "operations": 33,
+      "nonzero_coordinates": 437616,
+      "widest_interval": 0
+    },
+    {
+      "layer": 9,
+      "operations": 33,
+      "nonzero_coordinates": 436706,
+      "widest_interval": 0
+    },
+    {
+      "layer": 8,
+      "operations": 33,
+      "nonzero_coordinates": 436656,
+      "widest_interval": 0
+    },
+    {
+      "layer": 7,
+      "operations": 33,
+      "nonzero_coordinates": 436640,
+      "widest_interval": 0
+    },
+    {
+      "layer": 6,
+      "operations": 33,
+      "nonzero_coordinates": 435689,
+      "widest_interval": 0
+    },
+    {
+      "layer": 5,
+      "operations": 33,
+      "nonzero_coordinates": 502164,
+      "widest_interval": 0
+    },
+    {
+      "layer": 4,
+      "operations": 33,
+      "nonzero_coordinates": 436884,
+      "widest_interval": 0
+    },
+    {
+      "layer": 3,
+      "operations": 33,
+      "nonzero_coordinates": 436130,
+      "widest_interval": 0
+    },
+    {
+      "layer": 2,
+      "operations": 33,
+      "nonzero_coordinates": 437101,
+      "widest_interval": 0
+    },
+    {
+      "layer": 1,
+      "operations": 33,
+      "nonzero_coordinates": 434423,
+      "widest_interval": 0
+    },
+    {
+      "layer": 0,
+      "operations": 33,
+      "nonzero_coordinates": 437064,
+      "widest_interval": 0
+    }
+  ],
+  "return_milliseconds": 3014,
+  "overlay_rank_after": 1720,
+  "second_cycle_milliseconds": 4674,
+  "second_face_selected": 506,
+  "second_face_rendered": " the",
+  "second_emission_digest": "8cbbcd7875106aad",
+  "repeated_return": {
+    "predecessor_generation": 2550,
+    "successor_generation": 3825,
+    "overlay_rank_before": 1720,
+    "overlay_rank_used_by_return": 1720,
+    "overlay_rank_after": 5504,
+    "operations_returned": 1271,
+    "cross_sections_deposited": 344,
+    "cycle_milliseconds": 6464,
+    "emission_digest": "9a1245ec3ab55a45"
+  }
+}

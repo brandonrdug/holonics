@@ -350,8 +350,17 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             aperture,
         )?;
         deposit.population = tied.0;
-        self.overlay.entry(tied).or_default().push(atom);
-        let adjoint = self.adjoint_return(differential, ReturnDeed::Cultivate(aperture))?;
+        // The receiver has consumed these terminal sections; the return now owns its
+        // differential and staged atom. Their old device storage is not part of the pullback.
+        self.terminal_carrier = None;
+        self.terminal_reacted = None;
+        self.terminal_presented = None;
+        self.terminal_contracted = None;
+        let (adjoint, mut deposits) = self.adjoint_return(differential, ReturnDeed::Cultivate(aperture))?;
+        deposits.entry(tied).or_default().push(atom);
+        for (population, atoms) in deposits {
+            self.overlay.entry(population).or_default().extend(atoms);
+        }
         Ok(NativeMorphologyTransition::Changed {
             operation: 0,
             deposit,

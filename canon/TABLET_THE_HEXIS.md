@@ -5,7 +5,7 @@
 `definition` for the lifecycle and receiver-exact condensation criterion; `interpretation` for the
 industry crosswalk, illicium vocabulary, crystal/fractal model morphology, and inherited-model
 dismantling; `established-bounded` only for the individual owners whose own deposits carry that grade;
-`open` for the joined Soulkiller-spool and Eros-cultivation cycle.
+`open` for extensions beyond the receiver families of the completed HNA/SKE contracts.
 **Derivation:**
 `research/records/2026-08-18_HEXIS_IS_RESTED_CONDITIONAL_TRANSPORT_TUNING_DEFORMS_IT_AND_DISTILLATION_CONDENSES_FAMILIES.md`.
 **Governing documents:** `canon/THE_HOLOBROCHOS_SPINE.md`, `canon/TABLET_THE_REASONING_CYCLE.md`,
@@ -28,13 +28,16 @@ For standing `S`, proposed hexis `H`, passage `p`, and declared receiver family 
 Conduct(S + H, p) !=_R Conduct(S, p),
 ```
 
-with the movement surviving source-detached rest and targeted removal of `H` removing the
-attributable consequence. Parameter weights, adapters, lattices, state equations, codec routes, and
-generated organs may realize hexis. No one representation defines it.
+with persistence tested by rest/remount when claimed, and causal attribution tested by targeted
+removal when claimed. Source detachment is an additional independence question, not the definition
+of every hexis. Parameter weights, adapters, lattices, state equations, codec routes and generated
+organs may realize hexis. No one representation defines it.
 
-`project-postulate`: cultivation is the world-mediated return which changes reusable morphology.
-Exposure presents material. Reference consults retained testimony. Prompting mounts contemporary
-material. None becomes cultivation merely by changing an output in one event.
+`project-postulate`: cultivation is ordinary recurrence whose operation changes reusable
+morphology. Its successor is used by the next operation. Exposure presents material, reference
+consults retained testimony, and prompting presents contemporary material; no special world
+verdict or later commit gives an occurrence its power to change morphology. A changed output
+alone does not establish a changed morphology. The HNA correction of 2026-09-02 governs.
 
 ## 2. The industry cultivates through several distinct cuts
 
@@ -290,9 +293,9 @@ foreign rest
     -> familywise condensation into source-neutral native spools
     -> sealed spool bundle + cold witness + insufficiency.
 
-Eros standing + native spools + genuinely returned caused material
-    -> cultivation into one Athena morphology
-    -> rest, remount, later conduct, ablation.
+Eros standing + native spools + ordinary caused occurrences
+    -> operations returning the successor Athena ecology
+    -> further recurrence and optional rest or attribution controls.
 ```
 
 The original training corpus is unnecessary only for those receiver/history families whose relevant
@@ -337,21 +340,19 @@ becomes source-neutral native construction material:
 excite -> intervene/dissect -> thread -> condense -> spool -> seal.
 ```
 
-The target is not a renamed transformer, converted file, or directly returned Athena. Soulkiller
-ends at `NativeSpoolBundle`, `ExteriorSoulkillerWitness`, and `ReceiverInsufficiency`. The foreign
-body may remain live only inside Soulkiller while threads are founded and tested against matched
-controls. The witness is cold lineage/reconstruction testimony outside every Athena dependency
-closure. Eros alone composes spools and returned world consequences into native ecological
-morphology.
+Soulkiller ends at a source-neutral productive lane, separate cold witness and explicit
+insufficiency. Under the completed SKE contract the resident HNA1 realization is the excitation
+apparatus; its signature classes return restricted native operator ecologies, and Eros composes
+them into Athena. A converted file or renamed realization alone does not establish that return.
 
-`definition`: Soulkiller is a one-way scrapyard boundary. Any source-specific coordinate, operator
-factorization, topology, identity, state/cache convention, or execution law may be load-bearing
-inside Soulkiller intake, excitation, dissection, reconstruction, and controls. After the return,
-they do not qualify Athena, determine its topology, or remain reachable from Holonic Inference.
-Source-detached rest means that later conduct survives with the foreign realization, its witness,
-its executors, and its architecture physically unavailable—not merely that the original weight
-files are absent. A richer receiver which reopens a fibre returns insufficiency; it does not reopen
-the foreign realization as a fallback.
+`definition`: Brandon's 2026-09-04 ruling supersedes this section's old blanket scrapyard test.
+The admitted native operator, cross-sections, incidence and decoder may retain inherited
+mathematical structure; that provenance does not revoke their Athena grade. Foreign names remain
+cold lineage, and a witness or exterior executor cannot silently supply the native consequence.
+A source-detached claim names the absent original material and the actual retained decoder.
+Rest/remount, source-access and ablation controls answer their declared storage, independence
+and attribution questions. A richer receiver outside the family returns insufficiency rather
+than silently reopening an exterior executor.
 
 Native Eros/Athena and the inherited dismantling arm are complementary experiments. The native body asks
 what Eros founds without foreign hexis. The inherited arm asks what prior development can be lifted.
@@ -373,11 +374,12 @@ reconstruction fibre and does not license foreign execution inside Athena.
 - Compare source and candidate transports through explicit cross-chart maps and successor histories.
 - Treat a pretrained map as inherited hexis, never as its lost corpus or as the whole productive
   ecology.
-- Require source-detached rest, held-out later conduct, matched siblings, and targeted ablation for
-  every cultivation or Soulkiller-spool claim.
-- Audit the mounted hot dependency closure: a wrapper around a foreign runtime is Soulkiller
-  transition material even when original model files are absent, and it must not receive an Athena
-  grade. Soulkiller returns parts; Eros alone returns Athena.
+- Require source-detached rest, held-out conduct, matched siblings and ablation when the specific
+  persistence, independence or attribution claim or admitted contract calls for them. They do
+  not define every cultivation or Soulkiller return.
+- Audit the actual productive owner and its declared decoder. Respect the SKE construction
+  admitted by Brandon's 2026-09-04 ruling; do not reapply the superseded foreign-tower test.
+  Soulkiller returns native class bodies; Eros composes Athena.
 - Compose existing owners before founding a FineTuner, Distiller, Autograd, Trainer, AdapterManager,
   or another industry-shaped cabinet.
 

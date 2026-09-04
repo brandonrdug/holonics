@@ -23,6 +23,7 @@ pub(super) struct MomentResidentContextState {
 }
 
 pub(super) struct MomentFrontPlan<'a> {
+    pub(super) post_target_observer: bool,
     pub(super) factored_receiver_history: ResidentFactoredReceiverHistoryReceipt,
     pub(super) resident_current: Option<ResidentCurrentAddress>,
     pub(super) resident_boundary: Option<&'a ResidentBoundaryRestrictionFront>,
@@ -333,10 +334,12 @@ impl<'a> MomentFrontAdmission<'a> {
             resident_rectangular_restrictions,
             restriction_count,
         } = self;
-        // Completion and relational comparison are different receiver events.  A lawful target
-        // can be observed without a separately mounted relational-current chart; in that case the
-        // ordinary resident contraction observes the completed factor-current section.
-        let post_target_observer = false;
+        // With its relational-current chart present, observe the committed target directly;
+        // applying its outgoing restrictions again would change the receiver consequence.
+        // Without that chart, the ordinary contraction observes the completed factor-current
+        // section. A front with no completed step still follows its original transport path.
+        let post_target_observer =
+            completed_step.is_some() && word.sparse_relational_current.is_some();
         let native_factors = word.factors as usize;
         let generator_count = front.generator_count as usize;
 
@@ -1043,6 +1046,7 @@ impl<'a> MomentFrontAdmission<'a> {
         }
 
         Ok(MomentFrontPlan {
+            post_target_observer,
             factored_receiver_history,
             resident_current,
             resident_boundary,
