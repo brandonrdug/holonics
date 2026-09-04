@@ -20,6 +20,7 @@ open Soma.Holonics.RH.EventBounds
 open Soma.Holonics.RH.EventGaussian
 open Soma.Holonics.RH.EventPieces
 open Soma.Holonics.RH.EventHorizontal
+open Soma.Holonics.RH.EventAssembly
 open Soma.Holonics.RH.EventExplicit
 
 /-! ## The parameter constants -/
@@ -94,5 +95,336 @@ theorem Z_le {t X : ℝ} (ht : 0 ≤ t) (hX : 0 ≤ X) {L u : ℝ} (hL : 0 ≤ L
   have hcξ : 0 ≤ cξ t X := by unfold cξ; linarith
   have h4 := mul_le_mul_of_nonneg_left h2 hcξ
   linarith
+
+/-! ## The majorants of the four pieces -/
+
+/-- `c₃ = 3/(32t)`, the Gaussian decay rate of the window estimates. -/
+def c₃ (t : ℝ) : ℝ := 3 / (32 * t)
+def I₀ (t : ℝ) : ℝ := √(π / c₃ t)
+def I₃ (t : ℝ) : ℝ := 7 * (c₃ t) ^ (-(3 / 2 : ℝ)) * √(π / (3 * c₃ t / 4))
+
+def Amaj (t u : ℝ) : ℝ := (12 * t + 12 * t ^ 2) / u
+def Bmaj' (t u : ℝ) : ℝ := (36 * t + 4 * t * (3 + 6 * t) ^ 2) / u
+def β₃maj (t u : ℝ) : ℝ :=
+  2 * Real.exp (8 * t) * ((12864 * t ^ 3 + 2 * π / 3) * I₀ t + 1608 * I₃ t) / u
+def β₄maj (t u : ℝ) : ℝ :=
+  2 * Real.exp (8 * t) * √(2 * π / c₃ t) * Real.exp (-(c₃ t / 2) * (u ^ 2 / 20) ^ 2)
+def Dmaj (t u : ℝ) : ℝ := Real.exp 1 / √(2 * π * t) * (β₃maj t u + β₄maj t u)
+def Mmaj (t X u : ℝ) : ℝ :=
+  Real.exp ((c₁ t X ^ 2 * u ^ 2 - u ^ 4 / 1600) / (4 * t)) *
+    (Real.exp (π / 4) * (√(2 * π) / 2 * (cZ t X * u ^ 3) ^ 2 *
+      (cZ t X * u ^ 3) ^ ((cξ t X * u + 1) / 2) * (π * Real.exp 1) ^ (cξ t X * u / 2)))
+def Tmaj (t X u : ℝ) : ℝ :=
+  2 * (Real.exp (c₁ t X ^ 2 * u ^ 2 / (4 * t)) / (2 * π)) * (1 + u ^ 3 + 4 * √t) *
+    √(64 * π * t) * Real.exp (-(u ^ 4 / (25600 * t)))
+def Γmaj (t X u : ℝ) : ℝ :=
+  (1 / cg X) * (2 * u ^ 3) ^ ((X + 1) / 2) * Real.exp (π * u ^ 3) * Real.exp (t * π ^ 2 / 4)
+def Emaj (t X u : ℝ) : ℝ :=
+  (2 * Mmaj t X u * (cξ t X * u) + Tmaj t X u) * (√(4 * π * t))⁻¹ * Γmaj t X u
+/-- The majorant of the relative defect. -/
+def Bmaj (t X u : ℝ) : ℝ :=
+  (Amaj t u * (1 + Bmaj' t u) + Bmaj' t u) * (1 + Dmaj t u) + Dmaj t u + Emaj t X u
+
+theorem norm_q_le_u {t : ℝ} (ht : 0 < t) {s : ℂ} (hs2 : 2 ≤ ‖s‖) {u L : ℝ} (hu : 1 ≤ u)
+    (hy : s.im = u ^ 3) (hL : 0 ≤ L) (hLu : L ≤ u) : ‖q s (2 * t * L)‖ ≤ (3 + 6 * t) / u ^ 2 := by
+  have hu0 : 0 < u := by linarith
+  have hsu := norm_s_ge hy hu0.le
+  refine (norm_q_le hs2 (by positivity)).trans ?_
+  have h1 : 3 + 3 * (2 * t * L) ≤ (3 + 6 * t) * u := by nlinarith [mul_le_mul_of_nonneg_left hLu ht.le]
+  calc (3 + 3 * (2 * t * L)) / ‖s‖ ≤ ((3 + 6 * t) * u) / u ^ 3 := by gcongr
+    _ = (3 + 6 * t) / u ^ 2 := by
+        field_simp
+        first | done | ring
+
+theorem u_le_cube {u : ℝ} (hu : 1 ≤ u) : u ≤ u ^ 3 := by
+  nlinarith [mul_nonneg (mul_nonneg (by linarith : (0 : ℝ) ≤ u) (sub_nonneg.mpr hu))
+    (by linarith : (0 : ℝ) ≤ u + 1)]
+
+theorem I₀_nonneg (t : ℝ) : 0 ≤ I₀ t := Real.sqrt_nonneg _
+theorem I₃_nonneg {t : ℝ} (ht : 0 < t) : 0 ≤ I₃ t := by
+  unfold I₃
+  have := Real.rpow_nonneg (by unfold c₃; positivity : (0 : ℝ) ≤ c₃ t) (-(3 / 2 : ℝ))
+  positivity
+theorem Dmaj_nonneg {t : ℝ} (ht : 0 < t) {u : ℝ} (hu : 0 ≤ u) : 0 ≤ Dmaj t u := by
+  unfold Dmaj β₃maj β₄maj
+  have := I₀_nonneg t; have := I₃_nonneg ht
+  positivity
+
+theorem a_le_Amaj {t : ℝ} (ht : 0 < t) {s : ℂ} {u L : ℝ} (hu : 1 ≤ u) (hsu : u ^ 3 ≤ ‖s‖)
+    (hL : 0 ≤ L) (hLu : L ≤ u) : 2 * ((6 * t * L + 6 * t ^ 2 * L ^ 2) / ‖s‖) ≤ Amaj t u := by
+  have hu0 : 0 < u := by linarith
+  unfold Amaj
+  have h1 : 6 * t * L + 6 * t ^ 2 * L ^ 2 ≤ (6 * t + 6 * t ^ 2) * u ^ 2 := by
+    have e1 : t * L ≤ t * u := mul_le_mul_of_nonneg_left hLu ht.le
+    have e2 : L ^ 2 ≤ u ^ 2 := pow_le_pow_left₀ hL hLu 2
+    nlinarith [mul_le_mul_of_nonneg_left e2 (by positivity : (0 : ℝ) ≤ 6 * t ^ 2),
+      mul_nonneg ht.le (sub_nonneg.mpr hu), mul_nonneg ht.le hu0.le]
+  calc 2 * ((6 * t * L + 6 * t ^ 2 * L ^ 2) / ‖s‖) ≤ 2 * (((6 * t + 6 * t ^ 2) * u ^ 2) / u ^ 3) := by
+        gcongr
+    _ = (12 * t + 12 * t ^ 2) / u := by
+        field_simp
+        first | done | ring
+
+theorem b_le_Bmaj' {t : ℝ} (ht : 0 < t) {s : ℂ} {u L : ℝ} (hu : 1 ≤ u) (hsu : u ^ 3 ≤ ‖s‖)
+    (hqu : ‖q s (2 * t * L)‖ ≤ (3 + 6 * t) / u ^ 2) :
+    36 * t / ‖s‖ + 4 * t * ‖q s (2 * t * L)‖ ^ 2 ≤ Bmaj' t u := by
+  have hu0 : 0 < u := by linarith
+  unfold Bmaj'
+  have h1 : 36 * t / ‖s‖ ≤ 36 * t / u := by
+    apply div_le_div_of_nonneg_left (by positivity) hu0
+    linarith [u_le_cube hu]
+  have h2 : ‖q s (2 * t * L)‖ ^ 2 ≤ (3 + 6 * t) ^ 2 / u := by
+    calc ‖q s (2 * t * L)‖ ^ 2 ≤ ((3 + 6 * t) / u ^ 2) ^ 2 := pow_le_pow_left₀ (norm_nonneg _) hqu 2
+      _ = (3 + 6 * t) ^ 2 / u ^ 4 := by ring
+      _ ≤ (3 + 6 * t) ^ 2 / u := by
+          apply div_le_div_of_nonneg_left (by positivity) hu0
+          nlinarith [u_le_cube hu, mul_le_mul_of_nonneg_left (u_le_cube hu) hu0.le]
+  calc 36 * t / ‖s‖ + 4 * t * ‖q s (2 * t * L)‖ ^ 2 ≤ 36 * t / u + 4 * t * ((3 + 6 * t) ^ 2 / u) := by
+        gcongr
+    _ = (36 * t + 4 * t * (3 + 6 * t) ^ 2) / u := by ring
+
+theorem β₃_le_β₃maj {t : ℝ} (ht : 0 < t) {s : ℂ} {u L : ℝ} (hu : 1 ≤ u) (hsu : u ^ 3 ≤ ‖s‖)
+    (hL : 0 ≤ L) (hLu : L ≤ u) : β₃ t s (2 * t * L) ≤ β₃maj t u := by
+  have hu0 : 0 < u := by linarith
+  have hs0 : 0 < ‖s‖ := by nlinarith [pow_pos hu0 3]
+  unfold β₃ β₃maj
+  have hI₀ := I₀_nonneg t
+  have hI₃ := I₃_nonneg ht
+  have e1 : 1608 * (2 * t * L) ^ 3 / ‖s‖ ^ 2 ≤ 12864 * t ^ 3 / u := by
+    have : (2 * t * L) ^ 3 ≤ 8 * t ^ 3 * u ^ 3 := by
+      have := pow_le_pow_left₀ hL hLu 3
+      nlinarith [pow_nonneg ht.le 3]
+    calc 1608 * (2 * t * L) ^ 3 / ‖s‖ ^ 2 ≤ 1608 * (8 * t ^ 3 * u ^ 3) / (u ^ 3) ^ 2 := by
+          gcongr
+      _ = 12864 * t ^ 3 / u ^ 3 := by
+          field_simp
+          first | done | ring
+      _ ≤ 12864 * t ^ 3 / u := by
+          apply div_le_div_of_nonneg_left (by positivity) hu0
+          linarith [u_le_cube hu]
+  have e2 : 2 * π / (3 * ‖s‖) ≤ (2 * π / 3) / u := by
+    have : (2 * π / 3) / u = 2 * π / (3 * u) := by
+      field_simp
+    rw [this]
+    apply div_le_div_of_nonneg_left (by positivity) (by positivity)
+    linarith [u_le_cube hu]
+  have e3 : 1608 / ‖s‖ ^ 2 ≤ 1608 / u := by
+    apply div_le_div_of_nonneg_left (by norm_num) hu0
+    have hs1 : 1 ≤ ‖s‖ := by linarith [u_le_cube hu]
+    nlinarith [u_le_cube hu, mul_le_mul_of_nonneg_left hs1 (by linarith : (0 : ℝ) ≤ ‖s‖)]
+  have hI₀' : √(π / (3 / (32 * t))) = I₀ t := rfl
+  have hI₃' : 7 * (3 / (32 * t)) ^ (-(3 / 2 : ℝ)) * √(π / (3 * (3 / (32 * t)) / 4)) = I₃ t := rfl
+  rw [hI₀', hI₃']
+  calc 2 * Real.exp (8 * t) * ((1608 * (2 * t * L) ^ 3 / ‖s‖ ^ 2 + 2 * π / (3 * ‖s‖)) * I₀ t +
+        1608 / ‖s‖ ^ 2 * I₃ t)
+      ≤ 2 * Real.exp (8 * t) * ((12864 * t ^ 3 / u + (2 * π / 3) / u) * I₀ t + 1608 / u * I₃ t) := by
+        gcongr
+    _ = 2 * Real.exp (8 * t) * ((12864 * t ^ 3 + 2 * π / 3) * I₀ t + 1608 * I₃ t) / u := by
+        field_simp
+        first | done | ring
+
+theorem d_le_Dmaj {t : ℝ} (ht : 0 < t) {s : ℂ} {u L : ℝ} (hu : 0 ≤ u) (hL : 0 ≤ L)
+    (hq2 : 2 * t * ‖q s (2 * t * L)‖ ^ 2 ≤ 1) (hβ₃ : β₃ t s (2 * t * L) ≤ β₃maj t u) :
+    (β₃ t s (2 * t * L) + β₄ t (u ^ 2 / 20)) /
+      (√(2 * π * t) * Real.exp (-(2 * t * ‖q s (2 * t * L)‖ ^ 2))) ≤ Dmaj t u := by
+  unfold Dmaj
+  have hI₀ := I₀_nonneg t
+  have hI₃ := I₃_nonneg ht
+  have hβ₄ : β₄ t (u ^ 2 / 20) = β₄maj t u := rfl
+  have hβ₃0 : 0 ≤ β₃ t s (2 * t * L) := by unfold β₃; positivity
+  have hβ₄0 : 0 ≤ β₄ t (u ^ 2 / 20) := by unfold β₄; positivity
+  have hm0 : 0 ≤ β₃maj t u + β₄maj t u := by unfold β₃maj β₄maj; positivity
+  have hden : √(2 * π * t) * Real.exp (-1) ≤
+      √(2 * π * t) * Real.exp (-(2 * t * ‖q s (2 * t * L)‖ ^ 2)) := by
+    apply mul_le_mul_of_nonneg_left _ (Real.sqrt_nonneg _)
+    exact Real.exp_le_exp.mpr (by linarith)
+  have hden0 : 0 < √(2 * π * t) * Real.exp (-1) := by positivity
+  calc (β₃ t s (2 * t * L) + β₄ t (u ^ 2 / 20)) /
+        (√(2 * π * t) * Real.exp (-(2 * t * ‖q s (2 * t * L)‖ ^ 2)))
+      ≤ (β₃maj t u + β₄maj t u) / (√(2 * π * t) * Real.exp (-1)) := by
+        apply div_le_div₀ hm0 _ hden0 hden
+        rw [hβ₄]
+        exact add_le_add hβ₃ le_rfl
+    _ = Real.exp 1 / √(2 * π * t) * (β₃maj t u + β₄maj t u) := by
+        rw [Real.exp_neg]
+        field_simp
+
+theorem Mmaj_nonneg {t X u : ℝ} (hcZ : 0 ≤ cZ t X * u ^ 3) : 0 ≤ Mmaj t X u := by
+  unfold Mmaj
+  apply mul_nonneg (Real.exp_pos _).le
+  apply mul_nonneg (Real.exp_pos _).le
+  apply mul_nonneg (mul_nonneg (mul_nonneg (by positivity) (sq_nonneg _))
+    (Real.rpow_nonneg hcZ _)) (Real.rpow_nonneg (by positivity) _)
+
+theorem MH_nonneg {t X h Y y ξ₁ : ℝ} (hZ : 0 ≤ X + h + 2 + y + Y) : 0 ≤ MH t X h Y y ξ₁ := by
+  unfold MH
+  apply mul_nonneg (Real.exp_pos _).le
+  apply mul_nonneg (Real.exp_pos _).le
+  apply mul_nonneg (mul_nonneg (mul_nonneg (by positivity) (sq_nonneg _))
+    (Real.rpow_nonneg hZ _)) (Real.rpow_nonneg (by positivity) _)
+
+theorem MH_le_Mmaj {t X : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) {u L ξ₁ : ℝ} (hu : 1 ≤ u)
+    (hL : 0 ≤ L) (hLu : L ≤ u) (hξ₁0 : 0 ≤ ξ₁) (hξ₁ : ξ₁ ≤ c₁ t X * u)
+    (hY2 : 2 * t * π ≤ u ^ 2 / 20) :
+    MH t X (2 * t * L) (u ^ 2 / 20) (u ^ 3) ξ₁ ≤ Mmaj t X u := by
+  have hu0 : 0 < u := by linarith
+  have hZ := Z_le ht.le hX0 hL hLu hu
+  have hξ := ξ_le ht.le hX0 hL hLu hu
+  have hcξ : 0 ≤ cξ t X := by unfold cξ; positivity
+  have hZ0 : 0 ≤ X + 2 * t * L + 2 + u ^ 3 + u ^ 2 / 20 := by positivity
+  have hcZ1 : 1 ≤ cZ t X * u ^ 3 := by
+    have hu3 : 1 ≤ u ^ 3 := one_le_pow₀ hu
+    unfold cZ
+    nlinarith
+  unfold MH Mmaj
+  have hexp : ξ₁ ^ 2 - (u ^ 2 / 20 - t * π) ^ 2 ≤ c₁ t X ^ 2 * u ^ 2 - u ^ 4 / 1600 := by
+    have e1 : ξ₁ ^ 2 ≤ (c₁ t X * u) ^ 2 := pow_le_pow_left₀ hξ₁0 hξ₁ 2
+    have e2 : (u ^ 2 / 40) ^ 2 ≤ (u ^ 2 / 20 - t * π) ^ 2 := by
+      apply pow_le_pow_left₀ (by positivity)
+      nlinarith [Real.pi_pos]
+    nlinarith
+  have hπe : 1 ≤ π * Real.exp 1 := by nlinarith [Real.pi_gt_three, Real.add_one_le_exp 1]
+  have e3 : (X + 2 * t * L + 2 + u ^ 3 + u ^ 2 / 20) ^ ((X + 2 * t * L + 2 + 1) / 2) ≤
+      (cZ t X * u ^ 3) ^ ((cξ t X * u + 1) / 2) :=
+    (Real.rpow_le_rpow hZ0 hZ (by positivity)).trans
+      (Real.rpow_le_rpow_of_exponent_le hcZ1 (by linarith))
+  have e4 : (π * Real.exp 1) ^ ((X + 2 * t * L + 2) / 2) ≤ (π * Real.exp 1) ^ (cξ t X * u / 2) :=
+    Real.rpow_le_rpow_of_exponent_le hπe (by linarith)
+  have e5 : (X + 2 * t * L + 2 + u ^ 3 + u ^ 2 / 20) ^ 2 ≤ (cZ t X * u ^ 3) ^ 2 :=
+    pow_le_pow_left₀ hZ0 hZ 2
+  apply mul_le_mul (Real.exp_le_exp.mpr (div_le_div_of_nonneg_right hexp (by positivity)))
+    _ (by positivity) (Real.exp_pos _).le
+  apply mul_le_mul_of_nonneg_left _ (Real.exp_pos _).le
+  exact mul_le_mul (mul_le_mul (mul_le_mul_of_nonneg_left e5 (by positivity)) e3
+    (by positivity) (by positivity)) e4 (by positivity) (by positivity)
+
+theorem T_le_Tmaj {t X : ℝ} (ht : 0 < t) {u ξ₁ : ℝ} (hu : 1 ≤ u)
+    (hξ₁0 : 0 ≤ ξ₁) (hξ₁ : ξ₁ ≤ c₁ t X * u) :
+    2 * (Real.exp (ξ₁ ^ 2 / (4 * t)) / (2 * π)) * (1 + |u ^ 3| + 4 * √t) * √(64 * π * t) *
+      Real.exp (-((u ^ 2 / 20) ^ 2 / (64 * t))) ≤ Tmaj t X u := by
+  have hu0 : 0 < u := by linarith
+  unfold Tmaj
+  rw [abs_of_nonneg (by positivity)]
+  have e1 : Real.exp (ξ₁ ^ 2 / (4 * t)) ≤ Real.exp (c₁ t X ^ 2 * u ^ 2 / (4 * t)) := by
+    apply Real.exp_le_exp.mpr
+    apply div_le_div_of_nonneg_right _ (by positivity)
+    have := pow_le_pow_left₀ hξ₁0 hξ₁ 2
+    nlinarith
+  have e2 : Real.exp (-((u ^ 2 / 20) ^ 2 / (64 * t))) = Real.exp (-(u ^ 4 / (25600 * t))) := by
+    congr 1
+    field_simp
+    first | done | ring
+  rw [e2]
+  gcongr
+
+theorem inv_γlow_le_Γmaj {t X : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) {s : ℂ} {u : ℝ} (hu : 1 ≤ u)
+    (hs1 : 1 ≤ ‖s‖) (hs2u : ‖s‖ ≤ 2 * u ^ 3) : 1 / γlow t X s ≤ Γmaj t X u := by
+  have hu0 : 0 < u := by linarith
+  have hs0 : 0 < ‖s‖ := by linarith
+  unfold γlow Γmaj
+  have hcg := cg_pos X
+  have h1 : 1 ≤ ‖s‖ ^ 2 := one_le_pow₀ hs1
+  have h2 : ‖s‖ ^ (-((X + 1) / 2)) = (‖s‖ ^ ((X + 1) / 2))⁻¹ := Real.rpow_neg hs0.le _
+  have h3 : ‖s‖ ^ ((X + 1) / 2) ≤ (2 * u ^ 3) ^ ((X + 1) / 2) :=
+    Real.rpow_le_rpow hs0.le hs2u (by positivity)
+  have h4 : Real.exp (-(π * u ^ 3)) ≤ Real.exp (-(π * ‖s‖ / 2)) := by
+    apply Real.exp_le_exp.mpr
+    nlinarith [Real.pi_pos]
+  have hpos2 : 0 < (2 * u ^ 3) ^ ((X + 1) / 2) := Real.rpow_pos_of_pos (by positivity) _
+  have h5 : ((2 * u ^ 3) ^ ((X + 1) / 2))⁻¹ ≤ (‖s‖ ^ ((X + 1) / 2))⁻¹ :=
+    inv_anti₀ (Real.rpow_pos_of_pos hs0 _) h3
+  have hlow : cg X * ((2 * u ^ 3) ^ ((X + 1) / 2))⁻¹ * Real.exp (-(π * u ^ 3)) *
+      Real.exp (-(t * π ^ 2 / 4)) ≤
+      cg X * ‖s‖ ^ 2 * ‖s‖ ^ (-((X + 1) / 2)) * Real.exp (-(π * ‖s‖ / 2)) *
+        Real.exp (-(t * π ^ 2 / 4)) := by
+    rw [h2]
+    apply mul_le_mul_of_nonneg_right _ (Real.exp_pos _).le
+    apply mul_le_mul _ h4 (Real.exp_pos _).le (by positivity)
+    calc cg X * ((2 * u ^ 3) ^ ((X + 1) / 2))⁻¹ = cg X * 1 * ((2 * u ^ 3) ^ ((X + 1) / 2))⁻¹ := by
+          ring
+      _ ≤ cg X * ‖s‖ ^ 2 * (‖s‖ ^ ((X + 1) / 2))⁻¹ :=
+          mul_le_mul (mul_le_mul_of_nonneg_left h1 hcg.le) h5 (by positivity) (by positivity)
+  have hlow0 : 0 < cg X * ((2 * u ^ 3) ^ ((X + 1) / 2))⁻¹ * Real.exp (-(π * u ^ 3)) *
+      Real.exp (-(t * π ^ 2 / 4)) := by positivity
+  calc 1 / (cg X * ‖s‖ ^ 2 * ‖s‖ ^ (-((X + 1) / 2)) * Real.exp (-(π * ‖s‖ / 2)) *
+        Real.exp (-(t * π ^ 2 / 4)))
+      ≤ 1 / (cg X * ((2 * u ^ 3) ^ ((X + 1) / 2))⁻¹ * Real.exp (-(π * u ^ 3)) *
+        Real.exp (-(t * π ^ 2 / 4))) := div_le_div_of_nonneg_left (by norm_num) hlow0 hlow
+    _ = 1 / cg X * (2 * u ^ 3) ^ ((X + 1) / 2) * Real.exp (π * u ^ 3) *
+        Real.exp (t * π ^ 2 / 4) := by
+        rw [Real.exp_neg, Real.exp_neg]
+        field_simp
+
+theorem Tmaj_nonneg {t X u : ℝ} (ht : 0 < t) (hu : 0 ≤ u) : 0 ≤ Tmaj t X u := by
+  unfold Tmaj; positivity
+
+theorem epiece_le_Emaj {t : ℝ} (ht : 0 < t) {X : ℝ} (hX0 : 0 ≤ X) {s : ℂ} (hX : |s.re| ≤ X)
+    {u : ℝ} (hu : 1 ≤ u) (hy : s.im = u ^ 3) (hXu : X ≤ u ^ 3) {L : ℝ} (hL : 0 ≤ L) (hLu : L ≤ u)
+    (hY2 : 2 * t * π ≤ u ^ 2 / 20) : epiece t X s L (u ^ 2 / 20) ≤ Emaj t X u := by
+  have hu0 : 0 < u := by linarith
+  have hsu := norm_s_ge hy hu0.le
+  have hs2u := norm_s_le hX hy hXu hu0.le
+  have hu3 : 1 ≤ u ^ 3 := one_le_pow₀ hu
+  have hs1 : 1 ≤ ‖s‖ := by linarith
+  have hs0 : 0 < ‖s‖ := by linarith
+  have hξ := ξ_le ht.le hX0 hL hLu hu
+  have hξ₁ := ξ₁_le ht.le hX0 hX hL hLu hu hy hXu
+  have hξ₁0 : 0 ≤ 2 * X + 2 * (2 * t * L) + 2 + t * (Real.log ‖s‖ + 6) := by
+    have : 0 ≤ Real.log ‖s‖ := Real.log_nonneg hs1
+    positivity
+  have hcξ : 0 ≤ cξ t X := by unfold cξ; positivity
+  have hξ0 : 0 ≤ X + 2 * t * L + 2 := by positivity
+  have hM := MH_le_Mmaj ht hX0 hu hL hLu hξ₁0 hξ₁ hY2
+  have hT := T_le_Tmaj (X := X) ht hu hξ₁0 hξ₁
+  have hΓ := inv_γlow_le_Γmaj (t := t) ht hX0 hu hs1 hs2u
+  have hγpos : 0 < γlow t X s := γlow_pos hs0
+  have hMH0 : 0 ≤ MH t X (2 * t * L) (u ^ 2 / 20) (u ^ 3)
+      (2 * X + 2 * (2 * t * L) + 2 + t * (Real.log ‖s‖ + 6)) := MH_nonneg (by positivity)
+  have hTm0 := Tmaj_nonneg (X := X) ht hu0.le
+  have hMm0 : 0 ≤ Mmaj t X u := Mmaj_nonneg (by unfold cZ cξ; positivity)
+  have hT0 : 0 ≤ 2 * (Real.exp ((2 * X + 2 * (2 * t * L) + 2 + t * (Real.log ‖s‖ + 6)) ^ 2 /
+      (4 * t)) / (2 * π)) * (1 + |u ^ 3| + 4 * √t) * √(64 * π * t) *
+      Real.exp (-((u ^ 2 / 20) ^ 2 / (64 * t))) := by positivity
+  unfold epiece
+  rw [hy]
+  rw [div_eq_mul_one_div]
+  apply mul_le_mul (mul_le_mul_of_nonneg_right _ (by positivity)) hΓ (by positivity) (by positivity)
+  exact add_le_add (mul_le_mul (mul_le_mul_of_nonneg_left hM (by norm_num)) hξ hξ0
+    (by positivity)) hT
+
+/-- **The relative defect is majorized by `Bmaj t X u`.** -/
+theorem norm_rdef_le_Bmaj {t : ℝ} (ht : 0 < t) {X : ℝ} (hX0 : 0 ≤ X) {s : ℂ} (hX : |s.re| ≤ X)
+    {u : ℝ} (hu : 1 ≤ u) (hy : s.im = u ^ 3) (hXu : X ≤ u ^ 3) {L : ℝ} (hL : 0 ≤ L) (hLu : L ≤ u)
+    (hs2π : 2 * π ≤ ‖s‖) (hst : 12 * t ≤ ‖s‖) (hstrip : 4 * |s.re| ≤ s.im) (hy2' : 2 ≤ s.im)
+    (hY2 : 2 * t * π ≤ u ^ 2 / 20)
+    (hsec : X + 2 * t * L + 2 ≤ s.im - u ^ 2 / 20) (hy2 : 2 ≤ s.im - u ^ 2 / 20)
+    (hζY : 2 * t * L + u ^ 2 / 20 ≤ ‖s‖ / 8)
+    (hsmall : 402 * (2 * t * L + u ^ 2 / 20) ^ 3 / ‖s‖ ^ 2 + 2 * π / (3 * ‖s‖) ≤ 1)
+    (hq : ‖q s (2 * t * L)‖ ≤ 1) (hq2 : 2 * t * ‖q s (2 * t * L)‖ ^ 2 ≤ 1)
+    (hF : (6 * t * L + 6 * t ^ 2 * L ^ 2) / ‖s‖ ≤ 1) :
+    ‖rdef t s L (u ^ 2 / 20)‖ ≤ Bmaj t X u := by
+  have hu0 : 0 < u := by linarith
+  have hY : 0 < u ^ 2 / 20 := by positivity
+  have hmain := norm_rdef_le_explicit ht hX0 hX hs2π hst hstrip hy2' hL hY hY2 hsec hy2 hζY hsmall
+    hq hq2 hF
+  refine hmain.trans ?_
+  have hsu := norm_s_ge hy hu0.le
+  have hs2 : 2 ≤ ‖s‖ := by nlinarith [Real.pi_gt_three]
+  have hqu := norm_q_le_u ht hs2 hu hy hL hLu
+  have ha := a_le_Amaj ht hu hsu hL hLu
+  have hb := b_le_Bmaj' ht hu hsu hqu
+  have hd := d_le_Dmaj ht hu0.le hL hq2 (β₃_le_β₃maj ht hu hsu hL hLu)
+  have he := epiece_le_Emaj ht hX0 hX hu hy hXu hL hLu hY2
+  have hDm0 := Dmaj_nonneg ht hu0.le
+  have hAm0 : 0 ≤ Amaj t u := by unfold Amaj; positivity
+  have hBm0 : 0 ≤ Bmaj' t u := by unfold Bmaj'; positivity
+  have hd0 : 0 ≤ (β₃ t s (2 * t * L) + β₄ t (u ^ 2 / 20)) /
+      (√(2 * π * t) * Real.exp (-(2 * t * ‖q s (2 * t * L)‖ ^ 2))) := by
+    unfold β₃ β₄
+    positivity
+  have hb0 : 0 ≤ 36 * t / ‖s‖ + 4 * t * ‖q s (2 * t * L)‖ ^ 2 := by positivity
+  have ha0 : 0 ≤ 2 * ((6 * t * L + 6 * t ^ 2 * L ^ 2) / ‖s‖) := by positivity
+  unfold Bmaj
+  gcongr
 
 end Soma.Holonics.RH.EventMainRange
