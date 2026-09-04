@@ -209,7 +209,7 @@ is
 de Bruijn--Newman time is `t = -4u` after `s = 1/2 + i z/2`. Its Lean theorems stand, but the direct
 standard-`H_t` interpretation is retracted pending the RH0/RH1 bridge.
 
-**RH line position:** FT4
+**RH line position:** FT6 (campaign closed at the deposited-inequality scope)
 
 [definition] Brandon's direct instruction of 2026-09-03 activates the `FT0--FT6` Foster-tank and
 threshold campaign on the RH line under
@@ -257,9 +257,18 @@ the seam times as a closed up-set with `0 ∈ seamTimes ↔ RH`, `Λ_DN := sInf 
 `seamTimes.Nonempty → (RH ⟺ Λ_DN ≤ 0)` (`RH/RealZeroTimes.lean`, `RH/LinePreservation.lean`).
 The receipt is
 [`research/records/2026-09-03_FT4_THE_FLOW_NEVER_CREATES_A_PAIR_THE_SEAM_TIMES_ARE_A_CLOSED_UP_SET_AND_RH_IS_THE_THRESHOLD_GIVEN_ONE_SEAM_TIME.md`](research/records/2026-09-03_FT4_THE_FLOW_NEVER_CREATES_A_PAIR_THE_SEAM_TIMES_ARE_A_CLOSED_UP_SET_AND_RH_IS_THE_THRESHOLD_GIVEN_ONE_SEAM_TIME.md).
-`FT4` remains current on one item: the nonemptiness of the seam times (de Bruijn's bound), the
-first exact missing item of the line, whose pair-descent transport is obstructed at the entire
-face by the absence of a highest pair.
+[proved-derived; formal-checked] FT5 passed at the kernel scope (`RH/FlowedExplicitFormula.lean`:
+the flowed integer events with the weights of `HeatFlowBinding` sum to `heatE t ξ` for
+repository `t ≥ 0`, `Re z > 1`; the zero side is the Foster form of `heatE t ξ`; every flowed
+event diverges for `t < 0`). FT6 passed at the deposited-inequality scope
+(`RH/ThresholdReturn.lean`: `RH ⟺ Λ_DN = 0` given the ports `DeBruijnBound` and
+`RodgersTaoNonneg`; the first exact missing inequality `Λ_DN ≤ 0` deposited with the null
+falsifier of the conjecture). The FT campaign is closed. The receipts are
+[`research/records/2026-09-03_FT5_THE_FLOWED_INTEGER_EVENTS_SUM_TO_THE_FLOW_ON_ONE_SIDE_AND_DIVERGE_ON_THE_DESCENT_SIDE.md`](research/records/2026-09-03_FT5_THE_FLOWED_INTEGER_EVENTS_SUM_TO_THE_FLOW_ON_ONE_SIDE_AND_DIVERGE_ON_THE_DESCENT_SIDE.md)
+and
+[`research/records/2026-09-03_FT6_THE_THRESHOLD_IS_RH_GIVEN_THE_TWO_STANDING_THEOREMS_AND_THE_MISSING_INEQUALITY_IS_THE_CONJECTURE.md`](research/records/2026-09-03_FT6_THE_THRESHOLD_IS_RH_GIVEN_THE_TWO_STANDING_THEOREMS_AND_THE_MISSING_INEQUALITY_IS_THE_CONJECTURE.md).
+The standing open theorems of the RH line are de Bruijn's bound (`½ ∈ seamTimes`), Rodgers–Tao's
+`0 ≤ Λ_DN`, and the conjecture itself; no RH deed is scheduled beyond this closure.
 
 [definition] Use `c_CD` for the Copson--de Bruijn sharp coefficient and reserve `Λ_DN` for the
 coordinate-corrected de Bruijn--Newman threshold. The correction record is

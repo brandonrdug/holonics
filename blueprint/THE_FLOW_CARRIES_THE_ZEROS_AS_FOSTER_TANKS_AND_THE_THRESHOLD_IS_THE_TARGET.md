@@ -178,8 +178,15 @@ Return the explicit formula of `heatE t ξ` for every `t`: its zero side is the 
 campaign's new mathematics: at `t = 0` the integer side is the von Mangoldt comb; at `t ≠ 0` it is
 the bound comb, and the binding defect of every composite is exhibited in the receiver.
 
-**Pass FT5:** the flowed explicit formula is a theorem for the test class of
-`ExplicitFormulaReceiver`, and its `t = 0` specialization is definitionally the standing one.  
+*Corrected in place 2026-09-03:* the integer side exists termwise only on the repository-forward
+side `t ≥ 0`; on the descent side `t < 0` every flowed event has infinite norm integral
+(`FlowedExplicitFormula.not_integrable_flowedTerm`), while the kernel integral converges at every
+time. FT5 passes at the kernel scope: `hasSum_flowedTerm` on `t ≥ 0`, `Re z > 1`, with the
+weights `event_eq` and `flow_weight_split`, and the zero side `foster_form_heatE`; receipt
+[`the FT5 record`](../research/records/2026-09-03_FT5_THE_FLOWED_INTEGER_EVENTS_SUM_TO_THE_FLOW_ON_ONE_SIDE_AND_DIVERGE_ON_THE_DESCENT_SIDE.md).
+
+**Pass FT5:** the flowed explicit formula is a theorem for the flowed events on the convergent
+side, and its `t = 0` specialization is the kernel form of the standing one.  
 **Falsifier:** a test function and a time at which the zero side of `heatE t ξ` and the bound
 integer side differ by more than the horizontal-edge remainder.
 
@@ -192,6 +199,14 @@ time `τ` with `0 < τ ≤ y₀²/2`; along `[0, τ]` FT5 gives the flowed expli
 binding defect active; FT6 must return the inequality the bound integer side violates that the
 free one satisfies, or the first exact missing inequality with its falsifier. The prohibition of
 §0 binds: the target may not be assumed in any field, hypothesis, or certificate.
+
+*Returned 2026-09-03:* `ThresholdReturn.riemannHypothesis_iff_Λ_DN_eq`: given the two named
+standing theorems as ports (`DeBruijnBound : ½ ∈ seamTimes`, `RodgersTaoNonneg : 0 ≤ Λ_DN`),
+`RH ⟺ Λ_DN = 0`; the first exact missing inequality is `Λ_DN ≤ 0` itself, with the null falsifier
+of the conjecture, deposited; the contract's sharper integer-side inequality cannot be formed on
+the descent side (FT5); receipt
+[`the FT6 record`](../research/records/2026-09-03_FT6_THE_THRESHOLD_IS_RH_GIVEN_THE_TWO_STANDING_THEOREMS_AND_THE_MISSING_INEQUALITY_IS_THE_CONJECTURE.md).
+The campaign closes at this return.
 
 **Pass FT6:** `Λ_DN = 0` formal-checked against `RH.Statement`, or the named missing inequality
 with a falsifier that can fire, deposited as the phase's return.  

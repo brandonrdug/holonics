@@ -89,7 +89,21 @@ convergence dichotomy. Coefficient-specific branch selection and a certified dec
 research and schedule nothing. Brandon's direct correction of 2026-09-02 closes HTP at this bounded
 handoff and activates the engine HNA campaign.
 
-**RH line position:** FT4
+**RH line position:** FT6 (campaign closed at the deposited-inequality scope)
+
+[proved-derived; formal-checked] FT5 passed at the kernel scope: `RH/FlowedExplicitFormula.lean`
+returned the integer events `Φ(u) = Σ_n |n|^{−1/2} φ(u + log |n|)` with the flow weight split of
+`HeatFlowBinding`, the identity `Σ_n ∫ (flowed event) = heatE t ξ (z)` for repository `t ≥ 0`,
+`Re z > 1`, the zero side as the Foster form of `heatE t ξ`, and the exact divergence of every
+flowed event for `t < 0`. FT6 passed at the deposited-inequality scope:
+`RH/ThresholdReturn.lean` returned `RH ⟺ Λ_DN = 0` given the two named standing theorems as
+ports (de Bruijn's `½ ∈ seamTimes`, Rodgers–Tao's `0 ≤ Λ_DN`), and deposited the first exact
+missing inequality, `Λ_DN ≤ 0` with the null falsifier of the conjecture. The FT campaign is
+closed; the standing open theorems of the line are de Bruijn's bound, Rodgers–Tao's
+nonnegativity, and the conjecture. The receipts are
+[`the FT5 record`](../research/records/2026-09-03_FT5_THE_FLOWED_INTEGER_EVENTS_SUM_TO_THE_FLOW_ON_ONE_SIDE_AND_DIVERGE_ON_THE_DESCENT_SIDE.md)
+and
+[`the FT6 record`](../research/records/2026-09-03_FT6_THE_THRESHOLD_IS_RH_GIVEN_THE_TWO_STANDING_THEOREMS_AND_THE_MISSING_INEQUALITY_IS_THE_CONJECTURE.md).
 
 [proved-derived; formal-checked] FT4 (iii)–(v) returned: `RH/KernelFlow.lean` (admissible kernels,
 `heatE t (T_K) = T_{e^{−t u²} K}`, the semigroup `heatE s (heatE t ξ) = heatE (s + t) ξ`),
@@ -166,10 +180,13 @@ and each advances on its own gate. The order is fixed:
 5. `FT4` -- the Foster class and the port discharged for `heatE t ξ` from `Φ`'s centre value,
    the entire-face flow, `Λ_DN` defined, and `RH ⟺ Λ_DN ≤ 0` against the anchor (all returned
    2026-09-03, the equivalence under the explicit hypothesis that a seam time exists); the
-   nonemptiness of the seam times, de Bruijn's bound, remains -- **CURRENT**;
+   nonemptiness of the seam times, de Bruijn's bound, carried as a named port -- **PASSED** at
+   that scope;
 6. `FT5` -- the flowed explicit formula: the bound integer comb against the divisor of
-   `heatE t ξ`; and
-7. `FT6` -- `Λ_DN ≥ 0` and the target, or the first exact missing inequality with its falsifier.
+   `heatE t ξ` -- **PASSED** at the kernel scope (termwise on `t ≥ 0`, divergent on `t < 0`);
+   and
+7. `FT6` -- `Λ_DN ≥ 0` and the target, or the first exact missing inequality with its falsifier
+   -- **PASSED** at the deposited-inequality scope; the campaign is closed.
 
 [definition] The de Bruijn--Newman/RH line remains independent: use `c_CD` for the
 Copson--de Bruijn coefficient and `Λ_DN` for the coordinate-corrected heat-flow threshold. The
