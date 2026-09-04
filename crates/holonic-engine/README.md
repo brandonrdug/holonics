@@ -160,7 +160,7 @@ witness remains testimony; only recurrent equality can force later
 separation. The complete upward envelope is an obstruction, not an assumed
 universal monotone law for heterogeneous spectral distance.
 
-`src/soma/life/examples/eros_relampago_atmospheric_current.rs` conducts the
+`src/crates/holonic-life/examples/eros_relampago_atmospheric_current.rs` conducts the
 native five-episode application over 60 GLM products, two five-band ABI scans,
 and one IGRA sounding. It composes this exact law with eight persistent native
 current organs through `life::ExactWorldOrgan`; generates before each later

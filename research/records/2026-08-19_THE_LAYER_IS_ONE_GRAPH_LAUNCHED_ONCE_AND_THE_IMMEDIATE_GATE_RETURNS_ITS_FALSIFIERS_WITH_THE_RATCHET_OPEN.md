@@ -9,9 +9,9 @@ artifact line); `implemented-exact` for the owners whose focused tests pass; **`
 roadmap's immediate gate as one coherent reading**, because the architecture ratchet is red on the
 tree that carries this construction and re-seeding it is not this session's to do; `open` for every
 Phoenix master station.
-**Authority:** [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) §"THE PHOENIX REBIRTH…",
-[the Phoenix master](../../blueprint/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md),
-[the Gemma instance](../../blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md),
+**Authority:** [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) §"THE PHOENIX REBIRTH…",
+[the Phoenix master](../../archive/plans/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md),
+[the Gemma instance](../../archive/plans/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md),
 [the contract](2026-08-18_THE_SECTION_MUST_STAY_ON_THE_CARD_THE_CONTRACT_BEFORE_THE_RESIDENT_LAYER.md),
 [the audit that withdrew the previous claim](2026-08-18_THE_SECTION_STAYED_BUT_THE_HOST_STILL_OWNED_THE_PASSAGE_AND_NO_PHOENIX_STATION_PASSED.md),
 [the validation cadence](2026-08-18_THE_GATE_IS_A_RELEASE_RECEIVER_NOT_AN_INNER_LOOP_AND_REPEATED_VALIDATION_BECAME_THE_BOTTLENECK.md).

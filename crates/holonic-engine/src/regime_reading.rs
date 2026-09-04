@@ -2,7 +2,7 @@
 //!
 //! # Why this exists
 //!
-//! `canon/THE_INFORMATION_ENGINE.md` §1.1 states that the cooling stroke's middle row —
+//! `docs/canon/THE_INFORMATION_ENGINE.md` §1.1 states that the cooling stroke's middle row —
 //! condensation with a certified remainder — has a **termination condition set by the material**,
 //! and §4 item 0 records that this body carries no organ that reads it. An engine that cannot say
 //! what its material admits is choosing strokes blind.
@@ -10,7 +10,7 @@
 //! The instrument is not new. It was built in the frozen laboratory as
 //! `experiments/fractal/dimension_probe.py`, calibrated on eight deterministic walks of known
 //! dimension and then turned on the machine's own lattice, and its doctrine is
-//! `reference/holobrochos-a07ff376/src/holobrochos/CANON/FRACTAL.md` §3. This module is the port,
+//! `archive/reference/holobrochos-a07ff376/src/holobrochos/CANON/FRACTAL.md` §3. This module is the port,
 //! and it ports the **discipline** as carefully as the arithmetic.
 //!
 //! # The reading
@@ -53,7 +53,7 @@
 //!
 //! # What this does NOT return
 //!
-//! `canon/THE_INFORMATION_ENGINE.md` §1.1 names three regimes — `SETTLED`, `BENT`, `GROWING`. This
+//! `docs/canon/THE_INFORMATION_ENGINE.md` §1.1 names three regimes — `SETTLED`, `BENT`, `GROWING`. This
 //! compare separates **two**, and inventing a third would be a partition the material never
 //! supplied. `BENT` is a curvature reading and belongs to `contact_gluing::hinge_deficits`, not to a
 //! dimension meter. What this organ detects is the `GROWING` case specifically, and

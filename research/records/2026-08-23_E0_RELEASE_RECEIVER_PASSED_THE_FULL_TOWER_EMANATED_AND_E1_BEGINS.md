@@ -3,7 +3,7 @@
 **Date:** 2026-08-23  
 **Kind:** release admission and construction-state transition  
 **Campaign:** E0 under
-[`blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](../../blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md)  
+[`blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](../../archive/plans/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md)  
 **Truth status:** `established-bounded` for E0's admitted four-front recurrence and detached
 continuation; `measured` for the release receiver and apparatus testimony; `open` for E1--E5.
 

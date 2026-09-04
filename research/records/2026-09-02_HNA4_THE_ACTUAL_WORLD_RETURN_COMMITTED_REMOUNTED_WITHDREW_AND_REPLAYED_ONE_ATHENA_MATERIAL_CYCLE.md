@@ -2,10 +2,10 @@
 
 **Date:** 2026-09-02
 **Scope:** HNA4 under
-[`the superseded first HNA contract`](../../blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
+[`the superseded first HNA contract`](../../archive/plans/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
 **Disposition:** `counterexample`; no phase passed. The complete retraction is
 [`THE_HNA_WORLD_RETURN_SPLIT_IS_RETRACTED_AND_INFERENCE_IS_ONE_RECURRENT_ECOLOGY.md`](2026-09-02_THE_HNA_WORLD_RETURN_SPLIT_IS_RETRACTED_AND_INFERENCE_IS_ONE_RECURRENT_ECOLOGY.md).
-**Truth status:** per claim under [`../../canon/EPISTEMIC_GRADES.md`](../../canon/EPISTEMIC_GRADES.md).
+**Truth status:** per claim under [`../../canon/EPISTEMIC_GRADES.md`](../../docs/canon/EPISTEMIC_GRADES.md).
 
 ## Return
 

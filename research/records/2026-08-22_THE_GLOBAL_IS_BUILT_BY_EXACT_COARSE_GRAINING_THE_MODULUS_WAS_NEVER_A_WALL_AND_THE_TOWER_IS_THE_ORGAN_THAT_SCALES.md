@@ -10,7 +10,7 @@ happen to depend on each other then we can navigate by pivoting between conjectu
 is like tying a knot or a lightning strike."*  The two deeds graded here are
 `d525724` (`FamilyGauss.lean`) and `08082ba` (`LandenLattice.lean`), performed to feed
 this strategy.  **It schedules nothing**; Brandon's direct requests govern the campaign,
-and [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) with
+and [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) with
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the construction
 authorities for the engine arm.
 **Truth grades:** `formal-checked` for every named theorem; `proved-standard` for the

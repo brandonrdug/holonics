@@ -25,7 +25,7 @@
 //!   2  after the join the movement is non-zero and every moved passage names the earlier return
 //!      that caused it
 //!   3  the no-op control: a reading that moved nothing leaves the second production bit-identical
-//!   4  the cut, named from measurement, out of the five `canon/THE_HOLOBROCHOS_SPINE.md` §1
+//!   4  the cut, named from measurement, out of the five `docs/canon/THE_HOLOBROCHOS_SPINE.md` §1
 //!      distinguishes: circulation, rest, accumulation, leak, short circuit
 //! ```
 //!
@@ -592,7 +592,7 @@ fn main() {
     // ---------------------------------------------------------------------------------------------
 
     rule("THE WORLD'S RECORD — THE RETURN CROSSES A DEPOSIT, NOT A CALL");
-    println!("  `canon/THE_HOLOBROCHOS_SPINE.md` §4 carries Soma's prohibition:");
+    println!("  `docs/canon/THE_HOLOBROCHOS_SPINE.md` §4 carries Soma's prohibition:");
     println!("      \"The membrane mails the radiation OUT into the world's own record; the world");
     println!("       answers; the answer returns as the next light. Reafference is the WORLD'S,");
     println!("       never a WIRE'S.\"");
@@ -611,7 +611,7 @@ fn main() {
 
     let sealed = reading.returned.seal();
     let address = format!("{:x}", Sha256::digest(&sealed));
-    let deposit_root = PathBuf::from("output/the-reading-returns");
+    let deposit_root = PathBuf::from(".local/artifacts/the-reading-returns");
     fs::create_dir_all(&deposit_root).expect("the deposit root opens");
     let deposit = deposit_root.join(format!("movement-{address}.returned-reading"));
     fs::write(&deposit, &sealed).expect("the deposit is written");
@@ -678,7 +678,7 @@ fn main() {
     // The probe population is READ OFF THE MATERIAL, not authored. One flip inside each return's
     // text is exactly one corrupted occurrence per return, which is the mechanism under test, and
     // it exhausts the declared population rather than sampling it. A stride over the octets would
-    // have needed a probe count nobody could derive — `canon/THE_AUTHORED_LEVEL.md`, and O1's
+    // have needed a probe count nobody could derive — `docs/canon/THE_AUTHORED_LEVEL.md`, and O1's
     // standard: the family is exhausted, so "no probe moved it" is a statement about the family.
     let probed = reading.returned.returns().len();
     let (mut refused, mut read_moved, mut production_moved) = (0usize, 0usize, 0usize);
@@ -748,7 +748,7 @@ fn main() {
 
     println!("\n  THE DELETION FALSIFIER — remove the world's record and the return must fail");
     println!(
-        "      `canon/THE_HOLOBROCHOS_SPINE.md` §4's test is one question: did it get written"
+        "      `docs/canon/THE_HOLOBROCHOS_SPINE.md` §4's test is one question: did it get written"
     );
     println!("      and re-read? A return that survives the deletion of the record never went");
     println!("      through it. So the record is deleted and the same call is made again.");
@@ -1006,7 +1006,7 @@ fn main() {
 
     rule("CONTROL 4 — THE CUT, MEASURED OVER SUCCESSIVE TURNS OF THE LOOP");
     println!(
-        "  `canon/THE_HOLOBROCHOS_SPINE.md` §1: circulation j != 0, rest, accumulation, leak and\n  \
+        "  `docs/canon/THE_HOLOBROCHOS_SPINE.md` §1: circulation j != 0, rest, accumulation, leak and\n  \
          short circuit are DISTINCT CUTS. Which one this body sits at is a measurement, so the loop\n  \
          is turned until it stops moving and what it does is reported.\n"
     );

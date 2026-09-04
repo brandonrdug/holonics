@@ -45,7 +45,7 @@ use std::time::Instant;
 type Rat = BigRational;
 type Poly = RationalPolynomial;
 
-const OUTPUT: &str = "output/the_height_form_of_the_surface_is_exact";
+const OUTPUT: &str = ".local/artifacts/the_height_form_of_the_surface_is_exact";
 
 fn rational(values: [i64; 6]) -> [Rat; 6] {
     values.map(|v| Rat::from_integer(BigInt::from(v)))

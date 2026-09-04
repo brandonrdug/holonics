@@ -969,7 +969,7 @@ impl StarTable {
     /// **A measurement with no library consumer.** Nothing downstream reads it; its only reader is
     /// `examples/the_material_states_its_own_isolation_depth.rs`, which needs the pair to exhibit
     /// that the derived depth is what governs. Stated rather than left to be discovered
-    /// (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.1).
+    /// (`docs/canon/THE_CONTAMINANT_PROTOCOL.md` §2.1).
     pub fn isolation_depth(&self) -> (u64, u64) {
         (self.isolation_depth_reached, self.isolation_depth_permitted)
     }

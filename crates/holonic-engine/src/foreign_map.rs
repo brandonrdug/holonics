@@ -1,8 +1,8 @@
 //! **A foreign rested map, admitted as material through one architecture-neutral mouth.**
 //!
-//! Plan: [`blueprint/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md`],
+//! Plan: [`archive/plans/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md`],
 //! first instance
-//! [`blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md`].
+//! [`archive/plans/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md`].
 //!
 //! # What this replaces, and the defect that occasioned it
 //!

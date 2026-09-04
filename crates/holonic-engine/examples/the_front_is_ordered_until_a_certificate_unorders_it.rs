@@ -24,23 +24,23 @@
 //! 3. **Both verdicts come out of one code path**, on one organ, in one run.
 //! 4. **The mint ordinal moves and the verdict does not.** A `ReceiverId` is an absolute frame;
 //!    the two orders hand the same axis different ordinals and the comparison must not notice.
-//! 5. **Endpoint comparison against lineage comparison.** On `soma/formal` they disagree, and the
+//! 5. **Endpoint comparison against lineage comparison.** On `formal` they disagree, and the
 //!    endpoint-only comparator is the convicted defect — *"Endpoint equality became stateful
 //!    equivalence."*
 //! 6. **Disjoint footprints do not prove independence.** `CoupledJunctions` stages two junctions
 //!    sharing one item and coupled through a third pair neither names.
 //! 7. **The three-or-more case is not inferred.** A pair certificate returns `PairwiseOnly` and
 //!    names what a triple would require; a declared set is certified over every permutation.
-//! 8. **`capacities()` has a library consumer.** `canon/THE_CONTAMINANT_PROTOCOL.md` §2.1's verified
+//! 8. **`capacities()` has a library consumer.** `docs/canon/THE_CONTAMINANT_PROTOCOL.md` §2.1's verified
 //!    instance is `FoundedPanel::capacities`, whose only call sites were a driver and a test. The
 //!    certificate compares it as the successor's logical resource, so the arrow now exists in
 //!    library code.
 //!
 //! ## The material, and why this driver did not return before 2026-08-11
 //!
-//! `canon/TABLET_THE_MANIFOLD.md` recorded that this driver *"reaches soma/formal and stops,
+//! `docs/canon/TABLET_THE_MANIFOLD.md` recorded that this driver *"reaches soma/formal and stops,
 //! including under an 8 GB bound."* The diagnosis is not a cost defect in the certificate. It is
-//! the material: `lean_paths` walked **every** `.lean` under the root, and `soma/formal` carries a
+//! the material: `lean_paths` walked **every** `.lean` under the root, and `formal` carries a
 //! Lake package cache — **8,612 files and 91,167,882 octets** of vendored mathlib, batteries and
 //! plausible against **13 files and 27,980 octets** of soma's own development. The certificate was
 //! being asked about mathlib. Refusing `.lake` by name returns the whole run, all sixteen
@@ -359,7 +359,7 @@ fn report(certificate: &InterchangeCertificate, name: Naming<'_>) {
             println!(
                 "  Every permutation of the DECLARED set was compared -- strictly stronger than"
             );
-            println!("  pairwise, which is what `canon/01_CAUSAL_CALCULUS.md:88` asks for.");
+            println!("  pairwise, which is what `docs/canon/01_CAUSAL_CALCULUS.md:88` asks for.");
         }
     }
 }
@@ -476,7 +476,7 @@ fn exhibit(word: &DistinguishingWord, name: Naming<'_>) {
                 "    Equal endpoints do not identify ordered paths. `CLAUDE.md` §0 lesson 4 and"
             );
             println!(
-                "    `canon/01_CAUSAL_CALCULUS.md:85`: the isomorphism must preserve complete"
+                "    `docs/canon/01_CAUSAL_CALCULUS.md:85`: the isomorphism must preserve complete"
             );
             println!("    successor incidence AND morphology, not just the returned state.");
         }
@@ -535,12 +535,12 @@ fn truncate(text: &str, width: usize) -> String {
 
 /// **The material is declared, and a package cache is not the development.**
 ///
-/// This walked every `.lean` under the root, and under `soma/formal` that is **8,625 files and
+/// This walked every `.lean` under the root, and under `formal` that is **8,625 files and
 /// 91,195,862 octets** — the vendored `.lake/packages/` tree (mathlib, batteries, plausible, …)
 /// against **13 files and 27,980 octets** of soma's own development, a factor of **3,259 in
-/// octets**. Every previous attempt to run this driver on `soma/formal` was therefore running the
+/// octets**. Every previous attempt to run this driver on `formal` was therefore running the
 /// certificate over mathlib, which is not the material the header names and is not a development
-/// this repository authored. That is `blueprint/THE_ROADMAP.md` plan 1's convicted shape — an
+/// this repository authored. That is `docs/plans/THE_ROADMAP.md` plan 1's convicted shape — an
 /// inferred layout standing in for a declared root — arriving one organ over.
 ///
 /// A `.lake` directory is a build artifact by Lake's own convention. It is refused here by name,
@@ -590,7 +590,7 @@ fn main() {
     let root = PathBuf::from(
         std::env::args()
             .nth(1)
-            .unwrap_or_else(|| "soma/formal".to_owned()),
+            .unwrap_or_else(|| "formal".to_owned()),
     );
 
     println!("truth_status=established-bounded");
@@ -839,7 +839,7 @@ fn main() {
     let development = Development::read(&reading);
     let named = |item: ItemId| development.name_of(item).to_owned();
 
-    section("REAL MATERIAL -- THE WHOLE-ORDER FORM ON soma/formal");
+    section("REAL MATERIAL -- THE WHOLE-ORDER FORM ON formal");
     println!("\n  material  {}", root.display());
     println!(
         "  declared  {} .lean files, {} octets — the package cache under `.lake` is REFUSED by name",
@@ -1043,7 +1043,7 @@ fn main() {
     // ---------------------------------------------------------------- 7. capacities
     section("CONTROL 8 -- capacities() NOW HAS A LIBRARY CONSUMER");
     println!(
-        "\n  `canon/THE_CONTAMINANT_PROTOCOL.md` §2.1, the verified instance of the unconsumed"
+        "\n  `docs/canon/THE_CONTAMINANT_PROTOCOL.md` §2.1, the verified instance of the unconsumed"
     );
     println!(
         "  return: `founded_receiver.rs:238 capacities()`, whose only call sites were a driver"
@@ -1080,7 +1080,7 @@ fn main() {
     // ---------------------------------------------------------------- the cost law, on declared slices
     //
     // **Where the wall is, measured rather than narrated.** The certificate returns on soma's own
-    // development in well under a second; it had never returned on `soma/formal` because
+    // development in well under a second; it had never returned on `formal` because
     // `lean_paths` was walking mathlib. That leaves a real question this section answers: at what
     // material extent does the certificate stop returning, and which phase stops first?
     //

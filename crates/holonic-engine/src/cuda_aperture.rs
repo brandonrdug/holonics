@@ -45,13 +45,13 @@ const CUDA_SUCCESS: i32 = 0;
 ///
 /// This module carried `const THREADS_PER_BLOCK: u32 = 128` until 2026-08-10, historically called
 /// an ABI level because launch geometry was said to be fixed by the device interface. **That reason
-/// was false.** Launch geometry is queryable, and `soma/mount` has
+/// was false.** Launch geometry is queryable, and `crates/holonic-mount` has
 /// derived it correctly all along: `min(the function's own MAX_THREADS_PER_BLOCK, the device's)`,
 /// grid from the work extent, refused rather than clipped when it exceeds the grid aperture.
 ///
 /// This is a second implementation of that derivation, and the duplication is **forced**, not
-/// chosen: `soma/life` depends on `holonic-engine`, so the engine cannot depend on `soma/mount`
-/// without a Cargo cycle (`blueprint/THE_ASSEMBLY.md` F1). Saying so is better than either
+/// chosen: `crates/holonic-life` depends on `holonic-engine`, so the engine cannot depend on `crates/holonic-mount`
+/// without a Cargo cycle (`archive/plans/THE_ASSEMBLY.md` F1). Saying so is better than either
 /// pretending the pin was ABI or pretending the two owners could be one.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct DerivedLaunch {

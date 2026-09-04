@@ -21,9 +21,9 @@ def crates_composition():
         ["presentation / display", "<span class='mono'>presentation.rs ExactSurfacePresentation</span> · <span class='mono'>display.rs DisplayFace</span> · <span class='mono'>live_presentation.rs LiveCpuPresenter</span>", "exact cells → octets; caused receiver faces realized", "the editor chrome (apparatus)"],
         ["reflective codec runtime", "<span class='mono'>holonic-language ReflectiveRuntime, CodecStep, CodecObstruction</span>", "mount/open/receive/revise codecs with lineage refusals", "Lean and the agent as mounted codecs"],
     ])
-    body = col([t, note("Every row was confirmed against the type census of 2026-08-30 (reports/holonics-types.md); paths are <span class='mono'>crates/…/src</span> and <span class='mono'>soma/formal/elementary-holonics/…</span>. Search before founding: these owners are rotated into typed contact first; only the five absences on the next board justify any new owner (AGENTS.md, circulation before new organs).")], "flex: 1 1 auto; min-height: 0; overflow: hidden")
+    body = col([t, note("Every row was confirmed against the type census of 2026-08-30 (reports/holonics-types.md); paths are <span class='mono'>crates/…/src</span> and <span class='mono'>formal/elementary-holonics/…</span>. Search before founding: these owners are rotated into typed contact first; only the five absences on the next board justify any new owner (AGENTS.md, circulation before new organs).")], "flex: 1 1 auto; min-height: 0; overflow: hidden")
     return artboard("Crate branch — what already exists, face by face", "the CAD composes existing owners; a large new subsystem would be a hidden foreman", 1560, 1060, body,
-                    "sources: reports/holonics-types.md (read-only census) · AGENTS.md circulation before new organs · canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md")
+                    "sources: reports/holonics-types.md (read-only census) · AGENTS.md circulation before new organs · docs/canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md")
 
 @board("CratesBranch.dc.html", "Crates 2 — the branch, its absent types, and what must not be founded", 1560, 1000, "page-crates")
 def crates_branch():

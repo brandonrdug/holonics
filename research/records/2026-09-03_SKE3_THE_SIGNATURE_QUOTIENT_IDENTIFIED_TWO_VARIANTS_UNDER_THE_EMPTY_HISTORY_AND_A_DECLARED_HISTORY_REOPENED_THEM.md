@@ -4,8 +4,8 @@
 **Truth status:** `established-bounded`  
 **Evidence:** `implemented-exact`, `source-inspected`, `measured`  
 **Campaign:** SKE3 under
-[`THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md`](../../blueprint/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md).  
-**Receipts:** [`2026-09-03_SKE3_receipts/`](2026-09-03_SKE3_receipts/): one exact receipt per
+[`THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md`](../../archive/plans/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md).  
+**Receipts:** [`2026-09-03_SKE3_receipts/`](2026-09-03_SKE3_receipts): one exact receipt per
 exposure (face, exact digest, cone per population as a site bitmask) and the quotient.
 
 ## The instrument

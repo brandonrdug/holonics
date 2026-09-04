@@ -11,8 +11,8 @@ at Brandon's instruction — *"Overview the entirety of the repository and addre
 you are not unifying, do not be an idiot and not utilize things that are already partially
 constructed"* — together with an external adjudication of the same day.
 **Plan:** stations one and two of
-[`blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`](../../blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md),
-which sits under [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md).
+[`blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`](../../archive/plans/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md),
+which sits under [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md).
 
 ---
 

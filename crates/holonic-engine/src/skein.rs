@@ -8,9 +8,9 @@
 //! the Riemann Hypothesis and how we define compression for machine learning.**"*
 //!
 //! The definition and theorem were written as Typst
-//! (`papers/source/mathematics/definitions/contextual-tangle-compression.typ`,
-//! `papers/source/mathematics/theorems/contextual-skein-compression.typ`) and nothing implemented
-//! them. `canon/THE_QUOTE_NETWORK.md` records that he supplied this thirteen days before `CLAUDE.md`
+//! (`research/papers/source/mathematics/definitions/contextual-tangle-compression.typ`,
+//! `research/papers/source/mathematics/theorems/contextual-skein-compression.typ`) and nothing implemented
+//! them. `docs/canon/THE_QUOTE_NETWORK.md` records that he supplied this thirteen days before `CLAUDE.md`
 //! §11 named the certified-remainder condensation as the missing organ, and that no record cites
 //! the connection.
 //!

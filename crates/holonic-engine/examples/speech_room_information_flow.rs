@@ -55,9 +55,9 @@ impl Args {
     fn parse() -> Result<Self, Box<dyn Error>> {
         let mut args = env::args().skip(1);
         let mut librispeech =
-            PathBuf::from("runs/information-flow-datasets/source/LibriSpeech/dev-clean");
-        let mut rirs = PathBuf::from("runs/information-flow-datasets/source/RIRS_NOISES");
-        let mut output = PathBuf::from("runs/information-flow-distributions/speech-room");
+            PathBuf::from(".local/runs/information-flow-datasets/source/LibriSpeech/dev-clean");
+        let mut rirs = PathBuf::from(".local/runs/information-flow-datasets/source/RIRS_NOISES");
+        let mut output = PathBuf::from(".local/runs/information-flow-distributions/speech-room");
         let mut rir_pattern = None;
         let mut mode_limit = 3_usize;
         let mut finest_support = 256_usize;

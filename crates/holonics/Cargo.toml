@@ -1,0 +1,10 @@
+[package]
+name = "holonics"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+holonics-hna = { path = "../holonics-hna" }
+holonic-engine = { path = "../holonic-engine", default-features = false }
+life = { path = "../holonic-life" }

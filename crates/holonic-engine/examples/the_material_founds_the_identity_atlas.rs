@@ -61,7 +61,7 @@ use relational_geometry::receiver_atlas;
 
 /// The declared material. A subtree, named so the aperture is visible: this is one region of one
 /// library, and every figure below is about it.
-const SUBTREE: &str = "soma/formal/elementary-holonics/.lake/packages/mathlib/Mathlib/Geometry";
+const SUBTREE: &str = "formal/elementary-holonics/.lake/packages/mathlib/Mathlib/Geometry";
 
 /// How many members of a population to print before saying how many are left. Exhibition, never a
 /// filter: the populations themselves are complete and every count is of the whole.

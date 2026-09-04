@@ -4,7 +4,7 @@
 //! the material it was built for — the machine's generated proof candidates, one `theorem` per
 //! file — that is exact. Pointed at a development a person wrote, it is an organ used past its
 //! declared aperture, which `CLAUDE.md` §8 convicts *"even when it appears to return"*. It does
-//! appear to return. Run against `soma/formal` it reads 13 files, emits 11 derivations named by
+//! appear to return. Run against `formal` it reads 13 files, emits 11 derivations named by
 //! whichever `theorem` happened to be **last** in each file, hands each of them the whole file's
 //! tokens as its recruitment, and reports **zero** recruited-and-declared names — a deposit in which
 //! nothing can be opened, from material carrying 80 declared-to-declared recruitment edges.
@@ -14,7 +14,7 @@
 //! §7 closed with *"exactly one recruited identifier in 103 artifacts is declared… a **material**
 //! constraint rather than a construction one."* The material was in the tree. The instrument could
 //! not resolve it, and an instrument's blindness reported as a property of the world is the failure
-//! `papers/source/synopsis/AUDIT.md:49-68` names.
+//! `research/papers/source/synopsis/AUDIT.md:49-68` names.
 //!
 //! ## The three resolutions, and each is a separate defect
 //!
@@ -71,7 +71,7 @@
 //!
 //! **Depth is a chart index, not a distance.** `FORMULA.md` §XVI: *"the moving origin grown to full
 //! rank, emanated by each relating and receiving the next infall — **`frame(n+1)` is the emanation
-//! of the relating in `frame(n)`**."* And `soma/body/src/manifold.rs`: *"depth 0 is the word grain;
+//! of the relating in `frame(n)`**."* And `crates/holonic-body/src/manifold.rs`: *"depth 0 is the word grain;
 //! **a completion at depth k is an arrival at depth k+1 — the same node, the same verb** … the
 //! illicium is depth-recursive; the hourglass nests."*
 //!
@@ -179,7 +179,7 @@ pub struct UnopenedDeclaration {
 
 /// One founded step of a proof body — **the sub-illicium**.
 ///
-/// `soma/body/src/manifold.rs`, W9 · THE LIVING BOUNDARY: *"the sub-illicium — the atom-grain
+/// `crates/holonic-body/src/manifold.rs`, W9 · THE LIVING BOUNDARY: *"the sub-illicium — the atom-grain
 /// traversal given the SAME live law (sub-stance, sub-groove), so the walk FEELS the standing
 /// terrain (the tire on the road) instead of dead reckoning. **Its completions are THE FOLDS — the
 /// cohered segments, found never listed — handed up as the word grain's arrivals.**"* And the
@@ -804,7 +804,7 @@ fn split_comments(text: &str) -> Vec<SplitLine> {
 /// **The prime is load-bearing and its absence was a defect.** Lean primes a shadowing binder —
 /// `rintro ⟨b', hab', rfl⟩` beside `intro hab` in the *same* proof — and the narrower rule cut at
 /// the `'`, so `hab'` and `hab` became **one name**. Two distinct objects merged onto one vertex is
-/// the defect this whole module exists to remove, arriving one grain further down. `soma/formal`
+/// the defect this whole module exists to remove, arriving one grain further down. `formal`
 /// carries twelve primed identifiers; the generated deposit carries none, so widening moves no
 /// parity figure.
 /// **`?` and `!` are Lean name characters and their absence truncated 249 names.** `getElem?_eq`

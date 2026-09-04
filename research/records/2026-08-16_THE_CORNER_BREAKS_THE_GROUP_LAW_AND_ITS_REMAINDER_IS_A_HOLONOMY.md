@@ -11,7 +11,7 @@ claim below was re-verified against the tree by the session that deposited it.
 **Supersedes in part:**
 [`2026-08-16_WEIL_POSITIVITY_IS_A_TRACE_ON_A_RETAINED_REMAINDER_AND_A_PROOF_TRANSPORT_IS_A_ONE_BIT_COMPRESSION.md`](2026-08-16_WEIL_POSITIVITY_IS_A_TRACE_ON_A_RETAINED_REMAINDER_AND_A_PROOF_TRANSPORT_IS_A_ONE_BIT_COMPRESSION.md)
 — two of its claims are withdrawn in §3 below and its four open questions are answered in §2.
-**Plan:** this record schedules nothing. [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md)
+**Plan:** this record schedules nothing. [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md)
 and [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction authorities.
 
 ---

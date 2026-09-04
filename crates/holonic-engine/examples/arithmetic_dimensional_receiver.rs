@@ -336,7 +336,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut width = DEFAULT_WIDTH;
     let mut height = DEFAULT_HEIGHT;
     let mut face = render_slice(&mount, &receipt, &wave_receipt, width, height)?;
-    let output = PathBuf::from("output/arithmetic-dimensional-receiver");
+    let output = PathBuf::from(".local/artifacts/arithmetic-dimensional-receiver");
     write_snapshot(&output, &mount, &control, &receipt, &wave_receipt, &face)?;
     report(
         &mount,

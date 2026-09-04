@@ -7,7 +7,7 @@ corrected HNA intention; exact surviving software mechanisms retain only their p
 conversation.
 **Construction consequence:** the former engine `HNA0--HNA5` grades are withdrawn. `HNA0` restarts
 under
-[`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](../../blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
+[`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](../../archive/plans/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
 
 ---
 

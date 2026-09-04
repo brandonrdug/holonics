@@ -68,8 +68,8 @@ use relational_geometry::{
 };
 
 const DEFAULT_ARTIFACTS: &str =
-    "output/the_card_returns_the_eta_boundary_and_the_zero_is_a_winding";
-const OUTPUT: &str = "output/the_mertens_function_is_the_euler_characteristic_of_the_prime_simplex";
+    ".local/artifacts/the_card_returns_the_eta_boundary_and_the_zero_is_a_winding";
+const OUTPUT: &str = ".local/artifacts/the_mertens_function_is_the_euler_characteristic_of_the_prime_simplex";
 const BITS: u32 = 64;
 const TERMS: u32 = 20;
 /// The grain the Euler–Maclaurin start is derived for at each zero.

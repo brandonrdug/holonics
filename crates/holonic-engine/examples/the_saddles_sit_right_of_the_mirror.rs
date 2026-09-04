@@ -33,7 +33,7 @@ use std::path::PathBuf;
 use std::thread;
 use std::time::Instant;
 
-const ARTIFACT_DIRECTORY: &str = "output/the_saddles_sit_right_of_the_mirror";
+const ARTIFACT_DIRECTORY: &str = ".local/artifacts/the_saddles_sit_right_of_the_mirror";
 
 fn default_artifact(lower: i64, upper: i64) -> PathBuf {
     PathBuf::from(format!(

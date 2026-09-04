@@ -45,7 +45,7 @@ pub struct HornFillerBranchId {
 //
 // Until 2026-08-09 this line read `pub const DEFAULT_HORN_LOCAL_SECTION_LIMIT: u64 = 1_000_000;`
 // and `PrimeEcologyLaw::new` / `PrimeEcologyStanding::new` handed it to
-// `with_horn_local_section_limit` on the caller's behalf. `canon/THE_CONTAMINANT_PROTOCOL.md` §2.5
+// `with_horn_local_section_limit` on the caller's behalf. `docs/canon/THE_CONTAMINANT_PROTOCOL.md` §2.5
 // convicted the name itself: **a default is a level the organ picked because the caller was never
 // asked.** The horn local-section limit bounds how many affine integer-polynomial torsors one
 // horn-resolution event may retain, which is a statement about the cpu, so
@@ -1945,7 +1945,7 @@ mod tests {
     use super::*;
 
     /// **What this test body declares as its horn local-section limit.** It moved out of the organ
-    /// on 2026-08-09 (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.5 — *a default is a level the organ
+    /// on 2026-08-09 (`docs/canon/THE_CONTAMINANT_PROTOCOL.md` §2.5 — *a default is a level the organ
     /// picked because the caller was never asked*), and a fixture is a caller. The value reproduces
     /// the excised `DEFAULT_HORN_LOCAL_SECTION_LIMIT` so these fixtures' returns are unchanged by
     /// the move.

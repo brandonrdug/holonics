@@ -2,7 +2,7 @@
 //!
 //! **Record:** `research/records/2026-08-14_THE_MOVE_SPECIES_IS_A_FIBER_AND_THE_ISOLATED_POPULATION_IS_ITS_OWN_ROW.md`.
 //!
-//! This is the second instance of a shape the tree already owns. `soma/life/src/reconstruction_fiber.rs`
+//! This is the second instance of a shape the tree already owns. `crates/holonic-life/src/reconstruction_fiber.rs`
 //! presents a token occurrence together with a declared candidate population, gives every candidate
 //! **one common exposed face**, lets conduct reach their actual contexts, and returns the stable
 //! block of [`crate::receiver_exact_compression`] as the fiber. Nothing chooses a surface. The

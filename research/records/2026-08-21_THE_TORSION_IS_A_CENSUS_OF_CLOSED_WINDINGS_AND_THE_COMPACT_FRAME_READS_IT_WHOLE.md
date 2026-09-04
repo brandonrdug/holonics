@@ -6,10 +6,10 @@ classification carefully, I think that same tool will be useful for the other Mi
 problems; in general ideas pertaining to textile motion like Knot Theory, winding, gradients,
 etc. are powerful and more potent than you'd think, I say String Theory too even though it's
 theoretical physics (we have research deposits on all of these things)."* **It schedules
-nothing.** [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+nothing.** [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction authorities.
 **Position under the active plan.** Exterior mathematical material for Deed M2 of
-[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
+[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../archive/plans/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
 The Lean line does not couple to the engine, per Brandon's standing ruling.
 **Truth status and evidence:** `proved-derived` for the twelve Lean theorems, with
 `formal-checked` evidence from `#print axioms` (`[propext, Classical.choice, Quot.sound]`, zero

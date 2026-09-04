@@ -7,7 +7,7 @@ work, one Lean file; the full local structure computed and verified before encod
 (sixteen classes refused at two, twelve everywhere-locally-admissible, the
 depth-universal witness families checked in exact arithmetic).  **It schedules
 nothing.**
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction
 authorities.
 **Truth grades:** `proved-derived` with `formal-checked` evidence for the five headline

@@ -1084,7 +1084,7 @@ fn sign_variations(sequence: &[Vec<Rat>], point: &Rat) -> u32 {
 ///
 /// ## What a float is, stated precisely
 ///
-/// `canon/THE_MATHEMATICS_TABLET.md` §1: *a float is not a bad approximation of a ratio — it is the
+/// `docs/canon/THE_MATHEMATICS_TABLET.md` §1: *a float is not a bad approximation of a ratio — it is the
 /// ratio's series expansion in base two, truncated, with the remainder discarded.* The first half of
 /// that sentence is the part usually missed: the truncated expansion is itself **exact**. An
 /// IEEE-754 value is precisely `±m · 2^e` with `m` an integer, and nothing in that statement is
@@ -1101,7 +1101,7 @@ fn sign_variations(sequence: &[Vec<Rat>], point: &Rat) -> u32 {
 ///
 /// [`FloatReading`] is that declaration and the caller must make it. A codec that guessed would be
 /// choosing, for every consumer it will ever have, whether a deletion happened — which is the
-/// defect `canon/THE_MATHEMATICS_TABLET.md` §1 names in its own generalisation: *a carrier that
+/// defect `docs/canon/THE_MATHEMATICS_TABLET.md` §1 names in its own generalisation: *a carrier that
 /// reduces on construction has decided, for every consumer it will ever have, which distinctions
 /// are invisible.*
 ///
@@ -1133,7 +1133,7 @@ pub mod ieee754 {
     /// `bfloat16` is not an IEEE-754 interchange format, but it has the same three fields with the
     /// same meanings and the same subnormal convention, so one decode covers all three. It is here
     /// because it is the format the material arrives in: a transformer weight file is `BF16`, and
-    /// `soma/life/examples/eros_self_emanated_law.rs` refuses every other dtype by name.
+    /// `crates/holonic-life/examples/eros_self_emanated_law.rs` refuses every other dtype by name.
     #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
     pub enum BinaryFloatSpecies {
         /// IEEE-754 `binary16`: 1 sign, 5 exponent, 10 stored significand bits.
@@ -1471,7 +1471,7 @@ pub mod ieee754 {
         Ok(datum)
     }
 
-    /// A `bfloat16` word, as `soma/life/examples/eros_self_emanated_law.rs` reads them out of a
+    /// A `bfloat16` word, as `crates/holonic-life/examples/eros_self_emanated_law.rs` reads them out of a
     /// safetensors payload.
     pub fn decode_bfloat16_bits(word: u16) -> Result<BinaryFloatDatum, ExactValueError> {
         decode_bits(BinaryFloatSpecies::Bfloat16, u64::from(word))
@@ -2043,7 +2043,7 @@ mod tests {
     /// this workspace, and that includes this test module. (The earlier wording said the *tokens*
     /// `f32`/`f64` occur nowhere else, which is false — they occur in a doc line of `reopening.rs`,
     /// in a `#[test]` comment of `embedding_fiber.rs` recording a removal, and as the string
-    /// literals `".f16"`/`".f32"`/`".f64"` inside `soma/mount`'s *negative* assertion that the
+    /// literals `".f16"`/`".f32"`/`".f64"` inside `crates/holonic-mount`'s *negative* assertion that the
     /// generated PTX contains none. None of those is a float value; the claim about values holds
     /// and the claim about tokens did not. Measured 2026-08-16,
     /// `grep -rn --include='*.rs' -w 'f64\|f32' crates soma`.) The live-float round trip is
@@ -2171,7 +2171,7 @@ mod tests {
     }
 
     /// The bfloat16 decode must agree with the reader it was taken from,
-    /// `soma/life/examples/eros_self_emanated_law.rs:60`, on real material.
+    /// `crates/holonic-life/examples/eros_self_emanated_law.rs:60`, on real material.
     #[test]
     fn the_bfloat16_decode_agrees_with_the_reader_it_was_taken_from() {
         use ieee754::{BinaryFloatSpecies, decode_bfloat16_bits, decode_bits};

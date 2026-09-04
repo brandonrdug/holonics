@@ -9,7 +9,7 @@ rest), the session's unsealed terminal (`with_terminal_remainder`); the deed
 **Receipts:** `2026-09-03_SKE4_receipts/` (the session refit's receipts stay there too):
 `prefix_declaration_at_637_roles/` (withdrawn testimony) and `role_cones/` (the deed).
 **Campaign:** SKE4 under
-[`THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md`](../../blueprint/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md),
+[`THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md`](../../archive/plans/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md),
 on the segment session of
 [`the SKE4 session record`](2026-09-03_SKE4_THE_SESSION_RUNS_AS_SEGMENTS_UNDER_THE_2026-08-18_CONTRACT_AND_THE_FACE_ALONE_CROSSES_TO_THE_HOST.md).
 
@@ -179,7 +179,7 @@ verification, and the whole deed from one command about an hour of card time.
 ## 5. Corrected on 2026-09-04 after Sol's review
 
 [counterexample; source-inspected] Sol's review
-([`the review`](./2026-09-04_SOL_REVIEW_OF_THE_SKE_CAMPAIGN_THE_CONES_ARE_NOT_FOUNDED_CONES_THE_SPECIES_ARE_OFF_DOMAIN_AND_THE_PASSES_ARE_WITHDRAWN.md))
+([`the review`](2026-09-04_SOL_REVIEW_OF_THE_SKE_CAMPAIGN_THE_CONES_ARE_NOT_FOUNDED_CONES_THE_SPECIES_ARE_OFF_DOMAIN_AND_THE_PASSES_ARE_WITHDRAWN.md))
 found that the sets §4 called founded cones are not `FoundedCone`s: under the Lean a changed
 declared population enters the founded cone whole, so with the joint complement declared the
 founded union is every role, and under the singleton declaration alone the founded cone is the

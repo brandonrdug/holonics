@@ -16,7 +16,7 @@ mod store;
 pub use cli::{parse_cli, Cli, OutputFormat, WorkbenchInvocation};
 pub use command::{
     AthenaCommand, DiagnosticCommand, EngineCommand, ErosCommand, ExportCodecArgument,
-    SoulkillerCommand, WorkbenchCommand, WorkspaceCommand,
+    SoulkillerCommand, HnaCommand, WorkbenchCommand, WorkspaceCommand,
 };
 pub use event::{EventLevel, WorkbenchEvent};
 pub use protocol::{

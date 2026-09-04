@@ -1,5 +1,5 @@
 // ===== minkowski.js — the Minkowski chart between two objects: events, worldlines, cones, boosts, proper times, all exact in ℚ (c = 1 cell/tick) =====
-// canon/TABLET_THE_MANIFOLD.md §22: a receiver sits at an event; its reach is the causal cone; inside / on the null boundary / outside are
+// docs/canon/TABLET_THE_MANIFOLD.md §22: a receiver sits at an event; its reach is the causal cone; inside / on the null boundary / outside are
 // three regions, and on the boundary the returned difference is exactly zero. In 1+1 dimensions the cone is two lines, so the retarded
 // event of a uniformly moving object is RATIONAL. For a Pythagorean speed u = (m²−n²)/(m²+n²): γ = (m²+n²)/(2mn) and the Doppler factor
 // √((1−u)/(1+u)) = n/m are rational — the dilating terms of the relation between two frames are exact factors, not floats.

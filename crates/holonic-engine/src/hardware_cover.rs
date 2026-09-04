@@ -30,20 +30,20 @@
 //!
 //! Every quantity below comes from one of exactly two places:
 //!
-//! - **the surface declaring itself** — the device through `soma/mount`'s `Device::attribute` and
+//! - **the surface declaring itself** — the device through `crates/holonic-mount`'s `Device::attribute` and
 //!   `Device::launch_census`, the cpu through `std::thread::available_parallelism`. A device's warp
 //!   size is not a number this project chooses; it is the device's answer about the device.
 //! - **the material** — how many members a cell has, how many cells there are.
 //!
-//! **This module does not query the card, and it must not.** `soma/mount/src/cuda.rs` already owns
+//! **This module does not query the card, and it must not.** `crates/holonic-mount/src/cuda.rs` already owns
 //! that: `Device::attribute`, `Device::launch_census`, `Function::max_threads_per_block`, and
 //! `Function::linear_launch`, which derives grid and block from driver-reported apertures and
 //! **refuses rather than clipping** when the work exceeds them. A first version of this file
 //! declared its own `cuDeviceGetAttribute` block; that is precisely the construction
-//! `canon/THE_EXPLORATIVE_FAILURE.md` convicts, and it was removed. The engine owns the **law**; a
+//! `docs/canon/THE_EXPLORATIVE_FAILURE.md` convicts, and it was removed. The engine owns the **law**; a
 //! caller that can reach the surface supplies the declaration.
 //!
-//! **CORRECTED 2026-08-18: this paragraph read *"the engine cannot depend on `soma/mount` — a Cargo
+//! **CORRECTED 2026-08-18: this paragraph read *"the engine cannot depend on `crates/holonic-mount` — a Cargo
 //! cycle"*, and that was wrong.** `cargo metadata` shows `mount -> body, soma-abi` and nothing
 //! reaching the engine, so `holonic-engine -> mount` closes no cycle; it was `life -> engine` that
 //! forbids the *other* direction. The engine now depends on `mount`, and `resident_section` builds
@@ -53,7 +53,7 @@
 //! What IS a contaminant, and it is in the engine's own device path: `cuda_aperture.rs:44` carries
 //! `const THREADS_PER_BLOCK: u32 = 128` and `cuda_relation.rs` carries `128` and `256`, all three
 //! historically called ABI levels because launch geometry was said to be fixed by the device
-//! interface. **That reason is false**, and `soma/mount` proves it by deriving the
+//! interface. **That reason is false**, and `crates/holonic-mount` proves it by deriving the
 //! same quantity from the driver. Those two engine modules declare no device-attribute call at all,
 //! so they know the card's *name* and nothing about its shape — while a sibling stack in the same
 //! repository does it correctly.
@@ -248,13 +248,13 @@ impl HardwareCover {
     /// the device.
     ///
     /// **The engine does not query the card, and that is a structural fact rather than a gap.**
-    /// `soma/mount/src/cuda.rs` already owns the device query — `Device::attribute`,
+    /// `crates/holonic-mount/src/cuda.rs` already owns the device query — `Device::attribute`,
     /// `Device::launch_census`, `Function::max_threads_per_block`, and `Function::linear_launch`,
     /// which derives a launch shape from driver-reported apertures and refuses rather than clips.
-    /// `crates/holonic-engine` cannot depend on `soma/mount`: `soma/life` depends on the engine, so
-    /// the reverse edge is a Cargo cycle (`blueprint/THE_ASSEMBLY.md` F1). A first version of this
+    /// `crates/holonic-engine` cannot depend on `crates/holonic-mount`: `crates/holonic-life` depends on the engine, so
+    /// the reverse edge is a Cargo cycle (`archive/plans/THE_ASSEMBLY.md` F1). A first version of this
     /// module declared its own `cuDeviceGetAttribute` block, which is exactly the construction
-    /// `canon/THE_EXPLORATIVE_FAILURE.md` convicts — a new organ beside an existing owner. It was
+    /// `docs/canon/THE_EXPLORATIVE_FAILURE.md` convicts — a new organ beside an existing owner. It was
     /// removed.
     ///
     /// So the engine owns the **law** — which chart, licensed by what proof — and the physical
@@ -760,11 +760,11 @@ impl CoverDecomposition {
 // -------------------------------------------------------------------------------------------------
 //
 // A first version of this module carried a `launch_for` deriving grid and block from the device
-// declaration. It was removed for the same reason the FFI was: `soma/mount`'s
+// declaration. It was removed for the same reason the FFI was: `crates/holonic-mount`'s
 // `Function::linear_launch` already derives that shape from **both** the function's own
 // `CU_FUNC_ATTRIBUTE_MAX_THREADS_PER_BLOCK` and the device's census, folds X into Y when X
 // saturates, and refuses rather than clipping when the work exceeds the declared aperture. A weaker
-// twin beside it is the construction `canon/THE_EXPLORATIVE_FAILURE.md` convicts.
+// twin beside it is the construction `docs/canon/THE_EXPLORATIVE_FAILURE.md` convicts.
 //
 // This module returns **which cells may be separated onto which chart, and why that separation is
 // licensed**. How a chart realizes its own section is the chart's own owner's business.
@@ -1224,12 +1224,12 @@ mod tests {
 //
 // **All three conduct through this law as of 2026-08-11. Until that day this comment read "were
 // being covered separately" while two of them still were**, which is the overstatement
-// `canon/TABLET_THE_MANIFOLD.md` convicted in two code comments at once. The order the migration
+// `docs/canon/TABLET_THE_MANIFOLD.md` convicted in two code comments at once. The order the migration
 // ran in is worth keeping, because the three were not one motion:
 //
-// - `causal_language`'s leader (`soma/life/src/causal_language.rs`) — the law's only external
+// - `causal_language`'s leader (`crates/holonic-life/src/causal_language.rs`) — the law's only external
 //   caller for a day;
-// - `morphological_language::generate_currents` (`soma/life/src/morphological_language/ecology.rs`)
+// - `morphological_language::generate_currents` (`crates/holonic-life/src/morphological_language/ecology.rs`)
 //   — a change of **law** and not of plumbing: it sectioned `at % lanes` **by count**, and its own
 //   corpus proved that cover was not even lane-invariant;
 // - `token_invariance::sweep_covered` (`crates/holonic-engine/src/token_invariance.rs`) — which
@@ -1237,7 +1237,7 @@ mod tests {
 //   one law are where the two drift apart.
 //
 // **And three is the population of GENERATION fronts, not of every front in the body.** Two
-// receiver-conditioning fronts in `soma/life/src/causal_language.rs` —
+// receiver-conditioning fronts in `crates/holonic-life/src/causal_language.rs` —
 // `condition_route_receivers` and `condition_route_receivers_with_executor` — still section
 // `at % lanes` by count. The second cannot conduct through this law as written: it mounts a fresh
 // `&mut dyn LiveCurrentExecutor` per lane, and `expand` here is `Fn + Sync`, so a per-lane mutable

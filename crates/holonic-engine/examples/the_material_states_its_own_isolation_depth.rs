@@ -3,7 +3,7 @@
 //! Three authored levels bounded how deep an exact root isolation was allowed to descend before it
 //! refused: `MAXIMUM_ISOLATION_DEPTH = 200` in `rational_polynomial`, and `REFINEMENT_APERTURE = 64`
 //! and `ISOLATION_APERTURE = 64` in `winding_inertia`. None of the three was derived from anything.
-//! `canon/THE_CONTAMINANT_PROTOCOL.md` §2.5: *"Refusing past a number you invented does not make the
+//! `docs/canon/THE_CONTAMINANT_PROTOCOL.md` §2.5: *"Refusing past a number you invented does not make the
 //! number derived."*
 //!
 //! There is a theorem for it. For a squarefree `f` of degree `n >= 2`,
@@ -21,7 +21,7 @@
 //! ```
 //!
 //! This driver exhibits the orbit of lifting all three, in the form
-//! `canon/THE_CONTAMINANT_PROTOCOL.md` §4 asks for: the separating material, and the return on
+//! `docs/canon/THE_CONTAMINANT_PROTOCOL.md` §4 asks for: the separating material, and the return on
 //! either side of it.
 //!
 //! ```text

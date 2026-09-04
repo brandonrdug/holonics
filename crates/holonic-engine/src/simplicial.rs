@@ -681,7 +681,7 @@ impl ProjectiveTurn {
     /// infinity and never moves it.
     ///
     /// The affine subgroup is the weak part of the group: translation and
-    /// dilation are what `soma/body/src/soul.rs`'s own cross-ratio fixture
+    /// dilation are what `crates/holonic-body/src/soul.rs`'s own cross-ratio fixture
     /// varies, and cross-ratio invariance under it is a much smaller claim
     /// than invariance under `PGL(2,ℚ)`.  A declared family of turns that is
     /// entirely affine has not exercised the projective statement, so this is
@@ -1905,7 +1905,7 @@ mod tests {
 
     /// The declared family of turns.  Named, so a reader can see at a glance that it is not
     /// all affine — the last three have `c ≠ 0` and are therefore outside the subgroup that
-    /// `soma/body/src/soul.rs`'s own cross-ratio fixture varies.
+    /// `crates/holonic-body/src/soul.rs`'s own cross-ratio fixture varies.
     fn declared_turns() -> Vec<(&'static str, ProjectiveTurn)> {
         vec![
             (

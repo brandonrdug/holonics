@@ -42,6 +42,8 @@ pub fn capabilities() -> AdapterReturn {
         summary: "returned the callable workbench surface and explicit open fibres".to_owned(),
         payload: Some(json!({
             "implemented": {
+                "hna": ["run", "inspect", "infer", "train"],
+                "hna_artifact_scope": "current-native-session-receipt; full-operator checkpoint and standard-graph lowering remain separate pipeline work",
                 "variant_workspace": ["create", "inspect", "import-snapshot", "define-experiment", "conduct", "continue", "stage-return", "commit", "decline", "evaluate", "export"],
                 "diagnostic": {
                     "athena": ["open", "inspect", "conduct", "continue", "return", "decline", "diffuse-demo", "snapshot", "export"],

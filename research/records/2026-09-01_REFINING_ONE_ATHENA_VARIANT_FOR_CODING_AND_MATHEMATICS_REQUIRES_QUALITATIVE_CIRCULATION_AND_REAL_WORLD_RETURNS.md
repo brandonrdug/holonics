@@ -8,8 +8,8 @@ for the missing qualitative codecs and return constitution.
 **Evidence:** `implemented-exact`, `source-inspected`, and `process-audit` where explicitly tagged.
 **Construction effect:** none. This record is assessment and does not schedule a campaign, change
 the roadmap, or move `CONSTRUCTION_STATE.md`.
-**Governing doctrine:** [`canon/TABLET_THE_REASONING_CYCLE.md`](../../canon/TABLET_THE_REASONING_CYCLE.md),
-[`canon/TABLET_THE_HEXIS.md`](../../canon/TABLET_THE_HEXIS.md), and the learning/information and
+**Governing doctrine:** [`canon/TABLET_THE_REASONING_CYCLE.md`](../../docs/canon/TABLET_THE_REASONING_CYCLE.md),
+[`canon/TABLET_THE_HEXIS.md`](../../docs/canon/TABLET_THE_HEXIS.md), and the learning/information and
 experiment boundaries in [`AGENTS.md`](../../AGENTS.md).
 **Current application evidence:**
 [`2026-09-01_VWS6_HOLONICS_RETURNED_THE_PERSISTENT_VARIANT_WORKSPACE_APPLICATION.md`](2026-09-01_VWS6_HOLONICS_RETURNED_THE_PERSISTENT_VARIANT_WORKSPACE_APPLICATION.md).

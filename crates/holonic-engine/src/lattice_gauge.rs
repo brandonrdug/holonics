@@ -6,10 +6,10 @@
 //! [`crate::structure_group`] already carries the discrete `a ∧ a`: a connection valued in a
 //! declared finite group, holonomy as a group element, the basepoint-free conjugacy class, and
 //! [`crate::structure_group::StructureConnection::curvature_commutator`]. What it does **not**
-//! carry, and what `canon/THE_MILLENNIUM_FRAME.md`'s Yang–Mills row was corrected on 2026-08-11 to
+//! carry, and what `docs/canon/THE_MILLENNIUM_FRAME.md`'s Yang–Mills row was corrected on 2026-08-11 to
 //! say precisely, is *"a representation, a Wilson plaquette action, a transfer operator"*. Each of
 //! those is a **receiver** on a connection, not a new geometry, so building them beside
-//! `structure_group` would be the explorative failure `canon/THE_EXPLORATIVE_FAILURE.md` names. This
+//! `structure_group` would be the explorative failure `docs/canon/THE_EXPLORATIVE_FAILURE.md` names. This
 //! module is a **mouth**: every group operation below is `structure_group`'s, and what is added is
 //! the reading — a lattice, a representation, an action, and one operator whose spectrum is exact.
 //!
@@ -1259,7 +1259,7 @@ mod tests {
     /// face per vertex `U_x(v) · U_y(v+x̂) · U_x(v+ŷ)⁻¹ · U_y(v)⁻¹`.
     ///
     /// The extent is the **caller's declaration**, which is why it is an argument and not a constant
-    /// in this module: `canon/THE_AUTHORED_LEVEL.md`. Vertices are `(row, column)` folded as
+    /// in this module: `docs/canon/THE_AUTHORED_LEVEL.md`. Vertices are `(row, column)` folded as
     /// `extent·row + column`, so the torus wraps in both directions and the incidence is read off
     /// that folding rather than declared twice.
     fn torus(extent: u64) -> Lattice {

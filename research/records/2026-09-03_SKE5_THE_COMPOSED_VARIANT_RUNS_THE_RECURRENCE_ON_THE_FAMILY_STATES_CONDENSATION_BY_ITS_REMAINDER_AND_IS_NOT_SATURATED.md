@@ -1,7 +1,7 @@
 # SKE5: the composed variant runs the family; identification saturates on the final enlargement while reachable consequences grow
 
 **Date:** 2026-09-03, corrected 2026-09-04 after Sol's review and the subsequent receipt audit
-([`the review`](./2026-09-04_SOL_REVIEW_OF_THE_SKE_CAMPAIGN_THE_CONES_ARE_NOT_FOUNDED_CONES_THE_SPECIES_ARE_OFF_DOMAIN_AND_THE_PASSES_ARE_WITHDRAWN.md)).
+([`the review`](2026-09-04_SOL_REVIEW_OF_THE_SKE_CAMPAIGN_THE_CONES_ARE_NOT_FOUNDED_CONES_THE_SPECIES_ARE_OFF_DOMAIN_AND_THE_PASSES_ARE_WITHDRAWN.md)).
 **Owner:** `applications/athena-alpha/src/composed_variant.rs` (the composition, the species over
 the domain, the width difference at one grain, the product vector, the finite identification
 saturation reading and separate consequence growth, the deed release receiver); the deed
@@ -11,7 +11,7 @@ per-coordinate residual under every exposure as `composed_remainder_*.bin`, `dee
 SKE4 return (`2026-09-03_SKE4_receipts/role_cones/`). The committed SKE5 receipt's
 `product.rest_sha256` is empty; this record does not assert that it contains a rest digest.
 **Campaign:** SKE5, the last deed of
-[`THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md`](../../blueprint/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md).
+[`THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md`](../../archive/plans/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md).
 
 [historical; source-inspected] The receipt audit corrected the original prose's mount time,
 cycle range, full-residency comparison, and saturation interpretation against the committed

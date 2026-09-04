@@ -3,7 +3,7 @@
 //! ## What this implements
 //!
 //! **H.0016, receiver-exact compression**, already a machine-checked definition in this project's
-//! registry (`papers/source/holonics/foundations.typ`) and until now with no implementation:
+//! registry (`research/papers/source/holonics/foundations.typ`) and until now with no implementation:
 //!
 //! ```text
 //!   a compression is a quotient q : X -> Q such that every receiver factors, rho = rho_bar . q
@@ -14,7 +14,7 @@
 //! receiver by construction, so an organ that computed only this could never fail. `CLAUDE.md` §8
 //! calls that a receipt that could not have come out otherwise.
 //!
-//! The content is in the clause `canon/01_CAUSAL_CALCULUS.md` adds: a quotient is exact only when
+//! The content is in the clause `docs/canon/01_CAUSAL_CALCULUS.md` adds: a quotient is exact only when
 //! *"stateful successor conduct remains equivalent for every admitted input history"* — **"equal
 //! one-shot output is inadequate."** That clause CAN fail, and its failure is the returned artifact.
 //!

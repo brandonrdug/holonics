@@ -34,7 +34,7 @@
 //! `holonic_engine::traversible_chain` checks the two charts against each other over a swept
 //! material. It lives **here** because it is pure integer arithmetic over populations and because
 //! two crates that cannot see each other both need it: `holonic-engine` for transport, and
-//! `soma/membrane` for the co-present seam closure, whose candidate admission is the same junction.
+//! `crates/holonic-membrane` for the co-present seam closure, whose candidate admission is the same junction.
 //!
 //! # Why this is the right carrier for an admission
 //!

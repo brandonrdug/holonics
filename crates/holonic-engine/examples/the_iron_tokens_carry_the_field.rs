@@ -12,14 +12,14 @@
 //! > invariant tokens… The density and invariants it founds are not ours to necessarily author,
 //! > they are happenstance of our own writing."*
 //!
-//! The precedent is `canon/THE_DIALECT.md`: 8,935 messages measured, `holon` 1141, `current` 696,
+//! The precedent is `docs/canon/THE_DIALECT.md`: 8,935 messages measured, `holon` 1141, `current` 696,
 //! `FOUND`/`RIDE`/`OPEN` as capitalised primitives **zero**. Nobody authored that reading.
 //!
 //! ## Why two readings and not one
 //!
 //! **Frequency is `Π`** — the lived construction — and `Π` does not gate. **Probability is `Q`**, a
 //! quotient a *declared receiver* takes, and because it is a quotient its loss is exhibitable.
-//! `reference/holobrochos-a07ff376/src/soma/FORMULA.md:2459`: *"A probability distribution over
+//! `archive/reference/holobrochos-a07ff376/src/soma/FORMULA.md:2459`: *"A probability distribution over
 //! which event will be received is an observer's declared quotient over what that observer does not
 //! carry."*
 //!
@@ -70,7 +70,7 @@
 //! Assistant-declared, not Brandon's. `arxiv`-iron and `the`-fuzzy were formed from a throwaway
 //! Python probe of this same corpus taken before the Rust reading, and are therefore predictions
 //! about whether *this implementation* reproduces that probe rather than blind guesses. The
-//! `holon`-iron expectation is independent: it comes from `canon/THE_DIALECT.md`'s measurement of a
+//! `holon`-iron expectation is independent: it comes from `docs/canon/THE_DIALECT.md`'s measurement of a
 //! different corpus, and it is refuted here.
 
 use std::collections::{BTreeMap, BTreeSet};
@@ -1015,7 +1015,7 @@ fn main() {
         (
             "holon",
             true,
-            "canon/THE_DIALECT.md measures it the project's densest term of art, 1141 uses",
+            "docs/canon/THE_DIALECT.md measures it the project's densest term of art, 1141 uses",
         ),
     ] {
         let Some(surface) = census.lookup(name) else {
@@ -1369,7 +1369,7 @@ fn main() {
     println!("6 -- WHAT THE TWO EXCISED LEVELS WERE WITHHOLDING");
     println!("-------------------------------------------------");
     println!(
-        "`canon/THE_CONTAMINANT_PROTOCOL.md` §4: lift the level, re-run the declared material,\n\
+        "`docs/canon/THE_CONTAMINANT_PROTOCOL.md` §4: lift the level, re-run the declared material,\n\
          exhibit the difference. `WINDOW_APERTURE = 64` presented the first 64 distinct windows per\n\
          surface IN CORPUS ORDER and reported the conduct-block count of that subsample;\n\
          `SEPARATION_EXHIBIT = 512` then kept the first 512 separations of what was left. Both were\n\

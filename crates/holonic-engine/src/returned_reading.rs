@@ -19,7 +19,7 @@
 //!
 //! ## The law
 //!
-//! `canon/THE_HOLOBROCHOS_SPINE.md` §1, quoting Soma's chain law. Summing consecutive event grains
+//! `docs/canon/THE_HOLOBROCHOS_SPINE.md` §1, quoting Soma's chain law. Summing consecutive event grains
 //! cancels every interior `Σ_k` **while retaining it in the causal interior**:
 //!
 //! ```text
@@ -226,7 +226,7 @@ impl ReturnedReading {
     /// **The seal.** This reading as octets, so the return can cross the world's own record instead
     /// of a call.
     ///
-    /// `canon/THE_HOLOBROCHOS_SPINE.md` §4 carries Soma's prohibition and this is what it asks for:
+    /// `docs/canon/THE_HOLOBROCHOS_SPINE.md` §4 carries Soma's prohibition and this is what it asks for:
     ///
     /// > *"The membrane mails the radiation OUT into the world's own record; the world answers; the
     /// > answer returns as the next light. **Reafference is the world's, never a wire's.**"*
@@ -1468,7 +1468,7 @@ fn occurrences_taken(
 /// this function without sealing it first, and a caller who sealed to disk and then conditioned on
 /// the memory value would have to call [`condition_again`] by name to do it.
 ///
-/// That distinction is the whole content. `canon/THE_HOLOBROCHOS_SPINE.md` §4 quotes Soma's
+/// That distinction is the whole content. `docs/canon/THE_HOLOBROCHOS_SPINE.md` §4 quotes Soma's
 /// prohibition — *"Reafference is the world's, never a wire's"* — and its test is one question: *did
 /// it get written and re-read?* A function whose argument is a live carrier cannot answer that
 /// question about itself; one whose argument is octets has already answered it, because octets are

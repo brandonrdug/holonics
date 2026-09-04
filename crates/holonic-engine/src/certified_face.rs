@@ -1,7 +1,7 @@
 //! A presentation face whose feature population is Sturm-certified, not sampled.
 //!
 //! Record: `research/records/2026-08-08_THE_SAMPLER_HOPES_THE_CERTIFICATE_KNOWS_THE_GAUGE_CARRIES_NO_STRUCTURE.md`.
-//! Contract: `blueprint/THE_PRESENTATION_ORGAN.md`.
+//! Contract: `archive/plans/THE_PRESENTATION_ORGAN.md`.
 //!
 //! ## Why this is not a plotter
 //!

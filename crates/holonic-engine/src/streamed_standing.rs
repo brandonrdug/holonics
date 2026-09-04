@@ -227,8 +227,8 @@ pub struct StreamedCensus {
 /// An input of a **different** extent moves the section shapes, hence the kernel parameters, and
 /// that is where the two routes divide: `cuGraphExecKernelNodeSetParams` updates an instantiated
 /// executable's node in place, or the passage is re-instantiated. **Neither is exercised and the
-/// first is not bound** — `soma/mount/src/ffi.rs` carries no `cuGraphExecKernelNodeSetParams`,
-/// measured 2026-08-19 by `grep -c cuGraphExec soma/mount/src/ffi.rs` → 1, which is
+/// first is not bound** — `crates/holonic-mount/src/ffi.rs` carries no `cuGraphExecKernelNodeSetParams`,
+/// measured 2026-08-19 by `grep -c cuGraphExec crates/holonic-mount/src/ffi.rs` → 1, which is
 /// `cuGraphExecDestroy`. Deed H5's cohort conduction is where a second extent
 /// enters.
 ///

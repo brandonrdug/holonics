@@ -4,7 +4,7 @@
 **Kind:** framing deposit — Brandon's clock/units exposition, his critique of the official
 P versus NP problem statement, and his question on the exact carriers of `e` and the
 transcendentals.  **It schedules nothing.**
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction
 authorities.
 **Truth grades:** `proved-standard` for every classical statement, cited;

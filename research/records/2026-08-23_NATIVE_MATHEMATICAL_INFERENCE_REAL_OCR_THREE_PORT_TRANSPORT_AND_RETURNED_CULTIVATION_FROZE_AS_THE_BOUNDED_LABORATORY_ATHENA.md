@@ -3,7 +3,7 @@
 **Date:** 2026-08-23  
 **Kind:** construction return and capability address  
 **Campaign:** N0--N4 under
-[`blueprint/THE_LABORATORY_ATHENA_UNIFIES_NATIVE_MATHEMATICAL_INFERENCE_REAL_OCR_AND_HETEROGENEOUS_TRANSPORT.md`](../../blueprint/THE_LABORATORY_ATHENA_UNIFIES_NATIVE_MATHEMATICAL_INFERENCE_REAL_OCR_AND_HETEROGENEOUS_TRANSPORT.md)  
+[`blueprint/THE_LABORATORY_ATHENA_UNIFIES_NATIVE_MATHEMATICAL_INFERENCE_REAL_OCR_AND_HETEROGENEOUS_TRANSPORT.md`](../../archive/plans/THE_LABORATORY_ATHENA_UNIFIES_NATIVE_MATHEMATICAL_INFERENCE_REAL_OCR_AND_HETEROGENEOUS_TRANSPORT.md)  
 **Truth status:** `implemented-exact` for deterministic native/device consequences;
 `measured` for apparatus, byte, population, and timing testimony; `established-bounded` for every
 capability statement restricted to the named receiver/history/material aperture; `open` for every

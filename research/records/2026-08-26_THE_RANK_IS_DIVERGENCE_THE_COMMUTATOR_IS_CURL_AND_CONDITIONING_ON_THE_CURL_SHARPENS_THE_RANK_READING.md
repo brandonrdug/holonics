@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-26
 **Kind:** returned measurement plus one exploitable consequence. **It schedules nothing.**
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction authorities.
 **Occasion:** Brandon, direct request, 2026-08-26 — *"do some real shit with the riemann zeta
 function and its zeros in relation to these elliptical curves… treat the zeros of things as
@@ -64,7 +64,7 @@ instanced.
 
 Ordinates are exact rationals (published to nine places; the decimal *is* the exact datum). The
 argument principle is `cellularCurl` of
-[`HolonicDiscreteMaxwellOperator.lean`](../../soma/formal/elementary-holonics/ElementaryHolonics/Millennium/HolonicDiscreteMaxwellOperator.lean):
+[`HolonicDiscreteMaxwellOperator.lean`](../../formal/elementary-holonics/ElementaryHolonics/Millennium/HolonicDiscreteMaxwellOperator.lean):
 circulation of the phase 1-form around a face equals the enclosed charge. Coarse-graining the
 critical line into unit cells makes the charge an integer 2-form.
 
@@ -93,7 +93,7 @@ w = 2000, t * (second difference of the exact integer count)
 
 **In this chart the cosmological-constant analogue is not constant — the phase curvature dilutes.**
 Typed against
-[`HolonicTypedOriginDimensions.lean`](../../soma/formal/elementary-holonics/ElementaryHolonics/Millennium/HolonicTypedOriginDimensions.lean):
+[`HolonicTypedOriginDimensions.lean`](../../formal/elementary-holonics/ElementaryHolonics/Millennium/HolonicTypedOriginDimensions.lean):
 `N` is a winding, `N'` is `[t]^-1`, `N''` is `[t]^-2` — the same tensor line as `Λg`.
 
 ### 2b. Two clocks in one locale, and cross-entropy without a logarithm

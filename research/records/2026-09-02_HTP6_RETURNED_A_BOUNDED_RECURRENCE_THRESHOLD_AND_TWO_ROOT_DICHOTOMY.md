@@ -2,8 +2,8 @@
 
 **Date:** 2026-09-02
 **Scope:** Non-scheduling progress record for HTP6 under
-[`../../blueprint/THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md`](../../blueprint/THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md).
-**Truth status:** per claim under [`../../canon/EPISTEMIC_GRADES.md`](../../canon/EPISTEMIC_GRADES.md).
+[`../../blueprint/THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md`](../../archive/plans/THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md).
+**Truth status:** per claim under [`../../canon/EPISTEMIC_GRADES.md`](../../docs/canon/EPISTEMIC_GRADES.md).
 
 ## 1. Bounded return
 

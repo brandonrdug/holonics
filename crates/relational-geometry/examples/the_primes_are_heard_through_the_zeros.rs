@@ -38,8 +38,8 @@ use relational_geometry::{
 };
 
 const DEFAULT_ARTIFACTS: &str =
-    "output/the_card_returns_the_eta_boundary_and_the_zero_is_a_winding";
-const OUTPUT: &str = "output/the_primes_are_heard_through_the_zeros";
+    ".local/artifacts/the_card_returns_the_eta_boundary_and_the_zero_is_a_winding";
+const OUTPUT: &str = ".local/artifacts/the_primes_are_heard_through_the_zeros";
 const BITS: u32 = 64;
 const TERMS: u32 = 20;
 

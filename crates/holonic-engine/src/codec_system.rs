@@ -25,7 +25,7 @@
 //!
 //! ## The state of a codec is not its symbol class
 //!
-//! `blueprint/THE_ASSEMBLY.md` step 3 says the recovered codec is *"a finite machine whose states
+//! `archive/plans/THE_ASSEMBLY.md` step 3 says the recovered codec is *"a finite machine whose states
 //! are `SymbolClass` and whose inputs are symbols."* **That reading is degenerate and this module
 //! does not use it.** Under it the successor map is
 //!
@@ -1058,7 +1058,7 @@ mod tests {
     };
 
     /// **What this test body declares as its own capacity**, since `codec_recovery` no longer
-    /// picks one (`canon/THE_AUTHORED_LEVEL.md` §5.2). Reproduces the excised constants.
+    /// picks one (`docs/canon/THE_AUTHORED_LEVEL.md` §5.2). Reproduces the excised constants.
     const TEST_APERTURES: RecoveryApertures = RecoveryApertures {
         family_words: 65_536,
         free_entries: 12,

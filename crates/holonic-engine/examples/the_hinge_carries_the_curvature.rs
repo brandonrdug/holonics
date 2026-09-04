@@ -37,7 +37,7 @@
 //! ## What is deliberately NOT reported as a finding
 //!
 //! `Σ_v deficit(v) = 2πχ` is a **theorem** for closed triangulated surfaces, so it cannot fail
-//! there. `canon/TABLET_THE_TURN.md` §11.4 already convicts it: *"The one row where `Σδ = 6χ` holds
+//! there. `docs/canon/TABLET_THE_TURN.md` §11.4 already convicts it: *"The one row where `Σδ = 6χ` holds
 //! requires `F = 2E/3` and is `CLAUDE.md` §8's tautology rule firing."* It is computed below as a
 //! **correctness gate on the angle arithmetic** and labelled as one, and the surface condition is
 //! measured rather than assumed.

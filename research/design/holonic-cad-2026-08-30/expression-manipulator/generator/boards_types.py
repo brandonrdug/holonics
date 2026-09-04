@@ -7,39 +7,39 @@ def cite(t): return f'<span class="meta">{t}</span>'
 def types_ontology():
     left = col([
         typ("Occurrence", ["id: (birth moment, rank) — owner-minted, never a value/hash", "kind: site | edge | cell | port | swing | …", "chart: declared presentation", "lineage: caused_by[]", "grade: Grade"],
-            "a datum occurs in a declared type/fibre, parameter, event cut, source boundary and incidence context; equal bytes do not imply the same occurrence", "canon/00_PURE_HOLONICS.md:9"),
+            "a datum occurs in a declared type/fibre, parameter, event cut, source boundary and incidence context; equal bytes do not imply the same occurrence", "docs/canon/00_PURE_HOLONICS.md:9"),
         typ("Holon", ["members: Occurrence[] (composite of holons)", "closure: transitions internal to H close in H", "exterior: explicit crossing incidence", "boundary: receiver-relative B_ρ", "obstruction: O retained"],
-            "a relative local closure with its exterior explicit — a black box with a face; always a composite", "canon/00_PURE_HOLONICS.md:66,71 · THE_HOLOBROCHOS_SPINE.md:193"),
+            "a relative local closure with its exterior explicit — a black box with a face; always a composite", "docs/canon/00_PURE_HOLONICS.md:66,71 · THE_HOLOBROCHOS_SPINE.md:193"),
         typ("AddressedPassage (span X ← W_f → Y)", ["source: Occurrence (X)", "occurrences: W_f — the population that crossed", "target: Occurrence (Y)", "boundary_src, boundary_tgt: both maps, retained", "ports: Port[] typed", "current: exact complex section", "phase, hand", "chronology, obstruction, open_exterior", "fibre: ReconstructionFiber"],
-            "the elementary lineage-bearing passage; serial composition keeps the pullback W_f ×_Y W_g; endpoint connectivity alone is a receiver shadow", "canon/07_CAUSAL_ALGEBRAIC_GEOMETRY.md:64 · AGENTS.md ownership"),
+            "the elementary lineage-bearing passage; serial composition keeps the pullback W_f ×_Y W_g; endpoint connectivity alone is a receiver shadow", "docs/canon/07_CAUSAL_ALGEBRAIC_GEOMETRY.md:64 · AGENTS.md ownership"),
         typ("Port", ["name, kind: PortKind (see Library — contact rules)", "orientation: in | out | shared", "chart: local frame", "lineage: which passage exposed it"],
-            "exposed subscheme / module map / correspondence leg / typed boundary section — not interchangeable", "canon/07:51 · 01:16,105"),
+            "exposed subscheme / module map / correspondence leg / typed boundary section — not interchangeable", "docs/canon/07:51 · 01:16,105"),
     ], "flex: 1 1 0")
     mid = col([
         typ("Receiver ⟨ρ|", ["map: ρ : X → Y (or relation)", "aperture, calibration", "preserved: what it keeps", "forgotten: fibres it drops (named)", "transition law"],
-            "a declared map, instrument, use or comparison presenting one face; evaluation, trace, spectrum, rendered image are different receivers", "canon/00:12 · SPINE:181 · 08:160"),
+            "a declared map, instrument, use or comparison presenting one face; evaluation, trace, spectrum, rendered image are different receivers", "docs/canon/00:12 · SPINE:181 · 08:160"),
         typ("Face ⟨φ|ψ⟩", ["receiver: Receiver", "of: Holon | Passage", "value: exact carrier element (ℚ, ℚ(i), ℚ(ζₙ), …)", "forgets: named collapsed population", "exact: bool — every future distinction at scope factors through it"],
-            "testimony about x through ρ, never its identity; a float is a face retained as if it were the construction", "canon/00:13 · OPERATIONS:47 · SPINE:183"),
+            "testimony about x through ρ, never its identity; a float is a face retained as if it were the construction", "docs/canon/00:13 · OPERATIONS:47 · SPINE:183"),
         typ("Swing", ["before: Occurrence", "operator: Transport | Tactic | Rewrite | Tick", "after: Occurrence", "receiver: Receiver", "hypotheses: Occurrence[]", "orientation: hand (+ | −, e^{iπ})", "boundary: spawned / owed", "grade: Grade", "fibre: ReconstructionFiber (assignment, kernels)"],
-            "algebraic manipulations and proof derivations are typed swings through mathematical objects", "AGENTS.md:99 · canon/08:115 (cross-ratio swing) · THE_DIALECT:89 (constraint equations)"),
+            "algebraic manipulations and proof derivations are typed swings through mathematical objects", "AGENTS.md:99 · docs/canon/08:115 (cross-ratio swing) · THE_DIALECT:89 (constraint equations)"),
         typ("Chain", ["swings: Swing[] ordered", "interior: retained Σ_k (telescoped in the face, kept in lineage)", "transport: matrix, not ratio", "cocycle: composes path-independently or reports holonomy"],
-            "∂E_k = Σ_{k+1} − Σ_k + Γ_k; chronology is part of the construction even when an endpoint quotient is equal", "canon/SPINE:49,62 · 01:58 · blueprint/THE_TRAVERSIBLE_CHAIN:72"),
+            "∂E_k = Σ_{k+1} − Σ_k + Γ_k; chronology is part of the construction even when an endpoint quotient is equal", "docs/canon/SPINE:49,62 · 01:58 · blueprint/THE_TRAVERSIBLE_CHAIN:72"),
         typ("Cell (higher)", ["paths: (P, Q) parallel passages with equal source address", "filling: declared higher boundary map (∂∂ = 0 only after it exists)"],
-            "a comparison cell relates two complete paths with compatible boundaries; never a new solver or universal holon type", "canon/01:10 · SPINE:197 · ADDRESSED_TRANSPORT_CHAIN:237"),
+            "a comparison cell relates two complete paths with compatible boundaries; never a new solver or universal holon type", "docs/canon/01:10 · SPINE:197 · ADDRESSED_TRANSPORT_CHAIN:237"),
     ], "flex: 1 1 0")
     right = col([
         typ("Lattice", ["sites: Occurrence[] (ℤⁿ coordinates in a chart)", "incidence: oriented, exact, ∂² = 0", "cells: 0..k", "members may present an internal lattice (recursion)"],
-            "lattice = founded incidence; crystal adds locked phase transport; fractal recurs under restriction/rebase", "canon/TABLET_THE_REASONING_CYCLE.md:487 · blueprint ATHENA_ALPHA:309"),
+            "lattice = founded incidence; crystal adds locked phase transport; fractal recurs under restriction/rebase", "docs/canon/TABLET_THE_REASONING_CYCLE.md:487 · blueprint ATHENA_ALPHA:309"),
         typ("Site / Arc / Junction", ["site: capacity", "arc: one conducting channel (ordered)", "junction: current distributes (co-present)"],
-            "the site carries capacity, the passage carries characteristic delay; chronology is not seriality", "canon/THE_SURFACES_ARE_PATHS.md:79,99"),
+            "the site carries capacity, the passage carries characteristic delay; chronology is not seriality", "docs/canon/THE_SURFACES_ARE_PATHS.md:79,99"),
         typ("Current / Storage / Boundary map", ["q: locally stored response", "j: transported current", "B: incidence", "r: supplied residual", "law: q_{k+1} − q_k + B j_k = r_k"],
-            "current and form are roles: a relation is current while crossing a selected cut, form when retained for a later cut", "canon/02_INFORMATION_PHYSICS.md:35,48,53"),
+            "current and form are roles: a relation is current while crossing a selected cut, form when retained for a later cut", "docs/canon/02_INFORMATION_PHYSICS.md:35,48,53"),
         typ("Membrane", ["ports: crossing points (ingress/egress = one membrane, two orientations)", "phase: distributed local sampling", "radiation, return"],
-            "a clock is a distributed local phase and sampling membrane, not a global instant", "canon/02:67 · blueprint WORLD_TUBE:91"),
+            "a clock is a distributed local phase and sampling membrane, not a global instant", "docs/canon/02:67 · blueprint WORLD_TUBE:91"),
         typ("ReconstructionFiber", ["quotient: q_R", "population: predecessors compatible with one observed future class", "separator: shortest reopening history"],
-            "RF(D_K,R;[y]) = (q_R ∘ D_K)⁻¹([y]); not a probability, a nearest neighbour, or a chosen representative", "canon/TABLET_THE_OPERATIONS.md:275"),
+            "RF(D_K,R;[y]) = (q_R ∘ D_K)⁻¹([y]); not a probability, a nearest neighbour, or a chosen representative", "docs/canon/TABLET_THE_OPERATIONS.md:275"),
         typ("Grade", ["truth: definition | project-postulate | proved-standard | proved-derived | established-bounded | conditional | interpretation | conjecture | counterexample | open | historical", "evidence: formal-checked | implemented-exact | measured | computational-witness | source-inspected | source-audit | process-audit"],
-            "exactly one truth grade, zero or more tags; orthogonal", "canon/EPISTEMIC_GRADES.md"),
+            "exactly one truth grade, zero or more tags; orthogonal", "docs/canon/EPISTEMIC_GRADES.md"),
     ], "flex: 1 1 0")
     body = row([left, mid, right], "flex: 1 1 auto; min-height: 0") + note("Each type here is a <b>reading</b> of an existing canon definition, not a proposed struct: the Crate page names which existing Rust owner already carries it and where the CAD would add only a projection. Field lists are top-level and illustrative of what a document must retain; none is a database schema.")
     return artboard("Ontology — the types every face is drawn from", "occurrence · holon · addressed passage · port · receiver · face · swing · chain · cell · lattice · current · membrane · fibre · grade", 1560, 1060, body,
@@ -100,7 +100,7 @@ intervention       : holding drive or mutual coupling fixed
 binary parametron  : the sign face — an exact quotient ONLY on the declared locked population
 lattice            : a population of carriers through typed shared incidence; each member may
                      present a further internal lattice""") +
-        note(grade("proved-derived") + " " + tag("formal-checked") + " Millennium/HolonicParametron.lean (two half-turn-related locked sheets; cosine coupling → Ising only after the lock) and Millennium/HolonicComplexParametron.lean (B, M, G = BᵀMB, reorientation covariance) — canon/TABLET_THE_REASONING_CYCLE.md:460–495"), "flex: 1 1 0")
+        note(grade("proved-derived") + " " + tag("formal-checked") + " Millennium/HolonicParametron.lean (two half-turn-related locked sheets; cosine coupling → Ising only after the lock) and Millennium/HolonicComplexParametron.lean (B, M, G = BᵀMB, reorientation covariance) — docs/canon/TABLET_THE_REASONING_CYCLE.md:460–495"), "flex: 1 1 0")
     types_ = panel("as CAD types — a component instance, its finite lattice, its tick", col([
         typ("ParametronCarrier", ["nodes: Site[n] (addressed coefficient nodes)", "branches: OrientedEdge[m] — B : m×n, entries {−1,0,1}", "c: Vec&lt;Exact&lt;ℂ&gt;&gt;ⁿ — ℚ(i) / ℚ(ζ_k) / multiquadratic tower", "M: Hermitian m×m exact (per-branch L, C, R; mutual coupling off-diagonal)", "G: derived = BᵀMB (never stored as truth)", "ker_B, ker_G: retained fibres", "drive: Pump? (ω exact phase, parametric)", "lineage: growth rule + signature", "exterior: Port[] undeclared"],
             "the productive object; width, branch count and lock do not bound its semantic capacity"),
@@ -118,4 +118,4 @@ lattice            : a population of carriers through typed shared incidence; ea
     ]), "flex: 0 0 auto")
     body = row([carrier, types_], "flex: 1 1 auto; min-height: 0") + refuse
     return artboard("Carrier types — the Complex Parametron as a computational object", "an oriented incidence, an exact complex current, a receiver form, a pulled storage; its finite lattice transports action like electricity, literally", 1560, 960, body,
-                    "sources: canon/TABLET_THE_REASONING_CYCLE.md §8d · AGENTS.md causal arithmetic clause on the Complex Parametron · Millennium/HolonicComplexParametron.lean · HolonicParametron.lean")
+                    "sources: docs/canon/TABLET_THE_REASONING_CYCLE.md §8d · AGENTS.md causal arithmetic clause on the Complex Parametron · Millennium/HolonicComplexParametron.lean · HolonicParametron.lean")

@@ -9,7 +9,7 @@
 //! `tensor`, `vector`, `lemma`, `group`, `field`, `holon`, `receiver` and `exact` were **all**
 //! `Varying`, and the 1,269 surfaces that did collapse were URL components and timestamps.
 //!
-//! `canon/MEANING_DEFINED.md:81` carries the same object as its one unbuilt row: competing
+//! `docs/canon/MEANING_DEFINED.md:81` carries the same object as its one unbuilt row: competing
 //! decompositions live as pathways, *"nothing yet keeps two incompatible decompositions live."*
 //!
 //! ## What the fourth axis reads

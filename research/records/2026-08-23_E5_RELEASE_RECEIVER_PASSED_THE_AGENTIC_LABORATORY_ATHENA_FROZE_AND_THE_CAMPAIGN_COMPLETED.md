@@ -25,7 +25,7 @@ uncatalogued and exit status zero. No workspace test, example build, native math
 membrane deed or Phoenix frontier was replayed.
 
 [established-bounded] E5 is release-admitted, and the ordered E0--E5 construction campaign is
-complete. `CONSTRUCTION_STATE.md`, [`THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md), and the
+complete. `CONSTRUCTION_STATE.md`, [`THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md), and the
 active blueprint now record no authorized successor deed.
 
 [open] Unexcited foreign successor histories, nonlinear analytic and wider dimensional/unit

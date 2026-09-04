@@ -4,8 +4,8 @@
 //! ```text
 //! cargo run --release --example derivation_curvature_flow -- \
 //!     standing/output \
-//!     reference/pureholonics-seed/src/pureholonics \
-//!     reference/holobrochos-a07ff376/src/soma
+//!     archive/reference/pureholonics-seed/src/pureholonics \
+//!     archive/reference/holobrochos-a07ff376/src/soma
 //! ```
 //!
 //! The three paths are the mathematical deposit and two frames of linguistic material, exactly as
@@ -215,8 +215,8 @@ fn main() {
         arguments[1..].to_vec()
     } else {
         vec![
-            "reference/pureholonics-seed/src/pureholonics".to_owned(),
-            "reference/holobrochos-a07ff376/src/soma".to_owned(),
+            "archive/reference/pureholonics-seed/src/pureholonics".to_owned(),
+            "archive/reference/holobrochos-a07ff376/src/soma".to_owned(),
         ]
     };
 

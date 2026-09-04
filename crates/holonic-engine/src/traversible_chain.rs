@@ -1,5 +1,5 @@
 //! The chain of interactions, over exact rationals — the arithmetic half of
-//! `blueprint/THE_TRAVERSIBLE_CHAIN.md`.
+//! `archive/plans/THE_TRAVERSIBLE_CHAIN.md`.
 //!
 //! [`holonic_structure`] owns the shape: a link that weighs and gates separately, a chain with both
 //! ends open that retains what did not connect, and the cocycle law as a trait contract. This module
@@ -660,7 +660,7 @@ impl Relating for Crossing {
 // The junction law over integer populations MOVED to `holonic_structure::CountedCrossing` on
 // 2026-08-15, and re-exported here so every consumer of this module is unchanged.
 //
-// It moved because `soma/membrane` needs the same law for its co-present seam closure and cannot
+// It moved because `crates/holonic-membrane` needs the same law for its co-present seam closure and cannot
 // see this crate — `membrane` depends on `holonic-structure`, not on the engine. Two crates that
 // cannot see each other both needing one law is the definition of a substrate carrier. The exact
 // rational chart stays here, and the parity gate between the two charts stays here with it — and
@@ -943,7 +943,7 @@ impl Relating for PhasedLink {
     ///
     /// `holonic_structure::Hand::Ortho` is defined as *"cohere-null with the cross **maximal** — the
     /// pure orthogonal turn, the founding hand"*, so `Ortho` names the case where nothing stands and
-    /// everything transports. `soma/body/src/arrow.rs` reads the sign of `aim`, which its own typing
+    /// everything transports. `crates/holonic-body/src/arrow.rs` reads the sign of `aim`, which its own typing
     /// calls *what STANDS*; [`Crossing::meet`] reads the sign of `M₂₁`, the half that came **back**
     /// and therefore did not transport. Both are the stored face and both agree.
     ///

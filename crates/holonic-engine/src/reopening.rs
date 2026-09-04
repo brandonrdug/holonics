@@ -2,7 +2,7 @@
 //!
 //! ## What a collapsed face is
 //!
-//! `canon/THE_MATHEMATICS_TABLET.md` §1 states the deletion this module reverses. A float is not a
+//! `docs/canon/THE_MATHEMATICS_TABLET.md` §1 states the deletion this module reverses. A float is not a
 //! bad approximation *of* a ratio — it is the ratio's series expansion in base two, truncated, with
 //! the remainder discarded: `x = Σ b_i 2^{−i}`, cut at 53 bits, tail deleted with no record that a
 //! tail existed. The law is therefore not *"do not expand"*; it is **you may take the expansion,

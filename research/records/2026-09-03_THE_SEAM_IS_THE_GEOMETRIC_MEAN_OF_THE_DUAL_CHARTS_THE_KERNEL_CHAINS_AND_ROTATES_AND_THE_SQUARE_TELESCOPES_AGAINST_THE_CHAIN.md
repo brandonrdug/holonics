@@ -10,7 +10,7 @@ compound reading, marked in place.
 [`the morning record`](2026-09-03_THE_SEAMS_ARE_LOCAL_OPTIMA_OF_THE_THREAD_ENERGY_THE_PRIMES_ARE_THE_MISSING_HALF_AND_THE_FLOW_BINDS_THE_INTEGER_EVENTS.md),
 committed at `40eaef2d`.  
 **Scope:** this record schedules nothing.
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction authorities;
 `SKE4` remains the frontier. No fleet exists; the Gemini instruction document was never launched,
 and its task labels are names only.  
@@ -169,7 +169,7 @@ physical law, and does not make `c_CD` and `Λ_DN` one constant.
 
 - The Leray inequality, supercriticality of `L²` against `L³`, and vortex stretching as winding
   amplified by the flow that carries it are in
-  [`canon/TABLET_THE_FLOW.md`](../../canon/TABLET_THE_FLOW.md) §7.4.
+  [`canon/TABLET_THE_FLOW.md`](../../docs/canon/TABLET_THE_FLOW.md) §7.4.
 - Helicity as the linking of vortex lines is in the 2026-08-21 torsion record.
 - The thesis that equations are interior balance and inequalities are boundary capacity is this
   tree's own clause: `∂² = 0`, Stokes, divergence and Bianchi are kinematic, and conservation
@@ -190,7 +190,7 @@ physical law, and does not make `c_CD` and `Λ_DN` one constant.
    pairs is the backward equation `∂_t H = −∂_z² H`, the Fourier multiplier `e^{tu²}`. The content
    of *"zero thermal margin at `Λ = 0`"* survives with the words forward and backward exchanged.
 2. **Landauer is a correspondence card here, not a law of the interior.**
-   [`canon/TABLET_THE_CAUSAL_PROFILE.md`](../../canon/TABLET_THE_CAUSAL_PROFILE.md) states that
+   [`canon/TABLET_THE_CAUSAL_PROFILE.md`](../../docs/canon/TABLET_THE_CAUSAL_PROFILE.md) states that
    every arrow retains a reconstruction fibre and that Landauer's erasure bound is not a cost per
    instruction; the 2026-07-14 atlas grades the bridge open. The tree's compression law is not a
    heat tax but the retained fibre with a certified remainder (`skein.rs`, the receiver-exact

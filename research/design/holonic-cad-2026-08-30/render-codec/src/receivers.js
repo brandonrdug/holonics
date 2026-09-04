@@ -1,5 +1,5 @@
 // ===== receivers.js — receivers all the way down: monitor, window, element, mounted object; each a chart with discrete cells =====
-// Mirrors canon/TABLET_THE_CHART.md (a chart is a receiver's declaration; two charts compare only through a declared FrameRelation),
+// Mirrors docs/canon/TABLET_THE_CHART.md (a chart is a receiver's declaration; two charts compare only through a declared FrameRelation),
 // relational-geometry/src/receiver_atlas.rs (apertures; a seam point addresses two or four cells; never one by array convention),
 // and holonic-engine/examples/layout_curvature_consumption.rs (a layout's cycle deficit is its curvature; a flat layout stays exactly fixed).
 (function (HR) {

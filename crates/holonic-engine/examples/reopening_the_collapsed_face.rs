@@ -2,7 +2,7 @@
 //!
 //! ## What this is
 //!
-//! `canon/THE_MATHEMATICS_TABLET.md` §1 states the deletion: a float is not a bad approximation *of*
+//! `docs/canon/THE_MATHEMATICS_TABLET.md` §1 states the deletion: a float is not a bad approximation *of*
 //! a ratio — it is the ratio's series expansion in base two, truncated, with the remainder
 //! discarded. So the law is not *"do not expand"*; it is **you may take the expansion, you may not
 //! discard the tail.**
@@ -141,7 +141,7 @@ fn abbreviate(vector: &[BigInt]) -> String {
 
 /// The provenance, returned as the artifact it is rather than as a label.
 ///
-/// `canon/THE_MATHEMATICS_TABLET.md` §2 measured `CertifiedSeries` at thirteen references in one
+/// `docs/canon/THE_MATHEMATICS_TABLET.md` §2 measured `CertifiedSeries` at thirteen references in one
 /// file and `SeriesTailCertificate` at six in one, with **zero in any `examples/`, `tests/` or
 /// `bin/` path** -- the half of the enclosure carrier that this movement's question needs, written
 /// and never exercised. This driver exercises it, so the certificate is printed and not just used.

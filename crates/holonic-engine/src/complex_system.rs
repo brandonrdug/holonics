@@ -2,7 +2,7 @@
 //!
 //! ## The cut this closes
 //!
-//! `blueprint/THE_ASSEMBLY.md` §1: `CausalCellId(u64)` and `ItemId(u64)` are the same
+//! `archive/plans/THE_ASSEMBLY.md` §1: `CausalCellId(u64)` and `ItemId(u64)` are the same
 //! representation, and until now **no function anywhere converted them**. That single missing
 //! adapter was the cut line between the engine's condensation half — `algebraic`, `dilation`,
 //! `rebase_invariants`, `skein`, all of which speak `CausalCellId` — and its positivity half —
@@ -49,7 +49,7 @@
 //! ```
 //!
 //! Both are receiver-local addresses, the same shape
-//! `soma/life/examples/eros_placement_over_real_charts.rs` already uses. Two receivers at different
+//! `crates/holonic-life/examples/eros_placement_over_real_charts.rs` already uses. Two receivers at different
 //! foci return different addresses for one cell, and neither address is a coordinate in the complex —
 //! there is no frame in which they agree.
 //!

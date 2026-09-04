@@ -2,7 +2,7 @@
 //!
 //! ## The defect this closes
 //!
-//! `canon/THE_HOLOBROCHOS_SPINE.md` §2, from Soma's `MATHEMATICAL_HOLONICS.md`, retains this as
+//! `docs/canon/THE_HOLOBROCHOS_SPINE.md` §2, from Soma's `MATHEMATICAL_HOLONICS.md`, retains this as
 //! mathematically exact:
 //!
 //! > *"comparison is **situated by a frame** and is therefore at least a frame/object/object
@@ -624,7 +624,7 @@ pub fn one_body_read(emission: &Emission) -> Result<Support, SurprisalError> {
 /// query rather than by the deposit as a whole, and what lets a body's production bring an identifier
 /// the reference's standing genuinely does not carry.
 ///
-/// This is the edge, not an organ. `canon/THE_HOLOBROCHOS_SPINE.md` §5 measured that
+/// This is the edge, not an organ. `docs/canon/THE_HOLOBROCHOS_SPINE.md` §5 measured that
 /// `crates/holonic-engine` contains zero module cycles and that its analyses terminate in `stdout`;
 /// putting this seam in the library rather than in a driver is the difference between an emission
 /// that returns and one that does not.

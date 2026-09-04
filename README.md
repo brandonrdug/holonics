@@ -1,74 +1,59 @@
 # Holonics
 
-This repository is the clean source of truth for pure holonics: a receiver-relative causal
-calculus, its algebraic-geometric carrier, the information physics it induces, and an agnostic
-blueprint for a machine whose reusable morphology is changed by returned passages.
+[project-postulate] **Holonics is a machine-learning framework for Holonic Neural Networks
+(HNA), built in Rust with resident CUDA execution and mathematical foundations in Lean.**
+The objective is frontier-level usefulness on consumer hardware through efficient, continuous
+learning and reusable local structure—the project's “20W ideology”.
 
-The central typed construction is deliberately small:
+**Athena** is a native model/ecology. **Eros** forms and refines it through recurrent operation.
+**Soulkiller** dismantles supported pretrained realizations into reusable native material.
+Training, inference, model persistence and export belong to one explicit framework lifecycle.
 
-\[
-\Lambda_F\subseteq Q_F\times A_F\times L_F\times P_F\times\Pi_{B,F}.
-\]
+## Start here
 
-`F` is the contemporary frame and admitted cut, `Q` the receiving question or aperture, `A` the
-retained morphology of prior relations, `L` the live caused incidence/current, `P` the consequent
-placement or deed, and `π_B` the boundary-relative return. The expression is a schema for one
-situated causal passage—not a software pipeline, a privileged equation of every discipline, or a
-license to hide local constitutive laws. Its factors may be represented by relations, spans,
-chains, sheaves, correspondences, operators, or physical ports as the ecology requires. The
-historical tensor spelling is used only after a monoidal category and its interaction doctrine
-have been declared.
+- [Architecture and the consumer-hardware objective](docs/ARCHITECTURE.md)
+- [Soulkiller: intake, excitation, dismantling and model-family support](docs/SOULKILLER.md)
+- [Athena/HNA: training, inference, requests and artifact scopes](docs/ATHENA.md)
+- [Interoperability: Safetensors, ONNX and executable model recompilation](docs/INTEROPERABILITY.md)
+- [Build and development guide](docs/DEVELOPMENT.md)
 
-## Reading order
+## Run the current native interface
 
-1. [`CONSTRUCTION_STATE.md`](CONSTRUCTION_STATE.md) — the admitted position and next deed.
-2. [`archive/blueprints/COMPLETE_CPP_ENGINE_ROADMAP.md`](archive/blueprints/COMPLETE_CPP_ENGINE_ROADMAP.md) — the
-   complete ordered construction from the C++/CUDA foundation through the dependent two-theorem
-   Lean-mediated production deed.
-3. [`canon/00_PURE_HOLONICS.md`](canon/00_PURE_HOLONICS.md) — the compact doctrine and its terms.
-4. [`canon/01_CAUSAL_CALCULUS.md`](canon/01_CAUSAL_CALCULUS.md) — the exact event and composition law.
-5. [`canon/02_INFORMATION_PHYSICS.md`](canon/02_INFORMATION_PHYSICS.md) — information, current,
-   storage, resource, and receiver testimony.
-6. [`canon/03_CONDITIONING_AND_LEARNING.md`](canon/03_CONDITIONING_AND_LEARNING.md) — arbitrary
-   conditioning without a privileged model species.
-7. [`canon/04_GEOMETRY_NAVIGATION_AND_WEAVE.md`](canon/04_GEOMETRY_NAVIGATION_AND_WEAVE.md) —
-   charts, holonomy, projections, shadows, stress, knotting, and warp/weft.
-8. [`canon/05_ONTOLOGY.md`](canon/05_ONTOLOGY.md) — the ontological and philosophical commitments.
-9. [`canon/06_ESTABLISHED_CAPABILITIES.md`](canon/06_ESTABLISHED_CAPABILITIES.md) — what the prior
-   machine has actually done.
-10. [`canon/07_CAUSAL_ALGEBRAIC_GEOMETRY.md`](canon/07_CAUSAL_ALGEBRAIC_GEOMETRY.md) — exact
-   algebraic-geometric realization of the causal calculus.
-11. [`canon/08_CORE_MATHEMATICAL_INSTRUMENTS.md`](canon/08_CORE_MATHEMATICAL_INSTRUMENTS.md) — swing,
-   soul/equivalence, bit purity, knots/strings, hypergeometric navigation, cycles, and the
-   information-relativistic construction program.
-12. [`blueprint/PURE_HOLONIC_ENGINE.md`](blueprint/PURE_HOLONIC_ENGINE.md) — the implementation-neutral
-   engine contract.
-13. [`blueprint/ARBITRARY_LEARNING_MACHINE.md`](blueprint/ARBITRARY_LEARNING_MACHINE.md) — the machine
-   construction.
-14. [`archive/blueprints/CPP_GPU_FOUNDATION.md`](archive/blueprints/CPP_GPU_FOUNDATION.md) — the ratified C++/CUDA,
-    GPU-primary, bit-pure production realization.
-15. [`archive/blueprints/REALIZATION_AND_HARDWARE.md`](archive/blueprints/REALIZATION_AND_HARDWARE.md),
-    [`blueprint/ADAPTING_A_NEW_ECOLOGY.md`](blueprint/ADAPTING_A_NEW_ECOLOGY.md), and
-    [`archive/blueprints/BUILD_AND_GRADE.md`](archive/blueprints/BUILD_AND_GRADE.md) — adaptation, realization, and
-    grade index.
+```sh
+cargo build -p holonics-workbench --bin holonics
+target/debug/holonics hna --help
+target/debug/holonics hna infer /path/to/supported/model 'Explain holonics briefly.'
+target/debug/holonics --format json hna train /path/to/supported/model sequence.json
+```
 
-## Evidence map
+[established-bounded; source-inspected] The current full native path executes the supported
+Gemma text realization and restricted Soulkiller bodies on CUDA. The API retains one successor
+session across ordered occurrences and can apply developmental returns through previously
+learned overlays. `hna infer` returns one selected face; `hna train` returns a developmental
+run receipt. It does not yet save a full cultivated-operator checkpoint or claim frontier-level
+output quality. The exact scopes and next production bridges are documented above.
 
-- [`research/records/`](research/records/) contains the complete laboratory research record.
-- [`papers/source/`](papers/source/) contains all authored Typst papers and mathematical entries.
-- [`papers/rendered/`](papers/rendered/) contains the rendered core papers.
-- [`formal/`](formal/) contains only project-owned Lean sources and project manifests; generated
-  `.lake` packages and build products were excluded.
-- [`archive/cpp-engine/evidence/observations/`](archive/cpp-engine/evidence/observations/) contains human-readable result records and
-  structured reports from prior experiments.
-- [`reference/`](reference/) contains provenance-locked historical theory and code. Nothing there
-  is linked into a new build by default.
-- [`archive/cpp-engine/provenance/`](archive/cpp-engine/provenance/) states exactly what was copied, what remains laboratory-only, and
-  which claims are canonical, implemented, measured, conditional, conjectural, or open.
+For Rust clients, `crates/holonics` exposes `holonics::hna`, `holonics::soulkiller` and
+`holonics::interop`. Existing Safetensors/ONNX package exports preserve Holonics artifacts;
+compilation into standard executable model architectures has its own [contract](docs/INTEROPERABILITY.md).
 
-## Governing distinction
+## Repository map
 
-The canon specifies invariants and admissible causal structure. A domain supplies its local
-constitutive conduct. An executor realizes that conduct on available apparatus. A codec presents
-or receives it. None of those layers may impersonate another, and no named software, file format,
-processor, device, or language is ontologically privileged.
+| Directory | Purpose |
+|---|---|
+| [crates](crates/README.md) | Live Rust libraries and public framework API |
+| [applications](applications) | CLI/workspace and standalone research tools |
+| [accelerators](accelerators/README.md) | Independent device-only targets |
+| [formal](formal/README.md) | Live Lean projects |
+| [docs](docs/ARCHITECTURE.md) | Architecture, interfaces, doctrine, active plans and navigation |
+| [research](research/README.md) | Dated evidence, experiments, papers and notebooks |
+| [archive](archive/README.md) | Completed plans and frozen historical bodies |
+| [tools](tools/README.md) | Optional helpers used for relevant work |
+
+[definition] [CONSTRUCTION_STATE.md](CONSTRUCTION_STATE.md) records the current position;
+[the roadmap](docs/plans/THE_ROADMAP.md) orders construction. [AGENTS.md](AGENTS.md) is the
+shared agent contract. History and retired plans do not silently schedule new work.
+
+Use the [owner map](docs/ARCHITECTURE_MAP.md) for Lean–Rust–CUDA relations, the
+subject guides and Provenance for research navigation, and the
+[repository/recovery guide](docs/REPOSITORY.md) for relocated paths and backups.

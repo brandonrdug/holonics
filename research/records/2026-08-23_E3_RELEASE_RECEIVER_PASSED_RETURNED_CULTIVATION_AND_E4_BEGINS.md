@@ -23,6 +23,6 @@ source, executable artifact or semantic law changed. The named retake at
 four retired. No test suite, example population or GPU deed was replayed.
 
 [established-bounded] E3 is release-admitted. `CONSTRUCTION_STATE.md` and
-[`THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) authorize only E4: the native membrane, fresh
+[`THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) authorize only E4: the native membrane, fresh
 client, addressed resume, generic nominal occurrences, explicit authorized withdrawal, concurrent
 interchange and exterior compatibility adapters must return over one source-detached product.

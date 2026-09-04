@@ -24,7 +24,7 @@
 //! launch and the terminal synchronize the serial chart issues nothing — [`TransferCensus`] counts
 //! it, so a renamed loop is caught by measurement rather than by a string.
 //!
-//! # One apparatus occurrence, through `soma/mount`
+//! # One apparatus occurrence, through `crates/holonic-mount`
 //!
 //! Device discovery, attributes, module loading, streams, events, capture and graphs come through
 //! [`mount`] — the one CUDA census this tree owns — not a second `#[link(name = "cuda")]` block.

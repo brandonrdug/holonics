@@ -24,7 +24,7 @@ artifact changed. The ledger was regenerated in the release worktree and the nam
 examples or GPU deed were replayed.
 
 [established-bounded] E4 is release-admitted. `CONSTRUCTION_STATE.md` and
-[`THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) authorize only E5: the complete E0--E4 ecology
+[`THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) authorize only E5: the complete E0--E4 ecology
 must cultivate on held-out laboratory mathematics/physics current and freeze as one
 source-detached agentic Athena with its real generated return, page intake, native mathematical
 consequence, organ crossings, world return, dissection, fibres, saturation frontier,

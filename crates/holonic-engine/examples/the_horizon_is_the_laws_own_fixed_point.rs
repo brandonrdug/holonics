@@ -8,7 +8,7 @@
 //! `crates/holonic-engine/src/derivation_capacitance.rs` carried, until 2026-08-09, an authored
 //! level: `HORIZON_DOUBLINGS = 64`, guarding a schedule that started the horizon at
 //! `site_count * longest_characteristic_delay` and doubled it until the circuit returned whole.
-//! `canon/THE_AUTHORED_LEVEL.md` §5.1 names its replacement in four words — *the transport law's own
+//! `docs/canon/THE_AUTHORED_LEVEL.md` §5.1 names its replacement in four words — *the transport law's own
 //! fixed point* — and this driver conducts the difference.
 //!
 //! **What the excised schedule was, restated so it can be run rather than remembered.**

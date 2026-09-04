@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-18
 **Kind:** corrective audit and construction derivation under
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and the Phoenix blueprints.
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and the Phoenix blueprints.
 **Truth status:** `established-bounded` for the source/code/hardware audit and focused corrected
 returns; `definition` where the standing tablets define holon and operation species;
 `proved-standard` for the linear factorization, inverse and metric-adjoint facts;

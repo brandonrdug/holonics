@@ -3,7 +3,7 @@
 **Date:** 2026-08-20
 **Kind:** loop iteration 11. A measured reading of the July corpus. It redirects the target of four
 prior iterations and bounds the construction of one. No new theorem. It schedules nothing.
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction authorities.
 **Truth status:** `established-bounded` for the reading; `counterexample` for the open item it
 refutes.

@@ -14,8 +14,8 @@ carries the command that took it and its date.
 materials and produce real generative output."* And, shown the previous emission path's output on
 2026-08-18: *"why the fuck is it preserving the original source files as origin traces… do you just
 have it copying and pasting snippets from text files?"*
-**Plan:** executes [`blueprint/THE_HORIZON_IS_A_COORDINATE_NOT_A_GATE_AND_THE_EMISSION_KEEPS_ITS_CROSS.md`](../../blueprint/THE_HORIZON_IS_A_COORDINATE_NOT_A_GATE_AND_THE_EMISSION_KEEPS_ITS_CROSS.md),
-all four stations, which sits under [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md).
+**Plan:** executes [`blueprint/THE_HORIZON_IS_A_COORDINATE_NOT_A_GATE_AND_THE_EMISSION_KEEPS_ITS_CROSS.md`](../../archive/plans/THE_HORIZON_IS_A_COORDINATE_NOT_A_GATE_AND_THE_EMISSION_KEEPS_ITS_CROSS.md),
+all four stations, which sits under [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md).
 
 ---
 

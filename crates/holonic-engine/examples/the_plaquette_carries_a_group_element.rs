@@ -5,7 +5,7 @@
 //! cargo run --release --example the_plaquette_carries_a_group_element
 //! ```
 //!
-//! `canon/THE_MILLENNIUM_FRAME.md`'s Yang–Mills row was corrected on 2026-08-11: the discrete
+//! `docs/canon/THE_MILLENNIUM_FRAME.md`'s Yang–Mills row was corrected on 2026-08-11: the discrete
 //! `a ∧ a` already exists at `structure_group.rs:511`, and what the Yang–Mills-facing line lacks is
 //! *a representation, a Wilson plaquette action, a transfer operator*. Each of those is a **receiver
 //! on a connection**, not a new geometry, so [`holonic_engine::lattice_gauge`] is a mouth around

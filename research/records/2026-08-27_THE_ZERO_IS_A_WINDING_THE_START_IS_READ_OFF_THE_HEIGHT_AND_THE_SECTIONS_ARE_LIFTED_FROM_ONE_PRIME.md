@@ -3,7 +3,7 @@
 **Date:** 2026-08-27 (session continuing into 2026-08-28 UTC)
 **Kind:** two exterior arithmetic deeds over existing owners — the exact eta-zero winding atlas and
 the Mestre realizer/section owner — with their drivers, artifacts, and measurements. **Schedules
-nothing.** [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+nothing.** [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction authorities;
 the MEM6 line and the Hodge/Navier–Stokes Lean lines held by the other cursors are untouched.
 **Provenance:** Brandon's direct request opening the session: *"Observe Sol's active Lean campaign,

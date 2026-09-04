@@ -4,7 +4,7 @@
 **Truth status:** `proved-derived`  
 **Evidence:** `formal-checked`, `source-inspected`  
 **Campaign:** FT3 under
-[`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](../../blueprint/THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md).  
+[`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](../../archive/plans/THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md).  
 **Owners:** `RH/FosterSplit.lean`, `RH/FosterHadamard.lean`, `RH/CombFlux.lean`, the amended port in
 `RH/PhaseFlowLedger.lean`, and the population and fixed-constant additions to `RH/FosterTanks.lean`,
 all under `soma/formal/elementary-holonics/ElementaryHolonics/` and registered in the root umbrella.  

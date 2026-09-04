@@ -1,7 +1,7 @@
 //! **Source-mouth checkpoint: every declared population is manifested and a bounded population is
 //! decoded exactly.**
 //!
-//! Plan: `blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md`.
+//! Plan: `archive/plans/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md`.
 //!
 //! Enumeration is not admission and admission is not a transport lift. This driver enumerates
 //! every entry the container declares —

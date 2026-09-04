@@ -1,7 +1,7 @@
 //! The Tschirnhaus organ, driven up and down the degree ladder.
 //!
 //! Until 2026-08-09 this organ carried `const QUINTIC_DEGREE: usize = 5` and refused anything else
-//! at its first gate. `canon/THE_CONTAMINANT_PROTOCOL.md` §2.6 names that species — **a restriction
+//! at its first gate. `docs/canon/THE_CONTAMINANT_PROTOCOL.md` §2.6 names that species — **a restriction
 //! the organ imposes presented as a fact about the subject** — and says why lifting it is not
 //! hygiene:
 //!
@@ -61,7 +61,7 @@ use num_traits::One;
 use relational_geometry::Rat;
 
 /// **What this driver declares as its horn local-section limit.** `prime_ecology` stopped picking a
-/// default on 2026-08-09 (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.5 — *a default is a level the
+/// default on 2026-08-09 (`docs/canon/THE_CONTAMINANT_PROTOCOL.md` §2.5 — *a default is a level the
 /// organ picked because the caller was never asked*).
 const HORN_LOCAL_SECTION_LIMIT: u64 = 1_000_000;
 

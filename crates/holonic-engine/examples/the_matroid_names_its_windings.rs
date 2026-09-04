@@ -1,6 +1,6 @@
 //! The matroid hands its Hodge–Riemann form to the organ that names windings.
 //!
-//! `canon/THE_HOLOBROCHOS_SPINE.md` recorded the cut: *"`matroid_chow::generator_pairing` (the
+//! `docs/canon/THE_HOLOBROCHOS_SPINE.md` recorded the cut: *"`matroid_chow::generator_pairing` (the
 //! Hodge–Riemann pairing) → `winding_inertia::from_symmetric_form`: no join at all, in library or
 //! driver. Nothing has handed a matroid's form to the organ that names windings."* This driver is
 //! the join, and `ChowRing::cyclic_generator_receiver` is the library edge it runs on.
@@ -45,7 +45,7 @@ fn main() -> ExitCode {
     println!("matroid_chow::generator_pairing  ->  winding_inertia");
     println!();
     println!(
-        "the cut this closes, from canon/THE_HOLOBROCHOS_SPINE.md: \"no join at all, in library or"
+        "the cut this closes, from docs/canon/THE_HOLOBROCHOS_SPINE.md: \"no join at all, in library or"
     );
     println!("driver. Nothing has handed a matroid's form to the organ that names windings.\"");
     println!();

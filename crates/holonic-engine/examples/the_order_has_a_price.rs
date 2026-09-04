@@ -205,7 +205,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     println!(
         "\n  NOT CLAIMED: that this body's production front carries an unreadable order. That is a\n\
         \x20 measurement on the front's own material and it is roadmap item 4's second half. The\n\
-        \x20 driver that runs the certificate on `soma/formal` —\n\
+        \x20 driver that runs the certificate on `formal` —\n\
         \x20 `the_front_is_ordered_until_a_certificate_unorders_it` — SIGKILLs at HEAD (exit 137),\n\
         \x20 measured 2026-08-10, so the real-material figure is not available and is not guessed."
     );

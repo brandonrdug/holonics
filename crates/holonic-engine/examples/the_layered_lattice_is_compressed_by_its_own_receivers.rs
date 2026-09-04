@@ -6,7 +6,7 @@
 //! ```
 //!
 //! **Station five of
-//! [`blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md`](../../../blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md).**
+//! [`archive/plans/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md`](../../../archive/plans/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md).**
 //!
 //! # The lattice, stated exactly
 //!
@@ -83,8 +83,8 @@ const RECEIVER_OCTET_WINDING: ReceiverId = ReceiverId(3);
 /// The corpus files this run reads. The declared corpus of `CLAUDE.md` §0e includes this codebase;
 /// these are its own governing documents.
 const CORPUS: [&str; 2] = [
-    "canon/THE_HOLOBROCHOS_SPINE.md",
-    "canon/THE_INFORMATION_ENGINE.md",
+    "docs/canon/THE_HOLOBROCHOS_SPINE.md",
+    "docs/canon/THE_INFORMATION_ENGINE.md",
 ];
 
 /// One position of the material: its octets and the four faces read off them.

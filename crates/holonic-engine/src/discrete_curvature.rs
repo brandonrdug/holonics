@@ -64,7 +64,7 @@
 //! component at unit response `c = 1/2` flattens in one step *by arithmetic*,
 //! which is a property of the incidence and not of the coefficient.
 //!
-//! `canon/TABLET_THE_TURN.md` §11.6 carries the statement and both bounds.
+//! `docs/canon/TABLET_THE_TURN.md` §11.6 carries the statement and both bounds.
 //!
 //! # The carrier
 //!

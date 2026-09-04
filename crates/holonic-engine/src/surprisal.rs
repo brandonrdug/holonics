@@ -2,7 +2,7 @@
 //!
 //! ## What this implements, and what it deliberately does not
 //!
-//! `canon/THE_RECOVERED_LAW.md` §1, Brandon-ratified 2026-07-14, states the instrument:
+//! `docs/canon/THE_RECOVERED_LAW.md` §1, Brandon-ratified 2026-07-14, states the instrument:
 //!
 //! > *"Surprisal and cross-entropy are exact instruments. For a 2/3 gear word `p = 2^-a 3^-b`,
 //! > `S = a + b·log₂3`, exact symbolically. No smoothing constant is owed: if `Q_B(a) = 0` the live
@@ -35,7 +35,7 @@
 //!
 //! which is a **ℚ-linear form in the logarithms of the primes**. It is stored as its coefficient
 //! map and **never evaluated**. `CLAUDE.md` §2b's rule for signs and
-//! `canon/THE_MATHEMATICS_TABLET.md` §1's rule for floats are the same rule here: a decimal
+//! `docs/canon/THE_MATHEMATICS_TABLET.md` §1's rule for floats are the same rule here: a decimal
 //! surprisal keeps the magnitude and discards the term structure that produced it, and the term
 //! structure is what lets a later receiver differentiate, compose, or continue it.
 //!
@@ -356,7 +356,7 @@ impl Support {
     /// Read one event's surprisal against a receiver's standing population.
     ///
     /// `standing` is the exact occurrence count per event, so the quotient is
-    /// `p(a) = N(a) / Σ N(a')` — the embodied distribution, `canon/THE_RECOVERED_LAW.md` §1, not a
+    /// `p(a) = N(a) / Σ N(a')` — the embodied distribution, `docs/canon/THE_RECOVERED_LAW.md` §1, not a
     /// tabulated one. An event absent from the population, or present with zero count, returns
     /// `Unsupported`.
     pub fn read(standing: &BTreeMap<u64, BigUint>, event: u64) -> Result<Self, SurprisalError> {

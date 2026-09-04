@@ -67,7 +67,7 @@ impl CodebookGraphIdentity {
     }
 }
 
-/// A typed boundary port.  `carrier` is lineage and law testimony, not a semantic data/program
+/// A typed boundary port.  `carrier` is lineage and law testimony, not a semantic .local/data/program
 /// distinction.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]

@@ -3,7 +3,7 @@
 **Date:** 2026-09-02
 **Scope:** interpretation correction for the current `ElementaryHolonics/RH/` entire heat-flow
 line; no Lean theorem is retracted.
-**Truth status:** per claim under [`../../canon/EPISTEMIC_GRADES.md`](../../canon/EPISTEMIC_GRADES.md).
+**Truth status:** per claim under [`../../canon/EPISTEMIC_GRADES.md`](../../docs/canon/EPISTEMIC_GRADES.md).
 
 ## 1. Correction
 

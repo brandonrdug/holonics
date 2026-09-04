@@ -2,7 +2,7 @@
 //!
 //! ## What this is
 //!
-//! The cross-ratio is this project's most-used technical primitive, and `canon/THE_QUOTE_NETWORK.md`
+//! The cross-ratio is this project's most-used technical primitive, and `docs/canon/THE_QUOTE_NETWORK.md`
 //! puts it in the foundations:
 //!
 //! > *"the fundamentals of mathematics are in counting, cross-ratios, factors, and offsets."*
@@ -18,7 +18,7 @@
 //!   on `relational-geometry`, so neither side could see the other's half.
 //!
 //! Its three fixtures used `ProjectiveTurn::identity()` or the fixed translate `(1,1,0,1)`: **the
-//! orbit was trivial by construction.** A third cross-ratio at `soma/body/src/soul.rs:159` does test
+//! orbit was trivial by construction.** A third cross-ratio at `crates/holonic-body/src/soul.rs:159` does test
 //! invariance, but only under translation and scaling — the **affine subgroup**, which is the weak
 //! part of the group and the part that fixes the point at infinity.
 //!

@@ -53,7 +53,7 @@
 //! joins commute. **Founding does not.** Junction `J₂` exists *only because* `a` was founded, so
 //! `found(a)∘found(b)` and `found(b)∘found(a)` reach different panels.
 //!
-//! `papers/source/papers/knot-causal-topology/main.typ:314-332` names the object —
+//! `research/papers/source/research/papers/knot-causal-topology/main.typ:314-332` names the object —
 //! `gyr[a,b]` is *"a finite holonomy face of the noncommuting transports"* — and states its own
 //! bound: *"It should not be installed as the universal law of every comparison complex. The general
 //! object is connection and holonomy; the gyroparallelogram is one exact hyperbolic
@@ -134,7 +134,7 @@ pub struct FoundedReceiver {
     ///
     /// the pairs **every other receiver identifies and this one separates**: what remains after
     /// quotienting by the rest. This is the residue-quotient sense the project already carries at
-    /// `papers/source/mathematics/definitions/radix-residue-character-cell.typ`, not a metaphor.
+    /// `research/papers/source/mathematics/definitions/radix-residue-character-cell.typ`, not a metaphor.
     ///
     /// `Res(r) = ∅` iff `⋂_{s≠r} ≡_s ⊆ ≡_r`, iff **removing `r` does not move the partition** — the
     /// axis is redundant in the family. That is the exact statement, and it is what stops "more
@@ -894,7 +894,7 @@ impl Gyration {
 
 /// **The gyration read as a group element, which is what this module's own bound asked for.**
 ///
-/// The header quotes `papers/source/papers/knot-causal-topology/main.typ:314-332` naming the
+/// The header quotes `research/papers/source/research/papers/knot-causal-topology/main.typ:314-332` naming the
 /// object and stating its limit: *"The general object is **connection and holonomy**; the
 /// gyroparallelogram is one exact hyperbolic specialization."* [`Gyration`] returns that holonomy as
 /// three booleans and two lists — a flag. This returns it as an element of a group, and the group is

@@ -12,8 +12,8 @@ blueprint/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md, analyze 
 interpretations."* The plan itself was ordered by an external adjudication which refuted five claims
 before they were deposited, and by his instruction to *"raise your standards to excellence and be
 more genuinely careful with your implementation."*
-**Plan:** [`blueprint/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md`](../../blueprint/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md),
-all four stations executed. It sits under [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md).
+**Plan:** [`blueprint/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md`](../../archive/plans/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md),
+all four stations executed. It sits under [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md).
 
 ---
 

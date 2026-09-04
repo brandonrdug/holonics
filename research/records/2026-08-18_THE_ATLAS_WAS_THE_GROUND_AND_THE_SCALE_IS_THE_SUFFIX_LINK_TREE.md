@@ -19,7 +19,7 @@ And, correcting the framing the previous return closed on:
 > really **pins** is whenever I can attribute another event's causal trace to being due to openly
 > standing actions of my own."*
 
-**Plan:** [`blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`](../../blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md).
+**Plan:** [`blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`](../../archive/plans/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md).
 
 ---
 

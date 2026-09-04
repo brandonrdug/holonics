@@ -8,7 +8,7 @@
 //!
 //! An amplitude is complex; a probability is its squared modulus. **A probability keeps the
 //! magnitude and deletes the phase** — the same deletion a float performs on the tail
-//! (`canon/THE_MATHEMATICS_TABLET.md` §1) and a bare sign performs on the turn (`CLAUDE.md` §2b), at
+//! (`docs/canon/THE_MATHEMATICS_TABLET.md` §1) and a bare sign performs on the turn (`CLAUDE.md` §2b), at
 //! a fourth carrier. Two routes to one result add as amplitudes, not as counts, so **a frequency
 //! census cannot tell two routes that reinforce from two that cancel.** A token occurring 4,712
 //! times is not thereby an invariant object: it may be one object seen 4,712 times, or a dozen
@@ -1854,7 +1854,7 @@ pub fn sweep_covered(
 /// one conduct block.
 ///
 /// Read over the **whole** occurrence population of every surface. Until 2026-08-09 this ran on the
-/// first 64 distinct windows of each surface, which is what `canon/THE_CONTAMINANT_PROTOCOL.md`
+/// first 64 distinct windows of each surface, which is what `docs/canon/THE_CONTAMINANT_PROTOCOL.md`
 /// §2.5 convicted; the aperture is gone and no subsample participates.
 pub fn iron_at(sweep: &BTreeMap<SurfaceId, SeparationReading>) -> BTreeSet<SurfaceId> {
     sweep
@@ -3194,15 +3194,15 @@ mod tests {
         let root = scratch(name);
         write(
             &root,
-            "papers/source/mathematics/a.typ",
+            "research/papers/source/mathematics/a.typ",
             "pad pad ref arxiv . org pad pad ref arxiv . org pad pad ref arxiv . org pad pad\n\
              abc Abc abcde xyz xyz\n",
         );
-        write(&root, "canon/a.md", "the set of points\n");
+        write(&root, "docs/canon/a.md", "the set of points\n");
         write(&root, "research/records/a.md", "a set with members\n");
         write(
             &root,
-            "reference/pureholonics-seed/a.md",
+            "archive/reference/pureholonics-seed/a.md",
             "set members here and set again\n",
         );
         root
@@ -3545,12 +3545,12 @@ mod tests {
         let root = scratch(name);
         write(
             &root,
-            "papers/source/mathematics/a.typ",
+            "research/papers/source/mathematics/a.typ",
             "zz aa bee cc zz\n\
              zz dddd bee eeee zz\n\
              pad ref arxiv . org pad ref arxiv . org pad\n",
         );
-        write(&root, "canon/a.md", "qq mm nn rr qq ss\n");
+        write(&root, "docs/canon/a.md", "qq mm nn rr qq ss\n");
         write(
             &root,
             "research/records/a.md",
@@ -3558,7 +3558,7 @@ mod tests {
         );
         write(
             &root,
-            "reference/pureholonics-seed/a.md",
+            "archive/reference/pureholonics-seed/a.md",
             "Kk pp ll tt pp Nn\n",
         );
         root
@@ -4137,14 +4137,14 @@ mod tests {
         let root = scratch(name);
         write(
             &root,
-            "papers/source/mathematics/a.typ",
+            "research/papers/source/mathematics/a.typ",
             "zero one alpha two three\n",
         );
-        write(&root, "canon/a.md", "zero LONGWORD alpha four five\n");
+        write(&root, "docs/canon/a.md", "zero LONGWORD alpha four five\n");
         write(&root, "research/records/a.md", "pp gg alpha six hh\n");
         write(
             &root,
-            "reference/pureholonics-seed/a.md",
+            "archive/reference/pureholonics-seed/a.md",
             "pp gg alpha six hh\n",
         );
         root
@@ -4512,10 +4512,10 @@ mod tests {
         // Every declared stratum must be non-empty; the three carrying `c` are the fixture and the
         // fourth is filler that never writes the surface.
         let root = scratch("stalled-refinement");
-        write(&root, "papers/source/mathematics/a.typ", "k a c b k\n");
-        write(&root, "canon/a.md", "k z c b k\n");
+        write(&root, "research/papers/source/mathematics/a.typ", "k a c b k\n");
+        write(&root, "docs/canon/a.md", "k z c b k\n");
         write(&root, "research/records/a.md", "m k a c b k m\n");
-        write(&root, "reference/pureholonics-seed/a.md", "filler only\n");
+        write(&root, "archive/reference/pureholonics-seed/a.md", "filler only\n");
         let census = CorpusCensus::read(&root).unwrap();
         let atlas = atlas(&census);
         let surface = census.lookup("c").expect("the fixture writes it");
@@ -4665,10 +4665,10 @@ mod tests {
             let root = scratch(name);
             // Two byte-identical wholes: `c` sits at the same place in both, so no shell ever
             // separates the two occurrences and the propagation cannot exhaust.
-            write(&root, "papers/source/mathematics/a.typ", "k a c b k\n");
-            write(&root, "canon/a.md", "k a c b k\n");
+            write(&root, "research/papers/source/mathematics/a.typ", "k a c b k\n");
+            write(&root, "docs/canon/a.md", "k a c b k\n");
             write(&root, "research/records/a.md", filler);
-            write(&root, "reference/pureholonics-seed/a.md", "filler only\n");
+            write(&root, "archive/reference/pureholonics-seed/a.md", "filler only\n");
             root
         };
 

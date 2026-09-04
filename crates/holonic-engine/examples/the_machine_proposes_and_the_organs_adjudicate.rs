@@ -6,7 +6,7 @@
 //! ```
 //!
 //! Stations three through six of
-//! [`blueprint/THE_MACHINE_PRODUCES_MATHEMATICS_IT_WAS_NOT_GIVEN.md`](../../../blueprint/THE_MACHINE_PRODUCES_MATHEMATICS_IT_WAS_NOT_GIVEN.md).
+//! [`archive/plans/THE_MACHINE_PRODUCES_MATHEMATICS_IT_WAS_NOT_GIVEN.md`](../../../archive/plans/THE_MACHINE_PRODUCES_MATHEMATICS_IT_WAS_NOT_GIVEN.md).
 //!
 //! ## The mount is a deposit, not a library
 //!
@@ -52,7 +52,7 @@ use relational_geometry::Rat;
 use relational_geometry::exact::RatVec2;
 use relational_geometry::receiver_atlas;
 
-const DEFAULT_ATLAS: &str = "meta/IDENTITY_ATLAS_mathlib.tsv";
+const DEFAULT_ATLAS: &str = "tools/baselines/IDENTITY_ATLAS_mathlib.tsv";
 const SHOWN: usize = 12;
 
 fn workspace_root() -> PathBuf {
@@ -1312,7 +1312,7 @@ fn main() {
     match fs::write(&sealed_path, &sealed) {
         Ok(()) => {
             println!(
-                "  sealed   meta/PROPOSED_IDENTITIES.tsv   {} octets   {} rows",
+                "  sealed   tools/baselines/PROPOSED_IDENTITIES.tsv   {} octets   {} rows",
                 sealed.len(),
                 rows.len() - 1
             );

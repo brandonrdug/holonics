@@ -52,10 +52,10 @@ def lib_ports():
         return "ok"
     rows = [[f"<span class='mono'>{a}</span>"] + [cell(a, b) for b in ks] for a in ks]
     matrix = panel("contact rules · a net is checked pairwise like KiCad's ERC pin matrix; a refusal is a returned obstruction, drawn, never hidden", table([""] + [f"<span class='mono'>{k}</span>" for k in ks], rows) +
-                   note(grade("definition") + " port kinds · " + grade("project-postulate") + " contact rules — rules descend from canon: co-presence is not contact, contact requires a declared interaction (AGENTS.md ownership) · a returned output may re-enter only through an explicit feedback port (canon/01:105) · two emissions meeting without a junction component have no declared law · an all-receiver net reads nothing."), "flex: 1 1 auto")
+                   note(grade("definition") + " port kinds · " + grade("project-postulate") + " contact rules — rules descend from canon: co-presence is not contact, contact requires a declared interaction (AGENTS.md ownership) · a returned output may re-enter only through an explicit feedback port (docs/canon/01:105) · two emissions meeting without a junction component have no declared law · an all-receiver net reads nothing."), "flex: 1 1 auto")
     body = row([kinds, matrix], "flex: 1 1 auto; min-height: 0")
     return artboard("Port kinds and the contact rules", "every component port carries a kind; nets are derived from geometry + labels and checked pairwise", 1560, 900, body,
-                    "sources: KiCad master (post-9.0) common/pin_type.h, eeschema/erc/erc_settings.cpp m_defaultPinMap + m_PinMinDrive, connection_graph.h PRIORITY · AGENTS.md ownership and composition · canon/01_CAUSAL_CALCULUS.md:105")
+                    "sources: KiCad master (post-9.0) common/pin_type.h, eeschema/erc/erc_settings.cpp m_defaultPinMap + m_PinMinDrive, connection_graph.h PRIORITY · AGENTS.md ownership and composition · docs/canon/01_CAUSAL_CALCULUS.md:105")
 
 @board("LibParametron.dc.html", "Library 1 — Complex Parametron", 1400, 820, "page-library")
 def lib_parametron():
@@ -107,7 +107,7 @@ constraints:  |n_i n_{i+1}| = 1 (ref)  ·  cycle closes  ·  B c ∈ range(B)"""
                 box("obstructed", grade("open") + " runtime conformance of an exact GPU tick to the formal law — the roadmap's UAR obligation, frozen")]
     nots = ["a perceptron, a neuron, a layer: those are locked receiver faces", "a float circuit: coefficients are exact", "a SPICE model: the law is the Lean structure, SPICE would be an exterior codec"]
     return sheet("Complex Parametron", "the primitive computational component: exact complex current through oriented incidence with a receiver form", sym, fp, lean, params, ports, rule, receipts, nots,
-                 h=820, sources="sources: canon/TABLET_THE_REASONING_CYCLE.md §8d · Millennium/HolonicComplexParametron.lean · HolonicParametron.lean · MorphoHDL rule/fallback · KiCad symbol/footprint/model triple")
+                 h=820, sources="sources: docs/canon/TABLET_THE_REASONING_CYCLE.md §8d · Millennium/HolonicComplexParametron.lean · HolonicParametron.lean · MorphoHDL rule/fallback · KiCad symbol/footprint/model triple")
 
 def simple_sheet(file, title, kind, glyph_fn, foot_txt, lean, params, ports, rule, receipts, nots, sources):
     @board(file, title, 1400, 760, "page-library")
@@ -123,13 +123,13 @@ def g_receiver():
     return d
 simple_sheet("LibReceiver.dc.html", "Library 2 — Receiver ⟨ρ|", "a bra placed on the lattice: a probe, a projection, a measurement", g_receiver,
     ["occupies 0 sites · attaches to 1 site or 1 edge", "no keep-out · many receivers per site allowed", "the face is drawn beside it, never on the net"],
-    "receiver : (X → Y) with aperture, calibration, preserved, forgotten, transition law   -- canon/08:160\nface   ρ x : Y                    -- testimony about x through ρ, never its identity\nexact  ρ : ∀ future distinction at scope factors through ρ",
+    "receiver : (X → Y) with aperture, calibration, preserved, forgotten, transition law   -- docs/canon/08:160\nface   ρ x : Y                    -- testimony about x through ρ, never its identity\nexact  ρ : ∀ future distinction at scope factors through ρ",
     [["chart", "enum", "site", "site | edge | storage | phase"], ["carrier", "enum", "ℚ(i)", "reading carrier"], ["forgets", "text", "declared", "named collapsed population"]],
     [[".in", "receiver", "in", "the only port"]],
     "no rewrite: a receiver is atomic\nconstraint: attaches to exactly one occurrence",
-    [box("carried", grade("definition") + " canon/00_PURE_HOLONICS.md:12 · SPINE:181")],
+    [box("carried", grade("definition") + " docs/canon/00_PURE_HOLONICS.md:12 · SPINE:181")],
     ["a wire: it carries nothing", "an output: it is a reading, not an emission"],
-    "sources: canon/00:12 · 08:160 · TABLET_THE_OPERATIONS.md:59")
+    "sources: docs/canon/00:12 · 08:160 · TABLET_THE_OPERATIONS.md:59")
 
 def g_transport():
     d = s_line(40, 85, 110, 85, "ink"); d += s_rect(110, 65, 90, 40, "ink", 4); d += s_text(140, 90, "X", "svgmath"); d += s_line(200, 85, 270, 85, "ink", 'marker-end="url(#ahk)"')
@@ -137,13 +137,13 @@ def g_transport():
     return d
 simple_sheet("LibTransport.dc.html", "Library 3 — Transport X", "an edge component: carries a holon between charts; invertible transport is rebase", g_transport,
     ["occupies 1 oriented edge (or a path of edges)", "orientation = hand; reversal exchanges faces and negates the difference", "a chart transition carries its Jacobian"],
-    "transport T_f : H_v → H_(v+1)       -- lawful composite when output ports meet input ports and port lineage is retained (canon/01:56)\n<ρ|y> = <ρ|T_f|x>                    -- canon/TABLET_THE_REASONING_CYCLE.md:79\nrebase ⇔ invertible; kernel/image/cokernel returned otherwise (AGENTS: matrix inversion is only the rebase case)",
+    "transport T_f : H_v → H_(v+1)       -- lawful composite when output ports meet input ports and port lineage is retained (docs/canon/01:56)\n<ρ|y> = <ρ|T_f|x>                    -- docs/canon/TABLET_THE_REASONING_CYCLE.md:79\nrebase ⇔ invertible; kernel/image/cokernel returned otherwise (AGENTS: matrix inversion is only the rebase case)",
     [["law", "enum", "linear", "linear | conjugation | continuation | rewrite"], ["hand", "±", "+", "e^{iπ} reverses"], ["exact", "bool", "true", "exact carrier required"]],
     [[".a", "shared", "in", "source node"], [".b", "shared", "out", "target node"]],
     "composition: serial keeps W_f ×_Y W_g; parallel needs an interchange receipt\nconstraint: both boundary maps preserved (passage equivalence)",
-    [box("carried", grade("definition") + " canon/TABLET_THE_OPERATIONS.md:46 · 01:56")],
+    [box("carried", grade("definition") + " docs/canon/TABLET_THE_OPERATIONS.md:46 · 01:56")],
     ["a wire in the EDA sense: a wire here is a passage with both boundary maps, not a connection"],
-    "sources: canon/TABLET_THE_OPERATIONS.md §1,§3.1 · canon/01_CAUSAL_CALCULUS.md:56")
+    "sources: docs/canon/TABLET_THE_OPERATIONS.md §1,§3.1 · docs/canon/01_CAUSAL_CALCULUS.md:56")
 
 def g_deposit():
     d = s_line(40, 85, 120, 85, "ink"); d += s_line(120, 55, 120, 115, "ink", 'stroke-width="3"'); d += s_line(140, 55, 140, 115, "ink", 'stroke-width="3"'); d += s_line(140, 85, 220, 85, "ink")
@@ -151,13 +151,13 @@ def g_deposit():
     return d
 simple_sheet("LibDeposit.dc.html", "Library 4 — Deposit |a⟩⟨a|", "terrain: a construction reversed into a receiver; memory and conditioning live here", g_deposit,
     ["occupies 1 site (the pole)", "changes the continuation fibre of later current", "one symbol, two species: quotient when applied, deposit when read as terrain"],
-    "deposit |a⟩⟨a| : construction → receiver          -- canon/TABLET_THE_OPERATIONS.md:62\nΣᵢ |aᵢ⟩⟨aᵢ| = I  only for a G-orthonormal family; else frame operator S, dual frame S⁻¹|aᵢ⟩\nresidue changes the continuation fibre; later passage navigates terrain drawn by earlier motion (CIRCULATING_CARTOGRAPHER:24)",
+    "deposit |a⟩⟨a| : construction → receiver          -- docs/canon/TABLET_THE_OPERATIONS.md:62\nΣᵢ |aᵢ⟩⟨aᵢ| = I  only for a G-orthonormal family; else frame operator S, dual frame S⁻¹|aᵢ⟩\nresidue changes the continuation fibre; later passage navigates terrain drawn by earlier motion (CIRCULATING_CARTOGRAPHER:24)",
     [["G", "inner product", "declared", "required before any resolution claim"], ["family", "list", "[a]", "deposited constructions"]],
     [[".pole", "shared", "shared", "the site it conditions"], [".read", "shared", "shared", "a site a receiver may attach to; read as terrain"]],
     "no rewrite\nconstraint: G declared or the resolution row is refused",
     [box("carried", grade("definition") + " " + grade("proved-standard") + " frame operator / dual frame (corrected 2026-08-17)")],
     ["a database record: nothing is looked up; later current rides it", "a projection without its metric"],
-    "sources: canon/TABLET_THE_OPERATIONS.md:62–82 · THE_HOLOBROCHOS_SPINE.md §4")
+    "sources: docs/canon/TABLET_THE_OPERATIONS.md:62–82 · THE_HOLOBROCHOS_SPINE.md §4")
 
 def g_junction():
     d = s_circ(130, 85, 6, "ink", 'fill="#292418"'); d += s_line(40, 85, 124, 85, "ink"); d += s_line(136, 85, 220, 85, "ink"); d += s_line(130, 20, 130, 79, "ink")
@@ -169,9 +169,9 @@ simple_sheet("LibJunction.dc.html", "Library 5 — Junction (+/−)", "where cur
     [["arms", "int", "3", "≥ 2"], ["hands", "list ±", "[+,+,−]", "per arm"]],
     [[".arm[i]", "shared", "in/out", "typed"], [".out", "emission", "out", "co-present current"]],
     "fallback := wire (arms = 2, hands equal)\nconstraint: hands declared before any additive receiver maps into a signed chart",
-    [box("carried", grade("definition") + " canon/TABLET_THE_OPERATIONS.md §2 · THE_SURFACES_ARE_PATHS.md:79")],
+    [box("carried", grade("definition") + " docs/canon/TABLET_THE_OPERATIONS.md §2 · THE_SURFACES_ARE_PATHS.md:79")],
     ["an adder: nothing scales; a sum is a face of co-presence"],
-    "sources: canon/TABLET_THE_OPERATIONS.md §2 · THE_SURFACES_ARE_PATHS.md:79 · TABLET_THE_TURN.md")
+    "sources: docs/canon/TABLET_THE_OPERATIONS.md §2 · THE_SURFACES_ARE_PATHS.md:79 · TABLET_THE_TURN.md")
 
 def g_vertex():
     d = s_circ(150, 85, 10, "ink", 'fill="#292418"'); d += s_line(50, 40, 142, 80, "wire", 'marker-end="url(#ah)"'); d += s_line(50, 130, 142, 90, "wire", 'marker-end="url(#ah)"'); d += s_line(160, 85, 250, 85, "wire", 'marker-end="url(#ah)"')
@@ -185,7 +185,7 @@ simple_sheet("LibVertex.dc.html", "Library 6 — Interaction vertex", "the Feynm
     "fallback := junction (Γ linear, no cross term)\nconstraint: obstruction retained; a refused contact is drawn dashed",
     [box("carried", grade("interpretation") + " external legs = typed ports, vertices = local constitutive interactions (TABLET_THE_CAUSAL_PROFILE.md:146)")],
     ["a claim of quantum field identity: bra-ket types transport only (CAUSAL_PROFILE:215)"],
-    "sources: canon/TABLET_THE_REASONING_CYCLE.md §2,:106 · TABLET_THE_CAUSAL_PROFILE.md:146,215 · OPERATIONS §3.2")
+    "sources: docs/canon/TABLET_THE_REASONING_CYCLE.md §2,:106 · TABLET_THE_CAUSAL_PROFILE.md:146,215 · OPERATIONS §3.2")
 
 def g_membrane():
     d = s_rect(70, 30, 160, 110, "ink", 10, 'stroke-dasharray="6 4" stroke-width="2"'); d += s_line(20, 60, 70, 60, "wire", 'marker-end="url(#ah)"'); d += s_line(230, 110, 280, 110, "wire", 'marker-end="url(#ah)"'); d += s_line(280, 60, 230, 60, "wire", 'marker-end="url(#ah)"')
@@ -193,13 +193,13 @@ def g_membrane():
     return d
 simple_sheet("LibMembrane.dc.html", "Library 7 — Membrane", "a boundary with ports: ingress and egress are one membrane read in two orientations; the clock lives here", g_membrane,
     ["occupies a closed (k−1)-cycle of the lattice", "ports = crossing sites; nothing crosses elsewhere", "hierarchical sheet: a membrane is how a sub-lattice is instanced (KiCad sheet pins)"],
-    "membrane : distributed local phase and sampling boundary, not a global instant  -- canon/02:67\ningress/egress : opposite orientations of one membrane                            -- blueprint WORLD_TUBE:91\nboundary flux : the only terms that decouple a partition are boundary fluxes; every other term is a barrier (SPINE:710, H.0219)",
+    "membrane : distributed local phase and sampling boundary, not a global instant  -- docs/canon/02:67\ningress/egress : opposite orientations of one membrane                            -- blueprint WORLD_TUBE:91\nboundary flux : the only terms that decouple a partition are boundary fluxes; every other term is a barrier (SPINE:710, H.0219)",
     [["ports", "list", "[]", "crossing sites"], ["phase", "sampling", "local", "no global instant"], ["instance", "sheet", "—", "per-path identity of the interior"]],
     [[".in[i]", "return", "in", "ingress crossing"], [".out[j]", "emission", "out", "egress / radiation"], [".ret", "feedback", "in", "exterior return"]],
     "rewrite: instantiate the interior lattice per instance path (hierarchical sheets)\nconstraint: every interior passage crossing the cycle passes a declared port",
-    [box("carried", grade("definition") + " canon/02:67 · SPINE:710")],
+    [box("carried", grade("definition") + " docs/canon/02:67 · SPINE:710")],
     ["a container: it is a cut with ports, not a place"],
-    "sources: canon/02_INFORMATION_PHYSICS.md:67 · THE_HOLOBROCHOS_SPINE.md:710 · KiCad hierarchical sheets (form)")
+    "sources: docs/canon/02_INFORMATION_PHYSICS.md:67 · THE_HOLOBROCHOS_SPINE.md:710 · KiCad hierarchical sheets (form)")
 
 def g_site():
     d = s_circ(80, 85, 6, "ink", 'fill="#fffdf8"'); d += s_circ(200, 85, 6, "ink", 'fill="#fffdf8"'); d += s_line(86, 85, 194, 85, "wire", 'marker-end="url(#ah)" stroke-width="2"')
@@ -207,13 +207,13 @@ def g_site():
     return d
 simple_sheet("LibSite.dc.html", "Library 8 — Site and oriented edge", "the lattice primitives: situated occurrence and exact oriented incidence", g_site,
     ["site: 1 coordinate tuple in a chart, capacity", "edge: ordered pair, entry ±1 in B", "cells admitted only by caused occurrence or explicit inherited construction"],
-    "site  : Occurrence with capacity                                       -- THE_SURFACES_ARE_PATHS:99\nedge  : target − source ; reversal exchanges faces and negates (ADDRESSED_TRANSPORT_CHAIN:432)\n(C_•, ∂) graded occurrence complex with exact oriented incidence, ∂² = 0   -- canon/01:10",
+    "site  : Occurrence with capacity                                       -- THE_SURFACES_ARE_PATHS:99\nedge  : target − source ; reversal exchanges faces and negates (ADDRESSED_TRANSPORT_CHAIN:432)\n(C_•, ∂) graded occurrence complex with exact oriented incidence, ∂² = 0   -- docs/canon/01:10",
     [["chart", "enum", "ℤ⁴", "coordinates live in a declared chart"], ["capacity", "exact", "1", "site"], ["delay", "exact", "1", "passage characteristic"]],
     [[".self", "shared", "shared", "a site is a node others may share"]],
     "no rewrite\nconstraint: coordinates from a request; freeness reported by the solver",
-    [box("carried", grade("definition") + " canon/01:10 · THE_SURFACES_ARE_PATHS.md:99")],
+    [box("carried", grade("definition") + " docs/canon/01:10 · THE_SURFACES_ARE_PATHS.md:99")],
     ["a pixel or a sample: an observer's coordinate mints nothing"],
-    "sources: canon/01_CAUSAL_CALCULUS.md:10 · THE_SURFACES_ARE_PATHS.md:99 · blueprint ADDRESSED_TRANSPORT_CHAIN:432")
+    "sources: docs/canon/01_CAUSAL_CALCULUS.md:10 · THE_SURFACES_ARE_PATHS.md:99 · blueprint ADDRESSED_TRANSPORT_CHAIN:432")
 
 def g_pump():
     d = s_circ(130, 85, 30, "ink"); d += s_path("M 105 85 q 12 -20 25 0 t 25 0", "ink"); d += s_line(160, 85, 240, 85, "ink"); d += s_line(20, 85, 100, 85, "ink")
@@ -221,13 +221,13 @@ def g_pump():
     return d
 simple_sheet("LibPump.dc.html", "Library 9 — Pump / drive", "the parametric drive: the source of the two locked sheets", g_pump,
     ["occupies 1 edge", "phase in ℚ(ζ_k) — exact cyclotomic", "a source term r_k in q_{k+1} − q_k + B j_k = r_k"],
-    "drive ω : exact phase ; pump-storage receiver identifies the two half-turn-related sheets while the complex carrier changes sign  -- HolonicParametron.lean (§8d)\nsource r_k supplied residual                                                                                                -- canon/02:53",
+    "drive ω : exact phase ; pump-storage receiver identifies the two half-turn-related sheets while the complex carrier changes sign  -- HolonicParametron.lean (§8d)\nsource r_k supplied residual                                                                                                -- docs/canon/02:53",
     [["ω", "exact phase", "2π/12", "ζ₁₂"], ["φ", "exact phase", "0", "relative"], ["amplitude", "exact", "1", "ℚ"]],
     [[".out", "pump", "out", "into a .pump port"]],
     "no rewrite\nconstraint: exactly one .pump target",
     [box("carried", grade("proved-derived") + " " + tag("formal-checked") + " HolonicParametron.lean")],
     ["a clock: a clock is a membrane phase, not a source"],
-    "sources: canon/TABLET_THE_REASONING_CYCLE.md §8d · 02_INFORMATION_PHYSICS.md:53")
+    "sources: docs/canon/TABLET_THE_REASONING_CYCLE.md §8d · 02_INFORMATION_PHYSICS.md:53")
 
 def g_coupling():
     d = s_line(40, 60, 240, 60, "wire", 'marker-end="url(#ah)"'); d += s_line(40, 110, 240, 110, "wire", 'marker-end="url(#ah)"'); d += s_line(140, 60, 140, 110, "ink", 'stroke-dasharray="3 3"'); d += s_text(150, 90, "M_ij ≠ 0", "svgmath")
@@ -241,7 +241,7 @@ simple_sheet("LibCoupling.dc.html", "Library 10 — Coupling", "how carriers for
     "rewrite: couple(x, y) = junction at the shared node\nconstraint: hermiticity of M after coupling",
     [box("carried", grade("definition") + " canon §8d · " + grade("project-postulate") + " fusion law (AGENTS)")],
     ["a wire between boxes: coupling changes the storage form, not just connectivity"],
-    "sources: canon/TABLET_THE_REASONING_CYCLE.md:487 · AGENTS.md hexis/fusion clause")
+    "sources: docs/canon/TABLET_THE_REASONING_CYCLE.md:487 · AGENTS.md hexis/fusion clause")
 
 def g_quotient():
     d = s_line(40, 55, 130, 85, "ink"); d += s_line(40, 115, 130, 85, "ink"); d += s_line(130, 85, 240, 85, "ink", 'marker-end="url(#ahk)"'); d += s_rect(120, 70, 20, 30, "ink", 3, 'fill="#9c5480"')
@@ -255,7 +255,7 @@ simple_sheet("LibQuotient.dc.html", "Library 11 — Quotient / lock", "a declare
     "no rewrite\nconstraint: refuses without a declared receiver family",
     [box("carried", grade("definition") + " OPERATIONS:48,286 · §8d")],
     ["lossy compression: the loss is named and its fibre kept"],
-    "sources: canon/TABLET_THE_OPERATIONS.md:48,275–286 · TABLET_THE_REASONING_CYCLE.md §8d")
+    "sources: docs/canon/TABLET_THE_OPERATIONS.md:48,275–286 · TABLET_THE_REASONING_CYCLE.md §8d")
 
 def g_chart():
     d = s_path("M 60 120 L 140 120 L 180 60 L 100 60 Z", "ink", 'fill="#efece4"'); d += s_line(120, 90, 120, 30, "ink", 'marker-end="url(#ahk)"'); d += s_text(126, 40, "n (quaternion)", "svgtxt"); d += s_circ(120, 90, 3, "ink", 'fill="#292418"'); d += s_text(126, 100, "origin", "svgtxt")
@@ -269,7 +269,7 @@ simple_sheet("LibChart.dc.html", "Library 12 — Chart / projection receiver", "
     "no rewrite\nconstraint: cocycle on triple overlaps when several charts are declared",
     [box("carried", grade("definition") + " TABLET_THE_CHART.md:17 · TABLET_THE_MANIFOLD.md:65 · SolveSpace workplane (form)")],
     ["a camera: the camera is a view preset; the chart is a type"],
-    "sources: canon/TABLET_THE_CHART.md · TABLET_THE_MANIFOLD.md §15 · AGENTS.md typed physical theory (4 directions, 6 planes) · solvespace workplane entity")
+    "sources: docs/canon/TABLET_THE_CHART.md · TABLET_THE_MANIFOLD.md §15 · AGENTS.md typed physical theory (4 directions, 6 planes) · solvespace workplane entity")
 
 def g_tactic():
     d = s_rect(40, 60, 240, 50, "ink", 8, 'fill="#fffdf8"'); d += s_rect(50, 72, 70, 24, "ink", 4, 'fill="#3c6ea5" stroke="none"'); d += s_text(58, 88, "TRANSPORT", "svgtxt", 'fill="#fbf8f2"'); d += s_text(130, 90, "rw [h] at h₂", "svgtxt")

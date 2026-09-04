@@ -57,7 +57,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let output = std::env::args()
         .nth(1)
         .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from("output/analytic-field-transport"));
+        .unwrap_or_else(|| PathBuf::from(".local/artifacts/analytic-field-transport"));
     fs::create_dir_all(&output)?;
 
     let field = cause_field()?;

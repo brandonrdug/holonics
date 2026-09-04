@@ -20,8 +20,8 @@ use num_traits::{ToPrimitive, Zero};
 use relational_geometry::{EtaRatioAtlas, RatInterval, pi_interval, riemann_siegel_theta};
 
 const DEFAULT_ARTIFACTS: &str =
-    "output/the_card_returns_the_eta_boundary_and_the_zero_is_a_winding";
-const OUTPUT: &str = "output/the_vortices_repel_like_a_unitary_gas";
+    ".local/artifacts/the_card_returns_the_eta_boundary_and_the_zero_is_a_winding";
+const OUTPUT: &str = ".local/artifacts/the_vortices_repel_like_a_unitary_gas";
 
 fn render(value: &BigRational) -> String {
     format!("{} (≈ {:.4})", value, value.to_f64().unwrap_or(f64::NAN))

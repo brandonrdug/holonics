@@ -4,10 +4,10 @@
 **Kind:** the rank-N investigation's first return — planned in the descent record at Brandon's
 direction, informed by the breadth wave's rank-mechanics investigator, verified and enacted by
 the orchestrator. **It schedules nothing.**
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction authorities.
 **Position under the active plan.** Exterior mathematical material for Deed M2 of
-[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
+[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../archive/plans/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
 The Lean line does not couple to the engine, per Brandon's standing ruling.
 **Truth grades:** `proved-derived` for the Lean theorems of the two owners named below;
 `proved-standard` for Shioda–Tate, the `E₈` lattice facts, and the specialization theorems,

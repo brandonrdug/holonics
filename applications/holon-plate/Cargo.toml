@@ -1,0 +1,34 @@
+[package]
+name = "holon-plate"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# The plate is a container and a mouth, not a codec. Every octet it holds is
+# produced by a form codec that already exists in this body, so the dependency
+# list is exactly: the two codecs whose schemas it holds, and the deposit
+# container seal. The seal is an internal wire-integrity field, never repository
+# authority or semantic identity.
+#
+# `holonic-engine` is the third codec's owner: `graded_complex_form` writes the
+# canonical octets of a `GradedCausalComplex` and `rebase_invariants` takes the
+# reading over it. This is not a cycle. The engine sits BELOW `life`, which
+# already depends on it, so the edge added here is one the build graph already
+# carried -- `archive/plans/THE_ASSEMBLY.md` F1 is about a `life` example calling
+# UP into the plate, which nothing here does.
+[dependencies]
+sha2 = "0.10"
+soma-membrane = { path = "../../crates/holonic-membrane" }
+soma-abi = { path = "../../crates/holonic-abi" }
+body = { path = "../../crates/holonic-body" }
+life = { path = "../../crates/holonic-life" }
+holonic-engine = { path = "../../crates/holonic-engine", default-features = false }
+num-bigint = "0.4"
+
+[lib]
+name = "holon_plate"
+path = "src/lib.rs"
+
+[[bin]]
+name = "holon-plate"
+path = "src/main.rs"

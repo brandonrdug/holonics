@@ -18,7 +18,7 @@ use holonic_engine::{
 use num_bigint::BigInt;
 
 /// **What this driver declares as its horn local-section limit.** `prime_ecology` stopped picking a
-/// default on 2026-08-09 (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.5 — *a default is a level the
+/// default on 2026-08-09 (`docs/canon/THE_CONTAMINANT_PROTOCOL.md` §2.5 — *a default is a level the
 /// organ picked because the caller was never asked*). It bounds how many affine
 /// integer-polynomial torsors one horn-resolution event may retain; past it the event refuses by
 /// name rather than sampling.

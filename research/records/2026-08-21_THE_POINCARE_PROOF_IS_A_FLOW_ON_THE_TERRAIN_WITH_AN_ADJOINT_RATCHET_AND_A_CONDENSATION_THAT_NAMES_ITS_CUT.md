@@ -3,10 +3,10 @@
 **Date:** 2026-08-21
 **Kind:** external-proof reading — the solved Millennium problem posed in pure holonics, at
 Brandon's direction, as the paradigm the six open routes measure themselves against. **It
-schedules nothing.** [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+schedules nothing.** [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction authorities.
 **Position under the active plan.** Exterior mathematical material for Deed M2 of
-[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
+[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../archive/plans/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
 The Lean line does not couple to the engine, per Brandon's standing ruling; the only trees
 written are `research/records/` and the regenerated claim index.
 **Truth grades:** `proved-standard` for Perelman's results and every classical theorem named —

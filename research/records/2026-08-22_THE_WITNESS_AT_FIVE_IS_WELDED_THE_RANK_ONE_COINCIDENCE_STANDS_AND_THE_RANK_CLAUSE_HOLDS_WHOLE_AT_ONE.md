@@ -5,7 +5,7 @@
 the posed conjecture — under Brandon's goal *"Solve BSD, found pivots using the
 composition of the solution…"*.  Solo orchestrator work, commits `dda4793`, `b4eaac5`
 (on top of `217c64c`, `6164bdb`, `036c63b` the same day).  **It schedules nothing.**
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction
 authorities.
 **Truth grades:** `proved-derived` with `formal-checked` evidence

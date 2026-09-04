@@ -11,9 +11,9 @@ its artifact line); `implemented-exact` for the owners whose focused tests pass 
 **Station A of the directive PASSES on this tree**; every later Phoenix master station remains
 `open` and is named so.
 **Authority:** the directive of 2026-08-19 (Stations A–L);
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) §"THE PHOENIX REBIRTH…";
-[the Phoenix master](../../blueprint/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md);
-[the Gemma instance](../../blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md);
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) §"THE PHOENIX REBIRTH…";
+[the Phoenix master](../../archive/plans/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md);
+[the Gemma instance](../../archive/plans/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md);
 [the one-graph return this repairs](2026-08-19_THE_LAYER_IS_ONE_GRAPH_LAUNCHED_ONCE_AND_THE_IMMEDIATE_GATE_RETURNS_ITS_FALSIFIERS_WITH_THE_RATCHET_OPEN.md);
 [the validation cadence](2026-08-18_THE_GATE_IS_A_RELEASE_RECEIVER_NOT_AN_INNER_LOOP_AND_REPEATED_VALIDATION_BECAME_THE_BOTTLENECK.md).
 **Position boundary:** [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) does not move. A

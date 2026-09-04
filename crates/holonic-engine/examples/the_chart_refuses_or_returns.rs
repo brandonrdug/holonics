@@ -1,6 +1,6 @@
 //! The Tschirnhaus organ, driven over a declared quintic family.
 //!
-//! `canon/TABLET_THE_CHART.md:280` names the owed construction: take a degree-five input, transport
+//! `docs/canon/TABLET_THE_CHART.md:280` names the owed construction: take a degree-five input, transport
 //! it to Bring form by an exact rational chart change, return the transported form **and the
 //! transport**, and refuse — with the obstruction named — when the target chart cannot represent the
 //! answer.
@@ -38,7 +38,7 @@ use num_traits::{One, Zero};
 use relational_geometry::Rat;
 
 /// **What this driver declares as its horn local-section limit.** `prime_ecology` stopped picking a
-/// default on 2026-08-09 (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.5 — *a default is a level the
+/// default on 2026-08-09 (`docs/canon/THE_CONTAMINANT_PROTOCOL.md` §2.5 — *a default is a level the
 /// organ picked because the caller was never asked*). It bounds how many affine
 /// integer-polynomial torsors one horn-resolution event may retain; past it the event refuses by
 /// name rather than sampling.

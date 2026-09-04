@@ -3,7 +3,7 @@
 **Date:** 2026-08-22
 **Kind:** derivation from direct correspondence with Brandon, same evening as the
 witness deposit.  **It schedules nothing**;
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction
 authorities.  **Truth grades:** `interpretation` throughout, with the named Lean
 owners carrying their own grades.

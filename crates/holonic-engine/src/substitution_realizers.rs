@@ -10,7 +10,7 @@
 //! [`crate::skein::Substitution`] is that record. A substitution is a declared local move — two
 //! fillings of one hole — and `substitution.added()` is exactly the population of cells the move
 //! deposits. **Each declared substitution is a realizer; its landings are what it added.** That is
-//! `blueprint/THE_ASSEMBLY.md` step 2, and it gives `skein` — which had zero callers — a caller
+//! `archive/plans/THE_ASSEMBLY.md` step 2, and it gives `skein` — which had zero callers — a caller
 //! whose return is a placement rather than a verdict.
 //!
 //! ```text

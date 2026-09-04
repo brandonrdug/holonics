@@ -7,6 +7,6 @@
 # Imported evidence preserves source whitespace exactly.
 research/records/** -whitespace
 evidence/observations/** -whitespace
-reference/** -whitespace
+archive/reference/** -whitespace
 formal/** -whitespace
-papers/source/** -whitespace
+research/papers/source/** -whitespace

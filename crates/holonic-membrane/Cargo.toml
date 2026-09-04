@@ -1,0 +1,10 @@
+[package]
+name = "soma-membrane"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+body = { path = "../holonic-body" }
+holonic-structure = { path = "../holonic-structure" }
+soma-abi = { path = "../holonic-abi" }

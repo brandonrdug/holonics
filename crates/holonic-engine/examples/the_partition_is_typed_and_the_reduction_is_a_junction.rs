@@ -1,6 +1,6 @@
 //! **Deed H1: the partition is typed and the reduction is a junction.**
 //!
-//! Plan: `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md` §2
+//! Plan: `archive/plans/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md` §2
 //! (existing owners composed), §3.2 `TilingReceipt`, §3.3 `ReductionReceipt`, §3.4
 //! `PressureReceipt`, §4.3, §8 Deed H1, §11. Audit: the warp-scheduler record's §6 and §8.
 //!
@@ -42,7 +42,7 @@ use num_bigint::{BigInt, BigUint};
 use num_traits::Zero;
 use relational_geometry::Rat;
 
-const OUTPUT: &str = "output/the_partition_is_typed_and_the_reduction_is_a_junction";
+const OUTPUT: &str = ".local/artifacts/the_partition_is_typed_and_the_reduction_is_a_junction";
 const LAYER: usize = 0;
 
 /// The receiver's declared boundary grain, `2^-BOUNDARY`. A **declaration of this driver**, like the

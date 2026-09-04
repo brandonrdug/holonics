@@ -12,8 +12,8 @@ I'm not obviously leading this to general conversational problem solving AI. Tha
 meaning by 'tokens'. I want to scale to code and language. You are going to take me wrongly with
 those requests superficially if you are not careful."*
 **Plan:** this record schedules nothing. It reports what running
-[`blueprint/THE_MACHINE_PRODUCES_MATHEMATICS_IT_WAS_NOT_GIVEN.md`](../../blueprint/THE_MACHINE_PRODUCES_MATHEMATICS_IT_WAS_NOT_GIVEN.md)
-over three codecs measured, and it sits under [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md).
+[`blueprint/THE_MACHINE_PRODUCES_MATHEMATICS_IT_WAS_NOT_GIVEN.md`](../../archive/plans/THE_MACHINE_PRODUCES_MATHEMATICS_IT_WAS_NOT_GIVEN.md)
+over three codecs measured, and it sits under [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md).
 
 ---
 
@@ -147,7 +147,7 @@ The adjudicator is the other codec-specific slot and the same analysis applies:
 > **WITHDRAWN 2026-08-18, and the withdrawal is written here rather than only elsewhere so a later
 > reader does not inherit the slot.** The code row above names *the compiler and the test suite* as
 > this codec's adjudicator.
-> [`blueprint/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md`](../../blueprint/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md),
+> [`blueprint/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md`](../../archive/plans/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md),
 > deposited the same day as this record, strikes exactly that: **no interpreter, compiler, checker or
 > kernel decides anything the machine produced, on any codec.** Brandon, 2026-08-17, on the same
 > proposal for Lean: *"This same logic would require that we give the machine every kind of in-process

@@ -70,7 +70,7 @@ use holonic_engine::rational_polynomial::RationalPolynomial;
 use relational_geometry::Rat;
 
 /// The declared material: mathlib's own table of definite integrals.
-const SUBTREE: &str = "soma/formal/elementary-holonics/.lake/packages/mathlib/Mathlib/Analysis/SpecialFunctions/Integrals";
+const SUBTREE: &str = "formal/elementary-holonics/.lake/packages/mathlib/Mathlib/Analysis/SpecialFunctions/Integrals";
 
 fn workspace_root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))

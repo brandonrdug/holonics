@@ -6,7 +6,7 @@ solution, I do not want to continue taking baby-steps"* and the goal *"complete 
 suggested turns 2–7; go until you hit a real BSD wall."*  Solo orchestrator work, five
 Lean files across six commits (`4aa9dbb`, `7f4e045`, `683d91d`, `d0f3574`, `4cbc5f0`,
 `159e552`, `2b8bb89`).  **It schedules nothing.**
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction
 authorities.
 **Truth grades:** `proved-derived` with `formal-checked` evidence for every named

@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-24  
 **Authority:** admission record for the second station of
-[`../../blueprint/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md`](../../blueprint/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md)  
+[`../../blueprint/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md`](../../archive/plans/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md)  
 **Driver:**
 [`../../soma/life/examples/the_candidate_departs_before_sibling_testimony_returns.rs`](../../soma/life/examples/the_candidate_departs_before_sibling_testimony_returns.rs)  
 **Owner:**

@@ -62,7 +62,7 @@
 //! this same crate, and returned `Z/2` on the wound grown circuit. Until 2026-08-10 this module
 //! hard-wired all three arms of [`ChordObstruction`] to [`BigInt`], so the tree's holonomy
 //! instrument was provably blind to the class the tree's invariant instrument had just found.
-//! `canon/TABLET_THE_FLOW.md` §6 states the defect and §"Why this is today's finding under another
+//! `docs/canon/TABLET_THE_FLOW.md` §6 states the defect and §"Why this is today's finding under another
 //! name" states the construction: *give `running_integral`'s chord obstruction the same two-arm
 //! shape, with a coefficient group the caller declares.*
 //!

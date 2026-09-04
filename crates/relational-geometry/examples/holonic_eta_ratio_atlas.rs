@@ -19,11 +19,11 @@ use relational_geometry::{
     write_atlas,
 };
 
-/// Returns land under `output/`, never at the repository root, one artifact per height range so
+/// Returns land under `.local/artifacts/`, never at the repository root, one artifact per height range so
 /// ranges scanned under the process aperture compose as files. The v1 artifact in the same
 /// directory carries a declared start of twelve and is bound by content hash to its consumer; it
 /// is not rewritten.
-const ARTIFACT_DIRECTORY: &str = "output/holonic-eta-ratio-atlas";
+const ARTIFACT_DIRECTORY: &str = ".local/artifacts/holonic-eta-ratio-atlas";
 
 fn default_artifact(lower: i64, upper: i64) -> PathBuf {
     PathBuf::from(format!(

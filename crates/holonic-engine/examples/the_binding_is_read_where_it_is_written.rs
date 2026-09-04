@@ -1,7 +1,7 @@
 //! The orbit instrument for the reader repair, and it is run **before** the repair so the repair
 //! has something to move.
 //!
-//! `blueprint/THE_TYPED_TRANSPORT_ATLAS.md` names four defects in
+//! `archive/plans/THE_TYPED_TRANSPORT_ATLAS.md` names four defects in
 //! [`crate::lean_development`], each with a measured population, and makes the movement's
 //! completion conditional on exhibiting what changed. A repair wave that reports no movement has
 //! done bookkeeping, and this driver is what makes that statement checkable rather than a promise.
@@ -52,7 +52,7 @@ fn repository_root() -> PathBuf {
 }
 
 fn material_root(root: &Path) -> PathBuf {
-    root.join("soma/formal/elementary-holonics/.lake/packages/mathlib")
+    root.join("formal/elementary-holonics/.lake/packages/mathlib")
 }
 
 fn balanced(text: &str) -> bool {
@@ -135,7 +135,7 @@ fn main() {
     println!("  material {}", material.display());
     if !material.exists() {
         println!("  the library is not materialised here.");
-        println!("  recover it with:  cd soma/formal/elementary-holonics && lake exe cache get");
+        println!("  recover it with:  cd formal/elementary-holonics && lake exe cache get");
         std::process::exit(2);
     }
 

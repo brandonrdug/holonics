@@ -4,10 +4,10 @@
 **Kind:** a problem-specific route chart, the second of the pair with
 [`2026-08-21_THE_RIEMANN_ROUTE_RUNS_FROM_A_KERNEL_CHECKED_ANCHOR_TO_A_REALIZER_AT_THE_ARCHIMEDEAN_PLACE.md`](2026-08-21_THE_RIEMANN_ROUTE_RUNS_FROM_A_KERNEL_CHECKED_ANCHOR_TO_A_REALIZER_AT_THE_ARCHIMEDEAN_PLACE.md).
 Stations are founded terrain; rungs are named open constructions with falsifiers; **it schedules
-nothing.** [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+nothing.** [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction authorities.
 **Position under the active plan.** Exterior mathematical material for Deed M2 of
-[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
+[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../archive/plans/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
 No engine source is touched; the Lean tree is read, not extended, by this deposit.
 **Truth grades:** `proved-derived` for the cited Lean theorems; `proved-standard` for every imported
 classical theorem, cited at its station; `established-bounded` for the engine owners read at

@@ -7,12 +7,12 @@ one Lean file; the symbolic coset structure (four torsion classes, sixteen coset
 canonical refusals), the seven refusal cascades, and the mod-eight kernel were all
 derived and verified exactly (empty solution searches at `p = 3, 11, 19`, zero primitive
 mod-eight solutions for the seventh system) before encoding.  **It schedules nothing.**
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction
 authorities.
 **Position under the active plan.** Exterior mathematical material for the mathematics
 codec arm of
-[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
+[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../archive/plans/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
 The Lean line does not couple to the engine, per Brandon's standing ruling.
 **Truth grades:** `proved-derived` with `formal-checked` evidence for the five headline
 Lean theorems (`#print axioms` → `[propext, Classical.choice, Quot.sound]`, zero

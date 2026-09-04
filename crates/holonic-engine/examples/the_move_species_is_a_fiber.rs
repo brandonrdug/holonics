@@ -1,6 +1,6 @@
 //! The species of a proof move, returned as a fiber, on real mathematics.
 //!
-//! This is the transposition of `soma/life/examples/the_token_reconstruction_remains_a_fiber.rs`
+//! This is the transposition of `crates/holonic-life/examples/the_token_reconstruction_remains_a_fiber.rs`
 //! from tokens to moves. There the occurrence is a token and conduct is its stream neighbours; here
 //! the occurrence is a [`ProofStep`](holonic_engine::lean_development::ProofStep) and conduct is the
 //! body's own **arrival graph** — a step recruiting a name an earlier step founded.
@@ -64,7 +64,7 @@ fn repository_root() -> PathBuf {
 }
 
 fn material_root(root: &Path) -> PathBuf {
-    root.join("soma/formal/elementary-holonics/.lake/packages/mathlib")
+    root.join("formal/elementary-holonics/.lake/packages/mathlib")
 }
 
 fn found(root: &Path, relative: &str, binders: BinderGrain) -> Option<MoveComplex> {
@@ -102,7 +102,7 @@ fn main() {
     println!("  material  {}", material_root(&root).display());
     if !material_root(&root).exists() {
         println!("  the library is not materialised here; nothing to read.");
-        println!("  recover it with:  cd soma/formal/elementary-holonics && lake exe cache get");
+        println!("  recover it with:  cd formal/elementary-holonics && lake exe cache get");
         std::process::exit(2);
     }
 

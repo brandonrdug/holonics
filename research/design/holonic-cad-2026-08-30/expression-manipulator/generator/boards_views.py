@@ -86,7 +86,7 @@ def view_trace():
 
     body = tb + row([left, center, insp], "flex:1 1 auto; min-height:0") + stack
     return artboard("Trace — the proof as a debugger", "paperproof's box tree + a deterministic time index + the retained fibre paperproof drops", 1560, 1040, body,
-                    "sources: Paper-Proof/paperproof 69401f7 (lean/Services/BetterParser.lean, app/types/*.ts) · canon/TABLET_THE_REASONING_CYCLE.md §2")
+                    "sources: Paper-Proof/paperproof 69401f7 (lean/Services/BetterParser.lean, app/types/*.ts) · docs/canon/TABLET_THE_REASONING_CYCLE.md §2")
 
 @board("ViewGrowth.dc.html", "View 5 — Growth: program → lattice", 1560, 980, "page-views")
 def view_growth():

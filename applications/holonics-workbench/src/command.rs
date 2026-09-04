@@ -5,8 +5,18 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "domain", content = "command", rename_all = "kebab-case")]
 pub enum WorkbenchCommand {
+    Hna(HnaCommand),
     Workspace(WorkspaceCommand),
     Diagnostic(DiagnosticCommand),
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "action", rename_all = "kebab-case", deny_unknown_fields)]
+pub enum HnaCommand {
+    Run { request: PathBuf },
+    Inspect { rest: PathBuf },
+    Infer { model: PathBuf, text: String },
+    Train { model: PathBuf, sequence: PathBuf, learning_shift: u32, series_terms: u32 },
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

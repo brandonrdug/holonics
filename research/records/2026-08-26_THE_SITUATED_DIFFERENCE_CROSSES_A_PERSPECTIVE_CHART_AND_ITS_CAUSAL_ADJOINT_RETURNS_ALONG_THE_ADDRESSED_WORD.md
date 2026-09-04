@@ -3,7 +3,7 @@
 ## Scope and grade
 
 [established-bounded; implemented-exact; measured] L0 of
-[`blueprint/THE_SITUATED_DIFFERENCE_RETURNS_THROUGH_PERSPECTIVE_CHARTS_AND_ATHENA_CULTIVATES_PROSE_MATHEMATICS_AND_CODE_AS_ONE_CAUSAL_ECOLOGY.md`](../../blueprint/THE_SITUATED_DIFFERENCE_RETURNS_THROUGH_PERSPECTIVE_CHARTS_AND_ATHENA_CULTIVATES_PROSE_MATHEMATICS_AND_CODE_AS_ONE_CAUSAL_ECOLOGY.md)
+[`blueprint/THE_SITUATED_DIFFERENCE_RETURNS_THROUGH_PERSPECTIVE_CHARTS_AND_ATHENA_CULTIVATES_PROSE_MATHEMATICS_AND_CODE_AS_ONE_CAUSAL_ECOLOGY.md`](../../archive/plans/THE_SITUATED_DIFFERENCE_RETURNS_THROUGH_PERSPECTIVE_CHARTS_AND_ATHENA_CULTIVATES_PROSE_MATHEMATICS_AND_CODE_AS_ONE_CAUSAL_ECOLOGY.md)
 returned.  The construction is the narrow composition seam requested by the governing derivation:
 one dependent returned difference, its lawful chart transport or concrete defect, and its causal
 adjoint over an actual addressed word.  It does not apply morphology; its exact open boundary is
@@ -12,7 +12,7 @@ adjoint over an actual addressed word.  It does not apply morphology; its exact 
 ## Formal return
 
 [proved-derived; formal-checked] New file
-[`soma/formal/elementary-holonics/ElementaryHolonics/Millennium/SituatedReturnedDifference.lean`](../../soma/formal/elementary-holonics/ElementaryHolonics/Millennium/SituatedReturnedDifference.lean)
+[`soma/formal/elementary-holonics/ElementaryHolonics/Millennium/SituatedReturnedDifference.lean`](../../formal/elementary-holonics/ElementaryHolonics/Millennium/SituatedReturnedDifference.lean)
 defines four distinct additive fibres, source and target charts, source and rebased connection
 transport, and the commuting connection square.  It proves
 
@@ -66,7 +66,7 @@ not representable as an admitted section.
 ## K3 structural artifact
 
 [established-bounded; implemented-exact; measured] The focused driver
-[`soma/life/examples/the_situated_difference_returns_through_one_perspective_chart.rs`](../../soma/life/examples/the_situated_difference_returns_through_one_perspective_chart.rs)
+[`soma/life/examples/the_situated_difference_returns_through_one_perspective_chart.rs`](../../crates/holonic-life/examples/the_situated_difference_returns_through_one_perspective_chart.rs)
 mounted two genuinely consecutive sections from the admitted K3 artifact.  It joined occurrence
 `3591734304357398349` to later occurrence `3770587694998394597` through native state `3`, retained
 both occurrences in the reconstruction fibre, and derived receiver metrics and complex

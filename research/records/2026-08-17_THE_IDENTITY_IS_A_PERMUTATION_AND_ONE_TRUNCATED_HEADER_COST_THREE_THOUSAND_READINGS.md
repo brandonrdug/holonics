@@ -16,9 +16,9 @@ text about mathematics… geometric proofs and math analysis proof methods throu
 mathematics or code, or anything ordered which all things are)"*; and *"I want Eros to be able to
 authoritatively output an atlas of common mathematics identities… prominent dynamic transport
 mechanisms and tools for mathematics."*
-**Plan:** [`blueprint/THE_STATEMENT_IS_A_CROSSING_WORD_AND_THE_SEPARATOR_IS_ORIENTED.md`](../../blueprint/THE_STATEMENT_IS_A_CROSSING_WORD_AND_THE_SEPARATOR_IS_ORIENTED.md),
+**Plan:** [`blueprint/THE_STATEMENT_IS_A_CROSSING_WORD_AND_THE_SEPARATOR_IS_ORIENTED.md`](../../archive/plans/THE_STATEMENT_IS_A_CROSSING_WORD_AND_THE_SEPARATOR_IS_ORIENTED.md),
 **all five stations executed**; what remains open at the end of them is stated below. It sits under
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) at the station *MATHEMATICS INTO THE
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) at the station *MATHEMATICS INTO THE
 INFORMATION CENTRIFUGE*.
 
 ---

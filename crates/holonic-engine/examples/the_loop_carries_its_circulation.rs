@@ -5,7 +5,7 @@
 //! `analytic_field.rs:1331` — point at it without conducting through it. This file conducts through
 //! it.
 //!
-//! `canon/THE_HOLOBROCHOS_SPINE.md` §1 names five cuts a body can be at and says which one applies
+//! `docs/canon/THE_HOLOBROCHOS_SPINE.md` §1 names five cuts a body can be at and says which one applies
 //! is a **measurement**. `kelvin.rs` carries the `j != 0` cut literally: a material loop, moved by
 //! the flow, whose circulation `Gamma = <c, v>` is conserved.
 //!

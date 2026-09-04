@@ -72,7 +72,7 @@ use crate::multiquadratic::{
 /// the kernels its own corners already hold, so the union of those kernels **is** the aperture.
 ///
 /// This was `pub const DECLARED_GENERATOR_APERTURE: usize = 12` until 2026-08-10, which is
-/// `canon/THE_AUTHORED_LEVEL.md`'s convicted shape exactly: *"refusing past a number you invented
+/// `docs/canon/THE_AUTHORED_LEVEL.md`'s convicted shape exactly: *"refusing past a number you invented
 /// does not make the number derived"*, the same defect that excised `FREE_ENTRY_APERTURE = 12` and
 /// `REFINEMENT_APERTURE = 64`. Lifting it moved no return on the declared material — three corners
 /// contribute at most three generators, well inside twelve — so this is **bookkeeping and is
@@ -1010,7 +1010,7 @@ mod tests {
 ///
 /// From three integer arc weights that is an exact rational, and **no arccos is ever taken** — an
 /// angle is transcendental where its cosine is rational, so extracting it would leave `ℚ` and
-/// discard the exactness the whole body is built on. `canon/TABLET_THE_TURN.md` already carries the
+/// discard the exactness the whole body is built on. `docs/canon/TABLET_THE_TURN.md` already carries the
 /// law; `research/records/2026-08-09_THE_SET_IS_THE_SPECTRUM…` carries why the angle is the object:
 /// *a radian is arc over radius, a length over a length* — the only pure ratio, dimensionless, and
 /// therefore the one quantity that survives every rebase.
@@ -1678,7 +1678,7 @@ fn link_of(at: &str, cofaces: &[[String; 3]]) -> LinkClass {
 /// **The generator aperture is read off the material and not authored.** A hinge's composition can
 /// only carry the squarefree kernels its own cofaces' corners already carry, so the union of those
 /// kernels *is* the aperture — computable before composing, exact, and moving with the material.
-/// `canon/THE_AUTHORED_LEVEL.md` §1: *a level is either read off the material or declared by the
+/// `docs/canon/THE_AUTHORED_LEVEL.md` §1: *a level is either read off the material or declared by the
 /// caller; it is never authored inside the organ.* [`hinge_deficits_in_aperture`] is the
 /// caller-declared form for a caller who wants to bound it more tightly and be refused by name.
 pub fn hinge_deficits(triangles: &[ContactTriangle]) -> Vec<HingeDeficit> {

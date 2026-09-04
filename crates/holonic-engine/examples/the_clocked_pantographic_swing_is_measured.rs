@@ -423,7 +423,7 @@ fn parse_config() -> Result<Config, String> {
         population: 96,
         width: 128,
         height: 96,
-        output: PathBuf::from("output/the_clocked_pantographic_swing_is_measured/measurement.json"),
+        output: PathBuf::from(".local/artifacts/the_clocked_pantographic_swing_is_measured/measurement.json"),
     };
     let mut arguments = std::env::args().skip(1);
     while let Some(argument) = arguments.next() {

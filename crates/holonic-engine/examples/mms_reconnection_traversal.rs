@@ -35,11 +35,11 @@ use sha2::{Digest, Sha256};
 
 const DEFAULT_DATA: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/../../data/mms-reconnection/2015-10-16T130655-130710Z"
+    "/../../.local/data/mms-reconnection/2015-10-16T130655-130710Z"
 );
 const DEFAULT_OUTPUT: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/../../output/mms-reconnection/causal-traversal"
+    "/../../.local/artifacts/mms-reconnection/causal-traversal"
 );
 const CONDITIONING_END: &str = "2015-10-16T13:07:00.000000000Z";
 const SAMPLE_STRIDE: usize = 8;

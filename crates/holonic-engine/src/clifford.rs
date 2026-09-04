@@ -2,9 +2,9 @@
 //!
 //! ## What this is a lift of
 //!
-//! `soma/body/src/arrow.rs` carries `Arrow { reach, aim, cross }` — the span, the cohere, the
+//! `crates/holonic-body/src/arrow.rs` carries `Arrow { reach, aim, cross }` — the span, the cohere, the
 //! gyration — with the note *"The whole arrow, never one scalar."* That organ is **two-dimensional**:
-//! `Place` is a pair, so its `cross` is the scalar signed area, and `soma/body` is `no_std` with zero
+//! `Place` is a pair, so its `cross` is the scalar signed area, and `crates/holonic-body` is `no_std` with zero
 //! dependencies and cannot hold a `d`-dimensional blade. This module is that arrow at `d` dimensions
 //! over exact rationals, and the algebra it lives in.
 //!
@@ -22,7 +22,7 @@
 //!
 //! ## Why the algebra, and not just the blade
 //!
-//! `blueprint/THE_ARROW_IS_THE_DIVISION_AND_ATTENTION_KEEPS_ONLY_ITS_AIM.md` asserted that
+//! `archive/plans/THE_ARROW_IS_THE_DIVISION_AND_ATTENTION_KEEPS_ONLY_ITS_AIM.md` asserted that
 //! [`crate::multiquadratic`] is the crossing-word algebra and that *"the hand is the sign of the
 //! cross."* **That algebra has no sign.** Its structure constant is `∏_{i∈S∩T} kᵢ` with every
 //! `kᵢ > 1` — a strictly positive rational, symmetric in its arguments — so the algebra is
@@ -368,7 +368,7 @@ impl Clifford {
     }
 }
 
-/// **WHICH WAY THE ARROW AIMS** — lifted unchanged from `soma/body/src/arrow.rs:36-39`.
+/// **WHICH WAY THE ARROW AIMS** — lifted unchanged from `crates/holonic-body/src/arrow.rs:36-39`.
 ///
 /// `Ortho` is the case that matters: *"the cohere is null, but the CROSS/gyration is **MAXIMAL**:
 /// the pure orthogonal turn, the FOUNDING hand, the magnitude looked-past. NOT 'no current' — it is
@@ -380,7 +380,7 @@ pub enum Aim {
     Ortho,
 }
 
-/// **THE CAUSAL CLASS** — lifted from `soma/body/src/arrow.rs:69-75`, whose own note is the reason
+/// **THE CAUSAL CLASS** — lifted from `crates/holonic-body/src/arrow.rs:69-75`, whose own note is the reason
 /// this enum is here rather than `Aim` alone:
 ///
 /// > *"squaring sends the whole wall to zero along with the origin, so `Re(z²) = 0` cannot tell
@@ -950,7 +950,7 @@ mod tests {
             let left = Clifford::vector(signature.clone(), &[whole(ar), whole(ai)]).expect("in");
             let right = Clifford::vector(signature.clone(), &[whole(br), whole(bi)]).expect("in");
             let product = left.product(&right).expect("same signature");
-            // `soma/body/src/arrow.rs:119-120`: aim = ar*br + ai*bi, cross = ai*br - ar*bi.
+            // `crates/holonic-body/src/arrow.rs:119-120`: aim = ar*br + ai*bi, cross = ai*br - ar*bi.
             assert_eq!(product.coefficient(&[]), whole(ar * br + ai * bi));
             assert_eq!(product.coefficient(&[0, 1]), whole(ar * bi - ai * br));
             // The product of two vectors has grades 0 and 2 only — the even subalgebra.

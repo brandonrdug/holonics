@@ -34,7 +34,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 const PROBE_FIBRES: [i64; 4] = [101, 1009, 2411, 3001];
-const OUTPUT: &str = "output/the_section_census_walks_the_realizer_variety";
+const OUTPUT: &str = ".local/artifacts/the_section_census_walks_the_realizer_variety";
 
 fn argument<T: std::str::FromStr>(arguments: &[String], flag: &str, fallback: T) -> T {
     arguments

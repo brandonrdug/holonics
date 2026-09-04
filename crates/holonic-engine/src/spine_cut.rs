@@ -2,7 +2,7 @@
 //!
 //! # Why this exists
 //!
-//! `canon/THE_HOLOBROCHOS_SPINE.md` states the chain law
+//! `docs/canon/THE_HOLOBROCHOS_SPINE.md` states the chain law
 //!
 //! ```text
 //!   q_{k+1} − q_k + B j_k = r_k
@@ -18,7 +18,7 @@
 //! leak, or short circuit applies.**"*
 //!
 //! **Five distinct cuts, not one pass/fail** — and until 2026-08-10 four had owners and the fifth had
-//! none. `blueprint/THE_ROADMAP.md` carried *"the short-circuit cut has no owner"* as open work, and
+//! none. `docs/plans/THE_ROADMAP.md` carried *"the short-circuit cut has no owner"* as open work, and
 //! `short_circuit` returned zero hits in every `src/` in the tree.
 //!
 //! **The missing object was not one organ. It was the classifier.** Naming the cut is a measurement,
@@ -515,7 +515,7 @@ pub fn read_counted_transfers(
 // the exterior control — an attention sink as a named cut
 // ---------------------------------------------------------------------------------------------
 
-/// The two published sink species, `canon/THE_CORRESPONDENCE_ATLAS.md` §4 *"the sink as a named
+/// The two published sink species, `docs/canon/THE_CORRESPONDENCE_ATLAS.md` §4 *"the sink as a named
 /// cut"*.
 ///
 /// - **`Nop`** — `arXiv:2605.08453`, which proves a sink is a **hard attention switch**: attention

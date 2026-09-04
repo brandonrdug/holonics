@@ -52,7 +52,7 @@ const EXCISED_AUTHORED_HORIZON: usize = 1;
 /// **The founding horizon, declared by this caller and not derived.** `ConductAtlas::found` builds
 /// one orthographic signature per surface at this depth, so it is a different quantity from the
 /// reading horizon and has its own saturation. Deriving it is owed; declaring it and saying so is
-/// lawful under `canon/THE_AUTHORED_LEVEL.md`, and pretending it was derived would not be.
+/// lawful under `docs/canon/THE_AUTHORED_LEVEL.md`, and pretending it was derived would not be.
 const FOUNDING_DECLARATION: usize = 1;
 
 fn main() {
@@ -198,7 +198,7 @@ fn main() {
     println!("-----------------------------");
     println!();
     println!(
-        "  `canon/THE_AUTHORED_LEVEL.md`: an excision is graded by its ORBIT. Lift the level, \
+        "  `docs/canon/THE_AUTHORED_LEVEL.md`: an excision is graded by its ORBIT. Lift the level, \
          re-run,\n  exhibit the difference. A wave of excisions reporting no movement has done \
          bookkeeping.\n"
     );

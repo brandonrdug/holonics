@@ -5,7 +5,7 @@
 goal *"Solve BSD, found pivots using the composition of the solution…"*.  Solo
 orchestrator work, three Lean files across three commits (`217c64c`, `6164bdb`,
 `036c63b`).  **It schedules nothing.**
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction
 authorities.
 **Truth grades:** `proved-derived` with `formal-checked` evidence for every named

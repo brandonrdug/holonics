@@ -1,7 +1,7 @@
 //! A declared-option modeling surface: the holonic answer to Mathematica's option convention.
 //!
 //! Record: `research/records/2026-08-08_THE_WINDING_IS_THE_PHASE_THE_OPTION_IS_A_DECLARED_RECEIVER.md`.
-//! Contract: `blueprint/THE_PRESENTATION_ORGAN.md`.
+//! Contract: `archive/plans/THE_PRESENTATION_ORGAN.md`.
 //!
 //! ## What is imported from Wolfram, and what is refused
 //!
@@ -67,7 +67,7 @@ pub enum ExactReading {
     ///
     /// # This is the exact carrier of the founding predicate's form
     ///
-    /// `soma/body/src/arrow.rs` reads a relating from a pole as the pair `(aim, cross)` — the
+    /// `crates/holonic-body/src/arrow.rs` reads a relating from a pole as the pair `(aim, cross)` — the
     /// cohere `W+` that STANDS and the gyration `W-` that FLOWS — and gates the founding on an
     /// indefinite form of signature `(1,1)`. Identify the pair with one complex rational,
     ///
@@ -98,7 +98,7 @@ pub enum ExactReading {
     /// A single reading off `z^2` cannot recover it, because squaring sends `0` and nothing else
     /// to `0` but sends the whole wall there too.
     ///
-    /// **This is a citation, not a dependency.** `soma/body` has zero dependencies and cannot
+    /// **This is a citation, not a dependency.** `crates/holonic-body` has zero dependencies and cannot
     /// import this crate; the test `the_harmonic_real_is_the_arrows_founding_form` below carries
     /// the correspondence by re-deriving `(aim, cross)` from `arrow.rs`'s own declared points
     /// over `Rat`, so the classes are computed from the material rather than declared.
@@ -786,10 +786,10 @@ mod tests {
         );
     }
 
-    /// THE JOIN. `HarmonicReal` is the exact carrier of the form `soma/body/src/arrow.rs` gates
+    /// THE JOIN. `HarmonicReal` is the exact carrier of the form `crates/holonic-body/src/arrow.rs` gates
     /// the founding on, and this exhibits the correspondence rather than asserting it.
     ///
-    /// `soma/body` has zero dependencies and cannot import this crate, so the arrow's own
+    /// `crates/holonic-body` has zero dependencies and cannot import this crate, so the arrow's own
     /// `relate` arithmetic is re-derived here over `Rat` from the **same four declared points**
     /// that `arrow.rs`'s `the_founding_band_is_a_cone_and_all_three_classes_are_reachable`
     /// uses. The classes are therefore computed from the material; nothing here hands two

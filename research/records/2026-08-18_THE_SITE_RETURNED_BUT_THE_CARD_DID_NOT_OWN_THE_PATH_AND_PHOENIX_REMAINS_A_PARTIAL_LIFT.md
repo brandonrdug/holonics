@@ -9,9 +9,9 @@ promoted claims refuted by source or execution; **open** for every Phoenix maste
 **proposal** only for the corrected status and next gate.
 **Audited range:** commits **4a99b32** through **584b5d5**, on top of the corrected Phoenix
 foundation **d601e9e**.
-**Authority:** [Phoenix master](../../blueprint/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md),
-[Gemma instance](../../blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md),
-and [THE_ROADMAP.md](../../blueprint/THE_ROADMAP.md).
+**Authority:** [Phoenix master](../../archive/plans/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md),
+[Gemma instance](../../archive/plans/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md),
+and [THE_ROADMAP.md](../../docs/plans/THE_ROADMAP.md).
 **Position boundary:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md) remains unchanged. That
 was correct.
 

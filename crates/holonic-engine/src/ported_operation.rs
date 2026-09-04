@@ -1,7 +1,7 @@
 //! **A foreign operator diagram, ported into the standing operation complex.**
 //!
-//! Plan: [`blueprint/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md`],
-//! first instance [`blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md`].
+//! Plan: [`archive/plans/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md`],
+//! first instance [`archive/plans/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md`].
 //! Derivation and disposition:
 //! `research/records/2026-08-18_THE_HOLON_IS_THE_OPERATION_COMPLEX_THE_FOREIGN_MAP_IS_A_PORTED_WORD_AND_THE_CARD_CARRIES_ITS_FRONTS.md`
 //! §§4, 6, 12.
@@ -72,7 +72,7 @@ use crate::interaction::{
 };
 use crate::realization::{RealizationError, RealizationWitness};
 
-/// The four operation species of `canon/TABLET_THE_OPERATIONS.md`. **Every ported operation is
+/// The four operation species of `docs/canon/TABLET_THE_OPERATIONS.md`. **Every ported operation is
 /// exactly one of them**, and the tablet's own readings are quoted in each variant because the
 /// species decides what return is owed.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
@@ -158,7 +158,7 @@ impl SourceTestimony {
 /// **Human inspection of plausible output cannot collapse this.** A collapse is lawful only through
 /// a declared receiver family and a separating successor history, which is
 /// [`crate::receiver_exact_compression`]'s deed and not this module's. When the bridge is lifted
-/// into `soma/life`, this population is what `reconstruction_fiber` receives.
+/// into `crates/holonic-life`, this population is what `reconstruction_fiber` receives.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CandidateDiagrams {
     pub question: String,

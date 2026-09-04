@@ -1,0 +1,405 @@
+# The Holonic Intelligence Framework returns intrinsic holons and packages dismantling, inference,
+# cultivation, and generation
+
+**Date:** 2026-08-31
+**Kind:** completed construction contract composed by
+[`THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md).
+**Current frontier:** none.
+[counterexample; source-inspected] HNA's 2026-09-02 recurrence audit retains this campaign's exact
+interfaces, charts, persistence, and apparatus mechanisms but withdraws their use as proof of an
+operable neural lifecycle. Fixed-morphology inference followed by a genuinely-later cultivation
+return is a specialized formalization, not HNA's primitive. The active replacement is
+[`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
+**Supersession:** this contract supersedes the unresolved scheduling authority of UAR/R0Q. Exact
+completed UAR/R0Q mechanisms retain their scoped grades as evidence and implementation standing;
+their unfinished intentions are obligations below, not a second campaign.
+**Derivation:**
+[`../research/records/2026-08-31_HOLONIC_INTELLIGENCE_REQUIRES_INTRINSIC_PROFILES_AND_NEUTRAL_LIFECYCLE_INTERFACES.md`](../../research/records/2026-08-31_HOLONIC_INTELLIGENCE_REQUIRES_INTRINSIC_PROFILES_AND_NEUTRAL_LIFECYCLE_INTERFACES.md).
+
+**Governing doctrine:**
+[`../docs/canon/TABLET_THE_REASONING_CYCLE.md`](../../docs/canon/TABLET_THE_REASONING_CYCLE.md),
+[`../docs/canon/TABLET_THE_HEXIS.md`](../../docs/canon/TABLET_THE_HEXIS.md),
+[`../docs/canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md`](../../docs/canon/TABLET_THE_CIRCULATING_CARTOGRAPHER.md),
+[`../docs/canon/TABLET_THE_OPERATIONS.md`](../../docs/canon/TABLET_THE_OPERATIONS.md),
+[`../docs/canon/TABLET_THE_MANIFOLD.md`](../../docs/canon/TABLET_THE_MANIFOLD.md), and
+[`../docs/canon/THE_SURFACES_ARE_PATHS.md`](../../docs/canon/THE_SURFACES_ARE_PATHS.md).
+
+---
+
+## 0. Verdict and naming boundary
+
+[definition] Holonics is the common causal calculus. Holonic Inference is one continuing
+circulation through a rested ecology. Soulkiller is a one-way dismantling boundary for foreign
+realizations. Eros composes and cultivates native ecology. Athena is one resulting source-neutral
+rested ecology. Athena, Eros, and Soulkiller may name implementations, products, and boundary
+instances; they may not qualify the generic carrier, passage, rest, membrane, receiver,
+cultivation, generation, or apparatus types which make those instances possible.
+
+[counterexample; source-inspected] The live executable surface does not currently honor that
+boundary. `crates/holonic-life/src/athena_native/` contains 74 Rust files and about 47,400 lines; the related
+Athena/native-ecology/native-spool region declares hundreds of public types and more than thirty
+distinct public rest wrappers. Several incompatible generation families have no common lifecycle
+interface. The formal line is more coherent, but `AthenaRestedEcology`, `ErosCultivationPassage`,
+and `SoulkillerReturn` still place campaign names on generic structures.
+
+[definition] This campaign consolidates existing owners. It does not found `InferenceEngine`,
+`Trainer`, `Layer`, `Expert`, `Router`, `KVCache`, `ModelManager`, or another industry-shaped
+semantic cabinet. Package boundaries and neutral traits expose already-founded relations; they do
+not create new organs.
+
+## 1. The intrinsic holon profile
+
+[definition] A native holon is classified by the caused relations it carries, not by its source
+filename, tensor path, layer ordinal, model family, codec, or campaign. Its intrinsic profile is a
+dependent collection of typed facets:
+
+```text
+IntrinsicHolonProfile =
+  boundary signature
+  × incidence signature
+  × carrier signature
+  × transport signature
+  × constitutive signature
+  × chronology signature
+  × receiver signature
+  × morphology signature
+  × reconstruction signature
+  × open obligations.
+```
+
+[definition] Dimension is never one untyped integer. The framework keeps topological/cell degree,
+incidence rank and nullity, cycle rank, carrier/module rank, exterior degree, physical quantity
+line, representation rank, phase/orientation group, generator extent, receiver quotient extent,
+reconstruction-fibre extent, spatial/temporal/scale extent, and apparatus work/residency as
+different types or fields with explicit passages between them.
+
+[definition] Structural roles are derived receiver faces over this profile. Carrier, passage,
+junction, recurrence, receiver quotient, morphology deposit, organ, and ecology are not source
+labels. An organ is a minimal consequence-bearing subcomplex for a declared receiver/history
+family; an ecology is the one continuing owner in which such organs exchange current and
+morphology.
+
+## 2. The neutral lifecycle
+
+[definition] The common lifecycle is:
+
+```text
+foreign chart --dismantle--> native holon bundle
+
+rested ecology --mount--> situated occurrence
+  --differentiate/conduct/diffuse/interact--> plural continuation
+  --receiver condensation--> emitted occurrence
+  --world return--> situated difference
+  --causal adjoint--> proposed morphology delta
+  --commit or decline--> successor or unchanged rest
+  --remount--> later conduct.
+```
+
+[definition] The generic contracts are:
+
+- `RestedTransportEcology`: one move-owned body, rested morphology, exact remount, typed ingress,
+  native conduct, receiver family, reconstruction fibre, and open exterior;
+- `DismantlingReturn`: productive native transport scaffold, physically separate cold reconstruction witness,
+  and receiver insufficiency family;
+- `InferenceCirculationReturn`: entering occurrence, active continuation, emitted occurrence,
+  receiver face, exact lineage, and unchanged reusable morphology at the inference cut;
+- `CultivationPassage`: genuine later return, complete situated difference, causal-adjoint
+  passage, proposed delta, commit/decline event, source-detached changed later conduct, targeted
+  withdrawal, and exact restoration;
+- `ExactWeightPassage`: foreign codeword and chart to exact native carrier with the complete
+  residual/preimage fibre;
+- `ContactScheduleChart`: a receiver chart over fixed-window, periodic-global, recurrent,
+  input-conditioned sparse, or current-founded incidence without making any schedule native
+  ontology.
+
+[definition] These contracts may be expressed through several owner-local Rust structures. They
+need not become one cloneable universal wrapper. Their public vocabulary and composition laws must
+nevertheless be singular, generic, and matched by Lean definitions.
+
+## 3. Holonic generation
+
+[definition] Generation is the outward boundary of Holonic Inference, not a standalone language
+method:
+
+```text
+mount -> active continuation section -> current-founded contact
+      -> plural future fibre -> receiver condensation -> emission
+      -> exterior return -> reflection -> later current.
+```
+
+[definition] Text, image, proof, action, and sensor generation are exterior codec projections of
+the emitted section. A convenience adapter may accept a prompt-like occurrence and render a
+surface. It may not own native candidate selection, authored response length, semantic routing,
+or the constitutive law.
+
+[definition] A fixed sliding window is a fixed local contact chart; attention sinks are persistent
+boundary ports; linear attention is a fixed-size history condensation; a periodic full-attention
+layer is a scheduled reopening; and a lightning morphology is a current front founding its path
+while it travels. None is identified with the native ecology without an exact realization passage,
+successor law, receiver factors, and reconstruction fibre.
+
+## 4. Training, cultivation, and hexis
+
+[definition] Inference leaves reusable morphology fixed at its cut. Cultivation begins only when a
+genuinely later receiver/world return causes a morphology change which survives source-detached
+remount and changes later conduct. Loss, reward, gradient, probability, accuracy, and preference
+are receiver faces of the complete returned difference.
+
+[definition] Backpropagation/autograd is an exterior implementation chart of the causal-adjoint
+return through retained forward lineage. A gradient exists only after a declared metric raises the
+returned covector. A non-smooth or open seam may return plural derivatives, a fibre, or an
+obstruction.
+
+[definition] Pretraining, fine-tuning, LoRA, adapters, distillation, and diffusion training are
+specialized cultivation charts. Their mutable carrier and receiver family remain explicit. No
+`Trainer` or `AdapterManager` owner is introduced.
+
+## 5. Foreign-model interoperability and Soulkiller
+
+[definition] ONNX, Safetensors, Transformers configuration, GGUF, and other model formats are
+exterior charts. They retain every byte, dtype, shape, offset, operator, opset, attribute,
+initializer, function, tensor name, shard, configuration field, and source coordinate required for
+reconstruction. These fields may be load-bearing inside Soulkiller and may not route native
+conduct after the boundary.
+
+[definition] Interoperability proceeds in three grades:
+
+1. manifestation: every source object and storage relation is accounted for;
+2. structural reconstruction: the foreign operation/configuration chart identifies possible
+   transports and exact type/shape constraints;
+3. active realization: excitation and intervention return the transport actually used for a
+   declared receiver/history family.
+
+[definition] Soulkiller returns only after grade three. Its productive return is a profiled
+`NativeHolonBundle`; cold ancestry and reconstruction testimony remain separately mountable only as
+reference evidence; unexcited, collapsed, noncommuting, or unsupported capability returns as an
+insufficiency or open fibre. No callable foreign executor crosses the boundary.
+
+## 6. Exact precision and discrete carriers
+
+[definition] A finite foreign floating or quantized codeword is imported exactly as the dyadic
+rational or discrete value it stores, together with scale/basis, native carrier, phase/orientation,
+and complete source preimage. If a richer predecessor value is available, the exact residual is
+retained. Without that predecessor, the complete rounding/quantization preimage is the
+reconstruction fibre.
+
+[definition] “No error” means no unaccounted error. It does not identify a quantized word with a
+unique departed real value. Transcendental and normalization operations require an exact symbolic
+carrier, certified enclosure with retained residual, or a declared receiver quotient. Modular
+weights are exact only for receiver families which factor through their modulus.
+
+## 7. UAR intentions folded into this framework
+
+[definition] UAR and R0Q schedule nothing after this contract took effect. Their unfinished
+intentions survive as follows:
+
+| UAR/R0Q intention | HIF owner |
+|---|---|
+| source-neutral rest constructed without historical output chain | HIF2 dismantling boundary and HIF6 source-absence audit |
+| response/source/target addresses and off-diagonal transport | admitted standing used by HIF1 profiles and passages |
+| resident complex contraction before positive receiver | admitted standing used by HIF1/HIF6 runtime conformance |
+| full-complex recurrence and no CPU semantic replay | admitted standing used by HIF3/HIF6 |
+| actual emission/world-return situated difference | HIF4 cultivation passage and HIF6 actual-return gate |
+| source-detached remount, targeted withdrawal, exact restoration | HIF4 and HIF6 |
+| complete source-neutral release and contact-chart comparison | HIF7 exact framework release |
+
+[definition] Historical `OpticalAthenaRest`, ALP, SENS, UAR, and output-file chains remain bounded
+controls and provenance. They cannot instantiate the productive generic framework unless they pass
+the same neutral interfaces and source-absence gates; no compatibility alias is added for them.
+
+## 8. Ordered construction
+
+### HIF0 — formal intrinsic profiles and lifecycle contracts — PASSED
+
+[definition] Consolidate the existing formal machine-learning line under neutral structures. Add
+intrinsic holon dimensions/profile, rested ecology, dismantling return, inference circulation,
+cultivation passage, and exact foreign-weight passage. Existing Athena/Eros/Soulkiller definitions
+become named instantiations or are superseded without aliases after their consumers migrate.
+
+[definition] HIF0's returned formal artifact is the import closure
+`ElementaryHolonics/Computation/HolonicIntelligenceFramework.lean`, composed from
+`IntrinsicHolonProfile.lean`, `HolonicIntelligenceLifecycle.lean`, and
+`ExactForeignWeight.lean`. Its named controls are
+`ContactScheduleChart.currentFounded_not_fixed`,
+`RestedTransportEcology.conductWord_after_remount`,
+`DismantlingReturn.admitted_replaceColdWitness`,
+`InferenceCirculationReturn.isInferenceCut`,
+`CultivationPassage.cultivation_excludes_inference`,
+`CultivationPassage.has_later_conduct_separator`,
+`CultivationPassage.remount_returns_successor`,
+`CultivationPassage.withdrawal_returns_predecessor`, and the `ExactForeignWeightPassage`
+preimage/reconstruction controls. HIF0 neutralizes the new common formal surface; migration and
+removal of older named formal and executable wrappers belongs to HIF5.
+
+**Pass HIF0:** the live Lean umbrella builds without `sorry` or a new axiom; cold witness cannot
+change productive admission; inference leaves reusable morphology fixed; a witnessed cultivation
+excludes inference and carries a later-conduct separator; exact codeword conversion retains its
+preimage/residual fibre; dimension faces cannot be silently identified; and the public generic
+structures contain no Athena, Eros, Soulkiller, transformer, token, layer, or expert field.
+
+[proved-derived; formal-checked; measured] HIF0 returned the four-file
+`HolonicIntelligenceFramework.lean` closure. The focused closure built 3,164 jobs and the live
+umbrella built 3,769 jobs. Every named control passed without `sorryAx`; authority, epistemic,
+claim-index, source-shape, and equation-atlas receivers are green. The exact return is recorded in
+[`../research/records/2026-08-31_HIF0_INTRINSIC_HOLON_PROFILES_AND_NEUTRAL_LIFECYCLE_CONTRACTS_RETURNED.md`](../../research/records/2026-08-31_HIF0_INTRINSIC_HOLON_PROFILES_AND_NEUTRAL_LIFECYCLE_CONTRACTS_RETURNED.md).
+
+### HIF1 — generic Rust carriers and package surface — PASSED
+
+[definition] Establish Rust counterparts to the HIF0 contracts over the existing addressed span,
+native spool, receiver history, exact current, morphology delta, rest/remount, and apparatus owners.
+Campaign/product types may implement or contain the neutral contracts; generic behavior may not be
+duplicated behind Athena-named methods.
+
+**Pass HIF1:** one public neutral surface conducts the existing bounded native controls; the Lean
+and Rust catalog rows name the same carrier and open fibre; no compatibility alias, cloneable
+ecology, digest identity, or second implementation is introduced.
+
+[established-bounded; implemented-exact; measured] HIF1 returned the neutral
+`native_ecology::holonic_intelligence` package. `NativeTransportScaffold` itself implements the rested
+surface; borrowed profiles retain every native facet; neutral and direct resident word conduct are
+structurally equal. The engine suite returned 1,984 passed, zero failed, 32 ignored; `life`
+type-checked and source-shape remained green. The exact return is recorded in
+[`../research/records/2026-08-31_HIF1_GENERIC_RUST_PROFILE_AND_RESTED_TRANSPORT_SURFACE_RETURNED.md`](../../research/records/2026-08-31_HIF1_GENERIC_RUST_PROFILE_AND_RESTED_TRANSPORT_SURFACE_RETURNED.md).
+
+### HIF2 — exact foreign charts and profiled Soulkiller return — PASSED
+
+[definition] Consolidate Safetensors manifestation, shard-index/config intake, exact dtype/shape
+conversion, and ONNX model graph intake behind lossless exterior charts. Compose them with actual
+excitation/intervention testimony and return profiled native holons through Soulkiller.
+
+**Pass HIF2:** representative dense, sparse/MoE, hybrid-attention, quantized, and ONNX controls
+retain complete exterior reconstruction while source names cannot change native profile or conduct;
+the productive hot closure has no foreign executor or source topology.
+
+[established-bounded; implemented-exact; source-inspected; measured] HIF2 returned lossless vendor
+configuration, shard-index, and ONNX charts; exact packed FP4/FP6/FP8/sub-byte intake; explicit
+nonfinite and open quantization-preimage faces; and productive-lane-only dismantling profiles. The
+live GLM, DeepSeek, and Qwen resources parsed through one implementation. The engine suite returned
+1,998 passed, zero failed, 32 ignored; dependent targets and source-shape passed. The exact return is
+recorded in
+[`../research/records/2026-08-31_HIF2_EXACT_FOREIGN_CHARTS_LOW_PRECISION_WEIGHTS_AND_PROFILED_DISMANTLING_RETURNED.md`](../../research/records/2026-08-31_HIF2_EXACT_FOREIGN_CHARTS_LOW_PRECISION_WEIGHTS_AND_PROFILED_DISMANTLING_RETURNED.md).
+
+### HIF3 — packaged Holonic Inference and generation — PASSED
+
+[definition] Compose mount, active continuation, transport/diffusion, contact/glue, receiver
+condensation, emission, exterior return aperture, and later-current continuation through one
+move-owned circulation. Provide narrow codec adapters only at the boundary.
+
+**Pass HIF3:** one generic return covers text and at least one non-text codec without codec routing;
+plural futures, obstruction, complete fibres, and emitted lineage survive; no authored response
+length, lexical candidate selector, KV-cache owner, or CPU semantic choreography appears.
+
+[established-bounded; implemented-exact; measured] HIF3 returned one borrowed-rest native
+circulation, 27,020 plural future/fibre faces in one resident launch, actual-ingress emission,
+return aperture, exact text/binary codec projections, and one actual later-current successor through
+unchanged morphology. The engine suite returned 2,000 passed, zero failed, 32 ignored; dependent
+targets and source-shape passed. The exact return is recorded in
+[`../research/records/2026-08-31_HIF3_ONE_NATIVE_INFERENCE_CIRCULATION_EMITTED_CODEC_NEUTRAL_PLURAL_FUTURES.md`](../../research/records/2026-08-31_HIF3_ONE_NATIVE_INFERENCE_CIRCULATION_EMITTED_CODEC_NEUTRAL_PLURAL_FUTURES.md).
+
+### HIF4 — packaged cultivation and hexis — PASSED
+
+[definition] Compose complete returned difference, causal adjoint, staged morphology delta,
+commit/decline, source-detached remount, later conduct, targeted withdrawal, sibling invariance,
+and exact restoration through one generic cultivation passage.
+
+**Pass HIF4:** scalar loss is shown insufficient where equal faces cause different changes; a
+committed delta changes held-out later conduct; targeted withdrawal removes its attributable
+effect; restoration returns identity and conduct; reference, prompting, exposure, and training
+remain distinct.
+
+[established-bounded; implemented-exact; measured] HIF4 returned generic lifecycle types and an
+implementation over the exact recurrent causal-adjoint owner. Consuming the boundary passage
+separates cold testimony from productive hexis; source-detached remount, held-out change, sibling
+invariance, withdrawal, and restoration pass. The engine suite returned 2,002 passed, zero failed,
+32 ignored; engine examples and source-shape passed. The exact return is recorded in
+[`../research/records/2026-08-31_HIF4_CAUSAL_ADJOINT_CULTIVATION_RETURNED_SOURCE_DETACHED_HEXIS.md`](../../research/records/2026-08-31_HIF4_CAUSAL_ADJOINT_CULTIVATION_RETURNED_SOURCE_DETACHED_HEXIS.md).
+
+### HIF5 — migrate products and remove campaign ontology — PASSED
+
+[definition] Migrate Eros and Athena implementations onto the neutral framework. Rename or remove
+generic Athena-prefixed types and methods, merge duplicate rest/cultivation/generation owners, split
+remaining large foremen at founded relations, and delete superseded wrappers and drivers. Preserve
+exact completed consequences through the new owners, not through compatibility decoders.
+
+[established-bounded; implemented-exact; measured] The first HIF5 unit removed the generic
+`AthenaNative*` rest/passage/consequence/error family. Every consumer now uses neutral
+`NativeEcologyRest` and `NativeConduct*` names and schemas with no aliases. The affected examples
+type-check and `life` returns 491 passed, zero failed, 15 ignored. HIF5 remains current for the
+product/rest hierarchy and remaining campaign-qualified generic owners.
+
+[established-bounded; implemented-exact; source-inspected; measured] HIF5 passed. The live package,
+generic type families, wire domains, low-level continuing body, receiver-history formal owner, and
+resident integrated front now carry neutral names without aliases. Superseded lexical/atlas/Eros
+rest owners, resident atlas laws and kernels, and their sole-purpose drivers were deleted. The
+resident-section foreman was split at founded apparatus relations. Engine tests returned 1,991
+passed, zero failed, 32 ignored; life returned 466 passed, zero failed, 14 ignored; the Lean
+umbrella built 3,768 jobs. The exact return is
+[`../research/records/2026-08-31_HIF5_PRODUCTS_MOVED_TO_NEUTRAL_OWNERS_AND_CAMPAIGN_ONTOLOGY_DEPARTED.md`](../../research/records/2026-08-31_HIF5_PRODUCTS_MOVED_TO_NEUTRAL_OWNERS_AND_CAMPAIGN_ONTOLOGY_DEPARTED.md).
+
+**Pass HIF5:** Athena denotes a composed product/ecology rather than a generic type family; Eros
+denotes its composer/cultivator; Soulkiller denotes the one-way boundary; no live generic source
+owner is campaign-qualified; source-shape and public-owner review return no hotspot or redundant
+rest hierarchy.
+
+### HIF6 — resident and source-neutral closure — PASSED
+
+[definition] Carry the neutral inference and cultivation lifecycle through the strongest lawful
+resident surface. Revalidate actual emission/world-return identities, off-diagonal complex
+transport, reconstruction fibres, semantic replay telemetry, and source-detached remount without
+historical output dependencies.
+
+**Pass HIF6:** the direct rest constructs and remounts with foreign/source artifacts unavailable;
+all hot semantic work remains resident; the actual return, not a representative, causes the child;
+withdrawal/restoration and later conduct pass; removed historical outputs change no consequence.
+
+[established-bounded; implemented-exact; source-inspected; measured] HIF6 passed on the direct
+finite native cycle. The canonical rest remounted without filesystem, environment, source, foreign,
+or historical-output intake; one resident complex launch retained quadrature and off-diagonal
+contact; the actual emission and later return founded source-detached hexis; held-out conduct,
+withdrawal, and restoration passed. The exact return is
+[`../research/records/2026-08-31_HIF6_DIRECT_SOURCE_NEUTRAL_REST_CLOSED_ONE_RESIDENT_RETURN_AND_CULTIVATION_CYCLE.md`](../../research/records/2026-08-31_HIF6_DIRECT_SOURCE_NEUTRAL_REST_CLOSED_ONE_RESIDENT_RETURN_AND_CULTIVATION_CYCLE.md).
+
+### HIF7 — exact interoperability and framework release — PASSED
+
+[definition] Compare fixed-window, periodic-hybrid, recurrent/linear, and current-founded contact
+charts over one declared native population and receiver family. Retain active causal extent, exact
+pair work, receiver fibres, and every coarse pair reopened by the richer receiver. Revalidate the
+lossless foreign configuration, shard-index, ONNX, and exact-weight charts at the cold boundary and
+the direct source-neutral resident inference/cultivation lifecycle at the hot boundary.
+
+**Pass HIF7:** all four contact charts return over the common native population; their active extent
+and exact pair work are explicit; the richer receiver returns a nonempty reopening family; foreign
+charts remain complete exterior testimony and cannot alter productive native identity; the direct
+source-neutral cycle remounts, conducts, cultivates, withdraws, and restores without source,
+foreign, filesystem, environment, or historical-output intake; Git is clean and pushed; and
+reproducible outputs are absent from the release tree.
+
+[historical; source-inspected; process-audit] The frozen “Describe Brandon” family was an exterior
+experiment. It was wrongly promoted from a structural probe into H4, UAR, and then HIF7 scheduling.
+“Unchanged” meant only that the prompt/aperture was held fixed; “qualitative” meant undeclared
+primary-agent inspection. Neither supplied a reproducible pass criterion. The failed
+presentation-contact construction remains a useful counterexample to lexical lookup, but the
+absent natural-language answer relation is not a HIF7 framework debt.
+
+[established-bounded; implemented-exact; source-inspected; measured] HIF7 returned the four exact
+contact-chart families, active extent and pair-work receipts, receiver fibres, and richer-receiver
+reopenings in `holonic_intelligence/contact_chart.rs`. HIF2 retains the exact cold foreign charts;
+HIF6 retains the direct source-neutral resident lifecycle. The factorized resident/radiation/path
+repairs constructed during the invalid probe campaign remain admitted only at their own exact
+scopes. The audit and correction are recorded in
+[`../research/records/2026-09-01_HIF7_QUALITATIVE_PROBE_WAS_WRONGLY_PROMOTED_AND_THE_FRAMEWORK_RELEASES_ON_EXACT_CONTRACTS.md`](../../research/records/2026-09-01_HIF7_QUALITATIVE_PROBE_WAS_WRONGLY_PROMOTED_AND_THE_FRAMEWORK_RELEASES_ON_EXACT_CONTRACTS.md).
+
+[established-bounded; process-audit; measured] The coherent release returned 2,922 tests passed,
+zero failed, and 50 ignored; every Cargo example type-checked; the Lean umbrella built 3,768 jobs;
+and all nine repository release gates passed inside the 180-second outer boundary.
+
+## 9. Process law
+
+[definition] Every nontrivial process retains the 180-second outer boundary. Owner-local tests and
+the exact active formal target run during construction; a complete release receiver runs only at a
+declared release boundary. A timeout, digest, count, topology census, residency receipt, human-read
+surface, or generated surface cannot advance a phase by itself.
+
+[definition] `CONSTRUCTION_STATE.md` advances only after the named phase returns its complete
+artifact and grade. `docs/ARCHITECTURE_MAP.md` changes with the actual formal/Rust owner, never in
+anticipation. Historical UAR records retain their truth grades and never regain scheduling force.

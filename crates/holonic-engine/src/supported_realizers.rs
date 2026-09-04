@@ -293,11 +293,11 @@ pub fn landings_from_classes(
 /// **The pair was joined only inside `#[cfg(test)]` until 2026-08-10.** [`positive_form`] returned
 /// `MᵀM` and [`crate::inertia::inertia`] returned its signature, and the only place the two met was
 /// an `assert_eq!` in this file's test module — so the chain the project's own doctrine runs through
-/// was a test assertion and not a conduct path. `blueprint/THE_ROADMAP.md` carried it as open work.
+/// was a test assertion and not a conduct path. `docs/plans/THE_ROADMAP.md` carried it as open work.
 /// The caller is `examples/the_realizer_places_itself.rs`, which builds the incidence from
 /// `skein::Substitution` moves read against a real complex rather than typing a matrix out.
 ///
-/// **What this returns is the split, not a verdict.** `canon/TABLET_THE_TURN.md` §2b: *"positivity is
+/// **What this returns is the split, not a verdict.** `docs/canon/TABLET_THE_TURN.md` §2b: *"positivity is
 /// not absolute… State the **split** and the **hand** separately."* `MᵀM` is positive semi-definite
 /// by construction, so its inertia is `(rank, 0, nullity)` and the content is **where the rank
 /// falls**. The nullity is the measurement to read, and it is `columns − rank`.

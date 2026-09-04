@@ -32,7 +32,7 @@ closure manifest, 433 catalogued drivers with zero uncatalogued, and a clean 354
 census. Together with the twelve already-green scopes, the E2 release boundary is complete.
 
 [established-bounded] E2 is release-admitted. `CONSTRUCTION_STATE.md` and
-[`THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) now authorize only E3: actual returned
+[`THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) now authorize only E3: actual returned
 consequence must cultivate E2's provisional codec candidate in the same addressed continuation,
 survive source-detached remount, change held-out conduct, depart under attributable ablation and
 withdraw to the exact predecessor.

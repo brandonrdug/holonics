@@ -2,7 +2,7 @@ use std::fs;
 use std::path::Path;
 use std::process::Command;
 
-use athena_alpha::AthenaAlphaApplication;
+use holonics_hna::AthenaAlphaApplication;
 use holonic_engine::native_spool::fixture;
 use holonics_workbench::{render_human, WorkbenchResponse};
 use life::native_intelligence::NativeCirculationConfiguration;
@@ -12,7 +12,7 @@ use tempfile::tempdir;
 /// shipped `workspace import-snapshot` command founds the workspace from it.
 fn declared_snapshot(path: &Path) {
     let mut configuration: NativeCirculationConfiguration =
-        serde_json::from_str(athena_alpha::BASE_CONFIGURATION).expect("configuration");
+        serde_json::from_str(holonics_hna::BASE_CONFIGURATION).expect("configuration");
     configuration.address.receiver = fixture::FIXTURE_RECEIVER;
     let admission =
         AthenaAlphaApplication::from_dismantling_return(fixture::detached_returned(), configuration)

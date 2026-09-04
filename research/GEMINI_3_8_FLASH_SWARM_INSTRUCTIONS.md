@@ -4,11 +4,11 @@
 **Kind:** exterior fleet instruction and theorem-task pool.
 **Authority:** Brandon's direct instruction of 2026-09-02.
 **Scheduling boundary:** this document does not replace
-[`../blueprint/THE_ROADMAP.md`](../blueprint/THE_ROADMAP.md) or
+[`../docs/plans/THE_ROADMAP.md`](../docs/plans/THE_ROADMAP.md) or
 [`../CONSTRUCTION_STATE.md`](../CONSTRUCTION_STATE.md). The roadmap alone schedules construction in
 the primary Holonics worktree. Results from this fleet are proposals until the primary integrator
 admits them.
-**Truth status:** per claim under [`../canon/EPISTEMIC_GRADES.md`](../canon/EPISTEMIC_GRADES.md).
+**Truth status:** per claim under [`../docs/canon/EPISTEMIC_GRADES.md`](../docs/canon/EPISTEMIC_GRADES.md).
 
 ---
 
@@ -33,7 +33,7 @@ Read, in order:
 
 1. [`../AGENTS.md`](../AGENTS.md);
 2. [`../CONSTRUCTION_STATE.md`](../CONSTRUCTION_STATE.md);
-3. the complete [`../blueprint/THE_ROADMAP.md`](../blueprint/THE_ROADMAP.md);
+3. the complete [`../docs/plans/THE_ROADMAP.md`](../docs/plans/THE_ROADMAP.md);
 4. this document;
 5. only the exact source/import closure named by the selected task; and
 6. the official problem and finish-line owner before making any Millennium capability claim.
@@ -62,10 +62,10 @@ Never edit from a fleet leaf return:
 
 - `AGENTS.md`;
 - `CONSTRUCTION_STATE.md`;
-- `blueprint/THE_ROADMAP.md`;
+- `docs/plans/THE_ROADMAP.md`;
 - any campaign status or current-frontier declaration;
-- `THE_CLAIM_INDEX.md`;
-- `UNIVERSAL_CATALOG.md`; or
+- `docs/CLAIM_INDEX.md`;
+- `docs/ARCHITECTURE_MAP.md`; or
 - `ElementaryHolonics.lean` and other aggregate imports.
 
 ## 2. Universal return contract
@@ -107,7 +107,7 @@ timeout 180s lake env lean ElementaryHolonics/<path>.lean
 timeout 180s lake build ElementaryHolonics.<module>
 ```
 
-From `soma/formal/elementary-holonics/`, choose the exact module path. Additionally:
+From `formal/elementary-holonics/`, choose the exact module path. Additionally:
 
 - Foundation/Computation changes must build
   `ElementaryHolonics.Computation.HolonicQuantumTransport`;

@@ -14,7 +14,7 @@ continuation now return one `ReceiverHistoryRealizationPassage`. The receipt ref
 owner artifacts by content identity and does not copy them into a second runtime body.
 
 [proved-derived] The formal construction is
-[`PhysicalRealization.lean`](../../soma/formal/elementary-holonics/ElementaryHolonics/Millennium/PhysicalRealization.lean).
+[`PhysicalRealization.lean`](../../formal/elementary-holonics/ElementaryHolonics/Millennium/PhysicalRealization.lean).
 It introduces the pure causal-algebraic `PhysicalRealizationCore`, an addressed
 `RealizationSpan`, and its zero-local-defect `RealizationPassage`. Literal occurrence identity,
 addressed passage equivalence, receiver-history equivalence, rebase, and non-injective compression
@@ -48,7 +48,7 @@ local commuting square, shortest-separator addresses, and exact construction-wor
 A forged native target is refused by a focused adversarial test.
 
 [implemented-exact; measured] The real deed is
-[`the_realization_passage_closes_over_every_successor_word.rs`](../../soma/life/examples/the_realization_passage_closes_over_every_successor_word.rs).
+[`the_realization_passage_closes_over_every_successor_word.rs`](../../crates/holonic-life/examples/the_realization_passage_closes_over_every_successor_word.rs).
 It reopened the admitted M3 reconstruction/native-rest artifacts and the A3 input, cultivation, and
 grade artifacts. No new foreign-model or device deed occurred; unchanged addressed M3/A3 apparatus
 receipts were reused. The final product code closure is

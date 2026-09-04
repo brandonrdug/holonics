@@ -10,14 +10,14 @@ use std::process::Command;
 
 const DEFAULT_EROS: &str = "target/release/eros";
 const PRODUCT: &str =
-    "output/the_lifted_body_is_cultivated_and_the_delta_survives_native_rest/product";
-const MATERIAL_MANIFEST: &str = "output/the_lifted_body_is_cultivated_and_the_delta_survives_native_rest/material_manifest.json";
+    ".local/artifacts/the_lifted_body_is_cultivated_and_the_delta_survives_native_rest/product";
+const MATERIAL_MANIFEST: &str = ".local/artifacts/the_lifted_body_is_cultivated_and_the_delta_survives_native_rest/material_manifest.json";
 const TEXTS: [&str; 3] = [
     "Geometry returns through another chart",
     "A crystal carries the reflected current",
     "Discrete faces close around a curved path",
 ];
-const OUTPUT: &str = "output/the_application_infers_from_the_cultivated_phoenix_rest_on_the_card";
+const OUTPUT: &str = ".local/artifacts/the_application_infers_from_the_cultivated_phoenix_rest_on_the_card";
 
 struct Child {
     status: Option<i32>,

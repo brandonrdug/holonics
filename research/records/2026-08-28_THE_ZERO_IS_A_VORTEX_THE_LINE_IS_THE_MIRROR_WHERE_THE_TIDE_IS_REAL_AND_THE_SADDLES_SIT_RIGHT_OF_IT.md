@@ -3,7 +3,7 @@
 **Date:** 2026-08-28
 **Kind:** the physical reading of the Riemann receiver question, in this framework's species, with
 the two measurements that make it checkable — the exact tide and the saddle census — and the
-positive form it reduces to. **Schedules nothing.** [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md)
+positive form it reduces to. **Schedules nothing.** [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md)
 and [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction authorities.
 **Provenance:** Brandon, 2026-08-27, on the winding atlas: *"the winding being the zeros is like
 saying 'there's a current that describes the motion between these things' … the whole point is

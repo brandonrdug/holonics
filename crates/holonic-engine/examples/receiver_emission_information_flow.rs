@@ -51,16 +51,16 @@ impl Args {
     fn parse() -> Result<Self, Box<dyn Error>> {
         let mut args = env::args().skip(1);
         let mut speech = PathBuf::from(
-            "runs/information-flow-datasets/source/LibriSpeech/dev-clean/3081/166546/3081-166546-0059.flac",
+            ".local/runs/information-flow-datasets/source/LibriSpeech/dev-clean/3081/166546/3081-166546-0059.flac",
         );
         let mut transcript = PathBuf::from(
-            "runs/information-flow-datasets/source/LibriSpeech/dev-clean/3081/166546/3081-166546.trans.txt",
+            ".local/runs/information-flow-datasets/source/LibriSpeech/dev-clean/3081/166546/3081-166546.trans.txt",
         );
         let mut rir = PathBuf::from(
-            "runs/information-flow-datasets/source/RIRS_NOISES/real_rirs_isotropic_noises/air_type1_air_binaural_aula_carolina_1_7_90_3.wav",
+            ".local/runs/information-flow-datasets/source/RIRS_NOISES/real_rirs_isotropic_noises/air_type1_air_binaural_aula_carolina_1_7_90_3.wav",
         );
         let mut output =
-            PathBuf::from("runs/information-flow-distributions/receiver-emission-aula-carolina");
+            PathBuf::from(".local/runs/information-flow-distributions/receiver-emission-aula-carolina");
         let mut phase_extent = 1024_usize;
         let mut wave_grain = 1024_usize;
         let mut workers = std::thread::available_parallelism()?;

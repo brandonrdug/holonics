@@ -1,6 +1,6 @@
 //! `skein -> substitution_realizers -> placement`, driven end to end through step 1's organ.
 //!
-//! `blueprint/THE_ASSEMBLY.md` steps 1 and 2 in one run, on one carrier:
+//! `archive/plans/THE_ASSEMBLY.md` steps 1 and 2 in one run, on one carrier:
 //!
 //! ```text
 //!   GradedCausalComplex  --ComplexSystem-->  ObservedSystem   (step 1: dilated sections as

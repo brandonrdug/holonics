@@ -1,6 +1,6 @@
 //! The link, which is a relating and not a pointer.
 //!
-//! The substrate already owns this law. `soma/body/src/arrow.rs` reads a relating from a pole as
+//! The substrate already owns this law. `crates/holonic-body/src/arrow.rs` reads a relating from a pole as
 //! `Arrow { reach, aim, cross }` — *"the reach WEIGHS (the elevation), never gates"*, the aim
 //! GATES, and the hand is one of three turns rather than a bool. That law never reached the
 //! traversal carriers: `BranchLineage`'s link is `Option<Arc<BranchNode<T>>>` with `extent: usize`,

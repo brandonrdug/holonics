@@ -10,7 +10,7 @@
 you could just alter the dimensions of layers and heads… We don't respect floats, but we'll reverse
 engineer them so they go away and we can work with pure integers again."*
 **Plan:** station one of
-[`blueprint/ATHENA_THE_DIMENSION_IS_DECLARED_AND_THE_RANK_IS_THE_FILE_SIZE.md`](../../blueprint/ATHENA_THE_DIMENSION_IS_DECLARED_AND_THE_RANK_IS_THE_FILE_SIZE.md).
+[`blueprint/ATHENA_THE_DIMENSION_IS_DECLARED_AND_THE_RANK_IS_THE_FILE_SIZE.md`](../../archive/plans/ATHENA_THE_DIMENSION_IS_DECLARED_AND_THE_RANK_IS_THE_FILE_SIZE.md).
 
 ---
 

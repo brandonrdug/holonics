@@ -1,0 +1,266 @@
+# The descent side has off-seam zeros at every negative time, and the threshold is nonnegative
+
+**Status:** COMPLETED — RT0–RT6 passed on 2026-09-03 at the returned scopes below. The later
+DB campaign discharged the remaining de Bruijn port; neither campaign schedules further work.
+
+**Founded:** 2026-09-03, by Brandon's direct request: *"I would indeed like to move towards RT,
+but I need you to further scope what will be required and constructed more critically, and
+formally deposit the RT plans."*  
+**Authority:** this is a subordinate contract. [`THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) alone orders
+construction and [`../CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) alone records position;
+this file composes the phases the roadmap lists under the RH line and schedules nothing by
+itself.  
+**Truth status:** `definition` for the contract; every returned phase carries its own grade under
+[`../docs/canon/EPISTEMIC_GRADES.md`](../../docs/canon/EPISTEMIC_GRADES.md).
+**Occasion:** the closure of the Foster-tank campaign
+([`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md))
+at the deposited-inequality scope, whose FT6 return carries two ports, `DeBruijnBound :
+½ ∈ seamTimes` and `RodgersTaoNonneg : 0 ≤ Λ_DN`, and Brandon's question that followed: whether
+Rodgers--Tao's result was available as a formalization. The pre-campaign searches of 2026-09-03
+found two published proofs and no Lean development of the de Bruijn--Newman constant. RT6 below
+returned the formal nonnegativity theorem by the descent route. The receipt of the scoping is
+[`the RT0 record`](../../research/records/2026-09-03_RT0_THE_TWO_PUBLISHED_PROOFS_ARE_MAPPED_TO_OWNERS_AND_THE_DESCENT_ROUTE_IS_FOUNDED_ON_THE_FLOWED_INTEGER_EVENTS.md).
+
+---
+
+## 0. The target, stated once
+
+[definition] The target is the discharge of the port `RodgersTaoNonneg`: the theorem
+`0 ≤ Λ_DN` on `propext`, `Classical.choice`, `Quot.sound` alone, so that
+`ThresholdReturn.riemannHypothesis_iff_Λ_DN_eq` rests on de Bruijn's bound alone. In the flow's
+coordinate the statement is: **for every tree seam time `τ < 0`, that is every repository time
+`t = −τ > 0` and standard de Bruijn–Newman time `4τ < 0`, `heatE t ξ` has a zero off the seam
+`Re z = ½`.** Then `seamTimes ⊆ Set.Ici 0`, and
+`Λ_DN = sInf seamTimes ≥ 0` (Mathlib's `Real.sInf_empty` gives `sInf ∅ = 0`, so this inequality
+needs no nonemptiness; nonemptiness was de Bruijn's port and is needed for
+`Λ_DN ≤ 0 ⇒ RH`; DB4–DB5 subsequently discharged it).
+
+[definition] The prohibition of the Foster contract binds in full: no phase returns a structure
+whose field is the target or an implication to it; no numerical enclosure substitutes for a
+theorem; no coordinate transport without the factor and sign of the 2026-09-02 correction; every
+owner is Lean under the root umbrella; no estimate of duration is a phase artifact. Added here:
+**no phase may cite Rodgers--Tao's or Dobner's theorem as a port to discharge a phase of this
+contract.** The ports exist only in `ThresholdReturn` until RT6 replaces one of them.
+
+## 0b. The critical scoping: two published proofs, one the tree can carry
+
+[established-bounded; source-inspected] **Rodgers--Tao** (arXiv 1801.05914; Forum of
+Mathematics, Pi 8 (2020)). Assume `Λ < 0`; this gives RH, so every RH-conditional theorem is
+available. The chain is: Lemma 4 (saddle-point asymptotics of `H_t(x − iκ log x)` and of
+`H_t′/H_t`, by contour shifting to Gamma-type integrals and Stirling); Theorem 9 and Corollary 10
+(Riemann--von Mangoldt counts for `H_t` with error `O(log² T)`, by Jensen and the argument
+principle); Theorem 11 (the zero ODE, from Csordas--Smith--Varga 1994, with simplicity of every
+zero for `t > Λ`); Lemma 12, Lemma 14, Proposition 13 (gap dynamics, cross-energy inequality, the
+lower bound `log(1/(x_{j+1} − x_j)) ≪ log² j · log log j`); Propositions 15, 17, 22 and Lemmas
+16--21, 24, Corollary 25 (the cutoff Hamiltonian `H̃_T`, the renormalized energy `Ẽ_T`,
+`∂_t H̃_T = −4 Ẽ_T + negligible`, the integrated bound `∫ Ẽ_T dt = o(T log³ T)`); Propositions
+26--28 (energy at time zero by Bourgain's pigeonholing); and §9, where
+`Ẽ(0) = o(T log³ T)` forces `x_{j+1}(0) − x_j(0) = (4π + o(1))/log T` for almost all `j`, which
+contradicts Conrey--Ghosh--Goldston--Gonek--Heath-Brown 1985 (a positive proportion of gaps at
+most `λ` times the mean for every `λ > 0.77`), a theorem whose own proof is Montgomery's
+pair-correlation method: the explicit formula against the Montgomery--Vaughan mean-value
+theorem. **Verdict:** the fleet document's `RT6` hides a second programme (Montgomery 1973 and
+CGGGH-B 1985), neither formalized anywhere; `RT1` needs complex Stirling with a remainder, which
+Mathlib lacks; `RT3` alone is a theorem in the tree.
+
+[established-bounded; source-inspected] **Dobner** (arXiv 2005.05142, 2020; announced in
+Rodgers--Tao's Remark 3). For standard `t < 0`: the deformation is the Gaussian convolution of
+`ξ` along a vertical line (his equation (9)); each Dirichlet term of `ξ` convolves to a term with a
+computable Gaussian weight, and after the shift `J_t(s) = s + (|t|/2) log Q + (|t|/2) Σ_i ω_i
+Log(ω_i s)` (for `ζ`: `Q = π^{−1/2}`, one factor with `ω = ½`, `μ = 0`) his Theorem 4 gives,
+uniformly for `|x| ≤ C y^{1/4}` and `y` large,
+`ξ_t(J_t(s)) = γ_t(s) (F_t(s) + O(y^{−1/5} e^{(10/|t|) min(x, −2)²}))` with
+`F_t(s) = Σ_n e^{−|t| log² n / 4} n^{−s}`, everywhere absolutely convergent; the term split is
+`|t| log n ≤ y^{1/3}` (main), `≤ y^{3/5}` (exponentially small), and the rest (doubly
+exponentially small). Lemma 3: `F_t` has a zero, and by Bohr's almost periodicity zeros at
+unbounded heights in a fixed strip; Rouché transfers them to zeros of `ξ_t ∘ J_t`; and
+`Re J_t(s) → ∞` with the height, so the zeros of `ξ_t` lie to the right of the seam. Inputs: Stirling
+with a remainder (his Lemma 1), inverse-Mellin decay (Lemma 2), per-term steepest descent
+(Lemma 4), the Taylor expansion of `γ` (Lemma 5), Bohr's theorem (his Theorem 5), Rouché. **No
+zero statistics, no counts, no zero-free region, no Laguerre--Pólya structure, and no information
+about the zeros of `ζ`.**
+
+[definition] **The tree's position, and the route.** The Foster contract's FT5 already returned
+the termwise structure Dobner estimates. `FlowedExplicitFormula.hasSum_flowedTerm` states: for
+repository `t ≥ 0` and `Re z > 1`, `heatE t ξ (z) = Σ_{n ≠ 0} ∫ flowedTerm t z n`, where the flowed
+integer event is `e^{−t u²} e^{(z − ½) u} |n|^{−1/2} φ(u + log |n|)`. Repository `t > 0` is
+standard `τ < 0`: the descent side, Dobner's regime, exactly where FT5 converges (and FT5's
+divergence for repository `t < 0` is the forward side, where the contract's integer-side
+inequality could not be formed). The flowed integer events are Dobner's per-term Gaussian
+convolutions. Therefore this contract founds the RT programme on the **descent route**, and keeps
+the Rodgers--Tao route as the alternate of §2 with its obstructions named. The labels
+`RT0`--`RT6` of the fleet document are re-assigned to the descent route by this deposit; the
+fleet's meanings are preserved under `RTa1`--`RTa6` in §2.
+
+## 1. The ordered phases
+
+### RT0 — the manifest and the route
+
+Return the source-exact map from both published proofs to current owners, Mathlib owners, and
+missing owners, and the founding of the route on FT5's flowed integer events.
+
+*Returned 2026-09-03:*
+[`the RT0 record`](../../research/records/2026-09-03_RT0_THE_TWO_PUBLISHED_PROOFS_ARE_MAPPED_TO_OWNERS_AND_THE_DESCENT_ROUTE_IS_FOUNDED_ON_THE_FLOWED_INTEGER_EVENTS.md).
+**RT0 passes.**
+
+### RT1 — the descent comb everywhere
+
+For repository `t > 0` and every `z`, `Σ_{n ≠ 0} ∫ flowedTerm t z n` converges absolutely and
+equals `heatE t ξ (z)`; each event carries the Gaussian weight in `n`,
+`‖∫ flowedTerm t z n‖ ≤ C(t, z) e^{−c (log |n|)²}` with `c = min(t, 1)/8` (corrected in place from
+the `t/4`-type first written; the record states why), by the split of the `u`-line at `−log|n|/2`;
+the identity holds at every `z` by the kernel's own exchange, no continuation needed. Owner
+`RH/DescentComb.lean`.
+
+*Returned 2026-09-03:* `DescentComb.hasSum_flowedTerm_of_pos`,
+`summable_norm_integral_flowedTerm`, `integral_norm_flowedTerm_le` (`K(t,z)|n|^{−3/2}`),
+`integral_norm_flowedTerm_le_gaussian` (`K₂(t,z) e^{−(min(t,1)/8)(log|n|)²}`), and the profile
+bounds `abs_φ_le`, `abs_φ_le_of_nonneg`; receipt
+[`the RT1 record`](../../research/records/2026-09-03_RT1_THE_DESCENT_COMB_CONVERGES_ABSOLUTELY_AT_EVERY_POINT_AND_EACH_EVENT_CARRIES_A_GAUSSIAN_WEIGHT_IN_N.md).
+**RT1 passes.**
+
+**Pass RT1:** `HasSum` at every `z` for every `t > 0`, formal-checked.  
+**Falsifier:** one `t > 0`, one `z`, and a divergent comb.
+
+### RT2 — Stirling with a remainder
+
+`log Γ(s) = (s − ½) log s − s + ½ log 2π + O(1/|s|)` on `Re s ≥ 1`, with the constant exhibited,
+and the consequences for `Γ_ℝ(s) = π^{−s/2} Γ(s/2)` and for the log-derivative. Mathlib holds real
+Stirling for `n!` only; the tree's `GammaBound`, `GammaGrowth`, `GammaDecay` are magnitude bounds.
+This is the one owner both routes need. Owner `RH/GammaStirling.lean`.
+
+*Returned 2026-09-03:* on the sector `{w ≠ 0 : 0 ≤ Re w ∨ |Re w| ≤ |Im w|}`, larger than the
+`Re s ≥ 1` first written, `GammaStirling.gamma_eq_sqrt`:
+`Γ(w) = √(2π) exp((w − ½) Log w − w − μ(w))` with `norm_μ_le : ‖μ(w)‖ ≤ π/(4‖w‖)`, and the
+multiplicative form `gamma_eq_mul` with `norm_ρ_le : ‖ρ(w)‖ ≤ π/(2‖w‖)` for `‖w‖ ≥ 1`; receipt
+[`the RT2 record`](../../research/records/2026-09-03_RT2_STIRLING_HOLDS_ON_THE_SECTOR_WITH_THE_REMAINDER_EXHIBITED_AND_NO_LOGARITHM_OF_GAMMA_IS_TAKEN.md).
+**RT2 passes.**
+
+**Pass RT2:** the remainder bound formal-checked.  
+**Falsifier:** a point of the sector violating the exhibited constant.
+
+### RT3 — the event by steepest descent
+
+For repository `t > 0`, each flowed integer event after the shift `J_t` equals
+`γ_t(z) e^{−t log² n / 4} n^{−z} (1 + r_n(z))` with `|r_n(z)|` bounded as in Dobner's Lemma 4 under
+the three-range split of §0b. The shift `J_t` and `γ_t` are defined here from RT2. Owners: the
+`RH/FlowedGamma`, `FlowedGammaContour`, `GammaPhase`, `EventSaddle`, `EventMain`, `EventBounds`,
+`EventGaussian`, `EventWindow`, `EventPieces`, `EventTail`, `EventAssembly`, `EventDefect`,
+`EventHorizontal`, `EventExplicit`, `EventMainRange`, `EventMedium`, and `EventLarge` family
+(one owner per organ; the single owner `RH/DescentEvent.lean` first written is withdrawn).
+
+*Returned 2026-09-03:* `EventAssembly.event_eq_main_mul`:
+`∫ flowedTerm t (J_t s) n = γ_t'(s) e^{−sL} e^{−tL²} (1 + r)` exactly, with
+`J_t(s) = s + t(Log(s/2) − log π)`, `γ_t'(s) = g(s) e^{tΛ(s)²/4}`, `L = log|n|`;
+`EventExplicit.norm_rdef_le_explicit` bounds `‖r‖` by four exhibited pieces; on the main range
+`L ≤ y^{1/3}`, `EventMainRange.event_main` gives `‖r‖ ≤ Bmaj t X u` for `u = y^{1/3} ≥ u₀(t, X)`
+with `tendsto_Bmaj : Bmaj → 0` (rate `O(y^{−1/3})`); on the medium range `L ≤ y^{7/12}`,
+`EventMedium.event_medium` gives `‖event‖ ≤ 12 ‖γ_t'(s)‖ e^{−xL} e^{−tL²/2}`; on the large range
+`L ≥ y^{7/12}`, `EventLarge.event_large` gives `‖event‖ ≤ ‖γ_t'(s)‖ e^{−xL} e^{−(c/2)L²}`,
+`c = min(t,1)/8`; all uniform on `|x| ≤ X` for each fixed `X ≥ 0`, all on `propext`,
+`Classical.choice`, `Quot.sound`. The split `y^{1/3}`, `y^{7/12}` replaces Dobner's
+`y^{1/3}`, `y^{3/5}` (any exponent in `(1/2, 2/3)` serves; `7/12` makes every threshold an
+integer power of `w = y^{1/12}`); receipt
+[`the RT3 record`](../../research/records/2026-09-03_RT3_EVERY_FLOWED_INTEGER_EVENT_IS_ITS_STEEPEST_DESCENT_MAIN_TERM_ON_THREE_RANGES_WITH_THE_DEFECT_EXHIBITED.md).
+**RT3 passes.**
+
+**Pass RT3:** the per-event identity with its remainder bound, formal-checked.  
+**Falsifier:** an `n`, `z` in the window outside the bound.
+
+### RT4 — the approximation theorem
+
+`heatE t ξ (J_t s) = γ_t(s) (F_t(s) + R_t(s))` with `‖R_t(s)‖ ≤ C y^{−1/5} e^{(10/t) min(x, −2)²}`
+uniformly for `|x| ≤ C y^{1/4}`, `y ≥ y₀(t)`, by RT1's absolute convergence and RT3's per-event
+bound summed over the three ranges. Owner `RH/DescentApproximation.lean`.
+
+*Returned 2026-09-03:* `DescentApproximation.descent_approximation`: eventually in
+`w = y^{1/12}`, for every `s = x + iy` with `|x| ≤ X`, `γ_t'(s) ≠ 0`,
+`heatE t ξ (J_t s) = γ_t'(s) (F_t(s) + R_t(s))` with `F_t(s) = Σ_{n ≠ 0} e^{−t log²|n|} |n|^{−s}`
+absolutely convergent, and `‖R_t(s)‖ ≤ ρ(w)` with `tendsto_ρ : ρ → 0` at the rate of RT3's
+`Bmaj`, i.e. `O(y^{−1/3})`; the strip is `|x| ≤ X` fixed rather than `|x| ≤ C y^{1/4}` and the
+rate replaces `C y^{−1/5} e^{(10/t) min(x,−2)²}`, which is what RT5 and RT6 use; on `propext`,
+`Classical.choice`, `Quot.sound`; receipt
+[`the RT4 record`](../../research/records/2026-09-03_RT4_THE_FLOWED_XI_AFTER_THE_SHIFT_IS_GAMMA_TIMES_THE_MAIN_SERIES_PLUS_A_REMAINDER_THAT_VANISHES_UNIFORMLY_ON_EVERY_STRIP.md).
+**RT4 passes.**
+
+**Pass RT4:** the uniform bound formal-checked.  
+**Falsifier:** a point in the window where the remainder exceeds the bound.
+
+### RT5 — the Dirichlet series has zeros at every height
+
+`F_t` is an absolutely convergent Dirichlet series, not a monomial; it has a zero (Dobner's
+Lemma 3), and the almost-period construction returns zeros at unbounded heights in a fixed
+strip. The original request for a uniformly bounded distance from every height was narrowed
+by the RT5 return below. The construction uses simultaneous Diophantine approximation of finitely many
+`log p` multiples by pigeonhole, then the tail; Mathlib holds only the one-dimensional Dirichlet
+theorem (`Real.exists_int_int_abs_mul_sub_le`). Owner `RH/BohrZeros.lean`.
+
+*Returned 2026-09-03:* `BohrZeros.exists_zero_Ft` (a zero of `F_t` for every `t > 0`, by the
+harmonic logarithm, Mathlib's Borel–Carathéodory, and Cauchy's estimate, with no Hadamard
+factorization), `exists_simultaneous_approx` (simultaneous Dirichlet approximation by
+pigeonhole), `exists_almost_period` (an almost period `τ ≥ T₀` of every size on every strip),
+`exists_zero_of_norm_center_lt` (the minimum-modulus principle), and
+`exists_zero_Ft_above` (for every `T₀` a zero of `F_t` above `T₀` in a fixed strip). The
+relatively dense form of the almost periods was not needed and is not claimed; receipt
+[`the RT5 record`](../../research/records/2026-09-03_RT5_THE_MAIN_SERIES_HAS_A_ZERO_BY_THE_HARMONIC_LOGARITHM_AND_ZEROS_AT_EVERY_HEIGHT_BY_BOHR_ALMOST_PERIODS.md).
+**RT5 passes** at the corrected scope.
+
+**Pass RT5:** for every `t > 0` a fixed strip and, for every height `T₀`, a zero of `F_t` in
+that strip with imaginary part at least `T₀`, formal-checked.
+**Falsifier:** a `t > 0` and a height above which the returned strip has no zero of `F_t`.
+
+### RT6 — the transfer and the seal
+
+Rouché's transfer on discs (from the tree's `RectangleArgumentPrinciple` and `HurwitzLine`, or
+`Complex.norm_le_of_forall_mem_frontier_norm_le` with the argument principle) carries each zero of
+`F_t` at large height to a zero of `heatE t ξ ∘ J_t`; `Re J_t(s) − ½ → ∞` with the height, so the
+zero of `heatE t ξ` is off the seam. Hence for every repository `t > 0` a zero off the seam;
+`seamTimes ⊆ Set.Ici 0`; `Λ_DN_nonneg : 0 ≤ Λ_DN`; and `ThresholdReturn` re-stated with the single
+port `DeBruijnBound`. Owners `RH/DescentZeros.lean`, `RH/ThresholdReturn.lean` amended.
+
+*Returned 2026-09-03:* the transfer is by the minimum-modulus principle on a disc rather than
+Rouché on rectangles (the rectangle owners need entire functions, and `heatE t ξ ∘ J_t / γ_t'`
+carries the logarithm's slit): `DescentZeros.exists_offSeam_zero` (for every `t > 0` a zero of
+`heatE t ξ` with `Re ≥ 1`), `seamTimes_subset_Ici`, **`Λ_DN_nonneg : 0 ≤ Λ_DN`**, and
+`ThresholdReturn.riemannHypothesis_iff_Λ_DN_eq_of_deBruijn` with the single port
+`DeBruijnBound`; every theorem on `propext`, `Classical.choice`, `Quot.sound`; root umbrella
+9,834 jobs; receipt
+[`the RT6 record`](../../research/records/2026-09-03_RT6_EVERY_NEGATIVE_TIME_HAS_AN_OFF_SEAM_ZERO_AND_THE_THRESHOLD_IS_NONNEGATIVE_ON_THE_THREE_AXIOMS.md).
+**RT6 passes. The campaign is complete.**
+
+**Pass RT6:** `0 ≤ Λ_DN` on the three axioms, `#print axioms` deposited, root umbrella green under
+180 s per owner.  
+**Falsifier:** a repository `t > 0` at which every zero of `heatE t ξ` is on the seam; it cannot
+fire against the published theorem, so a firing is a construction error of RT1--RT5.
+
+## 2. The alternate: the Rodgers--Tao route, kept with its obstructions
+
+[definition] The fleet document's labels are preserved here and not scheduled:
+
+1. `RTa1` (`H_t` asymptotics, Lemma 4): needs RT2 and the saddle-point shift; nothing in the tree.
+2. `RTa2` (Riemann--von Mangoldt for `H_t`, Theorem 9): the tree has Jensen (`RH/Jensen.lean`,
+   Mathlib's `JensenFormula`), the rectangle argument principle, and the count `K₁ + K₂ R^{3/2}`
+   of the Foster class; the `O(log² T)` count needs `RTa1`.
+3. `RTa3` (the zero ODE, Theorem 11): **a theorem**, `FosterClassHeatFlow.rodgersTaoZeroDynamics_heatE`
+   and `SimpleZeroCurve.exists_zero_curve_riemannXi`; the global ordering `x_j(t)` and simplicity
+   for all `t > Λ` (Csordas--Smith--Varga, Corollary 1) are not returned.
+4. `RTa4` (gap lower bound, Proposition 13, Lemmas 12, 14): untouched.
+5. `RTa5` (cutoff Hamiltonian, Propositions 15, 17, 22, Corollary 25): untouched.
+6. `RTa6` (energy at time zero, Propositions 26--28, and §9): untouched; its external input is
+   CGGGH-B 1985 on Montgomery's pair-correlation method, a second contract of its own.
+
+## 3. The later de Bruijn return and the remaining conjecture
+
+[proved-derived; formal-checked] The later DB campaign returned `1/8 ∈ seamTimes` and
+`DeBruijnSeal.deBruijnBound`, discharging the original weak port `½ ∈ seamTimes`. The bridge
+`CriticalChart.Λstd_eq` gives the standard bound `Λstd ≤ ½` from the tree's `Λ_DN ≤ 1/8`.
+The completed contract is
+[`THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md`](THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md).
+
+[open] The conjecture `Λ_DN ≤ 0`, with its null falsifier, unchanged.
+
+## 4. Relation to the engine frontier
+
+[definition] Brandon directed this scoping on 2026-09-03 while `SKE4` is the engine frontier. The
+roadmap carries this campaign as the RH line's ordered position beside the engine's. The two lines
+share no owner and no process; each advances on its own gate.

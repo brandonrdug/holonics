@@ -2,7 +2,7 @@
 //!
 //! # The hypothesis, and its owner
 //!
-//! Brandon's, folded into `blueprint/THE_EROS_INFORMATION_ENGINE.md` at his direction 2026-08-16:
+//! Brandon's, folded into `archive/plans/THE_EROS_INFORMATION_ENGINE.md` at his direction 2026-08-16:
 //! *a real relationship between power input and purposed information compression*. Its formal owner
 //! is the frozen laboratory —
 //! `git -C /home/b/Workspaces/laboratory show a07ff376:src/eros/um/THEORY_AND_EQUATIONS.md` §18 —
@@ -16,7 +16,7 @@
 //! **Landauer efficiency**: the fraction of the thermodynamic budget converted into kept structure.
 //!
 //! Measured 2026-08-16 by `grep -rn "watt\|joule\|nvml\|power_draw" --include='*.rs' crates soma`:
-//! **nothing in this tree computed it.** Landauer is carried in `canon/TABLET_THE_CAUSAL_PROFILE.md`
+//! **nothing in this tree computed it.** Landauer is carried in `docs/canon/TABLET_THE_CAUSAL_PROFILE.md`
 //! and nine research records, and computed nowhere. This module is that computation.
 //!
 //! # Three conditions, and none of them is a formality

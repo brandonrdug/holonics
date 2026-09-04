@@ -8,14 +8,14 @@ synthesis corrections; `interpretation` for the lens, marked in place with its f
 **Evidence:** `formal-checked`, `computational-witness`, `source-inspected`.  
 **Occasion:** Brandon's three messages of 2026-09-03, quoted in §0.  
 **Scope:** this record schedules nothing.
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction authorities;
 `SKE4` remains the frontier, and the roadmap's clause that the de Bruijn--Newman/RH line is
 independent of the engine campaign is unchanged.  
 **Apparatus:** Lean `v4.33.0` through `lake` (the root umbrella `ElementaryHolonics` built 9,786 jobs
 after the two owner changes); sympy 1.14 in `/home/b/scratch/huggingface/.venv` as an observer
 outside the engine.  
-**Receipts:** [`2026-09-03_flow_witnesses/`](2026-09-03_flow_witnesses/): the observer script and
+**Receipts:** [`2026-09-03_flow_witnesses/`](2026-09-03_flow_witnesses): the observer script and
 its receipt.
 
 ---
@@ -148,7 +148,7 @@ the two incoming vertical worldlines leave as two horizontal ones. That is the n
 hourglass and the orthogonal worldlines braiding. Forward preservation says the flow never
 amplifies winding off the seam, which is the two-dimensional case of the vortex-stretching
 obstruction in
-[`canon/TABLET_THE_FLOW.md`](../../canon/TABLET_THE_FLOW.md) §7.4. Pair births live only in the
+[`canon/TABLET_THE_FLOW.md`](../../docs/canon/TABLET_THE_FLOW.md) §7.4. Pair births live only in the
 flow's past. RH is the statement that at time zero none remain.
 
 ### 2.5 Time zero is the seam of the seams
@@ -430,8 +430,8 @@ on 2026-09-03. It is testimony; this section integrates it.
 `DiagramNodeKind::ApparentCrossing { under, over }` in relational geometry; the three advection
 gates and the Cayley successor in `crates/holonic-engine/src/analytic_field.rs`. The synthesis
 lifted these from
-[`canon/TABLET_THE_TURN.md`](../../canon/TABLET_THE_TURN.md) §13 and
-[`canon/TABLET_THE_FLOW.md`](../../canon/TABLET_THE_FLOW.md) §7, correctly.
+[`canon/TABLET_THE_TURN.md`](../../docs/canon/TABLET_THE_TURN.md) §13 and
+[`canon/TABLET_THE_FLOW.md`](../../docs/canon/TABLET_THE_FLOW.md) §7, correctly.
 
 [counterexample; source-inspected] Corrected:
 
@@ -440,10 +440,10 @@ lifted these from
    never a sealed box; a zero is a potential singularity and phase vortex, and the line is not a
    source singularity.
 2. **Primes as prime knots, the Euler product as a product over knots.** Over the bar.
-   [`riemann-receiver-geometry`](../../papers/source/papers/riemann-receiver-geometry/main.typ)
+   [`riemann-receiver-geometry`](../papers/source/papers/riemann-receiver-geometry/main.typ)
    admits Morishita's dictionary (linking numbers to power-residue symbols, the Borromean triple)
    and charges any use of it with a trace reduction back to the explicit formula;
-   [`knot-causal-topology`](../../papers/source/papers/knot-causal-topology/main.typ) refuses the
+   [`knot-causal-topology`](../papers/source/papers/knot-causal-topology/main.typ) refuses the
    identifications of connected sum with multiplication, a knot polynomial with zeta, and
    crossings with zeros.
 3. **Strings, branes, BPS spectra.** No standing. `canon/TABLET_THE_TURN.md` §13.3 measured

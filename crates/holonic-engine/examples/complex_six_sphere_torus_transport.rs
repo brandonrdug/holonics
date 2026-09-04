@@ -32,7 +32,7 @@ use num_bigint::BigInt;
 use num_traits::{One, Signed, ToPrimitive, Zero};
 use relational_geometry::{ProjectionLaw, Rat, RatVec3, ReceiverId, project_receiver_point};
 
-const DEFAULT_OUT: &str = "output/complex-s6-torus-transport";
+const DEFAULT_OUT: &str = ".local/artifacts/complex-s6-torus-transport";
 const EXTENT: i64 = 4;
 const WIDTH: u32 = 1600;
 const HEIGHT: u32 = 1100;

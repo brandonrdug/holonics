@@ -38,7 +38,7 @@ use std::thread;
 use std::time::Instant;
 
 const ARTIFACT_DIRECTORY: &str =
-    "output/the_card_returns_the_eta_boundary_and_the_zero_is_a_winding";
+    ".local/artifacts/the_card_returns_the_eta_boundary_and_the_zero_is_a_winding";
 
 fn default_artifact(lower: i64, upper: i64) -> PathBuf {
     PathBuf::from(format!(

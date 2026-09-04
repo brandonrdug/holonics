@@ -90,7 +90,7 @@
 //!
 //! ## The seam a foreign conditioner enters by
 //!
-//! `soma/life/src/decomposing_codec.rs` founds one parented `CodecVersion` per collapsed pair,
+//! `crates/holonic-life/src/decomposing_codec.rs` founds one parented `CodecVersion` per collapsed pair,
 //! cutting at that pair's own shortest distinguishing word. That organ is the conditioning mechanism
 //! this module was specified against, and it **cannot be called from here**: `life` depends on
 //! `holonic-engine`, so the edge runs the other way and naming it would be a dependency cycle.
@@ -107,7 +107,7 @@
 //! *resumption*: [`FoundedMorphology::without_stem`] keeps the surviving stems' original identities,
 //! so an ablated morphology's identities carry the gap where the removed stem stood, and replaying
 //! it in arrival order would renumber that gap away. The gap is the record of the ablation, and
-//! `soma/life/src/conditioned_rest.rs` is the owner that has to put an ablated body back together
+//! `crates/holonic-life/src/conditioned_rest.rs` is the owner that has to put an ablated body back together
 //! after it has been to disk.
 
 use std::collections::{BTreeMap, BTreeSet};
@@ -622,7 +622,7 @@ impl FoundedMorphology {
         // **The full family is retained. Maximality is a READING, not the constructor's decision.**
         //
         // This filter used to run here and `all` was discarded — every occurrence strictly inside
-        // another was deleted before any consumer saw it. `canon/THE_MATHEMATICS_TABLET.md` §1 names
+        // another was deleted before any consumer saw it. `docs/canon/THE_MATHEMATICS_TABLET.md` §1 names
         // that exactly: *"a carrier that reduces on construction has decided, for every consumer it
         // will ever have, which distinctions are invisible… the reduction belongs in the reading and
         // never in the constructor."*

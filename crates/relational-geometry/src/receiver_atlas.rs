@@ -655,7 +655,7 @@ pub enum CrossRatioRefusal {
 /// - **Grow a second projective action here** (refused): two `PGL(2,ℚ)`
 ///   carriers in one workspace, and a second implementation agreeing with the
 ///   first is one computation compared with itself twice — `CLAUDE.md` §8.
-///   `soma/body/src/soul.rs:159` is already a third cross-ratio, and its own
+///   `crates/holonic-body/src/soul.rs:159` is already a third cross-ratio, and its own
 ///   invariance test covers only the affine subgroup.
 ///
 /// The invariance itself is asserted in `holonic-engine`, where the group

@@ -2,7 +2,7 @@ use std::fs;
 use std::io::Write;
 use std::process::{Command, Stdio};
 
-use athena_alpha::AthenaAlphaApplication;
+use holonics_hna::AthenaAlphaApplication;
 use holonic_engine::native_spool::fixture;
 use holonics_workbench::{
     AthenaCommand, DiagnosticCommand, EngineCommand, ErosCommand, EventLevel, ExportCodecArgument,
@@ -16,7 +16,7 @@ use tempfile::tempdir;
 /// workbench opens it exactly the way an operator opens any other snapshot.
 fn declared_snapshot(path: &std::path::Path) {
     let mut configuration: NativeCirculationConfiguration =
-        serde_json::from_str(athena_alpha::BASE_CONFIGURATION).expect("configuration");
+        serde_json::from_str(holonics_hna::BASE_CONFIGURATION).expect("configuration");
     configuration.address.receiver = fixture::FIXTURE_RECEIVER;
     let admission =
         AthenaAlphaApplication::from_dismantling_return(fixture::detached_returned(), configuration)

@@ -15,7 +15,7 @@
 //! > weight and hand under an internal gauge connection**, and mass the invariant of its complete
 //! > spacetime-translation current."*
 //!
-//! and the live registry states the bar, `papers/source/holonics/mathematical-physics.typ` `H.0461`,
+//! and the live registry states the bar, `research/papers/source/holonics/mathematical-physics.typ` `H.0461`,
 //! `grade: "definition"`:
 //!
 //! > *"Charge, spin, and mass are not derived merely from triangle orientation, polarity, or
@@ -55,7 +55,7 @@
 //! ## What this organ does NOT author
 //!
 //! - **The group is declared by the caller** and closed by exhaustion of the declared generators
-//!   inside a finite carrier. There is no authored order, no cap, and no catalogue: `canon/THE_AUTHORED_LEVEL.md`.
+//!   inside a finite carrier. There is no authored order, no cap, and no catalogue: `docs/canon/THE_AUTHORED_LEVEL.md`.
 //! - **The complex is not this organ's.** It evaluates holonomy on **cycles the caller declares**.
 //!   `simplicial` and `running_integral` each root a spanning tree over their own material; a third
 //!   would be the restatement this project convicts, and the incidence belongs to whoever owns it.
@@ -268,7 +268,7 @@ impl std::error::Error for StructureGroupRefusal {}
 /// **Nothing here is authored.** The elements are whatever the declared generators generate; the
 /// order is whatever that closure reaches; the carrier and its extent are read off the generators.
 /// The one number the caller supplies is a **bound on the closure**, and it is the caller's
-/// declaration rather than this organ's — `canon/THE_AUTHORED_LEVEL.md`: a level is read off the
+/// declaration rather than this organ's — `docs/canon/THE_AUTHORED_LEVEL.md`: a level is read off the
 /// material or declared by the caller, never authored inside the organ. Exceeding it is a typed
 /// refusal naming what was reached, not a truncation.
 #[derive(Clone, PartialEq, Eq, Debug)]

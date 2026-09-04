@@ -4,7 +4,7 @@
 **Kind:** framing deposit — Brandon's question: how pyramidal numbers relate to the
 area distributions/partitions about primes and the Riemann zeta function, to volumes,
 integration by reflection, and sphere/fractal-packing.  **It schedules nothing.**
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction
 authorities.
 **Truth grades:** `proved-standard` for every classical statement, cited;

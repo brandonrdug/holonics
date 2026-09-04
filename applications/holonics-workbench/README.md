@@ -1,8 +1,22 @@
 # Holonics command application
 
-`holonics` operates persistent, explicit-root morphology-variant workspaces. The model lifecycle is
-the primary CLI. Low-level transport probes remain under `diagnostic`; the premature Ratatui surface
-has been removed.
+`holonics hna` runs the current full native recurrent model interface. `holonics workspace`
+retains the earlier persistent snapshot family; low-level probes remain under `diagnostic`.
+The [Athena guide](../../docs/ATHENA.md) owns the training/inference contract, and
+[WORKBENCH.md](WORKBENCH.md) describes command-family composition.
+
+## Native training and inference
+
+```sh
+holonics hna infer /path/to/supported/model 'Explain holonics briefly.'
+holonics --format json hna train /path/to/supported/model sequence.json
+holonics --format json hna run request.json
+holonics hna inspect /path/to/native.rest
+```
+
+The native commands support the configured Gemma realization and restricted SKE material.
+Training uses one session over continuing tokenized prefixes and returns a run receipt, not a
+saved full-operator checkpoint. Inference returns one selected face, not a complete chat response.
 
 ## Install
 
@@ -128,7 +142,7 @@ They inspect or exercise low-level owners. They do not create a persistent model
 [2026-09-03: the per-event construction departed without alias under SKE4 and the workbench demo
 went with it; `diagnostic demo` and `athena demo-open` are absent.]
 
-## Honest open capabilities
+## Snapshot-workspace boundary
 
 Every workspace names these as open:
 
@@ -136,6 +150,7 @@ Every workspace names these as open:
 - `qualitative-emission-codec-open`; and
 - `persistent-configurable-diffusion-open`.
 
-The current application produces a real source-neutral, persistently cultivated and evaluable
-morphology variant from an admitted native snapshot. It does not yet accept a text prompt
-or emit a useful natural-language answer.
+These workspace limitations do not describe the new `hna` command family. This snapshot
+application persists its own morphology variant; it does not persist the full HNA operator's
+device overlays. Its ONNX/Safetensors exports are package containers, not standard executable
+model recompilation. See [interoperability](../../docs/INTEROPERABILITY.md).

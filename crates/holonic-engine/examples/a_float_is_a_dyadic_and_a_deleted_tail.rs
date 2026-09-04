@@ -13,7 +13,7 @@
 //!
 //! ## What a float is, and why the distinction in the type is the whole content
 //!
-//! `canon/THE_MATHEMATICS_TABLET.md` §1, Brandon's sentence: *"Floats are not real numbers, they
+//! `docs/canon/THE_MATHEMATICS_TABLET.md` §1, Brandon's sentence: *"Floats are not real numbers, they
 //! are series expansions of ratios."* The part usually missed is that **the truncated expansion is
 //! itself exact**: an IEEE-754 value is precisely `±m·2^e` with `m` an integer, and that dyadic is
 //! not an approximation of anything. What was destroyed is the **tail**, and the tail's width is
@@ -89,7 +89,7 @@ use relational_geometry::exact_analysis::log_rational_interval;
 /// Trained network weights are the strongest available source of *measured* floating point in
 /// reach of this machine: every word is the residue of an optimisation over real data, nobody
 /// chose it, and the file is the same bytes for everyone who downloads it. The reader below is the
-/// shape of `soma/life/examples/eros_self_emanated_law.rs:1560` — an eight-byte little-endian
+/// shape of `crates/holonic-life/examples/eros_self_emanated_law.rs:1560` — an eight-byte little-endian
 /// header extent, a JSON manifest, a dtype refused by name if it is not the declared one, and a
 /// seek to a flat coordinate.
 struct DeclaredArtifact {
@@ -863,7 +863,7 @@ fn open_real_material() -> Vec<RealMaterial> {
 fn control_the_organ_on_real_material(material: &[RealMaterial]) -> bool {
     println!("-- control 3: the organ on real material --\n");
     println!("   Trained network weights, read straight out of safetensors payloads by the reader");
-    println!("   shape of soma/life/examples/eros_self_emanated_law.rs. Nobody chose these words;");
+    println!("   shape of crates/holonic-life/examples/eros_self_emanated_law.rs. Nobody chose these words;");
     println!("   they are the residue of an optimisation over real data.\n");
     println!(
         "   A stored weight is read as an EXACT BIT PATTERN, because it is one: the number in"

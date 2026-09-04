@@ -1,7 +1,7 @@
 //! The channel population is the receiver's, and the comparison extent is the caller's.
 //!
 //! Three authored levels were excised on 2026-08-09 and this driver is their orbit
-//! (`canon/THE_CONTAMINANT_PROTOCOL.md` §4, `canon/THE_AUTHORED_LEVEL.md` §5.1):
+//! (`docs/canon/THE_CONTAMINANT_PROTOCOL.md` §4, `docs/canon/THE_AUTHORED_LEVEL.md` §5.1):
 //!
 //! ```text
 //!   receiver_phase_atlas.rs:24   CHANNEL_COUNT = 3              -> the occurrence declares it
@@ -14,7 +14,7 @@
 //! three different extents (14, 18, 24).
 //!
 //! **The declared material is this driver's own**, and it says so. The RELAMPAGO run this organ was
-//! built for needs `data/relampago-lightning/{raw/glm,raw/abi,raw/igra}`, which do not exist in this
+//! built for needs `.local/data/relampago-lightning/{raw/glm,raw/abi,raw/igra}`, which do not exist in this
 //! tree; the tiger raster the atlas drivers default to
 //! (`/tmp/codex-clipboard-T9jMYB.png`) does not either. Nothing below stands in for either of them.
 //!

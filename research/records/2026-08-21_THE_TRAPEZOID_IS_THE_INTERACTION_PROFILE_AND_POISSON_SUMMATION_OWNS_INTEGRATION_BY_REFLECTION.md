@@ -7,7 +7,7 @@ that the actual object is *"integration through Holonic Interactions in a diffus
 way"* tied to sphere-packing or **fractal-packing**; the cyclic-product paper he supplied;
 the directive to relate all of it to the winding and torsion dynamics, to lineage paths as
 causal objects, and to the ground-up mathematics of biological structure.  **It schedules
-nothing.**  [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+nothing.**  [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction
 authorities.
 **Truth grades:** `proved-standard` for every classical statement, cited; `proved-derived`

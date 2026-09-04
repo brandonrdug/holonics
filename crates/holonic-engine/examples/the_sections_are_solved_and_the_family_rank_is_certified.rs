@@ -31,7 +31,7 @@ use std::time::Instant;
 /// Fibres fixed here, before any family is seen.
 const PROBE_FIBRES: [i64; 4] = [101, 1009, 2411, 3001];
 
-const OUTPUT: &str = "output/the_sections_are_solved_and_the_family_rank_is_certified";
+const OUTPUT: &str = ".local/artifacts/the_sections_are_solved_and_the_family_rank_is_certified";
 
 fn rational(values: [i64; 6]) -> [BigRational; 6] {
     values.map(|v| BigRational::from_integer(BigInt::from(v)))

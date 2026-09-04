@@ -72,7 +72,7 @@ pub enum CoupledPhaseCoordinateKind {
 /// Until 2026-08-09 this organ carried `COUPLED_PHASE_EXTENT: usize = 18` and
 /// `COUPLED_SPECTRAL_BANDS: [SpectralBandId; 5]` — the RELAMPAGO fixture's coordinate count and
 /// GOES-16 ABI band list, welded into the library that reads experiments.
-/// `canon/THE_AUTHORED_LEVEL.md` §5.1 names it: *"one experiment's material fixed into the organ
+/// `docs/canon/THE_AUTHORED_LEVEL.md` §5.1 names it: *"one experiment's material fixed into the organ
 /// that reads it."* Nothing here is authored now. The extent is a **reading**:
 ///
 /// ```text
@@ -94,7 +94,7 @@ pub struct CoupledPhaseChart {
 /// support endpoints, one vertical extent, one scan identity. Written as a slice so that no number
 /// is written at all — the extent below reads this list rather than being fitted to it, which is
 /// the same repair `CoupledInformantCurrentChannel::ALL` makes one layer out
-/// (`canon/THE_AUTHORED_LEVEL.md` §5.4: a fixed-size array is a level the census cannot see).
+/// (`docs/canon/THE_AUTHORED_LEVEL.md` §5.4: a fixed-size array is a level the census cannot see).
 const COUPLED_SCALAR_COORDINATES: &[CoupledPhaseCoordinateKind] = &[
     CoupledPhaseCoordinateKind::ScanDepartureDifference,
     CoupledPhaseCoordinateKind::VerticalLowerDifference,

@@ -1,6 +1,6 @@
 //! # SUPERSEDED 2026-08-17 — THIS IS AN AUTHORED GRAMMAR AND ITS REMOVAL IS LICENSED
 //!
-//! **Superseding plan:** `blueprint/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md`.
+//! **Superseding plan:** `archive/plans/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md`.
 //! **Ruling:** Brandon, 2026-08-17 — *"Authoritatively supersede whatever the 'parser' thing you just
 //! identified is, it has been a contaminant that you passed off as something foundational during
 //! experiments."*

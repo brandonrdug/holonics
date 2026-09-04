@@ -18,7 +18,7 @@
 //! > invariant tokens… The density and invariants it founds are not ours to necessarily author,
 //! > they are happenstance of our own writing."*
 //!
-//! **`tensor` is not iron precisely because it is used variously**, and by `canon/MEANING_DEFINED.md`
+//! **`tensor` is not iron precisely because it is used variously**, and by `docs/canon/MEANING_DEFINED.md`
 //! that is what makes it meaningful rather than what disqualifies it:
 //!
 //! > *"the meaning of the token depends on the context it is used in, and **what we mean by
@@ -133,13 +133,13 @@ const FOUNDING_HORIZON: usize = 1;
 /// below the floor is printed complete, and the residual is named.
 const DEFAULT_EXHIBIT_FLOOR: u64 = 6;
 
-/// The prediction, declared before the sweep runs. `canon/MEANING_DEFINED.md` and Brandon's own
+/// The prediction, declared before the sweep runs. `docs/canon/MEANING_DEFINED.md` and Brandon's own
 /// statement name `tensor` and `vector`; the other three are the same shape in the same material.
 const PREDICTED: [&str; 10] = [
     "tensor", "vector", "lemma", "group", "field", "Tensor", "Vector", "Lemma", "Group", "Field",
 ];
 
-/// The project's own dialect, from `canon/THE_DIALECT.md`, as a second frame on the same question.
+/// The project's own dialect, from `docs/canon/THE_DIALECT.md`, as a second frame on the same question.
 const DIALECT: [&str; 6] = [
     "holon", "receiver", "current", "passage", "residual", "exact",
 ];

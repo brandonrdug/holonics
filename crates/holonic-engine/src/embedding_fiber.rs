@@ -23,7 +23,7 @@
 //!
 //! An `argmax` welded into this path would **be** that receiver, in the one place no later caller
 //! could decline it — and the deposit's reason is exactly that *"a later recurrence can use the
-//! fiber without having inherited an accidental selection policy."* `soma/life`'s
+//! fiber without having inherited an accidental selection policy."* `crates/holonic-life`'s
 //! `reconstruction_fiber` already builds the object and says the same in its own opening: *"Nothing
 //! chooses a surface."* This module supplies that organ's exact scores at map scale and stops there.
 //!
@@ -33,7 +33,7 @@
 //! *"**`cpu`** is CUDA's word"*. Both were wrong: the ruling is `host`, and `host` is CUDA's word —
 //! `cpu` is not. A mechanical `host → cpu` sweep passed **through the quotation marks**, leaving
 //! Brandon quoted as telling himself not to call the CPU "the cpu". `CLAUDE.md` and
-//! `canon/THE_SURFACES_ARE_PATHS.md` both carry the correct form.
+//! `docs/canon/THE_SURFACES_ARE_PATHS.md` both carry the correct form.
 //!
 //! **A corrupted quotation is the contamination `CLAUDE.md` §9 calls hardest to detect**, because no
 //! later reader re-checks a provenance line — that is what the line is for. A sweep that rewrites

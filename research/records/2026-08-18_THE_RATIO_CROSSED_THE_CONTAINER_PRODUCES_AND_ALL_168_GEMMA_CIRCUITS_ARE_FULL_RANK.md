@@ -4,7 +4,7 @@
 **Truth status:** `established-bounded` throughout; every figure from running the named drivers today.
 **Evidence:** `measured`. `soma/life/examples/athena_002_the_container_generates_from_itself.rs`,
 `crates/holonic-engine/examples/the_dimension_is_measured_before_it_is_spent.rs`.
-**Plan:** [`blueprint/ATHENA_THE_DIMENSION_IS_DECLARED_AND_THE_RANK_IS_THE_FILE_SIZE.md`](../../blueprint/ATHENA_THE_DIMENSION_IS_DECLARED_AND_THE_RANK_IS_THE_FILE_SIZE.md),
+**Plan:** [`blueprint/ATHENA_THE_DIMENSION_IS_DECLARED_AND_THE_RANK_IS_THE_FILE_SIZE.md`](../../archive/plans/ATHENA_THE_DIMENSION_IS_DECLARED_AND_THE_RANK_IS_THE_FILE_SIZE.md),
 stations three, four and five.
 
 ---

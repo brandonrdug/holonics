@@ -116,7 +116,7 @@
 //! ## The apertures are the caller's, and there is no default
 //!
 //! Until 2026-08-09 the two numbers were `const FAMILY_APERTURE: u64 = 65_536` and
-//! `const FREE_ENTRY_APERTURE: u64 = 12`, authored here. `canon/THE_AUTHORED_LEVEL.md` convicted
+//! `const FREE_ENTRY_APERTURE: u64 = 12`, authored here. `docs/canon/THE_AUTHORED_LEVEL.md` convicted
 //! both: neither is derivable from the material — they are statements about the **cpu** the
 //! recovery runs on — so neither was this organ's to pick. They now arrive in
 //! [`RecoveryApertures`], which deliberately implements no `Default`: *a default is a level the

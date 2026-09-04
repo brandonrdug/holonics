@@ -921,7 +921,7 @@ fn control_six_the_triple_overlaps(readings: &[Reading], controls: &mut Controls
     rule_line("CONTROL 6 -- THE TRIPLE-OVERLAP CHECK, REPORTED EITHER WAY");
 
     println!(
-        "\n  `papers/source/holonics/logic-category.typ` H.0035: \"Pairwise compatibility alone may\n  \
+        "\n  `research/papers/source/holonics/logic-category.typ` H.0035: \"Pairwise compatibility alone may\n  \
          be insufficient when higher overlaps matter.\" Three questions are asked of every triple\n  \
          reaching one statement."
     );

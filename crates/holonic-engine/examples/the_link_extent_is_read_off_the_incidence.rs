@@ -4,13 +4,13 @@
 //! ```text
 //! cargo run --release --example the_link_extent_is_read_off_the_incidence -- \
 //!     standing/output \
-//!     reference/pureholonics-seed/src/pureholonics \
-//!     reference/holobrochos-a07ff376/src/soma
+//!     archive/reference/pureholonics-seed/src/pureholonics \
+//!     archive/reference/holobrochos-a07ff376/src/soma
 //! ```
 //!
 //! `crates/holonic-engine/src/derivation_curvature.rs` carried, until 2026-08-09, an authored level:
 //! `SCAFFOLD_LINK_FOLD: usize = 3`, read at exactly two sites —
-//! `FrameAgreement::fold_holds`, and one test. `canon/THE_AUTHORED_LEVEL.md` §5.1 names its
+//! `FrameAgreement::fold_holds`, and one test. `docs/canon/THE_AUTHORED_LEVEL.md` §5.1 names its
 //! replacement in four words: *the fold from the incidence*.
 //!
 //! **The three was a theorem, and the theorem is stated and kept.** For a site `v` of the layout,

@@ -132,7 +132,7 @@ def view_transport():
     obstr = panel("obstructions", box("obstructed", "t=5: drive ω changed mid-tube — recorded as an intervention, not folded into the law") + box("refused", "energy in joules: unknown — physical calibration enters only through a declared sector port"), "flex: 0 0 auto")
     body = tb + row([lattice, col([scope, receipts], "flex: 1 1 auto"), col([state, obstr], "flex: 0 0 360px")], "flex: 1 1 auto; min-height: 0")
     return artboard("Transport — action over the lattice, exactly", "the electricity analogy made literal: exact complex current through oriented incidence, ticked by a discrete induction law, read by placed receivers", 1560, 1000, body,
-                    "sources: canon/TABLET_THE_REASONING_CYCLE.md §8d · Millennium/HolonicComplexParametron.lean · HolonicDiscreteInduction.lean · HolonicMembraneActionTransport.lean · KiCad simulator / GElectrical results overlay (form only)")
+                    "sources: docs/canon/TABLET_THE_REASONING_CYCLE.md §8d · Millennium/HolonicComplexParametron.lean · HolonicDiscreteInduction.lean · HolonicMembraneActionTransport.lean · KiCad simulator / GElectrical results overlay (form only)")
 
 # ---------- V7 notation ----------
 @board("ViewNotation.dc.html", "View 7 — Notation: typed Dirac primitives", 1400, 900, "page-views")
@@ -164,7 +164,7 @@ def view_notation():
         box("obstructed", "refused: <span class='math'>Σᵢ|aᵢ⟩⟨aᵢ| = I</span> without a declared inner product G — the editor asks for the metric (corrected 2026-08-17, canon §1)"), "flex: 0 0 auto")
     body = row([pal, tree], "flex: 1 1 auto; min-height: 0") + edit
     return artboard("Notation — typed Dirac primitives", "bra-ket is machinery here, not ornament: every symbol is a construction, transport, face, quotient, or deposit", 1400, 900, body,
-                    "sources: canon/TABLET_THE_OPERATIONS.md §1–3 (H.0476) · canon/TABLET_THE_REASONING_CYCLE.md §2 · AGENTS.md Provenance clauses")
+                    "sources: docs/canon/TABLET_THE_OPERATIONS.md §1–3 (H.0476) · docs/canon/TABLET_THE_REASONING_CYCLE.md §2 · AGENTS.md Provenance clauses")
 
 # ---------- V8 interaction ----------
 @board("ViewInteraction.dc.html", "View 8 — Interaction: the Feynman vertex as a typed component", 1400, 900, "page-views")
@@ -205,7 +205,7 @@ def view_interaction():
     lib = panel("vertex kinds in the library", row([btn("junction (+/−)"), btn("coupling"), btn("pump / drive"), btn("membrane crossing"), btn("radiation / return"), btn("deposit |a⟩⟨a|"), btn("quotient (lock)")], gap=6), "flex: 0 0 auto")
     body = row([fig, insp], "flex: 1 1 auto; min-height: 0") + lib
     return artboard("Interaction — the Feynman vertex as a typed component", "diagrams are chains of swings; a vertex owns its ports, hand, cross term, current, obstruction and residue", 1400, 900, body,
-                    "sources: canon/TABLET_THE_REASONING_CYCLE.md §2 · canon/TABLET_THE_OPERATIONS.md §3.2, §5 · AGENTS.md ownership/composition · circuitikz node-style anchors (form only)")
+                    "sources: docs/canon/TABLET_THE_REASONING_CYCLE.md §2 · docs/canon/TABLET_THE_OPERATIONS.md §3.2, §5 · AGENTS.md ownership/composition · circuitikz node-style anchors (form only)")
 
 # ---------- V9 constraints ----------
 @board("ViewConstraints.dc.html", "View 9 — Constraint and DOF inspector", 1400, 860, "page-views")
@@ -259,4 +259,4 @@ def view_provenance():
     ]) + box("carried", "a claim without a grade cannot be saved: the document law is enforced at authoring") + box("refused", "a diagnostic hash, a nonempty output, or a passing self-authored test does not raise a grade"), "flex: 0 0 520px")
     body = row([left, right], "flex: 1 1 auto; min-height: 0")
     return artboard("Provenance and grades", "the epistemic grade is a first-class field of every object; kernel acceptance is a later world event attached to one projected passage", 1400, 860, body,
-                    "sources: canon/EPISTEMIC_GRADES.md · AGENTS.md Provenance sidecar · mathematical production boundary")
+                    "sources: docs/canon/EPISTEMIC_GRADES.md · AGENTS.md Provenance sidecar · mathematical production boundary")

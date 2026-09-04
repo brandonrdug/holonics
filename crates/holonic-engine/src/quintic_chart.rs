@@ -2,7 +2,7 @@
 //! transport, and refuse — with the obstruction named — when the target chart cannot represent the
 //! answer.
 //!
-//! `canon/TABLET_THE_CHART.md:280` states the construction this organ was first built for:
+//! `docs/canon/TABLET_THE_CHART.md:280` states the construction this organ was first built for:
 //!
 //! > *"a Tschirnhaus organ. Take a degree-5 input, transport it to Bring form by an exact rational
 //! > chart change, return the transported form and the transport, and refuse — with the obstruction
@@ -16,7 +16,7 @@
 //! ## The degree is a rung, not a category
 //!
 //! Until 2026-08-09 this organ carried `const QUINTIC_DEGREE: usize = 5` and refused anything else
-//! at its first gate. `canon/THE_CONTAMINANT_PROTOCOL.md` §2.6 names the species and why lifting it
+//! at its first gate. `docs/canon/THE_CONTAMINANT_PROTOCOL.md` §2.6 names the species and why lifting it
 //! is not hygiene: **the restriction deletes the mechanism the organ exists to demonstrate.** The
 //! radical chart's refusal at degree five is a statement only against the degrees where it does not
 //! refuse — a quartic runs the whole family and the radical chart **returns**, because `S_n` is
@@ -72,7 +72,7 @@
 //! its roots the *squares* of the roots of `y^5 - y - 1`: if `y^5 = y + 1` and `x = y^2` then
 //! `x^3 - x = y^6 - y^2 = y(y+1) - y^2 = y`. So the cubic transform `g = x^3 - x` carries it back to
 //! Bring form exactly, over `Q`, with no radical anywhere — while its Galois group is still `S_5`
-//! and the radical chart still refuses. That is `canon/TABLET_THE_CHART.md` §3.4's sentence as a
+//! and the radical chart still refuses. That is `docs/canon/TABLET_THE_CHART.md` §3.4's sentence as a
 //! computation: **not unsolvable, unsolvable in that chart.**
 //!
 //! The depressed step is a shift and always succeeds. The principal step needs a root of a
@@ -731,7 +731,7 @@ impl QuinticChartAtlas {
 ///
 /// `horn_local_section_limit` is the caller's declaration of how many affine integer-polynomial
 /// torsors one horn-resolution event of the arithmetic-monodromy fiber may retain. It moved out of
-/// `prime_ecology` on 2026-08-09 (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.5) and is passed straight
+/// `prime_ecology` on 2026-08-09 (`docs/canon/THE_CONTAMINANT_PROTOCOL.md` §2.5) and is passed straight
 /// through: this organ does not pick it either.
 ///
 /// The degree is read off the normalised source and nothing here is pinned to it. A chart that is
@@ -1900,7 +1900,7 @@ mod tests {
     use super::*;
 
     /// **What this test body declares as its horn local-section limit**, since `prime_ecology` no
-    /// longer picks one (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.5). The value reproduces the
+    /// longer picks one (`docs/canon/THE_CONTAMINANT_PROTOCOL.md` §2.5). The value reproduces the
     /// excised `DEFAULT_HORN_LOCAL_SECTION_LIMIT`.
     const TEST_HORN_LOCAL_SECTION_LIMIT: u64 = 1_000_000;
 

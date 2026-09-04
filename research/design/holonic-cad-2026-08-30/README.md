@@ -1,6 +1,6 @@
 # Holonic CAD design testimony — export for Sol (2026-08-30)
 
-[definition] Everything here is design testimony under `blueprint/THE_PRESENTATION_ORGAN.md`. It schedules nothing, asserts no engine capability, and is not canon. CONS1 / the UAR freeze are untouched. Files are exported verbatim from the Claude session scratchpad (session `deaf7379`), with the published artifact URLs recorded so the online copies can be compared.
+[definition] Everything here is design testimony under `archive/plans/THE_PRESENTATION_ORGAN.md`. It schedules nothing, asserts no engine capability, and is not canon. CONS1 / the UAR freeze are untouched. Files are exported verbatim from the Claude session scratchpad (session `deaf7379`), with the published artifact URLs recorded so the online copies can be compared.
 
 ## The two artifacts
 

@@ -6,7 +6,7 @@
 //! ```
 //!
 //! **Stations two and four of
-//! [`blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md`](../../../blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md)** —
+//! [`archive/plans/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md`](../../../archive/plans/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md)** —
 //! one driver, because they are one carrier. The wire is what makes the reading possible: without a
 //! phase there is no round trip, and without a round trip there is nothing to stand.
 //!

@@ -5,7 +5,7 @@
 itself, finiteness of the full Ш, and the general rank-equals-order-vanishing statement
 by posing the conjecture directly; go for the solution."*  Solo orchestrator work, one
 Lean file.  **It schedules nothing**;
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction
 authorities — but the campaign plan below was posed to Brandon with committed turn
 counts and is recorded as posed.

@@ -5,7 +5,7 @@
 //! the one constraint here a richer deposit genuinely would move, and it is a **material**
 //! constraint rather than a construction one."*
 //!
-//! It is not a material constraint. `soma/formal` — thirteen files a person wrote, in the tree the
+//! It is not a material constraint. `formal` — thirteen files a person wrote, in the tree the
 //! whole time — carries **65 top-level declarations** with real recruitment chains. Run
 //! `derivation_atlas::read_derivation` over it and you get 13 files, 11 derivations named by
 //! whichever `theorem` was **last** in each file, and **zero** recruited-and-declared names: a
@@ -67,7 +67,7 @@
 //!    is a table and not a closure.
 //! 7. **The correction to the four-relation record's own figure.** §7's *"exactly one recruited
 //!    identifier in 103 artifacts is declared"* is wrong **on the generated deposit itself**, not
-//!    only on `soma/formal`: **39 of those 103 artifacts carry two top-level declarations**, and
+//!    only on `formal`: **39 of those 103 artifacts carry two top-level declarations**, and
 //!    `def exactCarrier` was read as an atom by a former list that founded only `theorem`. The
 //!    openable count is **two**, and **five** declarations recruit another. `abbrev ExactRelay` is a
 //!    third declaration the old reader could not see, but nothing recruits it, so it is a declared
@@ -151,7 +151,7 @@ fn independent_former_count(text: &str) -> usize {
 fn main() {
     let mut arguments = std::env::args().skip(1);
     let development_root =
-        PathBuf::from(arguments.next().unwrap_or_else(|| "soma/formal".to_owned()));
+        PathBuf::from(arguments.next().unwrap_or_else(|| "formal".to_owned()));
     let generated_root = PathBuf::from(
         arguments
             .next()
@@ -753,7 +753,7 @@ fn control_nine_sub_illicium(
     section("CONTROL 9 -- THE SUB-ILLICIUM: A COMPLETION IS AN ARRIVAL ONE GRAIN UP");
 
     println!(
-        "\n  `soma/body/src/manifold.rs`, W9: \"the sub-illicium -- the atom-grain traversal given"
+        "\n  `crates/holonic-body/src/manifold.rs`, W9: \"the sub-illicium -- the atom-grain traversal given"
     );
     println!(
         "  the SAME live law, so the walk FEELS the standing terrain instead of dead reckoning."

@@ -5,7 +5,7 @@
 **Evidence:** `source-inspected` (the two papers read in full structure; the tree and Mathlib
 grepped for owners)  
 **Campaign:** RT0 under
-[`THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md`](../../blueprint/THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md).  
+[`THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md`](../../archive/plans/THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md).  
 **Owner:** none in Lean; this deed returns a manifest and a route.  
 **Scope:** schedules nothing beyond the directed order; the engine frontier is unchanged.
 

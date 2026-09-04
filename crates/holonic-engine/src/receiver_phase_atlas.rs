@@ -27,7 +27,7 @@ use crate::{
 ///
 /// This organ authors no channel count. Until 2026-08-09 it carried `const CHANNEL_COUNT: usize =
 /// 3` and eight fixed-size-3 array types beneath it, which made *one receiver's* channel population
-/// — RGB — a property of the law that reads receivers. `canon/THE_AUTHORED_LEVEL.md` §1: *"A level
+/// — RGB — a property of the law that reads receivers. `docs/canon/THE_AUTHORED_LEVEL.md` §1: *"A level
 /// is either read off the material or declared by the caller. It is never authored inside the
 /// organ."* [`ExactRgb`] is now one instance of this carrier and not the definition of it; a
 /// single-channel and a five-channel receiver are declared the same way and cost nothing extra.
@@ -1449,7 +1449,7 @@ mod tests {
     }
 
     /// THE DECLARED CONTROL for the `CHANNEL_COUNT` excision
-    /// (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.5, §4).
+    /// (`docs/canon/THE_CONTAMINANT_PROTOCOL.md` §2.5, §4).
     ///
     /// One scene, read by five receivers that differ only in the channel population they declare.
     /// Under the pinned organ four of the five could not be constructed: `ExactReceiverPhaseJet`
@@ -1531,7 +1531,7 @@ mod tests {
             }
         }
 
-        // THE DISTINGUISHING WORD, in the sense `canon/THE_CONTAMINANT_PROTOCOL.md` §4 asks for:
+        // THE DISTINGUISHING WORD, in the sense `docs/canon/THE_CONTAMINANT_PROTOCOL.md` §4 asks for:
         // the least address on which the one-channel and three-channel receivers disagree.
         let single = germ_addresses(&readings[0].1);
         let triple = germ_addresses(&readings[2].1);

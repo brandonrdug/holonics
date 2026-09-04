@@ -4,7 +4,7 @@
 **Truth status:** `proved-derived`  
 **Evidence:** `formal-checked`, `source-inspected`  
 **Campaign:** DB4 under
-[`THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md`](../../blueprint/THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md).  
+[`THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md`](../../archive/plans/THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md).  
 **Owner:** `RH/DeBruijnLimit.lean` under `soma/formal/elementary-holonics/ElementaryHolonics/`,
 registered in the root umbrella.  
 **Scope:** schedules nothing beyond the directed order; the engine frontier is unchanged.

@@ -51,8 +51,8 @@ use relational_geometry::{
 };
 
 const DEFAULT_ARTIFACTS: &str =
-    "output/the_card_returns_the_eta_boundary_and_the_zero_is_a_winding";
-const OUTPUT: &str = "output/the_weil_form_is_positive_on_the_primes_and_the_zeros_agree";
+    ".local/artifacts/the_card_returns_the_eta_boundary_and_the_zero_is_a_winding";
+const OUTPUT: &str = ".local/artifacts/the_weil_form_is_positive_on_the_primes_and_the_zeros_agree";
 const BITS: u32 = 64;
 const TERMS: u32 = 20;
 /// The grid: `2^-FINE_BITS` cells on `[2^-FINE_BITS, 1/8]`; beyond `1/8` the integral is a series.

@@ -15,8 +15,8 @@ receiver would be emanating from… it comes from the **collapse**, the constrai
 freedom of a body."* And his instruction to launch the adjudicators: *"I value Sol's rigor… I don't
 want to miss anything or happen to neglect existing aspects of our research."*
 **Plan:** this record schedules nothing. Its consequences are carried by
-[`blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md`](../../blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md),
-which sits under [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md).
+[`blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md`](../../archive/plans/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md),
+which sits under [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md).
 
 ---
 

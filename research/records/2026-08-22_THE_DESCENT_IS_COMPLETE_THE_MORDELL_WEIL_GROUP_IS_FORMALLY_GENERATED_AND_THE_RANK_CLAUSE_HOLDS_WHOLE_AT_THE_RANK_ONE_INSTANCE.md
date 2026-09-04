@@ -4,7 +4,7 @@
 **Kind:** the summit return of the descent campaign — under Brandon's goal *"Solve BSD,
 found pivots using the composition of the solution…"*.  Solo orchestrator work, commits
 `2f094f9`, `7943d50`, `1cbedd6` (on `ca7a734`, `0a58be1` the same day).  **It schedules
-nothing.**  [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+nothing.**  [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction
 authorities.
 **Truth grades:** `proved-derived` with `formal-checked` evidence

@@ -14,7 +14,7 @@
 //! ## The degree is a rung, not a category
 //!
 //! Until 2026-08-09 this module carried `const QUINTIC_DEGREE: usize = 5` and refused any
-//! polynomial whose coefficient count was not six. `canon/THE_CONTAMINANT_PROTOCOL.md` §2.6 names
+//! polynomial whose coefficient count was not six. `docs/canon/THE_CONTAMINANT_PROTOCOL.md` §2.6 names
 //! that species — **a restriction the organ imposes presented as a fact about the subject** — and
 //! records why it is not hygiene: `solvable_by_radicals` refusing at degree five is meaningful only
 //! against the degrees where it does *not* refuse, so an organ that only ever sees degree five
@@ -1439,7 +1439,7 @@ fn greatest_common_divisor_u32(mut left: u32, mut right: u32) -> u32 {
 ///
 /// **This carrier was `type Permutation5 = [u8; QUINTIC_DEGREE]` until 2026-08-09** — the degree
 /// carried as a type, which no search over `const NAME: type = N;` could ever see
-/// (`canon/THE_AUTHORED_LEVEL.md` §5.4 names it as the standing example). Its extent is now read
+/// (`docs/canon/THE_AUTHORED_LEVEL.md` §5.4 names it as the standing example). Its extent is now read
 /// off the permutation itself.
 type Permutation = Vec<u8>;
 
@@ -1948,7 +1948,7 @@ mod tests {
     use super::*;
 
     /// **What this test body declares as its horn local-section limit.** It moved out of the organ
-    /// on 2026-08-09 (`canon/THE_CONTAMINANT_PROTOCOL.md` §2.5 — *a default is a level the organ
+    /// on 2026-08-09 (`docs/canon/THE_CONTAMINANT_PROTOCOL.md` §2.5 — *a default is a level the organ
     /// picked because the caller was never asked*), and a fixture is a caller. The value reproduces
     /// the excised `DEFAULT_HORN_LOCAL_SECTION_LIMIT` so these fixtures' returns are unchanged by
     /// the move.

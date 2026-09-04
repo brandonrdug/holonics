@@ -4,7 +4,7 @@
 **Truth status:** `proved-derived`  
 **Evidence:** `formal-checked`, `source-inspected`  
 **Campaign:** FT0 under
-[`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](../../blueprint/THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md),
+[`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](../../archive/plans/THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md),
 directed by Brandon on 2026-09-03: *"I am directing that campaign."*  
 **Owner:** `soma/formal/elementary-holonics/ElementaryHolonics/RH/FosterTanks.lean`, registered in the
 root umbrella after `HeatFlowStackedSeam`.  

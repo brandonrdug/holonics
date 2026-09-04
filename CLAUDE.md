@@ -6,7 +6,7 @@ contract for Claude and Codex. This file adds no competing rule, capability grad
 ## Pickup
 
 Read [AGENTS.md](AGENTS.md), [CONSTRUCTION_STATE.md](CONSTRUCTION_STATE.md), and the complete
-[roadmap](blueprint/THE_ROADMAP.md), then follow its task-specific source and evidence links.
+[roadmap](docs/plans/THE_ROADMAP.md), then follow its task-specific source and evidence links.
 Use the orientation and retraction tier for Eros/Athena/Soulkiller work. Retain already-read
 context across turns; do not repeat an unchanged orientation as a substitute for the authorized
 work.
@@ -35,8 +35,9 @@ work and remains responsible for the complete outcome.
 
 [definition] Follow AGENTS.md's validation cadence and 180-second hang-guard ruling. A naturally
 long productive command uses progress-aware supervision; it is not subdivided merely to fit an
-outer clock. Run focused checks while editing and one complete release receiver at the coherent
-boundary. State the actual scope of each receipt.
+outer clock. Run checks needed for the changed source and product. The former blanket gate,
+document/index checks and source-size ledger are archived; do not revive them. Compile papers
+only when that work is relevant. State the actual scope of each receipt.
 
 Do not delete caches, ignored artifacts, source or evidence without authorization. Preserve
 unrelated user changes. Follow the shared Provenance protocol where it applies; the exterior

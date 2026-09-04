@@ -7,11 +7,11 @@ orchestrator work, two Lean files; the Tate ladders and the pinned rational veri
 exact integer arithmetic (a full exact run of Tate's algorithm) before encoding, the one
 transcendental ratio pinned by an arithmetic–geometric-mean scaffold that enters no
 statement.  **It schedules nothing.**
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction
 authorities.
 **Position under the active plan.** Exterior mathematical material for Deed M2 of
-[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
+[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../archive/plans/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
 The Lean line does not couple to the engine, per Brandon's standing ruling.
 **Truth grades:** `proved-derived` with `formal-checked` evidence for the ten Lean theorems
 (`#print axioms` → `[propext, Classical.choice, Quot.sound]`, zero `sorryAx`);

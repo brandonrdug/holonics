@@ -1,7 +1,7 @@
 //! The workbench: present exact mathematics, emit the artifact, then READ IT BACK.
 //!
 //! Record: `research/records/2026-08-08_THE_SAMPLER_HOPES_THE_CERTIFICATE_KNOWS_THE_GAUGE_CARRIES_NO_STRUCTURE.md`.
-//! Contract: `blueprint/THE_PRESENTATION_ORGAN.md`.
+//! Contract: `archive/plans/THE_PRESENTATION_ORGAN.md`.
 //!
 //! Run:
 //!
@@ -11,7 +11,7 @@
 //!
 //! ## What this driver is for
 //!
-//! `blueprint/THE_ROADMAP.md` carries the atlas reader as `open`: "what lets any of it be read
+//! `docs/plans/THE_ROADMAP.md` carries the atlas reader as `open`: "what lets any of it be read
 //! back rather than emitted into a directory nothing opens". The roadmap's own measurement is that
 //! the five TSV tables the engine emits are opened by nothing in the tree.
 //!

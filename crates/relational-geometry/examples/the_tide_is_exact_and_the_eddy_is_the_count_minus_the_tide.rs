@@ -29,8 +29,8 @@ use num_traits::{Signed, Zero};
 use relational_geometry::{EtaRatioAtlas, RatInterval, pi_interval, riemann_siegel_theta};
 
 const DEFAULT_ARTIFACTS: &str =
-    "output/the_card_returns_the_eta_boundary_and_the_zero_is_a_winding";
-const DEFAULT_OUTPUT: &str = "output/the_tide_is_exact_and_the_eddy_is_the_count_minus_the_tide";
+    ".local/artifacts/the_card_returns_the_eta_boundary_and_the_zero_is_a_winding";
+const DEFAULT_OUTPUT: &str = ".local/artifacts/the_tide_is_exact_and_the_eddy_is_the_count_minus_the_tide";
 
 fn integer(value: i64) -> BigRational {
     BigRational::from_integer(BigInt::from(value))

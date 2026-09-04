@@ -9,7 +9,7 @@
 //! runs the founding under two junction orders and returns the gyration.
 //!
 //! **The material is the development itself.** Items are the 66 top-level declarations of
-//! `soma/formal`; an input is *"take the k-th declared name this declaration recruits"*, so conduct
+//! `formal`; an input is *"take the k-th declared name this declaration recruits"*, so conduct
 //! is the recruitment chain the intake recovered; the declared panel is three faces a reader has
 //! before opening anything — the former that founded it, its namespace depth, and whether it carries
 //! a statement. Nothing here is authored about *which* declarations differ; the panel is coarse on
@@ -194,7 +194,7 @@ fn main() {
     let root = PathBuf::from(
         std::env::args()
             .nth(1)
-            .unwrap_or_else(|| "soma/formal".to_owned()),
+            .unwrap_or_else(|| "formal".to_owned()),
     );
     let paths = lean_paths(&root);
     if paths.is_empty() {

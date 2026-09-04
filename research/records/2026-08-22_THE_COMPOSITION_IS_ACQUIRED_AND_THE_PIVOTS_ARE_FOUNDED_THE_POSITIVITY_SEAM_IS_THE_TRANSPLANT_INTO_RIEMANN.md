@@ -7,7 +7,7 @@ acquired, and analyze traversal patterns into the other Millennium problems"*.  
 solution whose composition this analyzes: `theBirchSwinnertonDyerConjectureHoldsAtFive`
 (`5961d20`) and `theRankClauseHoldsAtOne` — the posed conjecture whole at the rank-one
 instance, the rank clause whole at the rank-zero instance.  **It schedules nothing**;
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction
 authorities.
 **Truth grades:** `formal-checked` for every named theorem; `interpretation` for every

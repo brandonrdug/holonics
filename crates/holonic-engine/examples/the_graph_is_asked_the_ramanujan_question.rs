@@ -37,7 +37,7 @@
 //!
 //! This is a property of a finite graph the driver declares. It is **not** a statement about the
 //! Riemann hypothesis, and the analogy that licenses the name is a theorem about Ihara zetas of
-//! finite graphs and nothing more. `canon/THE_HOLOBROCHOS_SPINE.md` bars a suggestive spectral
+//! finite graphs and nothing more. `docs/canon/THE_HOLOBROCHOS_SPINE.md` bars a suggestive spectral
 //! image from grading a deed, and this driver grades nothing.
 //!
 //! ```text

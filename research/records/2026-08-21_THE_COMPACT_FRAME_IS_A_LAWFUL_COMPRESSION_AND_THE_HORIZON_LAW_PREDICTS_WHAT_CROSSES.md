@@ -5,11 +5,11 @@
 [the winding-census record](2026-08-21_THE_TORSION_IS_A_CENSUS_OF_CLOSED_WINDINGS_AND_THE_COMPACT_FRAME_READS_IT_WHOLE.md),
 deposited at Brandon's direction after he asked whether the compact frame is relevant to
 compression, noting the question bears on standing work of Sol's. **It schedules nothing.**
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction
 authorities.
 **Position under the active plan.** Exterior mathematical material for Deed M2 of
-[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
+[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../archive/plans/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
 The Lean line does not couple to the engine, per Brandon's standing ruling.
 **Truth status and evidence:** `proved-derived` with `formal-checked` evidence for the kernel-checked
 census and lineage/compression theorems named here; `proved-standard` for the cited classical facts,

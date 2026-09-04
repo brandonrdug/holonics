@@ -23,7 +23,7 @@ use std::env;
 use std::fs;
 use std::time::Instant;
 
-const OUTPUT: &str = "output/the_shadow_side_is_a_pure_drain";
+const OUTPUT: &str = ".local/artifacts/the_shadow_side_is_a_pure_drain";
 
 fn parse_rational(text: &str) -> Option<BigRational> {
     let mut parts = text.split('/');

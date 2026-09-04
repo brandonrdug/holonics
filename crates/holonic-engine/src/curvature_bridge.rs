@@ -20,7 +20,7 @@
 //! standings, enters at the response population, iterates [`revise`] and
 //! [`revise_partially`], and returns the revision, deficit, leak and
 //! unlifted-hinge **populations** — not their sizes. Its assertions are the
-//! falsifiers `blueprint/THE_ASSEMBLY.md` names for loop (b), so a wrong bridge
+//! falsifiers `archive/plans/THE_ASSEMBLY.md` names for loop (b), so a wrong bridge
 //! makes the driver exit nonzero.
 //!
 //! Nothing here is approximate. Every quantity is an exact `Rat` or an exact

@@ -2,7 +2,7 @@
 //!
 //! ## Why this exists, and what it discharges
 //!
-//! `canon/TABLET_THE_CHART.md` §3.7 carries a standing owed item, and it is the one that makes every
+//! `docs/canon/TABLET_THE_CHART.md` §3.7 carries a standing owed item, and it is the one that makes every
 //! cost question in this repository unanswerable:
 //!
 //! > *"the machine currently has no organ that returns **'is this solvable, and at what cost'** as a
@@ -259,7 +259,7 @@ impl ExactWork {
     /// 2026-08-17 because the material refuted the metric that lacked it.
     ///
     /// A linear metric over the counted coordinates prices an operation on a 5,000-bit rational the
-    /// same as one on a 60-bit rational. `canon/TABLET_THE_CHART.md` §3.7 says *"the dominating
+    /// same as one on a 60-bit rational. `docs/canon/TABLET_THE_CHART.md` §3.7 says *"the dominating
     /// quantity is intermediate entry bit-length"*, and under unit weights the measurement said
     /// otherwise: at every deferred extent the operation **count** carried the price. Both are true
     /// and they are not in conflict — the width does not dominate the count, it dominates the **cost

@@ -264,7 +264,7 @@ impl Derivation {
 /// `!isEmpty` one token beginning with `!`, which the first-character filter then deletes whole —
 /// so two classes is what the fix requires and not a wider one. Measured on the 103 artifacts this
 /// reading admits, `contrapose!` occurs 5 times and was returned as `contrapose`; the generator
-/// that writes it is `soma/life/src/lean_mathematics/ecology.rs:733`.
+/// that writes it is `crates/holonic-life/src/lean_mathematics/ecology.rs:733`.
 ///
 /// **Declared bound: a guillemet identifier `«a b»` is read as its interior words.** Lean permits
 /// spaces inside `«…»` and no line-splitting rule can carry that; a scanner that could is a change
@@ -482,7 +482,7 @@ fn naming_declarations(text: &str) -> Vec<(usize, &'static str, String)> {
 /// What is *not* in the module documentation, because a bound stated in prose is a bound nothing
 /// can enforce, is [`DerivationApertureRefusal`]. A text outside the aperture returns the clause
 /// that excludes it and no `Derivation` at all. For a development a person wrote — mathlib, or
-/// `soma/formal` — the reader is [`crate::lean_development::read_development`], which opens every
+/// `formal` — the reader is [`crate::lean_development::read_development`], which opens every
 /// top-level declaration, separates comment text, and returns what it set aside.
 pub fn read_derivation_within_aperture(
     text: &str,
@@ -1344,7 +1344,7 @@ pub fn invariant_movement(
 /// machine's actual production mode.** Every other field here reads `vertices_reaching`, a
 /// deduplicated set, so under `ByDeclaration` a production depositing a thirty-second artifact of
 /// an already-named declaration moved nothing any of them can see. That is
-/// `blueprint/THE_ASSEMBLY.md`'s named failure verbatim — *"keeps the support and drops the
+/// `archive/plans/THE_ASSEMBLY.md`'s named failure verbatim — *"keeps the support and drops the
 /// lineage"* — and `deepened_routes` reads the ordered, non-deduplicated `routes()` the circuit
 /// already holds.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -1764,7 +1764,7 @@ end LinearOrderedAddCommGroup
     /// The prime, the bang and the question mark are **continuations**, and the witness is the
     /// machine's own production.
     ///
-    /// `soma/life/src/lean_mathematics/ecology.rs:733` writes `"by\n  contrapose! {}\n  exact
+    /// `crates/holonic-life/src/lean_mathematics/ecology.rs:733` writes `"by\n  contrapose! {}\n  exact
     /// {application}"`, so `contrapose!` occurs 5 times across the 103 artifacts under
     /// `standing/output` and the reading returned `contrapose` for every one of them. The other two
     /// characters carry no witness in the present deposit and are declared here rather than left to

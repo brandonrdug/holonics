@@ -4,11 +4,11 @@
 **Kind:** the compact-frame deed — Brandon's direction: *"let's proceed with the compact-frame
 and BSD."*  Solo orchestrator work, two Lean files, no agents; every identity verified in
 exact modular arithmetic on random curve points over two large prime fields before encoding.
-**It schedules nothing.** [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+**It schedules nothing.** [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction
 authorities.
 **Position under the active plan.** Exterior mathematical material for Deed M2 of
-[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
+[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../archive/plans/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
 The Lean line does not couple to the engine, per Brandon's standing ruling.
 **Truth grades:** `proved-derived` with `formal-checked` evidence for every theorem named —
 all audited by `#print axioms` to `[propext, Classical.choice, Quot.sound]`, zero `sorryAx`;

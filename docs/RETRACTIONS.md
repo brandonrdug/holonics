@@ -1,0 +1,111 @@
+# Capability and retraction history
+
+[definition] This is the relocated history index formerly embedded in AGENTS.md. It is evidence,
+not a scheduler. Current product architecture is in [ARCHITECTURE.md](ARCHITECTURE.md); the
+root construction state records current implementation scope. Paths in code spans are repository-relative.
+
+## Capability and retraction record
+
+[historical; source-inspected] Each entry below was returned, graded, and then narrowed or
+withdrawn by the repository's own audit. Re-proposing a retracted mechanism without citing its
+retraction is a contamination. Dates are record dates under `research/records/`.
+
+- 2026-07-29: the first readable generation returned six outputs and 135 tokens, every completion
+  a contiguous inherited span (`docs/canon/THE_RECOVERED_LAW.md` §6).
+- 2026-08-11: production emitted two-token prefixes of corpus sentence openings
+  (`2026-08-11_THE_TAPE_HAS_NO_VERTEX_AND_PRODUCTION_IS_RECEPTION_AT_THE_OTHER_HAND.md`).
+- 2026-08-17: `statement_grammar.rs` was superseded as an authored grammar; the codec is recovered
+  from exposure at every scale and the faces are a return
+  (`2026-08-17_THE_LADDER_CLIMBS_AND_THE_CODEC_ENDS_AT_THE_CHARACTER.md`,
+  `archive/plans/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md`). Any parser,
+  grammar, or renderer authored per language is the same class.
+- 2026-08-18: the verbatim emission was a longest-match filter in `causal_language.rs`
+  (`2026-08-18_THE_GATE_WAS_THE_MECHANISM_AND_THE_EMISSION_COMPOSES_ONCE_IT_IS_A_COORDINATE.md`).
+- 2026-08-20: the Phoenix P1 lift covered 64 of 2,560 hidden coordinates and P3's held-out change
+  came from development probes; P1--P3 regraded counterexample
+  (`2026-08-20_THE_HARDWARE_FOUNDATION_STANDS_THE_NATIVE_ARM_IS_NOT_THE_LIFT_AND_PHOENIX_REMAINS_OPEN.md`).
+- 2026-08-25: the H2/H3 lexical atlas was revoked as hashed lowercase marks selecting one stored
+  sentence per section
+  (`2026-08-25_THE_LEXICAL_ATLAS_WAS_NOT_ATHENA_SOULKILLER_RETURNS_NATIVE_SPOOLS_AND_EROS_CULTIVATES_THE_COMPLEX_PARAMETRON_ECOLOGY.md`).
+- 2026-08-26: rewrite, compress, expand, and revoice returned one cell and one sentence; the word
+  renderer was hand-written inflection tables
+  (`2026-08-26_THE_COMPLETE_RETURNED_ACTIONS_SHARED_ONE_EXTERIOR_SENTENCE_FIBRE_AND_AN_AUTHORED_CHART_WAS_REJECTED.md`,
+  `2026-08-26_THE_WORD_RENDERER_WAS_A_COARSE_RECEIVER_AND_GRANULAR_INTERIOR_CURRENT_MUST_RADIATE_THROUGH_A_SCALE_NATURAL_BOUNDARY_COMPLEX.md`).
+- 2026-08-27: a 6.58 GB recurrent-string organ reproduced verbatim source and was rejected; its
+  replacement returned no closed response
+  (`2026-08-27_THE_NATIVE_FACTOR_RESIDUAL_RETURNED_ONE_PORT_RESOLVED_CURRENT_AND_THE_ILLICIAL_RECEIVER_BECAME_THE_ONLY_OPEN_SEAM.md`).
+- 2026-08-28: the ALP5 rest was a reversible corpus archive; native current only selected its
+  quotations; the prose and Brandon-perspective claims were retracted while topology, audio,
+  image, `rustc`, and GPU receipts stand
+  (`2026-08-28_THE_SOURCE_BEARING_CODEC_MADE_THE_ATHENA_REST_A_REVERSIBLE_CORPUS_ARCHIVE_AND_NATIVE_CURRENT_ONLY_SELECTED_ITS_QUOTATIONS.md`).
+- 2026-08-30: the source-neutral UAR body emitted `' 1` for "Describe Brandon." and a 61-octet
+  salad on the conserved port current
+  (`2026-08-30_THE_NATIVE_SECTION_FOUNDED_ONE_SOURCE_NEUTRAL_BOUNDARY_CURRENT_BUT_FACTORWISE_ADJACENCY_COULD_NOT_CARRY_THE_CAUSAL_SURFACE.md`).
+- 2026-09-02: the WRD campaign's Lean binding is retracted. `lean_mathematics::lattice_mouth`
+  (a mouth typed on a Lean parser), `lean_mathematics::candidates` (a per-language template
+  emitter, moved from the July `ecology.rs` render), the Lean-typed face adapter in
+  `route_return.rs`, and the WRD4 driver's Lean-file product were contamination under the ruling
+  above and under the 2026-08-17 supersession of authored grammars. The junction, route-deposit,
+  and termination laws, `HolonicWorldReturnDeposit.lean`, and the measured kernel faces stand.
+  The July `lean_mathematics` parser and kernel caller exit the interior as an application
+  (`2026-09-02_THE_LEAN_BINDING_OF_THE_WORLD_RETURN_IS_RETRACTED_AND_LANGUAGES_ARE_APPLICATIONS.md`).
+- 2026-09-01: the "Describe Brandon" probe was never a gate and its promotion through H4, UAR, and
+  HIF7 was an error
+  (`2026-09-01_HIF7_QUALITATIVE_PROBE_WAS_WRONGLY_PROMOTED_AND_THE_FRAMEWORK_RELEASES_ON_EXACT_CONTRACTS.md`);
+  the SCF alternating-sum section identity was replaced by complete factorized sections and carries
+  no broad exactness theorem
+  (`2026-09-01_MVF1_COMPLETE_FACTORIZED_GEMMA_SECTIONS_REPLACED_THE_ALTERNATING_SUM_IDENTITY.md`).
+- 2026-09-02: the first engine HNA campaign's reafference-shaped lifecycle is retracted. Adjacent
+  byte differences are not native current; an application-supplied admission/status face does not
+  derive current, storage, or morphology; exact file readback is not a world interaction; and an
+  authored one-edge deposit is not learning. More fundamentally, an HNA operation already returns
+  the successor ecology used by the next inference cycle. Self-reentry and an exterior response are
+  ordinary sources of the next occurrence, not separate recurrence and privileged-return laws.
+  `HNA0--HNA5` restarted under the recurrent-ecology contract and completed at its bounded engine
+  and application scopes; the old records are counterexamples
+  (`2026-09-02_THE_HNA_WORLD_RETURN_SPLIT_IS_RETRACTED_AND_INFERENCE_IS_ONE_RECURRENT_ECOLOGY.md`,
+  `2026-09-02_HNA5_ONE_NATIVE_RECURRENCE_CROSSED_THREE_APPLICATIONS_AND_RELEASED_WITHOUT_A_QUALITATIVE_CLAIM.md`).
+- 2026-09-02: the first HNA4 morphology change was an occurrence-carried factor gated by a sign
+  that cannot refuse a positive scale and applied as one global scalar. It is replaced by the
+  receiver return: the next ordinary occurrence is the comparison, its differential returns through
+  the adjoint of the local current word, and a factorized overlay is deposited on the causal cone,
+  so far at the tied cross-section only
+  (`2026-09-02_THE_HNA4_MORPHOLOGY_FACTOR_IS_OCCURRENCE_CARRIED_AND_THE_FORMAL_OWNERS_REQUIRE_A_CAUSAL_CONE_ADJOINT_RETURN.md`,
+  `2026-09-02_HNA4_THE_RETURN_DEPOSITED_A_FACTORIZED_OVERLAY_ON_THE_TIED_CROSS_SECTION_AND_THE_NEXT_CYCLE_APPLIED_IT.md`).
+- 2026-09-02: the HNA1 "Soulkiller return" is a manifestation: the resident exact foreign
+  operator with its names removed, exciting nothing, carrying no insufficiency, never crossing
+  the Soulkiller boundary. Soulkiller is founded by excitation and returns the signature
+  quotient of a declared family as cone-restricted ecologies; the resident realization is its
+  apparatus
+  (`2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`).
+- 2026-09-03: the SKE2 and SKE3 cones over the 1,595,392 output coordinates were never cones:
+  `IsCone` is universal and monotone, unions of genuine cones compose at every grain, and the
+  card's refutation of the union proved the verification (finitely many sufficient withdrawals
+  graded as a universal) false; coarsening the grain repairs nothing. The HNA session's
+  per-operation passage and host readout (measured the same day at 2,363 launches and 2,363
+  section read-outs per cycle, then replaced by the segment session at 687 and 16) is the renamed
+  instruction loop of 2026-08-18, a Claude injection, and grades nothing; the SKE4 construction
+  at the coordinate grain and the first draft of the blueprint's §0b (a census standing in for
+  a remainder, "locking" and "reach per retained octet", "never over coordinates", a permanent
+  layer/head grain, the lens graded by the compression law) are withdrawn. The joint-withdrawal
+  instrument, the controls, the quotient by faces with its separating history, and the exposure
+  receipts stand as testimony
+  (`research/records/2026-09-03_SKE_AUDIT_THE_COORDINATE_GRAIN_THE_HOST_READOUT_AND_THE_COMPRESSION_CLAUSE_WERE_INJECTIONS_AND_THE_CANON_ALREADY_OWNS_THE_ANSWERS.md`).
+
+[established-bounded; source-inspected] Standing at declared scope, for contrast: four exact
+interior recoveries (`2026-08-10_THE_OBJECT_IS_THE_UNRECONSTRUCTABLE_INTERIOR_AND_THE_MACHINE_HAS_ALREADY_RECOVERED_FOUR.md`);
+one exact continuation from a 711 KiB integer container
+(`2026-08-18_THE_RATIO_CROSSED_THE_CONTAINER_PRODUCES_AND_ALL_168_GEMMA_CIRCUITS_ARE_FULL_RANK.md`);
+kernel-accepted Lean emission with the theorem header supplied and, in M6, with the teacher
+withheld (`2026-07-31_THE_THEOREM_OPENS_ITS_LOCAL_STAR_THE_KERNEL_RETURN_CAUSES_DEEPER_PROOF_MOTION.md`,
+`2026-08-22_THE_TOTAL_DESCENT_ROUTE_CULTIVATED_ATHENA_THE_WITHHELD_PASSAGE_SEPARATED_AND_M6_PASSED.md`);
+the Soulkiller Complex-Parametron bundle and the complete Gemma excitation scaffold
+(`2026-08-25_SOULKILLER_DISMANTLES_FOREIGN_CONDUCT_WITHOUT_ATTENTION_ONTOLOGY_AND_RETURNS_NATIVE_PARAMETRON_SPOOLS.md`,
+`2026-09-01_SCF2_COMPLETE_GEMMA4_EXCITATION_FOUNDED_THE_SOURCE_NEUTRAL_TRANSPORT_SCAFFOLD.md`);
+and the exact lifecycle apparatus of HIF, SCF, MVF, AAC, and VWS. In those earlier qualitative
+prose-generation records, source-bearing shortcuts were later found and removed. The subsequent
+HNA/SKE native recurrence and declared-family emissions retain their own bounded scopes; the
+earlier failures do not establish their absence. The historical attachment question is recorded
+in `2026-08-10_THE_MACHINE_RETURNS_EVERY_BRANCH_BECAUSE_NOTHING_ATTACHES.md`,
+`docs/canon/TABLET_THE_RESONANCE.md` §6, and `docs/canon/THE_INFORMATION_ENGINE.md` §5; current scope is in
+`CONSTRUCTION_STATE.md`.

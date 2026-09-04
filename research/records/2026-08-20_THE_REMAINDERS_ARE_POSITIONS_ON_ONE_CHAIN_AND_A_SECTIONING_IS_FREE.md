@@ -2,14 +2,14 @@
 
 **Date:** 2026-08-20
 **Kind:** formal derivation deposit answering one named open question. It schedules nothing.
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction authorities.
 **Position under the active plan.** Exterior mathematical material for Deed M2 of
-[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
+[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../archive/plans/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
 The active deed is W1. **No engine source is touched.**
 **Truth status:** `proved-derived` for every Lean theorem, kernel-checked and audited free of
 `sorryAx`; `proved-standard` for the cited classical results; `interpretation` for the readings.
-**Companion:** [`research/equation-atlas/`](../equation-atlas/) — six equations and six relations
+**Companion:** [`research/equation-atlas/`](../equation-atlas) — six equations and six relations
 appended.
 **Predecessor:**
 [`2026-08-20_THE_PLACEMENT_IS_A_MONODROMY_AND_THE_REMAINDER_IS_WHAT_PAYS.md`](2026-08-20_THE_PLACEMENT_IS_A_MONODROMY_AND_THE_REMAINDER_IS_WHAT_PAYS.md),

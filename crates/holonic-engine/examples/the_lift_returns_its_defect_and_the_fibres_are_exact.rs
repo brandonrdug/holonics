@@ -82,10 +82,10 @@ const COMPRESSION_ITEMS: usize = 512;
 const COMPRESSION_DEPTH: usize = 12;
 
 const LAYER: usize = 0;
-const OUT_DIR: &str = "output/the_lift_returns_its_defect";
+const OUT_DIR: &str = ".local/artifacts/the_lift_returns_its_defect";
 /// The committed Station B/C deposit the declared source closure is read out of.
 const SOURCE_CLOSURE_ARTIFACT: &str =
-    "output/the_layer_stays_on_the_card/layer-0-resident-2-tokens-grain-48-terms-14.form";
+    ".local/artifacts/the_layer_stays_on_the_card/layer-0-resident-2-tokens-grain-48-terms-14.form";
 
 fn named(suffix: &str) -> String {
     format!("model.language_model.layers.{LAYER}.{suffix}")

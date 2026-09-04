@@ -525,7 +525,7 @@ fn rational(value: &BigInt) -> Rat {
 ///
 /// **Neither level is authored here.** Both were, until 2026-08-09:
 /// `LEADER_GRAIN_RECIPROCAL: i64 = 3` and `LEADER_WITNESS_DEPTH: usize = 1`, excised for
-/// `canon/THE_AUTHORED_LEVEL.md` §5.1.
+/// `docs/canon/THE_AUTHORED_LEVEL.md` §5.1.
 ///
 /// - The **witness depth** is read at every tip off the jet standing there
 ///   ([`crate::leader_quadrature::WitnessDepth::ReadOffTheJet`]). On this module's route material
@@ -1578,7 +1578,7 @@ mod tests {
 
     /// **The reading enters the next production as material, and something moves.**
     ///
-    /// The falsifier `blueprint/THE_ROADMAP.md` names for the accumulation cut: *"Require
+    /// The falsifier `docs/plans/THE_ROADMAP.md` names for the accumulation cut: *"Require
     /// `invariant_movement` to be non-zero and attributable — each moved invariant naming the
     /// earlier return that caused it. A second production bit-identical to the first has not closed
     /// the cycle, whatever it printed."*
@@ -1705,7 +1705,7 @@ impl ConductedReturn {
 
 /// **Conduct one return.**
 ///
-/// `blueprint/THE_ROADMAP.md`'s accumulation cut names this exact pair: *"`temper` ⇄
+/// `docs/plans/THE_ROADMAP.md`'s accumulation cut names this exact pair: *"`temper` ⇄
 /// `derivation_integral`, through `Cochain`, in **both** directions… **Neither file references the
 /// other.**"* Both halves were built and nothing sat between them.
 ///
@@ -1718,7 +1718,7 @@ impl ConductedReturn {
 ///   TemperedFamily::read(…, &founded, …) -> the next reading against the changed world
 /// ```
 ///
-/// **The return is world-mediated, not wired.** `canon/THE_HOLOBROCHOS_SPINE.md` §5b: *"A consequence
+/// **The return is world-mediated, not wired.** `docs/canon/THE_HOLOBROCHOS_SPINE.md` §5b: *"A consequence
 /// handed from a reading to a production across a call, without leaving the process and landing in
 /// the world's own record, is the shape Soma's contaminant list names. **The consequence returns as a
 /// PLACE.**"* Here the place is a cell of the shared cochain: the deposit is not passed to the second

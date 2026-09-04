@@ -24,10 +24,10 @@
 //!
 //! ## This module is the fifth name of one organ, and it is the one that computes its law
 //!
-//! `canon/THE_INFORMATION_ENGINE.md` records the Schur complement as **one organ under four
+//! `docs/canon/THE_INFORMATION_ENGINE.md` records the Schur complement as **one organ under four
 //! names, none of which cites the others**: `diffusion.rs`'s certified boundary transfer, `H.0219`'s
 //! parallelization barrier, the effective tension `S = D − C*A⁻¹C` of
-//! `papers/source/mathematics/theorems/conditioned-effective-tension.typ`, and **`H.0127` *Schur
+//! `research/papers/source/mathematics/theorems/conditioned-effective-tension.typ`, and **`H.0127` *Schur
 //! complement and inertia***, `proved-standard`, which states the law the other three use.
 //!
 //! **This module is the fifth**, and it is the one that actually computes `H.0127`: the elimination
@@ -37,7 +37,7 @@
 //! That matters beyond bookkeeping. `H.0127`'s second sentence — *"the block matrix has the inertia
 //! of `A` plus the inertia of its Schur complement"* — is Haynsworth's additivity, and it is the law
 //! the Riemann support-successor obligation is stated in:
-//! `papers/source/mathematics/theorems/weil-support-induction-reduction.typ` reduces the hypothesis
+//! `research/papers/source/mathematics/theorems/weil-support-induction-reduction.typ` reduces the hypothesis
 //! to `(RANGE)` and `(OPERATOR SHORT)`, which are Albert's block-positivity pair, whose finite form
 //! is `H/A >= 0`. `examples/the_pullback_bounds_the_inertia.rs` returns
 //! `In(H) = In(A) + In(H/A)` on three fixtures, with the positive-definite arm labelled as the one
@@ -393,7 +393,7 @@ pub fn inertia_with_schedule(
 
 /// **The same elimination, returning what it cost.**
 ///
-/// Added 2026-08-17. `canon/TABLET_THE_CHART.md` §3.7 records that *"the dominating quantity is
+/// Added 2026-08-17. `docs/canon/TABLET_THE_CHART.md` §3.7 records that *"the dominating quantity is
 /// intermediate entry bit-length and nothing counts it. Until a work vector exists, no cost question
 /// in this repository has a lawful answer."* This is that count, taken at the only place it can be
 /// taken exactly: inside the elimination, on every entry it writes.
@@ -934,7 +934,7 @@ mod tests {
     /// ★ THE PIVOT COUNT IS PROVABLY NOT THE DOMINATING QUANTITY, and this is the proof the tablet
     /// asserts without one.
     ///
-    /// `canon/TABLET_THE_CHART.md` §3.7: *"`PivotSchedule` returns the pivot count and it is
+    /// `docs/canon/TABLET_THE_CHART.md` §3.7: *"`PivotSchedule` returns the pivot count and it is
     /// provably **not** the dominating quantity; the dominating quantity is intermediate entry
     /// bit-length and nothing counts it."* Two forms of the same extent, taking the **same number of
     /// pivots**, whose peak intermediate widths differ by orders. If the widths agreed, the vector

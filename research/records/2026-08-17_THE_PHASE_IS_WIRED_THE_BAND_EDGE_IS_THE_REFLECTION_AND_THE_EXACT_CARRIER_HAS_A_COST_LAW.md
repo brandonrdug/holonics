@@ -13,8 +13,8 @@ analyze outcomes and interpret."* And mid-run, on hardware: *"as we approach com
 likely genuinely require GPU utilization for a reasonable runtime the hardware surfaces become more
 relevant and important to secure."* And on the failure that follows: *"raise your standards to
 excellence and be more genuinely careful with your implementation."*
-**Plan:** [`blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md`](../../blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md),
-all eight stations executed. It sits under [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md).
+**Plan:** [`blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md`](../../archive/plans/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md),
+all eight stations executed. It sits under [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md).
 
 ---
 
@@ -327,7 +327,7 @@ The honest return was **`Open: exceeded this apparatus-time aperture; work unkno
 law returns from **counted** coordinates rather than from elapsed seconds — `16.25×` per doubling of
 the extent, so `k^4.03`, with six of eight coordinates predicted **exactly** and the two width
 coordinates refuted in opposite directions. Deposited
-[`blueprint/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md`](../../blueprint/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md).
+[`blueprint/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md`](../../archive/plans/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md).
 
 **The general form, which survives and is the thing to carry forward.** Exactness is not free, and its
 cost laws are superlinear where a float's are not: `Rat` elimination is `k⁴b`, a `BigInt` contraction

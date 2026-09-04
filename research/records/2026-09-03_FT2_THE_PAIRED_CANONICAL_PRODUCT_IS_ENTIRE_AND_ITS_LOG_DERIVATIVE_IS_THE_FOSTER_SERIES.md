@@ -4,7 +4,7 @@
 **Truth status:** `proved-derived`  
 **Evidence:** `formal-checked`, `source-inspected`  
 **Campaign:** FT2 under
-[`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](../../blueprint/THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md).  
+[`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](../../archive/plans/THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md).  
 **Owner:** `RH/FosterProduct.lean` under `soma/formal/elementary-holonics/ElementaryHolonics/`,
 registered in the root umbrella.  
 **Scope:** schedules nothing beyond the directed order; the engine frontier is unchanged.

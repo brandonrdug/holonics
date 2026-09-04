@@ -6,13 +6,13 @@
 //! ```
 //!
 //! **Station six of
-//! [`blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md`](../../../blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md).**
+//! [`archive/plans/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md`](../../../archive/plans/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md).**
 //!
 //! # What is asked, and why it is four classes rather than one hand
 //!
 //! An attention score is `⟨q, k⟩` — the **aim** of the arrow between two directions, and one third
 //! of it. `crates/holonic-engine/src/clifford.rs` carries the whole arrow at `d` dimensions, and
-//! `soma/body/src/arrow.rs:159-161` records why the census must read the **pair** rather than the
+//! `crates/holonic-body/src/arrow.rs:159-161` records why the census must read the **pair** rather than the
 //! square:
 //!
 //! > *"squaring sends the whole wall to zero along with the origin, so `Re(z²) = 0` cannot tell
@@ -105,7 +105,7 @@ const PROJECTED_TOKENS: usize = 2048;
 /// arbitrary-precision, so this is declared and **the excluded population is reported**.
 const CENSUS_TOKENS: usize = 128;
 
-/// The causal class of a relating, lifted from `soma/body/src/arrow.rs:69-75`.
+/// The causal class of a relating, lifted from `crates/holonic-body/src/arrow.rs:69-75`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 enum Causal {
     TransportDominant,

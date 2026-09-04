@@ -6,7 +6,7 @@
 //! ```
 //!
 //! **Station four of
-//! [`blueprint/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md`](../../../blueprint/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md).**
+//! [`archive/plans/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md`](../../../archive/plans/THE_WORK_VECTOR_THE_HANDS_POLARITY_AND_THE_COMMITTED_STEP.md).**
 //!
 //! ## What was already standing, and what was not
 //!

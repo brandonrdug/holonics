@@ -6,7 +6,7 @@ READ-ONLY extraction from `/home/b/Workspaces/holonics`. Nothing modified, built
 
 # PART 1 — DOCTRINE
 
-## 1.1 `blueprint/THE_PRESENTATION_ORGAN.md`
+## 1.1 `archive/plans/THE_PRESENTATION_ORGAN.md`
 
 `:7-9` — "**Truth status:** `project-postulate`. **Provenance:** Brandon, 2026-08-08 — *'I want to effectively establish our workbench for all of the same advanced mathematics graphical rendering features, but adapted rigorously to holonics.'*" `:5` — "**It schedules nothing.**"
 
@@ -54,7 +54,7 @@ READ-ONLY extraction from `/home/b/Workspaces/holonics`. Nothing modified, built
 
 `:257-263`: "It does not claim a general plotting system… an organ used past its declared aperture is a defect even when it appears to return. — **It does not make the display an input. Nothing rendered re-enters the construction.** — It does not retire the three example SVG writers by deleting them silently; superseded implementation is deleted only after its replacement's evidence is committed."
 
-## 1.2 `canon/TABLET_THE_MANIFOLD.md` §21
+## 1.2 `docs/canon/TABLET_THE_MANIFOLD.md` §21
 
 `:336` `## 21. Reflection is the mechanism, and the crossing bears the load`
 
@@ -82,7 +82,7 @@ READ-ONLY extraction from `/home/b/Workspaces/holonics`. Nothing modified, built
 
 `:466-475`: a window enumerates a neighbourhood "**shell by shell** — `−1, +1, −2, +2, …` — in order of `|offset|`. That is a discrete causal diamond… **The horizon is that diamond's radius**… the window at `h` is a **prefix** of the window at `h+1`, so refinement is monotone." `:477`: "### The horizon is read off the material — and a cone propagates, it is not searched".
 
-## 1.4 `canon/TABLET_THE_CHART.md`
+## 1.4 `docs/canon/TABLET_THE_CHART.md`
 
 `:7`: "A coordinate system is a receiver and the Jacobian is the transport; a radical is a chart that forgets a winding; warp and weft are a reading in a frame."
 
@@ -141,30 +141,30 @@ caused arithmetic incidence -> exact modal wave current and physical successor
 
 **The gauge law.** `2026-07-13_COLOR_IS_A_RECEIVER_FACE_THE_HIGHLIGHT_IS_THE_RELATION.md:13` "Color is a further receiver-relative equivalence formed through the delivered spectrum, contemporary organ, gaze, history, surrounding field, and receiving frame."; `:27` "Color is consequently not wavelength alone but light ⊕ transducer ⊕ place ⊕ traversal ⊕ history."; `:53` "A global change of `G` changes only the human colors; it cannot alter `T`."; `:57-58` "**Raw rows and a text equivalent remain beside every visual mark. Color is never the only carrier of a distinction.**"
 
-`canon/TABLET_THE_REALIZER.md:202-206`: "**Colour is derived from the receiver's own state, not assigned.** `examples/desktop_receiver.rs:49`: each embodied receiver's exact coordinate, momentum and net impulse form its contemporary phase triple; the monitor membrane subtracts the least component — which retains signed phase orientation — and takes exact barycentric ratios into its local RGB basis. RGB is the outer transducer's basis, not a colour ontology."
+`docs/canon/TABLET_THE_REALIZER.md:202-206`: "**Colour is derived from the receiver's own state, not assigned.** `examples/desktop_receiver.rs:49`: each embodied receiver's exact coordinate, momentum and net impulse form its contemporary phase triple; the monitor membrane subtracts the least component — which retains signed phase orientation — and takes exact barycentric ratios into its local RGB basis. RGB is the outer transducer's basis, not a colour ontology."
 
-`2026-07-28_…OBSTRUCTION….md:161-162`: "**A hard-coded edge color is not a phase law.**" `receiver_phase_atlas.rs:28-33`: a fixed `CHANNEL_COUNT = 3` "made *one receiver's* channel population — RGB — a property of the law that reads receivers", against `canon/THE_AUTHORED_LEVEL.md` §1 — *"A level is either read off the material or declared by the caller. It is never authored inside the organ."* `field_atlas.rs:204-205`: "RGB channels are receiver coordinates, not universal wavelengths."
+`2026-07-28_…OBSTRUCTION….md:161-162`: "**A hard-coded edge color is not a phase law.**" `receiver_phase_atlas.rs:28-33`: a fixed `CHANNEL_COUNT = 3` "made *one receiver's* channel population — RGB — a property of the law that reads receivers", against `docs/canon/THE_AUTHORED_LEVEL.md` §1 — *"A level is either read off the material or declared by the caller. It is never authored inside the organ."* `field_atlas.rs:204-205`: "RGB channels are receiver coordinates, not universal wavelengths."
 
 **The Four Colour theorem.** `2026-07-25_THE_SOURCE_LOOP_IS_TOO_COARSE_THE_RECEIVER_LOOP_IS_NOT_THE_SOURCE.md:7` banner: "**NO FOUR-COLOR GOVERNOR**". `:12`:
 > The work did not seek a Four Color Theorem application. That theorem supplied one useful connection among planar faces, triangular duals, and finite junction states, but it neither scheduled nor governed the construction.
 
 `:75-78` — what did the work is topology, not colouring: "The direct receiver has no crossing and a four-face dual. The precessed receiver adds one apparent `AC/BD` crossing and presents a five-face dual with a different Ihara polynomial and different primitive-loop population. No source incidence changed." `:164-165`: "No color assignment, palette optimizer, absolute camera, floating-point projection…".
 
-**Measured absences.** Zero `Kempe` and zero `Heawood` hits in `canon/`, `blueprint/`, `research/records/`, `research/equation-atlas/`. Zero four-colour / chromatic-number / face-colouring code in `crates/` or `soma/`. **No chromatic-number law and no four-colour law for figures exists anywhere.** The only "emergent color" occurrence, `2026-07-30…md:318`, names the `dimensional_wave` transduction. `2026-08-20_THE_SWING_IS_HARMONIC_CONJUGATION….md:191-200` contributes only "**Achromaticity means the transport carries no spectral remainder: it is a rebase.**"; its "four" hits are the cross-ratio's four participants and `Λ/2Λ`.
+**Measured absences.** Zero `Kempe` and zero `Heawood` hits in `docs/canon/`, `blueprint/`, `research/records/`, `research/equation-atlas/`. Zero four-colour / chromatic-number / face-colouring code in `crates/` or `soma/`. **No chromatic-number law and no four-colour law for figures exists anywhere.** The only "emergent color" occurrence, `2026-07-30…md:318`, names the `dimensional_wave` transduction. `2026-08-20_THE_SWING_IS_HARMONIC_CONJUGATION….md:191-200` contributes only "**Achromaticity means the transport carries no spectral remainder: it is a rebase.**"; its "four" hits are the cross-ratio's four participants and `Λ/2Λ`.
 
 ## 1.6 Lines, thickness, arrows, traces, occlusion
 
-**Measured empties.** No law on line thickness, stroke width, hairline, dash, hidden-line removal, z-order, painter's algorithm, draw order, or arrowheads exists in `canon/`, `blueprint/`, or `research/records/`. Every `arrow` hit is a category-theoretic morphism or `soma/body/src/arrow.rs`; every `stroke` is an engine or lightning return stroke; the only `thickness` is physical.
+**Measured empties.** No law on line thickness, stroke width, hairline, dash, hidden-line removal, z-order, painter's algorithm, draw order, or arrowheads exists in `docs/canon/`, `blueprint/`, or `research/records/`. Every `arrow` hit is a category-theoretic morphism or `crates/holonic-body/src/arrow.rs`; every `stroke` is an engine or lightning return stroke; the only `thickness` is physical.
 
-`canon/TABLET_THE_REALIZER.md:198-201`: "**A raster member is not a point sample.** `presentation.rs`: *'A matrix member receives every primitive whose support intersects its finite area; its center is never used as a surrogate ray.'* Point-sampling a pixel is the same defect as sampling a curve, one dimension down."
+`docs/canon/TABLET_THE_REALIZER.md:198-201`: "**A raster member is not a point sample.** `presentation.rs`: *'A matrix member receives every primitive whose support intersects its finite area; its center is never used as a surrogate ray.'* Point-sampling a pixel is the same defect as sampling a curve, one dimension down."
 
 `presentation.rs:703-707` — the one stroke clause in the body: "Area fractions are used only for two-dimensional triangle support. A thread carries its exact source-parameter interval instead: **a line has no area until a downstream display gauge declares a stroke law.** Conics are currently support-certified but retain `SupportOnly` until an exact arc measure is admitted."
 
-`canon/04_GEOMETRY_NAVIGATION_AND_WEAVE.md:47-59`: "A shadow is a receiver relation among source geometry, occluder, propagation law, and receiving surface. It is neither a detached property of the source nor a second source object. A projection can identify many distinct source fibers; **the unresolved preimage must remain open when a later receiver can distinguish it.** Perspective derivation therefore retains: … occlusion/intersection event; … chart transition/projective depth; and unresolved source fibers behind equal projected faces."
+`docs/canon/04_GEOMETRY_NAVIGATION_AND_WEAVE.md:47-59`: "A shadow is a receiver relation among source geometry, occluder, propagation law, and receiving surface. It is neither a detached property of the source nor a second source object. A projection can identify many distinct source fibers; **the unresolved preimage must remain open when a later receiver can distinguish it.** Perspective derivation therefore retains: … occlusion/intersection event; … chart transition/projective depth; and unresolved source fibers behind equal projected faces."
 
 `2026-07-26_THE_LOCAL_FIBERS_RECEIVE_THE_CAUSED_WORLD….md:274-277`: "Material, lighting, occlusion, color, and labels are world-side transducers from the complete crossing fiber. A transducer may select a visible surface, integrate several layers, or display all crossings. **Its decision remains inspectable and cannot delete the underlying geometry receipt.**"
 
-`canon/TABLET_THE_TURN.md:494-498`: "`receiver_topology.rs:65` returns `DiagramNodeKind::ApparentCrossing { under, over }`… `decorated_path.rs:41` carries `CrossingRole::{Over, Under}` with a `crossing_orientation: i8`. … `EqualDepthCrossing` and `MultipleCrossingAtOnePoint` are refused by name rather than perturbed away. **That is a signed knot diagram in all but the word.**"
+`docs/canon/TABLET_THE_TURN.md:494-498`: "`receiver_topology.rs:65` returns `DiagramNodeKind::ApparentCrossing { under, over }`… `decorated_path.rs:41` carries `CrossingRole::{Over, Under}` with a `crossing_orientation: i8`. … `EqualDepthCrossing` and `MultipleCrossingAtOnePoint` are refused by name rather than perturbed away. **That is a signed knot diagram in all but the word.**"
 
 `2026-07-19_THE_LIVE_WEAVE….md:470`: "**silhouette does not determine lineage;**" `2026-08-21_…REFUSED_THE_WHITE_BACKGROUND….md:106-110` — the one background law: declaring white when "the diagram's actual background is `#FBFAF5`" was refused, corrected "to read the exact border sample at `(0,0)`".
 

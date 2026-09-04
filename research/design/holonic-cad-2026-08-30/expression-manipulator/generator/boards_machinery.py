@@ -86,7 +86,7 @@ def mach_solve():
                   box("carried", "DOF is a first-class number on every lattice group; a free site is drawn amber") + box("hyp", grade("interpretation") + " this pipeline retypes SolveSpace; nothing here is implemented"), "flex: 0 0 360px")
     body = row([left, right], "flex: 1 1 auto; min-height: 0")
     return artboard("Constraints → DOF", "declared requests expand to entities and params; constraints are equation generators; the solver is type-blind and reports four states plus DOF", 1400, 820, body,
-                    "sources: solvespace 3297d9a (src/sketch.h, generate.cpp, system.cpp) · canon/THE_DIALECT.md:89")
+                    "sources: solvespace 3297d9a (src/sketch.h, generate.cpp, system.cpp) · docs/canon/THE_DIALECT.md:89")
 
 @board("MachIdentity.dc.html", "Machinery 7 — identity, history and the file", 1400, 820, "page-machinery")
 def mach_identity():
@@ -97,7 +97,7 @@ def mach_identity():
         ["SolveSpace", "lineage handles; persisted remap for derived copies", "100-deep snapshot ring", "derived ids stable across regeneration via a persisted remap"],
         ["KiCad (master)", "KIID uuid per item; sheet-path instances", "COMMIT undo", "one uuid per occurrence; per-path instance identity for reused membranes"],
         ["FreeCAD (main 3b2c969)", "Name vs Label; topological naming problem", "transactions", "element names must survive recompute — the hard problem, owned explicitly"],
-    ]) + note("the canon rule under all of these: unqualified equality is occurrence identity; every other equality is typed (canon/08:53). Equal bytes, hashes, coordinates or text never imply the same occurrence (canon/00:9)."), "flex: 1 1 auto")
+    ]) + note("the canon rule under all of these: unqualified equality is occurrence identity; every other equality is typed (docs/canon/08:53). Equal bytes, hashes, coordinates or text never imply the same occurrence (docs/canon/00:9)."), "flex: 1 1 auto")
     right = panel("the file · holonic-json-v1 as the primary face", code(
 """{ "document": { "owner": "one ecology", "grade": "…", "lineage": [...] },
   "occurrences": [ { "id": {"born": 4, "rank": 1}, "kind": "site", "chart": "z4", "coords": ["1","1","1","0"], "grade": "definition" } ],
@@ -109,7 +109,7 @@ def mach_identity():
         box("obstructed", grade("open") + " holonic-json-v1 has no object schema in canon or blueprint; the sole normative mention is AGENTS.md:97"), "flex: 0 0 640px")
     body = row([left, right], "flex: 1 1 auto; min-height: 0")
     return artboard("Identity, history and the file", "occurrence identity is owner-minted; every reference's id scheme is a lesson; the file is a face", 1400, 820, body,
-                    "sources: canon/08_CORE_MATHEMATICAL_INSTRUMENTS.md:53 · 00_PURE_HOLONICS.md:9 · AGENTS.md:97 · reference reports")
+                    "sources: docs/canon/08_CORE_MATHEMATICAL_INSTRUMENTS.md:53 · 00_PURE_HOLONICS.md:9 · AGENTS.md:97 · reference reports")
 
 @board("MachNets.dc.html", "Machinery 3 — schematic → nets: the connection graph", 1400, 820, "page-machinery")
 def mach_nets():

@@ -1,7 +1,7 @@
 //! **The exact bracket becomes a face that crosses a horizon, on real map material.**
 //!
 //! Station three of
-//! `blueprint/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`. The chain that
+//! `archive/plans/THE_MAP_IS_MATERIAL_THE_HEAD_IS_A_CONTACT_AND_THE_INSTANCE_RESUMES.md`. The chain that
 //! blueprint carries listed steps four and five — `cos² = <a|b>²/(<a|a><b|b>)` with the powers of
 //! two cancelling, and ordering without division — as **IN NUMPY ONLY**. This driver takes both into
 //! the body, through the library intake rather than a sixth private parser.

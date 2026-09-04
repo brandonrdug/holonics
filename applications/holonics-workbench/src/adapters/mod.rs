@@ -1,4 +1,5 @@
 pub mod engine;
+pub mod hna;
 pub mod eros;
 pub mod soulkiller;
 pub mod workspace;

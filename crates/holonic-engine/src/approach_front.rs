@@ -9,7 +9,7 @@
 //! > bottleneck; this is like the Doppler effect because we are talking about literally propagating
 //! > signals."*
 //!
-//! The owning theory is `canon/THE_TRAFFIC_SYSTEM.md` §3b. Two clauses of it are built here.
+//! The owning theory is `docs/canon/THE_TRAFFIC_SYSTEM.md` §3b. Two clauses of it are built here.
 //!
 //! # `deferred_arrivals` is not an overflow bucket
 //!
@@ -197,7 +197,7 @@ impl ApproachReading {
 
 /// Whether two sites that both stand in a radiation are actually **coupled**, or merely agree.
 ///
-/// `canon/THE_TRAFFIC_SYSTEM.md` §3b: far things relate through two channels and only one of them is
+/// `docs/canon/THE_TRAFFIC_SYSTEM.md` §3b: far things relate through two channels and only one of them is
 /// an interaction. **Concurred invariants** — atomic clocks, entanglement — agree with no signal
 /// passing, because each is locked to the same standing structure. **Propagated coupling** is
 /// influence crossing a medium through a chain of local contacts, with delay.

@@ -4,7 +4,7 @@
 **Truth status:** `proved-derived`  
 **Evidence:** `formal-checked`, `source-inspected`  
 **Campaign:** FT4 (iii)–(v) under
-[`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](../../blueprint/THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md).  
+[`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](../../archive/plans/THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md).  
 **Owners:** `RH/KernelFlow.lean`, `RH/HurwitzLine.lean`, `RH/PolyaLine.lean`,
 `RH/LineApproximation.lean`, `RH/EulerIterates.lean`, `RH/RealZeroTimes.lean`,
 `RH/LinePreservation.lean`, all under `soma/formal/elementary-holonics/ElementaryHolonics/` and

@@ -38,7 +38,7 @@ use holonic_engine::lean_development::{
 };
 use holonic_engine::rebase_invariants::PivotRule;
 
-const PROJECT: &str = "soma/formal/rh-source-transport";
+const PROJECT: &str = "formal/rh-source-transport";
 const CORPUS: &str = "SomaRHSourceTransport/FiniteTransport.lean";
 
 /// The theorem the kernel admitted, and the node its proof applied. Both are returns of

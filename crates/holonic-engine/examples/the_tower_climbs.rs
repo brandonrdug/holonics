@@ -495,7 +495,7 @@ fn main() {
     println!("  same material: 5 distinct hinge turns over 11 hinges against 1 over 25 triangles,");
     println!("  generators {{3, 7, 1463}} reached, and 6 of 11 hinges moving under a non-similar");
     println!("  metric while 0 move under a similarity.");
-    println!("  See canon/TABLET_THE_TURN.md §11.5 and the 2026-08-10 manifold record.");
+    println!("  See docs/canon/TABLET_THE_TURN.md §11.5 and the 2026-08-10 manifold record.");
 
     open_falsifiers.push((
         "the climb carries the corners' generators upward".to_owned(),

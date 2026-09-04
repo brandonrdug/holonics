@@ -4,7 +4,7 @@
 **Truth status:** `proved-derived` for the returned theorems; `open` for the named ports.  
 **Evidence:** `formal-checked`, `source-inspected`  
 **Campaign:** FT6 under
-[`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](../../blueprint/THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md).  
+[`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](../../archive/plans/THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md).  
 **Owner:** `RH/ThresholdReturn.lean` under `soma/formal/elementary-holonics/ElementaryHolonics/`,
 registered in the root umbrella.  
 **Scope:** the phase's return under the contract's second clause: the first exact missing

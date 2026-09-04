@@ -22,7 +22,7 @@
 //!
 //! ## Endpoint equality is NOT the certificate
 //!
-//! `canon/01_CAUSAL_CALCULUS.md:85-89` and
+//! `docs/canon/01_CAUSAL_CALCULUS.md:85-89` and
 //! `research/records/2026-08-01_THE_HARDWARE_IS_A_RECEIVER_COVER_THE_CARD_MUST_CARRY_THE_CURRENT.md`
 //! agree on the point and the second is RATIFIED: two events belong to the independence relation
 //! only when their complete exact consequences commute, *"including lineage, radiation, obstruction,
@@ -33,7 +33,7 @@
 //! [`InterchangeCertificate::endpoint_only_verdict`] therefore computes what such a comparator
 //! *would* have said and keeps it beside the real verdict, so the disagreement is legible rather
 //! than argued. [`InterchangeCertificate::lineage_changed_the_verdict`] is true exactly when the two
-//! differ, and it is true on `soma/formal`.
+//! differ, and it is true on `formal`.
 //!
 //! ## Which coordinates are compared, and which are refused as frames
 //!
@@ -50,7 +50,7 @@
 //!
 //! ## The three-or-more case
 //!
-//! `canon/01_CAUSAL_CALCULUS.md:88`: *"For three or more events, adjacent interchange must satisfy
+//! `docs/canon/01_CAUSAL_CALCULUS.md:88`: *"For three or more events, adjacent interchange must satisfy
 //! the relevant braid/coherence diagrams; pairwise equal endpoints alone are insufficient."*
 //! [`certify_pair`] returns [`Coherence::PairwiseOnly`] and names what a triple would require; it
 //! does not claim a triple. [`certify_set`] discharges the obligation by **rebasing every
@@ -73,7 +73,7 @@ use crate::receiver_exact_compression::{
 
 /// One staged occurrence, named by the junction it founds a receiver at.
 ///
-/// The **footprint** is the pair it must separate. `canon/01_CAUSAL_CALCULUS.md:85`: disjoint
+/// The **footprint** is the pair it must separate. `docs/canon/01_CAUSAL_CALCULUS.md:85`: disjoint
 /// read/write support is sufficient *"only when no hidden allocator, lineage mint, port, resource
 /// state, or other owner is shared"* — and here the mint, the panel, and the junction population are
 /// all shared, so disjointness of the footprints proves nothing on its own and this type carries no
@@ -275,7 +275,7 @@ pub enum Coherence {
     /// See [`Coherence::TRIPLE_REQUIRES`].
     PairwiseOnly,
     /// Every permutation of the declared occurrence set was rebased and compared — strictly stronger
-    /// than pairwise, and what `canon/01_CAUSAL_CALCULUS.md:88` asks for on a declared set.
+    /// than pairwise, and what `docs/canon/01_CAUSAL_CALCULUS.md:88` asks for on a declared set.
     AllOrders {
         occurrences: usize,
         orders_compared: usize,
@@ -296,7 +296,7 @@ pub enum Coherence {
 impl Coherence {
     /// What a triple would require, named rather than assumed.
     pub const TRIPLE_REQUIRES: &'static str = "\
-pairwise interchange does not compose. `canon/01_CAUSAL_CALCULUS.md:88`: for three or more events \
+pairwise interchange does not compose. `docs/canon/01_CAUSAL_CALCULUS.md:88`: for three or more events \
 adjacent interchange must satisfy the relevant braid/coherence diagrams, and pairwise equal \
 endpoints alone are insufficient. On a declared set {a,b,c} that is: all 6 orders rebase lawfully, \
 all 6 reach one endpoint, one equivalence, one content-keyed delta and one capacity vector -- and \
@@ -904,7 +904,7 @@ fn separating_pair(
 ///
 /// Both fixtures live outside `#[cfg(test)]` on purpose: the unit tests and
 /// `examples/the_front_is_ordered_until_a_certificate_unorders_it.rs` must run the **same** material,
-/// or the two reconciliations are of two different things — `canon/THE_CONTAMINANT_PROTOCOL.md` §2.3.
+/// or the two reconciliations are of two different things — `docs/canon/THE_CONTAMINANT_PROTOCOL.md` §2.3.
 /// Neither is a production organ; each is a declared system whose junctions are known by
 /// construction to be independent, or known by construction not to be.
 ///
@@ -967,7 +967,7 @@ pub mod declared_material {
     /// The breadth-first search for `(0,2)`'s distinguishing word walks straight through `(3,4)`, so
     /// once that axis stands the pair is **witnessed** and `(0,2)` is no longer a junction.
     ///
-    /// This is `canon/01_CAUSAL_CALCULUS.md:85` in one fixture: the two footprints share no item,
+    /// This is `docs/canon/01_CAUSAL_CALCULUS.md:85` in one fixture: the two footprints share no item,
     /// and disjoint support proves nothing because the panel, the junction population and the mint
     /// are shared.
     ///
@@ -1066,7 +1066,7 @@ pub mod declared_material {
     /// defect `2026-08-02_THE_CPU_FOREMAN...` convicts, reproduced on eight items so it does not
     /// depend on the filesystem.
     ///
-    /// This is the same shape `soma/formal` returns — there the divergence is
+    /// This is the same shape `formal` returns — there the divergence is
     /// `Compression|Programme` against `Compression|Route`.
     pub struct SameEndpointDifferentPath;
 
@@ -1692,7 +1692,7 @@ fn ranges_meet(a: (u64, u64), b: (u64, u64)) -> Option<u64> {
 }
 
 /// **Certify a front from its members' footprints, before any launch.** The law it applies is
-/// `canon/01_CAUSAL_CALCULUS.md:85`: two events belong to the independence relation when their
+/// `docs/canon/01_CAUSAL_CALCULUS.md:85`: two events belong to the independence relation when their
 /// complete exact consequences commute, for which disjoint read/write support suffices *"only when
 /// no hidden allocator, lineage mint, port, resource state, or other owner is shared."* The caller
 /// asserts the second half by construction — every member owns its own census slot, every

@@ -37,7 +37,7 @@
 //! ## The material, and it is real on both sides
 //!
 //! ```text
-//!   ATMOSPHERE   canon/*.md            real prose. What recurs across two documents is committed.
+//!   ATMOSPHERE   docs/canon/*.md            real prose. What recurs across two documents is committed.
 //!   POPULATION   standing/output/**/*.lean, every distinct word the ground exhibits.
 //! ```
 //!
@@ -804,7 +804,7 @@ fn main() {
     println!("      returns something neither arc carries needs a cycle longer than two.");
 
     rule("BOUNDS");
-    println!("  - One frame of material. Every figure is a reading of `canon/*.md` against the");
+    println!("  - One frame of material. Every figure is a reading of `docs/canon/*.md` against the");
     println!("    words `standing/output/**/*.lean` exhibits, and moves when either does.");
     println!("  - No timing is taken and none would be falsifiable if it were.");
     println!("  - Nothing here is submitted to a kernel and no formal claim is made.");

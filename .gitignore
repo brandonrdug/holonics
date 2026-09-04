@@ -1,47 +1,15 @@
-# A driver writes its returns under `/output/`. That directory is ignored, and an ignored
-# directory is exactly what permanently lost the laboratory's tiger phase-atlas figures and
-# `semantics_invariant_under_exact_chart.lean` — only a name, a proof term and a SHA-256 survive,
-# at no commit in either repository.
-#
-# So what carries standing does not stay here. It is DEPOSITED into `/standing/`, which is tracked,
-# bound to its content hash AND to the closure hash of the founding that produced it. See
-# `standing/README.md` and `soma/tools/standing-deposit/`. A return that is only ever written to
-# `/output/` is a return the repository cannot certify and can lose.
+# Reproducible Cargo/Lake output and private runtime material.
 /target/
-/output/
-/runs/
-/data/
-/tmp/
-*.log
-
-# Lake writes every generated artifact under a project's `.lake/` directory: compiled `.olean`
-# and `.ilean` output, the C intermediate, and the third-party package cache (Mathlib alone is
-# 9.2-9.6 GiB, see archive/cpp-engine/provenance/LABORATORY_ONLY.md). None of it is source and
-# none of it is tracked.
-#
-# Lean PROJECT SOURCES are not under `.lake/` and are not ignored: `soma/formal/*/lakefile.toml`,
-# `soma/formal/*/lean-toolchain`, `soma/formal/*/lake-manifest.json`, and every `.lean` file
-# beside them are tracked. Kernel scratch written by a driver belongs under `/output/`, which is
-# ignored above; it must not be written under `.lake/`, where a tracked file would match this
-# pattern and the repository's only formal artifacts would be generated fixtures.
+/.local/
 **/.lake/
-
-# Python bytecode from `tools/`. The tools are sources; their caches are not.
 __pycache__/
 *.pyc
+*.log
 
-# A driver return that landed at the root before its default path was corrected (2026-08-08).
-# Returns belong under `/output/`, where the manifest can certify them.
-/holonic-eta-ratio-atlas.ron
-
-# Third-party transcripts held for reference. `reference/**` asserts nothing (THE_DOCUMENT_LAW §1),
-# and these are not this project's material to redistribute: they are working sources, cited in short
-# attributed fragments by the records that use them and never carried in the tree.
-reference/external/3b1b-compression-*
-
-# Agent worktrees. The harness mounts a full checkout per isolated agent under `.claude/worktrees/`,
-# each with its own `target/`. Measured 2026-08-13: four abandoned worktrees from 08-10 and 08-11
-# holding 223 GB inside the repository, untracked and NOT ignored — one `git add -A` from being
-# staged. They are scratch: what an agent returns is its report, and any edit it made belongs in
-# the main tree or nowhere. Remove them with `git worktree remove`, never by deleting the directory.
+# Local agent/runtime configuration and isolated harness worktrees.
 .claude/
+.codex/
+.agents/
+
+# Third-party working transcripts remain private, even inside frozen reference material.
+archive/reference/external/3b1b-compression-*

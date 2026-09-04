@@ -3,7 +3,7 @@
 //! ```text
 //! cargo run --release --example the_statement_is_founded -- \
 //!     standing/output \
-//!     reference/holobrochos-a07ff376/src/soma
+//!     archive/reference/holobrochos-a07ff376/src/soma
 //! ```
 //!
 //! ## The question
@@ -361,7 +361,7 @@ fn main() {
         arguments
             .get(1)
             .cloned()
-            .unwrap_or_else(|| "reference/holobrochos-a07ff376/src/soma".to_owned()),
+            .unwrap_or_else(|| "archive/reference/holobrochos-a07ff376/src/soma".to_owned()),
     );
 
     let deposit = read_deposit(&deposit_root);

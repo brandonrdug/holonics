@@ -34,7 +34,7 @@ $$\Phi_i = \iint_{S_i} \mathbf{J} \cdot d\mathbf{S}$$
 By Gauss's Divergence Theorem:
 $$\iint_{\partial V_i} \mathbf{J} \cdot d\mathbf{S} = \iiint_{V_i} (\nabla \cdot \mathbf{J}) \, dV$$
 
-In our Lean foundation [`NavierStokesCellCurrentLaw.lean:45–52`](../soma/formal/elementary-holonics/ElementaryHolonics/), this relation is formally proved at the unit cell level:
+In our Lean foundation [`NavierStokesCellCurrentLaw.lean:45–52`](../../formal/elementary-holonics/ElementaryHolonics), this relation is formally proved at the unit cell level:
 - `integral_divergence_unitCube_eq_faceBalance`: The integrated divergence over the cell equals the face balance (outgoing minus incoming flux across all six boundary faces).
 - `faceBalance_eq_zero_of_divergenceFree`: A divergence-free field ($\nabla \cdot \mathbf{v} = 0$) has exact zero face balance.
 - **Physical consequence:** Incompressibility is identical to zero storage on the cell—Kirchhoff's current law.
@@ -47,7 +47,7 @@ is the **constitutive flux crossing the boundary channel from port $j$ to port $
 
 The total current arriving at site $i$ before local reaction is:
 $$\text{aggregateCurrent}(i) = \sum_{j} \text{localCurrent}(j \to i) = \sum_{j} W_{ij} x_j$$
-which is [`HolonicNeuralEcology.lean:47–50`](../soma/formal/elementary-holonics/ElementaryHolonics/Computation/HolonicNeuralEcology.lean#L47-L50):
+which is [`HolonicNeuralEcology.lean:47–50`](../../formal/elementary-holonics/ElementaryHolonics/Computation/HolonicNeuralEcology.lean#L47-L50):
 ```lean
 def aggregateCurrent (morphology : Morphology) (generator : Generator)
     (state : Site → Carrier) (target : Site) : Carrier :=
@@ -57,7 +57,7 @@ def aggregateCurrent (morphology : Morphology) (generator : Generator)
 ### 1.3 Eddy currents, vorticity, and the commutator
 
 [proved-derived; formal-checked] In fluid dynamics, when velocity field lines shear or curve, vorticity $\boldsymbol{\omega} = \nabla \times \mathbf{v}$ creates circulating eddy currents.
-In [`2026-09-02_THE_ABELIAN_REDUCTION_THE_YANG_MILLS_FLOW_IS_THE_HEAT_FLOW_OF_THE_CURVATURE_AND_THE_COMMUTATOR_IS_THE_GAUGE_TWIN_OF_VORTEX_STRETCHING.md`](2026-09-02_THE_ABELIAN_REDUCTION_THE_YANG_MILLS_FLOW_IS_THE_HEAT_FLOW_OF_THE_CURVATURE_AND_THE_COMMUTATOR_IS_THE_GAUGE_TWIN_OF_VORTEX_STRETCHING.md) and [`HolonicConnectionCurvature.lean`](../soma/formal/elementary-holonics/ElementaryHolonics/), we proved:
+In [`2026-09-02_THE_ABELIAN_REDUCTION_THE_YANG_MILLS_FLOW_IS_THE_HEAT_FLOW_OF_THE_CURVATURE_AND_THE_COMMUTATOR_IS_THE_GAUGE_TWIN_OF_VORTEX_STRETCHING.md`](2026-09-02_THE_ABELIAN_REDUCTION_THE_YANG_MILLS_FLOW_IS_THE_HEAT_FLOW_OF_THE_CURVATURE_AND_THE_COMMUTATOR_IS_THE_GAUGE_TWIN_OF_VORTEX_STRETCHING.md) and [`HolonicConnectionCurvature.lean`](../../formal/elementary-holonics/ElementaryHolonics), we proved:
 $$F_{ij} = \partial_i A_j - \partial_j A_i + [A_i, A_j]$$
 where the ring commutator $[A_i, A_j]$ is the gauge twin of fluid vortex stretching $(\boldsymbol{\omega} \cdot \nabla)\mathbf{v}$.
 
@@ -89,15 +89,15 @@ flowchart LR
 
 ### 2.2 Why "Scaffold" belongs to the transitional phase
 
-[established-bounded] In [`Computation/NativeTransportScaffold.lean`](../soma/formal/elementary-holonics/ElementaryHolonics/Computation/NativeTransportScaffold.lean) and `crates/holonic-engine/src/native_spool/scaffold.rs`:
+[established-bounded] In [`Computation/NativeTransportScaffold.lean`](../../formal/elementary-holonics/ElementaryHolonics/Computation/NativeTransportScaffold.lean) and `crates/holonic-engine/src/native_spool/scaffold.rs`:
 - A scaffold packages `profiledHolons`, `windings`, `compositions`, and `openObligations`.
 - In architectural construction and optics, **scaffolding is temporary staging**: it holds up the arch until the keystone is placed, or acts as an exterior lensing frame that guides initial excitation.
-- In `SCF5` ([`CONSTRUCTION_STATE.md:223–228`](../CONSTRUCTION_STATE.md#L223-L228)), `ScaffoldReleasePassage` proves that once native hexis is cultivated, the inherited scaffolding is **withdrawn**, leaving behind only native cultivated morphology.
+- In `SCF5` ([`CONSTRUCTION_STATE.md:223–228`](../../CONSTRUCTION_STATE.md#L223-L228)), `ScaffoldReleasePassage` proves that once native hexis is cultivated, the inherited scaffolding is **withdrawn**, leaving behind only native cultivated morphology.
 - Therefore, calling the permanent, cultivated body a "scaffold" is a category mistake: the scaffold is the temporary armature; the cultivated body is what survives.
 
 ### 2.3 `MorphologyPackage` vs. `MorphologyHolons`
 
-[interpretation] The term `MorphologyPackage` in [`soma/life/src/native_intelligence/morphology_package.rs`](../soma/life/src/native_intelligence/morphology_package.rs) was adopted during the AAC/VWS campaigns as a container noun:
+[interpretation] The term `MorphologyPackage` in [`soma/life/src/native_intelligence/morphology_package.rs`](../../crates/holonic-life/src/native_intelligence/morphology_package.rs) was adopted during the AAC/VWS campaigns as a container noun:
 - `manifest`: metadata, schema, lineage;
 - `reconstruction`: departed withdrawals and fibres;
 - `evaluation`: benchmark receipts;
@@ -135,6 +135,6 @@ To reconcile classical ML exports with native interior purity:
 ## 4. Verification and Non-Contamination Safeguards
 
 [project-postulate] In making this semantic and architectural alignment, the following boundaries must remain absolute:
-1. **No Math/Physics Counterfeit:** Calling a weight matrix a "flux cross-section" must remain grounded in exact Kirchhoff face balance ([`NavierStokesCellCurrentLaw.lean`](../soma/formal/elementary-holonics/ElementaryHolonics/)) and discrete port transport. It must never be used as a decorative metaphor to sneak floating-point matrix multiplications back into the native interior.
+1. **No Math/Physics Counterfeit:** Calling a weight matrix a "flux cross-section" must remain grounded in exact Kirchhoff face balance ([`NavierStokesCellCurrentLaw.lean`](../../formal/elementary-holonics/ElementaryHolonics)) and discrete port transport. It must never be used as a decorative metaphor to sneak floating-point matrix multiplications back into the native interior.
 2. **Purity of the Circulation ABI:** `MorphologyTensors` exists strictly outside or at the boundary of `soma/circulation-abi`. Inside the ABI, only `MorphologyHolons` (resident cells, threads, and currents) exist.
 3. **Preservation of Scaffold Release:** Clarifying that `Scaffold` is temporary reinforces `SCF5`'s law: scaffolding is meant to be released once native hexis is established.

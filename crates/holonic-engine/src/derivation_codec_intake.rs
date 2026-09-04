@@ -727,7 +727,7 @@ mod tests {
     };
 
     /// **What this test body declares as its own capacity.** The apertures moved out of
-    /// `codec_recovery` on 2026-08-09 (`canon/THE_AUTHORED_LEVEL.md` §5.2); a fixture is a caller
+    /// `codec_recovery` on 2026-08-09 (`docs/canon/THE_AUTHORED_LEVEL.md` §5.2); a fixture is a caller
     /// and declares its own. The values reproduce the excised constants so these fixtures' returns
     /// are unchanged by the move.
     const TEST_APERTURES: RecoveryApertures = RecoveryApertures {

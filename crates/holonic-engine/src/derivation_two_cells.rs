@@ -94,7 +94,7 @@
 //!
 //! ## Higher overlaps
 //!
-//! `papers/source/holonics/logic-category.typ` H.0035 carries the standing bound: *"Pairwise
+//! `research/papers/source/holonics/logic-category.typ` H.0035 carries the standing bound: *"Pairwise
 //! compatibility alone may be insufficient when higher overlaps matter."* A graph `β₁` cannot see a
 //! triple; a 2-complex can, and three questions are asked of every triple reaching one statement:
 //!

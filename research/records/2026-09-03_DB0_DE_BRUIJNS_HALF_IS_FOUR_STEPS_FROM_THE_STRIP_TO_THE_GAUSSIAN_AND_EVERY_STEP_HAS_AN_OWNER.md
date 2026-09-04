@@ -4,7 +4,7 @@
 **Truth status:** `established-bounded` (a scoping record; no theorem returned)  
 **Evidence:** `source-inspected`  
 **Campaign:** DB0 under
-[`THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md`](../../blueprint/THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md).  
+[`THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md`](../../archive/plans/THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md).  
 **Scope:** the manifest; schedules nothing beyond the directed order; the engine frontier is
 unchanged.
 

@@ -3,8 +3,8 @@
 //! ```text
 //! cargo run --release --example derivation_holonomy -- \
 //!     standing/output \
-//!     reference/pureholonics-seed/src/pureholonics \
-//!     reference/holobrochos-a07ff376/src/soma
+//!     archive/reference/pureholonics-seed/src/pureholonics \
+//!     archive/reference/holobrochos-a07ff376/src/soma
 //! ```
 //!
 //! The three paths are the mathematical deposit and two frames of linguistic material — the same
@@ -311,13 +311,13 @@ fn main() {
         arguments
             .get(1)
             .cloned()
-            .unwrap_or_else(|| "reference/pureholonics-seed/src/pureholonics".to_owned()),
+            .unwrap_or_else(|| "archive/reference/pureholonics-seed/src/pureholonics".to_owned()),
     );
     let frame_b = PathBuf::from(
         arguments
             .get(2)
             .cloned()
-            .unwrap_or_else(|| "reference/holobrochos-a07ff376/src/soma".to_owned()),
+            .unwrap_or_else(|| "archive/reference/holobrochos-a07ff376/src/soma".to_owned()),
     );
 
     let deposit = read_deposit(&deposit_root);

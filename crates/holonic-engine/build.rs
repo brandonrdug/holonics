@@ -3,7 +3,7 @@
 //! **The virtual architecture is read off the device present at build time, not authored.** This
 //! script pinned `--gpu-architecture=compute_75` — Turing — until 2026-08-10, while the machine it
 //! builds on is Ada. `nvidia-smi --query-gpu=compute_cap` is the device stating its own capability,
-//! exactly as `soma/mount`'s `Device::attribute` does at run time. When no device answers, the
+//! exactly as `crates/holonic-mount`'s `Device::attribute` does at run time. When no device answers, the
 //! floor `compute_75` is used and **said aloud** through `cargo:warning`, because a build that
 //! silently targets a generation nobody has is how the pin survived.
 

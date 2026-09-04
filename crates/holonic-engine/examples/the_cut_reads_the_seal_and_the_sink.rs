@@ -3,7 +3,7 @@
 //!
 //! ```text
 //! cargo run --release --example the_cut_reads_the_seal_and_the_sink -- \
-//!     output/the_conditioning_return_crosses_the_seal
+//!     .local/artifacts/the_conditioning_return_crosses_the_seal
 //! ```
 //!
 //! `CONSTRUCTION_STATE.md`'s open line records [`holonic_engine::spine_cut`] as *joined to nothing*.
@@ -33,7 +33,7 @@
 //!
 //! # Exterior — the attention sink, where the field has the diagnostics and no cut vocabulary
 //!
-//! `canon/THE_CORRESPONDENCE_ATLAS.md` §4, *"the sink as a named cut"*: two species with published
+//! `docs/canon/THE_CORRESPONDENCE_ATLAS.md` §4, *"the sink as a named cut"*: two species with published
 //! structural diagnostics. A **nop** sink (`arXiv:2605.08453`, proved: a sink is a hard attention
 //! switch and the output is identically zero) has negligible value norms; a **broadcast** sink
 //! (`arXiv:2606.08105`) aggregates from the context and redistributes, which induces low-rank
@@ -644,7 +644,7 @@ fn print_head(label: &str, head: &AttentionHead, declared: SinkSpecies) -> Optio
 fn main() {
     let root = std::env::args()
         .nth(1)
-        .unwrap_or_else(|| "output/the_conditioning_return_crosses_the_seal".to_string());
+        .unwrap_or_else(|| ".local/artifacts/the_conditioning_return_crosses_the_seal".to_string());
     let root = PathBuf::from(root);
 
     println!("== the cut classifier, joined to two materials ==");

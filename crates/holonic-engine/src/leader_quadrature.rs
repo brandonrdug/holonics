@@ -10,7 +10,7 @@
 //! > scale by without losing accuracy on the scaled area ... and the integration pathways must
 //! > accomodate transformations of parameters."*
 //! >
-//! > — 2026-08-07, deposited in `canon/THE_QUOTE_NETWORK.md` §9.
+//! > — 2026-08-07, deposited in `docs/canon/THE_QUOTE_NETWORK.md` §9.
 //!
 //! ## The three rulings this module obeys
 //!
@@ -71,7 +71,7 @@
 //!
 //! ## The self-similarity termination law
 //!
-//! This criterion is recorded as **undeposited** in `canon/THE_QUOTE_NETWORK.md` §9 (*"The
+//! This criterion is recorded as **undeposited** in `docs/canon/THE_QUOTE_NETWORK.md` §9 (*"The
 //! self-similarity termination criterion is undeposited as a falsifier"*). It is what makes this
 //! construction more than a Riemann sum, and it is stated here so it can be tested rather than
 //! asserted.
@@ -107,7 +107,7 @@
 //! Ruling 2 above already bans the instantaneous return, and it is the same ban one level down: a
 //! limit is not something a single comparison can certify, and the depth at which a limit *has*
 //! been reached is the depth at which the mechanism transforming the information during transport
-//! stops being able to contribute a difference. `canon/THE_AUTHORED_LEVEL.md` §5.1 names the
+//! stops being able to contribute a difference. `docs/canon/THE_AUTHORED_LEVEL.md` §5.1 names the
 //! excision this module owes on exactly that reading — *"what the material stopped the leader at …
 //! **A leader whose witness depth is one takes a single step; that is not a leader.**"*
 //!
@@ -123,7 +123,7 @@
 //! every jet of rank two or more, where the leader is still reading a moving jet when the gate
 //! declares the limit reached. Authored as a constant it could not tell those two cases apart, and
 //! it was authored as a constant: `derivation_integral.rs:135`, `LEADER_WITNESS_DEPTH: usize = 1`,
-//! excised 2026-08-09 for `canon/THE_AUTHORED_LEVEL.md` §5.1.
+//! excised 2026-08-09 for `docs/canon/THE_AUTHORED_LEVEL.md` §5.1.
 //!
 //! **Exact scope of the agreement gate.** Measured, not assumed: replacing the jet-agreement
 //! decision with a constant `true` leaves every returned area exact under

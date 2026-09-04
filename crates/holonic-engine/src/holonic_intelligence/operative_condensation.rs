@@ -18,7 +18,7 @@
 //! the declared boundary of the family: an occurrence or history outside it returns this lane,
 //! never a face.
 //!
-//! The remainder is exhibited, never a number (`canon/TABLET_THE_COMPRESSION.md`, `H.0420`,
+//! The remainder is exhibited, never a number (`docs/canon/TABLET_THE_COMPRESSION.md`, `H.0420`,
 //! `H.0480`): the collapsed pairs between the class body and the full operator over the declared
 //! exposures, each with the shortest declared history that separates it under the full
 //! operator, and the enclosure the terminal reactions propagate to every coordinate of the face

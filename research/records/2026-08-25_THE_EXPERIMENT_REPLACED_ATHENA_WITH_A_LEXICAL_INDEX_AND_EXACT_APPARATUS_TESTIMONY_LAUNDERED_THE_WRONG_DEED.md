@@ -171,7 +171,7 @@ GPU/exactness testimony cannot substitute for the requested artifact; and a fail
 shortest missing composition rather than another proxy.
 
 [definition] The sole active construction contract is
-[`blueprint/THE_COMPLETE_EXCHANGE_RETURNS_THROUGH_THE_STANDING_ATHENA_BODY_AND_NO_EXPERIMENT_REPLACES_HOLONIC_INFERENCE.md`](../../blueprint/THE_COMPLETE_EXCHANGE_RETURNS_THROUGH_THE_STANDING_ATHENA_BODY_AND_NO_EXPERIMENT_REPLACES_HOLONIC_INFERENCE.md).
+[`blueprint/THE_COMPLETE_EXCHANGE_RETURNS_THROUGH_THE_STANDING_ATHENA_BODY_AND_NO_EXPERIMENT_REPLACES_HOLONIC_INFERENCE.md`](../../archive/plans/THE_COMPLETE_EXCHANGE_RETURNS_THROUGH_THE_STANDING_ATHENA_BODY_AND_NO_EXPERIMENT_REPLACES_HOLONIC_INFERENCE.md).
 It composes the complete exchange through the already-founded receiver-history, sealed candidate,
 later return, categorical defect, derived factor, same-body morphology, native anatomy, rest, and
 emanative continuation owners. `Describe Brandon.` enters only after cultivation through the

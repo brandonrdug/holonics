@@ -11,7 +11,7 @@
 //! small formal deposit. Brandon, 2026-08-09: *"Right, scale. An actual atmosphere and ground."*
 //!
 //! ```text
-//!   THE ATMOSPHERE   papers/source/mathematics/*.typ   +  canon/*.md  +  research/records/*.md
+//!   THE ATMOSPHERE   research/papers/source/mathematics/*.typ   +  docs/canon/*.md  +  research/records/*.md
 //!                    the charge distribution: what the corpus committed, by recurrence
 //!
 //!   THE GROUND       standing/output/**/*.lean
@@ -24,7 +24,7 @@
 //!
 //! ## The aperture, and why there is one
 //!
-//! `blueprint/THE_ROADMAP.md` forbids an aperture-less organ in the corpus path, and names the two
+//! `docs/plans/THE_ROADMAP.md` forbids an aperture-less organ in the corpus path, and names the two
 //! precedents: `eros_resonant_corpus_current` SIGKILLs at 10,963 MB on 1,556 lines, while
 //! `the_iron_tokens_carry_the_field` returns a **typed obstruction naming the required width** and
 //! answers a narrower question whole, at 12.3M tokens in 2 GB.
@@ -56,7 +56,7 @@ use holonic_engine::statement_composition::{StatementAdmission, found_statements
 /// for the census; this driver names them again rather than importing, because the census measures
 /// tokens and this conditions on wholes, and one root list serving two questions would hide which.
 const ATMOSPHERE: [(&str, &str); 3] = [
-    ("papers/source/mathematics", "typ"),
+    ("research/papers/source/mathematics", "typ"),
     ("canon", "md"),
     ("research/records", "md"),
 ];

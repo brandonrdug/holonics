@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 use std::path::PathBuf;
 use std::str::FromStr;
 
-use athena_alpha::{addressed_ingress, declared_diffusion_law, AthenaAlphaApplication};
+use holonics_hna::{addressed_ingress, declared_diffusion_law, AthenaAlphaApplication};
 use holonic_engine::{receiver_exact_compression::ReceiverId, EventId};
 use life::native_intelligence::{
     export_morphology, ExportCodecKind, ExportPurpose, MorphologyExportRequest,
@@ -124,6 +124,9 @@ impl WorkbenchRuntime {
 
     pub fn execute(&mut self, command: WorkbenchCommand) -> Vec<WorkbenchEvent> {
         let result = match command {
+            WorkbenchCommand::Hna(command) => {
+                adapters::hna::execute(command).map(|returned| vec![self.adapter(returned)])
+            }
             WorkbenchCommand::Workspace(command) => {
                 adapters::workspace::execute(command).map(|returned| vec![self.adapter(returned)])
             }
@@ -748,7 +751,7 @@ mod tests {
     /// the same way an operator opens any other snapshot.
     fn declared_snapshot(path: &Path) {
         let mut configuration: NativeCirculationConfiguration =
-            serde_json::from_str(athena_alpha::BASE_CONFIGURATION).expect("configuration");
+            serde_json::from_str(holonics_hna::BASE_CONFIGURATION).expect("configuration");
         configuration.address.receiver = fixture::FIXTURE_RECEIVER;
         let admission = AthenaAlphaApplication::from_dismantling_return(
             fixture::detached_returned(),

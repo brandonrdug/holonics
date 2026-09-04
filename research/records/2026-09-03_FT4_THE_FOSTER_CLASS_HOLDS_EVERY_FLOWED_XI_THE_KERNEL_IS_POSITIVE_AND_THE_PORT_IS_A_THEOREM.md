@@ -4,7 +4,7 @@
 **Truth status:** `proved-derived`  
 **Evidence:** `formal-checked`, `source-inspected`  
 **Campaign:** FT4 (i)–(ii) under
-[`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](../../blueprint/THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md).  
+[`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](../../archive/plans/THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md).  
 **Owners:** `RH/FosterClassLandau.lean`, `RH/FosterClassCount.lean`, `RH/FosterClassProduct.lean`,
 `RH/FosterClassSplit.lean`, `RH/FosterClassHadamard.lean`, `RH/FosterClassFlux.lean`,
 `RH/FosterClassHeat.lean`, `RH/HeatKernelPhi.lean`, `RH/FosterClassHeatFlow.lean`, and the

@@ -3,7 +3,7 @@
 //!
 //! ## The defect this drives
 //!
-//! `canon/TABLET_THE_FLOW.md` §6 states it as a theorem rather than a complaint:
+//! `docs/canon/TABLET_THE_FLOW.md` §6 states it as a theorem rather than a complaint:
 //!
 //! > `Hom(Z/n, Z) = 0`. **A `Z`-valued holonomy is a homomorphism out of `H_1` and kills every
 //! > torsion class by construction.** The tree's holonomy instrument is provably blind to the class

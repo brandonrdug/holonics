@@ -25,8 +25,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::{Digest, Sha256};
 
-const DEFECTS: &str = "output/the_candidate_departs_before_sibling_testimony_returns/02-returned-sibling-defects.json";
-const OUTPUT: &str = "output/the_returned_defect_founds_a_derived_local_factor_cover";
+const DEFECTS: &str = ".local/artifacts/the_candidate_departs_before_sibling_testimony_returns/02-returned-sibling-defects.json";
+const OUTPUT: &str = ".local/artifacts/the_returned_defect_founds_a_derived_local_factor_cover";
 const ONE: u16 = 0x3f80;
 
 #[derive(Clone, Debug, Deserialize)]

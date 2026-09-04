@@ -1,10 +1,10 @@
 //! The canonical octet form of a [`GradedCausalComplex`], and the only one.
 //!
-//! `blueprint/THE_ASSEMBLY.md` step 6 asks for a plate schema carrying a rebase-invariants reading.
+//! `archive/plans/THE_ASSEMBLY.md` step 6 asks for a plate schema carrying a rebase-invariants reading.
 //! A plate holds form codecs that already exist and defines none of its own — that is the sentence
-//! `soma/tools/holon-plate/src/lib.rs` opens with — so the codec belongs here, beside the type it
-//! encodes, exactly as `HTEC` lives in `soma/life/src/holonic_training.rs` and `ERST` in
-//! `soma/membrane/src/live_current.rs`.
+//! `applications/holon-plate/src/lib.rs` opens with — so the codec belongs here, beside the type it
+//! encodes, exactly as `HTEC` lives in `crates/holonic-life/src/holonic_training.rs` and `ERST` in
+//! `crates/holonic-membrane/src/live_current.rs`.
 //!
 //! # What is deposited, and what is not
 //!

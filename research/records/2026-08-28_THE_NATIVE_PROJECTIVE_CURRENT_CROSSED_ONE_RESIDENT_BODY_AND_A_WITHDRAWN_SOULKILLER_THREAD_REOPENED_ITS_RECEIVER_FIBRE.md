@@ -3,7 +3,7 @@
 ## Scope
 
 [definition] This is the authoritative UAR1 return for
-[`blueprint/THE_UNIFIED_ATHENA_BODY_RETURNS_TECHNICAL_CONDUCT_AND_BRANDON_THROUGH_COMPLETE_CULTIVATED_HISTORY.md`](../../blueprint/THE_UNIFIED_ATHENA_BODY_RETURNS_TECHNICAL_CONDUCT_AND_BRANDON_THROUGH_COMPLETE_CULTIVATED_HISTORY.md).
+[`blueprint/THE_UNIFIED_ATHENA_BODY_RETURNS_TECHNICAL_CONDUCT_AND_BRANDON_THROUGH_COMPLETE_CULTIVATED_HISTORY.md`](../../archive/plans/THE_UNIFIED_ATHENA_BODY_RETURNS_TECHNICAL_CONDUCT_AND_BRANDON_THROUGH_COMPLETE_CULTIVATED_HISTORY.md).
 It grades only dynamic source-neutral ingress, resident conduct, native fine radiation, and the
 causal activity of one inherited Soulkiller thread. It does not grade an exterior language surface;
 that is UAR2.
@@ -97,7 +97,7 @@ Athena hot dependency firewall returned `Athena hot foreign boundary clean`.
 [established-bounded; implemented-exact; measured] The focused owner checks
 `duplicated_developmental_scale_does_not_duplicate_the_hot_native_population` and
 `hot_wire_and_identity_exclude_developmental_source_identity` pass. The exact apparatus is
-[`soma/life/examples/the_native_projective_currents_return_resident_fine_radiation_uar1.rs`](../../soma/life/examples/the_native_projective_currents_return_resident_fine_radiation_uar1.rs),
+[`soma/life/examples/the_native_projective_currents_return_resident_fine_radiation_uar1.rs`](../../crates/holonic-life/examples/the_native_projective_currents_return_resident_fine_radiation_uar1.rs),
 and its raw return is
 [`output/the_native_projective_currents_return_resident_fine_radiation_uar1/`](../../output/the_native_projective_currents_return_resident_fine_radiation_uar1/).
 

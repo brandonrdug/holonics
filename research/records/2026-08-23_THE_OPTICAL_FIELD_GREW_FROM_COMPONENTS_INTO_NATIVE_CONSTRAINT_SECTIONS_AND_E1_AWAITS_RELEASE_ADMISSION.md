@@ -3,7 +3,7 @@
 **Date:** 2026-08-23  
 **Kind:** construction return and capability address  
 **Campaign:** E1 under
-[`blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](../../blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md)  
+[`blueprint/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md`](../../archive/plans/THE_AGENTIC_ATHENA_EMANATES_THROUGH_ADDRESSED_CONTINUATION_AND_OPTICAL_HOLONS_GROW_ACROSS_SCALES.md)  
 **Truth status:** `implemented-exact` for the addressed incidence, reconstruction and intervention
 receipts; `measured` for the CUDA, extent and elapsed testimony; `established-bounded` for the
 returned hierarchy over the named raw page and receiver family; `open` for unrestricted visual

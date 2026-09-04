@@ -14,7 +14,7 @@
 //! *"Do not build modal placement and supported lifting as two organs. **Derive placement from
 //! realization.**"* `supported_realizers::induced_placement` is that derivation in code — it takes an
 //! incidence, forms `MᵀM`, and hands it to `inertia::inertia`. Until this driver it had **no caller
-//! anywhere**, and its two tests both hand it a matrix typed out by hand. `blueprint/THE_ROADMAP.md`:
+//! anywhere**, and its two tests both hand it a matrix typed out by hand. `docs/plans/THE_ROADMAP.md`:
 //! *"the assertion moved out of `#[cfg(test)]`; the conduct did not."*
 //!
 //! Here the incidence comes from `skein::Substitution` moves read against a real

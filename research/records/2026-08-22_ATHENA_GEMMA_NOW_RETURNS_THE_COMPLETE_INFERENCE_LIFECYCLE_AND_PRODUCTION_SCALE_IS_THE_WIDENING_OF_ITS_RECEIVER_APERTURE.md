@@ -273,7 +273,7 @@ and exact resident conduct before accepting global replay as necessary.
 | proof and formal route testimony | M6 product family and `soma/formal/elementary-holonics` as exterior Lean material/checker port |
 
 The construction owner map and ordered deeds are in
-[`../../blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md`](../../blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md).
+[`../../blueprint/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md`](../../archive/plans/THE_ATHENA_PRODUCTION_APERTURE_WIDENS_THROUGH_MATHEMATICAL_WORLD_TUBES_AND_RETURNED_CONSTRAINTS_CULTIVATE_THE_ECOLOGY.md).
 
 ## What this does not establish
 

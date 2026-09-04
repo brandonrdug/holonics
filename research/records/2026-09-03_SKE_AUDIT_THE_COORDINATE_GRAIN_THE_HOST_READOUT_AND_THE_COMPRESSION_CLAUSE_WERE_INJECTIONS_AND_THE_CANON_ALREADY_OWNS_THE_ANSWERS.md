@@ -4,7 +4,7 @@
 **Truth status:** `established-bounded` for the source and Lean findings; `process-audit` for the attribution; `open` for the obligations named  
 **Evidence:** `source-inspected`, `formal-checked` (hand proofs from quoted Lean, not kernel-run), `measured` (the SKE receipts cited)  
 **Occasion:** Brandon's rulings of 2026-09-03 (group characteristics of flux, never exact relational details on one grain; certifying and reading every operation was never asked for; holonic compression in the holonic sense) and his instruction to audit rigorously against the formalized mathematics and the research deposits rather than react.  
-**Receipts:** [`2026-09-03_SKE_AUDIT_receipts/`](2026-09-03_SKE_AUDIT_receipts/): four Opus 5 read-only audits (the Lean owners; the canon, records, and conversation logs; the resident session against the 2026-08-18 contract; the lineage A dependents). They are testimony; what follows is the integration against the governing files, with each finding cited to the tree.
+**Receipts:** [`2026-09-03_SKE_AUDIT_receipts/`](2026-09-03_SKE_AUDIT_receipts): four Opus 5 read-only audits (the Lean owners; the canon, records, and conversation logs; the resident session against the 2026-08-18 contract; the lineage A dependents). They are testimony; what follows is the integration against the governing files, with each finding cited to the tree.
 
 ## 1. The session is the renamed instruction loop, and it is a Claude injection
 

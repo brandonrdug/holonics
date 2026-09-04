@@ -6,10 +6,10 @@
 //! ```
 //!
 //! **Station one of
-//! [`blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md`](../../../blueprint/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md).**
+//! [`archive/plans/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md`](../../../archive/plans/THE_CLIFFORD_LIFT_THE_PHASE_WIRE_AND_THE_FOUR_UNTAKEN_READINGS.md).**
 //! It executed first against a struct local to this file; the carrier is now
 //! [`holonic_engine::clifford`] in the library, and this driver reads it. The superseded plan is
-//! `blueprint/THE_ARROW_IS_THE_DIVISION_AND_ATTENTION_KEEPS_ONLY_ITS_AIM.md`, whose station four —
+//! `archive/plans/THE_ARROW_IS_THE_DIVISION_AND_ATTENTION_KEEPS_ONLY_ITS_AIM.md`, whose station four —
 //! *the cross is the hand, so a layer is a braid* — is merged into the same build, because the
 //! algebra that carries a hand is the even Clifford algebra and there is only one of those.
 //!
@@ -90,7 +90,7 @@ fn main() {
     println!("                 a scalar            an oriented area");
     println!();
     println!(
-        "  `soma/body/src/arrow.rs` already carries this as Arrow{{reach, aim, cross}} in TWO"
+        "  `crates/holonic-body/src/arrow.rs` already carries this as Arrow{{reach, aim, cross}} in TWO"
     );
     println!("  dimensions, with the note \"The whole arrow, never one scalar.\" The carrier read");
     println!(
@@ -347,7 +347,7 @@ fn main() {
     println!("[3]  THE ORTHO CASE  --  where the score reads nothing and the gyration is maximal");
     println!("{}", "=".repeat(100));
     println!();
-    println!("  `soma/body/src/arrow.rs:32-34`, on Aim::Ortho:");
+    println!("  `crates/holonic-body/src/arrow.rs:32-34`, on Aim::Ortho:");
     println!();
     println!(
         "    \"the cohere is null, but the CROSS/gyration is MAXIMAL: the pure orthogonal turn,"

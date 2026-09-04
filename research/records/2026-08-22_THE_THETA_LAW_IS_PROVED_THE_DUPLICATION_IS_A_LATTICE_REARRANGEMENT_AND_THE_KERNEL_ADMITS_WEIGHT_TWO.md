@@ -5,7 +5,7 @@
 modular transformation law of the congruent-number curve's theta function, kernel-checked.
 Solo orchestrator work, one Lean file.  Every identity was verified in exact/high-precision
 arithmetic (twelve digits, including the exact prefactor) before encoding.  **It schedules
-nothing.**  [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+nothing.**  [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction
 authorities.
 **Truth grades:** `proved-derived` with `formal-checked` evidence for both theorems

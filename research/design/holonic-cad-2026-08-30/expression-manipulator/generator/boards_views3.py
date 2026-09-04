@@ -99,4 +99,4 @@ def view_auto():
         box("carried", "the human and the agent see the same faces; auto-formalization is the same CAD driven through the same projection port"), "flex: 0 0 440px")
     body = tb + row([routes, agent], "flex: 1 1 auto; min-height: 0")
     return artboard("Auto-formalization — proposals as plural continuation", "an agent proposes candidate swings; the kernel returns verdicts as world events; the route space retains every fibre; no chooser quotient is taken silently", 1560, 1000, body,
-                    "sources: blueprint/THE_TYPED_TRANSPORT_ATLAS.md:251,288 · canon/THE_HOLOBROCHOS_SPINE.md:201 · AGENTS.md dialogue/agent rollouts as world-tubes · TABLET_THE_FLOW.md:38")
+                    "sources: blueprint/THE_TYPED_TRANSPORT_ATLAS.md:251,288 · docs/canon/THE_HOLOBROCHOS_SPINE.md:201 · AGENTS.md dialogue/agent rollouts as world-tubes · TABLET_THE_FLOW.md:38")

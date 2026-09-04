@@ -9,9 +9,10 @@ name = "holonics"
 path = "src/main.rs"
 
 [dependencies]
-athena-alpha = { path = "../athena-alpha" }
-holonics-application = { path = "../holonics-application" }
-life = { path = "../../soma/life" }
+holonics-hna = { path = "../../crates/holonics-hna" }
+holonics = { path = "../../crates/holonics" }
+holonics-workspace = { path = "../../crates/holonics-workspace" }
+life = { path = "../../crates/holonic-life" }
 holonic-engine = { path = "../../crates/holonic-engine", default-features = false }
 clap = { version = "4.5", features = ["derive"] }
 serde = { workspace = true }

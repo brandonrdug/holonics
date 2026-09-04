@@ -11,13 +11,13 @@
 //! > recurrences (density)**… The density and invariants it founds are not ours to necessarily
 //! > author, they are happenstance of our own writing."*
 //!
-//! The precedent is `canon/THE_DIALECT.md`: 8,935 messages measured, `holon` 1141, `current` 696,
+//! The precedent is `docs/canon/THE_DIALECT.md`: 8,935 messages measured, `holon` 1141, `current` 696,
 //! and `FOUND`/`RIDE`/`OPEN` as capitalised primitives **zero**. Nobody authored that reading; it
 //! fell out of density.
 //!
 //! ## Frequency is `Π`, and `Π` is not allowed to gate
 //!
-//! `reference/holobrochos-a07ff376/src/soma/FORMULA.md:2459`, ratified, and `CLAUDE.md` §13 rule 2:
+//! `archive/reference/holobrochos-a07ff376/src/soma/FORMULA.md:2459`, ratified, and `CLAUDE.md` §13 rule 2:
 //! a distribution has four faces — `Π` the lived construction, `Q` the declared quotient,
 //! `q_current` the transported testimony, and `G_authored`, the only contaminant. **This module is
 //! `Π` and nothing else.** It counts what occurred, per surface form, per whole, per stratum, and it
@@ -40,7 +40,7 @@
 //!   It was not always so. Until 2026-08-09 `read` joined its root with four `&'static str` paths
 //!   compiled into this file, `admit` was private, and **every corpus that was not this repository
 //!   returned `EmptyStratum`** — a caller's declaration living inside the organ, which is the
-//!   species `canon/THE_AUTHORED_LEVEL.md` convicts.
+//!   species `docs/canon/THE_AUTHORED_LEVEL.md` convicts.
 //! - **The stream** is every token: word runs *and* markup runs. Whitespace separates and is not a
 //!   token. Under [`LexicalSpecies::LeanSource`] comment text is not in the stream at all and is
 //!   returned whole by [`CorpusCensus::comment_bound`].
@@ -176,14 +176,14 @@ pub const DECLARED_STRATA: [StratumDeclaration; 4] = [
     StratumDeclaration {
         stratum: Stratum::Papers,
         label: "papers",
-        relative_root: "papers/source/mathematics",
+        relative_root: "research/papers/source/mathematics",
         extension: "typ",
         recursive: true,
     },
     StratumDeclaration {
         stratum: Stratum::Canon,
         label: "canon",
-        relative_root: "canon",
+        relative_root: "docs/canon",
         extension: "md",
         recursive: false,
     },
@@ -197,7 +197,7 @@ pub const DECLARED_STRATA: [StratumDeclaration; 4] = [
     StratumDeclaration {
         stratum: Stratum::Seed,
         label: "seed",
-        relative_root: "reference/pureholonics-seed",
+        relative_root: "archive/reference/pureholonics-seed",
         extension: "md",
         recursive: true,
     },

@@ -8,7 +8,7 @@
 //!
 //! `crates/holonic-engine/src/surprisal.rs` holds an exact symbolic measure and, until this run,
 //! reached nothing. Its every entry point takes **one** population, and
-//! `canon/THE_HOLOBROCHOS_SPINE.md` §2 retains as mathematically exact that *"comparison is situated
+//! `docs/canon/THE_HOLOBROCHOS_SPINE.md` §2 retains as mathematically exact that *"comparison is situated
 //! by a frame and is therefore at least a frame/object/object relation"*. A measure computed from one
 //! body alone is a one-body read; calling it a comparison is the dropped third.
 //!

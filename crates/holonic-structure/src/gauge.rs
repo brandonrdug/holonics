@@ -32,7 +32,7 @@
 //!
 //! **It is not a test framework and it enforces nothing about what you then assert.** It removes
 //! exactly one failure mode: asserting invariance under a transformation that did nothing. The one
-//! test in the tree that already had both arms — `soma/body/src/arrow.rs`'s affine gauge orbit, with
+//! test in the tree that already had both arms — `crates/holonic-body/src/arrow.rs`'s affine gauge orbit, with
 //! its `a_magnitude_moved` flag — is the pattern this generalises.
 
 use alloc::vec::Vec;

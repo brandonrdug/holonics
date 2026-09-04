@@ -5,14 +5,14 @@ use clap::{Args, Parser, Subcommand, ValueEnum};
 
 use crate::{
     AthenaCommand, DiagnosticCommand, EngineCommand, ErosCommand, ExportCodecArgument,
-    SoulkillerCommand, WorkbenchCommand, WorkspaceCommand,
+    SoulkillerCommand, HnaCommand, WorkbenchCommand, WorkspaceCommand,
 };
 
 #[derive(Clone, Debug, Parser)]
 #[command(
     name = "holonics",
     version,
-    about = "Holonics variant workspace application"
+    about = "Holonic Neural Network runtime, model interoperability and variant workspace"
 )]
 pub struct Cli {
     /// Select typed human, one-envelope JSON, or event-stream JSONL output.
@@ -24,6 +24,11 @@ pub struct Cli {
 
 #[derive(Clone, Debug, Subcommand)]
 pub enum CliCommand {
+    /// Run the current full native HNA operator or inspect a Soulkiller native rest.
+    Hna {
+        #[command(subcommand)]
+        command: HnaCli,
+    },
     /// Create, lift, cultivate, evaluate, and export a persistent morphology variant.
     Workspace {
         #[command(subcommand)]
@@ -39,6 +44,37 @@ pub enum CliCommand {
         #[command(subcommand)]
         command: DiagnosticCli,
     },
+}
+
+#[derive(Clone, Debug, Subcommand)]
+pub enum HnaCli {
+    /// Execute ordered native occurrences from a HnaRunRequest JSON file in one session.
+    Run { request: PathBuf },
+    /// Inspect the header of a restricted Soulkiller rest without initializing CUDA.
+    Inspect { rest: PathBuf },
+    /// Emit one native selected face for a text occurrence (not a complete chat response).
+    Infer { model: PathBuf, text: String },
+    /// Develop one session from cumulative text prefixes in a JSON string array; returns a run receipt, not a checkpoint.
+    Train {
+        model: PathBuf,
+        sequence: PathBuf,
+        #[arg(long, default_value_t = 16)]
+        learning_shift: u32,
+        #[arg(long, default_value_t = 14)]
+        series_terms: u32,
+    },
+}
+
+impl From<HnaCli> for HnaCommand {
+    fn from(command: HnaCli) -> Self {
+        match command {
+            HnaCli::Run { request } => Self::Run { request },
+            HnaCli::Inspect { rest } => Self::Inspect { rest },
+            HnaCli::Infer { model, text } => Self::Infer { model, text },
+            HnaCli::Train { model, sequence, learning_shift, series_terms } =>
+                Self::Train { model, sequence, learning_shift, series_terms },
+        }
+    }
 }
 
 #[derive(Clone, Debug, Subcommand)]
@@ -286,6 +322,7 @@ impl Cli {
     pub fn invocation(self) -> WorkbenchInvocation {
         let (command, request_input) = match self.command {
             None => (None, None),
+            Some(CliCommand::Hna { command }) => (Some(WorkbenchCommand::Hna(command.into())), None),
             Some(CliCommand::Run { input }) => (None, Some(input)),
             Some(CliCommand::Workspace { command }) => {
                 (Some(WorkbenchCommand::Workspace(command.into())), None)

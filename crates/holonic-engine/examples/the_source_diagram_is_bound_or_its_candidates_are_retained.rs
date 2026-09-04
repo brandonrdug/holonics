@@ -1,7 +1,7 @@
 //! **Phoenix station one: the source's own testimony is bound, and what it does not decide is
 //! retained whole.**
 //!
-//! Plan: `blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md`.
+//! Plan: `archive/plans/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md`.
 //! Derivation:
 //! `research/records/2026-08-18_THE_HOLON_IS_THE_OPERATION_COMPLEX_THE_FOREIGN_MAP_IS_A_PORTED_WORD_AND_THE_CARD_CARRIES_ITS_FRONTS.md`
 //! §12.1 — *"Admit the source configuration and authoritative implementation as exterior realization

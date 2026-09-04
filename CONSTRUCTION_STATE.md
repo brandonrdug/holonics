@@ -1,109 +1,85 @@
 # Construction state
 
-**Currency:** 2026-09-04, authoritative reconciliation under Brandon's direct instruction.
+**Currency:** 2026-09-04. **Current frontier:** NONE — HNA consolidation complete.
 
-This is the sole current-position record. [The roadmap](blueprint/THE_ROADMAP.md) orders work.
-Completed campaign history remains in its existing contracts, dated records and Git.
+This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md) orders work;
+completed history stays in its existing records and Git. Brandon's latest direct instruction
+governs. No new research campaign is scheduled by this completion.
 
-## Current position
+## Framework and organization
 
-**Current frontier:** NONE
+[project-postulate] Holonics is a machine-learning framework and its mathematical foundation.
+HNA names the Holonic Neural Network architecture. Soulkiller independently dismantles inherited
+realizations; Eros composes/refines Athena through one native recurrence. The objective is
+frontier-level usefulness on consumer hardware; the 20W ideology is an efficiency direction,
+not a current twenty-watt power measurement.
 
-[established-bounded; implemented-exact; process-audit] The authorized repair is complete.
-Instructions and records are reconciled; retained overlays participate in the adjoint; new
-deposits are staged; redundant sealed-factor storage and reverse scratch are released; conflicting
-signature observations refuse; identification saturation is distinct from consequence growth.
-The unchanged three-cycle/two-return CUDA regression and completed-target receiver pass.
-All nine existing release checks passed across the full invocation and the resumed test gate:
-3,014 tests passed, zero failed, 52 ignored; examples type-checked; the live formal umbrella
-built 3,775 jobs. The initial test compilation hit the old wall-time cap; compilation is now
-supervised separately from the test-runtime guard. No later construction is scheduled.
-The [repair record](research/records/2026-09-04_THE_AUDIT_REPAIRS_THE_RECURRENT_ADJOINT_AND_RECONCILES_THE_OPERATING_CONTRACT.md)
-contains the exact scope and receipts.
+[established-bounded; implemented-exact] The public `holonics` Rust facade exposes HNA,
+Soulkiller and interoperability. `holonics hna run/inspect/infer/train` uses the existing complete
+native session or admitted SKE rest. Ordered occurrences use one successor ecology, declared
+histories participate in execution, and cultivation retains prior overlays in its adjoint.
+The actual three-cycle CLI training run reached generation 3,825 and overlay rank 5,504.
 
-[definition] Brandon is the sole human operator. His 2026-09-04 instruction directs agents to
-complete these repairs without handing him another list of minor decisions. His earlier ruling
-that day admits the SKE construction and defines 180 seconds as a hang guard. Those rulings
-supersede contrary agent prose; [AGENTS.md](AGENTS.md) carries the shared operative contract.
+[established-bounded; process-audit] Live Rust libraries share `crates/`, executable clients
+`applications/`, device targets `accelerators/`, Lean `formal/`, current doctrine/design `docs/`,
+and evidence/papers/experiments/notebooks `research/`. Retired bodies and plans are in `archive/`;
+local generated material is retained in ignored `.local/`. The root README and operating contract
+now lead into this layout. The equation atlas, generated index and invasive blanket validation
+suite are archived; Provenance and the actual organization supply navigation.
 
-## Admitted Eros/Athena/Soulkiller standing
+[open] The current HNA training result is a run receipt, not a saved cultivated full-operator
+checkpoint. Standard executable model recompilation is distinct from existing Safetensors/ONNX
+package round-trips. Full cultivated checkpoint/remount, target graph/state/numeric lowering and
+additional realized model-family adapters remain the specified production bridges. Qualitative
+frontier performance is an objective, not a result inferred from the mechanical checks.
 
-[established-bounded; source-inspected] HNA0--HNA5 and SKE0--SKE5 returned their bounded
-construction artifacts. The native operator contains 1,275 operations over 42 layers, with all
-719 source-declared coefficient populations resident; 665 are used by the configured operation
-and 54 remain explicit shared-K/V obstructions. The successor ecology is used by the next
-operation. The operator is Soulkiller apparatus; the excitation-founded class bodies and the
-variant Eros composes are Athena material under Brandon's September 4 ruling.
+Current contracts: [architecture](docs/ARCHITECTURE.md), [Soulkiller](docs/SOULKILLER.md),
+[Athena](docs/ATHENA.md), [interoperability](docs/INTEROPERABILITY.md),
+[repository and recovery](docs/REPOSITORY.md).
 
-[established-bounded; source-inspected] SKE1's first return crossed the cycle and deposited on
-344 cross-sections. Gains, scalars and embedding rows received no deposit. The audit found
-that a subsequent reverse contraction omitted previously retained overlays. The corrected
-second return uses all 1,720 retained ranks and the successor retains 5,504 after its deposit;
-three complete cycles reach generation 3,825 on the unchanged input. The first-deposit result
-retains its original scope.
+## Admitted native standing
 
-[established-bounded; source-inspected] The corrected SKE4 bodies carry sets sound under the
-declared withdrawal of their complements. The extent is their union. Every class states
-condensation on its own admitted domain. The earlier universal/founded-cone and off-domain
-species claims remain withdrawn.
+[established-bounded; source-inspected] HNA0--HNA5 and SKE0--SKE5 retain their bounded returns.
+The supported Gemma text realization has 1,275 operations and 719 resident coefficient
+populations; 665 are used and 54 remain explicit shared-K/V obstructions. Under Brandon's
+September 4 ruling the resident realization is Soulkiller apparatus, and the restricted class
+bodies/composed variant are Athena material. The old blanket foreign-tower prohibition is
+superseded.
 
-[established-bounded; source-inspected] SKE5's committed receipt carries one continuing session
-from generation 0 to 19,125 and fifteen selected-face equalities over five occurrences and
-three histories. Outside occurrences and undeclared histories are refused. The final history
-enlargement preserves the five singleton classes while adding a reachable face: identification
-saturation and observed consequence growth are different results. The completed repair makes
-that distinction explicit in the owner and receipt.
+[established-bounded; source-inspected] Corrected SKE4 sets are sound under the declared
+withdrawals of their complements, not a universal cone claim inferred from finite probes.
+SKE5's selected-face comparisons hold on the declared family. Identification saturation and
+growth in observed consequences are distinct. Stored-presentation condensation does not claim
+reduced resident allocation. The [retraction history](docs/RETRACTIONS.md) and linked SKE
+records retain the exact boundaries.
 
-[established-bounded; source-inspected] The stored presentation contains 9,383,688,554 octets;
-the composed resident allocation is 15,752,729,188 octets. The current receipt does not contain
-a measured full-operator residency baseline. The decoder still mounts complete population
-shapes, so reduced resident allocation is not claimed. The recorded pass is a declared-family
-deed receiver, not evidence that the complete repository release ran.
-
-[definition] No qualitative language, coding or mathematical-answer capability follows from
-these bounded receipts. The existing workspace remains on its earlier circulation/snapshot
-interface; the full-operator and SKE examples have a separate declared application scope.
-
-Decisive contracts and returns:
-[HNA](blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md),
-[SKE](blueprint/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md),
-[SKE1](research/records/2026-09-03_SKE1_THE_RETURN_CROSSED_EVERY_REACTION_OF_THE_CYCLE_AND_DEPOSITED_ON_EVERY_CROSS_SECTION.md),
-[SKE4](research/records/2026-09-03_SKE4_THE_DECLARED_WITHDRAWALS_FOUND_ROLE_CONES_THE_CLASS_BODIES_CARRY_THEIR_REMAINDER_AND_THE_RETURN_CROSSES_THE_BOUNDARY.md),
-[SKE5](research/records/2026-09-03_SKE5_THE_COMPOSED_VARIANT_RUNS_THE_RECURRENCE_ON_THE_FAMILY_STATES_CONDENSATION_BY_ITS_REMAINDER_AND_IS_NOT_SATURATED.md).
+[established-bounded; implemented-exact] The prior September 4 repair corrected retained-overlay
+adjoints, staged deposits, redundant storage, conflicting observations and the completed-target
+receiver. Its [record and native receipts](research/records/2026-09-04_THE_AUDIT_REPAIRS_THE_RECURRENT_ADJOINT_AND_RECONCILES_THE_OPERATING_CONTRACT.md)
+remain standing. That earlier release suite is now retired, not a current obligation.
 
 ## RH line
 
-**RH line position:** DB complete. FT0--FT6, RT0--RT6 and DB0--DB5 passed at their recorded scopes.
-No later RH proof campaign is scheduled.
+[proved-derived; formal-checked] FT, RT and DB are complete at their recorded scopes.
+`DeBruijnSeal.riemannHypothesis_iff_Λ_DN_eq` proves Mathlib's
+`RiemannHypothesis ↔ Λ_DN = 0` without a port; `Λ_DN ∈ [0,1/8]` and
+`seamTimes = Ici Λ_DN`. `CriticalChart.Hstd_eq` gives
+`Hstd t z = (1/8) * heatE (-t/4) ξ (1/2 + i*z/2)`, with
+`Λstd = 4*Λ_DN ∈ [0,1/2]`. Endpoint axiom checks contain only
+`propext`, `Classical.choice` and `Quot.sound`. RT realizes Dobner's descent route for the
+actual xi function; RT5 establishes unbounded heights, not bounded gaps.
 
-[proved-derived; formal-checked] `DeBruijnSeal.riemannHypothesis_iff_Λ_DN_eq` proves
-Mathlib's `RiemannHypothesis ↔ Λ_DN = 0` without a port.
-`Λ_DN ∈ [0,1/8]` and `seamTimes = Ici Λ_DN`.
-`CriticalChart.Hstd_eq` proves
-`Hstd t z = (1/8) * heatE (-t/4) ξ (1/2 + i*z/2)`;
-`Λstd = 4*Λ_DN ∈ [0,1/2]`.
-The endpoint axiom checks return only `propext`, `Classical.choice`, and `Quot.sound`.
+[open] `Λ_DN ≤ 0`, equivalently RH, remains the missing inequality. The Copson–de Bruijn
+coefficient is distinct. No new RH proof campaign follows from repository reorganization.
 
-[established-bounded; source-inspected] RT implements Dobner's descent route for the actual
-Riemann xi function. RT5 returns zeros at unbounded heights in a fixed strip; a bounded gap
-between those heights is not part of its scope. DB discharges the final seam-time existence
-port and the coordinate bridge.
+## Verification and handoff
 
-[open] `Λ_DN ≤ 0`, equivalently RH, remains the missing inequality. The Copson--de Bruijn
-constant `c_CD` is distinct; HTP's branch selection and decimal certification remain parked.
+[established-bounded; process-audit] The relocated active workspace tests passed across the full
+invocation and the repaired plate-mouth target's successful rerun. Examples type-check; the
+native CLI training receipt returned; the relocated RH CriticalChart built 8,835 jobs. New/current
+entry-point links resolve. The [consolidation record](research/records/2026-09-04_HNA_HAS_A_PUBLIC_FRAMEWORK_INTERFACE_AND_THE_REPOSITORY_IS_ORGANIZED_AROUND_THE_MACHINE_LEARNING_LIFECYCLE.md)
+states the actual commands and scopes, including the retired tools' disposition.
 
-Decisive returns:
-[RT6](research/records/2026-09-03_RT6_EVERY_NEGATIVE_TIME_HAS_AN_OFF_SEAM_ZERO_AND_THE_THRESHOLD_IS_NONNEGATIVE_ON_THE_THREE_AXIOMS.md),
-[DB4](research/records/2026-09-03_DB4_THE_GAUSSIAN_IS_THE_LIMIT_OF_THE_COSH_POWERS_AND_ONE_EIGHTH_IS_A_SEAM_TIME.md),
-[DB5](research/records/2026-09-03_DB5_THE_LAST_PORT_IS_DISCHARGED_RH_IS_LAMBDA_DN_EQUALS_ZERO_WITH_NO_PORT_AND_THE_TREE_TIME_IS_THE_STANDARD_TIME_OVER_FOUR.md).
-
-## Earlier standing and validation
-
-[historical] HTP, HIF, SCF, MVF, AAC, VWS, QLT, CDB1, CONS and R0Q retain the exact bounded
-mechanisms and retractions recorded in their existing sources. The old WRD/WRN and first HNA
-world-verdict constructions have no live HNA grade. The C++ body is archived provenance.
-The [universal catalog](UNIVERSAL_CATALOG.md) routes current formal and implementation owners.
-
-[definition] Follow AGENTS.md's proportionate checks and hang guard. Focused tests, exact
-resident regressions, historical receipts and a complete release are distinct evidence scopes.
-Preserve unrelated user files and existing evidence.
+[definition] Use relevant source/product checks, not index regeneration or untouched-paper builds.
+The backup branch, verified Git bundle and private untracked-material tar remain available;
+no historical source, model weights, native artifacts or caches were deleted.

@@ -2,7 +2,7 @@
 //!
 //! ## The law this organ owns
 //!
-//! `reference/holobrochos-a07ff376/src/soma/FORMULA.md:298`, ratified and until now with no
+//! `archive/reference/holobrochos-a07ff376/src/soma/FORMULA.md:298`, ratified and until now with no
 //! implementation anywhere in either tree:
 //!
 //! > *"ONE law: **coherence is collocation over time** — two things relate iff presented together,

@@ -385,7 +385,7 @@ fn main() {
     println!("{}", "=".repeat(112));
     println!();
 
-    let roots = ["soma/formal"];
+    let roots = ["formal"];
     let (declarations, stripped, kept) = read_material(&roots);
     println!(
         "  material          {} declarations under {roots:?}",

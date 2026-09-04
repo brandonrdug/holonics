@@ -3,7 +3,7 @@
 //! ```text
 //! cargo run --release --example the_research_act -- \
 //!     standing/output \
-//!     reference/holobrochos-a07ff376/src/soma
+//!     archive/reference/holobrochos-a07ff376/src/soma
 //! ```
 //!
 //! One mathematical question is posed to a conditioned instance; the instance produces; the
@@ -491,7 +491,7 @@ fn main() {
         arguments
             .get(1)
             .cloned()
-            .unwrap_or_else(|| "reference/holobrochos-a07ff376/src/soma".to_owned()),
+            .unwrap_or_else(|| "archive/reference/holobrochos-a07ff376/src/soma".to_owned()),
     );
 
     let deposit = read_deposit(&deposit_root);

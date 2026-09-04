@@ -123,7 +123,7 @@ fn report(label: &str, pullback: &PullbackInertia) {
 /// This is the second sentence of `H.0127` *Schur complement and inertia*, `proved-standard`, and
 /// it is the law the Riemann support-successor obligation is stated in: that reduction's remaining
 /// conditions are Albert's block-positivity pair, `Ran(C) ⊆ Ran(A^{1/2})` and `D − Y*Y ≥ 0`, whose
-/// finite form is exactly `H/A ≥ 0`. `canon/THE_INFORMATION_ENGINE.md` already records the Schur
+/// finite form is exactly `H/A ≥ 0`. `docs/canon/THE_INFORMATION_ENGINE.md` already records the Schur
 /// complement as one organ under four names, none citing the others; `inertia.rs` is the fifth and
 /// it is the one that computes this law, by repeated Schur complement over `Rat`.
 ///

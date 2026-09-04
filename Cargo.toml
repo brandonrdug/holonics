@@ -9,7 +9,7 @@
 # typed atomic membrane. `crates/relational-geometry` and `crates/holonic-engine`
 # are the exact receiver-relative geometry, float-free over BigRational with
 # Sturm-certified algebraic roots. `crates/holonic-language` is the reflective
-# runtime. `soma/life` is the membrane where the ecologies live.
+# runtime. `crates/holonic-life` is the membrane where the ecologies live.
 #
 # Excluded on purpose: the rust-gpu kernel and the nvptx mount kernel each pin
 # their own nightly and publish a committed boundary artifact, so the host
@@ -17,33 +17,33 @@
 [workspace]
 resolver = "2"
 members = [
-  "applications/athena-alpha",
-  "applications/holonics-application",
+  "crates/holonics",
+  "crates/holonics-hna",
+  "crates/holonics-workspace",
   "applications/holonics-workbench",
   "crates/holonic-structure",
   "crates/holonic-language",
   "crates/relational-geometry",
   "crates/holonic-engine",
-  "soma/body",
-  "soma/abi",
-  "soma/circulation-abi",
-  "soma/membrane",
-  "soma/surface",
-  "soma/life",
-  "soma/mount",
-  "soma/tools/record-index",
-  "soma/tools/derivation-atlas",
-  "soma/tools/holon-plate",
+  "crates/holonic-body",
+  "crates/holonic-abi",
+  "crates/holonic-circulation-abi",
+  "crates/holonic-membrane",
+  "crates/holonic-surface",
+  "crates/holonic-life",
+  "crates/holonic-mount",
+  "applications/derivation-atlas",
+  "applications/holon-plate",
 ]
 # The rust-gpu kernel and the nvptx mount kernel each pin their own nightly.
-# Their compiled artifacts -- soma/kernel/soma.spv and the mount PTX -- are
+# Their compiled artifacts -- accelerators/rust-gpu/soma.spv and the mount PTX -- are
 # committed boundary objects that soma-surface and mount include directly, so
 # the host workspace carries the artifact without carrying the toolchain.
 exclude = [
-  "soma/kernel",
-  "soma/kernel/builder",
-  "soma/mount/mount-smoke-kernel",
-  "soma/mount/soma-kernel-cuda",
+  "accelerators/rust-gpu",
+  "accelerators/rust-gpu/builder",
+  "accelerators/cuda-smoke",
+  "accelerators/cuda-kernel",
 ]
 
 [workspace.package]

@@ -112,23 +112,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "athena-alpha"
-version = "0.1.0"
-dependencies = [
- "holonic-engine",
- "holonics-circulation-abi",
- "life",
- "num-rational",
- "num-traits",
- "serde",
- "serde_json",
- "sha2 0.10.9",
- "tempfile",
- "thiserror 2.0.19",
- "tokenizers",
-]
-
-[[package]]
 name = "autocfg"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -917,20 +900,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "holonics-application"
+name = "holonics"
 version = "0.1.0"
 dependencies = [
- "athena-alpha",
  "holonic-engine",
+ "holonics-hna",
  "life",
- "num-bigint",
- "num-rational",
- "num-traits",
- "serde",
- "serde_json",
- "sha2 0.10.9",
- "tempfile",
- "thiserror 2.0.19",
 ]
 
 [[package]]
@@ -947,13 +922,48 @@ dependencies = [
 ]
 
 [[package]]
+name = "holonics-hna"
+version = "0.1.0"
+dependencies = [
+ "holonic-engine",
+ "holonics-circulation-abi",
+ "life",
+ "num-rational",
+ "num-traits",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
+ "thiserror 2.0.19",
+ "tokenizers",
+]
+
+[[package]]
 name = "holonics-workbench"
 version = "0.4.0"
 dependencies = [
- "athena-alpha",
  "clap",
  "holonic-engine",
- "holonics-application",
+ "holonics",
+ "holonics-hna",
+ "holonics-workspace",
+ "life",
+ "num-bigint",
+ "num-rational",
+ "num-traits",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
+ "thiserror 2.0.19",
+]
+
+[[package]]
+name = "holonics-workspace"
+version = "0.1.0"
+dependencies = [
+ "holonic-engine",
+ "holonics-hna",
  "life",
  "num-bigint",
  "num-rational",
@@ -1867,10 +1877,6 @@ dependencies = [
  "holonic-structure",
  "soma-abi",
 ]
-
-[[package]]
-name = "soma-record-index"
-version = "0.1.0"
 
 [[package]]
 name = "soma-surface"

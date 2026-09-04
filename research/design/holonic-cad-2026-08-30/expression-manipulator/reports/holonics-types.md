@@ -1,8 +1,8 @@
 # Holonics typed glossary (read-only survey, 2026-08-30)
 
 Path prefixes used below (all paths absolute once expanded):
-- `L/` = `/home/b/Workspaces/holonics/soma/formal/elementary-holonics/ElementaryHolonics/`
-- `LR/` = `/home/b/Workspaces/holonics/soma/formal/elementary-holonics/`
+- `L/` = `/home/b/Workspaces/holonics/formal/elementary-holonics/ElementaryHolonics/`
+- `LR/` = `/home/b/Workspaces/holonics/formal/elementary-holonics/`
 - `R/` = `/home/b/Workspaces/holonics/crates/`
 
 Format of every row: `Name — fields — meaning — path:line`. Meanings are the source's own doc-comment, condensed to one line. Nothing was built or modified.
@@ -345,7 +345,7 @@ Owns: "Exact reflective runtime beneath learnable surface codecs … defines no 
 
 - `R/holonic-engine/src/lean_development.rs` (2400): parses Lean **source text** (not kernel output). `read_development(text, grain: DeclarationGrain{OneArtifactOneDeclaration | EveryTopLevelDeclaration}) -> DevelopmentReading` (1867); emits `DevelopmentReading {grain, declarations: Vec<DeclaredForm>, unopened: Vec<UnopenedDeclaration>, commentary, preamble, scoping: BTreeMap<String,u32>, ambiguous_short_names}` (366); `DeclaredForm {former, name, anonymous, namespace_path, statement, recruited: BTreeMap<String,u32>, tactics, local_bindings, steps: Vec<ProofStep>, line}` (220); `ProofStep {former, cohort, focus, binder, statement, recruited, column, line}` (193); projections `derivations(ConductGrain)`, `declared_recruitment`, `open_recruitment`, `qualified_index`, `resolve` (386-610). Doc (`:1-40`) records why: the earlier reader named each file by its last `theorem` and charged comments/preamble as recruitment.
 - `R/holonic-engine/src/derivation_atlas.rs` (2746): `Derivation {name, statement, recruited}` (236); `read_derivation(text) -> Option<Derivation>` (505); `DECLARATION_FORMERS` = abbrev, axiom, class, def, example, inductive, instance, lemma, opaque, structure, theorem, variable (188); `CircuitAperture {identity: {ByDeclaration|ByRoute}, coefficient: {Incidence|Multiplicity}, statements: {Withheld|Founded}, reach: {IntoDerivation|OutOfDerivation}}` (646); `found_circuit(...) -> DerivationCircuit {aperture, complex: GradedCausalComplex, vertices, recruitments, reaches, routes}` (1012, 800) — 0-cells = declarations/symbols/statements, 1-cells = recruitment or reach, no 2-cells (doc `:11-26`); `invariant_movement`, `route_movement` (1311, 1409) return what changed between two readings.
-- `/home/b/Workspaces/holonics/soma/tools/derivation-atlas/src/main.rs`: `extract` runs `lake build derivation_atlas` then `.lake/build/bin/derivation_atlas --input … --output …` (1274-1290); `validate`, `inspect`, `corpus` consume the `holonics.derivation-atlas.v2` JSON (`SCHEMA`, mirrored `camelCase` structs).
+- `/home/b/Workspaces/holonics/applications/derivation-atlas/src/main.rs`: `extract` runs `lake build derivation_atlas` then `.lake/build/bin/derivation_atlas --input … --output …` (1274-1290); `validate`, `inspect`, `corpus` consume the `holonics.derivation-atlas.v2` JSON (`SCHEMA`, mirrored `camelCase` structs).
 
 ### B.6 CUDA kernels `R/holonic-engine/kernels/` (all registered in `build.rs:52-58`)
 
@@ -363,7 +363,7 @@ Owns: "Exact reflective runtime beneath learnable surface codecs … defines no 
 
 ## C. Cargo workspace (`/home/b/Workspaces/holonics/Cargo.toml`)
 
-Header (`:1-13`): "`body` is pure law: no_std, zero dependencies. `crates/holonic-structure` is the substrate … `relational-geometry` and `holonic-engine` are the exact receiver-relative geometry, float-free over BigRational with Sturm-certified algebraic roots. `holonic-language` is the reflective runtime. `soma/life` is the membrane where the ecologies live." Resolver 2, edition 2024. Excluded (own nightlies, committed artifacts): `soma/kernel`, `soma/kernel/builder`, `soma/mount/mount-smoke-kernel`, `soma/mount/soma-kernel-cuda`.
+Header (`:1-13`): "`body` is pure law: no_std, zero dependencies. `crates/holonic-structure` is the substrate … `relational-geometry` and `holonic-engine` are the exact receiver-relative geometry, float-free over BigRational with Sturm-certified algebraic roots. `holonic-language` is the reflective runtime. `crates/holonic-life` is the membrane where the ecologies live." Resolver 2, edition 2024. Excluded (own nightlies, committed artifacts): `accelerators/rust-gpu`, `accelerators/rust-gpu/builder`, `accelerators/cuda-smoke`, `accelerators/cuda-kernel`.
 
 | Member | First doc comment |
 |---|---|
@@ -372,15 +372,15 @@ Header (`:1-13`): "`body` is pure law: no_std, zero dependencies. `crates/holoni
 | `crates/relational-geometry` | Exact, receiver-relative geometry for the standalone laboratory (`:1`) |
 | `crates/holonic-engine` | Exact causal execution and receiver-relative visibility (`:1`) |
 | `crates/holonic-architecture-lint` | Repository architecture ratchet for continuing holonic machinery; observer/build tool, per-file census (`:1-6`) |
-| `soma/body` | `#![no_std]` "the law and the organs — one module per organ" (`src/lib.rs:3`) |
-| `soma/abi` | Substrate-neutral word records at Soma's execution membrane |
-| `soma/membrane` | The live, organ-neutral execution membrane |
-| `soma/surface` | the M4 felt-series card boundary; `FeltSurface` |
-| `soma/life` | Production library surface for the continuing Soma bodies |
-| `soma/mount` | CUDA Driver API boundary scaffolding for the headless production mount |
-| `soma/tools/record-index` | (no crate doc; modules `model, render, scan, sha256`) |
-| `soma/tools/derivation-atlas` | CLI `extract|validate|inspect|corpus` over `holonics.derivation-atlas.v2` bundles (`src/main.rs:11-16`) |
+| `crates/holonic-body` | `#![no_std]` "the law and the organs — one module per organ" (`src/lib.rs:3`) |
+| `crates/holonic-abi` | Substrate-neutral word records at Soma's execution membrane |
+| `crates/holonic-membrane` | The live, organ-neutral execution membrane |
+| `crates/holonic-surface` | the M4 felt-series card boundary; `FeltSurface` |
+| `crates/holonic-life` | Production library surface for the continuing Soma bodies |
+| `crates/holonic-mount` | CUDA Driver API boundary scaffolding for the headless production mount |
+| `applications/record-index` | (no crate doc; modules `model, render, scan, sha256`) |
+| `applications/derivation-atlas` | CLI `extract|validate|inspect|corpus` over `holonics.derivation-atlas.v2` bundles (`src/main.rs:11-16`) |
 | `soma/tools/standing-deposit` | The standing deposit and its verifier |
-| `soma/tools/holon-plate` | `.holon` — the on-disk deposit mouth |
+| `applications/holon-plate` | `.holon` — the on-disk deposit mouth |
 
 Workspace deps: `serde`, `ron 0.12`, `num-bigint 0.4`, `num-rational 0.4`, `num-traits`, `sha2`, `thiserror 2`.

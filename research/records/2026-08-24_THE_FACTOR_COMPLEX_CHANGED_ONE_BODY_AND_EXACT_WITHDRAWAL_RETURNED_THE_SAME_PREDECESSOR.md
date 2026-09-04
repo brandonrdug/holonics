@@ -2,7 +2,7 @@
 
 **Date:** 2026-08-24  
 **Authority:** admission record for the fourth station of
-[`../../blueprint/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md`](../../blueprint/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md)  
+[`../../blueprint/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md`](../../archive/plans/THE_ATHENA_ALPHA_IS_REFOUNDED_AS_A_RECEIVER_HISTORY_QUOTIENT_AND_RETURNED_DEFECTS_CULTIVATE_ONE_GLUED_CAUSAL_MORPHOLOGY.md)  
 **Engine owner:**
 [`../../crates/holonic-engine/src/phoenix/session_factor_complex.rs`](../../crates/holonic-engine/src/phoenix/session_factor_complex.rs)  
 **Same-body seam:**

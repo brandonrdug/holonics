@@ -10,7 +10,7 @@
 set -u -o pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PROJECT="$ROOT/soma/formal/elementary-holonics"
+PROJECT="$ROOT/formal/elementary-holonics"
 TARGET="${1:-ElementaryHolonics.Computation.HolonicQuantumTransport}"
 
 if [ ! -f "$PROJECT/lakefile.toml" ] || [ ! -f "$PROJECT/lean-toolchain" ]; then
@@ -21,7 +21,7 @@ fi
 cd "$PROJECT"
 LEAN_LOG="$(mktemp)"
 trap 'rm -- "$LEAN_LOG"' EXIT
-if ! timeout -k 2s 180s lake build "$TARGET" 2>&1 | tee "$LEAN_LOG"; then
+if ! lake build "$TARGET" 2>&1 | tee "$LEAN_LOG"; then
     exit 1
 fi
 if grep -Fq "declaration uses 'sorry'" "$LEAN_LOG"; then

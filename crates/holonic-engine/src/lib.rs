@@ -83,7 +83,7 @@ pub mod foreign_codec_rest;
 // across the engine's receiver modules and must be named at every call site.
 pub mod causal_traversal;
 /// The `d`-dimensional arrow and the even Clifford algebra that carries its hand — the lift of
-/// `soma/body/src/arrow.rs` out of two dimensions, over exact rationals.
+/// `crates/holonic-body/src/arrow.rs` out of two dimensions, over exact rationals.
 pub mod clifford;
 pub mod codec_system;
 /// Source-detached cultivated Phoenix product over one immutable native rest.
@@ -94,19 +94,19 @@ pub mod cultivation_derivation;
 pub mod soulkiller;
 // Reached explicitly rather than glob-exported for the same reason as
 // `discrete_curvature`: the bridge names `read`, `step` and `revise`, and a glob would put those
-// verbs in the crate root where nothing says what they read or step. `blueprint/THE_ASSEMBLY.md`.
+// verbs in the crate root where nothing says what they read or step. `archive/plans/THE_ASSEMBLY.md`.
 pub mod curvature_bridge;
 // Reached explicitly rather than glob-exported: a presentation face is a declared apparatus
 // membrane, and flattening it into the crate root would let a caller reach a display type without
-// naming that it is one. `blueprint/THE_PRESENTATION_ORGAN.md`.
+// naming that it is one. `archive/plans/THE_PRESENTATION_ORGAN.md`.
 pub mod certified_face;
 pub mod communication;
 // Declared, never glob-exported. `ReceiverId`, `Observation` and `ItemId` reach this module from
 // `receiver_exact_compression` and collide at the crate root with `relational_geometry::ReceiverId`
-// and with `graph_receiver`'s own vocabulary. `blueprint/THE_ASSEMBLY.md`, "what must not be built".
+// and with `graph_receiver`'s own vocabulary. `archive/plans/THE_ASSEMBLY.md`, "what must not be built".
 pub mod complex_system;
 // Coherence is collocation over time: two things relate iff presented together within one source.
-// The ratified law `reference/holobrochos-a07ff376/src/soma/FORMULA.md:298` and its referent law at
+// The ratified law `archive/reference/holobrochos-a07ff376/src/soma/FORMULA.md:298` and its referent law at
 // `:1278`, which had no implementation in either tree until this module. Declared, never
 // glob-exported: `Presentation` collides with the `presentation` family at the crate root.
 pub mod collocation;
@@ -230,7 +230,7 @@ pub mod landauer;
 // The canonical octet form of a `GradedCausalComplex`, so a rebase-invariants reading can be
 // deposited and re-lit by a different part. Declared, never glob-exported: it names
 // `encode_native_bytes` and `decode_native_bytes`, and a glob would put those verbs in the crate
-// root where nothing says which form they are of. `blueprint/THE_ASSEMBLY.md` step 6.
+// root where nothing says which form they are of. `archive/plans/THE_ASSEMBLY.md` step 6.
 pub mod graded_complex_form;
 pub mod graph_receiver;
 // A size-agnostic recursive cell, the schedules that expand it, and the 2-complex it grows.
@@ -265,7 +265,7 @@ pub mod live_presentation;
 // about which field they belong to.
 pub mod kelvin;
 // The species of a proof move, returned as a fiber rather than a label. A sibling of
-// `soma/life/src/reconstruction_fiber.rs`: the same common-exposed-face construction over
+// `crates/holonic-life/src/reconstruction_fiber.rs`: the same common-exposed-face construction over
 // `receiver_exact_compression`, with causal arrivals where the token system has stream neighbours.
 pub mod move_species;
 // A lattice gauge configuration read through `structure_group`: an exact integral representation,
@@ -323,7 +323,7 @@ pub mod returned_reading;
 pub mod returned_conduct;
 // The Tschirnhaus organ: transport a quintic to another chart, exhibit the transport, and refuse
 // with the obstruction named when the target chart cannot represent the answer.
-// `canon/TABLET_THE_CHART.md:280`.
+// `docs/canon/TABLET_THE_CHART.md:280`.
 /// Complete source/native operation and population coverage for Phoenix W1. This is a
 /// serialization-ready correspondence ledger, not a runtime or graph executor.
 pub mod operation_correspondence;
@@ -354,7 +354,7 @@ pub mod receiver_history_cultivation;
 // Declared, never glob-exported: it names `ExactFace`, `reopen`, `probe_at_grain` and
 // `DeclaredGrain`, and `ExactFace` collides in meaning with `certified_face`'s presentation face
 // while `reopen` says nothing at the crate root about what is being reopened. `CLAUDE.md` §2b and
-// `canon/THE_MATHEMATICS_TABLET.md` §1, "one deletion, three carriers".
+// `docs/canon/THE_MATHEMATICS_TABLET.md` §1, "one deletion, three carriers".
 pub mod receiver_current;
 pub mod receiver_ecology;
 pub mod receiver_phase_atlas;
@@ -404,7 +404,7 @@ pub mod simplicial;
 // One emission read against a declared reference body's standing, on material both were given.
 // Declared, never glob-exported: `Emission`, `Frame` and `situate` say nothing at the crate root
 // about which carrier they belong to, and `Frame` would collide with the receiver families.
-// `canon/THE_HOLOBROCHOS_SPINE.md` §2 — comparison is situated by a frame.
+// `docs/canon/THE_HOLOBROCHOS_SPINE.md` §2 — comparison is situated by a frame.
 pub mod situated_residual;
 pub mod skein;
 // A statement grammar recovered from the deposit's own statement population, and the composition of
@@ -422,10 +422,10 @@ pub mod statement_grammar;
 pub mod structure_group;
 // Declared, never glob-exported: `ReceiverId`, `Disagreement`, `Partition`, `Cover`, `Observation`
 // and `ItemId` collide across the placement family, and a realizer founded by a substitution must
-// be reached by naming which organ founded it. `blueprint/THE_ASSEMBLY.md` step 2.
+// be reached by naming which organ founded it. `archive/plans/THE_ASSEMBLY.md` step 2.
 // Surprisal as an exact symbolic form. Reached explicitly, never glob-exported: `Support` and
 // `entropy` say nothing at the crate root about which carrier they belong to, and a caller wanting a
-// number must be made to ask for an enclosure. `canon/THE_RECOVERED_LAW.md` §1 and §3.
+// number must be made to ask for an enclosure. `docs/canon/THE_RECOVERED_LAW.md` §1 and §3.
 pub mod substitution_realizers;
 pub mod supported_realizers;
 pub mod surprisal;

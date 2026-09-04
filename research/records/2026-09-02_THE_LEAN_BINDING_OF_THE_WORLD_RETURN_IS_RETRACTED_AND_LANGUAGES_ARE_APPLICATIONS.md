@@ -62,7 +62,7 @@ license.
 ## What replaces it
 
 [definition] The revised blueprint
-[`THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md`](../../blueprint/THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md)
+[`THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md`](../../archive/plans/THE_WORLD_RETURN_IS_MODALITY_NEUTRAL_AND_EVERY_LANGUAGE_IS_AN_APPLICATION.md)
 states the three seams without a codec: a mouth that founds carriers from any population and
 reference relation, a world face that is format-free, and an emitter that is the machine's own
 emission surface rendered by the application on its side of the ABI.

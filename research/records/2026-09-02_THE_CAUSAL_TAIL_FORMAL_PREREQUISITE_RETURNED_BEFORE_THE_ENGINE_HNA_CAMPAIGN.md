@@ -1,7 +1,7 @@
 # The causal-tail formal prerequisite returned before the engine HNA campaign
 
 **Date:** 2026-09-02
-**Truth status:** per claim under [`../../canon/EPISTEMIC_GRADES.md`](../../canon/EPISTEMIC_GRADES.md).
+**Truth status:** per claim under [`../../canon/EPISTEMIC_GRADES.md`](../../docs/canon/EPISTEMIC_GRADES.md).
 **Construction effect:** bounded formal prerequisite only. This record schedules no phase and
 advances no Rust, CUDA, Eros, or Athena capability grade.
 
@@ -9,7 +9,7 @@ advances no Rust, CUDA, Eros, or Athena capability grade.
 
 [definition] The temporary use of `HNA0--HNA4` for this Lean sequence was a scheduling error. HNA
 means the live Holonic Neural Athena engine campaign under
-[`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](../../blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
+[`THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](../../archive/plans/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
 The formal files below remain valid prerequisite law, but their temporary phase labels are
 withdrawn and schedule nothing.
 

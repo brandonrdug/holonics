@@ -34,7 +34,7 @@ use std::process::Command;
 use holonic_engine::lean_development::{BinderGrain, DeclarationGrain, read_development_at};
 use holonic_engine::move_species::{MoveComplex, MoveOccurrence};
 
-const PROJECT: &str = "soma/formal/rh-source-transport";
+const PROJECT: &str = "formal/rh-source-transport";
 const CORPUS: &str = "SomaRHSourceTransport/FiniteTransport.lean";
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -104,7 +104,7 @@ fn main() {
     }
     if !project.join(".lake/packages/mathlib").exists() {
         println!("  mathlib is not materialised for this project.");
-        println!("  recover it with:  cd soma/formal/elementary-holonics && lake exe cache get");
+        println!("  recover it with:  cd formal/elementary-holonics && lake exe cache get");
         std::process::exit(2);
     }
 
@@ -131,7 +131,7 @@ fn main() {
         std::process::exit(2);
     }
 
-    let scratch = root.join("output/the-kernel-decides-which-moves-are-load-bearing");
+    let scratch = root.join(".local/artifacts/the-kernel-decides-which-moves-are-load-bearing");
     fs::create_dir_all(&scratch).expect("the scratch root is writable");
 
     // The baseline. A file that does not check clean measures nothing when ablated.

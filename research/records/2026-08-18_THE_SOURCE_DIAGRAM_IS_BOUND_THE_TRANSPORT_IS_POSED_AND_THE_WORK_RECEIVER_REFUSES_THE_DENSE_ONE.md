@@ -1,7 +1,7 @@
 # The source diagram is bound, the transport is posed, and the work receiver refuses the dense one
 
 **Date:** 2026-08-18
-**Kind:** returned construction under [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md)
+**Kind:** returned construction under [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md)
 and the Phoenix blueprints.
 **Truth status:** `established-bounded` for every measured return below, each carrying the command
 that produced it; `implemented-exact` for the linear factorization, rebase receipt, metric adjoint
@@ -10,8 +10,8 @@ it.
 **Evidence:** `implemented-exact`, `measured`, `computational-witness`. Engine library tests
 `1,661 passed, 0 failed, 3 ignored`. No Phoenix capability is promoted and `CONSTRUCTION_STATE.md`
 is untouched.
-**Plan:** [`blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md`](../../blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md)
-under [`blueprint/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md`](../../blueprint/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md).
+**Plan:** [`blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md`](../../archive/plans/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md)
+under [`blueprint/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md`](../../archive/plans/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md).
 **Derivation:**
 [`2026-08-18_THE_HOLON_IS_THE_OPERATION_COMPLEX_THE_FOREIGN_MAP_IS_A_PORTED_WORD_AND_THE_CARD_CARRIES_ITS_FRONTS.md`](2026-08-18_THE_HOLON_IS_THE_OPERATION_COMPLEX_THE_FOREIGN_MAP_IS_A_PORTED_WORD_AND_THE_CARD_CARRIES_ITS_FRONTS.md)
 §§4, 5, 6, 10, 12 and 13. **This record executes stations one and two of its §12 and nothing

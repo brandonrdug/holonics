@@ -1,5 +1,5 @@
 use holonic_engine::{receiver_exact_compression::ReceiverId, EventId};
-use holonics_application::{VariantWorkspace, WorkspaceReturn};
+use holonics_workspace::{VariantWorkspace, WorkspaceReturn};
 use life::native_intelligence::ExportCodecKind;
 use serde::Serialize;
 

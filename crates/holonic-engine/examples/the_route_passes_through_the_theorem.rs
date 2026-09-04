@@ -45,7 +45,7 @@ use holonic_engine::derivation_capacitance::{
 };
 use holonic_engine::lean_development::{DeclarationGrain, join, read_development};
 
-const DEFAULT_ROOT: &str = "soma/formal";
+const DEFAULT_ROOT: &str = "formal";
 
 /// Collect every `.lean` file under `root`, skipping `.lake` — build output and vendored packages
 /// are not this development's own declarations.

@@ -5,7 +5,7 @@
 **Truth status:** `[proved-derived; formal-checked]`  
 **Evidence:** focused theorem build, complete library import build, and explicit axiom audit.  
 **Artifact:**
-[`HolonicMembraneActionTransport.lean`](../../soma/formal/elementary-holonics/ElementaryHolonics/Millennium/HolonicMembraneActionTransport.lean)
+[`HolonicMembraneActionTransport.lean`](../../formal/elementary-holonics/ElementaryHolonics/Millennium/HolonicMembraneActionTransport.lean)
 
 ## Returned construction
 

@@ -15,7 +15,7 @@ part that fits and the part that doesn't: 20/3 == 6 + 2/3 == 6.6666 repeating. T
 that loses information because you collapse it to 6.6666667 at some part of the mantissa, where we
 only care about the ratios in holonics. This is modulus."*
 **Plan:** this record schedules nothing and sits under
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md); the emission half it bears on is that
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md); the emission half it bears on is that
 roadmap's *Production as re-emission*.
 
 ---

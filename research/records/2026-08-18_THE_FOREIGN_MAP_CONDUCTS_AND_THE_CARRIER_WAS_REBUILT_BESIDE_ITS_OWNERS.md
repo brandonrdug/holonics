@@ -12,8 +12,8 @@
 **Truth status:** `established-bounded` for every measured return below, each carrying the command
 that produced it; `open` for the composition question in §4, which is the thing this deposit exists
 to hand over.
-**Plan:** [`blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md`](../../blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md)
-under [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md).
+**Plan:** [`blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md`](../../archive/plans/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md)
+under [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md).
 **Provenance:** Brandon, 2026-08-18, three times, escalating: *"If it's the mathematics & holonics
 that you're struggling with, I will need you to pause and write a communication deposit so that I
 can consult Sol."* Then: *"Would recommend not only studying floats, we have holonic analysis. You

@@ -7,10 +7,10 @@ and
 [`2026-08-21_THE_HODGE_ROUTE_LIFTS_THE_CLASS_TO_A_SHAPE_AND_THE_SHAPES_ARE_THE_PARTICLES.md`](2026-08-21_THE_HODGE_ROUTE_LIFTS_THE_CLASS_TO_A_SHAPE_AND_THE_SHAPES_ARE_THE_PARTICLES.md),
 plus the toolkit-import survey and the first UnsolvedMath sweep. Stations are founded terrain;
 rungs carry falsifiers; **it schedules nothing.**
-[`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) and
+[`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) and
 [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) remain the only construction authorities.
 **Position under the active plan.** Exterior mathematical material for Deed M2 of
-[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
+[`blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md`](../../archive/plans/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md).
 The Lean line does not couple to the engine, per Brandon's standing ruling.
 **Truth grades:** `proved-standard` for every imported classical theorem, cited at its station;
 `proved-derived` for the cited Lean theorems of this repository; `measured` for the dataset

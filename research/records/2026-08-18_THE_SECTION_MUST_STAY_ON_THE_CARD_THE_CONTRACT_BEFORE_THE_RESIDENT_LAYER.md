@@ -8,9 +8,9 @@ construction it contracts are deposited separately, after they exist.
 **Truth status:** **established-bounded** for every measurement below (each carries its command);
 **counterexample** for the paused pathway's promoted claims it refutes by reading source;
 **proposal** for the contract itself, which schedules nothing until the roadmap's named gate returns.
-**Authority:** [`blueprint/THE_ROADMAP.md`](../../blueprint/THE_ROADMAP.md) §"THE PHOENIX REBIRTH…",
-[the Phoenix master](../../blueprint/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md),
-[the Gemma instance](../../blueprint/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md),
+**Authority:** [`blueprint/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md) §"THE PHOENIX REBIRTH…",
+[the Phoenix master](../../archive/plans/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md),
+[the Gemma instance](../../archive/plans/THE_GEMMA_MAP_IS_DISSECTED_CONDENSED_CULTIVATED_AND_REBORN_AS_A_FROZEN_NATIVE_MODEL.md),
 and [the adversarial audit](2026-08-18_THE_SITE_RETURNED_BUT_THE_CARD_DID_NOT_OWN_THE_PATH_AND_PHOENIX_REMAINS_A_PARTIAL_LIFT.md).
 **Position boundary:** [`CONSTRUCTION_STATE.md`](../../CONSTRUCTION_STATE.md) is not moved by this
 deposit.

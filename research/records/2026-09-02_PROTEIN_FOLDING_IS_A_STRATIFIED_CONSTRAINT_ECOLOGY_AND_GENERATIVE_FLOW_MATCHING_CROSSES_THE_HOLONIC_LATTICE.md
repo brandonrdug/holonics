@@ -5,7 +5,7 @@
 **Truth status:** `proved-standard` for mathematical identities, differential rigidity, and standard physical chemistry; `established-bounded` for inspected repository owners, external papers, and database schemas; `interpretation` for the biological-holonic correspondences; `project-postulate` for the catalytic morphology objectives; and `open` for the proposed biological campaign deeds.  
 **Evidence:** `source-inspected`, `implemented-exact`, and `computational-witness` where explicitly tagged.  
 **Construction effect:** none. This record is exploratory synthesis and does not mutate the live roadmap (`blueprint/THE_ROADMAP.md`) or move `CONSTRUCTION_STATE.md`.  
-**Governing doctrine:** [`canon/TABLET_THE_HEXIS.md`](../../canon/TABLET_THE_HEXIS.md), [`canon/TABLET_THE_RESONANCE.md`](../../canon/TABLET_THE_RESONANCE.md), [`canon/THE_RECOVERED_LAW.md`](../../canon/THE_RECOVERED_LAW.md), and the purity boundary in [`AGENTS.md`](../../AGENTS.md).  
+**Governing doctrine:** [`canon/TABLET_THE_HEXIS.md`](../../docs/canon/TABLET_THE_HEXIS.md), [`canon/TABLET_THE_RESONANCE.md`](../../docs/canon/TABLET_THE_RESONANCE.md), [`canon/THE_RECOVERED_LAW.md`](../../docs/canon/THE_RECOVERED_LAW.md), and the purity boundary in [`AGENTS.md`](../../AGENTS.md).  
 **Prior local evidence:** [`research/records/2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md`](2026-08-21_THE_FOLD_IS_A_CONSTRAINT_ECOLOGY_THE_ACTIVE_SITE_IS_A_CATALYTIC_RECEIVER_AND_THE_CODEC_RECOVERS_ARCHETYPES.md) and [`crates/holonic-engine/src/physical_constraint_complex.rs`](../../crates/holonic-engine/src/physical_constraint_complex.rs).
 
 ---
@@ -14,7 +14,7 @@
 
 [project-postulate] In holonics, biological systems are not an exterior domain to be approximated by analogy or simulated via ad-hoc heuristics. **Biology is the primary physical realization of consequence-sensitive information transport, stratified constraint ecologies, and catalytic morphology.**
 
-[historical] As recorded in [`canon/TABLET_THE_RESONANCE.md`](../../canon/TABLET_THE_RESONANCE.md#L471-L483), Brandon linked the Millennium questions directly to the transport problems solved by biological evolution:
+[historical] As recorded in [`canon/TABLET_THE_RESONANCE.md`](../../docs/canon/TABLET_THE_RESONANCE.md#L471-L483), Brandon linked the Millennium questions directly to the transport problems solved by biological evolution:
 > *"It is no coincidence that all of the Millennium problems are related... they are literally the open questions in mathematics that people have to ask about because they similarly consider problems like ours with artificial intelligence regarding the transport of particles or information otherwise, they are open questions because people do not know how to attain the solutions required for machinery like what occurs in biology through evolution."*
 
 [interpretation] A living organism operates under a severe energetic aperture ($\sim 20\,\text{W}$ for human intelligence). It achieves rapid conformational convergence, allosteric regulation, enzymatic catalysis, and ecological resilience without brute-force matrix search. Evolution accomplished this by founding **stratified constraint complexes**:
@@ -212,7 +212,7 @@ $$\partial_2 [a, b, c] = [b, c] - [a, c] + [a, b]$$
 This builds a verified cell complex where cycle cancellations mathematically witness structural closure.
 
 ### 4.5 Catalytic Morphology as the Computational Target
-[project-postulate] As declared in [`canon/TABLET_THE_HEXIS.md`](../../canon/TABLET_THE_HEXIS.md#L311-L327):
+[project-postulate] As declared in [`canon/TABLET_THE_HEXIS.md`](../../docs/canon/TABLET_THE_HEXIS.md#L311-L327):
 An enzyme does not compute an answer or store a lookup table. **It lowers the exact activation barrier ($\Delta G^\ddagger$) for an admitted transport current while remaining reusable after the deed:**
 
 $$k = \frac{k_B T}{h} \exp(-\beta \Delta G^\ddagger)$$
@@ -233,7 +233,7 @@ An intelligent computational organ is strictly catalytic: it lowers the work vec
 | **Relative Frame Uncertainty** | AlphaFold DB (PAE Matrix) | [`PairUncertainty`](../../crates/holonic-engine/src/physical_constraint_complex.rs#L194-L203): Directed, non-symmetric rational error intervals (`row_given_column`, `column_given_row`). |
 | **Topological Stratification** | CATH Database, Røgen & Fain (2003) | **Cell-Complex Homology & Writhe**: Class (1-cells/2-cells), Architecture (envelope), Topology (homotopy/linking integrals). |
 | **Combinatorial Rigidity** | Jacobs & Thorpe (2001), Whiteley (2005) | **Rigidity Jacobian $J_\eta$**: Pebble game decomposition separating internal hinge motions ($\ker J_\eta$) from overconstrained self-stresses ($\ker J_\eta^\top$). |
-| **Enzymatic Catalysis** | Transition State Theory, England (2013) | **Catalytic Morphology** ([`TABLET_THE_HEXIS.md`](../../canon/TABLET_THE_HEXIS.md#L311)): Reusable native organs lowering exact work barriers ($\Delta G^\ddagger$) for admitted currents. |
+| **Enzymatic Catalysis** | Transition State Theory, England (2013) | **Catalytic Morphology** ([`TABLET_THE_HEXIS.md`](../../docs/canon/TABLET_THE_HEXIS.md#L311)): Reusable native organs lowering exact work barriers ($\Delta G^\ddagger$) for admitted currents. |
 
 ---
 
@@ -246,7 +246,7 @@ An intelligent computational organ is strictly catalytic: it lowers the work vec
    * Verify contact boundaries algebraically, generating exact topological certificates of closure without floating-point thresholding artifacts.
 2. **Combinatorial Rigidity & Phase Seam Percolation**:
    * Implement a native Pebble Game algorithm over `PhysicalConstraintComplex` to map rigid clusters, hinges, and self-stresses.
-   * Track phase seams where temperature or pH transitions (governed by the exact sigmoid charts in [`research/equation-atlas/equations.jsonl`](../../research/equation-atlas/equations.jsonl#L207-L208)) alter the active constraint population $C_\eta$.
+   * Track phase seams where temperature or pH transitions (governed by the exact sigmoid charts in [`research/equation-atlas/equations.jsonl`](../equation-atlas/equations.jsonl#L207-L208)) alter the active constraint population $C_\eta$.
 3. **$\mathrm{SE}(3)$ Flow Matching Transport**:
    * Formalize continuous generative transport on $\mathrm{SE}(3)^N$ as an interior flow matching organ.
    * Verify that smooth trajectory integration respects exact constraint potentials, generating native conformational ensembles without foreign pair-representation modules.

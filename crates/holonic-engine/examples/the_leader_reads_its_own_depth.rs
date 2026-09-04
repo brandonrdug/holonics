@@ -19,7 +19,7 @@
 //! The same header's ruling 2 quotes the Brandon-ratified
 //! `research/records/2026-07-17_THE_LEADER_GROWS_THE_CHANNEL_THE_RETURN_TRAVELS_THE_FOUND_PATH.md`
 //! banning *"No random route chooser, target search, global path, standing-wave cause, or
-//! **instantaneous return**"*, and `canon/THE_AUTHORED_LEVEL.md` §5.1 names this excision on the
+//! **instantaneous return**"*, and `docs/canon/THE_AUTHORED_LEVEL.md` §5.1 names this excision on the
 //! same reading: *"what the material stopped the leader at … **A leader whose witness depth is one
 //! takes a single step; that is not a leader.**"*
 //!
@@ -52,7 +52,7 @@
 //!    against a true `23`. That is the pin deciding a return, and the refusal the excision installs
 //!    names it.
 //! 4. **`derivation_integral`'s own material**, where the derived levels reproduce `1/3` and `1`
-//!    exactly — the outcome `canon/THE_CONTAMINANT_PROTOCOL.md` §4 calls *the return holds, the
+//!    exactly — the outcome `docs/canon/THE_CONTAMINANT_PROTOCOL.md` §4 calls *the return holds, the
 //!    reachable population grows* — together with the material that would move them.
 
 use std::error::Error;
