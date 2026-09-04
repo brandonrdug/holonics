@@ -707,4 +707,123 @@ theorem exists_almost_period {t X : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) {ε : ℝ}
   refine le_trans (add_le_add hA hB) ?_
   linarith
 
+/-! ## The minimum-modulus principle, and zeros at unbounded heights -/
+
+/-- **Minimum modulus.** If `f` is differentiable on a disc and continuous on its closure,
+`‖f c‖ < δ`, and `δ ≤ ‖f‖` on the boundary circle, then `f` has a zero in the closed disc. -/
+theorem exists_zero_of_norm_center_lt {f : ℂ → ℂ} {c : ℂ} {r δ : ℝ} (hr : 0 < r)
+    (hf : DiffContOnCl ℂ f (Metric.ball c r)) (hc : ‖f c‖ < δ)
+    (hsph : ∀ z ∈ Metric.sphere c r, δ ≤ ‖f z‖) :
+    ∃ z ∈ Metric.closedBall c r, f z = 0 := by
+  by_contra hno
+  push_neg at hno
+  have hδ : 0 < δ := lt_of_le_of_lt (norm_nonneg _) hc
+  have hcl : closure (Metric.ball c r) = Metric.closedBall c r := closure_ball c hr.ne'
+  have hfr : frontier (Metric.ball c r) = Metric.sphere c r := frontier_ball c hr.ne'
+  have hg : DiffContOnCl ℂ (fun z => (f z)⁻¹) (Metric.ball c r) := by
+    refine ⟨hf.differentiableOn.inv (fun z hz => hno z (Metric.ball_subset_closedBall hz)), ?_⟩
+    exact hf.continuousOn.inv₀ (fun z hz => hno z (by rwa [hcl] at hz))
+  have hbd := Complex.norm_le_of_forall_mem_frontier_norm_le Metric.isBounded_ball hg
+    (C := 1 / δ) (fun z hz => by
+      rw [hfr] at hz
+      rw [norm_inv, one_div]
+      exact inv_anti₀ hδ (hsph z hz))
+    (z := c) (by rw [hcl]; exact Metric.mem_closedBall_self hr.le)
+  rw [norm_inv, one_div] at hbd
+  have hfc : 0 < ‖f c‖ := norm_pos_iff.mpr (hno c (Metric.mem_closedBall_self hr.le))
+  have := (inv_le_inv₀ hfc hδ).mp hbd
+  linarith
+
+/-- `F_t` is not identically zero. -/
+theorem Ft_zero_ne_zero {t : ℝ} (ht : 0 < t) : Ft t 0 ≠ 0 := by
+  intro h
+  have := norm_Ft_zero_ge ht
+  rw [h, norm_zero] at this
+  have := Real.exp_pos (-t * Real.log 2 ^ 2)
+  linarith
+
+/-- **A zero of `F_t` with a margin on a circle around it.** -/
+theorem exists_zero_margin {t : ℝ} (ht : 0 < t) :
+    ∃ s₀ : ℂ, ∃ r δ : ℝ, 0 < r ∧ 0 < δ ∧ Ft t s₀ = 0 ∧
+      ∀ s ∈ Metric.sphere s₀ r, δ ≤ ‖Ft t s‖ := by
+  obtain ⟨s₀, hs₀⟩ := exists_zero_Ft ht
+  have hd := differentiable_Ft ht
+  -- the zero is isolated
+  have hiso : ∀ᶠ s in 𝓝[≠] s₀, Ft t s ≠ 0 := by
+    rcases (hd.analyticAt s₀).eventually_eq_zero_or_eventually_ne_zero with h | h
+    · exfalso
+      have hall : EqOn (Ft t) 0 univ :=
+        AnalyticOnNhd.eqOn_zero_of_preconnected_of_eventuallyEq_zero
+          (fun y _ => hd.analyticAt y) isPreconnected_univ (mem_univ s₀) h
+      exact Ft_zero_ne_zero ht (hall (mem_univ 0))
+    · exact h
+  obtain ⟨ε, hε, hball⟩ := Metric.mem_nhdsWithin_iff.mp hiso
+  set r : ℝ := ε / 2 with hr
+  have hr0 : 0 < r := by positivity
+  have hne : ∀ s ∈ Metric.sphere s₀ r, Ft t s ≠ 0 := by
+    intro s hs
+    apply hball
+    refine ⟨?_, ?_⟩
+    · rw [Metric.mem_ball]
+      have : dist s s₀ = r := hs
+      linarith
+    · intro h
+      have : dist s s₀ = r := hs
+      rw [h, dist_self] at this
+      linarith
+  have hcomp : IsCompact (Metric.sphere s₀ r) := isCompact_sphere s₀ r
+  have hnonempty : (Metric.sphere s₀ r).Nonempty := NormedSpace.sphere_nonempty.mpr hr0.le
+  obtain ⟨z, hz, hmin⟩ := hcomp.exists_isMinOn hnonempty
+    (hd.continuous.norm.continuousOn)
+  refine ⟨s₀, r, ‖Ft t z‖, hr0, norm_pos_iff.mpr (hne z hz), hs₀, fun s hs => hmin hs⟩
+
+/-- **RT5: `F_t` has zeros at every height, in a fixed strip.** For every `T₀` there is a zero
+of `F_t` with `Im ≥ T₀` and `|Re| ≤ X₀`, where `X₀` depends only on `t`. -/
+theorem exists_zero_Ft_above {t : ℝ} (ht : 0 < t) :
+    ∃ X₀ : ℝ, ∀ T₀ : ℝ, ∃ s : ℂ, T₀ ≤ s.im ∧ |s.re| ≤ X₀ ∧ Ft t s = 0 := by
+  obtain ⟨s₀, r, δ, hr, hδ, hs₀, hsph⟩ := exists_zero_margin ht
+  refine ⟨|s₀.re| + r, fun T₀ => ?_⟩
+  have hX0 : 0 ≤ |s₀.re| + r := by positivity
+  obtain ⟨τ, hτ, hclose⟩ := exists_almost_period ht hX0 (by positivity : 0 < δ / 4)
+    (T₀ + r - s₀.im)
+  -- the translate has a zero in the disc
+  have hstrip : ∀ s ∈ Metric.closedBall s₀ r, |s.re| ≤ |s₀.re| + r := by
+    intro s hs
+    have h1 : ‖s - s₀‖ ≤ r := by rwa [Metric.mem_closedBall, dist_eq_norm] at hs
+    have h2 : |s.re - s₀.re| ≤ ‖s - s₀‖ := by
+      have := Complex.abs_re_le_norm (s - s₀)
+      rwa [Complex.sub_re] at this
+    calc |s.re| = |(s.re - s₀.re) + s₀.re| := by ring_nf
+      _ ≤ |s.re - s₀.re| + |s₀.re| := abs_add_le _ _
+      _ ≤ |s₀.re| + r := by linarith
+  have hd := differentiable_Ft ht
+  have hG : DiffContOnCl ℂ (fun s => Ft t (s + Complex.I * τ)) (Metric.ball s₀ r) :=
+    (hd.comp (differentiable_id.add_const _)).diffContOnCl
+  have hcenter : ‖Ft t (s₀ + Complex.I * τ)‖ < δ / 2 := by
+    have := hclose s₀ (hstrip s₀ (Metric.mem_closedBall_self hr.le))
+    rw [hs₀, sub_zero] at this
+    linarith
+  have hsphere : ∀ z ∈ Metric.sphere s₀ r, δ / 2 ≤ ‖Ft t (z + Complex.I * τ)‖ := by
+    intro z hz
+    have h1 := hsph z hz
+    have h2 := hclose z (hstrip z (Metric.sphere_subset_closedBall hz))
+    have h3 : ‖Ft t z‖ - ‖Ft t (z + Complex.I * τ) - Ft t z‖ ≤ ‖Ft t (z + Complex.I * τ)‖ := by
+      have := norm_sub_norm_le (Ft t (z + Complex.I * τ)) (Ft t z)
+      rw [norm_sub_rev] at this
+      linarith [abs_le.mp (abs_norm_sub_norm_le (Ft t (z + Complex.I * τ)) (Ft t z))]
+    linarith
+  obtain ⟨z, hz, hz0⟩ := exists_zero_of_norm_center_lt hr hG hcenter hsphere
+  refine ⟨z + Complex.I * τ, ?_, ?_, hz0⟩
+  · have h1 : ‖z - s₀‖ ≤ r := by rwa [Metric.mem_closedBall, dist_eq_norm] at hz
+    have h2 : |z.im - s₀.im| ≤ ‖z - s₀‖ := by
+      have := Complex.abs_im_le_norm (z - s₀)
+      rwa [Complex.sub_im] at this
+    have h3 : (z + Complex.I * τ).im = z.im + τ := by simp
+    rw [h3]
+    have := abs_le.mp h2
+    linarith
+  · have h3 : (z + Complex.I * τ).re = z.re := by simp
+    rw [h3]
+    exact hstrip z hz
+
 end Soma.Holonics.RH.BohrZeros
