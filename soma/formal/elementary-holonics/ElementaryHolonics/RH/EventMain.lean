@@ -33,20 +33,20 @@ open Soma.Holonics.RH.EventSaddle
 
 /-! ## The coordinates -/
 
-/-- `Λ(s) = Log(s/2) − log π`, so that `Λ(s) = Log(s/(2π))` off the slit. -/
-def Λ (s : ℂ) : ℂ := Complex.log (s / 2) - (Real.log π : ℂ)
+/-- `Λs(s) = Log(s/2) − log π`, so that `Λs(s) = Log(s/(2π))` off the slit. -/
+def Λs (s : ℂ) : ℂ := Complex.log (s / 2) - (Real.log π : ℂ)
 
 /-- Dobner's `J_t(s) = s + tΛ(s)` (repository time `t`, standard `|t|_D = 4t`). -/
-def J (t : ℝ) (s : ℂ) : ℂ := s + t * Λ s
+def J (t : ℝ) (s : ℂ) : ℂ := s + t * Λs s
 
 /-- Dobner's `γ_t(s) = g(s) e^{tΛ(s)²/4}`. -/
-def γt' (t : ℝ) (s : ℂ) : ℂ := g s * Complex.exp (t * (Λ s) ^ 2 / 4)
+def γt' (t : ℝ) (s : ℂ) : ℂ := g s * Complex.exp (t * (Λs s) ^ 2 / 4)
 
 /-- `ε₁(s) = 1/(2s) + 1/(s − 1)`, the exact difference `ℓ(s) − Λ(s)/2`. -/
 def ε₁ (s : ℂ) : ℂ := (2 * s)⁻¹ + (s - 1)⁻¹
 
-theorem ℓ_sub_half_Λ (s : ℂ) : ℓ s - Λ s / 2 = ε₁ s := by
-  unfold ℓ Λ ε₁
+theorem ℓ_sub_half_Λ (s : ℂ) : ℓ s - Λs s / 2 = ε₁ s := by
+  unfold ℓ Λs ε₁
   ring
 
 /-- The quadratic coefficient `A = 1/(4t) + ℓ'(s)/2`. -/
@@ -56,7 +56,7 @@ def A (t : ℝ) (s : ℂ) : ℂ := 1 / (4 * t) + ℓ' s / 2
 def q (s : ℂ) (h : ℝ) : ℂ := ε₁ s + h * ℓ' s
 
 /-- The `v`-free exponent `P = tΛ²/4 + hℓ(s) + h²ℓ'(s)/2`. -/
-def P (t : ℝ) (s : ℂ) (h : ℝ) : ℂ := t * (Λ s) ^ 2 / 4 + h * ℓ s + h ^ 2 * ℓ' s / 2
+def P (t : ℝ) (s : ℂ) (h : ℝ) : ℂ := t * (Λs s) ^ 2 / 4 + h * ℓ s + h ^ 2 * ℓ' s / 2
 
 /-- The main Gaussian `e^{−A v² + i q v}`. -/
 def gauss (t : ℝ) (s : ℂ) (h : ℝ) (v : ℝ) : ℂ :=
@@ -92,17 +92,17 @@ theorem f_window {t : ℝ} (ht : 0 < t) {s : ℂ} {h v : ℝ}
   · rw [f_apply, hzeq, γ₁_eq_γ hz0, γ_eq_g hsec, hR]
     unfold gauss P A q
     have htC : (t : ℂ) ≠ 0 := by exact_mod_cast ht.ne'
-    have hJ : s + ((h : ℂ) + Complex.I * v) - (J t s + h) = Complex.I * v - t * Λ s := by
+    have hJ : s + ((h : ℂ) + Complex.I * v) - (J t s + h) = Complex.I * v - t * Λs s := by
       unfold J
       ring
     rw [hJ]
-    have hε : ℓ s = Λ s / 2 + ε₁ s := by
+    have hε : ℓ s = Λs s / 2 + ε₁ s := by
       have := ℓ_sub_half_Λ s
       linear_combination this
     rw [Complex.exp_add, Complex.exp_add, Complex.exp_add, Complex.exp_add]
-    have key : Complex.exp ((Complex.I * v - t * Λ s) ^ 2 / (4 * t)) *
+    have key : Complex.exp ((Complex.I * v - t * Λs s) ^ 2 / (4 * t)) *
         Complex.exp (((h : ℂ) + Complex.I * v) * ℓ s + ((h : ℂ) + Complex.I * v) ^ 2 * ℓ' s / 2) =
-        Complex.exp (t * Λ s ^ 2 / 4) * Complex.exp (h * ℓ s) * Complex.exp (h ^ 2 * ℓ' s / 2) *
+        Complex.exp (t * Λs s ^ 2 / 4) * Complex.exp (h * ℓ s) * Complex.exp (h ^ 2 * ℓ' s / 2) *
           Complex.exp (-(1 / (4 * t) + ℓ' s / 2) * (v : ℂ) ^ 2 +
             Complex.I * (ε₁ s + h * ℓ' s) * v) := by
       rw [← Complex.exp_add, ← Complex.exp_add, ← Complex.exp_add, ← Complex.exp_add]
@@ -112,11 +112,11 @@ theorem f_window {t : ℝ} (ht : 0 < t) {s : ℂ} {h v : ℝ}
       ring_nf
       rw [Complex.I_sq]
       ring
-    calc Complex.exp ((Complex.I * v - t * Λ s) ^ 2 / (4 * t)) *
+    calc Complex.exp ((Complex.I * v - t * Λs s) ^ 2 / (4 * t)) *
           (g s * (Complex.exp (((h : ℂ) + Complex.I * v) * ℓ s) *
             Complex.exp (((h : ℂ) + Complex.I * v) ^ 2 * ℓ' s / 2) * Complex.exp R) *
             Complex.exp (-μ ((s + ((h : ℂ) + Complex.I * v)) / 2)))
-        = g s * (Complex.exp ((Complex.I * v - t * Λ s) ^ 2 / (4 * t)) *
+        = g s * (Complex.exp ((Complex.I * v - t * Λs s) ^ 2 / (4 * t)) *
             Complex.exp (((h : ℂ) + Complex.I * v) * ℓ s + ((h : ℂ) + Complex.I * v) ^ 2 * ℓ' s / 2)) *
             (Complex.exp R * Complex.exp (-μ ((s + ((h : ℂ) + Complex.I * v)) / 2))) := by
           rw [Complex.exp_add]

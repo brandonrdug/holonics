@@ -120,6 +120,7 @@ import ElementaryHolonics.RH.GammaPhase
 import ElementaryHolonics.RH.FlowedGammaContour
 import ElementaryHolonics.RH.EventSaddle
 import ElementaryHolonics.RH.EventMain
+import ElementaryHolonics.RH.EventBounds
 import ElementaryHolonics.RH.LogDerivativeRemainder
 import ElementaryHolonics.RH.LandauLemma
 import ElementaryHolonics.RH.ZeroFactorizationExists
