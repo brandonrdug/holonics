@@ -139,6 +139,7 @@ import ElementaryHolonics.RH.XiStrip
 import ElementaryHolonics.RH.TranslationAverage
 import ElementaryHolonics.RH.KernelAverage
 import ElementaryHolonics.RH.ConjIndex
+import ElementaryHolonics.RH.StripAverage
 import ElementaryHolonics.RH.LogDerivativeRemainder
 import ElementaryHolonics.RH.LandauLemma
 import ElementaryHolonics.RH.ZeroFactorizationExists
