@@ -1,0 +1,1725 @@
+{
+  "schema": "athena-alpha.composed-variant.v1",
+  "classes": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "class_cone_roles": [
+    109,
+    115,
+    110,
+    106,
+    99
+  ],
+  "extent_roles": 117,
+  "roles": 127,
+  "faces": [
+    {
+      "occurrence": 0,
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": []
+      },
+      "full_face": 236832,
+      "composed_face": 236832,
+      "equal": true,
+      "width_difference": [
+        [
+          -90,
+          232
+        ],
+        [
+          -60,
+          10325
+        ],
+        [
+          -30,
+          59925
+        ],
+        [
+          0,
+          127253
+        ],
+        [
+          30,
+          55207
+        ],
+        [
+          60,
+          8997
+        ],
+        [
+          90,
+          205
+        ]
+      ]
+    },
+    {
+      "occurrence": 0,
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          1855,
+          47940,
+          563,
+          236743
+        ]
+      },
+      "full_face": 236810,
+      "composed_face": 236810,
+      "equal": true,
+      "width_difference": [
+        [
+          -90,
+          61
+        ],
+        [
+          -60,
+          4798
+        ],
+        [
+          -30,
+          63725
+        ],
+        [
+          0,
+          125119
+        ],
+        [
+          30,
+          63554
+        ],
+        [
+          60,
+          4845
+        ],
+        [
+          90,
+          42
+        ]
+      ]
+    },
+    {
+      "occurrence": 0,
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          2324,
+          563,
+          236743
+        ]
+      },
+      "full_face": 236770,
+      "composed_face": 236770,
+      "equal": true,
+      "width_difference": [
+        [
+          -90,
+          223
+        ],
+        [
+          -60,
+          8261
+        ],
+        [
+          -30,
+          58373
+        ],
+        [
+          0,
+          135063
+        ],
+        [
+          30,
+          53074
+        ],
+        [
+          60,
+          6947
+        ],
+        [
+          90,
+          203
+        ]
+      ]
+    },
+    {
+      "occurrence": 1,
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": []
+      },
+      "full_face": 236819,
+      "composed_face": 236819,
+      "equal": true,
+      "width_difference": [
+        [
+          -90,
+          240
+        ],
+        [
+          -60,
+          11680
+        ],
+        [
+          -30,
+          60580
+        ],
+        [
+          0,
+          124055
+        ],
+        [
+          30,
+          55442
+        ],
+        [
+          60,
+          9944
+        ],
+        [
+          90,
+          203
+        ]
+      ]
+    },
+    {
+      "occurrence": 1,
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          1855,
+          47940,
+          563,
+          236743
+        ]
+      },
+      "full_face": 236800,
+      "composed_face": 236800,
+      "equal": true,
+      "width_difference": [
+        [
+          -90,
+          37
+        ],
+        [
+          -60,
+          4658
+        ],
+        [
+          -30,
+          64259
+        ],
+        [
+          0,
+          124944
+        ],
+        [
+          30,
+          63676
+        ],
+        [
+          60,
+          4538
+        ],
+        [
+          90,
+          32
+        ]
+      ]
+    },
+    {
+      "occurrence": 1,
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          2324,
+          563,
+          236743
+        ]
+      },
+      "full_face": 236770,
+      "composed_face": 236770,
+      "equal": true,
+      "width_difference": [
+        [
+          -120,
+          1
+        ],
+        [
+          -90,
+          227
+        ],
+        [
+          -60,
+          10484
+        ],
+        [
+          -30,
+          59174
+        ],
+        [
+          0,
+          128812
+        ],
+        [
+          30,
+          54706
+        ],
+        [
+          60,
+          8496
+        ],
+        [
+          90,
+          244
+        ]
+      ]
+    },
+    {
+      "occurrence": 2,
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": []
+      },
+      "full_face": 236832,
+      "composed_face": 236832,
+      "equal": true,
+      "width_difference": [
+        [
+          -90,
+          225
+        ],
+        [
+          -60,
+          9586
+        ],
+        [
+          -30,
+          60012
+        ],
+        [
+          0,
+          128069
+        ],
+        [
+          30,
+          55700
+        ],
+        [
+          60,
+          8361
+        ],
+        [
+          90,
+          191
+        ]
+      ]
+    },
+    {
+      "occurrence": 2,
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          1855,
+          47940,
+          563,
+          236743
+        ]
+      },
+      "full_face": 236825,
+      "composed_face": 236825,
+      "equal": true,
+      "width_difference": [
+        [
+          -90,
+          46
+        ],
+        [
+          -60,
+          4921
+        ],
+        [
+          -30,
+          63640
+        ],
+        [
+          0,
+          126367
+        ],
+        [
+          30,
+          62465
+        ],
+        [
+          60,
+          4668
+        ],
+        [
+          90,
+          37
+        ]
+      ]
+    },
+    {
+      "occurrence": 2,
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          2324,
+          563,
+          236743
+        ]
+      },
+      "full_face": 236770,
+      "composed_face": 236770,
+      "equal": true,
+      "width_difference": [
+        [
+          -90,
+          208
+        ],
+        [
+          -60,
+          7091
+        ],
+        [
+          -30,
+          57816
+        ],
+        [
+          0,
+          137789
+        ],
+        [
+          30,
+          53100
+        ],
+        [
+          60,
+          5989
+        ],
+        [
+          90,
+          151
+        ]
+      ]
+    },
+    {
+      "occurrence": 3,
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": []
+      },
+      "full_face": 236800,
+      "composed_face": 236800,
+      "equal": true,
+      "width_difference": [
+        [
+          -90,
+          232
+        ],
+        [
+          -60,
+          10623
+        ],
+        [
+          -30,
+          60172
+        ],
+        [
+          0,
+          126308
+        ],
+        [
+          30,
+          55450
+        ],
+        [
+          60,
+          9153
+        ],
+        [
+          90,
+          206
+        ]
+      ]
+    },
+    {
+      "occurrence": 3,
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          1855,
+          47940,
+          563,
+          236743
+        ]
+      },
+      "full_face": 236812,
+      "composed_face": 236812,
+      "equal": true,
+      "width_difference": [
+        [
+          -90,
+          45
+        ],
+        [
+          -60,
+          4632
+        ],
+        [
+          -30,
+          63186
+        ],
+        [
+          0,
+          125473
+        ],
+        [
+          30,
+          63885
+        ],
+        [
+          60,
+          4880
+        ],
+        [
+          90,
+          43
+        ]
+      ]
+    },
+    {
+      "occurrence": 3,
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          2324,
+          563,
+          236743
+        ]
+      },
+      "full_face": 236832,
+      "composed_face": 236832,
+      "equal": true,
+      "width_difference": [
+        [
+          -90,
+          257
+        ],
+        [
+          -60,
+          10583
+        ],
+        [
+          -30,
+          59149
+        ],
+        [
+          0,
+          128894
+        ],
+        [
+          30,
+          54150
+        ],
+        [
+          60,
+          8856
+        ],
+        [
+          90,
+          255
+        ]
+      ]
+    },
+    {
+      "occurrence": 4,
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": []
+      },
+      "full_face": 236828,
+      "composed_face": 236828,
+      "equal": true,
+      "width_difference": [
+        [
+          -90,
+          217
+        ],
+        [
+          -60,
+          10061
+        ],
+        [
+          -30,
+          60311
+        ],
+        [
+          0,
+          127451
+        ],
+        [
+          30,
+          55226
+        ],
+        [
+          60,
+          8658
+        ],
+        [
+          90,
+          220
+        ]
+      ]
+    },
+    {
+      "occurrence": 4,
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          1855,
+          47940,
+          563,
+          236743
+        ]
+      },
+      "full_face": 236828,
+      "composed_face": 236828,
+      "equal": true,
+      "width_difference": [
+        [
+          -90,
+          52
+        ],
+        [
+          -60,
+          5114
+        ],
+        [
+          -30,
+          63441
+        ],
+        [
+          0,
+          126034
+        ],
+        [
+          30,
+          62389
+        ],
+        [
+          60,
+          5064
+        ],
+        [
+          90,
+          50
+        ]
+      ]
+    },
+    {
+      "occurrence": 4,
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          2324,
+          563,
+          236743
+        ]
+      },
+      "full_face": 236770,
+      "composed_face": 236770,
+      "equal": true,
+      "width_difference": [
+        [
+          -90,
+          227
+        ],
+        [
+          -60,
+          8716
+        ],
+        [
+          -30,
+          58393
+        ],
+        [
+          0,
+          133804
+        ],
+        [
+          30,
+          53554
+        ],
+        [
+          60,
+          7269
+        ],
+        [
+          90,
+          181
+        ]
+      ]
+    }
+  ],
+  "refused_outside_family": "Some(OccurrenceOutsideFamily { addresses: [2, 105, 2364, 107, 236770, 236770, 900, 236743, 236778, 578, 106, 107, 105, 4368, 107] })",
+  "refused_undeclared_history": "Some(HistoryUndeclared { history: [818, 4954, 563, 236743] })",
+  "collapsed": [],
+  "species": "condensation",
+  "propagated": [
+    {
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": []
+      },
+      "occurrence": 0,
+      "coordinates": 262144,
+      "nonpoint_coordinates": 262144,
+      "widest_grains": 150,
+      "grain": 43,
+      "widths": [
+        [
+          30,
+          162
+        ],
+        [
+          60,
+          70854
+        ],
+        [
+          90,
+          160721
+        ],
+        [
+          120,
+          29662
+        ],
+        [
+          150,
+          745
+        ]
+      ]
+    },
+    {
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          1855,
+          47940,
+          563,
+          236743
+        ]
+      },
+      "occurrence": 0,
+      "coordinates": 262144,
+      "nonpoint_coordinates": 262144,
+      "widest_grains": 150,
+      "grain": 43,
+      "widths": [
+        [
+          30,
+          10
+        ],
+        [
+          60,
+          99577
+        ],
+        [
+          90,
+          149502
+        ],
+        [
+          120,
+          12904
+        ],
+        [
+          150,
+          151
+        ]
+      ]
+    },
+    {
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          2324,
+          563,
+          236743
+        ]
+      },
+      "occurrence": 0,
+      "coordinates": 262144,
+      "nonpoint_coordinates": 262144,
+      "widest_grains": 150,
+      "grain": 43,
+      "widths": [
+        [
+          30,
+          220
+        ],
+        [
+          60,
+          64907
+        ],
+        [
+          90,
+          171491
+        ],
+        [
+          120,
+          24779
+        ],
+        [
+          150,
+          747
+        ]
+      ]
+    },
+    {
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": []
+      },
+      "occurrence": 1,
+      "coordinates": 262144,
+      "nonpoint_coordinates": 262144,
+      "widest_grains": 150,
+      "grain": 43,
+      "widths": [
+        [
+          30,
+          152
+        ],
+        [
+          60,
+          70527
+        ],
+        [
+          90,
+          157537
+        ],
+        [
+          120,
+          33156
+        ],
+        [
+          150,
+          772
+        ]
+      ]
+    },
+    {
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          1855,
+          47940,
+          563,
+          236743
+        ]
+      },
+      "occurrence": 1,
+      "coordinates": 262144,
+      "nonpoint_coordinates": 262144,
+      "widest_grains": 150,
+      "grain": 43,
+      "widths": [
+        [
+          30,
+          2
+        ],
+        [
+          60,
+          102773
+        ],
+        [
+          90,
+          147470
+        ],
+        [
+          120,
+          11806
+        ],
+        [
+          150,
+          93
+        ]
+      ]
+    },
+    {
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          2324,
+          563,
+          236743
+        ]
+      },
+      "occurrence": 1,
+      "coordinates": 262144,
+      "nonpoint_coordinates": 262144,
+      "widest_grains": 150,
+      "grain": 43,
+      "widths": [
+        [
+          30,
+          174
+        ],
+        [
+          60,
+          65767
+        ],
+        [
+          90,
+          166016
+        ],
+        [
+          120,
+          29296
+        ],
+        [
+          150,
+          891
+        ]
+      ]
+    },
+    {
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": []
+      },
+      "occurrence": 2,
+      "coordinates": 262144,
+      "nonpoint_coordinates": 262144,
+      "widest_grains": 150,
+      "grain": 43,
+      "widths": [
+        [
+          30,
+          159
+        ],
+        [
+          60,
+          72481
+        ],
+        [
+          90,
+          160551
+        ],
+        [
+          120,
+          28310
+        ],
+        [
+          150,
+          643
+        ]
+      ]
+    },
+    {
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          1855,
+          47940,
+          563,
+          236743
+        ]
+      },
+      "occurrence": 2,
+      "coordinates": 262144,
+      "nonpoint_coordinates": 262144,
+      "widest_grains": 150,
+      "grain": 43,
+      "widths": [
+        [
+          30,
+          20
+        ],
+        [
+          60,
+          98841
+        ],
+        [
+          90,
+          150373
+        ],
+        [
+          120,
+          12787
+        ],
+        [
+          150,
+          123
+        ]
+      ]
+    },
+    {
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          2324,
+          563,
+          236743
+        ]
+      },
+      "occurrence": 2,
+      "coordinates": 262144,
+      "nonpoint_coordinates": 262144,
+      "widest_grains": 150,
+      "grain": 43,
+      "widths": [
+        [
+          30,
+          254
+        ],
+        [
+          60,
+          65291
+        ],
+        [
+          90,
+          174452
+        ],
+        [
+          120,
+          21525
+        ],
+        [
+          150,
+          622
+        ]
+      ]
+    },
+    {
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": []
+      },
+      "occurrence": 3,
+      "coordinates": 262144,
+      "nonpoint_coordinates": 262144,
+      "widest_grains": 150,
+      "grain": 43,
+      "widths": [
+        [
+          30,
+          179
+        ],
+        [
+          60,
+          71010
+        ],
+        [
+          90,
+          159608
+        ],
+        [
+          120,
+          30607
+        ],
+        [
+          150,
+          740
+        ]
+      ]
+    },
+    {
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          1855,
+          47940,
+          563,
+          236743
+        ]
+      },
+      "occurrence": 3,
+      "coordinates": 262144,
+      "nonpoint_coordinates": 262144,
+      "widest_grains": 150,
+      "grain": 43,
+      "widths": [
+        [
+          30,
+          11
+        ],
+        [
+          60,
+          99058
+        ],
+        [
+          90,
+          150008
+        ],
+        [
+          120,
+          12938
+        ],
+        [
+          150,
+          129
+        ]
+      ]
+    },
+    {
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          2324,
+          563,
+          236743
+        ]
+      },
+      "occurrence": 3,
+      "coordinates": 262144,
+      "nonpoint_coordinates": 262144,
+      "widest_grains": 150,
+      "grain": 43,
+      "widths": [
+        [
+          30,
+          193
+        ],
+        [
+          60,
+          65718
+        ],
+        [
+          90,
+          164935
+        ],
+        [
+          120,
+          30392
+        ],
+        [
+          150,
+          906
+        ]
+      ]
+    },
+    {
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": []
+      },
+      "occurrence": 4,
+      "coordinates": 262144,
+      "nonpoint_coordinates": 262144,
+      "widest_grains": 150,
+      "grain": 43,
+      "widths": [
+        [
+          30,
+          157
+        ],
+        [
+          60,
+          71966
+        ],
+        [
+          90,
+          160102
+        ],
+        [
+          120,
+          29185
+        ],
+        [
+          150,
+          734
+        ]
+      ]
+    },
+    {
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          1855,
+          47940,
+          563,
+          236743
+        ]
+      },
+      "occurrence": 4,
+      "coordinates": 262144,
+      "nonpoint_coordinates": 262144,
+      "widest_grains": 150,
+      "grain": 43,
+      "widths": [
+        [
+          30,
+          42
+        ],
+        [
+          60,
+          95336
+        ],
+        [
+          90,
+          152408
+        ],
+        [
+          120,
+          14182
+        ],
+        [
+          150,
+          176
+        ]
+      ]
+    },
+    {
+      "exposure": {
+        "receiver": "terminal-face",
+        "history": [
+          818,
+          2324,
+          563,
+          236743
+        ]
+      },
+      "occurrence": 4,
+      "coordinates": 262144,
+      "nonpoint_coordinates": 262144,
+      "widest_grains": 150,
+      "grain": 43,
+      "widths": [
+        [
+          30,
+          189
+        ],
+        [
+          60,
+          65075
+        ],
+        [
+          90,
+          170636
+        ],
+        [
+          120,
+          25549
+        ],
+        [
+          150,
+          695
+        ]
+      ]
+    }
+  ],
+  "product": {
+    "rest_octets": 9383686281,
+    "retained_rows": {
+      "addressed": 21,
+      "sites": 1305088,
+      "whole": 283986
+    },
+    "rest_sha256": "e76a301e11e2a98fa709652ec47fdff27047cebc38696472003b4629d1b17c6e",
+    "decoder": {
+      "mount": "holonic_engine::native_ecology::holonic_intelligence::NativeOperatorResidence::mount_from_intake over NativeConeRestrictedEcology::intake(None)",
+      "recurrence": "NativeFullOperatorSession::advance_cycle (the segment session under the 2026-08-18 contract)",
+      "receiver": "the selected face at the terminal position, read once",
+      "mount_seconds_milli": 7805,
+      "cycle_milliseconds": [
+        1467,
+        1804,
+        1813,
+        1458,
+        1838,
+        1813,
+        1459,
+        1812,
+        1817,
+        1462,
+        1824,
+        1806,
+        1456,
+        1815,
+        1815
+      ],
+      "launches_per_cycle": [
+        681,
+        681,
+        681,
+        681,
+        681,
+        681,
+        681,
+        681,
+        681,
+        681,
+        681,
+        681,
+        681,
+        681,
+        681
+      ],
+      "passages_per_cycle": [
+        666,
+        666,
+        666,
+        666,
+        666,
+        666,
+        666,
+        666,
+        666,
+        666,
+        666,
+        666,
+        666,
+        666,
+        666
+      ]
+    },
+    "retained_fibres": [
+      [
+        0,
+        [
+          2,
+          105,
+          2364,
+          107,
+          236832,
+          900,
+          236743,
+          236810,
+          578,
+          106,
+          107,
+          105,
+          4368,
+          107
+        ]
+      ],
+      [
+        1,
+        [
+          2,
+          105,
+          2364,
+          107,
+          236819,
+          900,
+          236743,
+          236800,
+          578,
+          106,
+          107,
+          105,
+          4368,
+          107
+        ]
+      ],
+      [
+        2,
+        [
+          2,
+          105,
+          2364,
+          107,
+          236832,
+          900,
+          236743,
+          236825,
+          578,
+          106,
+          107,
+          105,
+          4368,
+          107
+        ]
+      ],
+      [
+        3,
+        [
+          2,
+          105,
+          2364,
+          107,
+          236800,
+          900,
+          236743,
+          236812,
+          578,
+          106,
+          107,
+          105,
+          4368,
+          107
+        ]
+      ],
+      [
+        4,
+        [
+          2,
+          105,
+          2364,
+          107,
+          236828,
+          900,
+          236743,
+          236828,
+          578,
+          106,
+          107,
+          105,
+          4368,
+          107
+        ]
+      ]
+    ],
+    "operations_per_cycle": 1275,
+    "deed_launches_per_cycle": 681,
+    "section_read_outs_per_cycle": 16,
+    "occurrences": 5,
+    "histories": 3,
+    "exposures": 15,
+    "composed_resident_octets": 15752729188,
+    "full_coefficient_octets": 15036138068,
+    "ingress_octets_per_cycle": 6860,
+    "egress_section_octets_per_cycle": 71303168
+  },
+  "saturation": {
+    "steps": [
+      {
+        "occurrence": 0,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        "classes": 1,
+        "separations": 0,
+        "extent_roles": 109,
+        "insufficiency_roles": 18,
+        "reachable_faces": 1,
+        "added_classes": 1,
+        "added_separations": 0,
+        "added_extent_roles": 109,
+        "added_reachable_faces": 1,
+        "added_anything": true
+      },
+      {
+        "occurrence": 0,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        "classes": 1,
+        "separations": 0,
+        "extent_roles": 109,
+        "insufficiency_roles": 18,
+        "reachable_faces": 2,
+        "added_classes": 0,
+        "added_separations": 0,
+        "added_extent_roles": 0,
+        "added_reachable_faces": 1,
+        "added_anything": true
+      },
+      {
+        "occurrence": 0,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        "classes": 1,
+        "separations": 0,
+        "extent_roles": 109,
+        "insufficiency_roles": 18,
+        "reachable_faces": 3,
+        "added_classes": 0,
+        "added_separations": 0,
+        "added_extent_roles": 0,
+        "added_reachable_faces": 1,
+        "added_anything": true
+      },
+      {
+        "occurrence": 1,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        "classes": 1,
+        "separations": 0,
+        "extent_roles": 115,
+        "insufficiency_roles": 12,
+        "reachable_faces": 4,
+        "added_classes": 0,
+        "added_separations": 0,
+        "added_extent_roles": 6,
+        "added_reachable_faces": 1,
+        "added_anything": true
+      },
+      {
+        "occurrence": 1,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        "classes": 1,
+        "separations": 0,
+        "extent_roles": 115,
+        "insufficiency_roles": 12,
+        "reachable_faces": 5,
+        "added_classes": 0,
+        "added_separations": 0,
+        "added_extent_roles": 0,
+        "added_reachable_faces": 1,
+        "added_anything": true
+      },
+      {
+        "occurrence": 1,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        "classes": 2,
+        "separations": 0,
+        "extent_roles": 115,
+        "insufficiency_roles": 12,
+        "reachable_faces": 5,
+        "added_classes": 1,
+        "added_separations": 0,
+        "added_extent_roles": 0,
+        "added_reachable_faces": 0,
+        "added_anything": true
+      },
+      {
+        "occurrence": 2,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        "classes": 2,
+        "separations": 0,
+        "extent_roles": 117,
+        "insufficiency_roles": 10,
+        "reachable_faces": 5,
+        "added_classes": 0,
+        "added_separations": 0,
+        "added_extent_roles": 2,
+        "added_reachable_faces": 0,
+        "added_anything": true
+      },
+      {
+        "occurrence": 2,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        "classes": 2,
+        "separations": 0,
+        "extent_roles": 117,
+        "insufficiency_roles": 10,
+        "reachable_faces": 6,
+        "added_classes": 0,
+        "added_separations": 0,
+        "added_extent_roles": 0,
+        "added_reachable_faces": 1,
+        "added_anything": true
+      },
+      {
+        "occurrence": 2,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        "classes": 3,
+        "separations": 1,
+        "extent_roles": 117,
+        "insufficiency_roles": 10,
+        "reachable_faces": 6,
+        "added_classes": 1,
+        "added_separations": 1,
+        "added_extent_roles": 0,
+        "added_reachable_faces": 0,
+        "added_anything": true
+      },
+      {
+        "occurrence": 3,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        "classes": 3,
+        "separations": 1,
+        "extent_roles": 117,
+        "insufficiency_roles": 10,
+        "reachable_faces": 6,
+        "added_classes": 0,
+        "added_separations": 0,
+        "added_extent_roles": 0,
+        "added_reachable_faces": 0,
+        "added_anything": false
+      },
+      {
+        "occurrence": 3,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        "classes": 3,
+        "separations": 1,
+        "extent_roles": 117,
+        "insufficiency_roles": 10,
+        "reachable_faces": 7,
+        "added_classes": 0,
+        "added_separations": 0,
+        "added_extent_roles": 0,
+        "added_reachable_faces": 1,
+        "added_anything": true
+      },
+      {
+        "occurrence": 3,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        "classes": 4,
+        "separations": 1,
+        "extent_roles": 117,
+        "insufficiency_roles": 10,
+        "reachable_faces": 7,
+        "added_classes": 1,
+        "added_separations": 0,
+        "added_extent_roles": 0,
+        "added_reachable_faces": 0,
+        "added_anything": true
+      },
+      {
+        "occurrence": 4,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        "classes": 4,
+        "separations": 1,
+        "extent_roles": 117,
+        "insufficiency_roles": 10,
+        "reachable_faces": 8,
+        "added_classes": 0,
+        "added_separations": 0,
+        "added_extent_roles": 0,
+        "added_reachable_faces": 1,
+        "added_anything": true
+      },
+      {
+        "occurrence": 4,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        "classes": 4,
+        "separations": 1,
+        "extent_roles": 117,
+        "insufficiency_roles": 10,
+        "reachable_faces": 8,
+        "added_classes": 0,
+        "added_separations": 0,
+        "added_extent_roles": 0,
+        "added_reachable_faces": 0,
+        "added_anything": false
+      },
+      {
+        "occurrence": 4,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        "classes": 5,
+        "separations": 1,
+        "extent_roles": 117,
+        "insufficiency_roles": 10,
+        "reachable_faces": 8,
+        "added_classes": 1,
+        "added_separations": 0,
+        "added_extent_roles": 0,
+        "added_reachable_faces": 0,
+        "added_anything": true
+      }
+    ],
+    "trailing_crossings_that_added_nothing": 0,
+    "last_crossing_added_nothing": false
+  }
+}

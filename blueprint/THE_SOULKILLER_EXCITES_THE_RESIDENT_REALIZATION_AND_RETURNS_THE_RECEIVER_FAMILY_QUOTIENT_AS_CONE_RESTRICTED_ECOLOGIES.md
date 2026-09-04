@@ -445,6 +445,21 @@ decoder, the product vector, and the saturation receipt are returned, no scalar 
 any of them; focused tests and one complete release receiver pass; capability claims are limited
 to the family that ran.
 
+[established-bounded; implemented-exact; measured] **SKE5 returned** on 2026-09-03
+(`applications/athena-alpha/examples/composed_variant_ske5.rs deed`, one command, on the SKE4
+return). The five class ecologies compose into one variant whose body is the extent (117 of 127
+roles) mounted from the rest alone; the recurrence on it returned 15 of 15 family faces equal to
+the full operator's, and refused at admission an occurrence outside the family and an undeclared
+history. Over the family nothing collapses, so the composed variant states condensation with the
+propagated enclosure as its certified remainder; the decoder is declared with its measured cost
+(7,805 ms to mount, 1,456 to 1,838 ms and 681 launches per cycle); the invariance is stated as
+differences (15 face differences, all zero; per-coordinate width differences exhibited as
+histograms); the product is returned as a vector, whose residency coordinate records that the
+composed body is resident at the full operator's size because the surface mounts populations
+whole. Saturation is returned structurally and says not yet: every occurrence's third exposure
+added a class, and the last crossing added one. The receipt is
+[`the SKE5 return`](../research/records/2026-09-03_SKE5_THE_COMPOSED_VARIANT_RUNS_THE_RECURRENCE_ON_THE_FAMILY_STATES_CONDENSATION_BY_ITS_REMAINDER_AND_IS_NOT_SATURATED.md).
+
 ## 7. Falsifiers
 
 [counterexample] If "active" is decided by an activation magnitude, the cone is authored.

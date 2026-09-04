@@ -339,7 +339,9 @@ The order is fixed:
    the session's 2026-08-18 contract restored first and cones as declared-withdrawal cones --
    **RETURNED** (the apparatus obligation passed; the role cones founded and verified; the
    return crossed the boundary with every class stating its species by its remainder); and
-6. `SKE5` -- Eros composes the classes and the recurrence runs on them -- **CURRENT**.
+6. `SKE5` -- Eros composes the classes and the recurrence runs on them -- **RETURNED** (15 of
+   15 family faces on the composed body; condensation by remainder; decoder, differences,
+   product vector, and a saturation receipt that says not yet).
 
 [definition] Soulkiller is founded by excitation. The resident exact realization is the
 manifestation grade and the apparatus; the return is the signature quotient of a declared family,
@@ -400,7 +402,14 @@ founded jointly over each class's exposures and verified under every lens, the f
 condensation and 3 compression by their exhibited remainders, and the rest mounting every
 class body from the stored presentation alone
 ([`the SKE4 return`](../research/records/2026-09-03_SKE4_THE_DECLARED_WITHDRAWALS_FOUND_ROLE_CONES_THE_CLASS_BODIES_CARRY_THEIR_REMAINDER_AND_THE_RETURN_CROSSES_THE_BOUNDARY.md)).
-SKE5 is current.
+
+[established-bounded; implemented-exact; measured] SKE5 returned on 2026-09-03: the composed
+variant (the extent mounted from the rest alone) ran the recurrence on the family with 15 of 15
+faces equal to the full operator's and refused an outside occurrence and an undeclared history;
+it states condensation by its exhibited remainder, declares its decoder with its cost, states
+its invariance as differences, returns its product as a vector, and returns a saturation
+receipt that says not yet ([`the SKE5 return`](../research/records/2026-09-03_SKE5_THE_COMPOSED_VARIANT_RUNS_THE_RECURRENCE_ON_THE_FAMILY_STATES_CONDENSATION_BY_ITS_REMAINDER_AND_IS_NOT_SATURATED.md)).
+The SKE campaign is complete at the scopes its records state; no later deed is admitted.
 
 [counterexample; source-inspected] The audit
 [`2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](../research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md)

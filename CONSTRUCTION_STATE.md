@@ -45,8 +45,16 @@ exhibited remainders; the rest mounting every class body, 15 of 15 member faces
 reproduced from the stored presentation alone)
 ([`the SKE4 return`](research/records/2026-09-03_SKE4_THE_DECLARED_WITHDRAWALS_FOUND_ROLE_CONES_THE_CLASS_BODIES_CARRY_THEIR_REMAINDER_AND_THE_RETURN_CROSSES_THE_BOUNDARY.md)).
 The withdrawn coordinate-grain owners are gone; the boundary's generic productive lane and the
-mount from a productive lane are kept. `SKE5` (Eros composes the classes and the recurrence runs
-on them; the compression law applies to the composed variant) is next and not begun. The Soulkiller audit is
+mount from a productive lane are kept. `SKE5` returned the same day: the five classes compose
+into one variant (the extent mounted from the rest alone) on which the recurrence returned 15 of
+15 family faces equal to the full operator's and refused an outside occurrence and an undeclared
+history; the composed variant states condensation by its exhibited remainder, declares its
+decoder with its measured cost, states its invariance as differences and its product as a
+vector (the composed body resident at the full operator's size, the condensation being in the
+stored presentation), and returns a saturation receipt that says not yet
+([`the SKE5 return`](research/records/2026-09-03_SKE5_THE_COMPOSED_VARIANT_RUNS_THE_RECURRENCE_ON_THE_FAMILY_STATES_CONDENSATION_BY_ITS_REMAINDER_AND_IS_NOT_SATURATED.md)).
+The SKE campaign, `SKE0` through `SKE5`, is complete at the scopes its records state; no later
+deed is admitted. The Soulkiller audit is
 [`research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md).
 
 [proved-derived; formal-checked] SKE0 returned `HolonicExcitationFoundedQuotient.lean`: the

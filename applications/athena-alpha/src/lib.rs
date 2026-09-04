@@ -5,6 +5,7 @@
 
 mod apertures;
 mod application;
+mod composed_variant;
 mod diffusion;
 mod material_codec;
 mod receivers;
@@ -13,6 +14,11 @@ mod world_application;
 
 pub use apertures::addressed_ingress;
 pub use application::{AthenaAlphaAdmission, AthenaAlphaApplication, AthenaAlphaError};
+pub use composed_variant::{
+    COMPOSED_VARIANT_SCHEMA, ComposedFace, ComposedVariant, DeclaredDecoder, ProductVector,
+    SaturationReceipt, SaturationStep, class_cone_roles, saturation, species_over_family,
+    width_difference,
+};
 pub use diffusion::declared_diffusion_law;
 pub use material_codec::{
     AthenaMaterialArtifact, AthenaMaterialCodecError, render_material_artifact,
