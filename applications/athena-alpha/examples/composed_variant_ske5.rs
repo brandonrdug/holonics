@@ -2,13 +2,15 @@
 //! runs on it; the compression law is stated over that body.
 //!
 //! `deed <root> <rest> <ske4-receipts> <out>` from one command: the composed body (the rest
-//! mounted with no class, the union of the class cones) is mounted once and every declared
-//! exposure of the family is driven through it, its face beside the full operator's (from the
-//! SKE4 exposure receipts) and the enclosure it propagates to the face beside the full
-//! operator's per coordinate; an occurrence outside the family and an undeclared history are
-//! refused at admission and never driven; then the species by remainder, the declared decoder
-//! with its measured cost, the product vector, and the saturation over the growing family are
-//! returned as one receipt.  A guard aborts the process when no card step completes for 180 s.
+//! mounted with no class, the union of the class cones) is mounted once and one continuing
+//! session drives every declared exposure of the family through it, its face beside the full
+//! operator's (from the SKE4 exposure receipts); a second reading with the terminal unsealed
+//! deposits the enclosure the composed body propagates to every coordinate of the face beside the
+//! full operator's, rebased to one grain; an occurrence outside the family and an undeclared
+//! history are refused at admission and never driven; then the species by remainder on that
+//! domain, the declared decoder with its measured cost, the product vector, the saturation
+//! receipt over the enlargement of the declared exposures, and the release receiver are returned
+//! as one receipt.  A guard aborts the process when no card step completes for 180 s.
 
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -17,8 +19,8 @@ use std::{
 
 use athena_alpha::{
     AthenaTokenApplication, COMPOSED_VARIANT_SCHEMA, ComposedFace, ComposedVariant,
-    DeclaredDecoder, ProductVector, class_cone_roles, saturation, species_over_family,
-    width_difference,
+    DeclaredDecoder, ProductVector, ReleaseReceipt, class_cone_roles, saturation,
+    species_over_family, width_difference,
 };
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
@@ -64,6 +66,7 @@ struct ExposureReceipt {
     history_addresses: Vec<u32>,
     face: u32,
     exact_digest: String,
+    remainder: NativeTerminalRemainder,
 }
 
 fn exposure_name(occurrence: usize, history: usize) -> String {
@@ -88,7 +91,6 @@ fn deed(args: &[String]) -> Result<(), Error> {
     let (class_cone_roles_per_class, cone_roles_by_occurrence) = class_cone_roles(&restricted, &roles);
     let extent_roles: BTreeSet<u32> = cone_roles_by_occurrence.values().flatten().copied().collect();
     step("composed");
-    // The full operator's faces and remainders, from the SKE4 receipts.
     let mut full: BTreeMap<(usize, usize), ExposureReceipt> = BTreeMap::new();
     for occurrence in 0..FAMILY.len() {
         for history in 0..HISTORIES.len() {
@@ -98,7 +100,10 @@ fn deed(args: &[String]) -> Result<(), Error> {
     }
     let dismantle: serde_json::Value = serde_json::from_slice(&std::fs::read(receipts.join("dismantle.json"))?)?;
     let rest_sha256 = std::fs::read_to_string(receipts.join("rest.sha256")).map(|s| s.trim().to_owned()).unwrap_or_default();
-    // The composed body, mounted once from the rest with no class.
+    let full_resident_octets = std::fs::read(receipts.join("../session_census_one_cycle_segments.json"))
+        .ok()
+        .and_then(|b| serde_json::from_slice::<serde_json::Value>(&b).ok())
+        .and_then(|v| v["resident_octets_now"].as_u64().or_else(|| v["resident_octets_peak"].as_u64()));
     let readout = ResidentReadout::new()?;
     let surface = mount_operator_surface(&readout)?;
     let mount_started = std::time::Instant::now();
@@ -108,40 +113,72 @@ fn deed(args: &[String]) -> Result<(), Error> {
     };
     let mount_seconds_milli = mount_started.elapsed().as_millis() as u64;
     step("mounted");
-    let composed_resident_octets = NativeFullOperatorSession::found(&restricted.ecology, &mut residence)?.census().resident_octets_now;
-    let mut faces = Vec::new();
-    let mut propagated = Vec::new();
-    let mut cycle_milliseconds = Vec::new();
-    let mut launches_per_cycle = Vec::new();
-    let mut passages_per_cycle = Vec::new();
-    let (mut read_outs, mut ingress, mut egress) = (0u64, 0u64, 0u64);
+    // Admission of every declared exposure, before any is driven.
     for occurrence in 0..FAMILY.len() {
         for history in 0..HISTORIES.len() {
             let r = &full[&(occurrence, history)];
-            // Admission first: a member under a declared history enters its class.
             let occurrence_addresses = &r.addresses[..r.addresses.len() - r.history_addresses.len()];
             restricted.admit(occurrence_addresses, &r.history_addresses).map_err(|_| "a declared exposure of the family was refused")?;
-            let session = NativeFullOperatorSession::found(&restricted.ecology, &mut residence)?;
+        }
+    }
+    // One continuing session over the family: every cycle advances the same successor line.
+    let mut session = NativeFullOperatorSession::found(&restricted.ecology, &mut residence)?;
+    let composed_resident_octets = session.census().resident_octets_now;
+    let mut cycle_milliseconds = Vec::new();
+    let mut launches_per_cycle = Vec::new();
+    let mut session_generations = Vec::new();
+    let (mut read_outs, mut ingress, mut egress) = (0u64, 0u64, 0u64);
+    let mut composed_faces: BTreeMap<(usize, usize), u32> = BTreeMap::new();
+    for occurrence in 0..FAMILY.len() {
+        for history in 0..HISTORIES.len() {
+            let r = &full[&(occurrence, history)];
             let before = session.census();
+            let predecessor = session.generation();
             let started = std::time::Instant::now();
             let cycle = session.advance_cycle(&r.addresses)?;
             let elapsed = started.elapsed().as_millis();
             let after = cycle.successor.census();
             let rendered = application.render(&cycle.final_emission)?;
+            session = cycle.successor;
+            session_generations.push((predecessor, session.generation()));
             cycle_milliseconds.push(elapsed);
             launches_per_cycle.push(after.deed_launches - before.deed_launches);
-            passages_per_cycle.push(cycle.traces.iter().map(|t| t.census_after.deed_launches).collect::<BTreeSet<_>>().len() as u64);
             read_outs += after.section_read_outs - before.section_read_outs;
             ingress += after.ingress_octets - before.ingress_octets;
             egress += after.egress_section_octets - before.egress_section_octets;
+            composed_faces.insert((occurrence, history), rendered.selected);
+            eprintln!(
+                "{}: full {} composed {} {:?} equal {} (generation {} -> {})",
+                exposure_name(occurrence, history), r.face, rendered.selected, rendered.rendered, rendered.selected == r.face, predecessor, session.generation()
+            );
             step(&format!("cycle {}", exposure_name(occurrence, history)));
-            // The propagated remainder on the composed body, beside the full operator's.
+        }
+    }
+    drop(session);
+    // The propagated remainder on the composed body: a second reading with the terminal
+    // unsealed, beside the full operator's per coordinate at one grain.
+    let mut faces = Vec::new();
+    let mut propagated = Vec::new();
+    let mut residual_files = Vec::new();
+    let mut difference_grain = 0u32;
+    for occurrence in 0..FAMILY.len() {
+        for history in 0..HISTORIES.len() {
+            let r = &full[&(occurrence, history)];
             let unsealed = NativeFullOperatorSession::found(&restricted.ecology, &mut residence)?.with_terminal_remainder();
             let cycle_unsealed = unsealed.advance_cycle(&r.addresses)?;
             let emission = &cycle_unsealed.final_emission;
             let last = &emission.intervals[(emission.rows - 1) * emission.width..];
             let composed_widths: Vec<u32> = last.iter().map(|(lo, hi)| (hi - lo) as u32).collect();
+            let file = format!("composed_remainder_{}.bin", exposure_name(occurrence, history));
+            let mut octets = Vec::with_capacity(composed_widths.len() * 4);
+            for w in &composed_widths {
+                octets.extend_from_slice(&w.to_le_bytes());
+            }
+            std::fs::write(out.join(&file), octets)?;
+            residual_files.push(file);
             let full_widths = read_widths(&receipts.join(format!("remainder_{}.bin", exposure_name(occurrence, history))))?;
+            let (difference, grain) = width_difference(&full_widths, r.remainder.grain, &composed_widths, emission.grain);
+            difference_grain = grain;
             let mut histogram: BTreeMap<u64, usize> = BTreeMap::new();
             for w in &composed_widths {
                 *histogram.entry(u64::from(*w)).or_default() += 1;
@@ -155,44 +192,41 @@ fn deed(args: &[String]) -> Result<(), Error> {
                 grain: emission.grain,
                 widths: histogram.into_iter().collect(),
             });
-            step(&format!("remainder {}", exposure_name(occurrence, history)));
-            eprintln!(
-                "{}: full {} composed {} {:?} equal {}",
-                exposure_name(occurrence, history), r.face, rendered.selected, rendered.rendered, rendered.selected == r.face
-            );
+            let composed_face = composed_faces[&(occurrence, history)];
             faces.push(ComposedFace {
                 occurrence,
                 exposure: NativeExposure { receiver: RECEIVER.to_owned(), history: r.history_addresses.clone() },
                 full_face: r.face,
-                composed_face: rendered.selected,
-                equal: rendered.selected == r.face,
-                width_difference: width_difference(&full_widths, &composed_widths),
+                composed_face,
+                equal: composed_face == r.face,
+                width_difference: difference,
             });
+            step(&format!("remainder {}", exposure_name(occurrence, history)));
         }
     }
     drop(residence);
-    // The insufficiency lane: refused at admission, never driven.
     let outside = application.encode_turn("11 + 2 =")?;
     let undeclared = application.encode_plain("The difference is ")?;
     let member = restricted.classes[0].fibre[0].addresses.clone();
     let refused_outside_family = restricted.admit(&outside, &[]).err().map(|i| format!("{:?}", i.cause));
     let refused_undeclared_history = restricted.admit(&member, &undeclared).err().map(|i| format!("{:?}", i.cause));
-    let (collapsed, species) = species_over_family(&faces, &propagated);
-    // Saturation over the growing family, in the declared order of exposures.
-    let mut faces_in_order: Vec<NativeExposureFace> = Vec::new();
-    for occurrence in 0..FAMILY.len() {
-        for history in 0..HISTORIES.len() {
-            let r = &full[&(occurrence, history)];
-            faces_in_order.push(NativeExposureFace {
-                occurrence,
-                exposure: NativeExposure { receiver: RECEIVER.to_owned(), history: r.history_addresses.clone() },
-                face: r.face,
-                exact_digest: r.exact_digest.clone(),
-                cones: BTreeMap::new(),
-            });
-        }
-    }
-    let saturation = saturation(&faces_in_order, &cone_roles_by_occurrence, roles.len())?;
+    let (collapsed, species) = species_over_family(&faces);
+    // Saturation: the declared exposures enlarged in their declared order over the fixed family.
+    let exposures_in_order: Vec<NativeExposure> = (0..HISTORIES.len())
+        .map(|history| NativeExposure { receiver: RECEIVER.to_owned(), history: full[&(0, history)].history_addresses.clone() })
+        .collect();
+    let family_faces: Vec<NativeExposureFace> = full
+        .iter()
+        .map(|((occurrence, _), r)| NativeExposureFace {
+            occurrence: *occurrence,
+            exposure: NativeExposure { receiver: RECEIVER.to_owned(), history: r.history_addresses.clone() },
+            face: r.face,
+            exact_digest: r.exact_digest.clone(),
+            cones: BTreeMap::new(),
+        })
+        .collect();
+    let refusals = usize::from(refused_outside_family.is_some()) + usize::from(refused_undeclared_history.is_some());
+    let saturation = saturation(&family_faces, &exposures_in_order, &cone_roles_by_occurrence, roles.len(), refusals)?;
     let cycles = faces.len() as u64;
     let product = ProductVector {
         rest_octets: std::fs::metadata(&rest)?.len(),
@@ -200,12 +234,12 @@ fn deed(args: &[String]) -> Result<(), Error> {
         rest_sha256,
         decoder: DeclaredDecoder {
             mount: "holonic_engine::native_ecology::holonic_intelligence::NativeOperatorResidence::mount_from_intake over NativeConeRestrictedEcology::intake(None)".to_owned(),
-            recurrence: "NativeFullOperatorSession::advance_cycle (the segment session under the 2026-08-18 contract)".to_owned(),
+            recurrence: "NativeFullOperatorSession::advance_cycle, one continuing session (the segment session under the 2026-08-18 contract)".to_owned(),
             receiver: "the selected face at the terminal position, read once".to_owned(),
             mount_seconds_milli,
             cycle_milliseconds: cycle_milliseconds.clone(),
             launches_per_cycle: launches_per_cycle.clone(),
-            passages_per_cycle: passages_per_cycle.clone(),
+            passages_per_cycle: launches_per_cycle.clone(),
         },
         retained_fibres: restricted.classes.iter().flat_map(|c| c.fibre.iter().map(|r| (r.occurrence, r.addresses.clone()))).collect(),
         operations_per_cycle: restricted.ecology.operations.len(),
@@ -215,10 +249,33 @@ fn deed(args: &[String]) -> Result<(), Error> {
         histories: HISTORIES.len(),
         exposures: faces.len(),
         composed_resident_octets,
+        full_resident_octets,
         full_coefficient_octets: dismantle["full_coefficient_octets"].as_u64().unwrap_or(0),
         ingress_octets_per_cycle: ingress / cycles.max(1),
         egress_section_octets_per_cycle: egress / cycles.max(1),
     };
+    let extent_is_union = restricted.validate().is_ok();
+    let mut release = ReleaseReceipt {
+        one_session_over_the_family: session_generations.windows(2).all(|w| w[0].1 == w[1].0),
+        every_family_face_equal: faces.iter().all(|f| f.equal),
+        outside_occurrence_refused: refused_outside_family.is_some(),
+        undeclared_history_refused: refused_undeclared_history.is_some(),
+        species_stated: species.is_some(),
+        remainder_exhibited: residual_files.len() == faces.len(),
+        decoder_declared: true,
+        product_vector_returned: true,
+        saturation_receipt_returned: !saturation.steps.is_empty(),
+        extent_is_union_of_class_cones: extent_is_union,
+        passed: false,
+    };
+    release.passed = release.one_session_over_the_family
+        && release.every_family_face_equal
+        && release.outside_occurrence_refused
+        && release.undeclared_history_refused
+        && release.species_stated
+        && release.remainder_exhibited
+        && release.saturation_receipt_returned
+        && release.extent_is_union_of_class_cones;
     let variant = ComposedVariant {
         schema: COMPOSED_VARIANT_SCHEMA.to_owned(),
         classes: restricted.classes.iter().map(|c| c.ordinal).collect(),
@@ -231,23 +288,30 @@ fn deed(args: &[String]) -> Result<(), Error> {
         collapsed,
         species,
         propagated,
+        residual_files,
+        difference_grain,
         product,
         saturation,
+        session_generations,
+        release,
     };
     std::fs::write(out.join("ske5_composed_variant.json"), serde_json::to_string_pretty(&variant)?)?;
     println!(
-        "composed variant: {} classes, extent {} of {} roles; faces equal {}/{}; collapsed {}; species {:?}; refused outside {:?}, undeclared {:?}; saturation: last crossing added nothing {}, trailing {}; DEED DONE",
+        "composed variant: {} classes, extent {} of {} roles; one session {}; faces equal {}/{}; collapsed {}; species {:?}; refused outside {}, undeclared {}; difference grain {}; saturation last crossing added nothing {} (trailing {}); release passed {}; DEED DONE",
         variant.classes.len(),
         variant.extent_roles,
         variant.roles,
+        variant.release.one_session_over_the_family,
         variant.faces.iter().filter(|f| f.equal).count(),
         variant.faces.len(),
         variant.collapsed.len(),
         variant.species,
-        variant.refused_outside_family.is_some(),
-        variant.refused_undeclared_history.is_some(),
+        variant.release.outside_occurrence_refused,
+        variant.release.undeclared_history_refused,
+        variant.difference_grain,
         variant.saturation.last_crossing_added_nothing,
-        variant.saturation.trailing_crossings_that_added_nothing
+        variant.saturation.trailing_crossings_that_added_nothing,
+        variant.release.passed
     );
     Ok(())
 }

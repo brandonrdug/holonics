@@ -339,8 +339,12 @@ pub(super) fn enact_segment<'chart>(
                 }
                 // The value bound of a contraction: the input's octaves and the population's
                 // greatest row mass (`resident_law.rs`, `Contract::bound_octaves`).
+                // The value bound a consumer in this segment is admitted against: the base
+                // contraction's, and, when overlay atoms join, the joined carrier's obligation,
+                // which bounds the joined value; the consumer's bound must not be less than what
+                // the producer's own admission allows it to hold.
                 let value_octaves = octaves + aligned.mounted.mass_value_octaves + 1;
-                let value_octaves = value_octaves.max(carrier_octaves.min(value_octaves));
+                let value_octaves = if atoms.is_empty() { value_octaves } else { value_octaves.max(carrier_octaves) };
                 let out = surface.fresh_section(rows, *out_rows, g)?;
                 tile = Some(aligned);
                 Planned {

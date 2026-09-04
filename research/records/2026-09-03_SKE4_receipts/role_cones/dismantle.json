@@ -17,9 +17,11 @@
       ],
       "cone_roles": 109,
       "cone_sites": 1282560,
-      "species": "compression",
-      "collapsed_pairs": 1,
-      "member_faces_changed": 0,
+      "founding": "SoundUnderComplementWithdrawal { founded_by_singletons: 32, restored: 77 }",
+      "species": "condensation",
+      "collapsed_pairs": 0,
+      "lens_collapsed_pairs": 1,
+      "descent_failures": 0,
       "cone_withdrawn_changed_everywhere": true,
       "propagated_nonpoint": [
         262144,
@@ -37,9 +39,11 @@
       ],
       "cone_roles": 115,
       "cone_sites": 1299456,
+      "founding": "SoundUnderComplementWithdrawal { founded_by_singletons: 33, restored: 82 }",
       "species": "condensation",
       "collapsed_pairs": 0,
-      "member_faces_changed": 0,
+      "lens_collapsed_pairs": 0,
+      "descent_failures": 0,
       "cone_withdrawn_changed_everywhere": true,
       "propagated_nonpoint": [
         262144,
@@ -57,9 +61,11 @@
       ],
       "cone_roles": 110,
       "cone_sites": 1285376,
+      "founding": "SoundUnderComplementWithdrawal { founded_by_singletons: 59, restored: 51 }",
       "species": "condensation",
       "collapsed_pairs": 0,
-      "member_faces_changed": 0,
+      "lens_collapsed_pairs": 0,
+      "descent_failures": 0,
       "cone_withdrawn_changed_everywhere": true,
       "propagated_nonpoint": [
         262144,
@@ -77,9 +83,11 @@
       ],
       "cone_roles": 106,
       "cone_sites": 1271296,
-      "species": "compression",
-      "collapsed_pairs": 5,
-      "member_faces_changed": 0,
+      "founding": "SoundUnderComplementWithdrawal { founded_by_singletons: 31, restored: 75 }",
+      "species": "condensation",
+      "collapsed_pairs": 0,
+      "lens_collapsed_pairs": 5,
+      "descent_failures": 0,
       "cone_withdrawn_changed_everywhere": true,
       "propagated_nonpoint": [
         262144,
@@ -97,9 +105,11 @@
       ],
       "cone_roles": 99,
       "cone_sites": 1243136,
-      "species": "compression",
-      "collapsed_pairs": 5,
-      "member_faces_changed": 0,
+      "founding": "SoundUnderComplementWithdrawal { founded_by_singletons: 42, restored: 57 }",
+      "species": "condensation",
+      "collapsed_pairs": 0,
+      "lens_collapsed_pairs": 5,
+      "descent_failures": 0,
       "cone_withdrawn_changed_everywhere": true,
       "propagated_nonpoint": [
         262144,
@@ -108,13 +118,13 @@
       ]
     }
   ],
-  "rest_octets": 9383686281,
-  "rest_sha256": "e76a301e11e2a98fa709652ec47fdff27047cebc38696472003b4629d1b17c6e",
+  "rest_octets": 9383688554,
+  "rest_sha256": "e2c6d0b30ceb158dca934e7cf2ac57fe8e2ac02c902423c99eefaa97bd144fed",
   "full_coefficient_octets": 15036138068,
   "retained_rows_by_restriction": {
     "addressed": 21,
     "sites": 1305088,
     "whole": 283986
   },
-  "elapsed_seconds": 30.963551095
+  "elapsed_seconds": 18.250352272
 }

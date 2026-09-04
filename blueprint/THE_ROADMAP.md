@@ -409,10 +409,10 @@ The order is fixed:
    the session's 2026-08-18 contract restored first and cones as declared-withdrawal cones --
    **RETURNED** (the apparatus obligation passed; the role cones founded and verified; the
    return crossed the boundary with every class stating its species by its remainder); and
-6. `SKE5` -- Eros composes the classes and the recurrence runs on them -- **CURRENT**; its
-   first return of 2026-09-03 and SKE4's role-cone return are withdrawn by Sol's review of
-   2026-09-04 on technical counterexamples, whose corrections are the next deed; Brandon's
-   ruling of the same day answers the review's jurisdiction and process points.
+6. `SKE5` -- Eros composes the classes and the recurrence runs on them -- **RETURNED** on
+   2026-09-04 after Sol's review: one continuing session, 15 of 15 family faces, condensation
+   on the domain by exhibited remainder, the decoder and product declared, saturation as the
+   formal object (not yet), the release receiver passed. The campaign is complete.
 
 [definition] Soulkiller is founded by excitation. The resident exact realization is the
 manifestation grade and the apparatus; the return is the signature quotient of a declared family,
@@ -482,9 +482,11 @@ its invariance as differences, returns its product as a vector, and returns a sa
 receipt that says not yet ([`the SKE5 return`](../research/records/2026-09-03_SKE5_THE_COMPOSED_VARIANT_RUNS_THE_RECURRENCE_ON_THE_FAMILY_STATES_CONDENSATION_BY_ITS_REMAINDER_AND_IS_NOT_SATURATED.md)).
 Withdrawn on 2026-09-04 by Sol's review ([`the review`](../research/records/2026-09-04_SOL_REVIEW_OF_THE_SKE_CAMPAIGN_THE_CONES_ARE_NOT_FOUNDED_CONES_THE_SPECIES_ARE_OFF_DOMAIN_AND_THE_PASSES_ARE_WITHDRAWN.md)):
 the role sets are not founded cones, the species are off their domain, the SKE5 width
-differences cross grains, one session was not run, and no release receiver ran. SKE5 is current
-with the corrections open; Brandon's ruling of 2026-09-04 (`AGENTS.md`) answers the review's
-jurisdiction and process points.
+differences cross grains, one session was not run, and no release receiver ran. All were
+corrected in the tree the same day and SKE5 returned with its release receiver passed
+([`the SKE5 return`](../research/records/2026-09-03_SKE5_THE_COMPOSED_VARIANT_RUNS_THE_RECURRENCE_ON_THE_FAMILY_STATES_CONDENSATION_BY_ITS_REMAINDER_AND_IS_NOT_SATURATED.md));
+Brandon's ruling of 2026-09-04 (`AGENTS.md`) answers the review's jurisdiction and process
+points. The SKE campaign is complete at the scopes its records state; no later deed is admitted.
 
 [counterexample; source-inspected] The audit
 [`2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](../research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md)

@@ -22,7 +22,7 @@ after the refit, read from the surface's transfer census.
 | section read-outs | 2,363 | 16 |
 | section egress | about 2.06 GB | 58,720,256 octets |
 | allocations | 9,450 | 4,075 |
-| passages (distinct census readings) | 2,363 | 672 |
+| passages | 2,363 | 687 |
 | cycle | 1,915 ms | 1,412 ms |
 | face | `7` | `7` |
 
@@ -72,8 +72,9 @@ seal projects every widening operation's enclosure to its midpoint and the exact
 law never governs a segment. When an operation's carrier obligation exceeds what the a-priori
 bounds admit (the GELU's and tanh's obligations are quadratic in their input's octaves), the
 segment closes before it and it is enacted at the head of the next passage on the measured
-bounds. That rule, not a fixed schedule, is why the cycle is 672 passages rather than the
-roughly 500 the slot rule alone would give.
+bounds. That rule, not a fixed schedule, is why the cycle is 687 passages rather than the
+roughly 500 the slot rule alone would give (a first reading of 672 counted distinct census
+readings in the traces, a trace artifact: the terminal's five traces share one reading).
 
 ## 3. What the differential found
 

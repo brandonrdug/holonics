@@ -42,13 +42,14 @@ use athena_alpha::AthenaTokenApplication;
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::holonic_intelligence::{
-        NativeClassRemainder, NativeCollapsedPair, NativeConeRestrictedEcology,
+        NativeClassRemainder, NativeCollapsedPair, NativeConeFounding, NativeConeRestrictedEcology,
         NativeDissectionAperture, NativeExposure, NativeExposureFace, NativeExposureTestimony,
         NativeFoundedClassCone, NativeFoundedCones, NativeFullOperationError,
         NativeFullOperatorDismantlingReturn, NativeFullOperatorEcology, NativeFullOperatorSession,
         NativeOperatorResidence, NativeRetainedOccurrence, NativeRoleGrain, NativeRoleOrder,
-        NativeSignatureQuotient, NativeSiteBitmask, NativeSiteContributions, NativeSiteSelection,
-        NativeTensorOrdinal, NativeTerminalRemainder, NativeWithdrawnFace, ResidentExcitationDismantling,
+        NativeSignatureQuotient, NativeSiteBitmask, NativeSiteContributions,
+        NativeSiteSelection, NativeTensorOrdinal, NativeTerminalRemainder, NativeWithdrawnFace,
+        ResidentExcitationDismantling,
         cone_of_roles, declared_roles, dismantle_full_native_operator, mount_operator_surface,
         role_shares, role_sizes, selection_of_roles,
     },
@@ -900,9 +901,11 @@ struct ClassSummary {
     materials: Vec<String>,
     cone_roles: usize,
     cone_sites: usize,
-    species: String,
+    founding: String,
+    species: Option<String>,
     collapsed_pairs: usize,
-    member_faces_changed: usize,
+    lens_collapsed_pairs: usize,
+    descent_failures: usize,
     cone_withdrawn_changed_everywhere: bool,
     propagated_nonpoint: Vec<usize>,
 }
@@ -950,6 +953,7 @@ fn dismantle_mode(args: &[String]) -> Result<(), Error> {
     let mut class_cones: Vec<NativeFoundedClassCone> = Vec::new();
     let mut class_cone_by_occurrence: BTreeMap<usize, BTreeMap<u32, NativeSiteBitmask>> = BTreeMap::new();
     let mut remainders: Vec<NativeClassRemainder> = Vec::new();
+    let mut foundings: Vec<NativeConeFounding> = Vec::new();
     let mut summaries = Vec::new();
     let mut family_complement_unchanged = true;
     let mut extent_mask: BTreeMap<u32, NativeSiteBitmask> = BTreeMap::new();
@@ -969,8 +973,12 @@ fn dismantle_mode(args: &[String]) -> Result<(), Error> {
         for occurrence in &cone.occurrences {
             class_cone_by_occurrence.insert(*occurrence, mask.clone());
         }
+        // The lens over the whole family is testimony; the body's remainder is on its own
+        // domain, the exposures of the occurrences it retains, where the lens reading is the
+        // body's face (the cone's complement withdrawn on a member is the class body).
         let mut lens_faces = Vec::new();
-        let mut member_faces_changed = Vec::new();
+        let mut domain_faces = Vec::new();
+        let mut descent_failures = Vec::new();
         let mut cone_withdrawn_changed = true;
         for occurrence in 0..FAMILY.len() {
             for history in 0..HISTORIES.len() {
@@ -979,38 +987,65 @@ fn dismantle_mode(args: &[String]) -> Result<(), Error> {
                 let full = full_face(occurrence, history);
                 lens_faces.push((occurrence, exposure_at(history), lens.complement_withdrawn_face, full));
                 if lens.member {
+                    domain_faces.push((occurrence, exposure_at(history), lens.complement_withdrawn_face, full));
                     if !lens.complement_unchanged {
-                        member_faces_changed.push((occurrence, exposure_at(history), lens.complement_withdrawn_face, full));
+                        descent_failures.push((occurrence, exposure_at(history), lens.complement_withdrawn_face, full));
                     }
                     cone_withdrawn_changed &= lens.cone_changed.unwrap_or(false);
                 }
             }
         }
-        let collapsed: Vec<NativeCollapsedPair> = NativeClassRemainder::collapsed_pairs(&lens_faces);
+        let collapsed: Vec<NativeCollapsedPair> = NativeClassRemainder::collapsed_pairs(&domain_faces);
+        let lens_collapsed: Vec<NativeCollapsedPair> = NativeClassRemainder::collapsed_pairs(&lens_faces);
         let propagated: Vec<NativeTerminalRemainder> = receipts
             .iter()
             .filter(|r| cone.occurrences.contains(&r.occurrence))
             .map(|r| r.remainder.clone())
             .collect();
-        let species = NativeClassRemainder::species_of(&collapsed, &propagated);
+        let residual_files: Vec<String> = receipts
+            .iter()
+            .filter(|r| cone.occurrences.contains(&r.occurrence))
+            .map(|r| format!("remainder_{}.bin", exposure_name(r.occurrence, r.history_index)))
+            .collect();
+        let species = NativeClassRemainder::species_of(&collapsed, descent_failures.len());
+        let founded_by_singletons: BTreeSet<u32> = found
+            .exposures
+            .iter()
+            .filter(|e| cone.occurrences.contains(&e.occurrence))
+            .flat_map(|e| e.load_bearing.iter().copied())
+            .collect();
+        let founding = if cone.roles.len() == founded_by_singletons.len() {
+            NativeConeFounding::FoundedBySingletons
+        } else {
+            NativeConeFounding::SoundUnderComplementWithdrawal {
+                founded_by_singletons: founded_by_singletons.len(),
+                restored: cone.roles.len() - founded_by_singletons.len(),
+            }
+        };
         summaries.push(ClassSummary {
             ordinal: at,
             occurrences: cone.occurrences.clone(),
             materials: cone.occurrences.iter().map(|o| FAMILY[*o].to_owned()).collect(),
             cone_roles: cone.roles.len(),
             cone_sites: cone.sites,
-            species: format!("{species:?}").to_lowercase(),
+            founding: format!("{founding:?}"),
+            species: species.map(|s| format!("{s:?}").to_lowercase()),
             collapsed_pairs: collapsed.len(),
-            member_faces_changed: member_faces_changed.len(),
+            lens_collapsed_pairs: lens_collapsed.len(),
+            descent_failures: descent_failures.len(),
             cone_withdrawn_changed_everywhere: cone_withdrawn_changed,
             propagated_nonpoint: propagated.iter().map(|p| p.nonpoint_coordinates).collect(),
         });
+        foundings.push(founding);
         remainders.push(NativeClassRemainder {
-            lens_faces,
+            domain_faces,
             collapsed,
-            member_faces_changed,
+            descent_failures,
             propagated,
+            residual_files,
             species,
+            lens_faces,
+            lens_collapsed,
         });
         class_cones.push(NativeFoundedClassCone {
             occurrences: cone.occurrences.clone(),
@@ -1049,7 +1084,7 @@ fn dismantle_mode(args: &[String]) -> Result<(), Error> {
                 complement_unchanged: class_lens.is_some_and(|l| l.complement_unchanged),
                 cone_changed: class_lens.and_then(|l| l.cone_changed).unwrap_or(false),
                 probes: exposure_cone.map(|e| e.load_bearing.len() + e.refused.len()).unwrap_or(0),
-                monotone: true,
+                monotone: None,
             }
         })
         .collect();
@@ -1065,7 +1100,8 @@ fn dismantle_mode(args: &[String]) -> Result<(), Error> {
             extent: extent_mask,
             classes: class_cones,
         },
-        remainders,
+        remainders: remainders.clone(),
+        foundings,
     };
     let dismantled = soulkiller::dismantle(input)?;
     let productive: NativeConeRestrictedEcology = dismantled.native;
@@ -1099,6 +1135,9 @@ fn dismantle_mode(args: &[String]) -> Result<(), Error> {
         elapsed_seconds: started.elapsed().as_secs_f64(),
     };
     std::fs::write(dir.join("dismantle.json"), serde_json::to_string_pretty(&receipt)?)?;
+    // The remainders themselves, with every collapsed pair and separating word, beside the
+    // counts: the witness is deposited, never only counted.
+    std::fs::write(dir.join("remainders.json"), serde_json::to_string_pretty(&remainders)?)?;
     println!("{}", serde_json::to_string_pretty(&receipt)?);
     Ok(())
 }
@@ -1143,13 +1182,7 @@ fn body_mode(args: &[String]) -> Result<(), Error> {
         }
         class.response.iter().find(|r| r.exposure.history == history_addresses).map(|r| r.face).ok_or("no response at the exposure")?
     } else {
-        class
-            .remainder
-            .lens_faces
-            .iter()
-            .find(|(o, e, _, _)| *o == occurrence && e.history == history_addresses)
-            .map(|(_, _, lens, _)| *lens)
-            .ok_or("no lens face at the exposure")?
+        return Err("the occurrence is outside the class's fibre: the class body refuses it at admission and is not driven".into());
     };
     let readout = ResidentReadout::new()?;
     let surface = mount_operator_surface(&readout)?;

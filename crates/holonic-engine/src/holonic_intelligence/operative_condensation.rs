@@ -143,29 +143,50 @@ pub enum NativeRemainderSpecies {
     Compression,
 }
 
-/// The remainder of one class body against the full operator, exhibited.
+/// The remainder of one class body, exhibited on the body's own domain: the exposures of the
+/// occurrences it retains.  The lens over the whole family (the full operator with the class
+/// cone's complement withdrawn, read under every occurrence) is separate testimony and not the
+/// body's remainder, because the body refuses every occurrence outside its fibre.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeClassRemainder {
-    /// The faces the class body returned for every occurrence of the family at every declared
-    /// exposure, beside the full operator's.
-    pub lens_faces: Vec<(usize, NativeExposure, u32, u32)>,
+    /// The body's own domain: (occurrence, exposure, body face, full face) for every declared
+    /// exposure of every occurrence the class retains.
+    pub domain_faces: Vec<(usize, NativeExposure, u32, u32)>,
+    /// The collapsed population on the domain: pairs of the body's own exposures it identifies
+    /// where the full operator separates them, each with its shortest separating word.
     pub collapsed: Vec<NativeCollapsedPair>,
-    /// Member exposures whose face under the lens differed from the full operator's: the class
-    /// body's own descent failures (the lift obligation refused for that word).
-    pub member_faces_changed: Vec<(usize, NativeExposure, u32, u32)>,
+    /// Exposures of the domain whose body face differs from the full operator's: the lift
+    /// obligation refused for that word.
+    pub descent_failures: Vec<(usize, NativeExposure, u32, u32)>,
+    /// The propagated enclosure at the face under every exposure of the domain; the
+    /// per-coordinate residual is deposited as octets beside the receipt under `residual_files`.
     pub propagated: Vec<NativeTerminalRemainder>,
-    pub species: NativeRemainderSpecies,
+    pub residual_files: Vec<String>,
+    /// Absent when the body refuses descent on a word of its domain: no species is stated.
+    pub species: Option<NativeRemainderSpecies>,
+    /// Testimony: the lens over the whole family, (occurrence, exposure, lens face, full face),
+    /// and the pairs it collapses among occurrences outside the body's domain.
+    pub lens_faces: Vec<(usize, NativeExposure, u32, u32)>,
+    pub lens_collapsed: Vec<NativeCollapsedPair>,
 }
 
 impl NativeClassRemainder {
-    /// The species by the remainder alone.
-    pub fn species_of(collapsed: &[NativeCollapsedPair], propagated: &[NativeTerminalRemainder]) -> NativeRemainderSpecies {
-        if !collapsed.is_empty() {
-            NativeRemainderSpecies::Compression
-        } else if propagated.iter().all(|remainder| remainder.nonpoint_coordinates == 0) {
-            NativeRemainderSpecies::Rebase
+    /// The species by the remainder on the domain (`H.0420`): a nonempty collapsed population
+    /// states compression, the quotient by the declared family; none collapsed and every domain
+    /// face descending states condensation, the far population replaced by a compact realizer
+    /// with the propagated enclosure as its certified remainder.  A rebase (invertible
+    /// conjugacy) is never stated here: nothing in a face reading shows invertibility.  A descent
+    /// failure is neither: the body is not a lift on that word and no species is stated.
+    pub fn species_of(
+        collapsed: &[NativeCollapsedPair],
+        descent_failures: usize,
+    ) -> Option<NativeRemainderSpecies> {
+        if descent_failures > 0 {
+            None
+        } else if !collapsed.is_empty() {
+            Some(NativeRemainderSpecies::Compression)
         } else {
-            NativeRemainderSpecies::Condensation
+            Some(NativeRemainderSpecies::Condensation)
         }
     }
 
@@ -228,6 +249,23 @@ pub struct NativeClassEcology {
     pub cone_population: usize,
     pub response: Vec<NativeReceiverResponse>,
     pub remainder: NativeClassRemainder,
+    /// Whether the cone is the union of the declared populations whose single withdrawal changed
+    /// a member face (`FoundedCone` under the singleton declaration), or a larger set sound under
+    /// the one declared withdrawal of its complement, found by restoration.
+    pub cone_founding: NativeConeFounding,
+}
+
+/// How a class cone was founded and what it is sound under.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum NativeConeFounding {
+    /// The union of the declared populations whose single withdrawal changed a member face:
+    /// `FoundedCone` under the singleton declaration, sound under those withdrawals alone.
+    FoundedBySingletons,
+    /// A superset found by restoring roles until the joint withdrawal of the complement left
+    /// every member face: sound under that one declared withdrawal (`IsConeUnder` with a
+    /// one-member declaration), not `FoundedCone`, and not minimal.
+    SoundUnderComplementWithdrawal { founded_by_singletons: usize, restored: usize },
 }
 
 /// The productive lane: the cone-restricted ecology of the declared family.
@@ -254,7 +292,9 @@ pub struct NativeExposureTestimony {
     pub complement_unchanged: bool,
     pub cone_changed: bool,
     pub probes: usize,
-    pub monotone: bool,
+    /// Whether the readings along a declared order were monotone, when an order was read;
+    /// absent when the declaration had no order (single withdrawals).
+    pub monotone: Option<bool>,
 }
 
 /// The cold lane: where the coefficients came from, and what excited and intervened.
@@ -321,6 +361,8 @@ pub struct ResidentExcitationDismantling {
     pub founded: NativeFoundedCones,
     /// One remainder per founded class cone, in the order of `founded.classes`.
     pub remainders: Vec<NativeClassRemainder>,
+    /// How each class cone was founded, in the order of `founded.classes`.
+    pub foundings: Vec<NativeConeFounding>,
 }
 
 impl SoulkillerDismantlingInput for ResidentExcitationDismantling {
@@ -390,6 +432,11 @@ impl SoulkillerDismantlingInput for ResidentExcitationDismantling {
                 .get(founded_at)
                 .cloned()
                 .ok_or_else(|| NativeCondensationError::Rest(format!("no remainder for class {}", class.ordinal)))?;
+            let cone_founding = self
+                .foundings
+                .get(founded_at)
+                .cloned()
+                .ok_or_else(|| NativeCondensationError::Rest(format!("no founding for class {}", class.ordinal)))?;
             classes.push(NativeClassEcology {
                 ordinal: class.ordinal,
                 signature: class.signature.clone(),
@@ -398,6 +445,7 @@ impl SoulkillerDismantlingInput for ResidentExcitationDismantling {
                 cone: founded.cone.clone(),
                 response,
                 remainder,
+                cone_founding,
             });
         }
         let extent = self.founded.extent.clone();
@@ -552,6 +600,33 @@ impl NativeConeRestrictedEcology {
         self.ecology
             .validate()
             .map_err(|error| NativeCondensationError::Rest(error.to_string()))?;
+        // The extent is the union of the class cones (`DeclaredFamily.extent`), population by
+        // population.
+        let mut union: BTreeMap<u32, Vec<bool>> = BTreeMap::new();
+        for class in &self.classes {
+            for (population, mask) in &class.cone {
+                let sites = mask.to_sites();
+                let entry = union.entry(*population).or_insert_with(|| vec![false; sites.len()]);
+                if entry.len() != sites.len() {
+                    return Err(NativeCondensationError::Rest(format!("class cones disagree on the sites of population {population}")));
+                }
+                for (u, s) in entry.iter_mut().zip(&sites) {
+                    *u |= *s;
+                }
+            }
+        }
+        for (population, sites) in &union {
+            let extent = self
+                .extent
+                .get(population)
+                .ok_or_else(|| NativeCondensationError::Rest(format!("the extent lacks population {population}")))?;
+            if extent.to_sites() != *sites {
+                return Err(NativeCondensationError::Rest(format!("the extent of population {population} is not the union of the class cones")));
+            }
+        }
+        if self.extent.len() != union.len() {
+            return Err(NativeCondensationError::Rest("the extent names populations no class cone names".to_owned()));
+        }
         if self.cross_sections.len() != self.ecology.coefficient_populations.len() {
             return Err(NativeCondensationError::Rest("cross-section population".to_owned()));
         }

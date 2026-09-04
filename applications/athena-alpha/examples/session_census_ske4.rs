@@ -56,7 +56,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "egress_receipt_octets": last.egress_receipt_octets - first.egress_receipt_octets,
         "ingress_octets": last.ingress_octets - first.ingress_octets,
         "resident_octets_peak": last.resident_octets_peak,
-        "passages": cycle.traces.iter().map(|t| t.census_after.deed_launches).collect::<std::collections::BTreeSet<_>>().len(),
+        "passages": last.deed_launches - first.deed_launches,
     });
     println!("{}", serde_json::to_string_pretty(&receipt)?);
     Ok(())

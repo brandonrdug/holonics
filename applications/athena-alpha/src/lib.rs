@@ -16,8 +16,8 @@ pub use apertures::addressed_ingress;
 pub use application::{AthenaAlphaAdmission, AthenaAlphaApplication, AthenaAlphaError};
 pub use composed_variant::{
     COMPOSED_VARIANT_SCHEMA, ComposedFace, ComposedVariant, DeclaredDecoder, ProductVector,
-    SaturationReceipt, SaturationStep, class_cone_roles, saturation, species_over_family,
-    width_difference,
+    ReleaseReceipt, SaturationReceipt, SaturationStep, class_cone_roles, saturation,
+    species_over_family, width_difference,
 };
 pub use diffusion::declared_diffusion_law;
 pub use material_codec::{

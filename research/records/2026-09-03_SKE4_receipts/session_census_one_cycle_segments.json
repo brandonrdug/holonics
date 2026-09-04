@@ -2,7 +2,7 @@
   "addresses": 14,
   "allocations": 4075,
   "captured_launches": 3729,
-  "cycle_milliseconds": 1412,
+  "cycle_milliseconds": 1413,
   "deed_launches": 687,
   "egress_receipt_octets": 152256,
   "egress_section_octets": 58720256,
@@ -10,7 +10,7 @@
   "ingress_octets": 6824,
   "material": "7 + 5 =",
   "operations": 1275,
-  "passages": 672,
+  "passages": 687,
   "resident_octets_peak": 15871317244,
   "section_read_outs": 16,
   "synchronizations": 687

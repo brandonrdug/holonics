@@ -136,11 +136,11 @@ them under the full operator.
 
 | class | collapsed pairs | separating word | species |
 |---|---|---|---|
-| 0 | 1: `9 + 3 =` with `8 + 8 =` under the empty history (lens `$` for both; full `9`, `8`) | the empty history | compression |
+| 0 | 1: `9 + 3 =` with `8 + 8 =` under the empty history (lens `$` for both; full `9`, `8`) | the empty history | compression (withdrawn, §5: condensation on the body's domain) |
 | 1 | 0 | | condensation |
 | 2 | 0 | | condensation |
-| 3 | 5, all under the empty history, all at lens face `$` | the empty history | compression |
-| 4 | 5: two under the empty history (lens `The`, and `2094`), one under `The second operand is ` separated by that word, two more under the second and third words separated by the empty history | as listed | compression |
+| 3 | 5, all under the empty history, all at lens face `$` | the empty history | compression (withdrawn, §5) |
+| 4 | 5: two under the empty history (lens `The`, and `2094`), one under `The second operand is ` separated by that word, two more under the second and third words separated by the empty history | as listed | compression (withdrawn, §5) |
 
 Two class bodies collapse nothing and reproduce every member face; their remainder is the
 propagated enclosure alone, exhibited, and they state condensation. Three collapse pairs of the
@@ -176,7 +176,32 @@ the singly-run steps (corrected: every card step marks); the child steps ran 91 
 class extensions, 656 s for the family's, 104 to 132 s per exposure, 16 to 26 s per
 verification, and the whole deed from one command about an hour of card time.
 
-## 5. What this does not grade
+## 5. Corrected on 2026-09-04 after Sol's review
+
+[counterexample; source-inspected] Sol's review
+([`the review`](./2026-09-04_SOL_REVIEW_OF_THE_SKE_CAMPAIGN_THE_CONES_ARE_NOT_FOUNDED_CONES_THE_SPECIES_ARE_OFF_DOMAIN_AND_THE_PASSES_ARE_WITHDRAWN.md))
+found that the sets §4 called founded cones are not `FoundedCone`s: under the Lean a changed
+declared population enters the founded cone whole, so with the joint complement declared the
+founded union is every role, and under the singleton declaration alone the founded cone is the
+union of the changing singletons (32, 33, 59, 31, and 42 roles), which the card refuted jointly.
+The sets returned are what they are: sound under the one declared withdrawal of their complement
+(`IsConeUnder` with a one-member declaration), found by restoration, not minimal. The return now
+carries that as `NativeConeFounding::SoundUnderComplementWithdrawal` with both counts, and
+`validate` enforces the extent as the union of the class cones.
+
+[counterexample; source-inspected; measured] The species of §4 were stated over a lens domain
+the class bodies refuse: a class body retains only its own fibre's rows and refuses every other
+occurrence at admission, so pairs collapsed among other occurrences are not its `H.0420`
+collapsed population. The remainder is now stated on the body's own domain (its fibre's
+declared exposures): every class collapses nothing there, descends on every word, and states
+condensation, with the per-coordinate residual deposited (`remainder_*.bin`) beside the
+propagated enclosure and the lens over the whole family kept as testimony (1, 0, 0, 5, 5 pairs
+the lens collapses, `remainders.json`). `species_of` no longer states a rebase, which no face
+reading shows, and states nothing where descent fails. The testimony field `monotone` is absent
+where no order was read. The consumer bound of a contraction with overlay joins now includes
+the joined carrier's obligation.
+
+## 6. What this does not grade
 
 [definition] The class ecology is a lens and shortcut graded as a lift; it is not the
 compression, whose law applies to the composed variant in SKE5. The remainder is exhibited: the

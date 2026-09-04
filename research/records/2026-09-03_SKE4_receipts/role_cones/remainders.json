@@ -1,0 +1,1957 @@
+[
+  {
+    "domain_faces": [
+      [
+        0,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236832,
+        236832
+      ],
+      [
+        0,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236810,
+        236810
+      ],
+      [
+        0,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ]
+    ],
+    "collapsed": [],
+    "descent_failures": [],
+    "propagated": [
+      {
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        "occurrence": 0,
+        "coordinates": 262144,
+        "nonpoint_coordinates": 262144,
+        "widest_grains": 150,
+        "grain": 47,
+        "widths": [
+          [
+            30,
+            97
+          ],
+          [
+            60,
+            68201
+          ],
+          [
+            90,
+            158801
+          ],
+          [
+            120,
+            34266
+          ],
+          [
+            150,
+            779
+          ]
+        ]
+      },
+      {
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        "occurrence": 0,
+        "coordinates": 262144,
+        "nonpoint_coordinates": 262144,
+        "widest_grains": 150,
+        "grain": 47,
+        "widths": [
+          [
+            30,
+            6
+          ],
+          [
+            60,
+            99372
+          ],
+          [
+            90,
+            149797
+          ],
+          [
+            120,
+            12811
+          ],
+          [
+            150,
+            158
+          ]
+        ]
+      },
+      {
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        "occurrence": 0,
+        "coordinates": 262144,
+        "nonpoint_coordinates": 262144,
+        "widest_grains": 150,
+        "grain": 47,
+        "widths": [
+          [
+            30,
+            135
+          ],
+          [
+            60,
+            61673
+          ],
+          [
+            90,
+            170363
+          ],
+          [
+            120,
+            29090
+          ],
+          [
+            150,
+            883
+          ]
+        ]
+      }
+    ],
+    "residual_files": [
+      "remainder_occ0_hist0.bin",
+      "remainder_occ0_hist1.bin",
+      "remainder_occ0_hist2.bin"
+    ],
+    "species": "condensation",
+    "lens_faces": [
+      [
+        0,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236832,
+        236832
+      ],
+      [
+        0,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236810,
+        236810
+      ],
+      [
+        0,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ],
+      [
+        1,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236795,
+        236819
+      ],
+      [
+        1,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236800,
+        236800
+      ],
+      [
+        1,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ],
+      [
+        2,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236832,
+        236832
+      ],
+      [
+        2,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236825,
+        236825
+      ],
+      [
+        2,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ],
+      [
+        3,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236800,
+        236800
+      ],
+      [
+        3,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236812,
+        236812
+      ],
+      [
+        3,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236832,
+        236832
+      ],
+      [
+        4,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236795,
+        236828
+      ],
+      [
+        4,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236828,
+        236828
+      ],
+      [
+        4,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ]
+    ],
+    "lens_collapsed": [
+      {
+        "left": 1,
+        "right": 4,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        "lens_face": 236795,
+        "full_faces": [
+          236819,
+          236828
+        ],
+        "separating_word": []
+      }
+    ]
+  },
+  {
+    "domain_faces": [
+      [
+        1,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236819,
+        236819
+      ],
+      [
+        1,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236800,
+        236800
+      ],
+      [
+        1,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ]
+    ],
+    "collapsed": [],
+    "descent_failures": [],
+    "propagated": [
+      {
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        "occurrence": 1,
+        "coordinates": 262144,
+        "nonpoint_coordinates": 262144,
+        "widest_grains": 150,
+        "grain": 47,
+        "widths": [
+          [
+            30,
+            122
+          ],
+          [
+            60,
+            68292
+          ],
+          [
+            90,
+            153478
+          ],
+          [
+            120,
+            39378
+          ],
+          [
+            150,
+            874
+          ]
+        ]
+      },
+      {
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        "occurrence": 1,
+        "coordinates": 262144,
+        "nonpoint_coordinates": 262144,
+        "widest_grains": 150,
+        "grain": 47,
+        "widths": [
+          [
+            30,
+            1
+          ],
+          [
+            60,
+            102221
+          ],
+          [
+            90,
+            147768
+          ],
+          [
+            120,
+            12032
+          ],
+          [
+            150,
+            122
+          ]
+        ]
+      },
+      {
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        "occurrence": 1,
+        "coordinates": 262144,
+        "nonpoint_coordinates": 262144,
+        "widest_grains": 150,
+        "grain": 47,
+        "widths": [
+          [
+            30,
+            127
+          ],
+          [
+            60,
+            64605
+          ],
+          [
+            90,
+            160176
+          ],
+          [
+            120,
+            36253
+          ],
+          [
+            150,
+            983
+          ]
+        ]
+      }
+    ],
+    "residual_files": [
+      "remainder_occ1_hist0.bin",
+      "remainder_occ1_hist1.bin",
+      "remainder_occ1_hist2.bin"
+    ],
+    "species": "condensation",
+    "lens_faces": [
+      [
+        0,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236832,
+        236832
+      ],
+      [
+        0,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236810,
+        236810
+      ],
+      [
+        0,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ],
+      [
+        1,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236819,
+        236819
+      ],
+      [
+        1,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236800,
+        236800
+      ],
+      [
+        1,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ],
+      [
+        2,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236832,
+        236832
+      ],
+      [
+        2,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236825,
+        236825
+      ],
+      [
+        2,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ],
+      [
+        3,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236800,
+        236800
+      ],
+      [
+        3,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236812,
+        236812
+      ],
+      [
+        3,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236832,
+        236832
+      ],
+      [
+        4,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236828,
+        236828
+      ],
+      [
+        4,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236828,
+        236828
+      ],
+      [
+        4,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ]
+    ],
+    "lens_collapsed": []
+  },
+  {
+    "domain_faces": [
+      [
+        2,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236832,
+        236832
+      ],
+      [
+        2,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236825,
+        236825
+      ],
+      [
+        2,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ]
+    ],
+    "collapsed": [],
+    "descent_failures": [],
+    "propagated": [
+      {
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        "occurrence": 2,
+        "coordinates": 262144,
+        "nonpoint_coordinates": 262144,
+        "widest_grains": 150,
+        "grain": 47,
+        "widths": [
+          [
+            30,
+            113
+          ],
+          [
+            60,
+            69080
+          ],
+          [
+            90,
+            160784
+          ],
+          [
+            120,
+            31367
+          ],
+          [
+            150,
+            800
+          ]
+        ]
+      },
+      {
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        "occurrence": 2,
+        "coordinates": 262144,
+        "nonpoint_coordinates": 262144,
+        "widest_grains": 150,
+        "grain": 47,
+        "widths": [
+          [
+            30,
+            20
+          ],
+          [
+            60,
+            97441
+          ],
+          [
+            90,
+            151463
+          ],
+          [
+            120,
+            13099
+          ],
+          [
+            150,
+            121
+          ]
+        ]
+      },
+      {
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        "occurrence": 2,
+        "coordinates": 262144,
+        "nonpoint_coordinates": 262144,
+        "widest_grains": 150,
+        "grain": 47,
+        "widths": [
+          [
+            30,
+            187
+          ],
+          [
+            60,
+            61706
+          ],
+          [
+            90,
+            174907
+          ],
+          [
+            120,
+            24547
+          ],
+          [
+            150,
+            797
+          ]
+        ]
+      }
+    ],
+    "residual_files": [
+      "remainder_occ2_hist0.bin",
+      "remainder_occ2_hist1.bin",
+      "remainder_occ2_hist2.bin"
+    ],
+    "species": "condensation",
+    "lens_faces": [
+      [
+        0,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236832,
+        236832
+      ],
+      [
+        0,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236810,
+        236810
+      ],
+      [
+        0,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ],
+      [
+        1,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236819,
+        236819
+      ],
+      [
+        1,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236800,
+        236800
+      ],
+      [
+        1,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ],
+      [
+        2,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236832,
+        236832
+      ],
+      [
+        2,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236825,
+        236825
+      ],
+      [
+        2,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ],
+      [
+        3,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236800,
+        236800
+      ],
+      [
+        3,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236812,
+        236812
+      ],
+      [
+        3,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236832,
+        236832
+      ],
+      [
+        4,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236828,
+        236828
+      ],
+      [
+        4,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236828,
+        236828
+      ],
+      [
+        4,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ]
+    ],
+    "lens_collapsed": []
+  },
+  {
+    "domain_faces": [
+      [
+        3,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236800,
+        236800
+      ],
+      [
+        3,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236812,
+        236812
+      ],
+      [
+        3,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236832,
+        236832
+      ]
+    ],
+    "collapsed": [],
+    "descent_failures": [],
+    "propagated": [
+      {
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        "occurrence": 3,
+        "coordinates": 262144,
+        "nonpoint_coordinates": 262144,
+        "widest_grains": 150,
+        "grain": 47,
+        "widths": [
+          [
+            30,
+            129
+          ],
+          [
+            60,
+            68479
+          ],
+          [
+            90,
+            157199
+          ],
+          [
+            120,
+            35478
+          ],
+          [
+            150,
+            859
+          ]
+        ]
+      },
+      {
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        "occurrence": 3,
+        "coordinates": 262144,
+        "nonpoint_coordinates": 262144,
+        "widest_grains": 150,
+        "grain": 47,
+        "widths": [
+          [
+            30,
+            7
+          ],
+          [
+            60,
+            99935
+          ],
+          [
+            90,
+            149455
+          ],
+          [
+            120,
+            12618
+          ],
+          [
+            150,
+            129
+          ]
+        ]
+      },
+      {
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        "occurrence": 3,
+        "coordinates": 262144,
+        "nonpoint_coordinates": 262144,
+        "widest_grains": 150,
+        "grain": 47,
+        "widths": [
+          [
+            30,
+            144
+          ],
+          [
+            60,
+            63448
+          ],
+          [
+            90,
+            161344
+          ],
+          [
+            120,
+            36121
+          ],
+          [
+            150,
+            1087
+          ]
+        ]
+      }
+    ],
+    "residual_files": [
+      "remainder_occ3_hist0.bin",
+      "remainder_occ3_hist1.bin",
+      "remainder_occ3_hist2.bin"
+    ],
+    "species": "condensation",
+    "lens_faces": [
+      [
+        0,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236795,
+        236832
+      ],
+      [
+        0,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236810,
+        236810
+      ],
+      [
+        0,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ],
+      [
+        1,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236795,
+        236819
+      ],
+      [
+        1,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236800,
+        236800
+      ],
+      [
+        1,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ],
+      [
+        2,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236795,
+        236832
+      ],
+      [
+        2,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236825,
+        236825
+      ],
+      [
+        2,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ],
+      [
+        3,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236800,
+        236800
+      ],
+      [
+        3,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236812,
+        236812
+      ],
+      [
+        3,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236832,
+        236832
+      ],
+      [
+        4,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236795,
+        236828
+      ],
+      [
+        4,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236828,
+        236828
+      ],
+      [
+        4,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ]
+    ],
+    "lens_collapsed": [
+      {
+        "left": 0,
+        "right": 1,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        "lens_face": 236795,
+        "full_faces": [
+          236832,
+          236819
+        ],
+        "separating_word": []
+      },
+      {
+        "left": 0,
+        "right": 4,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        "lens_face": 236795,
+        "full_faces": [
+          236832,
+          236828
+        ],
+        "separating_word": []
+      },
+      {
+        "left": 1,
+        "right": 2,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        "lens_face": 236795,
+        "full_faces": [
+          236819,
+          236832
+        ],
+        "separating_word": []
+      },
+      {
+        "left": 1,
+        "right": 4,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        "lens_face": 236795,
+        "full_faces": [
+          236819,
+          236828
+        ],
+        "separating_word": []
+      },
+      {
+        "left": 2,
+        "right": 4,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        "lens_face": 236795,
+        "full_faces": [
+          236832,
+          236828
+        ],
+        "separating_word": []
+      }
+    ]
+  },
+  {
+    "domain_faces": [
+      [
+        4,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236828,
+        236828
+      ],
+      [
+        4,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236828,
+        236828
+      ],
+      [
+        4,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ]
+    ],
+    "collapsed": [],
+    "descent_failures": [],
+    "propagated": [
+      {
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        "occurrence": 4,
+        "coordinates": 262144,
+        "nonpoint_coordinates": 262144,
+        "widest_grains": 150,
+        "grain": 47,
+        "widths": [
+          [
+            30,
+            122
+          ],
+          [
+            60,
+            68074
+          ],
+          [
+            90,
+            160217
+          ],
+          [
+            120,
+            32889
+          ],
+          [
+            150,
+            842
+          ]
+        ]
+      },
+      {
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        "occurrence": 4,
+        "coordinates": 262144,
+        "nonpoint_coordinates": 262144,
+        "widest_grains": 150,
+        "grain": 47,
+        "widths": [
+          [
+            30,
+            10
+          ],
+          [
+            60,
+            94488
+          ],
+          [
+            90,
+            153038
+          ],
+          [
+            120,
+            14436
+          ],
+          [
+            150,
+            172
+          ]
+        ]
+      },
+      {
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        "occurrence": 4,
+        "coordinates": 262144,
+        "nonpoint_coordinates": 262144,
+        "widest_grains": 150,
+        "grain": 47,
+        "widths": [
+          [
+            30,
+            162
+          ],
+          [
+            60,
+            62491
+          ],
+          [
+            90,
+            168181
+          ],
+          [
+            120,
+            30448
+          ],
+          [
+            150,
+            862
+          ]
+        ]
+      }
+    ],
+    "residual_files": [
+      "remainder_occ4_hist0.bin",
+      "remainder_occ4_hist1.bin",
+      "remainder_occ4_hist2.bin"
+    ],
+    "species": "condensation",
+    "lens_faces": [
+      [
+        0,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        818,
+        236832
+      ],
+      [
+        0,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236832,
+        236810
+      ],
+      [
+        0,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ],
+      [
+        1,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        2094,
+        236819
+      ],
+      [
+        1,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236800,
+        236800
+      ],
+      [
+        1,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236800,
+        236770
+      ],
+      [
+        2,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        2094,
+        236832
+      ],
+      [
+        2,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236832,
+        236825
+      ],
+      [
+        2,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ],
+      [
+        3,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        818,
+        236800
+      ],
+      [
+        3,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236800,
+        236812
+      ],
+      [
+        3,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236800,
+        236832
+      ],
+      [
+        4,
+        {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        236828,
+        236828
+      ],
+      [
+        4,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        236828,
+        236828
+      ],
+      [
+        4,
+        {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        236770,
+        236770
+      ]
+    ],
+    "lens_collapsed": [
+      {
+        "left": 0,
+        "right": 3,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        "lens_face": 818,
+        "full_faces": [
+          236832,
+          236800
+        ],
+        "separating_word": []
+      },
+      {
+        "left": 1,
+        "right": 2,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": []
+        },
+        "lens_face": 2094,
+        "full_faces": [
+          236819,
+          236832
+        ],
+        "separating_word": []
+      },
+      {
+        "left": 0,
+        "right": 2,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        "lens_face": 236832,
+        "full_faces": [
+          236810,
+          236825
+        ],
+        "separating_word": [
+          818,
+          1855,
+          47940,
+          563,
+          236743
+        ]
+      },
+      {
+        "left": 1,
+        "right": 3,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            1855,
+            47940,
+            563,
+            236743
+          ]
+        },
+        "lens_face": 236800,
+        "full_faces": [
+          236800,
+          236812
+        ],
+        "separating_word": []
+      },
+      {
+        "left": 1,
+        "right": 3,
+        "exposure": {
+          "receiver": "terminal-face",
+          "history": [
+            818,
+            2324,
+            563,
+            236743
+          ]
+        },
+        "lens_face": 236800,
+        "full_faces": [
+          236770,
+          236832
+        ],
+        "separating_word": []
+      }
+    ]
+  }
+]
