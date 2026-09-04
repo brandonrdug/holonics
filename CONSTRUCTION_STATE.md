@@ -218,9 +218,7 @@ is
 de Bruijn--Newman time is `t = -4u` after `s = 1/2 + i z/2`. Its Lean theorems stand, but the direct
 standard-`H_t` interpretation is retracted pending the RH0/RH1 bridge.
 
-**RH line position:** RT complete (the descent-route RT campaign; RT0–RT6 passed; `0 ≤ Λ_DN`
-is a theorem on the three axioms; the single remaining port is `DeBruijnBound`; no later RH
-deed is scheduled)
+**RH line position:** DB1 (the de Bruijn campaign; DB0 passed)
 
 [definition] Brandon's direct instruction of 2026-09-03 activates the `FT0--FT6` Foster-tank and
 threshold campaign on the RH line under
@@ -328,8 +326,15 @@ by the minimum-modulus transfer, hence `seamTimes ⊆ Ici 0` and `Λ_DN_nonneg :
 (`riemannHypothesis_iff_Λ_DN_eq_of_deBruijn`); every theorem on the three axioms; root
 umbrella 9,834 jobs. The receipt is
 [`research/records/2026-09-03_RT6_EVERY_NEGATIVE_TIME_HAS_AN_OFF_SEAM_ZERO_AND_THE_THRESHOLD_IS_NONNEGATIVE_ON_THE_THREE_AXIOMS.md`](research/records/2026-09-03_RT6_EVERY_NEGATIVE_TIME_HAS_AN_OFF_SEAM_ZERO_AND_THE_THRESHOLD_IS_NONNEGATIVE_ON_THE_THREE_AXIOMS.md).
-The RT campaign is complete; the first exact missing inequality of the RH line is `Λ_DN ≤ 0`,
-and no later RH deed is scheduled.
+The RT campaign is complete; the first exact missing inequality of the RH line is `Λ_DN ≤ 0`.
+
+[definition] Brandon's direct request of 2026-09-03 ("Proceed with the scoping") activates the
+ordered `DB0--DB5` de Bruijn campaign on the RH line under
+[`blueprint/THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md`](blueprint/THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md),
+target the discharge of the last port `DeBruijnBound` by de Bruijn's own chain (Duke Math. J.
+17, 1950, §7 with Theorems 3, 7, 8, 12, 13, read in full and mapped to owners), returning
+`1/8 ∈ seamTimes`, `Λ_DN ∈ [0, 1/8]`, `RiemannHypothesis ↔ Λ_DN = 0` with no port, and the
+RH0/RH1 bridge in Lean. DB0 passed with the deposit; DB1 (the strip of `ξ`) is current.
 
 [definition] Use `c_CD` for the Copson--de Bruijn sharp coefficient and reserve `Λ_DN` for the
 coordinate-corrected de Bruijn--Newman threshold. The correction record is

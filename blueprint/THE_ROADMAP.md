@@ -92,9 +92,21 @@ convergence dichotomy. Coefficient-specific branch selection and a certified dec
 research and schedule nothing. Brandon's direct correction of 2026-09-02 closes HTP at this bounded
 handoff and activates the engine HNA campaign.
 
-**RH line position:** RT complete (the descent-route RT campaign; RT0–RT6 passed; `0 ≤ Λ_DN`
-is a theorem on the three axioms; the single remaining port of the RH line is `DeBruijnBound`;
-no later RH deed is scheduled)
+**RH line position:** DB1 (the de Bruijn campaign; DB0 passed)
+
+[definition] Brandon's direct request of 2026-09-03 ("Proceed with the scoping") activates the
+ordered `DB0--DB5` de Bruijn campaign on the RH line under
+[`THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md`](THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md):
+target the discharge of the last port `DeBruijnBound` from the actual kernel by de Bruijn's own
+chain (the strip of `ξ`, the translation average on real polynomials, its transport to the class
+by approximants and Hurwitz, the Gaussian as the limit of `cosh(u/(2N))^{N²}`), returning
+`1/8 ∈ seamTimes`, `Λ_DN ∈ [0, 1/8]`, `RiemannHypothesis ↔ Λ_DN = 0` with no port, and the
+RH0/RH1 coordinate bridge in Lean. DB0 passed with the deposit. The order is DB1 (the strip),
+DB2 (the polynomial average), DB3 (the class transport and the iteration), DB4 (the Gaussian
+limit), DB5 (the seal and the bridge).
+
+[proved-derived; formal-checked] RT complete: RT0–RT6 passed; `0 ≤ Λ_DN` is a theorem on the
+three axioms.
 
 [proved-derived; formal-checked] RT6 passed: `RH/DescentZeros.lean` returned, for every
 repository `t > 0`, a zero of `heatE t ξ` off the seam (`exists_offSeam_zero`, by the
