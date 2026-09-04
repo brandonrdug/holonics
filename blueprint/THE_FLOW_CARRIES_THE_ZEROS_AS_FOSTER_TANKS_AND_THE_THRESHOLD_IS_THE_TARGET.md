@@ -206,8 +206,8 @@ standing theorems as ports (`DeBruijnBound : ½ ∈ seamTimes`, `RodgersTaoNonne
 of the conjecture, deposited; the contract's sharper integer-side inequality cannot be formed on
 the descent side (FT5); receipt
 [`the FT6 record`](../research/records/2026-09-03_FT6_THE_THRESHOLD_IS_RH_GIVEN_THE_TWO_STANDING_THEOREMS_AND_THE_MISSING_INEQUALITY_IS_THE_CONJECTURE.md).
-The campaign closes at this return. The port `RodgersTaoNonneg` is taken up by the descent-route
-RT contract,
+The campaign closes at this return. The port `RodgersTaoNonneg` is taken up, and on 2026-09-03
+returned as the theorem `DescentZeros.Λ_DN_nonneg`, by the descent-route RT contract,
 [`THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md`](THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md),
 which re-assigns the `RT0`--`RT6` labels named above to Dobner's route and keeps the fleet's
 meanings as `RTa1`--`RTa6`.

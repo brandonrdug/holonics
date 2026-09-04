@@ -158,7 +158,8 @@ under
 [`THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md`](THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md).
 Its target is the discharge of the port `RodgersTaoNonneg`: `0 ≤ Λ_DN` as a theorem, by exhibiting
 a zero of `heatE t ξ` off the seam at every repository `t > 0` (standard `τ < 0`) along Dobner's
-route, founded on FT5's flowed integer events. The order is fixed:
+route, founded on FT5's flowed integer events. The target was returned on 2026-09-03
+(`DescentZeros.Λ_DN_nonneg`; the RT6 paragraph above). The order is fixed:
 
 1. `RT0` -- the manifest of both published proofs against owners and the route -- **PASSED**,
    receipt

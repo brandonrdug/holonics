@@ -284,7 +284,8 @@ The standing open theorems of the RH line are de Bruijn's bound (`½ ∈ seamTim
 [definition] Brandon's direct request of 2026-09-03 to scope the RT programme critically and
 deposit its plans activates the ordered `RT0--RT6` descent-route campaign on the RH line under
 [`blueprint/THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md`](blueprint/THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md),
-target the discharge of the port `RodgersTaoNonneg` (`0 ≤ Λ_DN` as a theorem) by a zero of
+target the discharge of the port `RodgersTaoNonneg` (`0 ≤ Λ_DN` as a theorem; returned
+2026-09-03 as `DescentZeros.Λ_DN_nonneg`) by a zero of
 `heatE t ξ` off the seam at every repository `t > 0`, along Dobner's route founded on FT5's flowed
 integer events; the Rodgers--Tao route is kept as `RTa1--RTa6` with its obstructions and is not
 scheduled. RT0 passed: the manifest of both published proofs against tree and Mathlib owners
