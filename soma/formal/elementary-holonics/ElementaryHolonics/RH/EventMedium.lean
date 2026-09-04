@@ -392,4 +392,350 @@ theorem d_le_Dmed {t : ℝ} (ht : 0 < t) {s : ℂ} {w L : ℝ} (hw : 1 ≤ w) (h
   · unfold β₃maj; positivity
   · unfold β₄maj; positivity
 
+/-! ## The `e`-piece on the medium range -/
+
+theorem MH_le_Mmed {t X : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) {w L ξ₁ : ℝ} (hw : 1 ≤ w)
+    (hL : 0 ≤ L) (hLw : L ≤ w ^ 7) (hξ₁0 : 0 ≤ ξ₁) (hξ₁ : ξ₁ ≤ c₁' t X * w ^ 7)
+    (hY2 : 2 * t * π ≤ w ^ 8 / 20) :
+    MH t X (2 * t * L) (w ^ 8 / 20) (w ^ 12) ξ₁ ≤ Mmed t X w := by
+  have hw0 : 0 < w := by linarith
+  have hZ := Z_le_med ht.le hX0 hw hL hLw
+  have hξ := ξ_le_med ht.le hX0 hw hL hLw
+  have hcξ : 0 ≤ cξ t X := by unfold cξ; positivity
+  have hZ0 : 0 ≤ X + 2 * t * L + 2 + w ^ 12 + w ^ 8 / 20 := by positivity
+  have hw12 : 1 ≤ w ^ 12 := one_le_pow₀ hw
+  have hcZ1 : 1 ≤ cZ t X * w ^ 12 := by
+    unfold cZ
+    nlinarith
+  unfold MH Mmed
+  have hexp : ξ₁ ^ 2 - (w ^ 8 / 20 - t * π) ^ 2 ≤ c₁' t X ^ 2 * w ^ 14 - w ^ 16 / 1600 := by
+    have e1 : ξ₁ ^ 2 ≤ (c₁' t X * w ^ 7) ^ 2 := pow_le_pow_left₀ hξ₁0 hξ₁ 2
+    have e2 : (w ^ 8 / 40) ^ 2 ≤ (w ^ 8 / 20 - t * π) ^ 2 := by
+      apply pow_le_pow_left₀ (by positivity)
+      nlinarith [Real.pi_pos]
+    nlinarith
+  have hπe : 1 ≤ π * Real.exp 1 := by nlinarith [Real.pi_gt_three, Real.add_one_le_exp 1]
+  have e3 : (X + 2 * t * L + 2 + w ^ 12 + w ^ 8 / 20) ^ ((X + 2 * t * L + 2 + 1) / 2) ≤
+      (cZ t X * w ^ 12) ^ ((cξ t X * w ^ 7 + 1) / 2) :=
+    (Real.rpow_le_rpow hZ0 hZ (by positivity)).trans
+      (Real.rpow_le_rpow_of_exponent_le hcZ1 (by linarith))
+  have e4 : (π * Real.exp 1) ^ ((X + 2 * t * L + 2) / 2) ≤
+      (π * Real.exp 1) ^ (cξ t X * w ^ 7 / 2) :=
+    Real.rpow_le_rpow_of_exponent_le hπe (by linarith)
+  have e5 : (X + 2 * t * L + 2 + w ^ 12 + w ^ 8 / 20) ^ 2 ≤ (cZ t X * w ^ 12) ^ 2 :=
+    pow_le_pow_left₀ hZ0 hZ 2
+  apply mul_le_mul (Real.exp_le_exp.mpr (div_le_div_of_nonneg_right hexp (by positivity)))
+    _ (by positivity) (Real.exp_pos _).le
+  apply mul_le_mul_of_nonneg_left _ (Real.exp_pos _).le
+  exact mul_le_mul (mul_le_mul (mul_le_mul_of_nonneg_left e5 (by positivity)) e3
+    (by positivity) (by positivity)) e4 (by positivity) (by positivity)
+
+theorem T_le_Tmed {t X : ℝ} (ht : 0 < t) {w ξ₁ : ℝ} (hw : 1 ≤ w)
+    (hξ₁0 : 0 ≤ ξ₁) (hξ₁ : ξ₁ ≤ c₁' t X * w ^ 7) :
+    2 * (Real.exp (ξ₁ ^ 2 / (4 * t)) / (2 * π)) * (1 + |w ^ 12| + 4 * √t) * √(64 * π * t) *
+      Real.exp (-((w ^ 8 / 20) ^ 2 / (64 * t))) ≤ Tmed t X w := by
+  have hw0 : 0 < w := by linarith
+  unfold Tmed
+  rw [abs_of_nonneg (by positivity)]
+  have e1 : Real.exp (ξ₁ ^ 2 / (4 * t)) ≤ Real.exp (c₁' t X ^ 2 * w ^ 14 / (4 * t)) := by
+    apply Real.exp_le_exp.mpr
+    apply div_le_div_of_nonneg_right _ (by positivity)
+    have := pow_le_pow_left₀ hξ₁0 hξ₁ 2
+    nlinarith
+  gcongr
+
+theorem Mmed_nonneg {t X w : ℝ} (hcZ : 0 ≤ cZ t X * w ^ 12) : 0 ≤ Mmed t X w := by
+  unfold Mmed
+  apply mul_nonneg (Real.exp_pos _).le
+  apply mul_nonneg (Real.exp_pos _).le
+  apply mul_nonneg (mul_nonneg (mul_nonneg (by positivity) (sq_nonneg _))
+    (Real.rpow_nonneg hcZ _)) (Real.rpow_nonneg (by positivity) _)
+
+theorem Tmed_nonneg {t X w : ℝ} (ht : 0 < t) (hw : 0 ≤ w) : 0 ≤ Tmed t X w := by
+  unfold Tmed; positivity
+
+theorem Γmaj_nonneg {t X u : ℝ} (hu : 0 ≤ u) : 0 ≤ Γmaj t X u := by
+  unfold Γmaj
+  have := cg_pos X
+  have := Real.rpow_nonneg (by positivity : (0 : ℝ) ≤ 2 * u ^ 3) ((X + 1) / 2)
+  positivity
+
+theorem epiece_le_Emed {t : ℝ} (ht : 0 < t) {X : ℝ} (hX0 : 0 ≤ X) {s : ℂ} (hX : |s.re| ≤ X)
+    {w : ℝ} (hw : 1 ≤ w) (hy : s.im = w ^ 12) (hXw : X ≤ w ^ 12) {L : ℝ} (hL : 0 ≤ L)
+    (hLw : L ≤ w ^ 7) (hY2 : 2 * t * π ≤ w ^ 8 / 20) :
+    epiece t X s L (w ^ 8 / 20) ≤ Emed t X w := by
+  have hw0 : 0 < w := by linarith
+  have hw4 : 1 ≤ w ^ 4 := one_le_pow₀ hw
+  have hy' : s.im = (w ^ 4) ^ 3 := by rw [hy]; ring
+  have hXw' : X ≤ (w ^ 4) ^ 3 := by rw [show (w ^ 4) ^ 3 = w ^ 12 by ring]; exact hXw
+  have hsu : w ^ 12 ≤ ‖s‖ := by
+    have := norm_s_ge hy' (by positivity)
+    rw [show (w ^ 4) ^ 3 = w ^ 12 by ring] at this
+    exact this
+  have hs2u : ‖s‖ ≤ 2 * (w ^ 4) ^ 3 := norm_s_le hX hy' hXw' (by positivity)
+  have hs2u' : ‖s‖ ≤ 2 * w ^ 12 := by
+    rw [show (w ^ 4) ^ 3 = w ^ 12 by ring] at hs2u
+    exact hs2u
+  have hw12 : 1 ≤ w ^ 12 := one_le_pow₀ hw
+  have hs1 : 1 ≤ ‖s‖ := by linarith
+  have hs0 : 0 < ‖s‖ := by linarith
+  have hξ := ξ_le_med ht.le hX0 hw hL hLw
+  have hξ₁ := ξ₁_le_med ht.le hX0 hw hL hLw hs1 hs2u'
+  have hξ₁0 : 0 ≤ 2 * X + 2 * (2 * t * L) + 2 + t * (Real.log ‖s‖ + 6) := by
+    have : 0 ≤ Real.log ‖s‖ := Real.log_nonneg hs1
+    positivity
+  have hcξ : 0 ≤ cξ t X := by unfold cξ; positivity
+  have hξ0 : 0 ≤ X + 2 * t * L + 2 := by positivity
+  have hM := MH_le_Mmed ht hX0 hw hL hLw hξ₁0 hξ₁ hY2
+  have hT := T_le_Tmed (X := X) ht hw hξ₁0 hξ₁
+  have hΓ := inv_γlow_le_Γmaj (t := t) ht hX0 hw4 hs1 hs2u
+  have hγpos : 0 < γlow t X s := γlow_pos hs0
+  have hMH0 : 0 ≤ MH t X (2 * t * L) (w ^ 8 / 20) (w ^ 12)
+      (2 * X + 2 * (2 * t * L) + 2 + t * (Real.log ‖s‖ + 6)) := MH_nonneg (by positivity)
+  have hTm0 := Tmed_nonneg (X := X) ht hw0.le
+  have hMm0 : 0 ≤ Mmed t X w := Mmed_nonneg (by unfold cZ cξ; positivity)
+  have hT0 : 0 ≤ 2 * (Real.exp ((2 * X + 2 * (2 * t * L) + 2 + t * (Real.log ‖s‖ + 6)) ^ 2 /
+      (4 * t)) / (2 * π)) * (1 + |w ^ 12| + 4 * √t) * √(64 * π * t) *
+      Real.exp (-((w ^ 8 / 20) ^ 2 / (64 * t))) := by positivity
+  unfold epiece
+  rw [hy]
+  rw [div_eq_mul_one_div]
+  apply mul_le_mul (mul_le_mul_of_nonneg_right _ (by positivity)) hΓ (by positivity) (by positivity)
+  exact add_le_add (mul_le_mul (mul_le_mul_of_nonneg_left hM (by norm_num)) hξ hξ0
+    (by positivity)) hT
+
+/-! ## Exponential domination and vanishing -/
+
+theorem const_le_exp_two : Real.exp (π / 4) * (√(2 * π) / 2) ≤ Real.exp 2 := by
+  have h1 : Real.exp (π / 4) ≤ Real.exp 1 := Real.exp_le_exp.mpr (by linarith [Real.pi_le_four])
+  have h2 : √(2 * π) ≤ 3 := by
+    calc √(2 * π) ≤ √9 := Real.sqrt_le_sqrt (by nlinarith [Real.pi_le_four])
+      _ = 3 := by rw [show (9 : ℝ) = 3 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+  have h3 : Real.exp 2 = Real.exp 1 * Real.exp 1 := by
+    rw [← Real.exp_add]; norm_num
+  have h4 := Real.add_one_le_exp (1 : ℝ)
+  have h5 := Real.exp_pos (1 : ℝ)
+  have h6 := Real.exp_pos (π / 4)
+  rw [h3]
+  nlinarith [Real.sqrt_nonneg (2 * π)]
+
+theorem log_cZ_pow_le {t X w : ℝ} (ht : 0 ≤ t) (hX0 : 0 ≤ X) (hw : 1 ≤ w) :
+    Real.log (cZ t X * w ^ 12) ≤ (cZ t X + 12) * w := by
+  have hw0 : 0 < w := by linarith
+  have hcZ : 2 ≤ cZ t X := by unfold cZ cξ; linarith
+  rw [Real.log_mul (by positivity) (by positivity), Real.log_pow]
+  have := Real.log_le_sub_one_of_pos (by linarith : 0 < cZ t X)
+  have := Real.log_le_sub_one_of_pos hw0
+  push_cast
+  nlinarith
+
+/-- The lower-order part of the exponent majorizing `Mmed`. -/
+def pM (t X w : ℝ) : ℝ :=
+  c₁' t X ^ 2 / (4 * t) * w ^ 14 + (cZ t X + 12) * (cξ t X + 1) / 2 * w ^ 8 +
+    2 * cξ t X * w ^ 7 + 2 * (cZ t X + 12) * w + 2
+
+theorem Mmed_le_exp {t X : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) {w : ℝ} (hw : 1 ≤ w) :
+    Mmed t X w ≤ Real.exp (-(1 / (6400 * t)) * w ^ 16 + pM t X w) := by
+  have hw0 : 0 < w := by linarith
+  have hcξ : 0 ≤ cξ t X := by unfold cξ; positivity
+  have hcZ : 2 ≤ cZ t X := by unfold cZ cξ; linarith
+  have hw12 : 1 ≤ w ^ 12 := one_le_pow₀ hw
+  have hw7 : 1 ≤ w ^ 7 := one_le_pow₀ hw
+  have hb : 1 ≤ cZ t X * w ^ 12 := by nlinarith
+  have hb0 : 0 < cZ t X * w ^ 12 := by linarith
+  have hlogb := log_cZ_pow_le ht.le hX0 hw
+  have hlogb0 : 0 ≤ Real.log (cZ t X * w ^ 12) := Real.log_nonneg hb
+  have e1 : (cZ t X * w ^ 12) ^ ((cξ t X * w ^ 7 + 1) / 2) ≤
+      Real.exp ((cZ t X + 12) * (cξ t X + 1) / 2 * w ^ 8) := by
+    rw [Real.rpow_def_of_pos hb0]
+    apply Real.exp_le_exp.mpr
+    have h1 : cξ t X * w ^ 7 + 1 ≤ (cξ t X + 1) * w ^ 7 := by nlinarith
+    calc Real.log (cZ t X * w ^ 12) * ((cξ t X * w ^ 7 + 1) / 2)
+        ≤ ((cZ t X + 12) * w) * (((cξ t X + 1) * w ^ 7) / 2) := by gcongr
+      _ = (cZ t X + 12) * (cξ t X + 1) / 2 * w ^ 8 := by ring
+  have e2 : (cZ t X * w ^ 12) ^ 2 ≤ Real.exp (2 * (cZ t X + 12) * w) := by
+    rw [← Real.exp_log (by positivity : 0 < (cZ t X * w ^ 12) ^ 2), Real.log_pow]
+    apply Real.exp_le_exp.mpr
+    push_cast
+    nlinarith
+  have e3 : (π * Real.exp 1) ^ (cξ t X * w ^ 7 / 2) ≤ Real.exp (2 * cξ t X * w ^ 7) := by
+    rw [Real.rpow_def_of_pos (by positivity)]
+    apply Real.exp_le_exp.mpr
+    rw [Real.log_mul (by positivity) (by positivity), Real.log_exp]
+    have := Real.log_le_sub_one_of_pos Real.pi_pos
+    have := Real.pi_le_four
+    have : 0 ≤ cξ t X * w ^ 7 := by positivity
+    nlinarith
+  have e4 := const_le_exp_two
+  have hB0 : 0 ≤ (cZ t X * w ^ 12) ^ ((cξ t X * w ^ 7 + 1) / 2) := Real.rpow_nonneg hb0.le _
+  have hC0 : 0 ≤ (π * Real.exp 1) ^ (cξ t X * w ^ 7 / 2) := Real.rpow_nonneg (by positivity) _
+  unfold Mmed
+  calc Real.exp ((c₁' t X ^ 2 * w ^ 14 - w ^ 16 / 1600) / (4 * t)) *
+        (Real.exp (π / 4) * (√(2 * π) / 2 * (cZ t X * w ^ 12) ^ 2 *
+          (cZ t X * w ^ 12) ^ ((cξ t X * w ^ 7 + 1) / 2) * (π * Real.exp 1) ^ (cξ t X * w ^ 7 / 2)))
+      = Real.exp ((c₁' t X ^ 2 * w ^ 14 - w ^ 16 / 1600) / (4 * t)) *
+        ((Real.exp (π / 4) * (√(2 * π) / 2)) * ((cZ t X * w ^ 12) ^ 2 *
+          (cZ t X * w ^ 12) ^ ((cξ t X * w ^ 7 + 1) / 2) *
+          (π * Real.exp 1) ^ (cξ t X * w ^ 7 / 2))) := by ring
+    _ ≤ Real.exp ((c₁' t X ^ 2 * w ^ 14 - w ^ 16 / 1600) / (4 * t)) *
+        (Real.exp 2 * (Real.exp (2 * (cZ t X + 12) * w) *
+          Real.exp ((cZ t X + 12) * (cξ t X + 1) / 2 * w ^ 8) *
+          Real.exp (2 * cξ t X * w ^ 7))) := by
+        apply mul_le_mul_of_nonneg_left _ (Real.exp_pos _).le
+        apply mul_le_mul e4 _ (by positivity) (Real.exp_pos _).le
+        exact mul_le_mul (mul_le_mul e2 e1 hB0 (Real.exp_pos _).le) e3 hC0 (by positivity)
+    _ = Real.exp (-(1 / (6400 * t)) * w ^ 16 + pM t X w) := by
+        simp only [← Real.exp_add]
+        congr 1
+        unfold pM
+        field_simp
+        ring
+
+/-- The lower-order part of the exponent majorizing `Tmed`. -/
+def pT (t X w : ℝ) : ℝ := c₁' t X ^ 2 / (4 * t) * w ^ 14 + w ^ 12 + (4 * √t + √(64 * π * t))
+
+theorem Tmed_le_exp {t X : ℝ} (ht : 0 < t) {w : ℝ} (hw : 1 ≤ w) :
+    Tmed t X w ≤ Real.exp (-(1 / (25600 * t)) * w ^ 16 + pT t X w) := by
+  have hw0 : 0 ≤ w := by linarith
+  unfold Tmed
+  have hE := Real.exp_pos (c₁' t X ^ 2 * w ^ 14 / (4 * t))
+  have e1 : 2 * (Real.exp (c₁' t X ^ 2 * w ^ 14 / (4 * t)) / (2 * π)) ≤
+      Real.exp (c₁' t X ^ 2 * w ^ 14 / (4 * t)) := by
+    calc 2 * (Real.exp (c₁' t X ^ 2 * w ^ 14 / (4 * t)) / (2 * π))
+        = Real.exp (c₁' t X ^ 2 * w ^ 14 / (4 * t)) / π := by
+          field_simp
+          first | done | ring
+      _ ≤ Real.exp (c₁' t X ^ 2 * w ^ 14 / (4 * t)) :=
+          div_le_self hE.le (by linarith [Real.pi_gt_three])
+  have e2 : 1 + w ^ 12 + 4 * √t ≤ Real.exp (w ^ 12 + 4 * √t) := by
+    have := Real.add_one_le_exp (w ^ 12 + 4 * √t); linarith
+  have e3 : √(64 * π * t) ≤ Real.exp (√(64 * π * t)) := by
+    have := Real.add_one_le_exp (√(64 * π * t)); linarith
+  calc 2 * (Real.exp (c₁' t X ^ 2 * w ^ 14 / (4 * t)) / (2 * π)) * (1 + w ^ 12 + 4 * √t) *
+        √(64 * π * t) * Real.exp (-((w ^ 8 / 20) ^ 2 / (64 * t)))
+      ≤ Real.exp (c₁' t X ^ 2 * w ^ 14 / (4 * t)) * Real.exp (w ^ 12 + 4 * √t) *
+        Real.exp (√(64 * π * t)) * Real.exp (-((w ^ 8 / 20) ^ 2 / (64 * t))) := by
+        gcongr
+    _ = Real.exp (-(1 / (25600 * t)) * w ^ 16 + pT t X w) := by
+        simp only [← Real.exp_add]
+        congr 1
+        unfold pT
+        field_simp
+        ring
+
+/-- The exponents majorizing the two parts of `Emed`. -/
+def pEM (t X w : ℝ) : ℝ :=
+  pM t X w + 2 * cξ t X * w ^ 7 + Real.log ((√(4 * π * t))⁻¹) + π * w ^ 12 +
+    3 * (X + 1) / 2 * w ^ 4 + (Real.log (1 / cg X) + t * π ^ 2 / 4)
+def pET (t X w : ℝ) : ℝ :=
+  pT t X w + Real.log ((√(4 * π * t))⁻¹) + π * w ^ 12 +
+    3 * (X + 1) / 2 * w ^ 4 + (Real.log (1 / cg X) + t * π ^ 2 / 4)
+
+theorem Emed_le_exp {t X : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) {w : ℝ} (hw : 1 ≤ w) :
+    Emed t X w ≤ Real.exp (-(1 / (6400 * t)) * w ^ 16 + pEM t X w) +
+      Real.exp (-(1 / (25600 * t)) * w ^ 16 + pET t X w) := by
+  have hw0 : 0 < w := by linarith
+  have hw4 : 1 ≤ w ^ 4 := one_le_pow₀ hw
+  have hcξ : 0 ≤ cξ t X := by unfold cξ; positivity
+  have hM := Mmed_le_exp ht hX0 hw
+  have hT := Tmed_le_exp (X := X) ht hw
+  have hΓ := Γmaj_le_exp (t := t) ht hX0 hw4
+  have hk : (√(4 * π * t))⁻¹ = Real.exp (Real.log ((√(4 * π * t))⁻¹)) :=
+    (Real.exp_log (by positivity)).symm
+  have hcu : 2 * (cξ t X * w ^ 7) ≤ Real.exp (2 * cξ t X * w ^ 7) := by
+    have := Real.add_one_le_exp (2 * cξ t X * w ^ 7); linarith
+  have hMm0 : 0 ≤ Mmed t X w := Mmed_nonneg (by unfold cZ cξ; positivity)
+  have hTm0 := Tmed_nonneg (X := X) ht hw0.le
+  have hΓ0 : 0 ≤ Γmaj t X (w ^ 4) := Γmaj_nonneg (by positivity)
+  unfold Emed
+  calc (2 * Mmed t X w * (cξ t X * w ^ 7) + Tmed t X w) * (√(4 * π * t))⁻¹ * Γmaj t X (w ^ 4)
+      = (Mmed t X w * (2 * (cξ t X * w ^ 7)) + Tmed t X w) * (√(4 * π * t))⁻¹ *
+        Γmaj t X (w ^ 4) := by ring
+    _ ≤ (Real.exp (-(1 / (6400 * t)) * w ^ 16 + pM t X w) * Real.exp (2 * cξ t X * w ^ 7) +
+          Real.exp (-(1 / (25600 * t)) * w ^ 16 + pT t X w)) *
+        Real.exp (Real.log ((√(4 * π * t))⁻¹)) *
+        Real.exp (π * (w ^ 4) ^ 3 + 3 * (X + 1) / 2 * w ^ 4 +
+          (Real.log (1 / cg X) + t * π ^ 2 / 4)) := by
+        rw [← hk]
+        apply mul_le_mul (mul_le_mul_of_nonneg_right _ (by positivity)) hΓ hΓ0 (by positivity)
+        exact add_le_add (mul_le_mul hM hcu (by positivity) (Real.exp_pos _).le) hT
+    _ = Real.exp (-(1 / (6400 * t)) * w ^ 16 + pEM t X w) +
+        Real.exp (-(1 / (25600 * t)) * w ^ 16 + pET t X w) := by
+        unfold pEM pET
+        rw [add_mul, add_mul]
+        simp only [← Real.exp_add]
+        congr 1 <;> congr 1 <;> ring
+
+theorem const_le_pow {w : ℝ} (hw : 1 ≤ w) (A : ℝ) (N : ℕ) : A ≤ |A| * w ^ N := by
+  have h1 : 1 ≤ w ^ N := one_le_pow₀ hw
+  nlinarith [le_abs_self A, abs_nonneg A]
+
+theorem pEM_le {t X : ℝ} (ht : 0 < t) : ∃ C, ∀ w, 1 ≤ w → pEM t X w ≤ C * w ^ 15 := by
+  refine ⟨|c₁' t X ^ 2 / (4 * t)| + |(cZ t X + 12) * (cξ t X + 1) / 2| + |2 * cξ t X| +
+    |2 * (cZ t X + 12)| + |(2 : ℝ)| + |2 * cξ t X| + |Real.log ((√(4 * π * t))⁻¹)| + |π| +
+    |3 * (X + 1) / 2| + |Real.log (1 / cg X) + t * π ^ 2 / 4|, ?_⟩
+  intro w hw
+  unfold pEM pM
+  have h1 := monomial_le hw (c₁' t X ^ 2 / (4 * t)) (by norm_num : 14 ≤ 15)
+  have h2 := monomial_le hw ((cZ t X + 12) * (cξ t X + 1) / 2) (by norm_num : 8 ≤ 15)
+  have h3 := monomial_le hw (2 * cξ t X) (by norm_num : 7 ≤ 15)
+  have h4 := monomial_le hw (2 * (cZ t X + 12)) (by norm_num : 1 ≤ 15)
+  have h5 := const_le_pow hw (2 : ℝ) 15
+  have h6 := const_le_pow hw (Real.log ((√(4 * π * t))⁻¹)) 15
+  have h7 := monomial_le hw π (by norm_num : 12 ≤ 15)
+  have h8 := monomial_le hw (3 * (X + 1) / 2) (by norm_num : 4 ≤ 15)
+  have h9 := const_le_pow hw (Real.log (1 / cg X) + t * π ^ 2 / 4) 15
+  rw [pow_one] at h4
+  have := add_le_add (add_le_add (add_le_add (add_le_add (add_le_add (add_le_add (add_le_add
+    (add_le_add (add_le_add h1 h2) h3) h4) h5) h3) h6) h7) h8) h9
+  refine this.trans (le_of_eq ?_)
+  ring
+
+theorem pET_le {t X : ℝ} (ht : 0 < t) : ∃ C, ∀ w, 1 ≤ w → pET t X w ≤ C * w ^ 15 := by
+  refine ⟨|c₁' t X ^ 2 / (4 * t)| + |(1 : ℝ)| + |4 * √t + √(64 * π * t)| +
+    |Real.log ((√(4 * π * t))⁻¹)| + |π| + |3 * (X + 1) / 2| +
+    |Real.log (1 / cg X) + t * π ^ 2 / 4|, ?_⟩
+  intro w hw
+  unfold pET pT
+  have h1 := monomial_le hw (c₁' t X ^ 2 / (4 * t)) (by norm_num : 14 ≤ 15)
+  have h2 := monomial_le hw (1 : ℝ) (by norm_num : 12 ≤ 15)
+  have h3 := const_le_pow hw (4 * √t + √(64 * π * t)) 15
+  have h6 := const_le_pow hw (Real.log ((√(4 * π * t))⁻¹)) 15
+  have h7 := monomial_le hw π (by norm_num : 12 ≤ 15)
+  have h8 := monomial_le hw (3 * (X + 1) / 2) (by norm_num : 4 ≤ 15)
+  have h9 := const_le_pow hw (Real.log (1 / cg X) + t * π ^ 2 / 4) 15
+  rw [one_mul] at h2
+  have := add_le_add (add_le_add (add_le_add (add_le_add (add_le_add (add_le_add h1 h2) h3) h6)
+    h7) h8) h9
+  refine this.trans (le_of_eq ?_)
+  ring
+
+theorem tendsto_Emed {t X : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) :
+    Tendsto (fun w => Emed t X w) atTop (𝓝 0) := by
+  obtain ⟨C₁, hC₁⟩ := pEM_le (X := X) ht
+  obtain ⟨C₂, hC₂⟩ := pET_le (X := X) ht
+  have h1 := tendsto_exp_neg_pow_add (by positivity : (0 : ℝ) < 1 / (6400 * t))
+    (by norm_num : 1 ≤ 16) (p := pEM t X) (C := C₁) (fun w hw => hC₁ w hw)
+  have h2 := tendsto_exp_neg_pow_add (by positivity : (0 : ℝ) < 1 / (25600 * t))
+    (by norm_num : 1 ≤ 16) (p := pET t X) (C := C₂) (fun w hw => hC₂ w hw)
+  have h := h1.add h2
+  rw [add_zero] at h
+  refine squeeze_zero' ?_ ?_ h
+  · filter_upwards [eventually_ge_atTop 1] with w hw
+    have hw0 : 0 ≤ w := by linarith
+    have hcξ : 0 ≤ cξ t X := by unfold cξ; positivity
+    have hMm0 : 0 ≤ Mmed t X w := Mmed_nonneg (by unfold cZ cξ; positivity)
+    have hTm0 := Tmed_nonneg (X := X) ht hw0
+    have hΓ0 : 0 ≤ Γmaj t X (w ^ 4) := Γmaj_nonneg (by positivity)
+    unfold Emed
+    positivity
+  · filter_upwards [eventually_ge_atTop 1] with w hw
+    exact Emed_le_exp ht hX0 hw
+
+theorem tendsto_Dmed {t : ℝ} (ht : 0 < t) : Tendsto (fun w => Dmed t w) atTop (𝓝 0) := by
+  have h4 : Tendsto (fun w : ℝ => β₄maj t (w ^ 4)) atTop (𝓝 0) :=
+    (tendsto_β₄maj ht).comp (tendsto_pow_atTop (by norm_num))
+  have h := ((tendsto_β₃maj t).add h4).const_mul (Real.exp 1 / √(2 * π * t))
+  simpa [Dmed] using h
+
 end Soma.Holonics.RH.EventMedium
