@@ -92,7 +92,15 @@ convergence dichotomy. Coefficient-specific branch selection and a certified dec
 research and schedule nothing. Brandon's direct correction of 2026-09-02 closes HTP at this bounded
 handoff and activates the engine HNA campaign.
 
-**RH line position:** RT2 (the descent-route RT campaign; RT0–RT1 passed)
+**RH line position:** RT3 (the descent-route RT campaign; RT0–RT2 passed)
+
+[proved-derived; formal-checked] RT2 passed: `RH/GammaStirling.lean` returned Stirling with a
+remainder on the sector `{w ≠ 0 : 0 ≤ Re w ∨ |Re w| ≤ |Im w|}`,
+`Γ(w) = √(2π) exp((w − ½) Log w − w − μ(w))` with `‖μ(w)‖ ≤ π/(4‖w‖)` and the multiplicative form
+with `‖ρ(w)‖ ≤ π/(2‖w‖)` for `‖w‖ ≥ 1`, through Euler's limit, the trapezoid identity on unit
+intervals, and Mathlib's real Stirling, with no logarithm of `Γ` taken; every theorem on
+`propext`, `Classical.choice`, `Quot.sound`; root umbrella 9,814 jobs. The receipt is
+[`the RT2 record`](../research/records/2026-09-03_RT2_STIRLING_HOLDS_ON_THE_SECTOR_WITH_THE_REMAINDER_EXHIBITED_AND_NO_LOGARITHM_OF_GAMMA_IS_TAKEN.md).
 
 [proved-derived; formal-checked] RT1 passed: `RH/DescentComb.lean` returned, for every repository
 `t > 0` and every `z`, `Σ_n ∫ flowedTerm t z n = heatE t ξ (z)` with absolute convergence, the
@@ -117,7 +125,9 @@ route, founded on FT5's flowed integer events. The order is fixed:
 2. `RT1` -- the descent comb everywhere: absolute convergence and equality with `heatE t ξ` at
    every `z` for `t > 0`, with the Gaussian weight in `n` -- **PASSED**, receipt
    [`the RT1 record`](../research/records/2026-09-03_RT1_THE_DESCENT_COMB_CONVERGES_ABSOLUTELY_AT_EVERY_POINT_AND_EACH_EVENT_CARRIES_A_GAUSSIAN_WEIGHT_IN_N.md);
-3. `RT2` -- Stirling with a remainder on `Re s ≥ 1`, the one owner both routes need;
+3. `RT2` -- Stirling with a remainder, the one owner both routes need -- **PASSED** on the sector
+   `{0 ≤ Re w ∨ |Re w| ≤ |Im w|}`, receipt
+   [`the RT2 record`](../research/records/2026-09-03_RT2_STIRLING_HOLDS_ON_THE_SECTOR_WITH_THE_REMAINDER_EXHIBITED_AND_NO_LOGARITHM_OF_GAMMA_IS_TAKEN.md);
 4. `RT3` -- each flowed event by steepest descent after the shift `J_t`, with its remainder;
 5. `RT4` -- the approximation theorem `heatE t ξ (J_t s) = γ_t(s)(F_t(s) + R_t(s))` uniformly
    in the window;

@@ -209,7 +209,7 @@ is
 de Bruijn--Newman time is `t = -4u` after `s = 1/2 + i z/2`. Its Lean theorems stand, but the direct
 standard-`H_t` interpretation is retracted pending the RH0/RH1 bridge.
 
-**RH line position:** RT2 (the descent-route RT campaign; RT0–RT1 passed)
+**RH line position:** RT3 (the descent-route RT campaign; RT0–RT2 passed)
 
 [definition] Brandon's direct instruction of 2026-09-03 activates the `FT0--FT6` Foster-tank and
 threshold campaign on the RH line under
@@ -285,7 +285,12 @@ RT1 passed: `RH/DescentComb.lean` returned `Σ_n ∫ flowedTerm t z n = heatE t 
 Gaussian weight `K₂(t,z) e^{−(min(t,1)/8)(log|n|)²}`; every theorem on the three axioms; root
 umbrella 9,813 jobs. The receipt is
 [`research/records/2026-09-03_RT1_THE_DESCENT_COMB_CONVERGES_ABSOLUTELY_AT_EVERY_POINT_AND_EACH_EVENT_CARRIES_A_GAUSSIAN_WEIGHT_IN_N.md`](research/records/2026-09-03_RT1_THE_DESCENT_COMB_CONVERGES_ABSOLUTELY_AT_EVERY_POINT_AND_EACH_EVENT_CARRIES_A_GAUSSIAN_WEIGHT_IN_N.md).
-RT2 (Stirling with a remainder) is current.
+RT2 passed: `RH/GammaStirling.lean` returned `Γ(w) = √(2π) exp((w − ½) Log w − w − μ(w))` on
+the sector `{w ≠ 0 : 0 ≤ Re w ∨ |Re w| ≤ |Im w|}` with `‖μ(w)‖ ≤ π/(4‖w‖)`, and the
+multiplicative form with `‖ρ(w)‖ ≤ π/(2‖w‖)` for `‖w‖ ≥ 1`; every theorem on the three axioms;
+root umbrella 9,814 jobs. The receipt is
+[`research/records/2026-09-03_RT2_STIRLING_HOLDS_ON_THE_SECTOR_WITH_THE_REMAINDER_EXHIBITED_AND_NO_LOGARITHM_OF_GAMMA_IS_TAKEN.md`](research/records/2026-09-03_RT2_STIRLING_HOLDS_ON_THE_SECTOR_WITH_THE_REMAINDER_EXHIBITED_AND_NO_LOGARITHM_OF_GAMMA_IS_TAKEN.md).
+RT3 (each flowed event by steepest descent) is current.
 
 [definition] Use `c_CD` for the Copson--de Bruijn sharp coefficient and reserve `Λ_DN` for the
 coordinate-corrected de Bruijn--Newman threshold. The correction record is

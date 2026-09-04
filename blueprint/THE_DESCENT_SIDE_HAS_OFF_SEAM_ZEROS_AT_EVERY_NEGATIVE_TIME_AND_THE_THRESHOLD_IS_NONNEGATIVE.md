@@ -123,9 +123,17 @@ bounds `abs_φ_le`, `abs_φ_le_of_nonneg`; receipt
 `log Γ(s) = (s − ½) log s − s + ½ log 2π + O(1/|s|)` on `Re s ≥ 1`, with the constant exhibited,
 and the consequences for `Γ_ℝ(s) = π^{−s/2} Γ(s/2)` and for the log-derivative. Mathlib holds real
 Stirling for `n!` only; the tree's `GammaBound`, `GammaGrowth`, `GammaDecay` are magnitude bounds.
-This is the one owner both routes need. Owner `RH/GammaStirling.lean`.  
+This is the one owner both routes need. Owner `RH/GammaStirling.lean`.
+
+*Returned 2026-09-03:* on the sector `{w ≠ 0 : 0 ≤ Re w ∨ |Re w| ≤ |Im w|}`, larger than the
+`Re s ≥ 1` first written, `GammaStirling.gamma_eq_sqrt`:
+`Γ(w) = √(2π) exp((w − ½) Log w − w − μ(w))` with `norm_μ_le : ‖μ(w)‖ ≤ π/(4‖w‖)`, and the
+multiplicative form `gamma_eq_mul` with `norm_ρ_le : ‖ρ(w)‖ ≤ π/(2‖w‖)` for `‖w‖ ≥ 1`; receipt
+[`the RT2 record`](../research/records/2026-09-03_RT2_STIRLING_HOLDS_ON_THE_SECTOR_WITH_THE_REMAINDER_EXHIBITED_AND_NO_LOGARITHM_OF_GAMMA_IS_TAKEN.md).
+**RT2 passes.**
+
 **Pass RT2:** the remainder bound formal-checked.  
-**Falsifier:** a point on `Re s ≥ 1` violating the exhibited constant.
+**Falsifier:** a point of the sector violating the exhibited constant.
 
 ### RT3 — the event by steepest descent
 
