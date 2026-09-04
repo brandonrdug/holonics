@@ -460,6 +460,26 @@ whole. Saturation is returned structurally and says not yet: every occurrence's 
 added a class, and the last crossing added one. The receipt is
 [`the SKE5 return`](../research/records/2026-09-03_SKE5_THE_COMPOSED_VARIANT_RUNS_THE_RECURRENCE_ON_THE_FAMILY_STATES_CONDENSATION_BY_ITS_REMAINDER_AND_IS_NOT_SATURATED.md).
 
+[counterexample; source-inspected; measured] **Withdrawn on 2026-09-04** by Sol's review
+([`the review`](../research/records/2026-09-04_SOL_REVIEW_OF_THE_SKE_CAMPAIGN_THE_CONES_ARE_NOT_FOUNDED_CONES_THE_SPECIES_ARE_OFF_DOMAIN_AND_THE_PASSES_ARE_WITHDRAWN.md)),
+whose counterexamples the session verified: the role sets are not `FoundedCone`s (a changed
+complement enters `FoundedCone` whole; the restored sets are at most `IsConeUnder` candidates
+under the one declared withdrawal that verified them, and `validate` does not enforce the
+extent as the union of the class cones); the SKE4 "compression" species are stated over a lens
+domain the class bodies refuse, so they are off their domain; `species_of` is an authored
+classifier and not `H.0420`; the propagated remainder is persisted as histograms, a quotient of
+the witness; the SKE5 width differences subtract widths at grain `2^-43` from widths at `2^-47`
+without rebasing; SKE5 founded a fresh session per exposure instead of one continuing session;
+its saturation counter is not the formal `Saturated`; `NativeExposureTestimony.monotone` was
+written `true` unconditionally; the contraction consumer bound discards overlay growth; "672
+passages" is a trace artifact (687 launches); no release receiver ran; and the deed's child
+processes exceed 180 s wall time under a heartbeat guard, which the contract's absolute process
+aperture does not permit. Two questions are put to Brandon: whether the HNA1 operator graph
+(layers, attention topology, shared keys and values) may be an Athena variant's hot law at all,
+which the Soulkiller clause of `AGENTS.md` reads against, and how the absolute process aperture
+is to be honored by a deed whose natural unit exceeds it. Until the corrections and the rulings,
+SKE4 stands at its apparatus obligation and its bounded testimony, and SKE5 does not stand.
+
 ## 7. Falsifiers
 
 [counterexample] If "active" is decided by an activation magnitude, the cone is authored.

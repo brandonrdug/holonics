@@ -53,8 +53,14 @@ decoder with its measured cost, states its invariance as differences and its pro
 vector (the composed body resident at the full operator's size, the condensation being in the
 stored presentation), and returns a saturation receipt that says not yet
 ([`the SKE5 return`](research/records/2026-09-03_SKE5_THE_COMPOSED_VARIANT_RUNS_THE_RECURRENCE_ON_THE_FAMILY_STATES_CONDENSATION_BY_ITS_REMAINDER_AND_IS_NOT_SATURATED.md)).
-The SKE campaign, `SKE0` through `SKE5`, is complete at the scopes its records state; no later
-deed is admitted. The Soulkiller audit is
+On 2026-09-04 Sol's review ([`the review`](research/records/2026-09-04_SOL_REVIEW_OF_THE_SKE_CAMPAIGN_THE_CONES_ARE_NOT_FOUNDED_CONES_THE_SPECIES_ARE_OFF_DOMAIN_AND_THE_PASSES_ARE_WITHDRAWN.md))
+withdrew the SKE4 and SKE5 passes with verified counterexamples (the role sets are not founded
+cones; the species are stated off the class bodies' domain; the SKE5 width differences cross
+grains; one session was not run; the saturation counter is not `Saturated`; no release receiver
+ran; the deed's processes exceed the absolute process aperture). SKE4 stands at its apparatus
+obligation and its bounded testimony; SKE5 does not stand. The corrections are open and two
+rulings are Brandon's: whether the HNA1 operator graph may be an Athena variant's hot law, and
+how the absolute process aperture is honored by a deed whose natural unit exceeds it. The Soulkiller audit is
 [`research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md).
 
 [proved-derived; formal-checked] SKE0 returned `HolonicExcitationFoundedQuotient.lean`: the

@@ -147,6 +147,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/THE_ONE_ATHENA_MEMBRANE_TRANSDUCES_ARBITRARY_CURRENT_AND_INFERRED_RESPONSE_RETURNS_AS_DURABLE_MORPHOLOGY.md` | **The one Athena membrane transduces arbitrary current and inferred response returns as durable morphology** — **Binding MEM6 correction:**… |
 | `blueprint/THE_PHOENIX_REBIRTH_LIFTS_INHERITED_HEXIS_AND_RETURNS_A_NATIVE_EXECUTABLE_ECOLOGY.md` | **SUPERSEDED — The Phoenix rebirth lifts inherited hexis and returns a native executable ecology** — **Truth status:** construction contract. |
 | `blueprint/THE_PRESENTATION_ORGAN.md` | **The presentation organ** — It states a contract the roadmap composes. |
+| `blueprint/THE_SEAM_HAS_A_FIRST_TIME_BY_DE_BRUIJN_AND_THE_THRESHOLD_IS_RH_WITH_NO_PORT.md` | **The seam has a first time by de Bruijn, and the threshold is RH with no port** — **Line:** RH, beside the engine frontier; the lines share no owner. |
 | `blueprint/THE_SINGLE_CARD_PASSAGE_CARRIES_PHOENIX_AND_THE_MATHEMATICS_CODEC.md` | **SUPERSEDED — The single-card passage carries Phoenix and the mathematics codec** — **Status:** active construction contract when named by the roadmap. |
 | `blueprint/THE_SITUATED_DIFFERENCE_RETURNS_THROUGH_PERSPECTIVE_CHARTS_AND_ATHENA_CULTIVATES_PROSE_MATHEMATICS_AND_CODE_AS_ONE_CAUSAL_ECOLOGY.md` | **The situated difference returns through perspective charts, and Athena cultivates prose, mathematics, and code as one causal ecology** — A scalar or probability may be emitted only afterward as a receiver face with its fibre. |
 | `blueprint/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md` | **Soulkiller excites the resident realization and returns the receiver-family quotient as cone-restricted ecologies** — **Status:** CURRENT under `THE_ROADMAP.md`, which alone orders the construction. |
@@ -162,7 +163,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (450 deposits of 948)
+## 4 · The 2026-08 record line (450 deposits of 954)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:

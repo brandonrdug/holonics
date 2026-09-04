@@ -60,10 +60,10 @@ variant; `SKE4` returned (the segment session under the 2026-08-18 contract, 687
 and 16 read-outs per cycle; 127 declared withdrawals at the layer-block role grain founding class
 cones of 99 to 115 roles jointly; the return through `soulkiller::dismantle` with 2
 class bodies stating condensation and 3 compression by their exhibited remainders); `SKE5`
-returned (the composed variant on the extent: 15 of 15 family faces, condensation by
-remainder, the decoder declared with its cost, differences never ratios, the product as a
-vector, saturation not yet). The SKE campaign is complete at its recorded scopes; no later deed
-is admitted. The completed HNA contract is
+and the SKE4 role-cone return were withdrawn on 2026-09-04 by Sol's review (the role sets
+are not founded cones, the species are off their domain, the SKE5 width differences cross
+grains, one session was not run, no release receiver ran, the processes exceed the absolute
+aperture); SKE5 is current with the corrections open and two rulings Brandon's. The completed HNA contract is
 [`blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
 HNA0 returned the recurrent formal owner. HNA1 returned the complete source-neutral text-operator
 ecology: 1,275 nodes over 42 layers, all 719 coefficient populations resident once, 665 configured
