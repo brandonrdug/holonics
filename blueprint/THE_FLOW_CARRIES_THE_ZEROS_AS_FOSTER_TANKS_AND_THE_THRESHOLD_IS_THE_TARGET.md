@@ -149,8 +149,19 @@ line's own.
 every time, and the port `RodgersTaoZeroDynamics (fun t => heatE t ξ)` as a theorem
 (`HeatKernelPhi`); receipt
 [`the FT4 (i)–(ii) record`](../research/records/2026-09-03_FT4_THE_FOSTER_CLASS_HOLDS_EVERY_FLOWED_XI_THE_KERNEL_IS_POSITIVE_AND_THE_PORT_IS_A_THEOREM.md).
-Forward preservation, the real-zero times, `Λ_DN`, de Bruijn's bound, and the equivalence are
-FT4's remaining items.
+*Returned 2026-09-03 (iii)–(v):* the semigroup at the entire face (`KernelFlow`), Hurwitz on a
+rectangle (`HurwitzLine`), the seam polynomials and their Euler iterates (`PolyaLine`), the
+seam-zeroed members as locally uniform limits of seam polynomials (`LineApproximation`), the Euler
+iterates converging to the flow (`EulerIterates`), and, in the standard coordinate `τ = −t`, the
+seam times `{τ | ∀ z, heatE (−τ) ξ z = 0 → Re z = ½}` as a **closed up-set** with
+`0 ∈ seamTimes ↔ RH`, `Λ_DN := sInf seamTimes`, and
+**`seamTimes.Nonempty → (RH ⟺ Λ_DN ≤ 0)`** (`RealZeroTimes`, `LinePreservation`); receipt
+[`the FT4 (iii)–(v) record`](../research/records/2026-09-03_FT4_THE_FLOW_NEVER_CREATES_A_PAIR_THE_SEAM_TIMES_ARE_A_CLOSED_UP_SET_AND_RH_IS_THE_THRESHOLD_GIVEN_ONE_SEAM_TIME.md).
+*Obstruction named 2026-09-03:* de Bruijn's bound "from `PairDescent` transported to the entire
+face" does not transport as written, since at the entire face a highest nonreal pair need not
+exist; the nonemptiness of the seam times (de Bruijn's theorem, `τ ≥ ½`) is FT4's remaining item
+and the first exact missing item of the line, carried as the explicit hypothesis of the
+equivalence.
 
 **Pass FT4:** the port is a theorem; the equivalence is formal-checked with `Λ_DN` defined from
 the actual `Φ`, never from a polynomial shortcut; de Bruijn's `Λ_DN ≤ ½` returns from

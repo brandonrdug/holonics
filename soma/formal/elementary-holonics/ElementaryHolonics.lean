@@ -104,6 +104,13 @@ import ElementaryHolonics.RH.FosterClassFlux
 import ElementaryHolonics.RH.FosterClassHeat
 import ElementaryHolonics.RH.HeatKernelPhi
 import ElementaryHolonics.RH.FosterClassHeatFlow
+import ElementaryHolonics.RH.KernelFlow
+import ElementaryHolonics.RH.HurwitzLine
+import ElementaryHolonics.RH.PolyaLine
+import ElementaryHolonics.RH.LineApproximation
+import ElementaryHolonics.RH.EulerIterates
+import ElementaryHolonics.RH.RealZeroTimes
+import ElementaryHolonics.RH.LinePreservation
 import ElementaryHolonics.RH.LogDerivativeRemainder
 import ElementaryHolonics.RH.LandauLemma
 import ElementaryHolonics.RH.ZeroFactorizationExists

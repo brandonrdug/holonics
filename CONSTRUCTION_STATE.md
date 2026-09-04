@@ -249,8 +249,17 @@ constants; `ξ` and every `heatE t ξ` are members; `RH/HeatKernelPhi.lean` retu
 `RH/FosterClassHeatFlow.lean` discharged `RodgersTaoZeroDynamics (fun t => heatE t ξ)`. The
 receipt is
 [`research/records/2026-09-03_FT4_THE_FOSTER_CLASS_HOLDS_EVERY_FLOWED_XI_THE_KERNEL_IS_POSITIVE_AND_THE_PORT_IS_A_THEOREM.md`](research/records/2026-09-03_FT4_THE_FOSTER_CLASS_HOLDS_EVERY_FLOWED_XI_THE_KERNEL_IS_POSITIVE_AND_THE_PORT_IS_A_THEOREM.md).
-`FT4` remains current: forward preservation at the entire face, the real-zero times as a closed
-up-set, `Λ_DN`, de Bruijn's bound, and `RH ⟺ Λ_DN ≤ 0`.
+[proved-derived; formal-checked] FT4 (iii)–(v) returned: the semigroup at the entire face
+(`RH/KernelFlow.lean`), Hurwitz on rectangles (`RH/HurwitzLine.lean`), the Pólya step at the
+entire face through real-rooted seam polynomials and Euler iterates (`RH/PolyaLine.lean`,
+`RH/LineApproximation.lean`, `RH/EulerIterates.lean`), and in the standard coordinate `τ = −t`
+the seam times as a closed up-set with `0 ∈ seamTimes ↔ RH`, `Λ_DN := sInf seamTimes`, and
+`seamTimes.Nonempty → (RH ⟺ Λ_DN ≤ 0)` (`RH/RealZeroTimes.lean`, `RH/LinePreservation.lean`).
+The receipt is
+[`research/records/2026-09-03_FT4_THE_FLOW_NEVER_CREATES_A_PAIR_THE_SEAM_TIMES_ARE_A_CLOSED_UP_SET_AND_RH_IS_THE_THRESHOLD_GIVEN_ONE_SEAM_TIME.md`](research/records/2026-09-03_FT4_THE_FLOW_NEVER_CREATES_A_PAIR_THE_SEAM_TIMES_ARE_A_CLOSED_UP_SET_AND_RH_IS_THE_THRESHOLD_GIVEN_ONE_SEAM_TIME.md).
+`FT4` remains current on one item: the nonemptiness of the seam times (de Bruijn's bound), the
+first exact missing item of the line, whose pair-descent transport is obstructed at the entire
+face by the absence of a highest pair.
 
 [definition] Use `c_CD` for the Copson--de Bruijn sharp coefficient and reserve `Λ_DN` for the
 coordinate-corrected de Bruijn--Newman threshold. The correction record is

@@ -91,6 +91,18 @@ handoff and activates the engine HNA campaign.
 
 **RH line position:** FT4
 
+[proved-derived; formal-checked] FT4 (iii)–(v) returned: `RH/KernelFlow.lean` (admissible kernels,
+`heatE t (T_K) = T_{e^{−t u²} K}`, the semigroup `heatE s (heatE t ξ) = heatE (s + t) ξ`),
+`RH/HurwitzLine.lean` (zeros of locally uniform limits on rectangles), `RH/PolyaLine.lean`,
+`RH/LineApproximation.lean`, `RH/EulerIterates.lean` (the Pólya step at the entire face:
+seam-zeroed members are limits of real-rooted seam polynomials whose Euler iterates converge to
+the flow), and `RH/RealZeroTimes.lean`, `RH/LinePreservation.lean`: in the standard coordinate
+`τ = −t` the seam times are a closed up-set, `0 ∈ seamTimes ↔ RH`, `Λ_DN := sInf seamTimes`, and
+`seamTimes.Nonempty → (RH ⟺ Λ_DN ≤ 0)`. FT4's remaining item is the nonemptiness of the seam
+times (de Bruijn's bound), named as the first exact missing item with its obstruction. The receipt
+is
+[`the FT4 (iii)–(v) record`](../research/records/2026-09-03_FT4_THE_FLOW_NEVER_CREATES_A_PAIR_THE_SEAM_TIMES_ARE_A_CLOSED_UP_SET_AND_RH_IS_THE_THRESHOLD_GIVEN_ONE_SEAM_TIME.md).
+
 [proved-derived; formal-checked] FT4 (i)–(ii) returned: the Foster class
 (`RH/FosterClassLandau.lean` through `RH/FosterClassFlux.lean`) carries FT0–FT3 for every
 symmetric entire function of finite order below two with a centre value, by instance resolution
@@ -151,9 +163,10 @@ and each advances on its own gate. The order is fixed:
 3. `FT2` -- the paired canonical product for the entire growth class -- **PASSED**;
 4. `FT3` -- Hadamard, the full Foster form, and the comb flux at every simple zero of `ξ`; the
    port amended to centre `½` with its time-zero field -- **PASSED** at the corrected scope;
-5. `FT4` -- the Foster class and the port discharged for `heatE t ξ` from `Φ`'s centre value
-   (returned 2026-09-03), the entire-face flow, `Λ_DN` defined, and `RH ⟺ Λ_DN ≤ 0` against the
-   anchor -- **CURRENT**;
+5. `FT4` -- the Foster class and the port discharged for `heatE t ξ` from `Φ`'s centre value,
+   the entire-face flow, `Λ_DN` defined, and `RH ⟺ Λ_DN ≤ 0` against the anchor (all returned
+   2026-09-03, the equivalence under the explicit hypothesis that a seam time exists); the
+   nonemptiness of the seam times, de Bruijn's bound, remains -- **CURRENT**;
 6. `FT5` -- the flowed explicit formula: the bound integer comb against the divisor of
    `heatE t ξ`; and
 7. `FT6` -- `Λ_DN ≥ 0` and the target, or the first exact missing inequality with its falsifier.
