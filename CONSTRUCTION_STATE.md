@@ -224,7 +224,10 @@ is
 de Bruijn--Newman time is `t = -4u` after `s = 1/2 + i z/2`. Its Lean theorems stand, but the direct
 standard-`H_t` interpretation is retracted pending the RH0/RH1 bridge.
 
-**RH line position:** DB1 (the de Bruijn campaign; DB0 passed)
+**RH line position:** DB4 (the de Bruijn campaign; DB0–DB3 passed: `XiStrip`,
+`TranslationAverage`, `KernelAverage`, `ConjIndex`, `StripAverage.re_sq_le_of_avg_eq_zero`,
+`DeBruijnIterate.onSeam_xiIter`; receipt
+[`research/records/2026-09-03_DB3_THE_AVERAGE_CONTRACTS_THE_STRIP_OF_EVERY_MEMBER_AND_N_SQUARED_AVERAGES_PUT_THE_ZEROS_OF_XI_ON_THE_SEAM.md`](research/records/2026-09-03_DB3_THE_AVERAGE_CONTRACTS_THE_STRIP_OF_EVERY_MEMBER_AND_N_SQUARED_AVERAGES_PUT_THE_ZEROS_OF_XI_ON_THE_SEAM.md))
 
 [definition] Brandon's direct instruction of 2026-09-03 activates the `FT0--FT6` Foster-tank and
 threshold campaign on the RH line under

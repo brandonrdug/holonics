@@ -92,7 +92,10 @@ convergence dichotomy. Coefficient-specific branch selection and a certified dec
 research and schedule nothing. Brandon's direct correction of 2026-09-02 closes HTP at this bounded
 handoff and activates the engine HNA campaign.
 
-**RH line position:** DB1 (the de Bruijn campaign; DB0 passed)
+**RH line position:** DB4 (the de Bruijn campaign; DB0–DB3 passed: the strip of `ξ`, the
+polynomial average, and `DeBruijnIterate.onSeam_xiIter` — `N²` averages with `μ = 1/(2N)` put
+every zero of `ξ` on the seam; receipt
+[`the DB3 record`](../research/records/2026-09-03_DB3_THE_AVERAGE_CONTRACTS_THE_STRIP_OF_EVERY_MEMBER_AND_N_SQUARED_AVERAGES_PUT_THE_ZEROS_OF_XI_ON_THE_SEAM.md))
 
 [definition] Brandon's direct request of 2026-09-03 ("Proceed with the scoping") activates the
 ordered `DB0--DB5` de Bruijn campaign on the RH line under

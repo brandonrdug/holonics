@@ -148,7 +148,20 @@ replaced by "no real zero"), each is a seam-type polynomial with zeros in the st
 `A_μ` (differentiable, symmetric, growth of order `3/2`), the iterates `A_μ^k ξ` have
 `A_μ^k ξ (½) = ∫ e^{μu} cosh(μu)^k Φ(u) du > 0`, and by induction the `N²`-fold average with
 `μ = 1/(2N)` has all its zeros on the seam. Owners `RH/StripApproximation.lean`,
-`RH/StripHurwitz.lean`, `RH/StripAverage.lean`.  
+`RH/StripHurwitz.lean`, `RH/StripAverage.lean`.
+
+*Returned 2026-09-03:* DB1 (`XiStrip`: the strip and the positive real axis of `ξ`) and DB2
+(`TranslationAverage`: Lemma 1 and Theorem 3 in strip form on `ℝ[X]`) passed on the way;
+DB3 returned `KernelAverage` (`avg μ T_K = T_{cosh(μu)K}`, positivity and both symmetries),
+`LineApproximation` generalized to `NoRealZero`, `ConjIndex` (`mult_conj`, the involution `σ'`,
+symmetric finsets), `StripAverage.re_sq_le_of_avg_eq_zero` (Theorem 8 in the tree's coordinate,
+proved on the infinite product's symmetric finite sections with the margin of one pair, so no
+strip Hurwitz and no strip polynomial approximants were needed; the owner list is corrected),
+and `DeBruijnIterate.onSeam_xiIter`: for `N ≥ 1`, `OnSeam ((avg (1/(2N)))^[N²] ξ)`; all on
+`propext`, `Classical.choice`, `Quot.sound`; receipt
+[`the DB3 record`](../research/records/2026-09-03_DB3_THE_AVERAGE_CONTRACTS_THE_STRIP_OF_EVERY_MEMBER_AND_N_SQUARED_AVERAGES_PUT_THE_ZEROS_OF_XI_ON_THE_SEAM.md).
+**DB1, DB2, DB3 pass.**
+
 **Pass DB3:** `OnSeam (A_{1/(2N)}^{N²} ξ)` for every `N ≥ 1`, formal-checked.  
 **Falsifier:** an `N` and a zero of the iterate off the seam.
 
