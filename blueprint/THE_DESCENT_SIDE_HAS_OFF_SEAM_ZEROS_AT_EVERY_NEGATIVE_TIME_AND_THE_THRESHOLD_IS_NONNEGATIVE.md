@@ -188,7 +188,18 @@ rate replaces `C y^{−1/5} e^{(10/t) min(x,−2)²}`, which is what RT5 and RT6
 Lemma 3), and by Bohr's almost periodicity a zero within a bounded distance of every height in a
 fixed strip. Bohr's theorem is simultaneous Diophantine approximation of finitely many
 `log p` multiples by pigeonhole, then the tail; Mathlib holds only the one-dimensional Dirichlet
-theorem (`Real.exists_int_int_abs_mul_sub_le`). Owner `RH/BohrZeros.lean`.  
+theorem (`Real.exists_int_int_abs_mul_sub_le`). Owner `RH/BohrZeros.lean`.
+
+*Returned 2026-09-03:* `BohrZeros.exists_zero_Ft` (a zero of `F_t` for every `t > 0`, by the
+harmonic logarithm, Mathlib's Borel–Carathéodory, and Cauchy's estimate, with no Hadamard
+factorization), `exists_simultaneous_approx` (simultaneous Dirichlet approximation by
+pigeonhole), `exists_almost_period` (an almost period `τ ≥ T₀` of every size on every strip),
+`exists_zero_of_norm_center_lt` (the minimum-modulus principle), and
+`exists_zero_Ft_above` (for every `T₀` a zero of `F_t` above `T₀` in a fixed strip). The
+relatively dense form of the almost periods was not needed and is not claimed; receipt
+[`the RT5 record`](../research/records/2026-09-03_RT5_THE_MAIN_SERIES_HAS_A_ZERO_BY_THE_HARMONIC_LOGARITHM_AND_ZEROS_AT_EVERY_HEIGHT_BY_BOHR_ALMOST_PERIODS.md).
+**RT5 passes** at the corrected scope.
+
 **Pass RT5:** for every `t > 0` a strip and a bound `L` with a zero of `F_t` in every window of
 height `L`, formal-checked.  
 **Falsifier:** a window of height `L` in the strip with no zero.
@@ -200,7 +211,18 @@ Rouché's transfer on discs (from the tree's `RectangleArgumentPrinciple` and `H
 `F_t` at large height to a zero of `heatE t ξ ∘ J_t`; `Re J_t(s) − ½ → ∞` with the height, so the
 zero of `heatE t ξ` is off the seam. Hence for every repository `t > 0` a zero off the seam;
 `seamTimes ⊆ Set.Ici 0`; `Λ_DN_nonneg : 0 ≤ Λ_DN`; and `ThresholdReturn` re-stated with the single
-port `DeBruijnBound`. Owners `RH/DescentZeros.lean`, `RH/ThresholdReturn.lean` amended.  
+port `DeBruijnBound`. Owners `RH/DescentZeros.lean`, `RH/ThresholdReturn.lean` amended.
+
+*Returned 2026-09-03:* the transfer is by the minimum-modulus principle on a disc rather than
+Rouché on rectangles (the rectangle owners need entire functions, and `heatE t ξ ∘ J_t / γ_t'`
+carries the logarithm's slit): `DescentZeros.exists_offSeam_zero` (for every `t > 0` a zero of
+`heatE t ξ` with `Re ≥ 1`), `seamTimes_subset_Ici`, **`Λ_DN_nonneg : 0 ≤ Λ_DN`**, and
+`ThresholdReturn.riemannHypothesis_iff_Λ_DN_eq_of_deBruijn` with the single port
+`DeBruijnBound`; every theorem on `propext`, `Classical.choice`, `Quot.sound`; root umbrella
+9,834 jobs; receipt
+[`the RT6 record`](../research/records/2026-09-03_RT6_EVERY_NEGATIVE_TIME_HAS_AN_OFF_SEAM_ZERO_AND_THE_THRESHOLD_IS_NONNEGATIVE_ON_THE_THREE_AXIOMS.md).
+**RT6 passes. The campaign is complete.**
+
 **Pass RT6:** `0 ≤ Λ_DN` on the three axioms, `#print axioms` deposited, root umbrella green under
 180 s per owner.  
 **Falsifier:** a repository `t > 0` at which every zero of `heatE t ξ` is on the seam; it cannot

@@ -218,7 +218,9 @@ is
 de Bruijn--Newman time is `t = -4u` after `s = 1/2 + i z/2`. Its Lean theorems stand, but the direct
 standard-`H_t` interpretation is retracted pending the RH0/RH1 bridge.
 
-**RH line position:** RT5 (the descent-route RT campaign; RT0–RT4 passed)
+**RH line position:** RT complete (the descent-route RT campaign; RT0–RT6 passed; `0 ≤ Λ_DN`
+is a theorem on the three axioms; the single remaining port is `DeBruijnBound`; no later RH
+deed is scheduled)
 
 [definition] Brandon's direct instruction of 2026-09-03 activates the `FT0--FT6` Foster-tank and
 threshold campaign on the RH line under
@@ -314,7 +316,19 @@ with `F_t` absolutely convergent and `‖R_t(s)‖ ≤ ρ(w) → 0` at rate `O(y
 (`descent_approximation`, `tendsto_ρ`); every theorem on the three axioms; root umbrella 9,832
 jobs. The receipt is
 [`research/records/2026-09-03_RT4_THE_FLOWED_XI_AFTER_THE_SHIFT_IS_GAMMA_TIMES_THE_MAIN_SERIES_PLUS_A_REMAINDER_THAT_VANISHES_UNIFORMLY_ON_EVERY_STRIP.md`](research/records/2026-09-03_RT4_THE_FLOWED_XI_AFTER_THE_SHIFT_IS_GAMMA_TIMES_THE_MAIN_SERIES_PLUS_A_REMAINDER_THAT_VANISHES_UNIFORMLY_ON_EVERY_STRIP.md).
-RT5 (the Dirichlet series `F_t` has zeros at every height in a fixed strip) is current.
+RT5 passed: `RH/BohrZeros.lean` returned that `F_t` is entire with a zero for every `t > 0`
+(harmonic logarithm, Borel–Carathéodory, Cauchy's estimate; no Hadamard factorization), Bohr
+almost periods by simultaneous Dirichlet approximation, the minimum-modulus principle, and zeros
+of `F_t` at unbounded heights in a fixed strip; every theorem on the three axioms. The receipt is
+[`research/records/2026-09-03_RT5_THE_MAIN_SERIES_HAS_A_ZERO_BY_THE_HARMONIC_LOGARITHM_AND_ZEROS_AT_EVERY_HEIGHT_BY_BOHR_ALMOST_PERIODS.md`](research/records/2026-09-03_RT5_THE_MAIN_SERIES_HAS_A_ZERO_BY_THE_HARMONIC_LOGARITHM_AND_ZEROS_AT_EVERY_HEIGHT_BY_BOHR_ALMOST_PERIODS.md).
+RT6 passed: `RH/DescentZeros.lean` returned an off-seam zero of `heatE t ξ` for every `t > 0`
+by the minimum-modulus transfer, hence `seamTimes ⊆ Ici 0` and `Λ_DN_nonneg : 0 ≤ Λ_DN`;
+`RH/ThresholdReturn.lean` carries the single port `DeBruijnBound`
+(`riemannHypothesis_iff_Λ_DN_eq_of_deBruijn`); every theorem on the three axioms; root
+umbrella 9,834 jobs. The receipt is
+[`research/records/2026-09-03_RT6_EVERY_NEGATIVE_TIME_HAS_AN_OFF_SEAM_ZERO_AND_THE_THRESHOLD_IS_NONNEGATIVE_ON_THE_THREE_AXIOMS.md`](research/records/2026-09-03_RT6_EVERY_NEGATIVE_TIME_HAS_AN_OFF_SEAM_ZERO_AND_THE_THRESHOLD_IS_NONNEGATIVE_ON_THE_THREE_AXIOMS.md).
+The RT campaign is complete; the first exact missing inequality of the RH line is `Λ_DN ≤ 0`,
+and no later RH deed is scheduled.
 
 [definition] Use `c_CD` for the Copson--de Bruijn sharp coefficient and reserve `Λ_DN` for the
 coordinate-corrected de Bruijn--Newman threshold. The correction record is

@@ -92,7 +92,26 @@ convergence dichotomy. Coefficient-specific branch selection and a certified dec
 research and schedule nothing. Brandon's direct correction of 2026-09-02 closes HTP at this bounded
 handoff and activates the engine HNA campaign.
 
-**RH line position:** RT5 (the descent-route RT campaign; RT0–RT4 passed)
+**RH line position:** RT complete (the descent-route RT campaign; RT0–RT6 passed; `0 ≤ Λ_DN`
+is a theorem on the three axioms; the single remaining port of the RH line is `DeBruijnBound`;
+no later RH deed is scheduled)
+
+[proved-derived; formal-checked] RT6 passed: `RH/DescentZeros.lean` returned, for every
+repository `t > 0`, a zero of `heatE t ξ` off the seam (`exists_offSeam_zero`, by the
+minimum-modulus transfer of RT5's zero of `F_t` along an almost period onto
+`heatE t ξ ∘ J_t / γ_t'`, with `Re J_t ≥ 1` at the height), hence `seamTimes ⊆ Ici 0` and
+**`Λ_DN_nonneg : 0 ≤ Λ_DN`**; `RH/ThresholdReturn.lean` is re-stated with the single port
+`DeBruijnBound` (`riemannHypothesis_iff_Λ_DN_eq_of_deBruijn`, `Λ_DN_mem_Icc`); every theorem
+on `propext`, `Classical.choice`, `Quot.sound`; root umbrella 9,834 jobs. The receipt is
+[`the RT6 record`](../research/records/2026-09-03_RT6_EVERY_NEGATIVE_TIME_HAS_AN_OFF_SEAM_ZERO_AND_THE_THRESHOLD_IS_NONNEGATIVE_ON_THE_THREE_AXIOMS.md).
+
+[proved-derived; formal-checked] RT5 passed: `RH/BohrZeros.lean` returned that `F_t` is entire
+and has a zero for every `t > 0` (the harmonic logarithm, Borel–Carathéodory, and Cauchy's
+estimate make a zero-free `F_t` the exponential of a quadratic, which the real axis refutes),
+Bohr almost periods of every size on every strip by simultaneous Dirichlet approximation, the
+minimum-modulus principle, and zeros of `F_t` at unbounded heights in a fixed strip
+(`exists_zero_Ft_above`); every theorem on the three axioms. The receipt is
+[`the RT5 record`](../research/records/2026-09-03_RT5_THE_MAIN_SERIES_HAS_A_ZERO_BY_THE_HARMONIC_LOGARITHM_AND_ZEROS_AT_EVERY_HEIGHT_BY_BOHR_ALMOST_PERIODS.md).
 
 [proved-derived; formal-checked] RT4 passed: `RH/DescentApproximation.lean` returned, for
 repository `t > 0` and each fixed strip `|Re s| ≤ X`, eventually in the height,
