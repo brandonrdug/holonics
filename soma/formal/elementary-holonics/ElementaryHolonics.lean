@@ -136,6 +136,7 @@ import ElementaryHolonics.RH.DescentApproximation
 import ElementaryHolonics.RH.BohrZeros
 import ElementaryHolonics.RH.DescentZeros
 import ElementaryHolonics.RH.XiStrip
+import ElementaryHolonics.RH.TranslationAverage
 import ElementaryHolonics.RH.LogDerivativeRemainder
 import ElementaryHolonics.RH.LandauLemma
 import ElementaryHolonics.RH.ZeroFactorizationExists
