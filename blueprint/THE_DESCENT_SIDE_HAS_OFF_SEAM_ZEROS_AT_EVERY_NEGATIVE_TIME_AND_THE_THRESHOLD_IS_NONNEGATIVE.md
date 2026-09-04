@@ -103,9 +103,18 @@ missing owners, and the founding of the route on FT5's flowed integer events.
 
 For repository `t > 0` and every `z`, `Σ_{n ≠ 0} ∫ flowedTerm t z n` converges absolutely and
 equals `heatE t ξ (z)`; each event carries the Gaussian weight in `n`,
-`‖∫ flowedTerm t z n‖ ≤ C(t, z) e^{−t (log |n|)² / 4}`-type, by the shift `u ↦ u − log |n|` under
-`e^{−t u²}`; the identity extends from `Re z > 1` to every `z` (both sides entire in `z`, the
-identity theorem, or direct domination). Owner `RH/DescentComb.lean`.  
+`‖∫ flowedTerm t z n‖ ≤ C(t, z) e^{−c (log |n|)²}` with `c = min(t, 1)/8` (corrected in place from
+the `t/4`-type first written; the record states why), by the split of the `u`-line at `−log|n|/2`;
+the identity holds at every `z` by the kernel's own exchange, no continuation needed. Owner
+`RH/DescentComb.lean`.
+
+*Returned 2026-09-03:* `DescentComb.hasSum_flowedTerm_of_pos`,
+`summable_norm_integral_flowedTerm`, `integral_norm_flowedTerm_le` (`K(t,z)|n|^{−3/2}`),
+`integral_norm_flowedTerm_le_gaussian` (`K₂(t,z) e^{−(min(t,1)/8)(log|n|)²}`), and the profile
+bounds `abs_φ_le`, `abs_φ_le_of_nonneg`; receipt
+[`the RT1 record`](../research/records/2026-09-03_RT1_THE_DESCENT_COMB_CONVERGES_ABSOLUTELY_AT_EVERY_POINT_AND_EACH_EVENT_CARRIES_A_GAUSSIAN_WEIGHT_IN_N.md).
+**RT1 passes.**
+
 **Pass RT1:** `HasSum` at every `z` for every `t > 0`, formal-checked.  
 **Falsifier:** one `t > 0`, one `z`, and a divergent comb.
 

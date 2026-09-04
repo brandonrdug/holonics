@@ -209,7 +209,7 @@ is
 de Bruijn--Newman time is `t = -4u` after `s = 1/2 + i z/2`. Its Lean theorems stand, but the direct
 standard-`H_t` interpretation is retracted pending the RH0/RH1 bridge.
 
-**RH line position:** RT1 (the descent-route RT campaign; RT0 passed)
+**RH line position:** RT2 (the descent-route RT campaign; RT0–RT1 passed)
 
 [definition] Brandon's direct instruction of 2026-09-03 activates the `FT0--FT6` Foster-tank and
 threshold campaign on the RH line under
@@ -280,7 +280,12 @@ scheduled. RT0 passed: the manifest of both published proofs against tree and Ma
 (only the zero ODE is a theorem; Stirling with a remainder is missing from both; the fleet's
 `RT6` hid a second programme, Montgomery's method and CGGGH-B 1985). The receipt is
 [`research/records/2026-09-03_RT0_THE_TWO_PUBLISHED_PROOFS_ARE_MAPPED_TO_OWNERS_AND_THE_DESCENT_ROUTE_IS_FOUNDED_ON_THE_FLOWED_INTEGER_EVENTS.md`](research/records/2026-09-03_RT0_THE_TWO_PUBLISHED_PROOFS_ARE_MAPPED_TO_OWNERS_AND_THE_DESCENT_ROUTE_IS_FOUNDED_ON_THE_FLOWED_INTEGER_EVENTS.md).
-RT1 is current; no Lean owner of the RT campaign exists yet.
+RT1 passed: `RH/DescentComb.lean` returned `Σ_n ∫ flowedTerm t z n = heatE t ξ (z)` for every
+`t > 0` and every `z`, with absolute convergence, the event bound `K(t,z)|n|^{−3/2}`, and the
+Gaussian weight `K₂(t,z) e^{−(min(t,1)/8)(log|n|)²}`; every theorem on the three axioms; root
+umbrella 9,813 jobs. The receipt is
+[`research/records/2026-09-03_RT1_THE_DESCENT_COMB_CONVERGES_ABSOLUTELY_AT_EVERY_POINT_AND_EACH_EVENT_CARRIES_A_GAUSSIAN_WEIGHT_IN_N.md`](research/records/2026-09-03_RT1_THE_DESCENT_COMB_CONVERGES_ABSOLUTELY_AT_EVERY_POINT_AND_EACH_EVENT_CARRIES_A_GAUSSIAN_WEIGHT_IN_N.md).
+RT2 (Stirling with a remainder) is current.
 
 [definition] Use `c_CD` for the Copson--de Bruijn sharp coefficient and reserve `Λ_DN` for the
 coordinate-corrected de Bruijn--Newman threshold. The correction record is

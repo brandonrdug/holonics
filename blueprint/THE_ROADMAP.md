@@ -92,7 +92,15 @@ convergence dichotomy. Coefficient-specific branch selection and a certified dec
 research and schedule nothing. Brandon's direct correction of 2026-09-02 closes HTP at this bounded
 handoff and activates the engine HNA campaign.
 
-**RH line position:** RT1 (the descent-route RT campaign; RT0 passed)
+**RH line position:** RT2 (the descent-route RT campaign; RT0–RT1 passed)
+
+[proved-derived; formal-checked] RT1 passed: `RH/DescentComb.lean` returned, for every repository
+`t > 0` and every `z`, `Σ_n ∫ flowedTerm t z n = heatE t ξ (z)` with absolute convergence, the
+event bound `K(t,z)|n|^{−3/2}`, and the Gaussian weight `K₂(t,z) e^{−(min(t,1)/8)(log|n|)²}`, from
+the profile bounds `|φ(v)| ≤ (2π²+3π)e^{−|v|}` and `|φ(v)| ≤ (2π²+3π)e^{−v}e^{−e^{2v}/2}` on `v ≥ 0`;
+every theorem on `propext`, `Classical.choice`, `Quot.sound`; root umbrella 9,813 jobs. The
+receipt is
+[`the RT1 record`](../research/records/2026-09-03_RT1_THE_DESCENT_COMB_CONVERGES_ABSOLUTELY_AT_EVERY_POINT_AND_EACH_EVENT_CARRIES_A_GAUSSIAN_WEIGHT_IN_N.md).
 
 [definition] Brandon's direct request of 2026-09-03, *"I would indeed like to move towards RT, but I
 need you to further scope what will be required and constructed more critically, and formally
@@ -107,7 +115,8 @@ route, founded on FT5's flowed integer events. The order is fixed:
    receipt
    [`the RT0 record`](../research/records/2026-09-03_RT0_THE_TWO_PUBLISHED_PROOFS_ARE_MAPPED_TO_OWNERS_AND_THE_DESCENT_ROUTE_IS_FOUNDED_ON_THE_FLOWED_INTEGER_EVENTS.md);
 2. `RT1` -- the descent comb everywhere: absolute convergence and equality with `heatE t ξ` at
-   every `z` for `t > 0`, with the Gaussian weight in `n`;
+   every `z` for `t > 0`, with the Gaussian weight in `n` -- **PASSED**, receipt
+   [`the RT1 record`](../research/records/2026-09-03_RT1_THE_DESCENT_COMB_CONVERGES_ABSOLUTELY_AT_EVERY_POINT_AND_EACH_EVENT_CARRIES_A_GAUSSIAN_WEIGHT_IN_N.md);
 3. `RT2` -- Stirling with a remainder on `Re s ≥ 1`, the one owner both routes need;
 4. `RT3` -- each flowed event by steepest descent after the shift `J_t`, with its remainder;
 5. `RT4` -- the approximation theorem `heatE t ξ (J_t s) = γ_t(s)(F_t(s) + R_t(s))` uniformly
