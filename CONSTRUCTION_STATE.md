@@ -209,7 +209,7 @@ is
 de Bruijn--Newman time is `t = -4u` after `s = 1/2 + i z/2`. Its Lean theorems stand, but the direct
 standard-`H_t` interpretation is retracted pending the RH0/RH1 bridge.
 
-**RH line position:** FT3
+**RH line position:** FT4
 
 [definition] Brandon's direct instruction of 2026-09-03 activates the `FT0--FT6` Foster-tank and
 threshold campaign on the RH line under
@@ -232,7 +232,17 @@ canonical product over the zeros repeated by multiplicity, entire, reflection sy
 exactly on the zeros of `ξ`, with the Foster series as its log-derivative off the zeros. The
 receipt is
 [`research/records/2026-09-03_FT2_THE_PAIRED_CANONICAL_PRODUCT_IS_ENTIRE_AND_ITS_LOG_DERIVATIVE_IS_THE_FOSTER_SERIES.md`](research/records/2026-09-03_FT2_THE_PAIRED_CANONICAL_PRODUCT_IS_ENTIRE_AND_ITS_LOG_DERIVATIVE_IS_THE_FOSTER_SERIES.md).
-`FT3` is current: `ξ² = ξ(½)² P` and the entire-face thread law.
+[proved-derived; formal-checked] FT3 passed: `RH/FosterSplit.lean`, `RH/FosterHadamard.lean`,
+and `RH/CombFlux.lean` returned the finite/tail split of `P`, Landau's remainder logarithmic in
+the radius, Cauchy's estimate on the connected nonzero set, hence `2 ξ′/ξ = P′/P`,
+`ξ² = ξ(½)² P`, the full Foster form, and the principal-value comb flux
+`2 Σ_{u ∈ D(½,R), u ≠ z₀} m_u/(z₀ − u) → ξ″(z₀)/ξ′(z₀)` at every simple zero of `ξ`; the port
+`RodgersTaoZeroDynamics` is amended to discs centred at `½` on `C¹` curves and its time-zero field
+is a theorem. The discharge for `heatE t ξ` needs the centre value at every `t`, which `Φ` returns,
+and is FT4 (i). The receipt is
+[`research/records/2026-09-03_FT3_HADAMARD_HOLDS_THE_FOSTER_FORM_IS_THE_LOG_DERIVATIVE_AND_THE_COMB_FLUX_IS_THE_VELOCITY_AT_A_SIMPLE_ZERO.md`](research/records/2026-09-03_FT3_HADAMARD_HOLDS_THE_FOSTER_FORM_IS_THE_LOG_DERIVATIVE_AND_THE_COMB_FLUX_IS_THE_VELOCITY_AT_A_SIMPLE_ZERO.md).
+`FT4` is current: the Foster class and the port discharged for `heatE t ξ`, the entire-face flow,
+`Λ_DN`, and `RH ⟺ Λ_DN ≤ 0`.
 
 [definition] Use `c_CD` for the Copson--de Bruijn sharp coefficient and reserve `Λ_DN` for the
 coordinate-corrected de Bruijn--Newman threshold. The correction record is

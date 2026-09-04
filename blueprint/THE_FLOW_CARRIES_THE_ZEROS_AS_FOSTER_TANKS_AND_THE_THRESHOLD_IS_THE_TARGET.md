@@ -113,22 +113,37 @@ comb flux at the entire face. Discharge the port `PhaseFlowLedger.RodgersTaoZero
 `heatE t ξ` at every `t` for which `HeatFlowEntire` returns an entire function of the class, the
 same argument running on `heatE t ξ` once its Landau bound and count are returned.
 
-**Pass FT3:** `RodgersTaoZeroDynamics (fun t => heatE t riemannXi)` is a theorem, not a port; the
-docstring of `ZeroDynamicsEntire` no longer names its second half open.  
-**Falsifier:** a computed velocity of a simple zero of `heatE t ξ` disagreeing with the finite
-comb flux on a declared truncation, the falsifier the port already carries.
+*Corrected in place 2026-09-03:* the argument on `heatE t ξ` needs the centre value
+`heatE t ξ (½) ≠ 0` at every `t` (Jensen's count and the paired product both require it), and the
+centre value at every time is a property of the kernel, `∫ e^{tu²} Φ(u) du` with a positive
+integrand, which is FT4's artifact. FT3 therefore passes on `ξ`: `ξ² = ξ(½)² P`, the full Foster
+form, the principal-value comb flux at every simple zero of `ξ`, and the port amended to discs
+centred at `½` on `C¹` curves with its field at `t = 0` a theorem. The discharge for the family
+`heatE t ξ` is FT4 (i), the Foster class.
+
+**Pass FT3:** `FosterHadamard.sq_eq_centre_mul_P`, `FosterHadamard.foster_form`, and
+`CombFlux.flux_riemannXi` are theorems; `RodgersTaoZeroDynamics` states the law at centre `½` and
+`CombFlux.flux_time_zero` is its field at `t = 0`.  
+**Falsifier:** a simple zero of `ξ` at which the finite comb flux on a declared truncation
+disagrees with `ξ″/ξ′`, or a point at which `ξ² − ξ(½)² P` is nonzero.
 
 ### FT4 — the flow at the entire face and the threshold defined
 
-Return the entire-face forward preservation (the flow never creates a pair), the kernel `Φ` with
-its cosine-transform identity to `heatE` in the corrected coordinate, the real-zero times as a
-nonempty closed up-set, `Λ_DN` as their infimum, and `RH ⟺ Λ_DN ≤ 0` against Mathlib's
-`RiemannHypothesis` through `Millennium/Seam.lean`. This absorbs the labels `RH6`--`RH9` of the
-fleet document as the primary line's own.
+Return first (i) the Foster class: FT0--FT3 generalized over symmetric entire functions of finite
+order below two with a centre value, so that the Hadamard identity, the Foster form, and the comb
+flux hold for every member; then the kernel `Φ` with its cosine-transform identity to `heatE` in
+the corrected coordinate, whose positive integrand returns the centre value `heatE t ξ (½) ≠ 0`
+at every `t` and, with the majorant's growth envelope, places `heatE t ξ` in the class, discharging
+`RodgersTaoZeroDynamics (fun t => heatE t riemannXi)` so that the docstring of
+`ZeroDynamicsEntire` no longer names its second half open; then the entire-face forward
+preservation (the flow never creates a pair), the real-zero times as a nonempty closed up-set,
+`Λ_DN` as their infimum, and `RH ⟺ Λ_DN ≤ 0` against Mathlib's `RiemannHypothesis` through
+`Millennium/Seam.lean`. This absorbs the labels `RH6`--`RH9` of the fleet document as the primary
+line's own.
 
-**Pass FT4:** the equivalence is formal-checked with `Λ_DN` defined from the actual `Φ`, never
-from a polynomial shortcut; de Bruijn's `Λ_DN ≤ ½` returns from `PairDescent` transported to the
-entire face.  
+**Pass FT4:** the port is a theorem; the equivalence is formal-checked with `Λ_DN` defined from
+the actual `Φ`, never from a polynomial shortcut; de Bruijn's `Λ_DN ≤ ½` returns from
+`PairDescent` transported to the entire face.  
 **Falsifier:** a time in the real-zero set below which a real-zero time exists, contradicting the
 up-set law.
 

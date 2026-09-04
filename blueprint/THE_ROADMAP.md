@@ -89,7 +89,19 @@ convergence dichotomy. Coefficient-specific branch selection and a certified dec
 research and schedule nothing. Brandon's direct correction of 2026-09-02 closes HTP at this bounded
 handoff and activates the engine HNA campaign.
 
-**RH line position:** FT3
+**RH line position:** FT4
+
+[proved-derived; formal-checked] FT3 passed: `RH/FosterSplit.lean`, `RH/FosterHadamard.lean`, and
+`RH/CombFlux.lean` returned the finite/tail split of `P` on every centred disc, Landau's remainder
+logarithmic in the radius, the vanishing of the tail of the inverse squares, Cauchy's estimate and
+the connectedness of the nonzero set, hence `2 ξ′/ξ = P′/P`, **`ξ² = ξ(½)² P`**, the full Foster
+form `ξ′/ξ = Σ_u m_u (z − ½)/((z − ½)² − (u − ½)²)`, and the principal-value comb flux
+`2 Σ_{u ∈ D(½,R), u ≠ z₀} m_u/(z₀ − u) → ξ″(z₀)/ξ′(z₀)` at every simple zero; the port
+`RodgersTaoZeroDynamics` is amended to discs centred at `½` on `C¹` curves and its time-zero field
+is a theorem. The contract is corrected in place: the discharge for `heatE t ξ` needs the centre
+value `heatE t ξ (½) ≠ 0` at every `t`, which the kernel `Φ` returns, so it is FT4 (i). The receipt
+is
+[`the FT3 record`](../research/records/2026-09-03_FT3_HADAMARD_HOLDS_THE_FOSTER_FORM_IS_THE_LOG_DERIVATIVE_AND_THE_COMB_FLUX_IS_THE_VELOCITY_AT_A_SIMPLE_ZERO.md).
 
 [proved-derived; formal-checked] FT2 passed: `RH/FosterProduct.lean` returned the paired canonical
 product over the zeros repeated by multiplicity, entire and reflection symmetric, vanishing exactly
@@ -124,9 +136,10 @@ and each advances on its own gate. The order is fixed:
 2. `FT1` -- the centre value `ξ(½) ≠ 0`, the count `N(R) ≤ C R log R`, and the exponent of
    convergence -- **PASSED**;
 3. `FT2` -- the paired canonical product for the entire growth class -- **PASSED**;
-4. `FT3` -- Hadamard, the full Foster form, and the entire-face thread law (discharging the
-   `RodgersTaoZeroDynamics` port) -- **CURRENT**;
-5. `FT4` -- the entire-face flow, `Λ_DN` defined, and `RH ⟺ Λ_DN ≤ 0` against the anchor;
+4. `FT3` -- Hadamard, the full Foster form, and the comb flux at every simple zero of `ξ`; the
+   port amended to centre `½` with its time-zero field -- **PASSED** at the corrected scope;
+5. `FT4` -- the Foster class and the port discharged for `heatE t ξ` from `Φ`'s centre value, the
+   entire-face flow, `Λ_DN` defined, and `RH ⟺ Λ_DN ≤ 0` against the anchor -- **CURRENT**;
 6. `FT5` -- the flowed explicit formula: the bound integer comb against the divisor of
    `heatE t ξ`; and
 7. `FT6` -- `Λ_DN ≥ 0` and the target, or the first exact missing inequality with its falsifier.

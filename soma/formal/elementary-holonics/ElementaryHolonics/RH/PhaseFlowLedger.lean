@@ -186,13 +186,18 @@ polynomial face this is the theorem `HeatFlowOfPolynomials.zero_curve_flux`; at 
 other zeros in principal-value order (the Hadamard product) is the open half this port names.  No
 theorem of this owner consumes it.  Falsifier: a computed velocity of a simple zero of `H t` that
 disagrees with the finite comb flux on a declared truncation.  Until 2026-09-03 this port's only
-field was `True`; it now states the law it was named for. -/
+field was `True`; it now states the law it was named for.  *Amended by FT3, 2026-09-03:* the discs
+are centred at `½`, the centre of the reflection `z ↦ 1 − z` that pairs the comb, and the curve is
+`C¹` (`z′` continuous), the hypothesis `ZeroDynamicsEntire.zero_curve_velocity` carries.  For
+`H t = heatE t ξ` the field is the theorem `CombFlux.flux_time_zero` at `t = 0`; at `t ≠ 0` it
+waits on the centre value `heatE t ξ (½) ≠ 0` and the growth of `heatE t ξ`, which FT4 returns
+through the kernel `Φ`. -/
 structure RodgersTaoZeroDynamics (H : ℝ → ℂ → ℂ) : Prop where
-  flux : ∀ (t : ℝ) (z z' : ℝ → ℂ), (∀ s, HasDerivAt z (z' s) s) → (∀ s, H s (z s) = 0) →
-    deriv (H t) (z t) ≠ 0 →
+  flux : ∀ (t : ℝ) (z z' : ℝ → ℂ), (∀ s, HasDerivAt z (z' s) s) → Continuous z' →
+    (∀ s, H s (z s) = 0) → deriv (H t) (z t) ≠ 0 →
     Filter.Tendsto
       (fun R : ℝ => 2 * ∑ᶠ u, if u = z t then (0 : ℂ) else
-        (MeromorphicOn.divisor (H t) (Metric.closedBall 0 R) u : ℂ) / (z t - u))
+        (MeromorphicOn.divisor (H t) (Metric.closedBall (1 / 2 : ℂ) R) u : ℂ) / (z t - u))
       Filter.atTop (nhds (z' t))
 
 end Soma.Holonics.RH.PhaseFlowLedger

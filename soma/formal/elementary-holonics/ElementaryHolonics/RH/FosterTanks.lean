@@ -241,6 +241,11 @@ structure SymmetricZeroFactorization (r : ℝ) extends
     ZeroFactorization riemannXi (1 / 2 : ℂ) r where
   refl_mem : ∀ ρ ∈ zeros, 1 - ρ ∈ zeros
   refl_mult : ∀ ρ ∈ zeros, mult (1 - ρ) = mult ρ
+  /-- The comb is exactly the support of the divisor of the open disc inside the closed half disc. -/
+  mem_zeros_iff : ∀ ρ, ρ ∈ zeros ↔
+    (MeromorphicOn.divisor riemannXi (ball (1 / 2 : ℂ) r) ρ ≠ 0 ∧ ρ ∈ closedBall (1 / 2 : ℂ) (r / 2))
+  /-- The multiplicities are the divisor's. -/
+  mult_eq_div : ∀ ρ, (mult ρ : ℤ) = MeromorphicOn.divisor riemannXi (ball (1 / 2 : ℂ) r) ρ
 
 theorem one_sub_mem_ball_half_iff {R : ℝ} (u : ℂ) :
     (1 - u) ∈ ball (1 / 2 : ℂ) R ↔ u ∈ ball (1 / 2 : ℂ) R := by
@@ -339,7 +344,9 @@ theorem exists_symmetricZeroFactorization_count {r : ℝ} (hr : 0 < r)
             unit_ne := ?_
             factor := ?_
             refl_mem := ?_
-            refl_mult := ?_ }, ?_⟩
+            refl_mult := ?_
+            mem_zeros_iff := ?_
+            mult_eq_div := ?_ }, ?_⟩
   · intro ρ hρ
     exact (Finset.mem_filter.mp hρ).2
   · intro ρ hρ
@@ -374,6 +381,11 @@ theorem exists_symmetricZeroFactorization_count {r : ℝ} (hr : 0 < r)
   · intro ρ _
     show (D (1 - ρ)).toNat = (D ρ).toNat
     rw [hDrefl]
+  · intro ρ
+    rw [Finset.mem_filter, hSdef, Set.Finite.mem_toFinset, Function.mem_support]
+  · intro ρ
+    show ((D ρ).toNat : ℤ) = D ρ
+    exact Int.toNat_of_nonneg (hDnn ρ)
   · set D' := MeromorphicOn.divisor riemannXi (closedBall z₀ (r / 2)) with hD'def
     have hmer' : MeromorphicOn riemannXi (closedBall z₀ (r / 2)) :=
       fun u _ => (hf.analyticAt u).meromorphicAt
@@ -472,5 +484,56 @@ theorem exists_paired_foster_form' {r : ℝ} (hr : 0 < r) :
             Real.log (jensenCeiling C (1 / 2) r / ‖riemannXi (1 / 2)‖) / Real.log (3 / 2) *
               Real.log 2) / r :=
   exists_paired_foster_form hr XiCentre.riemannXi_one_half_ne_zero
+
+/-! ## The Foster form at the fixed envelope constant -/
+
+/-- The pointwise order-one envelope's constant, chosen once. -/
+def pointC : ℝ := Classical.choose pointwiseAbscissaGrowthOfRiemannXiHolds
+
+theorem pointC_pos : 0 < pointC := (Classical.choose_spec pointwiseAbscissaGrowthOfRiemannXiHolds).1
+
+theorem pointC_spec (z : ℂ) :
+    Real.log ‖riemannXi z‖ ≤ pointC * (‖z‖ + 3) * Real.log (‖z‖ + 3) :=
+  (Classical.choose_spec pointwiseAbscissaGrowthOfRiemannXiHolds).2 z
+
+/-- **The paired finite Foster form at the fixed constant.**  Same bound as
+`exists_paired_foster_form'`, with `pointC` in place of the existential constant, so the remainder
+is one explicit function of the radius. -/
+theorem exists_paired_foster_form_fixed {r : ℝ} (hr : 0 < r) :
+    ∃ Z : SymmetricZeroFactorization r,
+      (Z.count : ℝ) ≤ Real.log (jensenCeiling pointC (1 / 2) r / ‖riemannXi (1 / 2)‖) /
+        Real.log (3 / 2) ∧
+      ∀ z ∈ closedBall (1 / 2 : ℂ) (r / 8), riemannXi z ≠ 0 →
+        ‖logDeriv riemannXi z -
+            ∑ ρ ∈ Z.zeros, (Z.mult ρ : ℂ) *
+              ((z - 1 / 2) / ((z - 1 / 2) ^ 2 - (ρ - 1 / 2) ^ 2))‖ ≤
+          16 * (xiBudget pointC (1 / 2) r +
+            Real.log (jensenCeiling pointC (1 / 2) r / ‖riemannXi (1 / 2)‖) / Real.log (3 / 2) *
+              Real.log 2) / r := by
+  have hξ := XiCentre.riemannXi_one_half_ne_zero
+  have hC := pointC_pos
+  have hgrowth := pointC_spec
+  obtain ⟨Z, hcount⟩ := exists_symmetricZeroFactorization_count hr hξ
+  have hN : (Z.count : ℝ) ≤
+      Real.log (jensenCeiling pointC (1 / 2) r / ‖riemannXi (1 / 2)‖) / Real.log (3 / 2) := by
+    have h := finsum_divisor_le hC hgrowth hr hξ
+    rw [← hcount] at h
+    exact_mod_cast h
+  refine ⟨Z, hN, fun z hz hfz => ?_⟩
+  have hL := Z.toZeroFactorization.norm_logDeriv_sub_flux_le hr (xiBudget_pos pointC (1 / 2) r) hξ
+    (fun w hw => norm_riemannXi_le_of_growth hC hgrowth hr hξ hw) hz hfz
+  have hzρ : ∀ ρ ∈ Z.zeros, z ≠ ρ := by
+    intro ρ hρ h
+    apply hfz
+    rw [h]
+    exact Z.riemannXi_eq_zero hr hρ
+  have hpair := flux_eq_tankSum Z.refl_mem Z.refl_mult hzρ
+  rw [← hpair]
+  refine hL.trans ?_
+  apply div_le_div_of_nonneg_right _ hr.le
+  apply mul_le_mul_of_nonneg_left _ (by norm_num)
+  have hlog2 : 0 ≤ Real.log 2 := Real.log_nonneg (by norm_num)
+  have := mul_le_mul_of_nonneg_right hN hlog2
+  linarith
 
 end Soma.Holonics.RH.FosterTanks
