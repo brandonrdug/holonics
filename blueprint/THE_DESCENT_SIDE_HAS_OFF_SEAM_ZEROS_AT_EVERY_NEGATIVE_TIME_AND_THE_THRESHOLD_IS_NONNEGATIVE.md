@@ -167,7 +167,18 @@ integer power of `w = y^{1/12}`); receipt
 
 `heatE t ξ (J_t s) = γ_t(s) (F_t(s) + R_t(s))` with `‖R_t(s)‖ ≤ C y^{−1/5} e^{(10/t) min(x, −2)²}`
 uniformly for `|x| ≤ C y^{1/4}`, `y ≥ y₀(t)`, by RT1's absolute convergence and RT3's per-event
-bound summed over the three ranges. Owner `RH/DescentApproximation.lean`.  
+bound summed over the three ranges. Owner `RH/DescentApproximation.lean`.
+
+*Returned 2026-09-03:* `DescentApproximation.descent_approximation`: eventually in
+`w = y^{1/12}`, for every `s = x + iy` with `|x| ≤ X`, `γ_t'(s) ≠ 0`,
+`heatE t ξ (J_t s) = γ_t'(s) (F_t(s) + R_t(s))` with `F_t(s) = Σ_{n ≠ 0} e^{−t log²|n|} |n|^{−s}`
+absolutely convergent, and `‖R_t(s)‖ ≤ ρ(w)` with `tendsto_ρ : ρ → 0` at the rate of RT3's
+`Bmaj`, i.e. `O(y^{−1/3})`; the strip is `|x| ≤ X` fixed rather than `|x| ≤ C y^{1/4}` and the
+rate replaces `C y^{−1/5} e^{(10/t) min(x,−2)²}`, which is what RT5 and RT6 use; on `propext`,
+`Classical.choice`, `Quot.sound`; receipt
+[`the RT4 record`](../research/records/2026-09-03_RT4_THE_FLOWED_XI_AFTER_THE_SHIFT_IS_GAMMA_TIMES_THE_MAIN_SERIES_PLUS_A_REMAINDER_THAT_VANISHES_UNIFORMLY_ON_EVERY_STRIP.md).
+**RT4 passes.**
+
 **Pass RT4:** the uniform bound formal-checked.  
 **Falsifier:** a point in the window where the remainder exceeds the bound.
 

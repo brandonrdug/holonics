@@ -218,7 +218,7 @@ is
 de Bruijn--Newman time is `t = -4u` after `s = 1/2 + i z/2`. Its Lean theorems stand, but the direct
 standard-`H_t` interpretation is retracted pending the RH0/RH1 bridge.
 
-**RH line position:** RT4 (the descent-route RT campaign; RT0–RT3 passed)
+**RH line position:** RT5 (the descent-route RT campaign; RT0–RT4 passed)
 
 [definition] Brandon's direct instruction of 2026-09-03 activates the `FT0--FT6` Foster-tank and
 threshold campaign on the RH line under
@@ -308,7 +308,13 @@ beyond an explicit threshold (`EventMainRange.event_main`), the absolute bound
 (`EventLarge.event_large`), uniform on `|x| ≤ X` for each fixed `X`; every theorem on the three
 axioms; root umbrella 9,831 jobs. The receipt is
 [`research/records/2026-09-03_RT3_EVERY_FLOWED_INTEGER_EVENT_IS_ITS_STEEPEST_DESCENT_MAIN_TERM_ON_THREE_RANGES_WITH_THE_DEFECT_EXHIBITED.md`](research/records/2026-09-03_RT3_EVERY_FLOWED_INTEGER_EVENT_IS_ITS_STEEPEST_DESCENT_MAIN_TERM_ON_THREE_RANGES_WITH_THE_DEFECT_EXHIBITED.md).
-RT4 (the approximation theorem: the sum over the three ranges) is current.
+RT4 passed: `RH/DescentApproximation.lean` returned, on each fixed strip `|Re s| ≤ X` and
+eventually in the height, `γ_t'(s) ≠ 0` and `heatE t ξ (J_t s) = γ_t'(s) (F_t(s) + R_t(s))`
+with `F_t` absolutely convergent and `‖R_t(s)‖ ≤ ρ(w) → 0` at rate `O(y^{−1/3})`
+(`descent_approximation`, `tendsto_ρ`); every theorem on the three axioms; root umbrella 9,832
+jobs. The receipt is
+[`research/records/2026-09-03_RT4_THE_FLOWED_XI_AFTER_THE_SHIFT_IS_GAMMA_TIMES_THE_MAIN_SERIES_PLUS_A_REMAINDER_THAT_VANISHES_UNIFORMLY_ON_EVERY_STRIP.md`](research/records/2026-09-03_RT4_THE_FLOWED_XI_AFTER_THE_SHIFT_IS_GAMMA_TIMES_THE_MAIN_SERIES_PLUS_A_REMAINDER_THAT_VANISHES_UNIFORMLY_ON_EVERY_STRIP.md).
+RT5 (the Dirichlet series `F_t` has zeros at every height in a fixed strip) is current.
 
 [definition] Use `c_CD` for the Copson--de Bruijn sharp coefficient and reserve `Λ_DN` for the
 coordinate-corrected de Bruijn--Newman threshold. The correction record is

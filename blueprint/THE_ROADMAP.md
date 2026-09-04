@@ -92,7 +92,16 @@ convergence dichotomy. Coefficient-specific branch selection and a certified dec
 research and schedule nothing. Brandon's direct correction of 2026-09-02 closes HTP at this bounded
 handoff and activates the engine HNA campaign.
 
-**RH line position:** RT4 (the descent-route RT campaign; RT0–RT3 passed)
+**RH line position:** RT5 (the descent-route RT campaign; RT0–RT4 passed)
+
+[proved-derived; formal-checked] RT4 passed: `RH/DescentApproximation.lean` returned, for
+repository `t > 0` and each fixed strip `|Re s| ≤ X`, eventually in the height,
+`γ_t'(s) ≠ 0` and `heatE t ξ (J_t s) = γ_t'(s) (F_t(s) + R_t(s))` with
+`F_t(s) = Σ_{n ≠ 0} e^{−t log²|n|} |n|^{−s}` absolutely convergent and `‖R_t(s)‖ ≤ ρ(w) → 0`
+(`descent_approximation`, `tendsto_ρ`; rate `O(y^{−1/3})`), by summing RT3's three ranges
+against RT1's absolutely convergent comb; every theorem on `propext`, `Classical.choice`,
+`Quot.sound`; root umbrella 9,832 jobs. The receipt is
+[`the RT4 record`](../research/records/2026-09-03_RT4_THE_FLOWED_XI_AFTER_THE_SHIFT_IS_GAMMA_TIMES_THE_MAIN_SERIES_PLUS_A_REMAINDER_THAT_VANISHES_UNIFORMLY_ON_EVERY_STRIP.md).
 
 [proved-derived; formal-checked] RT3 passed: the `RH/Event*` family returned, for repository
 `t > 0`, the exact per-event decomposition
