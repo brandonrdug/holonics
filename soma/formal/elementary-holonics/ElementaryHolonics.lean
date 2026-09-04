@@ -128,6 +128,7 @@ import ElementaryHolonics.RH.EventTail
 import ElementaryHolonics.RH.EventAssembly
 import ElementaryHolonics.RH.EventDefect
 import ElementaryHolonics.RH.EventHorizontal
+import ElementaryHolonics.RH.EventExplicit
 import ElementaryHolonics.RH.LogDerivativeRemainder
 import ElementaryHolonics.RH.LandauLemma
 import ElementaryHolonics.RH.ZeroFactorizationExists
