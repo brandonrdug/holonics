@@ -465,4 +465,246 @@ theorem exists_zero_Ft {t : ℝ} (ht : 0 < t) : ∃ s, Ft t s = 0 := by
   have := hconst (N : ℝ) (by positivity)
   linarith
 
+/-! ## Bohr: almost periods by simultaneous Diophantine approximation -/
+
+/-- Two reals whose scaled fractional parts share a floor are within `1/Q`. -/
+theorem abs_fract_sub_lt_of_floor_eq {Q : ℕ} (hQ : 0 < Q) {a b : ℝ}
+    (h : ⌊(Q : ℝ) * Int.fract a⌋₊ = ⌊(Q : ℝ) * Int.fract b⌋₊) :
+    |Int.fract b - Int.fract a| < 1 / Q := by
+  have hQ' : (0 : ℝ) < Q := by exact_mod_cast hQ
+  have ha0 : 0 ≤ (Q : ℝ) * Int.fract a := by positivity
+  have hb0 : 0 ≤ (Q : ℝ) * Int.fract b := by positivity
+  have h1 := Nat.floor_le ha0
+  have h2 := Nat.lt_floor_add_one ((Q : ℝ) * Int.fract a)
+  have h3 := Nat.floor_le hb0
+  have h4 := Nat.lt_floor_add_one ((Q : ℝ) * Int.fract b)
+  rw [h] at h1 h2
+  rw [abs_sub_lt_iff]
+  constructor
+  · rw [lt_div_iff₀ hQ']
+    nlinarith
+  · rw [lt_div_iff₀ hQ']
+    nlinarith
+
+/-- **Simultaneous Dirichlet approximation** by pigeonhole: for finitely many reals `θ n`,
+`n ∈ s`, and any `Q, q₀`, some integer `q ≥ q₀` has `‖q θ n‖ ≤ 1/Q` for all `n ∈ s`. -/
+theorem exists_simultaneous_approx (s : Finset ℤ) (θ : ℤ → ℝ) {Q : ℕ} (hQ : 0 < Q) (q₀ : ℕ) :
+    ∃ q : ℕ, q₀ ≤ q ∧ 0 < q ∧ ∀ n ∈ s, ∃ m : ℤ, |(q : ℝ) * θ n - m| ≤ 1 / Q := by
+  classical
+  set J : ℕ := Q ^ s.card + 1 with hJ
+  set box : ℕ → (s → ℕ) := fun j n => ⌊(Q : ℝ) * Int.fract (((j * (q₀ + 1) : ℕ) : ℝ) * θ n)⌋₊
+    with hbox
+  have hmaps : ∀ j ∈ Finset.range J, box j ∈ Fintype.piFinset (fun _ : s => Finset.range Q) := by
+    intro j _
+    rw [Fintype.mem_piFinset]
+    intro n
+    rw [Finset.mem_range]
+    have hQ' : (0 : ℝ) < Q := by exact_mod_cast hQ
+    have : (Q : ℝ) * Int.fract (((j * (q₀ + 1) : ℕ) : ℝ) * θ n) < Q := by
+      have := Int.fract_lt_one (((j * (q₀ + 1) : ℕ) : ℝ) * θ n)
+      nlinarith
+    exact Nat.floor_lt (by positivity) |>.mpr this
+  have hcard : (Fintype.piFinset (fun _ : s => Finset.range Q)).card < (Finset.range J).card := by
+    rw [Fintype.card_piFinset, Finset.card_range]
+    simp only [Finset.card_range, Finset.prod_const, Finset.card_univ, Fintype.card_coe]
+    omega
+  obtain ⟨j, hj, j', hj', hne, heq⟩ :=
+    Finset.exists_ne_map_eq_of_card_lt_of_maps_to hcard hmaps
+  -- order the pair
+  rcases lt_or_gt_of_ne hne with hlt | hlt
+  · refine ⟨(j' - j) * (q₀ + 1), ?_, ?_, ?_⟩
+    · have : 1 ≤ j' - j := by omega
+      nlinarith
+    · have : 1 ≤ j' - j := by omega
+      positivity
+    · intro n hn
+      have hb := congrFun heq ⟨n, hn⟩
+      simp only [hbox] at hb
+      set a : ℝ := ((j * (q₀ + 1) : ℕ) : ℝ) * θ n with ha
+      set b : ℝ := ((j' * (q₀ + 1) : ℕ) : ℝ) * θ n with hb'
+      have hfr := abs_fract_sub_lt_of_floor_eq hQ hb
+      refine ⟨⌊b⌋ - ⌊a⌋, ?_⟩
+      have e3 : (((j' - j) * (q₀ + 1) : ℕ) : ℝ) * θ n = b - a := by
+        rw [hb', ha, Nat.cast_mul, Nat.cast_sub hlt.le]
+        push_cast
+        ring
+      rw [e3]
+      push_cast
+      have : b - a - ((⌊b⌋ : ℝ) - ⌊a⌋) = Int.fract b - Int.fract a := by
+        rw [← Int.self_sub_floor, ← Int.self_sub_floor]
+        ring
+      rw [this]
+      exact hfr.le
+  · refine ⟨(j - j') * (q₀ + 1), ?_, ?_, ?_⟩
+    · have : 1 ≤ j - j' := by omega
+      nlinarith
+    · have : 1 ≤ j - j' := by omega
+      positivity
+    · intro n hn
+      have hb := congrFun heq ⟨n, hn⟩
+      simp only [hbox] at hb
+      set a : ℝ := ((j' * (q₀ + 1) : ℕ) : ℝ) * θ n with ha
+      set b : ℝ := ((j * (q₀ + 1) : ℕ) : ℝ) * θ n with hb'
+      have hfr := abs_fract_sub_lt_of_floor_eq hQ hb.symm
+      refine ⟨⌊b⌋ - ⌊a⌋, ?_⟩
+      have e3 : (((j - j') * (q₀ + 1) : ℕ) : ℝ) * θ n = b - a := by
+        rw [hb', ha, Nat.cast_mul, Nat.cast_sub hlt.le]
+        push_cast
+        ring
+      rw [e3]
+      push_cast
+      have : b - a - ((⌊b⌋ : ℝ) - ⌊a⌋) = Int.fract b - Int.fract a := by
+        rw [← Int.self_sub_floor, ← Int.self_sub_floor]
+        ring
+      rw [this]
+      exact hfr.le
+
+/-- The translate of a main term. -/
+theorem Fterm_add_I_mul (t : ℝ) (s : ℂ) (τ : ℝ) (n : ℤ) :
+    Fterm t (s + Complex.I * τ) n =
+      Fterm t s n * Complex.exp (-(Complex.I * τ) * ((Real.log |(n : ℝ)| : ℝ) : ℂ)) := by
+  unfold Fterm
+  split_ifs with hn
+  · simp
+  · rw [← Complex.exp_add, ← Complex.exp_add, ← Complex.exp_add]
+    congr 1
+    ring
+
+/-- `‖e^{−iτ L} − 1‖ ≤ |τ L − 2π m|` for every integer `m`. -/
+theorem norm_exp_neg_I_sub_one_le (τ L : ℝ) (m : ℤ) :
+    ‖Complex.exp (-(Complex.I * τ) * (L : ℂ)) - 1‖ ≤ |τ * L - 2 * π * m| := by
+  have h1 : Complex.exp (-(Complex.I * τ) * (L : ℂ)) =
+      Complex.exp (Complex.I * ((-(τ * L) + 2 * π * m : ℝ) : ℂ)) := by
+    rw [show Complex.I * ((-(τ * L) + 2 * π * m : ℝ) : ℂ) =
+      -(Complex.I * τ) * (L : ℂ) + (m : ℂ) * (2 * π * Complex.I) by push_cast; ring,
+      Complex.exp_add, Complex.exp_int_mul_two_pi_mul_I, mul_one]
+  rw [h1]
+  have := norm_exp_I_mul_ofReal_sub_one_le (x := -(τ * L) + 2 * π * m)
+  rw [Real.norm_eq_abs] at this
+  calc ‖Complex.exp (Complex.I * ((-(τ * L) + 2 * π * m : ℝ) : ℂ)) - 1‖
+      ≤ |-(τ * L) + 2 * π * m| := this
+    _ = |τ * L - 2 * π * m| := by rw [← abs_neg]; congr 1; ring
+
+/-- **Bohr's almost periods.** For every `ε > 0` and `T₀`, some `τ ≥ T₀` has
+`‖F_t(s + iτ) − F_t(s)‖ ≤ ε` for every `s` in the strip `|Re s| ≤ X`. -/
+theorem exists_almost_period {t X : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) {ε : ℝ} (hε : 0 < ε)
+    (T₀ : ℝ) :
+    ∃ τ : ℝ, T₀ ≤ τ ∧ ∀ s : ℂ, |s.re| ≤ X → ‖Ft t (s + Complex.I * τ) - Ft t s‖ ≤ ε := by
+  classical
+  set K : ℝ := Real.exp (X ^ 2 / (2 * t) + 9 / (8 * t)) with hK
+  have hK0 : 0 < K := Real.exp_pos _
+  -- the tail
+  have hsum : Summable (fun n : ℤ => K * |(n : ℝ)| ^ (-(3 / 2 : ℝ))) := summable_Z32.mul_left K
+  have htail := tendsto_tsum_compl_atTop_zero (fun n : ℤ => K * |(n : ℝ)| ^ (-(3 / 2 : ℝ)))
+  have hev : ∀ᶠ s₀ : Finset ℤ in atTop,
+      ∑' n : {n : ℤ // n ∉ s₀}, K * |((n : ℤ) : ℝ)| ^ (-(3 / 2 : ℝ)) < ε / 4 :=
+    (tendsto_order.1 htail).2 _ (by positivity)
+  obtain ⟨s₀, hs₀⟩ := hev.exists
+  -- the modulus of approximation
+  obtain ⟨Q, hQ⟩ := exists_nat_gt (4 * π * K * Z32 / ε)
+  have hQ0 : 0 < Q := by
+    have : (0 : ℝ) < 4 * π * K * Z32 / ε := by
+      have := Z32_pos
+      positivity
+    exact_mod_cast this.trans hQ
+  -- the almost period
+  obtain ⟨q₀, hq₀⟩ := exists_nat_gt T₀
+  obtain ⟨q, hqq₀, hq0, hq⟩ := exists_simultaneous_approx s₀
+    (fun n => Real.log |(n : ℝ)| / (2 * π)) hQ0 q₀
+  set τ : ℝ := (q : ℝ) with hτ
+  refine ⟨τ, ?_, ?_⟩
+  · have : (q₀ : ℝ) ≤ q := by exact_mod_cast hqq₀
+    rw [hτ]
+    linarith
+  intro s hX
+  -- the termwise bound
+  have hpt : ∀ n : ℤ, ‖Fterm t (s + Complex.I * τ) n - Fterm t s n‖ ≤
+      (if n ∈ s₀ then 2 * π / Q else 2) * ‖Fterm t s n‖ := by
+    intro n
+    rw [Fterm_add_I_mul, ← mul_sub_one, norm_mul, mul_comm]
+    apply mul_le_mul_of_nonneg_right _ (norm_nonneg _)
+    split_ifs with hn
+    · obtain ⟨m, hm⟩ := hq n hn
+      refine (norm_exp_neg_I_sub_one_le _ _ m).trans ?_
+      have : τ * Real.log |(n : ℝ)| - 2 * π * m =
+          2 * π * (q * (Real.log |(n : ℝ)| / (2 * π)) - m) := by
+        rw [hτ]
+        field_simp
+        first | done | ring
+      rw [this, abs_mul, abs_of_pos (by positivity : (0 : ℝ) < 2 * π)]
+      calc 2 * π * |q * (Real.log |(n : ℝ)| / (2 * π)) - m| ≤ 2 * π * (1 / Q) := by gcongr
+        _ = 2 * π / Q := by ring
+    · calc ‖Complex.exp (-(Complex.I * τ) * ((Real.log |(n : ℝ)| : ℝ) : ℂ)) - 1‖
+          ≤ ‖Complex.exp (-(Complex.I * τ) * ((Real.log |(n : ℝ)| : ℝ) : ℂ))‖ +
+            ‖(1 : ℂ)‖ := norm_sub_le _ _
+        _ ≤ 1 + 1 := by
+            gcongr
+            · rw [Complex.norm_exp, Real.exp_le_one_iff]
+              simp [Complex.mul_re, Complex.mul_im]
+            · simp
+        _ = 2 := by norm_num
+  -- summability
+  have hsF := summable_norm_Fterm ht s
+  have hsF' := summable_Fterm ht s
+  have hsF2 := summable_Fterm ht (s + Complex.I * τ)
+  have hg : Summable (fun n : ℤ => (if n ∈ s₀ then 2 * π / Q else 2) * ‖Fterm t s n‖) := by
+    refine (hsF.mul_left (2 * π / Q + 2)).of_nonneg_of_le (fun n => by positivity)
+      (fun n => ?_)
+    have hQpos : (0 : ℝ) ≤ 2 * π / Q := by positivity
+    split_ifs
+    · apply mul_le_mul_of_nonneg_right _ (norm_nonneg _)
+      linarith
+    · apply mul_le_mul_of_nonneg_right _ (norm_nonneg _)
+      linarith
+  -- the sum
+  have hdiff : Ft t (s + Complex.I * τ) - Ft t s =
+      ∑' n : ℤ, (Fterm t (s + Complex.I * τ) n - Fterm t s n) := by
+    unfold Ft
+    rw [hsF2.tsum_sub hsF']
+  rw [hdiff]
+  have hsd : Summable (fun n : ℤ => ‖Fterm t (s + Complex.I * τ) n - Fterm t s n‖) :=
+    hg.of_nonneg_of_le (fun n => norm_nonneg _) hpt
+  refine (norm_tsum_le_tsum_norm hsd).trans ?_
+  refine (hasSum_le hpt hsd.hasSum hg.hasSum).trans ?_
+  -- split the majorant over `s₀` and its complement
+  rw [← hg.sum_add_tsum_compl (s := s₀)]
+  have hA : ∑ n ∈ s₀, (if n ∈ s₀ then 2 * π / Q else 2) * ‖Fterm t s n‖ ≤ ε / 2 := by
+    have h1 : ∑ n ∈ s₀, (if n ∈ s₀ then 2 * π / Q else 2) * ‖Fterm t s n‖ =
+        2 * π / Q * ∑ n ∈ s₀, ‖Fterm t s n‖ := by
+      rw [Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      intro n hn
+      rw [if_pos hn]
+    rw [h1]
+    have h2 : ∑ n ∈ s₀, ‖Fterm t s n‖ ≤ K * Z32 := by
+      calc ∑ n ∈ s₀, ‖Fterm t s n‖ ≤ ∑' n, ‖Fterm t s n‖ :=
+            hsF.sum_le_tsum s₀ (fun n _ => norm_nonneg _)
+        _ ≤ K * Z32 := tsum_norm_Fterm_le ht hX
+    have h3 : 2 * π / Q * (K * Z32) ≤ ε / 2 := by
+      have hQ' : 4 * π * K * Z32 < Q * ε := by
+        have := hQ
+        rwa [div_lt_iff₀ hε] at this
+      have e1 : 2 * π / Q * (K * Z32) = (4 * π * K * Z32) / (2 * Q) := by
+        field_simp
+        first | done | ring
+      rw [e1, div_le_iff₀ (by positivity : (0 : ℝ) < 2 * Q)]
+      nlinarith
+    calc 2 * π / Q * ∑ n ∈ s₀, ‖Fterm t s n‖ ≤ 2 * π / Q * (K * Z32) := by gcongr
+      _ ≤ ε / 2 := h3
+  have hB : ∑' n : {n : ℤ // n ∉ s₀}, (if (n : ℤ) ∈ s₀ then 2 * π / Q else 2) *
+      ‖Fterm t s n‖ ≤ ε / 2 := by
+    have h1 : ∀ n : {n : ℤ // n ∉ s₀},
+        (if (n : ℤ) ∈ s₀ then 2 * π / Q else 2) * ‖Fterm t s n‖ ≤
+          2 * (K * |((n : ℤ) : ℝ)| ^ (-(3 / 2 : ℝ))) := by
+      intro n
+      rw [if_neg n.2]
+      apply mul_le_mul_of_nonneg_left _ (by norm_num)
+      exact norm_Fterm_le ht hX n
+    have h2 := hasSum_le h1 (hg.subtype _).hasSum ((hsum.mul_left 2).subtype _).hasSum
+    simp only [Function.comp_apply] at h2
+    rw [tsum_mul_left] at h2
+    linarith
+  refine le_trans (add_le_add hA hB) ?_
+  linarith
+
 end Soma.Holonics.RH.BohrZeros
