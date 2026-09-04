@@ -209,7 +209,7 @@ is
 de Bruijn--Newman time is `t = -4u` after `s = 1/2 + i z/2`. Its Lean theorems stand, but the direct
 standard-`H_t` interpretation is retracted pending the RH0/RH1 bridge.
 
-**RH line position:** FT6 (campaign closed at the deposited-inequality scope)
+**RH line position:** RT1 (the descent-route RT campaign; RT0 passed)
 
 [definition] Brandon's direct instruction of 2026-09-03 activates the `FT0--FT6` Foster-tank and
 threshold campaign on the RH line under
@@ -268,7 +268,19 @@ falsifier of the conjecture). The FT campaign is closed. The receipts are
 and
 [`research/records/2026-09-03_FT6_THE_THRESHOLD_IS_RH_GIVEN_THE_TWO_STANDING_THEOREMS_AND_THE_MISSING_INEQUALITY_IS_THE_CONJECTURE.md`](research/records/2026-09-03_FT6_THE_THRESHOLD_IS_RH_GIVEN_THE_TWO_STANDING_THEOREMS_AND_THE_MISSING_INEQUALITY_IS_THE_CONJECTURE.md).
 The standing open theorems of the RH line are de Bruijn's bound (`½ ∈ seamTimes`), Rodgers–Tao's
-`0 ≤ Λ_DN`, and the conjecture itself; no RH deed is scheduled beyond this closure.
+`0 ≤ Λ_DN`, and the conjecture itself; the RT campaign below takes up the second.
+
+[definition] Brandon's direct request of 2026-09-03 to scope the RT programme critically and
+deposit its plans activates the ordered `RT0--RT6` descent-route campaign on the RH line under
+[`blueprint/THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md`](blueprint/THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md),
+target the discharge of the port `RodgersTaoNonneg` (`0 ≤ Λ_DN` as a theorem) by a zero of
+`heatE t ξ` off the seam at every repository `t > 0`, along Dobner's route founded on FT5's flowed
+integer events; the Rodgers--Tao route is kept as `RTa1--RTa6` with its obstructions and is not
+scheduled. RT0 passed: the manifest of both published proofs against tree and Mathlib owners
+(only the zero ODE is a theorem; Stirling with a remainder is missing from both; the fleet's
+`RT6` hid a second programme, Montgomery's method and CGGGH-B 1985). The receipt is
+[`research/records/2026-09-03_RT0_THE_TWO_PUBLISHED_PROOFS_ARE_MAPPED_TO_OWNERS_AND_THE_DESCENT_ROUTE_IS_FOUNDED_ON_THE_FLOWED_INTEGER_EVENTS.md`](research/records/2026-09-03_RT0_THE_TWO_PUBLISHED_PROOFS_ARE_MAPPED_TO_OWNERS_AND_THE_DESCENT_ROUTE_IS_FOUNDED_ON_THE_FLOWED_INTEGER_EVENTS.md).
+RT1 is current; no Lean owner of the RT campaign exists yet.
 
 [definition] Use `c_CD` for the Copson--de Bruijn sharp coefficient and reserve `Λ_DN` for the
 coordinate-corrected de Bruijn--Newman threshold. The correction record is

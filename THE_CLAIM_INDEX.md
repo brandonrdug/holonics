@@ -121,6 +121,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 | `blueprint/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md` | **The codec is recovered at every scale, and the faces are a return** — It sits under `blueprint/THE_ROADMAP.md`, which with `CONSTRUCTION_STATE.md` remains the only construction authority; nothing here overrides either. |
 | `blueprint/THE_COMPLETE_EXCHANGE_RETURNS_THROUGH_THE_STANDING_ATHENA_BODY_AND_NO_EXPERIMENT_REPLACES_HOLONIC_INFERENCE.md` | **SUPERSEDED — The complete exchange returns through native Athena, and Phoenix closes before cultivation begins** — **Supersession:** this revision withdraws the 2026-08-25 interpretation which called a mounted Phoenix execution wrapper the “general Athena body” and then divided its foreign transport… |
 | `blueprint/THE_CONSTRUCTIVE_DIFFERENTIAL_BOUNDARY_AND_RECEIVER_CALCULUS.md` | **The constructive differential boundary and receiver calculus** — **Pass CDB1:** [definition] the new owner builds through `HolonicQuantumTransport.lean` under Lean `v4.33.0`, contains no `sorry` or new axiom, prints only admitted Lean/Mathlib axioms, and… |
+| `blueprint/THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md` | **The descent side has off-seam zeros at every negative time, and the threshold is nonnegative** — **Founded:** 2026-09-03, by Brandon's direct request: *"I would indeed like to move towards RT, but I need you to further scope what will be required and constructed more critically, and… |
 | `blueprint/THE_ENGINE_REVISIONS.md` | **The engine revisions — what the 2026-08-15 findings oblige** — **Sources:** the six records of 2026-08-15, three Opus audits and one Sol (GPT-5.6, xhigh) mathematics audit. |
 | `blueprint/THE_EROS_INFORMATION_ENGINE.md` | **The Eros cycle as an Information Engine** — **Sits under:** `blueprint/THE_ROADMAP.md`, which remains the single active roadmap. |
 | `blueprint/THE_EROS_INSTANTIATION.md` | **The Eros instantiation — what a model IS, what conditioning IS, what production IS** — **HNA correction, 2026-09-02:** §2's one-passage law governs. |
@@ -161,7 +162,7 @@ complete sentence of its first non-metadata paragraph. Nothing here is summarize
 
 ---
 
-## 4 · The 2026-08 record line (450 deposits of 944)
+## 4 · The 2026-08 record line (450 deposits of 945)
 
 Each row is the record's own title, which under `canon/THE_DOCUMENT_LAW.md` is a declarative
 sentence — so this table is the month's claims, not a file listing. Full chronological atlas:

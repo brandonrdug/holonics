@@ -59,6 +59,9 @@ Read, in order:
 18. for the RH line, the directed Foster-tank and threshold contract,
     [`THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md`](THE_FLOW_CARRIES_THE_ZEROS_AS_FOSTER_TANKS_AND_THE_THRESHOLD_IS_THE_TARGET.md),
     with the two records of 2026-09-03 that founded it.
+19. for the RH line's current campaign, the descent-route RT contract,
+    [`THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md`](THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md),
+    with its RT0 record.
 
 Read only the smallest source, formal, and evidence closure required by the active deed. Completed
 sensory, membrane, Athena-alpha, Soulkiller, L, H, and Millennium campaign files
@@ -89,7 +92,33 @@ convergence dichotomy. Coefficient-specific branch selection and a certified dec
 research and schedule nothing. Brandon's direct correction of 2026-09-02 closes HTP at this bounded
 handoff and activates the engine HNA campaign.
 
-**RH line position:** FT6 (campaign closed at the deposited-inequality scope)
+**RH line position:** RT1 (the descent-route RT campaign; RT0 passed)
+
+[definition] Brandon's direct request of 2026-09-03, *"I would indeed like to move towards RT, but I
+need you to further scope what will be required and constructed more critically, and formally
+deposit the RT plans,"* activates the ordered `RT0--RT6` descent-route campaign on the RH line
+under
+[`THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md`](THE_DESCENT_SIDE_HAS_OFF_SEAM_ZEROS_AT_EVERY_NEGATIVE_TIME_AND_THE_THRESHOLD_IS_NONNEGATIVE.md).
+Its target is the discharge of the port `RodgersTaoNonneg`: `0 ≤ Λ_DN` as a theorem, by exhibiting
+a zero of `heatE t ξ` off the seam at every repository `t > 0` (standard `τ < 0`) along Dobner's
+route, founded on FT5's flowed integer events. The order is fixed:
+
+1. `RT0` -- the manifest of both published proofs against owners and the route -- **PASSED**,
+   receipt
+   [`the RT0 record`](../research/records/2026-09-03_RT0_THE_TWO_PUBLISHED_PROOFS_ARE_MAPPED_TO_OWNERS_AND_THE_DESCENT_ROUTE_IS_FOUNDED_ON_THE_FLOWED_INTEGER_EVENTS.md);
+2. `RT1` -- the descent comb everywhere: absolute convergence and equality with `heatE t ξ` at
+   every `z` for `t > 0`, with the Gaussian weight in `n`;
+3. `RT2` -- Stirling with a remainder on `Re s ≥ 1`, the one owner both routes need;
+4. `RT3` -- each flowed event by steepest descent after the shift `J_t`, with its remainder;
+5. `RT4` -- the approximation theorem `heatE t ξ (J_t s) = γ_t(s)(F_t(s) + R_t(s))` uniformly
+   in the window;
+6. `RT5` -- the Dirichlet series `F_t` has a zero in every window of a fixed strip (Bohr); and
+7. `RT6` -- the Rouché transfer, the zero off the seam at every `t > 0`, `Λ_DN_nonneg`, and
+   `ThresholdReturn` with the single port `DeBruijnBound`.
+
+The Rodgers--Tao route is kept as `RTa1--RTa6` in the contract's §2 with its obstructions (the
+saddle-point asymptotics, and the pair-correlation input CGGGH-B 1985 on Montgomery's method) and
+is not scheduled. De Bruijn's bound and the conjecture remain open as the contract's §3 states.
 
 [proved-derived; formal-checked] FT5 passed at the kernel scope: `RH/FlowedExplicitFormula.lean`
 returned the integer events `Φ(u) = Σ_n |n|^{−1/2} φ(u + log |n|)` with the flow weight split of
