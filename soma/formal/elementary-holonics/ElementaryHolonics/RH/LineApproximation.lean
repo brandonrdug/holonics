@@ -29,6 +29,9 @@ open scoped Classical
 /-- Every zero lies on the seam. -/
 def OnSeam (f : ℂ → ℂ) : Prop := ∀ z, f z = 0 → z.re = 1 / 2
 
+/-- A member with no real zero: every zero has `Im ≠ 0`. This is all the approximation needs. -/
+def NoRealZero (f : ℂ → ℂ) : Prop := ∀ z, f z = 0 → z.im ≠ 0
+
 variable {f : ℂ → ℂ} {A B σ : ℝ} [hf : FosterClass f A B σ]
 include hf
 
@@ -36,13 +39,20 @@ theorem f_eq_zero_of_mult_ne_zero {u : ℂ} (hu : mult f u ≠ 0) : f u = 0 := b
   by_contra h
   exact hu (mult_eq_zero_of_ne_zero (f := f) h)
 
-theorem zero_im_ne_zero (hs : OnSeam f) (u : Zero f) : ((u : ℂ)).im ≠ 0 := by
-  intro h
-  have hre := hs u (f_eq_zero_of_mult_ne_zero u.2)
-  apply Zero.ne_half (f := f) u
+theorem zero_im_ne_zero' (hs : NoRealZero f) (u : Zero f) : ((u : ℂ)).im ≠ 0 :=
+  hs u (f_eq_zero_of_mult_ne_zero u.2)
+
+theorem OnSeam.noRealZero (hs : OnSeam f) : NoRealZero f := by
+  intro z hz h
+  have hre := hs z hz
+  have hmult : mult f z ≠ 0 := mult_ne_zero_of_eq_zero (f := f) hz
+  apply Zero.ne_half (f := f) ⟨z, hmult⟩
   apply Complex.ext
   · simpa using hre
   · simpa using h
+
+theorem zero_im_ne_zero (hs : OnSeam f) (u : Zero f) : ((u : ℂ)).im ≠ 0 :=
+  zero_im_ne_zero' hs.noRealZero u
 
 /-- The upper half of the repeated index. -/
 def upper (f : ℂ → ℂ) : Set (Idx f) := {i | 0 < ((i.1 : Zero f) : ℂ).im}
@@ -72,8 +82,8 @@ theorem a_mirror (i : Idx f) (z : ℂ) : a (mirror i) z = a i z := by
   rw [mirror_fst, show (1 : ℂ) - ((i.1 : Zero f) : ℂ) - 1 / 2 = -(((i.1 : Zero f) : ℂ) - 1 / 2) by ring,
     div_neg, neg_sq]
 
-theorem mirror_mem_upper_iff (hs : OnSeam f) (i : Idx f) : mirror i ∈ upper f ↔ i ∉ upper f := by
-  have hne := zero_im_ne_zero hs i.1
+theorem mirror_mem_upper_iff' (hs : NoRealZero f) (i : Idx f) : mirror i ∈ upper f ↔ i ∉ upper f := by
+  have hne := zero_im_ne_zero' hs i.1
   simp only [upper, mem_setOf_eq, mirror_fst, Complex.sub_im, Complex.one_im, zero_sub, neg_pos]
   constructor
   · intro h1 h2
@@ -83,10 +93,10 @@ theorem mirror_mem_upper_iff (hs : OnSeam f) (i : Idx f) : mirror i ∈ upper f 
     exact lt_of_le_of_ne h hne
 
 /-- The upper half is in bijection with the lower half through the mirror. -/
-def upperEquivCompl (hs : OnSeam f) : ↥(upper f) ≃ ↥(upper f)ᶜ :=
+def upperEquivCompl' (hs : NoRealZero f) : ↥(upper f) ≃ ↥(upper f)ᶜ :=
   Equiv.subtypeEquiv (mirrorPerm (f := f)) (fun i => by
     show i ∈ upper f ↔ mirror i ∈ (upper f)ᶜ
-    rw [mem_compl_iff, mirror_mem_upper_iff hs, not_not])
+    rw [mem_compl_iff, mirror_mem_upper_iff' hs, not_not])
 
 omit hf in
 /-- The half product `Qplus f`. -/
@@ -97,17 +107,17 @@ theorem hasProd_upper (z : ℂ) :
   (multipliable_one_add_of_summable (f := fun i : ↥(upper f) => a (i : Idx f) z)
     ((summable_norm_a (f := f) z).subtype _)).hasProd
 
-theorem hasProd_lower (hs : OnSeam f) (z : ℂ) :
+theorem hasProd_lower' (hs : NoRealZero f) (z : ℂ) :
     HasProd ((fun i : Idx f => 1 + a i z) ∘ (Subtype.val : ↥(upper f)ᶜ → Idx f)) (Qplus f z) := by
-  rw [← Equiv.hasProd_iff (upperEquivCompl hs)]
+  rw [← Equiv.hasProd_iff (upperEquivCompl' hs)]
   refine (hasProd_upper z).congr_fun ?_
   intro i
   show 1 + a (mirror (i : Idx f)) z = 1 + a (i : Idx f) z
   rw [a_mirror]
 
 /-- **`P f = (Qplus f)²` when the zeros are on the seam.** -/
-theorem P_eq_Qplus_sq (hs : OnSeam f) (z : ℂ) : P f z = Qplus f z * Qplus f z :=
-  ((hasProd_upper z).mul_compl (hasProd_lower hs z)).tprod_eq
+theorem P_eq_Qplus_sq' (hs : NoRealZero f) (z : ℂ) : P f z = Qplus f z * Qplus f z :=
+  ((hasProd_upper z).mul_compl (hasProd_lower' hs z)).tprod_eq
 
 theorem Qplus_half : Qplus f (1 / 2) = 1 := by
   unfold Qplus
@@ -148,13 +158,13 @@ theorem continuous_Qplus : Continuous (Qplus f) := by
   exact h.continuousAt (isOpen_ball.mem_nhds hR)
 
 /-- **`f = f(½) · Qplus f` when the zeros are on the seam.** -/
-theorem eq_centre_mul_Qplus (hs : OnSeam f) : f = fun z => f (1 / 2) * Qplus f z := by
+theorem eq_centre_mul_Qplus' (hs : NoRealZero f) : f = fun z => f (1 / 2) * Qplus f z := by
   have hU : EqOn f (fun z => f (1 / 2) * Qplus f z) (U f) := by
     apply IsPreconnected.eq_of_sq_eq (isPreconnected_U (f := f)) hf.diff.continuous.continuousOn
       (continuous_const.mul continuous_Qplus).continuousOn
     · intro z hz
       simp only [Pi.pow_apply, Pi.mul_apply]
-      rw [sq_eq_centre_mul_P (f := f), P_eq_Qplus_sq hs]
+      rw [sq_eq_centre_mul_P (f := f), P_eq_Qplus_sq' hs]
       ring
     · intro z hz
       exact mul_ne_zero hf.centre (Qplus_ne_zero (mult_eq_zero_of_ne_zero (f := f) hz))
@@ -170,7 +180,7 @@ theorem eq_centre_mul_Qplus (hs : OnSeam f) : f = fun z => f (1 / 2) * Qplus f z
 def approx (s : Finset ↥(upper f)) (z : ℂ) : ℂ := f (1 / 2) * ∏ i ∈ s, (1 + a (i : Idx f) z)
 
 /-- **The approximants converge to `f` locally uniformly.** -/
-theorem tendsto_approx (hs : OnSeam f) :
+theorem tendsto_approx' (hs : NoRealZero f) :
     TendstoLocallyUniformly (approx (f := f)) f atTop := by
   rw [tendstoLocallyUniformly_iff_forall_isCompact]
   intro K hK
@@ -184,7 +194,7 @@ theorem tendsto_approx (hs : OnSeam f) :
   intro ε hε
   have hc : 0 < ‖f (1 / 2 : ℂ)‖ + 1 := by positivity
   filter_upwards [h (ε / (‖f (1 / 2 : ℂ)‖ + 1)) (by positivity)] with s hs' z hz
-  have hfz : f z = f (1 / 2) * Qplus f z := congrFun (eq_centre_mul_Qplus hs) z
+  have hfz : f z = f (1 / 2) * Qplus f z := congrFun (eq_centre_mul_Qplus' hs) z
   rw [hfz]
   unfold approx
   rw [dist_eq_norm, ← mul_sub, norm_mul]
@@ -197,6 +207,27 @@ theorem tendsto_approx (hs : OnSeam f) :
     _ < (‖f (1 / 2)‖ + 1) * (ε / (‖f (1 / 2)‖ + 1)) := by
         apply mul_lt_mul_of_pos_left h1 hc
     _ = ε := by field_simp
+
+/-! ### The seam forms, as before -/
+
+theorem mirror_mem_upper_iff (hs : OnSeam f) (i : Idx f) : mirror i ∈ upper f ↔ i ∉ upper f :=
+  mirror_mem_upper_iff' hs.noRealZero i
+
+def upperEquivCompl (hs : OnSeam f) : ↥(upper f) ≃ ↥(upper f)ᶜ := upperEquivCompl' hs.noRealZero
+
+theorem hasProd_lower (hs : OnSeam f) (z : ℂ) :
+    HasProd ((fun i : Idx f => 1 + a i z) ∘ (Subtype.val : ↥(upper f)ᶜ → Idx f)) (Qplus f z) :=
+  hasProd_lower' hs.noRealZero z
+
+theorem P_eq_Qplus_sq (hs : OnSeam f) (z : ℂ) : P f z = Qplus f z * Qplus f z :=
+  P_eq_Qplus_sq' hs.noRealZero z
+
+theorem eq_centre_mul_Qplus (hs : OnSeam f) : f = fun z => f (1 / 2) * Qplus f z :=
+  eq_centre_mul_Qplus' hs.noRealZero
+
+theorem tendsto_approx (hs : OnSeam f) :
+    TendstoLocallyUniformly (approx (f := f)) f atTop :=
+  tendsto_approx' hs.noRealZero
 
 /-! ## The approximants are seam polynomials -/
 
