@@ -201,4 +201,268 @@ theorem norm_Ft_ofReal_le {t : ℝ} (ht : 0 < t) {x : ℝ} (hx : 0 ≤ x) :
     _ = 2 + (2 : ℝ) ^ (-x) * ∑' n, Fr t 0 n := by
         rw [hsg.tsum_add hs0, hg_sum, tsum_mul_left]
 
+/-! ## A zero-free `F_t` would be the exponential of a quadratic -/
+
+open InnerProductSpace in
+theorem exists_analytic_re_eq_log {t : ℝ} (ht : 0 < t) (h0 : ∀ s, Ft t s ≠ 0) :
+    ∃ H : ℂ → ℂ, Differentiable ℂ H ∧ ∀ s, (H s).re = Real.log ‖Ft t s‖ := by
+  have hharm : HarmonicOnNhd (fun s => Real.log ‖Ft t s‖) univ := by
+    intro s _
+    exact ((differentiable_Ft ht).analyticAt s).harmonicAt_log_norm (h0 s)
+  obtain ⟨H, hH, hre⟩ := HarmonicOnNhd.exists_analyticOnNhd_univ_re_eq hharm
+  refine ⟨H, ?_, fun s => ?_⟩
+  · exact differentiableOn_univ.mp hH.differentiableOn
+  · exact congrFun hre s
+
+/-- Borel–Carathéodory: a quadratic bound on `Re H` gives a quadratic bound on `‖H‖`. -/
+theorem norm_H_le {H : ℂ → ℂ} (hH : Differentiable ℂ H) {C₁ C₂ : ℝ} (hC₂ : 0 ≤ C₂)
+    (hre : ∀ s, (H s).re ≤ C₁ + C₂ * ‖s‖ ^ 2) {R : ℝ} (hR : 0 < R) {z : ℂ} (hz : ‖z‖ ≤ R) :
+    ‖H z‖ ≤ ‖H 0‖ + 2 * (|C₁| + ‖H 0‖ + 4 * C₂ * R ^ 2 + 1) := by
+  set M : ℝ := |C₁| + ‖H 0‖ + 4 * C₂ * R ^ 2 + 1 with hM
+  have hMpos : 0 < M := by positivity
+  set f : ℂ → ℂ := fun s => H s - H 0 with hf
+  have hfd : DifferentiableOn ℂ f (Metric.ball 0 (2 * R)) := (hH.sub_const _).differentiableOn
+  have hf₁ : Set.MapsTo f (Metric.ball 0 (2 * R)) {z | z.re ≤ M} := by
+    intro s hs
+    simp only [Set.mem_setOf_eq, hf, Complex.sub_re]
+    have h1 := hre s
+    have hs' : ‖s‖ < 2 * R := by simpa using hs
+    have h2 : C₂ * ‖s‖ ^ 2 ≤ C₂ * (2 * R) ^ 2 := by gcongr
+    have h3 := Complex.abs_re_le_norm (H 0)
+    have h4 := neg_abs_le (H 0).re
+    nlinarith [le_abs_self C₁, abs_nonneg C₁]
+  have hz' : z ∈ Metric.ball 0 (2 * R) := by
+    simp only [Metric.mem_ball, dist_zero_right]
+    linarith
+  have hbc := Complex.borelCaratheodory_zero hMpos hfd hf₁ (by positivity) hz' (by simp [hf])
+  have h2 : 2 * M * ‖z‖ / (2 * R - ‖z‖) ≤ 2 * M := by
+    rw [div_le_iff₀ (by linarith)]
+    nlinarith [norm_nonneg z]
+  calc ‖H z‖ = ‖f z + H 0‖ := by simp [hf]
+    _ ≤ ‖f z‖ + ‖H 0‖ := norm_add_le _ _
+    _ ≤ 2 * M + ‖H 0‖ := by linarith
+    _ = ‖H 0‖ + 2 * M := by ring
+
+/-- Cauchy's estimate: the third derivative of an entire function of quadratic growth vanishes. -/
+theorem iteratedDeriv_three_eq_zero {H : ℂ → ℂ} (hH : Differentiable ℂ H) {C₁ C₂ : ℝ}
+    (hC₂ : 0 ≤ C₂) (hre : ∀ s, (H s).re ≤ C₁ + C₂ * ‖s‖ ^ 2) (c : ℂ) :
+    iteratedDeriv 3 H c = 0 := by
+  set A : ℝ := ‖H 0‖ + 2 * (|C₁| + ‖H 0‖ + 16 * C₂ + 1) with hA
+  have hA0 : 0 ≤ A := by positivity
+  have hbound : ∀ R, 1 ≤ R → ‖c‖ ≤ R → ‖iteratedDeriv 3 H c‖ ≤ 6 * A / R := by
+    intro R hR hcR
+    have hR0 : 0 < R := by linarith
+    have hcau := Complex.norm_iteratedDeriv_le_of_forall_mem_sphere_norm_le 3 hR0
+      hH.diffContOnCl (C := ‖H 0‖ + 2 * (|C₁| + ‖H 0‖ + 4 * C₂ * (‖c‖ + R) ^ 2 + 1)) (fun z hz => by
+        have hz' : ‖z‖ ≤ ‖c‖ + R := by
+          have hd : dist z c = R := hz
+          calc ‖z‖ = ‖(z - c) + c‖ := by ring_nf
+            _ ≤ ‖z - c‖ + ‖c‖ := norm_add_le _ _
+            _ = R + ‖c‖ := by rw [← dist_eq_norm, hd]
+            _ = ‖c‖ + R := by ring
+        exact norm_H_le hH hC₂ hre (by positivity : 0 < ‖c‖ + R) hz')
+    refine hcau.trans ?_
+    have hnum : ‖H 0‖ + 2 * (|C₁| + ‖H 0‖ + 4 * C₂ * (‖c‖ + R) ^ 2 + 1) ≤ A * R ^ 2 := by
+      have e1 : (‖c‖ + R) ^ 2 ≤ 4 * R ^ 2 := by nlinarith [norm_nonneg c]
+      have e2 : 1 ≤ R ^ 2 := by nlinarith
+      have e3 : C₂ * (‖c‖ + R) ^ 2 ≤ C₂ * (4 * R ^ 2) := by gcongr
+      rw [hA]
+      nlinarith [norm_nonneg (H 0), abs_nonneg C₁]
+    calc (Nat.factorial 3 : ℝ) * (‖H 0‖ + 2 * (|C₁| + ‖H 0‖ + 4 * C₂ * (‖c‖ + R) ^ 2 + 1)) / R ^ 3
+        ≤ (Nat.factorial 3 : ℝ) * (A * R ^ 2) / R ^ 3 := by gcongr
+      _ = 6 * A / R := by
+          rw [show (Nat.factorial 3 : ℝ) = 6 by norm_num]
+          field_simp
+          first | done | ring
+  by_contra hne
+  have hpos : 0 < ‖iteratedDeriv 3 H c‖ := norm_pos_iff.mpr hne
+  set D := ‖iteratedDeriv 3 H c‖ with hD
+  set R : ℝ := max (max 1 ‖c‖) (6 * A / D + 1) with hR
+  have hR1 : 1 ≤ R := le_trans (le_max_left _ _) (le_max_left _ _)
+  have hRc : ‖c‖ ≤ R := le_trans (le_max_right _ _) (le_max_left _ _)
+  have hRA : 6 * A / D + 1 ≤ R := le_max_right _ _
+  have hb := hbound R hR1 hRc
+  have hR0 : 0 < R := by linarith
+  have : 6 * A / R < D := by
+    rw [div_lt_iff₀ hR0]
+    have : 6 * A / D * D = 6 * A := by field_simp
+    nlinarith
+  linarith
+
+/-- An entire function with vanishing third derivative is a quadratic. -/
+theorem eq_quadratic_of_iteratedDeriv_three {H : ℂ → ℂ} (hH : Differentiable ℂ H)
+    (h3 : ∀ c, iteratedDeriv 3 H c = 0) :
+    ∀ s, H s = H 0 + deriv H 0 * s + iteratedDeriv 2 H 0 / 2 * s ^ 2 := by
+  have hD1 : Differentiable ℂ (deriv H) := hH.deriv
+  have hD2 : Differentiable ℂ (deriv (deriv H)) := hD1.deriv
+  have h3' : ∀ c, deriv (deriv (deriv H)) c = 0 := by
+    intro c
+    have := h3 c
+    rwa [iteratedDeriv_succ, iteratedDeriv_succ, iteratedDeriv_one] at this
+  have hconst2 : ∀ s, deriv (deriv H) s = deriv (deriv H) 0 :=
+    fun s => is_const_of_deriv_eq_zero hD2 h3' s 0
+  set a := deriv (deriv H) 0 with ha
+  have hD1eq : ∀ s, deriv H s = deriv H 0 + a * s := by
+    intro s
+    have hφ : Differentiable ℂ (fun s => deriv H s - a * s) := hD1.sub (differentiable_id.const_mul _)
+    have hφ' : ∀ x, deriv (fun s => deriv H s - a * s) x = 0 := by
+      intro x
+      have hd : HasDerivAt (fun s => deriv H s - a * s) (deriv (deriv H) x - a * 1) x :=
+        (hD1 x).hasDerivAt.sub ((hasDerivAt_id x).const_mul a)
+      rw [hd.deriv, hconst2 x]
+      ring
+    have := is_const_of_deriv_eq_zero hφ hφ' s 0
+    simp only [mul_zero, sub_zero] at this
+    linear_combination this
+  intro s
+  have hψ : Differentiable ℂ (fun s => H s - (H 0 + deriv H 0 * s + a / 2 * s ^ 2)) := by
+    fun_prop
+  have hψ' : ∀ x, deriv (fun s => H s - (H 0 + deriv H 0 * s + a / 2 * s ^ 2)) x = 0 := by
+    intro x
+    have hd : HasDerivAt (fun s => H s - (H 0 + deriv H 0 * s + a / 2 * s ^ 2))
+        (deriv H x - (0 + deriv H 0 * 1 + a / 2 * (2 * x))) x := by
+      apply HasDerivAt.sub (hH x).hasDerivAt
+      apply HasDerivAt.add (HasDerivAt.add (hasDerivAt_const _ _) ((hasDerivAt_id x).const_mul _))
+      have := (hasDerivAt_pow 2 x).const_mul (a / 2)
+      simpa using this
+    rw [hd.deriv, hD1eq x]
+    ring
+  have := is_const_of_deriv_eq_zero hψ hψ' s 0
+  simp only [mul_zero, add_zero, zero_pow, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, sub_self] at this
+  have h2 : iteratedDeriv 2 H 0 = a := by
+    rw [iteratedDeriv_succ, iteratedDeriv_one]
+  rw [h2]
+  linear_combination this
+
+/-- A real quadratic bounded on `[0, ∞)` has no linear or quadratic term. -/
+theorem quad_bounded {α β γ B : ℝ} (h : ∀ x : ℝ, 0 ≤ x → |α * x ^ 2 + β * x + γ| ≤ B) :
+    α = 0 ∧ β = 0 := by
+  have hB : 0 ≤ B := le_trans (abs_nonneg _) (h 0 le_rfl)
+  have hα : α = 0 := by
+    by_contra hα
+    have hα' : 0 < |α| := abs_pos.mpr hα
+    set x : ℝ := (|β| + B + |γ| + 1) / |α| + 1 with hx
+    clear_value x
+    have hx1 : 1 ≤ x := by
+      have : 0 ≤ (|β| + B + |γ| + 1) / |α| := by positivity
+      linarith
+    have hx0 : 0 ≤ x := by linarith
+    have hxα : |α| * x ≥ |β| + B + |γ| + 1 := by
+      have : |α| * x = (|β| + B + |γ| + 1) + |α| := by
+        rw [hx]
+        field_simp
+        first | done | ring
+      linarith
+    have hq := h x hx0
+    have hlow : |α * x ^ 2 + β * x + γ| ≥ |α| * x ^ 2 - |β| * x - |γ| := by
+      have h1 : |α * x ^ 2 + β * x + γ| ≥ |α * x ^ 2| - |β * x + γ| := by
+        have := abs_sub_abs_le_abs_sub (α * x ^ 2) (-(β * x + γ))
+        rw [abs_neg, sub_neg_eq_add, ← add_assoc] at this
+        linarith
+      have h2 : |β * x + γ| ≤ |β| * x + |γ| := by
+        calc |β * x + γ| ≤ |β * x| + |γ| := abs_add_le _ _
+          _ = |β| * x + |γ| := by rw [abs_mul, abs_of_nonneg hx0]
+      rw [abs_mul, abs_pow, abs_of_nonneg hx0] at h1
+      linarith
+    have e1 : (|β| + B + |γ| + 1) * x ≤ |α| * x ^ 2 := by
+      have := mul_le_mul_of_nonneg_right hxα hx0
+      nlinarith
+    have e2 : |β| * x + (B + |γ| + 1) ≤ (|β| + B + |γ| + 1) * x := by
+      nlinarith [mul_nonneg (by positivity : (0 : ℝ) ≤ B + |γ| + 1) (sub_nonneg.mpr hx1)]
+    linarith [abs_nonneg γ]
+  refine ⟨hα, ?_⟩
+  subst hα
+  by_contra hβ
+  have hβ' : 0 < |β| := abs_pos.mpr hβ
+  set x : ℝ := (B + |γ| + 1) / |β| with hx
+  clear_value x
+  have hx0 : 0 ≤ x := by rw [hx]; positivity
+  have hxβ : |β| * x = B + |γ| + 1 := by rw [hx]; field_simp
+  have hq := h x hx0
+  have hlow : |0 * x ^ 2 + β * x + γ| ≥ |β| * x - |γ| := by
+    have := abs_sub_abs_le_abs_sub (β * x) (-γ)
+    rw [abs_neg, sub_neg_eq_add, abs_mul, abs_of_nonneg hx0] at this
+    simp only [zero_mul, zero_add]
+    linarith
+  linarith
+
+/-- **`F_t` has a zero.** -/
+theorem exists_zero_Ft {t : ℝ} (ht : 0 < t) : ∃ s, Ft t s = 0 := by
+  by_contra hno
+  push_neg at hno
+  obtain ⟨H, hH, hre⟩ := exists_analytic_re_eq_log ht hno
+  have hgrow : ∀ s, (H s).re ≤ (9 / (8 * t) + Real.log Z32) + (1 / (2 * t)) * ‖s‖ ^ 2 := by
+    intro s
+    rw [hre]
+    have h1 := log_norm_Ft_le ht s (hno s)
+    have h2 : s.re ^ 2 ≤ ‖s‖ ^ 2 := by
+      have := Complex.abs_re_le_norm s
+      nlinarith [abs_nonneg s.re, sq_abs s.re]
+    have h3 : s.re ^ 2 / (2 * t) ≤ (1 / (2 * t)) * ‖s‖ ^ 2 := by
+      rw [div_eq_mul_one_div, mul_comm]
+      gcongr
+    linarith
+  have h3 := iteratedDeriv_three_eq_zero hH (by positivity) hgrow
+  have hq := eq_quadratic_of_iteratedDeriv_three hH h3
+  set b := deriv H 0 with hb
+  set c := iteratedDeriv 2 H 0 / 2 with hc
+  have hq' : ∀ x : ℝ, Real.log ‖Ft t (x : ℂ)‖ = c.re * x ^ 2 + b.re * x + (H 0).re := by
+    intro x
+    rw [← hre, hq (x : ℂ), ← Complex.ofReal_pow]
+    simp only [Complex.add_re, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im, mul_zero,
+      sub_zero]
+    ring
+  have hK : 0 ≤ ‖Ft t 0‖ := norm_nonneg _
+  -- bounded on `[0, ∞)`
+  have hbdd : ∀ x : ℝ, 0 ≤ x →
+      |c.re * x ^ 2 + b.re * x + (H 0).re| ≤ |Real.log (2 + ‖Ft t 0‖)| + |Real.log 2| := by
+    intro x hx
+    rw [← hq' x]
+    have hlo := norm_Ft_ofReal_ge ht x
+    have hhi := norm_Ft_ofReal_le ht hx
+    have h2x : (2 : ℝ) ^ (-x) ≤ 1 := by
+      rw [Real.rpow_neg (by norm_num)]
+      exact inv_le_one_of_one_le₀ (Real.one_le_rpow (by norm_num) hx)
+    have hlog1 : Real.log 2 ≤ Real.log ‖Ft t (x : ℂ)‖ := Real.log_le_log (by norm_num) hlo
+    have hlog2 : Real.log ‖Ft t (x : ℂ)‖ ≤ Real.log (2 + ‖Ft t 0‖) := by
+      apply Real.log_le_log (by linarith)
+      have : (2 : ℝ) ^ (-x) * ‖Ft t 0‖ ≤ 1 * ‖Ft t 0‖ := by gcongr
+      linarith
+    rw [abs_le]
+    constructor
+    · have := neg_abs_le (Real.log 2)
+      have := abs_nonneg (Real.log (2 + ‖Ft t 0‖))
+      linarith
+    · have := le_abs_self (Real.log (2 + ‖Ft t 0‖))
+      have := abs_nonneg (Real.log 2)
+      linarith
+  obtain ⟨hcre, hbre⟩ := quad_bounded hbdd
+  -- so `log ‖F_t(x)‖ = log ‖F_t(0)‖` for all `x ≥ 0`
+  have hconst : ∀ x : ℝ, 0 ≤ x → Real.log ‖Ft t (x : ℂ)‖ = Real.log ‖Ft t 0‖ := by
+    intro x hx
+    have h0 : ((0 : ℝ) : ℂ) = 0 := by simp
+    rw [hq' x, hcre, hbre, ← h0, hq' 0]
+    simp
+  -- but `‖F_t(x)‖ ≤ 2 + 2^{−x}‖F_t(0)‖ < 2 + 2e^{−t log² 2} ≤ ‖F_t(0)‖` for `x` large
+  have hε : 0 < 2 * Real.exp (-t * Real.log 2 ^ 2) := by positivity
+  obtain ⟨N, hN⟩ := exists_pow_lt_of_lt_one (by positivity : 0 < 2 * Real.exp (-t * Real.log 2 ^ 2) / (‖Ft t 0‖ + 1))
+    (by norm_num : (1 / 2 : ℝ) < 1)
+  have hx : (2 : ℝ) ^ (-(N : ℝ)) * ‖Ft t 0‖ < 2 * Real.exp (-t * Real.log 2 ^ 2) := by
+    have e1 : (2 : ℝ) ^ (-(N : ℝ)) = (1 / 2) ^ N := by
+      rw [Real.rpow_neg (by norm_num), Real.rpow_natCast, one_div, inv_pow]
+    rw [e1]
+    have hK1 : ‖Ft t 0‖ < ‖Ft t 0‖ + 1 := by linarith
+    calc (1 / 2 : ℝ) ^ N * ‖Ft t 0‖ ≤ (1 / 2 : ℝ) ^ N * (‖Ft t 0‖ + 1) := by gcongr
+      _ < 2 * Real.exp (-t * Real.log 2 ^ 2) / (‖Ft t 0‖ + 1) * (‖Ft t 0‖ + 1) := by
+          gcongr
+      _ = 2 * Real.exp (-t * Real.log 2 ^ 2) := by
+          field_simp
+          first | done | ring
+  have hlo := norm_Ft_zero_ge ht
+  have hhi := norm_Ft_ofReal_le ht (x := (N : ℝ)) (by positivity)
+  have hlt : ‖Ft t ((N : ℝ) : ℂ)‖ < ‖Ft t 0‖ := by linarith
+  have hlog := Real.log_lt_log (by linarith [norm_Ft_ofReal_ge ht (N : ℝ)]) hlt
+  have := hconst (N : ℝ) (by positivity)
+  linarith
+
 end Soma.Holonics.RH.BohrZeros
