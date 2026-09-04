@@ -125,6 +125,7 @@ import ElementaryHolonics.RH.EventGaussian
 import ElementaryHolonics.RH.EventWindow
 import ElementaryHolonics.RH.EventPieces
 import ElementaryHolonics.RH.EventTail
+import ElementaryHolonics.RH.EventAssembly
 import ElementaryHolonics.RH.LogDerivativeRemainder
 import ElementaryHolonics.RH.LandauLemma
 import ElementaryHolonics.RH.ZeroFactorizationExists
