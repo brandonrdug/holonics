@@ -139,8 +139,27 @@ multiplicative form `gamma_eq_mul` with `norm_ρ_le : ‖ρ(w)‖ ≤ π/(2‖w�
 
 For repository `t > 0`, each flowed integer event after the shift `J_t` equals
 `γ_t(z) e^{−t log² n / 4} n^{−z} (1 + r_n(z))` with `|r_n(z)|` bounded as in Dobner's Lemma 4 under
-the three-range split of §0b. The shift `J_t` and `γ_t` are defined here from RT2. Owner
-`RH/DescentEvent.lean`.  
+the three-range split of §0b. The shift `J_t` and `γ_t` are defined here from RT2. Owners: the
+`RH/FlowedGamma`, `FlowedGammaContour`, `GammaPhase`, `EventSaddle`, `EventMain`, `EventBounds`,
+`EventGaussian`, `EventWindow`, `EventPieces`, `EventTail`, `EventAssembly`, `EventDefect`,
+`EventHorizontal`, `EventExplicit`, `EventMainRange`, `EventMedium`, and `EventLarge` family
+(one owner per organ; the single owner `RH/DescentEvent.lean` first written is withdrawn).
+
+*Returned 2026-09-03:* `EventAssembly.event_eq_main_mul`:
+`∫ flowedTerm t (J_t s) n = γ_t'(s) e^{−sL} e^{−tL²} (1 + r)` exactly, with
+`J_t(s) = s + t(Log(s/2) − log π)`, `γ_t'(s) = g(s) e^{tΛ(s)²/4}`, `L = log|n|`;
+`EventExplicit.norm_rdef_le_explicit` bounds `‖r‖` by four exhibited pieces; on the main range
+`L ≤ y^{1/3}`, `EventMainRange.event_main` gives `‖r‖ ≤ Bmaj t X u` for `u = y^{1/3} ≥ u₀(t, X)`
+with `tendsto_Bmaj : Bmaj → 0` (rate `O(y^{−1/3})`); on the medium range `L ≤ y^{7/12}`,
+`EventMedium.event_medium` gives `‖event‖ ≤ 12 ‖γ_t'(s)‖ e^{−xL} e^{−tL²/2}`; on the large range
+`L ≥ y^{7/12}`, `EventLarge.event_large` gives `‖event‖ ≤ ‖γ_t'(s)‖ e^{−xL} e^{−(c/2)L²}`,
+`c = min(t,1)/8`; all uniform on `|x| ≤ X` for each fixed `X ≥ 0`, all on `propext`,
+`Classical.choice`, `Quot.sound`. The split `y^{1/3}`, `y^{7/12}` replaces Dobner's
+`y^{1/3}`, `y^{3/5}` (any exponent in `(1/2, 2/3)` serves; `7/12` makes every threshold an
+integer power of `w = y^{1/12}`); receipt
+[`the RT3 record`](../research/records/2026-09-03_RT3_EVERY_FLOWED_INTEGER_EVENT_IS_ITS_STEEPEST_DESCENT_MAIN_TERM_ON_THREE_RANGES_WITH_THE_DEFECT_EXHIBITED.md).
+**RT3 passes.**
+
 **Pass RT3:** the per-event identity with its remainder bound, formal-checked.  
 **Falsifier:** an `n`, `z` in the window outside the bound.
 

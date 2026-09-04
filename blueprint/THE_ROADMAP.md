@@ -92,7 +92,20 @@ convergence dichotomy. Coefficient-specific branch selection and a certified dec
 research and schedule nothing. Brandon's direct correction of 2026-09-02 closes HTP at this bounded
 handoff and activates the engine HNA campaign.
 
-**RH line position:** RT3 (the descent-route RT campaign; RT0–RT2 passed)
+**RH line position:** RT4 (the descent-route RT campaign; RT0–RT3 passed)
+
+[proved-derived; formal-checked] RT3 passed: the `RH/Event*` family returned, for repository
+`t > 0`, the exact per-event decomposition
+`∫ flowedTerm t (J_t s) n = γ_t'(s) e^{−sL} e^{−tL²} (1 + r)` after the shift
+`J_t(s) = s + t(Log(s/2) − log π)`, by the saddle contour `Re z = Re s + 2tL`, the rectangle
+exchange to `Re z = 2`, and the phase expansion of RT2's Stirling; on the main range
+`L ≤ y^{1/3}` the defect obeys `‖r‖ ≤ Bmaj t X u → 0` beyond an explicit threshold
+(`EventMainRange.event_main`, rate `O(y^{−1/3})`), on the medium range `L ≤ y^{7/12}` the event
+is at most `12 ‖γ_t'(s)‖ e^{−xL} e^{−tL²/2}` (`EventMedium.event_medium`), and on the large
+range it is at most `‖γ_t'(s)‖ e^{−xL} e^{−(c/2)L²}` with `c = min(t,1)/8`
+(`EventLarge.event_large`); uniform on `|x| ≤ X` for each fixed `X`; every theorem on
+`propext`, `Classical.choice`, `Quot.sound`; root umbrella 9,831 jobs. The receipt is
+[`the RT3 record`](../research/records/2026-09-03_RT3_EVERY_FLOWED_INTEGER_EVENT_IS_ITS_STEEPEST_DESCENT_MAIN_TERM_ON_THREE_RANGES_WITH_THE_DEFECT_EXHIBITED.md).
 
 [proved-derived; formal-checked] RT2 passed: `RH/GammaStirling.lean` returned Stirling with a
 remainder on the sector `{w ≠ 0 : 0 ≤ Re w ∨ |Re w| ≤ |Im w|}`,

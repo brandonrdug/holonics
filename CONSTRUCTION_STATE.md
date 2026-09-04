@@ -218,7 +218,7 @@ is
 de Bruijn--Newman time is `t = -4u` after `s = 1/2 + i z/2`. Its Lean theorems stand, but the direct
 standard-`H_t` interpretation is retracted pending the RH0/RH1 bridge.
 
-**RH line position:** RT3 (the descent-route RT campaign; RT0–RT2 passed)
+**RH line position:** RT4 (the descent-route RT campaign; RT0–RT3 passed)
 
 [definition] Brandon's direct instruction of 2026-09-03 activates the `FT0--FT6` Foster-tank and
 threshold campaign on the RH line under
@@ -299,7 +299,16 @@ the sector `{w ≠ 0 : 0 ≤ Re w ∨ |Re w| ≤ |Im w|}` with `‖μ(w)‖ ≤ 
 multiplicative form with `‖ρ(w)‖ ≤ π/(2‖w‖)` for `‖w‖ ≥ 1`; every theorem on the three axioms;
 root umbrella 9,814 jobs. The receipt is
 [`research/records/2026-09-03_RT2_STIRLING_HOLDS_ON_THE_SECTOR_WITH_THE_REMAINDER_EXHIBITED_AND_NO_LOGARITHM_OF_GAMMA_IS_TAKEN.md`](research/records/2026-09-03_RT2_STIRLING_HOLDS_ON_THE_SECTOR_WITH_THE_REMAINDER_EXHIBITED_AND_NO_LOGARITHM_OF_GAMMA_IS_TAKEN.md).
-RT3 (each flowed event by steepest descent) is current.
+RT3 passed: the `RH/Event*` family returned the exact per-event decomposition
+`∫ flowedTerm t (J_t s) n = γ_t'(s) e^{−sL} e^{−tL²} (1 + r)` after the shift
+`J_t(s) = s + t(Log(s/2) − log π)`, with `‖r‖ ≤ Bmaj t X u → 0` on the main range `L ≤ y^{1/3}`
+beyond an explicit threshold (`EventMainRange.event_main`), the absolute bound
+`12 ‖γ_t'(s)‖ e^{−xL} e^{−tL²/2}` on the medium range `L ≤ y^{7/12}`
+(`EventMedium.event_medium`), and `‖γ_t'(s)‖ e^{−xL} e^{−(min(t,1)/16) L²}` on the large range
+(`EventLarge.event_large`), uniform on `|x| ≤ X` for each fixed `X`; every theorem on the three
+axioms; root umbrella 9,831 jobs. The receipt is
+[`research/records/2026-09-03_RT3_EVERY_FLOWED_INTEGER_EVENT_IS_ITS_STEEPEST_DESCENT_MAIN_TERM_ON_THREE_RANGES_WITH_THE_DEFECT_EXHIBITED.md`](research/records/2026-09-03_RT3_EVERY_FLOWED_INTEGER_EVENT_IS_ITS_STEEPEST_DESCENT_MAIN_TERM_ON_THREE_RANGES_WITH_THE_DEFECT_EXHIBITED.md).
+RT4 (the approximation theorem: the sum over the three ranges) is current.
 
 [definition] Use `c_CD` for the Copson--de Bruijn sharp coefficient and reserve `Λ_DN` for the
 coordinate-corrected de Bruijn--Newman threshold. The correction record is
