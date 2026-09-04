@@ -427,4 +427,263 @@ theorem norm_rdef_le_Bmaj {t : ℝ} (ht : 0 < t) {X : ℝ} (hX0 : 0 ≤ X) {s : 
   unfold Bmaj
   gcongr
 
+/-! ## The majorant vanishes at infinity -/
+
+theorem tendsto_quartic_atBot {a : ℝ} (ha : 0 < a) (A B C D : ℝ) :
+    Tendsto (fun u : ℝ => -a * u ^ 4 + A * u ^ 3 + B * u ^ 2 + C * u + D) atTop atBot := by
+  have h1 : Tendsto (fun u : ℝ => -a + A / u + B / u ^ 2 + C / u ^ 3 + D / u ^ 4) atTop
+      (𝓝 (-a + 0 + 0 + 0 + 0)) :=
+    (((tendsto_const_nhds.add (tendsto_const_nhds.div_atTop tendsto_id)).add
+      (tendsto_const_nhds.div_atTop (tendsto_pow_atTop (by norm_num)))).add
+      (tendsto_const_nhds.div_atTop (tendsto_pow_atTop (by norm_num)))).add
+      (tendsto_const_nhds.div_atTop (tendsto_pow_atTop (by norm_num)))
+  simp only [add_zero] at h1
+  have h2 : Tendsto (fun u : ℝ => u ^ 4 * (-a + A / u + B / u ^ 2 + C / u ^ 3 + D / u ^ 4)) atTop
+      atBot :=
+    Tendsto.atTop_mul_neg (by linarith) (tendsto_pow_atTop (by norm_num)) h1
+  refine h2.congr' ?_
+  filter_upwards [eventually_gt_atTop 0] with u hu
+  field_simp
+  first | done | ring
+
+theorem tendsto_exp_quartic {a : ℝ} (ha : 0 < a) (A B C D : ℝ) :
+    Tendsto (fun u : ℝ => Real.exp (-a * u ^ 4 + A * u ^ 3 + B * u ^ 2 + C * u + D)) atTop (𝓝 0) :=
+  Real.tendsto_exp_atBot.comp (tendsto_quartic_atBot ha A B C D)
+
+theorem tendsto_const_div (c : ℝ) : Tendsto (fun u : ℝ => c / u) atTop (𝓝 0) :=
+  tendsto_const_nhds.div_atTop tendsto_id
+
+theorem tendsto_Amaj (t : ℝ) : Tendsto (fun u => Amaj t u) atTop (𝓝 0) := tendsto_const_div _
+theorem tendsto_Bmaj' (t : ℝ) : Tendsto (fun u => Bmaj' t u) atTop (𝓝 0) := tendsto_const_div _
+theorem tendsto_β₃maj (t : ℝ) : Tendsto (fun u => β₃maj t u) atTop (𝓝 0) := tendsto_const_div _
+
+theorem tendsto_β₄maj {t : ℝ} (ht : 0 < t) : Tendsto (fun u => β₄maj t u) atTop (𝓝 0) := by
+  have hc : 0 < c₃ t / 800 := by unfold c₃; positivity
+  have h := (tendsto_exp_quartic hc 0 0 0 0).const_mul (2 * Real.exp (8 * t) * √(2 * π / c₃ t))
+  rw [mul_zero] at h
+  refine h.congr' (Eventually.of_forall fun u => ?_)
+  simp only [β₄maj]
+  rw [show -(c₃ t / 2) * (u ^ 2 / 20) ^ 2 =
+    -(c₃ t / 800) * u ^ 4 + 0 * u ^ 3 + 0 * u ^ 2 + 0 * u + 0 by ring]
+
+theorem tendsto_Dmaj {t : ℝ} (ht : 0 < t) : Tendsto (fun u => Dmaj t u) atTop (𝓝 0) := by
+  have h := ((tendsto_β₃maj t).add (tendsto_β₄maj ht)).const_mul (Real.exp 1 / √(2 * π * t))
+  simpa [Dmaj] using h
+
+theorem Mmaj_le_exp {t X : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) {u : ℝ} (hu : 1 ≤ u) :
+    Mmaj t X u ≤ Real.exp (-(1 / (6400 * t)) * u ^ 4 + 0 * u ^ 3 +
+      (c₁ t X ^ 2 / (4 * t) + (cZ t X + 3) * (cξ t X + 1) / 2) * u ^ 2 +
+      (2 * (cZ t X + 3) + 2 * cξ t X) * u + 2) := by
+  have hu0 : 0 < u := by linarith
+  have hcξ : 0 ≤ cξ t X := by unfold cξ; positivity
+  have hcZ : 2 ≤ cZ t X := by unfold cZ; linarith
+  have hu3 : 1 ≤ u ^ 3 := one_le_pow₀ hu
+  have hb : 1 ≤ cZ t X * u ^ 3 := by nlinarith
+  have hb0 : 0 < cZ t X * u ^ 3 := by linarith
+  have hlogb : Real.log (cZ t X * u ^ 3) ≤ (cZ t X + 3) * u := by
+    rw [Real.log_mul (by positivity) (by positivity), Real.log_pow]
+    have := Real.log_le_sub_one_of_pos (by linarith : 0 < cZ t X)
+    have := Real.log_le_sub_one_of_pos hu0
+    push_cast
+    nlinarith
+  have hlogb0 : 0 ≤ Real.log (cZ t X * u ^ 3) := Real.log_nonneg hb
+  have e1 : (cZ t X * u ^ 3) ^ ((cξ t X * u + 1) / 2) ≤
+      Real.exp ((cZ t X + 3) * (cξ t X + 1) / 2 * u ^ 2) := by
+    rw [Real.rpow_def_of_pos hb0]
+    apply Real.exp_le_exp.mpr
+    have h1 : cξ t X * u + 1 ≤ (cξ t X + 1) * u := by nlinarith
+    calc Real.log (cZ t X * u ^ 3) * ((cξ t X * u + 1) / 2)
+        ≤ ((cZ t X + 3) * u) * (((cξ t X + 1) * u) / 2) := by gcongr
+      _ = (cZ t X + 3) * (cξ t X + 1) / 2 * u ^ 2 := by ring
+  have e2 : (cZ t X * u ^ 3) ^ 2 ≤ Real.exp (2 * (cZ t X + 3) * u) := by
+    rw [← Real.exp_log (by positivity : 0 < (cZ t X * u ^ 3) ^ 2), Real.log_pow]
+    apply Real.exp_le_exp.mpr
+    push_cast
+    nlinarith
+  have e3 : (π * Real.exp 1) ^ (cξ t X * u / 2) ≤ Real.exp (2 * cξ t X * u) := by
+    rw [Real.rpow_def_of_pos (by positivity)]
+    apply Real.exp_le_exp.mpr
+    rw [Real.log_mul (by positivity) (by positivity), Real.log_exp]
+    have := Real.log_le_sub_one_of_pos Real.pi_pos
+    have := Real.pi_le_four
+    have : 0 ≤ cξ t X * u := by positivity
+    nlinarith
+  have e4 : Real.exp (π / 4) * (√(2 * π) / 2) ≤ Real.exp 2 := by
+    have h1 : Real.exp (π / 4) ≤ Real.exp 1 := Real.exp_le_exp.mpr (by linarith [Real.pi_le_four])
+    have h2 : √(2 * π) ≤ 3 := by
+      calc √(2 * π) ≤ √9 := Real.sqrt_le_sqrt (by nlinarith [Real.pi_le_four])
+        _ = 3 := by rw [show (9 : ℝ) = 3 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]
+    have h3 : Real.exp 2 = Real.exp 1 * Real.exp 1 := by
+      rw [← Real.exp_add]; norm_num
+    have h4 := Real.add_one_le_exp (1 : ℝ)
+    have h5 := Real.exp_pos (1 : ℝ)
+    have h6 := Real.exp_pos (π / 4)
+    rw [h3]
+    nlinarith [Real.sqrt_nonneg (2 * π)]
+  have hA0 : 0 ≤ (cZ t X * u ^ 3) ^ 2 := sq_nonneg _
+  have hB0 : 0 ≤ (cZ t X * u ^ 3) ^ ((cξ t X * u + 1) / 2) := Real.rpow_nonneg hb0.le _
+  have hC0 : 0 ≤ (π * Real.exp 1) ^ (cξ t X * u / 2) := Real.rpow_nonneg (by positivity) _
+  unfold Mmaj
+  calc Real.exp ((c₁ t X ^ 2 * u ^ 2 - u ^ 4 / 1600) / (4 * t)) *
+        (Real.exp (π / 4) * (√(2 * π) / 2 * (cZ t X * u ^ 3) ^ 2 *
+          (cZ t X * u ^ 3) ^ ((cξ t X * u + 1) / 2) * (π * Real.exp 1) ^ (cξ t X * u / 2)))
+      = Real.exp ((c₁ t X ^ 2 * u ^ 2 - u ^ 4 / 1600) / (4 * t)) *
+        ((Real.exp (π / 4) * (√(2 * π) / 2)) * ((cZ t X * u ^ 3) ^ 2 *
+          (cZ t X * u ^ 3) ^ ((cξ t X * u + 1) / 2) * (π * Real.exp 1) ^ (cξ t X * u / 2))) := by
+        ring
+    _ ≤ Real.exp ((c₁ t X ^ 2 * u ^ 2 - u ^ 4 / 1600) / (4 * t)) *
+        (Real.exp 2 * (Real.exp (2 * (cZ t X + 3) * u) *
+          Real.exp ((cZ t X + 3) * (cξ t X + 1) / 2 * u ^ 2) * Real.exp (2 * cξ t X * u))) := by
+        apply mul_le_mul_of_nonneg_left _ (Real.exp_pos _).le
+        apply mul_le_mul e4 _ (by positivity) (Real.exp_pos _).le
+        exact mul_le_mul (mul_le_mul e2 e1 hB0 (Real.exp_pos _).le) e3 hC0 (by positivity)
+    _ = Real.exp (-(1 / (6400 * t)) * u ^ 4 + 0 * u ^ 3 +
+        (c₁ t X ^ 2 / (4 * t) + (cZ t X + 3) * (cξ t X + 1) / 2) * u ^ 2 +
+        (2 * (cZ t X + 3) + 2 * cξ t X) * u + 2) := by
+        rw [← Real.exp_add, ← Real.exp_add, ← Real.exp_add, ← Real.exp_add]
+        congr 1
+        field_simp
+        ring
+
+theorem Tmaj_le_exp {t X : ℝ} (ht : 0 < t) {u : ℝ} (hu : 1 ≤ u) :
+    Tmaj t X u ≤ Real.exp (-(1 / (25600 * t)) * u ^ 4 + 1 * u ^ 3 +
+      (c₁ t X ^ 2 / (4 * t)) * u ^ 2 + 0 * u + (4 * √t + √(64 * π * t))) := by
+  have hu0 : 0 ≤ u := by linarith
+  unfold Tmaj
+  have hE := Real.exp_pos (c₁ t X ^ 2 * u ^ 2 / (4 * t))
+  have e1 : 2 * (Real.exp (c₁ t X ^ 2 * u ^ 2 / (4 * t)) / (2 * π)) ≤
+      Real.exp (c₁ t X ^ 2 * u ^ 2 / (4 * t)) := by
+    calc 2 * (Real.exp (c₁ t X ^ 2 * u ^ 2 / (4 * t)) / (2 * π))
+        = Real.exp (c₁ t X ^ 2 * u ^ 2 / (4 * t)) / π := by
+          field_simp
+          first | done | ring
+      _ ≤ Real.exp (c₁ t X ^ 2 * u ^ 2 / (4 * t)) :=
+          div_le_self hE.le (by linarith [Real.pi_gt_three])
+  have e2 : 1 + u ^ 3 + 4 * √t ≤ Real.exp (u ^ 3 + 4 * √t) := by
+    have := Real.add_one_le_exp (u ^ 3 + 4 * √t); linarith
+  have e3 : √(64 * π * t) ≤ Real.exp (√(64 * π * t)) := by
+    have := Real.add_one_le_exp (√(64 * π * t)); linarith
+  calc 2 * (Real.exp (c₁ t X ^ 2 * u ^ 2 / (4 * t)) / (2 * π)) * (1 + u ^ 3 + 4 * √t) *
+        √(64 * π * t) * Real.exp (-(u ^ 4 / (25600 * t)))
+      ≤ Real.exp (c₁ t X ^ 2 * u ^ 2 / (4 * t)) * Real.exp (u ^ 3 + 4 * √t) *
+        Real.exp (√(64 * π * t)) * Real.exp (-(u ^ 4 / (25600 * t))) := by
+        gcongr
+    _ = Real.exp (-(1 / (25600 * t)) * u ^ 4 + 1 * u ^ 3 +
+        (c₁ t X ^ 2 / (4 * t)) * u ^ 2 + 0 * u + (4 * √t + √(64 * π * t))) := by
+        rw [← Real.exp_add, ← Real.exp_add, ← Real.exp_add]
+        congr 1
+        field_simp
+        ring
+
+theorem Γmaj_le_exp {t X : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) {u : ℝ} (hu : 1 ≤ u) :
+    Γmaj t X u ≤ Real.exp (π * u ^ 3 + 3 * (X + 1) / 2 * u + (Real.log (1 / cg X) + t * π ^ 2 / 4)) := by
+  have hu0 : 0 < u := by linarith
+  unfold Γmaj
+  have hcg := cg_pos X
+  have e1 : 1 / cg X = Real.exp (Real.log (1 / cg X)) := (Real.exp_log (by positivity)).symm
+  have hu3 : 1 ≤ u ^ 3 := one_le_pow₀ hu
+  have e2 : (2 * u ^ 3) ^ ((X + 1) / 2) ≤ Real.exp (3 * (X + 1) / 2 * u) := by
+    rw [Real.rpow_def_of_pos (by positivity)]
+    apply Real.exp_le_exp.mpr
+    have hl : Real.log (2 * u ^ 3) ≤ 3 * u := by
+      rw [Real.log_mul (by norm_num) (by positivity), Real.log_pow]
+      have := Real.log_two_lt_d9
+      have := Real.log_le_sub_one_of_pos hu0
+      push_cast
+      nlinarith
+    have hl0 : 0 ≤ Real.log (2 * u ^ 3) := Real.log_nonneg (by nlinarith)
+    calc Real.log (2 * u ^ 3) * ((X + 1) / 2) ≤ 3 * u * ((X + 1) / 2) := by gcongr
+      _ = 3 * (X + 1) / 2 * u := by ring
+  calc 1 / cg X * (2 * u ^ 3) ^ ((X + 1) / 2) * Real.exp (π * u ^ 3) * Real.exp (t * π ^ 2 / 4)
+      ≤ Real.exp (Real.log (1 / cg X)) * Real.exp (3 * (X + 1) / 2 * u) * Real.exp (π * u ^ 3) *
+        Real.exp (t * π ^ 2 / 4) := by
+        rw [← e1]
+        gcongr
+    _ = Real.exp (π * u ^ 3 + 3 * (X + 1) / 2 * u + (Real.log (1 / cg X) + t * π ^ 2 / 4)) := by
+        rw [← Real.exp_add, ← Real.exp_add, ← Real.exp_add]
+        congr 1
+        ring
+
+/-- The exponent majorizing the `M`-part of `Emaj`. -/
+def PM (t X u : ℝ) : ℝ := -(1 / (6400 * t)) * u ^ 4 + π * u ^ 3 +
+  (c₁ t X ^ 2 / (4 * t) + (cZ t X + 3) * (cξ t X + 1) / 2) * u ^ 2 +
+  (2 * (cZ t X + 3) + 2 * cξ t X + 2 * cξ t X + 3 * (X + 1) / 2) * u +
+  (2 + Real.log ((√(4 * π * t))⁻¹) + Real.log (1 / cg X) + t * π ^ 2 / 4)
+/-- The exponent majorizing the `T`-part of `Emaj`. -/
+def PT (t X u : ℝ) : ℝ := -(1 / (25600 * t)) * u ^ 4 + (1 + π) * u ^ 3 +
+  (c₁ t X ^ 2 / (4 * t)) * u ^ 2 + (3 * (X + 1) / 2) * u +
+  (4 * √t + √(64 * π * t) + Real.log ((√(4 * π * t))⁻¹) + Real.log (1 / cg X) + t * π ^ 2 / 4)
+
+theorem Emaj_le_exp {t X : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) {u : ℝ} (hu : 1 ≤ u) :
+    Emaj t X u ≤ Real.exp (PM t X u) + Real.exp (PT t X u) := by
+  have hu0 : 0 < u := by linarith
+  have hcξ : 0 ≤ cξ t X := by unfold cξ; positivity
+  have hM := Mmaj_le_exp ht hX0 hu
+  have hT := Tmaj_le_exp (X := X) ht hu
+  have hΓ := Γmaj_le_exp ht hX0 hu
+  have hk : (√(4 * π * t))⁻¹ = Real.exp (Real.log ((√(4 * π * t))⁻¹)) :=
+    (Real.exp_log (by positivity)).symm
+  have hcu : 2 * (cξ t X * u) ≤ Real.exp (2 * cξ t X * u) := by
+    have := Real.add_one_le_exp (2 * cξ t X * u); linarith
+  have hMm0 : 0 ≤ Mmaj t X u := Mmaj_nonneg (by unfold cZ cξ; positivity)
+  have hTm0 := Tmaj_nonneg (X := X) ht hu0.le
+  have hΓ0 : 0 ≤ Γmaj t X u := by
+    unfold Γmaj
+    have := cg_pos X
+    have := Real.rpow_nonneg (by positivity : (0 : ℝ) ≤ 2 * u ^ 3) ((X + 1) / 2)
+    positivity
+  unfold Emaj
+  calc (2 * Mmaj t X u * (cξ t X * u) + Tmaj t X u) * (√(4 * π * t))⁻¹ * Γmaj t X u
+      = (Mmaj t X u * (2 * (cξ t X * u)) + Tmaj t X u) * (√(4 * π * t))⁻¹ * Γmaj t X u := by ring
+    _ ≤ (Real.exp (-(1 / (6400 * t)) * u ^ 4 + 0 * u ^ 3 +
+          (c₁ t X ^ 2 / (4 * t) + (cZ t X + 3) * (cξ t X + 1) / 2) * u ^ 2 +
+          (2 * (cZ t X + 3) + 2 * cξ t X) * u + 2) * Real.exp (2 * cξ t X * u) +
+          Real.exp (-(1 / (25600 * t)) * u ^ 4 + 1 * u ^ 3 +
+          (c₁ t X ^ 2 / (4 * t)) * u ^ 2 + 0 * u + (4 * √t + √(64 * π * t)))) *
+        Real.exp (Real.log ((√(4 * π * t))⁻¹)) *
+        Real.exp (π * u ^ 3 + 3 * (X + 1) / 2 * u + (Real.log (1 / cg X) + t * π ^ 2 / 4)) := by
+        rw [← hk]
+        apply mul_le_mul (mul_le_mul_of_nonneg_right _ (by positivity)) hΓ hΓ0 (by positivity)
+        exact add_le_add (mul_le_mul hM hcu (by positivity) (Real.exp_pos _).le) hT
+    _ = Real.exp (PM t X u) + Real.exp (PT t X u) := by
+        unfold PM PT
+        rw [add_mul, add_mul]
+        simp only [← Real.exp_add]
+        congr 1 <;> congr 1 <;> ring
+
+theorem tendsto_Emaj {t X : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) :
+    Tendsto (fun u => Emaj t X u) atTop (𝓝 0) := by
+  have hPM : Tendsto (fun u => Real.exp (PM t X u)) atTop (𝓝 0) :=
+    tendsto_exp_quartic (by positivity) _ _ _ _
+  have hPT : Tendsto (fun u => Real.exp (PT t X u)) atTop (𝓝 0) :=
+    tendsto_exp_quartic (by positivity) _ _ _ _
+  have h := hPM.add hPT
+  rw [add_zero] at h
+  refine squeeze_zero' ?_ ?_ h
+  · filter_upwards [eventually_ge_atTop 1] with u hu
+    have hu0 : 0 ≤ u := by linarith
+    have hMm0 : 0 ≤ Mmaj t X u := Mmaj_nonneg (by unfold cZ cξ; positivity)
+    have hTm0 := Tmaj_nonneg (X := X) ht hu0
+    have hcξ : 0 ≤ cξ t X := by unfold cξ; positivity
+    have hΓ0 : 0 ≤ Γmaj t X u := by
+      unfold Γmaj
+      have := cg_pos X
+      have := Real.rpow_nonneg (by positivity : (0 : ℝ) ≤ 2 * u ^ 3) ((X + 1) / 2)
+      positivity
+    unfold Emaj
+    positivity
+  · filter_upwards [eventually_ge_atTop 1] with u hu
+    exact Emaj_le_exp ht hX0 hu
+
+/-- **The majorant of the relative defect vanishes as `u → ∞`.** -/
+theorem tendsto_Bmaj {t X : ℝ} (ht : 0 < t) (hX0 : 0 ≤ X) :
+    Tendsto (fun u => Bmaj t X u) atTop (𝓝 0) := by
+  have hA := tendsto_Amaj t
+  have hB := tendsto_Bmaj' t
+  have hD := tendsto_Dmaj ht
+  have hE := tendsto_Emaj ht hX0
+  have h1 : Tendsto (fun _ : ℝ => (1 : ℝ)) atTop (𝓝 1) := tendsto_const_nhds
+  have h := ((((hA.mul (h1.add hB)).add hB).mul (h1.add hD)).add hD).add hE
+  simpa [Bmaj] using h
+
 end Soma.Holonics.RH.EventMainRange
