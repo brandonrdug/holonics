@@ -132,6 +132,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                         row_addresses: &[],
                         withdrawals: &withdrawals,
                         tile_window: Some((first_row, tile_rows)),
+                        seal: self.terminal_seal,
                     };
                     enact_segment(&site, &operations[cursor..])?
                 };

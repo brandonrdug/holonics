@@ -405,6 +405,26 @@ face is recorded open. The receipt is
 The rest of SKE4 (declared-withdrawal cones, the class ecologies with their collapsed pairs, the
 seal through `soulkiller::dismantle`) is open and runs on this session.
 
+[established-bounded; implemented-exact; measured] **SKE4 returned** on 2026-09-03 at the
+layer-block role grain, on the segment session, from one command
+(`applications/athena-alpha/examples/condensation_seal_ske4.rs deed`). The family's 127 declared
+withdrawals founded declared-withdrawal cones: single withdrawals first (2 to 56 of 127 roles
+load-bearing per exposure, none refused), then the joint withdrawal of each union's complement,
+which changed every face, then the extension along the excitation order founded jointly over
+each class's exposures and over the family's, verified once more under every lens. The class
+cones hold 99 to 115 of 127 roles, the family cone 117, the
+insufficiency 28,160 of 1,333,248 sites; the family cone's complement leaves all
+15 faces. The return crossed `soulkiller::dismantle`; the rest (9,383,686,281 octets against
+15,036,138,068 of coefficients) mounts every class body from the stored presentation alone,
+which reproduced 15 of 15 member faces and refused at admission all 60 of 60 non-member exposures.
+Each class states its species by its exhibited remainder: 2 condensation (nothing collapsed;
+the propagated enclosure at the face, all 262,144 coordinates, widest 150 grains, is the
+certificate) and 3 compression (collapsed pairs of the family's occurrences with their
+separating words). Every class body descends on every declared word. The prefix
+declaration at 637 roles (39 order inversions, 102 apparatus refusals) is withdrawn as testimony,
+and the exact carrier's refusal of some withdrawals is recorded. The receipt is
+[`the SKE4 return`](../research/records/2026-09-03_SKE4_THE_DECLARED_WITHDRAWALS_FOUND_ROLE_CONES_THE_CLASS_BODIES_CARRY_THEIR_REMAINDER_AND_THE_RETURN_CROSSES_THE_BOUNDARY.md).
+
 ### SKE5 -- Eros composes the classes and the recurrence runs on them
 
 [definition] Eros composes the class ecologies into one Athena variant; the HNA recurrence runs

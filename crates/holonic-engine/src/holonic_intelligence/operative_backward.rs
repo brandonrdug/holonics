@@ -234,7 +234,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         }
         // Enacted by segments with the forward's own successor projection, so the replay is the
         // cycle's carrier; every produced carrier is retained for the return.
-        self.enact_run(first, last + 1, &rows, &BTreeMap::new(), true)?;
+        self.enact_run(first, last + 1, &rows, &BTreeMap::new(), true, false)?;
         Ok(())
     }
 

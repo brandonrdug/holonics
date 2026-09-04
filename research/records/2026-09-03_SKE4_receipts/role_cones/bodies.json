@@ -1,0 +1,157 @@
+[
+  {
+    "class": 0,
+    "mount_seconds": 11.418996287,
+    "faces": [
+      [
+        0,
+        0,
+        236832,
+        236832,
+        true
+      ],
+      [
+        0,
+        1,
+        236810,
+        236810,
+        true
+      ],
+      [
+        0,
+        2,
+        236770,
+        236770,
+        true
+      ]
+    ],
+    "member_faces_agree": 3,
+    "member_faces": 3,
+    "non_members_refused": 12,
+    "non_members": 12
+  },
+  {
+    "class": 1,
+    "mount_seconds": 10.925635024,
+    "faces": [
+      [
+        1,
+        0,
+        236819,
+        236819,
+        true
+      ],
+      [
+        1,
+        1,
+        236800,
+        236800,
+        true
+      ],
+      [
+        1,
+        2,
+        236770,
+        236770,
+        true
+      ]
+    ],
+    "member_faces_agree": 3,
+    "member_faces": 3,
+    "non_members_refused": 12,
+    "non_members": 12
+  },
+  {
+    "class": 2,
+    "mount_seconds": 5.228002576,
+    "faces": [
+      [
+        2,
+        0,
+        236832,
+        236832,
+        true
+      ],
+      [
+        2,
+        1,
+        236825,
+        236825,
+        true
+      ],
+      [
+        2,
+        2,
+        236770,
+        236770,
+        true
+      ]
+    ],
+    "member_faces_agree": 3,
+    "member_faces": 3,
+    "non_members_refused": 12,
+    "non_members": 12
+  },
+  {
+    "class": 3,
+    "mount_seconds": 4.7869079150000005,
+    "faces": [
+      [
+        3,
+        0,
+        236800,
+        236800,
+        true
+      ],
+      [
+        3,
+        1,
+        236812,
+        236812,
+        true
+      ],
+      [
+        3,
+        2,
+        236832,
+        236832,
+        true
+      ]
+    ],
+    "member_faces_agree": 3,
+    "member_faces": 3,
+    "non_members_refused": 12,
+    "non_members": 12
+  },
+  {
+    "class": 4,
+    "mount_seconds": 4.788577888,
+    "faces": [
+      [
+        4,
+        0,
+        236828,
+        236828,
+        true
+      ],
+      [
+        4,
+        1,
+        236828,
+        236828,
+        true
+      ],
+      [
+        4,
+        2,
+        236770,
+        236770,
+        true
+      ]
+    ],
+    "member_faces_agree": 3,
+    "member_faces": 3,
+    "non_members_refused": 12,
+    "non_members": 12
+  }
+]

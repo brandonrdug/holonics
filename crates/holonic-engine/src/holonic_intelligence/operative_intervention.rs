@@ -738,7 +738,8 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                 );
             }
         }
-        let steps = self.enact_run(start, terminal_start, &rows, &withdrawals, false)?;
+        // A counterfactual: the session's checkpoints are not overwritten by withdrawn carriers.
+        let steps = self.enact_run(start, terminal_start, &rows, &withdrawals, false, false)?;
         drop(withdrawals);
         let mut enacted = steps.len();
         let boundary = self.ecology.operations[terminal_start..].to_vec();

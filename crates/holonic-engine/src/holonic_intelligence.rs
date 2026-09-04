@@ -48,6 +48,10 @@ mod operative_intervention;
 mod operative_identification;
 #[path = "holonic_intelligence/operative_segment.rs"]
 mod operative_segment;
+#[path = "holonic_intelligence/operative_roles.rs"]
+mod operative_roles;
+#[path = "holonic_intelligence/operative_condensation.rs"]
+mod operative_condensation;
 #[path = "holonic_intelligence/profile.rs"]
 mod profile;
 #[path = "holonic_intelligence/repeated_circulation.rs"]
@@ -78,6 +82,8 @@ pub use operative_residence::*;
 pub use operative_session::*;
 pub use operative_intervention::*;
 pub use operative_identification::*;
+pub use operative_roles::*;
+pub use operative_condensation::*;
 pub use profile::*;
 pub use repeated_circulation::*;
 pub use rested::*;

@@ -1,0 +1,296 @@
+{
+  "round": 0,
+  "cones": [
+    {
+      "order": "order_class0",
+      "occurrences": [
+        0
+      ],
+      "prefix_roles": 477,
+      "roles": 637,
+      "cone_sites": 1288960,
+      "sites": 1333248,
+      "brackets": [
+        [
+          0,
+          0,
+          437,
+          477
+        ],
+        [
+          0,
+          1,
+          437,
+          477
+        ],
+        [
+          0,
+          2,
+          517,
+          238
+        ]
+      ],
+      "refused_probes": 6,
+      "resolved": false
+    },
+    {
+      "order": "order_class1",
+      "occurrences": [
+        1
+      ],
+      "prefix_roles": 517,
+      "roles": 637,
+      "cone_sites": 1299968,
+      "sites": 1333248,
+      "brackets": [
+        [
+          1,
+          0,
+          477,
+          517
+        ],
+        [
+          1,
+          1,
+          437,
+          477
+        ],
+        [
+          1,
+          2,
+          477,
+          358
+        ]
+      ],
+      "refused_probes": 9,
+      "resolved": false
+    },
+    {
+      "order": "order_class2",
+      "occurrences": [
+        2
+      ],
+      "prefix_roles": 517,
+      "roles": 637,
+      "cone_sites": 1300224,
+      "sites": 1333248,
+      "brackets": [
+        [
+          2,
+          0,
+          437,
+          477
+        ],
+        [
+          2,
+          1,
+          477,
+          517
+        ],
+        [
+          2,
+          2,
+          517,
+          358
+        ]
+      ],
+      "refused_probes": 12,
+      "resolved": false
+    },
+    {
+      "order": "order_class3",
+      "occurrences": [
+        3
+      ],
+      "prefix_roles": 517,
+      "roles": 637,
+      "cone_sites": 1300224,
+      "sites": 1333248,
+      "brackets": [
+        [
+          3,
+          0,
+          557,
+          477
+        ],
+        [
+          3,
+          1,
+          477,
+          517
+        ],
+        [
+          3,
+          2,
+          477,
+          517
+        ]
+      ],
+      "refused_probes": 6,
+      "resolved": false
+    },
+    {
+      "order": "order_class4",
+      "occurrences": [
+        4
+      ],
+      "prefix_roles": 398,
+      "roles": 637,
+      "cone_sites": 1261056,
+      "sites": 1333248,
+      "brackets": [
+        [
+          4,
+          0,
+          597,
+          358
+        ],
+        [
+          4,
+          1,
+          398,
+          358
+        ],
+        [
+          4,
+          2,
+          477,
+          398
+        ]
+      ],
+      "refused_probes": 9,
+      "resolved": true
+    },
+    {
+      "order": "order_family",
+      "occurrences": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "prefix_roles": 557,
+      "roles": 637,
+      "cone_sites": 1310976,
+      "sites": 1333248,
+      "brackets": [
+        [
+          0,
+          0,
+          557,
+          477
+        ],
+        [
+          0,
+          1,
+          437,
+          477
+        ],
+        [
+          0,
+          2,
+          517,
+          398
+        ],
+        [
+          1,
+          0,
+          477,
+          517
+        ],
+        [
+          1,
+          1,
+          477,
+          517
+        ],
+        [
+          1,
+          2,
+          517,
+          398
+        ],
+        [
+          2,
+          0,
+          477,
+          398
+        ],
+        [
+          2,
+          1,
+          477,
+          398
+        ],
+        [
+          2,
+          2,
+          517,
+          437
+        ],
+        [
+          3,
+          0,
+          557,
+          437
+        ],
+        [
+          3,
+          1,
+          477,
+          517
+        ],
+        [
+          3,
+          2,
+          517,
+          557
+        ],
+        [
+          4,
+          0,
+          437,
+          477
+        ],
+        [
+          4,
+          1,
+          437,
+          398
+        ],
+        [
+          4,
+          2,
+          477,
+          358
+        ]
+      ],
+      "refused_probes": 60,
+      "resolved": false
+    }
+  ],
+  "next": {
+    "order_class0": [],
+    "order_class1": [
+      479,
+      482,
+      484,
+      487,
+      489,
+      492,
+      494,
+      497,
+      499,
+      502,
+      504,
+      507,
+      509,
+      512,
+      514
+    ],
+    "order_class2": [],
+    "order_class3": [],
+    "order_family": []
+  }
+}

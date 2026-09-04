@@ -1,0 +1,120 @@
+{
+  "grain": "layer-block",
+  "roles": 127,
+  "sites": 1333248,
+  "extent_roles": 117,
+  "extent_sites": 1305088,
+  "insufficiency_sites": 28160,
+  "family_complement_unchanged_everywhere": true,
+  "classes": [
+    {
+      "ordinal": 0,
+      "occurrences": [
+        0
+      ],
+      "materials": [
+        "7 + 5 ="
+      ],
+      "cone_roles": 109,
+      "cone_sites": 1282560,
+      "species": "compression",
+      "collapsed_pairs": 1,
+      "member_faces_changed": 0,
+      "cone_withdrawn_changed_everywhere": true,
+      "propagated_nonpoint": [
+        262144,
+        262144,
+        262144
+      ]
+    },
+    {
+      "ordinal": 1,
+      "occurrences": [
+        1
+      ],
+      "materials": [
+        "9 + 3 ="
+      ],
+      "cone_roles": 115,
+      "cone_sites": 1299456,
+      "species": "condensation",
+      "collapsed_pairs": 0,
+      "member_faces_changed": 0,
+      "cone_withdrawn_changed_everywhere": true,
+      "propagated_nonpoint": [
+        262144,
+        262144,
+        262144
+      ]
+    },
+    {
+      "ordinal": 2,
+      "occurrences": [
+        2
+      ],
+      "materials": [
+        "7 + 6 ="
+      ],
+      "cone_roles": 110,
+      "cone_sites": 1285376,
+      "species": "condensation",
+      "collapsed_pairs": 0,
+      "member_faces_changed": 0,
+      "cone_withdrawn_changed_everywhere": true,
+      "propagated_nonpoint": [
+        262144,
+        262144,
+        262144
+      ]
+    },
+    {
+      "ordinal": 3,
+      "occurrences": [
+        3
+      ],
+      "materials": [
+        "3 + 4 ="
+      ],
+      "cone_roles": 106,
+      "cone_sites": 1271296,
+      "species": "compression",
+      "collapsed_pairs": 5,
+      "member_faces_changed": 0,
+      "cone_withdrawn_changed_everywhere": true,
+      "propagated_nonpoint": [
+        262144,
+        262144,
+        262144
+      ]
+    },
+    {
+      "ordinal": 4,
+      "occurrences": [
+        4
+      ],
+      "materials": [
+        "8 + 8 ="
+      ],
+      "cone_roles": 99,
+      "cone_sites": 1243136,
+      "species": "compression",
+      "collapsed_pairs": 5,
+      "member_faces_changed": 0,
+      "cone_withdrawn_changed_everywhere": true,
+      "propagated_nonpoint": [
+        262144,
+        262144,
+        262144
+      ]
+    }
+  ],
+  "rest_octets": 9383686281,
+  "rest_sha256": "e76a301e11e2a98fa709652ec47fdff27047cebc38696472003b4629d1b17c6e",
+  "full_coefficient_octets": 15036138068,
+  "retained_rows_by_restriction": {
+    "addressed": 21,
+    "sites": 1305088,
+    "whole": 283986
+  },
+  "elapsed_seconds": 30.963551095
+}

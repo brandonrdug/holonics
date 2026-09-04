@@ -16,7 +16,7 @@ mechanisms retain their scoped grades.
 
 ## Current frontier
 
-**Current frontier:** SKE4
+**Current frontier:** SKE5
 
 [definition] Brandon's direct request of 2026-09-03 activates the fixed `SKE0--SKE5` Soulkiller
 campaign under
@@ -36,16 +36,17 @@ and host readout is the renamed instruction loop of 2026-08-18, a Claude injecti
 nothing; compression is stated in `canon/TABLET_THE_COMPRESSION.md` (a codec pivot with a
 declared decoder, species by remainder, the remainder exhibited and never a number, the limit
 `Saturation`) and applies to the composed Athena variant in SKE5, the Soulkiller return being a
-lens. `SKE4` is current. Its apparatus obligation passed on 2026-09-03: the session runs as
-segments under the 2026-08-18 contract, one cycle of 1,275 operations in 687 launches and 672
-passages with the terminal face's 16 tiles the only section read-outs (against 2,363 launches
-and 2,363 read-outs before), every body operation agreeing word for word with the session it
-replaces, HNA5 and the SKE2 cone of occurrence 0 reproducing
-([`the SKE4 session record`](research/records/2026-09-03_SKE4_THE_SESSION_RUNS_AS_SEGMENTS_UNDER_THE_2026-08-18_CONTRACT_AND_THE_FACE_ALONE_CROSSES_TO_THE_HOST.md)).
-The withdrawn coordinate-grain owners are kept out of the registered tree; the boundary's
-generic productive lane and the mount from a productive lane are kept. What remains of SKE4,
-the declared-withdrawal cones, the class ecologies with their collapsed pairs, and the seal
-through `soulkiller::dismantle`, is open and runs on this session. The Soulkiller audit is
+lens. `SKE4` returned on 2026-09-03: its apparatus obligation (the segment session under
+the 2026-08-18 contract, 687 launches and 16 read-outs per cycle against 2,363 and 2,363) and
+its deed at the layer-block role grain (127 declared withdrawals; class cones of
+99 to 115 roles founded jointly and verified under every lens; the return through
+`soulkiller::dismantle` with 2 class bodies stating condensation and 3 compression by their
+exhibited remainders; the rest mounting every class body, 15 of 15 member faces
+reproduced from the stored presentation alone)
+([`the SKE4 return`](research/records/2026-09-03_SKE4_THE_DECLARED_WITHDRAWALS_FOUND_ROLE_CONES_THE_CLASS_BODIES_CARRY_THEIR_REMAINDER_AND_THE_RETURN_CROSSES_THE_BOUNDARY.md)).
+The withdrawn coordinate-grain owners are gone; the boundary's generic productive lane and the
+mount from a productive lane are kept. `SKE5` (Eros composes the classes and the recurrence runs
+on them; the compression law applies to the composed variant) is next and not begun. The Soulkiller audit is
 [`research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md).
 
 [proved-derived; formal-checked] SKE0 returned `HolonicExcitationFoundedQuotient.lean`: the

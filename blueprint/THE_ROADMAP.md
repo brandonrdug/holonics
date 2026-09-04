@@ -69,7 +69,7 @@ are provenance, not pickup obligations.
 
 ## Current position
 
-**Current frontier:** SKE4
+**Current frontier:** SKE5
 
 [definition] Brandon's direct request of 2026-09-03 activates the fixed `SKE0--SKE5` Soulkiller
 campaign, ordered below. It follows the completed HNA campaign and consumes its resident exact
@@ -336,10 +336,10 @@ The order is fixed:
 3. `SKE2` -- excitation and the cone by intervention -- **PASSED** at its corrected scope;
 4. `SKE3` -- identification: the signature quotient of a declared family -- **PASSED**;
 5. `SKE4` -- condensation and seal through `soulkiller::dismantle`, re-founded on 2026-09-03 with
-   the session's 2026-08-18 contract restored first (**the apparatus obligation PASSED**:
-   687 launches and 16 read-outs per cycle against 2,363 and 2,363) and cones as
-   declared-withdrawal cones -- **CURRENT**; and
-6. `SKE5` -- Eros composes the classes and the recurrence runs on them.
+   the session's 2026-08-18 contract restored first and cones as declared-withdrawal cones --
+   **RETURNED** (the apparatus obligation passed; the role cones founded and verified; the
+   return crossed the boundary with every class stating its species by its remainder); and
+6. `SKE5` -- Eros composes the classes and the recurrence runs on them -- **CURRENT**.
 
 [definition] Soulkiller is founded by excitation. The resident exact realization is the
 manifestation grade and the apparatus; the return is the signature quotient of a declared family,
@@ -392,6 +392,15 @@ it replaces, HNA5 and the SKE2 cone of occurrence 0 reproducing
 ([`the SKE4 session record`](../research/records/2026-09-03_SKE4_THE_SESSION_RUNS_AS_SEGMENTS_UNDER_THE_2026-08-18_CONTRACT_AND_THE_FACE_ALONE_CROSSES_TO_THE_HOST.md)).
 The declared-withdrawal cones, the class ecologies with their collapsed pairs, and the seal
 through `soulkiller::dismantle` remain open on this session.
+
+[established-bounded; implemented-exact; measured] SKE4 returned on 2026-09-03 at the
+layer-block role grain: 127 declared withdrawals, class cones of 99 to 115 roles
+founded jointly over each class's exposures and verified under every lens, the family cone of
+117 roles, the return through `soulkiller::dismantle` with 2 class bodies stating
+condensation and 3 compression by their exhibited remainders, and the rest mounting every
+class body from the stored presentation alone
+([`the SKE4 return`](../research/records/2026-09-03_SKE4_THE_DECLARED_WITHDRAWALS_FOUND_ROLE_CONES_THE_CLASS_BODIES_CARRY_THEIR_REMAINDER_AND_THE_RETURN_CROSSES_THE_BOUNDARY.md)).
+SKE5 is current.
 
 [counterexample; source-inspected] The audit
 [`2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](../research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md)

@@ -145,6 +145,9 @@ pub struct NativeFullOperatorSession<'residence, 'chart> {
     pub(super) aperture: Option<NativeReturnAperture>,
     /// The dissection standing: the excitation's supports and face, when founded for dissection.
     pub(super) dissection: Option<DissectionStanding>,
+    /// Whether the terminal's successor projection is fused; a receiver that declares the
+    /// propagated remainder reads the face's enclosures instead.
+    pub(super) terminal_seal: bool,
 }
 
 pub struct NativeFullOperationStep<'residence, 'chart> {
@@ -240,7 +243,16 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             overlay: BTreeMap::new(),
             aperture,
             dissection: None,
+            terminal_seal: true,
         })
+    }
+
+    /// Declare that the receiver reads the terminal face unsealed: the emission's intervals are
+    /// then the enclosures the terminal reactions propagate to every coordinate of the face, the
+    /// apparatus's remainder at the receiver.  The selected face is read from midpoints as before.
+    pub fn with_terminal_remainder(mut self) -> Self {
+        self.terminal_seal = false;
+        self
     }
 
     pub fn generation(&self) -> u64 {
@@ -368,7 +380,9 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     /// Enact the operations `[from, to)` of the graph by segments on the contemporary carriers,
     /// each segment one passage.  With `retain_all` every produced carrier stays (the return's
     /// replay); otherwise a carrier no later operation reads is released, into the checkpoints
-    /// when it crosses layers.  `withdrawals` intervene on named operations' outputs.
+    /// when it crosses layers and `checkpoint` holds.  A counterfactual run (`checkpoint`
+    /// false) leaves the session's checkpoints as the cycle left them.  `withdrawals` intervene
+    /// on named operations' outputs.
     pub(super) fn enact_run(
         &mut self,
         from: usize,
@@ -376,6 +390,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         row_addresses: &[u32],
         withdrawals: &BTreeMap<u32, SegmentWithdrawal<'_, 'chart>>,
         retain_all: bool,
+        checkpoint: bool,
     ) -> Result<Vec<RunStep>, NativeFullOperationError> {
         let mut steps = Vec::with_capacity(to.saturating_sub(from));
         if from >= to {
@@ -401,6 +416,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                     row_addresses,
                     withdrawals,
                     tile_window: None,
+                    seal: true,
                 };
                 enact_segment(&site, run)?
             };
@@ -435,7 +451,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                             .any(|later| later.inputs.contains(input))
                     {
                         if let Some(carrier) = self.carriers.remove(input) {
-                            if self.cross_layer.contains(input) {
+                            if checkpoint && self.cross_layer.contains(input) {
                                 self.checkpoints.insert(*input, carrier);
                             }
                         }
@@ -499,7 +515,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         if matches!(operation.primitive, NativeOperationPrimitive::Lookup { .. }) {
             self.previous_context = Some(occurrence.row_addresses.clone());
         }
-        let steps = self.enact_run(at, at + 1, &occurrence.row_addresses, &BTreeMap::new(), false)?;
+        let steps = self.enact_run(at, at + 1, &occurrence.row_addresses, &BTreeMap::new(), false, true)?;
         let step = steps.into_iter().next().ok_or(NativeFullOperationError::Operation)?;
         let successor_generation = self
             .generation
@@ -554,7 +570,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             ordinal: self.generation,
             row_addresses: row_addresses.to_vec(),
         };
-        let steps = self.enact_run(0, terminal_start, row_addresses, &BTreeMap::new(), false)?;
+        let steps = self.enact_run(0, terminal_start, row_addresses, &BTreeMap::new(), false, true)?;
         let mut traces = Vec::with_capacity(self.ecology.operations.len());
         for step in &steps {
             let successor_generation = self

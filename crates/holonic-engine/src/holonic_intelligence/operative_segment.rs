@@ -91,6 +91,10 @@ pub(super) struct SegmentSite<'a, 'chart> {
     /// For a tiled boundary: the rows `(first_row, rows)` of the segment's contraction population
     /// this passage aligns and contracts, so a population wider than the slot crosses tile by tile.
     pub tile_window: Option<(usize, usize)>,
+    /// Whether the successor projection is fused after every widening operation.  A declared
+    /// receiver may read the terminal unsealed: its enclosures are then the apparatus's propagated
+    /// remainder at the face, per coordinate, and the seal is withheld for the whole segment.
+    pub seal: bool,
 }
 
 /// One operation planned before capture: its output section, its admission, whether it widens,
@@ -610,7 +614,7 @@ pub(super) fn enact_segment<'chart>(
                 tail = b + 2 * count;
             }
         }
-        if plan.widens {
+        if plan.widens && site.seal {
             lineage.push(vec![tail]);
             tail = lineage.len() - 1;
         }
@@ -724,7 +728,7 @@ pub(super) fn enact_segment<'chart>(
                 tail = b + 2 * count;
             }
         }
-        if plan.widens {
+        if plan.widens && site.seal {
             let index = tail + 1;
             let sealed = plan.joined();
             {

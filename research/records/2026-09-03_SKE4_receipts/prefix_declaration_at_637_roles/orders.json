@@ -1,0 +1,28 @@
+{
+  "classes": [
+    [
+      0
+    ],
+    [
+      1
+    ],
+    [
+      2
+    ],
+    [
+      3
+    ],
+    [
+      4
+    ]
+  ],
+  "roles": 637,
+  "orders": [
+    "order_class0",
+    "order_class1",
+    "order_class2",
+    "order_class3",
+    "order_class4",
+    "order_family"
+  ]
+}
