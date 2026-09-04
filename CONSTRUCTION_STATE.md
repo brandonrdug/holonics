@@ -57,10 +57,10 @@ On 2026-09-04 Sol's review ([`the review`](research/records/2026-09-04_SOL_REVIE
 withdrew the SKE4 and SKE5 passes with verified counterexamples (the role sets are not founded
 cones; the species are stated off the class bodies' domain; the SKE5 width differences cross
 grains; one session was not run; the saturation counter is not `Saturated`; no release receiver
-ran; the deed's processes exceed the absolute process aperture). SKE4 stands at its apparatus
-obligation and its bounded testimony; SKE5 does not stand. The corrections are open and two
-rulings are Brandon's: whether the HNA1 operator graph may be an Athena variant's hot law, and
-how the absolute process aperture is honored by a deed whose natural unit exceeds it. The Soulkiller audit is
+ran). Its jurisdiction and process-aperture points are answered by Brandon's ruling of
+2026-09-04 in `AGENTS.md`: the construction is what was directed and the cap is a hang guard.
+SKE4 stands at its apparatus obligation and its bounded testimony; SKE5 does not stand; the
+technical corrections are open and are the next deed. The Soulkiller audit is
 [`research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md).
 
 [proved-derived; formal-checked] SKE0 returned `HolonicExcitationFoundedQuotient.lean`: the

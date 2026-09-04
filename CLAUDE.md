@@ -62,8 +62,10 @@ cones of 99 to 115 roles jointly; the return through `soulkiller::dismantle` wit
 class bodies stating condensation and 3 compression by their exhibited remainders); `SKE5`
 and the SKE4 role-cone return were withdrawn on 2026-09-04 by Sol's review (the role sets
 are not founded cones, the species are off their domain, the SKE5 width differences cross
-grains, one session was not run, no release receiver ran, the processes exceed the absolute
-aperture); SKE5 is current with the corrections open and two rulings Brandon's. The completed HNA contract is
+grains, one session was not run, no release receiver ran); SKE5 is current with those
+corrections open; Brandon's ruling of 2026-09-04 (`AGENTS.md`) answers the review's
+jurisdiction and process points: the construction is what was directed, and the 180-second cap
+is a hang guard, not a deed bound. The completed HNA contract is
 [`blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md`](blueprint/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md).
 HNA0 returned the recurrent formal owner. HNA1 returned the complete source-neutral text-operator
 ecology: 1,275 nodes over 42 layers, all 719 coefficient populations resident once, 665 configured

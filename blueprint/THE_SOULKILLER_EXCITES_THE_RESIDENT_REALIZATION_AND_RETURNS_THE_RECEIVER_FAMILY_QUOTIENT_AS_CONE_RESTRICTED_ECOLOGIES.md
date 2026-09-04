@@ -472,13 +472,12 @@ the witness; the SKE5 width differences subtract widths at grain `2^-43` from wi
 without rebasing; SKE5 founded a fresh session per exposure instead of one continuing session;
 its saturation counter is not the formal `Saturated`; `NativeExposureTestimony.monotone` was
 written `true` unconditionally; the contraction consumer bound discards overlay growth; "672
-passages" is a trace artifact (687 launches); no release receiver ran; and the deed's child
-processes exceed 180 s wall time under a heartbeat guard, which the contract's absolute process
-aperture does not permit. Two questions are put to Brandon: whether the HNA1 operator graph
-(layers, attention topology, shared keys and values) may be an Athena variant's hot law at all,
-which the Soulkiller clause of `AGENTS.md` reads against, and how the absolute process aperture
-is to be honored by a deed whose natural unit exceeds it. Until the corrections and the rulings,
-SKE4 stands at its apparatus obligation and its bounded testimony, and SKE5 does not stand.
+passages" is a trace artifact (687 launches); and no release receiver ran. Sol's two further
+points, that the class ecologies carry a foreign tower under the old scrapyard clause of
+`AGENTS.md` and that the deed's child processes breach the absolute process aperture, are
+answered by Brandon's ruling of 2026-09-04 (`AGENTS.md`, retraction record): the construction is
+what was directed and the cap is a hang guard. Until the technical corrections, SKE4 stands at
+its apparatus obligation and its bounded testimony, and SKE5 does not stand.
 
 ## 7. Falsifiers
 

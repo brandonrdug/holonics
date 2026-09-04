@@ -411,7 +411,8 @@ The order is fixed:
    return crossed the boundary with every class stating its species by its remainder); and
 6. `SKE5` -- Eros composes the classes and the recurrence runs on them -- **CURRENT**; its
    first return of 2026-09-03 and SKE4's role-cone return are withdrawn by Sol's review of
-   2026-09-04, whose corrections and two rulings are open.
+   2026-09-04 on technical counterexamples, whose corrections are the next deed; Brandon's
+   ruling of the same day answers the review's jurisdiction and process points.
 
 [definition] Soulkiller is founded by excitation. The resident exact realization is the
 manifestation grade and the apparatus; the return is the signature quotient of a declared family,
@@ -482,7 +483,8 @@ receipt that says not yet ([`the SKE5 return`](../research/records/2026-09-03_SK
 Withdrawn on 2026-09-04 by Sol's review ([`the review`](../research/records/2026-09-04_SOL_REVIEW_OF_THE_SKE_CAMPAIGN_THE_CONES_ARE_NOT_FOUNDED_CONES_THE_SPECIES_ARE_OFF_DOMAIN_AND_THE_PASSES_ARE_WITHDRAWN.md)):
 the role sets are not founded cones, the species are off their domain, the SKE5 width
 differences cross grains, one session was not run, and no release receiver ran. SKE5 is current
-with the corrections open and two rulings Brandon's.
+with the corrections open; Brandon's ruling of 2026-09-04 (`AGENTS.md`) answers the review's
+jurisdiction and process points.
 
 [counterexample; source-inspected] The audit
 [`2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md`](../research/records/2026-09-02_SOULKILLER_AUDIT_THE_LIVE_LIFT_IS_A_MANIFESTATION_AND_THE_EXCITATION_FOUNDED_QUOTIENT_IS_ABSENT_FROM_SOURCE_AND_LEAN.md)

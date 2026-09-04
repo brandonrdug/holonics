@@ -334,6 +334,16 @@ returns.
   returns is format-free: whether an emission was admitted, which carriers it carried, and its
   diagnostic as octets. The interior derives the returned interaction from those faces; an
   application never types it.
+- **Brandon, 2026-09-04, ruling.** The SKE construction of 2026-09-03 is what was directed: the
+  resident exact realization (the HNA1 operator ecology, source-neutral as HNA1 returned it) is
+  the apparatus of the excitation-founded quotient; the class ecologies restricted to their
+  cones and the variant Eros composes from them are Athena material, and the old scrapyard
+  clause's "foreign tower" test does not apply to them. That clause and the Soulkiller reading
+  of `AGENTS.md` it belonged to were the problematic notes Brandon named on 2026-09-03 ("it was
+  plaguing us and part of Sol's behavioral issues"), and the SKE blueprint re-founded Soulkiller
+  because Soulkiller was incomplete under them. A review that reads the old clause against the
+  directed construction reads a retracted note; it cannot withdraw the construction. Likewise the
+  180-second cap is the hang guard stated above and nothing more.
 - **Brandon, 2026-09-03, ruling.** "We care about group characteristics of flux, we cannot do
   anything with absolute positions and exact relational details on one grain"; "Holonics deals
   in exact and deterministic relationship coupling." Read with his 2026-08-16 correction
@@ -668,7 +678,8 @@ returns.
   factorization, explicit insufficiency, a sealed source-neutral native transport scaffold, source-detached
   remount, matched siblings, and targeted spool ablation. A renamed tensor container or equal
   output on one corpus does not grade it.
-- **Soulkiller is the one-way foreign-realization scrapyard boundary.** Any source-specific
+- [superseded 2026-09-04 by Brandon's ruling, below] **Soulkiller is the one-way
+  foreign-realization scrapyard boundary.** Any source-specific
   coordinate, operator factorization, state/cache convention, topology, identity, or execution law
   may be load-bearing only inside its intake, excitation, dissection, reconstruction, and
   matched controls. Its return is
@@ -811,7 +822,14 @@ return is absent.
 The complete gate is a **release receiver**, never an edit-loop command. Validation is proportional
 to the closure which changed:
 
-**Absolute process aperture, ratified 2026-08-25:** no process started by an agent may run longer
+**Absolute process aperture, ratified 2026-08-25; its meaning ruled 2026-09-04:** the 180-second
+cap exists to eliminate churn and the awaiting of hung processes started by an agent. It is a
+hang guard, not a bound on a deed's wall time and not a production law; a card deed whose
+natural unit runs longer runs as one command with an in-process guard that aborts a hung step
+and says where (Brandon, 2026-09-04: "it's just a time-cap that prevents you from leaving
+hanging processes open, it's not for production launches"). Sectioning a deed into processes to
+fit the cap is the churn the cap exists against. The paragraph that follows is retained as the
+earlier wording. No process started by an agent may run longer
 than 180 seconds wall time. This is an exterior apparatus limit, never a semantic capacity, batch
 size, context bound, or stopping law. Wrap every potentially nontrivial invocation in an outer hard
 180-second boundary. If the requested deed cannot return an atomic addressed artifact inside that
