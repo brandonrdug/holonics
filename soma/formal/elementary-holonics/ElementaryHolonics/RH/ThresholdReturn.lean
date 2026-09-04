@@ -6,13 +6,15 @@ import ElementaryHolonics.RH.DescentZeros
 # FT6 and RT6: the threshold, and the return of the campaign
 
 The campaign's exact form of the target is `RH ⟺ Λ_DN = 0` with `Λ_DN = sInf seamTimes` from the
-actual kernel. One standing theorem of the literature is not returned by this line and is
-carried here as a named port, which is neither the target nor implies it: de Bruijn's bound
-(`½` is a seam time). Rodgers–Tao's `0 ≤ Λ_DN` was a second port until the descent-route
-campaign RT0–RT6 returned it as `DescentZeros.Λ_DN_nonneg`; it is now a theorem. Given de
-Bruijn's bound alone, `RH ⟺ Λ_DN = 0`. The **first exact missing inequality** of the line is
-therefore `Λ_DN ≤ 0` itself, whose falsifier is the null falsifier of the conjecture: a zero of
-`ξ` off the seam. Every theorem is discharged with no `sorryAx`.
+actual kernel. Two standing theorems of the literature were carried here as named ports, neither
+the target nor implying it: de Bruijn's bound (`½` is a seam time) and Rodgers–Tao's
+`0 ≤ Λ_DN`. Both are now theorems of the tree: Rodgers–Tao's by the descent-route campaign
+(`DescentZeros.Λ_DN_nonneg`, `rodgersTaoNonneg` below), de Bruijn's by the de Bruijn campaign
+(`DeBruijnLimit.eighth_mem_seamTimes`, `DeBruijnSeal.deBruijnBound`, which imports this file), so
+`DeBruijnSeal.riemannHypothesis_iff_Λ_DN_eq : RiemannHypothesis ↔ Λ_DN = 0` holds with no
+hypothesis. The **first exact missing inequality** of the line is `Λ_DN ≤ 0` itself, whose
+falsifier is the null falsifier of the conjecture: a zero of `ξ` off the seam. Every theorem is
+discharged with no `sorryAx`.
 -/
 
 noncomputable section

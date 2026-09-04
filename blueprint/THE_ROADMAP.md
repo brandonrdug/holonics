@@ -92,7 +92,20 @@ convergence dichotomy. Coefficient-specific branch selection and a certified dec
 research and schedule nothing. Brandon's direct correction of 2026-09-02 closes HTP at this bounded
 handoff and activates the engine HNA campaign.
 
-**RH line position:** DB4 (the de Bruijn campaign; DB0–DB3 passed: the strip of `ξ`, the
+**RH line position:** DB complete (the de Bruijn campaign; DB0–DB5 passed;
+`RiemannHypothesis ↔ Λ_DN = 0` holds with no port, `Λ_DN ∈ [0, 1/8]`, `Λstd = 4 Λ_DN ∈ [0, ½]`,
+the RH0/RH1 bridge is in Lean; the first exact missing inequality of the RH line is `Λ_DN ≤ 0`,
+which is RH; no later RH deed is scheduled)
+
+[proved-derived; formal-checked] DB5 passed: `RH/DeBruijnSeal.lean` returned `deBruijnBound`,
+`Λ_DN ∈ [0, 1/8]`, and `riemannHypothesis_iff_Λ_DN_eq` with no hypothesis; `RH/CriticalChart.lean`
+returned `Hstd_eq : H_t(z) = ⅛ · heatE(−t/4, ξ, ½ + iz/2)`, `Λstd = 4 Λ_DN ∈ [0, ½]`, and
+`RiemannHypothesis ↔ Λstd = 0`; every theorem on the three axioms; root umbrella 9,843 jobs. The
+receipt is
+[`the DB5 record`](../research/records/2026-09-03_DB5_THE_LAST_PORT_IS_DISCHARGED_RH_IS_LAMBDA_DN_EQUALS_ZERO_WITH_NO_PORT_AND_THE_TREE_TIME_IS_THE_STANDARD_TIME_OVER_FOUR.md).
+DB4 passed: `DeBruijnLimit.eighth_mem_seamTimes`, receipt
+[`the DB4 record`](../research/records/2026-09-03_DB4_THE_GAUSSIAN_IS_THE_LIMIT_OF_THE_COSH_POWERS_AND_ONE_EIGHTH_IS_A_SEAM_TIME.md).
+DB0–DB3 passed: the strip of `ξ`, the
 polynomial average, and `DeBruijnIterate.onSeam_xiIter` — `N²` averages with `μ = 1/(2N)` put
 every zero of `ξ` on the seam; receipt
 [`the DB3 record`](../research/records/2026-09-03_DB3_THE_AVERAGE_CONTRACTS_THE_STRIP_OF_EVERY_MEMBER_AND_N_SQUARED_AVERAGES_PUT_THE_ZEROS_OF_XI_ON_THE_SEAM.md))

@@ -220,11 +220,20 @@ obstruction. It remains imported formal law and schedules no engine phase. The c
 is
 [`research/records/2026-09-02_THE_CAUSAL_TAIL_FORMAL_PREREQUISITE_RETURNED_BEFORE_THE_ENGINE_HNA_CAMPAIGN.md`](research/records/2026-09-02_THE_CAUSAL_TAIL_FORMAL_PREREQUISITE_RETURNED_BEFORE_THE_ENGINE_HNA_CAMPAIGN.md).
 
-[counterexample; source-inspected] The current RH entire flow is `heatE(u, xi, s)`; standard
-de Bruijn--Newman time is `t = -4u` after `s = 1/2 + i z/2`. Its Lean theorems stand, but the direct
-standard-`H_t` interpretation is retracted pending the RH0/RH1 bridge.
+[proved-derived; formal-checked] The current RH entire flow is `heatE(u, xi, s)`; standard
+de Bruijn--Newman time is `t = -4u` after `s = 1/2 + i z/2`. The RH0/RH1 bridge is deposited:
+`CriticalChart.Hstd_eq : H_t(z) = ⅛ · heatE(−t/4, ξ, ½ + iz/2)`, `Λstd = 4 Λ_DN`; the earlier
+retraction of the direct standard-`H_t` reading is closed by the bridge (DB5 record, 2026-09-03).
 
-**RH line position:** DB4 (the de Bruijn campaign; DB0–DB3 passed: `XiStrip`,
+**RH line position:** DB complete (the de Bruijn campaign; DB0–DB5 passed;
+`DeBruijnSeal.riemannHypothesis_iff_Λ_DN_eq : RiemannHypothesis ↔ Λ_DN = 0` with no port,
+`Λ_DN ∈ [0, 1/8]`, `CriticalChart.Λstd_eq : Λstd = 4 Λ_DN ∈ [0, ½]`, the RH0/RH1 bridge
+`Hstd_eq` in Lean; receipts
+[`research/records/2026-09-03_DB5_THE_LAST_PORT_IS_DISCHARGED_RH_IS_LAMBDA_DN_EQUALS_ZERO_WITH_NO_PORT_AND_THE_TREE_TIME_IS_THE_STANDARD_TIME_OVER_FOUR.md`](research/records/2026-09-03_DB5_THE_LAST_PORT_IS_DISCHARGED_RH_IS_LAMBDA_DN_EQUALS_ZERO_WITH_NO_PORT_AND_THE_TREE_TIME_IS_THE_STANDARD_TIME_OVER_FOUR.md)
+and
+[`research/records/2026-09-03_DB4_THE_GAUSSIAN_IS_THE_LIMIT_OF_THE_COSH_POWERS_AND_ONE_EIGHTH_IS_A_SEAM_TIME.md`](research/records/2026-09-03_DB4_THE_GAUSSIAN_IS_THE_LIMIT_OF_THE_COSH_POWERS_AND_ONE_EIGHTH_IS_A_SEAM_TIME.md);
+the first exact missing inequality of the RH line is `Λ_DN ≤ 0`, which is RH; no later RH deed
+is scheduled; before it, `XiStrip`,
 `TranslationAverage`, `KernelAverage`, `ConjIndex`, `StripAverage.re_sq_le_of_avg_eq_zero`,
 `DeBruijnIterate.onSeam_xiIter`; receipt
 [`research/records/2026-09-03_DB3_THE_AVERAGE_CONTRACTS_THE_STRIP_OF_EVERY_MEMBER_AND_N_SQUARED_AVERAGES_PUT_THE_ZEROS_OF_XI_ON_THE_SEAM.md`](research/records/2026-09-03_DB3_THE_AVERAGE_CONTRACTS_THE_STRIP_OF_EVERY_MEMBER_AND_N_SQUARED_AVERAGES_PUT_THE_ZEROS_OF_XI_ON_THE_SEAM.md))

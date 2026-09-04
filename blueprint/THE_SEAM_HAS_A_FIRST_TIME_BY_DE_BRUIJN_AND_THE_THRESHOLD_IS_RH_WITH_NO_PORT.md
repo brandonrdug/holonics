@@ -170,7 +170,15 @@ and `DeBruijnIterate.onSeam_xiIter`: for `N ≥ 1`, `OnSeam ((avg (1/(2N)))^[N²
 `A_μ^k (T_K) = T_{cosh(μu)^k K}` (kernel calculus), `cosh(u/(2N))^{N²} → e^{u²/8}` pointwise with
 `cosh(u/(2N))^{N²} ≤ e^{u²/8}` (de Bruijn's (3.9)), the transforms converge locally uniformly by
 dominated convergence against the admissible weight, and `zeros_on_seam` gives
-`OnSeam (heatE (−1/8) ξ)`, i.e. `(1/8 : ℝ) ∈ seamTimes`. Owner `RH/DeBruijnLimit.lean`.  
+`OnSeam (heatE (−1/8) ξ)`, i.e. `(1/8 : ℝ) ∈ seamTimes`. Owner `RH/DeBruijnLimit.lean`.
+
+*Returned 2026-09-03:* `DeBruijnLimit.tendsto_coshPow` (the squeeze between
+`(1 + (u²/8)/N²)^{N²}` and `e^{u²/8}`), `tendstoLocallyUniformly_T` (transforms of dominated
+pointwise-convergent kernels), `tendsto_xiIter`, and **`eighth_mem_seamTimes`**; on the three
+axioms; root umbrella 9,841 jobs; receipt
+[`the DB4 record`](../research/records/2026-09-03_DB4_THE_GAUSSIAN_IS_THE_LIMIT_OF_THE_COSH_POWERS_AND_ONE_EIGHTH_IS_A_SEAM_TIME.md).
+**DB4 passes.**
+
 **Pass DB4:** `eighth_mem_seamTimes` formal-checked.  
 **Falsifier:** a zero of `heatE (−1/8) ξ` off the seam.
 
@@ -182,7 +190,17 @@ with no hypothesis; `ThresholdReturn` re-stated with no port. The bridge: `criti
 `Φ_std(v) = ½ Φ(2v)`, `Hstd t z = ½ ∫ e^{tv²} Φ_std(v) e^{izv} dv`,
 `Hstd_eq : Hstd t z = ⅛ · heatE (−t/4) ξ (criticalChart z)`, `seamTimes_std = (4·) '' seamTimes`,
 so `Λ_std = 4 Λ_DN` and the tree's `[0, 1/8]` is the literature's `[0, ½]`. Owners
-`RH/DeBruijnSeal.lean`, `RH/CriticalChart.lean`, `RH/ThresholdReturn.lean` amended.  
+`RH/DeBruijnSeal.lean`, `RH/CriticalChart.lean`, `RH/ThresholdReturn.lean` amended.
+
+*Returned 2026-09-03:* `DeBruijnSeal.deBruijnBound`, `Λ_DN_le_eighth`, `Λ_DN_mem_Icc_eighth`,
+**`riemannHypothesis_iff_Λ_DN_eq : RiemannHypothesis ↔ Λ_DN = 0`** with no port,
+`seamTimes_eq_Ici`; `CriticalChart.Hstd_eq` (the bridge in Lean), `mem_seamTimesStd_iff`,
+`Λstd_eq : Λstd = 4 Λ_DN`, `Λstd_mem_Icc : Λstd ∈ [0, ½]`, `riemannHypothesis_iff_Λstd_eq`;
+`ThresholdReturn`'s docstring records both ports discharged; all on `propext`,
+`Classical.choice`, `Quot.sound`; root umbrella 9,843 jobs; receipt
+[`the DB5 record`](../research/records/2026-09-03_DB5_THE_LAST_PORT_IS_DISCHARGED_RH_IS_LAMBDA_DN_EQUALS_ZERO_WITH_NO_PORT_AND_THE_TREE_TIME_IS_THE_STANDARD_TIME_OVER_FOUR.md).
+**DB5 passes. The campaign is complete.**
+
 **Pass DB5:** `#print axioms` on `riemannHypothesis_iff_Λ_DN_eq`, `Λ_DN_mem_Icc`, and `Hstd_eq`
 returns the three axioms; root umbrella green under 180 s per owner; records deposited.  
 **Falsifier:** any identity of the bridge failing at a point, or a port surviving in the seal.
