@@ -11,10 +11,10 @@ use super::{
     NativeCarrierOrdinal, NativeFullOperatorEcology, NativeOperationPrimitive, NativeOperatorNode,
     NativeSuccessorProjection, NativeTensorOrdinal,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
 
-#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeForwardReuseCensus {
     pub indexed_operations: usize,
     pub indexed_segments: usize,
@@ -123,7 +123,7 @@ struct NumericalReturn {
 /// scoped to this one continuing session, whose immutable ecology supplies the actual operator
 /// and both input/output boundary maps. The entering word is retained, not hashed or replaced
 /// by an equality of counts. This is not the identity of the new native occurrence.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeNumericalOrigin {
     pub occurrence: u64,
     pub operation: u32,
@@ -138,6 +138,36 @@ pub(super) struct NativeForwardReuse<'chart> {
 }
 
 impl<'chart> NativeForwardReuse<'chart> {
+    pub(super) fn detach_rest(&self, surface: &crate::resident_section::ResidentSurface<'chart>)
+        -> Result<super::NativeForwardReuseRest, super::NativeSessionRestError> {
+        Ok(super::NativeForwardReuseRest { census: self.census(),
+            numerical: self.numerical.iter().map(|(ordinal, n)| (*ordinal, super::NativeNumericalRest {
+                admitted: n.admitted, projection: n.projection.clone(), origin: n.origin.clone() })).collect(),
+            standing: super::operative_rest::detach_carriers(surface, &self.standing)? })
+    }
+
+    pub(super) fn remount_rest(ecology: &NativeFullOperatorEcology,
+        surface: &'chart crate::resident_section::ResidentSurface<'chart>, rest: &super::NativeForwardReuseRest,
+    ) -> Result<Self, super::NativeSessionRestError> {
+        let mut reuse = Self::found(ecology);
+        let outputs: BTreeSet<_> = reuse.index.segments.iter().flat_map(|s| s.outputs.iter().copied()).collect();
+        if rest.numerical.keys().any(|key| !outputs.contains(key)) {
+            return Err(super::NativeSessionRestError::Malformed("reuse names a non-forward output".into()));
+        }
+        reuse.numerical = rest.numerical.iter().map(|(ordinal, n)| (*ordinal, NumericalReturn {
+            admitted: n.admitted, projection: n.projection.clone(), origin: n.origin.clone() })).collect();
+        reuse.standing = super::operative_rest::mount_carriers(surface, &rest.standing)?;
+        let retained: u64 = reuse.standing.values().map(|c| c.section.resident_octets()).sum();
+        if rest.census.retained_octets != retained
+            || rest.census.indexed_operations != reuse.census.indexed_operations
+            || rest.census.indexed_segments != reuse.census.indexed_segments
+            || rest.census.indexed_dependencies != reuse.census.indexed_dependencies {
+            return Err(super::NativeSessionRestError::Malformed("reuse representation receipt differs".into()));
+        }
+        reuse.census = rest.census.clone();
+        Ok(reuse)
+    }
+
     pub(super) fn found(ecology: &NativeFullOperatorEcology) -> Self {
         let operations = &ecology.operations[..ecology.operations.len().saturating_sub(5)];
         let index = DependencyIndex::found(operations);

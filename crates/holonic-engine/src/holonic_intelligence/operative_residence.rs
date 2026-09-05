@@ -902,7 +902,7 @@ mod restriction_tests {
             carriers: [3, 5, 7, 11].into_iter().enumerate().map(|(at, dim)| NativeCarrierChart {
                 ordinal: NativeCarrierOrdinal(at as u32), axes: vec![NativeCarrierAxis::Fixed(dim)] }).collect(),
             operations: vec![NativeOperatorNode { ordinal: 0, layer: Some(0),
-                primitive: NativeOperationPrimitive::Contract, inputs: vec![], output: NativeCarrierOrdinal(3),
+                primitive: NativeOperationPrimitive::Lookup { scale: super::super::NativeScaleConstraint::Rational { numerator: 1, denominator: 1 } }, inputs: vec![], output: NativeCarrierOrdinal(3),
                 coefficients: vec![NativeTensorOrdinal(0)] }],
             layers: vec![NativeLayerTopology { ordinal: 0, attention: NativeAttentionTopology::Local,
                 kv_standing: NativeKvStanding::Own, first_operation: 0, operation_population: 1 }],

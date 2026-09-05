@@ -207,6 +207,20 @@ impl NativeFullOperatorEcology {
         let mut produced = BTreeSet::new();
         let mut used = BTreeSet::new();
         for (at, operation) in self.operations.iter().enumerate() {
+            // These are the actual ports consumed by the resident primitive owner. Refuse a
+            // malformed artifact before an unchecked input/parameter index can reach the device.
+            let (inputs, coefficients) = match &operation.primitive {
+                NativeOperationPrimitive::Lookup { .. } => (0, 1),
+                NativeOperationPrimitive::Contract => (1, 1),
+                NativeOperationPrimitive::RmsRebase { has_gain, .. } => (1, usize::from(*has_gain)),
+                NativeOperationPrimitive::Scale { by: NativeScaleConstraint::Coefficient } => (1, 1),
+                NativeOperationPrimitive::Add | NativeOperationPrimitive::Hadamard => (2, 0),
+                NativeOperationPrimitive::CausalContact { .. } => (3, 0),
+                _ => (1, 0),
+            };
+            if operation.inputs.len() != inputs || operation.coefficients.len() != coefficients {
+                return Err(NativeFullOperatorError::Malformed("operator port arity"));
+            }
             if operation.ordinal != at as u32
                 || operation.output.0 as usize >= self.carriers.len()
                 || !produced.insert(operation.output)
@@ -223,6 +237,9 @@ impl NativeFullOperatorEcology {
             used.extend(operation.coefficients.iter().copied());
         }
         let mut first = self.layers[0].first_operation;
+        if first as usize > self.operations.len() {
+            return Err(NativeFullOperatorError::Malformed("operator prefix extent"));
+        }
         if self.operations[..first as usize]
             .iter()
             .any(|operation| operation.layer.is_some())
@@ -230,18 +247,20 @@ impl NativeFullOperatorEcology {
             return Err(NativeFullOperatorError::Malformed("operator prefix"));
         }
         for (at, layer) in self.layers.iter().enumerate() {
+            let end = layer.first_operation.checked_add(layer.operation_population)
+                .ok_or(NativeFullOperatorError::Malformed("layer extent overflow"))?;
             if layer.ordinal != at as u16
                 || layer.first_operation != first
                 || layer.operation_population == 0
-                || layer.first_operation + layer.operation_population > self.operations.len() as u32
+                || end as usize > self.operations.len()
                 || self.operations[layer.first_operation as usize
-                    ..(layer.first_operation + layer.operation_population) as usize]
+                    ..end as usize]
                     .iter()
                     .any(|operation| operation.layer != Some(layer.ordinal))
             {
                 return Err(NativeFullOperatorError::Malformed("layer topology"));
             }
-            first += layer.operation_population;
+            first = end;
         }
         if self.operations[first as usize..]
             .iter()

@@ -9,6 +9,9 @@ mod application;
 mod composed_variant;
 mod diffusion;
 mod hna;
+mod publication;
+mod checkpoint;
+mod session;
 mod material_codec;
 mod receivers;
 mod recurrent_operator;
@@ -27,6 +30,9 @@ pub use hna::{
     HnaOccurrence, HnaRestrictedInspection, HnaRunReceipt, HnaRunRequest, HnaSource, HnaSourceKind,
     HNA_RUN_SCHEMA,
 };
+pub use publication::{publish_new, PublicationError, PublicationReceipt};
+pub use checkpoint::{read_checkpoint, save_checkpoint_new, CheckpointError, HnaBaseDependency, HnaCheckpointReceipt};
+pub use session::{HnaDeclaredOccurrence, HnaModel, HnaSession, HnaSessionAnatomy, HnaSessionError, HnaSessionStatus};
 pub use material_codec::{
     render_material_artifact, AthenaMaterialArtifact, AthenaMaterialCodecError,
 };

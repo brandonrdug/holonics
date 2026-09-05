@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** 2026-09-04. **Next construction:** HNP3 — persistent models and continuing sessions.
+**Currency:** 2026-09-05. **Current construction:** HNP3 — streaming public-session integration.
 
 This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md) orders work;
 completed history stays in its existing records and Git. Brandon's latest direct instruction
@@ -40,11 +40,17 @@ Formal locality/cancellation/reconnection, native disconnected-growth and move-o
 passed. The [HNP2 completion record](research/records/2026-09-04_HNP2_THE_NUMERICAL_SEGMENT_IS_REUSED_THE_NATIVE_OCCURRENCE_STILL_DEVELOPS_AND_CHANGED_DEPENDENCIES_REOPEN.md)
 states the complete-continuation correspondence and physical/architecture boundaries.
 
-[open] HNP3 must return a durable cultivated model and continuing public session, including
-actual overlays, carrier/chronology/open-boundary state, base dependencies and recoverable I/O.
-The CLI prefix convenience path is unchanged; observed-passage development/reuse remains on the
-native session owner. Useful production and export remain HNP4--HNP7. The earlier equalization
-policy remains archived.
+[established-bounded; measured] HNP3's actual 363,259,185-byte cultivated checkpoint restored
+every held field after process exit, then reached the same complete learned successor as the
+reference (generation 5,100 / factor extent 7,112). The public `HnaModel`/`HnaSession` callback,
+base wire pins, atomic no-overwrite publication, malformed/truncated artifact controls and native
+interruption/remount controls returned. The [record](research/records/2026-09-05_HNP3_THE_CULTIVATED_SESSION_RESTORES_EVERY_HELD_FIELD_AND_CONTINUES_AFTER_PROCESS_EXIT.md)
+states the dependency-bearing artifact and exact runtime boundaries.
+
+[open] HNP3 still owes the structured streaming CLI and partial input/output delivery controls
+over that continuing owner. The CLI prefix convenience path is unchanged. Broader applications,
+useful production and executable export remain HNP4--HNP7. The earlier equalization policy remains
+archived; a checkpoint is not a qualitative model-performance claim.
 
 [definition] The plan then orders general material contact, resident locality/reuse, persistent
 sessions, multi-cycle output, a useful consumer-model milestone, executable export and supported

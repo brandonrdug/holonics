@@ -7,7 +7,7 @@
 //! Formal owner: HolonicOrientedSiteTransport.ConstitutiveSectionReturn.additive_joined_passage_effect.
 //! See research/records/2026-09-04_HNP1_ADDITIVE_EQUALIZATION_CHANGED_CONDUCT_BUT_DID_NOT_FOUND_A_LEARNING_COMPARISON.md.
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::rc::Rc;
 
@@ -24,7 +24,7 @@ use super::{
 };
 
 /// Descriptive chart of an actual graph contact; runtime construction is private and derived.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeJoinedPassage {
     pub joining_operation: u32,
     pub transport_operation: u32,
@@ -39,7 +39,7 @@ pub struct NativeJoinedPassage {
     pub population: NativeTensorOrdinal,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativePassageReturn {
     pub contact: NativeJoinedPassage,
     /// The actual session occurrence generation, not an input-supplied identity.
@@ -154,6 +154,35 @@ impl NativeFullOperatorEcology {
 }
 
 impl<'chart> PassageCultivation<'chart> {
+    pub(super) fn check_rest_ownership(&self) -> Result<(), super::NativeSessionRestError> {
+        if Rc::strong_count(&self.origin) != 1 {
+            return Err(super::NativeSessionRestError::Unsupported("an external withdrawal still owns part of this passage lineage"));
+        }
+        Ok(())
+    }
+
+    pub(super) fn detach_rest(&self, surface: &crate::resident_section::ResidentSurface<'chart>)
+        -> Result<super::NativePassageRest, super::NativeSessionRestError> {
+        self.check_rest_ownership()?;
+        Ok(super::NativePassageRest { aperture: self.aperture,
+            pending: super::operative_rest::detach_overlays(surface, &self.pending)?, returns: self.returns.clone() })
+    }
+
+    pub(super) fn remount_rest(ecology: &NativeFullOperatorEcology,
+        surface: &'chart crate::resident_section::ResidentSurface<'chart>, rest: &super::NativePassageRest,
+    ) -> Result<Self, super::NativeSessionRestError> {
+        let mut passage = Self::found(ecology, rest.aperture);
+        for returned in &rest.returns {
+            if !passage.bindings.get(&returned.contact.joining_operation)
+                .is_some_and(|contacts| contacts.contains(&returned.contact)) {
+                return Err(super::NativeSessionRestError::Malformed("pending return does not join the actual graph".into()));
+            }
+        }
+        passage.pending = super::operative_rest::mount_overlays(surface, &rest.pending)?;
+        passage.returns = rest.returns.clone();
+        Ok(passage)
+    }
+
     fn found(ecology: &NativeFullOperatorEcology, aperture: NativeReturnAperture) -> Self {
         let bindings = bindings_of(&ecology.operations);
         let mut last_source_use: BTreeMap<NativeCarrierOrdinal, u32> = BTreeMap::new();

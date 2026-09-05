@@ -109,21 +109,56 @@ available for consumers needing complete emitted interval sections or interactiv
 |---|---|
 | Native restricted SKE rest | Executable inherited class/extent material, with declared domain and remainder. |
 | HNA run receipt | Evidence of a completed session; it is **not a trained checkpoint**. |
+| Native HNA checkpoint | Actual full-session state and integer factor codewords, with an explicit pinned native-base dependency; process-separated remount and further development returned in HNP3. |
 | Earlier `NativeCirculationSnapshot` / `NativeMorphologyArtifact` | The existing persistent workspace's exact package/snapshot family. It has a specialized lifecycle and does not silently contain the full operator's device overlays. |
 | Standard executable model | Target architecture, parameters, configuration/codecs and validated runtime behavior; see [interop](INTEROPERABILITY.md). |
 
-[open] A durable checkpoint of the cultivated full native operator—including overlays, carrier
-state, chronology, base realization dependency and exact remount—is the next persistence bridge.
-Current `hna train` retains the successor during its session and returns its receipt; it does not
+[established-bounded; measured] The cultivated full native operator now has a durable checkpoint,
+including overlays, carriers, chronology, numerical origins and interrupted/pending state.
+Every held field and a later complete successor matched after process restart in
+[HNP3](../research/records/2026-09-05_HNP3_THE_CULTIVATED_SESSION_RESTORES_EVERY_HELD_FIELD_AND_CONTINUES_AFTER_PROCESS_EXIT.md).
+The native base remains an explicit dependency, not silently embedded or identified by a path.
+
+[definition] Current `hna train` still retains the successor during its legacy prefix session and returns its receipt; it does not
 claim to save a deployable trained model. The older `workspace` commands remain usable for their
 own snapshot family and are labeled accordingly.
+
+## Continuing public session
+
+[established-bounded; implemented-exact] `HnaModel::from_native_rest` opens admitted material with
+an explicit cultivation aperture; `from_checkpoint` restores its recorded state and profile.
+`with_session` mounts once for the callback's lifetime. `advance` uses the same owner on every
+request; `checkpoint` borrows that owner and publishes without overwrite. `declared_occurrences`
+exposes the actual family/history records, and `anatomy` reports the model's held structure and
+status. No tokenizer is reopened or old text re-encoded inside these calls.
+
+```rust
+use holonics::hna::{HnaModel, HnaSessionError};
+
+fn continue_model() -> Result<(), HnaSessionError> {
+    let model = HnaModel::from_checkpoint("checkpoint.hna", None)?;
+    let occurrence = model.declared_occurrences()[0].occurrence.clone();
+    model.with_session(|session| {
+        let output = session.advance(&occurrence)?;
+        println!("generation {}", output.final_emission.generation);
+        session.checkpoint("checkpoint-next.hna")?;
+        Ok(())
+    })
+}
+```
+
+[definition] Keep the callback open across a continuing request stream. Returning closes the
+runtime; save explicitly if development must outlive it. Admission and publication refusals leave
+the owner available inside the callback. A native failure after work begins retains an explicit
+interruption and refuses silent replay. The structured streaming CLI and delivery controls are
+still HNP3 work, not aliases for the existing commands above.
 
 ## Production expectations
 
 [definition] The [production campaign](plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md)
 specifies the general material/current binding and local development missing from the narrow
-prefix convenience pathway, as well as persistence and multi-cycle output. Its target session
-interfaces are planned, not already implemented versions of the commands above. Dataset delivery
+prefix convenience pathway, as well as persistence and multi-cycle output. The public callback
+session exists; the production stream and multi-cycle application outputs remain in construction. Dataset delivery
 must preserve actual causal occurrences and may not define learning through arbitrary batching,
 shuffling or an optimizer callback.
 

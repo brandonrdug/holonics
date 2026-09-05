@@ -116,7 +116,7 @@ is a complete account of conventional or holonic learning; the distinction is it
 [definition] The standard pipeline has explicit products: source/codec configuration; admitted
 native model and insufficiency; an ordered exposure stream; run results and successor model;
 native checkpoint; evaluation result; and a target-specific export. Each carries its actual
-scope. The current commands and missing persistence/compiler bridges are described in
+scope. The current checkpoint/session return and remaining streaming/compiler bridges are described in
 [Athena](ATHENA.md) and [interoperability](INTEROPERABILITY.md).
 
 [project-postulate] Frontier competition must eventually be evaluated through useful language,

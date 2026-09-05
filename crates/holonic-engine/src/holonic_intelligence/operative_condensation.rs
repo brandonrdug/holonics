@@ -767,7 +767,7 @@ impl NativeConeRestrictedEcology {
         Self::read_header(&mut input)
     }
 
-    fn read_header(input: &mut BufReader<File>) -> Result<Self, NativeCondensationError> {
+    fn read_header(input: &mut impl Read) -> Result<Self, NativeCondensationError> {
         let mut magic = [0u8; 32];
         input.read_exact(&mut magic).map_err(|error| NativeCondensationError::Io(error.to_string()))?;
         if &magic != REST_MAGIC {
@@ -775,8 +775,11 @@ impl NativeConeRestrictedEcology {
         }
         let mut length = [0u8; 8];
         input.read_exact(&mut length).map_err(|error| NativeCondensationError::Io(error.to_string()))?;
-        let mut header = vec![0u8; u64::from_le_bytes(length) as usize];
-        input.read_exact(&mut header).map_err(|error| NativeCondensationError::Io(error.to_string()))?;
+        let length = u64::from_le_bytes(length);
+        let mut header = Vec::new();
+        let copied = input.take(length).read_to_end(&mut header)
+            .map_err(|error| NativeCondensationError::Io(error.to_string()))?;
+        if copied as u64 != length { return Err(NativeCondensationError::Rest("truncated header".into())); }
         serde_json::from_slice(&header).map_err(|error| NativeCondensationError::Rest(error.to_string()))
     }
 
@@ -784,11 +787,17 @@ impl NativeConeRestrictedEcology {
     pub fn read_rest(path: &Path) -> Result<Self, NativeCondensationError> {
         let file = File::open(path).map_err(|error| NativeCondensationError::Io(error.to_string()))?;
         let mut input = BufReader::with_capacity(1 << 24, file);
-        let mut rest = Self::read_header(&mut input)?;
+        Self::read_rest_from(&mut input)
+    }
+
+    /// Decode the same opened base stream that an exterior artifact verifier admitted. This
+    /// avoids replacing a verified file descriptor with a new lookup of its pathname.
+    pub fn read_rest_from(input: &mut impl Read) -> Result<Self, NativeCondensationError> {
+        let mut rest = Self::read_header(input)?;
         for section in &mut rest.cross_sections {
             let count = section.retained_rows.len().checked_mul(section.dim)
                 .ok_or_else(|| NativeCondensationError::Rest("coefficient extent overflow".to_owned()))?;
-            section.words = read_coefficient_words(&mut input, count)?;
+            section.words = read_coefficient_words(input, count)?;
         }
         rest.validate()?;
         Ok(rest)

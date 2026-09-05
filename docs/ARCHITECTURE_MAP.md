@@ -67,6 +67,13 @@ enact. `HolonicResidentRestriction` supplies the exact finite current/support an
 reconnection laws; its executable/native correspondence and limits are in the
 [HNP2 completion record](../research/records/2026-09-04_HNP2_THE_NUMERICAL_SEGMENT_IS_REUSED_THE_NATIVE_OCCURRENCE_STILL_DEVELOPS_AND_CHANGED_DEPENDENCIES_REOPEN.md).
 
+[established-bounded; measured] HNP3's `holonic_intelligence/{operative_rest,operative_rest_wire}.rs`
+and `holonics-hna::{checkpoint,publication,session}` preserve actual factor arrays, carriers,
+chronology, pending/interrupted state and numerical origins through a dependency-bearing checkpoint.
+The public callback session retains one native owner across requests. The
+[process-separated full-state return](../research/records/2026-09-05_HNP3_THE_CULTIVATED_SESSION_RESTORES_EVERY_HELD_FIELD_AND_CONTINUES_AFTER_PROCESS_EXIT.md)
+does not imply the still-unfinished streaming CLI or useful application output.
+
 | Relation | Lean owner | Rust owner | CUDA owner | Status and exact open fibre |
 |---|---|---|---|---|
 | Exact finite diffusion and state-space chart | `Computation/HolonicDiffusionCharts.lean` | `diffusion.rs`; `sheaf_diffusion.rs`; `causal_body.rs` | `cuda_refine/membrane_boundary_*`; `membrane_factored_transport.rs` | **partial:** Lean Markov/deterministic separation is broader than one resident runtime owner |

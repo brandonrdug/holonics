@@ -22,7 +22,7 @@ contracts and records preserve their completed scope; their old imperatives sche
 
 ## Current campaign: production HNA
 
-**Next construction:** HNP3 — persistent models and the continuing public session.
+**Current construction:** HNP3 — streaming integration over the returned persistent session.
 
 [definition] Brandon's subsequent September 4 request authorizes the formal, holistic design of
 [the production-HNA campaign](THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md).
@@ -37,8 +37,10 @@ It uses the joining output, not the archived equalization target. HNP2's
 preserves the observed development under its decoder. Its subsequent
 [complete-segment reuse return](../../research/records/2026-09-04_HNP2_THE_NUMERICAL_SEGMENT_IS_REUSED_THE_NATIVE_OCCURRENCE_STILL_DEVELOPS_AND_CHANGED_DEPENDENCIES_REOPEN.md)
 closed HNP2 at the admitted operator scope with numerical-origin lineage, dependency reopening
-and native controls. HNP3 now returns durable model/session state and the continuing interface.
-No persistence or useful-model result is inferred from HNP2.
+and native controls. HNP3's [checkpoint/public-session return](../../research/records/2026-09-05_HNP3_THE_CULTIVATED_SESSION_RESTORES_EVERY_HELD_FIELD_AND_CONTINUES_AFTER_PROCESS_EXIT.md)
+now preserves every held field across process restart and further native development. Structured
+streaming and its partial-delivery controls remain HNP3's next deed; useful-model performance
+is not inferred from persistence.
 The ordered work is concrete local-current/presentation/development binding; general material
 contact; resident locality and reusable factors; persistent models and sessions; multi-cycle
 production; useful consumer-model evaluation; executable export; and additional model families.

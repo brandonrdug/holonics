@@ -14,7 +14,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::resident_section::{
@@ -92,7 +92,7 @@ pub enum NativeMorphologyTransition {
     },
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum NativeSuccessorProjection {
     Exact,
@@ -129,7 +129,7 @@ pub struct NativeFullOperatorSession<'residence, 'chart> {
     pub(super) chronology: Vec<u64>,
     pub(super) grain: ResidentGrain,
     pub(super) positions: Option<Positions<'chart>>,
-    row_population: Option<usize>,
+    pub(super) row_population: Option<usize>,
     pub(super) cycle_complete: bool,
     /// Carriers produced in one layer (or the prologue) and consumed in another: retained through
     /// the cycle as the checkpoints the return replays each layer from.
@@ -153,6 +153,8 @@ pub struct NativeFullOperatorSession<'residence, 'chart> {
     pub(super) aperture: Option<NativeReturnAperture>,
     pub(super) passage_cultivation: Option<PassageCultivation<'chart>>,
     pub(super) forward_reuse: Option<NativeForwardReuse<'chart>>,
+    pub(super) progress: Option<NativeCycleProgress>,
+    pub(super) interruption: Option<NativeCycleInterruption>,
     /// Last direct use in the immutable word; local-return retention adds its own actual edges.
     last_use: BTreeMap<NativeCarrierOrdinal, u32>,
     /// The dissection standing: the excitation's supports and face, when founded for dissection.
@@ -179,6 +181,29 @@ pub struct NativeFullCycle<'residence, 'chart> {
     pub traces: Vec<NativeFullOperationTrace>,
     pub passage_returns: Vec<NativePassageReturn>,
     pub successor: NativeFullOperatorSession<'residence, 'chart>,
+}
+
+/// Output of a recurrence whose unique session owner stays with the caller, including on error.
+pub struct NativeFullCycleOutput {
+    pub final_emission: NativeFullOperationEmission,
+    pub traces: Vec<NativeFullOperationTrace>,
+    pub passage_returns: Vec<NativePassageReturn>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct NativeCycleProgress {
+    pub occurrence: u64,
+    pub row_addresses: Vec<u32>,
+    /// Last carrier installed into current use, not a claim about uninstalled GPU temporaries.
+    pub installed_through: Option<u32>,
+    pub returned_through: Option<u32>,
+    pub at_terminal: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct NativeCycleInterruption {
+    pub progress: NativeCycleProgress,
+    pub reason: String,
 }
 
 impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
@@ -259,6 +284,8 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             aperture,
             passage_cultivation: None,
             forward_reuse: None,
+            progress: None,
+            interruption: None,
             last_use,
             dissection: None,
             terminal_seal: true,
@@ -294,6 +321,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     }
 
     pub fn accepts_occurrence(&self, occurrence: &NativeFullOperationOccurrence) -> bool {
+        if self.interruption.is_some() { return false; }
         if occurrence.ordinal != self.generation {
             return false;
         }
@@ -331,6 +359,10 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     pub fn without_forward_reuse(mut self) -> Self {
         self.forward_reuse = None;
         self
+    }
+
+    pub fn interruption(&self) -> Option<&NativeCycleInterruption> {
+        self.interruption.as_ref()
     }
 
     /// The return: if `entering` continues the last cycle's line, the retained emitted face meets
@@ -517,6 +549,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                     }
                     let bound_octaves = outcome.carrier.bound_octaves;
                     self.carriers.insert(outcome.output, outcome.carrier);
+                    if let Some(progress) = &mut self.progress { progress.installed_through = Some(operation.ordinal); }
                     loop {
                         match self.return_joined_passage(operation.ordinal) {
                             Ok(()) => break,
@@ -530,6 +563,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                             Err(error) => return Err(error),
                         }
                     }
+                    if let Some(progress) = &mut self.progress { progress.returned_through = Some(operation.ordinal); }
                     steps.push(RunStep {
                         operation: operation.clone(),
                         admitted_octaves: outcome.admitted_octaves,
@@ -607,6 +641,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         mut self,
         occurrence: NativeFullOperationOccurrence,
     ) -> Result<NativeFullOperationStep<'residence, 'chart>, NativeFullOperationError> {
+        if self.interruption.is_some() { return Err(NativeFullOperationError::Interrupted); }
         if self.passage_cultivation.is_some() {
             return Err(NativeFullOperationError::Contact("this chart advances complete cycles, not exposed primitive steps"));
         }
@@ -672,9 +707,32 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         mut self,
         row_addresses: &[u32],
     ) -> Result<NativeFullCycle<'residence, 'chart>, NativeFullOperationError> {
+        let output = self.advance_cycle_retained(row_addresses)?;
+        Ok(NativeFullCycle { final_emission: output.final_emission, traces: output.traces,
+            passage_returns: output.passage_returns, successor: self })
+    }
+
+    /// The production ownership boundary: a refusal cannot drop the caller's ecology. Invalid
+    /// input refuses before mutation. A later failure preserves the actual installed carriers and
+    /// staged differences, with an explicit interruption that prevents a silent retry/replay.
+    pub fn advance_cycle_retained(&mut self, row_addresses: &[u32]) -> Result<NativeFullCycleOutput, NativeFullOperationError> {
+        if self.interruption.is_some() { return Err(NativeFullOperationError::Interrupted); }
         if row_addresses.is_empty() || (self.operation_at != 0 && !self.cycle_complete) {
             return Err(NativeFullOperationError::Occurrence);
         }
+        self.generation.checked_add(self.ecology.operations.len() as u64).ok_or(NativeFullOperationError::Generation)?;
+        self.progress = Some(NativeCycleProgress { occurrence: self.generation, row_addresses: row_addresses.to_vec(),
+            installed_through: None, returned_through: None, at_terminal: false });
+        let result = self.advance_cycle_inner(row_addresses);
+        match &result {
+            Ok(_) => self.progress = None,
+            Err(error) => self.interruption = self.progress.clone().map(|progress|
+                NativeCycleInterruption { progress, reason: error.to_string() }),
+        }
+        result
+    }
+
+    fn advance_cycle_inner(&mut self, row_addresses: &[u32]) -> Result<NativeFullCycleOutput, NativeFullOperationError> {
         let mut morphology_transition = NativeMorphologyTransition::Unchanged;
         if self.cycle_complete {
             morphology_transition = self.enter_cycle(row_addresses)?;
@@ -699,20 +757,18 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             self.operation_at += 1;
         }
         let ordinal = self.generation;
-        let mut terminal = self.advance_terminal(NativeFullOperationOccurrence {
+        if let Some(progress) = &mut self.progress { progress.at_terminal = true; }
+        let (mut emissions, mut terminal_traces) = self.advance_terminal_retained(NativeFullOperationOccurrence {
             ordinal,
             row_addresses: Vec::new(),
         })?;
-        traces.append(&mut terminal.traces);
-        let final_emission = terminal
-            .emissions
-            .pop()
+        traces.append(&mut terminal_traces);
+        let final_emission = emissions.pop()
             .ok_or(NativeFullOperationError::Operation)?;
-        Ok(NativeFullCycle {
+        Ok(NativeFullCycleOutput {
             final_emission,
             traces,
-            passage_returns: terminal.successor.publish_passage_returns(),
-            successor: terminal.successor,
+            passage_returns: self.publish_passage_returns(),
         })
     }
 
@@ -761,6 +817,8 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
 
 #[derive(Debug, Error)]
 pub enum NativeFullOperationError {
+    #[error("the native session is interrupted; its held state must not be silently replayed")]
+    Interrupted,
     #[error("native contact: {0}")]
     Contact(&'static str),
     #[error("operator ecology: {0}")]

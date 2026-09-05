@@ -17,7 +17,7 @@
 //! factor enters: the only exterior data are the declared apertures, reported in every deposit.
 
 use mount::DeviceBuffer;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     embedding_fiber::MountedReadout,
@@ -30,14 +30,14 @@ use crate::{
 /// The declared apparatus apertures of the return. `learning_shift` is `k` in `η = 2^-k`; it enters
 /// only as the exponent of the deposit readout. `series_terms` is the certified exponential's
 /// aperture. Neither is derived from the material and both are reported in the deposit.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeReturnAperture {
     pub learning_shift: u32,
     pub series_terms: u32,
 }
 
 /// The testimony of one deposit, carried in the trace of the operation that enacted it.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NativeMorphologyDeposit {
     /// The coefficient population deposited on.
     pub population: u32,
@@ -69,7 +69,53 @@ pub(super) struct OverlayAtom<'chart> {
     v_octaves: u32,
 }
 
+/// Exterior rest of a factorized native morphology atom, not another running ecology.
+/// The two arrays are the actual sealed integer factors, with their distinct dyadic exponents.
+#[derive(Debug, PartialEq, Eq)]
+pub struct NativeOverlayRest {
+    pub rows: usize,
+    pub width: usize,
+    pub rank: usize,
+    pub u: Vec<i64>,
+    pub v: Vec<i64>,
+    pub u_exponent: i32,
+    pub v_exponent: i32,
+    pub u_octaves: u32,
+    pub v_octaves: u32,
+}
+
+impl NativeOverlayRest {
+    pub fn validate(&self) -> Result<(), ResidentRefusal> {
+        let bound = |words: &[i64], octaves: u32| octaves <= 64 && words.iter().all(|word|
+            64 - word.unsigned_abs().leading_zeros() <= octaves);
+        if self.rows == 0 || self.width == 0 || self.rank == 0
+            || self.rows.checked_mul(self.rank) != Some(self.u.len())
+            || self.rank.checked_mul(self.width) != Some(self.v.len())
+            || !bound(&self.u, self.u_octaves) || !bound(&self.v, self.v_octaves) {
+            return Err(ResidentRefusal::Declaration { operation: "native-overlay-rest",
+                what: "factor shapes or declared octave bounds do not reconstruct the held atom".into() });
+        }
+        Ok(())
+    }
+}
+
 impl<'chart> OverlayAtom<'chart> {
+    pub(super) fn detach(&self, surface: &ResidentSurface<'chart>) -> Result<NativeOverlayRest, ResidentRefusal> {
+        let rest = NativeOverlayRest { rows: self.u.rows(), width: self.v.width(), rank: self.rank,
+            u: surface.detach_endpoint(&self.u)?, v: surface.detach_endpoint(&self.v)?,
+            u_exponent: self.u_exponent, v_exponent: self.v_exponent,
+            u_octaves: self.u_octaves, v_octaves: self.v_octaves };
+        rest.validate()?;
+        Ok(rest)
+    }
+
+    pub(super) fn remount(surface: &'chart ResidentSurface<'chart>, rest: &NativeOverlayRest) -> Result<Self, ResidentRefusal> {
+        rest.validate()?;
+        Ok(Self { u: surface.mount_endpoint_rest(rest.rows, rest.rank, &rest.u)?,
+            v: surface.mount_endpoint_rest(rest.rank, rest.width, &rest.v)?, rank: rest.rank,
+            u_exponent: rest.u_exponent, v_exponent: rest.v_exponent,
+            u_octaves: rest.u_octaves, v_octaves: rest.v_octaves })
+    }
     pub(super) fn rank(&self) -> usize {
         self.rank
     }

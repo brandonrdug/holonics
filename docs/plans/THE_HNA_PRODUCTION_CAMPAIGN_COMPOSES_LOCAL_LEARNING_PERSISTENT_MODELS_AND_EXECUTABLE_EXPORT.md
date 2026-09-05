@@ -1,6 +1,6 @@
 # HNA production: local learning, persistent models and executable export
 
-**Date:** 2026-09-04. **Status:** ACTIVE; HNP0--HNP2 returned, HNP3 persistence/session next.
+**Date:** 2026-09-04. **Status:** ACTIVE; HNP0--HNP2 returned, HNP3 streaming/session integration in progress.
 **Authority:** Brandon's formal planning request and subsequent instruction to complete HNP0--HNP7.
 **Order:** [THE_ROADMAP.md](THE_ROADMAP.md). **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 **Starting implementation:** `c12b2634`. Phase names below identify dependencies, not capabilities.
@@ -288,6 +288,10 @@ separately. No per-operation host readout, full pair-current dump or second chec
 introduced to certify the hot run. Condensation whose old chart ceases to commute is reopened.
 
 ### HNP3 — Persistent models and the continuing public session
+
+[established-bounded; measured] The checkpoint, process-separated full-state continuation and
+public callback session returned in the [HNP3 persistence record](../../research/records/2026-09-05_HNP3_THE_CULTIVATED_SESSION_RESTORES_EVERY_HELD_FIELD_AND_CONTINUES_AFTER_PROCESS_EXIT.md).
+Streaming CLI integration and partial-delivery controls below remain required before phase closure.
 
 **Depends on:** HNP1; integrate HNP2's state/representation before closing the phase.
 

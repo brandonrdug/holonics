@@ -216,6 +216,14 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         mut self,
         occurrence: NativeFullOperationOccurrence,
     ) -> Result<NativeFullTerminalBranch<'residence, 'chart>, NativeFullOperationError> {
+        let (emissions, traces) = self.advance_terminal_retained(occurrence)?;
+        Ok(NativeFullTerminalBranch { emissions, traces, successor: self })
+    }
+
+    pub(super) fn advance_terminal_retained(
+        &mut self, occurrence: NativeFullOperationOccurrence,
+    ) -> Result<(Vec<NativeFullOperationEmission>, Vec<NativeFullOperationTrace>), NativeFullOperationError> {
+        if self.interruption.is_some() { return Err(NativeFullOperationError::Interrupted); }
         let start = self.ecology.operations.len().saturating_sub(5);
         if self.operation_at != start
             || occurrence.ordinal != self.generation
@@ -223,6 +231,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         {
             return Err(NativeFullOperationError::Occurrence);
         }
+        self.generation.checked_add(5).ok_or(NativeFullOperationError::Generation)?;
         let operations = self.terminal_operations()?;
         let dissecting = self.dissection.is_some();
         let returning = self.aperture.is_some() || dissecting;
@@ -327,11 +336,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             let contracted = contracted.ok_or(NativeFullOperationError::Operation)?;
             self.terminal_contracted = Some(self.tiled_last_row(&contracted)?);
         }
-        Ok(NativeFullTerminalBranch {
-            emissions,
-            traces,
-            successor: self,
-        })
+        Ok((emissions, traces))
     }
 }
 

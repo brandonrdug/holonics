@@ -267,6 +267,36 @@ impl<'chart> ResidentSurface<'chart> {
         Ok(section)
     }
 
+    /// Mount one already-sealed endpoint from an exterior rest without allocating a redundant
+    /// upper endpoint. This is persistence of an existing point carrier, not interval projection.
+    pub(crate) fn mount_endpoint_rest(
+        &'chart self, rows: usize, width: usize, words: &[i64],
+    ) -> Result<ResidentEndpoint<'chart>, ResidentRefusal> {
+        if rows == 0 || width == 0 || rows.checked_mul(width) != Some(words.len()) {
+            return Err(ResidentRefusal::Declaration { operation: "mount-endpoint-rest",
+                what: "endpoint shape does not match its complete word population".into() });
+        }
+        let endpoint = ResidentEndpoint { surface: self, words: self.alloc::<i64>(words.len())?, rows, width };
+        self.context.make_current()?;
+        endpoint.words.copy_from_slice(words)?;
+        self.census.borrow_mut().ingress_octets += (words.len() * 8) as u64;
+        Ok(endpoint)
+    }
+
+    /// Explicit checkpoint egress of an existing sealed endpoint. No arithmetic is replayed.
+    pub(crate) fn detach_endpoint(&self, endpoint: &ResidentEndpoint<'chart>) -> Result<Vec<i64>, ResidentRefusal> {
+        let mut words = Vec::new();
+        words.try_reserve_exact(endpoint.words.len()).map_err(|error|
+            ResidentRefusal::Declaration { operation: "detach-endpoint", what: error.to_string() })?;
+        words.resize(endpoint.words.len(), 0);
+        self.context.make_current()?;
+        endpoint.words.copy_to_slice(&mut words)?;
+        let mut census = self.census.borrow_mut();
+        census.egress_section_octets += (words.len() * 8) as u64;
+        census.section_read_outs += 1;
+        Ok(words)
+    }
+
     /// Detach one exact resident section after its passage has returned. This is one explicit
     /// apparatus egress and is counted by [`read_out`].
     pub fn detach_section(
