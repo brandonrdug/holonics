@@ -83,6 +83,21 @@ impl HnaModel {
         base_override: Option<&Path>,
     ) -> Result<Self, HnaSessionError> {
         let saved = read_session_checkpoint(path)?;
+        Self::from_saved(saved, base_override)
+    }
+
+    pub fn from_checkpoint_reference(
+        reference: &crate::HnaFileDependency,
+        base_override: Option<&Path>,
+    ) -> Result<Self, HnaSessionError> {
+        let saved = crate::checkpoint::read_session_checkpoint_file(reference.open_verified()?)?;
+        Self::from_saved(saved, base_override)
+    }
+
+    fn from_saved(
+        saved: crate::HnaSavedSession,
+        base_override: Option<&Path>,
+    ) -> Result<Self, HnaSessionError> {
         let mut dependency = saved.dependency;
         let initial = saved.state;
         let mut input = BufReader::new(dependency.open_verified(base_override)?);
@@ -121,6 +136,12 @@ impl HnaModel {
 
     pub fn dependency(&self) -> &HnaBaseDependency {
         &self.dependency
+    }
+
+    pub fn starting_generation(&self) -> u64 {
+        self.initial
+            .as_ref()
+            .map_or(0, |rest| rest.header.generation)
     }
 
     /// Acquire only missing input rows through the exterior source chart. This saves independent
@@ -250,8 +271,7 @@ impl HnaModel {
         let mut session = HnaSession {
             native,
             material: &self.material,
-            dependency: &self.dependency,
-            input_intake: intake,
+            dependency: self.dependency.clone(),
             additional_input_codewords: self
                 .input_material
                 .iter()
@@ -265,8 +285,7 @@ impl HnaModel {
 pub struct HnaSession<'residence, 'chart> {
     native: NativeFullOperatorSession<'residence, 'chart>,
     material: &'residence NativeConeRestrictedEcology,
-    dependency: &'residence HnaBaseDependency,
-    input_intake: NativeInputExtendedIntake<'residence>,
+    dependency: HnaBaseDependency,
     additional_input_codewords: u64,
 }
 
@@ -314,12 +333,89 @@ pub struct HnaSessionAnatomy {
 }
 
 impl HnaSession<'_, '_> {
+    pub fn terminal_width(&self) -> Option<usize> {
+        use holonic_engine::native_ecology::holonic_intelligence::NativeCarrierAxis;
+        let output = self.material.ecology.operations.last()?.output;
+        match self
+            .material
+            .ecology
+            .carriers
+            .get(output.0 as usize)?
+            .axes
+            .as_slice()
+        {
+            [NativeCarrierAxis::Occurrence, NativeCarrierAxis::Fixed(width)] => Some(*width),
+            _ => None,
+        }
+    }
+    pub fn missing_input_rows(&self, addresses: &[u32]) -> BTreeMap<u32, Vec<u32>> {
+        self.native.missing_input_rows(addresses)
+    }
+
+    /// The application acquires exact input codewords outside the engine, then supplies them at
+    /// the same continuing owner's operation boundary. It never calls the source as an emitter.
+    pub fn acquire_input_material(
+        &mut self,
+        source_root: &Path,
+        addresses: &[u32],
+        output: &Path,
+    ) -> Result<crate::HnaInputAcquisitionReceipt, HnaSessionError> {
+        let missing = self.native.missing_input_rows(addresses);
+        let receipt = crate::input_material::acquire_missing(
+            self.material,
+            &self.dependency,
+            source_root,
+            missing,
+            output,
+        )?;
+        self.supply_input_material(output)?;
+        Ok(receipt)
+    }
+
+    /// A failure before publication leaves the existing native material and dependency set
+    /// unchanged. A separately published material file may remain available for explicit retry.
+    pub fn supply_input_material(&mut self, path: impl AsRef<Path>) -> Result<(), HnaSessionError> {
+        let pin = crate::HnaInputMaterialDependency::capture(path)?;
+        let mut incoming = self.dependency.clone();
+        incoming.input_material = vec![pin.clone()];
+        let additions = crate::input_material::load(&incoming)?;
+        let count = additions
+            .iter()
+            .try_fold(self.additional_input_codewords, |sum, section| {
+                sum.checked_add(section.words.len() as u64)
+            })
+            .ok_or_else(|| HnaSessionError::Base("input material extent".into()))?;
+        self.dependency
+            .input_material
+            .try_reserve(1)
+            .map_err(|error| HnaSessionError::Base(error.to_string()))?;
+        self.native.extend_input_rows(&additions)?;
+        self.dependency.input_material.push(pin);
+        self.additional_input_codewords = count;
+        Ok(())
+    }
     /// Explicit native-domain recurrence, separate from the old inherited-family admission
     /// receiver. The same native operation develops the same successor; this is not another
     /// training mode. Every entering row must have actual material at every lookup port.
     pub fn advance_native(
         &mut self,
         occurrence: &HnaOccurrence,
+    ) -> Result<HnaNativeCycle, HnaSessionError> {
+        self.advance_native_receiver(occurrence, false)
+    }
+
+    /// Explicit fixed-morphology comparison of the same native owner, not production inference.
+    pub fn observe_native(
+        &mut self,
+        occurrence: &HnaOccurrence,
+    ) -> Result<HnaNativeCycle, HnaSessionError> {
+        self.advance_native_receiver(occurrence, true)
+    }
+
+    fn advance_native_receiver(
+        &mut self,
+        occurrence: &HnaOccurrence,
+        observe: bool,
     ) -> Result<HnaNativeCycle, HnaSessionError> {
         if self.native.joined_passage_population() == 0 {
             return Err(HnaSessionError::Admission(
@@ -335,7 +431,7 @@ impl HnaSession<'_, '_> {
                 entering.len()
             )));
         }
-        let missing = self.input_intake.missing_input_rows(&entering);
+        let missing = self.native.missing_input_rows(&entering);
         if !missing.is_empty() {
             return Err(HnaSessionError::MissingInput { rows: missing });
         }
@@ -349,7 +445,11 @@ impl HnaSession<'_, '_> {
                     .is_none_or(|selected| selected == class.ordinal)
             })
             .map(|class| class.ordinal);
-        let output = self.native.advance_cycle_retained(&entering)?;
+        let output = if observe {
+            self.native.observe_passage_cycle_retained(&entering)?
+        } else {
+            self.native.advance_cycle_retained(&entering)?
+        };
         Ok(HnaNativeCycle {
             admission: HnaNativeAdmission {
                 original_family_class,
@@ -405,7 +505,7 @@ impl HnaSession<'_, '_> {
         path: impl AsRef<Path>,
     ) -> Result<HnaCheckpointReceipt, HnaSessionError> {
         let state = self.native.detach_rest()?;
-        Ok(save_checkpoint_new(path, self.dependency, &state)?)
+        Ok(save_checkpoint_new(path, &self.dependency, &state)?)
     }
 
     pub fn checkpoint_stream(
@@ -416,7 +516,7 @@ impl HnaSession<'_, '_> {
         let state = self.native.detach_rest()?;
         Ok(save_stream_checkpoint_new(
             path,
-            self.dependency,
+            &self.dependency,
             &state,
             transport,
         )?)

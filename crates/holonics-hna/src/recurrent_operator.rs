@@ -30,6 +30,11 @@ pub struct AthenaTokenApplication {
 }
 
 impl AthenaTokenApplication {
+    pub fn from_bytes(bytes:&[u8]) -> Result<Self,AthenaRecurrentApplicationError> {
+        Ok(Self {tokenizer:Tokenizer::from_bytes(bytes).map_err(|error|
+            AthenaRecurrentApplicationError::Tokenizer(error.to_string()))?})
+    }
+    pub fn vocabulary_extent(&self) -> usize { self.tokenizer.get_vocab_size(true) }
     /// Decode a native selected-address face through this exterior tokenizer only.
     pub fn decode_addresses(&self, addresses: &[u32]) -> Result<String, AthenaRecurrentApplicationError> {
         self.tokenizer.decode(addresses, false)

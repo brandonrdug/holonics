@@ -266,6 +266,15 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         mut self,
         rows: &[u32],
     ) -> Result<NativeFullCycle<'residence, 'chart>, NativeFullOperationError> {
+        let output=self.observe_passage_cycle_retained(rows)?;
+        Ok(NativeFullCycle {final_emission:output.final_emission,traces:output.traces,
+            passage_returns:output.passage_returns,successor:self})
+    }
+
+    /// Borrowed attribution receiver: even a refused observation retains the same native owner
+    /// and restores the local-return chart. It is never the default productive operation.
+    pub fn observe_passage_cycle_retained(&mut self,rows:&[u32])
+        -> Result<super::NativeFullCycleOutput,NativeFullOperationError> {
         if !self.cycle_complete && self.operation_at != 0 {
             return Err(NativeFullOperationError::Contact(
                 "an observation requires an operation boundary",
@@ -273,7 +282,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         }
         let chart = self
             .passage_cultivation
-            .take()
+            .as_ref()
             .ok_or(NativeFullOperationError::Contact(
                 "this session has no joined-passage chart",
             ))?;
@@ -282,9 +291,10 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                 "an unclosed local return is not an observation boundary",
             ));
         }
-        let mut cycle = self.advance_cycle(rows)?;
-        cycle.successor.passage_cultivation = Some(chart);
-        Ok(cycle)
+        let chart=self.passage_cultivation.take().expect("checked chart");
+        let result=self.advance_cycle_retained(rows);
+        self.passage_cultivation=Some(chart);
+        result
     }
 
     /// Withdraw the complete local delta for a declared attribution experiment. A later normal

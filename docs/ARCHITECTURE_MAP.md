@@ -91,6 +91,13 @@ preservation and exact added-row return; its conditional continuation lemma is n
 The [HNP4 input return](../research/records/2026-09-05_HNP4_INPUT_MATERIAL_EXTENDS_THE_NATIVE_DOMAIN_WITHOUT_PROMOTING_THE_INHERITED_FAMILY.md)
 records actual old-successor preservation and further process-separated development, not useful text.
 
+[established-bounded; measured] `operative_residence` now owns staged live input blocks and their
+native frame/refusal boundary. `holonics-hna::text_session` owns codec completion and paired
+text/model rest. The [HNP4 text comparison](../research/records/2026-09-05_HNP4_NATIVE_TEXT_CONTINUES_BUT_UNCHECKED_ADDITIVE_CULTIVATION_DESTROYS_THE_RETURN.md)
+returned coherent fixed-morphology prose and exposed unstable additive cultivation. The paired
+feedback specialization in `HolonicOrientedSiteTransport` supplies its bounded stability
+counterexample; useful continuing learning and output cost remain open.
+
 | Relation | Lean owner | Rust owner | CUDA owner | Status and exact open fibre |
 |---|---|---|---|---|
 | Exact finite diffusion and state-space chart | `Computation/HolonicDiffusionCharts.lean` | `diffusion.rs`; `sheaf_diffusion.rs`; `causal_body.rs` | `cuda_refine/membrane_boundary_*`; `membrane_factored_transport.rs` | **partial:** Lean Markov/deterministic separation is broader than one resident runtime owner |

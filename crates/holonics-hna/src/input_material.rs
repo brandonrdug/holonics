@@ -55,6 +55,16 @@ pub(crate) fn acquire(
         NativeInputExtendedIntake::new(base.intake(dependency.class).map_err(error)?, held)
             .map_err(error)?;
     let missing = intake.missing_input_rows(addresses);
+    acquire_missing(base, dependency, source_root, missing, output)
+}
+
+pub(crate) fn acquire_missing(
+    base: &NativeConeRestrictedEcology,
+    dependency: &HnaBaseDependency,
+    source_root: &Path,
+    missing: BTreeMap<u32, Vec<u32>>,
+    output: &Path,
+) -> Result<HnaInputAcquisitionReceipt, HnaSessionError> {
     if missing.is_empty() {
         return Err(error("all requested input sections are already present"));
     }
@@ -97,13 +107,7 @@ pub(crate) fn acquire(
     }
     // The native constructor refuses replacement, overlap and a population with any non-lookup
     // use. Validate the complete composition before publishing any file.
-    let combined = merge(
-        held.iter()
-            .cloned()
-            .chain(additions.iter().cloned())
-            .collect(),
-    )?;
-    NativeInputExtendedIntake::new(base.intake(dependency.class).map_err(error)?, &combined)
+    NativeInputExtendedIntake::new(base.intake(dependency.class).map_err(error)?, &additions)
         .map_err(error)?;
     write_material(output, dependency, &additions)?;
     Ok(HnaInputAcquisitionReceipt {

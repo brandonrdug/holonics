@@ -36,13 +36,16 @@ pub struct HnaBaseDependency {
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct HnaInputMaterialDependency {
+pub struct HnaFileDependency {
     pub path: PathBuf,
     pub octets: u64,
     pub sha256: String,
 }
 
-impl HnaInputMaterialDependency {
+/// Input material uses the same immutable wire reference as other exterior session artifacts.
+pub type HnaInputMaterialDependency = HnaFileDependency;
+
+impl HnaFileDependency {
     pub fn capture(path: impl AsRef<Path>) -> Result<Self, CheckpointError> {
         let pin = HnaBaseDependency::capture(path, None)?;
         Ok(Self {
@@ -246,7 +249,12 @@ pub fn read_checkpoint(
 }
 
 pub fn read_session_checkpoint(path: impl AsRef<Path>) -> Result<HnaSavedSession, CheckpointError> {
-    let mut file = File::open(path)?;
+    read_session_checkpoint_file(File::open(path)?)
+}
+
+pub(crate) fn read_session_checkpoint_file(
+    mut file: File,
+) -> Result<HnaSavedSession, CheckpointError> {
     let length = file.metadata()?.len();
     if length < (MAGIC.len() + END.len() + 48) as u64 {
         return Err(CheckpointError::Malformed("magic or minimum frame".into()));

@@ -115,6 +115,9 @@ pub struct NativeOperatorDecoderCensus {
 pub struct NativeOperatorResidence<'chart> {
     surface: &'chart ResidentSurface<'chart>,
     raw: CountedOctets<'chart>,
+    /// New input material is owned in separate immutable blocks; the standing raw allocation
+    /// is never copied, resized or replaced to receive another lookup row.
+    input_blocks: BTreeMap<NativeTensorOrdinal, Vec<ResidentInputBlock<'chart>>>,
     /// One shared zero codeword row; no absent population is expanded into resident coefficients.
     zero_row: Option<CountedOctets<'chart>>,
     pool: CountedOctets<'chart>,
@@ -133,6 +136,11 @@ pub struct NativeOperatorResidence<'chart> {
     /// positions.
     slot_in_use: std::cell::Cell<bool>,
     decoder_census: std::cell::Cell<NativeOperatorDecoderCensus>,
+}
+
+struct ResidentInputBlock<'chart> {
+    addresses: Vec<u32>,
+    raw: CountedOctets<'chart>,
 }
 
 pub struct NativeAlignedOperatorTile<'residence, 'chart> {
@@ -546,6 +554,7 @@ impl<'chart> NativeOperatorResidence<'chart> {
         Ok(Self {
             surface,
             raw,
+            input_blocks: BTreeMap::new(),
             zero_row,
             pool,
             aligned_offset,
@@ -573,6 +582,95 @@ impl<'chart> NativeOperatorResidence<'chart> {
 
     pub fn populations(&self) -> &[ResidentNativeOperatorPopulation] {
         &self.populations
+    }
+
+    pub(crate) fn has_input_row(&self, population: NativeTensorOrdinal, address: u32) -> bool {
+        self.populations.get(population.0 as usize).is_some_and(|held|
+            (address as usize) < held.rows && (held.retained_rows.as_ref()
+                .is_none_or(|rows| rows.binary_search(&address).is_ok())
+                || self.input_blocks.get(&population).is_some_and(|blocks|
+                    blocks.iter().any(|block| block.addresses.binary_search(&address).is_ok()))))
+    }
+
+    /// Prepare all new buffers and frames before publishing any change. Only the native
+    /// operation boundary calls this; a refused acquisition retains all standing allocations.
+    pub(crate) fn extend_input_rows(&mut self, ecology: &NativeFullOperatorEcology,
+        additions: &[super::NativeInputRowExtension], grain: u32)
+        -> Result<(), super::NativeFullOperationError> {
+        use super::NativeFullOperationError as Error;
+        if self.slot_in_use.get() || additions.is_empty() { return Err(Error::Operation); }
+        let mut addresses_by_population: BTreeMap<NativeTensorOrdinal, std::collections::BTreeSet<u32>> = BTreeMap::new();
+        let mut added_octets = 0u64;
+        let mut row_chart_octets = 0u64;
+        for addition in additions {
+            let population = NativeTensorOrdinal(addition.population);
+            let held = self.populations.get(population.0 as usize).ok_or(Error::Operation)?;
+            let uses: Vec<_> = ecology.operations.iter().filter(|node| node.coefficients.contains(&population)).collect();
+            if uses.is_empty() || uses.iter().any(|node| !matches!(node.primitive, NativeOperationPrimitive::Lookup {..}))
+                || addition.rows != held.rows || addition.dim != held.dim || addition.addresses.is_empty()
+                || addition.addresses.len().checked_mul(addition.dim) != Some(addition.words.len())
+                || addition.addresses.windows(2).any(|pair| pair[0] >= pair[1]) {
+                return Err(Error::Operation);
+            }
+            for row in &addition.addresses {
+                if *row as usize >= held.rows || self.has_input_row(population,*row)
+                    || !addresses_by_population.entry(population).or_default().insert(*row) {
+                    return Err(Error::Occurrence);
+                }
+            }
+            added_octets = added_octets.checked_add((addition.words.len() as u64).checked_mul(2).ok_or(Error::Operation)?).ok_or(Error::Operation)?;
+            row_chart_octets = row_chart_octets.checked_add((addition.addresses.len() as u64).checked_mul(4).ok_or(Error::Operation)?).ok_or(Error::Operation)?;
+        }
+        let raw_total = self.receipt.raw_coefficient_octets.checked_add(added_octets).ok_or(Error::Operation)?;
+        let total = self.receipt.total_resident_octets.checked_add(added_octets).ok_or(Error::Operation)?;
+        let ingress = self.receipt.ingress_octets.checked_add(added_octets).ok_or(Error::Operation)?;
+        let row_chart = self.receipt.retained_row_chart_octets.checked_add(row_chart_octets).ok_or(Error::Operation)?;
+        let mut staged = Vec::new();
+        let mut frames = BTreeMap::new();
+        for addition in additions {
+            let octets = addition.words.len().checked_mul(2).ok_or(Error::Operation)?;
+            let count = u32::try_from(addition.words.len()).map_err(|_| Error::Operation)?;
+            let raw = CountedOctets {surface:self.surface, buffer:self.surface.alloc_octets(octets)?, octets};
+            #[cfg(target_endian = "little")]
+            {
+                // SAFETY: initialized u16 storage has no padding. The borrowed view is read-only
+                // and consumed synchronously while its owner remains alive.
+                let bytes = unsafe { std::slice::from_raw_parts(addition.words.as_ptr().cast::<u8>(),octets) };
+                self.surface.copy_octets(&raw.buffer,0,bytes)?;
+            }
+            #[cfg(target_endian = "big")]
+            {
+                let bytes:Vec<u8>=addition.words.iter().flat_map(|word| word.to_le_bytes()).collect();
+                self.surface.copy_octets(&raw.buffer,0,&bytes)?;
+            }
+            let frame = unsafe { self.surface.readout().resident_bfloat16_frames(std::ptr::null_mut(),
+                self.pool.device_ptr()+self.scratch_offset as u64,
+                &[ResidentBfloat16Population {stored:raw.device_ptr(),count}])
+            }.map_err(NativeOperatorResidenceError::from)?.into_iter().next().ok_or(Error::Operation)?;
+            let population=NativeTensorOrdinal(addition.population);
+            let previous=frames.get(&population).copied().unwrap_or(self.populations[population.0 as usize].frame.exponent);
+            frames.insert(population,previous.min(frame.exponent));
+            staged.push((population,ResidentInputBlock {addresses:addition.addresses.clone(),raw}));
+        }
+        // The existing session grain is standing. A new section needing a finer one refuses;
+        // this intake is not permission to rebase or truncate the continuing native fields.
+        for operation in &ecology.operations {
+            if let NativeOperationPrimitive::Lookup {scale}=&operation.primitive {
+                if let Some(exponent)=frames.get(&operation.coefficients[0]) {
+                    let scale=super::operative_scalars::projected_scale(scale)?;
+                    if i64::from(grain)+i64::from(*exponent)+i64::from(scale.exponent)<0 {
+                        return Err(Error::Grain);
+                    }
+                }
+            }
+        }
+        for (population,block) in staged { self.input_blocks.entry(population).or_default().push(block); }
+        for (population,exponent) in frames { self.populations[population.0 as usize].frame.exponent=exponent; }
+        self.receipt.raw_coefficient_octets=raw_total;
+        self.receipt.total_resident_octets=total;
+        self.receipt.ingress_octets=ingress;
+        self.receipt.retained_row_chart_octets=row_chart;
+        Ok(())
     }
 
     pub(crate) fn surface(&self) -> &'chart ResidentSurface<'chart> {
@@ -653,6 +751,16 @@ impl<'chart> NativeOperatorResidence<'chart> {
                 None => Some(*address as usize),
                 Some(rows) => rows.binary_search(address).ok(),
             };
+            if physical.is_none() {
+                let added = self.input_blocks.get(&population).and_then(|blocks| blocks.iter().find_map(|block|
+                    block.addresses.binary_search(address).ok().map(|row| (block,row))));
+                if let Some((block,row))=added {
+                    self.surface.copy_resident_octets(&self.pool.buffer,self.gather_offset+at*row_octets,
+                        &block.raw.buffer,row*row_octets,row_octets)?;
+                    self.count_decoder_copy(row_octets);
+                    continue;
+                }
+            }
             self.decode_run(descriptor, self.gather_offset + at * row_octets, physical, 1)?;
         }
         if descriptor.retained_rows.is_some() {

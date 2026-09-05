@@ -39,6 +39,9 @@ pub enum HnaStreamCommand {
     Checkpoint {
         path: PathBuf,
     },
+    SupplyInputMaterial {
+        path: PathBuf,
+    },
     Close,
 }
 
@@ -232,6 +235,17 @@ impl HnaStream {
                     }
                 },
                 HnaStreamCommand::Inspect => self.emit("state", target.inspect())?,
+                HnaStreamCommand::SupplyInputMaterial { path } => {
+                    match target.supply_input_material(&path) {
+                        Ok(()) => self.emit(
+                            "input-material-supplied",
+                            json!({"path":path,"anatomy":target.inspect()}),
+                        )?,
+                        Err(error) => {
+                            self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?
+                        }
+                    }
+                }
                 HnaStreamCommand::AdvanceNative {
                     occurrence,
                     full_emission,
@@ -277,9 +291,13 @@ trait StreamTarget {
     fn advance_native(&mut self, occurrence: &HnaOccurrence, full: bool) -> Result<Value, String>;
     fn inspect(&self) -> Value;
     fn checkpoint(&self, path: &Path, transport: &HnaStreamState) -> Result<(), String>;
+    fn supply_input_material(&mut self, path: &Path) -> Result<(), String>;
 }
 
 impl StreamTarget for HnaSession<'_, '_> {
+    fn supply_input_material(&mut self, path: &Path) -> Result<(), String> {
+        HnaSession::supply_input_material(self, path).map_err(|error| error.to_string())
+    }
     fn advance(&mut self, occurrence: &HnaOccurrence, full: bool) -> Result<Value, String> {
         let cycle = HnaSession::advance(self, occurrence).map_err(|e| e.to_string())?;
         Ok(cycle_value(cycle, full, self.anatomy()))
@@ -332,6 +350,9 @@ mod tests {
         saved: RefCell<Option<HnaStreamState>>,
     }
     impl StreamTarget for Target {
+        fn supply_input_material(&mut self, _: &Path) -> Result<(), String> {
+            Ok(())
+        }
         fn advance_native(
             &mut self,
             occurrence: &HnaOccurrence,
@@ -372,15 +393,35 @@ mod tests {
 
     #[test]
     fn native_domain_is_an_explicit_stream_request_and_event() {
-        let bytes=request(HnaStreamCommand::AdvanceNative {
-            occurrence:HnaOccurrence {row_addresses:vec![4,9],history:vec![]},full_emission:false,
+        let bytes = request(HnaStreamCommand::AdvanceNative {
+            occurrence: HnaOccurrence {
+                row_addresses: vec![4, 9],
+                history: vec![],
+            },
+            full_emission: false,
         });
+        let mut stream = HnaStream::new();
+        let mut target = Target::default();
+        let mut output = Vec::new();
+        assert_eq!(
+            stream
+                .pump_target(&mut target, &mut Cursor::new(bytes), &mut output)
+                .unwrap(),
+            HnaStreamDisposition::InputExhausted
+        );
+        let event: Value = serde_json::from_slice(&output).unwrap();
+        assert_eq!(event["event"], "native-advanced");
+        assert_eq!(target.advances, 1);
+    }
+
+    #[test]
+    fn supplied_material_is_receipted_without_manufacturing_a_native_occurrence() {
+        let bytes=request(HnaStreamCommand::SupplyInputMaterial {path:PathBuf::from("input.safetensors")});
         let mut stream=HnaStream::new(); let mut target=Target::default(); let mut output=Vec::new();
-        assert_eq!(stream.pump_target(&mut target,&mut Cursor::new(bytes),&mut output).unwrap(),
-            HnaStreamDisposition::InputExhausted);
+        stream.pump_target(&mut target,&mut Cursor::new(bytes),&mut output).unwrap();
+        assert_eq!(target.advances,0);
         let event:Value=serde_json::from_slice(&output).unwrap();
-        assert_eq!(event["event"],"native-advanced");
-        assert_eq!(target.advances,1);
+        assert_eq!(event["event"],"input-material-supplied");
     }
 
     struct PartialInput {

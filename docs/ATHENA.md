@@ -237,9 +237,11 @@ target/debug/holonics hna session cultivated.hna --resume \
 
 [definition] Checkpoint versions 3 and 4 carry explicit input-material dependencies, respectively
 without and with transport state. Versions 1 and 2 retain their old meanings. Resume verifies and
-loads all named material without reopening a foreign source executor. Additional material is
-presently composed at mount, not acquired automatically during a live session; a generated address
-without its input sections remains an explicit obstruction. Safetensors here stores input sections,
+loads all named material without reopening a foreign source executor. Live sessions now accept
+`supply_input_material(path)` and exterior `acquire_input_material(source_root, addresses, path)`
+between operations. The stream action is `supply-input-material`. New resident blocks are staged
+without replacing the standing allocation; an incompatible finer grain refuses before publication.
+A generated address without supplied sections remains an explicit obstruction. Safetensors stores input sections,
 not an executable standard-model export. The original base and every material artifact must remain
 available and immutable.
 
@@ -249,6 +251,47 @@ continued after process restart with complete successor equality. Their single-t
 were ` mik` and ` yên`; neither is a useful response to the corresponding description/correction.
 The [input return](../research/records/2026-09-05_HNP4_INPUT_MATERIAL_EXTENDS_THE_NATIVE_DOMAIN_WITHOUT_PROMOTING_THE_INHERITED_FAMILY.md)
 states the control and remaining output obligations. This does not close HNP4.
+
+## Multi-cycle text application: returned interface, unstable cultivation
+
+[established-bounded; implemented-exact] `HnaTextApplication` composes the existing tokenizer,
+native session and rest. `begin` presents one turn; `step` returns a selected native face and
+retains it as the next ordinary self-occurrence. `followup` appends a later message to an actually
+completed transcript. No word/grammar renderer or foreign inference call supplies the output.
+Completion is a native-emitted marker admitted by the exterior `generation_config.json` codec;
+a cycle budget is interruption, not completion. This is not the unfounded reflection/count rule.
+
+[established-bounded; implemented-exact] `save` publishes a native checkpoint and then a paired
+text manifest carrying exact checkpoint/codec file references, prompt and emitted addresses,
+generation, disposition and the declared comparison profile. `load` verifies those dependencies.
+A failed manifest publication leaves the native artifact recoverable and both live owners with
+the callback. The example attempts this save on output failure as well; it does not claim peer
+acknowledgment or arbitrary-crash exactly-once delivery.
+
+```sh
+cargo build -p holonics-hna --example text_hnp4
+target/debug/examples/text_hnp4 fresh native.rest /path/to/codec-and-input-source \
+  'Describe a red cube.' NEW_RUN_DIR 12 develop 16
+target/debug/examples/text_hnp4 resume PREVIOUS_RUN/text.json \
+  /path/to/input-source NEW_RUN_DIR 1
+```
+
+[counterexample; measured] The current additive observed-passage law at shift 16 is not a
+production-quality learner. In the actual matched text experiment it emitted eight addresses,
+degraded into repetition, then exceeded the 126-octave carrier boundary during the ninth operation.
+The paired artifact preserved that real interruption. The same native text pipeline with the
+explicit fixed-morphology comparison (`observe`, not the productive default) returned coherent
+prose through 64 cycles; a fresh process then continued its saved text. That comparison is not a
+replacement HNA learning lifecycle and does not close HNP4.
+
+[proved-derived; formal-checked] The existing rectangular-return law admits a reciprocal scalar
+specialization with sum `(1 + eta)^n * (a + b)`. Thus positive current and a correct adjoint do not
+by themselves supply stability. This is a bounded counterexample, not a proof of the entire Gemma
+failure's mechanism. The [diagnosis and raw outputs](../research/records/2026-09-05_HNP4_NATIVE_TEXT_CONTINUES_BUT_UNCHECKED_ADDITIVE_CULTIVATION_DESTROYS_THE_RETURN.md)
+keep exact HNP0/HNP1 results separate from the failed productive inference. Stable local
+cultivation and output cost must be addressed before the useful-model grade is claimed.
+
+## Remaining production requirements
 
 [definition] The [production campaign](plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md)
 specifies the general material/current binding and local development missing from the narrow

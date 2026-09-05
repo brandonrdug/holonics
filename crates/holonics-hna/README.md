@@ -18,6 +18,10 @@ developmental sequence, selected-face receipts and persistence boundaries.
   input-row additions. `HnaSession::advance_native` admits their actually supplied input domain;
   the old inherited-family `advance` remains unchanged. See the guide for checkpoint versions
   3/4, explicit dependencies and the currently incomplete application-output boundary.
+- Live `HnaSession::supply_input_material` stages new resident lookup rows without remounting.
+- `HnaTextApplication` composes ordinary self-occurrences, declared codec completion and paired
+  text/model rest. Its actual comparison exposes unstable additive cultivation at shift 16;
+  coherent fixed-morphology output is not a replacement production learner. See the guide.
 
 The lower-level native session remains available from `holonic-engine` for interactive consumers.
 Earlier alpha/circulation adapters retain their exact artifact and wire scopes; they are not

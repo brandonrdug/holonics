@@ -65,6 +65,16 @@ development (generation 8,925 / factor extent 12,700). Their single-token readin
 responses. Complete multi-cycle application products, completion and the second interaction remain
 HNP4 work; this return does not advance the phase.
 
+[established-bounded; measured] HNP4 then returned live resident input acquisition and paired
+text/model continuation. The [text diagnosis](research/records/2026-09-05_HNP4_NATIVE_TEXT_CONTINUES_BUT_UNCHECKED_ADDITIVE_CULTIVATION_DESTROYS_THE_RETURN.md)
+records coherent 64-cycle fixed-morphology prose and a fresh-process continuation.
+
+[counterexample; measured] The same application with shift-16 additive cultivation degraded into
+repetition and exceeded the carrier bound during its ninth operation; its actual interruption was
+saved. HNP4 next requires justified stable local development and output-cost repair, followed by
+its remaining complete-product/correction/second-application returns. Freezing the learner or
+raising the numeric limit is not completion. HNP0/HNP1's exact scoped results remain standing.
+
 [definition] The plan then orders general material contact, resident locality/reuse, persistent
 sessions, multi-cycle output, a useful consumer-model milestone, executable export and supported
 SSM/diffusion-family extensions. This is not a token-volume programme or a conventional trainer

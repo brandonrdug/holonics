@@ -17,13 +17,14 @@ mod receivers;
 mod recurrent_operator;
 mod session;
 mod stream;
+mod text_session;
 mod world_application;
 
 pub use apertures::addressed_ingress;
 pub use application::{AthenaAlphaAdmission, AthenaAlphaApplication, AthenaAlphaError};
 pub use checkpoint::{
     read_checkpoint, save_checkpoint_new, CheckpointError, HnaBaseDependency, HnaCheckpointReceipt,
-    HnaInputMaterialDependency,
+    HnaFileDependency, HnaInputMaterialDependency,
 };
 pub use checkpoint::{read_session_checkpoint, save_stream_checkpoint_new, HnaSavedSession};
 pub use composed_variant::{
@@ -55,6 +56,7 @@ pub use stream::{
     HnaStream, HnaStreamCommand, HnaStreamDisposition, HnaStreamError, HnaStreamRequest,
     HnaStreamState, HNA_STREAM_EVENT_SCHEMA, HNA_STREAM_REQUEST_SCHEMA,
 };
+pub use text_session::{HnaTextApplication, HnaTextContinuation, HnaTextDisposition, HnaTextStep};
 pub use world_application::{
     ApplicationWorldError, ApplicationWorldReturn, ExactReadbackWorld, ProcessArtifactWorld,
 };

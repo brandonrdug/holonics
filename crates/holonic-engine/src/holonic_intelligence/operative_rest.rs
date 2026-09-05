@@ -639,4 +639,44 @@ mod native_tests {
             Err(NativeFullOperationError::Interrupted)
         ));
     }
+
+    #[test]
+    #[ignore = "requires CUDA; live row acquisition and staged refusal"]
+    fn live_input_rows_stage_before_publish_and_preserve_held_native_state() {
+        use super::super::NativeInputRowExtension;
+        struct Input;
+        impl NativeCoefficientIntake for Input {
+            fn populations(&self)->usize {4}
+            fn population_octets(&self,at:usize)->Result<u64,NativeOperatorResidenceError> {Ok([12,12,12,8][at])}
+            fn retained_rows(&self,at:usize)->Result<Option<Vec<u32>>,NativeOperatorResidenceError> {Ok((at==0).then_some(vec![0]))}
+            fn deliver_retained(&mut self,at:usize,sink:&mut dyn FnMut(usize,&[u8])->Result<(),NativeOperatorResidenceError>) -> Result<(),NativeOperatorResidenceError> {
+                let count=[2,6,6,4][at];
+                let bytes:Vec<_>=(0..count).flat_map(|_|0x3e80u16.to_le_bytes()).collect();
+                sink(0,&bytes)
+            }
+            fn deliver(&mut self,at:usize,sink:&mut dyn FnMut(usize,&[u8])->Result<(),NativeOperatorResidenceError>) -> Result<(),NativeOperatorResidenceError> {
+                if at==0 {sink(0,&[0x80,0x3e,0x80,0x3e,0,0,0,0,0,0,0,0])} else {self.deliver_retained(at,sink)}
+            }
+        }
+        let mut graph=interrupted_chart();
+        graph.operations[6].primitive=P::Scale {by:S::Rational {numerator:1,denominator:1}};
+        let readout=ResidentReadout::new().unwrap();
+        let surface=mount_operator_surface(&readout).unwrap();
+        let mut residence=NativeOperatorResidence::mount_from_intake(&surface,&graph,&mut Input).unwrap();
+        let mut session=NativeFullOperatorSession::found(&graph,&mut residence).unwrap();
+        let old=session.advance_cycle_retained(&[0]).unwrap().final_emission.intervals;
+        let held=session.detach_rest().unwrap();
+        let finer=NativeInputRowExtension {population:0,rows:3,dim:2,addresses:vec![1],words:vec![1,1]};
+        assert!(matches!(session.extend_input_rows(&[finer]),Err(NativeFullOperationError::Grain)));
+        assert_eq!(session.missing_input_rows(&[1])[&0],vec![1]);
+        assert_eq!(session.detach_rest().unwrap(),held);
+        let added=NativeInputRowExtension {population:0,rows:3,dim:2,addresses:vec![1],words:vec![0x3f00,0x3f00]};
+        session.extend_input_rows(std::slice::from_ref(&added)).unwrap();
+        assert!(session.missing_input_rows(&[0,1]).is_empty());
+        assert_eq!(session.detach_rest().unwrap(),held);
+        assert!(session.extend_input_rows(&[added]).is_err());
+        assert_eq!(session.detach_rest().unwrap(),held);
+        assert_eq!(session.advance_cycle_retained(&[0]).unwrap().final_emission.intervals,old);
+        assert_ne!(session.advance_cycle_retained(&[1]).unwrap().final_emission.intervals,old);
+    }
 }

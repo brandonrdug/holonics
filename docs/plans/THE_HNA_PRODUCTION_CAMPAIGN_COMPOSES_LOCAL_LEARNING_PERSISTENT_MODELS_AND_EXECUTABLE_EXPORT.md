@@ -320,6 +320,13 @@ old native successor. Further off-family native development survives process res
 material/persistence progress; its two single-token readings do not close the application-product,
 completion, ordinary-correction or second-interaction obligations below.
 
+[counterexample; measured] The subsequent [text comparison](../../research/records/2026-09-05_HNP4_NATIVE_TEXT_CONTINUES_BUT_UNCHECKED_ADDITIVE_CULTIVATION_DESTROYS_THE_RETURN.md)
+returned live input acquisition and paired application restart, but the productive shift-16
+additive return destroyed coherent output and exceeded the carrier bound. The frozen comparison
+returned coherent prose at high cost. HNP4 next addresses stable native development and that
+output cost before claiming its useful application returns; it does not substitute the frozen
+comparison, a larger numeric limit or a parameter search for the constitutive obligation.
+
 **Depends on:** HNP3.
 
 [definition] Build the first usable material/interaction pipeline over that session. Deliver a

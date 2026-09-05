@@ -11,6 +11,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = std::env::args().collect();
     let started = Instant::now();
     match args.get(1).map(String::as_str) {
+        Some("fresh") if args.len()==5 => {
+            let model=HnaModel::from_native_rest(&args[2],None,holonics_hna::HnaCultivationAperture {
+                learning_shift:16,series_terms:14,
+            })?.with_input_material(&args[3])?;
+            let codec=AthenaTokenApplication::open(Path::new(&args[4]))?;
+            let occurrence=HnaOccurrence {row_addresses:codec.encode_turn(TEXTS[0])?,history:vec![]};
+            model.with_session(|session| {
+                let before=session.anatomy();
+                let cycle=session.advance_native(&occurrence)?;
+                let face=codec.render(&cycle.output.final_emission).map_err(|e|HnaSessionError::Base(e.to_string()))?;
+                println!("{}",json!({"event":"fresh-native","text":TEXTS[0],"before":before,
+                    "admission":cycle.admission,"face":face,"after":session.anatomy()}));
+                Ok(())
+            })?;
+        }
         Some("request") if args.len()==3 => {
             let codec=AthenaTokenApplication::open(Path::new(&args[2]))?;
             println!("{}",serde_json::to_string(&holonics_hna::HnaStreamRequest {

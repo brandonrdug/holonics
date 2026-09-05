@@ -704,6 +704,68 @@ theorem zero_partner_separates_passage_effect_from_equalization :
     ((1 : ℚ) + 0) - 1 = 0 ∧ (0 : ℚ) - 1 ≠ 0 := by
   norm_num
 
+/-! ### A bounded paired-feedback growth control
+
+This is a counterexample to unconditional stability: two reciprocal legs can amplify their
+shared sum.  The leg deposits below are the already-defined rectangular deposit, with unit source
+scalar and each evolving transported coefficient; `partner` is the joined residual returned by
+that leg.
+-/
+
+def unitLegDeposit (eta transported partner : ℚ) : ℚ :=
+  deposit (bipartiteFrame eta)
+    (bipartiteMatrix (fun _ _ ↦ transported))
+    (bipartiteSource (fun _ : Fin 1 ↦ 1))
+    (bipartiteArrival (fun _ : Fin 1 ↦ transported + partner)) (Sum.inl 0) (Sum.inr 0)
+
+theorem unitLegDeposit_eq (eta transported partner : ℚ) :
+    unitLegDeposit eta transported partner = eta * partner := by
+  unfold unitLegDeposit
+  rw [rectangular_deposit]
+  norm_num [Matrix.one_apply]
+  ring
+
+def pairedFeedbackStep (eta a b : ℚ) : ℚ × ℚ :=
+  (a + unitLegDeposit eta a b, b + unitLegDeposit eta b a)
+
+theorem pairedFeedbackStep_eq (eta a b : ℚ) :
+    pairedFeedbackStep eta a b = (a + eta * b, b + eta * a) := by
+  simp [pairedFeedbackStep, unitLegDeposit_eq]
+
+theorem pairedFeedbackStep_sum (eta a b : ℚ) :
+    (pairedFeedbackStep eta a b).1 + (pairedFeedbackStep eta a b).2 =
+      (1 + eta) * (a + b) := by
+  rw [pairedFeedbackStep_eq]
+  ring
+
+def pairedFeedbackState (eta a b : ℚ) : ℕ → ℚ × ℚ
+  | 0 => (a, b)
+  | n + 1 => pairedFeedbackStep eta
+      (pairedFeedbackState eta a b n).1 (pairedFeedbackState eta a b n).2
+
+def pairedFeedbackSum (eta a b : ℚ) : ℕ → ℚ
+  | n => (pairedFeedbackState eta a b n).1 + (pairedFeedbackState eta a b n).2
+
+theorem pairedFeedbackSum_succ (eta a b : ℚ) (n : ℕ) :
+    pairedFeedbackSum eta a b (n + 1) =
+      (1 + eta) * pairedFeedbackSum eta a b n := by
+  unfold pairedFeedbackSum pairedFeedbackState
+  rw [pairedFeedbackStep_sum]
+
+theorem pairedFeedbackSum_eq_pow (eta a b : ℚ) (n : ℕ) :
+    pairedFeedbackSum eta a b n = (1 + eta) ^ n * (a + b) := by
+  induction n with
+  | zero => simp [pairedFeedbackSum]
+  | succ n ih =>
+      rw [pairedFeedbackSum_succ, ih, pow_succ]
+      ring
+
+theorem pairedFeedback_sum_strictly_grows (eta a b : ℚ)
+    (eta_pos : 0 < eta) (sum_pos : 0 < a + b) :
+    a + b < (pairedFeedbackStep eta a b).1 + (pairedFeedbackStep eta a b).2 := by
+  rw [pairedFeedbackStep_sum]
+  nlinarith
+
 end Rectangular
 end ConstitutiveSectionReturn
 

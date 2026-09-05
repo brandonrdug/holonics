@@ -327,6 +327,28 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         Ok(capacity)
     }
 
+    pub fn missing_input_rows(&self, addresses: &[u32]) -> BTreeMap<u32,Vec<u32>> {
+        let mut missing=BTreeMap::new();
+        for operation in &self.ecology.operations {
+            if matches!(operation.primitive,NativeOperationPrimitive::Lookup {..}) {
+                let population=operation.coefficients[0];
+                let absent:BTreeSet<_>=addresses.iter().copied().filter(|row|
+                    !self.residence.has_input_row(population,*row)).collect();
+                if !absent.is_empty() { missing.insert(population.0,absent.into_iter().collect()); }
+            }
+        }
+        missing
+    }
+
+    /// Acquisition between ordinary operations preserves the same move owner and every held
+    /// carrier/overlay. Old addressed words keep their numerical standing; a newly addressed
+    /// row reopens dependencies when its ordinary occurrence enters.
+    pub fn extend_input_rows(&mut self, additions: &[super::NativeInputRowExtension]) -> Result<(),NativeFullOperationError> {
+        if self.interruption.is_some() { return Err(NativeFullOperationError::Interrupted); }
+        if !self.cycle_complete && self.operation_at != 0 { return Err(NativeFullOperationError::Occurrence); }
+        self.residence.extend_input_rows(self.ecology,additions,self.grain.0)
+    }
+
     pub fn cycle_complete(&self) -> bool {
         self.cycle_complete
     }
