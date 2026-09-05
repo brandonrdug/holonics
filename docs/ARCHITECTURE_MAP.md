@@ -72,7 +72,11 @@ and `holonics-hna::{checkpoint,publication,session}` preserve actual factor arra
 chronology, pending/interrupted state and numerical origins through a dependency-bearing checkpoint.
 The public callback session retains one native owner across requests. The
 [process-separated full-state return](../research/records/2026-09-05_HNP3_THE_CULTIVATED_SESSION_RESTORES_EVERY_HELD_FIELD_AND_CONTINUES_AFTER_PROCESS_EXIT.md)
-does not imply the still-unfinished streaming CLI or useful application output.
+does not imply useful application output. `holonics-hna::stream` and
+`holonics-workbench::session_stream` now own backpressured JSONL delivery; version-2 checkpoints
+retain its partial-input/pending-response state alongside that same native owner. The
+[streaming return](../research/records/2026-09-05_HNP3_THE_STREAM_RETAINS_PARTIAL_INPUT_AND_REPLAYS_OUTPUT_WITHOUT_REPEATING_DEVELOPMENT.md)
+preserves full native successors through process-separated input and output interruption.
 
 | Relation | Lean owner | Rust owner | CUDA owner | Status and exact open fibre |
 |---|---|---|---|---|

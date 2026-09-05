@@ -2,8 +2,8 @@
 use std::path::Path;
 
 use holonics::hna::{
-    AthenaTokenApplication, HnaCultivationAperture, HnaOccurrence, HnaRunReceipt, HnaRunRequest,
-    HnaSource, inspect_native_restricted_rest, run_hna,
+    inspect_native_restricted_rest, run_hna, AthenaTokenApplication, HnaCultivationAperture,
+    HnaOccurrence, HnaRunReceipt, HnaRunRequest, HnaSource,
 };
 use serde_json::json;
 
@@ -16,6 +16,7 @@ fn owner(error: impl std::fmt::Display) -> WorkbenchError {
 
 pub fn execute(command: HnaCommand) -> Result<AdapterReturn, WorkbenchError> {
     match command {
+        HnaCommand::Session { .. } => Err(owner("streaming HNA sessions require the process stream entry point or holonics::hna::HnaStream, not a batch response collector")),
         HnaCommand::Run { request } => {
             let bytes = std::fs::read(&request).map_err(owner)?;
             let request: HnaRunRequest = serde_json::from_slice(&bytes).map_err(owner)?;

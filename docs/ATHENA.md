@@ -31,8 +31,8 @@ the same body, and actual joined-output changes return through their retained lo
 New factors publish when the cycle closes. Three native-model occurrences, the zero-partner
 discriminator and exact withdrawal/restoration returned in
 [HNP1](../research/records/2026-09-04_HNP1_THE_ACTUAL_JOINED_PASSAGE_RETURNS_LOCAL_DEVELOPMENT_AND_THE_DELTA_SURVIVES_ATTRIBUTION.md).
-The CLI commands below still expose their earlier prefix chart; persistent public sessions and
-general production delivery are HNP3/HNP4, not implied by this low-level addition.
+The older batch/text commands retain their prefix chart. The continuing public session and
+stream below expose observed-passage development; useful production applications are HNP4/HNP5.
 
 [established-bounded; measured] The observed-passage session now retains complete native numerical
 segments and reopens their dependency closure when entering material or coefficients change.
@@ -58,9 +58,11 @@ target/debug/holonics hna --help
 | `hna train MODEL SEQUENCE.json` | One developmental session over a JSON array of strictly extending text prefixes; optional `--learning-shift` and `--series-terms` declare the existing return aperture. |
 | `hna run REQUEST.json` | A typed address/history sequence over a supported resident operator directory or a restricted SKE rest. |
 | `hna inspect REST` | A native restricted-rest header, without initializing CUDA. |
+| `hna session SOURCE --checkpoint NEW.hna` | A continuing observed-passage session with versioned JSONL input/output and a final native-plus-transport checkpoint; use `--resume` for a checkpoint source. |
 
-Use global `--format json` for the versioned response envelope, `--format jsonl` for events,
-or the default human summary. `MODEL` currently names a supported local Gemma directory with
+For the batch commands, use global `--format json` for the versioned response envelope,
+`--format jsonl` for events, or the default human summary. `session` always uses its own JSONL
+stream on stdout and final process receipt on stderr. `MODEL` names a supported local Gemma directory with
 its configuration, Safetensors coefficients and tokenizer. The tokenizer is an application codec.
 
 Example developmental material:
@@ -150,15 +152,72 @@ fn continue_model() -> Result<(), HnaSessionError> {
 [definition] Keep the callback open across a continuing request stream. Returning closes the
 runtime; save explicitly if development must outlive it. Admission and publication refusals leave
 the owner available inside the callback. A native failure after work begins retains an explicit
-interruption and refuses silent replay. The structured streaming CLI and delivery controls are
-still HNP3 work, not aliases for the existing commands above.
+interruption and refuses silent replay.
+
+## Streaming session and restart
+
+[established-bounded; implemented-exact] `HnaModel::with_stream_session` supplies the same native
+owner plus an exterior `HnaStream`. It reads one complete request before advancing and drains and
+flushes the resulting event before accepting another. Transport packet boundaries create no
+native occurrences. The request schema is `org.holonics.hna.stream-request.v1`; each JSONL record
+has a `command` with `action` equal to `advance`, `inspect`, `checkpoint`, or `close`:
+
+```json
+{"schema":"org.holonics.hna.stream-request.v1","command":{"action":"inspect"}}
+{"schema":"org.holonics.hna.stream-request.v1","command":{"action":"advance","occurrence":{"row_addresses":[1,2],"history":[]}}}
+{"schema":"org.holonics.hna.stream-request.v1","command":{"action":"checkpoint","path":"during-session.hna"}}
+{"schema":"org.holonics.hna.stream-request.v1","command":{"action":"close"}}
+```
+
+[definition] Replace the illustrative addresses with an actually admitted occurrence/history
+from `declared_occurrences()`; the current SKE family restriction still applies. An `advance`
+can request `"full_emission":true` to include all terminal intervals. The default returns the
+selected face, emission shape, local-return receipt and anatomy; it does not decode prose.
+Full interval responses can be large (118 MB in the native recovery control).
+
+```sh
+# Fresh observed-passage model; source is a native restricted SKE rest, not an HF directory.
+target/debug/holonics hna session native.rest --input requests.jsonl \
+  --checkpoint first.hna --learning-shift 16 --series-terms 14
+
+# New process, same saved native development and delivery state.
+target/debug/holonics hna session first.hna --resume --input more.jsonl \
+  --checkpoint second.hna
+```
+
+[definition] Input defaults to stdin (`--input -`). `--checkpoint` is required and must name a
+new file. EOF or `close` triggers a final checkpoint; input/output errors also attempt that save
+and exit nonzero. A failed final publication is reported as unsaved state, not rollback.
+Resume preserves the stored learning aperture; explicit aperture overrides are refused.
+`--base PATH` on resume relocates the separate immutable base only if its wire pin matches.
+
+[definition] `HNA-CHECKPOINT` version 1 carries native state; version 2 additionally carries
+partial input, a pending response, the writer's accepted-byte cursor, event sequence and connection
+state. Both retain the exact separate base dependency and the existing integrity footer. Native-only
+read/session APIs refuse a transport-bearing checkpoint rather than discarding delivery state.
+The native model requires the standing CUDA apparatus; the returned actual run uses an RTX 4080
+SUPER/16 GiB, an 8.8 GiB base and 0.36--0.58 GB session artifacts. These are measured sizes for
+this model/configuration, not general model limits or host-memory requirements.
+
+[definition] Retrying the same writer continues at its accepted-byte cursor. Opening a new
+connection replays the pending event from its start with the same sequence, without repeating
+the native request. Accepted bytes and successful flush are not peer acknowledgment; peer-side
+deduplication is external, and arbitrary process crashes do not imply end-to-end exactly-once
+delivery. The CLI opens a new connection on each process. Incomplete input can receive its tail
+after restart. A completed malformed frame remains held until the API operator explicitly takes
+it with `take_input()`; later records are not silently appended to it.
+
+[established-bounded; measured] The [HNP3 streaming return](../research/records/2026-09-05_HNP3_THE_STREAM_RETAINS_PARTIAL_INPUT_AND_REPLAYS_OUTPUT_WITHOUT_REPEATING_DEVELOPMENT.md)
+compared complete native successor states after normal streaming, split-input process restart,
+and a broken output pipe followed by replay. `input-exhausted` and `connection-closed` describe
+transport only: the native anatomy remains `awaiting-occurrence`, not naturally completed output.
 
 ## Production expectations
 
 [definition] The [production campaign](plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md)
 specifies the general material/current binding and local development missing from the narrow
 prefix convenience pathway, as well as persistence and multi-cycle output. The public callback
-session exists; the production stream and multi-cycle application outputs remain in construction. Dataset delivery
+and durable stream now exist; useful multi-cycle application output remains in construction. Dataset delivery
 must preserve actual causal occurrences and may not define learning through arbitrary batching,
 shuffling or an optimizer callback.
 

@@ -2,8 +2,8 @@
 //! here; the native operation owns current, reaction and developmental successor formation.
 
 use crate::{
-    read_checkpoint, save_checkpoint_new, CheckpointError, HnaBaseDependency, HnaCheckpointReceipt,
-    HnaCultivationAperture, HnaOccurrence,
+    read_session_checkpoint, save_checkpoint_new, save_stream_checkpoint_new, CheckpointError,
+    HnaBaseDependency, HnaCheckpointReceipt, HnaCultivationAperture, HnaOccurrence,
 };
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
@@ -30,6 +30,8 @@ pub enum HnaSessionError {
     Rest(#[from] NativeSessionRestError),
     #[error("checkpoint: {0}")]
     Checkpoint(#[from] CheckpointError),
+    #[error("stream: {0}")]
+    Stream(#[from] crate::HnaStreamError),
 }
 
 /// Immutable admitted material and an optional durable starting state. This is not a running
@@ -39,6 +41,7 @@ pub struct HnaModel {
     dependency: HnaBaseDependency,
     initial: Option<NativeFullSessionRest>,
     aperture: Option<HnaCultivationAperture>,
+    transport: Option<crate::HnaStreamState>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -66,6 +69,7 @@ impl HnaModel {
             dependency,
             initial: None,
             aperture: Some(aperture),
+            transport: None,
         })
     }
 
@@ -73,7 +77,9 @@ impl HnaModel {
         path: impl AsRef<Path>,
         base_override: Option<&Path>,
     ) -> Result<Self, HnaSessionError> {
-        let (mut dependency, initial) = read_checkpoint(path)?;
+        let saved = read_session_checkpoint(path)?;
+        let mut dependency = saved.dependency;
+        let initial = saved.state;
         let mut input = BufReader::new(dependency.open_verified(base_override)?);
         let material = NativeConeRestrictedEcology::read_rest_from(&mut input)
             .map_err(|e| HnaSessionError::Base(e.to_string()))?;
@@ -95,6 +101,7 @@ impl HnaModel {
             dependency,
             initial: Some(initial),
             aperture: None,
+            transport: saved.transport,
         })
     }
 
@@ -105,13 +112,30 @@ impl HnaModel {
     /// The existing admitted family, with its actual occurrence and history records. Equal
     /// entering words are not deduplicated into a claimed semantic occurrence identity.
     pub fn declared_occurrences(&self) -> Vec<HnaDeclaredOccurrence> {
-        self.material.classes.iter().filter(|class|
-            self.dependency.class.is_none_or(|selected| selected == class.ordinal))
-            .flat_map(|class| class.fibre.iter().flat_map(move |held|
-                self.material.histories.iter().map(move |history| HnaDeclaredOccurrence {
-                    class: class.ordinal, ordinal: held.occurrence,
-                    occurrence: HnaOccurrence { row_addresses: held.addresses.clone(), history: history.clone() }
-                }))).collect()
+        self.material
+            .classes
+            .iter()
+            .filter(|class| {
+                self.dependency
+                    .class
+                    .is_none_or(|selected| selected == class.ordinal)
+            })
+            .flat_map(|class| {
+                class.fibre.iter().flat_map(move |held| {
+                    self.material
+                        .histories
+                        .iter()
+                        .map(move |history| HnaDeclaredOccurrence {
+                            class: class.ordinal,
+                            ordinal: held.occurrence,
+                            occurrence: HnaOccurrence {
+                                row_addresses: held.addresses.clone(),
+                                history: history.clone(),
+                            },
+                        })
+                })
+            })
+            .collect()
     }
 
     /// Keep this callback open across the exposure/output stream: the base is mounted once and
@@ -119,6 +143,28 @@ impl HnaModel {
     /// explicitly before returning if its development must outlive the process. No tokenizer or
     /// old context is re-opened/re-encoded by an advance call.
     pub fn with_session<T>(
+        &self,
+        body: impl FnOnce(&mut HnaSession<'_, '_>) -> Result<T, HnaSessionError>,
+    ) -> Result<T, HnaSessionError> {
+        if self.transport.is_some() {
+            return Err(HnaSessionError::Base(
+                "checkpoint carries transport state; use with_stream_session".into(),
+            ));
+        }
+        self.with_native(body)
+    }
+
+    /// Restore both the continuing native owner and its exterior delivery state. The caller
+    /// explicitly opens a new connection if a pending response must be replayed there.
+    pub fn with_stream_session<T>(
+        &self,
+        body: impl FnOnce(&mut HnaSession<'_, '_>, &mut crate::HnaStream) -> Result<T, HnaSessionError>,
+    ) -> Result<T, HnaSessionError> {
+        let mut stream = crate::HnaStream::from_state(self.transport.clone().unwrap_or_default())?;
+        self.with_native(|session| body(session, &mut stream))
+    }
+
+    fn with_native<T>(
         &self,
         body: impl FnOnce(&mut HnaSession<'_, '_>) -> Result<T, HnaSessionError>,
     ) -> Result<T, HnaSessionError> {
@@ -240,6 +286,20 @@ impl HnaSession<'_, '_> {
     ) -> Result<HnaCheckpointReceipt, HnaSessionError> {
         let state = self.native.detach_rest()?;
         Ok(save_checkpoint_new(path, self.dependency, &state)?)
+    }
+
+    pub fn checkpoint_stream(
+        &self,
+        path: impl AsRef<Path>,
+        transport: &crate::HnaStreamState,
+    ) -> Result<HnaCheckpointReceipt, HnaSessionError> {
+        let state = self.native.detach_rest()?;
+        Ok(save_stream_checkpoint_new(
+            path,
+            self.dependency,
+            &state,
+            transport,
+        )?)
     }
 
     pub fn anatomy(&self) -> HnaSessionAnatomy {

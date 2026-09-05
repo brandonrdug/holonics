@@ -11,9 +11,13 @@ developmental sequence, selected-face receipts and persistence boundaries.
 - `HnaModel::from_checkpoint` and `with_session` restore one continuing native owner;
   `HnaSession::advance`, `checkpoint`, `anatomy` and the declared family are the current public
   persistent-session seam. Checkpoints explicitly pin their separate native base.
+- `HnaModel::with_stream_session` and `HnaStream::pump` retain partial JSONL input and pending
+  responses with backpressure. Native-plus-transport checkpoints restore both; new connections
+  replay a held event without repeating native development. The CLI is `holonics hna session`.
 
 The lower-level native session remains available from `holonic-engine` for interactive consumers.
 Earlier alpha/circulation adapters retain their exact artifact and wire scopes; they are not
 checkpoints of the cultivated full operator. The new native checkpoint is distinct from those
-older packages. Structured streaming CLI integration remains HNP3 work. Standard executable model export is a separate
+older packages. See the Athena guide for versioned requests, required final checkpoints, delivery
+limits and the still-bounded admitted family. Standard executable model export is a separate
 [interoperability contract](../../docs/INTEROPERABILITY.md).

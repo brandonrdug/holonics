@@ -6,19 +6,24 @@
 
 mod apertures;
 mod application;
+mod checkpoint;
 mod composed_variant;
 mod diffusion;
 mod hna;
-mod publication;
-mod checkpoint;
-mod session;
 mod material_codec;
+mod publication;
 mod receivers;
 mod recurrent_operator;
+mod session;
+mod stream;
 mod world_application;
 
 pub use apertures::addressed_ingress;
 pub use application::{AthenaAlphaAdmission, AthenaAlphaApplication, AthenaAlphaError};
+pub use checkpoint::{
+    read_checkpoint, save_checkpoint_new, CheckpointError, HnaBaseDependency, HnaCheckpointReceipt,
+};
+pub use checkpoint::{read_session_checkpoint, save_stream_checkpoint_new, HnaSavedSession};
 pub use composed_variant::{
     class_cone_roles, saturation, species_over_family, width_difference, ComposedFace,
     ComposedVariant, DeclaredDecoder, ProductVector, ReceiptDerivation, ReleaseReceipt,
@@ -30,16 +35,22 @@ pub use hna::{
     HnaOccurrence, HnaRestrictedInspection, HnaRunReceipt, HnaRunRequest, HnaSource, HnaSourceKind,
     HNA_RUN_SCHEMA,
 };
-pub use publication::{publish_new, PublicationError, PublicationReceipt};
-pub use checkpoint::{read_checkpoint, save_checkpoint_new, CheckpointError, HnaBaseDependency, HnaCheckpointReceipt};
-pub use session::{HnaDeclaredOccurrence, HnaModel, HnaSession, HnaSessionAnatomy, HnaSessionError, HnaSessionStatus};
 pub use material_codec::{
     render_material_artifact, AthenaMaterialArtifact, AthenaMaterialCodecError,
 };
+pub use publication::{publish_new, PublicationError, PublicationReceipt};
 pub use receivers::{inspect_cycle, AthenaAlphaCycleReceipt};
 pub use recurrent_operator::{
     AthenaRecurrentApplicationError, AthenaRenderedTokenFace, AthenaTextOccurrenceApplication,
     AthenaTokenApplication, AthenaVocabularyFace,
+};
+pub use session::{
+    HnaDeclaredOccurrence, HnaModel, HnaSession, HnaSessionAnatomy, HnaSessionError,
+    HnaSessionStatus,
+};
+pub use stream::{
+    HnaStream, HnaStreamCommand, HnaStreamDisposition, HnaStreamError, HnaStreamRequest,
+    HnaStreamState, HNA_STREAM_EVENT_SCHEMA, HNA_STREAM_REQUEST_SCHEMA,
 };
 pub use world_application::{
     ApplicationWorldError, ApplicationWorldReturn, ExactReadbackWorld, ProcessArtifactWorld,

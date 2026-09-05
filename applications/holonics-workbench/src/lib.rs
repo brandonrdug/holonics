@@ -11,12 +11,13 @@ pub mod presentation;
 pub mod protocol;
 pub mod render;
 pub mod runtime;
+mod session_stream;
 mod store;
 
 pub use cli::{parse_cli, Cli, OutputFormat, WorkbenchInvocation};
 pub use command::{
-    AthenaCommand, DiagnosticCommand, EngineCommand, ErosCommand, ExportCodecArgument,
-    SoulkillerCommand, HnaCommand, WorkbenchCommand, WorkspaceCommand,
+    AthenaCommand, DiagnosticCommand, EngineCommand, ErosCommand, ExportCodecArgument, HnaCommand,
+    SoulkillerCommand, WorkbenchCommand, WorkspaceCommand,
 };
 pub use event::{EventLevel, WorkbenchEvent};
 pub use protocol::{
@@ -25,5 +26,6 @@ pub use protocol::{
 };
 pub use render::{render_human, render_json, render_json_lines};
 pub use runtime::{WorkbenchError, WorkbenchRuntime};
+pub use session_stream::{run_hna_session_stream, HnaStreamProcessReceipt};
 
 pub const WORKBENCH_SCHEMA: &str = "org.holonics.workbench.event.v4";

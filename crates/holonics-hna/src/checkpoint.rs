@@ -17,6 +17,7 @@ use holonic_engine::native_ecology::holonic_intelligence::{
 use crate::publication::{publish_new, PublicationError, PublicationReceipt};
 
 const MAGIC: &[u8] = b"HNA-CHECKPOINT\x01";
+const STREAM_MAGIC: &[u8] = b"HNA-CHECKPOINT\x02";
 const END: &[u8] = b"HNA-CHECKPOINT-END\x01";
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -52,6 +53,22 @@ pub enum CheckpointError {
 pub struct HnaCheckpointReceipt {
     pub publication: PublicationReceipt<()>,
     pub dependency: HnaBaseDependency,
+}
+
+pub struct HnaSavedSession {
+    pub dependency: HnaBaseDependency,
+    pub state: NativeFullSessionRest,
+    pub transport: Option<crate::HnaStreamState>,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct TransportHeader {
+    sequence: u64,
+    input_complete: bool,
+    output_accepted: usize,
+    closed: bool,
+    has_output: bool,
 }
 
 impl HnaBaseDependency {
@@ -106,12 +123,55 @@ pub fn save_checkpoint_new(
     dependency: &HnaBaseDependency,
     state: &NativeFullSessionRest,
 ) -> Result<HnaCheckpointReceipt, CheckpointError> {
+    save_checkpoint(path.as_ref(), dependency, state, None)
+}
+
+pub fn save_stream_checkpoint_new(
+    path: impl AsRef<Path>,
+    dependency: &HnaBaseDependency,
+    state: &NativeFullSessionRest,
+    transport: &crate::HnaStreamState,
+) -> Result<HnaCheckpointReceipt, CheckpointError> {
+    transport
+        .validate()
+        .map_err(|e| CheckpointError::Malformed(e.to_string()))?;
+    save_checkpoint(path.as_ref(), dependency, state, Some(transport))
+}
+
+fn save_checkpoint(
+    path: &Path,
+    dependency: &HnaBaseDependency,
+    state: &NativeFullSessionRest,
+    transport: Option<&crate::HnaStreamState>,
+) -> Result<HnaCheckpointReceipt, CheckpointError> {
     let metadata = serde_json::to_vec(dependency)?;
     state.validate()?;
     let publication = publish_new(path, |file| {
-        file.write_all(MAGIC)?;
+        file.write_all(if transport.is_some() {
+            STREAM_MAGIC
+        } else {
+            MAGIC
+        })?;
         write_len(file, metadata.len())?;
         file.write_all(&metadata)?;
+        if let Some(transport) = transport {
+            let header = serde_json::to_vec(&TransportHeader {
+                sequence: transport.sequence,
+                input_complete: transport.input_complete,
+                output_accepted: transport.output_accepted,
+                closed: transport.closed,
+                has_output: transport.output.is_some(),
+            })
+            .map_err(io::Error::other)?;
+            for bytes in [
+                header.as_slice(),
+                transport.input.as_slice(),
+                transport.output.as_deref().unwrap_or(&[]),
+            ] {
+                write_len(file, bytes.len())?;
+                file.write_all(bytes)?;
+            }
+        }
         let extent_position = file.stream_position()?;
         file.write_all(&0u64.to_le_bytes())?;
         let start = file.stream_position()?;
@@ -138,6 +198,16 @@ pub fn save_checkpoint_new(
 pub fn read_checkpoint(
     path: impl AsRef<Path>,
 ) -> Result<(HnaBaseDependency, NativeFullSessionRest), CheckpointError> {
+    let saved = read_session_checkpoint(path)?;
+    if saved.transport.is_some() {
+        return Err(CheckpointError::Malformed(
+            "checkpoint carries transport state; use read_session_checkpoint".into(),
+        ));
+    }
+    Ok((saved.dependency, saved.state))
+}
+
+pub fn read_session_checkpoint(path: impl AsRef<Path>) -> Result<HnaSavedSession, CheckpointError> {
     let mut file = File::open(path)?;
     let length = file.metadata()?.len();
     if length < (MAGIC.len() + END.len() + 48) as u64 {
@@ -158,11 +228,35 @@ pub fn read_checkpoint(
     file.seek(SeekFrom::Start(0))?;
     let mut magic = vec![0; MAGIC.len()];
     file.read_exact(&mut magic)?;
-    if magic != MAGIC {
+    if magic != MAGIC && magic != STREAM_MAGIC {
         return Err(CheckpointError::Malformed("magic/version".into()));
     }
     let metadata = read_blob(&mut file, footer_start)?;
     let dependency: HnaBaseDependency = serde_json::from_slice(&metadata)?;
+    let transport = if magic == STREAM_MAGIC {
+        let header: TransportHeader = serde_json::from_slice(&read_blob(&mut file, footer_start)?)?;
+        let input = read_blob(&mut file, footer_start)?;
+        let output = read_blob(&mut file, footer_start)?;
+        if !header.has_output && !output.is_empty() {
+            return Err(CheckpointError::Malformed(
+                "unclaimed transport output".into(),
+            ));
+        }
+        let transport = crate::HnaStreamState {
+            sequence: header.sequence,
+            input,
+            input_complete: header.input_complete,
+            output: header.has_output.then_some(output),
+            output_accepted: header.output_accepted,
+            closed: header.closed,
+        };
+        transport
+            .validate()
+            .map_err(|e| CheckpointError::Malformed(e.to_string()))?;
+        Some(transport)
+    } else {
+        None
+    };
     let mut extent = [0; 8];
     file.read_exact(&mut extent)?;
     let extent = u64::from_le_bytes(extent);
@@ -172,7 +266,11 @@ pub fn read_checkpoint(
     }
     let mut input = io::BufReader::new(file.take(extent));
     let state = NativeFullSessionRest::read_from(&mut input, extent)?;
-    Ok((dependency, state))
+    Ok(HnaSavedSession {
+        dependency,
+        state,
+        transport,
+    })
 }
 
 fn write_len(out: &mut impl Write, len: usize) -> io::Result<()> {

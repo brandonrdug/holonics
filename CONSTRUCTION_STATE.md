@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** 2026-09-05. **Current construction:** HNP3 — streaming public-session integration.
+**Currency:** 2026-09-05. **Current construction:** HNP4 — production applications and multi-cycle output.
 
 This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md) orders work;
 completed history stays in its existing records and Git. Brandon's latest direct instruction
@@ -47,10 +47,16 @@ base wire pins, atomic no-overwrite publication, malformed/truncated artifact co
 interruption/remount controls returned. The [record](research/records/2026-09-05_HNP3_THE_CULTIVATED_SESSION_RESTORES_EVERY_HELD_FIELD_AND_CONTINUES_AFTER_PROCESS_EXIT.md)
 states the dependency-bearing artifact and exact runtime boundaries.
 
-[open] HNP3 still owes the structured streaming CLI and partial input/output delivery controls
-over that continuing owner. The CLI prefix convenience path is unchanged. Broader applications,
-useful production and executable export remain HNP4--HNP7. The earlier equalization policy remains
-archived; a checkpoint is not a qualitative model-performance claim.
+[established-bounded; measured] HNP3 is complete. The versioned streaming CLI retains partial
+input and pending output alongside the native state; actual process-separated split-input and
+broken-output recovery preserved the entire learned successor without repeating development.
+The [streaming completion record](research/records/2026-09-05_HNP3_THE_STREAM_RETAINS_PARTIAL_INPUT_AND_REPLAYS_OUTPUT_WITHOUT_REPEATING_DEVELOPMENT.md)
+states the full-state comparisons, delivery boundaries and 30 HNA / nine workbench checks.
+
+[open] HNP4 next composes text/document and genuinely different stateful/sensory applications,
+lawful wider native admission, complete multi-cycle products and ordinary later corrections over
+that owner. Useful evaluation and executable export remain HNP5--HNP7. The CLI prefix convenience
+path is unchanged; a checkpoint or stream transcript is not a qualitative model-performance claim.
 
 [definition] The plan then orders general material contact, resident locality/reuse, persistent
 sessions, multi-cycle output, a useful consumer-model milestone, executable export and supported
@@ -79,12 +85,14 @@ local generated material is retained in ignored `.local/`. The root README and o
 now lead into this layout. The equation atlas, generated index and invasive blanket validation
 suite are archived; Provenance and the actual organization supply navigation.
 
-[open] The current HNA training result is a run receipt, not a saved cultivated full-operator
-checkpoint. Standard executable model recompilation is distinct from existing Safetensors/ONNX
-package round-trips. Full cultivated checkpoint/remount, target graph/state/numeric lowering and
-additional realized model-family adapters remain the specified production bridges, alongside
-general material/current binding and local developmental execution. Qualitative
-frontier performance is an objective, not a result inferred from the mechanical checks.
+[established-bounded; measured] Cultivated full-operator checkpoint/remount and continuing
+public-session delivery now stand at HNP3's scope; the older prefix `hna train` still returns its
+run receipt. The new artifact is distinct from existing snapshot/package families.
+
+[open] Standard executable recompilation remains distinct from Safetensors/ONNX package
+round-trips. Useful applications, wider native admission, target graph/state/numeric lowering and
+additional realized model-family adapters remain the production bridges. Qualitative frontier
+performance is an objective, not a result inferred from mechanical checks.
 
 Current contracts: [architecture](docs/ARCHITECTURE.md), [Soulkiller](docs/SOULKILLER.md),
 [Athena](docs/ATHENA.md), [interoperability](docs/INTEROPERABILITY.md),

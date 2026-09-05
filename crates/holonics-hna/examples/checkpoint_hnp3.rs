@@ -8,7 +8,8 @@ use holonic_engine::{
     },
 };
 use holonics_hna::{
-    publish_new, read_checkpoint, save_checkpoint_new, HnaBaseDependency, HnaModel, HnaOccurrence,
+    publish_new, read_checkpoint, read_session_checkpoint, save_checkpoint_new, HnaBaseDependency,
+    HnaModel, HnaOccurrence,
 };
 use serde_json::json;
 use std::{
@@ -48,6 +49,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = std::env::args().collect();
     let started = std::time::Instant::now();
     match args.get(1).map(String::as_str) {
+        Some("compare-stream") if args.len() == 4 => {
+            let actual = read_session_checkpoint(&args[2])?;
+            let (_, expected) = read_checkpoint(&args[3])?;
+            assert!(actual.state == expected, "streamed native successor differs from its complete reference");
+            let transport = actual.transport.ok_or("stream checkpoint lacks transport state")?;
+            println!("{}", json!({"schema":"holonics.hnp3.stream-state-control.v1",
+                "complete_native_rest_equal":true,"generation":expected.header.generation,
+                "sequence":transport.sequence,"pending_input_octets":transport.input.len(),
+                "pending_output_octets":transport.output.as_ref().map_or(0,Vec::len),
+                "output_accepted":transport.output_accepted,"closed":transport.closed}));
+        }
         Some("write") if args.len() == 5 => {
             eprintln!("HNP3: pinning and loading base");
             let dependency = HnaBaseDependency::capture(&args[2], None)?;

@@ -22,7 +22,7 @@ contracts and records preserve their completed scope; their old imperatives sche
 
 ## Current campaign: production HNA
 
-**Current construction:** HNP3 — streaming integration over the returned persistent session.
+**Current construction:** HNP4 — production applications and multi-cycle output.
 
 [definition] Brandon's subsequent September 4 request authorizes the formal, holistic design of
 [the production-HNA campaign](THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md).
@@ -38,9 +38,12 @@ preserves the observed development under its decoder. Its subsequent
 [complete-segment reuse return](../../research/records/2026-09-04_HNP2_THE_NUMERICAL_SEGMENT_IS_REUSED_THE_NATIVE_OCCURRENCE_STILL_DEVELOPS_AND_CHANGED_DEPENDENCIES_REOPEN.md)
 closed HNP2 at the admitted operator scope with numerical-origin lineage, dependency reopening
 and native controls. HNP3's [checkpoint/public-session return](../../research/records/2026-09-05_HNP3_THE_CULTIVATED_SESSION_RESTORES_EVERY_HELD_FIELD_AND_CONTINUES_AFTER_PROCESS_EXIT.md)
-now preserves every held field across process restart and further native development. Structured
-streaming and its partial-delivery controls remain HNP3's next deed; useful-model performance
-is not inferred from persistence.
+now preserves every held field across process restart and further native development. Its
+[streaming completion](../../research/records/2026-09-05_HNP3_THE_STREAM_RETAINS_PARTIAL_INPUT_AND_REPLAYS_OUTPUT_WITHOUT_REPEATING_DEVELOPMENT.md)
+adds partial-input and broken-output process recovery without repeating development. HNP3 is
+complete. HNP4 next composes actual text/document and stateful/sensory applications, lawful wider
+admission, complete multi-cycle output and later ordinary correction; useful-model performance
+is not inferred from persistence or stream delivery.
 The ordered work is concrete local-current/presentation/development binding; general material
 contact; resident locality and reusable factors; persistent models and sessions; multi-cycle
 production; useful consumer-model evaluation; executable export; and additional model families.
