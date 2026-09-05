@@ -38,7 +38,10 @@ then derives a pressure-independent positive residual for the explicit radial co
 affine viscosity response, changing the next attempt to an anisotropic source chart. The
 [anisotropic-source return](../../research/records/2026-09-05_MFR3_THE_ANISOTROPIC_FRAME_RETURNS_ITS_PRESSURE_METRIC_AND_RADIAL_VISCOUS_CLOCK.md)
 constructs that actual source and its radial viscous clock, retaining the pressure metric,
-tensor diffusion, energy law and physical reconstruction.
+tensor diffusion, energy law and physical reconstruction. The
+[axial-pressure return](../../research/records/2026-09-05_MFR3_THE_AXIAL_PRESSURE_MEAN_RETURNS_THE_COMPLETE_QUADRATIC_SOURCE_THROUGH_THE_MOVING_CELL.md)
+then derives the complete pressure mean from the actual quadratic velocity source and transports
+its derivative through the exact moving horizontal cell.
 Later phase requirements are not asserted as results. The concurrent HNP campaign continues.
 **Grades:** per claim; written derivations, finite symbolic witnesses and kernel-checked returns
 retain their separate scopes.
@@ -428,11 +431,19 @@ recovers MFR1's velocity and the corresponding pressure metric normalization.
 at `K` and radial viscosity at `nu/K`. Axial viscosity and reduced axial pressure share the aspect
 factor `(r/z)^2`. These are source identities, without an asserted leading profile or stability.
 
-[definition] MFR3 next derives the pressure component with zero horizontal frequency from the
-actual periodic source, including its moving horizontal cell and axial period. Its possible axial
-force must remain in an aspect-ratio limit. Only then select the replacement leading profile and
-exterior, retaining radial diffusion and actual source/strain coupling. A further scalar frame
-only composes the old scalar chart; it does not create a new physical source.
+[proved-derived; formal-checked] The actual unforced periodic source now returns
+`Fourier(p)(0,0,n)=-Fourier(u_3^2)(0,0,n)` for every `n!=0`. Complete reconstruction gives
+`mean_h p + mean_h(u_3^2)=C(t)`, retaining the spatially constant pressure gauge. Compact-slab
+bounds pay the physical mean derivative. The exact shifted horizontal cell then gives
+`epsilon*d_zeta mean_h Pi=-d_zeta mean_h(W^2)` and the corresponding inverse-aspect gradient
+magnitude. These are actual source identities, without an asserted aspect-ratio limit.
+
+[definition] MFR3 next constructs the replacement radial-viscous profile and its periodic
+finite-energy exterior, deriving the required strain and pressure from that same source. The
+complete moving-cell quadratic mean must be evaluated before its axial force can be neglected;
+a first velocity mean or a local core alone does not supply it. Retain radial diffusion and
+actual source/strain coupling. A further scalar frame only composes the old scalar chart; it does
+not create a new physical source.
 
 [open] The replacement surviving family, MFR4 quantitative residual/stability control and MFR5
 arithmetic sign remain unfinished. Requiring full radial convergence before this source-directed

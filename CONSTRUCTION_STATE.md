@@ -222,9 +222,21 @@ share the aspect factor `(r/z)^2`; the physical angular reconstruction factor st
 passed. The isolated 9,904-job umbrella passed after repairing a committed HNP proof elaboration
 defect, preserving its statements and native behavior. The record states the checked snapshot.
 
-[open] MFR3 next derives the zero-horizontal-frequency pressure component from the actual
-periodic source and transported cell before selecting a replacement leading profile/exterior.
-A small axial coefficient does not itself remove the axial pressure force. MFR4's quantitative
+[proved-derived; formal-checked] The [axial-pressure return](research/records/2026-09-05_MFR3_THE_AXIAL_PRESSURE_MEAN_RETURNS_THE_COMPLETE_QUADRATIC_SOURCE_THROUGH_THE_MOVING_CELL.md)
+now fixes every nonconstant axial pressure mode from the actual periodic source, reconstructs the
+physical horizontal mean and pays its derivative under the integral. Exact moving-cell transport
+gives `epsilon*d_zeta mean_h Pi = -d_zeta mean_h(W^2)` and the inverse-aspect gradient magnitude.
+The constant pressure gauge and complete quadratic population remain explicit.
+
+[established-bounded; computational-witness] A smooth Taylor–Green source independently pays
+the full PDE and shifted-cell mean. Dropping the aspect factor or replacing the mean square by
+the square of the mean returns exact nonzero residuals.
+
+[established-bounded; process-audit] The complete frame endpoint passed 9,029 focused jobs;
+the live Lean umbrella passed all 9,912 jobs. The exact source control also returned.
+
+[open] MFR3 next constructs a replacement radial-viscous profile and derives its strain/pressure
+from a periodic finite-energy exterior, retaining the full mean-square source. MFR4's quantitative
 stability and MFR5's arithmetic sign remain open.
 
 ## RH line

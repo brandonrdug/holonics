@@ -1,0 +1,99 @@
+{
+  "scope": "Exact smooth Taylor--Green source and transported horizontal physical-cell mean; no blowup or normalized-family claim",
+  "arithmetic": "SymPy exact symbolic trigonometric identities; no floating values",
+  "sympy_version": "1.14.0",
+  "field": "u=a*(sin(2*pi*x)*cos(2*pi*z),0,-cos(2*pi*x)*sin(2*pi*z))",
+  "pressure": "p=a^2/4*(cos(4*pi*x)+cos(4*pi*z))",
+  "physical_harmonics": {
+    "velocity": [
+      [
+        1,
+        0,
+        1
+      ],
+      [
+        1,
+        0,
+        -1
+      ],
+      [
+        -1,
+        0,
+        1
+      ],
+      [
+        -1,
+        0,
+        -1
+      ]
+    ],
+    "pressure": [
+      [
+        2,
+        0,
+        0
+      ],
+      [
+        -2,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        2
+      ],
+      [
+        0,
+        0,
+        -2
+      ]
+    ]
+  },
+  "amplitude_law": "a_dot=-8*pi^2*nu*a",
+  "actual_amplitude": "exp(-8*pi**2*nu*t)",
+  "physical_checks": {
+    "divergence": "0",
+    "momentum_residual": [
+      "0",
+      "0",
+      "0"
+    ],
+    "horizontal_pressure_mean": "a**2*cos(4*pi*z)/4",
+    "horizontal_u3_square_mean": "a**2*sin(2*pi*z)**2/2",
+    "mean_sum": "a**2/4",
+    "mean_sum_z_derivative": "0"
+  },
+  "anisotropic_chart": {
+    "map": "(x,z)=(c0+r*y0,c2+zScale*zeta)",
+    "clock_rate": "r**2/K",
+    "W": "(r^2/(K*zScale))*u3(chart)",
+    "Pi": "(r/K)^2*p(chart)",
+    "epsilon": "r**2/zScale**2",
+    "inverse_frame_periods": {
+      "horizontal_chart_period": "1/r",
+      "vertical_chart_period": "1/zScale"
+    },
+    "transported_cell_mean": "r^2*integral_[-c0/r,(1-c0)/r] integral_[-c1/r,(1-c1)/r]",
+    "Pi_mean": "a**2*r**2*cos(pi*(4*c2 + 4*zScale*zeta))/(4*K**2)",
+    "W_square_mean": "a**2*r**4*(1 - cos(pi*(4*c2 + 4*zScale*zeta)))/(4*K**2*zScale**2)",
+    "W_mean": "0",
+    "balance": "0",
+    "without_epsilon": "pi*a**2*r**4*sin(4*pi*c2 + 4*pi*zScale*zeta)/(K**2*zScale) - pi*a**2*r**2*zScale*sin(4*pi*c2 + 4*pi*zScale*zeta)/K**2",
+    "mean_before_square": "-pi*a**2*r**4*sin(4*pi*c2 + 4*pi*zScale*zeta)/(K**2*zScale)",
+    "nonzero_source_coefficient": "-pi*a**2*r**2*zScale*sin(4*pi*c2 + 4*pi*zScale*zeta)/K**2"
+  },
+  "exact_control_point": {
+    "parameters": {
+      "a": "1",
+      "r": "1",
+      "zScale": "2",
+      "K": "1",
+      "c2": "0",
+      "zeta": "1/16"
+    },
+    "without_epsilon": "-3*pi/2",
+    "mean_before_square": "-pi/2"
+  },
+  "exit_status": 0
+}

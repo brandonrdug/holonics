@@ -103,8 +103,12 @@ The [anisotropic-source return](../../research/records/2026-09-05_MFR3_THE_ANISO
 now constructs that broader source chart, including the actual momentum equation, pressure metric,
 tensor diffusion, moving-cell energy law, periods and angular reconstruction. Choosing `b=r^2/K`
 retains radial diffusion and couples the axial pressure/diffusion through `(r/z)^2`.
-MFR3 next derives the zero-horizontal-frequency pressure component from the actual periodic
-source and transported cell, before choosing a replacement leading profile and exterior.
+The [axial-pressure return](../../research/records/2026-09-05_MFR3_THE_AXIAL_PRESSURE_MEAN_RETURNS_THE_COMPLETE_QUADRATIC_SOURCE_THROUGH_THE_MOVING_CELL.md)
+now derives that source component, reconstructs the physical horizontal mean, and transports its
+actual derivative through the shifted cell: `epsilon*d_zeta mean_h Pi = -d_zeta mean_h(W^2)`.
+Only the spatially constant pressure gauge is free. MFR3 next constructs a replacement
+radial-viscous profile with strain/pressure supplied by a periodic finite-energy exterior,
+retaining this complete quadratic mean before taking an aspect-ratio limit.
 MFR4 owns quantitative residual and linear/nonlinear control; full convergence is not a prior
 condition imposed on MFR3. The stationary exclusions and MFR5 arithmetic-sign obligation remain.
 HNP construction continues independently.
