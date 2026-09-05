@@ -121,29 +121,31 @@ integral derivatives and eventual rectangle-count agreement; its
 [record](research/records/2026-09-04_MFR2_THE_FOLDED_SOURCE_RETURNS_EVERY_HEAT_TIME_WITH_A_GAUSSIAN_REMAINDER_AND_ZERO_COUNT_RECEIVERS.md)
 includes the focused and 9,853-job umbrella checks.
 
-[proved-derived; formal-checked] MFR3's first
-[progress record](research/records/2026-09-04_MFR3_THE_PERIODIC_SOURCE_REJECTS_FIXED_PROFILES_AND_RETURNS_ITS_ENERGY_AND_COHERENT_FEEDS.md)
-returns periodic-profile exclusions, the actual energy exponent constraint, a complete shear
-control, and coherent finite coefficient feeds. Focused and umbrella builds passed; the record
-states the acceptance scope separately from its written local-core residual derivation.
-
-[proved-derived; formal-checked] The next
-[MFR3 return](research/records/2026-09-04_MFR3_THE_COHERENT_SOURCE_REACHES_A_PHYSICAL_FIELD_AND_THE_LOCAL_FRAME_RETURNS_ITS_FLUX.md)
-reconstructs the smooth coherent initial field, its actual advection and a local physical solution
-with nonzero projected nonlinear source at a positive time. It also returns initial-time Fourier
-continuity and the source's local moving energy flux. Focused and umbrella builds passed.
+[proved-derived; formal-checked] MFR3's earlier returns establish the
+[periodic exclusions and source controls](research/records/2026-09-04_MFR3_THE_PERIODIC_SOURCE_REJECTS_FIXED_PROFILES_AND_RETURNS_ITS_ENERGY_AND_COHERENT_FEEDS.md),
+the [physical coherent source and local moving flux](research/records/2026-09-04_MFR3_THE_COHERENT_SOURCE_REACHES_A_PHYSICAL_FIELD_AND_THE_LOCAL_FRAME_RETURNS_ITS_FLUX.md),
+and the [algebraic axis and first radial pressure correction](research/records/2026-09-05_MFR3_THE_AXIS_RETURNS_ITS_RADIAL_PRESSURE_JET_AND_THE_UNPAID_SWIRL_REMAINDER.md).
+Their focused and umbrella checks returned at the scopes stated in those records.
 
 [proved-derived; formal-checked] The
-[radial continuation](research/records/2026-09-05_MFR3_THE_AXIS_RETURNS_ITS_RADIAL_PRESSURE_JET_AND_THE_UNPAID_SWIRL_REMAINDER.md)
-now constructs the actual algebraic axis and strain, derives Cartesian pressure compatibility,
-rejects the affine-radial lift, and constructs the first pressure correction with its derivative
-at the zero axis. Matching the first swirl row leaves a positive quadratic remainder. Focused
-and umbrella builds passed.
+[resonance return](research/records/2026-09-05_MFR3_THE_RESONANT_ROW_RETURNS_A_COMPATIBILITY_POLYNOMIAL_AND_TWO_AXIS_REPAIRS.md)
+now derives the actual dilation transport, its resonant source-jet condition and free homogeneous
+fibre, an interior positive root of the explicit compatibility polynomial, and a smooth positive
+axis perturbation preserving the lower jets and relative tail.
 
-[open] MFR3 remains in progress. The next return must continue or replace the finite radial
-expansion with control of its retained swirl/pressure remainder, radial convergence and actual
-periodic exterior. The written smooth swirl integral construction remains to be formalized.
-Stability and the arithmetic sign remain open.
+[established-bounded; computational-witness] Exact reflection-symmetric radial rows find a
+degree-14 compatibility polynomial in squared swirl strength. Its unique positive root closes
+the retained rows through mode 15; pressure determines the prior free swirl coefficient while
+the next axial coefficient remains free. An independent 30th-axis-coefficient repair closes
+the retained rows through mode 14. These are finite Taylor returns.
+
+[established-bounded; process-audit] Focused Lean checks and the 9,875-job umbrella returned.
+The resonance record separates kernel acceptance from the exact finite symbolic source checks.
+
+[open] MFR3 remains in progress. Continue the amplitude branch with its retained axial
+fibre, subsequent resonances, radial remainder/convergence and actual periodic exterior.
+The general smooth inverse, full profile time current, viscosity, stability and arithmetic sign
+remain open.
 
 ## RH line
 

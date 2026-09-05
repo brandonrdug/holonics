@@ -1,0 +1,258 @@
+{
+  "scope": "Finite exact Taylor recurrence through radial mode 14; reflection-symmetric F even and W odd; no PDE existence or stability claim",
+  "sympy_version": "1.14.0",
+  "command": "/tmp/holonics-mfr3-symbolic/bin/python research/experiments/mfr3_periodic_core/derive_radial_resonance.py",
+  "parameters": {
+    "alpha": "3/2",
+    "beta": "1",
+    "p": "5/2",
+    "kappa": "7/2"
+  },
+  "budgets": {
+    "N_F(m)": "30-2*m",
+    "N_W(m)": "31-2*m",
+    "max_radial_mode": 14
+  },
+  "baseline": {
+    "F0": "(1+z^2)^(-5/4)",
+    "W0": "(7/2)*F0*integral(1/F0)-z"
+  },
+  "assertions": {
+    "divergence": "2*V+2*s*V_s+W_z",
+    "pressure_equation": "A_(m-1)'=2*m*B_m",
+    "swirl_equation": "C_m=0",
+    "V_m": "-W_m'/(2*(m+1))",
+    "scalar_row_control": "Each nonzero z-power row retains exact linear_coefficients and zero-coefficient compatibility forcing in the script receipt."
+  },
+  "row_summary": [
+    {
+      "label": "W1 pressure",
+      "status": "solved",
+      "rank": 15,
+      "unknown_count": 15,
+      "free_unknowns": []
+    },
+    {
+      "label": "F1 swirl",
+      "status": "solved",
+      "rank": 15,
+      "unknown_count": 15,
+      "free_unknowns": []
+    },
+    {
+      "label": "W2 pressure",
+      "status": "solved",
+      "rank": 14,
+      "unknown_count": 14,
+      "free_unknowns": []
+    },
+    {
+      "label": "F2 swirl",
+      "status": "solved",
+      "rank": 14,
+      "unknown_count": 14,
+      "free_unknowns": []
+    },
+    {
+      "label": "W3 pressure",
+      "status": "solved",
+      "rank": 13,
+      "unknown_count": 13,
+      "free_unknowns": []
+    },
+    {
+      "label": "F3 swirl",
+      "status": "solved",
+      "rank": 13,
+      "unknown_count": 13,
+      "free_unknowns": []
+    },
+    {
+      "label": "W4 pressure",
+      "status": "solved",
+      "rank": 12,
+      "unknown_count": 12,
+      "free_unknowns": []
+    },
+    {
+      "label": "F4 swirl",
+      "status": "solved",
+      "rank": 12,
+      "unknown_count": 12,
+      "free_unknowns": []
+    },
+    {
+      "label": "W5 pressure",
+      "status": "solved",
+      "rank": 11,
+      "unknown_count": 11,
+      "free_unknowns": []
+    },
+    {
+      "label": "F5 swirl",
+      "status": "solved",
+      "rank": 11,
+      "unknown_count": 11,
+      "free_unknowns": []
+    },
+    {
+      "label": "W6 pressure",
+      "status": "solved",
+      "rank": 10,
+      "unknown_count": 10,
+      "free_unknowns": []
+    },
+    {
+      "label": "F6 swirl",
+      "status": "solved",
+      "rank": 10,
+      "unknown_count": 10,
+      "free_unknowns": []
+    },
+    {
+      "label": "W7 pressure",
+      "status": "solved",
+      "rank": 9,
+      "unknown_count": 9,
+      "free_unknowns": []
+    },
+    {
+      "label": "F7 swirl",
+      "status": "solved",
+      "rank": 9,
+      "unknown_count": 9,
+      "free_unknowns": []
+    },
+    {
+      "label": "W8 pressure",
+      "status": "solved",
+      "rank": 8,
+      "unknown_count": 8,
+      "free_unknowns": []
+    },
+    {
+      "label": "F8 swirl",
+      "status": "solved",
+      "rank": 8,
+      "unknown_count": 8,
+      "free_unknowns": []
+    },
+    {
+      "label": "W9 pressure",
+      "status": "solved",
+      "rank": 7,
+      "unknown_count": 7,
+      "free_unknowns": []
+    },
+    {
+      "label": "F9 swirl",
+      "status": "solved",
+      "rank": 7,
+      "unknown_count": 7,
+      "free_unknowns": []
+    },
+    {
+      "label": "W10 pressure",
+      "status": "solved",
+      "rank": 6,
+      "unknown_count": 6,
+      "free_unknowns": []
+    },
+    {
+      "label": "F10 swirl",
+      "status": "solved",
+      "rank": 6,
+      "unknown_count": 6,
+      "free_unknowns": []
+    },
+    {
+      "label": "W11 pressure",
+      "status": "solved",
+      "rank": 5,
+      "unknown_count": 5,
+      "free_unknowns": []
+    },
+    {
+      "label": "F11 swirl",
+      "status": "solved",
+      "rank": 5,
+      "unknown_count": 5,
+      "free_unknowns": []
+    },
+    {
+      "label": "W12 pressure",
+      "status": "solved",
+      "rank": 4,
+      "unknown_count": 4,
+      "free_unknowns": []
+    },
+    {
+      "label": "F12 swirl",
+      "status": "solved",
+      "rank": 4,
+      "unknown_count": 4,
+      "free_unknowns": []
+    },
+    {
+      "label": "W13 pressure",
+      "status": "solved",
+      "rank": 3,
+      "unknown_count": 3,
+      "free_unknowns": []
+    },
+    {
+      "label": "F13 swirl",
+      "status": "solved",
+      "rank": 3,
+      "unknown_count": 3,
+      "free_unknowns": []
+    },
+    {
+      "label": "W14 pressure",
+      "status": "solved",
+      "rank": 2,
+      "unknown_count": 2,
+      "free_unknowns": []
+    },
+    {
+      "label": "F14 swirl",
+      "status": "incompatible",
+      "rank": 1,
+      "unknown_count": 2,
+      "free_unknowns": [
+        "F14_2"
+      ]
+    }
+  ],
+  "resonant_scalar_rows": [
+    {
+      "power": 0,
+      "linear_coefficients": {
+        "F14_0": "-7",
+        "F14_2": "0"
+      }
+    },
+    {
+      "power": 2,
+      "linear_coefficients": {
+        "F14_0": "525/4",
+        "F14_2": "0"
+      }
+    }
+  ],
+  "resonant_partial_solution": {
+    "F14_0": "19940827990687236191223094334062144680055788318838563356362668903149277459404972488906072006589868482164203264978413804872743687928368296447942607108761177705111581554991717389267696801844949035574540420888108971471608521066009791800485899/2582459260707003100222923184325662377850348466178803396832653060309980884211317062096927887990189190521737272915174794745036641210402929538642457758033662567947652063909901784635858607981155445645173063680000000000000000000000000"
+  },
+  "residual_recompute": {
+    "pressure_all_zero": true,
+    "swirl_m1_to_m13_zero": true,
+    "swirl_m14_z2": "-8851822921199785613621417443066016281182926116982311457301459062614200899082184589969057887127890434316223230613459928606880603954148898717772590150291106289149834700496174196627165384305943724327022743610371291630155196674390400336330191652461931/5590477544384058901170003372047127599214443925812785560611020712305996110552172324655608043547474174611880421798103420959429402494141077455922661588289420770109859051404531439218168013089543029567291993882624000000000000000000000000000000000"
+  },
+  "resonance": {
+    "row": 14,
+    "coefficient": "F14_z2",
+    "forcing": "-8851822921199785613621417443066016281182926116982311457301459062614200899082184589969057887127890434316223230613459928606880603954148898717772590150291106289149834700496174196627165384305943724327022743610371291630155196674390400336330191652461931/5590477544384058901170003372047127599214443925812785560611020712305996110552172324655608043547474174611880421798103420959429402494141077455922661588289420770109859051404531439218168013089543029567291993882624000000000000000000000000000000000",
+    "forcing_vanishes": false
+  },
+  "exit_status": 0
+}

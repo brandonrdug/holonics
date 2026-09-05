@@ -70,9 +70,14 @@ binds that population to a physical source, returns local moving energy flux, an
 specified modulated core at two spatial receivers. Its replacement algebraic axis now has a
 [radial continuation](../../research/records/2026-09-05_MFR3_THE_AXIS_RETURNS_ITS_RADIAL_PRESSURE_JET_AND_THE_UNPAID_SWIRL_REMAINDER.md):
 actual pressure compatibility forces a regular first correction, while the swirl equations retain
-a positive remainder beyond the matched rows. Continue or replace that radial expansion with
-remainder/convergence control and actual periodic exterior transport. Residual/stability and
-arithmetic-sign investigations follow their actual returns. HNP construction continues independently.
+a positive remainder beyond the matched rows. The
+[resonance return](../../research/records/2026-09-05_MFR3_THE_RESONANT_ROW_RETURNS_A_COMPATIBILITY_POLYNOMIAL_AND_TWO_AXIS_REPAIRS.md)
+then exposes the singular row, returns a degree-14 amplitude compatibility polynomial, and closes
+the retained finite rows through mode 15 at its positive root. A separate smooth axis perturbation
+repairs the mode-14 row while preserving lower jets. Continue the amplitude branch with the free
+axial coefficient retained, control subsequent resonances and radial convergence, and construct
+the actual periodic exterior transport. Residual/stability and arithmetic-sign investigations
+follow their actual returns. HNP construction continues independently.
 
 [project-postulate] Holonics is the mathematical framework and ontology of which HNA is an
 executable architecture. A research route may return a derivation, a counterexample or a precise

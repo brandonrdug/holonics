@@ -16,9 +16,13 @@ retains the first exclusions and controls; its
 returns physical reconstruction, local energy flux and a two-receiver modulated-core obstruction;
 the [radial continuation](../../research/records/2026-09-05_MFR3_THE_AXIS_RETURNS_ITS_RADIAL_PRESSURE_JET_AND_THE_UNPAID_SWIRL_REMAINDER.md)
 then constructs the first pressure correction of the replacement algebraic axis and retains its
-unpaid swirl coefficient.
+unpaid swirl coefficient. The
+[resonance return](../../research/records/2026-09-05_MFR3_THE_RESONANT_ROW_RETURNS_A_COMPATIBILITY_POLYNOMIAL_AND_TWO_AXIS_REPAIRS.md)
+continues the finite rows, exposes their compatibility polynomial, and returns two repairs of
+the first resonant row. The amplitude branch retains a free axial coefficient after mode 15.
 Later phase requirements are not asserted as results. The concurrent HNP campaign continues.
-**Grades:** per claim; new analytic calculations below are written derivations, not new Lean receipts.
+**Grades:** per claim; written derivations, finite symbolic witnesses and kernel-checked returns
+retain their separate scopes.
 
 ## 1. Purpose and the latest ruling
 
@@ -305,7 +309,7 @@ neither is a prerequisite to the other's first lemma.
 
 [definition] MFR1 returned the varying scalar length/amplitude chart with a moving centre.
 MFR2 returned its folded source, uniform remainder, derivatives and retained zero-count passage.
-MFR3 is the next construction. The later ansatz and sign phases are adaptive
+MFR3 is the current construction. The later ansatz and sign phases are adaptive
 research: their models and estimates are determined by the preceding source returns. They do
 not authorize an unbounded simulation, a new general search subsystem, or a claimed solution
 assembled from assumed stability/positivity fields.
@@ -326,11 +330,25 @@ smooth strain, Cartesian residual/pressure laws and a first radial pressure corr
 genuine derivative at the zero transport axis. The affine-radial profile has no smooth pressure
 completion; matching its first swirl correction leaves a strictly positive quadratic coefficient.
 
-[open] MFR3 remains in progress. The radial record retains the complete first-correction
-polynomials and a written regular integral construction for swirl. The next attempt must continue
-or replace the finite radial expansion while controlling its pressure/swirl remainder, radial
-convergence and actual periodic exterior transport. The full profile time current and viscosity
-remain part of that construction. The complete surviving-family return is unfinished.
+[proved-derived; formal-checked] The actual reciprocal axis now conjugates the linear swirl
+operator to dilation transport. Its differentiated zero-axis relation retains both the resonant
+source condition and the free homogeneous coefficient. The explicit compatibility polynomial
+has a kernel-checked interior positive root and a corresponding positive amplitude.
+A smooth positive perturbation of the
+axis changes its 30th derivative while preserving lower derivatives and its relative tail.
+
+[established-bounded; computational-witness] In the explicit reflection class at
+`alpha=3/2,beta=1,p=5/2`, the first resonant row gives a degree-14 polynomial in squared swirl
+strength. Its unique positive root closes the retained finite pressure/swirl rows through mode
+15. The mode-15 pressure relation determines the previous free swirl coefficient and retains
+the new axial coefficient. Independently, the 30th-axis-coefficient perturbation closes all
+retained rows through mode 14. The resonance record states exact Taylor budgets and receipts.
+
+[open] MFR3 remains in progress. Continue the amplitude branch with that free axial fibre and
+the subsequent compatibility conditions; control the complete pressure/swirl remainder, radial
+convergence and actual periodic exterior transport, or return the precise obstruction directing
+another family. The general smooth inverse, full profile time current and viscosity remain part
+of that construction. The complete surviving-family return is unfinished.
 
 ## 10. Return into the wider framework and verification
 

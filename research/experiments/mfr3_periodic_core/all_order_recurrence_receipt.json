@@ -1,0 +1,69 @@
+{
+  "scope": "Exact tests of the written all-order recurrence at modes 1..4, indicial multipliers, and a limited symmetry-breaking slice; no existence, stability, or continuation claim",
+  "sympy_version": "1.14.0",
+  "command": "/tmp/holonics-mfr3-symbolic/bin/python research/experiments/mfr3_periodic_core/derive_all_order_recurrence.py",
+  "all_order_coefficients": {
+    "B_linear": "Gamma*W_m' + [alpha+2*m*beta+(1-m)*W0']*W_m",
+    "B_lower": "sum_(i+j=m,i,j>=1) [W_i*W_j' - j/(i+1)*W_i'*W_j]",
+    "pressure_row": "A_(m-1)' = 2*m*B_m",
+    "C_linear": "Gamma*F_m' + [alpha+(2*m+1)*beta-(m+1)*W0']*F_m",
+    "C_known": "W_m*F0' - W_m'*F0/(m+1)",
+    "C_lower": "sum_(i+j=m,i,j>=1) [W_i*F_j' - (j+1)/(i+1)*W_i'*F_j]"
+  },
+  "finite_recurrence_test": {
+    "independent_fields": "W_j(z), F_j(z), j=0..4",
+    "tested_orders": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "source": "coefficients extracted from original B(rho), C(rho) Cauchy products"
+  },
+  "indicial_denominators": {
+    "W_m_z_n": "n*kappa+(2-m)*alpha+(m+1)*beta",
+    "F_m_z_n": "n*kappa-m*(alpha-beta)",
+    "kappa": "alpha+2*beta"
+  },
+  "resonance_aperture": {
+    "alpha": "3*beta/2",
+    "tested_m": "0..15",
+    "tested_n": "0..2",
+    "W_resonances": [
+      [
+        8,
+        0
+      ],
+      [
+        15,
+        1
+      ]
+    ],
+    "F_resonances": [
+      [
+        0,
+        0
+      ],
+      [
+        7,
+        1
+      ],
+      [
+        14,
+        2
+      ]
+    ],
+    "parity_reading": "W odd excludes W8,z0 and admits W15,z1; F even excludes F7,z1 and admits F14,z2",
+    "symmetry_breaking_retained": [
+      "F7,z1",
+      "W8,z0"
+    ]
+  },
+  "pressure_symmetry_breaking_audit": {
+    "paid_slice": "W0'=alpha+beta, W0''=0, W0'''=-2*kappa*p, F0=1-p*z^2/2, W8(0)=a8, F7'(0)=b7",
+    "B8_axis": "0 at alpha=3*beta/2",
+    "A7_prime_axis": "-2*b7",
+    "pressure_row": "A7'=16*B8 therefore b7=0 in this paid lower-aperture slice"
+  },
+  "exit_status": 0
+}
