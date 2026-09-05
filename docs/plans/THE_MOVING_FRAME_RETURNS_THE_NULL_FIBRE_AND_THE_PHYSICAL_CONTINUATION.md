@@ -41,7 +41,10 @@ constructs that actual source and its radial viscous clock, retaining the pressu
 tensor diffusion, energy law and physical reconstruction. The
 [axial-pressure return](../../research/records/2026-09-05_MFR3_THE_AXIAL_PRESSURE_MEAN_RETURNS_THE_COMPLETE_QUADRATIC_SOURCE_THROUGH_THE_MOVING_CELL.md)
 then derives the complete pressure mean from the actual quadratic velocity source and transports
-its derivative through the exact moving horizontal cell.
+its derivative through the exact moving horizontal cell. The
+[viscous-core return](../../research/records/2026-09-05_MFR3_THE_VISCOUS_CORE_RETURNS_ITS_PERIODIC_STRAIN_SOURCE_AND_CUBIC_RESPONSE.md)
+constructs the regular Gaussian comparison and actual periodic source, then returns the complete
+cubic pressure deformation that must join the continuing profile.
 Later phase requirements are not asserted as results. The concurrent HNP campaign continues.
 **Grades:** per claim; written derivations, finite symbolic witnesses and kernel-checked returns
 retain their separate scopes.
@@ -438,12 +441,24 @@ bounds pay the physical mean derivative. The exact shifted horizontal cell then 
 `epsilon*d_zeta mean_h Pi=-d_zeta mean_h(W^2)` and the corresponding inverse-aspect gradient
 magnitude. These are actual source identities, without an asserted aspect-ratio limit.
 
-[definition] MFR3 next constructs the replacement radial-viscous profile and its periodic
-finite-energy exterior, deriving the required strain and pressure from that same source. The
-complete moving-cell quadratic mean must be evaluated before its axial force can be neglected;
-a first velocity mean or a local core alone does not supply it. Retain radial diffusion and
-actual source/strain coupling. A further scalar frame only composes the old scalar chart; it does
-not create a new physical source.
+[proved-derived; formal-checked] The Gaussian circulation `L=Gamma*(1-exp(-q*s))`,
+`q=(a-2*beta)/(4*mu)`, now has a regular analytic angular velocity on the axis and an actual
+smooth divergence-free Cartesian field. Its whole linear-strain background is nonperiodic.
+A separate trigonometric potential supplies actual periodic initial data and positive local
+existence. The actual solution's first-gradient law retains the pressure Hessian and the viscous
+source. Three arbitrary-coefficient quartic harmonic pressures supply smooth cubic currents:
+their first jet vanishes, while their complete null fibre contains only the zero coefficient triple.
+
+[established-bounded; computational-witness] The periodic initial source matches the Gaussian
+velocity through fifth order; the exterior parameter first changes seventh-order velocity.
+Its complete Fourier pressure has a positive parameter matching the full desired first-gradient
+rate. The next complete cubic response is the negative gradient of three nonzero quartic harmonic
+pressure components. Both parameter roots and all Fourier/shape coefficients remain explicit.
+
+[definition] MFR3 next composes those returned cubic currents into the modulated core and derives
+its pressure evolution and higher spatial/time remainder from the same periodic exterior. The
+complete moving-cell quadratic mean remains part of this source. Retain radial diffusion and
+actual strain coupling; no fixed Gaussian shape or continuing growth law is assumed.
 
 [open] The replacement surviving family, MFR4 quantitative residual/stability control and MFR5
 arithmetic sign remain unfinished. Requiring full radial convergence before this source-directed

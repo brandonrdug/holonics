@@ -106,9 +106,19 @@ retains radial diffusion and couples the axial pressure/diffusion through `(r/z)
 The [axial-pressure return](../../research/records/2026-09-05_MFR3_THE_AXIAL_PRESSURE_MEAN_RETURNS_THE_COMPLETE_QUADRATIC_SOURCE_THROUGH_THE_MOVING_CELL.md)
 now derives that source component, reconstructs the physical horizontal mean, and transports its
 actual derivative through the shifted cell: `epsilon*d_zeta mean_h Pi = -d_zeta mean_h(W^2)`.
-Only the spatially constant pressure gauge is free. MFR3 next constructs a replacement
-radial-viscous profile with strain/pressure supplied by a periodic finite-energy exterior,
-retaining this complete quadratic mean before taking an aspect-ratio limit.
+Only the spatially constant pressure gauge is free.
+
+[proved-derived; formal-checked] The [viscous-core return](../../research/records/2026-09-05_MFR3_THE_VISCOUS_CORE_RETURNS_ITS_PERIODIC_STRAIN_SOURCE_AND_CUBIC_RESPONSE.md)
+now gives a regular Gaussian circulation, actual periodic potential/local-existence data, the
+physical first-gradient source law, and harmonic pressure currents with their complete null fibre.
+
+[established-bounded; computational-witness] The periodic source pays the desired full
+first-gradient rate at an algebraic parameter, while its complete cubic response requires three
+nonzero harmonic shape currents. The full Fourier source and both matching roots are retained.
+
+[definition] MFR3 next composes those currents into the modulated core and derives its pressure
+evolution and higher remainder from the same periodic exterior. The actual moving-cell mean
+remains part of that source; no aspect-ratio limit has been taken.
 MFR4 owns quantitative residual and linear/nonlinear control; full convergence is not a prior
 condition imposed on MFR3. The stationary exclusions and MFR5 arithmetic-sign obligation remain.
 HNP construction continues independently.

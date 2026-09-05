@@ -241,9 +241,23 @@ the square of the mean returns exact nonzero residuals.
 [established-bounded; process-audit] The complete frame endpoint passed 9,029 focused jobs;
 the live Lean umbrella passed all 9,912 jobs. The exact source control also returned.
 
-[open] MFR3 next constructs a replacement radial-viscous profile and derives its strain/pressure
-from a periodic finite-energy exterior, retaining the full mean-square source. MFR4's quantitative
-stability and MFR5's arithmetic sign remain open.
+[proved-derived; formal-checked] The [viscous-core return](research/records/2026-09-05_MFR3_THE_VISCOUS_CORE_RETURNS_ITS_PERIODIC_STRAIN_SOURCE_AND_CUBIC_RESPONSE.md)
+constructs the regular Gaussian circulation, actual periodic strain-potential data with local
+existence, and the physical first-gradient source law. Three smooth harmonic pressure currents
+have zero first jet while retaining a faithful complete coefficient receiver.
+
+[established-bounded; computational-witness] The exact periodic source matches the desired full
+first-gradient rate at a retained positive algebraic root. Its complete cubic response supplies
+three nonzero harmonic pressure currents; preserving the fixed Gaussian local shape fails there.
+Both matching roots, full modes and the lower-order attempt remain in the record.
+
+[established-bounded; process-audit] All five new formal owners passed their focused checks;
+the isolated 9,917-job umbrella passed against committed base `98efc058` plus those owners/imports.
+The exact source replay matched its receipt. Concurrent HNP draft work remains separate.
+
+[open] MFR3 next composes the three currents into a modulated core and derives its pressure
+evolution and higher remainder from the same periodic exterior. MFR4's quantitative stability
+and MFR5's arithmetic sign remain open.
 
 ## RH line
 

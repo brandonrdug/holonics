@@ -1,0 +1,36 @@
+{
+  "scope": "Exact off-axis Cartesian Gaussian comparison with prescribed linear strain; no periodic exterior or stability claim",
+  "sympy_version": "1.14.0",
+  "parameters": {
+    "strain": "2*beta + 4*mu*q",
+    "radial_viscosity": "mu",
+    "aspect": "epsilon"
+  },
+  "velocity": [
+    "-Gamma*y*(1 - exp(-q*(x**2 + y**2)))/(x**2 + y**2) + x*(-2*beta - 4*mu*q)/2",
+    "Gamma*x*(1 - exp(-q*(x**2 + y**2)))/(x**2 + y**2) + y*(-2*beta - 4*mu*q)/2",
+    "z*(2*beta + 4*mu*q)"
+  ],
+  "pressure": "(x**2 + y**2)*(beta*(2*beta + 4*mu*q)/2 - (2*beta + 4*mu*q)**2/8) + Integral(Gamma**2*(1 - exp(-q*v))**2/(2*v**2), (v, 0, x**2 + y**2)) - z**2*(2*beta + 4*mu*q)*(4*beta + 4*mu*q)/(2*epsilon)",
+  "drift": [
+    "-Gamma*y*(1 - exp(-q*(x**2 + y**2)))/(x**2 + y**2) + beta*x + x*(-2*beta - 4*mu*q)/2",
+    "Gamma*x*(1 - exp(-q*(x**2 + y**2)))/(x**2 + y**2) + beta*y + y*(-2*beta - 4*mu*q)/2",
+    "gamma*z + z*(2*beta + 4*mu*q)"
+  ],
+  "reaction": [
+    "beta*(-Gamma*y*(1 - exp(-q*(x**2 + y**2)))/(x**2 + y**2) + x*(-2*beta - 4*mu*q)/2)",
+    "beta*(Gamma*x*(1 - exp(-q*(x**2 + y**2)))/(x**2 + y**2) + y*(-2*beta - 4*mu*q)/2)",
+    "z*(2*beta - gamma)*(2*beta + 4*mu*q)"
+  ],
+  "cartesian_residual": [
+    "0",
+    "0",
+    "0"
+  ],
+  "axial_pressure_curvature": "-8*(beta + mu*q)*(beta + 2*mu*q)/epsilon",
+  "circulation": "Gamma*(1 - exp(-q*(x**2 + y**2)))",
+  "angular_axis_series": "Gamma*q**3*v**2/6 - Gamma*q**2*v/2 + Gamma*q",
+  "potential_axis_series_Gamma3_q1over3": "-v**3/324 + v**2/24 - v/2",
+  "axis_scope": "Smooth extension supplied separately by gaussianAngularVelocity_analyticAt in Lean",
+  "exit_status": 0
+}
