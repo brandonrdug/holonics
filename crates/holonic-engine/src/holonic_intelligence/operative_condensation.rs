@@ -846,6 +846,101 @@ pub struct NativeRestrictedIntake<'a> {
     class: Option<&'a NativeClassEcology>,
 }
 
+/// Additional immutable input sections, not a new Soulkiller signature family or a learned
+/// overlay. Only previously absent rows of lookup-only populations may be supplied here.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct NativeInputRowExtension {
+    pub population: u32,
+    pub rows: usize,
+    pub dim: usize,
+    pub addresses: Vec<u32>,
+    pub words: Vec<u16>,
+}
+
+/// Composition of admitted restricted material and independently acquired input sections.
+/// The original class/family records stay untouched. Wider input operation makes no assertion
+/// of inherited correspondence outside those records.
+pub struct NativeInputExtendedIntake<'a> {
+    base: NativeRestrictedIntake<'a>,
+    extensions: &'a [NativeInputRowExtension],
+}
+
+impl<'a> NativeInputExtendedIntake<'a> {
+    pub fn new(base: NativeRestrictedIntake<'a>, extensions: &'a [NativeInputRowExtension])
+        -> Result<Self, NativeOperatorResidenceError> {
+        base.restricted.validate().map_err(|_| NativeOperatorResidenceError::Witness)?;
+        let mut populations = BTreeSet::new();
+        for extension in extensions {
+            let at = extension.population as usize;
+            let section = base.restricted.cross_sections.get(at)
+                .ok_or(NativeOperatorResidenceError::Witness)?;
+            let uses: Vec<_> = base.restricted.ecology.operations.iter()
+                .filter(|node| node.coefficients.contains(&super::NativeTensorOrdinal(extension.population)))
+                .collect();
+            if !populations.insert(extension.population) || uses.is_empty()
+                || uses.iter().any(|node| !matches!(node.primitive, NativeOperationPrimitive::Lookup { .. }))
+                || extension.rows != section.rows || extension.dim != section.dim
+                || extension.addresses.is_empty()
+                || extension.addresses.len().checked_mul(extension.dim) != Some(extension.words.len())
+                || extension.addresses.windows(2).any(|pair| pair[0] >= pair[1])
+                || extension.addresses.iter().any(|row| *row as usize >= section.rows
+                    || section.retained_rows.binary_search(row).is_ok()) {
+                return Err(NativeOperatorResidenceError::Witness);
+            }
+        }
+        Ok(Self { base, extensions })
+    }
+
+    fn extension(&self, ordinal: usize) -> Option<&NativeInputRowExtension> {
+        self.extensions.iter().find(|extension| extension.population as usize == ordinal)
+    }
+
+    /// Input admission is the intersection of the actually supplied rows at every lookup port.
+    /// Missing material is not admitted by silently interpreting a foreign row as zero.
+    pub fn missing_input_rows(&self, addresses: &[u32]) -> BTreeMap<u32, Vec<u32>> {
+        let mut missing = BTreeMap::new();
+        for node in &self.base.restricted.ecology.operations {
+            if !matches!(node.primitive, NativeOperationPrimitive::Lookup { .. }) { continue; }
+            let population = node.coefficients[0].0;
+            let section = &self.base.restricted.cross_sections[population as usize];
+            let selected;
+            let rows = if self.base.class.is_none() { &section.retained_rows } else {
+                selected = self.base.selected_rows(section); &selected
+            };
+            let extension = self.extension(population as usize);
+            let absent: BTreeSet<_> = addresses.iter().copied().filter(|row|
+                rows.binary_search(row).is_err()
+                    && extension.is_none_or(|extra| extra.addresses.binary_search(row).is_err())).collect();
+            if !absent.is_empty() { missing.insert(population, absent.into_iter().collect()); }
+        }
+        missing
+    }
+}
+
+impl NativeCoefficientIntake for NativeInputExtendedIntake<'_> {
+    fn populations(&self) -> usize { self.base.populations() }
+    fn population_octets(&self, ordinal: usize) -> Result<u64, NativeOperatorResidenceError> {
+        self.base.population_octets(ordinal)
+    }
+    fn retained_rows(&self, ordinal: usize) -> Result<Option<Vec<u32>>, NativeOperatorResidenceError> {
+        let Some(extension) = self.extension(ordinal) else { return self.base.retained_rows(ordinal); };
+        let section = &self.base.restricted.cross_sections[ordinal];
+        let rows: BTreeSet<_> = self.base.selected_rows(section).into_iter()
+            .chain(extension.addresses.iter().copied()).collect();
+        Ok((rows.len() != section.rows).then(|| rows.into_iter().collect()))
+    }
+    fn deliver_retained(&mut self, ordinal: usize,
+        sink: &mut dyn FnMut(usize, &[u8]) -> Result<(), NativeOperatorResidenceError>)
+        -> Result<(), NativeOperatorResidenceError> {
+        self.base.deliver_chart_with_extension(ordinal, true, self.extension(ordinal), sink)
+    }
+    fn deliver(&mut self, ordinal: usize,
+        sink: &mut dyn FnMut(usize, &[u8]) -> Result<(), NativeOperatorResidenceError>)
+        -> Result<(), NativeOperatorResidenceError> {
+        self.base.deliver_chart_with_extension(ordinal, false, self.extension(ordinal), sink)
+    }
+}
+
 impl NativeCoefficientIntake for NativeRestrictedIntake<'_> {
     fn populations(&self) -> usize {
         self.restricted.cross_sections.len()
@@ -894,18 +989,30 @@ impl NativeRestrictedIntake<'_> {
     fn deliver_chart(&self, ordinal: usize, packed: bool,
         sink: &mut dyn FnMut(usize, &[u8]) -> Result<(), NativeOperatorResidenceError>,
     ) -> Result<(), NativeOperatorResidenceError> {
+        self.deliver_chart_with_extension(ordinal, packed, None, sink)
+    }
+
+    fn deliver_chart_with_extension(&self, ordinal: usize, packed: bool,
+        extension: Option<&NativeInputRowExtension>,
+        sink: &mut dyn FnMut(usize, &[u8]) -> Result<(), NativeOperatorResidenceError>,
+    ) -> Result<(), NativeOperatorResidenceError> {
         let section = self
             .restricted
             .cross_sections
             .get(ordinal)
             .ok_or(NativeOperatorResidenceError::Witness)?;
-        let rows = self.selected_rows(section);
+        let base_rows = self.selected_rows(section);
+        let rows: Vec<u32> = match extension {
+            None => base_rows.clone(),
+            Some(extra) => base_rows.iter().copied().chain(extra.addresses.iter().copied())
+                .collect::<BTreeSet<_>>().into_iter().collect(),
+        };
         let row_octets = section.dim.checked_mul(2).ok_or(NativeOperatorResidenceError::Extent)?;
         let expanded_octets = section.rows.checked_mul(row_octets).ok_or(NativeOperatorResidenceError::Extent)?;
         if section.retained_rows.windows(2).any(|pair| pair[0] >= pair[1])
             || section.retained_rows.last().is_some_and(|row| *row as usize >= section.rows)
             || section.retained_rows.len().checked_mul(section.dim) != Some(section.words.len())
-            || rows.iter().any(|row| section.retained_rows.binary_search(row).is_err()) {
+            || base_rows.iter().any(|row| section.retained_rows.binary_search(row).is_err()) {
             return Err(NativeOperatorResidenceError::Witness);
         }
         const CHUNK_OCTETS: usize = 64 << 20;
@@ -921,7 +1028,12 @@ impl NativeRestrictedIntake<'_> {
                         let words = &section.words[index * section.dim..(index + 1) * section.dim];
                         append_coefficient_octets(&mut chunk, words);
                     }
-                    Err(_) => return Err(NativeOperatorResidenceError::Witness),
+                    Err(_) => {
+                        let extra = extension.ok_or(NativeOperatorResidenceError::Witness)?;
+                        let index = extra.addresses.binary_search(&row)
+                            .map_err(|_| NativeOperatorResidenceError::Witness)?;
+                        append_coefficient_octets(&mut chunk, &extra.words[index * section.dim..(index + 1) * section.dim]);
+                    }
                 }
             } else {
                 chunk.resize(chunk.len() + row_octets, 0);
@@ -956,6 +1068,9 @@ fn append_coefficient_octets(chunk: &mut Vec<u8>, words: &[u16]) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use super::super::{NativeAttentionTopology, NativeCarrierAxis, NativeCarrierChart,
+        NativeCarrierOrdinal, NativeCoefficientPopulation, NativeKvStanding, NativeLayerTopology,
+        NativeOperatorNode, NativeScaleConstraint, NativeTensorOrdinal};
 
     #[test]
     fn native_coefficient_wire_preserves_every_u16_codeword_and_refuses_truncation() {
@@ -1072,6 +1187,60 @@ mod tests {
         restricted.cross_sections[0].retained_rows = vec![1];
         assert!(restricted.intake(None).unwrap().deliver_retained(0, &mut |_, _| Ok(())).is_err(),
             "missing codewords refuse rather than panic or synthesize values");
+    }
+
+    fn extension_control_base() -> NativeConeRestrictedEcology {
+        NativeConeRestrictedEcology {
+            schema: NATIVE_CONE_RESTRICTED_ECOLOGY_SCHEMA.to_owned(),
+            ecology: NativeFullOperatorEcology {
+                schema: super::super::NATIVE_FULL_OPERATOR_ECOLOGY_SCHEMA.to_owned(),
+                shared_carrier_extent: 2,
+                coefficient_populations: vec![NativeCoefficientPopulation {
+                    ordinal: NativeTensorOrdinal(0), shape: vec![4, 2], coefficient_population: 8,
+                }],
+                carriers: vec![NativeCarrierChart { ordinal: NativeCarrierOrdinal(0), axes: vec![NativeCarrierAxis::Occurrence, NativeCarrierAxis::Fixed(2)] }],
+                operations: vec![NativeOperatorNode { ordinal: 0, layer: Some(0), primitive: NativeOperationPrimitive::Lookup { scale: NativeScaleConstraint::Rational { numerator: 1, denominator: 1 } }, inputs: vec![], output: NativeCarrierOrdinal(0), coefficients: vec![NativeTensorOrdinal(0)] }],
+                layers: vec![NativeLayerTopology { ordinal: 0, attention: NativeAttentionTopology::Local, kv_standing: NativeKvStanding::Own, first_operation: 0, operation_population: 1 }],
+                coefficient_obstructions: vec![],
+            }, histories: vec![], classes: vec![], extent: BTreeMap::new(), sites: 0, extent_population: 0,
+            cross_sections: vec![NativeRestrictedCrossSection { population: 0, restriction: NativeRestriction::Addressed, rows: 4, dim: 2, retained_rows: vec![0, 2], words: vec![10, 11, 20, 21] }],
+        }
+    }
+
+    #[test]
+    fn extended_intake_merges_packed_rows_and_reports_missing_rows() {
+        let restricted = extension_control_base();
+        let extension = NativeInputRowExtension { population: 0, rows: 4, dim: 2, addresses: vec![1], words: vec![30, 31] };
+        let extensions = [extension];
+        let base = restricted.intake(None).unwrap();
+        let mut intake = NativeInputExtendedIntake::new(base, &extensions).unwrap();
+        assert_eq!(intake.retained_rows(0).unwrap(), Some(vec![0, 1, 2]));
+        assert_eq!(intake.missing_input_rows(&[0, 1, 2, 3]).get(&0), Some(&vec![3]));
+        let mut bytes = Vec::new();
+        intake.deliver_retained(0, &mut |offset, chunk| { assert_eq!(offset, bytes.len()); bytes.extend_from_slice(chunk); Ok(()) }).unwrap();
+        assert_eq!(bytes, [10u16, 11, 30, 31, 20, 21].into_iter().flat_map(u16::to_le_bytes).collect::<Vec<_>>());
+        let mut expanded = Vec::new();
+        intake.deliver(0, &mut |offset, chunk| { assert_eq!(offset, expanded.len()); expanded.extend_from_slice(chunk); Ok(()) }).unwrap();
+        assert_eq!(expanded, [10u16, 11, 30, 31, 20, 21, 0, 0].into_iter().flat_map(u16::to_le_bytes).collect::<Vec<_>>());
+    }
+
+    #[test]
+    fn extended_intake_refuses_replacement_duplicate_unsorted_range_extent_and_contract_use() {
+        let base = extension_control_base();
+        let reject = |extension: NativeInputRowExtension| NativeInputExtendedIntake::new(base.intake(None).unwrap(), &[extension]).is_err();
+        assert!(reject(NativeInputRowExtension { population: 0, rows: 4, dim: 2, addresses: vec![0], words: vec![1, 2] }));
+        assert!(reject(NativeInputRowExtension { population: 0, rows: 4, dim: 2, addresses: vec![3, 1], words: vec![1, 2, 3, 4] }));
+        assert!(reject(NativeInputRowExtension { population: 0, rows: 4, dim: 2, addresses: vec![3, 3], words: vec![1, 2, 3, 4] }));
+        assert!(reject(NativeInputRowExtension { population: 0, rows: 4, dim: 2, addresses: vec![4], words: vec![1, 2] }));
+        assert!(reject(NativeInputRowExtension { population: 0, rows: 4, dim: 2, addresses: vec![3], words: vec![1] }));
+        let mut contracted = base;
+        contracted.ecology.carriers.push(NativeCarrierChart { ordinal: NativeCarrierOrdinal(1), axes: vec![NativeCarrierAxis::Occurrence, NativeCarrierAxis::Fixed(4)] });
+        contracted.ecology.operations.push(NativeOperatorNode { ordinal: 1, layer: Some(0), primitive: NativeOperationPrimitive::Contract, inputs: vec![NativeCarrierOrdinal(0)], output: NativeCarrierOrdinal(1), coefficients: vec![NativeTensorOrdinal(0)] });
+        contracted.ecology.layers[0].operation_population = 2;
+        assert!(contracted.validate().is_ok());
+        assert!(NativeInputExtendedIntake::new(contracted.intake(None).unwrap(), &[
+            NativeInputRowExtension { population: 0, rows: 4, dim: 2, addresses: vec![1], words: vec![1, 2] }
+        ]).is_err());
     }
 
     #[test]

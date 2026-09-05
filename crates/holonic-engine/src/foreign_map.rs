@@ -499,9 +499,18 @@ use crate::exact_json as header_scan;
 /// **Every** entry: rank 0 included, unknown dtypes included as refusals, and the metadata slot
 /// retained verbatim rather than skipped by a name predicate.
 pub fn manifest_safetensors(address: &str) -> Result<(File, ForeignContainer), ForeignMapError> {
-    let mut file = File::open(address).map_err(|error| ForeignMapError::Open {
+    let file = File::open(address).map_err(|error| ForeignMapError::Open {
         address: address.to_owned(),
         reason: error.to_string(),
+    })?;
+    manifest_safetensors_file(file, address)
+}
+
+/// Manifest the same already-opened handle an exterior caller verified. The address is only
+/// diagnostic testimony; the caller must keep the underlying artifact immutable while consumed.
+pub fn manifest_safetensors_file(mut file: File, address: &str) -> Result<(File, ForeignContainer), ForeignMapError> {
+    file.seek(SeekFrom::Start(0)).map_err(|error| ForeignMapError::Open {
+        address: address.to_owned(), reason: error.to_string(),
     })?;
     let file_octets = file
         .metadata()

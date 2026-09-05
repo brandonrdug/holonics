@@ -33,6 +33,8 @@ pub enum HnaCommand {
         source: PathBuf,
         resume: bool,
         base_override: Option<PathBuf>,
+        #[serde(default)]
+        input_material: Vec<PathBuf>,
         class: Option<usize>,
         input: PathBuf,
         checkpoint: PathBuf,

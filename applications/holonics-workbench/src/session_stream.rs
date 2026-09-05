@@ -29,6 +29,7 @@ pub fn run_hna_session_stream(
         source,
         resume,
         base_override,
+        input_material,
         class,
         input,
         checkpoint,
@@ -57,7 +58,7 @@ pub fn run_hna_session_stream(
             File::open(input).map_err(|e| HnaSessionError::Base(e.to_string()))?,
         ))
     };
-    let model = if resume {
+    let mut model = if resume {
         HnaModel::from_checkpoint(source, base_override.as_deref())?
     } else {
         if base_override.is_some() {
@@ -74,6 +75,9 @@ pub fn run_hna_session_stream(
             },
         )?
     };
+    for material in input_material {
+        model = model.with_input_material(material)?;
+    }
     let mut output = io::stdout().lock();
     serve(&model, &mut input, &mut output, checkpoint)
 }

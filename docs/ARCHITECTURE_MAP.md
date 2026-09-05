@@ -78,6 +78,19 @@ retain its partial-input/pending-response state alongside that same native owner
 [streaming return](../research/records/2026-09-05_HNP3_THE_STREAM_RETAINS_PARTIAL_INPUT_AND_REPLAYS_OUTPUT_WITHOUT_REPEATING_DEVELOPMENT.md)
 preserves full native successors through process-separated input and output interruption.
 
+[established-bounded; measured] `operative_condensation.rs::NativeInputExtendedIntake` composes
+immutable, previously absent lookup-only rows with the restricted base. The application owner
+`holonics-hna::input_material` acquires and stores them as Safetensors; `session::advance_native`
+keeps supplied-input admission distinct from the original family. Checkpoint versions 3/4 retain
+the explicit additional dependencies.
+
+[proved-derived; formal-checked] `HolonicResidentRestriction` proves ordered old-row gather
+preservation and exact added-row return; its conditional continuation lemma is not CUDA verification.
+
+[established-bounded; measured]
+The [HNP4 input return](../research/records/2026-09-05_HNP4_INPUT_MATERIAL_EXTENDS_THE_NATIVE_DOMAIN_WITHOUT_PROMOTING_THE_INHERITED_FAMILY.md)
+records actual old-successor preservation and further process-separated development, not useful text.
+
 | Relation | Lean owner | Rust owner | CUDA owner | Status and exact open fibre |
 |---|---|---|---|---|
 | Exact finite diffusion and state-space chart | `Computation/HolonicDiffusionCharts.lean` | `diffusion.rs`; `sheaf_diffusion.rs`; `causal_body.rs` | `cuda_refine/membrane_boundary_*`; `membrane_factored_transport.rs` | **partial:** Lean Markov/deterministic separation is broader than one resident runtime owner |

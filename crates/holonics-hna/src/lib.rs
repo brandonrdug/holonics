@@ -10,6 +10,7 @@ mod checkpoint;
 mod composed_variant;
 mod diffusion;
 mod hna;
+mod input_material;
 mod material_codec;
 mod publication;
 mod receivers;
@@ -22,6 +23,7 @@ pub use apertures::addressed_ingress;
 pub use application::{AthenaAlphaAdmission, AthenaAlphaApplication, AthenaAlphaError};
 pub use checkpoint::{
     read_checkpoint, save_checkpoint_new, CheckpointError, HnaBaseDependency, HnaCheckpointReceipt,
+    HnaInputMaterialDependency,
 };
 pub use checkpoint::{read_session_checkpoint, save_stream_checkpoint_new, HnaSavedSession};
 pub use composed_variant::{
@@ -35,6 +37,7 @@ pub use hna::{
     HnaOccurrence, HnaRestrictedInspection, HnaRunReceipt, HnaRunRequest, HnaSource, HnaSourceKind,
     HNA_RUN_SCHEMA,
 };
+pub use input_material::HnaInputAcquisitionReceipt;
 pub use material_codec::{
     render_material_artifact, AthenaMaterialArtifact, AthenaMaterialCodecError,
 };
@@ -45,8 +48,8 @@ pub use recurrent_operator::{
     AthenaTokenApplication, AthenaVocabularyFace,
 };
 pub use session::{
-    HnaDeclaredOccurrence, HnaModel, HnaSession, HnaSessionAnatomy, HnaSessionError,
-    HnaSessionStatus,
+    HnaDeclaredOccurrence, HnaModel, HnaNativeAdmission, HnaNativeCycle, HnaSession,
+    HnaSessionAnatomy, HnaSessionError, HnaSessionStatus,
 };
 pub use stream::{
     HnaStream, HnaStreamCommand, HnaStreamDisposition, HnaStreamError, HnaStreamRequest,

@@ -316,6 +316,17 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         self.carriers.len() + usize::from(self.terminal_carrier.is_some())
     }
 
+    /// The current mounted input-workspace aperture, not a semantic maximum word length.
+    pub fn lookup_input_capacity(&self) -> Result<usize, NativeFullOperationError> {
+        let mut capacity = self.residence.receipt().addressed_occurrence_rows;
+        for operation in &self.ecology.operations {
+            if matches!(operation.primitive, NativeOperationPrimitive::Lookup { .. }) {
+                capacity = capacity.min(self.residence.aligned_row_capacity(operation.coefficients[0])?);
+            }
+        }
+        Ok(capacity)
+    }
+
     pub fn cycle_complete(&self) -> bool {
         self.cycle_complete
     }

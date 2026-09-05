@@ -18,6 +18,8 @@ use crate::publication::{publish_new, PublicationError, PublicationReceipt};
 
 const MAGIC: &[u8] = b"HNA-CHECKPOINT\x01";
 const STREAM_MAGIC: &[u8] = b"HNA-CHECKPOINT\x02";
+const MATERIAL_MAGIC: &[u8] = b"HNA-CHECKPOINT\x03";
+const MATERIAL_STREAM_MAGIC: &[u8] = b"HNA-CHECKPOINT\x04";
 const END: &[u8] = b"HNA-CHECKPOINT-END\x01";
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -27,6 +29,38 @@ pub struct HnaBaseDependency {
     pub octets: u64,
     pub sha256: String,
     pub class: Option<usize>,
+    /// Explicit immutable input material in addition to the original restricted base.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub input_material: Vec<HnaInputMaterialDependency>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct HnaInputMaterialDependency {
+    pub path: PathBuf,
+    pub octets: u64,
+    pub sha256: String,
+}
+
+impl HnaInputMaterialDependency {
+    pub fn capture(path: impl AsRef<Path>) -> Result<Self, CheckpointError> {
+        let pin = HnaBaseDependency::capture(path, None)?;
+        Ok(Self {
+            path: pin.path,
+            octets: pin.octets,
+            sha256: pin.sha256,
+        })
+    }
+    pub fn open_verified(&self) -> Result<File, CheckpointError> {
+        HnaBaseDependency {
+            path: self.path.clone(),
+            octets: self.octets,
+            sha256: self.sha256.clone(),
+            class: None,
+            input_material: Vec::new(),
+        }
+        .open_verified(None)
+    }
 }
 
 #[derive(Debug, Error)]
@@ -97,6 +131,7 @@ impl HnaBaseDependency {
             octets,
             sha256,
             class,
+            input_material: Vec::new(),
         })
     }
 
@@ -147,11 +182,14 @@ fn save_checkpoint(
     let metadata = serde_json::to_vec(dependency)?;
     state.validate()?;
     let publication = publish_new(path, |file| {
-        file.write_all(if transport.is_some() {
-            STREAM_MAGIC
-        } else {
-            MAGIC
-        })?;
+        file.write_all(
+            match (dependency.input_material.is_empty(), transport.is_some()) {
+                (true, false) => MAGIC,
+                (true, true) => STREAM_MAGIC,
+                (false, false) => MATERIAL_MAGIC,
+                (false, true) => MATERIAL_STREAM_MAGIC,
+            },
+        )?;
         write_len(file, metadata.len())?;
         file.write_all(&metadata)?;
         if let Some(transport) = transport {
@@ -228,12 +266,21 @@ pub fn read_session_checkpoint(path: impl AsRef<Path>) -> Result<HnaSavedSession
     file.seek(SeekFrom::Start(0))?;
     let mut magic = vec![0; MAGIC.len()];
     file.read_exact(&mut magic)?;
-    if magic != MAGIC && magic != STREAM_MAGIC {
+    if magic != MAGIC
+        && magic != STREAM_MAGIC
+        && magic != MATERIAL_MAGIC
+        && magic != MATERIAL_STREAM_MAGIC
+    {
         return Err(CheckpointError::Malformed("magic/version".into()));
     }
     let metadata = read_blob(&mut file, footer_start)?;
     let dependency: HnaBaseDependency = serde_json::from_slice(&metadata)?;
-    let transport = if magic == STREAM_MAGIC {
+    if dependency.input_material.is_empty() != (magic == MAGIC || magic == STREAM_MAGIC) {
+        return Err(CheckpointError::Malformed(
+            "input material requires its distinct checkpoint version".into(),
+        ));
+    }
+    let transport = if magic == STREAM_MAGIC || magic == MATERIAL_STREAM_MAGIC {
         let header: TransportHeader = serde_json::from_slice(&read_blob(&mut file, footer_start)?)?;
         let input = read_blob(&mut file, footer_start)?;
         let output = read_blob(&mut file, footer_start)?;

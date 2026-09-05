@@ -58,6 +58,13 @@ lawful wider native admission, complete multi-cycle products and ordinary later 
 that owner. Useful evaluation and executable export remain HNP5--HNP7. The CLI prefix convenience
 path is unchanged; a checkpoint or stream transcript is not a qualitative model-performance claim.
 
+[established-bounded; measured] HNP4's [input-material return](research/records/2026-09-05_HNP4_INPUT_MATERIAL_EXTENDS_THE_NATIVE_DOMAIN_WITHOUT_PROMOTING_THE_INHERITED_FAMILY.md)
+adds nine missing lookup rows without changing the original family. The entire old successor
+matched; two new text occurrences developed natively, and a fresh process retained all further
+development (generation 8,925 / factor extent 12,700). Their single-token readings were not useful
+responses. Complete multi-cycle application products, completion and the second interaction remain
+HNP4 work; this return does not advance the phase.
+
 [definition] The plan then orders general material contact, resident locality/reuse, persistent
 sessions, multi-cycle output, a useful consumer-model milestone, executable export and supported
 SSM/diffusion-family extensions. This is not a token-volume programme or a conventional trainer

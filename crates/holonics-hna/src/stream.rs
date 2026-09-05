@@ -29,6 +29,12 @@ pub enum HnaStreamCommand {
         #[serde(default)]
         full_emission: bool,
     },
+    /// Explicit native material domain; the original inherited-family command is unchanged.
+    AdvanceNative {
+        occurrence: HnaOccurrence,
+        #[serde(default)]
+        full_emission: bool,
+    },
     Inspect,
     Checkpoint {
         path: PathBuf,
@@ -226,6 +232,15 @@ impl HnaStream {
                     }
                 },
                 HnaStreamCommand::Inspect => self.emit("state", target.inspect())?,
+                HnaStreamCommand::AdvanceNative {
+                    occurrence,
+                    full_emission,
+                } => match target.advance_native(&occurrence, full_emission) {
+                    Ok(value) => self.emit("native-advanced", value)?,
+                    Err(error) => {
+                        self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?
+                    }
+                },
                 HnaStreamCommand::Checkpoint { path } => {
                     // The artifact contains this pending reply. Restoring it can deliver the
                     // publication result without repeating any earlier native operation.
@@ -259,6 +274,7 @@ impl Default for HnaStream {
 /// supplied through the public stream protocol; the production implementation uses HnaSession.
 trait StreamTarget {
     fn advance(&mut self, occurrence: &HnaOccurrence, full: bool) -> Result<Value, String>;
+    fn advance_native(&mut self, occurrence: &HnaOccurrence, full: bool) -> Result<Value, String>;
     fn inspect(&self) -> Value;
     fn checkpoint(&self, path: &Path, transport: &HnaStreamState) -> Result<(), String>;
 }
@@ -266,19 +282,13 @@ trait StreamTarget {
 impl StreamTarget for HnaSession<'_, '_> {
     fn advance(&mut self, occurrence: &HnaOccurrence, full: bool) -> Result<Value, String> {
         let cycle = HnaSession::advance(self, occurrence).map_err(|e| e.to_string())?;
-        let face = face_of_last_row(
-            &cycle.final_emission.intervals,
-            cycle.final_emission.rows,
-            cycle.final_emission.width,
-        );
-        let mut emission = cycle.final_emission;
-        if !full {
-            emission.intervals.clear();
-        }
-        Ok(
-            json!({"emission":emission,"selected_face":face,"full_intervals":full,
-            "local_returns":cycle.passage_returns,"anatomy":self.anatomy()}),
-        )
+        Ok(cycle_value(cycle, full, self.anatomy()))
+    }
+    fn advance_native(&mut self, occurrence: &HnaOccurrence, full: bool) -> Result<Value, String> {
+        let cycle = HnaSession::advance_native(self, occurrence).map_err(|e| e.to_string())?;
+        let mut value = cycle_value(cycle.output, full, self.anatomy());
+        value["admission"] = json!(cycle.admission);
+        Ok(value)
     }
     fn inspect(&self) -> Value {
         json!(self.anatomy())
@@ -288,6 +298,24 @@ impl StreamTarget for HnaSession<'_, '_> {
             .map(|_| ())
             .map_err(|e| e.to_string())
     }
+}
+
+fn cycle_value(
+    cycle: holonic_engine::native_ecology::holonic_intelligence::NativeFullCycleOutput,
+    full: bool,
+    anatomy: crate::HnaSessionAnatomy,
+) -> Value {
+    let face = face_of_last_row(
+        &cycle.final_emission.intervals,
+        cycle.final_emission.rows,
+        cycle.final_emission.width,
+    );
+    let mut emission = cycle.final_emission;
+    if !full {
+        emission.intervals.clear();
+    }
+    json!({"emission":emission,"selected_face":face,"full_intervals":full,
+            "local_returns":cycle.passage_returns,"anatomy":anatomy})
 }
 
 #[cfg(test)]
@@ -304,6 +332,13 @@ mod tests {
         saved: RefCell<Option<HnaStreamState>>,
     }
     impl StreamTarget for Target {
+        fn advance_native(
+            &mut self,
+            occurrence: &HnaOccurrence,
+            full: bool,
+        ) -> Result<Value, String> {
+            self.advance(occurrence, full)
+        }
         fn advance(&mut self, _: &HnaOccurrence, _: bool) -> Result<Value, String> {
             self.advances += 1;
             Ok(json!({"effects":self.advances}))
@@ -333,6 +368,19 @@ mod tests {
             },
             full_emission: false,
         })
+    }
+
+    #[test]
+    fn native_domain_is_an_explicit_stream_request_and_event() {
+        let bytes=request(HnaStreamCommand::AdvanceNative {
+            occurrence:HnaOccurrence {row_addresses:vec![4,9],history:vec![]},full_emission:false,
+        });
+        let mut stream=HnaStream::new(); let mut target=Target::default(); let mut output=Vec::new();
+        assert_eq!(stream.pump_target(&mut target,&mut Cursor::new(bytes),&mut output).unwrap(),
+            HnaStreamDisposition::InputExhausted);
+        let event:Value=serde_json::from_slice(&output).unwrap();
+        assert_eq!(event["event"],"native-advanced");
+        assert_eq!(target.advances,1);
     }
 
     struct PartialInput {

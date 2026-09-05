@@ -1,6 +1,6 @@
 # HNA production: local learning, persistent models and executable export
 
-**Date:** 2026-09-04. **Status:** ACTIVE; HNP0--HNP3 returned, HNP4 application composition next.
+**Date:** 2026-09-04. **Status:** ACTIVE; HNP0--HNP3 returned, HNP4 application composition in progress.
 **Authority:** Brandon's formal planning request and subsequent instruction to complete HNP0--HNP7.
 **Order:** [THE_ROADMAP.md](THE_ROADMAP.md). **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 **Starting implementation:** `c12b2634`. Phase names below identify dependencies, not capabilities.
@@ -313,6 +313,12 @@ or re-tokenizing the entire prior session on every request. A trained model is a
 not the current run receipt. Document version and explicit resource/dependency requirements.
 
 ### HNP4 — Production learning and multi-cycle output
+
+[established-bounded; measured] The [input-material return](../../research/records/2026-09-05_HNP4_INPUT_MATERIAL_EXTENDS_THE_NATIVE_DOMAIN_WITHOUT_PROMOTING_THE_INHERITED_FAMILY.md)
+extends actual supplied lookup rows while retaining the original inherited family and complete
+old native successor. Further off-family native development survives process restart. This is
+material/persistence progress; its two single-token readings do not close the application-product,
+completion, ordinary-correction or second-interaction obligations below.
 
 **Depends on:** HNP3.
 

@@ -10,11 +10,12 @@ use holonic_engine::{
     native_ecology::holonic_intelligence::{
         mount_operator_surface, NativeConeRestrictedEcology, NativeCycleInterruption,
         NativeForwardReuseCensus, NativeFullCycleOutput, NativeFullOperationError,
-        NativeFullOperatorSession, NativeFullSessionRest, NativeOperatorResidence,
-        NativeSessionRestError,
+        NativeFullOperatorSession, NativeFullSessionRest, NativeInputExtendedIntake,
+        NativeInputRowExtension, NativeOperatorResidence, NativeSessionRestError,
     },
 };
 use serde::Serialize;
+use std::collections::BTreeMap;
 use std::{io::BufReader, path::Path};
 use thiserror::Error;
 
@@ -24,6 +25,8 @@ pub enum HnaSessionError {
     Base(String),
     #[error("occurrence admission: {0}")]
     Admission(String),
+    #[error("input sections absent at native populations: {rows:?}")]
+    MissingInput { rows: BTreeMap<u32, Vec<u32>> },
     #[error("native operation: {0}")]
     Native(#[from] NativeFullOperationError),
     #[error("native rest: {0}")]
@@ -42,6 +45,7 @@ pub struct HnaModel {
     initial: Option<NativeFullSessionRest>,
     aperture: Option<HnaCultivationAperture>,
     transport: Option<crate::HnaStreamState>,
+    input_material: Vec<NativeInputRowExtension>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -70,6 +74,7 @@ impl HnaModel {
             initial: None,
             aperture: Some(aperture),
             transport: None,
+            input_material: Vec::new(),
         })
     }
 
@@ -91,6 +96,14 @@ impl HnaModel {
         material
             .intake(dependency.class)
             .map_err(|e| HnaSessionError::Base(e.to_string()))?;
+        let input_material = crate::input_material::load(&dependency)?;
+        NativeInputExtendedIntake::new(
+            material
+                .intake(dependency.class)
+                .map_err(|e| HnaSessionError::Base(e.to_string()))?,
+            &input_material,
+        )
+        .map_err(|e| HnaSessionError::Base(e.to_string()))?;
         if let Some(path) = base_override {
             dependency.path = path
                 .canonicalize()
@@ -102,11 +115,48 @@ impl HnaModel {
             initial: Some(initial),
             aperture: None,
             transport: saved.transport,
+            input_material,
         })
     }
 
     pub fn dependency(&self) -> &HnaBaseDependency {
         &self.dependency
+    }
+
+    /// Acquire only missing input rows through the exterior source chart. This saves independent
+    /// material; it does not alter this model, run source inference or claim a new Soulkiller lift.
+    pub fn acquire_input_material(
+        &self,
+        source_root: &Path,
+        addresses: &[u32],
+        output: &Path,
+    ) -> Result<crate::HnaInputAcquisitionReceipt, HnaSessionError> {
+        crate::input_material::acquire(
+            &self.material,
+            &self.dependency,
+            &self.input_material,
+            source_root,
+            addresses,
+            output,
+        )
+    }
+
+    /// Compose an immutable material extension before mounting. Native development/rest is kept;
+    /// the original family remains unchanged and is not silently expanded by this operation.
+    pub fn with_input_material(mut self, path: impl AsRef<Path>) -> Result<Self, HnaSessionError> {
+        self.dependency
+            .input_material
+            .push(crate::HnaInputMaterialDependency::capture(path)?);
+        let input_material = crate::input_material::load(&self.dependency)?;
+        NativeInputExtendedIntake::new(
+            self.material
+                .intake(self.dependency.class)
+                .map_err(|e| HnaSessionError::Base(e.to_string()))?,
+            &input_material,
+        )
+        .map_err(|e| HnaSessionError::Base(e.to_string()))?;
+        self.input_material = input_material;
+        Ok(self)
     }
 
     /// The existing admitted family, with its actual occurrence and history records. Equal
@@ -171,9 +221,11 @@ impl HnaModel {
         let readout = ResidentReadout::new().map_err(|e| HnaSessionError::Base(e.to_string()))?;
         let surface =
             mount_operator_surface(&readout).map_err(|e| HnaSessionError::Base(e.to_string()))?;
-        let mut intake = self
+        let intake = self
             .material
             .intake(self.dependency.class)
+            .map_err(|e| HnaSessionError::Base(e.to_string()))?;
+        let mut intake = NativeInputExtendedIntake::new(intake, &self.input_material)
             .map_err(|e| HnaSessionError::Base(e.to_string()))?;
         let mut residence = NativeOperatorResidence::mount_from_intake(
             &surface,
@@ -199,6 +251,12 @@ impl HnaModel {
             native,
             material: &self.material,
             dependency: &self.dependency,
+            input_intake: intake,
+            additional_input_codewords: self
+                .input_material
+                .iter()
+                .map(|section| section.words.len() as u64)
+                .sum(),
         };
         body(&mut session)
     }
@@ -208,6 +266,22 @@ pub struct HnaSession<'residence, 'chart> {
     native: NativeFullOperatorSession<'residence, 'chart>,
     material: &'residence NativeConeRestrictedEcology,
     dependency: &'residence HnaBaseDependency,
+    input_intake: NativeInputExtendedIntake<'residence>,
+    additional_input_codewords: u64,
+}
+
+/// Domain testimony attached to an explicitly native continuation. Membership records only
+/// the original comparison family, not fidelity of a subsequently cultivated successor.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct HnaNativeAdmission {
+    pub original_family_class: Option<usize>,
+    pub supplied_input_rows: usize,
+    pub mounted_input_capacity: usize,
+}
+
+pub struct HnaNativeCycle {
+    pub admission: HnaNativeAdmission,
+    pub output: NativeFullCycleOutput,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -230,6 +304,7 @@ pub struct HnaSessionAnatomy {
     pub operations: usize,
     pub coefficient_populations: usize,
     pub retained_base_codewords: u64,
+    pub additional_input_codewords: u64,
     pub morphology_factor_extent: usize,
     pub held_carriers: usize,
     pub declared_occurrences: usize,
@@ -239,6 +314,51 @@ pub struct HnaSessionAnatomy {
 }
 
 impl HnaSession<'_, '_> {
+    /// Explicit native-domain recurrence, separate from the old inherited-family admission
+    /// receiver. The same native operation develops the same successor; this is not another
+    /// training mode. Every entering row must have actual material at every lookup port.
+    pub fn advance_native(
+        &mut self,
+        occurrence: &HnaOccurrence,
+    ) -> Result<HnaNativeCycle, HnaSessionError> {
+        if self.native.joined_passage_population() == 0 {
+            return Err(HnaSessionError::Admission(
+                "native continuation requires the observed-passage law".into(),
+            ));
+        }
+        let mut entering = occurrence.row_addresses.clone();
+        entering.extend_from_slice(&occurrence.history);
+        let capacity = self.native.lookup_input_capacity()?;
+        if entering.is_empty() || entering.len() > capacity {
+            return Err(HnaSessionError::Admission(format!(
+                "input rows {} exceed mounted aperture {capacity}, or are empty",
+                entering.len()
+            )));
+        }
+        let missing = self.input_intake.missing_input_rows(&entering);
+        if !missing.is_empty() {
+            return Err(HnaSessionError::MissingInput { rows: missing });
+        }
+        let original_family_class = self
+            .material
+            .admit(&occurrence.row_addresses, &occurrence.history)
+            .ok()
+            .filter(|class| {
+                self.dependency
+                    .class
+                    .is_none_or(|selected| selected == class.ordinal)
+            })
+            .map(|class| class.ordinal);
+        let output = self.native.advance_cycle_retained(&entering)?;
+        Ok(HnaNativeCycle {
+            admission: HnaNativeAdmission {
+                original_family_class,
+                supplied_input_rows: entering.len(),
+                mounted_input_capacity: capacity,
+            },
+            output,
+        })
+    }
     pub fn status(&self) -> HnaSessionStatus {
         match self.native.interruption() {
             Some(boundary) => HnaSessionStatus::Interrupted {
@@ -315,6 +435,7 @@ impl HnaSession<'_, '_> {
                 .map(|s| s.words.len() as u64)
                 .sum(),
             morphology_factor_extent: self.native.morphology_overlay_rank(),
+            additional_input_codewords: self.additional_input_codewords,
             held_carriers: self.native.carrier_population(),
             declared_occurrences: self.material.classes.iter().map(|c| c.fibre.len()).sum(),
             operation_profile: if self.native.joined_passage_population() > 0 {

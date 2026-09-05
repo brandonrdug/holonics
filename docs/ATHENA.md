@@ -214,6 +214,42 @@ transport only: the native anatomy remains `awaiting-occurrence`, not naturally 
 
 ## Production expectations
 
+[established-bounded; measured] HNP4 now has an explicit input-material extension. The actual
+restricted base kept all 262,144 rows at one lookup port but only 21 at the second. The public
+`HnaModel::acquire_input_material(source_root, addresses, output)` acquires missing rows through
+the exterior source chart and saves ordinary Safetensors; `with_input_material(path)` composes
+them before mounting. Only previously absent rows of lookup-only populations are accepted.
+Retained rows and populations used by any other operation cannot be replaced through this seam.
+This is material acquisition, not a new learning rule or an enlarged Soulkiller fidelity claim.
+
+[definition] `HnaSession::advance_native` uses the same observed-passage recurrence on the
+actually supplied input domain. It refuses missing sections or the mounted input-workspace limit
+before native advancement. Its admission receipt distinguishes original-family membership from
+native operation; it does not assert fidelity of a cultivated model. The existing `advance`
+retains its original-family check. The corresponding JSONL action is `advance-native` and its
+event is `native-advanced`; no existing `advance` request changes meaning.
+
+```sh
+target/debug/holonics hna session cultivated.hna --resume \
+  --input-material inputs.safetensors --input native-requests.jsonl \
+  --checkpoint extended.hna
+```
+
+[definition] Checkpoint versions 3 and 4 carry explicit input-material dependencies, respectively
+without and with transport state. Versions 1 and 2 retain their old meanings. Resume verifies and
+loads all named material without reopening a foreign source executor. Additional material is
+presently composed at mount, not acquired automatically during a live session; a generated address
+without its input sections remains an explicit obstruction. Safetensors here stores input sections,
+not an executable standard-model export. The original base and every material artifact must remain
+available and immutable.
+
+[established-bounded; measured] Nine added rows (193,980-byte artifact) preserved the entire
+old native successor and admitted two new text occurrences. A material-bearing checkpoint then
+continued after process restart with complete successor equality. Their single-token readings
+were ` mik` and ` yên`; neither is a useful response to the corresponding description/correction.
+The [input return](../research/records/2026-09-05_HNP4_INPUT_MATERIAL_EXTENDS_THE_NATIVE_DOMAIN_WITHOUT_PROMOTING_THE_INHERITED_FAMILY.md)
+states the control and remaining output obligations. This does not close HNP4.
+
 [definition] The [production campaign](plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md)
 specifies the general material/current binding and local development missing from the narrow
 prefix convenience pathway, as well as persistence and multi-cycle output. The public callback

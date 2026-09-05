@@ -184,6 +184,64 @@ theorem reconnection_changes_the_actual_current :
 
 end LocalityControls
 
+/-! ## Input-material extension -/
+
+def decodedOld (retained : Finset Row)
+    (compact : CompactRows retained → Col → K) : Row → Col → K :=
+  fun row col => if h : row ∈ retained then compact ⟨row, h⟩ col else 0
+
+def ExtensionRows (old new : Finset Row) := {row // row ∈ new ∧ row ∉ old}
+
+def decodedExtension (old new : Finset Row)
+    (compact : CompactRows old → Col → K)
+    (added : ExtensionRows old new → Col → K) : Row → Col → K :=
+  fun row col => if h : row ∈ old then compact ⟨row, h⟩ col
+    else if h : row ∈ new then added ⟨row, h, by assumption⟩ col else 0
+
+def gatherRows (matrix : Row → Col → K) (word : List Row) : List (Col → K) :=
+  word.map (matrix ·)
+
+theorem gather_old_rows_unchanged_after_extension
+    (old new : Finset Row) (compact : CompactRows old → Col → K)
+    (added : ExtensionRows old new → Col → K)
+    (word : List Row) (all_old : ∀ row ∈ word, row ∈ old) :
+    gatherRows (decodedOld old compact) word =
+      gatherRows (decodedExtension old new compact added) word := by
+  induction word with
+  | nil => rfl
+  | cons row rest ih =>
+      have row_old : row ∈ old := all_old row (by simp)
+      have rest_old : ∀ value ∈ rest, value ∈ old := by
+        intro value present
+        exact all_old value (by simp [present])
+      change decodedOld old compact row :: gatherRows (decodedOld old compact) rest =
+        decodedExtension old new compact added row ::
+          gatherRows (decodedExtension old new compact added) rest
+      rw [ih rest_old]
+      congr 1
+      funext col
+      simp [decodedOld, decodedExtension, row_old]
+
+theorem extension_returns_exact_added_section
+    (old new : Finset Row) (compact : CompactRows old → Col → K)
+    (added : ExtensionRows old new → Col → K)
+    {row : Row} (new_row : row ∈ new) (not_old : row ∉ old) (col : Col) :
+    decodedExtension old new compact added row col =
+      added ⟨row, new_row, not_old⟩ col := by
+  simp [decodedExtension, not_old, new_row]
+
+/-- A deterministic downstream receiver preserves the old gathered word conditionally: this is a
+mathematical consequence of equal inputs, not a claim about any particular CUDA implementation. -/
+theorem deterministic_continuation_preserves_old_word
+    (continuation : List (Col → K) → Face)
+    (old new : Finset Row) (compact : CompactRows old → Col → K)
+    (added : ExtensionRows old new → Col → K)
+    (word : List Row) (all_old : ∀ row ∈ word, row ∈ old) :
+    continuation (gatherRows (decodedOld old compact) word) =
+      continuation (gatherRows (decodedExtension old new compact added) word) := by
+  exact congrArg continuation
+    (gather_old_rows_unchanged_after_extension old new compact added word all_old)
+
 /-! ## Packed native state and local additive recurrence -/
 
 /-- A resident state keeps its compact base immutable in the chart and carries later full-width
@@ -245,6 +303,11 @@ def controlRetained : Finset TwoRows := {controlKept}
 
 def controlCompact : CompactRows controlRetained → OneCol → ℤ := fun _ _ => 3
 
+def extensionRetained : Finset TwoRows := {controlKept, controlOmitted}
+
+def extensionAdded : ExtensionRows controlRetained extensionRetained → OneCol → ℤ :=
+  fun _ _ => 11
+
 theorem omitted_control_is_zero :
     decode controlRetained controlCompact controlOmitted controlOnly = 0 := by
   exact decode_omitted_zero controlRetained controlCompact (row := controlOmitted)
@@ -255,6 +318,22 @@ theorem retained_control_is_nonzero :
   have present : controlKept ∈ controlRetained := by simp [controlRetained]
   rw [decode_retained controlRetained controlCompact present]
   norm_num [controlCompact, CompactRows]
+
+theorem old_word_repeats_are_unchanged_after_input_extension :
+    gatherRows (decodedOld controlRetained controlCompact)
+        [controlKept, controlKept] =
+      gatherRows (decodedExtension controlRetained extensionRetained controlCompact extensionAdded)
+        [controlKept, controlKept] := by
+  apply gather_old_rows_unchanged_after_extension
+  intro row present
+  simpa [controlRetained, controlKept] using present
+
+theorem new_row_discriminator_returns_added_section :
+    decodedExtension controlRetained extensionRetained controlCompact extensionAdded
+        controlOmitted controlOnly = 11 := by
+  apply extension_returns_exact_added_section
+  · simp [extensionRetained, controlOmitted]
+  · simp [controlRetained, controlOmitted, controlKept]
 
 def controlOverlay : Matrix TwoRows OneCol ℤ
   | row, _ => if row = controlKept then 5 else 7

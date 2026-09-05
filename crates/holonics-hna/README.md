@@ -14,6 +14,10 @@ developmental sequence, selected-face receipts and persistence boundaries.
 - `HnaModel::with_stream_session` and `HnaStream::pump` retain partial JSONL input and pending
   responses with backpressure. Native-plus-transport checkpoints restore both; new connections
   replay a held event without repeating native development. The CLI is `holonics hna session`.
+- `acquire_input_material` / `with_input_material` compose separately persisted, immutable
+  input-row additions. `HnaSession::advance_native` admits their actually supplied input domain;
+  the old inherited-family `advance` remains unchanged. See the guide for checkpoint versions
+  3/4, explicit dependencies and the currently incomplete application-output boundary.
 
 The lower-level native session remains available from `holonic-engine` for interactive consumers.
 Earlier alpha/circulation adapters retain their exact artifact and wire scopes; they are not

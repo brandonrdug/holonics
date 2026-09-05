@@ -73,6 +73,9 @@ pub enum HnaCli {
         /// Optional verified base override used only while resuming.
         #[arg(long = "base", requires = "resume")]
         base_override: Option<PathBuf>,
+        /// Additional native input sections; checkpoints retain their explicit dependencies.
+        #[arg(long)]
+        input_material: Vec<PathBuf>,
         /// Optional retained class used for a fresh session.
         #[arg(long, conflicts_with = "resume")]
         class: Option<usize>,
@@ -111,6 +114,7 @@ impl From<HnaCli> for HnaCommand {
                 source,
                 resume,
                 base_override,
+                input_material,
                 class,
                 input,
                 checkpoint,
@@ -120,6 +124,7 @@ impl From<HnaCli> for HnaCommand {
                 source,
                 resume,
                 base_override,
+                input_material,
                 class,
                 input,
                 checkpoint,
@@ -618,8 +623,34 @@ mod tests {
 
     #[test]
     fn hna_session_parses_checkpoint_and_mode_constraints() {
-        assert!(parse_cli(["holonics", "hna", "session", "saved.hna", "--resume", "--base", "base.rest", "--checkpoint", "next.hna"]).is_ok());
-        assert!(parse_cli(["holonics", "hna", "session", "saved.hna", "--resume", "--learning-shift", "9", "--checkpoint", "next.hna"]).is_err());
+        let material=parse_cli(["holonics","hna","session","model.hna","--resume",
+            "--checkpoint","next.hna","--input-material","inputs.safetensors"]).unwrap();
+        assert!(matches!(material.command,Some(WorkbenchCommand::Hna(HnaCommand::Session {input_material,..}))
+            if input_material==vec![PathBuf::from("inputs.safetensors")]));
+        assert!(parse_cli([
+            "holonics",
+            "hna",
+            "session",
+            "saved.hna",
+            "--resume",
+            "--base",
+            "base.rest",
+            "--checkpoint",
+            "next.hna"
+        ])
+        .is_ok());
+        assert!(parse_cli([
+            "holonics",
+            "hna",
+            "session",
+            "saved.hna",
+            "--resume",
+            "--learning-shift",
+            "9",
+            "--checkpoint",
+            "next.hna"
+        ])
+        .is_err());
         let invocation = parse_cli([
             "holonics",
             "hna",
@@ -637,7 +668,7 @@ mod tests {
             invocation.command,
             Some(WorkbenchCommand::Hna(HnaCommand::Session {
                 source, resume: false, base_override: None, class: None, input, checkpoint,
-                learning_shift: 9, series_terms: 14,
+                learning_shift: 9, series_terms: 14, ..
             })) if source == PathBuf::from("source.rest")
                 && input == PathBuf::from("events.jsonl")
                 && checkpoint == PathBuf::from("next.hna")
