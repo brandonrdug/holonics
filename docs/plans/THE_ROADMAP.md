@@ -67,9 +67,11 @@ contains its focused and umbrella checks. MFR3 is in progress: its
 retains the periodic exclusions, source energy/shear controls and complete coherent coefficient
 population. The [next return](../../research/records/2026-09-04_MFR3_THE_COHERENT_SOURCE_REACHES_A_PHYSICAL_FIELD_AND_THE_LOCAL_FRAME_RETURNS_ITS_FLUX.md)
 binds that population to a physical source, returns local moving energy flux, and rejects a
-specified modulated core at two spatial receivers. It constructs a replacement axial
-strain/vorticity relation with algebraic tails; extend that axis through the radial momentum,
-pressure and exterior/periodic transport or return the next obstruction. Residual/stability and
+specified modulated core at two spatial receivers. Its replacement algebraic axis now has a
+[radial continuation](../../research/records/2026-09-05_MFR3_THE_AXIS_RETURNS_ITS_RADIAL_PRESSURE_JET_AND_THE_UNPAID_SWIRL_REMAINDER.md):
+actual pressure compatibility forces a regular first correction, while the swirl equations retain
+a positive remainder beyond the matched rows. Continue or replace that radial expansion with
+remainder/convergence control and actual periodic exterior transport. Residual/stability and
 arithmetic-sign investigations follow their actual returns. HNP construction continues independently.
 
 [project-postulate] Holonics is the mathematical framework and ontology of which HNA is an

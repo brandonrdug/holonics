@@ -13,7 +13,10 @@ state their returned scopes. The
 [MFR3 progress record](../../research/records/2026-09-04_MFR3_THE_PERIODIC_SOURCE_REJECTS_FIXED_PROFILES_AND_RETURNS_ITS_ENERGY_AND_COHERENT_FEEDS.md)
 retains the first exclusions and controls; its
 [continuation](../../research/records/2026-09-04_MFR3_THE_COHERENT_SOURCE_REACHES_A_PHYSICAL_FIELD_AND_THE_LOCAL_FRAME_RETURNS_ITS_FLUX.md)
-returns physical reconstruction, local energy flux and a two-receiver modulated-core obstruction.
+returns physical reconstruction, local energy flux and a two-receiver modulated-core obstruction;
+the [radial continuation](../../research/records/2026-09-05_MFR3_THE_AXIS_RETURNS_ITS_RADIAL_PRESSURE_JET_AND_THE_UNPAID_SWIRL_REMAINDER.md)
+then constructs the first pressure correction of the replacement algebraic axis and retains its
+unpaid swirl coefficient.
 Later phase requirements are not asserted as results. The concurrent HNP campaign continues.
 **Grades:** per claim; new analytic calculations below are written derivations, not new Lean receipts.
 
@@ -318,12 +321,16 @@ field and its actual nonlinear source, including initial-time Fourier continuity
 interior time in an actual local solution where the projected nonlinear component is nonzero.
 The actual moving-frame energy law now retains local pressure, viscous, frame and boundary flux.
 
-[open] MFR3 remains in progress. The continuation record derives the full residual for a
-specified periodic toroidal/poloidal core. Its centre requires a particular strain modulation,
-while a second fixed axial receiver excludes that profile. The record then constructs the axial
-strain from a positive axial vorticity profile and selects an algebraic tail exponent. The next
-attempt must extend that coupled axis through radial momentum, pressure and actual
-core/exterior transport. This required complete surviving-family return remains unfinished.
+[proved-derived; formal-checked] The replacement positive algebraic axis now has an actual
+smooth strain, Cartesian residual/pressure laws and a first radial pressure correction with a
+genuine derivative at the zero transport axis. The affine-radial profile has no smooth pressure
+completion; matching its first swirl correction leaves a strictly positive quadratic coefficient.
+
+[open] MFR3 remains in progress. The radial record retains the complete first-correction
+polynomials and a written regular integral construction for swirl. The next attempt must continue
+or replace the finite radial expansion while controlling its pressure/swirl remainder, radial
+convergence and actual periodic exterior transport. The full profile time current and viscosity
+remain part of that construction. The complete surviving-family return is unfinished.
 
 ## 10. Return into the wider framework and verification
 

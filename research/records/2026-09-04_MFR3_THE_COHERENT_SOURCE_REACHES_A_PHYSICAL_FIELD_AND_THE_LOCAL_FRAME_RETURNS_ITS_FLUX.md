@@ -6,6 +6,10 @@
 **Position:** MFR3 remains in progress. **Grades:** per claim. Formal acceptance, written
 derivations and the symbolic receiver check have separate scopes.
 
+[historical] The [subsequent radial return](2026-09-05_MFR3_THE_AXIS_RETURNS_ITS_RADIAL_PRESSURE_JET_AND_THE_UNPAID_SWIRL_REMAINDER.md)
+constructs the first pressure correction of the coupled algebraic axis, verifies its derivative
+through the zero transport coefficient, and retains the next swirl remainder.
+
 ## The coherent population now has an actual source
 
 [proved-derived; formal-checked] `NavierStokesFiniteFourierSmoothReconstruction` upgrades the

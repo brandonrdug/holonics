@@ -133,11 +133,17 @@ reconstructs the smooth coherent initial field, its actual advection and a local
 with nonzero projected nonlinear source at a positive time. It also returns initial-time Fourier
 continuity and the source's local moving energy flux. Focused and umbrella builds passed.
 
-[open] MFR3 remains in progress. A second axial receiver rejects the tested Gaussian core after
-its centre strain is matched. The record constructs a replacement axial strain from the vorticity
-profile, with algebraic exponent `p=1+alpha/beta`. The next return must extend that axis through
-radial momentum, pressure and actual exterior/periodic transport. Stability and the arithmetic
-sign remain open.
+[proved-derived; formal-checked] The
+[radial continuation](research/records/2026-09-05_MFR3_THE_AXIS_RETURNS_ITS_RADIAL_PRESSURE_JET_AND_THE_UNPAID_SWIRL_REMAINDER.md)
+now constructs the actual algebraic axis and strain, derives Cartesian pressure compatibility,
+rejects the affine-radial lift, and constructs the first pressure correction with its derivative
+at the zero axis. Matching the first swirl row leaves a positive quadratic remainder. Focused
+and umbrella builds passed.
+
+[open] MFR3 remains in progress. The next return must continue or replace the finite radial
+expansion with control of its retained swirl/pressure remainder, radial convergence and actual
+periodic exterior. The written smooth swirl integral construction remains to be formalized.
+Stability and the arithmetic sign remain open.
 
 ## RH line
 

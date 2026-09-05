@@ -1,0 +1,43 @@
+{
+  "scope": "Exact Cartesian radial derivative algebra; no PDE existence, stability, or continuation claim",
+  "sympy_version": "1.14.0",
+  "command": "/tmp/holonics-mfr3-symbolic/bin/python research/experiments/mfr3_periodic_core/derive_radial_continuation.py",
+  "assertions": {
+    "divergence": "2*V + 2*s*V_s + W_z",
+    "residual": "(x*A-y*C, y*A+x*C, B)",
+    "radial_angular_laplacian": "4*s*f_ss + 8*f_s + f_zz",
+    "axial_laplacian": "4*s*W_ss + 4*W_s + W_zz",
+    "pressure_compatibility": "C=0 and A_z=2*B_s",
+    "pressure_gradient": "actual Cartesian gradient (2*x*P_s,2*y*P_s,P_z)",
+    "radial_lift_divergence": "0",
+    "radial_lift_pressure_equation": "Gamma*H' + (alpha+2*beta)*H = A0'/2",
+    "radial_lift_swirl_equation": "Gamma*K' + (alpha+3*beta-2*W0')*K = F*H'/2 - H*F'",
+    "axis_jet_receipt": {
+      "assumptions": [
+        "F(0)=1",
+        "F'(0)=0",
+        "F''(0)=-p",
+        "W(0)=0",
+        "p>0",
+        "kappa=alpha+2*beta>0",
+        "alpha>beta"
+      ],
+      "derived_axis_jets": {
+        "W_prime_0": "alpha+beta",
+        "W_second_0": "0 (from C'(0)=0 under F'(0)=0)",
+        "W_third_0": "-2*(alpha+2*beta)*p"
+      },
+      "pressure_correction": {
+        "H_0": "0",
+        "H_prime_0": "p*(1+kappa**2)/(2*kappa)"
+      },
+      "swirl_correction": {
+        "K_0": "p*(1+kappa**2)/(4*kappa*(beta-alpha))",
+        "quadratic_swirl_coefficient": "p**2*((alpha + 2*beta)**2 + 1)**2/(8*(alpha - beta)*(alpha + 2*beta)**2)",
+        "radial_order": "C_second_order = D*r**4; horizontal swirl residual is O(r**5)",
+        "curled_third_order": "6*D*r**4"
+      }
+    }
+  },
+  "exit_status": 0
+}
