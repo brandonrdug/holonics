@@ -701,6 +701,46 @@ impl<'chart> ResidentSurface<'chart> {
 
     /// Record the exact terminal-row restriction.  The source row stays resident; only the
     /// requested receiver fibre is copied into the successor section.
+    /// Finite Euclidean contact of two point observations, applied to a third interval section.
+    /// Formal owner: `HolonicOrientedSiteTransport.PassiveContact.contact`. Rows are independent
+    /// declared charts. This records its projected map, not a learned model binding, an inferred
+    /// metric, or the lifted axis. Inputs remain owned by their caller as the reconstruction fibre.
+    /// Non-point founding observations and unsupported arithmetic refuse on the device; no
+    /// midpoint, learning gain, clipping or hidden wider ecology is substituted.
+    pub fn record_passive_contact(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        source: &ResidentSection<'chart>,
+        arrived: &ResidentSection<'chart>,
+        query: &ResidentSection<'chart>,
+        out: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        const OPERATION: &str = "passive-contact";
+        if source.rows == 0 || source.width == 0
+            || [arrived, query, out].iter().any(|section|
+                section.rows != source.rows || section.width != source.width
+                    || section.grain != source.grain)
+        {
+            return Err(ResidentRefusal::Declaration {
+                operation: OPERATION, what: "contact sections require one nonempty carrier chart".into(),
+            });
+        }
+        let rows = u32::try_from(source.rows).map_err(|_| ResidentRefusal::GridAperture {
+            operation: OPERATION, rows: source.rows, width: source.width,
+        })?;
+        let width = u32::try_from(source.width).map_err(|_| ResidentRefusal::GridAperture {
+            operation: OPERATION, rows: source.rows, width: source.width,
+        })?;
+        let mut params = Params::new();
+        params.ptr(source.lo.device_ptr()).ptr(source.hi.device_ptr())
+            .ptr(arrived.lo.device_ptr()).ptr(arrived.hi.device_ptr())
+            .ptr(query.lo.device_ptr()).ptr(query.hi.device_ptr())
+            .u32(rows).u32(width).ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane, "section_passive_contact", source.rows, self.launch.block_x,
+            0, &mut params, OPERATION)
+    }
+
     pub fn record_terminal_row(
         &self,
         lane: &Lane<'_, 'chart>,

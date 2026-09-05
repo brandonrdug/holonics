@@ -773,6 +773,363 @@ theorem pairedFeedback_sum_strictly_grows (eta a b : ℚ)
 end Rectangular
 end ConstitutiveSectionReturn
 
+/-! ### Finite positive-metric passive contact
+
+This is a candidate contact law over actual same-fibre source and arrived observations.  It is
+not the `Add` equalization of an internal child and its sum: `x` and `y` are the observations
+which caused the contact.  The extra one-dimensional axis below records the signed energy gap;
+it is a passive lifting, not an application or full-network stability theorem.
+-/
+
+namespace PassiveContact
+
+open scoped BigOperators
+
+abbrev Vector (n : ℕ) := Fin n → ℝ
+
+def dot {n : ℕ} (u v : Vector n) : ℝ :=
+  ∑ i, u i * v i
+
+def squaredNorm {n : ℕ} (v : Vector n) : ℝ := dot v v
+
+theorem dot_add_left {n : ℕ} (u v w : Vector n) :
+    dot (u + v) w = dot u w + dot v w := by
+  simp [dot, Pi.add_apply, add_mul, Finset.sum_add_distrib]
+
+theorem dot_add_right {n : ℕ} (u v w : Vector n) :
+    dot u (v + w) = dot u v + dot u w := by
+  simp [dot, Pi.add_apply, mul_add, Finset.sum_add_distrib]
+
+theorem dot_neg_left {n : ℕ} (u v : Vector n) :
+    dot (-u) v = -dot u v := by
+  simp [dot, Pi.neg_apply, neg_mul, Finset.sum_neg_distrib]
+
+theorem dot_neg_right {n : ℕ} (u v : Vector n) :
+    dot u (-v) = -dot u v := by
+  simp [dot, Pi.neg_apply, mul_neg, Finset.sum_neg_distrib]
+
+theorem dot_smul_left {n : ℕ} (r : ℝ) (u v : Vector n) :
+    dot (r • u) v = r * dot u v := by
+  simp only [dot, Pi.smul_apply, smul_eq_mul]
+  calc
+    (∑ i, (r * u i) * v i) = ∑ i, r * (u i * v i) := by
+      apply Finset.sum_congr rfl
+      intro i hi
+      ring
+    _ = r * ∑ i, u i * v i := by rw [Finset.mul_sum]
+
+theorem dot_smul_right {n : ℕ} (u v : Vector n) (r : ℝ) :
+    dot u (r • v) = r * dot u v := by
+  simp only [dot, Pi.smul_apply, smul_eq_mul]
+  calc
+    (∑ i, u i * (r * v i)) = ∑ i, r * (u i * v i) := by
+      apply Finset.sum_congr rfl
+      intro i hi
+      ring
+    _ = r * ∑ i, u i * v i := by rw [Finset.mul_sum]
+
+theorem dot_comm {n : ℕ} (u v : Vector n) : dot u v = dot v u := by
+  simp [dot, mul_comm]
+
+theorem squaredNorm_nonneg {n : ℕ} (v : Vector n) : 0 ≤ squaredNorm v := by
+  unfold squaredNorm dot
+  exact Finset.sum_nonneg (fun i _ ↦ mul_self_nonneg (v i))
+
+theorem squaredNorm_eq_zero {n : ℕ} {v : Vector n}
+    (h : squaredNorm v = 0) : v = 0 := by
+  have hz : ∀ i : Fin n, v i * v i = 0 := by
+    have h' := (Finset.sum_eq_zero_iff_of_nonneg
+      (s := Finset.univ) (f := fun i : Fin n ↦ v i * v i)
+      (fun i _ ↦ mul_self_nonneg (v i))).mp h
+    simpa [squaredNorm, dot] using h'
+  funext i
+  have hi := hz i
+  exact mul_self_eq_zero.mp hi
+
+theorem dot_sub_left {n : ℕ} (u v w : Vector n) :
+    dot (u - v) w = dot u w - dot v w := by
+  rw [show u - v = u + (-v) by rfl, dot_add_left, dot_neg_left]
+  simp [sub_eq_add_neg]
+
+theorem dot_sub_right {n : ℕ} (u v w : Vector n) :
+    dot u (v - w) = dot u v - dot u w := by
+  rw [show v - w = v + (-w) by rfl, dot_add_right, dot_neg_right]
+  simp [sub_eq_add_neg]
+
+def difference {n : ℕ} (x y : Vector n) : Vector n := x - y
+
+def energyGap {n : ℕ} (x y : Vector n) : ℝ :=
+  squaredNorm y - squaredNorm x
+
+def positiveGap {n : ℕ} (x y : Vector n) : ℝ := max (energyGap x y) 0
+
+def gapMagnitude {n : ℕ} (x y : Vector n) : ℝ := |energyGap x y|
+
+def denominator {n : ℕ} (x y : Vector n) : ℝ :=
+  squaredNorm (difference x y) + gapMagnitude x y
+
+def contact {n : ℕ} (x y z : Vector n) : Vector n :=
+  if denominator x y = 0 then z else
+    z - (2 * (dot (difference x y) z + positiveGap x y) /
+      denominator x y) • difference x y
+
+theorem energyGap_eq_dot_difference_add {n : ℕ} (x y : Vector n) :
+    energyGap x y = squaredNorm (difference x y) - 2 * dot (difference x y) x := by
+  unfold energyGap difference squaredNorm
+  simp only [dot_sub_left, dot_sub_right]
+  rw [dot_comm y x]
+  ring
+
+theorem denominator_nonneg {n : ℕ} (x y : Vector n) : 0 ≤ denominator x y := by
+  unfold denominator
+  exact add_nonneg (squaredNorm_nonneg _) (abs_nonneg _)
+
+theorem denominator_eq_zero_iff {n : ℕ} (x y : Vector n) :
+    denominator x y = 0 ↔ x = y ∧ energyGap x y = 0 := by
+  constructor
+  · intro h
+    have hd : squaredNorm (difference x y) = 0 := by
+      have hn := squaredNorm_nonneg (difference x y)
+      have hc := abs_nonneg (energyGap x y)
+      unfold denominator at h
+      exact le_antisymm
+        (calc
+          squaredNorm (difference x y) ≤ squaredNorm (difference x y) +
+              gapMagnitude x y := le_add_of_nonneg_right hc
+          _ = 0 := h)
+        hn
+    have hxy : difference x y = 0 := squaredNorm_eq_zero hd
+    have hgap : |energyGap x y| = 0 := by
+      have hn := squaredNorm_nonneg (difference x y)
+      have hc := abs_nonneg (energyGap x y)
+      unfold denominator at h
+      exact le_antisymm
+        (calc
+          gapMagnitude x y ≤ squaredNorm (difference x y) + gapMagnitude x y :=
+            le_add_of_nonneg_left hn
+          _ = 0 := h)
+        hc
+    exact ⟨sub_eq_zero.mp hxy, abs_eq_zero.mp hgap⟩
+  · rintro ⟨rfl, hgap⟩
+    simp [denominator, difference, energyGap, gapMagnitude, squaredNorm, dot]
+
+theorem positiveGap_eq_of_pos {n : ℕ} {x y : Vector n}
+    (h : 0 < energyGap x y) : positiveGap x y = energyGap x y := by
+  exact max_eq_left h.le
+
+theorem positiveGap_eq_zero_of_nonpos {n : ℕ} {x y : Vector n}
+    (h : energyGap x y ≤ 0) : positiveGap x y = 0 := by
+  exact max_eq_right h
+
+theorem contact_eq_identity_of_denominator_zero {n : ℕ} {x y : Vector n}
+    (h : denominator x y = 0) : contact x y = id := by
+  funext z
+  simp only [contact, if_pos h]
+  rfl
+
+theorem contact_matched (x : Vector n) : contact x x = id := by
+  apply contact_eq_identity_of_denominator_zero
+  simp [denominator, difference, energyGap, gapMagnitude, squaredNorm, dot]
+
+theorem contact_x_eq_y {n : ℕ} (x y : Vector n) : contact x y x = y := by
+  by_cases hN : denominator x y = 0
+  · have hid := contact_eq_identity_of_denominator_zero hN
+    rw [hid]
+    change x = y
+    exact (denominator_eq_zero_iff x y).mp hN |>.1
+  · have hden : denominator x y ≠ 0 := hN
+    have hkey : dot (difference x y) x + positiveGap x y =
+        denominator x y / 2 := by
+      have hgap := energyGap_eq_dot_difference_add x y
+      by_cases hD : 0 < energyGap x y
+      · unfold denominator
+        rw [positiveGap_eq_of_pos hD, show gapMagnitude x y = energyGap x y by
+          exact abs_of_pos hD]
+        nlinarith
+      · have hD' : energyGap x y ≤ 0 := le_of_not_gt hD
+        unfold denominator
+        rw [positiveGap_eq_zero_of_nonpos hD', show gapMagnitude x y = -energyGap x y by
+          exact abs_of_nonpos hD']
+        nlinarith
+    simp only [contact, if_neg hden]
+    rw [hkey]
+    have hcoef : 2 * (denominator x y / 2) / denominator x y = 1 := by
+      field_simp
+    rw [hcoef, one_smul]
+    change x - (x - y) = y
+    abel
+
+theorem contact_difference {n : ℕ} {x y z w : Vector n}
+    (hN : denominator x y ≠ 0) :
+    contact x y z - contact x y w =
+      (z - w) - (2 * dot (difference x y) (z - w) / denominator x y) •
+        difference x y := by
+  simp only [contact, if_neg hN]
+  have hcoef :
+      2 * (dot (difference x y) z + positiveGap x y) / denominator x y -
+        2 * (dot (difference x y) w + positiveGap x y) / denominator x y =
+      2 * dot (difference x y) (z - w) / denominator x y := by
+    rw [dot_sub_right]
+    ring
+  rw [← hcoef]
+  simp only [sub_smul]
+  module
+
+theorem squaredNorm_sub_smul {n : ℕ} (q d : Vector n) (r : ℝ) :
+    squaredNorm (q - r • d) = squaredNorm q - 2 * r * dot d q +
+      r ^ 2 * squaredNorm d := by
+  unfold squaredNorm
+  simp only [dot_sub_left, dot_sub_right, dot_smul_left, dot_smul_right]
+  rw [dot_comm q d]
+  ring
+
+theorem contact_squared_distance {n : ℕ} {x y z w : Vector n}
+    (hN : denominator x y ≠ 0) :
+    squaredNorm (contact x y z - contact x y w) =
+      squaredNorm (z - w) -
+        4 * gapMagnitude x y / denominator x y ^ 2 *
+          dot (difference x y) (z - w) ^ 2 := by
+  rw [contact_difference hN]
+  rw [squaredNorm_sub_smul]
+  unfold denominator
+  have hden : squaredNorm (difference x y) + gapMagnitude x y ≠ 0 := hN
+  field_simp
+  ring
+
+theorem contact_nonexpansive {n : ℕ} {x y z w : Vector n}
+    (hN : denominator x y ≠ 0) :
+    squaredNorm (contact x y z - contact x y w) ≤ squaredNorm (z - w) := by
+  rw [contact_squared_distance hN]
+  have hc : 0 ≤ gapMagnitude x y := abs_nonneg _
+  have hden : 0 < denominator x y := lt_of_le_of_ne
+    (denominator_nonneg x y) (Ne.symm hN)
+  have hs : 0 ≤ dot (difference x y) (z - w) ^ 2 := sq_nonneg _
+  have hcoef : 0 ≤ 4 * gapMagnitude x y / denominator x y ^ 2 := by
+    positivity
+  nlinarith
+
+def sourceAxis {n : ℕ} (x y : Vector n) : ℝ :=
+  if 0 < energyGap x y then 1 else 0
+
+def targetAxis {n : ℕ} (x y : Vector n) : ℝ :=
+  if energyGap x y < 0 then 1 else 0
+
+def axisDifference {n : ℕ} (x y : Vector n) : ℝ :=
+  sourceAxis x y - targetAxis x y
+
+def contactCoefficient {n : ℕ} (x y z : Vector n) : ℝ :=
+  2 * (dot (difference x y) z + positiveGap x y) / denominator x y
+
+def liftedEnergy {n : ℕ} (x y : Vector n) (z : Vector n) (a : ℝ) : ℝ :=
+  squaredNorm z + gapMagnitude x y * a ^ 2
+
+def liftedContact {n : ℕ} (x y z : Vector n) : Vector n × ℝ :=
+  (contact x y z,
+    sourceAxis x y - axisDifference x y * contactCoefficient x y z)
+
+theorem axis_energy_eq_positiveGap {n : ℕ} (x y : Vector n) :
+    gapMagnitude x y * sourceAxis x y ^ 2 = positiveGap x y := by
+  unfold gapMagnitude sourceAxis positiveGap
+  by_cases hD : 0 < energyGap x y
+  · rw [if_pos hD, abs_of_pos hD, max_eq_left hD.le]
+    ring
+  · have hD' : energyGap x y ≤ 0 := le_of_not_gt hD
+    rw [if_neg hD, abs_of_nonpos hD', max_eq_right hD']
+    ring
+
+theorem axisDifference_sq_eq_one {n : ℕ} (x y : Vector n) :
+    axisDifference x y ^ 2 = 1 ∨ gapMagnitude x y = 0 := by
+  unfold axisDifference sourceAxis targetAxis
+  by_cases hD : 0 < energyGap x y
+  · left
+    rw [if_pos hD, if_neg (not_lt_of_ge hD.le)]
+    norm_num
+  · by_cases hneg : energyGap x y < 0
+    · left
+      rw [if_neg hD, if_pos hneg]
+      norm_num
+    · right
+      have hzero : energyGap x y = 0 := le_antisymm (le_of_not_gt hD) (le_of_not_gt hneg)
+      simp [gapMagnitude, hzero]
+
+theorem axisDifference_sq_metric {n : ℕ} (x y : Vector n) :
+    gapMagnitude x y * axisDifference x y ^ 2 = gapMagnitude x y := by
+  rcases axisDifference_sq_eq_one x y with hs | hz
+  · rw [hs, mul_one]
+  · rw [hz, zero_mul]
+
+theorem axisDifference_cross_metric {n : ℕ} (x y : Vector n) :
+    gapMagnitude x y * sourceAxis x y * axisDifference x y = positiveGap x y := by
+  unfold gapMagnitude sourceAxis axisDifference targetAxis positiveGap
+  by_cases hD : 0 < energyGap x y
+  · have ha : sourceAxis x y = 1 := by simp [sourceAxis, hD]
+    rw [ha]
+    simp [hD, not_lt_of_ge hD.le, abs_of_pos hD, max_eq_left hD.le]
+  · have hD' : energyGap x y ≤ 0 := le_of_not_gt hD
+    rw [if_neg hD]
+    by_cases hneg : energyGap x y < 0
+    · simp [hneg, abs_of_nonpos hD', max_eq_right hD']
+    · simp [hneg, abs_of_nonpos hD', max_eq_right hD']
+
+theorem lifted_reflection_energy {n : ℕ} (d z : Vector n)
+    (c p a sigma N r : ℝ)
+    (hN : N ≠ 0) (hden : N = squaredNorm d + c)
+    (hcross : c * a * sigma = p) (hsquare : c * sigma ^ 2 = c)
+    (hr : r = 2 * (dot d z + p) / N) :
+    squaredNorm (z - r • d) + c * (a - sigma * r) ^ 2 =
+      squaredNorm z + c * a ^ 2 := by
+  rw [squaredNorm_sub_smul]
+  calc
+    squaredNorm z - 2 * r * dot d z + r ^ 2 * squaredNorm d +
+        c * (a - sigma * r) ^ 2 =
+      (squaredNorm z - 2 * r * dot d z + r ^ 2 * squaredNorm d) +
+        (c * a ^ 2 - 2 * (c * a * sigma) * r + (c * sigma ^ 2) * r ^ 2) := by
+          ring
+    _ = squaredNorm z - 2 * r * dot d z + r ^ 2 * squaredNorm d +
+        (c * a ^ 2 - 2 * p * r + c * r ^ 2) := by rw [hcross, hsquare]
+    _ = squaredNorm z + c * a ^ 2 := by
+      rw [hr, hden]
+      have hden' : squaredNorm d + c ≠ 0 := by
+        rw [← hden]
+        exact hN
+      field_simp [hden']
+      ring
+
+theorem liftedContact_energy_preserved {n : ℕ} {x y : Vector n}
+    (hN : denominator x y ≠ 0) (z : Vector n) :
+    liftedEnergy x y (liftedContact x y z).1 (liftedContact x y z).2 =
+      liftedEnergy x y z (sourceAxis x y) := by
+  simp only [liftedEnergy, liftedContact]
+  simp only [contact, if_neg hN]
+  unfold contactCoefficient axisDifference
+  apply lifted_reflection_energy (difference x y) z
+    (gapMagnitude x y) (positiveGap x y) (sourceAxis x y)
+      (sourceAxis x y - targetAxis x y) (denominator x y)
+      (2 * (dot (difference x y) z + positiveGap x y) / denominator x y)
+  · exact hN
+  · rfl
+  · exact axisDifference_cross_metric x y
+  · exact axisDifference_sq_metric x y
+  · rfl
+
+theorem liftedContact_passive {n : ℕ} {x y : Vector n}
+    (hN : denominator x y ≠ 0) (z : Vector n) :
+    squaredNorm (contact x y z) ≤ squaredNorm z + positiveGap x y := by
+  have hp := liftedContact_energy_preserved hN z
+  have haxis : 0 ≤ gapMagnitude x y *
+      (sourceAxis x y - axisDifference x y * contactCoefficient x y z) ^ 2 :=
+    mul_nonneg (abs_nonneg _) (sq_nonneg _)
+  have hsource : gapMagnitude x y * sourceAxis x y ^ 2 = positiveGap x y :=
+    axis_energy_eq_positiveGap x y
+  unfold liftedEnergy at hp
+  rw [hsource] at hp
+  change squaredNorm (contact x y z) + gapMagnitude x y *
+      (sourceAxis x y - axisDifference x y * contactCoefficient x y z) ^ 2 =
+    squaredNorm z + positiveGap x y at hp
+  nlinarith
+
+end PassiveContact
+
 end Soma.Holonics.Computation.HolonicOrientedSiteTransport
 
 section Audit
@@ -804,4 +1161,9 @@ open Soma.Holonics.Computation.HolonicOrientedSiteTransport
 #print axioms ConstitutiveSectionReturn.additive_face_does_not_found_an_equalization_target
 #print axioms ConstitutiveSectionReturn.additive_joined_passage_effect
 #print axioms ConstitutiveSectionReturn.zero_partner_separates_passage_effect_from_equalization
+#print axioms PassiveContact.contact_x_eq_y
+#print axioms PassiveContact.contact_squared_distance
+#print axioms PassiveContact.contact_nonexpansive
+#print axioms PassiveContact.liftedContact_energy_preserved
+#print axioms PassiveContact.liftedContact_passive
 end Audit

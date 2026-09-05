@@ -67,6 +67,103 @@ fn terminal_row_readback_preserves_full_source_without_device_allocation() {
     assert_eq!(surface.read_out(&source).unwrap(),rest.intervals);
 }
 
+/// Independent arbitrary-precision observer of the finite contact map in raw dyadic coordinates.
+fn passive_reference(x: &[i64], y: &[i64], z: &[i64]) -> Vec<Rat> {
+    use num_traits::{Signed, Zero};
+    let d: Vec<BigInt> = x.iter().zip(y).map(|(x,y)| BigInt::from(*x)-BigInt::from(*y)).collect();
+    let gap: BigInt = y.iter().map(|v| BigInt::from(*v).pow(2)).sum::<BigInt>()
+        - x.iter().map(|v| BigInt::from(*v).pow(2)).sum::<BigInt>();
+    let denominator: BigInt = d.iter().map(|v| v*v).sum::<BigInt>() + gap.abs();
+    if denominator.is_zero() { return z.iter().map(|v| Rat::from_integer((*v).into())).collect(); }
+    let positive = gap.max(BigInt::zero());
+    let dot: BigInt = d.iter().zip(z).map(|(a,b)| a*BigInt::from(*b)).sum();
+    let coefficient = Rat::new((dot+positive)*2,denominator);
+    z.iter().zip(d).map(|(z,d)| Rat::from_integer((*z).into())
+        - Rat::from_integer(d)*&coefficient).collect()
+}
+
+fn passive_run<'a>(surface: &'a ResidentSurface<'a>, rows:usize, width:usize,
+    grain:ResidentGrain, x:Vec<(i64,i64)>,y:Vec<(i64,i64)>,z:Vec<(i64,i64)>)
+    -> (PassageReading,Option<Vec<(i64,i64)>>) {
+    let mount=|values| surface.mount_section_rest(
+        &ResidentSectionRest::found(rows,width,grain,64,values).unwrap()).unwrap();
+    let source=mount(x);let arrived=mount(y);let query=mount(z);
+    let output=surface.fresh_section(rows,width,grain).unwrap();
+    let mut passage=surface.begin_passage(&[vec![]]).unwrap();
+    {
+        let lane=passage.open(0,&[]).unwrap();
+        surface.record_passive_contact(&lane,&source,&arrived,&query,&output).unwrap();
+    }
+    passage.close(0,&output,64).unwrap();
+    let reading=passage.finish().unwrap().launch().unwrap();
+    let returned=reading.obstruction.is_empty().then(||surface.read_out(&output).unwrap());
+    (reading,returned)
+}
+
+#[test]
+#[ignore = "requires CUDA; finite passive contact against arbitrary-precision rational oracle"]
+fn passive_contact_points_calibrate_and_round_signed_wide_products() {
+    use num_traits::ToPrimitive;
+    let readout=ResidentReadout::new().expect("CUDA");
+    let surface=ResidentSurface::on(&readout).unwrap();
+    let observations=[[0,0,0],[1,0,0],[0,2,0],[3,4,0],[0,0,5],[-3,1,2],[2,-5,1]];
+    let queries=[[0,0,0],[1,-2,3],[-7,3,-1],[5,5,5]];
+    for grain in [0,43] {
+        let scale=1i64<<grain;
+        let mut xs=Vec::new();let mut ys=Vec::new();let mut zs=Vec::new();let mut expected=Vec::new();
+        for x in observations { for y in observations {
+            for z in queries.into_iter().chain([x]) {
+                let x=x.map(|v|v*scale);let y=y.map(|v|v*scale);let z=z.map(|v|v*scale);
+                let image=passive_reference(&x,&y,&z);
+                if x==z { assert_eq!(image,y.map(|v|Rat::from_integer(v.into()))); }
+                expected.extend(image.into_iter().map(|q|
+                    (q.floor().to_integer().to_i64().unwrap(),q.ceil().to_integer().to_i64().unwrap())));
+                xs.extend(x.map(|v|(v,v)));ys.extend(y.map(|v|(v,v)));zs.extend(z.map(|v|(v,v)));
+            }
+        }}
+        let (reading,returned)=passive_run(&surface,xs.len()/3,3,ResidentGrain(grain),xs,ys,zs);
+        assert!(reading.obstruction.is_empty(),"{:?}",reading.obstruction);
+        assert_eq!(returned.unwrap(),expected,"grain {grain}");
+    }
+}
+
+#[test]
+#[ignore = "requires CUDA; passive contact interval, matched, permutation and refusal controls"]
+fn passive_contact_encloses_query_boxes_and_refuses_unfounded_point_pairs() {
+    let readout=ResidentReadout::new().expect("CUDA");
+    let mut surface=ResidentSurface::on(&readout).unwrap();
+    // Launch geometry is not generally a power of two. This legal three-warp realization must
+    // retain the third coordinate through the same row reduction.
+    let three_warps=3*surface.launch.warp;
+    assert!(three_warps<=surface.launch.block_x);
+    surface.launch.block_x=three_warps;
+    let x=[2,-1,3];let y=[-1,4,2];let z=[(-3,2),(1,4),(-7,-2)];
+    let (_,output)=passive_run(&surface,1,3,ResidentGrain(0),
+        x.map(|v|(v,v)).to_vec(),y.map(|v|(v,v)).to_vec(),z.to_vec());
+    let output=output.unwrap();
+    for corner in 0..8 {
+        let query=std::array::from_fn::<_,3,_>(|i| if corner&(1<<i)==0 {z[i].0}else{z[i].1});
+        for (at,value) in passive_reference(&x,&y,&query).into_iter().enumerate() {
+            assert!(Rat::from_integer(output[at].0.into())<=value);
+            assert!(value<=Rat::from_integer(output[at].1.into()));
+        }
+    }
+    let perm=[2,0,1];
+    let (_,permuted)=passive_run(&surface,1,3,ResidentGrain(0),
+        perm.map(|i|(x[i],x[i])).to_vec(),perm.map(|i|(y[i],y[i])).to_vec(),
+        perm.map(|i|z[i]).to_vec());
+    assert_eq!(permuted.unwrap(),perm.map(|i|output[i]));
+    let (_,matched)=passive_run(&surface,1,3,ResidentGrain(0),
+        x.map(|v|(v,v)).to_vec(),x.map(|v|(v,v)).to_vec(),z.to_vec());
+    assert_eq!(matched.unwrap(),z);
+    let (reading,output)=passive_run(&surface,1,1,ResidentGrain(0),
+        vec![(0,1)],vec![(2,2)],vec![(1,1)]);
+    assert!(!reading.obstruction.is_empty());assert!(output.is_none());
+    let (reading,output)=passive_run(&surface,1,1,ResidentGrain(0),
+        vec![(i64::MAX,i64::MAX)],vec![(0,0)],vec![(1,1)]);
+    assert!(!reading.obstruction.is_empty());assert!(output.is_none());
+}
+
 /// A one-occurrence passage entering `words` at `grain`, launched, and read out.
 fn enter_once(
     surface: &'static ResidentSurface<'static>,

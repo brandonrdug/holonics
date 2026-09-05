@@ -228,6 +228,76 @@ __device__ __forceinline__ void mul_magnitude_256(uwide a, uwide b, uwide *hi, u
     *hi = p11 + (p01 >> 64) + (p10 >> 64) + (mid >> 64);
 }
 
+// Checked addition for the candidate's 126-bit magnitude carrier.  The signed minimum and every
+// 127-bit candidate are deliberately refused before they enter a reduction; no wide overflow is
+// hidden by a cast even when an older broad helper supplied a larger intermediate.
+__device__ __forceinline__ wide add_checked(wide a, wide b, uint32_t *refused) {
+    uwide ma = magnitude(a), mb = magnitude(b);
+    const uwide lim = (uwide)1 << 126;
+    if (ma >= lim || mb >= lim) { atomicOr(refused, REFUSED_CARRIER); return 0; }
+    if ((a < 0) == (b < 0)) {
+        uwide m = ma + mb;
+        if (m < ma || m >= lim) { atomicOr(refused, REFUSED_CARRIER); return 0; }
+        wide v = (wide)m;
+        return a < 0 ? -v : v;
+    }
+    if (ma >= mb) {
+        uwide m = ma - mb;
+        return a < 0 ? -(wide)m : (wide)m;
+    }
+    uwide m = mb - ma;
+    return b < 0 ? -(wide)m : (wide)m;
+}
+
+__device__ __forceinline__ wide sub_checked(wide a, wide b, uint32_t *refused) {
+    // Every value entering this helper is refused before it can be the signed minimum.
+    return add_checked(a, -b, refused);
+}
+
+// Exact directed quotient of `2*a*b / d`, where `d` is a positive denominator in the admitted
+// 126-bit range.  The product itself is retained as a 256-bit unsigned magnitude, so a product
+// wider than `wide` is not rounded or silently wrapped merely because its quotient fits.
+__device__ __forceinline__ wide signed_product_divide_2(
+    wide a, wide b, wide d, int toward_ceiling, uint32_t *refused
+) {
+    const uwide lim126 = (uwide)1 << 126;
+    if (magnitude(a) >= lim126 || magnitude(b) >= lim126) {
+        atomicOr(refused, REFUSED_CARRIER); return 0;
+    }
+    if (d <= 0 || magnitude(d) >= lim126) {
+        atomicOr(refused, REFUSED_MALFORMED); return 0;
+    }
+    const int negative = (a < 0) != (b < 0);
+    uwide hi, lo;
+    mul_magnitude_256(magnitude(a), magnitude(b), &hi, &lo);
+    if ((hi >> 127) != 0) { atomicOr(refused, REFUSED_CARRIER); return 0; }
+    hi = (hi << 1) | (lo >> 127);
+    lo <<= 1;
+    uwide den = magnitude(d), q_hi = 0, q_lo = 0, rem = 0;
+    // Bit-at-a-time unsigned 256/126 division.  `rem < den < 2^126`, so doubling rem is safe in
+    // the wide unsigned scratch value and every quotient bit is exact.
+    for (int bit = 255; bit >= 0; --bit) {
+        uint32_t incoming = bit >= 128 ? (uint32_t)((hi >> (bit - 128)) & 1u)
+                                       : (uint32_t)((lo >> bit) & 1u);
+        rem = (rem << 1) | (uwide)incoming;
+        if (rem >= den) {
+            rem -= den;
+            if (bit >= 128) q_hi |= (uwide)1 << (bit - 128);
+            else q_lo |= (uwide)1 << bit;
+        }
+    }
+    if (q_hi != 0 || q_lo >= ((uwide)1 << 126)) {
+        atomicOr(refused, REFUSED_CARRIER); return 0;
+    }
+    const int rounds_up = negative ? !toward_ceiling : toward_ceiling;
+    if (rounds_up && rem != 0 && q_lo == (((uwide)1 << 126) - 1)) {
+        atomicOr(refused, REFUSED_CARRIER); return 0;
+    }
+    wide q = (wide)q_lo;
+    if (negative) return toward_ceiling ? -q : -(q + (rem != 0 ? 1 : 0));
+    return toward_ceiling ? q + (rem != 0 ? 1 : 0) : q;
+}
+
 // `a · b · 2^-k` rounded toward −∞ (floor) or +∞ (ceil), through the 256-bit product, refusing a
 // result that would not fit the wide carrier. `k` in `[0, 255]`.
 __device__ wide product_shift(wide a, wide b, int k, int toward_ceiling, uint32_t *refused) {
@@ -914,6 +984,135 @@ extern "C" __global__ void section_contact(
         if (q_lo > q_hi) atomicOr(refused, REFUSED_INVERTED);
         out_lo[q_base + d] = to_word(q_lo, refused);
         out_hi[q_base + d] = to_word(q_hi, refused);
+    }
+}
+
+// Candidate finite passive-contact projection.  One block owns one row and first forms the row's
+// shared d/D/N and dot-product intervals; the output lanes then apply the exact same quotient to
+// their coordinates.  `x` and `y` are required to be POINT endpoints.  `z` may be an enclosure,
+// and the resulting enclosure is intentionally not claimed minimal because each z_i also enters
+// the shared dot interval.  This is a projection primitive only: it does not bind a model learner,
+// a full lifted axis on the GPU, or a network conservation theorem.
+extern "C" __global__ void __launch_bounds__(512) section_passive_contact(
+    const int64_t *xlo, const int64_t *xhi, const int64_t *ylo, const int64_t *yhi,
+    const int64_t *zlo, const int64_t *zhi, uint32_t rows, uint32_t width,
+    int64_t *olo, int64_t *ohi, uint32_t *slot, const uint32_t *census,
+    const uint32_t *lineage, uint32_t lineage_count
+) {
+    // The recorder launches this one-row kernel with zero dynamic shared bytes.  The launch bound
+    // fixes the admitted block at 512, while these arrays keep the four row reductions resident.
+    __shared__ wide gap_part[512];
+    __shared__ wide norm_part[512];
+    __shared__ wide dot_lo_part[512];
+    __shared__ wide dot_hi_part[512];
+    __shared__ wide gap_s, c_s, p_s, den_s, dot_lo_s, dot_hi_s;
+    __shared__ int stop_s, malformed_s, identity_s;
+
+    const uint32_t row = blockIdx.x;
+    if (row >= rows) return;
+    if (threadIdx.x == 0) {
+        stop_s = upstream_refused(census, lineage, lineage_count, slot);
+        malformed_s = 0;
+        identity_s = 0;
+    }
+    __syncthreads();
+    if (stop_s) return;
+
+    const size_t base = (size_t)row * (size_t)width;
+    int local_bad = 0;
+    for (uint32_t i = threadIdx.x; i < width; i += blockDim.x) {
+        if (xlo[base + i] != xhi[base + i] || ylo[base + i] != yhi[base + i] ||
+            zlo[base + i] > zhi[base + i]) local_bad = 1;
+    }
+    if (local_bad) atomicOr((unsigned int *)&malformed_s, 1u);
+    __syncthreads();
+    if (malformed_s) {
+        if (threadIdx.x == 0) atomicOr(slot + SLOT_REFUSED, REFUSED_MALFORMED);
+        return;
+    }
+
+    // The four reductions below are the only row-wide dot/norm pass.  Every product and every
+    // accumulation is checked before it enters shared standing; a refusal never becomes a wrap.
+    wide gap = 0, norm = 0, dl = 0, dh = 0;
+    for (uint32_t i = threadIdx.x; i < width; i += blockDim.x) {
+        wide x = (wide)xlo[base + i], y = (wide)ylo[base + i];
+        wide d;
+        d = sub_checked(x, y, slot + SLOT_REFUSED);
+        wide xx = product_checked(x, x, slot + SLOT_REFUSED);
+        wide yy = product_checked(y, y, slot + SLOT_REFUSED);
+        wide dd = product_checked(d, d, slot + SLOT_REFUSED);
+        gap = add_checked(gap, sub_checked(yy, xx, slot + SLOT_REFUSED), slot + SLOT_REFUSED);
+        norm = add_checked(norm, dd, slot + SLOT_REFUSED);
+        wide zl = (wide)zlo[base + i], zh = (wide)zhi[base + i];
+        wide pl, ph;
+        if (d >= 0) {
+            pl = product_checked(d, zl, slot + SLOT_REFUSED);
+            ph = product_checked(d, zh, slot + SLOT_REFUSED);
+        } else {
+            pl = product_checked(d, zh, slot + SLOT_REFUSED);
+            ph = product_checked(d, zl, slot + SLOT_REFUSED);
+        }
+        dl = add_checked(dl, pl, slot + SLOT_REFUSED);
+        dh = add_checked(dh, ph, slot + SLOT_REFUSED);
+    }
+    gap_part[threadIdx.x] = gap;
+    norm_part[threadIdx.x] = norm;
+    dot_lo_part[threadIdx.x] = dl;
+    dot_hi_part[threadIdx.x] = dh;
+    __syncthreads();
+    // `block_x` is only warp-rounded by the caller, not necessarily a power of two.  The active
+    // count shrinks by ceil(active/2), so a 384-lane launch retains all 384 partials.
+    uint32_t active = blockDim.x;
+    while (active > 1u) {
+        const uint32_t next = (active + 1u) / 2u;
+        if (threadIdx.x < active - next) {
+            gap_part[threadIdx.x] = add_checked(gap_part[threadIdx.x], gap_part[threadIdx.x + next], slot + SLOT_REFUSED);
+            norm_part[threadIdx.x] = add_checked(norm_part[threadIdx.x], norm_part[threadIdx.x + next], slot + SLOT_REFUSED);
+            dot_lo_part[threadIdx.x] = add_checked(dot_lo_part[threadIdx.x], dot_lo_part[threadIdx.x + next], slot + SLOT_REFUSED);
+            dot_hi_part[threadIdx.x] = add_checked(dot_hi_part[threadIdx.x], dot_hi_part[threadIdx.x + next], slot + SLOT_REFUSED);
+        }
+        __syncthreads();
+        active = next;
+    }
+    if (threadIdx.x == 0) {
+        gap_s = gap_part[0];
+        c_s = magnitude(gap_s);
+        p_s = gap_s > 0 ? gap_s : 0;
+        dot_lo_s = add_checked(dot_lo_part[0], p_s, slot + SLOT_REFUSED);
+        dot_hi_s = add_checked(dot_hi_part[0], p_s, slot + SLOT_REFUSED);
+        den_s = add_checked(norm_part[0], c_s, slot + SLOT_REFUSED);
+        if (den_s == 0) identity_s = 1;
+        else if (den_s < 0 || magnitude(den_s) >= ((uwide)1 << 126)) {
+            atomicOr(slot + SLOT_REFUSED, REFUSED_CARRIER);
+            stop_s = 1;
+        }
+        if (atomicOr(slot + SLOT_REFUSED, 0u) != 0u) stop_s = 1;
+    }
+    __syncthreads();
+    if (stop_s) return;
+    if (identity_s) {
+        for (uint32_t i = threadIdx.x; i < width; i += blockDim.x) {
+            olo[base + i] = zlo[base + i];
+            ohi[base + i] = zhi[base + i];
+        }
+        return;
+    }
+
+    for (uint32_t i = threadIdx.x; i < width; i += blockDim.x) {
+        wide d = sub_checked((wide)xlo[base + i], (wide)ylo[base + i], slot + SLOT_REFUSED);
+        wide delta_lo, delta_hi;
+        if (d >= 0) {
+            delta_lo = signed_product_divide_2(d, dot_lo_s, den_s, 0, slot + SLOT_REFUSED);
+            delta_hi = signed_product_divide_2(d, dot_hi_s, den_s, 1, slot + SLOT_REFUSED);
+        } else {
+            delta_lo = signed_product_divide_2(d, dot_hi_s, den_s, 0, slot + SLOT_REFUSED);
+            delta_hi = signed_product_divide_2(d, dot_lo_s, den_s, 1, slot + SLOT_REFUSED);
+        }
+        wide lower = sub_checked((wide)zlo[base + i], delta_hi, slot + SLOT_REFUSED);
+        wide upper = sub_checked((wide)zhi[base + i], delta_lo, slot + SLOT_REFUSED);
+        if (lower > upper) atomicOr(slot + SLOT_REFUSED, REFUSED_INVERTED);
+        olo[base + i] = to_word(lower, slot + SLOT_REFUSED);
+        ohi[base + i] = to_word(upper, slot + SLOT_REFUSED);
     }
 }
 

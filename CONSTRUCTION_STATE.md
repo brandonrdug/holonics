@@ -81,6 +81,15 @@ The actual cultivated control preserved the entire checkpoint and reduced 14-row
 from 56 MiB to 4 MiB, without an added device allocation or launch. This repairs one output cost;
 HNP4's productive-development and useful-application obligations remain open.
 
+[proved-derived; formal-checked] The [passive paired-contact candidate](research/records/2026-09-05_HNP4_A_PASSIVE_PAIRED_CONTACT_HAS_A_CHECKED_METRIC_LIFT_AND_A_RESIDENT_PROJECTION.md)
+now has exact calibration, non-expansiveness and a metric-preserving one-axis lift in the existing
+oriented-site formal owner.
+
+[established-bounded; measured] Its resident projection passed 490 point-row rational comparisons,
+interval/permutation, non-power-of-two launch and refusal controls. It has not replaced HNA's
+unstable additive cultivation. The next live binding owes an actual source/arrived comparison,
+its metric and retained successor; the isolated candidate does not close HNP4.
+
 [definition] The plan then orders general material contact, resident locality/reuse, persistent
 sessions, multi-cycle output, a useful consumer-model milestone, executable export and supported
 SSM/diffusion-family extensions. This is not a token-volume programme or a conventional trainer

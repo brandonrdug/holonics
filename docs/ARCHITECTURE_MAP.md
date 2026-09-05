@@ -104,6 +104,16 @@ an exact terminal receiver restriction with the unchanged complete resident succ
 text adapter requests this row explicitly. The [actual-model readout control](../research/records/2026-09-05_HNP4_THE_TERMINAL_RECEIVER_READS_ONE_ROW_AND_PRESERVES_THE_COMPLETE_SUCCESSOR.md)
 returned complete checkpoint equality and lower host transfer without another device kernel.
 
+[proved-derived; formal-checked] `HolonicOrientedSiteTransport.PassiveContact` now owns a finite
+Euclidean paired-observation map with exact calibration, non-expansiveness and a one-axis metric
+lift. Its bounded [candidate record](../research/records/2026-09-05_HNP4_A_PASSIVE_PAIRED_CONTACT_HAS_A_CHECKED_METRIC_LIFT_AND_A_RESIDENT_PROJECTION.md)
+states the hypotheses and the still-open live comparison/metric/successor binding.
+
+[established-bounded; measured] `ResidentSurface::record_passive_contact` and
+`exact_resident_section.cu::section_passive_contact` realize the candidate's point-founded,
+interval-query projection, with exact-rational CUDA controls. They do not implement its lifted
+axis or replace the full-operator cultivation law.
+
 | Relation | Lean owner | Rust owner | CUDA owner | Status and exact open fibre |
 |---|---|---|---|---|
 | Exact finite diffusion and state-space chart | `Computation/HolonicDiffusionCharts.lean` | `diffusion.rs`; `sheaf_diffusion.rs`; `causal_body.rs` | `cuda_refine/membrane_boundary_*`; `membrane_factored_transport.rs` | **partial:** Lean Markov/deterministic separation is broader than one resident runtime owner |

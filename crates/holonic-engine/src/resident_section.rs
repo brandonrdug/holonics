@@ -130,11 +130,12 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 46] = [
+pub const KERNELS: [&str; 47] = [
     "section_withdraw_sites",
     "section_from_bfloat16",
     "section_carry",
     "section_terminal_row",
+    "section_passive_contact",
     "section_partition_terminal_rows",
     "section_partition_mean",
     "section_withdraw_rows",
