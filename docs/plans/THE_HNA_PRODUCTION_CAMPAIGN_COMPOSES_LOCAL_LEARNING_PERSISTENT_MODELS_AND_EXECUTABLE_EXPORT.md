@@ -1,7 +1,7 @@
 # HNA production: local learning, persistent models and executable export
 
-**Date:** 2026-09-04. **Status:** PLANNED; no implementation phase has passed.
-**Authority:** Brandon's request to design the next campaign formally and holistically.
+**Date:** 2026-09-04. **Status:** ACTIVE; HNP0 returned, HNP1 next.
+**Authority:** Brandon's formal planning request and subsequent instruction to complete HNP0--HNP7.
 **Order:** [THE_ROADMAP.md](THE_ROADMAP.md). **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 **Starting implementation:** `c12b2634`. Phase names below identify dependencies, not capabilities.
 
@@ -197,6 +197,12 @@ correspondence at their tested scope. No field named `exact` or assumed kernel-c
 is presented as a machine-checked proof of the Rust/CUDA program.
 
 ### HNP0 — Constitutive binding and occurrence contract
+
+[proved-derived; formal-checked] Returned at the finite diagonal-admittance chart scope in the
+[HNP0 record](../../research/records/2026-09-04_HNP0_JOINED_SECTIONS_RETURN_LOCAL_CONSTITUTIVE_CURRENT_WITH_SUCCESSOR_AND_REBASE_LAWS.md).
+
+[established-bounded; measured] Its numerical helper passed two CUDA controls; production admission
+and session use are HNP1.
 
 **Depends on:** the standing owners in §2; no re-demonstration of completed HNA/SKE.
 

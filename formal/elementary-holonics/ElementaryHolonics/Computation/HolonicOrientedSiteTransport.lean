@@ -1,4 +1,6 @@
 import ElementaryHolonics.Computation.HolonicDiffusionCharts
+import ElementaryHolonics.Computation.HolonicRecurrentEcology
+import ElementaryHolonics.Computation.HolonicInformationTheory
 import Mathlib.LinearAlgebra.Matrix.ToLin
 
 /-!
@@ -262,6 +264,376 @@ theorem norm_before_linear_join_is_not_postContraction :
 
 end OrientedPortSiteTransport
 
+/-! ## Constitutive return of an ordinary joined section
+
+This is a finite diagonal-admittance/diagonal-duality chart, not a universal update rule.
+The source section and the arriving section are data on two genuinely joined occurrences.
+Their difference is formed after the source crosses the contemporary cross-section.  Local
+admittance returns its signed current; the source duality carries the other factor of the
+existing additive morphology deposit.  Neither a scalar loss nor a next-token label enters.
+
+The frame coefficients are constitutive chart data: no claim derives an arbitrary admittance
+from shape, count, or magnitude.  The proofs below give coefficient support, complete later
+transport, and the nonzero relation the deposit can found.  Universal future-cone soundness,
+useful learning, and a physical calibration are not consequences of this finite algebra.
+-/
+
+namespace ConstitutiveSectionReturn
+
+open Soma.Holonics
+open Soma.Holonics.Computation.HolonicInformationTheory
+
+variable {K Site : Type*} [CommRing K] [Fintype Site]
+
+/-- Local admittance and source tangent-to-cotangent chart of the admitted cross-section. -/
+structure Frame (K Site : Type*) where
+  admittance : Site → K
+  sourceDuality : Site → K
+
+/-- Current is still a source--target section before the target junction is read. -/
+def pairCurrent (morphology : Matrix Site Site K) (presented : Site → K)
+    (target source : Site) : K := morphology target source * presented source
+
+def conduct (morphology : Matrix Site Site K) (presented : Site → K) : Site → K :=
+  fun target ↦ ∑ source, pairCurrent morphology presented target source
+
+/-- The arriving section is compared in the target fibre, after source transport. -/
+def difference (morphology : Matrix Site Site K) (presented arrived : Site → K) : Site → K :=
+  arrived - conduct morphology presented
+
+def current (frame : Frame K Site) (morphology : Matrix Site Site K)
+    (presented arrived : Site → K) : Site → K :=
+  fun target ↦ frame.admittance target * difference morphology presented arrived target
+
+def sourceCovector (frame : Frame K Site) (presented : Site → K) : Site → K :=
+  fun source ↦ frame.sourceDuality source * presented source
+
+/-- The two factors are derived from the actual signed current and presented source section. -/
+def deposit (frame : Frame K Site) (morphology : Matrix Site Site K)
+    (presented arrived : Site → K) : Matrix Site Site K :=
+  Matrix.vecMulVec (current frame morphology presented arrived) (sourceCovector frame presented)
+
+def successor (frame : Frame K Site) (morphology : Matrix Site Site K)
+    (presented arrived : Site → K) : Matrix Site Site K :=
+  morphology + deposit frame morphology presented arrived
+
+/-- One actual joining, with section charts on its occurrences rather than a fabricated key. -/
+structure JoinedSections {Source Middle Target : Type*}
+    (first : AddressedPassage Source Middle) (second : AddressedPassage Middle Target)
+    (K Site : Type*) where
+  joining : first.Join second
+  sourceSection : first.Occurrence → Site → K
+  targetSection : second.Occurrence → Site → K
+
+def JoinedSections.presented {Source Middle Target : Type*}
+    {first : AddressedPassage Source Middle} {second : AddressedPassage Middle Target}
+    (sections : JoinedSections first second K Site) : Site → K :=
+  sections.sourceSection sections.joining.left
+
+def JoinedSections.arrived {Source Middle Target : Type*}
+    {first : AddressedPassage Source Middle} {second : AddressedPassage Middle Target}
+    (sections : JoinedSections first second K Site) : Site → K :=
+  sections.targetSection sections.joining.right
+
+omit [CommRing K] [Fintype Site] in
+/-- The declaration of a joining preserves its actual common boundary. -/
+theorem JoinedSections.boundary_joins {Source Middle Target : Type*}
+    {first : AddressedPassage Source Middle} {second : AddressedPassage Middle Target}
+    (sections : JoinedSections first second K Site) :
+    first.target sections.joining.left = second.source sections.joining.right :=
+  sections.joining.joins
+
+theorem deposit_apply (frame : Frame K Site) (morphology : Matrix Site Site K)
+    (presented arrived : Site → K) (target source : Site) :
+    deposit frame morphology presented arrived target source =
+      current frame morphology presented arrived target * sourceCovector frame presented source := rfl
+
+/-- An unaffected coefficient is proved unchanged; no magnitude threshold chooses its support. -/
+theorem successor_eq_of_zero_factor (frame : Frame K Site) (morphology : Matrix Site Site K)
+    (presented arrived : Site → K) (target source : Site)
+    (zeroFactor : current frame morphology presented arrived target = 0 ∨
+      sourceCovector frame presented source = 0) :
+    successor frame morphology presented arrived target source = morphology target source := by
+  rcases zeroFactor with zeroCurrent | zeroSource
+  · simp [successor, deposit, Matrix.vecMulVec, zeroCurrent]
+  · simp [successor, deposit, Matrix.vecMulVec, zeroSource]
+
+/-- Every later input sees the whole additive transport, not a stored output from the exposure. -/
+theorem successor_conduct (frame : Frame K Site) (morphology : Matrix Site Site K)
+    (presented arrived query : Site → K) (target : Site) :
+    conduct (successor frame morphology presented arrived) query target =
+      conduct morphology query target + current frame morphology presented arrived target *
+        (∑ source, sourceCovector frame presented source * query source) := by
+  change (∑ source, (morphology target source +
+      current frame morphology presented arrived target * sourceCovector frame presented source) *
+      query source) = (∑ source, morphology target source * query source) +
+      current frame morphology presented arrived target *
+        (∑ source, sourceCovector frame presented source * query source)
+  simp_rw [add_mul, mul_assoc]
+  rw [Finset.sum_add_distrib, Finset.mul_sum]
+
+/-- Unchanged later conduct requires vanishing complete coupling, not just a remote address. -/
+theorem successor_conduct_eq_of_annihilates
+    (frame : Frame K Site) (morphology : Matrix Site Site K)
+    (presented arrived query : Site → K)
+    (annihilates : (∑ source, sourceCovector frame presented source * query source) = 0) :
+    conduct (successor frame morphology presented arrived) query = conduct morphology query := by
+  funext target
+  rw [successor_conduct, annihilates, mul_zero, add_zero]
+
+/-- A previously absent relation can be founded only by the nonzero returned factor product. -/
+theorem absent_relation_founded (frame : Frame K Site) (morphology : Matrix Site Site K)
+    (presented arrived : Site → K) (target source : Site)
+    (absent : morphology target source = 0)
+    (couples : current frame morphology presented arrived target *
+      sourceCovector frame presented source ≠ 0) :
+    successor frame morphology presented arrived target source ≠ 0 := by
+  simpa [successor, deposit, Matrix.vecMulVec, absent] using couples
+
+/-- A matched arrival causes no deposit, even though its chronology is a new occurrence. -/
+theorem matched_successor (frame : Frame K Site) (morphology : Matrix Site Site K)
+    (presented : Site → K) :
+    successor frame morphology presented (conduct morphology presented) = morphology := by
+  ext target source
+  simp [successor, deposit, current, difference, Matrix.vecMulVec]
+
+/-! ### The existing physical-crossing and recurrent-operation owners are instantiated -/
+
+/-- This chart's transport is the actual finite cross-section, not a byte/identifier conversion. -/
+def physicalCrossing {Source Middle Target : Type*}
+    {first : AddressedPassage Source Middle} {second : AddressedPassage Middle Target}
+    (frame : Frame K Site) (morphology : Matrix Site Site K)
+    (sections : JoinedSections first second K Site) :
+    AddressedPhysicalCrossing (first.Join second) Source Target (Site → K) (Site → K)
+      (Site → K) where
+  occurrence := sections.joining
+  exteriorBoundary := first.source sections.joining.left
+  interiorBoundary := second.target sections.joining.right
+  exteriorPotential := sections.presented
+  interiorPotential := sections.arrived
+  transport := morphology.mulVecLin.toAddMonoidHom
+  admittance := {
+    toFun := fun carrier site ↦ frame.admittance site * carrier site
+    map_zero' := by ext site; simp
+    map_add' := by intros; ext site; simp [mul_add]
+  }
+
+theorem physicalCrossing_current {Source Middle Target : Type*}
+    {first : AddressedPassage Source Middle} {second : AddressedPassage Middle Target}
+    (frame : Frame K Site) (morphology : Matrix Site Site K)
+    (sections : JoinedSections first second K Site) :
+    (physicalCrossing frame morphology sections).returnedCurrent =
+      current frame morphology sections.presented sections.arrived := by
+  rfl
+
+/-- The cross-section is the existing source--target current ecology, with identity reaction. -/
+def neural : FiniteLocalCurrentEcology Site K (Matrix Site Site K) (Site → K) Unit (Site → K) where
+  localCurrent morphology _ presented target source := pairCurrent morphology presented target source
+  reaction _ _ _ joined := joined
+  observe _ carrier := carrier
+
+theorem neural_step (morphology : Matrix Site Site K) (presented arrived : Site → K) :
+    (neural (K := K) (Site := Site)).step morphology arrived presented =
+      conduct morphology presented := rfl
+
+open Soma.Holonics.Computation.HolonicRecurrentEcology
+
+/-- No update callback: both presentation and morphology advance have the concrete laws above. -/
+def recurrentOperation {Source Middle Target : Type*}
+    (first : AddressedPassage Source Middle) (second : AddressedPassage Middle Target)
+    (frame : Frame K Site) :
+    FiniteRecurrentOperation (neural (K := K) (Site := Site))
+      (JoinedSections first second K Site) where
+  present _ sections := (sections.arrived, (), sections.presented)
+  advanceMorphology morphology sections presented _ :=
+    successor frame morphology presented sections.arrived
+
+theorem recurrent_successor {Source Middle Target : Type*}
+    {first : AddressedPassage Source Middle} {second : AddressedPassage Middle Target}
+    (frame : Frame K Site)
+    (state : FiniteEcologyState Site K (Matrix Site Site K) (JoinedSections first second K Site))
+    (sections : JoinedSections first second K Site) :
+    ((recurrentOperation first second frame).operate state sections).2.2 =
+      { morphology := successor frame state.morphology sections.presented sections.arrived
+        carrier := conduct state.morphology sections.presented
+        chronology := state.chronology ++ [sections] } := rfl
+
+/-- The second return's difference is read through the already changed transport, not the base. -/
+theorem next_difference_uses_successor (frame : Frame K Site) (morphology : Matrix Site Site K)
+    (presented arrived nextPresented nextArrived : Site → K) (target : Site) :
+    difference (successor frame morphology presented arrived) nextPresented nextArrived target =
+      difference morphology nextPresented nextArrived target -
+        current frame morphology presented arrived target *
+          (∑ source, sourceCovector frame presented source * nextPresented source) := by
+  change nextArrived target - conduct (successor frame morphology presented arrived) nextPresented target = _
+  rw [successor_conduct]
+  change nextArrived target - (conduct morphology nextPresented target + _) =
+    (nextArrived target - conduct morphology nextPresented target) - _
+  ring
+
+/-! ### Reindex the whole local chart, not just its final receiver -/
+
+variable {OtherSite : Type*} [Fintype OtherSite]
+
+def rebaseSection (equiv : Site ≃ OtherSite) (carrier : Site → K) : OtherSite → K :=
+  carrier ∘ equiv.symm
+
+def rebaseMatrix (equiv : Site ≃ OtherSite) (matrix : Matrix Site Site K) :
+    Matrix OtherSite OtherSite K := fun target source ↦ matrix (equiv.symm target) (equiv.symm source)
+
+def rebaseFrame (equiv : Site ≃ OtherSite) (frame : Frame K Site) : Frame K OtherSite :=
+  ⟨rebaseSection equiv frame.admittance, rebaseSection equiv frame.sourceDuality⟩
+
+theorem conduct_rebase (equiv : Site ≃ OtherSite) (matrix : Matrix Site Site K)
+    (presented : Site → K) :
+    conduct (rebaseMatrix equiv matrix) (rebaseSection equiv presented) =
+      rebaseSection equiv (conduct matrix presented) := by
+  funext target
+  exact equiv.symm.sum_comp (fun source ↦ matrix (equiv.symm target) source * presented source)
+
+theorem difference_rebase (equiv : Site ≃ OtherSite) (matrix : Matrix Site Site K)
+    (presented arrived : Site → K) :
+    difference (rebaseMatrix equiv matrix) (rebaseSection equiv presented)
+      (rebaseSection equiv arrived) = rebaseSection equiv (difference matrix presented arrived) := by
+  rw [difference, conduct_rebase]
+  rfl
+
+theorem current_rebase (equiv : Site ≃ OtherSite) (frame : Frame K Site)
+    (matrix : Matrix Site Site K) (presented arrived : Site → K) :
+    current (rebaseFrame equiv frame) (rebaseMatrix equiv matrix)
+      (rebaseSection equiv presented) (rebaseSection equiv arrived) =
+      rebaseSection equiv (current frame matrix presented arrived) := by
+  unfold current
+  rw [difference_rebase]
+  rfl
+
+theorem successor_rebase (equiv : Site ≃ OtherSite) (frame : Frame K Site)
+    (matrix : Matrix Site Site K) (presented arrived : Site → K) :
+    successor (rebaseFrame equiv frame) (rebaseMatrix equiv matrix)
+      (rebaseSection equiv presented) (rebaseSection equiv arrived) =
+      rebaseMatrix equiv (successor frame matrix presented arrived) := by
+  unfold successor deposit
+  rw [current_rebase]
+  rfl
+
+def rebaseJoined {Source Middle Target : Type*}
+    {first : AddressedPassage Source Middle} {second : AddressedPassage Middle Target}
+    (equiv : Site ≃ OtherSite) (sections : JoinedSections first second K Site) :
+    JoinedSections first second K OtherSite where
+  joining := sections.joining
+  sourceSection carried := rebaseSection equiv (sections.sourceSection carried)
+  targetSection carried := rebaseSection equiv (sections.targetSection carried)
+
+def rebaseState {Source Middle Target : Type*}
+    {first : AddressedPassage Source Middle} {second : AddressedPassage Middle Target}
+    (equiv : Site ≃ OtherSite)
+    (state : FiniteEcologyState Site K (Matrix Site Site K) (JoinedSections first second K Site)) :
+    FiniteEcologyState OtherSite K (Matrix OtherSite OtherSite K)
+      (JoinedSections first second K OtherSite) where
+  morphology := rebaseMatrix equiv state.morphology
+  carrier := rebaseSection equiv state.carrier
+  chronology := state.chronology.map (rebaseJoined equiv)
+
+omit [CommRing K] [Fintype Site] [Fintype OtherSite] in
+/-- Reindexing leaves the actual joining occurrence in place, rather than replacing its identity. -/
+theorem rebaseJoined_same_join {Source Middle Target : Type*}
+    {first : AddressedPassage Source Middle} {second : AddressedPassage Middle Target}
+    (equiv : Site ≃ OtherSite) (sections : JoinedSections first second K Site) :
+    (rebaseJoined equiv sections).joining = sections.joining := rfl
+
+theorem recurrent_emission_rebase {Source Middle Target : Type*}
+    {first : AddressedPassage Source Middle} {second : AddressedPassage Middle Target}
+    (equiv : Site ≃ OtherSite) (frame : Frame K Site)
+    (state : FiniteEcologyState Site K (Matrix Site Site K) (JoinedSections first second K Site))
+    (sections : JoinedSections first second K Site) :
+    ((recurrentOperation first second (rebaseFrame equiv frame)).operate
+      (rebaseState equiv state) (rebaseJoined equiv sections)).1 =
+      rebaseSection equiv (((recurrentOperation first second frame).operate state sections).1) :=
+  conduct_rebase equiv state.morphology sections.presented
+
+/-- The whole successor commutes: morphology, continuing carrier and the complete chronology. -/
+theorem recurrent_successor_rebase {Source Middle Target : Type*}
+    {first : AddressedPassage Source Middle} {second : AddressedPassage Middle Target}
+    (equiv : Site ≃ OtherSite) (frame : Frame K Site)
+    (state : FiniteEcologyState Site K (Matrix Site Site K) (JoinedSections first second K Site))
+    (sections : JoinedSections first second K Site) :
+    ((recurrentOperation first second (rebaseFrame equiv frame)).operate
+      (rebaseState equiv state) (rebaseJoined equiv sections)).2.2 =
+      rebaseState equiv (((recurrentOperation first second frame).operate state sections).2.2) := by
+  rw [recurrent_successor, recurrent_successor]
+  simp only [rebaseState, rebaseJoined, JoinedSections.presented, JoinedSections.arrived,
+    successor_rebase, conduct_rebase, List.map_append, List.map_cons, List.map_nil]
+
+/-- The formal trace keeps every addressed contribution under the same endpoint reindexing.
+This is a denotation theorem, not an instruction to copy that population off the GPU. -/
+theorem recurrent_pairCurrent_rebase {Source Middle Target : Type*}
+    {first : AddressedPassage Source Middle} {second : AddressedPassage Middle Target}
+    (equiv : Site ≃ OtherSite) (frame : Frame K Site)
+    (state : FiniteEcologyState Site K (Matrix Site Site K) (JoinedSections first second K Site))
+    (sections : JoinedSections first second K Site) (target source : OtherSite) :
+    ((recurrentOperation first second (rebaseFrame equiv frame)).operate
+      (rebaseState equiv state) (rebaseJoined equiv sections)).2.1.localCurrent target source =
+      (((recurrentOperation first second frame).operate state sections).2.1.localCurrent
+        (equiv.symm target) (equiv.symm source)) := rfl
+
+/-! ### A chart can grow without changing old transport, but silence alone learns nothing -/
+
+def extendSection (carrier : Site → K) : Option Site → K
+  | some site => carrier site
+  | none => 0
+
+def extendMatrix (matrix : Matrix Site Site K) : Matrix (Option Site) (Option Site) K
+  | some target, some source => matrix target source
+  | _, _ => 0
+
+def extendFrame (frame : Frame K Site) (newAdmittance newDuality : K) : Frame K (Option Site) where
+  admittance site := site.elim newAdmittance frame.admittance
+  sourceDuality site := site.elim newDuality frame.sourceDuality
+
+theorem conduct_extend (matrix : Matrix Site Site K) (carrier : Site → K) :
+    conduct (extendMatrix matrix) (extendSection carrier) = extendSection (conduct matrix carrier) := by
+  funext site
+  cases site <;> simp [conduct, pairCurrent, extendMatrix, extendSection, Fintype.sum_option]
+
+theorem successor_extend (frame : Frame K Site) (matrix : Matrix Site Site K)
+    (presented arrived : Site → K) (newAdmittance newDuality : K) :
+    successor (extendFrame frame newAdmittance newDuality) (extendMatrix matrix)
+      (extendSection presented) (extendSection arrived) =
+      extendMatrix (successor frame matrix presented arrived) := by
+  ext target source
+  cases target <;> cases source <;>
+    simp [successor, deposit, current, difference, conduct_extend, sourceCovector,
+      extendFrame, extendMatrix, extendSection, Matrix.vecMulVec]
+
+namespace Control
+
+def unitFrame : Frame ℚ (Fin 2) := ⟨fun _ ↦ 1, fun _ ↦ 1⟩
+
+/-- Equal squared receiver faces do not identify orthogonally situated returns. -/
+theorem equal_scalar_distinct_deposits :
+    ((1 : ℚ)^2 + 0^2 = 0^2 + 1^2) ∧
+      deposit unitFrame 0 ![1, 0] ![1, 0] ≠ deposit unitFrame 0 ![1, 0] ![0, 1] := by
+  constructor
+  · norm_num
+  · intro same
+    have atSite := congrFun (congrFun same 0) 0
+    norm_num [deposit, current, difference, conduct, pairCurrent, sourceCovector,
+      unitFrame, Matrix.vecMulVec, Fin.sum_univ_two] at atSite
+
+/-- The new site is not a silent padding trick: a caused nonzero contact forms a later-used edge. -/
+theorem new_site_contact_is_used :
+    let frame : Frame ℚ (Option (Fin 1)) := ⟨fun _ ↦ 1, fun _ ↦ 1⟩
+    let source : Option (Fin 1) → ℚ := fun site ↦ site.elim 1 (fun _ ↦ 0)
+    let arrival : Option (Fin 1) → ℚ := fun site ↦ site.elim 2 (fun _ ↦ 0)
+    successor frame 0 source arrival none none = 2 ∧
+      conduct (successor frame 0 source arrival) source none = 2 ∧
+      successor frame 0 source arrival (some 0) (some 0) = 0 := by
+  norm_num [successor, deposit, current, difference, conduct, pairCurrent,
+    sourceCovector, Matrix.vecMulVec, Fintype.sum_option, Fintype.sum_unique]
+
+end Control
+end ConstitutiveSectionReturn
+
 end Soma.Holonics.Computation.HolonicOrientedSiteTransport
 
 section Audit
@@ -276,4 +648,16 @@ open Soma.Holonics.Computation.HolonicOrientedSiteTransport
 #print axioms OrientedPortSiteTransport.postContractionPortMass_eq_norm_joined_current
 #print axioms OrientedPortSiteTransport.postContractionPortMass_nonnegative
 #print axioms OrientedPortSiteTransport.norm_before_linear_join_is_not_postContraction
+#print axioms ConstitutiveSectionReturn.successor_conduct
+#print axioms ConstitutiveSectionReturn.successor_conduct_eq_of_annihilates
+#print axioms ConstitutiveSectionReturn.absent_relation_founded
+#print axioms ConstitutiveSectionReturn.physicalCrossing_current
+#print axioms ConstitutiveSectionReturn.recurrent_successor
+#print axioms ConstitutiveSectionReturn.next_difference_uses_successor
+#print axioms ConstitutiveSectionReturn.successor_rebase
+#print axioms ConstitutiveSectionReturn.recurrent_successor_rebase
+#print axioms ConstitutiveSectionReturn.recurrent_pairCurrent_rebase
+#print axioms ConstitutiveSectionReturn.successor_extend
+#print axioms ConstitutiveSectionReturn.Control.equal_scalar_distinct_deposits
+#print axioms ConstitutiveSectionReturn.Control.new_site_contact_is_used
 end Audit

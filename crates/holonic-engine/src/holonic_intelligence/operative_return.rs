@@ -186,6 +186,100 @@ pub(super) struct DepositMaterial<'a, 'chart> {
     pub grain: ResidentGrain,
 }
 
+/// The five resident sections of one already-admitted local contact. The session owns the
+/// source/target lineage and must establish its joining before calling this numerical passage.
+/// Shape equality alone never establishes that relation. Admittance and source duality are
+/// native constitutive chart data, not caller-provided scores or a fabricated semantic current.
+pub(super) struct SectionContactMaterial<'a, 'chart> {
+    pub presented: &'a ResidentSection<'chart>,
+    pub presented_octaves: u32,
+    pub transported: &'a ResidentSection<'chart>,
+    pub transported_octaves: u32,
+    pub arrived: &'a ResidentSection<'chart>,
+    pub arrived_octaves: u32,
+    pub admittance: &'a ResidentSection<'chart>,
+    pub admittance_octaves: u32,
+    pub source_duality: &'a ResidentSection<'chart>,
+    pub source_duality_octaves: u32,
+}
+
+/// The non-prefix current chart of `ConstitutiveSectionReturn` in
+/// `HolonicOrientedSiteTransport.lean`. All four elementary operations remain resident:
+/// d = admittance * (transported - arrived), v = source_duality * presented.
+/// The existing deposit seals u = -2^-learning_shift * d^T and v. Thus its effective formal
+/// admittance includes that explicitly declared dyadic readout. Interval sealing retains the
+/// existing deposit's numerical boundary; this function does not claim a new exact real model.
+pub(super) fn enact_section_contact<'chart>(
+    surface: &'chart ResidentSurface<'chart>,
+    material: SectionContactMaterial<'_, 'chart>,
+    aperture: NativeReturnAperture,
+) -> Result<(OverlayAtom<'chart>, NativeMorphologyDeposit), ResidentRefusal> {
+    let refuse = |what: &str| ResidentRefusal::Declaration {
+        operation: "section-contact-return",
+        what: what.to_owned(),
+    };
+    let rows = material.presented.rows();
+    let input_width = material.presented.width();
+    let output_width = material.transported.width();
+    let grain = material.presented.grain();
+    let inputs = [material.transported, material.arrived, material.admittance];
+    if rows == 0 || input_width == 0 || output_width == 0
+        || inputs.iter().any(|part| part.rows() != rows || part.width() != output_width)
+        || material.source_duality.rows() != rows || material.source_duality.width() != input_width
+        || inputs.iter().any(|part| part.grain() != grain)
+        || material.source_duality.grain() != grain
+    {
+        return Err(refuse("the joined contact has incompatible resident charts"));
+    }
+    let negative = crate::resident_section::DyadicEnclosure { lo: -1, hi: -1, grain: 0 };
+    let negate_shape = surface.shape_scale(rows, output_width, material.arrived_octaves, negative)?;
+    let difference_shape = surface.shape_re_entry(
+        rows, output_width, material.transported_octaves, negate_shape.needed,
+    )?;
+    let current_shape = surface.shape_hadamard(
+        rows, output_width, difference_shape.needed, material.admittance_octaves,
+    )?;
+    let covector_shape = surface.shape_hadamard(
+        rows, input_width, material.presented_octaves, material.source_duality_octaves,
+    )?;
+    let negated = surface.fresh_section(rows, output_width, grain)?;
+    let difference = surface.fresh_section(rows, output_width, grain)?;
+    let differential = surface.fresh_section(rows, output_width, grain)?;
+    let covector = surface.fresh_section(rows, input_width, grain)?;
+    let mut passage = surface.begin_passage(&[vec![], vec![0], vec![1], vec![]])?;
+    {
+        let lane = passage.open(0, &[])?;
+        surface.record_scale(&lane, material.arrived, negative, &negated)?;
+    }
+    passage.close(0, &negated, negate_shape.needed)?;
+    {
+        let lane = passage.open(1, &[0])?;
+        surface.record_re_entry(&lane, material.transported, &negated, &difference)?;
+    }
+    passage.close(1, &difference, difference_shape.needed)?;
+    {
+        let lane = passage.open(2, &[1])?;
+        surface.record_hadamard(&lane, &difference, material.admittance, &differential)?;
+    }
+    passage.close(2, &differential, current_shape.needed)?;
+    {
+        let lane = passage.open(3, &[])?;
+        surface.record_hadamard(&lane, material.presented, material.source_duality, &covector)?;
+    }
+    passage.close(3, &covector, covector_shape.needed)?;
+    let reading = passage.finish()?.launch()?;
+    if !reading.obstruction.is_empty() {
+        return Err(refuse("the native joined-section passage returned an obstruction"));
+    }
+    deposit_from_material(surface, DepositMaterial {
+        differential: &differential,
+        differential_octaves: reading.slots[2].max_octave.max(1),
+        presented: &covector,
+        presented_octaves: reading.slots[3].max_octave.max(1),
+        grain,
+    }, aperture)
+}
+
 /// Deposit one overlay atom `u · v` with `u = −η · dᵀ` and `v = x`: one passage of three
 /// occurrences — the transposed seal of the differential, the carry or coarsening of the
 /// presented carrier, and its midpoint seal.
@@ -645,6 +739,92 @@ mod adjoint_tests;
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{embedding_fiber::ResidentReadout, resident_section::ResidentSectionRest};
+
+    #[test]
+    #[ignore = "requires CUDA; explicit joined-section numerical binding"]
+    fn joined_section_contact_deposits_oriented_factors_without_host_section_reads() {
+        let readout = ResidentReadout::new().expect("CUDA readout");
+        let surface = ResidentSurface::on(&readout).expect("resident surface");
+        let grain = ResidentGrain(4);
+        let mount = |width, words: &[i64]| {
+            surface.mount_section_rest(&ResidentSectionRest {
+                rows: 1, width, grain, bound_octaves: 8,
+                intervals: words.iter().map(|word| (*word, *word)).collect(),
+            }).expect("native section")
+        };
+        let presented = mount(3, &[16, 32, 0]);
+        let transported = mount(2, &[48, 64]);
+        let arrived = mount(2, &[80, 16]);
+        let admittance = mount(2, &[8, 32]);
+        let duality = mount(3, &[16, 8, 48]);
+        let make = |arrived| SectionContactMaterial {
+            presented: &presented, presented_octaves: 8,
+            transported: &transported, transported_octaves: 8,
+            arrived, arrived_octaves: 8,
+            admittance: &admittance, admittance_octaves: 8,
+            source_duality: &duality, source_duality_octaves: 8,
+        };
+        let before = surface.census();
+        let (atom, receipt) = enact_section_contact(&surface, make(&arrived),
+            NativeReturnAperture { learning_shift: 1, series_terms: 14 }).expect("contact return");
+        assert_eq!(surface.census().section_read_outs, before.section_read_outs,
+            "only the final test receiver may read a section");
+        assert_eq!(receipt.rank, 1, "one paired occurrence, not a caller-chosen rank");
+        assert!(receipt.next_occurrences.is_empty(), "no token comparison was fabricated");
+        // The complete factorized map is [[1/2,1/2,0],[-3,-3,0]]. A later query which
+        // excites an unused column does not make it participate in this local deposit.
+        let query = mount(3, &[32, 16, 1584]);
+        let apply = |atom: &OverlayAtom<'_>| {
+            let (u, v) = atom.readouts(&surface);
+            let inward_shape = surface.shape_contract(1, 3, 12, &v).expect("inward shape");
+            let outward_shape = surface.shape_contract(1, 1, inward_shape.needed, &u).expect("outward shape");
+            let inward = surface.fresh_section(1, 1, grain).unwrap();
+            let outward = surface.fresh_section(1, 2, grain).unwrap();
+            let mut passage = surface.begin_passage(&[vec![], vec![0]]).unwrap();
+            {
+                let lane = passage.open(0, &[]).unwrap();
+                surface.record_contract(&lane, &query, &v, &inward).unwrap();
+            }
+            passage.close(0, &inward, inward_shape.needed).unwrap();
+            {
+                let lane = passage.open(1, &[0]).unwrap();
+                surface.record_contract(&lane, &inward, &u, &outward).unwrap();
+            }
+            passage.close(1, &outward, outward_shape.needed).unwrap();
+            let reading = passage.finish().unwrap().launch().unwrap();
+            assert!(reading.obstruction.is_empty());
+            surface.read_out(&outward).unwrap()
+        };
+        assert_eq!(apply(&atom), vec![(24, 24), (-144, -144)]);
+        let (matched, _) = enact_section_contact(&surface, make(&transported),
+            NativeReturnAperture { learning_shift: 1, series_terms: 14 }).expect("matched return");
+        assert_eq!(apply(&matched), vec![(0, 0), (0, 0)]);
+    }
+
+    #[test]
+    #[ignore = "requires CUDA; explicit joined-section chart refusal"]
+    fn joined_section_contact_refuses_incompatible_charts_before_allocating_a_deposit() {
+        let readout = ResidentReadout::new().expect("CUDA readout");
+        let surface = ResidentSurface::on(&readout).expect("resident surface");
+        let mount = |grain| surface.mount_section_rest(&ResidentSectionRest {
+            rows: 1, width: 1, grain, bound_octaves: 8, intervals: vec![(16,16)],
+        }).unwrap();
+        let standing = mount(ResidentGrain(4));
+        let wrong_chart = mount(ResidentGrain(3));
+        let before = surface.census();
+        let returned = enact_section_contact(&surface, SectionContactMaterial {
+            presented: &standing, presented_octaves: 8,
+            transported: &standing, transported_octaves: 8,
+            arrived: &wrong_chart, arrived_octaves: 8,
+            admittance: &standing, admittance_octaves: 8,
+            source_duality: &standing, source_duality_octaves: 8,
+        }, NativeReturnAperture { learning_shift: 0, series_terms: 14 });
+        assert!(matches!(returned, Err(ResidentRefusal::Declaration { operation: "section-contact-return", .. })));
+        let after = surface.census();
+        assert_eq!(before.resident_octets_now, after.resident_octets_now);
+        assert_eq!(before.section_read_outs, after.section_read_outs);
+    }
 
     #[test]
     fn continuation_returns_the_address_that_followed_every_emitted_row() {

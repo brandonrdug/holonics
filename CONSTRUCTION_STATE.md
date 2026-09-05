@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** 2026-09-04. **Next construction:** HNP0 — planned, not started.
+**Currency:** 2026-09-04. **Next construction:** HNP1 — owned non-prefix contact and development.
 
 This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md) orders work;
 completed history stays in its existing records and Git. Brandon's latest direct instruction
@@ -9,11 +9,18 @@ governs. The preceding HNA consolidation is complete; its implementation standin
 ## Current campaign
 
 [definition] The formal [production-HNA plan](docs/plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md)
-is deposited under Brandon's latest instruction. No HNP implementation phase has passed.
-The next artifact is HNP0's concrete constitutive binding of presentation, addressed current/
-difference, reaction and local morphology advance, with the ordinary occurrence/domain contract.
-It uses the existing formal and native owners; a generic callback or restatement of recurrence
-does not satisfy it. No GPU campaign was launched by the planning pass.
+is active under Brandon's explicit instruction to complete HNP0--HNP7.
+
+[proved-derived; formal-checked] HNP0's finite constitutive binding is complete in
+`HolonicOrientedSiteTransport.ConstitutiveSectionReturn`: actual joined occurrences, transported
+difference, diagonal-admittance current, factorized return, successor/reindexing and growing-chart
+laws. The [HNP0 record](research/records/2026-09-04_HNP0_JOINED_SECTIONS_RETURN_LOCAL_CONSTITUTIVE_CURRENT_WITH_SUCCESSOR_AND_REBASE_LAWS.md)
+states the source/application contract and exact limitations.
+
+[established-bounded; measured] The corresponding internal resident passage passed both new CUDA
+controls; the live Lean umbrella built 3,775 jobs. It has no production caller yet. HNP1 must
+construct the admitted joining from actual native carrier owners and integrate this non-prefix
+return into one continuing session on model material; a raw numeric helper is not that result.
 
 [definition] The plan then orders general material contact, resident locality/reuse, persistent
 sessions, multi-cycle output, a useful consumer-model milestone, executable export and supported

@@ -22,16 +22,20 @@ contracts and records preserve their completed scope; their old imperatives sche
 
 ## Current campaign: production HNA
 
-**Next construction:** HNP0 — constitutive binding and occurrence contract. Not started.
+**Next construction:** HNP1 — owned non-prefix contact and local development.
 
 [definition] Brandon's subsequent September 4 request authorizes the formal, holistic design of
 [the production-HNA campaign](THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md).
-The plan is deposited; no implementation phase is passed or training run started by that deposit.
+The plan is deposited and Brandon has subsequently instructed completion of the whole campaign.
+HNP0 returned its concrete finite binding, formal laws, application contract and two resident
+numerical controls; the [record](../../research/records/2026-09-04_HNP0_JOINED_SECTIONS_RETURN_LOCAL_CONSTITUTIVE_CURRENT_WITH_SUCCESSOR_AND_REBASE_LAWS.md)
+states its scope. The numerical helper has no production caller yet; that admission/integration
+and actual native-model development are HNP1, not a capability inferred from the HNP0 tests.
 The ordered work is concrete local-current/presentation/development binding; general material
 contact; resident locality and reusable factors; persistent models and sessions; multi-cycle
 production; useful consumer-model evaluation; executable export; and additional model families.
 
-[definition] Construction begins with HNP0's actual constitutive relations and source binding,
+[definition] The campaign begins with HNP0's actual constitutive relations and source binding,
 not another definition of `OperationStep`, a larger prefix-training driver, a checkpoint-only
 substitute, or revalidation of the completed HNA/SKE campaigns. Each phase's required artifact,
 formal/runtime scope, falsifiers and completion conditions are in that plan. The existing native

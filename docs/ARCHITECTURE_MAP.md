@@ -34,6 +34,16 @@ test result never upgrades a correspondence.
 
 ## Computation, receiver history, and cultivation
 
+[proved-derived; formal-checked] HNP0's `HolonicOrientedSiteTransport.ConstitutiveSectionReturn`
+binds joined sections to a finite diagonal-admittance current and factorized morphology return,
+with later-query, reindexing, successor and site-extension laws.
+
+[established-bounded; measured] Its internal numerical composition is
+`holonic_intelligence/operative_return.rs::enact_section_contact`, verified on CUDA at the
+bounded point-section scope in the
+[HNP0 record](../research/records/2026-09-04_HNP0_JOINED_SECTIONS_RETURN_LOCAL_CONSTITUTIVE_CURRENT_WITH_SUCCESSOR_AND_REBASE_LAWS.md).
+Live session admission and general non-prefix development remain HNP1, not a grade of this helper.
+
 | Relation | Lean owner | Rust owner | CUDA owner | Status and exact open fibre |
 |---|---|---|---|---|
 | Exact finite diffusion and state-space chart | `Computation/HolonicDiffusionCharts.lean` | `diffusion.rs`; `sheaf_diffusion.rs`; `causal_body.rs` | `cuda_refine/membrane_boundary_*`; `membrane_factored_transport.rs` | **partial:** Lean Markov/deterministic separation is broader than one resident runtime owner |
