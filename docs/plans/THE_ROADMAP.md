@@ -59,9 +59,12 @@ moving centre, actual fluid/domain transport and physical-clock/endpoint theorem
 contains the focused and umbrella checks. MFR2 returned the all-time folded RH source, Gaussian
 remainder, derivatives and zero-count receivers; the
 [MFR2 record](../../research/records/2026-09-04_MFR2_THE_FOLDED_SOURCE_RETURNS_EVERY_HEAT_TIME_WITH_A_GAUSSIAN_REMAINDER_AND_ZERO_COUNT_RECEIVERS.md)
-contains its focused and umbrella checks. MFR3 is next: source-specific fluid concentration
-conditions and exclusions, followed by the actual ansatz/stability and arithmetic-sign
-investigations. HNP construction continues independently.
+contains its focused and umbrella checks. MFR3 is in progress: its
+[progress record](../../research/records/2026-09-04_MFR3_THE_PERIODIC_SOURCE_REJECTS_FIXED_PROFILES_AND_RETURNS_ITS_ENERGY_AND_COHERENT_FEEDS.md)
+retains the periodic exclusions, source energy/shear controls, complete coherent coefficient
+population and the localized core's residual. The next attempt must supply actual modulation or
+core/exterior transport and its full source relation. Residual/stability and arithmetic-sign
+investigations follow their actual returns. HNP construction continues independently.
 
 [project-postulate] Holonics is the mathematical framework and ontology of which HNA is an
 executable architecture. A research route may return a derivation, a counterexample or a precise

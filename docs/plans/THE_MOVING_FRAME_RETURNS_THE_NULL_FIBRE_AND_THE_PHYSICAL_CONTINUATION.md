@@ -4,13 +4,15 @@
 nullity, the RH line and the mathematical purpose of Holonics into a research strategy.
 **Position:** MFR0 strategy deposited; Brandon subsequently activated this plan as the standing
 mathematical goal. MFR1's scalar moving-frame/endpoint and MFR2's folded-source returns are
-complete; MFR3's source-specific fluid concentration conditions are next.
+complete; MFR3's source-specific fluid concentration conditions are in progress.
 **Authority:** [the roadmap](THE_ROADMAP.md) alone orders construction;
 [the position](../../CONSTRUCTION_STATE.md) records completed work. The
 [MFR1 record](../../research/records/2026-09-04_MFR1_THE_MOVING_FLUID_CHART_RETURNS_ITS_PDE_AND_ITS_PHYSICAL_ENDPOINT.md)
 and [MFR2 record](../../research/records/2026-09-04_MFR2_THE_FOLDED_SOURCE_RETURNS_EVERY_HEAT_TIME_WITH_A_GAUSSIAN_REMAINDER_AND_ZERO_COUNT_RECEIVERS.md)
-state the returned scopes; later phase requirements are not asserted as results. The concurrent
-HNP campaign continues.
+state their returned scopes. The
+[MFR3 progress record](../../research/records/2026-09-04_MFR3_THE_PERIODIC_SOURCE_REJECTS_FIXED_PROFILES_AND_RETURNS_ITS_ENERGY_AND_COHERENT_FEEDS.md)
+retains the new exclusions, controls and local-core residual derivation. Later phase requirements
+are not asserted as results. The concurrent HNP campaign continues.
 **Grades:** per claim; new analytic calculations below are written derivations, not new Lean receipts.
 
 ## 1. Purpose and the latest ruling
@@ -302,6 +304,19 @@ MFR3 is the next construction. The later ansatz and sign phases are adaptive
 research: their models and estimates are determined by the preceding source returns. They do
 not authorize an unbounded simulation, a new general search subsystem, or a claimed solution
 assembled from assumed stability/positivity fields.
+
+[proved-derived; formal-checked] MFR3's first return excludes a nonzero globally stationary
+exponential profile using actual periodicity and pressure; binds the energy exponent condition
+to an actual unforced solution; constructs a decaying shear with zero coherence defect; and
+returns a complete finite coherent coefficient population. Its absent output coefficient has a
+nonzero nonlinear source, and its third-component coherence inequality requires `kappa>=1`.
+
+[open] MFR3 remains in progress. The linked record derives the full residual of a periodized
+compact solenoidal core, including moving image addresses and nonlocal pressure. Its energy
+pairing also excludes a nonzero fixed core for varying rescaled viscosity. The next attempt
+must supply profile modulation or actual core/exterior transport and evaluate that family's
+full source relation. The finite coherent population still needs its smooth physical slice
+reconstruction. These are concrete continuing obligations, not additional completion gates.
 
 ## 10. Return into the wider framework and verification
 

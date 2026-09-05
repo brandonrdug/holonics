@@ -102,17 +102,27 @@ remain standing. That earlier release suite is now retired, not a current obliga
 [definition] Brandon's September 4 instruction authorizes the
 [MFR strategy](docs/plans/THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md):
 chart-relative null fibres, physical finite-time continuation and the RH arithmetic source.
-Brandon has subsequently activated this plan as the standing mathematical goal. MFR0's design
-and source/derivation review are complete. MFR1 returned the varying scalar fluid chart, moving
+Brandon has subsequently activated this plan as the standing mathematical goal.
+
+[proved-derived; formal-checked] MFR1 returned the varying scalar fluid chart, moving
 centre, actual momentum/pressure/domain transport, finite clocks and sufficient physical endpoint
 criteria. The [MFR1 record](research/records/2026-09-04_MFR1_THE_MOVING_FLUID_CHART_RETURNS_ITS_PDE_AND_ITS_PHYSICAL_ENDPOINT.md)
 states the exact hypotheses; the focused endpoint and live umbrella builds passed (9,847 jobs
 for the umbrella). MFR2 then returned the all-time folded RH source, explicit Gaussian remainder,
 integral derivatives and eventual rectangle-count agreement; its
 [record](research/records/2026-09-04_MFR2_THE_FOLDED_SOURCE_RETURNS_EVERY_HEAT_TIME_WITH_A_GAUSSIAN_REMAINDER_AND_ZERO_COUNT_RECEIVERS.md)
-includes the focused and 9,853-job umbrella checks. MFR3's source-specific concentration
-conditions are next. No singularity profile, stability estimate or arithmetic-sign conclusion
-is inferred from MFR1 or MFR2.
+includes the focused and 9,853-job umbrella checks.
+
+[proved-derived; formal-checked] MFR3's first
+[progress record](research/records/2026-09-04_MFR3_THE_PERIODIC_SOURCE_REJECTS_FIXED_PROFILES_AND_RETURNS_ITS_ENERGY_AND_COHERENT_FEEDS.md)
+returns periodic-profile exclusions, the actual energy exponent constraint, a complete shear
+control, and coherent finite coefficient feeds. Focused and umbrella builds passed; the record
+states the acceptance scope separately from its written local-core residual derivation.
+
+[open] MFR3 remains in progress. The next return is a modulated/core-exterior family with its
+complete source relation and the coherent population's physical slice passage. The fixed local
+core's derived energy obstruction guides that attempt. Stability and the arithmetic sign remain
+open.
 
 ## RH line
 
