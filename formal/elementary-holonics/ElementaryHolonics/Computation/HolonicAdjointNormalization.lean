@@ -73,6 +73,16 @@ theorem causalAdjoint_returns_in_reverse_factor_order
 
 /-! ## Normalized exponential receiver and its weighted Laplacian return -/
 
+/-- A declared scalar readout may cross the linear causal adjoint. This is the ideal-law
+identity; moving a factor through a finite interval realization still owes its projection bound. -/
+theorem causalAdjoint_carries_declared_scale
+    {Source : Type*} {Target : Type*}
+    [NormedAddCommGroup Source] [InnerProductSpace ℝ Source] [FiniteDimensional ℝ Source]
+    [NormedAddCommGroup Target] [InnerProductSpace ℝ Target] [FiniteDimensional ℝ Target]
+    (transport : Source →L[ℝ] Target) (scale : ℝ) (returned : Target) :
+    transport.adjoint (scale • returned) = scale • transport.adjoint returned :=
+  map_smul transport.adjoint scale returned
+
 namespace NormalizedExponential
 
 variable {Index : Type uI} [Fintype Index] [Nonempty Index]

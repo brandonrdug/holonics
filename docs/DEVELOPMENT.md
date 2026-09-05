@@ -50,6 +50,11 @@ papers. It is not a required check for unrelated Rust work.
 
 ## Verification cadence
 
+[definition] CUDA controls that measure allocation granularity require an isolated allocation
+reading. Run the explicit resident-return controls with `--test-threads=1`; concurrent contexts
+can invalidate that calibration before the numerical test starts. This is an observer/apparatus
+condition, not a production worker limit or a reason to serialize independent native currents.
+
 ```sh
 cargo test -p holonics-hna --lib hna
 cargo test -p holonics-workbench --lib adapters::hna

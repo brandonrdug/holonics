@@ -1,0 +1,107 @@
+diff --git a/crates/holonic-engine/src/holonic_intelligence.rs b/crates/holonic-engine/src/holonic_intelligence.rs
+index d5d1aa74..9cc9b49f 100644
+--- a/crates/holonic-engine/src/holonic_intelligence.rs
++++ b/crates/holonic-engine/src/holonic_intelligence.rs
+@@ -20,6 +20,8 @@ mod foreign_multimodal;
+ mod foreign_onnx;
+ #[path = "holonic_intelligence/full_operation.rs"]
+ mod full_operation;
++#[path = "holonic_intelligence/operative_contact.rs"]
++mod operative_contact;
+ #[path = "holonic_intelligence/lifecycle.rs"]
+ mod lifecycle;
+ #[path = "holonic_intelligence/material_ingress.rs"]
+@@ -71,6 +73,7 @@ pub use foreign_json::*;
+ pub use foreign_multimodal::*;
+ pub use foreign_onnx::*;
+ pub use full_operation::*;
++pub use operative_contact::*;
+ pub use lifecycle::*;
+ pub use material_ingress::*;
+ pub use operative_atlas::*;
+diff --git a/crates/holonic-engine/src/holonic_intelligence/full_operation.rs b/crates/holonic-engine/src/holonic_intelligence/full_operation.rs
+index 04cf7cba..5bb816e6 100644
+--- a/crates/holonic-engine/src/holonic_intelligence/full_operation.rs
++++ b/crates/holonic-engine/src/holonic_intelligence/full_operation.rs
+@@ -24,6 +24,7 @@ use super::{
+     NativeOperationPrimitive, NativeOperatorNode, NativeOperatorResidence,
+     NativeOperatorResidenceError, NativeReturnAperture, NativeTensorOrdinal,
+     operative_backward::{NativeAdjointReturnTrace, ReturnDeed},
++    operative_contact::{JunctionCultivation, NativeJunctionReturn},
+     operative_intervention::DissectionStanding,
+     operative_return::{OverlayAtom, ReturnMaterial, continuation_next_occurrences, enact_return},
+     operative_scalars::projected_scale,
+@@ -143,6 +144,7 @@ pub struct NativeFullOperatorSession<'residence, 'chart> {
+     pub(super) overlay: BTreeMap<NativeTensorOrdinal, Vec<OverlayAtom<'chart>>>,
+     /// The declared return apertures; `None` enacts no return.
+     pub(super) aperture: Option<NativeReturnAperture>,
++    pub(super) junction_cultivation: Option<JunctionCultivation<'chart>>,
+     /// The dissection standing: the excitation's supports and face, when founded for dissection.
+     pub(super) dissection: Option<DissectionStanding>,
+     /// Whether the terminal's successor projection is fused; a receiver that declares the
+@@ -165,6 +167,7 @@ pub struct NativeFullTerminalBranch<'residence, 'chart> {
+ pub struct NativeFullCycle<'residence, 'chart> {
+     pub final_emission: NativeFullOperationEmission,
+     pub traces: Vec<NativeFullOperationTrace>,
++    pub junction_returns: Vec<NativeJunctionReturn>,
+     pub successor: NativeFullOperatorSession<'residence, 'chart>,
+ }
+ 
+@@ -242,6 +245,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+             previous_context: None,
+             overlay: BTreeMap::new(),
+             aperture,
++            junction_cultivation: None,
+             dissection: None,
+             terminal_seal: true,
+         })
+@@ -436,6 +440,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+             for (outcome, operation) in outcomes.into_iter().zip(run) {
+                 let bound_octaves = outcome.carrier.bound_octaves;
+                 self.carriers.insert(outcome.output, outcome.carrier);
++                self.return_at_junction(operation.ordinal)?;
+                 steps.push(RunStep {
+                     operation: operation.clone(),
+                     admitted_octaves: outcome.admitted_octaves,
+@@ -453,8 +458,13 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+                     .iter()
+                     .position(|candidate| candidate.ordinal == operation.ordinal)
+                     .ok_or(NativeFullOperationError::Operation)?;
+-                for input in &operation.inputs {
++                let mut consumed = operation.inputs.clone();
++                if let Some(cultivation) = &self.junction_cultivation {
++                    consumed.extend(cultivation.released_sources_at(operation.ordinal));
++                }
++                for input in &consumed {
+                     if *input != operation.output
++                        && !self.junction_cultivation.as_ref().is_some_and(|c| c.retains_source_after(*input, operation.ordinal))
+                         && !self.ecology.operations[absolute + 1..]
+                             .iter()
+                             .any(|later| later.inputs.contains(input))
+@@ -504,6 +514,9 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+         mut self,
+         occurrence: NativeFullOperationOccurrence,
+     ) -> Result<NativeFullOperationStep<'residence, 'chart>, NativeFullOperationError> {
++        if self.junction_cultivation.is_some() {
++            return Err(NativeFullOperationError::Contact("this chart advances complete cycles, not exposed primitive steps"));
++        }
+         if occurrence.ordinal != self.generation {
+             return Err(NativeFullOperationError::Occurrence);
+         }
+@@ -605,6 +618,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+         Ok(NativeFullCycle {
+             final_emission,
+             traces,
++            junction_returns: terminal.successor.publish_junction_returns(),
+             successor: terminal.successor,
+         })
+     }
+@@ -654,6 +668,8 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+ 
+ #[derive(Debug, Error)]
+ pub enum NativeFullOperationError {
++    #[error("native contact: {0}")]
++    Contact(&'static str),
+     #[error("operator ecology: {0}")]
+     Ecology(#[from] super::NativeFullOperatorError),
+     #[error("operator residence: {0}")]

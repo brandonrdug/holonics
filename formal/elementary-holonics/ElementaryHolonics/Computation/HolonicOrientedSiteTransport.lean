@@ -632,6 +632,66 @@ theorem new_site_contact_is_used :
     sourceCovector, Matrix.vecMulVec, Fintype.sum_option, Fintype.sum_unique]
 
 end Control
+
+/-! ### Rectangular cross-sections are bipartite charts of the same local operation
+
+The embedding is formal only: the implementation stores the rectangular factors, never the
+zero-filled square. Identity admittance is the derivative of the native additive junction in
+either input slot; the source-coordinate pairing is declared in that native chart. The dyadic
+deposit readout remains the explicit scalar `eta`, not a derived learning constant.
+-/
+
+section Rectangular
+variable {InputSite OutputSite : Type*} [Fintype InputSite] [Fintype OutputSite]
+
+def bipartiteMatrix (matrix : Matrix OutputSite InputSite K) :
+    Matrix (OutputSite ⊕ InputSite) (OutputSite ⊕ InputSite) K
+  | Sum.inl target, Sum.inr source => matrix target source
+  | _, _ => 0
+
+def bipartiteSource (carrier : InputSite → K) : OutputSite ⊕ InputSite → K :=
+  Sum.elim (fun _ ↦ 0) carrier
+
+def bipartiteArrival (carrier : OutputSite → K) : OutputSite ⊕ InputSite → K :=
+  Sum.elim carrier (fun _ ↦ 0)
+
+def bipartiteFrame (eta : K) : Frame K (OutputSite ⊕ InputSite) where
+  admittance := Sum.elim (fun _ ↦ eta) (fun _ ↦ 0)
+  sourceDuality := Sum.elim (fun _ ↦ 0) (fun _ ↦ 1)
+
+theorem bipartite_conduct (matrix : Matrix OutputSite InputSite K) (presented : InputSite → K)
+    (target : OutputSite) :
+    conduct (bipartiteMatrix matrix) (bipartiteSource presented) (Sum.inl target) =
+      ∑ source, matrix target source * presented source := by
+  simp [conduct, pairCurrent, bipartiteMatrix, bipartiteSource, Fintype.sum_sum_type]
+
+theorem rectangular_deposit (eta : K) (matrix : Matrix OutputSite InputSite K)
+    (presented : InputSite → K) (arrived : OutputSite → K) (target : OutputSite) (source : InputSite) :
+    deposit (bipartiteFrame eta) (bipartiteMatrix matrix)
+      (bipartiteSource presented) (bipartiteArrival arrived) (Sum.inl target) (Sum.inr source) =
+      eta * (arrived target - ∑ inner, matrix target inner * presented inner) * presented source := by
+  change eta * (arrived target -
+    conduct (bipartiteMatrix matrix) (bipartiteSource presented) (Sum.inl target)) *
+    (1 * presented source) = _
+  rw [one_mul, bipartite_conduct]
+
+/-- Both branches of an additive junction have identity local differential, without a score. -/
+theorem additive_junction_input_differences (left right dl dr : K) :
+    ((left + dl) + right - (left + right) = dl) ∧
+      (left + (right + dr) - (left + right) = dr) := by
+  constructor <;> ring
+
+/-- A sum and its input derivative do not determine the individual constitutive routes. Both
+these bodies return the same complete sum for every input, while a branch receiver separates
+them. Thus the Add primitive cannot by itself authorize equalizing its arriving fields. -/
+theorem additive_face_does_not_found_an_equalization_target :
+    (∀ x : ℚ, 1 * x + 0 * x = (1 / 2) * x + (1 / 2) * x) ∧
+      (1 : ℚ) ≠ 1 / 2 := by
+  constructor
+  · intro x; ring
+  · norm_num
+
+end Rectangular
 end ConstitutiveSectionReturn
 
 end Soma.Holonics.Computation.HolonicOrientedSiteTransport
@@ -660,4 +720,7 @@ open Soma.Holonics.Computation.HolonicOrientedSiteTransport
 #print axioms ConstitutiveSectionReturn.successor_extend
 #print axioms ConstitutiveSectionReturn.Control.equal_scalar_distinct_deposits
 #print axioms ConstitutiveSectionReturn.Control.new_site_contact_is_used
+#print axioms ConstitutiveSectionReturn.rectangular_deposit
+#print axioms ConstitutiveSectionReturn.additive_junction_input_differences
+#print axioms ConstitutiveSectionReturn.additive_face_does_not_found_an_equalization_target
 end Audit

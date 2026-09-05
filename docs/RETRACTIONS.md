@@ -6,6 +6,13 @@ root construction state records current implementation scope. Paths in code span
 
 ## Capability and retraction record
 
+[historical; source-inspected] 2026-09-04 HNP1 attempted automatic equalization at native Add
+junctions. Actual non-prefix development and exact ablation/restoration returned, but Add's input
+derivative does not supply a desired comparison target. The automatic policy and session hooks
+were archived before phase admission. The numerical return and formal local laws stand only for
+an already-admitted comparison. See
+[the HNP1 record](../research/records/2026-09-04_HNP1_ADDITIVE_EQUALIZATION_CHANGED_CONDUCT_BUT_DID_NOT_FOUND_A_LEARNING_COMPARISON.md).
+
 [historical; source-inspected] Each entry below was returned, graded, and then narrowed or
 withdrawn by the repository's own audit. Re-proposing a retracted mechanism without citing its
 retraction is a contamination. Dates are record dates under `research/records/`.

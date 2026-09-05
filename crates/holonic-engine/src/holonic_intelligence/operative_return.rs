@@ -203,6 +203,83 @@ pub(super) struct SectionContactMaterial<'a, 'chart> {
     pub source_duality_octaves: u32,
 }
 
+/// Identity-admittance specialization of an ALREADY admitted HNP0 comparison. The numerical
+/// passage does not establish that two fields should agree: an additive junction's derivative
+/// alone supplies neither an observation target nor a learning law. Source duality is the
+/// declared coefficient-coordinate pairing; no fabricated all-ones tensor is needed.
+pub(super) fn enact_identity_admittance_contact<'chart>(
+    surface: &'chart ResidentSurface<'chart>,
+    presented: &ResidentSection<'chart>,
+    presented_octaves: u32,
+    transported: &ResidentSection<'chart>,
+    transported_octaves: u32,
+    arrived: &ResidentSection<'chart>,
+    arrived_octaves: u32,
+    aperture: NativeReturnAperture,
+) -> Result<Option<(OverlayAtom<'chart>, NativeMorphologyDeposit)>, ResidentRefusal> {
+    let refuse = |what: &str| ResidentRefusal::Declaration {
+        operation: "identity-admittance-return", what: what.to_owned(),
+    };
+    if presented.rows() == 0 || presented.width() == 0 || transported.width() == 0
+        || transported.rows() != presented.rows() || arrived.rows() != transported.rows()
+        || arrived.width() != transported.width() || arrived.grain() != transported.grain()
+        || presented.grain() != transported.grain()
+    {
+        return Err(refuse("the actual junction inputs do not share the declared carrier charts"));
+    }
+    let Some(differential) = native_section_difference(surface, transported, transported_octaves,
+        arrived, arrived_octaves)? else { return Ok(None) };
+    deposit_from_material(surface, DepositMaterial {
+        differential: &differential.section, differential_octaves: differential.octaves,
+        presented, presented_octaves, grain: presented.grain(),
+    }, aperture).map(Some)
+}
+
+/// The receiver differential before returning through any intervening native reactions.
+pub(super) fn native_section_difference<'chart>(
+    surface: &'chart ResidentSurface<'chart>,
+    transported: &ResidentSection<'chart>, transported_octaves: u32,
+    arrived: &ResidentSection<'chart>, arrived_octaves: u32,
+) -> Result<Option<ReturnedDifferential<'chart>>, ResidentRefusal> {
+    let refuse = |what: &str| ResidentRefusal::Declaration {
+        operation: "native-section-difference", what: what.to_owned(),
+    };
+    if transported.rows() == 0 || transported.width() == 0
+        || arrived.rows() != transported.rows() || arrived.width() != transported.width()
+        || arrived.grain() != transported.grain()
+    {
+        return Err(refuse("the two native arrivals do not share the target chart"));
+    }
+    let negative = crate::resident_section::DyadicEnclosure { lo: -1, hi: -1, grain: 0 };
+    let negate_shape = surface.shape_scale(arrived.rows(), arrived.width(), arrived_octaves, negative)?;
+    let difference_shape = surface.shape_re_entry(
+        arrived.rows(), arrived.width(), transported_octaves, negate_shape.needed,
+    )?;
+    let negated = surface.fresh_section(arrived.rows(), arrived.width(), arrived.grain())?;
+    let difference = surface.fresh_section(arrived.rows(), arrived.width(), arrived.grain())?;
+    let mut passage = surface.begin_passage(&[vec![], vec![0]])?;
+    {
+        let lane = passage.open(0, &[])?;
+        surface.record_scale(&lane, arrived, negative, &negated)?;
+    }
+    passage.close(0, &negated, negate_shape.needed)?;
+    {
+        let lane = passage.open(1, &[0])?;
+        surface.record_re_entry(&lane, transported, &negated, &difference)?;
+    }
+    passage.close(1, &difference, difference_shape.needed)?;
+    let reading = passage.finish()?.launch()?;
+    if !reading.obstruction.is_empty() {
+        return Err(refuse("the joined current returned a resident obstruction"));
+    }
+    // A zero maximum bit width certifies BOTH endpoints at EVERY coordinate are zero.
+    // This is exact zero transport, not a magnitude threshold or a semantic importance score.
+    if reading.slots[1].max_octave == 0 {
+        return Ok(None);
+    }
+    Ok(Some(ReturnedDifferential { section: difference, octaves: reading.slots[1].max_octave }))
+}
+
 /// The non-prefix current chart of `ConstitutiveSectionReturn` in
 /// `HolonicOrientedSiteTransport.lean`. All four elementary operations remain resident:
 /// d = admittance * (transported - arrived), v = source_duality * presented.
@@ -392,6 +469,34 @@ pub(super) fn deposit_from_material<'chart>(
 pub(super) struct ReturnedDifferential<'chart> {
     pub section: ResidentSection<'chart>,
     pub octaves: u32,
+}
+
+/// Move an already-declared dyadic factor before a linear pullback. The ideal adjoint commutes
+/// with this factor. The finite-grain passage encloses any division remainder instead of clipping
+/// a large unscaled intermediate; callers must not apply the same factor again at deposition.
+pub(super) fn scale_contact_differential<'chart>(
+    surface: &'chart ResidentSurface<'chart>, differential: ReturnedDifferential<'chart>, shift: u32,
+) -> Result<(ReturnedDifferential<'chart>, Option<u64>), ResidentRefusal> {
+    // None means no new scaling receiver ran; it does not claim the existing enclosure is a point.
+    if shift == 0 { return Ok((differential, None)); }
+    if i32::try_from(shift).is_err() {
+        return Err(ResidentRefusal::Declaration { operation: "contact-current-scale", what: "dyadic exponent outside the chart".to_owned() });
+    }
+    let scale = crate::resident_section::DyadicEnclosure { lo: 1, hi: 1, grain: shift };
+    let input = &differential.section;
+    let shape = surface.shape_scale(input.rows(), input.width(), differential.octaves, scale)?;
+    let output = surface.fresh_section(input.rows(), input.width(), input.grain())?;
+    let mut passage = surface.begin_passage(&[vec![]])?;
+    {
+        let lane = passage.open(0, &[])?;
+        surface.record_scale(&lane, input, scale, &output)?;
+    }
+    passage.close(0, &output, shape.needed)?;
+    let reading = passage.finish()?.launch()?;
+    if !reading.obstruction.is_empty() {
+        return Err(ResidentRefusal::Declaration { operation: "contact-current-scale", what: "the dyadic current scaling was obstructed".to_owned() });
+    }
+    Ok((ReturnedDifferential { section: output, octaves: reading.slots[0].max_octave.max(1) }, Some(reading.slots[0].max_width)))
 }
 
 /// The tile table of the terminal face: `tiles[4t..4t+4] = e_lo, e_hi, t_lo, t_hi`, uploaded once.
@@ -824,6 +929,55 @@ mod tests {
         let after = surface.census();
         assert_eq!(before.resident_octets_now, after.resident_octets_now);
         assert_eq!(before.section_read_outs, after.section_read_outs);
+    }
+
+    #[test]
+    #[ignore = "requires CUDA; additive-junction matched and unaffected controls"]
+    fn identity_admittance_matched_current_is_absent_and_an_unaffected_native_coordinate_stands() {
+        use super::super::operative_adjoint::{NativeAdjointContraction, add_overlay_adjoints};
+        let readout = ResidentReadout::new().expect("CUDA readout");
+        let surface = ResidentSurface::on(&readout).expect("resident surface");
+        let grain = ResidentGrain(4);
+        let mount = |words: &[i64]| surface.mount_section_rest(&ResidentSectionRest {
+            rows: 1, width: words.len(), grain, bound_octaves: 8,
+            intervals: words.iter().map(|word| (*word,*word)).collect(),
+        }).unwrap();
+        let x = mount(&[16,0]);
+        let transported = mount(&[48,80]);
+        let same_face_distinct_carrier = mount(&[48,80]);
+        let arrived = mount(&[64,112]);
+        let aperture = NativeReturnAperture { learning_shift: 0, series_terms: 14 };
+        assert!(enact_identity_admittance_contact(&surface, &x, 8, &transported, 8,
+            &same_face_distinct_carrier, 8, aperture).unwrap().is_none());
+        let (atom, _) = enact_identity_admittance_contact(&surface, &x, 8, &transported, 8,
+            &arrived, 8, aperture).unwrap().expect("nonzero local current");
+        let dy = mount(&[16,0]);
+        let base = NativeAdjointContraction { section: mount(&[16,80]), bound_octaves: 8, tiles: 1 };
+        let before = surface.census();
+        let returned = add_overlay_adjoints(&surface, base, &dy, 8, &[atom]).unwrap();
+        assert_eq!(surface.census().section_read_outs, before.section_read_outs);
+        assert_eq!(surface.read_out(&returned.section).unwrap(), vec![(32,32),(80,80)],
+            "the affected coordinate changed and the nonzero unaffected coordinate stayed exact");
+    }
+
+    #[test]
+    #[ignore = "requires CUDA; declared current scaling and division enclosures"]
+    fn contact_readout_scale_retains_signed_division_enclosures() {
+        let readout = ResidentReadout::new().expect("CUDA readout");
+        let surface = ResidentSurface::on(&readout).expect("resident surface");
+        let section = surface.mount_section_rest(&ResidentSectionRest {
+            rows: 1, width: 3, grain: ResidentGrain(4), bound_octaves: 8,
+            intervals: vec![(3,3),(-3,-3),(32,32)],
+        }).unwrap();
+        let before = surface.census();
+        let (scaled, width) = scale_contact_differential(&surface,
+            ReturnedDifferential { section, octaves: 8 }, 1).unwrap();
+        assert_eq!(surface.census().section_read_outs, before.section_read_outs);
+        assert_eq!(width, Some(1));
+        assert_eq!(surface.read_out(&scaled.section).unwrap(), vec![(1,2),(-2,-1),(16,16)]);
+        let (unchanged, observation) = scale_contact_differential(&surface, scaled, 0).unwrap();
+        assert_eq!(observation, None);
+        assert_eq!(surface.read_out(&unchanged.section).unwrap(), vec![(1,2),(-2,-1),(16,16)]);
     }
 
     #[test]

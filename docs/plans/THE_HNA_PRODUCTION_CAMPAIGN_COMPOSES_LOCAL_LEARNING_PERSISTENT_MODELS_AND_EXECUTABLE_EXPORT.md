@@ -230,6 +230,12 @@ This phase does not pass on restating `OperationStep` or rebuilding its existing
 
 ### HNP1 — General material contact and productive local development
 
+[counterexample; source-inspected] The first automatic Add-equalization attempt was withdrawn
+before admission: topology and the Add derivative do not supply a desired observation target.
+Its actual native effect/attribution receipts do not pass this phase. The
+[record](../../research/records/2026-09-04_HNP1_ADDITIVE_EQUALIZATION_CHANGED_CONDUCT_BUT_DID_NOT_FOUND_A_LEARNING_COMPARISON.md)
+names the retained numerical work and the missing stipulated comparison relation.
+
 **Depends on:** HNP0.
 
 [definition] Compose the founded boundary with the existing resident session and Soulkiller

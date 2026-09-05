@@ -339,7 +339,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     }
 
     /// Return the differential of one operation's output through each of its inputs.
-    fn return_through(
+    pub(super) fn return_through(
         &mut self,
         operation: &NativeOperatorNode,
         dy: ContemporaryCarrier<'chart>,

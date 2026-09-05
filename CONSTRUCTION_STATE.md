@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** 2026-09-04. **Next construction:** HNP1 — owned non-prefix contact and development.
+**Currency:** 2026-09-04. **Current construction:** HNP1 — in progress.
 
 This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md) orders work;
 completed history stays in its existing records and Git. Brandon's latest direct instruction
@@ -18,9 +18,18 @@ laws. The [HNP0 record](research/records/2026-09-04_HNP0_JOINED_SECTIONS_RETURN_
 states the source/application contract and exact limitations.
 
 [established-bounded; measured] The corresponding internal resident passage passed both new CUDA
-controls; the live Lean umbrella built 3,775 jobs. It has no production caller yet. HNP1 must
-construct the admitted joining from actual native carrier owners and integrate this non-prefix
-return into one continuing session on model material; a raw numeric helper is not that result.
+controls; the live Lean umbrella built 3,775 jobs. HNP1's attempted Add-equalization policy ran
+three non-prefix occurrences on the corrected SKE body with changed conduct and exact attribution,
+but was withdrawn before admission: Add does not supply a desired comparison target. Its source
+and receipt are archived. The valid numerical return, rectangular binding, dyadic factorization
+and codeword I/O improvements remain; HNP1 is not passed.
+
+[definition] The next relation is actual source/candidate or observed-interaction comparison
+with shared causal occurrence and explicit carrier-chart connection. The existing
+`FamilyDistillationChart.returnedDifference` now ties zero difference to the stipulated receiver
+correspondence. That comparison must be admitted before a local adjoint is invoked; raw arrays,
+shape equality or a shared sum do not found it. See the
+[HNP1 record](research/records/2026-09-04_HNP1_ADDITIVE_EQUALIZATION_CHANGED_CONDUCT_BUT_DID_NOT_FOUND_A_LEARNING_COMPARISON.md).
 
 [definition] The plan then orders general material contact, resident locality/reuse, persistent
 sessions, multi-cycle output, a useful consumer-model milestone, executable export and supported

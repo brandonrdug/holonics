@@ -162,6 +162,25 @@ def Defect (source : Source) (candidate : Candidate) : Prop :=
   ∃ query receiver,
     chart.candidateConduct candidate query receiver ≠ chart.sourceConduct source query receiver
 
+/-- The oriented difference of a STIPULATED source/candidate receiver correspondence.
+The correspondence question supplies the two roles; co-presence at a native Add does not.
+This is an exterior comparison receiver, not a universal morphology-update policy. -/
+def returnedDifference [AddCommGroup Face]
+    (source : Source) (candidate : Candidate) (query : Query) (receiver : Receiver) : Face :=
+  chart.sourceConduct source query receiver - chart.candidateConduct candidate query receiver
+
+theorem returnedDifference_zero_iff_correspondence [AddCommGroup Face]
+    (source : Source) (candidate : Candidate) (query : Query) (receiver : Receiver) :
+    chart.returnedDifference source candidate query receiver = 0 ↔
+      chart.candidateConduct candidate query receiver = chart.sourceConduct source query receiver := by
+  simp only [returnedDifference, sub_eq_zero]
+  exact eq_comm
+
+theorem exact_condensation_has_no_comparison_defect [AddCommGroup Face]
+    (source : Source) (query : Query) (receiver : Receiver) :
+    chart.returnedDifference source (chart.condense source) query receiver = 0 := by
+  simp [returnedDifference, chart.exact]
+
 /-- One separating receiver/query pair is the exact obstruction to claiming receiver-exact
 distillation for that candidate. -/
 theorem defect_obstructs_exact
@@ -216,6 +235,8 @@ section Audit
 #print axioms FactorizedLinearOverlay.apply_eq_base_add_factorized
 #print axioms FamilyDistillationChart.every_declared_face_factors
 #print axioms FamilyDistillationChart.defect_obstructs_exact
+#print axioms FamilyDistillationChart.returnedDifference_zero_iff_correspondence
+#print axioms FamilyDistillationChart.exact_condensation_has_no_comparison_defect
 #print axioms WorldReturnedCultivation.occurrence_action
 
 end Audit

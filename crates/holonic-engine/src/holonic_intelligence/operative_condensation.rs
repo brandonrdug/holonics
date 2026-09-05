@@ -786,10 +786,9 @@ impl NativeConeRestrictedEcology {
         let mut input = BufReader::with_capacity(1 << 24, file);
         let mut rest = Self::read_header(&mut input)?;
         for section in &mut rest.cross_sections {
-            let count = section.retained_rows.len() * section.dim;
-            let mut bytes = vec![0u8; count * 2];
-            input.read_exact(&mut bytes).map_err(|error| NativeCondensationError::Io(error.to_string()))?;
-            section.words = bytes.chunks_exact(2).map(|pair| u16::from_le_bytes([pair[0], pair[1]])).collect();
+            let count = section.retained_rows.len().checked_mul(section.dim)
+                .ok_or_else(|| NativeCondensationError::Rest("coefficient extent overflow".to_owned()))?;
+            section.words = read_coefficient_words(&mut input, count)?;
         }
         rest.validate()?;
         Ok(rest)
@@ -809,6 +808,26 @@ impl NativeConeRestrictedEcology {
         };
         Ok(NativeRestrictedIntake { restricted: self, class })
     }
+}
+
+/// Exterior wire decoding, not native arithmetic. Read directly into the owned integer-codeword
+/// population instead of retaining a second multi-gigabyte byte vector and decoding every pair
+/// through an unoptimized iterator. Every u16 bit pattern is valid; endian conversion is explicit.
+fn read_coefficient_words(input: &mut impl Read, count: usize) -> Result<Vec<u16>, NativeCondensationError> {
+    let byte_count = count.checked_mul(std::mem::size_of::<u16>())
+        .ok_or_else(|| NativeCondensationError::Rest("coefficient octet extent overflow".to_owned()))?;
+    let mut words = Vec::<u16>::new();
+    words.try_reserve_exact(count).map_err(|error| NativeCondensationError::Io(error.to_string()))?;
+    words.resize(count, 0);
+    // SAFETY: initialized u16 storage permits every bit pattern. Its exclusive byte view covers
+    // exactly the allocation's initialized length, has alignment one, and cannot outlive words.
+    // No u16 reference is used until the byte borrow ends; no native ecology is copied or aliased.
+    let bytes = unsafe { std::slice::from_raw_parts_mut(words.as_mut_ptr().cast::<u8>(), byte_count) };
+    input.read_exact(bytes).map_err(|error| NativeCondensationError::Io(error.to_string()))?;
+    if cfg!(target_endian = "big") {
+        for word in &mut words { *word = u16::from_le(*word); }
+    }
+    Ok(words)
 }
 
 /// The intake of a restricted mount: every retained row's codewords, zero elsewhere.  With a
@@ -881,6 +900,28 @@ impl NativeCoefficientIntake for NativeRestrictedIntake<'_> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn native_coefficient_wire_preserves_every_u16_codeword_and_refuses_truncation() {
+        let expected: Vec<u16> = (0..=u16::MAX).collect();
+        let bytes: Vec<u8> = expected.iter().flat_map(|word| word.to_le_bytes()).collect();
+        let returned = read_coefficient_words(&mut std::io::Cursor::new(&bytes), expected.len()).unwrap();
+        assert_eq!(returned, expected);
+        struct Fragments<'a>(&'a [u8]);
+        impl std::io::Read for Fragments<'_> {
+            fn read(&mut self, out: &mut [u8]) -> std::io::Result<usize> {
+                let count = out.len().min(self.0.len()).min(7);
+                out[..count].copy_from_slice(&self.0[..count]);
+                self.0 = &self.0[count..];
+                Ok(count)
+            }
+        }
+        assert_eq!(read_coefficient_words(&mut Fragments(&bytes), expected.len()).unwrap(), expected,
+            "delivery fragments do not become new native codewords or occurrences");
+        assert!(read_coefficient_words(&mut std::io::Cursor::new(&bytes[..1]), 2).is_err());
+        assert!(read_coefficient_words(&mut std::io::Cursor::new(&[]), usize::MAX).is_err());
+        assert!(read_coefficient_words(&mut std::io::Cursor::new(&[]), 0).unwrap().is_empty());
+    }
 
     #[test]
     fn the_restriction_of_every_population_follows_the_operations_that_read_it() {
