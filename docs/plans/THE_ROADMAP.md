@@ -84,9 +84,15 @@ The [second-resonance and moving-source return](../../research/records/2026-09-0
 now constructs the full finite forcing and positive axial repair through mode 28, retaining the
 next angular fibre. The actual moving Cartesian source includes viscosity and physical
 reconstruction; two leading axis receivers require a shape current beyond amplitude variation.
-Continue with that time-dependent axis/radial construction and coupled pressure, then its actual
-nonlinear bounds and exterior/time transport. A globally sublinear stationary axisymmetric
-completion remains excluded at the current rates.
+The [forced-axis and inner-chart return](../../research/records/2026-09-05_MFR3_THE_FORCED_AXIS_RETURNS_A_VISCOUS_RESPONSE_AND_THE_INNER_CHART_RETAINS_PRESSURE.md)
+now constructs a positive changing axis, its forced velocity primitive, and the retained first
+viscous response with local pressure through mode 14. The inner chart carries physical circulation
+and keeps the axis pressure separately. Its quadratic source remains explicit. MFR3 next requires
+a periodic source realization of the local core and its complete exterior pressure coupling,
+including pressure torque where symmetry is broken. MFR4 then supplies complete residual and
+quantitative linear/nonlinear control for that specified realization. Full convergence is not
+a prerequisite imposed on MFR3 before that residual/stability work begins. A globally sublinear
+stationary axisymmetric completion remains excluded at the current rates.
 Residual/stability and arithmetic-sign investigations follow their actual returns.
 HNP construction continues independently.
 

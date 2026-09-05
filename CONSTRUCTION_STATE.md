@@ -150,13 +150,24 @@ positive repair. Actual time-dependent circulation now includes the Cartesian ve
 its retained axis derivative and MFR1's physical source/reconstruction. Two leading viscous axis
 receivers reject amplitude-only modulation and return a separate shape current.
 
-[established-bounded; process-audit] Focused checks and the 9,884-job Lean umbrella returned.
-The final exact recurrence and forcing/coefficient certificate comparisons agree.
+[proved-derived; formal-checked] The
+[forced-axis and inner-chart return](research/records/2026-09-05_MFR3_THE_FORCED_AXIS_RETURNS_A_VISCOUS_RESPONSE_AND_THE_INNER_CHART_RETAINS_PRESSURE.md)
+constructs the changing axis primitive, a positive shape on the stated viscosity interval,
+and an exact inner-coordinate source law with physical scale tied to the clock. Its pressure
+chart retains the axis trace and the derivative receiver of the changing radial difference.
 
-[open] MFR3 remains in progress. Construct
-the time-dependent axis/radial shape and coupled pressure using that current, retaining the
-next angular fibre. Nonlinear bounds, radial convergence, exterior transport, stability and
-the arithmetic sign remain open. The stationary global exclusion remains standing.
+[established-bounded; computational-witness] The corrected first-viscosity construction closes
+the retained axis, pressure and swirl rows through mode 14, retaining a new axial coefficient.
+Its actual local pressure is reconstructed. A positive quadratic-viscosity source remains.
+
+[established-bounded; process-audit] Focused checks and the 9,888-job Lean umbrella returned.
+The accepted response includes the repaired axis-source audit and exact selector comparisons.
+
+[open] MFR3 remains in progress. The next
+construction is a periodic source realization of this local core with its full exterior
+pressure coupling. MFR4 owns complete residual and quantitative nonlinear/stability control
+for that specified realization. Further local corrections must respond to those source returns.
+The stationary global exclusion and open RH arithmetic-sign obligation remain standing.
 
 ## RH line
 

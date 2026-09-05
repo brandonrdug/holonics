@@ -1,0 +1,22 @@
+{
+  "scope": "Exact symbolic coefficient identity in viscosity order0..2; no convergence or solution claim",
+  "sympy_version": "1.14.0",
+  "clock": "mu_prime=-delta*mu",
+  "first_order": {
+    "A1": "-delta*v(s, z) + 2*s*((beta + V(s, z))*Derivative(v(s, z), s) + v(s, z)*Derivative(V(s, z), s)) - 4*s*Derivative(V(s, z), (s, 2)) + (beta*z + W(s, z))*Derivative(v(s, z), z) + (alpha + beta + 2*V(s, z))*v(s, z) - 2*Omega(s, z)*f(s, z) + w(s, z)*Derivative(V(s, z), z) - 8*Derivative(V(s, z), s) - Derivative(V(s, z), (z, 2))",
+    "B1": "alpha*w(s, z) - delta*w(s, z) + 2*s*((beta + V(s, z))*Derivative(w(s, z), s) + v(s, z)*Derivative(W(s, z), s)) - 4*s*Derivative(W(s, z), (s, 2)) + (beta*z + W(s, z))*Derivative(w(s, z), z) + w(s, z)*Derivative(W(s, z), z) - 4*Derivative(W(s, z), s) - Derivative(W(s, z), (z, 2))",
+    "C1": "-delta*f(s, z) + 2*s*((beta + V(s, z))*Derivative(f(s, z), s) + v(s, z)*Derivative(Omega(s, z), s)) - 4*s*Derivative(Omega(s, z), (s, 2)) + (beta*z + W(s, z))*Derivative(f(s, z), z) + (alpha + beta + 2*V(s, z))*f(s, z) + 2*Omega(s, z)*v(s, z) + w(s, z)*Derivative(Omega(s, z), z) - 8*Derivative(Omega(s, z), s) - Derivative(Omega(s, z), (z, 2))"
+  },
+  "second_order": {
+    "A2": "2*s*v(s, z)*Derivative(v(s, z), s) - 4*s*Derivative(v(s, z), (s, 2)) - f(s, z)**2 + v(s, z)**2 + w(s, z)*Derivative(v(s, z), z) - 8*Derivative(v(s, z), s) - Derivative(v(s, z), (z, 2))",
+    "B2": "2*s*v(s, z)*Derivative(w(s, z), s) - 4*s*Derivative(w(s, z), (s, 2)) + w(s, z)*Derivative(w(s, z), z) - 4*Derivative(w(s, z), s) - Derivative(w(s, z), (z, 2))",
+    "C2": "2*s*v(s, z)*Derivative(f(s, z), s) - 4*s*Derivative(f(s, z), (s, 2)) + 2*f(s, z)*v(s, z) + w(s, z)*Derivative(f(s, z), z) - 8*Derivative(f(s, z), s) - Derivative(f(s, z), (z, 2))"
+  },
+  "indicial": {
+    "axial": "(7*n+8-m-j)/2",
+    "angular": "(7*n-m-j)/2",
+    "scope": "critical rates, viscosity order j"
+  },
+  "pressure": "A_j,z=2*B_j,s for each retained viscosity coefficient",
+  "exit_status": 0
+}

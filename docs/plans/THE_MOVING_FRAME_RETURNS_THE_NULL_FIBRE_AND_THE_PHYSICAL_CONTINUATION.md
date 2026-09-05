@@ -26,6 +26,9 @@ sensitivity, and derives the circulation condition that the actual exterior must
 The [second-resonance and moving-source return](../../research/records/2026-09-05_MFR3_THE_SECOND_RESONANCE_CLOSES_AND_THE_MOVING_SWIRL_RETURNS_ITS_VISCOUS_SOURCE.md)
 closes the full retained Euler rows through mode 28 and derives the actual viscous circulation
 source, physical reconstruction and a necessary leading shape current.
+The [forced-axis and inner-chart return](../../research/records/2026-09-05_MFR3_THE_FORCED_AXIS_RETURNS_A_VISCOUS_RESPONSE_AND_THE_INNER_CHART_RETAINS_PRESSURE.md)
+constructs that axis shape and first viscous response, derives the inner source chart and
+retains the pressure trace. A quadratic viscosity source remains.
 Later phase requirements are not asserted as results. The concurrent HNP campaign continues.
 **Grades:** per claim; written derivations, finite symbolic witnesses and kernel-checked returns
 retain their separate scopes.
@@ -374,11 +377,23 @@ return the viscous angular-momentum law, which MFR1 binds to the physical soluti
 length/normalizer reconstruction. The zero-axis diffusion value retains a derivative source.
 Two leading viscous axis equations force a separate shape current beyond amplitude modulation.
 
-[open] MFR3 remains in progress. Construct the time-dependent axis/radial shape and its
-coupled pressure using that source current, with every subsequent compatibility condition and
-free fibre retained. Establish the nonlinear bounds, radial convergence and actual exterior
-transport of that family. The stationary global exclusion remains standing; the complete
-surviving-family and stability returns are unfinished.
+[proved-derived; formal-checked] The actual forced primitive now pays the changing axis
+equation and retains its anchored uniqueness and homogeneous fibre. The selected shape is
+positive on the stated viscosity interval. The exact inner chart `s=mu*xi` keeps radial
+diffusion at unit strength, ties its physical radial scale to the physical clock, and retains
+the axis pressure together with the regularized radial difference.
+
+[established-bounded; computational-witness] After correcting and verifying the complete
+axis source, the first-viscosity pressure/swirl response closes through the retained mode 14.
+Its new axial fibre and positive quadratic-viscosity source remain explicit.
+
+[open] MFR3 next needs a periodic source realization of the local core and the complete
+exterior pressure coupling, including pressure torque where symmetry is broken. Preserve all
+remaining local source terms and free fibres during that construction. MFR4 then owns the
+complete residual and quantitative linear/nonlinear control for the specified realization;
+requiring full radial convergence before starting that phase would move its work into MFR3.
+The stationary global exclusion remains standing. The complete surviving-family, stability
+and arithmetic-sign returns remain unfinished.
 
 ## 10. Return into the wider framework and verification
 
