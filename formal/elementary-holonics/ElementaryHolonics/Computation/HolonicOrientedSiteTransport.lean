@@ -691,6 +691,19 @@ theorem additive_face_does_not_found_an_equalization_target :
   · intro x; ring
   · norm_num
 
+/-- The actual joined passage compares the joining operation's OUTPUT with its transported
+input. Its returned effect is the partner current, not partner-minus-transported. This records
+what the interaction did and introduces no desired setpoint for either incoming branch. -/
+theorem additive_joined_passage_effect (transported partner : K) :
+    (transported + partner) - transported = partner := by
+  ring
+
+/-- A zero partner leaves the actual passage unchanged; the rejected equalization still changes
+a nonzero branch. This separates the two candidate bindings before any model-quality claim. -/
+theorem zero_partner_separates_passage_effect_from_equalization :
+    ((1 : ℚ) + 0) - 1 = 0 ∧ (0 : ℚ) - 1 ≠ 0 := by
+  norm_num
+
 end Rectangular
 end ConstitutiveSectionReturn
 
@@ -723,4 +736,6 @@ open Soma.Holonics.Computation.HolonicOrientedSiteTransport
 #print axioms ConstitutiveSectionReturn.rectangular_deposit
 #print axioms ConstitutiveSectionReturn.additive_junction_input_differences
 #print axioms ConstitutiveSectionReturn.additive_face_does_not_found_an_equalization_target
+#print axioms ConstitutiveSectionReturn.additive_joined_passage_effect
+#print axioms ConstitutiveSectionReturn.zero_partner_separates_passage_effect_from_equalization
 end Audit

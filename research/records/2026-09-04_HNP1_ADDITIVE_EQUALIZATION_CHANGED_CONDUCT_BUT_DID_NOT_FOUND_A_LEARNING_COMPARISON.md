@@ -102,3 +102,17 @@ fibre instead of being erased. The next composition must consider those existing
 as the explicitly stipulated source/candidate case. What is withdrawn is the unsupported automatic
 equalization policy, not unsupervised cultivation, native difference, or the possibility of
 learning from ordinary interaction without an exterior verdict.
+
+[proved-derived; formal-checked] The observed-interaction binding is now concrete:
+`additive_joined_passage_effect` compares the joining operation's actual output with the
+transported input, `(transported + partner) - transported = partner`. It does not choose the
+other input as a desired target. `zero_partner_separates_passage_effect_from_equalization`
+distinguishes this actual before/after effect from the rejected policy: a zero partner causes
+no change, while the rejected partner-minus-transported difference remains nonzero.
+
+[definition] This is the next native integration: retain the actual joined output as HNP0's
+target section, return its caused effect through the existing local reaction word, and test the
+zero-partner discriminator before any phase admission. Normalization contributes its existing
+linearized adjoint, not a desired setpoint. The archived ownership/staging mechanics can be reused,
+but their old partner-as-target binding cannot. A source/candidate fidelity comparison remains
+another declared application, not a universal requirement for learning.

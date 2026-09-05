@@ -24,11 +24,12 @@ but was withdrawn before admission: Add does not supply a desired comparison tar
 and receipt are archived. The valid numerical return, rectangular binding, dyadic factorization
 and codeword I/O improvements remain; HNP1 is not passed.
 
-[definition] The next relation is actual source/candidate or observed-interaction comparison
-with shared causal occurrence and explicit carrier-chart connection. The existing
-`FamilyDistillationChart.returnedDifference` now ties zero difference to the stipulated receiver
-correspondence. That comparison must be admitted before a local adjoint is invoked; raw arrays,
-shape equality or a shared sum do not found it. See the
+[definition] The next native integration uses the actual output of the joining operation as the
+target section: `(transported + partner) - transported = partner`. This proved observed-passage
+effect needs no desired setpoint; a zero partner is its discriminating matched control. Return
+that effect through the existing local reaction word using the retained ownership/staging mechanics,
+not the archived partner-as-target binding. `FamilyDistillationChart.returnedDifference` supplies
+the separate source/candidate correspondence case, not a universal supervision requirement. See the
 [HNP1 record](research/records/2026-09-04_HNP1_ADDITIVE_EQUALIZATION_CHANGED_CONDUCT_BUT_DID_NOT_FOUND_A_LEARNING_COMPARISON.md).
 
 [definition] The plan then orders general material contact, resident locality/reuse, persistent
