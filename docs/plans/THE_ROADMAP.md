@@ -74,10 +74,15 @@ a positive remainder beyond the matched rows. The
 [resonance return](../../research/records/2026-09-05_MFR3_THE_RESONANT_ROW_RETURNS_A_COMPATIBILITY_POLYNOMIAL_AND_TWO_AXIS_REPAIRS.md)
 then exposes the singular row, returns a degree-14 amplitude compatibility polynomial, and closes
 the retained finite rows through mode 15 at its positive root. A separate smooth axis perturbation
-repairs the mode-14 row while preserving lower jets. Continue the amplitude branch with the free
-axial coefficient retained, control subsequent resonances and radial convergence, and construct
-the actual periodic exterior transport. Residual/stability and arithmetic-sign investigations
-follow their actual returns. HNP construction continues independently.
+repairs the mode-14 row while preserving lower jets. The
+[analytic and circulation return](../../research/records/2026-09-05_MFR3_THE_ANALYTIC_INVERSE_RETAINS_ITS_RESONANCE_AND_THE_CIRCULATION_DEMANDS_AN_EXTERIOR.md)
+constructs the scalar analytic inverse and actual axial homogeneous carrier, proves a positive
+mode-28 sensitivity, and derives the circulation threshold for a compact complete past.
+Continue with the full next forcing and nonlinear radial bounds, preserving every free
+coefficient. Construct the actual exterior/time transport required by that circulation;
+a globally sublinear stationary axisymmetric completion is excluded at the current rates.
+Residual/stability and arithmetic-sign investigations follow their actual returns.
+HNP construction continues independently.
 
 [project-postulate] Holonics is the mathematical framework and ontology of which HNA is an
 executable architecture. A research route may return a derivation, a counterexample or a precise

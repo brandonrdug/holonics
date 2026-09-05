@@ -139,12 +139,24 @@ the retained rows through mode 15; pressure determines the prior free swirl coef
 the next axial coefficient remains free. An independent 30th-axis-coefficient repair closes
 the retained rows through mode 14. These are finite Taylor returns.
 
-[established-bounded; process-audit] Focused Lean checks and the 9,875-job umbrella returned.
-The resonance record separates kernel acceptance from the exact finite symbolic source checks.
+[proved-derived; formal-checked] The
+[analytic and circulation return](research/records/2026-09-05_MFR3_THE_ANALYTIC_INVERSE_RETAINS_ITS_RESONANCE_AND_THE_CIRCULATION_DEMANDS_AN_EXTERIOR.md)
+constructs a radius-preserving scalar analytic inverse with its real fluid carrier, the actual
+mode-15 axial homogeneous variation, and a positive next-sensitivity polynomial on the amplitude
+bracket. Actual circulation now retains its incoming finite history and an explicit source
+threshold for a compact complete past.
 
-[open] MFR3 remains in progress. Continue the amplitude branch with its retained axial
-fibre, subsequent resonances, radial remainder/convergence and actual periodic exterior.
-The general smooth inverse, full profile time current, viscosity, stability and arithmetic sign
+[established-bounded; computational-witness] The complete linearized mode-28 swirl row is
+`R(X)z^4`, with `R>0` throughout the selected amplitude bracket. Thus the retained axial
+coefficient can repair the next affine row once its full constant forcing is returned.
+
+[established-bounded; process-audit] Focused Lean checks and the 9,879-job umbrella returned.
+The new sensitivity receipt and all fourteen formal coefficients agree exactly.
+
+[open] MFR3 remains in progress. Return the
+full mode-28 forcing, nonlinear radial bounds and a lawful exterior carrying circulation and
+time current. A globally sublinear stationary axisymmetric completion with this swirl is
+excluded by the stated backward-history argument. Viscosity, stability and the arithmetic sign
 remain open.
 
 ## RH line

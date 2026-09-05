@@ -20,6 +20,9 @@ unpaid swirl coefficient. The
 [resonance return](../../research/records/2026-09-05_MFR3_THE_RESONANT_ROW_RETURNS_A_COMPATIBILITY_POLYNOMIAL_AND_TWO_AXIS_REPAIRS.md)
 continues the finite rows, exposes their compatibility polynomial, and returns two repairs of
 the first resonant row. The amplitude branch retains a free axial coefficient after mode 15.
+The [analytic and circulation return](../../research/records/2026-09-05_MFR3_THE_ANALYTIC_INVERSE_RETAINS_ITS_RESONANCE_AND_THE_CIRCULATION_DEMANDS_AN_EXTERIOR.md)
+then constructs its analytic inverse and homogeneous carrier, certifies a positive next
+sensitivity, and derives the circulation condition that the actual exterior must respect.
 Later phase requirements are not asserted as results. The concurrent HNP campaign continues.
 **Grades:** per claim; written derivations, finite symbolic witnesses and kernel-checked returns
 retain their separate scopes.
@@ -344,11 +347,24 @@ strength. Its unique positive root closes the retained finite pressure/swirl row
 the new axial coefficient. Independently, the 30th-axis-coefficient perturbation closes all
 retained rows through mode 14. The resonance record states exact Taylor budgets and receipts.
 
-[open] MFR3 remains in progress. Continue the amplitude branch with that free axial fibre and
-the subsequent compatibility conditions; control the complete pressure/swirl remainder, radial
-convergence and actual periodic exterior transport, or return the precise obstruction directing
-another family. The general smooth inverse, full profile time current and viscosity remain part
-of that construction. The complete surviving-family return is unfinished.
+[proved-derived; formal-checked] The scalar critical inverse now preserves the admitted
+source-series radius, returns the exact resonant projection and retains its homogeneous fibre.
+Its real restriction composes with the actual fluid axis. Axial transport constructs the mode-15
+homogeneous profile. The explicit mode-28 sensitivity polynomial is positive throughout the
+amplitude bracket. Actual angular momentum has a finite incoming-history bound and a source
+threshold for a compact complete past.
+
+[established-bounded; computational-witness] Linearizing the actual source in the retained
+axial coefficient gives the complete next swirl residual `R(X)z^4`, with all other retained
+linearized rows zero. Its positive slope makes that coefficient effective at the next affine
+row. The full constant forcing of that row has not yet returned.
+
+[open] MFR3 remains in progress. Return that constant forcing and the nonlinear source bounds
+needed for radial convergence, keeping subsequent compatibility conditions and free fibres.
+Construct the actual periodic exterior and profile time current that carry the circulation:
+a globally sublinear stationary axisymmetric completion with the current nonzero swirl is
+excluded by the stated backward-history argument. Viscosity and stability remain part of the
+surviving-family construction. The complete return is unfinished.
 
 ## 10. Return into the wider framework and verification
 

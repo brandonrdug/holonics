@@ -114,11 +114,57 @@ theorem axialW_const_mul (alpha beta a : ℝ) (ha : a ≠ 0) (F : ℝ → ℝ) :
   unfold axialW
   rw [axialGamma_const_mul alpha beta a ha F z]
 
+/-- The same carrier is the axial coefficient at radial mode `m+2`. The actual axial
+transport differs from the swirl transport by `3*beta`, shifting its resonance. -/
+theorem axial_linear_transport (m : ℕ) (alpha beta : ℝ) (F L : ℝ → ℝ)
+    (hF : ContDiff ℝ 2 F) (hpositive : ∀ z, 0 < F z)
+    (hk : alpha + 2 * beta ≠ 0) (z : ℝ)
+    (hL : DifferentiableAt ℝ L (primitiveInv F z)) :
+    axialGamma alpha beta F z * deriv (swirlCarrier m F L) z +
+      (alpha + 2 * ((m : ℝ) + 2) * beta - ((m : ℝ) + 1) * deriv (axialW alpha beta F) z)
+        * swirlCarrier m F L z =
+      (alpha + 2 * beta) * F z ^ (m + 1) *
+        dilationTransport (((m : ℝ) * (alpha - beta) - 3 * beta) / (alpha + 2 * beta))
+          L (primitiveInv F z) := by
+  have h := swirl_linear_transport m alpha beta F L hF hpositive hk z hL
+  calc
+    _ = (axialGamma alpha beta F z * deriv (swirlCarrier m F L) z +
+      (alpha + (2 * (m : ℝ) + 1) * beta - ((m : ℝ) + 1) * deriv (axialW alpha beta F) z)
+        * swirlCarrier m F L z) + 3 * beta * swirlCarrier m F L z := by ring
+    _ = (alpha + 2 * beta) * F z ^ (m + 1) *
+        dilationTransport (swirlExponent m alpha beta) L (primitiveInv F z) +
+        3 * beta * swirlCarrier m F L z := by rw [h]
+    _ = _ := by
+      unfold dilationTransport swirlExponent swirlCarrier
+      field_simp [hk]
+      ring
+
+/-- The retained mode-15 axial freedom is an actual homogeneous profile, not just one
+unconstrained Taylor coefficient. -/
+theorem critical_mode15_axial_homogeneous (F : ℝ → ℝ)
+    (hF : ContDiff ℝ 2 F) (hpositive : ∀ z, 0 < F z) (z : ℝ) :
+    axialGamma (3 / 2) 1 F z * deriv (swirlCarrier 13 F (fun q ↦ q)) z +
+      (63 / 2 - 14 * deriv (axialW (3 / 2) 1 F) z) *
+        swirlCarrier 13 F (fun q ↦ q) z = 0 := by
+  have h := axial_linear_transport 13 (3 / 2) 1 F (fun q ↦ q) hF hpositive
+    (by norm_num) z (by fun_prop)
+  norm_num [dilationTransport] at h
+  convert h using 1 <;> norm_num
+
+theorem critical_mode15_axial_homogeneous_hasDerivAt_zero (F : ℝ → ℝ)
+    (hF : ContDiff ℝ 2 F) (hpositive : ∀ z, 0 < F z) (hzero : F 0 = 1) :
+    HasDerivAt (swirlCarrier 13 F (fun q ↦ q)) 1 0 := by
+  have h := swirlCarrier_hasDerivAt 13 F (fun q ↦ q) hF hpositive 0 (by fun_prop)
+  simpa [primitiveInv, hzero] using h
+
 #print axioms swirl_linear_transport
 #print axioms firstSwirlCoefficient_eq_dilation
 #print axioms swirlExponent_energyCritical
 #print axioms firstSwirlExponent_window
 #print axioms primitiveInv_const_mul
 #print axioms axialW_const_mul
+#print axioms axial_linear_transport
+#print axioms critical_mode15_axial_homogeneous
+#print axioms critical_mode15_axial_homogeneous_hasDerivAt_zero
 
 end Soma.Holonics.Millennium.NavierStokesSwirlDilationTransport
