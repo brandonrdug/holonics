@@ -1,10 +1,24 @@
 # Construction state
 
-**Currency:** 2026-09-04. **Current frontier:** NONE — HNA consolidation complete.
+**Currency:** 2026-09-04. **Next construction:** HNP0 — planned, not started.
 
 This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md) orders work;
 completed history stays in its existing records and Git. Brandon's latest direct instruction
-governs. No new research campaign is scheduled by this completion.
+governs. The preceding HNA consolidation is complete; its implementation standing remains below.
+
+## Current campaign
+
+[definition] The formal [production-HNA plan](docs/plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md)
+is deposited under Brandon's latest instruction. No HNP implementation phase has passed.
+The next artifact is HNP0's concrete constitutive binding of presentation, addressed current/
+difference, reaction and local morphology advance, with the ordinary occurrence/domain contract.
+It uses the existing formal and native owners; a generic callback or restatement of recurrence
+does not satisfy it. No GPU campaign was launched by the planning pass.
+
+[definition] The plan then orders general material contact, resident locality/reuse, persistent
+sessions, multi-cycle output, a useful consumer-model milestone, executable export and supported
+SSM/diffusion-family extensions. This is not a token-volume programme or a conventional trainer
+wrapped around the bounded prefix pathway. The RH line remains unchanged and unscheduled.
 
 ## Framework and organization
 
@@ -30,7 +44,8 @@ suite are archived; Provenance and the actual organization supply navigation.
 [open] The current HNA training result is a run receipt, not a saved cultivated full-operator
 checkpoint. Standard executable model recompilation is distinct from existing Safetensors/ONNX
 package round-trips. Full cultivated checkpoint/remount, target graph/state/numeric lowering and
-additional realized model-family adapters remain the specified production bridges. Qualitative
+additional realized model-family adapters remain the specified production bridges, alongside
+general material/current binding and local developmental execution. Qualitative
 frontier performance is an objective, not a result inferred from the mechanical checks.
 
 Current contracts: [architecture](docs/ARCHITECTURE.md), [Soulkiller](docs/SOULKILLER.md),

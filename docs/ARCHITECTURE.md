@@ -90,6 +90,13 @@ against frontier models.
 
 ## The next production contracts
 
+[definition] The ordered construction is the
+[production-HNA campaign](plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md).
+It starts with concrete constitutive/current and ordinary-occurrence binding, then joins local
+development, reuse, persistence and application output. The present prefix/adjoint pathway is
+one supported chart, not the general learning contract. Neither token volume nor its reduction
+is a complete account of conventional or holonic learning; the distinction is its organization.
+
 [definition] The standard pipeline has explicit products: source/codec configuration; admitted
 native model and insufficiency; an ordered exposure stream; run results and successor model;
 native checkpoint; evaluation result; and a target-specific export. Each carries its actual

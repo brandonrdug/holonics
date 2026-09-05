@@ -104,6 +104,13 @@ own snapshot family and are labeled accordingly.
 
 ## Production expectations
 
+[definition] The [production campaign](plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md)
+specifies the general material/current binding and local development missing from the narrow
+prefix convenience pathway, as well as persistence and multi-cycle output. Its target session
+interfaces are planned, not already implemented versions of the commands above. Dataset delivery
+must preserve actual causal occurrences and may not define learning through arbitrary batching,
+shuffling or an optimizer callback.
+
 [definition] A production training pipeline must stream declared material through the same owner,
 retain its successor, checkpoint/remount it and evaluate later behavior without changing the
 training population from the evaluation target. Inference must retain state across requests,

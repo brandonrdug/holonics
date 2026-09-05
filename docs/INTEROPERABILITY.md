@@ -61,12 +61,13 @@ unsupported operation/state/receiver boundary rather than a mislabeled package.
 ## The pipeline now to be built on this interface
 
 [open] The full native cultivated checkpoint and standard executable lowering are not yet
-returned by the existing export owner. The ordered implementation is native checkpoint/remount,
-a target-operation/state map for one supported family, emitted standard weights/graph and
-configuration, and matched target-runtime execution. It must then expand by actual adapters to
-additional Transformer, diffusion and SSM families. This is the intended route to refining models
-with Eros and using them in existing machinery; no new permission or rediscovery of that intent
-is needed to scope its concrete construction.
+returned by the existing export owner. Their ordered construction now belongs to the
+[production-HNA campaign](plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md),
+which first joins the concrete local-learning and occurrence contracts. Its outward branch carries
+native checkpoint/remount, a target-operation/state map, standard weights/graph/configuration and
+matched target-runtime execution, followed by actual additional family adapters. A frozen target
+exports an inference projection of a cultivated rest, not the whole continuing learner. Live
+stateful execution and export of developmental updates owe their additional successor laws.
 
 [definition] The public namespace `holonics::interop` exposes tensor/configuration/ONNX intake;
 `holonics::interop::packages` exposes the existing package export/import owners. It does not present a stub portable-model compiler

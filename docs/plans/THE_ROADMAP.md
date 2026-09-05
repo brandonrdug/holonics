@@ -20,9 +20,25 @@ contracts and records preserve their completed scope; their old imperatives sche
    reread every completed campaign, rerun unchanged expensive receipts, or reconstruct historical
    capability just to start the next authorized repair.
 
-## Current position and completed correction
+## Current campaign: production HNA
 
-**Current frontier:** NONE — HNA-CONSOLIDATION complete.
+**Next construction:** HNP0 — constitutive binding and occurrence contract. Not started.
+
+[definition] Brandon's subsequent September 4 request authorizes the formal, holistic design of
+[the production-HNA campaign](THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md).
+The plan is deposited; no implementation phase is passed or training run started by that deposit.
+The ordered work is concrete local-current/presentation/development binding; general material
+contact; resident locality and reusable factors; persistent models and sessions; multi-cycle
+production; useful consumer-model evaluation; executable export; and additional model families.
+
+[definition] Construction begins with HNP0's actual constitutive relations and source binding,
+not another definition of `OperationStep`, a larger prefix-training driver, a checkpoint-only
+substitute, or revalidation of the completed HNA/SKE campaigns. Each phase's required artifact,
+formal/runtime scope, falsifiers and completion conditions are in that plan. The existing native
+operator and Soulkiller returns retain their bounded grades. The comparison with conventional ML
+is about learning organization, not token volume as an alleged sole or primary industry lever.
+
+## Completed consolidation and correction
 
 [historical] Brandon's latest 2026-09-04 request authorized
 [the HNA framework consolidation](THE_HNA_FRAMEWORK_HAS_ONE_PUBLIC_LIFECYCLE_AND_ONE_NAVIGABLE_REPOSITORY.md).
@@ -32,8 +48,8 @@ and relevant Cargo/native/formal checks. Brandon's later steering retires the lo
 atlas, generated index and blanket gate suite; no metadata/paper checks are required merely
 because the old scripts ran them. The public API/CLI, reorganization and relevant checks returned;
 the [completion record](../../research/records/2026-09-04_HNA_HAS_A_PUBLIC_FRAMEWORK_INTERFACE_AND_THE_REPOSITORY_IS_ORGANIZED_AROUND_THE_MACHINE_LEARNING_LIFECYCLE.md)
-states their scope. Full cultivated persistence and executable target compilation remain explicit
-production bridges, not silently completed or newly scheduled by this document.
+states their scope. Its open production bridges are now composed into the campaign above;
+they remain unimplemented until their actual phases return.
 
 [definition] Brandon's direct instruction of 2026-09-04 authorizes completing the defects and
 workflow inconsistencies identified in the repository audit. This is repair of the existing
