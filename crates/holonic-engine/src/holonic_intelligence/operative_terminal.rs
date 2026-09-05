@@ -223,6 +223,12 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     pub(super) fn advance_terminal_retained(
         &mut self, occurrence: NativeFullOperationOccurrence,
     ) -> Result<(Vec<NativeFullOperationEmission>, Vec<NativeFullOperationTrace>), NativeFullOperationError> {
+        self.advance_terminal_readout_retained(occurrence,super::NativeEmissionReadout::Complete)
+    }
+
+    pub(super) fn advance_terminal_readout_retained(&mut self,occurrence:NativeFullOperationOccurrence,
+        readout:super::NativeEmissionReadout)
+        -> Result<(Vec<NativeFullOperationEmission>,Vec<NativeFullOperationTrace>),NativeFullOperationError> {
         if self.interruption.is_some() { return Err(NativeFullOperationError::Interrupted); }
         let start = self.ecology.operations.len().saturating_sub(5);
         if self.operation_at != start
@@ -245,18 +251,23 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         };
         let mut emissions = Vec::with_capacity(5);
         let mut traces = Vec::with_capacity(5);
-        let emitted_intervals = {
+        let (emitted_rows, mut emitted_intervals, projection) = {
             let emitted = run
                 .carriers
                 .last()
                 .and_then(Option::as_ref)
                 .ok_or(NativeFullOperationError::Operation)?;
-            let tiles = emitted
-                .sections
-                .iter()
-                .map(|section| self.residence.surface().read_out(section))
-                .collect::<Result<Vec<_>, _>>()?;
-            stitch_intervals(emitted.rows, &tiles)?
+            match readout {
+                super::NativeEmissionReadout::Complete=>{
+                    let tiles=emitted.sections.iter().map(|section|self.residence.surface().read_out(section))
+                        .collect::<Result<Vec<_>,_>>()?;
+                    (emitted.rows,stitch_intervals(emitted.rows,&tiles)?,None)
+                }
+                super::NativeEmissionReadout::LastRow=>{
+                    let intervals=self.read_terminal_row(emitted)?;
+                    (1,intervals,Some(super::NativeEmissionProjection::LastRow {source_rows:emitted.rows,row:emitted.rows-1}))
+                }
+            }
         };
         for (at, operation) in operations.iter().enumerate() {
             let predecessor_generation = self.generation;
@@ -276,10 +287,11 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                 generation: successor_generation,
                 operation: operation.ordinal,
                 carrier: operation.output,
-                rows,
+                rows:if at==4 {emitted_rows}else{rows},
                 width,
                 grain,
-                intervals: if at == 4 { emitted_intervals.clone() } else { Vec::new() },
+                intervals: if at == 4 { std::mem::take(&mut emitted_intervals) } else { Vec::new() },
+                projection: if at==4 {projection}else{None},
             });
             traces.push(NativeFullOperationTrace {
                 schema: NATIVE_FULL_OPERATION_STEP_SCHEMA.to_owned(),
@@ -337,6 +349,16 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             self.terminal_contracted = Some(self.tiled_last_row(&contracted)?);
         }
         Ok((emissions, traces))
+    }
+
+    /// Read only the declared terminal-row fibre from each resident tile. This is an exact
+    /// receiver restriction, not another native operation or a replacement of the successor.
+    fn read_terminal_row(&self,source:&TiledCarrier<'chart>)->Result<Vec<(i64,i64)>,NativeFullOperationError> {
+        if source.rows==0 || source.sections.is_empty() || source.sections.len()!=source.bounds.len()
+            || source.sections.iter().any(|section|section.rows()!=source.rows) {return Err(NativeFullOperationError::Operation);}
+        let surface=self.residence.surface();
+        let tiles=source.sections.iter().map(|section|surface.read_out_terminal_row(section)).collect::<Result<Vec<_>,_>>()?;
+        stitch_intervals(1,&tiles)
     }
 }
 

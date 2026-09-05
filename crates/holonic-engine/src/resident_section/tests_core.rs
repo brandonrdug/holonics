@@ -50,6 +50,23 @@ fn an_exact_section_rest_round_trips_and_remounts_without_replaying_its_law() {
     );
 }
 
+#[test]
+#[ignore = "requires CUDA; exact interval subrange readback"]
+fn terminal_row_readback_preserves_full_source_without_device_allocation() {
+    let readout=ResidentReadout::new().expect("CUDA");
+    let surface=ResidentSurface::on(&readout).unwrap();
+    let rest=ResidentSectionRest::found(3,2,ResidentGrain(20),7,
+        vec![(-3,-1),(0,0),(2,5),(9,9),(-11,-7),(13,17)]).unwrap();
+    let source=surface.mount_section_rest(&rest).unwrap();
+    let before=surface.census();
+    assert_eq!(surface.read_out_terminal_row(&source).unwrap(),vec![(-11,-7),(13,17)]);
+    let after=surface.census();
+    assert_eq!(after.egress_section_octets-before.egress_section_octets,32);
+    assert_eq!(after.allocations,before.allocations);
+    assert_eq!(after.deed_launches,before.deed_launches);
+    assert_eq!(surface.read_out(&source).unwrap(),rest.intervals);
+}
+
 /// A one-occurrence passage entering `words` at `grain`, launched, and read out.
 fn enter_once(
     surface: &'static ResidentSurface<'static>,

@@ -22,6 +22,9 @@ developmental sequence, selected-face receipts and persistence boundaries.
 - `HnaTextApplication` composes ordinary self-occurrences, declared codec completion and paired
   text/model rest. Its actual comparison exposes unstable additive cultivation at shift 16;
   coherent fixed-morphology output is not a replacement production learner. See the guide.
+- Text steps request `NativeEmissionReadout::LastRow` through the public readout methods. Only
+  that terminal row crosses to the host; the complete resident successor and checkpoint remain
+  unchanged. Existing `advance_native` and `observe_native` still return every terminal row.
 
 The lower-level native session remains available from `holonic-engine` for interactive consumers.
 Earlier alpha/circulation adapters retain their exact artifact and wire scopes; they are not

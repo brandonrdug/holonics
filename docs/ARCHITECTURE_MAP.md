@@ -98,6 +98,12 @@ returned coherent fixed-morphology prose and exposed unstable additive cultivati
 feedback specialization in `HolonicOrientedSiteTransport` supplies its bounded stability
 counterexample; useful continuing learning and output cost remain open.
 
+[established-bounded; measured] `full_operation::NativeEmissionReadout`,
+`operative_terminal::read_terminal_row` and `ResidentSurface::read_out_terminal_row` now compose
+an exact terminal receiver restriction with the unchanged complete resident successor. The HNA
+text adapter requests this row explicitly. The [actual-model readout control](../research/records/2026-09-05_HNP4_THE_TERMINAL_RECEIVER_READS_ONE_ROW_AND_PRESERVES_THE_COMPLETE_SUCCESSOR.md)
+returned complete checkpoint equality and lower host transfer without another device kernel.
+
 | Relation | Lean owner | Rust owner | CUDA owner | Status and exact open fibre |
 |---|---|---|---|---|
 | Exact finite diffusion and state-space chart | `Computation/HolonicDiffusionCharts.lean` | `diffusion.rs`; `sheaf_diffusion.rs`; `causal_body.rs` | `cuda_refine/membrane_boundary_*`; `membrane_factored_transport.rs` | **partial:** Lean Markov/deterministic separation is broader than one resident runtime owner |

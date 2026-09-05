@@ -244,9 +244,9 @@ impl HnaTextApplication {
             history: state.emitted_addresses.clone(),
         };
         let native = if state.observation_only {
-            session.observe_native(&occurrence)
+            session.observe_native_readout(&occurrence,crate::NativeEmissionReadout::LastRow)
         } else {
-            session.advance_native(&occurrence)
+            session.advance_native_readout(&occurrence,crate::NativeEmissionReadout::LastRow)
         };
         let cycle = match native {
             Ok(cycle) => cycle,

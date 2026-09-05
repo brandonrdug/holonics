@@ -55,7 +55,17 @@ pub struct NativeFullOperationEmission {
     pub width: usize,
     pub grain: u32,
     pub intervals: Vec<(i64, i64)>,
+    /// Exact receiver projection; the complete source section stays with the native successor.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub projection: Option<NativeEmissionProjection>,
 }
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(tag="kind",rename_all="kebab-case")]
+pub enum NativeEmissionProjection { LastRow {source_rows:usize,row:usize} }
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum NativeEmissionReadout { Complete, LastRow }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct NativeFullOperationTrace {
@@ -723,6 +733,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             width: carrier.section.width(),
             grain: carrier.section.grain().0,
             intervals: Vec::new(),
+            projection: None,
         };
         let trace = self.trace_of(&step, &occurrence, morphology_transition, successor_generation);
         Ok(NativeFullOperationStep {
@@ -749,6 +760,12 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     /// input refuses before mutation. A later failure preserves the actual installed carriers and
     /// staged differences, with an explicit interruption that prevents a silent retry/replay.
     pub fn advance_cycle_retained(&mut self, row_addresses: &[u32]) -> Result<NativeFullCycleOutput, NativeFullOperationError> {
+        self.advance_cycle_readout_retained(row_addresses,NativeEmissionReadout::Complete)
+    }
+
+    /// The readout changes only the exterior receiver, never the complete resident successor.
+    pub fn advance_cycle_readout_retained(&mut self,row_addresses:&[u32],readout:NativeEmissionReadout)
+        -> Result<NativeFullCycleOutput,NativeFullOperationError> {
         if self.interruption.is_some() { return Err(NativeFullOperationError::Interrupted); }
         if row_addresses.is_empty() || (self.operation_at != 0 && !self.cycle_complete) {
             return Err(NativeFullOperationError::Occurrence);
@@ -756,7 +773,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         self.generation.checked_add(self.ecology.operations.len() as u64).ok_or(NativeFullOperationError::Generation)?;
         self.progress = Some(NativeCycleProgress { occurrence: self.generation, row_addresses: row_addresses.to_vec(),
             installed_through: None, returned_through: None, at_terminal: false });
-        let result = self.advance_cycle_inner(row_addresses);
+        let result = self.advance_cycle_inner(row_addresses,readout);
         match &result {
             Ok(_) => self.progress = None,
             Err(error) => self.interruption = self.progress.clone().map(|progress|
@@ -765,7 +782,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         result
     }
 
-    fn advance_cycle_inner(&mut self, row_addresses: &[u32]) -> Result<NativeFullCycleOutput, NativeFullOperationError> {
+    fn advance_cycle_inner(&mut self, row_addresses: &[u32],readout:NativeEmissionReadout) -> Result<NativeFullCycleOutput, NativeFullOperationError> {
         let mut morphology_transition = NativeMorphologyTransition::Unchanged;
         if self.cycle_complete {
             morphology_transition = self.enter_cycle(row_addresses)?;
@@ -791,10 +808,10 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         }
         let ordinal = self.generation;
         if let Some(progress) = &mut self.progress { progress.at_terminal = true; }
-        let (mut emissions, mut terminal_traces) = self.advance_terminal_retained(NativeFullOperationOccurrence {
+        let (mut emissions, mut terminal_traces) = self.advance_terminal_readout_retained(NativeFullOperationOccurrence {
             ordinal,
             row_addresses: Vec::new(),
-        })?;
+        },readout)?;
         traces.append(&mut terminal_traces);
         let final_emission = emissions.pop()
             .ok_or(NativeFullOperationError::Operation)?;

@@ -20,6 +20,8 @@ mod stream;
 mod text_session;
 mod world_application;
 
+pub use holonic_engine::native_ecology::holonic_intelligence::{NativeEmissionReadout,NativeEmissionProjection};
+
 pub use apertures::addressed_ingress;
 pub use application::{AthenaAlphaAdmission, AthenaAlphaApplication, AthenaAlphaError};
 pub use checkpoint::{

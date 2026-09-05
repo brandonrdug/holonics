@@ -291,6 +291,17 @@ failure's mechanism. The [diagnosis and raw outputs](../research/records/2026-09
 keep exact HNP0/HNP1 results separate from the failed productive inference. Stable local
 cultivation and output cost must be addressed before the useful-model grade is claimed.
 
+[established-bounded; measured] Text steps now use `advance_native_readout` (or the explicitly
+frozen comparison's `observe_native_readout`) with `NativeEmissionReadout::LastRow`. This returns
+one row plus `NativeEmissionProjection::LastRow { source_rows, row }`; all earlier rows remain
+resident in the complete native successor. The old methods still use the complete receiver.
+On the 14-row cultivated control, output transfer fell from 58,720,256 to 4,194,304 bytes, with
+the entire persisted successor equal to the full-readout reference. Warm identical-occurrence
+comparison timings were 285/274 ms complete and 233 ms projected. These are scoped receiver
+measurements, not end-to-end generation throughput or a solution to unstable development. The
+[readout record](../research/records/2026-09-05_HNP4_THE_TERMINAL_RECEIVER_READS_ONE_ROW_AND_PRESERVES_THE_COMPLETE_SUCCESSOR.md)
+contains the control, resource boundary and reproduction command.
+
 ## Remaining production requirements
 
 [definition] The [production campaign](plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md)

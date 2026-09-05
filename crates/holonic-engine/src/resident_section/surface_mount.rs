@@ -434,6 +434,26 @@ impl<'chart> ResidentSurface<'chart> {
         Ok(lo.into_iter().zip(hi).collect())
     }
 
+    /// Exact terminal-row receiver. The earlier rows stay resident as reconstruction fibre;
+    /// no projection buffer or native mutation is needed to read this contiguous interval span.
+    pub fn read_out_terminal_row(&self,section:&ResidentSection<'chart>)
+        -> Result<Vec<(i64,i64)>,ResidentRefusal> {
+        if section.rows==0 || section.width==0 {
+            return Err(ResidentRefusal::Declaration {operation:"read-terminal-row",what:"empty source section".into()});
+        }
+        let offset=(section.rows-1).checked_mul(section.width).ok_or_else(||ResidentRefusal::Declaration {
+            operation:"read-terminal-row",what:"source row extent overflow".into()})?;
+        self.context.make_current()?;
+        let mut lower=vec![0i64;section.width];
+        let mut upper=vec![0i64;section.width];
+        section.lo.copy_range_to_slice(offset,&mut lower)?;
+        section.hi.copy_range_to_slice(offset,&mut upper)?;
+        let mut census=self.census.borrow_mut();
+        census.egress_section_octets+=(section.width*16) as u64;
+        census.section_read_outs+=1;
+        Ok(lower.into_iter().zip(upper).collect())
+    }
+
     /// The octaves the entering words occupy after the exact dyadic scale and the placement at the
     /// grain — the mouth's a-priori bound, read from the material. Public so a caller can take the
     /// same reading the law takes.

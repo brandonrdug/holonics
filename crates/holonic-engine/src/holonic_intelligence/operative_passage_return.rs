@@ -275,6 +275,11 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     /// and restores the local-return chart. It is never the default productive operation.
     pub fn observe_passage_cycle_retained(&mut self,rows:&[u32])
         -> Result<super::NativeFullCycleOutput,NativeFullOperationError> {
+        self.observe_passage_readout_retained(rows,super::NativeEmissionReadout::Complete)
+    }
+
+    pub fn observe_passage_readout_retained(&mut self,rows:&[u32],readout:super::NativeEmissionReadout)
+        -> Result<super::NativeFullCycleOutput,NativeFullOperationError> {
         if !self.cycle_complete && self.operation_at != 0 {
             return Err(NativeFullOperationError::Contact(
                 "an observation requires an operation boundary",
@@ -292,7 +297,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             ));
         }
         let chart=self.passage_cultivation.take().expect("checked chart");
-        let result=self.advance_cycle_retained(rows);
+        let result=self.advance_cycle_readout_retained(rows,readout);
         self.passage_cultivation=Some(chart);
         result
     }

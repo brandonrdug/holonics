@@ -333,6 +333,7 @@ pub struct HnaSessionAnatomy {
 }
 
 impl HnaSession<'_, '_> {
+    pub fn transfer_census(&self)->holonic_engine::resident_section::TransferCensus {self.native.census()}
     pub fn terminal_width(&self) -> Option<usize> {
         use holonic_engine::native_ecology::holonic_intelligence::NativeCarrierAxis;
         let output = self.material.ecology.operations.last()?.output;
@@ -401,21 +402,28 @@ impl HnaSession<'_, '_> {
         &mut self,
         occurrence: &HnaOccurrence,
     ) -> Result<HnaNativeCycle, HnaSessionError> {
-        self.advance_native_receiver(occurrence, false)
+        self.advance_native_readout(occurrence,crate::NativeEmissionReadout::Complete)
     }
+
+    pub fn advance_native_readout(&mut self,occurrence:&HnaOccurrence,readout:crate::NativeEmissionReadout)
+        -> Result<HnaNativeCycle,HnaSessionError> {self.advance_native_receiver(occurrence,false,readout)}
 
     /// Explicit fixed-morphology comparison of the same native owner, not production inference.
     pub fn observe_native(
         &mut self,
         occurrence: &HnaOccurrence,
     ) -> Result<HnaNativeCycle, HnaSessionError> {
-        self.advance_native_receiver(occurrence, true)
+        self.observe_native_readout(occurrence,crate::NativeEmissionReadout::Complete)
     }
+
+    pub fn observe_native_readout(&mut self,occurrence:&HnaOccurrence,readout:crate::NativeEmissionReadout)
+        -> Result<HnaNativeCycle,HnaSessionError> {self.advance_native_receiver(occurrence,true,readout)}
 
     fn advance_native_receiver(
         &mut self,
         occurrence: &HnaOccurrence,
         observe: bool,
+        readout:crate::NativeEmissionReadout,
     ) -> Result<HnaNativeCycle, HnaSessionError> {
         if self.native.joined_passage_population() == 0 {
             return Err(HnaSessionError::Admission(
@@ -446,9 +454,9 @@ impl HnaSession<'_, '_> {
             })
             .map(|class| class.ordinal);
         let output = if observe {
-            self.native.observe_passage_cycle_retained(&entering)?
+            self.native.observe_passage_readout_retained(&entering,readout)?
         } else {
-            self.native.advance_cycle_retained(&entering)?
+            self.native.advance_cycle_readout_retained(&entering,readout)?
         };
         Ok(HnaNativeCycle {
             admission: HnaNativeAdmission {

@@ -75,6 +75,12 @@ saved. HNP4 next requires justified stable local development and output-cost rep
 its remaining complete-product/correction/second-application returns. Freezing the learner or
 raising the numeric limit is not completion. HNP0/HNP1's exact scoped results remain standing.
 
+[established-bounded; measured] The [terminal-readout return](research/records/2026-09-05_HNP4_THE_TERMINAL_RECEIVER_READS_ONE_ROW_AND_PRESERVES_THE_COMPLETE_SUCCESSOR.md)
+now keeps the complete native successor while reading only the text receiver's terminal row.
+The actual cultivated control preserved the entire checkpoint and reduced 14-row output transfer
+from 56 MiB to 4 MiB, without an added device allocation or launch. This repairs one output cost;
+HNP4's productive-development and useful-application obligations remain open.
+
 [definition] The plan then orders general material contact, resident locality/reuse, persistent
 sessions, multi-cycle output, a useful consumer-model milestone, executable export and supported
 SSM/diffusion-family extensions. This is not a token-volume programme or a conventional trainer
