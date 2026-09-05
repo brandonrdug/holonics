@@ -3,11 +3,13 @@
 **Founded:** Brandon's 2026-09-04 request to combine Tao's singularity strategy, chart-relative
 nullity, the RH line and the mathematical purpose of Holonics into a research strategy.
 **Position:** MFR0 strategy deposited; Brandon subsequently activated this plan as the standing
-mathematical goal. MFR1's scalar moving-frame/endpoint return is complete; MFR2 is in progress.
+mathematical goal. MFR1's scalar moving-frame/endpoint and MFR2's folded-source returns are
+complete; MFR3's source-specific fluid concentration conditions are next.
 **Authority:** [the roadmap](THE_ROADMAP.md) alone orders construction;
 [the position](../../CONSTRUCTION_STATE.md) records completed work. The
 [MFR1 record](../../research/records/2026-09-04_MFR1_THE_MOVING_FLUID_CHART_RETURNS_ITS_PDE_AND_ITS_PHYSICAL_ENDPOINT.md)
-states the returned scope; later phase requirements are not asserted as results. The concurrent
+and [MFR2 record](../../research/records/2026-09-04_MFR2_THE_FOLDED_SOURCE_RETURNS_EVERY_HEAT_TIME_WITH_A_GAUSSIAN_REMAINDER_AND_ZERO_COUNT_RECEIVERS.md)
+state the returned scopes; later phase requirements are not asserted as results. The concurrent
 HNP campaign continues.
 **Grades:** per claim; new analytic calculations below are written derivations, not new Lean receipts.
 
@@ -242,8 +244,8 @@ Mathlib's RH with `Λstd=0`, where `Λstd=4Λ_DN`. `RH/DescentZeros.lean` proves
 the Dobner route. `RH/FosterClassHeatFlow.lean` discharges the entire-flow principal-value
 zero-dynamics port. A structure declaration in `PhaseFlowLedger` does not revoke that theorem.
 
-[proved-derived] The prior turn's folded source derivation supplies an independent next
-construction. After applying the full theta reflection, standard
+[proved-derived; formal-checked] MFR2 has returned the folded source construction, its
+Gaussian remainder, integral derivatives and zero-count receivers. After applying the full theta reflection, standard
 
 ```text
 H_t(z) = Σ_(n≥1) ∫₀^∞ exp(tu²) φ_n(u) cos(zu) du,
@@ -295,7 +297,8 @@ neither is a prerequisite to the other's first lemma.
 | **MFR5 — arithmetic sign** | Use MFR2 to derive a source-specific positive form or a separating negative direction; compose a returned positivity theorem with the complete Weil or Foster passage | An unsigned cross term, unresolved range condition, or absent global limit is the next analytic task |
 
 [definition] MFR1 returned the varying scalar length/amplitude chart with a moving centre.
-MFR2 is now the active RH source construction. The later ansatz and sign phases are adaptive
+MFR2 returned its folded source, uniform remainder, derivatives and retained zero-count passage.
+MFR3 is the next construction. The later ansatz and sign phases are adaptive
 research: their models and estimates are determined by the preceding source returns. They do
 not authorize an unbounded simulation, a new general search subsystem, or a claimed solution
 assembled from assumed stability/positivity fields.

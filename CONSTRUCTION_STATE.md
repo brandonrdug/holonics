@@ -101,8 +101,12 @@ and source/derivation review are complete. MFR1 returned the varying scalar flui
 centre, actual momentum/pressure/domain transport, finite clocks and sufficient physical endpoint
 criteria. The [MFR1 record](research/records/2026-09-04_MFR1_THE_MOVING_FLUID_CHART_RETURNS_ITS_PDE_AND_ITS_PHYSICAL_ENDPOINT.md)
 states the exact hypotheses; the focused endpoint and live umbrella builds passed (9,847 jobs
-for the umbrella). MFR2's folded RH source and remainder are now in progress. No singularity
-profile, stability estimate or arithmetic-sign conclusion is claimed by MFR1.
+for the umbrella). MFR2 then returned the all-time folded RH source, explicit Gaussian remainder,
+integral derivatives and eventual rectangle-count agreement; its
+[record](research/records/2026-09-04_MFR2_THE_FOLDED_SOURCE_RETURNS_EVERY_HEAT_TIME_WITH_A_GAUSSIAN_REMAINDER_AND_ZERO_COUNT_RECEIVERS.md)
+includes the focused and 9,853-job umbrella checks. MFR3's source-specific concentration
+conditions are next. No singularity profile, stability estimate or arithmetic-sign conclusion
+is inferred from MFR1 or MFR2.
 
 ## RH line
 

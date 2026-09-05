@@ -51,10 +51,12 @@ RH source. Brandon has subsequently activated this plan as the standing mathemat
 MFR0's design and source/derivation review are complete. MFR1 returned its varying scalar chart,
 moving centre, actual fluid/domain transport and physical-clock/endpoint theorems; the
 [MFR1 record](../../research/records/2026-09-04_MFR1_THE_MOVING_FLUID_CHART_RETURNS_ITS_PDE_AND_ITS_PHYSICAL_ENDPOINT.md)
-contains the focused and umbrella checks. MFR2's all-time folded RH source and remainder are
-now in progress. These precede the
-source-specific ansatz/stability and arithmetic-sign investigations described in that strategy.
-HNP construction continues independently. MFR3--MFR5 remain the later research phases.
+contains the focused and umbrella checks. MFR2 returned the all-time folded RH source, Gaussian
+remainder, derivatives and zero-count receivers; the
+[MFR2 record](../../research/records/2026-09-04_MFR2_THE_FOLDED_SOURCE_RETURNS_EVERY_HEAT_TIME_WITH_A_GAUSSIAN_REMAINDER_AND_ZERO_COUNT_RECEIVERS.md)
+contains its focused and umbrella checks. MFR3 is next: source-specific fluid concentration
+conditions and exclusions, followed by the actual ansatz/stability and arithmetic-sign
+investigations. HNP construction continues independently.
 
 [project-postulate] Holonics is the mathematical framework and ontology of which HNA is an
 executable architecture. A research route may return a derivation, a counterexample or a precise
@@ -136,9 +138,9 @@ in [the corrected Eros instantiation](../../archive/plans/THE_EROS_INSTANTIATION
 
 ## RH line: FT, RT and DB complete
 
-**RH line position:** DB complete; MFR research strategy above deposited. The remaining research
-inequality is `Λ_DN ≤ 0`, equivalent to RH. MFR2 proposes the folded source/remainder construction
-needed to investigate that sign; it does not report the inequality as proved.
+**RH line position:** DB and MFR2 complete at their recorded scopes. The remaining research
+inequality is `Λ_DN ≤ 0`, equivalent to RH. MFR2 supplies the folded source, remainder,
+derivatives and zero-count passage; MFR5 retains the arithmetic-sign investigation.
 
 [proved-derived; formal-checked] The formal endpoints are:
 `0 ≤ Λ_DN ≤ 1/8`, `seamTimes = Ici Λ_DN`, and
