@@ -90,10 +90,13 @@ reconstruction; two leading axis receivers require a shape current beyond amplit
 The [forced-axis and inner-chart return](../../research/records/2026-09-05_MFR3_THE_FORCED_AXIS_RETURNS_A_VISCOUS_RESPONSE_AND_THE_INNER_CHART_RETAINS_PRESSURE.md)
 now constructs a positive changing axis, its forced velocity primitive, and the retained first
 viscous response with local pressure through mode 14. The inner chart carries physical circulation
-and keeps the axis pressure separately. Its quadratic source remains explicit. MFR3 next requires
-a periodic source realization of the local core and its complete exterior pressure coupling,
-including pressure torque where symmetry is broken. MFR4 then supplies complete residual and
-quantitative linear/nonlinear control for that specified realization. Full convergence is not
+and keeps the axis pressure separately. Its quadratic source remains explicit. The
+[periodic-source return](../../research/records/2026-09-05_MFR3_THE_LOCAL_CORE_HAS_A_PERIODIC_REALIZATION_AND_ITS_PRESSURE_RETAINS_EXTERIOR_TORQUE.md)
+now constructs a smooth periodic divergence-free realization of the finite core and its actual
+local lifespan. Arbitrary pressure torque is retained; an exact periodic variation shows that
+vanishing finite velocity jets do not fix the pressure Hessian or torque. Next evaluate the
+complete exterior pressure and momentum residual of that specified family, including its cutoff
+and moving frame. MFR4 supplies quantitative linear/nonlinear control. Full convergence is not
 a prerequisite imposed on MFR3 before that residual/stability work begins. A globally sublinear
 stationary axisymmetric completion remains excluded at the current rates.
 Residual/stability and arithmetic-sign investigations follow their actual returns.

@@ -28,7 +28,11 @@ closes the full retained Euler rows through mode 28 and derives the actual visco
 source, physical reconstruction and a necessary leading shape current.
 The [forced-axis and inner-chart return](../../research/records/2026-09-05_MFR3_THE_FORCED_AXIS_RETURNS_A_VISCOUS_RESPONSE_AND_THE_INNER_CHART_RETAINS_PRESSURE.md)
 constructs that axis shape and first viscous response, derives the inner source chart and
-retains the pressure trace. A quadratic viscosity source remains.
+retains the pressure trace. A quadratic viscosity source remains. The
+[periodic-source return](../../research/records/2026-09-05_MFR3_THE_LOCAL_CORE_HAS_A_PERIODIC_REALIZATION_AND_ITS_PRESSURE_RETAINS_EXTERIOR_TORQUE.md)
+constructs a smooth periodic realization of the finite core with an actual local lifespan, and
+retains arbitrary pressure torque in the circulation law. An exact periodic pressure witness
+separates fields with the same finite local velocity jets.
 Later phase requirements are not asserted as results. The concurrent HNP campaign continues.
 **Grades:** per claim; written derivations, finite symbolic witnesses and kernel-checked returns
 retain their separate scopes.
@@ -387,13 +391,22 @@ the axis pressure together with the regularized radial difference.
 axis source, the first-viscosity pressure/swirl response closes through the retained mode 14.
 Its new axial fibre and positive quadratic-viscosity source remain explicit.
 
-[open] MFR3 next needs a periodic source realization of the local core and the complete
-exterior pressure coupling, including pressure torque where symmetry is broken. Preserve all
-remaining local source terms and free fibres during that construction. MFR4 then owns the
-complete residual and quantitative linear/nonlinear control for the specified realization;
-requiring full radial convergence before starting that phase would move its work into MFR3.
-The stationary global exclusion remains standing. The complete surviving-family, stability
-and arithmetic-sign returns remain unfinished.
+[proved-derived; formal-checked] The finite polynomial core now has an actual smooth periodic
+completion, preserving its velocity germ on the inner ball, and a positive local Navier--Stokes
+lifespan with global pressure. The arbitrary Cartesian pressure torque remains in its angular
+source law and physical reconstruction.
+
+[established-bounded; computational-witness] The exact finite potential retains the surviving
+axial and angular coefficients. A separate periodic variation vanishes to order 65 in velocity
+but changes the pressure Hessian and quartic angular torque. This witnesses a distinction lost
+by the finite local velocity receiver; it is not the full core's pressure computation.
+
+[open] MFR3 next evaluates the complete exterior pressure and oriented momentum residual of
+this specified finite-core family, including the cutoff region, moving frame and unretained
+products. MFR4 owns quantitative residual and linear/nonlinear control. Further local corrections
+must respond to this global source calculation; requiring full radial convergence beforehand
+would move MFR4's work into MFR3. The stationary global exclusion and the complete surviving-family,
+stability and arithmetic-sign obligations remain standing.
 
 ## 10. Return into the wider framework and verification
 

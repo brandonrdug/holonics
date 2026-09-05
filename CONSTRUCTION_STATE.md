@@ -58,6 +58,13 @@ lawful wider native admission, complete multi-cycle products and ordinary later 
 that owner. Useful evaluation and executable export remain HNP5--HNP7. The CLI prefix convenience
 path is unchanged; a checkpoint or stream transcript is not a qualitative model-performance claim.
 
+[established-bounded; measured] HNP4's [input-material return](research/records/2026-09-05_HNP4_INPUT_MATERIAL_EXTENDS_THE_NATIVE_DOMAIN_WITHOUT_PROMOTING_THE_INHERITED_FAMILY.md)
+adds nine missing lookup rows without changing the original family. The entire old successor
+matched; two new text occurrences developed natively, and a fresh process retained all further
+development (generation 8,925 / factor extent 12,700). Their single-token readings were not useful
+responses. Complete multi-cycle application products, completion and the second interaction remain
+HNP4 work; this return does not advance the phase.
+
 [definition] The plan then orders general material contact, resident locality/reuse, persistent
 sessions, multi-cycle output, a useful consumer-model milestone, executable export and supported
 SSM/diffusion-family extensions. This is not a token-volume programme or a conventional trainer
@@ -171,11 +178,22 @@ Its actual local pressure is reconstructed. A positive quadratic-viscosity sourc
 [established-bounded; process-audit] Focused checks and the 9,888-job Lean umbrella returned.
 The accepted response includes the repaired axis-source audit and exact selector comparisons.
 
-[open] MFR3 remains in progress. The next
-construction is a periodic source realization of this local core with its full exterior
-pressure coupling. MFR4 owns complete residual and quantitative nonlinear/stability control
-for that specified realization. Further local corrections must respond to those source returns.
-The stationary global exclusion and open RH arithmetic-sign obligation remain standing.
+[proved-derived; formal-checked] The [periodic-source return](research/records/2026-09-05_MFR3_THE_LOCAL_CORE_HAS_A_PERIODIC_REALIZATION_AND_ITS_PRESSURE_RETAINS_EXTERIOR_TORQUE.md)
+constructs a smooth periodic divergence-free velocity preserving the finite core's local germ,
+and supplies an actual positive local lifespan with global pressure. The Cartesian circulation
+law now retains arbitrary pressure torque and its physical reconstruction.
+
+[established-bounded; computational-witness] The exact finite potential retains both free
+coefficients. An independent periodic field has zero velocity jets through order 64 but a
+nonzero pressure Hessian and quartic angular torque; finite local jets cannot fix this source.
+
+[established-bounded; process-audit] The periodic-source focused checks, exact symbolic
+constructions and final 9,891-job Lean umbrella passed at the scopes in that record.
+
+[open] MFR3 remains in progress. Next evaluate the complete exterior pressure and momentum
+residual of the specified finite-core family, including the cutoff and moving frame. MFR4 owns
+quantitative residual and nonlinear/stability control. Further corrections must respond to
+that source return. The stationary global exclusion and open RH arithmetic sign remain standing.
 
 ## RH line
 
