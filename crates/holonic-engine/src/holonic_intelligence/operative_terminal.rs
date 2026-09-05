@@ -226,7 +226,14 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         let operations = self.terminal_operations()?;
         let dissecting = self.dissection.is_some();
         let returning = self.aperture.is_some() || dissecting;
-        let mut run = self.enact_terminal(&operations, None, [dissecting, false, returning, false, true])?;
+        let mut run = loop {
+            match self.enact_terminal(&operations, None, [dissecting, false, returning, false, true]) {
+                Ok(run) => break run,
+                Err(error) if super::full_operation::allocation_refusal(&error)
+                    && self.forward_reuse.as_mut().is_some_and(|reuse| reuse.relieve_pressure()) => {},
+                Err(error) => return Err(error),
+            }
+        };
         let mut emissions = Vec::with_capacity(5);
         let mut traces = Vec::with_capacity(5);
         let emitted_intervals = {
@@ -277,6 +284,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                 morphology_overlay_rank: self.morphology_overlay_rank(),
                 admitted_octaves: run.admitted[at],
                 successor_bound_octaves: bound,
+                numerical_origin: None,
                 resident_coefficient_octets: self.residence.receipt().raw_coefficient_octets,
                 census_before: run.census_before.clone(),
                 census_after: run.census_after.clone(),
@@ -289,7 +297,9 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         // contraction's own row stay with the successor when a return or a dissection is
         // declared: they are what the next occurrence meets.
         let presented = self.carriers.remove(&operations[0].inputs[0]);
-        self.carriers.clear();
+        if let Some(reuse) = &mut self.forward_reuse {
+            for (output, carrier) in std::mem::take(&mut self.carriers) { reuse.retain(output, carrier); }
+        } else { self.carriers.clear(); }
         self.operation_at = 0;
         self.cycle_complete = true;
         let emitted = run
@@ -308,7 +318,10 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         } else {
             self.terminal_reacted = None;
             self.terminal_presented = None;
-            self.checkpoints.clear();
+            if let Some(reuse) = &mut self.forward_reuse {
+                if let Some(presented) = presented { reuse.retain(operations[0].inputs[0], presented); }
+                for (output, carrier) in std::mem::take(&mut self.checkpoints) { reuse.retain(output, carrier); }
+            } else { self.checkpoints.clear(); }
         }
         if dissecting {
             let contracted = contracted.ok_or(NativeFullOperationError::Operation)?;

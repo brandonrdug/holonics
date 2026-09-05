@@ -49,7 +49,7 @@ the actual Contract/unary-word/joined-output roles and extends `NativeFullOperat
 observed-passage local return, staged factors and ownership-preserving attribution. Its
 [native-material result](../research/records/2026-09-04_HNP1_THE_ACTUAL_JOINED_PASSAGE_RETURNS_LOCAL_DEVELOPMENT_AND_THE_DELTA_SURVIVES_ATTRIBUTION.md)
 uses the joining OUTPUT as target. The earlier partner-as-target policy is still withdrawn;
-general locality remains HNP2.
+its native reuse/dependency composition is recorded below.
 
 [proved-derived; formal-checked] `Computation/HolonicResidentRestriction.lean` owns zero-insertion
 decoding and its commutation with additive overlay generators through finite ordered words.
@@ -58,7 +58,14 @@ decoding and its commutation with additive overlay generators through finite ord
 keep restricted rows packed on device and decode requested tiles/gathers. The
 [actual native comparison](../research/records/2026-09-04_HNP2_THE_RESTRICTED_ROWS_STAY_COMPACT_ON_DEVICE_AND_THE_DECODER_PRESERVES_DEVELOPMENT.md)
 preserved developmental/withdrawal/restoration receivers with reduced residency; full dependency
-locality and reuse are not inferred from this storage correspondence.
+locality and reuse are not inferred from this storage correspondence alone.
+
+[established-bounded; measured] `operative_reuse.rs::NativeForwardReuse` now supplies complete
+numerical-segment retention by move ownership, dependency-closed reopening and explicit
+`NativeNumericalOrigin` through `full_operation.rs`. Native chronology and local returns still
+enact. `HolonicResidentRestriction` supplies the exact finite current/support and cancellation/
+reconnection laws; its executable/native correspondence and limits are in the
+[HNP2 completion record](../research/records/2026-09-04_HNP2_THE_NUMERICAL_SEGMENT_IS_REUSED_THE_NATIVE_OCCURRENCE_STILL_DEVELOPS_AND_CHANGED_DEPENDENCIES_REOPEN.md).
 
 | Relation | Lean owner | Rust owner | CUDA owner | Status and exact open fibre |
 |---|---|---|---|---|

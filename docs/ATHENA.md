@@ -34,6 +34,13 @@ discriminator and exact withdrawal/restoration returned in
 The CLI commands below still expose their earlier prefix chart; persistent public sessions and
 general production delivery are HNP3/HNP4, not implied by this low-level addition.
 
+[established-bounded; measured] The observed-passage session now retains complete native numerical
+segments and reopens their dependency closure when entering material or coefficients change.
+It still enacts local returns and chronology. Reuse traces name their prior numerical computation;
+the actual reference/reuse continuation and costs are in
+[HNP2](../research/records/2026-09-04_HNP2_THE_NUMERICAL_SEGMENT_IS_REUSED_THE_NATIVE_OCCURRENCE_STILL_DEVELOPS_AND_CHANGED_DEPENDENCIES_REOPEN.md).
+`without_forward_reuse` supplies a full-execution observer comparison, not a second learning law.
+
 ## Commands
 
 Build the application:

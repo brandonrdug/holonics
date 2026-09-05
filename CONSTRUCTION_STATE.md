@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** 2026-09-04. **Current construction:** HNP2 — locality/reuse after compact residence.
+**Currency:** 2026-09-04. **Next construction:** HNP3 — persistent models and continuing sessions.
 
 This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md) orders work;
 completed history stays in its existing records and Git. Brandon's latest direct instruction
@@ -32,11 +32,19 @@ and compact layouts. Accounted coefficient/pool/chronology residency fell from 1
 decoder/umbrella builds passed. The [record](research/records/2026-09-04_HNP2_THE_RESTRICTED_ROWS_STAY_COMPACT_ON_DEVICE_AND_THE_DECODER_PRESERVES_DEVELOPMENT.md)
 keeps this storage result distinct from phase completion.
 
-[open] HNP2 still owes dependency-derived participation, reusable consequences and stale-state
-reopening with complete-successor/locality controls. `enter_cycle` still clears transient standing;
-`advance_cycle` still runs the complete forward graph. Persistence and useful output remain later
-phases. The earlier partner-as-target policy remains archived. The CLI prefix convenience path
-is unchanged; observed-passage development remains on the native session owner.
+[established-bounded; measured] HNP2 then returned complete-segment reuse with native origin
+lineage and dependency-closed reopening. The final actual-model comparison preserved seven
+terminal results, deposit words and complete chronology. The repeated occurrence reused all 665
+forward segments while enacting 127 local returns; changed inputs recomputed their dependencies.
+Formal locality/cancellation/reconnection, native disconnected-growth and move-ownership controls
+passed. The [HNP2 completion record](research/records/2026-09-04_HNP2_THE_NUMERICAL_SEGMENT_IS_REUSED_THE_NATIVE_OCCURRENCE_STILL_DEVELOPS_AND_CHANGED_DEPENDENCIES_REOPEN.md)
+states the complete-continuation correspondence and physical/architecture boundaries.
+
+[open] HNP3 must return a durable cultivated model and continuing public session, including
+actual overlays, carrier/chronology/open-boundary state, base dependencies and recoverable I/O.
+The CLI prefix convenience path is unchanged; observed-passage development/reuse remains on the
+native session owner. Useful production and export remain HNP4--HNP7. The earlier equalization
+policy remains archived.
 
 [definition] The plan then orders general material contact, resident locality/reuse, persistent
 sessions, multi-cycle output, a useful consumer-model milestone, executable export and supported

@@ -32,6 +32,8 @@ mod operative_atlas;
 mod operative_morphology;
 #[path = "holonic_intelligence/operative_residence.rs"]
 mod operative_residence;
+#[path = "holonic_intelligence/operative_reuse.rs"]
+mod operative_reuse;
 #[path = "holonic_intelligence/operative_adjoint.rs"]
 mod operative_adjoint;
 #[path = "holonic_intelligence/operative_backward.rs"]
@@ -82,6 +84,7 @@ pub use operative_adjoint::*;
 pub use operative_backward::*;
 pub use operative_return::*;
 pub use operative_residence::*;
+pub use operative_reuse::{NativeForwardReuseCensus, NativeNumericalOrigin};
 pub use operative_session::*;
 pub use operative_intervention::*;
 pub use operative_identification::*;

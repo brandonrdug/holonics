@@ -20,8 +20,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .parse()?;
     let output = std::env::args().nth(3);
     let layout = std::env::args().nth(4).unwrap_or_else(|| "compact".into());
-    if !["compact", "expanded", "compare"].contains(&layout.as_str()) {
-        return Err("layout must be compact, expanded or compare".into());
+    if !["compact", "expanded", "compare", "compare-reuse"].contains(&layout.as_str()) {
+        return Err("layout must be compact, expanded, compare or compare-reuse".into());
     }
     eprintln!("HNP1: reading the native rest");
     let started = std::time::Instant::now();
@@ -68,18 +68,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Err("this receiver needs three already-admitted non-prefix occurrences".into());
     }
     let outside_refused = restricted.admit(&[u32::MAX], &[]).is_err();
-    let receipt = if layout == "compare" {
-        let (expanded, left) = run(&restricted, &rest, shift, &occurrences, outside_refused, true)?;
-        let (compact, right) = run(&restricted, &rest, shift, &occurrences, outside_refused, false)?;
+    let receipt = if layout == "compare" || layout == "compare-reuse" {
+        let compare_reuse = layout == "compare-reuse";
+        let (expanded, left) = run(&restricted, &rest, shift, &occurrences, outside_refused, !compare_reuse, !compare_reuse)?;
+        let (compact, right) = run(&restricted, &rest, shift, &occurrences, outside_refused, false, true)?;
         let correspondence = left == right;
-        let receipt = json!({"schema":"holonics.hnp2.resident-layout-control.v1",
+        let mut receipt = json!({"schema":if compare_reuse {"holonics.hnp2.segment-reuse-control.v1"} else {"holonics.hnp2.resident-layout-control.v1"},
             "complete_observed_continuation_equal":correspondence,
             "comparison_scope":"all seven terminal sections, three deposit-return words, generations and factor extents; not a serialized full-state comparison",
-            "expanded":expanded,"compact":compact});
+            });
+        if compare_reuse {
+            receipt["reference"] = expanded; receipt["candidate"] = compact;
+        } else {
+            receipt["expanded"] = expanded; receipt["compact"] = compact;
+        }
         if !correspondence { return Err("compact and expanded continuation receivers differ".into()); }
         receipt
     } else {
-        run(&restricted, &rest, shift, &occurrences, outside_refused, layout == "expanded")?.0
+        run(&restricted, &rest, shift, &occurrences, outside_refused, layout == "expanded", true)?.0
     };
     if let Some(output) = output {
         use std::io::Write;
@@ -95,7 +101,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn run(restricted: &NativeConeRestrictedEcology, rest: &str, shift: u32,
-    occurrences: &[Vec<u32>], outside_refused: bool, expanded: bool,
+    occurrences: &[Vec<u32>], outside_refused: bool, expanded: bool, reuse: bool,
 ) -> Result<(serde_json::Value, serde_json::Value), Box<dyn std::error::Error>> {
     let started = std::time::Instant::now();
     eprintln!("HNP2: mounting {} layout", if expanded { "expanded" } else { "compact" });
@@ -118,6 +124,7 @@ fn run(restricted: &NativeConeRestrictedEcology, rest: &str, shift: u32,
             series_terms: 14,
         },
     )?;
+    if !reuse { session = session.without_forward_reuse(); }
     let contact_population = session.joined_passage_population();
     eprintln!("HNP1: baseline receiver over {contact_population} derived contacts");
     let baseline = session.observe_passage_cycle(&occurrences[0])?;
@@ -129,10 +136,16 @@ fn run(restricted: &NativeConeRestrictedEcology, rest: &str, shift: u32,
         eprintln!("HNP1: developmental cycle {at}");
         let before_rank = session.morphology_overlay_rank();
         let before = session.census();
+        let reuse_before = session.forward_reuse_census();
         let cycle_started = std::time::Instant::now();
         let cycle = session.advance_cycle(occurrence)?;
         let elapsed_millis = cycle_started.elapsed().as_millis();
         let after = cycle.successor.census();
+        let lineage_valid = cycle.traces.iter().all(|trace| trace.numerical_origin.as_ref().is_none_or(|origin|
+            origin.occurrence < trace.occurrence && origin.operation == trace.operation.ordinal));
+        if !lineage_valid { return Err("a reused numerical passage lost its prior occurrence/operation address".into()); }
+        let first_reuse = cycle.traces.iter().find_map(|trace| trace.numerical_origin.as_ref().map(|origin|
+            json!({"new_native_occurrence":trace.occurrence,"retained_computation":origin})));
         semantic_cycles.push(json!({"emission":cycle.final_emission,
             "generation":cycle.successor.generation(), "rank":cycle.successor.morphology_overlay_rank(),
             "contacts":cycle.passage_returns}));
@@ -143,6 +156,8 @@ fn run(restricted: &NativeConeRestrictedEcology, rest: &str, shift: u32,
             "section_read_outs": after.section_read_outs - before.section_read_outs,
             "contacts": cycle.passage_returns,
             "elapsed_millis":elapsed_millis,"census_before":before,"census_after":after,
+            "reuse_before":reuse_before,"reuse_after":cycle.successor.forward_reuse_census(),
+            "prior_numerical_lineage_valid":lineage_valid,"first_reuse":first_reuse,
         }));
         session = cycle.successor;
     }
@@ -167,12 +182,15 @@ fn run(restricted: &NativeConeRestrictedEcology, rest: &str, shift: u32,
     let restoration_equal = restored.final_emission.intervals == trained_face;
     let final_generation = restored.successor.generation();
     let final_rank = restored.successor.morphology_overlay_rank();
+    let final_chronology = restored.successor.chronology().to_vec();
+    let reuse_census = restored.successor.forward_reuse_census();
     drop(restored.successor);
     let receipt = json!({
         "schema":"holonics.hnp1.observed-passage-control.v1", "source":rest,
         "layout":if expanded {"expanded"} else {"compact"},
         "residence":residence_receipt,"mount_millis":mount_millis,
         "decoder_census":residence.decoder_census(),
+        "forward_reuse":reuse,"reuse_census":reuse_census,
         "learning_shift":shift, "occurrences":occurrences,
         "comparison":"actual-joining-output-minus-transported-input",
         "outside_family_refused":outside_refused, "contact_population":contact_population,
@@ -187,6 +205,7 @@ fn run(restricted: &NativeConeRestrictedEcology, rest: &str, shift: u32,
         return Err("the native contact attribution receiver did not close".into());
     }
     let semantics = json!({"baseline":baseline_face,"trained":trained_face,
+        "final_generation":final_generation,"final_rank":final_rank,"chronology":final_chronology,
         "cycles":semantic_cycles,"ablation_recovers_baseline":ablation_equal,
         "restoration_recovers_cultivated":restoration_equal});
     Ok((receipt, semantics))

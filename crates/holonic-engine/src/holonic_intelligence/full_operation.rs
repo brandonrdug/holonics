@@ -3,7 +3,9 @@
 //! This owner begins at the first operation of the full HNA1 graph.  It consumes ordinary row
 //! addresses at the occurrence port, gathers those coefficient rows without leaving the device,
 //! enacts the graph's laws, and returns its emission, trace, and move-owned successor ecology
-//! together.  No exterior verdict, stored activation, candidate, or commit intervenes.
+//! together. No exterior verdict, answer lookup, candidate, or privileged commit intervenes.
+//! The observed-passage chart may retain native numerical segments under their complete input
+//! and morphology dependencies; native occurrences, chronology and local returns still enact.
 //!
 //! Under the contract of 2026-08-18 the cycle runs as segments (`operative_segment.rs`): each
 //! segment is one passage bound whole, launched once, and read once through its census; the
@@ -25,6 +27,7 @@ use super::{
     NativeOperatorResidenceError, NativeReturnAperture, NativeTensorOrdinal,
     operative_backward::{NativeAdjointReturnTrace, ReturnDeed},
     operative_passage_return::{PassageCultivation, NativePassageReturn},
+    operative_reuse::NativeForwardReuse,
     operative_intervention::DissectionStanding,
     operative_return::{OverlayAtom, ReturnMaterial, continuation_next_occurrences, enact_return},
     operative_scalars::projected_scale,
@@ -70,6 +73,9 @@ pub struct NativeFullOperationTrace {
     pub admitted_octaves: u32,
     /// The measured octave bound of the successor carrier, from the segment's census.
     pub successor_bound_octaves: u32,
+    /// None is a freshly enacted numerical passage; Some retains its exact prior computation
+    /// while this trace's native occurrence, chronology and local return are new.
+    pub numerical_origin: Option<super::NativeNumericalOrigin>,
     pub resident_coefficient_octets: u64,
     pub census_before: TransferCensus,
     pub census_after: TransferCensus,
@@ -107,6 +113,7 @@ pub(super) struct RunStep {
     pub(super) admitted_octaves: u32,
     pub(super) bound_octaves: u32,
     pub(super) projection: NativeSuccessorProjection,
+    pub(super) numerical_origin: Option<super::NativeNumericalOrigin>,
     pub(super) census_before: TransferCensus,
     pub(super) census_after: TransferCensus,
 }
@@ -145,6 +152,9 @@ pub struct NativeFullOperatorSession<'residence, 'chart> {
     /// The declared return apertures; `None` enacts no return.
     pub(super) aperture: Option<NativeReturnAperture>,
     pub(super) passage_cultivation: Option<PassageCultivation<'chart>>,
+    pub(super) forward_reuse: Option<NativeForwardReuse<'chart>>,
+    /// Last direct use in the immutable word; local-return retention adds its own actual edges.
+    last_use: BTreeMap<NativeCarrierOrdinal, u32>,
     /// The dissection standing: the excitation's supports and face, when founded for dissection.
     pub(super) dissection: Option<DissectionStanding>,
     /// Whether the terminal's successor projection is fused; a receiver that declares the
@@ -210,7 +220,9 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             }
         }
         let mut grain = 0u32;
+        let mut last_use = BTreeMap::new();
         for operation in &ecology.operations {
+            for input in &operation.inputs { last_use.insert(*input, operation.ordinal); }
             if let NativeOperationPrimitive::Lookup { scale } = &operation.primitive {
                 let coefficient = *operation
                     .coefficients
@@ -246,6 +258,8 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             overlay: BTreeMap::new(),
             aperture,
             passage_cultivation: None,
+            forward_reuse: None,
+            last_use,
             dissection: None,
             terminal_seal: true,
         })
@@ -309,6 +323,16 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         self.residence.surface().census()
     }
 
+    pub fn forward_reuse_census(&self) -> Option<super::NativeForwardReuseCensus> {
+        self.forward_reuse.as_ref().map(NativeForwardReuse::census)
+    }
+
+    /// Expanded execution receiver: discard numerical reuse only, never developmental standing.
+    pub fn without_forward_reuse(mut self) -> Self {
+        self.forward_reuse = None;
+        self
+    }
+
     /// The return: if `entering` continues the last cycle's line, the retained emitted face meets
     /// the address that followed each of its rows and the deposit joins the overlay. Any other
     /// occurrence has no comparison and changes no morphology.
@@ -362,6 +386,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         self.terminal_contracted = None;
         let (adjoint, mut deposits) = self.adjoint_return(differential, ReturnDeed::Cultivate(aperture))?;
         deposits.entry(tied).or_default().push(atom);
+        if let Some(reuse) = &mut self.forward_reuse { reuse.morphology_changed(deposits.keys().copied()); }
         for (population, atoms) in deposits {
             self.overlay.entry(population).or_default().extend(atoms);
         }
@@ -375,6 +400,11 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
     /// Clear the previous cycle's standing when a new occurrence enters at operation zero.
     fn enter_cycle(&mut self, entering: &[u32]) -> Result<NativeMorphologyTransition, NativeFullOperationError> {
         let transition = self.return_on_continuation(entering)?;
+        // Exact equality of this exterior occurrence chart permits reusing its numerical
+        // realization; it does not identify the two native occurrences or skip their chronology.
+        if self.previous_context.as_deref() != Some(entering) {
+            if let Some(reuse) = &mut self.forward_reuse { reuse.occurrence_changed(); }
+        }
         self.carriers.clear();
         self.checkpoints.clear();
         self.positions = None;
@@ -413,70 +443,132 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             self.ensure_row_population(row_addresses.len())?;
         }
         let operations: Vec<NativeOperatorNode> = self.ecology.operations[from..to].to_vec();
+        let use_reuse = self.forward_reuse.is_some()
+            && !retain_all
+            && checkpoint
+            && withdrawals.is_empty()
+            && from == 0
+            && to == self.ecology.operations.len().saturating_sub(5);
         for (start, end) in segments(&operations) {
             let mut cursor = start;
-            while cursor < end {
-            let run = &operations[cursor..end];
-            let (outcomes, reading) = {
-                let site = SegmentSite {
-                    residence: self.residence,
-                    ecology: self.ecology,
-                    carriers: &self.carriers,
-                    checkpoints: &self.checkpoints,
-                    positions: self.positions.as_ref(),
-                    overlay: &self.overlay,
-                    grain: self.grain,
-                    row_addresses,
-                    withdrawals,
-                    tile_window: None,
-                    seal: true,
-                };
-                enact_segment(&site, run)?
+            let mut cached = if use_reuse {
+                self.forward_reuse
+                    .as_mut()
+                    .and_then(|reuse| reuse.take_segment(start, end))
+            } else {
+                None
             };
-            if outcomes.is_empty() {
-                return Err(NativeFullOperationError::Operation);
-            }
-            cursor += outcomes.len();
-            for (outcome, operation) in outcomes.into_iter().zip(run) {
-                let bound_octaves = outcome.carrier.bound_octaves;
-                self.carriers.insert(outcome.output, outcome.carrier);
-                self.return_joined_passage(operation.ordinal)?;
-                steps.push(RunStep {
-                    operation: operation.clone(),
-                    admitted_octaves: outcome.admitted_octaves,
-                    bound_octaves,
-                    projection: outcome.projection,
-                    census_before: reading.census_before.clone(),
-                    census_after: reading.census_after.clone(),
-                });
-                if retain_all {
-                    continue;
+            while cursor < end {
+                let run = &operations[cursor..end];
+                let (outcomes, census_before, census_after, origins) = if let Some((outcomes, origins)) = cached.take()
+                {
+                    let census = self.residence.surface().census();
+                    (outcomes, census.clone(), census, Some(origins))
+                } else {
+                    loop {
+                        let result = {
+                            let site = SegmentSite {
+                                residence: self.residence,
+                                ecology: self.ecology,
+                                carriers: &self.carriers,
+                                checkpoints: &self.checkpoints,
+                                positions: self.positions.as_ref(),
+                                overlay: &self.overlay,
+                                grain: self.grain,
+                                row_addresses,
+                                withdrawals,
+                                tile_window: None,
+                                seal: true,
+                            };
+                            enact_segment(&site, run)
+                        };
+                        match result {
+                            Ok((outcomes, reading)) => {
+                                break (outcomes, reading.census_before, reading.census_after, None)
+                            }
+                            Err(error) => {
+                                // Numerical standing is optional apparatus. An allocation refusal before
+                                // a successful segment can release it and retry the same pure segment;
+                                // no local return, chronology or staged morphology has run yet.
+                                if use_reuse
+                                    && allocation_refusal(&error)
+                                    && self
+                                        .forward_reuse
+                                        .as_mut()
+                                        .is_some_and(|reuse| reuse.relieve_pressure())
+                                {
+                                    continue;
+                                }
+                                return Err(error);
+                            }
+                        }
+                    }
+                };
+                if outcomes.is_empty() {
+                    return Err(NativeFullOperationError::Operation);
                 }
-                let absolute = self
-                    .ecology
-                    .operations
-                    .iter()
-                    .position(|candidate| candidate.ordinal == operation.ordinal)
-                    .ok_or(NativeFullOperationError::Operation)?;
-                let mut consumed = operation.inputs.clone();
-                if let Some(cultivation) = &self.passage_cultivation {
-                    consumed.extend(cultivation.released_sources_at(operation.ordinal));
-                }
-                for input in &consumed {
-                    if *input != operation.output
-                        && !self.passage_cultivation.as_ref().is_some_and(|c| c.retains_source_after(*input, operation.ordinal))
-                        && !self.ecology.operations[absolute + 1..]
-                            .iter()
-                            .any(|later| later.inputs.contains(input))
-                    {
-                        if let Some(carrier) = self.carriers.remove(input) {
-                            if checkpoint && self.cross_layer.contains(input) {
-                                self.checkpoints.insert(*input, carrier);
+                cursor += outcomes.len();
+                for (at, (outcome, operation)) in outcomes.into_iter().zip(run).enumerate() {
+                    let numerical_origin = origins.as_ref().map(|origins| origins[at].clone());
+                    if use_reuse && numerical_origin.is_none() {
+                        if let Some(reuse) = &mut self.forward_reuse {
+                            reuse.remember(&outcome, self.generation, operation.ordinal, row_addresses);
+                        }
+                    }
+                    let bound_octaves = outcome.carrier.bound_octaves;
+                    self.carriers.insert(outcome.output, outcome.carrier);
+                    loop {
+                        match self.return_joined_passage(operation.ordinal) {
+                            Ok(()) => break,
+                            Err(error)
+                                if use_reuse
+                                    && allocation_refusal(&error)
+                                    && self
+                                        .forward_reuse
+                                        .as_mut()
+                                        .is_some_and(|reuse| reuse.relieve_pressure()) => {}
+                            Err(error) => return Err(error),
+                        }
+                    }
+                    steps.push(RunStep {
+                        operation: operation.clone(),
+                        admitted_octaves: outcome.admitted_octaves,
+                        bound_octaves,
+                        projection: outcome.projection,
+                        numerical_origin,
+                        census_before: census_before.clone(),
+                        census_after: census_after.clone(),
+                    });
+                    if retain_all {
+                        continue;
+                    }
+                    let mut consumed = operation.inputs.clone();
+                    if let Some(cultivation) = &self.passage_cultivation {
+                        consumed.extend(cultivation.released_sources_at(operation.ordinal));
+                    }
+                    for input in &consumed {
+                        if *input != operation.output
+                            && !self
+                                .passage_cultivation
+                                .as_ref()
+                                .is_some_and(|c| c.retains_source_after(*input, operation.ordinal))
+                            && self
+                                .last_use
+                                .get(input)
+                                .is_none_or(|last| *last <= operation.ordinal)
+                        {
+                            if let Some(carrier) = self.carriers.remove(input) {
+                                if checkpoint && self.cross_layer.contains(input) {
+                                    self.checkpoints.insert(*input, carrier);
+                                } else if use_reuse {
+                                    if let Some(reuse) = &mut self.forward_reuse {
+                                        reuse.retain(*input, carrier);
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            }
             }
         }
         Ok(steps)
@@ -501,6 +593,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             morphology_overlay_rank: self.morphology_overlay_rank(),
             admitted_octaves: step.admitted_octaves,
             successor_bound_octaves: step.bound_octaves,
+            numerical_origin: step.numerical_origin.clone(),
             resident_coefficient_octets: self.residence.receipt().raw_coefficient_octets,
             census_before: step.census_before.clone(),
             census_after: step.census_after.clone(),
@@ -696,6 +789,14 @@ pub enum NativeFullOperationError {
     Morphology,
     #[error("the return through the body refused: {0}")]
     Adjoint(String),
+}
+
+pub(super) fn allocation_refusal(error: &NativeFullOperationError) -> bool {
+    matches!(error,
+        NativeFullOperationError::Resident(ResidentRefusal::MemoryAperture { .. })
+        | NativeFullOperationError::Resident(ResidentRefusal::Driver { code: 2, .. })
+        | NativeFullOperationError::Residence(NativeOperatorResidenceError::Allocation {
+            source: ResidentRefusal::Driver { code: 2, .. }, .. }))
 }
 
 /// A contemporary carrier: produced in this cycle or replay, or retained as a checkpoint.

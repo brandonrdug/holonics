@@ -22,7 +22,7 @@ contracts and records preserve their completed scope; their old imperatives sche
 
 ## Current campaign: production HNA
 
-**Current construction:** HNP2 — dependency locality/reuse after compact resident restriction.
+**Next construction:** HNP3 — persistent models and the continuing public session.
 
 [definition] Brandon's subsequent September 4 request authorizes the formal, holistic design of
 [the production-HNA campaign](THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md).
@@ -34,8 +34,11 @@ native-model development/attribution in its
 [completion record](../../research/records/2026-09-04_HNP1_THE_ACTUAL_JOINED_PASSAGE_RETURNS_LOCAL_DEVELOPMENT_AND_THE_DELTA_SURVIVES_ATTRIBUTION.md).
 It uses the joining output, not the archived equalization target. HNP2's
 [compact residence return](../../research/records/2026-09-04_HNP2_THE_RESTRICTED_ROWS_STAY_COMPACT_ON_DEVICE_AND_THE_DECODER_PRESERVES_DEVELOPMENT.md)
-preserves the observed development under its decoder; dependency-driven execution, reuse and
-reopening remain HNP2 obligations. No persistence or useful-model result is inferred.
+preserves the observed development under its decoder. Its subsequent
+[complete-segment reuse return](../../research/records/2026-09-04_HNP2_THE_NUMERICAL_SEGMENT_IS_REUSED_THE_NATIVE_OCCURRENCE_STILL_DEVELOPS_AND_CHANGED_DEPENDENCIES_REOPEN.md)
+closed HNP2 at the admitted operator scope with numerical-origin lineage, dependency reopening
+and native controls. HNP3 now returns durable model/session state and the continuing interface.
+No persistence or useful-model result is inferred from HNP2.
 The ordered work is concrete local-current/presentation/development binding; general material
 contact; resident locality and reusable factors; persistent models and sessions; multi-cycle
 production; useful consumer-model evaluation; executable export; and additional model families.

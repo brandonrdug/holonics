@@ -221,6 +221,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         }
         let mut session = Self::found(ecology, residence)?;
         session.passage_cultivation = Some(cultivation);
+        session.forward_reuse = Some(super::operative_reuse::NativeForwardReuse::found(ecology));
         Ok(session)
     }
 
@@ -273,6 +274,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                 "withdrawal requires a completed operation",
             ));
         }
+        if let Some(reuse) = &mut self.forward_reuse { reuse.morphology_changed(self.overlay.keys().copied()); }
         Ok(NativePassageWithdrawal {
             origin: Rc::clone(&chart.origin),
             atoms: std::mem::take(&mut self.overlay),
@@ -298,6 +300,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             ));
         }
         self.overlay = withdrawal.atoms;
+        if let Some(reuse) = &mut self.forward_reuse { reuse.morphology_changed(self.overlay.keys().copied()); }
         Ok(())
     }
 
@@ -312,6 +315,11 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             return Ok(());
         };
         let aperture = cultivation.aperture;
+        // A joining operation publishes its pending differences only after all its contacts
+        // return. On allocation refusal these local atoms drop, permitting an apparatus-only
+        // cache eviction and retry without duplicating an earlier contact's deposit.
+        let mut pending: BTreeMap<NativeTensorOrdinal, Vec<OverlayAtom<'chart>>> = BTreeMap::new();
+        let mut returns = Vec::new();
         for contact in bindings {
             let mut receiver_scale_width_grains = None;
             let receiver_scale_shift = if contact.reaction_path.is_empty() {
@@ -418,17 +426,14 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                     }
                 }
             };
-            let cultivation = self.passage_cultivation.as_mut().expect("same owned chart");
             let deposit = returned.map(|(atom, mut deposit)| {
                 deposit.population = contact.population.0;
-                cultivation
-                    .pending
-                    .entry(contact.population)
+                pending.entry(contact.population)
                     .or_default()
                     .push(atom);
                 deposit
             });
-            cultivation.returns.push(NativePassageReturn {
+            returns.push(NativePassageReturn {
                 contact,
                 occurrence: self.generation,
                 receiver_scale_shift,
@@ -436,6 +441,9 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                 deposit,
             });
         }
+        let cultivation = self.passage_cultivation.as_mut().expect("same owned chart");
+        for (population, atoms) in pending { cultivation.pending.entry(population).or_default().extend(atoms); }
+        cultivation.returns.extend(returns);
         Ok(())
     }
 
@@ -443,6 +451,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         let Some(cultivation) = self.passage_cultivation.as_mut() else {
             return Vec::new();
         };
+        if let Some(reuse) = &mut self.forward_reuse { reuse.morphology_changed(cultivation.pending.keys().copied()); }
         for (population, atoms) in std::mem::take(&mut cultivation.pending) {
             self.overlay.entry(population).or_default().extend(atoms);
         }

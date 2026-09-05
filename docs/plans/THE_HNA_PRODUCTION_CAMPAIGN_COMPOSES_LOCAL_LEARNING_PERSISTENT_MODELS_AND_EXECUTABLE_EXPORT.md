@@ -1,6 +1,6 @@
 # HNA production: local learning, persistent models and executable export
 
-**Date:** 2026-09-04. **Status:** ACTIVE; HNP0/HNP1 returned, HNP2 locality/reuse in progress.
+**Date:** 2026-09-04. **Status:** ACTIVE; HNP0--HNP2 returned, HNP3 persistence/session next.
 **Authority:** Brandon's formal planning request and subsequent instruction to complete HNP0--HNP7.
 **Order:** [THE_ROADMAP.md](THE_ROADMAP.md). **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 **Starting implementation:** `c12b2634`. Phase names below identify dependencies, not capabilities.
@@ -262,7 +262,10 @@ phase also returns the composition on actual native model material, not only a f
 
 [established-bounded; measured] The compact resident restriction and actual-model decoder
 comparison returned in the [HNP2 storage record](../../research/records/2026-09-04_HNP2_THE_RESTRICTED_ROWS_STAY_COMPACT_ON_DEVICE_AND_THE_DECODER_PRESERVES_DEVELOPMENT.md).
-It does not close this phase: dependency-driven execution, reuse and reopening below remain owed.
+The subsequent [HNP2 completion record](../../research/records/2026-09-04_HNP2_THE_NUMERICAL_SEGMENT_IS_REUSED_THE_NATIVE_OCCURRENCE_STILL_DEVELOPS_AND_CHANGED_DEPENDENCIES_REOPEN.md)
+returns complete numerical-segment reuse, dependency-closed reopening, retained numerical origins,
+formal locality/cancellation/reconnection laws and native continuation/cost controls. Completion
+is at the stated admitted primitive-graph scope, not arbitrary family support or useful output.
 
 **Depends on:** HNP1.
 

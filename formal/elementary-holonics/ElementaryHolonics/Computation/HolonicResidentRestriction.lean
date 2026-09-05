@@ -16,7 +16,7 @@ open scoped BigOperators
 universe uR uC uK uReceiver uFace
 
 variable {Row : Type uR} {Col : Type uC} {K : Type uK}
-  [Fintype Row] [Fintype Col] [DecidableEq Row]
+  [Fintype Row] [Fintype Col] [DecidableEq Row] [DecidableEq Col]
   [CommSemiring K]
 
 /-- The compact resident section contains exactly the rows admitted by `retained`. -/
@@ -101,6 +101,88 @@ theorem receiver_family_successor_eq
   funext row
   rw [show contract (addMatrix left overlay) carrier row =
       contract (addMatrix right overlay) carrier row by rw [equal_successor]]
+
+/-! ## Local coefficient current and support consequences -/
+
+def matrixCurrent (matrix : Matrix Row Col K) (input : Col → K) (target : Row) : K :=
+  ∑ source, matrix target source * input source
+
+theorem current_unchanged_outside_input_difference
+    (matrix : Matrix Row Col K) (left right : Col → K) (support : Finset Col)
+    (difference_supported : ∀ source, source ∉ support → left source = right source)
+    (target : Row)
+    (no_incidence : ∀ source, source ∈ support → matrix target source = 0) :
+    matrixCurrent matrix left target = matrixCurrent matrix right target := by
+  unfold matrixCurrent
+  apply Finset.sum_congr rfl
+  intro source _
+  by_cases contained : source ∈ support
+  · simp [no_incidence source contained]
+  · rw [difference_supported source contained]
+
+theorem current_delta_unchanged_outside_rows
+    (matrix delta : Matrix Row Col K) (input : Col → K) (support : Finset Row)
+    (delta_supported : ∀ target, target ∉ support → ∀ source, delta target source = 0)
+    (target : Row) (outside : target ∉ support) :
+    matrixCurrent (addMatrix matrix delta) input target =
+      matrixCurrent matrix input target := by
+  unfold matrixCurrent
+  apply Finset.sum_congr rfl
+  intro source _
+  simp [addMatrix, delta_supported target outside]
+
+theorem present_zero_does_not_remove_dependency
+    (matrix : Matrix Row Col K) (input : Col → K) (target : Row) (source : Col)
+    (nonzero_coefficient : matrix target source ≠ 0)
+    (present_zero : input source = 0) :
+    matrix target source ≠ 0 ∧
+      matrixCurrent matrix input target =
+        (∑ other ∈ Finset.univ.erase source, matrix target other * input other) := by
+  classical
+  constructor
+  · exact nonzero_coefficient
+  · unfold matrixCurrent
+    rw [← Finset.sum_erase_add _ _ (Finset.mem_univ source)]
+    simp [present_zero]
+
+section LocalityControls
+
+abbrev CancelRows := Fin 1
+abbrev CancelCols := Fin 2
+
+def cancelMatrix : Matrix CancelRows CancelCols ℤ
+  | _, source => if source = 0 then 1 else -1
+
+def cancelInput : CancelCols → ℤ := fun _ => 1
+
+theorem cancelling_current_has_nonzero_dependencies :
+    matrixCurrent cancelMatrix cancelInput (0 : CancelRows) = 0 ∧
+      cancelMatrix (0 : CancelRows) (0 : CancelCols) ≠ 0 ∧
+      cancelMatrix (0 : CancelRows) (1 : CancelCols) ≠ 0 := by
+  norm_num [matrixCurrent, cancelMatrix, cancelInput, Fin.sum_univ_two]
+
+theorem a_later_input_reopens_the_cancelling_current :
+    matrixCurrent cancelMatrix (fun source => if source = 0 then 1 else 0)
+        (0 : CancelRows) ≠ matrixCurrent cancelMatrix cancelInput (0 : CancelRows) := by
+  norm_num [matrixCurrent, cancelMatrix, cancelInput, Fin.sum_univ_two]
+
+def reconnectedBase : Matrix CancelRows CancelCols ℤ := fun _ _ => 0
+def reconnectedDelta : Matrix CancelRows CancelCols ℤ := fun target source =>
+  if target = 0 ∧ source = 1 then 5 else 0
+
+theorem reconnection_invalidates_lawful_omission :
+    reconnectedBase (0 : CancelRows) (1 : CancelCols) = 0 ∧
+      addMatrix reconnectedBase reconnectedDelta (0 : CancelRows) (1 : CancelCols) = 5 := by
+  constructor
+  · rfl
+  · simp [addMatrix, reconnectedBase, reconnectedDelta]
+
+theorem reconnection_changes_the_actual_current :
+    matrixCurrent reconnectedBase cancelInput (0 : CancelRows) = 0 ∧
+      matrixCurrent (addMatrix reconnectedBase reconnectedDelta) cancelInput (0 : CancelRows) = 5 := by
+  norm_num [matrixCurrent, reconnectedBase, reconnectedDelta, addMatrix, cancelInput, Fin.sum_univ_two]
+
+end LocalityControls
 
 /-! ## Packed native state and local additive recurrence -/
 
