@@ -64,14 +64,18 @@ theorem sum_coordinate_fderiv_eq_divergence (v : InitialVelocity) (x : Space) :
   rw [equiv_symm_single_eq_basisFun]
   rfl
 
-/-- **Periodic face conservation.**  The total divergence over one spatial period is zero.
+/-- The complete oriented face current of the declared cube, before any boundary cancellation. -/
+def unitCubeBoundaryFlux (v : InitialVelocity) : ℝ :=
+  ∑ i : Fin 3,
+    ((∫ y in Icc (0 : Fin 2 → ℝ) (fun _ ↦ 1),
+        v ((EuclideanSpace.equiv (Fin 3) ℝ).symm (i.insertNth 1 y)) i) -
+      ∫ y in Icc (0 : Fin 2 → ℝ) (fun _ ↦ 1),
+        v ((EuclideanSpace.equiv (Fin 3) ℝ).symm (i.insertNth 0 y)) i)
 
-Global `C¹` regularity supplies continuity and integrability on the compact cube.  Periodicity
-is used only after the divergence theorem has returned the two addressed faces in each coordinate
-direction. -/
-theorem integral_divergence_unitCube_eq_zero_of_onePeriodic
-    (v : InitialVelocity) (hperiodic : IsOnePeriodic v) (hsmooth : ContDiff ℝ 1 v) :
-    ∫ x in unitCube, divergence v x = 0 := by
+/-- The divergence theorem returns every front and back face. No periodicity is required. -/
+theorem integral_divergence_unitCube_eq_boundaryFlux
+    (v : InitialVelocity) (hsmooth : ContDiff ℝ 1 v) :
+    ∫ x in unitCube, divergence v x = unitCubeBoundaryFlux v := by
   let eL : Space ≃L[ℝ] (Fin 3 → ℝ) := EuclideanSpace.equiv (Fin 3) ℝ
   let component : Fin 3 → (Fin 3 → ℝ) → ℝ :=
     fun i z => v (eL.symm z) i
@@ -147,22 +151,30 @@ theorem integral_divergence_unitCube_eq_zero_of_onePeriodic
               ((0 : Fin 3 → ℝ) ∘ i.succAbove)
               ((fun _ : Fin 3 => (1 : ℝ)) ∘ i.succAbove),
                 component i (i.insertNth 0 y)) := hdivergence
-    _ = 0 := by
-      apply Finset.sum_eq_zero
-      intro i _hi
-      apply sub_eq_zero.mpr
-      apply setIntegral_congr_fun measurableSet_Icc
-      intro y _hy
-      change v (eL.symm (i.insertNth 1 y)) i = v (eL.symm (i.insertNth 0 y)) i
-      rw [unitFront_eq_unitBack_add_single]
-      exact congrArg (fun z : Space => z i)
-        (hperiodic (eL.symm (i.insertNth 0 y)) i)
+    _ = unitCubeBoundaryFlux v := rfl
+
+/-- Periodicity cancels the two actual oriented faces in each coordinate direction. -/
+theorem integral_divergence_unitCube_eq_zero_of_onePeriodic
+    (v : InitialVelocity) (hperiodic : IsOnePeriodic v) (hsmooth : ContDiff ℝ 1 v) :
+    ∫ x in unitCube, divergence v x = 0 := by
+  rw [integral_divergence_unitCube_eq_boundaryFlux v hsmooth]
+  apply Finset.sum_eq_zero
+  intro i _hi
+  apply sub_eq_zero.mpr
+  apply setIntegral_congr_fun measurableSet_Icc
+  intro y _hy
+  change v ((EuclideanSpace.equiv (Fin 3) ℝ).symm (i.insertNth 1 y)) i =
+    v ((EuclideanSpace.equiv (Fin 3) ℝ).symm (i.insertNth 0 y)) i
+  rw [unitFront_eq_unitBack_add_single]
+  exact congrArg (fun z : Space ↦ z i)
+    (hperiodic ((EuclideanSpace.equiv (Fin 3) ℝ).symm (i.insertNth 0 y)) i)
 
 section Audit
 
 #print axioms unitFront_eq_unitBack_add_single
 #print axioms equiv_symm_single_eq_basisFun
 #print axioms sum_coordinate_fderiv_eq_divergence
+#print axioms integral_divergence_unitCube_eq_boundaryFlux
 #print axioms integral_divergence_unitCube_eq_zero_of_onePeriodic
 
 end Audit

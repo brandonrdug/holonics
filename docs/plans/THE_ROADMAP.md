@@ -64,10 +64,13 @@ remainder, derivatives and zero-count receivers; the
 [MFR2 record](../../research/records/2026-09-04_MFR2_THE_FOLDED_SOURCE_RETURNS_EVERY_HEAT_TIME_WITH_A_GAUSSIAN_REMAINDER_AND_ZERO_COUNT_RECEIVERS.md)
 contains its focused and umbrella checks. MFR3 is in progress: its
 [progress record](../../research/records/2026-09-04_MFR3_THE_PERIODIC_SOURCE_REJECTS_FIXED_PROFILES_AND_RETURNS_ITS_ENERGY_AND_COHERENT_FEEDS.md)
-retains the periodic exclusions, source energy/shear controls, complete coherent coefficient
-population and the localized core's residual. The next attempt must supply actual modulation or
-core/exterior transport and its full source relation. Residual/stability and arithmetic-sign
-investigations follow their actual returns. HNP construction continues independently.
+retains the periodic exclusions, source energy/shear controls and complete coherent coefficient
+population. The [next return](../../research/records/2026-09-04_MFR3_THE_COHERENT_SOURCE_REACHES_A_PHYSICAL_FIELD_AND_THE_LOCAL_FRAME_RETURNS_ITS_FLUX.md)
+binds that population to a physical source, returns local moving energy flux, and rejects a
+specified modulated core at two spatial receivers. It constructs a replacement axial
+strain/vorticity relation with algebraic tails; extend that axis through the radial momentum,
+pressure and exterior/periodic transport or return the next obstruction. Residual/stability and
+arithmetic-sign investigations follow their actual returns. HNP construction continues independently.
 
 [project-postulate] Holonics is the mathematical framework and ontology of which HNA is an
 executable architecture. A research route may return a derivation, a counterexample or a precise

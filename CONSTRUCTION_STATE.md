@@ -127,10 +127,17 @@ returns periodic-profile exclusions, the actual energy exponent constraint, a co
 control, and coherent finite coefficient feeds. Focused and umbrella builds passed; the record
 states the acceptance scope separately from its written local-core residual derivation.
 
-[open] MFR3 remains in progress. The next return is a modulated/core-exterior family with its
-complete source relation and the coherent population's physical slice passage. The fixed local
-core's derived energy obstruction guides that attempt. Stability and the arithmetic sign remain
-open.
+[proved-derived; formal-checked] The next
+[MFR3 return](research/records/2026-09-04_MFR3_THE_COHERENT_SOURCE_REACHES_A_PHYSICAL_FIELD_AND_THE_LOCAL_FRAME_RETURNS_ITS_FLUX.md)
+reconstructs the smooth coherent initial field, its actual advection and a local physical solution
+with nonzero projected nonlinear source at a positive time. It also returns initial-time Fourier
+continuity and the source's local moving energy flux. Focused and umbrella builds passed.
+
+[open] MFR3 remains in progress. A second axial receiver rejects the tested Gaussian core after
+its centre strain is matched. The record constructs a replacement axial strain from the vorticity
+profile, with algebraic exponent `p=1+alpha/beta`. The next return must extend that axis through
+radial momentum, pressure and actual exterior/periodic transport. Stability and the arithmetic
+sign remain open.
 
 ## RH line
 

@@ -1,0 +1,18 @@
+{
+  "scope": "Exact derivative algebra for the specified periodic cores and Gaussian limit; no existence or stability claim",
+  "sympy_version": "1.14.0",
+  "periodic_scale": "b = 2*pi*ell; b_s = -beta*b",
+  "third_curl_residual_at_centre": {
+    "even": "2*alpha + 2*beta + 2*mu*(b**2 + 5)",
+    "odd": "2*alpha + 2*beta - 4*lam + 2*mu*(b**2 + 5)"
+  },
+  "odd_centre_required_modulation": "lam = (alpha + beta + mu*(5 + b**2))/2",
+  "gaussian_axis_third_curl_residual": "-4*lam*exp(-z**2) + (2*alpha - 2*beta*z**2 + 2*beta)*exp(-z**2/2)",
+  "energy_critical_modulation": "alpha = 3*beta/2; lam = 5*beta/4",
+  "second_receiver": "(0, 0, sqrt(5/2))",
+  "second_receiver_third_curl_residual": "-5*beta*exp(-5/2)",
+  "general_second_receiver": "(0, 0, sqrt((alpha+beta)/beta)); alpha,beta > 0",
+  "general_second_receiver_third_curl_residual": "2*(-alpha - beta)*exp((-alpha - beta)/beta)",
+  "coupled_axis_balance": "(W+beta*z)*F' + (alpha+beta-W')*F = 0",
+  "constructed_axis_velocity": "W=-beta*z+F*(C+(alpha+2*beta)*I); I'=1/F; F>0"
+}

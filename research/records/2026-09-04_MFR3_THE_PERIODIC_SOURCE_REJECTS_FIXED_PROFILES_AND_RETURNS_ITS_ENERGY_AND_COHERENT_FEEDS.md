@@ -5,6 +5,11 @@
 **Position:** a progress return; MFR3 remains in progress. **Grades:** per claim.
 The formal returns and the subsequent written local-core derivation have separate evidence scopes.
 
+[historical] This record retains the first MFR3 return at `4b25305e`. The
+[subsequent return](2026-09-04_MFR3_THE_COHERENT_SOURCE_REACHES_A_PHYSICAL_FIELD_AND_THE_LOCAL_FRAME_RETURNS_ITS_FLUX.md)
+completes the coherent population's physical reconstruction and returns the local energy flux;
+its source scopes supersede the corresponding unfinished passages recorded below.
+
 ## The global stationary attempt and its obstruction
 
 [definition] Reuse MFR1's actual periodic source and chart
