@@ -190,10 +190,21 @@ nonzero pressure Hessian and quartic angular torque; finite local jets cannot fi
 [established-bounded; process-audit] The periodic-source focused checks, exact symbolic
 constructions and final 9,891-job Lean umbrella passed at the scopes in that record.
 
-[open] MFR3 remains in progress. Next evaluate the complete exterior pressure and momentum
-residual of the specified finite-core family, including the cutoff and moving frame. MFR4 owns
-quantitative residual and nonlinear/stability control. Further corrections must respond to
-that source return. The stationary global exclusion and open RH arithmetic sign remain standing.
+[proved-derived; formal-checked] The [compact-cutoff return](research/records/2026-09-05_MFR3_THE_COMPACT_RADIAL_CUTOFF_RETURNS_A_PRESSURE_INDEPENDENT_RESIDUAL_OBSTRUCTION.md)
+now gives the actual periodic family's complete angular residual, with arbitrary pressure and
+all quadratic response terms retained. A positive compact leading circulation forces a residual
+bounded away from zero as viscosity decays. The seed radius remains a parameter in the theorem.
+
+[established-bounded; computational-witness] Exact arithmetic verifies the positive seed for
+the retained coefficients and both free fibres. The fixed radial-cutoff affine-viscosity
+continuation is rejected; its initial-data and local-existence construction remains valid.
+
+[established-bounded; process-audit] The final parameterized-radius endpoint, exact symbolic
+audit and 9,898-job Lean umbrella passed at the scopes in the compact-cutoff record.
+
+[open] MFR3 next derives an anisotropic two-length chart, retaining pressure metric, viscosity
+tensor, energy and physical angular reconstruction before selecting a replacement leading profile
+and exterior. MFR4's quantitative stability and MFR5's arithmetic sign remain open.
 
 ## RH line
 

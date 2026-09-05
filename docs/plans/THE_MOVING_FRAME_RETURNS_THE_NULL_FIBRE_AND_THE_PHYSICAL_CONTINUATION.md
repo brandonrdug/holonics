@@ -32,7 +32,10 @@ retains the pressure trace. A quadratic viscosity source remains. The
 [periodic-source return](../../research/records/2026-09-05_MFR3_THE_LOCAL_CORE_HAS_A_PERIODIC_REALIZATION_AND_ITS_PRESSURE_RETAINS_EXTERIOR_TORQUE.md)
 constructs a smooth periodic realization of the finite core with an actual local lifespan, and
 retains arbitrary pressure torque in the circulation law. An exact periodic pressure witness
-separates fields with the same finite local velocity jets.
+separates fields with the same finite local velocity jets. The
+[compact-cutoff return](../../research/records/2026-09-05_MFR3_THE_COMPACT_RADIAL_CUTOFF_RETURNS_A_PRESSURE_INDEPENDENT_RESIDUAL_OBSTRUCTION.md)
+then derives a pressure-independent positive residual for the explicit radial completion and its
+affine viscosity response, changing the next attempt to an anisotropic source chart.
 Later phase requirements are not asserted as results. The concurrent HNP campaign continues.
 **Grades:** per claim; written derivations, finite symbolic witnesses and kernel-checked returns
 retain their separate scopes.
@@ -401,12 +404,26 @@ axial and angular coefficients. A separate periodic variation vanishes to order 
 but changes the pressure Hessian and quartic angular torque. This witnesses a distinction lost
 by the finite local velocity receiver; it is not the full core's pressure computation.
 
-[open] MFR3 next evaluates the complete exterior pressure and oriented momentum residual of
-this specified finite-core family, including the cutoff region, moving frame and unretained
-products. MFR4 owns quantitative residual and linear/nonlinear control. Further local corrections
-must respond to this global source calculation; requiring full radial convergence beforehand
-would move MFR4's work into MFR3. The stationary global exclusion and the complete surviving-family,
-stability and arithmetic-sign obligations remain standing.
+[proved-derived; formal-checked] The explicit radial cutoff and complete affine viscosity
+source now give a positive angular residual at sufficiently late normalized times for every
+smooth Cartesian pressure. Compactness constructs the critical circle; Rolle's theorem supplies
+its zero-pressure-torque angle. The first response may be nonaxisymmetric. Actual physical
+periodization and its changing normalized period preserve this local residual exactly.
+
+[established-bounded; computational-witness] The exact finite coefficients supply the positive
+seed inequality consumed by that theorem. The fixed compact radial completion is rejected as a
+vanishing-residual continuation. Its local existence and earlier finite coefficient equalities
+remain valid at their stated scopes.
+
+[definition] MFR3 next derives the anisotropic chart `A=diag(ell_r,ell_r,ell_z)`, with physical
+clock derivative `b` and velocity `U=b*A^(-1)*u`. Its pressure metric, viscosity tensor, divergence,
+energy and physical angular reconstruction must return before another leading profile/exterior
+is selected. A further scalar frame only composes the old scalar chart; it does not create a
+new physical source. Preserve actual leading time dependence and transported exterior currents.
+
+[open] The replacement surviving family, MFR4 quantitative residual/stability control and MFR5
+arithmetic sign remain unfinished. Requiring full radial convergence before this source-directed
+residual work would move MFR4's task into MFR3.
 
 ## 10. Return into the wider framework and verification
 

@@ -1,0 +1,75 @@
+{
+  "scale_relations": {
+    "radius": "2^(-6)",
+    "squared_radius": "r^2=2^(-12)",
+    "seed_lower_bound": "r^2",
+    "angular_gap": "1/2",
+    "residual_floor": "(alpha-beta)*r^2/2=2^(-14)",
+    "evaluated_residual_floor": "1/16384"
+  },
+  "scope": "Finite compact-cutoff source audit at inner radius; no maximum theorem or global residual bound",
+  "payload": {
+    "path": "/home/b/Workspaces/holonics/.local/mfr3-periodic-core/periodic_potential.json",
+    "sha256": "e58d08259631e43aa645b47f00f03ed8e4ccbae1272d0011c61b9206d75185ad",
+    "axis_a_times_g_rows_mu0_z0": 29,
+    "axis_first_coefficient": {
+      "(1, 0)": "-1/2"
+    },
+    "source_reconstruction_verified": true
+  },
+  "selectors": {
+    "X": [
+      "5625/2236",
+      "1366/543"
+    ],
+    "Y": [
+      "1679495189493",
+      "1691966325597"
+    ],
+    "s": "1/4096",
+    "r": "1/64",
+    "inner_cutoff_radius": "1/8",
+    "chi_inner_value": "1"
+  },
+  "axis_angular_momentum": {
+    "reconstruction": "J(s,0)=-2*partial_s(a*g) from payload a_times_g",
+    "interval_raw": [
+      "29821189924293984858747417098375101455903070723904122511055734538598089658485843138982067529802882289355771536764021481575094598285101537514848669955166755588696000894448656264491709395447392888657187892544882407829245463690639311021887768160171658882260108670373322020366362997746441546262265823077790038677772217025741775985322233213470443915285898840451211626038280934526164522330559083004264741508438767974983554584690850581433511332718508869426613557157572778911759313162438591204740521760683054622081181833608856462102862608750911180253375879327829198502855481911005725309326645051384378106059871975415319377208355775073983621054181624807496074634713358422960675085896991328435175512162472302143655296738218678977927459667660107541389931508521161885409705162861011420775791968724392867577720035210615265814635963043126531335520811035412119454784638831445711285365131877421520041260046764883449099151886100156585960893481514318114505004187156864785704641421310759/11869516042234304851820206621901523403848850874679693794565522395959940998938575671468109177130793588604062032552674652910293333055127561944561105150188044453232508841785458239544239505572410931453376247841709182289230658186111503233878879629048485575272219875489564687353566554830557467649085808328917728008804521080248444658669589488678920618758319239445046491057348111844535811196848303407974076788046579340334151268388509128190486741448262937677044413176397531912046909207514920146979137276106660072303674504150466459622247394712180692876549434090815976854587554249636855916195855790118706515216183176706758703845478370895529567313755293806177641218598735099094989175629801213962174873333047887360978528822218315230586533675604647730068039114157732396891772815303789717997180856386933563546805448281888676005199466627748848290836369225287000556769916580822826180581397538599549926629482052976640000000000000000000000000000000000000000000000000000000000000000000000",
+      "854087214076353608463091455562325977866054052221920547556866793377757842817201828177892461732438832690760484684737695235446120366681319238744298538152096172337547993000645589832627358111679012531199843038217928951864314418543151966995306142671273455598743184623037146686576525835333474347752934261205202393217910930423924511447835207655616970244448842378801593343839522554292350502325306264787054959804703926354306130128554882206205805939569407253007070950367429730473910674886804876914412386765079197888682442353189918552621832716537834144470291753570453207492367232232871786458577350328505453993617727537720407751959493726054188549676750210850511617663553802728629848400943510582386471698606533965615943519748893162099215664715125971355553214980849561484881331277664110021896632694572206452923735918597988787121561864498303561538973615782678031562646223201652331511602914114483554318096175625923648307337881936019658240545856886457376913678009179166969694148650388787/339946145457606809614285905429598265442951588433505901771304142040215498652841772837535072841643446824016276322127093880619849879488628853605585242960112470205993063237262464190261813463769694295246942199542628544938033368737281880525855818964553158081231073229567612331786769561460809486291036456467560835021961283608957142756433209081838576714652783374038455518895381312527205814235087535604070320777356144335966744890525410298175051517660348285649175627222115930851165469046414118758325137886283748111312421111810934729082843585203677241347706474835493799969786582883245864192828515585014274074531016641653669323456595085408798012905618927272693585668338849630617998765505448518971926774311448241145766275138487106864956862268468287198480273094554330863711271146714738669833316669571752858978642228110200232671934386444212717623677597425270111096439814658249819186632966337238797929342225403084800000000000000000000000000000000000000000000000000000000000000000000000"
+    ],
+    "readable_interval": [
+      "2",
+      "3"
+    ],
+    "J_greater_than_2": true,
+    "a_less_than_2": true,
+    "Omega_greater_than_1": true,
+    "L0_lower_bound": "1/4096",
+    "L0_greater_than_lower_bound": true
+  },
+  "cutoff_curl": {
+    "Vcut": "-2*z*h(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2) - chi(s + z**2)*Derivative(h(s, z), z)",
+    "Omegacut": "-2*chi(s + z**2)*Derivative(g(s, z), s) - 2*g(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2)",
+    "Wcut": "2*s*(chi(s + z**2)*Derivative(h(s, z), s) + h(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2)) + 2*chi(s + z**2)*h(s, z)",
+    "Lcut": "s*(-2*chi(s + z**2)*Derivative(g(s, z), s) - 2*g(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2))",
+    "cartesian_curl_verified": true
+  },
+  "angular_source_identity": {
+    "b0": "(2*s*(V0+1), W0+z)",
+    "b1": "(2*s*V1, W1)",
+    "C1": "2*s**2*V0(s, z)*Derivative(O1(s, z), s) - 4*s**2*Derivative(O0(s, z), (s, 2)) + 2*s**2*Derivative(O1(s, z), s) + s*z*Derivative(O1(s, z), z) + 2*s*O1(s, z)*V0(s, z) + 2*s*O1(s, z) + s*W0(s, z)*Derivative(O1(s, z), z) - 8*s*Derivative(O0(s, z), s) - s*Derivative(O0(s, z), (z, 2))",
+    "C2": "2*s**2*V1(s, z)*Derivative(O1(s, z), s) - 4*s**2*Derivative(O1(s, z), (s, 2)) + 2*s*O1(s, z)*V1(s, z) + s*W1(s, z)*Derivative(O1(s, z), z) - 8*s*Derivative(O1(s, z), s) - s*Derivative(O1(s, z), (z, 2))",
+    "criticality_defect": "2*mu*s**2*V1(s, z)*Derivative(O0(s, z), s) + 2*mu*s*O0(s, z)*V1(s, z) + mu*s*W1(s, z)*Derivative(O0(s, z), z) + 2*s**2*V0(s, z)*Derivative(O0(s, z), s) + 2*s**2*Derivative(O0(s, z), s) + s*z*Derivative(O0(s, z), z) + 2*s*O0(s, z)*V0(s, z) + 2*s*O0(s, z) + s*W0(s, z)*Derivative(O0(s, z), z)",
+    "pressure_free_mu0": "2*s**2*V0(s, z)*Derivative(O0(s, z), s) + 2*s**2*Derivative(O0(s, z), s) + s*z*Derivative(O0(s, z), z) + 2*s*O0(s, z)*V0(s, z) + 5*s*O0(s, z)/2 + s*W0(s, z)*Derivative(O0(s, z), z)",
+    "pressure_free_mu1": "2*s**2*V0(s, z)*Derivative(O1(s, z), s) + 2*s**2*V1(s, z)*Derivative(O0(s, z), s) - 4*s**2*Derivative(O0(s, z), (s, 2)) + 2*s**2*Derivative(O1(s, z), s) + s*z*Derivative(O1(s, z), z) + 2*s*O0(s, z)*V1(s, z) + 2*s*O1(s, z)*V0(s, z) + 2*s*O1(s, z) + s*W0(s, z)*Derivative(O1(s, z), z) + s*W1(s, z)*Derivative(O0(s, z), z) - 8*s*Derivative(O0(s, z), s) - s*Derivative(O0(s, z), (z, 2))",
+    "pressure_free_mu2": "2*s**2*V1(s, z)*Derivative(O1(s, z), s) - 4*s**2*Derivative(O1(s, z), (s, 2)) + 2*s*O1(s, z)*V1(s, z) + s*W1(s, z)*Derivative(O1(s, z), z) - 8*s*Derivative(O1(s, z), s) - s*Derivative(O1(s, z), (z, 2))",
+    "cutoff_h0g0_mu0": "-4*s**2*z*h0(s, z)*Derivative(-2*chi(s + z**2)*Derivative(g0(s, z), s) - 2*g0(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), s)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2) - 2*s**2*chi(s + z**2)*Derivative(-2*chi(s + z**2)*Derivative(g0(s, z), s) - 2*g0(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), s)*Derivative(h0(s, z), z) + 2*s**2*chi(s + z**2)*Derivative(-2*chi(s + z**2)*Derivative(g0(s, z), s) - 2*g0(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), z)*Derivative(h0(s, z), s) + 2*s**2*h0(s, z)*Derivative(-2*chi(s + z**2)*Derivative(g0(s, z), s) - 2*g0(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2) + 2*s**2*Derivative(-2*chi(s + z**2)*Derivative(g0(s, z), s) - 2*g0(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), s) + 8*s*z*chi(s + z**2)*h0(s, z)*Derivative(g0(s, z), s)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2) + 8*s*z*g0(s, z)*h0(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2)**2 + s*z*Derivative(-2*chi(s + z**2)*Derivative(g0(s, z), s) - 2*g0(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), z) + 4*s*chi(s + z**2)**2*Derivative(g0(s, z), s)*Derivative(h0(s, z), z) + 4*s*chi(s + z**2)*g0(s, z)*Derivative(h0(s, z), z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2) + 2*s*chi(s + z**2)*h0(s, z)*Derivative(-2*chi(s + z**2)*Derivative(g0(s, z), s) - 2*g0(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), z) - 5*s*chi(s + z**2)*Derivative(g0(s, z), s) - 5*s*g0(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2)",
+    "cutoff_h0g0_h1g1_mu1": "-4*s**2*z*h0(s, z)*Derivative(-2*chi(s + z**2)*Derivative(g1(s, z), s) - 2*g1(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), s)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2) - 4*s**2*z*h1(s, z)*Derivative(-2*chi(s + z**2)*Derivative(g0(s, z), s) - 2*g0(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), s)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2) - 2*s**2*chi(s + z**2)*Derivative(-2*chi(s + z**2)*Derivative(g0(s, z), s) - 2*g0(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), s)*Derivative(h1(s, z), z) + 2*s**2*chi(s + z**2)*Derivative(-2*chi(s + z**2)*Derivative(g0(s, z), s) - 2*g0(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), z)*Derivative(h1(s, z), s) - 2*s**2*chi(s + z**2)*Derivative(-2*chi(s + z**2)*Derivative(g1(s, z), s) - 2*g1(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), s)*Derivative(h0(s, z), z) + 2*s**2*chi(s + z**2)*Derivative(-2*chi(s + z**2)*Derivative(g1(s, z), s) - 2*g1(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), z)*Derivative(h0(s, z), s) + 2*s**2*h0(s, z)*Derivative(-2*chi(s + z**2)*Derivative(g1(s, z), s) - 2*g1(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2) + 2*s**2*h1(s, z)*Derivative(-2*chi(s + z**2)*Derivative(g0(s, z), s) - 2*g0(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2) - 4*s**2*Derivative(-2*chi(s + z**2)*Derivative(g0(s, z), s) - 2*g0(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), (s, 2)) + 2*s**2*Derivative(-2*chi(s + z**2)*Derivative(g1(s, z), s) - 2*g1(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), s) + 8*s*z*chi(s + z**2)*h0(s, z)*Derivative(g1(s, z), s)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2) + 8*s*z*chi(s + z**2)*h1(s, z)*Derivative(g0(s, z), s)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2) + 8*s*z*g0(s, z)*h1(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2)**2 + 8*s*z*g1(s, z)*h0(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2)**2 + s*z*Derivative(-2*chi(s + z**2)*Derivative(g1(s, z), s) - 2*g1(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), z) + 4*s*chi(s + z**2)**2*Derivative(g0(s, z), s)*Derivative(h1(s, z), z) + 4*s*chi(s + z**2)**2*Derivative(g1(s, z), s)*Derivative(h0(s, z), z) + 4*s*chi(s + z**2)*g0(s, z)*Derivative(h1(s, z), z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2) + 4*s*chi(s + z**2)*g1(s, z)*Derivative(h0(s, z), z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2) + 2*s*chi(s + z**2)*h0(s, z)*Derivative(-2*chi(s + z**2)*Derivative(g1(s, z), s) - 2*g1(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), z) + 2*s*chi(s + z**2)*h1(s, z)*Derivative(-2*chi(s + z**2)*Derivative(g0(s, z), s) - 2*g0(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), z) - 4*s*chi(s + z**2)*Derivative(g1(s, z), s) - 4*s*g1(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2) - 8*s*Derivative(-2*chi(s + z**2)*Derivative(g0(s, z), s) - 2*g0(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), s) - s*Derivative(-2*chi(s + z**2)*Derivative(g0(s, z), s) - 2*g0(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), (z, 2))",
+    "cutoff_h0g0_h1g1_mu2": "-4*s**2*z*h1(s, z)*Derivative(-2*chi(s + z**2)*Derivative(g1(s, z), s) - 2*g1(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), s)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2) - 2*s**2*chi(s + z**2)*Derivative(-2*chi(s + z**2)*Derivative(g1(s, z), s) - 2*g1(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), s)*Derivative(h1(s, z), z) + 2*s**2*chi(s + z**2)*Derivative(-2*chi(s + z**2)*Derivative(g1(s, z), s) - 2*g1(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), z)*Derivative(h1(s, z), s) + 2*s**2*h1(s, z)*Derivative(-2*chi(s + z**2)*Derivative(g1(s, z), s) - 2*g1(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2) - 4*s**2*Derivative(-2*chi(s + z**2)*Derivative(g1(s, z), s) - 2*g1(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), (s, 2)) + 8*s*z*chi(s + z**2)*h1(s, z)*Derivative(g1(s, z), s)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2) + 8*s*z*g1(s, z)*h1(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2)**2 + 4*s*chi(s + z**2)**2*Derivative(g1(s, z), s)*Derivative(h1(s, z), z) + 4*s*chi(s + z**2)*g1(s, z)*Derivative(h1(s, z), z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2) + 2*s*chi(s + z**2)*h1(s, z)*Derivative(-2*chi(s + z**2)*Derivative(g1(s, z), s) - 2*g1(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), z) - 8*s*Derivative(-2*chi(s + z**2)*Derivative(g1(s, z), s) - 2*g1(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), s) - s*Derivative(-2*chi(s + z**2)*Derivative(g1(s, z), s) - 2*g1(s, z)*Subs(Derivative(chi(_xi_1), _xi_1), _xi_1, s + z**2), (z, 2))",
+    "pressure_torque_retained": true,
+    "mu_prime": "-delta*mu with delta=1/2; delta*L0+mu*C1+mu^2*C2",
+    "full_source": "delta*L0+mu*C1+mu^2*C2+criticality_defect+arbitrary pressure torque"
+  },
+  "fourier_source_formula": "trace(Dv^2) is audited in derive_jet_flat_pressure.py; this audit retains the actual angular diffusion and pressure torque symbols",
+  "exit_status": 0
+}

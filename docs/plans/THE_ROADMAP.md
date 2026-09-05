@@ -94,12 +94,15 @@ and keeps the axis pressure separately. Its quadratic source remains explicit. T
 [periodic-source return](../../research/records/2026-09-05_MFR3_THE_LOCAL_CORE_HAS_A_PERIODIC_REALIZATION_AND_ITS_PRESSURE_RETAINS_EXTERIOR_TORQUE.md)
 now constructs a smooth periodic divergence-free realization of the finite core and its actual
 local lifespan. Arbitrary pressure torque is retained; an exact periodic variation shows that
-vanishing finite velocity jets do not fix the pressure Hessian or torque. Next evaluate the
-complete exterior pressure and momentum residual of that specified family, including its cutoff
-and moving frame. MFR4 supplies quantitative linear/nonlinear control. Full convergence is not
-a prerequisite imposed on MFR3 before that residual/stability work begins. A globally sublinear
-stationary axisymmetric completion remains excluded at the current rates.
-Residual/stability and arithmetic-sign investigations follow their actual returns.
+vanishing finite velocity jets do not fix the pressure Hessian or torque. The
+[compact-cutoff return](../../research/records/2026-09-05_MFR3_THE_COMPACT_RADIAL_CUTOFF_RETURNS_A_PRESSURE_INDEPENDENT_RESIDUAL_OBSTRUCTION.md)
+now gives a pressure-independent positive angular residual: the explicit fixed radial
+cutoff with an affine vanishing-viscosity response cannot supply a vanishing-residual continuation.
+Its physical periodization, changing normalized period and complete angular residual are retained.
+MFR3 next derives an anisotropic two-length chart with its pressure metric, viscosity tensor,
+energy and angular reconstruction before selecting a replacement leading profile/exterior.
+MFR4 owns quantitative residual and linear/nonlinear control; full convergence is not a prior
+condition imposed on MFR3. The stationary exclusions and MFR5 arithmetic-sign obligation remain.
 HNP construction continues independently.
 
 [project-postulate] Holonics is the mathematical framework and ontology of which HNA is an
