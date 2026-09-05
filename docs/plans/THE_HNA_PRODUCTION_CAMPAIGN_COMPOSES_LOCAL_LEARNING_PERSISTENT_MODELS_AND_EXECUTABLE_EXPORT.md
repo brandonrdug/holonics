@@ -1,6 +1,6 @@
 # HNA production: local learning, persistent models and executable export
 
-**Date:** 2026-09-04. **Status:** ACTIVE; HNP0 and corrected HNP1 returned, HNP2 next.
+**Date:** 2026-09-04. **Status:** ACTIVE; HNP0/HNP1 returned, HNP2 locality/reuse in progress.
 **Authority:** Brandon's formal planning request and subsequent instruction to complete HNP0--HNP7.
 **Order:** [THE_ROADMAP.md](THE_ROADMAP.md). **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 **Starting implementation:** `c12b2634`. Phase names below identify dependencies, not capabilities.
@@ -260,6 +260,10 @@ phase also returns the composition on actual native model material, not only a f
 
 ### HNP2 — Resident locality, reusable factors and honest cost
 
+[established-bounded; measured] The compact resident restriction and actual-model decoder
+comparison returned in the [HNP2 storage record](../../research/records/2026-09-04_HNP2_THE_RESTRICTED_ROWS_STAY_COMPACT_ON_DEVICE_AND_THE_DECODER_PRESERVES_DEVELOPMENT.md).
+It does not close this phase: dependency-driven execution, reuse and reopening below remain owed.
+
 **Depends on:** HNP1.
 
 [definition] Replace unconditional graph replay where the new law admits incremental execution.
@@ -415,6 +419,6 @@ closes an investigation only as an obstruction; it cannot be marked as delivery 
 usable model, export or family adapter. New work resumes from the exact missing relation, not a
 restart of orientation or a rebranding of an earlier rejected mechanism.
 
-[definition] The present planning pass returns this integrated contract and its authoritative
-roadmap/position links. It starts no GPU training campaign, rewrites no runtime and claims no new
-implementation grade. The next construction artifact is HNP0's concrete constitutive binding.
+[historical] The original planning pass deposited this contract without starting construction.
+Brandon subsequently activated completion; the actual current position is recorded above and in
+`CONSTRUCTION_STATE.md`, not in the original planning-only boundary.

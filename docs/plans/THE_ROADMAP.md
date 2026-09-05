@@ -22,7 +22,7 @@ contracts and records preserve their completed scope; their old imperatives sche
 
 ## Current campaign: production HNA
 
-**Next construction:** HNP2 — resident locality and reusable factors.
+**Current construction:** HNP2 — dependency locality/reuse after compact resident restriction.
 
 [definition] Brandon's subsequent September 4 request authorizes the formal, holistic design of
 [the production-HNA campaign](THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md).
@@ -32,8 +32,10 @@ numerical controls; the [record](../../research/records/2026-09-04_HNP0_JOINED_S
 states its scope. HNP1 subsequently returned the observed joined-passage integration and actual
 native-model development/attribution in its
 [completion record](../../research/records/2026-09-04_HNP1_THE_ACTUAL_JOINED_PASSAGE_RETURNS_LOCAL_DEVELOPMENT_AND_THE_DELTA_SURVIVES_ATTRIBUTION.md).
-It uses the joining output, not the archived equalization target. Dense residence and complete
-forward execution remain HNP2 obligations; no persistence or useful-model result is inferred.
+It uses the joining output, not the archived equalization target. HNP2's
+[compact residence return](../../research/records/2026-09-04_HNP2_THE_RESTRICTED_ROWS_STAY_COMPACT_ON_DEVICE_AND_THE_DECODER_PRESERVES_DEVELOPMENT.md)
+preserves the observed development under its decoder; dependency-driven execution, reuse and
+reopening remain HNP2 obligations. No persistence or useful-model result is inferred.
 The ordered work is concrete local-current/presentation/development binding; general material
 contact; resident locality and reusable factors; persistent models and sessions; multi-cycle
 production; useful consumer-model evaluation; executable export; and additional model families.

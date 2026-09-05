@@ -848,7 +848,21 @@ impl NativeCoefficientIntake for NativeRestrictedIntake<'_> {
             .cross_sections
             .get(ordinal)
             .ok_or(NativeOperatorResidenceError::Witness)?;
-        Ok((section.rows * section.dim * 2) as u64)
+        section.rows.checked_mul(section.dim).and_then(|words| words.checked_mul(2))
+            .map(|octets| octets as u64).ok_or(NativeOperatorResidenceError::Extent)
+    }
+
+    fn retained_rows(&self, ordinal: usize) -> Result<Option<Vec<u32>>, NativeOperatorResidenceError> {
+        let section = self.restricted.cross_sections.get(ordinal)
+            .ok_or(NativeOperatorResidenceError::Witness)?;
+        let rows = self.selected_rows(section);
+        Ok((rows.len() != section.rows).then_some(rows))
+    }
+
+    fn deliver_retained(&mut self, ordinal: usize,
+        sink: &mut dyn FnMut(usize, &[u8]) -> Result<(), NativeOperatorResidenceError>,
+    ) -> Result<(), NativeOperatorResidenceError> {
+        self.deliver_chart(ordinal, true, sink)
     }
 
     fn deliver(
@@ -856,27 +870,47 @@ impl NativeCoefficientIntake for NativeRestrictedIntake<'_> {
         ordinal: usize,
         sink: &mut dyn FnMut(usize, &[u8]) -> Result<(), NativeOperatorResidenceError>,
     ) -> Result<(), NativeOperatorResidenceError> {
+        self.deliver_chart(ordinal, false, sink)
+    }
+}
+
+impl NativeRestrictedIntake<'_> {
+    fn selected_rows(&self, section: &NativeRestrictedCrossSection) -> Vec<u32> {
+        match self.class {
+            Some(class) => self.restricted.class_rows(class, section).into_iter().collect(),
+            None => section.retained_rows.clone(),
+        }
+    }
+
+    fn deliver_chart(&self, ordinal: usize, packed: bool,
+        sink: &mut dyn FnMut(usize, &[u8]) -> Result<(), NativeOperatorResidenceError>,
+    ) -> Result<(), NativeOperatorResidenceError> {
         let section = self
             .restricted
             .cross_sections
             .get(ordinal)
             .ok_or(NativeOperatorResidenceError::Witness)?;
-        let rows: BTreeSet<u32> = match self.class {
-            Some(class) => self.restricted.class_rows(class, section),
-            None => section.retained_rows.iter().copied().collect(),
-        };
-        let row_octets = section.dim * 2;
+        let rows = self.selected_rows(section);
+        let row_octets = section.dim.checked_mul(2).ok_or(NativeOperatorResidenceError::Extent)?;
+        let expanded_octets = section.rows.checked_mul(row_octets).ok_or(NativeOperatorResidenceError::Extent)?;
+        if section.retained_rows.windows(2).any(|pair| pair[0] >= pair[1])
+            || section.retained_rows.last().is_some_and(|row| *row as usize >= section.rows)
+            || section.retained_rows.len().checked_mul(section.dim) != Some(section.words.len())
+            || rows.iter().any(|row| section.retained_rows.binary_search(row).is_err()) {
+            return Err(NativeOperatorResidenceError::Witness);
+        }
         const CHUNK_OCTETS: usize = 64 << 20;
-        let mut chunk: Vec<u8> = Vec::with_capacity(CHUNK_OCTETS.min(section.rows * row_octets));
+        let mut chunk: Vec<u8> = Vec::with_capacity(CHUNK_OCTETS.min(expanded_octets));
         let mut chunk_offset = 0usize;
         let mut position = 0usize;
-        for row in 0..section.rows as u32 {
-            if rows.contains(&row) {
+        let delivered_rows = if packed { rows.len() } else { section.rows };
+        for at in 0..delivered_rows {
+            let row = if packed { rows[at] } else { u32::try_from(at).map_err(|_| NativeOperatorResidenceError::Extent)? };
+            if packed || rows.binary_search(&row).is_ok() {
                 match section.retained_rows.binary_search(&row) {
                     Ok(index) => {
-                        for word in &section.words[index * section.dim..(index + 1) * section.dim] {
-                            chunk.extend_from_slice(&word.to_le_bytes());
-                        }
+                        let words = &section.words[index * section.dim..(index + 1) * section.dim];
+                        append_coefficient_octets(&mut chunk, words);
                     }
                     Err(_) => return Err(NativeOperatorResidenceError::Witness),
                 }
@@ -895,6 +929,19 @@ impl NativeCoefficientIntake for NativeRestrictedIntake<'_> {
         }
         Ok(())
     }
+}
+
+/// Exterior exact codeword encoding, with a bounded byte view rather than per-word allocation.
+fn append_coefficient_octets(chunk: &mut Vec<u8>, words: &[u16]) {
+    #[cfg(target_endian = "little")]
+    {
+        // SAFETY: u16 has no padding and every byte is initialized. The read-only byte slice
+        // covers exactly this borrow, has alignment one, and is consumed before it ends.
+        let bytes = unsafe { std::slice::from_raw_parts(words.as_ptr().cast::<u8>(), std::mem::size_of_val(words)) };
+        chunk.extend_from_slice(bytes);
+    }
+    #[cfg(target_endian = "big")]
+    for word in words { chunk.extend_from_slice(&word.to_le_bytes()); }
 }
 
 #[cfg(test)]
@@ -997,5 +1044,32 @@ mod tests {
             delivered[0].1,
             vec![0, 0, 0, 0, 0x80, 0x3f, 0x00, 0x40, 0, 0, 0, 0, 0x40, 0x40, 0x80, 0x40]
         );
+        assert_eq!(intake.retained_rows(0).unwrap(), Some(vec![1, 3]));
+        let mut compact = Vec::new();
+        intake.deliver_retained(0, &mut |offset, bytes| {
+            assert_eq!(offset, compact.len());
+            compact.extend_from_slice(bytes);
+            Ok(())
+        }).unwrap();
+        assert_eq!(compact, [delivered[0].1[4..8].to_vec(), delivered[0].1[12..16].to_vec()].concat());
+        assert_eq!(compact.len(), 8, "omitted rows consume no intake codewords");
+
+        let mut restricted = restricted;
+        restricted.cross_sections[0].retained_rows.clear();
+        restricted.cross_sections[0].words.clear();
+        let mut empty = restricted.intake(None).unwrap();
+        assert_eq!(empty.retained_rows(0).unwrap(), Some(vec![]));
+        empty.deliver_retained(0, &mut |_, _| panic!("empty physical population has no bytes")).unwrap();
+        restricted.cross_sections[0].retained_rows = vec![1];
+        assert!(restricted.intake(None).unwrap().deliver_retained(0, &mut |_, _| Ok(())).is_err(),
+            "missing codewords refuse rather than panic or synthesize values");
+    }
+
+    #[test]
+    fn compact_encoding_preserves_all_codewords_including_negative_zero() {
+        let words: Vec<u16> = (0..=u16::MAX).collect();
+        let mut bytes = Vec::new();
+        append_coefficient_octets(&mut bytes, &words);
+        assert_eq!(bytes, words.iter().flat_map(|word| word.to_le_bytes()).collect::<Vec<_>>());
     }
 }

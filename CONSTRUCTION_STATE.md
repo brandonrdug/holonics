@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** 2026-09-04. **Next construction:** HNP2 — resident locality and reusable factors.
+**Currency:** 2026-09-04. **Current construction:** HNP2 — locality/reuse after compact residence.
 
 This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md) orders work;
 completed history stays in its existing records and Git. Brandon's latest direct instruction
@@ -25,11 +25,18 @@ moving out the actual factors recovered baseline conduct, and restoration recove
 conduct exactly. The zero-partner discriminator and source-role/unary-path controls passed.
 See the [HNP1 completion record](research/records/2026-09-04_HNP1_THE_ACTUAL_JOINED_PASSAGE_RETURNS_LOCAL_DEVELOPMENT_AND_THE_DELTA_SURVIVES_ATTRIBUTION.md).
 
-[definition] The earlier partner-as-target policy remains archived and is not reinstated by
-this result. The full dense coefficient residence and complete forward graph are still used.
-HNP2 must now realize locality, reusable current and condensed storage with their complete
-successor/decoder obligations. Persistence and useful output remain later phases. The existing
-CLI prefix convenience path is unchanged; the new chart is on the native session owner.
+[established-bounded; measured] HNP2's compact resident restriction returned: the actual SKE
+comparison matched all seven terminal results and three deposit-return sequences under expanded
+and compact layouts. Accounted coefficient/pool/chronology residency fell from 15,752,729,188 to
+11,146,807,908 bytes, with decoder costs recorded separately. CUDA/CPU controls and the formal
+decoder/umbrella builds passed. The [record](research/records/2026-09-04_HNP2_THE_RESTRICTED_ROWS_STAY_COMPACT_ON_DEVICE_AND_THE_DECODER_PRESERVES_DEVELOPMENT.md)
+keeps this storage result distinct from phase completion.
+
+[open] HNP2 still owes dependency-derived participation, reusable consequences and stale-state
+reopening with complete-successor/locality controls. `enter_cycle` still clears transient standing;
+`advance_cycle` still runs the complete forward graph. Persistence and useful output remain later
+phases. The earlier partner-as-target policy remains archived. The CLI prefix convenience path
+is unchanged; observed-passage development remains on the native session owner.
 
 [definition] The plan then orders general material contact, resident locality/reuse, persistent
 sessions, multi-cycle output, a useful consumer-model milestone, executable export and supported
