@@ -1,0 +1,52 @@
+{
+  "grade": "established-bounded",
+  "evidence": [
+    "computational-witness"
+  ],
+  "scope": "Exact arbitrary second spatial/first time jet under a symbolic anisotropic sheared frame; no PDE solution or stability claim",
+  "sympy_version": "1.14.0",
+  "frame": {
+    "A": "Matrix([[r, shear, 0], [0, r, 0], [0, 0, z]])",
+    "B": "Matrix([[1/r, -shear/r**2, 0], [0, 1/r, 0], [0, 0, 1/z]])",
+    "pressure_metric_C": "Matrix([[r**(-2) + shear**2/r**4, -shear/r**3, 0], [-shear/r**3, r**(-2), 0], [0, 0, z**(-2)]])",
+    "energy_metric_G": "Matrix([[r**2, r*shear, 0], [r*shear, r**2 + shear**2, 0], [0, 0, z**2]])"
+  },
+  "source": {
+    "physical": "u_t+Du[u]+grad(p)-nu*Laplacian(u)-f",
+    "chart": "U_tau+DU[U-D*y-B*c_dot]+(D-b_dot/b*I)U+C*grad(P)-nu*b*L_B(U)-b^2*B*f",
+    "relations": "U=b*B*u; P=b^2*p; x=c+A*y; t'=b; D=B*A_dot; C=B*B^T",
+    "complete_residual_identity": "R_chart=b^2*B*R_physical"
+  },
+  "checks": {
+    "inverse_derivative": true,
+    "spatial_derivative": true,
+    "divergence": true,
+    "pressure_metric": true,
+    "weighted_second_derivative": true,
+    "complete_source": true,
+    "ordinary_pressure_gradient_control_fails": true,
+    "ordinary_laplacian_control_fails": true,
+    "kinetic_metric": true,
+    "jacobian": true,
+    "relative_angular_reconstruction": true,
+    "angular_viscosity_reciprocity": true,
+    "actual_angular_factor_derivative": true
+  },
+  "radial_clock_regime": {
+    "clock_rate": "r^2/k",
+    "fixed_angular_reconstruction": "k",
+    "aspect": "epsilon=(r/z)^2",
+    "diffusion": "(nu/k)*(horizontalSecond+epsilon*axialSecond)",
+    "reduced_pressure_metric": "diag(1,1,epsilon)",
+    "energy_weights": "k^2*z and k^2*z^3/r^2",
+    "operator_and_energy_checks": true
+  },
+  "diagonal_specialization": {
+    "shear": "0",
+    "jacobian": "r^2*z",
+    "angular_reconstruction": "r^2/b",
+    "radial_viscosity": "nu*b/r^2",
+    "axial_viscosity": "nu*b/z^2",
+    "physical_energy_density": "abs(det A)/b^2 * U^T*(A^T*A)*U"
+  }
+}

@@ -35,7 +35,10 @@ retains arbitrary pressure torque in the circulation law. An exact periodic pres
 separates fields with the same finite local velocity jets. The
 [compact-cutoff return](../../research/records/2026-09-05_MFR3_THE_COMPACT_RADIAL_CUTOFF_RETURNS_A_PRESSURE_INDEPENDENT_RESIDUAL_OBSTRUCTION.md)
 then derives a pressure-independent positive residual for the explicit radial completion and its
-affine viscosity response, changing the next attempt to an anisotropic source chart.
+affine viscosity response, changing the next attempt to an anisotropic source chart. The
+[anisotropic-source return](../../research/records/2026-09-05_MFR3_THE_ANISOTROPIC_FRAME_RETURNS_ITS_PRESSURE_METRIC_AND_RADIAL_VISCOUS_CLOCK.md)
+constructs that actual source and its radial viscous clock, retaining the pressure metric,
+tensor diffusion, energy law and physical reconstruction.
 Later phase requirements are not asserted as results. The concurrent HNP campaign continues.
 **Grades:** per claim; written derivations, finite symbolic witnesses and kernel-checked returns
 retain their separate scopes.
@@ -415,11 +418,21 @@ seed inequality consumed by that theorem. The fixed compact radial completion is
 vanishing-residual continuation. Its local existence and earlier finite coefficient equalities
 remain valid at their stated scopes.
 
-[definition] MFR3 next derives the anisotropic chart `A=diag(ell_r,ell_r,ell_z)`, with physical
-clock derivative `b` and velocity `U=b*A^(-1)*u`. Its pressure metric, viscosity tensor, divergence,
-energy and physical angular reconstruction must return before another leading profile/exterior
-is selected. A further scalar frame only composes the old scalar chart; it does not create a
-new physical source. Preserve actual leading time dependence and transported exterior currents.
+[proved-derived; formal-checked] The anisotropic chart `A=diag(r,r,z)`, with clock derivative
+`b` and velocity `U=b*A^(-1)*u`, now returns its actual physical momentum equation. Pressure and
+viscosity use `A^(-1)*(A^(-1))^*`; inverse/grid derivatives, divergence, periods, complete spatial
+fibres, transported-cell energy and its source dissipation law are retained. Scalar specialization
+recovers MFR1's velocity and the corresponding pressure metric normalization.
+
+[proved-derived; formal-checked] The coupled clock `b=r^2/K` keeps physical angular reconstruction
+at `K` and radial viscosity at `nu/K`. Axial viscosity and reduced axial pressure share the aspect
+factor `(r/z)^2`. These are source identities, without an asserted leading profile or stability.
+
+[definition] MFR3 next derives the pressure component with zero horizontal frequency from the
+actual periodic source, including its moving horizontal cell and axial period. Its possible axial
+force must remain in an aspect-ratio limit. Only then select the replacement leading profile and
+exterior, retaining radial diffusion and actual source/strain coupling. A further scalar frame
+only composes the old scalar chart; it does not create a new physical source.
 
 [open] The replacement surviving family, MFR4 quantitative residual/stability control and MFR5
 arithmetic sign remain unfinished. Requiring full radial convergence before this source-directed

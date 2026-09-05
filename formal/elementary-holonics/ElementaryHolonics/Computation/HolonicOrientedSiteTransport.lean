@@ -714,16 +714,18 @@ that leg.
 
 def unitLegDeposit (eta transported partner : ℚ) : ℚ :=
   deposit (bipartiteFrame eta)
-    (bipartiteMatrix (fun _ _ ↦ transported))
-    (bipartiteSource (fun _ : Fin 1 ↦ 1))
-    (bipartiteArrival (fun _ : Fin 1 ↦ transported + partner)) (Sum.inl 0) (Sum.inr 0)
+    (bipartiteMatrix (OutputSite := Fin 1) (InputSite := Fin 1)
+      (fun _ : Fin 1 => fun _ : Fin 1 => transported))
+    (bipartiteSource (InputSite := Fin 1) (fun _ : Fin 1 ↦ 1))
+    (bipartiteArrival (OutputSite := Fin 1) (fun _ : Fin 1 ↦ transported + partner))
+      (Sum.inl 0) (Sum.inr 0)
 
 theorem unitLegDeposit_eq (eta transported partner : ℚ) :
     unitLegDeposit eta transported partner = eta * partner := by
   unfold unitLegDeposit
-  rw [rectangular_deposit]
-  norm_num [Matrix.one_apply]
-  ring
+  norm_num [deposit, current, difference, conduct, pairCurrent, sourceCovector,
+    bipartiteFrame, bipartiteMatrix, bipartiteSource, bipartiteArrival,
+    Matrix.vecMulVec, Fintype.sum_sum_type]
 
 def pairedFeedbackStep (eta a b : ℚ) : ℚ × ℚ :=
   (a + unitLegDeposit eta a b, b + unitLegDeposit eta b a)
@@ -749,13 +751,15 @@ def pairedFeedbackSum (eta a b : ℚ) : ℕ → ℚ
 theorem pairedFeedbackSum_succ (eta a b : ℚ) (n : ℕ) :
     pairedFeedbackSum eta a b (n + 1) =
       (1 + eta) * pairedFeedbackSum eta a b n := by
-  unfold pairedFeedbackSum pairedFeedbackState
-  rw [pairedFeedbackStep_sum]
+  simpa only [pairedFeedbackSum, pairedFeedbackState] using
+    (pairedFeedbackStep_sum eta
+      (pairedFeedbackState eta a b n).1
+      (pairedFeedbackState eta a b n).2)
 
 theorem pairedFeedbackSum_eq_pow (eta a b : ℚ) (n : ℕ) :
     pairedFeedbackSum eta a b n = (1 + eta) ^ n * (a + b) := by
   induction n with
-  | zero => simp [pairedFeedbackSum]
+  | zero => norm_num [pairedFeedbackSum, pairedFeedbackState]
   | succ n ih =>
       rw [pairedFeedbackSum_succ, ih, pow_succ]
       ring

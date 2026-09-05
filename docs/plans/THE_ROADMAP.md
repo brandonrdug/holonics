@@ -99,8 +99,12 @@ vanishing finite velocity jets do not fix the pressure Hessian or torque. The
 now gives a pressure-independent positive angular residual: the explicit fixed radial
 cutoff with an affine vanishing-viscosity response cannot supply a vanishing-residual continuation.
 Its physical periodization, changing normalized period and complete angular residual are retained.
-MFR3 next derives an anisotropic two-length chart with its pressure metric, viscosity tensor,
-energy and angular reconstruction before selecting a replacement leading profile/exterior.
+The [anisotropic-source return](../../research/records/2026-09-05_MFR3_THE_ANISOTROPIC_FRAME_RETURNS_ITS_PRESSURE_METRIC_AND_RADIAL_VISCOUS_CLOCK.md)
+now constructs that broader source chart, including the actual momentum equation, pressure metric,
+tensor diffusion, moving-cell energy law, periods and angular reconstruction. Choosing `b=r^2/K`
+retains radial diffusion and couples the axial pressure/diffusion through `(r/z)^2`.
+MFR3 next derives the zero-horizontal-frequency pressure component from the actual periodic
+source and transported cell, before choosing a replacement leading profile and exterior.
 MFR4 owns quantitative residual and linear/nonlinear control; full convergence is not a prior
 condition imposed on MFR3. The stationary exclusions and MFR5 arithmetic-sign obligation remain.
 HNP construction continues independently.

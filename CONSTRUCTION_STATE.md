@@ -212,9 +212,20 @@ continuation is rejected; its initial-data and local-existence construction rema
 [established-bounded; process-audit] The final parameterized-radius endpoint, exact symbolic
 audit and 9,898-job Lean umbrella passed at the scopes in the compact-cutoff record.
 
-[open] MFR3 next derives an anisotropic two-length chart, retaining pressure metric, viscosity
-tensor, energy and physical angular reconstruction before selecting a replacement leading profile
-and exterior. MFR4's quantitative stability and MFR5's arithmetic sign remain open.
+[proved-derived; formal-checked] The [anisotropic-source return](research/records/2026-09-05_MFR3_THE_ANISOTROPIC_FRAME_RETURNS_ITS_PRESSURE_METRIC_AND_RADIAL_VISCOUS_CLOCK.md)
+now derives the complete moving linear/diagonal physical PDE, pressure metric, tensor diffusion,
+transported-cell energy and its source dissipation law, exact periods and angular reconstruction.
+The radial clock `b=r^2/K` retains radial viscosity while axial diffusion and reduced pressure
+share the aspect factor `(r/z)^2`; the physical angular reconstruction factor stays `K`.
+
+[established-bounded; process-audit] Focused source checks and an independent exact-jet audit
+passed. The isolated 9,904-job umbrella passed after repairing a committed HNP proof elaboration
+defect, preserving its statements and native behavior. The record states the checked snapshot.
+
+[open] MFR3 next derives the zero-horizontal-frequency pressure component from the actual
+periodic source and transported cell before selecting a replacement leading profile/exterior.
+A small axial coefficient does not itself remove the axial pressure force. MFR4's quantitative
+stability and MFR5's arithmetic sign remain open.
 
 ## RH line
 
