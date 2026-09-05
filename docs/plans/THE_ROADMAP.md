@@ -78,9 +78,13 @@ repairs the mode-14 row while preserving lower jets. The
 [analytic and circulation return](../../research/records/2026-09-05_MFR3_THE_ANALYTIC_INVERSE_RETAINS_ITS_RESONANCE_AND_THE_CIRCULATION_DEMANDS_AN_EXTERIOR.md)
 constructs the scalar analytic inverse and actual axial homogeneous carrier, proves a positive
 mode-28 sensitivity, and derives the circulation threshold for a compact complete past.
-Continue with the full next forcing and nonlinear radial bounds, preserving every free
-coefficient. Construct the actual exterior/time transport required by that circulation;
-a globally sublinear stationary axisymmetric completion is excluded at the current rates.
+The [second-resonance and moving-source return](../../research/records/2026-09-05_MFR3_THE_SECOND_RESONANCE_CLOSES_AND_THE_MOVING_SWIRL_RETURNS_ITS_VISCOUS_SOURCE.md)
+now constructs the full finite forcing and positive axial repair through mode 28, retaining the
+next angular fibre. The actual moving Cartesian source includes viscosity and physical
+reconstruction; two leading axis receivers require a shape current beyond amplitude variation.
+Continue with that time-dependent axis/radial construction and coupled pressure, then its actual
+nonlinear bounds and exterior/time transport. A globally sublinear stationary axisymmetric
+completion remains excluded at the current rates.
 Residual/stability and arithmetic-sign investigations follow their actual returns.
 HNP construction continues independently.
 

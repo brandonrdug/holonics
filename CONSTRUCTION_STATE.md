@@ -127,37 +127,30 @@ the [physical coherent source and local moving flux](research/records/2026-09-04
 and the [algebraic axis and first radial pressure correction](research/records/2026-09-05_MFR3_THE_AXIS_RETURNS_ITS_RADIAL_PRESSURE_JET_AND_THE_UNPAID_SWIRL_REMAINDER.md).
 Their focused and umbrella checks returned at the scopes stated in those records.
 
-[proved-derived; formal-checked] The
-[resonance return](research/records/2026-09-05_MFR3_THE_RESONANT_ROW_RETURNS_A_COMPATIBILITY_POLYNOMIAL_AND_TWO_AXIS_REPAIRS.md)
-now derives the actual dilation transport, its resonant source-jet condition and free homogeneous
-fibre, an interior positive root of the explicit compatibility polynomial, and a smooth positive
-axis perturbation preserving the lower jets and relative tail.
+[proved-derived; formal-checked] The earlier
+[resonance](research/records/2026-09-05_MFR3_THE_RESONANT_ROW_RETURNS_A_COMPATIBILITY_POLYNOMIAL_AND_TWO_AXIS_REPAIRS.md)
+and [analytic/circulation](research/records/2026-09-05_MFR3_THE_ANALYTIC_INVERSE_RETAINS_ITS_RESONANCE_AND_THE_CIRCULATION_DEMANDS_AN_EXTERIOR.md)
+returns supply the amplitude root, analytic inverse, free homogeneous carriers and the
+compact-past circulation threshold at their recorded scopes.
 
-[established-bounded; computational-witness] Exact reflection-symmetric radial rows find a
-degree-14 compatibility polynomial in squared swirl strength. Its unique positive root closes
-the retained rows through mode 15; pressure determines the prior free swirl coefficient while
-the next axial coefficient remains free. An independent 30th-axis-coefficient repair closes
-the retained rows through mode 14. These are finite Taylor returns.
+[established-bounded; computational-witness] The
+[second-resonance and moving-source return](research/records/2026-09-05_MFR3_THE_SECOND_RESONANCE_CLOSES_AND_THE_MOVING_SWIRL_RETURNS_ITS_VISCOUS_SOURCE.md)
+now reconstructs every retained Euler row through mode 28. Its full forcing determines a positive
+axial coefficient; all selected residual numerators vanish modulo the first compatibility
+polynomial. The next angular coefficient remains free.
 
-[proved-derived; formal-checked] The
-[analytic and circulation return](research/records/2026-09-05_MFR3_THE_ANALYTIC_INVERSE_RETAINS_ITS_RESONANCE_AND_THE_CIRCULATION_DEMANDS_AN_EXTERIOR.md)
-constructs a radius-preserving scalar analytic inverse with its real fluid carrier, the actual
-mode-15 axial homogeneous variation, and a positive next-sensitivity polynomial on the amplitude
-bracket. Actual circulation now retains its incoming finite history and an explicit source
-threshold for a compact complete past.
+[proved-derived; formal-checked] The exact second forcing has a checked negative sign and
+positive repair. Actual time-dependent circulation now includes the Cartesian vector Laplacian,
+its retained axis derivative and MFR1's physical source/reconstruction. Two leading viscous axis
+receivers reject amplitude-only modulation and return a separate shape current.
 
-[established-bounded; computational-witness] The complete linearized mode-28 swirl row is
-`R(X)z^4`, with `R>0` throughout the selected amplitude bracket. Thus the retained axial
-coefficient can repair the next affine row once its full constant forcing is returned.
+[established-bounded; process-audit] Focused checks and the 9,884-job Lean umbrella returned.
+The final exact recurrence and forcing/coefficient certificate comparisons agree.
 
-[established-bounded; process-audit] Focused Lean checks and the 9,879-job umbrella returned.
-The new sensitivity receipt and all fourteen formal coefficients agree exactly.
-
-[open] MFR3 remains in progress. Return the
-full mode-28 forcing, nonlinear radial bounds and a lawful exterior carrying circulation and
-time current. A globally sublinear stationary axisymmetric completion with this swirl is
-excluded by the stated backward-history argument. Viscosity, stability and the arithmetic sign
-remain open.
+[open] MFR3 remains in progress. Construct
+the time-dependent axis/radial shape and coupled pressure using that current, retaining the
+next angular fibre. Nonlinear bounds, radial convergence, exterior transport, stability and
+the arithmetic sign remain open. The stationary global exclusion remains standing.
 
 ## RH line
 

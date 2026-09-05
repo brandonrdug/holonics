@@ -23,6 +23,9 @@ the first resonant row. The amplitude branch retains a free axial coefficient af
 The [analytic and circulation return](../../research/records/2026-09-05_MFR3_THE_ANALYTIC_INVERSE_RETAINS_ITS_RESONANCE_AND_THE_CIRCULATION_DEMANDS_AN_EXTERIOR.md)
 then constructs its analytic inverse and homogeneous carrier, certifies a positive next
 sensitivity, and derives the circulation condition that the actual exterior must respect.
+The [second-resonance and moving-source return](../../research/records/2026-09-05_MFR3_THE_SECOND_RESONANCE_CLOSES_AND_THE_MOVING_SWIRL_RETURNS_ITS_VISCOUS_SOURCE.md)
+closes the full retained Euler rows through mode 28 and derives the actual viscous circulation
+source, physical reconstruction and a necessary leading shape current.
 Later phase requirements are not asserted as results. The concurrent HNP campaign continues.
 **Grades:** per claim; written derivations, finite symbolic witnesses and kernel-checked returns
 retain their separate scopes.
@@ -357,14 +360,25 @@ threshold for a compact complete past.
 [established-bounded; computational-witness] Linearizing the actual source in the retained
 axial coefficient gives the complete next swirl residual `R(X)z^4`, with all other retained
 linearized rows zero. Its positive slope makes that coefficient effective at the next affine
-row. The full constant forcing of that row has not yet returned.
+row. This sensitivity supplies the divisor used in the full repair below.
 
-[open] MFR3 remains in progress. Return that constant forcing and the nonlinear source bounds
-needed for radial convergence, keeping subsequent compatibility conditions and free fibres.
-Construct the actual periodic exterior and profile time current that carry the circulation:
-a globally sublinear stationary axisymmetric completion with the current nonzero swirl is
-excluded by the stated backward-history argument. Viscosity and stability remain part of the
-surviving-family construction. The complete return is unfinished.
+[established-bounded; computational-witness] The full constant forcing has now returned.
+An exact polynomial construction with `J=XG` and the surviving axial parameter closes every
+retained pressure/swirl row through mode 28 after the two compatibility selections. Its first
+polynomial and next sensitivity match the independent earlier returns, and the next angular
+coefficient remains free.
+
+[proved-derived; formal-checked] The second forcing is negative on the certified interval
+and admits a positive axial repair. The joint moving source and actual Cartesian Laplacian
+return the viscous angular-momentum law, which MFR1 binds to the physical solution and its
+length/normalizer reconstruction. The zero-axis diffusion value retains a derivative source.
+Two leading viscous axis equations force a separate shape current beyond amplitude modulation.
+
+[open] MFR3 remains in progress. Construct the time-dependent axis/radial shape and its
+coupled pressure using that source current, with every subsequent compatibility condition and
+free fibre retained. Establish the nonlinear bounds, radial convergence and actual exterior
+transport of that family. The stationary global exclusion remains standing; the complete
+surviving-family and stability returns are unfinished.
 
 ## 10. Return into the wider framework and verification
 
