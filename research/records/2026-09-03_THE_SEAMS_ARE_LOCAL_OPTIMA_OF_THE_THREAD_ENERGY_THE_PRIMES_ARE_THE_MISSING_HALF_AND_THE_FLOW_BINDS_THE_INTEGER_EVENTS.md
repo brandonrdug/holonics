@@ -111,12 +111,20 @@ worldlines braiding"*), and it governs §7 below.
 
 ### 2.2 Navier--Stokes is the heat deformation, and it moves the vortices along the threads
 
-[proved-standard] The backward heat flow is viscosity on the Fourier side. Its zero dynamics is
-the gradient flow of the Coulomb energy `−Σ_{j<k} log|z_j − z_k|`; the Euler point-vortex dynamics
-is the Hamiltonian flow of the same energy (Kirchhoff). On the seam, where all zeros are real, the
-thread sum `S_j = Σ_{k≠j} 1/(z_j − z_k)` is real; the heat velocity is `2 S_j` along the seam and
+[proved-derived] The standard deformation obeys `∂_t H = −∂_z² H`. Its logarithmic field
+`U=H'/H` obeys `∂_t U=−∂_z²U−2U∂_zU` away from zeros. On a real simple zero comb the zero
+motion is a Coulomb descent, with normalization fixed by the thread sum. On the seam, where all
+zeros are real, the thread sum `S_j = Σ_{k≠j} 1/(z_j − z_k)` is real; the heat velocity is `2 S_j` along the seam and
 the vortex velocity is `i S_j / 2π` across it. The two receivers read one thread population,
 turned by a quarter and scaled. The `J` in §2.1 is that quarter turn.
+
+[counterexample] Corrected 2026-09-04: the earlier paragraph extended ordinary Euclidean Coulomb
+descent to the whole complex configuration. There its gradient uses conjugated denominators,
+while the heat-zero motion uses `1/(z_j-z_k)`. For `H_t(z)=z²+1−2t`, the imaginary roots move
+toward each other for `t<1/2`, opposite to planar repulsive descent. The real-comb identity does
+not supply a positive energy law off the seam. The
+[MFR strategy](../../docs/plans/THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md)
+retains the exact complex equation and its reconstruction boundary.
 
 [interpretation] So the threads between seams are one object under two receivers: the vortex
 velocity of the holomorphic field, and the drift under the viscous deformation. Brandon's

@@ -2,9 +2,12 @@
 
 ## Current navigation
 
-Use the [HNA architecture](../docs/ARCHITECTURE.md), [Soulkiller](../docs/SOULKILLER.md),
-[Athena](../docs/ATHENA.md) and [interoperability](../docs/INTEROPERABILITY.md) guides for the
-current machine-learning framework. Dated evidence remains in `records/`, with conceptual
+Use the [mathematical framework and architecture](../docs/ARCHITECTURE.md),
+[mathematics tablet](../docs/canon/THE_MATHEMATICS_TABLET.md), and
+[moving-frame/RH strategy](../docs/plans/THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md)
+for the current research direction. The [Soulkiller](../docs/SOULKILLER.md),
+[Athena](../docs/ATHENA.md) and [interoperability](../docs/INTEROPERABILITY.md) guides describe the
+current HNA application's executable scope. Dated evidence remains in `records/`, with conceptual
 navigation in Provenance. [The owner map](../docs/ARCHITECTURE_MAP.md)
 connects executable and formal source. Experiments, papers and notebooks now live alongside
 these records under `experiments/`, `papers/` and `notebook/`.

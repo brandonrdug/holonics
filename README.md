@@ -1,9 +1,15 @@
 # Holonics
 
-[project-postulate] **Holonics is a machine-learning framework for Holonic Neural Networks
-(HNA), built in Rust with resident CUDA execution and mathematical foundations in Lean.**
-The objective is frontier-level usefulness on consumer hardware through efficient, continuous
-learning and reusable local structure—the project's “20W ideology”.
+[project-postulate] **Holonics is a mathematical framework and ontology for situated objects,
+causal composition, information transport and physical realization.** Its central mathematical
+object is the holon: an addressed occurrence population with source and target ports, a receiver,
+and the full fibre behind its returned face. The framework develops reusable ways to construct,
+explain and compute with mathematical, physical, biological and learning systems.
+
+[definition] **HNA** is the Holonic Neural Network architecture within Holonics, implemented in
+Rust with resident CUDA execution. Its product objective is frontier-level usefulness on consumer
+hardware through efficient, continuous learning and reusable local structure—the project's
+“20W ideology”. Lean carries formal mathematical constructions across the framework.
 
 **Athena** is a native model/ecology. **Eros** forms and refines it through recurrent operation.
 **Soulkiller** dismantles supported pretrained realizations into reusable native material.
@@ -11,7 +17,9 @@ Training, inference, model persistence and export belong to one explicit framewo
 
 ## Start here
 
-- [Architecture and the consumer-hardware objective](docs/ARCHITECTURE.md)
+- [Mathematical framework and executable architectures](docs/ARCHITECTURE.md)
+- [The mathematics tablet](docs/canon/THE_MATHEMATICS_TABLET.md)
+- [Moving frames, singularities and the RH research strategy](docs/plans/THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md)
 - [Soulkiller: intake, excitation, dismantling and model-family support](docs/SOULKILLER.md)
 - [Athena/HNA: training, inference, requests and artifact scopes](docs/ATHENA.md)
 - [Interoperability: Safetensors, ONNX and executable model recompilation](docs/INTEROPERABILITY.md)

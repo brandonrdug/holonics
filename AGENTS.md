@@ -11,11 +11,13 @@ Brandon asks for analysis only. Resolve contradictory agent prose from his lates
 and its chronological context. Correct the live clause and consumers together; do not return a
 catalogue of minor decisions or ask him to repeat a settled ruling.
 
-[project-postulate] Holonics is both mathematical foundation and executable machine-learning
-architecture. HNA names the Holonic Neural Network architecture; Athena is a model/ecology;
-Eros composes and develops it; Soulkiller independently dismantles inherited realizations.
-The goal is frontier-level usefulness on consumer hardware. The “20W ideology” directs efficient
-local learning and reuse, not a literal current-machine power claim. Read
+[project-postulate] Holonics is a mathematical framework and ontology for situated objects,
+causal composition, information transport and physical realization. Its mathematical research
+develops reusable methods of construction and explanation across mathematical, physical,
+biological and learning systems. HNA is its Holonic Neural Network architecture; Athena is a
+model/ecology; Eros composes and develops it; Soulkiller independently dismantles inherited
+realizations. HNA's product goal is frontier-level usefulness on consumer hardware. The “20W
+ideology” directs efficient local learning and reuse, not a literal current-machine power claim. Read
 [the architecture](docs/ARCHITECTURE.md), [Soulkiller](docs/SOULKILLER.md),
 [Athena](docs/ATHENA.md) and [interoperability](docs/INTEROPERABILITY.md) before reassessing
 those subjects.

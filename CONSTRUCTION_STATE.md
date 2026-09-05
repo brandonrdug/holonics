@@ -25,13 +25,14 @@ return into one continuing session on model material; a raw numeric helper is no
 [definition] The plan then orders general material contact, resident locality/reuse, persistent
 sessions, multi-cycle output, a useful consumer-model milestone, executable export and supported
 SSM/diffusion-family extensions. This is not a token-volume programme or a conventional trainer
-wrapped around the bounded prefix pathway. The RH line remains unchanged and unscheduled.
+wrapped around the bounded prefix pathway. The mathematical research strategy is recorded below.
 
 ## Framework and organization
 
-[project-postulate] Holonics is a machine-learning framework and its mathematical foundation.
-HNA names the Holonic Neural Network architecture. Soulkiller independently dismantles inherited
-realizations; Eros composes/refines Athena through one native recurrence. The objective is
+[project-postulate] Holonics is a mathematical framework and ontology for causal composition,
+information transport and physical realization, with executable architectures and applications.
+HNA names its Holonic Neural Network architecture. Soulkiller independently dismantles inherited
+realizations; Eros composes/refines Athena through one native recurrence. HNA's product objective is
 frontier-level usefulness on consumer hardware; the 20W ideology is an efficiency direction,
 not a current twenty-watt power measurement.
 
@@ -80,6 +81,15 @@ adjoints, staged deposits, redundant storage, conflicting observations and the c
 receiver. Its [record and native receipts](research/records/2026-09-04_THE_AUDIT_REPAIRS_THE_RECURRENT_ADJOINT_AND_RECONCILES_THE_OPERATING_CONTRACT.md)
 remain standing. That earlier release suite is now retired, not a current obligation.
 
+## Mathematical research: moving frames and continuation
+
+[definition] Brandon's September 4 instruction authorizes the
+[MFR strategy](docs/plans/THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md):
+chart-relative null fibres, physical finite-time continuation and the RH arithmetic source.
+MFR0's design and source/derivation review are complete. MFR1's proposed first construction is the source-bound fluid rescaling
+and physical-clock theorem; MFR2's folded RH source expansion can proceed independently.
+No new Lean proof phase or numerical singularity construction is claimed by the design.
+
 ## RH line
 
 [proved-derived; formal-checked] FT, RT and DB are complete at their recorded scopes.
@@ -92,7 +102,8 @@ remain standing. That earlier release suite is now retired, not a current obliga
 actual xi function; RT5 establishes unbounded heights, not bounded gaps.
 
 [open] `Λ_DN ≤ 0`, equivalently RH, remains the missing inequality. The Copson–de Bruijn
-coefficient is distinct. No new RH proof campaign follows from repository reorganization.
+coefficient is distinct. The subsequent MFR strategy studies the missing source relation;
+the completed FT/RT/DB theorem scopes remain unchanged.
 
 ## Verification and handoff
 

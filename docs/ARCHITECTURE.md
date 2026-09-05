@@ -1,15 +1,31 @@
-# Holonics as a machine-learning framework
+# Holonics: mathematical framework and executable architectures
 
-[project-postulate] The product objective is frontier-level usefulness from a Holonic Neural
-Network running on consumer hardware. The mathematical work supplies the construction laws,
-proof obligations and instruments used to build that machine. It is not a separate justification
-for postponing usable learning, inference and model interoperability.
+[project-postulate] Holonics is a mathematical framework and ontology for situated objects,
+causal composition, information transport and physical realization. Its research develops
+methods for constructing and explaining mathematical, physical, biological and learning
+systems. The Millennium lines investigate those methods through exact source problems;
+their purpose includes reusable explanation and computational application.
+
+[definition] The elementary [holon](../formal/elementary-holonics/ElementaryHolonics/Foundation/Holon.lean)
+retains an occurrence population, oriented source and target ports, and a receiver. Its preimage
+fibre preserves the occurrences behind a returned face; composition retains the joining
+population; a rebase carries the complete diagram. The
+[causal-natural extension](../formal/elementary-holonics/ElementaryHolonics/Foundation/CausalNaturalHolon.lean)
+transports that construction through parameter changes.
+
+[project-postulate] HNA is an executable architecture within this framework. Its product
+objective is frontier-level usefulness on consumer hardware. Mathematical research and HNA
+construction have their own explicit returns and can inform each other. The current
+[moving-frame strategy](plans/THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md)
+joins null fibres, physical continuation and the RH source without making the neural product
+the limit of the mathematics. The [mathematics tablet](canon/THE_MATHEMATICS_TABLET.md) supplies
+the broader doctrine; the remainder of this guide describes the current executable architecture.
 
 ## Names and responsibilities
 
 | Name | Responsibility | Current source |
 |---|---|---|
-| **Holonics** | The framework and public Rust entry point | [holonics](../crates/holonics/src/lib.rs) |
+| **Holonics** | The mathematical framework and ontology, with executable applications | [Holon](../formal/elementary-holonics/ElementaryHolonics/Foundation/Holon.lean), [mathematics](canon/THE_MATHEMATICS_TABLET.md), [public Rust entry point](../crates/holonics/src/lib.rs) |
 | **HNA** | The Holonic Neural Network architecture and recurrent runtime | [HNA application API](../crates/holonics-hna/src/hna.rs), [native session](../crates/holonic-engine/src/holonic_intelligence/full_operation.rs) |
 | **Athena** | A particular native model/ecology, its changing morphology and admitted capability domain | [Athena lifecycle](ATHENA.md) |
 | **Eros** | Composition and developmental recurrence that form/refine Athena | [recurrent return](../crates/holonic-engine/src/holonic_intelligence/operative_return.rs), [adjoint](../crates/holonic-engine/src/holonic_intelligence/operative_backward.rs) |

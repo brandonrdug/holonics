@@ -42,6 +42,23 @@ formal/runtime scope, falsifiers and completion conditions are in that plan. The
 operator and Soulkiller returns retain their bounded grades. The comparison with conventional ML
 is about learning organization, not token volume as an alleged sole or primary industry lever.
 
+## Mathematical research strategy: moving frames and continuation
+
+[definition] Brandon's subsequent September 4 request directs the
+[MFR strategy](THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md), connecting
+chart-relative null fibres, Tao's ansatz/residual/stability method, physical information and the
+RH source. MFR0's design and source/derivation review are complete. The first proposed construction is
+MFR1: the actual fluid rescaling, transported domain and physical-clock/endpoint theorem.
+MFR2's all-time folded RH source and remainder have independent owners. These precede the
+source-specific ansatz/stability and arithmetic-sign investigations described in that strategy.
+HNP construction continues independently. No proposed mathematical phase is marked implemented.
+
+[project-postulate] Holonics is the mathematical framework and ontology of which HNA is an
+executable architecture. A research route may return a derivation, a counterexample or a precise
+remaining relation; targeting a Millennium problem is not a promise of a proof. Its constructive
+content determines the next attempt rather than forcing a choice between known theorems and
+parking the problem.
+
 ## Completed consolidation and correction
 
 [historical] Brandon's latest 2026-09-04 request authorized
@@ -116,8 +133,9 @@ in [the corrected Eros instantiation](../../archive/plans/THE_EROS_INSTANTIATION
 
 ## RH line: FT, RT and DB complete
 
-**RH line position:** DB complete. The remaining research inequality is `Λ_DN ≤ 0`, equivalent
-to RH. No new RH proof campaign is scheduled.
+**RH line position:** DB complete; MFR research strategy above deposited. The remaining research
+inequality is `Λ_DN ≤ 0`, equivalent to RH. MFR2 proposes the folded source/remainder construction
+needed to investigate that sign; it does not report the inequality as proved.
 
 [proved-derived; formal-checked] The formal endpoints are:
 `0 ≤ Λ_DN ≤ 1/8`, `seamTimes = Ici Λ_DN`, and
