@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** 2026-09-04. **Current construction:** HNP1 — in progress.
+**Currency:** 2026-09-04. **Next construction:** HNP2 — resident locality and reusable factors.
 
 This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md) orders work;
 completed history stays in its existing records and Git. Brandon's latest direct instruction
@@ -17,20 +17,19 @@ difference, diagonal-admittance current, factorized return, successor/reindexing
 laws. The [HNP0 record](research/records/2026-09-04_HNP0_JOINED_SECTIONS_RETURN_LOCAL_CONSTITUTIVE_CURRENT_WITH_SUCCESSOR_AND_REBASE_LAWS.md)
 states the source/application contract and exact limitations.
 
-[established-bounded; measured] The corresponding internal resident passage passed both new CUDA
-controls; the live Lean umbrella built 3,775 jobs. HNP1's attempted Add-equalization policy ran
-three non-prefix occurrences on the corrected SKE body with changed conduct and exact attribution,
-but was withdrawn before admission: Add does not supply a desired comparison target. Its source
-and receipt are archived. The valid numerical return, rectangular binding, dyadic factorization
-and codeword I/O improvements remain; HNP1 is not passed.
+[established-bounded; measured] HNP1 returned the corrected observed-passage binding on the actual
+SKE body: the joining OUTPUT supplies the target, so `(transported + partner) - transported`
+is the actual effect, not an equalization setpoint. Three non-prefix occurrences used 127 native
+contacts each; factor extents advanced 0 → 1778 → 3556 → 5334. A later complete receiver changed;
+moving out the actual factors recovered baseline conduct, and restoration recovered cultivated
+conduct exactly. The zero-partner discriminator and source-role/unary-path controls passed.
+See the [HNP1 completion record](research/records/2026-09-04_HNP1_THE_ACTUAL_JOINED_PASSAGE_RETURNS_LOCAL_DEVELOPMENT_AND_THE_DELTA_SURVIVES_ATTRIBUTION.md).
 
-[definition] The next native integration uses the actual output of the joining operation as the
-target section: `(transported + partner) - transported = partner`. This proved observed-passage
-effect needs no desired setpoint; a zero partner is its discriminating matched control. Return
-that effect through the existing local reaction word using the retained ownership/staging mechanics,
-not the archived partner-as-target binding. `FamilyDistillationChart.returnedDifference` supplies
-the separate source/candidate correspondence case, not a universal supervision requirement. See the
-[HNP1 record](research/records/2026-09-04_HNP1_ADDITIVE_EQUALIZATION_CHANGED_CONDUCT_BUT_DID_NOT_FOUND_A_LEARNING_COMPARISON.md).
+[definition] The earlier partner-as-target policy remains archived and is not reinstated by
+this result. The full dense coefficient residence and complete forward graph are still used.
+HNP2 must now realize locality, reusable current and condensed storage with their complete
+successor/decoder obligations. Persistence and useful output remain later phases. The existing
+CLI prefix convenience path is unchanged; the new chart is on the native session owner.
 
 [definition] The plan then orders general material contact, resident locality/reuse, persistent
 sessions, multi-cycle output, a useful consumer-model milestone, executable export and supported

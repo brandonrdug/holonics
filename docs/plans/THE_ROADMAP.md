@@ -22,15 +22,18 @@ contracts and records preserve their completed scope; their old imperatives sche
 
 ## Current campaign: production HNA
 
-**Next construction:** HNP1 — owned non-prefix contact and local development.
+**Next construction:** HNP2 — resident locality and reusable factors.
 
 [definition] Brandon's subsequent September 4 request authorizes the formal, holistic design of
 [the production-HNA campaign](THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md).
 The plan is deposited and Brandon has subsequently instructed completion of the whole campaign.
 HNP0 returned its concrete finite binding, formal laws, application contract and two resident
 numerical controls; the [record](../../research/records/2026-09-04_HNP0_JOINED_SECTIONS_RETURN_LOCAL_CONSTITUTIVE_CURRENT_WITH_SUCCESSOR_AND_REBASE_LAWS.md)
-states its scope. The numerical helper has no production caller yet; that admission/integration
-and actual native-model development are HNP1, not a capability inferred from the HNP0 tests.
+states its scope. HNP1 subsequently returned the observed joined-passage integration and actual
+native-model development/attribution in its
+[completion record](../../research/records/2026-09-04_HNP1_THE_ACTUAL_JOINED_PASSAGE_RETURNS_LOCAL_DEVELOPMENT_AND_THE_DELTA_SURVIVES_ATTRIBUTION.md).
+It uses the joining output, not the archived equalization target. Dense residence and complete
+forward execution remain HNP2 obligations; no persistence or useful-model result is inferred.
 The ordered work is concrete local-current/presentation/development binding; general material
 contact; resident locality and reusable factors; persistent models and sessions; multi-cycle
 production; useful consumer-model evaluation; executable export; and additional model families.

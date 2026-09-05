@@ -1,6 +1,6 @@
 # HNA production: local learning, persistent models and executable export
 
-**Date:** 2026-09-04. **Status:** ACTIVE; HNP0 returned, HNP1 next.
+**Date:** 2026-09-04. **Status:** ACTIVE; HNP0 and corrected HNP1 returned, HNP2 next.
 **Authority:** Brandon's formal planning request and subsequent instruction to complete HNP0--HNP7.
 **Order:** [THE_ROADMAP.md](THE_ROADMAP.md). **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 **Starting implementation:** `c12b2634`. Phase names below identify dependencies, not capabilities.
@@ -229,6 +229,11 @@ relation is named and derived here before HNP1; it is not hidden behind the word
 This phase does not pass on restating `OperationStep` or rebuilding its existing proofs alone.
 
 ### HNP1 — General material contact and productive local development
+
+[established-bounded; measured] The corrected observed-passage family returned on native model
+material with zero-partner discrimination, repeated local development and exact attribution.
+See the [completion record](../../research/records/2026-09-04_HNP1_THE_ACTUAL_JOINED_PASSAGE_RETURNS_LOCAL_DEVELOPMENT_AND_THE_DELTA_SURVIVES_ATTRIBUTION.md).
+This is not a general useful-model or locality-compiler grade.
 
 [counterexample; source-inspected] The first automatic Add-equalization attempt was withdrawn
 before admission: topology and the Add derivative do not supply a desired observation target.

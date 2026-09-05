@@ -42,7 +42,14 @@ with later-query, reindexing, successor and site-extension laws.
 `holonic_intelligence/operative_return.rs::enact_section_contact`, verified on CUDA at the
 bounded point-section scope in the
 [HNP0 record](../research/records/2026-09-04_HNP0_JOINED_SECTIONS_RETURN_LOCAL_CONSTITUTIVE_CURRENT_WITH_SUCCESSOR_AND_REBASE_LAWS.md).
-Live session admission and general non-prefix development remain HNP1, not a grade of this helper.
+That numerical helper alone does not grade a live learning interface.
+
+[established-bounded; measured] HNP1's `holonic_intelligence/operative_passage_return.rs` derives
+the actual Contract/unary-word/joined-output roles and extends `NativeFullOperatorSession` with
+observed-passage local return, staged factors and ownership-preserving attribution. Its
+[native-material result](../research/records/2026-09-04_HNP1_THE_ACTUAL_JOINED_PASSAGE_RETURNS_LOCAL_DEVELOPMENT_AND_THE_DELTA_SURVIVES_ATTRIBUTION.md)
+uses the joining OUTPUT as target. The earlier partner-as-target policy is still withdrawn;
+general locality and condensed resident storage remain HNP2.
 
 | Relation | Lean owner | Rust owner | CUDA owner | Status and exact open fibre |
 |---|---|---|---|---|

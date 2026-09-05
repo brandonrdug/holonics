@@ -24,6 +24,7 @@ use super::{
     NativeOperationPrimitive, NativeOperatorNode, NativeOperatorResidence,
     NativeOperatorResidenceError, NativeReturnAperture, NativeTensorOrdinal,
     operative_backward::{NativeAdjointReturnTrace, ReturnDeed},
+    operative_passage_return::{PassageCultivation, NativePassageReturn},
     operative_intervention::DissectionStanding,
     operative_return::{OverlayAtom, ReturnMaterial, continuation_next_occurrences, enact_return},
     operative_scalars::projected_scale,
@@ -143,6 +144,7 @@ pub struct NativeFullOperatorSession<'residence, 'chart> {
     pub(super) overlay: BTreeMap<NativeTensorOrdinal, Vec<OverlayAtom<'chart>>>,
     /// The declared return apertures; `None` enacts no return.
     pub(super) aperture: Option<NativeReturnAperture>,
+    pub(super) passage_cultivation: Option<PassageCultivation<'chart>>,
     /// The dissection standing: the excitation's supports and face, when founded for dissection.
     pub(super) dissection: Option<DissectionStanding>,
     /// Whether the terminal's successor projection is fused; a receiver that declares the
@@ -165,6 +167,7 @@ pub struct NativeFullTerminalBranch<'residence, 'chart> {
 pub struct NativeFullCycle<'residence, 'chart> {
     pub final_emission: NativeFullOperationEmission,
     pub traces: Vec<NativeFullOperationTrace>,
+    pub passage_returns: Vec<NativePassageReturn>,
     pub successor: NativeFullOperatorSession<'residence, 'chart>,
 }
 
@@ -242,6 +245,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             previous_context: None,
             overlay: BTreeMap::new(),
             aperture,
+            passage_cultivation: None,
             dissection: None,
             terminal_seal: true,
         })
@@ -436,6 +440,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
             for (outcome, operation) in outcomes.into_iter().zip(run) {
                 let bound_octaves = outcome.carrier.bound_octaves;
                 self.carriers.insert(outcome.output, outcome.carrier);
+                self.return_joined_passage(operation.ordinal)?;
                 steps.push(RunStep {
                     operation: operation.clone(),
                     admitted_octaves: outcome.admitted_octaves,
@@ -453,8 +458,13 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
                     .iter()
                     .position(|candidate| candidate.ordinal == operation.ordinal)
                     .ok_or(NativeFullOperationError::Operation)?;
-                for input in &operation.inputs {
+                let mut consumed = operation.inputs.clone();
+                if let Some(cultivation) = &self.passage_cultivation {
+                    consumed.extend(cultivation.released_sources_at(operation.ordinal));
+                }
+                for input in &consumed {
                     if *input != operation.output
+                        && !self.passage_cultivation.as_ref().is_some_and(|c| c.retains_source_after(*input, operation.ordinal))
                         && !self.ecology.operations[absolute + 1..]
                             .iter()
                             .any(|later| later.inputs.contains(input))
@@ -504,6 +514,9 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         mut self,
         occurrence: NativeFullOperationOccurrence,
     ) -> Result<NativeFullOperationStep<'residence, 'chart>, NativeFullOperationError> {
+        if self.passage_cultivation.is_some() {
+            return Err(NativeFullOperationError::Contact("this chart advances complete cycles, not exposed primitive steps"));
+        }
         if occurrence.ordinal != self.generation {
             return Err(NativeFullOperationError::Occurrence);
         }
@@ -605,6 +618,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
         Ok(NativeFullCycle {
             final_emission,
             traces,
+            passage_returns: terminal.successor.publish_passage_returns(),
             successor: terminal.successor,
         })
     }
@@ -654,6 +668,8 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
 
 #[derive(Debug, Error)]
 pub enum NativeFullOperationError {
+    #[error("native contact: {0}")]
+    Contact(&'static str),
     #[error("operator ecology: {0}")]
     Ecology(#[from] super::NativeFullOperatorError),
     #[error("operator residence: {0}")]

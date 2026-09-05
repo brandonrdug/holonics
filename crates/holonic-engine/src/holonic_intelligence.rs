@@ -20,6 +20,8 @@ mod foreign_multimodal;
 mod foreign_onnx;
 #[path = "holonic_intelligence/full_operation.rs"]
 mod full_operation;
+#[path = "holonic_intelligence/operative_passage_return.rs"]
+mod operative_passage_return;
 #[path = "holonic_intelligence/lifecycle.rs"]
 mod lifecycle;
 #[path = "holonic_intelligence/material_ingress.rs"]
@@ -71,6 +73,7 @@ pub use foreign_json::*;
 pub use foreign_multimodal::*;
 pub use foreign_onnx::*;
 pub use full_operation::*;
+pub use operative_passage_return::*;
 pub use lifecycle::*;
 pub use material_ingress::*;
 pub use operative_atlas::*;

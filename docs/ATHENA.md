@@ -19,11 +19,20 @@ the morphology where the declared local return law applies. These are uses of on
 not separate forward and world-verdict engines. A receiver result or a loss scalar is testimony;
 the native operation owns its current, reaction and successor.
 
-[established-bounded; source-inspected] The current full-operator return compares a continuing
+[established-bounded; source-inspected] The earlier full-operator prefix return compares a continuing
 occurrence with the previous emission, propagates its differential through the retained forward
 morphology and stages factorized deposits. Previously retained overlays participate in the
 adjoint. New atoms join after the return succeeds. Three-cycle/two-return CUDA execution and
 exact local pullback controls stand at the [September 4 repair scope](../research/records/2026-09-04_THE_AUDIT_REPAIRS_THE_RECURRENT_ADJOINT_AND_RECONCILES_THE_OPERATING_CONTRACT.md).
+
+[established-bounded; measured] The native session now also exposes
+`NativeFullOperatorSession::found_with_passage_return`: ordinary non-prefix material operates
+the same body, and actual joined-output changes return through their retained local reactions.
+New factors publish when the cycle closes. Three native-model occurrences, the zero-partner
+discriminator and exact withdrawal/restoration returned in
+[HNP1](../research/records/2026-09-04_HNP1_THE_ACTUAL_JOINED_PASSAGE_RETURNS_LOCAL_DEVELOPMENT_AND_THE_DELTA_SURVIVES_ATTRIBUTION.md).
+The CLI commands below still expose their earlier prefix chart; persistent public sessions and
+general production delivery are HNP3/HNP4, not implied by this low-level addition.
 
 ## Commands
 

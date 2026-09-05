@@ -13,6 +13,12 @@ were archived before phase admission. The numerical return and formal local laws
 an already-admitted comparison. See
 [the HNP1 record](../research/records/2026-09-04_HNP1_ADDITIVE_EQUALIZATION_CHANGED_CONDUCT_BUT_DID_NOT_FOUND_A_LEARNING_COMPARISON.md).
 
+[established-bounded; measured] The later HNP1 binding uses the joining operation's actual OUTPUT,
+not its partner as a desired target. Its zero-partner control distinguishes the two policies;
+the corrected native-material development and attribution
+[returned](../research/records/2026-09-04_HNP1_THE_ACTUAL_JOINED_PASSAGE_RETURNS_LOCAL_DEVELOPMENT_AND_THE_DELTA_SURVIVES_ATTRIBUTION.md).
+The old retraction must not be read as withdrawing that different, explicitly grounded passage.
+
 [historical; source-inspected] Each entry below was returned, graded, and then narrowed or
 withdrawn by the repository's own audit. Re-proposing a retracted mechanism without citing its
 retraction is a contamination. Dates are record dates under `research/records/`.
