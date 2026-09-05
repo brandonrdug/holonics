@@ -95,9 +95,13 @@ remain standing. That earlier release suite is now retired, not a current obliga
 [definition] Brandon's September 4 instruction authorizes the
 [MFR strategy](docs/plans/THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md):
 chart-relative null fibres, physical finite-time continuation and the RH arithmetic source.
-MFR0's design and source/derivation review are complete. MFR1's proposed first construction is the source-bound fluid rescaling
-and physical-clock theorem; MFR2's folded RH source expansion can proceed independently.
-No new Lean proof phase or numerical singularity construction is claimed by the design.
+Brandon has subsequently activated this plan as the standing mathematical goal. MFR0's design
+and source/derivation review are complete. MFR1 returned the varying scalar fluid chart, moving
+centre, actual momentum/pressure/domain transport, finite clocks and sufficient physical endpoint
+criteria. The [MFR1 record](research/records/2026-09-04_MFR1_THE_MOVING_FLUID_CHART_RETURNS_ITS_PDE_AND_ITS_PHYSICAL_ENDPOINT.md)
+states the exact hypotheses; the focused endpoint and live umbrella builds passed (9,847 jobs
+for the umbrella). MFR2's folded RH source and remainder are now in progress. No singularity
+profile, stability estimate or arithmetic-sign conclusion is claimed by MFR1.
 
 ## RH line
 

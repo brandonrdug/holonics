@@ -47,11 +47,14 @@ is about learning organization, not token volume as an alleged sole or primary i
 [definition] Brandon's subsequent September 4 request directs the
 [MFR strategy](THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md), connecting
 chart-relative null fibres, Tao's ansatz/residual/stability method, physical information and the
-RH source. MFR0's design and source/derivation review are complete. The first proposed construction is
-MFR1: the actual fluid rescaling, transported domain and physical-clock/endpoint theorem.
-MFR2's all-time folded RH source and remainder have independent owners. These precede the
+RH source. Brandon has subsequently activated this plan as the standing mathematical goal.
+MFR0's design and source/derivation review are complete. MFR1 returned its varying scalar chart,
+moving centre, actual fluid/domain transport and physical-clock/endpoint theorems; the
+[MFR1 record](../../research/records/2026-09-04_MFR1_THE_MOVING_FLUID_CHART_RETURNS_ITS_PDE_AND_ITS_PHYSICAL_ENDPOINT.md)
+contains the focused and umbrella checks. MFR2's all-time folded RH source and remainder are
+now in progress. These precede the
 source-specific ansatz/stability and arithmetic-sign investigations described in that strategy.
-HNP construction continues independently. No proposed mathematical phase is marked implemented.
+HNP construction continues independently. MFR3--MFR5 remain the later research phases.
 
 [project-postulate] Holonics is the mathematical framework and ontology of which HNA is an
 executable architecture. A research route may return a derivation, a counterexample or a precise

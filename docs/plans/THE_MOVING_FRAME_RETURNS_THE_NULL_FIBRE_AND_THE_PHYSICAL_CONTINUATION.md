@@ -2,10 +2,13 @@
 
 **Founded:** Brandon's 2026-09-04 request to combine Tao's singularity strategy, chart-relative
 nullity, the RH line and the mathematical purpose of Holonics into a research strategy.
-**Position:** MFR0 strategy deposited; MFR1 is the first proposed construction.
+**Position:** MFR0 strategy deposited; Brandon subsequently activated this plan as the standing
+mathematical goal. MFR1's scalar moving-frame/endpoint return is complete; MFR2 is in progress.
 **Authority:** [the roadmap](THE_ROADMAP.md) alone orders construction;
-[the position](../../CONSTRUCTION_STATE.md) records completed work. This design does not report
-its proposed Lean or numerical work as implemented. The concurrent HNP campaign continues.
+[the position](../../CONSTRUCTION_STATE.md) records completed work. The
+[MFR1 record](../../research/records/2026-09-04_MFR1_THE_MOVING_FLUID_CHART_RETURNS_ITS_PDE_AND_ITS_PHYSICAL_ENDPOINT.md)
+states the returned scope; later phase requirements are not asserted as results. The concurrent
+HNP campaign continues.
 **Grades:** per claim; new analytic calculations below are written derivations, not new Lean receipts.
 
 ## 1. Purpose and the latest ruling
@@ -214,8 +217,13 @@ fluid build is claimed by this design.
 | Compatible extension preserving the prior open solution | `Millennium/NavierStokesOpenLifespan.lean`; `CompatibleOpenPeriodicExtension`, `CanExtendCompatibly`, `IsMaximal`; later fields agree on the prior lifespan, with pressure compared modulo its time-dependent gauge |
 | Conditional regularity route | `Millennium/NavierStokesEleventhMomentCompactBound.lean`; `officialProblem_of_coherenceDefectOnly` consumes the unproved universal `CoherenceDefectOnly` bound |
 
-[open] The absent joined return is a source-bound dynamic rescaling and physical-clock theorem,
-followed by an actual residual/stability construction or an actual terminal continuation bound.
+[proved-derived; formal-checked] MFR1 now supplies the source-bound dynamic scalar rescaling and
+physical-clock/endpoint theorem through `NavierStokesRescalingSpace`,
+`NavierStokesDynamicRescaling`, `NavierStokesRescalingClock` and
+`NavierStokesRescalingEndpoint`. Its full source equation, transported domain and sufficient
+continuation obstruction are stated in the linked record.
+
+[open] An actual residual/stability construction or actual terminal continuation bound remains.
 The existing scalar-transport product rule does not construct its assumed integrating scalar.
 The earlier `extension_or_controlledTerminalObstruction` is a logical alternative, not a proof
 that the extension branch holds. `CanonicalTerminalMajorantReceipt` is a sufficient-control
@@ -270,10 +278,11 @@ of calling the system passive. `RH/GlobalWeilFinishLine.lean` retains the additi
 explicit-formula, convergence and complete-separator obligations. A zero old gap requires
 the appropriate range/kernel shorting law, not division by zero.
 
-## 9. Proposed construction order
+## 9. Construction order
 
-[definition] This is the strategy requested in this turn, not a report of executed proof phases.
-The roadmap carries the next construction. MFR1 and MFR2 have independent mathematical owners;
+[definition] Brandon's subsequent instruction activates this strategy as the standing goal.
+The roadmap carries the next construction; phase entries below specify required returns rather
+than asserting they have already been produced. MFR1 and MFR2 have independent mathematical owners;
 neither is a prerequisite to the other's first lemma.
 
 | Phase | Required return | Failure that changes the next attempt |
@@ -285,8 +294,8 @@ neither is a prerequisite to the other's first lemma.
 | **MFR4 — residual and stability** | One specified family, approximate profile and complete residual, quantitative linear/nonlinear control, then an exact solution and physical endpoint if the stability threshold closes | Return the actual unstable mode, tail, pressure coupling or residual term; repair the family at that relation |
 | **MFR5 — arithmetic sign** | Use MFR2 to derive a source-specific positive form or a separating negative direction; compose a returned positivity theorem with the complete Weil or Foster passage | An unsigned cross term, unresolved range condition, or absent global limit is the next analytic task |
 
-[definition] The first work session should take MFR1's exact rescaling/physical-clock relation;
-MFR2 can proceed independently in the RH line. The later ansatz and sign phases are adaptive
+[definition] MFR1 returned the varying scalar length/amplitude chart with a moving centre.
+MFR2 is now the active RH source construction. The later ansatz and sign phases are adaptive
 research: their models and estimates are determined by the preceding source returns. They do
 not authorize an unbounded simulation, a new general search subsystem, or a claimed solution
 assembled from assumed stability/positivity fields.
