@@ -1,0 +1,65 @@
+{
+  "scope": "Exact periodic fluid solutions, oriented current and complex heat/logarithmic continuation; no fluid blowup or general closure conclusion",
+  "coordinates": {
+    "q": "positive spatial frequency; period 2*pi/q; q=2*pi gives a unit-period field",
+    "nu": "nonnegative viscosity",
+    "rate": "nu*q^2",
+    "pressure": "zero for both solutions"
+  },
+  "fields": {
+    "J": [
+      "exp(-nu*q**2*t)*cos(q*z)",
+      "exp(-nu*q**2*t)*sin(q*z)",
+      "0"
+    ],
+    "K": [
+      "1/2 + exp(-4*nu*q**2*t)*cos(2*q*z)/2",
+      "exp(-4*nu*q**2*t)*sin(2*q*z)/2",
+      "0"
+    ]
+  },
+  "complex_faces": {
+    "j": "exp(-rate*t)*exp(i*q*z)",
+    "k": "(1+exp(-4*rate*t)*exp(2*i*q*z))/2",
+    "cross": "Im(conjugate(j)*k)"
+  },
+  "complex_heat_continuation": {
+    "H": "exp(2*I*q*zeta)*exp(-4*nu*q**2*t)/2 + 1/2",
+    "simple_zero_curve": "pi*n/q - 2*I*nu*q*t + pi/(2*q)",
+    "derivative_at_zero": "-I*q",
+    "logarithmic_field": "H_zeta/H",
+    "Burgers_field": "-2*nu*H_zeta/H",
+    "regular_domain": "H != 0"
+  },
+  "cross_current": "(-1 + exp(-4*nu*q**2*t))*exp(-nu*q**2*t)*sin(q*z)/2",
+  "cross_heat_defect": "-2*nu*q**2*exp(-5*nu*q**2*t)*sin(q*z)",
+  "initial_cross_rate": "-2*nu*q**2*sin(q*z)",
+  "energy_balances": [
+    {
+      "average_kinetic_energy": "exp(-2*nu*q**2*t)/2",
+      "average_viscous_dissipation": "nu*q**2*exp(-2*nu*q**2*t)"
+    },
+    {
+      "average_kinetic_energy": "1/8 + exp(-8*nu*q**2*t)/8",
+      "average_viscous_dissipation": "nu*q**2*exp(-8*nu*q**2*t)"
+    }
+  ],
+  "checks": {
+    "complete_NS_momentum": true,
+    "divergence": true,
+    "actual_periodicity": true,
+    "Euler_specialization": true,
+    "initial_pointwise_alignment": true,
+    "complex_oriented_receiver": true,
+    "mixed_gradient_heat_source": true,
+    "local_energy_flux_and_dissipation": true,
+    "periodic_energy_balance": true,
+    "general_product_Laplacian": true,
+    "general_stretching_exterior_action": true,
+    "entire_complex_heat_source": true,
+    "actual_simple_zero_trajectory": true,
+    "complex_Burgers_source_on_regular_domain": true
+  },
+  "sympy_version": "1.14.0",
+  "exit_status": 0
+}

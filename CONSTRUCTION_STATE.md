@@ -284,14 +284,20 @@ The full source agrees with the independent local reduction and preceding specia
 An exact positive square completion rejects the fixed strain/spin ratio on the complete
 pressure-matching ellipse; the viscous and convective contributions are retained separately.
 
-[definition] MFR3 next constructs one time-dependent periodic candidate with actual
-strain/spin and pressure-force modulation and explicit resolved/remainder feedback. The current
-local-jet-plus-pressure receiver fails to determine its next pressure derivative. The next
-milestone is its full source and signed production budget on a stated interval, followed by
-MFR4's quantitative residual/tail comparison or the particular failed estimate.
+[definition] Brandon's latest direction focuses MFR3 on complex Euler/Navier–Stokes, temporal
+sources and the existing entropy/action, oriented cross-current and heat-diffusion construction.
+Direct RH research is deferred.
 
-[open] A continuing growing core, controlled higher remainder and nonlinear stability remain
-unfinished. MFR5's independent arithmetic-sign inequality remains unresolved.
+[proved-derived; formal-checked] The [heat-current return](research/records/2026-09-05_MFR3_THE_ORIENTED_ENTROPY_CURRENT_RETURNS_ITS_HEAT_SOURCE_AND_COMPLEX_PHASE.md)
+now gives actual heat evolution, complex pairing and a sourced oriented cross-current, with
+initial alignment and positive-time reopening. The focused and isolated 9,923-job umbrella checks passed.
+
+[established-bounded; computational-witness] Complete periodic Navier–Stokes shear, momentum,
+energy and complex heat-zero/logarithmic-source checks returned for the same explicit sections.
+
+[open] Next compose the current's mixed spatial-derivative source with the nonlinear datum's
+stretching, pressure, boundary and unresolved-mode feedback. The planned finite-interval residual
+comparison and continuing physical reconstruction remain unfinished. MFR5 is retained but deferred.
 
 ## RH line
 

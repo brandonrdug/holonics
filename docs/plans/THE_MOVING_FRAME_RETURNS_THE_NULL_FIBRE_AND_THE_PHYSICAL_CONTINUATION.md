@@ -2,6 +2,9 @@
 
 **Founded:** Brandon's 2026-09-04 request to combine Tao's singularity strategy, chart-relative
 nullity, the RH line and the mathematical purpose of Holonics into a research strategy.
+**Current focus:** Brandon's September 5 correction directs complex Euler, Navier–Stokes,
+temporal evolution and their existing entropy/action, oriented cross-current and heat-diffusion
+relations. Direct RH research is deferred; its completed source and formal standing remain usable.
 **Position:** MFR0 strategy deposited; Brandon subsequently activated this plan as the standing
 mathematical goal. MFR1's scalar moving-frame/endpoint and MFR2's folded-source returns are
 complete; MFR3's source-specific fluid concentration conditions are in progress.
@@ -276,7 +279,7 @@ regularity endpoint. A counterexample to that sufficient bound would narrow that
 would not, without the reconstruction/stability argument, prove physical blowup. Neither sign
 is selected by the ontology in advance.
 
-## 8. RH uses the same methodology with its own source relation
+## 8. Preserved RH application — direct research deferred
 
 [proved-derived; source-inspected] `RH/CriticalChart.lean` and `RH/DeBruijnSeal.lean` identify
 Mathlib's RH with `Λstd=0`, where `Λstd=4Λ_DN`. `RH/DescentZeros.lean` proves nonnegativity by
@@ -309,7 +312,7 @@ descent away from the real axis: the Euclidean gradient conjugates the denominat
 `z²+1-2t` moves its imaginary roots inward. The September 3 flow-reading prose's unqualified
 complex gradient assertion is corrected by this example; the actual complex ODE remains valid.
 
-[interpretation] The next RH question is which source relation controls the full signed
+[interpretation] The retained RH question is which source relation controls the full signed
 interaction, with the reflected source and its tail now available in the needed direction.
 The existing written shorting construction
 `research/papers/source/mathematics/theorems/conditioned-effective-tension.typ` identifies
@@ -333,7 +336,7 @@ neither is a prerequisite to the other's first lemma.
 | **MFR2 — folded RH source** | Extend the existing kernel/event owners with the half-line all-time expansion, compact-uniform remainder, then justified derivative/zero-count receivers | A failed integrable majorant or missing reflection/limit interchange narrows the decomposition; the whole-line divergence theorem remains standing |
 | **MFR3 — locating admissible fluid conditions** | Use MFR1 to derive source-specific exclusions and surviving modulated families; instantiate the actual pressure/triad and coherence-defect relation before numerical search | Energy/viscosity/critical-norm conflict or wrong periodicity rejects the family with the violated equation retained |
 | **MFR4 — residual and stability** | One specified family, approximate profile and complete residual, quantitative linear/nonlinear control, then an exact solution and physical endpoint if the stability threshold closes | Return the actual unstable mode, tail, pressure coupling or residual term; repair the family at that relation |
-| **MFR5 — arithmetic sign** | Use MFR2 to derive a source-specific positive form or a separating negative direction; compose a returned positivity theorem with the complete Weil or Foster passage | An unsigned cross term, unresolved range condition, or absent global limit is the next analytic task |
+| **MFR5 — arithmetic sign (deferred)** | Use MFR2 to derive a source-specific positive form or a separating negative direction; compose a returned positivity theorem with the complete Weil or Foster passage | An unsigned cross term, unresolved range condition, or absent global limit is the next analytic task |
 
 [definition] MFR1 returned the varying scalar length/amplitude chart with a moving centre.
 MFR2 returned its folded source, uniform remainder, derivatives and retained zero-count passage.
@@ -519,9 +522,34 @@ term or estimate that prevents it. Do not substitute another batch of initial Ta
 this temporal question. A finite-interval return remains distinct from the global normalized
 continuation, finite physical clock and divergence bound needed for a singularity.
 
-[definition] RH retains its independent arithmetic target in MFR5 and §8. Fluid transport and
-closure results are reusable methods, but do not supply the remaining signed explicit-formula
-estimate. Report progress against that inequality separately from fluid construction.
+### Entropy/action and complex heat source are part of the temporal construction
+
+[definition] Brandon's latest correction defers direct RH pursuit and makes the existing
+entropy/action and complex-field construction explicit in MFR3. The next source passage composes
+`HolonicEntropyActionInduction`, `HolonicTorusEntropyParametronEquivalence` and the actual fluid
+heat/pressure owners. The oriented cross-current `J_i*K_j-J_j*K_i` is the August 26 interaction
+construction. Statistical cross-entropy remains a declared receiver through its existing membrane
+owner. Neither replaces the addressed currents, phase, source and boundary history.
+
+[proved-derived] For two smooth sections with shared advection and diffusivity, the evolution of
+`J wedge K` retains `-2*nu*sum_a (partial_a J) wedge (partial_a K)`, in addition to stretching and
+external sources. Initial pointwise alignment therefore does not by itself make the null fibre
+invariant under diffusion. This follows from the actual second-order product rule.
+
+[established-bounded; computational-witness] The [temporal heat return](../../research/records/2026-09-05_MFR3_THE_ORIENTED_ENTROPY_CURRENT_RETURNS_ITS_HEAT_SOURCE_AND_COMPLEX_PHASE.md)
+constructs two smooth periodic shear solutions of the complete unforced Navier–Stokes equations.
+They are initially aligned; their complex-phase cross-current subsequently becomes nonzero at
+positive viscosity while each kinetic-energy balance remains dissipative. The zero-viscosity
+Euler specialization retains alignment. The source is precisely the mixed spatial-derivative
+term; pressure and nonlinear stretching vanish in this control.
+
+[definition] Continue by composing that same oriented temporal law with the actual stretching,
+pressure, boundary and unresolved-mode source of the nonlinear datum. Keep the storage/current/
+production balance and its constitutive signs explicit, including the thermal quantity map when
+reading physical entropy. In the complex potential chart retain the Hodge/phase relation and the
+actual logarithmic heat/Burgers source with its time sign and zero fibre. Existing complex-valued
+fluid singularity constructions provide source comparisons; a scalar entropy or a real-valued
+Millennium endpoint does not govern this investigation. MFR5 remains deferred.
 
 [open] The replacement surviving family, MFR4 quantitative residual/stability control and MFR5
 arithmetic sign remain unfinished. Requiring full radial convergence before this source-directed

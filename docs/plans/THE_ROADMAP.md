@@ -130,14 +130,15 @@ retains a complete pressure-matching ellipse and a joint pressure/time receiver 
 Jacobian on the retained positive branch. Its exact square completion excludes the fixed-ratio
 second condition throughout that ellipse; the full source, quartic coefficients and viscous/convective split remain explicit.
 
-[definition] MFR3 next carries one admitted periodic datum into a time-dependent candidate,
-with actual strain/spin and pressure-force modulation, the complete exterior, and explicit
-resolved/remainder feedback. The current local-jet-plus-pressure receiver does not close under
-evolution. Its next return is the full candidate source and signed production budget on a stated
-finite interval; MFR4 then pays a quantitative residual/tail comparison or names its failed
-estimate. Further initial coefficient matching alone does not answer this temporal question.
-Full convergence is not a prior condition imposed on MFR3. The stationary exclusions and the
-independent MFR5 arithmetic-sign obligation remain. HNP construction continues independently.
+[definition] Brandon's latest correction focuses MFR3 on complex Euler/Navier–Stokes temporal
+sources and the existing entropy/action, oriented cross-current and heat-diffusion construction.
+Direct RH research in MFR5 is deferred. The [heat-current return](../../research/records/2026-09-05_MFR3_THE_ORIENTED_ENTROPY_CURRENT_RETURNS_ITS_HEAT_SOURCE_AND_COMPLEX_PHASE.md)
+now supplies an exact periodic fluid control for diffusion of the relation between two currents.
+Next compose its mixed spatial-derivative source with actual stretching, pressure, boundary and
+resolved/remainder feedback. Carry one time-dependent candidate into a full source/production
+budget on a stated interval; MFR4 then pays a quantitative residual/tail comparison or names the
+failed estimate. The complex potential/Hodge and logarithmic heat sources remain explicit.
+Full convergence is not a prior condition imposed on MFR3; the earlier exclusions remain standing. HNP construction continues independently.
 
 [project-postulate] Holonics is the mathematical framework and ontology of which HNA is an
 executable architecture. A research route may return a derivation, a counterexample or a precise
@@ -219,7 +220,8 @@ in [the corrected Eros instantiation](../../archive/plans/THE_EROS_INSTANTIATION
 
 ## RH line: FT, RT and DB complete
 
-**RH line position:** DB and MFR2 complete at their recorded scopes. The remaining research
+**RH line position:** Direct RH research is deferred under Brandon's latest fluid/temporal focus.
+DB and MFR2 remain complete at their recorded scopes. The remaining research
 inequality is `Λ_DN ≤ 0`, equivalent to RH. MFR2 supplies the folded source, remainder,
 derivatives and zero-count passage; MFR5 retains the arithmetic-sign investigation.
 

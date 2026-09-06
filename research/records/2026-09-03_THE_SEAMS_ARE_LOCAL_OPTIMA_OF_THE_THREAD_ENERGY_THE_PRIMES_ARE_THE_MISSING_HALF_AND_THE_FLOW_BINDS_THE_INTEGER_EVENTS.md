@@ -98,21 +98,28 @@ annihilates pairs forward in time and cannot decide that face, which is why the 
 
 [proved-standard; source-inspected] With `Ξ(w) = ξ(1/2 + w)`, `U = log|Ξ|`, `V = arg Ξ`, the
 regular field satisfies `grad V = J grad U`; a zero of multiplicity `m` is a phase vortex with
-`∮ dV = 2πm`; the argument principle is Kelvin's circulation theorem for that field
+`∮ dV = 2πm`. The argument principle supplies this circulation count. Kelvin conservation along
+material contours additionally uses their actual evolution and source/boundary conditions
 ([`the succession record`](2026-07-20_THE_SUCCESSION_SWEEPS_THE_FIBER_THE_UNITARY_SEAM_MAKES_REBASE_PURE_TURN.md),
 [`the hinge record`](2026-07-20_THE_HINGE_CARRIES_THE_FRAME_THE_SUCCESSOR_REPLACES_THE_STANDING_STAR.md)).
-The complex velocity `Ξ′/Ξ` is the point-vortex field of the zeros with circulation equal to
-multiplicity. The Cauchy--Riemann equations are incompressibility and irrotationality away from the
-vortices, which is two-dimensional Euler. The July records refuse to make the line a singularity:
+The logarithmic derivative `Ξ′/Ξ` determines the amplitude gradient and its quarter-turned phase
+circulation after the complex velocity convention is fixed. On a zero-free patch,
+`v=grad V=J grad U` is divergence-free and irrotational. At fixed time it solves steady Euler with
+pressure `-|v|^2/2`. A smooth time-dependent potential uses pressure `-partial_t V-|v|^2/2`
+on its regular patch. Vortex motion and global pressure/boundary reconstruction remain part of a
+full flow realization. The July records refuse to make the line a singularity:
 the seam is the invariant unitary seam, and the zeros are vortices on it. That refusal is
 Brandon's ruling of 2026-07-10 (a prime is a founding, the neck of an hourglass, never a sealed
 box) and of 2026-07-23 (*"they are the neck of the hourglass … the foundings are orthogonal
 worldlines braiding"*), and it governs §7 below.
 
-### 2.2 Navier--Stokes is the heat deformation, and it moves the vortices along the threads
+### 2.2 Heat deformation drives the logarithmic field and moves its zeros
 
 [proved-derived] The standard deformation obeys `∂_t H = −∂_z² H`. Its logarithmic field
-`U=H'/H` obeys `∂_t U=−∂_z²U−2U∂_zU` away from zeros. On a real simple zero comb the zero
+`U=H'/H` obeys `∂_t U=−∂_z²U−2U∂_zU` away from zeros. This is the complex logarithmic
+heat/Burgers source with the displayed time sign. An incompressible Navier–Stokes realization
+also supplies its actual velocity, pressure, divergence and spatial diffusion law; those equations
+are not replaced by this scalar logarithmic equation. On a real simple zero comb the zero
 motion is a Coulomb descent, with normalization fixed by the thread sum. On the seam, where all
 zeros are real, the thread sum `S_j = Σ_{k≠j} 1/(z_j − z_k)` is real; the heat velocity is `2 S_j` along the seam and
 the vortex velocity is `i S_j / 2π` across it. The two receivers read one thread population,
