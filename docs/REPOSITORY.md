@@ -9,7 +9,7 @@ mathematical subject or a source dependency is obsolete.
 | Root | Contents |
 |---|---|
 | `crates/` | All live Rust libraries: public framework/HNA APIs, native engine, lifecycle, geometry, substrate and apparatus. |
-| `applications/` | The `holonics` CLI/workspace and standalone research/document tools. |
+| `applications/` | The `holonics` CLI/workspace, private [conversation-data preparation](CONVERSATION_DATA.md), and standalone research/document tools. |
 | `accelerators/` | Device-only Rust-GPU/CUDA targets with their independent toolchains and committed boundary artifacts. |
 | `formal/` | Live project-owned Lean sources: elementary holonics, kernel-witness fixture and the independent RH source-transport project. |
 | `docs/` | Current architecture, interfaces, developer guide, doctrine, references and active plans. |

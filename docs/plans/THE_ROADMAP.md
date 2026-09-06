@@ -20,7 +20,20 @@ contracts and records preserve their completed scope; their old imperatives sche
    reread every completed campaign, rerun unchanged expensive receipts, or reconstruct historical
    capability just to start the next authorized repair.
 
-## Current HNA direction: native contextual foundations
+## Completed conversation-data integration/preparation
+
+[definition] Brandon's September 6 request directs [conversation-data integration](CONVERSATION_DATA_INTEGRATION.md):
+review prior Claude/Codex cultivation attempts and refine the actual data around user-agent
+comparison, retaining distinct tool/delegation/inference causality and contextual curation.
+Lean is corpus material when present, never this pipeline's evaluator or loss. This contract
+schedules neither another isolated native foundation, an inherited-model training run nor a new
+language-specific interior.
+
+[established-bounded; measured] The completed pass returned the
+[private dataset, curation and inspected exports](../CONVERSATION_DATA.md#september-6-local-return)
+with 23 passing focused data tests.
+
+## Completed native contextual foundation
 
 **HNA position:** NCF0--NCF4 complete at the declared native phase-foundation scope.
 

@@ -1,12 +1,23 @@
 # Construction state
 
-**Currency:** 2026-09-06. **HNA position:** NCF0--NCF4 complete at the declared native phase-foundation scope.
+**Currency:** 2026-09-06. **HNA position:** conversation-data integration/preparation complete; NCF0--NCF4 remains complete at its scope.
 
 This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md) orders work;
 completed history stays in its existing records and Git. Brandon's latest direct instruction
 governs. The preceding HNA consolidation is complete; its implementation standing remains below.
 
 ## Current HNA direction
+
+[definition] Brandon's latest request directs integration/synthesis and refinement of the Claude
+Code/Codex conversation dataset. The [data-integration contract](docs/plans/CONVERSATION_DATA_INTEGRATION.md)
+separates actual user-agent comparison from runtime/tool/delegation activity, with exact source
+relations and contextual curation. No automatic training run is scheduled; existing language
+capability is preserved, not reset by the newer foundation's measurement scope. Lean is not this
+data pipeline's evaluator.
+
+[established-bounded; measured] The [private package and curation](docs/CONVERSATION_DATA.md#september-6-local-return)
+have returned with inspected exports and 23 passing focused tests. This is a data-preparation
+return, not a corpus-training result.
 
 [project-postulate] Brandon's latest correction makes fostering native HNAs from the ground up
 the priority before further Soulkiller/Gemma-led production. The

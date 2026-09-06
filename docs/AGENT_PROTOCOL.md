@@ -21,10 +21,15 @@ Paths in code spans are repository-relative.
   Eros/Athena task. Codex: `~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl`, one file per thread or
   sub-thread; a line with `type == "response_item"`, `payload.type == "message"`, and
   `payload.role` in `user`/`assistant` is a message; `session_meta.payload.thread_source ==
-  "subagent"` marks Luna threads; user text beginning `<codex_internal_context`,
+  "subagent"` marks child-agent origin, not model identity; user text beginning `<codex_internal_context`,
   `<environment_context`, `<user_instructions`, `<user_shell_command`, or `# AGENTS.md` is harness
-  text; resumed threads repeat history, so deduplicate by text. Claude: `~/.claude/history.jsonl`
-  and `~/.claude/projects/<workspace>/*.jsonl`. Provenance: `/home/b/Workspaces/provenance`.
+  text. Keep repeated captured views by declared occurrence ID; equal text never identifies an
+  occurrence. Preserve first container origin when a child log copies parent metadata. Claude:
+  `~/.claude/history.jsonl` and `~/.claude/projects/<workspace>/*.jsonl`; user-role tool returns,
+  task notifications and generated compaction summaries are not human messages. The
+  [conversation-data guide](CONVERSATION_DATA.md) and `applications/conversation-data/providers.py`
+  carry the detailed exterior codec and separate comparison/trace relations. Provenance:
+  `/home/b/Workspaces/provenance`.
 - Apparatus, measured 2026-09-02: one NVIDIA GeForce RTX 4080 SUPER with 16 GiB, a Ryzen 9 7900X,
   30 GiB of system memory. The foreign realization is `/home/b/models/gemma-4-E4B-it` (15 GiB
   BF16, 2,130 tensors). Python apparatus for world and observer use only:
