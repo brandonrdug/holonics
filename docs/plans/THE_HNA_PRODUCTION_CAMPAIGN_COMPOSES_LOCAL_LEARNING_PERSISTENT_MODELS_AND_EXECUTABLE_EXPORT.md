@@ -1,9 +1,18 @@
 # HNA production: local learning, persistent models and executable export
 
-**Date:** 2026-09-04. **Status:** ACTIVE; HNP0--HNP3 returned, HNP4 application composition in progress.
+**Date:** 2026-09-04. **Status:** PAUSED; inherited-first order superseded for the current foundations.
 **Authority:** Brandon's formal planning request and subsequent instruction to complete HNP0--HNP7.
 **Order:** [THE_ROADMAP.md](THE_ROADMAP.md). **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 **Starting implementation:** `c12b2634`. Phase names below identify dependencies, not capabilities.
+
+[project-postulate] Brandon's September 5 contextual-transport correction now prioritizes fostering
+HNAs natively from the ground up, without Soulkiller/Gemma supplying the missing contextual
+architecture. The [audit](../../research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md)
+withdraws the portable-fact experiment's framing and the tied-head draft's promotion into that
+foundation. The valid finite mathematics and apparatus results below retain their scopes.
+The phase order is preserved as prior planning, not an instruction to continue inherited-model
+production. Native foundations are the current roadmap priority; later inheritance/export are
+not forbidden or declared unnecessary.
 
 ## 1. Product and non-substitution boundary
 
@@ -326,6 +335,17 @@ additive return destroyed coherent output and exceeded the carrier bound. The fr
 returned coherent prose at high cost. HNP4 next addresses stable native development and that
 output cost before claiming its useful application returns; it does not substitute the frozen
 comparison, a larger numeric limit or a parameter search for the constitutive obligation.
+
+[established-bounded; measured] The later [tied next-arrival return](../../research/records/2026-09-05_HNP4_THE_NEXT_ARRIVAL_DEPOSITS_A_REUSABLE_CONTACT_AND_MATCHED_SELF_RETURN_IS_ZERO.md)
+binds an actual received contrast to a reusable contact word, preserves complete learned-state
+continuation across processes, and returns a completed ordinary correction with further native
+development. Matched self-returns have zero current under this declared chart.
+
+[historical; measured] Its isolated six-address document trial did not answer the new question
+with blue. The later audit withdraws treating this as a failed transfer of a portable fact:
+contextual identification and transport had not been established. The `Red` response does not
+establish native contextual learning either. The native-foundations priority now governs;
+the older production obligations below are not an automatic continuation order.
 
 **Depends on:** HNP3.
 

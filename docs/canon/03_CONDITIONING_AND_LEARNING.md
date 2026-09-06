@@ -27,17 +27,20 @@ Caching a corpus, index, retrieval result, proof, or conversation beside a body 
 
 ## Training contract
 
-For body `H_m`, developmental passage `d`, return `r`, and later probe `p`, a valid training event
-must establish:
+For body `H_m`, developmental passage `d`, return `r`, and a later probe `p` in a declared
+contextual receiver family, one witness of consequential development is:
 
 \[
 H_m \xrightarrow{d/r} H_{m'},\qquad
 \operatorname{conduct}(H_m,p)\ne\operatorname{conduct}(H_{m'},p),
 \]
 
-with `m'` persisting after `d` and its source corpus are detached and the body is rested/remounted.
-The receipt retains predecessor identity, caused support, local `Δm`, return lineage, alternatives,
-and the behavioral ablation.
+The receipt retains the situated predecessor, caused support, local `Δm`, return lineage and
+alternatives. Persistence, source detachment and behavioral ablation answer their respective
+storage, independence and attribution claims; they are not universal conditions defining every
+learning/inference occurrence. The September 2 recurrent law and `TABLET_THE_HEXIS.md` govern
+that distinction. A later use also owes the contextual relation that makes the prior change
+applicable; changed parameters do not confer an unqualified property on unrelated occurrences.
 
 Training is not required to change every probe. It must change the declared later conduct for
 which the returned difference was consequential.
@@ -78,8 +81,9 @@ general law which induces unknown interactions or fillers across transported var
 - **Recognition:** a current navigates carried incidence and closes against a receiver; it is not
   merely a label lookup.
 
-Each claim owes a held-out return and an ablation. A diagnostic topology, candidate count, or
-source quotation is supporting testimony, not the deed.
+The claim's declared scope determines its held-out, attribution and other controls. A diagnostic
+topology, candidate count or source quotation does not establish contextual generalization.
+Neither does forcing a descriptor to persist after removing the conditions that made it true.
 
 ## Codecs and reflection
 
@@ -101,6 +105,6 @@ Do not rebuild:
 - corpus scans presented as thought;
 - retrieval presented as native memory;
 - generated text assembled from source quotations and called learning;
-- source-retaining rest;
+- source-retaining rest presented as source-independent learned conduct;
 - CPU-authored phases that decide which organ “thinks” next; or
 - device selection based on terms such as language, proof, or graphics.

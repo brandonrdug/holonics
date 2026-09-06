@@ -1,0 +1,2411 @@
+diff --git a/CONSTRUCTION_STATE.md b/CONSTRUCTION_STATE.md
+index 6c693943..34f341fe 100644
+--- a/CONSTRUCTION_STATE.md
++++ b/CONSTRUCTION_STATE.md
+@@ -86,9 +86,16 @@ now has exact calibration, non-expansiveness and a metric-preserving one-axis li
+ oriented-site formal owner.
+ 
+ [established-bounded; measured] Its resident projection passed 490 point-row rational comparisons,
+-interval/permutation, non-power-of-two launch and refusal controls. It has not replaced HNA's
+-unstable additive cultivation. The next live binding owes an actual source/arrived comparison,
+-its metric and retained successor; the isolated candidate does not close HNP4.
++interval/permutation, non-power-of-two launch and refusal controls. The subsequent
++[tied next-arrival binding](research/records/2026-09-05_HNP4_THE_NEXT_ARRIVAL_DEPOSITS_A_REUSABLE_CONTACT_AND_MATCHED_SELF_RETURN_IS_ZERO.md)
++now retains actual received contacts, preserves the entire learned state across process restart,
++and develops further with the same complete successor. Its active text run completed 20 addresses
++without self-amplification; a later ordinary correction grew five maps to 22 and completed `Red`.
++
++[counterexample; measured] The small isolated document exposure did not transfer its blue-color
++fact to a new question. The later correct answer had its correction in context; it is not proof
++of source-detached fact retention or a learned-map benefit. HNP4 next owes the genuinely different
++second application and remaining useful-production checks, with this limitation kept explicit.
+ 
+ [definition] The plan then orders general material contact, resident locality/reuse, persistent
+ sessions, multi-cycle output, a useful consumer-model milestone, executable export and supported
+diff --git a/README.md b/README.md
+index 636c6358..0d46e2aa 100644
+--- a/README.md
++++ b/README.md
+@@ -38,8 +38,10 @@ target/debug/holonics --format json hna train /path/to/supported/model sequence.
+ Gemma text realization and restricted Soulkiller bodies on CUDA. The API retains one successor
+ session across ordered occurrences and can apply developmental returns through previously
+ learned overlays. `hna infer` returns one selected face; `hna train` returns a developmental
+-run receipt. It does not yet save a full cultivated-operator checkpoint or claim frontier-level
+-output quality. The exact scopes and next production bridges are documented above.
++run receipt. Full checkpoints, backpressured sessions and paired text/model continuation are
++available through `HnaModel`, `HnaTextApplication` and `hna session`. The new tied-next-arrival
++chart retains actual learned contacts; its scope and remaining usefulness limits are in the
++[Athena guide](docs/ATHENA.md). No frontier-level output quality is claimed.
+ 
+ For Rust clients, `crates/holonics` exposes `holonics::hna`, `holonics::soulkiller` and
+ `holonics::interop`. Existing Safetensors/ONNX package exports preserve Holonics artifacts;
+diff --git a/applications/holonics-workbench/src/cli.rs b/applications/holonics-workbench/src/cli.rs
+index 2581402d..74988a65 100644
+--- a/applications/holonics-workbench/src/cli.rs
++++ b/applications/holonics-workbench/src/cli.rs
+@@ -85,6 +85,9 @@ pub enum HnaCli {
+         /// Destination checkpoint path.
+         #[arg(long)]
+         checkpoint: PathBuf,
++        /// Fresh tied-map next-arrival development; no learning-rate aperture is used.
++        #[arg(long, conflicts_with_all = ["resume", "learning_shift", "series_terms"])]
++        tied_next_arrival: bool,
+         /// Fresh-session aperture; resumed sessions keep their saved native law.
+         #[arg(long, default_value_t = 16, conflicts_with = "resume")]
+         learning_shift: u32,
+@@ -118,6 +121,7 @@ impl From<HnaCli> for HnaCommand {
+                 class,
+                 input,
+                 checkpoint,
++                tied_next_arrival,
+                 learning_shift,
+                 series_terms,
+             } => Self::Session {
+@@ -128,6 +132,7 @@ impl From<HnaCli> for HnaCommand {
+                 class,
+                 input,
+                 checkpoint,
++                tied_next_arrival,
+                 learning_shift,
+                 series_terms,
+             },
+@@ -623,6 +628,15 @@ mod tests {
+ 
+     #[test]
+     fn hna_session_parses_checkpoint_and_mode_constraints() {
++        let tied=parse_cli(["holonics","hna","session","source.rest","--checkpoint","next.hna",
++            "--tied-next-arrival"]).unwrap();
++        assert!(matches!(tied.command,Some(WorkbenchCommand::Hna(HnaCommand::Session {tied_next_arrival:true,..}))));
++        assert!(parse_cli(["holonics","hna","session","source.rest","--checkpoint","next.hna",
++            "--tied-next-arrival","--learning-shift","16"]).is_err());
++        assert!(parse_cli(["holonics","hna","session","source.rest","--checkpoint","next.hna",
++            "--tied-next-arrival","--series-terms","14"]).is_err());
++        assert!(parse_cli(["holonics","hna","session","model.hna","--checkpoint","next.hna",
++            "--tied-next-arrival","--resume"]).is_err());
+         let material=parse_cli(["holonics","hna","session","model.hna","--resume",
+             "--checkpoint","next.hna","--input-material","inputs.safetensors"]).unwrap();
+         assert!(matches!(material.command,Some(WorkbenchCommand::Hna(HnaCommand::Session {input_material,..}))
+diff --git a/applications/holonics-workbench/src/command.rs b/applications/holonics-workbench/src/command.rs
+index 7cd37540..54e4ae23 100644
+--- a/applications/holonics-workbench/src/command.rs
++++ b/applications/holonics-workbench/src/command.rs
+@@ -38,6 +38,8 @@ pub enum HnaCommand {
+         class: Option<usize>,
+         input: PathBuf,
+         checkpoint: PathBuf,
++        #[serde(default)]
++        tied_next_arrival: bool,
+         learning_shift: u32,
+         series_terms: u32,
+     },
+diff --git a/applications/holonics-workbench/src/session_stream.rs b/applications/holonics-workbench/src/session_stream.rs
+index 59028a25..712b3d5f 100644
+--- a/applications/holonics-workbench/src/session_stream.rs
++++ b/applications/holonics-workbench/src/session_stream.rs
+@@ -33,6 +33,7 @@ pub fn run_hna_session_stream(
+         class,
+         input,
+         checkpoint,
++        tied_next_arrival,
+         learning_shift,
+         series_terms,
+     } = command
+@@ -41,6 +42,9 @@ pub fn run_hna_session_stream(
+             "expected a streaming session command".into(),
+         ));
+     };
++    if tied_next_arrival && (resume || learning_shift!=16 || series_terms!=14) {
++        return Err(HnaSessionError::Base("tied next-arrival is a fresh law, not an override of saved or explicit aperture settings".into()));
++    }
+     if checkpoint.exists() {
+         return Err(HnaSessionError::Base(
+             "final checkpoint already exists; use a new output path".into(),
+@@ -66,14 +70,16 @@ pub fn run_hna_session_stream(
+                 "base override requires checkpoint resume".into(),
+             ));
+         }
+-        HnaModel::from_native_rest(
++        if tied_next_arrival {
++            HnaModel::from_native_rest_with_boundary_contact(source,class)?
++        } else { HnaModel::from_native_rest(
+             source,
+             class,
+             HnaCultivationAperture {
+                 learning_shift,
+                 series_terms,
+             },
+-        )?
++        )? }
+     };
+     for material in input_material {
+         model = model.with_input_material(material)?;
+diff --git a/crates/holonic-engine/kernels/exact_resident_section.cu b/crates/holonic-engine/kernels/exact_resident_section.cu
+index 9f36c3f4..31335818 100644
+--- a/crates/holonic-engine/kernels/exact_resident_section.cu
++++ b/crates/holonic-engine/kernels/exact_resident_section.cu
+@@ -987,15 +987,16 @@ extern "C" __global__ void section_contact(
+     }
+ }
+ 
+-// Candidate finite passive-contact projection.  One block owns one row and first forms the row's
+-// shared d/D/N and dot-product intervals; the output lanes then apply the exact same quotient to
+-// their coordinates.  `x` and `y` are required to be POINT endpoints.  `z` may be an enclosure,
+-// and the resulting enclosure is intentionally not claimed minimal because each z_i also enters
+-// the shared dot interval.  This is a projection primitive only: it does not bind a model learner,
+-// a full lifted axis on the GPU, or a network conservation theorem.
++// Candidate finite passive-contact projection.  One block owns one query row and first forms the
++// founding row's shared d/D/N and the query row's dot interval; `founding_rows == 1` broadcasts
++// one immutable source/arrived row over all query rows, while `founding_rows == rows` preserves
++// the ordinary row-paired operation.  `x` and `y` are required to be POINT endpoints.  `z` may be
++// an enclosure, and the resulting enclosure is intentionally not claimed minimal because each
++// z_i also enters the shared dot interval.  This is a projection primitive only: it does not bind
++// a model learner, a full lifted axis on the GPU, or a network conservation theorem.
+ extern "C" __global__ void __launch_bounds__(512) section_passive_contact(
+     const int64_t *xlo, const int64_t *xhi, const int64_t *ylo, const int64_t *yhi,
+-    const int64_t *zlo, const int64_t *zhi, uint32_t rows, uint32_t width,
++    const int64_t *zlo, const int64_t *zhi, uint32_t rows, uint32_t width, uint32_t founding_rows,
+     int64_t *olo, int64_t *ohi, uint32_t *slot, const uint32_t *census,
+     const uint32_t *lineage, uint32_t lineage_count
+ ) {
+@@ -1018,11 +1019,20 @@ extern "C" __global__ void __launch_bounds__(512) section_passive_contact(
+     __syncthreads();
+     if (stop_s) return;
+ 
+-    const size_t base = (size_t)row * (size_t)width;
++    if (threadIdx.x == 0) {
++        if (founding_rows != 1u && founding_rows != rows)
++            atomicOr(slot + SLOT_REFUSED, REFUSED_MALFORMED);
++        stop_s = atomicOr(slot + SLOT_REFUSED, 0u) != 0u;
++    }
++    __syncthreads();
++    if (stop_s) return;
++
++    const size_t source_base = (size_t)(founding_rows == 1u ? 0u : row) * (size_t)width;
++    const size_t query_base = (size_t)row * (size_t)width;
+     int local_bad = 0;
+     for (uint32_t i = threadIdx.x; i < width; i += blockDim.x) {
+-        if (xlo[base + i] != xhi[base + i] || ylo[base + i] != yhi[base + i] ||
+-            zlo[base + i] > zhi[base + i]) local_bad = 1;
++        if (xlo[source_base + i] != xhi[source_base + i] || ylo[source_base + i] != yhi[source_base + i] ||
++            zlo[query_base + i] > zhi[query_base + i]) local_bad = 1;
+     }
+     if (local_bad) atomicOr((unsigned int *)&malformed_s, 1u);
+     __syncthreads();
+@@ -1035,7 +1045,7 @@ extern "C" __global__ void __launch_bounds__(512) section_passive_contact(
+     // accumulation is checked before it enters shared standing; a refusal never becomes a wrap.
+     wide gap = 0, norm = 0, dl = 0, dh = 0;
+     for (uint32_t i = threadIdx.x; i < width; i += blockDim.x) {
+-        wide x = (wide)xlo[base + i], y = (wide)ylo[base + i];
++        wide x = (wide)xlo[source_base + i], y = (wide)ylo[source_base + i];
+         wide d;
+         d = sub_checked(x, y, slot + SLOT_REFUSED);
+         wide xx = product_checked(x, x, slot + SLOT_REFUSED);
+@@ -1043,7 +1053,7 @@ extern "C" __global__ void __launch_bounds__(512) section_passive_contact(
+         wide dd = product_checked(d, d, slot + SLOT_REFUSED);
+         gap = add_checked(gap, sub_checked(yy, xx, slot + SLOT_REFUSED), slot + SLOT_REFUSED);
+         norm = add_checked(norm, dd, slot + SLOT_REFUSED);
+-        wide zl = (wide)zlo[base + i], zh = (wide)zhi[base + i];
++        wide zl = (wide)zlo[query_base + i], zh = (wide)zhi[query_base + i];
+         wide pl, ph;
+         if (d >= 0) {
+             pl = product_checked(d, zl, slot + SLOT_REFUSED);
+@@ -1092,14 +1102,14 @@ extern "C" __global__ void __launch_bounds__(512) section_passive_contact(
+     if (stop_s) return;
+     if (identity_s) {
+         for (uint32_t i = threadIdx.x; i < width; i += blockDim.x) {
+-            olo[base + i] = zlo[base + i];
+-            ohi[base + i] = zhi[base + i];
++            olo[query_base + i] = zlo[query_base + i];
++            ohi[query_base + i] = zhi[query_base + i];
+         }
+         return;
+     }
+ 
+     for (uint32_t i = threadIdx.x; i < width; i += blockDim.x) {
+-        wide d = sub_checked((wide)xlo[base + i], (wide)ylo[base + i], slot + SLOT_REFUSED);
++        wide d = sub_checked((wide)xlo[source_base + i], (wide)ylo[source_base + i], slot + SLOT_REFUSED);
+         wide delta_lo, delta_hi;
+         if (d >= 0) {
+             delta_lo = signed_product_divide_2(d, dot_lo_s, den_s, 0, slot + SLOT_REFUSED);
+@@ -1108,11 +1118,11 @@ extern "C" __global__ void __launch_bounds__(512) section_passive_contact(
+             delta_lo = signed_product_divide_2(d, dot_hi_s, den_s, 0, slot + SLOT_REFUSED);
+             delta_hi = signed_product_divide_2(d, dot_lo_s, den_s, 1, slot + SLOT_REFUSED);
+         }
+-        wide lower = sub_checked((wide)zlo[base + i], delta_hi, slot + SLOT_REFUSED);
+-        wide upper = sub_checked((wide)zhi[base + i], delta_lo, slot + SLOT_REFUSED);
++        wide lower = sub_checked((wide)zlo[query_base + i], delta_hi, slot + SLOT_REFUSED);
++        wide upper = sub_checked((wide)zhi[query_base + i], delta_lo, slot + SLOT_REFUSED);
+         if (lower > upper) atomicOr(slot + SLOT_REFUSED, REFUSED_INVERTED);
+-        olo[base + i] = to_word(lower, slot + SLOT_REFUSED);
+-        ohi[base + i] = to_word(upper, slot + SLOT_REFUSED);
++        olo[query_base + i] = to_word(lower, slot + SLOT_REFUSED);
++        ohi[query_base + i] = to_word(upper, slot + SLOT_REFUSED);
+     }
+ }
+ 
+diff --git a/crates/holonic-engine/src/holonic_intelligence.rs b/crates/holonic-engine/src/holonic_intelligence.rs
+index cc386687..c655fca8 100644
+--- a/crates/holonic-engine/src/holonic_intelligence.rs
++++ b/crates/holonic-engine/src/holonic_intelligence.rs
+@@ -22,6 +22,8 @@ mod foreign_onnx;
+ mod full_operation;
+ #[path = "holonic_intelligence/operative_passage_return.rs"]
+ mod operative_passage_return;
++#[path = "holonic_intelligence/operative_boundary_contact.rs"]
++mod operative_boundary_contact;
+ #[path = "holonic_intelligence/lifecycle.rs"]
+ mod lifecycle;
+ #[path = "holonic_intelligence/material_ingress.rs"]
+@@ -80,6 +82,7 @@ pub use foreign_multimodal::*;
+ pub use foreign_onnx::*;
+ pub use full_operation::*;
+ pub use operative_passage_return::*;
++pub use operative_boundary_contact::*;
+ pub use lifecycle::*;
+ pub use material_ingress::*;
+ pub use operative_atlas::*;
+diff --git a/crates/holonic-engine/src/holonic_intelligence/full_operation.rs b/crates/holonic-engine/src/holonic_intelligence/full_operation.rs
+index 3f50671b..9549b244 100644
+--- a/crates/holonic-engine/src/holonic_intelligence/full_operation.rs
++++ b/crates/holonic-engine/src/holonic_intelligence/full_operation.rs
+@@ -95,6 +95,7 @@ pub struct NativeFullOperationTrace {
+ #[serde(rename_all = "kebab-case")]
+ pub enum NativeMorphologyTransition {
+     Unchanged,
++    BoundaryContact { returned: super::NativeBoundaryContactReceipt },
+     Changed {
+         operation: u32,
+         deposit: NativeMorphologyDeposit,
+@@ -162,6 +163,7 @@ pub struct NativeFullOperatorSession<'residence, 'chart> {
+     /// The declared return apertures; `None` enacts no return.
+     pub(super) aperture: Option<NativeReturnAperture>,
+     pub(super) passage_cultivation: Option<PassageCultivation<'chart>>,
++    pub(super) boundary_cultivation: Option<super::operative_boundary_contact::BoundaryCultivation<'chart>>,
+     pub(super) forward_reuse: Option<NativeForwardReuse<'chart>>,
+     pub(super) progress: Option<NativeCycleProgress>,
+     pub(super) interruption: Option<NativeCycleInterruption>,
+@@ -293,6 +295,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+             overlay: BTreeMap::new(),
+             aperture,
+             passage_cultivation: None,
++            boundary_cultivation: None,
+             forward_reuse: None,
+             progress: None,
+             interruption: None,
+@@ -314,6 +317,9 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+         self.generation
+     }
+ 
++    /// Borrowed exterior word chart of the actual current/last occurrence, never a new event ID.
++    pub fn previous_input_word(&self) -> Option<&[u32]> { self.previous_context.as_deref() }
++
+     pub fn operation_at(&self) -> usize {
+         self.operation_at
+     }
+@@ -474,7 +480,9 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+ 
+     /// Clear the previous cycle's standing when a new occurrence enters at operation zero.
+     fn enter_cycle(&mut self, entering: &[u32]) -> Result<NativeMorphologyTransition, NativeFullOperationError> {
+-        let transition = self.return_on_continuation(entering)?;
++        let transition = if self.boundary_cultivation.is_some() {
++            self.return_boundary_contact(entering)?
++        } else { self.return_on_continuation(entering)? };
+         // Exact equality of this exterior occurrence chart permits reusing its numerical
+         // realization; it does not identify the two native occurrences or skip their chronology.
+         if self.previous_context.as_deref() != Some(entering) {
+@@ -770,6 +778,9 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+         if row_addresses.is_empty() || (self.operation_at != 0 && !self.cycle_complete) {
+             return Err(NativeFullOperationError::Occurrence);
+         }
++        if self.boundary_cultivation.is_some() && !self.missing_input_rows(row_addresses).is_empty() {
++            return Err(NativeFullOperationError::Contact("the boundary occurrence requires actually supplied input rows"));
++        }
+         self.generation.checked_add(self.ecology.operations.len() as u64).ok_or(NativeFullOperationError::Generation)?;
+         self.progress = Some(NativeCycleProgress { occurrence: self.generation, row_addresses: row_addresses.to_vec(),
+             installed_through: None, returned_through: None, at_terminal: false });
+diff --git a/crates/holonic-engine/src/holonic_intelligence/operative_boundary_contact.rs b/crates/holonic-engine/src/holonic_intelligence/operative_boundary_contact.rs
+new file mode 100644
+index 00000000..8effc380
+--- /dev/null
++++ b/crates/holonic-engine/src/holonic_intelligence/operative_boundary_contact.rs
+@@ -0,0 +1,460 @@
++//! Actual next-arrival current through a shared tied cross-section, followed by a retained
++//! carrier-local contact word. This is a bounded deterministic boundary chart, not the generic
++//! definition of learning and not an internal Add teaching its own endogenous output.
++//!
++//! The former source face and the actual next arrived address return through the SAME coefficient
++//! map's Euclidean adjoint. Their difference joins the actual contextual carrier. A matched
++//! self-return deposits nothing. The new map is staged before joining the same session owner.
++
++use super::{
++    full_operation::{carrier_of, ContemporaryCarrier},
++    operative_reuse::NativeForwardReuse,
++    NativeEmissionReadout, NativeFullCycleOutput, NativeFullOperationError as Error,
++    NativeFullOperatorEcology, NativeFullOperatorSession, NativeMorphologyTransition,
++    NativeOperationPrimitive, NativeOperatorResidence, NativeTensorOrdinal,
++};
++use crate::resident_section::{Dyadic, DyadicEnclosure, ResidentSection};
++use serde::{Deserialize, Serialize};
++
++#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
++#[serde(deny_unknown_fields)]
++pub struct NativeBoundaryFace {
++    pub generation: u64,
++    pub address: u32,
++}
++
++#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
++#[serde(deny_unknown_fields)]
++pub struct NativeBoundaryContactReceipt {
++    pub source_generation: u64,
++    pub return_generation: u64,
++    pub population: NativeTensorOrdinal,
++    pub predicted: u32,
++    pub arrived: u32,
++    pub deposited: bool,
++}
++
++pub(super) struct BoundaryContact<'chart> {
++    pub(super) source: ContemporaryCarrier<'chart>,
++    pub(super) arrived: ContemporaryCarrier<'chart>,
++    pub(super) receipt: NativeBoundaryContactReceipt,
++}
++
++pub(super) struct BoundaryCultivation<'chart> {
++    pub(super) contacts: Vec<BoundaryContact<'chart>>,
++    pub(super) last_face: Option<NativeBoundaryFace>,
++    pub(super) last_return: Option<NativeBoundaryContactReceipt>,
++    /// Ephemeral observer configuration, restored even after a refused native operation.
++    pub(super) suppress_return: bool,
++}
++
++impl BoundaryCultivation<'_> {
++    pub(super) fn empty() -> Self {
++        Self {
++            contacts: Vec::new(),
++            last_face: None,
++            last_return: None,
++            suppress_return: false,
++        }
++    }
++}
++
++#[derive(Debug, PartialEq, Eq)]
++pub struct NativeBoundaryContactRest {
++    pub source: crate::resident_section::ResidentSectionRest,
++    pub arrived: crate::resident_section::ResidentSectionRest,
++    pub receipt: NativeBoundaryContactReceipt,
++}
++
++#[derive(Debug, PartialEq, Eq)]
++pub struct NativeBoundaryCultivationRest {
++    pub contacts: Vec<NativeBoundaryContactRest>,
++    pub last_face: Option<NativeBoundaryFace>,
++    pub last_return: Option<NativeBoundaryContactReceipt>,
++}
++
++impl<'chart> BoundaryCultivation<'chart> {
++    pub(super) fn detach_rest(
++        &self,
++        surface: &crate::resident_section::ResidentSurface<'chart>,
++    ) -> Result<NativeBoundaryCultivationRest, super::NativeSessionRestError> {
++        if self.suppress_return {
++            return Err(super::NativeSessionRestError::Unsupported(
++                "active boundary observation",
++            ));
++        }
++        Ok(NativeBoundaryCultivationRest {
++            contacts: self
++                .contacts
++                .iter()
++                .map(|contact| {
++                    Ok(NativeBoundaryContactRest {
++                        source: surface.detach_section(
++                            &contact.source.section,
++                            contact.source.bound_octaves,
++                        )?,
++                        arrived: surface.detach_section(
++                            &contact.arrived.section,
++                            contact.arrived.bound_octaves,
++                        )?,
++                        receipt: contact.receipt.clone(),
++                    })
++                })
++                .collect::<Result<Vec<_>, super::NativeSessionRestError>>()?,
++            last_face: self.last_face.clone(),
++            last_return: self.last_return.clone(),
++        })
++    }
++    pub(super) fn remount_rest(
++        surface: &'chart crate::resident_section::ResidentSurface<'chart>,
++        rest: &NativeBoundaryCultivationRest,
++    ) -> Result<Self, super::NativeSessionRestError> {
++        Ok(Self {
++            contacts: rest
++                .contacts
++                .iter()
++                .map(|contact| {
++                    Ok(BoundaryContact {
++                        source: ContemporaryCarrier {
++                            section: surface.mount_section_rest(&contact.source)?,
++                            bound_octaves: contact.source.bound_octaves,
++                        },
++                        arrived: ContemporaryCarrier {
++                            section: surface.mount_section_rest(&contact.arrived)?,
++                            bound_octaves: contact.arrived.bound_octaves,
++                        },
++                        receipt: contact.receipt.clone(),
++                    })
++                })
++                .collect::<Result<Vec<_>, super::NativeSessionRestError>>()?,
++            last_face: rest.last_face.clone(),
++            last_return: rest.last_return.clone(),
++            suppress_return: false,
++        })
++    }
++}
++
++fn contact_error(message: &'static str) -> Error {
++    Error::Contact(message)
++}
++
++impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
++    pub fn found_with_boundary_contact(
++        ecology: &'residence NativeFullOperatorEcology,
++        residence: &'residence mut NativeOperatorResidence<'chart>,
++    ) -> Result<Self, Error> {
++        let mut session = Self::found(ecology, residence)?;
++        session.boundary_contact_population()?;
++        session.boundary_cultivation = Some(BoundaryCultivation::empty());
++        session.forward_reuse = Some(NativeForwardReuse::found(ecology));
++        Ok(session)
++    }
++
++    pub fn has_boundary_contact(&self) -> bool {
++        self.boundary_cultivation.is_some()
++    }
++    pub fn boundary_contact_count(&self) -> usize {
++        self.boundary_cultivation
++            .as_ref()
++            .map_or(0, |s| s.contacts.len())
++    }
++    pub fn last_boundary_return(&self) -> Option<&NativeBoundaryContactReceipt> {
++        self.boundary_cultivation
++            .as_ref()
++            .and_then(|s| s.last_return.as_ref())
++    }
++
++    /// This specialization requires the actual terminal coefficient map to also be an entering
++    /// lookup map. Equal widths, names, or an application-provided ordinal do not supply that tie.
++    pub(super) fn boundary_contact_population(&self) -> Result<NativeTensorOrdinal, Error> {
++        let terminal = self.terminal_operations()?;
++        let population = *terminal[0].coefficients.first().ok_or(Error::Operation)?;
++        if terminal[0].coefficients.len() != 1
++            || !self.ecology.operations.iter().any(|node| {
++                matches!(node.primitive, NativeOperationPrimitive::Lookup { .. })
++                    && node.coefficients.as_slice() == [population]
++            })
++        {
++            return Err(contact_error(
++                "the next-arrival chart requires an actual shared entering/emitting map",
++            ));
++        }
++        if !self.overlay.is_empty() || self.aperture.is_some() || self.passage_cultivation.is_some()
++        {
++            return Err(contact_error(
++                "the boundary chart cannot silently omit another cultivation map's adjoint",
++            ));
++        }
++        Ok(population)
++    }
++
++    pub fn observe_boundary_readout_retained(
++        &mut self,
++        rows: &[u32],
++        readout: NativeEmissionReadout,
++    ) -> Result<NativeFullCycleOutput, Error> {
++        if self.interruption.is_some() {
++            return Err(Error::Interrupted);
++        }
++        let state = self
++            .boundary_cultivation
++            .as_mut()
++            .ok_or(contact_error("no boundary contact chart"))?;
++        if state.suppress_return {
++            return Err(contact_error("nested boundary observation"));
++        }
++        state.suppress_return = true;
++        let result = self.advance_cycle_readout_retained(rows, readout);
++        self.boundary_cultivation
++            .as_mut()
++            .expect("same owner")
++            .suppress_return = false;
++        result
++    }
++
++    /// Apply the entire learned local word as one resident passage. Earlier immutable contacts
++    /// remain shared standing; only the current contextual field is replaced. No host field dump
++    /// or per-contact launch/readout loop is used.
++    pub(super) fn apply_boundary_word(&mut self) -> Result<(), Error> {
++        let Some(state) = self.boundary_cultivation.as_ref() else {
++            return Ok(());
++        };
++        if state.contacts.is_empty() {
++            return Ok(());
++        }
++        let port = self.terminal_operations()?[0].inputs[0];
++        let input = carrier_of(&self.carriers, &self.checkpoints, &port).ok_or(Error::Carrier)?;
++        let surface = self.residence.surface();
++        let outputs = state
++            .contacts
++            .iter()
++            .map(|_| {
++                surface.fresh_section(
++                    input.section.rows(),
++                    input.section.width(),
++                    input.section.grain(),
++                )
++            })
++            .collect::<Result<Vec<_>, _>>()?;
++        let lineage: Vec<Vec<usize>> = (0..2 * outputs.len())
++            .map(|at| if at == 0 { vec![] } else { vec![at - 1] })
++            .collect();
++        let mut passage = surface.begin_passage(&lineage)?;
++        for (at, contact) in state.contacts.iter().enumerate() {
++            let query = if at == 0 {
++                &input.section
++            } else {
++                &outputs[at - 1]
++            };
++            let current = 2 * at;
++            {
++                let lane = passage.open(current, &lineage[current])?;
++                surface.record_passive_contact(
++                    &lane,
++                    &contact.source.section,
++                    &contact.arrived.section,
++                    query,
++                    &outputs[at],
++                )?;
++            }
++            passage.close(current, &outputs[at], 64)?;
++            {
++                let lane = passage.open(current + 1, &lineage[current + 1])?;
++                surface.record_midpoint_seal(&lane, &outputs[at], 64)?;
++            }
++            passage.close_fused(current + 1)?;
++        }
++        let reading = passage.finish()?.launch()?;
++        if !reading.obstruction.is_empty() {
++            return Err(contact_error(
++                "the retained boundary word refused its numerical chart",
++            ));
++        }
++        let bound = reading
++            .slots
++            .last()
++            .ok_or(Error::Operation)?
++            .max_octave
++            .max(1);
++        let mut outputs = outputs;
++        let changed = ContemporaryCarrier {
++            section: outputs.pop().ok_or(Error::Operation)?,
++            bound_octaves: bound,
++        };
++        // The original pre-contact numerical output stays in the existing immutable reuse cache
++        // only where that owner retained it. It is not the contemporary post-contact carrier.
++        let previous = self
++            .carriers
++            .remove(&port)
++            .or_else(|| self.checkpoints.remove(&port));
++        if let (Some(reuse), Some(previous)) = (&mut self.forward_reuse, previous) {
++            reuse.retain(port, previous);
++        }
++        self.carriers.insert(port, changed);
++        Ok(())
++    }
++
++    pub(super) fn return_boundary_contact(
++        &mut self,
++        entering: &[u32],
++    ) -> Result<NativeMorphologyTransition, Error> {
++        let state = self
++            .boundary_cultivation
++            .as_ref()
++            .ok_or(contact_error("no boundary chart"))?;
++        if state.suppress_return {
++            return Ok(NativeMorphologyTransition::Unchanged);
++        }
++        let (Some(previous), Some(face)) =
++            (self.previous_context.as_ref(), state.last_face.as_ref())
++        else {
++            return Ok(NativeMorphologyTransition::Unchanged);
++        };
++        // This addressed-word application presents one actual next arrival. A nonextending word
++        // does not invent a matching fibre. It still runs as an ordinary new native occurrence.
++        if entering.len() <= previous.len() || entering[..previous.len()] != *previous {
++            self.boundary_cultivation
++                .as_mut()
++                .expect("same owner")
++                .last_return = None;
++            return Ok(NativeMorphologyTransition::Unchanged);
++        }
++        if face.generation != self.generation {
++            return Err(contact_error("stale boundary face"));
++        }
++        let population = self.boundary_contact_population()?;
++        let arrived = entering[previous.len()];
++        let predicted = face.address;
++        let mut receipt = NativeBoundaryContactReceipt {
++            source_generation: face.generation,
++            return_generation: self.generation,
++            population,
++            predicted,
++            arrived,
++            deposited: false,
++        };
++        if predicted != arrived {
++            let source = self.terminal_presented.as_ref().ok_or(Error::Carrier)?;
++            // A missing selected/arrived row is an obstruction, not the compact intake's zero
++            // complement. The shared map must actually carry both compared covectors.
++            if self
++                .missing_input_rows(&[predicted, arrived])
++                .contains_key(&population.0)
++            {
++                return Err(contact_error(
++                    "the compared tied rows have not been supplied",
++                ));
++            }
++            let pair = self.found_boundary_pair(population, predicted, arrived, source)?;
++            if let Some((source, arrived)) = pair {
++                let state = self.boundary_cultivation.as_mut().expect("same owner");
++                state
++                    .contacts
++                    .try_reserve(1)
++                    .map_err(|_| contact_error("cannot retain the returned contact"))?;
++                receipt.deposited = true;
++                state.contacts.push(BoundaryContact {
++                    source,
++                    arrived,
++                    receipt: receipt.clone(),
++                });
++            }
++        }
++        self.boundary_cultivation
++            .as_mut()
++            .expect("same owner")
++            .last_return = Some(receipt.clone());
++        Ok(NativeMorphologyTransition::BoundaryContact { returned: receipt })
++    }
++
++    fn found_boundary_pair(
++        &self,
++        population: NativeTensorOrdinal,
++        predicted: u32,
++        arrived: u32,
++        source: &ContemporaryCarrier<'chart>,
++    ) -> Result<Option<(ContemporaryCarrier<'chart>, ContemporaryCarrier<'chart>)>, Error> {
++        let selected = self
++            .residence
++            .gather_rows(population, &[predicted, arrived])?;
++        if selected.width != source.section.width() {
++            return Err(Error::Operation);
++        }
++        let surface = self.residence.surface();
++        let grain = source.section.grain();
++        let width = source.section.width();
++        let fields = (0..6)
++            .map(|_| surface.fresh_section(1, width, grain))
++            .collect::<Result<Vec<_>, _>>()?;
++        let entering = surface.shape_enter_resident_bfloat16(
++            1,
++            width,
++            Dyadic::ONE,
++            grain,
++            selected.frame.exponent,
++            selected.entry_octaves,
++        )?;
++        let negative = DyadicEnclosure {
++            lo: -1,
++            hi: -1,
++            grain: 0,
++        };
++        let negative_shape = surface.shape_scale(1, width, entering.needed, negative)?;
++        let current_shape =
++            surface.shape_re_entry(1, width, entering.needed, negative_shape.needed)?;
++        let joined_shape =
++            surface.shape_re_entry(1, width, source.bound_octaves, current_shape.needed)?;
++        let lineage = [vec![], vec![], vec![], vec![0], vec![1, 3], vec![2, 4]];
++        let bounds = [
++            entering.needed,
++            entering.needed,
++            source.bound_octaves,
++            negative_shape.needed,
++            current_shape.needed,
++            joined_shape.needed,
++        ];
++        let mut passage = surface.begin_passage(&lineage)?;
++        for at in 0..6 {
++            {
++                let lane = passage.open(at, &lineage[at])?;
++                match at {
++                    0 | 1 => surface.record_enter_resident_bfloat16(
++                        &lane,
++                        selected.address + (at * width * 2) as u64,
++                        1,
++                        width,
++                        Dyadic::ONE,
++                        &fields[at],
++                    )?,
++                    2 => surface.record_terminal_row(&lane, &source.section, &fields[at])?,
++                    3 => surface.record_scale(&lane, &fields[0], negative, &fields[at])?,
++                    4 => surface.record_re_entry(&lane, &fields[1], &fields[3], &fields[at])?,
++                    5 => surface.record_re_entry(&lane, &fields[2], &fields[4], &fields[at])?,
++                    _ => unreachable!(),
++                }
++            }
++            passage.close(at, &fields[at], bounds[at])?;
++        }
++        let reading = passage.finish()?.launch()?;
++        if !reading.obstruction.is_empty() {
++            return Err(contact_error(
++                "the actual next-arrival current refused its chart",
++            ));
++        }
++        if reading.slots[4].max_octave == 0 {
++            return Ok(None);
++        }
++        let mut fields: Vec<Option<ResidentSection<'chart>>> =
++            fields.into_iter().map(Some).collect();
++        Ok(Some((
++            ContemporaryCarrier {
++                section: fields[2].take().expect("source"),
++                bound_octaves: reading.slots[2].max_octave.max(1),
++            },
++            ContemporaryCarrier {
++                section: fields[5].take().expect("arrived"),
++                bound_octaves: reading.slots[5].max_octave.max(1),
++            },
++        )))
++    }
++}
+diff --git a/crates/holonic-engine/src/holonic_intelligence/operative_rest.rs b/crates/holonic-engine/src/holonic_intelligence/operative_rest.rs
+index 01a92b12..3ad6d0cb 100644
+--- a/crates/holonic-engine/src/holonic_intelligence/operative_rest.rs
++++ b/crates/holonic-engine/src/holonic_intelligence/operative_rest.rs
+@@ -3,12 +3,13 @@
+ 
+ use super::{
+     full_operation::ContemporaryCarrier, operative_passage_return::PassageCultivation,
++    operative_boundary_contact::{BoundaryCultivation, NativeBoundaryCultivationRest},
+     operative_return::OverlayAtom, operative_reuse::NativeForwardReuse,
+     operative_terminal::TiledCarrier, NativeCarrierOrdinal, NativeCycleInterruption,
+     NativeCycleProgress, NativeForwardReuseCensus, NativeFullOperationError,
+     NativeFullOperatorEcology, NativeFullOperatorSession, NativeNumericalOrigin,
+     NativeOperatorResidence, NativeOverlayRest, NativePassageReturn, NativeReturnAperture,
+-    NativeSuccessorProjection, NativeTensorOrdinal,
++    NativeSuccessorProjection, NativeTensorOrdinal, NativeOperationPrimitive,
+ };
+ use crate::resident_section::{
+     ResidentGrain, ResidentRefusal, ResidentSectionRest, ResidentSurface,
+@@ -18,6 +19,7 @@ use std::collections::BTreeMap;
+ use thiserror::Error;
+ 
+ pub const NATIVE_SESSION_REST_SCHEMA: &str = "holonic-engine.native-full-session-rest.v1";
++pub const NATIVE_SESSION_REST_SCHEMA_V2: &str = "holonic-engine.native-full-session-rest.v2";
+ 
+ #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+ #[serde(deny_unknown_fields)]
+@@ -82,6 +84,7 @@ pub struct NativeFullSessionRest {
+     pub overlay: BTreeMap<NativeTensorOrdinal, Vec<NativeOverlayRest>>,
+     pub passage: Option<NativePassageRest>,
+     pub reuse: Option<NativeForwardReuseRest>,
++    pub boundary: Option<NativeBoundaryCultivationRest>,
+ }
+ 
+ #[derive(Debug, Error)]
+@@ -218,9 +221,18 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+             passage.check_rest_ownership()?;
+         }
+         let surface = self.residence.surface();
++        let boundary = self
++            .boundary_cultivation
++            .as_ref()
++            .map(|b| b.detach_rest(surface))
++            .transpose()?;
+         let rest = NativeFullSessionRest {
+             header: NativeSessionRestHeader {
+-                schema: NATIVE_SESSION_REST_SCHEMA.into(),
++                schema: if boundary.is_some() {
++                    NATIVE_SESSION_REST_SCHEMA_V2.into()
++                } else {
++                    NATIVE_SESSION_REST_SCHEMA.into()
++                },
+                 ecology: self.ecology.clone(),
+                 operation_at: self.operation_at,
+                 generation: self.generation,
+@@ -263,6 +275,7 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+                 .as_ref()
+                 .map(|r| r.detach_rest(surface))
+                 .transpose()?,
++            boundary,
+         };
+         rest.validate()?;
+         Ok(rest)
+@@ -325,6 +338,11 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+             .as_ref()
+             .map(|r| NativeForwardReuse::remount_rest(ecology, surface, r))
+             .transpose()?;
++        session.boundary_cultivation = rest
++            .boundary
++            .as_ref()
++            .map(|b| BoundaryCultivation::remount_rest(surface, b))
++            .transpose()?;
+         if let Some(rows) = rest.header.row_population {
+             session.ensure_row_population(rows)?;
+         }
+@@ -346,7 +364,8 @@ impl NativeFullSessionRest {
+             .ecology
+             .validate()
+             .map_err(NativeFullOperationError::from)?;
+-        if self.header.schema != NATIVE_SESSION_REST_SCHEMA
++        if (self.header.schema != NATIVE_SESSION_REST_SCHEMA
++            && self.header.schema != NATIVE_SESSION_REST_SCHEMA_V2)
+             || self.header.generation != self.header.chronology.len() as u64
+             || self
+                 .header
+@@ -363,7 +382,13 @@ impl NativeFullSessionRest {
+                 .as_ref()
+                 .is_some_and(|i| self.header.progress.as_ref() != Some(&i.progress))
+             || (self.header.aperture.is_some() && self.passage.is_some())
+-            || (self.reuse.is_some() && self.passage.is_none())
++            || (self.reuse.is_some() && self.passage.is_none() && self.boundary.is_none())
++            || (self.boundary.is_some()
++                && (self.header.schema != NATIVE_SESSION_REST_SCHEMA_V2
++                    || self.header.aperture.is_some()
++                    || self.passage.is_some()
++                    || !self.overlay.is_empty()))
++            || (self.boundary.is_none() && self.header.schema != NATIVE_SESSION_REST_SCHEMA)
+         {
+             return Err(NativeSessionRestError::Malformed(
+                 "session header or profile".into(),
+@@ -416,6 +441,102 @@ impl NativeFullSessionRest {
+         if let Some(held) = &self.terminal_presented {
+             section(held)?;
+         }
++        if let Some(boundary) = &self.boundary {
++            let terminal_at = self.header.ecology.operations.len().checked_sub(5).ok_or_else(||
++                NativeSessionRestError::Malformed("boundary terminal chart".into()))?;
++            let terminal = self.header.ecology.operations.get(terminal_at).ok_or_else(||
++                NativeSessionRestError::Malformed("boundary terminal operation".into()))?;
++            if !matches!(terminal.primitive, NativeOperationPrimitive::Contract)
++                || terminal.coefficients.len() != 1
++            {
++                return Err(NativeSessionRestError::Malformed("boundary terminal coefficient map".into()));
++            }
++            let population = terminal.coefficients[0];
++            let tied = self.header.ecology.coefficient_populations.get(population.0 as usize)
++                .ok_or_else(|| NativeSessionRestError::Malformed("boundary coefficient population".into()))?;
++            let [address_extent, tied_dim] = tied.shape.as_slice() else {
++                return Err(NativeSessionRestError::Malformed("boundary coefficient shape".into()));
++            };
++            if *address_extent == 0 || *tied_dim == 0 || !self.header.ecology.operations.iter().any(|operation| {
++                matches!(operation.primitive, NativeOperationPrimitive::Lookup { .. })
++                    && operation.coefficients.as_slice() == [population]
++            }) {
++                return Err(NativeSessionRestError::Malformed(
++                    "boundary map is not shared by Lookup and terminal Contract".into(),
++                ));
++            }
++            let mut prior_order = None;
++            let validate_receipt = |receipt: &super::operative_boundary_contact::NativeBoundaryContactReceipt|
++                -> Result<(), NativeSessionRestError> {
++                if !receipt.deposited || receipt.population != population
++                    || receipt.predicted as usize >= *address_extent
++                    || receipt.arrived as usize >= *address_extent
++                    || receipt.source_generation > receipt.return_generation
++                    || receipt.return_generation > self.header.generation
++                {
++                    return Err(NativeSessionRestError::Malformed("boundary contact receipt".into()));
++                }
++                Ok(())
++            };
++            for contact in &boundary.contacts {
++                for held in [&contact.source, &contact.arrived] {
++                    section(held)?;
++                    if held.rows != 1 || held.width != *tied_dim
++                        || held.grain.0 != self.header.grain
++                        || held.intervals.iter().any(|(lo, hi)| lo != hi)
++                    {
++                        return Err(NativeSessionRestError::Malformed("boundary founding section chart".into()));
++                    }
++                }
++                validate_receipt(&contact.receipt)?;
++                let order = (contact.receipt.source_generation, contact.receipt.return_generation);
++                if prior_order.is_some_and(|prior| order < prior) {
++                    return Err(NativeSessionRestError::Malformed("boundary contact order".into()));
++                }
++                prior_order = Some(order);
++            }
++            if let Some(face) = &boundary.last_face {
++                if face.generation > self.header.generation || face.address as usize >= *address_extent {
++                    return Err(NativeSessionRestError::Malformed("boundary last face".into()));
++                }
++                if self.header.cycle_complete && self.header.interruption.is_none()
++                    && face.generation != self.header.generation
++                {
++                    return Err(NativeSessionRestError::Malformed(
++                        "completed boundary face is stale".into(),
++                    ));
++                }
++            } else if self.terminal_presented.is_some() {
++                return Err(NativeSessionRestError::Malformed("boundary terminal has no last face".into()));
++            }
++            if self.header.cycle_complete && self.header.interruption.is_none()
++                && (boundary.last_face.is_none()
++                    || self.terminal_presented.is_none()
++                    || self.terminal_carrier.is_none())
++            {
++                return Err(NativeSessionRestError::Malformed(
++                    "completed boundary has no terminal standing".into(),
++                ));
++            }
++            if let Some(last_return) = &boundary.last_return {
++                if last_return.deposited {
++                    validate_receipt(last_return)?;
++                    if boundary.contacts.last().map(|contact| &contact.receipt) != Some(last_return) {
++                        return Err(NativeSessionRestError::Malformed("boundary last return differs from final contact".into()));
++                    }
++                } else if last_return.population != population
++                    || last_return.predicted as usize >= *address_extent
++                    || last_return.arrived as usize >= *address_extent
++                    || last_return.source_generation > last_return.return_generation
++                    || last_return.return_generation > self.header.generation
++                {
++                    return Err(NativeSessionRestError::Malformed("boundary last return".into()));
++                }
++                if boundary.last_face.is_none() {
++                    return Err(NativeSessionRestError::Malformed("boundary return has no face".into()));
++                }
++            }
++        }
+         let overlays = |map: &BTreeMap<NativeTensorOrdinal, Vec<NativeOverlayRest>>| -> Result<(), NativeSessionRestError> {
+             for (population, atoms) in map {
+                 let shape = self.header.ecology.coefficient_populations.get(population.0 as usize)
+diff --git a/crates/holonic-engine/src/holonic_intelligence/operative_rest_wire.rs b/crates/holonic-engine/src/holonic_intelligence/operative_rest_wire.rs
+index 5514e8ab..c3e97928 100644
+--- a/crates/holonic-engine/src/holonic_intelligence/operative_rest_wire.rs
++++ b/crates/holonic-engine/src/holonic_intelligence/operative_rest_wire.rs
+@@ -10,7 +10,9 @@ use std::{
+ };
+ 
+ const MAGIC: &[u8] = b"HNA-SESSION-REST\x01";
++const MAGIC_V2: &[u8] = b"HNA-SESSION-REST\x02";
+ const END: &[u8] = b"HNA-REST-END\x01";
++const END_V2: &[u8] = b"HNA-REST-END\x02";
+ const CHUNK: usize = 64 * 1024;
+ 
+ #[cfg(test)]
+@@ -243,10 +245,65 @@ fn read_tiled(input: &mut Take<impl Read>) -> Result<Option<NativeTiledRest>, Er
+     }))
+ }
+ 
++fn boundary(
++    out: &mut impl Write,
++    value: &Option<NativeBoundaryCultivationRest>,
++) -> Result<(), Error> {
++    flag(out, value.is_some())?;
++    if let Some(value) = value {
++        number(out, value.contacts.len())?;
++        for contact in &value.contacts {
++            section(out, &contact.source)?;
++            section(out, &contact.arrived)?;
++            json(out, &contact.receipt)?;
++        }
++        flag(out, value.last_face.is_some())?;
++        if let Some(face) = &value.last_face {
++            json(out, face)?;
++        }
++        flag(out, value.last_return.is_some())?;
++        if let Some(receipt) = &value.last_return {
++            json(out, receipt)?;
++        }
++    }
++    Ok(())
++}
++
++fn read_boundary(input: &mut Take<impl Read>) -> Result<Option<NativeBoundaryCultivationRest>, Error> {
++    if !read_flag(input)? {
++        return Ok(None);
++    }
++    let count = count(input, 32)?;
++    let mut contacts = Vec::new();
++    for _ in 0..count {
++        contacts.push(NativeBoundaryContactRest {
++            source: read_section(input)?,
++            arrived: read_section(input)?,
++            receipt: read_json(input)?,
++        });
++    }
++    let last_face = if read_flag(input)? {
++        Some(read_json(input)?)
++    } else {
++        None
++    };
++    let last_return = if read_flag(input)? {
++        Some(read_json(input)?)
++    } else {
++        None
++    };
++    Ok(Some(NativeBoundaryCultivationRest {
++        contacts,
++        last_face,
++        last_return,
++    }))
++}
++
+ impl NativeFullSessionRest {
+     pub fn write_to(&self, out: &mut impl Write) -> Result<(), Error> {
+         self.validate()?;
+-        out.write_all(MAGIC)?;
++        let version_two = self.boundary.is_some();
++        out.write_all(if version_two { MAGIC_V2 } else { MAGIC })?;
+         json(out, &self.header)?;
+         sections(out, &self.carriers)?;
+         sections(out, &self.checkpoints)?;
+@@ -282,7 +339,10 @@ impl NativeFullSessionRest {
+             }
+             sections(out, &reuse.standing)?;
+         }
+-        out.write_all(END)?;
++        if version_two {
++            boundary(out, &self.boundary)?;
++        }
++        out.write_all(if version_two { END_V2 } else { END })?;
+         Ok(())
+     }
+ 
+@@ -292,9 +352,13 @@ impl NativeFullSessionRest {
+         let mut input = input.take(octets);
+         let mut magic = vec![0; MAGIC.len()];
+         input.read_exact(&mut magic)?;
+-        if magic != MAGIC {
++        let version_two = if magic == MAGIC {
++            false
++        } else if magic == MAGIC_V2 {
++            true
++        } else {
+             return Err(malformed("session wire magic/version"));
+-        }
++        };
+         let header = read_json(&mut input)?;
+         let carriers = read_sections(&mut input)?;
+         let checkpoints = read_sections(&mut input)?;
+@@ -348,9 +412,17 @@ impl NativeFullSessionRest {
+         } else {
+             None
+         };
++        let boundary_state = if version_two {
++            read_boundary(&mut input)?
++        } else {
++            None
++        };
++        if version_two && boundary_state.is_none() {
++            return Err(malformed("v2 boundary marker is absent"));
++        }
+         let mut end = vec![0; END.len()];
+         input.read_exact(&mut end)?;
+-        if end != END || input.limit() != 0 {
++        if end != if version_two { END_V2 } else { END } || input.limit() != 0 {
+             return Err(malformed("session frame end/trailing bytes"));
+         }
+         let rest = Self {
+@@ -364,6 +436,7 @@ impl NativeFullSessionRest {
+             overlay,
+             passage,
+             reuse,
++            boundary: boundary_state,
+         };
+         rest.validate()?;
+         Ok(rest)
+diff --git a/crates/holonic-engine/src/holonic_intelligence/operative_rest_wire_tests.rs b/crates/holonic-engine/src/holonic_intelligence/operative_rest_wire_tests.rs
+index 9629df5d..a3c199d0 100644
+--- a/crates/holonic-engine/src/holonic_intelligence/operative_rest_wire_tests.rs
++++ b/crates/holonic-engine/src/holonic_intelligence/operative_rest_wire_tests.rs
+@@ -27,7 +27,7 @@ fn ecology() -> NativeFullOperatorEcology {
+     NativeFullOperatorEcology {
+         schema: NATIVE_FULL_OPERATOR_ECOLOGY_SCHEMA.to_owned(),
+         shared_carrier_extent: 1,
+-        coefficient_populations: (0..3)
++        coefficient_populations: (0..2)
+             .map(|at| NativeCoefficientPopulation {
+                 ordinal: NativeTensorOrdinal(at),
+                 shape: vec![1, 1],
+@@ -51,7 +51,7 @@ fn ecology() -> NativeFullOperatorEcology {
+             ),
+             node(1, NativeOperationPrimitive::Contract, &[0], &[1]),
+             node(2, NativeOperationPrimitive::Add, &[0, 1], &[]),
+-            node(3, NativeOperationPrimitive::Contract, &[2], &[2]),
++            node(3, NativeOperationPrimitive::Contract, &[2], &[0]),
+             node(
+                 4,
+                 NativeOperationPrimitive::Scale { by: scale.clone() },
+@@ -130,6 +130,51 @@ fn base_rest() -> NativeFullSessionRest {
+             .collect(),
+         passage: None,
+         reuse: None,
++        boundary: None,
++    }
++}
++
++fn boundary() -> NativeBoundaryCultivationRest {
++    let receipt = NativeBoundaryContactReceipt {
++        source_generation: 8,
++        return_generation: 8,
++        population: NativeTensorOrdinal(0),
++        predicted: 0,
++        arrived: 0,
++        deposited: true,
++    };
++    NativeBoundaryCultivationRest {
++        contacts: vec![NativeBoundaryContactRest {
++            source: section(),
++            arrived: section(),
++            receipt: receipt.clone(),
++        }],
++        last_face: Some(NativeBoundaryFace {
++            generation: 8,
++            address: 0,
++        }),
++        last_return: Some(receipt),
++    }
++}
++
++fn reuse() -> NativeForwardReuseRest {
++    NativeForwardReuseRest {
++        census: NativeForwardReuseCensus::default(),
++        numerical: [(
++            NativeCarrierOrdinal(0),
++            NativeNumericalRest {
++                admitted: 1,
++                projection: NativeSuccessorProjection::Exact,
++                origin: NativeNumericalOrigin {
++                    occurrence: 0,
++                    operation: 0,
++                    row_addresses: vec![0],
++                },
++            },
++        )]
++        .into_iter()
++        .collect(),
++        standing: [(NativeCarrierOrdinal(0), section())].into_iter().collect(),
+     }
+ }
+ 
+@@ -252,3 +297,75 @@ fn malformed_operator_extents_and_missing_ports_refuse_before_device_access() {
+     rest.header.ecology.operations[1].inputs.clear();
+     assert!(rest.validate().is_err());
+ }
++
++#[test]
++fn boundary_v2_roundtrip_truncation_and_profile_controls() {
++    let mut rest = base_rest();
++    rest.header.schema = NATIVE_SESSION_REST_SCHEMA_V2.to_owned();
++    rest.terminal_presented = Some(section());
++    rest.overlay.clear();
++    rest.boundary = Some(boundary());
++    rest.reuse = Some(reuse());
++    let bytes = encoded(&rest);
++    assert!(bytes.starts_with(b"HNA-SESSION-REST\x02"));
++    assert_eq!(
++        NativeFullSessionRest::read_from(&mut Cursor::new(bytes.clone()), bytes.len() as u64)
++            .unwrap(),
++        rest
++    );
++    for length in 0..bytes.len() {
++        assert!(NativeFullSessionRest::read_from(
++            &mut Cursor::new(bytes[..length].to_vec()),
++            length as u64
++        )
++        .is_err());
++    }
++    let mut malformed = base_rest();
++    malformed.header.schema = NATIVE_SESSION_REST_SCHEMA_V2.to_owned();
++    malformed.terminal_presented = Some(section());
++    malformed.overlay.clear();
++    malformed.boundary = Some(boundary());
++    malformed.reuse = Some(reuse());
++    malformed.boundary.as_mut().unwrap().contacts[0].receipt.deposited = false;
++    assert!(malformed.write_to(&mut Vec::new()).is_err());
++    let mut mismatched = base_rest();
++    mismatched.terminal_presented = Some(section());
++    mismatched.overlay.clear();
++    mismatched.boundary = Some(boundary());
++    mismatched.reuse = Some(reuse());
++    mismatched.header.schema = NATIVE_SESSION_REST_SCHEMA.to_owned();
++    assert!(mismatched.write_to(&mut Vec::new()).is_err());
++
++    let mut missing_marker = encoded(&base_rest());
++    let old_end = b"HNA-REST-END\x01".len();
++    missing_marker.truncate(missing_marker.len() - old_end);
++    missing_marker[b"HNA-SESSION-REST".len()] = 2;
++    missing_marker.push(0);
++    missing_marker.extend_from_slice(b"HNA-REST-END\x02");
++    assert!(NativeFullSessionRest::read_from(
++        &mut Cursor::new(missing_marker.clone()),
++        missing_marker.len() as u64
++    )
++    .is_err());
++
++    let mut no_face = base_rest();
++    no_face.header.schema = NATIVE_SESSION_REST_SCHEMA_V2.to_owned();
++    no_face.overlay.clear();
++    no_face.boundary = Some(boundary());
++    no_face.boundary.as_mut().unwrap().last_face = None;
++    assert!(no_face.write_to(&mut Vec::new()).is_err());
++
++    let mut stale_face = base_rest();
++    stale_face.header.schema = NATIVE_SESSION_REST_SCHEMA_V2.to_owned();
++    stale_face.overlay.clear();
++    stale_face.boundary = Some(boundary());
++    stale_face.boundary.as_mut().unwrap().last_face.as_mut().unwrap().generation = 7;
++    assert!(stale_face.write_to(&mut Vec::new()).is_err());
++
++    let mut no_terminal = base_rest();
++    no_terminal.header.schema = NATIVE_SESSION_REST_SCHEMA_V2.to_owned();
++    no_terminal.overlay.clear();
++    no_terminal.boundary = Some(boundary());
++    no_terminal.terminal_carrier = None;
++    assert!(no_terminal.write_to(&mut Vec::new()).is_err());
++}
+diff --git a/crates/holonic-engine/src/holonic_intelligence/operative_terminal.rs b/crates/holonic-engine/src/holonic_intelligence/operative_terminal.rs
+index 08ff5612..d9062e85 100644
+--- a/crates/holonic-engine/src/holonic_intelligence/operative_terminal.rs
++++ b/crates/holonic-engine/src/holonic_intelligence/operative_terminal.rs
+@@ -239,6 +239,17 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+         }
+         self.generation.checked_add(5).ok_or(NativeFullOperationError::Generation)?;
+         let operations = self.terminal_operations()?;
++        // The word stages all new fields before replacing its input. An allocation refusal may
++        // release numerical cache and retry that same local realization without repeating a
++        // contact deposit or changing the occurrence's chronology.
++        loop {
++            match self.apply_boundary_word() {
++                Ok(())=>break,
++                Err(error) if super::full_operation::allocation_refusal(&error)
++                    && self.forward_reuse.as_mut().is_some_and(|reuse|reuse.relieve_pressure())=>{},
++                Err(error)=>return Err(error),
++            }
++        }
+         let dissecting = self.dissection.is_some();
+         let returning = self.aperture.is_some() || dissecting;
+         let mut run = loop {
+@@ -336,6 +347,12 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+         if returning {
+             self.terminal_reacted = Some(reacted.ok_or(NativeFullOperationError::Operation)?);
+             self.terminal_presented = presented;
++        } else if self.boundary_cultivation.is_some() {
++            self.terminal_reacted = None;
++            self.terminal_presented = presented;
++            if let Some(reuse) = &mut self.forward_reuse {
++                for (output, carrier) in std::mem::take(&mut self.checkpoints) { reuse.retain(output, carrier); }
++            } else { self.checkpoints.clear(); }
+         } else {
+             self.terminal_reacted = None;
+             self.terminal_presented = None;
+@@ -348,6 +365,12 @@ impl<'residence, 'chart> NativeFullOperatorSession<'residence, 'chart> {
+             let contracted = contracted.ok_or(NativeFullOperationError::Operation)?;
+             self.terminal_contracted = Some(self.tiled_last_row(&contracted)?);
+         }
++        if let Some(state)=&mut self.boundary_cultivation {
++            let emitted=emissions.last().ok_or(NativeFullOperationError::Operation)?;
++            let address=super::face_of_last_row(&emitted.intervals,emitted.rows,emitted.width)
++                .ok_or(NativeFullOperationError::Operation)?;
++            state.last_face=Some(super::NativeBoundaryFace {generation:self.generation,address:address.selected});
++        }
+         Ok((emissions, traces))
+     }
+ 
+diff --git a/crates/holonic-engine/src/resident_section/surface_passage.rs b/crates/holonic-engine/src/resident_section/surface_passage.rs
+index 2de6e6c1..4e7cec1f 100644
+--- a/crates/holonic-engine/src/resident_section/surface_passage.rs
++++ b/crates/holonic-engine/src/resident_section/surface_passage.rs
+@@ -704,7 +704,9 @@ impl<'chart> ResidentSurface<'chart> {
+     /// Finite Euclidean contact of two point observations, applied to a third interval section.
+     /// Formal owner: `HolonicOrientedSiteTransport.PassiveContact.contact`. Rows are independent
+     /// declared charts. This records its projected map, not a learned model binding, an inferred
+-    /// metric, or the lifted axis. Inputs remain owned by their caller as the reconstruction fibre.
++    /// metric, or the lifted axis. A one-row founding section is broadcast immutably over later
++    /// query rows; equal source/query rows retain row-paired behavior. Inputs remain owned by
++    /// their caller as the reconstruction fibre.
+     /// Non-point founding observations and unsupported arithmetic refuse on the device; no
+     /// midpoint, learning gain, clipping or hidden wider ecology is substituted.
+     pub fn record_passive_contact(
+@@ -716,18 +718,24 @@ impl<'chart> ResidentSurface<'chart> {
+         out: &ResidentSection<'chart>,
+     ) -> Result<(), ResidentRefusal> {
+         const OPERATION: &str = "passive-contact";
+-        if source.rows == 0 || source.width == 0
+-            || [arrived, query, out].iter().any(|section|
+-                section.rows != source.rows || section.width != source.width
+-                    || section.grain != source.grain)
++        if source.rows == 0 || query.rows == 0 || source.width == 0
++            || (source.rows != 1 && source.rows != query.rows)
++            || arrived.rows != source.rows || arrived.width != source.width
++            || arrived.grain != source.grain
++            || query.width != source.width || query.grain != source.grain
++            || out.rows != query.rows || out.width != query.width
++            || out.grain != query.grain
+         {
+             return Err(ResidentRefusal::Declaration {
+                 operation: OPERATION, what: "contact sections require one nonempty carrier chart".into(),
+             });
+         }
+-        let rows = u32::try_from(source.rows).map_err(|_| ResidentRefusal::GridAperture {
++        let founding_rows = u32::try_from(source.rows).map_err(|_| ResidentRefusal::GridAperture {
+             operation: OPERATION, rows: source.rows, width: source.width,
+         })?;
++        let rows = u32::try_from(query.rows).map_err(|_| ResidentRefusal::GridAperture {
++            operation: OPERATION, rows: query.rows, width: query.width,
++        })?;
+         let width = u32::try_from(source.width).map_err(|_| ResidentRefusal::GridAperture {
+             operation: OPERATION, rows: source.rows, width: source.width,
+         })?;
+@@ -735,9 +743,10 @@ impl<'chart> ResidentSurface<'chart> {
+         params.ptr(source.lo.device_ptr()).ptr(source.hi.device_ptr())
+             .ptr(arrived.lo.device_ptr()).ptr(arrived.hi.device_ptr())
+             .ptr(query.lo.device_ptr()).ptr(query.hi.device_ptr())
+-            .u32(rows).u32(width).ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr())
++            .u32(rows).u32(width).u32(founding_rows)
++            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr())
+             .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+-        self.record_blocks(lane, "section_passive_contact", source.rows, self.launch.block_x,
++        self.record_blocks(lane, "section_passive_contact", query.rows, self.launch.block_x,
+             0, &mut params, OPERATION)
+     }
+ 
+diff --git a/crates/holonic-engine/src/resident_section/tests_core.rs b/crates/holonic-engine/src/resident_section/tests_core.rs
+index 9cca5a00..87c1e87d 100644
+--- a/crates/holonic-engine/src/resident_section/tests_core.rs
++++ b/crates/holonic-engine/src/resident_section/tests_core.rs
+@@ -164,6 +164,36 @@ fn passive_contact_encloses_query_boxes_and_refuses_unfounded_point_pairs() {
+     assert!(!reading.obstruction.is_empty());assert!(output.is_none());
+ }
+ 
++#[test]
++#[ignore = "requires CUDA; one founding contact reused across distinct query rows"]
++fn passive_contact_reuses_one_founding_row_across_later_queries() {
++    use num_traits::ToPrimitive;
++    let readout=ResidentReadout::new().expect("CUDA");
++    let surface=ResidentSurface::on(&readout).unwrap();
++    let x=[2,-1,3];
++    let y=[-1,4,2];
++    let queries=[[-7,3,-1],[5,5,5]];
++    let mount=|rows, values: Vec<(i64,i64)>| surface.mount_section_rest(
++        &ResidentSectionRest::found(rows,3,ResidentGrain(0),64,values).unwrap()).unwrap();
++    let source=mount(1,x.into_iter().map(|v|(v,v)).collect());
++    let arrived=mount(1,y.into_iter().map(|v|(v,v)).collect());
++    let query=mount(2,queries.into_iter().flatten().map(|v|(v,v)).collect());
++    let output=surface.fresh_section(2,3,ResidentGrain(0)).unwrap();
++    let mut passage=surface.begin_passage(&[vec![]]).unwrap();
++    {
++        let lane=passage.open(0,&[]).unwrap();
++        surface.record_passive_contact(&lane,&source,&arrived,&query,&output).unwrap();
++    }
++    passage.close(0,&output,64).unwrap();
++    let reading=passage.finish().unwrap().launch().unwrap();
++    assert!(reading.obstruction.is_empty(),"{:?}",reading.obstruction);
++    let returned=surface.read_out(&output).unwrap();
++    let expected=queries.into_iter().flat_map(|q|
++        passive_reference(&x,&y,&q).into_iter().map(|v| (v.floor().to_integer().to_i64().unwrap(),
++            v.ceil().to_integer().to_i64().unwrap()))).collect::<Vec<_>>();
++    assert_eq!(returned,expected);
++}
++
+ /// A one-occurrence passage entering `words` at `grain`, launched, and read out.
+ fn enter_once(
+     surface: &'static ResidentSurface<'static>,
+diff --git a/crates/holonics-hna/README.md b/crates/holonics-hna/README.md
+index 65e7f6b5..a47004a7 100644
+--- a/crates/holonics-hna/README.md
++++ b/crates/holonics-hna/README.md
+@@ -25,6 +25,14 @@ developmental sequence, selected-face receipts and persistence boundaries.
+ - Text steps request `NativeEmissionReadout::LastRow` through the public readout methods. Only
+   that terminal row crosses to the host; the complete resident successor and checkpoint remain
+   unchanged. Existing `advance_native` and `observe_native` still return every terminal row.
++- `HnaModel::from_native_rest_with_boundary_contact` opens the bounded tied-next-arrival law:
++  actual received contrasts retain reusable carrier-local contact maps, while matched self-returns
++  deposit nothing. Native inner-wire v2 preserves the learned word and pending face; earlier
++  native v1 rests are unchanged. The CLI selection is `hna session --tied-next-arrival`.
++- For this chart the text adapter delivers every newly received prompt address in causal order,
++  including a full followup. `HnaTextStep.native_occurrences` reports that work. The successful
++  ordinary correction and the failed isolated document-fact transfer are separate results in
++  the guide; coherent output is not a generalization guarantee.
+ 
+ The lower-level native session remains available from `holonic-engine` for interactive consumers.
+ Earlier alpha/circulation adapters retain their exact artifact and wire scopes; they are not
+diff --git a/crates/holonics-hna/examples/adjoint_return_ske1.rs b/crates/holonics-hna/examples/adjoint_return_ske1.rs
+index fdd66e72..433aa55f 100644
+--- a/crates/holonics-hna/examples/adjoint_return_ske1.rs
++++ b/crates/holonics-hna/examples/adjoint_return_ske1.rs
+@@ -139,6 +139,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
+     let (changed, adjoint) = match &second.traces[0].morphology_transition {
+         NativeMorphologyTransition::Changed { adjoint, .. } => (true, Some(adjoint.clone())),
+         NativeMorphologyTransition::Unchanged => (false, None),
++        NativeMorphologyTransition::BoundaryContact { .. } => return Err("this adjoint instrument requires its original return chart".into()),
+     };
+     let second_face = application.render(&second.final_emission)?;
+     let mut supports_by_layer: Vec<LayerSupport> = Vec::new();
+diff --git a/crates/holonics-hna/examples/boundary_contact_hnp4.rs b/crates/holonics-hna/examples/boundary_contact_hnp4.rs
+new file mode 100644
+index 00000000..4b4aa36d
+--- /dev/null
++++ b/crates/holonics-hna/examples/boundary_contact_hnp4.rs
+@@ -0,0 +1,112 @@
++//! Actual document occurrences cultivate the shared native boundary map. The file is exposure
++//! material, never a generated answer substituted for the model. The same probe is measured
++//! before/after, then the native model itself produces its text and paired rest.
++use holonics_hna::{
++    publish_new, AthenaTokenApplication, HnaModel, HnaOccurrence, HnaSession, HnaSessionError,
++    HnaTextApplication, HnaTextDisposition, NativeEmissionReadout,
++};
++use serde_json::json;
++use std::{io::Write, path::Path, time::Instant};
++
++fn err(e: impl std::fmt::Display) -> HnaSessionError {
++    HnaSessionError::Base(e.to_string())
++}
++fn material(
++    session: &mut HnaSession<'_, '_>,
++    source: &Path,
++    rows: &[u32],
++    out: &Path,
++    index: usize,
++) -> Result<(), HnaSessionError> {
++    if !session.missing_input_rows(rows).is_empty() {
++        session.acquire_input_material(
++            source,
++            rows,
++            &out.join(format!("input-{index:04}.safetensors")),
++        )?;
++    }
++    Ok(())
++}
++fn emit(value: serde_json::Value) -> Result<(), HnaSessionError> {
++    let mut out = std::io::stdout().lock();
++    serde_json::to_writer(&mut out, &value).map_err(err)?;
++    out.write_all(b"\n").and_then(|_| out.flush()).map_err(err)
++}
++fn main() -> Result<(), Box<dyn std::error::Error>> {
++    let args: Vec<_> = std::env::args().collect();
++    if args.len() != 7 {
++        return Err("BASE CODEC_SOURCE MATERIAL_FILE PROBE OUTPUT_DIR CYCLES".into());
++    }
++    let source = Path::new(&args[2]);
++    let out = Path::new(&args[5]);
++    let cycles: usize = args[6].parse()?;
++    if out.exists() {
++        return Err("use a new output directory".into());
++    }
++    std::fs::create_dir_all(out)?;
++    let bytes = std::fs::read(&args[3])?;
++    let document = std::str::from_utf8(&bytes)?;
++    let codec = AthenaTokenApplication::open(source)?;
++    let words = codec.encode(document)?;
++    if words.len() < 2 {
++        return Err("exposure has no next arrival".into());
++    }
++    let app = HnaTextApplication::open(source)?;
++    let probe = codec.encode_turn(&args[4])?;
++    let model = HnaModel::from_native_rest_with_boundary_contact(&args[1], None)?;
++    let started = Instant::now();
++    model.with_session(|session| {
++        material(session,source,&probe,out,0)?;
++        let before=session.advance_native_readout(&HnaOccurrence {row_addresses:probe.clone(),history:vec![]},
++            NativeEmissionReadout::LastRow)?.output.final_emission;
++        let before_face=codec.render(&before).map_err(err)?;
++        let mut returned=Vec::new();
++        // These are ordered, causally next document occurrences, not epochs or packet-size
++        // dependent events. The application does not compute a loss, contact or morphology.
++        let development=(||->Result<(),HnaSessionError> {
++            for end in 1..=words.len() {
++                material(session,source,&words[..end],out,end)?;
++                session.advance_native_readout(&HnaOccurrence {row_addresses:words[..end].to_vec(),history:vec![]},
++                    NativeEmissionReadout::LastRow)?;
++                if let Some(receipt)=session.last_boundary_return() {returned.push(receipt.clone());}
++                emit(json!({"event":"actual-material","addresses":end,"returned":session.last_boundary_return(),
++                    "maps":session.anatomy().boundary_contact_maps}))?;
++            }
++            Ok(())
++        })().err().map(|e|e.to_string());
++        session.checkpoint(&out.join("developed.hna"))?;
++        if let Some(failure)=development {
++            emit(json!({"event":"development-obstructed","error":failure,"anatomy":session.anatomy()}))?;
++            return Err(err(failure))
++        }
++        let after=session.advance_native_readout(&HnaOccurrence {row_addresses:probe,history:vec![]},
++            NativeEmissionReadout::LastRow)?.output.final_emission;
++        let after_face=codec.render(&after).map_err(err)?;
++        let altered=before.intervals.iter().zip(&after.intervals).filter(|(a,b)|a!=b).count();
++        let mut state=app.begin(session,&args[4])?;
++        let maps=session.anatomy().boundary_contact_maps;
++        let generation=(||->Result<(),HnaSessionError> {
++            for at in 0..cycles {
++                if matches!(state.disposition,HnaTextDisposition::Completed{..}|HnaTextDisposition::Obstructed{..}) {break}
++                material(session,source,&state.next_addresses(),out,words.len()+at+1)?;
++                let step=app.step(session,&mut state)?;
++                emit(json!({"event":"text-step","step":step,"returned":session.last_boundary_return()}))?;
++                assert_eq!(session.anatomy().boundary_contact_maps,maps,"a matched self-return deposited again");
++            }
++            Ok(())
++        })().err().map(|e|e.to_string());
++        state.interrupt("declared application budget or delivery boundary");
++        app.save(session,&state,&out.join("model.hna"),&out.join("text.json"))?;
++        let result=json!({"schema":"holonics.hnp4.boundary-contact-result.v1","material_file":args[3],
++            "material_octets":bytes.len(),"material_addresses":words.len(),"probe":args[4],
++            "before":before_face,"after":after_face,"altered_terminal_intervals":altered,
++            "returned":returned,"text":app.text(&state)?,"state":state,"anatomy":session.anatomy(),
++            "generation_error":generation,"elapsed_ms":started.elapsed().as_millis()});
++        publish_new(out.join("result.json"),|output|{
++            serde_json::to_writer(&mut *output,&result).map_err(std::io::Error::other)?;
++            output.write_all(b"\n")
++        }).map_err(err)?;
++        emit(result)
++    })?;
++    Ok(())
++}
+diff --git a/crates/holonics-hna/examples/boundary_restart_hnp4.rs b/crates/holonics-hna/examples/boundary_restart_hnp4.rs
+new file mode 100644
+index 00000000..c84dd49b
+--- /dev/null
++++ b/crates/holonics-hna/examples/boundary_restart_hnp4.rs
+@@ -0,0 +1,65 @@
++//! Complete-state native restart control, not an application quality experiment.
++use holonics_hna::{
++    read_checkpoint, HnaModel, HnaOccurrence, HnaSessionError, NativeEmissionReadout,
++};
++use serde_json::json;
++use std::path::Path;
++
++fn main() -> Result<(), Box<dyn std::error::Error>> {
++    let args: Vec<_> = std::env::args().collect();
++    let (source, remounted, expected, actual) = match args.get(1).map(String::as_str) {
++        Some("reference") if args.len() == 5 => (&args[2], Some(&args[3]), &args[4], None),
++        Some("resume") if args.len() == 5 => (&args[2], None, &args[3], Some(&args[4])),
++        _ => {
++            return Err(
++                "reference SOURCE REMOUNTED EXPECTED | resume REMOUNTED EXPECTED ACTUAL".into(),
++            )
++        }
++    };
++    let (_, original) = read_checkpoint(source)?;
++    let boundary = original
++        .boundary
++        .as_ref()
++        .ok_or("not a boundary-contact model")?;
++    let prior = original
++        .header
++        .previous_context
++        .as_ref()
++        .ok_or("no retained input word")?;
++    let predicted = boundary
++        .last_face
++        .as_ref()
++        .ok_or("no pending face")?
++        .address;
++    // Deliberate unmatched receiver control from actual already-present input material. This
++    // choice belongs to the test apparatus; the production law never chooses its next arrival.
++    let received = prior
++        .iter()
++        .copied()
++        .find(|value| *value != predicted)
++        .ok_or("no unmatched held input")?;
++    let mut word = prior.clone();
++    word.push(received);
++    let model = HnaModel::from_checkpoint(source, None)?;
++    model.with_session(|session| {
++        if let Some(path)=remounted {
++            session.checkpoint(Path::new(path))?;
++            let (_,restored)=read_checkpoint(path)?;
++            assert!(restored==original,"fresh mount altered complete native state");
++        }
++        let maps=session.anatomy().boundary_contact_maps;
++        session.advance_native_readout(&HnaOccurrence {row_addresses:word,history:vec![]},NativeEmissionReadout::LastRow)?;
++        assert_eq!(session.anatomy().boundary_contact_maps,maps+1,"the unmatched held-material control did not develop");
++        let path=actual.unwrap_or(expected);
++        session.checkpoint(Path::new(path))?;
++        if actual.is_some() {
++            let (_,reference)=read_checkpoint(expected)?;
++            let (_,continued)=read_checkpoint(path)?;
++            assert!(reference==continued,"process-separated learned successors differ");
++        }
++        println!("{}",json!({"event":"boundary-restart","mode":args[1],"full_state_equal":true,
++            "received":received,"returned":session.last_boundary_return(),"anatomy":session.anatomy()}));
++        Ok::<_,HnaSessionError>(())
++    })?;
++    Ok(())
++}
+diff --git a/crates/holonics-hna/examples/developmental_return_hna4.rs b/crates/holonics-hna/examples/developmental_return_hna4.rs
+index 0aecd785..7eff8696 100644
+--- a/crates/holonics-hna/examples/developmental_return_hna4.rs
++++ b/crates/holonics-hna/examples/developmental_return_hna4.rs
+@@ -97,6 +97,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
+     let (second_transition_changed, deposit) = match &second.traces[0].morphology_transition {
+         NativeMorphologyTransition::Changed { deposit, .. } => (true, Some(deposit.clone())),
+         NativeMorphologyTransition::Unchanged => (false, None),
++        NativeMorphologyTransition::BoundaryContact { .. } => return Err("this overlay instrument requires its original return chart".into()),
+     };
+     let overlay_rank_carried_by_terminal_operations = second
+         .traces
+diff --git a/crates/holonics-hna/examples/text_hnp4.rs b/crates/holonics-hna/examples/text_hnp4.rs
+index ffa92ca5..3c44ab1f 100644
+--- a/crates/holonics-hna/examples/text_hnp4.rs
++++ b/crates/holonics-hna/examples/text_hnp4.rs
+@@ -75,6 +75,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
+     let args: Vec<_> = std::env::args().collect();
+     let started = Instant::now();
+     let (model,app,initial,source,output,cycles,prompt,observe)=match args.get(1).map(String::as_str) {
++        Some("contact") if args.len()==7=>{
++            let source=Path::new(&args[3]);
++            let model=HnaModel::from_native_rest_with_boundary_contact(&args[2],None)?;
++            (model,HnaTextApplication::open(source)?,None,source,Path::new(&args[5]),args[6].parse::<usize>()?,Some(args[4].as_str()),false)
++        }
+         Some("fresh") if args.len()==9=>{
+             let source=Path::new(&args[3]);
+             let shift=args[8].parse()?;
+@@ -88,7 +93,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
+             let observe=state.observation_only;
+             (model,app,Some(state),Path::new(&args[3]),Path::new(&args[4]),args[5].parse::<usize>()?,None,observe)
+         }
+-        _=>return Err("fresh REST CODEC_SOURCE TEXT OUT_DIR CYCLES develop|observe SHIFT | resume TEXT_MANIFEST SOURCE OUT_DIR CYCLES".into()),
++        Some("followup") if args.len()==7=>{
++            let (model,app,state)=HnaTextApplication::load(Path::new(&args[2]))?;
++            let observe=state.observation_only;
++            (model,app,Some(state),Path::new(&args[3]),Path::new(&args[4]),args[6].parse::<usize>()?,Some(args[5].as_str()),observe)
++        }
++        _=>return Err("contact REST CODEC_SOURCE TEXT OUT_DIR CYCLES | fresh REST CODEC_SOURCE TEXT OUT_DIR CYCLES develop|observe SHIFT | resume TEXT_MANIFEST SOURCE OUT_DIR CYCLES | followup TEXT_MANIFEST SOURCE OUT_DIR TEXT CYCLES".into()),
+     };
+     std::fs::create_dir_all(output)?;
+     if output.join("model.hna").exists() || output.join("text.json").exists() {
+@@ -96,7 +106,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
+     }
+     eprintln!("HNP4 text: mounting at {:?}", started.elapsed());
+     model.with_session(|session| {
+-        let mut state=match initial {Some(state)=>state,None=>app.begin(session,prompt.expect("fresh prompt"))?};
++        let mut state=match initial {
++            Some(previous) if args[1]=="followup"=>app.followup(session,&previous,prompt.expect("followup text"))?,
++            Some(state)=>state,None=>app.begin(session,prompt.expect("fresh prompt"))?
++        };
+         state.observation_only=observe;
+         let delivery=drive(&app,session,&mut state,source,output,cycles).err().map(|error|error.to_string());
+         if let Some(error)=&delivery {state.interrupt(format!("exterior delivery: {error}"));}
+diff --git a/crates/holonics-hna/src/checkpoint.rs b/crates/holonics-hna/src/checkpoint.rs
+index cb0ac258..5f04c1fb 100644
+--- a/crates/holonics-hna/src/checkpoint.rs
++++ b/crates/holonics-hna/src/checkpoint.rs
+@@ -110,6 +110,16 @@ struct TransportHeader {
+ 
+ impl HnaBaseDependency {
+     pub fn capture(path: impl AsRef<Path>, class: Option<usize>) -> Result<Self, CheckpointError> {
++        Ok(Self::capture_with_open_handle(path, class)?.0)
++    }
++
++    /// Capture the immutable pin and return the same file handle, rewound to byte zero after its
++    /// hash is complete. Fresh model construction consumes this handle directly, avoiding a
++    /// second full hash; loading an existing dependency continues to use `open_verified` below.
++    pub fn capture_with_open_handle(
++        path: impl AsRef<Path>,
++        class: Option<usize>,
++    ) -> Result<(Self, File), CheckpointError> {
+         let requested = path.as_ref();
+         let path = requested.canonicalize().map_err(|error| {
+             if error.kind() == io::ErrorKind::NotFound {
+@@ -129,13 +139,17 @@ impl HnaBaseDependency {
+         })?;
+         let octets = file.metadata()?.len();
+         let sha256 = hash_reader(&mut file)?;
+-        Ok(Self {
+-            path,
+-            octets,
+-            sha256,
+-            class,
+-            input_material: Vec::new(),
+-        })
++        file.seek(SeekFrom::Start(0))?;
++        Ok((
++            Self {
++                path,
++                octets,
++                sha256,
++                class,
++                input_material: Vec::new(),
++            },
++            file,
++        ))
+     }
+ 
+     /// Opens the verified base once and rewinds that same handle for the consumer.
+@@ -420,6 +434,25 @@ mod tests {
+         assert!(dependency.open_verified(Some(&moved)).is_ok());
+     }
+ 
++    #[test]
++    fn capture_with_open_handle_returns_the_pinned_file_at_zero() {
++        let directory = tempdir().unwrap();
++        let path = directory.path().join("base.bin");
++        std::fs::write(&path, b"abc").unwrap();
++        let (dependency, mut file) = HnaBaseDependency::capture_with_open_handle(&path, Some(7)).unwrap();
++        assert_eq!(dependency.path, path.canonicalize().unwrap());
++        assert_eq!(dependency.octets, 3);
++        assert_eq!(dependency.sha256, "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
++        assert_eq!(file.stream_position().unwrap(), 0);
++        std::fs::rename(&path, directory.path().join("retained.bin")).unwrap();
++        std::fs::write(&path, b"xyz").unwrap();
++        let mut bytes = Vec::new();
++        file.read_to_end(&mut bytes).unwrap();
++        assert_eq!(bytes, b"abc");
++        assert_eq!(file.stream_position().unwrap(), dependency.octets);
++        assert!(dependency.open_verified(None).is_err(), "an existing pin must not trust the replacement path");
++    }
++
+     #[test]
+     fn checksum_is_verified_before_native_state_decoding_and_truncation_refuses() {
+         let directory = tempdir().unwrap();
+diff --git a/crates/holonics-hna/src/hna.rs b/crates/holonics-hna/src/hna.rs
+index 7063b6b2..7f88820c 100644
+--- a/crates/holonics-hna/src/hna.rs
++++ b/crates/holonics-hna/src/hna.rs
+@@ -291,6 +291,8 @@ fn run_mounted(
+         let (morphology_changed, returned_operations, deposited_populations) =
+             match &morphology_transition {
+                 NativeMorphologyTransition::Unchanged => (false, 0, Vec::new()),
++                NativeMorphologyTransition::BoundaryContact { returned } =>
++                    (returned.deposited,0,Vec::new()),
+                 NativeMorphologyTransition::Changed {
+                     deposit, adjoint, ..
+                 } => {
+diff --git a/crates/holonics-hna/src/session.rs b/crates/holonics-hna/src/session.rs
+index 4750854d..681b7666 100644
+--- a/crates/holonics-hna/src/session.rs
++++ b/crates/holonics-hna/src/session.rs
+@@ -46,6 +46,7 @@ pub struct HnaModel {
+     aperture: Option<HnaCultivationAperture>,
+     transport: Option<crate::HnaStreamState>,
+     input_material: Vec<NativeInputRowExtension>,
++    boundary_contact: bool,
+ }
+ 
+ #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+@@ -61,8 +62,8 @@ impl HnaModel {
+         class: Option<usize>,
+         aperture: HnaCultivationAperture,
+     ) -> Result<Self, HnaSessionError> {
+-        let dependency = HnaBaseDependency::capture(path, class)?;
+-        let mut input = BufReader::new(dependency.open_verified(None)?);
++        let (dependency, file) = HnaBaseDependency::capture_with_open_handle(path, class)?;
++        let mut input = BufReader::new(file);
+         let material = NativeConeRestrictedEcology::read_rest_from(&mut input)
+             .map_err(|e| HnaSessionError::Base(e.to_string()))?;
+         material
+@@ -75,9 +76,22 @@ impl HnaModel {
+             aperture: Some(aperture),
+             transport: None,
+             input_material: Vec::new(),
++            boundary_contact: false,
+         })
+     }
+ 
++    /// Fresh native model with the bounded tied-map next-arrival chart. No learning-rate knob:
++    /// the actual received covector difference supplies its local current. This does not promote
++    /// the inherited receiver family or replace another saved model's development profile.
++    pub fn from_native_rest_with_boundary_contact(path:impl AsRef<Path>,class:Option<usize>)
++        ->Result<Self,HnaSessionError> {
++        let mut model=Self::from_native_rest(path,class,HnaCultivationAperture {
++            learning_shift:0,series_terms:14})?;
++        model.boundary_contact=true;
++        model.aperture=None;
++        Ok(model)
++    }
++
+     pub fn from_checkpoint(
+         path: impl AsRef<Path>,
+         base_override: Option<&Path>,
+@@ -131,6 +145,7 @@ impl HnaModel {
+             aperture: None,
+             transport: saved.transport,
+             input_material,
++            boundary_contact: false, // saved native profile, not this fresh-model switch, governs
+         })
+     }
+ 
+@@ -260,6 +275,8 @@ impl HnaModel {
+                 &mut residence,
+                 state,
+             )?,
++            None if self.boundary_contact => NativeFullOperatorSession::found_with_boundary_contact(
++                &self.material.ecology,&mut residence)?,
+             None => NativeFullOperatorSession::found_with_passage_return(
+                 &self.material.ecology,
+                 &mut residence,
+@@ -325,6 +342,7 @@ pub struct HnaSessionAnatomy {
+     pub retained_base_codewords: u64,
+     pub additional_input_codewords: u64,
+     pub morphology_factor_extent: usize,
++    pub boundary_contact_maps: usize,
+     pub held_carriers: usize,
+     pub declared_occurrences: usize,
+     pub status: HnaSessionStatus,
+@@ -334,6 +352,14 @@ pub struct HnaSessionAnatomy {
+ 
+ impl HnaSession<'_, '_> {
+     pub fn transfer_census(&self)->holonic_engine::resident_section::TransferCensus {self.native.census()}
++    pub fn last_boundary_return(&self)->Option<&holonic_engine::native_ecology::holonic_intelligence::NativeBoundaryContactReceipt> {
++        self.native.last_boundary_return()
++    }
++    pub(crate) fn has_boundary_contact(&self)->bool {self.native.has_boundary_contact()}
++    pub(crate) fn previous_input_word(&self)->Option<&[u32]> {self.native.previous_input_word()}
++    pub(crate) fn native_input_capacity(&self)->Result<usize,HnaSessionError> {
++        Ok(self.native.lookup_input_capacity()?)
++    }
+     pub fn terminal_width(&self) -> Option<usize> {
+         use holonic_engine::native_ecology::holonic_intelligence::NativeCarrierAxis;
+         let output = self.material.ecology.operations.last()?.output;
+@@ -425,9 +451,9 @@ impl HnaSession<'_, '_> {
+         observe: bool,
+         readout:crate::NativeEmissionReadout,
+     ) -> Result<HnaNativeCycle, HnaSessionError> {
+-        if self.native.joined_passage_population() == 0 {
++        if self.native.joined_passage_population() == 0 && !self.native.has_boundary_contact() {
+             return Err(HnaSessionError::Admission(
+-                "native continuation requires the observed-passage law".into(),
++                "native continuation requires an admitted developmental chart".into(),
+             ));
+         }
+         let mut entering = occurrence.row_addresses.clone();
+@@ -453,7 +479,9 @@ impl HnaSession<'_, '_> {
+                     .is_none_or(|selected| selected == class.ordinal)
+             })
+             .map(|class| class.ordinal);
+-        let output = if observe {
++        let output = if observe && self.native.has_boundary_contact() {
++            self.native.observe_boundary_readout_retained(&entering,readout)?
++        } else if observe {
+             self.native.observe_passage_readout_retained(&entering,readout)?
+         } else {
+             self.native.advance_cycle_readout_retained(&entering,readout)?
+@@ -543,10 +571,13 @@ impl HnaSession<'_, '_> {
+                 .map(|s| s.words.len() as u64)
+                 .sum(),
+             morphology_factor_extent: self.native.morphology_overlay_rank(),
++            boundary_contact_maps: self.native.boundary_contact_count(),
+             additional_input_codewords: self.additional_input_codewords,
+             held_carriers: self.native.carrier_population(),
+             declared_occurrences: self.material.classes.iter().map(|c| c.fibre.len()).sum(),
+-            operation_profile: if self.native.joined_passage_population() > 0 {
++            operation_profile: if self.native.has_boundary_contact() {
++                "tied-next-arrival"
++            } else if self.native.joined_passage_population() > 0 {
+                 "observed-passage"
+             } else if self.native.return_aperture().is_some() {
+                 "prefix-continuation"
+diff --git a/crates/holonics-hna/src/text_session.rs b/crates/holonics-hna/src/text_session.rs
+index b58011d9..66302e90 100644
+--- a/crates/holonics-hna/src/text_session.rs
++++ b/crates/holonics-hna/src/text_session.rs
+@@ -87,6 +87,22 @@ pub struct HnaTextStep {
+     pub text: String,
+     pub generation: u64,
+     pub disposition: HnaTextDisposition,
++    /// Native occurrences enacted by this application step, including newly received prompt
++    /// material before the output occurrence. This is measured work, not a training target.
++    pub native_occurrences: usize,
++}
++
++/// The codec's declared next-address stream, independent of file/transport packet boundaries.
++/// Equal complete words still enact a new occurrence; they are not deduplicated as identities.
++fn input_prefix_ends(previous:Option<&[u32]>,target:&[u32])->std::ops::RangeInclusive<usize> {
++    let end=target.len();
++    if end==0 {return 1..=0}
++    let start=match previous {
++        Some(previous) if previous==target=>end,
++        Some(previous) if !previous.is_empty() && target.starts_with(previous)=>previous.len()+1,
++        _=>1,
++    };
++    start..=end
+ }
+ 
+ #[derive(Serialize, Deserialize)]
+@@ -234,6 +250,7 @@ impl HnaTextApplication {
+                 text: self.text(state)?,
+                 generation: state.generation,
+                 disposition: state.disposition.clone(),
++                native_occurrences: 0,
+             });
+         }
+         // Reserve before the native effect: retaining its selected result cannot require another
+@@ -243,11 +260,41 @@ impl HnaTextApplication {
+             row_addresses: state.prompt_addresses.clone(),
+             history: state.emitted_addresses.clone(),
+         };
+-        let native = if state.observation_only {
+-            session.observe_native_readout(&occurrence,crate::NativeEmissionReadout::LastRow)
+-        } else {
+-            session.advance_native_readout(&occurrence,crate::NativeEmissionReadout::LastRow)
+-        };
++        // This boundary chart returns on each actual next address. Deliver all new input material
++        // in that declared order, not only the first new address of a multi-address followup.
++        // A native generation/address prefix already retained after a partial step is resumed;
++        // it is not replayed. Older development profiles retain their existing one-word behavior.
++        let mut native_occurrences=0;
++        let native=(||->Result<crate::HnaNativeCycle,HnaSessionError> {
++            if session.has_boundary_contact() {
++                let target=state.next_addresses();
++                if target.len()>session.native_input_capacity()? {
++                    return Err(error("complete input word exceeds the mounted native aperture"));
++                }
++                let ends=input_prefix_ends(session.previous_input_word(),&target);
++                let mut last=None;
++                for end in ends {
++                    let next=HnaOccurrence {row_addresses:target[..end].to_vec(),history:Vec::new()};
++                    let cycle=if state.observation_only {
++                        session.observe_native_readout(&next,crate::NativeEmissionReadout::LastRow)?
++                    } else {
++                        session.advance_native_readout(&next,crate::NativeEmissionReadout::LastRow)?
++                    };
++                    state.generation=session.anatomy().generation;
++                    native_occurrences+=1;
++                    last=Some(cycle);
++                }
++                last.ok_or_else(||error("no admitted input occurrence"))
++            } else {
++                let cycle=if state.observation_only {
++                    session.observe_native_readout(&occurrence,crate::NativeEmissionReadout::LastRow)?
++                } else {
++                    session.advance_native_readout(&occurrence,crate::NativeEmissionReadout::LastRow)?
++                };
++                native_occurrences=1;
++                Ok(cycle)
++            }
++        })();
+         let cycle = match native {
+             Ok(cycle) => cycle,
+             Err(failure) => {
+@@ -285,6 +332,7 @@ impl HnaTextApplication {
+             text,
+             generation: state.generation,
+             disposition: state.disposition.clone(),
++            native_occurrences,
+         })
+     }
+     /// Save native state first, then publish one immutable application manifest pointing at those
+@@ -362,6 +410,16 @@ fn parse_completion(
+ mod tests {
+     use super::*;
+     #[test]
++    fn incoming_material_delivers_every_new_address_and_resumes_its_actual_prefix() {
++        let target=[2,7,8,9];
++        assert_eq!(input_prefix_ends(None,&target).collect::<Vec<_>>(),vec![1,2,3,4]);
++        assert_eq!(input_prefix_ends(Some(&target[..2]),&target).collect::<Vec<_>>(),vec![3,4]);
++        assert_eq!(input_prefix_ends(Some(&target),&target).collect::<Vec<_>>(),vec![4]);
++        assert_eq!(input_prefix_ends(Some(&[2,5]),&target).collect::<Vec<_>>(),vec![1,2,3,4]);
++        assert_eq!(input_prefix_ends(Some(&[2,7,8,9,10]),&target).collect::<Vec<_>>(),vec![1,2,3,4]);
++        assert!(input_prefix_ends(Some(&[]),&[]).next().is_none());
++    }
++    #[test]
+     fn completion_is_declared_and_resource_interruption_is_not_completion() {
+         assert_eq!(
+             parse_completion(&serde_json::json!({"eos_token_id":[1,6,1]}), 8).unwrap(),
+diff --git a/docs/ARCHITECTURE_MAP.md b/docs/ARCHITECTURE_MAP.md
+index cf1cbaaa..d397567f 100644
+--- a/docs/ARCHITECTURE_MAP.md
++++ b/docs/ARCHITECTURE_MAP.md
+@@ -107,13 +107,22 @@ returned complete checkpoint equality and lower host transfer without another de
+ [proved-derived; formal-checked] `HolonicOrientedSiteTransport.PassiveContact` now owns a finite
+ Euclidean paired-observation map with exact calibration, non-expansiveness and a one-axis metric
+ lift. Its bounded [candidate record](../research/records/2026-09-05_HNP4_A_PASSIVE_PAIRED_CONTACT_HAS_A_CHECKED_METRIC_LIFT_AND_A_RESIDENT_PROJECTION.md)
+-states the hypotheses and the still-open live comparison/metric/successor binding.
++states the hypotheses; `TiedMapNextArrival` now gives the explicit prefix join and shared-map
++received contrast, without a universal learning or stability claim.
+ 
+ [established-bounded; measured] `ResidentSurface::record_passive_contact` and
+ `exact_resident_section.cu::section_passive_contact` realize the candidate's point-founded,
+ interval-query projection, with exact-rational CUDA controls. They do not implement its lifted
+ axis or replace the full-operator cultivation law.
+ 
++[established-bounded; measured] `holonic_intelligence::operative_boundary_contact` now binds
++that contrast to actual retained native fields and applies a persistent contact word at the
++tied-input port. `operative_rest{,_wire}` owns its inner v2 state, and `holonics-hna::{session,
++text_session}` exposes ordinary input delivery and output. The
++[actual-model record](../research/records/2026-09-05_HNP4_THE_NEXT_ARRIVAL_DEPOSITS_A_REUSABLE_CONTACT_AND_MATCHED_SELF_RETURN_IS_ZERO.md)
++returns full-state restart/further-development equality and a completed ordinary correction,
++while retaining the failed isolated document-fact observation.
++
+ | Relation | Lean owner | Rust owner | CUDA owner | Status and exact open fibre |
+ |---|---|---|---|---|
+ | Exact finite diffusion and state-space chart | `Computation/HolonicDiffusionCharts.lean` | `diffusion.rs`; `sheaf_diffusion.rs`; `causal_body.rs` | `cuda_refine/membrane_boundary_*`; `membrane_factored_transport.rs` | **partial:** Lean Markov/deterministic separation is broader than one resident runtime owner |
+diff --git a/docs/ATHENA.md b/docs/ATHENA.md
+index 1631ab4a..c9c7cfec 100644
+--- a/docs/ATHENA.md
++++ b/docs/ATHENA.md
+@@ -302,6 +302,52 @@ measurements, not end-to-end generation throughput or a solution to unstable dev
+ [readout record](../research/records/2026-09-05_HNP4_THE_TERMINAL_RECEIVER_READS_ONE_ROW_AND_PRESERVES_THE_COMPLETE_SUCCESSOR.md)
+ contains the control, resource boundary and reproduction command.
+ 
++## Tied next-arrival development
++
++[definition] `HnaModel::from_native_rest_with_boundary_contact(path, class)` selects a bounded
++alternative to the unstable additive profile. The actual emitted address and next received
++address return through the same tied coefficient map's adjoint in its declared Euclidean chart.
++Their current joins the retained contextual field and founds a reusable local contact map.
++An equal self-return has zero current; this is the productive law, not observation-only mode.
++The source, metric and numerical projection are explicit in the
++[binding record](../research/records/2026-09-05_HNP4_THE_NEXT_ARRIVAL_DEPOSITS_A_REUSABLE_CONTACT_AND_MATCHED_SELF_RETURN_IS_ZERO.md).
++
++[established-bounded; implemented-exact] The normal session APIs retain this word and its
++pending face. Native **inner** rest v2 carries it; existing v1 inner rests and the outer
++checkpoint/dependency/delivery meanings remain unchanged. Loading a saved model restores its
++law; it does not accept an overriding profile or return aperture. Fresh CLI sessions select it
++with `--tied-next-arrival`, which cannot be combined with `--resume`, `--learning-shift` or
++`--series-terms`. This chart has no learning-rate parameter.
++
++```sh
++holonics hna session native.rest --tied-next-arrival \
++  --input occurrences.jsonl --checkpoint NEW.hna
++target/debug/examples/text_hnp4 contact native.rest /path/to/codec-and-input-source \
++  'Describe the object.' NEW_RUN_DIR 24
++target/debug/examples/text_hnp4 followup PREVIOUS_RUN/text.json \
++  /path/to/input-source NEW_RUN_DIR 'The object is now red. Answer briefly.' 8
++```
++
++[definition] The underlying `advance_native` still enacts one declared native occurrence.
++For this chart the text adapter delivers newly received codec addresses in order before reading
++its answer, rather than ignoring the remaining addresses of a long followup. It reports the
++number in `HnaTextStep.native_occurrences`; intermediate successful progress is retained through
++the native input word and matching application generation. Transport packet sizes do not create
++these occurrences. Other development profiles keep their existing text-delivery behavior.
++
++[established-bounded; measured] The actual document run formed five maps and produced a coherent
++20-address response including its native completion marker. All matched self-returns left the
++maps unchanged. Complete remount and cross-process continuation equality passed, including
++further development to a sixth map. After another restart, an ordinary correction to red
++delivered 26 native occurrences before its first answer, grew five maps to 22 and returned
++`Red` followed by the native completion marker.
++
++[counterexample; measured] The isolated six-address document exposure did not make a new
++question recover the document's blue color. The later correct response had the correction in
++its conversation context; it does not isolate a learned-map contribution to that answer or
++repair the failed source-detached transfer claim. Broader useful learning and the second
++application remain HNP4 work; useful-model evaluation and executable export remain later phases.
++
+ ## Remaining production requirements
+ 
+ [definition] The [production campaign](plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md)
+diff --git a/docs/plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md b/docs/plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md
+index f1571aeb..d4cefec8 100644
+--- a/docs/plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md
++++ b/docs/plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md
+@@ -327,6 +327,16 @@ returned coherent prose at high cost. HNP4 next addresses stable native developm
+ output cost before claiming its useful application returns; it does not substitute the frozen
+ comparison, a larger numeric limit or a parameter search for the constitutive obligation.
+ 
++[established-bounded; measured] The later [tied next-arrival return](../../research/records/2026-09-05_HNP4_THE_NEXT_ARRIVAL_DEPOSITS_A_REUSABLE_CONTACT_AND_MATCHED_SELF_RETURN_IS_ZERO.md)
++binds an actual received contrast to a reusable contact word, preserves complete learned-state
++continuation across processes, and returns a completed ordinary correction with further native
++development. Matched self-returns have zero current under this declared chart.
++
++[counterexample; measured] Its isolated six-address document exposure did not supply the
++document's fact to a new question. The successful contextual correction does not establish that
++stronger transfer or a learned-map performance benefit. The second genuinely different interaction
++and remaining useful-production obligations below still govern HNP4 completion.
++
+ **Depends on:** HNP3.
+ 
+ [definition] Build the first usable material/interaction pipeline over that session. Deliver a
+diff --git a/formal/elementary-holonics/ElementaryHolonics/Computation/HolonicOrientedSiteTransport.lean b/formal/elementary-holonics/ElementaryHolonics/Computation/HolonicOrientedSiteTransport.lean
+index 3c767504..8824aed5 100644
+--- a/formal/elementary-holonics/ElementaryHolonics/Computation/HolonicOrientedSiteTransport.lean
++++ b/formal/elementary-holonics/ElementaryHolonics/Computation/HolonicOrientedSiteTransport.lean
+@@ -1130,6 +1130,127 @@ theorem liftedContact_passive {n : ℕ} {x y : Vector n}
+ 
+ end PassiveContact
+ 
++/-! ### A tied-map next-arrival contrast
++
++The following is an independently defined next-arrival contrast, not the endogenous `Add` effect.
++The map owns both row covectors and the declared deterministic receiver face.  An occurrence keeps
++the actual context, receiver address, a nonempty source word, and an entering word whose first
++post-source element is the observed address.  This is an abstract prefix-join receipt, not a proof
++of the whole Rust runtime; no answer, logit margin, or gain is selected by the theorem.  The
++Euclidean metric is the same declared chart used by `PassiveContact`: equal widths alone do not
++found a returned current.
++-/
++
++namespace TiedMapNextArrival
++
++abbrev Address (a : ℕ) := Fin a
++abbrev Chart (h : ℕ) := PassiveContact.Vector h
++
++/-- A finite tied coefficient map `W : H → A`, represented by its row covectors in the H chart.
++The receiver-face selector is an actual deterministic receiver owner, not a score or answer map. -/
++structure TiedCoefficientMap (h a : ℕ) where
++  row : Address a → Chart h
++  receiverFace : Chart h → Address a
++
++namespace TiedCoefficientMap
++
++variable {h a : ℕ} (W : TiedCoefficientMap h a)
++
++def coefficientMap : Address a → Chart h := W.row
++
++theorem coefficientMap_eq_row (address : Address a) :
++    W.coefficientMap address = W.row address := rfl
++
++end TiedCoefficientMap
++
++/-- A joined occurrence with an actual deterministic receiver face `p` and a causally next
++observed input address `a`.  The field `receiver_face` is the occurrence's receiver-scope receipt. -/
++structure ActualNextArrival {h a : ℕ} (W : TiedCoefficientMap h a) where
++  context : Chart h
++  observedAddress : Address a
++  receiverAddress : Address a
++  receiver_face : receiverAddress = W.receiverFace context
++  sourceWord : List (Address a)
++  enteringWord : List (Address a)
++  remainder : List (Address a)
++  source_nonempty : sourceWord ≠ []
++  joining : enteringWord = sourceWord ++ observedAddress :: remainder
++
++namespace ActualNextArrival
++
++variable {h a : ℕ} {W : TiedCoefficientMap h a}
++
++def returnedCurrent (occurrence : ActualNextArrival W) : Chart h :=
++  W.row occurrence.observedAddress - W.row occurrence.receiverAddress
++
++def joinedField (occurrence : ActualNextArrival W) : Chart h :=
++  occurrence.context + occurrence.returnedCurrent
++
++def passiveCalibration (occurrence : ActualNextArrival W) : Chart h :=
++  PassiveContact.contact occurrence.context occurrence.joinedField occurrence.context
++
++theorem observedAddress_after_source (occurrence : ActualNextArrival W) :
++    occurrence.enteringWord =
++      occurrence.sourceWord ++ occurrence.observedAddress :: occurrence.remainder :=
++  occurrence.joining
++
++theorem enteringWord_nonempty (occurrence : ActualNextArrival W) :
++    occurrence.enteringWord ≠ [] := by
++  rw [occurrence.joining]
++  simp
++
++/-- The paired margin reads the returned current against the actual joined field.  Its second term
++is the squared norm of the same row difference, so it is not an externally supplied margin. -/
++theorem paired_margin_identity (occurrence : ActualNextArrival W) :
++    PassiveContact.dot occurrence.returnedCurrent occurrence.joinedField =
++      PassiveContact.dot occurrence.returnedCurrent occurrence.context +
++        PassiveContact.squaredNorm occurrence.returnedCurrent := by
++  simp [joinedField, PassiveContact.dot_add_right, PassiveContact.squaredNorm]
++
++/-- When the observed address is the actual receiver address, the shared tied map returns zero. -/
++theorem matched_returnedCurrent (occurrence : ActualNextArrival W)
++    (matched : occurrence.observedAddress = occurrence.receiverAddress) :
++    occurrence.returnedCurrent = 0 := by
++  simp [returnedCurrent, matched]
++
++theorem matched_joinedField (occurrence : ActualNextArrival W)
++    (matched : occurrence.observedAddress = occurrence.receiverAddress) :
++    occurrence.joinedField = occurrence.context := by
++  simp [joinedField, matched_returnedCurrent occurrence matched]
++
++/-- A matched next arrival is the passive identity contact in the same declared metric chart. -/
++theorem matched_passiveCalibration_identity (occurrence : ActualNextArrival W)
++    (matched : occurrence.observedAddress = occurrence.receiverAddress) :
++    PassiveContact.contact occurrence.context occurrence.joinedField = id := by
++  rw [matched_joinedField occurrence matched]
++  exact PassiveContact.contact_matched occurrence.context
++
++/-- Passive calibration of the actual joined passage returns that same actual joined field. -/
++theorem passiveCalibration_eq_joinedField (occurrence : ActualNextArrival W) :
++    occurrence.passiveCalibration = occurrence.joinedField := by
++  exact PassiveContact.contact_x_eq_y occurrence.context occurrence.joinedField
++
++end ActualNextArrival
++
++/-! Equal finite widths do not identify a row contrast: the shared coefficient map and its metric
++chart are constitutive inputs.  This explicit control keeps that boundary visible without making
++the contrast a claim about a top face, useful learning, or global HNA stability. -/
++
++theorem equal_widths_do_not_found_return :
++    ∃ (W₁ W₂ : TiedCoefficientMap 1 2) (a p : Address 2),
++      (W₁.row a - W₁.row p) ≠ (W₂.row a - W₂.row p) := by
++  refine ⟨
++    { row := fun _ ↦ ![0]
++      receiverFace := fun _ ↦ 0 },
++    { row := fun address ↦ if address = 0 then ![1] else ![0]
++      receiverFace := fun _ ↦ 0 },
++    0, 1, ?_⟩
++  intro same
++  have hcoord := congrFun same 0
++  norm_num at hcoord
++
++end TiedMapNextArrival
++
+ end Soma.Holonics.Computation.HolonicOrientedSiteTransport
+ 
+ section Audit
+@@ -1166,4 +1287,8 @@ open Soma.Holonics.Computation.HolonicOrientedSiteTransport
+ #print axioms PassiveContact.contact_nonexpansive
+ #print axioms PassiveContact.liftedContact_energy_preserved
+ #print axioms PassiveContact.liftedContact_passive
++#print axioms TiedMapNextArrival.ActualNextArrival.paired_margin_identity
++#print axioms TiedMapNextArrival.ActualNextArrival.matched_passiveCalibration_identity
++#print axioms TiedMapNextArrival.ActualNextArrival.passiveCalibration_eq_joinedField
++#print axioms TiedMapNextArrival.equal_widths_do_not_found_return
+ end Audit
+diff --git a/research/records/2026-09-05_HNP4_THE_NEXT_ARRIVAL_DEPOSITS_A_REUSABLE_CONTACT_AND_MATCHED_SELF_RETURN_IS_ZERO.md b/research/records/2026-09-05_HNP4_THE_NEXT_ARRIVAL_DEPOSITS_A_REUSABLE_CONTACT_AND_MATCHED_SELF_RETURN_IS_ZERO.md
+new file mode 100644
+index 00000000..d1db4e67
+--- /dev/null
++++ b/research/records/2026-09-05_HNP4_THE_NEXT_ARRIVAL_DEPOSITS_A_REUSABLE_CONTACT_AND_MATCHED_SELF_RETURN_IS_ZERO.md
+@@ -0,0 +1,141 @@
++# HNP4: the next arrival deposits a reusable contact and matched self-return is zero
++
++**Date:** 2026-09-05, local apparatus date. **Status:** HNP4 partial native binding and application return.
++
++## Actual binding
++
++[definition] The new `tied-next-arrival` profile uses the actual shared coefficient population
++which occurs both at an entering Lookup and the terminal Contract. In its declared Euclidean
++chart, row `w_a` is the return of address face `a` through that coefficient map's adjoint.
++For the actual former emitted face `p`, causally next received address `a`, and retained
++contextual carrier `h`, the current is `r = w_a-w_p` and its joined field is `h+r`.
++This is a specific constitutive chart, not a derivation of a physical metric/admittance from
++widths. The Lookup's complete scaled operation and the later nonlinear output reactions are
++not silently identified with the unscaled shared coefficient map.
++
++[proved-derived; formal-checked] `HolonicOrientedSiteTransport.TiedMapNextArrival` retains a
++nonempty source word and the exact entering-word equation `source ++ a :: remainder`. It proves
++that `a` is the first new address, the paired-current identity
++`dot(r,h+r)=dot(r,h)+||r||²`, matched-current zero, matched passive identity, and calibration
++of this joined field by `PassiveContact`. Equal widths do not determine the current. These
++theorems do not guarantee a changed winning face, useful generalization, physical energy
++conservation, or correctness of the whole Rust/CUDA implementation.
++
++[established-bounded; source-inspected] `operative_boundary_contact.rs` binds that comparison
++to the session's actual retained emission, contextual carrier, next input and shared resident
++coefficient rows. Neither an application-supplied desired logit nor an internal Add effect
++chooses it. Missing coefficient material refuses instead of using a zero complement. A matched
++face, or an exact zero resident contrast, deposits nothing. The new contact keeps its actual
++source and arrived sections, applies after the existing contact word, and stays with the same
++move-owned session. No learning-rate parameter is used in this chart.
++
++[established-bounded; source-inspected] The learned word acts at the tied-input port, not at
++every internal node. One resident passage applies its ordered maps, including the declared
++midpoint successor projection after each map. A founding row is reused immutably across later
++query rows. The pre-contact numerical carrier returns to the existing reuse owner; it is never
++confused with the contemporary post-contact field. The complete later nonlinear terminal
++operation still emits the answer. The CUDA projection is not the full conserved-axis lift.
++
++[definition] Nonextending words do not invent a matching continuation fibre. This boundary
++specialization does not replace HNP0's generic local-current contract or establish all model
++families. Existing prefix and observed-passage profiles keep their wire meanings and bounded
++results. Another saved cultivation profile cannot silently be combined with this one while
++omitting its adjoint. Broad SKE inherited correspondence is not inferred from broader native input.
++
++## Public operation and rest
++
++[established-bounded; implemented-exact] `HnaModel::from_native_rest_with_boundary_contact`
++constructs the new profile over admitted native material. The normal public session operation
++returns its successor; `anatomy` reports contact maps separately from linear overlay rank.
++The full session rest uses a new inner v2 wire/header only when this profile is present.
++It preserves source/arrived fields, ordered receipts, last face, last return, native carriers,
++chronology, input context and numerical reuse. Old v1 native rests retain their bytes and meaning.
++Missing profile data, incompatible schemas, malformed sections and stale completed faces refuse.
++
++[established-bounded; implemented-exact] The text adapter delivers each newly received codec
++address in order for this chart, including all of a multi-address followup. It resumes from the
++actual retained input prefix and updates its generation after each successful native occurrence.
++Already-complete equal words still enact a new occurrence. `HnaTextStep.native_occurrences`
++discloses this application work; it is not an epoch or learning target. Other profiles retain
++their earlier one-word application behavior. The codeword stream is independent of file/transport
++packet sizes. The underlying general `advance_native` still advances one declared occurrence.
++
++[established-bounded; source-inspected] Fresh native-base construction now hashes its source
++once and consumes that same rewound file handle. Existing dependency/checkpoint loads retain
++their full verification. No mtime cache, checksum registry or semantic identity was introduced.
++
++## Returned document experiment
++
++[established-bounded; measured] `boundary_contact_hnp4` read the 18-byte UTF-8 document
++`The cube is blue.\n` from `.local/artifacts/hnp4/received-cube.txt`, encoded it once, and exposed
++its six addresses in causal order. Five received contrasts founded five maps. For the identical
++probe `What color is the cube?`, all 262,144 terminal intervals changed; the first selected
++face remained `I`. This establishes a numerical effect at that receiver, not useful fact transfer.
++
++[established-bounded; measured] The active, non-observer model then emitted 20 addresses,
++including native completion marker 106, reaching generation 35,700. Every actual matched
++self-return returned zero and the five maps remained. No carrier refusal or numeric-limit
++increase occurred. Its complete output was:
++
++> I need an image or a description of the cube to tell you what color it is! 😊
++
++[counterexample; measured] This trial did **not** recover the document's color in the new
++question. Coherent termination and nonzero changed transport do not establish useful document
++learning. This result does not close HNP4 or supply HNP5's useful-model evaluation.
++
++[established-bounded; measured] The run took 283,188 ms including cold construction, live input
++acquisition, native operations and persistence. It saved `developed.hna` (five maps, generation
++8,925), then `model.hna`, `text.json` and `result.json` under
++`.local/artifacts/hnp4/boundary-contact-01/`. The final accounted numerical reuse high-water was
++2,092,859,392 bytes, not a measurement of whole-process/GPU peak. The run preceded the fresh-base
++single-scan improvement, so its duration does not measure that improvement.
++
++```sh
++cargo build -p holonics-hna --example boundary_contact_hnp4 --example text_hnp4
++target/debug/examples/boundary_contact_hnp4 target/ske4/rest.bin \
++  /home/b/models/gemma-4-E4B-it .local/artifacts/hnp4/received-cube.txt \
++  'What color is the cube?' .local/artifacts/hnp4/boundary-contact-01 24
++```
++
++[definition] Repetition requires new output paths. The material is an exposure input, not a
++generated answer inserted by the driver. The probe is a bounded observation, not a universal
++gate for every training/inference configuration.
++
++## Verification and remaining work
++
++[established-bounded; measured] Three explicit passive CUDA controls passed, including reuse of
++one founding row across two distinct queries. The new wire's six focused tests and all 36 HNA
++library tests passed, including full-field wire round-trip/refusal cases and incoming-prefix
++delivery. Native build and focused Lean checks passed.
++
++[established-bounded; measured] The actual `developed.hna` then remounted with its **entire native
++state equal** after a zero-operation save. An explicitly unmatched continuation from already-held
++material added a sixth map and reached generation 10,200. A second process started from the
++remounted artifact, enacted that same continuation and returned the **same entire learned
++successor** as the first process. This includes contact fields/receipts, pending face, all native
++carriers and numerical origins—not just a selected address. Artifacts are
++`.local/artifacts/hnp4/boundary-{remounted,expected,resumed}-01.hna`; the reproduction owner is
++`examples/boundary_restart_hnp4.rs`. This is a persistence/continued-learning control, not a
++useful-task exposure.
++
++[established-bounded; measured] A separate process loaded the completed text/model pair and
++received the ordinary followup `The cube is now red. What color is it? Answer in one word.`
++The first text step delivered 26 actual native occurrences, returned `Red`, and the next step
++returned native completion marker 106. Maps grew from five to 22; generation advanced from
++35,700 to 70,125. The result and paired rest are under
++`.local/artifacts/hnp4/boundary-correction-01/`; whole-run time was 264,235 ms. The native cache
++recorded five pressure evictions and a 3,560,448,000-byte retained-cache high-water, not total
++GPU/process peak. No foreign inference call or authored answer supplied the two emitted addresses.
++
++[definition] This is a successful ordinary contextual correction with continuing native
++development. The correction was present in the conversation, so the answer does not isolate
++the contribution of learned maps or fix the earlier source-detached fact-transfer failure.
++
++[established-bounded; measured] The nine workbench tests also passed with the explicit
++`hna session --tied-next-arrival` selection and conflicting override refusals. The profile's
++source, native inner-wire v2 boundary and application delivery are documented in `docs/ATHENA.md`.
++
++[open] HNP4 still owes its complete useful application/correction and genuinely different
++second interaction. The failed isolated fact-transfer observation must remain visible while
++the ordinary continuing application is developed. HNP5's useful-task/held-out evaluation,
++HNP6's actual standard-runtime export and HNP7's SSM/diffusion artifacts remain required.

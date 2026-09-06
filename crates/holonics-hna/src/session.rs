@@ -61,8 +61,8 @@ impl HnaModel {
         class: Option<usize>,
         aperture: HnaCultivationAperture,
     ) -> Result<Self, HnaSessionError> {
-        let dependency = HnaBaseDependency::capture(path, class)?;
-        let mut input = BufReader::new(dependency.open_verified(None)?);
+        let (dependency, file) = HnaBaseDependency::capture_with_open_handle(path, class)?;
+        let mut input = BufReader::new(file);
         let material = NativeConeRestrictedEcology::read_rest_from(&mut input)
             .map_err(|e| HnaSessionError::Base(e.to_string()))?;
         material

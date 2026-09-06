@@ -1,15 +1,41 @@
 # Construction state
 
-**Currency:** 2026-09-05. **Current construction:** HNP4 — production applications and multi-cycle output.
+**Currency:** 2026-09-05. **Current HNA construction:** NCF1 — coupled native ecology and formation.
 
 This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md) orders work;
 completed history stays in its existing records and Git. Brandon's latest direct instruction
 governs. The preceding HNA consolidation is complete; its implementation standing remains below.
 
-## Current campaign
+## Current HNA direction
 
-[definition] The formal [production-HNA plan](docs/plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md)
-is active under Brandon's explicit instruction to complete HNP0--HNP7.
+[project-postulate] Brandon's latest correction makes fostering native HNAs from the ground up
+the priority before further Soulkiller/Gemma-led production. The
+[contextual-transport audit](research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md)
+records the ontology, exact source defects and reading of the relevance hypothesis. Contextual
+applicability must be carried by situated charts/channels and their actual relations; a changed
+matrix, token window or globally reused map does not supply it. Existing native owners are the
+starting material, not an imported pretrained model or another authored relevance subsystem.
+
+[definition] The inherited-first [HNP production sequence](docs/plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md)
+is paused and no longer schedules automatic continuation. Its bounded mathematics and apparatus
+results stand; they are not completed native contextual foundations. No new update law or native
+learner is claimed by this audit. The inherited-model draft is
+[archived recoverably](archive/experiments/2026-09-05-tied-next-arrival/README.md), with its active
+integration removed and its measurements preserved.
+
+[definition] Brandon subsequently authorized the corrected goal and continued work. The
+[native-HNA construction contract](docs/plans/THE_NATIVE_HNA_FOUNDS_CONTEXTUAL_TRANSPORT_BEFORE_INHERITANCE.md)
+is active. NCF1 now instantiates the native receiving interaction and successor formation from
+existing incidence/current/phase and formation owners, then joins them in one resident operation.
+A caller-supplied aperture or factor delta is not that missing constitutive relation.
+
+[proved-derived; formal-checked] NCF0 returned range-restricted receiver transport through an
+actual admitted crossing and the finite branch/drive controls distinguishing changed conditions
+from joint reorientation. The [NCF0 return](research/records/2026-09-05_NCF0_RECEIVER_TRANSPORT_KEEPS_ITS_DOMAIN_AND_ORIENTATION_IS_NOT_A_SCALAR_STATE.md)
+states the assumptions and exact native composition boundary. This closes the formal contract
+only; the coupled native learner, usable interface and integrated evidence remain NCF1--NCF4.
+
+## Previous HNP returns — preserved scopes, not the current work order
 
 [proved-derived; formal-checked] HNP0's finite constitutive binding is complete in
 `HolonicOrientedSiteTransport.ConstitutiveSectionReturn`: actual joined occurrences, transported
@@ -53,7 +79,7 @@ broken-output recovery preserved the entire learned successor without repeating 
 The [streaming completion record](research/records/2026-09-05_HNP3_THE_STREAM_RETAINS_PARTIAL_INPUT_AND_REPLAYS_OUTPUT_WITHOUT_REPEATING_DEVELOPMENT.md)
 states the full-state comparisons, delivery boundaries and 30 HNA / nine workbench checks.
 
-[open] HNP4 next composes text/document and genuinely different stateful/sensory applications,
+[historical] The paused HNP4 contract calls for text/document and genuinely different stateful/sensory applications,
 lawful wider native admission, complete multi-cycle products and ordinary later corrections over
 that owner. Useful evaluation and executable export remain HNP5--HNP7. The CLI prefix convenience
 path is unchanged; a checkpoint or stream transcript is not a qualitative model-performance claim.
@@ -71,7 +97,7 @@ records coherent 64-cycle fixed-morphology prose and a fresh-process continuatio
 
 [counterexample; measured] The same application with shift-16 additive cultivation degraded into
 repetition and exceeded the carrier bound during its ninth operation; its actual interruption was
-saved. HNP4 next requires justified stable local development and output-cost repair, followed by
+saved. Its production sequence required justified stable local development and output-cost repair, followed by
 its remaining complete-product/correction/second-application returns. Freezing the learner or
 raising the numeric limit is not completion. HNP0/HNP1's exact scoped results remain standing.
 
@@ -86,11 +112,19 @@ now has exact calibration, non-expansiveness and a metric-preserving one-axis li
 oriented-site formal owner.
 
 [established-bounded; measured] Its resident projection passed 490 point-row rational comparisons,
-interval/permutation, non-power-of-two launch and refusal controls. It has not replaced HNA's
-unstable additive cultivation. The next live binding owes an actual source/arrived comparison,
-its metric and retained successor; the isolated candidate does not close HNP4.
+interval/permutation, non-power-of-two launch and refusal controls. The subsequent
+[tied next-arrival binding](research/records/2026-09-05_HNP4_THE_NEXT_ARRIVAL_DEPOSITS_A_REUSABLE_CONTACT_AND_MATCHED_SELF_RETURN_IS_ZERO.md)
+retained received contacts, preserved the entire changed state across process restart,
+and developed further with the same complete successor. Its recorded text run completed 20 addresses
+without self-amplification; a later ordinary correction grew five maps to 22 and completed `Red`.
 
-[definition] The plan then orders general material contact, resident locality/reuse, persistent
+[historical; measured] The small document trial did not answer the later fresh-context question
+with blue; calling this a failed transfer of a portable fact is withdrawn. No contextual
+identification/transport warranted requiring that answer. The later `Red` response and parameter
+changes likewise do not prove contextual learning. The numerical observations remain evidence
+about the draft, not a reason to pursue unqualified color recall or another Gemma application.
+
+[historical] The paused HNP plan orders general material contact, resident locality/reuse, persistent
 sessions, multi-cycle output, a useful consumer-model milestone, executable export and supported
 SSM/diffusion-family extensions. This is not a token-volume programme or a conventional trainer
 wrapped around the bounded prefix pathway. The mathematical research strategy is recorded below.

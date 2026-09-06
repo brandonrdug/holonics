@@ -1,4 +1,5 @@
 import ElementaryHolonics.Foundation.Holon
+import ElementaryHolonics.Foundation.Receiver
 import Mathlib.CategoryTheory.Category.Basic
 
 /-!
@@ -113,6 +114,111 @@ def mapPreimageFibre (family : CausalNaturalHolon Parameter)
           (family.receive_natural step occurrence.1).symm
         _ = family.receiverFace.map step face := congrArg _ occurrence.2⟩
 
+/-- Transport an actually presented source face along an admitted parameter arrow.
+
+The codomain is again a `Set.range`: source naturality proves that the transported face is
+presented by the mapped occurrence.  No value is assigned to an exterior source coordinate which
+was not presented by this component.
+-/
+def mapSourceRange (family : CausalNaturalHolon Parameter)
+    {before after : Parameter} (step : before ⟶ after) :
+    Set.range (family.source.app before) → Set.range (family.source.app after) :=
+  fun face ↦
+    ⟨family.sourceFace.map step face.1, by
+      rcases face.2 with ⟨occurrence, hsource⟩
+      refine ⟨family.occurrence.map step occurrence, ?_⟩
+      calc
+        family.source.app after (family.occurrence.map step occurrence) =
+            family.sourceFace.map step (family.source.app before occurrence) :=
+          (family.source_natural step occurrence).symm
+        _ = family.sourceFace.map step face.1 := congrArg _ hsource⟩
+
+/-- A pair of exact local receiver transformers commutes with source-range transport.
+
+Both transformers are defined only on the source faces that their own component actually presents;
+the parameter arrow transports those ranges, while receiver naturality transports the returned face.
+-/
+theorem receiverTransformer_natural
+    (family : CausalNaturalHolon Parameter)
+    {before after : Parameter} (step : before ⟶ after)
+    (beforeTransformer : ReceiverTransformer
+      (family.source.app before) (family.receive.app before))
+    (afterTransformer : ReceiverTransformer
+      (family.source.app after) (family.receive.app after))
+    (face : Set.range (family.source.app before)) :
+    afterTransformer.transform (mapSourceRange family step face) =
+      family.receiverFace.map step (beforeTransformer.transform face) := by
+  rcases face.2 with ⟨occurrence, hsource⟩
+  let entering : Set.range (family.source.app before) :=
+    ⟨family.source.app before occurrence, ⟨occurrence, rfl⟩⟩
+  have hentering : entering = face := Subtype.ext hsource
+  have hmapped : mapSourceRange family step entering =
+      (⟨family.source.app after (family.occurrence.map step occurrence),
+        ⟨family.occurrence.map step occurrence, rfl⟩⟩ :
+        Set.range (family.source.app after)) := by
+    apply Subtype.ext
+    exact family.source_natural step occurrence
+  calc
+    afterTransformer.transform (mapSourceRange family step face) =
+        afterTransformer.transform (mapSourceRange family step entering) := by
+          rw [hentering]
+    _ = family.receive.app after (family.occurrence.map step occurrence) := by
+          rw [hmapped]
+          exact afterTransformer.exact _
+    _ = family.receiverFace.map step (family.receive.app before occurrence) :=
+          (family.receive_natural step occurrence).symm
+    _ = family.receiverFace.map step (beforeTransformer.transform face) := by
+          rw [← beforeTransformer.exact occurrence]
+          congr 1
+          exact congrArg beforeTransformer.transform hentering
+
+/-- An actual addressed parameter-passage crossing obeys the local transformer square.
+
+The crossing is retained explicitly; its target is not replaced by an unconditioned global map.
+-/
+theorem parameterPassage_crossing_receiverTransformer_natural
+    (family : CausalNaturalHolon Parameter)
+    {before after : Parameter} (step : before ⟶ after)
+    (beforeTransformer : ReceiverTransformer
+      (family.source.app before) (family.receive.app before))
+    (afterTransformer : ReceiverTransformer
+      (family.source.app after) (family.receive.app after))
+    (crossing : (family.parameterPassage step).Occurrence) :
+    afterTransformer.transform
+        (⟨family.source.app after ((family.parameterPassage step).target crossing),
+          ⟨(family.parameterPassage step).target crossing, rfl⟩⟩ :
+          Set.range (family.source.app after)) =
+      family.receiverFace.map step
+        (beforeTransformer.transform
+          (⟨family.source.app before ((family.parameterPassage step).source crossing),
+            ⟨(family.parameterPassage step).source crossing, rfl⟩⟩ :
+            Set.range (family.source.app before))) := by
+  let entering : Set.range (family.source.app before) :=
+    ⟨family.source.app before ((family.parameterPassage step).source crossing),
+      ⟨(family.parameterPassage step).source crossing, rfl⟩⟩
+  let target : Set.range (family.source.app after) :=
+    ⟨family.source.app after ((family.parameterPassage step).target crossing),
+      ⟨(family.parameterPassage step).target crossing, rfl⟩⟩
+  have htarget : mapSourceRange family step entering = target := by
+    apply Subtype.ext
+    calc
+      family.sourceFace.map step
+          (family.source.app before ((family.parameterPassage step).source crossing)) =
+          family.source.app after
+            (family.occurrence.map step ((family.parameterPassage step).source crossing)) :=
+        family.source_natural step ((family.parameterPassage step).source crossing)
+      _ = family.source.app after ((family.parameterPassage step).target crossing) := by
+        rw [← family.target_transport step crossing]
+  have hcommutes := receiverTransformer_natural family step beforeTransformer afterTransformer entering
+  rw [show (⟨family.source.app before ((family.parameterPassage step).source crossing),
+      ⟨(family.parameterPassage step).source crossing, rfl⟩⟩ :
+      Set.range (family.source.app before)) = entering by rfl]
+  rw [show (⟨family.source.app after ((family.parameterPassage step).target crossing),
+      ⟨(family.parameterPassage step).target crossing, rfl⟩⟩ :
+      Set.range (family.source.app after)) = target by rfl]
+  rw [← htarget]
+  exact hcommutes
+
 /-- An addressed crossing receives exactly the transported face of its entering occurrence. -/
 theorem crossing_receive_eq_transported_source_receive
     (family : CausalNaturalHolon Parameter)
@@ -134,5 +240,8 @@ open Soma.Holonics
 #print axioms CausalNaturalHolon.target_natural
 #print axioms CausalNaturalHolon.receive_natural
 #print axioms CausalNaturalHolon.mapPreimageFibre
+#print axioms CausalNaturalHolon.mapSourceRange
+#print axioms CausalNaturalHolon.receiverTransformer_natural
+#print axioms CausalNaturalHolon.parameterPassage_crossing_receiverTransformer_natural
 #print axioms CausalNaturalHolon.crossing_receive_eq_transported_source_receive
 end Audit

@@ -33,6 +33,16 @@ research, a new subsystem, a qualitative gate or destructive/external permission
 
 ## Pickup and authority
 
+[project-postulate] Brandon's September 5 contextual-transport correction makes **native HNA
+foundations** the present priority, before further Soulkiller/Gemma-led production. Changed
+coefficients or transport do not establish contextual transport; context is the relevant situated
+charts/channels and conditions, not a token window, cache or appended label. A local descriptor
+is not a global property, and equal wording does not identify a holon across contexts. Read the
+[contextual-transport audit](research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md)
+before resuming the HNA line. Do not substitute an authored classifier, score, scene-ID switch
+or per-language rule for contextual transport inside HNA. Reuse existing native owners; ground-up does not mean no
+foundations. Inherited-model work is deferred, not universally banned.
+
 1. Read this contract, [CONSTRUCTION_STATE.md](CONSTRUCTION_STATE.md), and the complete
    [live roadmap](docs/plans/THE_ROADMAP.md).
 2. Read the relevant current architecture/interface guide and exact source owners. Use

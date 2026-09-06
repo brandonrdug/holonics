@@ -13,7 +13,10 @@ Architecture names, codecs, and apparatus coordinates do not occur in the object
 The same object supplies a native generator family to `DynamicReceiverChart`.  A classical
 architecture is therefore an additional quotient, transition, and receiver factorization, never
 the native ontology.  Inference retains one morphology through an ordered transport word;
-cultivation is a separately returned passage that changes reusable morphology.
+cultivation is a separately returned passage that changes reusable morphology in that fixed-rest
+receiver presentation. This older presentation does not define the general HNA lifecycle:
+`HolonicRecurrentEcology` owns the complete operation and its developing successor. In particular,
+these fixed-morphology words must not be substituted for native contextual recurrence.
 -/
 
 noncomputable section

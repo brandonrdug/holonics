@@ -1130,6 +1130,132 @@ theorem liftedContact_passive {n : ℕ} {x y : Vector n}
 
 end PassiveContact
 
+/-! ### A tied-map next-arrival contrast
+
+Historical bounded algebra from the withdrawn inherited-model draft (2026-09-05). The prefix
+receipt and shared-map contrast do not found contextual applicability; `context` below is the
+declared vector chart, not the full situated conditions of HNA. Its runtime integration is archived
+under `archive/experiments/2026-09-05-tied-next-arrival/`. No native foundation is scheduled here.
+
+The following is an independently defined next-arrival contrast, not the endogenous `Add` effect.
+The map owns both row covectors and the declared deterministic receiver face.  An occurrence keeps
+the actual context, receiver address, a nonempty source word, and an entering word whose first
+post-source element is the observed address.  This is an abstract prefix-join receipt, not a proof
+of the whole Rust runtime; no answer, logit margin, or gain is selected by the theorem.  The
+Euclidean metric is the same declared chart used by `PassiveContact`: equal widths alone do not
+found a returned current.
+-/
+
+namespace TiedMapNextArrival
+
+abbrev Address (a : ℕ) := Fin a
+abbrev Chart (h : ℕ) := PassiveContact.Vector h
+
+/-- A finite tied coefficient map `W : H → A`, represented by its row covectors in the H chart.
+The receiver-face selector is an actual deterministic receiver owner, not a score or answer map. -/
+structure TiedCoefficientMap (h a : ℕ) where
+  row : Address a → Chart h
+  receiverFace : Chart h → Address a
+
+namespace TiedCoefficientMap
+
+variable {h a : ℕ} (W : TiedCoefficientMap h a)
+
+def coefficientMap : Address a → Chart h := W.row
+
+theorem coefficientMap_eq_row (address : Address a) :
+    W.coefficientMap address = W.row address := rfl
+
+end TiedCoefficientMap
+
+/-- A joined occurrence with an actual deterministic receiver face `p` and a causally next
+observed input address `a`.  The field `receiver_face` is the occurrence's receiver-scope receipt. -/
+structure ActualNextArrival {h a : ℕ} (W : TiedCoefficientMap h a) where
+  context : Chart h
+  observedAddress : Address a
+  receiverAddress : Address a
+  receiver_face : receiverAddress = W.receiverFace context
+  sourceWord : List (Address a)
+  enteringWord : List (Address a)
+  remainder : List (Address a)
+  source_nonempty : sourceWord ≠ []
+  joining : enteringWord = sourceWord ++ observedAddress :: remainder
+
+namespace ActualNextArrival
+
+variable {h a : ℕ} {W : TiedCoefficientMap h a}
+
+def returnedCurrent (occurrence : ActualNextArrival W) : Chart h :=
+  W.row occurrence.observedAddress - W.row occurrence.receiverAddress
+
+def joinedField (occurrence : ActualNextArrival W) : Chart h :=
+  occurrence.context + occurrence.returnedCurrent
+
+def passiveCalibration (occurrence : ActualNextArrival W) : Chart h :=
+  PassiveContact.contact occurrence.context occurrence.joinedField occurrence.context
+
+theorem observedAddress_after_source (occurrence : ActualNextArrival W) :
+    occurrence.enteringWord =
+      occurrence.sourceWord ++ occurrence.observedAddress :: occurrence.remainder :=
+  occurrence.joining
+
+theorem enteringWord_nonempty (occurrence : ActualNextArrival W) :
+    occurrence.enteringWord ≠ [] := by
+  rw [occurrence.joining]
+  simp
+
+/-- The paired margin reads the returned current against the actual joined field.  Its second term
+is the squared norm of the same row difference, so it is not an externally supplied margin. -/
+theorem paired_margin_identity (occurrence : ActualNextArrival W) :
+    PassiveContact.dot occurrence.returnedCurrent occurrence.joinedField =
+      PassiveContact.dot occurrence.returnedCurrent occurrence.context +
+        PassiveContact.squaredNorm occurrence.returnedCurrent := by
+  simp [joinedField, PassiveContact.dot_add_right, PassiveContact.squaredNorm]
+
+/-- When the observed address is the actual receiver address, the shared tied map returns zero. -/
+theorem matched_returnedCurrent (occurrence : ActualNextArrival W)
+    (matched : occurrence.observedAddress = occurrence.receiverAddress) :
+    occurrence.returnedCurrent = 0 := by
+  simp [returnedCurrent, matched]
+
+theorem matched_joinedField (occurrence : ActualNextArrival W)
+    (matched : occurrence.observedAddress = occurrence.receiverAddress) :
+    occurrence.joinedField = occurrence.context := by
+  simp [joinedField, matched_returnedCurrent occurrence matched]
+
+/-- A matched next arrival is the passive identity contact in the same declared metric chart. -/
+theorem matched_passiveCalibration_identity (occurrence : ActualNextArrival W)
+    (matched : occurrence.observedAddress = occurrence.receiverAddress) :
+    PassiveContact.contact occurrence.context occurrence.joinedField = id := by
+  rw [matched_joinedField occurrence matched]
+  exact PassiveContact.contact_matched occurrence.context
+
+/-- Passive calibration of the actual joined passage returns that same actual joined field. -/
+theorem passiveCalibration_eq_joinedField (occurrence : ActualNextArrival W) :
+    occurrence.passiveCalibration = occurrence.joinedField := by
+  exact PassiveContact.contact_x_eq_y occurrence.context occurrence.joinedField
+
+end ActualNextArrival
+
+/-! Equal finite widths do not identify a row contrast: the shared coefficient map and its metric
+chart are constitutive inputs.  This explicit control keeps that boundary visible without making
+the contrast a claim about a top face, useful learning, or global HNA stability. -/
+
+theorem equal_widths_do_not_found_return :
+    ∃ (W₁ W₂ : TiedCoefficientMap 1 2) (a p : Address 2),
+      (W₁.row a - W₁.row p) ≠ (W₂.row a - W₂.row p) := by
+  refine ⟨
+    { row := fun _ ↦ ![0]
+      receiverFace := fun _ ↦ 0 },
+    { row := fun address ↦ if address = 0 then ![1] else ![0]
+      receiverFace := fun _ ↦ 0 },
+    0, 1, ?_⟩
+  intro same
+  have hcoord := congrFun same 0
+  norm_num at hcoord
+
+end TiedMapNextArrival
+
 end Soma.Holonics.Computation.HolonicOrientedSiteTransport
 
 section Audit
@@ -1166,4 +1292,8 @@ open Soma.Holonics.Computation.HolonicOrientedSiteTransport
 #print axioms PassiveContact.contact_nonexpansive
 #print axioms PassiveContact.liftedContact_energy_preserved
 #print axioms PassiveContact.liftedContact_passive
+#print axioms TiedMapNextArrival.ActualNextArrival.paired_margin_identity
+#print axioms TiedMapNextArrival.ActualNextArrival.matched_passiveCalibration_identity
+#print axioms TiedMapNextArrival.ActualNextArrival.passiveCalibration_eq_joinedField
+#print axioms TiedMapNextArrival.equal_widths_do_not_found_return
 end Audit

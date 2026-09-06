@@ -1,4 +1,5 @@
 import ElementaryHolonics.Computation.MachineLearningStrictLift
+import ElementaryHolonics.Foundation.Receiver
 import ElementaryHolonics.Millennium.HolonicComplexParametron
 import ElementaryHolonics.Millennium.SituatedReturnedDifference
 import Mathlib.Tactic
@@ -10,6 +11,10 @@ Loss is first a complete returned difference.  A scalar loss is a later receiver
 learning only when the durable morphology return itself descends through that face.  The second
 half of the file gives one exact configuration in which a pre-locking complex Parametron current
 has a traditional real-valued affine receiver chart.
+
+`IsInferenceReturn` below names the zero-morphology special case of this receiver chart, not the
+definition of inference throughout HNA. The complete developing operation is owned by
+`HolonicRecurrentEcology`; no inference/exterior-cultivation mode split follows from this file.
 -/
 
 namespace Soma.Holonics.Computation.SituatedMachineLearning
@@ -170,6 +175,59 @@ theorem equalClassicalPotential_canRetainDifferentQuadrature :
 
 end ParametronChart
 
+/-! ## A finite orientation control for a situated receiver -/
+
+namespace OrientationControl
+
+open Soma.Holonics.Millennium.HolonicComplexParametron
+
+/-- One scalar node coordinate shared by two branch-orientation charts. -/
+def scalarState : Unit → ℝ := fun _ ↦ 1
+
+/-- Equal branch drive in the two-branch control. -/
+def branchDrive : Bool → ℝ := fun _ ↦ 1
+
+/-- Equal unoriented branch incidence in the two-branch control. -/
+def branchIncidence : Bool → Unit → ℝ := fun _ _ ↦ 1
+
+/-- One orientation chart leaves both branches alone; the other reverses the second branch. -/
+def selected (orientation : Bool) : Bool → Bool :=
+  fun branch ↦ orientation && branch
+
+/-- The returned drive action when only incidence is reoriented. -/
+def untransportedAction (orientation : Bool) : ℝ :=
+  driveAction branchDrive
+    (reorientIncidence (selected orientation) branchIncidence) scalarState
+
+theorem sameScalar_differentUntransportedOrientation :
+    (untransportedAction false : ℝ) ≠ untransportedAction true := by
+  norm_num [untransportedAction, branchDrive, branchIncidence, scalarState,
+    selected, driveAction, branchDrop, reorientIncidence, orientationSign]
+
+/-- The same scalar entering coordinate carries two distinct returned actions. -/
+def orientationInsufficiency : ReceiverInsufficiency
+    (fun _ : Bool ↦ (1 : ℝ)) untransportedAction where
+  left := false
+  right := true
+  sameEntering := rfl
+  differentReturned := sameScalar_differentUntransportedOrientation
+
+/-- Forgetting branch orientation cannot define this action from the scalar coordinate alone. -/
+theorem untransportedOrientation_noReceiverTransformer :
+    ¬ Nonempty (ReceiverTransformer
+      (fun _ : Bool ↦ (1 : ℝ)) untransportedAction) := by
+  rintro ⟨transformer⟩
+  exact transformer.excludesInsufficiency orientationInsufficiency
+
+/-- Transporting the drive covector with incidence preserves the action on the same state. -/
+theorem transportingDriveWithIncidence_preservesAction :
+    driveAction (reorientDrive (selected true) branchDrive)
+        (reorientIncidence (selected true) branchIncidence) scalarState =
+      driveAction branchDrive branchIncidence scalarState := by
+  exact driveAction_reorientBoth (selected true) branchDrive branchIncidence scalarState
+
+end OrientationControl
+
 end Soma.Holonics.Computation.SituatedMachineLearning
 
 section Audit
@@ -180,4 +238,7 @@ open Soma.Holonics.Computation.SituatedMachineLearning
 #print axioms LossControl.scalarLossDoesNotDetermineCultivation
 #print axioms ParametronChart.fixedRealPhaseChart_everyRecurrence
 #print axioms ParametronChart.equalClassicalPotential_canRetainDifferentQuadrature
+#print axioms OrientationControl.sameScalar_differentUntransportedOrientation
+#print axioms OrientationControl.untransportedOrientation_noReceiverTransformer
+#print axioms OrientationControl.transportingDriveWithIncidence_preservesAction
 end Audit

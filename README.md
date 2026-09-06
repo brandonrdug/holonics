@@ -27,6 +27,11 @@ Training, inference, model persistence and export belong to one explicit framewo
 
 ## Run the current native interface
 
+[project-postulate] Current construction prioritizes **native HNA foundations and contextual
+transport**, before further Soulkiller/Gemma-led production. Existing inherited-model commands
+below are bounded apparatus, not evidence that those foundations are complete. See the
+[contextual audit](research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md).
+
 ```sh
 cargo build -p holonics-workbench --bin holonics
 target/debug/holonics hna --help
@@ -38,8 +43,10 @@ target/debug/holonics --format json hna train /path/to/supported/model sequence.
 Gemma text realization and restricted Soulkiller bodies on CUDA. The API retains one successor
 session across ordered occurrences and can apply developmental returns through previously
 learned overlays. `hna infer` returns one selected face; `hna train` returns a developmental
-run receipt. It does not yet save a full cultivated-operator checkpoint or claim frontier-level
-output quality. The exact scopes and next production bridges are documented above.
+run receipt. Full checkpoints, backpressured sessions and paired text/model continuation are
+available through `HnaModel`, `HnaTextApplication` and `hna session` at their declared scopes.
+Their storage and numerical results do not establish contextual learning or frontier-level
+quality. The tied-head experiment is archived, not the current foundation route.
 
 For Rust clients, `crates/holonics` exposes `holonics::hna`, `holonics::soulkiller` and
 `holonics::interop`. Existing Safetensors/ONNX package exports preserve Holonics artifacts;

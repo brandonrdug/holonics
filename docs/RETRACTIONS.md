@@ -6,6 +6,13 @@ root construction state records current implementation scope. Paths in code span
 
 ## Capability and retraction record
 
+[historical; source-inspected] September 5 contextual-transport correction: the expectation that
+`The cube is blue` should become a freely portable association is withdrawn. A changed map or
+new prompt does not establish contextual identification and transport. The tied-head draft's
+promotion into native HNA foundations is also withdrawn; its finite algebra, numerical runs and
+I/O results retain their own scopes. Native foundations now precede further inherited-model
+production. See the [audit](../research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md).
+
 [historical; source-inspected] 2026-09-04 HNP1 attempted automatic equalization at native Add
 junctions. Actual non-prefix development and exact ablation/restoration returned, but Add's input
 derivative does not supply a desired comparison target. The automatic policy and session hooks

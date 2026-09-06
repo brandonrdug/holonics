@@ -110,6 +110,16 @@ struct TransportHeader {
 
 impl HnaBaseDependency {
     pub fn capture(path: impl AsRef<Path>, class: Option<usize>) -> Result<Self, CheckpointError> {
+        Ok(Self::capture_with_open_handle(path, class)?.0)
+    }
+
+    /// Capture the immutable pin and return the same file handle, rewound to byte zero after its
+    /// hash is complete. Fresh model construction consumes this handle directly, avoiding a
+    /// second full hash; loading an existing dependency continues to use `open_verified` below.
+    pub fn capture_with_open_handle(
+        path: impl AsRef<Path>,
+        class: Option<usize>,
+    ) -> Result<(Self, File), CheckpointError> {
         let requested = path.as_ref();
         let path = requested.canonicalize().map_err(|error| {
             if error.kind() == io::ErrorKind::NotFound {
@@ -129,13 +139,17 @@ impl HnaBaseDependency {
         })?;
         let octets = file.metadata()?.len();
         let sha256 = hash_reader(&mut file)?;
-        Ok(Self {
-            path,
-            octets,
-            sha256,
-            class,
-            input_material: Vec::new(),
-        })
+        file.seek(SeekFrom::Start(0))?;
+        Ok((
+            Self {
+                path,
+                octets,
+                sha256,
+                class,
+                input_material: Vec::new(),
+            },
+            file,
+        ))
     }
 
     /// Opens the verified base once and rewinds that same handle for the consumer.
@@ -418,6 +432,25 @@ mod tests {
             "the consumer keeps the admitted descriptor, not a new path lookup"
         );
         assert!(dependency.open_verified(Some(&moved)).is_ok());
+    }
+
+    #[test]
+    fn capture_with_open_handle_returns_the_pinned_file_at_zero() {
+        let directory = tempdir().unwrap();
+        let path = directory.path().join("base.bin");
+        std::fs::write(&path, b"abc").unwrap();
+        let (dependency, mut file) = HnaBaseDependency::capture_with_open_handle(&path, Some(7)).unwrap();
+        assert_eq!(dependency.path, path.canonicalize().unwrap());
+        assert_eq!(dependency.octets, 3);
+        assert_eq!(dependency.sha256, "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
+        assert_eq!(file.stream_position().unwrap(), 0);
+        std::fs::rename(&path, directory.path().join("retained.bin")).unwrap();
+        std::fs::write(&path, b"xyz").unwrap();
+        let mut bytes = Vec::new();
+        file.read_to_end(&mut bytes).unwrap();
+        assert_eq!(bytes, b"abc");
+        assert_eq!(file.stream_position().unwrap(), dependency.octets);
+        assert!(dependency.open_verified(None).is_err(), "an existing pin must not trust the replacement path");
     }
 
     #[test]

@@ -302,14 +302,38 @@ measurements, not end-to-end generation throughput or a solution to unstable dev
 [readout record](../research/records/2026-09-05_HNP4_THE_TERMINAL_RECEIVER_READS_ONE_ROW_AND_PRESERVES_THE_COMPLETE_SUCCESSOR.md)
 contains the control, resource boundary and reproduction command.
 
+## Tied next-arrival experiment — not the current foundation
+
+[historical; source-inspected] The archived `from_native_rest_with_boundary_contact` experiment
+compares selected/received addresses through an inherited tied map and applies a persistent
+map word at its latent input port. The [contextual audit](../research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md)
+withdraws its promotion into native HNA foundations. It supplies no contextual applicability
+relation for that globally applied word. Zero address contrast is zero at that receiver, not
+proof of no relevant internal difference. Its uncommitted API and CLI promotion were removed;
+the [recoverable draft](../archive/experiments/2026-09-05-tied-next-arrival/README.md), finite
+algebra and rest v2 observations remain available for inspection, not as a new construction order.
+
+[established-bounded; measured] The actual document run formed five maps and produced a coherent
+20-address response including its native completion marker. All matched self-returns left the
+maps unchanged. Complete remount and cross-process continuation equality passed, including
+further development to a sixth map. After another restart, an ordinary correction to red
+delivered 26 native occurrences before its first answer, grew five maps to 22 and returned
+`Red` followed by the native completion marker.
+
+[historical; measured] The trial did not answer the fresh-context question with blue. Requiring
+that answer without establishing contextual identification/transport was an invalid foundation
+test, not a demonstrated failure of Holonics. The later contextual `Red` response does not prove
+native contextual learning either. The observations are retained; the portable-fact framing is
+withdrawn. Native foundations now take priority over further Gemma application trials.
+
 ## Remaining production requirements
 
 [definition] The [production campaign](plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md)
-specifies the general material/current binding and local development missing from the narrow
-prefix convenience pathway, as well as persistence and multi-cycle output. The public callback
-and durable stream now exist; useful multi-cycle application output remains in construction. Dataset delivery
-must preserve actual causal occurrences and may not define learning through arbitrary batching,
-shuffling or an optimizer callback.
+is paused under the [live roadmap](plans/THE_ROADMAP.md). Native contextual foundations precede
+its remaining application/export work. Existing callback, stream and persistence machinery is
+reusable at its scope; it does not establish the contextual relations the next construction must
+make operative. Dataset delivery must preserve actual causal occurrences rather than define
+learning through arbitrary batching, shuffling or an optimizer callback.
 
 [definition] A production training pipeline must stream declared material through the same owner,
 retain its successor, checkpoint/remount it and evaluate later behavior without changing the

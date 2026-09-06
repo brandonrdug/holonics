@@ -987,15 +987,16 @@ extern "C" __global__ void section_contact(
     }
 }
 
-// Candidate finite passive-contact projection.  One block owns one row and first forms the row's
-// shared d/D/N and dot-product intervals; the output lanes then apply the exact same quotient to
-// their coordinates.  `x` and `y` are required to be POINT endpoints.  `z` may be an enclosure,
-// and the resulting enclosure is intentionally not claimed minimal because each z_i also enters
-// the shared dot interval.  This is a projection primitive only: it does not bind a model learner,
-// a full lifted axis on the GPU, or a network conservation theorem.
+// Candidate finite passive-contact projection.  One block owns one query row and first forms the
+// founding row's shared d/D/N and the query row's dot interval; `founding_rows == 1` broadcasts
+// one immutable source/arrived row over all query rows, while `founding_rows == rows` preserves
+// the ordinary row-paired operation.  `x` and `y` are required to be POINT endpoints.  `z` may be
+// an enclosure, and the resulting enclosure is intentionally not claimed minimal because each
+// z_i also enters the shared dot interval.  This is a projection primitive only: it does not bind
+// a model learner, a full lifted axis on the GPU, or a network conservation theorem.
 extern "C" __global__ void __launch_bounds__(512) section_passive_contact(
     const int64_t *xlo, const int64_t *xhi, const int64_t *ylo, const int64_t *yhi,
-    const int64_t *zlo, const int64_t *zhi, uint32_t rows, uint32_t width,
+    const int64_t *zlo, const int64_t *zhi, uint32_t rows, uint32_t width, uint32_t founding_rows,
     int64_t *olo, int64_t *ohi, uint32_t *slot, const uint32_t *census,
     const uint32_t *lineage, uint32_t lineage_count
 ) {
@@ -1018,11 +1019,20 @@ extern "C" __global__ void __launch_bounds__(512) section_passive_contact(
     __syncthreads();
     if (stop_s) return;
 
-    const size_t base = (size_t)row * (size_t)width;
+    if (threadIdx.x == 0) {
+        if (founding_rows != 1u && founding_rows != rows)
+            atomicOr(slot + SLOT_REFUSED, REFUSED_MALFORMED);
+        stop_s = atomicOr(slot + SLOT_REFUSED, 0u) != 0u;
+    }
+    __syncthreads();
+    if (stop_s) return;
+
+    const size_t source_base = (size_t)(founding_rows == 1u ? 0u : row) * (size_t)width;
+    const size_t query_base = (size_t)row * (size_t)width;
     int local_bad = 0;
     for (uint32_t i = threadIdx.x; i < width; i += blockDim.x) {
-        if (xlo[base + i] != xhi[base + i] || ylo[base + i] != yhi[base + i] ||
-            zlo[base + i] > zhi[base + i]) local_bad = 1;
+        if (xlo[source_base + i] != xhi[source_base + i] || ylo[source_base + i] != yhi[source_base + i] ||
+            zlo[query_base + i] > zhi[query_base + i]) local_bad = 1;
     }
     if (local_bad) atomicOr((unsigned int *)&malformed_s, 1u);
     __syncthreads();
@@ -1035,7 +1045,7 @@ extern "C" __global__ void __launch_bounds__(512) section_passive_contact(
     // accumulation is checked before it enters shared standing; a refusal never becomes a wrap.
     wide gap = 0, norm = 0, dl = 0, dh = 0;
     for (uint32_t i = threadIdx.x; i < width; i += blockDim.x) {
-        wide x = (wide)xlo[base + i], y = (wide)ylo[base + i];
+        wide x = (wide)xlo[source_base + i], y = (wide)ylo[source_base + i];
         wide d;
         d = sub_checked(x, y, slot + SLOT_REFUSED);
         wide xx = product_checked(x, x, slot + SLOT_REFUSED);
@@ -1043,7 +1053,7 @@ extern "C" __global__ void __launch_bounds__(512) section_passive_contact(
         wide dd = product_checked(d, d, slot + SLOT_REFUSED);
         gap = add_checked(gap, sub_checked(yy, xx, slot + SLOT_REFUSED), slot + SLOT_REFUSED);
         norm = add_checked(norm, dd, slot + SLOT_REFUSED);
-        wide zl = (wide)zlo[base + i], zh = (wide)zhi[base + i];
+        wide zl = (wide)zlo[query_base + i], zh = (wide)zhi[query_base + i];
         wide pl, ph;
         if (d >= 0) {
             pl = product_checked(d, zl, slot + SLOT_REFUSED);
@@ -1092,14 +1102,14 @@ extern "C" __global__ void __launch_bounds__(512) section_passive_contact(
     if (stop_s) return;
     if (identity_s) {
         for (uint32_t i = threadIdx.x; i < width; i += blockDim.x) {
-            olo[base + i] = zlo[base + i];
-            ohi[base + i] = zhi[base + i];
+            olo[query_base + i] = zlo[query_base + i];
+            ohi[query_base + i] = zhi[query_base + i];
         }
         return;
     }
 
     for (uint32_t i = threadIdx.x; i < width; i += blockDim.x) {
-        wide d = sub_checked((wide)xlo[base + i], (wide)ylo[base + i], slot + SLOT_REFUSED);
+        wide d = sub_checked((wide)xlo[source_base + i], (wide)ylo[source_base + i], slot + SLOT_REFUSED);
         wide delta_lo, delta_hi;
         if (d >= 0) {
             delta_lo = signed_product_divide_2(d, dot_lo_s, den_s, 0, slot + SLOT_REFUSED);
@@ -1108,11 +1118,11 @@ extern "C" __global__ void __launch_bounds__(512) section_passive_contact(
             delta_lo = signed_product_divide_2(d, dot_hi_s, den_s, 0, slot + SLOT_REFUSED);
             delta_hi = signed_product_divide_2(d, dot_lo_s, den_s, 1, slot + SLOT_REFUSED);
         }
-        wide lower = sub_checked((wide)zlo[base + i], delta_hi, slot + SLOT_REFUSED);
-        wide upper = sub_checked((wide)zhi[base + i], delta_lo, slot + SLOT_REFUSED);
+        wide lower = sub_checked((wide)zlo[query_base + i], delta_hi, slot + SLOT_REFUSED);
+        wide upper = sub_checked((wide)zhi[query_base + i], delta_lo, slot + SLOT_REFUSED);
         if (lower > upper) atomicOr(slot + SLOT_REFUSED, REFUSED_INVERTED);
-        olo[base + i] = to_word(lower, slot + SLOT_REFUSED);
-        ohi[base + i] = to_word(upper, slot + SLOT_REFUSED);
+        olo[query_base + i] = to_word(lower, slot + SLOT_REFUSED);
+        ohi[query_base + i] = to_word(upper, slot + SLOT_REFUSED);
     }
 }
 

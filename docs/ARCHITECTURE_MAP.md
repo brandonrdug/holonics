@@ -29,6 +29,7 @@ test result never upgrades a correspondence.
 | Holon composition and retained middle boundary | `Foundation/Holon.lean` | `realization/passage.rs`; `holonic_complex.rs` | `cuda_refine/membrane_factored_transport.rs` | **partial:** runtime composition exists; complete realization-site fibre is R0Q0 |
 | Addressed causal-natural holon, dependent tensor receiver, and artifact passage | `Foundation/Holon.lean::{Rebase,PreimageFibre}`; `Foundation/CausalNaturalHolon.lean`; `Foundation/HolonTensorLens.lean` | — | — | **formal-only:** every causal parameter arrow owns a source-complete addressed passage; arbitrary arrows map preimages forward; heterogeneous axes reindex as dependent tensor products; homogeneous slot permutations lift to complete preimage equivalences; artifact naming requires validation and exact remount |
 | Receiver face and quotient fibre | `Foundation/Receiver.lean`; `Foundation/ReceiverQuotient.lean`; `Foundation/BoundaryReceiver.lean` | `receiver.rs`; `receiver_exact_compression.rs`; `founded_receiver.rs` | `cuda_refine/membrane_factored_receivers.rs`; `membrane_receiver_completion.rs` | **exact** for bounded receiver quotients; richer families may reopen fibres |
+| Contextual receiver descent and orientation control | `Foundation/CausalNaturalHolon.lean::{mapSourceRange,receiverTransformer_natural,parameterPassage_crossing_receiverTransformer_natural}`; `Computation/SituatedMachineLearning.lean::OrientationControl` | — | — | [proved-derived; formal-checked] Actual-range receiver square with addressed crossing; scalar orientation insufficiency and jointly reoriented drive/incidence action. Formal contract only; concrete native participation/formation remains NCF1 |
 | Transport lift and lawful descent | `Foundation/TransportLift.lean`; `Foundation/LatticeTransport.lean` | `inverse_transport.rs`; `reduction_junction.rs`; `embedding_fiber.rs`; `rebase_invariants.rs` | `membrane_factored_transport.rs`; `membrane_factored_descent.rs` | **partial:** every descended generator still owes a commuting square in its declared carrier |
 | Chain, product, and higher incidence | `Foundation/DiagonalChainTransport.lean`; `Foundation/ProductDegreeTwo.lean` | `holonic_complex.rs`; `derivation_two_cells.rs`; `derivation_atlas.rs` | `membrane_generated_transport.rs`; `membrane_joint_boundary.rs` | **partial:** complete higher-cell pullback lineage is receiver-dependent |
 
@@ -107,12 +108,23 @@ returned complete checkpoint equality and lower host transfer without another de
 [proved-derived; formal-checked] `HolonicOrientedSiteTransport.PassiveContact` now owns a finite
 Euclidean paired-observation map with exact calibration, non-expansiveness and a one-axis metric
 lift. Its bounded [candidate record](../research/records/2026-09-05_HNP4_A_PASSIVE_PAIRED_CONTACT_HAS_A_CHECKED_METRIC_LIFT_AND_A_RESIDENT_PROJECTION.md)
-states the hypotheses and the still-open live comparison/metric/successor binding.
+states the hypotheses; `TiedMapNextArrival` now gives the explicit prefix join and shared-map
+received contrast, without a universal learning or stability claim.
 
 [established-bounded; measured] `ResidentSurface::record_passive_contact` and
 `exact_resident_section.cu::section_passive_contact` realize the candidate's point-founded,
 interval-query projection, with exact-rational CUDA controls. They do not implement its lifted
 axis or replace the full-operator cultivation law.
+
+[historical; measured] The withdrawn `holonic_intelligence::operative_boundary_contact` draft
+bound that contrast to retained fields and applied a persistent contact word at the tied-input
+port. Its API, inner v2 wire and application integration are now
+[archived](../archive/experiments/2026-09-05-tied-next-arrival/README.md), not active source owners. The
+[actual-model record](../research/records/2026-09-05_HNP4_THE_NEXT_ARRIVAL_DEPOSITS_A_REUSABLE_CONTACT_AND_MATCHED_SELF_RETURN_IS_ZERO.md)
+records numerical changes and full-state restart equality. Its promotion into contextual HNA
+foundations and portable-fact test framing are withdrawn by the
+[contextual audit](../research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md).
+The draft applies its maps globally at that port; it does not supply the missing scoped relation.
 
 | Relation | Lean owner | Rust owner | CUDA owner | Status and exact open fibre |
 |---|---|---|---|---|

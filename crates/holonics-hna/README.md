@@ -25,6 +25,10 @@ developmental sequence, selected-face receipts and persistence boundaries.
 - Text steps request `NativeEmissionReadout::LastRow` through the public readout methods. Only
   that terminal row crosses to the host; the complete resident successor and checkpoint remain
   unchanged. Existing `advance_native` and `observe_native` still return every terminal row.
+- The withdrawn `from_native_rest_with_boundary_contact` draft and its inner-wire v2 are
+  [archived](../../archive/experiments/2026-09-05-tied-next-arrival/README.md), not active APIs
+  or native contextual foundations. The portable-fact framing and CLI promotion were withdrawn. See the
+  [contextual audit](../../research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md).
 
 The lower-level native session remains available from `holonic-engine` for interactive consumers.
 Earlier alpha/circulation adapters retain their exact artifact and wire scopes; they are not

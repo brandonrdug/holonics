@@ -39,13 +39,18 @@ native topology or proves a particular executable adapter exists.
 
 ## The lifecycle
 
+[project-postulate] Native founding and contextual development are now the primary construction
+path. Inherited material is a later composition path, not the source of the missing contextual
+architecture. The diagram describes roles and composition, not completed capabilities.
+
 ```mermaid
 flowchart LR
-    F[Pretrained assets and execution chart] --> S[Soulkiller apparatus]
+    C[Caused interactions and native constitutive owners] --> A[Athena]
+    F[Pretrained assets and execution chart] -. Later inheritance .-> S[Soulkiller apparatus]
     X[Declared exposures and interventions] --> S
     S --> N[Native class ecologies]
     S --> W[Cold witness and insufficiency]
-    N --> A[Athena]
+    N -.-> A
     O[Ordinary occurrence] --> E[Eros / HNA operation]
     A --> E
     E --> A2[Successor Athena]
@@ -106,12 +111,13 @@ against frontier models.
 
 ## The next production contracts
 
-[definition] The ordered construction is the
-[production-HNA campaign](plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md).
-It starts with concrete constitutive/current and ordinary-occurrence binding, then joins local
-development, reuse, persistence and application output. The present prefix/adjoint pathway is
-one supported chart, not the general learning contract. Neither token volume nor its reduction
-is a complete account of conventional or holonic learning; the distinction is its organization.
+[definition] The [live roadmap](plans/THE_ROADMAP.md) now prioritizes native contextual foundations.
+The earlier [production campaign](plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md)
+is paused. Existing prefix/adjoint and tied-head experiments are bounded charts, not the general
+learning contract. Context is the situated organization that makes a relation applicable and
+transportable; neither a changed parameter nor a longer input window establishes it. The
+[contextual audit](../research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md)
+states the correction and existing mathematical owners to compose.
 
 [definition] The standard pipeline has explicit products: source/codec configuration; admitted
 native model and insufficiency; an ordered exposure stream; run results and successor model;

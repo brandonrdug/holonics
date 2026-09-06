@@ -20,9 +20,39 @@ contracts and records preserve their completed scope; their old imperatives sche
    reread every completed campaign, rerun unchanged expensive receipts, or reconstruct historical
    capability just to start the next authorized repair.
 
-## Current campaign: production HNA
+## Current HNA direction: native contextual foundations
 
-**Current construction:** HNP4 — production applications and multi-cycle output.
+**Current construction:** NCF1 — one coupled native ecology and actual formation law.
+
+[definition] Brandon has explicitly requested the corrected goal and continued construction.
+The [native-HNA contract](THE_NATIVE_HNA_FOUNDS_CONTEXTUAL_TRANSPORT_BEFORE_INHERITANCE.md)
+orders NCF0--NCF4: situated receiver/transport laws, coupled native formation, retained contextual
+development, an application interface and durable integrated native evidence. The goal is not
+closed by the contract or its first finite controls. The existing native owners are the starting
+point; the inherited-first sequence below remains paused.
+
+[proved-derived; formal-checked] [NCF0 returned](../../research/records/2026-09-05_NCF0_RECEIVER_TRANSPORT_KEEPS_ITS_DOMAIN_AND_ORIENTATION_IS_NOT_A_SCALAR_STATE.md)
+the range-restricted receiver square through an actual contextual passage and finite orientation
+controls. NCF1 now owes the concrete native receiving/formation law and resident composition;
+the formal contract alone establishes no learned contextual capability.
+
+[project-postulate] Brandon's latest contextual-transport correction supersedes the inherited-first
+order below. Audit and compose the existing native occurrence, chart/channel, current, comparison,
+recurrent and conditional-transport owners. Neither a Gemma representation nor its language output
+may stand in for a missing native contextual relation. The
+[audit](../../research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md)
+records the primary messages, source defects and retained mathematical scopes.
+
+[definition] This priority does not revoke completed SKE/numerical results or permanently forbid
+inheritance and standard export. It suspends their use as the route to founding HNA itself.
+Next construction must make contextual applicability and lawful transport of conditions operative,
+not add a context-window surrogate, relevance classifier or per-language controller. The audit
+does not announce a replacement universal numerical law.
+
+## Paused production-HNA campaign
+
+[historical] The following records prior authorization and returned scopes. It does not schedule
+HNP4 experiments, a second Gemma application, or HNP5--HNP7 ahead of the native priority above.
 
 [definition] Brandon's subsequent September 4 request authorizes the formal, holistic design of
 [the production-HNA campaign](THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md).
@@ -138,7 +168,8 @@ Next compose its mixed spatial-derivative source with actual stretching, pressur
 resolved/remainder feedback. Carry one time-dependent candidate into a full source/production
 budget on a stated interval; MFR4 then pays a quantitative residual/tail comparison or names the
 failed estimate. The complex potential/Hodge and logarithmic heat sources remain explicit.
-Full convergence is not a prior condition imposed on MFR3; the earlier exclusions remain standing. HNP construction continues independently.
+Full convergence is not a prior condition imposed on MFR3; the earlier exclusions remain standing. The HNA line follows the native-foundations
+priority above, independently of MFR.
 
 [project-postulate] Holonics is the mathematical framework and ontology of which HNA is an
 executable architecture. A research route may return a derivation, a counterexample or a precise

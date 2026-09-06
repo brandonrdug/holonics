@@ -164,6 +164,36 @@ fn passive_contact_encloses_query_boxes_and_refuses_unfounded_point_pairs() {
     assert!(!reading.obstruction.is_empty());assert!(output.is_none());
 }
 
+#[test]
+#[ignore = "requires CUDA; one founding contact reused across distinct query rows"]
+fn passive_contact_reuses_one_founding_row_across_later_queries() {
+    use num_traits::ToPrimitive;
+    let readout=ResidentReadout::new().expect("CUDA");
+    let surface=ResidentSurface::on(&readout).unwrap();
+    let x=[2,-1,3];
+    let y=[-1,4,2];
+    let queries=[[-7,3,-1],[5,5,5]];
+    let mount=|rows, values: Vec<(i64,i64)>| surface.mount_section_rest(
+        &ResidentSectionRest::found(rows,3,ResidentGrain(0),64,values).unwrap()).unwrap();
+    let source=mount(1,x.into_iter().map(|v|(v,v)).collect());
+    let arrived=mount(1,y.into_iter().map(|v|(v,v)).collect());
+    let query=mount(2,queries.into_iter().flatten().map(|v|(v,v)).collect());
+    let output=surface.fresh_section(2,3,ResidentGrain(0)).unwrap();
+    let mut passage=surface.begin_passage(&[vec![]]).unwrap();
+    {
+        let lane=passage.open(0,&[]).unwrap();
+        surface.record_passive_contact(&lane,&source,&arrived,&query,&output).unwrap();
+    }
+    passage.close(0,&output,64).unwrap();
+    let reading=passage.finish().unwrap().launch().unwrap();
+    assert!(reading.obstruction.is_empty(),"{:?}",reading.obstruction);
+    let returned=surface.read_out(&output).unwrap();
+    let expected=queries.into_iter().flat_map(|q|
+        passive_reference(&x,&y,&q).into_iter().map(|v| (v.floor().to_integer().to_i64().unwrap(),
+            v.ceil().to_integer().to_i64().unwrap()))).collect::<Vec<_>>();
+    assert_eq!(returned,expected);
+}
+
 /// A one-occurrence passage entering `words` at `grain`, launched, and read out.
 fn enter_once(
     surface: &'static ResidentSurface<'static>,
