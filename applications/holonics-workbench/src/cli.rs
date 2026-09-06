@@ -107,8 +107,17 @@ pub enum HnaCli {
     },
     /// Run the declared native wave-control adapter from a JSON specification.
     WaveControl {
-        /// Wave-control specification JSON.
-        spec: PathBuf,
+        /// Wave-control specification JSON, or a native wave checkpoint when resuming.
+        source: PathBuf,
+        /// Resume the positional source as a native wave checkpoint.
+        #[arg(long, requires = "checkpoint")]
+        resume: bool,
+        /// Optional cycle limit override.
+        #[arg(long)]
+        cycles: Option<usize>,
+        /// Optional destination native wave checkpoint.
+        #[arg(long)]
+        checkpoint: Option<PathBuf>,
     },
 }
 
@@ -161,7 +170,17 @@ impl From<HnaCli> for HnaCommand {
                 input,
                 checkpoint,
             },
-            HnaCli::WaveControl { spec } => Self::WaveControl { spec },
+            HnaCli::WaveControl {
+                source,
+                resume,
+                cycles,
+                checkpoint,
+            } => Self::WaveControl {
+                source,
+                resume,
+                cycles,
+                checkpoint,
+            },
         }
     }
 }
@@ -732,6 +751,8 @@ mod tests {
 
     #[test]
     fn native_session_and_wave_control_parse_their_positional_specs() {
+        let earlier: HnaCommand=serde_json::from_str(r#"{"action":"wave-control","spec":"wave.json"}"#).unwrap();
+        assert!(matches!(earlier,HnaCommand::WaveControl {resume:false,cycles:None,checkpoint:None,..}));
         let native = parse_cli([
             "holonics",
             "hna",
@@ -789,8 +810,38 @@ mod tests {
             .expect("wave control parse");
         assert!(matches!(
             wave.command,
-            Some(WorkbenchCommand::Hna(HnaCommand::WaveControl { ref spec }))
-            if spec == &PathBuf::from("wave.json")
+            Some(WorkbenchCommand::Hna(HnaCommand::WaveControl {
+                ref source, resume: false, cycles: None, checkpoint: None
+            }))
+            if source == &PathBuf::from("wave.json")
         ));
+        let resumed = parse_cli([
+            "holonics",
+            "hna",
+            "wave-control",
+            "saved.hna",
+            "--resume",
+            "--cycles",
+            "3",
+            "--checkpoint",
+            "next.hna",
+        ])
+        .expect("wave control resume parse");
+        assert!(matches!(
+            resumed.command,
+            Some(WorkbenchCommand::Hna(HnaCommand::WaveControl {
+                ref source, resume: true, cycles: Some(3), ref checkpoint
+            }))
+            if source == &PathBuf::from("saved.hna")
+                && checkpoint == &Some(PathBuf::from("next.hna"))
+        ));
+        assert!(parse_cli([
+            "holonics",
+            "hna",
+            "wave-control",
+            "saved.hna",
+            "--resume"
+        ])
+        .is_err());
     }
 }

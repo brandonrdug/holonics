@@ -6,12 +6,12 @@ tokenizer or inherited model. The present backend is a **local rational phase-cu
 coupled two-port currents and a developing, domain-restricted receiver relation. Its linear
 constitutive hypothesis is not a claim that HNA, language or general contextual conduct is linear.
 
-[definition] This guide covers NCF3's native interface and application. The
+[definition] This guide covers the NCF0--NCF4 native foundation and its application. The
 [Athena guide](ATHENA.md) separately documents the earlier inherited-operator interfaces.
 [The construction contract](plans/THE_NATIVE_HNA_FOUNDS_CONTEXTUAL_TRANSPORT_BEFORE_INHERITANCE.md)
-keeps integrated application/resource evidence in NCF4. Native checkpoints now retain the complete
-phase ecology and stream. A seed, JSON report or relation inspection is **not a learned-model
-checkpoint**, and a standalone wave-control report still does not persist its world.
+states its bounded scope. Native checkpoints retain the complete phase ecology and stream;
+application-bearing checkpoints also retain the independent world and pending interaction. A seed,
+JSON report or relation inspection is **not a learned-model checkpoint**.
 
 ## Run it
 
@@ -165,7 +165,8 @@ leave an actual destination file; inspect it, never overwrite it by treating the
 
 ## Independent phase-current application
 
-[definition] The application contract was declared before its run. For native root-frame source
+[definition] The application is an independently owned exact simulation, not a claim of measured
+physical actuator hardware. Its contract was declared before its run. For native root-frame source
 currents `s_j`, the exterior sensor measures `m = sum(c_j * s_j)`. It is upstream of the actuator.
 Only a native `unique` receiver commands `a`; an open/plural reading leaves the actuator
 uncommanded. The independent exterior state evolves by `z' = rho*z + (m-a)` when commanded,
@@ -185,11 +186,86 @@ retains the controls and exact scope.
 [established-bounded; measured] An intentionally oversized exterior response completes one
 world effect and then refuses native reception. The report retains that effect, final world
 states and the exact `pending_receive` current/source instead of claiming rollback or replaying
-the actuator. This is an interruption report, not a resumable checkpoint.
+the actuator. Without `--checkpoint` this is only a report. With a checkpoint, the pending
+receiving and already-enacted world state now survive restart together.
 
-[open] NCF4 still owes independent application/world continuation and integrated cold/warm,
-locality and resource measurements; native-session persistence alone does not close it. The present
-application establishes a local linear-current interaction, not language generation, universal
-contextual identification, arbitrary nonlinear control, frontier parity or measured twenty-watt
-operation. Wider architectures must compose their actual native constitutive relations; neither
-this linear family nor an inherited language model silently supplies them.
+### Continue the world and model together
+
+[established-bounded; measured] These release commands preserve every actuation and the complete
+paired artifact across a three-cycle process cut. `--cycles` limits completed application cycles
+in this invocation; it is not an intrinsic capacity or a separate native training mode.
+
+```sh
+cargo build --release -p holonics-workbench --bin holonics
+target/release/holonics hna wave-control applications/holonics-workbench/examples/native/wave-control.json --cycles 3 --checkpoint .local/artifacts/wave-first.hna --format json
+target/release/holonics hna wave-control .local/artifacts/wave-first.hna --resume --checkpoint .local/artifacts/wave-next.hna --format json
+```
+
+[definition] A partial successful run reports `complete: false`, its `next_cycle`, and
+`persistent: true` only if publication succeeded. Resumption requires a fresh checkpoint path.
+The report's `cycles` contains only world effects enacted during that invocation; a pending native
+reception can finish a previously enacted cycle without producing a second world effect. `complete`
+means the declared application sequence ended, not that the native learner is saturated.
+
+[definition] `WaveApplication` owns the world/control state, the retained native emission,
+intervention cursor and pending receiving. Its `advance_boundary(session)` enacts the next actual
+application effect. `checkpoint(session, path)` captures it with the same native ecology.
+`WaveSavedApplication::read(path).with_application(...)` resumes both. The CLI composes these
+through `run_wave_control_with_options` / `resume_wave_control` and `WaveRunOptions`.
+
+| Saved application boundary | Next actual effect |
+|---|---|
+| `intervention` | Apply the next unapplied declared intervention; earlier ones do not repeat |
+| `world` | Measure the retained native source, apply any admitted actuation and advance the world |
+| `reception` | Receive the saved current through its actual source; the world effect is already done |
+| `complete` | No further effect in this declared application sequence |
+
+[established-bounded; implemented-exact] Application-bearing native checkpoints use envelope v2,
+with opaque exterior application bytes under the same integrity/publication boundary. Plain native
+v1 files remain supported. A plain `NativeSavedSession::with_session` refuses a v2 application
+instead of dropping its world; generic consumers use the explicit `with_application_session`
+and preserve the supplied bytes through `checkpoint_application`. No application type or simulator
+law enters the engine's interior. The simulator validates its own state and source correspondence
+before mounting. A still-unadmitted saved current remains pending on retry, without replaying the
+world or increasing the native integer aperture.
+
+[definition] A paired checkpoint is not a distributed transaction with external hardware, nor
+proof that a batch report reached its recipient. The ordinary native JSONL stream has the separate
+pending-output/backpressure contract above. This batch application returns chunks; consumers retain
+delivered reports separately. Unsaved effects after the last published boundary are not recovered
+from an arbitrary crash by pretending that an earlier checkpoint is current.
+
+## Measured consumer costs and limits
+
+[established-bounded; measured] The release receiver on the RTX 4080 SUPER / Ryzen 9 7900X
+returned fixed warm native costs across 1, 64, 1,024 and 4,096 retained unlinked occurrences in its
+two-node chart. Both open readings and later readings of the actually formed rank-one relation
+used one deed, one section readout, six allocations, 48 ingress bytes and 464 egress bytes per
+occurrence. Median latencies were 84--90 μs before contact and 91--96 μs after formation in the
+final run. These are sixteen-observation samples per state/extent, not a throughput or worst-case
+guarantee for other model families.
+
+[established-bounded; measured] Retained native section payload grew from 7,728 to 1,645,728
+bytes; driver-reported live process GPU memory was 252--256 MiB. Checkpoints grew from 12,418 to
+2,601,353 bytes; the largest measured write/read/remount costs were 53.7/4.9/105.1 ms.
+Driver memory and Linux process-memory snapshots are different receivers from exact section-byte
+accounting. No power measurement or compression claim follows. The
+[integrated return](../research/records/2026-09-06_NCF4_THE_WORLD_AND_NATIVE_ECOLOGY_CONTINUE_TOGETHER_AND_THE_CONSUMER_COSTS_ARE_MEASURED.md)
+contains raw evidence paths, both measurement runs, instrument scopes and the completion audit.
+
+[definition] The scoped receiver can be rerun when a new resource question warrants it:
+
+```sh
+cargo build --release -p holonics-hna --example native_resources
+mkdir -p .local/artifacts/native-resources-new
+target/release/examples/native_resources .local/artifacts/native-resources-new
+```
+
+[open] The present application establishes a local rational-linear current interaction, not
+language generation, universal contextual identification, arbitrary nonlinear control, frontier
+parity or measured twenty-watt operation. Historical source residency and cold serialization grow;
+six allocations per ordinary occurrence remain visible overhead. The locality observation is over
+unrelated retained history at a fixed local chart, not arbitrary disconnected graphs or model-size
+scaling. The engine's exact word/shared-memory apertures can refuse. Wider architectures must
+compose their actual native constitutive relations; neither this linear family nor an inherited
+language model silently supplies them.

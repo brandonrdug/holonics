@@ -44,8 +44,9 @@ and an independent current-compensation application. Actual local development ch
 receiver conduct, with explicit outside-domain/plural readings, live recharting and owned source
 handles. The [native guide](docs/NATIVE_HNA.md) states the local rational-linear family and recipes.
 Native checkpoints preserve the whole phase ecology and stream, with source/frame history and
-outstanding handles. Integrated application/world continuation and resource evidence remain NCF4.
-This is not a language model or a general-context capability claim.
+outstanding handles; paired application checkpoints retain the independent world and pending
+interaction too. NCF0--NCF4 returned the scoped foundation, process continuation and release-build
+consumer-resource evidence. This is not a language model or a general-context capability claim.
 
 [established-bounded; source-inspected] The earlier full-operator path executes the supported
 Gemma text realization and restricted Soulkiller bodies on CUDA. The API retains one successor

@@ -168,3 +168,87 @@ fn broken_output_process_replays_delivery_not_native_development() {
     success(&run(&seed(), false, &whole_input, &whole));
     assert_eq!(fs::read(&whole).unwrap(), fs::read(&resumed).unwrap());
 }
+
+fn wave_run(source: &Path, resume: bool, cycles: Option<usize>, checkpoint: &Path) -> Output {
+    let mut command = Command::new(env!("CARGO_BIN_EXE_holonics"));
+    command
+        .args(["hna", "wave-control"])
+        .arg(source)
+        .arg("--format")
+        .arg("json")
+        .arg("--checkpoint")
+        .arg(checkpoint);
+    if resume {
+        command.arg("--resume");
+    }
+    if let Some(cycles) = cycles {
+        command.arg("--cycles").arg(cycles.to_string());
+    }
+    command.output().unwrap()
+}
+fn wave_payload(output: &Output) -> serde_json::Value {
+    serde_json::from_slice::<serde_json::Value>(&output.stdout).unwrap()["events"][0]["payload"]
+        .clone()
+}
+
+#[test]
+#[ignore = "requires CUDA; paired world/native process continuation preserves every actuation and complete artifact"]
+fn wave_application_process_cut_preserves_world_native_state_and_later_actuation() {
+    let dir = tempfile::tempdir().unwrap();
+    let spec = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("examples/native/wave-control.json");
+    let whole_path = dir.path().join("whole-wave.hna");
+    let whole = wave_run(&spec, false, None, &whole_path);
+    success(&whole);
+    let cut_path = dir.path().join("cut-wave.hna");
+    let first = wave_run(&spec, false, Some(3), &cut_path);
+    success(&first);
+    let first = wave_payload(&first);
+    assert_eq!(first["complete"], false);
+    assert_eq!(first["persistent"], true);
+    let next_path = dir.path().join("next-wave.hna");
+    let next = wave_run(&cut_path, true, None, &next_path);
+    success(&next);
+    let whole = wave_payload(&whole);
+    let next = wave_payload(&next);
+    assert_eq!(next["complete"], true);
+    let mut cycles = first["cycles"].as_array().unwrap().clone();
+    cycles.extend(next["cycles"].as_array().unwrap().clone());
+    assert_eq!(serde_json::Value::Array(cycles), whole["cycles"]);
+    assert_eq!(next["final_world_state"], whole["final_world_state"]);
+    assert_eq!(fs::read(whole_path).unwrap(), fs::read(next_path).unwrap());
+    assert_eq!(next["anatomy"]["occurrences"], 9);
+    assert_eq!(
+        next["anatomy"]["census"]["deed_launches"], 6,
+        "five new receptions plus one gauge, not a replay"
+    );
+}
+
+#[test]
+#[ignore = "requires CUDA; refused receiving rest preserves the actual exterior effect across processes"]
+fn wave_process_refusal_retains_pending_receiving_without_reenacting_world() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut spec: serde_json::Value =
+        serde_json::from_slice(include_bytes!("../examples/native/wave-control.json")).unwrap();
+    spec["cycles"] = 2.into();
+    spec["interventions"] = serde_json::json!([]);
+    spec["world"]["couplings"][0] =
+        serde_json::to_value(CurrentWire::integers(i64::MAX, 0)).unwrap();
+    let input = dir.path().join("aperture.json");
+    fs::write(&input, serde_json::to_vec(&spec).unwrap()).unwrap();
+    let first_path = dir.path().join("pending-wave.hna");
+    let first = wave_run(&input, false, None, &first_path);
+    assert_eq!(first.status.code(), Some(1));
+    let first = wave_payload(&first);
+    assert_eq!(first["persistent"], true);
+    assert_eq!(first["cycles"].as_array().unwrap().len(), 1);
+    let next_path = dir.path().join("still-pending.hna");
+    let next = wave_run(&first_path, true, None, &next_path);
+    assert_eq!(next.status.code(), Some(1));
+    let next = wave_payload(&next);
+    assert_eq!(next["cycles"].as_array().unwrap().len(), 0);
+    assert_eq!(next["final_world_state"], first["final_world_state"]);
+    assert_eq!(next["pending_receive"], first["pending_receive"]);
+    assert_eq!(next["anatomy"]["occurrences"], 1);
+    assert_eq!(next["anatomy"]["census"]["deed_launches"], 0);
+    assert_eq!(fs::read(first_path).unwrap(), fs::read(next_path).unwrap());
+}

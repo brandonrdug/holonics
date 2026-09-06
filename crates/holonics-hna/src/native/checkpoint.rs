@@ -1,7 +1,7 @@
 //! Dependency-free native-phase artifact, with the existing no-overwrite publication and
 //! transport codec. One wire digest protects corruption, not semantic identity or provenance.
 use super::*;
-use crate::checkpoint::{hash_prefix, read_transport, write_transport};
+use crate::checkpoint::{hash_prefix, read_blob, read_transport, write_len, write_transport};
 use crate::publication::{publish_new, PublicationReceipt};
 use crate::{HnaStream, HnaStreamState};
 use holonic_engine::native_ecology::constitutive_fibre::NativeEcologyRest;
@@ -12,6 +12,7 @@ use std::{
 };
 
 const MAGIC: &[u8] = b"HNA-NATIVE-CHECKPOINT\x01";
+const APPLICATION_MAGIC: &[u8] = b"HNA-NATIVE-CHECKPOINT\x02";
 const END: &[u8] = b"HNA-NATIVE-CHECKPOINT-END\x01";
 fn malformed(detail: impl std::fmt::Display) -> NativeSessionError {
     NativeSessionError::Application(format!("native checkpoint: {detail}"))
@@ -21,6 +22,7 @@ fn malformed(detail: impl std::fmt::Display) -> NativeSessionError {
 pub struct NativeSavedSession {
     ecology: NativeEcologyRest,
     transport: HnaStreamState,
+    application: Option<Vec<u8>>,
 }
 impl NativeSavedSession {
     pub fn occurrences(&self) -> usize {
@@ -31,6 +33,12 @@ impl NativeSavedSession {
     }
     pub fn transport(&self) -> &HnaStreamState {
         &self.transport
+    }
+    pub fn application_state(&self) -> Option<&[u8]> {
+        self.application.as_deref()
+    }
+    pub fn nodes(&self) -> usize {
+        self.ecology.nodes()
     }
     /// Like the standing checkpoint codec, this consumes one opened descriptor; its artifact
     /// must remain immutable while the integrity pass and bounded decoding complete.
@@ -55,10 +63,17 @@ impl NativeSavedSession {
         file.seek(SeekFrom::Start(0))?;
         let mut magic = vec![0; MAGIC.len()];
         file.read_exact(&mut magic)?;
-        if magic != MAGIC {
+        let has_application = if magic == APPLICATION_MAGIC {
+            true
+        } else if magic == MAGIC {
+            false
+        } else {
             return Err(malformed("model kind/version"));
-        }
+        };
         let transport = read_transport(&mut file, footer).map_err(malformed)?;
+        let application = has_application
+            .then(|| read_blob(&mut file, footer).map_err(malformed))
+            .transpose()?;
         let mut extent = [0; 8];
         file.read_exact(&mut extent)?;
         let extent = u64::from_le_bytes(extent);
@@ -66,7 +81,11 @@ impl NativeSavedSession {
             return Err(malformed("native extent"));
         }
         let ecology = NativeEcologyRest::read(&mut io::BufReader::new(file.take(extent)), extent)?;
-        Ok(Self { ecology, transport })
+        Ok(Self {
+            ecology,
+            transport,
+            application,
+        })
     }
     /// Consume the saved representation into one live native owner and its matching delivery
     /// state. Connection replay is explicit via HnaStream::open_new_connection, not implicit here.
@@ -74,6 +93,11 @@ impl NativeSavedSession {
         self,
         operation: impl FnOnce(&mut NativeSession<'_>, &mut HnaStream) -> Result<R, NativeSessionError>,
     ) -> Result<R, NativeSessionError> {
+        if self.application.is_some() {
+            return Err(malformed(
+                "application state requires with_application_session",
+            ));
+        }
         let mut stream = HnaStream::from_state(self.transport).map_err(malformed)?;
         let readout = ResidentReadout::new().map_err(malformed)?;
         let surface = ResidentSurface::on(&readout).map_err(malformed)?;
@@ -85,6 +109,32 @@ impl NativeSavedSession {
             confirmed_rank,
         };
         let returned = operation(&mut session, &mut stream);
+        drop(session);
+        returned
+    }
+
+    pub fn with_application_session<R>(
+        self,
+        operation: impl FnOnce(
+            &mut NativeSession<'_>,
+            &mut HnaStream,
+            Vec<u8>,
+        ) -> Result<R, NativeSessionError>,
+    ) -> Result<R, NativeSessionError> {
+        let application = self
+            .application
+            .ok_or_else(|| malformed("checkpoint has no application state"))?;
+        let mut stream = HnaStream::from_state(self.transport).map_err(malformed)?;
+        let readout = ResidentReadout::new().map_err(malformed)?;
+        let surface = ResidentSurface::on(&readout).map_err(malformed)?;
+        let confirmed_rank = self.ecology.rank();
+        let (body, sources) = NativeConstitutiveEcology::remount(&surface, self.ecology)?;
+        let mut session = NativeSession {
+            body,
+            sources,
+            confirmed_rank,
+        };
+        let returned = operation(&mut session, &mut stream, application);
         drop(session);
         returned
     }
@@ -104,6 +154,24 @@ impl NativeSession<'_> {
         path: impl AsRef<Path>,
         transport: &HnaStreamState,
     ) -> Result<PublicationReceipt<()>, NativeSessionError> {
+        self.checkpoint_inner(path, transport, None)
+    }
+
+    pub fn checkpoint_application(
+        &self,
+        path: impl AsRef<Path>,
+        transport: &HnaStreamState,
+        application: &[u8],
+    ) -> Result<PublicationReceipt<()>, NativeSessionError> {
+        self.checkpoint_inner(path, transport, Some(application))
+    }
+
+    fn checkpoint_inner(
+        &self,
+        path: impl AsRef<Path>,
+        transport: &HnaStreamState,
+        application: Option<&[u8]>,
+    ) -> Result<PublicationReceipt<()>, NativeSessionError> {
         transport.validate().map_err(malformed)?;
         if path.as_ref().exists() {
             return Err(crate::publication::PublicationError::ExistingTarget {
@@ -114,9 +182,14 @@ impl NativeSession<'_> {
         let state = self
             .body
             .rest(&self.sources.iter().map(Option::as_ref).collect::<Vec<_>>())?;
+        let magic = application.map_or(MAGIC, |_| APPLICATION_MAGIC);
         let receipt = publish_new(path, |file| {
-            file.write_all(MAGIC)?;
+            file.write_all(magic)?;
             write_transport(file, transport)?;
+            if let Some(application) = application {
+                write_len(file, application.len())?;
+                file.write_all(application)?;
+            }
             let extent_at = file.stream_position()?;
             file.write_all(&0u64.to_le_bytes())?;
             let start = file.stream_position()?;

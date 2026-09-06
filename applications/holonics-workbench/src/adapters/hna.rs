@@ -3,7 +3,10 @@ use std::path::Path;
 
 use holonics::hna::{
     inspect_native_restricted_rest,
-    native::{run_wave_control, WaveControlSpec},
+    native::{
+        resume_wave_control, run_wave_control, run_wave_control_with_options, WaveControlSpec,
+        WaveRunOptions,
+    },
     run_hna, AthenaTokenApplication, HnaCultivationAperture, HnaOccurrence, HnaRunReceipt,
     HnaRunRequest, HnaSource,
 };
@@ -20,19 +23,36 @@ pub fn execute(command: HnaCommand) -> Result<AdapterReturn, WorkbenchError> {
     match command {
         HnaCommand::Session { .. } => Err(owner("streaming HNA sessions require the process stream entry point or holonics::hna::HnaStream, not a batch response collector")),
         HnaCommand::NativeSession { .. } => Err(owner("native streaming sessions require the process stream entry point or holonics::hna::HnaStream, not a batch response collector")),
-        HnaCommand::WaveControl { spec } => {
-            let bytes = std::fs::read(&spec).map_err(owner)?;
-            let spec: WaveControlSpec = serde_json::from_slice(&bytes).map_err(owner)?;
-            let result = run_wave_control(&spec).map_err(owner)?;
+        HnaCommand::WaveControl {
+            source,
+            resume,
+            cycles,
+            checkpoint,
+        } => {
+            let options = WaveRunOptions { cycles, checkpoint };
+            if resume && options.checkpoint.is_none() {
+                return Err(owner("resumed wave-control command requires a fresh checkpoint path"));
+            }
+            let result = if resume {
+                resume_wave_control(&source, &options).map_err(owner)?
+            } else if options.cycles.is_none() && options.checkpoint.is_none() {
+                let bytes = std::fs::read(&source).map_err(owner)?;
+                let spec: WaveControlSpec = serde_json::from_slice(&bytes).map_err(owner)?;
+                run_wave_control(&spec).map_err(owner)?
+            } else {
+                let bytes = std::fs::read(&source).map_err(owner)?;
+                let spec: WaveControlSpec = serde_json::from_slice(&bytes).map_err(owner)?;
+                run_wave_control_with_options(&spec, &options).map_err(owner)?
+            };
             let payload = serde_json::to_value(&result).map_err(owner)?;
             let mut returned=AdapterReturn::consequence(
                 "hna/wave-control",
-                "Ran the declared native wave-control specification",
+                "Ran the declared native wave-control operation",
                 payload,
             );
-            if result.interruption.is_some() {
+            if result.interruption.is_some() || result.checkpoint_error.is_some() {
                 returned.level=crate::EventLevel::Obstruction;
-                returned.summary="Native wave control interrupted; actual exterior consequences are retained in the report".into();
+                returned.summary="Native wave control interrupted or failed to publish; actual consequences are retained in the report".into();
             }
             Ok(returned)
         }

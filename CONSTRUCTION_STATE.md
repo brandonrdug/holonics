@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** 2026-09-06. **Current HNA construction:** NCF4 — durable native model and integrated foundation return.
+**Currency:** 2026-09-06. **HNA position:** NCF0--NCF4 complete at the declared native phase-foundation scope.
 
 This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md) orders work;
 completed history stays in its existing records and Git. Brandon's latest direct instruction
@@ -25,19 +25,23 @@ integration removed and its measurements preserved.
 
 [definition] Brandon subsequently authorized the corrected goal and continued work. The
 [native-HNA construction contract](docs/plans/THE_NATIVE_HNA_FOUNDS_CONTEXTUAL_TRANSPORT_BEFORE_INHERITANCE.md)
-is active. NCF3 has returned the same native owner through the public current/session interface
-and an independently evolving application. NCF4 now owes complete native artifacts and
-process-separated continuation: relation/phase, historical frames/material, actual source and
-receiving lineage, exterior source handles, pending stream output and application world state.
-Cold/warm resource and contextual continuation evidence must accompany that integrated return.
+has returned all NCF0--NCF4 requirements at its declared local rational-linear phase scope.
+The [integrated completion](research/records/2026-09-06_NCF4_THE_WORLD_AND_NATIVE_ECOLOGY_CONTINUE_TOGETHER_AND_THE_CONSUMER_COSTS_ARE_MEASURED.md)
+contains the requirement-by-requirement audit: formal/native correspondence at its grades, public
+interface, contextual/gauge/open-fibre controls, persistent world/model continuation and measured
+consumer costs. No further HNA deed is scheduled by this completed campaign. The inherited-first
+HNP sequence stays paused; wider families, language/frontier products and export are not claimed.
 
 [established-bounded; measured] NCF4's [native persistence return](research/records/2026-09-06_NCF4_THE_NATIVE_ECOLOGY_AND_STREAM_RESTART_WITH_THEIR_ACTUAL_SOURCES_AND_NO_REPLAY.md)
 now preserves the complete phase ecology, actual historical sources/frames/material and linear
 handle table alongside pending stream input/output. Real split-input and broken-output process
 controls preserved the entire native-plus-transport artifact, and further development continued
 after restart. The public API/CLI saves dependency-free native checkpoints; uncertain native deeds
-refuse publication as confirmed state. The independent application's world/intervention/pending
-effect state and integrated locality/resource evidence remain NCF4's next deed.
+refuse publication as confirmed state. The subsequent integrated return also preserves the
+independent world's state, partial-intervention cursor and pending reception, with actual
+process-separated actuation equivalence. Release open/formed warm medians were 84--90/91--96 μs
+in the measured two-node chart; history storage/cold costs grow, and process GPU snapshots were
+252--256 MiB. These are bounded observations, not general model scaling or twenty-watt claims.
 
 [proved-derived; formal-checked] NCF0 returned range-restricted receiver transport through an
 actual admitted crossing and the finite branch/drive controls distinguishing changed conditions
@@ -71,8 +75,9 @@ linear-current application scope. The [NCF3 return](research/records/2026-09-05_
 records the public Rust/JSONL session, actual eight-cycle actuator/world return, new fields across
 gauge/physical changes, open readings and retained interruption. Twenty-two native controls,
 six public CUDA controls, 37 HNA and ten workbench tests passed. The [native guide](docs/NATIVE_HNA.md)
-gives working recipes. These live sessions/reports are explicitly nonpersistent; NCF4 is not
-closed by their bounded application result, and no language/general-context capability is claimed.
+gives working recipes. NCF3's original sessions/reports were nonpersistent; the subsequent NCF4
+artifacts and integrated return above close that obligation. No language/general-context
+capability is claimed by the bounded application.
 
 ## Previous HNP returns — preserved scopes, not the current work order
 

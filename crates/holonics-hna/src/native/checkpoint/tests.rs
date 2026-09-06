@@ -68,6 +68,8 @@ fn native_artifact_restores_pending_output_without_repeating_development() {
     let saved = NativeSavedSession::read(&path).unwrap();
     assert_eq!(saved.ecology, expected);
     assert_eq!(*saved.transport(), held);
+    assert_eq!(saved.application_state(), None);
+    assert_eq!(saved.nodes(), 2);
     saved
         .with_session(|session, stream| {
             let before = session.inspect();
@@ -83,6 +85,34 @@ fn native_artifact_restores_pending_output_without_repeating_development() {
             assert_eq!(old.native_received_from, Some(1));
             assert_eq!(old.frame.ordinal, 1);
             assert_eq!(session.inspect().occurrences, 3);
+            Ok(())
+        })
+        .unwrap();
+}
+
+#[test]
+#[ignore = "requires CUDA; opaque application continuation is exercised at the native mount boundary"]
+fn application_artifact_is_v2_and_plain_session_refuses_to_discard_it() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("application.hna");
+    let seed = NativeModelSpec::read(SEED).unwrap();
+    let application = b"opaque-wave-state-v1".to_vec();
+    with_native_session(&seed, |session| {
+        session.checkpoint_application(&path, &HnaStreamState::default(), &application)?;
+        Ok(())
+    })
+    .unwrap();
+
+    let saved = NativeSavedSession::read(&path).unwrap();
+    assert_eq!(saved.application_state(), Some(application.as_slice()));
+    assert_eq!(saved.nodes(), 2);
+    let plain = saved.with_session(|_, _| Ok(())).unwrap_err();
+    assert!(plain.to_string().contains("application state"));
+
+    let saved = NativeSavedSession::read(&path).unwrap();
+    saved
+        .with_application_session(|_, _, received| {
+            assert_eq!(received, application);
             Ok(())
         })
         .unwrap();

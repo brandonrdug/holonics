@@ -1,7 +1,7 @@
 # Native HNA: contextual transport before inheritance
 
 **Authority:** Brandon's contextual-transport correction and subsequent request to establish the
-corrected goal and continue. **Status:** ACTIVE, NCF0--NCF3 complete at their scopes; NCF4 in construction.
+corrected goal and continue. **Status:** COMPLETE, NCF0--NCF4 at the declared local rational-linear phase scopes.
 **Order:** [THE_ROADMAP.md](THE_ROADMAP.md). **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 **Correction:** [audit](../../research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md).
 
@@ -191,9 +191,11 @@ probe after seeing a convenient result.
 
 [established-bounded; measured] The [native persistence return](../../research/records/2026-09-06_NCF4_THE_NATIVE_ECOLOGY_AND_STREAM_RESTART_WITH_THEIR_ACTUAL_SOURCES_AND_NO_REPLAY.md)
 preserves the full ecology/handle/stream boundary and actual process-separated further development.
-NCF4 remains in progress: next compose the independent application's world/control state,
-intervention cursor and pending effect/reception, then return integrated contextual/locality and
-consumer-resource evidence. The raw native checkpoint alone does not complete the phase.
+The [integrated completion](../../research/records/2026-09-06_NCF4_THE_WORLD_AND_NATIVE_ECOLOGY_CONTINUE_TOGETHER_AND_THE_CONSUMER_COSTS_ARE_MEASURED.md)
+now also returns the world's state, exact intervention/pending-reception boundary, actual
+process-separated application correspondence and release contextual/locality/resource evidence.
+Its explicit completion audit closes NCF4 and this contract; the original requirements below
+remain the scope of that return, not a new schedule or a claim of universal contextual competence.
 
 [definition] The native artifact must retain the coupled relation/held state, current and
 historical frames/material, actual emitted-source sections, receiving lineage and outstanding
@@ -216,6 +218,19 @@ accounted mount/index work; a genuine new connection must reopen the affected su
 condensation only with its receiver/generator/reconstruction law and stated decoder cost. Energy
 claims require an actual measurement instrument. No literal 20-watt or frontier-parity result is
 inferred from this foundation return.
+
+[definition] The NCF4 measurement receiver is the scoped `holonics-hna` example
+`native_resources`: a declared two-node unit-admittance phase seed, 1/64/1024/4096 retained
+unlinked occurrences, sixteen warm ordinary occurrences at each extent, then an actual old-source
+receiving edge and sixteen further warm readings of the formed relation. It reports cold mount,
+unformed/formed warm latency distributions, the existing native allocation/
+transfer/deed census, artifact write/read/remount cost and Linux/driver process memory at their instrument
+scopes. The decision is whether this admitted local family replays unrelated retained history on
+its hot path, and which growing storage/decoder costs remain explicit consumer limitations. The
+new connection must form/use its relation while the unlinked control remains open. This is an
+experimental receiver for NCF4, not a new repository census or release gate; it schedules no future
+rerun and is archived with the campaign when this contract is retired. It does not claim arbitrary
+disconnected-graph locality, model-size scaling, compression or energy from these cases.
 
 [definition] Close only when the actual native implementation, formal scope, interface, artifact
 and contextual application evidence agree. The full corrected goal remains active until then;

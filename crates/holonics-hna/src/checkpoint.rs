@@ -359,7 +359,7 @@ pub(crate) fn read_transport(
     Ok(transport)
 }
 
-fn write_len(out: &mut impl Write, len: usize) -> io::Result<()> {
+pub(crate) fn write_len(out: &mut impl Write, len: usize) -> io::Result<()> {
     out.write_all(
         &u64::try_from(len)
             .map_err(|_| io::Error::other("checkpoint extent"))?
@@ -367,7 +367,7 @@ fn write_len(out: &mut impl Write, len: usize) -> io::Result<()> {
     )
 }
 
-fn read_blob(input: &mut File, end: u64) -> Result<Vec<u8>, CheckpointError> {
+pub(crate) fn read_blob(input: &mut File, end: u64) -> Result<Vec<u8>, CheckpointError> {
     let mut length = [0; 8];
     input.read_exact(&mut length)?;
     let length = u64::from_le_bytes(length);

@@ -22,11 +22,11 @@ contracts and records preserve their completed scope; their old imperatives sche
 
 ## Current HNA direction: native contextual foundations
 
-**Current construction:** NCF4 — durable native model and integrated foundation return.
+**HNA position:** NCF0--NCF4 complete at the declared native phase-foundation scope.
 
 [definition] Brandon has explicitly requested the corrected goal and continued construction.
 The [native-HNA contract](THE_NATIVE_HNA_FOUNDS_CONTEXTUAL_TRANSPORT_BEFORE_INHERITANCE.md)
-orders NCF0--NCF4: situated receiver/transport laws, coupled native formation, retained contextual
+ordered NCF0--NCF4: situated receiver/transport laws, coupled native formation, retained contextual
 development, an application interface and durable integrated native evidence. The goal is not
 closed by the contract or its first finite controls. The existing native owners are the starting
 point; the inherited-first sequence below remains paused.
@@ -46,16 +46,17 @@ transport and full receiver/obstruction controls.
 [established-bounded; measured] [NCF3 returned](../../research/records/2026-09-05_NCF3_THE_NATIVE_SESSION_DRIVES_AN_INDEPENDENT_CURRENT_APPLICATION_AND_RETAINS_OPEN_READINGS.md)
 the public native current session, shared JSONL delivery and independent phase-current application.
 Its actual actuation changes exterior state; new currents, gauge/physical changes and open/refused
-conduct retain their exact scopes. NCF4 now owes complete native artifacts, process-separated
-further development and integrated contextual/resource evidence. A live session/report is not
-a persistent model or completion of the corrected goal.
+conduct retain their exact scopes. A live session/report alone was not the persistent model or
+completion of the corrected goal; NCF4 subsequently returned the complete integrated result below.
 
 [established-bounded; measured] NCF4's [native persistence return](../../research/records/2026-09-06_NCF4_THE_NATIVE_ECOLOGY_AND_STREAM_RESTART_WITH_THEIR_ACTUAL_SOURCES_AND_NO_REPLAY.md)
 now preserves the complete native ecology, historical frames/sources/material, actual handles
 and stream across process exit. Split-input and real broken-output recovery preserved complete
-artifacts without replaying development. Next compose the independent application's world and
-intervention/pending-effect state, then supply integrated contextual/locality/resource evidence.
-NCF4 and the corrected goal remain open.
+artifacts without replaying development. Its [integrated completion](../../research/records/2026-09-06_NCF4_THE_WORLD_AND_NATIVE_ECOLOGY_CONTINUE_TOGETHER_AND_THE_CONSUMER_COSTS_ARE_MEASURED.md)
+then preserved the independent world, partial-intervention cursor and pending reception, with
+complete process-separated actuation/artifact correspondence and release consumer-cost evidence.
+The corrected foundation contract is complete at the local rational-linear phase scope. No
+additional HNA deed or inherited-first restart is scheduled by that completion.
 
 [project-postulate] Brandon's latest contextual-transport correction supersedes the inherited-first
 order below. Audit and compose the existing native occurrence, chart/channel, current, comparison,

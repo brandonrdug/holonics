@@ -13,6 +13,12 @@ it contains no private learner. `NativeSession::{checkpoint,checkpoint_stream}` 
 `NativeSavedSession::with_session` persist/remount the whole native body and actual handles, with
 shared stream delivery state. Native seed/report files remain distinct from these learned models.
 
+[established-bounded; measured] `WaveApplication` / `WaveSavedApplication` retain the independent
+world, intervention cursor and pending reception with that model. `run_wave_control_with_options`
+and `resume_wave_control` expose bounded process cuts; generic application-bearing checkpoints use
+opaque exterior bytes without typing the engine interior. Actual process comparisons and the
+scoped release `native_resources` receiver returned at the guide's declared limits.
+
 ## Earlier inherited-operator interface
 
 [established-bounded; source-inspected] These interfaces retain their existing bounded scope:

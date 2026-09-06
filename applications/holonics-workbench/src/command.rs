@@ -48,7 +48,12 @@ pub enum HnaCommand {
         checkpoint: PathBuf,
     },
     WaveControl {
-        spec: PathBuf,
+        #[serde(alias = "spec")]
+        source: PathBuf,
+        #[serde(default)]
+        resume: bool,
+        cycles: Option<usize>,
+        checkpoint: Option<PathBuf>,
     },
 }
 

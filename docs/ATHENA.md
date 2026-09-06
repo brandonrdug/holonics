@@ -28,7 +28,12 @@ semantics, recipes and measured application scope. Existing `HnaStream` delivery
 historical sources/frames/material and outstanding handles alongside the stream. The native guide
 documents `NativeSavedSession` and `hna native-session --resume --checkpoint`.
 
-[open] Integrated application/world continuation and resource evidence remain NCF4. The commands
+[established-bounded; measured] NCF4 now returns paired application/world continuation, actual
+process-separated actuation equivalence and release-build resource evidence. See the
+[integrated return](../research/records/2026-09-06_NCF4_THE_WORLD_AND_NATIVE_ECOLOGY_CONTINUE_TOGETHER_AND_THE_CONSUMER_COSTS_ARE_MEASURED.md)
+for its local rational-linear scope and remaining broader architecture/performance limitations.
+
+[definition] The commands
 and checkpoints in the remaining sections describe the earlier inherited-operator backend; they
 do not mount or persist the new native phase body. The inherited-first HNP sequence stays paused.
 
@@ -139,7 +144,7 @@ available for consumers needing complete emitted interval sections or interactiv
 |---|---|
 | Native restricted SKE rest | Executable inherited class/extent material, with declared domain and remainder. |
 | HNA run receipt | Evidence of a completed session; it is **not a trained checkpoint**. |
-| Native HNA checkpoint | Actual full-session state and integer factor codewords, with an explicit pinned native-base dependency; process-separated remount and further development returned in HNP3. |
+| Earlier inherited-operator HNA checkpoint | Actual full-session state and integer factor codewords, with an explicit pinned native-base dependency; process-separated remount and further development returned in HNP3. The dependency-free native phase v1/v2 artifacts are documented separately above. |
 | Earlier `NativeCirculationSnapshot` / `NativeMorphologyArtifact` | The existing persistent workspace's exact package/snapshot family. It has a specialized lifecycle and does not silently contain the full operator's device overlays. |
 | Standard executable model | Target architecture, parameters, configuration/codecs and validated runtime behavior; see [interop](INTEROPERABILITY.md). |
 

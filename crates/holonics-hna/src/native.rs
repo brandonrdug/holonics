@@ -7,7 +7,7 @@ use holonic_engine::native_ecology::constitutive_fibre::{
     NativeCurrentOccurrence, NativeEmissionHandle, NativeJunctionSeed, NativePhaseCurrent,
 };
 use holonic_engine::resident_section::{ResidentSurface, TransferCensus};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 mod wire;
@@ -16,8 +16,10 @@ mod checkpoint;
 pub use checkpoint::NativeSavedSession;
 mod wave_control;
 pub use wave_control::{
-    run_wave_control, PendingWaveReceive, WaveChange, WaveControlRun, WaveControlSpec, WaveCycle,
-    WaveInterruption, WaveIntervention, WaveWorldSpec, WAVE_CONTROL_SCHEMA,
+    resume_wave_control, run_wave_control, run_wave_control_with_options, PendingWaveReceive,
+    WaveApplication, WaveBoundary, WaveChange, WaveControlRun, WaveControlSpec, WaveCycle,
+    WaveInterruption, WaveIntervention, WaveRunOptions, WaveSavedApplication, WaveWorldSpec,
+    WAVE_CONTROL_SCHEMA,
 };
 
 #[derive(Debug, Error)]
@@ -46,19 +48,22 @@ pub struct NativeSessionAnatomy {
     pub census: TransferCensus,
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct NativeFrameWire {
     pub ordinal: u64,
     pub root_to_local: Vec<CurrentWire>,
 }
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct NativeReceivedWire {
     pub source: Option<u64>,
     pub native_source_occurrence: usize,
     pub former_receiver_fibre: ReceiverWire,
     pub arrived: CurrentWire,
 }
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct NativeSessionStep {
     /// A coordinate of a linear handle in THIS running session, not a portable source identity.
     pub source: u64,
@@ -114,6 +119,28 @@ pub fn with_native_session<R>(
 }
 
 impl NativeSession<'_> {
+    pub fn nodes(&self) -> usize {
+        self.body.material().len()
+    }
+    pub fn occurrence_count(&self) -> usize {
+        self.body.occurrence_count()
+    }
+    /// O(1) exterior delivery-slot check; this is not a lookup of a model answer.
+    pub fn has_source(&self, source: u64) -> bool {
+        usize::try_from(source)
+            .ok()
+            .and_then(|s| self.sources.get(s))
+            .is_some_and(Option::is_some)
+    }
+    pub fn matches_untouched_seed(
+        &self,
+        spec: &NativeModelSpec,
+    ) -> Result<bool, NativeSessionError> {
+        Ok(self.occurrence_count() == 0
+            && self.body.recharts().is_empty()
+            && self.body.incidence_changes().is_empty()
+            && self.body.material() == spec.material()?)
+    }
     pub fn relation_snapshot(&self) -> Result<NativeRelationSnapshot, NativeSessionError> {
         let rest = self.body.inspect_relation()?;
         Ok(NativeRelationSnapshot {
