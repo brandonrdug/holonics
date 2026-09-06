@@ -1,6 +1,41 @@
 use super::*;
 
 impl<'chart> ResidentSurface<'chart> {
+    /// Joined exact wave-state / local-relation recurrence with one atomic native commit.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_constitutive_circulation(
+        &self, lane: &Lane<'_, 'chart>, seed: &ResidentSection<'chart>,
+        memory: &mut ResidentSection<'chart>, basis: &mut ResidentSection<'chart>,
+        incoming: &ResidentSection<'chart>, origin: Option<&ResidentSection<'chart>>,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let nodes = seed.rows;
+        let width = nodes.checked_mul(2).and_then(|n| n.checked_add(2))
+            .ok_or_else(|| ResidentRefusal::Declaration { operation: "constitutive-circulation",
+                what: "local chart extent overflow".into() })?;
+        if nodes == 0 || width > u32::MAX as usize / 4 || seed.width != 5
+            || memory.rows != nodes || memory.width != 3 || basis.rows != width || basis.width != width
+            || incoming.rows != 1 || incoming.width != 3 || output.rows != 1 || output.width != 6*nodes+13
+            || origin.is_some_and(|s| s.rows != 1 || s.width != output.width || s.grain.0 != 0)
+            || [seed.grain, memory.grain, basis.grain, incoming.grain, output.grain].iter().any(|g| g.0 != 0)
+        {
+            return Err(ResidentRefusal::Declaration { operation: "constitutive-circulation",
+                what: "incompatible seed, current, retained source or state chart".into() });
+        }
+        let shared = (12*nodes+6).checked_mul(16).and_then(|n| u32::try_from(n).ok())
+            .filter(|n| *n <= self.declaration.max_sectiond_bytes)
+            .ok_or_else(|| ResidentRefusal::Declaration { operation: "constitutive-circulation",
+                what: "local exact scratch exceeds the mounted per-block aperture".into() })?;
+        let mut params = Params::new();
+        params.ptr(seed.lo.device_ptr()).ptr(memory.lo.device_ptr()).ptr(memory.hi.device_ptr())
+            .ptr(basis.lo.device_ptr()).ptr(basis.hi.device_ptr()).ptr(incoming.lo.device_ptr())
+            .ptr(origin.unwrap_or(incoming).lo.device_ptr()).u32(nodes as u32).u32(u32::from(origin.is_some()))
+            .ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr()).ptr(lane.slot).ptr(lane.census)
+            .ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane, "section_constitutive_circulation", 1, self.launch.block_x,
+            shared, &mut params, "constitutive-circulation")
+    }
+
     /// One local rational-relation operation. The only continuing write is a fully checked new
     /// echelon row; its source/receiver hypotheses belong to `native_ecology::constitutive_fibre`.
     pub(crate) fn record_constitutive_fibre(

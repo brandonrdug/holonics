@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** 2026-09-05. **Current HNA construction:** NCF1 — coupled native ecology and formation.
+**Currency:** 2026-09-05. **Current HNA construction:** NCF2 — retained contextual development and live recharting.
 
 This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md) orders work;
 completed history stays in its existing records and Git. Brandon's latest direct instruction
@@ -25,22 +25,28 @@ integration removed and its measurements preserved.
 
 [definition] Brandon subsequently authorized the corrected goal and continued work. The
 [native-HNA construction contract](docs/plans/THE_NATIVE_HNA_FOUNDS_CONTEXTUAL_TRANSPORT_BEFORE_INHERITANCE.md)
-is active. NCF1 now instantiates the native receiving interaction and successor formation from
-existing incidence/current/phase and formation owners, then joins them in one resident operation.
-A caller-supplied aperture or factor delta is not that missing constitutive relation.
+is active. NCF2 now transports the held phase, native incidence, learned relation and retained
+emission/receiving lineage together, while distinguishing a lawful re-expression from a genuine
+change of conditions. Reinterpreting old source handles in a new frame is not such a transport.
 
 [proved-derived; formal-checked] NCF0 returned range-restricted receiver transport through an
 actual admitted crossing and the finite branch/drive controls distinguishing changed conditions
 from joint reorientation. The [NCF0 return](research/records/2026-09-05_NCF0_RECEIVER_TRANSPORT_KEEPS_ITS_DOMAIN_AND_ORIENTATION_IS_NOT_A_SCALAR_STATE.md)
-states the assumptions and exact native composition boundary. This closes the formal contract
-only; the coupled native learner, usable interface and integrated evidence remain NCF1--NCF4.
+states the assumptions and exact native composition boundary. The native returns below do not
+follow from that formal contract alone.
 
 [established-bounded; measured] NCF1 has returned a move-owned local constitutive-relation
 accumulator on CUDA, with exact source-domain/vertical-fibre controls and 30 row-space comparisons.
 The [local return](research/records/2026-09-05_NCF1_THE_LOCAL_CONSTITUTIVE_RELATION_FORMS_ON_DEVICE_WITH_ITS_DOMAIN_AND_VERTICAL_FIBRE.md)
-states its explicit linear-chart hypothesis. NCF1 remains open: next join its paired receipt to
-actual native incidence/current and continuing phase/state, retaining contextual conditions and
-addressed lineage. Supplied current pairs and an operation counter do not complete that join.
+states its explicit linear-chart hypothesis.
+
+[established-bounded; measured] NCF1 is complete at the fixed-seed local native scope. The
+[coupled return](research/records/2026-09-05_NCF1_CURRENT_AND_ADDRESSED_RETURN_FORM_ONE_NATIVE_SUCCESSOR.md)
+joins exact two-port phase current, an owned prior source/receiving edge, local formation, receiver
+and successor in one resident operation. Sixteen CUDA controls passed, including new-current
+conduct separated from an unlinked matched body and full incidence/pullback reconstruction.
+The qualified formal law passed Lean. Live recharting, the production interface/application and
+durable integrated artifacts remain NCF2--NCF4; the full corrected goal is not complete.
 
 ## Previous HNP returns — preserved scopes, not the current work order
 

@@ -1,7 +1,7 @@
 # Native HNA: contextual transport before inheritance
 
 **Authority:** Brandon's contextual-transport correction and subsequent request to establish the
-corrected goal and continue. **Status:** ACTIVE, NCF0 complete; NCF1 in construction.
+corrected goal and continue. **Status:** ACTIVE, NCF0--NCF1 complete at their scopes; NCF2 in construction.
 **Order:** [THE_ROADMAP.md](THE_ROADMAP.md). **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 **Correction:** [audit](../../research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md).
 
@@ -97,6 +97,11 @@ learning. It must not be replaced by another global interpolation rule, or by me
 
 ### NCF1 — One coupled native ecology and actual formation law
 
+[established-bounded; measured] Complete for the fixed-seed local rational phase ecology in the
+[NCF1 return](../../research/records/2026-09-05_NCF1_CURRENT_AND_ADDRESSED_RETURN_FORM_ONE_NATIVE_SUCCESSOR.md).
+Native generated currents, actual retained receiving handles, phase state and relation formation
+now share one owner/operation. This is not a general-context or production-application claim.
+
 [definition] Instantiate the contextual contract with existing native current, incidence, phase/
 constitutive and formation owners. Derive the concrete receiving interaction and successor formation
 before implementing their integration. State the seed laws/material separately from what is learned.
@@ -127,6 +132,11 @@ fraction-free elimination, with arithmetic refusal and staged single-row formati
 the body resident. It introduces no optimizer, semantic labels or answer-selecting score.
 
 ### NCF2 — Retained contextual development and lawful recharting
+
+[definition] The live rechart must carry held phase, seed incidence, the learned relation's source
+chart, every outstanding emitted source section and its lineage/reconstruction frame. Numerical
+node positions and old source handles must not be silently reinterpreted. Distinguish this passage
+from a physical incidence change and keep the original conditions of past interactions recoverable.
 
 [definition] Show that a later current uses organization formed by earlier interaction, retaining
 the conditions under which it applies. Exercise the same exterior face with distinct situated

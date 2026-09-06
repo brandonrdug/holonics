@@ -5,6 +5,19 @@ incidence, chronology, lineage and admitted receiver domain. Eros is the composi
 operation that forms and refines it. The current public Rust entry point is `holonics::hna`;
 the implementation is in [holonics-hna](../crates/holonics-hna/src/hna.rs).
 
+## Native-first construction
+
+[established-bounded; measured] NCF1 has returned the ground-up
+`holonic_engine::native_ecology::constitutive_fibre::NativeConstitutiveEcology`: one resident
+phase/current body and developing receiver relation, with actual emitted-source handles and
+incoming/held/receiving lineage. No pretrained coefficients or tokenizer are used. Its
+[bounded return](../research/records/2026-09-05_NCF1_CURRENT_AND_ADDRESSED_RETURN_FORM_ONE_NATIVE_SUCCESSOR.md)
+states the fixed seed, local linear-family hypothesis, native controls and exact limits.
+
+[open] NCF2 now transports that live body's charts. Its production adapter and durable artifact
+are still NCF3--NCF4, so the existing `holonics::hna` commands below remain inherited-model
+apparatus, not commands for the new native body. The inherited-first HNP sequence is paused.
+
 ## One operation, two uses
 
 ```text
@@ -32,7 +45,8 @@ New factors publish when the cycle closes. Three native-model occurrences, the z
 discriminator and exact withdrawal/restoration returned in
 [HNP1](../research/records/2026-09-04_HNP1_THE_ACTUAL_JOINED_PASSAGE_RETURNS_LOCAL_DEVELOPMENT_AND_THE_DELTA_SURVIVES_ATTRIBUTION.md).
 The older batch/text commands retain their prefix chart. The continuing public session and
-stream below expose observed-passage development; useful production applications are HNP4/HNP5.
+stream below expose observed-passage development at the standing HNP scopes. HNP4/HNP5's
+application obligations are paused behind the native-first construction above.
 
 [established-bounded; measured] The observed-passage session now retains complete native numerical
 segments and reopens their dependency closure when entering material or coefficients change.

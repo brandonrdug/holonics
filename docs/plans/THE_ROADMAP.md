@@ -22,7 +22,7 @@ contracts and records preserve their completed scope; their old imperatives sche
 
 ## Current HNA direction: native contextual foundations
 
-**Current construction:** NCF1 — one coupled native ecology and actual formation law.
+**Current construction:** NCF2 — retained contextual development and lawful live recharting.
 
 [definition] Brandon has explicitly requested the corrected goal and continued construction.
 The [native-HNA contract](THE_NATIVE_HNA_FOUNDS_CONTEXTUAL_TRANSPORT_BEFORE_INHERITANCE.md)
@@ -33,8 +33,12 @@ point; the inherited-first sequence below remains paused.
 
 [proved-derived; formal-checked] [NCF0 returned](../../research/records/2026-09-05_NCF0_RECEIVER_TRANSPORT_KEEPS_ITS_DOMAIN_AND_ORIENTATION_IS_NOT_A_SCALAR_STATE.md)
 the range-restricted receiver square through an actual contextual passage and finite orientation
-controls. NCF1 now owes the concrete native receiving/formation law and resident composition;
-the formal contract alone establishes no learned contextual capability.
+controls. The formal contract alone establishes no learned contextual capability.
+
+[established-bounded; measured] [NCF1 returned](../../research/records/2026-09-05_NCF1_CURRENT_AND_ADDRESSED_RETURN_FORM_ONE_NATIVE_SUCCESSOR.md)
+one fixed-seed rational phase ecology with native current, actual addressed reception, local
+formation and successor in one resident operation. NCF2 must transport its full live charts and
+retained sources; NCF3--NCF4 still owe the production interface, application and durable result.
 
 [project-postulate] Brandon's latest contextual-transport correction supersedes the inherited-first
 order below. Audit and compose the existing native occurrence, chart/channel, current, comparison,

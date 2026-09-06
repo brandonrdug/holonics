@@ -17,6 +17,9 @@ use crate::resident_section::{
     TransferCensus,
 };
 
+mod circulation;
+pub use circulation::*;
+
 #[derive(Debug, PartialEq, Eq, Serialize)]
 pub enum ConstitutiveReading {
     Unique {
@@ -45,6 +48,8 @@ pub struct ConstitutiveFibreReturn {
 
 #[derive(Debug, Error)]
 pub enum ConstitutiveFibreError {
+    #[error("the receiving edge does not carry an available emission from this ecology")]
+    ForeignOccurrence,
     #[error(
         "local exact elimination requires {required} shared octets; the mounted apparatus admits {available}"
     )]
@@ -184,41 +189,12 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
         if returned.iter().any(|(lo, hi)| lo != hi) || returned[width].0 <= 0 {
             return Err(ConstitutiveFibreError::Uncertain);
         }
-        let denominator = returned[width].0;
-        let rational = |j: usize| Rat::new(returned[j].0.into(), denominator.into());
-        let particular = || (self.source_width..width).map(rational).collect();
         let formed_pivot = match returned[width + 2].0 {
             -1 => None,
             p if p >= 0 && (p as usize) < width => Some(p as usize),
             _ => return Err(ConstitutiveFibreError::Uncertain),
         };
-        let predecessor_reading = match returned[width + 1].0 {
-            0 => ConstitutiveReading::Unique {
-                current: particular(),
-            },
-            1 => ConstitutiveReading::OutsideDomain {
-                source_remainder: (0..self.source_width).map(rational).collect(),
-            },
-            2 => {
-                // This is an explicitly requested full receiver fibre, not a host numerical
-                // decision used to conduct the operation. The newly formed row belongs only to
-                // the successor and is excluded from this predecessor reading.
-                let standing = self.surface.read_out(&self.basis)?;
-                let directions = (self.source_width..width)
-                    .filter(|p| Some(*p) != formed_pivot && standing[p * width + p].0 != 0)
-                    .map(|p| {
-                        (self.source_width..width)
-                            .map(|j| Rat::from_integer(standing[p * width + j].0.into()))
-                            .collect()
-                    })
-                    .collect();
-                ConstitutiveReading::Plural {
-                    particular: particular(),
-                    directions,
-                }
-            }
-            _ => return Err(ConstitutiveFibreError::Uncertain),
-        };
+        let predecessor_reading = self.decode_reading(&returned, 0, formed_pivot)?;
         let rank = usize::try_from(returned[width + 3].0)
             .map_err(|_| ConstitutiveFibreError::Uncertain)?;
         if rank > width {
@@ -232,6 +208,49 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
             formed_pivot,
             successor_rank: rank,
         })
+    }
+
+    fn decode_reading(
+        &self,
+        returned: &[(i64, i64)],
+        at: usize,
+        exclude: Option<usize>,
+    ) -> Result<ConstitutiveReading, ConstitutiveFibreError> {
+        let width = self.source_width + self.target_width;
+        let denominator = returned[at + width].0;
+        if denominator <= 0 {
+            return Err(ConstitutiveFibreError::Uncertain);
+        }
+        let rational = |j: usize| Rat::new(returned[at + j].0.into(), denominator.into());
+        let particular = || (self.source_width..width).map(rational).collect();
+        let reading = match returned[at + width + 1].0 {
+            0 => ConstitutiveReading::Unique {
+                current: particular(),
+            },
+            1 => ConstitutiveReading::OutsideDomain {
+                source_remainder: (0..self.source_width).map(rational).collect(),
+            },
+            2 => {
+                // This is an explicitly requested full receiver fibre, not a host numerical
+                // decision used to conduct the operation. A predecessor reading excludes the
+                // newly formed pivot; a successor reading excludes nothing.
+                let standing = self.surface.read_out(&self.basis)?;
+                let directions = (self.source_width..width)
+                    .filter(|p| Some(*p) != exclude && standing[p * width + p].0 != 0)
+                    .map(|p| {
+                        (self.source_width..width)
+                            .map(|j| Rat::from_integer(standing[p * width + j].0.into()))
+                            .collect()
+                    })
+                    .collect();
+                ConstitutiveReading::Plural {
+                    particular: particular(),
+                    directions,
+                }
+            }
+            _ => return Err(ConstitutiveFibreError::Uncertain),
+        };
+        Ok(reading)
     }
 
     /// Exterior inspection of the represented relation. This is not yet a durable whole-HNA
