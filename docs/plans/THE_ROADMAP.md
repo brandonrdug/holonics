@@ -128,15 +128,16 @@ certificate. The full pressure/velocity source and quartic response remain retai
 [proved-derived; computational-witness] The [two-direction exterior return](../../research/records/2026-09-05_MFR3_THE_EXTERIOR_MODULATION_RETURNS_A_JOINT_PRESSURE_RECEIVER.md)
 retains a complete pressure-matching ellipse and a joint pressure/time receiver with nonzero
 Jacobian on the retained positive branch. Its exact square completion excludes the fixed-ratio
-second condition throughout that
-ellipse; the full source, quartic coefficients and viscous/convective split remain explicit.
+second condition throughout that ellipse; the full source, quartic coefficients and viscous/convective split remain explicit.
 
-[definition] MFR3 next follows the source-derived nonconstant strain/spin and full pressure-force
-modulation. Further exterior variation must pay its actual pressure and diffusion contributions.
-The complete moving-cell mean and higher spatial/time remainder remain part of that source.
-MFR4 owns quantitative residual and linear/nonlinear control; full convergence is not a prior
-condition imposed on MFR3. The stationary exclusions and MFR5 arithmetic-sign obligation remain.
-HNP construction continues independently.
+[definition] MFR3 next carries one admitted periodic datum into a time-dependent candidate,
+with actual strain/spin and pressure-force modulation, the complete exterior, and explicit
+resolved/remainder feedback. The current local-jet-plus-pressure receiver does not close under
+evolution. Its next return is the full candidate source and signed production budget on a stated
+finite interval; MFR4 then pays a quantitative residual/tail comparison or names its failed
+estimate. Further initial coefficient matching alone does not answer this temporal question.
+Full convergence is not a prior condition imposed on MFR3. The stationary exclusions and the
+independent MFR5 arithmetic-sign obligation remain. HNP construction continues independently.
 
 [project-postulate] Holonics is the mathematical framework and ontology of which HNA is an
 executable architecture. A research route may return a derivation, a counterexample or a precise

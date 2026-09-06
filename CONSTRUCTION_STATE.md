@@ -284,9 +284,14 @@ The full source agrees with the independent local reduction and preceding specia
 An exact positive square completion rejects the fixed strain/spin ratio on the complete
 pressure-matching ellipse; the viscous and convective contributions are retained separately.
 
-[open] MFR3 next follows the source-derived nonconstant strain/spin and complete pressure-force
-modulation. A continuing growing core and higher remainder, MFR4 nonlinear stability and
-MFR5's arithmetic sign remain unresolved.
+[definition] MFR3 next constructs one time-dependent periodic candidate with actual
+strain/spin and pressure-force modulation and explicit resolved/remainder feedback. The current
+local-jet-plus-pressure receiver fails to determine its next pressure derivative. The next
+milestone is its full source and signed production budget on a stated interval, followed by
+MFR4's quantitative residual/tail comparison or the particular failed estimate.
+
+[open] A continuing growing core, controlled higher remainder and nonlinear stability remain
+unfinished. MFR5's independent arithmetic-sign inequality remains unresolved.
 
 ## RH line
 

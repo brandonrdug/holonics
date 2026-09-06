@@ -145,6 +145,29 @@ target equations. On the whole initial-pressure ellipse,
 `(a/Omega)_tt=-T<-64`. This rejects the fixed-ratio trajectory for this
 expanded exterior family; it is not a later-time estimate.
 
+## The retained local receiver does not close under time evolution
+
+[proved-derived; computational-witness] Let `Q(u)` retain all velocity derivatives
+through order six at the centre and the initial axial pressure Hessian `h`.
+The matching ellipse keeps this whole receiver fixed. Its gradient `grad h`
+cannot vanish on the ellipse: the only stationary point is its centre, where
+`P=H>0`. At the retained positive branch, the tangent
+`v=(-h_sigma,h_rho)` satisfies
+
+```text
+Dh[v]=0,             D(ht)[v]=det D(h,ht)>0.
+```
+
+A regular local parametrization of the ellipse in this direction consequently
+contains distinct data with identical `Q` and different `ht`. Since `ht` is the
+actual initial time derivative of the pressure entry of `Q`, the evolution of
+this receiver cannot be an autonomous function of its displayed value on this
+family. This conclusion uses the complete-ellipse and Jacobian certificate
+above; it requires no new Fourier calculation. It concerns this particular
+local receiver. A larger receiver, retained exterior state or history could
+separate these data, but its proposed evolution would require its own closure
+or remainder estimate.
+
 ## The returned obstruction separates its physical source terms
 
 [established-bounded; computational-witness] The audit also computes the

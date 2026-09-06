@@ -481,11 +481,47 @@ exact positive square completion gives relative-strain second curvature below `-
 the ellipse. The fixed ratio fails in this enlarged family. The full five-coefficient pressure
 response and the opposing viscous/convective contributions remain retained.
 
-[definition] MFR3 next follows the source-derived nonconstant strain/spin and full pressure-force
-modulation. Further exterior variation must pay its actual pressure and diffusion contributions,
-including the full moving-cell mean if axial velocity changes. Retain radial diffusion,
-generated modes and higher spatial/time remainder; no fixed shape or continuing growth law is
-assumed.
+### Adaptation after the joint exterior receiver
+
+[proved-derived; computational-witness] The latest return also gives a specific failure of
+closure. The receiver consisting of the sixth-order velocity jet and initial pressure Hessian
+is constant along the pressure-matching ellipse, while the pressure-time Hessian varies along
+it. The record's tangent calculation derives this from the certified nonzero joint Jacobian.
+Thus this retained state does not determine its own next pressure derivative. This is not an
+exclusion of every finite receiver or every possible concentrating family.
+
+[interpretation] Initial coefficient compatibility has supplied useful exclusions but has not
+yet produced a continuing concentrating profile with controlled error. The next investigation
+should resolve the omitted feedback over time. Merely allowing the displayed strain/spin ratio
+to vary does not close its equation when the exterior pressure source remains unresolved.
+
+[definition] The next construction composes the existing periodic coefficient equation,
+weighted mild path, pressure-time receivers and moving-force modulation. Start from the
+admitted positive matching datum as a comparison case, with its complete periodic exterior;
+let the strain/spin ratio and all five pressure coefficients evolve under the actual source.
+Use the fixed physical torus for any finite Fourier projection and transport its receivers
+through the existing moving chart. An exterior variation is selected only to address an
+identified pressure, diffusion or transfer term.
+
+[definition] Retain a resolved field `v` and an explicit remainder `w`, with `u=v+w`.
+Both ordered cross interactions and the remainder self-interaction remain in the projected
+velocity and pressure equations. Derive their coupling from the actual bilinear source rather
+than supplying a closed local ODE as a new hypothesis. `NavierStokesWeightedMildCoefficientEquation`
+and the pressure owners provide the full source; `NavierStokesFiniteGalerkinLocalPicard`
+provides a finite approximation at its declared scope. Its local finite solution is not yet
+identified with the untruncated solution. A proposed smaller exact receiver owes invariance of
+its fibres under the dynamics; an approximation owes an explicit bound for the omitted feedback.
+
+[definition] MFR3's next output is one time-dependent candidate with its complete resolved and
+remainder source and signed production budget on a stated finite interval. The first MFR4 return
+then pays the quantitative residual/tail comparison on that interval, or returns the particular
+term or estimate that prevents it. Do not substitute another batch of initial Taylor matches for
+this temporal question. A finite-interval return remains distinct from the global normalized
+continuation, finite physical clock and divergence bound needed for a singularity.
+
+[definition] RH retains its independent arithmetic target in MFR5 and §8. Fluid transport and
+closure results are reusable methods, but do not supply the remaining signed explicit-formula
+estimate. Report progress against that inequality separately from fluid construction.
 
 [open] The replacement surviving family, MFR4 quantitative residual/stability control and MFR5
 arithmetic sign remain unfinished. Requiring full radial convergence before this source-directed
