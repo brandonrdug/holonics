@@ -125,9 +125,15 @@ aspect basis.
 relative-strain second condition, with negative curvature and an exact polynomial incompatibility
 certificate. The full pressure/velocity source and quartic response remain retained.
 
-[definition] MFR3 next uses the pressure and pressure-time receivers together to search the
-remaining exterior fibre for a source-consistent growing-core modulation. The complete
-moving-cell mean and higher spatial/time remainder remain part of that source.
+[proved-derived; computational-witness] The [two-direction exterior return](../../research/records/2026-09-05_MFR3_THE_EXTERIOR_MODULATION_RETURNS_A_JOINT_PRESSURE_RECEIVER.md)
+retains a complete pressure-matching ellipse and a joint pressure/time receiver with nonzero
+Jacobian on the retained positive branch. Its exact square completion excludes the fixed-ratio
+second condition throughout that
+ellipse; the full source, quartic coefficients and viscous/convective split remain explicit.
+
+[definition] MFR3 next follows the source-derived nonconstant strain/spin and full pressure-force
+modulation. Further exterior variation must pay its actual pressure and diffusion contributions.
+The complete moving-cell mean and higher spatial/time remainder remain part of that source.
 MFR4 owns quantitative residual and linear/nonlinear control; full convergence is not a prior
 condition imposed on MFR3. The stationary exclusions and MFR5 arithmetic-sign obligation remain.
 HNP construction continues independently.

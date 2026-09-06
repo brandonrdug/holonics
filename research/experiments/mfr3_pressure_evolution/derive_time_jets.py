@@ -31,7 +31,9 @@ def qp(value):
 
 def from_sympy(value):
     polynomial = sp.Poly(sp.expand(value), rho)
-    return Poly([Q(str(polynomial.nth(i))) for i in range(3)]) % P
+    # Reduce the complete polynomial: dropping high powers before reduction changes
+    # their lower-order remainder in the matching-root quotient algebra.
+    return Poly([Q(str(value)) for value in reversed(polynomial.all_coeffs())]) % P
 
 
 def add(a, b):

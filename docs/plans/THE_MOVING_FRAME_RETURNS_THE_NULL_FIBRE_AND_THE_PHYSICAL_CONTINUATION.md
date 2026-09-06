@@ -472,10 +472,20 @@ matching branches. An exact polynomial identity excludes simultaneous first-pres
 fixed-ratio second conditions in this one-parameter family. Both source terms and all three
 harmonic rates remain; no later-time turnover or exclusion of other modulation follows.
 
-[definition] MFR3 next uses the pressure and pressure-time receivers together to search the
-remaining exterior fibre for a source-consistent growing-core modulation. Retain the full
-moving-cell quadratic mean, radial diffusion, generated modes, and higher spatial/time remainder;
-no fixed shape or continuing growth law is assumed.
+[proved-derived; computational-witness] The [joint exterior return](../../research/records/2026-09-05_MFR3_THE_EXTERIOR_MODULATION_RETURNS_A_JOINT_PRESSURE_RECEIVER.md)
+adds a second independent periodic modulation while preserving all velocity jets through order
+six. Full finite Fourier pressure/time sources agree with the local Poisson reduction and the
+previous source specializations. The pressure-matching fibre is a complete ellipse; the joint
+receiver has nonzero derivative determinant at its retained positive branch. Nevertheless, an
+exact positive square completion gives relative-strain second curvature below `-64` throughout
+the ellipse. The fixed ratio fails in this enlarged family. The full five-coefficient pressure
+response and the opposing viscous/convective contributions remain retained.
+
+[definition] MFR3 next follows the source-derived nonconstant strain/spin and full pressure-force
+modulation. Further exterior variation must pay its actual pressure and diffusion contributions,
+including the full moving-cell mean if axial velocity changes. Retain radial diffusion,
+generated modes and higher spatial/time remainder; no fixed shape or continuing growth law is
+assumed.
 
 [open] The replacement surviving family, MFR4 quantitative residual/stability control and MFR5
 arithmetic sign remain unfinished. Requiring full radial convergence before this source-directed

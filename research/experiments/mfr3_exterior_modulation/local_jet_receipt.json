@@ -1,0 +1,109 @@
+{
+  "scope": "Exact local polynomial source identities for the accepted velocity jet and C4-invariant pressure Hessians",
+  "symbols": {
+    "h": "p_zz(0)",
+    "ht": "p_tzz(0)"
+  },
+  "input_velocity_jet": [
+    "-5*x/3 - y*(-x**2/6 - y**2/6 + (x**2 + y**2)**2/54 + 1)",
+    "x*(-x**2/6 - y**2/6 + (x**2 + y**2)**2/54 + 1) - 5*y/3",
+    "10*z/3"
+  ],
+  "pressure_hessian": [
+    [
+      "-h/2 - 22/3",
+      "0",
+      "0"
+    ],
+    [
+      "0",
+      "-h/2 - 22/3",
+      "0"
+    ],
+    [
+      "0",
+      "0",
+      "h"
+    ]
+  ],
+  "Du": [
+    [
+      "-5/3",
+      "-1",
+      "0"
+    ],
+    [
+      "1",
+      "-5/3",
+      "0"
+    ],
+    [
+      "0",
+      "0",
+      "10/3"
+    ]
+  ],
+  "Dv": [
+    [
+      "h/2 + 50/9",
+      "-2",
+      "0"
+    ],
+    [
+      "2",
+      "h/2 + 50/9",
+      "0"
+    ],
+    [
+      "0",
+      "0",
+      "-h - 100/9"
+    ]
+  ],
+  "laplacian_Dv": [
+    [
+      "0",
+      "16/3",
+      "0"
+    ],
+    [
+      "-16/3",
+      "0",
+      "0"
+    ],
+    [
+      "0",
+      "0",
+      "0"
+    ]
+  ],
+  "Dw": [
+    [
+      "-10*h/3 + ht/2 - 1000/27",
+      "h + 88/9",
+      "0"
+    ],
+    [
+      "-h - 88/9",
+      "-10*h/3 + ht/2 - 1000/27",
+      "0"
+    ],
+    [
+      "0",
+      "0",
+      "20*h/3 - ht + 2000/27"
+    ]
+  ],
+  "spin_second": "-h - 88/9",
+  "pressure_match": "-160/9",
+  "ratio_second_on_match": "-ht - 640/9",
+  "checks": {
+    "local_poisson_trace_retained": true,
+    "laplacian_source_reduced": true,
+    "first_gradient_match": true,
+    "spin_second_on_match": true,
+    "relative_strain_second_reduced": true
+  },
+  "sympy_version": "1.14.0",
+  "exit_status": 0
+}

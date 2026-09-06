@@ -278,9 +278,15 @@ family. Full modes, source checks and quartic rates remain; later turnover is no
 umbrella passed against committed base `e92d24bc` plus the five new owners/imports. The shared
 initial-spectrum extraction preserves the parent audit; the exact time-source replay returned.
 
-[open] MFR3 next uses pressure and pressure-time receivers together to search the remaining
-exterior fibre for a source-consistent growing-core modulation. Higher remainder, MFR4 nonlinear
-stability and MFR5's arithmetic sign remain unresolved.
+[proved-derived; computational-witness] The [joint exterior receiver](research/records/2026-09-05_MFR3_THE_EXTERIOR_MODULATION_RETURNS_A_JOINT_PRESSURE_RECEIVER.md)
+now retains two independent periodic modulations in the same sixth-order velocity-jet fibre.
+The full source agrees with the independent local reduction and preceding specializations.
+An exact positive square completion rejects the fixed strain/spin ratio on the complete
+pressure-matching ellipse; the viscous and convective contributions are retained separately.
+
+[open] MFR3 next follows the source-derived nonconstant strain/spin and complete pressure-force
+modulation. A continuing growing core and higher remainder, MFR4 nonlinear stability and
+MFR5's arithmetic sign remain unresolved.
 
 ## RH line
 
