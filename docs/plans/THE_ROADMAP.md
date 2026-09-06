@@ -20,6 +20,26 @@ contracts and records preserve their completed scope; their old imperatives sche
    reread every completed campaign, rerun unchanged expensive receipts, or reconstruct historical
    capability just to start the next authorized repair.
 
+## Active Athena-alpha cultivation campaign
+
+[definition] Brandon has authorized design followed immediately by construction and completion of
+[the Athena-alpha blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md) as a goal. It orders AC0–AC5:
+source-qualified available conversations; coupled native material/current/formation; learned text
+codec and complete responses; broad development and durable models; general contextual use and
+attribution; then usable consumer release. The actual product is required, not another isolated
+foundation or an inherited text demonstration.
+
+[project-postulate] Athena-alpha remains unattained until that blueprint's model, interface,
+useful English/code/mathematics products, contextual development, persistence and measured costs
+return together. Lean never enters cultivation/inference pipelines. Native owners are composed;
+no conventional trainer, authored semantic classifier, quotation selector or fixture-local learner
+supplies the missing relation. The retired side database stays unused. Apple/audio implementation
+and the inherited-first sequence are not activated by this campaign.
+
+[definition] Design is deposited; construction starts with AC0 while AC1's actual material/current
+attachment is derived against existing native source. Completed NCF and data preparation remain
+standing and need no repeated orientation or unchanged demonstration to begin useful work.
+
 ## Completed September 6 synthesis before Athena-alpha cultivation
 
 [definition] Brandon's latest request directs repository-wide synthesis of the available

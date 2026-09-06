@@ -1,7 +1,7 @@
 # Construction state
 
-**Currency:** September 6, 2026. **Latest return:** repository synthesis, portable evidence and
-scoped repairs complete. **Athena-alpha:** planned, not attained.
+**Currency:** September 6, 2026. **Active goal:** construct and complete the deposited Athena-alpha
+cultivation blueprint. **Position:** design deposited; AC0 starts. **Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct
@@ -9,17 +9,20 @@ instruction governs.
 
 ## Current HNA direction
 
-[project-postulate] Brandon's latest request directs synthesis before the subsequent general
-conversation-data cultivation campaign: join the native and recent mathematical lines, import
-needed side-database testimony into the repository, and retire that database/connector from
-operation. Athena-alpha has never been attained by his standard. Existing artifacts and completed
-campaigns retain their bounded results, not that product grade.
+[definition] Brandon now authorizes immediate construction and completion of the
+[Athena-alpha blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md).
+AC0 prepares source-qualified available conversation occurrences; AC1 composes actual native
+material/current/formation; AC2 returns learned text-codec conduct and complete responses; AC3
+cultivates and persists the broader model; AC4 establishes general contextual use and attribution;
+AC5 delivers the usable consumer product and measured costs. The whole goal remains active across
+partial returns. A data adapter or another bounded fixture is not alpha completion.
 
-[definition] The intended material is general English, code and mathematics in the
-[curated conversations](docs/CONVERSATION_DATA.md). Lean discussions remain ordinary data; no
-Lean parser, kernel, theorem emitter or verdict may enter a cultivation/inference pipeline.
-Apple/MLX and planned audio/acoustics inform the boundary comparison, with their implementation
-left to subsequent work. The present pass returns synthesis and repairs, not a new trained model.
+[project-postulate] Athena-alpha has never been attained by Brandon's standard. The intended
+material is general English, code and mathematics in the prepared conversations. Lean text remains
+ordinary material; no Lean parser, kernel, theorem emitter or verdict enters cultivation/inference.
+Reuse existing native owners and preserve full contextual conditions, current, fibres and successor.
+The inherited-first sequence and Apple/audio implementation remain separate. The retired external
+memory database stays unused.
 
 [established-bounded; source-inspected] The integrated
 [mathematical guide](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) connects temporal fibres, mixed
@@ -121,5 +124,5 @@ claim index, equation atlas or blanket gate is revived. Current source checks fo
 [established-bounded; process-audit] The consolidation's exact archival comparisons and final
 changed-example Cargo check passed. No native kernel, formal proof or corpus cultivation was
 changed or rerun. Source, documentation and imported testimony are ready for repository pickup;
-the next product work uses the general conversations through the native composition described in
+the active blueprint now constructs the conversation product through the native composition in
 [Athena](docs/ATHENA.md#athena-alpha-and-the-next-cultivation).

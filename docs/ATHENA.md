@@ -7,6 +7,10 @@ the application implementations are in [holonics-hna](../crates/holonics-hna/REA
 
 ## Athena-alpha and the next cultivation
 
+[definition] The active [Athena-alpha blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
+is authorized for immediate construction through completion. It uses the prepared conversations
+and existing native owners, and requires the actual useful model, interface and integrated evidence.
+
 [project-postulate] Brandon's September 6 ruling is explicit: Athena-alpha has been planned but
 has never been attained by his product standard. Historical `AthenaAlphaApplication` types,
 wire names and files named `athena-alpha.rest` retain their bounded apparatus meanings. They
