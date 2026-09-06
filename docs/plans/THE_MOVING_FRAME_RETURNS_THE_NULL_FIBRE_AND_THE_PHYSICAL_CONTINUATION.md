@@ -44,7 +44,10 @@ then derives the complete pressure mean from the actual quadratic velocity sourc
 its derivative through the exact moving horizontal cell. The
 [viscous-core return](../../research/records/2026-09-05_MFR3_THE_VISCOUS_CORE_RETURNS_ITS_PERIODIC_STRAIN_SOURCE_AND_CUBIC_RESPONSE.md)
 constructs the regular Gaussian comparison and actual periodic source, then returns the complete
-cubic pressure deformation that must join the continuing profile.
+cubic pressure deformation that must join the continuing profile. The
+[pressure-evolution return](../../research/records/2026-09-05_MFR3_THE_PRESSURE_TIME_SOURCE_RETURNS_THE_MOVING_QUARTIC_CHART_AND_RELATIVE_STRAIN_CURVATURE.md)
+then pays its actual time source and moving five-coefficient force, and excludes the same datum's
+fixed relative-strain trajectory at the second-time receiver.
 Later phase requirements are not asserted as results. The concurrent HNP campaign continues.
 **Grades:** per claim; written derivations, finite symbolic witnesses and kernel-checked returns
 retain their separate scopes.
@@ -455,10 +458,24 @@ Its complete Fourier pressure has a positive parameter matching the full desired
 rate. The next complete cubic response is the negative gradient of three nonzero quartic harmonic
 pressure components. Both parameter roots and all Fourier/shape coefficients remain explicit.
 
-[definition] MFR3 next composes those returned cubic currents into the modulated core and derives
-its pressure evolution and higher spatial/time remainder from the same periodic exterior. The
-complete moving-cell quadratic mean remains part of this source. Retain radial diffusion and
-actual strain coupling; no fixed Gaussian shape or continuing growth law is assumed.
+[proved-derived; formal-checked] Pressure first-time and velocity second-time jets now come
+from the actual fixed mild source at every Sobolev order, including the initial right face.
+Bounded ordered pressure derivatives anchor to the same physical pressure. The five quartic
+coefficients split into two Poisson-source terms and three harmonic force amplitudes; their
+actual diagonal pullback has weights `r^6/K^2` and `r^4*zScale^2/K^2`. The axial force variable
+`kappa=epsilon*D` retains its regular current chart without a bounded-pressure assumption.
+The full sourced force derivative keeps the aspect-basis connection term.
+
+[counterexample; computational-witness] The complete periodic pressure-time source preserves
+the accepted first-gradient match but gives strictly negative relative-strain curvature on both
+matching branches. An exact polynomial identity excludes simultaneous first-pressure and
+fixed-ratio second conditions in this one-parameter family. Both source terms and all three
+harmonic rates remain; no later-time turnover or exclusion of other modulation follows.
+
+[definition] MFR3 next uses the pressure and pressure-time receivers together to search the
+remaining exterior fibre for a source-consistent growing-core modulation. Retain the full
+moving-cell quadratic mean, radial diffusion, generated modes, and higher spatial/time remainder;
+no fixed shape or continuing growth law is assumed.
 
 [open] The replacement surviving family, MFR4 quantitative residual/stability control and MFR5
 arithmetic sign remain unfinished. Requiring full radial convergence before this source-directed

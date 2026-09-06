@@ -264,9 +264,23 @@ Both matching roots, full modes and the lower-order attempt remain in the record
 the isolated 9,917-job umbrella passed against committed base `98efc058` plus those owners/imports.
 The exact source replay matched its receipt. Concurrent HNP draft work remains separate.
 
-[open] MFR3 next composes the three currents into a modulated core and derives its pressure
-evolution and higher remainder from the same periodic exterior. MFR4's quantitative stability
-and MFR5's arithmetic sign remain open.
+[proved-derived; formal-checked] The [pressure-evolution return](research/records/2026-09-05_MFR3_THE_PRESSURE_TIME_SOURCE_RETURNS_THE_MOVING_QUARTIC_CHART_AND_RELATIVE_STRAIN_CURVATURE.md)
+now derives the actual pressure first-time and velocity second-time sources, including initial
+right derivatives. Bounded physical pressure-jet receivers drive the full five-coefficient
+quartic force, with its two factored frame weights and moving-basis connection retained.
+
+[counterexample; computational-witness] Both initial-pressure matching branches have strictly
+negative relative-strain curvature at the second-time receiver. An exact polynomial certificate
+excludes simultaneous first-pressure and fixed-ratio second conditions in this one-parameter
+family. Full modes, source checks and quartic rates remain; later turnover is not asserted.
+
+[established-bounded; process-audit] The 9,027-job focused integration and isolated 9,922-job
+umbrella passed against committed base `e92d24bc` plus the five new owners/imports. The shared
+initial-spectrum extraction preserves the parent audit; the exact time-source replay returned.
+
+[open] MFR3 next uses pressure and pressure-time receivers together to search the remaining
+exterior fibre for a source-consistent growing-core modulation. Higher remainder, MFR4 nonlinear
+stability and MFR5's arithmetic sign remain unresolved.
 
 ## RH line
 

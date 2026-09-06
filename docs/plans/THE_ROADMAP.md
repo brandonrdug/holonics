@@ -116,9 +116,18 @@ physical first-gradient source law, and harmonic pressure currents with their co
 first-gradient rate at an algebraic parameter, while its complete cubic response requires three
 nonzero harmonic shape currents. The full Fourier source and both matching roots are retained.
 
-[definition] MFR3 next composes those currents into the modulated core and derives its pressure
-evolution and higher remainder from the same periodic exterior. The actual moving-cell mean
-remains part of that source; no aspect-ratio limit has been taken.
+[proved-derived; formal-checked] The [pressure-evolution return](../../research/records/2026-09-05_MFR3_THE_PRESSURE_TIME_SOURCE_RETURNS_THE_MOVING_QUARTIC_CHART_AND_RELATIVE_STRAIN_CURVATURE.md)
+now pays the pressure first-time and velocity second-time sources, their initial right faces,
+bounded pressure-jet receivers and full five-coefficient force modulation through the moving
+aspect basis.
+
+[counterexample; computational-witness] Both initial-pressure matching branches fail the fixed
+relative-strain second condition, with negative curvature and an exact polynomial incompatibility
+certificate. The full pressure/velocity source and quartic response remain retained.
+
+[definition] MFR3 next uses the pressure and pressure-time receivers together to search the
+remaining exterior fibre for a source-consistent growing-core modulation. The complete
+moving-cell mean and higher spatial/time remainder remain part of that source.
 MFR4 owns quantitative residual and linear/nonlinear control; full convergence is not a prior
 condition imposed on MFR3. The stationary exclusions and MFR5 arithmetic-sign obligation remain.
 HNP construction continues independently.
