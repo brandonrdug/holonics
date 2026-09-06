@@ -263,10 +263,10 @@ fn application_uses_native_conduct_in_new_conditions_and_retains_open_cases() {
 }
 
 #[test]
-#[ignore = "requires CUDA; unsupported commands neither change native state nor publish a false artifact"]
-fn native_stream_refuses_inherited_commands_and_unimplemented_checkpoint() {
+#[ignore = "requires CUDA; backend separation and actual native checkpoint publication"]
+fn native_stream_keeps_backend_boundaries_and_checkpoints_its_actual_state() {
     let directory = tempfile::tempdir().unwrap();
-    let checkpoint = directory.path().join("must-not-exist.hna");
+    let checkpoint = directory.path().join("native-state.hna");
     with_native_session(&NativeModelSpec::read(SEED).unwrap(), |session| {
         let commands = [
             HnaStreamCommand::ReceiveCurrent {
@@ -282,6 +282,9 @@ fn native_stream_refuses_inherited_commands_and_unimplemented_checkpoint() {
             },
             HnaStreamCommand::SupplyInputMaterial {
                 path: directory.path().join("no-inherited-material"),
+            },
+            HnaStreamCommand::Checkpoint {
+                path: checkpoint.clone(),
             },
             HnaStreamCommand::Checkpoint {
                 path: checkpoint.clone(),
@@ -306,12 +309,16 @@ fn native_stream_refuses_inherited_commands_and_unimplemented_checkpoint() {
             .lines()
             .map(|s| serde_json::from_str::<serde_json::Value>(s).unwrap())
             .collect::<Vec<_>>();
-        assert_eq!(events.len(), 6);
+        assert_eq!(events.len(), 7);
         assert_eq!(events[1]["event"], "refused");
         assert_eq!(events[2]["event"], "refused");
-        assert_eq!(events[3]["event"], "checkpoint-refused-or-unconfirmed");
-        assert!(!events.iter().any(|e| e["event"] == "checkpoint-published"));
-        assert!(!checkpoint.exists());
+        assert_eq!(events[3]["event"], "checkpoint-published");
+        assert_eq!(events[4]["event"], "checkpoint-refused-or-unconfirmed");
+        let saved = NativeSavedSession::read(&checkpoint)?;
+        assert_eq!(saved.occurrences(), 1);
+        assert_eq!(saved.source_slots(), &[Some(0)]);
+        assert_eq!(saved.transport().sequence, 4);
+        assert!(saved.transport().output.is_some());
         assert_eq!(session.inspect().occurrences, 1);
         assert_eq!(session.inspect().available_sources, vec![0]);
         Ok(())

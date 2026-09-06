@@ -9,8 +9,9 @@ constitutive hypothesis is not a claim that HNA, language or general contextual 
 [definition] This guide covers NCF3's native interface and application. The
 [Athena guide](ATHENA.md) separately documents the earlier inherited-operator interfaces.
 [The construction contract](plans/THE_NATIVE_HNA_FOUNDS_CONTEXTUAL_TRANSPORT_BEFORE_INHERITANCE.md)
-keeps durable native artifacts and integrated resource evidence in NCF4. A seed, JSON report or
-relation inspection is **not a learned-model checkpoint**.
+keeps integrated application/resource evidence in NCF4. Native checkpoints now retain the complete
+phase ecology and stream. A seed, JSON report or relation inspection is **not a learned-model
+checkpoint**, and a standalone wave-control report still does not persist its world.
 
 ## Run it
 
@@ -19,14 +20,15 @@ apparatus. The build uses the repository's usual [development setup](DEVELOPMENT
 
 ```sh
 cargo build -p holonics-workbench --bin holonics
-target/debug/holonics hna native-session applications/holonics-workbench/examples/native/phase-seed.json --input applications/holonics-workbench/examples/native/current-requests.jsonl
+target/debug/holonics hna native-session applications/holonics-workbench/examples/native/phase-seed.json --input applications/holonics-workbench/examples/native/current-requests.jsonl --checkpoint .local/artifacts/native-example.hna
 target/debug/holonics hna wave-control applications/holonics-workbench/examples/native/wave-control.json --format json
 ```
 
-[definition] `native-session SEED` reads JSONL from stdin by default; `--input FILE` supplies a
+[definition] `native-session SEED --checkpoint NEW.hna` reads JSONL from stdin by default; `--input FILE` supplies a
 file. Each response is flushed to stdout while the same native owner remains live. The final
-process receipt goes to stderr. The receipt explicitly says `persistent: false`: exiting this
-version loses the developing body. `wave-control` returns an inspectable application report in
+process receipt goes to stderr. A fresh checkpoint path is required: publication never overwrites
+an existing artifact. The process attempts that final checkpoint even on an input/output error,
+and reports `persistent: true` only after successful publication. `wave-control` returns an inspectable application report in
 the ordinary workbench response envelope; an interrupted run is an obstruction, with exit code 1.
 
 ## Material, current and applicable relation
@@ -83,19 +85,23 @@ transport at one node in the **current local frame**; it is not a re-expression 
 | `replace-incidence` | `node`, `transport` | `incidence-replaced` |
 | `inspect` | none | `state` |
 | `inspect-relation` | none | `relation` |
+| `checkpoint` | a fresh `path` | `checkpoint-published` |
 | `close` | none | `connection-closed` |
 
 [established-bounded; implemented-exact] `advance`, `advance-native` and `supply-input-material`
 belong to the inherited address/lookup backend and refuse on a native phase session. Conversely,
-that backend does not accept the new phase commands. Native `checkpoint` currently returns
-`checkpoint-refused-or-unconfirmed` and publishes nothing. A new protocol action is not permission
-to treat these different bodies or artifacts as interchangeable.
+that backend does not accept the new phase commands. Native `checkpoint` publishes the native
+phase artifact, not an inherited-operator checkpoint. Publication failure/uncertainty returns
+`checkpoint-refused-or-unconfirmed`; later requests may continue on the still-owned body.
+The process's required final checkpoint must name a different fresh path from any in-stream save.
+A shared protocol action does not make these bodies or artifacts interchangeable.
 
 [established-bounded; measured] Backpressure retains a produced event and its accepted-byte
 cursor before another request can execute. Resuming the live stream drains the pending output
 without repeating native development. A new connection can explicitly replay a retained event;
-peer acknowledgment/deduplication remains exterior. This delivery discipline is not crash-safe
-native persistence: the current CLI cannot restore this body after process exit.
+peer acknowledgment/deduplication remains exterior. Native checkpoints now retain the body and
+this delivery state together. They recover the state at the saved boundary, not later unsaved
+actions after an arbitrary process or power failure.
 
 [definition] Rust consumers enter through these public owners:
 
@@ -123,6 +129,39 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 paired basis is an explicit device readout, labelled `after_occurrences`, not a selected total
 weight matrix or a mountable artifact. On arithmetic refusal, unconsumed handles remain available.
 Driver uncertainty marks the body uncertain and prohibits silent retry of a possibly enacted deed.
+Such a body refuses a remountable checkpoint rather than publishing uncertain conduct as success.
+
+## Native artifacts and process continuation
+
+[established-bounded; implemented-exact] `NativeSession::checkpoint(path)` saves the native body
+with a fresh delivery chart; `checkpoint_stream(path, stream.state())` preserves an existing
+stream's actual partial input and pending output. Both reuse atomic no-overwrite publication.
+`NativeSavedSession::read(path)` verifies the single wire-integrity digest and the engine's
+structural/lineage checks before mounting. Its consuming `with_session(|session, stream| ...)`
+remounts exact native sections without replaying exposure or development. The native artifact
+has its own versioned magic and has no external coefficient, seed-file or tokenizer dependency.
+As with the standing artifact codec, the opened file must remain immutable during verification
+and decoding; the integrity digest does not authenticate an externally authored history.
+
+[definition] The cold representation retains seed and held phase, the full paired relation,
+every emitted source section and its receiving flag/lineage, historical immutable material and
+frame sharing, rechart and physical-change receipts, and the separately indexed exterior handle
+table. Dropped handles are not recreated just because their emissions remain in history. A restored
+runtime receives a new ownership scope: an old live body's handles do not authenticate against it.
+File validation checks structural reconstruction, not authenticity of a deliberately forged history.
+
+[definition] Resume on a new connection with:
+
+```sh
+target/debug/holonics hna native-session .local/artifacts/native-example.hna --resume --checkpoint .local/artifacts/native-next.hna
+```
+
+[definition] The source seed is no longer needed. New input can receive through outstanding saved
+source coordinates. An old pending event is replayed first with the same sequence; native current
+does not repeat. An incomplete saved request must be supplied its remaining bytes, not restarted
+from the beginning. The CLI's `org.holonics.hna.native-stream-process.v2` receipt distinguishes
+stream error, checkpoint error, published byte count and persistence. Publication uncertainty may
+leave an actual destination file; inspect it, never overwrite it by treating the error as rollback.
 
 ## Independent phase-current application
 
@@ -148,8 +187,8 @@ world effect and then refuses native reception. The report retains that effect, 
 states and the exact `pending_receive` current/source instead of claiming rollback or replaying
 the actuator. This is an interruption report, not a resumable checkpoint.
 
-[open] NCF4 still owes complete native session/model persistence, process-separated further
-development, transport/application continuation and cold/warm resource measurements. The present
+[open] NCF4 still owes independent application/world continuation and integrated cold/warm,
+locality and resource measurements; native-session persistence alone does not close it. The present
 application establishes a local linear-current interaction, not language generation, universal
 contextual identification, arbitrary nonlinear control, frontier parity or measured twenty-watt
 operation. Wider architectures must compose their actual native constitutive relations; neither

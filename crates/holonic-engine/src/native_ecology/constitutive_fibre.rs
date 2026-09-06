@@ -48,6 +48,8 @@ pub struct ConstitutiveFibreReturn {
 
 #[derive(Debug, Error)]
 pub enum ConstitutiveFibreError {
+    #[error("native ecology rest: {0}")]
+    Rest(String),
     #[error("the receiving edge does not carry an available emission from this ecology")]
     ForeignOccurrence,
     #[error(

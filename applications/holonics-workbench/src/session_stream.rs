@@ -2,7 +2,10 @@
 //! Workbench response collector so responses are flushed while the native owner remains live.
 use crate::HnaCommand;
 use holonics::hna::{
-    native::{with_native_session, NativeModelSpec, NativeSessionAnatomy, NativeSessionError},
+    native::{
+        with_native_session, NativeModelSpec, NativeSavedSession, NativeSessionAnatomy,
+        NativeSessionError,
+    },
     HnaCultivationAperture, HnaModel, HnaSessionAnatomy, HnaSessionError, HnaStream,
     HnaStreamDisposition,
 };
@@ -31,21 +34,40 @@ pub struct NativeHnaStreamProcessReceipt {
     pub stream_error: Option<String>,
     pub transport_sequence: u64,
     pub anatomy: NativeSessionAnatomy,
+    pub checkpoint: PathBuf,
+    pub checkpoint_octets: Option<u64>,
+    pub checkpoint_error: Option<String>,
     pub persistent: bool,
 }
 
 pub fn run_native_session_stream(
     command: HnaCommand,
 ) -> Result<NativeHnaStreamProcessReceipt, NativeSessionError> {
-    let HnaCommand::NativeSession { seed, input } = command else {
+    let HnaCommand::NativeSession {
+        source,
+        resume,
+        input,
+        checkpoint,
+    } = command
+    else {
         return Err(NativeSessionError::Application(
             "expected a native streaming session command".into(),
         ));
     };
-    let seed = fs::read(&seed).map_err(|error| {
-        NativeSessionError::Application(format!("cannot read native seed {:?}: {error}", seed))
-    })?;
-    let spec = NativeModelSpec::read(&seed)?;
+    if checkpoint.exists() {
+        return Err(NativeSessionError::Application(format!(
+            "native checkpoint already exists: {:?}",
+            checkpoint
+        )));
+    }
+    if let Some(parent) = checkpoint.parent().filter(|p| !p.as_os_str().is_empty()) {
+        fs::create_dir_all(parent).map_err(|error| {
+            NativeSessionError::Application(format!(
+                "cannot create native checkpoint directory {:?}: {error}",
+                parent
+            ))
+        })?;
+    }
     let mut input: Box<dyn BufRead> = if input.as_os_str() == "-" {
         Box::new(io::stdin().lock())
     } else {
@@ -57,21 +79,53 @@ pub fn run_native_session_stream(
         })?))
     };
     let mut output = io::stdout().lock();
-    let mut stream = HnaStream::new();
-    with_native_session(&spec, |session| {
-        let result = stream.pump_native(session, &mut input, &mut output);
-        let (disposition, stream_error) = match result {
+
+    fn finish_native_stream(
+        session: &mut holonics::hna::native::NativeSession<'_>,
+        stream: &HnaStream,
+        pump: Result<HnaStreamDisposition, holonics::hna::HnaStreamError>,
+        checkpoint: &PathBuf,
+    ) -> NativeHnaStreamProcessReceipt {
+        let (disposition, stream_error) = match pump {
             Ok(disposition) => (Some(disposition), None),
             Err(error) => (None, Some(error.to_string())),
         };
-        Ok(NativeHnaStreamProcessReceipt {
-            schema: "org.holonics.hna.native-stream-process.v1",
+        let publication = session.checkpoint_stream(checkpoint, stream.state());
+        let (checkpoint_octets, checkpoint_error, persistent) = match publication {
+            Ok(receipt) => (Some(receipt.bytes), None, true),
+            Err(error) => (None, Some(error.to_string()), false),
+        };
+        NativeHnaStreamProcessReceipt {
+            schema: "org.holonics.hna.native-stream-process.v2",
             disposition,
             stream_error,
             transport_sequence: stream.state().sequence,
             anatomy: session.inspect(),
-            persistent: false,
-        })
+            checkpoint: checkpoint.clone(),
+            checkpoint_octets,
+            checkpoint_error,
+            persistent,
+        }
+    }
+
+    if resume {
+        let saved = NativeSavedSession::read(&source)?;
+        return saved.with_session(|session, stream| {
+            stream.open_new_connection();
+            let pump = stream.pump_native(session, &mut input, &mut output);
+            Ok(finish_native_stream(session, stream, pump, &checkpoint))
+        });
+    }
+
+    let seed = fs::read(&source).map_err(|error| {
+        NativeSessionError::Application(format!("cannot read native seed {:?}: {error}", source))
+    })?;
+    let spec = NativeModelSpec::read(&seed)?;
+    with_native_session(&spec, |session| {
+        let mut stream = HnaStream::new();
+        stream.open_new_connection();
+        let result = stream.pump_native(session, &mut input, &mut output);
+        Ok(finish_native_stream(session, &stream, result, &checkpoint))
     })
 }
 

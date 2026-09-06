@@ -9,7 +9,9 @@ NativeSession}` exposes one developing native phase ecology. Exact-current recep
 source handles, live rechart, incidence changes and open/plural receiver readings share the
 same engine owner. `HnaStream::pump_native` uses the existing backpressured JSONL delivery.
 `native::run_wave_control` composes an independent exterior current system with this public API;
-it contains no private learner. Native seed/report files are not persistent learned models.
+it contains no private learner. `NativeSession::{checkpoint,checkpoint_stream}` and the consuming
+`NativeSavedSession::with_session` persist/remount the whole native body and actual handles, with
+shared stream delivery state. Native seed/report files remain distinct from these learned models.
 
 ## Earlier inherited-operator interface
 

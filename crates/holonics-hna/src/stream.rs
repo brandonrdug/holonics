@@ -402,8 +402,10 @@ impl StreamTarget for crate::native::NativeSession<'_> {
     fn advance_native(&mut self, _: &HnaOccurrence, _: bool) -> Result<Value, String> {
         Err("address/token occurrences do not define native phase currents".into())
     }
-    fn checkpoint(&self, _: &Path, _: &HnaStreamState) -> Result<(), String> {
-        Err("native phase persistence is not implemented yet; an inherited checkpoint cannot represent this body".into())
+    fn checkpoint(&self, path: &Path, transport: &HnaStreamState) -> Result<(), String> {
+        self.checkpoint_stream(path, transport)
+            .map(|_| ())
+            .map_err(|e| e.to_string())
     }
     fn supply_input_material(&mut self, _: &Path) -> Result<(), String> {
         Err("inherited lookup rows do not define native phase material".into())

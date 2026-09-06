@@ -50,6 +50,13 @@ conduct retain their exact scopes. NCF4 now owes complete native artifacts, proc
 further development and integrated contextual/resource evidence. A live session/report is not
 a persistent model or completion of the corrected goal.
 
+[established-bounded; measured] NCF4's [native persistence return](../../research/records/2026-09-06_NCF4_THE_NATIVE_ECOLOGY_AND_STREAM_RESTART_WITH_THEIR_ACTUAL_SOURCES_AND_NO_REPLAY.md)
+now preserves the complete native ecology, historical frames/sources/material, actual handles
+and stream across process exit. Split-input and real broken-output recovery preserved complete
+artifacts without replaying development. Next compose the independent application's world and
+intervention/pending-effect state, then supply integrated contextual/locality/resource evidence.
+NCF4 and the corrected goal remain open.
+
 [project-postulate] Brandon's latest contextual-transport correction supersedes the inherited-first
 order below. Audit and compose the existing native occurrence, chart/channel, current, comparison,
 recurrent and conditional-transport owners. Neither a Gemma representation nor its language output

@@ -91,13 +91,19 @@ pub enum HnaCli {
         #[arg(long, default_value_t = 14, conflicts_with = "resume")]
         series_terms: u32,
     },
-    /// Live native phase session; native checkpoint support is not yet implemented.
+    /// Live native phase session, with a seed or resumed native checkpoint.
     NativeSession {
-        /// Native model specification JSON.
-        seed: PathBuf,
+        /// Native model specification JSON, or a native checkpoint when resuming.
+        source: PathBuf,
+        /// Resume the positional source as an existing native checkpoint.
+        #[arg(long)]
+        resume: bool,
         /// JSONL input path, or `-` for standard input.
         #[arg(long, default_value = "-")]
         input: PathBuf,
+        /// Destination native checkpoint; it must not already exist.
+        #[arg(long)]
+        checkpoint: PathBuf,
     },
     /// Run the declared native wave-control adapter from a JSON specification.
     WaveControl {
@@ -144,7 +150,17 @@ impl From<HnaCli> for HnaCommand {
                 learning_shift,
                 series_terms,
             },
-            HnaCli::NativeSession { seed, input } => Self::NativeSession { seed, input },
+            HnaCli::NativeSession {
+                source,
+                resume,
+                input,
+                checkpoint,
+            } => Self::NativeSession {
+                source,
+                resume,
+                input,
+                checkpoint,
+            },
             HnaCli::WaveControl { spec } => Self::WaveControl { spec },
         }
     }
@@ -716,12 +732,23 @@ mod tests {
 
     #[test]
     fn native_session_and_wave_control_parse_their_positional_specs() {
-        let native = parse_cli(["holonics", "hna", "native-session", "seed.json"])
+        let native = parse_cli([
+            "holonics",
+            "hna",
+            "native-session",
+            "seed.json",
+            "--checkpoint",
+            "next.hna",
+        ])
             .expect("native session parse");
         assert!(matches!(
             native.command,
-            Some(WorkbenchCommand::Hna(HnaCommand::NativeSession { ref seed, ref input }))
-            if seed == &PathBuf::from("seed.json") && input == &PathBuf::from("-")
+            Some(WorkbenchCommand::Hna(HnaCommand::NativeSession {
+                ref source, resume: false, ref input, ref checkpoint
+            }))
+            if source == &PathBuf::from("seed.json")
+                && input == &PathBuf::from("-")
+                && checkpoint == &PathBuf::from("next.hna")
         ));
         let native_input = parse_cli([
             "holonics",
@@ -730,6 +757,8 @@ mod tests {
             "seed.json",
             "--input",
             "events.jsonl",
+            "--checkpoint",
+            "next.hna",
         ])
         .expect("native session input parse");
         assert!(matches!(
@@ -737,6 +766,25 @@ mod tests {
             Some(WorkbenchCommand::Hna(HnaCommand::NativeSession { ref input, .. }))
             if input == &PathBuf::from("events.jsonl")
         ));
+        let resumed = parse_cli([
+            "holonics",
+            "hna",
+            "native-session",
+            "saved.hna",
+            "--resume",
+            "--checkpoint",
+            "next.hna",
+        ])
+        .expect("native session resume parse");
+        assert!(matches!(
+            resumed.command,
+            Some(WorkbenchCommand::Hna(HnaCommand::NativeSession {
+                ref source, resume: true, ref checkpoint, ..
+            }))
+            if source == &PathBuf::from("saved.hna")
+                && checkpoint == &PathBuf::from("next.hna")
+        ));
+        assert!(parse_cli(["holonics", "hna", "native-session", "seed.json"]).is_err());
         let wave = parse_cli(["holonics", "hna", "wave-control", "wave.json"])
             .expect("wave control parse");
         assert!(matches!(

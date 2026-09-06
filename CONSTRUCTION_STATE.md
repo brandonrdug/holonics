@@ -31,6 +31,14 @@ process-separated continuation: relation/phase, historical frames/material, actu
 receiving lineage, exterior source handles, pending stream output and application world state.
 Cold/warm resource and contextual continuation evidence must accompany that integrated return.
 
+[established-bounded; measured] NCF4's [native persistence return](research/records/2026-09-06_NCF4_THE_NATIVE_ECOLOGY_AND_STREAM_RESTART_WITH_THEIR_ACTUAL_SOURCES_AND_NO_REPLAY.md)
+now preserves the complete phase ecology, actual historical sources/frames/material and linear
+handle table alongside pending stream input/output. Real split-input and broken-output process
+controls preserved the entire native-plus-transport artifact, and further development continued
+after restart. The public API/CLI saves dependency-free native checkpoints; uncertain native deeds
+refuse publication as confirmed state. The independent application's world/intervention/pending
+effect state and integrated locality/resource evidence remain NCF4's next deed.
+
 [proved-derived; formal-checked] NCF0 returned range-restricted receiver transport through an
 actual admitted crossing and the finite branch/drive controls distinguishing changed conditions
 from joint reorientation. The [NCF0 return](research/records/2026-09-05_NCF0_RECEIVER_TRANSPORT_KEEPS_ITS_DOMAIN_AND_ORIENTATION_IS_NOT_A_SCALAR_STATE.md)

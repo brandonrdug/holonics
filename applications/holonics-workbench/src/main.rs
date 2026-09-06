@@ -74,9 +74,9 @@ fn run(arguments: Vec<OsString>) -> i32 {
     {
         return match holonics_workbench::run_native_session_stream(stream) {
             Ok(receipt) => {
-                let failed = receipt.stream_error.is_some();
+                let failed = receipt.stream_error.is_some() || receipt.checkpoint_error.is_some();
                 // stdout is exclusively the flushed native JSONL response stream. The process
-                // receipt belongs to stderr and this pre-NCF4 session is not persistent.
+                // receipt belongs to stderr; persistence is explicit in the receipt.
                 eprintln!(
                     "{}",
                     serde_json::to_string(&receipt).expect("structured native process receipt")

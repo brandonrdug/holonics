@@ -12,6 +12,8 @@ use thiserror::Error;
 
 mod wire;
 pub use wire::*;
+mod checkpoint;
+pub use checkpoint::NativeSavedSession;
 mod wave_control;
 pub use wave_control::{
     run_wave_control, PendingWaveReceive, WaveChange, WaveControlRun, WaveControlSpec, WaveCycle,
@@ -20,6 +22,10 @@ pub use wave_control::{
 
 #[derive(Debug, Error)]
 pub enum NativeSessionError {
+    #[error("native artifact I/O: {0}")]
+    Io(#[from] std::io::Error),
+    #[error(transparent)]
+    Publication(#[from] crate::publication::PublicationError),
     #[error(transparent)]
     Engine(#[from] ConstitutiveFibreError),
     #[error(transparent)]

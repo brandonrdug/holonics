@@ -24,7 +24,11 @@ states its admitted gauge family and full-state/open-fibre controls.
 application. The [native interface guide](NATIVE_HNA.md) gives exact-current schemas, source/frame
 semantics, recipes and measured application scope. Existing `HnaStream` delivery is reused.
 
-[open] Durable native-phase artifacts and integrated resource evidence remain NCF4. The commands
+[established-bounded; implemented-exact] Native-phase checkpoints now preserve complete state,
+historical sources/frames/material and outstanding handles alongside the stream. The native guide
+documents `NativeSavedSession` and `hna native-session --resume --checkpoint`.
+
+[open] Integrated application/world continuation and resource evidence remain NCF4. The commands
 and checkpoints in the remaining sections describe the earlier inherited-operator backend; they
 do not mount or persist the new native phase body. The inherited-first HNP sequence stays paused.
 

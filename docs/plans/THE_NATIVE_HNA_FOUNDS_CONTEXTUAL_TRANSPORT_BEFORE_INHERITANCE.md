@@ -189,6 +189,12 @@ probe after seeing a convenient result.
 
 ### NCF4 — Durable native model and integrated foundation return
 
+[established-bounded; measured] The [native persistence return](../../research/records/2026-09-06_NCF4_THE_NATIVE_ECOLOGY_AND_STREAM_RESTART_WITH_THEIR_ACTUAL_SOURCES_AND_NO_REPLAY.md)
+preserves the full ecology/handle/stream boundary and actual process-separated further development.
+NCF4 remains in progress: next compose the independent application's world/control state,
+intervention cursor and pending effect/reception, then return integrated contextual/locality and
+consumer-resource evidence. The raw native checkpoint alone does not complete the phase.
+
 [definition] The native artifact must retain the coupled relation/held state, current and
 historical frames/material, actual emitted-source sections, receiving lineage and outstanding
 linear handles. Serialize the exterior source-handle table separately from native occurrence

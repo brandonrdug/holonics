@@ -42,8 +42,10 @@ pub enum HnaCommand {
         series_terms: u32,
     },
     NativeSession {
-        seed: PathBuf,
+        source: PathBuf,
+        resume: bool,
         input: PathBuf,
+        checkpoint: PathBuf,
     },
     WaveControl {
         spec: PathBuf,

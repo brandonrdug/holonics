@@ -7,17 +7,35 @@
 use super::*;
 
 mod rechart;
+mod rest;
 use crate::dimensional_wave::ExactComplexWaveCurrent;
 use rechart::HeldCurrentFrame;
 pub use rechart::{NativeCurrentFrame, NativeIncidenceChange, NativeRechartReceipt};
+pub use rest::NativeEcologyRest;
+use serde::Deserialize;
 use std::rc::Rc;
 
 /// One exact local phase pair. The denominator is positive; this is an apparatus chart, not an ID.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(try_from = "PhaseRestWire")]
 pub struct NativePhaseCurrent {
     real: i64,
     imaginary: i64,
     denominator: i64,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct PhaseRestWire {
+    real: i64,
+    imaginary: i64,
+    denominator: i64,
+}
+impl TryFrom<PhaseRestWire> for NativePhaseCurrent {
+    type Error = ConstitutiveFibreError;
+    fn try_from(wire: PhaseRestWire) -> Result<Self, Self::Error> {
+        Self::new(wire.real, wire.imaginary, wire.denominator)
+    }
 }
 
 impl NativePhaseCurrent {
@@ -103,7 +121,8 @@ impl NativePhaseCurrent {
 
 /// Declared constitutive seed, not learned task coefficients. Every node has an incoming and a
 /// retained-wave port; the incoming edge carries this exact unit-phase change of local chart.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct NativeJunctionSeed {
     pub incoming_admittance: i64,
     pub held_admittance: i64,
@@ -163,7 +182,8 @@ impl NativeCurrentOccurrence {
 /// Boundary maps for the actual incoming/held incidence population in an operation. Each node's
 /// two incidences read this incoming occurrence and the named prior native state, respectively.
 /// The optional receiving edge joins the exact carried emission, not the immediately prior text.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct NativeCurrentLineage {
     pub occurrence: usize,
     /// A position in this body's chart history, not a source identity or a global frame key.

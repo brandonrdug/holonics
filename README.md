@@ -35,7 +35,7 @@ transport**, before further Soulkiller/Gemma-led production. See the
 ```sh
 cargo build -p holonics-workbench --bin holonics
 target/debug/holonics hna --help
-target/debug/holonics hna native-session applications/holonics-workbench/examples/native/phase-seed.json --input applications/holonics-workbench/examples/native/current-requests.jsonl
+target/debug/holonics hna native-session applications/holonics-workbench/examples/native/phase-seed.json --input applications/holonics-workbench/examples/native/current-requests.jsonl --checkpoint .local/artifacts/native-example.hna
 target/debug/holonics hna wave-control applications/holonics-workbench/examples/native/wave-control.json --format json
 ```
 
@@ -43,8 +43,9 @@ target/debug/holonics hna wave-control applications/holonics-workbench/examples/
 and an independent current-compensation application. Actual local development changes later
 receiver conduct, with explicit outside-domain/plural readings, live recharting and owned source
 handles. The [native guide](docs/NATIVE_HNA.md) states the local rational-linear family and recipes.
-Its live session is not yet persistent; durable artifacts and integrated resource evidence remain
-NCF4. This is not a language model or a general-context capability claim.
+Native checkpoints preserve the whole phase ecology and stream, with source/frame history and
+outstanding handles. Integrated application/world continuation and resource evidence remain NCF4.
+This is not a language model or a general-context capability claim.
 
 [established-bounded; source-inspected] The earlier full-operator path executes the supported
 Gemma text realization and restricted Soulkiller bodies on CUDA. The API retains one successor

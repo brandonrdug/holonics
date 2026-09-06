@@ -210,22 +210,7 @@ fn save_checkpoint(
         write_len(file, metadata.len())?;
         file.write_all(&metadata)?;
         if let Some(transport) = transport {
-            let header = serde_json::to_vec(&TransportHeader {
-                sequence: transport.sequence,
-                input_complete: transport.input_complete,
-                output_accepted: transport.output_accepted,
-                closed: transport.closed,
-                has_output: transport.output.is_some(),
-            })
-            .map_err(io::Error::other)?;
-            for bytes in [
-                header.as_slice(),
-                transport.input.as_slice(),
-                transport.output.as_deref().unwrap_or(&[]),
-            ] {
-                write_len(file, bytes.len())?;
-                file.write_all(bytes)?;
-            }
+            write_transport(file, transport)?;
         }
         let extent_position = file.stream_position()?;
         file.write_all(&0u64.to_le_bytes())?;
@@ -303,26 +288,7 @@ pub(crate) fn read_session_checkpoint_file(
         ));
     }
     let transport = if magic == STREAM_MAGIC || magic == MATERIAL_STREAM_MAGIC {
-        let header: TransportHeader = serde_json::from_slice(&read_blob(&mut file, footer_start)?)?;
-        let input = read_blob(&mut file, footer_start)?;
-        let output = read_blob(&mut file, footer_start)?;
-        if !header.has_output && !output.is_empty() {
-            return Err(CheckpointError::Malformed(
-                "unclaimed transport output".into(),
-            ));
-        }
-        let transport = crate::HnaStreamState {
-            sequence: header.sequence,
-            input,
-            input_complete: header.input_complete,
-            output: header.has_output.then_some(output),
-            output_accepted: header.output_accepted,
-            closed: header.closed,
-        };
-        transport
-            .validate()
-            .map_err(|e| CheckpointError::Malformed(e.to_string()))?;
-        Some(transport)
+        Some(read_transport(&mut file, footer_start)?)
     } else {
         None
     };
@@ -340,6 +306,57 @@ pub(crate) fn read_session_checkpoint_file(
         state,
         transport,
     })
+}
+
+/// Shared transport encoding; model bodies and artifact magic remain backend-specific.
+pub(crate) fn write_transport(
+    file: &mut impl Write,
+    transport: &crate::HnaStreamState,
+) -> io::Result<()> {
+    transport.validate().map_err(io::Error::other)?;
+    let header = serde_json::to_vec(&TransportHeader {
+        sequence: transport.sequence,
+        input_complete: transport.input_complete,
+        output_accepted: transport.output_accepted,
+        closed: transport.closed,
+        has_output: transport.output.is_some(),
+    })
+    .map_err(io::Error::other)?;
+    for bytes in [
+        header.as_slice(),
+        transport.input.as_slice(),
+        transport.output.as_deref().unwrap_or(&[]),
+    ] {
+        write_len(file, bytes.len())?;
+        file.write_all(bytes)?;
+    }
+    Ok(())
+}
+
+pub(crate) fn read_transport(
+    file: &mut File,
+    end: u64,
+) -> Result<crate::HnaStreamState, CheckpointError> {
+    let header: TransportHeader = serde_json::from_slice(&read_blob(file, end)?)?;
+    let input = read_blob(file, end)?;
+    let output = read_blob(file, end)?;
+    if !header.has_output && !output.is_empty() {
+        return Err(CheckpointError::Malformed(
+            "unclaimed transport output".into(),
+        ));
+    }
+    let transport = crate::HnaStreamState {
+        sequence: header.sequence,
+        input,
+        input_complete: header.input_complete,
+        output: header.has_output.then_some(output),
+        output_accepted: header.output_accepted,
+        closed: header.closed,
+    };
+    transport
+        .validate()
+        .map_err(|e| CheckpointError::Malformed(e.to_string()))?;
+    Ok(transport)
 }
 
 fn write_len(out: &mut impl Write, len: usize) -> io::Result<()> {
@@ -385,7 +402,7 @@ fn hash_reader(file: &mut File) -> Result<String, CheckpointError> {
 
 /// One integrity scheme for each serialized artifact, not a model-identity or theorem registry.
 /// The source/artifact is required to remain immutable while its opened descriptor is consumed.
-fn hash_prefix(file: &mut File, octets: u64) -> io::Result<[u8; 32]> {
+pub(crate) fn hash_prefix(file: &mut File, octets: u64) -> io::Result<[u8; 32]> {
     file.seek(SeekFrom::Start(0))?;
     let mut remaining = octets;
     let mut digest = Sha256::new();
