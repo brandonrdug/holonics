@@ -17,3 +17,9 @@ uploaded. `reproject` refines views from captured bytes without rereading growin
 `annotate` adds explicitly authored, source-addressed curation. The dataset is material, not a
 repository registry, navigation authority or release gate. No GPU, Lean, Torch or network service
 is used by preparation.
+
+[definition] `export-exposure DATASET --output NEW.jsonl --development-cut TIMESTAMP` supplies
+Athena-alpha's separate occurrence-family stream, with all source views, explicit development/
+evaluation/deferred partitions and metadata-only relation targets. It retains unpaired visible
+material and does not put a response beside the earlier request's input. See the
+[exposure contract and actual return](../../docs/CONVERSATION_DATA.md#athena-alpha-causal-exposure).

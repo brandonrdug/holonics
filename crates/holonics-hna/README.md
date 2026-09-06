@@ -55,3 +55,13 @@ of the cultivated full operator. That inherited-operator checkpoint is also not 
 the new ground-up phase body. See the Athena guide for versioned requests, required final checkpoints, delivery
 limits and the still-bounded admitted family. Standard executable model export is a separate
 [interoperability contract](../../docs/INTEROPERABILITY.md).
+
+## Athena-alpha construction
+
+[established-bounded; implemented-exact] `alpha::exposure` currently owns only the cold
+conversation occurrence reader and source-file-pinned cursor. It admits no native current or
+model operation. The `alpha_exposure` example inspects metadata and demonstrates source-position
+restart without printing private material. The [data guide](../../docs/CONVERSATION_DATA.md#athena-alpha-causal-exposure)
+documents its partition and availability boundary; the
+[active blueprint](../../docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
+still requires the actual native attachment, learned codec, model and useful product.

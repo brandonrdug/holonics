@@ -511,6 +511,10 @@ def main():
     export = commands.add_parser("export-comparisons")
     export.add_argument("dataset", type=Path)
     export.add_argument("--output", type=Path, required=True)
+    exposure = commands.add_parser("export-exposure")
+    exposure.add_argument("dataset", type=Path)
+    exposure.add_argument("--output", type=Path, required=True)
+    exposure.add_argument("--development-cut", default="2026-09-04T00:00:00Z")
     followups=commands.add_parser("export-followups")
     followups.add_argument("dataset",type=Path)
     followups.add_argument("--output",type=Path,required=True)
@@ -530,6 +534,9 @@ def main():
         result = summary(args.dataset)
     elif args.command=="reproject":
         result=reproject(args.dataset,args.output)
+    elif args.command == "export-exposure":
+        from exposure import export_exposure
+        result = export_exposure(args.dataset, args.output, args.development_cut)
     elif args.command=="export-followups":
         export_followups(args.dataset,args.output)
         result={"output":str(args.output),"private":True}

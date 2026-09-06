@@ -2,7 +2,7 @@
 
 **Authority:** Brandon's September 6 instruction to design and deposit this blueprint, update the
 roadmap and position, then immediately construct and complete it as a goal.
-**Status:** designed; construction authorized. **Order:** [the roadmap](THE_ROADMAP.md).
+**Status:** active; AC0 returned at cold scope, AC1 in construction. **Order:** [the roadmap](THE_ROADMAP.md).
 **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 
 ## 1. The required product
@@ -44,6 +44,12 @@ is conduct, not a gold answer. A later human message is a new occurrence with it
 not automatic reward, rejection or approval. Request and response are differently oriented acts;
 learning does not mean making their strings identical. Recorded reasoning, tools, child agents,
 client controls and human messages retain their distinct authorship and relations.
+
+[definition] Recorded replies and corrections remain about their actual recorded partners.
+Mounting the history does not make its human feedback a reaction to an answer newly emitted by
+alpha. Any comparison with alpha's own candidate needs its actual common-source chart and retained
+conditions. A source handle for that new candidate cannot be substituted for the recorded agent
+occurrence merely because their text or position looks similar.
 
 [definition] Construct the exposure stream from the existing package, with explicit source/event/
 part coordinates, declared occurrence views, parent/branch/turn relations, comparison provenance
@@ -166,6 +172,10 @@ it requires their explicit composition and replacement of any incompatible histo
 ## 5. Ordered construction and returned artifacts
 
 ### AC0 — Available conversation occurrences
+
+[established-bounded; measured] [Returned](../../research/records/2026-09-06_AC0_THE_CONVERSATIONS_ENTER_AS_SEPARATE_OCCURRENCES_AND_THE_COLD_CURSOR_RESTARTS.md):
+all-visible occurrence-family exposure, typed cold reader, complete source comparison and actual
+process-separated cursor continuation. This closes AC0 only; no model was executed.
 
 [definition] Extend the preparation owner with a private causal-exposure format and resumable
 source cursor. Preserve actual operands, source/part boundaries, declared views, separate later

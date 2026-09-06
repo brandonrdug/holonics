@@ -36,8 +36,10 @@ no conventional trainer, authored semantic classifier, quotation selector or fix
 supplies the missing relation. The retired side database stays unused. Apple/audio implementation
 and the inherited-first sequence are not activated by this campaign.
 
-[definition] Design is deposited; construction starts with AC0 while AC1's actual material/current
-attachment is derived against existing native source. Completed NCF and data preparation remain
+[established-bounded; measured] [AC0 returned](../../research/records/2026-09-06_AC0_THE_CONVERSATIONS_ENTER_AS_SEPARATE_OCCURRENCES_AND_THE_COLD_CURSOR_RESTARTS.md)
+the actual source-qualified occurrence stream, cold Rust reader, complete source comparison and
+process-separated cursor continuation. AC1 is now active: derive and implement the actual native
+material/current/formation attachment. Completed NCF and data preparation remain
 standing and need no repeated orientation or unchanged demonstration to begin useful work.
 
 ## Completed September 6 synthesis before Athena-alpha cultivation
