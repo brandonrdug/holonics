@@ -2,11 +2,11 @@ use super::*;
 use crate::embedding_fiber::ResidentReadout;
 use num_traits::{ToPrimitive, Zero};
 
-fn phase(real: i64, imaginary: i64, denominator: i64) -> NativePhaseCurrent {
+pub(super) fn phase(real: i64, imaginary: i64, denominator: i64) -> NativePhaseCurrent {
     NativePhaseCurrent::new(real, imaginary, denominator).unwrap()
 }
 
-fn material() -> Vec<NativeJunctionSeed> {
+pub(super) fn material() -> Vec<NativeJunctionSeed> {
     vec![
         NativeJunctionSeed {
             incoming_admittance: 1,
@@ -45,7 +45,7 @@ fn from_current(current: &ExactComplexWaveCurrent) -> NativePhaseCurrent {
 
 /// An independently declared exterior linear current law. It knows only actual emitted port
 /// currents; it cannot inspect or write native state, relation rows, rank or expected answers.
-fn exterior(currents: &[ExactComplexWaveCurrent]) -> NativePhaseCurrent {
+pub(super) fn exterior(currents: &[ExactComplexWaveCurrent]) -> NativePhaseCurrent {
     let left = phase(1, 1, 2).current();
     let right = phase(2, -1, 3).current();
     from_current(
@@ -355,7 +355,13 @@ fn held_state_composition_retains_the_full_joined_occurrences() {
     assert_eq!(first.len(), 8);
     let joined = body.joined_incidence(0, 1).unwrap();
     assert_eq!(joined.len(), 8);
-    for (left, right) in &joined {
+    for crossing in &joined {
+        let left = &crossing.first;
+        let right = &crossing.second;
+        assert_eq!(
+            crossing.middle_transport,
+            NativePhaseCurrent::unit().current()
+        );
         assert_eq!(left.target, right.source);
         assert_eq!(left.node, right.node);
         assert_eq!(left.occurrence, 0);

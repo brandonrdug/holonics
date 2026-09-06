@@ -1,7 +1,7 @@
 # Native HNA: contextual transport before inheritance
 
 **Authority:** Brandon's contextual-transport correction and subsequent request to establish the
-corrected goal and continue. **Status:** ACTIVE, NCF0--NCF1 complete at their scopes; NCF2 in construction.
+corrected goal and continue. **Status:** ACTIVE, NCF0--NCF2 complete at their scopes; NCF3 in construction.
 **Order:** [THE_ROADMAP.md](THE_ROADMAP.md). **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 **Correction:** [audit](../../research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md).
 
@@ -132,6 +132,12 @@ fraction-free elimination, with arithmetic refusal and staged single-row formati
 the body resident. It introduces no optimizer, semantic labels or answer-selecting score.
 
 ### NCF2 — Retained contextual development and lawful recharting
+
+[established-bounded; measured] Complete for the fixed-node rational unit-phase family in the
+[NCF2 return](../../research/records/2026-09-05_NCF2_THE_LIVE_RECHART_CARRIES_THE_RELATION_AND_RETURNS_OLD_SOURCES_THROUGH_THEIR_FRAMES.md).
+The live body and learned relation rechart on-device; old source frames/material remain
+immutable and receiving crosses their actual frame passage. This does not found every possible
+source-domain enlargement or nonlinear constitutive family.
 
 [definition] The live rechart must carry held phase, seed incidence, the learned relation's source
 chart, every outstanding emitted source section and its lineage/reconstruction frame. Numerical

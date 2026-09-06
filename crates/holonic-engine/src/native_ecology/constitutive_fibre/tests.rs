@@ -3,7 +3,7 @@ use crate::embedding_fiber::ResidentReadout;
 use crate::exact_linear::ExactRatMatrix;
 use num_traits::Zero;
 
-fn row_space(rows: Vec<Vec<Rat>>) -> Vec<Vec<Rat>> {
+pub(super) fn row_space(rows: Vec<Vec<Rat>>) -> Vec<Vec<Rat>> {
     ExactRatMatrix::new(rows)
         .unwrap()
         .reduced_row_echelon()

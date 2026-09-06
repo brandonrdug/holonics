@@ -1119,6 +1119,81 @@ __device__ __forceinline__ wide fibre_lcm(wide a, wide b, uint32_t *slot) {
     return product_checked(a / gcd, b, slot);
 }
 
+__device__ void fibre_phase_product(wide ar, wide ai, wide ad, wide br, wide bi, wide bd,
+    wide *out, uint32_t *slot) {
+    if (ad <= 0 || bd <= 0) { atomicOr(slot, REFUSED_MALFORMED); return; }
+    out[0] = sub_checked(product_checked(ar,br,slot),product_checked(ai,bi,slot),slot);
+    out[1] = add_checked(product_checked(ai,br,slot),product_checked(ar,bi,slot),slot);
+    out[2] = product_checked(ad,bd,slot);
+    if (*slot) return;
+    fibre_normalize(out,2,out+2,slot);
+}
+
+// A staged representation transfer under a fixed-node unit-phase gauge. No old state is written.
+// The relation is a span of paired CURRENT points, so its source rows push forward by the gauge;
+// it is not a coefficient matrix to which the opposite covector transformation could be applied.
+extern "C" __global__ void __launch_bounds__(512) section_constitutive_rechart(
+    const int64_t *seed, const int64_t *memory, const int64_t *root_frame, const int64_t *basis,
+    const int64_t *change, uint32_t nodes,
+    int64_t *seed_lo, int64_t *seed_hi, int64_t *memory_lo, int64_t *memory_hi,
+    int64_t *frame_lo, int64_t *frame_hi, int64_t *basis_lo, int64_t *basis_hi,
+    int64_t *report_lo, int64_t *report_hi,
+    uint32_t *slot, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    if (blockIdx.x != 0 || threadIdx.x != 0) return;
+    if (upstream_refused(census,lineage,lineage_count,slot)) return;
+    uint32_t source_width = 2*nodes, width = source_width+2;
+    extern __shared__ wide rechart_scratch[];
+    wide *row = rechart_scratch;
+    wide common = 1;
+    for (uint32_t node=0; node<nodes; ++node) {
+        const int64_t *g=change+6*node;
+        wide unit=add_checked(product_checked(g[0],g[0],slot),product_checked(g[1],g[1],slot),slot);
+        if (g[2]<=0 || unit!=product_checked(g[2],g[2],slot)) atomicOr(slot,REFUSED_MALFORMED);
+        if (*slot) return;
+        common=fibre_lcm(common,g[2],slot);
+        wide turn[3], held[3], root[3], initial[3];
+        const int64_t *law=seed+5*node, *h=memory+3*node, *f=root_frame+3*node;
+        fibre_phase_product(g[0],g[1],g[2],law[2],law[3],law[4],turn,slot);
+        fibre_phase_product(g[0],g[1],g[2],h[0],h[1],h[2],held,slot);
+        fibre_phase_product(g[0],g[1],g[2],f[0],f[1],f[2],root,slot);
+        fibre_phase_product(g[0],g[1],g[2],g[3],g[4],g[5],initial,slot);
+        if (*slot) return;
+        seed_lo[5*node]=seed_hi[5*node]=law[0];
+        seed_lo[5*node+1]=seed_hi[5*node+1]=law[1];
+        for (uint32_t j=0; j<3; ++j) {
+            seed_lo[5*node+2+j]=seed_hi[5*node+2+j]=to_word(turn[j],slot);
+            memory_lo[3*node+j]=memory_hi[3*node+j]=to_word(held[j],slot);
+            frame_lo[3*node+j]=frame_hi[3*node+j]=to_word(root[j],slot);
+            report_lo[9*node+j]=report_hi[9*node+j]=to_word(turn[j],slot);
+            report_lo[9*node+3+j]=report_hi[9*node+3+j]=to_word(initial[j],slot);
+            report_lo[9*node+6+j]=report_hi[9*node+6+j]=to_word(root[j],slot);
+        }
+        if (*slot) return;
+    }
+    if (*slot) return;
+    for (size_t j=0; j<(size_t)width*width; ++j) basis_lo[j]=basis_hi[j]=0;
+    for (uint32_t p=0; p<width; ++p) {
+        if (!basis[(size_t)p*width+p]) continue;
+        for (uint32_t node=0; node<nodes; ++node) {
+            const int64_t *g=change+6*node;
+            wide x=basis[(size_t)p*width+2*node], y=basis[(size_t)p*width+2*node+1];
+            row[2*node]=product_checked(sub_checked(product_checked(g[0],x,slot),product_checked(g[1],y,slot),slot),common/g[2],slot);
+            row[2*node+1]=product_checked(add_checked(product_checked(g[1],x,slot),product_checked(g[0],y,slot),slot),common/g[2],slot);
+        }
+        for (uint32_t j=source_width; j<width; ++j) row[j]=product_checked(basis[(size_t)p*width+j],common,slot);
+        if (*slot) return;
+        fibre_normalize(row,width,nullptr,slot);
+        int64_t inserted=fibre_stage(basis_lo,width,row,slot);
+        if (*slot) return;
+        if (inserted>=0) for (uint32_t j=0; j<width; ++j) {
+            size_t at=(size_t)inserted*width+j;
+            basis_lo[at]=basis_hi[at]=to_word(row[j],slot);
+        }
+        if (*slot) return;
+    }
+}
+
 // One native current/formation recurrence. The immutable seed contains positive two-port
 // admittances and a rational unit-phase incidence; the continuing memory and relation never leave
 // the card between its current, comparison, formation and successor steps. `origin` is an actual
@@ -1126,7 +1201,8 @@ __device__ __forceinline__ wide fibre_lcm(wide a, wide b, uint32_t *slot) {
 extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulation(
     const int64_t *seed, int64_t *memory_lo, int64_t *memory_hi,
     int64_t *basis_lo, int64_t *basis_hi, const int64_t *incoming,
-    const int64_t *origin, uint32_t nodes, uint32_t linked,
+    const int64_t *origin, const int64_t *current_frame, const int64_t *origin_frame,
+    uint32_t nodes, uint32_t linked,
     int64_t *output_lo, int64_t *output_hi,
     uint32_t *slot, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
 ) {
@@ -1198,17 +1274,29 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
     int64_t inserted = -1;
     if (linked) {
         if (origin[source_width] <= 0) { atomicOr(slot, REFUSED_MALFORMED); return; }
-        prior_den = origin[source_width];
-        for (uint32_t j = 0; j < source_width; ++j) prior_query[j] = origin[j];
+        // Keep the old source occurrence immutable. Its actual frame-to-frame transport acts
+        // here, before either comparison or formation. `departing` is now free scratch.
+        prior_den=1;
+        for (uint32_t node=0; node<nodes; ++node) {
+            const int64_t *now=current_frame+3*node, *before=origin_frame+3*node;
+            wide crossing[3];
+            fibre_phase_product(now[0],now[1],now[2],before[0],-(wide)before[1],before[2],crossing,slot);
+            fibre_phase_product(crossing[0],crossing[1],crossing[2],origin[2*node],origin[2*node+1],
+                origin[source_width],departing+3*node,slot);
+            if (*slot) return;
+            prior_den=fibre_lcm(prior_den,departing[3*node+2],slot);
+        }
+        wide paired_den=fibre_lcm(prior_den,incoming[2],slot);
+        if (*slot) return;
+        for (uint32_t node=0; node<nodes; ++node) for (uint32_t component=0; component<2; ++component) {
+            prior_query[2*node+component]=product_checked(departing[3*node+component],prior_den/departing[3*node+2],slot);
+            formed[2*node+component]=product_checked(departing[3*node+component],paired_den/departing[3*node+2],slot);
+        }
+        formed[source_width]=product_checked(incoming[0],paired_den/incoming[2],slot);
+        formed[source_width+1]=product_checked(incoming[1],paired_den/incoming[2],slot);
+        if (*slot) return;
         fibre_query(basis_lo, source_width, width, prior_query, &prior_den, nullptr, -1,
             &prior_status, &prior_rank, slot);
-        if (*slot) return;
-        wide paired_den = fibre_lcm(origin[source_width], incoming[2], slot);
-        if (*slot) return;
-        for (uint32_t j = 0; j < source_width; ++j)
-            formed[j] = product_checked(origin[j], paired_den / origin[source_width], slot);
-        formed[source_width] = product_checked(incoming[0], paired_den / incoming[2], slot);
-        formed[source_width + 1] = product_checked(incoming[1], paired_den / incoming[2], slot);
         if (*slot) return;
         fibre_normalize(formed, width, nullptr, slot);
         inserted = fibre_stage(basis_lo, width, formed, slot);

@@ -130,7 +130,8 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 49] = [
+pub const KERNELS: [&str; 50] = [
+    "section_constitutive_rechart",
     "section_constitutive_circulation",
     "section_constitutive_fibre",
     "section_withdraw_sites",

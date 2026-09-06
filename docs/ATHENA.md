@@ -14,9 +14,14 @@ incoming/held/receiving lineage. No pretrained coefficients or tokenizer are use
 [bounded return](../research/records/2026-09-05_NCF1_CURRENT_AND_ADDRESSED_RETURN_FORM_ONE_NATIVE_SUCCESSOR.md)
 states the fixed seed, local linear-family hypothesis, native controls and exact limits.
 
-[open] NCF2 now transports that live body's charts. Its production adapter and durable artifact
-are still NCF3--NCF4, so the existing `holonics::hna` commands below remain inherited-model
-apparatus, not commands for the new native body. The inherited-first HNP sequence is paused.
+[established-bounded; measured] NCF2 returned live rational phase recharting of that body, with
+immutable source frames/material and explicit old-to-current receiving transport. Physical
+incidence changes remain distinct. The [rechart return](../research/records/2026-09-05_NCF2_THE_LIVE_RECHART_CARRIES_THE_RELATION_AND_RETURNS_OLD_SOURCES_THROUGH_THEIR_FRAMES.md)
+states its admitted gauge family and full-state/open-fibre controls.
+
+[open] Production adapters/application and durable artifacts remain NCF3--NCF4. The existing
+`holonics::hna` commands below are inherited-model apparatus, not commands for the new native
+body. The inherited-first HNP sequence is paused.
 
 ## One operation, two uses
 

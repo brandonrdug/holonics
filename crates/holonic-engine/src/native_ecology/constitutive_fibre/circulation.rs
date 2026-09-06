@@ -5,7 +5,11 @@
 //! carrying section, not arbitrary assertions about an exterior's constitutive law.
 
 use super::*;
+
+mod rechart;
 use crate::dimensional_wave::ExactComplexWaveCurrent;
+use rechart::HeldCurrentFrame;
+pub use rechart::{NativeCurrentFrame, NativeIncidenceChange, NativeRechartReceipt};
 use std::rc::Rc;
 
 /// One exact local phase pair. The denominator is positive; this is an apparatus chart, not an ID.
@@ -122,6 +126,8 @@ impl NativeCurrentOccurrence {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct NativeCurrentLineage {
     pub occurrence: usize,
+    /// A position in this body's chart history, not a source identity or a global frame key.
+    pub frame: u64,
     pub predecessor_state: Option<usize>,
     pub received_from: Option<usize>,
     pub incoming: NativePhaseCurrent,
@@ -140,14 +146,48 @@ pub enum NativeCurrentCarrier {
 pub struct NativeCurrentBoundary {
     owner: Rc<()>,
     pub position: NativeCurrentCarrier,
+    frame: Option<Rc<NativeCurrentFrame>>,
 }
 
 impl PartialEq for NativeCurrentBoundary {
     fn eq(&self, other: &Self) -> bool {
-        Rc::ptr_eq(&self.owner, &other.owner) && self.position == other.position
+        self.same_carrier(other)
+            && match (&self.frame, &other.frame) {
+                (None, None) => true,
+                (Some(a), Some(b)) => Rc::ptr_eq(a, b),
+                _ => false,
+            }
     }
 }
 impl Eq for NativeCurrentBoundary {}
+
+impl NativeCurrentBoundary {
+    fn same_carrier(&self, other: &Self) -> bool {
+        Rc::ptr_eq(&self.owner, &other.owner) && self.position == other.position
+    }
+    pub fn frame(&self) -> Option<&NativeCurrentFrame> {
+        self.frame.as_deref()
+    }
+    fn transport_into(&self, other: &Self) -> ExactComplexWaveCurrent {
+        let node = match self.position {
+            NativeCurrentCarrier::Held { node, .. }
+            | NativeCurrentCarrier::Emitted { node, .. } => node,
+            NativeCurrentCarrier::Incoming { .. } => return NativePhaseCurrent::unit().current(),
+        };
+        let unit = NativePhaseCurrent::unit();
+        let first = self
+            .frame
+            .as_ref()
+            .map_or(unit, |f| f.root_to_local[node])
+            .current();
+        let second = other
+            .frame
+            .as_ref()
+            .map_or(unit, |f| f.root_to_local[node])
+            .current();
+        second.multiply(&first.conjugate())
+    }
+}
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct NativeCurrentIncidence {
@@ -158,6 +198,14 @@ pub struct NativeCurrentIncidence {
     /// Exact complex linear transport in the declared seed chart. A zero transported current
     /// does not erase the carrying occurrence from this population.
     pub transport: ExactComplexWaveCurrent,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct NativeJoinedCurrentIncidence {
+    pub first: NativeCurrentIncidence,
+    pub second: NativeCurrentIncidence,
+    /// The admitted middle-frame passage, not an equality of raw coordinate faces.
+    pub middle_transport: ExactComplexWaveCurrent,
 }
 
 #[derive(Debug, PartialEq, Eq, Serialize)]
@@ -171,7 +219,8 @@ pub struct NativeReceivedCurrentDifference {
 pub struct NativeCurrentStep {
     pub source: NativeEmissionHandle,
     pub lineage: NativeCurrentLineage,
-    /// Ordered in the fixed local node frames declared by `material()`. These coordinates are
+    pub frame: Rc<NativeCurrentFrame>,
+    /// Ordered in this return's local node frame, not a later value of `material()`. These coordinates are
     /// not interchangeable with another body's or a later recharted field without its transport.
     pub source_currents: Vec<ExactComplexWaveCurrent>,
     pub receiver: ConstitutiveReading,
@@ -180,20 +229,37 @@ pub struct NativeCurrentStep {
     pub successor_rank: usize,
 }
 
+impl NativeCurrentStep {
+    /// Exterior codec projection to the stable boundary chart. It does not execute or alter the
+    /// learner; the device has already enacted its complete current and successor.
+    pub fn root_source_currents(&self) -> Vec<ExactComplexWaveCurrent> {
+        self.source_currents
+            .iter()
+            .zip(&self.frame.root_to_local)
+            .map(|(current, gauge)| gauge.current().conjugate().multiply(current))
+            .collect()
+    }
+}
+
 struct HeldEmission<'chart> {
     section: ResidentSection<'chart>,
     lineage: NativeCurrentLineage,
     returned: bool,
+    frame: Rc<HeldCurrentFrame<'chart>>,
+    material: Rc<[NativeJunctionSeed]>,
 }
 
-/// One continuing ecology: immutable incidence/constitution, held phase, developing relation,
+/// One continuing ecology: versioned incidence/constitution, held phase, developing relation,
 /// and its occurrence-bearing emitted sources. Neither the ecology nor its device state is Clone.
 /// The held source sections serve only actual receiving edges, never answer lookup for a query.
 pub struct NativeConstitutiveEcology<'chart> {
     seed: ResidentSection<'chart>,
     memory: ResidentSection<'chart>,
     relation: ResidentConstitutiveFibre<'chart>,
-    material: Vec<NativeJunctionSeed>,
+    material: Rc<[NativeJunctionSeed]>,
+    frame: Rc<HeldCurrentFrame<'chart>>,
+    recharts: Vec<NativeRechartReceipt>,
+    incidence_changes: Vec<NativeIncidenceChange>,
     owner: Rc<()>,
     history: Vec<HeldEmission<'chart>>,
     pending: Option<HeldEmission<'chart>>,
@@ -254,7 +320,16 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
             seed: mount(5, seed_words)?,
             memory: mount(3, memory_words)?,
             relation,
-            material,
+            material: material.into(),
+            frame: Rc::new(HeldCurrentFrame {
+                native: mount(3, (0..nodes).flat_map(|_| [1, 0, 1]).collect())?,
+                view: Rc::new(NativeCurrentFrame {
+                    ordinal: 0,
+                    root_to_local: vec![NativePhaseCurrent::unit(); nodes],
+                }),
+            }),
+            recharts: Vec::new(),
+            incidence_changes: Vec::new(),
             owner: Rc::new(()),
             history: Vec::new(),
             pending: None,
@@ -263,6 +338,12 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
 
     pub fn material(&self) -> &[NativeJunctionSeed] {
         &self.material
+    }
+    pub fn material_at(&self, occurrence: usize) -> Option<&[NativeJunctionSeed]> {
+        self.history.get(occurrence).map(|h| h.material.as_ref())
+    }
+    pub fn current_frame(&self) -> &NativeCurrentFrame {
+        &self.frame.view
     }
     pub fn lineage(&self) -> impl Iterator<Item = &NativeCurrentLineage> {
         self.history.iter().map(|e| &e.lineage)
@@ -280,10 +361,15 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
             .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
         let boundary = |position| NativeCurrentBoundary {
             owner: Rc::clone(&self.owner),
+            frame: if matches!(position, NativeCurrentCarrier::Incoming { .. }) {
+                None
+            } else {
+                Some(Rc::clone(&history.frame.view))
+            },
             position,
         };
         let mut result = Vec::with_capacity(4 * self.material.len());
-        for (node, seed) in self.material.iter().enumerate() {
+        for (node, seed) in history.material.iter().enumerate() {
             let a = Rat::from_integer(seed.incoming_admittance.into());
             let b = Rat::from_integer(seed.held_admittance.into());
             let sum = &a + &b;
@@ -326,21 +412,28 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
         Ok(result)
     }
 
-    /// The full joining occurrence population, not merely the endpoint relation. The boundary
-    /// equality keeps the exact held-state occurrence and node, inside this same owner.
+    /// The full joining occurrence population, not merely the endpoint relation. The same
+    /// held-state carrier and node are joined through their explicit middle-frame transport;
+    /// different coordinate presentations are not asserted equal.
     pub fn joined_incidence(
         &self,
         first: usize,
         second: usize,
-    ) -> Result<Vec<(NativeCurrentIncidence, NativeCurrentIncidence)>, ConstitutiveFibreError> {
+    ) -> Result<Vec<NativeJoinedCurrentIncidence>, ConstitutiveFibreError> {
         let left = self.incidence(first)?;
         let right = self.incidence(second)?;
         Ok(left
             .into_iter()
             .flat_map(|a| {
-                right
-                    .iter()
-                    .filter_map(move |b| (a.target == b.source).then(|| (a.clone(), b.clone())))
+                right.iter().filter_map(move |b| {
+                    a.target
+                        .same_carrier(&b.source)
+                        .then(|| NativeJoinedCurrentIncidence {
+                            middle_transport: a.target.transport_into(&b.source),
+                            first: a.clone(),
+                            second: b.clone(),
+                        })
+                })
             })
             .collect())
     }
@@ -392,6 +485,7 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
             .map_err(|_| ConstitutiveFibreError::Shape)?;
         let lineage = NativeCurrentLineage {
             occurrence: at,
+            frame: self.frame.view.ordinal,
             predecessor_state: at.checked_sub(1),
             received_from: source_at,
             incoming: occurrence.current,
@@ -423,6 +517,8 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
                 &mut self.relation.basis,
                 &input,
                 source_at.map(|i| &self.history[i].section),
+                &self.frame.native,
+                source_at.map(|i| &self.history[i].frame.native),
                 &output,
             )?;
         }
@@ -432,6 +528,8 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
             section: output,
             lineage: lineage.clone(),
             returned: false,
+            frame: Rc::clone(&self.frame),
+            material: Rc::clone(&self.material),
         });
         self.relation.usable = false;
         let reading = passage.launch()?;
@@ -498,6 +596,7 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
                 occurrence: at,
             },
             lineage,
+            frame: Rc::clone(&self.frame.view),
             source_currents,
             receiver,
             received_difference,

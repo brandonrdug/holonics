@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** 2026-09-05. **Current HNA construction:** NCF2 — retained contextual development and live recharting.
+**Currency:** 2026-09-05. **Current HNA construction:** NCF3 — native development/inference interface and application.
 
 This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md) orders work;
 completed history stays in its existing records and Git. Brandon's latest direct instruction
@@ -25,9 +25,9 @@ integration removed and its measurements preserved.
 
 [definition] Brandon subsequently authorized the corrected goal and continued work. The
 [native-HNA construction contract](docs/plans/THE_NATIVE_HNA_FOUNDS_CONTEXTUAL_TRANSPORT_BEFORE_INHERITANCE.md)
-is active. NCF2 now transports the held phase, native incidence, learned relation and retained
-emission/receiving lineage together, while distinguishing a lawful re-expression from a genuine
-change of conditions. Reinterpreting old source handles in a new frame is not such a transport.
+is active. NCF3 now exposes the same native owner through a usable application interface:
+frame-qualified current, actual source/receiving handles, open fibres and continuing development.
+An independently evolving application must use that owner, not a fixture-local learner.
 
 [proved-derived; formal-checked] NCF0 returned range-restricted receiver transport through an
 actual admitted crossing and the finite branch/drive controls distinguishing changed conditions
@@ -45,8 +45,16 @@ states its explicit linear-chart hypothesis.
 joins exact two-port phase current, an owned prior source/receiving edge, local formation, receiver
 and successor in one resident operation. Sixteen CUDA controls passed, including new-current
 conduct separated from an unlinked matched body and full incidence/pullback reconstruction.
-The qualified formal law passed Lean. Live recharting, the production interface/application and
-durable integrated artifacts remain NCF2--NCF4; the full corrected goal is not complete.
+The qualified formal law passed Lean. That return alone did not close live recharting,
+the production interface/application or durable integrated artifacts.
+
+[established-bounded; measured] NCF2 is complete for fixed-node rational unit-phase gauges.
+The [live-rechart return](research/records/2026-09-05_NCF2_THE_LIVE_RECHART_CARRIES_THE_RELATION_AND_RETURNS_OLD_SOURCES_THROUGH_THEIR_FRAMES.md)
+transports phase, incidence, learned relation and old-source frames without rewriting historical
+emissions/material. Full held-state pullbacks carry their middle-frame passage. Twenty-two native
+controls and the formal rebase/recurrence laws passed, including residual classes, plural fibres,
+physical changes and refusal without partial state mutation. Production adapters/application and
+durable process-separated models remain NCF3--NCF4.
 
 ## Previous HNP returns — preserved scopes, not the current work order
 
