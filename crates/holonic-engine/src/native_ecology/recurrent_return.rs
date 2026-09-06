@@ -1,11 +1,12 @@
-//! Exterior return and local cultivation of one retained native recurrence.
+//! Historical fixed-edge return apparatus for one retained native recurrence.
 //!
-//! This owner closes the relation absent between [`super::recurrent`] and the existing exact
-//! adjoint/cultivation laws. It does not own a tool, scheduler, trainer, language, or second native
-//! body. One actual exterior consequence supplies an oriented nonzero return. The return follows
-//! the already-retained closing edge, founds one rank-one local generator difference, and leaves a
-//! source-detached rest carrying the predecessor action plus that difference. Targeted ablation is
-//! subtraction of the same addressed difference, not reconstruction from source material.
+//! `seal` chooses `successor_to := from`: the external nonempty readback only admits that
+//! predefined replacement of the closing edge. Its content does not derive a new constitutive
+//! relation. Exact rank, adjoint, withdrawal and rest results retain their bounded apparatus
+//! scope; they are not a native contextual formation law and do not schedule NCF1.
+//! The September 2 recurrent-ecology correction rejects this *species* of authored-edge inference;
+//! its named `derive_returned_scaffold_deposit` was a separate implementation. Do not conflate
+//! their source histories, or infer a general learner from this module's lifecycle trait.
 
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};

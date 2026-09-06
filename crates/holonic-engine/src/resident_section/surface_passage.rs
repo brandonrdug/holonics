@@ -1,6 +1,43 @@
 use super::*;
 
 impl<'chart> ResidentSurface<'chart> {
+    /// One local rational-relation operation. The only continuing write is a fully checked new
+    /// echelon row; its source/receiver hypotheses belong to `native_ecology::constitutive_fibre`.
+    pub(crate) fn record_constitutive_fibre(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        basis: &mut ResidentSection<'chart>,
+        input: &ResidentSection<'chart>,
+        source_width: usize,
+        paired: bool,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let width = basis.width;
+        if source_width == 0 || source_width >= width || basis.rows != width
+            || input.rows != 1 || input.width != width || output.rows != 1
+            || output.width != width + 4 || width > u32::MAX as usize - 4
+            || [basis.grain, input.grain, output.grain].iter().any(|g| g.0 != 0)
+        {
+            return Err(ResidentRefusal::Declaration { operation: "constitutive-fibre",
+                what: "expected point integer local relation, joined current and rational return charts".into() });
+        }
+        let shared = width.checked_mul(32).and_then(|v| u32::try_from(v).ok())
+            .ok_or_else(|| ResidentRefusal::Declaration { operation: "constitutive-fibre",
+                what: "local exact scratch exceeds the apparatus chart".into() })?;
+        if shared > self.declaration.max_sectiond_bytes {
+            return Err(ResidentRefusal::Declaration { operation: "constitutive-fibre",
+                what: "local exact scratch exceeds the mounted per-block shared-memory aperture".into() });
+        }
+        let mut params = Params::new();
+        params.ptr(basis.lo.device_ptr()).ptr(basis.hi.device_ptr())
+            .ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr())
+            .u32(source_width as u32).u32((width-source_width) as u32).u32(u32::from(paired))
+            .ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane, "section_constitutive_fibre", 1, self.launch.block_x,
+            shared, &mut params, "constitutive-fibre")
+    }
+
     // -----------------------------------------------------------------------------------------
     // the passage: capture, launch once, read once
     // -----------------------------------------------------------------------------------------

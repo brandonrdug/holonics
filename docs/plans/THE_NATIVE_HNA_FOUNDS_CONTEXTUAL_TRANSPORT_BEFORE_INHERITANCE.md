@@ -114,6 +114,18 @@ conditional conduct and local formation. A helper kernel, caller-authored delta,
 table or CPU reference cannot close this phase. Any missing constitutive law stays an explicit
 construction obligation rather than being supplied as an unexplained callback.
 
+[project-postulate] The first concrete local receiving chart is an explicitly admitted linear
+constitutive family over situated source/receiver current spaces. It forms the rational relation
+spanned by actual paired currents, without selecting a fitted total map. Source-only arrivals read
+that same evolving relation; a new paired arrival joins it. The source projection determines its
+admitted domain; the vertical fibre retains every compatible receiver difference. A missing source
+direction or nonzero vertical fibre is open, not permission to interpolate an arbitrary answer.
+Linearity is this seed chart's constitutive hypothesis, not the law of all HNA, all contexts or
+language. Its physical/application contact and incidence must still be joined in NCF1; a resident
+relation accumulator alone cannot close the phase. The first implementation uses exact local
+fraction-free elimination, with arithmetic refusal and staged single-row formation, and leaves
+the body resident. It introduces no optimizer, semantic labels or answer-selecting score.
+
 ### NCF2 — Retained contextual development and lawful recharting
 
 [definition] Show that a later current uses organization formed by earlier interaction, retaining

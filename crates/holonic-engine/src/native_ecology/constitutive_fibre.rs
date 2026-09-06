@@ -1,0 +1,245 @@
+//! One developing local linear constitutive relation, with its full open receiver fibre.
+//!
+//! Seed hypothesis: paired currents inhabit one declared rational-linear source/receiver chart.
+//! This is NOT an assumption that HNA, language, or arbitrary contexts are globally linear.
+//! The resident body forms the span of received pairs, not a selected total coefficient map.
+//! Source-only and paired occurrences use the same operation and continuing owner. Outside the
+//! source projection there is no inferred response; a vertical fibre remains plural, not averaged.
+//! Formal owner: `Computation/HolonicConstitutiveFibre.lean`. Native incidence, physical contact
+//! and the wider ecology must still be composed: this local owner alone does not complete NCF1.
+
+use relational_geometry::Rat;
+use serde::Serialize;
+use thiserror::Error;
+
+use crate::resident_section::{
+    ResidentGrain, ResidentRefusal, ResidentSection, ResidentSectionRest, ResidentSurface,
+    TransferCensus,
+};
+
+#[derive(Debug, PartialEq, Eq, Serialize)]
+pub enum ConstitutiveReading {
+    Unique {
+        current: Vec<Rat>,
+    },
+    /// No response is claimed at this source. The remainder is the exact source direction which
+    /// the currently presented domain does not carry, in its retained elimination chart.
+    OutsideDomain {
+        source_remainder: Vec<Rat>,
+    },
+    /// Every `particular + span(directions)` is retained. None is selected as the answer.
+    Plural {
+        particular: Vec<Rat>,
+        directions: Vec<Vec<Rat>>,
+    },
+}
+
+#[derive(Debug, PartialEq, Eq, Serialize)]
+pub struct ConstitutiveFibreReturn {
+    pub occurrence: u64,
+    pub predecessor_reading: ConstitutiveReading,
+    /// A pivot is a coordinate of the represented relation, not a semantic identity.
+    pub formed_pivot: Option<usize>,
+    pub successor_rank: usize,
+}
+
+#[derive(Debug, Error)]
+pub enum ConstitutiveFibreError {
+    #[error(
+        "local exact elimination requires {required} shared octets; the mounted apparatus admits {available}"
+    )]
+    ScratchAperture { required: usize, available: u32 },
+    #[error("local constitutive chart shape or integer aperture is invalid")]
+    Shape,
+    #[error(
+        "the last device operation/readout has uncertain completion; this owner cannot replay it"
+    )]
+    Uncertain,
+    #[error("native constitutive arithmetic refused without depositing a row: {0}")]
+    Arithmetic(String),
+    #[error(transparent)]
+    Resident(#[from] ResidentRefusal),
+}
+
+/// One move-owned local relation. The basis is never copied for a speculative successor:
+/// elimination stages at most one new row, and commits it only after every arithmetic check.
+pub struct ResidentConstitutiveFibre<'chart> {
+    basis: ResidentSection<'chart>,
+    surface: &'chart ResidentSurface<'chart>,
+    source_width: usize,
+    target_width: usize,
+    occurrences: u64,
+    usable: bool,
+}
+
+impl<'chart> ResidentConstitutiveFibre<'chart> {
+    pub fn found(
+        surface: &'chart ResidentSurface<'chart>,
+        source_width: usize,
+        target_width: usize,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        let width = source_width
+            .checked_add(target_width)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let count = width
+            .checked_mul(width)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        if source_width == 0 || target_width == 0 || width > u32::MAX as usize - 4 {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let scratch = width.checked_mul(32).ok_or(ConstitutiveFibreError::Shape)?;
+        let available = surface.declaration().max_sectiond_bytes;
+        if scratch > available as usize {
+            return Err(ConstitutiveFibreError::ScratchAperture {
+                required: scratch,
+                available,
+            });
+        }
+        let mut zeros = Vec::new();
+        zeros
+            .try_reserve_exact(count)
+            .map_err(|_| ConstitutiveFibreError::Shape)?;
+        zeros.resize(count, (0, 0));
+        let basis = surface.mount_section_rest(
+            &ResidentSectionRest::found(width, width, ResidentGrain(0), 64, zeros)
+                .map_err(|_| ConstitutiveFibreError::Shape)?,
+        )?;
+        Ok(Self {
+            basis,
+            surface,
+            source_width,
+            target_width,
+            occurrences: 0,
+            usable: true,
+        })
+    }
+
+    pub fn occurrences(&self) -> u64 {
+        self.occurrences
+    }
+
+    pub fn census(&self) -> TransferCensus {
+        self.surface.census()
+    }
+
+    /// One occurrence in this local chart. `receiving` is an actual co-measured current at the
+    /// paired receiver port, not a reward, admission Boolean or requested output. Its presence
+    /// joins the paired relation after the same operation reads the predecessor domain.
+    ///
+    /// Integer currents are the first apparatus mouth; all derived responses remain rational.
+    /// The kernel—not the caller—derives the pivot, rank change, response and open fibre.
+    pub fn advance(
+        &mut self,
+        source: &[i64],
+        receiving: Option<&[i64]>,
+    ) -> Result<ConstitutiveFibreReturn, ConstitutiveFibreError> {
+        if !self.usable {
+            return Err(ConstitutiveFibreError::Uncertain);
+        }
+        if source.len() != self.source_width
+            || receiving.is_some_and(|v| v.len() != self.target_width)
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let next = self
+            .occurrences
+            .checked_add(1)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let width = self.source_width + self.target_width;
+        let mut input = source.iter().map(|v| (*v, *v)).collect::<Vec<_>>();
+        input.extend((0..self.target_width).map(|j| {
+            let value = receiving.map_or(0, |v| v[j]);
+            (value, value)
+        }));
+        let input = self.surface.mount_section_rest(
+            &ResidentSectionRest::found(1, width, ResidentGrain(0), 64, input)
+                .map_err(|_| ConstitutiveFibreError::Shape)?,
+        )?;
+        let output = self.surface.fresh_section(1, width + 4, ResidentGrain(0))?;
+        let mut passage = self.surface.begin_passage(&[vec![]])?;
+        {
+            let lane = passage.open(0, &[])?;
+            self.surface.record_constitutive_fibre(
+                &lane,
+                &mut self.basis,
+                &input,
+                self.source_width,
+                receiving.is_some(),
+                &output,
+            )?;
+        }
+        passage.close(0, &output, 64)?;
+        let passage = passage.finish()?;
+        // A launch/readback failure cannot authorize silently repeating a possibly committed row.
+        self.usable = false;
+        let reading = passage.launch()?;
+        if !reading.obstruction.is_empty() {
+            self.usable = true; // the kernel refuses before its sole continuing write
+            return Err(ConstitutiveFibreError::Arithmetic(format!(
+                "{:?}",
+                reading.obstruction
+            )));
+        }
+        let returned = self.surface.read_out(&output)?;
+        if returned.iter().any(|(lo, hi)| lo != hi) || returned[width].0 <= 0 {
+            return Err(ConstitutiveFibreError::Uncertain);
+        }
+        let denominator = returned[width].0;
+        let rational = |j: usize| Rat::new(returned[j].0.into(), denominator.into());
+        let particular = || (self.source_width..width).map(rational).collect();
+        let formed_pivot = match returned[width + 2].0 {
+            -1 => None,
+            p if p >= 0 && (p as usize) < width => Some(p as usize),
+            _ => return Err(ConstitutiveFibreError::Uncertain),
+        };
+        let predecessor_reading = match returned[width + 1].0 {
+            0 => ConstitutiveReading::Unique {
+                current: particular(),
+            },
+            1 => ConstitutiveReading::OutsideDomain {
+                source_remainder: (0..self.source_width).map(rational).collect(),
+            },
+            2 => {
+                // This is an explicitly requested full receiver fibre, not a host numerical
+                // decision used to conduct the operation. The newly formed row belongs only to
+                // the successor and is excluded from this predecessor reading.
+                let standing = self.surface.read_out(&self.basis)?;
+                let directions = (self.source_width..width)
+                    .filter(|p| Some(*p) != formed_pivot && standing[p * width + p].0 != 0)
+                    .map(|p| {
+                        (self.source_width..width)
+                            .map(|j| Rat::from_integer(standing[p * width + j].0.into()))
+                            .collect()
+                    })
+                    .collect();
+                ConstitutiveReading::Plural {
+                    particular: particular(),
+                    directions,
+                }
+            }
+            _ => return Err(ConstitutiveFibreError::Uncertain),
+        };
+        let rank = usize::try_from(returned[width + 3].0)
+            .map_err(|_| ConstitutiveFibreError::Uncertain)?;
+        if rank > width {
+            return Err(ConstitutiveFibreError::Uncertain);
+        }
+        self.occurrences = next;
+        self.usable = true;
+        Ok(ConstitutiveFibreReturn {
+            occurrence: next,
+            predecessor_reading,
+            formed_pivot,
+            successor_rank: rank,
+        })
+    }
+
+    /// Exterior inspection of the represented relation. This is not yet a durable whole-HNA
+    /// artifact or a source-independence claim. The native operation never reads this wire back.
+    pub fn inspect_relation(&self) -> Result<ResidentSectionRest, ConstitutiveFibreError> {
+        Ok(self.surface.detach_section(&self.basis, 64)?)
+    }
+}
+
+#[cfg(test)]
+mod tests;

@@ -191,6 +191,70 @@ def coupledResponse [Fintype Node] [Fintype Branch]
   ∑ first, incidence first node *
     ∑ second, coupling first second * branchDrop incidence state second
 
+/-- A rank-one mutual constitutive table, with one factor on each addressed branch index. -/
+def rankOneCoupling (u v : Branch → ℝ) : Branch → Branch → ℝ :=
+  fun first second ↦ u first * v second
+
+/-- Coupled response is additive in the mutual constitutive table. -/
+theorem coupledResponse_additive [Fintype Node] [Fintype Branch]
+    (left right : Branch → Branch → ℝ)
+    (incidence : Branch → Node → ℝ) (state : Node → ℝ) (node : Node) :
+    coupledResponse (fun first second ↦ left first second + right first second)
+        incidence state node =
+      coupledResponse left incidence state node + coupledResponse right incidence state node := by
+  simp only [coupledResponse, add_mul, Finset.sum_add_distrib, mul_add]
+
+/-- A rank-one coupling contracts as a left incidence factor times a right branch-drop factor. -/
+theorem coupledResponse_rankOne [Fintype Node] [Fintype Branch]
+    (u v : Branch → ℝ) (incidence : Branch → Node → ℝ)
+    (state : Node → ℝ) (node : Node) :
+    coupledResponse (rankOneCoupling u v) incidence state node =
+      (∑ first, incidence first node * u first) *
+        (∑ second, v second * branchDrop incidence state second) := by
+  unfold coupledResponse rankOneCoupling
+  rw [Finset.sum_mul]
+  apply Finset.sum_congr rfl
+  intro first hfirst
+  calc
+    incidence first node * ∑ second, u first * v second * branchDrop incidence state second =
+        incidence first node * (u first *
+          ∑ second, v second * branchDrop incidence state second) := by
+      congr 1
+      calc
+        ∑ second, u first * v second * branchDrop incidence state second =
+            ∑ second, u first * (v second * branchDrop incidence state second) := by
+          apply Finset.sum_congr rfl
+          intro second hsecond
+          ring
+        _ = u first * ∑ second, v second * branchDrop incidence state second := by
+          symm
+          simpa using (Finset.mul_sum (Finset.univ : Finset Branch)
+            (fun second ↦ v second * branchDrop incidence state second) (u first))
+    _ = incidence first node * u first *
+          ∑ second, v second * branchDrop incidence state second := by ring
+
+/-- Two-sided branch-chart transport preserves rank-one form by transporting both factors. -/
+theorem reorientCoupling_rankOne [Fintype Branch]
+    (selected : Branch → Bool) (u v : Branch → ℝ) :
+    reorientCoupling selected (rankOneCoupling u v) =
+      rankOneCoupling (reorientDrive selected u) (reorientDrive selected v) := by
+  funext first second
+  simp only [reorientCoupling, rankOneCoupling, reorientDrive]
+  ring
+
+/-- A null left or right rank-one contraction annihilates the returned node response. -/
+theorem coupledResponse_rankOne_eq_zero_of_null_contraction
+    [Fintype Node] [Fintype Branch]
+    (u v : Branch → ℝ) (incidence : Branch → Node → ℝ)
+    (state : Node → ℝ) (node : Node)
+    (null : (∑ first, incidence first node * u first) = 0 ∨
+      (∑ second, v second * branchDrop incidence state second) = 0) :
+    coupledResponse (rankOneCoupling u v) incidence state node = 0 := by
+  rw [coupledResponse_rankOne]
+  rcases null with null | null
+  · rw [null, zero_mul]
+  · rw [null, mul_zero]
+
 /-- A mutual response is invariant precisely when the two-index constitutive table is transported
 with both reoriented branch charts. -/
 theorem coupledResponse_reorient [Fintype Node] [Fintype Branch]
@@ -623,6 +687,10 @@ end Soma.Holonics.Millennium.HolonicComplexParametron
 
 #print axioms Soma.Holonics.Millennium.HolonicComplexParametron.diagonalStorage_reorient
 #print axioms Soma.Holonics.Millennium.HolonicComplexParametron.isGeneralizedMode_reorient_iff
+#print axioms Soma.Holonics.Millennium.HolonicComplexParametron.coupledResponse_additive
+#print axioms Soma.Holonics.Millennium.HolonicComplexParametron.coupledResponse_rankOne
+#print axioms Soma.Holonics.Millennium.HolonicComplexParametron.reorientCoupling_rankOne
+#print axioms Soma.Holonics.Millennium.HolonicComplexParametron.coupledResponse_rankOne_eq_zero_of_null_contraction
 #print axioms Soma.Holonics.Millennium.HolonicComplexParametron.driveAction_reorientBoth
 #print axioms Soma.Holonics.Millennium.HolonicComplexParametron.branchDrop_endpointIncidence
 #print axioms Soma.Holonics.Millennium.HolonicComplexParametron.complexBranchDrop_endpointIncidence

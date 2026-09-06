@@ -5,6 +5,7 @@
 
 pub mod boundary_cultivation;
 pub mod continuation;
+pub mod constitutive_fibre;
 pub mod cultivation_overlay;
 pub mod factor_complex;
 pub mod heterogeneous_fusion;

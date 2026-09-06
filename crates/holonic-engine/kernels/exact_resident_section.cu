@@ -987,6 +987,116 @@ extern "C" __global__ void section_contact(
     }
 }
 
+// Exact local rational relation, not a fitted total function. Each occupied row is indexed by
+// its leading coordinate. Source pivots read the actual admitted domain; target-only pivots are
+// the vertical fibre and are never silently discarded. An occurrence optionally carries a paired
+// receiver current. Its row is reduced and staged BEFORE the sole basis write. No source values,
+// selected answer, scalar loss or host-derived rank enter the formation rule.
+__device__ __forceinline__ uwide fibre_gcd(uwide a, uwide b) {
+    while (b != 0) { uwide r = a % b; a = b; b = r; }
+    return a;
+}
+
+__device__ __forceinline__ void fibre_normalize(
+    wide *row, uint32_t width, wide *denominator, uint32_t *slot
+) {
+    uwide divisor = denominator ? magnitude(*denominator) : 0;
+    for (uint32_t j = 0; j < width; ++j) divisor = fibre_gcd(divisor, magnitude(row[j]));
+    if (divisor == 0) return;
+    // Every checked product below stays in the symmetric signed-wide aperture.
+    wide d = of_magnitude(divisor, 0, slot);
+    if (*slot) return;
+    for (uint32_t j = 0; j < width; ++j) row[j] /= d;
+    if (denominator) *denominator /= d;
+}
+
+extern "C" __global__ void __launch_bounds__(512) section_constitutive_fibre(
+    int64_t *basis_lo, int64_t *basis_hi,
+    const int64_t *input_lo, const int64_t *input_hi,
+    uint32_t source_width, uint32_t target_width, uint32_t paired,
+    int64_t *output_lo, int64_t *output_hi,
+    uint32_t *slot, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    // Elimination has a dependent pivot word inside this ONE local interaction. It is not a
+    // host-instruction loop. Independent local fibres can later be placed independently.
+    if (blockIdx.x != 0 || threadIdx.x != 0) return;
+    if (upstream_refused(census, lineage, lineage_count, slot)) return;
+    uint32_t width = source_width + target_width;
+    if (!source_width || !target_width || width < source_width || paired > 1) {
+        atomicOr(slot, REFUSED_MALFORMED); return;
+    }
+    extern __shared__ wide fibre_scratch[];
+    wide *query = fibre_scratch;
+    wide *formed = fibre_scratch + width;
+    for (uint32_t j = 0; j < width; ++j) {
+        if (input_lo[j] != input_hi[j]) { atomicOr(slot, REFUSED_MALFORMED); return; }
+        query[j] = j < source_width ? input_lo[j] : 0;
+        formed[j] = input_lo[j];
+    }
+    wide denominator = 1;
+    uint32_t vertical = 0, rank = 0;
+    for (uint32_t p = 0; p < width; ++p) {
+        int64_t pivot = basis_lo[(size_t)p * width + p];
+        if (pivot < 0) { atomicOr(slot, REFUSED_MALFORMED); return; }
+        if (pivot) { ++rank; if (p >= source_width) ++vertical; }
+        if (p >= source_width || !pivot || !query[p]) continue;
+        wide coefficient = query[p];
+        for (uint32_t j = 0; j < width; ++j) {
+            query[j] = sub_checked(product_checked(pivot, query[j], slot),
+                product_checked(coefficient, basis_lo[(size_t)p * width + j], slot), slot);
+        }
+        denominator = product_checked(denominator, pivot, slot);
+        if (*slot) return;
+        fibre_normalize(query, width, &denominator, slot);
+        if (*slot) return;
+    }
+    uint32_t disposition = vertical ? 2u : 0u;
+    for (uint32_t j = 0; j < source_width; ++j) if (query[j]) disposition = 1u;
+
+    int64_t inserted = -1;
+    if (paired) {
+        for (uint32_t p = 0; p < width; ++p) {
+            if (!formed[p]) continue;
+            int64_t pivot = basis_lo[(size_t)p * width + p];
+            if (!pivot) { inserted = p; break; }
+            wide coefficient = formed[p];
+            for (uint32_t j = 0; j < width; ++j) {
+                formed[j] = sub_checked(product_checked(pivot, formed[j], slot),
+                    product_checked(coefficient, basis_lo[(size_t)p * width + j], slot), slot);
+            }
+            if (*slot) return;
+            fibre_normalize(formed, width, nullptr, slot);
+            if (*slot) return;
+        }
+        if (inserted >= 0) {
+            fibre_normalize(formed, width, nullptr, slot);
+            if (*slot) return;
+            if (formed[inserted] < 0) {
+                for (uint32_t j = 0; j < width; ++j) formed[j] = -formed[j];
+            }
+        }
+    }
+    // Check every output and staged coefficient before changing any continuing basis row.
+    for (uint32_t j = 0; j < width; ++j) {
+        if (j >= source_width) query[j] = -query[j];
+        to_word(query[j], slot);
+        if (inserted >= 0) to_word(formed[j], slot);
+    }
+    to_word(denominator, slot);
+    if (*slot) return;
+    for (uint32_t j = 0; j < width; ++j) output_lo[j] = output_hi[j] = (int64_t)query[j];
+    output_lo[width] = output_hi[width] = (int64_t)denominator;
+    output_lo[width + 1] = output_hi[width + 1] = disposition;
+    output_lo[width + 2] = output_hi[width + 2] = inserted;
+    output_lo[width + 3] = output_hi[width + 3] = rank + (inserted >= 0 ? 1 : 0);
+    if (inserted >= 0) {
+        for (uint32_t j = 0; j < width; ++j) {
+            size_t at = (size_t)inserted * width + j;
+            basis_lo[at] = basis_hi[at] = (int64_t)formed[j];
+        }
+    }
+}
+
 // Candidate finite passive-contact projection.  One block owns one query row and first forms the
 // founding row's shared d/D/N and the query row's dot interval; `founding_rows == 1` broadcasts
 // one immutable source/arrived row over all query rows, while `founding_rows == rows` preserves

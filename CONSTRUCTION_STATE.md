@@ -35,6 +35,13 @@ from joint reorientation. The [NCF0 return](research/records/2026-09-05_NCF0_REC
 states the assumptions and exact native composition boundary. This closes the formal contract
 only; the coupled native learner, usable interface and integrated evidence remain NCF1--NCF4.
 
+[established-bounded; measured] NCF1 has returned a move-owned local constitutive-relation
+accumulator on CUDA, with exact source-domain/vertical-fibre controls and 30 row-space comparisons.
+The [local return](research/records/2026-09-05_NCF1_THE_LOCAL_CONSTITUTIVE_RELATION_FORMS_ON_DEVICE_WITH_ITS_DOMAIN_AND_VERTICAL_FIBRE.md)
+states its explicit linear-chart hypothesis. NCF1 remains open: next join its paired receipt to
+actual native incidence/current and continuing phase/state, retaining contextual conditions and
+addressed lineage. Supplied current pairs and an operation counter do not complete that join.
+
 ## Previous HNP returns — preserved scopes, not the current work order
 
 [proved-derived; formal-checked] HNP0's finite constitutive binding is complete in
