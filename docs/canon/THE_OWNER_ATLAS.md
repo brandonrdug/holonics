@@ -1,8 +1,8 @@
 # The owner atlas: which owner implements or states this, and where
 
 > Historical atlas at its declared August 13 scope. For current owners use
-> [the maintained crosswalk](../ARCHITECTURE_MAP.md) and the subject guides; Provenance supplies
-> graph navigation. The generated claim index mentioned below is now archived.
+> [the maintained crosswalk](../ARCHITECTURE_MAP.md) and the subject guides; dated repository records supply
+> source and evidence navigation. The generated claim index mentioned below is now archived.
 
 **Deposited 2026-08-13.** **Truth status:** `index` — this file asserts nothing of its own. It
 routes, and every claim belongs to the owner it points at and is graded there.

@@ -6,7 +6,11 @@ apparatus; they are not dependencies that schedule native inference.
 
 ## Rust and CUDA
 
-The current native runtime uses the NVIDIA CUDA driver and toolkit. Make `nvcc` available on
+The current native engine/HNA build is Linux/CUDA-bound, including generated PTX and CUDA
+linkage. A Mac checkout does not yet provide an executable engine backend; see
+[hardware and modality boundaries](HARDWARE_AND_MODALITY_BOUNDARIES.md) for the exact dependency
+seam and MLX comparison. Repository documentation and exterior data tools are independent of
+that native runtime. The current native runtime uses the NVIDIA CUDA driver and toolkit. Make `nvcc` available on
 `PATH` (this workstation uses `/opt/cuda/bin`). The kernel builder declares its architecture;
 the driver can JIT the admitted PTX on the actual device. Model material is supplied separately.
 
@@ -31,7 +35,9 @@ target/debug/holonics --format json hna run request.json
 target/debug/holonics hna inspect /path/to/native.rest
 ```
 
-The [Athena guide](ATHENA.md) defines the request and artifact scopes. The current training
+The [native guide](NATIVE_HNA.md) gives the current ground-up phase-session recipes. The
+commands above use the earlier inherited-operator chart, whose campaign remains paused.
+The [Athena guide](ATHENA.md) defines those request and artifact scopes. The current training
 command consumes a continuing prefix sequence and returns a run receipt. A checkpoint/export
 must not be inferred from that receipt.
 

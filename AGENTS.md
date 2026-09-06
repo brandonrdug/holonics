@@ -33,6 +33,12 @@ research, a new subsystem, a qualitative gate or destructive/external permission
 
 ## Pickup and authority
 
+[project-postulate] Brandon's September 6 synthesis ruling records Athena-alpha as planned but
+unattained. Curated conversation material supports the next native cultivation direction for
+English, code and mathematics. Recent mathematical constructions inform native owners; Lean
+never enters cultivation/inference pipelines. Hardware and modality charts share the native
+recurrence; Apple/MLX and audio implementation follow their separately authorized work.
+
 [project-postulate] Brandon's September 5 contextual-transport correction makes **native HNA
 foundations** the present priority, before further Soulkiller/Gemma-led production. Changed
 coefficients or transport do not establish contextual transport; context is the relevant situated
@@ -47,7 +53,7 @@ foundations. Inherited-model work is deferred, not universally banned.
    [live roadmap](docs/plans/THE_ROADMAP.md).
 2. Read the relevant current architecture/interface guide and exact source owners. Use
    [ARCHITECTURE_MAP.md](docs/ARCHITECTURE_MAP.md) to cross Lean, Rust and CUDA ownership,
-   and the subject guides, dated research directories and Provenance to find supporting evidence.
+   and the subject guides, dated research directories and repository-local evidence to find support.
 3. For Eros/Athena/Soulkiller, consult [the retraction history](docs/RETRACTIONS.md) and the
    latest relevant direct messages before revoking a capability or proposing a mechanism.
    [AGENT_PROTOCOL.md](docs/AGENT_PROTOCOL.md) gives the log recipe and apparatus/evidence atlas.
@@ -61,7 +67,7 @@ reread the entire archive, or re-demonstrate an unchanged bounded result before 
 [definition] `docs/canon/` is doctrine; `docs/plans/THE_ROADMAP.md` is the sole construction
 order; `CONSTRUCTION_STATE.md` is the sole current position. `research/`, formal source and
 papers provide evidence at their declared scopes. `archive/`, old commits, imported records and
-Provenance messages schedule nothing. The C++ body and predecessor snapshots are frozen history.
+imported agent messages schedule nothing. The C++ body and predecessor snapshots are frozen history.
 A later direct user ruling resolves contrary agent interpretation; its age does not revoke
 a completed exact construction.
 
@@ -157,8 +163,10 @@ engine.
 - Experiments use the standing body and public owners. A driver may mount inputs and read results;
   it may not manufacture the desired answer, select developmental material from an evaluation
   target, or implement a fixture-local learner.
-- Lean is an exterior proof/verification application. Its syntax or kernel verdict is not native
-  inference topology. Preserve mathematical construction behind every later surface projection.
+- Lean is separate mathematical proof/verification apparatus. Do not embed its parser, compiler,
+  kernel, theorem emitter or verdict in any HNA cultivation/inference pipeline. Lean discussions
+  already present in source conversations remain ordinary material. Reuse the mathematical
+  constructions through their actual native owners, not through a live proof-assistant binding.
 
 ## Repository and verification discipline
 
@@ -168,8 +176,8 @@ declared roots. Age locates forgotten material; actual dependencies and subject 
 placement. Preserve source, measurements and user work recoverably before archiving or deletion.
 
 The maintained owner map is descriptive navigation, not a theorem or scheduler. Update it with
-an owner change. Provenance supersedes the local equation atlas; the generated claim index and
-blanket validation suite are archived. Do not revive them or replace them with another census,
+an owner change. Repository source, subject guides and dated evidence own navigation; the local
+equation atlas, generated claim index and blanket validation suite are archived. Do not revive them or replace them with another census,
 checksum registry or release gate. Content hashes may
 protect a local wire, not define semantic identity, recurrence or authority.
 
@@ -187,6 +195,6 @@ artifact and checks return. Keep the position concise and move completed narrati
 existing records. Commit and push coherent authorized changes; preserve unrelated local files.
 Do not delete caches, source or evidence without authorization and report material removals.
 
-Follow [the evidence/Provenance protocol](docs/AGENT_PROTOCOL.md) when using that exterior
-apparatus. Its graph, messages and schema refinements never displace the repository's source
-owners, canon, roadmap or position. Never let it obstruct an otherwise authorized local repair.
+Follow [the repository evidence protocol](docs/AGENT_PROTOCOL.md). The external memory database
+and connector are retired after the September 6 import; do not query, deposit, message or require
+them for pickup. Imported historical testimony never displaces source, canon, roadmap or position.

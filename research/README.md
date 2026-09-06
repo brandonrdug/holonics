@@ -8,7 +8,8 @@ Use the [mathematical framework and architecture](../docs/ARCHITECTURE.md),
 for the current research direction. The [Soulkiller](../docs/SOULKILLER.md),
 [Athena](../docs/ATHENA.md) and [interoperability](../docs/INTEROPERABILITY.md) guides describe the
 current HNA application's executable scope. Dated evidence remains in `records/`, with conceptual
-navigation in Provenance. [The owner map](../docs/ARCHITECTURE_MAP.md)
+navigation through the [repository evidence protocol](../docs/AGENT_PROTOCOL.md) and
+[September 6 synthesis](records/2026-09-06_REPOSITORY_SYNTHESIS_AND_PORTABLE_EVIDENCE.md). [The owner map](../docs/ARCHITECTURE_MAP.md)
 connects executable and formal source. Experiments, papers and notebooks now live alongside
 these records under `experiments/`, `papers/` and `notebook/`.
 

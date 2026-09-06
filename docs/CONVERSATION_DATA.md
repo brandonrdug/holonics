@@ -5,7 +5,8 @@ must retain what the collaboration actually did, so that native learning can gau
 difference. Packaging the logs is not a reason to install a prover, a conventional trainer or an
 authored semantic scoring mechanism. The [current preparation contract](plans/CONVERSATION_DATA_INTEGRATION.md)
 and [historical findings](../research/records/2026-09-06_CONVERSATION_DATA_PRESERVES_USER_AGENT_DIFFERENCE_WITHOUT_A_PROVER_OR_SYNTHETIC_FEEDBACK.md)
-state this pass's scope. Existing HNA/language capability is preserved.
+state the completed preparation scope. Existing HNA/language capability is preserved;
+Athena-alpha remains unattained under Brandon's subsequent September 6 ruling.
 
 ## The primary distinction
 
@@ -208,3 +209,17 @@ capture exactly, including every source boundary and the curated events. Every e
 checked for the visible-role boundary, absent assigned loss/gold status and separate later
 observations. Eight parent references and one tool return remain unresolved, with seven parent
 candidate links retained; no source is selected merely to make the graph appear complete.
+
+## Cultivation and machine transfer
+
+[definition] The subsequent [Athena synthesis](ATHENA.md#athena-alpha-and-the-next-cultivation)
+places this package in the general English, code and mathematics cultivation direction. It keeps
+actual available ancestry, paired response and later human return distinct when mounting native
+material. The preparation application supplies no native current by subtracting token IDs and no
+Lean parser, kernel, theorem emitter or proof verdict participates in a downstream pipeline.
+
+[definition] Git carries this guide and the preparation source; it does not carry the private
+SQLite dataset or its JSONL exports. The planned desktop conversation campaign uses the refined
+local artifacts above. A MacBook checkout has the source, documentation and imported research
+evidence without transferring the retired side database. Private conversation data, model rests
+and other ignored artifacts require separate intentional transfer if later needed there.

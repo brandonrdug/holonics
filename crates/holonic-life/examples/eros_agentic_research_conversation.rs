@@ -1,4 +1,8 @@
-//! EROS AGENTIC RESEARCH CONVERSATION — the agentic loop, end to end, on real material.
+//! Historical Eros research-conversation apparatus over declared repository material.
+//!
+//! This example is not the conversation-data cultivation pipeline or an attained Athena-alpha.
+//! It supplies two declared questions and records their returned conduct. It supplies no human
+//! feedback; an answer cannot become a user correction by being copied into a feedback event.
 //!
 //! Recovered from the frozen laboratory at `ba8716b5:src/crates/holonic-life/examples/eros_agentic_research_conversation.rs`
 //! (1,327 lines). The file does **not** exist at `a07ff376`: that commit deleted it along with
@@ -11,12 +15,12 @@
 //!
 //! ```text
 //!   question  ->  typed deed  ->  world contact front  ->  world return
-//!             ->  answer      ->  feedback (correction) ->  codec cultivation
-//!             ->  second question, which may conduct through the cultivated codec
+//!             ->  answer      ->  second declared question -> later answer
 //! ```
 //!
-//! Every input is a byte of a file tracked in this repository. No measurement is authored, no
-//! model is executed, no answer text is supplied by this driver.
+//! Source documents are repository files or an explicitly supplied text rest. Questions and
+//! observation apertures are declared by this driver or its caller. Answers come from the
+//! historical language/research owners; this does not establish the current native HNA product.
 //!
 //! ## Four API divergences from the laboratory source, each named
 //!
@@ -60,11 +64,9 @@ use std::{
 };
 
 use body::num::Cog;
-use holonic_structure::CausalMembrane;
 use life::{
     agentic_language::{
-        AgenticLanguageCapability, AgenticLanguageEcology, AgenticLanguageFeedback,
-        AgenticLanguageFeedbackKind, AgenticLanguageOccurrence, AgenticLanguageSpec,
+        AgenticLanguageCapability, AgenticLanguageEcology, AgenticLanguageSpec,
     },
     agentic_research::{
         answer_causes, AgenticResearchAnswer, AgenticResearchSession, MountedResearchInformantWorld,
@@ -81,8 +83,8 @@ const RESEARCH_CAPABILITY: &str = "conditioned-laboratory-history";
 /// The laboratory's own default question, unchanged.
 const DEFAULT_QUESTION: &str = "What carries a continuity obstruction for relational morphology?";
 
-/// A second question, asked after a correction, so the cultivated codec has something to conduct
-/// through. Nothing here asserts the second answer must differ; the run reports whether it did.
+/// A second declared question. No human correction is available in this driver; differences
+/// between these answers are observations, not attribution to user-feedback cultivation.
 const SECOND_QUESTION: &str = "What cultivates contemporary relational morphology?";
 
 /// APERTURE — declared, and small on purpose. This is the **only** aperture this driver applies to
@@ -439,7 +441,7 @@ fn run() -> Result<(), String> {
         .clone()
         .unwrap_or_else(|| DEFAULT_QUESTION.to_owned());
     println!("\nSTATION 6 — THE FIRST QUESTION");
-    println!("  you> {question}");
+    println!("  declared-question> {question}");
     let started = Instant::now();
     let first = session
         .converse_with_world_front(90, &question, |requests| {
@@ -449,60 +451,12 @@ fn run() -> Result<(), String> {
     let first_millis = started.elapsed().as_millis();
     print_answer("FIRST", &first, first_millis);
 
-    // ── STATION 7 — the correction, and the codec it cultivates ─────────────────────────────
-    println!("\nSTATION 7 — THE RETURNED CORRECTION");
-    let correction_text = first.answer.text.clone();
-    let correction = AgenticLanguageFeedback::new(
-        "agentic-research-correction-0",
-        90,
-        first.answer.answer_episode_identity.clone(),
-        AgenticLanguageFeedbackKind::Correction,
-        correction_text.clone(),
-    );
-    println!(
-        "  you> [correction on {}]",
-        first.answer.answer_episode_identity
-    );
-    println!("       {correction_text}");
-    let standing_before = session.agent().standing().reflective_codec_training_events;
-    let feedback_receipt = match session
-        .agent_mut()
-        .receive_occurrence(AgenticLanguageOccurrence::Feedback(&correction))
-    {
-        Ok(life::agentic_language::AgenticLanguageConsequence::Feedback(receipt)) => Some(receipt),
-        Ok(other) => {
-            println!("  correction returned  {other:?}");
-            None
-        }
-        Err(error) => {
-            println!("  correction OBSTRUCTED {error:?}");
-            None
-        }
-    };
-    match feedback_receipt
-        .as_ref()
-        .and_then(|r| r.committed_codec_version.as_ref())
-    {
-        Some(version) => {
-            println!("  committed codec      {}", version.identity);
-            println!(
-                "  cultivation          receiver_views={} active_transductions {} -> {}",
-                version.cultivation.receiver_views,
-                version.cultivation.active_transductions_before,
-                version.cultivation.active_transductions_after
-            );
-        }
-        None => println!("  committed codec      NONE — the correction changed no conduct"),
-    }
-    println!(
-        "  training events      {} -> {}",
-        standing_before,
-        session.agent().standing().reflective_codec_training_events
-    );
+    // No human return was received. Keep the first answer in its actual agent role.
+    println!("\nSTATION 7 — NO HUMAN FEEDBACK SUPPLIED");
 
-    // ── STATION 8 — the second question, after the correction ───────────────────────────────
-    println!("\nSTATION 8 — THE SECOND QUESTION, AFTER THE CORRECTION");
-    println!("  you> {SECOND_QUESTION}");
+    // ── STATION 8 — the next declared question ─────────────────────────────────────────────
+    println!("\nSTATION 8 — THE SECOND DECLARED QUESTION");
+    println!("  declared-question> {SECOND_QUESTION}");
     let started = Instant::now();
     match session.converse_with_world_front(90, SECOND_QUESTION, |requests| {
         world.enact_contact_front(requests)
@@ -546,7 +500,7 @@ fn run() -> Result<(), String> {
             println!("\n  WHAT THE DEED STILL CARRIES");
             println!("    deed still open      {}", session.has_open_deed());
             println!(
-                "    training events      {} (was 0 before the correction)",
+                "    training events      {} (historical owner observation)",
                 standing.reflective_codec_training_events
             );
             println!(

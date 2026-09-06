@@ -40,7 +40,7 @@ document/index checks and source-size ledger are archived; do not revive them. C
 only when that work is relevant. State the actual scope of each receipt.
 
 Do not delete caches, ignored artifacts, source or evidence without authorization. Preserve
-unrelated user changes. Follow the shared Provenance protocol where it applies; the exterior
-apparatus never displaces repository authority.
+unrelated user changes. Follow the [repository evidence protocol](docs/AGENT_PROTOCOL.md);
+all required pickup evidence lives in the repository, with no external memory-database dependency.
 
 The current construction position is in [CONSTRUCTION_STATE.md](CONSTRUCTION_STATE.md).

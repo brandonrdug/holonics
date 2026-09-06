@@ -48,8 +48,8 @@ The explicitly open persistence/compiler bridges are not presented as completed 
 [definition] A one-time private relocation script/stat snapshot is authorized only for these
 moves and their review. It is removed from the maintained tool surface after the relocation;
 it is not a repository census, semantic identity system or new release gate. The old local
-equation atlas and generated navigation/validation suite are archived, not replaced. Provenance
-and the actual directory/subject organization provide navigation.
+equation atlas and generated navigation/validation suite remain archived. The repository layout,
+subject guides and source-linked research records provide navigation.
 
 ## Interoperability contract
 

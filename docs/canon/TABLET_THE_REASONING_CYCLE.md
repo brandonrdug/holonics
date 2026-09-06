@@ -142,7 +142,7 @@ Attention coefficients alone are not a causal explanation; the cause may include
 chart, mounted context, residual lineage, nonlinear reactions, chronology, rebase, routing, cached
 trajectory, decoding apparatus, and later returns.
 
-## 4. Training is the adjoint return
+## 4. The differential adjoint chart of training
 
 Let one forward passage be `|y> = F_Lambda |x>`. The actual return and the presented face form an
 oriented residual `r`; a declared receiver may read a scalar `L = ell_R(r)`.
@@ -158,10 +158,13 @@ grad_G L = G^-1 dL.
 
 Backpropagation is the adjoint return of this covector through the morphology and lineage that
 produced the retained forward carriers, including any previously learned overlays. New deposits
-belong to the successor and must not enter the pullback of that earlier passage. Training is
-developmental recurrence retaining that successor; remount and ablation are narrower persistence
-and attribution receivers, not prerequisites for every operation. Pretraining is conditioning at scale, not a lossless
-archive and not intrinsically lossy without a receiver whose distinction failed to survive.
+belong to the successor and must not enter the pullback of that earlier passage. This is the
+differentiable chart of training; the native constitutive-fibre owner can also retain a relation
+with an open or plural reading, without choosing a total map or derivative. Training is
+developmental recurrence retaining the actual successor; remount and ablation are narrower
+persistence and attribution receivers, not prerequisites for every operation. Pretraining is
+conditioning at scale, not a lossless archive and not intrinsically lossy without a receiver whose
+distinction failed to survive.
 
 ## 5. Compression, reconstruction, and diffusion
 
@@ -171,7 +174,8 @@ scope, pretrained morphology may be read as a deposited compression of prior pas
 its parameter count is smaller than a corpus, but because later conduct rides distinctions retained
 by the morphology while discarded distinctions are invisible to the declared receiver family.
 
-The inverse image of one compressed consequence is its `ReconstructionFiber`. Enlarging the
+The inverse image of one compressed consequence is its `PreimageFibre`
+([operations §5.4](TABLET_THE_OPERATIONS.md#54-preimagefibre-the-preimage-of-a-stable-receiver-quotient)). Enlarging the
 receiver family refines or reopens that fiber. “Loss” is therefore not a scalar substance; it is a
 named distinction which the active quotient cannot reconstruct.
 

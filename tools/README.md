@@ -8,6 +8,6 @@ shows progress and refuses a `sorry` warning. It is opt-in, not an inference dep
 automatic requirement for a Rust edit. Cargo owns Rust build/test discovery.
 
 The superseded suite is in [archive/tooling](../archive/tooling/README.md). Prior Nsight scripts
-are [research instruments](../research/experiments/profiling/README.md). Provenance owns the
-equation-atlas/navigation role; ordinary navigation starts with the
+are [research instruments](../research/experiments/profiling/README.md). Research navigation uses
+repository-local evidence; start with the
 [architecture](../docs/ARCHITECTURE.md) and [directory map](../docs/REPOSITORY.md).

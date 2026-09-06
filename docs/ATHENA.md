@@ -5,6 +5,36 @@ incidence, chronology, lineage and admitted receiver domain. Eros is the composi
 operation that forms and refines it. The current public Rust entry point is `holonics::hna`;
 the application implementations are in [holonics-hna](../crates/holonics-hna/README.md).
 
+## Athena-alpha and the next cultivation
+
+[project-postulate] Brandon's September 6 ruling is explicit: Athena-alpha has been planned but
+has never been attained by his product standard. Historical `AthenaAlphaApplication` types,
+wire names and files named `athena-alpha.rest` retain their bounded apparatus meanings. They
+are not evidence of the intended general model. This does not revoke the separately admitted
+native, SKE, language or sensory results.
+
+[definition] The [conversation dataset](CONVERSATION_DATA.md) is the next cultivation material
+for general English and text codecs concerning code and mathematics. An observed agent reply
+and a later human return retain their actual orientation and chronology. No Lean parser, kernel,
+theorem emitter or verdict enters cultivation/inference; Lean text in the logs remains data.
+
+[established-bounded; source-inspected] Preparation exports actual message operands and their
+relations. The public native phase session consumes exact currents and real source handles;
+`HnaTextApplication` consumes the earlier inherited address/lookup chart. The prepared comparison
+record is not directly either kind of occurrence. The composition must mount available message
+material and its actual incidence through the native material/returned-difference owners, then
+carry native emission into an exterior text receiver. The
+[September 6 synthesis](../research/records/2026-09-06_REPOSITORY_SYNTHESIS_AND_PORTABLE_EVIDENCE.md)
+names those owners and the remaining attachment; it does not install a second learner or turn
+arbitrary token differences into native current.
+
+[definition] The [mathematical synthesis](MATHEMATICS_AND_NATIVE_CONDUCT.md) supplies concrete
+reuse constraints: preserve temporal fibres and both mixed contributions, transport historical
+frames before comparison, and justify condensation for the admitted future operations. The
+[hardware/modality boundary](HARDWARE_AND_MODALITY_BOUNDARIES.md) carries that same contract into
+future device and acoustic charts. This consolidation returns synthesis and repairs, not a
+corpus-trained Athena-alpha artifact.
+
 ## Native-first construction
 
 [established-bounded; measured] NCF1 has returned the ground-up

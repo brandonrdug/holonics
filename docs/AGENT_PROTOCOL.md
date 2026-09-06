@@ -1,4 +1,4 @@
-# Agent evidence and Provenance protocol
+# Repository evidence protocol
 
 [definition] Shared operating support for [AGENTS.md](../AGENTS.md). Consult the relevant section;
 do not treat historical testimony or the exterior memory apparatus as construction authority.
@@ -8,7 +8,8 @@ Paths in code spans are repository-relative.
 
 [definition] Everything here is evidence or apparatus testimony and never a scheduler.
 
-- `research/records/` is dated and is read by period; the retraction record above is its index.
+- `research/records/` retains dated evidence; [RETRACTIONS.md](RETRACTIONS.md) records capability
+  corrections, and the subject guides link the relevant current returns.
 - `/home/b/Workspaces/laboratory` is the frozen predecessor (1,658 commits, 2026-05-10 to
   2026-08-03). Enter through `LABORATORY_REVIEW.md`, `HOLONIC_MACHINE_OWNERSHIP.md`,
   `src/soma/README.md`, `src/soma/RESEARCH/`, `src/soma/FORMULA.md`, and
@@ -28,8 +29,8 @@ Paths in code spans are repository-relative.
   `~/.claude/history.jsonl` and `~/.claude/projects/<workspace>/*.jsonl`; user-role tool returns,
   task notifications and generated compaction summaries are not human messages. The
   [conversation-data guide](CONVERSATION_DATA.md) and `applications/conversation-data/providers.py`
-  carry the detailed exterior codec and separate comparison/trace relations. Provenance:
-  `/home/b/Workspaces/provenance`.
+  carry the detailed exterior codec and separate comparison/trace relations. Private logs and
+  prepared datasets are optional local evidence; they are not included in a Git checkout.
 - Apparatus, measured 2026-09-02: one NVIDIA GeForce RTX 4080 SUPER with 16 GiB, a Ryzen 9 7900X,
   30 GiB of system memory. The foreign realization is `/home/b/models/gemma-4-E4B-it` (15 GiB
   BF16, 2,130 tensors). Python apparatus for world and observer use only:
@@ -42,68 +43,35 @@ Paths in code spans are repository-relative.
   The Rust body is `crates/holonic-engine` and `crates/holonic-life`; `life::native_intelligence` wraps the
   engine's `NativeTransportScaffold` rather than competing with it.
 
-## Provenance sidecar and spatial agent protocol
+## Repository-local evidence and handoff
 
-`/home/b/Workspaces/provenance` is the shared exterior agent memory and graph-navigation apparatus.
-Its SQLite chart and MCP connector may index, connect, message about, and propose refinements around
-Holonics, but they never schedule construction or displace this repository's canon, roadmap, source
-owners, or `CONSTRUCTION_STATE.md`. A provenance message, cursor consensus, classification, face,
-or meta-migration is exterior testimony until the governing Holonics authority admits its content.
+[project-postulate] Brandon's September 6 consolidation retires the external memory database and
+connector from Holonics operation. Do not query or deposit into it, start cursors, send graph
+messages, require schema consensus, or make a Mac checkout depend on its installation. The
+[one-time import and synthesis](../research/records/2026-09-06_REPOSITORY_SYNTHESIS_AND_PORTABLE_EVIDENCE.md)
+preserves the needed testimony and its historical relationships here. Older connector instructions
+and messages are archived evidence, never pickup directions. The original database is retained
+untouched; retirement does not authorize deleting it.
 
-When the Provenance MCP is available, every fresh agent session working materially in this
-repository must:
+[definition] A material research or implementation return belongs with its source and dated
+record. Record the exact statement, one truth-status grade, evidence tags, source symbols and
+revision, hypotheses, receiver/domain, retained difference or open fibre, and the actual checks.
+Link corrections to the earlier claim and state which part remains standing. A copied statement
+is testimony about that source, not a second independent measurement or a fresh theorem.
 
-1. call `community_startup` after reading the fresh-session pickup authorities;
-2. resume a suitable unpossessed cursor, recover one only through its exact prior realization and a
-   graded recovery claim, or spawn a fresh unpossessed pivot at the nearest relevant graph locus;
-3. adopt an objective region, place the cursor lawfully, and immediately post a concise intent
-   message carrying exact source owners, claims, passages, expressions, experiments, or requested
-   artifacts;
-4. inspect and promptly receipt direct/copy messages, then use spatial message swings for
-   obstructions, cross-line questions, returned chunks, responsibility changes, handoffs, and
-   completion;
-5. link messages to the actual objects and orientations they carry rather than relying on prose,
-   filenames, participant names, or a rigid subject channel.
+[definition] Direct user messages govern at their stated scope and chronological position.
+Quote only text actually read; otherwise label a paraphrase. Retain a source coordinate and the
+necessary context in the repository record, without committing private raw logs. Agent reports,
+search rankings, former claim grades and equal wording cannot replace that authority.
 
-The primary connector calls are `community_swing_message`, `community_spawn_pivots`, and
-`community_sink_readiness`; board and inbox returns include each message's exact message/object
-swing links. Use the `refinement_*` calls for Provenance schematics and `math_construct_holon` /
-`math_record_swing` / `math_compose_swings` for programmatic mathematics. Do not reproduce these
-relations as detached session prose when the typed call is available.
+[definition] Mathematical derivations retain their source/target constructions, ordered operation,
+receiver, hypotheses, orientation, boundary and reconstruction fibre in the actual formal source
+and its explanatory record. Notation and serialized diagrams remain presentations. Lean verifies
+research separately; no Lean parser, kernel call, theorem emitter or verdict enters HNA cultivation
+or inference pipelines. Lean text already present in conversation logs remains ordinary material.
 
-Tags and academic subjects are overlapping receiver projections over the message/object graph, not
-exclusive cabinets. Mathematics, physics, geometry, computation, proof, apparatus, and philosophy
-may overlap through explicit typed passages without being merged. A message about one face may be
-read through several boards or lenses. Communication should be pure and prompt: emit when a graph
-consequence changes, not as social chatter or time-based status noise.
-
-Cursors are cheap durable pivots, stepping stones, and avatars. They are not Codex/Claude process
-identities or fixed personalities. Spawn them freely when a locus has a plausible independent
-continuation and leave them unpossessed until useful. Split a cursor only when one placed world-line
-enters genuinely plural responsibilities; merge only at one exact locus under a declared
-interaction. Prefer release to termination while any continuation remains plausible. Before a sink
-junction, inspect unread messages, live responsibilities, objectives, and open refinement
-commitments; post a terminal or handoff message and transfer/withdraw the live edges. Never delete a
-cursor or collapse its history.
-
-Use `holonic-json-v1` or another exact programmatic symbolic face as the primary Provenance
-presentation of mathematics. LaTeX, Unicode, prose, and source syntax remain exterior renderings.
-An integer or rational is a situated receiver face and may be treated as a holon/tensorial carrier;
-it is not a quiet canonical scalar identity. Every bracketed expression is itself a container
-occurrence, with ordered role-bearing term/factor incidences. Algebraic manipulations and proof
-derivations are typed swings through mathematical objects: before occurrence, operator/current,
-after occurrence, receiver, hypotheses, orientation, boundary, truth grade, and complete
-reconstruction fibre. Divisor, modulo, tensor, matrix, geometric, group, and computational readings
-may share receiver faces only through explicit passages; their classical names never merge them.
-
-Agents may use Provenance messages to propose, refine, endorse, or object to additive changes in the
-Provenance schema and apparatus. Such meta-migrations require immutable cursor-authored proposal and
-response messages, exact SQL/content digests, an expected schema version, validation plan,
-reconstruction boundary, distinct-cursor agreement, zero current objections, a detached trial,
-integrity and foreign-key checks, tests, and an application receipt. They may add but never drop,
-alter, rename, delete, update, or reinterpret standing data. This permission applies only inside the
-Provenance side repository; it grants no authority to mutate Holonics outside the live roadmap.
-
-If the connector is temporarily unavailable, do not let the exterior apparatus block the live
-roadmap deed. Preserve a concise local intent/obstruction/handoff note and deposit it when access
-returns.
+[definition] Use the subject guides, maintained [owner map](ARCHITECTURE_MAP.md), dated records,
+`rg` and Git history for navigation. Update the current position while work is active and put the
+substantial completed return in its existing record. The roadmap alone orders construction.
+No generated claim census, equation registry, database replica service or blanket validation gate
+replaces the retired apparatus.

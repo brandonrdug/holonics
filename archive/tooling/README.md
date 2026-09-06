@@ -10,8 +10,8 @@ not maintained validators, current prerequisites or templates for a replacement 
 - `source_shape.py`, `baselines/`: source-size/public-item ledger.
 - `build_m0_source_fixture.sh`: old M0 source-fixture workflow.
 
-[definition] Provenance supersedes the local equation atlas. Current layout and concise subject
-guides supply ordinary navigation. Rust behavior tests and the Lean proof kernel remain useful
+[definition] The local equation atlas remains retired. Current layout, repository-local evidence
+and concise subject guides supply ordinary navigation. Rust behavior tests and the Lean proof kernel remain useful
 when relevant; retiring this orchestration does not erase their scientific results.
 
 [historical; source-inspected] The record-index application is preserved from `08965182`; its

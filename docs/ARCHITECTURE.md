@@ -26,9 +26,9 @@ the broader doctrine; the remainder of this guide describes the current executab
 | Name | Responsibility | Current source |
 |---|---|---|
 | **Holonics** | The mathematical framework and ontology, with executable applications | [Holon](../formal/elementary-holonics/ElementaryHolonics/Foundation/Holon.lean), [mathematics](canon/THE_MATHEMATICS_TABLET.md), [public Rust entry point](../crates/holonics/src/lib.rs) |
-| **HNA** | The Holonic Neural Network architecture and recurrent runtime | [HNA application API](../crates/holonics-hna/src/hna.rs), [native session](../crates/holonic-engine/src/holonic_intelligence/full_operation.rs) |
+| **HNA** | The Holonic Neural Network architecture and recurrent runtime | [native phase session](../crates/holonics-hna/src/native.rs), [constitutive ecology](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [full operator](../crates/holonic-engine/src/holonic_intelligence/full_operation.rs) |
 | **Athena** | A particular native model/ecology, its changing morphology and admitted capability domain | [Athena lifecycle](ATHENA.md) |
-| **Eros** | Composition and developmental recurrence that form/refine Athena | [recurrent return](../crates/holonic-engine/src/holonic_intelligence/operative_return.rs), [adjoint](../crates/holonic-engine/src/holonic_intelligence/operative_backward.rs) |
+| **Eros** | Composition and developmental recurrence that form/refine Athena | [native relation formation](../crates/holonic-engine/src/native_ecology/constitutive_fibre.rs) and [circulation](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [adjoint return](../crates/holonic-engine/src/holonic_intelligence/operative_return.rs) |
 | **Soulkiller** | Independent model-intake, excitation and dismantling apparatus | [Soulkiller](SOULKILLER.md), [consumed-input boundary](../crates/holonic-engine/src/soulkiller/boundary.rs) |
 | **Applications/codecs** | Text, image, audio, files, user protocols and target runtimes | [CLI](../applications/holonics-workbench/src/cli.rs), [interoperability](INTEROPERABILITY.md) |
 
@@ -80,6 +80,10 @@ comparison, quotient/reopening laws, factorized morphology overlays, and residen
 The forward and reverse passages share the morphology that produced the retained carriers;
 new deposits join only after the reverse traversal succeeds. The
 [owner map](ARCHITECTURE_MAP.md) connects the Lean laws with their Rust/CUDA implementations.
+The [mathematical synthesis](MATHEMATICS_AND_NATIVE_CONDUCT.md) carries the recent fluid, moving-frame
+and RH consequences into the native comparison: temporal fibres, full mixed current, transported
+metrics and source/remainder controls. Theorems guide native constructions; Lean does not run in
+cultivation or inference pipelines.
 
 [definition] Finite native arithmetic is exact about its declared representation. Transcendental
 reactions and midpoint projections have their stated enclosure/quotient boundaries. This does
@@ -109,9 +113,12 @@ three cycles. See the [actual receipt](../research/records/2026-09-04_recurrent_
 These are bounded execution results, not a twenty-watt power measurement or a quality comparison
 against frontier models.
 
-## The next production contracts
+## Cultivation direction
 
-[definition] The [live roadmap](plans/THE_ROADMAP.md) now prioritizes native contextual foundations.
+[definition] The [live roadmap](plans/THE_ROADMAP.md) records completed native contextual
+foundations and conversation-data preparation, followed by September 6 synthesis. Athena-alpha
+remains unattained; the subsequent cultivation direction is general English, code and mathematics
+through the [curated conversations](CONVERSATION_DATA.md), using native contextual transport.
 The earlier [production campaign](plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md)
 is paused. Existing prefix/adjoint and tied-head experiments are bounded charts, not the general
 learning contract. Context is the situated organization that makes a relation applicable and
@@ -122,7 +129,7 @@ states the correction and existing mathematical owners to compose.
 [definition] The standard pipeline has explicit products: source/codec configuration; admitted
 native model and insufficiency; an ordered exposure stream; run results and successor model;
 native checkpoint; evaluation result; and a target-specific export. Each carries its actual
-scope. The current checkpoint/session return and remaining streaming/compiler bridges are described in
+scope. The current checkpoint/session returns and remaining product/compiler bridges are described in
 [Athena](ATHENA.md) and [interoperability](INTEROPERABILITY.md).
 
 [project-postulate] Frontier competition must eventually be evaluated through useful language,
@@ -130,3 +137,8 @@ coding, mathematics and multimodal behavior, alongside end-to-end cost, on decla
 tasks and comparable hardware. A test count, selected-token equality or serialization round-trip
 cannot substitute for that product evaluation. Existing exact foundations are reused, not
 repeated as demonstrations before each pipeline improvement.
+
+[definition] Hardware placement and modality codecs are separate charts over the same recurrence.
+The [hardware and modality guide](HARDWARE_AND_MODALITY_BOUNDARIES.md) records the Linux/CUDA
+build boundary, the MLX comparison and existing acoustic owners for subsequent MacBook work.
+It adds no backend or modality-specific learning law.

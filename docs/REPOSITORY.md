@@ -46,7 +46,7 @@ public HNA library is now `holonics-hna`, and `holonics` is the framework entry 
 | `meta/SOURCE_SHAPE_BASELINE.tsv` | Retired under `archive/tooling/baselines/` |
 | Root generated claim index | Retired snapshot under `archive/tooling/` |
 | Universal conceptual crosswalk | [ARCHITECTURE_MAP.md](ARCHITECTURE_MAP.md) |
-| `research/equation-atlas` | `archive/equation-atlas/`; superseded by Provenance |
+| `research/equation-atlas` | `archive/equation-atlas/`; retired historical graph |
 | `output`, `data`, `runs`, `tmp` | `.local/artifacts`, `.local/data`, `.local/runs`, `.local/scratch/previous` |
 | Untracked September 2 fleet files | `.local/archive/fleet-2026-09-02/` |
 
@@ -59,8 +59,10 @@ when following an old inline path. No compatibility symlink makes an old root lo
 
 Start with [architecture](ARCHITECTURE.md), [Soulkiller](SOULKILLER.md), [Athena](ATHENA.md) and
 [interop](INTEROPERABILITY.md). The [owner map](ARCHITECTURE_MAP.md) connects formal and executable
-relations. Dated records remain in `research/records/`; Provenance provides the conceptual
-graph/navigation apparatus. The old generated claim index and equation atlas are archived.
+relations. Dated records remain in `research/records/`; the
+[repository evidence protocol](AGENT_PROTOCOL.md) explains source and correction lineage. The
+one-time imported testimony is local documentation; no database or connector is required.
+The old generated claim index and equation atlas remain archived.
 Completed contracts are grouped under `archive/plans/`, without becoming schedulers again.
 
 ```sh
@@ -88,3 +90,16 @@ not deleted. They are not included in the Git bundle; their existing local copie
 the locations above. Recovery should use a separate checkout or extraction directory so it does
 not overwrite later work. The one-time relocation scripts remain private scratch, not maintained
 repository governance.
+
+## A checkout on another machine
+
+[definition] Git supplies the native/formal source, guides, historical records and the
+[imported research testimony](../research/records/2026-09-06_portable_evidence/README.md).
+The retired side database and connector are not required. The
+[hardware/modality guide](HARDWARE_AND_MODALITY_BOUNDARIES.md) states why the current engine/HNA
+compile path is still Linux/CUDA-bound; Apple support is subsequent implementation work.
+
+[definition] Ignored `.local/` datasets, checkpoints, weights and caches do not travel in a clone.
+The [conversation-data guide](CONVERSATION_DATA.md#cultivation-and-machine-transfer) names the
+private desktop material. Transfer such artifacts separately if needed, preserving their declared
+source, codec and native-base dependencies; do not substitute an export receipt for the artifact.

@@ -1,6 +1,6 @@
 # The document law
 
-**Reconciled 2026-09-04 under Brandon's consolidation instruction.**
+**Reconciled September 4 and September 6, 2026 under Brandon's consolidation instructions.**
 **Truth status:** `project-postulate` — repository documentation discipline, not mathematics.
 
 The former document law is preserved in
@@ -21,7 +21,7 @@ does not create another approval layer for the sole human operator.
 | Architecture and interfaces | `docs/ARCHITECTURE.md`, the Soulkiller/Athena/interoperability guides, and the actual public source owners. |
 | Doctrine | `docs/canon/`, with explicit grades and decisive evidence. |
 | Evidence | `research/records/`, experiments, papers and formal source at their declared scopes. |
-| Navigation | The repository layout, subject guides, manual `docs/ARCHITECTURE_MAP.md` and exterior Provenance graph. |
+| Navigation | The repository layout, subject guides, manual `docs/ARCHITECTURE_MAP.md` and linked dated evidence. |
 | Superseded material | `archive/`, dated and retained as provenance; it schedules nothing. |
 
 Historical evidence inside a doctrinal file stays historical. A date, filename, old imperative,
@@ -48,8 +48,10 @@ required. Age helps recover forgotten work, but does not decide whether its subj
 
 Use direct links to the relevant source or subject guide. Update the manual owner map when its
 owner changes. Do not maintain file counts, regenerate an all-repository index or create another
-catalogue merely to keep a previous catalogue current. Provenance supersedes the local equation
-atlas; that atlas and the old generated claim index are archived.
+catalogue merely to keep a previous catalogue current. The external memory database is retired;
+needed testimony lives in repository documentation under the
+[local evidence protocol](../AGENT_PROTOCOL.md). The equation atlas and generated claim index
+remain archived, with no replacement census.
 
 Maintain documentation when the subject changes. Review the links and claims actually affected.
 Do not make untouched Typst papers, document regexes, heading conventions or source-size ledgers

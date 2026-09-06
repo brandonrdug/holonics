@@ -20,6 +20,34 @@ contracts and records preserve their completed scope; their old imperatives sche
    reread every completed campaign, rerun unchanged expensive receipts, or reconstruct historical
    capability just to start the next authorized repair.
 
+## Completed September 6 synthesis before Athena-alpha cultivation
+
+[definition] Brandon's latest request directs repository-wide synthesis of the available
+Holonics resources, especially the recent native HNA and Navier–Stokes/RH lines, and a one-time
+import of needed side-database testimony into repository documentation. After import, the external
+memory database and connector are retired from operation. The [evidence protocol](../AGENT_PROTOCOL.md)
+owns local source, correction and handoff practice.
+
+[project-postulate] Athena-alpha has been planned but never attained by Brandon's standard.
+The next model direction is cultivation from the curated general conversation material for
+English, code and mathematics. Lean must not be embedded in any cultivation/inference pipeline;
+Lean discussions in the logs remain ordinary material. Completed native and inherited apparatus
+results retain their declared scopes.
+
+[definition] The current pass integrates the
+[mathematical consequences](../MATHEMATICS_AND_NATIVE_CONDUCT.md),
+[hardware and modality boundaries](../HARDWARE_AND_MODALITY_BOUNDARIES.md), source repairs and
+[portable evidence](../../research/records/2026-09-06_REPOSITORY_SYNTHESIS_AND_PORTABLE_EVIDENCE.md).
+Apple/MLX and planned audio/acoustics work inform this comparison; their implementation and the
+subsequent corpus-cultivation campaign are separate work. This pass does not resume the paused
+inherited-first sequence, invent a new native subsystem or impose a new qualitative gate.
+
+[established-bounded; process-audit] The consolidation returned the portable testimony, source-linked
+synthesis, corrected live consumers, removal of fabricated human feedback in the older Eros
+example, exact archival comparisons and a passing focused Cargo check. See the
+[completed record](../../research/records/2026-09-06_REPOSITORY_SYNTHESIS_AND_PORTABLE_EVIDENCE.md).
+No trained Athena-alpha, Apple backend or audio campaign was claimed by this return.
+
 ## Completed conversation-data integration/preparation
 
 [definition] Brandon's September 6 request directs [conversation-data integration](CONVERSATION_DATA_INTEGRATION.md):

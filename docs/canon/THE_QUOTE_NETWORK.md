@@ -2,7 +2,7 @@
 
 > Dated quotation/evidence collection, not a current capability or tooling index. Read its
 > repository-status prose at its deposit date. Current organization is described in
-> [the repository guide](../REPOSITORY.md); Provenance supersedes the local equation atlas.
+> [the repository guide](../REPOSITORY.md); the local equation atlas remains archived; current evidence is repository-local.
 
 **Deposited 2026-08-07.** The provenance spine: where every idea in this project came from, in
 Brandon's own words, organised by theme and cross-referenced to what carries the idea in this

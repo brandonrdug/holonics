@@ -6,6 +6,14 @@ root construction state records current implementation scope. Paths in code span
 
 ## Capability and retraction record
 
+[project-postulate] Brandon's September 6 ruling states that Athena-alpha has never been
+attained by his product standard. Historical alpha filenames, type names and campaign completion
+claims retain only their explicitly demonstrated apparatus/model-material scopes. The
+[consolidation](../research/records/2026-09-06_REPOSITORY_SYNTHESIS_AND_PORTABLE_EVIDENCE.md)
+also removes the older research-conversation example's fabricated self-answer-as-human-correction
+step. Its earlier transcript remains evidence about that defective driver, not user feedback.
+
+
 [historical; source-inspected] September 5 contextual-transport correction: the expectation that
 `The cube is blue` should become a freely portable association is withdrawn. A changed map or
 new prompt does not establish contextual identification and transport. The tied-head draft's

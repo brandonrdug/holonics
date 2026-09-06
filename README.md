@@ -61,6 +61,13 @@ For Rust clients, `crates/holonics` exposes `holonics::hna`, `holonics::soulkill
 `holonics::interop`. Existing Safetensors/ONNX package exports preserve Holonics artifacts;
 compilation into standard executable model architectures has its own [contract](docs/INTEROPERABILITY.md).
 
+[definition] Athena-alpha remains a planned, unattained product. The
+[September 6 synthesis](research/records/2026-09-06_REPOSITORY_SYNTHESIS_AND_PORTABLE_EVIDENCE.md)
+joins the prepared conversations, recent mathematics and native owners, and imports the needed
+research testimony into this repository. Pickup needs no external memory database. The
+[hardware/modality guide](docs/HARDWARE_AND_MODALITY_BOUNDARIES.md) records the current Linux/CUDA
+build boundary and future Apple/audio composition.
+
 ## Repository map
 
 | Directory | Purpose |
@@ -79,5 +86,5 @@ compilation into standard executable model architectures has its own [contract](
 shared agent contract. History and retired plans do not silently schedule new work.
 
 Use the [owner map](docs/ARCHITECTURE_MAP.md) for Lean–Rust–CUDA relations, the
-subject guides and Provenance for research navigation, and the
+subject guides and dated repository evidence for research navigation, and the
 [repository/recovery guide](docs/REPOSITORY.md) for relocated paths and backups.

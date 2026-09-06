@@ -580,8 +580,8 @@ The source-specific PDE or arithmetic inequality is the part that does not trans
 storage, boundary flux and chronology productive questions for research. Physical instantiations
 retain calibrated units and constitutive laws. The objective is a growing body of explanations
 and executable methods whose derivations and unsuccessful alternatives remain recoverable.
-Preserve candidate ancestry and the equation that rejected it in existing research records and
-Provenance, not merely a terminal proof or a scalar success score.
+Preserve candidate ancestry, the equation that rejected it, full hypotheses and residual in
+existing source-linked research records, not merely a terminal proof or a scalar success score.
 
 [established-bounded; computational-witness] MFR0's exact symbolic check returned the normalized
 PDE chain-rule coefficients with `b=ell/a`, the Riccati/reciprocal clock identities, all five

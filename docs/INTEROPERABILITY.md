@@ -58,16 +58,22 @@ can be useful and honestly graded; an exact claim requires its full declared con
 If a target architecture cannot express the required relation, the compiler returns the precise
 unsupported operation/state/receiver boundary rather than a mislabeled package.
 
-## The pipeline now to be built on this interface
+## Native persistence and remaining executable lowering
 
-[open] The full native cultivated checkpoint and standard executable lowering are not yet
-returned by the existing export owner. Their ordered construction now belongs to the
-[production-HNA campaign](plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md),
-which first joins the concrete local-learning and occurrence contracts. Its outward branch carries
-native checkpoint/remount, a target-operation/state map, standard weights/graph/configuration and
-matched target-runtime execution, followed by actual additional family adapters. A frozen target
-exports an inference projection of a cultivated rest, not the whole continuing learner. Live
-stateful execution and export of developmental updates owe their additional successor laws.
+[established-bounded; measured] Native cultivated persistence has returned in two distinct
+families: the earlier dependency-bearing full-operator checkpoint (HNP3) and the dependency-free
+native phase checkpoint, including optional world/stream continuation (NCF4). The
+[Athena guide](ATHENA.md#model-artifacts-and-persistence) and [native guide](NATIVE_HNA.md)
+name their actual owners. Neither is an export produced by the older package-conversion owner.
+
+[open] Standard executable lowering still requires the actual target-operation/state map,
+coefficients/configuration, numeric projection, decoder boundary and matched target execution.
+The inherited-first [production campaign](plans/THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md)
+remains paused; its old outward branch is not automatic construction order. A frozen target
+exports an inference projection of a cultivated rest; exporting a continuing learner additionally
+owes its developmental successor law. Apple execution is a device-realization question described
+in [hardware boundaries](HARDWARE_AND_MODALITY_BOUNDARIES.md), distinct from either package storage
+or standard-model export.
 
 [definition] The public namespace `holonics::interop` exposes tensor/configuration/ONNX intake;
 `holonics::interop::packages` exposes the existing package export/import owners. It does not present a stub portable-model compiler
