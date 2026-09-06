@@ -2,8 +2,10 @@
 use std::path::Path;
 
 use holonics::hna::{
-    inspect_native_restricted_rest, run_hna, AthenaTokenApplication, HnaCultivationAperture,
-    HnaOccurrence, HnaRunReceipt, HnaRunRequest, HnaSource,
+    inspect_native_restricted_rest,
+    native::{run_wave_control, WaveControlSpec},
+    run_hna, AthenaTokenApplication, HnaCultivationAperture, HnaOccurrence, HnaRunReceipt,
+    HnaRunRequest, HnaSource,
 };
 use serde_json::json;
 
@@ -17,6 +19,23 @@ fn owner(error: impl std::fmt::Display) -> WorkbenchError {
 pub fn execute(command: HnaCommand) -> Result<AdapterReturn, WorkbenchError> {
     match command {
         HnaCommand::Session { .. } => Err(owner("streaming HNA sessions require the process stream entry point or holonics::hna::HnaStream, not a batch response collector")),
+        HnaCommand::NativeSession { .. } => Err(owner("native streaming sessions require the process stream entry point or holonics::hna::HnaStream, not a batch response collector")),
+        HnaCommand::WaveControl { spec } => {
+            let bytes = std::fs::read(&spec).map_err(owner)?;
+            let spec: WaveControlSpec = serde_json::from_slice(&bytes).map_err(owner)?;
+            let result = run_wave_control(&spec).map_err(owner)?;
+            let payload = serde_json::to_value(&result).map_err(owner)?;
+            let mut returned=AdapterReturn::consequence(
+                "hna/wave-control",
+                "Ran the declared native wave-control specification",
+                payload,
+            );
+            if result.interruption.is_some() {
+                returned.level=crate::EventLevel::Obstruction;
+                returned.summary="Native wave control interrupted; actual exterior consequences are retained in the report".into();
+            }
+            Ok(returned)
+        }
         HnaCommand::Run { request } => {
             let bytes = std::fs::read(&request).map_err(owner)?;
             let request: HnaRunRequest = serde_json::from_slice(&bytes).map_err(owner)?;

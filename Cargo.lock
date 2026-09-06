@@ -928,6 +928,7 @@ dependencies = [
  "holonic-engine",
  "holonics-circulation-abi",
  "life",
+ "num-bigint",
  "num-rational",
  "num-traits",
  "serde",

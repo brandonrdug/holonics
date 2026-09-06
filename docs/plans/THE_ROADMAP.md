@@ -22,7 +22,7 @@ contracts and records preserve their completed scope; their old imperatives sche
 
 ## Current HNA direction: native contextual foundations
 
-**Current construction:** NCF3 — native development/inference interface and situated application.
+**Current construction:** NCF4 — durable native model and integrated foundation return.
 
 [definition] Brandon has explicitly requested the corrected goal and continued construction.
 The [native-HNA contract](THE_NATIVE_HNA_FOUNDS_CONTEXTUAL_TRANSPORT_BEFORE_INHERITANCE.md)
@@ -41,8 +41,14 @@ formation and successor in one resident operation.
 
 [established-bounded; measured] [NCF2 returned](../../research/records/2026-09-05_NCF2_THE_LIVE_RECHART_CARRIES_THE_RELATION_AND_RETURNS_OLD_SOURCES_THROUGH_THEIR_FRAMES.md)
 live phase/incident/relation recharting with immutable historical frames, explicit old-source
-transport and full receiver/obstruction controls. NCF3--NCF4 still owe the production interface,
-independently usable application and durable integrated result.
+transport and full receiver/obstruction controls.
+
+[established-bounded; measured] [NCF3 returned](../../research/records/2026-09-05_NCF3_THE_NATIVE_SESSION_DRIVES_AN_INDEPENDENT_CURRENT_APPLICATION_AND_RETAINS_OPEN_READINGS.md)
+the public native current session, shared JSONL delivery and independent phase-current application.
+Its actual actuation changes exterior state; new currents, gauge/physical changes and open/refused
+conduct retain their exact scopes. NCF4 now owes complete native artifacts, process-separated
+further development and integrated contextual/resource evidence. A live session/report is not
+a persistent model or completion of the corrected goal.
 
 [project-postulate] Brandon's latest contextual-transport correction supersedes the inherited-first
 order below. Audit and compose the existing native occurrence, chart/channel, current, comparison,

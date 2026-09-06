@@ -12,6 +12,7 @@ mod diffusion;
 mod hna;
 mod input_material;
 mod material_codec;
+pub mod native;
 mod publication;
 mod receivers;
 mod recurrent_operator;

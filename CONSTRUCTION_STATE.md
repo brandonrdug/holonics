@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** 2026-09-05. **Current HNA construction:** NCF3 — native development/inference interface and application.
+**Currency:** 2026-09-06. **Current HNA construction:** NCF4 — durable native model and integrated foundation return.
 
 This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md) orders work;
 completed history stays in its existing records and Git. Brandon's latest direct instruction
@@ -25,9 +25,11 @@ integration removed and its measurements preserved.
 
 [definition] Brandon subsequently authorized the corrected goal and continued work. The
 [native-HNA construction contract](docs/plans/THE_NATIVE_HNA_FOUNDS_CONTEXTUAL_TRANSPORT_BEFORE_INHERITANCE.md)
-is active. NCF3 now exposes the same native owner through a usable application interface:
-frame-qualified current, actual source/receiving handles, open fibres and continuing development.
-An independently evolving application must use that owner, not a fixture-local learner.
+is active. NCF3 has returned the same native owner through the public current/session interface
+and an independently evolving application. NCF4 now owes complete native artifacts and
+process-separated continuation: relation/phase, historical frames/material, actual source and
+receiving lineage, exterior source handles, pending stream output and application world state.
+Cold/warm resource and contextual continuation evidence must accompany that integrated return.
 
 [proved-derived; formal-checked] NCF0 returned range-restricted receiver transport through an
 actual admitted crossing and the finite branch/drive controls distinguishing changed conditions
@@ -54,7 +56,15 @@ transports phase, incidence, learned relation and old-source frames without rewr
 emissions/material. Full held-state pullbacks carry their middle-frame passage. Twenty-two native
 controls and the formal rebase/recurrence laws passed, including residual classes, plural fibres,
 physical changes and refusal without partial state mutation. Production adapters/application and
-durable process-separated models remain NCF3--NCF4.
+durable process-separated models were the subsequent NCF3--NCF4 obligations.
+
+[established-bounded; measured] NCF3 is complete at the native phase-interface and independent
+linear-current application scope. The [NCF3 return](research/records/2026-09-05_NCF3_THE_NATIVE_SESSION_DRIVES_AN_INDEPENDENT_CURRENT_APPLICATION_AND_RETAINS_OPEN_READINGS.md)
+records the public Rust/JSONL session, actual eight-cycle actuator/world return, new fields across
+gauge/physical changes, open readings and retained interruption. Twenty-two native controls,
+six public CUDA controls, 37 HNA and ten workbench tests passed. The [native guide](docs/NATIVE_HNA.md)
+gives working recipes. These live sessions/reports are explicitly nonpersistent; NCF4 is not
+closed by their bounded application result, and no language/general-context capability is claimed.
 
 ## Previous HNP returns — preserved scopes, not the current work order
 

@@ -1,8 +1,19 @@
 # HNA application interfaces
 
-Use the public framework through `holonics::hna`; this crate owns its application adapters.
-The [Athena guide](../../docs/ATHENA.md) defines the supported run requests, inference and
-developmental sequence, selected-face receipts and persistence boundaries.
+[definition] Use the public framework through `holonics::hna`; this crate owns its application
+adapters. The [native guide](../../docs/NATIVE_HNA.md) documents the ground-up phase body;
+the [Athena guide](../../docs/ATHENA.md) retains the inherited-operator interface and artifact scopes.
+
+[established-bounded; implemented-exact] `native::{NativeModelSpec, with_native_session,
+NativeSession}` exposes one developing native phase ecology. Exact-current reception, owned
+source handles, live rechart, incidence changes and open/plural receiver readings share the
+same engine owner. `HnaStream::pump_native` uses the existing backpressured JSONL delivery.
+`native::run_wave_control` composes an independent exterior current system with this public API;
+it contains no private learner. Native seed/report files are not persistent learned models.
+
+## Earlier inherited-operator interface
+
+[established-bounded; source-inspected] These interfaces retain their existing bounded scope:
 
 - `run_hna` mounts the supported resident realization or admitted restricted SKE material and
   executes an ordered sequence in one continuing native session.
@@ -30,9 +41,9 @@ developmental sequence, selected-face receipts and persistence boundaries.
   or native contextual foundations. The portable-fact framing and CLI promotion were withdrawn. See the
   [contextual audit](../../research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md).
 
-The lower-level native session remains available from `holonic-engine` for interactive consumers.
-Earlier alpha/circulation adapters retain their exact artifact and wire scopes; they are not
-checkpoints of the cultivated full operator. The new native checkpoint is distinct from those
-older packages. See the Athena guide for versioned requests, required final checkpoints, delivery
+[definition] Lower-level native owners remain available from `holonic-engine`. Earlier
+alpha/circulation adapters retain their exact artifact and wire scopes; they are not checkpoints
+of the cultivated full operator. That inherited-operator checkpoint is also not an artifact of
+the new ground-up phase body. See the Athena guide for versioned requests, required final checkpoints, delivery
 limits and the still-bounded admitted family. Standard executable model export is a separate
 [interoperability contract](../../docs/INTEROPERABILITY.md).

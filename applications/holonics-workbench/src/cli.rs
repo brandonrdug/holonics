@@ -91,6 +91,19 @@ pub enum HnaCli {
         #[arg(long, default_value_t = 14, conflicts_with = "resume")]
         series_terms: u32,
     },
+    /// Live native phase session; native checkpoint support is not yet implemented.
+    NativeSession {
+        /// Native model specification JSON.
+        seed: PathBuf,
+        /// JSONL input path, or `-` for standard input.
+        #[arg(long, default_value = "-")]
+        input: PathBuf,
+    },
+    /// Run the declared native wave-control adapter from a JSON specification.
+    WaveControl {
+        /// Wave-control specification JSON.
+        spec: PathBuf,
+    },
 }
 
 impl From<HnaCli> for HnaCommand {
@@ -131,6 +144,8 @@ impl From<HnaCli> for HnaCommand {
                 learning_shift,
                 series_terms,
             },
+            HnaCli::NativeSession { seed, input } => Self::NativeSession { seed, input },
+            HnaCli::WaveControl { spec } => Self::WaveControl { spec },
         }
     }
 }
@@ -697,5 +712,37 @@ mod tests {
             "1"
         ])
         .is_err());
+    }
+
+    #[test]
+    fn native_session_and_wave_control_parse_their_positional_specs() {
+        let native = parse_cli(["holonics", "hna", "native-session", "seed.json"])
+            .expect("native session parse");
+        assert!(matches!(
+            native.command,
+            Some(WorkbenchCommand::Hna(HnaCommand::NativeSession { ref seed, ref input }))
+            if seed == &PathBuf::from("seed.json") && input == &PathBuf::from("-")
+        ));
+        let native_input = parse_cli([
+            "holonics",
+            "hna",
+            "native-session",
+            "seed.json",
+            "--input",
+            "events.jsonl",
+        ])
+        .expect("native session input parse");
+        assert!(matches!(
+            native_input.command,
+            Some(WorkbenchCommand::Hna(HnaCommand::NativeSession { ref input, .. }))
+            if input == &PathBuf::from("events.jsonl")
+        ));
+        let wave = parse_cli(["holonics", "hna", "wave-control", "wave.json"])
+            .expect("wave control parse");
+        assert!(matches!(
+            wave.command,
+            Some(WorkbenchCommand::Hna(HnaCommand::WaveControl { ref spec }))
+            if spec == &PathBuf::from("wave.json")
+        ));
     }
 }

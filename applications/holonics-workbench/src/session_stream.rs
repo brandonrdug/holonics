@@ -2,11 +2,13 @@
 //! Workbench response collector so responses are flushed while the native owner remains live.
 use crate::HnaCommand;
 use holonics::hna::{
-    HnaCultivationAperture, HnaModel, HnaSessionAnatomy, HnaSessionError, HnaStreamDisposition,
+    native::{with_native_session, NativeModelSpec, NativeSessionAnatomy, NativeSessionError},
+    HnaCultivationAperture, HnaModel, HnaSessionAnatomy, HnaSessionError, HnaStream,
+    HnaStreamDisposition,
 };
 use serde::Serialize;
 use std::{
-    fs::File,
+    fs::{self, File},
     io::{self, BufRead, BufReader, Write},
     path::PathBuf,
 };
@@ -20,6 +22,57 @@ pub struct HnaStreamProcessReceipt {
     pub checkpoint_octets: u64,
     pub transport_sequence: u64,
     pub anatomy: HnaSessionAnatomy,
+}
+
+#[derive(Debug, Serialize)]
+pub struct NativeHnaStreamProcessReceipt {
+    pub schema: &'static str,
+    pub disposition: Option<HnaStreamDisposition>,
+    pub stream_error: Option<String>,
+    pub transport_sequence: u64,
+    pub anatomy: NativeSessionAnatomy,
+    pub persistent: bool,
+}
+
+pub fn run_native_session_stream(
+    command: HnaCommand,
+) -> Result<NativeHnaStreamProcessReceipt, NativeSessionError> {
+    let HnaCommand::NativeSession { seed, input } = command else {
+        return Err(NativeSessionError::Application(
+            "expected a native streaming session command".into(),
+        ));
+    };
+    let seed = fs::read(&seed).map_err(|error| {
+        NativeSessionError::Application(format!("cannot read native seed {:?}: {error}", seed))
+    })?;
+    let spec = NativeModelSpec::read(&seed)?;
+    let mut input: Box<dyn BufRead> = if input.as_os_str() == "-" {
+        Box::new(io::stdin().lock())
+    } else {
+        Box::new(BufReader::new(File::open(&input).map_err(|error| {
+            NativeSessionError::Application(format!(
+                "cannot read native input {:?}: {error}",
+                input
+            ))
+        })?))
+    };
+    let mut output = io::stdout().lock();
+    let mut stream = HnaStream::new();
+    with_native_session(&spec, |session| {
+        let result = stream.pump_native(session, &mut input, &mut output);
+        let (disposition, stream_error) = match result {
+            Ok(disposition) => (Some(disposition), None),
+            Err(error) => (None, Some(error.to_string())),
+        };
+        Ok(NativeHnaStreamProcessReceipt {
+            schema: "org.holonics.hna.native-stream-process.v1",
+            disposition,
+            stream_error,
+            transport_sequence: stream.state().sequence,
+            anatomy: session.inspect(),
+            persistent: false,
+        })
+    })
 }
 
 pub fn run_hna_session_stream(

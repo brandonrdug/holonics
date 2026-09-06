@@ -24,6 +24,19 @@ pub struct HnaStreamRequest {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "action", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum HnaStreamCommand {
+    ReceiveCurrent {
+        current: crate::native::CurrentWire,
+        #[serde(default)]
+        source: Option<u64>,
+    },
+    Rechart {
+        gauges: Vec<crate::native::CurrentWire>,
+    },
+    ReplaceIncidence {
+        node: usize,
+        transport: crate::native::CurrentWire,
+    },
+    InspectRelation,
     Advance {
         occurrence: HnaOccurrence,
         #[serde(default)]
@@ -137,6 +150,15 @@ impl HnaStream {
         self.pump_target(session, input, output)
     }
 
+    pub fn pump_native(
+        &mut self,
+        session: &mut crate::native::NativeSession<'_>,
+        input: &mut impl BufRead,
+        output: &mut impl Write,
+    ) -> Result<HnaStreamDisposition, HnaStreamError> {
+        self.pump_target(session, input, output)
+    }
+
     fn emit(&mut self, event: &str, value: Value) -> Result<(), HnaStreamError> {
         let mut bytes = serde_json::to_vec(&json!({"schema":HNA_STREAM_EVENT_SCHEMA,
             "sequence":self.state.sequence,"event":event,"value":value}))?;
@@ -225,6 +247,34 @@ impl HnaStream {
             self.state.input.clear();
             self.state.input_complete = false;
             match request.command {
+                HnaStreamCommand::ReceiveCurrent { current, source } => {
+                    match target.receive_current(&current, source) {
+                        Ok(value) => self.emit("current-received", value)?,
+                        Err(error) => {
+                            self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?
+                        }
+                    }
+                }
+                HnaStreamCommand::Rechart { gauges } => match target.rechart(&gauges) {
+                    Ok(value) => self.emit("recharted", value)?,
+                    Err(error) => {
+                        self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?
+                    }
+                },
+                HnaStreamCommand::ReplaceIncidence { node, transport } => {
+                    match target.replace_incidence(node, &transport) {
+                        Ok(value) => self.emit("incidence-replaced", value)?,
+                        Err(error) => {
+                            self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?
+                        }
+                    }
+                }
+                HnaStreamCommand::InspectRelation => match target.inspect_relation() {
+                    Ok(value) => self.emit("relation", value)?,
+                    Err(error) => {
+                        self.emit("refused", json!({"error":error,"anatomy":target.inspect()}))?
+                    }
+                },
                 HnaStreamCommand::Advance {
                     occurrence,
                     full_emission,
@@ -285,13 +335,79 @@ impl Default for HnaStream {
 }
 
 /// Only an exterior effect seam for I/O tests. Native current and learning are never callbacks
-/// supplied through the public stream protocol; the production implementation uses HnaSession.
+/// supplied through the public stream protocol; actual adapters use HnaSession or NativeSession.
 trait StreamTarget {
+    fn receive_current(
+        &mut self,
+        _: &crate::native::CurrentWire,
+        _: Option<u64>,
+    ) -> Result<Value, String> {
+        Err("current reception is not supported by this model kind".into())
+    }
+    fn rechart(&mut self, _: &[crate::native::CurrentWire]) -> Result<Value, String> {
+        Err("live phase recharting is not supported by this model kind".into())
+    }
+    fn replace_incidence(
+        &mut self,
+        _: usize,
+        _: &crate::native::CurrentWire,
+    ) -> Result<Value, String> {
+        Err("phase incidence replacement is not supported by this model kind".into())
+    }
+    fn inspect_relation(&self) -> Result<Value, String> {
+        Err("local relation inspection is not supported by this model kind".into())
+    }
     fn advance(&mut self, occurrence: &HnaOccurrence, full: bool) -> Result<Value, String>;
     fn advance_native(&mut self, occurrence: &HnaOccurrence, full: bool) -> Result<Value, String>;
     fn inspect(&self) -> Value;
     fn checkpoint(&self, path: &Path, transport: &HnaStreamState) -> Result<(), String>;
     fn supply_input_material(&mut self, path: &Path) -> Result<(), String>;
+}
+
+impl StreamTarget for crate::native::NativeSession<'_> {
+    fn receive_current(
+        &mut self,
+        current: &crate::native::CurrentWire,
+        source: Option<u64>,
+    ) -> Result<Value, String> {
+        self.receive(current, source)
+            .map(|v| json!(v))
+            .map_err(|e| e.to_string())
+    }
+    fn rechart(&mut self, gauges: &[crate::native::CurrentWire]) -> Result<Value, String> {
+        crate::native::NativeSession::rechart(self, gauges)
+            .map(|v| json!(v))
+            .map_err(|e| e.to_string())
+    }
+    fn replace_incidence(
+        &mut self,
+        node: usize,
+        transport: &crate::native::CurrentWire,
+    ) -> Result<Value, String> {
+        crate::native::NativeSession::replace_incidence(self, node, transport)
+            .map(|_| json!(self.inspect()))
+            .map_err(|e| e.to_string())
+    }
+    fn inspect_relation(&self) -> Result<Value, String> {
+        self.relation_snapshot()
+            .map(|v| json!(v))
+            .map_err(|e| e.to_string())
+    }
+    fn inspect(&self) -> Value {
+        json!(crate::native::NativeSession::inspect(self))
+    }
+    fn advance(&mut self, _: &HnaOccurrence, _: bool) -> Result<Value, String> {
+        Err("address/token occurrences do not define native phase currents".into())
+    }
+    fn advance_native(&mut self, _: &HnaOccurrence, _: bool) -> Result<Value, String> {
+        Err("address/token occurrences do not define native phase currents".into())
+    }
+    fn checkpoint(&self, _: &Path, _: &HnaStreamState) -> Result<(), String> {
+        Err("native phase persistence is not implemented yet; an inherited checkpoint cannot represent this body".into())
+    }
+    fn supply_input_material(&mut self, _: &Path) -> Result<(), String> {
+        Err("inherited lookup rows do not define native phase material".into())
+    }
 }
 
 impl StreamTarget for HnaSession<'_, '_> {
@@ -416,12 +532,18 @@ mod tests {
 
     #[test]
     fn supplied_material_is_receipted_without_manufacturing_a_native_occurrence() {
-        let bytes=request(HnaStreamCommand::SupplyInputMaterial {path:PathBuf::from("input.safetensors")});
-        let mut stream=HnaStream::new(); let mut target=Target::default(); let mut output=Vec::new();
-        stream.pump_target(&mut target,&mut Cursor::new(bytes),&mut output).unwrap();
-        assert_eq!(target.advances,0);
-        let event:Value=serde_json::from_slice(&output).unwrap();
-        assert_eq!(event["event"],"input-material-supplied");
+        let bytes = request(HnaStreamCommand::SupplyInputMaterial {
+            path: PathBuf::from("input.safetensors"),
+        });
+        let mut stream = HnaStream::new();
+        let mut target = Target::default();
+        let mut output = Vec::new();
+        stream
+            .pump_target(&mut target, &mut Cursor::new(bytes), &mut output)
+            .unwrap();
+        assert_eq!(target.advances, 0);
+        let event: Value = serde_json::from_slice(&output).unwrap();
+        assert_eq!(event["event"], "input-material-supplied");
     }
 
     struct PartialInput {

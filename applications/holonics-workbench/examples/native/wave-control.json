@@ -1,0 +1,158 @@
+{
+  "schema": "org.holonics.hna.wave-control.v1",
+  "model": {
+    "schema": "org.holonics.hna.native-phase-seed.v1",
+    "nodes": [
+      {
+        "incoming_admittance": 1,
+        "held_admittance": 2,
+        "incoming_transport": {
+          "real": {
+            "numerator": "1",
+            "denominator": "1"
+          },
+          "imaginary": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        },
+        "initial_held": {
+          "real": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "imaginary": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        }
+      },
+      {
+        "incoming_admittance": 2,
+        "held_admittance": 1,
+        "incoming_transport": {
+          "real": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "imaginary": {
+            "numerator": "1",
+            "denominator": "1"
+          }
+        },
+        "initial_held": {
+          "real": {
+            "numerator": "0",
+            "denominator": "1"
+          },
+          "imaginary": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        }
+      }
+    ]
+  },
+  "world": {
+    "couplings": [
+      {
+        "real": {
+          "numerator": "1",
+          "denominator": "2"
+        },
+        "imaginary": {
+          "numerator": "1",
+          "denominator": "2"
+        }
+      },
+      {
+        "real": {
+          "numerator": "2",
+          "denominator": "3"
+        },
+        "imaginary": {
+          "numerator": "-1",
+          "denominator": "3"
+        }
+      }
+    ],
+    "state_rotation": {
+      "real": {
+        "numerator": "0",
+        "denominator": "1"
+      },
+      "imaginary": {
+        "numerator": "1",
+        "denominator": "1"
+      }
+    },
+    "initial_state": {
+      "real": {
+        "numerator": "1",
+        "denominator": "1"
+      },
+      "imaginary": {
+        "numerator": "-1",
+        "denominator": "1"
+      }
+    }
+  },
+  "initial_current": {
+    "real": {
+      "numerator": "1",
+      "denominator": "1"
+    },
+    "imaginary": {
+      "numerator": "0",
+      "denominator": "1"
+    }
+  },
+  "cycles": 8,
+  "interventions": [
+    {
+      "before_cycle": 4,
+      "change": {
+        "action": "rechart",
+        "gauges": [
+          {
+            "real": {
+              "numerator": "0",
+              "denominator": "1"
+            },
+            "imaginary": {
+              "numerator": "1",
+              "denominator": "1"
+            }
+          },
+          {
+            "real": {
+              "numerator": "1",
+              "denominator": "1"
+            },
+            "imaginary": {
+              "numerator": "0",
+              "denominator": "1"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "before_cycle": 5,
+      "change": {
+        "action": "replace-incidence",
+        "node": 0,
+        "transport": {
+          "real": {
+            "numerator": "-1",
+            "denominator": "1"
+          },
+          "imaginary": {
+            "numerator": "0",
+            "denominator": "1"
+          }
+        }
+      }
+    }
+  ]
+}

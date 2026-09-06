@@ -21,6 +21,29 @@ pub struct NativePhaseCurrent {
 }
 
 impl NativePhaseCurrent {
+    /// Exact apparatus-mouth conversion. No midpoint or floating-point approximation is used.
+    pub fn from_current(current: &ExactComplexWaveCurrent) -> Result<Self, ConstitutiveFibreError> {
+        use num_traits::{ToPrimitive, Zero};
+        let mut a = current.real.denom().clone();
+        let mut b = current.imaginary.denom().clone();
+        while !b.is_zero() {
+            let r = &a % &b;
+            a = b;
+            b = r;
+        }
+        let denominator = current.real.denom() / a * current.imaginary.denom();
+        let real = (current.real.numer() * (&denominator / current.real.denom()))
+            .to_i64()
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let imaginary = (current.imaginary.numer() * (&denominator / current.imaginary.denom()))
+            .to_i64()
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        Self::new(
+            real,
+            imaginary,
+            denominator.to_i64().ok_or(ConstitutiveFibreError::Shape)?,
+        )
+    }
     pub fn new(
         real: i64,
         imaginary: i64,
@@ -88,6 +111,19 @@ pub struct NativeJunctionSeed {
     pub initial_held: NativePhaseCurrent,
 }
 
+impl NativeJunctionSeed {
+    pub fn validate(&self) -> Result<(), ConstitutiveFibreError> {
+        if self.incoming_admittance <= 0
+            || self.held_admittance <= 0
+            || !self.incoming_transport.is_unit()
+        {
+            Err(ConstitutiveFibreError::Shape)
+        } else {
+            Ok(())
+        }
+    }
+}
+
 /// A linear handle to one actual emitted source section. It cannot be constructed from an event
 /// number, copied for multiple returns, or used against another ecology with equal coordinate data.
 #[derive(Debug)]
@@ -103,6 +139,10 @@ pub struct NativeCurrentOccurrence {
 }
 
 impl NativeCurrentOccurrence {
+    /// Recover an unconsumed source after refusal. Successful reception has already consumed it.
+    pub fn take_source(&mut self) -> Option<NativeEmissionHandle> {
+        self.source.take()
+    }
     pub fn entering(current: NativePhaseCurrent) -> Self {
         Self {
             current,
@@ -277,14 +317,11 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
             .and_then(|n| n.checked_mul(16))
             .ok_or(ConstitutiveFibreError::Shape)?;
         let available = surface.declaration().max_sectiond_bytes;
-        if nodes == 0
-            || material.iter().any(|n| {
-                n.incoming_admittance <= 0
-                    || n.held_admittance <= 0
-                    || !n.incoming_transport.is_unit()
-            })
-        {
+        if nodes == 0 {
             return Err(ConstitutiveFibreError::Shape);
+        }
+        for seed in &material {
+            seed.validate()?;
         }
         if scratch > available as usize {
             return Err(ConstitutiveFibreError::ScratchAperture {
@@ -338,6 +375,9 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
 
     pub fn material(&self) -> &[NativeJunctionSeed] {
         &self.material
+    }
+    pub fn occurrence_count(&self) -> usize {
+        self.history.len()
     }
     pub fn material_at(&self, occurrence: usize) -> Option<&[NativeJunctionSeed]> {
         self.history.get(occurrence).map(|h| h.material.as_ref())

@@ -1,7 +1,7 @@
 # Native HNA: contextual transport before inheritance
 
 **Authority:** Brandon's contextual-transport correction and subsequent request to establish the
-corrected goal and continue. **Status:** ACTIVE, NCF0--NCF2 complete at their scopes; NCF3 in construction.
+corrected goal and continue. **Status:** ACTIVE, NCF0--NCF3 complete at their scopes; NCF4 in construction.
 **Order:** [THE_ROADMAP.md](THE_ROADMAP.md). **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 **Correction:** [audit](../../research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md).
 
@@ -157,6 +157,23 @@ loss, map count or polished output substitutes for that contextual return.
 
 ### NCF3 — Native development/inference interface and situated application
 
+[established-bounded; measured] Complete at the public native session and independent
+linear-current application scope in the [NCF3 return](../../research/records/2026-09-05_NCF3_THE_NATIVE_SESSION_DRIVES_AN_INDEPENDENT_CURRENT_APPLICATION_AND_RETAINS_OPEN_READINGS.md).
+The [native guide](../NATIVE_HNA.md) gives working CLI/SDK recipes, exact source/frame semantics,
+open/refused conduct and the explicit nonpersistent boundary. The original application contract
+below remains its grading scope; no language or general nonlinear-control claim follows.
+
+[definition] The first application is phase-current compensation. An independently declared
+linear exterior response is measured upstream of an actuator; the native unique receiver current
+commands that actuator. The exterior state follows its own declared unit rotation plus measured
+response minus actuation. An open/plural native reading leaves the actuator uncommanded, without
+inventing a model value. The world owns only that constitutive law/state, never the learner or its
+rows. Its predeclared controls are initial open conduct, actual state consequences of native
+actuation, later development and new-current use, and continued conduct through a gauge and a
+physical incidence change. This application does not claim language or general nonlinear control.
+The public adapter reuses the existing JSONL delivery owner and exposes current reception,
+source handles, rechart, physical incidence change and inspection over the same native session.
+
 [definition] Expose the same native owner through a usable application boundary. Worlds can be
 rich, designed and independently lawful; they provide actual exposure/interaction without writing
 the learner's internal associations. Codecs remain outside the native ontology. Begin with material
@@ -171,6 +188,14 @@ Specify the application contract before grading its outputs; do not invent a new
 probe after seeing a convenient result.
 
 ### NCF4 — Durable native model and integrated foundation return
+
+[definition] The native artifact must retain the coupled relation/held state, current and
+historical frames/material, actual emitted-source sections, receiving lineage and outstanding
+linear handles. Serialize the exterior source-handle table separately from native occurrence
+ordinals. Reuse the existing stream's partial-input/pending-output representation; the application
+continuation also retains independent world/control state, the exact intervention cursor and any
+enacted effect/pending receive, so partially applied interventions are not replayed.
+An uncertain native deed must remain an obstruction, never a reconstructed success or replay.
 
 [definition] Deliver the native model/session artifacts and reproducible development/inference
 recipes. Preserve the learned conditional organization, current state, unresolved boundaries and

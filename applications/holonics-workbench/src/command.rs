@@ -41,6 +41,13 @@ pub enum HnaCommand {
         learning_shift: u32,
         series_terms: u32,
     },
+    NativeSession {
+        seed: PathBuf,
+        input: PathBuf,
+    },
+    WaveControl {
+        spec: PathBuf,
+    },
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

@@ -26,6 +26,9 @@ pub use protocol::{
 };
 pub use render::{render_human, render_json, render_json_lines};
 pub use runtime::{WorkbenchError, WorkbenchRuntime};
-pub use session_stream::{run_hna_session_stream, HnaStreamProcessReceipt};
+pub use session_stream::{
+    run_hna_session_stream, run_native_session_stream, HnaStreamProcessReceipt,
+    NativeHnaStreamProcessReceipt,
+};
 
 pub const WORKBENCH_SCHEMA: &str = "org.holonics.workbench.event.v4";

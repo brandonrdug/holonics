@@ -68,6 +68,27 @@ fn run(arguments: Vec<OsString>) -> i32 {
             }
         };
     }
+    if let holonics_workbench::WorkbenchCommand::Hna(
+        stream @ holonics_workbench::HnaCommand::NativeSession { .. },
+    ) = command
+    {
+        return match holonics_workbench::run_native_session_stream(stream) {
+            Ok(receipt) => {
+                let failed = receipt.stream_error.is_some();
+                // stdout is exclusively the flushed native JSONL response stream. The process
+                // receipt belongs to stderr and this pre-NCF4 session is not persistent.
+                eprintln!(
+                    "{}",
+                    serde_json::to_string(&receipt).expect("structured native process receipt")
+                );
+                i32::from(failed)
+            }
+            Err(error) => {
+                eprintln!("holonics hna native-session: {error}");
+                1
+            }
+        };
+    }
     let events = WorkbenchRuntime::new().execute(command.clone());
     let response = WorkbenchResponse::new(command, events);
     if let Err(error) = emit_response(invocation.format, &response) {

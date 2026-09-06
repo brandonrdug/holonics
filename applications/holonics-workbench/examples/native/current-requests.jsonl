@@ -1,0 +1,5 @@
+{"schema":"org.holonics.hna.stream-request.v1","command":{"action":"receive-current","current":{"real":{"numerator":"1","denominator":"1"},"imaginary":{"numerator":"0","denominator":"1"}}}}
+{"schema":"org.holonics.hna.stream-request.v1","command":{"action":"rechart","gauges":[{"real":{"numerator":"0","denominator":"1"},"imaginary":{"numerator":"1","denominator":"1"}},{"real":{"numerator":"1","denominator":"1"},"imaginary":{"numerator":"0","denominator":"1"}}]}}
+{"schema":"org.holonics.hna.stream-request.v1","command":{"action":"receive-current","current":{"real":{"numerator":"-1","denominator":"18"},"imaginary":{"numerator":"1","denominator":"18"}},"source":0}}
+{"schema":"org.holonics.hna.stream-request.v1","command":{"action":"inspect-relation"}}
+{"schema":"org.holonics.hna.stream-request.v1","command":{"action":"close"}}

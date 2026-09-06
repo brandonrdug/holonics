@@ -10,6 +10,8 @@ holonic-engine = { path = "../../crates/holonic-engine", default-features = fals
 serde = { workspace = true }
 serde_json = "1"
 num-rational = { workspace = true }
+num-bigint = { workspace = true }
+num-traits = { workspace = true }
 thiserror = { workspace = true }
 tempfile = "3"
 tokenizers = "0.21.4"
@@ -17,4 +19,3 @@ sha2 = "0.10"
 
 [dev-dependencies]
 holonics-circulation-abi = { path = "../../crates/holonic-circulation-abi" }
-num-traits = "0.2"

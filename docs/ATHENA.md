@@ -3,7 +3,7 @@
 [definition] Athena is one continuing native ecology: its constitutive morphology, current,
 incidence, chronology, lineage and admitted receiver domain. Eros is the composition and recurrent
 operation that forms and refines it. The current public Rust entry point is `holonics::hna`;
-the implementation is in [holonics-hna](../crates/holonics-hna/src/hna.rs).
+the application implementations are in [holonics-hna](../crates/holonics-hna/README.md).
 
 ## Native-first construction
 
@@ -19,9 +19,14 @@ immutable source frames/material and explicit old-to-current receiving transport
 incidence changes remain distinct. The [rechart return](../research/records/2026-09-05_NCF2_THE_LIVE_RECHART_CARRIES_THE_RELATION_AND_RETURNS_OLD_SOURCES_THROUGH_THEIR_FRAMES.md)
 states its admitted gauge family and full-state/open-fibre controls.
 
-[open] Production adapters/application and durable artifacts remain NCF3--NCF4. The existing
-`holonics::hna` commands below are inherited-model apparatus, not commands for the new native
-body. The inherited-first HNP sequence is paused.
+[established-bounded; measured] NCF3 exposes that same owner through
+`holonics::hna::native::NativeSession`, `hna native-session` and the independent `hna wave-control`
+application. The [native interface guide](NATIVE_HNA.md) gives exact-current schemas, source/frame
+semantics, recipes and measured application scope. Existing `HnaStream` delivery is reused.
+
+[open] Durable native-phase artifacts and integrated resource evidence remain NCF4. The commands
+and checkpoints in the remaining sections describe the earlier inherited-operator backend; they
+do not mount or persist the new native phase body. The inherited-first HNP sequence stays paused.
 
 ## One operation, two uses
 
@@ -60,7 +65,7 @@ the actual reference/reuse continuation and costs are in
 [HNP2](../research/records/2026-09-04_HNP2_THE_NUMERICAL_SEGMENT_IS_REUSED_THE_NATIVE_OCCURRENCE_STILL_DEVELOPS_AND_CHANGED_DEPENDENCIES_REOPEN.md).
 `without_forward_reuse` supplies a full-execution observer comparison, not a second learning law.
 
-## Commands
+## Earlier inherited-operator commands
 
 Build the application:
 
