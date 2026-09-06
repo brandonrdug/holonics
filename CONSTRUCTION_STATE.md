@@ -7,6 +7,21 @@ cultivation blueprint. **Position:** design deposited; AC0 starts. **Athena-alph
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct
 instruction governs.
 
+## Parallel MacBook position
+
+[definition] Brandon's subsequent September 6 request establishes `codex/apple-silicon` for
+[Holonics on Apple silicon](docs/plans/HOLONICS_ON_APPLE_SILICON.md), independently of the desktop
+Athena-alpha session above. Sound perception and generation precede speech. Desktop private
+conversation data and cultivation remain on that machine.
+
+[established-bounded; process-audit] AS0 specification and apparatus setup returned in the
+[Mac record](research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md): compatible
+Rust, pinned Lean, repaired Xcode setup, Metal tools and an isolated MLX custom-kernel check.
+The native HNA Cargo check reached the known CUDA/PTX/target-gating obstruction on macOS.
+
+[open] AS1 device-boundary factoring is next. The native Apple backend and acoustic attachment
+remain unimplemented; the MLX arithmetic/dependency probe is exterior apparatus evidence only.
+
 ## Current HNA direction
 
 [definition] Brandon now authorizes immediate construction and completion of the

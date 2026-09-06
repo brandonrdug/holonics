@@ -4,6 +4,12 @@
 future Apple and audio work. It does not add a backend, alter native HNA, or schedule an audio
 campaign. The roadmap and `CONSTRUCTION_STATE.md` remain the construction authorities.
 
+[definition] Brandon's subsequent MacBook request is now specified in
+[Holonics on Apple silicon](plans/HOLONICS_ON_APPLE_SILICON.md). Its order is native Apple
+execution and sound perception/generation, then speech, on the separate `codex/apple-silicon`
+branch. The [Mac setup record](../research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md)
+adds actual local build and MLX apparatus evidence to the source comparison below.
+
 [established-bounded; source-inspected] Local sources were inspected at `6f547c4a` on September 6,
 2026. Source descriptions below are not fresh execution measurements.
 
@@ -81,6 +87,11 @@ unconditionally in [`cuda_refine.rs`](../crates/holonic-engine/src/cuda_refine.r
 PTX generation is skipped while several PTX-bearing modules and the CUDA mount remain in the
 dependency closure. Documentation, formal sources and exterior data tools remain portable
 repository material; this is a source-derived build obstruction, not an executed Mac check.
+
+[established-bounded; process-audit] The subsequent Mac check at `b16e6bc0`, with Rust 1.98.1,
+executed `cargo check -p holonics-hna --lib --locked` and failed with four missing PTX includes
+and six imports of target-gated `cuda_aperture`/`hardware_cover`. This confirms an actual
+compile obstruction before linkage, not an unavailable Rust installation.
 
 [definition] The future repair boundary is a target-gated CUDA/PTX implementation and a portable
 host/native surface whose exact owners can compile without `libcuda`. The repair must preserve the
@@ -192,6 +203,13 @@ rejects clipping, and marks the result `cold_renderer_only`
 `NativeAcousticRadiationInput::from_open_world_tube -> AcousticProductRest::radiate ->
 NativeAcousticPotentialComplex::found -> render_pcm16`. Native current formation remains the hot
 owner; PCM/WAV is a receiver and codec surface after the exact native return.
+
+[open; source-inspected] `AcousticProductRest` embeds the earlier
+`RecurrentGranularReturnedAffineEcologyRest`. It is not a wrapper for the current
+`NativeConstitutiveEcology`; nor does the current phase session return a
+`NativeOpenWorldTubeReceipt`. The Apple/acoustic specification therefore requires the actual
+PCM-to-native-material and native-outward-current attachments before claiming this composition
+over the current ecology. Existing acoustic results retain their original body/receiver scope.
 
 [open] No current audio owner establishes calibrated microphone pressure, speaker pressure, power,
 or room acoustics. Those claims require a physical chart with typed units, constitutive and

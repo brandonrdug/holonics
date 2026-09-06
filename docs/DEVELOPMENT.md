@@ -26,6 +26,42 @@ For Rust clients, depend on the local `crates/holonics` package and use
 `holonics::{hna,soulkiller,interop}`. The framework re-exports its implementation owners; it
 does not create a second neural engine.
 
+## Apple silicon development
+
+[established-bounded; process-audit] The September 6 MacBook setup installed Rust 1.98.1,
+Lean 4.33.0 and 4.27.0 through elan, and MLX/MLX Metal 0.32.2 in
+`.local/venvs/apple-silicon`. Xcode first-launch repair and Metal Toolchain download completed.
+The [setup record](../research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md)
+contains the M1 Pro apparatus and actual check scopes. The
+[platform specification](plans/HOLONICS_ON_APPLE_SILICON.md) keeps MLX apparatus distinct from
+the native backend still to be implemented.
+
+[definition] For another Apple checkout, use a Rust release supporting this workspace and let
+elan select the committed formal project versions. Do not update `lean-toolchain` or Mathlib
+merely because a newer release exists. Lean remains separate verification apparatus.
+
+```sh
+rustup update stable
+export PATH="$HOME/.cargo/bin:$HOME/.elan/bin:$PATH"
+elan toolchain install leanprover/lean4:v4.33.0
+elan toolchain install leanprover/lean4:v4.27.0
+uv venv --python 3.12 .local/venvs/apple-silicon
+uv pip install --python .local/venvs/apple-silicon/bin/python -r research/experiments/apple_silicon/requirements.txt
+.local/venvs/apple-silicon/bin/python research/experiments/apple_silicon/check_mlx_device.py
+cargo check -p relational-geometry --lib --locked
+```
+
+[definition] Install elan using the [official installer](https://lean-lang.org/install/manual/)
+if absent. Xcode provides the SDK and native compilers; `xcodebuild -runFirstLaunch` completes
+its system setup, and `xcodebuild -downloadComponent MetalToolchain` installs the separately
+distributed Metal compiler when needed. Do not reinstall an already-working toolchain.
+
+[established-bounded; process-audit] The commands above verify exterior GPU arithmetic and a
+portable Rust library. `cargo check -p holonics-hna --lib --locked` currently fails on macOS
+at the recorded CUDA/PTX and target-gating boundary. Neither this probe nor a successful MLX
+installation is a native HNA build. Formal dependencies are fetched when relevant Lean work
+requires them; no full Mathlib build is part of device setup.
+
 ## Training and inference
 
 ```sh

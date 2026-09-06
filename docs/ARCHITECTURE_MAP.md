@@ -18,6 +18,11 @@ consequences, and [hardware/modality boundaries](HARDWARE_AND_MODALITY_BOUNDARIE
 future Apple and acoustic composition. These are source comparisons, not implemented backends
 or a Lean runtime inside HNA.
 
+[definition] The [Apple platform specification](plans/HOLONICS_ON_APPLE_SILICON.md) names the
+current native session/resident boundary and the acoustic attachment to port. The exterior
+`research/experiments/apple_silicon/check_mlx_device.py` owns a custom-Metal arithmetic and
+dependent-stream apparatus probe only; it is not an alternate native owner.
+
 Each row connects one mathematical relation to its live formal and executable presentations.
 
 - **exact** means the named implementation owns the same stated carrier/law in the row's declared

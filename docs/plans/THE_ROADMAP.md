@@ -40,6 +40,24 @@ and the inherited-first sequence are not activated by this campaign.
 attachment is derived against existing native source. Completed NCF and data preparation remain
 standing and need no repeated orientation or unchanged demonstration to begin useful work.
 
+## Apple silicon and acoustic branch
+
+[definition] Brandon's subsequent September 6 MacBook request establishes the independent
+`codex/apple-silicon` branch and [Apple platform specification](HOLONICS_ON_APPLE_SILICON.md).
+The acoustic order is sound perception and generation, then speech. This track preserves the
+desktop's active Athena-alpha campaign and private conversation material; it does not resume
+inherited-first production or create another HNA learning law.
+
+[definition] AS0 deposits the specification and verifies the local apparatus. The ensuing order
+is AS1: factor the native device boundary and CUDA build closure; AS2: resident exact Apple phase
+operation; AS3: public session, persistence and measured continuation; AS4: offline acoustic
+material/production attachment; AS5: live sound and subsequent speech. Full-operation source,
+frame, fibre and successor parity govern the port. MLX is an apparatus candidate within Holonics.
+
+[established-bounded; process-audit] AS0 returned branch/specification and Mac toolchain/device
+checks in the [setup record](../../research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md).
+AS1 is next; no native Apple HNA or acoustic perception/generation product is claimed by setup.
+
 ## Completed September 6 synthesis before Athena-alpha cultivation
 
 [definition] Brandon's latest request directs repository-wide synthesis of the available
