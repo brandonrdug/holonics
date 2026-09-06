@@ -1,0 +1,112 @@
+{
+  "scope": "Exact full-support nonlinear Lamb-current source audit for the two-parameter exterior family; no stability conclusion",
+  "arithmetic": "FLINT fmpq_mpoly source carriers reused from verified exterior owner",
+  "coefficient_convention": "A,V,C and current-source vectors are imaginary amplitudes; actual Fourier coefficients are i times these amplitudes; Omega is real",
+  "supports": {
+    "A": 408,
+    "V": 3308,
+    "Omega": 408,
+    "C": 3406,
+    "high_complement": 384
+  },
+  "checks": {
+    "lamb_current_identity_full_modes": true,
+    "momentum_identity_full_modes": true,
+    "resolved_complement_decomposition": true,
+    "nonzero_generated_raw_complement": true,
+    "nonzero_generated_velocity_current_after_leray": true,
+    "actual_phase_evaluation": true,
+    "all_oriented_terms_reality": true,
+    "actual_nonzero_Lamb_divergence_source": true,
+    "generated_complement_uses_full_declared_cube": true,
+    "generated_projected_modes_divergence_free": true
+  },
+  "lamb_identity": {
+    "lhs": "C_t+(u.grad)C-Delta C",
+    "rhs": "u cross ((omega.grad)u)-grad(p) cross omega-2 sum_a(partial_a u) cross(partial_a omega)",
+    "term_supports": {
+      "Ct": 11198,
+      "advection": 11198,
+      "stretching": 10946,
+      "pressure": 11198,
+      "derivative_cross": 3406
+    }
+  },
+  "momentum": {
+    "identity": "u_t=Delta u+C-grad(p+|u|^2/2)",
+    "kinetic_pressure_included": true
+  },
+  "resolved_cutoff": {
+    "condition": "|k_i|<=1",
+    "low_modes": 24,
+    "high_modes": 384,
+    "all_four_products_retained": true,
+    "full_Lamb_tail_separate": true,
+    "selected_mode_zero_fibre": "rho+sigma=-2/5",
+    "selected_mode_nonzero_on_rho_positive_sigma_zero": true,
+    "generated_raw_mode": [
+      -2,
+      -2,
+      -1
+    ],
+    "generated_velocity_current_after_Leray_mode": [
+      -2,
+      -2,
+      -1
+    ],
+    "generated_velocity_current_after_Leray_coefficient": [
+      "-175/768*rho - 175/768*sigma - 35/384",
+      "175/768*rho + 175/768*sigma + 35/384",
+      "0"
+    ]
+  },
+  "phase_receiver": {
+    "point": "(pi/2,0,0)",
+    "C": [
+      "6463/8100",
+      "253/135",
+      "0"
+    ],
+    "Ct": [
+      "-73215677079808860413638967179/126307095674216366280402281250*rho - 296945446258807277520371801206410708568/186710403595282932814968421946014846875*sigma - 1181772120572551567/287574955268737500",
+      "10308919643287396094573/6293508878067055690500*rho^2 + 4000839239498301067767514339459744/2405375328734288124015309202839375*rho*sigma + 2666941057/3856949460*rho + 152409560249226654090763140829168256/30268816853828781365009243161715925*sigma^2 + 82336533830694550196/44721316317013961625*sigma - 1050441893183580121886260404977/111379893458172613901809284375",
+      "0"
+    ],
+    "advection": [
+      "192887/43740",
+      "4926451/437400",
+      "0"
+    ],
+    "minus_laplacian": [
+      "401438/18225",
+      "4037/1215",
+      "0"
+    ],
+    "stretching": [
+      "6463/4050",
+      "506/135",
+      "0"
+    ],
+    "minus_pressure_cross": [
+      "-73215677079808860413638967179/126307095674216366280402281250*rho - 296945446258807277520371801206410708568/186710403595282932814968421946014846875*sigma + 25248037609298843/47929159211456250",
+      "10308919643287396094573/6293508878067055690500*rho^2 + 4000839239498301067767514339459744/2405375328734288124015309202839375*rho*sigma + 2666941057/3856949460*rho + 152409560249226654090763140829168256/30268816853828781365009243161715925*sigma^2 + 82336533830694550196/44721316317013961625*sigma + 485909307464799616259868496853/297013049221793637071491425000",
+      "0"
+    ],
+    "derivative_cross": [
+      "122743/6075",
+      "-31/135",
+      "0"
+    ]
+  },
+  "input_lineage": {
+    "source_producer": "mfr3_exterior_modulation/derive_receivers.py",
+    "existing_full_source_and_parent_specialization_assertions_executed": true
+  },
+  "phase_to_physical": {
+    "k": "2*pi",
+    "u_phys": "k*u(kX,k^2*t)",
+    "p_phys": "k^2*p",
+    "nu": "unchanged"
+  },
+  "exit_status": 0
+}

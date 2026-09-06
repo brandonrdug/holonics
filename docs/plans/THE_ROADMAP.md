@@ -164,10 +164,12 @@ second condition throughout that ellipse; the full source, quartic coefficients 
 sources and the existing entropy/action, oriented cross-current and heat-diffusion construction.
 Direct RH research in MFR5 is deferred. The [heat-current return](../../research/records/2026-09-05_MFR3_THE_ORIENTED_ENTROPY_CURRENT_RETURNS_ITS_HEAT_SOURCE_AND_COMPLEX_PHASE.md)
 now supplies an exact periodic fluid control for diffusion of the relation between two currents.
-Next compose its mixed spatial-derivative source with actual stretching, pressure, boundary and
-resolved/remainder feedback. Carry one time-dependent candidate into a full source/production
-budget on a stated interval; MFR4 then pays a quantitative residual/tail comparison or names the
-failed estimate. The complex potential/Hodge and logarithmic heat sources remain explicit.
+The [nonlinear current return](../../research/records/2026-09-05_MFR3_THE_NONLINEAR_CROSS_CURRENT_RETURNS_PRESSURE_STRETCHING_AND_CELL_FLUX.md)
+now composes actual pressure, stretching, mixed diffusion, six-face temporal balance and complete
+resolved/remainder feedback. Next instantiate the first nonlinear Duhamel candidate with every
+generated mode and its exact three-term feedback residual on a stated interval; MFR4 then pays
+its quantitative residual/tail comparison or names the failed estimate. The complex potential/
+Hodge and logarithmic heat sources remain explicit.
 Full convergence is not a prior condition imposed on MFR3; the earlier exclusions remain standing. The HNA line follows the native-foundations
 priority above, independently of MFR.
 

@@ -543,10 +543,22 @@ positive viscosity while each kinetic-energy balance remains dissipative. The ze
 Euler specialization retains alignment. The source is precisely the mixed spatial-derivative
 term; pressure and nonlinear stretching vanish in this control.
 
-[definition] Continue by composing that same oriented temporal law with the actual stretching,
-pressure, boundary and unresolved-mode source of the nonlinear datum. Keep the storage/current/
-production balance and its constitutive signs explicit, including the thermal quantity map when
-reading physical entropy. In the complex potential chart retain the Hodge/phase relation and the
+[proved-derived; formal-checked] The [nonlinear current return](../../research/records/2026-09-05_MFR3_THE_NONLINEAR_CROSS_CURRENT_RETURNS_PRESSURE_STRETCHING_AND_CELL_FLUX.md)
+now composes the actual momentum and vorticity equations into `C=u cross omega`. It retains
+pressure, stretching, forcing and mixed diffusion, its complex/entropy-plane receiver, all four
+resolved/remainder products and the differentiated six-face cell balance on an open lifespan.
+
+[established-bounded; computational-witness] The full nonlinear periodic source verifies every
+oriented term. The resolved self-current generates a nonzero velocity mode outside its aperture
+after actual Leray projection; the coefficient's null fibre and the initial local source budget
+remain explicit.
+
+[definition] Next instantiate `h(t)=Heat_nu(t) u0` and its first nonlinear Duhamel return `g`
+from `Leray C(h)`, retaining every generated mode. The candidate `h+g` has the explicit feedback
+residual `-Leray(h cross curl g + g cross curl h + g cross curl g)` after its source equation is
+paid. Construct and bound that full residual on a stated interval for the admitted datum. Keep
+the storage/current/production balance and its constitutive signs explicit, including the
+thermal quantity map when reading physical entropy. In the complex potential chart retain the Hodge/phase relation and the
 actual logarithmic heat/Burgers source with its time sign and zero fibre. Existing complex-valued
 fluid singularity constructions provide source comparisons; a scalar entropy or a real-valued
 Millennium endpoint does not govern this investigation. MFR5 remains deferred.
