@@ -42,8 +42,16 @@ capture/playback chronology. These share the native session and introduce no sec
 [established-bounded; measured] `holonics-hna::native::acoustic_field::{AcousticFieldChart,AcousticFieldCell}`
 also mounts timed source coefficients through `mount_cell` into the shared resident rational
 current port. The [five-control return](../research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
-retains exact source/clock support and delivery lineage. Actual interval/interaction binding and
+retains exact source/clock support and delivery lineage. Native temporal/material action and
 useful acoustic conduct remain open.
+
+[established-bounded; measured] `native::recorded` exposes
+`native/speech/{recorded.rs,recorded/sections.rs}` for source/target pointer resolution, exact
+annotation-to-PCM bounds and `RecordedResponseSections::bind`. It uses
+`AcousticFieldChart::from_acoustic_range` and the existing resident ingress. The
+[actual-recording return](../research/records/2026-09-07_RECORDED_RESPONSE_POINTERS_RETAIN_THEIR_ACOUSTIC_INTERVALS.md)
+retains all 899 AMI records and their actual interval/receiver scope. This is an exterior source
+attachment; the native temporal/material action and useful acoustic conduct remain open.
 
 [established-bounded; implemented-exact] Ordered unlinked packets are owned by
 `constitutive_fibre/circulation/batch.rs` and `holonics-hna/src/native/batch.rs`; they reuse the

@@ -20,6 +20,13 @@ The local corpus is at:
 └── provenance.json
 ```
 
+[established-bounded; measured] The public Rust `holonics_hna::native::recorded` reader now
+retains this exact response-link index, resolves original relative pointers, preserves clock
+refusals and binds addressed PCM intervals. The
+[interval return](../../records/2026-09-07_RECORDED_RESPONSE_POINTERS_RETAIN_THEIR_ACOUSTIC_INTERVALS.md)
+records the complete 899-record check and one complete resident pair. Run its
+`recorded_acoustic_sections` example for source attachment; it does not cultivate or grade a model.
+
 [established-bounded; measured] The four WAVs total 275,208,026 bytes and retain the original 16 kHz, mono, signed PCM16 files.
 Their exact frame durations are 1272.64, 2279.7546875, 2423.68, and 2624.170625 seconds for
 ES2002a-d respectively. The revised index has 2,109 segments across four meetings and four

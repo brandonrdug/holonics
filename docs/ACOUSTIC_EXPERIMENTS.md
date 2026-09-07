@@ -36,7 +36,14 @@ interactions; chronological adjacency does not create one.
 This read-only source attachment retains exact support, receiver/lineage, clock, divisor, zeros,
 padding and parent delivery metadata. It does not advance the chart cursor or supply contact.
 The [resident ingress return](../research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
-records five passing acoustic-field controls and the remaining interval/interaction attachment.
+records five passing acoustic-field controls; the subsequent interval attachment is described below.
+
+[established-bounded; measured] The [recorded interval attachment](../research/records/2026-09-07_RECORDED_RESPONSE_POINTERS_RETAIN_THEIR_ACOUSTIC_INTERVALS.md)
+now supplies `AcousticFieldChart::from_acoustic_range` and `native::recorded` for exact original
+source/target pointers and recording bounds. `RecordedResponseSections::bind` keeps annotation
+support and PCM cover distinct and exposes both acoustic charts. The public
+`recorded_acoustic_sections` example retains all 899 AMI records (including 55 refusals) and
+mounts one complete pair. It performs source preparation, not native cultivation or recognition.
 
 [established-bounded; implemented-exact] `NativeConstitutiveField::intrinsic_profile()` borrows
 material, historical sources/frames and predecessor relations without another device readout or

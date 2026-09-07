@@ -1,0 +1,9 @@
+{
+  "truth_status": "established-bounded",
+  "evidence_tags": [
+    "computational-witness"
+  ],
+  "scope": "independent Fraction check of all emitted record identities, endpoint bounds, gap/overlap and retained source refusals",
+  "records_compared": 899,
+  "all_equal": true
+}

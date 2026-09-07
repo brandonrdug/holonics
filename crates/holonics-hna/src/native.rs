@@ -24,6 +24,7 @@ pub use acoustic::{
     run_acoustic_with_options,
 };
 mod speech;
+pub use speech::recorded;
 pub use speech::{
     SpeechExposureApplication, SpeechPendingReceive, SpeechRun, SpeechRunOptions,
     SpeechSavedApplication, resume_speech, run_speech_with_options,

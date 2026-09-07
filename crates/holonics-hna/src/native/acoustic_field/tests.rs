@@ -105,6 +105,63 @@ fn chosen_cell_support_is_exact_and_does_not_advance_the_chart() {
 }
 
 #[test]
+fn a_recording_interval_retains_parent_coordinates_and_exact_clock_offset() {
+    let recording = source(&[13, -7, 0, 9, 21]);
+    let origin = BigRational::new(7.into(), 3.into());
+    let c = AcousticFieldChart::from_acoustic_range(
+        &recording,
+        PhaseCurrentReceiverId(4),
+        PhaseCurrentLineageId(8),
+        origin.clone(),
+        1..4,
+        2,
+        32768,
+    )
+    .unwrap();
+    assert_eq!(c.source_range(), 1..4);
+    assert_eq!(c.recording_samples(), 5);
+    assert_eq!(c.reconstruct_samples(), vec![-7, 0, 9]);
+    assert_eq!(c.source_sha256(), recording.source_sha256);
+    assert_eq!(c.source_octets(), recording.source_octets);
+    let first = c.support_at(0).unwrap();
+    let tail = c.support_at(1).unwrap();
+    assert_eq!((first.coefficient_from, first.coefficient_until), (1, 3));
+    assert_eq!(
+        (
+            tail.coefficient_from,
+            tail.coefficient_until,
+            tail.structural_padding
+        ),
+        (3, 4, 1)
+    );
+    assert_eq!(
+        first.begin,
+        &origin + BigRational::new(1.into(), 16000.into())
+    );
+    assert_eq!(first.end, tail.begin);
+    assert_eq!(tail.end, &origin + BigRational::new(4.into(), 16000.into()));
+    assert_eq!(c.cursor(), 0);
+    assert_eq!(recording.samples, vec![13, -7, 0, 9, 21]);
+}
+
+#[test]
+fn empty_reversed_and_outside_recording_intervals_are_refused() {
+    let recording = source(&[1, 0, -1]);
+    for range in [0..0, 2..1, 0..4, usize::MAX..usize::MAX] {
+        assert!(AcousticFieldChart::from_acoustic_range(
+            &recording,
+            PhaseCurrentReceiverId(1),
+            PhaseCurrentLineageId(1),
+            BigRational::from_integer(0.into()),
+            range,
+            2,
+            32768,
+        )
+        .is_err());
+    }
+}
+
+#[test]
 #[ignore = "requires resident native field backend"]
 fn acoustic_field_returns_complete_branches_and_preserves_refused_source() {
     let readout = ResidentReadout::new().unwrap();

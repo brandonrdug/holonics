@@ -23,6 +23,10 @@ const SPEECH_APPLICATION_SCHEMA: &str = "org.holonics.hna.curated-speech-exposur
 #[cfg(test)]
 mod tests;
 
+/// Exact source/response annotations over recorded acoustic intervals. This exterior chart
+/// supplies lineage and clocks; native conditional conduct retains its own owner.
+pub mod recorded;
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SpeechPendingReceive {

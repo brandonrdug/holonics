@@ -19,6 +19,7 @@ use num_bigint::BigInt;
 use num_rational::BigRational;
 use num_traits::ToPrimitive;
 use serde::Serialize;
+use std::ops::Range;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -94,6 +95,8 @@ pub struct AcousticFieldChart {
     source_locator: String,
     source_sha256: String,
     source_octets: u64,
+    source_range: Range<usize>,
+    recording_samples: usize,
     divisor: i64,
     cursor: usize,
 }
@@ -107,18 +110,52 @@ impl AcousticFieldChart {
         port_extent: usize,
         divisor: i64,
     ) -> Result<Self, AcousticFieldError> {
+        Self::from_acoustic_range(
+            source,
+            receiver,
+            lineage,
+            origin,
+            0..source.samples.len(),
+            port_extent,
+            divisor,
+        )
+    }
+
+    /// Address a half-open sample span of the original recording. The origin belongs to the
+    /// recording's clock; the section starts at its actual offset on that clock. The selected
+    /// PCM is retained exactly, and its parent address survives without copying the whole WAV.
+    /// Annotation support and any sub-sample overhang belong to the caller's interval receipt.
+    #[allow(clippy::too_many_arguments)]
+    pub fn from_acoustic_range(
+        source: &ExactAcousticOccurrence,
+        receiver: PhaseCurrentReceiverId,
+        lineage: PhaseCurrentLineageId,
+        recording_origin: BigRational,
+        source_range: Range<usize>,
+        port_extent: usize,
+        divisor: i64,
+    ) -> Result<Self, AcousticFieldError> {
         if source.sample_rate == 0 || divisor <= 0 {
             return Err(AcousticFieldError::Chart(
                 "positive clock rate and divisor required".into(),
             ));
         }
+        let samples = source
+            .samples
+            .get(source_range.clone())
+            .filter(|samples| !samples.is_empty())
+            .ok_or_else(|| {
+                AcousticFieldError::Chart("empty or outside recording sample span".into())
+            })?;
+        let sample_step = BigRational::new(1.into(), source.sample_rate.into());
+        let origin = recording_origin + &sample_step * BigInt::from(source_range.start);
         let section = ExactPhaseCurrentSection::from_integers(
             receiver,
             lineage,
             origin,
-            BigRational::new(1.into(), source.sample_rate.into()),
+            sample_step,
             port_extent,
-            source.samples.iter().map(|s| BigInt::from(*s)).collect(),
+            samples.iter().map(|s| BigInt::from(*s)).collect(),
         )
         .map_err(|e| AcousticFieldError::Chart(e.to_string()))?;
         Ok(Self {
@@ -127,6 +164,8 @@ impl AcousticFieldChart {
             source_locator: source.locator.clone(),
             source_sha256: source.source_sha256.clone(),
             source_octets: source.source_octets,
+            source_range,
+            recording_samples: source.samples.len(),
             divisor,
             cursor: 0,
         })
@@ -143,6 +182,12 @@ impl AcousticFieldChart {
     }
     pub fn source_octets(&self) -> u64 {
         self.source_octets
+    }
+    pub fn source_range(&self) -> Range<usize> {
+        self.source_range.clone()
+    }
+    pub fn recording_samples(&self) -> usize {
+        self.recording_samples
     }
     pub fn divisor(&self) -> i64 {
         self.divisor
@@ -175,8 +220,8 @@ impl AcousticFieldChart {
         Ok(AcousticFieldSupport {
             source_occurrence: self.source_occurrence.clone(),
             cell,
-            coefficient_from: from,
-            coefficient_until: until,
+            coefficient_from: self.source_range.start + from,
+            coefficient_until: self.source_range.start + until,
             begin: at(from),
             end: at(until),
             structural_padding: width - (until - from),

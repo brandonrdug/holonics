@@ -22,14 +22,18 @@ and later resident currents use zero numerical readouts. The subsequent
 [condition-fibre integration](research/records/2026-09-07_APPLE_RETURNS_THE_SHARED_CONDITION_PREIMAGE_FIBRE.md)
 ports desktop `d3820ac3`, passes 22 engine controls and exactly matches its inferred condition,
 constraint graph and subsequent prediction. The public text-codec control reaches the known
-unported paired-field refusal. Actual acoustic interval/interaction and condition/receiver
-composition is next. No useful acoustic or English model is claimed.
+unported paired-field refusal. The native temporal/material action and condition/receiver
+composition remain next. No useful acoustic or English model is claimed.
 
 [established-bounded; measured] The [acoustic resident ingress](research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
 now exposes complete timed PCM cells to the same rational-current port, preserving source
 delivery lineage, zeros and padding without advancing the source cursor. Five acoustic-field
-controls pass. Next attach actual recording intervals and source/response pointers; the available
-AMI mono material does not supply separate microphone channels through its speaker labels.
+controls pass. The subsequent [recorded interval return](research/records/2026-09-07_RECORDED_RESPONSE_POINTERS_RETAIN_THEIR_ACOUSTIC_INTERVALS.md)
+now binds exact recording spans to original source/target pointers. Fourteen focused checks pass;
+all 899 AMI records retain 844 resolved pairs and 55 refusals, and one complete 100,800-sample pair
+mounts through the resident current port. Next compose the actual temporal/material action and
+condition standing; equal cell ordinals are not that passage. No native cultivation ran in this
+source-attachment return. AMI speaker labels still do not supply separate microphone channels.
 
 [established-bounded; measured] The September 7 Mac pickup integrates desktop `6ef7bf9d` with
 68 passing engine/public native tests and successful HNA library, application and shared-example
