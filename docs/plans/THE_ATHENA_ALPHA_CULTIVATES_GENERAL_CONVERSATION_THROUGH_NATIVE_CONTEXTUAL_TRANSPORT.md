@@ -237,6 +237,13 @@ unchanged two-node foundation need not be rerun as an independent demonstration.
 
 ### AC2 — Recovered text-codec conduct and complete responses
 
+[established-bounded; measured] The [initial differential text receiver](../../research/records/2026-09-06_AC1_THE_SHARED_SOURCE_MEETS_AN_EXPLICIT_TEXT_CURRENT_RECEIVER.md)
+is composed with the same resident field and shared historical-source port. Four development
+families and a fresh prompt enter an 18-port octet/end-of-part chart. Its first return is 64 copies
+of `d`, interrupted without completion; consecutive native currents remain distinct. This enables
+inspection of actual emitted material and preserves a concrete failed response. Useful text-codec
+conduct and AC2 completion are unestablished.
+
 [definition] Make the same changing ecology conduct inscription, contextual recurrence and
 text emission at the supported grains. Reuse native reconstruction and receiver-history owners;
 learned transport supplies compositional production. The exterior UTF-8 presentation decodes

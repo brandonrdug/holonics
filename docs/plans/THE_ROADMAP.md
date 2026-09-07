@@ -59,8 +59,15 @@ now carries all 728 operations of the four-family slice, retaining the full resi
 error decoder. All native certificates and the declared exact anchors pass. Resident continuation
 preserves that body with zero numerical section readouts during material admission; cold diagnostics
 remain separate and the complete launch obstruction is still checked. Continue AC1 with
-efficient broader operation, lawful history placement and record-level contextual channels;
-learned text-codec conduct and the actual alpha product remain required.
+efficient broader operation, lawful history placement and productive contextual organization.
+
+[established-bounded; measured] The [shared-source/text receiver](../../research/records/2026-09-06_AC1_THE_SHARED_SOURCE_MEETS_AN_EXPLICIT_TEXT_CURRENT_RECEIVER.md)
+now binds actual common-parent endpoints and conducts an exterior octet/end-of-part chart through
+one native field. Its first fresh-request return repeats `d` for all 64 allowed symbols and remains
+interrupted, with distinct continuing native currents. Repair the current-to-material composition
+and the productive use of historical/contextual standing; inspect actual responses as this grows.
+The scalar error bound for a continuous learned-source attachment is insufficient at its recorded
+scope. AC1 and the full useful alpha product remain open; this byte return does not complete AC2.
 
 ## Completed September 6 synthesis before Athena-alpha cultivation
 

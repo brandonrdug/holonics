@@ -206,3 +206,94 @@ fn observer_failure_does_not_report_a_native_rollback() {
         Err(ConstitutiveFibreError::Uncertain)
     ));
 }
+
+#[test]
+#[ignore = "requires CUDA; one shared source retains three distinct receiving contacts through rechart"]
+fn retained_source_shares_standing_without_consuming_the_linear_emission() {
+    let readout = ResidentReadout::new().expect("CUDA");
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let mut body = NativeConstitutiveField::found_with_enclosed_junction(
+        &surface,
+        seeds(1),
+        ResidentGrain(72),
+    )
+    .unwrap();
+    let first = body
+        .advance_resident(&mut NativeFieldOccurrence::entering(vec![phase(1, 0)]))
+        .unwrap();
+    let anchor = body.retain_source(&first.source).unwrap();
+    let original = body.inspect_source(0).unwrap();
+    let before = body.census();
+    body.advance_resident(&mut NativeFieldOccurrence::through_anchor(
+        &anchor,
+        vec![phase(2, 0)],
+    ))
+    .unwrap();
+    assert_eq!(body.census().section_read_outs, before.section_read_outs);
+    // Anchoring did not consume the original linear emission.
+    let shared = body.retain_source(&first.source).unwrap();
+    body.rechart(&[phase(0, 1)]).unwrap();
+    body.advance_resident(&mut NativeFieldOccurrence::through(
+        first.source,
+        vec![phase(3, 0)],
+    ))
+    .unwrap();
+    body.advance_resident(&mut NativeFieldOccurrence::through_anchor(
+        &shared,
+        vec![phase(4, 0)],
+    ))
+    .unwrap();
+    assert_eq!(body.inspect_source(0).unwrap(), original);
+    for at in 1..4 {
+        assert_eq!(body.lineage(at).unwrap().received_from, Some(0));
+    }
+    assert_eq!(
+        body.lineage(1).unwrap().source_contact,
+        Some(NativeFieldSourceContact::RetainedAnchor)
+    );
+    assert_eq!(
+        body.lineage(2).unwrap().source_contact,
+        Some(NativeFieldSourceContact::Emission)
+    );
+    assert_eq!(
+        body.lineage(3).unwrap().source_contact,
+        Some(NativeFieldSourceContact::RetainedAnchor)
+    );
+    let c = body.inspect_junction_covariance().unwrap().unwrap();
+    assert_eq!(c.intervals[2 * 6 + 2], (3, 3));
+    assert_eq!(c.intervals[2 * 6 + 4], (-9, -9));
+    assert_eq!(c.intervals[4 * 6 + 4], (29, 29));
+    let internal = body.inspect_internal_currents().unwrap().unwrap();
+    assert_eq!(
+        internal
+            .iter()
+            .map(|v| v.receiving_occurrence)
+            .collect::<Vec<_>>(),
+        vec![1, 2, 3]
+    );
+    let reconstructed =
+        internal
+            .iter()
+            .fold(vec![ExactComplexWaveCurrent::zero(); 3], |mut h, v| {
+                for (sum, d) in h.iter_mut().zip(&v.contact) {
+                    *sum = sum.add(&d.multiply(&v.current));
+                }
+                h
+            });
+    assert_eq!(
+        reconstructed,
+        body.inspect_exact_junction(3)
+            .unwrap()
+            .unwrap()
+            .held_current
+    );
+    let mut foreign = NativeConstitutiveField::found(&surface, seeds(1)).unwrap();
+    assert!(matches!(
+        foreign.advance_resident(&mut NativeFieldOccurrence::through_anchor(
+            &anchor,
+            vec![phase(1, 0)]
+        )),
+        Err(ConstitutiveFibreError::ForeignOccurrence)
+    ));
+    assert_eq!(foreign.occurrence_count(), 0);
+}

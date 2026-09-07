@@ -178,6 +178,32 @@ continues the same junction through all 728 material occurrences and 724 contact
 factorization, buffered diagnostic publication and exact unit-division shortcuts preserve its
 complete body and history; the final report is `material-enclosed-junction-g72-final.json`.
 
-[open] Efficient broader operation, lawful history placement, record-level situated channels and
+[open] Efficient broader operation, lawful history placement, wider situated channels and
 learned text-codec conduct remain required. No alpha-quality or Athena-alpha claim follows from
 this observer.
+
+## Contextual source and actual text-return inspections
+
+[definition] `contextual_source.py` proposes a different contact source: the retained junction
+outgoing source projection. It is a cold experiment, not a native implementation or a new
+representation of the existing raw-source law. The full carrier remains 96 real coordinates.
+
+[established-bounded; computational-witness] Its scalar operator-error bound accepts only
+seven/eleven occurrences at 24/72 fractional bits
+before its proposed report carrier refuses; four exact anchors pass. The
+[source/text return](../../records/2026-09-06_AC1_THE_SHARED_SOURCE_MEETS_AN_EXPLICIT_TEXT_CURRENT_RECEIVER.md)
+states why this bound does not settle the exact law's stability.
+
+[established-bounded; computational-witness] `inspect_text_return.py` checks the actual new
+18-port text study separately: source bytes and end markers, three shared parent contacts,
+all 64 differential current readings and actual self-returns, and the final moment against its
+full 856-contact population. All 63 consecutive outgoing-current balls are disjoint despite the
+64 repeated `d` bytes. Cold current capture leaves the complete observed body and output unchanged.
+The checker is a targeted comparison of the retained first-return reports, not a language gate.
+
+```sh
+python3 research/experiments/alpha_passive_junction/inspect_text_return.py \
+  .local/artifacts/athena-alpha/ac2/first-text-return-v2.json \
+  .local/artifacts/athena-alpha/ac2/first-text-return-v1.json \
+  --output .local/artifacts/athena-alpha/ac2/new-text-comparison.json
+```

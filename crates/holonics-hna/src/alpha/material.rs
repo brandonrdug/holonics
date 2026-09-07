@@ -131,7 +131,11 @@ impl OctetExcitation {
 /// A matched 16-port field seed. The native field derives outgoing and held currents from this
 /// standing material and the complete incoming field; no byte value enters the seed.
 pub fn matched_unit_field_seed() -> Vec<NativeJunctionSeed> {
-    (0..OCTET_INPUT_CHANNELS)
+    matched_unit_seed(OCTET_INPUT_CHANNELS)
+}
+
+fn matched_unit_seed(channels: usize) -> Vec<NativeJunctionSeed> {
+    (0..channels)
         .map(|_| NativeJunctionSeed {
             incoming_admittance: 1,
             held_admittance: 1,
@@ -182,6 +186,15 @@ fn with_octet_field_profile<R>(
     enclosed: Option<u32>,
     operation: impl FnOnce(&mut NativeConstitutiveField<'_>) -> Result<R, AlphaMaterialError>,
 ) -> Result<R, AlphaMaterialError> {
+    with_matched_field_profile(OCTET_INPUT_CHANNELS, paired, enclosed, operation)
+}
+
+pub(super) fn with_matched_field_profile<R>(
+    channels: usize,
+    paired: bool,
+    enclosed: Option<u32>,
+    operation: impl FnOnce(&mut NativeConstitutiveField<'_>) -> Result<R, AlphaMaterialError>,
+) -> Result<R, AlphaMaterialError> {
     let readout =
         ResidentReadout::new().map_err(|error| AlphaMaterialError::Apparatus(error.to_string()))?;
     let surface = ResidentSurface::on(&readout)
@@ -189,13 +202,13 @@ fn with_octet_field_profile<R>(
     let mut field = if let Some(grain) = enclosed {
         NativeConstitutiveField::found_with_enclosed_junction(
             &surface,
-            matched_unit_field_seed(),
+            matched_unit_seed(channels),
             ResidentGrain(grain),
         )?
     } else if paired {
-        NativeConstitutiveField::found_with_paired_junction(&surface, matched_unit_field_seed())?
+        NativeConstitutiveField::found_with_paired_junction(&surface, matched_unit_seed(channels))?
     } else {
-        NativeConstitutiveField::found(&surface, matched_unit_field_seed())?
+        NativeConstitutiveField::found(&surface, matched_unit_seed(channels))?
     };
     operation(&mut field)
 }

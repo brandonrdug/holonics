@@ -233,3 +233,52 @@ fn reference_availability_and_source_metadata_are_recomputed() {
     frame.views[0].links[0].availability = ExposureAvailability::Ambiguous;
     frame.validate(&manifest).unwrap();
 }
+
+#[test]
+fn shared_parent_keeps_common_evidence_and_refuses_a_link_order_choice() {
+    let mut frame: ExposureOccurrence =
+        serde_json::from_value(occurrence(3, "reply", "agent-visible", "response")).unwrap();
+    assert_eq!(frame.shared_prior_parent().unwrap(), None);
+    let target = ExposureTarget {
+        event: 1,
+        source: 1,
+        provider: "codex".into(),
+        record_group: "declared:request".into(),
+        timestamp: None,
+        normalized_timestamp: None,
+    };
+    let link = ExposureLink {
+        kind: "comparison-request".into(),
+        target_event: Some(1),
+        reference: None,
+        evidence: "captured".into(),
+        target: Some(target),
+        availability: ExposureAvailability::Prior,
+    };
+    frame.views[0].links = vec![link.clone(), link.clone()];
+    frame.views.push(frame.views[0].clone());
+    assert_eq!(
+        frame.shared_prior_parent().unwrap().unwrap().record_group,
+        "declared:request"
+    );
+    frame.views[1].links.clear();
+    assert!(frame.shared_prior_parent().is_err());
+    frame.views.pop();
+    let mut other = link.clone();
+    other.target.as_mut().unwrap().record_group = "declared:different".into();
+    for links in [vec![link.clone(), other.clone()], vec![other, link.clone()]] {
+        frame.views[0].links = links;
+        assert!(frame.shared_prior_parent().is_err());
+    }
+    for unavailable in [
+        ExposureAvailability::NotPrior,
+        ExposureAvailability::Ambiguous,
+        ExposureAvailability::Unresolved,
+    ] {
+        frame.views[0].links = vec![ExposureLink {
+            availability: unavailable,
+            ..link.clone()
+        }];
+        assert!(frame.shared_prior_parent().is_err());
+    }
+}

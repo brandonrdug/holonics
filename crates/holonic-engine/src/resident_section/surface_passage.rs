@@ -2,6 +2,33 @@ use super::*;
 
 impl<'chart> ResidentSurface<'chart> {
 
+    /// Terminal sign receiver on disjoint pairs of complex coordinates in a junction report.
+    pub(crate) fn record_field_differential_receiver(
+        &self, lane: &Lane<'_, 'chart>, report: &ResidentSection<'chart>,
+        dimension: usize, mode: u32, first_complex: usize, pairs: usize,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || ResidentRefusal::Declaration {
+            operation: "field-differential-receiver", what: "incompatible receiver chart".into(),
+        };
+        let words = dimension.checked_add(1)
+            .and_then(|n| n.checked_mul(if mode == 1 { 4 } else { 12 })).ok_or_else(fail)?;
+        if dimension == 0 || dimension % 2 != 0 || dimension > u32::MAX as usize
+            || !(1..=2).contains(&mode) || !(1..=63).contains(&pairs)
+            || first_complex.checked_add(2 * pairs).is_none_or(|end| end > dimension / 2)
+            || report.rows != 1 || report.width != words || report.grain.0 != 0
+            || output.rows != 1 || output.width != 4 || output.grain.0 != 0 {
+            return Err(fail());
+        }
+        let mut params = Params::new();
+        params.ptr(report.lo.device_ptr()).ptr(report.hi.device_ptr())
+            .u32(dimension as u32).u32(mode).u32(first_complex as u32).u32(pairs as u32)
+            .ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane, "section_field_differential_receiver", 1, self.launch.block_x,
+            0, &mut params, "field-differential-receiver")
+    }
+
     /// The same local relation/scattering construction over a complete independently addressed
     /// input field. Both departing branches are retained before receiver projection.
     #[allow(clippy::too_many_arguments)]

@@ -24,7 +24,10 @@ exterior octet excitation chart. The
 entered four actual conversation families through one owner and retained its unresolved receiver.
 
 [definition] `NativeFieldOccurrence::through` consumes an actual `NativeFieldEmission` from that
-field. `advance` reads the complete receiver fibre; `advance_status` explicitly projects only its
+field. `retain_source` derives shared immutable source standing from an available emission;
+`through_anchor` uses that standing for a separately recorded receiving contact. It does not copy
+or restore the ecology, and the original emission remains linear. `advance` reads the complete
+receiver fibre; `advance_status` explicitly projects only its
 classification while enacting the same successor. Inspection returns exact sections without
 creating receiving capabilities. `rechart` carries both source branches, relation and held phase;
 old-source reception crosses its actual producing frame on the device. `replace_incoming_transport`
@@ -71,6 +74,40 @@ inspections may be expensive and are not called by the productive recurrence. Th
 normally publishes internal enclosures in this mode, together with the residual source needed for
 exact reconstruction. Neither its JSON report nor the earlier scalar checkpoint format is an
 enclosed-junction model checkpoint.
+
+### Initial text-current application
+
+[definition] `alpha::text_codec` declares an 18-port, nine-pair chart for all octets and one
+end-of-part symbol. `read_differential_pairs` reads the junction's outgoing current on the device;
+it returns a sign only when the complete numerical ball lies in the corresponding half-space.
+Unresolved signs and reserved codewords remain explicit. `read_text_symbol` supplies the exterior
+presentation without a grammar or response lookup. Full current and residual sections remain
+resident until an explicit cold diagnostic requests them.
+
+[definition] `TextFieldSession` borrows one native field and returns every received or self-emitted
+symbol through its ordinary recurrence. It retains a failed native reception and distinguishes
+open current, reserved codeword, interruption, native refusal and part completion. The prototype
+uses an explicitly decoded-symbol return through the exterior chart; this is not an identity map
+on the full continuous outgoing field. An end-of-part marker is an application boundary, not a
+general measurement of completed thought. UTF-8 validity is checked separately.
+
+[established-bounded; measured] The first text run binds three recorded replies to their actual
+common request source and then presents a fresh mathematics question. It emits 64 copies of `d`
+and is interrupted without a completion marker. The [return record](../research/records/2026-09-06_AC1_THE_SHARED_SOURCE_MEETS_AN_EXPLICIT_TEXT_CURRENT_RECEIVER.md)
+retains the output, the distinct currents behind it and the verification scope. This prototype
+has not produced a useful alpha response or a durable model artifact.
+
+```sh
+cargo build -p holonics-hna --example alpha_text
+target/debug/examples/alpha_text .local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl --families 4 --fractional-bits 72 --prompt .local/artifacts/athena-alpha/ac2/first-request.txt --emit-symbols 64 --report .local/artifacts/athena-alpha/ac2/new-text-study.json
+```
+
+[definition] Supply a UTF-8 prompt file and a fresh private report path. The driver admits common
+development material, preserves source coordinates and open parent conditions, and samples actual
+native emission. Multiple parent families require a wider contextual port and remain unbound;
+the driver never picks one by ordering the links. The field is currently in-process only: this
+command freshly cultivates its declared slice and publishes a diagnostic report, not a checkpoint
+or an interactive consumer release.
 
 ## Run it
 

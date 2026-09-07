@@ -227,6 +227,49 @@ pub struct ExposureOccurrence {
 }
 
 impl ExposureOccurrence {
+    /// One prior parent common to every captured view of a validated exposure occurrence.
+    /// The reader/manifest validation owns source and availability verification. The first native text
+    /// attachment has one contextual source port; differing parents or unavailable relations
+    /// remain open rather than selecting a link by order or provider preference.
+    pub fn shared_prior_parent(&self) -> Result<Option<ExposureFamily>, ExposureError> {
+        let mut common: Option<BTreeSet<ExposureFamily>> = None;
+        for view in &self.views {
+            let mut parents = BTreeSet::new();
+            for link in &view.links {
+                if !matches!(
+                    link.kind.as_str(),
+                    "provider-parent" | "comparison-request" | "later-human-after-agent"
+                ) || link.availability != ExposureAvailability::Prior
+                {
+                    return Err(ExposureError::Open(
+                        "parent relation is unavailable or outside the admitted source port",
+                    ));
+                }
+                let target = link
+                    .target
+                    .as_ref()
+                    .ok_or(ExposureError::Open("prior parent has no source coordinate"))?;
+                parents.insert(ExposureFamily {
+                    provider: target.provider.clone(),
+                    record_group: target.record_group.clone(),
+                });
+            }
+            if common.as_ref().is_some_and(|previous| *previous != parents) {
+                return Err(ExposureError::Open(
+                    "captured views disagree on the available parent",
+                ));
+            }
+            common = Some(parents);
+        }
+        let parents = common.ok_or(ExposureError::Open("no captured views"))?;
+        if parents.len() > 1 {
+            return Err(ExposureError::Open(
+                "several parent families require a wider contextual source port",
+            ));
+        }
+        Ok(parents.into_iter().next())
+    }
+
     /// The same visible material in every captured view of this declared occurrence. This
     /// compares exterior presentations only; it neither chooses an incompatible view nor
     /// identifies equal text from distinct occurrences. Source/context views remain attached.

@@ -58,15 +58,25 @@ occurrence 6 without sealing a numerical center as an exact current.
 transport and same-input contextual differences under equal moments/raw fields. Cooperative LDL
 rows preserve the complete body and history bit-for-bit. The resident continuation now completes
 the same material with zero numerical section readouts during admission, retaining its complete
-obstruction receipts; all 25 field controls pass. Terminal diagnostics preserve the same body and
+obstruction receipts. Terminal diagnostics preserve the same body and
 separate material work, observation and I/O costs. The [current record](research/records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md)
 retains those costs and the earlier exact-chart obstruction at its proper scope.
 
-[open] AC1 remains active. Record-parent/branch channels and larger productive organization still
-need binding; current material links are within text parts. Broader cultivation requires efficient
-operation and lawful history placement. Learned text-codec emission, complete useful responses,
-durable cultivated models and the full AC0–AC5 return remain open. No alpha response has been
-produced, and the fixed linear receiver's plural readings are not a language-quality grade.
+[established-bounded; measured] The [shared-source/text-current return](research/records/2026-09-06_AC1_THE_SHARED_SOURCE_MEETS_AN_EXPLICIT_TEXT_CURRENT_RECEIVER.md)
+binds three replies to one immutable request source without cloning the ecology. Its 18-port
+octet/end-of-part chart receives the same four families in 732 operations; a terminal differential
+receiver presents native current as codewords. Thirty field and thirteen data/codec controls pass.
+
+[counterexample; measured] On a fresh function/derivative question, this first composition emits
+64 copies of `d` and reaches its work limit without a completion marker. All 63 consecutive
+current pairs remain certifiably distinct behind that repeated surface. The source/current
+comparison retains the failure and exact self-return chronology; this is not a useful alpha reply.
+
+[open] AC1 remains active. The shared endpoint port does not reconstruct a full parent history;
+wider contextual incidence and productive use of separating histories still need construction.
+A cold continuous-source-feedback candidate exposes a too-loose scalar error representation.
+Broader efficient cultivation, useful learned text conduct, durable native models and the full
+AC0–AC5 product remain open. The native current and the response quality retain separate grades.
 
 ## Completed foundation and data preparation
 

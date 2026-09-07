@@ -5,8 +5,8 @@
 //!
 //! This field chart has fixed nodes and unit-phase incidences. Live fixed-node recharting
 //! and physical incoming-incidence replacement retain their distinct frame/history semantics;
-//! root-carrier enlargement, contextual parent contacts and a learned text-codec product remain
-//! outside it.
+//! shared immutable source standing supports distinct later contacts. Root-carrier enlargement
+//! and a useful learned text product remain outside this component's established scope.
 //! The paired-junction constructor additionally makes a formed Hermitian contact moment and
 //! retained internal current operative on the root port field, with a complete internal decoder.
 
@@ -16,6 +16,7 @@ use crate::dimensional_wave::ExactComplexWaveCurrent;
 use std::rc::Rc;
 
 mod junction;
+mod receiver;
 mod rechart;
 pub use junction::{
     NativeFieldCurrentBall, NativeFieldEnclosedJunctionReading, NativeFieldExactJunctionReading,
@@ -23,6 +24,7 @@ pub use junction::{
     NativeFieldJunctionRepresentation,
 };
 use junction::{PairedJunction, PendingJunction};
+pub use receiver::NativeFieldDifferentialReading;
 
 /// One actual emitted source from this live body. It is linear; the caller cannot manufacture
 /// it from an occurrence number or duplicate it for another receiving edge.
@@ -32,10 +34,26 @@ pub struct NativeFieldEmission {
     occurrence: usize,
 }
 
+/// Shared immutable source standing, issued only from an actual available emission. Cloning
+/// this address shares its historical section and frame, never a continuing ecology or current.
+#[derive(Clone, Debug)]
+pub struct NativeFieldSourceAnchor {
+    owner: Rc<()>,
+    occurrence: usize,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum NativeFieldSourceContact {
+    Emission,
+    RetainedAnchor,
+}
+
 #[derive(Debug)]
 pub struct NativeFieldOccurrence {
     incoming: Vec<NativePhaseCurrent>,
     source: Option<NativeFieldEmission>,
+    anchor: Option<NativeFieldSourceAnchor>,
 }
 
 impl NativeFieldOccurrence {
@@ -43,12 +61,26 @@ impl NativeFieldOccurrence {
         Self {
             incoming,
             source: None,
+            anchor: None,
         }
     }
     pub fn through(source: NativeFieldEmission, incoming: Vec<NativePhaseCurrent>) -> Self {
         Self {
             incoming,
             source: Some(source),
+            anchor: None,
+        }
+    }
+    /// Join a new receiving occurrence to shared historical standing. Its new contact and
+    /// internal current belong to this actual receiving occurrence, not to a duplicated source.
+    pub fn through_anchor(
+        anchor: &NativeFieldSourceAnchor,
+        incoming: Vec<NativePhaseCurrent>,
+    ) -> Self {
+        Self {
+            incoming,
+            source: None,
+            anchor: Some(anchor.clone()),
         }
     }
     pub fn take_source(&mut self) -> Option<NativeFieldEmission> {
@@ -66,6 +98,7 @@ pub struct NativeFieldLineage {
     pub frame: u64,
     pub predecessor_state: Option<usize>,
     pub received_from: Option<usize>,
+    pub source_contact: Option<NativeFieldSourceContact>,
     /// Complete exterior excitation field, not a semantic feature vector or a fitted source.
     pub incoming: Vec<NativePhaseCurrent>,
 }
@@ -260,6 +293,26 @@ impl<'chart> NativeConstitutiveField<'chart> {
     /// is issued by observing it.
     pub fn source_frame(&self, occurrence: usize) -> Option<&NativeCurrentFrame> {
         self.history.get(occurrence).map(|p| p.frame.view.as_ref())
+    }
+    /// Retain the immutable standing behind an available linear emission. The original handle
+    /// remains linear. Anchored returns create separately recorded contacts and never restore or
+    /// clone the source-time ecology.
+    pub fn retain_source(
+        &self,
+        source: &NativeFieldEmission,
+    ) -> Result<NativeFieldSourceAnchor, ConstitutiveFibreError> {
+        if !Rc::ptr_eq(&source.owner, &self.owner)
+            || self
+                .history
+                .get(source.occurrence)
+                .is_none_or(|event| event.returned)
+        {
+            return Err(ConstitutiveFibreError::ForeignOccurrence);
+        }
+        Ok(NativeFieldSourceAnchor {
+            owner: Rc::clone(&self.owner),
+            occurrence: source.occurrence,
+        })
     }
     pub fn inspect_relation(&self) -> Result<ResidentSectionRest, ConstitutiveFibreError> {
         self.relation.inspect_relation()
@@ -459,6 +512,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
         if occurrence.incoming.len() != self.nodes() {
             return Err(ConstitutiveFibreError::Shape);
         }
+        if occurrence.source.is_some() && occurrence.anchor.is_some() {
+            return Err(ConstitutiveFibreError::Shape);
+        }
         let source_at = if let Some(source) = &occurrence.source {
             if !Rc::ptr_eq(&source.owner, &self.owner)
                 || self
@@ -469,6 +525,11 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 return Err(ConstitutiveFibreError::ForeignOccurrence);
             }
             Some(source.occurrence)
+        } else if let Some(anchor) = &occurrence.anchor {
+            if !Rc::ptr_eq(&anchor.owner, &self.owner) || anchor.occurrence >= self.history.len() {
+                return Err(ConstitutiveFibreError::ForeignOccurrence);
+            }
+            Some(anchor.occurrence)
         } else {
             None
         };
@@ -486,6 +547,16 @@ impl<'chart> NativeConstitutiveField<'chart> {
             frame: self.frame.view.ordinal,
             predecessor_state: at.checked_sub(1),
             received_from: source_at,
+            source_contact: occurrence
+                .source
+                .as_ref()
+                .map(|_| NativeFieldSourceContact::Emission)
+                .or_else(|| {
+                    occurrence
+                        .anchor
+                        .as_ref()
+                        .map(|_| NativeFieldSourceContact::RetainedAnchor)
+                }),
             incoming: occurrence.incoming.clone(),
         };
         let surface = self.relation.surface;
@@ -569,8 +640,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
         // Observer failure retains the existing pending/uncertain state; it is not rollback.
         // The resident callback is unit-valued and performs no section readout.
         let observed = observe(self, source_at, occurrence)?;
-        if let Some(i) = source_at {
-            self.history[i].returned = true;
+        if occurrence.source.is_some() {
+            self.history[source_at.expect("linear source")].returned = true;
         }
         occurrence.source = None;
         self.history
