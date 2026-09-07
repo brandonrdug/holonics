@@ -1,6 +1,104 @@
 use super::*;
 
 impl<'chart> ResidentSurface<'chart> {
+    /// The same local relation/scattering construction over a complete independently addressed
+    /// input field. Both departing branches are retained before receiver projection.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_constitutive_field(
+        &self, lane: &Lane<'_, 'chart>, seed: &ResidentSection<'chart>,
+        memory: &mut ResidentSection<'chart>, basis: &mut ResidentSection<'chart>,
+        incoming: &ResidentSection<'chart>, origin: Option<&ResidentSection<'chart>>,
+        frame: &ResidentSection<'chart>, origin_frame: Option<&ResidentSection<'chart>>,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = |what: &str| ResidentRefusal::Declaration {
+            operation: "constitutive-field", what: what.into(),
+        };
+        let nodes = seed.rows;
+        let width = nodes.checked_mul(6).filter(|v| *v <= u32::MAX as usize / 4)
+            .ok_or_else(|| fail("field relation extent overflow"))?;
+        let output_width = nodes.checked_mul(16).and_then(|v| v.checked_add(9))
+            .ok_or_else(|| fail("field report extent overflow"))?;
+        let matches = |s: &ResidentSection<'chart>, rows, columns|
+            s.rows == rows && s.width == columns && s.grain.0 == 0;
+        if nodes == 0 || !matches(seed, nodes, 5) || !matches(memory, nodes, 3)
+            || !matches(basis, width, width) || !matches(incoming, nodes, 3)
+            || !matches(frame, nodes, 3)
+            || !matches(output, 1, output_width)
+            || origin.is_some_and(|s| !matches(s, 1, output_width))
+            || origin.is_some() != origin_frame.is_some()
+            || origin_frame.is_some_and(|s| !matches(s, nodes, 3)) {
+            return Err(fail("incompatible field, source or continuing relation"));
+        }
+        let shared = nodes.checked_mul(24).and_then(|v| v.checked_mul(16))
+            .and_then(|v| u32::try_from(v).ok())
+            .filter(|v| *v <= self.declaration.max_sectiond_bytes)
+            .ok_or_else(|| fail("field exact scratch exceeds the mounted aperture"))?;
+        let mut params = Params::new();
+        params.ptr(seed.lo.device_ptr()).ptr(memory.lo.device_ptr()).ptr(memory.hi.device_ptr())
+            .ptr(basis.lo.device_ptr()).ptr(basis.hi.device_ptr()).ptr(incoming.lo.device_ptr())
+            .ptr(origin.unwrap_or(incoming).lo.device_ptr()).ptr(frame.lo.device_ptr())
+            .ptr(origin_frame.unwrap_or(frame).lo.device_ptr()).u32(nodes as u32)
+            .u32(u32::from(origin.is_some())).ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane, "section_constitutive_field", 1, self.launch.block_x,
+            shared, &mut params, "constitutive-field")
+    }
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_constitutive_field_rechart(
+        &self, lane: &Lane<'_, 'chart>, seed: &ResidentSection<'chart>,
+        memory: &ResidentSection<'chart>, frame: &ResidentSection<'chart>,
+        basis: &ResidentSection<'chart>, change: &ResidentSection<'chart>,
+        new_seed: &ResidentSection<'chart>, new_memory: &ResidentSection<'chart>,
+        new_frame: &ResidentSection<'chart>, new_basis: &ResidentSection<'chart>,
+        report: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let nodes = seed.rows;
+        let width = nodes.checked_mul(6)
+            .filter(|v| *v <= u32::MAX as usize / 4)
+            .ok_or_else(|| ResidentRefusal::Declaration {
+                operation: "constitutive-field-rechart",
+                what: "field relation extent overflow".into(),
+            })?;
+        let matching = |s: &ResidentSection<'chart>, rows, columns|
+            s.rows == rows && s.width == columns && s.grain.0 == 0;
+        if nodes == 0
+            || !matching(seed, nodes, 5)
+            || !matching(memory, nodes, 3)
+            || !matching(frame, nodes, 3)
+            || !matching(change, nodes, 6)
+            || !matching(basis, width, width)
+            || !matching(new_seed, nodes, 5)
+            || !matching(new_memory, nodes, 3)
+            || !matching(new_frame, nodes, 3)
+            || !matching(new_basis, width, width)
+            || !matching(report, nodes, 9)
+        {
+            return Err(ResidentRefusal::Declaration {
+                operation: "constitutive-field-rechart",
+                what: "incompatible field phase, seed or relation charts".into(),
+            });
+        }
+        let shared = width.checked_mul(16)
+            .and_then(|v| u32::try_from(v).ok())
+            .filter(|v| *v <= self.declaration.max_sectiond_bytes)
+            .ok_or_else(|| ResidentRefusal::Declaration {
+                operation: "constitutive-field-rechart",
+                what: "exact field rechart scratch exceeds the mounted aperture".into(),
+            })?;
+        let mut params = Params::new();
+        params.ptr(seed.lo.device_ptr()).ptr(memory.lo.device_ptr()).ptr(frame.lo.device_ptr())
+            .ptr(basis.lo.device_ptr()).ptr(change.lo.device_ptr()).u32(nodes as u32)
+            .ptr(new_seed.lo.device_ptr()).ptr(new_seed.hi.device_ptr())
+            .ptr(new_memory.lo.device_ptr()).ptr(new_memory.hi.device_ptr())
+            .ptr(new_frame.lo.device_ptr()).ptr(new_frame.hi.device_ptr())
+            .ptr(new_basis.lo.device_ptr()).ptr(new_basis.hi.device_ptr())
+            .ptr(report.lo.device_ptr()).ptr(report.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane, "section_constitutive_field_rechart", 1, self.launch.block_x,
+            shared, &mut params, "constitutive-field-rechart")
+    }
+
     /// Exact scratch layout of the target representation, including local denominators.
     pub(crate) fn constitutive_fibre_scratch(width: usize) -> Option<usize> {
         #[cfg(target_os = "macos")]

@@ -13,6 +13,26 @@ states its bounded scope. Native checkpoints retain the complete phase ecology a
 application-bearing checkpoints also retain the independent world and pending interaction. A seed,
 JSON report or relation inspection is **not a learned-model checkpoint**.
 
+## Athena-alpha material field
+
+[established-bounded; measured] The separate
+[`NativeConstitutiveField`](../crates/holonic-engine/src/native_ecology/constitutive_fibre/field.rs)
+extends the same native junction/relation construction to independently excited ports and both
+complex outgoing/held source branches. `holonics_hna::alpha::material` provides its reversible
+exterior octet excitation chart. The
+[first material run](../research/records/2026-09-06_AC1_THE_COMPLETE_MATERIAL_FIELD_RETAINS_ITS_CONTEXTUAL_OBSTRUCTION.md)
+entered four actual conversation families through one owner and retained its unresolved receiver.
+
+[definition] `NativeFieldOccurrence::through` consumes an actual `NativeFieldEmission` from that
+field. `advance` reads the complete receiver fibre; `advance_status` explicitly projects only its
+classification while enacting the same successor. Inspection returns exact sections without
+creating receiving capabilities. `rechart` carries both source branches, relation and held phase;
+old-source reception crosses its actual producing frame on the device. `replace_incoming_transport`
+changes a physical incidence in the present frame and preserves the distinction from recharting.
+The `alpha_material` example is a private material/current study;
+its excitation round-trip is not a learned text decoder and its report is not a model checkpoint.
+The existing scalar JSONL session and checkpoint format below do not serialize this wider field.
+
 ## Run it
 
 [established-bounded; measured] These commands run the checked-in examples on the standing CUDA

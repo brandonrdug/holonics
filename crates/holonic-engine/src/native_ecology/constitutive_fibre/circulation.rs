@@ -9,7 +9,7 @@ use super::*;
 mod rechart;
 mod rest;
 use crate::dimensional_wave::ExactComplexWaveCurrent;
-use rechart::HeldCurrentFrame;
+pub(super) use rechart::HeldCurrentFrame;
 pub use rechart::{NativeCurrentFrame, NativeIncidenceChange, NativeRechartReceipt};
 pub use rest::NativeEcologyRest;
 use serde::Deserialize;
@@ -109,10 +109,10 @@ impl NativePhaseCurrent {
             Rat::new(self.imaginary.into(), self.denominator.into()),
         )
     }
-    fn words(self) -> [i64; 3] {
+    pub(in crate::native_ecology::constitutive_fibre) fn words(self) -> [i64; 3] {
         [self.real, self.imaginary, self.denominator]
     }
-    fn is_unit(self) -> bool {
+    pub(in crate::native_ecology::constitutive_fibre) fn is_unit(self) -> bool {
         (self.real as i128 * self.real as i128)
             .checked_add(self.imaginary as i128 * self.imaginary as i128)
             == Some(self.denominator as i128 * self.denominator as i128)

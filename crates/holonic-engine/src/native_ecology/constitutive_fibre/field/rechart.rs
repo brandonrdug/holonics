@@ -1,57 +1,15 @@
-//! Live coordinate transport and physical incidence changes are different operations.
-//! Historical emissions retain their actual frame and immutable material. Native reception
-//! transports their source fields on-device; the exterior frame view below is only a codec.
+//! Live field recharting and physical incoming-incidence changes.
+//!
+//! Recharting is a recoverable representation transfer of one continuing field. It rotates both
+//! source branches (outgoing and held), the held memory, seed incidence and root frame. The
+//! external incoming field stays in its declared target chart. A later linked reception carries
+//! the old source frame to the current frame in the resident field kernel.
 
 use super::*;
 
-#[derive(Debug)]
-pub struct NativeCurrentFrame {
-    pub(in crate::native_ecology::constitutive_fibre) ordinal: u64,
-    pub(in crate::native_ecology::constitutive_fibre) root_to_local: Vec<NativePhaseCurrent>,
-}
-
-impl NativeCurrentFrame {
-    pub fn ordinal(&self) -> u64 {
-        self.ordinal
-    }
-    pub fn root_to_local(&self) -> &[NativePhaseCurrent] {
-        &self.root_to_local
-    }
-}
-
-pub(in crate::native_ecology::constitutive_fibre) struct HeldCurrentFrame<'chart> {
-    pub(in crate::native_ecology::constitutive_fibre) native: ResidentSection<'chart>,
-    pub(in crate::native_ecology::constitutive_fibre) view: Rc<NativeCurrentFrame>,
-}
-
-#[derive(Debug)]
-pub struct NativeRechartReceipt {
-    pub before: Rc<NativeCurrentFrame>,
-    pub after: Rc<NativeCurrentFrame>,
-    pub at_state: Option<usize>,
-    pub gauges: Vec<NativePhaseCurrent>,
-}
-
-#[derive(Debug)]
-pub struct NativeIncidenceChange {
-    pub at_state: Option<usize>,
-    pub frame: Rc<NativeCurrentFrame>,
-    pub node: usize,
-    pub before: NativePhaseCurrent,
-    pub after: NativePhaseCurrent,
-}
-
-impl<'chart> NativeConstitutiveEcology<'chart> {
-    pub fn recharts(&self) -> &[NativeRechartReceipt] {
-        &self.recharts
-    }
-    pub fn incidence_changes(&self) -> &[NativeIncidenceChange] {
-        &self.incidence_changes
-    }
-
-    /// A fixed-node rational unit-phase change of chart. This stages a new representation of
-    /// the same state/relation, never a second ecology or an independently running branch.
-    /// Old buffers and all source handles remain valid until the complete native return succeeds.
+impl<'chart> NativeConstitutiveField<'chart> {
+    /// Rechart the same fixed-node field by exact unit phases. Historical source sections retain
+    /// their producing frame; only the contemporary standing representation is replaced.
     pub fn rechart(
         &mut self,
         gauges: &[NativePhaseCurrent],
@@ -60,7 +18,7 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
             return Err(ConstitutiveFibreError::Uncertain);
         }
         let nodes = self.material.len();
-        if gauges.len() != nodes || gauges.iter().any(|g| !g.is_unit()) {
+        if gauges.len() != nodes || gauges.iter().any(|gauge| !gauge.is_unit()) {
             return Err(ConstitutiveFibreError::Shape);
         }
         let ordinal = self
@@ -72,28 +30,31 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
         self.recharts
             .try_reserve(1)
             .map_err(|_| ConstitutiveFibreError::Shape)?;
+
         let declared_gauges = gauges.to_vec();
         let surface = self.relation.surface;
-        let width = 2 * nodes + 2;
-        let words = gauges
+        let width = 6usize
+            .checked_mul(nodes)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let change_words = gauges
             .iter()
-            .zip(self.material.iter())
-            .flat_map(|(g, seed)| g.words().into_iter().chain(seed.initial_held.words()))
-            .map(|v| (v, v))
+            .zip(&self.material)
+            .flat_map(|(gauge, seed)| gauge.words().into_iter().chain(seed.initial_held.words()))
+            .map(|value| (value, value))
             .collect();
         let change = surface.mount_section_rest(
-            &ResidentSectionRest::found(nodes, 6, ResidentGrain(0), 64, words)
+            &ResidentSectionRest::found(nodes, 6, ResidentGrain(0), 64, change_words)
                 .map_err(|_| ConstitutiveFibreError::Shape)?,
         )?;
         let new_seed = surface.fresh_section(nodes, 5, ResidentGrain(0))?;
         let new_memory = surface.fresh_section(nodes, 3, ResidentGrain(0))?;
-        let new_frame = surface.fresh_section(nodes, 3, ResidentGrain(0))?;
+        let new_frame_native = surface.fresh_section(nodes, 3, ResidentGrain(0))?;
         let new_basis = surface.fresh_section(width, width, ResidentGrain(0))?;
         let report = surface.fresh_section(nodes, 9, ResidentGrain(0))?;
         let mut passage = surface.begin_passage(&[vec![]])?;
         {
             let lane = passage.open(0, &[])?;
-            surface.record_constitutive_rechart(
+            surface.record_constitutive_field_rechart(
                 &lane,
                 &self.seed,
                 &self.memory,
@@ -102,7 +63,7 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
                 &change,
                 &new_seed,
                 &new_memory,
-                &new_frame,
+                &new_frame_native,
                 &new_basis,
                 &report,
             )?;
@@ -116,7 +77,7 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
             )));
         }
         let returned = surface.read_out(&report)?;
-        if returned.iter().any(|(l, h)| l != h) {
+        if returned.iter().any(|(lower, upper)| lower != upper) {
             return Err(ConstitutiveFibreError::Uncertain);
         }
         let phase = |at: usize| {
@@ -140,7 +101,7 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
             root_to_local.push(root);
         }
         let frame = Rc::new(HeldCurrentFrame {
-            native: new_frame,
+            native: new_frame_native,
             view: Rc::new(NativeCurrentFrame {
                 ordinal,
                 root_to_local,
@@ -152,20 +113,20 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
             at_state: self.history.len().checked_sub(1),
             gauges: declared_gauges,
         };
-        // Recoverable ownership transfer: all staging and decoding succeeded before the one
-        // live owner's representation changes. No historical section is rewritten.
+        // The one representation transfer occurs only after all new sections and report fields
+        // have returned exactly. Existing source sections continue to own their old frames.
         self.seed = new_seed;
         self.memory = new_memory;
         self.relation.basis = new_basis;
-        self.material = material.into();
+        self.material = material;
         self.frame = frame;
         self.recharts.push(receipt);
-        Ok(self.recharts.last().expect("committed rechart"))
+        Ok(self.recharts.last().expect("committed field rechart"))
     }
 
-    /// An explicit physical change of one incoming incidence, in the PRESENT local frame.
-    /// This mounts new constitutive material; it does not rotate the held phase, learned relation
-    /// or old source fields. The difference from `rechart` is intentional and testable.
+    /// Replace one physical incoming incidence in the current local frame. This changes seed
+    /// transport only; it does not rotate held memory, rewrite historical source sections, or
+    /// alter the learned relation basis.
     pub fn replace_incoming_transport(
         &mut self,
         node: usize,
@@ -180,21 +141,21 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
         self.incidence_changes
             .try_reserve(1)
             .map_err(|_| ConstitutiveFibreError::Shape)?;
-        let mut material = self.material.to_vec(); // immutable declaration, never the live ecology
+        let mut material = self.material.clone();
         let before = material[node].incoming_transport;
         material[node].incoming_transport = after;
         let words = material
             .iter()
-            .flat_map(|n| {
+            .flat_map(|seed| {
                 [
-                    n.incoming_admittance,
-                    n.held_admittance,
-                    n.incoming_transport.real,
-                    n.incoming_transport.imaginary,
-                    n.incoming_transport.denominator,
+                    seed.incoming_admittance,
+                    seed.held_admittance,
+                    seed.incoming_transport.words()[0],
+                    seed.incoming_transport.words()[1],
+                    seed.incoming_transport.words()[2],
                 ]
             })
-            .map(|v| (v, v))
+            .map(|value| (value, value))
             .collect();
         let seed = self.relation.surface.mount_section_rest(
             &ResidentSectionRest::found(material.len(), 5, ResidentGrain(0), 64, words)
@@ -208,9 +169,12 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
             after,
         };
         self.seed = seed;
-        self.material = material.into();
+        self.material = material;
         self.incidence_changes.push(change);
-        Ok(self.incidence_changes.last().expect("committed material"))
+        Ok(self
+            .incidence_changes
+            .last()
+            .expect("committed field incidence change"))
     }
 }
 

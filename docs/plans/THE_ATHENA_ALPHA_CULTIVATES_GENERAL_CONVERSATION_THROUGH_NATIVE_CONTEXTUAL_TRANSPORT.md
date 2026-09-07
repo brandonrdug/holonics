@@ -189,6 +189,19 @@ Do not rebuild the completed raw capture. AC0 is data/application integration, n
 
 ### AC1 — Material, contextual current and developing native morphology
 
+[established-bounded; measured] The [first material field return](../../research/records/2026-09-06_AC1_THE_COMPLETE_MATERIAL_FIELD_RETAINS_ITS_CONTEXTUAL_OBSTRUCTION.md)
+composes an exterior octet port chart, separate native per-port excitation, complete outgoing/held
+source branches and actual paired receiving fields. Four development families entered one native
+owner. AC1 remains active: record circumstances, higher contact and learned productive reaction
+are not yet bound by this component.
+
+[counterexample; computational-witness] The fixed chart loses a source-side linear distinction
+which a local Hermitian pair receiver preserves, but also presents an identical-field/different-
+arrival collision with separating retained predecessors. Therefore a polynomial lift of that
+same local face is insufficient. The next binding must make the relevant differing standing and
+channels participate through native transport. Source ordinals and retained handles preserve
+lineage; they do not, by themselves, create that operation.
+
 [definition] Compose a reversible exterior material chart with native addressed sections,
 conditional channels, NCF formation and the admitted complex/higher contact law. Specify the
 actual source/target maps, seed constitutive laws, conditioning carriers and growth/rebase rule
