@@ -36,6 +36,14 @@ archive for learning. The [September 7 synthesis](../research/records/2026-09-07
 connects the existing constrained-law, observable-form and generator execution owners to the
 current text/acoustic attachment question, including their concrete host/resident boundaries.
 
+[established-bounded; measured] The existing `constitutive_fibre` owner now binds
+`ConstitutiveSourceChart::BilinearContact` and conducts `advance_bilinear_contact` through
+`section_constitutive_bilinear_source` followed by the existing relation kernel. Both direct
+currents and all complex mixed incidences remain resident. The
+[measured phase-action return](../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
+includes an independently supplied condition, a withheld physical return, inferred-operator
+identity and later wave conduct. Its condition Preimage Fibre and conversation binding remain open.
+
 [established-bounded; measured] `native_ecology/constitutive_fibre/resident.rs` now owns borrowed
 resident rational-current input and immutable original-fibre returns for the existing local
 relation. `resident_section::record_constitutive_current` and

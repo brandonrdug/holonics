@@ -3,6 +3,10 @@
 //! Seed hypothesis: paired currents inhabit one declared rational-linear source/receiver chart.
 //! This is NOT an assumption that HNA, language, or arbitrary contexts are globally linear.
 //! The resident body forms the span of received pairs, not a selected total coefficient map.
+//! The explicit bilinear contact composes two separately declared complex current ports and
+//! their mixed products into this same relation. Its source law is bound at founding; a flattened
+//! array cannot silently stand in for that contact. The condition must have its actual situated
+//! channel/receiver meaning in the application, not merely a contextual name.
 //! Source-only and paired occurrences use the same operation and continuing owner. Outside the
 //! source projection there is no inferred response; a vertical fibre remains plural, not averaged.
 //! Formal owner: `Computation/HolonicConstitutiveFibre.lean`. Native incidence, physical contact
@@ -23,6 +27,19 @@ mod field;
 pub use field::*;
 mod resident;
 pub use resident::{ResidentConstitutiveCurrent, ResidentConstitutiveReturn};
+
+/// Declared local source law, bound at founding rather than inferred from an array's width.
+/// These dimensions are the caller's interface chart, not learned semantic capacities.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(tag = "kind", rename_all = "kebab-case")]
+pub enum ConstitutiveSourceChart {
+    Linear,
+    /// Source, condition and their complete complex tensor product participate in one contact.
+    BilinearContact {
+        source_complex: usize,
+        condition_complex: usize,
+    },
+}
 
 #[derive(Debug, PartialEq, Eq, Serialize)]
 pub enum ConstitutiveReading {
@@ -79,6 +96,7 @@ pub struct ResidentConstitutiveFibre<'chart> {
     surface: &'chart ResidentSurface<'chart>,
     source_width: usize,
     target_width: usize,
+    source_chart: ConstitutiveSourceChart,
     occurrences: u64,
     usable: bool,
 }
@@ -120,6 +138,7 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
             surface,
             source_width,
             target_width,
+            source_chart: ConstitutiveSourceChart::Linear,
             occurrences: 0,
             usable: true,
         })
@@ -127,6 +146,38 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
 
     pub fn occurrences(&self) -> u64 {
         self.occurrences
+    }
+
+    pub fn source_chart(&self) -> ConstitutiveSourceChart {
+        self.source_chart
+    }
+
+    /// Found the existing local relation over an explicit two-current contact. No coefficient,
+    /// class label or source-selection rule is supplied. Mixed action is learned from returns.
+    pub fn found_bilinear_contact(
+        surface: &'chart ResidentSurface<'chart>,
+        source_complex: usize,
+        condition_complex: usize,
+        target_complex: usize,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        if source_complex == 0 || condition_complex == 0 || target_complex == 0 {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let width = source_complex
+            .checked_mul(condition_complex)
+            .and_then(|n| n.checked_add(source_complex))
+            .and_then(|n| n.checked_add(condition_complex))
+            .and_then(|n| n.checked_mul(2))
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let target_width = target_complex
+            .checked_mul(2)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let mut body = Self::found(surface, width, target_width)?;
+        body.source_chart = ConstitutiveSourceChart::BilinearContact {
+            source_complex,
+            condition_complex,
+        };
+        Ok(body)
     }
 
     pub fn census(&self) -> TransferCensus {
@@ -147,7 +198,8 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
         if !self.usable {
             return Err(ConstitutiveFibreError::Uncertain);
         }
-        if source.len() != self.source_width
+        if self.source_chart != ConstitutiveSourceChart::Linear
+            || source.len() != self.source_width
             || receiving.is_some_and(|v| v.len() != self.target_width)
         {
             return Err(ConstitutiveFibreError::Shape);

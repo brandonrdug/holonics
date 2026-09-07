@@ -22,17 +22,31 @@ checkpoint was not published; no complete continuation result is available.
 
 [definition] The goal is resumed with the chord/class clarification incorporated:
 reusable class, Preimage Fibre, coherent composition and ordered progression have distinct roles.
-The Mac handoff is the first committed shared generator/phase formation and continuation return
-with a concrete Metal port boundary. It is not yet available. Desktop acoustic work is optional
-research for that common relation; the conversation product remains the goal.
+The [conditional-generator return](research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
+now provides a useful Mac re-engagement point for the shared primitive, with a concrete
+[Metal port boundary](docs/HARDWARE_AND_MODALITY_BOUNDARIES.md#conditional-generator-port-for-the-mac-workflow).
+General acoustic/conversation models remain unfinished. Desktop acoustic work is optional
+research for the common relation; the conversation product remains the goal.
+
+[established-bounded; measured] The existing local relation now learns over an explicit native
+source/condition/mixed-current contact. Six measured phase-field returns identify a local action,
+predict a new rational condition exactly, and drive three later wave currents without numerical
+readback. The inferred operator itself is checked in the portable return. The 93-test constitutive
+scope and an additional multiport/denominator control pass. The condition is an independently
+supplied channel property in this experiment, not a semantic label.
+
+[open] Next construct the condition Preimage Fibre from a fixed actual source and later return
+inside the same learned relation, then use its supported consequences in continuing transport.
+For the bilinear chart this is an affine section, so it can reuse the native elimination owner.
+The appropriate binding to actual conversation material and useful text remain open.
 
 [established-bounded; measured] The existing local relation now has a
 [resident rational-current port](research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md).
 Two actual native observations support a new phase superposition while an unobserved direction
 remains open; learned rational currents conduct into subsequent operations with zero numerical
 readbacks or remounts. Original plural faces survive later development. All 84 constitutive tests
-pass. This closes a component's composition port; the general conversation-field attachment and
-Mac cultivation handoff remain unfinished.
+pass. This closes a component's composition port. General conversation-field attachment remains
+unfinished; the later conditional-generator return above now supplies the shared Mac port scope.
 
 [established-bounded; measured] The [field relation receiver](research/records/2026-09-07_AC1_THE_FIELD_RETURNS_A_RESIDENT_RELATION_FACE_AND_A_PLURAL_FIBRE_HAS_FIXED_RECEIVERS.md)
 now carries actual historical source branches into the current frame and returns a resident
@@ -44,7 +58,8 @@ function/derivative prompt, emits no text. Its relation has nine vertical direct
 witnesses show every output-bit differential can vary at fixed source. This is algebraic
 non-identification in the formed local relation, not a numerical-precision problem or an intrinsic
 semantic ambiguity. Next bind the actual situated conditions and applicable local action; the
-global use of one local linear chart remains insufficiently founded. The Mac handoff is not ready.
+global use of one local linear chart remains insufficiently founded. That failed text model does
+not establish or revoke the later shared conditional-phase return above.
 
 [definition] The original authorization is construction and completion of the
 [Athena-alpha blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md).

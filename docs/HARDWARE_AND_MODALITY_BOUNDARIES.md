@@ -22,6 +22,41 @@ neither a perfect inverse nor a copy of every past sample is a general learning 
 
 ## Current common mechanism
 
+### Conditional-generator port for the Mac workflow
+
+[established-bounded; measured] The [measured conditional phase return](../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
+now supplies a shared local primitive worth porting while desktop conversation construction
+continues. Six actual native observations identify a phase action in the declared bilinear family;
+it predicts a new rational condition and conducts successive resident wave currents. The
+[public example](../crates/holonic-engine/examples/native_conditioned_phase.rs) and portable
+[operator receipt](../research/records/2026-09-07_conditional_phase/return-v2.json) give a concrete
+comparison. This is not a completed acoustic or conversation model.
+
+[established-bounded; source-inspected] Apple `bd3ea689` remains the pushed branch at this check.
+Its Metal owner already supplies `fibre_query`, `fibre_stage`, `wnorm`, `phaseprod` and the native
+field used as the example's teacher. The remaining port boundary is:
+
+1. Carry `ConstitutiveSourceChart`, the bound bilinear constructor, resident rational-current
+   views and `advance_bilinear_contact` from the existing constitutive owner. Preserve the Mac's
+   target-aware field and mount code. Existing ordinary field/rest initializers stay `Linear`.
+2. Realize `section_constitutive_current` and `section_constitutive_bilinear_source` over the
+   existing Metal wide/rational helpers. Their source law is `s ⊕ c ⊕ (c ⊗ s)`;
+   the existing relation owns learning. Preserve checked denominators, both quadratures,
+   all mixed incidences, the original vertical fibre and commit-after-complete-return behavior.
+3. Map the new resident surface bindings and their two-lane dependency. Use Metal's actual `W`
+   layout and its existing scratch accounting rather than copying CUDA's sixteen-byte wide size.
+   The shared resident return also exposes `section_constitutive_differential` and its typed
+   source/relation-cut receipt; carry that dependency consistently if importing the complete owner.
+4. Run the public example and relevant contact/ownership controls on Metal. Compare exact
+   operator/current/fibre results, and report Apple transfer/timing measurements in their own scope.
+
+[definition] The scalar conditional example uses the ordinary native field, not the desktop's
+complete-current material variant. Porting that larger CUDA history/transport implementation is
+not a prerequisite imposed by this experiment. This is a concrete engineering handoff for shared
+generator work, not an instruction to replace acoustic development with a per-sample loop.
+Audio still needs its actual clocks, material conditions and receiver-family binding. The
+condition Preimage Fibre and general contextual organization continue as shared construction.
+
 [established-bounded; source-inspected] The public framework enters through
 [`holonics::hna`](../crates/holonics/src/lib.rs). Its native session is exposed by
 [`with_native_session`](NATIVE_HNA.md), while the earlier inherited operator retains a

@@ -36,6 +36,14 @@ The [Mac coordination milestone](../../research/records/2026-09-07_GENERATOR_REC
 is a committed shared generator/phase return with an explicit Metal port boundary. Notify Brandon
 then; desktop acoustics is optional supporting research, not another required campaign.
 
+[established-bounded; measured] The [conditional native action](../../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
+now binds an actual source and independently supplied condition through direct and mixed complex
+current. Native phase-field observations identify a reusable action, which predicts a new condition
+and conducts later wave currents without numerical readback. The shared primitive and explicit
+Metal port boundary are ready for Mac re-engagement; acoustic and conversation model completion
+remain open. Next derive the condition Preimage Fibre within the same learned relation, using a
+fixed actual source and later receiving current, then bind that conduct to the conversation ecology.
+
 [established-bounded; measured] The [resident local return](../../research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md)
 now lets native observations develop the existing local relation and its rational emitted current
 enter subsequent operations directly. Partial source-domain knowledge supports new superposition;

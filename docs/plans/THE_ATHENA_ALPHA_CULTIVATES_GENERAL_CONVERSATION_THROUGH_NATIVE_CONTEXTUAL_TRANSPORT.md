@@ -216,6 +216,20 @@ Do not rebuild the completed raw capture. AC0 is data/application integration, n
 
 ### AC1 — Material, contextual current and developing native morphology
 
+[established-bounded; measured] The [conditional-contact return](../../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
+composes the existing local relation with two declared native current roles and their complex
+mixed products. An independently supplied channel condition makes a measured phase action
+identifiable where pooling observations without that condition leaves a plural relation. Its
+native operator and later wave conduct are verified at the declared local family. This returns
+the forward conditional primitive; it does not supply a general conversation context by fiat.
+
+[definition] Next hold the actual source and later reception fixed and derive the compatible
+condition Preimage Fibre in that same learned action. For fixed source, the bilinear chart is
+affine in the condition. Reuse native elimination for the particular/free directions or scoped
+obstruction; carry supported consequences into subsequent native operation. Do not turn a missing
+condition into a source-ID switch, an authored semantic label, or a demand to reconstruct all
+past microscopic states.
+
 [established-bounded; measured] The [native field relation port](../../research/records/2026-09-07_AC1_THE_FIELD_RETURNS_A_RESIDENT_RELATION_FACE_AND_A_PLURAL_FIBRE_HAS_FIXED_RECEIVERS.md)
 now returns resident currents/fibres at historical sources through their actual frames, and a
 whole-fibre receiver can expose a fixed class face without selecting a current. Its actual

@@ -544,6 +544,59 @@ impl<'chart> ResidentSurface<'chart> {
             0,&mut params,"constitutive-differential")
     }
 
+    fn validate_constitutive_current_view(
+        &self,
+        current: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        if !std::ptr::eq(current.section.surface,self) || current.section.rows != 1
+            || current.section.grain.0 != 0 || current.section.width > u32::MAX as usize
+            || current.offset.checked_add(current.width).is_none_or(|n| n > current.section.width)
+            || current.denominator.is_some_and(|n| n >= current.section.width)
+            || current.disposition.is_some_and(|n| n >= current.section.width)
+        {
+            return Err(ResidentRefusal::Declaration { operation: "constitutive-current",
+                what: "incompatible resident surface or rational current view".into() });
+        }
+        Ok(())
+    }
+
+    pub(crate) fn record_constitutive_bilinear_source(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        source: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
+        condition: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        self.validate_constitutive_current_view(source)?;
+        self.validate_constitutive_current_view(condition)?;
+        let fail = || ResidentRefusal::Declaration { operation: "constitutive-bilinear-source",
+            what: "incompatible source/condition complex contact chart or scratch aperture".into() };
+        let source_complex=source.width/2;
+        let condition_complex=condition.width/2;
+        let width=source_complex.checked_mul(condition_complex)
+            .and_then(|n| n.checked_add(source_complex))
+            .and_then(|n| n.checked_add(condition_complex))
+            .and_then(|n| n.checked_mul(2)).ok_or_else(fail)?;
+        if source.width == 0 || condition.width == 0 || source.width%2 != 0 || condition.width%2 != 0
+            || width >= u32::MAX as usize || output.rows != 1 || output.width != width+1
+            || output.grain.0 != 0 || !std::ptr::eq(output.surface,self)
+        { return Err(fail()); }
+        let shared=width.checked_mul(16).and_then(|n| u32::try_from(n).ok())
+            .filter(|n| *n <= self.declaration.max_sectiond_bytes).ok_or_else(fail)?;
+        let mut params=Params::new();
+        for current in [source,condition] {
+            params.ptr(current.section.lo.device_ptr()).ptr(current.section.hi.device_ptr())
+                .u32(current.offset as u32)
+                .u32(current.denominator.map_or(u32::MAX,|n| n as u32))
+                .u32(current.disposition.map_or(u32::MAX,|n| n as u32));
+        }
+        params.u32(source_complex as u32).u32(condition_complex as u32)
+            .ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr()).ptr(lane.slot)
+            .ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_constitutive_bilinear_source",1,self.declaration.warp_size.max(1),
+            shared,&mut params,"constitutive-bilinear-source")
+    }
+
     /// Resident rational operands for the existing local constitutive relation. Layout fields
     /// address immutable current carriers; all numerical decisions stay on device.
     pub(crate) fn record_constitutive_current(
@@ -593,14 +646,7 @@ impl<'chart> ResidentSurface<'chart> {
             return Err(fail());
         }
         for current in std::iter::once(source).chain(receiving) {
-            if !std::ptr::eq(current.section.surface, self) || current.section.rows != 1
-                || current.section.grain.0 != 0 || current.section.width > u32::MAX as usize
-                || current.offset.checked_add(current.width).is_none_or(|n| n > current.section.width)
-                || current.denominator.is_some_and(|n| n >= current.section.width)
-                || current.disposition.is_some_and(|n| n >= current.section.width)
-            {
-                return Err(fail());
-            }
+            self.validate_constitutive_current_view(current)?;
         }
         let shared = width.checked_mul(32).and_then(|n| u32::try_from(n).ok())
             .filter(|n| *n <= self.declaration.max_sectiond_bytes).ok_or_else(fail)?;

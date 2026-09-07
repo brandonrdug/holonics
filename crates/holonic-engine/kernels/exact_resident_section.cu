@@ -1236,6 +1236,60 @@ __device__ void fibre_phase_product(wide ar, wide ai, wide ad, wide br, wide bi,
     fibre_normalize(out,2,out+2,slot);
 }
 
+// The declared two-current contact retains both direct ports and every complex mixed product.
+// It does not select a context or a response. The ordinary relation kernel consumes this source
+// and an actual receiving current only after this complete construction succeeds.
+extern "C" __global__ void section_constitutive_bilinear_source(
+    const int64_t *source_lo, const int64_t *source_hi,
+    uint32_t source_at, uint32_t source_denominator_at, uint32_t source_disposition_at,
+    const int64_t *condition_lo, const int64_t *condition_hi,
+    uint32_t condition_at, uint32_t condition_denominator_at, uint32_t condition_disposition_at,
+    uint32_t source_complex, uint32_t condition_complex,
+    int64_t *output_lo, int64_t *output_hi,
+    uint32_t *slot, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    if (blockIdx.x != 0 || threadIdx.x != 0) return;
+    if (upstream_refused(census,lineage,lineage_count,slot)) return;
+    uint64_t width64=2u*((uint64_t)source_complex+condition_complex+(uint64_t)source_complex*condition_complex);
+    if (!source_complex || !condition_complex || width64>=UINT32_MAX) {
+        atomicOr(slot,REFUSED_MALFORMED); return;
+    }
+    uint32_t width=(uint32_t)width64;
+    wide source_den=fibre_current_denominator(source_lo,source_hi,
+        source_denominator_at,source_disposition_at,slot);
+    wide condition_den=fibre_current_denominator(condition_lo,condition_hi,
+        condition_denominator_at,condition_disposition_at,slot);
+    if (*slot) return;
+    wide common=product_checked(source_den,condition_den,slot);
+    extern __shared__ wide bilinear_scratch[];
+    for (uint32_t j=0;j<2u*source_complex;++j) {
+        if (source_lo[source_at+j]!=source_hi[source_at+j]) atomicOr(slot,REFUSED_MALFORMED);
+        bilinear_scratch[j]=product_checked(source_lo[source_at+j],condition_den,slot);
+    }
+    for (uint32_t j=0;j<2u*condition_complex;++j) {
+        if (condition_lo[condition_at+j]!=condition_hi[condition_at+j]) atomicOr(slot,REFUSED_MALFORMED);
+        bilinear_scratch[2u*source_complex+j]=product_checked(condition_lo[condition_at+j],source_den,slot);
+    }
+    if (*slot) return;
+    uint32_t mixed_at=2u*(source_complex+condition_complex);
+    for (uint32_t c=0;c<condition_complex;++c) for (uint32_t s=0;s<source_complex;++s) {
+        wide ar=source_lo[source_at+2u*s],ai=source_lo[source_at+2u*s+1u];
+        wide br=condition_lo[condition_at+2u*c],bi=condition_lo[condition_at+2u*c+1u];
+        uint32_t at=mixed_at+2u*(c*source_complex+s);
+        wide product[3];
+        fibre_phase_product(ar,ai,1,br,bi,1,product,slot);
+        bilinear_scratch[at]=product[0];
+        bilinear_scratch[at+1u]=product[1];
+    }
+    if (*slot) return;
+    fibre_normalize(bilinear_scratch,width,&common,slot);
+    for (uint32_t j=0;j<width;++j) to_word(bilinear_scratch[j],slot);
+    to_word(common,slot);
+    if (*slot) return;
+    for (uint32_t j=0;j<width;++j) output_lo[j]=output_hi[j]=(int64_t)bilinear_scratch[j];
+    output_lo[width]=output_hi[width]=(int64_t)common;
+}
+
 // Push both actual source branches through their producing-to-current unit-phase frame.
 // This does not read the paired-junction enclosure or substitute its numerical centre.
 extern "C" __global__ void section_field_source_frame(

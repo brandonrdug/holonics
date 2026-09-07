@@ -15,6 +15,20 @@ JSON report or relation inspection is **not a learned-model checkpoint**.
 
 ## Resident local relation composition
 
+[established-bounded; measured] The same owner now admits an explicit two-current contact through
+`ResidentConstitutiveFibre::found_bilinear_contact` and `advance_bilinear_contact`. Its bound
+`ConstitutiveSourceChart` retains source, condition and all complex mixed products; flattened
+ingress cannot bypass that source law. `ResidentConstitutiveCurrent::rational` accepts an exact
+numerator section and common denominator without host numerical inspection. Existing field and
+phase checkpoints keep their ordinary linear source chart.
+
+[established-bounded; measured] The [conditional phase example](../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
+uses actual native field observations, identifies a local phase action, and predicts/continues
+under a new rational condition. Its portable operator receipt and Metal port boundary are ready
+for shared Mac work. The local relation report is not a new whole-HNA checkpoint. Inferring the
+condition Preimage Fibre from actual returns and binding conditions to conversation material
+remain the next construction.
+
 [established-bounded; measured] The existing `ResidentConstitutiveFibre` now exposes
 [`advance_resident`](../crates/holonic-engine/src/native_ecology/constitutive_fibre/resident.rs).
 It accepts exact integer sections or rational currents from an earlier `ResidentConstitutiveReturn`,

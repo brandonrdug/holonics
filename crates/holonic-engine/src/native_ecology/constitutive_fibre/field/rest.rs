@@ -906,6 +906,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             seed: surface.mount_section_rest(&seed)?,
             memory: surface.mount_section_rest(&memory)?,
             relation: ResidentConstitutiveFibre {
+                source_chart: ConstitutiveSourceChart::Linear,
                 basis: surface.mount_section_rest(&basis)?,
                 surface,
                 source_width: 4 * h.nodes,

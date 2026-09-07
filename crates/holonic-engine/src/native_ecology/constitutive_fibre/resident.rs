@@ -17,6 +17,20 @@ pub struct ResidentConstitutiveCurrent<'a, 'chart> {
 }
 
 impl<'a, 'chart> ResidentConstitutiveCurrent<'a, 'chart> {
+    /// Exact numerator coordinates followed by one common denominator. Pointness and a positive
+    /// denominator are checked on device when consumed; no numerical value is read here.
+    pub fn rational(section: &'a ResidentSection<'chart>) -> Result<Self, ConstitutiveFibreError> {
+        if section.rows() != 1 || section.width() < 2 || section.grain().0 != 0 {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        Ok(Self {
+            section,
+            offset: 0,
+            width: section.width() - 1,
+            denominator: Some(section.width() - 1),
+            disposition: None,
+        })
+    }
     /// A complete integer section, including a section produced by another native operation.
     /// The device checks pointness before admitting any source or receiving coordinate.
     pub fn integers(section: &'a ResidentSection<'chart>) -> Result<Self, ConstitutiveFibreError> {
@@ -41,6 +55,7 @@ pub struct ResidentConstitutiveReturn<'chart> {
     target_width: usize,
     occurrence: u64,
     source_occurrence: Option<usize>,
+    source_chart: ConstitutiveSourceChart,
 }
 
 impl<'chart> ResidentConstitutiveReturn<'chart> {
@@ -67,6 +82,10 @@ impl<'chart> ResidentConstitutiveReturn<'chart> {
 
     pub fn occurrence(&self) -> u64 {
         self.occurrence
+    }
+
+    pub fn source_chart(&self) -> ConstitutiveSourceChart {
+        self.source_chart
     }
 
     /// A receiver of the entire affine target fibre. A differential is fixed only when every
@@ -194,6 +213,7 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
             target_width: self.target_width,
             occurrence,
             source_occurrence: None,
+            source_chart: self.source_chart,
         })
     }
     /// Enact the existing relation law on resident rational operands. The receiving section is
@@ -204,12 +224,43 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
         source: ResidentConstitutiveCurrent<'_, 'chart>,
         receiving: Option<ResidentConstitutiveCurrent<'_, 'chart>>,
     ) -> Result<ResidentConstitutiveReturn<'chart>, ConstitutiveFibreError> {
+        self.advance_contact(source, None, receiving)
+    }
+
+    /// One declared bilinear contact. The condition is a separately supplied current in its
+    /// admitted chart, not an identifier or an answer-derived switch. Source, condition and all
+    /// mixed complex products enter the same local relation on device. Its full returned fibre
+    /// and the single continuing commit follow the ordinary relation law.
+    pub fn advance_bilinear_contact(
+        &mut self,
+        source: ResidentConstitutiveCurrent<'_, 'chart>,
+        condition: ResidentConstitutiveCurrent<'_, 'chart>,
+        receiving: Option<ResidentConstitutiveCurrent<'_, 'chart>>,
+    ) -> Result<ResidentConstitutiveReturn<'chart>, ConstitutiveFibreError> {
+        self.advance_contact(source, Some(condition), receiving)
+    }
+
+    fn advance_contact(
+        &mut self,
+        source: ResidentConstitutiveCurrent<'_, 'chart>,
+        condition: Option<ResidentConstitutiveCurrent<'_, 'chart>>,
+        receiving: Option<ResidentConstitutiveCurrent<'_, 'chart>>,
+    ) -> Result<ResidentConstitutiveReturn<'chart>, ConstitutiveFibreError> {
         if !self.usable {
             return Err(ConstitutiveFibreError::Uncertain);
         }
-        if source.width != self.source_width
-            || receiving.is_some_and(|v| v.width != self.target_width)
-        {
+        let valid_source = match (self.source_chart, condition) {
+            (ConstitutiveSourceChart::Linear, None) => source.width == self.source_width,
+            (
+                ConstitutiveSourceChart::BilinearContact {
+                    source_complex,
+                    condition_complex,
+                },
+                Some(c),
+            ) => source.width == 2 * source_complex && c.width == 2 * condition_complex,
+            _ => false,
+        };
+        if !valid_source || receiving.is_some_and(|v| v.width != self.target_width) {
             return Err(ConstitutiveFibreError::Shape);
         }
         let next = self
@@ -217,9 +268,42 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
             .checked_add(1)
             .ok_or(ConstitutiveFibreError::Shape)?;
         let returned = self.allocate_current_return(next)?;
-        let mut passage = self.surface.begin_passage(&[vec![]])?;
+        let contact = condition
+            .map(|_| {
+                self.surface
+                    .fresh_section(1, self.source_width + 1, ResidentGrain(0))
+            })
+            .transpose()?;
+        let lineage = if contact.is_some() {
+            vec![vec![], vec![0]]
+        } else {
+            vec![vec![]]
+        };
+        let mut passage = self.surface.begin_passage(&lineage)?;
+        if let (Some(condition), Some(contact)) = (condition, contact.as_ref()) {
+            {
+                let lane = passage.open(0, &[])?;
+                self.surface
+                    .record_constitutive_bilinear_source(&lane, source, condition, contact)?;
+            }
+            passage.close(0, contact, 64)?;
+        }
+        let (lane_at, predecessors) = if contact.is_some() {
+            (1, vec![0])
+        } else {
+            (0, vec![])
+        };
         {
-            let lane = passage.open(0, &[])?;
+            let lane = passage.open(lane_at, &predecessors)?;
+            let source = contact
+                .as_ref()
+                .map_or(source, |contact| ResidentConstitutiveCurrent {
+                    section: contact,
+                    offset: 0,
+                    width: self.source_width,
+                    denominator: Some(self.source_width),
+                    disposition: None,
+                });
             self.surface.record_constitutive_current(
                 &lane,
                 &mut self.basis,
@@ -228,7 +312,7 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
                 &returned.report,
             )?;
         }
-        passage.close(0, &returned.report, 64)?;
+        passage.close(lane_at, &returned.report, 64)?;
         let passage = passage.finish()?;
         self.usable = false;
         let reading = passage.launch()?;
@@ -248,3 +332,6 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod contact_tests;
