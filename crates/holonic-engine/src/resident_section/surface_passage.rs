@@ -10,6 +10,9 @@ impl<'chart> ResidentSurface<'chart> {
         memory: &mut ResidentSection<'chart>, basis: &mut ResidentSection<'chart>,
         incoming: &ResidentSection<'chart>, origin: Option<&ResidentSection<'chart>>,
         frame: &ResidentSection<'chart>, origin_frame: Option<&ResidentSection<'chart>>,
+        junction: Option<(&ResidentSection<'chart>, &ResidentSection<'chart>,
+            &ResidentSection<'chart>, &ResidentSection<'chart>, &ResidentSection<'chart>)>,
+        occurrence: u64,
         output: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
         let fail = |what: &str| ResidentRefusal::Declaration {
@@ -31,6 +34,17 @@ impl<'chart> ResidentSurface<'chart> {
             || origin_frame.is_some_and(|s| !matches(s, nodes, 3)) {
             return Err(fail("incompatible field, source or continuing relation"));
         }
+        if let Some((covariance, held, next_covariance, next_report, workspace)) = junction {
+            let matrix_width = width.checked_mul(width).and_then(|n| n.checked_add(1))
+                .ok_or_else(|| fail("paired junction matrix extent overflow"))?;
+            let scratch_words = width.checked_mul(width + 1).and_then(|n| n.checked_add(6 * width))
+                .and_then(|n| n.checked_mul(2)).ok_or_else(|| fail("paired junction scratch extent overflow"))?;
+            if !matches(covariance, 1, matrix_width) || !matches(next_covariance, 1, matrix_width)
+                || !matches(held, 1, 4 * (width + 1)) || !matches(next_report, 1, 4 * (width + 1))
+                || !matches(workspace, 1, scratch_words) {
+                return Err(fail("incompatible paired junction charts"));
+            }
+        }
         let shared = nodes.checked_mul(24).and_then(|v| v.checked_mul(16))
             .and_then(|v| u32::try_from(v).ok())
             .filter(|v| *v <= self.declaration.max_sectiond_bytes)
@@ -40,7 +54,15 @@ impl<'chart> ResidentSurface<'chart> {
             .ptr(basis.lo.device_ptr()).ptr(basis.hi.device_ptr()).ptr(incoming.lo.device_ptr())
             .ptr(origin.unwrap_or(incoming).lo.device_ptr()).ptr(frame.lo.device_ptr())
             .ptr(origin_frame.unwrap_or(frame).lo.device_ptr()).u32(nodes as u32)
-            .u32(u32::from(origin.is_some())).ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
+            .u32(u32::from(origin.is_some())).u32(u32::from(junction.is_some())).u64(occurrence);
+        if let Some((covariance, held, next_covariance, next_report, workspace)) = junction {
+            params.ptr(covariance.lo.device_ptr()).ptr(held.lo.device_ptr())
+                .ptr(next_covariance.lo.device_ptr()).ptr(next_covariance.hi.device_ptr())
+                .ptr(next_report.lo.device_ptr()).ptr(next_report.hi.device_ptr()).ptr(workspace.lo.device_ptr());
+        } else {
+            for _ in 0..7 { params.ptr(0); }
+        }
+        params.ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
             .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
         self.record_blocks(lane, "section_constitutive_field", 1, self.launch.block_x,
             shared, &mut params, "constitutive-field")

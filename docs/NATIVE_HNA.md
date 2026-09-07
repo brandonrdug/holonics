@@ -33,6 +33,16 @@ The `alpha_material` example is a private material/current study;
 its excitation round-trip is not a learned text decoder and its report is not a model checkpoint.
 The existing scalar JSONL session and checkpoint format below do not serialize this wider field.
 
+[established-bounded; measured] `NativeConstitutiveField::found_with_paired_junction` adds native
+reaction through the moment of actual joined currents and retained internal current. It requires
+unit seed admittances in this first chart. `NativeFieldStep::junction` returns the full root
+potential, departing field, internal aggregate and reconstruction prefix.
+`inspect_internal_currents` executes the retained birth-prefix decoder as an explicit observer.
+The [paired-junction record](../research/records/2026-09-06_AC1_THE_PAIRED_JUNCTION_RETAINS_ITS_INNER_CURRENT.md)
+contains the exact law and controls. `alpha_material --paired-junction` selects this declared
+construction for the study; the current word implementation refuses after six actual material
+occurrences and is not a corpus-capable model or text emitter.
+
 ## Run it
 
 [established-bounded; measured] These commands run the checked-in examples on the standing CUDA

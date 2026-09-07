@@ -67,6 +67,19 @@ cannot remove this identical-field collision. Actual contextual channels and cha
 must participate in transport; retaining source IDs or adding powers of the same field cannot
 substitute. AC1 and the full alpha goal remain active; no learned text response was produced.
 
+[established-bounded; measured] AC1's [paired passive junction](research/records/2026-09-06_AC1_THE_PAIRED_JUNCTION_RETAINS_ITS_INNER_CURRENT.md)
+now reacts through a formed Hermitian moment and retained internal current. Its five CUDA controls
+include equal raw fields/moments with different retained history under the same next input, full
+rechart transport and an executable internal-current decoder. Six actual material operations match
+the exact reference; the seventh refuses before commit. No conversation family completed in this
+coupled run. The reference reaches nearly 900-bit currents after 25 occurrences.
+
+[open] The next AC1 repair is the current representation: the demonstrated word/wide arithmetic
+cannot carry continuing coupled cultivation. Preserve the actual current, moment, decoder and
+refusal boundary while changing representation; silently rounding, dropping current or raising a
+magic threshold is not that repair. Record-level contextual channels and learned text production
+remain open. This changes neither AC0–AC5 order nor the alpha standard.
+
 ## Completed foundation and data preparation
 
 | Return | Standing scope and evidence |

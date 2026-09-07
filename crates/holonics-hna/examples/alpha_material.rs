@@ -8,8 +8,9 @@
 
 use holonic_engine::{
     native_ecology::constitutive_fibre::{
-        ConstitutiveFibreError, NativeConstitutiveField, NativeFieldEmission, NativeFieldLineage,
-        NativeFieldOccurrence, NativeFieldReceiverStatus,
+        ConstitutiveFibreError, NativeConstitutiveField, NativeFieldEmission,
+        NativeFieldInternalCurrent, NativeFieldLineage, NativeFieldOccurrence,
+        NativeFieldReceiverStatus,
     },
     resident_section::ResidentSectionRest,
 };
@@ -18,7 +19,10 @@ use holonics_hna::{
         exposure::{
             ExposureLink, ExposureOccurrence, ExposurePart, ExposurePartition, ExposureReader,
         },
-        material::{with_octet_field, AlphaMaterialError, OctetExcitation, OCTET_INPUT_CHANNELS},
+        material::{
+            with_octet_field, with_paired_octet_field, AlphaMaterialError, OctetExcitation,
+            OCTET_INPUT_CHANNELS,
+        },
     },
     publish_new,
 };
@@ -81,7 +85,7 @@ impl From<ResidentSectionRest> for SectionObserver {
     }
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Debug, Serialize)]
 struct BodyObserver {
     occurrence_count: usize,
     lineage: Vec<NativeFieldLineage>,
@@ -91,6 +95,9 @@ struct BodyObserver {
     relation: Option<SectionObserver>,
     pending_lineage: Option<NativeFieldLineage>,
     observer_error: Option<String>,
+    junction_covariance: Option<SectionObserver>,
+    junction_history: Vec<(usize, SectionObserver)>,
+    internal_currents: Option<Vec<NativeFieldInternalCurrent>>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -153,10 +160,14 @@ struct Report {
 }
 
 impl Report {
-    fn new(exposure_path: &Path, families_aperture: u64) -> Self {
+    fn new(exposure_path: &Path, families_aperture: u64, paired: bool) -> Self {
         Self {
             schema: "holonics.athena-alpha-material-study.v1",
-            profile: "matched-unit-octet-excitation-native-field",
+            profile: if paired {
+                "matched-unit-octet-field-with-paired-junction"
+            } else {
+                "matched-unit-octet-excitation-native-field"
+            },
             exposure_path: exposure_path.display().to_string(),
             families_aperture,
             frames_seen: 0,
@@ -279,6 +290,27 @@ fn observe_body(field: &NativeConstitutiveField<'_>, inspect_sources: &[usize]) 
                 .ok()
         })
         .collect();
+    let junction_covariance = field
+        .inspect_junction_covariance()
+        .map_err(|error| errors.push(error.to_string()))
+        .ok()
+        .flatten()
+        .map(Into::into);
+    let mut junction_history = Vec::new();
+    if field.has_paired_junction() {
+        for at in 0..occurrence_count {
+            match field.inspect_junction(at) {
+                Ok(Some(section)) => junction_history.push((at, section.into())),
+                Ok(None) => errors.push(format!("junction history missing at {at}")),
+                Err(error) => errors.push(error.to_string()),
+            }
+        }
+    }
+    let internal_currents = field
+        .inspect_internal_currents()
+        .map_err(|error| errors.push(error.to_string()))
+        .ok()
+        .flatten();
     BodyObserver {
         occurrence_count,
         lineage: (0..occurrence_count)
@@ -290,6 +322,9 @@ fn observe_body(field: &NativeConstitutiveField<'_>, inspect_sources: &[usize]) 
         held,
         relation,
         observer_error: (!errors.is_empty()).then(|| errors.join("; ")),
+        junction_covariance,
+        junction_history,
+        internal_currents,
     }
 }
 
@@ -438,7 +473,7 @@ fn process_exposure(
 }
 
 fn usage() -> &'static str {
-    "usage: alpha_material EXPOSURE --families N --report NEW.json [--inspect-source N ...]"
+    "usage: alpha_material EXPOSURE --families N --report NEW.json [--inspect-source N ...] [--paired-junction]"
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -447,8 +482,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut families = None;
     let mut report_path = None;
     let mut inspect_sources = Vec::new();
+    let mut paired = false;
     while let Some(arg) = args.next() {
         match arg.as_str() {
+            "--paired-junction" => paired = true,
             "--families" => {
                 families = Some(
                     args.next()
@@ -472,13 +509,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .ok_or("--families must be a positive explicit aperture")?;
     let report_path = report_path.ok_or("--report is required for the private report")?;
     let mut reader = ExposureReader::open(&source)?;
-    let mut report = Report::new(&source, families);
-    let native_result = with_octet_field(|field| {
+    let mut report = Report::new(&source, families, paired);
+    let operation = |field: &mut NativeConstitutiveField<'_>| {
         let result = process_exposure(&mut reader, field, families, &mut report);
         report.native_census_before_observers = Some(field.census());
         report.body = Some(observe_body(field, &inspect_sources));
         result
-    });
+    };
+    let native_result = if paired {
+        with_paired_octet_field(operation)
+    } else {
+        with_octet_field(operation)
+    };
     if let Err(error) = &native_result {
         report.failure = Some(FailureCoordinate {
             kind: "application-refusal".to_owned(),

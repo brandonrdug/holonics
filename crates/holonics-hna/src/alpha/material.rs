@@ -159,11 +159,29 @@ pub enum AlphaMaterialError {
 pub fn with_octet_field<R>(
     operation: impl FnOnce(&mut NativeConstitutiveField<'_>) -> Result<R, AlphaMaterialError>,
 ) -> Result<R, AlphaMaterialError> {
+    with_octet_field_profile(false, operation)
+}
+
+/// Mount the same exterior chart on the developing paired passive junction.
+pub fn with_paired_octet_field<R>(
+    operation: impl FnOnce(&mut NativeConstitutiveField<'_>) -> Result<R, AlphaMaterialError>,
+) -> Result<R, AlphaMaterialError> {
+    with_octet_field_profile(true, operation)
+}
+
+fn with_octet_field_profile<R>(
+    paired: bool,
+    operation: impl FnOnce(&mut NativeConstitutiveField<'_>) -> Result<R, AlphaMaterialError>,
+) -> Result<R, AlphaMaterialError> {
     let readout =
         ResidentReadout::new().map_err(|error| AlphaMaterialError::Apparatus(error.to_string()))?;
     let surface = ResidentSurface::on(&readout)
         .map_err(|error| AlphaMaterialError::Apparatus(error.to_string()))?;
-    let mut field = NativeConstitutiveField::found(&surface, matched_unit_field_seed())?;
+    let mut field = if paired {
+        NativeConstitutiveField::found_with_paired_junction(&surface, matched_unit_field_seed())?
+    } else {
+        NativeConstitutiveField::found(&surface, matched_unit_field_seed())?
+    };
     operation(&mut field)
 }
 

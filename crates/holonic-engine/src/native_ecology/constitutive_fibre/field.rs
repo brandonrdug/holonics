@@ -5,14 +5,20 @@
 //!
 //! This field chart has fixed nodes and unit-phase incidences. Live fixed-node recharting
 //! and physical incoming-incidence replacement retain their distinct frame/history semantics;
-//! carrier growth, contextual parent contacts and a learned text-codec product remain outside it.
+//! root-carrier enlargement, contextual parent contacts and a learned text-codec product remain
+//! outside it.
+//! The paired-junction constructor additionally makes a formed Hermitian contact moment and
+//! retained internal current operative on the root port field, with a complete internal decoder.
 
 use super::circulation::HeldCurrentFrame;
 use super::*;
 use crate::dimensional_wave::ExactComplexWaveCurrent;
 use std::rc::Rc;
 
+mod junction;
 mod rechart;
+pub use junction::{NativeFieldInternalCurrent, NativeFieldJunctionReading};
+use junction::{PairedJunction, PendingJunction};
 
 /// One actual emitted source from this live body. It is linear; the caller cannot manufacture
 /// it from an occurrence number or duplicate it for another receiving edge.
@@ -79,6 +85,7 @@ pub struct NativeFieldStep<Reading = ConstitutiveReading> {
     pub received_difference: Option<NativeFieldReceivedDifference<Reading>>,
     pub formed_pivot: Option<usize>,
     pub successor_rank: usize,
+    pub junction: Option<NativeFieldJunctionReading>,
 }
 
 /// Explicit classification projection. It contains no selected response or alleged full fibre;
@@ -96,6 +103,7 @@ struct HeldField<'chart> {
     lineage: NativeFieldLineage,
     frame: Rc<HeldCurrentFrame<'chart>>,
     returned: bool,
+    junction: Option<Rc<ResidentSection<'chart>>>,
 }
 
 /// One move owner for phase standing, the same local relation accumulator, and its actual
@@ -112,6 +120,8 @@ pub struct NativeConstitutiveField<'chart> {
     owner: Rc<()>,
     history: Vec<HeldField<'chart>>,
     pending: Option<HeldField<'chart>>,
+    junction: Option<PairedJunction<'chart>>,
+    pending_junction: Option<PendingJunction<'chart>>,
 }
 
 impl<'chart> NativeConstitutiveField<'chart> {
@@ -183,6 +193,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
             owner: Rc::new(()),
             history: Vec::new(),
             pending: None,
+            junction: None,
+            pending_junction: None,
         })
     }
 
@@ -333,6 +345,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .and_then(|v| v.checked_add(9))
             .ok_or(ConstitutiveFibreError::Shape)?;
         let output = surface.fresh_section(1, output_width, ResidentGrain(0))?;
+        let prepared = self.prepare_junction()?;
         let mut passage = surface.begin_passage(&[vec![]])?;
         {
             let lane = passage.open(0, &[])?;
@@ -345,6 +358,19 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 source_at.map(|i| &self.history[i].section),
                 &self.frame.native,
                 source_at.map(|i| &self.history[i].frame.native),
+                self.junction
+                    .as_ref()
+                    .zip(prepared.as_ref())
+                    .map(|(old, (next, scratch))| {
+                        (
+                            &old.covariance,
+                            old.current.as_ref(),
+                            &next.covariance,
+                            next.report.as_ref(),
+                            scratch,
+                        )
+                    }),
+                at as u64,
                 &output,
             )?;
         }
@@ -355,11 +381,19 @@ impl<'chart> NativeConstitutiveField<'chart> {
             lineage: lineage.clone(),
             frame: Rc::clone(&self.frame),
             returned: false,
+            junction: prepared.as_ref().map(|(next, _)| Rc::clone(&next.report)),
         });
+        let (pending_junction, junction_scratch) = match prepared {
+            Some((next, scratch)) => (Some(next), Some(scratch)),
+            None => (None, None),
+        };
+        self.pending_junction = pending_junction;
         self.relation.usable = false;
         let launched = passage.launch()?;
+        drop(junction_scratch);
         if !launched.obstruction.is_empty() {
             self.pending = None;
+            self.pending_junction = None;
             self.relation.usable = true;
             return Err(ConstitutiveFibreError::Arithmetic(format!(
                 "{:?}",
@@ -403,12 +437,19 @@ impl<'chart> NativeConstitutiveField<'chart> {
         };
         let outgoing = (0..self.nodes()).map(|i| phase(4 * i)).collect();
         let held_successor = (0..self.nodes()).map(|i| phase(4 * i + 2)).collect();
+        let junction = self.read_pending_junction()?;
         if let Some(i) = source_at {
             self.history[i].returned = true;
         }
         occurrence.source = None;
         self.history
             .push(self.pending.take().expect("completed field"));
+        if let Some(next) = self.pending_junction.take() {
+            self.junction = Some(PairedJunction {
+                covariance: next.covariance,
+                current: next.report,
+            });
+        }
         self.relation.occurrences = next;
         self.relation.usable = true;
         Ok(NativeFieldStep {
@@ -424,6 +465,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             received_difference,
             formed_pivot,
             successor_rank: rank,
+            junction,
         })
     }
 }

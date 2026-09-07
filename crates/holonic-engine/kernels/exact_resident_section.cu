@@ -1337,6 +1337,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
     for (uint32_t j = 0; j < 3 * nodes; ++j) memory_lo[j] = memory_hi[j] = (int64_t)successor[j];
 }
 
+#include "paired_field_junction.cuh"
 #include "constitutive_field.cuh"
 
 // Candidate finite passive-contact projection.  One block owns one query row and first forms the

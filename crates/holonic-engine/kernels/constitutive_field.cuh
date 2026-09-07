@@ -19,14 +19,17 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     const int64_t *incoming,
     const int64_t *origin,
     const int64_t *current_frame, const int64_t *origin_frame,
-    uint32_t nodes, uint32_t linked,
+    uint32_t nodes, uint32_t linked, uint32_t coupled, uint64_t occurrence,
+    const int64_t *covariance, const int64_t *junction_held,
+    int64_t *next_covariance_lo, int64_t *next_covariance_hi,
+    int64_t *junction_report_lo, int64_t *junction_report_hi, wide *junction_workspace,
     int64_t *output_lo, int64_t *output_hi,
     uint32_t *slot, const uint32_t *census,
     const uint32_t *lineage, uint32_t lineage_count
 ) {
     if (blockIdx.x != 0 || threadIdx.x != 0) return;
     if (upstream_refused(census, lineage, lineage_count, slot)) return;
-    if (!nodes || linked > 1 || nodes > UINT32_MAX / 6u) {
+    if (!nodes || linked > 1 || coupled > 1 || nodes > UINT32_MAX / 6u) {
         atomicOr(slot, REFUSED_MALFORMED);
         return;
     }
@@ -291,6 +294,20 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     output_lo[prior_at + width + 1] = output_hi[prior_at + width + 1] = prior_status;
     output_lo[prior_at + width + 2] = output_hi[prior_at + width + 2] = -1;
     output_lo[prior_at + width + 3] = output_hi[prior_at + width + 3] = prior_rank;
+
+    // The developing passive junction stages its entire return before this operation's only
+    // continuing phase/relation writes. A refused solve cannot leave half a coupled successor.
+    if (coupled) {
+        if (!covariance || !junction_held || !next_covariance_lo || !next_covariance_hi
+            || !junction_report_lo || !junction_report_hi || !junction_workspace) {
+            atomicOr(slot, REFUSED_MALFORMED); return;
+        }
+        field_paired_junction_prepare(output_lo, origin, incoming, current_frame, origin_frame,
+            nodes, linked, occurrence, covariance, junction_held,
+            next_covariance_lo, next_covariance_hi, junction_report_lo, junction_report_hi,
+            junction_workspace, slot);
+        if (*slot) return;
+    }
 
     // The only continuing writes.  Every conversion above has succeeded, so a refused branch can
     // never expose a partially updated relation or held successor.

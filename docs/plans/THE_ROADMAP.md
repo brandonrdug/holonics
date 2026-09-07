@@ -51,6 +51,13 @@ by binding reaction to developing morphology; a higher polynomial face alone doe
 that witness. This refines the current attachment, without changing AC0–AC5 order or declaring
 the field to be a cultivated alpha.
 
+[established-bounded; measured] The [paired junction](../../research/records/2026-09-06_AC1_THE_PAIRED_JUNCTION_RETAINS_ITS_INNER_CURRENT.md)
+now supplies native reaction through a formed Hermitian moment and retained internal current, with
+a complete internal-current decoder and same-input contextual controls. Actual material reaches
+six coupled operations before a numerical refusal; the exact reference exhibits the required wider
+currents. The immediate AC1 step is a lawful current representation for continuing cultivation.
+This component does not close AC1 or supply learned text-codec conduct.
+
 ## Completed September 6 synthesis before Athena-alpha cultivation
 
 [definition] Brandon's latest request directs repository-wide synthesis of the available
