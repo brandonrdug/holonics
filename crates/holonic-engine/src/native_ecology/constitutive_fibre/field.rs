@@ -17,7 +17,11 @@ use std::rc::Rc;
 
 mod junction;
 mod rechart;
-pub use junction::{NativeFieldInternalCurrent, NativeFieldJunctionReading};
+pub use junction::{
+    NativeFieldCurrentBall, NativeFieldEnclosedJunctionReading, NativeFieldExactJunctionReading,
+    NativeFieldInternalCurrent, NativeFieldInternalCurrentBall, NativeFieldJunctionReading,
+    NativeFieldJunctionRepresentation,
+};
 use junction::{PairedJunction, PendingJunction};
 
 /// One actual emitted source from this live body. It is linear; the caller cannot manufacture
@@ -368,6 +372,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                             &next.covariance,
                             next.report.as_ref(),
                             scratch,
+                            old.representation.kernel(),
                         )
                     }),
                 at as u64,
@@ -445,7 +450,13 @@ impl<'chart> NativeConstitutiveField<'chart> {
         self.history
             .push(self.pending.take().expect("completed field"));
         if let Some(next) = self.pending_junction.take() {
+            let representation = self
+                .junction
+                .as_ref()
+                .expect("existing junction")
+                .representation;
             self.junction = Some(PairedJunction {
+                representation,
                 covariance: next.covariance,
                 current: next.report,
             });

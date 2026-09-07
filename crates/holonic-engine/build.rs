@@ -69,6 +69,7 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/exact_resident_section.cu");
     println!("cargo:rerun-if-changed=kernels/constitutive_field.cuh");
     println!("cargo:rerun-if-changed=kernels/paired_field_junction.cuh");
+    println!("cargo:rerun-if-changed=kernels/enclosed_field_junction.cuh");
     println!("cargo:rerun-if-changed=kernels/exact_quartic_realizers.cu");
     println!("cargo:rerun-if-changed=kernels/exact_eta_head.cu");
     if env::var("CARGO_CFG_TARGET_OS").as_deref() != Ok("linux") {

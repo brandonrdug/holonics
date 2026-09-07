@@ -53,10 +53,12 @@ the field to be a cultivated alpha.
 
 [established-bounded; measured] The [paired junction](../../research/records/2026-09-06_AC1_THE_PAIRED_JUNCTION_RETAINS_ITS_INNER_CURRENT.md)
 now supplies native reaction through a formed Hermitian moment and retained internal current, with
-a complete internal-current decoder and same-input contextual controls. Actual material reaches
-six coupled operations before a numerical refusal; the exact reference exhibits the required wider
-currents. The immediate AC1 step is a lawful current representation for continuing cultivation.
-This component does not close AC1 or supply learned text-codec conduct.
+a complete internal-current decoder and same-input contextual controls. Its word realization
+stopped after six coupled operations. The [enclosed-current return](../../research/records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md)
+now carries all 728 operations of the four-family slice, retaining the full residual and exact
+error decoder. All native certificates and the declared exact anchors pass. Continue AC1 with
+efficient broader operation, lawful history placement and record-level contextual channels;
+learned text-codec conduct and the actual alpha product remain required.
 
 ## Completed September 6 synthesis before Athena-alpha cultivation
 

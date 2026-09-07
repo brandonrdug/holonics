@@ -10,7 +10,7 @@ use holonic_engine::{
     native_ecology::constitutive_fibre::{
         ConstitutiveFibreError, NativeConstitutiveField, NativeJunctionSeed,
     },
-    resident_section::ResidentSurface,
+    resident_section::{ResidentGrain, ResidentSurface},
 };
 use thiserror::Error;
 
@@ -159,25 +159,40 @@ pub enum AlphaMaterialError {
 pub fn with_octet_field<R>(
     operation: impl FnOnce(&mut NativeConstitutiveField<'_>) -> Result<R, AlphaMaterialError>,
 ) -> Result<R, AlphaMaterialError> {
-    with_octet_field_profile(false, operation)
+    with_octet_field_profile(false, None, operation)
 }
 
 /// Mount the same exterior chart on the developing paired passive junction.
 pub fn with_paired_octet_field<R>(
     operation: impl FnOnce(&mut NativeConstitutiveField<'_>) -> Result<R, AlphaMaterialError>,
 ) -> Result<R, AlphaMaterialError> {
-    with_octet_field_profile(true, operation)
+    with_octet_field_profile(true, None, operation)
+}
+
+/// The same paired current with certified dyadic enclosures and retained numerical residuals.
+pub fn with_enclosed_octet_field<R>(
+    fractional_bits: u32,
+    operation: impl FnOnce(&mut NativeConstitutiveField<'_>) -> Result<R, AlphaMaterialError>,
+) -> Result<R, AlphaMaterialError> {
+    with_octet_field_profile(true, Some(fractional_bits), operation)
 }
 
 fn with_octet_field_profile<R>(
     paired: bool,
+    enclosed: Option<u32>,
     operation: impl FnOnce(&mut NativeConstitutiveField<'_>) -> Result<R, AlphaMaterialError>,
 ) -> Result<R, AlphaMaterialError> {
     let readout =
         ResidentReadout::new().map_err(|error| AlphaMaterialError::Apparatus(error.to_string()))?;
     let surface = ResidentSurface::on(&readout)
         .map_err(|error| AlphaMaterialError::Apparatus(error.to_string()))?;
-    let mut field = if paired {
+    let mut field = if let Some(grain) = enclosed {
+        NativeConstitutiveField::found_with_enclosed_junction(
+            &surface,
+            matched_unit_field_seed(),
+            ResidentGrain(grain),
+        )?
+    } else if paired {
         NativeConstitutiveField::found_with_paired_junction(&surface, matched_unit_field_seed())?
     } else {
         NativeConstitutiveField::found(&surface, matched_unit_field_seed())?

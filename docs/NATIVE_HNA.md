@@ -43,6 +43,22 @@ contains the exact law and controls. `alpha_material --paired-junction` selects 
 construction for the study; the current word implementation refuses after six actual material
 occurrences and is not a corpus-capable model or text emitter.
 
+[established-bounded; measured] `found_with_enclosed_junction` represents the same current with
+dyadic numerical centers, certified Euclidean radii and the full signed residual trace. Its
+`NativeFieldJunctionReading::Enclosed` variant is distinct from `Exact`; a center is not the exact
+physical current. `alpha_material --enclosed-junction 72` carries the full four-family, 728-operation
+slice. Fractional precision is independent of carrier dimension. The
+[enclosure record](../research/records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md)
+contains the error laws, native checks and measured costs.
+
+[definition] `inspect_junction_enclosure` and `inspect_internal_current_enclosures` return explicit
+balls. `inspect_exact_junction` evaluates the retained residual expression for a requested cut;
+`inspect_internal_currents` can then reconstruct exact internal currents. Those cold exact
+inspections may be expensive and are not called by the productive recurrence. The material study
+normally publishes internal enclosures in this mode, together with the residual source needed for
+exact reconstruction. Neither its JSON report nor the earlier scalar checkpoint format is an
+enclosed-junction model checkpoint.
+
 ## Run it
 
 [established-bounded; measured] These commands run the checked-in examples on the standing CUDA

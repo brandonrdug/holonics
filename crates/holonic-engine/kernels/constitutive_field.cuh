@@ -12,24 +12,16 @@
 // branch fields are reused.  All source/current/branch conversions are checked before the one
 // continuing memory/basis commit; a carrier or malformed refusal publishes no plausible successor.
 
-extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
-    const int64_t *seed,
-    int64_t *memory_lo, int64_t *memory_hi,
-    int64_t *basis_lo, int64_t *basis_hi,
-    const int64_t *incoming,
-    const int64_t *origin,
+__device__ void field_constitutive_prepare(
+    const int64_t *seed, const int64_t *memory_lo, const int64_t *basis_lo,
+    const int64_t *incoming, const int64_t *origin,
     const int64_t *current_frame, const int64_t *origin_frame,
-    uint32_t nodes, uint32_t linked, uint32_t coupled, uint64_t occurrence,
-    const int64_t *covariance, const int64_t *junction_held,
-    int64_t *next_covariance_lo, int64_t *next_covariance_hi,
-    int64_t *junction_report_lo, int64_t *junction_report_hi, wide *junction_workspace,
-    int64_t *output_lo, int64_t *output_hi,
-    uint32_t *slot, const uint32_t *census,
-    const uint32_t *lineage, uint32_t lineage_count
+    uint32_t nodes, uint32_t linked, int64_t *output_lo, int64_t *output_hi,
+    uint32_t *slot, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count,
+    wide *field_scratch
 ) {
-    if (blockIdx.x != 0 || threadIdx.x != 0) return;
     if (upstream_refused(census, lineage, lineage_count, slot)) return;
-    if (!nodes || linked > 1 || coupled > 1 || nodes > UINT32_MAX / 6u) {
+    if (!nodes || linked > 1 || nodes > UINT32_MAX / 6u) {
         atomicOr(slot, REFUSED_MALFORMED);
         return;
     }
@@ -66,7 +58,6 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
         }
     }
 
-    extern __shared__ wide field_scratch[];
     wide *current_query = field_scratch;
     wide *prior_query = current_query + width;
     wide *formed = prior_query + width;
@@ -295,29 +286,67 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     output_lo[prior_at + width + 2] = output_hi[prior_at + width + 2] = -1;
     output_lo[prior_at + width + 3] = output_hi[prior_at + width + 3] = prior_rank;
 
-    // The developing passive junction stages its entire return before this operation's only
-    // continuing phase/relation writes. A refused solve cannot leave half a coupled successor.
-    if (coupled) {
-        if (!covariance || !junction_held || !next_covariance_lo || !next_covariance_hi
-            || !junction_report_lo || !junction_report_hi || !junction_workspace) {
-            atomicOr(slot, REFUSED_MALFORMED); return;
+}
+
+extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
+    const int64_t *seed,
+    int64_t *memory_lo, int64_t *memory_hi,
+    int64_t *basis_lo, int64_t *basis_hi,
+    const int64_t *incoming,
+    const int64_t *origin,
+    const int64_t *current_frame, const int64_t *origin_frame,
+    uint32_t nodes, uint32_t linked, uint32_t coupled, uint32_t junction_grain, uint64_t occurrence,
+    const int64_t *covariance, const int64_t *junction_held,
+    int64_t *next_covariance_lo, int64_t *next_covariance_hi,
+    int64_t *junction_report_lo, int64_t *junction_report_hi, wide *junction_workspace,
+    int64_t *output_lo, int64_t *output_hi,
+    uint32_t *slot, const uint32_t *census,
+    const uint32_t *lineage, uint32_t lineage_count
+) {
+    if (blockIdx.x != 0) return;
+    extern __shared__ wide field_scratch[];
+    // The dependent field word is prepared once. All continuing writes remain after the complete
+    // coupled return; early returns inside this helper cannot strand a block barrier.
+    if (threadIdx.x == 0) {
+        if (coupled > 2 || (coupled && (!covariance || !junction_held || !next_covariance_lo
+            || !next_covariance_hi || !junction_report_lo || !junction_report_hi || !junction_workspace))) {
+            atomicOr(slot, REFUSED_MALFORMED);
+        } else {
+            field_constitutive_prepare(seed, memory_lo, basis_lo, incoming, origin,
+                current_frame, origin_frame, nodes, linked, output_lo, output_hi,
+                slot, census, lineage, lineage_count, field_scratch);
         }
+    }
+    __syncthreads();
+    if (*slot) return;
+    if (coupled == 2) {
+        // Every thread participates. Each independent LDL row keeps its original arithmetic
+        // order; only a completed pivot column becomes input to the next one.
+        field_enclosed_junction_prepare(output_lo, origin, incoming, current_frame, origin_frame,
+            nodes, linked, occurrence, junction_grain, covariance, (const wide *)junction_held,
+            next_covariance_lo, next_covariance_hi, (wide *)junction_report_lo, (wide *)junction_report_hi,
+            junction_workspace, slot);
+    } else if (coupled == 1 && threadIdx.x == 0) {
         field_paired_junction_prepare(output_lo, origin, incoming, current_frame, origin_frame,
             nodes, linked, occurrence, covariance, junction_held,
             next_covariance_lo, next_covariance_hi, junction_report_lo, junction_report_hi,
             junction_workspace, slot);
-        if (*slot) return;
     }
-
-    // The only continuing writes.  Every conversion above has succeeded, so a refused branch can
-    // never expose a partially updated relation or held successor.
+    __syncthreads();
+    if (*slot || threadIdx.x != 0) return;
+    const uint32_t width = 6u * nodes;
+    const uint32_t current_at = 4u * nodes + 1u;
+    const int64_t inserted = output_lo[current_at + width + 2u];
+    const wide *formed = field_scratch + 2u * width;
+    const wide *held_departure = field_scratch + 3u * width;
+    // The only continuing writes: neither a refused row nor a refused enclosure can publish a
+    // partial successor. The staged source/relation/held conversions were all checked earlier.
     if (inserted >= 0) for (uint32_t j = 0; j < width; ++j) {
         size_t at = (size_t)inserted * width + j;
         basis_lo[at] = basis_hi[at] = (int64_t)formed[j];
     }
-    for (uint32_t j = 0; j < 3u * nodes; ++j) {
-        memory_lo[j] = memory_hi[j] = (int64_t)outward[j];
-    }
+    for (uint32_t j = 0; j < 3u * nodes; ++j)
+        memory_lo[j] = memory_hi[j] = (int64_t)held_departure[j];
 }
 
 // Re-express the same fixed-node field relation under a rational unit-phase gauge.  The source

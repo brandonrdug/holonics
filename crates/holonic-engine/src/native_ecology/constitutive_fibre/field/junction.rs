@@ -6,8 +6,57 @@
 
 use super::*;
 
+mod enclosure;
+pub use enclosure::{
+    NativeFieldCurrentBall, NativeFieldEnclosedJunctionReading, NativeFieldInternalCurrentBall,
+};
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(tag = "representation", rename_all = "kebab-case")]
+pub enum NativeFieldJunctionRepresentation {
+    RationalWords,
+    EnclosedDyadic { fractional_bits: u32 },
+}
+
+impl NativeFieldJunctionRepresentation {
+    pub(super) fn kernel(self) -> (u32, u32) {
+        match self {
+            Self::RationalWords => (1, 0),
+            Self::EnclosedDyadic { fractional_bits } => (2, fractional_bits),
+        }
+    }
+    fn report_words(self, width: usize) -> usize {
+        match self {
+            Self::RationalWords => 4 * (width + 1),
+            Self::EnclosedDyadic { .. } => 12 * (width + 1),
+        }
+    }
+}
+
 #[derive(Debug, PartialEq, Eq, Serialize)]
-pub struct NativeFieldJunctionReading {
+#[serde(tag = "kind", content = "reading", rename_all = "kebab-case")]
+pub enum NativeFieldJunctionReading {
+    Exact(NativeFieldExactJunctionReading),
+    Enclosed(NativeFieldEnclosedJunctionReading),
+}
+
+impl NativeFieldJunctionReading {
+    pub fn exact(&self) -> Option<&NativeFieldExactJunctionReading> {
+        match self {
+            Self::Exact(value) => Some(value),
+            _ => None,
+        }
+    }
+    pub fn enclosed(&self) -> Option<&NativeFieldEnclosedJunctionReading> {
+        match self {
+            Self::Enclosed(value) => Some(value),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Serialize)]
+pub struct NativeFieldExactJunctionReading {
     /// All three complex port blocks: two source branches per node, then the arriving-field port.
     pub potential: Vec<ExactComplexWaveCurrent>,
     pub outgoing: Vec<ExactComplexWaveCurrent>,
@@ -28,6 +77,7 @@ pub struct NativeFieldInternalCurrent {
 }
 
 pub(super) struct PairedJunction<'chart> {
+    pub(super) representation: NativeFieldJunctionRepresentation,
     pub(super) covariance: ResidentSection<'chart>,
     pub(super) current: Rc<ResidentSection<'chart>>,
 }
@@ -45,6 +95,37 @@ impl<'chart> NativeConstitutiveField<'chart> {
         surface: &'chart ResidentSurface<'chart>,
         material: Vec<NativeJunctionSeed>,
     ) -> Result<Self, ConstitutiveFibreError> {
+        Self::found_with_junction_representation(
+            surface,
+            material,
+            NativeFieldJunctionRepresentation::RationalWords,
+        )
+    }
+
+    /// Represent the same unique junction current by a certified dyadic ball and its retained
+    /// oriented residual trace. The numerical center is never reported as that exact current.
+    pub fn found_with_enclosed_junction(
+        surface: &'chart ResidentSurface<'chart>,
+        material: Vec<NativeJunctionSeed>,
+        grain: ResidentGrain,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        if !(1..=120).contains(&grain.0) {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        Self::found_with_junction_representation(
+            surface,
+            material,
+            NativeFieldJunctionRepresentation::EnclosedDyadic {
+                fractional_bits: grain.0,
+            },
+        )
+    }
+
+    fn found_with_junction_representation(
+        surface: &'chart ResidentSurface<'chart>,
+        material: Vec<NativeJunctionSeed>,
+        representation: NativeFieldJunctionRepresentation,
+    ) -> Result<Self, ConstitutiveFibreError> {
         if material
             .iter()
             .any(|seed| seed.incoming_admittance != 1 || seed.held_admittance != 1)
@@ -59,9 +140,18 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .ok_or(ConstitutiveFibreError::Shape)?;
         let mut covariance = vec![(0, 0); count];
         covariance[count - 1] = (1, 1);
-        let mut report = vec![(0, 0); 4 * (width + 1)];
-        for part in 0..4 {
-            report[part * (width + 1) + width] = (1, 1);
+        let mut report = vec![(0, 0); representation.report_words(width)];
+        match representation {
+            NativeFieldJunctionRepresentation::RationalWords => {
+                for part in 0..4 {
+                    report[part * (width + 1) + width] = (1, 1);
+                }
+            }
+            NativeFieldJunctionRepresentation::EnclosedDyadic { .. } => {
+                // The packed signed-wide C denominator is the report's final two wire words.
+                let low = report.len() - 2;
+                report[low] = (1, 1);
+            }
         }
         let mount = |words: Vec<(i64, i64)>| -> Result<_, ConstitutiveFibreError> {
             Ok(surface.mount_section_rest(
@@ -70,6 +160,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             )?)
         };
         body.junction = Some(PairedJunction {
+            representation,
             covariance: mount(covariance)?,
             current: Rc::new(mount(report)?),
         });
@@ -78,6 +169,12 @@ impl<'chart> NativeConstitutiveField<'chart> {
 
     pub fn has_paired_junction(&self) -> bool {
         self.junction.is_some()
+    }
+
+    pub fn junction_representation(&self) -> Option<NativeFieldJunctionRepresentation> {
+        self.junction
+            .as_ref()
+            .map(|junction| junction.representation)
     }
 
     /// Explicit observers; these create no source or reaction capability.
@@ -126,6 +223,12 @@ impl<'chart> NativeConstitutiveField<'chart> {
         let Some(junction) = self.junction.as_ref() else {
             return Ok(None);
         };
+        if matches!(
+            junction.representation,
+            NativeFieldJunctionRepresentation::EnclosedDyadic { .. }
+        ) {
+            return self.decode_enclosed_internal_currents().map(Some);
+        }
         let width = self.relation.source_width + self.relation.target_width;
         let prefix = |section: &ResidentSection<'chart>| -> Result<Vec<ExactComplexWaveCurrent>, ConstitutiveFibreError> {
             let words = self.relation.surface.read_out(section)?;
@@ -203,22 +306,30 @@ impl<'chart> NativeConstitutiveField<'chart> {
         &self,
     ) -> Result<Option<(PendingJunction<'chart>, ResidentSection<'chart>)>, ConstitutiveFibreError>
     {
-        if self.junction.is_none() {
+        let Some(junction) = self.junction.as_ref() else {
             return Ok(None);
-        }
+        };
         let width = self.relation.source_width + self.relation.target_width;
         let surface = self.relation.surface;
         // The scratch section is apparatus storage for signed wide words. Its low allocation is
         // interpreted as i128 only by the private native kernel; no interval readout is made.
+        let extra = match junction.representation {
+            NativeFieldJunctionRepresentation::RationalWords => 7,
+            NativeFieldJunctionRepresentation::EnclosedDyadic { .. } => 8,
+        };
         let scratch_words = width
-            .checked_mul(width + 1)
-            .and_then(|n| n.checked_add(6 * width))
+            .checked_mul(width)
+            .and_then(|n| n.checked_add(extra * width))
             .and_then(|n| n.checked_mul(2))
             .ok_or(ConstitutiveFibreError::Shape)?;
         Ok(Some((
             PendingJunction {
                 covariance: surface.fresh_section(1, width * width + 1, ResidentGrain(0))?,
-                report: Rc::new(surface.fresh_section(1, 4 * (width + 1), ResidentGrain(0))?),
+                report: Rc::new(surface.fresh_section(
+                    1,
+                    junction.representation.report_words(width),
+                    ResidentGrain(0),
+                )?),
             },
             surface.fresh_section(1, scratch_words, ResidentGrain(0))?,
         )))
@@ -232,6 +343,17 @@ impl<'chart> NativeConstitutiveField<'chart> {
         };
         let words = self.relation.surface.read_out(&pending.report)?;
         let width = self.relation.source_width + self.relation.target_width;
+        let representation = self
+            .junction
+            .as_ref()
+            .ok_or(ConstitutiveFibreError::Uncertain)?
+            .representation;
+        if let NativeFieldJunctionRepresentation::EnclosedDyadic { fractional_bits } =
+            representation
+        {
+            return enclosure::decode_report(&words, width, fractional_bits)
+                .map(|reading| Some(NativeFieldJunctionReading::Enclosed(reading)));
+        }
         let stride = width + 1;
         if words.len() != 4 * stride
             || words.iter().any(|(lo, hi)| lo != hi)
@@ -251,12 +373,14 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 })
                 .collect()
         };
-        Ok(Some(NativeFieldJunctionReading {
-            potential: decode(0),
-            outgoing: decode(1),
-            held_current: decode(2),
-            potential_prefix: decode(3),
-        }))
+        Ok(Some(NativeFieldJunctionReading::Exact(
+            NativeFieldExactJunctionReading {
+                potential: decode(0),
+                outgoing: decode(1),
+                held_current: decode(2),
+                potential_prefix: decode(3),
+            },
+        )))
     }
 }
 

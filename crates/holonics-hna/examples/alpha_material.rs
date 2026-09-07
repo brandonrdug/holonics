@@ -9,7 +9,8 @@
 use holonic_engine::{
     native_ecology::constitutive_fibre::{
         ConstitutiveFibreError, NativeConstitutiveField, NativeFieldEmission,
-        NativeFieldInternalCurrent, NativeFieldLineage, NativeFieldOccurrence,
+        NativeFieldInternalCurrent, NativeFieldInternalCurrentBall,
+        NativeFieldJunctionRepresentation, NativeFieldLineage, NativeFieldOccurrence,
         NativeFieldReceiverStatus,
     },
     resident_section::ResidentSectionRest,
@@ -20,16 +21,17 @@ use holonics_hna::{
             ExposureLink, ExposureOccurrence, ExposurePart, ExposurePartition, ExposureReader,
         },
         material::{
-            with_octet_field, with_paired_octet_field, AlphaMaterialError, OctetExcitation,
-            OCTET_INPUT_CHANNELS,
+            with_enclosed_octet_field, with_octet_field, with_paired_octet_field,
+            AlphaMaterialError, OctetExcitation, OCTET_INPUT_CHANNELS,
         },
     },
     publish_new,
 };
 use serde::Serialize;
 use std::{
-    io,
+    io::{self, Write},
     path::{Path, PathBuf},
+    time::Instant,
 };
 
 #[derive(Clone, Debug, Serialize)]
@@ -98,6 +100,8 @@ struct BodyObserver {
     junction_covariance: Option<SectionObserver>,
     junction_history: Vec<(usize, SectionObserver)>,
     internal_currents: Option<Vec<NativeFieldInternalCurrent>>,
+    junction_representation: Option<NativeFieldJunctionRepresentation>,
+    internal_current_enclosures: Option<Vec<NativeFieldInternalCurrentBall>>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -157,6 +161,8 @@ struct Report {
     native_census_before_observers: Option<holonic_engine::resident_section::TransferCensus>,
     body: Option<BodyObserver>,
     failure: Option<FailureCoordinate>,
+    material_wall_seconds: f64,
+    observer_wall_seconds: f64,
 }
 
 impl Report {
@@ -192,6 +198,8 @@ impl Report {
             native_census_before_observers: None,
             body: None,
             failure: None,
+            material_wall_seconds: 0.0,
+            observer_wall_seconds: 0.0,
         }
     }
 }
@@ -306,8 +314,21 @@ fn observe_body(field: &NativeConstitutiveField<'_>, inspect_sources: &[usize]) 
             }
         }
     }
-    let internal_currents = field
-        .inspect_internal_currents()
+    let junction_representation = field.junction_representation();
+    let internal_currents = if matches!(
+        junction_representation,
+        Some(NativeFieldJunctionRepresentation::EnclosedDyadic { .. })
+    ) {
+        None
+    } else {
+        field
+            .inspect_internal_currents()
+            .map_err(|error| errors.push(error.to_string()))
+            .ok()
+            .flatten()
+    };
+    let internal_current_enclosures = field
+        .inspect_internal_current_enclosures()
         .map_err(|error| errors.push(error.to_string()))
         .ok()
         .flatten();
@@ -325,6 +346,8 @@ fn observe_body(field: &NativeConstitutiveField<'_>, inspect_sources: &[usize]) 
         junction_covariance,
         junction_history,
         internal_currents,
+        junction_representation,
+        internal_current_enclosures,
     }
 }
 
@@ -473,7 +496,7 @@ fn process_exposure(
 }
 
 fn usage() -> &'static str {
-    "usage: alpha_material EXPOSURE --families N --report NEW.json [--inspect-source N ...] [--paired-junction]"
+    "usage: alpha_material EXPOSURE --families N --report NEW.json [--inspect-source N ...] [--paired-junction | --enclosed-junction FRACTIONAL_BITS]"
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -483,9 +506,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut report_path = None;
     let mut inspect_sources = Vec::new();
     let mut paired = false;
+    let mut enclosed = None;
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--paired-junction" => paired = true,
+            "--enclosed-junction" => {
+                enclosed = Some(
+                    args.next()
+                        .ok_or("missing fractional bits")?
+                        .parse::<u32>()?,
+                )
+            }
             "--families" => {
                 families = Some(
                     args.next()
@@ -508,15 +539,27 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .filter(|value| *value > 0)
         .ok_or("--families must be a positive explicit aperture")?;
     let report_path = report_path.ok_or("--report is required for the private report")?;
+    if paired && enclosed.is_some() {
+        return Err("choose one declared junction representation".into());
+    }
     let mut reader = ExposureReader::open(&source)?;
     let mut report = Report::new(&source, families, paired);
+    if enclosed.is_some() {
+        report.profile = "matched-unit-octet-field-with-enclosed-junction";
+    }
     let operation = |field: &mut NativeConstitutiveField<'_>| {
+        let start = Instant::now();
         let result = process_exposure(&mut reader, field, families, &mut report);
+        report.material_wall_seconds = start.elapsed().as_secs_f64();
         report.native_census_before_observers = Some(field.census());
+        let start = Instant::now();
         report.body = Some(observe_body(field, &inspect_sources));
+        report.observer_wall_seconds = start.elapsed().as_secs_f64();
         result
     };
-    let native_result = if paired {
+    let native_result = if let Some(grain) = enclosed {
+        with_enclosed_octet_field(grain, operation)
+    } else if paired {
         with_paired_octet_field(operation)
     } else {
         with_octet_field(operation)
@@ -541,14 +584,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cursor = reader.cursor();
     report.last_cursor_sequence = cursor.next_sequence;
     report.last_cursor_byte_offset = cursor.byte_offset;
+    let publication_start = Instant::now();
     publish_new(&report_path, |file| {
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;
             file.set_permissions(std::fs::Permissions::from_mode(0o600))?;
         }
-        serde_json::to_writer_pretty(file, &report).map_err(io::Error::other)
+        let mut writer = io::BufWriter::new(file);
+        serde_json::to_writer_pretty(&mut writer, &report).map_err(io::Error::other)?;
+        writer.flush()
     })?;
+    let publication_seconds = publication_start.elapsed().as_secs_f64();
     println!(
         "{}",
         serde_json::json!({
@@ -568,7 +615,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "unbound_source_relations":report.unbound_source_relations.len(),
             "record_context_is_operative":false,
             "learned_text_emitted":false,
-            "report_published": true
+            "report_published": true,
+            "material_wall_seconds":report.material_wall_seconds,
+            "observer_wall_seconds":report.observer_wall_seconds,
+            "publication_wall_seconds":publication_seconds
         })
     );
     if let Some(failure) = &report.failure {

@@ -11,7 +11,7 @@ impl<'chart> ResidentSurface<'chart> {
         incoming: &ResidentSection<'chart>, origin: Option<&ResidentSection<'chart>>,
         frame: &ResidentSection<'chart>, origin_frame: Option<&ResidentSection<'chart>>,
         junction: Option<(&ResidentSection<'chart>, &ResidentSection<'chart>,
-            &ResidentSection<'chart>, &ResidentSection<'chart>, &ResidentSection<'chart>)>,
+            &ResidentSection<'chart>, &ResidentSection<'chart>, &ResidentSection<'chart>, (u32, u32))>,
         occurrence: u64,
         output: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
@@ -34,13 +34,17 @@ impl<'chart> ResidentSurface<'chart> {
             || origin_frame.is_some_and(|s| !matches(s, nodes, 3)) {
             return Err(fail("incompatible field, source or continuing relation"));
         }
-        if let Some((covariance, held, next_covariance, next_report, workspace)) = junction {
+        if let Some((covariance, held, next_covariance, next_report, workspace, (mode, grain))) = junction {
+            if !(1..=2).contains(&mode) || (mode == 2 && !(1..=120).contains(&grain)) {
+                return Err(fail("unadmitted paired junction representation"));
+            }
             let matrix_width = width.checked_mul(width).and_then(|n| n.checked_add(1))
                 .ok_or_else(|| fail("paired junction matrix extent overflow"))?;
-            let scratch_words = width.checked_mul(width + 1).and_then(|n| n.checked_add(6 * width))
+            let scratch_words = width.checked_mul(width).and_then(|n| n.checked_add(if mode == 1 { 7 * width } else { 8 * width }))
                 .and_then(|n| n.checked_mul(2)).ok_or_else(|| fail("paired junction scratch extent overflow"))?;
             if !matches(covariance, 1, matrix_width) || !matches(next_covariance, 1, matrix_width)
-                || !matches(held, 1, 4 * (width + 1)) || !matches(next_report, 1, 4 * (width + 1))
+                || !matches(held, 1, if mode == 1 { 4 * (width+1) } else { 12 * (width+1) })
+                || !matches(next_report, 1, held.width)
                 || !matches(workspace, 1, scratch_words) {
                 return Err(fail("incompatible paired junction charts"));
             }
@@ -54,8 +58,9 @@ impl<'chart> ResidentSurface<'chart> {
             .ptr(basis.lo.device_ptr()).ptr(basis.hi.device_ptr()).ptr(incoming.lo.device_ptr())
             .ptr(origin.unwrap_or(incoming).lo.device_ptr()).ptr(frame.lo.device_ptr())
             .ptr(origin_frame.unwrap_or(frame).lo.device_ptr()).u32(nodes as u32)
-            .u32(u32::from(origin.is_some())).u32(u32::from(junction.is_some())).u64(occurrence);
-        if let Some((covariance, held, next_covariance, next_report, workspace)) = junction {
+            .u32(u32::from(origin.is_some())).u32(junction.map_or(0, |(_,_,_,_,_,(mode,_))| mode))
+            .u32(junction.map_or(0, |(_,_,_,_,_,(_,grain))| grain)).u64(occurrence);
+        if let Some((covariance, held, next_covariance, next_report, workspace, _)) = junction {
             params.ptr(covariance.lo.device_ptr()).ptr(held.lo.device_ptr())
                 .ptr(next_covariance.lo.device_ptr()).ptr(next_covariance.hi.device_ptr())
                 .ptr(next_report.lo.device_ptr()).ptr(next_report.hi.device_ptr()).ptr(workspace.lo.device_ptr());

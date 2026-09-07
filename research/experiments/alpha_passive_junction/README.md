@@ -28,7 +28,7 @@ The source `q` is the actual native field at the source occurrence named by the 
 it is never replaced by a predicted target field. The arriving `a` is the actual next field from
 the report. Raw message text and source coordinates remain outside this reference calculation.
 
-[established-bounded; computational-witness] The observer realifies each adjacent real/imaginary
+[established-bounded] Evidence tags: `computational-witness`. The observer realifies each adjacent real/imaginary
 coordinate pair with `J(x,y)=(-y,x)` and checks
 
 ```text
@@ -49,7 +49,7 @@ does not establish language conduct.
 
 ## Actual bounded observation
 
-[established-bounded; computational-witness] The default run reads only the first 25 actual native
+[established-bounded] Evidence tags: `computational-witness`. The default run reads only the first 25 actual native
 field lineages from the private `material-history-readbacks.json`. It adds contacts from the actual
 `received_from` source occurrence before each reaction, carries each exact internal current, and
 records reduced numerator/denominator widths and exact fraction-free arithmetic widths. The
@@ -87,12 +87,97 @@ native-staged full-matrix predivision 127-bit observation.
 The earlier v2-v6 aperture measurements are superseded by v7: multiplying
 the coefficient matrix by the RHS denominator does not reproduce the native arithmetic path.
 
-[established-bounded; measured] The [paired-junction native return](../../records/2026-09-06_AC1_THE_PAIRED_JUNCTION_RETAINS_ITS_INNER_CURRENT.md)
+## Fixed-point enclosure observer
+
+[established-bounded] Evidence tags: `computational-witness`, `measured`. `enclosure.py` is a separate CPU
+observer for the same passive junction. It keeps the full 96-real-coordinate carrier in every run:
+32 complex source coordinates and 16 complex arriving coordinates. It forms `C` exactly from raw
+source/arrival rows, including `d dᵀ + Jd(Jd)ᵀ`, keeps `h` approximate only in its fixed-point
+center, and uses native interleaved source ordering. It does not call `field.advance`, replay
+formation, update a model, or invoke Lean.
+
+For scale `Q = 2^g`, the center stores `H/Q`, `P/Q`, and candidate `V/Q`. It quantizes known exact
+ingress `u` toward zero (floor for nonnegative and ceil for negative coordinates), retaining exact `u` and its L1 quanta
+error `E_u`. The candidate solves `A = I+C` through integer fixed-point `LDL^T`, with positive
+pivots and toward-zero division after each shifted product. The oriented residual is retained as
+`r_hat = A(V/Q) - 2(Uhat/Q + H/Q)` and `R = ceil(Q ||r_hat||_1)`. The checked radii are
+
+```text
+E_v     = 2 E_h + 2 E_u + R
+E_out   = 2 E_h + E_u + R
+E_hnext = E_h + 2 E_u + R
+E_Pnext = E_P + E_v.
+```
+
+They follow from
+
+```text
+e_v     = 2 A^-1(e_h + delta_u) - A^-1 r,
+e_hnext = (I-2A^-1)e_h + (2I-2A^-1)delta_u + A^-1 r,
+e_Pnext = e_P + (-1)^t e_v,
+```
+
+and `||A^-1|| <= 1`, `||I-2A^-1|| <= 1`, `||2I-2A^-1|| <= 2` for exact positive
+semidefinite `C`. The full oriented residual is used in the radius and is never a quality score.
+
+The private anchor run uses precision bits `12, 24, 48, 72` with the same full carrier. Its first
+25 occurrences are exact anchors at every precision; all six checks (`v`, outgoing, `h`, prefix,
+internal-current reconstruction, and the error-trace decoder) pass 25/25. The 72-bit run then
+continues the certified center/radius recurrence through occurrence 727; it does not maintain an
+exact evolving rational state after the anchor window. At occurrence 727 there are 724 admitted
+contacts. The maximum 72-bit LDL intermediate width is 154 bits, with no emulated signed-256
+overflow. Its maximum radii in quanta are `E_v=66,464,443`, `E_hnext=33,274,133`, and
+`E_Pnext=16,112,079,081`. These enclosure results do not establish productive Athena-alpha
+quality.
+
+```sh
+python3 research/experiments/alpha_passive_junction/enclosure.py \
+  .local/artifacts/athena-alpha/ac1/material-history-readbacks.json \
+  --occurrences 728 --precisions 12 24 48 72 \
+  --output .local/artifacts/athena-alpha/ac1/passive-junction-enclosure-reference-v4.json
+```
+
+The earlier enclosure v1/v2 reports are superseded by v3/v4: they confused precision bits with
+carrier dimension. v3 corrected the full 96-dimensional carrier and decoder; v4 corrected the
+all-step LDL width summary.
+
+The 25-anchor four-precision receipt is retained as
+`passive-junction-enclosure-anchors-v1.json`; the 728-occurrence precision-72 receipt is
+`passive-junction-enclosure-reference-v4.json`.
+
+## Native certificate checker
+
+[established-bounded] `verify_native.py` checks the serial enclosed report
+`material-enclosed-junction-g72.json` directly. Its `evidence_tags` are
+`computational-witness` and `measured`. It decodes each adjacent packed signed-i128 word, checks
+all 728 exact source centers, residuals, center recurrences, radius recurrences, source links and
+part boundaries, reconstructs the covariance prefix operator from every raw `d` and `Jd` row, and
+compares the final covariance section. It does not rerun LDL, call native code, or claim exact
+point equality after the first 25 anchors.
+
+The first 25 exact anchors pass all four current balls; all 300 birth-current balls pass. The
+earlier enclosure-reference run separately checks its exact error trace. This material checker
+requires identity source frames; it does not transport recharted inputs. The final private
+certificate is `native-enclosed-junction-certificate-final-v1.json`, mode `0600`.
+
+```sh
+python3 research/experiments/alpha_passive_junction/verify_native.py \
+  .local/artifacts/athena-alpha/ac1/material-enclosed-junction-g72.json \
+  --output .local/artifacts/athena-alpha/ac1/native-enclosed-junction-certificate-v1.json
+```
+
+[established-bounded] Evidence tags: `measured`. The [paired-junction native return](../../records/2026-09-06_AC1_THE_PAIRED_JUNCTION_RETAINS_ITS_INNER_CURRENT.md)
 separately establishes its finite same-input contextual control and compares six actual native
 material operations with this reference. The word carrier then refuses, preserving the complete
 preceding body. The final artifact `material-paired-junction-word-v2.json` corrects the refusal
 classification to carrier exhaustion alone and has the identical body/readback history compared
 by v7. `paired-junction-final-comparison.json` retains that comparison.
 
-[open] Continuing current representation, record-level situated channels and learned text-codec
-conduct remain required. No alpha-quality or Athena-alpha claim follows from this observer.
+[established-bounded; measured] The [native enclosure return](../../records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md)
+continues the same junction through all 728 material occurrences and 724 contacts. Cooperative
+factorization, buffered diagnostic publication and exact unit-division shortcuts preserve its
+complete body and history; the final report is `material-enclosed-junction-g72-final.json`.
+
+[open] Efficient broader operation, lawful history placement, record-level situated channels and
+learned text-codec conduct remain required. No alpha-quality or Athena-alpha claim follows from
+this observer.

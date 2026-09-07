@@ -7,6 +7,170 @@
 // its positive common denominator.  `held` is the four-segment [v,b,h,P] report, each segment of
 // length D+1.  Every destination is fresh staging; the old covariance and report are read-only.
 
+// Common source/contact assembly for exact and enclosed representations.  The returned faces use
+// one common denominator each; the target half of u is zero and the target half of d is the
+// negative root receiving field.  No covariance or report destination is touched here.
+__device__ __forceinline__ bool field_paired_build_faces(
+    const int64_t *query, const int64_t *origin, const int64_t *incoming,
+    const int64_t *frame, const int64_t *origin_frame,
+    uint32_t nodes, uint32_t linked, wide *u, wide *d,
+    wide *u_den_out, wide *d_den_out, uint32_t *slot
+) {
+    if (!nodes || linked > 1 || query == nullptr || incoming == nullptr || frame == nullptr
+        || u == nullptr || d == nullptr || u_den_out == nullptr || d_den_out == nullptr) {
+        atomicOr(slot, REFUSED_MALFORMED);
+        return false;
+    }
+    if (linked && (origin == nullptr || origin_frame == nullptr)) {
+        atomicOr(slot, REFUSED_MALFORMED);
+        return false;
+    }
+    const uint32_t source_width = 4u * nodes;
+    const uint32_t dimension = 6u * nodes;
+    const int64_t query_den = query[source_width];
+    const int64_t origin_den = linked ? origin[source_width] : 1;
+    if (query_den <= 0 || origin_den <= 0) {
+        atomicOr(slot, REFUSED_MALFORMED);
+        return false;
+    }
+    wide u_den = 1, d_den = 1;
+    for (uint32_t node = 0; node < nodes; ++node) {
+        const int64_t *now = frame + 3u * node;
+        wide now_norm = add_checked(product_checked((wide)now[0], (wide)now[0], slot),
+            product_checked((wide)now[1], (wide)now[1], slot), slot);
+        wide now_den = product_checked((wide)now[2], (wide)now[2], slot);
+        if (*slot) return false;
+        if (now[2] <= 0 || now_norm != now_den) {
+            atomicOr(slot, REFUSED_MALFORMED);
+            return false;
+        }
+        const int64_t *before = linked ? origin_frame + 3u * node : nullptr;
+        if (linked) {
+            wide before_norm = add_checked(product_checked((wide)before[0], (wide)before[0], slot),
+                product_checked((wide)before[1], (wide)before[1], slot), slot);
+            wide before_den = product_checked((wide)before[2], (wide)before[2], slot);
+            if (*slot) return false;
+            if (before[2] <= 0 || before_norm != before_den) {
+                atomicOr(slot, REFUSED_MALFORMED);
+                return false;
+            }
+        }
+        for (uint32_t branch = 0; branch < 2u; ++branch) {
+            wide turned[3];
+            fibre_phase_product((wide)now[0], -(wide)now[1], (wide)now[2],
+                (wide)query[4u * node + 2u * branch],
+                (wide)query[4u * node + 2u * branch + 1u], (wide)query_den,
+                turned, slot);
+            if (*slot) return false;
+            u_den = fibre_lcm(u_den, turned[2], slot);
+            if (linked) {
+                wide old_turned[3];
+                fibre_phase_product((wide)before[0], -(wide)before[1], (wide)before[2],
+                    (wide)origin[4u * node + 2u * branch],
+                    (wide)origin[4u * node + 2u * branch + 1u], (wide)origin_den,
+                    old_turned, slot);
+                if (*slot) return false;
+                d_den = fibre_lcm(d_den, old_turned[2], slot);
+            }
+        }
+    }
+    for (uint32_t node = 0; node < nodes; ++node) {
+        const int64_t *arrived = incoming + 3u * node;
+        if (arrived[2] <= 0) {
+            atomicOr(slot, REFUSED_MALFORMED);
+            return false;
+        }
+        if (linked) d_den = fibre_lcm(d_den, (wide)arrived[2], slot);
+    }
+    if (*slot) return false;
+    for (uint32_t node = 0; node < nodes; ++node) {
+        const int64_t *now = frame + 3u * node;
+        const int64_t *before = linked ? origin_frame + 3u * node : nullptr;
+        for (uint32_t branch = 0; branch < 2u; ++branch) {
+            wide turned[3];
+            fibre_phase_product((wide)now[0], -(wide)now[1], (wide)now[2],
+                (wide)query[4u * node + 2u * branch],
+                (wide)query[4u * node + 2u * branch + 1u], (wide)query_den,
+                turned, slot);
+            u[4u * node + 2u * branch] = product_checked(turned[0], u_den / turned[2], slot);
+            u[4u * node + 2u * branch + 1u] = product_checked(turned[1], u_den / turned[2], slot);
+            if (linked) {
+                wide old_turned[3];
+                fibre_phase_product((wide)before[0], -(wide)before[1], (wide)before[2],
+                    (wide)origin[4u * node + 2u * branch],
+                    (wide)origin[4u * node + 2u * branch + 1u], (wide)origin_den,
+                    old_turned, slot);
+                d[4u * node + 2u * branch] = product_checked(old_turned[0], d_den / old_turned[2], slot);
+                d[4u * node + 2u * branch + 1u] = product_checked(old_turned[1], d_den / old_turned[2], slot);
+            } else {
+                d[4u * node + 2u * branch] = d[4u * node + 2u * branch + 1u] = 0;
+            }
+        }
+        const int64_t *arrived = incoming + 3u * node;
+        if (linked) {
+            d[source_width + 2u * node] = -product_checked((wide)arrived[0], d_den / (wide)arrived[2], slot);
+            d[source_width + 2u * node + 1u] = -product_checked((wide)arrived[1], d_den / (wide)arrived[2], slot);
+        } else {
+            d[source_width + 2u * node] = d[source_width + 2u * node + 1u] = 0;
+        }
+        u[source_width + 2u * node] = u[source_width + 2u * node + 1u] = 0;
+    }
+    if (*slot) return false;
+    fibre_normalize(u, dimension, &u_den, slot);
+    if (linked) fibre_normalize(d, dimension, &d_den, slot);
+    if (*slot) return false;
+    *u_den_out = u_den;
+    *d_den_out = d_den;
+    return true;
+}
+
+// Common exact covariance update. `matrix` is D² contiguous wide words and receives the normalized
+// numerator; the denominator is returned separately so the caller can either solve exactly or
+// preserve the same rational C representation in an enclosed path.
+__device__ __forceinline__ bool field_paired_build_covariance(
+    const int64_t *covariance, uint32_t dimension, uint32_t linked,
+    const wide *d, wide d_den, wide *matrix, wide *den_out, uint32_t *slot
+) {
+    if (covariance == nullptr || d == nullptr || matrix == nullptr || den_out == nullptr
+        || !dimension || linked > 1 || dimension > UINT32_MAX / dimension) {
+        atomicOr(slot, REFUSED_MALFORMED);
+        return false;
+    }
+    const size_t count = (size_t)dimension * dimension;
+    const int64_t old_den_word = covariance[count];
+    if (old_den_word <= 0 || d_den <= 0) {
+        atomicOr(slot, REFUSED_MALFORMED);
+        return false;
+    }
+    wide old_den = (wide)old_den_word;
+    wide residual_square_den = product_checked(d_den, d_den, slot);
+    wide next_den = linked ? fibre_lcm(old_den, residual_square_den, slot) : old_den;
+    if (*slot) return false;
+    for (uint32_t i = 0; i < dimension; ++i) {
+        for (uint32_t j = 0; j < dimension; ++j) {
+            if (covariance[(size_t)i * dimension + j] != covariance[(size_t)j * dimension + i]) {
+                atomicOr(slot, REFUSED_MALFORMED);
+                return false;
+            }
+            wide value = product_checked((wide)covariance[(size_t)i * dimension + j], next_den / old_den, slot);
+            if (linked) {
+                uint32_t ipair = i / 2u, jpair = j / 2u;
+                wide ji = (i & 1u) ? d[2u * ipair] : -d[2u * ipair + 1u];
+                wide jj = (j & 1u) ? d[2u * jpair] : -d[2u * jpair + 1u];
+                wide gram = add_checked(product_checked(d[i], d[j], slot),
+                    product_checked(ji, jj, slot), slot);
+                value = add_checked(value, product_checked(gram, next_den / residual_square_den, slot), slot);
+            }
+            matrix[(size_t)i * dimension + j] = value;
+        }
+    }
+    if (*slot) return false;
+    fibre_normalize(matrix, (uint32_t)count, &next_den, slot);
+    if (*slot) return false;
+    *den_out = next_den;
+    return true;
+}
+
 __device__ __forceinline__ void field_paired_junction_prepare(
     const int64_t *query, const int64_t *origin, const int64_t *incoming,
     const int64_t *frame, const int64_t *origin_frame,
@@ -64,154 +228,26 @@ __device__ __forceinline__ void field_paired_junction_prepare(
     wide *prefix = v + dimension;
     for (uint32_t i = 0; i < dimension; ++i) rhs[i] = 0;
 
-    wide current_den = 1;
-    wide residual_den = 1;
-    // Validate all frame phases and derive the common denominators before staging any current.
-    for (uint32_t node = 0; node < nodes; ++node) {
-        const int64_t *now = frame + 3u * node;
-        wide now_norm = add_checked(product_checked((wide)now[0], (wide)now[0], slot),
-            product_checked((wide)now[1], (wide)now[1], slot), slot);
-        wide now_den = product_checked((wide)now[2], (wide)now[2], slot);
-        if (*slot) return;
-        if (now[2] <= 0 || now_norm != now_den) {
-            atomicOr(slot, REFUSED_MALFORMED);
-            return;
-        }
-        const int64_t *before = linked ? origin_frame + 3u * node : nullptr;
-        if (linked) {
-            wide before_norm = add_checked(product_checked((wide)before[0], (wide)before[0], slot),
-                product_checked((wide)before[1], (wide)before[1], slot), slot);
-            wide before_den = product_checked((wide)before[2], (wide)before[2], slot);
-            if (*slot) return;
-            if (before[2] <= 0 || before_norm != before_den) {
-                atomicOr(slot, REFUSED_MALFORMED);
-                return;
-            }
-        }
-        for (uint32_t branch = 0; branch < 2u; ++branch) {
-            wide turned[3];
-            fibre_phase_product((wide)now[0], -(wide)now[1], (wide)now[2],
-                (wide)query[4u * node + 2u * branch],
-                (wide)query[4u * node + 2u * branch + 1u], (wide)query_den,
-                turned, slot);
-            if (*slot) return;
-            current_den = fibre_lcm(current_den, turned[2], slot);
-            if (linked) {
-                wide old_turned[3];
-                fibre_phase_product((wide)before[0], -(wide)before[1], (wide)before[2],
-                    (wide)origin[4u * node + 2u * branch],
-                    (wide)origin[4u * node + 2u * branch + 1u], (wide)origin_den,
-                    old_turned, slot);
-                if (*slot) return;
-                residual_den = fibre_lcm(residual_den, old_turned[2], slot);
-            }
-        }
-        if (*slot) return;
-    }
-    for (uint32_t node = 0; node < nodes; ++node) {
-        const int64_t *arrived = incoming + 3u * node;
-        if (arrived[2] <= 0) {
-            atomicOr(slot, REFUSED_MALFORMED);
-            return;
-        }
-        if (linked) residual_den = fibre_lcm(residual_den, (wide)arrived[2], slot);
-    }
-    if (*slot) return;
-
-    // Recompute the normalized phase products after their common denominators are known.
-    for (uint32_t node = 0; node < nodes; ++node) {
-        const int64_t *now = frame + 3u * node;
-        const int64_t *before = linked ? origin_frame + 3u * node : nullptr;
-        for (uint32_t branch = 0; branch < 2u; ++branch) {
-            wide turned[3];
-            fibre_phase_product((wide)now[0], -(wide)now[1], (wide)now[2],
-                (wide)query[4u * node + 2u * branch],
-                (wide)query[4u * node + 2u * branch + 1u], (wide)query_den,
-                turned, slot);
-            if (*slot) return;
-            u[4u * node + 2u * branch] = product_checked(turned[0],
-                current_den / turned[2], slot);
-            u[4u * node + 2u * branch + 1u] = product_checked(turned[1],
-                current_den / turned[2], slot);
-            if (linked) {
-                wide old_turned[3];
-                fibre_phase_product((wide)before[0], -(wide)before[1], (wide)before[2],
-                    (wide)origin[4u * node + 2u * branch],
-                    (wide)origin[4u * node + 2u * branch + 1u], (wide)origin_den,
-                    old_turned, slot);
-                if (*slot) return;
-                d[4u * node + 2u * branch] = product_checked(old_turned[0],
-                    residual_den / old_turned[2], slot);
-                d[4u * node + 2u * branch + 1u] = product_checked(old_turned[1],
-                    residual_den / old_turned[2], slot);
-            } else {
-                d[4u * node + 2u * branch] = d[4u * node + 2u * branch + 1u] = 0;
-            }
-        }
-    }
+    wide current_den = 1, residual_den = 1;
+    if (!field_paired_build_faces(query, origin, incoming, frame, origin_frame,
+        nodes, linked, u, d, &current_den, &residual_den, slot)) return;
     for (uint32_t j = 0; j < dimension; ++j) {
         h[j] = (wide)held[2u * report_segment + j];
         prefix[j] = (wide)held[3u * report_segment + j];
     }
-    if (*slot) return;
-    for (uint32_t node = 0; node < nodes; ++node) {
-        const int64_t *arrived = incoming + 3u * node;
-        if (linked) {
-            d[source_width + 2u * node] = -product_checked((wide)arrived[0],
-                residual_den / (wide)arrived[2], slot);
-            d[source_width + 2u * node + 1u] = -product_checked((wide)arrived[1],
-                residual_den / (wide)arrived[2], slot);
-        } else {
-            d[source_width + 2u * node] = d[source_width + 2u * node + 1u] = 0;
-        }
-        u[source_width + 2u * node] = u[source_width + 2u * node + 1u] = 0;
-    }
-    if (*slot) return;
-    fibre_normalize(u, dimension, &current_den, slot);
-    if (linked) fibre_normalize(d, dimension, &residual_den, slot);
-    if (*slot) return;
     wide held_den = (wide)held_den_word;
     wide prefix_den = (wide)prefix_den_word;
     fibre_normalize(h, dimension, &held_den, slot);
     fibre_normalize(prefix, dimension, &prefix_den, slot);
     if (*slot) return;
-
-    wide old_cov_den = (wide)covariance_den_word;
-    wide next_cov_den = old_cov_den;
-    wide residual_square_den = 1;
-    if (linked) {
-        residual_square_den = product_checked(residual_den, residual_den, slot);
-        next_cov_den = fibre_lcm(old_cov_den, residual_square_den, slot);
-    }
-    if (*slot) return;
-    for (uint32_t i = 0; i < dimension; ++i) {
-        for (uint32_t j = 0; j < dimension; ++j) {
-            if (covariance[(size_t)i * dimension + j]
-                != covariance[(size_t)j * dimension + i]) {
-                atomicOr(slot, REFUSED_MALFORMED);
-                return;
-            }
-            wide value = product_checked((wide)covariance[(size_t)i * dimension + j],
-                next_cov_den / old_cov_den, slot);
-            if (linked) {
-                uint32_t ipair = i / 2u, jpair = j / 2u;
-                wide ji = (i & 1u) ? d[2u * ipair] : -d[2u * ipair + 1u];
-                wide jj = (j & 1u) ? d[2u * jpair] : -d[2u * jpair + 1u];
-                wide gram = add_checked(product_checked(d[i], d[j], slot),
-                    product_checked(ji, jj, slot), slot);
-                value = add_checked(value, product_checked(gram,
-                    next_cov_den / residual_square_den, slot), slot);
-            }
-            matrix[(size_t)i * dimension + j] = value;
-        }
-    }
-    if (*slot) return;
-    fibre_normalize(matrix, (uint32_t)matrix_count, &next_cov_den, slot);
+    wide checked_cov_den;
+    if (!field_paired_build_covariance(covariance, dimension, linked, d, residual_den,
+        matrix, &checked_cov_den, slot)) return;
     if (*slot) return;
     for (size_t j = 0; j < matrix_count; ++j) {
         matrix[j] = (wide)to_word(matrix[j], slot);
     }
-    wide checked_cov_den = (wide)to_word(next_cov_den, slot);
+    checked_cov_den = (wide)to_word(checked_cov_den, slot);
     if (*slot) return;
     for (size_t j = 0; j < matrix_count; ++j)
         next_cov_lo[j] = next_cov_hi[j] = (int64_t)matrix[j];

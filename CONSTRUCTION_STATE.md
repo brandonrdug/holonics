@@ -46,39 +46,25 @@ cut gives 34,046 development / 1,121 evaluation / 1,753 deferred families. Full 
 comparison, the public cold Rust reader, actual process-separated cursor continuation, 32 data
 tests and nine Rust reader tests passed. No native model was executed.
 
-[open] AC1 now composes the real material/current/formation attachment over the existing native
-owners. Fixed codeword excitation can be an exterior chart, but actual standing interaction must
-generate current. Complete branch/source/receiver fibres and actual predecessor conditions must
-survive in one resident successor. The cold source cursor is not yet paired with a cultivated
-native model; the whole AC0–AC5 goal remains active.
+[established-bounded; measured] AC1's [enclosed native junction](research/records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md)
+now carries actual material through learned contact moments and retained internal current, with
+full numerical residuals and an executable exact residual decoder. All four selected conversation
+families, 728 operations and 724 contacts completed without refusal. All 728 native certificates
+pass; the first 25 exact currents and 300 internal-current anchors are enclosed. Forty-nine native
+fibre/circulation/field controls pass. The new representation crosses the old word failure at
+occurrence 6 without sealing a numerical center as an exact current.
 
-[established-bounded; measured] AC1's [complete port-field return](research/records/2026-09-06_AC1_THE_COMPLETE_MATERIAL_FIELD_RETAINS_ITS_CONTEXTUAL_OBSTRUCTION.md)
-retains separately excited ports, both outgoing/held source branches and the full later receiving
-field. One owner completed four actual conversation families and 728 octets without arithmetic
-refusal. Eleven integrated CUDA controls now include live full-field rechart, old-source frame
-transport, physical incidence change and refusal recovery; the earlier 20 scalar regressions passed.
-The public material adapter builds; both octet-chart tests passed. Direct source and predecessor
-readbacks reproduce the witness and the original complete native successor. AC1 remains active.
+[established-bounded; measured] Native controls retain actual delayed sources, full root rechart
+transport and same-input contextual differences under equal moments/raw fields. Cooperative LDL
+rows preserve the complete body and history bit-for-bit. Buffered diagnostic publication separates
+material work, terminal observation and I/O costs; the [current record](research/records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md)
+retains those costs and the earlier exact-chart obstruction at its proper scope.
 
-[counterexample; computational-witness] The fixed field's receiver is predominantly plural.
-Sources 11 and 19 have equal full local fields but different arrivals at 12 and 20; their predecessor
-fields at 10 and 18 differ. A local Hermitian receiver separates the first linear dependency but
-cannot remove this identical-field collision. Actual contextual channels and changed morphology
-must participate in transport; retaining source IDs or adding powers of the same field cannot
-substitute. AC1 and the full alpha goal remain active; no learned text response was produced.
-
-[established-bounded; measured] AC1's [paired passive junction](research/records/2026-09-06_AC1_THE_PAIRED_JUNCTION_RETAINS_ITS_INNER_CURRENT.md)
-now reacts through a formed Hermitian moment and retained internal current. Its five CUDA controls
-include equal raw fields/moments with different retained history under the same next input, full
-rechart transport and an executable internal-current decoder. Six actual material operations match
-the exact reference; the seventh refuses before commit. No conversation family completed in this
-coupled run. The reference reaches nearly 900-bit currents after 25 occurrences.
-
-[open] The next AC1 repair is the current representation: the demonstrated word/wide arithmetic
-cannot carry continuing coupled cultivation. Preserve the actual current, moment, decoder and
-refusal boundary while changing representation; silently rounding, dropping current or raising a
-magic threshold is not that repair. Record-level contextual channels and learned text production
-remain open. This changes neither AC0–AC5 order nor the alpha standard.
+[open] AC1 remains active. Record-parent/branch channels and larger productive organization still
+need binding; current material links are within text parts. Broader cultivation requires efficient
+operation and lawful history placement. Learned text-codec emission, complete useful responses,
+durable cultivated models and the full AC0–AC5 return remain open. No alpha response has been
+produced, and the fixed linear receiver's plural readings are not a language-quality grade.
 
 ## Completed foundation and data preparation
 

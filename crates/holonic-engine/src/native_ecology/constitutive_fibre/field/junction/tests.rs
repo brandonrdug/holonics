@@ -139,7 +139,12 @@ fn paired_junction_founds_actual_first_row_and_exact_report_shape() {
     let first = body
         .advance(&mut NativeFieldOccurrence::entering(incoming.clone()))
         .unwrap();
-    let reading = first.junction.as_ref().expect("paired reading");
+    let reading = first
+        .junction
+        .as_ref()
+        .expect("paired reading")
+        .exact()
+        .expect("exact representation");
     assert_eq!(reading.potential.len(), 3 * nodes);
     assert_eq!(reading.outgoing.len(), 3 * nodes);
     assert_eq!(reading.held_current.len(), 3 * nodes);
@@ -338,8 +343,14 @@ fn paired_junction_same_future_input_retains_history_difference_under_equal_cova
     assert_eq!(right.inspect_junction_covariance().unwrap(), moment);
     let a = left_step.junction.unwrap();
     let b = right_step.junction.unwrap();
-    assert_ne!(a.held_current, b.held_current);
-    assert_ne!(a.outgoing[2..], b.outgoing[2..]);
+    assert_ne!(
+        a.exact().unwrap().held_current,
+        b.exact().unwrap().held_current
+    );
+    assert_ne!(
+        a.exact().unwrap().outgoing[2..],
+        b.exact().unwrap().outgoing[2..]
+    );
 }
 
 #[test]

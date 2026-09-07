@@ -276,7 +276,10 @@ __device__ __forceinline__ wide signed_product_divide_2(
     uwide den = magnitude(d), q_hi = 0, q_lo = 0, rem = 0;
     // Bit-at-a-time unsigned 256/126 division.  `rem < den < 2^126`, so doubling rem is safe in
     // the wide unsigned scratch value and every quotient bit is exact.
-    for (int bit = 255; bit >= 0; --bit) {
+    if (den == 1) {
+        q_hi = hi;
+        q_lo = lo;
+    } else for (int bit = 255; bit >= 0; --bit) {
         uint32_t incoming = bit >= 128 ? (uint32_t)((hi >> (bit - 128)) & 1u)
                                        : (uint32_t)((lo >> bit) & 1u);
         rem = (rem << 1) | (uwide)incoming;
@@ -1001,7 +1004,13 @@ __device__ __forceinline__ void fibre_normalize(
     wide *row, uint32_t width, wide *denominator, uint32_t *slot
 ) {
     uwide divisor = denominator ? magnitude(*denominator) : 0;
-    for (uint32_t j = 0; j < width; ++j) divisor = fibre_gcd(divisor, magnitude(row[j]));
+    // A unit common divisor cannot shrink further. This is the same exact normalization,
+    // avoiding a full matrix of wide divisions by one on integral contact moments.
+    if (divisor == 1) return;
+    for (uint32_t j = 0; j < width; ++j) {
+        divisor = fibre_gcd(divisor, magnitude(row[j]));
+        if (divisor == 1) return;
+    }
     if (divisor == 0) return;
     // Every checked product below stays in the symmetric signed-wide aperture.
     wide d = of_magnitude(divisor, 0, slot);
@@ -1338,6 +1347,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 }
 
 #include "paired_field_junction.cuh"
+#include "enclosed_field_junction.cuh"
 #include "constitutive_field.cuh"
 
 // Candidate finite passive-contact projection.  One block owns one query row and first forms the
