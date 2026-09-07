@@ -51,7 +51,14 @@ learned relation. The native graph/RHS retains free directions, original vertica
 partially known source domains. An inferred phase drives a later native prediction in the
 [100-test and public-example return](../research/records/2026-09-07_AC1_THE_LEARNED_ACTION_RETURNS_ITS_CONDITION_PREIMAGE_FIBRE.md).
 `ConstitutiveDifferentialReading` distinguishes generic relation/class receivers from actual field
-source occurrences. Whole-family forward images and conversation coupling remain open.
+source occurrences.
+
+[established-bounded; measured] `resident/condition_image.rs`,
+`resident_section/surface_condition.rs` and `constitutive_condition_image.cuh` now own joint
+condition/output transport, both projections, domain coverage/witnesses and later reception.
+The [family-cycle return](../research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md)
+retains correlations and producing-law chronology while a complete-domain fixed output conducts.
+Actual condition-current realization and conversation coupling remain open.
 
 [established-bounded; measured] `native_ecology/constitutive_fibre/resident.rs` now owns borrowed
 resident rational-current input and immutable original-fibre returns for the existing local

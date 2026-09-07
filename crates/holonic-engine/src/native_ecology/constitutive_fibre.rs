@@ -27,7 +27,8 @@ mod field;
 pub use field::*;
 mod resident;
 pub use resident::{
-    ConditionPreimageReading, ConstitutiveDifferentialReading, ResidentConditionPreimage,
+    ConditionCoverage, ConditionImageReading, ConditionPreimageReading,
+    ConstitutiveDifferentialReading, ResidentConditionImage, ResidentConditionPreimage,
     ResidentConstitutiveCurrent, ResidentConstitutiveReturn,
 };
 

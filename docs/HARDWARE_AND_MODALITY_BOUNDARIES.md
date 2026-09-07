@@ -67,6 +67,14 @@ width `W` and condition width `C`, scratch is `W+2*(W+C)` wide values, using Met
 The public example and new native controls supply exact comparison data. Generic relation
 receivers now carry an optional field source; the field-specific conversion must not invent one.
 
+[established-bounded; measured] The [joint-family extension](../research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md)
+adds `section_constitutive_condition_image` and `section_constitutive_condition_receive`, bound
+in `resident_section/surface_condition.rs`. Their outputs retain the original family, joint
+conditions/outputs, both projections and explicit domain coverage. The ordinary differential
+kernel now accepts an optional coverage guard. Port these contracts with the exact helpers and
+Metal scratch layout; a fixed output on a strict supported subset must not be published as a
+whole-family result. The updated public example supplies the observation/refinement cycle.
+
 [established-bounded; source-inspected] The public framework enters through
 [`holonics::hna`](../crates/holonics/src/lib.rs). Its native session is exposed by
 [`with_native_session`](NATIVE_HNA.md), while the earlier inherited operator retains a

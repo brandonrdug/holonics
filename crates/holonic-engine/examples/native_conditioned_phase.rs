@@ -170,13 +170,53 @@ fn main() -> Result<(), Box<dyn Error>> {
         "later_source":later_source,"later_prediction":face(&inferred_prediction),
         "later_actual":face(&later_actual),"later_equal":inferred_prediction==later_actual,"later_work":inferred_work});
     let one = mount(&surface, &[1, 0, 1])?;
+    // Begin with a whole free condition family. Its image can conduct a fixed output even
+    // before a condition is known; a later actual observation refines the same joint family.
+    let zero = mount(&surface, &[0, 0, 1])?;
+    let family = learner.read_condition_preimage(rational(&zero)?, rational(&zero)?)?;
+    let silent = learner.read_condition_image(rational(&zero)?, &family)?;
+    let before = learner.census();
+    let silent_carried =
+        learner.advance_bilinear_contact(silent.current(), rational(&one)?, None)?;
+    let silent_work = delta(before, learner.census());
+    let cycle_source = phase(2, 1, 1)?;
+    let cycle_x = mount(&surface, &cycle_source.words())?;
+    let before = learner.census();
+    let expectation = learner.read_condition_image(rational(&cycle_x)?, &family)?;
+    let image_work = delta(before, learner.census());
+    let cycle_hidden = phase(-7, 24, 25)?;
+    let cycle_observed = observe(&mut world, cycle_source, cycle_hidden)?;
+    let cycle_y = mount(
+        &surface,
+        &NativePhaseCurrent::from_current(&cycle_observed)?.words(),
+    )?;
+    let before = learner.census();
+    let refined = expectation.receive(rational(&cycle_y)?)?;
+    let refinement_work = delta(before, learner.census());
+    let future_source = phase(3, -2, 1)?;
+    let future_x = mount(&surface, &future_source.words())?;
+    let before = learner.census();
+    let future = learner.read_condition_image(rational(&future_x)?, &refined)?;
+    let carried = learner.advance_bilinear_contact(future.current(), rational(&one)?, None)?;
+    let future_work = delta(before, learner.census());
+    let future_actual = observe(&mut world, future_source, cycle_hidden)?;
+    let future_predicted = returned(&carried)?;
+    let cycle_equal = future_actual == future_predicted;
+    let family_cycle = json!({"initial_condition":family.inspect()?,"silent_image":silent.inspect()?,
+        "silent_carried":face(&returned(&silent_carried)?),"silent_work":silent_work,
+        "source":cycle_source,"joint_before_return":expectation.inspect()?,"image_work":image_work,
+        "actual_return":face(&cycle_observed),"hidden_condition_for_observer_only":cycle_hidden,
+        "refined_condition":refined.inspect()?,"refinement_work":refinement_work,
+        "future_source":future_source,"future_image":future.inspect()?,
+        "future_prediction":face(&future_predicted),"future_actual":face(&future_actual),
+        "future_equal":cycle_equal,"future_work":future_work});
     let before = learner.census();
     let first = learner.advance_bilinear_contact(rational(&one)?, rational(&cs)?, None)?;
     let second = learner.advance_bilinear_contact(first.current(), rational(&cs)?, None)?;
     let third = learner.advance_bilinear_contact(second.current(), rational(&cs)?, None)?;
     let continuation_work = delta(before, learner.census());
     let continuation = [returned(&first)?, returned(&second)?, returned(&third)?];
-    let agreement = predicted == actual && inferred_prediction == later_actual;
+    let agreement = predicted == actual && inferred_prediction == later_actual && cycle_equal;
     let relation = learner.inspect_relation()?;
     // Cold receiver of the inferred operator, after every productive operation: the six source
     // pivots span the declared chart, and each row maps its mixed complex pair to the target.
@@ -195,6 +235,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         "source_chart":learner.source_chart(),"receiver":"one complex held phase current",
         "multiplication_graph_exact":multiplication_graph_exact,
         "condition_inference":condition_inference,
+        "condition_family_cycle":family_cycle,
         "observations":observations,"withheld":{"source":x,"condition":c,
             "prediction":face(&predicted),"actual_native_return":face(&actual),"equal":agreement,"work":prediction_work},
         "continuation":continuation.iter().map(face).collect::<Vec<_>>(),"continuation_work":continuation_work,

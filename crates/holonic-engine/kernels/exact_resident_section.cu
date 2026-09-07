@@ -1291,6 +1291,7 @@ extern "C" __global__ void section_constitutive_bilinear_source(
 }
 
 #include "constitutive_condition_preimage.cuh"
+#include "constitutive_condition_image.cuh"
 
 // Push both actual source branches through their producing-to-current unit-phase frame.
 // This does not read the paired-junction enclosure or substitute its numerical centre.
@@ -1355,7 +1356,8 @@ extern "C" __global__ void section_field_source_frame(
 // direction makes that differential variable over the fibre; its particular value is not chosen.
 extern "C" __global__ void section_constitutive_differential(
     const int64_t *lo, const int64_t *hi, uint32_t source_width, uint32_t target_width,
-    uint32_t first_complex, uint32_t pairs, int64_t *output_lo, int64_t *output_hi,
+    uint32_t first_complex, uint32_t pairs, const int64_t *coverage_lo, const int64_t *coverage_hi,
+    int64_t *output_lo, int64_t *output_hi,
     uint32_t *slot, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
 ) {
     if (blockIdx.x != 0 || threadIdx.x != 0) return;
@@ -1366,6 +1368,17 @@ extern "C" __global__ void section_constitutive_differential(
         atomicOr(slot,REFUSED_MALFORMED); return;
     }
     size_t words=(size_t)width+4+(size_t)target_width*target_width;
+    if (coverage_lo) {
+        if (!coverage_hi || coverage_lo[0]!=coverage_hi[0] || coverage_lo[0]<0 || coverage_lo[0]>3) {
+            atomicOr(slot,REFUSED_MALFORMED); return;
+        }
+        if (coverage_lo[0]!=0) {
+            for (uint32_t j=0;j<5;++j) output_lo[j]=output_hi[j]=0;
+            output_lo[2]=output_hi[2]=(int64_t)(((uint64_t)1u<<pairs)-1u);
+            output_lo[4]=output_hi[4]=1;
+            return;
+        }
+    }
     for (size_t j=0; j<words; ++j) if (lo[j]!=hi[j]) {
         atomicOr(slot,REFUSED_MALFORMED); return;
     }

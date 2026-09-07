@@ -36,9 +36,17 @@ includes an unprovided phase and a new prediction, free/partial fibres, and 100 
 The generic `ConstitutiveDifferentialReading` carries a relation cut and optional field source;
 only an actually qualified source can become a field-specific diagnostic.
 
-[open] General forward transport of a plural condition family must preserve its joint
-condition/output fibre and unsupported domain. That composition and the conversation-material
-binding remain the next construction; a particular condition cannot stand in for the whole family.
+[established-bounded; measured] `read_condition_image` now returns `ResidentConditionImage`:
+the original condition family, supported domain, supported output, joint affine fibre and domain
+coverage/witness. Its guarded current and differential ports never silently discard unsupported
+conditions. `receive` refines a complete-domain image with an actual later output, using the
+immutable producing relation. The [joint-family return](../research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md)
+contains the native tests and a public observation/refinement/prediction cycle.
+
+[definition] These guarded ports establish whole-family consequences. They are not a universal
+certainty prerequisite for native generation. The next binding gives the continuing body an
+actual retained condition current and a lawful response to its inferred family; it must not use
+an arbitrary particular solution as a selected external cause. Conversation integration remains open.
 
 [established-bounded; measured] The existing `ResidentConstitutiveFibre` now exposes
 [`advance_resident`](../crates/holonic-engine/src/native_ecology/constitutive_fibre/resident.rs).

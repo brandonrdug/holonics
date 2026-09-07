@@ -522,6 +522,7 @@ impl<'chart> ResidentSurface<'chart> {
     pub(crate) fn record_constitutive_differential(
         &self, lane: &Lane<'_, 'chart>, report: &ResidentSection<'chart>,
         source_width: usize, target_width: usize, first_complex: usize, pairs: usize,
+        coverage: Option<&ResidentSection<'chart>>,
         output: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
         let fail = || ResidentRefusal::Declaration { operation: "constitutive-differential",
@@ -534,17 +535,19 @@ impl<'chart> ResidentSurface<'chart> {
             || first_complex.checked_add(2*pairs).is_none_or(|n| n > target_width/2)
             || report.rows != 1 || report.width != expected || output.rows != 1 || output.width != 5
             || [report,output].iter().any(|s| s.grain.0 != 0 || !std::ptr::eq(s.surface,self))
+            || coverage.is_some_and(|s|s.rows!=1 || s.width==0 || s.grain.0!=0 || !std::ptr::eq(s.surface,self))
         { return Err(fail()); }
         let mut params = Params::new();
         params.ptr(report.lo.device_ptr()).ptr(report.hi.device_ptr())
             .u32(source_width as u32).u32(target_width as u32).u32(first_complex as u32).u32(pairs as u32)
+            .ptr(coverage.map_or(0,|s|s.lo.device_ptr())).ptr(coverage.map_or(0,|s|s.hi.device_ptr()))
             .ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr()).ptr(lane.slot)
             .ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
         self.record_blocks(lane,"section_constitutive_differential",1,self.declaration.warp_size.max(1),
             0,&mut params,"constitutive-differential")
     }
 
-    fn validate_constitutive_current_view(
+    pub(super) fn validate_constitutive_current_view(
         &self,
         current: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
     ) -> Result<(), ResidentRefusal> {

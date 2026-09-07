@@ -42,11 +42,19 @@ Free directions, outside-relation cases and partially known source domains survi
 condition fibre can expose a fixed receiver. All 100 constitutive tests and the public codec
 control pass. Generic receiver cuts no longer invent field source occurrences.
 
-[open] Next carry inferred condition families as continuing native standing and construct their
-joint condition/output relation for a new source, retaining unsupported domain and the complete
-Preimage Fibre. The unique-condition continuation already runs; the general forward image of a
-plural condition and the actual conversation-material binding remain unfinished. Athena-alpha
-still has no useful text response.
+[established-bounded; measured] The [joint condition-family return](research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md)
+now transports a whole family, retaining supported conditions, outputs, their correlation and
+unsupported-domain witnesses. A later actual output refines the immutable producing joint
+relation. The public cycle predicts a new native current after that refinement, without host
+numerical readback. The 107-test native suite, an additional translated-domain control and the
+public codec control pass.
+
+[open] Next bind an actual retained condition current and its native response to inferred
+families, preserving undetermined prior current and returned differences in one successor.
+Whole-family evidence receivers are not a universal certainty gate on model generation. The
+actual current must follow an explicit native contact law, not an arbitrary particular solution.
+Then bind the continuing owner to conversation material. Athena-alpha still has no useful text
+response; the full AC0–AC5 goal remains unfinished.
 
 [established-bounded; measured] The existing local relation now has a
 [resident rational-current port](research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md).

@@ -229,12 +229,18 @@ through native elimination. An unprovided phase conducts into a later prediction
 and outside-relation cases keep their scopes. The query changes no learned row or occurrence
 count. The retained condition is not a decoded and remounted host choice.
 
-[definition] Next carry that inferred family as continuing standing and derive the joint
-condition/output relation under a new source. Its output image must retain the condition Preimage
-Fibre and any unsupported condition domain. The unique-condition case already uses the resident
-point-current port; a plural condition requires its whole supported image or a scoped obstruction.
-Bind these relations to actual conversation material. Do not substitute a source-ID switch,
-authored semantic label or microscopic-past reconstruction requirement for the missing condition.
+[established-bounded; measured] The [joint condition/output family](../../research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md)
+now returns on device, with the supported domain, output projection, complete joint fibre and
+unsupported-domain witnesses. A later actual observation refines the same producing relation.
+Fixed outputs and receiver faces can conduct while the condition remains plural.
+
+[definition] Next bind an actual retained condition current and its reaction to an inferred
+family through the existing native current/contact discipline. The reaction must preserve prior
+current in undetermined directions, carry its full returned difference and publish one successor.
+Derive the actual contact law and frame/metric before claiming that implementation. This native
+generative current is not an arbitrary affine particular solution, and whole-family evidence
+receivers do not universally define whether the body may generate. Bind the continuing owner to
+actual conversation material, without a source-ID switch or authored semantic selector.
 
 [established-bounded; measured] The [native field relation port](../../research/records/2026-09-07_AC1_THE_FIELD_RETURNS_A_RESIDENT_RELATION_FACE_AND_A_PLURAL_FIBRE_HAS_FIXED_RECEIVERS.md)
 now returns resident currents/fibres at historical sources through their actual frames, and a
