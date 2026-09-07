@@ -17,6 +17,16 @@ derived, the material is re-presented in a second chart, and the first chart's f
 only by **running an algorithm**. The decoder is not an accessory to the compressed object. It is
 half of it.
 
+[project-postulate] **September 7 clarification, restoring September 2:** the fibre behind a
+face is its **Preimage Fibre**, as defined in [operations §5.4](TABLET_THE_OPERATIONS.md#54-preimagefibre-the-preimage-of-a-stable-receiver-quotient).
+It carries compatible causes and their family characteristics, possibly through implicit
+constraints such as a particular solution plus kernel. It is not a target for reproducing the
+microscopic past. Limited observations can found useful generative conduct while that fibre
+remains plural. A decoder owes the consequence admitted by its codec; perfect inversion,
+exhaustive source retention and singleton identification are not general learning requirements.
+The [September 7 correction](../../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
+separates those requirements from exact persistence and particular reversible charts.
+
 Brandon's own prior hypothesis states the same object from the geometry side and is retained
 verbatim as the origin (`docs/canon/THE_RECOVERED_LAW.md`): *compression is gauge-fixing the flat
 directions and keeping the curvature; information is the gauge-invariant difference between
@@ -75,8 +85,14 @@ Three consequences that are checkable:
 Chart-**preserving** compression is bounded; chart-**pivoting** compression is unbounded. That split
 is correct and its standard name is the **Shannon/Kolmogorov gap** — rate–distortion theory against
 algorithmic information theory. Under a declared source the two agree up to `K(P)`; the unbounded gap
-is visible only on individual objects, and **π is the canonical exhibit**: `O(log n)` as a string,
-maximal entropy rate as an ensemble.
+is visible on individual objects.
+
+[conditional] **π is the canonical exhibit of a compact generator**: given
+a fixed correct digit-producing program, its first `n` digits can be described by that program
+and an `O(log n)` encoding of `n`, with runtime accounted separately.
+
+[historical] The earlier unqualified maximal-entropy assertion is withdrawn: the compact-program
+argument establishes neither normality nor maximal digit entropy.
 
 The ceiling itself is the **Karhunen–Loève transform**, and it holds under four hypotheses:
 a **quadratic** distortion, a **linear** map, **second-order** statistics only, and truncation or

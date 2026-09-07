@@ -1,8 +1,21 @@
 # Hardware and modality boundaries
 
-[definition] This guide records the current execution boundary and the first lawful seams for
-future Apple and audio work. It does not add a backend, alter native HNA, or schedule an audio
-campaign. The roadmap and `CONSTRUCTION_STATE.md` remain the construction authorities.
+[definition] This guide records the desktop execution boundary and the separately developed
+Apple/audio seams. It does not add a backend or schedule an audio campaign. The roadmap and
+`CONSTRUCTION_STATE.md` remain the construction authorities.
+
+[established-bounded; source-inspected] **September 7 branch comparison:**
+[`codex/apple-silicon` at `bd3ea689`](https://github.com/brandonrdug/holonics/tree/bd3ea689d039ab210de7ad5968d6fa8ae73eaa61)
+now carries a Metal mount, exact phase kernels and the earlier complete field, plus acoustic
+applications. The Linux/CUDA obstructions below describe the inspected desktop revision, not
+the current Apple branch. The [shared text/acoustic synthesis](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
+records the exact branch scope and its continuing gap in learned acoustic organization. This
+review fetched and read the branch; it did not merge or execute it.
+
+[project-postulate] Acoustic sample cells and text bit pairs remain exterior charts. Generator
+recovery, phase-sensitive contact and Holonic Compression must develop the native organization.
+Its **Preimage Fibre** constrains possible causes and future conduct from available observations;
+neither a perfect inverse nor a copy of every past sample is a general learning requirement.
 
 [established-bounded; source-inspected] Local sources were inspected at `6f547c4a` on September 6,
 2026. Source descriptions below are not fresh execution measurements.
@@ -20,7 +33,7 @@ the standing used by the next deed; a readout, application response, or codec ou
 ordinary next occurrence.
 
 [established-bounded; source-inspected] The native transport scaffold retains addressed sections,
-incidence, ordered generator words, and reconstruction fibres through
+incidence, ordered generator words, and Preimage Fibres through
 [`NativeTransportScaffold`](../crates/holonic-engine/src/native_spool/scaffold.rs). Its
 non-owning `NativeAddressedSection` borrows those carriers from one scaffold rather than making a
 second topology.
@@ -46,7 +59,7 @@ around one backend does not create portability.
 
 [definition] The following objects belong to the mathematical/native owner and survive a device
 change: situated occurrence and caused incidence; local receiver charts; oriented current and
-relative phase; complete preimage/reconstruction fibres; lineage and obstruction; move ownership;
+relative phase; Preimage Fibres; lineage and obstruction; move ownership;
 atomic successor formation; and checkpoint chronology.
 
 [definition] Counts, launch time, energy, transfer bytes, occupancy, memory pressure, and device

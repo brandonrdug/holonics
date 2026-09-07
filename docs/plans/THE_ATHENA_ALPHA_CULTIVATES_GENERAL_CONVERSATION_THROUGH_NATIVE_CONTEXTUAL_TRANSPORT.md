@@ -2,7 +2,8 @@
 
 **Authority:** Brandon's September 6 instruction to design and deposit this blueprint, update the
 roadmap and position, then immediately construct and complete it as a goal.
-**Status:** active; AC0 returned at cold scope, AC1 in construction. **Order:** [the roadmap](THE_ROADMAP.md).
+**Status:** cultivation paused by Brandon on September 7; AC0 returned, AC1–AC2 attachment under
+correction. **Order:** [the roadmap](THE_ROADMAP.md).
 **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 
 ## 1. The required product
@@ -29,7 +30,10 @@ ongoing development, not an unmeasured power assertion or a limit copied into th
 NCF foundations and the [September 6 synthesis](../../research/records/2026-09-06_REPOSITORY_SYNTHESIS_AND_PORTABLE_EVIDENCE.md).
 It does not restart the inherited-first Gemma campaign. Soulkiller material and standard executable
 export retain their later jurisdictions. Apple/MLX and audio implementation remain separate work;
-the native and codec boundaries must remain suitable for those later compositions.
+the pushed Apple branch now supplies separately scoped phase/field apparatus. Brandon's September 7
+instruction reconciles its acoustic organization with this campaign's generator/phase construction.
+The [synthesis](../../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
+pins the inspected revisions and actual attachment gaps; it does not merge the device backends.
 
 ## 2. Material and comparison
 
@@ -77,6 +81,22 @@ native constructions through their actual carriers and laws. Separate research v
 not become an executable dependency of this model.
 
 ## 3. One native construction
+
+[project-postulate] **Preimage Fibre** is the compatible-source family behind an observed face
+under its declared map. It can be represented implicitly by constraints or generative structure.
+Learning from limited observations need not identify the original implementation, reproduce past
+microstates, enumerate all candidates, or wait for the fibre to become a singleton. Its material
+consequence is that the learned family characteristics constrain and conduct subsequent interaction.
+A decoder presents an admitted consequence; a perfect inverse of the source is not a cultivation
+requirement. Exact checkpoint restoration is a separate, narrower operation.
+
+[definition] The September 7 correction binds black-box recovery and Holonic Compression into
+formation itself. Actual material faces and available contextual returns constrain executable
+local transport families; group actions, relative phase and oriented incidence determine which
+relations can compose. A later occurrence acts through the resulting standing, and its returned
+difference further develops that standing. The existing fixed bit-pair/junction experiment is a
+bounded realization to reuse where appropriate; increasing its history or readout size does not
+establish this generative attachment. Arbitrary sample blocks or frequency bins cannot replace it.
 
 [definition] For one move-owned ecology `E` and ordinary occurrence `o`, the operation is
 
@@ -189,6 +209,16 @@ Do not rebuild the completed raw capture. AC0 is data/application integration, n
 
 ### AC1 — Material, contextual current and developing native morphology
 
+[definition] The corrected next attachment reuses `inverse_transport`/`generative_transport`
+for constrained law families, `receiver_history_compression` for admitted future consequences,
+`generator_native_rest` for descended execution, and the existing phase-current, native-spool and
+resident complex-incidence owners for the carried action. Their current domains differ: finite
+transition tables, exact host equations/forms and bounded resident section laws are not already
+one continuing field. Derive the actual source/receiver-to-law passage and its resident return
+into contact/reaction; do not supply invented future observations or use a host learner to fill it.
+Limited data can produce operative partial knowledge. Exact all-history quotient claims, when
+made, owe their stated commuting law; that law is not a universal prerequisite for learning.
+
 [established-bounded; measured] The [first material field return](../../research/records/2026-09-06_AC1_THE_COMPLETE_MATERIAL_FIELD_RETAINS_ITS_CONTEXTUAL_OBSTRUCTION.md)
 composes an exterior octet port chart, separate native per-port excitation, complete outgoing/held
 source branches and actual paired receiving fields. Four development families entered one native
@@ -253,7 +283,7 @@ remain required; its first four-family return emits no text and reports reserved
 The checked balanced solver reduces encoder work while keeping its current law intact.
 
 [definition] Make the same changing ecology conduct inscription, contextual recurrence and
-text emission at the supported grains. Reuse native reconstruction and receiver-history owners;
+text emission at the supported grains. Reuse native Preimage Fibre and receiver-history owners;
 learned transport supplies compositional production. The exterior UTF-8 presentation decodes
 native emission only. A stored passage, nearest sentence, hand-authored morphology/grammar or
 foreign model must not fill the response when native conduct is open.
@@ -360,13 +390,13 @@ changes, then mark the goal complete. No phrase in an earlier phase changes that
 
 ## 6. Execution and verification
 
-[project-postulate] Construction starts immediately after this plan, roadmap and position are
-deposited. The whole goal remains active across partial returns. A difficult or failed construction
-is not a reason to stop at a report or request renewed authorization. Change the concrete failed
+[project-postulate] The original instruction authorized immediate construction after deposit;
+Brandon's September 7 pause now governs execution. The goal remains unfinished across partial returns.
+A difficult or failed construction is not a reason to stop at a report or request renewed
+authorization once execution resumes. Change the concrete failed
 binding when the evidence warrants it and update this contract without shrinking its product aim.
 
-[definition] Use bounded Luna tasks for independent source, implementation and result review. The
-primary agent integrates exact source and actual artifacts; reports are testimony. Preserve the
+[definition] Work without agents under Brandon's latest preference. Preserve the
 unrelated flux-lattice work, existing private material and caches. The retired side database is
 neither queried nor written. Repository evidence owns the record of this campaign.
 

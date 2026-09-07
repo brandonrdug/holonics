@@ -30,6 +30,12 @@ test result never upgrades a correspondence.
 
 ## Foundation and transport
 
+[definition] **Preimage Fibre** is the governing term for compatible-source families. Some older
+source symbols retain reconstruction names; those names do not require an inverse or raw-state
+archive for learning. The [September 7 synthesis](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
+connects the existing constrained-law, observable-form and generator execution owners to the
+current text/acoustic attachment question, including their concrete host/resident boundaries.
+
 | Relation | Lean owner | Rust owner | CUDA owner | Status and exact open fibre |
 |---|---|---|---|---|
 | Addressed passage and both boundary maps | `formal/elementary-holonics/ElementaryHolonics/Foundation/Lineage.lean`; `formal/elementary-holonics/ElementaryHolonics/Foundation/AddressedBoundary.lean` | `crates/holonic-life/src/mathematical_particle/lineage.rs`; `crates/holonic-life/src/addressed_span.rs`; `crates/holonic-engine/src/realization/passage.rs`; `crates/holonic-life/src/native_intelligence/source_neutral_relational/pair_current.rs` | `crates/holonic-engine/src/cuda_refine/membrane_addressed_current.rs` | **exact** for the R0Q1 apparatus-neutral response/source/target pair fibre; resident realization transport is R0Q2 |

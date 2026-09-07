@@ -33,6 +33,15 @@ research, a new subsystem, a qualitative gate or destructive/external permission
 
 ## Pickup and authority
 
+[project-postulate] Brandon's September 7 correction makes generator recovery, group/phase
+transport and Holonic Compression the shared AC1–AC2/acoustic attachment question. Use
+**Preimage Fibre**, as already settled September 2: limited observations constrain compatible
+causes and future conduct; cultivation does not require a perfect inverse, singleton source,
+enumerated candidate population or archive of every raw state. Exact persistence and declared
+reversible codec checks retain their narrower scopes. Read the
+[text/acoustic synthesis](research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md).
+The corpus process and goal are paused; research and documentation correction do not resume them.
+
 [project-postulate] Brandon's September 6 synthesis ruling records Athena-alpha as planned but
 unattained. Curated conversation material supports the next native cultivation direction for
 English, code and mathematics. Recent mathematical constructions inform native owners; Lean

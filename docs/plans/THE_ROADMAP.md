@@ -22,6 +22,14 @@ contracts and records preserve their completed scope; their old imperatives sche
 
 ## Active Athena-alpha cultivation campaign
 
+[project-postulate] **Execution is paused under Brandon's September 7 instruction.** The current
+review corrects AC1–AC2 around generator recovery, group/phase transport and Holonic Compression,
+shared with the separately pushed Apple acoustic work. Read the
+[source/intent synthesis](../../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
+and the corrected blueprint before resuming. **Preimage Fibre** carries compatible causes and
+future-conduct constraints from limited observations; neither perfect inversion nor retention of
+every raw state is a learning prerequisite. The original continuation order does not supersede this pause.
+
 [definition] Brandon has authorized design followed immediately by construction and completion of
 [the Athena-alpha blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md) as a goal. It orders AC0–AC5:
 source-qualified available conversations; coupled native material/current/formation; learned text
@@ -77,20 +85,22 @@ change and actual returned difference, and stages its coercive parameter return 
 Its first four-family run stops at a reserved codeword without a text response. The
 [field persistence return](../../research/records/2026-09-07_AC3_THE_CULTIVATED_FIELD_RESTARTS_WITHOUT_SOURCE_REPLAY.md)
 now retains the complete cultivated owner, source capabilities and exposure cut across processes.
-Continue broader source-qualified development and inspect actual responses, using that durable
-state and the [exact historical placement](../../research/records/2026-09-07_AC3_THE_COMPLETE_HISTORY_MOVES_TO_AN_EXTERIOR_CHART_AND_ITS_ADDRESSED_SOURCE_RETURNS.md).
+The durable state and [exact historical placement](../../research/records/2026-09-07_AC3_THE_COMPLETE_HISTORY_MOVES_TO_AN_EXTERIOR_CHART_AND_ITS_ADDRESSED_SOURCE_RETURNS.md)
+remain available for their demonstrated scopes. Further broad development follows the corrected
+AC1–AC2 attachment and the operator's resumption of execution.
 Complete historical carriers now leave GPU residency and remount through actual source handles;
-host persistence and disk size remain growing costs. Continue productive contextual construction
-and economical broader development. Preserve numerical error and complete defects; do not turn source
+host persistence and disk size remain growing costs. Archive relocation is not the generative
+compression sought by the current correction. Preserve numerical error and complete defects; do not turn source
 uncertainty into a point. AC1–AC5 completion and the useful alpha product remain open.
 
 [definition] The [complete-current source return](../../research/records/2026-09-07_AC2_THE_FULL_INTERNAL_CURRENT_HAS_AN_ADDRESSED_PREFIX_PAIRING.md)
 now supplies native pairings over the complete born internal-current population and a reachable
 zero-boundary counterexample to outgoing-only source sufficiency. Its 732-source actual-material
-comparison and native controls return at construction-receiver scope. Next join that source to
-the native material/reaction operation through the derived source-qualified return, preserving
-forward chronology, complete numerical defects and persistence. The construction receiver itself
-does not improve language or close a cultivation phase.
+comparison and native controls return at construction-receiver scope. A subsequent working-tree
+variant joins that source to the material return; its diagnostic still fails useful language.
+The September 7 correction now governs the next attachment: constrained generative standing must
+participate in subsequent contact/reaction and emission. Full history and a larger current input
+do not establish that attachment or close a cultivation phase.
 
 ## Completed September 6 synthesis before Athena-alpha cultivation
 

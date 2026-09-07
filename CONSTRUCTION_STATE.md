@@ -1,7 +1,7 @@
 # Construction state
 
-**Currency:** September 7, 2026. **Active goal:** construct and complete the deposited Athena-alpha
-cultivation blueprint. **Position:** AC0 complete at cold exposure scope; AC1 active.
+**Currency:** September 7, 2026. **Goal:** Athena-alpha construction, paused by Brandon.
+**Position:** AC0 complete at cold exposure scope; AC1–AC2 attachment under correction.
 **Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -10,13 +10,22 @@ instruction governs.
 
 ## Current HNA direction
 
-[definition] Brandon now authorizes immediate construction and completion of the
+[project-postulate] The September 7 review now joins generator recovery, group/phase transport
+and Holonic Compression across text and the pushed Apple acoustic branch. **Preimage Fibre**
+carries compatible causes and constraints on future conduct from limited observations; learning
+does not require perfect inversion, a singleton source or complete raw-state retention. The
+[synthesis and source comparison](research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
+records the recovered September 2 naming correction, current attachment gaps and branch revision.
+The native corpus process remains stopped in memory; no additional cultivation or branch merge
+was performed during this review.
+
+[definition] The original authorization is construction and completion of the
 [Athena-alpha blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md).
 AC0 prepares source-qualified available conversation occurrences; AC1 composes actual native
 material/current/formation; AC2 returns learned text-codec conduct and complete responses; AC3
 cultivates and persists the broader model; AC4 establishes general contextual use and attribution;
-AC5 delivers the usable consumer product and measured costs. The whole goal remains active across
-partial returns. A data adapter or another bounded fixture is not alpha completion.
+AC5 delivers the usable consumer product and measured costs. The goal remains unfinished under
+the current pause. A data adapter or another bounded fixture is not alpha completion.
 
 [project-postulate] Athena-alpha has never been attained by Brandon's standard. The intended
 material is general English, code and mathematics in the prepared conversations. Lean text remains
@@ -118,10 +127,20 @@ boundary current at two successive cuts, while its internal currents are `(1/3,-
 `(-1/3,1/3)`. The new native pairing separates them. An outgoing-only linear material map cannot
 distinguish these sources for any coefficients; this establishes a specific missing input port.
 
-[open] The new source is presently a construction receiver. Integrate it into the same native
-material/reaction return, retaining the source-time forward, contemporary receiving current,
-parameter/source uncertainty, actual adjoint and complete durable successor. The productive
-model still uses the earlier outgoing-only transport and its latest response remains `Tm.`.
+[established-bounded; measured] The complete source now joins the fused native material return in
+the explicit `CompleteCurrent` variant. One actual reception learns opposite material currents
+`2/11` and `-2/11` on the two zero-boundary sources. Seventy-nine constitutive controls pass,
+including full coefficient/current reconstruction, late-refusal preservation and archived remount.
+This implementation remains uncommitted working material at the pause. Its actual four-family
+run saved 732 developmental occurrences, then emitted `.` and reached one uncertified bit at the
+text receiver. That diagnostic fails useful language. Its larger continuation is paused and has
+no completion result. The outgoing-only 128-family artifact and its `Tm.` response remain preserved.
+
+[established-bounded; source-inspected] Apple `codex/apple-silicon` at `bd3ea689` supplies Metal
+phase and earlier complete-field apparatus, an acoustic cell adapter, and separately recorded
+execution evidence. The cell width is caller-declared; learned acoustic organization and useful
+speech remain open there. The native generative attachment is the shared issue; this desktop
+review does not claim to execute Apple code or establish parity with newer desktop kernels.
 
 ## Completed foundation and data preparation
 
