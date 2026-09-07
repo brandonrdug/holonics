@@ -1,0 +1,27 @@
+{
+  "truth_status": "established-bounded",
+  "evidence_tags": [
+    "measured"
+  ],
+  "apple": "research/records/2026-09-07_apple_conditional_phase/return-family-cycle.json",
+  "desktop": "research/records/2026-09-07_conditional_phase/return-family-cycle.json",
+  "exact_semantic_agreement": {
+    "source_chart": true,
+    "relation": true,
+    "observations": true,
+    "withheld": true,
+    "condition_inference": true,
+    "condition_family_cycle": true,
+    "continuation": true,
+    "learner_occurrences": true,
+    "multiplication_graph_exact": true
+  },
+  "excluded_fields": "work census only within these roots; timing and aggregate apparatus census are outside parity scope",
+  "whole_family_native_stages_have_zero_numerical_readouts": true,
+  "future_prediction": {
+    "imaginary": "86/25",
+    "norm_square": "13",
+    "real": "27/25"
+  },
+  "future_equal": true
+}

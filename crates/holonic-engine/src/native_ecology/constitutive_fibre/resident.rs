@@ -74,6 +74,30 @@ pub struct ResidentConstitutiveReturn<'chart> {
 }
 
 impl<'chart> ResidentConstitutiveReturn<'chart> {
+    pub(super) fn allocate(
+        surface: &'chart ResidentSurface<'chart>,
+        source_width: usize,
+        target_width: usize,
+        occurrence: u64,
+        source_chart: ConstitutiveSourceChart,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        let width = source_width
+            .checked_add(target_width)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let report_width = target_width
+            .checked_mul(target_width)
+            .and_then(|n| n.checked_add(width.checked_add(4)?))
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        Ok(Self {
+            surface,
+            report: surface.fresh_section(1, report_width, ResidentGrain(0))?,
+            source_width,
+            target_width,
+            occurrence,
+            source_occurrence: None,
+            source_chart,
+        })
+    }
     pub(super) fn qualify_field_source(&mut self, source_occurrence: usize) {
         self.source_occurrence = Some(source_occurrence);
     }
@@ -112,6 +136,15 @@ impl<'chart> ResidentConstitutiveReturn<'chart> {
         first_complex: usize,
         pairs: usize,
     ) -> Result<ConstitutiveDifferentialReading, ConstitutiveFibreError> {
+        self.read_differential_pairs_guarded(first_complex, pairs, None)
+    }
+
+    pub(super) fn read_differential_pairs_guarded(
+        &self,
+        first_complex: usize,
+        pairs: usize,
+        coverage: Option<&ResidentSection<'chart>>,
+    ) -> Result<ConstitutiveDifferentialReading, ConstitutiveFibreError> {
         let output = self.surface.fresh_section(1, 5, ResidentGrain(0))?;
         let mut passage = self.surface.begin_passage(&[vec![]])?;
         {
@@ -123,6 +156,7 @@ impl<'chart> ResidentConstitutiveReturn<'chart> {
                 self.target_width,
                 first_complex,
                 pairs,
+                coverage,
                 &output,
             )?;
         }
@@ -351,3 +385,6 @@ mod contact_tests;
 
 mod preimage;
 pub use preimage::{ConditionPreimageReading, ResidentConditionPreimage};
+
+mod condition_image;
+pub use condition_image::{ConditionCoverage, ConditionImageReading, ResidentConditionImage};

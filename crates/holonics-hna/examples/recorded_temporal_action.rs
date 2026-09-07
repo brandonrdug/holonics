@@ -220,6 +220,29 @@ fn experiment<'c>(
     if body.occurrences() != cut {
         return Err("condition read changed the continuing relation".into());
     }
+    let image = stage(s, report, "whole_condition_image", || {
+        Ok(body.read_condition_image(later_cell.rational()?, &preimage)?)
+    })?;
+    // Consume the whole supported image without selecting a condition. The unit first tap
+    // preserves its coefficients; the declared zero second tap retains one extra zero tail.
+    let image_carried = stage(s, report, "whole_image_temporal_continuation", || {
+        let source = ResidentPhaseCurrentView::new(
+            image.current(),
+            PhaseCurrentReceiverId(3),
+            PhaseCurrentLineageId(103),
+            later_cell.support().begin.clone(),
+            later_cell.sample_step().clone(),
+            WIDTH as u32,
+            WIDTH + 1,
+        )?;
+        Ok(convolve_resident(
+            s,
+            source,
+            response(&controls[1], later_cell.sample_step(), 11)?,
+            PhaseCurrentReceiverId(4),
+            PhaseCurrentLineageId(104),
+        )?)
+    });
     // Attempt the native point consumer directly. Its device-side disposition check refuses
     // plural/outside conditions; the host does not inspect a fibre to select subsequent conduct.
     let predicted = stage(s, report, "inferred_prediction", || {
@@ -234,6 +257,9 @@ fn experiment<'c>(
             PhaseCurrentLineageId(102),
         )?)
     })?;
+    let refined = stage(s, report, "received_family_refinement", || {
+        Ok(image.receive(later_actual.current()?)?)
+    });
 
     // All numerical inspection happens after native development, inference and comparison act.
     let observed = stage(s, report, "terminal_observer", || {
@@ -255,14 +281,30 @@ fn experiment<'c>(
         let later = point(s, later_actual.section())?;
         let agreement = prediction["coordinates"].is_array()
             && prediction["coordinates"] == later["coordinates"];
+        let carried = match &image_carried {
+            Ok(value) => point(s, value.section())?,
+            Err(error) => json!({"status":"native-consumer-refused","error":error.to_string()}),
+        };
+        let refined = match &refined {
+            Ok(value) => json!({"reading":value.inspect()?}),
+            Err(error) => json!({"status":"native-consumer-refused","error":error.to_string()}),
+        };
         Ok(
             json!({"preimage":condition,"prediction":prediction,"later_actual":later,"exact_agreement":agreement,
+            "whole_image":image.inspect()?,"whole_image_carried":carried,"refined_condition":refined,
             "hidden_source":point(s,hidden_cell.section())?,"later_source":point(s,later_cell.section())?,
             "hidden_response":point(s,&hidden_response)?,"hidden_actual":point(s,actual.section())?}),
         )
     })?;
     report["observation"] = observed;
-    report["complete_bounded_comparison"] = report["observation"]["exact_agreement"].clone();
+    // Completion is an observer statement about this comparison, never a generation gate.
+    let mut expected = report["observation"]["later_actual"]["coordinates"]
+        .as_array()
+        .unwrap()
+        .clone();
+    expected.extend([json!("0"), json!("0")]);
+    report["complete_bounded_comparison"] =
+        json!(report["observation"]["whole_image_carried"]["coordinates"] == json!(expected));
     Ok(())
 }
 
@@ -295,7 +337,7 @@ fn main() -> Result<()> {
         WIDTH,
         DIVISOR,
     )?;
-    let mut report = json!({"schema":"holonics.recorded-temporal-action.v1","truth_status":"established-bounded",
+    let mut report = json!({"schema":"holonics.recorded-temporal-action.v2","truth_status":"established-bounded",
         "evidence_tags":["measured"],"scope":"declared complex polynomial action on recorded coefficients",
         "source":{"path":wav_path,"sha256":recording.source_sha256,"octets":recording.source_octets,
             "samples":recording.samples.len(),"sample_rate":recording.sample_rate,"occurrence":recording.occurrence,
@@ -328,7 +370,9 @@ fn main() -> Result<()> {
     println!(
         "{}",
         json!({"report":report_path,"recorded_observations":report["training_observations"],
-        "preimage":report["observation"]["preimage"]["status"],"agreement":report["observation"]["exact_agreement"],"refusal":report["refusal"]})
+        "preimage":report["observation"]["preimage"]["status"],
+        "point_condition_agreement":report["observation"]["exact_agreement"],
+        "whole_family_agreement":report["complete_bounded_comparison"],"refusal":report["refusal"]})
     );
     Ok(())
 }

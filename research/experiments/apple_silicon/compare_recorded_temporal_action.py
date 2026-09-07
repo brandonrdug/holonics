@@ -9,6 +9,22 @@ import struct
 import wave
 
 
+def native_fraction(value):
+    def integer(parts):
+        sign, limbs = parts
+        return sign * sum(limb << (32*i) for i, limb in enumerate(limbs))
+    numerator, denominator = value
+    return Q(integer(numerator), integer(denominator))
+
+
+def affine(reading):
+    if "Unique" in reading:
+        return [native_fraction(v) for v in reading["Unique"]["current"]], []
+    reading = reading["Plural"]
+    return ([native_fraction(v) for v in reading["particular"]],
+            [[native_fraction(v) for v in row] for row in reading["directions"]])
+
+
 def coordinates(point):
     pairs = point["raw_words"]
     assert all(a == b for a, b in pairs)
@@ -49,8 +65,8 @@ def compare(path):
     for role in ("hidden", "later"):
         support = report[f"{role}_support"]
         start, end = support["coefficient_from"], support["coefficient_until"]
-        # The report's rational clocks use the repository BigRational serializer. Their sample
-        # support is independently checked against the unchanged source PCM and exact rate.
+        assert native_fraction(support["begin"]) == Q(start,rate)
+        assert native_fraction(support["end"]) == Q(end,rate)
         actual = coordinates(observation[f"{role}_source"])
         expected = [q for sample in samples[start:end] for q in (Q(sample,32768),Q(0))]
         assert actual == expected
@@ -72,6 +88,24 @@ def compare(path):
     else:
         assert preimage["status"] == "plural" and directions
         assert observation["prediction"]["status"] == "native-consumer-refused"
+    family_verified = False
+    if "whole_image" in observation:
+        image = observation["whole_image"]
+        assert image["coverage"]["kind"] == "complete"
+        output, output_directions = affine(image["supported_outputs"])
+        assert not output_directions and output == convolve(inputs["later"],response)
+        joint, joint_directions = affine(image["joint"])
+        assert convolve(inputs["later"],joint[:4]) == joint[4:]
+        assert all(convolve(inputs["later"],d[:4]) == d[4:] for d in joint_directions)
+        assert coordinates(observation["whole_image_carried"]) == output+[Q(0),Q(0)]
+        refined = observation["refined_condition"]["reading"]
+        assert refined["kind"] == "compatible"
+        base = [native_fraction(v) for v in refined["particular"]]
+        assert convolve(inputs["later"],base) == output
+        assert all(not any(convolve(inputs["later"],[native_fraction(v) for v in d]))
+                   for d in refined["directions"])
+        assert report["complete_bounded_comparison"] is True
+        family_verified = True
     for name, stage in report["stages"].items():
         if name != "terminal_observer":
             assert stage["section_readouts"] == 0 and stage["numerical_egress_octets"] == 0
@@ -81,7 +115,8 @@ def compare(path):
         "native_prediction_status":observation["prediction"]["status"],
         "cold_later_image_directions":[[str(q) for q in row] for row in later_directions],
         "cold_later_image_is_singleton":not any(any(row) for row in later_directions),
-        "native_stages_have_zero_numerical_readouts":True}
+        "native_stages_have_zero_numerical_readouts":True,
+        "native_whole_image_continuation_and_refinement_verified":family_verified}
 
 
 def main():

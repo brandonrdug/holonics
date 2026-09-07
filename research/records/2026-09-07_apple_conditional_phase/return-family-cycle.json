@@ -1,0 +1,2477 @@
+{
+  "acoustic_model_established": false,
+  "apparatus_census_including_world_and_diagnostics": {
+    "allocations": 316,
+    "captured_launches": 86,
+    "control_launches": 0,
+    "deed_launches": 30,
+    "device_to_device_octets": 0,
+    "egress_receipt_octets": 2752,
+    "egress_section_octets": 15216,
+    "ingress_octets": 4580,
+    "resident_octets_now": 24656,
+    "resident_octets_peak": 24900,
+    "section_read_outs": 42,
+    "synchronizations": 30
+  },
+  "condition_family_cycle": {
+    "actual_return": {
+      "imaginary": "41/25",
+      "norm_square": "5",
+      "real": "-38/25"
+    },
+    "future_actual": {
+      "imaginary": "86/25",
+      "norm_square": "13",
+      "real": "27/25"
+    },
+    "future_equal": true,
+    "future_image": {
+      "condition_width": 2,
+      "coverage": {
+        "kind": "complete"
+      },
+      "joint": {
+        "Unique": {
+          "current": [
+            [
+              [
+                -1,
+                [
+                  7
+                ]
+              ],
+              [
+                1,
+                [
+                  25
+                ]
+              ]
+            ],
+            [
+              [
+                1,
+                [
+                  24
+                ]
+              ],
+              [
+                1,
+                [
+                  25
+                ]
+              ]
+            ],
+            [
+              [
+                1,
+                [
+                  27
+                ]
+              ],
+              [
+                1,
+                [
+                  25
+                ]
+              ]
+            ],
+            [
+              [
+                1,
+                [
+                  86
+                ]
+              ],
+              [
+                1,
+                [
+                  25
+                ]
+              ]
+            ]
+          ]
+        }
+      },
+      "output_width": 2,
+      "supported_conditions": {
+        "Unique": {
+          "current": [
+            [
+              [
+                -1,
+                [
+                  7
+                ]
+              ],
+              [
+                1,
+                [
+                  25
+                ]
+              ]
+            ],
+            [
+              [
+                1,
+                [
+                  24
+                ]
+              ],
+              [
+                1,
+                [
+                  25
+                ]
+              ]
+            ]
+          ]
+        }
+      },
+      "supported_outputs": {
+        "Unique": {
+          "current": [
+            [
+              [
+                1,
+                [
+                  27
+                ]
+              ],
+              [
+                1,
+                [
+                  25
+                ]
+              ]
+            ],
+            [
+              [
+                1,
+                [
+                  86
+                ]
+              ],
+              [
+                1,
+                [
+                  25
+                ]
+              ]
+            ]
+          ]
+        }
+      }
+    },
+    "future_prediction": {
+      "imaginary": "86/25",
+      "norm_square": "13",
+      "real": "27/25"
+    },
+    "future_source": {
+      "denominator": 1,
+      "imaginary": -2,
+      "real": 3
+    },
+    "future_work": {
+      "deeds": 2,
+      "ingress_octets": 4,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 192,
+      "section_readouts": 0
+    },
+    "hidden_condition_for_observer_only": {
+      "denominator": 25,
+      "imaginary": 24,
+      "real": -7
+    },
+    "image_work": {
+      "deeds": 1,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 64,
+      "section_readouts": 0
+    },
+    "initial_condition": {
+      "directions": [
+        [
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                1
+              ]
+            ]
+          ],
+          [
+            [
+              0,
+              []
+            ],
+            [
+              1,
+              [
+                1
+              ]
+            ]
+          ]
+        ],
+        [
+          [
+            [
+              0,
+              []
+            ],
+            [
+              1,
+              [
+                1
+              ]
+            ]
+          ],
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                1
+              ]
+            ]
+          ]
+        ]
+      ],
+      "kind": "compatible",
+      "particular": [
+        [
+          [
+            0,
+            []
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        [
+          [
+            0,
+            []
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ]
+      ]
+    },
+    "joint_before_return": {
+      "condition_width": 2,
+      "coverage": {
+        "kind": "complete"
+      },
+      "joint": {
+        "Plural": {
+          "directions": [
+            [
+              [
+                [
+                  1,
+                  [
+                    2
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  -1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  1,
+                  [
+                    5
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ],
+            [
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  -1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  1,
+                  [
+                    2
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ]
+          ],
+          "particular": [
+            [
+              [
+                0,
+                []
+              ],
+              [
+                1,
+                [
+                  1
+                ]
+              ]
+            ],
+            [
+              [
+                0,
+                []
+              ],
+              [
+                1,
+                [
+                  1
+                ]
+              ]
+            ],
+            [
+              [
+                0,
+                []
+              ],
+              [
+                1,
+                [
+                  1
+                ]
+              ]
+            ],
+            [
+              [
+                0,
+                []
+              ],
+              [
+                1,
+                [
+                  1
+                ]
+              ]
+            ]
+          ]
+        }
+      },
+      "output_width": 2,
+      "supported_conditions": {
+        "Plural": {
+          "directions": [
+            [
+              [
+                [
+                  1,
+                  [
+                    2
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  -1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ],
+            [
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ]
+          ],
+          "particular": [
+            [
+              [
+                0,
+                []
+              ],
+              [
+                1,
+                [
+                  1
+                ]
+              ]
+            ],
+            [
+              [
+                0,
+                []
+              ],
+              [
+                1,
+                [
+                  1
+                ]
+              ]
+            ]
+          ]
+        }
+      },
+      "supported_outputs": {
+        "Plural": {
+          "directions": [
+            [
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ],
+            [
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ]
+          ],
+          "particular": [
+            [
+              [
+                0,
+                []
+              ],
+              [
+                1,
+                [
+                  1
+                ]
+              ]
+            ],
+            [
+              [
+                0,
+                []
+              ],
+              [
+                1,
+                [
+                  1
+                ]
+              ]
+            ]
+          ]
+        }
+      }
+    },
+    "refined_condition": {
+      "directions": [],
+      "kind": "compatible",
+      "particular": [
+        [
+          [
+            -1,
+            [
+              7
+            ]
+          ],
+          [
+            1,
+            [
+              25
+            ]
+          ]
+        ],
+        [
+          [
+            1,
+            [
+              24
+            ]
+          ],
+          [
+            1,
+            [
+              25
+            ]
+          ]
+        ]
+      ]
+    },
+    "refinement_work": {
+      "deeds": 1,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 64,
+      "section_readouts": 0
+    },
+    "silent_carried": {
+      "imaginary": "0",
+      "norm_square": "0",
+      "real": "0"
+    },
+    "silent_image": {
+      "condition_width": 2,
+      "coverage": {
+        "kind": "complete"
+      },
+      "joint": {
+        "Plural": {
+          "directions": [
+            [
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ],
+            [
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ]
+          ],
+          "particular": [
+            [
+              [
+                0,
+                []
+              ],
+              [
+                1,
+                [
+                  1
+                ]
+              ]
+            ],
+            [
+              [
+                0,
+                []
+              ],
+              [
+                1,
+                [
+                  1
+                ]
+              ]
+            ],
+            [
+              [
+                0,
+                []
+              ],
+              [
+                1,
+                [
+                  1
+                ]
+              ]
+            ],
+            [
+              [
+                0,
+                []
+              ],
+              [
+                1,
+                [
+                  1
+                ]
+              ]
+            ]
+          ]
+        }
+      },
+      "output_width": 2,
+      "supported_conditions": {
+        "Plural": {
+          "directions": [
+            [
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ],
+            [
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ]
+          ],
+          "particular": [
+            [
+              [
+                0,
+                []
+              ],
+              [
+                1,
+                [
+                  1
+                ]
+              ]
+            ],
+            [
+              [
+                0,
+                []
+              ],
+              [
+                1,
+                [
+                  1
+                ]
+              ]
+            ]
+          ]
+        }
+      },
+      "supported_outputs": {
+        "Unique": {
+          "current": [
+            [
+              [
+                0,
+                []
+              ],
+              [
+                1,
+                [
+                  1
+                ]
+              ]
+            ],
+            [
+              [
+                0,
+                []
+              ],
+              [
+                1,
+                [
+                  1
+                ]
+              ]
+            ]
+          ]
+        }
+      }
+    },
+    "silent_work": {
+      "deeds": 1,
+      "ingress_octets": 4,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 128,
+      "section_readouts": 0
+    },
+    "source": {
+      "denominator": 1,
+      "imaginary": 1,
+      "real": 2
+    }
+  },
+  "condition_inference": {
+    "actual_return": {
+      "imaginary": "22/13",
+      "norm_square": "5",
+      "real": "19/13"
+    },
+    "constraint_graph": {
+      "intervals": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          1
+        ],
+        [
+          -2,
+          -2
+        ],
+        [
+          -1,
+          -1
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          2,
+          2
+        ],
+        [
+          -1,
+          -1
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "rows": 10,
+      "width": 10
+    },
+    "constraint_rhs": {
+      "intervals": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          -19,
+          -19
+        ],
+        [
+          -22,
+          -22
+        ],
+        [
+          13,
+          13
+        ]
+      ],
+      "width": 9
+    },
+    "hidden_condition_for_observer_only": {
+      "denominator": 13,
+      "imaginary": 12,
+      "real": -5
+    },
+    "later_actual": {
+      "imaginary": "43/13",
+      "norm_square": "17",
+      "real": "-32/13"
+    },
+    "later_equal": true,
+    "later_prediction": {
+      "imaginary": "43/13",
+      "norm_square": "17",
+      "real": "-32/13"
+    },
+    "later_source": {
+      "denominator": 1,
+      "imaginary": 1,
+      "real": 4
+    },
+    "later_work": {
+      "deeds": 1,
+      "ingress_octets": 4,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 128,
+      "section_readouts": 0
+    },
+    "preimage": {
+      "directions": [],
+      "kind": "compatible",
+      "particular": [
+        "-5/13",
+        "12/13"
+      ]
+    },
+    "relation_cut": 7,
+    "source": {
+      "denominator": 1,
+      "imaginary": -2,
+      "real": 1
+    },
+    "work": {
+      "deeds": 1,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 64,
+      "section_readouts": 0
+    }
+  },
+  "continuation": [
+    {
+      "imaginary": "4/5",
+      "norm_square": "1",
+      "real": "3/5"
+    },
+    {
+      "imaginary": "24/25",
+      "norm_square": "1",
+      "real": "-7/25"
+    },
+    {
+      "imaginary": "44/125",
+      "norm_square": "1",
+      "real": "-117/125"
+    }
+  ],
+  "continuation_work": {
+    "deeds": 3,
+    "ingress_octets": 12,
+    "numerical_egress_octets": 0,
+    "receipt_egress_octets": 384,
+    "section_readouts": 0
+  },
+  "conversation_quality_established": false,
+  "development_and_observation_seconds": 0.0145175,
+  "evidence_tags": [
+    "measured"
+  ],
+  "learner_occurrences": 13,
+  "model_persisted": false,
+  "multiplication_graph_exact": true,
+  "observations": [
+    {
+      "condition": {
+        "denominator": 1,
+        "imaginary": 0,
+        "real": 1
+      },
+      "learner_work": {
+        "deeds": 1,
+        "ingress_octets": 4,
+        "numerical_egress_octets": 0,
+        "receipt_egress_octets": 128,
+        "section_readouts": 0
+      },
+      "measured": {
+        "imaginary": "0",
+        "norm_square": "0",
+        "real": "0"
+      },
+      "return": {
+        "formed_pivot": 2,
+        "occurrence": 1,
+        "predecessor_reading": {
+          "OutsideDomain": {
+            "source_remainder": [
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ]
+          }
+        },
+        "successor_rank": 1
+      },
+      "source": {
+        "denominator": 1,
+        "imaginary": 0,
+        "real": 0
+      }
+    },
+    {
+      "condition": {
+        "denominator": 1,
+        "imaginary": 1,
+        "real": 0
+      },
+      "learner_work": {
+        "deeds": 1,
+        "ingress_octets": 4,
+        "numerical_egress_octets": 0,
+        "receipt_egress_octets": 128,
+        "section_readouts": 0
+      },
+      "measured": {
+        "imaginary": "0",
+        "norm_square": "0",
+        "real": "0"
+      },
+      "return": {
+        "formed_pivot": 3,
+        "occurrence": 2,
+        "predecessor_reading": {
+          "OutsideDomain": {
+            "source_remainder": [
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ]
+          }
+        },
+        "successor_rank": 2
+      },
+      "source": {
+        "denominator": 1,
+        "imaginary": 0,
+        "real": 0
+      }
+    },
+    {
+      "condition": {
+        "denominator": 1,
+        "imaginary": 0,
+        "real": 1
+      },
+      "learner_work": {
+        "deeds": 1,
+        "ingress_octets": 4,
+        "numerical_egress_octets": 0,
+        "receipt_egress_octets": 128,
+        "section_readouts": 0
+      },
+      "measured": {
+        "imaginary": "0",
+        "norm_square": "1",
+        "real": "1"
+      },
+      "return": {
+        "formed_pivot": 0,
+        "occurrence": 3,
+        "predecessor_reading": {
+          "OutsideDomain": {
+            "source_remainder": [
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ]
+          }
+        },
+        "successor_rank": 3
+      },
+      "source": {
+        "denominator": 1,
+        "imaginary": 0,
+        "real": 1
+      }
+    },
+    {
+      "condition": {
+        "denominator": 1,
+        "imaginary": 0,
+        "real": 1
+      },
+      "learner_work": {
+        "deeds": 1,
+        "ingress_octets": 4,
+        "numerical_egress_octets": 0,
+        "receipt_egress_octets": 128,
+        "section_readouts": 0
+      },
+      "measured": {
+        "imaginary": "1",
+        "norm_square": "1",
+        "real": "0"
+      },
+      "return": {
+        "formed_pivot": 1,
+        "occurrence": 4,
+        "predecessor_reading": {
+          "OutsideDomain": {
+            "source_remainder": [
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ]
+          }
+        },
+        "successor_rank": 4
+      },
+      "source": {
+        "denominator": 1,
+        "imaginary": 1,
+        "real": 0
+      }
+    },
+    {
+      "condition": {
+        "denominator": 1,
+        "imaginary": 0,
+        "real": -1
+      },
+      "learner_work": {
+        "deeds": 1,
+        "ingress_octets": 4,
+        "numerical_egress_octets": 0,
+        "receipt_egress_octets": 128,
+        "section_readouts": 0
+      },
+      "measured": {
+        "imaginary": "0",
+        "norm_square": "1",
+        "real": "-1"
+      },
+      "return": {
+        "formed_pivot": 4,
+        "occurrence": 5,
+        "predecessor_reading": {
+          "OutsideDomain": {
+            "source_remainder": [
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  -1,
+                  [
+                    2
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ]
+          }
+        },
+        "successor_rank": 5
+      },
+      "source": {
+        "denominator": 1,
+        "imaginary": 0,
+        "real": 1
+      }
+    },
+    {
+      "condition": {
+        "denominator": 1,
+        "imaginary": 0,
+        "real": -1
+      },
+      "learner_work": {
+        "deeds": 1,
+        "ingress_octets": 4,
+        "numerical_egress_octets": 0,
+        "receipt_egress_octets": 128,
+        "section_readouts": 0
+      },
+      "measured": {
+        "imaginary": "-1",
+        "norm_square": "1",
+        "real": "0"
+      },
+      "return": {
+        "formed_pivot": 5,
+        "occurrence": 6,
+        "predecessor_reading": {
+          "OutsideDomain": {
+            "source_remainder": [
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  -1,
+                  [
+                    2
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ]
+          }
+        },
+        "successor_rank": 6
+      },
+      "source": {
+        "denominator": 1,
+        "imaginary": 1,
+        "real": 0
+      }
+    }
+  ],
+  "receiver": "one complex held phase current",
+  "relation": {
+    "bound_octaves": 64,
+    "grain": 0,
+    "intervals": [
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ]
+    ],
+    "rows": 8,
+    "width": 8
+  },
+  "schema": "holonics.native-conditional-phase.v1",
+  "source_chart": {
+    "condition_complex": 1,
+    "kind": "bilinear-contact",
+    "source_complex": 1
+  },
+  "truth_status": "established-bounded",
+  "whole_seconds": 0.108049292,
+  "withheld": {
+    "actual_native_return": {
+      "imaginary": "17/5",
+      "norm_square": "13",
+      "real": "-6/5"
+    },
+    "condition": {
+      "denominator": 5,
+      "imaginary": 4,
+      "real": 3
+    },
+    "equal": true,
+    "prediction": {
+      "imaginary": "17/5",
+      "norm_square": "13",
+      "real": "-6/5"
+    },
+    "source": {
+      "denominator": 1,
+      "imaginary": 3,
+      "real": 2
+    },
+    "work": {
+      "deeds": 1,
+      "ingress_octets": 4,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 128,
+      "section_readouts": 0
+    }
+  }
+}

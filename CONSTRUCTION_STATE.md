@@ -22,8 +22,8 @@ and later resident currents use zero numerical readouts. The subsequent
 [condition-fibre integration](research/records/2026-09-07_APPLE_RETURNS_THE_SHARED_CONDITION_PREIMAGE_FIBRE.md)
 ports desktop `d3820ac3`, passes 22 engine controls and exactly matches its inferred condition,
 constraint graph and subsequent prediction. The public text-codec control reaches the known
-unported paired-field refusal. The native temporal/material action and condition/receiver
-composition remain next. No useful acoustic or English model is claimed.
+unported paired-field refusal. The subsequent temporal and joint-family returns below extend
+that port; actual material/condition binding remains next. No useful acoustic or English model is claimed.
 
 [established-bounded; measured] The [acoustic resident ingress](research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
 now exposes complete timed PCM cells to the same rational-current port, preserving source
@@ -31,8 +31,8 @@ delivery lineage, zeros and padding without advancing the source cursor. Five ac
 controls pass. The subsequent [recorded interval return](research/records/2026-09-07_RECORDED_RESPONSE_POINTERS_RETAIN_THEIR_ACOUSTIC_INTERVALS.md)
 now binds exact recording spans to original source/target pointers. Fourteen focused checks pass;
 all 899 AMI records retain 844 resolved pairs and 55 refusals, and one complete 100,800-sample pair
-mounts through the resident current port. Next compose the actual temporal/material action and
-condition standing; equal cell ordinals are not that passage. No native cultivation ran in this
+mounts through the resident current port. These source attachments alone do not define the
+temporal/material action or condition standing; equal cell ordinals are not that passage. No native cultivation ran in this
 source-attachment return. AMI speaker labels still do not supply separate microphone channels.
 
 [established-bounded; measured] The [native temporal return](research/records/2026-09-07_THE_NATIVE_TEMPORAL_ACTION_RETAINS_ITS_CAUSAL_TAIL.md)
@@ -40,9 +40,11 @@ now realizes the existing exact causal convolution on resident currents and bind
 clock/support to it. Twenty-one focused controls pass. One LibriSpeech coefficient experiment
 infers a digital two-tap response and predicts a later held-out source exactly; the fixed ESC-50
 cuts retain a plural condition and a native point-consumer refusal. No native stage numerically
-reads a current to the host. The new desktop `82fef476` whole-family image/receive return is the
-next integration, followed by actual material/condition binding. This is a bounded temporal
-action return, not useful sound or English-model completion.
+reads a current to the host. The subsequent [whole-family return](research/records/2026-09-07_APPLE_CONDUCTS_THE_SHARED_CONDITION_FAMILY.md)
+integrates desktop `82fef476` and passes 39 resident/temporal controls. Both recorded studies now
+conduct their complete supported output family; silence retains its four free condition directions.
+Next bind actual retained material/condition current through its native contact law. These are
+bounded temporal/family returns, not useful sound or English-model completion.
 
 [established-bounded; measured] The September 7 Mac pickup integrates desktop `6ef7bf9d` with
 68 passing engine/public native tests and successful HNA library, application and shared-example
@@ -151,11 +153,19 @@ Free directions, outside-relation cases and partially known source domains survi
 condition fibre can expose a fixed receiver. All 100 constitutive tests and the public codec
 control pass. Generic receiver cuts no longer invent field source occurrences.
 
-[open] Next carry inferred condition families as continuing native standing and construct their
-joint condition/output relation for a new source, retaining unsupported domain and the complete
-Preimage Fibre. The unique-condition continuation already runs; the general forward image of a
-plural condition and the actual conversation-material binding remain unfinished. Athena-alpha
-still has no useful text response.
+[established-bounded; measured] The [joint condition-family return](research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md)
+now transports a whole family, retaining supported conditions, outputs, their correlation and
+unsupported-domain witnesses. A later actual output refines the immutable producing joint
+relation. The public cycle predicts a new native current after that refinement, without host
+numerical readback. The 107-test native suite, an additional translated-domain control and the
+public codec control pass.
+
+[open] Next bind an actual retained condition current and its native response to inferred
+families, preserving undetermined prior current and returned differences in one successor.
+Whole-family evidence receivers are not a universal certainty gate on model generation. The
+actual current must follow an explicit native contact law, not an arbitrary particular solution.
+Then bind the continuing owner to conversation material. Athena-alpha still has no useful text
+response; the full AC0–AC5 goal remains unfinished.
 
 [established-bounded; measured] The existing local relation now has a
 [resident rational-current port](research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md).

@@ -401,6 +401,125 @@ inline long fibre_stage(device const long *basis, uint width, threadgroup W *for
   }
   return inserted;
 }
+
+// Stage one condition-family row and publish it only after every reduced carrier
+// has returned to the i64 wire. The high face mirrors the low face for this point
+// chart; a refusal leaves the derived graph unpublished.
+inline void condition_stage_row(device long *lo, device long *hi, uint width,
+                                 threadgroup W *row, device uint *slot) {
+  long inserted = fibre_stage(lo, width, row, slot);
+  for (uint j = 0; j < width; ++j)
+    toword(row[j], slot);
+  if (*slot)
+    return;
+  if (inserted >= 0)
+    for (uint j = 0; j < width; ++j) {
+      ulong at = (ulong)inserted * width + j;
+      long value = toword(row[j], slot);
+      lo[at] = hi[at] = value;
+    }
+}
+
+inline void condition_store_report(device const long *basis, uint source_width, uint width,
+                                    threadgroup W *query, thread W den, uint status, uint rank,
+                                    device long *lo, device long *hi, device uint *slot) {
+  for (uint j = 0; j < width; ++j)
+    toword(query[j], slot);
+  toword(den, slot);
+  if (*slot)
+    return;
+  for (uint j = 0; j < width; ++j)
+    lo[j] = hi[j] = toword(query[j], slot);
+  lo[width] = hi[width] = toword(den, slot);
+  lo[width + 1] = hi[width + 1] = (long)status;
+  lo[width + 2] = hi[width + 2] = -1;
+  lo[width + 3] = hi[width + 3] = (long)rank;
+  uint target_width = width - source_width;
+  for (uint p = 0; p < target_width; ++p)
+    for (uint j = 0; j < target_width; ++j) {
+      ulong at = (ulong)(source_width + p) * width + source_width + j;
+      long value = basis[(ulong)(source_width + p) * width + source_width + p] != 0
+          ? basis[at] : 0;
+      ulong out_at = (ulong)width + 4ul + (ulong)p * target_width + j;
+      lo[out_at] = hi[out_at] = value;
+    }
+}
+
+inline void condition_empty_report(device long *lo, device long *hi, uint source_width,
+                                   uint target_width) {
+  uint width = source_width + target_width;
+  ulong count = (ulong)width + 4ul + (ulong)target_width * target_width;
+  for (ulong i = 0; i < count; ++i)
+    lo[i] = hi[i] = 0;
+  lo[width] = hi[width] = 1;
+  lo[width + 1] = hi[width + 1] = 1;
+  lo[width + 2] = hi[width + 2] = -1;
+}
+
+inline void condition_project(device const long *joint, uint source_width, uint joint_target,
+                               uint start, uint target_width, device long *basis_lo,
+                               device long *basis_hi, device long *lo, device long *hi,
+                               threadgroup W *row, device uint *slot) {
+  uint joint_width = source_width + joint_target;
+  uint width = source_width + target_width;
+  for (ulong i = 0; i < (ulong)target_width * target_width; ++i)
+    basis_lo[i] = basis_hi[i] = 0;
+  for (uint p = 0; p < joint_target; ++p) {
+    ulong base = (ulong)joint_width + 4ul + (ulong)p * joint_target + start;
+    for (uint j = 0; j < target_width; ++j)
+      row[j] = fromword(joint[base + j]);
+    condition_stage_row(basis_lo, basis_hi, target_width, row, slot);
+    if (*slot)
+      return;
+  }
+  uint rank = 0;
+  for (uint p = 0; p < target_width; ++p)
+    if (basis_lo[(ulong)p * target_width + p] != 0)
+      ++rank;
+  for (uint j = 0; j < source_width; ++j)
+    lo[j] = hi[j] = joint[j];
+  for (uint j = 0; j < target_width; ++j)
+    lo[source_width + j] = hi[source_width + j] = joint[source_width + start + j];
+  lo[width] = hi[width] = joint[joint_width];
+  lo[width + 1] = hi[width + 1] = joint[joint_width + 1] == 1 ? 1 : (rank ? 2 : 0);
+  lo[width + 2] = hi[width + 2] = -1;
+  lo[width + 3] = hi[width + 3] = rank;
+  for (ulong i = 0; i < (ulong)target_width * target_width; ++i)
+    lo[width + 4ul + i] = hi[width + 4ul + i] = basis_lo[i];
+}
+
+inline bool condition_nonzero(threadgroup W *value, uint count) {
+  for (uint j = 0; j < count; ++j)
+    if (!wzero_p(value[j]))
+      return true;
+  return false;
+}
+
+inline void condition_coverage_write(uint kind, long generator, threadgroup W *witness,
+                                     thread W witness_denominator, uint condition_width,
+                                     threadgroup W *residual, thread W residual_denominator,
+                                     uint residual_width, uint output_width, device long *lo,
+                                     device long *hi, device uint *slot) {
+  wnorm(witness, condition_width, &witness_denominator, slot);
+  wnorm(residual, residual_width, &residual_denominator, slot);
+  for (uint j = 0; j < condition_width; ++j)
+    toword(witness[j], slot);
+  for (uint j = 0; j < residual_width; ++j)
+    toword(residual[j], slot);
+  toword(witness_denominator, slot);
+  toword(residual_denominator, slot);
+  if (*slot)
+    return;
+  lo[0] = hi[0] = kind;
+  lo[1] = hi[1] = generator;
+  lo[2] = hi[2] = toword(witness_denominator, slot);
+  for (uint j = 0; j < condition_width; ++j)
+    lo[3u + j] = hi[3u + j] = toword(witness[j], slot);
+  lo[3u + condition_width] = hi[3u + condition_width] = toword(residual_denominator, slot);
+  for (uint j = 0; j < output_width; ++j)
+    lo[4u + condition_width + j] = hi[4u + condition_width + j]
+        = j < residual_width ? toword(residual[j], slot) : 0;
+}
 inline W flcm(W a, W b, device uint *slot) {
   if (wneg_p(a) || wneg_p(b) || wzero_p(a) || wzero_p(b)) {
     atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed);
@@ -1268,6 +1387,423 @@ kernel void section_constitutive_condition_preimage(
   }
 }
 
+// Joint affine image and condition-domain coverage. The scalar metadata is packed
+// because the CUDA ABI has 34 direct arguments while Metal exposes 31 buffer slots.
+// The packing contains only launch metadata; all numerical carriers remain resident.
+kernel void section_constitutive_condition_image(
+    device const long *basis [[buffer(0)]], device const long *source_lo [[buffer(1)]],
+    device const long *source_hi [[buffer(2)]], device const long *condition_lo [[buffer(3)]],
+    device const long *condition_hi [[buffer(4)]], device long *graph_lo [[buffer(5)]],
+    device long *graph_hi [[buffer(6)]], device long *rhs_lo [[buffer(7)]],
+    device long *rhs_hi [[buffer(8)]], device long *joint_lo [[buffer(9)]],
+    device long *joint_hi [[buffer(10)]], device long *domain_basis_lo [[buffer(11)]],
+    device long *domain_basis_hi [[buffer(12)]], device long *output_basis_lo [[buffer(13)]],
+    device long *output_basis_hi [[buffer(14)]], device long *domain_lo [[buffer(15)]],
+    device long *domain_hi [[buffer(16)]], device long *output_lo [[buffer(17)]],
+    device long *output_hi [[buffer(18)]], device long *coverage_lo [[buffer(19)]],
+    device long *coverage_hi [[buffer(20)]], device long *safe_lo [[buffer(21)]],
+    device long *safe_hi [[buffer(22)]], device uint *slot [[buffer(23)]],
+    device const uint *census [[buffer(24)]], device const uint *lineage [[buffer(25)]],
+    constant uint *shape [[buffer(26)]], threadgroup W *scratch [[threadgroup(0)]],
+    uint3 tid [[thread_position_in_threadgroup]]) {
+  if (tid.x || tid.y || tid.z)
+    return;
+  if (upstream(census, lineage, shape[7], slot))
+    return;
+
+  uint source_at = shape[0], source_denominator_at = shape[1], source_disposition_at = shape[2];
+  uint ps = shape[3], ns = shape[4], nc = shape[5], y = shape[6];
+  ulong mixed = (ulong)ns * nc;
+  ulong source_linear = (ulong)ns + nc;
+  if (!ns || !nc || !y || (y & 1u) || !ps
+      || mixed > 0x7fffffffffffffffUL
+      || source_linear > 0x7fffffffffffffffUL - mixed) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  ulong source_inner = source_linear + mixed;
+  if (source_inner > 0x7fffffffffffffffUL / 2ul) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  ulong sw64 = 2ul * source_inner;
+  ulong w64 = sw64 + y;
+  ulong c64 = 2ul * nc;
+  ulong joint_target64 = c64 + y;
+  ulong k64 = w64 + joint_target64;
+  if (w64 < sw64 || k64 < w64 || ps > w64 || sw64 > 0xfffffffbUL || w64 > 0xfffffffbUL || k64 > 0xfffffffbUL
+      || c64 > 0xfffffffbUL || joint_target64 > 0xfffffffbUL) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  uint sw = (uint)sw64, width = (uint)w64, condition_width = (uint)c64;
+  uint joint_target = (uint)joint_target64, width_with_joint = (uint)k64;
+  uint pk = ps + condition_width;
+  ulong condition_words = (ulong)pk + 4ul + (ulong)condition_width * condition_width;
+  if (condition_words > 0xfffffffbUL) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  for (ulong i = 0; i < condition_words; ++i)
+    if (condition_lo[i] != condition_hi[i]) {
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                               memory_order_relaxed);
+      return;
+    }
+  long condition_den_word = condition_lo[pk];
+  long condition_status = condition_lo[pk + 1u];
+  if (condition_den_word <= 0 || condition_status < 0 || condition_status > 2) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  W source_den = fibre_current_denominator(source_lo, source_hi,
+                                           source_denominator_at,
+                                           source_disposition_at, slot);
+  W condition_den = fromword(condition_den_word);
+  if (*slot)
+    return;
+  for (uint i = 0; i < 2u * ns; ++i)
+    if (source_lo[source_at + i] != source_hi[source_at + i]) {
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                               memory_order_relaxed);
+      return;
+    }
+
+  threadgroup W *residual = scratch;
+  threadgroup W *row = residual + width;
+  threadgroup W *query = row + width_with_joint;
+  for (ulong i = 0; i < (ulong)width_with_joint * width_with_joint; ++i)
+    graph_lo[i] = graph_hi[i] = 0;
+  for (uint i = 0; i <= width; ++i)
+    rhs_lo[i] = rhs_hi[i] = 0;
+  rhs_lo[width] = rhs_hi[width] = 1;
+  condition_empty_report(joint_lo, joint_hi, width, joint_target);
+  condition_empty_report(domain_lo, domain_hi, width, condition_width);
+  condition_empty_report(output_lo, output_hi, width, y);
+  for (uint i = 0; i < 4u + condition_width + width; ++i)
+    coverage_lo[i] = coverage_hi[i] = 0;
+  coverage_lo[1] = coverage_hi[1] = -1;
+  coverage_lo[2] = coverage_hi[2] = 1;
+  coverage_lo[3u + condition_width] = coverage_hi[3u + condition_width] = 1;
+  for (uint i = 0; i < y + 2u; ++i)
+    safe_lo[i] = safe_hi[i] = 0;
+  safe_lo[y] = safe_hi[y] = 1;
+  safe_lo[y + 1u] = safe_hi[y + 1u] = 1;
+  if (condition_status == 1) {
+    coverage_lo[0] = coverage_hi[0] = 3;
+    for (uint i = 0; i < ps; ++i)
+      joint_lo[i] = joint_hi[i] = domain_lo[i] = domain_hi[i]
+          = output_lo[i] = output_hi[i] = rhs_lo[i] = rhs_hi[i] = condition_lo[i];
+    rhs_lo[width] = rhs_hi[width] = condition_den_word;
+    joint_lo[width_with_joint] = joint_hi[width_with_joint]
+        = domain_lo[width + condition_width] = domain_hi[width + condition_width]
+        = output_lo[width + y] = output_hi[width + y] = condition_den_word;
+    return;
+  }
+
+  uint ignored = 0, rank = 0;
+  for (uint column = 0; column < joint_target; ++column) {
+    for (uint i = 0; i < width; ++i)
+      residual[i] = wzero();
+    W denominator = wi64(1);
+    if (column < condition_width) {
+      ulong vbase = (ulong)pk + 4ul + (ulong)column * condition_width;
+      denominator = source_den;
+      for (uint i = 0; i < condition_width; ++i)
+        residual[2u * ns + i] = wmul(fromword(condition_lo[vbase + i]), source_den, slot);
+      for (uint a = 0; a < nc; ++a)
+        for (uint b = 0; b < ns; ++b) {
+          W product[3];
+          phaseprod(fromword(source_lo[source_at + 2u * b]),
+                    fromword(source_lo[source_at + 2u * b + 1u]), wi64(1),
+                    fromword(condition_lo[vbase + 2u * a]),
+                    fromword(condition_lo[vbase + 2u * a + 1u]), wi64(1), product, slot);
+          uint at = 2u * ns + condition_width + 2u * (a * ns + b);
+          residual[at] = product[0];
+          residual[at + 1u] = product[1];
+        }
+    } else {
+      residual[sw + column - condition_width] = wi64(1);
+    }
+    if (*slot)
+      return;
+    fibre_query(basis, width, width, residual, &denominator,
+                (threadgroup const W *)nullptr, -1, &ignored, &rank, slot);
+    if (*slot)
+      return;
+    for (uint i = 0; i < width_with_joint; ++i)
+      row[i] = i < width ? residual[i] : wzero();
+    if (column < condition_width) {
+      ulong vbase = (ulong)pk + 4ul + (ulong)column * condition_width;
+      for (uint i = 0; i < condition_width; ++i)
+        row[width + i] = wmul(fromword(condition_lo[vbase + i]), denominator, slot);
+    } else {
+      row[width + condition_width + column - condition_width] = denominator;
+    }
+    if (*slot)
+      return;
+    condition_stage_row(graph_lo, graph_hi, width_with_joint, row, slot);
+    if (*slot)
+      return;
+  }
+
+  W denominator = wmul(source_den, condition_den, slot);
+  for (uint i = 0; i < width; ++i)
+    residual[i] = wzero();
+  for (uint i = 0; i < 2u * ns; ++i)
+    residual[i] = wmul(fromword(source_lo[source_at + i]), condition_den, slot);
+  for (uint i = 0; i < condition_width; ++i)
+    residual[2u * ns + i] = wmul(fromword(condition_lo[ps + i]), source_den, slot);
+  for (uint a = 0; a < nc; ++a)
+    for (uint b = 0; b < ns; ++b) {
+      W product[3];
+      phaseprod(fromword(source_lo[source_at + 2u * b]),
+                fromword(source_lo[source_at + 2u * b + 1u]), wi64(1),
+                fromword(condition_lo[ps + 2u * a]),
+                fromword(condition_lo[ps + 2u * a + 1u]), wi64(1), product, slot);
+      uint at = 2u * ns + condition_width + 2u * (a * ns + b);
+      residual[at] = product[0];
+      residual[at + 1u] = product[1];
+    }
+  if (*slot)
+    return;
+  fibre_query(basis, width, width, residual, &denominator,
+              (threadgroup const W *)nullptr, -1, &ignored, &rank, slot);
+  if (*slot)
+    return;
+  for (uint i = 0; i < width_with_joint; ++i)
+    query[i] = i < width ? wneg(residual[i]) : wzero();
+  for (uint i = 0; i < width; ++i)
+    toword(query[i], slot);
+  toword(denominator, slot);
+  if (*slot)
+    return;
+  for (uint i = 0; i < width; ++i)
+    rhs_lo[i] = rhs_hi[i] = toword(query[i], slot);
+  rhs_lo[width] = rhs_hi[width] = toword(denominator, slot);
+  if (*slot)
+    return;
+  uint status = 0;
+  fibre_query(graph_lo, width, width_with_joint, query, &denominator,
+              (threadgroup const W *)nullptr, -1, &status, &rank, slot);
+  if (*slot)
+    return;
+  for (uint i = width; i < width_with_joint; ++i)
+    query[i] = wneg(query[i]);
+  if (status != 1) {
+    W common = flcm(denominator, condition_den, slot);
+    for (uint i = 0; i < width_with_joint; ++i)
+      query[i] = wmul(query[i], wdiv(common, denominator, slot), slot);
+    for (uint i = 0; i < condition_width; ++i)
+      query[width + i] = wadd(query[width + i],
+                              wmul(fromword(condition_lo[ps + i]),
+                                   wdiv(common, condition_den, slot), slot), slot);
+    denominator = common;
+    wnorm(query, width_with_joint, &denominator, slot);
+  }
+  if (*slot)
+    return;
+  condition_store_report(graph_lo, width, width_with_joint, query, denominator,
+                         status, rank, joint_lo, joint_hi, slot);
+  if (*slot)
+    return;
+  condition_project(joint_lo, width, joint_target, 0, condition_width,
+                    domain_basis_lo, domain_basis_hi, domain_lo, domain_hi, row, slot);
+  condition_project(joint_lo, width, joint_target, condition_width, y,
+                    output_basis_lo, output_basis_hi, output_lo, output_hi, row, slot);
+  if (*slot)
+    return;
+  if (status == 1) {
+    for (uint i = 0; i < condition_width; ++i)
+      row[i] = fromword(condition_lo[ps + i]);
+    for (uint i = 0; i < width; ++i)
+      query[i] = fromword(joint_lo[i]);
+    condition_coverage_write(2, -1, row, condition_den, condition_width, query,
+                              fromword(joint_lo[width_with_joint]), width, width,
+                              coverage_lo, coverage_hi, slot);
+    return;
+  }
+  W domain_den = fromword(domain_lo[width + condition_width]);
+  W residual_den = flcm(condition_den, domain_den, slot);
+  for (uint i = 0; i < condition_width; ++i)
+    query[i] = wsub(wmul(fromword(condition_lo[ps + i]),
+                         wdiv(residual_den, condition_den, slot), slot),
+                    wmul(fromword(domain_lo[width + i]),
+                         wdiv(residual_den, domain_den, slot), slot), slot);
+  if (*slot)
+    return;
+  fibre_query(domain_basis_lo, condition_width, condition_width, query, &residual_den,
+              (threadgroup const W *)nullptr, -1, &ignored, &rank, slot);
+  if (*slot)
+    return;
+  long failed = -1;
+  bool partial = condition_nonzero(query, condition_width);
+  if (!partial)
+    for (uint p = 0; p < condition_width; ++p) {
+      for (uint i = 0; i < condition_width; ++i)
+        query[i] = fromword(condition_lo[pk + 4u + (ulong)p * condition_width + i]);
+      residual_den = wi64(1);
+      fibre_query(domain_basis_lo, condition_width, condition_width, query, &residual_den,
+                  (threadgroup const W *)nullptr, -1, &ignored, &rank, slot);
+      if (*slot)
+        return;
+      if (condition_nonzero(query, condition_width)) {
+        partial = true;
+        failed = (long)p;
+        break;
+      }
+    }
+  if (partial) {
+    for (uint i = 0; i < condition_width; ++i) {
+      W value = fromword(condition_lo[ps + i]);
+      if (failed >= 0)
+        value = wadd(value, wmul(condition_den,
+                                 fromword(condition_lo[pk + 4u
+                                                       + (ulong)failed * condition_width + i]),
+                                 slot), slot);
+      row[i] = value;
+    }
+    if (*slot)
+      return;
+    condition_coverage_write(1, failed, row, condition_den, condition_width, query,
+                              residual_den, condition_width, width, coverage_lo, coverage_hi, slot);
+  }
+  if (*slot)
+    return;
+  for (uint i = 0; i < y; ++i)
+    safe_lo[i] = safe_hi[i] = output_lo[width + i];
+  safe_lo[y] = safe_hi[y] = output_lo[width + y];
+  safe_lo[y + 1u] = safe_hi[y + 1u]
+      = partial ? 1 : output_lo[width + y + 1u];
+}
+
+// Restrict a complete-domain joint affine family by an actual later output.
+// Homogenization pins the base-point coefficient to one, retaining absolute
+// condition coordinates and the complete vertical fibre.
+kernel void section_constitutive_condition_receive(
+    device const long *joint [[buffer(0)]], device const long *joint_hi [[buffer(1)]],
+    constant uint &joint_source_width [[buffer(2)]], constant uint &condition_width [[buffer(3)]],
+    constant uint &output_width [[buffer(4)]], device const long *coverage [[buffer(5)]],
+    device const long *coverage_hi [[buffer(6)]], device const long *observed_lo [[buffer(7)]],
+    device const long *observed_hi [[buffer(8)]], constant uint &observed_at [[buffer(9)]],
+    constant uint &observed_denominator_at [[buffer(10)]],
+    constant uint &observed_disposition_at [[buffer(11)]],
+    device long *graph_lo [[buffer(12)]], device long *graph_hi [[buffer(13)]],
+    device long *rhs_lo [[buffer(14)]], device long *rhs_hi [[buffer(15)]],
+    device long *output_lo [[buffer(16)]], device long *output_hi [[buffer(17)]],
+    device uint *slot [[buffer(18)]], device const uint *census [[buffer(19)]],
+    device const uint *lineage [[buffer(20)]], constant uint &lineage_count [[buffer(21)]],
+    threadgroup W *scratch [[threadgroup(0)]], uint3 tid [[thread_position_in_threadgroup]]) {
+  if (tid.x || tid.y || tid.z)
+    return;
+  if (upstream(census, lineage, lineage_count, slot))
+    return;
+
+  ulong c = (ulong)condition_width;
+  ulong y = (ulong)output_width;
+  ulong j64 = c + y;
+  ulong k64 = j64 + 1ul;
+  ulong joint_width64 = (ulong)joint_source_width + j64;
+  if (!condition_width || !output_width || (condition_width & 1u) || (output_width & 1u)
+      || k64 > 0xfffffffbUL || joint_width64 > 0xfffffffbUL
+      || !coverage || !coverage_hi || coverage[0] != coverage_hi[0] || coverage[0] != 0u) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  uint condition_count = (uint)c;
+  uint response_count = (uint)y;
+  uint joint_target = (uint)j64;
+  uint width = (uint)k64;
+  uint joint_width = (uint)joint_width64;
+  ulong report_words = (ulong)joint_width + 4ul + (ulong)joint_target * joint_target;
+  for (ulong i = 0; i < report_words; ++i)
+    if (joint[i] != joint_hi[i]) {
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                               memory_order_relaxed);
+      return;
+    }
+  ulong output_words = (ulong)condition_count * condition_count + (ulong)width + 4ul;
+  if (joint[joint_source_width + joint_target] <= 0
+      || (joint[joint_source_width + joint_target + 1u] != 0
+          && joint[joint_source_width + joint_target + 1u] != 2)
+      || output_words > 0xfffffffbUL) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  W den = fibre_current_denominator(observed_lo, observed_hi,
+                                    observed_denominator_at,
+                                    observed_disposition_at, slot);
+  if (*slot)
+    return;
+  for (uint i = 0; i < response_count; ++i)
+    if (observed_lo[observed_at + i] != observed_hi[observed_at + i]) {
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                               memory_order_relaxed);
+      return;
+    }
+
+  threadgroup W *row = scratch;
+  threadgroup W *query = row + width;
+  for (ulong i = 0; i < (ulong)width * width; ++i)
+    graph_lo[i] = graph_hi[i] = 0;
+  uint source_for_query = 1u + response_count;
+  for (uint p = 0; p <= joint_target; ++p) {
+    row[0] = p == 0 ? fromword(joint[joint_source_width + joint_target]) : wzero();
+    for (uint i = 0; i < response_count; ++i) {
+      row[1u + i] = p == 0
+          ? fromword(joint[joint_source_width + condition_count + i])
+          : fromword(joint[(ulong)joint_source_width + joint_target + 4ul
+                           + (ulong)(p - 1u) * joint_target + condition_count + i]);
+    }
+    for (uint i = 0; i < condition_count; ++i) {
+      row[source_for_query + i] = p == 0 ? fromword(joint[joint_source_width + i])
+                                         : fromword(joint[(ulong)joint_source_width + joint_target
+                                                          + 4ul + (ulong)(p - 1u) * joint_target + i]);
+    }
+    long inserted = fibre_stage(graph_lo, width, row, slot);
+    for (uint i = 0; i < width; ++i)
+      toword(row[i], slot);
+    if (*slot)
+      return;
+    if (inserted >= 0)
+      for (uint i = 0; i < width; ++i) {
+        ulong at = (ulong)inserted * width + i;
+        long value = toword(row[i], slot);
+        graph_lo[at] = graph_hi[at] = value;
+      }
+    if (*slot)
+      return;
+  }
+
+  query[0] = den;
+  for (uint i = 0; i < response_count; ++i)
+    query[1u + i] = fromword(observed_lo[observed_at + i]);
+  for (uint i = source_for_query; i < width; ++i)
+    query[i] = wzero();
+  for (uint i = 0; i < source_for_query; ++i)
+    rhs_lo[i] = rhs_hi[i] = toword(query[i], slot);
+  rhs_lo[source_for_query] = rhs_hi[source_for_query] = toword(den, slot);
+  if (*slot)
+    return;
+
+  uint status = 0, rank = 0;
+  fibre_query(graph_lo, source_for_query, width, query, &den,
+              (threadgroup const W *)nullptr, -1, &status, &rank, slot);
+  if (*slot)
+    return;
+  for (uint i = source_for_query; i < width; ++i)
+    query[i] = wneg(query[i]);
+  condition_store_report(graph_lo, source_for_query, width, query, den, status, rank,
+                         output_lo, output_hi, slot);
+}
+
 // The current relation consumes a source point and, when paired, a receiving
 // point. The returned section retains the original complete vertical fibre
 // before the staged row joins the continuing relation.
@@ -1555,9 +2091,10 @@ kernel void section_constitutive_differential(
     device const long *lo [[buffer(0)]], device const long *hi [[buffer(1)]],
     constant uint &source_width [[buffer(2)]], constant uint &target_width [[buffer(3)]],
     constant uint &first_complex [[buffer(4)]], constant uint &pairs [[buffer(5)]],
-    device long *output_lo [[buffer(6)]], device long *output_hi [[buffer(7)]],
-    device uint *slot [[buffer(8)]], device const uint *census [[buffer(9)]],
-    device const uint *lineage [[buffer(10)]], constant uint &lineage_count [[buffer(11)]],
+    device const long *coverage_lo [[buffer(6)]], device const long *coverage_hi [[buffer(7)]],
+    device long *output_lo [[buffer(8)]], device long *output_hi [[buffer(9)]],
+    device uint *slot [[buffer(10)]], device const uint *census [[buffer(11)]],
+    device const uint *lineage [[buffer(12)]], constant uint &lineage_count [[buffer(13)]],
     uint3 tid [[thread_position_in_grid]]) {
   if (tid.x || tid.y || tid.z)
     return;
@@ -1572,6 +2109,22 @@ kernel void section_constitutive_differential(
     return;
   }
   uint width = (uint)width64;
+  if (coverage_lo) {
+    if (!coverage_hi || coverage_lo[0] != coverage_hi[0] || coverage_lo[0] < 0
+        || coverage_lo[0] > 3) {
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                               memory_order_relaxed);
+      return;
+    }
+    if (coverage_lo[0] != 0) {
+      output_lo[0] = output_hi[0] = 0;
+      output_lo[1] = output_hi[1] = 0;
+      output_lo[2] = output_hi[2] = as_type<long>((1ul << pairs) - 1ul);
+      output_lo[3] = output_hi[3] = 0;
+      output_lo[4] = output_hi[4] = 1;
+      return;
+    }
+  }
   ulong words = width64 + 4ul + (ulong)target_width * target_width;
   for (ulong j = 0; j < words; ++j)
     if (lo[j] != hi[j]) {

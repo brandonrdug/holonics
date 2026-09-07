@@ -54,6 +54,12 @@ response and later prediction. Silent ESC-50 cuts retain four condition directio
 point-consumer refusal. The independent Fraction observer checks complete source/output
 coordinates. These finite coefficient studies do not establish learned sound or language quality.
 
+[established-bounded; measured] The subsequent [whole-family integration](../research/records/2026-09-07_APPLE_CONDUCTS_THE_SHARED_CONDITION_FAMILY.md)
+adds native image/refinement to that same example. Both recorded studies now conduct their
+complete supported output through the temporal owner, including the silent case with four
+free condition directions. Later actual returns refine the producing joint family. The prior
+point-condition attempt remains a separate comparison; no host inspection selects a condition.
+
 [established-bounded; measured] The [recorded interval attachment](../research/records/2026-09-07_RECORDED_RESPONSE_POINTERS_RETAIN_THEIR_ACOUSTIC_INTERVALS.md)
 now supplies `AcousticFieldChart::from_acoustic_range` and `native::recorded` for exact original
 source/target pointers and recording bounds. `RecordedResponseSections::bind` keeps annotation

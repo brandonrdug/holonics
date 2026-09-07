@@ -26,8 +26,8 @@ dependent-stream apparatus probe only; it is not an alternate native owner.
 `crates/holonic-mount/src/metal.rs` (resident allocation and ordered Metal commands),
 `crates/holonic-engine/src/device_launch.rs` (integer launch admission), and
 `accelerators/metal/native_phase.metal` (checked limb arithmetic, fibre, circulation, rechart,
-resident current, bilinear contact, condition preimage, historical source frames, differential,
-carry and census). `resident_section/{surface_mount,surface_passage}.rs` attaches these to the
+resident current, bilinear contact, condition preimage/image/refinement, historical source frames, differential,
+carry and census). `resident_section/{surface_mount,surface_passage,surface_condition}.rs` attaches these to the
 existing phase ecology. The CUDA mount and native kernels retain their Linux target. A missing
 Metal operation refuses explicitly; the legacy `mount::cuda` alias supplies source compatibility.
 
@@ -105,7 +105,14 @@ partially known source domains. An inferred phase drives a later native predicti
 The [Apple condition-fibre return](../research/records/2026-09-07_APPLE_RETURNS_THE_SHARED_CONDITION_PREIMAGE_FIBRE.md)
 supplies exact receipt agreement and the 22-test Metal scope.
 `ConstitutiveDifferentialReading` distinguishes generic relation/class receivers from actual field
-source occurrences. Whole-family forward images and conversation coupling remain open.
+source occurrences.
+
+[established-bounded; measured] `resident/condition_image.rs`,
+`resident_section/surface_condition.rs` and `constitutive_condition_image.cuh` now own joint
+condition/output transport, both projections, domain coverage/witnesses and later reception.
+The [family-cycle return](../research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md)
+retains correlations and producing-law chronology while a complete-domain fixed output conducts.
+Actual condition-current realization and conversation coupling remain open.
 
 [established-bounded; measured] `native_ecology/constitutive_fibre/resident.rs` now owns borrowed
 resident rational-current input and immutable original-fibre returns for the existing local

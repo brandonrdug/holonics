@@ -489,7 +489,9 @@ impl<T: DeviceZeroable> DeviceBuffer<T> {
 #[derive(Clone)]
 enum Argument {
     Buffer(Rc<Allocation>, u64),
+    NullBuffer,
     U32(u32),
+    U32Array(Vec<u32>),
 }
 #[derive(Clone)]
 enum Command {
@@ -536,7 +538,13 @@ fn submit_in_pool(rt: &Runtime, commands: &[Command]) -> Result<()> {
                         Argument::Buffer(b, offset) => {
                             enc.set_buffer(i as u64, Some(&b.buffer), *offset)
                         }
+                        Argument::NullBuffer => enc.set_buffer(i as u64, None, 0),
                         Argument::U32(v) => enc.set_bytes(i as u64, 4, (v as *const u32).cast()),
+                        Argument::U32Array(values) => enc.set_bytes(
+                            i as u64,
+                            (values.len() * size_of::<u32>()) as u64,
+                            values.as_ptr().cast(),
+                        ),
                     }
                 }
                 if *scratch > 0 {
@@ -803,6 +811,8 @@ pub struct Function<'m> {
     pipeline: ::metal::ComputePipelineState,
     signature: &'static [usize],
     arity: usize,
+    pack_scalars: bool,
+    nullable: &'static [usize],
     runtime: Rc<Runtime>,
     _module: PhantomData<&'m Module>,
 }
@@ -834,8 +844,10 @@ impl Module {
             "section_constitutive_current" => (&[4, 5, 6, 9, 10, 11, 12, 13, 14, 20], 21),
             "section_constitutive_bilinear_source" => (&[2, 3, 4, 7, 8, 9, 10, 11, 17], 18),
             "section_phase_convolution" => (&[2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 19], 20),
-            "section_constitutive_differential" => (&[2, 3, 4, 5, 11], 12),
+            "section_constitutive_differential" => (&[2, 3, 4, 5, 13], 14),
             "section_constitutive_condition_preimage" => (&[3, 4, 5, 8, 9, 10, 11, 12, 13, 23], 24),
+            "section_constitutive_condition_image" => (&[3, 4, 5, 8, 9, 10, 11, 33], 34),
+            "section_constitutive_condition_receive" => (&[2, 3, 4, 9, 10, 11, 21], 22),
             "section_field_source_frame" => (&[6, 12], 13),
             "section_constitutive_circulation" => (&[9, 10, 16], 17),
             "section_constitutive_rechart" => (&[5, 19], 20),
@@ -873,6 +885,12 @@ impl Module {
                 pipeline,
                 signature,
                 arity,
+                pack_scalars: name == "section_constitutive_condition_image",
+                nullable: if name == "section_constitutive_differential" {
+                    &[6, 7]
+                } else {
+                    &[]
+                },
                 runtime: self.runtime.clone(),
                 _module: PhantomData,
             })
@@ -943,19 +961,40 @@ impl Function<'_> {
             ));
         }
         let mut arguments = Vec::with_capacity(params.len());
+        let mut scalars = if self.pack_scalars {
+            Vec::with_capacity(self.signature.len())
+        } else {
+            Vec::new()
+        };
         for (index, pointer) in params.iter().enumerate() {
             if pointer.is_null() {
                 return Err(invalid("launch", "null argument storage"));
             }
             if self.signature.contains(&index) {
-                arguments.push(Argument::U32(unsafe { *(*pointer as *const u32) }));
+                let value = unsafe { *(*pointer as *const u32) };
+                if self.pack_scalars {
+                    scalars.push(value);
+                } else {
+                    arguments.push(Argument::U32(value));
+                }
             } else {
-                let (buffer, offset) = resolve(unsafe { *(*pointer as *const u64) }, 1)?;
+                let address = unsafe { *(*pointer as *const u64) };
+                if address == 0 && self.nullable.contains(&index) {
+                    arguments.push(Argument::NullBuffer);
+                    continue;
+                }
+                let (buffer, offset) = resolve(address, 1)?;
                 if !Rc::ptr_eq(&buffer.runtime, &self.runtime) {
                     return Err(invalid("launch", "buffer belongs to another context"));
                 }
                 arguments.push(Argument::Buffer(buffer, offset));
             }
+        }
+        // The shared image ABI has 34 arguments, beyond Metal's 31 buffer slots. Its eight
+        // immutable u32 launch fields share the final constant buffer; 26 current/evidence
+        // pointers remain in their original order. No numerical current crosses this boundary.
+        if self.pack_scalars {
+            arguments.push(Argument::U32Array(scalars));
         }
         record(
             &self.runtime,
@@ -1089,7 +1128,10 @@ mod tests {
         assert_eq!(output, [7, 11, 13, 17]);
         context.synchronize().unwrap();
         let timing = context.inner.execution_timing.get();
-        assert_eq!(timing.completed_command_buffers, timing_before.completed_command_buffers + 1);
+        assert_eq!(
+            timing.completed_command_buffers,
+            timing_before.completed_command_buffers + 1
+        );
         assert!(timing.unavailable_timestamps <= timing.completed_command_buffers);
         assert!(timing.gpu_seconds.is_finite() && timing.gpu_seconds >= 0.0);
         context.synchronize().unwrap();

@@ -2,6 +2,7 @@
 //! The represented family may be partial or plural; no inverse of the whole ecology is assumed.
 
 use super::*;
+use std::rc::Rc;
 
 #[derive(Debug, PartialEq, Eq, Serialize)]
 #[serde(tag = "kind", rename_all = "kebab-case")]
@@ -17,28 +18,33 @@ pub enum ConditionPreimageReading {
 
 /// Immutable derived constraints and their full condition fibre, not a copy of the learned body.
 pub struct ResidentConditionPreimage<'chart> {
-    returned: ResidentConstitutiveReturn<'chart>,
-    constraint: ResidentSection<'chart>,
-    rhs: ResidentSection<'chart>,
+    pub(super) inner: Rc<ConditionPreimageData<'chart>>,
+}
+
+pub(super) struct ConditionPreimageData<'chart> {
+    pub(super) returned: ResidentConstitutiveReturn<'chart>,
+    pub(super) constraint: ResidentSection<'chart>,
+    pub(super) rhs: ResidentSection<'chart>,
+    pub(super) action_target_width: usize,
 }
 
 impl<'chart> ResidentConditionPreimage<'chart> {
     pub fn relation_cut(&self) -> u64 {
-        self.returned.occurrence()
+        self.inner.returned.occurrence()
     }
 
     pub fn source_chart(&self) -> ConstitutiveSourceChart {
-        self.returned.source_chart()
+        self.inner.returned.source_chart()
     }
 
     /// Carry a uniquely supported condition into another native operation. The consumer checks
     /// the original fibre disposition on device; a plural fibre is never silently a point.
     pub fn current(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
-        self.returned.current()
+        self.inner.returned.current()
     }
 
     pub fn inspect(&self) -> Result<ConditionPreimageReading, ConstitutiveFibreError> {
-        Ok(match self.returned.inspect()?.predecessor_reading {
+        Ok(match self.inner.returned.inspect()?.predecessor_reading {
             ConstitutiveReading::Unique { current } => ConditionPreimageReading::Compatible {
                 particular: current,
                 directions: Vec::new(),
@@ -64,8 +70,14 @@ impl<'chart> ResidentConditionPreimage<'chart> {
         &self,
     ) -> Result<(ResidentSectionRest, ResidentSectionRest), ConstitutiveFibreError> {
         Ok((
-            self.returned.surface.detach_section(&self.constraint, 64)?,
-            self.returned.surface.detach_section(&self.rhs, 64)?,
+            self.inner
+                .returned
+                .surface
+                .detach_section(&self.inner.constraint, 64)?,
+            self.inner
+                .returned
+                .surface
+                .detach_section(&self.inner.rhs, 64)?,
         ))
     }
 
@@ -74,7 +86,9 @@ impl<'chart> ResidentConditionPreimage<'chart> {
         first_complex: usize,
         pairs: usize,
     ) -> Result<ConstitutiveDifferentialReading, ConstitutiveFibreError> {
-        self.returned.read_differential_pairs(first_complex, pairs)
+        self.inner
+            .returned
+            .read_differential_pairs(first_complex, pairs)
     }
 }
 
@@ -165,9 +179,12 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
             )));
         }
         Ok(ResidentConditionPreimage {
-            returned,
-            constraint,
-            rhs,
+            inner: Rc::new(ConditionPreimageData {
+                returned,
+                constraint,
+                rhs,
+                action_target_width: self.target_width,
+            }),
         })
     }
 }

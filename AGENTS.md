@@ -53,9 +53,11 @@ and concrete Metal port boundary make the dependent Mac workflow ready to re-eng
 [definition] The [measured conditional phase return](research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
 now supplies that shared primitive and port boundary. Mac work can re-engage on its port and
 acoustic generator studies. The [condition Preimage Fibre](research/records/2026-09-07_AC1_THE_LEARNED_ACTION_RETURNS_ITS_CONDITION_PREIMAGE_FIBRE.md)
-now infers compatible conditions from actual source/return currents. Desktop construction continues
-with whole-family forward conduct and conversation attachment. This does not declare either full
-model complete.
+now infers compatible conditions from actual source/return currents, and the
+[joint-family return](research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md)
+transports/refines those families with their domain. Desktop construction next binds an actual
+retained condition current and native contact response, then the conversation attachment.
+Whole-family evidence is not a universal certainty gate on generation. Neither full model is complete.
 
 [project-postulate] Brandon's September 6 synthesis ruling records Athena-alpha as planned but
 unattained. Curated conversation material supports the next native cultivation direction for
