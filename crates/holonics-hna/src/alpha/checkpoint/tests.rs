@@ -21,21 +21,25 @@ fn saved_text_field_restores_live_source_and_application_state_without_replay() 
     let saved = SavedTextField::read(&path).unwrap();
     assert_eq!(saved.occurrences(), 2);
     saved
-        .with_session(|session, _stream, anchors, application| {
-            assert_eq!(application, b"application-state");
-            assert_eq!(anchors.len(), 1);
-            assert_eq!(session.field().occurrence_count(), 2);
-            let before = session.field().census();
-            session.begin_part(Some(&anchors[0]))?;
-            session.receive(TextSymbol::Octet(b'B'))?;
-            assert_eq!(session.field().occurrence_count(), 3);
-            assert_eq!(
-                session.field().census().deed_launches - before.deed_launches,
-                1
-            );
-            assert_eq!(session.field().lineage(2).unwrap().received_from, Some(0));
-            Ok(())
-        })
+        .with_session_archived(
+            dir.path().join("historical-sections"),
+            |session, _stream, anchors, application| {
+                assert_eq!(application, b"application-state");
+                assert_eq!(anchors.len(), 1);
+                assert_eq!(session.field().occurrence_count(), 2);
+                let before = session.field().census();
+                session.begin_part(Some(&anchors[0]))?;
+                session.receive(TextSymbol::Octet(b'B'))?;
+                assert_eq!(session.field().occurrence_count(), 3);
+                assert_eq!(
+                    session.field().census().deed_launches - before.deed_launches,
+                    1
+                );
+                assert_eq!(session.field().lineage(2).unwrap().received_from, Some(0));
+                assert_eq!(session.field().history_placement().restored_sources, 1);
+                Ok(())
+            },
+        )
         .unwrap();
     let mut bytes = std::fs::read(&path).unwrap();
     let at = bytes.len() / 2;

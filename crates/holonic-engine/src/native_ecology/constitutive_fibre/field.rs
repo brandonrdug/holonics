@@ -15,11 +15,14 @@ use super::*;
 use crate::dimensional_wave::ExactComplexWaveCurrent;
 use std::rc::Rc;
 
+mod archive;
 mod junction;
 mod material_transport;
 mod receiver;
 mod rechart;
 mod rest;
+pub use archive::NativeFieldHistoryPlacement;
+use archive::{ArchivedField, FieldArchive};
 pub use junction::{
     NativeFieldCurrentBall, NativeFieldEnclosedJunctionReading, NativeFieldExactJunctionReading,
     NativeFieldInternalCurrent, NativeFieldInternalCurrentBall, NativeFieldJunctionReading,
@@ -176,13 +179,18 @@ pub enum NativeFieldReceiverStatus {
     Plural,
 }
 
-struct HeldField<'chart> {
+struct ResidentFieldHistory<'chart> {
     section: ResidentSection<'chart>,
+    junction: Option<Rc<ResidentSection<'chart>>>,
+    transport: Option<Rc<ResidentSection<'chart>>>,
+}
+
+struct HeldField<'chart> {
+    resident: Option<ResidentFieldHistory<'chart>>,
+    archived: Option<ArchivedField>,
     lineage: NativeFieldLineage,
     frame: Rc<HeldCurrentFrame<'chart>>,
     returned: bool,
-    junction: Option<Rc<ResidentSection<'chart>>>,
-    transport: Option<Rc<ResidentSection<'chart>>>,
 }
 
 /// One move owner for phase standing, the same local relation accumulator, and its actual
@@ -198,6 +206,7 @@ pub struct NativeConstitutiveField<'chart> {
     incidence_changes: Vec<NativeIncidenceChange>,
     owner: Rc<()>,
     history: Vec<HeldField<'chart>>,
+    archive: Option<FieldArchive>,
     pending: Option<HeldField<'chart>>,
     junction: Option<PairedJunction<'chart>>,
     pending_junction: Option<PendingJunction<'chart>>,
@@ -273,6 +282,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             incidence_changes: Vec::new(),
             owner: Rc::new(()),
             history: Vec::new(),
+            archive: None,
             pending: None,
             junction: None,
             pending_junction: None,
@@ -348,7 +358,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .history
             .get(occurrence)
             .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
-        Ok(self.relation.surface.detach_section(&source.section, 64)?)
+        Ok(source.source_rest(self.relation.surface)?)
     }
 
     pub fn advance(
@@ -400,7 +410,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .history
             .get(occurrence)
             .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
-        let words = self.relation.surface.read_out(&event.section)?;
+        let words = event.source_rest(self.relation.surface)?.intervals;
         let source_width = self.relation.source_width;
         let width = source_width + self.relation.target_width;
         let current_at = source_width + 1;
@@ -453,8 +463,14 @@ impl<'chart> NativeConstitutiveField<'chart> {
         let (continuation, observed) =
             self.advance_with(occurrence, |body, source_at, occurrence| {
                 let surface = body.relation.surface;
-                let words =
-                    surface.read_out(&body.pending.as_ref().expect("pending field").section)?;
+                let words = surface.read_out(
+                    &body
+                        .pending
+                        .as_ref()
+                        .expect("pending field")
+                        .resident()?
+                        .section,
+                )?;
                 let source_width = body.relation.source_width;
                 let width = source_width + body.relation.target_width;
                 let current_at = source_width + 1;
@@ -552,6 +568,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
         } else {
             None
         };
+        if let Some(at) = source_at {
+            self.mount_history_source(at)?;
+        }
         let next = self
             .relation
             .occurrences
@@ -611,7 +630,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 &mut self.memory,
                 &mut self.relation.basis,
                 &input,
-                source_at.map(|i| &self.history[i].section),
+                source_at
+                    .map(|i| self.history[i].resident().map(|h| &h.section))
+                    .transpose()?,
                 &self.frame.native,
                 source_at.map(|i| &self.history[i].frame.native),
                 self.junction
@@ -633,8 +654,18 @@ impl<'chart> NativeConstitutiveField<'chart> {
                     .map(|(old, next)| {
                         (
                             &mut old.state,
-                            source_at.and_then(|i| self.history[i].junction.as_deref()),
-                            source_at.and_then(|i| self.history[i].transport.as_deref()),
+                            source_at.and_then(|i| {
+                                self.history[i]
+                                    .resident
+                                    .as_ref()
+                                    .and_then(|h| h.junction.as_deref())
+                            }),
+                            source_at.and_then(|i| {
+                                self.history[i]
+                                    .resident
+                                    .as_ref()
+                                    .and_then(|h| h.transport.as_deref())
+                            }),
                             &next.delta,
                             next.report.as_ref(),
                         )
@@ -646,14 +677,17 @@ impl<'chart> NativeConstitutiveField<'chart> {
         passage.close(0, &output, 64)?;
         let passage = passage.finish()?;
         self.pending = Some(HeldField {
-            section: output,
+            archived: None,
+            resident: Some(ResidentFieldHistory {
+                section: output,
+                junction: prepared.as_ref().map(|(next, _)| Rc::clone(&next.report)),
+                transport: prepared_transport
+                    .as_ref()
+                    .map(|next| Rc::clone(&next.report)),
+            }),
             lineage: lineage.clone(),
             frame: Rc::clone(&self.frame),
             returned: false,
-            junction: prepared.as_ref().map(|(next, _)| Rc::clone(&next.report)),
-            transport: prepared_transport
-                .as_ref()
-                .map(|next| Rc::clone(&next.report)),
         });
         let (pending_junction, junction_scratch) = match prepared {
             Some((next, scratch)) => (Some(next), Some(scratch)),

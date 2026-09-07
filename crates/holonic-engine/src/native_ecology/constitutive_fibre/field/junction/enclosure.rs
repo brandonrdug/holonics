@@ -131,7 +131,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .history
             .get(occurrence)
             .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
-        let words = self.relation.surface.read_out(&source.section)?;
+        let words = source.source_rest(self.relation.surface)?.intervals;
         let denominator = words[self.relation.source_width].0;
         if denominator <= 0 || words.iter().any(|(a, b)| a != b) {
             return Err(ConstitutiveFibreError::Uncertain);
@@ -181,15 +181,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .get(occurrence)
             .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
         let section = event
-            .junction
-            .as_ref()
+            .junction_rest(self.relation.surface)?
             .ok_or(ConstitutiveFibreError::Uncertain)?;
-        decode_report(
-            &self.relation.surface.read_out(section)?,
-            6 * self.nodes(),
-            fractional_bits,
-        )
-        .map(Some)
+        decode_report(&section.intervals, 6 * self.nodes(), fractional_bits).map(Some)
     }
 
     /// Cheap cold enclosure of the complete internal population through the birth-prefix map.

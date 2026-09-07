@@ -78,7 +78,10 @@ Its first four-family run stops at a reserved codeword without a text response. 
 [field persistence return](../../research/records/2026-09-07_AC3_THE_CULTIVATED_FIELD_RESTARTS_WITHOUT_SOURCE_REPLAY.md)
 now retains the complete cultivated owner, source capabilities and exposure cut across processes.
 Continue broader source-qualified development and inspect actual responses, using that durable
-state and constructing lawful history placement. Preserve numerical error and complete defects; do not turn source
+state and the [exact historical placement](../../research/records/2026-09-07_AC3_THE_COMPLETE_HISTORY_MOVES_TO_AN_EXTERIOR_CHART_AND_ITS_ADDRESSED_SOURCE_RETURNS.md).
+Complete historical carriers now leave GPU residency and remount through actual source handles;
+host persistence and disk size remain growing costs. Continue productive contextual construction
+and economical broader development. Preserve numerical error and complete defects; do not turn source
 uncertainty into a point. AC1–AC5 completion and the useful alpha product remain open.
 
 ## Completed September 6 synthesis before Athena-alpha cultivation

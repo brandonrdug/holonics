@@ -254,15 +254,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .history
             .get(occurrence)
             .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
-        held.junction
-            .as_ref()
-            .map(|section| {
-                self.relation
-                    .surface
-                    .detach_section(section, 64)
-                    .map_err(Into::into)
-            })
-            .transpose()
+        held.junction_rest(self.relation.surface)
     }
 
     /// Executable reconstruction of every actual internal current. This is an explicitly
@@ -284,17 +276,23 @@ impl<'chart> NativeConstitutiveField<'chart> {
             return self.decode_enclosed_internal_currents().map(Some);
         }
         let width = self.relation.source_width + self.relation.target_width;
-        let prefix = |section: &ResidentSection<'chart>| -> Result<Vec<ExactComplexWaveCurrent>, ConstitutiveFibreError> {
-            let words = self.relation.surface.read_out(section)?;
-            let at = 3 * (width + 1);
-            let den = words[at + width].0;
-            if den <= 0 || words.iter().any(|(a,b)| a != b) { return Err(ConstitutiveFibreError::Uncertain); }
-            Ok((0..width/2).map(|j| ExactComplexWaveCurrent::new(
-                Rat::new(words[at + 2*j].0.into(), den.into()),
-                Rat::new(words[at + 2*j+1].0.into(), den.into()),
-            )).collect())
-        };
-        let current_prefix = prefix(&junction.current)?;
+        let prefix =
+            |words: &[(i64, i64)]| -> Result<Vec<ExactComplexWaveCurrent>, ConstitutiveFibreError> {
+                let at = 3 * (width + 1);
+                let den = words[at + width].0;
+                if den <= 0 || words.iter().any(|(a, b)| a != b) {
+                    return Err(ConstitutiveFibreError::Uncertain);
+                }
+                Ok((0..width / 2)
+                    .map(|j| {
+                        ExactComplexWaveCurrent::new(
+                            Rat::new(words[at + 2 * j].0.into(), den.into()),
+                            Rat::new(words[at + 2 * j + 1].0.into(), den.into()),
+                        )
+                    })
+                    .collect())
+            };
+        let current_prefix = prefix(&self.relation.surface.read_out(&junction.current)?)?;
         let sign = Rat::from_integer(if self.history.len() % 2 == 1 { 1 } else { -1 }.into());
         let mut internal = Vec::new();
         for (receiving, event) in self.history.iter().enumerate() {
@@ -302,7 +300,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 continue;
             };
             let source = &self.history[source_at];
-            let source_words = self.relation.surface.read_out(&source.section)?;
+            let source_words = source.source_rest(self.relation.surface)?.intervals;
             let denominator = source_words[self.relation.source_width].0;
             if denominator <= 0 || source_words.iter().any(|(a, b)| a != b) {
                 return Err(ConstitutiveFibreError::Uncertain);
@@ -330,10 +328,10 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 vec![ExactComplexWaveCurrent::zero(); width / 2]
             } else {
                 prefix(
-                    self.history[receiving - 1]
-                        .junction
-                        .as_ref()
-                        .ok_or(ConstitutiveFibreError::Uncertain)?,
+                    &self
+                        .inspect_junction(receiving - 1)?
+                        .ok_or(ConstitutiveFibreError::Uncertain)?
+                        .intervals,
                 )?
             };
             let current = contact

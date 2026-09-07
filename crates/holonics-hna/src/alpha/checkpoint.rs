@@ -139,12 +139,42 @@ impl SavedTextField {
             Vec<u8>,
         ) -> Result<R, AlphaMaterialError>,
     ) -> Result<R, AlphaMaterialError> {
+        self.with_session_placed(None, operation)
+    }
+    /// Restore the same session with older numerical carriers in a fresh history archive.
+    /// The portable checkpoint includes their payload; no earlier archive path is required.
+    pub fn with_session_archived<R>(
+        self,
+        archive_path: impl AsRef<Path>,
+        operation: impl FnOnce(
+            &mut TextFieldSession<'_, '_>,
+            &mut HnaStream,
+            Vec<NativeFieldSourceAnchor>,
+            Vec<u8>,
+        ) -> Result<R, AlphaMaterialError>,
+    ) -> Result<R, AlphaMaterialError> {
+        self.with_session_placed(Some(archive_path.as_ref()), operation)
+    }
+    fn with_session_placed<R>(
+        self,
+        archive_path: Option<&Path>,
+        operation: impl FnOnce(
+            &mut TextFieldSession<'_, '_>,
+            &mut HnaStream,
+            Vec<NativeFieldSourceAnchor>,
+            Vec<u8>,
+        ) -> Result<R, AlphaMaterialError>,
+    ) -> Result<R, AlphaMaterialError> {
         self.validate()?;
         let latest = self.field.source_slots()[0];
         let readout = ResidentReadout::new().map_err(error)?;
         let surface = ResidentSurface::on(&readout).map_err(error)?;
-        let (mut field, mut sources, mut anchors) =
-            NativeConstitutiveField::remount(&surface, self.field)?;
+        let (mut field, mut sources, mut anchors) = match archive_path {
+            Some(path) => {
+                NativeConstitutiveField::remount_with_history_archive(&surface, self.field, path)?
+            }
+            None => NativeConstitutiveField::remount(&surface, self.field)?,
+        };
         let mut session = TextFieldSession::on(&mut field)?;
         session.latest = latest.map(|occurrence| TextFieldSource {
             occurrence,

@@ -81,9 +81,31 @@ that later probe successor is outside the declared saved development cut.
 [open] AC1 remains active. The shared endpoint port does not reconstruct a full parent history;
 wider contextual incidence and productive use of separating histories still need construction.
 A cold continuous-source-feedback candidate remains numerically sensitive, and its unit-series
-refinement has only a numerical comparison. Lawful placement of complete historical sections is
-needed for economical broader development. Useful learned text, broad cultivation and the full
-AC0–AC5 product remain open. Persistence and numerical current claims do not grade response quality.
+refinement has only a numerical comparison. Useful learned text, broad cultivation and the full
+AC0–AC5 product remain open. Prioritize the productive use of complete historical/contextual
+current over treating more exposure or an end marker as useful language.
+
+[established-bounded; measured] The [exterior history return](research/records/2026-09-07_AC3_THE_COMPLETE_HISTORY_MOVES_TO_AN_EXTERIOR_CHART_AND_ITS_ADDRESSED_SOURCE_RETURNS.md)
+now moves complete immutable historical carriers out of GPU residency and remounts an actual
+addressed source without learning replay. The 64-family cut drops from 673,556,304 to 475,104 bytes
+of native resident payload, retaining the same final body and failed response. Seventy-one native
+constitutive controls pass, including archival failure and rechart/source-return cases; public
+checkpoint and actual partial-family continuation checks also pass.
+
+[established-bounded; measured] Continued cultivation returns **128 families / 33,628 development
+occurrences**. The current development artifact is
+`.local/artifacts/athena-alpha/ac3-placement/cultivated-128.hna` (646,255,490 bytes). Native payload
+is 475,104 bytes at the cut and peaks at 57,741,140 bytes during this continuation. Fifty-eight
+old addressed sources remount; all development section readouts belong to explicit history
+placement. Source/current inspection passes at its stated scope. A new process reproduces the
+same body and emission with the original exposure and history backing unavailable.
+
+[counterexample; measured] The new response is `Tm.` followed by an actual end-of-part marker.
+It still fails the function/derivative question. Numerical persistence and codec termination do
+not establish useful response quality.
+
+[open] Host checkpoint reading/writing still materializes full history, and disk/lineage storage
+grows. Those costs and broader contextual construction remain; this is not an alpha completion.
 
 ## Completed foundation and data preparation
 

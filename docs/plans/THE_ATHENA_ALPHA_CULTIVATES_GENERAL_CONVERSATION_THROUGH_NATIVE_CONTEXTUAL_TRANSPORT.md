@@ -280,6 +280,19 @@ artifact saves 18,476 native occurrences in 355,146,249 bytes and remounts witho
 Its response still fails. This returns a durability component of AC3; useful broad cultivation and the integrated product
 remain open.
 
+[established-bounded; measured] [Exterior historical placement](../../research/records/2026-09-07_AC3_THE_COMPLETE_HISTORY_MOVES_TO_AN_EXTERIOR_CHART_AND_ITS_ADDRESSED_SOURCE_RETURNS.md)
+now retains complete old carriers outside GPU memory and remounts an actual addressed source
+without native learning replay. At the 64-family cut, resident native payload is 475,104 bytes;
+the final body and failed emission equal the earlier fully resident run. Host persistence memory
+and disk history still grow. Use this placement for broader cultivation while preserving those
+costs and the open contextual/product obligations.
+
+[established-bounded; measured] That placement carries the next 64 families, reaching 128 families
+and 33,628 development occurrences in a durable 646,255,490-byte artifact. The recorded native
+payload peak is 57,741,140 bytes, and the saved state reproduces its complete body and emitted
+result with the original exposure and history backing unavailable. The output `Tm.` plus an
+end-of-part marker still fails the request; no useful response or AC2 completion is established.
+
 [definition] Stream the declared broader development population through the same resident owner,
 retaining changed successors and available source relations. Admission/order follows source
 causality and the declared study; no shuffled-message or token-volume convention defines learning.

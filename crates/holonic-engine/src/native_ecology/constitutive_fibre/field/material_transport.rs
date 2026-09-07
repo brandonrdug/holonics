@@ -213,16 +213,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .history
             .get(occurrence)
             .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
-        event
-            .transport
-            .as_ref()
-            .map(|report| {
-                self.relation
-                    .surface
-                    .detach_section(report, 64)
-                    .map_err(Into::into)
-            })
-            .transpose()
+        event.transport_rest(self.relation.surface)
     }
     pub fn inspect_material_transport(
         &self,

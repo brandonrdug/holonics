@@ -38,19 +38,21 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .history
             .get(occurrence)
             .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
-        let report = event
-            .junction
-            .as_ref()
-            .ok_or(ConstitutiveFibreError::Uncertain)?;
-        self.read_differential_report(
-            report,
-            occurrence,
-            6 * self.nodes(),
-            representation.kernel().0,
-            first_complex,
-            pairs,
-        )
-        .map(Some)
+        event.with_resident(self.relation.surface, |resident| {
+            let report = resident
+                .junction
+                .as_ref()
+                .ok_or(ConstitutiveFibreError::Uncertain)?;
+            self.read_differential_report(
+                report,
+                occurrence,
+                6 * self.nodes(),
+                representation.kernel().0,
+                first_complex,
+                pairs,
+            )
+            .map(Some)
+        })
     }
 
     /// The learned transport's native material current, observed without reading its coefficient
@@ -67,11 +69,13 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .history
             .get(occurrence)
             .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
-        let Some(report) = event.transport.as_ref() else {
-            return Ok(None);
-        };
-        self.read_differential_report(report, occurrence, 2 * self.nodes(), 3, 0, pairs)
-            .map(Some)
+        event.with_resident(self.relation.surface, |resident| {
+            let Some(report) = resident.transport.as_ref() else {
+                return Ok(None);
+            };
+            self.read_differential_report(report, occurrence, 2 * self.nodes(), 3, 0, pairs)
+                .map(Some)
+        })
     }
 
     fn read_differential_report(

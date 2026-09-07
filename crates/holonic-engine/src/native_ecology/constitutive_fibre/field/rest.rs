@@ -65,10 +65,10 @@ struct Header {
     anchor_slots: Vec<Option<usize>>,
 }
 #[derive(Debug, PartialEq, Eq)]
-struct HeldRest {
-    source: ResidentSectionRest,
-    junction: Option<ResidentSectionRest>,
-    transport: Option<ResidentSectionRest>,
+pub(super) struct HeldRest {
+    pub(super) source: ResidentSectionRest,
+    pub(super) junction: Option<ResidentSectionRest>,
+    pub(super) transport: Option<ResidentSectionRest>,
 }
 
 /// Serialized chart, not another live ecology. Deliberately not Clone.
@@ -97,7 +97,7 @@ fn packed(rest: &ResidentSectionRest) -> Result<Vec<i128>, Error> {
 
 // Every admitted section in this field wire has exact i64 codewords. Store each codeword once
 // and reconstruct both identical endpoints. This does not quotient a current ball or a fibre.
-fn point_bytes(section: &ResidentSectionRest) -> Result<Vec<u8>, Error> {
+pub(super) fn point_bytes(section: &ResidentSectionRest) -> Result<Vec<u8>, Error> {
     point_section(section, section.rows, section.width)?;
     let extent = section
         .intervals
@@ -115,7 +115,7 @@ fn point_bytes(section: &ResidentSectionRest) -> Result<Vec<u8>, Error> {
     }
     Ok(bytes)
 }
-fn read_point(bytes: &[u8]) -> Result<ResidentSectionRest, Error> {
+pub(super) fn read_point(bytes: &[u8]) -> Result<ResidentSectionRest, Error> {
     if bytes.len() < 24 {
         return Err(invalid("point section header"));
     }
@@ -700,13 +700,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             history: self
                 .history
                 .iter()
-                .map(|h| {
-                    Ok(HeldRest {
-                        source: section(&h.section)?,
-                        junction: h.junction.as_ref().map(|s| section(s)).transpose()?,
-                        transport: h.transport.as_ref().map(|s| section(s)).transpose()?,
-                    })
-                })
+                .map(|h| h.rest(self.relation.surface))
                 .collect::<Result<_, Error>>()?,
         };
         rest.validate()?;
@@ -715,6 +709,39 @@ impl<'chart> NativeConstitutiveField<'chart> {
     pub fn remount(
         surface: &'chart ResidentSurface<'chart>,
         rest: NativeFieldRest,
+    ) -> Result<
+        (
+            Self,
+            Vec<Option<NativeFieldEmission>>,
+            Vec<Option<NativeFieldSourceAnchor>>,
+        ),
+        Error,
+    > {
+        Self::remount_placed(surface, rest, None)
+    }
+    /// Mount current standing and the newest source on the device, with all older numerical
+    /// carriers in a fresh exterior archive. This consumes the same complete cold rest; it does
+    /// not replay history or require the prior backing file.
+    pub fn remount_with_history_archive(
+        surface: &'chart ResidentSurface<'chart>,
+        rest: NativeFieldRest,
+        path: impl AsRef<std::path::Path>,
+    ) -> Result<
+        (
+            Self,
+            Vec<Option<NativeFieldEmission>>,
+            Vec<Option<NativeFieldSourceAnchor>>,
+        ),
+        Error,
+    > {
+        rest.validate()?;
+        let archive = FieldArchive::create(path.as_ref())?;
+        Self::remount_placed(surface, rest, Some(archive))
+    }
+    fn remount_placed(
+        surface: &'chart ResidentSurface<'chart>,
+        rest: NativeFieldRest,
+        mut archive: Option<FieldArchive>,
     ) -> Result<
         (
             Self,
@@ -794,26 +821,36 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .history
             .into_iter()
             .zip(history)
-            .map(|(event, rest)| {
+            .enumerate()
+            .map(|(at, (event, rest))| {
+                let (resident, archived) = if let Some(archive) =
+                    archive.as_mut().filter(|_| at + 1 < occurrences as usize)
+                {
+                    (None, Some(archive.append(&rest)?))
+                } else {
+                    (Some(ResidentFieldHistory::mount(surface, rest)?), None)
+                };
                 Ok(HeldField {
-                    section: surface.mount_section_rest(&rest.source)?,
+                    resident,
+                    archived,
                     lineage: event.lineage,
                     returned: event.returned,
                     frame: Rc::clone(&frames[event.frame]),
-                    junction: rest
-                        .junction
-                        .map(|s| surface.mount_section_rest(&s).map(Rc::new))
-                        .transpose()?,
-                    transport: rest
-                        .transport
-                        .map(|s| surface.mount_section_rest(&s).map(Rc::new))
-                        .transpose()?,
                 })
             })
             .collect::<Result<Vec<_>, Error>>()?;
+        if let Some(archive) = &mut archive {
+            archive.sync()?;
+            archive.note_archived_prefix(history.len().saturating_sub(1));
+        }
         let junction = if let Some(j) = h.junction {
             let current = if let Some(last) = history.last() {
-                Rc::clone(last.junction.as_ref().expect("validated junction"))
+                Rc::clone(
+                    last.resident()?
+                        .junction
+                        .as_ref()
+                        .expect("validated junction"),
+                )
             } else {
                 Rc::new(surface.mount_section_rest(&initial_junction.expect("initial junction"))?)
             };
@@ -862,6 +899,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 .collect(),
             owner,
             history,
+            archive,
             pending: None,
             junction,
             pending_junction: None,

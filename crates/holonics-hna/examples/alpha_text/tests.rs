@@ -61,25 +61,28 @@ fn partial_actual_part_keeps_its_parent_and_enacts_the_staged_symbol_once() {
     drop(reader);
     SavedTextField::read(&checkpoint)
         .unwrap()
-        .with_session(|session, _, restored, _| {
-            assert_eq!(session.field().census().deed_launches, 0);
-            let before = session.field().occurrence_count();
-            let mut reader = ExposureReader::resume(cursor).map_err(exposure_error)?;
-            let mut anchors = anchor_families
-                .into_iter()
-                .zip(restored)
-                .map(|((family, at), source)| (family, (source, at)))
-                .collect();
-            cultivate(&mut reader, session, 1, &mut records, &mut anchors)?;
-            assert_eq!(records, expected_records);
-            assert_eq!(session.field().rest(&[], &[])?, expected);
-            assert_eq!(
-                session.field().census().deed_launches as usize,
-                session.field().occurrence_count() - before
-            );
-            assert!(session.pending_symbol().is_none());
-            assert_eq!(reader.cursor().next_sequence, 2);
-            Ok(())
-        })
+        .with_session_archived(
+            dir.path().join("historical-sections"),
+            |session, _, restored, _| {
+                assert_eq!(session.field().census().deed_launches, 0);
+                let before = session.field().occurrence_count();
+                let mut reader = ExposureReader::resume(cursor).map_err(exposure_error)?;
+                let mut anchors = anchor_families
+                    .into_iter()
+                    .zip(restored)
+                    .map(|((family, at), source)| (family, (source, at)))
+                    .collect();
+                cultivate(&mut reader, session, 1, &mut records, &mut anchors)?;
+                assert_eq!(records, expected_records);
+                assert_eq!(session.field().rest(&[], &[])?, expected);
+                assert_eq!(
+                    session.field().census().deed_launches as usize,
+                    session.field().occurrence_count() - before
+                );
+                assert!(session.pending_symbol().is_none());
+                assert_eq!(reader.cursor().next_sequence, 2);
+                Ok(())
+            },
+        )
         .unwrap();
 }

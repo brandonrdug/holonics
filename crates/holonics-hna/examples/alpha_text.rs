@@ -213,6 +213,9 @@ fn cultivate(
         }
         reader.acknowledge(sequence).map_err(exposure_error)?;
         completed += 1;
+        if session.field().has_history_archive() {
+            session.archive_history()?;
+        }
     }
     Ok(())
 }
@@ -250,6 +253,14 @@ fn run_session(
     report["development_records"] = json!(&*records);
     report["development_native_until"] = json!(session.field().occurrence_count());
     report["development_census"] = json!(session.field().census());
+    report["history_placement"] = json!(session.field().history_placement());
+    report["development_section_readouts_outside_history_placement"] = json!(
+        session.field().census().section_read_outs
+            - session
+                .field()
+                .history_placement()
+                .archive_section_read_outs
+    );
     report["development_error"] = json!(developed.as_ref().err().map(ToString::to_string));
     if let Some(path) = checkpoint {
         let app = CultivationCheckpoint {
@@ -362,7 +373,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -373,6 +384,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (mut families, mut grain, mut prompt_path, mut limit, mut report_path, mut checkpoint) =
         (None, None, None, None, None, None);
     let mut inspect_all_currents = false;
+    let mut history_archive = None;
     while let Some(option) = args.next() {
         let value = args.next().ok_or("missing option value")?;
         match option.as_str() {
@@ -382,6 +394,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "--emit-symbols" => limit = Some(value.parse::<usize>()?),
             "--report" => report_path = Some(PathBuf::from(value)),
             "--checkpoint" => checkpoint = Some(PathBuf::from(value)),
+            "--history-archive" => history_archive = Some(PathBuf::from(value)),
             "--inspect-all-currents" => inspect_all_currents = value.parse::<bool>()?,
             _ => return Err(format!("unknown option {option}").into()),
         }
@@ -458,7 +471,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         report["exposure"] = json!(app.exposure);
         report["fractional_bits"] = json!(actual_grain);
         report["families_aperture"] = json!(app.records.len() + families);
-        saved.with_session(|session, stream, restored, _application| {
+        let operation = |session: &mut TextFieldSession<'_, '_>,
+                         stream: &mut holonics_hna::HnaStream,
+                         restored: Vec<NativeFieldSourceAnchor>,
+                         _application: Vec<u8>| {
             if stream.state() != &holonics_hna::HnaStreamState::default() {
                 return Err(exposure_error(
                     "batch driver cannot discard saved delivery state; use the saved-session API",
@@ -491,7 +507,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 checkpoint.as_ref(),
                 &mut report,
             )
-        })
+        };
+        match &history_archive {
+            Some(path) => saved.with_session_archived(path, operation),
+            None => saved.with_session(operation),
+        }
     } else {
         let exposure = PathBuf::from(first);
         let grain = grain.ok_or("--fractional-bits required for fresh cultivation")?;
@@ -502,6 +522,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         report["families_aperture"] = json!(families);
         let exposure = exposure.to_string_lossy().into_owned();
         with_text_field(grain, |field| {
+            if let Some(path) = &history_archive {
+                field.enable_history_archive(path)?;
+            }
             let mut session = TextFieldSession::on(field)?;
             let mut records = Vec::new();
             let mut anchors = AnchorMap::new();

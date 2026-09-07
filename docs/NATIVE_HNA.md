@@ -159,6 +159,20 @@ Use `checkpoint_stream` for live delivery; `checkpoint` declares an empty batch 
 Unknown native completion refuses persistence. The batch driver binds its exposure cursor and
 record/source population to the saved native cut, and refuses a live delivery state it cannot own.
 
+[definition] `--history-archive NEW.history` adds the field's
+[exact exterior placement](../research/records/2026-09-07_AC3_THE_COMPLETE_HISTORY_MOVES_TO_AN_EXTERIOR_CHART_AND_ITS_ADDRESSED_SOURCE_RETURNS.md).
+Completed-family history moves to the declared file only after its full carriers are durably
+written; the latest source and current standing remain resident. A later actual source handle
+remounts its original carriers without replaying development. `with_session_archived` restores
+a checkpoint with that placement directly. A `.history` file backs the live field; `.hna` still
+includes every historical payload and has no dependency on that backing path.
+
+[established-bounded; measured] The 64-family development cut uses 475,104 bytes of native resident
+payload with archived history, versus 673,556,304 bytes previously. Its final body and failed
+response remain exactly equal. This is a GPU placement result: the checkpoint loader and writer
+still materialize complete history in host memory, and history storage grows on disk. Placement
+readouts are reported separately from native operations within each family.
+
 [definition] `--inspect-all-currents true` adds complete cold junction/transport history and the
 internal-current population to this diagnostic report. Without it, those historical diagnostics
 are not read out. Development performs no per-operation numerical section readout. The

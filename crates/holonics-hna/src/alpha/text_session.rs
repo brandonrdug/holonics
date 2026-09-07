@@ -63,6 +63,12 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
     pub fn field(&self) -> &NativeConstitutiveField<'chart> {
         self.field
     }
+    /// Exterior placement at a declared application boundary. This does not enact a symbol.
+    pub fn archive_history(&mut self) -> Result<(), AlphaMaterialError> {
+        let at = self.field.occurrence_count();
+        self.field.archive_history_before(at)?;
+        Ok(())
+    }
     pub fn pending_symbol(&self) -> Option<TextSymbol> {
         self.pending.as_ref().map(|v| v.0)
     }
