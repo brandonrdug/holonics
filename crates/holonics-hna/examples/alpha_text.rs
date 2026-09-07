@@ -3,13 +3,15 @@
 use holonic_engine::native_ecology::constitutive_fibre::NativeFieldSourceAnchor;
 use holonics_hna::{
     alpha::{
-        exposure::{ExposureFamily, ExposurePartition, ExposureReader},
+        checkpoint::SavedTextField,
+        exposure::{ExposureCursor, ExposureFamily, ExposurePartition, ExposureReader},
         material::AlphaMaterialError,
         text_codec::{with_text_field, TextSymbol},
         text_session::TextFieldSession,
     },
     publish_new,
 };
+use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::{
     collections::BTreeMap,
@@ -27,13 +29,32 @@ fn exposure_error(error: impl std::fmt::Display) -> AlphaMaterialError {
     AlphaMaterialError::Exposure(error.to_string())
 }
 
+type AnchorMap = BTreeMap<ExposureFamily, (NativeFieldSourceAnchor, usize)>;
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct AnchorPosition {
+    family: ExposureFamily,
+    occurrence: usize,
+}
+#[derive(Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct CultivationCheckpoint {
+    schema: String,
+    exposure: String,
+    cursor: ExposureCursor,
+    native_until: usize,
+    records: Vec<Value>,
+    anchors: Vec<AnchorPosition>,
+}
+
 fn cultivate(
     reader: &mut ExposureReader,
     session: &mut TextFieldSession<'_, '_>,
     families: usize,
     records: &mut Vec<Value>,
+    anchors: &mut AnchorMap,
 ) -> Result<(), AlphaMaterialError> {
-    let mut anchors: BTreeMap<ExposureFamily, (NativeFieldSourceAnchor, usize)> = BTreeMap::new();
+    let mut partial = records.last().filter(|r| r["complete"] == false).cloned();
     let mut completed = 0;
     let mut last_progress = Instant::now();
     while completed < families {
@@ -59,8 +80,30 @@ fn cultivate(
             })
         });
         let parts = frame.development_parts().map_err(exposure_error)?;
-        let native_from = session.field().occurrence_count();
-        let mut part_receipts = Vec::new();
+        let resumed = partial.take();
+        if resumed
+            .as_ref()
+            .is_some_and(|r| r["sequence"] != sequence || r["family"] != json!(frame.family))
+        {
+            return Err(exposure_error(
+                "saved partial frame disagrees with exposure cursor",
+            ));
+        }
+        let native_from = resumed
+            .as_ref()
+            .and_then(|r| r["native_from"].as_u64())
+            .map_or(session.field().occurrence_count(), |v| v as usize);
+        let mut part_receipts = resumed
+            .as_ref()
+            .and_then(|r| r["parts"].as_array())
+            .cloned()
+            .unwrap_or_default();
+        let partial_part = if resumed.is_some() {
+            part_receipts.pop()
+        } else {
+            None
+        };
+        let partial_ordinal = partial_part.as_ref().and_then(|p| p["ordinal"].as_u64());
         for (part_index, part) in parts.iter().enumerate() {
             let Some(text) = &part.text else {
                 continue;
@@ -71,13 +114,39 @@ fn cultivate(
             ) {
                 continue;
             }
+            if partial_ordinal.is_some_and(|ordinal| part.ordinal < ordinal) {
+                continue;
+            }
             let parent_anchor = if part_index == 0 {
                 mounted_parent.map(|v| &v.0)
             } else {
                 None
             };
-            session.begin_part(parent_anchor)?;
-            let part_from = session.field().occurrence_count();
+            let resume_part = partial_part
+                .as_ref()
+                .filter(|p| p["ordinal"] == part.ordinal);
+            let mut skip = 0usize;
+            let part_from = if let Some(saved) = resume_part {
+                if saved["pointer"] != part.pointer
+                    || saved["native_until"].as_u64()
+                        != Some(session.field().occurrence_count() as u64)
+                {
+                    return Err(exposure_error(
+                        "partial inscription/current boundary mismatch",
+                    ));
+                }
+                skip = saved["failure"]["symbol_index"]
+                    .as_u64()
+                    .ok_or_else(|| exposure_error("missing pending symbol coordinate"))?
+                    as usize;
+                saved["native_from"]
+                    .as_u64()
+                    .ok_or_else(|| exposure_error("missing partial native start"))?
+                    as usize
+            } else {
+                session.begin_part(parent_anchor)?;
+                session.field().occurrence_count()
+            };
             let mut failure = None;
             for (symbol_index, symbol) in text
                 .bytes()
@@ -85,7 +154,20 @@ fn cultivate(
                 .chain([TextSymbol::EndPart])
                 .enumerate()
             {
-                if let Err(error) = session.receive(symbol) {
+                if symbol_index < skip {
+                    continue;
+                }
+                let result = if resume_part.is_some() && symbol_index == skip {
+                    if session.pending_symbol() != Some(symbol) {
+                        return Err(exposure_error(
+                            "saved pending symbol disagrees with source material",
+                        ));
+                    }
+                    session.retry_pending()
+                } else {
+                    session.receive(symbol)
+                };
+                if let Err(error) = result {
                     failure = Some(
                         json!({"symbol_index":symbol_index,"symbol":symbol,"error":error.to_string()}),
                     );
@@ -108,6 +190,9 @@ fn cultivate(
             }
         }
         let failed = session.pending_symbol().is_some();
+        if resumed.is_some() {
+            records.pop();
+        }
         records.push(json!({"sequence":sequence,"family":frame.family,"views":frame.views.iter().map(|v|
             json!({"event":v.event,"source":v.source,"record":v.record,"links":v.links})).collect::<Vec<_>>(),
             "parent":parent,"parent_open":parent_open,"native_from":native_from,
@@ -132,11 +217,161 @@ fn cultivate(
     Ok(())
 }
 
+#[cfg(test)]
+#[path = "alpha_text/tests.rs"]
+mod tests;
+
+fn run_session(
+    session: &mut TextFieldSession<'_, '_>,
+    reader: &mut Option<ExposureReader>,
+    cursor: &mut ExposureCursor,
+    exposure: &str,
+    families: usize,
+    records: &mut Vec<Value>,
+    anchors: &mut AnchorMap,
+    prompt: Option<&str>,
+    limit: usize,
+    inspect_all_currents: bool,
+    checkpoint: Option<&PathBuf>,
+    report: &mut Value,
+) -> Result<(), AlphaMaterialError> {
+    report["junction_solver"] = json!(session.field().junction_solver());
+    report["has_material_transport"] = json!(session.field().has_material_transport());
+    let start = Instant::now();
+    let developed = if let Some(reader) = reader.as_mut() {
+        cultivate(reader, session, families, records, anchors)
+    } else {
+        Ok(())
+    };
+    if let Some(reader) = reader.as_ref() {
+        *cursor = reader.cursor();
+    }
+    report["material_wall_seconds"] = json!(start.elapsed().as_secs_f64());
+    report["development_records"] = json!(&*records);
+    report["development_native_until"] = json!(session.field().occurrence_count());
+    report["development_census"] = json!(session.field().census());
+    report["development_error"] = json!(developed.as_ref().err().map(ToString::to_string));
+    if let Some(path) = checkpoint {
+        let app = CultivationCheckpoint {
+            schema: "holonics.text-cultivation-checkpoint.v1".into(),
+            exposure: exposure.to_owned(),
+            cursor: cursor.clone(),
+            native_until: session.field().occurrence_count(),
+            records: records.clone(),
+            anchors: anchors
+                .iter()
+                .map(|(family, (_, occurrence))| AnchorPosition {
+                    family: family.clone(),
+                    occurrence: *occurrence,
+                })
+                .collect(),
+        };
+        let encoded = serde_json::to_vec(&app).map_err(exposure_error)?;
+        let sources = anchors
+            .values()
+            .map(|(anchor, _)| anchor)
+            .collect::<Vec<_>>();
+        let start = Instant::now();
+        match session.checkpoint(path, &sources, &encoded) {
+            Ok(_) => {
+                report["model_persisted"] = json!(true);
+                report["checkpoint"] = json!(path);
+                report["checkpoint_native_occurrences"] = json!(session.field().occurrence_count());
+                report["checkpoint_boundary"] = json!(if session.pending_symbol().is_some() {
+                    "pending-development-symbol"
+                } else {
+                    "after-development-before-prompt"
+                });
+            }
+            Err(error) => report["checkpoint_error"] = json!(error.to_string()),
+        }
+        report["checkpoint_wall_seconds"] = json!(start.elapsed().as_secs_f64());
+    }
+    if developed.is_ok() && prompt.is_some() {
+        let prompt = prompt.expect("checked prompt");
+        let start = Instant::now();
+        session.begin_part(None)?;
+        let prompt_from = session.field().occurrence_count();
+        let mut prompt_error = None;
+        for symbol in prompt
+            .bytes()
+            .map(TextSymbol::Octet)
+            .chain([TextSymbol::EndPart])
+        {
+            if let Err(error) = session.receive(symbol) {
+                prompt_error = Some(error.to_string());
+                break;
+            }
+        }
+        report["prompt_native_from"] = json!(prompt_from);
+        report["prompt_native_until"] = json!(session.field().occurrence_count());
+        report["prompt_error"] = json!(prompt_error);
+        if prompt_error.is_none() {
+            let generated = session.generate(limit);
+            report["utf8"] = json!(std::str::from_utf8(&generated.emitted_octets).ok());
+            report["utf8_error"] = json!(std::str::from_utf8(&generated.emitted_octets)
+                .err()
+                .map(|e| e.to_string()));
+            report["generation"] = json!(generated);
+        }
+        report["prompt_and_emission_wall_seconds"] = json!(start.elapsed().as_secs_f64());
+    }
+    let field = session.field();
+    report["final_native_census_before_diagnostics"] = json!(field.census());
+    let start = Instant::now();
+    let final_occurrence = field.occurrence_count().checked_sub(1);
+    report["body"] = json!({"occurrences":field.occurrence_count(),
+            "lineage":(0..field.occurrence_count()).map(|i| field.lineage(i)).collect::<Vec<_>>(),
+            "pending_lineage":field.pending_lineage(),"pending_symbol":session.pending_symbol(),
+            "held":section(field.inspect_held()?),"relation":section(field.inspect_relation()?),
+            "junction_covariance":field.inspect_junction_covariance()?.map(section),
+            "final_junction":final_occurrence.map(|i| field.inspect_junction(i)).transpose()?.flatten().map(section),
+            "material_transport":field.inspect_material_transport_state()?,
+            "internal_current_enclosures":if inspect_all_currents { field.inspect_internal_current_enclosures()? } else { None }});
+    // Only cold diagnostics copy numerical emission carriers. Product steps above read the
+    // four differential masks and retain all junction reports on the device.
+    let emitted_at = report["generation"]["readings"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|reading| reading["native"]["occurrence"].as_u64())
+        .map(|at| at as usize)
+        .collect::<Vec<_>>();
+    let mut emission_currents = Vec::new();
+    for at in emitted_at {
+        emission_currents.push(
+            json!({"occurrence":at,"junction":field.inspect_junction(at)?.map(section),
+                    "transport":field.inspect_material_transport_wire(at)?.map(section)}),
+        );
+    }
+    report["emission_current_history"] = json!(emission_currents);
+    if inspect_all_currents {
+        let mut history = Vec::new();
+        for at in 0..field.occurrence_count() {
+            history.push(
+                json!({"occurrence":at,"junction":field.inspect_junction(at)?.map(section),
+                    "transport":field.inspect_material_transport_wire(at)?.map(section)}),
+            );
+        }
+        report["junction_history"] = json!(history);
+    }
+    report["diagnostics_wall_seconds"] = json!(start.elapsed().as_secs_f64());
+    report["exposure_cursor"] = json!(cursor);
+    Ok(())
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let exposure = PathBuf::from(args.next().ok_or("usage: alpha_text EXPOSURE --families N --fractional-bits G --prompt FILE --emit-symbols N --report NEW.json")?);
-    let (mut families, mut grain, mut prompt_path, mut limit, mut report_path) =
-        (None, None, None, None, None);
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna]")?;
+    let resume = if first == "--resume" {
+        Some(PathBuf::from(
+            args.next().ok_or("missing resume checkpoint")?,
+        ))
+    } else {
+        None
+    };
+    let (mut families, mut grain, mut prompt_path, mut limit, mut report_path, mut checkpoint) =
+        (None, None, None, None, None, None);
     let mut inspect_all_currents = false;
     while let Some(option) = args.next() {
         let value = args.next().ok_or("missing option value")?;
@@ -146,107 +381,147 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "--prompt" => prompt_path = Some(PathBuf::from(value)),
             "--emit-symbols" => limit = Some(value.parse::<usize>()?),
             "--report" => report_path = Some(PathBuf::from(value)),
+            "--checkpoint" => checkpoint = Some(PathBuf::from(value)),
             "--inspect-all-currents" => inspect_all_currents = value.parse::<bool>()?,
             _ => return Err(format!("unknown option {option}").into()),
         }
     }
-    let families = families
-        .filter(|n| *n > 0)
-        .ok_or("positive --families required")?;
-    let grain = grain.ok_or("--fractional-bits required")?;
-    let limit = limit.ok_or("--emit-symbols required; interruption does not mean completion")?;
-    let prompt_path = prompt_path.ok_or("--prompt required")?;
+    let families = families.unwrap_or(0);
+    if resume.is_none() && families == 0 {
+        return Err("fresh cultivation requires positive --families".into());
+    }
+    if prompt_path.is_none() && checkpoint.is_none() && (resume.is_none() || families > 0) {
+        return Err("supply a prompt or a checkpoint destination".into());
+    }
+    let limit = if prompt_path.is_some() {
+        limit.ok_or("--emit-symbols required for a prompt")?
+    } else {
+        0
+    };
+    let prompt = prompt_path
+        .as_ref()
+        .map(std::fs::read_to_string)
+        .transpose()?;
     let report_path = report_path.ok_or("--report required")?;
-    let prompt = std::fs::read_to_string(&prompt_path)?;
-    let mut reader = ExposureReader::open(&exposure)?;
-    let mut report = json!({"schema":"holonics.alpha-text-study.v1","exposure":exposure,"families_aperture":families,
-        "fractional_bits":grain,"prompt_path":prompt_path,"prompt":prompt,"symbol_work_limit":limit,
-        "model_persisted":false,"language_quality_established":false});
-    report["all_currents_requested"] = json!(inspect_all_currents);
-    let native_result = with_text_field(grain, |field| {
-        let mut session = TextFieldSession::on(field)?;
-        report["junction_solver"] = json!(session.field().junction_solver());
-        report["has_material_transport"] = json!(session.field().has_material_transport());
-        let mut records = Vec::new();
-        let start = Instant::now();
-        let developed = cultivate(&mut reader, &mut session, families, &mut records);
-        report["material_wall_seconds"] = json!(start.elapsed().as_secs_f64());
-        report["development_records"] = json!(records);
-        report["development_native_until"] = json!(session.field().occurrence_count());
-        report["development_census"] = json!(session.field().census());
-        report["development_error"] = json!(developed.as_ref().err().map(ToString::to_string));
-        if developed.is_ok() {
-            let start = Instant::now();
-            session.begin_part(None)?;
-            let prompt_from = session.field().occurrence_count();
-            let mut prompt_error = None;
-            for symbol in prompt
-                .bytes()
-                .map(TextSymbol::Octet)
-                .chain([TextSymbol::EndPart])
+    let mut report = json!({"schema":"holonics.alpha-text-study.v1","prompt_path":prompt_path,"prompt":prompt,
+        "symbol_work_limit":limit,"model_persisted":false,"language_quality_established":false,
+        "all_currents_requested":inspect_all_currents,"additional_families_requested":families});
+    let native_result = if let Some(path) = resume {
+        let saved = SavedTextField::read(&path)?;
+        let mut app: CultivationCheckpoint = serde_json::from_slice(saved.application_state())?;
+        if app.schema != "holonics.text-cultivation-checkpoint.v1"
+            || app.native_until != saved.occurrences()
+            || app.anchors.len() != saved.external_anchor_occurrences().len()
+            || app
+                .anchors
+                .iter()
+                .zip(saved.external_anchor_occurrences())
+                .any(|(a, b)| Some(a.occurrence) != *b)
+        {
+            return Err("saved cultivation/capability boundary mismatch".into());
+        }
+        let mut recorded = BTreeMap::new();
+        let mut prior_end = 0u64;
+        for record in &app.records {
+            let family: ExposureFamily = serde_json::from_value(record["family"].clone())?;
+            let from = record["native_from"]
+                .as_u64()
+                .ok_or("missing native record start")?;
+            let end = record["native_until"]
+                .as_u64()
+                .ok_or("missing native record end")?;
+            if from != prior_end
+                || end < from
+                || recorded
+                    .insert(family, (end, record["complete"] == true))
+                    .is_some()
             {
-                if let Err(error) = session.receive(symbol) {
-                    prompt_error = Some(error.to_string());
-                    break;
-                }
+                return Err("saved record population or chronology mismatch".into());
             }
-            report["prompt_native_from"] = json!(prompt_from);
-            report["prompt_native_until"] = json!(session.field().occurrence_count());
-            report["prompt_error"] = json!(prompt_error);
-            if prompt_error.is_none() {
-                let generated = session.generate(limit);
-                report["utf8"] = json!(std::str::from_utf8(&generated.emitted_octets).ok());
-                report["utf8_error"] = json!(std::str::from_utf8(&generated.emitted_octets)
-                    .err()
-                    .map(|e| e.to_string()));
-                report["generation"] = json!(generated);
+            prior_end = end;
+        }
+        let mut families_seen = std::collections::BTreeSet::new();
+        if prior_end != app.native_until as u64
+            || app.anchors.iter().any(|a| {
+                !families_seen.insert(a.family.clone())
+                    || recorded.get(&a.family) != Some(&(a.occurrence as u64 + 1, true))
+            })
+        {
+            return Err("saved parent/source record boundary mismatch".into());
+        }
+        let actual_grain = saved.fractional_bits()?;
+        if grain.is_some_and(|g| g != actual_grain) {
+            return Err("resume cannot silently change the saved numerical chart".into());
+        }
+        report["resumed_from"] = json!(path);
+        report["resume_native_from"] = json!(saved.occurrences());
+        report["exposure"] = json!(app.exposure);
+        report["fractional_bits"] = json!(actual_grain);
+        report["families_aperture"] = json!(app.records.len() + families);
+        saved.with_session(|session, stream, restored, _application| {
+            if stream.state() != &holonics_hna::HnaStreamState::default() {
+                return Err(exposure_error(
+                    "batch driver cannot discard saved delivery state; use the saved-session API",
+                ));
             }
-            report["prompt_and_emission_wall_seconds"] = json!(start.elapsed().as_secs_f64());
-        }
-        let field = session.field();
-        report["final_native_census_before_diagnostics"] = json!(field.census());
-        let start = Instant::now();
-        let final_occurrence = field.occurrence_count().checked_sub(1);
-        report["body"] = json!({"occurrences":field.occurrence_count(),
-            "lineage":(0..field.occurrence_count()).map(|i| field.lineage(i)).collect::<Vec<_>>(),
-            "pending_lineage":field.pending_lineage(),"pending_symbol":session.pending_symbol(),
-            "held":section(field.inspect_held()?),"relation":section(field.inspect_relation()?),
-            "junction_covariance":field.inspect_junction_covariance()?.map(section),
-            "final_junction":final_occurrence.map(|i| field.inspect_junction(i)).transpose()?.flatten().map(section),
-            "material_transport":field.inspect_material_transport_state()?,
-            "internal_current_enclosures":if inspect_all_currents { field.inspect_internal_current_enclosures()? } else { None }});
-        // Only cold diagnostics copy numerical emission carriers. Product steps above read the
-        // four differential masks and retain all junction reports on the device.
-        let emitted_at = report["generation"]["readings"]
-            .as_array()
-            .into_iter()
-            .flatten()
-            .filter_map(|reading| reading["native"]["occurrence"].as_u64())
-            .map(|at| at as usize)
-            .collect::<Vec<_>>();
-        let mut emission_currents = Vec::new();
-        for at in emitted_at {
-            emission_currents.push(
-                json!({"occurrence":at,"junction":field.inspect_junction(at)?.map(section),
-                    "transport":field.inspect_material_transport_wire(at)?.map(section)}),
-            );
-        }
-        report["emission_current_history"] = json!(emission_currents);
-        if inspect_all_currents {
-            let mut history = Vec::new();
-            for at in 0..field.occurrence_count() {
-                history.push(
-                    json!({"occurrence":at,"junction":field.inspect_junction(at)?.map(section),
-                    "transport":field.inspect_material_transport_wire(at)?.map(section)}),
-                );
-            }
-            report["junction_history"] = json!(history);
-        }
-        report["diagnostics_wall_seconds"] = json!(start.elapsed().as_secs_f64());
-        Ok(())
-    });
+            report["remount_native_deeds"] = json!(session.field().census().deed_launches);
+            let mut anchors = app
+                .anchors
+                .into_iter()
+                .zip(restored)
+                .map(|(a, handle)| (a.family, (handle, a.occurrence)))
+                .collect();
+            // Inference-only resume never opens the original exposure source.
+            let mut reader = if families > 0 {
+                Some(ExposureReader::resume(app.cursor.clone()).map_err(exposure_error)?)
+            } else {
+                None
+            };
+            run_session(
+                session,
+                &mut reader,
+                &mut app.cursor,
+                &app.exposure,
+                families,
+                &mut app.records,
+                &mut anchors,
+                prompt.as_deref(),
+                limit,
+                inspect_all_currents,
+                checkpoint.as_ref(),
+                &mut report,
+            )
+        })
+    } else {
+        let exposure = PathBuf::from(first);
+        let grain = grain.ok_or("--fractional-bits required for fresh cultivation")?;
+        let mut reader = Some(ExposureReader::open(&exposure)?);
+        let mut cursor = reader.as_ref().unwrap().cursor();
+        report["exposure"] = json!(exposure);
+        report["fractional_bits"] = json!(grain);
+        report["families_aperture"] = json!(families);
+        let exposure = exposure.to_string_lossy().into_owned();
+        with_text_field(grain, |field| {
+            let mut session = TextFieldSession::on(field)?;
+            let mut records = Vec::new();
+            let mut anchors = AnchorMap::new();
+            run_session(
+                &mut session,
+                &mut reader,
+                &mut cursor,
+                &exposure,
+                families,
+                &mut records,
+                &mut anchors,
+                prompt.as_deref(),
+                limit,
+                inspect_all_currents,
+                checkpoint.as_ref(),
+                &mut report,
+            )
+        })
+    };
     report["native_error"] = json!(native_result.as_ref().err().map(ToString::to_string));
-    report["exposure_cursor"] = json!(reader.cursor());
     publish_new(&report_path, |file| {
         #[cfg(unix)]
         {
@@ -263,10 +538,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "development_native_until":report["development_native_until"],
         "emitted_octets":report["generation"]["emitted_octets"].as_array().map(Vec::len),
         "disposition":report["generation"]["disposition"],"native_error":report["native_error"],
-        "development_error":report["development_error"],"model_persisted":false})
+        "development_error":report["development_error"],"model_persisted":report["model_persisted"],
+        "checkpoint":report["checkpoint"],"checkpoint_error":report["checkpoint_error"]})
     );
     native_result?;
-    for key in ["development_error", "prompt_error"] {
+    for key in ["development_error", "prompt_error", "checkpoint_error"] {
         if let Some(error) = report[key].as_str() {
             return Err(error.to_owned().into());
         }

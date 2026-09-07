@@ -190,6 +190,13 @@ impl HnaStream {
         Ok(())
     }
 
+    /// Drain an already-produced frame without reading or executing any request. This is the
+    /// same delivery boundary used by the session pumps, also available to other native clients.
+    pub fn drain_pending(&mut self, output: &mut impl Write) -> Result<(), HnaStreamError> {
+        self.state.validate()?;
+        self.drain(output)
+    }
+
     fn pump_target(
         &mut self,
         target: &mut impl StreamTarget,

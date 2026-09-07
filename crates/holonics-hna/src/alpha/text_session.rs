@@ -8,8 +8,7 @@ use super::{
     },
 };
 use holonic_engine::native_ecology::constitutive_fibre::{
-    NativeConstitutiveField, NativeFieldContinuation, NativeFieldOccurrence,
-    NativeFieldSourceAnchor,
+    NativeConstitutiveField, NativeFieldEmission, NativeFieldOccurrence, NativeFieldSourceAnchor,
 };
 use serde::Serialize;
 
@@ -33,11 +32,16 @@ pub struct TextGeneration {
     pub pending_return: Option<TextSymbol>,
 }
 
+pub(super) struct TextFieldSource {
+    pub(super) source: NativeFieldEmission,
+    pub(super) occurrence: usize,
+}
+
 pub struct TextFieldSession<'field, 'chart> {
-    field: &'field mut NativeConstitutiveField<'chart>,
-    latest: Option<NativeFieldContinuation>,
-    next_anchor: Option<NativeFieldSourceAnchor>,
-    pending: Option<(TextSymbol, NativeFieldOccurrence)>,
+    pub(super) field: &'field mut NativeConstitutiveField<'chart>,
+    pub(super) latest: Option<TextFieldSource>,
+    pub(super) next_anchor: Option<NativeFieldSourceAnchor>,
+    pub(super) pending: Option<(TextSymbol, NativeFieldOccurrence)>,
 }
 
 impl<'field, 'chart> TextFieldSession<'field, 'chart> {
@@ -85,6 +89,12 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
         Ok(self.field.retain_source(&latest.source)?)
     }
     pub fn receive(&mut self, symbol: TextSymbol) -> Result<(), AlphaMaterialError> {
+        self.stage(symbol)?;
+        self.retry_pending()
+    }
+    /// Retain one decoded exterior symbol and its actual source before native enactment.
+    /// This boundary can be checkpointed; another input cannot overwrite it.
+    pub fn stage(&mut self, symbol: TextSymbol) -> Result<(), AlphaMaterialError> {
         if self.pending.is_some() {
             return Err(AlphaMaterialError::Apparatus(
                 "native reception is pending".into(),
@@ -98,7 +108,7 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
             NativeFieldOccurrence::entering(symbol.inputs())
         };
         self.pending = Some((symbol, occurrence));
-        self.retry_pending()
+        Ok(())
     }
     /// A known arithmetic refusal keeps this exact occurrence; unknown completion is refused
     /// by the native owner. No symbol is changed, and no successful occurrence is replayed.
@@ -108,7 +118,10 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
             .as_mut()
             .ok_or_else(|| AlphaMaterialError::Apparatus("no pending native reception".into()))?;
         let next = self.field.advance_resident(occurrence)?;
-        self.latest = Some(next);
+        self.latest = Some(TextFieldSource {
+            occurrence: next.lineage.occurrence,
+            source: next.source,
+        });
         self.pending = None;
         Ok(())
     }
@@ -128,7 +141,7 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
                 );
                 break;
             };
-            let reading = match read_text_symbol(self.field, latest.lineage.occurrence) {
+            let reading = match read_text_symbol(self.field, latest.occurrence) {
                 Ok(reading) => reading,
                 Err(error) => {
                     result.disposition =

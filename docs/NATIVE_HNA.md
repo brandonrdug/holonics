@@ -114,8 +114,8 @@ general measurement of completed thought. UTF-8 validity is checked separately.
 [established-bounded; measured] The first text run binds three recorded replies to their actual
 common request source and then presents a fresh mathematics question. It emits 64 copies of `d`
 and is interrupted without a completion marker. The [return record](../research/records/2026-09-06_AC1_THE_SHARED_SOURCE_MEETS_AN_EXPLICIT_TEXT_CURRENT_RECEIVER.md)
-retains the output, the distinct currents behind it and the verification scope. This prototype
-has not produced a useful alpha response or a durable model artifact.
+retains the output, the distinct currents behind it and the verification scope. This first run
+produced neither a useful alpha response nor a durable model artifact.
 
 [established-bounded; measured] The [learned transport return](../research/records/2026-09-07_AC2_THE_RETAINED_CONTEXT_RECEIVES_A_NATIVE_MATERIAL_TRANSPORT.md)
 now distinguishes retained contextual sources with equal raw endpoints. Its first actual
@@ -124,20 +124,40 @@ no text. This is preserved as a failed response while broader cultivation contin
 
 [established-bounded; measured] The subsequent 64-family run completes 18,476 developmental
 operations, then emits `Dq~` and encounters reserved word 261. This also fails the request.
-It retains a diagnostic report and verified source/current trace; durable model continuation
-and useful broader conduct remain construction work.
+It retained a diagnostic report and verified source/current trace. The subsequent
+[field persistence return](../research/records/2026-09-07_AC3_THE_CULTIVATED_FIELD_RESTARTS_WITHOUT_SOURCE_REPLAY.md)
+adds durable native continuation; useful broader conduct remains construction work.
 
 ```sh
 cargo build -p holonics-hna --example alpha_text
 target/debug/examples/alpha_text .local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl --families 4 --fractional-bits 72 --prompt .local/artifacts/athena-alpha/ac2/first-request.txt --emit-symbols 64 --report .local/artifacts/athena-alpha/ac2/new-text-study.json
+target/debug/examples/alpha_text .local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl --families 4 --fractional-bits 72 --checkpoint .local/artifacts/athena-alpha/new-field.hna --report .local/artifacts/athena-alpha/new-development.json
+target/debug/examples/alpha_text --resume .local/artifacts/athena-alpha/new-field.hna --families 0 --prompt .local/artifacts/athena-alpha/ac2/first-request.txt --emit-symbols 64 --report .local/artifacts/athena-alpha/new-inference.json
 ```
 
-[definition] Supply a UTF-8 prompt file and a fresh private report path. The driver admits common
+[definition] Supply a UTF-8 prompt file or a checkpoint destination, and a fresh private report
+path. The driver admits common
 development material, preserves source coordinates and open parent conditions, and samples actual
 native emission. Multiple parent families require a wider contextual port and remain unbound;
-the driver never picks one by ordering the links. The field is currently in-process only: this
-command freshly cultivates its declared slice and publishes a diagnostic report, not a checkpoint
-or an interactive consumer release.
+the driver never picks one by ordering the links. `--checkpoint` saves the actual development
+boundary before an optional prompt. `--resume` consumes that cold chart into one continuing owner;
+`--families N` then admits N additional development families. With zero additional families the
+driver never opens the original exposure. Fresh destinations are required; a resume cannot
+silently change the saved numerical grain. This batch driver is not an interactive consumer release.
+
+[definition] `NativeFieldRest` retains the current seed, memory, relation, covariance, full
+junction/transport history, numerical residuals, frames and actual supplied source capabilities.
+Remount installs those sections without native replay. Its compact wire stores each exact i64
+codeword once, rebuilding identical interval endpoints; current radii and separating histories
+remain. Structural validation and a wire checksum do not authenticate an externally invented history.
+
+[definition] `alpha::checkpoint::SavedTextField` adds the actual latest or staged text source,
+shared parent anchors, application bytes and `HnaStreamState`. `with_session` restores them together.
+Use `checkpoint_stream` for live delivery; `checkpoint` declares an empty batch delivery state.
+`TextFieldSession::stage` retains an unexecuted symbol, and `retry_pending` enacts that exact input.
+`HnaStream::drain_pending` delivers an already-produced frame without executing another request.
+Unknown native completion refuses persistence. The batch driver binds its exposure cursor and
+record/source population to the saved native cut, and refuses a live delivery state it cannot own.
 
 [definition] `--inspect-all-currents true` adds complete cold junction/transport history and the
 internal-current population to this diagnostic report. Without it, those historical diagnostics

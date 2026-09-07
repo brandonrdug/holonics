@@ -10,7 +10,7 @@ use serde::Serialize;
 pub const TEXT_BIT_PAIRS: usize = 9;
 pub const TEXT_INPUT_CHANNELS: usize = 2 * TEXT_BIT_PAIRS;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(tag = "kind", content = "value", rename_all = "kebab-case")]
 pub enum TextSymbol {
     Octet(u8),

@@ -19,6 +19,7 @@ mod junction;
 mod material_transport;
 mod receiver;
 mod rechart;
+mod rest;
 pub use junction::{
     NativeFieldCurrentBall, NativeFieldEnclosedJunctionReading, NativeFieldExactJunctionReading,
     NativeFieldInternalCurrent, NativeFieldInternalCurrentBall, NativeFieldJunctionReading,
@@ -31,6 +32,7 @@ pub use material_transport::{
     NativeFieldMaterialTransportResidual, NativeFieldMaterialTransportState,
 };
 pub use receiver::NativeFieldDifferentialReading;
+pub use rest::NativeFieldRest;
 
 /// One actual emitted source from this live body. It is linear; the caller cannot manufacture
 /// it from an occurrence number or duplicate it for another receiving edge.
@@ -48,7 +50,7 @@ pub struct NativeFieldSourceAnchor {
     occurrence: usize,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum NativeFieldSourceContact {
     Emission,
@@ -92,12 +94,18 @@ impl NativeFieldOccurrence {
     pub fn take_source(&mut self) -> Option<NativeFieldEmission> {
         self.source.take()
     }
+    pub fn source_ref(&self) -> Option<&NativeFieldEmission> {
+        self.source.as_ref()
+    }
+    pub fn anchor_ref(&self) -> Option<&NativeFieldSourceAnchor> {
+        self.anchor.as_ref()
+    }
     pub fn incoming(&self) -> &[NativePhaseCurrent] {
         &self.incoming
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 pub struct NativeFieldLineage {
     pub occurrence: usize,
     /// Producing chart in this body's frame chronology, never a contextual identity.

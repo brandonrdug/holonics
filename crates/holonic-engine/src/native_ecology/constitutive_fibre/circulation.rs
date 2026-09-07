@@ -7,7 +7,7 @@
 use super::*;
 
 mod rechart;
-mod rest;
+pub(super) mod rest;
 use crate::dimensional_wave::ExactComplexWaveCurrent;
 pub(super) use rechart::HeldCurrentFrame;
 pub use rechart::{NativeCurrentFrame, NativeIncidenceChange, NativeRechartReceipt};

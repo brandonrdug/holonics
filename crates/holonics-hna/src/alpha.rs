@@ -5,6 +5,7 @@
 //! receiver. The first native text return repeats a byte; useful contextual conversation remains
 //! construction in the active Athena-alpha blueprint.
 
+pub mod checkpoint;
 pub mod exposure;
 pub mod material;
 pub mod text_codec;

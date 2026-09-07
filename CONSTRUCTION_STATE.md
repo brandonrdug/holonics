@@ -47,55 +47,43 @@ comparison, the public cold Rust reader, actual process-separated cursor continu
 tests and nine Rust reader tests passed. No native model was executed.
 
 [established-bounded; measured] AC1's [enclosed native junction](research/records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md)
-now carries actual material through learned contact moments and retained internal current, with
-full numerical residuals and an executable exact residual decoder. All four selected conversation
-families, 728 operations and 724 contacts completed without refusal. All 728 native certificates
-pass; the first 25 exact currents and 300 internal-current anchors are enclosed. Forty-nine native
-fibre/circulation/field controls pass. The new representation crosses the old word failure at
-occurrence 6 without sealing a numerical center as an exact current.
+retains full material fields, contact moments, internal current and an executable exact residual
+decoder. Resident continuation performs no per-operation numerical section readout.
+[Shared source anchors](research/records/2026-09-06_AC1_THE_SHARED_SOURCE_MEETS_AN_EXPLICIT_TEXT_CURRENT_RECEIVER.md)
+bind actual common-parent replies; the octet/end-of-part chart presents differential current.
+The [balanced factorization](research/records/2026-09-07_AC1_THE_BALANCED_FACTOR_RETURNS_THE_FULL_CURRENT_AND_THE_CODEC_OWES_ITS_OWN_TRANSPORT.md)
+reduces numerical work while retaining the complete root current and residual.
 
-[established-bounded; measured] Native controls retain actual delayed sources, full root rechart
-transport and same-input contextual differences under equal moments/raw fields. Cooperative LDL
-rows preserve the complete body and history bit-for-bit. The resident continuation now completes
-the same material with zero numerical section readouts during admission, retaining its complete
-obstruction receipts. Terminal diagnostics preserve the same body and
-separate material work, observation and I/O costs. The [current record](research/records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md)
-retains those costs and the earlier exact-chart obstruction at its proper scope.
+[established-bounded; measured] The [native material transport](research/records/2026-09-07_AC2_THE_RETAINED_CONTEXT_RECEIVES_A_NATIVE_MATERIAL_TRANSPORT.md)
+receives the retained contextual source and old forward carrier, preserves chronology and stages
+its parameter return with the encoder. Equal raw endpoints with distinct retained contextual
+currents produce distinct learned transport. All 794 full encoder/transport certificates pass in
+the first four-family run. The broader run completed 18,476 developmental operations across 64
+families without refusal. Those records retain exact source/current scope and costs.
 
-[established-bounded; measured] The [shared-source/text-current return](research/records/2026-09-06_AC1_THE_SHARED_SOURCE_MEETS_AN_EXPLICIT_TEXT_CURRENT_RECEIVER.md)
-binds three replies to one immutable request source without cloning the ecology. Its 18-port
-octet/end-of-part chart receives the same four families in 732 operations; a terminal differential
-receiver presents native current as codewords. Thirty field and thirteen data/codec controls pass.
+[counterexample; measured] The initial text receiver repeated `d`; the learned transport's first
+four-family response emits no bytes and stops at reserved word 373. The 64-family response emits
+`Dq~` and stops at reserved word 261. These outputs fail the fresh function/derivative request;
+none establishes useful alpha conduct.
 
-[counterexample; measured] On a fresh function/derivative question, this first composition emits
-64 copies of `d` and reaches its work limit without a completion marker. All 63 consecutive
-current pairs remain certifiably distinct behind that repeated surface. The source/current
-comparison retains the failure and exact self-return chronology; this is not a useful alpha reply.
-
-[established-bounded; measured] The [balanced factorization](research/records/2026-09-07_AC1_THE_BALANCED_FACTOR_RETURNS_THE_FULL_CURRENT_AND_THE_CODEC_OWES_ITS_OWN_TRANSPORT.md)
-uses a checked smaller matrix while retaining the complete root covariance, both complex
-components and full residual. Native controls reconstruct the same exact current through rechart
-and shared-source reception; ineligible structure uses the full solver. The text return still
-repeats `d`. All 858 full-root certificates pass; development time is 17.00 seconds versus
-24.35 seconds previously. The four material endpoints have identical raw fields but distinct
-retained contextual currents. This changes numerical work and identifies the richer source port;
-it does not establish useful response quality.
+[established-bounded; measured] The [field persistence return](research/records/2026-09-07_AC3_THE_CULTIVATED_FIELD_RESTARTS_WITHOUT_SOURCE_REPLAY.md)
+now saves the complete native field, learned transport, actual source capabilities, text session
+and exposure cut. Actual two-plus-two-family process continuation and inference with the saved
+exposure path absent both reproduce the uninterrupted 794-current history and failed response
+exactly. Remount enacts zero native deeds. Sixty-nine native constitutive tests, two text checkpoint
+controls and seven stream tests pass; staged input and broken output survive at the SDK scope.
+An actual partial-family restart also matches an independently founded reference. The 64-family
+development checkpoint now exists at `.local/artifacts/athena-alpha/ac3/cultivated-64.hna`:
+355,146,249 bytes, 18,476 saved native occurrences. Its no-input remount preserves all lineage
+and the source cursor with zero native deeds. The subsequent diagnostic response still fails;
+that later probe successor is outside the declared saved development cut.
 
 [open] AC1 remains active. The shared endpoint port does not reconstruct a full parent history;
 wider contextual incidence and productive use of separating histories still need construction.
-A cold continuous-source-feedback candidate is numerically sensitive; its unit-series refinement
-has only a numerical comparison so far. The next binding is a native returned-current transport
-from the retained contextual field to material, with old/current forward carriers and a
-nonexpansive parameter return. The [native implementation](research/records/2026-09-07_AC2_THE_RETAINED_CONTEXT_RECEIVES_A_NATIVE_MATERIAL_TRANSPORT.md)
-and five transport controls now return, including different learned transports for equal raw
-endpoints with different retained currents and refusal after encoder staging. The first actual
-four-family run passes all 794 encoder/transport certificates but stops at reserved codeword 373;
-it emits no text. The subsequent 64-family run completes 18,476 developmental operations without
-refusal, then emits `Dq~` and stops at reserved codeword 261. Source/current inspection passes at
-its declared scope; the response remains unusable. Durable field/transport retention and lawful
-history placement are needed before further long cultivation can continue economically.
-Broader efficient cultivation, useful learned text conduct, durable native models and the full
-AC0–AC5 product remain open. The native current and the response quality retain separate grades.
+A cold continuous-source-feedback candidate remains numerically sensitive, and its unit-series
+refinement has only a numerical comparison. Lawful placement of complete historical sections is
+needed for economical broader development. Useful learned text, broad cultivation and the full
+AC0–AC5 product remain open. Persistence and numerical current claims do not grade response quality.
 
 ## Completed foundation and data preparation
 

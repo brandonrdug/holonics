@@ -74,9 +74,11 @@ keeps the complete native current under a checked balanced factorization. The
 [native material transport](../../research/records/2026-09-07_AC2_THE_RETAINED_CONTEXT_RECEIVES_A_NATIVE_MATERIAL_TRANSPORT.md)
 now receives the source-time contextual current and old forward field, retains the chronological
 change and actual returned difference, and stages its coercive parameter return with the encoder.
-Its first four-family run stops at a reserved codeword without a text response. Continue broader
-source-qualified development and inspect actual responses, while constructing durable retention
-of the cultivated owner. Preserve numerical error and complete defects; do not turn source
+Its first four-family run stops at a reserved codeword without a text response. The
+[field persistence return](../../research/records/2026-09-07_AC3_THE_CULTIVATED_FIELD_RESTARTS_WITHOUT_SOURCE_REPLAY.md)
+now retains the complete cultivated owner, source capabilities and exposure cut across processes.
+Continue broader source-qualified development and inspect actual responses, using that durable
+state and constructing lawful history placement. Preserve numerical error and complete defects; do not turn source
 uncertainty into a point. AC1–AC5 completion and the useful alpha product remain open.
 
 ## Completed September 6 synthesis before Athena-alpha cultivation

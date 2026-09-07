@@ -68,7 +68,11 @@ pub struct NativeEcologyRest {
     emissions: Vec<ResidentSectionRest>,
 }
 
-fn point_section(rest: &ResidentSectionRest, rows: usize, width: usize) -> Result<(), Error> {
+pub(in crate::native_ecology::constitutive_fibre) fn point_section(
+    rest: &ResidentSectionRest,
+    rows: usize,
+    width: usize,
+) -> Result<(), Error> {
     rest.validate().map_err(invalid)?;
     if rest.rows != rows
         || rest.width != width
@@ -343,12 +347,18 @@ impl NativeEcologyRest {
     }
 }
 
-fn blob(out: &mut impl Write, bytes: &[u8]) -> Result<(), Error> {
+pub(in crate::native_ecology::constitutive_fibre) fn blob(
+    out: &mut impl Write,
+    bytes: &[u8],
+) -> Result<(), Error> {
     out.write_all(&(bytes.len() as u64).to_le_bytes())
         .map_err(invalid)?;
     out.write_all(bytes).map_err(invalid)
 }
-fn expect(input: &mut impl Read, expected: &[u8]) -> Result<(), Error> {
+pub(in crate::native_ecology::constitutive_fibre) fn expect(
+    input: &mut impl Read,
+    expected: &[u8],
+) -> Result<(), Error> {
     let mut bytes = vec![0; expected.len()];
     input.read_exact(&mut bytes).map_err(invalid)?;
     if bytes != expected {
@@ -356,7 +366,9 @@ fn expect(input: &mut impl Read, expected: &[u8]) -> Result<(), Error> {
     }
     Ok(())
 }
-fn read_blob(input: &mut Take<impl Read>) -> Result<Vec<u8>, Error> {
+pub(in crate::native_ecology::constitutive_fibre) fn read_blob(
+    input: &mut Take<impl Read>,
+) -> Result<Vec<u8>, Error> {
     let mut length = [0; 8];
     input.read_exact(&mut length).map_err(invalid)?;
     let mut remaining = u64::from_le_bytes(length);

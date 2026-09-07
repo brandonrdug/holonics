@@ -270,6 +270,16 @@ phase does not pass on fluent inherited text, output length, nonempty bytes or a
 
 ### AC3 — Cultivated model and continuing corpus development
 
+[established-bounded; measured] The [field persistence return](../../research/records/2026-09-07_AC3_THE_CULTIVATED_FIELD_RESTARTS_WITHOUT_SOURCE_REPLAY.md)
+implements complete native/text rest, retained parent capabilities and the paired exposure cursor.
+Actual four-family process-separated continuation and source-unavailable inference match the
+uninterrupted current, lineage, learned coefficients and failed response exactly, with zero native
+deeds on remount. Staged input and partly written output also survive in the declared SDK controls.
+An actual partial-family restart matches its independent reference. The 64-family development
+artifact saves 18,476 native occurrences in 355,146,249 bytes and remounts without native replay.
+Its response still fails. This returns a durability component of AC3; useful broad cultivation and the integrated product
+remain open.
+
 [definition] Stream the declared broader development population through the same resident owner,
 retaining changed successors and available source relations. Admission/order follows source
 causality and the declared study; no shuffled-message or token-volume convention defines learning.

@@ -1,5 +1,13 @@
 # Exact passive junction observer
 
+[definition] `inspect_rest_continuation.py` compares a remounted actual text run with an
+independently executed reference: complete current/body, lineage, source cut and emitted result.
+It also checks that remount enacted zero native deeds. The
+[persistence record](../../records/2026-09-07_AC3_THE_CULTIVATED_FIELD_RESTARTS_WITHOUT_SOURCE_REPLAY.md)
+retains the actual split-process and unavailable-exposure scope. Use `python -P` for this script
+so this directory's historical `inspect.py` does not shadow Python's standard-library module.
+The checker is cold observation, never productive inference or learning.
+
 [definition] `inspect.py` is a bounded CPU observer for the proposed coupled passive junction.
 It reads the private AC1 material-history report and does not run native code, update a model,
 select a response, or invoke a proof assistant.

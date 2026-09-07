@@ -13,7 +13,7 @@ pub use enclosure::{
     NativeFieldCurrentBall, NativeFieldEnclosedJunctionReading, NativeFieldInternalCurrentBall,
 };
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(tag = "representation", rename_all = "kebab-case")]
 pub enum NativeFieldJunctionRepresentation {
     RationalWords,
@@ -21,7 +21,7 @@ pub enum NativeFieldJunctionRepresentation {
 }
 
 /// Numerical factorization policy. Both policies certify the same complete root-current law.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum NativeFieldJunctionSolver {
     Full,
