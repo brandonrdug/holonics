@@ -223,3 +223,79 @@ SQLite dataset or its JSONL exports. The planned desktop conversation campaign u
 local artifacts above. A MacBook checkout has the source, documentation and imported research
 evidence without transferring the retired side database. Private conversation data, model rests
 and other ignored artifacts require separate intentional transfer if later needed there.
+
+## Athena-alpha causal exposure
+
+[definition] The active [Athena-alpha blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
+uses a separate occurrence stream, `holonics.conversation-exposure.v1`. The existing comparison
+export remains a comparison artifact; it must not be fed wholesale as an earlier model input.
+The new stream emits each provider-declared occurrence family once, with all captured views,
+so a request, an agent's progress/final responses and later human material occupy different frames.
+Unpaired visible material remains available. Grouping is by declared record ID or a distinct
+capture address, never by equal text. It is presentation grouping, not native holon identification.
+
+```sh
+python3 applications/conversation-data/conversation_data.py export-exposure \
+  .local/datasets/conversations-refined-2026-09-06.sqlite \
+  --output .local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl \
+  --development-cut 2026-09-04T00:00:00Z
+```
+
+[definition] Publication is atomic, private (`0600`) and refuses overwrite. The manifest retains
+private source paths and captured extents. Each frame has a delivery sequence, provider/record
+family, one actual capture coordinate, partition/reasons, conflicting-view evidence and all views.
+A view retains its source/record/byte range, raw and normalized timestamp, role, phase, model,
+session/branch/parent, full provider metadata (including API-generation and parent-agent origin),
+visible material parts, nonvisible part references and actual outgoing links.
+The original source package is opened read-only in one coherent transaction.
+
+[definition] Relation targets contain coordinates and time metadata only, never target text.
+`comparison-request` belongs to the actual responding agent occurrence; the later-human link
+belongs to the actual later human occurrence. A descendant's parent edge is not reversed onto
+its ancestor. Curation stays in the separately retained annotation artifact. Neither a response
+interval nor internal/tool material is silently included in a response's earlier input.
+
+[definition] The experimental temporal cut is September 4, 2026 at 00:00 UTC, declared before
+cultivation and evaluation outputs. Coherent known pre-cut families enter `development`;
+post-cut families enter `evaluation`. Missing/invalid time, contradictory order and conflicting
+times, roles or material keep the complete family `deferred`. Equivalent UTC clock presentations
+do not create a conflict. A branch label alone does not prohibit participation. Counts are not
+training weights or quality scores. Subsequent study changes must keep their source and evaluation
+boundary explicit rather than selecting development from a desired evaluation answer.
+
+[definition] `availability: prior` means the retained target metadata has an earlier normalized
+time. It does not establish semantic relevance, native contact or the provider's complete effective
+prompt. Actual parent/comparison/tool relation kinds and their evidence remain separate. The native
+consumer must resolve available material through admitted source relations or retain an open
+boundary; metadata cannot manufacture a native source handle. Recorded feedback stays attached to its
+recorded partner; it must not be relabelled as a human response to alpha's newly generated output. The raw provider timestamp remains
+source testimony; the normalized UTC field is this exterior partition/ordering chart.
+
+[established-bounded; implemented-exact] Rust consumers use
+`holonics::hna::alpha::exposure::{ExposureReader, ExposureOccurrence, ExposureCursor}`. `peek`
+retains a frame until `acknowledge(sequence)`; the saved cursor continues to name the pending
+frame until acknowledgment. Resume verifies the immutable source-file pin, frame boundary and
+sequence. Invalid frames do not advance the retained cursor. The reader checks source extents,
+view families, visible-role boundaries, temporal development admission and reference availability;
+it accepts no target text in relation metadata. `development_parts` refuses evaluation/deferred
+material and conflicting captured presentations. Full views remain attached to the common visible
+presentation. Wire validation does not authenticate an externally fabricated source history.
+
+```sh
+cargo build -p holonics-hna --example alpha_exposure
+mkdir -p .local/artifacts/athena-alpha/ac0
+target/debug/examples/alpha_exposure .local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl \
+  --frames 1024 --cursor .local/artifacts/athena-alpha/ac0/NEW-cursor.json
+target/debug/examples/alpha_exposure .local/artifacts/athena-alpha/ac0/NEW-cursor.json --resume
+```
+
+[definition] This reader and example execute no model and print no message content. Their cursor
+records cold delivery only. AC3 must pair it atomically with the actual native successor before
+claiming resumable cultivation. File readback is not a native operation or a trained checkpoint.
+
+[established-bounded; measured] The [AC0 return](../research/records/2026-09-06_AC0_THE_CONVERSATIONS_ENTER_AS_SEPARATE_OCCURRENCES_AND_THE_COLD_CURSOR_RESTARTS.md)
+contains the actual 184,572,827-byte private exposure: 36,920 families, 49,928 captured views,
+34,046 development / 1,121 evaluation / 1,753 deferred families. All 49,142 visible source events
+remain, with 786 additional captured branch-input views retained in their families. The complete
+source/parts/relations comparison and process-separated cold-reader continuation passed, along
+with 32 data tests and nine Rust reader tests. No model cultivation or alpha capability is inferred.

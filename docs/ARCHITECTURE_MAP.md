@@ -296,6 +296,14 @@ boundary preserves source records, actual user-agent comparison, distinct runtim
 source-addressed curation. It invokes no engine, learner or prover; see the
 [data guide](CONVERSATION_DATA.md). This is an exterior data owner, not a second HNA engine.
 
+[established-bounded; implemented-exact] `applications/conversation-data/exposure.py` now emits
+separate source-qualified occurrence families, with development/evaluation/deferred boundaries,
+full captured views and metadata-only source links. `holonics-hna::alpha::exposure` is its typed
+cold reader and immutable-file cursor; `alpha_exposure` demonstrates cold inspection/restart.
+The [data guide](CONVERSATION_DATA.md#athena-alpha-causal-exposure) states the actual artifact and
+checks. These owners supply no native current or learned model; AC1 owns that attachment.
+
+
 | Application relation | Exterior owner | Engine/application owners | Status and exact open fibre |
 |---|---|---|---|
 | Persistent morphology-variant workspace | `crates/holonics-workspace/src/{artifact,evaluation,manifest,workspace}.rs`; `applications/holonics-workbench/src/adapters/workspace.rs` | admitted dismantling return -> earlier `AthenaAlphaApplication` adapter -> bounded circulation/cultivation/snapshot/evaluation -> package export | **exact-bounded application lifecycle, not attained Athena-alpha:** explicit-root manifest and artifacts return native snapshot import, resolved experiments, persisted conduct and actual continuation, staged candidate, atomic commit/decline, current-withdrawn-restored evaluation, and exact ONNX/Safetensors round trips. The CLI resolves the visible root from `--root` or the current directory. Open fibres are raw model-directory lift, qualitative multimodal emission, and persistent configurable diffusion. [2026-09-03: the per-event construction departed under SKE4 and `lift-gemma-receipt` went with it; the workspace is founded by `import-snapshot`.] |

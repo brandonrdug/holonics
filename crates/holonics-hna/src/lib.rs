@@ -4,6 +4,7 @@
 //! distinct artifact scopes and wire names. Native laws remain owned by `holonic-engine`, `life`,
 //! and `holonics-circulation-abi`; this crate does not supply a second learning mechanism.
 
+pub mod alpha;
 mod apertures;
 mod application;
 mod checkpoint;

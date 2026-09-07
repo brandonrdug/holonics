@@ -1,7 +1,8 @@
 # Construction state
 
 **Currency:** September 6, 2026. **Active goal:** construct and complete the deposited Athena-alpha
-cultivation blueprint. **Position:** design deposited; AC0 starts. **Athena-alpha:** not yet attained.
+cultivation blueprint. **Position:** AC0 complete at cold exposure scope; AC1 active.
+**Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct
@@ -84,6 +85,19 @@ The [repository evidence protocol](docs/AGENT_PROTOCOL.md) replaces connector/cu
 The [synthesis record](research/records/2026-09-06_REPOSITORY_SYNTHESIS_AND_PORTABLE_EVIDENCE.md)
 records the completed integration and exact verification scope. The original database and private data remain
 untouched; imported old instructions schedule nothing.
+
+[established-bounded; measured] [AC0 returned](research/records/2026-09-06_AC0_THE_CONVERSATIONS_ENTER_AS_SEPARATE_OCCURRENCES_AND_THE_COLD_CURSOR_RESTARTS.md)
+the actual 184,572,827-byte private occurrence stream: 36,920 families and all 49,142 visible
+human/agent source events, with 786 additional captured branch-input views. The declared temporal
+cut gives 34,046 development / 1,121 evaluation / 1,753 deferred families. Full source/parts/relations
+comparison, the public cold Rust reader, actual process-separated cursor continuation, 32 data
+tests and nine Rust reader tests passed. No native model was executed.
+
+[open] AC1 now composes the real material/current/formation attachment over the existing native
+owners. Fixed codeword excitation can be an exterior chart, but actual standing interaction must
+generate current. Complete branch/source/receiver fibres and actual predecessor conditions must
+survive in one resident successor. The cold source cursor is not yet paired with a cultivated
+native model; the whole AC0–AC5 goal remains active.
 
 ## Completed foundation and data preparation
 

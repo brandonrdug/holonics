@@ -116,3 +116,9 @@ failure prefix and complete successor. It cannot be replaced by dropping samples
 `.local/setup/apple-silicon/as4-*`. During integration, an agent's accidental workspace-wide
 formatting was restored outside the changed owners; the patch was retained locally. No corpus,
 user file or historical evidence was removed. The unrelated `.DS_Store` files remain unstaged.
+
+[established-bounded; source-inspected, measured] The desktop's published `5ff0b37e` AC0 exposure
+commit was integrated into this Apple branch after the continuation implementation. The merge
+preserves both the Mac position and desktop AC1 position. All nine public exposure-reader tests
+passed on macOS. No private desktop dataset was transferred, and the cold reader's arrival does
+not supply the still-open native material/formation attachment.
