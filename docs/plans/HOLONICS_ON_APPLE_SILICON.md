@@ -42,11 +42,11 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
 [definition] The resumed AS4–AS5 construction follows this order within the existing stages:
 
 1. Realize the shared resident conditional-current port on Metal: the existing constitutive
-   current, bilinear contact and whole-fibre differential kernels, their exact scratch layouts
-   and dependent launch bindings. Use the public `native_conditioned_phase` example and existing
+   current, bilinear contact, condition-Preimage-Fibre and whole-fibre differential kernels,
+   their exact scratch layouts and dependent launch bindings. Use the public `native_conditioned_phase` example and existing
    relation/contact controls to compare the inferred operator, returned currents, original
-   vertical fibres and refusal/ownership behavior with the desktop receipt. This is a device
-   composition return, not completion of acoustic development.
+   vertical fibres, inferred conditions and refusal/ownership behavior with the desktop receipt.
+   This is a device composition return, not completion of acoustic development.
 2. Bind actual acoustic sections and returns to that shared owner. Start at
    `AcousticFieldChart`, `ExactPhaseCurrentSection`, the existing clock-transport owners and
    native acoustic production/receiver boundary. Carry source support, phase, temporal order

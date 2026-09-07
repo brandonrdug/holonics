@@ -81,6 +81,9 @@ whole-fibre tests now run on Metal at the [54-test port scope](../research/recor
 That record gives the additional filters and explicitly excludes two tests whose teacher uses
 CUDA-only matrix contraction. The paired/material junction kernels also remain unported, so the
 complete constitutive filter is not a Mac parity suite. CUDA-only tests remain unavailable on Mac.
+The subsequent [condition-fibre return](../research/records/2026-09-07_APPLE_RETURNS_THE_SHARED_CONDITION_PREIMAGE_FIBRE.md)
+adds the exact inverse-query commands, 22 passing engine controls and the public example comparison.
+Its attempted public text-codec control uses an unported paired field and is not an Apple pass.
 Lean dependencies are fetched when relevant formal work requires them; no proof assistant enters
 the native runtime.
 

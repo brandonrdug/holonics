@@ -1,0 +1,42 @@
+{
+  "truth_status": "established-bounded",
+  "evidence_tags": [
+    "computational-witness"
+  ],
+  "desktop_receipt": "research/records/2026-09-07_conditional_phase/return-preimage.json",
+  "apple_receipt": "research/records/2026-09-07_apple_conditional_phase/return-preimage.json",
+  "equalities": {
+    "acoustic_model_established": true,
+    "condition_inference": true,
+    "continuation": true,
+    "continuation_work": true,
+    "conversation_quality_established": true,
+    "evidence_tags": true,
+    "learner_occurrences": true,
+    "model_persisted": true,
+    "multiplication_graph_exact": true,
+    "observations": true,
+    "receiver": true,
+    "relation": true,
+    "schema": true,
+    "source_chart": true,
+    "truth_status": true,
+    "withheld": true
+  },
+  "apple_inference_work": {
+    "deeds": 1,
+    "ingress_octets": 0,
+    "numerical_egress_octets": 0,
+    "receipt_egress_octets": 64,
+    "section_readouts": 0
+  },
+  "apple_inferred_continuation_work": {
+    "deeds": 1,
+    "ingress_octets": 4,
+    "numerical_egress_octets": 0,
+    "receipt_egress_octets": 128,
+    "section_readouts": 0
+  },
+  "apple_whole_seconds": 0.575188584,
+  "desktop_whole_seconds": 0.154013801
+}

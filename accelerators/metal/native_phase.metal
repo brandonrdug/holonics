@@ -951,6 +951,200 @@ inline W fibre_current_denominator(device const long *lo, device const long *hi,
   return fromword(lo[denominator_at]);
 }
 
+// Fixed-source condition preimage.  The graph and right-hand side are derived
+// evidence owned by this operation; the learned relation basis is read-only.
+// A refusal may leave partial derived evidence, but it never publishes a row
+// into the original basis.
+kernel void section_constitutive_condition_preimage(
+    device const long *basis [[buffer(0)]], device const long *source_lo [[buffer(1)]],
+    device const long *source_hi [[buffer(2)]], constant uint &source_at [[buffer(3)]],
+    constant uint &source_denominator_at [[buffer(4)]], constant uint &source_disposition_at [[buffer(5)]],
+    device const long *observed_lo [[buffer(6)]], device const long *observed_hi [[buffer(7)]],
+    constant uint &observed_at [[buffer(8)]], constant uint &observed_denominator_at [[buffer(9)]],
+    constant uint &observed_disposition_at [[buffer(10)]], constant uint &source_complex [[buffer(11)]],
+    constant uint &condition_complex [[buffer(12)]], constant uint &target_width [[buffer(13)]],
+    device long *graph_lo [[buffer(14)]], device long *graph_hi [[buffer(15)]],
+    device long *rhs_lo [[buffer(16)]], device long *rhs_hi [[buffer(17)]],
+    device long *output_lo [[buffer(18)]], device long *output_hi [[buffer(19)]],
+    device uint *slot [[buffer(20)]], device const uint *census [[buffer(21)]],
+    device const uint *lineage [[buffer(22)]], constant uint &lineage_count [[buffer(23)]],
+    threadgroup W *scratch [[threadgroup(0)]], uint3 tid [[thread_position_in_threadgroup]]) {
+  if (tid.x || tid.y || tid.z)
+    return;
+  if (upstream(census, lineage, lineage_count, slot))
+    return;
+
+  ulong sc = (ulong)source_complex, cc = (ulong)condition_complex;
+  ulong source_inner = sc + cc;
+  ulong mixed = sc * cc;
+  if (!source_complex || !condition_complex || !target_width || (target_width & 1u)
+      || mixed > 0x7fffffffffffffffUL
+      || source_inner > 0x7fffffffffffffffUL - mixed) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  source_inner += mixed;
+  ulong source_width64 = 2ul * source_inner;
+  if (source_width64 > 0xffffffffffffffffUL - target_width) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  ulong residual_width64 = source_width64 + target_width;
+  ulong conditions64 = 2ul * cc;
+  if (residual_width64 > 0xffffffffffffffffUL - conditions64) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  ulong width64 = residual_width64 + conditions64;
+  if (width64 > 0xfffffffbUL) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  uint source_width = (uint)source_width64;
+  uint residual_width = (uint)residual_width64;
+  uint conditions = (uint)conditions64;
+  uint width = (uint)width64;
+
+  W source_den = fibre_current_denominator(source_lo, source_hi,
+                                           source_denominator_at,
+                                           source_disposition_at, slot);
+  W observed_den = fibre_current_denominator(observed_lo, observed_hi,
+                                             observed_denominator_at,
+                                             observed_disposition_at, slot);
+  if (*slot)
+    return;
+  for (uint j = 0; j < 2u * source_complex; ++j)
+    if (source_lo[source_at + j] != source_hi[source_at + j]) {
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                               memory_order_relaxed);
+      return;
+    }
+  for (uint j = 0; j < target_width; ++j)
+    if (observed_lo[observed_at + j] != observed_hi[observed_at + j]) {
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                               memory_order_relaxed);
+      return;
+    }
+
+  threadgroup W *residual = scratch;
+  threadgroup W *formed = residual + residual_width;
+  threadgroup W *query = formed + width;
+  // The derived graph starts empty and is separate from the learned relation.
+  for (ulong j = 0; j < (ulong)width * width; ++j)
+    graph_lo[j] = graph_hi[j] = 0;
+  uint ignored_status = 0, ignored_rank = 0;
+  for (uint coordinate = 0; coordinate < conditions; ++coordinate) {
+    for (uint j = 0; j < residual_width; ++j)
+      residual[j] = wzero();
+    residual[2u * source_complex + coordinate] = source_den;
+    uint condition = coordinate / 2u;
+    uint mixed_at = 2u * (source_complex + condition_complex)
+                    + 2u * condition * source_complex;
+    for (uint s = 0; s < source_complex; ++s) {
+      W real = fromword(source_lo[source_at + 2u * s]);
+      W imaginary = fromword(source_lo[source_at + 2u * s + 1u]);
+      if (coordinate & 1u) {
+        residual[mixed_at + 2u * s] = wneg(imaginary);
+        residual[mixed_at + 2u * s + 1u] = real;
+      } else {
+        residual[mixed_at + 2u * s] = real;
+        residual[mixed_at + 2u * s + 1u] = imaginary;
+      }
+    }
+    W denominator = source_den;
+    fibre_query(basis, residual_width, residual_width, residual, &denominator,
+                (threadgroup const W *)nullptr, -1, &ignored_status, &ignored_rank, slot);
+    if (*slot)
+      return;
+    for (uint j = 0; j < width; ++j) {
+      formed[j] = wzero();
+      if (j < residual_width)
+        formed[j] = residual[j];
+      else if (j - residual_width == coordinate)
+        formed[j] = denominator;
+    }
+    long inserted = fibre_stage(graph_lo, width, formed, slot);
+    // Validate the entire staged row before adding it to the derived graph.
+    for (uint j = 0; j < width; ++j)
+      toword(formed[j], slot);
+    if (*slot)
+      return;
+    if (inserted >= 0)
+      for (uint j = 0; j < width; ++j) {
+        ulong at = (ulong)inserted * width + j;
+        graph_lo[at] = graph_hi[at] = toword(formed[j], slot);
+      }
+    if (*slot)
+      return;
+  }
+
+  // The affine constant uses the actual observed receiver and its own
+  // denominator; source and observation are never replaced by a guessed
+  // condition point.
+  W denominator = flcm(source_den, observed_den, slot);
+  for (uint j = 0; j < residual_width; ++j) {
+    residual[j] = wzero();
+    if (j < 2u * source_complex)
+      residual[j] = wmul(fromword(source_lo[source_at + j]),
+                         wdiv(denominator, source_den, slot), slot);
+    else if (j >= source_width)
+      residual[j] = wmul(fromword(observed_lo[observed_at + j - source_width]),
+                         wdiv(denominator, observed_den, slot), slot);
+  }
+  if (*slot)
+    return;
+  fibre_query(basis, residual_width, residual_width, residual, &denominator,
+              (threadgroup const W *)nullptr, -1, &ignored_status, &ignored_rank, slot);
+  if (*slot)
+    return;
+  for (uint j = 0; j < residual_width; ++j)
+    query[j] = wneg(residual[j]);
+  for (uint j = 0; j < residual_width; ++j)
+    toword(query[j], slot);
+  toword(denominator, slot);
+  if (*slot)
+    return;
+  for (uint j = 0; j < residual_width; ++j)
+    rhs_lo[j] = rhs_hi[j] = toword(query[j], slot);
+  rhs_lo[residual_width] = rhs_hi[residual_width] = toword(denominator, slot);
+  if (*slot)
+    return;
+  for (uint j = residual_width; j < width; ++j)
+    query[j] = wzero();
+  uint disposition = 0, rank = 0;
+  fibre_query(graph_lo, residual_width, width, query, &denominator,
+              (threadgroup const W *)nullptr, -1, &disposition, &rank, slot);
+  if (*slot)
+    return;
+  for (uint j = residual_width; j < width; ++j)
+    query[j] = wneg(query[j]);
+  for (uint j = 0; j < width; ++j)
+    toword(query[j], slot);
+  toword(denominator, slot);
+  if (*slot)
+    return;
+  for (uint j = 0; j < width; ++j)
+    output_lo[j] = output_hi[j] = toword(query[j], slot);
+  output_lo[width] = output_hi[width] = toword(denominator, slot);
+  output_lo[width + 1] = output_hi[width + 1] = (long)disposition;
+  output_lo[width + 2] = output_hi[width + 2] = -1;
+  output_lo[width + 3] = output_hi[width + 3] = (long)rank;
+  for (uint p = 0; p < conditions; ++p) {
+    bool occupied = graph_lo[(ulong)(residual_width + p) * width + residual_width + p] != 0;
+    for (uint j = 0; j < conditions; ++j) {
+      ulong at = (ulong)width + 4ul + (ulong)p * conditions + j;
+      long value = occupied
+          ? graph_lo[(ulong)(residual_width + p) * width + residual_width + j]
+          : 0;
+      output_lo[at] = output_hi[at] = value;
+    }
+  }
+}
+
 // The current relation consumes a source point and, when paired, a receiving
 // point. The returned section retains the original complete vertical fibre
 // before the staged row joins the continuing relation.

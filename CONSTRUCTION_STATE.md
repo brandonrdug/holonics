@@ -18,9 +18,12 @@ product sequence. AS4–AS5 remain unfinished.
 [established-bounded; measured] The [conditional Metal return](research/records/2026-09-07_APPLE_LEARNS_THE_SHARED_CONDITIONAL_PHASE_ACTION.md)
 now supplies the four shared current/contact/differential/historical-frame kernels, 54 passing
 engine controls and exact agreement with the desktop forward phase-action receipt. Prediction
-and later resident currents use zero numerical readouts. Desktop `d3820ac3` has subsequently
-published condition Preimage Fibre inference; integrating that extension is next before the
-actual acoustic condition/receiver composition. No useful acoustic or English model is claimed.
+and later resident currents use zero numerical readouts. The subsequent
+[condition-fibre integration](research/records/2026-09-07_APPLE_RETURNS_THE_SHARED_CONDITION_PREIMAGE_FIBRE.md)
+ports desktop `d3820ac3`, passes 22 engine controls and exactly matches its inferred condition,
+constraint graph and subsequent prediction. The public text-codec control reaches the known
+unported paired-field refusal. Actual acoustic interval/interaction and condition/receiver
+composition is next. No useful acoustic or English model is claimed.
 
 [established-bounded; measured] The September 7 Mac pickup integrates desktop `6ef7bf9d` with
 68 passing engine/public native tests and successful HNA library, application and shared-example
@@ -117,15 +120,23 @@ research for the common relation; the conversation product remains the goal.
 
 [established-bounded; measured] The existing local relation now learns over an explicit native
 source/condition/mixed-current contact. Six measured phase-field returns identify a local action,
-predict a new rational condition exactly, and drive three later wave currents without numerical
+predict its return under a new rational condition, and drive three later wave currents without numerical
 readback. The inferred operator itself is checked in the portable return. The 93-test constitutive
 scope and an additional multiport/denominator control pass. The condition is an independently
 supplied channel property in this experiment, not a semantic label.
 
-[open] Next construct the condition Preimage Fibre from a fixed actual source and later return
-inside the same learned relation, then use its supported consequences in continuing transport.
-For the bilinear chart this is an affine section, so it can reuse the native elimination owner.
-The appropriate binding to actual conversation material and useful text remain open.
+[established-bounded; measured] The [condition Preimage Fibre](research/records/2026-09-07_AC1_THE_LEARNED_ACTION_RETURNS_ITS_CONDITION_PREIMAGE_FIBRE.md)
+now derives compatible conditions from a fixed source and actual later return, entirely on the
+device. An unprovided phase is inferred and used to predict a later native current exactly.
+Free directions, outside-relation cases and partially known source domains survive; a plural
+condition fibre can expose a fixed receiver. All 100 constitutive tests and the public codec
+control pass. Generic receiver cuts no longer invent field source occurrences.
+
+[open] Next carry inferred condition families as continuing native standing and construct their
+joint condition/output relation for a new source, retaining unsupported domain and the complete
+Preimage Fibre. The unique-condition continuation already runs; the general forward image of a
+plural condition and the actual conversation-material binding remain unfinished. Athena-alpha
+still has no useful text response.
 
 [established-bounded; measured] The existing local relation now has a
 [resident rational-current port](research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md).

@@ -26,7 +26,10 @@ pub use circulation::*;
 mod field;
 pub use field::*;
 mod resident;
-pub use resident::{ResidentConstitutiveCurrent, ResidentConstitutiveReturn};
+pub use resident::{
+    ConditionPreimageReading, ConstitutiveDifferentialReading, ResidentConditionPreimage,
+    ResidentConstitutiveCurrent, ResidentConstitutiveReturn,
+};
 
 /// Declared local source law, bound at founding rather than inferred from an array's width.
 /// These dimensions are the caller's interface chart, not learned semantic capacities.

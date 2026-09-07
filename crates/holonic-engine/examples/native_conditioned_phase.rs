@@ -6,9 +6,9 @@ use holonic_engine::{
     dimensional_wave::ExactComplexWaveCurrent,
     embedding_fiber::ResidentReadout,
     native_ecology::constitutive_fibre::{
-        ConstitutiveFibreError, ConstitutiveReading, NativeConstitutiveField,
-        NativeFieldOccurrence, NativeJunctionSeed, NativePhaseCurrent, ResidentConstitutiveCurrent,
-        ResidentConstitutiveFibre, ResidentConstitutiveReturn,
+        ConditionPreimageReading, ConstitutiveFibreError, ConstitutiveReading,
+        NativeConstitutiveField, NativeFieldOccurrence, NativeJunctionSeed, NativePhaseCurrent,
+        ResidentConstitutiveCurrent, ResidentConstitutiveFibre, ResidentConstitutiveReturn,
     },
     resident_section::{
         ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface, TransferCensus,
@@ -130,6 +130,45 @@ fn main() -> Result<(), Box<dyn Error>> {
     // This previously unseen physical condition is executed only after prediction.
     let actual = observe(&mut world, x, c)?;
     let predicted = returned(&predicted)?;
+    // This phase is controlled by the world but never supplied to the learner. Only the actual
+    // source and its later native return enter the condition Preimage Fibre.
+    let hidden_condition = phase(-5, 12, 13)?;
+    let identifying_source = phase(1, -2, 1)?;
+    let identifying_return = observe(&mut world, identifying_source, hidden_condition)?;
+    let identifying_x = mount(&surface, &identifying_source.words())?;
+    let identifying_y = mount(
+        &surface,
+        &NativePhaseCurrent::from_current(&identifying_return)?.words(),
+    )?;
+    let before = learner.census();
+    let preimage =
+        learner.read_condition_preimage(rational(&identifying_x)?, rational(&identifying_y)?)?;
+    let preimage_work = delta(before, learner.census());
+    let later_source = phase(4, 1, 1)?;
+    let later_x = mount(&surface, &later_source.words())?;
+    let before = learner.census();
+    let inferred_prediction =
+        learner.advance_bilinear_contact(rational(&later_x)?, preimage.current(), None)?;
+    let inferred_work = delta(before, learner.census());
+    let later_actual = observe(&mut world, later_source, hidden_condition)?;
+    let inferred_prediction = returned(&inferred_prediction)?;
+    let condition_reading = match preimage.inspect()? {
+        ConditionPreimageReading::Compatible {
+            particular,
+            directions,
+        } => json!({"kind":"compatible",
+            "particular":particular.iter().map(ToString::to_string).collect::<Vec<_>>(),
+            "directions":directions.iter().map(|row|row.iter().map(ToString::to_string).collect::<Vec<_>>()).collect::<Vec<_>>()}),
+        other => return Err(format!("condition preimage remains {other:?}").into()),
+    };
+    let (constraint, rhs) = preimage.inspect_constraints()?;
+    let condition_inference = json!({"source":identifying_source,"actual_return":face(&identifying_return),
+        "hidden_condition_for_observer_only":hidden_condition,"preimage":condition_reading,
+        "relation_cut":preimage.relation_cut(),"work":preimage_work,
+        "constraint_graph":{"rows":constraint.rows,"width":constraint.width,"intervals":constraint.intervals},
+        "constraint_rhs":{"width":rhs.width,"intervals":rhs.intervals},
+        "later_source":later_source,"later_prediction":face(&inferred_prediction),
+        "later_actual":face(&later_actual),"later_equal":inferred_prediction==later_actual,"later_work":inferred_work});
     let one = mount(&surface, &[1, 0, 1])?;
     let before = learner.census();
     let first = learner.advance_bilinear_contact(rational(&one)?, rational(&cs)?, None)?;
@@ -137,7 +176,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let third = learner.advance_bilinear_contact(second.current(), rational(&cs)?, None)?;
     let continuation_work = delta(before, learner.census());
     let continuation = [returned(&first)?, returned(&second)?, returned(&third)?];
-    let agreement = predicted == actual;
+    let agreement = predicted == actual && inferred_prediction == later_actual;
     let relation = learner.inspect_relation()?;
     // Cold receiver of the inferred operator, after every productive operation: the six source
     // pivots span the declared chart, and each row maps its mixed complex pair to the target.
@@ -155,6 +194,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         "truth_status":"established-bounded","evidence_tags":["measured"],
         "source_chart":learner.source_chart(),"receiver":"one complex held phase current",
         "multiplication_graph_exact":multiplication_graph_exact,
+        "condition_inference":condition_inference,
         "observations":observations,"withheld":{"source":x,"condition":c,
             "prediction":face(&predicted),"actual_native_return":face(&actual),"equal":agreement,"work":prediction_work},
         "continuation":continuation.iter().map(face).collect::<Vec<_>>(),"continuation_work":continuation_work,

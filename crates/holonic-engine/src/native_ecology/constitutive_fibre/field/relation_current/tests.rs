@@ -156,12 +156,9 @@ fn receiver_of_a_plural_fibre_does_not_require_a_selected_current() {
         ConstitutiveReading::Plural { .. }
     ));
     let face = fixed.read_differential_pairs(0, 1).unwrap();
-    assert_eq!(face.occurrence, 0);
-    assert_eq!(face.relation_cut, Some(3));
-    assert_eq!(
-        face.constitutive_status,
-        Some(NativeFieldReceiverStatus::Plural)
-    );
+    assert_eq!(face.field_source, Some(0));
+    assert_eq!(face.relation_cut, 3);
+    assert_eq!(face.status, NativeFieldReceiverStatus::Plural);
     assert_eq!(
         (
             face.positive,

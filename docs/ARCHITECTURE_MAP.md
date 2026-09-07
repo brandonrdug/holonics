@@ -26,6 +26,7 @@ dependent-stream apparatus probe only; it is not an alternate native owner.
 `crates/holonic-mount/src/metal.rs` (resident allocation and ordered Metal commands),
 `crates/holonic-engine/src/device_launch.rs` (integer launch admission), and
 `accelerators/metal/native_phase.metal` (checked limb arithmetic, fibre, circulation, rechart,
+resident current, bilinear contact, condition preimage, historical source frames, differential,
 carry and census). `resident_section/{surface_mount,surface_passage}.rs` attaches these to the
 existing phase ecology. The CUDA mount and native kernels retain their Linux target. A missing
 Metal operation refuses explicitly; the legacy `mount::cuda` alias supplies source compatibility.
@@ -70,15 +71,28 @@ current text/acoustic attachment question, including their concrete host/residen
 currents and all complex mixed incidences remain resident. The
 [measured phase-action return](../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
 includes an independently supplied condition, a withheld physical return, inferred-operator
-identity and later wave conduct. Its condition Preimage Fibre and conversation binding remain open.
+identity and later wave conduct. The condition Preimage Fibre has subsequently returned below;
+general conversation binding remains open.
+
+[established-bounded; measured] `constitutive_fibre/resident/preimage.rs::read_condition_preimage`
+and `constitutive_condition_preimage.cuh` (CUDA), with `native_phase.metal` (Apple), derive the
+affine condition section of that same learned relation. The native graph/RHS retains free directions, original vertical receivers and
+partially known source domains. An inferred phase drives a later native prediction in the
+[100-test and public-example return](../research/records/2026-09-07_AC1_THE_LEARNED_ACTION_RETURNS_ITS_CONDITION_PREIMAGE_FIBRE.md).
+The [Apple condition-fibre return](../research/records/2026-09-07_APPLE_RETURNS_THE_SHARED_CONDITION_PREIMAGE_FIBRE.md)
+supplies exact receipt agreement and the 22-test Metal scope.
+`ConstitutiveDifferentialReading` distinguishes generic relation/class receivers from actual field
+source occurrences. Whole-family forward images and conversation coupling remain open.
 
 [established-bounded; measured] `native_ecology/constitutive_fibre/resident.rs` now owns borrowed
 resident rational-current input and immutable original-fibre returns for the existing local
 relation. `resident_section::record_constitutive_current` and
-`exact_resident_section.cu::section_constitutive_current` conduct that passage on CUDA. The
+the device `section_constitutive_current` in `exact_resident_section.cu` (CUDA) and
+`accelerators/metal/native_phase.metal` (Apple) conduct that passage. The
 [84-test return](../research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md)
 includes limited native observations, phase superposition and rational continuation without
-numerical readback. General conversation-field attachment and Metal realization are still open.
+numerical readback. The [Apple forward return](../research/records/2026-09-07_APPLE_LEARNS_THE_SHARED_CONDITIONAL_PHASE_ACTION.md)
+supplies the corresponding Metal evidence. General conversation-field attachment remains open.
 
 [established-bounded; measured] `field/relation_current.rs` now queries that same resident owner
 at an actual source of `NativeConstitutiveField`, with both branches transported by

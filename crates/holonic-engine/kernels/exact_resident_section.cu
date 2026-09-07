@@ -1290,6 +1290,8 @@ extern "C" __global__ void section_constitutive_bilinear_source(
     output_lo[width]=output_hi[width]=(int64_t)common;
 }
 
+#include "constitutive_condition_preimage.cuh"
+
 // Push both actual source branches through their producing-to-current unit-phase frame.
 // This does not read the paired-junction enclosure or substitute its numerical centre.
 extern "C" __global__ void section_field_source_frame(

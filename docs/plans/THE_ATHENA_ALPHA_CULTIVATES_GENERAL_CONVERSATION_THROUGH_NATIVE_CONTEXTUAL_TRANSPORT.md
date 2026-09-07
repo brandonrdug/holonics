@@ -223,12 +223,18 @@ identifiable where pooling observations without that condition leaves a plural r
 native operator and later wave conduct are verified at the declared local family. This returns
 the forward conditional primitive; it does not supply a general conversation context by fiat.
 
-[definition] Next hold the actual source and later reception fixed and derive the compatible
-condition Preimage Fibre in that same learned action. For fixed source, the bilinear chart is
-affine in the condition. Reuse native elimination for the particular/free directions or scoped
-obstruction; carry supported consequences into subsequent native operation. Do not turn a missing
-condition into a source-ID switch, an authored semantic label, or a demand to reconstruct all
-past microscopic states.
+[established-bounded; measured] The [condition Preimage Fibre](../../research/records/2026-09-07_AC1_THE_LEARNED_ACTION_RETURNS_ITS_CONDITION_PREIMAGE_FIBRE.md)
+now holds actual source and later reception fixed and derives the compatible condition family
+through native elimination. An unprovided phase conducts into a later prediction; free, partial
+and outside-relation cases keep their scopes. The query changes no learned row or occurrence
+count. The retained condition is not a decoded and remounted host choice.
+
+[definition] Next carry that inferred family as continuing standing and derive the joint
+condition/output relation under a new source. Its output image must retain the condition Preimage
+Fibre and any unsupported condition domain. The unique-condition case already uses the resident
+point-current port; a plural condition requires its whole supported image or a scoped obstruction.
+Bind these relations to actual conversation material. Do not substitute a source-ID switch,
+authored semantic label or microscopic-past reconstruction requirement for the missing condition.
 
 [established-bounded; measured] The [native field relation port](../../research/records/2026-09-07_AC1_THE_FIELD_RETURNS_A_RESIDENT_RELATION_FACE_AND_A_PLURAL_FIBRE_HAS_FIXED_RECEIVERS.md)
 now returns resident currents/fibres at historical sources through their actual frames, and a
