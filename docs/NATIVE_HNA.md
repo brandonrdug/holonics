@@ -33,6 +33,19 @@ The `alpha_material` example is a private material/current study;
 its excitation round-trip is not a learned text decoder and its report is not a model checkpoint.
 The existing scalar JSONL session and checkpoint format below do not serialize this wider field.
 
+[definition] `advance_resident` returns a `NativeFieldContinuation` containing only the committed
+source handle, lineage and producing frame. It shares the same native operation and commit owner
+with the observed methods, checks the complete launch obstruction, and leaves numerical reports
+resident. `inspect_occurrence_status` later reads an immutable occurrence's receiver classification,
+pivot and rank without issuing a receiving capability. This separates numerical observation from
+continuation; it does not remove the per-operation launch receipt or create an asynchronous driver.
+
+[definition] `alpha_material --resident` selects terminal diagnostics. It reports
+`observation_mode: "terminal"`, collects status counts after material admission, then publishes
+the same cold body observations. It does not capture an intermediate relation snapshot, so
+`first_vertical_formation` is `null` in this mode. That absence is not a claim that no vertical
+formation occurred. Material, terminal observation and publication retain separate clocks.
+
 [established-bounded; measured] `NativeConstitutiveField::found_with_paired_junction` adds native
 reaction through the moment of actual joined currents and retained internal current. It requires
 unit seed admittances in this first chart. `NativeFieldStep::junction` returns the full root

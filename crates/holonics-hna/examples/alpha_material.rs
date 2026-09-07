@@ -137,6 +137,7 @@ struct VerticalFormation {
 struct Report {
     schema: &'static str,
     profile: &'static str,
+    observation_mode: &'static str,
     exposure_path: String,
     families_aperture: u64,
     frames_seen: u64,
@@ -174,6 +175,7 @@ impl Report {
             } else {
                 "matched-unit-octet-excitation-native-field"
             },
+            observation_mode: "per-occurrence",
             exposure_path: exposure_path.display().to_string(),
             families_aperture,
             frames_seen: 0,
@@ -384,6 +386,7 @@ fn process_exposure(
     field: &mut NativeConstitutiveField<'_>,
     families_aperture: u64,
     report: &mut Report,
+    resident: bool,
 ) -> Result<(), AlphaMaterialError> {
     while report.development_families_acknowledged < families_aperture {
         let frame = reader
@@ -428,8 +431,40 @@ fn process_exposure(
                     Some(source) => NativeFieldOccurrence::through(source, incoming),
                     None => NativeFieldOccurrence::entering(incoming),
                 };
-                let step = match field.advance_status(&mut occurrence) {
-                    Ok(step) => step,
+                let advanced = if resident {
+                    field
+                        .advance_resident(&mut occurrence)
+                        .map(|step| step.source)
+                } else {
+                    field.advance_status(&mut occurrence).and_then(|step| {
+                        if report.first_vertical_formation.is_none() {
+                            if let Some(pivot) =
+                                step.formed_pivot.filter(|p| *p >= 4 * field.nodes())
+                            {
+                                report.first_vertical_formation = Some(VerticalFormation {
+                                    sequence: frame.sequence,
+                                    part_ordinal: part.ordinal,
+                                    octet_index,
+                                    native_occurrence: step.lineage.occurrence,
+                                    formed_pivot: pivot,
+                                    source_occurrence: step.lineage.received_from,
+                                    paired_source: step
+                                        .lineage
+                                        .received_from
+                                        .map(|i| field.inspect_source(i).map(SectionObserver::from))
+                                        .transpose()?,
+                                    relation_after: field.inspect_relation()?.into(),
+                                });
+                            }
+                        }
+                        report.final_rank = step.successor_rank;
+                        report.formed_pivots += u64::from(step.formed_pivot.is_some());
+                        record_reading(report, step.receiver);
+                        Ok(step.source)
+                    })
+                };
+                let source = match advanced {
+                    Ok(source) => source,
                     Err(error) => {
                         capture_failure(
                             report,
@@ -450,30 +485,9 @@ fn process_exposure(
                         return Ok(());
                     }
                 };
-                if report.first_vertical_formation.is_none() {
-                    if let Some(pivot) = step.formed_pivot.filter(|p| *p >= 4 * field.nodes()) {
-                        report.first_vertical_formation = Some(VerticalFormation {
-                            sequence: frame.sequence,
-                            part_ordinal: part.ordinal,
-                            octet_index,
-                            native_occurrence: step.lineage.occurrence,
-                            formed_pivot: pivot,
-                            source_occurrence: step.lineage.received_from,
-                            paired_source: step
-                                .lineage
-                                .received_from
-                                .map(|i| field.inspect_source(i).map(SectionObserver::from))
-                                .transpose()?,
-                            relation_after: field.inspect_relation()?.into(),
-                        });
-                    }
-                }
-                report.final_rank = step.successor_rank;
-                previous = Some(step.source);
+                previous = Some(source);
                 report.octets_presented += 1;
                 report.native_occurrences += 1;
-                report.formed_pivots += u64::from(step.formed_pivot.is_some());
-                record_reading(report, step.receiver);
             }
             // A part boundary is an actual source boundary; no emission is linked into the next part.
             drop(previous);
@@ -496,7 +510,7 @@ fn process_exposure(
 }
 
 fn usage() -> &'static str {
-    "usage: alpha_material EXPOSURE --families N --report NEW.json [--inspect-source N ...] [--paired-junction | --enclosed-junction FRACTIONAL_BITS]"
+    "usage: alpha_material EXPOSURE --families N --report NEW.json [--inspect-source N ...] [--paired-junction | --enclosed-junction FRACTIONAL_BITS] [--resident]"
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -507,8 +521,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut inspect_sources = Vec::new();
     let mut paired = false;
     let mut enclosed = None;
+    let mut resident = false;
     while let Some(arg) = args.next() {
         match arg.as_str() {
+            "--resident" => resident = true,
             "--paired-junction" => paired = true,
             "--enclosed-junction" => {
                 enclosed = Some(
@@ -547,15 +563,31 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if enclosed.is_some() {
         report.profile = "matched-unit-octet-field-with-enclosed-junction";
     }
+    if resident {
+        report.observation_mode = "terminal";
+    }
     let operation = |field: &mut NativeConstitutiveField<'_>| {
         let start = Instant::now();
-        let result = process_exposure(&mut reader, field, families, &mut report);
+        let result = process_exposure(&mut reader, field, families, &mut report, resident);
         report.material_wall_seconds = start.elapsed().as_secs_f64();
         report.native_census_before_observers = Some(field.census());
         let start = Instant::now();
+        let status_result = if resident {
+            // Read immutable historical receipts after the material run. No intermediate
+            // relation snapshot is claimed; first_vertical_formation is deliberately absent.
+            (0..field.occurrence_count()).try_for_each(|at| {
+                let status = field.inspect_occurrence_status(at)?;
+                report.final_rank = status.successor_rank;
+                report.formed_pivots += u64::from(status.formed_pivot.is_some());
+                record_reading(&mut report, status.receiver);
+                Ok::<_, ConstitutiveFibreError>(())
+            })
+        } else {
+            Ok(())
+        };
         report.body = Some(observe_body(field, &inspect_sources));
         report.observer_wall_seconds = start.elapsed().as_secs_f64();
-        result
+        result.and(status_result.map_err(AlphaMaterialError::Native))
     };
     let native_result = if let Some(grain) = enclosed {
         with_enclosed_octet_field(grain, operation)
@@ -565,21 +597,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         with_octet_field(operation)
     };
     if let Err(error) = &native_result {
-        report.failure = Some(FailureCoordinate {
-            kind: "application-refusal".to_owned(),
-            error: error.to_string(),
-            sequence: None,
-            event: None,
-            source: None,
-            record_number: None,
-            byte_start: None,
-            byte_end: None,
-            part_ordinal: None,
-            pointer: None,
-            octet_index: None,
-            octet: None,
-            native_occurrences: report.native_occurrences,
-        });
+        if report.failure.is_none() {
+            report.failure = Some(FailureCoordinate {
+                kind: "application-refusal".to_owned(),
+                error: error.to_string(),
+                sequence: None,
+                event: None,
+                source: None,
+                record_number: None,
+                byte_start: None,
+                byte_end: None,
+                part_ordinal: None,
+                pointer: None,
+                octet_index: None,
+                octet: None,
+                native_occurrences: report.native_occurrences,
+            });
+        }
     }
     let cursor = reader.cursor();
     report.last_cursor_sequence = cursor.next_sequence;
@@ -601,6 +635,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         serde_json::json!({
             "schema": report.schema,
             "profile": report.profile,
+            "observation_mode": report.observation_mode,
             "families_aperture": report.families_aperture,
             "development_families_acknowledged": report.development_families_acknowledged,
             "parts_presented": report.parts_presented,

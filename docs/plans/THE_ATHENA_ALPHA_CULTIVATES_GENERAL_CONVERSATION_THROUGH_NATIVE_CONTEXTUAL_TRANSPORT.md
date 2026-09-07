@@ -213,7 +213,9 @@ reference operations and then refuses its word/wide arithmetic. The subsequent
 continues the same current law through all 728 occurrences and 724 contacts of the four-family
 slice, retaining the complete signed residual and an executable exact-current decoder. All 728
 numerical certificates pass; the first 25 exact current anchors and their 300 internal-current
-comparisons pass. Efficient broader operation, lawful history placement, record-level contextual
+comparisons pass. A shared resident continuation preserves this body with zero numerical section
+readouts during admission and explicitly deferred diagnostics. Efficient broader operation,
+lawful history placement, record-level contextual
 channels and learned text emission remain AC1–AC2 obligations.
 
 [definition] Compose a reversible exterior material chart with native addressed sections,

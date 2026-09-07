@@ -56,7 +56,9 @@ now supplies native reaction through a formed Hermitian moment and retained inte
 a complete internal-current decoder and same-input contextual controls. Its word realization
 stopped after six coupled operations. The [enclosed-current return](../../research/records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md)
 now carries all 728 operations of the four-family slice, retaining the full residual and exact
-error decoder. All native certificates and the declared exact anchors pass. Continue AC1 with
+error decoder. All native certificates and the declared exact anchors pass. Resident continuation
+preserves that body with zero numerical section readouts during material admission; cold diagnostics
+remain separate and the complete launch obstruction is still checked. Continue AC1 with
 efficient broader operation, lawful history placement and record-level contextual channels;
 learned text-codec conduct and the actual alpha product remain required.
 

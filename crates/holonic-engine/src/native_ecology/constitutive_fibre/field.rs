@@ -92,6 +92,33 @@ pub struct NativeFieldStep<Reading = ConstitutiveReading> {
     pub junction: Option<NativeFieldJunctionReading>,
 }
 
+/// Continuation with numerical reports retained on the device. No numerical receiver is read.
+#[derive(Debug)]
+pub struct NativeFieldContinuation {
+    pub source: NativeFieldEmission,
+    pub lineage: NativeFieldLineage,
+    pub frame: Rc<NativeCurrentFrame>,
+}
+
+/// A cold observation of one committed occurrence. This issues no receiving capability.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct NativeFieldOccurrenceStatus {
+    pub receiver: NativeFieldReceiverStatus,
+    pub former_receiver: Option<NativeFieldReceiverStatus>,
+    pub formed_pivot: Option<usize>,
+    pub successor_rank: usize,
+}
+
+struct FieldObservation<Reading> {
+    outgoing: Vec<ExactComplexWaveCurrent>,
+    held_successor: Vec<ExactComplexWaveCurrent>,
+    receiver: Reading,
+    received_difference: Option<NativeFieldReceivedDifference<Reading>>,
+    formed_pivot: Option<usize>,
+    successor_rank: usize,
+    junction: Option<NativeFieldJunctionReading>,
+}
+
 /// Explicit classification projection. It contains no selected response or alleged full fibre;
 /// all source/relation carriers remain owned by the continuing body.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
@@ -282,6 +309,65 @@ impl<'chart> NativeConstitutiveField<'chart> {
         })
     }
 
+    /// Enact the same operation and validate its obstruction receipt, leaving numerical
+    /// sections resident. Source consumption and commit use the same owner as observed advances.
+    pub fn advance_resident(
+        &mut self,
+        occurrence: &mut NativeFieldOccurrence,
+    ) -> Result<NativeFieldContinuation, ConstitutiveFibreError> {
+        self.advance_with(occurrence, |_, _, _| Ok(()))
+            .map(|(continuation, ())| continuation)
+    }
+
+    /// Read the immutable status of an already committed occurrence, without issuing a handle.
+    pub fn inspect_occurrence_status(
+        &self,
+        occurrence: usize,
+    ) -> Result<NativeFieldOccurrenceStatus, ConstitutiveFibreError> {
+        let event = self
+            .history
+            .get(occurrence)
+            .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
+        let words = self.relation.surface.read_out(&event.section)?;
+        let source_width = self.relation.source_width;
+        let width = source_width + self.relation.target_width;
+        let current_at = source_width + 1;
+        if words.iter().any(|(lo, hi)| lo != hi) || words[source_width].0 <= 0 {
+            return Err(ConstitutiveFibreError::Uncertain);
+        }
+        let receiver = |at: usize| -> Result<NativeFieldReceiverStatus, ConstitutiveFibreError> {
+            if words[at + width].0 <= 0 {
+                return Err(ConstitutiveFibreError::Uncertain);
+            }
+            match words[at + width + 1].0 {
+                0 => Ok(NativeFieldReceiverStatus::Unique),
+                1 => Ok(NativeFieldReceiverStatus::OutsideDomain),
+                2 => Ok(NativeFieldReceiverStatus::Plural),
+                _ => Err(ConstitutiveFibreError::Uncertain),
+            }
+        };
+        let formed_pivot = match words[current_at + width + 2].0 {
+            -1 => None,
+            p if p >= 0 && (p as usize) < width => Some(p as usize),
+            _ => return Err(ConstitutiveFibreError::Uncertain),
+        };
+        let successor_rank = usize::try_from(words[current_at + width + 3].0)
+            .map_err(|_| ConstitutiveFibreError::Uncertain)?;
+        if successor_rank > width {
+            return Err(ConstitutiveFibreError::Uncertain);
+        }
+        Ok(NativeFieldOccurrenceStatus {
+            receiver: receiver(current_at)?,
+            former_receiver: event
+                .lineage
+                .received_from
+                .map(|_| receiver(current_at + width + 4))
+                .transpose()?,
+            formed_pivot,
+            successor_rank,
+        })
+    }
+
     fn advance_reading<Reading>(
         &mut self,
         occurrence: &mut NativeFieldOccurrence,
@@ -292,6 +378,81 @@ impl<'chart> NativeConstitutiveField<'chart> {
             Option<usize>,
         ) -> Result<Reading, ConstitutiveFibreError>,
     ) -> Result<NativeFieldStep<Reading>, ConstitutiveFibreError> {
+        let (continuation, observed) =
+            self.advance_with(occurrence, |body, source_at, occurrence| {
+                let surface = body.relation.surface;
+                let words =
+                    surface.read_out(&body.pending.as_ref().expect("pending field").section)?;
+                let source_width = body.relation.source_width;
+                let width = source_width + body.relation.target_width;
+                let current_at = source_width + 1;
+                let former_at = current_at + width + 4;
+                if words.iter().any(|(l, h)| l != h) || words[source_width].0 <= 0 {
+                    return Err(ConstitutiveFibreError::Uncertain);
+                }
+                let formed_pivot = match words[current_at + width + 2].0 {
+                    -1 => None,
+                    p if p >= 0 && (p as usize) < width => Some(p as usize),
+                    _ => return Err(ConstitutiveFibreError::Uncertain),
+                };
+                let rank = usize::try_from(words[current_at + width + 3].0)
+                    .map_err(|_| ConstitutiveFibreError::Uncertain)?;
+                if rank > width {
+                    return Err(ConstitutiveFibreError::Uncertain);
+                }
+                let receiver = read(&body.relation, &words, current_at, None)?;
+                let received_difference = source_at
+                    .map(|source_occurrence| -> Result<_, ConstitutiveFibreError> {
+                        Ok(NativeFieldReceivedDifference {
+                            source_occurrence,
+                            former_receiver: read(&body.relation, &words, former_at, formed_pivot)?,
+                            arrived: occurrence.incoming.iter().map(|p| p.current()).collect(),
+                        })
+                    })
+                    .transpose()?;
+                let denominator = words[source_width].0;
+                let phase = |j: usize| {
+                    ExactComplexWaveCurrent::new(
+                        Rat::new(words[j].0.into(), denominator.into()),
+                        Rat::new(words[j + 1].0.into(), denominator.into()),
+                    )
+                };
+                let outgoing = (0..body.nodes()).map(|i| phase(4 * i)).collect();
+                let held_successor = (0..body.nodes()).map(|i| phase(4 * i + 2)).collect();
+                let junction = body.read_pending_junction()?;
+                Ok(FieldObservation {
+                    outgoing,
+                    held_successor,
+                    receiver,
+                    received_difference,
+                    formed_pivot,
+                    successor_rank: rank,
+                    junction,
+                })
+            })?;
+        Ok(NativeFieldStep {
+            source: continuation.source,
+            lineage: continuation.lineage,
+            frame: continuation.frame,
+            outgoing: observed.outgoing,
+            held_successor: observed.held_successor,
+            receiver: observed.receiver,
+            received_difference: observed.received_difference,
+            formed_pivot: observed.formed_pivot,
+            successor_rank: observed.successor_rank,
+            junction: observed.junction,
+        })
+    }
+
+    fn advance_with<Observed>(
+        &mut self,
+        occurrence: &mut NativeFieldOccurrence,
+        observe: impl FnOnce(
+            &Self,
+            Option<usize>,
+            &NativeFieldOccurrence,
+        ) -> Result<Observed, ConstitutiveFibreError>,
+    ) -> Result<(NativeFieldContinuation, Observed), ConstitutiveFibreError> {
         if !self.relation.usable || self.pending.is_some() {
             return Err(ConstitutiveFibreError::Uncertain);
         }
@@ -405,44 +566,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 launched.obstruction
             )));
         }
-        let words = surface.read_out(&self.pending.as_ref().expect("pending field").section)?;
-        let source_width = self.relation.source_width;
-        let width = source_width + self.relation.target_width;
-        let current_at = source_width + 1;
-        let former_at = current_at + width + 4;
-        if words.iter().any(|(l, h)| l != h) || words[source_width].0 <= 0 {
-            return Err(ConstitutiveFibreError::Uncertain);
-        }
-        let formed_pivot = match words[current_at + width + 2].0 {
-            -1 => None,
-            p if p >= 0 && (p as usize) < width => Some(p as usize),
-            _ => return Err(ConstitutiveFibreError::Uncertain),
-        };
-        let rank = usize::try_from(words[current_at + width + 3].0)
-            .map_err(|_| ConstitutiveFibreError::Uncertain)?;
-        if rank > width {
-            return Err(ConstitutiveFibreError::Uncertain);
-        }
-        let receiver = read(&self.relation, &words, current_at, None)?;
-        let received_difference = source_at
-            .map(|source_occurrence| -> Result<_, ConstitutiveFibreError> {
-                Ok(NativeFieldReceivedDifference {
-                    source_occurrence,
-                    former_receiver: read(&self.relation, &words, former_at, formed_pivot)?,
-                    arrived: occurrence.incoming.iter().map(|p| p.current()).collect(),
-                })
-            })
-            .transpose()?;
-        let denominator = words[source_width].0;
-        let phase = |j: usize| {
-            ExactComplexWaveCurrent::new(
-                Rat::new(words[j].0.into(), denominator.into()),
-                Rat::new(words[j + 1].0.into(), denominator.into()),
-            )
-        };
-        let outgoing = (0..self.nodes()).map(|i| phase(4 * i)).collect();
-        let held_successor = (0..self.nodes()).map(|i| phase(4 * i + 2)).collect();
-        let junction = self.read_pending_junction()?;
+        // Observer failure retains the existing pending/uncertain state; it is not rollback.
+        // The resident callback is unit-valued and performs no section readout.
+        let observed = observe(self, source_at, occurrence)?;
         if let Some(i) = source_at {
             self.history[i].returned = true;
         }
@@ -463,23 +589,22 @@ impl<'chart> NativeConstitutiveField<'chart> {
         }
         self.relation.occurrences = next;
         self.relation.usable = true;
-        Ok(NativeFieldStep {
-            source: NativeFieldEmission {
-                owner: Rc::clone(&self.owner),
-                occurrence: at,
+        Ok((
+            NativeFieldContinuation {
+                source: NativeFieldEmission {
+                    owner: Rc::clone(&self.owner),
+                    occurrence: at,
+                },
+                lineage,
+                frame: Rc::clone(&self.frame.view),
             },
-            lineage,
-            frame: Rc::clone(&self.frame.view),
-            outgoing,
-            held_successor,
-            receiver,
-            received_difference,
-            formed_pivot,
-            successor_rank: rank,
-            junction,
-        })
+            observed,
+        ))
     }
 }
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod resident_tests;

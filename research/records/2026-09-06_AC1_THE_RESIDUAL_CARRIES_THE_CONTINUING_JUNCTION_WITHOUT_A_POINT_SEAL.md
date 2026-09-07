@@ -170,6 +170,45 @@ for publication; maximum process RSS is 145,216 KiB. The final report is
 728-occurrence diagnostic driver; they do not establish a throughput or residency bound for the
 full conversation corpus.
 
+## Resident continuation and deferred observation
+
+[definition] `advance_resident` enacts the same field through the shared `advance_with` owner.
+Its observation callback returns unit; the method returns only the committed source handle,
+lineage and producing frame. The numerical source and junction reports stay on the device.
+`advance` and `advance_status` retain their complete earlier return values and perform their
+observations before the same commit. All methods retain launch obstruction checking. An observer
+error after device enactment retains pending uncertainty and cannot authorize replay.
+
+[definition] `inspect_occurrence_status` is a cold receiver over an immutable historical report.
+It returns classification, pivot and rank without issuing a new source. The material driver's
+`--resident` mode performs these observations after the material run and labels its diagnostics
+`observation_mode: "terminal"`. It captures no intermediate relation snapshot;
+`first_vertical_formation: null` means that snapshot was not requested. An earlier source-qualified
+failure is retained if a later terminal observer also fails.
+
+[established-bounded; measured] All **25 field CUDA controls pass** after this refactor, including
+four new controls. Independent resident and observed bodies retain identical source/junction
+history, relation, phase and contextual internal enclosures through delayed reception and rechart.
+The new controls also return a retained source after actual covariance carrier refusal, reject
+and recover a foreign handle, and preserve pending uncertainty on observer failure. The example
+build passes. This is a scoped field check; the earlier 49 shared-arithmetic checks retain their
+earlier scope.
+
+[established-bounded; measured] `material-enclosed-junction-g72-resident.json` completes the same
+four development families, **728 operations and 724 contacts**. Its complete observed body and
+all source coordinates, part ranges, dispositions and exposure cursor equal the final observed
+run. `enclosed-resident-body-comparison.json` retains the comparison. The existing exact-anchor
+and 728-section certificate therefore applies to these identical fields; it was not rerun as a
+new independent mathematical result.
+
+[established-bounded; measured] Before terminal observation, numerical section egress falls from
+16,796,688 to **zero bytes**, and section readouts from 1,458 to **zero**. The 728 native deeds,
+728 synchronizations and 46,592 receipt bytes remain. The resident run's total debug process time
+is 25.042 seconds: 19.541 seconds for material operations, 4.098 for terminal observations and
+0.916 for publication; maximum RSS is 144,928 KiB. Allocations and retained native extent are
+unchanged. This separates numerical observation from native continuation; it does not yet solve
+history growth, per-operation launch cost or broader corpus throughput.
+
 [open] The numerical word obstruction is repaired for the actual slice. Larger-scale placement,
 record-level contextual channels, learned text-codec output and useful general responses remain
 required. The whole AC0–AC5 goal stays active; no trained alpha is claimed by this return.

@@ -56,8 +56,10 @@ occurrence 6 without sealing a numerical center as an exact current.
 
 [established-bounded; measured] Native controls retain actual delayed sources, full root rechart
 transport and same-input contextual differences under equal moments/raw fields. Cooperative LDL
-rows preserve the complete body and history bit-for-bit. Buffered diagnostic publication separates
-material work, terminal observation and I/O costs; the [current record](research/records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md)
+rows preserve the complete body and history bit-for-bit. The resident continuation now completes
+the same material with zero numerical section readouts during admission, retaining its complete
+obstruction receipts; all 25 field controls pass. Terminal diagnostics preserve the same body and
+separate material work, observation and I/O costs. The [current record](research/records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md)
 retains those costs and the earlier exact-chart obstruction at its proper scope.
 
 [open] AC1 remains active. Record-parent/branch channels and larger productive organization still
