@@ -615,6 +615,19 @@ impl<'chart> ResidentSurface<'chart> {
         )
     }
 
+    /// Scratch for a declared population of exact wide values. Metal uses four magnitude limbs
+    /// and a sign word; CUDA uses its sixteen-byte signed-wide carrier.
+    fn constitutive_wide_scratch(words: usize) -> Option<usize> {
+        #[cfg(target_os = "macos")]
+        {
+            words.checked_mul(20)?.checked_add(15).map(|bytes| bytes & !15)
+        }
+        #[cfg(not(target_os = "macos"))]
+        {
+            words.checked_mul(16)
+        }
+    }
+
     /// Exact scratch layout of the target representation, including local denominators.
     pub(crate) fn constitutive_fibre_scratch(width: usize) -> Option<usize> {
         #[cfg(target_os = "macos")]
@@ -871,7 +884,8 @@ impl<'chart> ResidentSurface<'chart> {
             return Err(fail());
         }
         let shared = nodes
-            .checked_mul(64)
+            .checked_mul(4)
+            .and_then(Self::constitutive_wide_scratch)
             .and_then(|n| u32::try_from(n).ok())
             .filter(|n| *n <= self.declaration.max_sectiond_bytes)
             .ok_or_else(fail)?;
@@ -1025,8 +1039,7 @@ impl<'chart> ResidentSurface<'chart> {
         {
             return Err(fail());
         }
-        let shared = width
-            .checked_mul(16)
+        let shared = Self::constitutive_wide_scratch(width)
             .and_then(|n| u32::try_from(n).ok())
             .filter(|n| *n <= self.declaration.max_sectiond_bytes)
             .ok_or_else(fail)?;
@@ -1123,7 +1136,8 @@ impl<'chart> ResidentSurface<'chart> {
             self.validate_constitutive_current_view(current)?;
         }
         let shared = width
-            .checked_mul(32)
+            .checked_mul(2)
+            .and_then(Self::constitutive_wide_scratch)
             .and_then(|n| u32::try_from(n).ok())
             .filter(|n| *n <= self.declaration.max_sectiond_bytes)
             .ok_or_else(fail)?;

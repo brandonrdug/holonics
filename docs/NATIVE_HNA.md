@@ -15,10 +15,10 @@ JSON report or relation inspection is **not a learned-model checkpoint**.
 
 ## Resident local relation composition
 
-[definition] The September 7 resident conditional-current and whole-fibre results below were
-executed on desktop CUDA. Their shared Rust source is integrated on the Apple branch; the new
-Metal kernels remain open at the [declared port boundary](HARDWARE_AND_MODALITY_BOUNDARIES.md#conditional-generator-port-for-the-mac-workflow).
-The existing Apple phase and ordinary complete-field realization keeps its own measured scope.
+[established-bounded; measured] The [September 7 Metal return](../research/records/2026-09-07_APPLE_LEARNS_THE_SHARED_CONDITIONAL_PHASE_ACTION.md)
+now executes shared resident conditional currents, whole-fibre differentials and historical field
+source transport on Apple. The public forward phase example matches the desktop operator/current
+receipt exactly. Larger paired/material junction kernels retain their separate CUDA boundary.
 
 [established-bounded; measured] The same owner now admits an explicit two-current contact through
 `ResidentConstitutiveFibre::found_bilinear_contact` and `advance_bilinear_contact`. Its bound

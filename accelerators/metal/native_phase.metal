@@ -929,6 +929,377 @@ kernel void section_constitutive_fibre(
     }
 }
 
+// A point-current aperture may consume only a complete rational current.  A
+// disposition marks a non-singleton fibre and is therefore accepted only when
+// it is the zero codeword; an absent denominator is the unit denominator.
+inline W fibre_current_denominator(device const long *lo, device const long *hi,
+                                   uint denominator_at, uint disposition_at,
+                                   device uint *slot) {
+  if (disposition_at != 0xffffffffu
+      && (lo[disposition_at] != hi[disposition_at] || lo[disposition_at] != 0)) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return wi64(1);
+  }
+  if (denominator_at == 0xffffffffu)
+    return wi64(1);
+  if (lo[denominator_at] != hi[denominator_at] || lo[denominator_at] <= 0) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return wi64(1);
+  }
+  return fromword(lo[denominator_at]);
+}
+
+// The current relation consumes a source point and, when paired, a receiving
+// point. The returned section retains the original complete vertical fibre
+// before the staged row joins the continuing relation.
+kernel void section_constitutive_current(
+    device long *basis_lo [[buffer(0)]], device long *basis_hi [[buffer(1)]],
+    device const long *source_lo [[buffer(2)]], device const long *source_hi [[buffer(3)]],
+    constant uint &source_at [[buffer(4)]], constant uint &source_denominator_at [[buffer(5)]],
+    constant uint &source_disposition_at [[buffer(6)]],
+    device const long *receiving_lo [[buffer(7)]], device const long *receiving_hi [[buffer(8)]],
+    constant uint &receiving_at [[buffer(9)]], constant uint &receiving_denominator_at [[buffer(10)]],
+    constant uint &receiving_disposition_at [[buffer(11)]], constant uint &source_width [[buffer(12)]],
+    constant uint &target_width [[buffer(13)]], constant uint &paired [[buffer(14)]],
+    device long *output_lo [[buffer(15)]], device long *output_hi [[buffer(16)]],
+    device uint *slot [[buffer(17)]], device const uint *census [[buffer(18)]],
+    device const uint *lineage [[buffer(19)]], constant uint &lineage_count [[buffer(20)]],
+    threadgroup W *scratch [[threadgroup(0)]], uint3 tid [[thread_position_in_threadgroup]]) {
+  if (tid.x || tid.y || tid.z)
+    return;
+  if (upstream(census, lineage, lineage_count, slot))
+    return;
+  uint width = source_width + target_width;
+  if (!source_width || !target_width || width < source_width || paired > 1) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  W source_den = fibre_current_denominator(source_lo, source_hi,
+                                           source_denominator_at,
+                                           source_disposition_at, slot);
+  W receiving_den = paired
+      ? fibre_current_denominator(receiving_lo, receiving_hi,
+                                  receiving_denominator_at,
+                                  receiving_disposition_at, slot)
+      : wi64(1);
+  if (*slot)
+    return;
+  W common = paired ? flcm(source_den, receiving_den, slot) : source_den;
+  if (*slot)
+    return;
+
+  threadgroup W *query = scratch;
+  threadgroup W *formed = query + width;
+  for (uint j = 0; j < width; ++j) {
+    W value = wzero();
+    if (j < source_width) {
+      if (source_lo[source_at + j] != source_hi[source_at + j]) {
+        atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                                 memory_order_relaxed);
+        return;
+      }
+      value = fromword(source_lo[source_at + j]);
+      query[j] = value;
+      formed[j] = wmul(value, wdiv(common, source_den, slot), slot);
+    } else {
+      query[j] = wzero();
+      if (paired) {
+        uint at = receiving_at + j - source_width;
+        if (receiving_lo[at] != receiving_hi[at]) {
+          atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                                   memory_order_relaxed);
+          return;
+        }
+        value = fromword(receiving_lo[at]);
+      }
+      formed[j] = wmul(value, wdiv(common, receiving_den, slot), slot);
+    }
+  }
+  if (*slot)
+    return;
+  W denominator = source_den;
+  uint disposition = 0, rank = 0;
+  fibre_query(basis_lo, source_width, width, query, &denominator,
+              (threadgroup const W *)nullptr, -1, &disposition, &rank, slot);
+  if (*slot)
+    return;
+  long inserted = paired ? fibre_stage(basis_lo, width, formed, slot) : -1;
+  if (*slot)
+    return;
+  for (uint j = 0; j < width; ++j)
+    if (j >= source_width)
+      query[j] = wneg(query[j]);
+
+  // Validate every exterior conversion before publishing either the returned
+  // section or the staged row into the continuing relation.
+  for (uint j = 0; j < width; ++j) {
+    toword(query[j], slot);
+    if (inserted >= 0)
+      toword(formed[j], slot);
+  }
+  toword(denominator, slot);
+  if (*slot)
+    return;
+  for (uint p = 0; p < target_width; ++p) {
+    bool occupied = basis_lo[(ulong)(source_width + p) * width + source_width + p] != 0;
+    for (uint j = 0; j < target_width; ++j) {
+      ulong at = (ulong)width + 4ul + (ulong)p * target_width + j;
+      long value = occupied
+          ? basis_lo[(ulong)(source_width + p) * width + source_width + j]
+          : 0;
+      output_lo[at] = output_hi[at] = value;
+    }
+  }
+  for (uint j = 0; j < width; ++j)
+    output_lo[j] = output_hi[j] = toword(query[j], slot);
+  output_lo[width] = output_hi[width] = toword(denominator, slot);
+  output_lo[width + 1] = output_hi[width + 1] = (long)disposition;
+  output_lo[width + 2] = output_hi[width + 2] = inserted;
+  output_lo[width + 3] = output_hi[width + 3] = (long)rank + (inserted >= 0 ? 1 : 0);
+  if (*slot)
+    return;
+  if (inserted >= 0)
+    for (uint j = 0; j < width; ++j) {
+      ulong at = (ulong)inserted * width + j;
+      basis_lo[at] = basis_hi[at] = toword(formed[j], slot);
+    }
+}
+
+// Construct s ⊕ c ⊕ (c ⊗ s) from two complete complex rational currents.
+// The mixed products retain every source/condition pair in declaration order.
+kernel void section_constitutive_bilinear_source(
+    device const long *source_lo [[buffer(0)]], device const long *source_hi [[buffer(1)]],
+    constant uint &source_at [[buffer(2)]], constant uint &source_denominator_at [[buffer(3)]],
+    constant uint &source_disposition_at [[buffer(4)]],
+    device const long *condition_lo [[buffer(5)]], device const long *condition_hi [[buffer(6)]],
+    constant uint &condition_at [[buffer(7)]], constant uint &condition_denominator_at [[buffer(8)]],
+    constant uint &condition_disposition_at [[buffer(9)]], constant uint &source_complex [[buffer(10)]],
+    constant uint &condition_complex [[buffer(11)]], device long *output_lo [[buffer(12)]],
+    device long *output_hi [[buffer(13)]], device uint *slot [[buffer(14)]],
+    device const uint *census [[buffer(15)]], device const uint *lineage [[buffer(16)]],
+    constant uint &lineage_count [[buffer(17)]], threadgroup W *scratch [[threadgroup(0)]],
+    uint3 tid [[thread_position_in_threadgroup]]) {
+  if (tid.x || tid.y || tid.z)
+    return;
+  if (upstream(census, lineage, lineage_count, slot))
+    return;
+  ulong width64 = 2ul * ((ulong)source_complex + condition_complex
+                         + (ulong)source_complex * condition_complex);
+  if (!source_complex || !condition_complex || width64 >= 0xfffffffful) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  uint width = (uint)width64;
+  W source_den = fibre_current_denominator(source_lo, source_hi,
+                                           source_denominator_at,
+                                           source_disposition_at, slot);
+  W condition_den = fibre_current_denominator(condition_lo, condition_hi,
+                                              condition_denominator_at,
+                                              condition_disposition_at, slot);
+  if (*slot)
+    return;
+  W common = wmul(source_den, condition_den, slot);
+  for (uint j = 0; j < 2u * source_complex; ++j) {
+    if (source_lo[source_at + j] != source_hi[source_at + j])
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                               memory_order_relaxed);
+    scratch[j] = wmul(fromword(source_lo[source_at + j]), condition_den, slot);
+  }
+  for (uint j = 0; j < 2u * condition_complex; ++j) {
+    if (condition_lo[condition_at + j] != condition_hi[condition_at + j])
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                               memory_order_relaxed);
+    scratch[2u * source_complex + j] =
+        wmul(fromword(condition_lo[condition_at + j]), source_den, slot);
+  }
+  if (*slot)
+    return;
+  uint mixed_at = 2u * (source_complex + condition_complex);
+  W one = wi64(1);
+  for (uint c = 0; c < condition_complex; ++c)
+    for (uint s = 0; s < source_complex; ++s) {
+      W product[3];
+      phaseprod(fromword(source_lo[source_at + 2u * s]),
+                fromword(source_lo[source_at + 2u * s + 1u]), one,
+                fromword(condition_lo[condition_at + 2u * c]),
+                fromword(condition_lo[condition_at + 2u * c + 1u]), one,
+                product, slot);
+      uint at = mixed_at + 2u * (c * source_complex + s);
+      scratch[at] = product[0];
+      scratch[at + 1u] = product[1];
+    }
+  if (*slot)
+    return;
+  wnorm(scratch, width, &common, slot);
+  for (uint j = 0; j < width; ++j)
+    toword(scratch[j], slot);
+  toword(common, slot);
+  if (*slot)
+    return;
+  for (uint j = 0; j < width; ++j)
+    output_lo[j] = output_hi[j] = toword(scratch[j], slot);
+  output_lo[width] = output_hi[width] = toword(common, slot);
+}
+
+// Push both actual source branches through their producing-to-current
+// unit-phase frame.  The source section remains a complete two-branch carrier;
+// this transport does not read a paired-junction enclosure or choose a centre.
+kernel void section_field_source_frame(
+    device const long *source_lo [[buffer(0)]], device const long *source_hi [[buffer(1)]],
+    device const long *before_lo [[buffer(2)]], device const long *before_hi [[buffer(3)]],
+    device const long *current_lo [[buffer(4)]], device const long *current_hi [[buffer(5)]],
+    constant uint &nodes [[buffer(6)]], device long *output_lo [[buffer(7)]],
+    device long *output_hi [[buffer(8)]], device uint *slot [[buffer(9)]],
+    device const uint *census [[buffer(10)]], device const uint *lineage [[buffer(11)]],
+    constant uint &lineage_count [[buffer(12)]], threadgroup W *scratch [[threadgroup(0)]],
+    uint3 tid [[thread_position_in_threadgroup]]) {
+  if (tid.x || tid.y || tid.z)
+    return;
+  if (upstream(census, lineage, lineage_count, slot))
+    return;
+  if (!nodes || nodes > 0xffffffffu / 4u || source_lo[4u * nodes] <= 0) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  for (uint j = 0; j <= 4u * nodes; ++j)
+    if (source_lo[j] != source_hi[j]) {
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                               memory_order_relaxed);
+      return;
+    }
+  for (uint node = 0; node < nodes; ++node) {
+    for (uint j = 0; j < 3; ++j)
+      if (before_lo[3u * node + j] != before_hi[3u * node + j]
+          || current_lo[3u * node + j] != current_hi[3u * node + j]) {
+        atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                                 memory_order_relaxed);
+        return;
+      }
+    for (uint frame = 0; frame < 2; ++frame) {
+      device const long *g = frame ? current_lo + 3u * node : before_lo + 3u * node;
+      W norm = wadd(wmul(fromword(g[0]), fromword(g[0]), slot),
+                    wmul(fromword(g[1]), fromword(g[1]), slot), slot);
+      W denom = wmul(fromword(g[2]), fromword(g[2]), slot);
+      if (g[2] <= 0 || *slot || !ueq(norm.m, denom.m)) {
+        atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                                 memory_order_relaxed);
+        return;
+      }
+    }
+  }
+  if (*slot)
+    return;
+  W common = wi64(1);
+  for (uint pass = 0; pass < 2; ++pass)
+    for (uint node = 0; node < nodes; ++node) {
+      device const long *a = before_lo + 3u * node;
+      device const long *b = current_lo + 3u * node;
+      W crossing[3];
+      phaseprod(fromword(b[0]), fromword(b[1]), fromword(b[2]), fromword(a[0]),
+                wneg(fromword(a[1])), fromword(a[2]), crossing, slot);
+      for (uint branch = 0; branch < 2; ++branch) {
+        uint at = 4u * node + 2u * branch;
+        W value[3];
+        phaseprod(crossing[0], crossing[1], crossing[2],
+                  fromword(source_lo[at]), fromword(source_lo[at + 1u]),
+                  fromword(source_lo[4u * nodes]), value, slot);
+        if (*slot)
+          return;
+        if (pass == 0)
+          common = flcm(common, value[2], slot);
+        else {
+          scratch[at] = wmul(value[0], wdiv(common, value[2], slot), slot);
+          scratch[at + 1u] = wmul(value[1], wdiv(common, value[2], slot), slot);
+        }
+        if (*slot)
+          return;
+      }
+    }
+  wnorm(scratch, 4u * nodes, &common, slot);
+  for (uint j = 0; j < 4u * nodes; ++j)
+    toword(scratch[j], slot);
+  toword(common, slot);
+  if (*slot)
+    return;
+  for (uint j = 0; j < 4u * nodes; ++j)
+    output_lo[j] = output_hi[j] = toword(scratch[j], slot);
+  output_lo[4u * nodes] = output_hi[4u * nodes] = toword(common, slot);
+}
+
+// Differential receiver of a complete affine current fibre.  Any nonzero
+// image of a vertical direction remains unresolved; no particular fibre point
+// is selected to manufacture a differential value.
+kernel void section_constitutive_differential(
+    device const long *lo [[buffer(0)]], device const long *hi [[buffer(1)]],
+    constant uint &source_width [[buffer(2)]], constant uint &target_width [[buffer(3)]],
+    constant uint &first_complex [[buffer(4)]], constant uint &pairs [[buffer(5)]],
+    device long *output_lo [[buffer(6)]], device long *output_hi [[buffer(7)]],
+    device uint *slot [[buffer(8)]], device const uint *census [[buffer(9)]],
+    device const uint *lineage [[buffer(10)]], constant uint &lineage_count [[buffer(11)]],
+    uint3 tid [[thread_position_in_grid]]) {
+  if (tid.x || tid.y || tid.z)
+    return;
+  if (upstream(census, lineage, lineage_count, slot))
+    return;
+  ulong width64 = (ulong)source_width + target_width;
+  if (!source_width || !target_width || width64 >= 0xfffffffful || !pairs || pairs > 63
+      || (target_width & 1u)
+      || (ulong)first_complex + 2ul * pairs > (ulong)(target_width / 2u)) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  uint width = (uint)width64;
+  ulong words = width64 + 4ul + (ulong)target_width * target_width;
+  for (ulong j = 0; j < words; ++j)
+    if (lo[j] != hi[j]) {
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                               memory_order_relaxed);
+      return;
+    }
+  if (lo[width] <= 0 || lo[width + 1] < 0 || lo[width + 1] > 2) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  ulong positive = 0, negative = 0, unresolved = 0, zero = 0;
+  for (uint bit = 0; bit < pairs; ++bit) {
+    uint left = 2u * (first_complex + 2u * bit), right = left + 2u;
+    ulong mask = 1ul << bit;
+    bool variable = lo[width + 1] == 1;
+    for (uint row = 0; row < target_width && !variable; ++row) {
+      ulong at = width64 + 4ul + (ulong)row * target_width;
+      variable = lo[at + left] != lo[at + right];
+    }
+    if (variable) {
+      unresolved |= mask;
+      continue;
+    }
+    W gap = wsub(fromword(lo[source_width + right]),
+                 fromword(lo[source_width + left]), slot);
+    if (*slot)
+      return;
+    if (!wzero_p(gap) && !wneg_p(gap))
+      positive |= mask;
+    else if (wneg_p(gap))
+      negative |= mask;
+    else {
+      unresolved |= mask;
+      zero |= mask;
+    }
+  }
+  output_lo[0] = output_hi[0] = as_type<long>(positive);
+  output_lo[1] = output_hi[1] = as_type<long>(negative);
+  output_lo[2] = output_hi[2] = as_type<long>(unresolved);
+  output_lo[3] = output_hi[3] = as_type<long>(zero);
+  output_lo[4] = output_hi[4] = lo[width + 1];
+}
+
 kernel void
 section_carry(device const long *in_lo [[buffer(0)]], device const long *in_hi [[buffer(1)]],
               constant uint &count [[buffer(2)]], device long *out_lo [[buffer(3)]],

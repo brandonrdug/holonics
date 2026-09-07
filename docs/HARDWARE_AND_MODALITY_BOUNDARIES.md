@@ -32,8 +32,9 @@ neither a perfect inverse nor a copy of every past sample is a general learning 
 
 [definition] The September 7 Mac pickup integrates desktop `6ef7bf9d` into the Apple branch.
 The [integration record](../research/records/2026-09-07_APPLE_INTEGRATES_THE_SHARED_CONDITIONAL_GENERATOR_HANDOFF.md)
-qualifies its checks and merge repair. Shared Rust source is present; the new conditional-current
-and whole-fibre Metal kernels below remain unported. The existing ordinary Metal field keeps
+qualifies its checks and merge repair. The subsequent [conditional Metal return](../research/records/2026-09-07_APPLE_LEARNS_THE_SHARED_CONDITIONAL_PHASE_ACTION.md)
+realizes the forward current/contact/differential kernels and historical source-frame transport.
+The existing ordinary Metal field keeps
 its argument layout and explicitly refuses the newer paired/material junction variants.
 
 [established-bounded; measured] The [measured conditional phase return](../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
@@ -44,9 +45,9 @@ it predicts a new rational condition and conducts successive resident wave curre
 [operator receipt](../research/records/2026-09-07_conditional_phase/return-v2.json) give a concrete
 comparison. This is not a completed acoustic or conversation model.
 
-[established-bounded; source-inspected] Apple `bd3ea689` remains the pushed branch at this check.
-Its Metal owner already supplies `fibre_query`, `fibre_stage`, `wnorm`, `phaseprod` and the native
-field used as the example's teacher. The remaining port boundary is:
+[historical; source-inspected] At the desktop handoff, Apple `bd3ea689` already supplied
+`fibre_query`, `fibre_stage`, `wnorm`, `phaseprod` and the native field used as the example's
+teacher. The following forward-port boundary has now returned at the scope above:
 
 1. Carry `ConstitutiveSourceChart`, the bound bilinear constructor, resident rational-current
    views and `advance_bilinear_contact` from the existing constitutive owner. Preserve the Mac's

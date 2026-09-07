@@ -132,6 +132,13 @@ do not establish that attachment or close a cultivation phase.
 
 ## Apple silicon and acoustic branch
 
+[project-postulate] Brandon's September 7 instruction resumes the updated AS4–AS5 goal after
+integration of desktop `6ef7bf9d`. Follow the [updated Apple blueprint](HOLONICS_ON_APPLE_SILICON.md#september-7-resumption-through-shared-native-generators):
+shared conditional-current Metal port; actual acoustic section/condition/receiver composition;
+persistent learned sound perception/production; recorded English/conversational conduct; then
+the continuing application and measured streaming costs. The shared port is the next step and
+does not close the acoustic product stages by itself.
+
 [definition] Brandon's subsequent September 6 MacBook request establishes the independent
 `codex/apple-silicon` branch and [Apple platform specification](HOLONICS_ON_APPLE_SILICON.md).
 The acoustic order is sound perception and generation, then speech. This track preserves the

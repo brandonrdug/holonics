@@ -1,0 +1,1012 @@
+{
+  "acoustic_model_established": false,
+  "apparatus_census_including_world_and_diagnostics": {
+    "allocations": 168,
+    "captured_launches": 54,
+    "control_launches": 0,
+    "deed_launches": 17,
+    "device_to_device_octets": 0,
+    "egress_receipt_octets": 1728,
+    "egress_section_octets": 6384,
+    "ingress_octets": 3720,
+    "resident_octets_now": 5744,
+    "resident_octets_peak": 5988,
+    "section_read_outs": 18,
+    "synchronizations": 17
+  },
+  "continuation": [
+    {
+      "imaginary": "4/5",
+      "norm_square": "1",
+      "real": "3/5"
+    },
+    {
+      "imaginary": "24/25",
+      "norm_square": "1",
+      "real": "-7/25"
+    },
+    {
+      "imaginary": "44/125",
+      "norm_square": "1",
+      "real": "-117/125"
+    }
+  ],
+  "continuation_work": {
+    "deeds": 3,
+    "ingress_octets": 12,
+    "numerical_egress_octets": 0,
+    "receipt_egress_octets": 384,
+    "section_readouts": 0
+  },
+  "conversation_quality_established": false,
+  "development_and_observation_seconds": 0.017757542,
+  "evidence_tags": [
+    "measured"
+  ],
+  "learner_occurrences": 10,
+  "model_persisted": false,
+  "multiplication_graph_exact": true,
+  "observations": [
+    {
+      "condition": {
+        "denominator": 1,
+        "imaginary": 0,
+        "real": 1
+      },
+      "learner_work": {
+        "deeds": 1,
+        "ingress_octets": 4,
+        "numerical_egress_octets": 0,
+        "receipt_egress_octets": 128,
+        "section_readouts": 0
+      },
+      "measured": {
+        "imaginary": "0",
+        "norm_square": "0",
+        "real": "0"
+      },
+      "return": {
+        "formed_pivot": 2,
+        "occurrence": 1,
+        "predecessor_reading": {
+          "OutsideDomain": {
+            "source_remainder": [
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ]
+          }
+        },
+        "successor_rank": 1
+      },
+      "source": {
+        "denominator": 1,
+        "imaginary": 0,
+        "real": 0
+      }
+    },
+    {
+      "condition": {
+        "denominator": 1,
+        "imaginary": 1,
+        "real": 0
+      },
+      "learner_work": {
+        "deeds": 1,
+        "ingress_octets": 4,
+        "numerical_egress_octets": 0,
+        "receipt_egress_octets": 128,
+        "section_readouts": 0
+      },
+      "measured": {
+        "imaginary": "0",
+        "norm_square": "0",
+        "real": "0"
+      },
+      "return": {
+        "formed_pivot": 3,
+        "occurrence": 2,
+        "predecessor_reading": {
+          "OutsideDomain": {
+            "source_remainder": [
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ]
+          }
+        },
+        "successor_rank": 2
+      },
+      "source": {
+        "denominator": 1,
+        "imaginary": 0,
+        "real": 0
+      }
+    },
+    {
+      "condition": {
+        "denominator": 1,
+        "imaginary": 0,
+        "real": 1
+      },
+      "learner_work": {
+        "deeds": 1,
+        "ingress_octets": 4,
+        "numerical_egress_octets": 0,
+        "receipt_egress_octets": 128,
+        "section_readouts": 0
+      },
+      "measured": {
+        "imaginary": "0",
+        "norm_square": "1",
+        "real": "1"
+      },
+      "return": {
+        "formed_pivot": 0,
+        "occurrence": 3,
+        "predecessor_reading": {
+          "OutsideDomain": {
+            "source_remainder": [
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ]
+          }
+        },
+        "successor_rank": 3
+      },
+      "source": {
+        "denominator": 1,
+        "imaginary": 0,
+        "real": 1
+      }
+    },
+    {
+      "condition": {
+        "denominator": 1,
+        "imaginary": 0,
+        "real": 1
+      },
+      "learner_work": {
+        "deeds": 1,
+        "ingress_octets": 4,
+        "numerical_egress_octets": 0,
+        "receipt_egress_octets": 128,
+        "section_readouts": 0
+      },
+      "measured": {
+        "imaginary": "1",
+        "norm_square": "1",
+        "real": "0"
+      },
+      "return": {
+        "formed_pivot": 1,
+        "occurrence": 4,
+        "predecessor_reading": {
+          "OutsideDomain": {
+            "source_remainder": [
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ]
+          }
+        },
+        "successor_rank": 4
+      },
+      "source": {
+        "denominator": 1,
+        "imaginary": 1,
+        "real": 0
+      }
+    },
+    {
+      "condition": {
+        "denominator": 1,
+        "imaginary": 0,
+        "real": -1
+      },
+      "learner_work": {
+        "deeds": 1,
+        "ingress_octets": 4,
+        "numerical_egress_octets": 0,
+        "receipt_egress_octets": 128,
+        "section_readouts": 0
+      },
+      "measured": {
+        "imaginary": "0",
+        "norm_square": "1",
+        "real": "-1"
+      },
+      "return": {
+        "formed_pivot": 4,
+        "occurrence": 5,
+        "predecessor_reading": {
+          "OutsideDomain": {
+            "source_remainder": [
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  -1,
+                  [
+                    2
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ]
+          }
+        },
+        "successor_rank": 5
+      },
+      "source": {
+        "denominator": 1,
+        "imaginary": 0,
+        "real": 1
+      }
+    },
+    {
+      "condition": {
+        "denominator": 1,
+        "imaginary": 0,
+        "real": -1
+      },
+      "learner_work": {
+        "deeds": 1,
+        "ingress_octets": 4,
+        "numerical_egress_octets": 0,
+        "receipt_egress_octets": 128,
+        "section_readouts": 0
+      },
+      "measured": {
+        "imaginary": "-1",
+        "norm_square": "1",
+        "real": "0"
+      },
+      "return": {
+        "formed_pivot": 5,
+        "occurrence": 6,
+        "predecessor_reading": {
+          "OutsideDomain": {
+            "source_remainder": [
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  0,
+                  []
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ],
+              [
+                [
+                  -1,
+                  [
+                    2
+                  ]
+                ],
+                [
+                  1,
+                  [
+                    1
+                  ]
+                ]
+              ]
+            ]
+          }
+        },
+        "successor_rank": 6
+      },
+      "source": {
+        "denominator": 1,
+        "imaginary": 1,
+        "real": 0
+      }
+    }
+  ],
+  "receiver": "one complex held phase current",
+  "relation": {
+    "bound_octaves": 64,
+    "grain": 0,
+    "intervals": [
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ]
+    ],
+    "rows": 8,
+    "width": 8
+  },
+  "schema": "holonics.native-conditional-phase.v1",
+  "source_chart": {
+    "condition_complex": 1,
+    "kind": "bilinear-contact",
+    "source_complex": 1
+  },
+  "truth_status": "established-bounded",
+  "whole_seconds": 0.580445041,
+  "withheld": {
+    "actual_native_return": {
+      "imaginary": "17/5",
+      "norm_square": "13",
+      "real": "-6/5"
+    },
+    "condition": {
+      "denominator": 5,
+      "imaginary": 4,
+      "real": 3
+    },
+    "equal": true,
+    "prediction": {
+      "imaginary": "17/5",
+      "norm_square": "13",
+      "real": "-6/5"
+    },
+    "source": {
+      "denominator": 1,
+      "imaginary": 3,
+      "real": 2
+    },
+    "work": {
+      "deeds": 1,
+      "ingress_octets": 4,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 128,
+      "section_readouts": 0
+    }
+  }
+}

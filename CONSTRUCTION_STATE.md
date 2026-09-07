@@ -10,11 +10,24 @@ instruction governs.
 
 ## Parallel MacBook position
 
+[definition] Brandon resumed the updated AS4–AS5 goal on September 7. The
+[Apple blueprint](docs/plans/HOLONICS_ON_APPLE_SILICON.md#september-7-resumption-through-shared-native-generators)
+now states the shared generator port, actual acoustic binding and subsequent useful sound/English
+product sequence. AS4–AS5 remain unfinished.
+
+[established-bounded; measured] The [conditional Metal return](research/records/2026-09-07_APPLE_LEARNS_THE_SHARED_CONDITIONAL_PHASE_ACTION.md)
+now supplies the four shared current/contact/differential/historical-frame kernels, 54 passing
+engine controls and exact agreement with the desktop forward phase-action receipt. Prediction
+and later resident currents use zero numerical readouts. Desktop `d3820ac3` has subsequently
+published condition Preimage Fibre inference; integrating that extension is next before the
+actual acoustic condition/receiver composition. No useful acoustic or English model is claimed.
+
 [established-bounded; measured] The September 7 Mac pickup integrates desktop `6ef7bf9d` with
 68 passing engine/public native tests and successful HNA library, application and shared-example
 checks. The [integration record](research/records/2026-09-07_APPLE_INTEGRATES_THE_SHARED_CONDITIONAL_GENERATOR_HANDOFF.md)
-retains the merge repair and shared conditional-generator handoff. Its new Metal kernels remain
-unported; learned linguistic/acoustic organization and AS4–AS5 remain unfinished.
+retains the merge repair and initial shared conditional-generator handoff. The subsequent Metal
+return above supersedes its then-unported boundary; learned linguistic/acoustic organization
+and AS4–AS5 remain unfinished.
 
 [definition] Brandon's subsequent September 6 request establishes `codex/apple-silicon` for
 [Holonics on Apple silicon](docs/plans/HOLONICS_ON_APPLE_SILICON.md), independently of the desktop

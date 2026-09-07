@@ -224,3 +224,51 @@ fn a_different_surface_does_not_supply_this_relations_current() {
     assert!(body.advance_resident(current(&source), None).is_err());
     assert_eq!(body.occurrences(), 0);
 }
+
+#[test]
+#[cfg(target_os = "macos")]
+#[ignore = "requires Metal; rational current uses the final admitted scratch coordinate"]
+fn metal_current_uses_the_complete_admitted_scratch_aperture() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let available = surface.declaration().max_sectiond_bytes as usize;
+    let width = (3..=available)
+        .take_while(|n| ResidentSurface::constitutive_fibre_scratch(*n).unwrap() <= available)
+        .last()
+        .unwrap();
+    let source_width = width - 2;
+    let mut body = ResidentConstitutiveFibre::found(&surface, source_width, 2).unwrap();
+    let mut input = vec![0; source_width + 1];
+    input[source_width - 1] = 6;
+    input[source_width] = 3;
+    let source = points(&surface, &input);
+    let received = points(&surface, &[4, -2, 5]);
+    let source = ResidentConstitutiveCurrent::rational(&source).unwrap();
+    let received = ResidentConstitutiveCurrent::rational(&received).unwrap();
+    let before = body.census();
+    body.advance_resident(source, Some(received)).unwrap();
+    let result = body.advance_resident(source, None).unwrap();
+    assert_eq!(body.census().section_read_outs, before.section_read_outs);
+    assert_eq!(body.census().ingress_octets, before.ingress_octets);
+    assert_eq!(values(&result), vec![Rat::new(4.into(), 5.into()), Rat::new((-2).into(), 5.into())]);
+    assert_eq!(result.inspect().unwrap().successor_rank, 1);
+}
+
+#[test]
+#[ignore = "requires native current; full differential word width and signed endpoint difference"]
+fn differential_keeps_the_last_mask_bit_and_wide_signed_difference() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let mut body = ResidentConstitutiveFibre::found(&surface, 1, 252).unwrap();
+    let mut received = vec![0; 252];
+    received[248] = i64::MIN;
+    received[250] = i64::MAX;
+    body.advance(&[1], Some(&received)).unwrap();
+    let source = points(&surface, &[1]);
+    let result = body.advance_resident(current(&source), None).unwrap();
+    let face = result.read_differential_pairs(0, 63).unwrap();
+    assert_eq!(face.positive, 1u64 << 62);
+    assert_eq!(face.negative, 0);
+    assert_eq!(face.exact_zero, (1u64 << 62) - 1);
+    assert_eq!(face.unresolved, face.exact_zero);
+}

@@ -29,6 +29,52 @@ Brandon's subsequent direct request authorizes completion of the entire AS1–AS
 He identifies AS3 as the milestone establishing the Holonics foundation on Apple silicon;
 AS4–AS5 remain required parts of the same authorized work.
 
+## September 7 resumption through shared native generators
+
+[project-postulate] Brandon now resumes the updated acoustic goal after desktop `6ef7bf9d`
+was integrated as `8e3a5b6f`. AS1–AS3's returned Apple foundation stands; AS4–AS5 remain the
+product objective. The [shared handoff](../HARDWARE_AND_MODALITY_BOUNDARIES.md#conditional-generator-port-for-the-mac-workflow)
+and [generator/class correction](../../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
+now refine the acoustic construction below. A reusable class, its Preimage Fibre, coherent
+composition and ordered progression retain distinct roles. Useful consequences can be supported
+by a plural fibre; identifying an individual performance or reversing the raw past is unnecessary.
+
+[definition] The resumed AS4–AS5 construction follows this order within the existing stages:
+
+1. Realize the shared resident conditional-current port on Metal: the existing constitutive
+   current, bilinear contact and whole-fibre differential kernels, their exact scratch layouts
+   and dependent launch bindings. Use the public `native_conditioned_phase` example and existing
+   relation/contact controls to compare the inferred operator, returned currents, original
+   vertical fibres and refusal/ownership behavior with the desktop receipt. This is a device
+   composition return, not completion of acoustic development.
+2. Bind actual acoustic sections and returns to that shared owner. Start at
+   `AcousticFieldChart`, `ExactPhaseCurrentSection`, the existing clock-transport owners and
+   native acoustic production/receiver boundary. Carry source support, phase, temporal order
+   and actual material/channel conditions. Derive the missing type/port composition rather than
+   treating cell width, sample ordinal, transcript spelling or a supplied class label as native
+   organization. Where conditions are only partially inferred, compose the existing affine
+   elimination/Preimage Fibre relation and use only its supported subsequent consequences.
+3. Develop and retain acoustic generative standing across source-qualified recordings and
+   actual joined returns, then conduct its native emission into the declared acoustic receiver.
+   Inspect perception differences and generated sound, preserve the declared reconstruction
+   boundary, and continue the same owner after persistence. A stored recording or fixed
+   sonification cannot supply the productive emission. Port larger desktop field owners only
+   when the actual composition requires their precise conduct.
+4. Compose recorded English and conversational audio through the same ecology, retaining actual
+   speaker/clock/turn/response relations and the relevant textual chart. Establish useful
+   recognition, generation and conversational conduct from the resulting model. Shared text
+   formation is reused at its actual scope; waiting for all desktop alpha work is not a new
+   prerequisite for acoustic construction.
+5. Finish the public continuing application, recorded streaming/restart behavior and measured
+   consumer cost, including latency, residency, transfers and reconstruction work. AS4–AS5
+   complete only with their useful acoustic/English products and the corresponding evidence.
+
+[definition] The bilinear contact is a declared local family `s ⊕ c ⊕ (c ⊗ s)`, not a universal
+acoustic constitutive law. Its condition port must be bound to relevant situated circumstances.
+Reference algebra and exterior codecs can verify or present a result; the existing GPU owner
+continues to determine committed current, learned relation and successor. No additional learner,
+authored phoneme/frequency table or PCM-step schedule replaces that relation.
+
 [historical; source-inspected] Before this request, the September 6
 [hardware/modality guide](../HARDWARE_AND_MODALITY_BOUNDARIES.md) already described the shared
 recurrence, CUDA build obstruction, MLX comparison and exact acoustic owners. It explicitly left

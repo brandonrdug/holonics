@@ -76,11 +76,11 @@ cargo test -p holonics-workbench --test native_checkpoint_process -- --ignored -
 
 [definition] Historical GPU tests still use `#[ignore]` to keep device initialization explicit.
 The phase tests run on the selected platform backend. The field command covers the ordinary
-Metal field and the refusal boundary for unported junctions. Desktop `6ef7bf9d` adds resident
-conditional-current, whole-fibre receiver and paired/material junction tests that need their
-corresponding Metal kernels; the complete constitutive test filter is therefore not a Mac parity
-suite. Follow the [conditional-generator handoff](HARDWARE_AND_MODALITY_BOUNDARIES.md#conditional-generator-port-for-the-mac-workflow)
-for that remaining port. CUDA-only tests remain unavailable on Mac.
+Metal field and the refusal boundary for unported junctions. Shared conditional-current and
+whole-fibre tests now run on Metal at the [54-test port scope](../research/records/2026-09-07_APPLE_LEARNS_THE_SHARED_CONDITIONAL_PHASE_ACTION.md#checks).
+That record gives the additional filters and explicitly excludes two tests whose teacher uses
+CUDA-only matrix contraction. The paired/material junction kernels also remain unported, so the
+complete constitutive filter is not a Mac parity suite. CUDA-only tests remain unavailable on Mac.
 Lean dependencies are fetched when relevant formal work requires them; no proof assistant enters
 the native runtime.
 
