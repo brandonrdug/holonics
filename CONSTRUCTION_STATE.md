@@ -19,6 +19,12 @@ records the recovered September 2 naming correction, current attachment gaps and
 The native corpus process remains stopped in memory; no additional cultivation or branch merge
 was performed during this review.
 
+[definition] Ready for Brandon to resume the goal with the chord/class clarification incorporated:
+reusable class, Preimage Fibre, coherent composition and ordered progression have distinct roles.
+The Mac handoff is the first committed shared generator/phase formation and continuation return
+with a concrete Metal port boundary. It is not yet available. Desktop acoustic work is optional
+research for that common relation; the conversation product remains the goal.
+
 [definition] The original authorization is construction and completion of the
 [Athena-alpha blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md).
 AC0 prepares source-qualified available conversation occurrences; AC1 composes actual native

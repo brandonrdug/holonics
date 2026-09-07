@@ -219,6 +219,67 @@ or operator forms. Their source maps, domain transport and developmental changes
 composed. Enumerating historical field records as a total transition table, supplying invented
 future replies, or fitting a fixture-specific law would conceal this exact gap.
 
+## Class, composed occurrence and progression
+
+[project-postulate] Brandon's subsequent chord clarification makes reusable classes explicit.
+A description such as “C-minor” can identify a general musical object without specifying one
+physical performance. Situated occurrence identity and class identity are different relations;
+insisting on the former before allowing the latter would repeat the earlier contextual-transport
+overcorrection. Text, vision and electromagnetic reception share this construction question.
+
+[definition] For a class receiver `q : Occurrences -> Classes`, the class `c` and its Preimage
+Fibre `{x | q(x)=c}` have distinct roles. The class may be described and used without selecting a
+particular member. Variations within the fibre can remain consequential for another receiver:
+voicing, phase, timing, instrument and spatial coupling may change while the declared chord-class
+face remains the same. The fibre may be constrained implicitly from limited observations. Neither
+the class nor its use requires recovery of the microscopic event that produced an observation.
+
+[definition] A chord's constituent composition and a sequence of chords carry different incidence.
+Notes can compose into chords, chords into passages, and passages into a song, with each whole
+participating in further relations. Temporal progression carries ordered transitions and their
+joining conditions. Permuting a presentation's interchangeable slots is not permission to permute
+that progression. Native organization must support both reusable class structure and the oriented
+relations of particular compositions; a list of labels does not supply those relations.
+
+[project-postulate] Text enters the same amplitude/phase-bearing ontology. Its holons admit
+superposition, and their interaction must retain the applicable relative phase and ordered action.
+Wavelength belongs to an admitted transport/clock chart; it is not assigned by the numerical value
+of a byte or by an authored frequency table for words. The quantum and physical laws invoked must
+be realized with their actual carriers and couplings, not reduced to a vocabulary of particles.
+
+[conditional] In an admitted linear wave carrier, `psi = sum_j psi_j` preserves coherent
+superposition. A quadratic receiver sees cross terms:
+`|sum_j z_j|^2 = sum_j |z_j|^2 + 2 Re(sum_(j<k) conj(z_j)*z_k)`.
+The equality follows by expanding the product with its conjugate. Keeping only separate component
+magnitudes loses the relative-phase terms of that receiver. This conditional calculation names
+a concrete relation the shared carrier can owe. Its source action, physical coupling and receiver
+domain must be supplied by the actual composition.
+
+[established-bounded; source-inspected] At desktop `d222c64a`,
+`Foundation/ReceiverQuotient.lean::quotient_eq_places_both_in_one_fibre` already keeps distinct
+sources behind one class face; `QuotientSection` treats selection of a member as additional
+structure. `Foundation/HolonTensorLens.lean::HomogeneousSlotNaturality` transports occurrences,
+ports and faces together under its declared slot permutations. These sources support the scoped
+class/occurrence distinction, not a requirement to supply an individual performance before a
+musical class exists. They were read as mathematical source; no Lean execution or pipeline was added.
+
+## Mac workflow handoff
+
+[definition] Brandon will resume the goal separately. Desktop construction remains directed at
+the conversation product. An acoustic/string/chord experiment is appropriate here when it makes
+the shared inverse/phase/composition question easier to derive or examine; a separate desktop
+acoustic product is not required. The Mac branch retains the acoustic application work.
+
+[definition] Recommend re-engaging the Mac's dependent native-cultivation workflow when the first
+committed shared generator/phase formation return can be consumed there: limited actual source
+returns constrain operative standing, and subsequent native transport/emission uses it while
+preserving the declared class distinctions and phase-sensitive differences. Supply the commit,
+public carrier/operation boundary, exact arithmetic requirements, relevant execution evidence and
+the concrete Metal port delta. This is a coordination milestone, not a new universal learning gate
+or a requirement to finish Athena-alpha before audio can proceed. Notify Brandon when that return
+exists; until then the previously inspected branch has apparatus to build on but not this shared
+attachment. Independent Mac work remains authorized.
+
 ## Disposition
 
 [definition] The blueprint's AC1–AC2 attachment is corrected to compose those owners and derive

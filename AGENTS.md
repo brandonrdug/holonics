@@ -42,6 +42,13 @@ reversible codec checks retain their narrower scopes. Read the
 [text/acoustic synthesis](research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md).
 The corpus process and goal are paused; research and documentation correction do not resume them.
 
+[project-postulate] Brandon's chord clarification preserves reusable class identity separately
+from physical occurrence identity. A class description need not specify one performance; its
+Preimage Fibre and the phase-bearing, temporally ordered relations of its instances remain
+distinct. Text holons admit superposition through actual transport charts. Desktop acoustics is
+optional shared research. Notify Brandon when a committed shared native generator/phase return
+and concrete Metal port boundary make the dependent Mac workflow ready to re-engage.
+
 [project-postulate] Brandon's September 6 synthesis ruling records Athena-alpha as planned but
 unattained. Curated conversation material supports the next native cultivation direction for
 English, code and mathematics. Recent mathematical constructions inform native owners; Lean

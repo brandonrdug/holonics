@@ -30,6 +30,12 @@ and the corrected blueprint before resuming. **Preimage Fibre** carries compatib
 future-conduct constraints from limited observations; neither perfect inversion nor retention of
 every raw state is a learning prerequisite. The original continuation order does not supersede this pause.
 
+[definition] Brandon's subsequent chord clarification preserves general class descriptions without
+requiring an individual physical occurrence, alongside superposition and ordered composition.
+The [Mac coordination milestone](../../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md#mac-workflow-handoff)
+is a committed shared generator/phase return with an explicit Metal port boundary. Notify Brandon
+then; desktop acoustics is optional supporting research, not another required campaign.
+
 [definition] Brandon has authorized design followed immediately by construction and completion of
 [the Athena-alpha blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md) as a goal. It orders AC0–AC5:
 source-qualified available conversations; coupled native material/current/formation; learned text

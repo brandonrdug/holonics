@@ -90,6 +90,13 @@ consequence is that the learned family characteristics constrain and conduct sub
 A decoder presents an admitted consequence; a perfect inverse of the source is not a cultivation
 requirement. Exact checkpoint restoration is a separate, narrower operation.
 
+[project-postulate] Reusable classes are valid objects of description without choosing a physical
+occurrence. Brandon's chord example distinguishes a general class, its compatible occurrence
+fibre, the phase-bearing composition within an occurrence, and its ordered progression into other
+compositions. Preserve those roles across text, vision and acoustics. Do not overcorrect situated
+identity into a prohibition on abstraction. Text holons admit superposition; wavelengths and phase
+belong to their actual transport charts, not authored mappings from byte IDs to frequencies.
+
 [definition] The September 7 correction binds black-box recovery and Holonic Compression into
 formation itself. Actual material faces and available contextual returns constrain executable
 local transport families; group actions, relative phase and oriented incidence determine which
@@ -389,6 +396,12 @@ and cost evidence agree. Update the position and final record, commit and push c
 changes, then mark the goal complete. No phrase in an earlier phase changes that completion rule.
 
 ## 6. Execution and verification
+
+[definition] Desktop acoustics is optional research material for the shared generator/phase
+attachment, not a second required product. Tell Brandon to re-engage the dependent Mac workflow
+when a committed, tested native formation/continuation return and its explicit Metal port boundary
+are available. The [handoff definition](../../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md#mac-workflow-handoff)
+precedes full Athena-alpha usefulness; it does not require completing text before acoustic work.
 
 [project-postulate] The original instruction authorized immediate construction after deposit;
 Brandon's September 7 pause now governs execution. The goal remains unfinished across partial returns.
