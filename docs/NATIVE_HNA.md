@@ -181,6 +181,19 @@ separates the factorization result from learned material conduct and response qu
 
 ## Run it
 
+[established-bounded; measured] The [complete-current source receiver](../research/records/2026-09-07_AC2_THE_FULL_INTERNAL_CURRENT_HAS_AN_ADDRESSED_PREFIX_PAIRING.md)
+constructs the retained outgoing current together with the full born internal-current population
+through exact prefix moments. `NativeCurrentHistorySourceReceiver::on_empty` binds it to one
+field; `receive_completed` observes each next completed field return while its receiving carriers
+are resident. `inspect` exposes numerical representatives and the complete-source radius;
+`pairing` returns a ball enclosing the actual source inner product. The current implementation
+supports integral root contacts and retains wider numerator words on the device.
+
+[definition] This is presently a construction receiver, separate from productive material
+learning. `alpha_current_source` runs it over actual exposure through the public text session and
+publishes a diagnostic report. It neither emits a response nor saves a new model. The active
+blueprint still owes integration of the complete source into material/reaction and durable state.
+
 [established-bounded; measured] These commands run the checked-in examples on the standing CUDA
 apparatus. The build uses the repository's usual [development setup](DEVELOPMENT.md).
 

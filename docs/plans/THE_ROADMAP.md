@@ -84,6 +84,14 @@ host persistence and disk size remain growing costs. Continue productive context
 and economical broader development. Preserve numerical error and complete defects; do not turn source
 uncertainty into a point. AC1–AC5 completion and the useful alpha product remain open.
 
+[definition] The [complete-current source return](../../research/records/2026-09-07_AC2_THE_FULL_INTERNAL_CURRENT_HAS_AN_ADDRESSED_PREFIX_PAIRING.md)
+now supplies native pairings over the complete born internal-current population and a reachable
+zero-boundary counterexample to outgoing-only source sufficiency. Its 732-source actual-material
+comparison and native controls return at construction-receiver scope. Next join that source to
+the native material/reaction operation through the derived source-qualified return, preserving
+forward chronology, complete numerical defects and persistence. The construction receiver itself
+does not improve language or close a cultivation phase.
+
 ## Completed September 6 synthesis before Athena-alpha cultivation
 
 [definition] Brandon's latest request directs repository-wide synthesis of the available

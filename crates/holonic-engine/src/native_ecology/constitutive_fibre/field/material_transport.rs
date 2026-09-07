@@ -49,7 +49,7 @@ pub struct NativeFieldMaterialTransportResidual {
     pub gain: Vec<ExactComplexWaveCurrent>,
 }
 
-fn wides(words: &[(i64, i64)]) -> Result<Vec<i128>, ConstitutiveFibreError> {
+pub(super) fn wides(words: &[(i64, i64)]) -> Result<Vec<i128>, ConstitutiveFibreError> {
     if words.len() % 2 != 0 || words.iter().any(|(a, b)| a != b) {
         return Err(ConstitutiveFibreError::Uncertain);
     }

@@ -16,6 +16,7 @@ use crate::dimensional_wave::ExactComplexWaveCurrent;
 use std::rc::Rc;
 
 mod archive;
+mod current_history_source;
 mod junction;
 mod material_transport;
 mod receiver;
@@ -23,6 +24,10 @@ mod rechart;
 mod rest;
 pub use archive::NativeFieldHistoryPlacement;
 use archive::{ArchivedField, FieldArchive};
+pub use current_history_source::{
+    NativeCurrentHistorySource, NativeCurrentHistorySourceReading,
+    NativeCurrentHistorySourceReceiver,
+};
 pub use junction::{
     NativeFieldCurrentBall, NativeFieldEnclosedJunctionReading, NativeFieldExactJunctionReading,
     NativeFieldInternalCurrent, NativeFieldInternalCurrentBall, NativeFieldJunctionReading,

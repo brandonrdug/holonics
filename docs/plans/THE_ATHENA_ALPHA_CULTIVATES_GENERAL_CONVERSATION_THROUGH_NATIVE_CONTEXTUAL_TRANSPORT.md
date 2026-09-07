@@ -268,6 +268,13 @@ attribution observation, not an interior generation rule or a blanket ban on use
 followups and later revision. Retain failed outputs and diagnose their actual transport. This
 phase does not pass on fluent inherited text, output length, nonempty bytes or a polished renderer.
 
+[definition] The [complete-current source construction](../../research/records/2026-09-07_AC2_THE_FULL_INTERNAL_CURRENT_HAS_AN_ADDRESSED_PREFIX_PAIRING.md)
+refines the open AC1–AC2 attachment: retain outgoing plus every born internal current, with
+actual source-prefix overlap, and join it to the material/reaction return. The native construction
+receiver and its actual-material comparison now return, including a reachable hidden-current
+distinction behind equal zero boundary output. Productive coupling, its full uncertainty/adjoint
+expression and durable integration remain open; this does not close AC2 or establish language.
+
 ### AC3 — Cultivated model and continuing corpus development
 
 [established-bounded; measured] The [field persistence return](../../research/records/2026-09-07_AC3_THE_CULTIVATED_FIELD_RESTARTS_WITHOUT_SOURCE_REPLAY.md)

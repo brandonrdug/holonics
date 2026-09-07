@@ -72,6 +72,7 @@
 // realized as block reductions on the card and never as serial-chart loops between launches.
 
 #include <stdint.h>
+#include "exact_integer.cuh"
 
 typedef __int128 wide;
 typedef unsigned __int128 uwide;
@@ -1350,6 +1351,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "balanced_field_factorization.cuh"
 #include "enclosed_field_junction.cuh"
 #include "field_material_transport.cuh"
+#include "field_current_history_source.cuh"
 #include "field_differential_receiver.cuh"
 #include "constitutive_field.cuh"
 

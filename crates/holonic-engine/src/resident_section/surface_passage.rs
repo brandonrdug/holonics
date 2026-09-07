@@ -2,6 +2,149 @@ use super::*;
 
 impl<'chart> ResidentSurface<'chart> {
 
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_field_current_history_source(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        query: &ResidentSection<'chart>,
+        origin: Option<&ResidentSection<'chart>>,
+        incoming: &ResidentSection<'chart>,
+        frame: &ResidentSection<'chart>,
+        origin_frame: Option<&ResidentSection<'chart>>,
+        covariance: &ResidentSection<'chart>,
+        before: &ResidentSection<'chart>,
+        current: &ResidentSection<'chart>,
+        state: &ResidentSection<'chart>,
+        nodes: usize,
+        grain: u32,
+        occurrence: u64,
+        next: &ResidentSection<'chart>,
+        source: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || ResidentRefusal::Declaration {
+            operation: "field-current-history-source",
+            what: "incompatible integral-contact current chart".into(),
+        };
+        let d = nodes
+            .checked_mul(6)
+            .filter(|d| *d <= u32::MAX as usize)
+            .ok_or_else(fail)?;
+        let matrix = d
+            .checked_mul(d)
+            .and_then(|n| n.checked_add(1))
+            .ok_or_else(fail)?;
+        let shape =
+            |s: &ResidentSection<'chart>, r, w| s.rows == r && s.width == w && s.grain.0 == 0;
+        if nodes == 0
+            || !(1..=120).contains(&grain)
+            || occurrence >= i64::MAX as u64
+            || !shape(query, 1, 16 * nodes + 9)
+            || !shape(incoming, nodes, 3)
+            || !shape(frame, nodes, 3)
+            || origin.is_some() != origin_frame.is_some()
+            || origin.is_some_and(|s| !shape(s, 1, 16 * nodes + 9))
+            || origin_frame.is_some_and(|s| !shape(s, nodes, 3))
+            || !shape(covariance, 1, matrix)
+            || !shape(before, 1, 12 * (d + 1))
+            || !shape(current, 1, 12 * (d + 1))
+            || !shape(state, 1, 2 * d + 8)
+            || !shape(next, 1, 2 * d + 8)
+            || !shape(source, 1, 6 * d + 22)
+        {
+            return Err(fail());
+        }
+        let shared = d
+            .checked_mul(32)
+            .and_then(|n| u32::try_from(n).ok())
+            .filter(|n| *n <= self.declaration.max_sectiond_bytes)
+            .ok_or_else(fail)?;
+        let mut params = Params::new();
+        params
+            .ptr(query.lo.device_ptr())
+            .ptr(origin.unwrap_or(query).lo.device_ptr())
+            .ptr(incoming.lo.device_ptr())
+            .ptr(frame.lo.device_ptr())
+            .ptr(origin_frame.unwrap_or(frame).lo.device_ptr())
+            .ptr(covariance.lo.device_ptr())
+            .ptr(before.lo.device_ptr())
+            .ptr(current.lo.device_ptr())
+            .ptr(state.lo.device_ptr())
+            .ptr(state.hi.device_ptr())
+            .u32(nodes as u32)
+            .u32(u32::from(origin.is_some()))
+            .u32(grain)
+            .u64(occurrence)
+            .ptr(next.lo.device_ptr())
+            .ptr(next.hi.device_ptr())
+            .ptr(source.lo.device_ptr())
+            .ptr(source.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_field_current_history_source",
+            1,
+            self.launch.block_x,
+            shared,
+            &mut params,
+            "field-current-history-source",
+        )
+    }
+
+    pub(crate) fn record_field_current_history_pairing(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        left: &ResidentSection<'chart>,
+        right: &ResidentSection<'chart>,
+        dimension: usize,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || ResidentRefusal::Declaration {
+            operation: "field-current-history-pairing",
+            what: "incompatible source charts".into(),
+        };
+        let width = dimension
+            .checked_mul(6)
+            .and_then(|n| n.checked_add(22))
+            .ok_or_else(fail)?;
+        if dimension == 0
+            || dimension % 2 != 0
+            || dimension > u32::MAX as usize
+            || [left, right]
+                .into_iter()
+                .any(|s| s.rows != 1 || s.width != width || s.grain.0 != 0)
+            || output.rows != 1
+            || output.width != 15
+            || output.grain.0 != 0
+        {
+            return Err(fail());
+        }
+        let mut params = Params::new();
+        params
+            .ptr(left.lo.device_ptr())
+            .ptr(left.hi.device_ptr())
+            .ptr(right.lo.device_ptr())
+            .ptr(right.hi.device_ptr())
+            .u32(dimension as u32)
+            .ptr(output.lo.device_ptr())
+            .ptr(output.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_field_current_history_pairing",
+            1,
+            self.launch.block_x,
+            0,
+            &mut params,
+            "field-current-history-pairing",
+        )
+    }
+
     /// Terminal sign receiver on disjoint pairs of complex coordinates in a junction report.
     pub(crate) fn record_field_differential_receiver(
         &self, lane: &Lane<'_, 'chart>, report: &ResidentSection<'chart>,

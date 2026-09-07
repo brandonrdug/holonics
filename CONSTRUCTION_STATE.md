@@ -107,6 +107,22 @@ not establish useful response quality.
 [open] Host checkpoint reading/writing still materializes full history, and disk/lineage storage
 grows. Those costs and broader contextual construction remain; this is not an alpha completion.
 
+[established-bounded; measured] The [complete-current source construction](research/records/2026-09-07_AC2_THE_FULL_INTERNAL_CURRENT_HAS_AN_ADDRESSED_PREFIX_PAIRING.md)
+now returns native birth moments and bounded pairings over outgoing plus all born internal
+currents. Seventy-five constitutive controls pass. An actual four-family probe verifies all 732
+native source constructions against the independent observer, with no numerical readouts during
+admission/construction. Wider exact arithmetic retains the birth-square numerators beyond 128 bits.
+
+[counterexample; measured] A reachable two-contact field has exactly zero outgoing and held
+boundary current at two successive cuts, while its internal currents are `(1/3,-1/3)` and
+`(-1/3,1/3)`. The new native pairing separates them. An outgoing-only linear material map cannot
+distinguish these sources for any coefficients; this establishes a specific missing input port.
+
+[open] The new source is presently a construction receiver. Integrate it into the same native
+material/reaction return, retaining the source-time forward, contemporary receiving current,
+parameter/source uncertainty, actual adjoint and complete durable successor. The productive
+model still uses the earlier outgoing-only transport and its latest response remains `Tm.`.
+
 ## Completed foundation and data preparation
 
 | Return | Standing scope and evidence |

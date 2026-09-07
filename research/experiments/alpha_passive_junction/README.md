@@ -1,5 +1,12 @@
 # Exact passive junction observer
 
+[definition] `current_history_source.py` derives the complete-source prefix geometry from the
+actual retained native report, preserves its error bounds, and compares optional native source
+construction output. Its declared scalar covectors check the full/folded/cached receiver identity;
+they do not train or emit a model. The [source-construction record](../../records/2026-09-07_AC2_THE_FULL_INTERNAL_CURRENT_HAS_AN_ADDRESSED_PREFIX_PAIRING.md)
+contains the derivation, native counterexample, numerical scope and commands. Use `python -P` here
+to avoid the neighboring historical `inspect.py` shadowing Python's standard-library module.
+
 [definition] `inspect_rest_continuation.py` compares a remounted actual text run with an
 independently executed reference: complete current/body, lineage, source cut and emitted result.
 It also checks that remount enacted zero native deeds. The
