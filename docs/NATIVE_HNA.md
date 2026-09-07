@@ -25,9 +25,20 @@ phase checkpoints keep their ordinary linear source chart.
 [established-bounded; measured] The [conditional phase example](../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
 uses actual native field observations, identifies a local phase action, and predicts/continues
 under a new rational condition. Its portable operator receipt and Metal port boundary are ready
-for shared Mac work. The local relation report is not a new whole-HNA checkpoint. Inferring the
-condition Preimage Fibre from actual returns and binding conditions to conversation material
-remain the next construction.
+for shared Mac work. The local relation report is not a new whole-HNA checkpoint.
+
+[established-bounded; measured] `ResidentConstitutiveFibre::read_condition_preimage` now derives
+the compatible condition family from a fixed source and observed return. `ResidentConditionPreimage`
+retains the native constraint graph/RHS, particular/free directions or an outside-represented-relation
+residual. Its supported condition can enter a later native operation directly. The
+[preimage return](../research/records/2026-09-07_AC1_THE_LEARNED_ACTION_RETURNS_ITS_CONDITION_PREIMAGE_FIBRE.md)
+includes an unprovided phase and a new prediction, free/partial fibres, and 100 passing native tests.
+The generic `ConstitutiveDifferentialReading` carries a relation cut and optional field source;
+only an actually qualified source can become a field-specific diagnostic.
+
+[open] General forward transport of a plural condition family must preserve its joint
+condition/output fibre and unsupported domain. That composition and the conversation-material
+binding remain the next construction; a particular condition cannot stand in for the whole family.
 
 [established-bounded; measured] The existing `ResidentConstitutiveFibre` now exposes
 [`advance_resident`](../crates/holonic-engine/src/native_ecology/constitutive_fibre/resident.rs).

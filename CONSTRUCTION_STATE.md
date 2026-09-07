@@ -30,15 +30,23 @@ research for the common relation; the conversation product remains the goal.
 
 [established-bounded; measured] The existing local relation now learns over an explicit native
 source/condition/mixed-current contact. Six measured phase-field returns identify a local action,
-predict a new rational condition exactly, and drive three later wave currents without numerical
+predict its return under a new rational condition, and drive three later wave currents without numerical
 readback. The inferred operator itself is checked in the portable return. The 93-test constitutive
 scope and an additional multiport/denominator control pass. The condition is an independently
 supplied channel property in this experiment, not a semantic label.
 
-[open] Next construct the condition Preimage Fibre from a fixed actual source and later return
-inside the same learned relation, then use its supported consequences in continuing transport.
-For the bilinear chart this is an affine section, so it can reuse the native elimination owner.
-The appropriate binding to actual conversation material and useful text remain open.
+[established-bounded; measured] The [condition Preimage Fibre](research/records/2026-09-07_AC1_THE_LEARNED_ACTION_RETURNS_ITS_CONDITION_PREIMAGE_FIBRE.md)
+now derives compatible conditions from a fixed source and actual later return, entirely on the
+device. An unprovided phase is inferred and used to predict a later native current exactly.
+Free directions, outside-relation cases and partially known source domains survive; a plural
+condition fibre can expose a fixed receiver. All 100 constitutive tests and the public codec
+control pass. Generic receiver cuts no longer invent field source occurrences.
+
+[open] Next carry inferred condition families as continuing native standing and construct their
+joint condition/output relation for a new source, retaining unsupported domain and the complete
+Preimage Fibre. The unique-condition continuation already runs; the general forward image of a
+plural condition and the actual conversation-material binding remain unfinished. Athena-alpha
+still has no useful text response.
 
 [established-bounded; measured] The existing local relation now has a
 [resident rational-current port](research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md).

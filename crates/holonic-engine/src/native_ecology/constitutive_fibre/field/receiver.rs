@@ -2,6 +2,28 @@
 //! enters this native owner. Full current reports and numerical residuals remain in history.
 use super::*;
 
+impl ConstitutiveDifferentialReading {
+    /// Convert an actually field-qualified relation receiver, preserving the historical source
+    /// and later relation cut. A generic condition/class receiver has no field occurrence.
+    pub fn into_field_reading(
+        self,
+    ) -> Result<NativeFieldDifferentialReading, ConstitutiveFibreError> {
+        Ok(NativeFieldDifferentialReading {
+            occurrence: self
+                .field_source
+                .ok_or(ConstitutiveFibreError::ForeignOccurrence)?,
+            relation_cut: Some(self.relation_cut),
+            constitutive_status: Some(self.status),
+            first_complex: self.first_complex,
+            pairs: self.pairs,
+            positive: self.positive,
+            negative: self.negative,
+            unresolved: self.unresolved,
+            exact_zero: self.exact_zero,
+        })
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct NativeFieldDifferentialReading {
     pub occurrence: usize,

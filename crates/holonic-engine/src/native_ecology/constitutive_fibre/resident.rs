@@ -6,6 +6,21 @@
 
 use super::*;
 
+/// A local relation's receiver result. Only field-qualified queries have a field source;
+/// a relation cut never stands in for an invented source occurrence.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+pub struct ConstitutiveDifferentialReading {
+    pub field_source: Option<usize>,
+    pub relation_cut: u64,
+    pub status: NativeFieldReceiverStatus,
+    pub first_complex: usize,
+    pub pairs: usize,
+    pub positive: u64,
+    pub negative: u64,
+    pub unresolved: u64,
+    pub exact_zero: u64,
+}
+
 /// A borrowed exact current chart. Coordinates and the optional denominator remain on device.
 #[derive(Clone, Copy)]
 pub struct ResidentConstitutiveCurrent<'a, 'chart> {
@@ -96,7 +111,7 @@ impl<'chart> ResidentConstitutiveReturn<'chart> {
         &self,
         first_complex: usize,
         pairs: usize,
-    ) -> Result<NativeFieldDifferentialReading, ConstitutiveFibreError> {
+    ) -> Result<ConstitutiveDifferentialReading, ConstitutiveFibreError> {
         let output = self.surface.fresh_section(1, 5, ResidentGrain(0))?;
         let mut passage = self.surface.begin_passage(&[vec![]])?;
         {
@@ -123,17 +138,15 @@ impl<'chart> ResidentConstitutiveReturn<'chart> {
         if words.iter().any(|(lo, hi)| lo != hi || *lo < 0) {
             return Err(ConstitutiveFibreError::Uncertain);
         }
-        Ok(NativeFieldDifferentialReading {
-            occurrence: self.source_occurrence.unwrap_or(
-                usize::try_from(self.occurrence).map_err(|_| ConstitutiveFibreError::Shape)?,
-            ),
-            relation_cut: Some(self.occurrence),
-            constitutive_status: Some(match words[4].0 {
+        Ok(ConstitutiveDifferentialReading {
+            field_source: self.source_occurrence,
+            relation_cut: self.occurrence,
+            status: match words[4].0 {
                 0 => NativeFieldReceiverStatus::Unique,
                 1 => NativeFieldReceiverStatus::OutsideDomain,
                 2 => NativeFieldReceiverStatus::Plural,
                 _ => return Err(ConstitutiveFibreError::Uncertain),
-            }),
+            },
             first_complex,
             pairs,
             positive: words[0].0 as u64,
@@ -335,3 +348,6 @@ mod tests;
 
 #[cfg(test)]
 mod contact_tests;
+
+mod preimage;
+pub use preimage::{ConditionPreimageReading, ResidentConditionPreimage};

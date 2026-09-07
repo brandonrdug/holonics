@@ -111,7 +111,9 @@ pub fn read_constitutive_text_symbol(
     }
     let returned = field.read_constitutive_source(source)?;
     Ok(from_differential(
-        returned.read_differential_pairs(0, TEXT_BIT_PAIRS)?,
+        returned
+            .read_differential_pairs(0, TEXT_BIT_PAIRS)?
+            .into_field_reading()?,
     ))
 }
 

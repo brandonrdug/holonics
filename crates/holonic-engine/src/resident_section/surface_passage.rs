@@ -597,6 +597,50 @@ impl<'chart> ResidentSurface<'chart> {
             shared,&mut params,"constitutive-bilinear-source")
     }
 
+    pub(crate) fn record_condition_preimage(
+        &self, lane: &Lane<'_, 'chart>, basis: &ResidentSection<'chart>,
+        source: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
+        observed: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
+        source_complex: usize, condition_complex: usize, target_width: usize,
+        constraint: &ResidentSection<'chart>, rhs: &ResidentSection<'chart>, output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        self.validate_constitutive_current_view(source)?;
+        self.validate_constitutive_current_view(observed)?;
+        let fail=||ResidentRefusal::Declaration { operation:"condition-preimage",
+            what:"incompatible fixed-source affine section or resident aperture".into() };
+        let source_width=source_complex.checked_mul(condition_complex)
+            .and_then(|n|n.checked_add(source_complex)).and_then(|n|n.checked_add(condition_complex))
+            .and_then(|n|n.checked_mul(2)).ok_or_else(fail)?;
+        let residual_width=source_width.checked_add(target_width).ok_or_else(fail)?;
+        let conditions=condition_complex.checked_mul(2).ok_or_else(fail)?;
+        let width=residual_width.checked_add(conditions).ok_or_else(fail)?;
+        let report_width=conditions.checked_mul(conditions).and_then(|n|n.checked_add(width.checked_add(4)?)).ok_or_else(fail)?;
+        if source_complex==0 || condition_complex==0 || target_width==0 || target_width%2!=0
+            || width>u32::MAX as usize-4 || source.width!=2*source_complex || observed.width!=target_width
+            || basis.rows!=residual_width || basis.width!=residual_width
+            || constraint.rows!=width || constraint.width!=width || rhs.rows!=1 || rhs.width!=residual_width+1
+            || output.rows!=1 || output.width!=report_width
+            || [basis,constraint,rhs,output].iter().any(|s|s.grain.0!=0 || !std::ptr::eq(s.surface,self))
+        { return Err(fail()); }
+        let shared=residual_width.checked_add(width.checked_mul(2).ok_or_else(fail)?)
+            .and_then(|n|n.checked_mul(16)).and_then(|n|u32::try_from(n).ok())
+            .filter(|n|*n<=self.declaration.max_sectiond_bytes).ok_or_else(fail)?;
+        let mut params=Params::new();
+        params.ptr(basis.lo.device_ptr());
+        for current in [source,observed] {
+            params.ptr(current.section.lo.device_ptr()).ptr(current.section.hi.device_ptr())
+                .u32(current.offset as u32).u32(current.denominator.map_or(u32::MAX,|n|n as u32))
+                .u32(current.disposition.map_or(u32::MAX,|n|n as u32));
+        }
+        params.u32(source_complex as u32).u32(condition_complex as u32).u32(target_width as u32);
+        for section in [constraint,rhs,output] {
+            params.ptr(section.lo.device_ptr()).ptr(section.hi.device_ptr());
+        }
+        params.ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_constitutive_condition_preimage",1,self.declaration.warp_size.max(1),
+            shared,&mut params,"condition-preimage")
+    }
+
     /// Resident rational operands for the existing local constitutive relation. Layout fields
     /// address immutable current carriers; all numerical decisions stay on device.
     pub(crate) fn record_constitutive_current(

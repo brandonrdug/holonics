@@ -41,8 +41,12 @@ now binds an actual source and independently supplied condition through direct a
 current. Native phase-field observations identify a reusable action, which predicts a new condition
 and conducts later wave currents without numerical readback. The shared primitive and explicit
 Metal port boundary are ready for Mac re-engagement; acoustic and conversation model completion
-remain open. Next derive the condition Preimage Fibre within the same learned relation, using a
-fixed actual source and later receiving current, then bind that conduct to the conversation ecology.
+remain open. The [native condition Preimage Fibre](../../research/records/2026-09-07_AC1_THE_LEARNED_ACTION_RETURNS_ITS_CONDITION_PREIMAGE_FIBRE.md)
+now infers an unprovided phase from an actual source/return and conducts a new current with it;
+100 native tests and the public codec control pass. Next retain inferred families as continuing
+standing and derive their supported forward image for a new source, preserving joint preimages
+and unsupported domain. Bind that conduct to actual conversation material; do not select a
+particular condition when the retained family remains plural.
 
 [established-bounded; measured] The [resident local return](../../research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md)
 now lets native observations develop the existing local relation and its rational emitted current

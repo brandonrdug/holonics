@@ -1,10 +1,10 @@
 use super::*;
 use crate::{dimensional_wave::ExactComplexWaveCurrent, embedding_fiber::ResidentReadout};
 
-fn phase(r: i64, i: i64, d: i64) -> NativePhaseCurrent {
+pub(super) fn phase(r: i64, i: i64, d: i64) -> NativePhaseCurrent {
     NativePhaseCurrent::new(r, i, d).unwrap()
 }
-fn points<'c>(s: &'c ResidentSurface<'c>, values: &[i64]) -> ResidentSection<'c> {
+pub(super) fn points<'c>(s: &'c ResidentSurface<'c>, values: &[i64]) -> ResidentSection<'c> {
     s.mount_section_rest(
         &ResidentSectionRest::found(
             1,
@@ -17,10 +17,10 @@ fn points<'c>(s: &'c ResidentSurface<'c>, values: &[i64]) -> ResidentSection<'c>
     )
     .unwrap()
 }
-fn current<'a, 'c>(s: &'a ResidentSection<'c>) -> ResidentConstitutiveCurrent<'a, 'c> {
+pub(super) fn current<'a, 'c>(s: &'a ResidentSection<'c>) -> ResidentConstitutiveCurrent<'a, 'c> {
     ResidentConstitutiveCurrent::integers(s).unwrap()
 }
-fn value(r: &ResidentConstitutiveReturn<'_>) -> ExactComplexWaveCurrent {
+pub(super) fn value(r: &ResidentConstitutiveReturn<'_>) -> ExactComplexWaveCurrent {
     match r.inspect().unwrap().predecessor_reading {
         ConstitutiveReading::Unique { current } => {
             ExactComplexWaveCurrent::new(current[0].clone(), current[1].clone())
@@ -28,7 +28,7 @@ fn value(r: &ResidentConstitutiveReturn<'_>) -> ExactComplexWaveCurrent {
         other => panic!("expected current: {other:?}"),
     }
 }
-fn world<'c>(s: &'c ResidentSurface<'c>) -> NativeConstitutiveField<'c> {
+pub(super) fn world<'c>(s: &'c ResidentSurface<'c>) -> NativeConstitutiveField<'c> {
     NativeConstitutiveField::found(
         s,
         vec![NativeJunctionSeed {
@@ -40,7 +40,7 @@ fn world<'c>(s: &'c ResidentSurface<'c>) -> NativeConstitutiveField<'c> {
     )
     .unwrap()
 }
-fn observe(
+pub(super) fn observe(
     world: &mut NativeConstitutiveField<'_>,
     source: NativePhaseCurrent,
     condition: NativePhaseCurrent,
@@ -54,7 +54,7 @@ fn observe(
         .held_successor[0]
         .clone()
 }
-fn calibrate<'c>(
+pub(super) fn calibrate<'c>(
     s: &'c ResidentSurface<'c>,
     body: &mut ResidentConstitutiveFibre<'c>,
     world: &mut NativeConstitutiveField<'c>,

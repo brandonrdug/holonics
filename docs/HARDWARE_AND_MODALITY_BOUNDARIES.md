@@ -55,7 +55,17 @@ complete-current material variant. Porting that larger CUDA history/transport im
 not a prerequisite imposed by this experiment. This is a concrete engineering handoff for shared
 generator work, not an instruction to replace acoustic development with a per-sample loop.
 Audio still needs its actual clocks, material conditions and receiver-family binding. The
-condition Preimage Fibre and general contextual organization continue as shared construction.
+general contextual organization continues as shared construction.
+
+[established-bounded; measured] The [condition Preimage Fibre extension](../research/records/2026-09-07_AC1_THE_LEARNED_ACTION_RETURNS_ITS_CONDITION_PREIMAGE_FIBRE.md)
+now infers an unprovided condition from source/return currents and uses it in a new prediction.
+The additional Metal port is `section_constitutive_condition_preimage`, over the same exact
+elimination helpers. It reduces through all original relation pivots, including vertical ones,
+builds the graph of the fixed-source condition map, and queries its actual RHS. Its output is
+the complete affine condition fibre or a scoped outside-relation residual. For original relation
+width `W` and condition width `C`, scratch is `W+2*(W+C)` wide values, using Metal's own `W` layout.
+The public example and new native controls supply exact comparison data. Generic relation
+receivers now carry an optional field source; the field-specific conversion must not invent one.
 
 [established-bounded; source-inspected] The public framework enters through
 [`holonics::hna`](../crates/holonics/src/lib.rs). Its native session is exposed by
