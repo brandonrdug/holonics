@@ -67,6 +67,15 @@ slice. Fractional precision is independent of carrier dimension. The
 [enclosure record](../research/records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md)
 contains the error laws, native checks and measured costs.
 
+[definition] `set_junction_solver(NativeFieldJunctionSolver::BalancedPairs)` selects an optional
+checked factorization for enclosed currents. The complete covariance must have the required real
+Hermitian pair structure, and both numerical right-hand-side fields must lie in its balanced
+range. The same smaller factor acts on both complex components and is lifted into the full root
+report; ineligible structure uses the full solver. The full residual still certifies every
+returned field. `Full` remains the field constructor's default; `with_text_field` requests
+`BalancedPairs`. A selected factorization's arithmetic refusal stays explicit, and changing a
+solver policy neither changes the exact model nor recovers an uncertain operation.
+
 [definition] `inspect_junction_enclosure` and `inspect_internal_current_enclosures` return explicit
 balls. `inspect_exact_junction` evaluates the retained residual expression for a requested cut;
 `inspect_internal_currents` can then reconstruct exact internal currents. Those cold exact
@@ -108,6 +117,11 @@ native emission. Multiple parent families require a wider contextual port and re
 the driver never picks one by ordering the links. The field is currently in-process only: this
 command freshly cultivates its declared slice and publishes a diagnostic report, not a checkpoint
 or an interactive consumer release.
+
+[definition] `--inspect-all-currents true` adds complete cold junction-history capture to this
+diagnostic report. It performs no per-operation numerical readout during development. The
+[September 7 record](../research/records/2026-09-07_AC1_THE_BALANCED_FACTOR_RETURNS_THE_FULL_CURRENT_AND_THE_CODEC_OWES_ITS_OWN_TRANSPORT.md)
+separates the factorization result from the still-unimplemented learned current-to-material binding.
 
 ## Run it
 

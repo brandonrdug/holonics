@@ -26,7 +26,7 @@ __device__ __forceinline__ wide field_enclosed_product_zero(
 __device__ __forceinline__ bool field_enclosed_junction_initialize(
     const int64_t *query, const int64_t *origin, const int64_t *incoming,
     const int64_t *frame, const int64_t *origin_frame,
-    uint32_t nodes, uint32_t linked, uint32_t grain,
+    uint32_t nodes, uint32_t linked, uint32_t grain, bool balanced,
     const int64_t *covariance, const wide *held,
     int64_t *next_cov_lo, int64_t *next_cov_hi,
     wide *report_lo, wide *report_hi, wide *workspace, uint32_t *slot
@@ -101,21 +101,48 @@ __device__ __forceinline__ bool field_enclosed_junction_initialize(
         }
     }
     if (*slot) return false;
-    for (uint32_t i = 0; i < dimension; ++i) solve[i] = 0;
-    wide *c_matrix = matrix;
-    wide cden = checked_covariance_den;
-    for (uint32_t i = 0; i < dimension; ++i)
-        c_matrix[(size_t)i * dimension + i] = add_checked(
-            c_matrix[(size_t)i * dimension + i], cden, slot);
-    // LDL stores L*S and D*S, so scale the complete exact A_num = C_num + Cden I by
-    // S = 2^grain before factorization.  The RHS below remains in grid quanta; this common
-    // scaling is what makes the fixed-point products and the later D division dimensionally agree.
-    wide scale = (wide)1 << grain;
-    for (size_t i = 0; i < matrix_count; ++i)
-        c_matrix[i] = product_checked(c_matrix[i], scale, slot);
+    uint32_t factor_kind = balanced ? field_balanced_prepare(next_cov_lo, nodes, grain,
+        u, h, matrix, solve) : 0u;
+    d[0] = factor_kind == 1u ? 3u * (nodes / 2u + 1u) : (factor_kind == 2u ? 0u : dimension);
+    d[1] = factor_kind;
+    if (factor_kind == 0u) {
+        for (uint32_t i = 0; i < dimension; ++i) solve[i] = 0;
+        wide scale = (wide)1 << grain;
+        // Also restores scratch after an ineligible B factorization attempt. The root C is
+        // already staged exactly, and no continuing state has been changed.
+        for (uint32_t i = 0; i < dimension; ++i) for (uint32_t j = 0; j < dimension; ++j) {
+            wide value = (wide)next_cov_lo[(size_t)i * dimension + j];
+            if (i == j) value = add_checked(value, checked_covariance_den, slot);
+            matrix[(size_t)i * dimension + j] = product_checked(value, scale, slot);
+        }
+    }
     if (*slot) return false;
     report_lo[4u * report_segment + dimension] = report_hi[4u * report_segment + dimension] = error_u;
     return true;
+}
+
+__device__ __forceinline__ void field_enclosed_solve(
+    const wide *c_matrix, const wide *diagonal, uint32_t dimension, uint32_t grain,
+    wide *solve, wide *v, uint32_t *slot
+) {
+    for (uint32_t i = 0; i < dimension; ++i) {
+        wide value = solve[i];
+        for (uint32_t j = 0; j < i; ++j)
+            value = sub_checked(value, field_enclosed_product_zero(
+                c_matrix[(size_t)i * dimension + j], solve[j], grain, slot), slot);
+        solve[i] = value;
+    }
+    for (uint32_t i = 0; i < dimension; ++i)
+        v[i] = field_enclosed_toward_zero(solve[i], diagonal[i], grain, slot);
+    for (int i = (int)dimension - 1; i >= 0; --i) {
+        wide value = v[i];
+        for (uint32_t j = (uint32_t)i + 1u; j < dimension; ++j)
+            value = sub_checked(value, field_enclosed_product_zero(
+                c_matrix[(size_t)j * dimension + (uint32_t)i], v[j], grain, slot), slot);
+        v[i] = value;
+    }
+    if (*slot) return;
+
 }
 
 __device__ __forceinline__ void field_enclosed_junction_finish(
@@ -140,30 +167,31 @@ __device__ __forceinline__ void field_enclosed_junction_finish(
     const wide prefix_radius = held[3u * report_segment + dimension];
     wide cden = (wide)next_cov_lo[matrix_count];
     wide error_u = report_lo[4u * report_segment + dimension];
-    wide cden_rhs = cden;
-    for (uint32_t i = 0; i < dimension; ++i) {
-        wide sum = add_checked(u[i], h[i], slot);
-        solve[i] = product_checked(2, product_checked(cden_rhs, sum, slot), slot);
-    }
-    if (*slot) return;
-    // L y = rhs, D z = y, L^T v = z, all centers in grid quanta.  The forward substitution
-    // uses y_j directly; division by the scaled diagonal occurs exactly once in the following z
-    // loop.  For C=0 this gives v=rhs=2(Uhat+H) and a zero exact residual at every grain.
-    for (uint32_t i = 0; i < dimension; ++i) {
-        wide value = solve[i];
-        for (uint32_t j = 0; j < i; ++j)
-            value = sub_checked(value, field_enclosed_product_zero(
-                c_matrix[(size_t)i * dimension + j], solve[j], grain, slot), slot);
-        solve[i] = value;
-    }
-    for (uint32_t i = 0; i < dimension; ++i)
-        v[i] = field_enclosed_toward_zero(solve[i], diagonal[i], grain, slot);
-    for (int i = (int)dimension - 1; i >= 0; --i) {
-        wide value = v[i];
-        for (uint32_t j = (uint32_t)i + 1u; j < dimension; ++j)
-            value = sub_checked(value, field_enclosed_product_zero(
-                c_matrix[(size_t)j * dimension + (uint32_t)i], v[j], grain, slot), slot);
-        v[i] = value;
+    const uint32_t factor_kind = (uint32_t)d[1];
+    const uint32_t factor_dimension = (uint32_t)d[0];
+    if (factor_kind == 2u) {
+        for (uint32_t i = 0; i < dimension; ++i)
+            v[i] = product_checked(2, add_checked(u[i], h[i], slot), slot);
+    } else if (factor_kind == 1u) {
+        const uint32_t nodes = dimension / 6u, pairs = nodes / 2u, bank_width = pairs + 1u;
+        for (uint32_t plane = 0; plane < 2u; ++plane) {
+            field_enclosed_solve(c_matrix, diagonal, factor_dimension, grain,
+                solve + (size_t)plane * factor_dimension, residual, slot);
+            if (*slot) return;
+            for (uint32_t bank = 0; bank < 3u; ++bank) for (uint32_t bit = 0; bit < pairs; ++bit) {
+                wide common = residual[bank * bank_width];
+                wide right = residual[bank * bank_width + 1u + bit];
+                v[field_bank_row(nodes, bank, 2u * bit) + plane] = sub_checked(common, right, slot);
+                v[field_bank_row(nodes, bank, 2u * bit + 1u) + plane] = right;
+            }
+        }
+    } else {
+        for (uint32_t i = 0; i < dimension; ++i) {
+            wide sum = add_checked(u[i], h[i], slot);
+            solve[i] = product_checked(2, product_checked(cden, sum, slot), slot);
+        }
+        if (*slot) return;
+        field_enclosed_solve(c_matrix, diagonal, dimension, grain, solve, v, slot);
     }
     if (*slot) return;
 
@@ -222,7 +250,7 @@ __device__ __forceinline__ void field_enclosed_junction_finish(
 __device__ __forceinline__ void field_enclosed_junction_prepare(
     const int64_t *query, const int64_t *origin, const int64_t *incoming,
     const int64_t *frame, const int64_t *origin_frame,
-    uint32_t nodes, uint32_t linked, uint64_t occurrence, uint32_t grain,
+    uint32_t nodes, uint32_t linked, uint64_t occurrence, uint32_t grain, bool balanced,
     const int64_t *covariance, const wide *held,
     int64_t *next_cov_lo, int64_t *next_cov_hi,
     wide *report_lo, wide *report_hi,
@@ -232,7 +260,7 @@ __device__ __forceinline__ void field_enclosed_junction_prepare(
     if (blockIdx.x != 0) return;
     if (threadIdx.x == 0) {
         field_enclosed_junction_initialize(query, origin, incoming, frame, origin_frame,
-            nodes, linked, grain, covariance, held, next_cov_lo, next_cov_hi,
+            nodes, linked, grain, balanced, covariance, held, next_cov_lo, next_cov_hi,
             report_lo, report_hi, workspace, slot);
     }
     __syncthreads();
@@ -248,32 +276,33 @@ __device__ __forceinline__ void field_enclosed_junction_prepare(
     wide *prefix = v + dimension;
     wide *diagonal = prefix + dimension;
     (void)u; (void)d; (void)h; (void)solve; (void)v; (void)prefix; (void)diagonal;
-    for (uint32_t k = 0; k < dimension; ++k) {
+    const uint32_t factor_dimension = (uint32_t)d[0];
+    for (uint32_t k = 0; k < factor_dimension; ++k) {
         if (threadIdx.x == 0) {
             wide correction = 0;
             for (uint32_t j = 0; j < k; ++j) {
-                wide pair = field_enclosed_product_zero(matrix[(size_t)k * dimension + j],
-                    matrix[(size_t)k * dimension + j], grain, slot);
+                wide pair = field_enclosed_product_zero(matrix[(size_t)k * factor_dimension + j],
+                    matrix[(size_t)k * factor_dimension + j], grain, slot);
                 wide term = field_enclosed_product_zero(pair, diagonal[j], grain, slot);
                 correction = add_checked(correction, term, slot);
             }
-            diagonal[k] = sub_checked(matrix[(size_t)k * dimension + k], correction, slot);
+            diagonal[k] = sub_checked(matrix[(size_t)k * factor_dimension + k], correction, slot);
             if (diagonal[k] <= 0) atomicOr(slot, REFUSED_CARRIER);
         }
         __syncthreads();
         if (*slot) return;
-        for (uint32_t i = k + 1u + threadIdx.x; i < dimension; i += blockDim.x) {
+        for (uint32_t i = k + 1u + threadIdx.x; i < factor_dimension; i += blockDim.x) {
             wide correction_off = 0;
             for (uint32_t j = 0; j < k; ++j) {
-                wide pair = field_enclosed_product_zero(matrix[(size_t)i * dimension + j],
-                    matrix[(size_t)k * dimension + j], grain, slot);
+                wide pair = field_enclosed_product_zero(matrix[(size_t)i * factor_dimension + j],
+                    matrix[(size_t)k * factor_dimension + j], grain, slot);
                 wide term = field_enclosed_product_zero(pair, diagonal[j], grain, slot);
                 correction_off = add_checked(correction_off, term, slot);
                 if (*slot) break;
             }
             if (!*slot) {
-                wide numerator = sub_checked(matrix[(size_t)k * dimension + i], correction_off, slot);
-                matrix[(size_t)i * dimension + k] = field_enclosed_toward_zero(
+                wide numerator = sub_checked(matrix[(size_t)k * factor_dimension + i], correction_off, slot);
+                matrix[(size_t)i * factor_dimension + k] = field_enclosed_toward_zero(
                     numerator, diagonal[k], grain, slot);
             }
         }

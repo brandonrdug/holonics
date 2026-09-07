@@ -21,7 +21,7 @@ mod rechart;
 pub use junction::{
     NativeFieldCurrentBall, NativeFieldEnclosedJunctionReading, NativeFieldExactJunctionReading,
     NativeFieldInternalCurrent, NativeFieldInternalCurrentBall, NativeFieldJunctionReading,
-    NativeFieldJunctionRepresentation,
+    NativeFieldJunctionRepresentation, NativeFieldJunctionSolver,
 };
 use junction::{PairedJunction, PendingJunction};
 pub use receiver::NativeFieldDifferentialReading;
@@ -604,7 +604,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                             &next.covariance,
                             next.report.as_ref(),
                             scratch,
-                            old.representation.kernel(),
+                            old.kernel(),
                         )
                     }),
                 at as u64,
@@ -654,6 +654,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 .representation;
             self.junction = Some(PairedJunction {
                 representation,
+                solver: self.junction.as_ref().expect("existing junction").solver,
                 covariance: next.covariance,
                 current: next.report,
             });

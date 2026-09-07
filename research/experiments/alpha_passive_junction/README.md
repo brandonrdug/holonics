@@ -207,3 +207,32 @@ python3 research/experiments/alpha_passive_junction/inspect_text_return.py \
   .local/artifacts/athena-alpha/ac2/first-text-return-v1.json \
   --output .local/artifacts/athena-alpha/ac2/new-text-comparison.json
 ```
+
+## Balanced factorization and September 7 comparisons
+
+[definition] `compare_source_precision.py` compares full numerical centre trajectories of the
+proposed contextual-source law. `range_source_precision.py` uses an explicit injective balanced
+chart and its Gram metric; it can compare that result to the full calculation and verify exact
+early intertwining anchors. The real-input reference uses 30 coordinates with a full 108-real-
+coordinate decoder. The native numerical policy separately retains both complex components and
+the complete covariance. Neither reference trajectory is an exact enclosure or a native model.
+
+[established-bounded; computational-witness] The 100-operation unscreened source comparison is
+sensitive to precision. A unit-series contact experiment improves the two-precision comparison
+through 732 material operations, but has no verified trajectory enclosure or native realization.
+The [September 7 record](../../records/2026-09-07_AC1_THE_BALANCED_FACTOR_RETURNS_THE_FULL_CURRENT_AND_THE_CODEC_OWES_ITS_OWN_TRANSPORT.md)
+states the exact scope and preserves the different laws separately.
+
+[established-bounded; computational-witness, measured] `inspect_balanced_text_return.py` checks
+all 858 full-root native residuals and centre/radius recurrences, material and self-return source
+chronology, final contact moment, and the current-to-bit projection. It permits numerical centres
+to change when the factorization changes; it requires the source chronology, raw standing and
+emitted sequence to remain identical. The four actual part endpoints have equal raw source
+fields and pairwise distinct contextual-current balls.
+
+```sh
+python3 research/experiments/alpha_passive_junction/inspect_balanced_text_return.py \
+  .local/artifacts/athena-alpha/ac2/first-text-balanced-v2.json \
+  .local/artifacts/athena-alpha/ac2/first-text-return-v2.json \
+  --output .local/artifacts/athena-alpha/ac2/new-balanced-certificate.json
+```

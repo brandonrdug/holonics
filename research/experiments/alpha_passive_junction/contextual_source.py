@@ -58,11 +58,14 @@ def exact_states(lineages, fields, arrivals, count):
 
 def ldlt(a_scaled, rhs, grain):
     """Integer LDL with A already in grid quanta. S is numeric precision, never dimension."""
+    dimension = len(a_scaled)
+    if not dimension or any(len(row) != dimension for row in a_scaled) or len(rhs) != dimension:
+        raise ValueError("LDL matrix/RHS shape mismatch")
     scale = 1 << grain
-    lower = [[0] * D for _ in range(D)]
-    diagonal = [0] * D
+    lower = [[0] * dimension for _ in range(dimension)]
+    diagonal = [0] * dimension
     maximum = 0
-    for k in range(D):
+    for k in range(dimension):
         correction = 0
         for j in range(k):
             pair = e.product_shift_zero(lower[k][j], lower[k][j], grain)
@@ -71,7 +74,7 @@ def ldlt(a_scaled, rhs, grain):
         diagonal[k] = a_scaled[k][k] - correction
         if diagonal[k] <= 0:
             raise ValueError(f'non-positive numerical LDL pivot {k}')
-        for i in range(k + 1, D):
+        for i in range(k + 1, dimension):
             correction = 0
             for j in range(k):
                 pair = e.product_shift_zero(lower[i][j], lower[k][j], grain)
@@ -81,13 +84,13 @@ def ldlt(a_scaled, rhs, grain):
             maximum = max(maximum, e.bits(numerator * scale))
             lower[i][k] = e.scaled_div_zero(numerator, diagonal[k], grain)
     y = rhs[:]
-    for i in range(D):
+    for i in range(dimension):
         for j in range(i):
             maximum = max(maximum, e.bits(lower[i][j] * y[j]))
             y[i] -= e.product_shift_zero(lower[i][j], y[j], grain)
-    v = [e.scaled_div_zero(y[i], diagonal[i], grain) for i in range(D)]
-    for i in range(D - 1, -1, -1):
-        for j in range(i + 1, D):
+    v = [e.scaled_div_zero(y[i], diagonal[i], grain) for i in range(dimension)]
+    for i in range(dimension - 1, -1, -1):
+        for j in range(i + 1, dimension):
             maximum = max(maximum, e.bits(lower[j][i] * v[j]))
             v[i] -= e.product_shift_zero(lower[j][i], v[j], grain)
     return v, maximum

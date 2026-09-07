@@ -308,7 +308,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     // The dependent field word is prepared once. All continuing writes remain after the complete
     // coupled return; early returns inside this helper cannot strand a block barrier.
     if (threadIdx.x == 0) {
-        if (coupled > 2 || (coupled && (!covariance || !junction_held || !next_covariance_lo
+        if (coupled > 3 || (coupled && (!covariance || !junction_held || !next_covariance_lo
             || !next_covariance_hi || !junction_report_lo || !junction_report_hi || !junction_workspace))) {
             atomicOr(slot, REFUSED_MALFORMED);
         } else {
@@ -319,11 +319,11 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     }
     __syncthreads();
     if (*slot) return;
-    if (coupled == 2) {
+    if (coupled == 2 || coupled == 3) {
         // Every thread participates. Each independent LDL row keeps its original arithmetic
         // order; only a completed pivot column becomes input to the next one.
         field_enclosed_junction_prepare(output_lo, origin, incoming, current_frame, origin_frame,
-            nodes, linked, occurrence, junction_grain, covariance, (const wide *)junction_held,
+            nodes, linked, occurrence, junction_grain, coupled == 3, covariance, (const wide *)junction_held,
             next_covariance_lo, next_covariance_hi, (wide *)junction_report_lo, (wide *)junction_report_hi,
             junction_workspace, slot);
     } else if (coupled == 1 && threadIdx.x == 0) {

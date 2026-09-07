@@ -69,6 +69,14 @@ and the productive use of historical/contextual standing; inspect actual respons
 The scalar error bound for a continuous learned-source attachment is insufficient at its recorded
 scope. AC1 and the full useful alpha product remain open; this byte return does not complete AC2.
 
+[definition] The [September 7 binding](../../research/records/2026-09-07_AC1_THE_BALANCED_FACTOR_RETURNS_THE_FULL_CURRENT_AND_THE_CODEC_OWES_ITS_OWN_TRANSPORT.md)
+keeps the complete native current under a checked balanced factorization. Next, compose the
+retained contextual current with an actual learned material transport, using the source-time
+forward carrier, its chronological change, the actual receiving difference and a staged native
+coercive return. Its numerical parameter error must remain bounded without turning an uncertain
+source into a point. Then inspect actual responses and continue broader development and
+persistence. The source-feedback experiments and numerical acceleration do not close the goal.
+
 ## Completed September 6 synthesis before Athena-alpha cultivation
 
 [definition] Brandon's latest request directs repository-wide synthesis of the available

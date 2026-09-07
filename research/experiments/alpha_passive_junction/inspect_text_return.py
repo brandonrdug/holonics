@@ -46,13 +46,18 @@ def input_code(lineage):
     return code, values
 
 
-def compare(report, earlier):
+def compare(report, earlier, require_identical_body=True):
     if report.get('native_error') or report.get('development_error') or report.get('prompt_error'):
         raise ValueError('the native/material return refused')
     if report['body']['pending_lineage'] is not None or report['body']['pending_symbol'] is not None:
         raise ValueError('the native/application successor is pending')
-    if report['body'] != earlier['body'] or report['generation'] != earlier['generation']:
+    same_body = report['body'] == earlier['body']
+    if (require_identical_body and not same_body) or report['generation'] != earlier['generation']:
         raise ValueError('cold current capture changed the observed body or generation')
+    if not require_identical_body:
+        for key in ('occurrences','lineage','pending_lineage','pending_symbol','held','relation','junction_covariance'):
+            if report['body'][key] != earlier['body'][key]:
+                raise ValueError(f'the numerical policy changed structural standing: {key}')
     lineages = report['body']['lineage']
     codes, arrivals, fields = [], [], []
     previous = [0] * N
@@ -179,7 +184,8 @@ def compare(report, earlier):
     if native != [[v, v] for row in covariance for v in row] + [[1, 1]]:
         raise ValueError('final native contact moment differs from its full actual contact population')
     return {'truth_status':'established-bounded','evidence_tags':['computational-witness','measured'],
-        'complete_body_and_generation_equal_to_earlier_run':True, 'native_occurrences':len(lineages),
+        'complete_body_and_generation_equal_to_earlier_run':same_body,
+        'generation_equal_to_earlier_run':True, 'native_occurrences':len(lineages),
         'development_symbols_checked':material_symbols,'shared_parent_contacts_checked':parent_contacts,
         'full_final_moment_contacts_checked':contacts,'emission_currents_checked':len(currents),
         'self_returns_checked':len(currents),'consecutive_disjoint_outgoing_balls':distinct,

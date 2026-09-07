@@ -2,7 +2,8 @@
 //! supplied by the native junction. This chart supplies no English grammar or response selector.
 use super::material::{with_matched_field_profile, AlphaMaterialError};
 use holonic_engine::native_ecology::constitutive_fibre::{
-    NativeConstitutiveField, NativeFieldDifferentialReading, NativePhaseCurrent,
+    NativeConstitutiveField, NativeFieldDifferentialReading, NativeFieldJunctionSolver,
+    NativePhaseCurrent,
 };
 use serde::Serialize;
 
@@ -109,7 +110,10 @@ pub fn with_text_field<R>(
     fractional_bits: u32,
     operation: impl FnOnce(&mut NativeConstitutiveField<'_>) -> Result<R, AlphaMaterialError>,
 ) -> Result<R, AlphaMaterialError> {
-    with_matched_field_profile(TEXT_INPUT_CHANNELS, true, Some(fractional_bits), operation)
+    with_matched_field_profile(TEXT_INPUT_CHANNELS, true, Some(fractional_bits), |field| {
+        field.set_junction_solver(NativeFieldJunctionSolver::BalancedPairs)?;
+        operation(field)
+    })
 }
 
 #[cfg(test)]

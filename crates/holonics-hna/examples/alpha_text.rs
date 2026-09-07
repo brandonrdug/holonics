@@ -128,6 +128,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let exposure = PathBuf::from(args.next().ok_or("usage: alpha_text EXPOSURE --families N --fractional-bits G --prompt FILE --emit-symbols N --report NEW.json")?);
     let (mut families, mut grain, mut prompt_path, mut limit, mut report_path) =
         (None, None, None, None, None);
+    let mut inspect_all_currents = false;
     while let Some(option) = args.next() {
         let value = args.next().ok_or("missing option value")?;
         match option.as_str() {
@@ -136,6 +137,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "--prompt" => prompt_path = Some(PathBuf::from(value)),
             "--emit-symbols" => limit = Some(value.parse::<usize>()?),
             "--report" => report_path = Some(PathBuf::from(value)),
+            "--inspect-all-currents" => inspect_all_currents = value.parse::<bool>()?,
             _ => return Err(format!("unknown option {option}").into()),
         }
     }
@@ -151,8 +153,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut report = json!({"schema":"holonics.alpha-text-study.v1","exposure":exposure,"families_aperture":families,
         "fractional_bits":grain,"prompt_path":prompt_path,"prompt":prompt,"symbol_work_limit":limit,
         "model_persisted":false,"language_quality_established":false});
+    report["all_currents_requested"] = json!(inspect_all_currents);
     let native_result = with_text_field(grain, |field| {
         let mut session = TextFieldSession::on(field)?;
+        report["junction_solver"] = json!(session.field().junction_solver());
         let mut records = Vec::new();
         let start = Instant::now();
         let developed = cultivate(&mut reader, &mut session, families, &mut records);
@@ -215,6 +219,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .push(json!({"occurrence":at,"junction":field.inspect_junction(at)?.map(section)}));
         }
         report["emission_current_history"] = json!(emission_currents);
+        if inspect_all_currents {
+            let mut history = Vec::new();
+            for at in 0..field.occurrence_count() {
+                history.push(json!({"occurrence":at,"junction":field.inspect_junction(at)?.map(section)}));
+            }
+            report["junction_history"] = json!(history);
+        }
         report["diagnostics_wall_seconds"] = json!(start.elapsed().as_secs_f64());
         Ok(())
     });

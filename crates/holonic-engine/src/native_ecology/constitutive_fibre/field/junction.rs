@@ -7,6 +7,8 @@
 use super::*;
 
 mod enclosure;
+#[cfg(test)]
+mod solver_tests;
 pub use enclosure::{
     NativeFieldCurrentBall, NativeFieldEnclosedJunctionReading, NativeFieldInternalCurrentBall,
 };
@@ -16,6 +18,14 @@ pub use enclosure::{
 pub enum NativeFieldJunctionRepresentation {
     RationalWords,
     EnclosedDyadic { fractional_bits: u32 },
+}
+
+/// Numerical factorization policy. Both policies certify the same complete root-current law.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum NativeFieldJunctionSolver {
+    Full,
+    BalancedPairs,
 }
 
 impl NativeFieldJunctionRepresentation {
@@ -78,8 +88,23 @@ pub struct NativeFieldInternalCurrent {
 
 pub(super) struct PairedJunction<'chart> {
     pub(super) representation: NativeFieldJunctionRepresentation,
+    pub(super) solver: NativeFieldJunctionSolver,
     pub(super) covariance: ResidentSection<'chart>,
     pub(super) current: Rc<ResidentSection<'chart>>,
+}
+
+impl PairedJunction<'_> {
+    pub(super) fn kernel(&self) -> (u32, u32) {
+        let (mode, grain) = self.representation.kernel();
+        (
+            if mode == 2 && self.solver == NativeFieldJunctionSolver::BalancedPairs {
+                3
+            } else {
+                mode
+            },
+            grain,
+        )
+    }
 }
 
 pub(super) struct PendingJunction<'chart> {
@@ -161,6 +186,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         };
         body.junction = Some(PairedJunction {
             representation,
+            solver: NativeFieldJunctionSolver::Full,
             covariance: mount(covariance)?,
             current: Rc::new(mount(report)?),
         });
@@ -175,6 +201,34 @@ impl<'chart> NativeConstitutiveField<'chart> {
         self.junction
             .as_ref()
             .map(|junction| junction.representation)
+    }
+
+    pub fn junction_solver(&self) -> Option<NativeFieldJunctionSolver> {
+        self.junction.as_ref().map(|junction| junction.solver)
+    }
+
+    /// Select a numerical factorization, without changing the exact current, morphology,
+    /// history or receiving capabilities. The balanced policy uses the full solver when its
+    /// exact covariance/RHS conditions do not hold. Arithmetic failures remain explicit.
+    pub fn set_junction_solver(
+        &mut self,
+        solver: NativeFieldJunctionSolver,
+    ) -> Result<(), ConstitutiveFibreError> {
+        if !self.relation.usable || self.pending.is_some() {
+            return Err(ConstitutiveFibreError::Uncertain);
+        }
+        let junction = self
+            .junction
+            .as_mut()
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        if !matches!(
+            junction.representation,
+            NativeFieldJunctionRepresentation::EnclosedDyadic { .. }
+        ) {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        junction.solver = solver;
+        Ok(())
     }
 
     /// Explicit observers; these create no source or reaction capability.

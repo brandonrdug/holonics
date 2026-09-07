@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 6, 2026. **Active goal:** construct and complete the deposited Athena-alpha
+**Currency:** September 7, 2026. **Active goal:** construct and complete the deposited Athena-alpha
 cultivation blueprint. **Position:** AC0 complete at cold exposure scope; AC1 active.
 **Athena-alpha:** not yet attained.
 
@@ -72,9 +72,21 @@ receiver presents native current as codewords. Thirty field and thirteen data/co
 current pairs remain certifiably distinct behind that repeated surface. The source/current
 comparison retains the failure and exact self-return chronology; this is not a useful alpha reply.
 
+[established-bounded; measured] The [balanced factorization](research/records/2026-09-07_AC1_THE_BALANCED_FACTOR_RETURNS_THE_FULL_CURRENT_AND_THE_CODEC_OWES_ITS_OWN_TRANSPORT.md)
+uses a checked smaller matrix while retaining the complete root covariance, both complex
+components and full residual. Native controls reconstruct the same exact current through rechart
+and shared-source reception; ineligible structure uses the full solver. The text return still
+repeats `d`. All 858 full-root certificates pass; development time is 17.00 seconds versus
+24.35 seconds previously. The four material endpoints have identical raw fields but distinct
+retained contextual currents. This changes numerical work and identifies the richer source port;
+it does not establish useful response quality.
+
 [open] AC1 remains active. The shared endpoint port does not reconstruct a full parent history;
 wider contextual incidence and productive use of separating histories still need construction.
-A cold continuous-source-feedback candidate exposes a too-loose scalar error representation.
+A cold continuous-source-feedback candidate is numerically sensitive; its unit-series refinement
+has only a numerical comparison so far. The next binding is a native returned-current transport
+from the retained contextual field to material, with old/current forward carriers and a
+nonexpansive parameter return; it is specified but not implemented.
 Broader efficient cultivation, useful learned text conduct, durable native models and the full
 AC0–AC5 product remain open. The native current and the response quality retain separate grades.
 

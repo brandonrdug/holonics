@@ -62,7 +62,7 @@ impl<'chart> ResidentSurface<'chart> {
             return Err(fail("incompatible field, source or continuing relation"));
         }
         if let Some((covariance, held, next_covariance, next_report, workspace, (mode, grain))) = junction {
-            if !(1..=2).contains(&mode) || (mode == 2 && !(1..=120).contains(&grain)) {
+            if !(1..=3).contains(&mode) || (mode != 1 && !(1..=120).contains(&grain)) {
                 return Err(fail("unadmitted paired junction representation"));
             }
             let matrix_width = width.checked_mul(width).and_then(|n| n.checked_add(1))
