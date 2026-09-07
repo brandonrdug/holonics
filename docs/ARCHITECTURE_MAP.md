@@ -68,6 +68,15 @@ elimination realizes the declared metric projection, and the equal-admittance tw
 preserves free current and returns both normal ports. Staged publication keeps the predecessor
 usable on arithmetic refusal. This is a condition-current port, not a separate learner.
 
+[established-bounded; measured] `field/resident_input.rs::advance_current_resident` now feeds
+generated current into the same field operation through `section_field_current_input` in
+`constitutive_field.cuh`. `NativeFieldIncoming` distinguishes actual resident input from exterior
+arrays; the history/rest owners retain its carrier, and `inspect_incoming` supplies cold decoders.
+The prefix source receiver borrows that carrier on device. The
+[ingress return](../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
+records 118 native/constitutive and 16 SDK alpha controls. This port does not relabel boundary
+branches as the complete contextual source.
+
 [established-bounded; measured] `native_ecology/constitutive_fibre/resident.rs` now owns borrowed
 resident rational-current input and immutable original-fibre returns for the existing local
 relation. `resident_section::record_constitutive_current` and

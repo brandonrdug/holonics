@@ -318,9 +318,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             }
             let minus_one = Rat::from_integer((-1).into());
             contact.extend(
-                event
-                    .lineage
-                    .incoming
+                self.inspect_incoming(receiving)?
                     .iter()
                     .map(|a| a.current().scaled(&minus_one)),
             );

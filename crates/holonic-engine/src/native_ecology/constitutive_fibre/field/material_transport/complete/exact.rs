@@ -126,9 +126,8 @@ impl NativeConstitutiveField<'_> {
             for row in &mut numeric {
                 row.resize(numerical_source.len(), ExactComplexWaveCurrent::zero());
             }
-            let observed = self.history[at]
-                .lineage
-                .incoming
+            let observed = self
+                .inspect_incoming(at)?
                 .iter()
                 .map(|v| v.current())
                 .collect::<Vec<_>>();

@@ -64,6 +64,13 @@ later condition inference changes the successor rather than rewriting its histor
 owner through the existing conversation exposure/session interface. Athena-alpha still has no
 useful text response; the full AC0–AC5 goal remains unfinished.
 
+[established-bounded; measured] The [generated-current ingress](research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
+now feeds the existing field operation directly, retaining its actual input through history
+placement and rest. All 118 constitutive and 16 SDK alpha tests pass, including paired/internal
+equivalence, refusal preservation and restart. The public conditional example drives three linked
+paired-field occurrences with zero numerical readback and retains their full internal currents.
+This closes the ingress port; the contextual-source/conditional-action binding above remains open.
+
 [established-bounded; measured] The existing local relation now has a
 [resident rational-current port](research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md).
 Two actual native observations support a new phase superposition while an unobserved direction

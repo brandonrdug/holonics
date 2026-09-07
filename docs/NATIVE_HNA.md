@@ -108,6 +108,14 @@ resident. `inspect_occurrence_status` later reads an immutable occurrence's rece
 pivot and rank without issuing a receiving capability. This separates numerical observation from
 continuation; it does not remove the per-operation launch receipt or create an asynchronous driver.
 
+[definition] `advance_current_resident(&mut occurrence, generated.current())` supplies a generated
+resident rational current to that same field operation. The occurrence carries its ordinary
+entering/emission/anchor contact and an empty exterior input vector. Input normalization and field
+conduct run as dependent lanes in one passage. The actual input remains in an immutable native
+carrier; `NativeFieldIncoming::Resident` identifies its representation, while `inspect_incoming`
+is its cold value receiver. Rest and history placement retain that carrier. Exterior input arrays
+keep their previous JSON form. See the [field ingress return](../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md).
+
 [definition] `alpha_material --resident` selects terminal diagnostics. It reports
 `observation_mode: "terminal"`, collects status counts after material admission, then publishes
 the same cold body observations. It does not capture an intermediate relation snapshot, so

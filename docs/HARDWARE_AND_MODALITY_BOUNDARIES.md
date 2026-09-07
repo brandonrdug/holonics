@@ -50,8 +50,9 @@ field used as the example's teacher. The remaining port boundary is:
 4. Run the public example and relevant contact/ownership controls on Metal. Compare exact
    operator/current/fibre results, and report Apple transfer/timing measurements in their own scope.
 
-[definition] The scalar conditional example uses the ordinary native field, not the desktop's
-complete-current material variant. Porting that larger CUDA history/transport implementation is
+[definition] The scalar conditional calibration uses the ordinary native field, not the desktop's
+complete-current material variant. Its additional generated-current ingress study now uses an
+enclosed paired recipient. Porting the larger complete-current material implementation is
 not a prerequisite imposed by this experiment. This is a concrete engineering handoff for shared
 generator work, not an instruction to replace acoustic development with a per-sample loop.
 Audio still needs its actual clocks, material conditions and receiver-family binding. The
@@ -83,6 +84,14 @@ pass on CUDA. The contact uses `9*C*sizeof(W)` scratch
 and the existing exact elimination helpers on a temporary relation of width `2C`; Metal must use
 its own wide layout. Empty condition evidence preserves actual standing. Complete staged
 publication and immutable family sharing are part of the port, not optional host behavior.
+
+[established-bounded; measured] The [field ingress extension](../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
+adds `section_field_current_input` and `advance_current_resident`. The kernel normalizes the
+resident current into the existing per-node phase chart before a dependent ordinary field lane.
+Port its `NativeFieldIncoming` provenance and historical input carrier with the cold rest/archive
+changes. The old exterior input JSON remains an array. The extended example's paired recipient
+requires that field representation; the earlier conditional-action receipts remain independently
+usable for the simpler phase port. Desktop controls do not establish Metal parity.
 
 [established-bounded; source-inspected] The public framework enters through
 [`holonics::hna`](../crates/holonics/src/lib.rs). Its native session is exposed by

@@ -452,9 +452,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 .ok_or(ConstitutiveFibreError::Uncertain)?;
             if let Some(source) = self.history[at].lineage.received_from {
                 let x = &encoder[source].outgoing;
-                let y = self.history[at]
-                    .lineage
-                    .incoming
+                let y = self
+                    .inspect_incoming(at)?
                     .iter()
                     .map(|value| value.current())
                     .collect::<Vec<_>>();

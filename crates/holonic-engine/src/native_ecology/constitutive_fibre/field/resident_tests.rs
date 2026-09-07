@@ -195,7 +195,7 @@ fn observer_failure_does_not_report_a_native_rollback() {
     let surface = ResidentSurface::on(&readout).unwrap();
     let mut body = NativeConstitutiveField::found(&surface, seeds(1)).unwrap();
     let mut occurrence = NativeFieldOccurrence::entering(vec![phase(1, 0)]);
-    let failed = body.advance_with(&mut occurrence, |_, _, _| {
+    let failed = body.advance_with(&mut occurrence, None, |_, _, _| {
         Err::<(), _>(ConstitutiveFibreError::Uncertain)
     });
     assert!(matches!(failed, Err(ConstitutiveFibreError::Uncertain)));

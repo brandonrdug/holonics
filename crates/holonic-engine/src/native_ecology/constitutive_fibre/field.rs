@@ -20,8 +20,9 @@ mod current_history_source;
 mod junction;
 mod material_transport;
 mod receiver;
-mod relation_current;
 mod rechart;
+mod relation_current;
+mod resident_input;
 mod rest;
 pub use archive::NativeFieldHistoryPlacement;
 use archive::{ArchivedField, FieldArchive};
@@ -43,6 +44,7 @@ pub use material_transport::{
     NativeMaterialTransportSource,
 };
 pub use receiver::NativeFieldDifferentialReading;
+pub use resident_input::NativeFieldIncoming;
 pub use rest::NativeFieldRest;
 
 /// One actual emitted source from this live body. It is linear; the caller cannot manufacture
@@ -125,7 +127,7 @@ pub struct NativeFieldLineage {
     pub received_from: Option<usize>,
     pub source_contact: Option<NativeFieldSourceContact>,
     /// Complete exterior excitation field, not a semantic feature vector or a fitted source.
-    pub incoming: Vec<NativePhaseCurrent>,
+    pub incoming: NativeFieldIncoming,
 }
 
 #[derive(Debug, PartialEq, Eq, Serialize)]
@@ -189,6 +191,7 @@ pub enum NativeFieldReceiverStatus {
 
 struct ResidentFieldHistory<'chart> {
     section: ResidentSection<'chart>,
+    incoming: Option<Rc<ResidentSection<'chart>>>,
     junction: Option<Rc<ResidentSection<'chart>>>,
     transport: Option<Rc<ResidentSection<'chart>>>,
 }
@@ -405,7 +408,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         &mut self,
         occurrence: &mut NativeFieldOccurrence,
     ) -> Result<NativeFieldContinuation, ConstitutiveFibreError> {
-        self.advance_with(occurrence, |_, _, _| Ok(()))
+        self.advance_with(occurrence, None, |_, _, _| Ok(()))
             .map(|(continuation, ())| continuation)
     }
 
@@ -469,7 +472,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         ) -> Result<Reading, ConstitutiveFibreError>,
     ) -> Result<NativeFieldStep<Reading>, ConstitutiveFibreError> {
         let (continuation, observed) =
-            self.advance_with(occurrence, |body, source_at, occurrence| {
+            self.advance_with(occurrence, None, |body, source_at, occurrence| {
                 let surface = body.relation.surface;
                 let words = surface.read_out(
                     &body
@@ -543,6 +546,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
     fn advance_with<Observed>(
         &mut self,
         occurrence: &mut NativeFieldOccurrence,
+        resident_current: Option<ResidentConstitutiveCurrent<'_, 'chart>>,
         observe: impl FnOnce(
             &Self,
             Option<usize>,
@@ -552,7 +556,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
         if !self.relation.usable || self.pending.is_some() {
             return Err(ConstitutiveFibreError::Uncertain);
         }
-        if occurrence.incoming.len() != self.nodes() {
+        if resident_current.map_or(occurrence.incoming.len() != self.nodes(), |c| {
+            !occurrence.incoming.is_empty() || c.width != 2 * self.nodes()
+        }) {
             return Err(ConstitutiveFibreError::Shape);
         }
         if occurrence.source.is_some() && occurrence.anchor.is_some() {
@@ -603,24 +609,34 @@ impl<'chart> NativeConstitutiveField<'chart> {
                         .as_ref()
                         .map(|_| NativeFieldSourceContact::RetainedAnchor)
                 }),
-            incoming: occurrence.incoming.clone(),
+            incoming: if resident_current.is_some() {
+                NativeFieldIncoming::Resident {
+                    resident_nodes: self.nodes(),
+                }
+            } else {
+                NativeFieldIncoming::Exterior(occurrence.incoming.clone())
+            },
         };
         let surface = self.relation.surface;
-        let input = surface.mount_section_rest(
-            &ResidentSectionRest::found(
-                self.nodes(),
-                3,
-                ResidentGrain(0),
-                64,
-                occurrence
-                    .incoming
-                    .iter()
-                    .flat_map(|p| p.words())
-                    .map(|v| (v, v))
-                    .collect(),
-            )
-            .map_err(|_| ConstitutiveFibreError::Shape)?,
-        )?;
+        let input = Rc::new(if resident_current.is_some() {
+            surface.fresh_section(self.nodes(), 3, ResidentGrain(0))?
+        } else {
+            surface.mount_section_rest(
+                &ResidentSectionRest::found(
+                    self.nodes(),
+                    3,
+                    ResidentGrain(0),
+                    64,
+                    occurrence
+                        .incoming
+                        .iter()
+                        .flat_map(|p| p.words())
+                        .map(|v| (v, v))
+                        .collect(),
+                )
+                .map_err(|_| ConstitutiveFibreError::Shape)?,
+            )?
+        });
         let output_width = self
             .nodes()
             .checked_mul(16)
@@ -629,9 +645,26 @@ impl<'chart> NativeConstitutiveField<'chart> {
         let output = surface.fresh_section(1, output_width, ResidentGrain(0))?;
         let prepared = self.prepare_junction()?;
         let prepared_transport = self.prepare_material_transport(source_at)?;
-        let mut passage = surface.begin_passage(&[vec![]])?;
+        let lineage_lanes = if resident_current.is_some() {
+            vec![vec![], vec![0]]
+        } else {
+            vec![vec![]]
+        };
+        let mut passage = surface.begin_passage(&lineage_lanes)?;
+        if let Some(current) = resident_current {
+            {
+                let lane = passage.open(0, &[])?;
+                surface.record_field_current_input(&lane, current, &input)?;
+            }
+            passage.close(0, &input, 64)?;
+        }
+        let (field_lane, predecessors) = if resident_current.is_some() {
+            (1, vec![0])
+        } else {
+            (0, vec![])
+        };
         {
-            let lane = passage.open(0, &[])?;
+            let lane = passage.open(field_lane, &predecessors)?;
             if let Some(refresh) = prepared_transport.as_ref().and_then(|p| p.refresh.as_ref()) {
                 surface.record_complete_material_source_current(
                     &lane,
@@ -698,12 +731,13 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 &output,
             )?;
         }
-        passage.close(0, &output, 64)?;
+        passage.close(field_lane, &output, 64)?;
         let passage = passage.finish()?;
         self.pending = Some(HeldField {
             archived: None,
             resident: Some(ResidentFieldHistory {
                 section: output,
+                incoming: resident_current.is_some().then(|| Rc::clone(&input)),
                 junction: prepared.as_ref().map(|(next, _)| Rc::clone(&next.report)),
                 transport: prepared_transport
                     .as_ref()
