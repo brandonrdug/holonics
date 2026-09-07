@@ -19,6 +19,8 @@ use crate::resident_section::{
 
 mod circulation;
 pub use circulation::*;
+mod field;
+pub use field::*;
 
 #[derive(Debug, PartialEq, Eq, Serialize)]
 pub enum ConstitutiveReading {

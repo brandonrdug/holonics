@@ -1,7 +1,8 @@
 //! Athena-alpha application construction over the existing native HNA owners.
 //!
-//! This module currently supplies only the cold conversation exposure boundary. It neither
-//! constructs a native current from text nor claims an attained model. Native formation and
-//! emission remain the subsequent composition in the active Athena-alpha blueprint.
+//! This module supplies cold conversation exposure and a declared octet excitation chart for
+//! the native port-field owner. Native field formation is executable; broader contextual contact
+//! and learned text emission remain subsequent composition in the active Athena-alpha blueprint.
 
 pub mod exposure;
+pub mod material;

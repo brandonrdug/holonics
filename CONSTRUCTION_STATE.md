@@ -52,6 +52,21 @@ generate current. Complete branch/source/receiver fibres and actual predecessor 
 survive in one resident successor. The cold source cursor is not yet paired with a cultivated
 native model; the whole AC0–AC5 goal remains active.
 
+[established-bounded; measured] AC1's [complete port-field return](research/records/2026-09-06_AC1_THE_COMPLETE_MATERIAL_FIELD_RETAINS_ITS_CONTEXTUAL_OBSTRUCTION.md)
+retains separately excited ports, both outgoing/held source branches and the full later receiving
+field. One owner completed four actual conversation families and 728 octets without arithmetic
+refusal. Eleven integrated CUDA controls now include live full-field rechart, old-source frame
+transport, physical incidence change and refusal recovery; the earlier 20 scalar regressions passed.
+The public material adapter builds; both octet-chart tests passed. Direct source and predecessor
+readbacks reproduce the witness and the original complete native successor. AC1 remains active.
+
+[counterexample; computational-witness] The fixed field's receiver is predominantly plural.
+Sources 11 and 19 have equal full local fields but different arrivals at 12 and 20; their predecessor
+fields at 10 and 18 differ. A local Hermitian receiver separates the first linear dependency but
+cannot remove this identical-field collision. Actual contextual channels and changed morphology
+must participate in transport; retaining source IDs or adding powers of the same field cannot
+substitute. AC1 and the full alpha goal remain active; no learned text response was produced.
+
 ## Completed foundation and data preparation
 
 | Return | Standing scope and evidence |

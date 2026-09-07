@@ -42,6 +42,15 @@ process-separated cursor continuation. AC1 is now active: derive and implement t
 material/current/formation attachment. Completed NCF and data preparation remain
 standing and need no repeated orientation or unchanged demonstration to begin useful work.
 
+[established-bounded; measured] AC1's first
+[material field return](../../research/records/2026-09-06_AC1_THE_COMPLETE_MATERIAL_FIELD_RETAINS_ITS_CONTEXTUAL_OBSTRUCTION.md)
+ran four actual conversation families through one native owner and retained its complete plural
+fibre. The fixed local face has an exact identical-field/different-history witness. Continue AC1
+by making the relevant historical standing and channels operative through admitted transport and
+by binding reaction to developing morphology; a higher polynomial face alone does not resolve
+that witness. This refines the current attachment, without changing AC0–AC5 order or declaring
+the field to be a cultivated alpha.
+
 ## Completed September 6 synthesis before Athena-alpha cultivation
 
 [definition] Brandon's latest request directs repository-wide synthesis of the available
