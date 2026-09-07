@@ -8,7 +8,7 @@ the application implementations are in [holonics-hna](../crates/holonics-hna/REA
 ## Athena-alpha and the next cultivation
 
 [definition] The [Athena-alpha blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
-is authorized through completion, with execution paused by Brandon on September 7. It uses the
+is authorized through completion and resumed after Brandon's September 7 corrections. It uses the
 prepared conversations and existing native owners, and requires the actual useful model, interface
 and integrated evidence.
 

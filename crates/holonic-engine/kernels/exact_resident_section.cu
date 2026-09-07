@@ -1129,6 +1129,103 @@ __device__ __forceinline__ wide fibre_lcm(wide a, wide b, uint32_t *slot) {
     return product_checked(a / gcd, b, slot);
 }
 
+// A point-current aperture on an immutable source section. Nonunique relation returns retain
+// their own full fibre; this point consumer must not silently pick their particular solution.
+__device__ wide fibre_current_denominator(const int64_t *lo, const int64_t *hi,
+    uint32_t denominator_at, uint32_t disposition_at, uint32_t *slot) {
+    if (disposition_at != UINT32_MAX
+        && (lo[disposition_at] != hi[disposition_at] || lo[disposition_at] != 0)) {
+        atomicOr(slot, REFUSED_MALFORMED); return 1;
+    }
+    if (denominator_at == UINT32_MAX) return 1;
+    if (lo[denominator_at] != hi[denominator_at] || lo[denominator_at] <= 0) {
+        atomicOr(slot, REFUSED_MALFORMED); return 1;
+    }
+    return lo[denominator_at];
+}
+
+extern "C" __global__ void section_constitutive_current(
+    int64_t *basis_lo, int64_t *basis_hi,
+    const int64_t *source_lo, const int64_t *source_hi,
+    uint32_t source_at, uint32_t source_denominator_at, uint32_t source_disposition_at,
+    const int64_t *receiving_lo, const int64_t *receiving_hi,
+    uint32_t receiving_at, uint32_t receiving_denominator_at, uint32_t receiving_disposition_at,
+    uint32_t source_width, uint32_t target_width, uint32_t paired,
+    int64_t *output_lo, int64_t *output_hi,
+    uint32_t *slot, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count
+) {
+    if (blockIdx.x != 0 || threadIdx.x != 0) return;
+    if (upstream_refused(census, lineage, lineage_count, slot)) return;
+    uint32_t width = source_width + target_width;
+    if (!source_width || !target_width || width < source_width || paired > 1) {
+        atomicOr(slot, REFUSED_MALFORMED); return;
+    }
+    wide source_den = fibre_current_denominator(source_lo,source_hi,
+        source_denominator_at,source_disposition_at,slot);
+    wide receiving_den = paired ? fibre_current_denominator(receiving_lo,receiving_hi,
+        receiving_denominator_at,receiving_disposition_at,slot) : 1;
+    if (*slot) return;
+    wide common = paired ? fibre_lcm(source_den,receiving_den,slot) : source_den;
+    if (*slot) return;
+    extern __shared__ wide current_scratch[];
+    wide *query = current_scratch, *formed = current_scratch + width;
+    for (uint32_t j=0; j<width; ++j) {
+        wide value = 0;
+        if (j < source_width) {
+            if (source_lo[source_at+j] != source_hi[source_at+j]) {
+                atomicOr(slot,REFUSED_MALFORMED); return;
+            }
+            value = source_lo[source_at+j];
+            query[j] = value;
+            formed[j] = product_checked(value,common/source_den,slot);
+        } else {
+            query[j] = 0;
+            if (paired) {
+                uint32_t at = receiving_at+j-source_width;
+                if (receiving_lo[at] != receiving_hi[at]) {
+                    atomicOr(slot,REFUSED_MALFORMED); return;
+                }
+                value = receiving_lo[at];
+            }
+            formed[j] = product_checked(value,common/receiving_den,slot);
+        }
+    }
+    if (*slot) return;
+    wide denominator = source_den;
+    uint32_t disposition = 0, rank = 0;
+    fibre_query(basis_lo,source_width,width,query,&denominator,nullptr,-1,
+        &disposition,&rank,slot);
+    if (*slot) return;
+    int64_t inserted = paired ? fibre_stage(basis_lo,width,formed,slot) : -1;
+    if (*slot) return;
+    for (uint32_t j=0; j<width; ++j) {
+        if (j >= source_width) query[j] = -query[j];
+        to_word(query[j],slot);
+        if (inserted >= 0) to_word(formed[j],slot);
+    }
+    to_word(denominator,slot);
+    if (*slot) return;
+    // This finite vertical basis is the consequence's Preimage Fibre direction space, not a
+    // copied ecology. Capture the predecessor face before the new row joins the continuing body.
+    for (uint32_t p=0; p<target_width; ++p) {
+        bool occupied = basis_lo[(size_t)(source_width+p)*width+source_width+p] != 0;
+        for (uint32_t j=0; j<target_width; ++j) {
+            size_t at = (size_t)width+4+(size_t)p*target_width+j;
+            int64_t value = occupied ? basis_lo[(size_t)(source_width+p)*width+source_width+j] : 0;
+            output_lo[at] = output_hi[at] = value;
+        }
+    }
+    for (uint32_t j=0; j<width; ++j) output_lo[j] = output_hi[j] = (int64_t)query[j];
+    output_lo[width] = output_hi[width] = (int64_t)denominator;
+    output_lo[width+1] = output_hi[width+1] = disposition;
+    output_lo[width+2] = output_hi[width+2] = inserted;
+    output_lo[width+3] = output_hi[width+3] = rank + (inserted >= 0 ? 1 : 0);
+    if (inserted >= 0) for (uint32_t j=0; j<width; ++j) {
+        size_t at = (size_t)inserted*width+j;
+        basis_lo[at] = basis_hi[at] = (int64_t)formed[j];
+    }
+}
+
 __device__ void fibre_phase_product(wide ar, wide ai, wide ad, wide br, wide bi, wide bd,
     wide *out, uint32_t *slot) {
     if (ad <= 0 || bd <= 0) { atomicOr(slot, REFUSED_MALFORMED); return; }
@@ -1352,6 +1449,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "enclosed_field_junction.cuh"
 #include "field_material_transport.cuh"
 #include "field_current_history_source.cuh"
+#include "field_complete_material_transport.cuh"
 #include "field_differential_receiver.cuh"
 #include "constitutive_field.cuh"
 

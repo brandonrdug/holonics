@@ -49,6 +49,12 @@ impl SavedTextField {
     pub fn nodes(&self) -> usize {
         self.field.nodes()
     }
+    pub fn material_transport_source(
+        &self,
+    ) -> Option<holonic_engine::native_ecology::constitutive_fibre::NativeMaterialTransportSource>
+    {
+        self.field.material_transport_source()
+    }
     pub fn application_state(&self) -> &[u8] {
         &self.application
     }

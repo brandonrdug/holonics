@@ -1,12 +1,13 @@
 use super::*;
-use crate::alpha::text_codec::{with_text_field, TextSymbol};
+use crate::alpha::text_codec::{with_text_field, with_text_field_source, TextSymbol};
+use holonic_engine::native_ecology::constitutive_fibre::NativeMaterialTransportSource;
 
 #[test]
 #[ignore = "requires CUDA; text-field checkpoint owns the exact session and supplied shared sources"]
 fn saved_text_field_restores_live_source_and_application_state_without_replay() {
     let dir = tempfile::tempdir().unwrap();
     let path = dir.path().join("field.hna");
-    with_text_field(72, |field| {
+    with_text_field_source(72, NativeMaterialTransportSource::CompleteCurrent, |field| {
         let mut session = TextFieldSession::on(field)?;
         session.receive(TextSymbol::Octet(b'A'))?;
         let anchor = session.retain_part_source()?;

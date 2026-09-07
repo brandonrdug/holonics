@@ -3,7 +3,7 @@
 use super::material::{with_matched_field_profile, AlphaMaterialError};
 use holonic_engine::native_ecology::constitutive_fibre::{
     NativeConstitutiveField, NativeFieldDifferentialReading, NativeFieldJunctionSolver,
-    NativePhaseCurrent,
+    NativeMaterialTransportSource, NativePhaseCurrent,
 };
 use serde::Serialize;
 
@@ -113,9 +113,21 @@ pub fn with_text_field<R>(
     fractional_bits: u32,
     operation: impl FnOnce(&mut NativeConstitutiveField<'_>) -> Result<R, AlphaMaterialError>,
 ) -> Result<R, AlphaMaterialError> {
+    with_text_field_source(
+        fractional_bits,
+        NativeMaterialTransportSource::CoupledOutgoing,
+        operation,
+    )
+}
+
+pub fn with_text_field_source<R>(
+    fractional_bits: u32,
+    source: NativeMaterialTransportSource,
+    operation: impl FnOnce(&mut NativeConstitutiveField<'_>) -> Result<R, AlphaMaterialError>,
+) -> Result<R, AlphaMaterialError> {
     with_matched_field_profile(TEXT_INPUT_CHANNELS, true, Some(fractional_bits), |field| {
         field.set_junction_solver(NativeFieldJunctionSolver::BalancedPairs)?;
-        field.enable_material_transport()?;
+        field.enable_material_transport_source(source)?;
         operation(field)
     })
 }

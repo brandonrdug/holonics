@@ -13,6 +13,23 @@ states its bounded scope. Native checkpoints retain the complete phase ecology a
 application-bearing checkpoints also retain the independent world and pending interaction. A seed,
 JSON report or relation inspection is **not a learned-model checkpoint**.
 
+## Resident local relation composition
+
+[established-bounded; measured] The existing `ResidentConstitutiveFibre` now exposes
+[`advance_resident`](../crates/holonic-engine/src/native_ecology/constitutive_fibre/resident.rs).
+It accepts exact integer sections or rational currents from an earlier `ResidentConstitutiveReturn`,
+and an optional actual receiving section. Native formation and later queries share the existing
+basis; no numerical section readback is needed to pass a learned return into the next operation.
+`inspect` is an explicit cold observer, and each immutable return retains its original vertical
+Preimage Fibre even after further development. A point-current consumer checks uniqueness on
+device and refuses a plural/outside-domain face without selecting a representative.
+
+[established-bounded; measured] The [native return](../research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md)
+conducts a new phase superposition from two native observations while an unobserved source
+direction remains open; rational emitted currents re-enter without host readback. All 84 native
+constitutive tests pass. This is a local engine composition port. General contextual formation,
+its attachment to the conversation field and useful text/acoustic conduct remain open.
+
 ## Athena-alpha material field
 
 [established-bounded; measured] The separate
@@ -189,10 +206,15 @@ are resident. `inspect` exposes numerical representatives and the complete-sourc
 `pairing` returns a ball enclosing the actual source inner product. The current implementation
 supports integral root contacts and retains wider numerator words on the device.
 
-[definition] This is presently a construction receiver, separate from productive material
-learning. `alpha_current_source` runs it over actual exposure through the public text session and
-publishes a diagnostic report. It neither emits a response nor saves a new model. The active
-blueprint still owes integration of the complete source into material/reaction and durable state.
+[definition] `alpha_current_source` remains an explicit construction receiver: it runs over actual
+exposure and publishes a diagnostic report, without a response or model publication.
+
+[established-bounded; measured] The separate [complete-current material variant](../research/records/2026-09-07_AC2_THE_COMPLETE_CURRENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md)
+now joins that source into the fused field/material return, retaining full parameter/source error
+and durable state. Select it on a fresh `alpha_text` run with `--material-source complete-current`;
+saved models retain their source mode. Its four-family development checkpoint returned, while
+its subsequent response was `.` followed by a text-receiver obstruction. This bounded coupling
+does not establish the generative contextual attachment or useful language.
 
 [established-bounded; measured] These commands run the checked-in examples on the standing CUDA
 apparatus. The build uses the repository's usual [development setup](DEVELOPMENT.md).

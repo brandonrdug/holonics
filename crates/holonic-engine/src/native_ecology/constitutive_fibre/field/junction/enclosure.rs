@@ -150,7 +150,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         Ok(values)
     }
 
-    fn junction_contact(
+    pub(in super::super) fn junction_contact(
         &self,
         receiving: usize,
     ) -> Result<Option<Vec<ExactComplexWaveCurrent>>, ConstitutiveFibreError> {

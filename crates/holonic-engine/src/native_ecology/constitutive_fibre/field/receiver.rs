@@ -73,8 +73,21 @@ impl<'chart> NativeConstitutiveField<'chart> {
             let Some(report) = resident.transport.as_ref() else {
                 return Ok(None);
             };
-            self.read_differential_report(report, occurrence, 2 * self.nodes(), 3, 0, pairs)
-                .map(Some)
+            self.read_differential_report(
+                report,
+                occurrence,
+                2 * self.nodes(),
+                if self.material_transport_source()
+                    == Some(NativeMaterialTransportSource::CompleteCurrent)
+                {
+                    4
+                } else {
+                    3
+                },
+                0,
+                pairs,
+            )
+            .map(Some)
         })
     }
 

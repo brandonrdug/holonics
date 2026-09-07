@@ -36,8 +36,10 @@ pub use junction::{
 use junction::{PairedJunction, PendingJunction};
 use material_transport::{MaterialTransport, PendingMaterialTransport};
 pub use material_transport::{
+    NativeCompleteMaterialTransportReading, NativeCompleteMaterialTransportState,
     NativeFieldExactMaterialTransport, NativeFieldMaterialTransportReading,
     NativeFieldMaterialTransportResidual, NativeFieldMaterialTransportState,
+    NativeMaterialTransportSource,
 };
 pub use receiver::NativeFieldDifferentialReading;
 pub use rest::NativeFieldRest;
@@ -625,10 +627,24 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .ok_or(ConstitutiveFibreError::Shape)?;
         let output = surface.fresh_section(1, output_width, ResidentGrain(0))?;
         let prepared = self.prepare_junction()?;
-        let prepared_transport = self.prepare_material_transport()?;
+        let prepared_transport = self.prepare_material_transport(source_at)?;
         let mut passage = surface.begin_passage(&[vec![]])?;
         {
             let lane = passage.open(0, &[])?;
+            if let Some(refresh) = prepared_transport.as_ref().and_then(|p| p.refresh.as_ref()) {
+                surface.record_complete_material_source_current(
+                    &lane,
+                    self.history[source_at.expect("refresh source")]
+                        .resident()?
+                        .transport
+                        .as_ref()
+                        .expect("complete source report"),
+                    &refresh.tail,
+                    refresh.count,
+                    self.nodes(),
+                    &refresh.output,
+                )?;
+            }
             surface.record_constitutive_field(
                 &lane,
                 &self.seed,
@@ -673,6 +689,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
                             }),
                             &next.delta,
                             next.report.as_ref(),
+                            old.source.kernel(),
+                            next.refresh.as_ref().map(|r| &r.output),
                         )
                     }),
                 at as u64,

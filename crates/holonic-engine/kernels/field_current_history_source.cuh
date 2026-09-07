@@ -166,6 +166,26 @@ extern "C" __global__ void section_field_current_history_source(
         before,current,state_lo,nodes,linked,grain,occurrence,next_lo,next_hi,source_lo,source_hi,scratch,slot);
 }
 
+__device__ void history_pairing_value(
+    const int64_t *a_lo, const int64_t *b_lo, uint32_t D,
+    HistoryInteger &real, HistoryInteger &imaginary, uint32_t *slot
+) {
+    bool reverse=a_lo[6u*D+19u]>b_lo[6u*D+19u];
+    const int64_t *old=reverse?b_lo:a_lo, *now=reverse?a_lo:b_lo;
+    const wide *x=(const wide *)old, *y=(const wide *)now;
+    HistoryInteger internal_real=-history_read_integer(old+6u*D,slot);
+    HistoryInteger internal_imaginary=history_read_integer(old+6u*D+5u,slot);
+    for (uint32_t i=0; i<D; i+=2) {
+        history_complex_add_product(real,imaginary,x[i],x[i+1],y[i],y[i+1],true);
+        history_complex_add_product(internal_real,internal_imaginary,x[2u*D+i],x[2u*D+i+1],y[D+i],y[D+i+1],true);
+    }
+    bool negative=((uint64_t)old[6u*D+19u]+(uint64_t)now[6u*D+19u])&1u;
+    real=real+(negative?-internal_real:internal_real);
+    imaginary=imaginary+(negative?-internal_imaginary:internal_imaginary);
+    if (reverse) imaginary=-imaginary;
+
+}
+
 extern "C" __global__ void section_field_current_history_pairing(
     const int64_t *a_lo, const int64_t *a_hi, const int64_t *b_lo, const int64_t *b_hi,
     uint32_t dimension, int64_t *out_lo, int64_t *out_hi,
@@ -180,19 +200,8 @@ extern "C" __global__ void section_field_current_history_pairing(
     if (a_lo[6u*D+15u]!=b_lo[6u*D+15u] || a_lo[6u*D+19u]<0 || b_lo[6u*D+19u]<0) {
         atomicOr(slot,REFUSED_MALFORMED); return;
     }
-    bool reverse=a_lo[6u*D+19u]>b_lo[6u*D+19u];
-    const int64_t *old=reverse?b_lo:a_lo, *now=reverse?a_lo:b_lo;
-    const wide *x=(const wide *)old, *y=(const wide *)now;
-    HistoryInteger real, imaginary, internal_real=-history_read_integer(old+6u*D,slot);
-    HistoryInteger internal_imaginary=history_read_integer(old+6u*D+5u,slot);
-    for (uint32_t i=0; i<D; i+=2) {
-        history_complex_add_product(real,imaginary,x[i],x[i+1],y[i],y[i+1],true);
-        history_complex_add_product(internal_real,internal_imaginary,x[2u*D+i],x[2u*D+i+1],y[D+i],y[D+i+1],true);
-    }
-    bool negative=((uint64_t)old[6u*D+19u]+(uint64_t)now[6u*D+19u])&1u;
-    real=real+(negative?-internal_real:internal_real);
-    imaginary=imaginary+(negative?-internal_imaginary:internal_imaginary);
-    if (reverse) imaginary=-imaginary;
+    HistoryInteger real, imaginary;
+    history_pairing_value(a_lo,b_lo,D,real,imaginary,slot);
     history_write_integer(real,out_lo,out_hi,slot);
     history_write_integer(imaginary,out_lo+5,out_hi+5,slot);
     wide left_error=((const wide *)(a_lo+6u*D+16u))[0];

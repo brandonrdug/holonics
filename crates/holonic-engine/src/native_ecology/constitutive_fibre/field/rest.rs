@@ -61,6 +61,11 @@ struct Header {
     history: Vec<EmissionWire>,
     junction: Option<JunctionWire>,
     transport: bool,
+    #[serde(
+        default,
+        skip_serializing_if = "NativeMaterialTransportSource::is_outgoing"
+    )]
+    transport_source: NativeMaterialTransportSource,
     source_slots: Vec<Option<usize>>,
     anchor_slots: Vec<Option<usize>>,
 }
@@ -202,6 +207,11 @@ impl NativeFieldRest {
     pub fn has_material_transport(&self) -> bool {
         self.header.transport
     }
+    pub fn material_transport_source(&self) -> Option<NativeMaterialTransportSource> {
+        self.header
+            .transport
+            .then_some(self.header.transport_source)
+    }
     pub fn junction_representation(&self) -> Option<NativeFieldJunctionRepresentation> {
         self.header.junction.as_ref().map(|j| j.representation)
     }
@@ -232,6 +242,7 @@ impl NativeFieldRest {
             || h.history.len() != self.history.len()
             || h.junction.is_some() != self.covariance.is_some()
             || h.transport != self.transport.is_some()
+            || (!h.transport && !h.transport_source.is_outgoing())
             || self.initial_junction.is_some() != (h.junction.is_some() && h.history.is_empty())
         {
             return Err(invalid("field populations"));
@@ -460,7 +471,18 @@ impl NativeFieldRest {
                 junction_section(section, dimension, wire.representation)?;
             }
             if let Some(section) = &rest.transport {
-                let error = transport_section(section, n, linked)?;
+                let error = if h.transport_source == NativeMaterialTransportSource::CompleteCurrent
+                {
+                    let grain = match h.junction.as_ref().map(|j| j.representation) {
+                        Some(NativeFieldJunctionRepresentation::EnclosedDyadic {
+                            fractional_bits,
+                        }) => fractional_bits,
+                        _ => return Err(invalid("complete-current representation")),
+                    };
+                    material_transport::complete::validate_report(section, n, grain, at)?
+                } else {
+                    transport_section(section, n, linked)?
+                };
                 if error < coefficient_error {
                     return Err(invalid("coefficient error chronology"));
                 }
@@ -491,12 +513,28 @@ impl NativeFieldRest {
             }
         }
         if let Some(state) = &self.transport {
-            point_section(state, 1, transport_width)?;
-            let values = packed(state)?;
-            if values.last().copied() != Some(coefficient_error)
-                || (h.history.is_empty() && values.iter().any(|v| *v != 0))
-            {
-                return Err(invalid("material transport standing/error"));
+            if h.transport_source == NativeMaterialTransportSource::CompleteCurrent {
+                let grain = match h.junction.as_ref().map(|j| j.representation) {
+                    Some(NativeFieldJunctionRepresentation::EnclosedDyadic { fractional_bits }) => {
+                        fractional_bits
+                    }
+                    _ => return Err(invalid("complete-current representation")),
+                };
+                material_transport::complete::validate_state(
+                    state,
+                    n,
+                    grain,
+                    h.history.len(),
+                    coefficient_error,
+                )?;
+            } else {
+                point_section(state, 1, transport_width)?;
+                let values = packed(state)?;
+                if values.last().copied() != Some(coefficient_error)
+                    || (h.history.is_empty() && values.iter().any(|v| *v != 0))
+                {
+                    return Err(invalid("material transport standing/error"));
+                }
             }
         }
         let mut supplied = vec![false; h.history.len()];
@@ -673,6 +711,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                     solver: j.solver,
                 }),
                 transport: self.transport.is_some(),
+                transport_source: self.material_transport_source().unwrap_or_default(),
                 source_slots,
                 anchor_slots,
             },
@@ -907,7 +946,10 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 .map(|s| {
                     surface
                         .mount_section_rest(&s)
-                        .map(|state| MaterialTransport { state })
+                        .map(|state| MaterialTransport {
+                            state,
+                            source: h.transport_source,
+                        })
                 })
                 .transpose()?,
             pending_transport: None,

@@ -21,6 +21,8 @@ mod circulation;
 pub use circulation::*;
 mod field;
 pub use field::*;
+mod resident;
+pub use resident::{ResidentConstitutiveCurrent, ResidentConstitutiveReturn};
 
 #[derive(Debug, PartialEq, Eq, Serialize)]
 pub enum ConstitutiveReading {

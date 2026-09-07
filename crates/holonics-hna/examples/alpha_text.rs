@@ -1,12 +1,14 @@
 //! First public text-codec composition over the resident native field. This driver mounts actual
 //! exposure and reads actual native emission; it contains no learner, target answer or fallback.
-use holonic_engine::native_ecology::constitutive_fibre::NativeFieldSourceAnchor;
+use holonic_engine::native_ecology::constitutive_fibre::{
+    NativeFieldSourceAnchor, NativeMaterialTransportSource,
+};
 use holonics_hna::{
     alpha::{
         checkpoint::SavedTextField,
         exposure::{ExposureCursor, ExposureFamily, ExposurePartition, ExposureReader},
         material::AlphaMaterialError,
-        text_codec::{with_text_field, TextSymbol},
+        text_codec::{with_text_field_source, TextSymbol},
         text_session::TextFieldSession,
     },
     publish_new,
@@ -240,6 +242,7 @@ fn run_session(
 ) -> Result<(), AlphaMaterialError> {
     report["junction_solver"] = json!(session.field().junction_solver());
     report["has_material_transport"] = json!(session.field().has_material_transport());
+    report["material_source"] = json!(session.field().material_transport_source());
     let start = Instant::now();
     let developed = if let Some(reader) = reader.as_mut() {
         cultivate(reader, session, families, records, anchors)
@@ -337,7 +340,9 @@ fn run_session(
             "held":section(field.inspect_held()?),"relation":section(field.inspect_relation()?),
             "junction_covariance":field.inspect_junction_covariance()?.map(section),
             "final_junction":final_occurrence.map(|i| field.inspect_junction(i)).transpose()?.flatten().map(section),
-            "material_transport":field.inspect_material_transport_state()?,
+            "material_transport":if field.material_transport_source()==Some(NativeMaterialTransportSource::CompleteCurrent) {
+                json!(field.inspect_complete_material_transport_state()?)
+            } else {json!(field.inspect_material_transport_state()?)},
             "internal_current_enclosures":if inspect_all_currents { field.inspect_internal_current_enclosures()? } else { None }});
     // Only cold diagnostics copy numerical emission carriers. Product steps above read the
     // four differential masks and retain all junction reports on the device.
@@ -373,7 +378,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -385,6 +390,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         (None, None, None, None, None, None);
     let mut inspect_all_currents = false;
     let mut history_archive = None;
+    let mut material_source = None;
     while let Some(option) = args.next() {
         let value = args.next().ok_or("missing option value")?;
         match option.as_str() {
@@ -395,6 +401,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "--report" => report_path = Some(PathBuf::from(value)),
             "--checkpoint" => checkpoint = Some(PathBuf::from(value)),
             "--history-archive" => history_archive = Some(PathBuf::from(value)),
+            "--material-source" => {
+                material_source = Some(match value.as_str() {
+                    "coupled-outgoing" => NativeMaterialTransportSource::CoupledOutgoing,
+                    "complete-current" => NativeMaterialTransportSource::CompleteCurrent,
+                    _ => {
+                        return Err(
+                            "material source must be coupled-outgoing or complete-current".into(),
+                        )
+                    }
+                })
+            }
             "--inspect-all-currents" => inspect_all_currents = value.parse::<bool>()?,
             _ => return Err(format!("unknown option {option}").into()),
         }
@@ -463,6 +480,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             return Err("saved parent/source record boundary mismatch".into());
         }
         let actual_grain = saved.fractional_bits()?;
+        if material_source.is_some() && material_source != saved.material_transport_source() {
+            return Err("resume cannot silently change the saved material source".into());
+        }
         if grain.is_some_and(|g| g != actual_grain) {
             return Err("resume cannot silently change the saved numerical chart".into());
         }
@@ -521,7 +541,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         report["fractional_bits"] = json!(grain);
         report["families_aperture"] = json!(families);
         let exposure = exposure.to_string_lossy().into_owned();
-        with_text_field(grain, |field| {
+        with_text_field_source(grain, material_source.unwrap_or_default(), |field| {
             if let Some(path) = &history_archive {
                 field.enable_history_archive(path)?;
             }

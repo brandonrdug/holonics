@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 7, 2026. **Goal:** Athena-alpha construction, paused by Brandon.
+**Currency:** September 7, 2026. **Goal:** Athena-alpha construction, resumed by Brandon.
 **Position:** AC0 complete at cold exposure scope; AC1–AC2 attachment under correction.
 **Athena-alpha:** not yet attained.
 
@@ -16,22 +16,31 @@ carries compatible causes and constraints on future conduct from limited observa
 does not require perfect inversion, a singleton source or complete raw-state retention. The
 [synthesis and source comparison](research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
 records the recovered September 2 naming correction, current attachment gaps and branch revision.
-The native corpus process remains stopped in memory; no additional cultivation or branch merge
-was performed during this review.
+The review performed no additional cultivation or branch merge. On resumption, the former native
+process and wrapper are absent. Its partial history backing survives, but the intended 64-family
+checkpoint was not published; no complete continuation result is available.
 
-[definition] Ready for Brandon to resume the goal with the chord/class clarification incorporated:
+[definition] The goal is resumed with the chord/class clarification incorporated:
 reusable class, Preimage Fibre, coherent composition and ordered progression have distinct roles.
 The Mac handoff is the first committed shared generator/phase formation and continuation return
 with a concrete Metal port boundary. It is not yet available. Desktop acoustic work is optional
 research for that common relation; the conversation product remains the goal.
+
+[established-bounded; measured] The existing local relation now has a
+[resident rational-current port](research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md).
+Two actual native observations support a new phase superposition while an unobserved direction
+remains open; learned rational currents conduct into subsequent operations with zero numerical
+readbacks or remounts. Original plural faces survive later development. All 84 constitutive tests
+pass. This closes a component's composition port; the general conversation-field attachment and
+Mac cultivation handoff remain unfinished.
 
 [definition] The original authorization is construction and completion of the
 [Athena-alpha blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md).
 AC0 prepares source-qualified available conversation occurrences; AC1 composes actual native
 material/current/formation; AC2 returns learned text-codec conduct and complete responses; AC3
 cultivates and persists the broader model; AC4 establishes general contextual use and attribution;
-AC5 delivers the usable consumer product and measured costs. The goal remains unfinished under
-the current pause. A data adapter or another bounded fixture is not alpha completion.
+AC5 delivers the usable consumer product and measured costs. The goal remains active and unfinished.
+A data adapter or another bounded fixture is not alpha completion.
 
 [project-postulate] Athena-alpha has never been attained by Brandon's standard. The intended
 material is general English, code and mathematics in the prepared conversations. Lean text remains
@@ -137,10 +146,11 @@ distinguish these sources for any coefficients; this establishes a specific miss
 the explicit `CompleteCurrent` variant. One actual reception learns opposite material currents
 `2/11` and `-2/11` on the two zero-boundary sources. Seventy-nine constitutive controls pass,
 including full coefficient/current reconstruction, late-refusal preservation and archived remount.
-This implementation remains uncommitted working material at the pause. Its actual four-family
+This pre-pause implementation is retained as a bounded material variant. Its actual four-family
 run saved 732 developmental occurrences, then emitted `.` and reached one uncertified bit at the
-text receiver. That diagnostic fails useful language. Its larger continuation is paused and has
-no completion result. The outgoing-only 128-family artifact and its `Tm.` response remain preserved.
+text receiver. That diagnostic fails useful language. Its larger continuation no longer has a
+live process and has no completion result. The outgoing-only 128-family artifact and its `Tm.`
+response remain preserved.
 
 [established-bounded; source-inspected] Apple `codex/apple-silicon` at `bd3ea689` supplies Metal
 phase and earlier complete-field apparatus, an acoustic cell adapter, and separately recorded

@@ -43,7 +43,7 @@ type Error = ConstitutiveFibreError;
 fn invalid(detail: impl std::fmt::Display) -> Error {
     Error::Rest(format!("complete-current source: {detail}"))
 }
-fn integer(words: &[(i64, i64)]) -> Result<BigInt, Error> {
+pub(super) fn integer(words: &[(i64, i64)]) -> Result<BigInt, Error> {
     if words.len() != 5 || words.iter().any(|(a, b)| a != b) || !matches!(words[4].0, 0 | 1) {
         return Err(invalid("signed-magnitude wire"));
     }
@@ -199,49 +199,7 @@ impl<'chart> NativeCurrentHistorySourceReceiver<'chart> {
             return Err(Error::ForeignOccurrence);
         }
         let words = self.surface.read_out(&source.section)?;
-        let d = 6 * self.nodes;
-        if words.len() != 6 * d + 22
-            || words.iter().any(|(a, b)| a != b)
-            || words[6 * d + 15].0 != self.grain as i64
-            || words[6 * d + 19].0 != source.occurrence as i64
-        {
-            return Err(invalid("source wire"));
-        }
-        let wide = material_transport::wides(&words[..6 * d])?;
-        let scale = BigInt::one() << self.grain;
-        let square = &scale * &scale;
-        let vector = |offset: usize| -> Vec<ExactComplexWaveCurrent> {
-            (0..d / 2)
-                .map(|i| {
-                    ExactComplexWaveCurrent::new(
-                        Rat::new(wide[offset + 2 * i].into(), scale.clone()),
-                        Rat::new(wide[offset + 2 * i + 1].into(), scale.clone()),
-                    )
-                })
-                .collect()
-        };
-        let norm = integer(&words[6 * d + 10..6 * d + 15])?;
-        let radius = material_transport::wides(&words[6 * d + 16..6 * d + 18])?[0];
-        if norm < BigInt::zero() || radius < 0 || words[6 * d + 18].0 < 0 {
-            return Err(invalid("negative source radius, norm or trace"));
-        }
-        Ok(NativeCurrentHistorySourceReading {
-            occurrence: source.occurrence,
-            outgoing_center: vector(0),
-            prefix_center: vector(d),
-            numerical_prefix_image: vector(2 * d),
-            numerical_birth_offset: ExactComplexWaveCurrent::new(
-                Rat::new(integer(&words[6 * d..6 * d + 5])?, square.clone()),
-                Rat::new(integer(&words[6 * d + 5..6 * d + 10])?, square.clone()),
-            ),
-            numerical_norm_square: Rat::new(norm, square),
-            source_radius: Rat::new(radius.into(), scale.clone()),
-            contact_trace: words[6 * d + 18].0.into(),
-            numerical_norm_upper: Rat::new(
-                material_transport::wides(&words[6 * d + 20..6 * d + 22])?[0].into(),
-                scale,
-            ),
-        })
+        decode_source(&words, self.nodes, self.grain, source.occurrence)
     }
     /// Enclose the full actual source pairing. The centre is the exact pairing of numerical
     /// representatives; the radius retains both complete-source uncertainties.
@@ -287,3 +245,54 @@ impl<'chart> NativeCurrentHistorySourceReceiver<'chart> {
 
 #[cfg(test)]
 mod tests;
+
+pub(super) fn decode_source(
+    words: &[(i64, i64)],
+    nodes: usize,
+    grain: u32,
+    occurrence: usize,
+) -> Result<NativeCurrentHistorySourceReading, Error> {
+    let d = 6 * nodes;
+    if words.len() != 6 * d + 22
+        || words.iter().any(|(a, b)| a != b)
+        || words[6 * d + 15].0 != grain as i64
+        || words[6 * d + 19].0 != occurrence as i64
+    {
+        return Err(invalid("source wire"));
+    }
+    let wide = material_transport::wides(&words[..6 * d])?;
+    let scale = BigInt::one() << grain;
+    let square = &scale * &scale;
+    let vector = |offset: usize| -> Vec<ExactComplexWaveCurrent> {
+        (0..d / 2)
+            .map(|i| {
+                ExactComplexWaveCurrent::new(
+                    Rat::new(wide[offset + 2 * i].into(), scale.clone()),
+                    Rat::new(wide[offset + 2 * i + 1].into(), scale.clone()),
+                )
+            })
+            .collect()
+    };
+    let norm = integer(&words[6 * d + 10..6 * d + 15])?;
+    let radius = material_transport::wides(&words[6 * d + 16..6 * d + 18])?[0];
+    if norm < BigInt::zero() || radius < 0 || words[6 * d + 18].0 < 0 {
+        return Err(invalid("negative source radius, norm or trace"));
+    }
+    Ok(NativeCurrentHistorySourceReading {
+        occurrence: occurrence,
+        outgoing_center: vector(0),
+        prefix_center: vector(d),
+        numerical_prefix_image: vector(2 * d),
+        numerical_birth_offset: ExactComplexWaveCurrent::new(
+            Rat::new(integer(&words[6 * d..6 * d + 5])?, square.clone()),
+            Rat::new(integer(&words[6 * d + 5..6 * d + 10])?, square.clone()),
+        ),
+        numerical_norm_square: Rat::new(norm, square),
+        source_radius: Rat::new(radius.into(), scale.clone()),
+        contact_trace: words[6 * d + 18].0.into(),
+        numerical_norm_upper: Rat::new(
+            material_transport::wides(&words[6 * d + 20..6 * d + 22])?[0].into(),
+            scale,
+        ),
+    })
+}

@@ -54,6 +54,7 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/exact_conic_support.cu");
     println!("cargo:rerun-if-changed=kernels/exact_integer.cuh");
     println!("cargo:rerun-if-changed=kernels/field_current_history_source.cuh");
+    println!("cargo:rerun-if-changed=kernels/field_complete_material_transport.cuh");
     println!("cargo:rerun-if-changed=kernels/exact_relation_support.cu");
     println!("cargo:rerun-if-changed=kernels/refine_shell.cu");
     println!("cargo:rerun-if-changed=kernels/refine_shell/refine_shared.cuh");

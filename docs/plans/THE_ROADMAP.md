@@ -22,19 +22,25 @@ contracts and records preserve their completed scope; their old imperatives sche
 
 ## Active Athena-alpha cultivation campaign
 
-[project-postulate] **Execution is paused under Brandon's September 7 instruction.** The current
-review corrects AC1–AC2 around generator recovery, group/phase transport and Holonic Compression,
+[project-postulate] **Brandon has resumed the goal after the September 7 corrections.**
+AC1–AC2 now composes generator recovery, group/phase transport and Holonic Compression,
 shared with the separately pushed Apple acoustic work. Read the
 [source/intent synthesis](../../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
-and the corrected blueprint before resuming. **Preimage Fibre** carries compatible causes and
+and the corrected blueprint. **Preimage Fibre** carries compatible causes and
 future-conduct constraints from limited observations; neither perfect inversion nor retention of
-every raw state is a learning prerequisite. The original continuation order does not supersede this pause.
+every raw state is a learning prerequisite. Continue the corrected native attachment.
 
 [definition] Brandon's subsequent chord clarification preserves general class descriptions without
 requiring an individual physical occurrence, alongside superposition and ordered composition.
 The [Mac coordination milestone](../../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md#mac-workflow-handoff)
 is a committed shared generator/phase return with an explicit Metal port boundary. Notify Brandon
 then; desktop acoustics is optional supporting research, not another required campaign.
+
+[established-bounded; measured] The [resident local return](../../research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md)
+now lets native observations develop the existing local relation and its rational emitted current
+enter subsequent operations directly. Partial source-domain knowledge supports new superposition;
+all 84 constitutive tests pass. Continue the AC1–AC2 attachment from this composable owner into
+the actual conversation ecology, with the appropriate phase-sensitive family and contact law.
 
 [definition] Brandon has authorized design followed immediately by construction and completion of
 [the Athena-alpha blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md) as a goal. It orders AC0–AC5:
@@ -93,7 +99,7 @@ Its first four-family run stops at a reserved codeword without a text response. 
 now retains the complete cultivated owner, source capabilities and exposure cut across processes.
 The durable state and [exact historical placement](../../research/records/2026-09-07_AC3_THE_COMPLETE_HISTORY_MOVES_TO_AN_EXTERIOR_CHART_AND_ITS_ADDRESSED_SOURCE_RETURNS.md)
 remain available for their demonstrated scopes. Further broad development follows the corrected
-AC1–AC2 attachment and the operator's resumption of execution.
+AC1–AC2 attachment. The goal's resumption does not establish that attachment by itself.
 Complete historical carriers now leave GPU residency and remount through actual source handles;
 host persistence and disk size remain growing costs. Archive relocation is not the generative
 compression sought by the current correction. Preserve numerical error and complete defects; do not turn source

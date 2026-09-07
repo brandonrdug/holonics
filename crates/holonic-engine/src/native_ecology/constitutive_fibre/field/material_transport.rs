@@ -3,12 +3,58 @@ use super::*;
 use num_bigint::BigInt;
 use num_traits::One;
 
+pub(super) mod complete;
+pub use complete::{NativeCompleteMaterialTransportReading, NativeCompleteMaterialTransportState};
+
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, serde::Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum NativeMaterialTransportSource {
+    #[default]
+    CoupledOutgoing,
+    CompleteCurrent,
+}
+impl NativeMaterialTransportSource {
+    pub(super) fn is_outgoing(&self) -> bool {
+        *self == Self::CoupledOutgoing
+    }
+    pub(super) fn kernel(self) -> u32 {
+        match self {
+            Self::CoupledOutgoing => 1,
+            Self::CompleteCurrent => 2,
+        }
+    }
+    pub(super) fn state_words(self, n: usize) -> Option<usize> {
+        match self {
+            Self::CoupledOutgoing => n.checked_mul(n)?.checked_mul(12)?.checked_add(2),
+            Self::CompleteCurrent => n
+                .checked_mul(n)?
+                .checked_mul(60)?
+                .checked_add(n.checked_mul(22)?)?
+                .checked_add(12),
+        }
+    }
+    pub(super) fn report_words(self, n: usize) -> Option<usize> {
+        n.checked_mul(if self == Self::CoupledOutgoing {
+            36
+        } else {
+            74
+        })?
+        .checked_add(if self == Self::CoupledOutgoing {
+            24
+        } else {
+            44
+        })
+    }
+}
+
 pub(super) struct MaterialTransport<'chart> {
     pub(super) state: ResidentSection<'chart>,
+    pub(super) source: NativeMaterialTransportSource,
 }
 pub(super) struct PendingMaterialTransport<'chart> {
     pub(super) delta: ResidentSection<'chart>,
     pub(super) report: Rc<ResidentSection<'chart>>,
+    pub(super) refresh: Option<complete::CurrentSourceRefresh<'chart>>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -151,6 +197,12 @@ impl<'chart> NativeConstitutiveField<'chart> {
     /// Found an initially zero transport in this same owner, before any material enters. Its
     /// contextual sources and actual future returns are subsequently formed on the device.
     pub fn enable_material_transport(&mut self) -> Result<(), ConstitutiveFibreError> {
+        self.enable_material_transport_source(NativeMaterialTransportSource::CoupledOutgoing)
+    }
+    pub fn enable_material_transport_source(
+        &mut self,
+        source: NativeMaterialTransportSource,
+    ) -> Result<(), ConstitutiveFibreError> {
         if !self.relation.usable || self.pending.is_some() {
             return Err(ConstitutiveFibreError::Uncertain);
         }
@@ -163,22 +215,26 @@ impl<'chart> NativeConstitutiveField<'chart> {
         {
             return Err(ConstitutiveFibreError::Shape);
         }
-        let width = self
-            .nodes()
-            .checked_mul(self.nodes())
-            .and_then(|v| v.checked_mul(6))
-            .and_then(|v| v.checked_add(1))
-            .and_then(|v| v.checked_mul(2))
+        let width = source
+            .state_words(self.nodes())
             .ok_or(ConstitutiveFibreError::Shape)?;
+        let mut words = vec![(0, 0); width];
+        if source == NativeMaterialTransportSource::CompleteCurrent {
+            let grain = self.transport_grain()? as i64;
+            words[12 * self.nodes() + 6] = (grain, grain);
+        }
         let state = self.relation.surface.mount_section_rest(
-            &ResidentSectionRest::found(1, width, ResidentGrain(0), 64, vec![(0, 0); width])
+            &ResidentSectionRest::found(1, width, ResidentGrain(0), 64, words)
                 .map_err(|_| ConstitutiveFibreError::Shape)?,
         )?;
-        self.transport = Some(MaterialTransport { state });
+        self.transport = Some(MaterialTransport { state, source });
         Ok(())
     }
     pub fn has_material_transport(&self) -> bool {
         self.transport.is_some()
+    }
+    pub fn material_transport_source(&self) -> Option<NativeMaterialTransportSource> {
+        self.transport.as_ref().map(|t| t.source)
     }
     fn transport_grain(&self) -> Result<u32, ConstitutiveFibreError> {
         match self.junction_representation() {
@@ -189,22 +245,40 @@ impl<'chart> NativeConstitutiveField<'chart> {
         }
     }
     pub(super) fn prepare_material_transport(
-        &self,
+        &mut self,
+        source_at: Option<usize>,
     ) -> Result<Option<PendingMaterialTransport<'chart>>, ConstitutiveFibreError> {
-        let Some(transport) = &self.transport else {
+        let Some(kind) = self.material_transport_source() else {
             return Ok(None);
         };
+        let refresh = if kind == NativeMaterialTransportSource::CompleteCurrent {
+            source_at
+                .map(|at| self.prepare_current_source_refresh(at))
+                .transpose()?
+                .flatten()
+        } else {
+            None
+        };
         let surface = self.relation.surface;
-        let width = self
-            .nodes()
-            .checked_mul(36)
-            .and_then(|v| v.checked_add(24))
-            .ok_or(ConstitutiveFibreError::Shape)?;
         Ok(Some(PendingMaterialTransport {
-            delta: surface.fresh_section(1, transport.state.width(), ResidentGrain(0))?,
-            report: Rc::new(surface.fresh_section(1, width, ResidentGrain(0))?),
+            delta: surface.fresh_section(
+                1,
+                kind.state_words(self.nodes())
+                    .ok_or(ConstitutiveFibreError::Shape)?,
+                ResidentGrain(0),
+            )?,
+            report: Rc::new(
+                surface.fresh_section(
+                    1,
+                    kind.report_words(self.nodes())
+                        .ok_or(ConstitutiveFibreError::Shape)?,
+                    ResidentGrain(0),
+                )?,
+            ),
+            refresh,
         }))
     }
+
     pub fn inspect_material_transport_wire(
         &self,
         occurrence: usize,
@@ -219,6 +293,13 @@ impl<'chart> NativeConstitutiveField<'chart> {
         &self,
         occurrence: usize,
     ) -> Result<Option<NativeFieldMaterialTransportReading>, ConstitutiveFibreError> {
+        if self.material_transport_source() == Some(NativeMaterialTransportSource::CompleteCurrent)
+        {
+            return Err(ConstitutiveFibreError::Rest(
+                "use the complete-current transport receiver".into(),
+            ));
+        }
+
         let Some(rest) = self.inspect_material_transport_wire(occurrence)? else {
             return Ok(None);
         };
@@ -267,6 +348,13 @@ impl<'chart> NativeConstitutiveField<'chart> {
     pub fn inspect_material_transport_state(
         &self,
     ) -> Result<Option<NativeFieldMaterialTransportState>, ConstitutiveFibreError> {
+        if self.material_transport_source() == Some(NativeMaterialTransportSource::CompleteCurrent)
+        {
+            return Err(ConstitutiveFibreError::Rest(
+                "use the complete-current transport receiver".into(),
+            ));
+        }
+
         if !self.relation.usable || self.pending.is_some() {
             return Err(ConstitutiveFibreError::Uncertain);
         }

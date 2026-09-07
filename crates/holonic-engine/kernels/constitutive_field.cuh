@@ -302,6 +302,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     uint32_t transport_enabled, wide *transport_lo, wide *transport_hi,
     const wide *origin_junction, const wide *origin_transport,
     wide *transport_delta_lo, wide *transport_delta_hi, wide *transport_report_lo, wide *transport_report_hi,
+    const int64_t *refreshed_source_current,
     int64_t *output_lo, int64_t *output_hi,
     uint32_t *slot, const uint32_t *census,
     const uint32_t *lineage, uint32_t lineage_count
@@ -311,7 +312,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     // The dependent field word is prepared once. All continuing writes remain after the complete
     // coupled return; early returns inside this helper cannot strand a block barrier.
     if (threadIdx.x == 0) {
-        if (coupled > 3 || transport_enabled > 1u
+        if (coupled > 3 || transport_enabled > 2u
             || (transport_enabled && (coupled < 2u || !transport_lo || !transport_hi
                 || !transport_delta_lo || !transport_delta_hi || !transport_report_lo || !transport_report_hi
                 || (linked && (!origin_junction || !origin_transport))))
@@ -341,7 +342,12 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     }
     __syncthreads();
     if (*slot) return;
-    if (transport_enabled && threadIdx.x == 0)
+    if (transport_enabled == 2u && threadIdx.x == 0)
+        complete_material_transport_prepare((const int64_t *)transport_lo,(const int64_t *)origin_transport,refreshed_source_current,
+            output_lo,origin,incoming,current_frame,origin_frame,next_covariance_lo,(const wide *)junction_held,
+            (const wide *)junction_report_lo,nodes,linked,junction_grain,occurrence,
+            (int64_t *)transport_delta_lo,(int64_t *)transport_delta_hi,(int64_t *)transport_report_lo,(int64_t *)transport_report_hi,field_scratch,slot);
+    else if (transport_enabled == 1u && threadIdx.x == 0)
         field_material_transport_prepare(transport_lo, origin_junction, origin_transport,
             (const wide *)junction_report_lo, incoming, nodes, linked, junction_grain,
             transport_delta_lo, transport_delta_hi, transport_report_lo, transport_report_hi, slot);
@@ -360,7 +366,10 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     }
     for (uint32_t j = 0; j < 3u * nodes; ++j)
         memory_lo[j] = memory_hi[j] = (int64_t)held_departure[j];
-    if (transport_enabled) {
+    if (transport_enabled == 2u) {
+        for (size_t i=0;i<complete_state_words(nodes);++i)
+            ((int64_t *)transport_lo)[i]=((int64_t *)transport_hi)[i]=((const int64_t *)transport_delta_lo)[i];
+    } else if (transport_enabled == 1u) {
         const size_t coefficients = (size_t)6u * nodes * nodes;
         // All sums and the complete current return were checked before any continuing write.
         for (size_t i = 0; i < coefficients; ++i)

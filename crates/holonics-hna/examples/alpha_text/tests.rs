@@ -1,11 +1,12 @@
 use super::*;
+use holonics_hna::alpha::text_codec::with_text_field_source;
 
 #[test]
 #[ignore = "requires CUDA and HOLONICS_ALPHA_TEST_EXPOSURE; resumes an actual partly admitted reply"]
 fn partial_actual_part_keeps_its_parent_and_enacts_the_staged_symbol_once() {
     let path = std::env::var("HOLONICS_ALPHA_TEST_EXPOSURE").expect("private exposure path");
     let mut expected_records = Vec::new();
-    let expected = with_text_field(72, |field| {
+    let expected = with_text_field_source(72, NativeMaterialTransportSource::CompleteCurrent, |field| {
         let mut session = TextFieldSession::on(field)?;
         let mut reader = ExposureReader::open(&path).map_err(exposure_error)?;
         cultivate(
@@ -23,7 +24,7 @@ fn partial_actual_part_keeps_its_parent_and_enacts_the_staged_symbol_once() {
     let mut reader = ExposureReader::open(&path).unwrap();
     let mut records = Vec::new();
     let mut anchor_families = Vec::new();
-    with_text_field(72, |field| {
+    with_text_field_source(72, NativeMaterialTransportSource::CompleteCurrent, |field| {
         let mut session = TextFieldSession::on(field)?;
         let mut anchors = AnchorMap::new();
         cultivate(&mut reader, &mut session, 1, &mut records, &mut anchors)?;

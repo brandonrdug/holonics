@@ -40,7 +40,8 @@ causes and future conduct; cultivation does not require a perfect inverse, singl
 enumerated candidate population or archive of every raw state. Exact persistence and declared
 reversible codec checks retain their narrower scopes. Read the
 [text/acoustic synthesis](research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md).
-The corpus process and goal are paused; research and documentation correction do not resume them.
+Brandon has resumed the goal after those corrections. Continue the corrected construction;
+the earlier fixed-field corpus run is not the new generative attachment.
 
 [project-postulate] Brandon's chord clarification preserves reusable class identity separately
 from physical occurrence identity. A class description need not specify one performance; its

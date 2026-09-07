@@ -2,8 +2,8 @@
 
 **Authority:** Brandon's September 6 instruction to design and deposit this blueprint, update the
 roadmap and position, then immediately construct and complete it as a goal.
-**Status:** cultivation paused by Brandon on September 7; AC0 returned, AC1–AC2 attachment under
-correction. **Order:** [the roadmap](THE_ROADMAP.md).
+**Status:** resumed after Brandon's September 7 corrections; AC0 returned, AC1–AC2 generative
+attachment in construction. **Order:** [the roadmap](THE_ROADMAP.md).
 **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 
 ## 1. The required product
@@ -309,8 +309,10 @@ phase does not pass on fluent inherited text, output length, nonempty bytes or a
 refines the open AC1–AC2 attachment: retain outgoing plus every born internal current, with
 actual source-prefix overlap, and join it to the material/reaction return. The native construction
 receiver and its actual-material comparison now return, including a reachable hidden-current
-distinction behind equal zero boundary output. Productive coupling, its full uncertainty/adjoint
-expression and durable integration remain open; this does not close AC2 or establish language.
+distinction behind equal zero boundary output. The [explicit complete-current variant](../../research/records/2026-09-07_AC2_THE_COMPLETE_CURRENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md)
+now supplies the fused material coupling, full source/parameter error and durable state. Its
+actual response remains unusable. The corrected generative/contextual attachment and useful
+language remain open; this bounded coefficient return does not close AC2.
 
 ### AC3 — Cultivated model and continuing corpus development
 
@@ -403,10 +405,9 @@ when a committed, tested native formation/continuation return and its explicit M
 are available. The [handoff definition](../../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md#mac-workflow-handoff)
 precedes full Athena-alpha usefulness; it does not require completing text before acoustic work.
 
-[project-postulate] The original instruction authorized immediate construction after deposit;
-Brandon's September 7 pause now governs execution. The goal remains unfinished across partial returns.
-A difficult or failed construction is not a reason to stop at a report or request renewed
-authorization once execution resumes. Change the concrete failed
+[project-postulate] Brandon has resumed construction after the September 7 corrections.
+The goal remains unfinished across partial returns. A difficult or failed construction is not
+a reason to stop at a report or request renewed authorization. Change the concrete failed
 binding when the evidence warrants it and update this contract without shrinking its product aim.
 
 [definition] Work without agents under Brandon's latest preference. Preserve the
