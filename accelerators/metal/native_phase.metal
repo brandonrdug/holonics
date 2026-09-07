@@ -520,6 +520,179 @@ inline void condition_coverage_write(uint kind, long generator, threadgroup W *w
     lo[4u + condition_width + j] = hi[4u + condition_width + j]
         = j < residual_width ? toword(residual[j], slot) : 0;
 }
+inline W flcm(W a, W b, device uint *slot);
+inline bool upstream(device const uint *census, device const uint *lineage, uint count,
+                     device uint *slot);
+inline W fibre_current_denominator(device const long *lo, device const long *hi,
+                                   uint denominator_at, uint disposition_at,
+                                   device uint *slot);
+
+// Found the five rows: predecessor, successor, incoming normal, returned normal,
+// and oriented difference. Initially both currents agree and all differences vanish.
+kernel void section_constitutive_condition_current_found(
+    device const long *lo [[buffer(0)]], device const long *hi [[buffer(1)]],
+    constant uint &at [[buffer(2)]], constant uint &denominator_at [[buffer(3)]],
+    constant uint &status_at [[buffer(4)]], constant uint &condition_width [[buffer(5)]],
+    device long *out [[buffer(6)]], device long *out_hi [[buffer(7)]],
+    device uint *slot [[buffer(8)]], device const uint *census [[buffer(9)]],
+    device const uint *lineage [[buffer(10)]], constant uint &lineage_count [[buffer(11)]],
+    uint3 tid [[thread_position_in_grid]]) {
+  if (tid.x || tid.y || tid.z)
+    return;
+  if (upstream(census, lineage, lineage_count, slot))
+    return;
+  uint c = condition_width;
+  if (!c) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  W den = fibre_current_denominator(lo, hi, denominator_at, status_at, slot);
+  for (uint j = 0; j < c; ++j)
+    if (lo[at + j] != hi[at + j])
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                               memory_order_relaxed);
+  toword(den, slot);
+  if (*slot)
+    return;
+  for (uint j = 0; j < 5u * c; ++j)
+    out[j] = out_hi[j] = j < 2u * c ? lo[at + (j % c)] : 0;
+  out[5u * c] = out_hi[5u * c] = toword(den, slot);
+  out[5u * c + 1u] = out_hi[5u * c + 1u] = 0;
+}
+
+// Unit-admittance contact with an affine condition family F=a+V in the realified
+// phase chart. The Gram graph computes the exact projection onto V; the successor
+// preserves the prior tangent current and exchanges the normal current at both ports.
+kernel void section_constitutive_condition_contact(
+    device const long *lo [[buffer(0)]], device const long *hi [[buffer(1)]],
+    constant uint &at [[buffer(2)]], constant uint &denominator_at [[buffer(3)]],
+    constant uint &status_at [[buffer(4)]], device const long *pf [[buffer(5)]],
+    device const long *pf_hi [[buffer(6)]], constant uint &condition_source_width [[buffer(7)]],
+    constant uint &condition_width [[buffer(8)]], device long *graph_lo [[buffer(9)]],
+    device long *graph_hi [[buffer(10)]], device long *out [[buffer(11)]],
+    device long *out_hi [[buffer(12)]], device uint *slot [[buffer(13)]],
+    device const uint *census [[buffer(14)]], device const uint *lineage [[buffer(15)]],
+    constant uint &lineage_count [[buffer(16)]], threadgroup W *scratch [[threadgroup(0)]],
+    uint3 tid [[thread_position_in_threadgroup]]) {
+  if (tid.x || tid.y || tid.z)
+    return;
+  if (upstream(census, lineage, lineage_count, slot))
+    return;
+  uint ps = condition_source_width;
+  uint c = condition_width;
+  if (!c || ps > 0xfffffffbU - c || c > 0x7fffffffu) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  uint pk = ps + c;
+  uint k = 2u * c;
+  ulong count = (ulong)pk + 4ul + (ulong)c * c;
+  if (count > 0xfffffffbUL) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+    return;
+  }
+  for (ulong j = 0; j < count; ++j)
+    if (pf[j] != pf_hi[j])
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                               memory_order_relaxed);
+  if (pf[pk] <= 0 || pf[pk + 1u] < 0 || pf[pk + 1u] > 2) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                             memory_order_relaxed);
+  }
+  W held_den = fibre_current_denominator(lo, hi, denominator_at, status_at, slot);
+  for (uint j = 0; j < c; ++j)
+    if (lo[at + j] != hi[at + j])
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                               memory_order_relaxed);
+  if (*slot)
+    return;
+
+  threadgroup W *row = scratch;
+  threadgroup W *query = row + k;
+  threadgroup W *values = query + k;
+  for (uint j = 0; j < 5u * c; ++j)
+    values[j] = j < 2u * c ? fromword(lo[at + (j % c)]) : wzero();
+  W den = held_den;
+  // An empty compatible family preserves the actual current and reports the
+  // family obstruction; no fabricated point is selected.
+  if (pf[pk + 1u] != 1) {
+    for (ulong j = 0; j < (ulong)k * k; ++j)
+      graph_lo[j] = graph_hi[j] = 0;
+    for (uint i = 0; i < c; ++i) {
+      for (uint j = 0; j < c; ++j) {
+        row[j] = wzero();
+        for (uint n = 0; n < c; ++n)
+          row[j] = wadd(row[j],
+                        wmul(fromword(pf[pk + 4u + (ulong)j * c + n]),
+                             fromword(pf[pk + 4u + (ulong)i * c + n]), slot), slot);
+        row[c + j] = fromword(pf[pk + 4u + (ulong)i * c + j]);
+      }
+      if (*slot)
+        return;
+      condition_stage_row(graph_lo, graph_hi, k, row, slot);
+      if (*slot)
+        return;
+    }
+    W projection_den[2];
+    for (uint which = 0; which < 2; ++which) {
+      bool condition_input = which != 0;
+      device const long *input = condition_input ? pf + ps : lo + at;
+      W projection = condition_input ? fromword(pf[pk]) : held_den;
+      for (uint j = 0; j < k; ++j)
+        query[j] = wzero();
+      for (uint j = 0; j < c; ++j)
+        for (uint n = 0; n < c; ++n)
+          query[j] = wadd(query[j],
+                          wmul(fromword(pf[pk + 4u + (ulong)j * c + n]),
+                               fromword(input[n]), slot), slot);
+      if (*slot)
+        return;
+      uint disposition = 0, rank = 0;
+      fibre_query(graph_lo, c, k, query, &projection,
+                  (threadgroup const W *)nullptr, -1, &disposition, &rank, slot);
+      if (*slot)
+        return;
+      if (disposition != 0) {
+        atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                                 memory_order_relaxed);
+        return;
+      }
+      for (uint j = 0; j < c; ++j)
+        values[(which + 1u) * c + j] = wneg(query[c + j]);
+      projection_den[which] = projection;
+    }
+    den = flcm(held_den, fromword(pf[pk]), slot);
+    den = flcm(den, projection_den[0], slot);
+    den = flcm(den, projection_den[1], slot);
+    if (*slot)
+      return;
+    for (uint j = 0; j < c; ++j) {
+      W h = wmul(fromword(lo[at + j]), wdiv(den, held_den, slot), slot);
+      W ph = wmul(values[c + j], wdiv(den, projection_den[0], slot), slot);
+      W pa = wmul(values[2u * c + j], wdiv(den, projection_den[1], slot), slot);
+      W incoming = wsub(wmul(fromword(pf[ps + j]), wdiv(den, fromword(pf[pk]), slot), slot), pa, slot);
+      W returned = wsub(h, ph, slot);
+      values[j] = h;
+      values[c + j] = wadd(ph, incoming, slot);
+      values[2u * c + j] = incoming;
+      values[3u * c + j] = returned;
+      values[4u * c + j] = wsub(incoming, returned, slot);
+    }
+  }
+  wnorm(values, 5u * c, &den, slot);
+  for (uint j = 0; j < 5u * c; ++j)
+    toword(values[j], slot);
+  toword(den, slot);
+  if (*slot)
+    return;
+  for (uint j = 0; j < 5u * c; ++j)
+    out[j] = out_hi[j] = toword(values[j], slot);
+  out[5u * c] = out_hi[5u * c] = toword(den, slot);
+  out[5u * c + 1u] = out_hi[5u * c + 1u] = pf[pk + 1u] == 1 ? 1 : 0;
+}
 inline W flcm(W a, W b, device uint *slot) {
   if (wneg_p(a) || wneg_p(b) || wzero_p(a) || wzero_p(b)) {
     atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed);

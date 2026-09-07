@@ -388,3 +388,9 @@ pub use preimage::{ConditionPreimageReading, ResidentConditionPreimage};
 
 mod condition_image;
 pub use condition_image::{ConditionCoverage, ConditionImageReading, ResidentConditionImage};
+
+mod condition_contact;
+pub use condition_contact::{
+    ConditionContactMetric, ConditionContactReading, ConditionContactStatus,
+    ResidentConditionContact, ResidentConditionCurrent,
+};

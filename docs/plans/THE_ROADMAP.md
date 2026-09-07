@@ -46,11 +46,19 @@ now infers an unprovided phase from an actual source/return and conducts a new c
 100 native tests and the public codec control pass. The subsequent
 [joint-family return](../../research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md)
 now supplies supported forward images, complete domain/witness distinctions and later refinement
-through the immutable producing relation. Next bind an actual retained condition current to
-inferred families through an explicit native contact law, preserving undetermined prior current
-and all returned differences. Its generative current is distinct from a whole-family evidence
-receiver; do not choose an arbitrary particular solution or require universal certainty to define
-all inference. Bind that continuing owner to actual conversation material.
+through the immutable producing relation. The
+[retained condition contact](../../research/records/2026-09-07_AC1_THE_RETAINED_CONDITION_CURRENT_MEETS_ITS_PREIMAGE_FIBRE.md)
+now returns a successor through the declared unit-admittance two-port law, preserving free prior
+current and all returned differences. All 114 constitutive tests and the public continuing-current
+example pass. Generation before condition identification and subsequent observation-driven change
+both return without numerical host readback; useful conversation remains unfinished.
+
+[definition] Next compose the actual field source/condition incidence, producing-law chronology
+and reception with that continuing current, then bind the native owner to conversation material.
+Retain the carriers used for each prediction; later inference changes the successor rather than
+rewriting that prediction's history. Native current is distinct from a whole-family evidence
+receiver; do not
+choose an arbitrary particular solution or require universal certainty to define all inference.
 
 [established-bounded; measured] The [resident local return](../../research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md)
 now lets native observations develop the existing local relation and its rational emitted current

@@ -49,6 +49,9 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
    The [whole-family return](../../research/records/2026-09-07_APPLE_CONDUCTS_THE_SHARED_CONDITION_FAMILY.md)
    also ports desktop `82fef476` joint images, later refinement and domain-coverage guards,
    preserving supported consequences even when conditions remain plural.
+   The [retained-current return](../../research/records/2026-09-07_APPLE_RETAINS_CONDITION_CURRENT_THROUGH_RECORDED_CONTACT.md)
+   adds desktop `2c99351c`'s current formation and affine-contact kernels, including Metal's
+   twenty-byte wide scratch and recoverable publication of the complete successor.
    This is a device composition return, not completion of acoustic development.
 2. Bind actual acoustic sections and returns to that shared owner. Start at
    `AcousticFieldChart`, `ExactPhaseCurrentSection`, the existing clock-transport owners and
@@ -65,8 +68,11 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
    conditional relation, condition Preimage Fibre and whole supported image without numerical host replay. Its response
    is a declared local temporal action, not an arbitrary second utterance. Next bind the material
    and receiving conditions appropriate to actual sound development; equal cell ordinals in
-   unequal utterances do not supply that action. Bind actual retained condition current and
-   returned differences through an explicit native contact law. Whole-family evidence does not
+   unequal utterances do not supply that action. Actual retained condition current now meets
+   inferred evidence through the explicit unit-admittance contact law in the recorded coefficient
+   study. Preserve each prediction's actual source and condition carriers across later contact;
+   bind this composition to productive timed acoustic reception/emission and actual field
+   incidence before claiming a sound model. Whole-family evidence does not
    impose a universal certainty prerequisite on generative current.
 3. Develop and retain acoustic generative standing across source-qualified recordings and
    actual joined returns, then conduct its native emission into the declared acoustic receiver.

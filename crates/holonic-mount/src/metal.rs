@@ -848,6 +848,8 @@ impl Module {
             "section_constitutive_condition_preimage" => (&[3, 4, 5, 8, 9, 10, 11, 12, 13, 23], 24),
             "section_constitutive_condition_image" => (&[3, 4, 5, 8, 9, 10, 11, 33], 34),
             "section_constitutive_condition_receive" => (&[2, 3, 4, 9, 10, 11, 21], 22),
+            "section_constitutive_condition_current_found" => (&[2, 3, 4, 5, 11], 12),
+            "section_constitutive_condition_contact" => (&[2, 3, 4, 7, 8, 16], 17),
             "section_field_source_frame" => (&[6, 12], 13),
             "section_constitutive_circulation" => (&[9, 10, 16], 17),
             "section_constitutive_rechart" => (&[5, 19], 20),

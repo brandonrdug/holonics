@@ -60,6 +60,14 @@ complete supported output through the temporal owner, including the silent case 
 free condition directions. Later actual returns refine the producing joint family. The prior
 point-condition attempt remains a separate comparison; no host inspection selects a condition.
 
+[established-bounded; measured] The subsequent [retained-current study](../research/records/2026-09-07_APPLE_RETAINS_CONDITION_CURRENT_THROUGH_RECORDED_CONTACT.md)
+uses the same fixed recorded cuts and adds actual condition current before the hidden observation.
+Native contact preserves the unit response under silent ESC-50 evidence and changes it under
+LibriSpeech evidence. Both successor predictions agree with the independent exact comparison;
+the earlier source/condition/prediction carriers remain available through terminal observation.
+All native stages have zero numerical readouts. This remains a digital coefficient study;
+productive sound development, timed acoustic emission and persistence remain to be composed.
+
 [established-bounded; measured] The [recorded interval attachment](../research/records/2026-09-07_RECORDED_RESPONSE_POINTERS_RETAIN_THEIR_ACOUSTIC_INTERVALS.md)
 now supplies `AcousticFieldChart::from_acoustic_range` and `native::recorded` for exact original
 source/target pointers and recording bounds. `RecordedResponseSections::bind` keeps annotation

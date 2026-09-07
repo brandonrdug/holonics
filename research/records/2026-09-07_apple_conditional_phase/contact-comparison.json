@@ -1,0 +1,33 @@
+{
+  "truth_status": "established-bounded",
+  "evidence_tags": [
+    "measured"
+  ],
+  "apple": "research/records/2026-09-07_apple_conditional_phase/return-retained-contact.json",
+  "desktop": "research/records/2026-09-07_conditional_phase/return-retained-contact.json",
+  "exact_semantic_agreement": {
+    "source_chart": true,
+    "relation": true,
+    "observations": true,
+    "withheld": true,
+    "condition_inference": true,
+    "condition_family_cycle": true,
+    "actual_condition_current_cycle": true,
+    "continuation": true,
+    "learner_occurrences": true,
+    "multiplication_graph_exact": true
+  },
+  "excluded_fields": "work and *_work census fields within these roots; timing and aggregate apparatus census are outside parity scope",
+  "retained_current_native_stages_have_zero_numerical_readouts": true,
+  "generation_before_observation": {
+    "imaginary": "11/5",
+    "norm_square": "5",
+    "real": "2/5"
+  },
+  "future_generation": {
+    "imaginary": "86/25",
+    "norm_square": "13",
+    "real": "27/25"
+  },
+  "future_equal": true
+}

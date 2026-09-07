@@ -3,8 +3,8 @@
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::constitutive_fibre::{
-        ConditionPreimageReading, ConstitutiveReading, ResidentConstitutiveCurrent,
-        ResidentConstitutiveFibre, ResidentConstitutiveReturn,
+        ConditionContactMetric, ConditionPreimageReading, ConstitutiveReading,
+        ResidentConstitutiveCurrent, ResidentConstitutiveFibre, ResidentConstitutiveReturn,
     },
     phase_current::{
         resident::{convolve_resident, ResidentPhaseCurrentView},
@@ -203,6 +203,39 @@ fn experiment<'c>(
     });
     report["training_observations"] = json!(body.occurrences() - calibration_cut);
     training?;
+    // The unit digital response is an explicit initial current already exercised in development,
+    // not a point selected from inferred evidence. Keep the actual source cell, immutable contact
+    // and prediction alive across subsequent reception, so later inference cannot rewrite them.
+    let free = stage(s, report, "free_condition_evidence", || {
+        let source = ResidentPhaseCurrentView::new(
+            rational(&zero)?,
+            PhaseCurrentReceiverId(1),
+            PhaseCurrentLineageId(2),
+            Rat::from_integer(0.into()),
+            chart.section().sample_step.clone(),
+            WIDTH as u32,
+            WIDTH,
+        )?;
+        let observed = convolve_resident(
+            s,
+            source,
+            response(&controls[1], &chart.section().sample_step, 11)?,
+            PhaseCurrentReceiverId(3),
+            PhaseCurrentLineageId(105),
+        )?;
+        Ok(body.read_condition_preimage(rational(&zero)?, observed.current()?)?)
+    })?;
+    let (mut held, free_contact, anticipated) =
+        stage(s, report, "generation_before_observation", || {
+            let mut held = body.retain_condition_current(
+                rational(&controls[1])?,
+                ConditionContactMetric::UnitAdmittanceRealification,
+            )?;
+            let contact = held.contact(&free)?;
+            let prediction =
+                body.advance_bilinear_contact(hidden_cell.rational()?, contact.successor(), None)?;
+            Ok((held, contact, prediction))
+        })?;
     let actual = stage(s, report, "hidden_native_observation", || {
         Ok(convolve_resident(
             s,
@@ -220,6 +253,16 @@ fn experiment<'c>(
     if body.occurrences() != cut {
         return Err("condition read changed the continuing relation".into());
     }
+    let identified_contact = stage(s, report, "actual_condition_contact", || {
+        Ok(held.contact(&preimage)?)
+    })?;
+    let generated = stage(s, report, "generation_after_contact", || {
+        Ok(body.advance_bilinear_contact(
+            later_cell.rational()?,
+            identified_contact.successor(),
+            None,
+        )?)
+    })?;
     let image = stage(s, report, "whole_condition_image", || {
         Ok(body.read_condition_image(later_cell.rational()?, &preimage)?)
     })?;
@@ -289,8 +332,19 @@ fn experiment<'c>(
             Ok(value) => json!({"reading":value.inspect()?}),
             Err(error) => json!({"status":"native-consumer-refused","error":error.to_string()}),
         };
+        let current_cycle = json!({
+            "initial_condition":point(s,&controls[1])?,
+            "free_contact":free_contact.inspect()?,
+            "identified_contact":identified_contact.inspect()?,
+            "prediction_before_observation":returned(&anticipated)?,
+            "prediction_after_contact":returned(&generated)?,
+            "before_relation_cut":anticipated.occurrence(),
+            "after_relation_cut":generated.occurrence(),
+            "contacts":held.contacts(),
+        });
         Ok(
             json!({"preimage":condition,"prediction":prediction,"later_actual":later,"exact_agreement":agreement,
+            "actual_condition_current_cycle":current_cycle,
             "whole_image":image.inspect()?,"whole_image_carried":carried,"refined_condition":refined,
             "hidden_source":point(s,hidden_cell.section())?,"later_source":point(s,later_cell.section())?,
             "hidden_response":point(s,&hidden_response)?,"hidden_actual":point(s,actual.section())?}),
@@ -337,7 +391,7 @@ fn main() -> Result<()> {
         WIDTH,
         DIVISOR,
     )?;
-    let mut report = json!({"schema":"holonics.recorded-temporal-action.v2","truth_status":"established-bounded",
+    let mut report = json!({"schema":"holonics.recorded-temporal-action.v3","truth_status":"established-bounded",
         "evidence_tags":["measured"],"scope":"declared complex polynomial action on recorded coefficients",
         "source":{"path":wav_path,"sha256":recording.source_sha256,"octets":recording.source_octets,
             "samples":recording.samples.len(),"sample_rate":recording.sample_rate,"occurrence":recording.occurrence,

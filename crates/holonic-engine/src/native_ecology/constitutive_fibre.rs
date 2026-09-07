@@ -27,9 +27,10 @@ mod field;
 pub use field::*;
 mod resident;
 pub use resident::{
-    ConditionCoverage, ConditionImageReading, ConditionPreimageReading,
-    ConstitutiveDifferentialReading, ResidentConditionImage, ResidentConditionPreimage,
-    ResidentConstitutiveCurrent, ResidentConstitutiveReturn,
+    ConditionContactMetric, ConditionContactReading, ConditionContactStatus, ConditionCoverage,
+    ConditionImageReading, ConditionPreimageReading, ConstitutiveDifferentialReading,
+    ResidentConditionContact, ResidentConditionCurrent, ResidentConditionImage,
+    ResidentConditionPreimage, ResidentConstitutiveCurrent, ResidentConstitutiveReturn,
 };
 
 /// Declared local source law, bound at founding rather than inferred from an array's width.
