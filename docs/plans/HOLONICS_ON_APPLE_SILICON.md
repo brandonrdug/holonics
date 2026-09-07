@@ -19,8 +19,9 @@ The wider multimodal direction composes situated charts and actual interactions 
 conversation material. This Mac branch develops apparatus and acoustic interfaces independently.
 It does not move that dataset, recreate cultivation, resume inherited-first production, or change
 the desktop's AC0–AC5 order. No new model name or duplicate learning engine is introduced.
-The user's current request authorizes review, specification, branch establishment and local
-toolchain preparation; the implementation sequence below makes the ensuing platform work concrete.
+Brandon's subsequent direct request authorizes completion of the entire AS1–AS5 sequence below.
+He identifies AS3 as the milestone establishing the Holonics foundation on Apple silicon;
+AS4–AS5 remain required parts of the same authorized work.
 
 [historical; source-inspected] Before this request, the September 6
 [hardware/modality guide](../HARDWARE_AND_MODALITY_BOUNDARIES.md) already described the shared
@@ -148,13 +149,18 @@ Vary packet boundaries without changing the underlying occurrence, then vary act
 source or receiver conditions separately. Read the full native return and listen to generated
 WAVs. No universal benchmark score or speech gate is imposed on this first exploration.
 
-[definition] Follow offline execution with an explicit microphone/speaker session using the
+[historical] The initial specification proposed following offline execution with an explicit microphone/speaker session using the
 platform audio API at the application boundary. Retain device/channel identity as lineage,
 sample format/rate, monotonic clock relation, buffer offsets, dropped/late frames, playback and
 capture chronology, and declared conversions. Callback buffers are delivery packets, not
 utterances or holons. Device permission and capture state remain visible. A resampler or audio
 format conversion is an exterior codec with declared loss. Backpressure must preserve pending
 input/output or report a gap; it cannot silently skip a committed occurrence.
+
+[definition] Brandon subsequently replaces the proposed microphone experiment with curated
+Hugging Face WAV material. AS5 therefore verifies recorded sound, actual speaker playback and
+curated speech/text exposure. The capture application remains available; no microphone or room
+path measurement is required or claimed by this return.
 
 [definition] Full duplex is one ecology receiving ordinary later occurrences during output.
 An emitted sound and a microphone's later reception have a caused interaction when the physical
@@ -179,7 +185,7 @@ or generation. Images and other sensors later reuse the same contact/clock/recur
 | AS2 — resident Apple phase ecology | Conduct formation, circulation and rechart with exact carriers, full source/frame/fibre and one atomic successor. Compare complete declared returns against existing exact reference/CUDA evidence, including old sources after rechart, open/plural readings, overflow and failure recovery. |
 | AS3 — public continuation | Run native-session and its independent wave-control application on this Mac; preserve checkpoints, stream cursors and pending output through process restart without replay. Measure actual costs on the M1 Pro. |
 | AS4 — offline acoustic composition | Attach real PCM material and actual native outward current through the existing owners; inspect perception consequences, generated WAVs and continuing development. Retain source/receiver and projection differences. |
-| AS5 — live sound, then speech | Add explicit capture/playback chronology, interruption and gap handling; inspect sound products and retained continuation. Extend to speech and cross-modal exposure through actual shared interactions. |
+| AS5 — sound apparatus, then speech | Add explicit capture/playback chronology, interruption and gap handling; use curated WAVs in place of the proposed microphone experiment under Brandon’s later ruling, and verify speaker playback. Inspect products and retained continuation, then extend to speech/text exposure through declared actual digital interactions. |
 
 [definition] A relevant check answers its claimed boundary. Arithmetic parity is not lifecycle
 parity; lifecycle parity is not sound perception; audible output is not speech competence. When
@@ -197,3 +203,14 @@ position with an older Mac snapshot. Do not merge this branch into `main` as par
 [definition] Checkpoint interchange requires a matching schema and the actual complete artifact,
 not a Git branch name or export receipt. Any later private-data transfer is separate from this
 source branch and retains provenance. No private conversation transfer is necessary for AS0–AS3.
+
+## Returned implementation
+
+[established-bounded; implemented-exact, measured] The
+[September 6 implementation record](../../research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md)
+returns AS1–AS5 at the scopes above, with the later curated-data substitution. Production uses
+direct Metal/Rust ownership; MLX remains optional apparatus. The phase foundation and process
+continuation are checked, sound/chronology/polarity products are retained and inspected, and
+speech/text exposure continues through the same persisted ecology. The
+[acoustic guide](../ACOUSTIC_EXPERIMENTS.md) gives the public commands. Neither a real-time
+sound engine nor useful speech recognition/synthesis is inferred from these experiments.

@@ -21,7 +21,7 @@ num-bigint = { workspace = true }
 num-rational = { workspace = true }
 num-traits = "0.2"
 thiserror = { workspace = true }
+sha2 = "0.10"
 
 [dev-dependencies]
-sha2 = "0.10"
 tempfile = "3"

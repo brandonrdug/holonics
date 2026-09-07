@@ -1274,6 +1274,8 @@ name = "mount"
 version = "0.1.0"
 dependencies = [
  "body",
+ "metal",
+ "objc",
  "soma-abi",
 ]
 

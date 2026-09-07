@@ -41,64 +41,8 @@ use crate::{
 };
 
 const CUDA_SUCCESS: i32 = 0;
-/// **The launch geometry, read off the device and the kernel — never authored.**
-///
-/// This module carried `const THREADS_PER_BLOCK: u32 = 128` until 2026-08-10, historically called
-/// an ABI level because launch geometry was said to be fixed by the device interface. **That reason
-/// was false.** Launch geometry is queryable, and `crates/holonic-mount` has
-/// derived it correctly all along: `min(the function's own MAX_THREADS_PER_BLOCK, the device's)`,
-/// grid from the work extent, refused rather than clipped when it exceeds the grid aperture.
-///
-/// This is a second implementation of that derivation, and the duplication is **forced**, not
-/// chosen: `crates/holonic-life` depends on `holonic-engine`, so the engine cannot depend on `crates/holonic-mount`
-/// without a Cargo cycle (`archive/plans/THE_ASSEMBLY.md` F1). Saying so is better than either
-/// pretending the pin was ABI or pretending the two owners could be one.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct DerivedLaunch {
-    /// Threads per block: the smaller of what the kernel admits and what the device admits, taken
-    /// down to a whole number of warps because a partial warp leaves lanes idle.
-    pub block_x: u32,
-    /// The device's own ceiling on the X grid dimension. A work extent past it is refused by name.
-    pub max_grid_x: u32,
-    /// The device's warp size, as the device stated it.
-    pub warp: u32,
-}
-
-impl DerivedLaunch {
-    /// **The derivation itself, as one owner.** The block is the smaller of what the device admits
-    /// and what the kernel admits, taken down to a whole number of warps because a partial warp
-    /// issues with idle lanes. Every input is read from the device or the compiled function; nothing
-    /// here is chosen.
-    ///
-    /// Lifted out of this module's constructor 2026-08-13. `embedding_fiber` had written its own
-    /// geometry as `max_threads.min(256).max(1)` — a level authored inside the organ, blind to the
-    /// warp and blind to what its own kernels admit — while this derivation sat one module away.
-    /// The FFI stays local to each module because each declares its own `extern` block; the *rule*
-    /// is here, once.
-    pub(crate) fn from_admissions(
-        device_block: u32,
-        kernel_block: u32,
-        max_grid_x: u32,
-        warp: u32,
-    ) -> Self {
-        let warp = warp.max(1);
-        let admitted = device_block.min(kernel_block);
-        Self {
-            block_x: (admitted / warp).max(1) * warp,
-            max_grid_x,
-            warp,
-        }
-    }
-
-    /// Grid for one flat work extent, or the refusal naming what could not be covered.
-    pub(crate) fn grid_for(&self, work: u32) -> Result<u32, CudaApertureError> {
-        let blocks = work.div_ceil(self.block_x.max(1));
-        if blocks > self.max_grid_x {
-            return Err(CudaApertureError::ExtentOverflow);
-        }
-        Ok(blocks)
-    }
-}
+pub use crate::device_launch::DerivedLaunch;
+use crate::device_launch::GridApertureError;
 
 /// `CUdevice_attribute` and `CUfunction_attribute` selectors from `cuda.h`. THESE are ABI: the
 /// integers are fixed by the foreign interface and a different value asks a different question.
@@ -1959,6 +1903,14 @@ pub enum CudaApertureError {
     ParityRefused,
     #[error(transparent)]
     Presentation(#[from] PresentationError),
+}
+
+impl From<GridApertureError> for CudaApertureError {
+    fn from(error: GridApertureError) -> Self {
+        match error {
+            GridApertureError::ExtentOverflow => Self::ExtentOverflow,
+        }
+    }
 }
 
 #[cfg(test)]

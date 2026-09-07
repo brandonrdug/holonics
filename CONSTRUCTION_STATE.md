@@ -19,8 +19,26 @@ conversation data and cultivation remain on that machine.
 Rust, pinned Lean, repaired Xcode setup, Metal tools and an isolated MLX custom-kernel check.
 The native HNA Cargo check reached the known CUDA/PTX/target-gating obstruction on macOS.
 
-[open] AS1 device-boundary factoring is next. The native Apple backend and acoustic attachment
-remain unimplemented; the MLX arithmetic/dependency probe is exterior apparatus evidence only.
+[established-bounded; implemented-exact, measured] AS1–AS5 have returned at the
+[specified experimental scopes](research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md).
+AS3 establishes the Apple phase foundation: direct Metal exact formation/circulation/rechart,
+complete persistence and public continuation. Final checks include 28 engine phase tests, six
+mount ownership tests, 20 public native tests and four separate-process tests. Warm open
+medians were 0.46–0.59 ms in the declared debug two-node receiver.
+
+[established-bounded; measured] AS4 completed a 220,500-sample real WAV, generated and played
+actual native emissions, and inspected nine chronology/polarity controls through one fixed
+receiver. AS5 supplies capture/playback apparatus, verified speaker completion/interruption,
+and a complete 105,440-sample LibriSpeech occurrence followed by 113 transcript bytes through
+one persisted ecology. Brandon substituted curated Hugging Face WAVs for the microphone
+experiment; no microphone capture occurred. Installed material is 2,000 ESC-50 WAVs and a
+100-clip LibriSpeech subset, retained locally outside Git. The [acoustic guide](docs/ACOUSTIC_EXPERIMENTS.md)
+gives runnable public commands.
+
+[open] The completed branch establishes the bounded phase and digital exposure foundation,
+not real-time audio throughput, calibrated room coupling, broader inherited operator support,
+or useful speech recognition/generation. The Linux/CUDA runtime was source-reviewed but not
+rerun on this Mac. These returns do not establish desktop Athena-alpha.
 
 ## Current HNA direction
 
@@ -44,7 +62,8 @@ memory database stays unused.
 currents, moving frames and source/remainder receivers to existing HNA owners. The
 [hardware/modality guide](docs/HARDWARE_AND_MODALITY_BOUNDARIES.md) locates current Linux/CUDA
 build dependencies and existing acoustic interfaces. Source and record comparisons establish
-these documented boundaries; no Apple execution or new PDE-to-HNA realization is claimed.
+the earlier documented boundaries; that source comparison itself claimed no Apple execution
+or new PDE-to-HNA realization. The separate Mac return above now owns Apple execution evidence.
 
 [established-bounded; process-audit] The [portable evidence import](research/records/2026-09-06_portable_evidence/README.md)
 retains the complete 985-message discussion history and manually authored mathematical material.

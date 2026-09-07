@@ -1,0 +1,13 @@
+{
+  "schema": "soma-life.native-acoustic-receiver-chart.v1",
+  "sample_rate": 44100,
+  "order_stride_samples": 1,
+  "order_support_samples": 64,
+  "lowest_frequency_hz": 80,
+  "highest_frequency_hz": 8000,
+  "calibration_production_identity_sha256": "13da763d5f612e4bbbc01ac63f4401fe7a99f2a9e9b8a12ea3726b8d18979c2a",
+  "logarithmic_current_center_millibits": -5490,
+  "logarithmic_current_width_millibits": 1059,
+  "calibration_source_current_retained": false,
+  "identity_sha256": "5dea2c01a5f139d7e100e78c572dd84861b47057750feaf45db76a3a85bfe279"
+}

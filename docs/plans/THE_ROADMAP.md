@@ -51,12 +51,18 @@ inherited-first production or create another HNA learning law.
 [definition] AS0 deposits the specification and verifies the local apparatus. The ensuing order
 is AS1: factor the native device boundary and CUDA build closure; AS2: resident exact Apple phase
 operation; AS3: public session, persistence and measured continuation; AS4: offline acoustic
-material/production attachment; AS5: live sound and subsequent speech. Full-operation source,
+material/production attachment; AS5: sound apparatus and subsequent speech exposure
+(with curated WAVs replacing the proposed microphone experiment under Brandon’s later ruling). Full-operation source,
 frame, fibre and successor parity govern the port. MLX is an apparatus candidate within Holonics.
 
 [established-bounded; process-audit] AS0 returned branch/specification and Mac toolchain/device
 checks in the [setup record](../../research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md).
-AS1 is next; no native Apple HNA or acoustic perception/generation product is claimed by setup.
+[definition] Brandon subsequently directs completion of AS1–AS5, with AS3 the Apple foundation
+milestone. The [implementation return](../../research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md)
+now closes AS1–AS5 at their bounded phase/digital-exposure scopes: resident Metal, complete
+continuation, actual sound production/playback and curated speech/text contact. Broader native
+operators, real-time acoustics and useful speech competence are not claimed by this sequence.
+The desktop Athena-alpha order remains independent.
 
 ## Completed September 6 synthesis before Athena-alpha cultivation
 

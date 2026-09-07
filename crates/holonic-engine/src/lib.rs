@@ -129,7 +129,9 @@ pub mod cuda_aperture;
 mod cuda_eta_head;
 #[cfg(target_os = "linux")]
 pub use cuda_eta_head::{EtaHeadError, ResidentEtaHead};
+#[cfg(target_os = "linux")]
 mod cuda_realizer_search;
+#[cfg(target_os = "linux")]
 pub use cuda_realizer_search::{
     RealizerSearchError, ReceiverFamily as CudaRealizerReceiverFamily, ResidentRealizerSearch,
     SearchReturn, SurfaceReturn, WheelReceiver, exact_square_root, homogeneous_value,
@@ -139,7 +141,9 @@ pub mod cuda_refine;
 pub mod cuda_relation;
 pub mod derivation_atlas;
 pub mod device;
+pub mod device_launch;
 pub mod diffusion;
+pub use device_launch::DerivedLaunch;
 mod digest;
 pub use digest::is_sha256_digest;
 // Whether an exponential integrand closes in the elementary chart, decided as the consistency of
@@ -154,7 +158,6 @@ pub mod embedding_fiber;
 // this returns a COCYCLE of exact pairwise ratios and normalises only when a caller names a null.
 // Temperature is a root on the ratio, and the `T -> 0` limit -- argmax -- is never taken.
 pub mod exponentiated_ratio;
-#[cfg(target_os = "linux")]
 pub mod hardware_cover;
 // The coboundary move, as distinct from a chart transition. Hermite reduction changes the
 // representative of a rational integrand by an exact term and leaves the residues untouched, which
@@ -481,7 +484,6 @@ pub use executor::*;
 pub use field_atlas::*;
 pub use generative_transport::*;
 pub use graph_receiver::*;
-#[cfg(target_os = "linux")]
 pub use hardware_cover::*;
 pub use holonic_complex::*;
 pub use image::*;

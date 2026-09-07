@@ -6,13 +6,15 @@ apparatus; they are not dependencies that schedule native inference.
 
 ## Rust and CUDA
 
-The current native engine/HNA build is Linux/CUDA-bound, including generated PTX and CUDA
-linkage. A Mac checkout does not yet provide an executable engine backend; see
-[hardware and modality boundaries](HARDWARE_AND_MODALITY_BOUNDARIES.md) for the exact dependency
-seam and MLX comparison. Repository documentation and exterior data tools are independent of
-that native runtime. The current native runtime uses the NVIDIA CUDA driver and toolkit. Make `nvcc` available on
-`PATH` (this workstation uses `/opt/cuda/bin`). The kernel builder declares its architecture;
-the driver can JIT the admitted PTX on the actual device. Model material is supplied separately.
+[established-bounded; implemented-exact] The native phase session runs through CUDA on Linux
+and direct Metal on macOS. The Metal realization covers the local constitutive fibre,
+circulation and rechart operation, with the same native state/checkpoint owners. Broader resident
+operations and inherited-model readout remain CUDA-only and return named unsupported-operation
+errors on Apple. The [platform specification](plans/HOLONICS_ON_APPLE_SILICON.md) records scope.
+
+[definition] Linux development needs the NVIDIA driver and toolkit. Make `nvcc` available on
+`PATH` (the desktop uses `/opt/cuda/bin`). The kernel builder declares its architecture; the
+driver can JIT admitted PTX on the actual device. Model material is supplied separately.
 
 ```sh
 export PATH=/opt/cuda/bin:$PATH
@@ -34,7 +36,7 @@ Lean 4.33.0 and 4.27.0 through elan, and MLX/MLX Metal 0.32.2 in
 The [setup record](../research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md)
 contains the M1 Pro apparatus and actual check scopes. The
 [platform specification](plans/HOLONICS_ON_APPLE_SILICON.md) keeps MLX apparatus distinct from
-the native backend still to be implemented.
+the implemented native Metal phase backend.
 
 [definition] For another Apple checkout, use a Rust release supporting this workspace and let
 elan select the committed formal project versions. Do not update `lean-toolchain` or Mathlib
@@ -56,11 +58,26 @@ if absent. Xcode provides the SDK and native compilers; `xcodebuild -runFirstLau
 its system setup, and `xcodebuild -downloadComponent MetalToolchain` installs the separately
 distributed Metal compiler when needed. Do not reinstall an already-working toolchain.
 
-[established-bounded; process-audit] The commands above verify exterior GPU arithmetic and a
-portable Rust library. `cargo check -p holonics-hna --lib --locked` currently fails on macOS
-at the recorded CUDA/PTX and target-gating boundary. Neither this probe nor a successful MLX
-installation is a native HNA build. Formal dependencies are fetched when relevant Lean work
-requires them; no full Mathlib build is part of device setup.
+[established-bounded; measured] The public HNA library compiles on this Mac. The existing 28
+engine phase tests and 15 public native-session tests passed against Metal, including exact
+reference comparisons, refusal recovery, recharting, remounting and stream continuation.
+
+```sh
+cargo check -p holonics-hna --lib --locked
+cargo test -p holonic-engine --lib native_ecology::constitutive_fibre -- --ignored --test-threads=1
+cargo test -p holonics-hna --lib native:: -- --include-ignored --test-threads=1
+cargo test -p holonics-workbench --test native_checkpoint_process -- --ignored --test-threads=1
+```
+
+[definition] Historical GPU tests still use `#[ignore]` to keep device initialization explicit.
+The phase tests run on the selected platform backend. CUDA-only tests remain unavailable on Mac.
+Lean dependencies are fetched when relevant formal work requires them; no proof assistant enters
+the native runtime.
+
+[definition] Curated audio stays outside Git. Install the pinned experiment requirements above,
+then run `research/experiments/apple_silicon/fetch_esc50.py` with the isolated Python interpreter.
+It fetches WAV files without executing a dataset loader and records the Hugging Face revision,
+source attribution, format and bytes in `.local/datasets/esc50/acquisition.json`.
 
 ## Training and inference
 
@@ -115,3 +132,13 @@ example/paper after each edit. Review source cohesion and verify behavior direct
 contract; CLAUDE.md is its pointer. The [repository guide](REPOSITORY.md) explains historical
 paths and backup recovery. Keep exact raw runtime evidence in dated research receipts, and
 private reproducible working data in `.local/`.
+
+## Apple sound applications
+
+[established-bounded; implemented-exact] `cargo build -p holonics-workbench --bins` builds
+`holonics`, `holonics-acoustic` and `holonics-speech`. The latter two use the same native phase
+session; the [acoustic guide](ACOUSTIC_EXPERIMENTS.md) documents their source charts, digital
+return law, complete checkpoints and cold receiver. The
+[implementation record](../research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md)
+contains the measured Mac return. The Swift audio apparatus builds independently with
+`applications/holonics-audio/build.sh`; no microphone is needed for the curated dataset recipes.

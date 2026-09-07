@@ -75,16 +75,21 @@ use std::ffi::{CStr, c_char, c_void};
 use num_bigint::BigInt;
 use thiserror::Error;
 
-use crate::cuda_aperture::DerivedLaunch;
+use crate::device_launch::DerivedLaunch;
 
+#[cfg(target_os = "linux")]
 const PTX: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/exact_embedding_fiber.ptx"));
 const CUDA_SUCCESS: i32 = 0;
 
 /// `CUdevice_attribute` and `CUfunction_attribute` selectors from `cuda.h`. ABI: the integers are
 /// fixed by the foreign interface and a different value asks a different question.
+#[cfg(target_os = "linux")]
 const DEVICE_MAX_THREADS_PER_BLOCK: i32 = 1;
+#[cfg(target_os = "linux")]
 const DEVICE_MAX_GRID_DIM_X: i32 = 5;
+#[cfg(target_os = "linux")]
 const DEVICE_WARP_SIZE: i32 = 10;
+#[cfg(target_os = "linux")]
 const FUNCTION_MAX_THREADS_PER_BLOCK: i32 = 0;
 
 /// The exact carrier the kernel accumulates in. Read off `__int128`, not chosen.
@@ -94,6 +99,7 @@ const CARRIER_OCTAVES: u32 = 128;
 /// and one of them is the hand, so a magnitude may occupy 63 and no more.
 const SIGNED_WORD_OCTAVES: u32 = i64::BITS - 1;
 
+#[cfg_attr(not(target_os = "linux"), allow(dead_code))]
 type CuDevice = i32;
 type CuContext = *mut c_void;
 type CuModule = *mut c_void;
@@ -101,6 +107,123 @@ type CuFunction = *mut c_void;
 type CuStream = *mut c_void;
 type CuDevicePtr = u64;
 
+#[cfg(not(target_os = "linux"))]
+#[allow(non_snake_case, unused_variables, dead_code)]
+mod unavailable_cuda {
+    use super::*;
+    pub(super) unsafe extern "C" fn cuInit(flags: u32) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuDeviceGetCount(count: *mut i32) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuDeviceGet(device: *mut CuDevice, ordinal: i32) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuDeviceGetName(
+        name: *mut c_char,
+        length: i32,
+        device: CuDevice,
+    ) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuDeviceGetAttribute(
+        value: *mut i32,
+        attribute: i32,
+        device: CuDevice,
+    ) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuFuncGetAttribute(
+        value: *mut i32,
+        attribute: i32,
+        function: CuFunction,
+    ) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuCtxCreate_v2(
+        context: *mut CuContext,
+        flags: u32,
+        device: CuDevice,
+    ) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuCtxSetCurrent(context: CuContext) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuCtxDestroy_v2(context: CuContext) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuCtxSynchronize() -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuModuleLoadData(
+        module: *mut CuModule,
+        image: *const c_void,
+    ) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuModuleUnload(module: CuModule) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuModuleGetFunction(
+        function: *mut CuFunction,
+        #[cfg_attr(not(target_os = "linux"), allow(dead_code))] module: CuModule,
+        name: *const c_char,
+    ) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuMemAlloc_v2(pointer: *mut CuDevicePtr, bytes: usize) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuMemFree_v2(pointer: CuDevicePtr) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuMemcpyHtoD_v2(
+        destination: CuDevicePtr,
+        source: *const c_void,
+        bytes: usize,
+    ) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuMemcpyDtoH_v2(
+        destination: *mut c_void,
+        source: CuDevicePtr,
+        bytes: usize,
+    ) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuStreamSynchronize(stream: CuStream) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuLaunchKernel(
+        function: CuFunction,
+        grid_x: u32,
+        grid_y: u32,
+        grid_z: u32,
+        block_x: u32,
+        block_y: u32,
+        block_z: u32,
+        shared: u32,
+        stream: CuStream,
+        parameters: *mut *mut c_void,
+        extra: *mut *mut c_void,
+    ) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuGetErrorName(error: i32, name: *mut *const c_char) -> i32 {
+        801
+    }
+    pub(super) unsafe extern "C" fn cuGetErrorString(
+        error: i32,
+        message: *mut *const c_char,
+    ) -> i32 {
+        801
+    }
+}
+#[cfg(not(target_os = "linux"))]
+use unavailable_cuda::*;
+#[cfg(target_os = "linux")]
 #[link(name = "cuda")]
 unsafe extern "C" {
     fn cuInit(flags: u32) -> i32;
@@ -208,6 +331,17 @@ fn text(query: unsafe extern "C" fn(i32, *mut *const c_char) -> i32, code: i32) 
 fn checked(code: i32, operation: &'static str) -> Result<(), FiberError> {
     if code == CUDA_SUCCESS {
         return Ok(());
+    }
+    #[cfg(not(target_os = "linux"))]
+    if code == 801 {
+        return Err(FiberError::Driver {
+            operation,
+            code,
+            name: "UnsupportedDeviceOperation".into(),
+            message:
+                "this CUDA readout operation has no Apple realization; use the native phase session"
+                    .into(),
+        });
     }
     Err(FiberError::Driver {
         operation,
@@ -396,7 +530,10 @@ impl ScorePopulation {
 /// The resident chart, mounted. Refuses by name when no device answers rather than conducting the
 /// deed on the serial chart and reporting the figure as though it had been mounted.
 pub struct ResidentReadout {
+    #[cfg(target_os = "macos")]
+    _metal_context: mount::Context,
     context: CuContext,
+    #[cfg_attr(not(target_os = "linux"), allow(dead_code))]
     module: CuModule,
     scores: CuFunction,
     scores_addressed: CuFunction,
@@ -420,6 +557,7 @@ struct ReadoutFrame {
 }
 
 impl ResidentReadout {
+    #[cfg(target_os = "linux")]
     pub fn new() -> Result<Self, FiberError> {
         unsafe {
             checked(cuInit(0), "cuInit")?;
@@ -532,6 +670,37 @@ impl ResidentReadout {
                 },
             })
         }
+    }
+
+    #[cfg(target_os = "macos")]
+    pub fn new() -> Result<Self, FiberError> {
+        let device = mount::Device::get(0).map_err(|e| FiberError::Driver {
+            operation: "Metal device",
+            code: e.code,
+            name: e.name,
+            message: e.message,
+        })?;
+        let metal_context = mount::Context::create(&device).map_err(|e| FiberError::Driver {
+            operation: "Metal context",
+            code: e.code,
+            name: e.name,
+            message: e.message,
+        })?;
+        Ok(Self {
+            context: metal_context.raw(),
+            _metal_context: metal_context,
+            module: std::ptr::null_mut(),
+            scores: std::ptr::null_mut(),
+            scores_addressed: std::ptr::null_mut(),
+            octaves: std::ptr::null_mut(),
+            scores_batched: std::ptr::null_mut(),
+            lowest_exponent: std::ptr::null_mut(),
+            align: std::ptr::null_mut(),
+            row_mass: std::ptr::null_mut(),
+            device_name: device.name.clone(),
+            // Foreign readout kernels are unavailable; the native surface derives its own launch.
+            launch: DerivedLaunch::from_admissions(device.max_threads(), 1, u32::MAX, 1),
+        })
     }
 
     pub fn device_name(&self) -> &str {
@@ -2052,6 +2221,7 @@ impl Drop for MountedReadout<'_> {
     }
 }
 
+#[cfg(target_os = "linux")]
 impl Drop for ResidentReadout {
     fn drop(&mut self) {
         unsafe {

@@ -1,3 +1,5 @@
+#![cfg_attr(not(target_os = "linux"), allow(dead_code, non_snake_case))]
+
 use std::ffi::{CStr, c_char, c_void};
 use std::ptr;
 
@@ -10,6 +12,7 @@ pub(super) type CuFunction = *mut c_void;
 pub(super) type CuStream = *mut c_void;
 pub(super) type CuDevicePtr = u64;
 
+#[cfg(target_os = "linux")]
 #[link(name = "cuda")]
 unsafe extern "C" {
     pub(super) fn cuInit(flags: u32) -> i32;
@@ -65,8 +68,134 @@ unsafe extern "C" {
     pub(super) fn cuGetErrorString(error: i32, message: *mut *const c_char) -> i32;
 }
 
+// Keep this source type-checkable on non-CUDA hosts without exposing a linker dependency.
+// Constructors return an explicit unsupported-device error before these shims are reached.
+#[cfg(not(target_os = "linux"))]
+const CUDA_UNAVAILABLE: i32 = -1;
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuInit(_: u32) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuDeviceGetCount(_: *mut i32) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuDeviceGet(_: *mut CuDevice, _: i32) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuDeviceGetName(_: *mut c_char, _: i32, _: CuDevice) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuDeviceGetAttribute(_: *mut i32, _: i32, _: CuDevice) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuFuncGetAttribute(_: *mut i32, _: i32, _: CuFunction) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuCtxCreate_v2(_: *mut CuContext, _: u32, _: CuDevice) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuCtxSetCurrent(_: CuContext) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuCtxDestroy_v2(_: CuContext) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuCtxSynchronize() -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuModuleLoadData(_: *mut CuModule, _: *const c_void) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuModuleUnload(_: CuModule) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuModuleGetFunction(
+    _: *mut CuFunction,
+    _: CuModule,
+    _: *const c_char,
+) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuMemAlloc_v2(_: *mut CuDevicePtr, _: usize) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuMemFree_v2(_: CuDevicePtr) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuMemcpyHtoD_v2(_: CuDevicePtr, _: *const c_void, _: usize) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuMemcpyDtoH_v2(_: *mut c_void, _: CuDevicePtr, _: usize) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuMemcpyDtoDAsync_v2(
+    _: CuDevicePtr,
+    _: CuDevicePtr,
+    _: usize,
+    _: CuStream,
+) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuMemsetD8_v2(_: CuDevicePtr, _: u8, _: usize) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuLaunchKernel(
+    _: CuFunction,
+    _: u32,
+    _: u32,
+    _: u32,
+    _: u32,
+    _: u32,
+    _: u32,
+    _: u32,
+    _: CuStream,
+    _: *mut *mut c_void,
+    _: *mut *mut c_void,
+) -> i32 {
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuGetErrorName(_: i32, out: *mut *const c_char) -> i32 {
+    if !out.is_null() {
+        unsafe {
+            *out = std::ptr::null();
+        }
+    }
+    CUDA_UNAVAILABLE
+}
+#[cfg(not(target_os = "linux"))]
+pub(super) unsafe extern "C" fn cuGetErrorString(_: i32, out: *mut *const c_char) -> i32 {
+    if !out.is_null() {
+        unsafe {
+            *out = std::ptr::null();
+        }
+    }
+    CUDA_UNAVAILABLE
+}
+
 #[derive(Debug, Error)]
 pub enum CudaRefineError {
+    #[error("the CUDA refinement apparatus is unavailable on this target")]
+    UnsupportedDevice,
     #[error("the CUDA driver reports no device")]
     NoDevice,
     #[error("CUDA {operation} returned {code} ({name}): {message}")]

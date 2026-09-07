@@ -8,12 +8,22 @@
 //! Layout: `ffi` holds the whole raw libcuda surface; `cuda` builds the safe typed layer
 //! (`Device`, `Context`, `Module`, `Function`, `DeviceBuffer<T>`) with driver-named `Result`s.
 
+#[cfg(target_os = "linux")]
 pub mod cuda;
+#[cfg(target_os = "linux")]
 pub mod ffi;
 pub mod live_event_launch;
+#[cfg(target_os = "linux")]
 pub mod register_carrier;
+#[cfg(target_os = "linux")]
 pub mod register_launch;
+#[cfg(target_os = "linux")]
 pub mod register_recast;
+
+#[cfg(target_os = "macos")]
+pub mod metal;
+#[cfg(target_os = "macos")]
+pub use metal as cuda;
 
 pub use cuda::{
     BorrowedContext, Context, CudaError, Device, DeviceAttribute, DeviceBuffer, Dim3, Event,
@@ -24,14 +34,17 @@ pub use live_event_launch::{
     LiveEventArguments, LiveEventKernel, LiveEventSpan, RegionalContactArguments,
     RegionalContactKernel,
 };
+#[cfg(target_os = "linux")]
 pub use register_carrier::{
     launch_register_carrier_rebase, RegisterCarrierRebase, RegisterCarrierRebaseOutput,
 };
+#[cfg(target_os = "linux")]
 pub use register_launch::{
     RegisterCarrierRebaseArguments, RegisterCarrierRebaseKernel, RegisterRecastArguments,
     RegisterRecastFinishKernel, RegisterRecastKernel, RegisterScopeArguments, RegisterScopeKernel,
     RegisterScopeSurfaceArguments, RegisterScopeSurfaceKernel, RegisterSpan,
 };
+#[cfg(target_os = "linux")]
 pub use register_recast::{
     launch_register_own_recast, RegisterOwnRecast, RegisterOwnRecastOutput, REGISTER_LANE_WORDS,
     REGISTER_RECAST_COMPLETE, REGISTER_RECAST_INCOMPLETE, REGISTER_STATUS_WORDS,
@@ -39,7 +52,8 @@ pub use register_recast::{
 
 /// The committed CUDA spelling of soma's shared body and receiving entries. Production and gates
 /// load the same bytes; rebuilding remains an explicit repository operation.
-pub const SOMA_PTX: &[u8] = include_bytes!("../../../accelerators/cuda-kernel/soma_kernel_cuda.ptx");
+pub const SOMA_PTX: &[u8] =
+    include_bytes!("../../../accelerators/cuda-kernel/soma_kernel_cuda.ptx");
 
 /// The odd fold constant the `atomic_fold` kernel adds once per thread (mirrors the kernel's
 /// `FOLD_CONSTANT`; kept here so the cpu's exact check needs no re-derivation). 2^61 - 1.
@@ -51,7 +65,8 @@ mod tests {
 
     /// The committed PTX boundary artifact, checked cpu-side (no GPU) so the workspace test
     /// gates that the artifact is present, sm_89, and carries both entry points.
-    const SMOKE_PTX: &[u8] = include_bytes!("../../../accelerators/cuda-smoke/mount_smoke_kernel.ptx");
+    const SMOKE_PTX: &[u8] =
+        include_bytes!("../../../accelerators/cuda-smoke/mount_smoke_kernel.ptx");
     /// The CUDA smoke boundary. This check is deliberately static: it validates
     /// the committed artifact without loading a driver or rebuilding PTX behind the user's back.
     #[test]

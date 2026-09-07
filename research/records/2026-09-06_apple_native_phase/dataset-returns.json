@@ -1,0 +1,836 @@
+{
+  "schema": "holonics.apple.dataset-returns.v1",
+  "sound": {
+    "run": {
+      "checkpoint": ".local/artifacts/acoustic/dog-complete.hna",
+      "checkpoint_error": null,
+      "checkpoint_octets": 465125473,
+      "complete": true,
+      "cursor": 220500,
+      "elapsed_ns": 299468770042,
+      "interruption": null,
+      "pending": null
+    },
+    "inspection": {
+      "checkpoint": ".local/artifacts/acoustic/dog-complete.hna",
+      "complete": true,
+      "digital_return_couplings": [
+        {
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          },
+          "real": {
+            "denominator": "1",
+            "numerator": "1"
+          }
+        },
+        {
+          "imaginary": {
+            "denominator": "1",
+            "numerator": "0"
+          },
+          "real": {
+            "denominator": "1",
+            "numerator": "0"
+          }
+        }
+      ],
+      "first_native_return": {
+        "formed_pivot": null,
+        "frame": {
+          "ordinal": 0,
+          "root_to_local": [
+            {
+              "imaginary": {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              "real": {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            },
+            {
+              "imaginary": {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              "real": {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            }
+          ]
+        },
+        "local_source_currents": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          }
+        ],
+        "native_occurrence": 0,
+        "native_received_from": null,
+        "predecessor_state": null,
+        "received_difference": null,
+        "received_from": null,
+        "receiver": {
+          "current": [
+            {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          ],
+          "kind": "unique"
+        },
+        "root_source_currents": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          }
+        ],
+        "source": 0,
+        "successor_rank": 0
+      },
+      "last_native_return": {
+        "formed_pivot": null,
+        "frame": {
+          "ordinal": 0,
+          "root_to_local": [
+            {
+              "imaginary": {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              "real": {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            },
+            {
+              "imaginary": {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              "real": {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            }
+          ]
+        },
+        "local_source_currents": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "16384",
+              "numerator": "-175"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "16384",
+              "numerator": "-175"
+            },
+            "real": {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          }
+        ],
+        "native_occurrence": 220499,
+        "native_received_from": 220498,
+        "predecessor_state": 220498,
+        "received_difference": {
+          "arrived": {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "32768",
+              "numerator": "-729"
+            }
+          },
+          "former_receiver_fibre": {
+            "directions": [
+              [
+                {
+                  "denominator": "1",
+                  "numerator": "1"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ]
+            ],
+            "kind": "plural",
+            "particular": [
+              {
+                "denominator": "32768",
+                "numerator": "-729"
+              },
+              {
+                "denominator": "1",
+                "numerator": "0"
+              }
+            ]
+          },
+          "native_source_occurrence": 220498,
+          "source": 220498
+        },
+        "received_from": 220498,
+        "receiver": {
+          "directions": [
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              },
+              {
+                "denominator": "1",
+                "numerator": "0"
+              }
+            ]
+          ],
+          "kind": "plural",
+          "particular": [
+            {
+              "denominator": "16384",
+              "numerator": "-175"
+            },
+            {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          ]
+        },
+        "root_source_currents": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "16384",
+              "numerator": "-175"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "16384",
+              "numerator": "-175"
+            },
+            "real": {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          }
+        ],
+        "source": 220499,
+        "successor_rank": 2
+      },
+      "locator": ".local/datasets/esc50/audio/1-100032-A-0.wav",
+      "next_sample": 220500,
+      "occurrence": "esc50-first-contact",
+      "pcm_divisor": 32768,
+      "pending": null,
+      "sample_rate": 44100,
+      "total_samples": 220500
+    },
+    "render": {
+      "elapsed_ns": 69474151666,
+      "output": ".local/artifacts/acoustic/dog-rendered",
+      "sample_rate": 44100,
+      "samples": 220563,
+      "source_scope": {
+        "input_complete": true,
+        "input_samples": 220500,
+        "next_input_sample": 220500,
+        "pending_input": null,
+        "sample_rate": 44100,
+        "source_checkpoint": ".local/artifacts/acoustic/dog-complete.hna"
+      }
+    }
+  },
+  "speech": {
+    "source_id": "2277-149896-0000",
+    "source_sample_rate": 16000,
+    "acoustic_prefix": {
+      "acoustic_cursor": 105440,
+      "acoustic_pending": null,
+      "checkpoint": ".local/artifacts/speech/audio-complete.hna",
+      "checkpoint_error": null,
+      "checkpoint_octets": 235647110,
+      "complete": false,
+      "elapsed_ns": 148175340125,
+      "first_text_return": null,
+      "interruption": null,
+      "last_text_return": null,
+      "pending": null,
+      "transcript_cursor": 0
+    },
+    "linked_complete": {
+      "acoustic_cursor": 105440,
+      "acoustic_pending": null,
+      "checkpoint": ".local/artifacts/speech/complete.hna",
+      "checkpoint_error": null,
+      "checkpoint_octets": 235886724,
+      "complete": true,
+      "elapsed_ns": 17244344042,
+      "first_text_return": {
+        "formed_pivot": null,
+        "frame": {
+          "ordinal": 0,
+          "root_to_local": [
+            {
+              "imaginary": {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              "real": {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            },
+            {
+              "imaginary": {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              "real": {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            }
+          ]
+        },
+        "local_source_currents": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "32768",
+              "numerator": "31091"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "32768",
+              "numerator": "31091"
+            },
+            "real": {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          }
+        ],
+        "native_occurrence": 105440,
+        "native_received_from": 105439,
+        "predecessor_state": 105439,
+        "received_difference": {
+          "arrived": {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "2048",
+              "numerator": "-1341"
+            }
+          },
+          "former_receiver_fibre": {
+            "directions": [
+              [
+                {
+                  "denominator": "1",
+                  "numerator": "1"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ]
+            ],
+            "kind": "plural",
+            "particular": [
+              {
+                "denominator": "124928",
+                "numerator": "-132273"
+              },
+              {
+                "denominator": "1",
+                "numerator": "0"
+              }
+            ]
+          },
+          "native_source_occurrence": 105439,
+          "source": 105439
+        },
+        "received_from": 105439,
+        "receiver": {
+          "directions": [
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              },
+              {
+                "denominator": "1",
+                "numerator": "0"
+              }
+            ]
+          ],
+          "kind": "plural",
+          "particular": [
+            {
+              "denominator": "1998848",
+              "numerator": "2145279"
+            },
+            {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          ]
+        },
+        "root_source_currents": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "32768",
+              "numerator": "31091"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "32768",
+              "numerator": "31091"
+            },
+            "real": {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          }
+        ],
+        "source": 105440,
+        "successor_rank": 2
+      },
+      "interruption": null,
+      "last_text_return": {
+        "formed_pivot": null,
+        "frame": {
+          "ordinal": 0,
+          "root_to_local": [
+            {
+              "imaginary": {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              "real": {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            },
+            {
+              "imaginary": {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              "real": {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            }
+          ]
+        },
+        "local_source_currents": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "32768",
+              "numerator": "508147"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "32768",
+              "numerator": "508147"
+            },
+            "real": {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          }
+        ],
+        "native_occurrence": 105552,
+        "native_received_from": 105551,
+        "predecessor_state": 105551,
+        "received_difference": {
+          "arrived": {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "2048",
+              "numerator": "29083"
+            }
+          },
+          "former_receiver_fibre": {
+            "directions": [
+              [
+                {
+                  "denominator": "1",
+                  "numerator": "1"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ]
+            ],
+            "kind": "plural",
+            "particular": [
+              {
+                "denominator": "124928",
+                "numerator": "1968639"
+              },
+              {
+                "denominator": "1",
+                "numerator": "0"
+              }
+            ]
+          },
+          "native_source_occurrence": 105551,
+          "source": 105551
+        },
+        "received_from": 105551,
+        "receiver": {
+          "directions": [
+            [
+              {
+                "denominator": "1",
+                "numerator": "1"
+              },
+              {
+                "denominator": "1",
+                "numerator": "0"
+              }
+            ]
+          ],
+          "kind": "plural",
+          "particular": [
+            {
+              "denominator": "1998848",
+              "numerator": "35062143"
+            },
+            {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          ]
+        },
+        "root_source_currents": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "32768",
+              "numerator": "508147"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "32768",
+              "numerator": "508147"
+            },
+            "real": {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          }
+        ],
+        "source": 105552,
+        "successor_rank": 2
+      },
+      "pending": null,
+      "transcript_cursor": 113
+    },
+    "unlinked_complete": {
+      "acoustic_cursor": 105440,
+      "acoustic_pending": null,
+      "checkpoint": ".local/artifacts/speech/unlinked.hna",
+      "checkpoint_error": null,
+      "checkpoint_octets": 193953639,
+      "complete": true,
+      "elapsed_ns": 116858365083,
+      "first_text_return": {
+        "formed_pivot": null,
+        "frame": {
+          "ordinal": 0,
+          "root_to_local": [
+            {
+              "imaginary": {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              "real": {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            },
+            {
+              "imaginary": {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              "real": {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            }
+          ]
+        },
+        "local_source_currents": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "2048",
+              "numerator": "-3"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "2048",
+              "numerator": "-3"
+            },
+            "real": {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          }
+        ],
+        "native_occurrence": 105440,
+        "native_received_from": null,
+        "predecessor_state": 105439,
+        "received_difference": null,
+        "received_from": null,
+        "receiver": {
+          "kind": "outside-domain",
+          "source_remainder": [
+            {
+              "denominator": "2048",
+              "numerator": "-3"
+            },
+            {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            {
+              "denominator": "2048",
+              "numerator": "-3"
+            }
+          ]
+        },
+        "root_source_currents": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "2048",
+              "numerator": "-3"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "2048",
+              "numerator": "-3"
+            },
+            "real": {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          }
+        ],
+        "source": 105440,
+        "successor_rank": 0
+      },
+      "interruption": null,
+      "last_text_return": {
+        "formed_pivot": null,
+        "frame": {
+          "ordinal": 0,
+          "root_to_local": [
+            {
+              "imaginary": {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              "real": {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            },
+            {
+              "imaginary": {
+                "denominator": "1",
+                "numerator": "0"
+              },
+              "real": {
+                "denominator": "1",
+                "numerator": "1"
+              }
+            }
+          ]
+        },
+        "local_source_currents": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "128",
+              "numerator": "41"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "128",
+              "numerator": "41"
+            },
+            "real": {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          }
+        ],
+        "native_occurrence": 105552,
+        "native_received_from": null,
+        "predecessor_state": 105551,
+        "received_difference": null,
+        "received_from": null,
+        "receiver": {
+          "kind": "outside-domain",
+          "source_remainder": [
+            {
+              "denominator": "128",
+              "numerator": "41"
+            },
+            {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            {
+              "denominator": "128",
+              "numerator": "41"
+            }
+          ]
+        },
+        "root_source_currents": [
+          {
+            "imaginary": {
+              "denominator": "1",
+              "numerator": "0"
+            },
+            "real": {
+              "denominator": "128",
+              "numerator": "41"
+            }
+          },
+          {
+            "imaginary": {
+              "denominator": "128",
+              "numerator": "41"
+            },
+            "real": {
+              "denominator": "1",
+              "numerator": "0"
+            }
+          }
+        ],
+        "source": 105552,
+        "successor_rank": 0
+      },
+      "pending": null,
+      "transcript_cursor": 113
+    },
+    "render": {
+      "elapsed_ns": 35896883875,
+      "output": ".local/artifacts/speech/rendered",
+      "sample_rate": 44100,
+      "samples": 105616,
+      "scope": {
+        "acoustic_samples": 105440,
+        "input_complete": true,
+        "receiver_order": "sample arrivals followed by byte arrivals; sonification clock, no word alignment",
+        "source_checkpoint": ".local/artifacts/speech/complete.hna",
+        "speech_recognition_or_synthesis_claimed": false,
+        "transcript_bytes": 113
+      }
+    }
+  }
+}

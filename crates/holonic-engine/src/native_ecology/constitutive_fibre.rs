@@ -94,7 +94,8 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
         if source_width == 0 || target_width == 0 || width > u32::MAX as usize - 4 {
             return Err(ConstitutiveFibreError::Shape);
         }
-        let scratch = width.checked_mul(32).ok_or(ConstitutiveFibreError::Shape)?;
+        let scratch = ResidentSurface::constitutive_fibre_scratch(width)
+            .ok_or(ConstitutiveFibreError::Shape)?;
         let available = surface.declaration().max_sectiond_bytes;
         if scratch > available as usize {
             return Err(ConstitutiveFibreError::ScratchAperture {

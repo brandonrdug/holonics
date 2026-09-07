@@ -331,10 +331,7 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
         material: Vec<NativeJunctionSeed>,
     ) -> Result<Self, ConstitutiveFibreError> {
         let nodes = material.len();
-        let scratch = nodes
-            .checked_mul(12)
-            .and_then(|n| n.checked_add(6))
-            .and_then(|n| n.checked_mul(16))
+        let scratch = ResidentSurface::constitutive_circulation_scratch(nodes)
             .ok_or(ConstitutiveFibreError::Shape)?;
         let available = surface.declaration().max_sectiond_bytes;
         if nodes == 0 {

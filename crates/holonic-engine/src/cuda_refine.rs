@@ -201,6 +201,7 @@ use cuda_driver::{
     cuMemcpyHtoD_v2, cuMemsetD8_v2, cuModuleGetFunction, driver,
 };
 
+#[cfg(target_os = "linux")]
 const PTX: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/refine_shell.ptx"));
 const CUDA_SUCCESS: i32 = 0;
 
@@ -208,9 +209,13 @@ const CUDA_SUCCESS: i32 = 0;
 pub const ABSENT: u32 = 0;
 
 /// `CUdevice_attribute` / `CUfunction_attribute` selectors from `cuda.h` — ABI.
+#[cfg(target_os = "linux")]
 const DEVICE_MAX_THREADS_PER_BLOCK: i32 = 1;
+#[cfg(target_os = "linux")]
 const DEVICE_MAX_GRID_DIM_X: i32 = 5;
+#[cfg(target_os = "linux")]
 const DEVICE_WARP_SIZE: i32 = 10;
+#[cfg(target_os = "linux")]
 const FUNCTION_MAX_THREADS_PER_BLOCK: i32 = 0;
 
 pub const CAUSAL_ADJOINT_PULLED_INCIDENCE_SCHEMA: &str =

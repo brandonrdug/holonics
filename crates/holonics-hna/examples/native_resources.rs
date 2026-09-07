@@ -162,6 +162,7 @@ fn seed() -> NativeModelSpec {
     }
 }
 
+#[cfg(not(target_os = "macos"))]
 fn memory_sample() -> Option<MemorySample> {
     let status = fs::read_to_string("/proc/self/status").ok()?;
     let value = |name: &str| {
@@ -173,6 +174,27 @@ fn memory_sample() -> Option<MemorySample> {
     Some(MemorySample {
         vm_rss_kib: value("VmRSS:"),
         vm_hwm_kib: value("VmHWM:"),
+    })
+}
+
+/// Resident process memory from macOS ps, in KiB. This includes shared/unified allocations;
+/// it does not pretend to isolate GPU residency or supply an unmeasured high-water mark.
+#[cfg(target_os = "macos")]
+fn memory_sample() -> Option<MemorySample> {
+    let output = Command::new("/bin/ps")
+        .args(["-o", "rss=", "-p", &std::process::id().to_string()])
+        .output()
+        .ok()?;
+    if !output.status.success() {
+        return None;
+    }
+    Some(MemorySample {
+        vm_rss_kib: std::str::from_utf8(&output.stdout)
+            .ok()?
+            .trim()
+            .parse()
+            .ok(),
+        vm_hwm_kib: None,
     })
 }
 

@@ -14,12 +14,22 @@ mod wire;
 pub use wire::*;
 mod checkpoint;
 pub use checkpoint::NativeSavedSession;
+mod acoustic;
+pub use acoustic::{
+    AcousticApplication, AcousticInterruption, AcousticPendingReceive, AcousticRun,
+    AcousticRunOptions, AcousticSavedApplication, resume_acoustic, run_acoustic_with_options,
+};
+mod speech;
+pub use speech::{
+    SpeechExposureApplication, SpeechPendingReceive, SpeechRun, SpeechRunOptions,
+    SpeechSavedApplication, resume_speech, run_speech_with_options,
+};
 mod wave_control;
 pub use wave_control::{
-    resume_wave_control, run_wave_control, run_wave_control_with_options, PendingWaveReceive,
-    WaveApplication, WaveBoundary, WaveChange, WaveControlRun, WaveControlSpec, WaveCycle,
-    WaveInterruption, WaveIntervention, WaveRunOptions, WaveSavedApplication, WaveWorldSpec,
-    WAVE_CONTROL_SCHEMA,
+    PendingWaveReceive, WAVE_CONTROL_SCHEMA, WaveApplication, WaveBoundary, WaveChange,
+    WaveControlRun, WaveControlSpec, WaveCycle, WaveInterruption, WaveIntervention, WaveRunOptions,
+    WaveSavedApplication, WaveWorldSpec, resume_wave_control, run_wave_control,
+    run_wave_control_with_options,
 };
 
 #[derive(Debug, Error)]

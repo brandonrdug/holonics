@@ -1,71 +1,220 @@
 use super::*;
 
 impl<'chart> ResidentSurface<'chart> {
-    #[allow(clippy::too_many_arguments)]
-    pub(crate) fn record_constitutive_rechart(&self,lane:&Lane<'_, 'chart>,
-        seed:&ResidentSection<'chart>,memory:&ResidentSection<'chart>,frame:&ResidentSection<'chart>,
-        basis:&ResidentSection<'chart>,change:&ResidentSection<'chart>,
-        new_seed:&ResidentSection<'chart>,new_memory:&ResidentSection<'chart>,new_frame:&ResidentSection<'chart>,
-        new_basis:&ResidentSection<'chart>,report:&ResidentSection<'chart>) -> Result<(),ResidentRefusal> {
-        let nodes=seed.rows;
-        let width=2*nodes+2;
-        let matching=|s:&ResidentSection<'chart>,rows,columns| s.rows==rows && s.width==columns && s.grain.0==0;
-        if !matching(seed,nodes,5) || !matching(memory,nodes,3) || !matching(frame,nodes,3)
-            || !matching(basis,width,width) || !matching(change,nodes,6) || !matching(new_seed,nodes,5)
-            || !matching(new_memory,nodes,3) || !matching(new_frame,nodes,3) || !matching(new_basis,width,width)
-            || !matching(report,nodes,9) || nodes==0 {
-            return Err(ResidentRefusal::Declaration { operation:"constitutive-rechart",what:"incompatible phase/seed/relation charts".into() });
+    /// Exact scratch layout of the target representation, including local denominators.
+    pub(crate) fn constitutive_fibre_scratch(width: usize) -> Option<usize> {
+        #[cfg(target_os = "macos")]
+        {
+            Some(
+                width
+                    .checked_mul(2)?
+                    .checked_add(1)?
+                    .checked_mul(20)?
+                    .checked_add(15)?
+                    / 16
+                    * 16,
+            )
         }
-        let shared=width.checked_mul(16).and_then(|v|u32::try_from(v).ok())
-            .filter(|v|*v<=self.declaration.max_sectiond_bytes).ok_or_else(||ResidentRefusal::Declaration {
-                operation:"constitutive-rechart",what:"exact rechart scratch exceeds the mounted aperture".into() })?;
-        let mut params=Params::new();
-        params.ptr(seed.lo.device_ptr()).ptr(memory.lo.device_ptr()).ptr(frame.lo.device_ptr())
-            .ptr(basis.lo.device_ptr()).ptr(change.lo.device_ptr()).u32(nodes as u32)
-            .ptr(new_seed.lo.device_ptr()).ptr(new_seed.hi.device_ptr()).ptr(new_memory.lo.device_ptr()).ptr(new_memory.hi.device_ptr())
-            .ptr(new_frame.lo.device_ptr()).ptr(new_frame.hi.device_ptr()).ptr(new_basis.lo.device_ptr()).ptr(new_basis.hi.device_ptr())
-            .ptr(report.lo.device_ptr()).ptr(report.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
-        self.record_blocks(lane,"section_constitutive_rechart",1,self.launch.block_x,shared,&mut params,"constitutive-rechart")
+        #[cfg(not(target_os = "macos"))]
+        {
+            width.checked_mul(32)
+        }
+    }
+    pub(crate) fn constitutive_circulation_scratch(nodes: usize) -> Option<usize> {
+        #[cfg(target_os = "macos")]
+        {
+            Some(
+                nodes
+                    .checked_mul(12)?
+                    .checked_add(9)?
+                    .checked_mul(20)?
+                    .checked_add(15)?
+                    / 16
+                    * 16,
+            )
+        }
+        #[cfg(not(target_os = "macos"))]
+        {
+            nodes.checked_mul(12)?.checked_add(6)?.checked_mul(16)
+        }
+    }
+    fn constitutive_rechart_scratch(width: usize) -> Option<usize> {
+        #[cfg(target_os = "macos")]
+        {
+            Some(width.checked_mul(20)?.checked_add(15)? / 16 * 16)
+        }
+        #[cfg(not(target_os = "macos"))]
+        {
+            width.checked_mul(16)
+        }
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_constitutive_rechart(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        seed: &ResidentSection<'chart>,
+        memory: &ResidentSection<'chart>,
+        frame: &ResidentSection<'chart>,
+        basis: &ResidentSection<'chart>,
+        change: &ResidentSection<'chart>,
+        new_seed: &ResidentSection<'chart>,
+        new_memory: &ResidentSection<'chart>,
+        new_frame: &ResidentSection<'chart>,
+        new_basis: &ResidentSection<'chart>,
+        report: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let nodes = seed.rows;
+        let width = 2 * nodes + 2;
+        let matching = |s: &ResidentSection<'chart>, rows, columns| {
+            s.rows == rows && s.width == columns && s.grain.0 == 0
+        };
+        if !matching(seed, nodes, 5)
+            || !matching(memory, nodes, 3)
+            || !matching(frame, nodes, 3)
+            || !matching(basis, width, width)
+            || !matching(change, nodes, 6)
+            || !matching(new_seed, nodes, 5)
+            || !matching(new_memory, nodes, 3)
+            || !matching(new_frame, nodes, 3)
+            || !matching(new_basis, width, width)
+            || !matching(report, nodes, 9)
+            || nodes == 0
+        {
+            return Err(ResidentRefusal::Declaration {
+                operation: "constitutive-rechart",
+                what: "incompatible phase/seed/relation charts".into(),
+            });
+        }
+        let shared = Self::constitutive_rechart_scratch(width)
+            .and_then(|v| u32::try_from(v).ok())
+            .filter(|v| *v <= self.declaration.max_sectiond_bytes)
+            .ok_or_else(|| ResidentRefusal::Declaration {
+                operation: "constitutive-rechart",
+                what: "exact rechart scratch exceeds the mounted aperture".into(),
+            })?;
+        let mut params = Params::new();
+        params
+            .ptr(seed.lo.device_ptr())
+            .ptr(memory.lo.device_ptr())
+            .ptr(frame.lo.device_ptr())
+            .ptr(basis.lo.device_ptr())
+            .ptr(change.lo.device_ptr())
+            .u32(nodes as u32)
+            .ptr(new_seed.lo.device_ptr())
+            .ptr(new_seed.hi.device_ptr())
+            .ptr(new_memory.lo.device_ptr())
+            .ptr(new_memory.hi.device_ptr())
+            .ptr(new_frame.lo.device_ptr())
+            .ptr(new_frame.hi.device_ptr())
+            .ptr(new_basis.lo.device_ptr())
+            .ptr(new_basis.hi.device_ptr())
+            .ptr(report.lo.device_ptr())
+            .ptr(report.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_constitutive_rechart",
+            1,
+            self.launch.block_x,
+            shared,
+            &mut params,
+            "constitutive-rechart",
+        )
     }
 
     /// Joined exact wave-state / local-relation recurrence with one atomic native commit.
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn record_constitutive_circulation(
-        &self, lane: &Lane<'_, 'chart>, seed: &ResidentSection<'chart>,
-        memory: &mut ResidentSection<'chart>, basis: &mut ResidentSection<'chart>,
-        incoming: &ResidentSection<'chart>, origin: Option<&ResidentSection<'chart>>,
-        frame: &ResidentSection<'chart>, origin_frame: Option<&ResidentSection<'chart>>,
+        &self,
+        lane: &Lane<'_, 'chart>,
+        seed: &ResidentSection<'chart>,
+        memory: &mut ResidentSection<'chart>,
+        basis: &mut ResidentSection<'chart>,
+        incoming: &ResidentSection<'chart>,
+        origin: Option<&ResidentSection<'chart>>,
+        frame: &ResidentSection<'chart>,
+        origin_frame: Option<&ResidentSection<'chart>>,
         output: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
         let nodes = seed.rows;
-        let width = nodes.checked_mul(2).and_then(|n| n.checked_add(2))
-            .ok_or_else(|| ResidentRefusal::Declaration { operation: "constitutive-circulation",
-                what: "local chart extent overflow".into() })?;
-        if nodes == 0 || width > u32::MAX as usize / 4 || seed.width != 5
-            || memory.rows != nodes || memory.width != 3 || basis.rows != width || basis.width != width
-            || incoming.rows != 1 || incoming.width != 3 || output.rows != 1 || output.width != 6*nodes+13
+        let width = nodes
+            .checked_mul(2)
+            .and_then(|n| n.checked_add(2))
+            .ok_or_else(|| ResidentRefusal::Declaration {
+                operation: "constitutive-circulation",
+                what: "local chart extent overflow".into(),
+            })?;
+        if nodes == 0
+            || width > u32::MAX as usize / 4
+            || seed.width != 5
+            || memory.rows != nodes
+            || memory.width != 3
+            || basis.rows != width
+            || basis.width != width
+            || incoming.rows != 1
+            || incoming.width != 3
+            || output.rows != 1
+            || output.width != 6 * nodes + 13
             || origin.is_some_and(|s| s.rows != 1 || s.width != output.width || s.grain.0 != 0)
-            || frame.rows != nodes || frame.width != 3 || frame.grain.0 != 0
+            || frame.rows != nodes
+            || frame.width != 3
+            || frame.grain.0 != 0
             || origin.is_some() != origin_frame.is_some()
             || origin_frame.is_some_and(|s| s.rows != nodes || s.width != 3 || s.grain.0 != 0)
-            || [seed.grain, memory.grain, basis.grain, incoming.grain, output.grain].iter().any(|g| g.0 != 0)
+            || [
+                seed.grain,
+                memory.grain,
+                basis.grain,
+                incoming.grain,
+                output.grain,
+            ]
+            .iter()
+            .any(|g| g.0 != 0)
         {
-            return Err(ResidentRefusal::Declaration { operation: "constitutive-circulation",
-                what: "incompatible seed, current, retained source or state chart".into() });
+            return Err(ResidentRefusal::Declaration {
+                operation: "constitutive-circulation",
+                what: "incompatible seed, current, retained source or state chart".into(),
+            });
         }
-        let shared = (12*nodes+6).checked_mul(16).and_then(|n| u32::try_from(n).ok())
+        let shared = Self::constitutive_circulation_scratch(nodes)
+            .and_then(|n| u32::try_from(n).ok())
             .filter(|n| *n <= self.declaration.max_sectiond_bytes)
-            .ok_or_else(|| ResidentRefusal::Declaration { operation: "constitutive-circulation",
-                what: "local exact scratch exceeds the mounted per-block aperture".into() })?;
+            .ok_or_else(|| ResidentRefusal::Declaration {
+                operation: "constitutive-circulation",
+                what: "local exact scratch exceeds the mounted per-block aperture".into(),
+            })?;
         let mut params = Params::new();
-        params.ptr(seed.lo.device_ptr()).ptr(memory.lo.device_ptr()).ptr(memory.hi.device_ptr())
-            .ptr(basis.lo.device_ptr()).ptr(basis.hi.device_ptr()).ptr(incoming.lo.device_ptr())
-            .ptr(origin.unwrap_or(incoming).lo.device_ptr()).ptr(frame.lo.device_ptr())
-            .ptr(origin_frame.unwrap_or(frame).lo.device_ptr()).u32(nodes as u32).u32(u32::from(origin.is_some()))
-            .ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr()).ptr(lane.slot).ptr(lane.census)
-            .ptr(lane.lineage).u32(lane.lineage_count);
-        self.record_blocks(lane, "section_constitutive_circulation", 1, self.launch.block_x,
-            shared, &mut params, "constitutive-circulation")
+        params
+            .ptr(seed.lo.device_ptr())
+            .ptr(memory.lo.device_ptr())
+            .ptr(memory.hi.device_ptr())
+            .ptr(basis.lo.device_ptr())
+            .ptr(basis.hi.device_ptr())
+            .ptr(incoming.lo.device_ptr())
+            .ptr(origin.unwrap_or(incoming).lo.device_ptr())
+            .ptr(frame.lo.device_ptr())
+            .ptr(origin_frame.unwrap_or(frame).lo.device_ptr())
+            .u32(nodes as u32)
+            .u32(u32::from(origin.is_some()))
+            .ptr(output.lo.device_ptr())
+            .ptr(output.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_constitutive_circulation",
+            1,
+            self.launch.block_x,
+            shared,
+            &mut params,
+            "constitutive-circulation",
+        )
     }
 
     /// One local rational-relation operation. The only continuing write is a fully checked new
@@ -80,29 +229,58 @@ impl<'chart> ResidentSurface<'chart> {
         output: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
         let width = basis.width;
-        if source_width == 0 || source_width >= width || basis.rows != width
-            || input.rows != 1 || input.width != width || output.rows != 1
-            || output.width != width + 4 || width > u32::MAX as usize - 4
-            || [basis.grain, input.grain, output.grain].iter().any(|g| g.0 != 0)
+        if source_width == 0
+            || source_width >= width
+            || basis.rows != width
+            || input.rows != 1
+            || input.width != width
+            || output.rows != 1
+            || output.width != width + 4
+            || width > u32::MAX as usize - 4
+            || [basis.grain, input.grain, output.grain]
+                .iter()
+                .any(|g| g.0 != 0)
         {
             return Err(ResidentRefusal::Declaration { operation: "constitutive-fibre",
                 what: "expected point integer local relation, joined current and rational return charts".into() });
         }
-        let shared = width.checked_mul(32).and_then(|v| u32::try_from(v).ok())
-            .ok_or_else(|| ResidentRefusal::Declaration { operation: "constitutive-fibre",
-                what: "local exact scratch exceeds the apparatus chart".into() })?;
+        let shared = Self::constitutive_fibre_scratch(width)
+            .and_then(|v| u32::try_from(v).ok())
+            .ok_or_else(|| ResidentRefusal::Declaration {
+                operation: "constitutive-fibre",
+                what: "local exact scratch exceeds the apparatus chart".into(),
+            })?;
         if shared > self.declaration.max_sectiond_bytes {
-            return Err(ResidentRefusal::Declaration { operation: "constitutive-fibre",
-                what: "local exact scratch exceeds the mounted per-block shared-memory aperture".into() });
+            return Err(ResidentRefusal::Declaration {
+                operation: "constitutive-fibre",
+                what: "local exact scratch exceeds the mounted per-block shared-memory aperture"
+                    .into(),
+            });
         }
         let mut params = Params::new();
-        params.ptr(basis.lo.device_ptr()).ptr(basis.hi.device_ptr())
-            .ptr(input.lo.device_ptr()).ptr(input.hi.device_ptr())
-            .u32(source_width as u32).u32((width-source_width) as u32).u32(u32::from(paired))
-            .ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
-            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
-        self.record_blocks(lane, "section_constitutive_fibre", 1, self.launch.block_x,
-            shared, &mut params, "constitutive-fibre")
+        params
+            .ptr(basis.lo.device_ptr())
+            .ptr(basis.hi.device_ptr())
+            .ptr(input.lo.device_ptr())
+            .ptr(input.hi.device_ptr())
+            .u32(source_width as u32)
+            .u32((width - source_width) as u32)
+            .u32(u32::from(paired))
+            .ptr(output.lo.device_ptr())
+            .ptr(output.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_constitutive_fibre",
+            1,
+            self.launch.block_x,
+            shared,
+            &mut params,
+            "constitutive-fibre",
+        )
     }
 
     // -----------------------------------------------------------------------------------------
@@ -822,36 +1000,66 @@ impl<'chart> ResidentSurface<'chart> {
         out: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
         const OPERATION: &str = "passive-contact";
-        if source.rows == 0 || query.rows == 0 || source.width == 0
+        if source.rows == 0
+            || query.rows == 0
+            || source.width == 0
             || (source.rows != 1 && source.rows != query.rows)
-            || arrived.rows != source.rows || arrived.width != source.width
+            || arrived.rows != source.rows
+            || arrived.width != source.width
             || arrived.grain != source.grain
-            || query.width != source.width || query.grain != source.grain
-            || out.rows != query.rows || out.width != query.width
+            || query.width != source.width
+            || query.grain != source.grain
+            || out.rows != query.rows
+            || out.width != query.width
             || out.grain != query.grain
         {
             return Err(ResidentRefusal::Declaration {
-                operation: OPERATION, what: "contact sections require one nonempty carrier chart".into(),
+                operation: OPERATION,
+                what: "contact sections require one nonempty carrier chart".into(),
             });
         }
-        let founding_rows = u32::try_from(source.rows).map_err(|_| ResidentRefusal::GridAperture {
-            operation: OPERATION, rows: source.rows, width: source.width,
-        })?;
+        let founding_rows =
+            u32::try_from(source.rows).map_err(|_| ResidentRefusal::GridAperture {
+                operation: OPERATION,
+                rows: source.rows,
+                width: source.width,
+            })?;
         let rows = u32::try_from(query.rows).map_err(|_| ResidentRefusal::GridAperture {
-            operation: OPERATION, rows: query.rows, width: query.width,
+            operation: OPERATION,
+            rows: query.rows,
+            width: query.width,
         })?;
         let width = u32::try_from(source.width).map_err(|_| ResidentRefusal::GridAperture {
-            operation: OPERATION, rows: source.rows, width: source.width,
+            operation: OPERATION,
+            rows: source.rows,
+            width: source.width,
         })?;
         let mut params = Params::new();
-        params.ptr(source.lo.device_ptr()).ptr(source.hi.device_ptr())
-            .ptr(arrived.lo.device_ptr()).ptr(arrived.hi.device_ptr())
-            .ptr(query.lo.device_ptr()).ptr(query.hi.device_ptr())
-            .u32(rows).u32(width).u32(founding_rows)
-            .ptr(out.lo.device_ptr()).ptr(out.hi.device_ptr())
-            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
-        self.record_blocks(lane, "section_passive_contact", query.rows, self.launch.block_x,
-            0, &mut params, OPERATION)
+        params
+            .ptr(source.lo.device_ptr())
+            .ptr(source.hi.device_ptr())
+            .ptr(arrived.lo.device_ptr())
+            .ptr(arrived.hi.device_ptr())
+            .ptr(query.lo.device_ptr())
+            .ptr(query.hi.device_ptr())
+            .u32(rows)
+            .u32(width)
+            .u32(founding_rows)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_passive_contact",
+            query.rows,
+            self.launch.block_x,
+            0,
+            &mut params,
+            OPERATION,
+        )
     }
 
     pub fn record_terminal_row(
@@ -1120,17 +1328,26 @@ impl<'chart> ResidentSurface<'chart> {
         &self,
         operation: &'static str,
     ) -> Result<(), ResidentRefusal> {
-        let warp = self.launch.warp.max(1);
-        if self.launch.block_x % warp != 0 || self.launch.block_x / warp > CENSUS_MAX_WARPS {
-            return Err(ResidentRefusal::Declaration {
-                operation,
-                what: format!(
-                    "the block-aggregated census needs a whole number of warps, at most {CENSUS_MAX_WARPS}; the derived block is {} at warp {warp}",
-                    self.launch.block_x
-                ),
-            });
+        // Metal's census is a scalar device loop, not the CUDA warp-mask reduction.
+        #[cfg(target_os = "macos")]
+        {
+            let _ = operation;
+            return Ok(());
         }
-        Ok(())
+        #[cfg(not(target_os = "macos"))]
+        {
+            let warp = self.launch.warp.max(1);
+            if self.launch.block_x % warp != 0 || self.launch.block_x / warp > CENSUS_MAX_WARPS {
+                return Err(ResidentRefusal::Declaration {
+                    operation,
+                    what: format!(
+                        "the block-aggregated census needs a whole number of warps, at most {CENSUS_MAX_WARPS}; the derived block is {} at warp {warp}",
+                        self.launch.block_x
+                    ),
+                });
+            }
+            Ok(())
+        }
     }
 
     /// **Both censuses, on one section, into two fresh slots** — the equality this deed measures

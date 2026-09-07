@@ -1,8 +1,7 @@
 # Hardware and modality boundaries
 
-[definition] This guide records the current execution boundary and the first lawful seams for
-future Apple and audio work. It does not add a backend, alter native HNA, or schedule an audio
-campaign. The roadmap and `CONSTRUCTION_STATE.md` remain the construction authorities.
+[definition] This guide records the current execution boundary and the implemented Apple phase boundary and the acoustic attachment. This guide
+describes source ownership; it does not schedule construction. The roadmap and `CONSTRUCTION_STATE.md` remain the construction authorities.
 
 [definition] Brandon's subsequent MacBook request is now specified in
 [Holonics on Apple silicon](plans/HOLONICS_ON_APPLE_SILICON.md). Its order is native Apple
@@ -68,35 +67,21 @@ mounted CUDA device and function attributes in [`CudaRefineExecutor::new`](../cr
 and [`mount::Device::launch_census`](../crates/holonic-mount/src/cuda.rs). A future backend must
 report its own capability census rather than reuse CUDA warp or block constants.
 
-## Present Linux/CUDA boundary
+## Native device boundary
 
-[established-bounded; source-inspected] The host workspace declares `mount` as an unconditional
-engine dependency ([`holonic-engine/Cargo.toml`](../crates/holonic-engine/Cargo.toml)). The
-mount crate is a CUDA Driver API wrapper and links `libcuda` in
-[`cuda.rs`](../crates/holonic-mount/src/cuda.rs) and [`ffi.rs`](../crates/holonic-mount/src/ffi.rs).
+[historical; process-audit] At `b16e6bc0`, the Mac HNA check failed at four unconditional generated
+PTX includes and six target-gated launch/cover imports. The pre-port source comparison correctly
+located a native dependency-closure obstruction, rather than an absent Rust installation.
 
-[established-bounded; source-inspected] The engine build script invokes `nvcc` for the resident
-CUDA laws and returns without producing PTX on non-Linux targets
-([`build.rs`](../crates/holonic-engine/build.rs)). The engine still includes generated PTX
-unconditionally in [`cuda_refine.rs`](../crates/holonic-engine/src/cuda_refine.rs),
-[`resident_section.rs`](../crates/holonic-engine/src/resident_section.rs),
-[`embedding_fiber.rs`](../crates/holonic-engine/src/embedding_fiber.rs), and
-[`cuda_realizer_search.rs`](../crates/holonic-engine/src/cuda_realizer_search.rs).
+[established-bounded; implemented-exact] The Apple phase port gates CUDA linkage, PTX consumers
+and CUDA-only realizer search under Linux. `device_launch.rs` owns the common integer launch
+admissions; `mount::metal` realizes resident allocation, serial command capture/replay and terminal
+completion. `ResidentReadout` owns a Metal context for `ResidentSurface`; foreign embedding and
+refine entry points refuse explicitly. No CPU current law or empty PTX substitutes for execution.
 
-[open; source-inspected] The inspected engine/HNA dependency closure has no supported macOS build path: non-Linux
-PTX generation is skipped while several PTX-bearing modules and the CUDA mount remain in the
-dependency closure. Documentation, formal sources and exterior data tools remain portable
-repository material; this is a source-derived build obstruction, not an executed Mac check.
-
-[established-bounded; process-audit] The subsequent Mac check at `b16e6bc0`, with Rust 1.98.1,
-executed `cargo check -p holonics-hna --lib --locked` and failed with four missing PTX includes
-and six imports of target-gated `cuda_aperture`/`hardware_cover`. This confirms an actual
-compile obstruction before linkage, not an unavailable Rust installation.
-
-[definition] The future repair boundary is a target-gated CUDA/PTX implementation and a portable
-host/native surface whose exact owners can compile without `libcuda`. The repair must preserve the
-same native operation and return an explicit unsupported-device obstruction when no admitted
-backend is present.
+[established-bounded; measured] The public HNA library compiles on the M1 Pro. The existing 28
+native phase and 15 public session tests pass against `accelerators/metal/native_phase.metal`.
+These cover the current local rational-linear phase domain, not all native owners.
 
 [established-bounded; source-inspected] `DeviceBackend` and `ExactDeviceExecutor` in
 [`device.rs`](../crates/holonic-engine/src/device.rs) provide a small exact parity vocabulary,
@@ -106,7 +91,7 @@ this trait; `NativeTransportScaffold` constructs `CudaRefineExecutor` directly a
 
 [open; source-inspected] Implementing `ExactDeviceExecutor` for another device would not by itself
 port native HNA. The native mount, resident carrier, operation scheduling, multiword arithmetic,
-and successor commit still need one coherent backend owner.
+and successor commit require their actual lifecycle owner; the phase path now uses the Metal mount.
 
 ## MLX as an architectural comparison
 
@@ -144,10 +129,11 @@ exterior apparatus contract; they do not author contextual topology.
 with `float64` restricted to CPU operations, in its [data-type reference](https://ml-explore.github.io/mlx/build/html/python/data_types.html).
 The documentation does not provide an arbitrary-precision rational or native `i128` carrier.
 
-[open; source-inspected] Direct exact-current parity on Metal therefore requires a declared
-multiword representation (for example sign/magnitude limbs plus explicit denominator limbs),
-Metal kernels for its contractions and reductions, and exact reconstruction at the receiver
-boundary. A float-array port may be a declared projection or export; it cannot silently become
+[established-bounded; implemented-exact] The phase port now uses checked sign/magnitude u32
+limbs, exact rational contraction and reconstruction at the existing receiver boundary. Its
+[measured return](../research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md)
+records the admitted signed-word mouth and bounded wide intermediates. Wider native families
+still require their own representation and growth law. A float-array port may be a declared projection or export; it cannot silently become
 the native current, topology, coefficient, or branch.
 
 ## Required backend mapping
@@ -155,14 +141,14 @@ the native current, topology, coefficient, or branch.
 [definition] Every future backend must map the following six boundaries without changing their
 meaning:
 
-| Native boundary | Current CUDA realization | Future Apple/MLX question |
+| Native boundary | Current CUDA realization | Apple phase realization |
 |---|---|---|
-| Mount | device/context/module and resident buffers | Which Metal/MLX device and shared allocations are admitted? |
-| Exact carrier | signed words, wide intermediate, rational reconstruction | Which multiword layout preserves sign, denominator, phase, and residual? |
-| Ownership | non-`Clone` resident organs and one move owner | Which handle owns the successor and how are branches staged? |
-| Dependency | CUDA stream/events/graph edges | Which stream/event graph orders every predecessor before commit? |
-| Commit | device conduct, terminal synchronization, typed return | Which explicit completion point validates and publishes the successor? |
-| Apparatus receipt | launch, sync, transfer, residency, refusal census | Which calibrated receiver reports work, memory, transfer, and obstruction? |
+| Mount | device/context/module and resident buffers | Owned Metal context and shared buffers with checked ranges. |
+| Exact carrier | signed words, wide intermediate, rational reconstruction | Checked four-u32 magnitude, sign and exact rational reconstruction. |
+| Ownership | non-`Clone` resident organs and one move owner | Existing unique ecology; staged device deltas and immutable pipeline sharing. |
+| Dependency | CUDA stream/events/graph edges | Ordered command queue and context-qualified captured dependencies. |
+| Commit | device conduct, terminal synchronization, typed return | Terminal command completion and native status check before successor publication. |
+| Apparatus receipt | launch, sync, transfer, residency, refusal census | Existing transfer census, actual Metal capabilities, working-set budget and process RSS. |
 
 [definition] Intermediate native sections remain resident for the duration of one operation. Input
 ingress, terminal readout, checkpoint I/O, and codec conversion may cross to the host or shared

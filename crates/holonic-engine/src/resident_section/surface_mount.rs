@@ -4,6 +4,7 @@ impl<'chart> ResidentSurface<'chart> {
     /// **Mount the apparatus occurrence** on the readout's context. Refuses when no device answers,
     /// when the census names a device the readout did not mount, or when a kernel symbol is
     /// missing from the module.
+    #[cfg(target_os = "linux")]
     pub fn on(readout: &'chart ResidentReadout) -> Result<Self, ResidentRefusal> {
         mount::cuda::init()?;
         if Device::count()? == 0 {
@@ -92,6 +93,72 @@ impl<'chart> ResidentSurface<'chart> {
         })
     }
 
+    #[cfg(target_os = "macos")]
+    pub fn on(readout: &'chart ResidentReadout) -> Result<Self, ResidentRefusal> {
+        let device = Device::get(0)?;
+        if device.name != readout.device_name() {
+            return Err(ResidentRefusal::DeviceDisagrees {
+                readout: readout.device_name().into(),
+                mounted: device.name,
+            });
+        }
+        let context = BorrowedContext::adopt(readout.raw_context())?;
+        context.make_current()?;
+        let module = Module::load_metal(METAL_SOURCE)?;
+        let function = module.function("section_constitutive_circulation")?;
+        let warp = function.execution_width();
+        let block = function.max_threads_per_block()?.min(device.max_threads());
+        let declaration = DeviceDeclaration {
+            ordinal: 0,
+            name: device.name.clone(),
+            capability_major: 0,
+            capability_minor: 0,
+            // Metal does not publish CUDA SM/engine counts. Zero records unavailable testimony;
+            // the ordered native implementation does not use those fields for placement.
+            multiprocessors: 0,
+            max_threads_per_multiprocessor: 0,
+            async_engines: 0,
+            warp_size: warp,
+            max_threads_per_block: block,
+            max_grid_x: u32::MAX,
+            max_sectiond_bytes: device.max_shared_bytes(),
+            concurrent_kernels: false,
+            unified_addressing: device.unified_memory(),
+        };
+        // This dependent implementation intentionally uses one thread, within the queried
+        // pipeline admission. The hardware SIMD width remains device testimony.
+        let launch = DerivedLaunch {
+            block_x: 1,
+            max_grid_x: u32::MAX,
+            warp,
+        };
+        let cover = HardwareCover::over(Some(declaration.clone()));
+        let allocation_grain = context.allocation_grain_bytes()? as u64;
+        let memory_at_mount = context.memory_info()?;
+        let ptx_sha256 = Sha256::digest(METAL_SOURCE.as_bytes())
+            .iter()
+            .map(|b| format!("{b:02x}"))
+            .collect();
+        drop(function);
+        Ok(Self {
+            readout,
+            context,
+            device,
+            module,
+            ptx_sha256,
+            max_shared_octets: declaration.max_sectiond_bytes,
+            declaration,
+            cover,
+            launch,
+            reduction_block: 1,
+            memory_at_mount,
+            allocation_grain,
+            sm_limits: MultiprocessorLimits::default(),
+            partials: RefCell::new(Vec::new()),
+            census: RefCell::new(TransferCensus::default()),
+        })
+    }
+
     pub fn device_name(&self) -> &str {
         &self.device.name
     }
@@ -107,7 +174,8 @@ impl<'chart> ResidentSurface<'chart> {
     pub fn cover(&self) -> &HardwareCover {
         &self.cover
     }
-    /// The PTX's content digest — the kernel identity as content, not as a name.
+    /// Kernel source/artifact content digest (PTX on CUDA, MSL source on Metal).
+    /// The legacy method name is retained for source compatibility; this is artifact lineage.
     pub fn ptx_sha256(&self) -> &str {
         &self.ptx_sha256
     }
@@ -123,7 +191,8 @@ impl<'chart> ResidentSurface<'chart> {
         )
         .with_kernel_content(self.ptx_sha256.clone())
     }
-    /// The memory the device reported at mount, and now.
+    /// CUDA free/total device memory, or Metal recommended working-set budget and
+    /// remaining allocation budget. The latter is not physical free VRAM.
     pub fn memory_at_mount(&self) -> MemoryInfo {
         self.memory_at_mount
     }
@@ -270,13 +339,23 @@ impl<'chart> ResidentSurface<'chart> {
     /// Mount one already-sealed endpoint from an exterior rest without allocating a redundant
     /// upper endpoint. This is persistence of an existing point carrier, not interval projection.
     pub(crate) fn mount_endpoint_rest(
-        &'chart self, rows: usize, width: usize, words: &[i64],
+        &'chart self,
+        rows: usize,
+        width: usize,
+        words: &[i64],
     ) -> Result<ResidentEndpoint<'chart>, ResidentRefusal> {
         if rows == 0 || width == 0 || rows.checked_mul(width) != Some(words.len()) {
-            return Err(ResidentRefusal::Declaration { operation: "mount-endpoint-rest",
-                what: "endpoint shape does not match its complete word population".into() });
+            return Err(ResidentRefusal::Declaration {
+                operation: "mount-endpoint-rest",
+                what: "endpoint shape does not match its complete word population".into(),
+            });
         }
-        let endpoint = ResidentEndpoint { surface: self, words: self.alloc::<i64>(words.len())?, rows, width };
+        let endpoint = ResidentEndpoint {
+            surface: self,
+            words: self.alloc::<i64>(words.len())?,
+            rows,
+            width,
+        };
         self.context.make_current()?;
         endpoint.words.copy_from_slice(words)?;
         self.census.borrow_mut().ingress_octets += (words.len() * 8) as u64;
@@ -284,10 +363,17 @@ impl<'chart> ResidentSurface<'chart> {
     }
 
     /// Explicit checkpoint egress of an existing sealed endpoint. No arithmetic is replayed.
-    pub(crate) fn detach_endpoint(&self, endpoint: &ResidentEndpoint<'chart>) -> Result<Vec<i64>, ResidentRefusal> {
+    pub(crate) fn detach_endpoint(
+        &self,
+        endpoint: &ResidentEndpoint<'chart>,
+    ) -> Result<Vec<i64>, ResidentRefusal> {
         let mut words = Vec::new();
-        words.try_reserve_exact(endpoint.words.len()).map_err(|error|
-            ResidentRefusal::Declaration { operation: "detach-endpoint", what: error.to_string() })?;
+        words
+            .try_reserve_exact(endpoint.words.len())
+            .map_err(|error| ResidentRefusal::Declaration {
+                operation: "detach-endpoint",
+                what: error.to_string(),
+            })?;
         words.resize(endpoint.words.len(), 0);
         self.context.make_current()?;
         endpoint.words.copy_to_slice(&mut words)?;
@@ -436,21 +522,30 @@ impl<'chart> ResidentSurface<'chart> {
 
     /// Exact terminal-row receiver. The earlier rows stay resident as reconstruction fibre;
     /// no projection buffer or native mutation is needed to read this contiguous interval span.
-    pub fn read_out_terminal_row(&self,section:&ResidentSection<'chart>)
-        -> Result<Vec<(i64,i64)>,ResidentRefusal> {
-        if section.rows==0 || section.width==0 {
-            return Err(ResidentRefusal::Declaration {operation:"read-terminal-row",what:"empty source section".into()});
+    pub fn read_out_terminal_row(
+        &self,
+        section: &ResidentSection<'chart>,
+    ) -> Result<Vec<(i64, i64)>, ResidentRefusal> {
+        if section.rows == 0 || section.width == 0 {
+            return Err(ResidentRefusal::Declaration {
+                operation: "read-terminal-row",
+                what: "empty source section".into(),
+            });
         }
-        let offset=(section.rows-1).checked_mul(section.width).ok_or_else(||ResidentRefusal::Declaration {
-            operation:"read-terminal-row",what:"source row extent overflow".into()})?;
+        let offset = (section.rows - 1)
+            .checked_mul(section.width)
+            .ok_or_else(|| ResidentRefusal::Declaration {
+                operation: "read-terminal-row",
+                what: "source row extent overflow".into(),
+            })?;
         self.context.make_current()?;
-        let mut lower=vec![0i64;section.width];
-        let mut upper=vec![0i64;section.width];
-        section.lo.copy_range_to_slice(offset,&mut lower)?;
-        section.hi.copy_range_to_slice(offset,&mut upper)?;
-        let mut census=self.census.borrow_mut();
-        census.egress_section_octets+=(section.width*16) as u64;
-        census.section_read_outs+=1;
+        let mut lower = vec![0i64; section.width];
+        let mut upper = vec![0i64; section.width];
+        section.lo.copy_range_to_slice(offset, &mut lower)?;
+        section.hi.copy_range_to_slice(offset, &mut upper)?;
+        let mut census = self.census.borrow_mut();
+        census.egress_section_octets += (section.width * 16) as u64;
+        census.section_read_outs += 1;
         Ok(lower.into_iter().zip(upper).collect())
     }
 

@@ -1,4 +1,4 @@
-# Universal Lean–Rust–CUDA catalog
+# Universal Lean–Rust–device catalog
 
 **Status:** descriptive navigation maintained with owner changes. This catalog schedules nothing,
 grades nothing by itself, and has no generator or release gate. The roadmap and construction state
@@ -15,13 +15,28 @@ owners below. See [native HNA](NATIVE_HNA.md), [Athena](ATHENA.md) and
 
 The [mathematical synthesis](MATHEMATICS_AND_NATIVE_CONDUCT.md) explains recent cross-line
 consequences, and [hardware/modality boundaries](HARDWARE_AND_MODALITY_BOUNDARIES.md) locates
-future Apple and acoustic composition. These are source comparisons, not implemented backends
-or a Lean runtime inside HNA.
+Apple and acoustic composition. Lean remains separate mathematical verification apparatus.
 
 [definition] The [Apple platform specification](plans/HOLONICS_ON_APPLE_SILICON.md) names the
-current native session/resident boundary and the acoustic attachment to port. The exterior
+native session/resident boundary and acoustic attachment. The exterior
 `research/experiments/apple_silicon/check_mlx_device.py` owns a custom-Metal arithmetic and
 dependent-stream apparatus probe only; it is not an alternate native owner.
+
+[established-bounded; implemented-exact] Apple phase execution is owned by
+`crates/holonic-mount/src/metal.rs` (resident allocation and ordered Metal commands),
+`crates/holonic-engine/src/device_launch.rs` (integer launch admission), and
+`accelerators/metal/native_phase.metal` (checked limb arithmetic, fibre, circulation, rechart,
+carry and census). `resident_section/{surface_mount,surface_passage}.rs` attaches these to the
+existing phase ecology. The CUDA mount and native kernels retain their Linux target. A missing
+Metal operation refuses explicitly; the legacy `mount::cuda` alias supplies source compatibility.
+
+[established-bounded; implemented-exact] Sound and curated speech exposure are public native
+application owners in `crates/holonics-hna/src/native/{acoustic,speech}.rs`, exposed by
+`applications/holonics-workbench/src/bin/holonics-{acoustic,speech}.rs`.
+`NativeAcousticProductionMorphology::found_phase_session` in
+`crates/holonic-life/src/native_intelligence/membrane_acoustic.rs` factors actual phase emissions
+into the existing acoustic receiver. `applications/holonics-audio/main.swift` owns exterior
+capture/playback chronology. These share the native session and introduce no second engine.
 
 Each row connects one mathematical relation to its live formal and executable presentations.
 

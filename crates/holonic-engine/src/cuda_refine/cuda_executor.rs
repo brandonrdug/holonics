@@ -1,14 +1,22 @@
+#[cfg(target_os = "linux")]
 use std::ffi::{CStr, c_char};
+#[cfg(target_os = "linux")]
 use std::ptr;
 
+use super::CudaRefineError;
+#[cfg(target_os = "linux")]
+use super::PTX;
+use super::cuda_driver::{CuContext, CuFunction, CuModule};
+#[cfg(target_os = "linux")]
 use super::cuda_driver::{
-    CuContext, CuFunction, CuModule, cuCtxCreate_v2, cuCtxDestroy_v2, cuDeviceGet,
-    cuDeviceGetAttribute, cuDeviceGetCount, cuDeviceGetName, cuFuncGetAttribute, cuInit,
-    cuModuleGetFunction, cuModuleLoadData, cuModuleUnload, driver,
+    cuCtxCreate_v2, cuCtxDestroy_v2, cuDeviceGet, cuDeviceGetAttribute, cuDeviceGetCount,
+    cuDeviceGetName, cuFuncGetAttribute, cuInit, cuModuleGetFunction, cuModuleLoadData,
+    cuModuleUnload, driver,
 };
+#[cfg(target_os = "linux")]
 use super::{
-    CudaRefineError, DEVICE_MAX_GRID_DIM_X, DEVICE_MAX_THREADS_PER_BLOCK, DEVICE_WARP_SIZE,
-    FUNCTION_MAX_THREADS_PER_BLOCK, PTX,
+    DEVICE_MAX_GRID_DIM_X, DEVICE_MAX_THREADS_PER_BLOCK, DEVICE_WARP_SIZE,
+    FUNCTION_MAX_THREADS_PER_BLOCK,
 };
 
 /// **Every distinct reading in the corpus, given a dense identity.**
@@ -139,6 +147,11 @@ pub struct CudaRefineExecutor {
 
 impl CudaRefineExecutor {
     pub fn new() -> Result<Self, CudaRefineError> {
+        #[cfg(not(target_os = "linux"))]
+        {
+            return Err(CudaRefineError::UnsupportedDevice);
+        }
+        #[cfg(target_os = "linux")]
         unsafe {
             driver(cuInit(0), "cuInit")?;
             let mut count = 0;
@@ -1292,8 +1305,8 @@ impl Drop for CudaRefineExecutor {
         }
         unsafe {
             let _ = super::cuda_driver::cuCtxSetCurrent(self.context);
-            let _ = cuModuleUnload(self.module);
-            let _ = cuCtxDestroy_v2(self.context);
+            let _ = super::cuda_driver::cuModuleUnload(self.module);
+            let _ = super::cuda_driver::cuCtxDestroy_v2(self.context);
         }
     }
 }

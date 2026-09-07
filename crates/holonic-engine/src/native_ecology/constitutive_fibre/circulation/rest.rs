@@ -484,12 +484,8 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
     ) -> Result<(Self, Vec<Option<NativeEmissionHandle>>), Error> {
         rest.validate()?;
         // The same apparatus scratch law as founding, before any native state allocation.
-        let scratch = rest
-            .nodes()
-            .checked_mul(12)
-            .and_then(|n| n.checked_add(6))
-            .and_then(|n| n.checked_mul(16))
-            .ok_or(Error::Shape)?;
+        let scratch =
+            ResidentSurface::constitutive_circulation_scratch(rest.nodes()).ok_or(Error::Shape)?;
         let available = surface.declaration().max_sectiond_bytes;
         if scratch > available as usize {
             return Err(Error::ScratchAperture {

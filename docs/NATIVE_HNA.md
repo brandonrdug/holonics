@@ -16,7 +16,8 @@ JSON report or relation inspection is **not a learned-model checkpoint**.
 ## Run it
 
 [established-bounded; measured] These commands run the checked-in examples on the standing CUDA
-apparatus. The build uses the repository's usual [development setup](DEVELOPMENT.md).
+apparatus and the Apple Metal phase realization. The [Apple return](../research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md)
+records the Mac continuation checks and scoped costs. The build uses the repository's usual [development setup](DEVELOPMENT.md).
 
 ```sh
 cargo build -p holonics-workbench --bin holonics

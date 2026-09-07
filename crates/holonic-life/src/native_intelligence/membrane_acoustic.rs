@@ -16,11 +16,12 @@ pub use potential_formation::{
 use std::io::Cursor;
 
 use holonic_engine::{
-    phase_current::{ExactPhaseCurrentSection, PhaseCurrentLineageId, PhaseCurrentReceiverId},
     ExactComplexWaveCurrent, ExactPhaseTransportSpectrum,
+    phase_current::{ExactPhaseCurrentSection, PhaseCurrentLineageId, PhaseCurrentReceiverId},
 };
 use num_bigint::{BigInt, BigUint};
 use num_rational::BigRational as Rat;
+use num_traits::Signed;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use thiserror::Error;
@@ -285,6 +286,127 @@ impl NativeAcousticProductionMorphology {
             return Err(NativeAcousticError::MalformedMorphology);
         }
         Ok(())
+    }
+
+    /// Found the acoustic production face directly from ordered phase-session emissions.
+    ///
+    /// This is deliberately separate from `NativeAcousticRadiationInput`: a phase session has
+    /// no open-world-tube receipt or terminal.  Each vector is one complete causal order, and
+    /// each entry is one declared native port.  Zero currents are retained as silence in the
+    /// complete port fibre; the input is never folded to a frame total or a nonzero population.
+    pub fn found_phase_session(
+        rested_identity_sha256: impl Into<String>,
+        session_lineage_sha256: impl Into<String>,
+        receiver: PhaseCurrentReceiverId,
+        lineage: PhaseCurrentLineageId,
+        origin: Rat,
+        sample_step: Rat,
+        ordered_emissions: &[(u64, Vec<ExactComplexWaveCurrent>)],
+    ) -> Result<(Self, NativeAcousticProductionSection), NativeAcousticError> {
+        if ordered_emissions.is_empty()
+            || ordered_emissions.iter().any(|(_, ports)| ports.is_empty())
+            || !sample_step.is_positive()
+        {
+            return Err(NativeAcousticError::Lineage);
+        }
+        let port_count = ordered_emissions[0].1.len();
+        if ordered_emissions
+            .iter()
+            .any(|(_, ports)| ports.len() != port_count)
+        {
+            return Err(NativeAcousticError::Lineage);
+        }
+        if ordered_emissions
+            .windows(2)
+            .any(|pair| pair[0].0.checked_add(1) != Some(pair[1].0))
+        {
+            return Err(NativeAcousticError::Lineage);
+        }
+        let expanded_emissions = ordered_emissions;
+        let ordered_ports = (0..port_count)
+            .map(|port| {
+                let port = u32::try_from(port).map_err(|_| NativeAcousticError::Extent)?;
+                Ok((port, port))
+            })
+            .collect::<Result<Vec<_>, NativeAcousticError>>()?;
+        let quadrature_population = 2_u32;
+        let phase_extent = u32::try_from(port_count)
+            .ok()
+            .and_then(|ports| ports.checked_mul(quadrature_population))
+            .ok_or(NativeAcousticError::Extent)?;
+        let mut morphology = Self {
+            schema: NATIVE_ACOUSTIC_PRODUCTION_MORPHOLOGY_SCHEMA.to_owned(),
+            founding_rest_identity_sha256: rested_identity_sha256.into(),
+            founding_radiation_identity_sha256: session_lineage_sha256.into(),
+            ordered_ports,
+            quadrature_population,
+            phase_extent,
+            identity_sha256: String::new(),
+        };
+        morphology.identity_sha256 = morphology.rederived_identity()?;
+        morphology.validate()?;
+
+        let mut denominator = BigInt::from(1);
+        for (_, ports) in expanded_emissions {
+            for current in ports {
+                denominator = lcm_positive(&denominator, current.real.denom());
+                denominator = lcm_positive(&denominator, current.imaginary.denom());
+            }
+        }
+        let common_denominator = denominator
+            .to_biguint()
+            .ok_or(NativeAcousticError::Extent)?;
+        let mut samples = Vec::with_capacity(
+            expanded_emissions
+                .len()
+                .checked_mul(port_count)
+                .and_then(|n| n.checked_mul(2))
+                .ok_or(NativeAcousticError::Extent)?,
+        );
+        let mut fibre = Vec::with_capacity(samples.capacity());
+        let mut outward_radical_population = 0_usize;
+        let mut nonradical_population = 0_usize;
+        for (causal_order, ports) in expanded_emissions {
+            for (port, current) in ports.iter().enumerate() {
+                let port = u32::try_from(port).map_err(|_| NativeAcousticError::Extent)?;
+                let real = clear_denominator(&current.real, &denominator);
+                let imaginary = clear_denominator(&current.imaginary, &denominator);
+                samples.extend([real, imaginary]);
+                fibre.push((*causal_order, port, port, current.clone()));
+                if current.is_zero() {
+                    outward_radical_population += 1;
+                } else {
+                    nonradical_population += 1;
+                }
+            }
+        }
+        let exact_phase_current = ExactPhaseCurrentSection::from_integers(
+            receiver,
+            lineage,
+            origin,
+            sample_step,
+            phase_extent as usize,
+            samples,
+        )
+        .map_err(|error| NativeAcousticError::Phase(error.to_string()))?;
+        let radiation_identity_sha256 = morphology.founding_radiation_identity_sha256.clone();
+        let mut section = NativeAcousticProductionSection {
+            schema: NATIVE_ACOUSTIC_PRODUCTION_SECTION_SCHEMA.to_owned(),
+            morphology_identity_sha256: morphology.identity_sha256.clone(),
+            radiation_identity_sha256,
+            causal_orders: expanded_emissions.iter().map(|(order, _)| *order).collect(),
+            exact_phase_current,
+            common_denominator,
+            outward_radical_population,
+            nonradical_population,
+            complete_port_quadrature_fibre: fibre,
+            source_samples_accessible: false,
+            waveform_template_applied: false,
+            identity_sha256: String::new(),
+        };
+        section.identity_sha256 = section.rederived_identity()?;
+        section.validate()?;
+        Ok((morphology, section))
     }
 
     fn rederived_identity(&self) -> Result<String, NativeAcousticError> {
@@ -1196,9 +1318,7 @@ pub enum NativeAcousticError {
     MalformedMorphology,
     #[error("the exact acoustic production section is malformed")]
     MalformedProduction,
-    #[error(
-        "the exact acoustic projective current lost its primitive ray or reconstruction scale"
-    )]
+    #[error("the exact acoustic projective current lost its primitive ray or reconstruction scale")]
     MalformedProjectiveCurrent,
     #[error("the acoustic room return lost its exact finite receiver current")]
     MalformedReceiverCurrent,
@@ -1369,6 +1489,64 @@ mod tests {
         let morphology = NativeAcousticProductionMorphology::found(&input).unwrap();
         assert_eq!(morphology.phase_extent, 4);
         assert_eq!(morphology.ordered_ports, vec![(0, 7), (1, 9)]);
+    }
+
+    #[test]
+    fn phase_session_factor_retains_ordered_silence_and_quadrature() {
+        let orders = vec![
+            (4, vec![current(0, 0), current(3, -2)]),
+            (5, vec![current(0, 0), current(5, 1)]),
+        ];
+        let (morphology, section) = NativeAcousticProductionMorphology::found_phase_session(
+            "1".repeat(64),
+            "2".repeat(64),
+            PhaseCurrentReceiverId(11),
+            PhaseCurrentLineageId(12),
+            Rat::from_integer(BigInt::from(0)),
+            Rat::new(BigInt::from(1), BigInt::from(16_000)),
+            &orders,
+        )
+        .unwrap();
+        assert_eq!(morphology.ordered_ports, vec![(0, 0), (1, 1)]);
+        assert_eq!(section.causal_orders, vec![4, 5]);
+        assert_eq!(section.complete_port_quadrature_fibre.len(), 4);
+        assert_eq!(section.exact_phase_current.flat_values().len(), 8);
+        assert!(section.complete_port_quadrature_fibre[0].3.is_zero());
+        assert_eq!(section.complete_port_quadrature_fibre[3].3, current(5, 1));
+        assert_eq!(section.outward_radical_population, 2);
+        assert_eq!(section.nonradical_population, 2);
+    }
+
+    #[test]
+    fn phase_session_factor_refuses_gaps_or_incomplete_ports() {
+        let gap = vec![(0, vec![current(1, 0)]), (2, vec![current(1, 0)])];
+        assert_eq!(
+            NativeAcousticProductionMorphology::found_phase_session(
+                "1".repeat(64),
+                "2".repeat(64),
+                PhaseCurrentReceiverId(1),
+                PhaseCurrentLineageId(1),
+                Rat::from_integer(BigInt::from(0)),
+                Rat::from_integer(BigInt::from(1)),
+                &gap,
+            )
+            .unwrap_err(),
+            NativeAcousticError::Lineage
+        );
+        let incomplete = vec![(0, vec![current(1, 0)]), (1, vec![])];
+        assert_eq!(
+            NativeAcousticProductionMorphology::found_phase_session(
+                "1".repeat(64),
+                "2".repeat(64),
+                PhaseCurrentReceiverId(1),
+                PhaseCurrentLineageId(1),
+                Rat::from_integer(BigInt::from(0)),
+                Rat::from_integer(BigInt::from(1)),
+                &incomplete,
+            )
+            .unwrap_err(),
+            NativeAcousticError::Lineage
+        );
     }
 
     #[test]

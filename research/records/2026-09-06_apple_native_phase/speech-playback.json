@@ -1,0 +1,28 @@
+{
+  "buffers": [],
+  "channelCount": 1,
+  "completed": true,
+  "conversionLoss": "AVAudioFile/device conversion is exterior; source WAV remains unchanged",
+  "deviceName": "MacBook Pro Speakers",
+  "deviceUID": "BuiltInSpeakerDevice",
+  "hardwareFormat": "float32 44100.0Hz 1ch noninterleaved",
+  "hostClock": "mach_absolute_time",
+  "hostTimebase": {
+    "nanosecondsNumerator": 125,
+    "ticksDenominator": 3
+  },
+  "operation": "playback",
+  "outputFormat": "float32 48000.0Hz 2ch noninterleaved",
+  "permission": "playback started successfully",
+  "playbackEndHostTime": 12527147494229,
+  "playbackPlayedFrames": 105616,
+  "playbackScheduledFileFrames": 105616,
+  "playbackScheduledSampleEnd": 105616,
+  "playbackScheduledSampleRate": 44100,
+  "playbackScheduledSampleStart": 0,
+  "playbackStartHostTime": 12527088338702,
+  "sampleRate": 44100,
+  "schema": "holonics.audio.exterior-receipt.v1",
+  "terminationReason": "finite playback player completion (dataPlayedBack); dataPlayedBack callback confirms player playback completion, DAC output timestamp unavailable",
+  "totalFrames": 105616
+}

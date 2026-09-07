@@ -71,26 +71,28 @@ use serde::Serialize;
 use sha2::{Digest, Sha256};
 use thiserror::Error;
 
-use crate::cuda_aperture::DerivedLaunch;
+use crate::device_launch::DerivedLaunch;
 use crate::embedding_fiber::{MountedReadout, ResidentReadout};
 use crate::exact_value::ExactInterval;
 use crate::exact_work::ExactWork;
 use crate::hardware_cover::{DeviceDeclaration, HardwareCover, ModeIdentity};
+#[cfg(target_os = "linux")]
+use mount::DeviceAttribute;
 use mount::{
-    BorrowedContext, Device, DeviceAttribute, DeviceBuffer, Dim3, Event, GraphCensus, GraphExec,
-    MemoryInfo, Module, Stream,
+    BorrowedContext, Device, DeviceBuffer, Dim3, Event, GraphCensus, GraphExec, MemoryInfo, Module,
+    Stream,
 };
 
 #[path = "resident_section/geometry.rs"]
 mod geometry;
-#[path = "resident_section/surface_mount.rs"]
-mod surface_mount;
-#[path = "resident_section/surface_passage.rs"]
-mod surface_passage;
 #[path = "resident_section/surface_adjoint.rs"]
 mod surface_adjoint;
 #[path = "resident_section/surface_intervention.rs"]
 mod surface_intervention;
+#[path = "resident_section/surface_mount.rs"]
+mod surface_mount;
+#[path = "resident_section/surface_passage.rs"]
+mod surface_passage;
 #[path = "resident_section/surface_shapes.rs"]
 mod surface_shapes;
 #[path = "resident_section/surface_tiled.rs"]
@@ -99,7 +101,11 @@ mod surface_tiled;
 pub use geometry::*;
 pub use surface_intervention::SiteMask;
 
+#[cfg(target_os = "linux")]
 const PTX: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/exact_resident_section.ptx"));
+#[cfg(target_os = "macos")]
+const METAL_SOURCE: &str = include_str!("../../../accelerators/metal/native_phase.metal");
+
 /// The exact accumulator the kernels carry, read off `__int128`; one octave is the hand.
 const WIDE_OCTAVES: u32 = 127;
 /// The signed word a section coordinate is stored in, read off `i64`; one octave is the hand.
@@ -115,6 +121,7 @@ pub const SLOT_WORDS: usize = 16;
 ///
 /// Falsifier: `resident_blocks` computed with it must reproduce the measured
 /// `resident_blocks_per_sm` of every kernel the profiler has already read.
+#[cfg(target_os = "linux")]
 const REGISTER_GRAIN_PER_WARP: u32 = 256;
 
 /// **The warps the block-aggregated census folds across**, mirroring `CENSUS_MAX_WARPS` in
@@ -198,19 +205,33 @@ pub const KERNELS: [&str; 50] = [
 ];
 
 /// `CUdevice_attribute` selectors from `cuda.h`, fixed by the foreign interface.
+#[cfg(target_os = "linux")]
 const ATTRIBUTE_MAX_THREADS_PER_BLOCK: i32 = 1;
+#[cfg(target_os = "linux")]
 const ATTRIBUTE_MAX_GRID_DIM_X: i32 = 5;
+#[cfg(target_os = "linux")]
 const ATTRIBUTE_MAX_SHARED_MEMORY_PER_BLOCK: i32 = 8;
+#[cfg(target_os = "linux")]
 const ATTRIBUTE_WARP_SIZE: i32 = 10;
+#[cfg(target_os = "linux")]
 const ATTRIBUTE_MULTIPROCESSOR_COUNT: i32 = 16;
+#[cfg(target_os = "linux")]
 const ATTRIBUTE_CONCURRENT_KERNELS: i32 = 31;
+#[cfg(target_os = "linux")]
 const ATTRIBUTE_MAX_THREADS_PER_MULTIPROCESSOR: i32 = 39;
+#[cfg(target_os = "linux")]
 const ATTRIBUTE_ASYNC_ENGINE_COUNT: i32 = 40;
+#[cfg(target_os = "linux")]
 const ATTRIBUTE_UNIFIED_ADDRESSING: i32 = 41;
+#[cfg(target_os = "linux")]
 const ATTRIBUTE_COMPUTE_CAPABILITY_MAJOR: i32 = 75;
+#[cfg(target_os = "linux")]
 const ATTRIBUTE_COMPUTE_CAPABILITY_MINOR: i32 = 76;
+#[cfg(target_os = "linux")]
 const ATTRIBUTE_MAX_SHARED_MEMORY_PER_MULTIPROCESSOR: i32 = 81;
+#[cfg(target_os = "linux")]
 const ATTRIBUTE_MAX_REGISTERS_PER_MULTIPROCESSOR: i32 = 82;
+#[cfg(target_os = "linux")]
 const ATTRIBUTE_MAX_BLOCKS_PER_MULTIPROCESSOR: i32 = 106;
 
 /// The refusal flags the kernels raise, mirrored from the kernel header.
@@ -223,9 +244,9 @@ pub const REFUSED_BOUND: u32 = 16;
 /// **Every way the resident owner refuses.** None of them is answered by a CPU computation.
 #[derive(Debug, Error)]
 pub enum ResidentRefusal {
-    #[error("the CUDA driver reports no device; the resident chart is not mounted")]
+    #[error("the device runtime reports no device; the resident chart is not mounted")]
     NoResidentChart,
-    #[error("CUDA {operation} returned {code} ({name}): {message}")]
+    #[error("{operation} returned {code} ({name}): {message}")]
     Driver {
         operation: String,
         code: i32,
@@ -640,26 +661,38 @@ impl<'chart> ResidentSection<'chart> {
         // SAFETY: ManuallyDrop suppresses the section's destructor. Each owning buffer is
         // moved exactly once: lo into the endpoint, hi into its destructor. The surface and
         // dimensions are borrowed/Copy; census ownership is split with those two buffers.
-        let (words, upper) = unsafe {
-            (std::ptr::read(&section.lo), std::ptr::read(&section.hi))
-        };
+        let (words, upper) = unsafe { (std::ptr::read(&section.lo), std::ptr::read(&section.hi)) };
         let retained_octets = (words.len() * std::mem::size_of::<i64>()) as u64;
         drop(upper);
-        section.surface.released_octets(section.octets - retained_octets);
-        ResidentEndpoint { surface: section.surface, words, rows: section.rows, width: section.width }
+        section
+            .surface
+            .released_octets(section.octets - retained_octets);
+        ResidentEndpoint {
+            surface: section.surface,
+            words,
+            rows: section.rows,
+            width: section.width,
+        }
     }
 }
 
 impl ResidentEndpoint<'_> {
-    pub(crate) fn lo_device_ptr(&self) -> u64 { self.words.device_ptr() }
-    pub(crate) fn rows(&self) -> usize { self.rows }
-    pub(crate) fn width(&self) -> usize { self.width }
+    pub(crate) fn lo_device_ptr(&self) -> u64 {
+        self.words.device_ptr()
+    }
+    pub(crate) fn rows(&self) -> usize {
+        self.rows
+    }
+    pub(crate) fn width(&self) -> usize {
+        self.width
+    }
 }
 
 impl Drop for ResidentEndpoint<'_> {
     fn drop(&mut self) {
         let _ = self.surface.context.make_current();
-        self.surface.released_octets((self.words.len() * std::mem::size_of::<i64>()) as u64);
+        self.surface
+            .released_octets((self.words.len() * std::mem::size_of::<i64>()) as u64);
     }
 }
 

@@ -1,0 +1,1693 @@
+{
+  "schema": "holonics.apple.as4.acoustic-observer-report.v1",
+  "runs": ".local/artifacts/acoustic/controls/runs.json",
+  "receiver": ".local/artifacts/acoustic/receiver.json",
+  "render_binary": "target/debug/holonics-acoustic",
+  "comparison": "all rational phase coordinates (including each production denominator) and complete port fibre are compared before generated PCM; rational JSON values are exact strings",
+  "pcm_interpretation": "cold sonification receiver face; it is not a waveform-copy or speech result",
+  "cases": [
+    {
+      "source": "1-100032-A-0.wav",
+      "variants": [
+        {
+          "variant": "original",
+          "wav": ".local/datasets/esc50-as4-controls/controls/1-100032-A-0__original.wav",
+          "checkpoint": ".local/artifacts/acoustic/controls/1-100032-A-0__original.hna",
+          "render_dir": ".local/artifacts/acoustic/controls/observed/1-100032-A-0__original",
+          "render_stdout": null,
+          "exact_phase_metrics": {
+            "cell_count": 11025,
+            "phase_extent": 4,
+            "nonzero_coordinates": 12832,
+            "absolute_rational_current_sum": "51009523/8192",
+            "oriented_rational_sums_by_phase": [
+              "-38003/2048",
+              "0",
+              "0",
+              "-38003/2048"
+            ]
+          },
+          "exact_phase_difference_from_original": {
+            "changed_cells": 0,
+            "changed_coordinates": 0,
+            "absolute_oriented_rational_difference_sum": "0",
+            "oriented_rational_difference_sums_by_phase": [
+              "0",
+              "0",
+              "0",
+              "0"
+            ],
+            "all_coordinates_negate_original": false
+          },
+          "complete_port_quadrature_fibre_equal_to_original": true,
+          "complete_port_quadrature_fibre_difference_from_original": {
+            "entry_count": 22050,
+            "changed_entries": 0,
+            "changed_current_entries": 0,
+            "changed_entry_indices_sample": []
+          },
+          "pcm_difference_from_original": {
+            "equal": true,
+            "all_samples_negate_original": false,
+            "changed_samples": 0,
+            "absolute_oriented_difference_sum": 0,
+            "oriented_difference_sum": 0
+          },
+          "receiver_and_rank": {
+            "initial_successor_rank": 0,
+            "final_successor_rank": 2,
+            "initial_native_receiver": {
+              "current": [
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ],
+              "kind": "unique"
+            },
+            "final_native_receiver": {
+              "directions": [
+                [
+                  {
+                    "denominator": "1",
+                    "numerator": "1"
+                  },
+                  {
+                    "denominator": "1",
+                    "numerator": "0"
+                  }
+                ]
+              ],
+              "kind": "plural",
+              "particular": [
+                {
+                  "denominator": "16384",
+                  "numerator": "8801"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ]
+            },
+            "final_received_difference": {
+              "arrived": {
+                "imaginary": {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                "real": {
+                  "denominator": "8192",
+                  "numerator": "4657"
+                }
+              },
+              "former_receiver_fibre": {
+                "directions": [
+                  [
+                    {
+                      "denominator": "1",
+                      "numerator": "1"
+                    },
+                    {
+                      "denominator": "1",
+                      "numerator": "0"
+                    }
+                  ]
+                ],
+                "kind": "plural",
+                "particular": [
+                  {
+                    "denominator": "32768",
+                    "numerator": "15375"
+                  },
+                  {
+                    "denominator": "1",
+                    "numerator": "0"
+                  }
+                ]
+              },
+              "native_source_occurrence": 11023,
+              "source": 11023
+            },
+            "final_root_currents": [
+              {
+                "imaginary": {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                "real": {
+                  "denominator": "16384",
+                  "numerator": "8801"
+                }
+              },
+              {
+                "imaginary": {
+                  "denominator": "16384",
+                  "numerator": "8801"
+                },
+                "real": {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              }
+            ],
+            "next_sample": 11025,
+            "complete": true,
+            "pending": null,
+            "declared_port_coordinates": [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                1
+              ]
+            ],
+            "complete_port_current_fibre_entries": 22050,
+            "complete_port_current_fibre_retained": true
+          },
+          "production_flags": {
+            "source_samples_accessible": false,
+            "waveform_template_applied": false,
+            "complete_port_quadrature_fibre_retained": true
+          },
+          "pcm_projection": {
+            "samples": 11088,
+            "nonzero_sample_population": 5823,
+            "clipped_sample_population": 0,
+            "cold_renderer_only": true
+          }
+        },
+        {
+          "variant": "reversed",
+          "wav": ".local/datasets/esc50-as4-controls/controls/1-100032-A-0__reversed.wav",
+          "checkpoint": ".local/artifacts/acoustic/controls/1-100032-A-0__reversed.hna",
+          "render_dir": ".local/artifacts/acoustic/controls/observed/1-100032-A-0__reversed",
+          "render_stdout": null,
+          "exact_phase_metrics": {
+            "cell_count": 11025,
+            "phase_extent": 4,
+            "nonzero_coordinates": 22048,
+            "absolute_rational_current_sum": "119071127/8192",
+            "oriented_rational_sums_by_phase": [
+              "100162705/16384",
+              "0",
+              "0",
+              "100162705/16384"
+            ]
+          },
+          "exact_phase_difference_from_original": {
+            "changed_cells": 11023,
+            "changed_coordinates": 22046,
+            "absolute_oriented_rational_difference_sum": "138283573/8192",
+            "oriented_rational_difference_sums_by_phase": [
+              "100466729/16384",
+              "0",
+              "0",
+              "100466729/16384"
+            ],
+            "all_coordinates_negate_original": false
+          },
+          "complete_port_quadrature_fibre_equal_to_original": false,
+          "complete_port_quadrature_fibre_difference_from_original": {
+            "entry_count": 22050,
+            "changed_entries": 22046,
+            "changed_current_entries": 22046,
+            "changed_entry_indices_sample": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17
+            ]
+          },
+          "pcm_difference_from_original": {
+            "equal": false,
+            "all_samples_negate_original": false,
+            "changed_samples": 11068,
+            "absolute_oriented_difference_sum": 8444743,
+            "oriented_difference_sum": 87013
+          },
+          "receiver_and_rank": {
+            "initial_successor_rank": 0,
+            "final_successor_rank": 2,
+            "initial_native_receiver": {
+              "current": [
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ],
+              "kind": "unique"
+            },
+            "final_native_receiver": {
+              "directions": [
+                [
+                  {
+                    "denominator": "1",
+                    "numerator": "1"
+                  },
+                  {
+                    "denominator": "1",
+                    "numerator": "0"
+                  }
+                ]
+              ],
+              "kind": "plural",
+              "particular": [
+                {
+                  "denominator": "53297152",
+                  "numerator": "61562995"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ]
+            },
+            "final_received_difference": {
+              "arrived": {
+                "imaginary": {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                "real": {
+                  "denominator": "8192",
+                  "numerator": "4657"
+                }
+              },
+              "former_receiver_fibre": {
+                "directions": [
+                  [
+                    {
+                      "denominator": "1",
+                      "numerator": "1"
+                    },
+                    {
+                      "denominator": "1",
+                      "numerator": "0"
+                    }
+                  ]
+                ],
+                "kind": "plural",
+                "particular": [
+                  {
+                    "denominator": "26648576",
+                    "numerator": "32575715"
+                  },
+                  {
+                    "denominator": "1",
+                    "numerator": "0"
+                  }
+                ]
+              },
+              "native_source_occurrence": 11023,
+              "source": 11023
+            },
+            "final_root_currents": [
+              {
+                "imaginary": {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                "real": {
+                  "denominator": "16384",
+                  "numerator": "8801"
+                }
+              },
+              {
+                "imaginary": {
+                  "denominator": "16384",
+                  "numerator": "8801"
+                },
+                "real": {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              }
+            ],
+            "next_sample": 11025,
+            "complete": true,
+            "pending": null,
+            "declared_port_coordinates": [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                1
+              ]
+            ],
+            "complete_port_current_fibre_entries": 22050,
+            "complete_port_current_fibre_retained": true
+          },
+          "production_flags": {
+            "source_samples_accessible": false,
+            "waveform_template_applied": false,
+            "complete_port_quadrature_fibre_retained": true
+          },
+          "pcm_projection": {
+            "samples": 11088,
+            "nonzero_sample_population": 11076,
+            "clipped_sample_population": 0,
+            "cold_renderer_only": true
+          }
+        },
+        {
+          "variant": "polarity-inverted",
+          "wav": ".local/datasets/esc50-as4-controls/controls/1-100032-A-0__polarity-inverted.wav",
+          "checkpoint": ".local/artifacts/acoustic/controls/1-100032-A-0__polarity-inverted.hna",
+          "render_dir": ".local/artifacts/acoustic/controls/observed/1-100032-A-0__polarity-inverted",
+          "render_stdout": null,
+          "exact_phase_metrics": {
+            "cell_count": 11025,
+            "phase_extent": 4,
+            "nonzero_coordinates": 12832,
+            "absolute_rational_current_sum": "51009523/8192",
+            "oriented_rational_sums_by_phase": [
+              "38003/2048",
+              "0",
+              "0",
+              "38003/2048"
+            ]
+          },
+          "exact_phase_difference_from_original": {
+            "changed_cells": 6416,
+            "changed_coordinates": 12832,
+            "absolute_oriented_rational_difference_sum": "51009523/4096",
+            "oriented_rational_difference_sums_by_phase": [
+              "38003/1024",
+              "0",
+              "0",
+              "38003/1024"
+            ],
+            "all_coordinates_negate_original": true
+          },
+          "complete_port_quadrature_fibre_equal_to_original": false,
+          "complete_port_quadrature_fibre_difference_from_original": {
+            "entry_count": 22050,
+            "changed_entries": 12832,
+            "changed_current_entries": 12832,
+            "changed_entry_indices_sample": [
+              9092,
+              9093,
+              9096,
+              9097,
+              9100,
+              9101,
+              9104,
+              9105,
+              9108,
+              9109,
+              9112,
+              9113,
+              9116,
+              9117,
+              9120,
+              9121
+            ]
+          },
+          "pcm_difference_from_original": {
+            "equal": false,
+            "all_samples_negate_original": true,
+            "changed_samples": 5823,
+            "absolute_oriented_difference_sum": 9304492,
+            "oriented_difference_sum": -1504
+          },
+          "receiver_and_rank": {
+            "initial_successor_rank": 0,
+            "final_successor_rank": 2,
+            "initial_native_receiver": {
+              "current": [
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ],
+              "kind": "unique"
+            },
+            "final_native_receiver": {
+              "directions": [
+                [
+                  {
+                    "denominator": "1",
+                    "numerator": "1"
+                  },
+                  {
+                    "denominator": "1",
+                    "numerator": "0"
+                  }
+                ]
+              ],
+              "kind": "plural",
+              "particular": [
+                {
+                  "denominator": "16384",
+                  "numerator": "-8801"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ]
+            },
+            "final_received_difference": {
+              "arrived": {
+                "imaginary": {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                "real": {
+                  "denominator": "8192",
+                  "numerator": "-4657"
+                }
+              },
+              "former_receiver_fibre": {
+                "directions": [
+                  [
+                    {
+                      "denominator": "1",
+                      "numerator": "1"
+                    },
+                    {
+                      "denominator": "1",
+                      "numerator": "0"
+                    }
+                  ]
+                ],
+                "kind": "plural",
+                "particular": [
+                  {
+                    "denominator": "32768",
+                    "numerator": "-15375"
+                  },
+                  {
+                    "denominator": "1",
+                    "numerator": "0"
+                  }
+                ]
+              },
+              "native_source_occurrence": 11023,
+              "source": 11023
+            },
+            "final_root_currents": [
+              {
+                "imaginary": {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                "real": {
+                  "denominator": "16384",
+                  "numerator": "-8801"
+                }
+              },
+              {
+                "imaginary": {
+                  "denominator": "16384",
+                  "numerator": "-8801"
+                },
+                "real": {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              }
+            ],
+            "next_sample": 11025,
+            "complete": true,
+            "pending": null,
+            "declared_port_coordinates": [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                1
+              ]
+            ],
+            "complete_port_current_fibre_entries": 22050,
+            "complete_port_current_fibre_retained": true
+          },
+          "production_flags": {
+            "source_samples_accessible": false,
+            "waveform_template_applied": false,
+            "complete_port_quadrature_fibre_retained": true
+          },
+          "pcm_projection": {
+            "samples": 11088,
+            "nonzero_sample_population": 5823,
+            "clipped_sample_population": 0,
+            "cold_renderer_only": true
+          }
+        }
+      ]
+    },
+    {
+      "source": "3-100018-A-18.wav",
+      "variants": [
+        {
+          "variant": "original",
+          "wav": ".local/datasets/esc50-as4-controls/controls/3-100018-A-18__original.wav",
+          "checkpoint": ".local/artifacts/acoustic/controls/3-100018-A-18__original.hna",
+          "render_dir": ".local/artifacts/acoustic/controls/observed/3-100018-A-18__original",
+          "render_stdout": null,
+          "exact_phase_metrics": {
+            "cell_count": 11025,
+            "phase_extent": 4,
+            "nonzero_coordinates": 22048,
+            "absolute_rational_current_sum": "975044813/16384",
+            "oriented_rational_sums_by_phase": [
+              "407532981/32768",
+              "0",
+              "0",
+              "407532981/32768"
+            ]
+          },
+          "exact_phase_difference_from_original": {
+            "changed_cells": 0,
+            "changed_coordinates": 0,
+            "absolute_oriented_rational_difference_sum": "0",
+            "oriented_rational_difference_sums_by_phase": [
+              "0",
+              "0",
+              "0",
+              "0"
+            ],
+            "all_coordinates_negate_original": false
+          },
+          "complete_port_quadrature_fibre_equal_to_original": true,
+          "complete_port_quadrature_fibre_difference_from_original": {
+            "entry_count": 22050,
+            "changed_entries": 0,
+            "changed_current_entries": 0,
+            "changed_entry_indices_sample": []
+          },
+          "pcm_difference_from_original": {
+            "equal": true,
+            "all_samples_negate_original": false,
+            "changed_samples": 0,
+            "absolute_oriented_difference_sum": 0,
+            "oriented_difference_sum": 0
+          },
+          "receiver_and_rank": {
+            "initial_successor_rank": 0,
+            "final_successor_rank": 2,
+            "initial_native_receiver": {
+              "current": [
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ],
+              "kind": "unique"
+            },
+            "final_native_receiver": {
+              "directions": [
+                [
+                  {
+                    "denominator": "1",
+                    "numerator": "1"
+                  },
+                  {
+                    "denominator": "1",
+                    "numerator": "0"
+                  }
+                ]
+              ],
+              "kind": "plural",
+              "particular": [
+                {
+                  "denominator": "3219456",
+                  "numerator": "9257225"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ]
+            },
+            "final_received_difference": {
+              "arrived": {
+                "imaginary": {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                "real": {
+                  "denominator": "16384",
+                  "numerator": "45117"
+                }
+              },
+              "former_receiver_fibre": {
+                "directions": [
+                  [
+                    {
+                      "denominator": "1",
+                      "numerator": "1"
+                    },
+                    {
+                      "denominator": "1",
+                      "numerator": "0"
+                    }
+                  ]
+                ],
+                "kind": "plural",
+                "particular": [
+                  {
+                    "denominator": "10731520",
+                    "numerator": "31915941"
+                  },
+                  {
+                    "denominator": "1",
+                    "numerator": "0"
+                  }
+                ]
+              },
+              "native_source_occurrence": 11023,
+              "source": 11023
+            },
+            "final_root_currents": [
+              {
+                "imaginary": {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                "real": {
+                  "denominator": "16384",
+                  "numerator": "43625"
+                }
+              },
+              {
+                "imaginary": {
+                  "denominator": "16384",
+                  "numerator": "43625"
+                },
+                "real": {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              }
+            ],
+            "next_sample": 11025,
+            "complete": true,
+            "pending": null,
+            "declared_port_coordinates": [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                1
+              ]
+            ],
+            "complete_port_current_fibre_entries": 22050,
+            "complete_port_current_fibre_retained": true
+          },
+          "production_flags": {
+            "source_samples_accessible": false,
+            "waveform_template_applied": false,
+            "complete_port_quadrature_fibre_retained": true
+          },
+          "pcm_projection": {
+            "samples": 11088,
+            "nonzero_sample_population": 11067,
+            "clipped_sample_population": 0,
+            "cold_renderer_only": true
+          }
+        },
+        {
+          "variant": "reversed",
+          "wav": ".local/datasets/esc50-as4-controls/controls/3-100018-A-18__reversed.wav",
+          "checkpoint": ".local/artifacts/acoustic/controls/3-100018-A-18__reversed.hna",
+          "render_dir": ".local/artifacts/acoustic/controls/observed/3-100018-A-18__reversed",
+          "render_stdout": null,
+          "exact_phase_metrics": {
+            "cell_count": 11025,
+            "phase_extent": 4,
+            "nonzero_coordinates": 22048,
+            "absolute_rational_current_sum": "1002353307/16384",
+            "oriented_rational_sums_by_phase": [
+              "570846077/32768",
+              "0",
+              "0",
+              "570846077/32768"
+            ]
+          },
+          "exact_phase_difference_from_original": {
+            "changed_cells": 11023,
+            "changed_coordinates": 22046,
+            "absolute_oriented_rational_difference_sum": "166848309/2048",
+            "oriented_rational_difference_sums_by_phase": [
+              "20414137/4096",
+              "0",
+              "0",
+              "20414137/4096"
+            ],
+            "all_coordinates_negate_original": false
+          },
+          "complete_port_quadrature_fibre_equal_to_original": false,
+          "complete_port_quadrature_fibre_difference_from_original": {
+            "entry_count": 22050,
+            "changed_entries": 22046,
+            "changed_current_entries": 22046,
+            "changed_entry_indices_sample": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17
+            ]
+          },
+          "pcm_difference_from_original": {
+            "equal": false,
+            "all_samples_negate_original": false,
+            "changed_samples": 9478,
+            "absolute_oriented_difference_sum": 4274310,
+            "oriented_difference_sum": 11866
+          },
+          "receiver_and_rank": {
+            "initial_successor_rank": 0,
+            "final_successor_rank": 2,
+            "initial_native_receiver": {
+              "current": [
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ],
+              "kind": "unique"
+            },
+            "final_native_receiver": {
+              "directions": [
+                [
+                  {
+                    "denominator": "1",
+                    "numerator": "1"
+                  },
+                  {
+                    "denominator": "1",
+                    "numerator": "0"
+                  }
+                ]
+              ],
+              "kind": "plural",
+              "particular": [
+                {
+                  "denominator": "147456",
+                  "numerator": "-13043875"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ]
+            },
+            "final_received_difference": {
+              "arrived": {
+                "imaginary": {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                "real": {
+                  "denominator": "16384",
+                  "numerator": "45117"
+                }
+              },
+              "former_receiver_fibre": {
+                "directions": [
+                  [
+                    {
+                      "denominator": "1",
+                      "numerator": "1"
+                    },
+                    {
+                      "denominator": "1",
+                      "numerator": "0"
+                    }
+                  ]
+                ],
+                "kind": "plural",
+                "particular": [
+                  {
+                    "denominator": "3072",
+                    "numerator": "-268801"
+                  },
+                  {
+                    "denominator": "1",
+                    "numerator": "0"
+                  }
+                ]
+              },
+              "native_source_occurrence": 11023,
+              "source": 11023
+            },
+            "final_root_currents": [
+              {
+                "imaginary": {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                "real": {
+                  "denominator": "16384",
+                  "numerator": "43625"
+                }
+              },
+              {
+                "imaginary": {
+                  "denominator": "16384",
+                  "numerator": "43625"
+                },
+                "real": {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              }
+            ],
+            "next_sample": 11025,
+            "complete": true,
+            "pending": null,
+            "declared_port_coordinates": [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                1
+              ]
+            ],
+            "complete_port_current_fibre_entries": 22050,
+            "complete_port_current_fibre_retained": true
+          },
+          "production_flags": {
+            "source_samples_accessible": false,
+            "waveform_template_applied": false,
+            "complete_port_quadrature_fibre_retained": true
+          },
+          "pcm_projection": {
+            "samples": 11088,
+            "nonzero_sample_population": 11069,
+            "clipped_sample_population": 0,
+            "cold_renderer_only": true
+          }
+        },
+        {
+          "variant": "polarity-inverted",
+          "wav": ".local/datasets/esc50-as4-controls/controls/3-100018-A-18__polarity-inverted.wav",
+          "checkpoint": ".local/artifacts/acoustic/controls/3-100018-A-18__polarity-inverted.hna",
+          "render_dir": ".local/artifacts/acoustic/controls/observed/3-100018-A-18__polarity-inverted",
+          "render_stdout": null,
+          "exact_phase_metrics": {
+            "cell_count": 11025,
+            "phase_extent": 4,
+            "nonzero_coordinates": 22048,
+            "absolute_rational_current_sum": "975044813/16384",
+            "oriented_rational_sums_by_phase": [
+              "-407532981/32768",
+              "0",
+              "0",
+              "-407532981/32768"
+            ]
+          },
+          "exact_phase_difference_from_original": {
+            "changed_cells": 11024,
+            "changed_coordinates": 22048,
+            "absolute_oriented_rational_difference_sum": "975044813/8192",
+            "oriented_rational_difference_sums_by_phase": [
+              "-407532981/16384",
+              "0",
+              "0",
+              "-407532981/16384"
+            ],
+            "all_coordinates_negate_original": true
+          },
+          "complete_port_quadrature_fibre_equal_to_original": false,
+          "complete_port_quadrature_fibre_difference_from_original": {
+            "entry_count": 22050,
+            "changed_entries": 22048,
+            "changed_current_entries": 22048,
+            "changed_entry_indices_sample": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17
+            ]
+          },
+          "pcm_difference_from_original": {
+            "equal": false,
+            "all_samples_negate_original": true,
+            "changed_samples": 11067,
+            "absolute_oriented_difference_sum": 4561912,
+            "oriented_difference_sum": -64760
+          },
+          "receiver_and_rank": {
+            "initial_successor_rank": 0,
+            "final_successor_rank": 2,
+            "initial_native_receiver": {
+              "current": [
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ],
+              "kind": "unique"
+            },
+            "final_native_receiver": {
+              "directions": [
+                [
+                  {
+                    "denominator": "1",
+                    "numerator": "1"
+                  },
+                  {
+                    "denominator": "1",
+                    "numerator": "0"
+                  }
+                ]
+              ],
+              "kind": "plural",
+              "particular": [
+                {
+                  "denominator": "3219456",
+                  "numerator": "-9257225"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ]
+            },
+            "final_received_difference": {
+              "arrived": {
+                "imaginary": {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                "real": {
+                  "denominator": "16384",
+                  "numerator": "-45117"
+                }
+              },
+              "former_receiver_fibre": {
+                "directions": [
+                  [
+                    {
+                      "denominator": "1",
+                      "numerator": "1"
+                    },
+                    {
+                      "denominator": "1",
+                      "numerator": "0"
+                    }
+                  ]
+                ],
+                "kind": "plural",
+                "particular": [
+                  {
+                    "denominator": "10731520",
+                    "numerator": "-31915941"
+                  },
+                  {
+                    "denominator": "1",
+                    "numerator": "0"
+                  }
+                ]
+              },
+              "native_source_occurrence": 11023,
+              "source": 11023
+            },
+            "final_root_currents": [
+              {
+                "imaginary": {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                "real": {
+                  "denominator": "16384",
+                  "numerator": "-43625"
+                }
+              },
+              {
+                "imaginary": {
+                  "denominator": "16384",
+                  "numerator": "-43625"
+                },
+                "real": {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              }
+            ],
+            "next_sample": 11025,
+            "complete": true,
+            "pending": null,
+            "declared_port_coordinates": [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                1
+              ]
+            ],
+            "complete_port_current_fibre_entries": 22050,
+            "complete_port_current_fibre_retained": true
+          },
+          "production_flags": {
+            "source_samples_accessible": false,
+            "waveform_template_applied": false,
+            "complete_port_quadrature_fibre_retained": true
+          },
+          "pcm_projection": {
+            "samples": 11088,
+            "nonzero_sample_population": 11067,
+            "clipped_sample_population": 0,
+            "cold_renderer_only": true
+          }
+        }
+      ]
+    },
+    {
+      "source": "4-102844-A-49.wav",
+      "variants": [
+        {
+          "variant": "original",
+          "wav": ".local/datasets/esc50-as4-controls/controls/4-102844-A-49__original.wav",
+          "checkpoint": ".local/artifacts/acoustic/controls/4-102844-A-49__original.hna",
+          "render_dir": ".local/artifacts/acoustic/controls/observed/4-102844-A-49__original",
+          "render_stdout": null,
+          "exact_phase_metrics": {
+            "cell_count": 11025,
+            "phase_extent": 4,
+            "nonzero_coordinates": 22048,
+            "absolute_rational_current_sum": "141448611/8192",
+            "oriented_rational_sums_by_phase": [
+              "-27915083/4096",
+              "0",
+              "0",
+              "-27915083/4096"
+            ]
+          },
+          "exact_phase_difference_from_original": {
+            "changed_cells": 0,
+            "changed_coordinates": 0,
+            "absolute_oriented_rational_difference_sum": "0",
+            "oriented_rational_difference_sums_by_phase": [
+              "0",
+              "0",
+              "0",
+              "0"
+            ],
+            "all_coordinates_negate_original": false
+          },
+          "complete_port_quadrature_fibre_equal_to_original": true,
+          "complete_port_quadrature_fibre_difference_from_original": {
+            "entry_count": 22050,
+            "changed_entries": 0,
+            "changed_current_entries": 0,
+            "changed_entry_indices_sample": []
+          },
+          "pcm_difference_from_original": {
+            "equal": true,
+            "all_samples_negate_original": false,
+            "changed_samples": 0,
+            "absolute_oriented_difference_sum": 0,
+            "oriented_difference_sum": 0
+          },
+          "receiver_and_rank": {
+            "initial_successor_rank": 0,
+            "final_successor_rank": 2,
+            "initial_native_receiver": {
+              "current": [
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ],
+              "kind": "unique"
+            },
+            "final_native_receiver": {
+              "directions": [
+                [
+                  {
+                    "denominator": "1",
+                    "numerator": "1"
+                  },
+                  {
+                    "denominator": "1",
+                    "numerator": "0"
+                  }
+                ]
+              ],
+              "kind": "plural",
+              "particular": [
+                {
+                  "denominator": "475136",
+                  "numerator": "-73489"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ]
+            },
+            "final_received_difference": {
+              "arrived": {
+                "imaginary": {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                "real": {
+                  "denominator": "512",
+                  "numerator": "-189"
+                }
+              },
+              "former_receiver_fibre": {
+                "directions": [
+                  [
+                    {
+                      "denominator": "1",
+                      "numerator": "1"
+                    },
+                    {
+                      "denominator": "1",
+                      "numerator": "0"
+                    }
+                  ]
+                ],
+                "kind": "plural",
+                "particular": [
+                  {
+                    "denominator": "59392",
+                    "numerator": "-8697"
+                  },
+                  {
+                    "denominator": "1",
+                    "numerator": "0"
+                  }
+                ]
+              },
+              "native_source_occurrence": 11023,
+              "source": 11023
+            },
+            "final_root_currents": [
+              {
+                "imaginary": {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                "real": {
+                  "denominator": "16384",
+                  "numerator": "-5653"
+                }
+              },
+              {
+                "imaginary": {
+                  "denominator": "16384",
+                  "numerator": "-5653"
+                },
+                "real": {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              }
+            ],
+            "next_sample": 11025,
+            "complete": true,
+            "pending": null,
+            "declared_port_coordinates": [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                1
+              ]
+            ],
+            "complete_port_current_fibre_entries": 22050,
+            "complete_port_current_fibre_retained": true
+          },
+          "production_flags": {
+            "source_samples_accessible": false,
+            "waveform_template_applied": false,
+            "complete_port_quadrature_fibre_retained": true
+          },
+          "pcm_projection": {
+            "samples": 11088,
+            "nonzero_sample_population": 11044,
+            "clipped_sample_population": 0,
+            "cold_renderer_only": true
+          }
+        },
+        {
+          "variant": "reversed",
+          "wav": ".local/datasets/esc50-as4-controls/controls/4-102844-A-49__reversed.wav",
+          "checkpoint": ".local/artifacts/acoustic/controls/4-102844-A-49__reversed.hna",
+          "render_dir": ".local/artifacts/acoustic/controls/observed/4-102844-A-49__reversed",
+          "render_stdout": null,
+          "exact_phase_metrics": {
+            "cell_count": 11025,
+            "phase_extent": 4,
+            "nonzero_coordinates": 22048,
+            "absolute_rational_current_sum": "55286339/4096",
+            "oriented_rational_sums_by_phase": [
+              "47158767/16384",
+              "0",
+              "0",
+              "47158767/16384"
+            ]
+          },
+          "exact_phase_difference_from_original": {
+            "changed_cells": 11023,
+            "changed_coordinates": 22046,
+            "absolute_oriented_rational_difference_sum": "200579859/8192",
+            "oriented_rational_difference_sums_by_phase": [
+              "158819099/16384",
+              "0",
+              "0",
+              "158819099/16384"
+            ],
+            "all_coordinates_negate_original": false
+          },
+          "complete_port_quadrature_fibre_equal_to_original": false,
+          "complete_port_quadrature_fibre_difference_from_original": {
+            "entry_count": 22050,
+            "changed_entries": 22046,
+            "changed_current_entries": 22046,
+            "changed_entry_indices_sample": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17
+            ]
+          },
+          "pcm_difference_from_original": {
+            "equal": false,
+            "all_samples_negate_original": false,
+            "changed_samples": 11048,
+            "absolute_oriented_difference_sum": 5280191,
+            "oriented_difference_sum": 101297
+          },
+          "receiver_and_rank": {
+            "initial_successor_rank": 0,
+            "final_successor_rank": 2,
+            "initial_native_receiver": {
+              "current": [
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ],
+              "kind": "unique"
+            },
+            "final_native_receiver": {
+              "directions": [
+                [
+                  {
+                    "denominator": "1",
+                    "numerator": "1"
+                  },
+                  {
+                    "denominator": "1",
+                    "numerator": "0"
+                  }
+                ]
+              ],
+              "kind": "plural",
+              "particular": [
+                {
+                  "denominator": "22806528",
+                  "numerator": "-16512413"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ]
+            },
+            "final_received_difference": {
+              "arrived": {
+                "imaginary": {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                "real": {
+                  "denominator": "512",
+                  "numerator": "-189"
+                }
+              },
+              "former_receiver_fibre": {
+                "directions": [
+                  [
+                    {
+                      "denominator": "1",
+                      "numerator": "1"
+                    },
+                    {
+                      "denominator": "1",
+                      "numerator": "0"
+                    }
+                  ]
+                ],
+                "kind": "plural",
+                "particular": [
+                  {
+                    "denominator": "11403264",
+                    "numerator": "-8917813"
+                  },
+                  {
+                    "denominator": "1",
+                    "numerator": "0"
+                  }
+                ]
+              },
+              "native_source_occurrence": 11023,
+              "source": 11023
+            },
+            "final_root_currents": [
+              {
+                "imaginary": {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                "real": {
+                  "denominator": "16384",
+                  "numerator": "-5653"
+                }
+              },
+              {
+                "imaginary": {
+                  "denominator": "16384",
+                  "numerator": "-5653"
+                },
+                "real": {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              }
+            ],
+            "next_sample": 11025,
+            "complete": true,
+            "pending": null,
+            "declared_port_coordinates": [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                1
+              ]
+            ],
+            "complete_port_current_fibre_entries": 22050,
+            "complete_port_current_fibre_retained": true
+          },
+          "production_flags": {
+            "source_samples_accessible": false,
+            "waveform_template_applied": false,
+            "complete_port_quadrature_fibre_retained": true
+          },
+          "pcm_projection": {
+            "samples": 11088,
+            "nonzero_sample_population": 11055,
+            "clipped_sample_population": 0,
+            "cold_renderer_only": true
+          }
+        },
+        {
+          "variant": "polarity-inverted",
+          "wav": ".local/datasets/esc50-as4-controls/controls/4-102844-A-49__polarity-inverted.wav",
+          "checkpoint": ".local/artifacts/acoustic/controls/4-102844-A-49__polarity-inverted.hna",
+          "render_dir": ".local/artifacts/acoustic/controls/observed/4-102844-A-49__polarity-inverted",
+          "render_stdout": null,
+          "exact_phase_metrics": {
+            "cell_count": 11025,
+            "phase_extent": 4,
+            "nonzero_coordinates": 22048,
+            "absolute_rational_current_sum": "141448611/8192",
+            "oriented_rational_sums_by_phase": [
+              "27915083/4096",
+              "0",
+              "0",
+              "27915083/4096"
+            ]
+          },
+          "exact_phase_difference_from_original": {
+            "changed_cells": 11024,
+            "changed_coordinates": 22048,
+            "absolute_oriented_rational_difference_sum": "141448611/4096",
+            "oriented_rational_difference_sums_by_phase": [
+              "27915083/2048",
+              "0",
+              "0",
+              "27915083/2048"
+            ],
+            "all_coordinates_negate_original": true
+          },
+          "complete_port_quadrature_fibre_equal_to_original": false,
+          "complete_port_quadrature_fibre_difference_from_original": {
+            "entry_count": 22050,
+            "changed_entries": 22048,
+            "changed_current_entries": 22048,
+            "changed_entry_indices_sample": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17
+            ]
+          },
+          "pcm_difference_from_original": {
+            "equal": false,
+            "all_samples_negate_original": true,
+            "changed_samples": 11044,
+            "absolute_oriented_difference_sum": 5516802,
+            "oriented_difference_sum": 139114
+          },
+          "receiver_and_rank": {
+            "initial_successor_rank": 0,
+            "final_successor_rank": 2,
+            "initial_native_receiver": {
+              "current": [
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ],
+              "kind": "unique"
+            },
+            "final_native_receiver": {
+              "directions": [
+                [
+                  {
+                    "denominator": "1",
+                    "numerator": "1"
+                  },
+                  {
+                    "denominator": "1",
+                    "numerator": "0"
+                  }
+                ]
+              ],
+              "kind": "plural",
+              "particular": [
+                {
+                  "denominator": "475136",
+                  "numerator": "73489"
+                },
+                {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              ]
+            },
+            "final_received_difference": {
+              "arrived": {
+                "imaginary": {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                "real": {
+                  "denominator": "512",
+                  "numerator": "189"
+                }
+              },
+              "former_receiver_fibre": {
+                "directions": [
+                  [
+                    {
+                      "denominator": "1",
+                      "numerator": "1"
+                    },
+                    {
+                      "denominator": "1",
+                      "numerator": "0"
+                    }
+                  ]
+                ],
+                "kind": "plural",
+                "particular": [
+                  {
+                    "denominator": "59392",
+                    "numerator": "8697"
+                  },
+                  {
+                    "denominator": "1",
+                    "numerator": "0"
+                  }
+                ]
+              },
+              "native_source_occurrence": 11023,
+              "source": 11023
+            },
+            "final_root_currents": [
+              {
+                "imaginary": {
+                  "denominator": "1",
+                  "numerator": "0"
+                },
+                "real": {
+                  "denominator": "16384",
+                  "numerator": "5653"
+                }
+              },
+              {
+                "imaginary": {
+                  "denominator": "16384",
+                  "numerator": "5653"
+                },
+                "real": {
+                  "denominator": "1",
+                  "numerator": "0"
+                }
+              }
+            ],
+            "next_sample": 11025,
+            "complete": true,
+            "pending": null,
+            "declared_port_coordinates": [
+              [
+                0,
+                0
+              ],
+              [
+                1,
+                1
+              ]
+            ],
+            "complete_port_current_fibre_entries": 22050,
+            "complete_port_current_fibre_retained": true
+          },
+          "production_flags": {
+            "source_samples_accessible": false,
+            "waveform_template_applied": false,
+            "complete_port_quadrature_fibre_retained": true
+          },
+          "pcm_projection": {
+            "samples": 11088,
+            "nonzero_sample_population": 11044,
+            "clipped_sample_population": 0,
+            "cold_renderer_only": true
+          }
+        }
+      ]
+    }
+  ]
+}

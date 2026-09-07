@@ -1,2 +1,6 @@
 mlx==0.32.2
 mlx-metal==0.32.2
+huggingface_hub==1.30.0
+datasets==5.0.1
+soundfile==0.14.0
+matplotlib==3.11.1
