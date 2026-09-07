@@ -20,7 +20,38 @@ audio is the development material; microphone recording is not a prerequisite. E
 `run` founds a seed, and `resume` continues that retained WAV/text experiment; neither command
 yet adds a new conversation to a continuing corpus-cultivated model.
 
-## Digital contact and return
+## Shared material field and profiling
+
+[established-bounded; implemented-exact] `holonics_hna::native::acoustic_field::AcousticFieldChart`
+now supplies complete timed coefficient fields to the shared `NativeConstitutiveField` used by
+the desktop material work. The field performs one joint operation, retaining both complex outgoing
+and held branches and the full source/receiving relation. This changes the native operation from
+the scalar probe below; it does not establish learned acoustic organization merely by grouping
+coefficients. Its port extent remains a caller-declared receiver aperture, and the exact source
+section, times and padding remain explicit. Source handles are passed only for declared receiving
+interactions; chronological adjacency does not create one.
+
+[established-bounded; implemented-exact] `NativeConstitutiveField::intrinsic_profile()` borrows
+material, historical sources/frames and predecessor relations without another device readout or
+consuming a source handle. It reports actual chart extents separately from intrinsic dimensions
+not exposed by this profile. The `acoustic_field_profile` example measures complete recordings
+through one continuing field and reports native source/receiver faces, latency and `TransferCensus`.
+The field API still reads each operation's terminal result; the profile adds no further readout.
+
+```sh
+cargo build --release -p holonics-hna --example acoustic_field_profile
+target/release/examples/acoustic_field_profile field-seed.json sound.wav english.wav
+```
+
+[definition] The seed uses the existing `NativeModelSpec` schema; its number of junctions is the
+declared temporal coefficient aperture. This profiler does not infer receiving contact between
+adjacent recordings or cells, select a response from a plural fibre, or report native field
+rest/remount. Its native sources stay owned by that running field. Timed productive acoustic
+emission and contextual acoustic morphology remain separate unfinished compositions; the
+[field construction record](../research/records/2026-09-06_APPLE_ACOUSTIC_FIELDS_AND_HOLONIC_PROFILING.md)
+records the actual scope and measurements.
+
+## Scalar digital contact and return probe
 
 [definition] At sample ordinal `n` and exact time `n / sample_rate`, PCM codeword `s[n]` enters
 as the exact complex current `(s[n] / pcm_divisor, 0)`. This is an explicitly declared digital

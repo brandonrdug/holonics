@@ -1,0 +1,54 @@
+{
+  "scope": "two matched individual runs; native equality only for the reported faces/census, not an unobserved full-history comparison",
+  "equal_report_fields": [
+    "source",
+    "source_sha256",
+    "samples",
+    "sample_rate",
+    "complete",
+    "failure",
+    "native_from",
+    "native_until",
+    "source_duration_seconds",
+    "receivers",
+    "profile",
+    "census_before",
+    "census_after",
+    "first",
+    "last"
+  ],
+  "measurements": [
+    {
+      "source": ".local/datasets/esc50/audio/1-100032-A-0.wav",
+      "source_seconds": 5.0,
+      "old_wall_seconds": 15.073592167,
+      "wall_seconds": 12.350280667,
+      "old_gpu_seconds": 13.186660920036957,
+      "gpu_seconds": 10.571534917340614,
+      "wall_ratio": 2.4700561334,
+      "wall_speedup": 1.220506041395213,
+      "gpu_speedup": 1.2473742955156608,
+      "median_ms": 1.757959,
+      "p95_ms": 2.150834,
+      "max_ms": 7.743125,
+      "field_source_budget_ms": 0.7256235827664399,
+      "gpu_fraction": 0.8559752771925093
+    },
+    {
+      "source": ".local/datasets/librispeech-dev-clean-subset/wav/2277-149896-0000.wav",
+      "source_seconds": 6.59,
+      "old_wall_seconds": 10.258985708,
+      "wall_seconds": 7.792538625,
+      "old_gpu_seconds": 9.335092545254156,
+      "gpu_seconds": 6.692135750316083,
+      "wall_ratio": 1.1824793057663125,
+      "wall_speedup": 1.3165139374589883,
+      "gpu_speedup": 1.394934725407093,
+      "median_ms": 2.1945,
+      "p95_ms": 3.509166,
+      "max_ms": 43.944125,
+      "field_source_budget_ms": 2.0,
+      "gpu_fraction": 0.8587876265183201
+    }
+  ]
+}

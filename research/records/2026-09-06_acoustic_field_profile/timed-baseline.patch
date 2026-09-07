@@ -1,0 +1,70 @@
+--- a/accelerators/metal/native_phase.metal
++++ b/accelerators/metal/native_phase.metal
+@@ -143,16 +143,6 @@
+   return a;
+ }
+ inline U umul(U a, U b, thread bool &ov) {
+-  // Exact one-limb product: (2^32-1)^2 fits in ulong. This is a carrier
+-  // specialization, not a different field law or a truncated product.
+-  if (!(a.x[1] | a.x[2] | a.x[3] | b.x[1] | b.x[2] | b.x[3])) {
+-    ulong product = (ulong)a.x[0] * (ulong)b.x[0];
+-    U r = uzero();
+-    r.x[0] = (uint)product;
+-    r.x[1] = (uint)(product >> 32);
+-    ov = false;
+-    return r;
+-  }
+   uint p[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+   for (uint i = 0; i < 4; ++i) {
+     ulong carry = 0;
+@@ -185,15 +175,6 @@
+   return wof(m, a.neg != b.neg, slot);
+ }
+ inline U udiv(U n, U d, thread U &rem) {
+-  // Callers have already established d != 0. Avoid emulated wider division
+-  // when both complete magnitudes inhabit the native uint chart.
+-  if (!(n.x[1] | n.x[2] | n.x[3] | d.x[1] | d.x[2] | d.x[3])) {
+-    U q = uzero();
+-    q.x[0] = n.x[0] / d.x[0];
+-    rem = uzero();
+-    rem.x[0] = n.x[0] % d.x[0];
+-    return q;
+-  }
+   if (n.x[2] == 0 && n.x[3] == 0 && d.x[2] == 0 && d.x[3] == 0) {
+     ulong nn = (ulong)n.x[0] | ((ulong)n.x[1] << 32);
+     ulong dd = (ulong)d.x[0] | ((ulong)d.x[1] << 32);
+@@ -241,9 +222,9 @@
+ }
+ inline W wnorm(thread W *row, uint width, thread W *den, device uint *slot) {
+   W d = den ? (!wzero_p(*den) ? *den : wzero()) : wzero();
+-  for (uint j = 0; j < width && !ueq(d.m, uone()); ++j)
++  for (uint j = 0; j < width; ++j)
+     d = wgcd(d, row[j], slot);
+-  if (wzero_p(d) || ueq(d.m, uone()))
++  if (wzero_p(d))
+     return d;
+   for (uint j = 0; j < width; ++j)
+     row[j] = wdiv(row[j], d, slot);
+@@ -253,9 +234,9 @@
+ }
+ inline W wnorm(threadgroup W *row, uint width, threadgroup W *den, device uint *slot) {
+   W d = den ? (!wzero_p(*den) ? *den : wzero()) : wzero();
+-  for (uint j = 0; j < width && !ueq(d.m, uone()); ++j)
++  for (uint j = 0; j < width; ++j)
+     d = wgcd(d, row[j], slot);
+-  if (wzero_p(d) || ueq(d.m, uone()))
++  if (wzero_p(d))
+     return d;
+   for (uint j = 0; j < width; ++j)
+     row[j] = wdiv(row[j], d, slot);
+@@ -265,8 +246,8 @@
+ }
+ inline W wnorm(threadgroup W *row, uint width, thread W *den, device uint *slot) {
+   W d = den ? (!wzero_p(*den) ? *den : wzero()) : wzero();
+-  for (uint j = 0; j < width && !ueq(d.m, uone()); ++j) d = wgcd(d, row[j], slot);
+-  if (wzero_p(d) || ueq(d.m, uone())) return d;
++  for (uint j = 0; j < width; ++j) d = wgcd(d, row[j], slot);
++  if (wzero_p(d)) return d;
+   for (uint j = 0; j < width; ++j) row[j] = wdiv(row[j], d, slot);
+   if (den) *den = wdiv(*den, d, slot);
+   return d;

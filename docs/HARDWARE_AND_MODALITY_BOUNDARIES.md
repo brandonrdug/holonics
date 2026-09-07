@@ -1,6 +1,6 @@
 # Hardware and modality boundaries
 
-[definition] This guide records the current execution boundary and the implemented Apple phase boundary and the acoustic attachment. This guide
+[definition] This guide records the execution boundary, implemented Apple phase/field owners and acoustic attachments. It
 describes source ownership; it does not schedule construction. The roadmap and `CONSTRUCTION_STATE.md` remain the construction authorities.
 
 [definition] Brandon's subsequent MacBook request is now specified in
@@ -82,6 +82,14 @@ refine entry points refuse explicitly. No CPU current law or empty PTX substitut
 [established-bounded; measured] The public HNA library compiles on the M1 Pro. The existing 28
 native phase and 15 public session tests pass against `accelerators/metal/native_phase.metal`.
 These cover the current local rational-linear phase domain, not all native owners.
+
+[established-bounded; implemented-exact] The subsequent
+[complete field return](../research/records/2026-09-06_APPLE_ACOUSTIC_FIELDS_AND_HOLONIC_PROFILING.md)
+adds Metal conduct/rechart for the desktop's `NativeConstitutiveField`, a public acoustic temporal
+chart and borrowed structural profile. GPU command-buffer timestamps are apparatus observations.
+This field retains its joint relation and historical source sections; each operation still reads
+its terminal result. Learned acoustic grain, field rest/remount and sustained real-time conduct
+are not established by this implementation.
 
 [established-bounded; source-inspected] `DeviceBackend` and `ExactDeviceExecutor` in
 [`device.rs`](../crates/holonic-engine/src/device.rs) provide a small exact parity vocabulary,

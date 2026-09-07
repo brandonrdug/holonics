@@ -56,6 +56,20 @@ alongside the shared linguistic formation work. The
 [correction record](research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md)
 locates existing owners and preserves the distinction between an exterior codec and native grain.
 
+[established-bounded; implemented-exact] The Mac branch has integrated desktop `673b8d42` and
+ported the shared complete material field to Metal. Acoustic temporal sections now enter that
+joint field, with exact source support and recoverable source handles. A borrowed structural
+profile exposes material, frame/history and actual chart extents without device readback.
+The [field return](research/records/2026-09-06_APPLE_ACOUSTIC_FIELDS_AND_HOLONIC_PROFILING.md)
+records verification and profiling. This is a shared field/codec construction; learned temporal
+organization, timed acoustic production and useful speech remain unfinished.
+
+[established-bounded; measured] Exact arithmetic fast paths improved matched 32-port field runs
+to 12.35 s for 5 s of sound and 7.79 s for 6.59 s of English. Both remain slower than real time;
+GPU execution accounts for about 86% of loop time. The field retains 85.5 MB after those recordings
+and still reads each terminal result. The field return separates these apparatus measurements
+from intrinsic dimensions and acoustic/linguistic capability.
+
 [established-bounded; measured] Local data comprise 2,000 ESC-50 WAVs and a 100-clip LibriSpeech
 subset, outside Git. The measured examples processed a small selection, not the downloaded
 corpora. A five-second sound continuation took 299.47 s including cold publication and produced

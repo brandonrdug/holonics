@@ -8,7 +8,10 @@ apparatus; they are not dependencies that schedule native inference.
 
 [established-bounded; implemented-exact] The native phase session runs through CUDA on Linux
 and direct Metal on macOS. The Metal realization covers the local constitutive fibre,
-circulation and rechart operation, with the same native state/checkpoint owners. Broader resident
+circulation and rechart operation, with the same native state/checkpoint owners. The shared complete
+constitutive field and its rechart also run on Metal; that field has no rest/remount product yet.
+The [field record](../research/records/2026-09-06_APPLE_ACOUSTIC_FIELDS_AND_HOLONIC_PROFILING.md)
+documents its acoustic chart and execution profiler. Broader resident
 operations and inherited-model readout remain CUDA-only and return named unsupported-operation
 errors on Apple. The [platform specification](plans/HOLONICS_ON_APPLE_SILICON.md) records scope.
 

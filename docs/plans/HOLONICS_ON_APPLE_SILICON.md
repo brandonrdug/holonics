@@ -245,3 +245,11 @@ the shared native material/formation construction, provide useful acoustic and E
 and continue execution/storage work. The
 [acoustic guide](../ACOUSTIC_EXPERIMENTS.md) documents the existing probe interfaces. More data
 alone does not supply these missing compositions; microphone access supplies none of them.
+
+[established-bounded; implemented-exact] The desktop's complete material field has subsequently
+been integrated and ported to Metal, including joint source/receiver formation and historical
+recharting. `AcousticFieldChart` delivers complete timed sections to this same field owner;
+`intrinsic_profile()` reads its material and retained causal structure without device readback.
+The [field return](../../research/records/2026-09-06_APPLE_ACOUSTIC_FIELDS_AND_HOLONIC_PROFILING.md)
+retains the checks and profiling evidence. The temporal coefficient aperture is still declared;
+this return does not identify it as learned holonic grain or close AS4–AS5.
