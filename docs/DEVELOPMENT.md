@@ -67,13 +67,20 @@ reference comparisons, refusal recovery, recharting, remounting and stream conti
 
 ```sh
 cargo check -p holonics-hna --lib --locked
-cargo test -p holonic-engine --lib native_ecology::constitutive_fibre -- --ignored --test-threads=1
+cargo test -p holonic-engine --lib native_ecology::constitutive_fibre::tests:: -- --include-ignored --test-threads=1
+cargo test -p holonic-engine --lib native_ecology::constitutive_fibre::circulation:: -- --include-ignored --test-threads=1
+cargo test -p holonic-engine --lib native_ecology::constitutive_fibre::field::tests:: -- --include-ignored --test-threads=1
 cargo test -p holonics-hna --lib native:: -- --include-ignored --test-threads=1
 cargo test -p holonics-workbench --test native_checkpoint_process -- --ignored --test-threads=1
 ```
 
 [definition] Historical GPU tests still use `#[ignore]` to keep device initialization explicit.
-The phase tests run on the selected platform backend. CUDA-only tests remain unavailable on Mac.
+The phase tests run on the selected platform backend. The field command covers the ordinary
+Metal field and the refusal boundary for unported junctions. Desktop `6ef7bf9d` adds resident
+conditional-current, whole-fibre receiver and paired/material junction tests that need their
+corresponding Metal kernels; the complete constitutive test filter is therefore not a Mac parity
+suite. Follow the [conditional-generator handoff](HARDWARE_AND_MODALITY_BOUNDARIES.md#conditional-generator-port-for-the-mac-workflow)
+for that remaining port. CUDA-only tests remain unavailable on Mac.
 Lean dependencies are fetched when relevant formal work requires them; no proof assistant enters
 the native runtime.
 

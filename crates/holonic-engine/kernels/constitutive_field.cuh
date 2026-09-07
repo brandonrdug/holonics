@@ -12,19 +12,14 @@
 // branch fields are reused.  All source/current/branch conversions are checked before the one
 // continuing memory/basis commit; a carrier or malformed refusal publishes no plausible successor.
 
-extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
-    const int64_t *seed,
-    int64_t *memory_lo, int64_t *memory_hi,
-    int64_t *basis_lo, int64_t *basis_hi,
-    const int64_t *incoming,
-    const int64_t *origin,
+__device__ void field_constitutive_prepare(
+    const int64_t *seed, const int64_t *memory_lo, const int64_t *basis_lo,
+    const int64_t *incoming, const int64_t *origin,
     const int64_t *current_frame, const int64_t *origin_frame,
-    uint32_t nodes, uint32_t linked,
-    int64_t *output_lo, int64_t *output_hi,
-    uint32_t *slot, const uint32_t *census,
-    const uint32_t *lineage, uint32_t lineage_count
+    uint32_t nodes, uint32_t linked, int64_t *output_lo, int64_t *output_hi,
+    uint32_t *slot, const uint32_t *census, const uint32_t *lineage, uint32_t lineage_count,
+    wide *field_scratch
 ) {
-    if (blockIdx.x != 0 || threadIdx.x != 0) return;
     if (upstream_refused(census, lineage, lineage_count, slot)) return;
     if (!nodes || linked > 1 || nodes > UINT32_MAX / 6u) {
         atomicOr(slot, REFUSED_MALFORMED);
@@ -63,7 +58,6 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
         }
     }
 
-    extern __shared__ wide field_scratch[];
     wide *current_query = field_scratch;
     wide *prior_query = current_query + width;
     wide *formed = prior_query + width;
@@ -292,14 +286,95 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     output_lo[prior_at + width + 2] = output_hi[prior_at + width + 2] = -1;
     output_lo[prior_at + width + 3] = output_hi[prior_at + width + 3] = prior_rank;
 
-    // The only continuing writes.  Every conversion above has succeeded, so a refused branch can
-    // never expose a partially updated relation or held successor.
+}
+
+extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
+    const int64_t *seed,
+    int64_t *memory_lo, int64_t *memory_hi,
+    int64_t *basis_lo, int64_t *basis_hi,
+    const int64_t *incoming,
+    const int64_t *origin,
+    const int64_t *current_frame, const int64_t *origin_frame,
+    uint32_t nodes, uint32_t linked, uint32_t coupled, uint32_t junction_grain, uint64_t occurrence,
+    const int64_t *covariance, const int64_t *junction_held,
+    int64_t *next_covariance_lo, int64_t *next_covariance_hi,
+    int64_t *junction_report_lo, int64_t *junction_report_hi, wide *junction_workspace,
+    uint32_t transport_enabled, wide *transport_lo, wide *transport_hi,
+    const wide *origin_junction, const wide *origin_transport,
+    wide *transport_delta_lo, wide *transport_delta_hi, wide *transport_report_lo, wide *transport_report_hi,
+    const int64_t *refreshed_source_current,
+    int64_t *output_lo, int64_t *output_hi,
+    uint32_t *slot, const uint32_t *census,
+    const uint32_t *lineage, uint32_t lineage_count
+) {
+    if (blockIdx.x != 0) return;
+    extern __shared__ wide field_scratch[];
+    // The dependent field word is prepared once. All continuing writes remain after the complete
+    // coupled return; early returns inside this helper cannot strand a block barrier.
+    if (threadIdx.x == 0) {
+        if (coupled > 3 || transport_enabled > 2u
+            || (transport_enabled && (coupled < 2u || !transport_lo || !transport_hi
+                || !transport_delta_lo || !transport_delta_hi || !transport_report_lo || !transport_report_hi
+                || (linked && (!origin_junction || !origin_transport))))
+            || (coupled && (!covariance || !junction_held || !next_covariance_lo
+            || !next_covariance_hi || !junction_report_lo || !junction_report_hi || !junction_workspace))) {
+            atomicOr(slot, REFUSED_MALFORMED);
+        } else {
+            field_constitutive_prepare(seed, memory_lo, basis_lo, incoming, origin,
+                current_frame, origin_frame, nodes, linked, output_lo, output_hi,
+                slot, census, lineage, lineage_count, field_scratch);
+        }
+    }
+    __syncthreads();
+    if (*slot) return;
+    if (coupled == 2 || coupled == 3) {
+        // Every thread participates. Each independent LDL row keeps its original arithmetic
+        // order; only a completed pivot column becomes input to the next one.
+        field_enclosed_junction_prepare(output_lo, origin, incoming, current_frame, origin_frame,
+            nodes, linked, occurrence, junction_grain, coupled == 3, covariance, (const wide *)junction_held,
+            next_covariance_lo, next_covariance_hi, (wide *)junction_report_lo, (wide *)junction_report_hi,
+            junction_workspace, slot);
+    } else if (coupled == 1 && threadIdx.x == 0) {
+        field_paired_junction_prepare(output_lo, origin, incoming, current_frame, origin_frame,
+            nodes, linked, occurrence, covariance, junction_held,
+            next_covariance_lo, next_covariance_hi, junction_report_lo, junction_report_hi,
+            junction_workspace, slot);
+    }
+    __syncthreads();
+    if (*slot) return;
+    if (transport_enabled == 2u && threadIdx.x == 0)
+        complete_material_transport_prepare((const int64_t *)transport_lo,(const int64_t *)origin_transport,refreshed_source_current,
+            output_lo,origin,incoming,current_frame,origin_frame,next_covariance_lo,(const wide *)junction_held,
+            (const wide *)junction_report_lo,nodes,linked,junction_grain,occurrence,
+            (int64_t *)transport_delta_lo,(int64_t *)transport_delta_hi,(int64_t *)transport_report_lo,(int64_t *)transport_report_hi,field_scratch,slot);
+    else if (transport_enabled == 1u && threadIdx.x == 0)
+        field_material_transport_prepare(transport_lo, origin_junction, origin_transport,
+            (const wide *)junction_report_lo, incoming, nodes, linked, junction_grain,
+            transport_delta_lo, transport_delta_hi, transport_report_lo, transport_report_hi, slot);
+    __syncthreads();
+    if (*slot || threadIdx.x != 0) return;
+    const uint32_t width = 6u * nodes;
+    const uint32_t current_at = 4u * nodes + 1u;
+    const int64_t inserted = output_lo[current_at + width + 2u];
+    const wide *formed = field_scratch + 2u * width;
+    const wide *held_departure = field_scratch + 3u * width;
+    // The only continuing writes: neither a refused row nor a refused enclosure can publish a
+    // partial successor. The staged source/relation/held conversions were all checked earlier.
     if (inserted >= 0) for (uint32_t j = 0; j < width; ++j) {
         size_t at = (size_t)inserted * width + j;
         basis_lo[at] = basis_hi[at] = (int64_t)formed[j];
     }
-    for (uint32_t j = 0; j < 3u * nodes; ++j) {
-        memory_lo[j] = memory_hi[j] = (int64_t)outward[j];
+    for (uint32_t j = 0; j < 3u * nodes; ++j)
+        memory_lo[j] = memory_hi[j] = (int64_t)held_departure[j];
+    if (transport_enabled == 2u) {
+        for (size_t i=0;i<complete_state_words(nodes);++i)
+            ((int64_t *)transport_lo)[i]=((int64_t *)transport_hi)[i]=((const int64_t *)transport_delta_lo)[i];
+    } else if (transport_enabled == 1u) {
+        const size_t coefficients = (size_t)6u * nodes * nodes;
+        // All sums and the complete current return were checked before any continuing write.
+        for (size_t i = 0; i < coefficients; ++i)
+            transport_lo[i] = transport_hi[i] = transport_lo[i] + transport_delta_lo[i];
+        transport_lo[coefficients] = transport_hi[coefficients] = transport_delta_lo[coefficients];
     }
 }
 

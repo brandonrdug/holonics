@@ -1,18 +1,73 @@
 # Hardware and modality boundaries
 
-[definition] This guide records the execution boundary, implemented Apple phase/field owners and acoustic attachments. It
-describes source ownership; it does not schedule construction. The roadmap and `CONSTRUCTION_STATE.md` remain the construction authorities.
+[definition] This guide records the desktop execution boundary and the separately developed
+Apple/audio seams. It does not add a backend or schedule an audio campaign. The roadmap and
+`CONSTRUCTION_STATE.md` remain the construction authorities.
 
-[definition] Brandon's subsequent MacBook request is now specified in
+[definition] Brandon's subsequent MacBook request is specified in
 [Holonics on Apple silicon](plans/HOLONICS_ON_APPLE_SILICON.md). Its order is native Apple
 execution and sound perception/generation, then speech, on the separate `codex/apple-silicon`
 branch. The [Mac setup record](../research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md)
 adds actual local build and MLX apparatus evidence to the source comparison below.
 
+[established-bounded; source-inspected] **September 7 branch comparison:**
+[`codex/apple-silicon` at `bd3ea689`](https://github.com/brandonrdug/holonics/tree/bd3ea689d039ab210de7ad5968d6fa8ae73eaa61)
+now carries a Metal mount, exact phase kernels and the earlier complete field, plus acoustic
+applications. The Linux/CUDA obstructions below describe the inspected desktop revision, not
+the current Apple branch. The [shared text/acoustic synthesis](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
+records the exact branch scope and its continuing gap in learned acoustic organization. This
+review fetched and read the branch; it did not merge or execute it.
+
+[project-postulate] Acoustic sample cells and text bit pairs remain exterior charts. Generator
+recovery, phase-sensitive contact and Holonic Compression must develop the native organization.
+Its **Preimage Fibre** constrains possible causes and future conduct from available observations;
+neither a perfect inverse nor a copy of every past sample is a general learning requirement.
+
 [established-bounded; source-inspected] Local sources were inspected at `6f547c4a` on September 6,
 2026. Source descriptions below are not fresh execution measurements.
 
 ## Current common mechanism
+
+### Conditional-generator port for the Mac workflow
+
+[definition] The September 7 Mac pickup integrates desktop `6ef7bf9d` into the Apple branch.
+The [integration record](../research/records/2026-09-07_APPLE_INTEGRATES_THE_SHARED_CONDITIONAL_GENERATOR_HANDOFF.md)
+qualifies its checks and merge repair. Shared Rust source is present; the new conditional-current
+and whole-fibre Metal kernels below remain unported. The existing ordinary Metal field keeps
+its argument layout and explicitly refuses the newer paired/material junction variants.
+
+[established-bounded; measured] The [measured conditional phase return](../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
+now supplies a shared local primitive worth porting while desktop conversation construction
+continues. Six actual native observations identify a phase action in the declared bilinear family;
+it predicts a new rational condition and conducts successive resident wave currents. The
+[public example](../crates/holonic-engine/examples/native_conditioned_phase.rs) and portable
+[operator receipt](../research/records/2026-09-07_conditional_phase/return-v2.json) give a concrete
+comparison. This is not a completed acoustic or conversation model.
+
+[established-bounded; source-inspected] Apple `bd3ea689` remains the pushed branch at this check.
+Its Metal owner already supplies `fibre_query`, `fibre_stage`, `wnorm`, `phaseprod` and the native
+field used as the example's teacher. The remaining port boundary is:
+
+1. Carry `ConstitutiveSourceChart`, the bound bilinear constructor, resident rational-current
+   views and `advance_bilinear_contact` from the existing constitutive owner. Preserve the Mac's
+   target-aware field and mount code. Existing ordinary field/rest initializers stay `Linear`.
+2. Realize `section_constitutive_current` and `section_constitutive_bilinear_source` over the
+   existing Metal wide/rational helpers. Their source law is `s ⊕ c ⊕ (c ⊗ s)`;
+   the existing relation owns learning. Preserve checked denominators, both quadratures,
+   all mixed incidences, the original vertical fibre and commit-after-complete-return behavior.
+3. Map the new resident surface bindings and their two-lane dependency. Use Metal's actual `W`
+   layout and its existing scratch accounting rather than copying CUDA's sixteen-byte wide size.
+   The shared resident return also exposes `section_constitutive_differential` and its typed
+   source/relation-cut receipt; carry that dependency consistently if importing the complete owner.
+4. Run the public example and relevant contact/ownership controls on Metal. Compare exact
+   operator/current/fibre results, and report Apple transfer/timing measurements in their own scope.
+
+[definition] The scalar conditional example uses the ordinary native field, not the desktop's
+complete-current material variant. Porting that larger CUDA history/transport implementation is
+not a prerequisite imposed by this experiment. This is a concrete engineering handoff for shared
+generator work, not an instruction to replace acoustic development with a per-sample loop.
+Audio still needs its actual clocks, material conditions and receiver-family binding. The
+condition Preimage Fibre and general contextual organization continue as shared construction.
 
 [established-bounded; source-inspected] The public framework enters through
 [`holonics::hna`](../crates/holonics/src/lib.rs). Its native session is exposed by
@@ -25,7 +80,7 @@ the standing used by the next deed; a readout, application response, or codec ou
 ordinary next occurrence.
 
 [established-bounded; source-inspected] The native transport scaffold retains addressed sections,
-incidence, ordered generator words, and reconstruction fibres through
+incidence, ordered generator words, and Preimage Fibres through
 [`NativeTransportScaffold`](../crates/holonic-engine/src/native_spool/scaffold.rs). Its
 non-owning `NativeAddressedSection` borrows those carriers from one scaffold rather than making a
 second topology.
@@ -51,7 +106,7 @@ around one backend does not create portability.
 
 [definition] The following objects belong to the mathematical/native owner and survive a device
 change: situated occurrence and caused incidence; local receiver charts; oriented current and
-relative phase; complete preimage/reconstruction fibres; lineage and obstruction; move ownership;
+relative phase; Preimage Fibres; lineage and obstruction; move ownership;
 atomic successor formation; and checkpoint chronology.
 
 [definition] Counts, launch time, energy, transfer bytes, occupancy, memory pressure, and device

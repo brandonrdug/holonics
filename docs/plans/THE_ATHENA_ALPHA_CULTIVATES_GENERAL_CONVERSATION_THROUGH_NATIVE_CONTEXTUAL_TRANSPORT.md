@@ -2,7 +2,8 @@
 
 **Authority:** Brandon's September 6 instruction to design and deposit this blueprint, update the
 roadmap and position, then immediately construct and complete it as a goal.
-**Status:** active; AC0 returned at cold scope, AC1 in construction. **Order:** [the roadmap](THE_ROADMAP.md).
+**Status:** resumed after Brandon's September 7 corrections; AC0 returned, AC1–AC2 generative
+attachment in construction. **Order:** [the roadmap](THE_ROADMAP.md).
 **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 
 ## 1. The required product
@@ -29,7 +30,10 @@ ongoing development, not an unmeasured power assertion or a limit copied into th
 NCF foundations and the [September 6 synthesis](../../research/records/2026-09-06_REPOSITORY_SYNTHESIS_AND_PORTABLE_EVIDENCE.md).
 It does not restart the inherited-first Gemma campaign. Soulkiller material and standard executable
 export retain their later jurisdictions. Apple/MLX and audio implementation remain separate work;
-the native and codec boundaries must remain suitable for those later compositions.
+the pushed Apple branch now supplies separately scoped phase/field apparatus. Brandon's September 7
+instruction reconciles its acoustic organization with this campaign's generator/phase construction.
+The [synthesis](../../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
+pins the inspected revisions and actual attachment gaps; it does not merge the device backends.
 
 ## 2. Material and comparison
 
@@ -77,6 +81,29 @@ native constructions through their actual carriers and laws. Separate research v
 not become an executable dependency of this model.
 
 ## 3. One native construction
+
+[project-postulate] **Preimage Fibre** is the compatible-source family behind an observed face
+under its declared map. It can be represented implicitly by constraints or generative structure.
+Learning from limited observations need not identify the original implementation, reproduce past
+microstates, enumerate all candidates, or wait for the fibre to become a singleton. Its material
+consequence is that the learned family characteristics constrain and conduct subsequent interaction.
+A decoder presents an admitted consequence; a perfect inverse of the source is not a cultivation
+requirement. Exact checkpoint restoration is a separate, narrower operation.
+
+[project-postulate] Reusable classes are valid objects of description without choosing a physical
+occurrence. Brandon's chord example distinguishes a general class, its compatible occurrence
+fibre, the phase-bearing composition within an occurrence, and its ordered progression into other
+compositions. Preserve those roles across text, vision and acoustics. Do not overcorrect situated
+identity into a prohibition on abstraction. Text holons admit superposition; wavelengths and phase
+belong to their actual transport charts, not authored mappings from byte IDs to frequencies.
+
+[definition] The September 7 correction binds black-box recovery and Holonic Compression into
+formation itself. Actual material faces and available contextual returns constrain executable
+local transport families; group actions, relative phase and oriented incidence determine which
+relations can compose. A later occurrence acts through the resulting standing, and its returned
+difference further develops that standing. The existing fixed bit-pair/junction experiment is a
+bounded realization to reuse where appropriate; increasing its history or readout size does not
+establish this generative attachment. Arbitrary sample blocks or frequency bins cannot replace it.
 
 [definition] For one move-owned ecology `E` and ordinary occurrence `o`, the operation is
 
@@ -189,6 +216,37 @@ Do not rebuild the completed raw capture. AC0 is data/application integration, n
 
 ### AC1 — Material, contextual current and developing native morphology
 
+[established-bounded; measured] The [conditional-contact return](../../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
+composes the existing local relation with two declared native current roles and their complex
+mixed products. An independently supplied channel condition makes a measured phase action
+identifiable where pooling observations without that condition leaves a plural relation. Its
+native operator and later wave conduct are verified at the declared local family. This returns
+the forward conditional primitive; it does not supply a general conversation context by fiat.
+
+[definition] Next hold the actual source and later reception fixed and derive the compatible
+condition Preimage Fibre in that same learned action. For fixed source, the bilinear chart is
+affine in the condition. Reuse native elimination for the particular/free directions or scoped
+obstruction; carry supported consequences into subsequent native operation. Do not turn a missing
+condition into a source-ID switch, an authored semantic label, or a demand to reconstruct all
+past microscopic states.
+
+[established-bounded; measured] The [native field relation port](../../research/records/2026-09-07_AC1_THE_FIELD_RETURNS_A_RESIDENT_RELATION_FACE_AND_A_PLURAL_FIBRE_HAS_FIXED_RECEIVERS.md)
+now returns resident currents/fibres at historical sources through their actual frames, and a
+whole-fibre receiver can expose a fixed class face without selecting a current. Its actual
+conversation diagnostic remains open at every text differential because the represented
+relation contains separating vertical directions. Next derive the applicable local action from
+situated conditions; do not extend the local linear hypothesis across unrelated contexts by fiat.
+
+[definition] The corrected next attachment reuses `inverse_transport`/`generative_transport`
+for constrained law families, `receiver_history_compression` for admitted future consequences,
+`generator_native_rest` for descended execution, and the existing phase-current, native-spool and
+resident complex-incidence owners for the carried action. Their current domains differ: finite
+transition tables, exact host equations/forms and bounded resident section laws are not already
+one continuing field. Derive the actual source/receiver-to-law passage and its resident return
+into contact/reaction; do not supply invented future observations or use a host learner to fill it.
+Limited data can produce operative partial knowledge. Exact all-history quotient claims, when
+made, owe their stated commuting law; that law is not a universal prerequisite for learning.
+
 [established-bounded; measured] The [first material field return](../../research/records/2026-09-06_AC1_THE_COMPLETE_MATERIAL_FIELD_RETAINS_ITS_CONTEXTUAL_OBSTRUCTION.md)
 composes an exterior octet port chart, separate native per-port excitation, complete outgoing/held
 source branches and actual paired receiving fields. Four development families entered one native
@@ -201,6 +259,22 @@ arrival collision with separating retained predecessors. Therefore a polynomial 
 same local face is insufficient. The next binding must make the relevant differing standing and
 channels participate through native transport. Source ordinals and retained handles preserve
 lineage; they do not, by themselves, create that operation.
+
+[established-bounded; measured] The subsequent
+[paired-junction binding](../../research/records/2026-09-06_AC1_THE_PAIRED_JUNCTION_RETAINS_ITS_INNER_CURRENT.md)
+forms `C=Σdd*` from actual joined root source/receiving currents and conducts through
+`v=2(I+C)^−1(u+h)`, with the full reflected branches, retained internal aggregate and executable
+birth-prefix decoder. Native controls establish a same-input response distinction under equal
+raw fields and moments but different internal standing. Its exact-word material run matches six
+reference operations and then refuses its word/wide arithmetic. The subsequent
+[residual-bearing enclosure](../../research/records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md)
+continues the same current law through all 728 occurrences and 724 contacts of the four-family
+slice, retaining the complete signed residual and an executable exact-current decoder. All 728
+numerical certificates pass; the first 25 exact current anchors and their 300 internal-current
+comparisons pass. A shared resident continuation preserves this body with zero numerical section
+readouts during admission and explicitly deferred diagnostics. Efficient broader operation,
+lawful history placement, record-level contextual
+channels and learned text emission remain AC1–AC2 obligations.
 
 [definition] Compose a reversible exterior material chart with native addressed sections,
 conditional channels, NCF formation and the admitted complex/higher contact law. Specify the
@@ -221,8 +295,23 @@ unchanged two-node foundation need not be rerun as an independent demonstration.
 
 ### AC2 — Recovered text-codec conduct and complete responses
 
+[established-bounded; measured] The [initial differential text receiver](../../research/records/2026-09-06_AC1_THE_SHARED_SOURCE_MEETS_AN_EXPLICIT_TEXT_CURRENT_RECEIVER.md)
+is composed with the same resident field and shared historical-source port. Four development
+families and a fresh prompt enter an 18-port octet/end-of-part chart. Its first return is 64 copies
+of `d`, interrupted without completion; consecutive native currents remain distinct. This enables
+inspection of actual emitted material and preserves a concrete failed response. Useful text-codec
+conduct and AC2 completion are unestablished.
+
+[definition] The [material transport](../../research/records/2026-09-07_AC2_THE_RETAINED_CONTEXT_RECEIVES_A_NATIVE_MATERIAL_TRANSPORT.md)
+uses the complete retained contextual outgoing field as its source. Its actual returned
+difference and chronological co-current remain separate; the native parameter return uses the
+producing source and declared metrics. Its native implementation retains full arithmetic defects
+and an exact coefficient decoder in that same owner. Broader cultivation and useful text conduct
+remain required; its first four-family return emits no text and reports reserved codeword 373.
+The checked balanced solver reduces encoder work while keeping its current law intact.
+
 [definition] Make the same changing ecology conduct inscription, contextual recurrence and
-text emission at the supported grains. Reuse native reconstruction and receiver-history owners;
+text emission at the supported grains. Reuse native Preimage Fibre and receiver-history owners;
 learned transport supplies compositional production. The exterior UTF-8 presentation decodes
 native emission only. A stored passage, nearest sentence, hand-authored morphology/grammar or
 foreign model must not fill the response when native conduct is open.
@@ -237,7 +326,39 @@ attribution observation, not an interior generation rule or a blanket ban on use
 followups and later revision. Retain failed outputs and diagnose their actual transport. This
 phase does not pass on fluent inherited text, output length, nonempty bytes or a polished renderer.
 
+[definition] The [complete-current source construction](../../research/records/2026-09-07_AC2_THE_FULL_INTERNAL_CURRENT_HAS_AN_ADDRESSED_PREFIX_PAIRING.md)
+refines the open AC1–AC2 attachment: retain outgoing plus every born internal current, with
+actual source-prefix overlap, and join it to the material/reaction return. The native construction
+receiver and its actual-material comparison now return, including a reachable hidden-current
+distinction behind equal zero boundary output. The [explicit complete-current variant](../../research/records/2026-09-07_AC2_THE_COMPLETE_CURRENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md)
+now supplies the fused material coupling, full source/parameter error and durable state. Its
+actual response remains unusable. The corrected generative/contextual attachment and useful
+language remain open; this bounded coefficient return does not close AC2.
+
 ### AC3 — Cultivated model and continuing corpus development
+
+[established-bounded; measured] The [field persistence return](../../research/records/2026-09-07_AC3_THE_CULTIVATED_FIELD_RESTARTS_WITHOUT_SOURCE_REPLAY.md)
+implements complete native/text rest, retained parent capabilities and the paired exposure cursor.
+Actual four-family process-separated continuation and source-unavailable inference match the
+uninterrupted current, lineage, learned coefficients and failed response exactly, with zero native
+deeds on remount. Staged input and partly written output also survive in the declared SDK controls.
+An actual partial-family restart matches its independent reference. The 64-family development
+artifact saves 18,476 native occurrences in 355,146,249 bytes and remounts without native replay.
+Its response still fails. This returns a durability component of AC3; useful broad cultivation and the integrated product
+remain open.
+
+[established-bounded; measured] [Exterior historical placement](../../research/records/2026-09-07_AC3_THE_COMPLETE_HISTORY_MOVES_TO_AN_EXTERIOR_CHART_AND_ITS_ADDRESSED_SOURCE_RETURNS.md)
+now retains complete old carriers outside GPU memory and remounts an actual addressed source
+without native learning replay. At the 64-family cut, resident native payload is 475,104 bytes;
+the final body and failed emission equal the earlier fully resident run. Host persistence memory
+and disk history still grow. Use this placement for broader cultivation while preserving those
+costs and the open contextual/product obligations.
+
+[established-bounded; measured] That placement carries the next 64 families, reaching 128 families
+and 33,628 development occurrences in a durable 646,255,490-byte artifact. The recorded native
+payload peak is 57,741,140 bytes, and the saved state reproduces its complete body and emitted
+result with the original exposure and history backing unavailable. The output `Tm.` plus an
+end-of-part marker still fails the request; no useful response or AC2 completion is established.
 
 [definition] Stream the declared broader development population through the same resident owner,
 retaining changed successors and available source relations. Admission/order follows source
@@ -299,13 +420,18 @@ changes, then mark the goal complete. No phrase in an earlier phase changes that
 
 ## 6. Execution and verification
 
-[project-postulate] Construction starts immediately after this plan, roadmap and position are
-deposited. The whole goal remains active across partial returns. A difficult or failed construction
-is not a reason to stop at a report or request renewed authorization. Change the concrete failed
+[definition] Desktop acoustics is optional research material for the shared generator/phase
+attachment, not a second required product. Tell Brandon to re-engage the dependent Mac workflow
+when a committed, tested native formation/continuation return and its explicit Metal port boundary
+are available. The [handoff definition](../../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md#mac-workflow-handoff)
+precedes full Athena-alpha usefulness; it does not require completing text before acoustic work.
+
+[project-postulate] Brandon has resumed construction after the September 7 corrections.
+The goal remains unfinished across partial returns. A difficult or failed construction is not
+a reason to stop at a report or request renewed authorization. Change the concrete failed
 binding when the evidence warrants it and update this contract without shrinking its product aim.
 
-[definition] Use bounded Luna tasks for independent source, implementation and result review. The
-primary agent integrates exact source and actual artifacts; reports are testimony. Preserve the
+[definition] Work without agents under Brandon's latest preference. Preserve the
 unrelated flux-lattice work, existing private material and caches. The retired side database is
 neither queried nor written. Repository evidence owns the record of this campaign.
 

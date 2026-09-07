@@ -1,6 +1,318 @@
 use super::*;
 
 impl<'chart> ResidentSurface<'chart> {
+    pub(crate) fn record_complete_material_source_reading(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        state: &ResidentSection<'chart>,
+        source: &ResidentSection<'chart>,
+        refreshed: Option<&ResidentSection<'chart>>,
+        nodes: usize,
+        grain: u32,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || ResidentRefusal::Declaration {
+            operation: "complete-material-source-reading",
+            what: "incompatible complete source chart".into(),
+        };
+        if nodes == 0
+            || !(1..=120).contains(&grain)
+            || state.rows != 1
+            || state.width != 60 * nodes * nodes + 22 * nodes + 12
+            || source.rows != 1
+            || source.width != 74 * nodes + 44
+            || [state, source, output].into_iter().any(|s| s.grain.0 != 0)
+            || refreshed.is_some_and(|s| s.rows != 1 || s.width != 10 * nodes || s.grain.0 != 0)
+            || output.rows != 1
+            || output.width != 4 * nodes + 2
+        {
+            return Err(fail());
+        }
+        let mut params = Params::new();
+        params
+            .ptr(state.lo.device_ptr())
+            .ptr(source.lo.device_ptr())
+            .ptr(refreshed.map_or(0, |s| s.lo.device_ptr()))
+            .u32(nodes as u32)
+            .u32(grain)
+            .ptr(output.lo.device_ptr())
+            .ptr(output.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_complete_material_source_reading",
+            1,
+            self.declaration.warp_size.max(1),
+            0,
+            &mut params,
+            "complete-material-source-reading",
+        )
+    }
+    pub(crate) fn record_complete_material_source_current(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        source: &ResidentSection<'chart>,
+        tail: &ResidentSection<'chart>,
+        count: usize,
+        nodes: usize,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || ResidentRefusal::Declaration {
+            operation: "complete-material-source-current",
+            what: "incompatible source or coefficient-tail chart".into(),
+        };
+        if count == 0
+            || count > u32::MAX as usize
+            || nodes == 0
+            || nodes > u32::MAX as usize
+            || source.rows != 1
+            || source.width != 74 * nodes + 44
+            || source.grain.0 != 0
+            || tail.rows != count
+            || tail.width != 2
+            || tail.grain.0 != 0
+            || output.rows != 1
+            || output.width != 10 * nodes
+            || output.grain.0 != 0
+        {
+            return Err(fail());
+        }
+        let mut params = Params::new();
+        params
+            .ptr(source.lo.device_ptr())
+            .ptr(tail.lo.device_ptr())
+            .u32(count as u32)
+            .u32(nodes as u32)
+            .ptr(output.lo.device_ptr())
+            .ptr(output.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_complete_material_source_current",
+            1,
+            self.declaration.warp_size.max(1),
+            0,
+            &mut params,
+            "complete-material-source-current",
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_field_current_history_source(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        query: &ResidentSection<'chart>,
+        origin: Option<&ResidentSection<'chart>>,
+        incoming: &ResidentSection<'chart>,
+        frame: &ResidentSection<'chart>,
+        origin_frame: Option<&ResidentSection<'chart>>,
+        covariance: &ResidentSection<'chart>,
+        before: &ResidentSection<'chart>,
+        current: &ResidentSection<'chart>,
+        state: &ResidentSection<'chart>,
+        nodes: usize,
+        grain: u32,
+        occurrence: u64,
+        next: &ResidentSection<'chart>,
+        source: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || ResidentRefusal::Declaration {
+            operation: "field-current-history-source",
+            what: "incompatible integral-contact current chart".into(),
+        };
+        let d = nodes
+            .checked_mul(6)
+            .filter(|d| *d <= u32::MAX as usize)
+            .ok_or_else(fail)?;
+        let matrix = d
+            .checked_mul(d)
+            .and_then(|n| n.checked_add(1))
+            .ok_or_else(fail)?;
+        let shape =
+            |s: &ResidentSection<'chart>, r, w| s.rows == r && s.width == w && s.grain.0 == 0;
+        if nodes == 0
+            || !(1..=120).contains(&grain)
+            || occurrence >= i64::MAX as u64
+            || !shape(query, 1, 16 * nodes + 9)
+            || !shape(incoming, nodes, 3)
+            || !shape(frame, nodes, 3)
+            || origin.is_some() != origin_frame.is_some()
+            || origin.is_some_and(|s| !shape(s, 1, 16 * nodes + 9))
+            || origin_frame.is_some_and(|s| !shape(s, nodes, 3))
+            || !shape(covariance, 1, matrix)
+            || !shape(before, 1, 12 * (d + 1))
+            || !shape(current, 1, 12 * (d + 1))
+            || !shape(state, 1, 2 * d + 8)
+            || !shape(next, 1, 2 * d + 8)
+            || !shape(source, 1, 6 * d + 22)
+        {
+            return Err(fail());
+        }
+        let shared = d
+            .checked_mul(32)
+            .and_then(|n| u32::try_from(n).ok())
+            .filter(|n| *n <= self.declaration.max_sectiond_bytes)
+            .ok_or_else(fail)?;
+        let mut params = Params::new();
+        params
+            .ptr(query.lo.device_ptr())
+            .ptr(origin.unwrap_or(query).lo.device_ptr())
+            .ptr(incoming.lo.device_ptr())
+            .ptr(frame.lo.device_ptr())
+            .ptr(origin_frame.unwrap_or(frame).lo.device_ptr())
+            .ptr(covariance.lo.device_ptr())
+            .ptr(before.lo.device_ptr())
+            .ptr(current.lo.device_ptr())
+            .ptr(state.lo.device_ptr())
+            .ptr(state.hi.device_ptr())
+            .u32(nodes as u32)
+            .u32(u32::from(origin.is_some()))
+            .u32(grain)
+            .u64(occurrence)
+            .ptr(next.lo.device_ptr())
+            .ptr(next.hi.device_ptr())
+            .ptr(source.lo.device_ptr())
+            .ptr(source.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_field_current_history_source",
+            1,
+            self.launch.block_x,
+            shared,
+            &mut params,
+            "field-current-history-source",
+        )
+    }
+
+    pub(crate) fn record_field_current_history_pairing(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        left: &ResidentSection<'chart>,
+        right: &ResidentSection<'chart>,
+        dimension: usize,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || ResidentRefusal::Declaration {
+            operation: "field-current-history-pairing",
+            what: "incompatible source charts".into(),
+        };
+        let width = dimension
+            .checked_mul(6)
+            .and_then(|n| n.checked_add(22))
+            .ok_or_else(fail)?;
+        if dimension == 0
+            || dimension % 2 != 0
+            || dimension > u32::MAX as usize
+            || [left, right]
+                .into_iter()
+                .any(|s| s.rows != 1 || s.width != width || s.grain.0 != 0)
+            || output.rows != 1
+            || output.width != 15
+            || output.grain.0 != 0
+        {
+            return Err(fail());
+        }
+        let mut params = Params::new();
+        params
+            .ptr(left.lo.device_ptr())
+            .ptr(left.hi.device_ptr())
+            .ptr(right.lo.device_ptr())
+            .ptr(right.hi.device_ptr())
+            .u32(dimension as u32)
+            .ptr(output.lo.device_ptr())
+            .ptr(output.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_field_current_history_pairing",
+            1,
+            self.launch.block_x,
+            0,
+            &mut params,
+            "field-current-history-pairing",
+        )
+    }
+
+    /// Terminal sign receiver on disjoint pairs of complex coordinates in a junction report.
+    pub(crate) fn record_field_differential_receiver(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        report: &ResidentSection<'chart>,
+        dimension: usize,
+        mode: u32,
+        first_complex: usize,
+        pairs: usize,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || ResidentRefusal::Declaration {
+            operation: "field-differential-receiver",
+            what: "incompatible receiver chart".into(),
+        };
+        let words = if mode >= 3 {
+            dimension
+                .checked_mul(if mode == 3 { 18 } else { 37 })
+                .and_then(|n| n.checked_add(if mode == 3 { 24 } else { 44 }))
+        } else {
+            dimension
+                .checked_add(1)
+                .and_then(|n| n.checked_mul(if mode == 1 { 4 } else { 12 }))
+        }
+        .ok_or_else(fail)?;
+        if dimension == 0
+            || dimension % 2 != 0
+            || dimension > u32::MAX as usize
+            || !(1..=4).contains(&mode)
+            || !(1..=63).contains(&pairs)
+            || first_complex
+                .checked_add(2 * pairs)
+                .is_none_or(|end| end > dimension / 2)
+            || report.rows != 1
+            || report.width != words
+            || report.grain.0 != 0
+            || output.rows != 1
+            || output.width != 4
+            || output.grain.0 != 0
+        {
+            return Err(fail());
+        }
+        let mut params = Params::new();
+        params
+            .ptr(report.lo.device_ptr())
+            .ptr(report.hi.device_ptr())
+            .u32(dimension as u32)
+            .u32(mode)
+            .u32(first_complex as u32)
+            .u32(pairs as u32)
+            .ptr(output.lo.device_ptr())
+            .ptr(output.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_field_differential_receiver",
+            1,
+            self.launch.block_x,
+            0,
+            &mut params,
+            "field-differential-receiver",
+        )
+    }
+
     /// The same local relation/scattering construction over a complete independently addressed
     /// input field. Both departing branches are retained before receiver projection.
     #[allow(clippy::too_many_arguments)]
@@ -14,6 +326,24 @@ impl<'chart> ResidentSurface<'chart> {
         origin: Option<&ResidentSection<'chart>>,
         frame: &ResidentSection<'chart>,
         origin_frame: Option<&ResidentSection<'chart>>,
+        junction: Option<(
+            &ResidentSection<'chart>,
+            &ResidentSection<'chart>,
+            &ResidentSection<'chart>,
+            &ResidentSection<'chart>,
+            &ResidentSection<'chart>,
+            (u32, u32),
+        )>,
+        transport: Option<(
+            &mut ResidentSection<'chart>,
+            Option<&ResidentSection<'chart>>,
+            Option<&ResidentSection<'chart>>,
+            &ResidentSection<'chart>,
+            &ResidentSection<'chart>,
+            u32,
+            Option<&ResidentSection<'chart>>,
+        )>,
+        occurrence: u64,
         output: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
         let fail = |what: &str| ResidentRefusal::Declaration {
@@ -45,6 +375,84 @@ impl<'chart> ResidentSurface<'chart> {
         {
             return Err(fail("incompatible field, source or continuing relation"));
         }
+        #[cfg(target_os = "macos")]
+        {
+            let _ = occurrence;
+            if junction.is_some() || transport.is_some() {
+                return Err(fail(
+                    "paired junction and material transport are not yet implemented on Metal",
+                ));
+            }
+        }
+        if let Some((covariance, held, next_covariance, next_report, workspace, (mode, grain))) =
+            junction
+        {
+            if !(1..=3).contains(&mode) || (mode != 1 && !(1..=120).contains(&grain)) {
+                return Err(fail("unadmitted paired junction representation"));
+            }
+            let matrix_width = width
+                .checked_mul(width)
+                .and_then(|n| n.checked_add(1))
+                .ok_or_else(|| fail("paired junction matrix extent overflow"))?;
+            let scratch_words = width
+                .checked_mul(width)
+                .and_then(|n| n.checked_add(if mode == 1 { 7 * width } else { 8 * width }))
+                .and_then(|n| n.checked_mul(2))
+                .ok_or_else(|| fail("paired junction scratch extent overflow"))?;
+            if !matches(covariance, 1, matrix_width)
+                || !matches(next_covariance, 1, matrix_width)
+                || !matches(
+                    held,
+                    1,
+                    if mode == 1 {
+                        4 * (width + 1)
+                    } else {
+                        12 * (width + 1)
+                    },
+                )
+                || !matches(next_report, 1, held.width)
+                || !matches(workspace, 1, scratch_words)
+            {
+                return Err(fail("incompatible paired junction charts"));
+            }
+        }
+        if let Some((state, source_current, source_forward, delta, report, kind, refreshed)) =
+            &transport
+        {
+            let state_words = if *kind == 1 {
+                nodes
+                    .checked_mul(nodes)
+                    .and_then(|n| n.checked_mul(12))
+                    .and_then(|n| n.checked_add(2))
+            } else if *kind == 2 {
+                nodes
+                    .checked_mul(nodes)
+                    .and_then(|n| n.checked_mul(60))
+                    .and_then(|n| n.checked_add(22 * nodes + 12))
+            } else {
+                None
+            }
+            .ok_or_else(|| fail("material state extent or kind"))?;
+            let report_words = nodes
+                .checked_mul(if *kind == 1 { 36 } else { 74 })
+                .and_then(|n| n.checked_add(if *kind == 1 { 24 } else { 44 }))
+                .ok_or_else(|| fail("material report extent"))?;
+            if refreshed.is_some_and(|s| *kind != 2 || !matches(s, 1, 10 * nodes)) {
+                return Err(fail("current source contraction extent"));
+            }
+            let enclosed = junction.is_some_and(|(_, _, _, _, _, (mode, _))| mode != 1);
+            if !enclosed
+                || !matches(state, 1, state_words)
+                || !matches(delta, 1, state_words)
+                || !matches(report, 1, report_words)
+                || source_current.is_some() != origin.is_some()
+                || source_forward.is_some() != origin.is_some()
+                || source_current.is_some_and(|s| !matches(s, 1, 12 * (width + 1)))
+                || source_forward.is_some_and(|s| !matches(s, 1, report_words))
+            {
+                return Err(fail("incompatible contextual material transport"));
+            }
+        }
         let shared = Self::constitutive_field_scratch(nodes)
             .and_then(|v| u32::try_from(v).ok())
             .filter(|v| *v <= self.declaration.max_sectiond_bytes)
@@ -61,7 +469,53 @@ impl<'chart> ResidentSurface<'chart> {
             .ptr(frame.lo.device_ptr())
             .ptr(origin_frame.unwrap_or(frame).lo.device_ptr())
             .u32(nodes as u32)
-            .u32(u32::from(origin.is_some()))
+            .u32(u32::from(origin.is_some()));
+        // Metal retains the ordinary-field ABI until its junction/material kernels are ported.
+        #[cfg(not(target_os = "macos"))]
+        {
+            params
+                .u32(junction.map_or(0, |(_, _, _, _, _, (mode, _))| mode))
+                .u32(junction.map_or(0, |(_, _, _, _, _, (_, grain))| grain))
+                .u64(occurrence);
+            if let Some((covariance, held, next_covariance, next_report, workspace, _)) = junction {
+                params
+                    .ptr(covariance.lo.device_ptr())
+                    .ptr(held.lo.device_ptr())
+                    .ptr(next_covariance.lo.device_ptr())
+                    .ptr(next_covariance.hi.device_ptr())
+                    .ptr(next_report.lo.device_ptr())
+                    .ptr(next_report.hi.device_ptr())
+                    .ptr(workspace.lo.device_ptr());
+            } else {
+                for _ in 0..7 {
+                    params.ptr(0);
+                }
+            }
+            params.u32(
+                transport
+                    .as_ref()
+                    .map_or(0, |(_, _, _, _, _, kind, _)| *kind),
+            );
+            if let Some((state, source_current, source_forward, delta, report, _, refreshed)) =
+                transport
+            {
+                params
+                    .ptr(state.lo.device_ptr())
+                    .ptr(state.hi.device_ptr())
+                    .ptr(source_current.map_or(0, |s| s.lo.device_ptr()))
+                    .ptr(source_forward.map_or(0, |s| s.lo.device_ptr()))
+                    .ptr(delta.lo.device_ptr())
+                    .ptr(delta.hi.device_ptr())
+                    .ptr(report.lo.device_ptr())
+                    .ptr(report.hi.device_ptr())
+                    .ptr(refreshed.map_or(0, |s| s.lo.device_ptr()));
+            } else {
+                for _ in 0..9 {
+                    params.ptr(0);
+                }
+            }
+        }
+        params
             .ptr(output.lo.device_ptr())
             .ptr(output.hi.device_ptr())
             .ptr(lane.slot)
@@ -385,6 +839,322 @@ impl<'chart> ResidentSurface<'chart> {
             shared,
             &mut params,
             "constitutive-circulation",
+        )
+    }
+
+    pub(crate) fn record_field_source_frame(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        source: &ResidentSection<'chart>,
+        before: &ResidentSection<'chart>,
+        current: &ResidentSection<'chart>,
+        nodes: usize,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || ResidentRefusal::Declaration {
+            operation: "field-source-frame",
+            what: "incompatible source, producing/current frames or rational source chart".into(),
+        };
+        if nodes == 0
+            || nodes > (u32::MAX as usize - 9) / 16
+            || source.rows != 1
+            || source.width != 16 * nodes + 9
+            || [before, current]
+                .iter()
+                .any(|s| s.rows != nodes || s.width != 3)
+            || output.rows != 1
+            || output.width != 4 * nodes + 1
+            || [source, before, current, output]
+                .iter()
+                .any(|s| s.grain.0 != 0 || !std::ptr::eq(s.surface, self))
+        {
+            return Err(fail());
+        }
+        let shared = nodes
+            .checked_mul(64)
+            .and_then(|n| u32::try_from(n).ok())
+            .filter(|n| *n <= self.declaration.max_sectiond_bytes)
+            .ok_or_else(fail)?;
+        let mut params = Params::new();
+        for section in [source, before, current] {
+            params
+                .ptr(section.lo.device_ptr())
+                .ptr(section.hi.device_ptr());
+        }
+        params
+            .u32(nodes as u32)
+            .ptr(output.lo.device_ptr())
+            .ptr(output.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_field_source_frame",
+            1,
+            self.declaration.warp_size.max(1),
+            shared,
+            &mut params,
+            "field-source-frame",
+        )
+    }
+
+    pub(crate) fn record_constitutive_differential(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        report: &ResidentSection<'chart>,
+        source_width: usize,
+        target_width: usize,
+        first_complex: usize,
+        pairs: usize,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || ResidentRefusal::Declaration {
+            operation: "constitutive-differential",
+            what: "incompatible full affine fibre or differential receiver".into(),
+        };
+        let width = source_width.checked_add(target_width).ok_or_else(fail)?;
+        let expected = target_width
+            .checked_mul(target_width)
+            .and_then(|n| n.checked_add(width.checked_add(4)?))
+            .ok_or_else(fail)?;
+        if source_width == 0
+            || target_width == 0
+            || target_width % 2 != 0
+            || width > u32::MAX as usize - 4
+            || !(1..=63).contains(&pairs)
+            || first_complex
+                .checked_add(2 * pairs)
+                .is_none_or(|n| n > target_width / 2)
+            || report.rows != 1
+            || report.width != expected
+            || output.rows != 1
+            || output.width != 5
+            || [report, output]
+                .iter()
+                .any(|s| s.grain.0 != 0 || !std::ptr::eq(s.surface, self))
+        {
+            return Err(fail());
+        }
+        let mut params = Params::new();
+        params
+            .ptr(report.lo.device_ptr())
+            .ptr(report.hi.device_ptr())
+            .u32(source_width as u32)
+            .u32(target_width as u32)
+            .u32(first_complex as u32)
+            .u32(pairs as u32)
+            .ptr(output.lo.device_ptr())
+            .ptr(output.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_constitutive_differential",
+            1,
+            self.declaration.warp_size.max(1),
+            0,
+            &mut params,
+            "constitutive-differential",
+        )
+    }
+
+    fn validate_constitutive_current_view(
+        &self,
+        current: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        if !std::ptr::eq(current.section.surface, self)
+            || current.section.rows != 1
+            || current.section.grain.0 != 0
+            || current.section.width > u32::MAX as usize
+            || current
+                .offset
+                .checked_add(current.width)
+                .is_none_or(|n| n > current.section.width)
+            || current
+                .denominator
+                .is_some_and(|n| n >= current.section.width)
+            || current
+                .disposition
+                .is_some_and(|n| n >= current.section.width)
+        {
+            return Err(ResidentRefusal::Declaration {
+                operation: "constitutive-current",
+                what: "incompatible resident surface or rational current view".into(),
+            });
+        }
+        Ok(())
+    }
+
+    pub(crate) fn record_constitutive_bilinear_source(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        source: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
+        condition: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<
+            '_,
+            'chart,
+        >,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        self.validate_constitutive_current_view(source)?;
+        self.validate_constitutive_current_view(condition)?;
+        let fail = || ResidentRefusal::Declaration {
+            operation: "constitutive-bilinear-source",
+            what: "incompatible source/condition complex contact chart or scratch aperture".into(),
+        };
+        let source_complex = source.width / 2;
+        let condition_complex = condition.width / 2;
+        let width = source_complex
+            .checked_mul(condition_complex)
+            .and_then(|n| n.checked_add(source_complex))
+            .and_then(|n| n.checked_add(condition_complex))
+            .and_then(|n| n.checked_mul(2))
+            .ok_or_else(fail)?;
+        if source.width == 0
+            || condition.width == 0
+            || source.width % 2 != 0
+            || condition.width % 2 != 0
+            || width >= u32::MAX as usize
+            || output.rows != 1
+            || output.width != width + 1
+            || output.grain.0 != 0
+            || !std::ptr::eq(output.surface, self)
+        {
+            return Err(fail());
+        }
+        let shared = width
+            .checked_mul(16)
+            .and_then(|n| u32::try_from(n).ok())
+            .filter(|n| *n <= self.declaration.max_sectiond_bytes)
+            .ok_or_else(fail)?;
+        let mut params = Params::new();
+        for current in [source, condition] {
+            params
+                .ptr(current.section.lo.device_ptr())
+                .ptr(current.section.hi.device_ptr())
+                .u32(current.offset as u32)
+                .u32(current.denominator.map_or(u32::MAX, |n| n as u32))
+                .u32(current.disposition.map_or(u32::MAX, |n| n as u32));
+        }
+        params
+            .u32(source_complex as u32)
+            .u32(condition_complex as u32)
+            .ptr(output.lo.device_ptr())
+            .ptr(output.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_constitutive_bilinear_source",
+            1,
+            self.declaration.warp_size.max(1),
+            shared,
+            &mut params,
+            "constitutive-bilinear-source",
+        )
+    }
+
+    /// Resident rational operands for the existing local constitutive relation. Layout fields
+    /// address immutable current carriers; all numerical decisions stay on device.
+    pub(crate) fn record_constitutive_current(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        basis: &mut ResidentSection<'chart>,
+        source: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
+        receiving: Option<
+            crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
+        >,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        self.record_constitutive_current_inner(lane, basis, source, receiving, output)
+    }
+
+    /// Read-only branch of the same native relation law. No row is eligible for commit.
+    pub(crate) fn record_constitutive_query(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        basis: &ResidentSection<'chart>,
+        source: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        self.record_constitutive_current_inner(lane, basis, source, None, output)
+    }
+
+    fn record_constitutive_current_inner(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        basis: &ResidentSection<'chart>,
+        source: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
+        receiving: Option<
+            crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
+        >,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || ResidentRefusal::Declaration {
+            operation: "constitutive-current",
+            what: "incompatible surface, rational current or complete local return chart".into(),
+        };
+        let width = basis.width;
+        let target_width = width.checked_sub(source.width).ok_or_else(fail)?;
+        let report_width = target_width
+            .checked_mul(target_width)
+            .and_then(|n| n.checked_add(width.checked_add(4)?))
+            .ok_or_else(fail)?;
+        if source.width == 0
+            || target_width == 0
+            || basis.rows != width
+            || width > u32::MAX as usize - 4
+            || !std::ptr::eq(basis.surface, self)
+            || !std::ptr::eq(output.surface, self)
+            || basis.grain.0 != 0
+            || output.rows != 1
+            || output.width != report_width
+            || output.grain.0 != 0
+            || receiving.is_some_and(|v| v.width != target_width)
+        {
+            return Err(fail());
+        }
+        for current in std::iter::once(source).chain(receiving) {
+            self.validate_constitutive_current_view(current)?;
+        }
+        let shared = width
+            .checked_mul(32)
+            .and_then(|n| u32::try_from(n).ok())
+            .filter(|n| *n <= self.declaration.max_sectiond_bytes)
+            .ok_or_else(fail)?;
+        let mut params = Params::new();
+        params.ptr(basis.lo.device_ptr()).ptr(basis.hi.device_ptr());
+        for current in [source, receiving.unwrap_or(source)] {
+            params
+                .ptr(current.section.lo.device_ptr())
+                .ptr(current.section.hi.device_ptr())
+                .u32(current.offset as u32)
+                .u32(current.denominator.map_or(u32::MAX, |n| n as u32))
+                .u32(current.disposition.map_or(u32::MAX, |n| n as u32));
+        }
+        params
+            .u32(source.width as u32)
+            .u32(target_width as u32)
+            .u32(u32::from(receiving.is_some()))
+            .ptr(output.lo.device_ptr())
+            .ptr(output.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_constitutive_current",
+            1,
+            self.declaration.warp_size.max(1),
+            shared,
+            &mut params,
+            "constitutive-current",
         )
     }
 

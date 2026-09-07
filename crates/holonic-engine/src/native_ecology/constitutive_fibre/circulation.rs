@@ -7,7 +7,7 @@
 use super::*;
 
 mod rechart;
-mod rest;
+pub(super) mod rest;
 use crate::dimensional_wave::ExactComplexWaveCurrent;
 pub(super) use rechart::HeldCurrentFrame;
 pub use rechart::{NativeCurrentFrame, NativeIncidenceChange, NativeRechartReceipt};
@@ -109,7 +109,9 @@ impl NativePhaseCurrent {
             Rat::new(self.imaginary.into(), self.denominator.into()),
         )
     }
-    pub(in crate::native_ecology::constitutive_fibre) fn words(self) -> [i64; 3] {
+    /// Exterior exact point chart: real numerator, imaginary numerator, positive denominator.
+    /// These codewords describe a current; their numeric values are not occurrence identities.
+    pub fn words(self) -> [i64; 3] {
         [self.real, self.imaginary, self.denominator]
     }
     pub(in crate::native_ecology::constitutive_fibre) fn is_unit(self) -> bool {

@@ -1022,6 +1022,10 @@ impl Params {
         self.words.push(u64::from(value));
         self
     }
+    fn u64(&mut self, value: u64) -> &mut Self {
+        self.words.push(value);
+        self
+    }
     fn i32(&mut self, value: i32) -> &mut Self {
         self.words.push(u64::from(value as u32));
         self

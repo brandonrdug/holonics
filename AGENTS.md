@@ -33,6 +33,28 @@ research, a new subsystem, a qualitative gate or destructive/external permission
 
 ## Pickup and authority
 
+[project-postulate] Brandon's September 7 correction makes generator recovery, group/phase
+transport and Holonic Compression the shared AC1–AC2/acoustic attachment question. Use
+**Preimage Fibre**, as already settled September 2: limited observations constrain compatible
+causes and future conduct; cultivation does not require a perfect inverse, singleton source,
+enumerated candidate population or archive of every raw state. Exact persistence and declared
+reversible codec checks retain their narrower scopes. Read the
+[text/acoustic synthesis](research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md).
+Brandon has resumed the goal after those corrections. Continue the corrected construction;
+the earlier fixed-field corpus run is not the new generative attachment.
+
+[project-postulate] Brandon's chord clarification preserves reusable class identity separately
+from physical occurrence identity. A class description need not specify one performance; its
+Preimage Fibre and the phase-bearing, temporally ordered relations of its instances remain
+distinct. Text holons admit superposition through actual transport charts. Desktop acoustics is
+optional shared research. Notify Brandon when a committed shared native generator/phase return
+and concrete Metal port boundary make the dependent Mac workflow ready to re-engage.
+
+[definition] The [measured conditional phase return](research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
+now supplies that shared primitive and port boundary. Mac work can re-engage on its port and
+acoustic generator studies while desktop construction derives the condition Preimage Fibre and
+conversation attachment. This does not declare either full model complete.
+
 [project-postulate] Brandon's September 6 synthesis ruling records Athena-alpha as planned but
 unattained. Curated conversation material supports the next native cultivation direction for
 English, code and mathematics. Recent mathematical constructions inform native owners; Lean

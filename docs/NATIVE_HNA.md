@@ -13,7 +13,58 @@ states its bounded scope. Native checkpoints retain the complete phase ecology a
 application-bearing checkpoints also retain the independent world and pending interaction. A seed,
 JSON report or relation inspection is **not a learned-model checkpoint**.
 
+## Resident local relation composition
+
+[definition] The September 7 resident conditional-current and whole-fibre results below were
+executed on desktop CUDA. Their shared Rust source is integrated on the Apple branch; the new
+Metal kernels remain open at the [declared port boundary](HARDWARE_AND_MODALITY_BOUNDARIES.md#conditional-generator-port-for-the-mac-workflow).
+The existing Apple phase and ordinary complete-field realization keeps its own measured scope.
+
+[established-bounded; measured] The same owner now admits an explicit two-current contact through
+`ResidentConstitutiveFibre::found_bilinear_contact` and `advance_bilinear_contact`. Its bound
+`ConstitutiveSourceChart` retains source, condition and all complex mixed products; flattened
+ingress cannot bypass that source law. `ResidentConstitutiveCurrent::rational` accepts an exact
+numerator section and common denominator without host numerical inspection. Existing field and
+phase checkpoints keep their ordinary linear source chart.
+
+[established-bounded; measured] The [conditional phase example](../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
+uses actual native field observations, identifies a local phase action, and predicts/continues
+under a new rational condition. Its portable operator receipt and Metal port boundary are ready
+for shared Mac work. The local relation report is not a new whole-HNA checkpoint. Inferring the
+condition Preimage Fibre from actual returns and binding conditions to conversation material
+remain the next construction.
+
+[established-bounded; measured] The existing `ResidentConstitutiveFibre` now exposes
+[`advance_resident`](../crates/holonic-engine/src/native_ecology/constitutive_fibre/resident.rs).
+It accepts exact integer sections or rational currents from an earlier `ResidentConstitutiveReturn`,
+and an optional actual receiving section. Native formation and later queries share the existing
+basis; no numerical section readback is needed to pass a learned return into the next operation.
+`inspect` is an explicit cold observer, and each immutable return retains its original vertical
+Preimage Fibre even after further development. A point-current consumer checks uniqueness on
+device and refuses a plural/outside-domain face without selecting a representative.
+
+[established-bounded; measured] The [native return](../research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md)
+conducts a new phase superposition from two native observations while an unobserved source
+direction remains open; rational emitted currents re-enter without host readback. All 84 native
+constitutive tests pass. This is a local engine composition port. General contextual formation,
+its attachment to the conversation field and useful text/acoustic conduct remain open.
+
 ## Athena-alpha material field
+
+[established-bounded; measured] `NativeConstitutiveField::read_constitutive_source` now reads the
+current local relation at an actual historical source anchor. Native frame transport includes
+both original source branches. Its `ResidentConstitutiveReturn` can enter another native port;
+the field query itself changes neither the ecology nor its source capabilities. The
+[whole-fibre receiver](../research/records/2026-09-07_AC1_THE_FIELD_RETURNS_A_RESIDENT_RELATION_FACE_AND_A_PLURAL_FIBRE_HAS_FIXED_RECEIVERS.md)
+can return a definite differential sign from a plural current when every free direction cancels
+through that receiver. Eighty-nine native tests and the public text-codec control pass.
+
+[definition] `TextFieldSession::generate_with_receiver(..., TextCurrentReceiver::Constitutive)`
+and `alpha_text --text-receiver constitutive` present this whole-fibre text receiver. The default
+remains `material`. Returned `occurrence` identifies the actual field source, while `relation_cut`
+and `constitutive_status` identify the later relation reading. The saved four-family model emits
+no text under this receiver: exact vertical directions make all nine bit differentials variable.
+This receiver does not supply the missing contextual generator family.
 
 [established-bounded; measured] The separate
 [`NativeConstitutiveField`](../crates/holonic-engine/src/native_ecology/constitutive_fibre/field.rs)
@@ -24,7 +75,10 @@ exterior octet excitation chart. The
 entered four actual conversation families through one owner and retained its unresolved receiver.
 
 [definition] `NativeFieldOccurrence::through` consumes an actual `NativeFieldEmission` from that
-field. `advance` reads the complete receiver fibre; `advance_status` explicitly projects only its
+field. `retain_source` derives shared immutable source standing from an available emission;
+`through_anchor` uses that standing for a separately recorded receiving contact. It does not copy
+or restore the ecology, and the original emission remains linear. `advance` reads the complete
+receiver fibre; `advance_status` explicitly projects only its
 classification while enacting the same successor. Inspection returns exact sections without
 creating receiving capabilities. `rechart` carries both source branches, relation and held phase;
 old-source reception crosses its actual producing frame on the device. `replace_incoming_transport`
@@ -33,7 +87,168 @@ The `alpha_material` example is a private material/current study;
 its excitation round-trip is not a learned text decoder and its report is not a model checkpoint.
 The existing scalar JSONL session and checkpoint format below do not serialize this wider field.
 
+[definition] `advance_resident` returns a `NativeFieldContinuation` containing only the committed
+source handle, lineage and producing frame. It shares the same native operation and commit owner
+with the observed methods, checks the complete launch obstruction, and leaves numerical reports
+resident. `inspect_occurrence_status` later reads an immutable occurrence's receiver classification,
+pivot and rank without issuing a receiving capability. This separates numerical observation from
+continuation; it does not remove the per-operation launch receipt or create an asynchronous driver.
+
+[definition] `alpha_material --resident` selects terminal diagnostics. It reports
+`observation_mode: "terminal"`, collects status counts after material admission, then publishes
+the same cold body observations. It does not capture an intermediate relation snapshot, so
+`first_vertical_formation` is `null` in this mode. That absence is not a claim that no vertical
+formation occurred. Material, terminal observation and publication retain separate clocks.
+
+[established-bounded; measured] `NativeConstitutiveField::found_with_paired_junction` adds native
+reaction through the moment of actual joined currents and retained internal current. It requires
+unit seed admittances in this first chart. `NativeFieldStep::junction` returns the full root
+potential, departing field, internal aggregate and reconstruction prefix.
+`inspect_internal_currents` executes the retained birth-prefix decoder as an explicit observer.
+The [paired-junction record](../research/records/2026-09-06_AC1_THE_PAIRED_JUNCTION_RETAINS_ITS_INNER_CURRENT.md)
+contains the exact law and controls. `alpha_material --paired-junction` selects this declared
+construction for the study; the current word implementation refuses after six actual material
+occurrences and is not a corpus-capable model or text emitter.
+
+[established-bounded; measured] `found_with_enclosed_junction` represents the same current with
+dyadic numerical centers, certified Euclidean radii and the full signed residual trace. Its
+`NativeFieldJunctionReading::Enclosed` variant is distinct from `Exact`; a center is not the exact
+physical current. `alpha_material --enclosed-junction 72` carries the full four-family, 728-operation
+slice. Fractional precision is independent of carrier dimension. The
+[enclosure record](../research/records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md)
+contains the error laws, native checks and measured costs.
+
+[definition] `set_junction_solver(NativeFieldJunctionSolver::BalancedPairs)` selects an optional
+checked factorization for enclosed currents. The complete covariance must have the required real
+Hermitian pair structure, and both numerical right-hand-side fields must lie in its balanced
+range. The same smaller factor acts on both complex components and is lifted into the full root
+report; ineligible structure uses the full solver. The full residual still certifies every
+returned field. `Full` remains the field constructor's default; `with_text_field` requests
+`BalancedPairs`. A selected factorization's arithmetic refusal stays explicit, and changing a
+solver policy neither changes the exact model nor recovers an uncertain operation.
+
+[definition] `inspect_junction_enclosure` and `inspect_internal_current_enclosures` return explicit
+balls. `inspect_exact_junction` evaluates the retained residual expression for a requested cut;
+`inspect_internal_currents` can then reconstruct exact internal currents. Those cold exact
+inspections may be expensive and are not called by the productive recurrence. The material study
+normally publishes internal enclosures in this mode, together with the residual source needed for
+exact reconstruction. Neither its JSON report nor the earlier scalar checkpoint format is an
+enclosed-junction model checkpoint.
+
+### Initial text-current application
+
+[definition] `alpha::text_codec` declares an 18-port, nine-pair chart for all octets and one
+end-of-part symbol. `read_material_transport_pairs` reads the learned material current on the
+device; `read_differential_pairs` remains available for the encoder's outgoing current. Both
+return a sign only when the complete numerical ball lies in the corresponding half-space.
+Unresolved signs and reserved codewords remain explicit. `read_text_symbol` supplies the exterior
+presentation without a grammar or response lookup. Full current and residual sections remain
+resident until an explicit cold diagnostic requests them.
+
+[definition] `enable_material_transport` adds zero coefficients before the first occurrence.
+The native update uses the complete contextual current and old forward field retained at the
+actual source. Its old returned difference, chronological change and contemporary difference
+remain separate. The field stages the parameter delta with the encoder reaction, then emits
+through the changed transport. `with_text_field` enables this component; it supplies no pretrained
+content or host learner. `inspect_material_transport_state` returns the coefficient enclosure;
+`inspect_material_transport_residual` reconstructs complete oriented arithmetic defects, and
+`inspect_exact_material_transport` is an explicitly cold, potentially expensive coefficient/current
+decoder. Product operations call none of these inspectors.
+
+[definition] `TextFieldSession` borrows one native field and returns every received or self-emitted
+symbol through its ordinary recurrence. It retains a failed native reception and distinguishes
+open current, reserved codeword, interruption, native refusal and part completion. The prototype
+uses an explicitly decoded-symbol return through the exterior chart; this is not an identity map
+on the full continuous outgoing field. An end-of-part marker is an application boundary, not a
+general measurement of completed thought. UTF-8 validity is checked separately.
+
+[established-bounded; measured] The first text run binds three recorded replies to their actual
+common request source and then presents a fresh mathematics question. It emits 64 copies of `d`
+and is interrupted without a completion marker. The [return record](../research/records/2026-09-06_AC1_THE_SHARED_SOURCE_MEETS_AN_EXPLICIT_TEXT_CURRENT_RECEIVER.md)
+retains the output, the distinct currents behind it and the verification scope. This first run
+produced neither a useful alpha response nor a durable model artifact.
+
+[established-bounded; measured] The [learned transport return](../research/records/2026-09-07_AC2_THE_RETAINED_CONTEXT_RECEIVES_A_NATIVE_MATERIAL_TRANSPORT.md)
+now distinguishes retained contextual sources with equal raw endpoints. Its first actual
+four-family run completes all native operations but stops at reserved codeword 373 and emits
+no text. This is preserved as a failed response while broader cultivation continues.
+
+[established-bounded; measured] The subsequent 64-family run completes 18,476 developmental
+operations, then emits `Dq~` and encounters reserved word 261. This also fails the request.
+It retained a diagnostic report and verified source/current trace. The subsequent
+[field persistence return](../research/records/2026-09-07_AC3_THE_CULTIVATED_FIELD_RESTARTS_WITHOUT_SOURCE_REPLAY.md)
+adds durable native continuation; useful broader conduct remains construction work.
+
+```sh
+cargo build -p holonics-hna --example alpha_text
+target/debug/examples/alpha_text .local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl --families 4 --fractional-bits 72 --prompt .local/artifacts/athena-alpha/ac2/first-request.txt --emit-symbols 64 --report .local/artifacts/athena-alpha/ac2/new-text-study.json
+target/debug/examples/alpha_text .local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl --families 4 --fractional-bits 72 --checkpoint .local/artifacts/athena-alpha/new-field.hna --report .local/artifacts/athena-alpha/new-development.json
+target/debug/examples/alpha_text --resume .local/artifacts/athena-alpha/new-field.hna --families 0 --prompt .local/artifacts/athena-alpha/ac2/first-request.txt --emit-symbols 64 --report .local/artifacts/athena-alpha/new-inference.json
+```
+
+[definition] Supply a UTF-8 prompt file or a checkpoint destination, and a fresh private report
+path. The driver admits common
+development material, preserves source coordinates and open parent conditions, and samples actual
+native emission. Multiple parent families require a wider contextual port and remain unbound;
+the driver never picks one by ordering the links. `--checkpoint` saves the actual development
+boundary before an optional prompt. `--resume` consumes that cold chart into one continuing owner;
+`--families N` then admits N additional development families. With zero additional families the
+driver never opens the original exposure. Fresh destinations are required; a resume cannot
+silently change the saved numerical grain. This batch driver is not an interactive consumer release.
+
+[definition] `NativeFieldRest` retains the current seed, memory, relation, covariance, full
+junction/transport history, numerical residuals, frames and actual supplied source capabilities.
+Remount installs those sections without native replay. Its compact wire stores each exact i64
+codeword once, rebuilding identical interval endpoints; current radii and separating histories
+remain. Structural validation and a wire checksum do not authenticate an externally invented history.
+
+[definition] `alpha::checkpoint::SavedTextField` adds the actual latest or staged text source,
+shared parent anchors, application bytes and `HnaStreamState`. `with_session` restores them together.
+Use `checkpoint_stream` for live delivery; `checkpoint` declares an empty batch delivery state.
+`TextFieldSession::stage` retains an unexecuted symbol, and `retry_pending` enacts that exact input.
+`HnaStream::drain_pending` delivers an already-produced frame without executing another request.
+Unknown native completion refuses persistence. The batch driver binds its exposure cursor and
+record/source population to the saved native cut, and refuses a live delivery state it cannot own.
+
+[definition] `--history-archive NEW.history` adds the field's
+[exact exterior placement](../research/records/2026-09-07_AC3_THE_COMPLETE_HISTORY_MOVES_TO_AN_EXTERIOR_CHART_AND_ITS_ADDRESSED_SOURCE_RETURNS.md).
+Completed-family history moves to the declared file only after its full carriers are durably
+written; the latest source and current standing remain resident. A later actual source handle
+remounts its original carriers without replaying development. `with_session_archived` restores
+a checkpoint with that placement directly. A `.history` file backs the live field; `.hna` still
+includes every historical payload and has no dependency on that backing path.
+
+[established-bounded; measured] The 64-family development cut uses 475,104 bytes of native resident
+payload with archived history, versus 673,556,304 bytes previously. Its final body and failed
+response remain exactly equal. This is a GPU placement result: the checkpoint loader and writer
+still materialize complete history in host memory, and history storage grows on disk. Placement
+readouts are reported separately from native operations within each family.
+
+[definition] `--inspect-all-currents true` adds complete cold junction/transport history and the
+internal-current population to this diagnostic report. Without it, those historical diagnostics
+are not read out. Development performs no per-operation numerical section readout. The
+[September 7 record](../research/records/2026-09-07_AC1_THE_BALANCED_FACTOR_RETURNS_THE_FULL_CURRENT_AND_THE_CODEC_OWES_ITS_OWN_TRANSPORT.md)
+separates the factorization result from learned material conduct and response quality.
+
 ## Run it
+
+[established-bounded; measured] The [complete-current source receiver](../research/records/2026-09-07_AC2_THE_FULL_INTERNAL_CURRENT_HAS_AN_ADDRESSED_PREFIX_PAIRING.md)
+constructs the retained outgoing current together with the full born internal-current population
+through exact prefix moments. `NativeCurrentHistorySourceReceiver::on_empty` binds it to one
+field; `receive_completed` observes each next completed field return while its receiving carriers
+are resident. `inspect` exposes numerical representatives and the complete-source radius;
+`pairing` returns a ball enclosing the actual source inner product. The current implementation
+supports integral root contacts and retains wider numerator words on the device.
+
+[definition] `alpha_current_source` remains an explicit construction receiver: it runs over actual
+exposure and publishes a diagnostic report, without a response or model publication.
+
+[established-bounded; measured] The separate [complete-current material variant](../research/records/2026-09-07_AC2_THE_COMPLETE_CURRENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md)
+now joins that source into the fused field/material return, retaining full parameter/source error
+and durable state. Select it on a fresh `alpha_text` run with `--material-source complete-current`;
+saved models retain their source mode. Its four-family development checkpoint returned, while
+its subsequent response was `.` followed by a text-receiver obstruction. This bounded coupling
+does not establish the generative contextual attachment or useful language.
 
 [established-bounded; measured] These commands run the checked-in examples on the standing CUDA
 apparatus and the Apple Metal phase realization. The [Apple return](../research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md)

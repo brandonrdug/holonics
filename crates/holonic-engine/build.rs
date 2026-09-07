@@ -52,6 +52,9 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/exact_resident_adjoint.cuh");
     println!("cargo:rerun-if-changed=kernels/exact_resident_intervention.cuh");
     println!("cargo:rerun-if-changed=kernels/exact_conic_support.cu");
+    println!("cargo:rerun-if-changed=kernels/exact_integer.cuh");
+    println!("cargo:rerun-if-changed=kernels/field_current_history_source.cuh");
+    println!("cargo:rerun-if-changed=kernels/field_complete_material_transport.cuh");
     println!("cargo:rerun-if-changed=kernels/exact_relation_support.cu");
     println!("cargo:rerun-if-changed=kernels/refine_shell.cu");
     println!("cargo:rerun-if-changed=kernels/refine_shell/refine_shared.cuh");
@@ -68,6 +71,11 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/exact_embedding_fiber.cu");
     println!("cargo:rerun-if-changed=kernels/exact_resident_section.cu");
     println!("cargo:rerun-if-changed=kernels/constitutive_field.cuh");
+    println!("cargo:rerun-if-changed=kernels/paired_field_junction.cuh");
+    println!("cargo:rerun-if-changed=kernels/enclosed_field_junction.cuh");
+    println!("cargo:rerun-if-changed=kernels/balanced_field_factorization.cuh");
+    println!("cargo:rerun-if-changed=kernels/field_material_transport.cuh");
+    println!("cargo:rerun-if-changed=kernels/field_differential_receiver.cuh");
     println!("cargo:rerun-if-changed=kernels/exact_quartic_realizers.cu");
     println!("cargo:rerun-if-changed=kernels/exact_eta_head.cu");
     if env::var("CARGO_CFG_TARGET_OS").as_deref() != Ok("linux") {

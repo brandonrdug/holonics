@@ -115,6 +115,12 @@ against frontier models.
 
 ## Cultivation direction
 
+[project-postulate] The [September 7 correction](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
+joins black-box generator recovery, group/phase transport and Holonic Compression in native
+formation. A Preimage Fibre represents compatible causes at the available observation scope;
+its family characteristics guide future conduct without requiring a perfect inverse or a
+reversible record of the past. This is the shared attachment question for text and acoustics.
+
 [definition] The [live roadmap](plans/THE_ROADMAP.md) records completed native contextual
 foundations and conversation-data preparation, followed by September 6 synthesis. Athena-alpha
 remains unattained; the subsequent cultivation direction is general English, code and mathematics

@@ -7,9 +7,15 @@ the application implementations are in [holonics-hna](../crates/holonics-hna/REA
 
 ## Athena-alpha and the next cultivation
 
-[definition] The active [Athena-alpha blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
-is authorized for immediate construction through completion. It uses the prepared conversations
-and existing native owners, and requires the actual useful model, interface and integrated evidence.
+[definition] The [Athena-alpha blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
+is authorized through completion and resumed after Brandon's September 7 corrections. It uses the
+prepared conversations and existing native owners, and requires the actual useful model, interface
+and integrated evidence.
+
+[project-postulate] The [September 7 correction](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
+places generator recovery, phase transport and Holonic Compression inside the developing
+recurrence shared with acoustics. A **Preimage Fibre** can carry useful constraints from limited
+observations; it is not an obligation to reverse the source or archive every past state.
 
 [project-postulate] Brandon's September 6 ruling is explicit: Athena-alpha has been planned but
 has never been attained by his product standard. Historical `AthenaAlphaApplication` types,

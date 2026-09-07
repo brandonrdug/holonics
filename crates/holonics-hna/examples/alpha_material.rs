@@ -8,8 +8,10 @@
 
 use holonic_engine::{
     native_ecology::constitutive_fibre::{
-        ConstitutiveFibreError, NativeConstitutiveField, NativeFieldEmission, NativeFieldLineage,
-        NativeFieldOccurrence, NativeFieldReceiverStatus,
+        ConstitutiveFibreError, NativeConstitutiveField, NativeFieldEmission,
+        NativeFieldInternalCurrent, NativeFieldInternalCurrentBall,
+        NativeFieldJunctionRepresentation, NativeFieldLineage, NativeFieldOccurrence,
+        NativeFieldReceiverStatus,
     },
     resident_section::ResidentSectionRest,
 };
@@ -18,14 +20,18 @@ use holonics_hna::{
         exposure::{
             ExposureLink, ExposureOccurrence, ExposurePart, ExposurePartition, ExposureReader,
         },
-        material::{with_octet_field, AlphaMaterialError, OctetExcitation, OCTET_INPUT_CHANNELS},
+        material::{
+            with_enclosed_octet_field, with_octet_field, with_paired_octet_field,
+            AlphaMaterialError, OctetExcitation, OCTET_INPUT_CHANNELS,
+        },
     },
     publish_new,
 };
 use serde::Serialize;
 use std::{
-    io,
+    io::{self, Write},
     path::{Path, PathBuf},
+    time::Instant,
 };
 
 #[derive(Clone, Debug, Serialize)]
@@ -81,7 +87,7 @@ impl From<ResidentSectionRest> for SectionObserver {
     }
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Debug, Serialize)]
 struct BodyObserver {
     occurrence_count: usize,
     lineage: Vec<NativeFieldLineage>,
@@ -91,6 +97,11 @@ struct BodyObserver {
     relation: Option<SectionObserver>,
     pending_lineage: Option<NativeFieldLineage>,
     observer_error: Option<String>,
+    junction_covariance: Option<SectionObserver>,
+    junction_history: Vec<(usize, SectionObserver)>,
+    internal_currents: Option<Vec<NativeFieldInternalCurrent>>,
+    junction_representation: Option<NativeFieldJunctionRepresentation>,
+    internal_current_enclosures: Option<Vec<NativeFieldInternalCurrentBall>>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -126,6 +137,7 @@ struct VerticalFormation {
 struct Report {
     schema: &'static str,
     profile: &'static str,
+    observation_mode: &'static str,
     exposure_path: String,
     families_aperture: u64,
     frames_seen: u64,
@@ -150,13 +162,20 @@ struct Report {
     native_census_before_observers: Option<holonic_engine::resident_section::TransferCensus>,
     body: Option<BodyObserver>,
     failure: Option<FailureCoordinate>,
+    material_wall_seconds: f64,
+    observer_wall_seconds: f64,
 }
 
 impl Report {
-    fn new(exposure_path: &Path, families_aperture: u64) -> Self {
+    fn new(exposure_path: &Path, families_aperture: u64, paired: bool) -> Self {
         Self {
             schema: "holonics.athena-alpha-material-study.v1",
-            profile: "matched-unit-octet-excitation-native-field",
+            profile: if paired {
+                "matched-unit-octet-field-with-paired-junction"
+            } else {
+                "matched-unit-octet-excitation-native-field"
+            },
+            observation_mode: "per-occurrence",
             exposure_path: exposure_path.display().to_string(),
             families_aperture,
             frames_seen: 0,
@@ -181,6 +200,8 @@ impl Report {
             native_census_before_observers: None,
             body: None,
             failure: None,
+            material_wall_seconds: 0.0,
+            observer_wall_seconds: 0.0,
         }
     }
 }
@@ -279,6 +300,40 @@ fn observe_body(field: &NativeConstitutiveField<'_>, inspect_sources: &[usize]) 
                 .ok()
         })
         .collect();
+    let junction_covariance = field
+        .inspect_junction_covariance()
+        .map_err(|error| errors.push(error.to_string()))
+        .ok()
+        .flatten()
+        .map(Into::into);
+    let mut junction_history = Vec::new();
+    if field.has_paired_junction() {
+        for at in 0..occurrence_count {
+            match field.inspect_junction(at) {
+                Ok(Some(section)) => junction_history.push((at, section.into())),
+                Ok(None) => errors.push(format!("junction history missing at {at}")),
+                Err(error) => errors.push(error.to_string()),
+            }
+        }
+    }
+    let junction_representation = field.junction_representation();
+    let internal_currents = if matches!(
+        junction_representation,
+        Some(NativeFieldJunctionRepresentation::EnclosedDyadic { .. })
+    ) {
+        None
+    } else {
+        field
+            .inspect_internal_currents()
+            .map_err(|error| errors.push(error.to_string()))
+            .ok()
+            .flatten()
+    };
+    let internal_current_enclosures = field
+        .inspect_internal_current_enclosures()
+        .map_err(|error| errors.push(error.to_string()))
+        .ok()
+        .flatten();
     BodyObserver {
         occurrence_count,
         lineage: (0..occurrence_count)
@@ -290,6 +345,11 @@ fn observe_body(field: &NativeConstitutiveField<'_>, inspect_sources: &[usize]) 
         held,
         relation,
         observer_error: (!errors.is_empty()).then(|| errors.join("; ")),
+        junction_covariance,
+        junction_history,
+        internal_currents,
+        junction_representation,
+        internal_current_enclosures,
     }
 }
 
@@ -326,6 +386,7 @@ fn process_exposure(
     field: &mut NativeConstitutiveField<'_>,
     families_aperture: u64,
     report: &mut Report,
+    resident: bool,
 ) -> Result<(), AlphaMaterialError> {
     while report.development_families_acknowledged < families_aperture {
         let frame = reader
@@ -370,8 +431,40 @@ fn process_exposure(
                     Some(source) => NativeFieldOccurrence::through(source, incoming),
                     None => NativeFieldOccurrence::entering(incoming),
                 };
-                let step = match field.advance_status(&mut occurrence) {
-                    Ok(step) => step,
+                let advanced = if resident {
+                    field
+                        .advance_resident(&mut occurrence)
+                        .map(|step| step.source)
+                } else {
+                    field.advance_status(&mut occurrence).and_then(|step| {
+                        if report.first_vertical_formation.is_none() {
+                            if let Some(pivot) =
+                                step.formed_pivot.filter(|p| *p >= 4 * field.nodes())
+                            {
+                                report.first_vertical_formation = Some(VerticalFormation {
+                                    sequence: frame.sequence,
+                                    part_ordinal: part.ordinal,
+                                    octet_index,
+                                    native_occurrence: step.lineage.occurrence,
+                                    formed_pivot: pivot,
+                                    source_occurrence: step.lineage.received_from,
+                                    paired_source: step
+                                        .lineage
+                                        .received_from
+                                        .map(|i| field.inspect_source(i).map(SectionObserver::from))
+                                        .transpose()?,
+                                    relation_after: field.inspect_relation()?.into(),
+                                });
+                            }
+                        }
+                        report.final_rank = step.successor_rank;
+                        report.formed_pivots += u64::from(step.formed_pivot.is_some());
+                        record_reading(report, step.receiver);
+                        Ok(step.source)
+                    })
+                };
+                let source = match advanced {
+                    Ok(source) => source,
                     Err(error) => {
                         capture_failure(
                             report,
@@ -392,30 +485,9 @@ fn process_exposure(
                         return Ok(());
                     }
                 };
-                if report.first_vertical_formation.is_none() {
-                    if let Some(pivot) = step.formed_pivot.filter(|p| *p >= 4 * field.nodes()) {
-                        report.first_vertical_formation = Some(VerticalFormation {
-                            sequence: frame.sequence,
-                            part_ordinal: part.ordinal,
-                            octet_index,
-                            native_occurrence: step.lineage.occurrence,
-                            formed_pivot: pivot,
-                            source_occurrence: step.lineage.received_from,
-                            paired_source: step
-                                .lineage
-                                .received_from
-                                .map(|i| field.inspect_source(i).map(SectionObserver::from))
-                                .transpose()?,
-                            relation_after: field.inspect_relation()?.into(),
-                        });
-                    }
-                }
-                report.final_rank = step.successor_rank;
-                previous = Some(step.source);
+                previous = Some(source);
                 report.octets_presented += 1;
                 report.native_occurrences += 1;
-                report.formed_pivots += u64::from(step.formed_pivot.is_some());
-                record_reading(report, step.receiver);
             }
             // A part boundary is an actual source boundary; no emission is linked into the next part.
             drop(previous);
@@ -438,7 +510,7 @@ fn process_exposure(
 }
 
 fn usage() -> &'static str {
-    "usage: alpha_material EXPOSURE --families N --report NEW.json [--inspect-source N ...]"
+    "usage: alpha_material EXPOSURE --families N --report NEW.json [--inspect-source N ...] [--paired-junction | --enclosed-junction FRACTIONAL_BITS] [--resident]"
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -447,8 +519,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut families = None;
     let mut report_path = None;
     let mut inspect_sources = Vec::new();
+    let mut paired = false;
+    let mut enclosed = None;
+    let mut resident = false;
     while let Some(arg) = args.next() {
         match arg.as_str() {
+            "--resident" => resident = true,
+            "--paired-junction" => paired = true,
+            "--enclosed-junction" => {
+                enclosed = Some(
+                    args.next()
+                        .ok_or("missing fractional bits")?
+                        .parse::<u32>()?,
+                )
+            }
             "--families" => {
                 families = Some(
                     args.next()
@@ -471,47 +555,87 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .filter(|value| *value > 0)
         .ok_or("--families must be a positive explicit aperture")?;
     let report_path = report_path.ok_or("--report is required for the private report")?;
+    if paired && enclosed.is_some() {
+        return Err("choose one declared junction representation".into());
+    }
     let mut reader = ExposureReader::open(&source)?;
-    let mut report = Report::new(&source, families);
-    let native_result = with_octet_field(|field| {
-        let result = process_exposure(&mut reader, field, families, &mut report);
+    let mut report = Report::new(&source, families, paired);
+    if enclosed.is_some() {
+        report.profile = "matched-unit-octet-field-with-enclosed-junction";
+    }
+    if resident {
+        report.observation_mode = "terminal";
+    }
+    let operation = |field: &mut NativeConstitutiveField<'_>| {
+        let start = Instant::now();
+        let result = process_exposure(&mut reader, field, families, &mut report, resident);
+        report.material_wall_seconds = start.elapsed().as_secs_f64();
         report.native_census_before_observers = Some(field.census());
+        let start = Instant::now();
+        let status_result = if resident {
+            // Read immutable historical receipts after the material run. No intermediate
+            // relation snapshot is claimed; first_vertical_formation is deliberately absent.
+            (0..field.occurrence_count()).try_for_each(|at| {
+                let status = field.inspect_occurrence_status(at)?;
+                report.final_rank = status.successor_rank;
+                report.formed_pivots += u64::from(status.formed_pivot.is_some());
+                record_reading(&mut report, status.receiver);
+                Ok::<_, ConstitutiveFibreError>(())
+            })
+        } else {
+            Ok(())
+        };
         report.body = Some(observe_body(field, &inspect_sources));
-        result
-    });
+        report.observer_wall_seconds = start.elapsed().as_secs_f64();
+        result.and(status_result.map_err(AlphaMaterialError::Native))
+    };
+    let native_result = if let Some(grain) = enclosed {
+        with_enclosed_octet_field(grain, operation)
+    } else if paired {
+        with_paired_octet_field(operation)
+    } else {
+        with_octet_field(operation)
+    };
     if let Err(error) = &native_result {
-        report.failure = Some(FailureCoordinate {
-            kind: "application-refusal".to_owned(),
-            error: error.to_string(),
-            sequence: None,
-            event: None,
-            source: None,
-            record_number: None,
-            byte_start: None,
-            byte_end: None,
-            part_ordinal: None,
-            pointer: None,
-            octet_index: None,
-            octet: None,
-            native_occurrences: report.native_occurrences,
-        });
+        if report.failure.is_none() {
+            report.failure = Some(FailureCoordinate {
+                kind: "application-refusal".to_owned(),
+                error: error.to_string(),
+                sequence: None,
+                event: None,
+                source: None,
+                record_number: None,
+                byte_start: None,
+                byte_end: None,
+                part_ordinal: None,
+                pointer: None,
+                octet_index: None,
+                octet: None,
+                native_occurrences: report.native_occurrences,
+            });
+        }
     }
     let cursor = reader.cursor();
     report.last_cursor_sequence = cursor.next_sequence;
     report.last_cursor_byte_offset = cursor.byte_offset;
+    let publication_start = Instant::now();
     publish_new(&report_path, |file| {
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;
             file.set_permissions(std::fs::Permissions::from_mode(0o600))?;
         }
-        serde_json::to_writer_pretty(file, &report).map_err(io::Error::other)
+        let mut writer = io::BufWriter::new(file);
+        serde_json::to_writer_pretty(&mut writer, &report).map_err(io::Error::other)?;
+        writer.flush()
     })?;
+    let publication_seconds = publication_start.elapsed().as_secs_f64();
     println!(
         "{}",
         serde_json::json!({
             "schema": report.schema,
             "profile": report.profile,
+            "observation_mode": report.observation_mode,
             "families_aperture": report.families_aperture,
             "development_families_acknowledged": report.development_families_acknowledged,
             "parts_presented": report.parts_presented,
@@ -526,7 +650,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "unbound_source_relations":report.unbound_source_relations.len(),
             "record_context_is_operative":false,
             "learned_text_emitted":false,
-            "report_published": true
+            "report_published": true,
+            "material_wall_seconds":report.material_wall_seconds,
+            "observer_wall_seconds":report.observer_wall_seconds,
+            "publication_wall_seconds":publication_seconds
         })
     );
     if let Some(failure) = &report.failure {

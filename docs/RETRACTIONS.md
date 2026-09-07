@@ -21,6 +21,14 @@ or conversational model. Curated data did not narrow the requested outcome, and 
 access is not a prerequisite for real-time processing or useful speech. See the
 [correction](../research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md).
 
+[historical; source-inspected] September 7: the synthesis again used “reconstruction fibre” after
+Brandon had replaced that term with **Preimage Fibre** on September 2 and repeated the correction
+on September 3. The terminology and any implied perfect-inverse/raw-past-retention requirement for
+learning are withdrawn. Limited observations can constrain generative families and future conduct.
+Exact persistence, source-codec round trips and declared exact receiver quotients retain their
+particular scopes. The [correction record](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
+contains the actual message coordinates and shared text/acoustic attachment.
+
 [project-postulate] Brandon's September 6 ruling states that Athena-alpha has never been
 attained by his product standard. Historical alpha filenames, type names and campaign completion
 claims retain only their explicitly demonstrated apparatus/model-material scopes. The

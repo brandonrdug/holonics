@@ -22,6 +22,42 @@ contracts and records preserve their completed scope; their old imperatives sche
 
 ## Active Athena-alpha cultivation campaign
 
+[project-postulate] **Brandon has resumed the goal after the September 7 corrections.**
+AC1–AC2 now composes generator recovery, group/phase transport and Holonic Compression,
+shared with the separately pushed Apple acoustic work. Read the
+[source/intent synthesis](../../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
+and the corrected blueprint. **Preimage Fibre** carries compatible causes and
+future-conduct constraints from limited observations; neither perfect inversion nor retention of
+every raw state is a learning prerequisite. Continue the corrected native attachment.
+
+[definition] Brandon's subsequent chord clarification preserves general class descriptions without
+requiring an individual physical occurrence, alongside superposition and ordered composition.
+The [Mac coordination milestone](../../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md#mac-workflow-handoff)
+is a committed shared generator/phase return with an explicit Metal port boundary. Notify Brandon
+then; desktop acoustics is optional supporting research, not another required campaign.
+
+[established-bounded; measured] The [conditional native action](../../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
+now binds an actual source and independently supplied condition through direct and mixed complex
+current. Native phase-field observations identify a reusable action, which predicts a new condition
+and conducts later wave currents without numerical readback. The shared primitive and explicit
+Metal port boundary are ready for Mac re-engagement; acoustic and conversation model completion
+remain open. Next derive the condition Preimage Fibre within the same learned relation, using a
+fixed actual source and later receiving current, then bind that conduct to the conversation ecology.
+
+[established-bounded; measured] The [resident local return](../../research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md)
+now lets native observations develop the existing local relation and its rational emitted current
+enter subsequent operations directly. Partial source-domain knowledge supports new superposition;
+all 84 constitutive tests pass. Continue the AC1–AC2 attachment from this composable owner into
+the actual conversation ecology, with the appropriate phase-sensitive family and contact law.
+
+[established-bounded; measured] The [field-to-resident return](../../research/records/2026-09-07_AC1_THE_FIELD_RETURNS_A_RESIDENT_RELATION_FACE_AND_A_PLURAL_FIBRE_HAS_FIXED_RECEIVERS.md)
+now crosses both historical source branches into the current frame, reads the learned relation
+on device and exposes fixed receivers of a plural fibre. All 89 native tests and the public codec
+control pass. The actual saved conversation model still emits no text. Its exact vertical
+directions locate the failure in the formed local relation; further precision cannot remove them.
+Continue with the actual contextual conditions and applicable local action. A corpus-wide use of
+one local linear chart is not justified by coherent superposition within a situated carrier.
+
 [definition] Brandon has authorized design followed immediately by construction and completion of
 [the Athena-alpha blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md) as a goal. It orders AC0–AC5:
 source-qualified available conversations; coupled native material/current/formation; learned text
@@ -50,6 +86,49 @@ by making the relevant historical standing and channels operative through admitt
 by binding reaction to developing morphology; a higher polynomial face alone does not resolve
 that witness. This refines the current attachment, without changing AC0–AC5 order or declaring
 the field to be a cultivated alpha.
+
+[established-bounded; measured] The [paired junction](../../research/records/2026-09-06_AC1_THE_PAIRED_JUNCTION_RETAINS_ITS_INNER_CURRENT.md)
+now supplies native reaction through a formed Hermitian moment and retained internal current, with
+a complete internal-current decoder and same-input contextual controls. Its word realization
+stopped after six coupled operations. The [enclosed-current return](../../research/records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md)
+now carries all 728 operations of the four-family slice, retaining the full residual and exact
+error decoder. All native certificates and the declared exact anchors pass. Resident continuation
+preserves that body with zero numerical section readouts during material admission; cold diagnostics
+remain separate and the complete launch obstruction is still checked. Continue AC1 with
+efficient broader operation, lawful history placement and productive contextual organization.
+
+[established-bounded; measured] The [shared-source/text receiver](../../research/records/2026-09-06_AC1_THE_SHARED_SOURCE_MEETS_AN_EXPLICIT_TEXT_CURRENT_RECEIVER.md)
+now binds actual common-parent endpoints and conducts an exterior octet/end-of-part chart through
+one native field. Its first fresh-request return repeats `d` for all 64 allowed symbols and remains
+interrupted, with distinct continuing native currents. Repair the current-to-material composition
+and the productive use of historical/contextual standing; inspect actual responses as this grows.
+The scalar error bound for a continuous learned-source attachment is insufficient at its recorded
+scope. AC1 and the full useful alpha product remain open; this byte return does not complete AC2.
+
+[definition] The [September 7 binding](../../research/records/2026-09-07_AC1_THE_BALANCED_FACTOR_RETURNS_THE_FULL_CURRENT_AND_THE_CODEC_OWES_ITS_OWN_TRANSPORT.md)
+keeps the complete native current under a checked balanced factorization. The
+[native material transport](../../research/records/2026-09-07_AC2_THE_RETAINED_CONTEXT_RECEIVES_A_NATIVE_MATERIAL_TRANSPORT.md)
+now receives the source-time contextual current and old forward field, retains the chronological
+change and actual returned difference, and stages its coercive parameter return with the encoder.
+Its first four-family run stops at a reserved codeword without a text response. The
+[field persistence return](../../research/records/2026-09-07_AC3_THE_CULTIVATED_FIELD_RESTARTS_WITHOUT_SOURCE_REPLAY.md)
+now retains the complete cultivated owner, source capabilities and exposure cut across processes.
+The durable state and [exact historical placement](../../research/records/2026-09-07_AC3_THE_COMPLETE_HISTORY_MOVES_TO_AN_EXTERIOR_CHART_AND_ITS_ADDRESSED_SOURCE_RETURNS.md)
+remain available for their demonstrated scopes. Further broad development follows the corrected
+AC1–AC2 attachment. The goal's resumption does not establish that attachment by itself.
+Complete historical carriers now leave GPU residency and remount through actual source handles;
+host persistence and disk size remain growing costs. Archive relocation is not the generative
+compression sought by the current correction. Preserve numerical error and complete defects; do not turn source
+uncertainty into a point. AC1–AC5 completion and the useful alpha product remain open.
+
+[definition] The [complete-current source return](../../research/records/2026-09-07_AC2_THE_FULL_INTERNAL_CURRENT_HAS_AN_ADDRESSED_PREFIX_PAIRING.md)
+now supplies native pairings over the complete born internal-current population and a reachable
+zero-boundary counterexample to outgoing-only source sufficiency. Its 732-source actual-material
+comparison and native controls return at construction-receiver scope. A subsequent working-tree
+variant joins that source to the material return; its diagnostic still fails useful language.
+The September 7 correction now governs the next attachment: constrained generative standing must
+participate in subsequent contact/reaction and emission. Full history and a larger current input
+do not establish that attachment or close a cultivation phase.
 
 ## Apple silicon and acoustic branch
 
