@@ -24,6 +24,7 @@ dimension!(ApparatusWork);
 pub enum DimensionObstruction {
     ScaleChartOutsideNativeThread,
     ApparatusWorkOutsideNativeRest,
+    NotExposedByConstitutiveFieldProfile,
 }
 
 /// An exact dimension or its typed open obligation. Unknown is never encoded as zero.

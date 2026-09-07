@@ -1,6 +1,11 @@
 use super::*;
 
 impl<'chart> ResidentSurface<'chart> {
+    /// Completed Metal command-buffer times, observed without reading native state or waiting.
+    #[cfg(target_os = "macos")]
+    pub fn metal_execution_timing(&self) -> mount::cuda::MetalExecutionTiming {
+        self.context.execution_timing()
+    }
     /// **Mount the apparatus occurrence** on the readout's context. Refuses when no device answers,
     /// when the census names a device the readout did not mount, or when a kernel symbol is
     /// missing from the module.

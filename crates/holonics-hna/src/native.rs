@@ -17,6 +17,7 @@ pub use batch::NativeBatchReceive;
 mod checkpoint;
 pub use checkpoint::NativeSavedSession;
 mod acoustic;
+pub mod acoustic_field;
 pub use acoustic::{
     AcousticApplication, AcousticInterruption, AcousticPendingReceive, AcousticRun,
     AcousticRunOptions, AcousticSavedApplication, append_acoustic, resume_acoustic,

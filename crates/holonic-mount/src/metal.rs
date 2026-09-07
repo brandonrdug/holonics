@@ -6,6 +6,7 @@
 //! the CPU only at explicit ingress/egress boundaries after GPU completion.
 
 use metal::{MTLCommandBufferStatus, MTLResourceOptions, MTLSize};
+use objc::{msg_send, sel, sel_impl};
 use std::{
     cell::{Cell, RefCell},
     collections::BTreeMap,
@@ -51,6 +52,16 @@ struct Runtime {
     queue: ::metal::CommandQueue,
     pending: RefCell<Vec<::metal::CommandBuffer>>,
     failure: RefCell<Option<CudaError>>,
+    execution_timing: Cell<MetalExecutionTiming>,
+}
+
+/// Cold command-buffer timing supplied by Metal after completion. These floating-point seconds
+/// are apparatus measurements only and never participate in native arithmetic or dispatch.
+#[derive(Clone, Copy, Debug, Default, PartialEq)]
+pub struct MetalExecutionTiming {
+    pub completed_command_buffers: u64,
+    pub unavailable_timestamps: u64,
+    pub gpu_seconds: f64,
 }
 struct Capture {
     runtime: Rc<Runtime>,
@@ -66,11 +77,24 @@ fn runtime() -> Result<Rc<Runtime>> {
         .with(|c| c.borrow().clone())
         .ok_or_else(|| invalid("context", "no current Metal context"))
 }
+#[allow(unexpected_cfgs)] // objc 0.2's selector macro checks the legacy cargo-clippy feature.
 fn synchronize(rt: &Runtime) -> Result<()> {
     let pending = std::mem::take(&mut *rt.pending.borrow_mut());
     let mut first_failure = rt.failure.borrow().clone();
     for command in pending {
         command.wait_until_completed();
+        let mut timing = rt.execution_timing.get();
+        timing.completed_command_buffers += 1;
+        // MTLCommandBuffer.h: host seconds at GPU execution start/end; zero means unavailable.
+        let command_ref = command.as_ref();
+        let start: f64 = unsafe { msg_send![command_ref, GPUStartTime] };
+        let end: f64 = unsafe { msg_send![command_ref, GPUEndTime] };
+        if start.is_finite() && end.is_finite() && start > 0.0 && end >= start {
+            timing.gpu_seconds += end - start;
+        } else {
+            timing.unavailable_timestamps += 1;
+        }
+        rt.execution_timing.set(timing);
         if command.status() != MTLCommandBufferStatus::Completed {
             if first_failure.is_none() {
                 first_failure = Some(invalid(
@@ -204,6 +228,7 @@ impl Context {
             queue: device.inner.new_command_queue(),
             pending: RefCell::new(Vec::new()),
             failure: RefCell::new(None),
+            execution_timing: Cell::new(MetalExecutionTiming::default()),
         });
         CURRENT.with(|c| *c.borrow_mut() = Some(inner.clone()));
         Ok(Self { inner })
@@ -250,6 +275,10 @@ impl Drop for Context {
     }
 }
 impl BorrowedContext {
+    /// Observe timestamps already collected at ordinary completion; this does not synchronize.
+    pub fn execution_timing(&self) -> MetalExecutionTiming {
+        self.inner.execution_timing.get()
+    }
     pub fn adopt(raw: *mut c_void) -> Result<Self> {
         let inner = runtime()?;
         if Rc::as_ptr(&inner) as *mut c_void != raw {
@@ -804,6 +833,8 @@ impl Module {
             "section_constitutive_fibre" => (&[4, 5, 6, 12], 13),
             "section_constitutive_circulation" => (&[9, 10, 16], 17),
             "section_constitutive_rechart" => (&[5, 19], 20),
+            "section_constitutive_field" => (&[9, 10, 16], 17),
+            "section_constitutive_field_rechart" => (&[5, 19], 20),
             "section_census" | "section_census_serial_control" => (&[2, 3], 5),
             "section_carry" => (&[2, 8], 9),
             _ => {
@@ -1044,12 +1075,19 @@ mod tests {
         let graph = stream.end_capture().unwrap();
         assert_eq!(graph.census().unwrap().memset_nodes, 1);
         assert_eq!(graph.census().unwrap().memcpy_nodes, 1);
+        let timing_before = context.inner.execution_timing.get();
         graph.instantiate().unwrap().launch(&stream).unwrap();
         stream.synchronize().unwrap();
         let mut output = [0u32; 4];
         destination.copy_to_slice(&mut output).unwrap();
         assert_eq!(output, [7, 11, 13, 17]);
         context.synchronize().unwrap();
+        let timing = context.inner.execution_timing.get();
+        assert_eq!(timing.completed_command_buffers, timing_before.completed_command_buffers + 1);
+        assert!(timing.unavailable_timestamps <= timing.completed_command_buffers);
+        assert!(timing.gpu_seconds.is_finite() && timing.gpu_seconds >= 0.0);
+        context.synchronize().unwrap();
+        assert_eq!(context.inner.execution_timing.get(), timing);
     }
 
     #[test]

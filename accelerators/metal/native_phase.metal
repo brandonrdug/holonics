@@ -143,6 +143,16 @@ inline U uset(U a, uint n) {
   return a;
 }
 inline U umul(U a, U b, thread bool &ov) {
+  // Exact one-limb product: (2^32-1)^2 fits in ulong. This is a carrier
+  // specialization, not a different field law or a truncated product.
+  if (!(a.x[1] | a.x[2] | a.x[3] | b.x[1] | b.x[2] | b.x[3])) {
+    ulong product = (ulong)a.x[0] * (ulong)b.x[0];
+    U r = uzero();
+    r.x[0] = (uint)product;
+    r.x[1] = (uint)(product >> 32);
+    ov = false;
+    return r;
+  }
   uint p[8] = {0, 0, 0, 0, 0, 0, 0, 0};
   for (uint i = 0; i < 4; ++i) {
     ulong carry = 0;
@@ -175,6 +185,15 @@ inline W wmul(W a, W b, device uint *slot) {
   return wof(m, a.neg != b.neg, slot);
 }
 inline U udiv(U n, U d, thread U &rem) {
+  // Callers have already established d != 0. Avoid emulated wider division
+  // when both complete magnitudes inhabit the native uint chart.
+  if (!(n.x[1] | n.x[2] | n.x[3] | d.x[1] | d.x[2] | d.x[3])) {
+    U q = uzero();
+    q.x[0] = n.x[0] / d.x[0];
+    rem = uzero();
+    rem.x[0] = n.x[0] % d.x[0];
+    return q;
+  }
   if (n.x[2] == 0 && n.x[3] == 0 && d.x[2] == 0 && d.x[3] == 0) {
     ulong nn = (ulong)n.x[0] | ((ulong)n.x[1] << 32);
     ulong dd = (ulong)d.x[0] | ((ulong)d.x[1] << 32);
@@ -222,9 +241,9 @@ inline W wgcd(W a, W b, device uint *slot) {
 }
 inline W wnorm(thread W *row, uint width, thread W *den, device uint *slot) {
   W d = den ? (!wzero_p(*den) ? *den : wzero()) : wzero();
-  for (uint j = 0; j < width; ++j)
+  for (uint j = 0; j < width && !ueq(d.m, uone()); ++j)
     d = wgcd(d, row[j], slot);
-  if (wzero_p(d))
+  if (wzero_p(d) || ueq(d.m, uone()))
     return d;
   for (uint j = 0; j < width; ++j)
     row[j] = wdiv(row[j], d, slot);
@@ -234,14 +253,22 @@ inline W wnorm(thread W *row, uint width, thread W *den, device uint *slot) {
 }
 inline W wnorm(threadgroup W *row, uint width, threadgroup W *den, device uint *slot) {
   W d = den ? (!wzero_p(*den) ? *den : wzero()) : wzero();
-  for (uint j = 0; j < width; ++j)
+  for (uint j = 0; j < width && !ueq(d.m, uone()); ++j)
     d = wgcd(d, row[j], slot);
-  if (wzero_p(d))
+  if (wzero_p(d) || ueq(d.m, uone()))
     return d;
   for (uint j = 0; j < width; ++j)
     row[j] = wdiv(row[j], d, slot);
   if (den)
     *den = wdiv(*den, d, slot);
+  return d;
+}
+inline W wnorm(threadgroup W *row, uint width, thread W *den, device uint *slot) {
+  W d = den ? (!wzero_p(*den) ? *den : wzero()) : wzero();
+  for (uint j = 0; j < width && !ueq(d.m, uone()); ++j) d = wgcd(d, row[j], slot);
+  if (wzero_p(d) || ueq(d.m, uone())) return d;
+  for (uint j = 0; j < width; ++j) row[j] = wdiv(row[j], d, slot);
+  if (den) *den = wdiv(*den, d, slot);
   return d;
 }
 inline long toword(W a, device uint *slot) {
@@ -295,6 +322,24 @@ inline void fibre_query(device const long *basis, uint source_width, uint width,
     if (!wzero_p(query[j]))
       *disp = 1u;
 }
+inline void fibre_query(device const long *basis, uint source_width, uint width,
+                        threadgroup W *query, thread W *den, threadgroup const W *staged,
+                        long staged_pivot, thread uint *disp, thread uint *rank,
+                        device uint *slot) {
+  uint vertical = 0; *rank = 0;
+  for (uint p = 0; p < width; ++p) {
+    W pivot = fibre_entry(basis, width, p, p, staged, staged_pivot);
+    if (wneg_p(pivot)) { atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed); return; }
+    if (!wzero_p(pivot)) { ++*rank; if (p >= source_width) ++vertical; }
+    if (p >= source_width || wzero_p(pivot) || wzero_p(query[p])) continue;
+    W coefficient = query[p];
+    for (uint j = 0; j < width; ++j)
+      query[j] = wsub(wmul(pivot, query[j], slot), wmul(coefficient, fibre_entry(basis,width,p,j,staged,staged_pivot),slot),slot);
+    *den = wmul(*den, pivot, slot); if (*slot) return;
+    wnorm(query, width, den, slot); if (*slot) return;
+  }
+  *disp = vertical ? 2u : 0u; for (uint j=0;j<source_width;++j) if(!wzero_p(query[j])) *disp=1u;
+}
 inline long fibre_stage(device const long *basis, uint width, thread W *formed, device uint *slot) {
   long inserted = -1;
   for (uint p = 0; p < width; ++p) {
@@ -311,12 +356,12 @@ inline long fibre_stage(device const long *basis, uint width, thread W *formed, 
                        wmul(co, fromword(basis[(ulong)p * width + j]), slot), slot);
     if (*slot)
       return -1;
-    wnorm(formed, width, nullptr, slot);
+    wnorm(formed, width, (thread W *)nullptr, slot);
     if (*slot)
       return -1;
   }
   if (inserted >= 0) {
-    wnorm(formed, width, nullptr, slot);
+    wnorm(formed, width, (thread W *)nullptr, slot);
     if (*slot)
       return -1;
     if (wneg_p(formed[inserted]))
@@ -342,12 +387,12 @@ inline long fibre_stage(device const long *basis, uint width, threadgroup W *for
                        wmul(co, fromword(basis[(ulong)p * width + j]), slot), slot);
     if (*slot)
       return -1;
-    wnorm(formed, width, nullptr, slot);
+    wnorm(formed, width, (threadgroup W *)nullptr, slot);
     if (*slot)
       return -1;
   }
   if (inserted >= 0) {
-    wnorm(formed, width, nullptr, slot);
+    wnorm(formed, width, (threadgroup W *)nullptr, slot);
     if (*slot)
       return -1;
     if (wneg_p(formed[inserted]))
@@ -515,6 +560,315 @@ kernel void native_phase_wide_probe(device const uint *a [[buffer(0)]],
 }
 #endif
 
+// Complete multi-port field recurrence.  The field uses four source coordinates per node
+// (outgoing and held complex branches) followed by the two-coordinate target face.  All
+// intermediates remain W until the checked exterior conversion at the commit boundary.
+kernel void section_constitutive_field(
+    device const long *seed [[buffer(0)]], device long *memory_lo [[buffer(1)]],
+    device long *memory_hi [[buffer(2)]], device long *basis_lo [[buffer(3)]],
+    device long *basis_hi [[buffer(4)]], device const long *incoming [[buffer(5)]],
+    device const long *origin [[buffer(6)]], device const long *current_frame [[buffer(7)]],
+    device const long *origin_frame [[buffer(8)]], constant uint &nodes [[buffer(9)]],
+    constant uint &linked [[buffer(10)]], device long *output_lo [[buffer(11)]],
+    device long *output_hi [[buffer(12)]], device uint *slot [[buffer(13)]],
+    device const uint *census [[buffer(14)]], device const uint *lineage [[buffer(15)]],
+    constant uint &lineage_count [[buffer(16)]], threadgroup W *scratch [[threadgroup(0)]],
+    uint3 tid [[thread_position_in_threadgroup]]) {
+  if (tid.x || tid.y || tid.z)
+    return;
+  if (upstream(census, lineage, lineage_count, slot))
+    return;
+  if (!nodes || linked > 1 || nodes > 0xffffffffu / 6u) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed);
+    return;
+  }
+  uint sw = 4u * nodes, width = 6u * nodes;
+  if (width < sw || !current_frame || (linked && (!origin || !origin_frame))) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed);
+    return;
+  }
+  for (uint n = 0; n < nodes; ++n) {
+    device const long *f = current_frame + 3u * n;
+    W lhs = wadd(wmul(fromword(f[0]), fromword(f[0]), slot),
+                 wmul(fromword(f[1]), fromword(f[1]), slot), slot);
+    W rhs = wmul(fromword(f[2]), fromword(f[2]), slot);
+    if (f[2] <= 0 || *slot || !ueq(lhs.m, rhs.m)) {
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed);
+      return;
+    }
+    if (linked) {
+      device const long *b = origin_frame + 3u * n;
+      W bl = wadd(wmul(fromword(b[0]), fromword(b[0]), slot),
+                  wmul(fromword(b[1]), fromword(b[1]), slot), slot),
+        br = wmul(fromword(b[2]), fromword(b[2]), slot);
+      if (b[2] <= 0 || *slot || !ueq(bl.m, br.m)) {
+        atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED,
+                                 memory_order_relaxed);
+        return;
+      }
+    }
+  }
+  threadgroup W *cur = scratch, *prior = cur + width, *formed = prior + width;
+  threadgroup W *out = formed + width, *held = out + 3u * nodes;
+  for (uint j = 0; j < width; ++j) {
+    cur[j] = prior[j] = formed[j] = wzero();
+  }
+  W incoming_den = wi64(1);
+  for (uint n = 0; n < nodes; ++n) {
+    device const long *law = seed + 5u * n, *mem = memory_lo + 3u * n, *arr = incoming + 3u * n;
+    if (law[0] <= 0 || law[1] <= 0 || law[4] <= 0 || mem[2] <= 0 || arr[2] <= 0) {
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed);
+      return;
+    }
+    W unit = wadd(wmul(fromword(law[2]), fromword(law[2]), slot),
+                  wmul(fromword(law[3]), fromword(law[3]), slot), slot);
+    if (*slot || !ueq(unit.m, wmul(fromword(law[4]), fromword(law[4]), slot).m)) {
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed);
+      return;
+    }
+    if (linked)
+      incoming_den = flcm(incoming_den, fromword(arr[2]), slot);
+    W ir = wsub(wmul(fromword(law[2]), fromword(arr[0]), slot),
+                wmul(fromword(law[3]), fromword(arr[1]), slot), slot);
+    W ii = wadd(wmul(fromword(law[3]), fromword(arr[0]), slot),
+                wmul(fromword(law[2]), fromword(arr[1]), slot), slot);
+    W id = wmul(fromword(law[4]), fromword(arr[2]), slot);
+    W inc[3] = {ir, ii, id};
+    wnorm(inc, 2, &inc[2], slot);
+    W common = flcm(inc[2], fromword(mem[2]), slot),
+      adm = wadd(fromword(law[0]), fromword(law[1]), slot), den = wmul(common, adm, slot);
+    for (uint c = 0; c < 2; ++c) {
+      W entering = wmul(inc[c], wdiv(common, inc[2], slot), slot),
+        retained = wmul(fromword(mem[c]), wdiv(common, fromword(mem[2]), slot), slot);
+      W vel = wmul(wi64(2),
+                   wadd(wmul(fromword(law[0]), entering, slot),
+                        wmul(fromword(law[1]), retained, slot), slot),
+                   slot);
+      out[3 * n + c] = wsub(vel, wmul(adm, entering, slot), slot);
+      held[3 * n + c] = wsub(vel, wmul(adm, retained, slot), slot);
+    }
+    out[3 * n + 2] = held[3 * n + 2] = den;
+    wnorm(out + 3 * n, 2, out + 3 * n + 2, slot);
+    wnorm(held + 3 * n, 2, held + 3 * n + 2, slot);
+    if (*slot)
+      return;
+  }
+  W source_den = wi64(1);
+  for (uint n = 0; n < nodes; ++n) {
+    source_den = flcm(source_den, out[3 * n + 2], slot);
+    source_den = flcm(source_den, held[3 * n + 2], slot);
+  }
+  for (uint n = 0; n < nodes; ++n)
+    for (uint c = 0; c < 2; ++c) {
+      cur[4 * n + c] = wmul(out[3 * n + c], wdiv(source_den, out[3 * n + 2], slot), slot);
+      cur[4 * n + 2 + c] = wmul(held[3 * n + c], wdiv(source_den, held[3 * n + 2], slot), slot);
+    }
+  wnorm(cur, sw, &source_den, slot);
+  if (*slot)
+    return;
+  for (uint j = 0; j < sw; ++j)
+    output_lo[j] = output_hi[j] = toword(cur[j], slot);
+  output_lo[sw] = output_hi[sw] = toword(source_den, slot);
+  if (*slot)
+    return;
+  for (uint n = 0; n < nodes; ++n) {
+    out[3 * n] = cur[4 * n + 2];
+    out[3 * n + 1] = cur[4 * n + 3];
+    out[3 * n + 2] = source_den;
+    wnorm(out + 3 * n, 2, out + 3 * n + 2, slot);
+  }
+  if (*slot)
+    return;
+  W prior_den = wi64(1);
+  uint prior_status = 3, prior_rank = 0, cur_status = 0, succ_rank = 0;
+  long ins = -1;
+  if (linked) {
+    W od = fromword(origin[sw]);
+    if (wzero_p(od) || wneg_p(od)) {
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed);
+      return;
+    }
+    for (uint n = 0; n < nodes; ++n) {
+      W cross[3];
+      device const long *now = current_frame + 3 * n;
+      device const long *before = origin_frame + 3 * n;
+      phaseprod(fromword(now[0]), fromword(now[1]), fromword(now[2]), fromword(before[0]),
+                wneg(fromword(before[1])), fromword(before[2]), cross, slot);
+      phaseprod(cross[0], cross[1], cross[2], fromword(origin[4 * n]), fromword(origin[4 * n + 1]),
+                od, held + 3 * n, slot);
+      prior_den = flcm(prior_den, held[3 * n + 2], slot);
+      phaseprod(cross[0], cross[1], cross[2], fromword(origin[4 * n + 2]),
+                fromword(origin[4 * n + 3]), od, held + 3 * n, slot);
+      prior_den = flcm(prior_den, held[3 * n + 2], slot);
+    }
+    W paired = flcm(prior_den, incoming_den, slot);
+    for (uint n = 0; n < nodes; ++n) {
+      W cross[3];
+      device const long *now = current_frame + 3 * n;
+      device const long *before = origin_frame + 3 * n;
+      phaseprod(fromword(now[0]), fromword(now[1]), fromword(now[2]), fromword(before[0]),
+                wneg(fromword(before[1])), fromword(before[2]), cross, slot);
+      for (uint branch = 0; branch < 2; ++branch) {
+        phaseprod(cross[0], cross[1], cross[2], fromword(origin[4 * n + 2 * branch]),
+                  fromword(origin[4 * n + 2 * branch + 1]), od, held + 3 * n, slot);
+        for (uint c = 0; c < 2; ++c) {
+          prior[4 * n + 2 * branch + c] =
+              wmul(held[3 * n + c], wdiv(prior_den, held[3 * n + 2], slot), slot);
+          formed[4 * n + 2 * branch + c] =
+              wmul(held[3 * n + c], wdiv(paired, held[3 * n + 2], slot), slot);
+        }
+      }
+      for (uint c = 0; c < 2; ++c)
+        formed[sw + 2 * n + c] = wmul(fromword(incoming[3 * n + c]),
+                                      wdiv(paired, fromword(incoming[3 * n + 2]), slot), slot);
+    }
+    fibre_query(basis_lo, sw, width, prior, &prior_den, (threadgroup const W *)nullptr, -1,
+                &prior_status, &prior_rank, slot);
+    wnorm(formed, width, (threadgroup W *)nullptr, slot);
+    ins = fibre_stage(basis_lo, width, formed, slot);
+    if (*slot)
+      return;
+  }
+  W cd = source_den;
+  fibre_query(basis_lo, sw, width, cur, &cd, formed, ins, &cur_status, &succ_rank, slot);
+  if (*slot)
+    return;
+  for (uint j = 0; j < width; ++j) {
+    if (j >= sw) {
+      cur[j] = wneg(cur[j]);
+      prior[j] = wneg(prior[j]);
+    }
+    toword(cur[j], slot);
+    toword(prior[j], slot);
+    if (ins >= 0)
+      toword(formed[j], slot);
+  }
+  toword(cd, slot);
+  toword(prior_den, slot);
+  for (uint j = 0; j < 3 * nodes; ++j)
+    toword(out[j], slot);
+  if (*slot)
+    return;
+  uint ca = sw + 1, pa = ca + width + 4;
+  for (uint j = 0; j < width; ++j) {
+    output_lo[ca + j] = output_hi[ca + j] = toword(cur[j], slot);
+    output_lo[pa + j] = output_hi[pa + j] = toword(prior[j], slot);
+  }
+  output_lo[ca + width] = output_hi[ca + width] = toword(cd, slot);
+  output_lo[ca + width + 1] = output_hi[ca + width + 1] = cur_status;
+  output_lo[ca + width + 2] = output_hi[ca + width + 2] = ins;
+  output_lo[ca + width + 3] = output_hi[ca + width + 3] = succ_rank;
+  output_lo[pa + width] = output_hi[pa + width] = toword(prior_den, slot);
+  output_lo[pa + width + 1] = output_hi[pa + width + 1] = prior_status;
+  output_lo[pa + width + 2] = output_hi[pa + width + 2] = -1;
+  output_lo[pa + width + 3] = output_hi[pa + width + 3] = prior_rank;
+  if (ins >= 0)
+    for (uint j = 0; j < width; ++j) {
+      ulong at = (ulong)ins * width + j;
+      basis_lo[at] = basis_hi[at] = toword(formed[j], slot);
+    }
+  for (uint j = 0; j < 3 * nodes; ++j) {
+    memory_lo[j] = memory_hi[j] = toword(out[j], slot);
+  }
+}
+
+kernel void section_constitutive_field_rechart(
+    device const long *seed [[buffer(0)]], device const long *memory [[buffer(1)]],
+    device const long *root_frame [[buffer(2)]], device const long *basis [[buffer(3)]],
+    device const long *change [[buffer(4)]], constant uint &nodes [[buffer(5)]],
+    device long *seed_lo [[buffer(6)]], device long *seed_hi [[buffer(7)]],
+    device long *memory_lo [[buffer(8)]], device long *memory_hi [[buffer(9)]],
+    device long *frame_lo [[buffer(10)]], device long *frame_hi [[buffer(11)]],
+    device long *basis_lo [[buffer(12)]], device long *basis_hi [[buffer(13)]],
+    device long *report_lo [[buffer(14)]], device long *report_hi [[buffer(15)]],
+    device uint *slot [[buffer(16)]], device const uint *census [[buffer(17)]],
+    device const uint *lineage [[buffer(18)]], constant uint &lineage_count [[buffer(19)]],
+    threadgroup W *row [[threadgroup(0)]], uint3 tid [[thread_position_in_threadgroup]]) {
+  if (tid.x || tid.y || tid.z)
+    return;
+  if (upstream(census, lineage, lineage_count, slot))
+    return;
+  if (!nodes || nodes > 0xffffffffu / 6u) {
+    atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed);
+    return;
+  }
+  uint sw = 4 * nodes, width = 6 * nodes;
+  W common = wi64(1);
+  for (uint n = 0; n < nodes; ++n) {
+    device const long *g = change + 6 * n;
+    device const long *law = seed + 5 * n;
+    device const long *mem = memory + 3 * n;
+    device const long *rf = root_frame + 3 * n;
+    W u = wadd(wmul(fromword(g[0]), fromword(g[0]), slot),
+               wmul(fromword(g[1]), fromword(g[1]), slot), slot);
+    W d = wmul(fromword(g[2]), fromword(g[2]), slot);
+    W ou = wadd(wmul(fromword(rf[0]), fromword(rf[0]), slot),
+                wmul(fromword(rf[1]), fromword(rf[1]), slot), slot);
+    W od = wmul(fromword(rf[2]), fromword(rf[2]), slot);
+    if (g[2] <= 0 || rf[2] <= 0 || law[0] <= 0 || law[1] <= 0 || law[4] <= 0 || mem[2] <= 0 ||
+        *slot || !ueq(u.m, d.m) || !ueq(ou.m, od.m)) {
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_MALFORMED, memory_order_relaxed);
+      return;
+    }
+    common = flcm(common, fromword(g[2]), slot);
+    W t[3], h[3], f[3], i[3];
+    phaseprod(fromword(g[0]), fromword(g[1]), fromword(g[2]), fromword(law[2]), fromword(law[3]),
+              fromword(law[4]), t, slot);
+    phaseprod(fromword(g[0]), fromword(g[1]), fromword(g[2]), fromword(mem[0]), fromword(mem[1]),
+              fromword(mem[2]), h, slot);
+    phaseprod(fromword(g[0]), fromword(g[1]), fromword(g[2]), fromword(rf[0]), fromword(rf[1]),
+              fromword(rf[2]), f, slot);
+    phaseprod(fromword(g[0]), fromword(g[1]), fromword(g[2]), fromword(g[3]), fromword(g[4]),
+              fromword(g[5]), i, slot);
+    seed_lo[5 * n] = seed_hi[5 * n] = law[0];
+    seed_lo[5 * n + 1] = seed_hi[5 * n + 1] = law[1];
+    for (uint j = 0; j < 3; ++j) {
+      seed_lo[5 * n + 2 + j] = seed_hi[5 * n + 2 + j] = toword(t[j], slot);
+      memory_lo[3 * n + j] = memory_hi[3 * n + j] = toword(h[j], slot);
+      frame_lo[3 * n + j] = frame_hi[3 * n + j] = toword(f[j], slot);
+      report_lo[9 * n + j] = report_hi[9 * n + j] = toword(t[j], slot);
+      report_lo[9 * n + 3 + j] = report_hi[9 * n + 3 + j] = toword(i[j], slot);
+      report_lo[9 * n + 6 + j] = report_hi[9 * n + 6 + j] = toword(f[j], slot);
+    }
+  }
+  if (*slot)
+    return;
+  for (ulong j = 0; j < (ulong)width * width; ++j)
+    basis_lo[j] = basis_hi[j] = 0;
+  for (uint p = 0; p < width; ++p) {
+    if (!basis[(ulong)p * width + p])
+      continue;
+    for (uint n = 0; n < nodes; ++n) {
+      device const long *g = change + 6 * n;
+      row[4 * n] = wmul(
+          wsub(wmul(fromword(g[0]), fromword(basis[(ulong)p * width + 4 * n]), slot),
+               wmul(fromword(g[1]), fromword(basis[(ulong)p * width + 4 * n + 1]), slot), slot),
+          wdiv(common, fromword(g[2]), slot), slot);
+      row[4 * n + 1] = wmul(
+          wadd(wmul(fromword(g[1]), fromword(basis[(ulong)p * width + 4 * n]), slot),
+               wmul(fromword(g[0]), fromword(basis[(ulong)p * width + 4 * n + 1]), slot), slot),
+          wdiv(common, fromword(g[2]), slot), slot);
+      row[4 * n + 2] = wmul(
+          wsub(wmul(fromword(g[0]), fromword(basis[(ulong)p * width + 4 * n + 2]), slot),
+               wmul(fromword(g[1]), fromword(basis[(ulong)p * width + 4 * n + 3]), slot), slot),
+          wdiv(common, fromword(g[2]), slot), slot);
+      row[4 * n + 3] = wmul(
+          wadd(wmul(fromword(g[1]), fromword(basis[(ulong)p * width + 4 * n + 2]), slot),
+               wmul(fromword(g[0]), fromword(basis[(ulong)p * width + 4 * n + 3]), slot), slot),
+          wdiv(common, fromword(g[2]), slot), slot);
+    }
+    for (uint j = sw; j < width; ++j)
+      row[j] = wmul(fromword(basis[(ulong)p * width + j]), common, slot);
+    wnorm(row, width, (threadgroup W *)nullptr, slot);
+    long ins = fibre_stage(basis_lo, width, row, slot);
+    if (ins >= 0)
+      for (uint j = 0; j < width; ++j)
+        basis_lo[(ulong)ins * width + j] = basis_hi[(ulong)ins * width + j] = toword(row[j], slot);
+    if (*slot)
+      return;
+  }
+}
+
 kernel void section_constitutive_fibre(
     device long *basis_lo [[buffer(0)]], device long *basis_hi [[buffer(1)]],
     device const long *input_lo [[buffer(2)]], device const long *input_hi [[buffer(3)]],
@@ -676,7 +1030,7 @@ kernel void section_constitutive_rechart(
       scratch[j] = wmul(fromword(basis[(ulong)p * width + j]), common, slot);
     if (*slot)
       return;
-    wnorm(scratch, width, nullptr, slot);
+    wnorm(scratch, width, (threadgroup W *)nullptr, slot);
     long ins = fibre_stage(basis_lo, width, scratch, slot);
     if (*slot)
       return;
@@ -792,7 +1146,7 @@ kernel void section_constitutive_circulation(
     formed[sw + 1] =
         wmul(fromword(incoming[1]), wdiv(paired_den, fromword(incoming[2]), slot), slot);
     fibre_query(basis_lo, sw, width, prior, pden, nullptr, -1, &prior_status, &prior_rank, slot);
-    wnorm(formed, width, nullptr, slot);
+    wnorm(formed, width, (threadgroup W *)nullptr, slot);
     ins = fibre_stage(basis_lo, width, formed, slot);
     if (*slot)
       return;

@@ -33,6 +33,79 @@ fn paired_vector(field: &[ExactComplexWaveCurrent]) -> Vec<Rat> {
 }
 
 #[test]
+#[cfg(target_os = "macos")]
+#[ignore = "requires Metal; complete field scratch aperture and full-width rechart"]
+fn metal_field_aperture_covers_the_last_rechart_coordinate() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let available = surface.declaration().max_sectiond_bytes as usize;
+    let nodes = (1..=available)
+        .take_while(|n| ResidentSurface::constitutive_field_scratch(*n).unwrap() <= available)
+        .last()
+        .unwrap();
+    assert!(matches!(
+        NativeConstitutiveField::found(&surface, equal_seed(nodes + 1)),
+        Err(ConstitutiveFibreError::ScratchAperture { .. })
+    ));
+    let mut field = NativeConstitutiveField::found(&surface, equal_seed(nodes)).unwrap();
+    let first = field
+        .advance_status(&mut NativeFieldOccurrence::entering(
+            vec![NativePhaseCurrent::unit(); nodes],
+        ))
+        .unwrap();
+    field
+        .advance_status(&mut NativeFieldOccurrence::through(
+            first.source,
+            vec![phase(2, 1, 1); nodes],
+        ))
+        .unwrap();
+    let historical = field.inspect_source(0).unwrap();
+    field.rechart(&vec![phase(0, 1, 1); nodes]).unwrap();
+    assert_eq!(field.inspect_source(0).unwrap(), historical);
+    let relation = field.inspect_relation().unwrap();
+    assert!(
+        relation
+            .intervals
+            .chunks_exact(relation.width)
+            .any(|row| row.last().unwrap().0 != 0)
+    );
+    assert_eq!(field.current_frame().ordinal(), 1);
+    assert_eq!(field.occurrence_count(), 2);
+}
+
+#[test]
+#[ignore = "requires native field; borrowed profile adds no device readout and consumes no handle"]
+fn field_profile_borrows_history_without_changing_native_ownership() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let mut field = NativeConstitutiveField::found(&surface, equal_seed(2)).unwrap();
+    let first = field
+        .advance_status(&mut NativeFieldOccurrence::entering(vec![
+            phase(1, 0, 1),
+            phase(0, 1, 1),
+        ]))
+        .unwrap();
+    let before = field.census();
+    {
+        let profile = field.intrinsic_profile();
+        assert_eq!(profile.extents.source_extent, 8);
+        assert_eq!(profile.extents.target_extent, 4);
+        assert_eq!(profile.lineages[0], field.lineage(0).unwrap());
+        assert!(std::ptr::eq(
+            profile.source_frames[0],
+            field.source_frame(0).unwrap()
+        ));
+        assert!(std::ptr::eq(profile.material, field.material()));
+        assert_eq!(profile.reconstruction_extent, 1);
+    }
+    assert_eq!(field.census(), before);
+    let next = field
+        .advance_status(&mut NativeFieldOccurrence::through(first.source, zero(2)))
+        .unwrap();
+    assert_eq!(next.lineage.received_from, Some(0));
+}
+
+#[test]
 #[ignore = "requires CUDA; complete independent port currents and actual held successor"]
 fn field_scattering_returns_both_branches_with_weighted_energy() {
     let readout = ResidentReadout::new().expect("CUDA");
@@ -229,10 +302,12 @@ fn zero_source_discrepancy_remains_a_full_plural_receiver() {
             assert!(particular.iter().all(Rat::is_zero));
             assert_eq!(
                 directions,
-                vec![vec![1, 0, 0, 2]
-                    .into_iter()
-                    .map(|v| Rat::from_integer(v.into()))
-                    .collect::<Vec<_>>()]
+                vec![
+                    vec![1, 0, 0, 2]
+                        .into_iter()
+                        .map(|v| Rat::from_integer(v.into()))
+                        .collect::<Vec<_>>()
+                ]
             );
         }
         other => panic!("lost full vertical fibre: {other:?}"),

@@ -80,7 +80,7 @@ struct WideCase: Codable {
 }
 let casesPath = CommandLine.arguments.dropFirst(2).first ?? "research/experiments/apple_silicon/wide_cases.json"
 let cases = try JSONDecoder().decode([WideCase].self, from: Data(contentsOf: URL(fileURLWithPath: casesPath)))
-precondition(cases.count == 100, "expected 100 generated wide cases")
+precondition(cases.count == 248, "expected 248 generated wide and carrier-boundary cases")
 for (index, test) in cases.enumerated() {
     let result = runWide(test.a, test.b)
     precondition(result.1 == test.flags, "wide case \(index) refusal mismatch: \(result.1) vs \(test.flags)")
@@ -89,3 +89,4 @@ for (index, test) in cases.enumerated() {
     }
 }
 print("native phase arithmetic probe passed: normal=\(normal.0), overflowFlags=\(overflow.1), minFlags=\(minCase.1), wideFlags=\(wide.1), earlyShiftFlags=\(earlyShift.1), boundaryFlags=\(boundary.1)")
+print("exact generated cases checked: \(cases.count)")

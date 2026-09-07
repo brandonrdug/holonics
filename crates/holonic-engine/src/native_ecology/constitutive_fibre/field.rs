@@ -12,7 +12,9 @@ use super::*;
 use crate::dimensional_wave::ExactComplexWaveCurrent;
 use std::rc::Rc;
 
+mod profile;
 mod rechart;
+pub use profile::*;
 
 /// One actual emitted source from this live body. It is linear; the caller cannot manufacture
 /// it from an occurrence number or duplicate it for another receiving edge.
@@ -122,9 +124,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         let nodes = material.len();
         let source_width = nodes.checked_mul(4).ok_or(ConstitutiveFibreError::Shape)?;
         let target_width = nodes.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?;
-        let scratch = nodes
-            .checked_mul(24)
-            .and_then(|v| v.checked_mul(16))
+        let scratch = ResidentSurface::constitutive_field_scratch(nodes)
             .ok_or(ConstitutiveFibreError::Shape)?;
         let available = surface.declaration().max_sectiond_bytes;
         if nodes == 0 {
