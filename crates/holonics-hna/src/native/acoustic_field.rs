@@ -9,8 +9,10 @@ use holonic_engine::{
     native_ecology::constitutive_fibre::{
         ConstitutiveFibreError, NativeConstitutiveField, NativeFieldEmission,
         NativeFieldOccurrence, NativeFieldReceiverStatus, NativeFieldStep, NativePhaseCurrent,
+        ResidentConstitutiveCurrent,
     },
     phase_current::{ExactPhaseCurrentSection, PhaseCurrentLineageId, PhaseCurrentReceiverId},
+    resident_section::{ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface},
 };
 use life::mathematical_source::ExactAcousticOccurrence;
 use num_bigint::BigInt;
@@ -39,11 +41,59 @@ pub struct AcousticFieldSupport {
     pub structural_padding: usize,
 }
 
+/// One immutable chart cell mounted as a resident rational current. The chart borrow keeps the
+/// complete raw PCM source and its receiver/lineage testimony live while the cell is consumed.
+pub struct AcousticFieldCell<'surface, 'source> {
+    chart: &'source AcousticFieldChart,
+    section: ResidentSection<'surface>,
+    support: AcousticFieldSupport,
+}
+
+impl<'surface, 'source> AcousticFieldCell<'surface, 'source> {
+    pub fn section(&self) -> &ResidentSection<'surface> {
+        &self.section
+    }
+
+    pub fn rational(
+        &self,
+    ) -> Result<ResidentConstitutiveCurrent<'_, 'surface>, AcousticFieldError> {
+        Ok(ResidentConstitutiveCurrent::rational(&self.section)?)
+    }
+
+    pub fn chart(&self) -> &'source AcousticFieldChart {
+        self.chart
+    }
+
+    pub fn support(&self) -> &AcousticFieldSupport {
+        &self.support
+    }
+
+    pub fn receiver(&self) -> PhaseCurrentReceiverId {
+        self.chart.section.receiver
+    }
+
+    pub fn lineage(&self) -> PhaseCurrentLineageId {
+        self.chart.section.lineage
+    }
+
+    pub fn divisor(&self) -> i64 {
+        self.chart.divisor
+    }
+
+    pub fn sample_step(&self) -> &BigRational {
+        &self.chart.section.sample_step
+    }
+}
+
 /// A cold reversible chart over the existing phase-current section. Its private construction
 /// prevents arbitrary serialized coefficients from being accepted as a validated PCM chart.
 pub struct AcousticFieldChart {
     section: ExactPhaseCurrentSection,
     source_occurrence: String,
+    // Exterior delivery lineage copied from the decoded occurrence, never semantic identity.
+    source_locator: String,
+    source_sha256: String,
+    source_octets: u64,
     divisor: i64,
     cursor: usize,
 }
@@ -74,6 +124,9 @@ impl AcousticFieldChart {
         Ok(Self {
             section,
             source_occurrence: source.occurrence.clone(),
+            source_locator: source.locator.clone(),
+            source_sha256: source.source_sha256.clone(),
+            source_octets: source.source_octets,
             divisor,
             cursor: 0,
         })
@@ -81,6 +134,15 @@ impl AcousticFieldChart {
 
     pub fn section(&self) -> &ExactPhaseCurrentSection {
         &self.section
+    }
+    pub fn source_locator(&self) -> &str {
+        &self.source_locator
+    }
+    pub fn source_sha256(&self) -> &str {
+        &self.source_sha256
+    }
+    pub fn source_octets(&self) -> u64 {
+        self.source_octets
     }
     pub fn divisor(&self) -> i64 {
         self.divisor
@@ -102,22 +164,55 @@ impl AcousticFieldChart {
             .collect()
     }
 
-    pub fn next_support(&self) -> Option<AcousticFieldSupport> {
-        if self.is_complete() {
-            return None;
+    fn support_at(&self, cell: usize) -> Result<AcousticFieldSupport, AcousticFieldError> {
+        if cell >= self.section.cells.len() {
+            return Err(AcousticFieldError::Chart("cell out of range".into()));
         }
         let width = self.section.phase_extent as usize;
-        let from = self.cursor * width;
+        let from = cell * width;
         let until = (from + width).min(self.section.raw_extent());
         let at = |i: usize| &self.section.origin + &self.section.sample_step * BigInt::from(i);
-        Some(AcousticFieldSupport {
+        Ok(AcousticFieldSupport {
             source_occurrence: self.source_occurrence.clone(),
-            cell: self.cursor,
+            cell,
             coefficient_from: from,
             coefficient_until: until,
             begin: at(from),
             end: at(until),
             structural_padding: width - (until - from),
+        })
+    }
+
+    pub fn next_support(&self) -> Option<AcousticFieldSupport> {
+        self.support_at(self.cursor).ok()
+    }
+
+    /// Mount one chosen temporal cell as `(sample / divisor, 0)` complex coordinates. The
+    /// operation is read-only with respect to this chart: it neither advances `cursor` nor
+    /// changes the retained PCM source or its receiver-local chronology.
+    pub fn mount_cell<'surface, 'source>(
+        &'source self,
+        surface: &'surface ResidentSurface<'surface>,
+        cell: usize,
+    ) -> Result<AcousticFieldCell<'surface, 'source>, AcousticFieldError> {
+        let support = self.support_at(cell)?;
+        let width = self.section.phase_extent as usize;
+        let mut words = Vec::with_capacity(2 * width + 1);
+        for sample in &self.section.cells[cell] {
+            let sample = sample.to_i64().expect("validated source");
+            words.push((sample, sample));
+            words.push((0, 0));
+        }
+        words.push((self.divisor, self.divisor));
+        let rest = ResidentSectionRest::found(1, words.len(), ResidentGrain(0), 64, words)
+            .map_err(AcousticFieldError::Chart)?;
+        let section = surface
+            .mount_section_rest(&rest)
+            .map_err(ConstitutiveFibreError::from)?;
+        Ok(AcousticFieldCell {
+            chart: self,
+            section,
+            support,
         })
     }
 

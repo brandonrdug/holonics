@@ -54,6 +54,9 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
    treating cell width, sample ordinal, transcript spelling or a supplied class label as native
    organization. Where conditions are only partially inferred, compose the existing affine
    elimination/Preimage Fibre relation and use only its supported subsequent consequences.
+   The [resident cell ingress](../../research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
+   now supplies the current port. Next retain parent recording and annotation-pointer lineage
+   when attaching source/response intervals and their exact supports, including gaps and refusals.
 3. Develop and retain acoustic generative standing across source-qualified recordings and
    actual joined returns, then conduct its native emission into the declared acoustic receiver.
    Inspect perception differences and generated sound, preserve the declared reconstruction

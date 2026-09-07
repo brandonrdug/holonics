@@ -25,6 +25,12 @@ constraint graph and subsequent prediction. The public text-codec control reache
 unported paired-field refusal. Actual acoustic interval/interaction and condition/receiver
 composition is next. No useful acoustic or English model is claimed.
 
+[established-bounded; measured] The [acoustic resident ingress](research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
+now exposes complete timed PCM cells to the same rational-current port, preserving source
+delivery lineage, zeros and padding without advancing the source cursor. Five acoustic-field
+controls pass. Next attach actual recording intervals and source/response pointers; the available
+AMI mono material does not supply separate microphone channels through its speaker labels.
+
 [established-bounded; measured] The September 7 Mac pickup integrates desktop `6ef7bf9d` with
 68 passing engine/public native tests and successful HNA library, application and shared-example
 checks. The [integration record](research/records/2026-09-07_APPLE_INTEGRATES_THE_SHARED_CONDITIONAL_GENERATOR_HANDOFF.md)

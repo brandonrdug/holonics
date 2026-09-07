@@ -31,6 +31,13 @@ coefficients. Its port extent remains a caller-declared receiver aperture, and t
 section, times and padding remain explicit. Source handles are passed only for declared receiving
 interactions; chronological adjacency does not create one.
 
+[established-bounded; measured] The same chart now exposes `mount_cell(surface, cell)` and
+`AcousticFieldCell::rational()` for the shared resident relation/conditional-current owners.
+This read-only source attachment retains exact support, receiver/lineage, clock, divisor, zeros,
+padding and parent delivery metadata. It does not advance the chart cursor or supply contact.
+The [resident ingress return](../research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
+records five passing acoustic-field controls and the remaining interval/interaction attachment.
+
 [established-bounded; implemented-exact] `NativeConstitutiveField::intrinsic_profile()` borrows
 material, historical sources/frames and predecessor relations without another device readout or
 consuming a source handle. It reports actual chart extents separately from intrinsic dimensions

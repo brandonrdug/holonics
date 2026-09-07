@@ -39,6 +39,12 @@ application owners in `crates/holonics-hna/src/native/{acoustic,speech}.rs`, exp
 into the existing acoustic receiver. `applications/holonics-audio/main.swift` owns exterior
 capture/playback chronology. These share the native session and introduce no second engine.
 
+[established-bounded; measured] `holonics-hna::native::acoustic_field::{AcousticFieldChart,AcousticFieldCell}`
+also mounts timed source coefficients through `mount_cell` into the shared resident rational
+current port. The [five-control return](../research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
+retains exact source/clock support and delivery lineage. Actual interval/interaction binding and
+useful acoustic conduct remain open.
+
 [established-bounded; implemented-exact] Ordered unlinked packets are owned by
 `constitutive_fibre/circulation/batch.rs` and `holonics-hna/src/native/batch.rs`; they reuse the
 circulation kernel with serial failure dependencies and retain every source section. The acoustic
