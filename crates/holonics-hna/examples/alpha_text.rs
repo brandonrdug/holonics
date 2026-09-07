@@ -8,13 +8,13 @@ use holonics_hna::{
         checkpoint::SavedTextField,
         exposure::{ExposureCursor, ExposureFamily, ExposurePartition, ExposureReader},
         material::AlphaMaterialError,
-        text_codec::{with_text_field_source, TextSymbol},
-        text_session::TextFieldSession,
+        text_codec::{TextSymbol, with_text_field_source},
+        text_session::{TextCurrentReceiver, TextFieldSession},
     },
     publish_new,
 };
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 use std::{
     collections::BTreeMap,
     io::{self, Write},
@@ -236,6 +236,7 @@ fn run_session(
     anchors: &mut AnchorMap,
     prompt: Option<&str>,
     limit: usize,
+    text_receiver: TextCurrentReceiver,
     inspect_all_currents: bool,
     checkpoint: Option<&PathBuf>,
     report: &mut Value,
@@ -243,6 +244,7 @@ fn run_session(
     report["junction_solver"] = json!(session.field().junction_solver());
     report["has_material_transport"] = json!(session.field().has_material_transport());
     report["material_source"] = json!(session.field().material_transport_source());
+    report["text_receiver"] = json!(text_receiver);
     let start = Instant::now();
     let developed = if let Some(reader) = reader.as_mut() {
         cultivate(reader, session, families, records, anchors)
@@ -321,11 +323,13 @@ fn run_session(
         report["prompt_native_until"] = json!(session.field().occurrence_count());
         report["prompt_error"] = json!(prompt_error);
         if prompt_error.is_none() {
-            let generated = session.generate(limit);
+            let generated = session.generate_with_receiver(limit, text_receiver);
             report["utf8"] = json!(std::str::from_utf8(&generated.emitted_octets).ok());
-            report["utf8_error"] = json!(std::str::from_utf8(&generated.emitted_octets)
-                .err()
-                .map(|e| e.to_string()));
+            report["utf8_error"] = json!(
+                std::str::from_utf8(&generated.emitted_octets)
+                    .err()
+                    .map(|e| e.to_string())
+            );
             report["generation"] = json!(generated);
         }
         report["prompt_and_emission_wall_seconds"] = json!(start.elapsed().as_secs_f64());
@@ -378,7 +382,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current] [--text-receiver material|constitutive]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -391,6 +395,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut inspect_all_currents = false;
     let mut history_archive = None;
     let mut material_source = None;
+    let mut text_receiver = TextCurrentReceiver::Material;
     while let Some(option) = args.next() {
         let value = args.next().ok_or("missing option value")?;
         match option.as_str() {
@@ -398,6 +403,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "--fractional-bits" => grain = Some(value.parse::<u32>()?),
             "--prompt" => prompt_path = Some(PathBuf::from(value)),
             "--emit-symbols" => limit = Some(value.parse::<usize>()?),
+            "--text-receiver" => {
+                text_receiver = match value.as_str() {
+                    "material" => TextCurrentReceiver::Material,
+                    "constitutive" => TextCurrentReceiver::Constitutive,
+                    _ => return Err("text receiver must be material or constitutive".into()),
+                }
+            }
             "--report" => report_path = Some(PathBuf::from(value)),
             "--checkpoint" => checkpoint = Some(PathBuf::from(value)),
             "--history-archive" => history_archive = Some(PathBuf::from(value)),
@@ -408,7 +420,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     _ => {
                         return Err(
                             "material source must be coupled-outgoing or complete-current".into(),
-                        )
+                        );
                     }
                 })
             }
@@ -523,6 +535,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 &mut anchors,
                 prompt.as_deref(),
                 limit,
+                text_receiver,
                 inspect_all_currents,
                 checkpoint.as_ref(),
                 &mut report,
@@ -558,6 +571,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 &mut anchors,
                 prompt.as_deref(),
                 limit,
+                text_receiver,
                 inspect_all_currents,
                 checkpoint.as_ref(),
                 &mut report,

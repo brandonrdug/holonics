@@ -216,6 +216,13 @@ Do not rebuild the completed raw capture. AC0 is data/application integration, n
 
 ### AC1 — Material, contextual current and developing native morphology
 
+[established-bounded; measured] The [native field relation port](../../research/records/2026-09-07_AC1_THE_FIELD_RETURNS_A_RESIDENT_RELATION_FACE_AND_A_PLURAL_FIBRE_HAS_FIXED_RECEIVERS.md)
+now returns resident currents/fibres at historical sources through their actual frames, and a
+whole-fibre receiver can expose a fixed class face without selecting a current. Its actual
+conversation diagnostic remains open at every text differential because the represented
+relation contains separating vertical directions. Next derive the applicable local action from
+situated conditions; do not extend the local linear hypothesis across unrelated contexts by fiat.
+
 [definition] The corrected next attachment reuses `inverse_transport`/`generative_transport`
 for constrained law families, `receiver_history_compression` for admitted future consequences,
 `generator_native_rest` for descended execution, and the existing phase-current, native-spool and

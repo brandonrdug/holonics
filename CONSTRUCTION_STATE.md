@@ -34,6 +34,18 @@ readbacks or remounts. Original plural faces survive later development. All 84 c
 pass. This closes a component's composition port; the general conversation-field attachment and
 Mac cultivation handoff remain unfinished.
 
+[established-bounded; measured] The [field relation receiver](research/records/2026-09-07_AC1_THE_FIELD_RETURNS_A_RESIDENT_RELATION_FACE_AND_A_PLURAL_FIBRE_HAS_FIXED_RECEIVERS.md)
+now carries actual historical source branches into the current frame and returns a resident
+rational current/fibre. A differential can be fixed over a plural fibre without selecting a
+member. All 89 native constitutive tests and the public whole-fibre text-codec control pass.
+
+[counterexample; measured] The saved four-family model, queried through that receiver after the
+function/derivative prompt, emits no text. Its relation has nine vertical directions; exact
+witnesses show every output-bit differential can vary at fixed source. This is algebraic
+non-identification in the formed local relation, not a numerical-precision problem or an intrinsic
+semantic ambiguity. Next bind the actual situated conditions and applicable local action; the
+global use of one local linear chart remains insufficiently founded. The Mac handoff is not ready.
+
 [definition] The original authorization is construction and completion of the
 [Athena-alpha blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md).
 AC0 prepares source-qualified available conversation occurrences; AC1 composes actual native

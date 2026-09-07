@@ -44,6 +44,14 @@ relation. `resident_section::record_constitutive_current` and
 includes limited native observations, phase superposition and rational continuation without
 numerical readback. General conversation-field attachment and Metal realization are still open.
 
+[established-bounded; measured] `field/relation_current.rs` now queries that same resident owner
+at an actual source of `NativeConstitutiveField`, with both branches transported by
+`section_field_source_frame`. `section_constitutive_differential` implements fixed differential
+faces of a whole affine fibre; `alpha::{text_codec,text_session}` and `alpha_text` expose it as
+an explicit exterior receiver. The [89-test and actual-model return](../research/records/2026-09-07_AC1_THE_FIELD_RETURNS_A_RESIDENT_RELATION_FACE_AND_A_PLURAL_FIBRE_HAS_FIXED_RECEIVERS.md)
+keeps the historical source distinct from the contemporary relation cut. The contextual
+generator/formation attachment remains open.
+
 | Relation | Lean owner | Rust owner | CUDA owner | Status and exact open fibre |
 |---|---|---|---|---|
 | Addressed passage and both boundary maps | `formal/elementary-holonics/ElementaryHolonics/Foundation/Lineage.lean`; `formal/elementary-holonics/ElementaryHolonics/Foundation/AddressedBoundary.lean` | `crates/holonic-life/src/mathematical_particle/lineage.rs`; `crates/holonic-life/src/addressed_span.rs`; `crates/holonic-engine/src/realization/passage.rs`; `crates/holonic-life/src/native_intelligence/source_neutral_relational/pair_current.rs` | `crates/holonic-engine/src/cuda_refine/membrane_addressed_current.rs` | **exact** for the R0Q1 apparatus-neutral response/source/target pair fibre; resident realization transport is R0Q2 |

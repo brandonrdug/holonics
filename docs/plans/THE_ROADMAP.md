@@ -42,6 +42,14 @@ enter subsequent operations directly. Partial source-domain knowledge supports n
 all 84 constitutive tests pass. Continue the AC1–AC2 attachment from this composable owner into
 the actual conversation ecology, with the appropriate phase-sensitive family and contact law.
 
+[established-bounded; measured] The [field-to-resident return](../../research/records/2026-09-07_AC1_THE_FIELD_RETURNS_A_RESIDENT_RELATION_FACE_AND_A_PLURAL_FIBRE_HAS_FIXED_RECEIVERS.md)
+now crosses both historical source branches into the current frame, reads the learned relation
+on device and exposes fixed receivers of a plural fibre. All 89 native tests and the public codec
+control pass. The actual saved conversation model still emits no text. Its exact vertical
+directions locate the failure in the formed local relation; further precision cannot remove them.
+Continue with the actual contextual conditions and applicable local action. A corpus-wide use of
+one local linear chart is not justified by coherent superposition within a situated carrier.
+
 [definition] Brandon has authorized design followed immediately by construction and completion of
 [the Athena-alpha blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md) as a goal. It orders AC0–AC5:
 source-qualified available conversations; coupled native material/current/formation; learned text

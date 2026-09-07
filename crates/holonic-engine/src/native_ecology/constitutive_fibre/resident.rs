@@ -40,9 +40,17 @@ pub struct ResidentConstitutiveReturn<'chart> {
     source_width: usize,
     target_width: usize,
     occurrence: u64,
+    source_occurrence: Option<usize>,
 }
 
 impl<'chart> ResidentConstitutiveReturn<'chart> {
+    pub(super) fn qualify_field_source(&mut self, source_occurrence: usize) {
+        self.source_occurrence = Some(source_occurrence);
+    }
+    pub(super) fn report(&self) -> &ResidentSection<'chart> {
+        &self.report
+    }
+
     /// Supply this return to a point-current operation. Its unique-current hypothesis is checked
     /// on device at consumption, including the denominator and original receiver disposition.
     /// The return itself still carries the full plural/outside-domain face for inspection.
@@ -59,6 +67,61 @@ impl<'chart> ResidentConstitutiveReturn<'chart> {
 
     pub fn occurrence(&self) -> u64 {
         self.occurrence
+    }
+
+    /// A receiver of the entire affine target fibre. A differential is fixed only when every
+    /// vertical direction vanishes through it. This can return a sign even for a plural current;
+    /// no particular member is selected. The receipt separates an actual field source from the
+    /// contemporary relation cut; querying old standing never invents a new source occurrence.
+    pub fn read_differential_pairs(
+        &self,
+        first_complex: usize,
+        pairs: usize,
+    ) -> Result<NativeFieldDifferentialReading, ConstitutiveFibreError> {
+        let output = self.surface.fresh_section(1, 5, ResidentGrain(0))?;
+        let mut passage = self.surface.begin_passage(&[vec![]])?;
+        {
+            let lane = passage.open(0, &[])?;
+            self.surface.record_constitutive_differential(
+                &lane,
+                &self.report,
+                self.source_width,
+                self.target_width,
+                first_complex,
+                pairs,
+                &output,
+            )?;
+        }
+        passage.close(0, &output, 64)?;
+        let receipt = passage.finish()?.launch()?;
+        if !receipt.obstruction.is_empty() {
+            return Err(ConstitutiveFibreError::Arithmetic(format!(
+                "{:?}",
+                receipt.obstruction
+            )));
+        }
+        let words = self.surface.read_out(&output)?;
+        if words.iter().any(|(lo, hi)| lo != hi || *lo < 0) {
+            return Err(ConstitutiveFibreError::Uncertain);
+        }
+        Ok(NativeFieldDifferentialReading {
+            occurrence: self.source_occurrence.unwrap_or(
+                usize::try_from(self.occurrence).map_err(|_| ConstitutiveFibreError::Shape)?,
+            ),
+            relation_cut: Some(self.occurrence),
+            constitutive_status: Some(match words[4].0 {
+                0 => NativeFieldReceiverStatus::Unique,
+                1 => NativeFieldReceiverStatus::OutsideDomain,
+                2 => NativeFieldReceiverStatus::Plural,
+                _ => return Err(ConstitutiveFibreError::Uncertain),
+            }),
+            first_complex,
+            pairs,
+            positive: words[0].0 as u64,
+            negative: words[1].0 as u64,
+            unresolved: words[2].0 as u64,
+            exact_zero: words[3].0 as u64,
+        })
     }
 
     /// Explicit cold observation of the original return. No live relation is consulted, so a
@@ -112,6 +175,27 @@ impl<'chart> ResidentConstitutiveReturn<'chart> {
 }
 
 impl<'chart> ResidentConstitutiveFibre<'chart> {
+    pub(super) fn allocate_current_return(
+        &self,
+        occurrence: u64,
+    ) -> Result<ResidentConstitutiveReturn<'chart>, ConstitutiveFibreError> {
+        let width = self.source_width + self.target_width;
+        let report_width = self
+            .target_width
+            .checked_mul(self.target_width)
+            .and_then(|n| n.checked_add(width + 4))
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        Ok(ResidentConstitutiveReturn {
+            surface: self.surface,
+            report: self
+                .surface
+                .fresh_section(1, report_width, ResidentGrain(0))?,
+            source_width: self.source_width,
+            target_width: self.target_width,
+            occurrence,
+            source_occurrence: None,
+        })
+    }
     /// Enact the existing relation law on resident rational operands. The receiving section is
     /// an actual observation, not a desired answer. Its absence reads the current local domain.
     /// Native arithmetic, disposition and the staged row all precede the continuing write.
@@ -132,15 +216,7 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
             .occurrences
             .checked_add(1)
             .ok_or(ConstitutiveFibreError::Shape)?;
-        let width = self.source_width + self.target_width;
-        let report_width = self
-            .target_width
-            .checked_mul(self.target_width)
-            .and_then(|n| n.checked_add(width + 4))
-            .ok_or(ConstitutiveFibreError::Shape)?;
-        let report = self
-            .surface
-            .fresh_section(1, report_width, ResidentGrain(0))?;
+        let returned = self.allocate_current_return(next)?;
         let mut passage = self.surface.begin_passage(&[vec![]])?;
         {
             let lane = passage.open(0, &[])?;
@@ -149,10 +225,10 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
                 &mut self.basis,
                 source,
                 receiving,
-                &report,
+                &returned.report,
             )?;
         }
-        passage.close(0, &report, 64)?;
+        passage.close(0, &returned.report, 64)?;
         let passage = passage.finish()?;
         self.usable = false;
         let reading = passage.launch()?;
@@ -166,13 +242,7 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
         }
         self.occurrences = next;
         self.usable = true;
-        Ok(ResidentConstitutiveReturn {
-            surface: self.surface,
-            report,
-            source_width: self.source_width,
-            target_width: self.target_width,
-            occurrence: next,
-        })
+        Ok(returned)
     }
 }
 

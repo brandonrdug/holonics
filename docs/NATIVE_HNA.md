@@ -32,6 +32,21 @@ its attachment to the conversation field and useful text/acoustic conduct remain
 
 ## Athena-alpha material field
 
+[established-bounded; measured] `NativeConstitutiveField::read_constitutive_source` now reads the
+current local relation at an actual historical source anchor. Native frame transport includes
+both original source branches. Its `ResidentConstitutiveReturn` can enter another native port;
+the field query itself changes neither the ecology nor its source capabilities. The
+[whole-fibre receiver](../research/records/2026-09-07_AC1_THE_FIELD_RETURNS_A_RESIDENT_RELATION_FACE_AND_A_PLURAL_FIBRE_HAS_FIXED_RECEIVERS.md)
+can return a definite differential sign from a plural current when every free direction cancels
+through that receiver. Eighty-nine native tests and the public text-codec control pass.
+
+[definition] `TextFieldSession::generate_with_receiver(..., TextCurrentReceiver::Constitutive)`
+and `alpha_text --text-receiver constitutive` present this whole-fibre text receiver. The default
+remains `material`. Returned `occurrence` identifies the actual field source, while `relation_cut`
+and `constitutive_status` identify the later relation reading. The saved four-family model emits
+no text under this receiver: exact vertical directions make all nine bit differentials variable.
+This receiver does not supply the missing contextual generator family.
+
 [established-bounded; measured] The separate
 [`NativeConstitutiveField`](../crates/holonic-engine/src/native_ecology/constitutive_fibre/field.rs)
 extends the same native junction/relation construction to independently excited ports and both

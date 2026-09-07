@@ -20,6 +20,7 @@ mod current_history_source;
 mod junction;
 mod material_transport;
 mod receiver;
+mod relation_current;
 mod rechart;
 mod rest;
 pub use archive::NativeFieldHistoryPlacement;

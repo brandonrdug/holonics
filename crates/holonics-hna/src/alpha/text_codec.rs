@@ -1,9 +1,9 @@
 //! Exterior octet/end-of-part chart and differential-current presentation. Learned current is
 //! supplied by the native junction. This chart supplies no English grammar or response selector.
-use super::material::{with_matched_field_profile, AlphaMaterialError};
+use super::material::{AlphaMaterialError, with_matched_field_profile};
 use holonic_engine::native_ecology::constitutive_fibre::{
     NativeConstitutiveField, NativeFieldDifferentialReading, NativeFieldJunctionSolver,
-    NativeMaterialTransportSource, NativePhaseCurrent,
+    NativeFieldSourceAnchor, NativeMaterialTransportSource, NativePhaseCurrent,
 };
 use serde::Serialize;
 
@@ -94,6 +94,28 @@ pub fn read_text_symbol(
     .ok_or_else(|| {
         AlphaMaterialError::Apparatus("text codec requires a junction outgoing current".into())
     })?;
+    Ok(from_differential(native))
+}
+
+/// Present the whole local constitutive fibre at an actual source. Differential signs can be
+/// fixed even when absolute target currents vary within that fibre. This remains an exterior
+/// codeword receiver; it supplies no grammar, candidate selector or replacement learning law.
+pub fn read_constitutive_text_symbol(
+    field: &mut NativeConstitutiveField<'_>,
+    source: &NativeFieldSourceAnchor,
+) -> Result<TextCodeReading, AlphaMaterialError> {
+    if field.nodes() != TEXT_INPUT_CHANNELS {
+        return Err(AlphaMaterialError::Apparatus(
+            "text codec requires its declared 18-channel chart".into(),
+        ));
+    }
+    let returned = field.read_constitutive_source(source)?;
+    Ok(from_differential(
+        returned.read_differential_pairs(0, TEXT_BIT_PAIRS)?,
+    ))
+}
+
+fn from_differential(native: NativeFieldDifferentialReading) -> TextCodeReading {
     let disposition = if native.unresolved != 0 {
         TextCodeDisposition::Open
     } else {
@@ -103,10 +125,10 @@ pub fn read_text_symbol(
             None => TextCodeDisposition::Reserved { codeword },
         }
     };
-    Ok(TextCodeReading {
+    TextCodeReading {
         native,
         disposition,
-    })
+    }
 }
 
 pub fn with_text_field<R>(
@@ -157,5 +179,32 @@ mod tests {
         malformed[0] = NativePhaseCurrent::unit();
         malformed[1] = NativePhaseCurrent::unit();
         assert!(TextSymbol::from_inputs(&malformed).is_none());
+    }
+
+    #[test]
+    #[ignore = "requires CUDA; the text receiver factors through a plural native current"]
+    fn a_fixed_codeword_does_not_require_a_unique_absolute_current() {
+        use holonic_engine::native_ecology::constitutive_fibre::NativeFieldOccurrence;
+        with_text_field(72, |field| {
+            let first=field.advance_resident(&mut NativeFieldOccurrence::entering(TextSymbol::Octet(b'A').inputs()))?;
+            let source=field.retain_source(&first.source)?;
+            let arrived=TextSymbol::Octet(b'B').inputs();
+            field.advance_resident(&mut NativeFieldOccurrence::through_anchor(&source,arrived.clone()))?;
+            // Actual native receiving variation adds the same real/imaginary current to both
+            // sides of each pair. The exterior bit receiver is constant over the resulting fibre.
+            let varied=arrived.iter().map(|v| {
+                let real=if *v==NativePhaseCurrent::unit() { 2 } else { 1 };
+                NativePhaseCurrent::new(real,2,1).unwrap()
+            }).collect();
+            field.advance_resident(&mut NativeFieldOccurrence::through_anchor(&source,varied))?;
+            let full=field.read_constitutive_source(&source)?;
+            assert!(matches!(full.inspect()?.predecessor_reading,
+                holonic_engine::native_ecology::constitutive_fibre::ConstitutiveReading::Plural{..}));
+            let before=field.occurrence_count();
+            let face=read_constitutive_text_symbol(field,&source)?;
+            assert!(matches!(face.disposition,TextCodeDisposition::Symbol { symbol: TextSymbol::Octet(b'B') }));
+            assert_eq!(field.occurrence_count(),before);
+            Ok(())
+        }).unwrap();
     }
 }

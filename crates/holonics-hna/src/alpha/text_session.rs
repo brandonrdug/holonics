@@ -4,13 +4,24 @@
 use super::{
     material::AlphaMaterialError,
     text_codec::{
-        read_text_symbol, TextCodeDisposition, TextCodeReading, TextSymbol, TEXT_INPUT_CHANNELS,
+        TEXT_INPUT_CHANNELS, TextCodeDisposition, TextCodeReading, TextSymbol,
+        read_constitutive_text_symbol, read_text_symbol,
     },
 };
 use holonic_engine::native_ecology::constitutive_fibre::{
     NativeConstitutiveField, NativeFieldEmission, NativeFieldOccurrence, NativeFieldSourceAnchor,
 };
 use serde::Serialize;
+
+/// An exterior receiving family over the same field. Emitted symbols still enter the ordinary
+/// recurrence and can change its successor; this choice supplies no separate learning law.
+#[derive(Clone, Copy, Debug, Default, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum TextCurrentReceiver {
+    #[default]
+    Material,
+    Constitutive,
+}
 
 #[derive(Debug, Serialize)]
 #[serde(tag = "kind", content = "reason", rename_all = "kebab-case")]
@@ -132,6 +143,14 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
         Ok(())
     }
     pub fn generate(&mut self, work_limit: usize) -> TextGeneration {
+        self.generate_with_receiver(work_limit, TextCurrentReceiver::Material)
+    }
+
+    pub fn generate_with_receiver(
+        &mut self,
+        work_limit: usize,
+        receiver: TextCurrentReceiver,
+    ) -> TextGeneration {
         let mut result = TextGeneration {
             native_from: self.field.occurrence_count(),
             native_until: self.field.occurrence_count(),
@@ -147,7 +166,15 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
                 );
                 break;
             };
-            let reading = match read_text_symbol(self.field, latest.occurrence) {
+            let received = match receiver {
+                TextCurrentReceiver::Material => read_text_symbol(self.field, latest.occurrence),
+                TextCurrentReceiver::Constitutive => self
+                    .field
+                    .retain_source(&latest.source)
+                    .map_err(AlphaMaterialError::from)
+                    .and_then(|source| read_constitutive_text_symbol(self.field, &source)),
+            };
+            let reading = match received {
                 Ok(reading) => reading,
                 Err(error) => {
                     result.disposition =

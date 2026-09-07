@@ -5,6 +5,12 @@ use super::*;
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct NativeFieldDifferentialReading {
     pub occurrence: usize,
+    /// When this is a receiver of the current constitutive relation at a historical source,
+    /// retain its contemporary state cut separately from that source's occurrence ordinal.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub relation_cut: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub constitutive_status: Option<NativeFieldReceiverStatus>,
     pub first_complex: usize,
     pub pairs: usize,
     pub positive: u64,
@@ -142,6 +148,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
         }
         Ok(NativeFieldDifferentialReading {
             occurrence,
+            relation_cut: None,
+            constitutive_status: None,
             first_complex,
             pairs,
             positive,
