@@ -1,9 +1,16 @@
 # Acoustic experiments through native HNA
 
-[definition] This application attaches ordered PCM material to the existing native phase
+[definition] This probe application attaches ordered PCM material to the existing native phase
 recurrence. It retains the WAV bytes, complete `ExactAcousticOccurrence`, sample clock, every
 native return, pending input and one native checkpoint. Labels and transcripts do not enter the
 sound-current interface. The [Apple plan](plans/HOLONICS_ON_APPLE_SILICON.md) governs scope.
+
+[project-postulate] Brandon's September 6 correction rejects using PCM samples as the native
+acoustic organization. The per-sample mapping documented below remains a digital control only.
+Native acoustic holons must be constructed through caused relations, temporal transport and
+receiver consequences; changing the file codec or naming a frame a holon does not supply this.
+The [grain correction](../research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md)
+records the source owners and the revised integration target.
 
 [open] This guide documents application probes. AS4–AS5 are not complete: the current two-node
 specimen and fixed sonification have not learned sound or English communication from a corpus.

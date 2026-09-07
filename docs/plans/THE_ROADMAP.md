@@ -68,6 +68,13 @@ persistent development across recordings and turns, useful speech/language condu
 streaming operation. Microphone access gates none of those; actual device/room checks have their
 own physical scope. The desktop Athena-alpha order remains independent.
 
+[project-postulate] Brandon subsequently rejects PCM sample steps as the native acoustic
+organization. Continue AS4 by composing acoustic holons through the existing native material,
+temporal transport and receiver-relative reconstruction owners, in coordination with linguistic
+formation. Optimize the resulting resident operation; sample-loop batching alone does not supply
+it. The [grain correction](../../research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md)
+amends the Apple specification without adding another construction campaign.
+
 ## Completed September 6 synthesis before Athena-alpha cultivation
 
 [definition] Brandon's latest request directs repository-wide synthesis of the available

@@ -1,7 +1,8 @@
-//! Public exact PCM attachment to the continuing native phase session.
+//! Public digital PCM probe over the continuing native phase session.
 //!
-//! PCM is retained as exterior source material. It enters one native occurrence per admitted
-//! sample; it is never used as a label, classifier, or replayed output.
+//! This probe chooses one native occurrence per admitted sample. That is an application control,
+//! not the native grain of acoustic holons; see docs/plans/HOLONICS_ON_APPLE_SILICON.md.
+//! PCM remains exterior source material, never a label, classifier, or replayed output.
 
 use super::*;
 use crate::{HnaStreamState, publication::PublicationReceipt};

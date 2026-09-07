@@ -6,6 +6,13 @@ root construction state records current implementation scope. Paths in code span
 
 ## Capability and retraction record
 
+[historical; source-inspected] September 6 acoustic-grain correction: the Apple application's
+one-PCM-sample/one-native-step mapping is withdrawn as the intended acoustic architecture. It
+remains an explicit digital probe with its actual continuation and timing evidence. Brandon
+requires acoustic material organized as holons through the existing ontology. PCM may remain
+an exterior import/playback chart; packet batching does not establish native acoustic grain.
+See the [source-grounded correction](../research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md).
+
 [historical] September 6 Apple/audio completion correction: `af2bb8fe`'s AS1–AS5 closure is
 withdrawn as completion of the intended conversational audio work. AS1–AS3's bounded Metal phase
 foundation stands. AS4–AS5's two-junction signal controls, sonification, WAV-then-byte exposure

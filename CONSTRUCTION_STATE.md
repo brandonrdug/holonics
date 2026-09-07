@@ -48,6 +48,14 @@ words and original response links, including source annotation refusals. These d
 learned acoustic/English conduct. Complete recorded inputs still took 7.07–12.65 times their
 source durations; retained per-sample allocation/history remains a concrete cost.
 
+[project-postulate] Brandon's subsequent acoustic-grain correction requires native holonic
+organization, not one PCM sample per recurrence. The existing sample loop remains a probe;
+its timings do not establish the cost of the intended acoustic realization. Next compose the
+exterior acoustic chart with native situated material/transport and receiver-relative reconstruction,
+alongside the shared linguistic formation work. The
+[correction record](research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md)
+locates existing owners and preserves the distinction between an exterior codec and native grain.
+
 [established-bounded; measured] Local data comprise 2,000 ESC-50 WAVs and a 100-clip LibriSpeech
 subset, outside Git. The measured examples processed a small selection, not the downloaded
 corpora. A five-second sound continuation took 299.47 s including cold publication and produced

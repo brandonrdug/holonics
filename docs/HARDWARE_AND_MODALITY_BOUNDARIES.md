@@ -194,8 +194,15 @@ owner; PCM/WAV is a receiver and codec surface after the exact native return.
 `RecurrentGranularReturnedAffineEcologyRest`. It is not a wrapper for the current
 `NativeConstitutiveEcology`; nor does the current phase session return a
 `NativeOpenWorldTubeReceipt`. The Apple/acoustic specification therefore requires the actual
-PCM-to-native-material and native-outward-current attachments before claiming this composition
+exterior-acoustic-to-native-material and native-outward-current attachments before claiming this composition
 over the current ecology. Existing acoustic results retain their original body/receiver scope.
+
+[project-postulate] Brandon's subsequent September 6 acoustic correction requires native holons,
+not PCM sample ordinals, to organize acoustic material. WAV decoding and playback are exterior
+charts; their coordinates do not prescribe native topology or operation frequency. The
+[grain correction](../research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md)
+locates phase, clock, occurrence and reconstruction owners without treating their older execution
+bodies as an already integrated Apple acoustic learner.
 
 [open] No current audio owner establishes calibrated microphone pressure, speaker pressure, power,
 or room acoustics. Those claims require a physical chart with typed units, constitutive and

@@ -120,17 +120,31 @@ governed by [interoperability](../INTEROPERABILITY.md).
 
 ## Acoustic perception and generation
 
-[definition] The initial offline input is a caused mono PCM16 occurrence with a positive sample
-rate, retained source samples and exact sample chronology. Reuse
-`life::mathematical_source::acoustic::ExactAcousticOccurrence`. Its frame length, hop and section
-width are declared receiver extents, never hidden learned capacity. Retain the complete samples
-alongside any folded section: equal frame sums cannot identify acoustically distinct sources.
+[project-postulate] Brandon's subsequent September 6 correction requires acoustic material to be
+organized as holons through the existing ontology and native constructions. PCM sample ordinals,
+WAV frames and delivery packets do not determine native grains or recurrence steps. The current
+sample-by-sample application is a retained digital probe, not the intended acoustic architecture.
+
+[definition] `life::mathematical_source::acoustic::ExactAcousticOccurrence` is the existing exterior
+WAV import chart. Its sample clock, source samples and declared frame extents preserve the input
+presentation; its folded section does not identify the source. Native acoustic material must carry
+addressed occurrences, caused incidence, local receiver charts, temporal transport, oriented current
+and retained reconstruction fibres. Composition derives native organization from these relations;
+neither a fixed frame size nor an authored spectral/phoneme vocabulary supplies that organization.
+The [acoustic grain correction](../../research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md)
+locates the existing constructions and their current attachment boundaries.
+
+[definition] A compact acoustic realization carries its executable decoder, declared receiver family
+and full reconstruction remainder. Where continuing generators descend through a quotient, retain
+their transport compatibility and separating histories. This is not a requirement to keep every
+source sample in hot native history or to preserve every possible receiver losslessly. Preserve
+source evidence recoverably while constructing and checking the declared representation.
 
 [definition] The first perception return must show how an acoustic occurrence participates in
 the current native material/contact relation and changes or is read through the continuing
 ecology. Reuse synchronized occurrence, clock transport and situated returned-difference owners.
 Do not map a file label, expected sound class or arbitrary frame summary straight into a desired
-native current. Derive and implement the actual PCM/material-to-contact attachment; report its
+native current. Derive and implement the exterior acoustic chart's native material/contact passage; report its
 retained fibre and present limitations. A waveform decoder alone is not sound perception.
 
 [definition] The production starting point is native outward port current, preserving its order
@@ -142,7 +156,7 @@ The first attachment must derive the current ecology's actual outward-port passa
 interface or factor the codec from its older body wrapper. Do not invent an open-world-tube
 receipt, adopt an older acoustic body as the new ecology, or play a stored input as native output.
 
-[definition] Keep receiver sample rate, time/frequency support, gain/divisor and PCM quantization
+[definition] Keep exterior receiver sample rate, time/frequency support, gain/divisor and PCM quantization
 explicit and stable during comparisons. Inspect both the exact emitted current and the audible
 surface: distinct internal states can collapse to the same rendered sound. Preserve silence,
 duration and gaps as chronology. Spectra, amplitudes and distances are observer measurements,
@@ -225,7 +239,8 @@ The acoustic application now appends distinct recordings without resetting its n
 the serial speech probe still resumes only its original WAV/text experiment. Ordered unlinked
 packet submission and a bounded Metal complex-incidence contraction are implemented in the
 [continuation record](../../research/records/2026-09-06_AS4_AS5_CORPUS_CONTINUATION_AND_RESIDENT_PACKETS.md).
-These do not establish corpus cultivation. Compose source-qualified conversational returns with
+These do not establish corpus cultivation or make PCM samples the native units. Compose
+source-qualified acoustic holons and conversational returns with
 the shared native material/formation construction, provide useful acoustic and English receivers,
 and continue execution/storage work. The
 [acoustic guide](../ACOUSTIC_EXPERIMENTS.md) documents the existing probe interfaces. More data
