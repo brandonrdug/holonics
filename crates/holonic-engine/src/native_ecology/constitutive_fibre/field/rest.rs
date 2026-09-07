@@ -72,6 +72,7 @@ struct Header {
 #[derive(Debug, PartialEq, Eq)]
 pub(super) struct HeldRest {
     pub(super) source: ResidentSectionRest,
+    pub(super) incoming: Option<ResidentSectionRest>,
     pub(super) junction: Option<ResidentSectionRest>,
     pub(super) transport: Option<ResidentSectionRest>,
 }
@@ -422,7 +423,16 @@ impl NativeFieldRest {
             {
                 return Err(invalid("field source/frame chronology"));
             }
-            for value in &event.lineage.incoming {
+            let incoming = match (&event.lineage.incoming, &rest.incoming) {
+                (NativeFieldIncoming::Exterior(values), None) => values.clone(),
+                (NativeFieldIncoming::Resident { resident_nodes }, Some(input))
+                    if *resident_nodes == n =>
+                {
+                    resident_input::decode_input(input, n)?
+                }
+                _ => return Err(invalid("input provenance/carrier disagreement")),
+            };
+            for value in &incoming {
                 let w = value.words();
                 if NativePhaseCurrent::new(w[0], w[1], w[2])?.words() != w {
                     return Err(invalid("incoming current normalization"));
@@ -578,6 +588,9 @@ impl NativeFieldRest {
             if let Some(s) = &h.transport {
                 section(s)?;
             }
+            if let Some(s) = &h.incoming {
+                section(s)?;
+            }
         }
         out.write_all(END).map_err(invalid)
     }
@@ -595,11 +608,17 @@ impl NativeFieldRest {
             .transpose()?;
         let transport = header.transport.then(&mut section).transpose()?;
         let mut history = Vec::new();
-        for _ in &header.history {
+        for event in &header.history {
             history.push(HeldRest {
                 source: section()?,
                 junction: header.junction.as_ref().map(|_| section()).transpose()?,
                 transport: header.transport.then(&mut section).transpose()?,
+                incoming: event
+                    .lineage
+                    .incoming
+                    .is_resident()
+                    .then(&mut section)
+                    .transpose()?,
             });
         }
         expect(&mut input, END)?;

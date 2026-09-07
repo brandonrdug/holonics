@@ -318,9 +318,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             }
             let minus_one = Rat::from_integer((-1).into());
             contact.extend(
-                event
-                    .lineage
-                    .incoming
+                self.inspect_incoming(receiving)?
                     .iter()
                     .map(|a| a.current().scaled(&minus_one)),
             );
@@ -363,8 +361,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
         };
         let width = self.relation.source_width + self.relation.target_width;
         let surface = self.relation.surface;
-        // The scratch section is apparatus storage for signed wide words. Its low allocation is
-        // interpreted as i128 only by the private native kernel; no interval readout is made.
+        // Apparatus scratch uses the target's wide layout. Durable reports keep their shared
+        // signed-word wire; no interval readout of this workspace is made.
         let extra = match junction.representation {
             NativeFieldJunctionRepresentation::RationalWords => 7,
             NativeFieldJunctionRepresentation::EnclosedDyadic { .. } => 8,
@@ -372,7 +370,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         let scratch_words = width
             .checked_mul(width)
             .and_then(|n| n.checked_add(extra * width))
-            .and_then(|n| n.checked_mul(2))
+            .and_then(ResidentSurface::constitutive_wide_workspace_words)
             .ok_or(ConstitutiveFibreError::Shape)?;
         Ok(Some((
             PendingJunction {

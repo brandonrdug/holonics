@@ -52,6 +52,10 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
    The [retained-current return](../../research/records/2026-09-07_APPLE_RETAINS_CONDITION_CURRENT_THROUGH_RECORDED_CONTACT.md)
    adds desktop `2c99351c`'s current formation and affine-contact kernels, including Metal's
    twenty-byte wide scratch and recoverable publication of the complete successor.
+   The [field-ingress return](../../research/records/2026-09-07_APPLE_CONTINUES_GENERATED_CURRENTS_THROUGH_THE_COMPLETE_JUNCTION.md)
+   adds desktop `99a921b9`'s resident entry and the paired/enclosed/balanced Metal junctions,
+   complete reports and resident-input persistence. Forty-three focused field controls pass;
+   the extended public example agrees with desktop at its declared receiver scope.
    This is a device composition return, not completion of acoustic development.
 2. Bind actual acoustic sections and returns to that shared owner. Start at
    `AcousticFieldChart`, `ExactPhaseCurrentSection`, the existing clock-transport owners and
@@ -71,8 +75,11 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
    unequal utterances do not supply that action. Actual retained condition current now meets
    inferred evidence through the explicit unit-admittance contact law in the recorded coefficient
    study. Preserve each prediction's actual source and condition carriers across later contact;
-   bind this composition to productive timed acoustic reception/emission and actual field
-   incidence before claiming a sound model. Whole-family evidence does not
+   the [field-ingress return](../../research/records/2026-09-07_APPLE_CONTINUES_GENERATED_CURRENTS_THROUGH_THE_COMPLETE_JUNCTION.md)
+   now conducts both recorded predictions through the existing complete junction and verifies
+   its residual, bounds and internal current. Clock/support remain exterior lineage; next bind
+   productive timed acoustic reception/emission and actual material incidence before claiming a
+   sound model. Whole-family evidence does not
    impose a universal certainty prerequisite on generative current.
 3. Develop and retain acoustic generative standing across source-qualified recordings and
    actual joined returns, then conduct its native emission into the declared acoustic receiver.

@@ -492,6 +492,7 @@ enum Argument {
     NullBuffer,
     U32(u32),
     U32Array(Vec<u32>),
+    U64(u64),
 }
 #[derive(Clone)]
 enum Command {
@@ -540,6 +541,7 @@ fn submit_in_pool(rt: &Runtime, commands: &[Command]) -> Result<()> {
                         }
                         Argument::NullBuffer => enc.set_buffer(i as u64, None, 0),
                         Argument::U32(v) => enc.set_bytes(i as u64, 4, (v as *const u32).cast()),
+                        Argument::U64(v) => enc.set_bytes(i as u64, 8, (v as *const u64).cast()),
                         Argument::U32Array(values) => enc.set_bytes(
                             i as u64,
                             (values.len() * size_of::<u32>()) as u64,
@@ -810,6 +812,7 @@ pub struct Module {
 pub struct Function<'m> {
     pipeline: ::metal::ComputePipelineState,
     signature: &'static [usize],
+    wide_signature: &'static [usize],
     arity: usize,
     pack_scalars: bool,
     nullable: &'static [usize],
@@ -850,10 +853,11 @@ impl Module {
             "section_constitutive_condition_receive" => (&[2, 3, 4, 9, 10, 11, 21], 22),
             "section_constitutive_condition_current_found" => (&[2, 3, 4, 5, 11], 12),
             "section_constitutive_condition_contact" => (&[2, 3, 4, 7, 8, 16], 17),
+            "section_field_current_input" => (&[2, 3, 4, 5, 11], 12),
             "section_field_source_frame" => (&[6, 12], 13),
             "section_constitutive_circulation" => (&[9, 10, 16], 17),
             "section_constitutive_rechart" => (&[5, 19], 20),
-            "section_constitutive_field" => (&[9, 10, 16], 17),
+            "section_constitutive_field" => (&[9, 10, 11, 12, 26], 27),
             "section_constitutive_field_rechart" => (&[5, 19], 20),
             "section_census" | "section_census_serial_control" => (&[2, 3], 5),
             "section_carry" => (&[2, 8], 9),
@@ -886,10 +890,17 @@ impl Module {
             Ok(Function {
                 pipeline,
                 signature,
+                wide_signature: if name == "section_constitutive_field" {
+                    &[13]
+                } else {
+                    &[]
+                },
                 arity,
                 pack_scalars: name == "section_constitutive_condition_image",
                 nullable: if name == "section_constitutive_differential" {
                     &[6, 7]
+                } else if name == "section_constitutive_field" {
+                    &[14, 15, 16, 17, 18, 19, 20]
                 } else {
                     &[]
                 },
@@ -972,7 +983,9 @@ impl Function<'_> {
             if pointer.is_null() {
                 return Err(invalid("launch", "null argument storage"));
             }
-            if self.signature.contains(&index) {
+            if self.wide_signature.contains(&index) {
+                arguments.push(Argument::U64(unsafe { *(*pointer as *const u64) }));
+            } else if self.signature.contains(&index) {
                 let value = unsafe { *(*pointer as *const u32) };
                 if self.pack_scalars {
                     scalars.push(value);

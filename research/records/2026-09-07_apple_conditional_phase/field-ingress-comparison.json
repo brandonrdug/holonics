@@ -1,0 +1,302 @@
+{
+  "truth_status": "established-bounded",
+  "evidence_tags": [
+    "measured"
+  ],
+  "apple": "research/records/2026-09-07_apple_conditional_phase/return-field-ingress.json",
+  "desktop": "research/records/2026-09-07_conditional_phase/return-field-ingress.json",
+  "exact_semantic_agreement": {
+    "source_chart": true,
+    "relation": true,
+    "observations": true,
+    "withheld": true,
+    "condition_inference": true,
+    "condition_family_cycle": true,
+    "actual_condition_current_cycle": true,
+    "continuation": true,
+    "learner_occurrences": true,
+    "multiplication_graph_exact": true,
+    "resident_field_cycle": true
+  },
+  "excluded_fields": "work and *_work census fields within these roots; timing and aggregate apparatus census outside parity scope",
+  "field_resident_work": {
+    "deeds": 3,
+    "ingress_octets": 12,
+    "numerical_egress_octets": 0,
+    "receipt_egress_octets": 384,
+    "section_readouts": 0
+  },
+  "field_inputs": [
+    [
+      {
+        "denominator": 5,
+        "imaginary": 11,
+        "real": 2
+      }
+    ],
+    [
+      {
+        "denominator": 25,
+        "imaginary": 86,
+        "real": 27
+      }
+    ],
+    [
+      {
+        "denominator": 25,
+        "imaginary": 24,
+        "real": -7
+      }
+    ]
+  ],
+  "field_internal_currents": [
+    {
+      "contact": [
+        {
+          "imaginary": [
+            [
+              0,
+              []
+            ],
+            [
+              1,
+              [
+                1
+              ]
+            ]
+          ],
+          "real": [
+            [
+              0,
+              []
+            ],
+            [
+              1,
+              [
+                1
+              ]
+            ]
+          ]
+        },
+        {
+          "imaginary": [
+            [
+              1,
+              [
+                11
+              ]
+            ],
+            [
+              1,
+              [
+                5
+              ]
+            ]
+          ],
+          "real": [
+            [
+              1,
+              [
+                2
+              ]
+            ],
+            [
+              1,
+              [
+                5
+              ]
+            ]
+          ]
+        },
+        {
+          "imaginary": [
+            [
+              -1,
+              [
+                86
+              ]
+            ],
+            [
+              1,
+              [
+                25
+              ]
+            ]
+          ],
+          "real": [
+            [
+              -1,
+              [
+                27
+              ]
+            ],
+            [
+              1,
+              [
+                25
+              ]
+            ]
+          ]
+        }
+      ],
+      "current": {
+        "imaginary": [
+          [
+            -1,
+            [
+              256
+            ]
+          ],
+          [
+            1,
+            [
+              2451
+            ]
+          ]
+        ],
+        "real": [
+          [
+            1,
+            [
+              224
+            ]
+          ],
+          [
+            1,
+            [
+              2451
+            ]
+          ]
+        ]
+      },
+      "receiving_occurrence": 1,
+      "source_occurrence": 0
+    },
+    {
+      "contact": [
+        {
+          "imaginary": [
+            [
+              1,
+              [
+                11
+              ]
+            ],
+            [
+              1,
+              [
+                5
+              ]
+            ]
+          ],
+          "real": [
+            [
+              1,
+              [
+                2
+              ]
+            ],
+            [
+              1,
+              [
+                5
+              ]
+            ]
+          ]
+        },
+        {
+          "imaginary": [
+            [
+              1,
+              [
+                86
+              ]
+            ],
+            [
+              1,
+              [
+                25
+              ]
+            ]
+          ],
+          "real": [
+            [
+              1,
+              [
+                27
+              ]
+            ],
+            [
+              1,
+              [
+                25
+              ]
+            ]
+          ]
+        },
+        {
+          "imaginary": [
+            [
+              -1,
+              [
+                24
+              ]
+            ],
+            [
+              1,
+              [
+                25
+              ]
+            ]
+          ],
+          "real": [
+            [
+              1,
+              [
+                7
+              ]
+            ],
+            [
+              1,
+              [
+                25
+              ]
+            ]
+          ]
+        }
+      ],
+      "current": {
+        "imaginary": [
+          [
+            1,
+            [
+              8
+            ]
+          ],
+          [
+            1,
+            [
+              129
+            ]
+          ]
+        ],
+        "real": [
+          [
+            1,
+            [
+              1236
+            ]
+          ],
+          [
+            1,
+            [
+              817
+            ]
+          ]
+        ]
+      },
+      "receiving_occurrence": 2,
+      "source_occurrence": 1
+    }
+  ]
+}

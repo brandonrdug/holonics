@@ -2,6 +2,49 @@ use super::*;
 use crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent;
 
 impl<'chart> ResidentSurface<'chart> {
+    pub(crate) fn record_field_current_input(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        current: ResidentConstitutiveCurrent<'_, 'chart>,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        self.validate_constitutive_current_view(current)?;
+        if current.width == 0
+            || current.width % 2 != 0
+            || output.rows != current.width / 2
+            || output.width != 3
+            || output.grain.0 != 0
+            || !std::ptr::eq(output.surface, self)
+        {
+            return Err(ResidentRefusal::Declaration {
+                operation: "field-current-input",
+                what: "incompatible phase input chart".into(),
+            });
+        }
+        let mut p = Params::new();
+        p.ptr(current.section.lo.device_ptr())
+            .ptr(current.section.hi.device_ptr())
+            .u32(current.offset as u32)
+            .u32(current.denominator.map_or(u32::MAX, |n| n as u32))
+            .u32(current.disposition.map_or(u32::MAX, |n| n as u32))
+            .u32(output.rows as u32)
+            .ptr(output.lo.device_ptr())
+            .ptr(output.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_field_current_input",
+            1,
+            self.declaration.warp_size.max(1),
+            0,
+            &mut p,
+            "field-current-input",
+        )
+    }
+
     /// Stage a retained condition current, or its unit-admittance affine contact. Neither
     /// kernel mutates the supplied current or family. The caller owns successor publication.
     pub(crate) fn record_condition_contact(

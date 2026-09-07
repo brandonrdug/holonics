@@ -66,7 +66,7 @@ def verify_condition_current_cycle(report, observation, source_inputs, direction
     """
     cycle = observation.get("actual_condition_current_cycle")
     if cycle is None:
-        assert report["schema"] != "holonics.recorded-temporal-action.v3"
+        assert report["schema"] not in ("holonics.recorded-temporal-action.v3", "holonics.recorded-temporal-action.v4")
         return None
 
     initial = coordinates(cycle["initial_condition"])
@@ -136,6 +136,102 @@ def verify_condition_current_cycle(report, observation, source_inputs, direction
     }
 
 
+def verify_generated_field(report, observation):
+    """Independent two-occurrence receiver: rank-one Hermitian solve and full balls.
+
+    This checks the declared unit junction on the actual predictions, including covariance,
+    packed signed128 centers, oriented residual and internal contact. It conducts no native
+    operation and assigns no semantics to the coordinate aperture.
+    """
+    field = observation.get("native_generated_field")
+    if field is None:
+        assert report["schema"] != "holonics.recorded-temporal-action.v4"
+        return None
+    n = report["aperture"]["target_complex"]
+    dim, grain = 6*n, field["grain"]
+    assert field["nodes"] == n and grain == 72
+    assert field["occurrence_count"] == 2 and field["linked_occurrences"] == 1
+    assert field["empty_exterior_input"] is True
+    cycle = observation["actual_condition_current_cycle"]
+    predictions = [decimal_vector(cycle[key]["coordinates"]) for key in
+                   ("prediction_before_observation", "prediction_after_contact")]
+    assert len(field["actual_incoming"]) == len(field["lineages"]) == 2
+    for at, (incoming, lineage, expected) in enumerate(zip(
+            field["actual_incoming"], field["lineages"], predictions)):
+        assert len(incoming) == n
+        values = [Q(p[c], p["denominator"]) for p in incoming for c in ("real", "imaginary")]
+        assert values == expected
+        assert lineage["incoming"] == {"resident_nodes":n}
+        assert lineage["occurrence"] == at and lineage["frame"] == 0
+        assert lineage["received_from"] == (None if at == 0 else 0)
+        assert lineage["predecessor_state"] == (None if at == 0 else 0)
+        assert lineage["source_contact"] == (None if at == 0 else "emission")
+    supports = observation["temporal_support_external_to_field"]
+    for name in ("hidden", "later"):
+        assert supports[name] == report[name + "_support"]
+    for name, expected in zip(("anticipated", "generated"), predictions):
+        carrier = observation["prediction_carriers"][name]
+        actual, directions = affine(carrier["reading"]["predecessor_reading"])
+        assert not directions and actual == expected
+    a, b = predictions
+    u0 = [v for i in range(n) for v in (Q(0), Q(0), a[2*i], a[2*i+1])] + [Q(0)]*(2*n)
+    u1 = [v for i in range(n) for v in (a[2*i], a[2*i+1], b[2*i], b[2*i+1])] + [Q(0)]*(2*n)
+    d = u0[:4*n] + [-v for v in b]
+    jd = [v for i in range(3*n) for v in (-d[2*i+1], d[2*i])]
+    c = [[d[i]*d[j] + jd[i]*jd[j] for j in range(dim)] for i in range(dim)]
+    cov = field["junction_covariance"]
+    assert cov["rows"] == 1 and cov["width"] == dim*dim+1 and cov["grain"] == 0
+    words = cov["intervals"]
+    assert all(lo == hi for lo, hi in words) and words[-1][0] > 0
+    cden = words[-1][0]
+    assert [[Q(words[i*dim+j][0],cden) for j in range(dim)] for i in range(dim)] == c
+    v0 = [2*x for x in u0]
+    denom = 1 + norm(d)
+    real_part, imaginary_part = dot(d,u1), dot(jd,u1)
+    v1 = [2*(u1[i] - (d[i]*real_part + jd[i]*imaginary_part)/denom) for i in range(dim)]
+    exact = []
+    for u, v, prefix in ((u0,v0,v0),(u1,v1,[x-y for x,y in zip(v0,v1)])):
+        exact.append((v,[x-y for x,y in zip(v,u)],[2*x-y for x,y in zip(u,v)],prefix))
+    previous_held = [0]*dim
+    assert len(field["junction_reports"]) == 2
+    for at, packet in enumerate(field["junction_reports"]):
+        assert packet["width"] == 12*(dim+1) and packet["rows"] == 1 and packet["grain"] == 0
+        wire = packet["intervals"]
+        assert len(wire) == packet["width"] and all(lo == hi for lo,hi in wire)
+        wide = []
+        for i in range(0,len(wire),2):
+            value = (wire[i][0] & ((1<<64)-1)) | ((wire[i+1][0] & ((1<<64)-1))<<64)
+            wide.append(value-(1<<128) if value >= (1<<127) else value)
+        sections = [wide[i*(dim+1):(i+1)*(dim+1)] for i in range(6)]
+        for segment, expected in zip(sections[:4], exact[at]):
+            center = [Q(x,1<<grain) for x in segment[:-1]]
+            radius = Q(segment[-1],1<<grain)
+            assert radius >= 0 and norm([x-y for x,y in zip(center,expected)]) <= radius*radius
+        u = (u0,u1)[at]
+        ugrid = [int(x*(1<<grain)) for x in u]
+        error_count = sum(Q(v,1<<grain) != x for v,x in zip(ugrid,u))
+        assert sections[4] == ugrid + [error_count]
+        cv = c if at else [[Q(0)]*dim for _ in range(dim)]
+        den = cden if at else 1
+        vg = sections[0][:-1]
+        residual = [sum(cv[i][j]*den*vg[j] for j in range(dim)) + den*vg[i]
+                    - 2*den*(ugrid[i]+previous_held[i]) for i in range(dim)]
+        assert sections[5] == residual + [den]
+        previous_held = sections[2][:-1]
+    internal = field["internal_currents"]
+    assert len(internal) == 1
+    current = internal[0]
+    assert current["source_occurrence"] == 0 and current["receiving_occurrence"] == 1
+    assert [native_fraction(p[c]) for p in current["contact"] for c in ("real","imaginary")] == d
+    assert native_fraction(current["current"]["real"]) == dot(d,v1)
+    assert native_fraction(current["current"]["imaginary"]) == dot(jd,v1)
+    stage = report["stages"]["native_generated_field_recurrence"]
+    assert stage["deeds"] == 2 and stage["ingress_octets"] == 8
+    return {"verified":True,"occurrences":2,"linked_contacts":1,
+            "full_covariance_and_oriented_residual":True,"all_four_current_balls_contain_exact_solve":True,
+            "exact_internal_current":True,"native_input_matches_retained_predictions":True}
+
+
 def convolve(source, response):
     n, k = len(source) // 2, len(response) // 2
     out = [Q(0) for _ in range(2 * (n + k - 1))]
@@ -191,6 +287,7 @@ def compare(path):
         assert observation["prediction"]["status"] == "native-consumer-refused"
     condition_current_cycle = verify_condition_current_cycle(
         report, observation, inputs, directions)
+    generated_field = verify_generated_field(report, observation)
     family_verified = False
     if "whole_image" in observation:
         image = observation["whole_image"]
@@ -221,7 +318,7 @@ def compare(path):
         "native_stages_have_zero_numerical_readouts":True,
         "native_whole_image_continuation_and_refinement_verified":family_verified,
         "condition_current_cycle_verified":None if condition_current_cycle is None else condition_current_cycle["verified"],
-        "condition_current_cycle":condition_current_cycle}
+        "condition_current_cycle":condition_current_cycle,"generated_field":generated_field}
 
 
 def main():

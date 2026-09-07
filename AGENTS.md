@@ -61,6 +61,11 @@ now has its explicit metric and native two-port response. Desktop construction n
 actual field source/condition incidence and producing-law chronology with that current and
 conversation reception. Retain the carriers used to produce each prediction; later condition
 inference changes the successor rather than rewriting that prediction's history.
+
+[definition] The [generated-current field ingress](research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
+now supplies the direct resident entry to that field operation, including its input provenance,
+history placement and restart. Its boundary branches remain a partial source chart; do not
+substitute them for complete context when internal currents distinguish the sources.
 Whole-family evidence is not a universal certainty gate on generation. Neither full model is complete.
 
 [project-postulate] Brandon's September 6 synthesis ruling records Athena-alpha as planned but

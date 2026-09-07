@@ -377,10 +377,9 @@ impl<'chart> ResidentSurface<'chart> {
         }
         #[cfg(target_os = "macos")]
         {
-            let _ = occurrence;
-            if junction.is_some() || transport.is_some() {
+            if transport.is_some() {
                 return Err(fail(
-                    "paired junction and material transport are not yet implemented on Metal",
+                    "contextual material transport is not yet implemented on Metal",
                 ));
             }
         }
@@ -397,7 +396,7 @@ impl<'chart> ResidentSurface<'chart> {
             let scratch_words = width
                 .checked_mul(width)
                 .and_then(|n| n.checked_add(if mode == 1 { 7 * width } else { 8 * width }))
-                .and_then(|n| n.checked_mul(2))
+                .and_then(Self::constitutive_wide_workspace_words)
                 .ok_or_else(|| fail("paired junction scratch extent overflow"))?;
             if !matches(covariance, 1, matrix_width)
                 || !matches(next_covariance, 1, matrix_width)
@@ -470,8 +469,7 @@ impl<'chart> ResidentSurface<'chart> {
             .ptr(origin_frame.unwrap_or(frame).lo.device_ptr())
             .u32(nodes as u32)
             .u32(u32::from(origin.is_some()));
-        // Metal retains the ordinary-field ABI until its junction/material kernels are ported.
-        #[cfg(not(target_os = "macos"))]
+        // Both targets carry the same paired-junction inputs and complete chronology.
         {
             params
                 .u32(junction.map_or(0, |(_, _, _, _, _, (mode, _))| mode))
@@ -491,6 +489,11 @@ impl<'chart> ResidentSurface<'chart> {
                     params.ptr(0);
                 }
             }
+        }
+        // Contextual material transport remains a declared obstruction on Metal until its
+        // complete operation is ported; the CUDA launch retains that separate argument block.
+        #[cfg(not(target_os = "macos"))]
+        {
             params.u32(
                 transport
                     .as_ref()
@@ -626,6 +629,14 @@ impl<'chart> ResidentSurface<'chart> {
         {
             words.checked_mul(16)
         }
+    }
+
+    /// Private device workspace measured in the section's i64 allocation words. Its bytes are
+    /// apparatus scratch, not a persisted wide report; durable junction reports keep their wire.
+    pub(crate) fn constitutive_wide_workspace_words(words: usize) -> Option<usize> {
+        Self::constitutive_wide_scratch(words)?
+            .checked_add(7)
+            .map(|n| n / 8)
     }
 
     /// Exact scratch layout of the target representation, including local denominators.

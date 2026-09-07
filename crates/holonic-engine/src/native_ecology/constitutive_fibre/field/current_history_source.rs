@@ -124,22 +124,30 @@ impl<'chart> NativeCurrentHistorySourceReceiver<'chart> {
         let at = self.next;
         let event = &field.history[at];
         let d = 6 * self.nodes;
-        let incoming = self.surface.mount_section_rest(
-            &ResidentSectionRest::found(
-                self.nodes,
-                3,
-                ResidentGrain(0),
-                64,
-                event
-                    .lineage
-                    .incoming
-                    .iter()
-                    .flat_map(|p| p.words())
-                    .map(|w| (w, w))
-                    .collect(),
+        let incoming = if let Some(input) = &event.resident()?.incoming {
+            Rc::clone(input)
+        } else {
+            Rc::new(
+                self.surface.mount_section_rest(
+                    &ResidentSectionRest::found(
+                        self.nodes,
+                        3,
+                        ResidentGrain(0),
+                        64,
+                        event
+                            .lineage
+                            .incoming
+                            .exterior()
+                            .ok_or_else(|| invalid("missing resident input"))?
+                            .iter()
+                            .flat_map(|p| p.words())
+                            .map(|w| (w, w))
+                            .collect(),
+                    )
+                    .map_err(invalid)?,
+                )?,
             )
-            .map_err(invalid)?,
-        )?;
+        };
         let next = self.surface.fresh_section(1, 2 * d + 8, ResidentGrain(0))?;
         let source = self
             .surface

@@ -50,6 +50,15 @@ generate from the successor while preserving their earlier carriers. Next join t
 to productive timed acoustic reception/emission across recordings and persistence. These bounded
 coefficient/contact returns do not establish useful sound or English-model completion.
 
+[established-bounded; measured] The [complete-junction return](research/records/2026-09-07_APPLE_CONTINUES_GENERATED_CURRENTS_THROUGH_THE_COMPLETE_JUNCTION.md)
+integrates desktop `99a921b9` resident field ingress, paired/enclosed/balanced Metal junctions and
+input persistence. Forty-three focused field controls pass, and all eleven compared public phase
+result groups agree with desktop, including exact internal currents. Both recorded studies now
+conduct their retained predictions into two resident field occurrences; cold PCM/algebra receivers
+verify complete covariance, all current bounds, residual and internal current. Their native field
+stages use zero numerical readouts. Contextual material-transport and complete-current history
+receivers remain separate unported owners; productive timed sound and English remain unfinished.
+
 [established-bounded; measured] The September 7 Mac pickup integrates desktop `6ef7bf9d` with
 68 passing engine/public native tests and successful HNA library, application and shared-example
 checks. The [integration record](research/records/2026-09-07_APPLE_INTEGRATES_THE_SHARED_CONDITIONAL_GENERATOR_HANDOFF.md)
@@ -178,6 +187,13 @@ universal certainty gate on model generation. Retain the carriers used for each 
 later condition inference changes the successor rather than rewriting its history. Bind that native
 owner through the existing conversation exposure/session interface. Athena-alpha still has no
 useful text response; the full AC0–AC5 goal remains unfinished.
+
+[established-bounded; measured] The [generated-current ingress](research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
+now feeds the existing field operation directly, retaining its actual input through history
+placement and rest. All 118 constitutive and 16 SDK alpha tests pass, including paired/internal
+equivalence, refusal preservation and restart. The public conditional example drives three linked
+paired-field occurrences with zero numerical readback and retains their full internal currents.
+This closes the ingress port; the contextual-source/conditional-action binding above remains open.
 
 [established-bounded; measured] The existing local relation now has a
 [resident rational-current port](research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md).

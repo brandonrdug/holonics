@@ -855,19 +855,13 @@ kernel void native_phase_wide_probe(device const uint *a [[buffer(0)]],
 // Complete multi-port field recurrence.  The field uses four source coordinates per node
 // (outgoing and held complex branches) followed by the two-coordinate target face.  All
 // intermediates remain W until the checked exterior conversion at the commit boundary.
-kernel void section_constitutive_field(
-    device const long *seed [[buffer(0)]], device long *memory_lo [[buffer(1)]],
-    device long *memory_hi [[buffer(2)]], device long *basis_lo [[buffer(3)]],
-    device long *basis_hi [[buffer(4)]], device const long *incoming [[buffer(5)]],
-    device const long *origin [[buffer(6)]], device const long *current_frame [[buffer(7)]],
-    device const long *origin_frame [[buffer(8)]], constant uint &nodes [[buffer(9)]],
-    constant uint &linked [[buffer(10)]], device long *output_lo [[buffer(11)]],
-    device long *output_hi [[buffer(12)]], device uint *slot [[buffer(13)]],
-    device const uint *census [[buffer(14)]], device const uint *lineage [[buffer(15)]],
-    constant uint &lineage_count [[buffer(16)]], threadgroup W *scratch [[threadgroup(0)]],
-    uint3 tid [[thread_position_in_threadgroup]]) {
-  if (tid.x || tid.y || tid.z)
-    return;
+inline void field_constitutive_prepare(
+    device const long *seed, device const long *memory_lo, device const long *basis_lo,
+    device const long *incoming, device const long *origin, device const long *current_frame,
+    device const long *origin_frame, uint nodes, uint linked,
+    device long *output_lo, device long *output_hi, device uint *slot,
+    device const uint *census, device const uint *lineage, uint lineage_count,
+    threadgroup W *scratch) {
   if (upstream(census, lineage, lineage_count, slot))
     return;
   if (!nodes || linked > 1 || nodes > 0xffffffffu / 6u) {
@@ -1054,14 +1048,6 @@ kernel void section_constitutive_field(
   output_lo[pa + width + 1] = output_hi[pa + width + 1] = prior_status;
   output_lo[pa + width + 2] = output_hi[pa + width + 2] = -1;
   output_lo[pa + width + 3] = output_hi[pa + width + 3] = prior_rank;
-  if (ins >= 0)
-    for (uint j = 0; j < width; ++j) {
-      ulong at = (ulong)ins * width + j;
-      basis_lo[at] = basis_hi[at] = toword(formed[j], slot);
-    }
-  for (uint j = 0; j < 3 * nodes; ++j) {
-    memory_lo[j] = memory_hi[j] = toword(out[j], slot);
-  }
 }
 
 kernel void section_constitutive_field_rechart(

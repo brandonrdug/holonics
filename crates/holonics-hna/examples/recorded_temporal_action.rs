@@ -4,6 +4,7 @@ use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::constitutive_fibre::{
         ConditionContactMetric, ConditionPreimageReading, ConstitutiveReading,
+        NativeConstitutiveField, NativeFieldOccurrence, NativeJunctionSeed, NativePhaseCurrent,
         ResidentConstitutiveCurrent, ResidentConstitutiveFibre, ResidentConstitutiveReturn,
     },
     phase_current::{
@@ -100,6 +101,10 @@ fn point(s: &ResidentSurface<'_>, section: &ResidentSection<'_>) -> Result<Value
         .map(|p| Rat::new(p.0.into(), den.into()))
         .collect();
     Ok(json!({"coordinates":strings(&coordinates),"raw_words":words}))
+}
+fn section_wire(rest: &ResidentSectionRest) -> Value {
+    json!({"rows":rest.rows,"width":rest.width,"grain":rest.grain.0,
+        "bound_octaves":rest.bound_octaves,"intervals":rest.intervals})
 }
 fn returned(result: &ResidentConstitutiveReturn<'_>) -> Result<Value> {
     Ok(match result.inspect()?.predecessor_reading {
@@ -263,6 +268,32 @@ fn experiment<'c>(
             None,
         )?)
     })?;
+    // The two actual prediction carriers enter one ordinary native field recurrence. The field
+    // has the caller-declared target aperture. Both occurrences receive no exterior values;
+    // their resident inputs remain the actual prediction carriers supplied to this field.
+    let mut generated_field = NativeConstitutiveField::found_with_enclosed_junction(
+        s,
+        (0..WIDTH + 1)
+            .map(|_| NativeJunctionSeed {
+                incoming_admittance: 1,
+                held_admittance: 1,
+                incoming_transport: NativePhaseCurrent::unit(),
+                initial_held: NativePhaseCurrent::zero(),
+            })
+            .collect(),
+        ResidentGrain(72),
+    )?;
+    let (first_field_lineage, second_field_lineage) =
+        stage(s, report, "native_generated_field_recurrence", || {
+            let mut entering = NativeFieldOccurrence::entering(Vec::new());
+            let first = generated_field
+                .advance_current_resident(&mut entering, anticipated.current())?;
+            let first_lineage = first.lineage.clone();
+            let mut linked = NativeFieldOccurrence::through(first.source, Vec::new());
+            let second = generated_field
+                .advance_current_resident(&mut linked, generated.current())?;
+            Ok((first_lineage, second.lineage.clone()))
+        })?;
     let image = stage(s, report, "whole_condition_image", || {
         Ok(body.read_condition_image(later_cell.rational()?, &preimage)?)
     })?;
@@ -342,9 +373,32 @@ fn experiment<'c>(
             "after_relation_cut":generated.occurrence(),
             "contacts":held.contacts(),
         });
+        let field_incoming = (0..2)
+            .map(|at| generated_field.inspect_incoming(at))
+            .collect::<std::result::Result<Vec<_>, _>>()?;
+        let field_junctions = (0..2)
+            .map(|at| generated_field.inspect_junction(at).map(|rest| rest.as_ref().map(section_wire)))
+            .collect::<std::result::Result<Vec<_>, _>>()?;
+        let native_field = json!({
+            "nodes":WIDTH + 1,
+            "grain":72,
+            "linked_occurrences":1,
+            "empty_exterior_input":true,
+            "lineages":[first_field_lineage.clone(),second_field_lineage.clone()],
+            "actual_incoming":field_incoming,
+            "junction_reports":field_junctions,
+            "junction_covariance":generated_field.inspect_junction_covariance()?.as_ref().map(section_wire),
+            "internal_currents":generated_field.inspect_internal_currents()?,
+            "occurrence_count":generated_field.occurrence_count(),
+        });
         Ok(
             json!({"preimage":condition,"prediction":prediction,"later_actual":later,"exact_agreement":agreement,
             "actual_condition_current_cycle":current_cycle,
+            "prediction_carriers":{"anticipated":{"occurrence":anticipated.occurrence(),"reading":anticipated.inspect()?},
+                "generated":{"occurrence":generated.occurrence(),"reading":generated.inspect()?}},
+            "native_generated_field":native_field,
+            "temporal_support_external_to_field":{"hidden":hidden_cell.support(),"later":later_cell.support(),
+                "binding":"recorded temporal support remains exterior lineage to the native field"},
             "whole_image":image.inspect()?,"whole_image_carried":carried,"refined_condition":refined,
             "hidden_source":point(s,hidden_cell.section())?,"later_source":point(s,later_cell.section())?,
             "hidden_response":point(s,&hidden_response)?,"hidden_actual":point(s,actual.section())?}),
@@ -391,13 +445,14 @@ fn main() -> Result<()> {
         WIDTH,
         DIVISOR,
     )?;
-    let mut report = json!({"schema":"holonics.recorded-temporal-action.v3","truth_status":"established-bounded",
+    let mut report = json!({"schema":"holonics.recorded-temporal-action.v4","truth_status":"established-bounded",
         "evidence_tags":["measured"],"scope":"declared complex polynomial action on recorded coefficients",
         "source":{"path":wav_path,"sha256":recording.source_sha256,"octets":recording.source_octets,
             "samples":recording.samples.len(),"sample_rate":recording.sample_rate,"occurrence":recording.occurrence,
             "receiver":1,"lineage":1},
         "aperture":{"source_complex":WIDTH,"condition_complex":2,"target_complex":WIDTH+1,"pcm_divisor":DIVISOR,
-            "interpretation":"caller-declared temporal aperture, not learned semantic grain"},
+            "field_nodes":WIDTH+1,"field_grain":72,
+            "interpretation":"caller-declared recorded coefficient and native field aperture, not learned semantic grain"},
         "response_control":{"coordinates":["2","-1","5","3"],"denominator":"3",
             "interpretation":"independently controlled complex digital two-tap action; no physical room/utterance response claim"},
         "training_controls":CONTROLS,"decode_seconds":decode_seconds,"active_stage":"found-owner","stages":{},

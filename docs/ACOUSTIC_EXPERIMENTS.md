@@ -20,6 +20,14 @@ audio is the development material; microphone recording is not a prerequisite. E
 `run` founds a seed, and `resume` continues that retained WAV/text experiment; neither command
 yet adds a new conversation to a continuing corpus-cultivated model.
 
+[established-bounded; measured] The September 7 [field-ingress return](../research/records/2026-09-07_APPLE_CONTINUES_GENERATED_CURRENTS_THROUGH_THE_COMPLETE_JUNCTION.md)
+now conducts the v4 recorded temporal study's retained before/after predictions through one
+five-node enclosed field, using two resident occurrences and one joined source. Both ESC-50 and
+LibriSpeech returns pass the cold full-junction comparison: actual PCM/prediction inputs, complete
+covariance, packed signed-128 reports, current balls, oriented residual and internal current.
+This caller-declared coefficient aperture and its exterior clock lineage do not establish a
+sound model or timed waveform emission; productive recorded development remains next.
+
 ## Shared material field and profiling
 
 [established-bounded; implemented-exact] `holonics_hna::native::acoustic_field::AcousticFieldChart`

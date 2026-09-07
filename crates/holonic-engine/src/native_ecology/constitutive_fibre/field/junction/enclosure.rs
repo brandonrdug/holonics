@@ -162,7 +162,11 @@ impl<'chart> NativeConstitutiveField<'chart> {
             return Ok(None);
         };
         let mut d = self.root_junction_source(source)?;
-        d.extend(event.lineage.incoming.iter().map(|a| a.current().negated()));
+        d.extend(
+            self.inspect_incoming(receiving)?
+                .iter()
+                .map(|a| a.current().negated()),
+        );
         Ok(Some(d))
     }
 

@@ -106,7 +106,15 @@ pub use surface_intervention::SiteMask;
 #[cfg(target_os = "linux")]
 const PTX: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/exact_resident_section.ptx"));
 #[cfg(target_os = "macos")]
-const METAL_SOURCE: &str = include_str!("../../../accelerators/metal/native_phase.metal");
+const METAL_SOURCE: &str = concat!(
+    include_str!("../../../accelerators/metal/native_phase.metal"),
+    "\n",
+    include_str!("../../../accelerators/metal/paired_field_junction.metal"),
+    "\n",
+    include_str!("../../../accelerators/metal/enclosed_field_junction.metal"),
+    "\n",
+    include_str!("../../../accelerators/metal/field_entry.metal"),
+);
 
 /// The exact accumulator the kernels carry, read off `__int128`; one octave is the hand.
 const WIDE_OCTAVES: u32 = 127;

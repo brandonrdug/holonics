@@ -222,6 +222,36 @@ fn main() -> Result<(), Box<dyn Error>> {
     let cycle_equal = future_actual == future_predicted;
     let generated_prediction = returned(&generated_future)?;
     let generated_equal = generated_prediction == future_actual;
+    // Generated current now reaches the ordinary paired field recurrence, including its internal
+    // contact and successor, without decoding/remounting it as an exterior vector.
+    let mut recipient = NativeConstitutiveField::found_with_enclosed_junction(
+        &surface,
+        vec![NativeJunctionSeed {
+            incoming_admittance: 1,
+            held_admittance: 1,
+            incoming_transport: NativePhaseCurrent::unit(),
+            initial_held: NativePhaseCurrent::zero(),
+        }],
+        ResidentGrain(72),
+    )?;
+    let before = recipient.census();
+    let first_received = recipient.advance_current_resident(
+        &mut NativeFieldOccurrence::entering(vec![]),
+        anticipated.current(),
+    )?;
+    let second_received = recipient.advance_current_resident(
+        &mut NativeFieldOccurrence::through(first_received.source, vec![]),
+        generated_future.current(),
+    )?;
+    let third_received = recipient.advance_current_resident(
+        &mut NativeFieldOccurrence::through(second_received.source, vec![]),
+        held.current(),
+    )?;
+    let field_work = delta(before, recipient.census());
+    let resident_field_cycle = json!({"work":field_work,"final_lineage":third_received.lineage,
+        "actual_inputs":(0..3).map(|at|recipient.inspect_incoming(at)).collect::<Result<Vec<_>,_>>()?,
+        "first_junction":recipient.inspect_exact_junction(0)?,"last_junction":recipient.inspect_exact_junction(2)?,
+        "internal_currents":recipient.inspect_internal_currents()?,"occurrences":recipient.occurrence_count()});
     let actual_current_cycle = json!({"initial_native_current":face(&returned(&initial)?),
         "free_contact":free_contact.inspect()?,"generation_before_observation":face(&returned(&anticipated)?),
         "generative_work":generative_work,"contact_after_observation":actual_contact.inspect()?,
@@ -266,6 +296,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         "condition_inference":condition_inference,
         "condition_family_cycle":family_cycle,
         "actual_condition_current_cycle":actual_current_cycle,
+        "resident_field_cycle":resident_field_cycle,
         "observations":observations,"withheld":{"source":x,"condition":c,
             "prediction":face(&predicted),"actual_native_return":face(&actual),"equal":agreement,"work":prediction_work},
         "continuation":continuation.iter().map(face).collect::<Vec<_>>(),"continuation_work":continuation_work,

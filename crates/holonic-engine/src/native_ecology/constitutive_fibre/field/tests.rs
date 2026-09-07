@@ -34,31 +34,26 @@ fn paired_vector(field: &[ExactComplexWaveCurrent]) -> Vec<Rat> {
 
 #[test]
 #[cfg(target_os = "macos")]
-#[ignore = "requires Metal; unported field variants refuse before native state changes"]
-fn metal_unported_junction_refuses_without_changing_the_field() {
+#[ignore = "requires Metal; unported material transport refuses before native state changes"]
+fn metal_unported_material_transport_refuses_without_changing_the_field() {
     let readout = ResidentReadout::new().unwrap();
     let surface = ResidentSurface::on(&readout).unwrap();
-    for enclosed in [false, true] {
-        let mut field = if enclosed {
-            NativeConstitutiveField::found_with_enclosed_junction(
-                &surface, equal_seed(1), ResidentGrain(72),
-            )
-        } else {
-            NativeConstitutiveField::found_with_paired_junction(&surface, equal_seed(1))
-        }.unwrap();
-        let before = (field.inspect_relation().unwrap(), field.inspect_held().unwrap());
-        let launches = field.census().deed_launches;
-        let mut occurrence = NativeFieldOccurrence::entering(vec![phase(1, 1, 1)]);
-        let error = field.advance_resident(&mut occurrence).err().expect("unported junction");
-        assert!(error.to_string().contains("paired junction and material transport are not yet implemented on Metal"));
-        assert_eq!(field.occurrence_count(), 0);
-        assert!(field.pending_lineage().is_none());
-        assert_eq!(field.census().deed_launches, launches);
-        assert_eq!(
-            (field.inspect_relation().unwrap(), field.inspect_held().unwrap()),
-            before,
-        );
-    }
+    let mut field = NativeConstitutiveField::found_with_enclosed_junction(
+        &surface, equal_seed(1), ResidentGrain(72),
+    ).unwrap();
+    field.enable_material_transport_source(NativeMaterialTransportSource::CompleteCurrent).unwrap();
+    let before = (field.inspect_relation().unwrap(), field.inspect_held().unwrap());
+    let launches = field.census().deed_launches;
+    let mut occurrence = NativeFieldOccurrence::entering(vec![phase(1, 1, 1)]);
+    let error = field.advance_resident(&mut occurrence).err().expect("unported material transport");
+    assert!(error.to_string().contains("contextual material transport is not yet implemented on Metal"));
+    assert_eq!(field.occurrence_count(), 0);
+    assert!(field.pending_lineage().is_none());
+    assert_eq!(field.census().deed_launches, launches);
+    assert_eq!(
+        (field.inspect_relation().unwrap(), field.inspect_held().unwrap()),
+        before,
+    );
 }
 
 #[test]

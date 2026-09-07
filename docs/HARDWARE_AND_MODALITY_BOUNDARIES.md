@@ -34,8 +34,9 @@ neither a perfect inverse nor a copy of every past sample is a general learning 
 The [integration record](../research/records/2026-09-07_APPLE_INTEGRATES_THE_SHARED_CONDITIONAL_GENERATOR_HANDOFF.md)
 qualifies its checks and merge repair. The subsequent [conditional Metal return](../research/records/2026-09-07_APPLE_LEARNS_THE_SHARED_CONDITIONAL_PHASE_ACTION.md)
 realizes the forward current/contact/differential kernels and historical source-frame transport.
-The existing ordinary Metal field keeps
-its argument layout and explicitly refuses the newer paired/material junction variants.
+The subsequent [field-ingress return](../research/records/2026-09-07_APPLE_CONTINUES_GENERATED_CURRENTS_THROUGH_THE_COMPLETE_JUNCTION.md)
+now extends the Metal field to the paired/enclosed/balanced junctions and resident generated input.
+The separate contextual material-transport implementation remains explicitly unported.
 
 [established-bounded; measured] The [measured conditional phase return](../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
 now supplies a shared local primitive worth porting while desktop conversation construction
@@ -63,8 +64,9 @@ teacher. The following forward-port boundary has now returned at the scope above
 4. Run the public example and relevant contact/ownership controls on Metal. Compare exact
    operator/current/fibre results, and report Apple transfer/timing measurements in their own scope.
 
-[definition] The scalar conditional example uses the ordinary native field, not the desktop's
-complete-current material variant. Porting that larger CUDA history/transport implementation is
+[definition] The scalar conditional calibration uses the ordinary native field, not the desktop's
+complete-current material variant. Its additional generated-current ingress study now uses an
+enclosed paired recipient. Porting the larger complete-current material implementation is
 not a prerequisite imposed by this experiment. This is a concrete engineering handoff for shared
 generator work, not an instruction to replace acoustic development with a per-sample loop.
 Audio still needs its actual clocks, material conditions and receiver-family binding. The
@@ -104,6 +106,21 @@ now realizes these two kernels with twelve and seventeen arguments respectively.
 admission and launch both use `constitutive_wide_scratch(9*C)`: twenty bytes per Metal wide
 carrier, rounded to sixteen-byte threadgroup alignment, and sixteen bytes per CUDA carrier.
 The shared move owner and immutable evidence remain the owners on both targets.
+
+[established-bounded; measured] The [field ingress extension](../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
+adds `section_field_current_input` and `advance_current_resident`. The kernel normalizes the
+resident current into the existing per-node phase chart before a dependent ordinary field lane.
+Port its `NativeFieldIncoming` provenance and historical input carrier with the cold rest/archive
+changes. The old exterior input JSON remains an array. The extended example's paired recipient
+requires that field representation; the earlier conditional-action receipts remain independently
+usable for the simpler phase port. Desktop controls do not establish Metal parity.
+
+[established-bounded; measured] The Apple field return now passes 43 focused field controls,
+including resident-input archive/rest continuation, and agrees with all eleven compared result
+groups of the extended public example. The Metal field ABI has 27 arguments with a 64-bit
+occurrence at index 13. Scratch uses the target's 20-byte wide layout; enclosed held/report
+values retain the common two-i64 signed-128 wire. The separate material/current-history and
+field differential receiver operations remain outside this port's scope.
 
 [established-bounded; source-inspected] The public framework enters through
 [`holonics::hna`](../crates/holonics/src/lib.rs). Its native session is exposed by

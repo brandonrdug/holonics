@@ -493,3 +493,23 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field_rec
         if (*slot) return;
     }
 }
+
+// Exact resident ingress to the same field recurrence.
+extern "C" __global__ void section_field_current_input(
+    const int64_t *lo,const int64_t *hi,uint32_t at,uint32_t den_at,uint32_t status_at,
+    uint32_t nodes,int64_t *out,int64_t *out_hi,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
+) {
+    if(blockIdx.x || threadIdx.x) return;
+    if(upstream_refused(census,lineage,lineage_count,slot)) return;
+    wide den=fibre_current_denominator(lo,hi,den_at,status_at,slot);
+    for(uint32_t j=0;j<2u*nodes;++j) if(lo[at+j]!=hi[at+j]) atomicOr(slot,REFUSED_MALFORMED);
+    if(*slot) return;
+    for(uint32_t n=0;n<nodes;++n) {
+        wide v[3]={lo[at+2u*n],lo[at+2u*n+1],den};
+        fibre_normalize(v,2,v+2,slot);
+        for(uint32_t j=0;j<3;++j) to_word(v[j],slot);
+        if(*slot) return;
+        for(uint32_t j=0;j<3;++j) out[3u*n+j]=out_hi[3u*n+j]=(int64_t)v[j];
+    }
+}

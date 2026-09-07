@@ -249,6 +249,12 @@ affine particular solution, and whole-family
 evidence receivers do not universally define whether the body may generate. No source-ID switch
 or authored semantic selector supplies the attachment.
 
+[established-bounded; measured] The [resident field ingress](../../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
+now lets generated current enter that same field operation directly. Its actual input survives
+history placement and checkpointing; cold internal/material decoders read the retained carrier.
+All 118 constitutive and 16 SDK alpha controls pass. The contextual-source/conditional-action
+attachment and useful conversation return remain open; this port does not complete AC1–AC2.
+
 [established-bounded; measured] The [native field relation port](../../research/records/2026-09-07_AC1_THE_FIELD_RETURNS_A_RESIDENT_RELATION_FACE_AND_A_PLURAL_FIBRE_HAS_FIXED_RECEIVERS.md)
 now returns resident currents/fibres at historical sources through their actual frames, and a
 whole-fibre receiver can expose a fixed class face without selecting a current. Its actual

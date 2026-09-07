@@ -57,8 +57,16 @@ both return without numerical host readback; useful conversation remains unfinis
 and reception with that continuing current, then bind the native owner to conversation material.
 Retain the carriers used for each prediction; later inference changes the successor rather than
 rewriting that prediction's history. Native current is distinct from a whole-family evidence
-receiver; do not
-choose an arbitrary particular solution or require universal certainty to define all inference.
+receiver; do not choose an arbitrary particular solution or require universal certainty to define
+all inference.
+
+[established-bounded; measured] The [generated-current ingress](../../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
+now reaches the ordinary field operation without numerical readback/remount, preserving paired
+internal current, source consumption and actual input through cold rest/history placement.
+All 118 constitutive and 16 SDK alpha controls pass; the public example drives three linked
+paired-field occurrences with no numerical readback. Next compose actual contextual source and
+receiving charts with the conditional action and its producing-law history, then exercise the
+conversation session.
 
 [established-bounded; measured] The [resident local return](../../research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md)
 now lets native observations develop the existing local relation and its rational emitted current

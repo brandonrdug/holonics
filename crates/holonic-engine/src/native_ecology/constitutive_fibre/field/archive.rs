@@ -1,6 +1,6 @@
 //! Exact exterior placement of immutable historical sections. Current numerical standing stays
 //! resident; a later addressed source mounts its original carriers, without developmental replay.
-use super::rest::{point_bytes, read_point, HeldRest};
+use super::rest::{HeldRest, point_bytes, read_point};
 use super::*;
 use crate::native_ecology::constitutive_fibre::circulation::rest::{blob, read_blob};
 use sha2::{Digest, Sha256};
@@ -72,10 +72,13 @@ impl FieldArchive {
     pub(super) fn append(&mut self, rest: &HeldRest) -> Result<ArchivedField, Error> {
         let mut bytes = vec![
             u8::from(rest.junction.is_some()),
-            u8::from(rest.transport.is_some()),
+            u8::from(rest.transport.is_some()) | (u8::from(rest.incoming.is_some()) << 1),
         ];
         blob(&mut bytes, &point_bytes(&rest.source)?)?;
-        for section in [&rest.junction, &rest.transport].into_iter().flatten() {
+        for section in [&rest.junction, &rest.transport, &rest.incoming]
+            .into_iter()
+            .flatten()
+        {
             blob(&mut bytes, &point_bytes(section)?)?;
         }
         let digest: [u8; 32] = Sha256::digest(&bytes).into();
@@ -111,7 +114,7 @@ impl ArchivedField {
         if bytes.len() != count || Sha256::digest(&bytes).as_slice() != self.digest {
             return Err(error("historical section extent or wire checksum"));
         }
-        if bytes.len() < 2 || bytes[0] > 1 || bytes[1] > 1 {
+        if bytes.len() < 2 || bytes[0] > 1 || bytes[1] > 3 {
             return Err(error("historical section presence"));
         }
         let mut input = (&bytes[2..]).take(self.octets - 2);
@@ -119,7 +122,10 @@ impl ArchivedField {
         let junction = (bytes[0] == 1)
             .then(|| read_point(&read_blob(&mut input)?))
             .transpose()?;
-        let transport = (bytes[1] == 1)
+        let transport = (bytes[1] & 1 == 1)
+            .then(|| read_point(&read_blob(&mut input)?))
+            .transpose()?;
+        let incoming = (bytes[1] & 2 != 0)
             .then(|| read_point(&read_blob(&mut input)?))
             .transpose()?;
         if input.limit() != 0 {
@@ -127,6 +133,7 @@ impl ArchivedField {
         }
         Ok(HeldRest {
             source,
+            incoming,
             junction,
             transport,
         })
@@ -140,6 +147,10 @@ impl<'chart> ResidentFieldHistory<'chart> {
     ) -> Result<Self, Error> {
         Ok(Self {
             section: surface.mount_section_rest(&rest.source)?,
+            incoming: rest
+                .incoming
+                .map(|s| surface.mount_section_rest(&s).map(Rc::new))
+                .transpose()?,
             junction: rest
                 .junction
                 .map(|s| surface.mount_section_rest(&s).map(Rc::new))
@@ -153,6 +164,11 @@ impl<'chart> ResidentFieldHistory<'chart> {
     fn rest(&self, surface: &ResidentSurface<'chart>) -> Result<HeldRest, Error> {
         Ok(HeldRest {
             source: surface.detach_section(&self.section, 64)?,
+            incoming: self
+                .incoming
+                .as_ref()
+                .map(|s| surface.detach_section(s, 64))
+                .transpose()?,
             junction: self
                 .junction
                 .as_ref()
@@ -167,6 +183,19 @@ impl<'chart> ResidentFieldHistory<'chart> {
     }
 }
 impl<'chart> HeldField<'chart> {
+    pub(super) fn incoming_rest(
+        &self,
+        surface: &ResidentSurface<'chart>,
+    ) -> Result<Option<ResidentSectionRest>, Error> {
+        match &self.resident {
+            Some(resident) => resident
+                .incoming
+                .as_ref()
+                .map(|s| surface.detach_section(s, 64).map_err(Error::from))
+                .transpose(),
+            None => Ok(self.rest(surface)?.incoming),
+        }
+    }
     pub(super) fn source_rest(
         &self,
         surface: &ResidentSurface<'chart>,
