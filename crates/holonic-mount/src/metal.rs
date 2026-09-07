@@ -833,6 +833,7 @@ impl Module {
             "section_constitutive_fibre" => (&[4, 5, 6, 12], 13),
             "section_constitutive_current" => (&[4, 5, 6, 9, 10, 11, 12, 13, 14, 20], 21),
             "section_constitutive_bilinear_source" => (&[2, 3, 4, 7, 8, 9, 10, 11, 17], 18),
+            "section_phase_convolution" => (&[2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 19], 20),
             "section_constitutive_differential" => (&[2, 3, 4, 5, 11], 12),
             "section_constitutive_condition_preimage" => (&[3, 4, 5, 8, 9, 10, 11, 12, 13, 23], 24),
             "section_field_source_frame" => (&[6, 12], 13),

@@ -38,6 +38,22 @@ padding and parent delivery metadata. It does not advance the chart cursor or su
 The [resident ingress return](../research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
 records five passing acoustic-field controls; the subsequent interval attachment is described below.
 
+[established-bounded; implemented-exact] `AcousticFieldCell::temporal_view()` now borrows the
+cell's exact support, clock and rational coefficients into
+`holonic_engine::phase_current::resident::convolve_resident`. This resident realization of the
+existing causal polynomial owner retains every output coefficient through the final carry and
+both particular operand carriers. A response has an explicitly declared local delay chart;
+this operation does not align arbitrary source/reply utterances or infer a physical room law.
+The existing conditional learner can receive its resident observations and later use the
+condition Preimage Fibre. A plural fibre is refused by a point consumer rather than selected.
+
+[established-bounded; measured] The [temporal return](../research/records/2026-09-07_THE_NATIVE_TEMPORAL_ACTION_RETAINS_ITS_CAUSAL_TAIL.md)
+records 21 focused checks and the public `recorded_temporal_action WAV_PATH NEW_REPORT.json`
+experiment. Fixed chronological LibriSpeech cells support an exact inferred two-tap digital
+response and later prediction. Silent ESC-50 cuts retain four condition directions and a native
+point-consumer refusal. The independent Fraction observer checks complete source/output
+coordinates. These finite coefficient studies do not establish learned sound or language quality.
+
 [established-bounded; measured] The [recorded interval attachment](../research/records/2026-09-07_RECORDED_RESPONSE_POINTERS_RETAIN_THEIR_ACOUSTIC_INTERVALS.md)
 now supplies `AcousticFieldChart::from_acoustic_range` and `native::recorded` for exact original
 source/target pointers and recording bounds. `RecordedResponseSections::bind` keeps annotation

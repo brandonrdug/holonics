@@ -1,0 +1,82 @@
+{
+  "truth_status": "established-bounded",
+  "evidence_tags": [
+    "measured"
+  ],
+  "scope": "cold Fraction and original PCM comparison; no native execution or learning",
+  "comparisons": [
+    {
+      "report": "research/records/2026-09-07_native_temporal_action/esc50.json",
+      "source_sha256": "f40a849a2375c8c63312a73dd2dd6c74007301fcc21b4be2ece29a642831e3d8",
+      "sample_rate": 44100,
+      "pcm_support_and_two_native_convolutions_agree": true,
+      "native_preimage_status": "plural",
+      "condition_direction_count": 4,
+      "native_prediction_status": "native-consumer-refused",
+      "cold_later_image_directions": [
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ]
+      ],
+      "cold_later_image_is_singleton": true,
+      "native_stages_have_zero_numerical_readouts": true
+    },
+    {
+      "report": "research/records/2026-09-07_native_temporal_action/librispeech.json",
+      "source_sha256": "a0f4ce7fc87c059762daedb43420a9763dd992949271666cca1eff2240dabcc3",
+      "sample_rate": 16000,
+      "pcm_support_and_two_native_convolutions_agree": true,
+      "native_preimage_status": "unique",
+      "condition_direction_count": 0,
+      "native_prediction_status": "unique",
+      "cold_later_image_directions": [],
+      "cold_later_image_is_singleton": true,
+      "native_stages_have_zero_numerical_readouts": true
+    }
+  ]
+}

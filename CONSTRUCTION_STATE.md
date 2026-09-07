@@ -35,6 +35,15 @@ mounts through the resident current port. Next compose the actual temporal/mater
 condition standing; equal cell ordinals are not that passage. No native cultivation ran in this
 source-attachment return. AMI speaker labels still do not supply separate microphone channels.
 
+[established-bounded; measured] The [native temporal return](research/records/2026-09-07_THE_NATIVE_TEMPORAL_ACTION_RETAINS_ITS_CAUSAL_TAIL.md)
+now realizes the existing exact causal convolution on resident currents and binds the acoustic
+clock/support to it. Twenty-one focused controls pass. One LibriSpeech coefficient experiment
+infers a digital two-tap response and predicts a later held-out source exactly; the fixed ESC-50
+cuts retain a plural condition and a native point-consumer refusal. No native stage numerically
+reads a current to the host. The new desktop `82fef476` whole-family image/receive return is the
+next integration, followed by actual material/condition binding. This is a bounded temporal
+action return, not useful sound or English-model completion.
+
 [established-bounded; measured] The September 7 Mac pickup integrates desktop `6ef7bf9d` with
 68 passing engine/public native tests and successful HNA library, application and shared-example
 checks. The [integration record](research/records/2026-09-07_APPLE_INTEGRATES_THE_SHARED_CONDITIONAL_GENERATOR_HANDOFF.md)

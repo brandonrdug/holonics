@@ -14,6 +14,8 @@ use thiserror::Error;
 
 use crate::{CpuExecutionError, CpuExecutionReceipt, CpuExecutor};
 
+pub mod resident;
+
 const SECTION_SCHEMA: &str = "holonic-engine.exact-phase-current-section.v1";
 const RECEIPT_SCHEMA: &str = "holonic-engine.phase-current-convolution-receipt.v1";
 const SPECTRUM_SCHEMA: &str = "holonic-engine.exact-phase-transport-spectrum.v1";

@@ -1291,6 +1291,7 @@ extern "C" __global__ void section_constitutive_bilinear_source(
 }
 
 #include "constitutive_condition_preimage.cuh"
+#include "phase_current_convolution.cuh"
 
 // Push both actual source branches through their producing-to-current unit-phase frame.
 // This does not read the paired-junction enclosure or substitute its numerical centre.

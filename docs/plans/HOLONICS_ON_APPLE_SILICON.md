@@ -57,8 +57,12 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
    The [resident cell ingress](../../research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
    supplies the current port. The [recorded interval return](../../research/records/2026-09-07_RECORDED_RESPONSE_POINTERS_RETAIN_THEIR_ACOUSTIC_INTERVALS.md)
    now attaches parent recording and annotation-pointer lineage, exact supports, gaps and refusals.
-   Next construct the admitted temporal/material action between the complete source and receiving
-   sections; equal cell ordinals in unequal utterances do not supply that action.
+   The resident temporal owner now realizes the existing exact causal polynomial convolution,
+   retaining the complete tail and borrowing both operand carriers. It composes with the shared
+   conditional relation and condition Preimage Fibre without numerical host replay. Its response
+   is a declared local temporal action, not an arbitrary second utterance. Next bind the material
+   and receiving conditions appropriate to actual sound development; equal cell ordinals in
+   unequal utterances do not supply that action.
 3. Develop and retain acoustic generative standing across source-qualified recordings and
    actual joined returns, then conduct its native emission into the declared acoustic receiver.
    Inspect perception differences and generated sound, preserve the declared reconstruction

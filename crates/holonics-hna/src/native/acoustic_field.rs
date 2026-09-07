@@ -11,7 +11,10 @@ use holonic_engine::{
         NativeFieldOccurrence, NativeFieldReceiverStatus, NativeFieldStep, NativePhaseCurrent,
         ResidentConstitutiveCurrent,
     },
-    phase_current::{ExactPhaseCurrentSection, PhaseCurrentLineageId, PhaseCurrentReceiverId},
+    phase_current::{
+        resident::{ResidentPhaseCurrentError, ResidentPhaseCurrentView},
+        ExactPhaseCurrentSection, PhaseCurrentLineageId, PhaseCurrentReceiverId,
+    },
     resident_section::{ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface},
 };
 use life::mathematical_source::ExactAcousticOccurrence;
@@ -59,6 +62,22 @@ impl<'surface, 'source> AcousticFieldCell<'surface, 'source> {
         &self,
     ) -> Result<ResidentConstitutiveCurrent<'_, 'surface>, AcousticFieldError> {
         Ok(ResidentConstitutiveCurrent::rational(&self.section)?)
+    }
+
+    /// Borrow this cell in its actual source clock for the resident causal temporal owner.
+    /// This supplies no contact or impulse-response interpretation for a second recording.
+    pub fn temporal_view(
+        &self,
+    ) -> Result<ResidentPhaseCurrentView<'_, 'surface>, ResidentPhaseCurrentError> {
+        ResidentPhaseCurrentView::new(
+            ResidentConstitutiveCurrent::rational(&self.section)?,
+            self.receiver(),
+            self.lineage(),
+            self.support.begin.clone(),
+            self.sample_step().clone(),
+            self.chart.section.phase_extent,
+            self.support.coefficient_until - self.support.coefficient_from,
+        )
     }
 
     pub fn chart(&self) -> &'source AcousticFieldChart {

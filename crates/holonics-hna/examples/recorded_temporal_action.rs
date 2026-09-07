@@ -1,0 +1,334 @@
+//! A declared native temporal action learned from recorded coefficient observations.
+//! The digital response controls do not assert a physical room or utterance-response law.
+use holonic_engine::{
+    embedding_fiber::ResidentReadout,
+    native_ecology::constitutive_fibre::{
+        ConditionPreimageReading, ConstitutiveReading, ResidentConstitutiveCurrent,
+        ResidentConstitutiveFibre, ResidentConstitutiveReturn,
+    },
+    phase_current::{
+        resident::{convolve_resident, ResidentPhaseCurrentView},
+        PhaseCurrentLineageId, PhaseCurrentReceiverId,
+    },
+    resident_section::{
+        ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface, TransferCensus,
+    },
+};
+use holonics_hna::native::acoustic_field::AcousticFieldChart;
+use life::mathematical_source::ExactAcousticOccurrence;
+use num_rational::BigRational as Rat;
+use serde_json::{json, Value};
+use std::{error::Error, fs::OpenOptions, io::Write, path::PathBuf, time::Instant};
+
+type Result<T> = std::result::Result<T, Box<dyn Error>>;
+const WIDTH: usize = 4;
+const DIVISOR: i64 = 32768;
+const CONTROLS: [[i64; 4]; 5] = [
+    [0, 0, 0, 0],
+    [1, 0, 0, 0],
+    [0, 1, 0, 0],
+    [0, 0, 1, 0],
+    [0, 0, 0, 1],
+];
+
+fn strings(values: &[Rat]) -> Vec<String> {
+    values.iter().map(ToString::to_string).collect()
+}
+fn work(before: &TransferCensus, after: &TransferCensus, seconds: f64) -> Value {
+    json!({"seconds":seconds,"section_readouts":after.section_read_outs-before.section_read_outs,
+        "numerical_egress_octets":after.egress_section_octets-before.egress_section_octets,
+        "ingress_octets":after.ingress_octets-before.ingress_octets,
+        "receipt_egress_octets":after.egress_receipt_octets-before.egress_receipt_octets,
+        "deeds":after.deed_launches-before.deed_launches,
+        "allocations":after.allocations-before.allocations,
+        "resident_octets_now":after.resident_octets_now,"resident_octets_peak":after.resident_octets_peak})
+}
+fn stage<T>(
+    s: &ResidentSurface<'_>,
+    report: &mut Value,
+    name: &str,
+    action: impl FnOnce() -> Result<T>,
+) -> Result<T> {
+    report["active_stage"] = json!(name);
+    let before = s.census();
+    let started = Instant::now();
+    let result = action();
+    report["stages"][name] = work(&before, &s.census(), started.elapsed().as_secs_f64());
+    result
+}
+fn mount<'c>(
+    s: &'c ResidentSurface<'c>,
+    coordinates: &[i64],
+    den: i64,
+) -> Result<ResidentSection<'c>> {
+    let mut words: Vec<_> = coordinates.iter().map(|v| (*v, *v)).collect();
+    words.push((den, den));
+    Ok(s.mount_section_rest(&ResidentSectionRest::found(
+        1,
+        words.len(),
+        ResidentGrain(0),
+        64,
+        words,
+    )?)?)
+}
+fn rational<'a, 'c>(s: &'a ResidentSection<'c>) -> Result<ResidentConstitutiveCurrent<'a, 'c>> {
+    Ok(ResidentConstitutiveCurrent::rational(s)?)
+}
+fn response<'a, 'c>(
+    s: &'a ResidentSection<'c>,
+    step: &Rat,
+    id: u64,
+) -> Result<ResidentPhaseCurrentView<'a, 'c>> {
+    Ok(ResidentPhaseCurrentView::new(
+        rational(s)?,
+        PhaseCurrentReceiverId(2),
+        PhaseCurrentLineageId(id),
+        Rat::from_integer(0.into()),
+        step.clone(),
+        WIDTH as u32,
+        2,
+    )?)
+}
+fn point(s: &ResidentSurface<'_>, section: &ResidentSection<'_>) -> Result<Value> {
+    let words = s.read_out(section)?;
+    if words.len() < 2 || words.iter().any(|(a, b)| a != b) || words.last().unwrap().0 <= 0 {
+        return Err("terminal point/denominator refusal".into());
+    }
+    let den = words.last().unwrap().0;
+    let coordinates: Vec<_> = words[..words.len() - 1]
+        .iter()
+        .map(|p| Rat::new(p.0.into(), den.into()))
+        .collect();
+    Ok(json!({"coordinates":strings(&coordinates),"raw_words":words}))
+}
+fn returned(result: &ResidentConstitutiveReturn<'_>) -> Result<Value> {
+    Ok(match result.inspect()?.predecessor_reading {
+        ConstitutiveReading::Unique { current } => {
+            json!({"status":"unique","coordinates":strings(&current)})
+        }
+        ConstitutiveReading::Plural {
+            particular,
+            directions,
+        } => json!({"status":"plural",
+            "particular":strings(&particular),"directions":directions.iter().map(|v|strings(v)).collect::<Vec<_>>()}),
+        ConstitutiveReading::OutsideDomain { source_remainder } => {
+            json!({"status":"outside-domain","residual":strings(&source_remainder)})
+        }
+    })
+}
+
+fn experiment<'c>(
+    s: &'c ResidentSurface<'c>,
+    chart: &AcousticFieldChart,
+    body: &mut ResidentConstitutiveFibre<'c>,
+    report: &mut Value,
+) -> Result<()> {
+    // Eight interior clock cuts are fixed before any current is observed. Cuts 3/9 and 6/9
+    // are held out; the other six train. No silence, amplitude, rank or answer selects a cut.
+    let full_cells = chart.section().raw_extent() / WIDTH;
+    if full_cells < 9 {
+        return Err("recording needs at least nine complete temporal cells".into());
+    }
+    let indices: Vec<_> = (1..=8).map(|i| i * (full_cells - 1) / 9).collect();
+    let training_indices: Vec<_> = indices
+        .iter()
+        .enumerate()
+        .filter(|(i, _)| *i != 2 && *i != 5)
+        .map(|(_, v)| *v)
+        .collect();
+    let hidden_index = indices[2];
+    let later_index = indices[5];
+    report["selection"] = json!({"rule":"eight fixed interior chronological cuts at ninths; third and sixth held out",
+        "training_cells":training_indices,"hidden_cell":hidden_index,"later_cell":later_index});
+    let cells: Vec<_> = training_indices
+        .iter()
+        .map(|i| chart.mount_cell(s, *i))
+        .collect::<std::result::Result<_, _>>()?;
+    let hidden_cell = chart.mount_cell(s, hidden_index)?;
+    let later_cell = chart.mount_cell(s, later_index)?;
+    let zero = mount(s, &[0; 2 * WIDTH], DIVISOR)?;
+    let controls: Vec<_> = CONTROLS
+        .iter()
+        .map(|v| mount(s, v, 1))
+        .collect::<Result<_>>()?;
+    let hidden_response = mount(s, &[2, -1, 5, 3], 3)?;
+    report["training_supports"] =
+        json!(cells.iter().map(|cell| cell.support()).collect::<Vec<_>>());
+    report["hidden_support"] = json!(hidden_cell.support());
+    report["later_support"] = json!(later_cell.support());
+    report["training_observations"] = json!(0);
+    report["calibration_observations"] = json!(0);
+    stage(s, report, "zero_source_calibration", || {
+        for (i, c) in controls.iter().enumerate() {
+            let source = ResidentPhaseCurrentView::new(
+                rational(&zero)?,
+                PhaseCurrentReceiverId(1),
+                PhaseCurrentLineageId(2),
+                Rat::from_integer(0.into()),
+                chart.section().sample_step.clone(),
+                WIDTH as u32,
+                WIDTH,
+            )?;
+            let actual = convolve_resident(
+                s,
+                source,
+                response(c, &chart.section().sample_step, 10 + i as u64)?,
+                PhaseCurrentReceiverId(3),
+                PhaseCurrentLineageId(20 + i as u64),
+            )?;
+            body.advance_bilinear_contact(rational(&zero)?, rational(c)?, Some(actual.current()?))?;
+        }
+        Ok(())
+    })?;
+    report["calibration_observations"] = json!(body.occurrences());
+    let calibration_cut = body.occurrences();
+    let training = stage(s, report, "recorded_development", || {
+        for cell in &cells {
+            for (i, c) in controls.iter().enumerate() {
+                let actual = convolve_resident(
+                    s,
+                    cell.temporal_view()?,
+                    response(c, cell.sample_step(), 10 + i as u64)?,
+                    PhaseCurrentReceiverId(3),
+                    PhaseCurrentLineageId(30 + body.occurrences()),
+                )?;
+                body.advance_bilinear_contact(
+                    cell.rational()?,
+                    rational(c)?,
+                    Some(actual.current()?),
+                )?;
+            }
+        }
+        Ok(())
+    });
+    report["training_observations"] = json!(body.occurrences() - calibration_cut);
+    training?;
+    let actual = stage(s, report, "hidden_native_observation", || {
+        Ok(convolve_resident(
+            s,
+            hidden_cell.temporal_view()?,
+            response(&hidden_response, hidden_cell.sample_step(), 100)?,
+            PhaseCurrentReceiverId(3),
+            PhaseCurrentLineageId(101),
+        )?)
+    })?;
+    let cut = body.occurrences();
+    let preimage = stage(s, report, "condition_preimage", || {
+        Ok(body.read_condition_preimage(hidden_cell.rational()?, actual.current()?)?)
+    })?;
+    report["preimage_relation_cut"] = json!(preimage.relation_cut());
+    if body.occurrences() != cut {
+        return Err("condition read changed the continuing relation".into());
+    }
+    // Attempt the native point consumer directly. Its device-side disposition check refuses
+    // plural/outside conditions; the host does not inspect a fibre to select subsequent conduct.
+    let predicted = stage(s, report, "inferred_prediction", || {
+        Ok(body.advance_bilinear_contact(later_cell.rational()?, preimage.current(), None)?)
+    });
+    let later_actual = stage(s, report, "later_native_observation", || {
+        Ok(convolve_resident(
+            s,
+            later_cell.temporal_view()?,
+            response(&hidden_response, later_cell.sample_step(), 100)?,
+            PhaseCurrentReceiverId(3),
+            PhaseCurrentLineageId(102),
+        )?)
+    })?;
+
+    // All numerical inspection happens after native development, inference and comparison act.
+    let observed = stage(s, report, "terminal_observer", || {
+        let condition = match preimage.inspect()? {
+            ConditionPreimageReading::Compatible {
+                particular,
+                directions,
+            } => json!({
+                "status":if directions.is_empty(){"unique"}else{"plural"},"particular":strings(&particular),
+                "directions":directions.iter().map(|v|strings(v)).collect::<Vec<_>>()}),
+            ConditionPreimageReading::OutsideRepresentedRelation { residual } => {
+                json!({"status":"outside","residual":strings(&residual)})
+            }
+        };
+        let prediction = match &predicted {
+            Ok(value) => returned(value)?,
+            Err(error) => json!({"status":"native-consumer-refused","error":error.to_string()}),
+        };
+        let later = point(s, later_actual.section())?;
+        let agreement = prediction["coordinates"].is_array()
+            && prediction["coordinates"] == later["coordinates"];
+        Ok(
+            json!({"preimage":condition,"prediction":prediction,"later_actual":later,"exact_agreement":agreement,
+            "hidden_source":point(s,hidden_cell.section())?,"later_source":point(s,later_cell.section())?,
+            "hidden_response":point(s,&hidden_response)?,"hidden_actual":point(s,actual.section())?}),
+        )
+    })?;
+    report["observation"] = observed;
+    report["complete_bounded_comparison"] = report["observation"]["exact_agreement"].clone();
+    Ok(())
+}
+
+fn main() -> Result<()> {
+    let args: Vec<_> = std::env::args().skip(1).collect();
+    if args.len() != 2 {
+        return Err("usage: recorded_temporal_action WAV_PATH NEW_REPORT.json".into());
+    }
+    let wav_path = PathBuf::from(&args[0]);
+    let report_path = PathBuf::from(&args[1]);
+    if report_path.exists() {
+        return Err("report already exists".into());
+    }
+    let started = Instant::now();
+    let recording = ExactAcousticOccurrence::read(
+        &wav_path,
+        format!("recorded-temporal-action:{}", wav_path.display()),
+        4096,
+        4096,
+        1,
+    )?;
+    let decode_seconds = started.elapsed().as_secs_f64();
+    let readout = ResidentReadout::new()?;
+    let s = ResidentSurface::on(&readout)?;
+    let chart = AcousticFieldChart::from_acoustic(
+        &recording,
+        PhaseCurrentReceiverId(1),
+        PhaseCurrentLineageId(1),
+        Rat::from_integer(0.into()),
+        WIDTH,
+        DIVISOR,
+    )?;
+    let mut report = json!({"schema":"holonics.recorded-temporal-action.v1","truth_status":"established-bounded",
+        "evidence_tags":["measured"],"scope":"declared complex polynomial action on recorded coefficients",
+        "source":{"path":wav_path,"sha256":recording.source_sha256,"octets":recording.source_octets,
+            "samples":recording.samples.len(),"sample_rate":recording.sample_rate,"occurrence":recording.occurrence,
+            "receiver":1,"lineage":1},
+        "aperture":{"source_complex":WIDTH,"condition_complex":2,"target_complex":WIDTH+1,"pcm_divisor":DIVISOR,
+            "interpretation":"caller-declared temporal aperture, not learned semantic grain"},
+        "response_control":{"coordinates":["2","-1","5","3"],"denominator":"3",
+            "interpretation":"independently controlled complex digital two-tap action; no physical room/utterance response claim"},
+        "training_controls":CONTROLS,"decode_seconds":decode_seconds,"active_stage":"found-owner","stages":{},
+        "complete_bounded_comparison":false,"sound_model":false,"conversation_model":false});
+    match ResidentConstitutiveFibre::found_bilinear_contact(&s, WIDTH, 2, WIDTH + 1) {
+        Ok(mut body) => {
+            if let Err(error) = experiment(&s, &chart, &mut body, &mut report) {
+                report["refusal"] =
+                    json!({"stage":report["active_stage"],"error":error.to_string()});
+            }
+            report["learner_occurrences"] = json!(body.occurrences());
+        }
+        Err(error) => report["refusal"] = json!({"stage":"found-owner","error":error.to_string()}),
+    }
+    report["elapsed_seconds"] = json!(started.elapsed().as_secs_f64());
+    report["final_census"] = json!(s.census());
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create_new(true)
+        .open(&report_path)?;
+    serde_json::to_writer_pretty(&mut file, &report)?;
+    file.write_all(b"\n")?;
+    file.sync_all()?;
+    println!(
+        "{}",
+        json!({"report":report_path,"recorded_observations":report["training_observations"],
+        "preimage":report["observation"]["preimage"]["status"],"agreement":report["observation"]["exact_agreement"],"refusal":report["refusal"]})
+    );
+    Ok(())
+}

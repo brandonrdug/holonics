@@ -225,6 +225,13 @@ fn mounted_cells_keep_exact_pcm_support_and_feed_rational_current_without_readba
     );
     assert_eq!(c.cursor(), 0);
 
+    let temporal = padded.temporal_view().unwrap();
+    assert_eq!(temporal.origin(), &padded.support().begin);
+    assert_eq!(temporal.sample_step(), padded.sample_step());
+    assert_eq!(temporal.raw_extent(), 1);
+    assert_eq!(temporal.phase_extent(), 2);
+    assert_eq!(temporal.lineage(), padded.lineage());
+
     let mut body = ResidentConstitutiveFibre::found(&surface, 4, 4).unwrap();
     let before = surface.census();
     // Identity-receiver control: the native relation must transport the common denominator
@@ -264,4 +271,69 @@ fn mounted_cells_keep_exact_pcm_support_and_feed_rational_current_without_readba
         padded_words,
         vec![(9, 9), (0, 0), (0, 0), (0, 0), (32768, 32768)]
     );
+}
+
+#[test]
+#[ignore = "requires native GPU; acoustic temporal support enters the resident causal owner"]
+fn acoustic_cell_convolution_retains_exact_clock_padding_and_causal_tail() {
+    use holonic_engine::phase_current::resident::{convolve_resident, ResidentPhaseCurrentView};
+    let r = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&r).unwrap();
+    let recording = chart(&[3, -7, 0, 9, 2], 4);
+    let cell = recording.mount_cell(&s, 0).unwrap();
+    let response = s
+        .mount_section_rest(
+            &ResidentSectionRest::found(
+                1,
+                5,
+                ResidentGrain(0),
+                64,
+                vec![(1, 1), (0, 0), (1, 1), (0, 0), (2, 2)],
+            )
+            .unwrap(),
+        )
+        .unwrap();
+    // A declared local two-tap response, whose origin is a delay rather than a recording clock.
+    let response = ResidentPhaseCurrentView::new(
+        ResidentConstitutiveCurrent::rational(&response).unwrap(),
+        PhaseCurrentReceiverId(3),
+        PhaseCurrentLineageId(4),
+        BigRational::from_integer(0.into()),
+        cell.sample_step().clone(),
+        4,
+        2,
+    )
+    .unwrap();
+    let before = s.census();
+    let out = convolve_resident(
+        &s,
+        cell.temporal_view().unwrap(),
+        response,
+        PhaseCurrentReceiverId(5),
+        PhaseCurrentLineageId(6),
+    )
+    .unwrap();
+    assert_eq!(s.census().section_read_outs, before.section_read_outs);
+    assert_eq!(s.census().ingress_octets, before.ingress_octets);
+    assert_eq!(out.view().unwrap().origin(), &cell.support().begin);
+    assert_eq!(out.view().unwrap().raw_extent(), 5);
+    let words = s.read_out(out.section()).unwrap();
+    assert_eq!(
+        words,
+        vec![
+            (3, 3),
+            (0, 0),
+            (-4, -4),
+            (0, 0),
+            (-7, -7),
+            (0, 0),
+            (9, 9),
+            (0, 0),
+            (9, 9),
+            (0, 0),
+            (65536, 65536)
+        ]
+    );
+    assert_eq!(recording.cursor(), 0);
+    assert_eq!(recording.reconstruct_samples(), vec![3, -7, 0, 9, 2]);
 }

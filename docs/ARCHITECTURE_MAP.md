@@ -42,8 +42,16 @@ capture/playback chronology. These share the native session and introduce no sec
 [established-bounded; measured] `holonics-hna::native::acoustic_field::{AcousticFieldChart,AcousticFieldCell}`
 also mounts timed source coefficients through `mount_cell` into the shared resident rational
 current port. The [five-control return](../research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
-retains exact source/clock support and delivery lineage. Native temporal/material action and
-useful acoustic conduct remain open.
+retains exact source/clock support and delivery lineage. `AcousticFieldCell::temporal_view`
+now attaches that exact clock/support to `holonic-engine::phase_current::resident`.
+
+[established-bounded; implemented-exact] `phase_current::resident::{ResidentPhaseCurrentView,
+ResidentPhaseConvolution,convolve_resident}` realizes the existing causal polynomial action
+from `phase_current::convolve_phase_current` on resident complex rational coefficients.
+`kernels/phase_current_convolution.cuh`, `resident_section/surface_passage.rs` and Apple
+`accelerators/metal/native_phase.metal::section_phase_convolution` own execution and launch.
+Both operand carriers remain borrowed and the complete causal tail returns. This is one declared
+temporal action; useful learned acoustic conduct and general material composition remain open.
 
 [established-bounded; measured] `native::recorded` exposes
 `native/speech/{recorded.rs,recorded/sections.rs}` for source/target pointer resolution, exact
@@ -51,7 +59,8 @@ annotation-to-PCM bounds and `RecordedResponseSections::bind`. It uses
 `AcousticFieldChart::from_acoustic_range` and the existing resident ingress. The
 [actual-recording return](../research/records/2026-09-07_RECORDED_RESPONSE_POINTERS_RETAIN_THEIR_ACOUSTIC_INTERVALS.md)
 retains all 899 AMI records and their actual interval/receiver scope. This is an exterior source
-attachment; the native temporal/material action and useful acoustic conduct remain open.
+attachment; it does not make one utterance an impulse response for another. Useful acoustic
+conduct and the appropriate material/condition binding remain open.
 
 [established-bounded; implemented-exact] Ordered unlinked packets are owned by
 `constitutive_fibre/circulation/batch.rs` and `holonics-hna/src/native/batch.rs`; they reuse the

@@ -976,7 +976,7 @@ impl<'chart> ResidentSurface<'chart> {
         )
     }
 
-    fn validate_constitutive_current_view(
+    pub(crate) fn validate_constitutive_current_view(
         &self,
         current: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
     ) -> Result<(), ResidentRefusal> {
@@ -1001,6 +1001,78 @@ impl<'chart> ResidentSurface<'chart> {
             });
         }
         Ok(())
+    }
+
+    pub(crate) fn record_phase_convolution(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        source: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
+        response: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<
+            '_,
+            'chart,
+        >,
+        source_extent: usize,
+        response_extent: usize,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        self.validate_constitutive_current_view(source)?;
+        self.validate_constitutive_current_view(response)?;
+        let fail = || ResidentRefusal::Declaration {
+            operation: "phase-convolution",
+            what: "incompatible temporal coefficient chart or scratch aperture".into(),
+        };
+        let width = source_extent
+            .checked_add(response_extent)
+            .and_then(|n| n.checked_sub(1))
+            .and_then(|n| n.checked_mul(2))
+            .filter(|n| *n < u32::MAX as usize)
+            .ok_or_else(fail)?;
+        if source_extent == 0
+            || response_extent == 0
+            || source.width % 2 != 0
+            || response.width % 2 != 0
+            || source_extent > source.width / 2
+            || response_extent > response.width / 2
+            || output.rows != 1
+            || output.width != width + 1
+            || output.grain.0 != 0
+            || !std::ptr::eq(output.surface, self)
+        {
+            return Err(fail());
+        }
+        let shared = Self::constitutive_wide_scratch(width)
+            .and_then(|n| u32::try_from(n).ok())
+            .filter(|n| *n <= self.declaration.max_sectiond_bytes)
+            .ok_or_else(fail)?;
+        let mut params = Params::new();
+        for current in [source, response] {
+            params
+                .ptr(current.section.lo.device_ptr())
+                .ptr(current.section.hi.device_ptr())
+                .u32(current.offset as u32)
+                .u32(current.denominator.map_or(u32::MAX, |n| n as u32))
+                .u32(current.disposition.map_or(u32::MAX, |n| n as u32));
+        }
+        params
+            .u32((source.width / 2) as u32)
+            .u32((response.width / 2) as u32)
+            .u32(source_extent as u32)
+            .u32(response_extent as u32)
+            .ptr(output.lo.device_ptr())
+            .ptr(output.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_phase_convolution",
+            1,
+            self.declaration.warp_size.max(1),
+            shared,
+            &mut params,
+            "phase-convolution",
+        )
     }
 
     pub(crate) fn record_constitutive_bilinear_source(

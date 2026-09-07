@@ -1,0 +1,743 @@
+{
+  "active_stage": "terminal_observer",
+  "aperture": {
+    "condition_complex": 2,
+    "interpretation": "caller-declared temporal aperture, not learned semantic grain",
+    "pcm_divisor": 32768,
+    "source_complex": 4,
+    "target_complex": 5
+  },
+  "calibration_observations": 5,
+  "complete_bounded_comparison": true,
+  "conversation_model": false,
+  "decode_seconds": 0.049800458,
+  "elapsed_seconds": 0.198372,
+  "evidence_tags": [
+    "measured"
+  ],
+  "final_census": {
+    "allocations": 404,
+    "captured_launches": 220,
+    "control_launches": 0,
+    "deed_launches": 74,
+    "device_to_device_octets": 0,
+    "egress_receipt_octets": 7040,
+    "egress_section_octets": 3984,
+    "ingress_octets": 25024,
+    "resident_octets_now": 0,
+    "resident_octets_peak": 57764,
+    "section_read_outs": 7,
+    "synchronizations": 74
+  },
+  "hidden_support": {
+    "begin": [
+      [
+        1,
+        [
+          10473
+        ]
+      ],
+      [
+        1,
+        [
+          4000
+        ]
+      ]
+    ],
+    "cell": 10473,
+    "coefficient_from": 41892,
+    "coefficient_until": 41896,
+    "end": [
+      [
+        1,
+        [
+          5237
+        ]
+      ],
+      [
+        1,
+        [
+          2000
+        ]
+      ]
+    ],
+    "source_occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
+    "structural_padding": 0
+  },
+  "later_support": {
+    "begin": [
+      [
+        1,
+        [
+          10473
+        ]
+      ],
+      [
+        1,
+        [
+          2000
+        ]
+      ]
+    ],
+    "cell": 20946,
+    "coefficient_from": 83784,
+    "coefficient_until": 83788,
+    "end": [
+      [
+        1,
+        [
+          20947
+        ]
+      ],
+      [
+        1,
+        [
+          4000
+        ]
+      ]
+    ],
+    "source_occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
+    "structural_padding": 0
+  },
+  "learner_occurrences": 36,
+  "observation": {
+    "exact_agreement": true,
+    "hidden_actual": {
+      "coordinates": [
+        "43/49152",
+        "-43/98304",
+        "277/98304",
+        "49/49152",
+        "181/98304",
+        "5/6144",
+        "31/32768",
+        "25/98304",
+        "35/49152",
+        "7/16384"
+      ],
+      "raw_words": [
+        [
+          86,
+          86
+        ],
+        [
+          -43,
+          -43
+        ],
+        [
+          277,
+          277
+        ],
+        [
+          98,
+          98
+        ],
+        [
+          181,
+          181
+        ],
+        [
+          80,
+          80
+        ],
+        [
+          93,
+          93
+        ],
+        [
+          25,
+          25
+        ],
+        [
+          70,
+          70
+        ],
+        [
+          42,
+          42
+        ],
+        [
+          98304,
+          98304
+        ]
+      ]
+    },
+    "hidden_response": {
+      "coordinates": [
+        "2/3",
+        "-1/3",
+        "5/3",
+        "1"
+      ],
+      "raw_words": [
+        [
+          2,
+          2
+        ],
+        [
+          -1,
+          -1
+        ],
+        [
+          5,
+          5
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          3,
+          3
+        ]
+      ]
+    },
+    "hidden_source": {
+      "coordinates": [
+        "43/32768",
+        "0",
+        "31/32768",
+        "0",
+        "13/32768",
+        "0",
+        "7/16384",
+        "0"
+      ],
+      "raw_words": [
+        [
+          43,
+          43
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          31,
+          31
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          13,
+          13
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          14,
+          14
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          32768,
+          32768
+        ]
+      ]
+    },
+    "later_actual": {
+      "coordinates": [
+        "-1/8192",
+        "1/16384",
+        "-1/4096",
+        "-7/32768",
+        "13/98304",
+        "5/49152",
+        "-17/32768",
+        "5/24576",
+        "-115/98304",
+        "-23/32768"
+      ],
+      "raw_words": [
+        [
+          -12,
+          -12
+        ],
+        [
+          6,
+          6
+        ],
+        [
+          -24,
+          -24
+        ],
+        [
+          -21,
+          -21
+        ],
+        [
+          13,
+          13
+        ],
+        [
+          10,
+          10
+        ],
+        [
+          -51,
+          -51
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          -115,
+          -115
+        ],
+        [
+          -69,
+          -69
+        ],
+        [
+          98304,
+          98304
+        ]
+      ]
+    },
+    "later_source": {
+      "coordinates": [
+        "-3/16384",
+        "0",
+        "3/32768",
+        "0",
+        "-1/32768",
+        "0",
+        "-23/32768",
+        "0"
+      ],
+      "raw_words": [
+        [
+          -6,
+          -6
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          3,
+          3
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          -1,
+          -1
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          -23,
+          -23
+        ],
+        [
+          0,
+          0
+        ],
+        [
+          32768,
+          32768
+        ]
+      ]
+    },
+    "prediction": {
+      "coordinates": [
+        "-1/8192",
+        "1/16384",
+        "-1/4096",
+        "-7/32768",
+        "13/98304",
+        "5/49152",
+        "-17/32768",
+        "5/24576",
+        "-115/98304",
+        "-23/32768"
+      ],
+      "status": "unique"
+    },
+    "preimage": {
+      "directions": [],
+      "particular": [
+        "2/3",
+        "-1/3",
+        "5/3",
+        "1"
+      ],
+      "status": "unique"
+    }
+  },
+  "preimage_relation_cut": 35,
+  "response_control": {
+    "coordinates": [
+      "2",
+      "-1",
+      "5",
+      "3"
+    ],
+    "denominator": "3",
+    "interpretation": "independently controlled complex digital two-tap action; no physical room/utterance response claim"
+  },
+  "schema": "holonics.recorded-temporal-action.v1",
+  "scope": "declared complex polynomial action on recorded coefficients",
+  "selection": {
+    "hidden_cell": 10473,
+    "later_cell": 20946,
+    "rule": "eight fixed interior chronological cuts at ninths; third and sixth held out",
+    "training_cells": [
+      3491,
+      6982,
+      13964,
+      17455,
+      24437,
+      27928
+    ]
+  },
+  "sound_model": false,
+  "source": {
+    "lineage": 1,
+    "occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
+    "octets": 251404,
+    "path": ".local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
+    "receiver": 1,
+    "sample_rate": 16000,
+    "samples": 125680,
+    "sha256": "a0f4ce7fc87c059762daedb43420a9763dd992949271666cca1eff2240dabcc3"
+  },
+  "stages": {
+    "condition_preimage": {
+      "allocations": 8,
+      "deeds": 1,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 64,
+      "resident_octets_now": 54896,
+      "resident_octets_peak": 54964,
+      "seconds": 0.002308208,
+      "section_readouts": 0
+    },
+    "hidden_native_observation": {
+      "allocations": 4,
+      "deeds": 1,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 64,
+      "resident_octets_now": 25056,
+      "resident_octets_peak": 27924,
+      "seconds": 0.000472542,
+      "section_readouts": 0
+    },
+    "inferred_prediction": {
+      "allocations": 6,
+      "deeds": 1,
+      "ingress_octets": 4,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 128,
+      "resident_octets_now": 57168,
+      "resident_octets_peak": 57764,
+      "seconds": 0.004068084,
+      "section_readouts": 0
+    },
+    "later_native_observation": {
+      "allocations": 4,
+      "deeds": 1,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 64,
+      "resident_octets_now": 57344,
+      "resident_octets_peak": 57764,
+      "seconds": 0.000689,
+      "section_readouts": 0
+    },
+    "recorded_development": {
+      "allocations": 300,
+      "deeds": 60,
+      "ingress_octets": 120,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 5760,
+      "resident_octets_now": 24880,
+      "resident_octets_peak": 27924,
+      "seconds": 0.067211667,
+      "section_readouts": 0
+    },
+    "terminal_observer": {
+      "allocations": 0,
+      "deeds": 0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 3984,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 57344,
+      "resident_octets_peak": 57764,
+      "seconds": 0.00026575,
+      "section_readouts": 7
+    },
+    "zero_source_calibration": {
+      "allocations": 50,
+      "deeds": 10,
+      "ingress_octets": 20,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 960,
+      "resident_octets_now": 24880,
+      "resident_octets_peak": 27924,
+      "seconds": 0.016494541,
+      "section_readouts": 0
+    }
+  },
+  "training_controls": [
+    [
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      1
+    ]
+  ],
+  "training_observations": 30,
+  "training_supports": [
+    {
+      "begin": [
+        [
+          1,
+          [
+            3491
+          ]
+        ],
+        [
+          1,
+          [
+            4000
+          ]
+        ]
+      ],
+      "cell": 3491,
+      "coefficient_from": 13964,
+      "coefficient_until": 13968,
+      "end": [
+        [
+          1,
+          [
+            873
+          ]
+        ],
+        [
+          1,
+          [
+            1000
+          ]
+        ]
+      ],
+      "source_occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
+      "structural_padding": 0
+    },
+    {
+      "begin": [
+        [
+          1,
+          [
+            3491
+          ]
+        ],
+        [
+          1,
+          [
+            2000
+          ]
+        ]
+      ],
+      "cell": 6982,
+      "coefficient_from": 27928,
+      "coefficient_until": 27932,
+      "end": [
+        [
+          1,
+          [
+            6983
+          ]
+        ],
+        [
+          1,
+          [
+            4000
+          ]
+        ]
+      ],
+      "source_occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
+      "structural_padding": 0
+    },
+    {
+      "begin": [
+        [
+          1,
+          [
+            3491
+          ]
+        ],
+        [
+          1,
+          [
+            1000
+          ]
+        ]
+      ],
+      "cell": 13964,
+      "coefficient_from": 55856,
+      "coefficient_until": 55860,
+      "end": [
+        [
+          1,
+          [
+            2793
+          ]
+        ],
+        [
+          1,
+          [
+            800
+          ]
+        ]
+      ],
+      "source_occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
+      "structural_padding": 0
+    },
+    {
+      "begin": [
+        [
+          1,
+          [
+            3491
+          ]
+        ],
+        [
+          1,
+          [
+            800
+          ]
+        ]
+      ],
+      "cell": 17455,
+      "coefficient_from": 69820,
+      "coefficient_until": 69824,
+      "end": [
+        [
+          1,
+          [
+            1091
+          ]
+        ],
+        [
+          1,
+          [
+            250
+          ]
+        ]
+      ],
+      "source_occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
+      "structural_padding": 0
+    },
+    {
+      "begin": [
+        [
+          1,
+          [
+            24437
+          ]
+        ],
+        [
+          1,
+          [
+            4000
+          ]
+        ]
+      ],
+      "cell": 24437,
+      "coefficient_from": 97748,
+      "coefficient_until": 97752,
+      "end": [
+        [
+          1,
+          [
+            12219
+          ]
+        ],
+        [
+          1,
+          [
+            2000
+          ]
+        ]
+      ],
+      "source_occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
+      "structural_padding": 0
+    },
+    {
+      "begin": [
+        [
+          1,
+          [
+            3491
+          ]
+        ],
+        [
+          1,
+          [
+            500
+          ]
+        ]
+      ],
+      "cell": 27928,
+      "coefficient_from": 111712,
+      "coefficient_until": 111716,
+      "end": [
+        [
+          1,
+          [
+            27929
+          ]
+        ],
+        [
+          1,
+          [
+            4000
+          ]
+        ]
+      ],
+      "source_occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
+      "structural_padding": 0
+    }
+  ],
+  "truth_status": "established-bounded"
+}
