@@ -1,0 +1,90 @@
+{
+  "schema": "holonics.apple.ami-conversation-subset.v3",
+  "source": "AMI Meeting Corpus official Edinburgh distribution",
+  "source_url": "https://groups.inf.ed.ac.uk/ami/corpus/",
+  "license": "Creative Commons Attribution 4.0 International (CC BY 4.0)",
+  "manual_annotation_sha256": "b56e5babb2496b8795deeeda7e71178d7fbc9963f94276cf2a3f4b56ebbc9f9d",
+  "source_word_clock_refusals": [
+    {
+      "word": "ES2002a.B.words1587",
+      "refusal": "source word interval is reversed"
+    },
+    {
+      "word": "ES2002b.A.words2346",
+      "refusal": "source word interval is reversed"
+    },
+    {
+      "word": "ES2002b.C.words848",
+      "refusal": "source word interval is reversed"
+    },
+    {
+      "word": "ES2002b.D.words2593",
+      "refusal": "source word interval is reversed"
+    }
+  ],
+  "sessions": [
+    "ES2002a",
+    "ES2002b",
+    "ES2002c",
+    "ES2002d"
+  ],
+  "audio": [
+    {
+      "session": "ES2002a",
+      "url": "https://groups.inf.ed.ac.uk/ami/AMICorpusMirror//amicorpus/ES2002a/audio/ES2002a.Mix-Headset.wav",
+      "path": ".local/datasets/ami-conversation-es2002/audio/ES2002a.Mix-Headset.wav",
+      "sha256": "9c76866990fcc8b84006dc32d273ad99df439090b748ebe72103bb78c3216ee7",
+      "bytes": 40724524,
+      "channels": 1,
+      "sample_width_bytes": 2,
+      "sample_rate": 16000,
+      "frames": 20362240,
+      "duration_seconds_exact": "1272.64"
+    },
+    {
+      "session": "ES2002b",
+      "url": "https://groups.inf.ed.ac.uk/ami/AMICorpusMirror//amicorpus/ES2002b/audio/ES2002b.Mix-Headset.wav",
+      "path": ".local/datasets/ami-conversation-es2002/audio/ES2002b.Mix-Headset.wav",
+      "sha256": "977fbf6cd473cfb1984b41755762eea4d7ffdad3fb15adcfdebcb8842163ec66",
+      "bytes": 72952194,
+      "channels": 1,
+      "sample_width_bytes": 2,
+      "sample_rate": 16000,
+      "frames": 36476075,
+      "duration_seconds_exact": "2279.7546875"
+    },
+    {
+      "session": "ES2002c",
+      "url": "https://groups.inf.ed.ac.uk/ami/AMICorpusMirror//amicorpus/ES2002c/audio/ES2002c.Mix-Headset.wav",
+      "path": ".local/datasets/ami-conversation-es2002/audio/ES2002c.Mix-Headset.wav",
+      "sha256": "8aa5dca8a0d31aaa596ecec8e0d7d8df1646fd4328d2740b287650d8012412df",
+      "bytes": 77557804,
+      "channels": 1,
+      "sample_width_bytes": 2,
+      "sample_rate": 16000,
+      "frames": 38778880,
+      "duration_seconds_exact": "2423.68"
+    },
+    {
+      "session": "ES2002d",
+      "url": "https://groups.inf.ed.ac.uk/ami/AMICorpusMirror//amicorpus/ES2002d/audio/ES2002d.Mix-Headset.wav",
+      "path": ".local/datasets/ami-conversation-es2002/audio/ES2002d.Mix-Headset.wav",
+      "sha256": "b8e0c2d0df9fccfcfab8e5d148f399a679bd2d90299c2262194b9db941749374",
+      "bytes": 83973504,
+      "channels": 1,
+      "sample_width_bytes": 2,
+      "sample_rate": 16000,
+      "frames": 41986730,
+      "duration_seconds_exact": "2624.170625"
+    }
+  ],
+  "response_links": {
+    "path": ".local/datasets/ami-conversation-es2002/response-links.exact.jsonl",
+    "dialogue_act_count": 3874,
+    "adjacency_pair_count": 899,
+    "resolved_count": 844,
+    "refused_count": 55,
+    "type_records": 27,
+    "link_semantics": "direct source/target pointers from original adjacency-pairs XML; no adjacency inference"
+  }
+}

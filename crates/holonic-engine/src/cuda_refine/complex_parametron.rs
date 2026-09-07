@@ -33,14 +33,36 @@ pub struct ResidentNativeWordReturn {
 /// binary receiver is taken.  The owner is singular and deliberately not `Clone`.
 pub struct ResidentComplexIncidence {
     // Released before the context which owns it.
+    #[cfg(target_os = "linux")]
     incidence: Buffer,
+    #[cfg(target_os = "linux")]
     card: CudaRefineExecutor,
+    #[cfg(target_os = "macos")]
+    metal: MetalComplexIncidence,
     address: String,
     grain: u32,
     branches: u32,
     nodes: u32,
     greatest_row_mass: u128,
     mount_host_ingress_octets: u64,
+}
+
+#[cfg(target_os = "macos")]
+struct MetalComplexIncidence {
+    incidence: mount::cuda::DeviceBuffer<i64>,
+    context: mount::cuda::Context,
+    module: mount::cuda::Module,
+    device_name: String,
+}
+
+#[cfg(target_os = "macos")]
+fn metal_refusal(error: mount::cuda::CudaError) -> CudaRefineError {
+    CudaRefineError::Metal {
+        operation: error.context,
+        code: error.code,
+        name: error.name,
+        message: error.message,
+    }
 }
 
 /// One terminal exact complex section returned from the resident incidence map.
@@ -67,6 +89,7 @@ pub struct ResidentComplexIncidenceReturn {
 impl ResidentComplexIncidence {
     /// Mount one exact oriented incidence map. Its extents and row-mass aperture are read from the
     /// material; no hidden width or phase population is authored.
+    #[cfg(target_os = "linux")]
     pub fn mount(
         card: CudaRefineExecutor,
         address: impl Into<String>,
@@ -111,8 +134,90 @@ impl ResidentComplexIncidence {
         })
     }
 
+    /// Preserve the legacy constructor for owners that have not yet selected a Metal route.
+    /// Those owners receive a typed obstruction instead of silently falling back to host work.
+    #[cfg(not(target_os = "linux"))]
+    pub fn mount(
+        _card: CudaRefineExecutor,
+        _address: impl Into<String>,
+        _grain: u32,
+        _branches: usize,
+        _nodes: usize,
+        _incidence: &[i64],
+    ) -> Result<Self, CudaRefineError> {
+        Err(CudaRefineError::UnsupportedDevice)
+    }
+
+    /// Mount the same exact incidence operation on the target-selected Metal backend.  The
+    /// legacy CUDA spelling remains at the call sites, but this path never accepts PTX or CPU
+    /// arithmetic as a substitute for the resident operation.
+    #[cfg(target_os = "macos")]
+    pub fn mount_metal(
+        address: impl Into<String>,
+        grain: u32,
+        branches: usize,
+        nodes: usize,
+        incidence: &[i64],
+    ) -> Result<Self, CudaRefineError> {
+        let expected = branches
+            .checked_mul(nodes)
+            .ok_or(CudaRefineError::ComplexIncidenceShape)?;
+        if branches == 0
+            || nodes == 0
+            || incidence.len() != expected
+            || branches > u32::MAX as usize
+            || nodes > u32::MAX as usize
+        {
+            return Err(CudaRefineError::ComplexIncidenceShape);
+        }
+        let greatest_row_mass = incidence
+            .chunks_exact(nodes)
+            .map(|row| {
+                row.iter().fold(0u128, |mass, entry| {
+                    mass.saturating_add(u128::from(entry.unsigned_abs()))
+                })
+            })
+            .max()
+            .unwrap_or(0);
+        let mount_host_ingress_octets = u64::try_from(std::mem::size_of_val(incidence))
+            .map_err(|_| CudaRefineError::ComplexIncidenceShape)?;
+        mount::cuda::init().map_err(metal_refusal)?;
+        let device = mount::cuda::Device::get(0).map_err(metal_refusal)?;
+        let context = mount::cuda::Context::create(&device).map_err(metal_refusal)?;
+        let device_name = device.name.clone();
+        let module = mount::cuda::Module::load_metal(include_str!(
+            "../../../../accelerators/metal/complex_incidence.metal"
+        ))
+        .map_err(metal_refusal)?;
+        let incidence_buffer =
+            mount::cuda::DeviceBuffer::alloc(incidence.len()).map_err(metal_refusal)?;
+        incidence_buffer
+            .copy_from_slice(incidence)
+            .map_err(metal_refusal)?;
+        Ok(Self {
+            metal: MetalComplexIncidence {
+                incidence: incidence_buffer,
+                context,
+                module,
+                device_name,
+            },
+            address: address.into(),
+            grain,
+            branches: branches as u32,
+            nodes: nodes as u32,
+            greatest_row_mass,
+            mount_host_ingress_octets,
+        })
+    }
+
+    #[cfg(target_os = "linux")]
     pub fn device_name(&self) -> &str {
         self.card.device_name()
+    }
+
+    #[cfg(target_os = "macos")]
+    pub fn device_name(&self) -> &str {
+        &self.metal.device_name
     }
 
     pub fn address(&self) -> &str {
@@ -127,6 +232,7 @@ impl ResidentComplexIncidence {
     /// Each front is rebased to its own common positive denominator at the apparatus mouth and
     /// reconstructed exactly after the terminal read. The card performs both contractions; the
     /// host neither selects a phase nor replays the product.
+    #[cfg(target_os = "linux")]
     pub fn conduct(
         &mut self,
         fronts: &[Vec<ExactComplexWaveCurrent>],
@@ -266,6 +372,166 @@ impl ResidentComplexIncidence {
             launches: u64::from(output_count > 0),
             synchronizations: u64::from(output_count > 0),
             block_threads: self.card.block_threads(),
+            mount_host_ingress_octets: self.mount_host_ingress_octets,
+            successor_host_ingress_octets: coefficient_octets,
+            successor_host_egress_octets: output_octets,
+            resident_invariant_octets: self.mount_host_ingress_octets,
+            resident_working_octets: coefficient_octets + output_octets,
+            invariant_transport_reuploaded: false,
+            cpu_semantic_replay_after_device: false,
+            binary_receiver_taken: false,
+        })
+    }
+
+    #[cfg(target_os = "macos")]
+    pub fn conduct(
+        &mut self,
+        fronts: &[Vec<ExactComplexWaveCurrent>],
+    ) -> Result<ResidentComplexIncidenceReturn, CudaRefineError> {
+        self.conduct_metal(fronts)
+    }
+
+    #[cfg(target_os = "macos")]
+    fn conduct_metal(
+        &mut self,
+        fronts: &[Vec<ExactComplexWaveCurrent>],
+    ) -> Result<ResidentComplexIncidenceReturn, CudaRefineError> {
+        self.metal.context.make_current().map_err(metal_refusal)?;
+        let nodes = self.nodes as usize;
+        if fronts.is_empty()
+            || fronts.len() > u32::MAX as usize
+            || fronts.iter().any(|front| front.len() != nodes)
+        {
+            return Err(CudaRefineError::ComplexCurrentShape);
+        }
+        let coefficient_count = fronts
+            .len()
+            .checked_mul(nodes)
+            .ok_or(CudaRefineError::ComplexIncidenceShape)?;
+        let mut real = Vec::with_capacity(coefficient_count);
+        let mut imaginary = Vec::with_capacity(coefficient_count);
+        let mut denominators = Vec::with_capacity(fronts.len());
+        let mut greatest_numerator = 0u128;
+        for front in fronts {
+            let denominator = common_complex_denominator(front)?;
+            for current in front {
+                let re = (current.real.numer() * (&denominator / current.real.denom()))
+                    .to_i64()
+                    .ok_or(CudaRefineError::ComplexCurrentOutsideApparatus)?;
+                let im = (current.imaginary.numer() * (&denominator / current.imaginary.denom()))
+                    .to_i64()
+                    .ok_or(CudaRefineError::ComplexCurrentOutsideApparatus)?;
+                greatest_numerator = greatest_numerator
+                    .max(u128::from(re.unsigned_abs()))
+                    .max(u128::from(im.unsigned_abs()));
+                real.push(re);
+                imaginary.push(im);
+            }
+            denominators.push(
+                denominator
+                    .to_u64()
+                    .ok_or(CudaRefineError::ComplexCurrentOutsideApparatus)?,
+            );
+        }
+        if self
+            .greatest_row_mass
+            .checked_mul(greatest_numerator)
+            .filter(|bound| *bound <= i64::MAX as u128)
+            .is_none()
+        {
+            return Err(CudaRefineError::ComplexIncidenceAccumulationOverflow);
+        }
+        let output_count = fronts
+            .len()
+            .checked_mul(self.branches as usize)
+            .ok_or(CudaRefineError::ComplexIncidenceShape)?;
+        let coefficient_octets = real
+            .len()
+            .checked_add(imaginary.len())
+            .and_then(|count| count.checked_mul(std::mem::size_of::<i64>()))
+            .ok_or(CudaRefineError::ComplexIncidenceShape)? as u64;
+        let output_octets = output_count
+            .checked_mul(2 * std::mem::size_of::<i64>())
+            .ok_or(CudaRefineError::ComplexIncidenceShape)? as u64;
+        let coefficient_real =
+            mount::cuda::DeviceBuffer::alloc(real.len()).map_err(metal_refusal)?;
+        let coefficient_imaginary =
+            mount::cuda::DeviceBuffer::alloc(imaginary.len()).map_err(metal_refusal)?;
+        coefficient_real
+            .copy_from_slice(&real)
+            .map_err(metal_refusal)?;
+        coefficient_imaginary
+            .copy_from_slice(&imaginary)
+            .map_err(metal_refusal)?;
+        let section_real = mount::cuda::DeviceBuffer::alloc(output_count).map_err(metal_refusal)?;
+        let section_imaginary =
+            mount::cuda::DeviceBuffer::alloc(output_count).map_err(metal_refusal)?;
+        let function = self
+            .metal
+            .module
+            .function("conduct_complex_incidence")
+            .map_err(metal_refusal)?;
+        let mut incidence_pointer = self.metal.incidence.device_ptr();
+        let mut real_pointer = coefficient_real.device_ptr();
+        let mut imaginary_pointer = coefficient_imaginary.device_ptr();
+        let mut section_real_pointer = section_real.device_ptr();
+        let mut section_imaginary_pointer = section_imaginary.device_ptr();
+        let mut branch_count = self.branches;
+        let mut node_count = self.nodes;
+        let mut front_count = fronts.len() as u32;
+        let mut arguments: [*mut std::ffi::c_void; 8] = [
+            (&mut incidence_pointer as *mut u64).cast(),
+            (&mut real_pointer as *mut u64).cast(),
+            (&mut imaginary_pointer as *mut u64).cast(),
+            (&mut section_real_pointer as *mut u64).cast(),
+            (&mut section_imaginary_pointer as *mut u64).cast(),
+            (&mut branch_count as *mut u32).cast(),
+            (&mut node_count as *mut u32).cast(),
+            (&mut front_count as *mut u32).cast(),
+        ];
+        function
+            .launch(
+                mount::cuda::Dim3::x(1),
+                mount::cuda::Dim3::x(1),
+                &mut arguments,
+            )
+            .map_err(metal_refusal)?;
+        self.metal.context.synchronize().map_err(metal_refusal)?;
+        let mut returned_real = vec![0i64; output_count];
+        let mut returned_imaginary = vec![0i64; output_count];
+        section_real
+            .copy_to_slice(&mut returned_real)
+            .map_err(metal_refusal)?;
+        section_imaginary
+            .copy_to_slice(&mut returned_imaginary)
+            .map_err(metal_refusal)?;
+        let branches = self.branches as usize;
+        let sections = denominators
+            .iter()
+            .enumerate()
+            .map(|(front, denominator)| {
+                (0..branches)
+                    .map(|branch| {
+                        let at = front * branches + branch;
+                        ExactComplexWaveCurrent::new(
+                            Rat::new(BigInt::from(returned_real[at]), BigInt::from(*denominator)),
+                            Rat::new(
+                                BigInt::from(returned_imaginary[at]),
+                                BigInt::from(*denominator),
+                            ),
+                        )
+                    })
+                    .collect()
+            })
+            .collect();
+        Ok(ResidentComplexIncidenceReturn {
+            address: self.address.clone(),
+            grain: self.grain,
+            sections,
+            device: self.metal.device_name.clone(),
+            launches: 1,
+            synchronizations: 1,
+            block_threads: 1,
             mount_host_ingress_octets: self.mount_host_ingress_octets,
             successor_host_ingress_octets: coefficient_octets,
             successor_host_egress_octets: output_octets,
@@ -1173,6 +1439,91 @@ fn integer_gcd(mut left: BigInt, mut right: BigInt) -> BigInt {
         right = remainder;
     }
     if left.is_zero() { BigInt::one() } else { left }
+}
+
+#[cfg(all(test, target_os = "macos"))]
+mod metal_complex_incidence_tests {
+    use super::*;
+
+    fn current(real: i64, imaginary: i64, denominator: i64) -> ExactComplexWaveCurrent {
+        ExactComplexWaveCurrent::new(
+            Rat::new(BigInt::from(real), BigInt::from(denominator)),
+            Rat::new(BigInt::from(imaginary), BigInt::from(denominator)),
+        )
+    }
+
+    #[test]
+    #[ignore = "requires a Metal device"]
+    fn metal_complex_incidence_matches_exact_oracle_and_preserves_ownership() {
+        let incidence = [1, -2, 3, -1, 0, 2];
+        let fronts = vec![
+            vec![current(1, 2, 2), current(-3, 1, 2), current(5, -1, 2)],
+            vec![current(-2, 3, 3), current(4, -2, 3), current(1, 5, 3)],
+        ];
+        let mut first = ResidentComplexIncidence::mount_metal(
+            "test/metal-complex-incidence/first",
+            0,
+            2,
+            3,
+            &incidence,
+        )
+        .expect("first Metal incidence mounts");
+        let mut second = ResidentComplexIncidence::mount_metal(
+            "test/metal-complex-incidence/second",
+            0,
+            2,
+            3,
+            &incidence,
+        )
+        .expect("second Metal incidence mounts");
+
+        let first_return = first.conduct(&fronts).expect("first conduct");
+        let reference: Vec<Vec<_>> = fronts
+            .iter()
+            .map(|front| {
+                incidence
+                    .chunks_exact(3)
+                    .map(|row| {
+                        row.iter().zip(front).fold(
+                            ExactComplexWaveCurrent::zero(),
+                            |sum, (coefficient, value)| {
+                                sum.add(&value.multiply(&current(*coefficient, 0, 1)))
+                            },
+                        )
+                    })
+                    .collect()
+            })
+            .collect();
+        assert_eq!(first_return.sections, reference);
+        let second_return = second.conduct(&fronts).expect("second conduct");
+        assert_eq!(second_return.sections, first_return.sections);
+        let first_again = first.conduct(&fronts).expect("first remains reusable");
+        assert_eq!(first_again.sections, first_return.sections);
+    }
+
+    #[test]
+    #[ignore = "requires a Metal device"]
+    fn metal_complex_incidence_refusal_does_not_consume_resident_state() {
+        let mut resident = ResidentComplexIncidence::mount_metal(
+            "test/metal-complex-incidence/overflow",
+            0,
+            1,
+            1,
+            &[i64::MAX],
+        )
+        .expect("overflow fixture mounts");
+        let overflowing = vec![vec![current(i64::MAX, -i64::MAX, 1)]];
+        assert!(matches!(
+            resident.conduct(&overflowing),
+            Err(CudaRefineError::ComplexIncidenceAccumulationOverflow)
+        ));
+        let valid = vec![vec![current(-1, 1, 2)]];
+        let returned = resident.conduct(&valid).expect("resident remains usable");
+        assert_eq!(
+            returned.sections,
+            vec![vec![current(-i64::MAX, i64::MAX, 2)]]
+        )
+    }
 }
 
 impl ResidentNativeWord {

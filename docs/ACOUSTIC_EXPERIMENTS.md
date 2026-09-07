@@ -105,6 +105,27 @@ actual shared interactions; a stored transcript or a WAV renderer alone does not
 
 ## Speech and text exposure
 
+[established-bounded; implemented-exact, measured] The acoustic owner can now attach a new WAV
+after the current recording completes, retaining both complete sources and the same native
+successor. The first sample of each new recording is unlinked exterior ingress; file adjacency
+does not create feedback. An explicitly declared digital return circuit starts within each
+recording. Unlinked input uses ordered packets of at most 256 samples, retaining every output
+source and the exact successful prefix on refusal. Coupled input retains its dependent scalar
+path. CLI frame/hop defaults are 4096 samples with section width one; complete PCM is retained
+and the folded section never drives the native operation.
+
+```sh
+target/debug/holonics-acoustic append completed-recording.hna \
+  --wav next-recording.wav --occurrence next-recorded-occurrence \
+  --checkpoint continuing-recordings.hna
+```
+
+[established-bounded; measured] The
+[current continuation record](../research/records/2026-09-06_AS4_AS5_CORPUS_CONTINUATION_AND_RESIDENT_PACKETS.md)
+includes full recorded-input timings and the AMI acquisition with timed speakers, words and
+original annotated response links. Recorded-stream execution remains slower than real time.
+The new corpus and continuation interfaces do not constitute speech recognition or synthesis.
+
 [definition] `SpeechExposureApplication` composes the acoustic application and a separate byte
 occurrence in one native session. All sound samples arrive before any transcript byte. A byte
 enters as `(byte / transcript_divisor, 0)` under a declared digital codeword chart. With the

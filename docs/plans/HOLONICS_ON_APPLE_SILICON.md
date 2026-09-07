@@ -221,9 +221,12 @@ process continuation stand at their measured scopes.
 
 [open] AS4–AS5 remain unfinished under the
 [completion correction](../../research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md).
-The current applications require a fresh seed for each WAV/text experiment and resume only
-that saved experiment. Compose new recordings and conversational turns into one continuing
-cultivated ecology, reuse/extend the actual native material and receiver owners for sound and
-English communication, and improve execution/storage for measured streaming conduct. The
+The acoustic application now appends distinct recordings without resetting its native successor;
+the serial speech probe still resumes only its original WAV/text experiment. Ordered unlinked
+packet submission and a bounded Metal complex-incidence contraction are implemented in the
+[continuation record](../../research/records/2026-09-06_AS4_AS5_CORPUS_CONTINUATION_AND_RESIDENT_PACKETS.md).
+These do not establish corpus cultivation. Compose source-qualified conversational returns with
+the shared native material/formation construction, provide useful acoustic and English receivers,
+and continue execution/storage work. The
 [acoustic guide](../ACOUSTIC_EXPERIMENTS.md) documents the existing probe interfaces. More data
 alone does not supply these missing compositions; microphone access supplies none of them.

@@ -12,12 +12,15 @@ use thiserror::Error;
 
 mod wire;
 pub use wire::*;
+mod batch;
+pub use batch::NativeBatchReceive;
 mod checkpoint;
 pub use checkpoint::NativeSavedSession;
 mod acoustic;
 pub use acoustic::{
     AcousticApplication, AcousticInterruption, AcousticPendingReceive, AcousticRun,
-    AcousticRunOptions, AcousticSavedApplication, resume_acoustic, run_acoustic_with_options,
+    AcousticRunOptions, AcousticSavedApplication, append_acoustic, resume_acoustic,
+    run_acoustic_with_options,
 };
 mod speech;
 pub use speech::{
@@ -247,6 +250,15 @@ impl NativeSession<'_> {
                 return Err(error.into());
             }
         };
+        Ok(self.commit_return(step, source, next_source))
+    }
+
+    fn commit_return(
+        &mut self,
+        step: holonic_engine::native_ecology::constitutive_fibre::NativeCurrentStep,
+        source: Option<u64>,
+        next_source: u64,
+    ) -> NativeSessionStep {
         let root = step.root_source_currents();
         let wire = NativeSessionStep {
             source: next_source,
@@ -284,7 +296,7 @@ impl NativeSession<'_> {
         };
         self.confirmed_rank = step.successor_rank;
         self.sources.push(Some(step.source));
-        Ok(wire)
+        wire
     }
 
     pub fn rechart(

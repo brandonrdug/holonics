@@ -800,6 +800,7 @@ impl Module {
     pub fn function(&self, name: &str) -> Result<Function<'_>> {
         // Scalar positions and arity are the exact published kernel ABI, not semantic routing.
         let (signature, arity): (&'static [usize], usize) = match name {
+            "conduct_complex_incidence" => (&[5, 6, 7], 8),
             "section_constitutive_fibre" => (&[4, 5, 6, 12], 13),
             "section_constitutive_circulation" => (&[9, 10, 16], 17),
             "section_constitutive_rechart" => (&[5, 19], 20),
@@ -809,7 +810,7 @@ impl Module {
                 return Err(error(
                     "function",
                     format!("native operation {name} has not been realized on Metal"),
-                ))
+                ));
             }
         };
         objc::rc::autoreleasepool(|| {

@@ -2,8 +2,8 @@
 use clap::{Parser, Subcommand};
 use holonic_engine::phase_current::{PhaseCurrentLineageId, PhaseCurrentReceiverId};
 use holonics_hna::native::{
-    resume_acoustic, run_acoustic_with_options, AcousticRunOptions, AcousticSavedApplication,
-    CurrentWire, NativeModelSpec,
+    append_acoustic, resume_acoustic, run_acoustic_with_options, AcousticApplication,
+    AcousticRunOptions, AcousticSavedApplication, CurrentWire, NativeModelSpec,
 };
 use life::mathematical_source::ExactAcousticOccurrence;
 use life::native_intelligence::{NativeAcousticPotentialComplex, NativeAcousticReceiverChart};
@@ -46,6 +46,33 @@ enum Action {
         /// JSON array of exact per-node gains for an explicitly declared one-sample digital return.
         #[arg(long)]
         return_couplings: Option<PathBuf>,
+        /// Exterior source frame length and hop; this does not define native recurrence.
+        #[arg(long, default_value_t = 4096)]
+        frame_size: u32,
+    },
+    /// Append a complete new PCM recording to an existing acoustic owner/checkpoint.
+    Append {
+        /// Existing complete acoustic checkpoint whose continuing owner receives the recording.
+        source: PathBuf,
+        #[arg(long)]
+        wav: PathBuf,
+        /// Source occurrence coordinate, distinct from its filename/content.
+        #[arg(long)]
+        occurrence: String,
+        #[arg(long)]
+        checkpoint: PathBuf,
+        /// Optional process cut. The remainder stays in the new checkpoint.
+        #[arg(long)]
+        samples: Option<usize>,
+        /// Exact digital amplitude divisor; this does not assert calibrated acoustic pressure.
+        #[arg(long, default_value_t = 32768)]
+        divisor: i64,
+        /// JSON array of exact per-node gains for an explicitly declared one-sample digital return.
+        #[arg(long)]
+        return_couplings: Option<PathBuf>,
+        /// Exterior source frame length and hop; this does not define native recurrence.
+        #[arg(long, default_value_t = 4096)]
+        frame_size: u32,
     },
     /// Continue the next pending sample from a complete application/native checkpoint.
     Resume {
@@ -93,6 +120,39 @@ fn write_new(path: &Path, bytes: &[u8]) -> Result<(), Box<dyn std::error::Error>
 }
 fn json_new(path: &Path, value: &impl Serialize) -> Result<(), Box<dyn std::error::Error>> {
     write_new(path, &serde_json::to_vec_pretty(value)?)
+}
+fn read_acoustic_occurrence(
+    wav: &Path,
+    occurrence: String,
+    frame_size: u32,
+) -> Result<(ExactAcousticOccurrence, Vec<u8>), Box<dyn std::error::Error>> {
+    if frame_size == 0 {
+        return Err("--frame-size must be positive".into());
+    }
+    let bytes = fs::read(wav)?;
+    let source = ExactAcousticOccurrence::from_wav_bytes(
+        &bytes,
+        occurrence,
+        wav.display().to_string(),
+        frame_size,
+        frame_size,
+        1,
+    )?;
+    Ok((source, bytes))
+}
+fn recording_summary(app: &AcousticApplication) -> serde_json::Value {
+    serde_json::json!({
+        "occurrence": app.occurrence().occurrence,
+        "locator": app.occurrence().locator,
+        "sample_rate": app.occurrence().sample_rate,
+        "sample_count": app.occurrence().samples.len(),
+        "frame_length": app.occurrence().frame_length,
+        "frame_hop": app.occurrence().frame_hop,
+        "native_start": app.native_start(),
+        "next_sample": app.cursor(),
+        "complete": app.complete(),
+        "pending": app.pending(),
+    })
 }
 fn production(
     path: &Path,
@@ -145,7 +205,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     "total_samples":app.occurrence().samples.len(), "next_sample":app.cursor(),
                     "complete":app.complete(), "pending":app.pending(),
                     "pcm_divisor":app.pcm_divisor(),"digital_return_couplings":app.return_couplings(),
-                    "first_native_return":app.steps().first(), "last_native_return":app.steps().last()
+                    "first_native_return":app.steps().first(), "last_native_return":app.steps().last(),
+                    "native_start":app.native_start(),
+                    "recording_count":app.recording_count(),
+                    "current_recording":recording_summary(app),
+                    "completed_recordings":app.completed_recordings().iter().map(recording_summary).collect::<Vec<_>>()
                 }))?
             );
         }
@@ -157,22 +221,49 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             samples,
             divisor,
             return_couplings,
+            frame_size,
         } => {
             let model: NativeModelSpec = read(&seed)?;
-            let bytes = fs::read(&wav)?;
-            // One-sample frame is an explicit receiver extent; the folded section is not used.
-            let occurrence = ExactAcousticOccurrence::from_wav_bytes(
-                &bytes,
-                occurrence,
-                wav.display().to_string(),
-                1,
-                1,
-                1,
-            )?;
+            let (occurrence, bytes) = read_acoustic_occurrence(&wav, occurrence, frame_size)?;
             let gains: Option<Vec<CurrentWire>> =
                 return_couplings.as_deref().map(read).transpose()?;
             let run = run_acoustic_with_options(
                 &model,
+                &occurrence,
+                &bytes,
+                divisor,
+                gains,
+                &AcousticRunOptions {
+                    samples,
+                    checkpoint: Some(checkpoint.clone()),
+                },
+            )?;
+            println!(
+                "{}",
+                serde_json::json!({"cursor":run.cursor,"complete":run.complete,
+                "checkpoint":run.checkpoint,"checkpoint_octets":run.checkpoint_octets,
+                "checkpoint_error":run.checkpoint_error,"interruption":run.interruption,
+                "pending":run.pending,"elapsed_ns":started.elapsed().as_nanos()})
+            );
+            if run.interruption.is_some() || run.checkpoint_error.is_some() {
+                std::process::exit(1);
+            }
+        }
+        Action::Append {
+            source,
+            wav,
+            occurrence,
+            checkpoint,
+            samples,
+            divisor,
+            return_couplings,
+            frame_size,
+        } => {
+            let (occurrence, bytes) = read_acoustic_occurrence(&wav, occurrence, frame_size)?;
+            let gains: Option<Vec<CurrentWire>> =
+                return_couplings.as_deref().map(read).transpose()?;
+            let run = append_acoustic(
+                &source,
                 &occurrence,
                 &bytes,
                 divisor,

@@ -194,6 +194,14 @@ pub(super) unsafe extern "C" fn cuGetErrorString(_: i32, out: *mut *const c_char
 
 #[derive(Debug, Error)]
 pub enum CudaRefineError {
+    #[cfg(target_os = "macos")]
+    #[error("Metal {operation} returned {code} ({name}): {message}")]
+    Metal {
+        operation: &'static str,
+        code: i32,
+        name: String,
+        message: String,
+    },
     #[error("the CUDA refinement apparatus is unavailable on this target")]
     UnsupportedDevice,
     #[error("the CUDA driver reports no device")]

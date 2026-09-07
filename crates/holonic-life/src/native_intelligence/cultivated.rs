@@ -13,12 +13,14 @@
 
 use std::collections::BTreeSet;
 
+#[cfg(target_os = "linux")]
+use holonic_engine::cuda_refine::CudaRefineExecutor;
 use holonic_engine::{
-    cuda_refine::{CudaRefineExecutor, ResidentComplexIncidence, ResidentComplexIncidenceReturn},
+    ExactComplexWaveCurrent,
+    cuda_refine::{ResidentComplexIncidence, ResidentComplexIncidenceReturn},
     exact_linear::ExactRatMatrix,
     native_spool::ReceiverInsufficiency,
     receiver_exact_compression::ReceiverId,
-    ExactComplexWaveCurrent,
 };
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
@@ -196,10 +198,22 @@ impl CultivatedEcologyRest {
             return Err(CultivatedEcologyError::Standing);
         }
         let incidence = native_incidence(&self.morphology, &ingress_sections)?;
-        let card = CudaRefineExecutor::new()
-            .map_err(|error| CultivatedEcologyError::Apparatus(error.to_string()))?;
-        let morphology_current = ResidentComplexIncidence::mount(
-            card,
+        #[cfg(target_os = "linux")]
+        let morphology_current = {
+            let card = CudaRefineExecutor::new()
+                .map_err(|error| CultivatedEcologyError::Apparatus(error.to_string()))?;
+            ResidentComplexIncidence::mount(
+                card,
+                "athena/native-cultivation-complex-parametron",
+                0,
+                self.morphology.deposits.len(),
+                ingress_sections.len(),
+                &incidence,
+            )
+            .map_err(|error| CultivatedEcologyError::Apparatus(error.to_string()))?
+        };
+        #[cfg(target_os = "macos")]
+        let morphology_current = ResidentComplexIncidence::mount_metal(
             "athena/native-cultivation-complex-parametron",
             0,
             self.morphology.deposits.len(),

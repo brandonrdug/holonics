@@ -38,6 +38,14 @@ application owners in `crates/holonics-hna/src/native/{acoustic,speech}.rs`, exp
 into the existing acoustic receiver. `applications/holonics-audio/main.swift` owns exterior
 capture/playback chronology. These share the native session and introduce no second engine.
 
+[established-bounded; implemented-exact] Ordered unlinked packets are owned by
+`constitutive_fibre/circulation/batch.rs` and `holonics-hna/src/native/batch.rs`; they reuse the
+circulation kernel with serial failure dependencies and retain every source section. The acoustic
+owner appends recordings to one successor. `cuda_refine/complex_parametron.rs::mount_metal` and
+`accelerators/metal/complex_incidence.metal` realize the bounded complex-incidence contraction.
+The cultivated morphology mount selects this route; predecessor spool conduct, situated
+cultivation and receiver-history quotient construction retain their separate CUDA dependencies.
+
 Each row connects one mathematical relation to its live formal and executable presentations.
 
 - **exact** means the named implementation owns the same stated carrier/law in the row's declared

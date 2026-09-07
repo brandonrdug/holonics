@@ -1,6 +1,6 @@
 use super::*;
 use crate::native::{
-    with_native_session, CurrentWire, JunctionSpec, NativeModelSpec, NATIVE_MODEL_SPEC_SCHEMA,
+    CurrentWire, JunctionSpec, NATIVE_MODEL_SPEC_SCHEMA, NativeModelSpec, with_native_session,
 };
 use life::mathematical_source::ExactAcousticOccurrence;
 use std::path::Path;
@@ -190,4 +190,99 @@ fn first_sample_refusal_remounts_without_losing_or_replaying_input() {
         std::fs::read(first).unwrap(),
         std::fs::read(second).unwrap()
     );
+}
+
+#[test]
+#[ignore = "requires resident GPU execution"]
+fn distinct_recordings_continue_the_same_successor_across_restart() {
+    for gains in [None, Some(vec![CurrentWire::integers(1, 0)])] {
+        let first = wav_bytes();
+        let mut second = first.clone();
+        second[44..46].copy_from_slice(&17_i16.to_le_bytes());
+        let a = occurrence(&first);
+        let mut b = occurrence(&second);
+        b.occurrence = "second-recording".into();
+        let directory = tempfile::tempdir().unwrap();
+        let start = directory.path().join("first.hna");
+        let cut = directory.path().join("second-cut.hna");
+        let done = directory.path().join("second-done.hna");
+        let uninterrupted = directory.path().join("uninterrupted.hna");
+        run_acoustic_with_options(
+            &spec(),
+            &a,
+            &first,
+            32768,
+            gains.clone(),
+            &run_options(None, Some(&start)),
+        )
+        .unwrap();
+        let prefix = append_acoustic(
+            &start,
+            &b,
+            &second,
+            32768,
+            gains.clone(),
+            &run_options(Some(1), Some(&cut)),
+        )
+        .unwrap();
+        assert_eq!(prefix.cursor, 1);
+        assert_eq!(prefix.steps[0].native_occurrence, 4);
+        assert_eq!(prefix.steps[0].predecessor_state, Some(3));
+        assert_eq!(prefix.steps[0].received_from, None);
+        let resumed = resume_acoustic(&cut, &run_options(None, Some(&done))).unwrap();
+        assert!(resumed.complete);
+        let full = append_acoustic(
+            &start,
+            &b,
+            &second,
+            32768,
+            gains,
+            &run_options(None, Some(&uninterrupted)),
+        )
+        .unwrap();
+        assert_eq!(
+            serde_json::to_vec(&full.steps).unwrap(),
+            serde_json::to_vec(&resumed.steps).unwrap()
+        );
+        assert_eq!(
+            std::fs::read(done).unwrap(),
+            std::fs::read(uninterrupted).unwrap()
+        );
+        let saved = AcousticSavedApplication::read(cut).unwrap();
+        assert_eq!(saved.application().recording_count(), 2);
+        assert_eq!(saved.application().native_start(), 4);
+        assert_eq!(
+            saved.application().completed_recordings()[0].original_wav,
+            first
+        );
+        assert_eq!(saved.application().original_wav, second);
+    }
+}
+
+#[test]
+#[ignore = "requires resident GPU execution"]
+fn incomplete_or_invalid_append_preserves_original_application_and_owner() {
+    let bytes = wav_bytes();
+    let source = occurrence(&bytes);
+    with_native_session(&spec(), |session| {
+        let mut app = AcousticApplication::found(&spec(), &source, &bytes, 32768, None, session)?;
+        app.advance_one(session)?;
+        let before = serde_json::to_vec(&app)?;
+        assert!(
+            app.append_recording(session, &source, &bytes, 32768, None)
+                .is_err()
+        );
+        assert_eq!(before, serde_json::to_vec(&app)?);
+        assert_eq!(session.occurrence_count(), 1);
+        while app.advance_one(session)? {}
+        let before = serde_json::to_vec(&app)?;
+        assert!(
+            app.append_recording(session, &source, &bytes, 0, None)
+                .is_err()
+        );
+        assert_eq!(before, serde_json::to_vec(&app)?);
+        assert_eq!(session.occurrence_count(), 4);
+        Ok(())
+    })
+    .unwrap();
 }

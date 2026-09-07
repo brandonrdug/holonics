@@ -39,6 +39,14 @@ real-time processing, recognition or synthesis. Continue AS4–AS5 using source-
 material and the same native recurrence; personal samples are optional later adaptation/device
 checks. The desktop Athena-alpha campaign and private conversation data remain independent.
 
+[open] Corrected AS4–AS5 implementation remains active. The
+[continuation return](research/records/2026-09-06_AS4_AS5_CORPUS_CONTINUATION_AND_RESIDENT_PACKETS.md)
+adds consecutive recordings in one native checkpoint, ordered packets with exact refusal
+prefixes, and bounded Metal complex incidence. Four complete AMI meetings retain timed speakers,
+words and original response links, including source annotation refusals. These do not yet return
+learned acoustic/English conduct. Complete recorded inputs still took 7.07–12.65 times their
+source durations; retained per-sample allocation/history remains a concrete cost.
+
 [established-bounded; measured] Local data comprise 2,000 ESC-50 WAVs and a 100-clip LibriSpeech
 subset, outside Git. The measured examples processed a small selection, not the downloaded
 corpora. A five-second sound continuation took 299.47 s including cold publication and produced

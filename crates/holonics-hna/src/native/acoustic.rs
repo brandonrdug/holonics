@@ -16,6 +16,7 @@ use sha2::{Digest, Sha256};
 use std::path::{Path, PathBuf};
 
 const ACOUSTIC_APPLICATION_SCHEMA: &str = "org.holonics.hna.acoustic-application.v1";
+const ACOUSTIC_CORPUS_SCHEMA: &str = "org.holonics.hna.acoustic-application.v2";
 
 #[cfg(test)]
 mod tests;
@@ -35,6 +36,16 @@ pub struct AcousticApplication {
     cursor: usize,
     steps: Vec<NativeSessionStep>,
     pending: Option<AcousticPendingReceive>,
+    /// Earlier complete recordings in this same native owner. These are cold source/return
+    /// records, not independently mountable ecologies. Entries never contain nested archives.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    completed_recordings: Vec<AcousticApplication>,
+    #[serde(default, skip_serializing_if = "is_zero")]
+    native_start: usize,
+}
+
+fn is_zero(value: &usize) -> bool {
+    *value == 0
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -105,6 +116,8 @@ impl AcousticApplication {
             cursor: 0,
             steps: Vec::new(),
             pending: None,
+            completed_recordings: Vec::new(),
+            native_start: 0,
         };
         app.validate_chart()?;
         Ok(app)
@@ -112,6 +125,60 @@ impl AcousticApplication {
 
     pub fn cursor(&self) -> usize {
         self.cursor
+    }
+    pub fn native_start(&self) -> usize {
+        self.native_start
+    }
+    pub fn recording_count(&self) -> usize {
+        self.completed_recordings.len() + 1
+    }
+    pub fn completed_recordings(&self) -> &[AcousticApplication] {
+        &self.completed_recordings
+    }
+
+    /// Attach a distinct recording without resetting or cloning the native successor. The
+    /// first sample is exterior ingress: recording adjacency cannot manufacture a return edge.
+    /// An explicitly supplied digital return circuit begins within this recording only.
+    pub fn append_recording(
+        &mut self,
+        session: &mut NativeSession<'_>,
+        occurrence: &ExactAcousticOccurrence,
+        original_wav: &[u8],
+        pcm_divisor: i64,
+        return_couplings: Option<Vec<CurrentWire>>,
+    ) -> Result<(), NativeSessionError> {
+        self.validate_session(session)?;
+        if !self.complete() || self.pending.is_some() {
+            return Err(invalid(
+                "finish the current recording before appending another",
+            ));
+        }
+        if occurrence.samples.is_empty() || !source_matches(occurrence, original_wav)? {
+            return Err(invalid("new recording source does not decode identically"));
+        }
+        let next = Self {
+            schema: ACOUSTIC_CORPUS_SCHEMA.to_owned(),
+            spec: self.spec.clone(),
+            occurrence: occurrence.clone(),
+            original_wav: original_wav.to_vec(),
+            pcm_divisor,
+            return_couplings,
+            cursor: 0,
+            steps: Vec::new(),
+            pending: None,
+            completed_recordings: Vec::new(),
+            native_start: session.occurrence_count(),
+        };
+        next.validate_chart()?;
+        self.completed_recordings
+            .try_reserve(1)
+            .map_err(|error| invalid(format!("recording allocation: {error}")))?;
+        // Every fallible check precedes this move. The old source bytes and returns remain
+        // attached, while the single session retains precisely its existing resident successor.
+        let mut previous = std::mem::replace(self, next);
+        self.completed_recordings = std::mem::take(&mut previous.completed_recordings);
+        self.completed_recordings.push(previous);
+        Ok(())
     }
     pub fn complete(&self) -> bool {
         self.cursor == self.occurrence.samples.len()
@@ -176,7 +243,7 @@ impl AcousticApplication {
     }
 
     fn validate(&self) -> Result<(), NativeSessionError> {
-        if self.schema != ACOUSTIC_APPLICATION_SCHEMA
+        if ![ACOUSTIC_APPLICATION_SCHEMA, ACOUSTIC_CORPUS_SCHEMA].contains(&self.schema.as_str())
             || self.pcm_divisor <= 0
             || self.cursor > self.occurrence.samples.len()
             || self.steps.len() != self.cursor
@@ -214,6 +281,29 @@ impl AcousticApplication {
         Ok(())
     }
 
+    fn validate_recordings(&self) -> Result<(), NativeSessionError> {
+        let mut start = 0usize;
+        for prior in &self.completed_recordings {
+            prior.validate()?;
+            prior.validate_chart()?;
+            if !prior.completed_recordings.is_empty()
+                || !prior.complete()
+                || prior.pending.is_some()
+                || prior.native_start != start
+                || prior.spec != self.spec
+            {
+                return Err(invalid("completed recording chronology"));
+            }
+            start = start
+                .checked_add(prior.cursor)
+                .ok_or_else(|| invalid("recording extent overflow"))?;
+        }
+        if start != self.native_start {
+            return Err(invalid("recording/native start differs"));
+        }
+        Ok(())
+    }
+
     fn validate_chart(&self) -> Result<(), NativeSessionError> {
         if self.pcm_divisor <= 0 {
             return Err(invalid("PCM divisor must be positive"));
@@ -232,8 +322,15 @@ impl AcousticApplication {
     pub(crate) fn validate_checkpoint(&self) -> Result<(), NativeSessionError> {
         self.validate()?;
         self.validate_chart()?;
-        if !source_matches(&self.occurrence, &self.original_wav)? {
-            return Err(invalid("acoustic source does not decode identically"));
+        self.validate_recordings()?;
+        for recording in self
+            .completed_recordings
+            .iter()
+            .chain(std::iter::once(self))
+        {
+            if !source_matches(&recording.occurrence, &recording.original_wav)? {
+                return Err(invalid("acoustic source does not decode identically"));
+            }
         }
         Ok(())
     }
@@ -241,7 +338,7 @@ impl AcousticApplication {
     fn validate_session(&self, session: &NativeSession<'_>) -> Result<(), NativeSessionError> {
         self.validate()?;
         self.validate_chart()?;
-        if session.occurrence_count() != self.cursor
+        if self.native_start.checked_add(self.cursor) != Some(session.occurrence_count())
             || session.nodes() != self.spec.nodes.len()
             || self
                 .steps
@@ -338,6 +435,62 @@ impl AcousticApplication {
         Ok(true)
     }
 
+    /// Deliver a bounded packet of independent exterior samples. Native operations remain
+    /// ordered; neither packet boundaries nor neighboring recordings create return contact.
+    /// A declared digital feedback circuit still uses `advance_one`, since its next input
+    /// depends on the preceding output and is not known at packet ingress.
+    pub fn advance_packet(
+        &mut self,
+        session: &mut NativeSession<'_>,
+        samples: usize,
+    ) -> Result<usize, NativeSessionError> {
+        self.validate_session(session)?;
+        if samples == 0 || self.complete() {
+            return Ok(0);
+        }
+        if self.return_couplings.is_some() {
+            return self.advance_one(session).map(usize::from);
+        }
+        let count = samples.min(self.occurrence.samples.len() - self.cursor);
+        let currents = (self.cursor..self.cursor + count)
+            .map(|i| self.current_for(i))
+            .collect::<Result<Vec<_>, _>>()?;
+        self.steps
+            .try_reserve(count)
+            .map_err(|e| invalid(format!("native step allocation: {e}")))?;
+        self.pending = Some(AcousticPendingReceive {
+            sample: self.cursor,
+            current: currents[0].clone(),
+            source: None,
+            detail: None,
+        });
+        let returned = match session.receive_unlinked_batch(&currents) {
+            Ok(returned) => returned,
+            Err(error) => {
+                self.pending.as_mut().expect("staged packet").detail = Some(error.to_string());
+                return Err(error);
+            }
+        };
+        let committed = returned.committed.len();
+        self.steps.extend(returned.committed);
+        self.cursor += committed;
+        self.pending = None;
+        if let Some(at) = returned.refused_at {
+            let error = invalid(format!(
+                "resident packet refusal: {:?}",
+                returned.obstruction
+            ));
+            self.pending = Some(AcousticPendingReceive {
+                sample: self.cursor,
+                current: currents[at].clone(),
+                source: None,
+                detail: Some(error.to_string()),
+            });
+            return Err(error);
+        }
+        Ok(committed)
+    }
+
     pub fn checkpoint(
         &self,
         session: &NativeSession<'_>,
@@ -375,33 +528,31 @@ pub fn resume_acoustic(
     options: &AcousticRunOptions,
 ) -> Result<AcousticRun, NativeSessionError> {
     preflight(options)?;
-    let native = NativeSavedSession::read(path)?;
-    let bytes = native
-        .application_state()
-        .ok_or_else(|| invalid("checkpoint has no acoustic application state"))?;
-    let mut app: AcousticApplication = serde_json::from_slice(bytes)?;
-    app.validate()?;
-    if !source_matches(&app.occurrence, &app.original_wav)? {
-        return Err(invalid(
-            "checkpoint acoustic source does not decode identically",
-        ));
-    }
-    app.validate_chart()?;
-    let last = app
-        .steps
-        .last()
-        .map(|step| (step.source as usize, step.native_occurrence));
-    if native.nodes() != app.spec.nodes.len()
-        || native.occurrences() != app.cursor
-        || last.is_some_and(|(source, occurrence)| {
-            native.source_slots().get(source) != Some(&Some(occurrence))
-        })
-        || *native.transport() != HnaStreamState::default()
-    {
-        return Err(invalid("checkpoint/native acoustic boundary differs"));
-    }
-    validate_saved_native(&native, &app)?;
-    native.with_application_session(|session, _, _| execute(&mut app, session, options))
+    AcousticSavedApplication::read(path)?
+        .with_application(|session, app| execute(app, session, options))
+}
+
+/// Continue a saved acoustic ecology with a new source recording, retaining every earlier
+/// recording and native successor. This is corpus ingress, not an audio/language learner.
+pub fn append_acoustic(
+    path: impl AsRef<Path>,
+    occurrence: &ExactAcousticOccurrence,
+    original_wav: &[u8],
+    pcm_divisor: i64,
+    return_couplings: Option<Vec<CurrentWire>>,
+    options: &AcousticRunOptions,
+) -> Result<AcousticRun, NativeSessionError> {
+    preflight(options)?;
+    AcousticSavedApplication::read(path)?.with_application(|session, app| {
+        app.append_recording(
+            session,
+            occurrence,
+            original_wav,
+            pcm_divisor,
+            return_couplings,
+        )?;
+        execute(app, session, options)
+    })
 }
 
 pub struct AcousticSavedApplication {
@@ -416,11 +567,10 @@ impl AcousticSavedApplication {
             .application_state()
             .ok_or_else(|| invalid("checkpoint has no acoustic application state"))?;
         let application: AcousticApplication = serde_json::from_slice(bytes)?;
-        application.validate()?;
-        application.validate_chart()?;
-        if !source_matches(&application.occurrence, &application.original_wav)?
-            || native.nodes() != application.spec.nodes.len()
-            || native.occurrences() != application.cursor
+        application.validate_checkpoint()?;
+        if native.nodes() != application.spec.nodes.len()
+            || application.native_start.checked_add(application.cursor)
+                != Some(native.occurrences())
             || *native.transport() != HnaStreamState::default()
         {
             return Err(invalid("checkpoint/native acoustic boundary differs"));
@@ -459,14 +609,16 @@ fn execute(
     let mut interruption = None;
     let mut remaining = limit;
     while remaining > 0 && !app.complete() {
-        if let Err(error) = app.advance_one(session) {
-            interruption = Some(AcousticInterruption {
-                sample: app.cursor,
-                detail: error.to_string(),
-            });
-            break;
+        match app.advance_packet(session, remaining.min(256)) {
+            Ok(committed) => remaining -= committed,
+            Err(error) => {
+                interruption = Some(AcousticInterruption {
+                    sample: app.cursor,
+                    detail: error.to_string(),
+                });
+                break;
+            }
         }
-        remaining -= 1;
     }
     let (checkpoint_octets, checkpoint_error) = if let Some(path) = &options.checkpoint {
         match app.checkpoint(session, path) {
@@ -477,7 +629,11 @@ fn execute(
         (None, None)
     };
     Ok(AcousticRun {
-        schema: ACOUSTIC_APPLICATION_SCHEMA,
+        schema: if app.completed_recordings.is_empty() {
+            ACOUSTIC_APPLICATION_SCHEMA
+        } else {
+            ACOUSTIC_CORPUS_SCHEMA
+        },
         steps: app.steps.clone(),
         cursor: app.cursor,
         complete: app.complete(),
@@ -515,19 +671,33 @@ fn validate_saved_native(
     native: &NativeSavedSession,
     application: &AcousticApplication,
 ) -> Result<(), NativeSessionError> {
-    if application.steps.iter().enumerate().any(|(index, step)| {
-        step.native_occurrence != index
-            || step.predecessor_state != index.checked_sub(1)
-            || native.source_slots().get(step.source as usize)
-                != Some(&if application.return_couplings.is_some()
-                    && index + 1 < application.steps.len()
-                {
-                    None
-                } else {
-                    Some(index)
-                })
-    }) {
-        return Err(invalid("checkpoint acoustic step/source lineage differs"));
+    for recording in application
+        .completed_recordings
+        .iter()
+        .chain(std::iter::once(application))
+    {
+        if recording.steps.iter().enumerate().any(|(index, step)| {
+            let ordinal = recording.native_start + index;
+            step.native_occurrence != ordinal
+                || step.source != ordinal as u64
+                || step.predecessor_state != ordinal.checked_sub(1)
+                || step.received_from
+                    != if recording.return_couplings.is_some() && index > 0 {
+                        Some((ordinal - 1) as u64)
+                    } else {
+                        None
+                    }
+                || native.source_slots().get(step.source as usize)
+                    != Some(&if recording.return_couplings.is_some()
+                        && index + 1 < recording.steps.len()
+                    {
+                        None
+                    } else {
+                        Some(ordinal)
+                    })
+        }) {
+            return Err(invalid("checkpoint acoustic step/source lineage differs"));
+        }
     }
     Ok(())
 }

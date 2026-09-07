@@ -323,6 +323,8 @@ pub struct NativeConstitutiveEcology<'chart> {
     owner: Rc<()>,
     history: Vec<HeldEmission<'chart>>,
     pending: Option<HeldEmission<'chart>>,
+    // Complete staged outputs survive uncertain batch launch/readback with this owner.
+    pending_batch: Vec<HeldEmission<'chart>>,
 }
 
 impl<'chart> NativeConstitutiveEcology<'chart> {
@@ -387,6 +389,7 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
             owner: Rc::new(()),
             history: Vec::new(),
             pending: None,
+            pending_batch: Vec::new(),
         })
     }
 
@@ -495,7 +498,10 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
             .collect())
     }
     pub fn pending_lineage(&self) -> Option<&NativeCurrentLineage> {
-        self.pending.as_ref().map(|e| &e.lineage)
+        self.pending
+            .as_ref()
+            .or_else(|| self.pending_batch.first())
+            .map(|e| &e.lineage)
     }
     pub fn census(&self) -> TransferCensus {
         self.relation.census()
@@ -665,3 +671,6 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
 
 #[cfg(test)]
 mod tests;
+
+mod batch;
+pub use batch::NativeUnlinkedBatchReturn;

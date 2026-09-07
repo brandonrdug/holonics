@@ -591,6 +591,7 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
             owner,
             history,
             pending: None,
+            pending_batch: Vec::new(),
         };
         Ok((body, sources))
     }
