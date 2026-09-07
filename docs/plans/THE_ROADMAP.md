@@ -57,12 +57,14 @@ frame, fibre and successor parity govern the port. MLX is an apparatus candidate
 
 [established-bounded; process-audit] AS0 returned branch/specification and Mac toolchain/device
 checks in the [setup record](../../research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md).
-[definition] Brandon subsequently directs completion of AS1–AS5, with AS3 the Apple foundation
-milestone. The [implementation return](../../research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md)
-now closes AS1–AS5 at their bounded phase/digital-exposure scopes: resident Metal, complete
-continuation, actual sound production/playback and curated speech/text contact. Broader native
-operators, real-time acoustics and useful speech competence are not claimed by this sequence.
-The desktop Athena-alpha order remains independent.
+[definition] Brandon directs completion of AS1–AS5, with AS3 the Apple foundation milestone.
+AS1–AS3 have returned at the local phase-family scope. AS4 remains partial and AS5 remains open
+under his later clarification that recorded conversational and English audio must support the
+intended useful system. The [completion correction](../../research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md)
+withdraws the earlier closure on application probes. Continue acoustic/corpus composition,
+persistent development across recordings and turns, useful speech/language conduct and measured
+streaming operation. Microphone access gates none of those; actual device/room checks have their
+own physical scope. The desktop Athena-alpha order remains independent.
 
 ## Completed September 6 synthesis before Athena-alpha cultivation
 

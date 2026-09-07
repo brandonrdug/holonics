@@ -19,26 +19,31 @@ conversation data and cultivation remain on that machine.
 Rust, pinned Lean, repaired Xcode setup, Metal tools and an isolated MLX custom-kernel check.
 The native HNA Cargo check reached the known CUDA/PTX/target-gating obstruction on macOS.
 
-[established-bounded; implemented-exact, measured] AS1–AS5 have returned at the
-[specified experimental scopes](research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md).
-AS3 establishes the Apple phase foundation: direct Metal exact formation/circulation/rechart,
-complete persistence and public continuation. Final checks include 28 engine phase tests, six
-mount ownership tests, 20 public native tests and four separate-process tests. Warm open
-medians were 0.46–0.59 ms in the declared debug two-node receiver.
+[established-bounded; implemented-exact, measured] AS1–AS3 returned the local rational phase
+foundation on Apple Metal: exact formation/circulation/rechart, complete persistence and public
+continuation. The [implementation record](research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md)
+retains 28 engine phase tests, six mount ownership tests, 20 public native tests and four
+separate-process tests. This does not claim every native owner is ported to Apple.
 
-[established-bounded; measured] AS4 completed a 220,500-sample real WAV, generated and played
-actual native emissions, and inspected nine chronology/polarity controls through one fixed
-receiver. AS5 supplies capture/playback apparatus, verified speaker completion/interruption,
-and a complete 105,440-sample LibriSpeech occurrence followed by 113 transcript bytes through
-one persisted ecology. Brandon substituted curated Hugging Face WAVs for the microphone
-experiment; no microphone capture occurred. Installed material is 2,000 ESC-50 WAVs and a
-100-clip LibriSpeech subset, retained locally outside Git. The [acoustic guide](docs/ACOUSTIC_EXPERIMENTS.md)
-gives runnable public commands.
+[open] AS4 is partial and AS5 remains open. The two-junction PCM/feedback application, fixed
+sonification, one-WAV-then-transcript experiment and speaker lifecycle checks are apparatus/probe
+returns. They have not produced a corpus-cultivated acoustic or conversational English model,
+useful recognition/synthesis, or real-time native audio. The
+[completion correction](research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md)
+withdraws the earlier AS1–AS5 completion claim while retaining the actual Apple foundation.
 
-[open] The completed branch establishes the bounded phase and digital exposure foundation,
-not real-time audio throughput, calibrated room coupling, broader inherited operator support,
-or useful speech recognition/generation. The Linux/CUDA runtime was source-reviewed but not
-rerun on this Mac. These returns do not establish desktop Athena-alpha.
+[project-postulate] Brandon's latest clarification requires recorded conversational and English
+audio as development material. His curated-data instruction replaces the proposed microphone
+sample, not the intended product. Microphone access is not a prerequisite for corpus development,
+real-time processing, recognition or synthesis. Continue AS4–AS5 using source-qualified recorded
+material and the same native recurrence; personal samples are optional later adaptation/device
+checks. The desktop Athena-alpha campaign and private conversation data remain independent.
+
+[established-bounded; measured] Local data comprise 2,000 ESC-50 WAVs and a 100-clip LibriSpeech
+subset, outside Git. The measured examples processed a small selection, not the downloaded
+corpora. A five-second sound continuation took 299.47 s including cold publication and produced
+a 465,125,473-byte checkpoint. These expose execution/storage work; they are not real-time
+performance. The [acoustic guide](docs/ACOUSTIC_EXPERIMENTS.md) documents the existing probe commands.
 
 ## Current HNA direction
 

@@ -6,6 +6,14 @@ root construction state records current implementation scope. Paths in code span
 
 ## Capability and retraction record
 
+[historical] September 6 Apple/audio completion correction: `af2bb8fe`'s AS1–AS5 closure is
+withdrawn as completion of the intended conversational audio work. AS1–AS3's bounded Metal phase
+foundation stands. AS4–AS5's two-junction signal controls, sonification, WAV-then-byte exposure
+and device lifecycle are retained as probes/apparatus; they do not establish a cultivated speech
+or conversational model. Curated data did not narrow the requested outcome, and microphone
+access is not a prerequisite for real-time processing or useful speech. See the
+[correction](../research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md).
+
 [project-postulate] Brandon's September 6 ruling states that Athena-alpha has never been
 attained by his product standard. Historical alpha filenames, type names and campaign completion
 claims retain only their explicitly demonstrated apparatus/model-material scopes. The

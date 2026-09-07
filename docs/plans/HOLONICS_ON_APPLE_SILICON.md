@@ -15,6 +15,12 @@ Sound has temporal, phase, source and receiver structure before a transcript exi
 later acoustic/text application, not the definition of perception or a prerequisite for learning.
 The wider multimodal direction composes situated charts and actual interactions in one ecology.
 
+[project-postulate] Brandon's subsequent clarification requires audio data based on conversations
+and English communication, and rejects closing this work on toy signal/application examples.
+Use suitably broad recorded speech and conversational material to develop the native capability.
+A few personal microphone recordings cannot establish that general capability. Microphone
+access is not a prerequisite for real-time processing, recognition, synthesis or corpus work.
+
 [definition] The desktop session continues Athena-alpha cultivation against its private
 conversation material. This Mac branch develops apparatus and acoustic interfaces independently.
 It does not move that dataset, recreate cultivation, resume inherited-first production, or change
@@ -158,9 +164,10 @@ format conversion is an exterior codec with declared loss. Backpressure must pre
 input/output or report a gap; it cannot silently skip a committed occurrence.
 
 [definition] Brandon subsequently replaces the proposed microphone experiment with curated
-Hugging Face WAV material. AS5 therefore verifies recorded sound, actual speaker playback and
-curated speech/text exposure. The capture application remains available; no microphone or room
-path measurement is required or claimed by this return.
+Hugging Face WAV material. This changes input acquisition, not the intended acoustic/English
+communication outcome. Recorded audio supplies development material and timestamped streaming
+tests; capture/playback remains an application boundary. Physical room measurements apply only
+to claims about that room/device path and are not prerequisites for the software capabilities.
 
 [definition] Full duplex is one ecology receiving ordinary later occurrences during output.
 An emitted sound and a microphone's later reception have a caused interaction when the physical
@@ -184,8 +191,8 @@ or generation. Images and other sensors later reuse the same contact/clock/recur
 | AS1 — native device boundary | Factor/gate the existing CUDA closure, compile the public native host interface on macOS, and expose precise unsupported operations until implemented. Check changed Rust owners and the preserved Linux/CUDA path. |
 | AS2 — resident Apple phase ecology | Conduct formation, circulation and rechart with exact carriers, full source/frame/fibre and one atomic successor. Compare complete declared returns against existing exact reference/CUDA evidence, including old sources after rechart, open/plural readings, overflow and failure recovery. |
 | AS3 — public continuation | Run native-session and its independent wave-control application on this Mac; preserve checkpoints, stream cursors and pending output through process restart without replay. Measure actual costs on the M1 Pro. |
-| AS4 — offline acoustic composition | Attach real PCM material and actual native outward current through the existing owners; inspect perception consequences, generated WAVs and continuing development. Retain source/receiver and projection differences. |
-| AS5 — sound apparatus, then speech | Add explicit capture/playback chronology, interruption and gap handling; use curated WAVs in place of the proposed microphone experiment under Brandon’s later ruling, and verify speaker playback. Inspect products and retained continuation, then extend to speech/text exposure through declared actual digital interactions. |
+| AS4 — offline acoustic composition | Compose recorded acoustic corpora through existing native owners, retaining development across distinct recordings. Establish usable sound perception/production and inspect actual products and source/receiver differences. PCM ingress, a two-node signal probe and fixed sonification alone do not complete this stage. |
+| AS5 — sound apparatus, then English communication | Retain capture/playback and stream chronology, interruption and gaps. Develop native speech/language conduct from recorded English and conversational audio with actual source, speaker, turn and temporal relations; produce and inspect useful recognition, generation and conversational behavior. Measure streaming latency/throughput with recorded streams. Microphone capture is optional device-path work; serial WAV-then-byte exposure is an initial probe. |
 
 [definition] A relevant check answers its claimed boundary. Arithmetic parity is not lifecycle
 parity; lifecycle parity is not sound perception; audible output is not speech competence. When
@@ -204,13 +211,19 @@ position with an older Mac snapshot. Do not merge this branch into `main` as par
 not a Git branch name or export receipt. Any later private-data transfer is separate from this
 source branch and retains provenance. No private conversation transfer is necessary for AS0–AS3.
 
-## Returned implementation
+## Returned implementation and remaining work
 
 [established-bounded; implemented-exact, measured] The
 [September 6 implementation record](../../research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md)
-returns AS1–AS5 at the scopes above, with the later curated-data substitution. Production uses
-direct Metal/Rust ownership; MLX remains optional apparatus. The phase foundation and process
-continuation are checked, sound/chronology/polarity products are retained and inspected, and
-speech/text exposure continues through the same persisted ecology. The
-[acoustic guide](../ACOUSTIC_EXPERIMENTS.md) gives the public commands. Neither a real-time
-sound engine nor useful speech recognition/synthesis is inferred from these experiments.
+returns AS1–AS3's bounded Metal phase foundation and initial AS4–AS5 apparatus/probes. Production
+uses direct Metal/Rust ownership; MLX remains optional apparatus. Exact phase conduct and public
+process continuation stand at their measured scopes.
+
+[open] AS4–AS5 remain unfinished under the
+[completion correction](../../research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md).
+The current applications require a fresh seed for each WAV/text experiment and resume only
+that saved experiment. Compose new recordings and conversational turns into one continuing
+cultivated ecology, reuse/extend the actual native material and receiver owners for sound and
+English communication, and improve execution/storage for measured streaming conduct. The
+[acoustic guide](../ACOUSTIC_EXPERIMENTS.md) documents the existing probe interfaces. More data
+alone does not supply these missing compositions; microphone access supplies none of them.

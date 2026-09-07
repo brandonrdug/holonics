@@ -6,6 +6,13 @@ direct instruction substitutes curated Hugging Face WAV material for the propose
 recording. The branch is `codex/apple-silicon`, following setup commit `2329a539`; the implementation
 revision is the commit containing this record. The desktop Athena-alpha position is independent.
 
+[historical] Completion status corrected after Brandon's follow-up: AS1–AS3's bounded phase
+foundation stands; AS4–AS5 are partial apparatus/application probes and do not complete the
+intended conversational audio work. See the
+[correction](2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md).
+The source and measurements below retain their actual scopes. Microphone access is not a
+prerequisite for the remaining corpus, streaming, recognition or synthesis work.
+
 ## Device and exact native operation
 
 [established-bounded; implemented-exact] The current public phase session runs on the M1 Pro GPU
@@ -181,12 +188,12 @@ scheduling and observed process intervals. They do not assert DAC calibration. C
 change and gap handling are implemented; actual microphone capture was replaced by curated data
 under Brandon's instruction and was not performed.
 
-[established-bounded; implemented-exact, measured] AS1–AS3 return the bounded Apple phase
-foundation; AS4 returns the offline sound attachment and generated/inspected products; AS5
-returns sound apparatus, actual speaker playback and curated sound/text exposure under the
-later dataset substitution. This closes the specified experimental sequence at these scopes.
-Broader native operators, real-time acoustic throughput, physical room coupling and useful
-speech competence remain distinct work, not conclusions of these returns.
+[historical] The original conclusion promoted these AS4–AS5 application probes into completion
+of the requested sequence. That promotion is withdrawn. AS1–AS3 return the bounded Apple phase
+foundation; the offline sound attachment, sonification, speaker lifecycle and serial sound/text
+exposure are partial AS4–AS5 work. Corpus-based acoustic and English conversational capability
+and measured real-time processing remain within the authorized objective. They do not depend
+on personal microphone recordings. Physical room coupling has its own optional measurement scope.
 
 ## Verification apparatus
 

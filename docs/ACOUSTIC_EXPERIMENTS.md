@@ -5,6 +5,14 @@ recurrence. It retains the WAV bytes, complete `ExactAcousticOccurrence`, sample
 native return, pending input and one native checkpoint. Labels and transcripts do not enter the
 sound-current interface. The [Apple plan](plans/HOLONICS_ON_APPLE_SILICON.md) governs scope.
 
+[open] This guide documents application probes. AS4–AS5 are not complete: the current two-node
+specimen and fixed sonification have not learned sound or English communication from a corpus.
+The [status correction](../research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md)
+retains the working apparatus and names the missing returns. Recorded conversational/English
+audio is the development material; microphone recording is not a prerequisite. Each current
+`run` founds a seed, and `resume` continues that retained WAV/text experiment; neither command
+yet adds a new conversation to a continuing corpus-cultivated model.
+
 ## Digital contact and return
 
 [definition] At sample ordinal `n` and exact time `n / sample_rate`, PCM codeword `s[n]` enters
