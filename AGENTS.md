@@ -55,8 +55,12 @@ now supplies that shared primitive and port boundary. Mac work can re-engage on 
 acoustic generator studies. The [condition Preimage Fibre](research/records/2026-09-07_AC1_THE_LEARNED_ACTION_RETURNS_ITS_CONDITION_PREIMAGE_FIBRE.md)
 now infers compatible conditions from actual source/return currents, and the
 [joint-family return](research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md)
-transports/refines those families with their domain. Desktop construction next binds an actual
-retained condition current and native contact response, then the conversation attachment.
+transports/refines those families with their domain. The
+[retained-current contact](research/records/2026-09-07_AC1_THE_RETAINED_CONDITION_CURRENT_MEETS_ITS_PREIMAGE_FIBRE.md)
+now has its explicit metric and native two-port response. Desktop construction next composes
+actual field source/condition incidence and producing-law chronology with that current and
+conversation reception. Retain the carriers used to produce each prediction; later condition
+inference changes the successor rather than rewriting that prediction's history.
 Whole-family evidence is not a universal certainty gate on generation. Neither full model is complete.
 
 [project-postulate] Brandon's September 6 synthesis ruling records Athena-alpha as planned but

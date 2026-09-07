@@ -75,6 +75,15 @@ kernel now accepts an optional coverage guard. Port these contracts with the exa
 Metal scratch layout; a fixed output on a strict supported subset must not be published as a
 whole-family result. The updated public example supplies the observation/refinement cycle.
 
+[established-bounded; measured] The [retained-current extension](../research/records/2026-09-07_AC1_THE_RETAINED_CONDITION_CURRENT_MEETS_ITS_PREIMAGE_FIBRE.md)
+adds `section_constitutive_condition_current_found` and `section_constitutive_condition_contact`.
+The shared Rust owner carries an explicit unit-admittance metric, actual successor, both normal
+ports and full difference. All 114 constitutive tests and the public continuing-current example
+pass on CUDA. The contact uses `9*C*sizeof(W)` scratch
+and the existing exact elimination helpers on a temporary relation of width `2C`; Metal must use
+its own wide layout. Empty condition evidence preserves actual standing. Complete staged
+publication and immutable family sharing are part of the port, not optional host behavior.
+
 [established-bounded; source-inspected] The public framework enters through
 [`holonics::hna`](../crates/holonics/src/lib.rs). Its native session is exposed by
 [`with_native_session`](NATIVE_HNA.md), while the earlier inherited operator retains a

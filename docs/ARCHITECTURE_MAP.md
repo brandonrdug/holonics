@@ -58,7 +58,15 @@ source occurrences.
 condition/output transport, both projections, domain coverage/witnesses and later reception.
 The [family-cycle return](../research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md)
 retains correlations and producing-law chronology while a complete-domain fixed output conducts.
-Actual condition-current realization and conversation coupling remain open.
+Conversation coupling remains open.
+
+[established-bounded; measured] `resident/condition_contact.rs` packages the actual
+`ResidentConditionCurrent` and immutable full contact return. The
+[contact and continuing-current return](../research/records/2026-09-07_AC1_THE_RETAINED_CONDITION_CURRENT_MEETS_ITS_PREIMAGE_FIBRE.md)
+binds `constitutive_condition_contact.cuh` through `surface_condition.rs`. Existing exact row
+elimination realizes the declared metric projection, and the equal-admittance two-port law
+preserves free current and returns both normal ports. Staged publication keeps the predecessor
+usable on arithmetic refusal. This is a condition-current port, not a separate learner.
 
 [established-bounded; measured] `native_ecology/constitutive_fibre/resident.rs` now owns borrowed
 resident rational-current input and immutable original-fibre returns for the existing local

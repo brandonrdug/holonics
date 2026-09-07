@@ -2,6 +2,80 @@ use super::*;
 use crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent;
 
 impl<'chart> ResidentSurface<'chart> {
+    /// Stage a retained condition current, or its unit-admittance affine contact. Neither
+    /// kernel mutates the supplied current or family. The caller owns successor publication.
+    pub(crate) fn record_condition_contact(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        current: ResidentConstitutiveCurrent<'_, 'chart>,
+        family: Option<(&ResidentSection<'chart>, usize, &ResidentSection<'chart>)>,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        self.validate_constitutive_current_view(current)?;
+        let fail = || ResidentRefusal::Declaration {
+            operation: "condition-contact",
+            what: "incompatible condition current, affine family or contact aperture".into(),
+        };
+        let c = current.width;
+        let k = c.checked_mul(2).ok_or_else(fail)?;
+        let out = c
+            .checked_mul(5)
+            .and_then(|n| n.checked_add(2))
+            .ok_or_else(fail)?;
+        let shape = |s: &ResidentSection<'chart>, rows: usize, width: usize| {
+            s.rows == rows && s.width == width && s.grain.0 == 0 && std::ptr::eq(s.surface, self)
+        };
+        if c == 0 || c % 2 != 0 || out > u32::MAX as usize || !shape(output, 1, out) {
+            return Err(fail());
+        }
+        let mut p = Params::new();
+        p.ptr(current.section.lo.device_ptr())
+            .ptr(current.section.hi.device_ptr())
+            .u32(current.offset as u32)
+            .u32(current.denominator.map_or(u32::MAX, |n| n as u32))
+            .u32(current.disposition.map_or(u32::MAX, |n| n as u32));
+        let (kernel, shared) = if let Some((f, ps, graph)) = family {
+            let fw = ps
+                .checked_add(c)
+                .and_then(|n| n.checked_add(4))
+                .and_then(|n| n.checked_add(c.checked_mul(c)?))
+                .ok_or_else(fail)?;
+            if ps == 0 || fw > u32::MAX as usize || !shape(f, 1, fw) || !shape(graph, k, k) {
+                return Err(fail());
+            }
+            let shared = c
+                .checked_mul(9 * 16)
+                .and_then(|n| u32::try_from(n).ok())
+                .filter(|n| *n <= self.declaration.max_sectiond_bytes)
+                .ok_or_else(fail)?;
+            p.ptr(f.lo.device_ptr())
+                .ptr(f.hi.device_ptr())
+                .u32(ps as u32)
+                .u32(c as u32)
+                .ptr(graph.lo.device_ptr())
+                .ptr(graph.hi.device_ptr());
+            ("section_constitutive_condition_contact", shared)
+        } else {
+            p.u32(c as u32);
+            ("section_constitutive_condition_current_found", 0)
+        };
+        p.ptr(output.lo.device_ptr())
+            .ptr(output.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            kernel,
+            1,
+            self.declaration.warp_size.max(1),
+            shared,
+            &mut p,
+            "condition-contact",
+        )
+    }
+
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn record_condition_image(
         &self,

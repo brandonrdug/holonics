@@ -49,12 +49,20 @@ relation. The public cycle predicts a new native current after that refinement, 
 numerical readback. The 107-test native suite, an additional translated-domain control and the
 public codec control pass.
 
-[open] Next bind an actual retained condition current and its native response to inferred
-families, preserving undetermined prior current and returned differences in one successor.
-Whole-family evidence receivers are not a universal certainty gate on model generation. The
-actual current must follow an explicit native contact law, not an arbitrary particular solution.
-Then bind the continuing owner to conversation material. Athena-alpha still has no useful text
-response; the full AC0–AC5 goal remains unfinished.
+[established-bounded; measured] The [retained condition contact](research/records/2026-09-07_AC1_THE_RETAINED_CONDITION_CURRENT_MEETS_ITS_PREIMAGE_FIBRE.md)
+now implements the declared unit-admittance two-port law on the device. It preserves actual
+current in a compatible family's free directions and returns the incoming/returned normal current
+and full difference. All 114 constitutive tests pass, including six new phase/contact controls.
+The public example generates while the condition family is free, receives an actual return,
+then changes its retained current and predicts a later native field response exactly. The contact
+and later generation require no numerical host readback. Conversation capability remains open.
+
+[open] Next compose the continuing condition current with actual field source/condition incidence,
+producing-law chronology and conversation reception. Whole-family evidence receivers are not a
+universal certainty gate on model generation. Retain the carriers used for each prediction;
+later condition inference changes the successor rather than rewriting its history. Bind that native
+owner through the existing conversation exposure/session interface. Athena-alpha still has no
+useful text response; the full AC0–AC5 goal remains unfinished.
 
 [established-bounded; measured] The existing local relation now has a
 [resident rational-current port](research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md).

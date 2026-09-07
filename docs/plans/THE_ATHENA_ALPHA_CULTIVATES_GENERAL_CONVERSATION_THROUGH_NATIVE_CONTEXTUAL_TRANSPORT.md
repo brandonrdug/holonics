@@ -234,13 +234,20 @@ now returns on device, with the supported domain, output projection, complete jo
 unsupported-domain witnesses. A later actual observation refines the same producing relation.
 Fixed outputs and receiver faces can conduct while the condition remains plural.
 
-[definition] Next bind an actual retained condition current and its reaction to an inferred
-family through the existing native current/contact discipline. The reaction must preserve prior
-current in undetermined directions, carry its full returned difference and publish one successor.
-Derive the actual contact law and frame/metric before claiming that implementation. This native
-generative current is not an arbitrary affine particular solution, and whole-family evidence
-receivers do not universally define whether the body may generate. Bind the continuing owner to
-actual conversation material, without a source-ID switch or authored semantic selector.
+[established-bounded; measured] The [actual condition-current contact](../../research/records/2026-09-07_AC1_THE_RETAINED_CONDITION_CURRENT_MEETS_ITS_PREIMAGE_FIBRE.md)
+now gives that continuing current an explicit unit-admittance two-port law. It retains the prior
+current in free directions, carries the incoming and returned normal currents and full difference,
+and publishes one successor after complete native success. All 114 constitutive tests and the
+public continuing-current example pass. Its metric is declared, and a general frame change
+owes metric transport. No conversation capability follows from this local return alone.
+
+[definition] Next compose actual field source/condition incidence and producing-law chronology
+with reception and this retained current, then bind the existing conversation exposure/session
+interface. Retain the carriers used to produce each prediction; later inference changes the
+successor rather than rewriting that prediction's history. Generative standing is not an arbitrary
+affine particular solution, and whole-family
+evidence receivers do not universally define whether the body may generate. No source-ID switch
+or authored semantic selector supplies the attachment.
 
 [established-bounded; measured] The [native field relation port](../../research/records/2026-09-07_AC1_THE_FIELD_RETURNS_A_RESIDENT_RELATION_FACE_AND_A_PLURAL_FIBRE_HAS_FIXED_RECEIVERS.md)
 now returns resident currents/fibres at historical sources through their actual frames, and a
