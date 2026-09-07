@@ -16,6 +16,7 @@ use crate::dimensional_wave::ExactComplexWaveCurrent;
 use std::rc::Rc;
 
 mod junction;
+mod material_transport;
 mod receiver;
 mod rechart;
 pub use junction::{
@@ -24,6 +25,11 @@ pub use junction::{
     NativeFieldJunctionRepresentation, NativeFieldJunctionSolver,
 };
 use junction::{PairedJunction, PendingJunction};
+use material_transport::{MaterialTransport, PendingMaterialTransport};
+pub use material_transport::{
+    NativeFieldExactMaterialTransport, NativeFieldMaterialTransportReading,
+    NativeFieldMaterialTransportResidual, NativeFieldMaterialTransportState,
+};
 pub use receiver::NativeFieldDifferentialReading;
 
 /// One actual emitted source from this live body. It is linear; the caller cannot manufacture
@@ -168,6 +174,7 @@ struct HeldField<'chart> {
     frame: Rc<HeldCurrentFrame<'chart>>,
     returned: bool,
     junction: Option<Rc<ResidentSection<'chart>>>,
+    transport: Option<Rc<ResidentSection<'chart>>>,
 }
 
 /// One move owner for phase standing, the same local relation accumulator, and its actual
@@ -186,6 +193,8 @@ pub struct NativeConstitutiveField<'chart> {
     pending: Option<HeldField<'chart>>,
     junction: Option<PairedJunction<'chart>>,
     pending_junction: Option<PendingJunction<'chart>>,
+    transport: Option<MaterialTransport<'chart>>,
+    pending_transport: Option<PendingMaterialTransport<'chart>>,
 }
 
 impl<'chart> NativeConstitutiveField<'chart> {
@@ -259,6 +268,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
             pending: None,
             junction: None,
             pending_junction: None,
+            transport: None,
+            pending_transport: None,
         })
     }
 
@@ -582,6 +593,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .ok_or(ConstitutiveFibreError::Shape)?;
         let output = surface.fresh_section(1, output_width, ResidentGrain(0))?;
         let prepared = self.prepare_junction()?;
+        let prepared_transport = self.prepare_material_transport()?;
         let mut passage = surface.begin_passage(&[vec![]])?;
         {
             let lane = passage.open(0, &[])?;
@@ -607,6 +619,18 @@ impl<'chart> NativeConstitutiveField<'chart> {
                             old.kernel(),
                         )
                     }),
+                self.transport
+                    .as_mut()
+                    .zip(prepared_transport.as_ref())
+                    .map(|(old, next)| {
+                        (
+                            &mut old.state,
+                            source_at.and_then(|i| self.history[i].junction.as_deref()),
+                            source_at.and_then(|i| self.history[i].transport.as_deref()),
+                            &next.delta,
+                            next.report.as_ref(),
+                        )
+                    }),
                 at as u64,
                 &output,
             )?;
@@ -619,18 +643,23 @@ impl<'chart> NativeConstitutiveField<'chart> {
             frame: Rc::clone(&self.frame),
             returned: false,
             junction: prepared.as_ref().map(|(next, _)| Rc::clone(&next.report)),
+            transport: prepared_transport
+                .as_ref()
+                .map(|next| Rc::clone(&next.report)),
         });
         let (pending_junction, junction_scratch) = match prepared {
             Some((next, scratch)) => (Some(next), Some(scratch)),
             None => (None, None),
         };
         self.pending_junction = pending_junction;
+        self.pending_transport = prepared_transport;
         self.relation.usable = false;
         let launched = passage.launch()?;
         drop(junction_scratch);
         if !launched.obstruction.is_empty() {
             self.pending = None;
             self.pending_junction = None;
+            self.pending_transport = None;
             self.relation.usable = true;
             return Err(ConstitutiveFibreError::Arithmetic(format!(
                 "{:?}",
@@ -660,6 +689,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             });
         }
         self.relation.occurrences = next;
+        self.pending_transport = None;
         self.relation.usable = true;
         Ok((
             NativeFieldContinuation {

@@ -244,12 +244,13 @@ of `d`, interrupted without completion; consecutive native currents remain disti
 inspection of actual emitted material and preserves a concrete failed response. Useful text-codec
 conduct and AC2 completion are unestablished.
 
-[definition] The [next material transport](../../research/records/2026-09-07_AC1_THE_BALANCED_FACTOR_RETURNS_THE_FULL_CURRENT_AND_THE_CODEC_OWES_ITS_OWN_TRANSPORT.md)
+[definition] The [material transport](../../research/records/2026-09-07_AC2_THE_RETAINED_CONTEXT_RECEIVES_A_NATIVE_MATERIAL_TRANSPORT.md)
 uses the complete retained contextual outgoing field as its source. Its actual returned
 difference and chronological co-current remain separate; the native parameter return uses the
-producing source and declared metrics. Implement this binding inside the same native owner,
-with full arithmetic residuals and coefficient reconstruction, before claiming a learned codec.
-The checked balanced solver reduces numerical work while keeping the full current law intact.
+producing source and declared metrics. Its native implementation retains full arithmetic defects
+and an exact coefficient decoder in that same owner. Broader cultivation and useful text conduct
+remain required; its first four-family return emits no text and reports reserved codeword 373.
+The checked balanced solver reduces encoder work while keeping its current law intact.
 
 [definition] Make the same changing ecology conduct inscription, contextual recurrence and
 text emission at the supported grains. Reuse native reconstruction and receiver-history owners;

@@ -71,6 +71,7 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/paired_field_junction.cuh");
     println!("cargo:rerun-if-changed=kernels/enclosed_field_junction.cuh");
     println!("cargo:rerun-if-changed=kernels/balanced_field_factorization.cuh");
+    println!("cargo:rerun-if-changed=kernels/field_material_transport.cuh");
     println!("cargo:rerun-if-changed=kernels/field_differential_receiver.cuh");
     println!("cargo:rerun-if-changed=kernels/exact_quartic_realizers.cu");
     println!("cargo:rerun-if-changed=kernels/exact_eta_head.cu");

@@ -8,12 +8,13 @@ extern "C" __global__ void section_field_differential_receiver(
 ) {
     if (blockIdx.x || threadIdx.x) return;
     if (upstream_refused(census, lineage, lineage_count, slot)) return;
-    if (!dimension || (dimension & 1u) || (mode != 1u && mode != 2u) || !pairs || pairs > 63u
+    if (!dimension || (dimension & 1u) || (mode < 1u || mode > 3u) || !pairs || pairs > 63u
         || first_complex > dimension / 2u || 2u * pairs > dimension / 2u - first_complex) {
         atomicOr(slot, REFUSED_MALFORMED); return;
     }
     const uint64_t stride = (uint64_t)dimension + 1u;
-    const uint64_t words = (mode == 1u ? 4u : 12u) * stride;
+    const uint64_t words = mode == 3u ? 18u * (uint64_t)dimension + 24u : (mode == 1u ? 4u : 12u) * stride;
+    const uint64_t start = mode == 3u ? 0u : stride;
     for (uint64_t i = 0; i < words; ++i) {
         if (report_lo[i] != report_hi[i]) { atomicOr(slot, REFUSED_MALFORMED); return; }
     }
@@ -21,7 +22,7 @@ extern "C" __global__ void section_field_differential_receiver(
     if (mode == 1u) {
         if (report_lo[stride + dimension] <= 0) { atomicOr(slot, REFUSED_MALFORMED); return; }
     } else {
-        radius = ((const wide *)report_lo)[stride + dimension];
+        radius = ((const wide *)report_lo)[start + dimension];
         if (radius < 0) { atomicOr(slot, REFUSED_MALFORMED); return; }
     }
     uwide error_hi, error_lo;
@@ -31,7 +32,7 @@ extern "C" __global__ void section_field_differential_receiver(
     error_lo <<= 1;
     uint64_t positive = 0, negative = 0, unresolved = 0, exact_zero = 0;
     for (uint32_t bit = 0; bit < pairs; ++bit) {
-        const uint64_t left_at = stride + 2u * ((uint64_t)first_complex + 2u * bit);
+        const uint64_t left_at = start + 2u * ((uint64_t)first_complex + 2u * bit);
         wide left, right;
         if (mode == 1u) {
             left = (wide)report_lo[left_at];

@@ -273,7 +273,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         Ok(self.decode_junction_residual_trace(occurrence)?.pop())
     }
 
-    fn decode_junction_residual_trace(
+    pub(in super::super) fn decode_junction_residual_trace(
         &self,
         until: usize,
     ) -> Result<Vec<NativeFieldExactJunctionReading>, ConstitutiveFibreError> {

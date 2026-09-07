@@ -86,11 +86,14 @@ pub fn read_text_symbol(
             "text codec requires its declared 18-channel chart".into(),
         ));
     }
-    let native = field
-        .read_differential_pairs(occurrence, 2 * field.nodes(), TEXT_BIT_PAIRS)?
-        .ok_or_else(|| {
-            AlphaMaterialError::Apparatus("text codec requires a junction outgoing current".into())
-        })?;
+    let native = (if field.has_material_transport() {
+        field.read_material_transport_pairs(occurrence, TEXT_BIT_PAIRS)?
+    } else {
+        field.read_differential_pairs(occurrence, 2 * field.nodes(), TEXT_BIT_PAIRS)?
+    })
+    .ok_or_else(|| {
+        AlphaMaterialError::Apparatus("text codec requires a junction outgoing current".into())
+    })?;
     let disposition = if native.unresolved != 0 {
         TextCodeDisposition::Open
     } else {
@@ -112,6 +115,7 @@ pub fn with_text_field<R>(
 ) -> Result<R, AlphaMaterialError> {
     with_matched_field_profile(TEXT_INPUT_CHANNELS, true, Some(fractional_bits), |field| {
         field.set_junction_solver(NativeFieldJunctionSolver::BalancedPairs)?;
+        field.enable_material_transport()?;
         operation(field)
     })
 }

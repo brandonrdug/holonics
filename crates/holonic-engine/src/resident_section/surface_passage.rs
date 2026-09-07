@@ -11,10 +11,11 @@ impl<'chart> ResidentSurface<'chart> {
         let fail = || ResidentRefusal::Declaration {
             operation: "field-differential-receiver", what: "incompatible receiver chart".into(),
         };
-        let words = dimension.checked_add(1)
-            .and_then(|n| n.checked_mul(if mode == 1 { 4 } else { 12 })).ok_or_else(fail)?;
+        let words = if mode == 3 {
+            dimension.checked_mul(18).and_then(|n| n.checked_add(24))
+        } else { dimension.checked_add(1).and_then(|n| n.checked_mul(if mode == 1 { 4 } else { 12 })) }.ok_or_else(fail)?;
         if dimension == 0 || dimension % 2 != 0 || dimension > u32::MAX as usize
-            || !(1..=2).contains(&mode) || !(1..=63).contains(&pairs)
+            || !(1..=3).contains(&mode) || !(1..=63).contains(&pairs)
             || first_complex.checked_add(2 * pairs).is_none_or(|end| end > dimension / 2)
             || report.rows != 1 || report.width != words || report.grain.0 != 0
             || output.rows != 1 || output.width != 4 || output.grain.0 != 0 {
@@ -39,6 +40,8 @@ impl<'chart> ResidentSurface<'chart> {
         frame: &ResidentSection<'chart>, origin_frame: Option<&ResidentSection<'chart>>,
         junction: Option<(&ResidentSection<'chart>, &ResidentSection<'chart>,
             &ResidentSection<'chart>, &ResidentSection<'chart>, &ResidentSection<'chart>, (u32, u32))>,
+        transport: Option<(&mut ResidentSection<'chart>, Option<&ResidentSection<'chart>>,
+            Option<&ResidentSection<'chart>>, &ResidentSection<'chart>, &ResidentSection<'chart>)>,
         occurrence: u64,
         output: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
@@ -76,6 +79,21 @@ impl<'chart> ResidentSurface<'chart> {
                 return Err(fail("incompatible paired junction charts"));
             }
         }
+        if let Some((state, source_current, source_forward, delta, report)) = &transport {
+            let state_words = nodes.checked_mul(nodes).and_then(|n| n.checked_mul(6))
+                .and_then(|n| n.checked_add(1)).and_then(|n| n.checked_mul(2))
+                .ok_or_else(|| fail("material transport matrix extent overflow"))?;
+            let report_words = nodes.checked_mul(36).and_then(|n| n.checked_add(24))
+                .ok_or_else(|| fail("material transport report extent overflow"))?;
+            let enclosed = junction.is_some_and(|(_,_,_,_,_,(mode,_))| mode != 1);
+            if !enclosed || !matches(state, 1, state_words) || !matches(delta, 1, state_words)
+                || !matches(report, 1, report_words)
+                || source_current.is_some() != origin.is_some() || source_forward.is_some() != origin.is_some()
+                || source_current.is_some_and(|s| !matches(s, 1, 12 * (width + 1)))
+                || source_forward.is_some_and(|s| !matches(s, 1, report_words)) {
+                return Err(fail("incompatible contextual material transport"));
+            }
+        }
         let shared = nodes.checked_mul(24).and_then(|v| v.checked_mul(16))
             .and_then(|v| u32::try_from(v).ok())
             .filter(|v| *v <= self.declaration.max_sectiond_bytes)
@@ -93,6 +111,16 @@ impl<'chart> ResidentSurface<'chart> {
                 .ptr(next_report.lo.device_ptr()).ptr(next_report.hi.device_ptr()).ptr(workspace.lo.device_ptr());
         } else {
             for _ in 0..7 { params.ptr(0); }
+        }
+        params.u32(u32::from(transport.is_some()));
+        if let Some((state, source_current, source_forward, delta, report)) = transport {
+            params.ptr(state.lo.device_ptr()).ptr(state.hi.device_ptr())
+                .ptr(source_current.map_or(0, |s| s.lo.device_ptr()))
+                .ptr(source_forward.map_or(0, |s| s.lo.device_ptr()))
+                .ptr(delta.lo.device_ptr()).ptr(delta.hi.device_ptr())
+                .ptr(report.lo.device_ptr()).ptr(report.hi.device_ptr());
+        } else {
+            for _ in 0..8 { params.ptr(0); }
         }
         params.ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
             .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);

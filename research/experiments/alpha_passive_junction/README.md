@@ -236,3 +236,28 @@ python3 research/experiments/alpha_passive_junction/inspect_balanced_text_return
   .local/artifacts/athena-alpha/ac2/first-text-return-v2.json \
   --output .local/artifacts/athena-alpha/ac2/new-balanced-certificate.json
 ```
+
+## Native material transport
+
+[established-bounded; computational-witness, measured] `inspect_material_transport.py` checks
+the first native learned-transport run: all encoder residuals/bounds, every retained source-time
+and contemporary field, oriented return, gain, numerical delta, coefficient bound and fresh
+forward field. It reconstructs the final coefficient matrix from the native update factors.
+Its first 794-operation certificate passes; the material receiver returns reserved word 373
+without emitting text.
+
+[established-bounded; computational-witness, measured] `inspect_material_exposure.py` has the
+narrower scope used for the 64-family report, which did not request full coefficient history.
+It checks actual material and parent chronology, the full final contact moment, material-current
+receivers and self-returns. The output is `Dq~`, then reserved word 261. Neither observer runs a
+learner or grades this as useful language. The [native transport record](../../records/2026-09-07_AC2_THE_RETAINED_CONTEXT_RECEIVES_A_NATIVE_MATERIAL_TRANSPORT.md)
+retains the different verification scopes and outstanding product work.
+
+```sh
+python3 research/experiments/alpha_passive_junction/inspect_material_transport.py \
+  .local/artifacts/athena-alpha/ac2/first-learned-transport-v1.json \
+  --output .local/artifacts/athena-alpha/ac2/new-transport-certificate.json
+python3 research/experiments/alpha_passive_junction/inspect_material_exposure.py \
+  .local/artifacts/athena-alpha/ac2/learned-transport-64-families-v1.json \
+  --output .local/artifacts/athena-alpha/ac2/new-exposure-inspection.json
+```

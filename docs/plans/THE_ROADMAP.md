@@ -70,12 +70,14 @@ The scalar error bound for a continuous learned-source attachment is insufficien
 scope. AC1 and the full useful alpha product remain open; this byte return does not complete AC2.
 
 [definition] The [September 7 binding](../../research/records/2026-09-07_AC1_THE_BALANCED_FACTOR_RETURNS_THE_FULL_CURRENT_AND_THE_CODEC_OWES_ITS_OWN_TRANSPORT.md)
-keeps the complete native current under a checked balanced factorization. Next, compose the
-retained contextual current with an actual learned material transport, using the source-time
-forward carrier, its chronological change, the actual receiving difference and a staged native
-coercive return. Its numerical parameter error must remain bounded without turning an uncertain
-source into a point. Then inspect actual responses and continue broader development and
-persistence. The source-feedback experiments and numerical acceleration do not close the goal.
+keeps the complete native current under a checked balanced factorization. The
+[native material transport](../../research/records/2026-09-07_AC2_THE_RETAINED_CONTEXT_RECEIVES_A_NATIVE_MATERIAL_TRANSPORT.md)
+now receives the source-time contextual current and old forward field, retains the chronological
+change and actual returned difference, and stages its coercive parameter return with the encoder.
+Its first four-family run stops at a reserved codeword without a text response. Continue broader
+source-qualified development and inspect actual responses, while constructing durable retention
+of the cultivated owner. Preserve numerical error and complete defects; do not turn source
+uncertainty into a point. AC1–AC5 completion and the useful alpha product remain open.
 
 ## Completed September 6 synthesis before Athena-alpha cultivation
 

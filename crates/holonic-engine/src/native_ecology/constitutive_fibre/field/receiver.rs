@@ -42,6 +42,47 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .junction
             .as_ref()
             .ok_or(ConstitutiveFibreError::Uncertain)?;
+        self.read_differential_report(
+            report,
+            occurrence,
+            6 * self.nodes(),
+            representation.kernel().0,
+            first_complex,
+            pairs,
+        )
+        .map(Some)
+    }
+
+    /// The learned transport's native material current, observed without reading its coefficient
+    /// matrix or source field back to the host.
+    pub fn read_material_transport_pairs(
+        &self,
+        occurrence: usize,
+        pairs: usize,
+    ) -> Result<Option<NativeFieldDifferentialReading>, ConstitutiveFibreError> {
+        if !(1..=63).contains(&pairs) || 2 * pairs > self.nodes() {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let event = self
+            .history
+            .get(occurrence)
+            .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
+        let Some(report) = event.transport.as_ref() else {
+            return Ok(None);
+        };
+        self.read_differential_report(report, occurrence, 2 * self.nodes(), 3, 0, pairs)
+            .map(Some)
+    }
+
+    fn read_differential_report(
+        &self,
+        report: &ResidentSection<'chart>,
+        occurrence: usize,
+        dimension: usize,
+        mode: u32,
+        first_complex: usize,
+        pairs: usize,
+    ) -> Result<NativeFieldDifferentialReading, ConstitutiveFibreError> {
         let surface = self.relation.surface;
         let output = surface.fresh_section(1, 4, ResidentGrain(0))?;
         let mut passage = surface.begin_passage(&[vec![]])?;
@@ -50,8 +91,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
             surface.record_field_differential_receiver(
                 &lane,
                 report,
-                6 * self.nodes(),
-                representation.kernel().0,
+                dimension,
+                mode,
                 first_complex,
                 pairs,
                 &output,
@@ -82,7 +123,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         {
             return Err(ConstitutiveFibreError::Uncertain);
         }
-        Ok(Some(NativeFieldDifferentialReading {
+        Ok(NativeFieldDifferentialReading {
             occurrence,
             first_complex,
             pairs,
@@ -90,7 +131,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             negative,
             unresolved,
             exact_zero,
-        }))
+        })
     }
 }
 

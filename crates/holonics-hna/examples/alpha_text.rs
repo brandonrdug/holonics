@@ -35,6 +35,7 @@ fn cultivate(
 ) -> Result<(), AlphaMaterialError> {
     let mut anchors: BTreeMap<ExposureFamily, (NativeFieldSourceAnchor, usize)> = BTreeMap::new();
     let mut completed = 0;
+    let mut last_progress = Instant::now();
     while completed < families {
         let Some(frame) = reader.peek().map_err(exposure_error)? else {
             break;
@@ -89,6 +90,14 @@ fn cultivate(
                         json!({"symbol_index":symbol_index,"symbol":symbol,"error":error.to_string()}),
                     );
                     break;
+                }
+                if last_progress.elapsed().as_secs() >= 10 {
+                    eprintln!(
+                        "{}",
+                        json!({"phase":"development","families_completed":completed,
+                        "native_occurrences":session.field().occurrence_count()})
+                    );
+                    last_progress = Instant::now();
                 }
             }
             part_receipts.push(json!({"ordinal":part.ordinal,"pointer":part.pointer,"kind":part.kind,
@@ -157,6 +166,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let native_result = with_text_field(grain, |field| {
         let mut session = TextFieldSession::on(field)?;
         report["junction_solver"] = json!(session.field().junction_solver());
+        report["has_material_transport"] = json!(session.field().has_material_transport());
         let mut records = Vec::new();
         let start = Instant::now();
         let developed = cultivate(&mut reader, &mut session, families, &mut records);
@@ -203,7 +213,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "held":section(field.inspect_held()?),"relation":section(field.inspect_relation()?),
             "junction_covariance":field.inspect_junction_covariance()?.map(section),
             "final_junction":final_occurrence.map(|i| field.inspect_junction(i)).transpose()?.flatten().map(section),
-            "internal_current_enclosures":field.inspect_internal_current_enclosures()?});
+            "material_transport":field.inspect_material_transport_state()?,
+            "internal_current_enclosures":if inspect_all_currents { field.inspect_internal_current_enclosures()? } else { None }});
         // Only cold diagnostics copy numerical emission carriers. Product steps above read the
         // four differential masks and retain all junction reports on the device.
         let emitted_at = report["generation"]["readings"]
@@ -215,14 +226,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .collect::<Vec<_>>();
         let mut emission_currents = Vec::new();
         for at in emitted_at {
-            emission_currents
-                .push(json!({"occurrence":at,"junction":field.inspect_junction(at)?.map(section)}));
+            emission_currents.push(
+                json!({"occurrence":at,"junction":field.inspect_junction(at)?.map(section),
+                    "transport":field.inspect_material_transport_wire(at)?.map(section)}),
+            );
         }
         report["emission_current_history"] = json!(emission_currents);
         if inspect_all_currents {
             let mut history = Vec::new();
             for at in 0..field.occurrence_count() {
-                history.push(json!({"occurrence":at,"junction":field.inspect_junction(at)?.map(section)}));
+                history.push(
+                    json!({"occurrence":at,"junction":field.inspect_junction(at)?.map(section),
+                    "transport":field.inspect_material_transport_wire(at)?.map(section)}),
+                );
             }
             report["junction_history"] = json!(history);
         }

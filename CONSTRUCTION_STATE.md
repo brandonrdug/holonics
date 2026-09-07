@@ -86,7 +86,14 @@ wider contextual incidence and productive use of separating histories still need
 A cold continuous-source-feedback candidate is numerically sensitive; its unit-series refinement
 has only a numerical comparison so far. The next binding is a native returned-current transport
 from the retained contextual field to material, with old/current forward carriers and a
-nonexpansive parameter return; it is specified but not implemented.
+nonexpansive parameter return. The [native implementation](research/records/2026-09-07_AC2_THE_RETAINED_CONTEXT_RECEIVES_A_NATIVE_MATERIAL_TRANSPORT.md)
+and five transport controls now return, including different learned transports for equal raw
+endpoints with different retained currents and refusal after encoder staging. The first actual
+four-family run passes all 794 encoder/transport certificates but stops at reserved codeword 373;
+it emits no text. The subsequent 64-family run completes 18,476 developmental operations without
+refusal, then emits `Dq~` and stops at reserved codeword 261. Source/current inspection passes at
+its declared scope; the response remains unusable. Durable field/transport retention and lawful
+history placement are needed before further long cultivation can continue economically.
 Broader efficient cultivation, useful learned text conduct, durable native models and the full
 AC0–AC5 product remain open. The native current and the response quality retain separate grades.
 

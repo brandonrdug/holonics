@@ -87,11 +87,22 @@ enclosed-junction model checkpoint.
 ### Initial text-current application
 
 [definition] `alpha::text_codec` declares an 18-port, nine-pair chart for all octets and one
-end-of-part symbol. `read_differential_pairs` reads the junction's outgoing current on the device;
-it returns a sign only when the complete numerical ball lies in the corresponding half-space.
+end-of-part symbol. `read_material_transport_pairs` reads the learned material current on the
+device; `read_differential_pairs` remains available for the encoder's outgoing current. Both
+return a sign only when the complete numerical ball lies in the corresponding half-space.
 Unresolved signs and reserved codewords remain explicit. `read_text_symbol` supplies the exterior
 presentation without a grammar or response lookup. Full current and residual sections remain
 resident until an explicit cold diagnostic requests them.
+
+[definition] `enable_material_transport` adds zero coefficients before the first occurrence.
+The native update uses the complete contextual current and old forward field retained at the
+actual source. Its old returned difference, chronological change and contemporary difference
+remain separate. The field stages the parameter delta with the encoder reaction, then emits
+through the changed transport. `with_text_field` enables this component; it supplies no pretrained
+content or host learner. `inspect_material_transport_state` returns the coefficient enclosure;
+`inspect_material_transport_residual` reconstructs complete oriented arithmetic defects, and
+`inspect_exact_material_transport` is an explicitly cold, potentially expensive coefficient/current
+decoder. Product operations call none of these inspectors.
 
 [definition] `TextFieldSession` borrows one native field and returns every received or self-emitted
 symbol through its ordinary recurrence. It retains a failed native reception and distinguishes
@@ -106,6 +117,16 @@ and is interrupted without a completion marker. The [return record](../research/
 retains the output, the distinct currents behind it and the verification scope. This prototype
 has not produced a useful alpha response or a durable model artifact.
 
+[established-bounded; measured] The [learned transport return](../research/records/2026-09-07_AC2_THE_RETAINED_CONTEXT_RECEIVES_A_NATIVE_MATERIAL_TRANSPORT.md)
+now distinguishes retained contextual sources with equal raw endpoints. Its first actual
+four-family run completes all native operations but stops at reserved codeword 373 and emits
+no text. This is preserved as a failed response while broader cultivation continues.
+
+[established-bounded; measured] The subsequent 64-family run completes 18,476 developmental
+operations, then emits `Dq~` and encounters reserved word 261. This also fails the request.
+It retains a diagnostic report and verified source/current trace; durable model continuation
+and useful broader conduct remain construction work.
+
 ```sh
 cargo build -p holonics-hna --example alpha_text
 target/debug/examples/alpha_text .local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl --families 4 --fractional-bits 72 --prompt .local/artifacts/athena-alpha/ac2/first-request.txt --emit-symbols 64 --report .local/artifacts/athena-alpha/ac2/new-text-study.json
@@ -118,10 +139,11 @@ the driver never picks one by ordering the links. The field is currently in-proc
 command freshly cultivates its declared slice and publishes a diagnostic report, not a checkpoint
 or an interactive consumer release.
 
-[definition] `--inspect-all-currents true` adds complete cold junction-history capture to this
-diagnostic report. It performs no per-operation numerical readout during development. The
+[definition] `--inspect-all-currents true` adds complete cold junction/transport history and the
+internal-current population to this diagnostic report. Without it, those historical diagnostics
+are not read out. Development performs no per-operation numerical section readout. The
 [September 7 record](../research/records/2026-09-07_AC1_THE_BALANCED_FACTOR_RETURNS_THE_FULL_CURRENT_AND_THE_CODEC_OWES_ITS_OWN_TRANSPORT.md)
-separates the factorization result from the still-unimplemented learned current-to-material binding.
+separates the factorization result from learned material conduct and response quality.
 
 ## Run it
 

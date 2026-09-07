@@ -183,3 +183,7 @@ coefficient decoder, staged parameter changes and actual response inspection. Th
 raw-source encoder can supply `x_j`; numerical source uncertainty must not be silently fed back as
 an exact new contact. The whole alpha goal remains open, including wider contextual organization,
 useful English/code/mathematics, durable restart, broader cultivation and consumer costs.
+
+[established-bounded; measured] The subsequent [native material-transport return](2026-09-07_AC2_THE_RETAINED_CONTEXT_RECEIVES_A_NATIVE_MATERIAL_TRANSPORT.md)
+implements this specified binding and retains its tests and failed initial product responses.
+It does not close the broader alpha goal.
