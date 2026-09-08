@@ -83,19 +83,30 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
             return Err(ConstitutiveFibreError::Shape);
         };
         let c = 2 * condition_complex;
-        if initial.width != c {
+        ResidentConditionCurrent::found(self.surface, self.source_chart, c, initial, metric)
+    }
+}
+
+impl<'chart> ResidentConditionCurrent<'chart> {
+    pub(super) fn found(
+        surface: &'chart ResidentSurface<'chart>,
+        source_chart: ConstitutiveSourceChart,
+        c: usize,
+        initial: ResidentConstitutiveCurrent<'_, 'chart>,
+        metric: ConditionContactMetric,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        if initial.width != c || c == 0 || c % 2 != 0 {
             return Err(ConstitutiveFibreError::Shape);
         }
         let width = c
             .checked_mul(5)
             .and_then(|n| n.checked_add(2))
             .ok_or(ConstitutiveFibreError::Shape)?;
-        let section = self.surface.fresh_section(1, width, ResidentGrain(0))?;
-        let mut passage = self.surface.begin_passage(&[vec![]])?;
+        let section = surface.fresh_section(1, width, ResidentGrain(0))?;
+        let mut passage = surface.begin_passage(&[vec![]])?;
         {
             let lane = passage.open(0, &[])?;
-            self.surface
-                .record_condition_contact(&lane, initial, None, &section)?;
+            surface.record_condition_contact(&lane, initial, None, &section)?;
         }
         passage.close(0, &section, 64)?;
         let receipt = passage.finish()?.launch()?;
@@ -106,9 +117,9 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
             )));
         }
         Ok(ResidentConditionCurrent {
-            surface: self.surface,
+            surface,
             section: Rc::new(section),
-            source_chart: self.source_chart,
+            source_chart,
             metric,
             width: c,
             contacts: 0,

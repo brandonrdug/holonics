@@ -1,23 +1,56 @@
 use super::*;
-use crate::alpha::text_codec::{with_text_field, with_text_field_source, TextSymbol};
+use crate::alpha::text_codec::{TextSymbol, with_text_field, with_text_field_source};
 use holonic_engine::native_ecology::constitutive_fibre::NativeMaterialTransportSource;
+
+#[test]
+#[ignore = "requires CUDA; a native point cannot disappear on remount by lacking its exterior pending symbol"]
+fn pending_native_return_requires_a_pending_text_symbol() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("empty.hna");
+    with_text_field(72, |field| {
+        TextFieldSession::on(field)?.checkpoint(&path, &[], b"empty")?;
+        Ok(())
+    })
+    .unwrap();
+    let mut saved = SavedTextField::read(&path).unwrap();
+    let c = 2;
+    let y = 36;
+    let w = c + y;
+    let mut words = vec![0i64; w + 4 + y * y];
+    for bit in 0..9 {
+        words[c + 4 * bit + 2] = 1;
+    }
+    words[w] = 1;
+    words[w + 2] = -1;
+    let native:ConstitutiveReturnRest=serde_json::from_value(serde_json::json!({"schema":"holonics.constitutive-return.v1",
+        "source_width":c,"target_width":y,"occurrence":0,"source_occurrence":null,"source_chart":{"kind":"linear"},"words":words})).unwrap();
+    assert!(native.is_unique_current());
+    saved.session.pending_native = Some(native);
+    assert!(saved.validate().is_err());
+}
 
 #[test]
 #[ignore = "requires CUDA; text-field checkpoint owns the exact session and supplied shared sources"]
 fn saved_text_field_restores_live_source_and_application_state_without_replay() {
     let dir = tempfile::tempdir().unwrap();
     let path = dir.path().join("field.hna");
-    with_text_field_source(72, NativeMaterialTransportSource::CompleteCurrent, |field| {
-        let mut session = TextFieldSession::on(field)?;
-        session.receive(TextSymbol::Octet(b'A'))?;
-        let anchor = session.retain_part_source()?;
-        session.receive(TextSymbol::EndPart)?;
-        session.checkpoint(&path, &[&anchor], b"application-state")?;
-        assert!(session
-            .checkpoint(&path, &[], b"must not overwrite")
-            .is_err());
-        Ok(())
-    })
+    with_text_field_source(
+        72,
+        NativeMaterialTransportSource::CompleteCurrent,
+        |field| {
+            let mut session = TextFieldSession::on(field)?;
+            session.receive(TextSymbol::Octet(b'A'))?;
+            let anchor = session.retain_part_source()?;
+            session.receive(TextSymbol::EndPart)?;
+            session.checkpoint(&path, &[&anchor], b"application-state")?;
+            assert!(
+                session
+                    .checkpoint(&path, &[], b"must not overwrite")
+                    .is_err()
+            );
+            Ok(())
+        },
+    )
     .unwrap();
     let saved = SavedTextField::read(&path).unwrap();
     assert_eq!(saved.occurrences(), 2);

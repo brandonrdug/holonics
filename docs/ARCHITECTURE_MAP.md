@@ -106,7 +106,16 @@ preimage algebra into the [contextual lift](../research/records/2026-09-07_AC1_T
 `field/contextual_lift.rs` binds its cold inspection to actual source and pre-return context
 currents; its bounded pair form reuses `NativeCurrentHistorySourceReading::numerical_pairing`.
 `alpha_contextual_lift` exercises saved conversation passages without changing the native model.
-These are derivation/reference owners; the resident source-null section is still to be composed.
+These remain derivation/reference owners; the resident section below supplies the native port.
+
+[established-bounded; source-inspected] `resident/context_section.rs` and
+`constitutive_context_section.cuh` now derive the fixed-source context/return relation and its
+translated preimage. `field/context_section.rs` with `field_context_section.cuh` constructs the
+bounded real-ray variant from actual field passages. `surface_context_section.rs` binds their
+native calls. The [native return](../research/records/2026-09-08_AC1_THE_CONTEXTUAL_SECTION_RETURNS_THROUGH_NATIVE_CONDITION_AND_FIELD_CURRENT.md)
+composes the existing condition-current/contact owner; `alpha/text_session.rs` retains generated
+returns through actual field re-entry and `resident/return_rest.rs` plus `alpha/checkpoint.rs`
+preserve pending native input. `alpha_contextual_return` exercises the same saved ecology.
 
 [established-bounded; measured] `native_ecology/constitutive_fibre/resident.rs` now owns borrowed
 resident rational-current input and immutable original-fibre returns for the existing local

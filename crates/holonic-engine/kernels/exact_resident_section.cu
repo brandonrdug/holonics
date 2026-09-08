@@ -1292,6 +1292,7 @@ extern "C" __global__ void section_constitutive_bilinear_source(
 
 #include "constitutive_condition_preimage.cuh"
 #include "constitutive_condition_image.cuh"
+#include "constitutive_context_section.cuh"
 #include "constitutive_condition_contact.cuh"
 
 // Push both actual source branches through their producing-to-current unit-phase frame.
@@ -1622,6 +1623,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "field_current_history_source.cuh"
 #include "field_complete_material_transport.cuh"
 #include "field_moment_material.cuh"
+#include "field_context_section.cuh"
 #include "field_material_mode.cuh"
 #include "field_differential_receiver.cuh"
 #include "constitutive_field.cuh"

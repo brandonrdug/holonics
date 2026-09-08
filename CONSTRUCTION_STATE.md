@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 7, 2026. **Goal:** Athena-alpha construction, resumed by Brandon.
+**Currency:** September 8, 2026. **Goal:** Athena-alpha construction, resumed by Brandon.
 **Position:** AC0 complete at cold exposure scope; AC1–AC2 attachment under correction.
 **Athena-alpha:** not yet attained.
 
@@ -93,18 +93,28 @@ Fourteen exact-linear tests, the native field/chronology control and five moment
 controls pass. These are derivation/reference results; no model update or language improvement
 is claimed.
 
-[definition] **Next: AC1 → AC2, native composition of that relation.** Construct the resident
-source-null context/return section in the existing joint constitutive owner. Carry its actual
-generative current, complete family, uncertainty and original lineage into subsequent native
-formation and condition contact. Exact reversal of the whole contextual state is not a
-prerequisite. The integrated return and AC2's useful responses remain open; no additional user
-information is currently required.
+[established-bounded; measured] The [resident contextual return](research/records/2026-09-08_AC1_THE_CONTEXTUAL_SECTION_RETURNS_THROUGH_NATIVE_CONDITION_AND_FIELD_CURRENT.md)
+now derives the fixed-source section with its mixed terms, preserves full forward/preimage
+fibres and updates the existing actual condition current. A bounded field contrast becomes
+native generative material without exact contextual coordinates. Full-amplitude text-session
+re-entry and pending-current restart are implemented. All 138 constitutive and 19 SDK alpha
+tests pass. On the saved model, one retained observation and one declared self-return drive a
+new current into that same field: 1,930 → 1,931 occurrences, with a 54,297,848-byte checkpoint.
+A fresh process preserves that current and reproduces the subsequent failed response `v`
+followed by an unresolved receiver. The historical pair is still selected by the study driver.
 
-[definition] The bounded conditional-generator
-and Preimage Fibre owners have not been integrated into the conversation recurrence with an
-established consequence for formation, reuse and transformation of subsequent relations.
-Identify and compose that actual attachment in the existing native owners, then inspect its
-complete conversation responses and contextual revisions. The fixed exterior chart and a
+[definition] **Next: AC1 → AC2, ordinary-cultivation integration.** Make the continuing owner
+form and reuse this native contextual material from its actual source-null returns, retain its
+condition/current state as part of the ecology and stage the complete successor/refusal. The
+application driver must no longer select a historical contrast or perform developmental
+composition. This native port and its actual-model study do not close AC1; AC2's useful
+English/code/mathematics responses remain outstanding. No additional user information is
+currently required.
+
+[definition] The conditional-generator and Preimage Fibre owners now compose through the
+explicit native study, including a changed field successor. Their ordinary-cultivation
+attachment remains open. Complete it in the existing native owners, then inspect complete
+conversation responses and contextual revisions. The fixed exterior chart and a
 changed material source do not establish learned contextual organization. The
 [chronological future contraction](research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
 remains a derived representation option with open numerical obligations; it is not the next

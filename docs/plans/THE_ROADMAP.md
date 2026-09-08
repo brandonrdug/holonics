@@ -89,13 +89,21 @@ does not need exact historical contextual coordinates. Fourteen exact-linear tes
 field/chronology control and five moment-reference controls pass. This closes one derivation
 obligation; the productive native composition and useful language remain unfinished.
 
-[definition] **Next AC1 construction:** form the resident source-null context/return section
-from the existing joint constitutive relation, with its supported context domain, full returned
-family and original lineage. Compose its actual current/generator carrier with subsequent native
-formation and retained condition contact; preserve numerical uncertainty without selecting a
-centre. The `exact_linear` construction and cold inspection are reference owners, not a host
-learner to insert into the pipeline. Carry this composition through actual cultivation and AC2
-responses; an isolated extraction receipt does not complete AC1.
+[established-bounded; measured] The [resident contextual-section return](../../research/records/2026-09-08_AC1_THE_CONTEXTUAL_SECTION_RETURNS_THROUGH_NATIVE_CONDITION_AND_FIELD_CURRENT.md)
+now preserves fixed-source mixed conduct, full forward and inverse families, actual condition
+contact and full-current re-entry into the same conversation field. All 138 constitutive and
+19 SDK alpha tests pass. A real 1,931-occurrence successor and process-separated continuation
+return. Its response is still `v` followed by an unresolved receiver. This is integrated native
+apparatus exercised by a declared study; the historical pair is not yet found and reused by the
+ordinary cultivation operation itself.
+
+[definition] **Next AC1 construction:** integrate contextual formation and reuse into the
+existing continuing owner’s ordinary reception, with actual source-null provenance, retained
+condition/current state and complete staged publication/refusal. Remove the study driver’s
+role in choosing a historical contrast and composing development. Preserve the full family,
+phase, source history and uncertainty; no cause or numerical centre is chosen. Then conduct
+actual corpus development and AC2’s complete responses. A source-chart optimization or another
+isolated extraction cannot replace that integrated product.
 
 [definition] **Next construction remains AC1 → AC2.** Compose the existing learned
 conditional/generative transport and Preimage Fibre owners with the productive conversation

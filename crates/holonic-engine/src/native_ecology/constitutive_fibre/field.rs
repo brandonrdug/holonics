@@ -18,6 +18,7 @@ use std::rc::Rc;
 mod archive;
 mod current_history_source;
 mod contextual_lift;
+mod context_section;
 pub use contextual_lift::{
     NativeContextContrastInspection, NativeContextContrastStatus, NativeContextualLiftInspection,
 };

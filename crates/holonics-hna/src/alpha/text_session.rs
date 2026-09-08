@@ -9,9 +9,12 @@ use super::{
     },
 };
 use holonic_engine::native_ecology::constitutive_fibre::{
-    NativeConstitutiveField, NativeFieldEmission, NativeFieldOccurrence, NativeFieldSourceAnchor,
+    NativeConstitutiveField, NativeFieldEmission, NativeFieldOccurrence, NativeFieldReceiverStatus,
+    NativeFieldSourceAnchor, ResidentConstitutiveReturn, ResidentContextualSection,
 };
 use serde::Serialize;
+#[cfg(test)]
+mod native_tests;
 
 /// An exterior receiving family over the same field. Emitted symbols still enter the ordinary
 /// recurrence and can change its successor; this choice supplies no separate learning law.
@@ -53,6 +56,7 @@ pub struct TextFieldSession<'field, 'chart> {
     pub(super) latest: Option<TextFieldSource>,
     pub(super) next_anchor: Option<NativeFieldSourceAnchor>,
     pub(super) pending: Option<(TextSymbol, NativeFieldOccurrence)>,
+    pub(super) pending_native: Option<ResidentConstitutiveReturn<'chart>>,
 }
 
 impl<'field, 'chart> TextFieldSession<'field, 'chart> {
@@ -69,10 +73,63 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
             latest: None,
             next_anchor: None,
             pending: None,
+            pending_native: None,
         })
     }
     pub fn field(&self) -> &NativeConstitutiveField<'chart> {
         self.field
+    }
+    /// Derive immutable contextual material from this body's actual passages, preserving
+    /// the text session's current source and application chronology.
+    pub fn derive_contextual_contrast(
+        &mut self,
+        receiving: [usize; 2],
+    ) -> Result<ResidentContextualSection<'chart>, AlphaMaterialError> {
+        Ok(self.field.derive_contextual_contrast(receiving)?)
+    }
+    /// Retain the whole native point return for the next ordinary field occurrence. Only the
+    /// exterior codeword is read; its amplitude and phase are not re-encoded as unit impulses.
+    pub fn stage_native_return(
+        &mut self,
+        returned: ResidentConstitutiveReturn<'chart>,
+    ) -> Result<TextSymbol, AlphaMaterialError> {
+        if self.pending.is_some() {
+            return Err(AlphaMaterialError::Apparatus(
+                "native reception is pending".into(),
+            ));
+        }
+        if returned.target_width() != 2 * TEXT_INPUT_CHANNELS {
+            return Err(AlphaMaterialError::Apparatus(
+                "native return has a different receiving chart".into(),
+            ));
+        }
+        let reading = returned.read_differential_pairs(0, super::text_codec::TEXT_BIT_PAIRS)?;
+        if reading.status != NativeFieldReceiverStatus::Unique || reading.unresolved != 0 {
+            return Err(AlphaMaterialError::Apparatus("native text-current reception requires a supported actual point and resolved codeword".into()));
+        }
+        let symbol = TextSymbol::from_codeword(reading.positive as u16).ok_or_else(|| {
+            AlphaMaterialError::Apparatus(
+                "native current lies outside the text codeword chart".into(),
+            )
+        })?;
+        let occurrence = if let Some(anchor) = self.next_anchor.take() {
+            NativeFieldOccurrence::through_anchor(&anchor, vec![])
+        } else if let Some(previous) = self.latest.take() {
+            NativeFieldOccurrence::through(previous.source, vec![])
+        } else {
+            NativeFieldOccurrence::entering(vec![])
+        };
+        self.pending = Some((symbol, occurrence));
+        self.pending_native = Some(returned);
+        Ok(symbol)
+    }
+    pub fn receive_native_return(
+        &mut self,
+        returned: ResidentConstitutiveReturn<'chart>,
+    ) -> Result<TextSymbol, AlphaMaterialError> {
+        let symbol = self.stage_native_return(returned)?;
+        self.retry_pending()?;
+        Ok(symbol)
     }
     /// Read-only condensation of two actual field contacts. This preserves application/source
     /// chronology and delegates the complete shared-drive condition to the native owner.
@@ -158,12 +215,18 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
             .pending
             .as_mut()
             .ok_or_else(|| AlphaMaterialError::Apparatus("no pending native reception".into()))?;
-        let next = self.field.advance_resident(occurrence)?;
+        let next = if let Some(native) = &self.pending_native {
+            self.field
+                .advance_current_resident(occurrence, native.current())?
+        } else {
+            self.field.advance_resident(occurrence)?
+        };
         self.latest = Some(TextFieldSource {
             occurrence: next.lineage.occurrence,
             source: next.source,
         });
         self.pending = None;
+        self.pending_native = None;
         Ok(())
     }
     pub fn generate(&mut self, work_limit: usize) -> TextGeneration {

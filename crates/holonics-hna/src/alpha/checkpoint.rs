@@ -7,11 +7,12 @@ use super::{
 };
 use crate::checkpoint::{hash_prefix, read_blob, read_transport, write_len, write_transport};
 use crate::publication::PublicationReceipt;
-use crate::{publish_new, HnaStream, HnaStreamState};
+use crate::{HnaStream, HnaStreamState, publish_new};
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::constitutive_fibre::{
-        NativeConstitutiveField, NativeFieldOccurrence, NativeFieldRest, NativeFieldSourceAnchor,
+        ConstitutiveReturnRest, NativeConstitutiveField, NativeFieldOccurrence, NativeFieldRest,
+        NativeFieldSourceAnchor,
     },
     resident_section::ResidentSurface,
 };
@@ -34,6 +35,8 @@ struct SessionWire {
     schema: String,
     pending: Option<TextSymbol>,
     external_anchors: usize,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pending_native: Option<ConstitutiveReturnRest>,
 }
 
 pub struct SavedTextField {
@@ -72,6 +75,33 @@ impl SavedTextField {
         self.stream.validate().map_err(error)?;
         let sources = self.field.source_slots();
         let anchors = self.field.anchor_slots();
+        if let Some(native) = &self.session.pending_native {
+            if self.session.pending.is_none() {
+                return Err(error("pending native current lacks its exterior symbol"));
+            }
+            native.validate()?;
+            let (words, _) = native
+                .unique_current_words()
+                .ok_or_else(|| error("pending native return is not a point"))?;
+            if words.len() != 2 * super::text_codec::TEXT_INPUT_CHANNELS {
+                return Err(error("pending native receiving chart"));
+            }
+            let mut code = 0u16;
+            for bit in 0..super::text_codec::TEXT_BIT_PAIRS {
+                match words[4 * bit + 2].cmp(&words[4 * bit]) {
+                    std::cmp::Ordering::Greater => code |= 1 << bit,
+                    std::cmp::Ordering::Less => {}
+                    std::cmp::Ordering::Equal => {
+                        return Err(error("pending native codeword is unresolved"));
+                    }
+                }
+            }
+            if super::text_codec::TextSymbol::from_codeword(code) != self.session.pending {
+                return Err(error(
+                    "pending native codeword does not match its exterior symbol",
+                ));
+            }
+        }
         if self.field.nodes() != super::text_codec::TEXT_INPUT_CHANNELS
             || self.field.junction_representation().is_none()
             || self.session.schema != "holonics.native-text-session.v1"
@@ -188,14 +218,24 @@ impl SavedTextField {
         });
         session.next_anchor = anchors[0].take();
         if let Some(symbol) = self.session.pending {
-            let occurrence = if let Some(source) = sources[1].take() {
-                NativeFieldOccurrence::through(source, symbol.inputs())
-            } else if let Some(anchor) = anchors[1].take() {
-                NativeFieldOccurrence::through_anchor(&anchor, symbol.inputs())
+            let inputs = if self.session.pending_native.is_some() {
+                vec![]
             } else {
-                NativeFieldOccurrence::entering(symbol.inputs())
+                symbol.inputs()
+            };
+            let occurrence = if let Some(source) = sources[1].take() {
+                NativeFieldOccurrence::through(source, inputs)
+            } else if let Some(anchor) = anchors[1].take() {
+                NativeFieldOccurrence::through_anchor(&anchor, inputs)
+            } else {
+                NativeFieldOccurrence::entering(inputs)
             };
             session.pending = Some((symbol, occurrence));
+            session.pending_native = self
+                .session
+                .pending_native
+                .map(|v| v.remount(&surface))
+                .transpose()?;
         }
         let external = anchors
             .into_iter()
@@ -243,6 +283,7 @@ impl TextFieldSession<'_, '_> {
             schema: "holonics.native-text-session.v1".into(),
             pending: self.pending_symbol(),
             external_anchors: anchors.len(),
+            pending_native: self.pending_native.as_ref().map(|v| v.rest()).transpose()?,
         };
         let session = serde_json::to_vec(&session).map_err(error)?;
         publish_new(path, |file| {

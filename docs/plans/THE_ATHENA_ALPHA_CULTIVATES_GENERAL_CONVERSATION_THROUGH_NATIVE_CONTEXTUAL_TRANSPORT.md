@@ -234,6 +234,14 @@ the model is unchanged. The next AC1 attachment is its resident context/return s
 existing joint relation, carried into actual subsequent native formation and condition contact.
 Derivation and cold references remain distinct from that productive integration and AC2.
 
+[established-bounded; measured] The [resident contextual section](../../research/records/2026-09-08_AC1_THE_CONTEXTUAL_SECTION_RETURNS_THROUGH_NATIVE_CONDITION_AND_FIELD_CURRENT.md)
+now conducts the derived family through actual condition contact and native text-current
+re-entry. Its real-model successor survives a process restart; 138 constitutive and 19 SDK alpha
+tests pass. The study supplies its historical pair explicitly, and the resulting response is
+still unusable. AC1 next puts formation, retained contextual state and reuse inside ordinary
+cultivation with one complete successor. The driver-selected interaction and successful current
+transport do not discharge that obligation or AC2’s useful-language requirement.
+
 [established-bounded; measured] The [conditional-contact return](../../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
 composes the existing local relation with two declared native current roles and their complex
 mixed products. An independently supplied channel condition makes a measured phase action

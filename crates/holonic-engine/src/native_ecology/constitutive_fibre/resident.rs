@@ -5,6 +5,8 @@
 //! A point-current consumer checks uniqueness on device; it never chooses from a plural fibre.
 
 use super::*;
+mod return_rest;
+pub use return_rest::ConstitutiveReturnRest;
 
 /// A local relation's receiver result. Only field-qualified queries have a field source;
 /// a relation cut never stands in for an invented source occurrence.
@@ -390,6 +392,8 @@ mod condition_image;
 pub use condition_image::{ConditionCoverage, ConditionImageReading, ResidentConditionImage};
 
 mod condition_contact;
+mod context_section;
+pub use context_section::{ContextualSectionOrigin, ResidentContextualSection};
 pub use condition_contact::{
     ConditionContactMetric, ConditionContactReading, ConditionContactStatus,
     ResidentConditionContact, ResidentConditionCurrent,

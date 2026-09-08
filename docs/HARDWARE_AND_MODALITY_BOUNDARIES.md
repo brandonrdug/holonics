@@ -22,6 +22,16 @@ neither a perfect inverse nor a copy of every past sample is a general learning 
 
 ## Current common mechanism
 
+[definition] The [native contextual-section return](../research/records/2026-09-08_AC1_THE_CONTEXTUAL_SECTION_RETURNS_THROUGH_NATIVE_CONDITION_AND_FIELD_CURRENT.md)
+adds a further shared port. Its generic bilinear section uses the existing exact row calculus
+and condition-image receive/contact kernels. The field-contrast variant additionally requires
+the complete-current source pairing and its bounded nonzero receipt. Port the logical i64
+return wires and source/condition roles; CUDA’s packed 128-bit words and sixteen-byte scratch
+values are not Metal’s `W` layout. The text-session native-current/pending-return changes are
+shared Rust interface work. Desktop tests and the failed text response establish no Metal or
+acoustic result. The Mac generator workflow remains free to proceed independently.
+
+
 [definition] The desktop [homogeneous-moment return](../research/records/2026-09-07_AC2_THE_HOMOGENEOUS_MOMENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md)
 is an additional optional source chart for the existing material learner. Its kernel uses the
 complete-current pairing plus an explicit phase reference and requires exact 544-bit intermediate

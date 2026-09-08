@@ -1,0 +1,109 @@
+{
+  "schema": "holonics.native-contextual-return-portable.v1",
+  "truth_status": "established-bounded",
+  "evidence": [
+    "measured",
+    "source-inspected"
+  ],
+  "scope": "Declared native contextual-section study on a saved conversation model; automatic ordinary-cultivation integration and useful language remain open",
+  "origin": {
+    "FieldContrast": {
+      "ambient_context_complex": 73,
+      "context": [
+        11,
+        19
+      ],
+      "field_occurrences": 1930,
+      "fractional_bits": 72,
+      "receiving": [
+        12,
+        20
+      ],
+      "source": [
+        11,
+        19
+      ]
+    }
+  },
+  "native_from": 1930,
+  "native_until": 1931,
+  "native_seconds": 0.037312132,
+  "native_deeds": 12,
+  "terminal_section_reads": 1,
+  "terminal_section_octets": 80,
+  "ingress_octets": 63692,
+  "coefficient_current_path": [
+    [
+      0,
+      0
+    ],
+    [
+      1,
+      0
+    ],
+    [
+      2,
+      0
+    ]
+  ],
+  "one_self_return_declared": true,
+  "input_kind": {
+    "resident_nodes": 18
+  },
+  "accepted_symbol": {
+    "kind": "octet",
+    "value": 115
+  },
+  "input_entries_different_from_unit_encoding": 10,
+  "input_contains_minus_one_and_two": true,
+  "checkpoint_octets": 54297848,
+  "checkpoint_boundary": "after-native-current-before-prompt",
+  "private_checkpoint": ".local/artifacts/athena-alpha/ac1-native-context/first-eight-context-return-v1.hna",
+  "private_report": ".local/artifacts/athena-alpha/ac1-native-context/first-eight-context-return-v1.json",
+  "response_utf8": "v",
+  "response_disposition": {
+    "kind": "open"
+  },
+  "response_readings": [
+    {
+      "disposition": {
+        "kind": "symbol",
+        "symbol": {
+          "kind": "octet",
+          "value": 118
+        }
+      },
+      "native": {
+        "exact_zero": 0,
+        "first_complex": 0,
+        "negative": 393,
+        "occurrence": 1992,
+        "pairs": 9,
+        "positive": 118,
+        "unresolved": 0
+      }
+    },
+    {
+      "disposition": {
+        "kind": "open"
+      },
+      "native": {
+        "exact_zero": 0,
+        "first_complex": 0,
+        "negative": 158,
+        "occurrence": 1993,
+        "pairs": 9,
+        "positive": 65,
+        "unresolved": 288
+      }
+    }
+  ],
+  "whole_process_seconds": 27.147347468999214,
+  "continuation_process_seconds": 18.71427933400264,
+  "restored_occurrences": 1931,
+  "restored_native_input_identical": true,
+  "generation_receipt_identical": true,
+  "native_constitutive_tests_passed": 138,
+  "sdk_alpha_tests_passed": 19,
+  "language_quality_established": false
+}

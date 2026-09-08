@@ -306,6 +306,16 @@ on two actual saved returns. It preserves the separate source/context epochs and
 update the model or emit an answer. Omitting `--enclosed-pair` runs the substantially more
 expensive exact contextual-current reference. This inspection is not a cultivation pipeline.
 
+[established-bounded; source-inspected] The [resident contextual return](../research/records/2026-09-08_AC1_THE_CONTEXTUAL_SECTION_RETURNS_THROUGH_NATIVE_CONDITION_AND_FIELD_CURRENT.md)
+is available through `contextual_section`, `derive_contextual_contrast`, the full forward/
+preimage interfaces and the existing condition-current contact. `TextFieldSession::receive_native_return`
+uses the actual generated point current rather than its unit-symbol encoding, with pending input
+preserved by the existing checkpoint. `alpha_contextual_return MODEL A,B --report NEW.json
+--checkpoint NEW.hna` runs the declared interaction; its `--continue MODEL --prompt FILE
+--emit-symbols N --report NEW.json` mode resumes the saved successor without repeating that
+interaction. This study envelope is distinct from `alpha_text`’s exposure-only application ledger.
+Automatic ordinary-cultivation integration and useful language remain open.
+
 [established-bounded; measured] These commands run the checked-in examples on the standing CUDA
 apparatus. The build uses the repository's usual [development setup](DEVELOPMENT.md).
 

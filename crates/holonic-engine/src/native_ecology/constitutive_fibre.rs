@@ -31,11 +31,12 @@ pub use resident::{
     ConditionImageReading, ConditionPreimageReading, ConstitutiveDifferentialReading,
     ResidentConditionContact, ResidentConditionCurrent, ResidentConditionImage,
     ResidentConditionPreimage, ResidentConstitutiveCurrent, ResidentConstitutiveReturn,
+    ConstitutiveReturnRest, ContextualSectionOrigin, ResidentContextualSection,
 };
 
 /// Declared local source law, bound at founding rather than inferred from an array's width.
 /// These dimensions are the caller's interface chart, not learned semantic capacities.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(tag = "kind", rename_all = "kebab-case")]
 pub enum ConstitutiveSourceChart {
     Linear,
