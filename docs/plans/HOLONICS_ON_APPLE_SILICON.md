@@ -81,6 +81,13 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
    productive timed acoustic reception/emission and actual material incidence before claiming a
    sound model. Whole-family evidence does not
    impose a universal certainty prerequisite on generative current.
+   The [complete-recording construction](../../research/records/2026-09-07_APPLE_CONDUCTS_COMPLETE_RECORDINGS_AND_RETURNS_TIMED_AUDIO.md)
+   now supplies resident workspace for the full causal action and `AcousticFieldSection` for
+   complete source/range mounting. Its cold two-channel receiver preserves one frame per
+   complex coefficient, exact clock, both quadratures and the projection fibre at a declared
+   digital gain. The v5 recorded study compares the retained earlier and successor conditions
+   across a whole recording. The digital two-tap law remains an explicit experimental control;
+   next attach actual acoustic material/receiving conditions and persistent generative standing.
 3. Develop and retain acoustic generative standing across source-qualified recordings and
    actual joined returns, then conduct its native emission into the declared acoustic receiver.
    Inspect perception differences and generated sound, preserve the declared reconstruction

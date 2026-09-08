@@ -76,6 +76,23 @@ the earlier source/condition/prediction carriers remain available through termin
 All native stages have zero numerical readouts. This remains a digital coefficient study;
 productive sound development, timed acoustic emission and persistence remain to be composed.
 
+[definition] The optional third argument enables the v5 complete timed receiver:
+
+```sh
+cargo build -p holonics-hna --example recorded_temporal_action
+target/debug/examples/recorded_temporal_action SOURCE.wav NEW_REPORT.json .local/experiments/NEW_AUDIO_DIR
+python3 research/experiments/apple_silicon/compare_recorded_temporal_action.py NEW_REPORT.json --output NEW_COMPARISON.json
+```
+
+[definition] The report and audio directory must be new. Each earlier/successor-condition output
+contains a stereo WAV and the complete canonical native section. One complex coefficient is one
+frame at the original clock; real/imaginary coordinates occupy the two channels. Gain is the
+declared constant 8192 PCM units per current unit. The exact section and report reconstruct all
+quantization/clipping residuals. These are outputs of the controlled resident two-tap action;
+their files do not checkpoint the learned ecology or establish useful sound/English generation.
+The [complete-recording return](../research/records/2026-09-07_APPLE_CONDUCTS_COMPLETE_RECORDINGS_AND_RETURNS_TIMED_AUDIO.md)
+records the implementation, comparisons and costs. Omitting the third argument retains v4.
+
 [established-bounded; measured] The [recorded interval attachment](../research/records/2026-09-07_RECORDED_RESPONSE_POINTERS_RETAIN_THEIR_ACOUSTIC_INTERVALS.md)
 now supplies `AcousticFieldChart::from_acoustic_range` and `native::recorded` for exact original
 source/target pointers and recording bounds. `RecordedResponseSections::bind` keeps annotation

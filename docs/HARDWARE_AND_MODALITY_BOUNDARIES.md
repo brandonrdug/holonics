@@ -122,6 +122,15 @@ occurrence at index 13. Scratch uses the target's 20-byte wide layout; enclosed 
 values retain the common two-i64 signed-128 wire. The separate material/current-history and
 field differential receiver operations remain outside this port's scope.
 
+[established-bounded; implemented-exact] The [complete temporal construction](../research/records/2026-09-07_APPLE_CONDUCTS_COMPLETE_RECORDINGS_AND_RETURNS_TIMED_AUDIO.md)
+adds resident workspace beyond threadgroup storage for full causal convolution. Four dependent
+commands validate the complete source, form independent product coordinates, normalize the
+whole result and publish exact words. The Metal mount retains actual flat dispatch geometry
+only for the independent product/pack kernels; complete serial owners retain one thread.
+Intermediate wide values occupy 20 bytes on Metal and 16 on CUDA, with the existing target
+alignment. Both Metal placements now use the shared checked-add/product admission. CUDA
+source accompanies the port, but this Mac return does not claim CUDA compilation or execution.
+
 [established-bounded; source-inspected] The public framework enters through
 [`holonics::hna`](../crates/holonics/src/lib.rs). Its native session is exposed by
 [`with_native_session`](NATIVE_HNA.md), while the earlier inherited operator retains a

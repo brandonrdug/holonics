@@ -8,22 +8,34 @@ use holonic_engine::{
         ResidentConstitutiveCurrent, ResidentConstitutiveFibre, ResidentConstitutiveReturn,
     },
     phase_current::{
-        resident::{convolve_resident, ResidentPhaseCurrentView},
+        resident::{convolve_resident, ResidentPhaseConvolution, ResidentPhaseCurrentView},
         PhaseCurrentLineageId, PhaseCurrentReceiverId,
     },
     resident_section::{
         ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface, TransferCensus,
     },
+    ExactComplexWaveCurrent,
 };
 use holonics_hna::native::acoustic_field::AcousticFieldChart;
-use life::mathematical_source::ExactAcousticOccurrence;
+use life::{
+    mathematical_source::ExactAcousticOccurrence,
+    native_intelligence::NativeAcousticTemporalPcm16Projection,
+};
 use num_rational::BigRational as Rat;
 use serde_json::{json, Value};
-use std::{error::Error, fs::OpenOptions, io::Write, path::PathBuf, time::Instant};
+use sha2::{Digest, Sha256};
+use std::{
+    error::Error,
+    fs::{self, OpenOptions},
+    io::Write,
+    path::{Path, PathBuf},
+    time::Instant,
+};
 
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 const WIDTH: usize = 4;
 const DIVISOR: i64 = 32768;
+const PCM_GAIN: i64 = 8192;
 const CONTROLS: [[i64; 4]; 5] = [
     [0, 0, 0, 0],
     [1, 0, 0, 0],
@@ -52,9 +64,20 @@ fn stage<T>(
 ) -> Result<T> {
     report["active_stage"] = json!(name);
     let before = s.census();
+    #[cfg(target_os = "macos")]
+    let gpu_before = s.metal_execution_timing();
     let started = Instant::now();
     let result = action();
     report["stages"][name] = work(&before, &s.census(), started.elapsed().as_secs_f64());
+    #[cfg(target_os = "macos")]
+    {
+        let after = s.metal_execution_timing();
+        report["stages"][name]["gpu_seconds"] = json!(after.gpu_seconds - gpu_before.gpu_seconds);
+        report["stages"][name]["completed_command_buffers"] =
+            json!(after.completed_command_buffers - gpu_before.completed_command_buffers);
+        report["stages"][name]["unavailable_gpu_timestamps"] =
+            json!(after.unavailable_timestamps - gpu_before.unavailable_timestamps);
+    }
     result
 }
 fn mount<'c>(
@@ -106,6 +129,66 @@ fn section_wire(rest: &ResidentSectionRest) -> Value {
     json!({"rows":rest.rows,"width":rest.width,"grain":rest.grain.0,
         "bound_octaves":rest.bound_octaves,"intervals":rest.intervals})
 }
+
+fn write_new(path: &Path, bytes: &[u8]) -> Result<()> {
+    let mut file = OpenOptions::new().write(true).create_new(true).open(path)?;
+    file.write_all(bytes)?;
+    file.sync_all()?;
+    Ok(())
+}
+
+// One cold terminal receiver. The complete canonical native section and declared gain retain
+// every quantization/clipping fibre; the stereo WAV is only its timed exterior projection.
+fn publish_temporal(
+    s: &ResidentSurface<'_>,
+    current: &ResidentPhaseConvolution<'_, '_>,
+    directory: &Path,
+    name: &str,
+    sample_rate: u32,
+) -> Result<Value> {
+    let view = current.view()?;
+    let rest = s.detach_section(current.section(), 64)?;
+    if rest.intervals.iter().any(|(a, b)| a != b) || rest.intervals.last().unwrap().0 <= 0 {
+        return Err("temporal terminal requires an exact rational point".into());
+    }
+    let denominator = rest.intervals.last().unwrap().0;
+    let coordinates: Vec<_> = rest.intervals[..rest.intervals.len() - 1]
+        .chunks_exact(2)
+        .map(|p| {
+            ExactComplexWaveCurrent::new(
+                Rat::new(p[0].0.into(), denominator.into()),
+                Rat::new(p[1].0.into(), denominator.into()),
+            )
+        })
+        .collect();
+    let projection = NativeAcousticTemporalPcm16Projection::found(
+        view.receiver(),
+        view.lineage(),
+        view.origin().clone(),
+        view.sample_step().clone(),
+        sample_rate,
+        Rat::from_integer(PCM_GAIN.into()),
+        &coordinates,
+    )?;
+    let section_bytes = rest.canonical_bytes()?;
+    let wav_bytes = projection.wav_bytes()?;
+    let section_path = directory.join(format!("{name}.section"));
+    let wav_path = directory.join(format!("{name}.wav"));
+    write_new(&section_path, &section_bytes)?;
+    write_new(&wav_path, &wav_bytes)?;
+    Ok(json!({
+        "receiver":view.receiver().0,"lineage":view.lineage().0,
+        "origin":view.origin().to_string(),"sample_step":view.sample_step().to_string(),
+        "sample_rate":sample_rate,"frames":projection.frames.len(),
+        "clipped_sample_population":projection.clipped_sample_population,
+        "projection_schema":projection.schema,
+        "section_path":section_path,"section_sha256":format!("{:x}",Sha256::digest(&section_bytes)),
+        "section_octets":section_bytes.len(),
+        "wav_path":wav_path,"wav_sha256":format!("{:x}",Sha256::digest(&wav_bytes)),
+        "wav_octets":wav_bytes.len(),
+        "fibre_decoder":"read the canonical ResidentSectionRest rational point; at the declared gain, residual = current * gain - PCM, and current = (PCM + residual) / gain"
+    }))
+}
 fn returned(result: &ResidentConstitutiveReturn<'_>) -> Result<Value> {
     Ok(match result.inspect()?.predecessor_reading {
         ConstitutiveReading::Unique { current } => {
@@ -127,6 +210,7 @@ fn experiment<'c>(
     chart: &AcousticFieldChart,
     body: &mut ResidentConstitutiveFibre<'c>,
     report: &mut Value,
+    audio_directory: Option<&Path>,
 ) -> Result<()> {
     // Eight interior clock cuts are fixed before any current is observed. Cuts 3/9 and 6/9
     // are held out; the other six train. No silence, amplitude, rank or answer selects a cut.
@@ -286,12 +370,12 @@ fn experiment<'c>(
     let (first_field_lineage, second_field_lineage) =
         stage(s, report, "native_generated_field_recurrence", || {
             let mut entering = NativeFieldOccurrence::entering(Vec::new());
-            let first = generated_field
-                .advance_current_resident(&mut entering, anticipated.current())?;
+            let first =
+                generated_field.advance_current_resident(&mut entering, anticipated.current())?;
             let first_lineage = first.lineage.clone();
             let mut linked = NativeFieldOccurrence::through(first.source, Vec::new());
-            let second = generated_field
-                .advance_current_resident(&mut linked, generated.current())?;
+            let second =
+                generated_field.advance_current_resident(&mut linked, generated.current())?;
             Ok((first_lineage, second.lineage.clone()))
         })?;
     let image = stage(s, report, "whole_condition_image", || {
@@ -335,6 +419,55 @@ fn experiment<'c>(
         Ok(image.receive(later_actual.current()?)?)
     });
 
+    // Conduct each complete recording in one native operation. Both operations happen now;
+    // the first reuses immutable earlier standing as a declared comparison, not retroactive
+    // prediction. The learned local condition is the resident response operand throughout.
+    let whole_outputs = if audio_directory.is_some() {
+        let complete = stage(s, report, "whole_recording_mount", || {
+            Ok(chart.mount_complete(s)?)
+        })?;
+        // Keep the input allocation alive through both complete operations, then publish only
+        // their owned outputs. No PCM sample or phase-cell ordinal becomes a native event.
+        let conduct = |condition, lineage| -> Result<ResidentPhaseConvolution<'_, 'c>> {
+            Ok(convolve_resident(
+                s,
+                complete.temporal_view()?,
+                ResidentPhaseCurrentView::new(
+                    condition,
+                    PhaseCurrentReceiverId(2),
+                    PhaseCurrentLineageId(lineage),
+                    Rat::from_integer(0.into()),
+                    chart.section().sample_step.clone(),
+                    WIDTH as u32,
+                    2,
+                )?,
+                PhaseCurrentReceiverId(5),
+                PhaseCurrentLineageId(lineage),
+            )?)
+        };
+        let initial = stage(s, report, "whole_recording_initial_condition", || {
+            conduct(free_contact.successor(), 110)
+        })?;
+        let successor = stage(s, report, "whole_recording_successor_condition", || {
+            conduct(identified_contact.successor(), 111)
+        })?;
+        let directory = audio_directory.unwrap();
+        let sample_rate = report["source"]["sample_rate"].as_u64().unwrap() as u32;
+        let received = stage(s, report, "whole_recording_terminal_receiver", || {
+            Ok(
+                json!({"source_raw_extent":chart.section().raw_extent(),"response_raw_extent":2,
+                "output_raw_extent":chart.section().raw_extent()+1,"gain":PCM_GAIN.to_string(),
+                "channel_interpretation":"real-left-imaginary-right",
+                "chronology":"both complete outputs are conducted after observation; the first uses the retained earlier condition for comparison",
+                "initial_condition":publish_temporal(s,&initial,directory,"initial-condition",sample_rate)?,
+                "successor_condition":publish_temporal(s,&successor,directory,"successor-condition",sample_rate)?}),
+            )
+        })?;
+        Some(received)
+    } else {
+        None
+    };
+
     // All numerical inspection happens after native development, inference and comparison act.
     let observed = stage(s, report, "terminal_observer", || {
         let condition = match preimage.inspect()? {
@@ -377,7 +510,11 @@ fn experiment<'c>(
             .map(|at| generated_field.inspect_incoming(at))
             .collect::<std::result::Result<Vec<_>, _>>()?;
         let field_junctions = (0..2)
-            .map(|at| generated_field.inspect_junction(at).map(|rest| rest.as_ref().map(section_wire)))
+            .map(|at| {
+                generated_field
+                    .inspect_junction(at)
+                    .map(|rest| rest.as_ref().map(section_wire))
+            })
             .collect::<std::result::Result<Vec<_>, _>>()?;
         let native_field = json!({
             "nodes":WIDTH + 1,
@@ -405,6 +542,9 @@ fn experiment<'c>(
         )
     })?;
     report["observation"] = observed;
+    if let Some(whole) = whole_outputs {
+        report["whole_recording"] = whole;
+    }
     // Completion is an observer statement about this comparison, never a generation gate.
     let mut expected = report["observation"]["later_actual"]["coordinates"]
         .as_array()
@@ -418,14 +558,26 @@ fn experiment<'c>(
 
 fn main() -> Result<()> {
     let args: Vec<_> = std::env::args().skip(1).collect();
-    if args.len() != 2 {
-        return Err("usage: recorded_temporal_action WAV_PATH NEW_REPORT.json".into());
+    if !(2..=3).contains(&args.len()) {
+        return Err(
+            "usage: recorded_temporal_action WAV_PATH NEW_REPORT.json [NEW_AUDIO_DIR]".into(),
+        );
     }
     let wav_path = PathBuf::from(&args[0]);
     let report_path = PathBuf::from(&args[1]);
     if report_path.exists() {
         return Err("report already exists".into());
     }
+    let audio_directory = args.get(2).map(PathBuf::from);
+    let audio_directory = audio_directory
+        .map(|directory| -> Result<PathBuf> {
+            if let Some(parent) = directory.parent().filter(|p| !p.as_os_str().is_empty()) {
+                fs::create_dir_all(parent)?;
+            }
+            fs::create_dir(&directory)?;
+            Ok(directory.canonicalize()?)
+        })
+        .transpose()?;
     let started = Instant::now();
     let recording = ExactAcousticOccurrence::read(
         &wav_path,
@@ -445,7 +597,7 @@ fn main() -> Result<()> {
         WIDTH,
         DIVISOR,
     )?;
-    let mut report = json!({"schema":"holonics.recorded-temporal-action.v4","truth_status":"established-bounded",
+    let mut report = json!({"schema":if audio_directory.is_some(){"holonics.recorded-temporal-action.v5"}else{"holonics.recorded-temporal-action.v4"},"truth_status":"established-bounded",
         "evidence_tags":["measured"],"scope":"declared complex polynomial action on recorded coefficients",
         "source":{"path":wav_path,"sha256":recording.source_sha256,"octets":recording.source_octets,
             "samples":recording.samples.len(),"sample_rate":recording.sample_rate,"occurrence":recording.occurrence,
@@ -459,7 +611,13 @@ fn main() -> Result<()> {
         "complete_bounded_comparison":false,"sound_model":false,"conversation_model":false});
     match ResidentConstitutiveFibre::found_bilinear_contact(&s, WIDTH, 2, WIDTH + 1) {
         Ok(mut body) => {
-            if let Err(error) = experiment(&s, &chart, &mut body, &mut report) {
+            if let Err(error) = experiment(
+                &s,
+                &chart,
+                &mut body,
+                &mut report,
+                audio_directory.as_deref(),
+            ) {
                 report["refusal"] =
                     json!({"stage":report["active_stage"],"error":error.to_string()});
             }

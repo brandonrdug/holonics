@@ -66,7 +66,9 @@ def verify_condition_current_cycle(report, observation, source_inputs, direction
     """
     cycle = observation.get("actual_condition_current_cycle")
     if cycle is None:
-        assert report["schema"] not in ("holonics.recorded-temporal-action.v3", "holonics.recorded-temporal-action.v4")
+        assert report["schema"] not in ("holonics.recorded-temporal-action.v3",
+                                         "holonics.recorded-temporal-action.v4",
+                                         "holonics.recorded-temporal-action.v5")
         return None
 
     initial = coordinates(cycle["initial_condition"])
@@ -145,7 +147,8 @@ def verify_generated_field(report, observation):
     """
     field = observation.get("native_generated_field")
     if field is None:
-        assert report["schema"] != "holonics.recorded-temporal-action.v4"
+        assert report["schema"] not in ("holonics.recorded-temporal-action.v4",
+                                         "holonics.recorded-temporal-action.v5")
         return None
     n = report["aperture"]["target_complex"]
     dim, grain = 6*n, field["grain"]
@@ -244,6 +247,131 @@ def convolve(source, response):
     return out
 
 
+RESIDENT_SECTION_REST_MAGIC = b"HRSRST\0\x01"
+PCM_DIVISOR = 32768
+
+
+def resident_point(path, width):
+    """Decode one canonical ResidentSectionRest point without invoking native code."""
+    data = path.read_bytes()
+    assert len(data) >= 40 and data[:8] == RESIDENT_SECTION_REST_MAGIC
+    rows, stored_width, grain, bound, population = struct.unpack_from("<QQIIQ", data, 8)
+    assert rows == 1 and stored_width == width and population == width
+    assert grain == 0 and bound == 64
+    assert len(data) == 40 + 16 * population
+    intervals = [struct.unpack_from("<qq", data, 40 + 16 * i)
+                 for i in range(population)]
+    assert all(lo == hi for lo, hi in intervals)
+    denominator = intervals[-1][0]
+    assert denominator > 0
+    coordinates = [Q(lo, denominator) for lo, _ in intervals[:-1]]
+    return coordinates, {"rows": rows, "width": stored_width, "grain": grain,
+                         "bound_octaves": bound, "population": population}
+
+
+def read_stereo_pcm16(path):
+    with wave.open(str(path), "rb") as recording:
+        assert recording.getnchannels() == 2 and recording.getsampwidth() == 2
+        rate = recording.getframerate()
+        frames = recording.getnframes()
+        raw = recording.readframes(frames)
+    samples = struct.unpack(f"<{2 * frames}h", raw)
+    return rate, frames, samples
+
+
+def toward_zero(value):
+    return value.numerator // value.denominator if value >= 0 else \
+        -((-value.numerator) // value.denominator)
+
+
+def verify_whole_recording(report, observation, source_samples, source_rate):
+    """Verify v5's full-recording temporal projections as cold exact receiver checks."""
+    whole = report.get("whole_recording")
+    if whole is None:
+        assert report["schema"] != "holonics.recorded-temporal-action.v5"
+        return None
+
+    count = len(source_samples)
+    output_frames = count + 1
+    assert whole["source_raw_extent"] == count
+    assert whole["response_raw_extent"] == 2
+    assert whole["output_raw_extent"] == output_frames
+    assert whole["gain"] == "8192"
+    assert whole["channel_interpretation"] == "real-left-imaginary-right"
+    for stage_name in ("whole_recording_initial_condition",
+                       "whole_recording_successor_condition"):
+        stage = report["stages"][stage_name]
+        assert stage["section_readouts"] == 0
+        assert stage["numerical_egress_octets"] == 0
+    terminal = report["stages"]["whole_recording_terminal_receiver"]
+    assert terminal["section_readouts"] == 2
+    assert terminal["numerical_egress_octets"] == 2 * (2 * output_frames + 1) * 16
+
+    source = [q for sample in source_samples
+              for q in (Q(sample, PCM_DIVISOR), Q(0))]
+    cycle = observation["actual_condition_current_cycle"]
+    result = {}
+    for name, contact_name in (("initial_condition", "free_contact"),
+                               ("successor_condition", "identified_contact")):
+        projection = whole[name]
+        expected_metadata = {
+            "receiver": 5,
+            "origin": "0",
+            "sample_step": f"1/{source_rate}",
+            "sample_rate": source_rate,
+            "frames": output_frames,
+        }
+        for field, expected in expected_metadata.items():
+            assert projection[field] == expected
+        assert projection["lineage"] == (110 if name == "initial_condition" else 111)
+        assert isinstance(projection["clipped_sample_population"], int)
+        section_path = Path(projection["section_path"])
+        wav_path = Path(projection["wav_path"])
+        assert section_path.is_absolute() and wav_path.is_absolute()
+        section_bytes = section_path.read_bytes()
+        wav_bytes = wav_path.read_bytes()
+        section_sha256 = hashlib.sha256(section_bytes).hexdigest()
+        wav_sha256 = hashlib.sha256(wav_bytes).hexdigest()
+        assert section_sha256 == projection["section_sha256"]
+        assert wav_sha256 == projection["wav_sha256"]
+
+        condition = vector(cycle[contact_name]["successor"])
+        assert len(condition) == 4
+        expected = convolve(source, condition)
+        coordinates, section_metadata = resident_point(section_path, 2 * output_frames + 1)
+        assert coordinates == expected
+
+        rate, frames, pcm = read_stereo_pcm16(wav_path)
+        assert rate == source_rate and frames == output_frames
+        clipped = 0
+        for carrier, (left, right) in zip(zip(coordinates[::2], coordinates[1::2]),
+                                           zip(pcm[::2], pcm[1::2])):
+            for value, sample in zip(carrier, (left, right)):
+                scaled = value * 8192
+                unbounded = toward_zero(scaled)
+                bounded = max(-32768, min(32767, unbounded))
+                assert sample == bounded
+                clipped += int(unbounded != bounded)
+                remainder = scaled - Q(sample)
+                assert (Q(sample) + remainder) / 8192 == value
+        assert clipped == projection["clipped_sample_population"]
+        result[name] = {
+            "verified": True,
+            "condition_contact": contact_name,
+            "frames": frames,
+            "clipped_sample_population": clipped,
+            "section_sha256": section_sha256,
+            "wav_sha256": wav_sha256,
+            "section": section_metadata,
+            "full_real_pcm_convolution_matches": True,
+            "fixed_gain_pcm_and_remainders_reconstruct": True,
+        }
+    return {"verified": True, "source_frames": count, "output_frames": output_frames,
+            "source_sample_rate": source_rate, "initial_condition": result["initial_condition"],
+            "successor_condition": result["successor_condition"],
+            "zero_egress_stages": True}
+
+
 def compare(path):
     report = json.loads(path.read_text())
     source = report["source"]
@@ -288,6 +416,7 @@ def compare(path):
     condition_current_cycle = verify_condition_current_cycle(
         report, observation, inputs, directions)
     generated_field = verify_generated_field(report, observation)
+    whole_recording = verify_whole_recording(report, observation, samples, rate)
     family_verified = False
     if "whole_image" in observation:
         image = observation["whole_image"]
@@ -307,7 +436,7 @@ def compare(path):
         assert report["complete_bounded_comparison"] is True
         family_verified = True
     for name, stage in report["stages"].items():
-        if name != "terminal_observer":
+        if name not in ("terminal_observer", "whole_recording_terminal_receiver"):
             assert stage["section_readouts"] == 0 and stage["numerical_egress_octets"] == 0
     return {"report":str(path),"source_sha256":source["sha256"],"sample_rate":rate,
         "pcm_support_and_two_native_convolutions_agree":True,
@@ -318,7 +447,8 @@ def compare(path):
         "native_stages_have_zero_numerical_readouts":True,
         "native_whole_image_continuation_and_refinement_verified":family_verified,
         "condition_current_cycle_verified":None if condition_current_cycle is None else condition_current_cycle["verified"],
-        "condition_current_cycle":condition_current_cycle,"generated_field":generated_field}
+        "condition_current_cycle":condition_current_cycle,"generated_field":generated_field,
+        "whole_recording":whole_recording}
 
 
 def main():

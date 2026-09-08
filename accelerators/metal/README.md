@@ -17,6 +17,16 @@ The command queue serializes requested dependencies; neither thread count nor sh
 establishes parallel independence. Dynamic threadgroup storage uses 20 bytes per wide carrier,
 rounded to Metal's 16-byte allocation multiple. Unsupported resident symbols refuse at lookup.
 
+[definition] `phase_convolution.metal` owns both placements of complete causal convolution.
+Its checked product/add helpers are shared with the paired/enclosed field and retain CUDA's
+operation-specific accumulator admission, including the 126-bit checked-add magnitude bound.
+When the result exceeds threadgroup storage, one passage records complete input validation,
+parallel products with disjoint output coordinates, one whole-result gcd, and disjoint normalized
+publication into private output. Each coefficient retains ascending source order; validation
+precedes arithmetic, and no output is admitted after any refusal. The Rust owner retains both
+operands and device workspace until completion. This changes placement, not temporal support
+or native grain, and requires no intermediate numerical readback.
+
 [definition] Build arithmetic apparatus explicitly; the probe kernels are absent from production:
 
 ```sh

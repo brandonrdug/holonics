@@ -143,6 +143,7 @@ pub use membrane_acoustic::{
     NativeAcousticProjectiveCurrent, NativeAcousticRadiationInput, NativeAcousticRadiationOrder,
     NativeAcousticReceiverChart, NativeAcousticReceiverCurrent, NativeAcousticSpectralIncidence,
     NativeAcousticStandingMutation, WithdrawnNativeAcousticProduction,
+    NativeAcousticTemporalPcm16Frame, NativeAcousticTemporalPcm16Projection,
     NATIVE_ACOUSTIC_PRODUCTION_MORPHOLOGY_SCHEMA,
 };
 pub use membrane_cultivation::{

@@ -7,10 +7,14 @@
 //! its divisor and every remainder.
 
 mod potential_formation;
+mod temporal_receiver;
 
 pub use potential_formation::{
     NativeAcousticAudibleProjection, NativeAcousticPotentialComplex, NativeAcousticReceiverChart,
     NativeAcousticSpectralIncidence,
+};
+pub use temporal_receiver::{
+    NativeAcousticTemporalPcm16Frame, NativeAcousticTemporalPcm16Projection,
 };
 
 use std::io::Cursor;

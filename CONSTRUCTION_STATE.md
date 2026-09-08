@@ -10,6 +10,15 @@ instruction governs.
 
 ## Parallel MacBook position
 
+[established-bounded; measured] The [complete-recording return](research/records/2026-09-07_APPLE_CONDUCTS_COMPLETE_RECORDINGS_AND_RETURNS_TIMED_AUDIO.md)
+now conducts whole ESC-50 and LibriSpeech sections through retained earlier/successor conditions
+and publishes timed stereo PCM with the complete exact current. Thirty-eight scoped Rust
+controls pass; cold comparisons verify all coordinates, clocks, tails and projection fibres.
+Each full native action takes 0.21–0.32 s with zero numerical readback; exporting both outputs
+takes 4.18/9.56 s and whole studies take 6.62/11.35 s. Next bind actual acoustic material and
+receiving conditions to persistent development across recordings. The controlled two-tap study
+does not establish a cultivated sound/English model or streaming completion; AS4–AS5 stay active.
+
 [definition] Brandon resumed the updated AS4–AS5 goal on September 7. The
 [Apple blueprint](docs/plans/HOLONICS_ON_APPLE_SILICON.md#september-7-resumption-through-shared-native-generators)
 now states the shared generator port, actual acoustic binding and subsequent useful sound/English

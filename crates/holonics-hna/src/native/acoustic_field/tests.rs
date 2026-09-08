@@ -162,6 +162,41 @@ fn empty_reversed_and_outside_recording_intervals_are_refused() {
 }
 
 #[test]
+#[ignore = "requires native GPU; complete chart mounting retains the actual range and clock"]
+fn complete_resident_section_excludes_padding_without_advancing_source() {
+    let recording = source(&[13, -7, 0, 9, 21]);
+    let c = AcousticFieldChart::from_acoustic_range(
+        &recording,
+        PhaseCurrentReceiverId(4),
+        PhaseCurrentLineageId(8),
+        BigRational::new(7.into(), 3.into()),
+        1..4,
+        2,
+        32768,
+    )
+    .unwrap();
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let mounted = c.mount_complete(&s).unwrap();
+    let view = mounted.temporal_view().unwrap();
+    assert_eq!(view.raw_extent(), 3);
+    assert_eq!(view.receiver(), PhaseCurrentReceiverId(4));
+    assert_eq!(view.lineage(), PhaseCurrentLineageId(8));
+    assert_eq!(view.origin(), &c.support_at(0).unwrap().begin);
+    assert_eq!(
+        view.sample_step(),
+        &BigRational::new(1.into(), 16000.into())
+    );
+    assert_eq!(mounted.chart().source_range(), 1..4);
+    assert_eq!(
+        s.read_out(mounted.section()).unwrap(),
+        [-7, 0, 0, 0, 9, 0, 32768].map(|v| (v, v))
+    );
+    assert_eq!(c.cursor(), 0);
+    assert_eq!(recording.samples, vec![13, -7, 0, 9, 21]);
+}
+
+#[test]
 #[ignore = "requires resident native field backend"]
 fn acoustic_field_returns_complete_branches_and_preserves_refused_source() {
     let readout = ResidentReadout::new().unwrap();
@@ -176,6 +211,8 @@ fn acoustic_field_returns_complete_branches_and_preserves_refused_source() {
         first
             .lineage
             .incoming
+            .exterior()
+            .expect("the PCM chart supplied an exterior occurrence")
             .iter()
             .map(|v| v.current())
             .collect::<Vec<_>>()

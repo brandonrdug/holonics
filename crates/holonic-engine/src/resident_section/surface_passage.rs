@@ -990,6 +990,7 @@ impl<'chart> ResidentSurface<'chart> {
         >,
         source_extent: usize,
         response_extent: usize,
+        workspace: Option<&ResidentSection<'chart>>,
         output: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
         self.validate_constitutive_current_view(source)?;
@@ -1017,10 +1018,25 @@ impl<'chart> ResidentSurface<'chart> {
         {
             return Err(fail());
         }
-        let shared = Self::constitutive_wide_scratch(width)
-            .and_then(|n| u32::try_from(n).ok())
-            .filter(|n| *n <= self.declaration.max_sectiond_bytes)
-            .ok_or_else(fail)?;
+        let shared = if let Some(workspace) = workspace {
+            let words = width
+                .checked_add(2)
+                .and_then(Self::constitutive_wide_workspace_words)
+                .ok_or_else(fail)?;
+            if workspace.rows != 1
+                || workspace.width != words
+                || workspace.grain.0 != 0
+                || !std::ptr::eq(workspace.surface, self)
+            {
+                return Err(fail());
+            }
+            0
+        } else {
+            Self::constitutive_wide_scratch(width)
+                .and_then(|n| u32::try_from(n).ok())
+                .filter(|n| *n <= self.declaration.max_sectiond_bytes)
+                .ok_or_else(fail)?
+        };
         let mut params = Params::new();
         for current in [source, response] {
             params
@@ -1034,7 +1050,75 @@ impl<'chart> ResidentSurface<'chart> {
             .u32((source.width / 2) as u32)
             .u32((response.width / 2) as u32)
             .u32(source_extent as u32)
-            .u32(response_extent as u32)
+            .u32(response_extent as u32);
+        if let Some(workspace) = workspace {
+            params
+                .ptr(workspace.lo.device_ptr())
+                .ptr(lane.slot)
+                .ptr(lane.census)
+                .ptr(lane.lineage)
+                .u32(lane.lineage_count);
+            let block = self.declaration.warp_size.max(1);
+            // Resolve malformed source/padding before parallel arithmetic. Thereafter all
+            // candidate failures are the same carrier obstruction, independent of scheduling.
+            self.record_blocks(
+                lane,
+                "section_phase_convolution_validate",
+                1,
+                block,
+                0,
+                &mut params,
+                "phase-convolution",
+            )?;
+            let population = width / 2;
+            self.record_blocks(
+                lane,
+                "section_phase_convolution_products",
+                population.div_ceil(block as usize),
+                block,
+                0,
+                &mut params,
+                "phase-convolution",
+            )?;
+            // Every product coordinate has a distinct write footprint. This ordered reduction
+            // joins the entire result; the following pack uses its one exact common divisor.
+            let mut normalize = Params::new();
+            normalize
+                .ptr(workspace.lo.device_ptr())
+                .u32(width as u32)
+                .ptr(lane.slot)
+                .ptr(lane.census)
+                .ptr(lane.lineage)
+                .u32(lane.lineage_count);
+            self.record_blocks(
+                lane,
+                "section_phase_convolution_normalize",
+                1,
+                block,
+                0,
+                &mut normalize,
+                "phase-convolution",
+            )?;
+            let mut pack = Params::new();
+            pack.ptr(workspace.lo.device_ptr())
+                .u32(width as u32)
+                .ptr(output.lo.device_ptr())
+                .ptr(output.hi.device_ptr())
+                .ptr(lane.slot)
+                .ptr(lane.census)
+                .ptr(lane.lineage)
+                .u32(lane.lineage_count);
+            return self.record_blocks(
+                lane,
+                "section_phase_convolution_pack",
+                (width + 1).div_ceil(block as usize),
+                block,
+                0,
+                &mut pack,
+                "phase-convolution",
+            );
+        }
+        params
             .ptr(output.lo.device_ptr())
             .ptr(output.hi.device_ptr())
             .ptr(lane.slot)

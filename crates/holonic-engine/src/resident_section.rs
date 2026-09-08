@@ -114,6 +114,8 @@ const METAL_SOURCE: &str = concat!(
     include_str!("../../../accelerators/metal/enclosed_field_junction.metal"),
     "\n",
     include_str!("../../../accelerators/metal/field_entry.metal"),
+    "\n",
+    include_str!("../../../accelerators/metal/phase_convolution.metal"),
 );
 
 /// The exact accumulator the kernels carry, read off `__int128`; one octave is the hand.

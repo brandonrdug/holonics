@@ -45,11 +45,21 @@ current port. The [five-control return](../research/records/2026-09-07_ACOUSTIC_
 retains exact source/clock support and delivery lineage. `AcousticFieldCell::temporal_view`
 now attaches that exact clock/support to `holonic-engine::phase_current::resident`.
 
+[established-bounded; implemented-exact] `AcousticFieldChart::mount_complete` returns an
+`AcousticFieldSection` with complete actual source/range support and no cursor advancement.
+`life::native_intelligence::NativeAcousticTemporalPcm16Projection`, owned by
+`membrane_acoustic/temporal_receiver.rs`, receives each ordered complex coefficient as one
+stereo frame with declared digital gain and exact reconstruction residuals. The optional v5
+`recorded_temporal_action` return binds these owners and persists the complete output section.
+
 [established-bounded; implemented-exact] `phase_current::resident::{ResidentPhaseCurrentView,
 ResidentPhaseConvolution,convolve_resident}` realizes the existing causal polynomial action
 from `phase_current::convolve_phase_current` on resident complex rational coefficients.
 `kernels/phase_current_convolution.cuh`, `resident_section/surface_passage.rs` and Apple
-`accelerators/metal/native_phase.metal::section_phase_convolution` own execution and launch.
+`accelerators/metal/phase_convolution.metal` own execution and launch. The Metal convolution
+shares the existing checked arithmetic with its paired/enclosed field helpers. A full output
+that exceeds threadgroup storage uses resident workspace and ordered validation, products,
+normalization and publication; these remain one native passage.
 Both operand carriers remain borrowed and the complete causal tail returns. This is one declared
 temporal action; useful learned acoustic conduct and general material composition remain open.
 

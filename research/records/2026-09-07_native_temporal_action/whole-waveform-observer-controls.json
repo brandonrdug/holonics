@@ -1,0 +1,15 @@
+{
+  "truth_status": "established-bounded",
+  "evidence_tags": [
+    "measured"
+  ],
+  "scope": "cold observer controls only; no native execution",
+  "passed": [
+    "changed-clock",
+    "missing-terminal-readout",
+    "changed-exact-tail-with-updated-wire-hash",
+    "changed-pcm-with-updated-wire-hash",
+    "v4-preserved:esc50-field-ingress",
+    "v4-preserved:librispeech-field-ingress"
+  ]
+}

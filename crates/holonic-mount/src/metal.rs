@@ -500,6 +500,8 @@ enum Command {
         pipeline: ::metal::ComputePipelineState,
         arguments: Vec<Argument>,
         scratch: u64,
+        grid: MTLSize,
+        block: MTLSize,
     },
     Fill {
         buffer: Rc<Allocation>,
@@ -531,6 +533,8 @@ fn submit_in_pool(rt: &Runtime, commands: &[Command]) -> Result<()> {
                 pipeline,
                 arguments,
                 scratch,
+                grid,
+                block,
             } => {
                 let enc = cb.new_compute_command_encoder();
                 enc.set_compute_pipeline_state(pipeline);
@@ -552,7 +556,7 @@ fn submit_in_pool(rt: &Runtime, commands: &[Command]) -> Result<()> {
                 if *scratch > 0 {
                     enc.set_threadgroup_memory_length(0, *scratch);
                 }
-                enc.dispatch_thread_groups(MTLSize::new(1, 1, 1), MTLSize::new(1, 1, 1));
+                enc.dispatch_thread_groups(*grid, *block);
                 enc.end_encoding();
             }
             Command::Fill {
@@ -815,6 +819,7 @@ pub struct Function<'m> {
     wide_signature: &'static [usize],
     arity: usize,
     pack_scalars: bool,
+    parallel_grid: bool,
     nullable: &'static [usize],
     runtime: Rc<Runtime>,
     _module: PhantomData<&'m Module>,
@@ -842,6 +847,8 @@ impl Module {
     pub fn function(&self, name: &str) -> Result<Function<'_>> {
         // Scalar positions and arity are the exact published kernel ABI, not semantic routing.
         let (signature, arity): (&'static [usize], usize) = match name {
+            #[cfg(test)]
+            "test_grid" => (&[1], 2),
             "conduct_complex_incidence" => (&[5, 6, 7], 8),
             "section_constitutive_fibre" => (&[4, 5, 6, 12], 13),
             "section_constitutive_current" => (&[4, 5, 6, 9, 10, 11, 12, 13, 14, 20], 21),
@@ -853,6 +860,11 @@ impl Module {
             "section_constitutive_condition_receive" => (&[2, 3, 4, 9, 10, 11, 21], 22),
             "section_constitutive_condition_current_found" => (&[2, 3, 4, 5, 11], 12),
             "section_constitutive_condition_contact" => (&[2, 3, 4, 7, 8, 16], 17),
+            "section_phase_convolution_validate" | "section_phase_convolution_products" => {
+                (&[2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 18], 19)
+            }
+            "section_phase_convolution_normalize" => (&[1, 5], 6),
+            "section_phase_convolution_pack" => (&[1, 7], 8),
             "section_field_current_input" => (&[2, 3, 4, 5, 11], 12),
             "section_field_source_frame" => (&[6, 12], 13),
             "section_constitutive_circulation" => (&[9, 10, 16], 17),
@@ -897,6 +909,10 @@ impl Module {
                 },
                 arity,
                 pack_scalars: name == "section_constitutive_condition_image",
+                parallel_grid: matches!(
+                    name,
+                    "section_phase_convolution_products" | "section_phase_convolution_pack"
+                ) || (cfg!(test) && name == "test_grid"),
                 nullable: if name == "section_constitutive_differential" {
                     &[6, 7]
                 } else if name == "section_constitutive_field" {
@@ -953,14 +969,38 @@ impl Function<'_> {
     pub fn launch_on_shared(
         &self,
         stream: &Stream,
-        _: Dim3,
-        _: Dim3,
+        grid: Dim3,
+        block: Dim3,
         shared: u32,
         params: &mut [*mut c_void],
     ) -> Result<()> {
         if !Rc::ptr_eq(&self.runtime, &stream.runtime) || params.len() != self.arity {
             return Err(invalid("launch", "context or kernel argument mismatch"));
         }
+        // Only explicitly independent coordinate kernels admit a flat parallel grid. Existing
+        // complete serial kernels loop over their declared carriers and retain one thread.
+        let (grid, block) = if self.parallel_grid {
+            if grid.x == 0
+                || block.x == 0
+                || grid.y != 1
+                || grid.z != 1
+                || block.y != 1
+                || block.z != 1
+                || block.x as u64 > self.pipeline.max_total_threads_per_threadgroup()
+                || grid.x as u64 * block.x as u64 > u32::MAX as u64 + 1
+            {
+                return Err(invalid(
+                    "launch",
+                    "parallel kernel requires an admitted flat u32 grid",
+                ));
+            }
+            (
+                MTLSize::new(grid.x as u64, 1, 1),
+                MTLSize::new(block.x as u64, 1, 1),
+            )
+        } else {
+            (MTLSize::new(1, 1, 1), MTLSize::new(1, 1, 1))
+        };
         let scratch = shared
             .checked_add(15)
             .ok_or_else(|| invalid("launch", "threadgroup scratch extent overflow"))?
@@ -1017,6 +1057,8 @@ impl Function<'_> {
                 pipeline: self.pipeline.clone(),
                 arguments,
                 scratch: scratch as u64,
+                grid,
+                block,
             },
         )
     }
@@ -1151,6 +1193,56 @@ mod tests {
         assert!(timing.gpu_seconds.is_finite() && timing.gpu_seconds >= 0.0);
         context.synchronize().unwrap();
         assert_eq!(context.inner.execution_timing.get(), timing);
+    }
+
+    #[test]
+    fn captured_parallel_grid_preserves_all_coordinates_and_rejects_invalid_geometry() {
+        let (_lock, context) = context();
+        let module = Module::load_metal(
+            r#"
+            #include <metal_stdlib>
+            using namespace metal;
+            kernel void test_grid(device uint *output [[buffer(0)]],
+                constant uint &n [[buffer(1)]], uint gid [[thread_position_in_grid]]) {
+                if (gid < n) output[gid] = 3u * gid + 7u;
+            }
+        "#,
+        )
+        .unwrap();
+        let function = module.function("test_grid").unwrap();
+        let output = DeviceBuffer::<u32>::alloc_zeroed(73).unwrap();
+        let stream = Stream::create().unwrap();
+        let mut address = output.device_ptr();
+        let mut count = 73_u32;
+        let mut params = [
+            (&mut address as *mut u64).cast(),
+            (&mut count as *mut u32).cast(),
+        ];
+        assert!(
+            function
+                .launch_on(&stream, Dim3::x(0), Dim3::x(32), &mut params)
+                .is_err()
+        );
+        assert!(
+            function
+                .launch_on(
+                    &stream,
+                    Dim3::x(1),
+                    Dim3::x(function.max_threads_per_block().unwrap() + 1),
+                    &mut params
+                )
+                .is_err()
+        );
+        stream.begin_capture().unwrap();
+        function
+            .launch_on(&stream, Dim3::x(3), Dim3::x(32), &mut params)
+            .unwrap();
+        let graph = stream.end_capture().unwrap();
+        graph.instantiate().unwrap().launch(&stream).unwrap();
+        context.synchronize().unwrap();
+        let mut returned = [0_u32; 73];
+        output.copy_to_slice(&mut returned).unwrap();
+        assert_eq!(returned, std::array::from_fn(|i| 3 * i as u32 + 7));
     }
 
     #[test]

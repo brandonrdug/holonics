@@ -53,6 +53,43 @@ pub struct AcousticFieldCell<'surface, 'source> {
     support: AcousticFieldSupport,
 }
 
+/// One complete recording section in resident storage. Its local phase-cell partition and
+/// source clock remain the chart's metadata; mounting it creates no native recurrence events.
+pub struct AcousticFieldSection<'surface, 'source> {
+    chart: &'source AcousticFieldChart,
+    section: ResidentSection<'surface>,
+}
+
+impl<'surface, 'source> AcousticFieldSection<'surface, 'source> {
+    pub fn section(&self) -> &ResidentSection<'surface> {
+        &self.section
+    }
+
+    pub fn chart(&self) -> &'source AcousticFieldChart {
+        self.chart
+    }
+
+    pub fn rational(
+        &self,
+    ) -> Result<ResidentConstitutiveCurrent<'_, 'surface>, AcousticFieldError> {
+        Ok(ResidentConstitutiveCurrent::rational(&self.section)?)
+    }
+
+    pub fn temporal_view(
+        &self,
+    ) -> Result<ResidentPhaseCurrentView<'_, 'surface>, ResidentPhaseCurrentError> {
+        ResidentPhaseCurrentView::new(
+            ResidentConstitutiveCurrent::rational(&self.section)?,
+            self.chart.section.receiver,
+            self.chart.section.lineage,
+            self.chart.section.origin.clone(),
+            self.chart.section.sample_step.clone(),
+            self.chart.section.phase_extent,
+            self.chart.section.raw_extent(),
+        )
+    }
+}
+
 impl<'surface, 'source> AcousticFieldCell<'surface, 'source> {
     pub fn section(&self) -> &ResidentSection<'surface> {
         &self.section
@@ -249,6 +286,43 @@ impl AcousticFieldChart {
 
     pub fn next_support(&self) -> Option<AcousticFieldSupport> {
         self.support_at(self.cursor).ok()
+    }
+
+    /// Mount every actual coefficient once, preserving the recording's clock, range and
+    /// phase partition. Structural final-cell padding is excluded from the timed source support.
+    /// This is an exterior codec operation and does not advance the source cursor.
+    pub fn mount_complete<'surface, 'source>(
+        &'source self,
+        surface: &'surface ResidentSurface<'surface>,
+    ) -> Result<AcousticFieldSection<'surface, 'source>, AcousticFieldError> {
+        let width = self
+            .section
+            .raw_extent()
+            .checked_mul(2)
+            .and_then(|n| n.checked_add(1))
+            .filter(|n| *n <= u32::MAX as usize)
+            .ok_or_else(|| AcousticFieldError::Chart("complete current extent overflow".into()))?;
+        let mut words = Vec::with_capacity(width);
+        for sample in self
+            .section
+            .cells
+            .iter()
+            .flatten()
+            .take(self.section.raw_extent())
+        {
+            let sample = sample.to_i64().expect("validated PCM source");
+            words.extend([(sample, sample), (0, 0)]);
+        }
+        words.push((self.divisor, self.divisor));
+        let rest = ResidentSectionRest::found(1, width, ResidentGrain(0), 64, words)
+            .map_err(AcousticFieldError::Chart)?;
+        let section = surface
+            .mount_section_rest(&rest)
+            .map_err(ConstitutiveFibreError::from)?;
+        Ok(AcousticFieldSection {
+            chart: self,
+            section,
+        })
     }
 
     /// Mount one chosen temporal cell as `(sample / divisor, 0)` complex coordinates. The

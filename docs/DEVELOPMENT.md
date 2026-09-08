@@ -83,6 +83,10 @@ CUDA-only matrix contraction. The [field-ingress return](../research/records/202
 now gives the 43-test paired/enclosed/resident-input scope and its exact exclusions. Separate
 material/current-history and field-differential kernels remain unported, so the complete
 constitutive filter is not a Mac parity suite. CUDA-only tests remain unavailable on Mac.
+The [complete temporal return](../research/records/2026-09-07_APPLE_CONDUCTS_COMPLETE_RECORDINGS_AND_RETURNS_TIMED_AUDIO.md)
+adds the 13-control resident convolution scope, 11 mount controls, nine acoustic-chart controls
+and five cold timed-receiver controls. Its exact commands and complete-recording comparisons
+retain the declared storage/receiver scope; useful sound and English remain unfinished.
 The subsequent [condition-fibre return](../research/records/2026-09-07_APPLE_RETURNS_THE_SHARED_CONDITION_PREIMAGE_FIBRE.md)
 adds the exact inverse-query commands, 22 passing engine controls and the public example comparison.
 Its attempted public text-codec control uses an unported paired field and is not an Apple pass.

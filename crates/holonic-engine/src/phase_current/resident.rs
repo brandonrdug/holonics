@@ -153,13 +153,18 @@ pub fn convolve_resident<'source, 'chart>(
     let scratch = ResidentSurface::constitutive_wide_scratch(width)
         .ok_or(PhaseCurrentError::CarrierOverflow)?;
     let available = surface.declaration().max_sectiond_bytes;
-    if scratch > available as usize {
-        return Err(ConstitutiveFibreError::ScratchAperture {
-            required: scratch,
-            available,
-        }
-        .into());
-    }
+    // Placement changes with the complete receiver extent, not with an authored semantic
+    // grain. Large currents keep all coefficients in resident device workspace; dependent
+    // commands normalize the same exact product before returning a public current.
+    let workspace = if scratch > available as usize {
+        let words = width
+            .checked_add(2)
+            .and_then(ResidentSurface::constitutive_wide_workspace_words)
+            .ok_or(PhaseCurrentError::CarrierOverflow)?;
+        Some(surface.fresh_section(1, words, ResidentGrain(0))?)
+    } else {
+        None
+    };
     let output = surface.fresh_section(1, width + 1, ResidentGrain(0))?;
     let mut passage = surface.begin_passage(&[vec![]])?;
     {
@@ -170,6 +175,7 @@ pub fn convolve_resident<'source, 'chart>(
             response.current,
             source.raw_extent,
             response.raw_extent,
+            workspace.as_ref(),
             &output,
         )?;
     }

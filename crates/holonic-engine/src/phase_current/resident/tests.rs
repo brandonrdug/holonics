@@ -67,6 +67,16 @@ fn values(s: &ResidentSurface<'_>, output: &ResidentSection<'_>) -> Vec<Rat> {
         .collect()
 }
 
+fn first_workspace_extent(s: &ResidentSurface<'_>) -> usize {
+    let available = s.declaration().max_sectiond_bytes as usize;
+    let mut shared_extent = 1;
+    while ResidentSurface::constitutive_wide_scratch(2 * (shared_extent + 1)).unwrap() <= available
+    {
+        shared_extent += 1;
+    }
+    shared_extent + 1
+}
+
 #[test]
 #[ignore = "requires native GPU; exact causal tail agrees with the independent cold owner"]
 fn complete_carry_matches_cold_reference_and_retains_operand_charts() {
@@ -165,6 +175,143 @@ fn wide_products_normalize_before_word_publication() {
 }
 
 #[test]
+#[ignore = "requires native GPU; resident workspace normalization reduces wide rational carriers exactly"]
+fn workspace_wide_denominator_reduces_i64_max_to_unit() {
+    let r = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&r).unwrap();
+    let raw = first_workspace_extent(&s);
+    assert!(
+        ResidentSurface::constitutive_wide_scratch(2 * raw).unwrap()
+            > s.declaration().max_sectiond_bytes as usize
+    );
+    let m = i64::MAX;
+    let mut source_words = Vec::with_capacity(2 * raw + 1);
+    for _ in 0..raw {
+        source_words.extend([m, 0]);
+    }
+    source_words.push(m);
+    let x = mount(&s, &source_words);
+    let c = mount(&s, &[m, 0, m]);
+    let out = product(&s, &x, &c, raw, 1).unwrap();
+    let expected: Vec<_> = (0..raw).flat_map(|_| [q(1, 1), q(0, 1)]).collect();
+    assert_eq!(values(&s, out.section()), expected);
+}
+
+#[test]
+#[ignore = "requires native GPU; workspace admission rejects distant nonzero structural padding"]
+fn workspace_nonzero_padding_refuses_without_mutating_the_source() {
+    let r = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&r).unwrap();
+    let raw = first_workspace_extent(&s);
+    assert!(
+        ResidentSurface::constitutive_wide_scratch(2 * raw).unwrap()
+            > s.declaration().max_sectiond_bytes as usize
+    );
+    let coordinates = raw + 1;
+    let mut source_words = vec![0; 2 * coordinates + 1];
+    source_words[2 * raw] = 7;
+    source_words[2 * coordinates] = 1;
+    let x = mount(&s, &source_words);
+    let c = mount(&s, &[1, 0, 1]);
+    let original = s.read_out(&x).unwrap();
+    assert!(product(&s, &x, &c, raw, 1).is_err());
+    assert_eq!(s.read_out(&x).unwrap(), original);
+}
+
+#[test]
+#[ignore = "requires native GPU; malformed padding precedes arithmetic refusal in either placement"]
+fn complete_validation_precedes_parallel_products() {
+    let r = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&r).unwrap();
+    let response = mount(&s, &[i64::MAX, i64::MAX, i64::MAX]);
+    let mut errors = Vec::new();
+    for raw in [1, first_workspace_extent(&s)] {
+        let coordinates = raw + 1;
+        let mut words = vec![0; 2 * coordinates + 1];
+        words[0] = i64::MAX;
+        words[1] = i64::MAX;
+        words[2 * raw] = 7; // Invalid distant structural padding.
+        words[2 * coordinates] = i64::MAX;
+        let source = mount(&s, &words);
+        let original = s.read_out(&source).unwrap();
+        match product(&s, &source, &response, raw, 1) {
+            Err(error) => errors.push(error.to_string()),
+            Ok(_) => panic!("malformed padding was admitted"),
+        }
+        assert_eq!(s.read_out(&source).unwrap(), original);
+    }
+    assert_eq!(errors[0], errors[1]);
+}
+
+#[test]
+#[ignore = "requires native GPU; a complete 16k resident waveform agrees with the cold exact owner"]
+fn complete_16k_real_waveform_matches_cold_convolution() {
+    let r = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&r).unwrap();
+    let waveform: Vec<i32> = (0..16_000)
+        .map(|at| ((at as i32 * 37 + 11) % 29) - 14)
+        .collect();
+    let response_values = [-2, 3, 1];
+    let mut source_words = Vec::with_capacity(2 * waveform.len() + 1);
+    for value in &waveform {
+        source_words.extend([i64::from(*value), 0]);
+    }
+    source_words.push(1);
+    let mut response_words = Vec::with_capacity(2 * response_values.len() + 1);
+    for &value in &response_values {
+        response_words.extend([i64::from(value), 0]);
+    }
+    response_words.push(1);
+    let source = mount(&s, &source_words);
+    let response = mount(&s, &response_words);
+    let before = s.census();
+    let out = product(
+        &s,
+        &source,
+        &response,
+        waveform.len(),
+        response_values.len(),
+    )
+    .unwrap();
+    let after = s.census();
+    assert_eq!(after.section_read_outs, before.section_read_outs);
+    assert_eq!(after.ingress_octets, before.ingress_octets);
+    let cold_source = ExactPhaseCurrentSection::from_i32(
+        PhaseCurrentReceiverId(1),
+        PhaseCurrentLineageId(1),
+        q(1, 10),
+        q(1, 16000),
+        2,
+        &waveform,
+    )
+    .unwrap();
+    let cold_response = ExactPhaseCurrentSection::from_i32(
+        PhaseCurrentReceiverId(2),
+        PhaseCurrentLineageId(2),
+        q(2, 10),
+        q(1, 16000),
+        2,
+        &response_values,
+    )
+    .unwrap();
+    let cold = convolve_phase_current(
+        &cold_source,
+        &cold_response,
+        PhaseCurrentReceiverId(3),
+        PhaseCurrentLineageId(4),
+        CpuExecutor::serial(),
+    )
+    .unwrap();
+    let expected: Vec<_> = cold
+        .output
+        .flat_values()
+        .into_iter()
+        .flat_map(|value| [Rat::from_integer(value), Rat::zero()])
+        .collect();
+    assert_eq!(values(&s, out.section()), expected);
+}
+
+#[test]
 #[ignore = "requires native GPU; malformed carriers and overflow refuse without changing sources"]
 fn malformed_numeric_carriers_and_late_overflow_preserve_inputs() {
     let r = ResidentReadout::new().unwrap();
@@ -244,31 +391,51 @@ fn incompatible_charts_and_surface_refuse_before_allocation() {
 }
 
 #[test]
-#[ignore = "requires native GPU; the full admitted scratch tail is retained and the next extent refuses"]
-fn scratch_boundary_uses_actual_target_carriers() {
+#[ignore = "requires native GPU; small and large placement retain CUDA checked accumulator admission"]
+fn checked_complex_accumulator_refuses_before_normalization_in_both_placements() {
     let r = ResidentReadout::new().unwrap();
     let s = ResidentSurface::on(&r).unwrap();
-    let available = s.declaration().max_sectiond_bytes as usize;
-    let mut n = 1;
-    while ResidentSurface::constitutive_wide_scratch(2 * (n + 1)).unwrap() <= available {
-        n += 1;
+    let m = i64::MAX;
+    let response = mount(&s, &[m, m, m]);
+    for raw in [1, first_workspace_extent(&s)] {
+        let mut words = vec![0; 2 * raw + 1];
+        words[0] = m;
+        words[1] = m;
+        words[2 * raw] = m;
+        let source = mount(&s, &words);
+        let before = s.read_out(&source).unwrap();
+        // The abstract product would normalize to 2i, but its imaginary intermediate
+        // exceeds the declared 126-bit checked-add aperture on both target backends.
+        assert!(product(&s, &source, &response, raw, 1).is_err());
+        assert_eq!(s.read_out(&source).unwrap(), before);
     }
-    let mut words = vec![0; 2 * n + 1];
-    words[2 * n - 2] = 7;
-    words[2 * n] = 1;
-    let x = mount(&s, &words);
-    let c = mount(&s, &[1, 0, 1]);
-    let out = product(&s, &x, &c, n, 1).unwrap();
-    assert_eq!(values(&s, out.section())[2 * n - 2], q(7, 1));
-    let too_wide = mount(&s, &vec![0; 2 * (n + 1) + 1]);
-    let before = s.census();
-    assert!(matches!(
-        product(&s, &too_wide, &c, n + 1, 1),
-        Err(ResidentPhaseCurrentError::Native(
-            ConstitutiveFibreError::ScratchAperture { .. }
-        ))
-    ));
-    assert_eq!(s.census(), before);
+}
+#[test]
+#[ignore = "requires native GPU; both storage placements preserve the complete complex causal tail"]
+fn shared_and_workspace_boundary_preserves_complete_complex_causal_tail_without_operand_reads() {
+    let r = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&r).unwrap();
+    let first_workspace = first_workspace_extent(&s);
+    for n in [first_workspace - 1, first_workspace] {
+        let mut source_words = Vec::with_capacity(2 * n + 1);
+        let mut expected = Vec::with_capacity(2 * n);
+        for at in 0..n {
+            let real = (at as i64 % 7) - 3;
+            let imaginary = (at as i64 % 5) - 2;
+            source_words.extend([real, imaginary]);
+            expected.extend([q(2 * real + imaginary, 1), q(2 * imaginary - real, 1)]);
+        }
+        source_words.push(1);
+        let x = mount(&s, &source_words);
+        let c = mount(&s, &[2, -1, 1]);
+        let before = s.census();
+        let out = product(&s, &x, &c, n, 1).unwrap();
+        let after = s.census();
+        assert_eq!(after.section_read_outs, before.section_read_outs);
+        assert_eq!(after.ingress_octets, before.ingress_octets);
+        assert_eq!(after.deed_launches - before.deed_launches, 1);
+        assert_eq!(values(&s, out.section()), expected);
+    }
 }
 
 #[test]
