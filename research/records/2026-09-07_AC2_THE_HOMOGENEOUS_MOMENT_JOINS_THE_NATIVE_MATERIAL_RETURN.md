@@ -129,7 +129,8 @@ checkpoint and reproduces the full body, generation and emission-current reports
 [open] Athena-alpha and the full AC0–AC5 product remain unfinished. These conversation
 prefixes contain 728/1,922 text octets; they are not a broad cultivated language model.
 The [chronological future contraction](2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
-provides the next concrete representation to compose for broader cultivation, with its
+provides a derived representation option for broader cultivation, with its
 delayed-source and numerical obligations explicit. Reducing its work does not by itself
-solve contextual progression or useful language. The measured repetition remains an actual
+solve contextual progression or useful language. The live roadmap retains AC1’s missing
+generative composition and AC2’s useful responses as the priority. The measured repetition remains an actual
 failed response; no output filter, alternative emitter or inherited-language fallback hides it.

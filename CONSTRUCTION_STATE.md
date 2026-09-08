@@ -83,12 +83,17 @@ response's error radius from about 0.321 to 0.00404 without changing its numeric
 The answer still repeats `va` to the 128-symbol work limit. This is a failed language result;
 Athena-alpha and the AC0–AC5 product remain unfinished.
 
-[definition] Next construct the [chronological future contraction](research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
-in the same native moment owner, retaining delayed-source coverage and the composed residual.
-Its derived parameter form can represent all chronologically new queries without expanding
-the history-sized Hermitian source; numerical realization and cost remain open. Follow it
-through broader actual cultivation and response inspection. Keep the private checkpoints and
-failed responses; a component test or another isolated diagnostic does not complete the goal.
+[definition] **Next: AC1 → AC2, generative composition.** The bounded conditional-generator
+and Preimage Fibre owners have not been integrated into the conversation recurrence with an
+established consequence for formation, reuse and transformation of subsequent relations.
+Identify and compose that actual attachment in the existing native owners, then inspect its
+complete conversation responses and contextual revisions. The fixed exterior chart and a
+changed material source do not establish learned contextual organization. The
+[chronological future contraction](research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
+remains a derived representation option with open numerical obligations; it is not the next
+mandatory step or evidence that the missing generative composition has returned. Keep the
+private checkpoints and failed responses. AC3 persistence apparatus does not complete AC3's
+cultivated-model obligation; AC4–AC5 remain outstanding.
 
 [established-bounded; measured] The [text-parent framing repair](research/records/2026-09-07_AC0_LEADING_MATERIAL_DOES_NOT_DROP_THE_TEXT_PART_PARENT.md)
 preserves an available parent when non-text material precedes the first admitted text part.

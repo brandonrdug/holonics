@@ -73,13 +73,17 @@ its numerical current. The resulting answer repeats `va` to the 128-symbol work 
 fails the requested language product. This component is complete at its declared scope;
 Athena-alpha remains unattained.
 
-[definition] Next compose the [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
-through this same owner so broader cultivation need not reevaluate every retained factor for
-every new source. Preserve source chronology, delayed-return coverage, exact residuals and the
-complete successor. The derived identity is not yet a finite-word implementation or a language
-result. Cultivate and inspect the resulting actual model through the existing public session;
-continue toward learned contextual progression and useful English/code/mathematics. Do not
-substitute another isolated diagnostic, a centre or a repetition filter for that product.
+[definition] **Next construction remains AC1 → AC2.** Compose the existing learned
+conditional/generative transport and Preimage Fibre owners with the productive conversation
+recurrence so that available contextual returns determine subsequent native relation formation,
+reuse and transformation. Name the actual missing source/condition/return attachment and its
+consequence; do not substitute another source chart or representation repair for that composition.
+Exercise it on actual conversation material and inspect complete responses with contextual
+followups. The phase controls, changed coefficients and persistence receipts do not close AC1
+or AC2. The [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
+is an available derived representation option, not a prerequisite scheduled ahead of this gap.
+Use it if the actual composition needs that representation, with its delayed-return and numerical
+obligations intact. Preserve the failed model and the full product standard.
 
 [established-bounded; measured] The [generated-current ingress](../../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
 now reaches the ordinary field operation without numerical readback/remount, preserving paired

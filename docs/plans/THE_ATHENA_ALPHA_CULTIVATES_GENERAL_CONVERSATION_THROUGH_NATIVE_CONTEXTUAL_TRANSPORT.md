@@ -261,11 +261,14 @@ eight-family cultivation retains 1,930 development occurrences, but its resolved
 `va` to the 128-symbol work limit. Numerical/source attachment and persistence have returned;
 useful language and the full AC0–AC5 objective remain open.
 
-[definition] The roadmap now orders the [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
-for broader actual cultivation. Its finite parameter identity preserves the full complete-source
-pairing at chronologically new queries; delayed returns retain their own addressed evaluator.
-Realize and price the composed numerical residual before claiming an efficient native decoder.
-Another isolated diagnostic or a repetition filter does not establish contextual development.
+[definition] AC1's generative composition and AC2's complete useful responses remain the
+construction priority. The bounded conditional-generator and Preimage Fibre owners must
+participate in the actual conversation recurrence with a demonstrated consequence for formation,
+reuse and transformation of subsequent relations. The fixed exterior chart and changed material
+source are not sufficient evidence of that attachment. The
+[chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
+remains a derived representation option; it is not a mandatory prerequisite ahead of this missing
+composition or an explanation of the failed language response. The roadmap orders work.
 
 [established-bounded; measured] The [resident field ingress](../../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
 now lets generated current enter that same field operation directly. Its actual input survives

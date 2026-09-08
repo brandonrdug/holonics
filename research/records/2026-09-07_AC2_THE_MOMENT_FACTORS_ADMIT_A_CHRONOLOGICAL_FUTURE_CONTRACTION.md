@@ -4,7 +4,8 @@
 uses every retained coefficient factor for each new source evaluation. The contraction below
 is scoped to that numerical operator and chronologically new queries. It does not identify
 the complete ecology with a matrix, remove separating histories, or establish useful language.
-The roadmap schedules its construction; this record supplies the mathematical relation.
+The roadmap decides whether its construction serves the active AC1–AC2 obligation; this
+record supplies the mathematical relation and schedules no prerequisite.
 
 [definition] For an existing complete numerical source at occurrence `s`, write its retained
 features as `p_s, P_s, u_s, w_s`, with numerical squared norm `n_s` and
