@@ -104,17 +104,24 @@ All 141 constitutive and 20 SDK alpha tests pass. Actual 16-family development a
 restart return the same complete body and current history, but the response repeats `~ena` and
 fails the request. This closes the declared ordinary equal-source attachment, not AC1 or AC2.
 
-[definition] **Next AC1 → AC2 construction:** derive and implement the next contextual-organization
-or productive-continuation attachment from the ordinary model's actual source, condition and
-returned differences. Equal visible-source families do not exhaust general class formation.
-Inspect the current-to-text continuation boundary: ordinary generation decodes signs and
-re-enters a unit codeword, while the separate full-current ingress currently takes exact returns.
-Establish the declared contact and uncertainty requirements before changing that path or blaming
-it for the language failure. Compose the existing native owners, retain complete staged refusal
-and actual Preimage Fibres, and inspect full responses with contextual followups. Do not replace
-an enclosure by its centre, install a quotation/template emitter or substitute another isolated
-source extraction. Necessary derivation remains inside AC1; no additional user information is
-required. AC2 useful English/code/mathematics, broad AC3 and AC4–AC5 remain open.
+[established-bounded; computational-witness] The [material context-cotangent return](../../research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_HAS_A_CONTEXT_COTANGENT.md)
+now derives the normalized phase-moment differential and metric adjoint, and certifies a nonzero
+source-side receiver from the actual ordinary model. The field currently deposits the material
+parameter return without conducting that cotangent through the context producer. Twenty explicit
+born-coordinate pairings, twenty symbolic derivatives, an independent complex adjoint identity
+and the actual forward evaluation bound verify the cold derivation. The model is unchanged.
+
+[definition] **Next AC1 → AC2 construction:** derive the actual paired-field/current producer's
+differential and constitutive response, then conduct the material context adjoint through it
+inside the same staged successor. Use the producing map, prior morphology and delayed-return
+split; retain all source uncertainty and Preimage Fibres. A cotangent cannot be installed as a
+state displacement without this contact. The derived joint parameter/producer tangent contact
+provides a composition law once that actual producer and metric are supplied. Logging the signal
+or repeating the cold derivation does not discharge this native attachment. Then inspect AC2's
+complete English/code/mathematics responses and contextual revision. The exterior unit-codeword
+feedback has not been proved erroneous, and a centre substitution into exact-current ingress
+remains inadmissible. Necessary derivation stays inside AC1; no additional user input is required.
+AC2 usefulness, broad AC3 and AC4–AC5 remain open.
 
 [definition] The [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
 remains an available representation option when the actual composition needs it, with its

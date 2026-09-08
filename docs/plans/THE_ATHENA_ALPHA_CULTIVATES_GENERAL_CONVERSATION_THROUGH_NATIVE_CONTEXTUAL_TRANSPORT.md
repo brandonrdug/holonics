@@ -295,16 +295,23 @@ and its complete process restart return; its repetitive response still fails. Th
 equal-source attachment is implemented, while AC1 contextual organization and AC2 useful
 language remain open. This does not infer a unique cause from the observations.
 
-[definition] Continue from the actual ordinary model's source/condition/return conduct into
-learned contextual organization and productive text continuation. Equal visible-source families
-have a bounded scope; general class formation is not supplied by reference equality. Review
-the declared contact between native current, its text receiver and the next occurrence: ordinary
-generation currently re-enters a unit codeword, while the separate full-current ingress takes
-exact native returns. Preserve uncertainty and producing carriers when deriving that continuation.
-Its effect on language must be measured, not assumed. The roadmap orders the concrete work;
-necessary derivation remains part of AC1 and useful English/code/mathematics remains AC2.
+[established-bounded; computational-witness] The [material context cotangent](../../research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_HAS_A_CONTEXT_COTANGENT.md)
+now supplies the normalized phase-moment differential, its real metric adjoint and a certified
+nonzero receiver from an actual conversation return. The successful native field currently has
+no source-side material cotangent input into its context producer; the material parameter contact
+alone does not supply it. The cold calculation preserves the actual forward factors and their
+uncertainty, and changes no model state.
+
+[definition] Continue the generative composition by deriving and implementing the actual context
+producer's differential, metric and constitutive return through the existing native field/current
+owners, within the same complete successor. Preserve old producing maps, prior overlays and the
+delayed-return split. The derived joint tangent contact is a response law, not an inverse cause;
+its native producer attachment remains owed. This is AC1 construction directed at AC2's useful
+complete language products, not a new phase or a diagnostic-only substitute. The ordinary
+exterior codeword loop has not been established as the cause of the failed response, and its
+alternative native-current path must preserve uncertainty. The roadmap orders the concrete work.
 The [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
-is an available representation construction when needed, not a replacement for this attachment.
+remains a representation option when the productive composition requires it.
 
 [established-bounded; measured] The [resident field ingress](../../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
 now lets generated current enter that same field operation directly. Its actual input survives

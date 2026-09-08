@@ -115,6 +115,11 @@ preimage algebra into the [contextual lift](../research/records/2026-09-07_AC1_T
 `field/contextual_lift.rs` binds its cold inspection to actual source and pre-return context
 currents; its bounded pair form reuses `NativeCurrentHistorySourceReading::numerical_pairing`.
 `alpha_contextual_lift` exercises saved conversation passages without changing the native model.
+Its `--material-history` mode now exports the complete cold material wires through the existing
+field inspector. `research/experiments/alpha_passive_junction/inspect_contextual_return.py`
+uses them to verify the [material context cotangent](../research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_HAS_A_CONTEXT_COTANGENT.md).
+The producer adjoint and its native constitutive attachment remain open; this is an observer,
+not another source of productive current.
 These remain derivation/reference owners; the resident section below supplies the native port.
 
 [established-bounded; source-inspected] `resident/context_section.rs` and

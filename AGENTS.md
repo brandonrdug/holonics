@@ -74,7 +74,10 @@ now conducts it through condition contact and full-current re-entry. The
 [ordinary contextual return](research/records/2026-09-08_AC1_ORDINARY_RECEPTION_CONDUCTS_THE_SOURCE_AND_ITS_AVAILABLE_CONTEXT.md)
 now discovers equal-source reference frames and stages both parameter contacts within ordinary
 reception. Its actual conversation response still fails. Follow AC1–AC2’s contextual-organization
-and productive-continuation obligation; do not repeat the completed pair-selected study. Do not replace enclosures with centres
+and productive-continuation obligation. The [material context cotangent](research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_HAS_A_CONTEXT_COTANGENT.md)
+now supplies a certified nonzero source-side receiver on the actual model. Continue its return
+through the actual native context producer and constitutive metric; the parameter deposit alone
+does not conduct that adjoint. Do not repeat the completed pair-selected study or cold derivation. Do not replace enclosures with centres
 or phase labels, or found a separate learner. Retain the carriers used to produce each prediction; later
 condition inference changes the successor rather than rewriting that prediction's history.
 

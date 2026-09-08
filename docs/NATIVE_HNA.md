@@ -319,6 +319,15 @@ on two actual saved returns. It preserves the separate source/context epochs and
 update the model or emit an answer. Omitting `--enclosed-pair` runs the substantially more
 expensive exact contextual-current reference. This inspection is not a cultivation pipeline.
 
+[established-bounded; source-inspected] `alpha_contextual_lift MODEL --material-history --report
+NEW.jsonl` is an explicit cold observer. It reads the saved field through the existing public
+owner, exports each complete material report's exact wire codewords and source lineage, and
+checks that no native deed occurred. It does not open the exposure dataset or cultivate.
+The [context-cotangent derivation](../research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_HAS_A_CONTEXT_COTANGENT.md)
+uses this export for an exact source-adjoint receiver with retained uncertainty. Its productive
+return into the paired-field/current producer remains unimplemented; the observer is not a model
+or a source of generated answers.
+
 [established-bounded; source-inspected] The [resident contextual return](../research/records/2026-09-08_AC1_THE_CONTEXTUAL_SECTION_RETURNS_THROUGH_NATIVE_CONDITION_AND_FIELD_CURRENT.md)
 is available through `contextual_section`, `derive_contextual_contrast`, the full forward/
 preimage interfaces and the existing condition-current contact. `TextFieldSession::receive_native_return`

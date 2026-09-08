@@ -43,16 +43,28 @@ Development takes 199.24 s, with zero numerical section readouts and 358,970,772
 native payload. Whole-process time is 305.76 s and peak host RSS is 2,194,532 KiB. These are
 bounded measurements, not consumer efficiency or alpha completion.
 
-[definition] **Next: AC1 → AC2, contextual organization and productive text continuation.**
-Inspect the ordinary model's source/condition/returned differences and actual generation path,
-then compose the missing native relation or port that the evidence identifies. The present
-reference construction covers equal visible-source faces; it does not establish general class
-formation or learned codec conduct. Ordinary text generation currently decodes differential signs
-and re-enters their unit codeword; the full-current ingress is separately available for exact
-native returns. Determine the declared contact and uncertainty requirements of native output
-continuation before attributing the failed response to that boundary. Do not replace an enclosed
-current by its centre. Further useful English/code/mathematics responses and contextual revisions
-must be inspected directly; more exposure or changed output alone does not discharge AC2.
+[established-bounded; computational-witness] The [material context cotangent](research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_HAS_A_CONTEXT_COTANGENT.md)
+now identifies a missing source-side return on the ordinary model. At receiving occurrence 20,
+the actual residual has a certified positive adjoint receiver along `c_19-c_11`: approximately
+`0.0304752459 ± 7.32e-11`. Exact factor reconstruction, 20 independent born-coordinate pairings,
+20 symbolic directional derivatives and a complex-phase adjoint identity verify the scope.
+A cold read of all 5,064 development reports enacts zero native deeds. Of 5,063 linked predictions,
+413 codewords are correct and 74 have an unresolved sign; this is development evidence, not a
+held-out language-quality measure.
+
+[definition] **Next: AC1 → AC2, conduct the material context adjoint through its producer.**
+The successful paired-field formation currently has no material context-cotangent input; only
+material coefficients receive that direct return. Exterior text feedback and complete refusal
+still affect subsequent conduct. Derive the actual producer differential and constitutive metric,
+then compose the source-side return through the existing paired-field/condition-current owners
+inside one staged successor. The cotangent is not a state displacement or an inverse cause; its nonzero ambient receiver
+does not yet prove a nonzero return through the producer’s admitted tangent range.
+Retain producing morphology, delayed-return chronology and numerical uncertainty. Merely logging
+this new signal or changing codeword feedback does not complete the attachment. The ordinary
+codeword loop was not established as the cause of the failed language response; an enclosed
+current still cannot enter the exact point port by losing its radius. Inspect actual complete
+responses and contextual revisions after productive integration. No additional user information
+is required; the AC0–AC5 product remains open.
 
 [definition] Existing [conditional transport](research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md),
 [condition families](research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md),
