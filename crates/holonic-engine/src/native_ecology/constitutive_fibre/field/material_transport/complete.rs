@@ -4,6 +4,11 @@ use super::super::current_history_source::{decode_source, integer};
 use super::*;
 
 mod exact;
+mod mode;
+pub use mode::{
+    NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading,
+    NativeMaterialModeReturn, NativeMaterialModeUnfolding,
+};
 #[cfg(test)]
 mod tests;
 

@@ -24,6 +24,15 @@ to desktop, with all receipt fields equal except path and timing. Source-indepen
 and recipient-field conduct use two deeds and zero numerical readout. Acoustic clock/interaction
 binding remains required; the mode's sign progression does not supply physical frequency.
 
+[established-bounded; source-inspected] Desktop `e577d9b3` now supplies the
+[material-mode contribution](research/records/2026-09-07_AC1_THE_SHARED_DRIVE_MODE_REACHES_THE_LEARNED_MATERIAL_CURRENT.md),
+its remaining current and actual producing/current operator cuts on this branch. Its complete
+material/history kernels have not yet returned on Metal.
+
+[open] Port that productive complete-current material path and expose its retained enclosed
+current directly to the existing temporal acoustic receiver. Keep recording clocks and actual
+source/return contact explicit; a mode's occurrence parity does not define an acoustic frequency.
+
 [established-bounded; measured] The [measured acoustic difference](research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md)
 and [producing adjoint](research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md)
 retain complete oriented returns through the actual source/response carriers. Their original
@@ -134,19 +143,35 @@ The actual four-family conversation model supplies a 2,030-byte mode at contacts
 a certified nonzero current and fixed numerical amplitude fibre. Its 732 occurrences remain
 unchanged, and the mode unfolds after the source session is dropped.
 
-[open] Next compose the mode through the existing complete-current material transport and its
-actual source/receiving chronology: for `m=(e_l-e_r)/2`, its output contribution is `(M m) q`.
-Preserve the remaining source, producing/current operator cuts, amplitude fibre and returned
-difference. Do not select the numerical centre or substitute a phase label or another learner.
-A mode being available does not establish that the learned emitter uses it. Athena-alpha still
-has no useful text response; the full AC0–AC5 goal remains unfinished.
+[established-bounded; measured] The [mode/material return](research/records/2026-09-07_AC1_THE_SHARED_DRIVE_MODE_REACHES_THE_LEARNED_MATERIAL_CURRENT.md)
+now computes `(M m) q`, remaining/full currents, producing/current coefficients and their actual
+change from the existing native factors. All 128 constitutive and 16 SDK alpha tests pass.
+The public control learns a hidden mode's receiving current and unfolds its native differential
+after the source field is dropped. The real four-family model has a certified nonzero mode
+contribution and change; its 17-step unfolding matches a later actual source under the same map.
+The full and remaining currents have the same nine text signs at that particular cut, so no
+text-quality improvement is claimed.
+
+[definition] Next construct the [homogeneous phase-moment source](research/records/2026-09-07_AC2_A_HOMOGENEOUS_PHASE_MOMENT_IS_THE_NEXT_MATERIAL_SOURCE_CHART.md)
+through the same native material-return owner, retaining the complete current, reference chart,
+lineage and numerical residual scope. Its implicit normalized Hermitian pairing presents mixed
+phase forms without enumerating a tensor population or selecting a centre. Language improvement
+is a construction hypothesis, to be tested by cultivation and complete actual responses. Keep
+the existing source variant and its evidence. Athena-alpha and the full AC0–AC5 product remain
+unfinished; another isolated mode diagnostic is not the next deliverable.
+
+[established-bounded; measured] The [text-parent framing repair](research/records/2026-09-07_AC0_LEADING_MATERIAL_DOES_NOT_DROP_THE_TEXT_PART_PARENT.md)
+preserves an available parent when non-text material precedes the first admitted text part.
+The prepared stream has 48 susceptible development layouts. A native regression verifies new
+framing and truthful completion of a legacy pending inscription; the early saved models do not
+reach these cases.
 
 [established-bounded; measured] The [generated-current ingress](research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
 now feeds the existing field operation directly, retaining its actual input through history
 placement and rest. All 118 constitutive and 16 SDK alpha tests pass, including paired/internal
 equivalence, refusal preservation and restart. The public conditional example drives three linked
 paired-field occurrences with zero numerical readback and retains their full internal currents.
-This closes the ingress port; the mode/material-transport binding above remains open.
+This closes the ingress port; the mode/material binding has now returned above.
 
 [established-bounded; measured] The existing local relation now has a
 [resident rational-current port](research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md).

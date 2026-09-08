@@ -148,6 +148,14 @@ their law. Twenty-seven focused controls pass. The 391-byte mode wire and every 
 field except path/timing match desktop. This closes that device port; actual acoustic attachment
 and the separate material/current-history consumers remain unfinished.
 
+[established-bounded; measured] The [material-mode extension](../research/records/2026-09-07_AC1_THE_SHARED_DRIVE_MODE_REACHES_THE_LEARNED_MATERIAL_CURRENT.md)
+adds `section_complete_material_mode` and `section_material_mode_unfold`, plus the packed-ball
+view of the existing differential receiver. It reuses retained coefficient factors, including
+source supports before/between/after the two births. Port the current/mode/source cuts separately,
+the exact numerical coefficient contractions and all enclosure/rounding terms. Mode ownership
+for an in-body coefficient query is distinct from portable standalone unfolding. No Metal
+execution or general backend parity is established by the desktop return.
+
 [established-bounded; source-inspected] The public framework enters through
 [`holonics::hna`](../crates/holonics/src/lib.rs). Its native session is exposed by
 [`with_native_session`](NATIVE_HNA.md), while the earlier inherited operator retains a

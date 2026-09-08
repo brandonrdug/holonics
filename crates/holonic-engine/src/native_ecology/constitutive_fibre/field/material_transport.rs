@@ -4,7 +4,11 @@ use num_bigint::BigInt;
 use num_traits::One;
 
 pub(super) mod complete;
-pub use complete::{NativeCompleteMaterialTransportReading, NativeCompleteMaterialTransportState};
+pub use complete::{
+    NativeCompleteMaterialTransportReading, NativeCompleteMaterialTransportState,
+    NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading,
+    NativeMaterialModeReturn, NativeMaterialModeUnfolding,
+};
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(rename_all = "kebab-case")]

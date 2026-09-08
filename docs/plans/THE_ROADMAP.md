@@ -59,19 +59,27 @@ and 16 SDK alpha tests pass. A mode from the actual four-family conversation mod
 nonzero contextual difference and unfolds after that session is dropped. Its amplitude remains
 an enclosure; the point-current port does not silently select its centre.
 
-[definition] Next compose this actual mode through the existing complete-current material
-transport, retaining source/receiving chronology, the producing/current operator cuts and full
-returned difference. Its mode contribution is `(M m) q`, with `m=(e_l-e_r)/2`; the remaining
-complete source is retained. Establish its productive coupling before repeating corpus exposure.
-Do not replace the amplitude fibre with its centre or a phase label. Native generative current
-remains distinct from whole-family evidence, without a universal certainty gate on generation.
+[established-bounded; measured] The [material-mode return](../../research/records/2026-09-07_AC1_THE_SHARED_DRIVE_MODE_REACHES_THE_LEARNED_MATERIAL_CURRENT.md)
+now preserves the mode, remainder, full current and operator chronology through the existing
+learner. The real model's contribution is nonzero and its frozen-map unfolding matches a later
+actual source. All 128 constitutive and 16 SDK alpha tests pass. That decomposition does not
+improve the old model's text result.
+
+[definition] Next implement the [homogeneous phase-moment source](../../research/records/2026-09-07_AC2_A_HOMOGENEOUS_PHASE_MOMENT_IS_THE_NEXT_MATERIAL_SOURCE_CHART.md)
+through the existing complete material-return owner. Retain the full contextual current and
+phase-reference chart; construct the implicit normalized Hermitian pairing and its exact
+source/parameter error receipts, then cultivate and inspect the actual conversation variant.
+Its benefit for language is a hypothesis. Preserve the existing variant and do not substitute
+a centre, phase label, sampled tensor population, separate learner or another isolated diagnostic
+for this productive construction. Native generative current remains distinct from whole-family
+evidence, without a universal certainty gate on generation.
 
 [established-bounded; measured] The [generated-current ingress](../../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
 now reaches the ordinary field operation without numerical readback/remount, preserving paired
 internal current, source consumption and actual input through cold rest/history placement.
 All 118 constitutive and 16 SDK alpha controls pass; the public example drives three linked
 paired-field occurrences with no numerical readback. The internal-mode/material binding above
-is now the next source composition within this same conversation campaign.
+has subsequently returned; the source construction above continues the same conversation campaign.
 
 [established-bounded; measured] The [resident local return](../../research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md)
 now lets native observations develop the existing local relation and its rational emitted current

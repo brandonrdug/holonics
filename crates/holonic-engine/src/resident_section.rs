@@ -91,6 +91,7 @@ mod surface_adjoint;
 mod surface_condition;
 #[path = "resident_section/surface_intervention.rs"]
 mod surface_intervention;
+mod surface_material_mode;
 #[path = "resident_section/surface_mount.rs"]
 mod surface_mount;
 #[path = "resident_section/surface_passage.rs"]

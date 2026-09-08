@@ -106,16 +106,22 @@ fn cultivate(
             None
         };
         let partial_ordinal = partial_part.as_ref().and_then(|p| p["ordinal"].as_u64());
-        for (part_index, part) in parts.iter().enumerate() {
+        // The first part admitted by this text chart inherits the actual available parent,
+        // including when an image or other unmounted material precedes it in the source.
+        for (part_index, part) in parts
+            .iter()
+            .filter(|part| {
+                part.text.is_some()
+                    && matches!(
+                        part.kind.as_str(),
+                        "human-text" | "human-command" | "agent-text"
+                    )
+            })
+            .enumerate()
+        {
             let Some(text) = &part.text else {
                 continue;
             };
-            if !matches!(
-                part.kind.as_str(),
-                "human-text" | "human-command" | "agent-text"
-            ) {
-                continue;
-            }
             if partial_ordinal.is_some_and(|ordinal| part.ordinal < ordinal) {
                 continue;
             }
@@ -184,9 +190,23 @@ fn cultivate(
                     last_progress = Instant::now();
                 }
             }
+            // A resumed part keeps the source that actually began it. Correcting the future
+            // framing must not rewrite an already committed or previously staged inscription.
+            let actual_parent = if session.field().occurrence_count() > part_from {
+                session
+                    .field()
+                    .lineage(part_from)
+                    .and_then(|l| l.received_from)
+            } else if let Some(saved) = resume_part {
+                saved["parent_source_occurrence"]
+                    .as_u64()
+                    .map(|at| at as usize)
+            } else {
+                parent_anchor.and(mounted_parent.map(|v| v.1))
+            };
             part_receipts.push(json!({"ordinal":part.ordinal,"pointer":part.pointer,"kind":part.kind,
                 "source_octets":text.len(),"native_from":part_from,"native_until":session.field().occurrence_count(),
-                "parent_source_occurrence":parent_anchor.and(mounted_parent.map(|v| v.1)),"failure":failure}));
+                "parent_source_occurrence":actual_parent,"failure":failure}));
             if failure.is_some() {
                 break;
             }

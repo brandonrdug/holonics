@@ -60,10 +60,12 @@ transports/refines those families with their domain. The
 now has its explicit metric and native two-port response. The
 [internal-current/mode return](research/records/2026-09-07_AC1_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE_GENERATORS.md)
 supplies an actual internal source and shared-drive generator, including a mode from the saved
-conversation model. Desktop construction next composes that mode through the existing
-complete-current material transport, preserving the amplitude fibre, source remainder, actual
-operator cuts and returned differences. Do not replace its enclosure with its centre or a phase
-label, or found a separate learner. Retain the carriers used to produce each prediction; later
+conversation model. The [material coupling](research/records/2026-09-07_AC1_THE_SHARED_DRIVE_MODE_REACHES_THE_LEARNED_MATERIAL_CURRENT.md)
+now returns its contribution, remainder and actual operator cuts. Next construct the
+[homogeneous phase-moment source](research/records/2026-09-07_AC2_A_HOMOGENEOUS_PHASE_MOMENT_IS_THE_NEXT_MATERIAL_SOURCE_CHART.md)
+through that same material-return owner and exercise actual conversation cultivation. Its
+language benefit is a hypothesis, not a completed alpha. Do not replace enclosures with centres
+or phase labels, or found a separate learner. Retain the carriers used to produce each prediction; later
 condition inference changes the successor rather than rewriting that prediction's history.
 
 [definition] The [generated-current field ingress](research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)

@@ -247,12 +247,19 @@ shared-drive condition implies `q T_i = -q`, with the common current retained in
 Fibre. The actual four-family conversation field yields a certified nonzero mode without new
 exposure. All 125 constitutive and 16 SDK alpha tests pass; useful conversation remains open.
 
-[definition] Next bind the mode through the existing complete-current material transport:
-`x_mode=m q`, `m=(e_l-e_r)/2`, and `M x_mode=(M m) q`. Preserve the source remainder and actual
-producing/current operator cuts through later reception. The numerical amplitude fibre remains
-operative; its centre or a phase label is not a replacement current. Retain the carriers used
-for each prediction, with later inference changing the successor rather than its prior history.
-No source-ID switch, authored semantic selector or second learner supplies the attachment.
+[established-bounded; measured] The [mode/material binding](../../research/records/2026-09-07_AC1_THE_SHARED_DRIVE_MODE_REACHES_THE_LEARNED_MATERIAL_CURRENT.md)
+now returns `M x_mode=(M m)q`, remaining/full currents and producing/current operator cuts from
+the existing native factors. Its actual conversation-mode contribution is nonzero, but the
+particular fixed text differential is unchanged by its removal in that linear decomposition.
+This is not a useful-language result or a developmental ablation.
+
+[definition] Next construct the [homogeneous phase-moment source](../../research/records/2026-09-07_AC2_A_HOMOGENEOUS_PHASE_MOMENT_IS_THE_NEXT_MATERIAL_SOURCE_CHART.md)
+`Q(x)=(1,x)(1,x)*/(1+||x||²)` from the complete contextual current. Reuse the native norm/pairing
+and material-return owners; keep its phase reference, lineage, original/current operator cuts
+and source/parameter error. The implicit pairing supplies mixed phase forms without allocating
+every tensor coordinate. Its language benefit remains a hypothesis and must return through
+actual cultivation and complete responses. No source-ID switch, authored semantic selector,
+centre substitution or second learner supplies the construction.
 
 [established-bounded; measured] The [resident field ingress](../../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
 now lets generated current enter that same field operation directly. Its actual input survives

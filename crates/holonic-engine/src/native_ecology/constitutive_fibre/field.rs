@@ -52,7 +52,8 @@ pub use material_transport::{
     NativeCompleteMaterialTransportReading, NativeCompleteMaterialTransportState,
     NativeFieldExactMaterialTransport, NativeFieldMaterialTransportReading,
     NativeFieldMaterialTransportResidual, NativeFieldMaterialTransportState,
-    NativeMaterialTransportSource,
+    NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading,
+    NativeMaterialModeReturn, NativeMaterialModeUnfolding, NativeMaterialTransportSource,
 };
 pub use receiver::NativeFieldDifferentialReading;
 pub use resident_input::NativeFieldIncoming;
