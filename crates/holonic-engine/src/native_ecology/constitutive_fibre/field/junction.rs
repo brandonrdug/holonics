@@ -7,6 +7,8 @@
 use super::*;
 
 mod enclosure;
+mod producer;
+pub use producer::{PairedContactCotangent, PairedJunctionCotangent, PairedJunctionLinearization, PairedJunctionTangent};
 #[cfg(test)]
 mod solver_tests;
 pub use enclosure::{

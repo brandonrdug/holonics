@@ -52,19 +52,26 @@ A cold read of all 5,064 development reports enacts zero native deeds. Of 5,063 
 413 codewords are correct and 74 have an unresolved sign; this is development evidence, not a
 held-out language-quality measure.
 
-[definition] **Next: AC1 → AC2, conduct the material context adjoint through its producer.**
-The successful paired-field formation currently has no material context-cotangent input; only
-material coefficients receive that direct return. Exterior text feedback and complete refusal
-still affect subsequent conduct. Derive the actual producer differential and constitutive metric,
-then compose the source-side return through the existing paired-field/condition-current owners
-inside one staged successor. The cotangent is not a state displacement or an inverse cause; its nonzero ambient receiver
-does not yet prove a nonzero return through the producer’s admitted tangent range.
-Retain producing morphology, delayed-return chronology and numerical uncertainty. Merely logging
-this new signal or changing codeword feedback does not complete the attachment. The ordinary
-codeword loop was not established as the cause of the failed language response; an enclosed
-current still cannot enter the exact point port by losing its radius. Inspect actual complete
-responses and contextual revisions after productive integration. No additional user information
-is required; the AC0–AC5 product remains open.
+[established-bounded; computational-witness] The [paired-producer return](research/records/2026-09-08_AC1_THE_PAIRED_PRODUCER_RETURNS_ITS_CURRENT_AND_CONTACT_MORPHOLOGY.md)
+now derives the entering/internal-current adjoints and the rank-two contact-morphology covector.
+The existing junction owner has an exact reference with five passing checks, including actual
+CUDA field conduct through rechart and delayed source reuse. On the conversation model's producer
+19, both the old internal-current component and morphology component are certified nonzero;
+the zero-current birth reaction remains separate. These are partial derivatives of the actual
+paired primitive, not a claim that the full recurrent adjoint or developmental update is complete.
+The cold observer's extra per-birth phase was corrected; the earlier scalar receiver is unchanged.
+
+[definition] **Next: AC1 → AC2, implement the joint native current/morphology return.**
+The concrete missing state is the evolving operative contact map and its returned internal
+current in the existing junction owner. Keep observed contact births/sources immutable. Compose
+the material/current/morphology constitutive response with the actual producing metrics, earlier
+material dependencies, prior overlays and chronological transfer. Stage the mixed moment/aggregate
+terms and preserve the full current decoder when contact maps change; the old fixed-contact
+prefix shortcut is then insufficient. Publish the complete successor atomically, with native exact
+arithmetic and retained numerical bounds. A cold cotangent, current-only change or new source-drive
+port does not replace that morphology attachment. Then inspect AC2's complete responses and
+contextual revisions. The model is unchanged by this derivation and still fails useful language.
+No additional user information is required; the AC0–AC5 goal remains active.
 
 [definition] Existing [conditional transport](research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md),
 [condition families](research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md),

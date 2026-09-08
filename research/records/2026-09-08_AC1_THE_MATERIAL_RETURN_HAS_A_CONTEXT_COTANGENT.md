@@ -144,6 +144,11 @@ norm bound to fit both returned vectors exactly. The bound follows from
 all observations is not an alpha requirement, and this diagnostic neither identifies a unique
 cause nor proves that increasing the norm would produce useful language.
 
+[established-bounded; source-inspected] The subsequent [paired-producer return](2026-09-08_AC1_THE_PAIRED_PRODUCER_RETURNS_ITS_CURRENT_AND_CONTACT_MORPHOLOGY.md)
+corrects the explicit observer's extra per-birth phase and checks the complete native current
+identity. That fixed unitary rechart left this record's scalar pairings and cotangent certificate
+unchanged. The corrected observer now uses the field's actual contact/current convention.
+
 ## The next native composition
 
 [definition] The existing parameter contact returns `r Psi*`; it does not exhaust the forward

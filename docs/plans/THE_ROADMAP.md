@@ -111,17 +111,24 @@ parameter return without conducting that cotangent through the context producer.
 born-coordinate pairings, twenty symbolic derivatives, an independent complex adjoint identity
 and the actual forward evaluation bound verify the cold derivation. The model is unchanged.
 
-[definition] **Next AC1 → AC2 construction:** derive the actual paired-field/current producer's
-differential and constitutive response, then conduct the material context adjoint through it
-inside the same staged successor. Use the producing map, prior morphology and delayed-return
-split; retain all source uncertainty and Preimage Fibres. A cotangent cannot be installed as a
-state displacement without this contact. The derived joint parameter/producer tangent contact
-provides a composition law once that actual producer and metric are supplied. Logging the signal
-or repeating the cold derivation does not discharge this native attachment. Then inspect AC2's
-complete English/code/mathematics responses and contextual revision. The exterior unit-codeword
-feedback has not been proved erroneous, and a centre substitution into exact-current ingress
-remains inadmissible. Necessary derivation stays inside AC1; no additional user input is required.
-AC2 usefulness, broad AC3 and AC4–AC5 remain open.
+[established-bounded; computational-witness] The [paired-producer differential and return](../../research/records/2026-09-08_AC1_THE_PAIRED_PRODUCER_RETURNS_ITS_CURRENT_AND_CONTACT_MORPHOLOGY.md)
+now provides the full current adjoint and a rank-two contact-morphology covector. Five exact/native
+controls pass. The actual model has a certified nonzero old internal-current return and morphology
+return at producer 19, with its new-row constraint reaction retained. The phase correction to the
+cold coordinate decoder preserves the earlier scalar cotangent certificate. This completes the
+paired-primitive derivation/reference; the native developmental attachment remains open.
+
+[definition] **Next AC1 → AC2 construction:** implement the joint material/current/morphology
+constitutive return in the existing native field. It needs an evolving operative contact map,
+separate immutable birth/source standing, returned internal current and the complete decoder
+through changing morphology. Retain earlier material-update dependencies, producing maps,
+metrics, old overlays and chronological transfer. Stage the mixed covariance/aggregate terms
+and publish one successor only after the full native return succeeds. Reuse the derived coupled
+tangent contact and exact producer reference; do not install a covector as an arbitrary current
+or replace morphology with an easier current-only/source-drive update. Native arithmetic and
+uncertainty remain required. Then inspect AC2's complete English/code/mathematics responses and
+contextual revision. No additional user information is required. AC2 usefulness, broad AC3 and
+AC4–AC5 remain open.
 
 [definition] The [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
 remains an available representation option when the actual composition needs it, with its

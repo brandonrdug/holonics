@@ -210,6 +210,61 @@ def tangent(query):
     )
 
 
+def full_context_cotangent(query):
+    """Complete numerical cotangent with a global exact error bound; no state update."""
+    assert rows[query]["source"] == query - 1
+    assert wide(rows[query]["w"], IN + 16 * N + 8) == 0
+    end = query - 1
+    context = rows[end]["c"]
+    current = explicit_context(end, end)
+    result = [F(0) for _ in current]
+    scalar = F(0)
+    r, er = ball(rows[query]["w"], 6)
+    r = [F(v, S) for v in r]
+
+    def factor(beta, at):
+        nonlocal scalar
+        c = rows[at - 1]["c"]
+        alpha = sum(F(b, S) * v for b, v in zip(beta, r)) * ksource(
+            rows[query]["w"], rows[at]["w"]
+        )
+        re, im = pair(c, context, at - 1, end)
+        normal = 1 + F(c["norm"], S * S)
+        re = alpha * (1 + re) / normal
+        im = alpha * im / normal
+        carrier = explicit_context(at - 1, end)
+        for j in range(0, len(carrier), 2):
+            result[j] += re * F(carrier[j], S) - im * F(carrier[j + 1], S)
+            result[j + 1] += re * F(carrier[j + 1], S) + im * F(carrier[j], S)
+        scalar += alpha * kernel(c, context, at - 1, end)
+
+    for at in range(1, query):
+        row = rows[at]
+        w = row["w"]
+        if row["source"] < 0:
+            continue
+        ordinary = vec(w, BETA, R)
+        contrast = vec(w, BETA + 2 * R, R)
+        factor([a + b for a, b in zip(ordinary, contrast)], at)
+        if row["reference"] < at:
+            factor([-b for b in contrast], row["reference"])
+    normal = 1 + F(context["norm"], S * S)
+    result = [2 * (g - scalar * F(c, S)) / normal for g, c in zip(result, current)]
+    E = F(wide(rows[end]["w"], EXTRA), S)
+    Nm = F(wide(rows[end]["w"], EXTRA + 2), S)
+    ec = F(context["error"], S)
+    error = (2 * E + 20 * Nm * ec) * norm_upper(sum(v * v for v in r)) + 2 * (
+        Nm + E
+    ) * F(er, S)
+    reference = rows[query]["reference"]
+    previous = explicit_context(reference - 1, end)
+    assert (
+        sum(g * F(a - b, S) for g, a, b in zip(result, current, previous))
+        == tangent(query)["numerical_cotangent_on_direction"]
+    )
+    return result, error
+
+
 def explicit_context(at, last):
     # Reconstruct the numerical born-current coordinates independently of prefix pairing.
     current = rows[at]["c"]
@@ -230,7 +285,9 @@ def explicit_context(at, last):
         before = rows[birth - 1]["c"]["prefix"]
         difference = [x - y for x, y in zip(current["prefix"], before)]
         re, im = dot(drive, difference)
-        sg = 1 if (at - birth) % 2 == 0 else -1
+        # The prefix already alternates by occurrence. Birth fixes the lower cut,
+        # not an additional phase on the native contact.
+        sg = 1 if at % 2 == 0 else -1
         values.extend([sg * re, sg * im])
     return values
 

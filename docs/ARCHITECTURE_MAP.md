@@ -118,8 +118,11 @@ currents; its bounded pair form reuses `NativeCurrentHistorySourceReading::numer
 Its `--material-history` mode now exports the complete cold material wires through the existing
 field inspector. `research/experiments/alpha_passive_junction/inspect_contextual_return.py`
 uses them to verify the [material context cotangent](../research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_HAS_A_CONTEXT_COTANGENT.md).
-The producer adjoint and its native constitutive attachment remain open; this is an observer,
-not another source of productive current.
+`field/junction/producer.rs` now composes `ExactRatMatrix` and `ExactComplexWaveCurrent` into
+`PairedJunctionLinearization`, its full current adjoint and two contact-covector factors.
+The [producer return](../research/records/2026-09-08_AC1_THE_PAIRED_PRODUCER_RETURNS_ITS_CURRENT_AND_CONTACT_MORPHOLOGY.md)
+includes the exact/native controls and actual-model producer inspection. These are cold reference
+owners; the native joint current/morphology update and its changing-contact decoder remain open.
 These remain derivation/reference owners; the resident section below supplies the native port.
 
 [established-bounded; source-inspected] `resident/context_section.rs` and

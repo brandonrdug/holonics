@@ -75,9 +75,13 @@ now conducts it through condition contact and full-current re-entry. The
 now discovers equal-source reference frames and stages both parameter contacts within ordinary
 reception. Its actual conversation response still fails. Follow AC1–AC2’s contextual-organization
 and productive-continuation obligation. The [material context cotangent](research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_HAS_A_CONTEXT_COTANGENT.md)
-now supplies a certified nonzero source-side receiver on the actual model. Continue its return
-through the actual native context producer and constitutive metric; the parameter deposit alone
-does not conduct that adjoint. Do not repeat the completed pair-selected study or cold derivation. Do not replace enclosures with centres
+now supplies a certified nonzero source-side receiver on the actual model. The
+[paired producer](research/records/2026-09-08_AC1_THE_PAIRED_PRODUCER_RETURNS_ITS_CURRENT_AND_CONTACT_MORPHOLOGY.md)
+now returns current components and a rank-two morphology covector, with actual-data evidence.
+Continue the native joint constitutive attachment in the existing junction, retaining an evolving
+operative contact map, immutable birth/source standing, prior dependencies and a complete current
+decoder through changing morphology. The cold reference or a current-only substitute is not that
+attachment. Do not repeat the completed pair-selected study or cold derivation. Do not replace enclosures with centres
 or phase labels, or found a separate learner. Retain the carriers used to produce each prediction; later
 condition inference changes the successor rather than rewriting that prediction's history.
 

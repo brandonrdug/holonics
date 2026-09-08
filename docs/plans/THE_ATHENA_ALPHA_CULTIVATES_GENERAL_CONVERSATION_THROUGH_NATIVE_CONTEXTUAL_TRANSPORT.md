@@ -302,16 +302,24 @@ no source-side material cotangent input into its context producer; the material 
 alone does not supply it. The cold calculation preserves the actual forward factors and their
 uncertainty, and changes no model state.
 
-[definition] Continue the generative composition by deriving and implementing the actual context
-producer's differential, metric and constitutive return through the existing native field/current
-owners, within the same complete successor. Preserve old producing maps, prior overlays and the
-delayed-return split. The derived joint tangent contact is a response law, not an inverse cause;
-its native producer attachment remains owed. This is AC1 construction directed at AC2's useful
-complete language products, not a new phase or a diagnostic-only substitute. The ordinary
-exterior codeword loop has not been established as the cause of the failed response, and its
-alternative native-current path must preserve uncertainty. The roadmap orders the concrete work.
-The [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
-remains a representation option when the productive composition requires it.
+[established-bounded; computational-witness] The [paired-producer return](../../research/records/2026-09-08_AC1_THE_PAIRED_PRODUCER_RETURNS_ITS_CURRENT_AND_CONTACT_MORPHOLOGY.md)
+now supplies the exact current and morphology differential/adjoint, including a rank-two contact
+covector, five passing exact/native controls and certified nonzero components on the actual
+conversation model. A new contact's zero-current constraint reaction is separate. This is the
+paired-primitive return; all earlier material dependencies and recurrent overlays remain part
+of the complete word, and no native developmental state was changed by this reference.
+
+[definition] Continue by implementing the joint native material/current/morphology response.
+The existing junction owner must carry the evolving operative contact map separately from
+immutable source/birth testimony, retain its internal-current return and execute the complete
+chronological decoder when contacts change. Include the mixed covariance/aggregate terms,
+producing metrics, prior overlays and time transport before atomic publication. The derived
+coupled tangent contact is available; do not replace it with a covector-as-displacement or a
+current-only/source-drive substitute. This is AC1 construction directed at AC2's complete useful
+language products. The roadmap orders the concrete work. The
+[chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
+remains a representation option when the productive composition requires it, with its actual
+future-generator and numerical obligations.
 
 [established-bounded; measured] The [resident field ingress](../../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
 now lets generated current enter that same field operation directly. Its actual input survives

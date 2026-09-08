@@ -328,6 +328,14 @@ uses this export for an exact source-adjoint receiver with retained uncertainty.
 return into the paired-field/current producer remains unimplemented; the observer is not a model
 or a source of generated answers.
 
+[established-bounded; implemented-exact] `PairedJunctionLinearization::at` is the exact cold
+reference for the existing junction at declared contact/current operands. Its `pushforward` and
+`pullback` retain current and contact-morphology terms; `PairedContactCotangent` carries two
+oriented factors. The [producer return](../research/records/2026-09-08_AC1_THE_PAIRED_PRODUCER_RETURNS_ITS_CURRENT_AND_CONTACT_MORPHOLOGY.md)
+verifies phase covariance, native primal correspondence and actual-model covectors. This reference
+uses unit metrics and is not a GPU update or a new live ecology. Enclosed operands retain their
+uncertainty separately; they cannot be sealed as exact point currents by this interface.
+
 [established-bounded; source-inspected] The [resident contextual return](../research/records/2026-09-08_AC1_THE_CONTEXTUAL_SECTION_RETURNS_THROUGH_NATIVE_CONDITION_AND_FIELD_CURRENT.md)
 is available through `contextual_section`, `derive_contextual_contrast`, the full forward/
 preimage interfaces and the existing condition-current contact. `TextFieldSession::receive_native_return`
