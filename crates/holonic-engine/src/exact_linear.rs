@@ -48,6 +48,11 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+mod contextual;
+pub use contextual::{
+    ContextualFactorization, ContextualObstruction, ExactContextualLift, LinearMapFamily,
+};
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ExactRatMatrix {
     rows: usize,

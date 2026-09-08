@@ -226,6 +226,14 @@ Separate formal verification may resolve a needed lemma, while Lean stays outsid
 cultivation/inference pipeline. The integrated result must continue through AC2's actual useful
 responses; derivation and source review alone do not complete AC1 or Athena-alpha.
 
+[established-bounded; measured] The [source-null lift derivation](../../research/records/2026-09-07_AC1_THE_SOURCE_NULL_RETURN_DERIVES_ITS_CONTEXTUAL_LIFT.md)
+now identifies exactly when carried context can resolve the source-invisible returned current,
+retaining the full map family and future-generator defects. Its bounded two-passage form works
+without exact contextual coordinates. Both forms agree on an actual saved conversation pair;
+the model is unchanged. The next AC1 attachment is its resident context/return section in the
+existing joint relation, carried into actual subsequent native formation and condition contact.
+Derivation and cold references remain distinct from that productive integration and AC2.
+
 [established-bounded; measured] The [conditional-contact return](../../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
 composes the existing local relation with two declared native current roles and their complex
 mixed products. An independently supplied channel condition makes a measured phase action

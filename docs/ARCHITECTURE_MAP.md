@@ -101,6 +101,13 @@ operator-norm transport and rest/differential receivers are documented in the
 `resident_section/surface_moment.rs` records the older-source evaluation; the fused field kernel
 owns publication. The exact rational factor decoder is an exterior diagnostic.
 
+[established-bounded; source-inspected] `exact_linear/contextual.rs` composes kernel/image and
+preimage algebra into the [contextual lift](../research/records/2026-09-07_AC1_THE_SOURCE_NULL_RETURN_DERIVES_ITS_CONTEXTUAL_LIFT.md).
+`field/contextual_lift.rs` binds its cold inspection to actual source and pre-return context
+currents; its bounded pair form reuses `NativeCurrentHistorySourceReading::numerical_pairing`.
+`alpha_contextual_lift` exercises saved conversation passages without changing the native model.
+These are derivation/reference owners; the resident source-null section is still to be composed.
+
 [established-bounded; measured] `native_ecology/constitutive_fibre/resident.rs` now owns borrowed
 resident rational-current input and immutable original-fibre returns for the existing local
 relation. `resident_section::record_constitutive_current` and

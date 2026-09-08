@@ -123,7 +123,7 @@ fn twice(a: &[Rat]) -> Vec<Rat> {
 }
 
 impl<'chart> NativeConstitutiveField<'chart> {
-    fn root_junction_source(
+    pub(in super::super) fn root_junction_source(
         &self,
         occurrence: usize,
     ) -> Result<Vec<ExactComplexWaveCurrent>, ConstitutiveFibreError> {

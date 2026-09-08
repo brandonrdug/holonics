@@ -300,6 +300,12 @@ pairing, retains immutable return factors and transports the signed operator-nor
 `inspect_exact_numerical_moment_forward` is the cold rational decoder. The native text receiver
 uses the enclosed forward current. This interface does not establish useful language.
 
+[established-bounded; source-inspected] `alpha_contextual_lift MODEL RECEIVING,RECEIVING
+--enclosed-pair --report NEW.json` performs the bounded [AC1 derivation check](../research/records/2026-09-07_AC1_THE_SOURCE_NULL_RETURN_DERIVES_ITS_CONTEXTUAL_LIFT.md)
+on two actual saved returns. It preserves the separate source/context epochs and does not
+update the model or emit an answer. Omitting `--enclosed-pair` runs the substantially more
+expensive exact contextual-current reference. This inspection is not a cultivation pipeline.
+
 [established-bounded; measured] These commands run the checked-in examples on the standing CUDA
 apparatus. The build uses the repository's usual [development setup](DEVELOPMENT.md).
 

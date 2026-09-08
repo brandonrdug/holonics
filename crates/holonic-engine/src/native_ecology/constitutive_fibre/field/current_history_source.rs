@@ -1,5 +1,5 @@
-//! Native construction receiver for the complete-current source. This receiver observes
-//! completed field returns; it does not yet replace the productive material transport.
+//! Native complete-current source geometry and its explicit construction receiver.
+//! The receiver observes completed returns; material owners reuse the same source chart.
 use super::*;
 use num_bigint::BigInt;
 use num_traits::{One, Zero};
@@ -26,6 +26,41 @@ pub struct NativeCurrentHistorySourceReading {
     pub source_radius: Rat,
     pub contact_trace: BigInt,
     pub numerical_norm_upper: Rat,
+}
+
+impl NativeCurrentHistorySourceReading {
+    /// Cold numerical pairing in one field's common root/birth chart. This is not the
+    /// unknown exact physical pairing; its operands keep their separate source radii.
+    pub(super) fn numerical_pairing(&self, other: &Self) -> ExactComplexWaveCurrent {
+        let dot = |a: &[ExactComplexWaveCurrent], b: &[ExactComplexWaveCurrent]| {
+            a.iter()
+                .zip(b)
+                .fold(ExactComplexWaveCurrent::zero(), |s, (a, b)| {
+                    s.add(&a.conjugate().multiply(b))
+                })
+        };
+        let (old, now) = if self.occurrence <= other.occurrence {
+            (self, other)
+        } else {
+            (other, self)
+        };
+        let internal = dot(&old.numerical_prefix_image, &now.prefix_center)
+            .subtract(&old.numerical_birth_offset.conjugate());
+        let sign = Rat::from_integer(
+            (if (old.occurrence + now.occurrence) % 2 == 0 {
+                1
+            } else {
+                -1
+            })
+            .into(),
+        );
+        let value = dot(&old.outgoing_center, &now.outgoing_center).add(&internal.scaled(&sign));
+        if self.occurrence <= other.occurrence {
+            value
+        } else {
+            value.conjugate()
+        }
+    }
 }
 
 /// One prefix expression over completed returns from one field. Its scalar/vector carriers are

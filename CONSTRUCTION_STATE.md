@@ -83,11 +83,22 @@ response's error radius from about 0.321 to 0.00404 without changing its numeric
 The answer still repeats `va` to the 128-symbol work limit. This is a failed language result;
 Athena-alpha and the AC0–AC5 product remain unfinished.
 
-[definition] **Next: AC1 → AC2, derive and integrate generative composition.** Brandon has
-explicitly included necessary derivation, formalization and focused review in AC1. The
-[source-boundary review](research/records/2026-09-07_AC1_DERIVATION_IS_PART_OF_THE_GENERATIVE_ATTACHMENT.md)
-has returned; its typed constitutive derivation remains open. No additional user input is
-currently required. No new native execution or model improvement is claimed by that review.
+[established-bounded; measured] The [first AC1 contextual derivation](research/records/2026-09-07_AC1_THE_SOURCE_NULL_RETURN_DERIVES_ITS_CONTEXTUAL_LIFT.md)
+now returns the criterion `ker(S) intersect ker(C) subset ker(Y)`, its lifted map family and
+future-generator obstruction. It is implemented in the existing exact-linear owner and checked
+on actual development returns `12,20`: their source faces coincide, their returns differ, and
+one carried context direction separates them. A bounded check establishes the same conclusion
+without exact context coordinates, retaining uncertainty and all unobserved map directions.
+Fourteen exact-linear tests, the native field/chronology control and five moment reference
+controls pass. These are derivation/reference results; no model update or language improvement
+is claimed.
+
+[definition] **Next: AC1 → AC2, native composition of that relation.** Construct the resident
+source-null context/return section in the existing joint constitutive owner. Carry its actual
+generative current, complete family, uncertainty and original lineage into subsequent native
+formation and condition contact. Exact reversal of the whole contextual state is not a
+prerequisite. The integrated return and AC2's useful responses remain open; no additional user
+information is currently required.
 
 [definition] The bounded conditional-generator
 and Preimage Fibre owners have not been integrated into the conversation recurrence with an

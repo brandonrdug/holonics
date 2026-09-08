@@ -1,33 +1,11 @@
 //! Cold evaluation of the retained numerical generator; never called by native conduct.
 use super::*;
 
-fn dot(a: &[ExactComplexWaveCurrent], b: &[ExactComplexWaveCurrent]) -> ExactComplexWaveCurrent {
-    a.iter()
-        .zip(b)
-        .fold(ExactComplexWaveCurrent::zero(), |sum, (a, b)| {
-            sum.add(&a.conjugate().multiply(b))
-        })
-}
 pub(super) fn source_pair(
     a: &NativeCurrentHistorySourceReading,
     b: &NativeCurrentHistorySourceReading,
 ) -> Rat {
-    let (old, now) = if a.occurrence <= b.occurrence {
-        (a, b)
-    } else {
-        (b, a)
-    };
-    let internal = dot(&old.numerical_prefix_image, &now.prefix_center)
-        .subtract(&old.numerical_birth_offset.conjugate());
-    let sign = Rat::from_integer(
-        (if (old.occurrence + now.occurrence) % 2 == 0 {
-            1
-        } else {
-            -1
-        })
-        .into(),
-    );
-    let overlap = dot(&old.outgoing_center, &now.outgoing_center).add(&internal.scaled(&sign));
+    let overlap = a.numerical_pairing(b);
     let homogeneous = overlap.add(&ExactComplexWaveCurrent::new(
         Rat::one(),
         Rat::from_integer(0.into()),

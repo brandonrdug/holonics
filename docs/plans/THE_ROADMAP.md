@@ -81,6 +81,22 @@ then implement and exercise it on actual conversations. Use independent formal v
 where a specific missing lemma needs it; Lean never enters cultivation/inference. No additional
 user information is currently required. Report the active AC obligation and its actual return.
 
+[established-bounded; measured] The [source-null contextual lift](../../research/records/2026-09-07_AC1_THE_SOURCE_NULL_RETURN_DERIVES_ITS_CONTEXTUAL_LIFT.md)
+derives a precise criterion and complete map family from actual source/context/return relations.
+Its exact and bounded checks agree on one separating contextual direction in the saved
+conversation model, without installing a cause or changing that model. The bounded construction
+does not need exact historical contextual coordinates. Fourteen exact-linear tests, a native
+field/chronology control and five moment-reference controls pass. This closes one derivation
+obligation; the productive native composition and useful language remain unfinished.
+
+[definition] **Next AC1 construction:** form the resident source-null context/return section
+from the existing joint constitutive relation, with its supported context domain, full returned
+family and original lineage. Compose its actual current/generator carrier with subsequent native
+formation and retained condition contact; preserve numerical uncertainty without selecting a
+centre. The `exact_linear` construction and cold inspection are reference owners, not a host
+learner to insert into the pipeline. Carry this composition through actual cultivation and AC2
+responses; an isolated extraction receipt does not complete AC1.
+
 [definition] **Next construction remains AC1 → AC2.** Compose the existing learned
 conditional/generative transport and Preimage Fibre owners with the productive conversation
 recurrence so that available contextual returns determine subsequent native relation formation,

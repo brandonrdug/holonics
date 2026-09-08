@@ -1,0 +1,50 @@
+{
+  "schema": "holonics.contextual-lift-return.v1",
+  "truth_status": "established-bounded",
+  "evidence": [
+    "measured",
+    "source-inspected"
+  ],
+  "scope": "Exact exterior AC1 derivation on actual saved development passages; no model update or language improvement",
+  "private_model": ".local/artifacts/athena-alpha/ac2-moment/first-eight-energy-v2.hna",
+  "native_occurrences": 1930,
+  "receiving_occurrences": [
+    12,
+    20
+  ],
+  "source_occurrences": [
+    11,
+    19
+  ],
+  "context_occurrences": [
+    11,
+    19
+  ],
+  "occurrence_combination": [
+    -1,
+    1
+  ],
+  "source_difference_zero": true,
+  "returned_difference_nonzero": true,
+  "demonstrated_context_rank": 1,
+  "full_context_real_coordinates": 146,
+  "exact_reference": {
+    "private_report": ".local/artifacts/athena-alpha/ac1-context-lift/first-source-ambiguity.json",
+    "native_deeds": 0,
+    "cold_section_readouts": 80,
+    "whole_wall_seconds": 368.574809194
+  },
+  "enclosed_reference": {
+    "private_report": ".local/artifacts/athena-alpha/ac1-context-lift/first-source-ambiguity-enclosed.json",
+    "native_deeds": 0,
+    "cold_section_readouts": 4,
+    "whole_wall_seconds": 17.453896289,
+    "status": "ContextContrastCertifiedNonzero",
+    "contrast_norm_square": "349933665019817525471426968125027909543906793/11150372599265311570767859136324180752990208",
+    "context_error": "126913793/2361183241434822606848",
+    "nonzero_inequality": true
+  },
+  "language_quality_established": false,
+  "free_contrast_covectors_per_output_row": 145,
+  "free_lifted_output_covectors_per_output_row": 216
+}
