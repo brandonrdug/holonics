@@ -1,0 +1,226 @@
+{
+  "schema": "holonics.material-source-pullback-receipt.v1",
+  "command": "target/debug/examples/alpha_contextual_lift .local/artifacts/athena-alpha/ac2-operative-context/first-eight-v1.hna --material-pullback 1,20,1600 --group-width 2 --report .local/artifacts/athena-alpha/ac1-normalized-receiver/material-pullback-v1.json",
+  "field_cut": 1930,
+  "whole_wall_seconds": 10.408645937,
+  "morphology_changed": false,
+  "language_quality_established": false,
+  "returns": [
+    {
+      "native_ingress_octets": 48,
+      "numerical_section_readouts": 0,
+      "resident_deeds": 1,
+      "resident_seconds": 0.000410217,
+      "source": 0,
+      "receiving": 1,
+      "metric": "RelativeEntropy",
+      "grain": 72,
+      "group_width": 2,
+      "series_terms": 32,
+      "visible_source": {
+        "real_coordinates": 72,
+        "certified_nonzero": 0,
+        "exact_zero": 72,
+        "contains_zero": 72,
+        "norm_square_lower": "0",
+        "maximum_interval_width": "0"
+      },
+      "outgoing_current": {
+        "real_coordinates": 108,
+        "certified_nonzero": 0,
+        "exact_zero": 108,
+        "contains_zero": 108,
+        "norm_square_lower": "0",
+        "maximum_interval_width": "0"
+      },
+      "internal_current": {
+        "real_coordinates": 0,
+        "certified_nonzero": 0,
+        "exact_zero": 0,
+        "contains_zero": 0,
+        "norm_square_lower": "0",
+        "maximum_interval_width": "0"
+      }
+    },
+    {
+      "native_ingress_octets": 48,
+      "numerical_section_readouts": 0,
+      "resident_deeds": 1,
+      "resident_seconds": 0.00017111,
+      "source": 0,
+      "receiving": 1,
+      "metric": "SquaredProbability",
+      "grain": 72,
+      "group_width": 2,
+      "series_terms": 32,
+      "visible_source": {
+        "real_coordinates": 72,
+        "certified_nonzero": 0,
+        "exact_zero": 72,
+        "contains_zero": 72,
+        "norm_square_lower": "0",
+        "maximum_interval_width": "0"
+      },
+      "outgoing_current": {
+        "real_coordinates": 108,
+        "certified_nonzero": 0,
+        "exact_zero": 108,
+        "contains_zero": 108,
+        "norm_square_lower": "0",
+        "maximum_interval_width": "0"
+      },
+      "internal_current": {
+        "real_coordinates": 0,
+        "certified_nonzero": 0,
+        "exact_zero": 0,
+        "contains_zero": 0,
+        "norm_square_lower": "0",
+        "maximum_interval_width": "0"
+      }
+    },
+    {
+      "native_ingress_octets": 960,
+      "numerical_section_readouts": 0,
+      "resident_deeds": 1,
+      "resident_seconds": 0.00067886,
+      "source": 19,
+      "receiving": 20,
+      "metric": "RelativeEntropy",
+      "grain": 72,
+      "group_width": 2,
+      "series_terms": 32,
+      "visible_source": {
+        "real_coordinates": 72,
+        "certified_nonzero": 32,
+        "exact_zero": 0,
+        "contains_zero": 40,
+        "norm_square_lower": "64538036130099934158357283020649486916645/22300745198530623141535718272648361505980416",
+        "maximum_interval_width": "2028071/1180591620717411303424"
+      },
+      "outgoing_current": {
+        "real_coordinates": 108,
+        "certified_nonzero": 48,
+        "exact_zero": 0,
+        "contains_zero": 60,
+        "norm_square_lower": "107281359047475116855475709329845154754695/22300745198530623141535718272648361505980416",
+        "maximum_interval_width": "1123851/590295810358705651712"
+      },
+      "internal_current": {
+        "real_coordinates": 38,
+        "certified_nonzero": 19,
+        "exact_zero": 0,
+        "contains_zero": 19,
+        "norm_square_lower": "10343457557146271400532674461370869283521/5575186299632655785383929568162090376495104",
+        "maximum_interval_width": "10267513/4722366482869645213696"
+      }
+    },
+    {
+      "native_ingress_octets": 960,
+      "numerical_section_readouts": 0,
+      "resident_deeds": 1,
+      "resident_seconds": 0.000672066,
+      "source": 19,
+      "receiving": 20,
+      "metric": "SquaredProbability",
+      "grain": 72,
+      "group_width": 2,
+      "series_terms": 32,
+      "visible_source": {
+        "real_coordinates": 72,
+        "certified_nonzero": 32,
+        "exact_zero": 0,
+        "contains_zero": 40,
+        "norm_square_lower": "16037467021675517247687312174169252021931/22300745198530623141535718272648361505980416",
+        "maximum_interval_width": "2107857/1180591620717411303424"
+      },
+      "outgoing_current": {
+        "real_coordinates": 108,
+        "certified_nonzero": 48,
+        "exact_zero": 0,
+        "contains_zero": 60,
+        "norm_square_lower": "1530728711541363675554694186535966503361/1393796574908163946345982392040522594123776",
+        "maximum_interval_width": "6824535/4722366482869645213696"
+      },
+      "internal_current": {
+        "real_coordinates": 38,
+        "certified_nonzero": 19,
+        "exact_zero": 0,
+        "contains_zero": 19,
+        "norm_square_lower": "9081430500839369643099879718333021535149/22300745198530623141535718272648361505980416",
+        "maximum_interval_width": "263923/147573952589676412928"
+      }
+    },
+    {
+      "native_ingress_octets": 76800,
+      "numerical_section_readouts": 0,
+      "resident_deeds": 1,
+      "resident_seconds": 0.026401299,
+      "source": 1599,
+      "receiving": 1600,
+      "metric": "RelativeEntropy",
+      "grain": 72,
+      "group_width": 2,
+      "series_terms": 32,
+      "visible_source": {
+        "real_coordinates": 72,
+        "certified_nonzero": 36,
+        "exact_zero": 0,
+        "contains_zero": 36,
+        "norm_square_lower": "1971242575724722861705091231644093460782279/22300745198530623141535718272648361505980416",
+        "maximum_interval_width": "8329247941365/2361183241434822606848"
+      },
+      "outgoing_current": {
+        "real_coordinates": 108,
+        "certified_nonzero": 54,
+        "exact_zero": 0,
+        "contains_zero": 54,
+        "norm_square_lower": "85370978299384326687425296128226402687/22300745198530623141535718272648361505980416",
+        "maximum_interval_width": "420362200325/4722366482869645213696"
+      },
+      "internal_current": {
+        "real_coordinates": 3198,
+        "certified_nonzero": 1599,
+        "exact_zero": 0,
+        "contains_zero": 1599,
+        "norm_square_lower": "3048188282526067549768966727785957162311/22300745198530623141535718272648361505980416",
+        "maximum_interval_width": "713696166369/4722366482869645213696"
+      }
+    },
+    {
+      "native_ingress_octets": 76800,
+      "numerical_section_readouts": 0,
+      "resident_deeds": 1,
+      "resident_seconds": 0.026116376,
+      "source": 1599,
+      "receiving": 1600,
+      "metric": "SquaredProbability",
+      "grain": 72,
+      "group_width": 2,
+      "series_terms": 32,
+      "visible_source": {
+        "real_coordinates": 72,
+        "certified_nonzero": 36,
+        "exact_zero": 0,
+        "contains_zero": 36,
+        "norm_square_lower": "243297492345599081298004892290059755308861/11150372599265311570767859136324180752990208",
+        "maximum_interval_width": "22040390036595/4722366482869645213696"
+      },
+      "outgoing_current": {
+        "real_coordinates": 108,
+        "certified_nonzero": 54,
+        "exact_zero": 0,
+        "contains_zero": 54,
+        "norm_square_lower": "21139575804509306921489096400600494319/22300745198530623141535718272648361505980416",
+        "maximum_interval_width": "74314428741/1180591620717411303424"
+      },
+      "internal_current": {
+        "real_coordinates": 3198,
+        "certified_nonzero": 1599,
+        "exact_zero": 0,
+        "contains_zero": 1599,
+        "norm_square_lower": "372796421188137507273727937172144246901/11150372599265311570767859136324180752990208",
+        "maximum_interval_width": "689376356387/4722366482869645213696"
+      }
+    }
+  ]
+}

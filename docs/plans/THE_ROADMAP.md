@@ -38,6 +38,11 @@ pins the refreshed Apple branch comparison.
 
 ## Athena-alpha: corrected AC0–AC5 order
 
+[established-bounded; measured] The [material query adjoint](../../research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_REACHES_BOTH_QUERY_ARGUMENTS.md)
+returns both visible and complete current arguments through the producing material operator,
+with independent exact-rational native verification. AC1 step 2 now composes that partial adjoint
+with the paired producer and finite successor; historical factors remain fixed in this component.
+
 [established-bounded; measured] The [normalized receiver](../../research/records/2026-09-08_AC1_THE_NORMALIZED_RECEIVER_RETURNS_ITS_COMPLETE_CURRENT_AND_TWO_METRIC_FACES.md)
 returns resident p/q/difference and its Jacobian pullback, with three native controls and actual
 model evidence. It does not yet change morphology. Ordinary constitutive generation now carries
@@ -321,8 +326,8 @@ generated mode and complete mixed feedback on a stated interval; MFR4 then pays
 its quantitative residual/tail comparison or names the failed estimate. The complex potential/
 Hodge and logarithmic heat sources remain explicit.
 Full convergence is not a prior condition imposed on MFR3; the earlier exclusions remain standing.
-The HNN line is paused while this mathematical review examines its unresolved generator and
-finite-return law, under the current priority above.
+The resumed AC0–AC5 construction above composes these mathematical sources with the native
+return. This research order does not pause that construction.
 
 [project-postulate] Holonics is the mathematical framework and ontology of which HNN is an
 executable architecture. A research route may return a derivation, a counterexample or a precise

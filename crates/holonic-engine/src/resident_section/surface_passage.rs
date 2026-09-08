@@ -1,6 +1,39 @@
 use super::*;
 
 impl<'chart> ResidentSurface<'chart> {
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_field_material_pullback(
+        &self, lane: &Lane<'_, 'chart>, table: &ResidentSection<'chart>,
+        returned: &ResidentSection<'chart>, source: usize, nodes: usize, contacts: usize,
+        grain: u32, metric: u32, factors: &ResidentSection<'chart>, output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || ResidentRefusal::Declaration {
+            operation: "field-material-pullback", what: "incompatible producing material chart".into(),
+        };
+        let coordinates=nodes.checked_mul(10).and_then(|v|contacts.checked_mul(2).and_then(|k|v.checked_add(k))).ok_or_else(fail)?;
+        if nodes==0 || coordinates>u32::MAX as usize/4 || source>=u32::MAX as usize/2
+            || !(1..=120).contains(&grain) || metric>1 || table.rows!=source+1 || table.width!=3
+            || returned.rows!=1 || returned.width!=20*nodes
+            || factors.rows!=2*(source+1) || factors.width!=20
+            || output.rows!=1 || output.width!=4*coordinates
+            || [table,returned,factors,output].iter().any(|s|s.grain.0!=0) { return Err(fail()); }
+        let mut params=Params::new();
+        params.ptr(table.lo.device_ptr()).ptr(returned.lo.device_ptr())
+            .u32(source as u32).u32(nodes as u32).u32(grain).u32(metric)
+            .ptr(factors.lo.device_ptr()).ptr(factors.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_field_material_pullback_factors",2*(source+1),
+            self.declaration.warp_size.max(1),0,&mut params,"field-material-pullback-factors")?;
+        let mut params=Params::new();
+        params.ptr(table.lo.device_ptr()).ptr(factors.lo.device_ptr()).ptr(returned.lo.device_ptr())
+            .u32(source as u32).u32(nodes as u32).u32(contacts as u32).u32(grain).u32(metric)
+            .ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        let block=self.declaration.warp_size.max(1);
+        self.record_blocks(lane,"section_field_material_pullback_return",coordinates.div_ceil(block as usize),
+            block,0,&mut params,"field-material-pullback-return")
+    }
+
     /// Reads the first material-current ball of prediction and the third ball of observation.
     /// The field owner validates the complete report family before calling this prefix primitive.
     #[allow(clippy::too_many_arguments)]

@@ -2,7 +2,8 @@
 //! enters this native owner. Full current reports and numerical residuals remain in history.
 use super::*;
 mod normalized;
-pub use normalized::{NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn};
+pub use normalized::{NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn,
+    NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading};
 
 impl ConstitutiveDifferentialReading {
     /// Convert an actually field-qualified relation receiver, preserving the historical source

@@ -2,10 +2,10 @@ use super::*;
 use crate::embedding_fiber::ResidentReadout;
 use crate::exact_value::CertifiedSeries;
 
-fn phase(r: i64, i: i64) -> NativePhaseCurrent {
+pub(super) fn phase(r: i64, i: i64) -> NativePhaseCurrent {
     NativePhaseCurrent::new(r, i, 1).unwrap()
 }
-fn seed(nodes: usize) -> Vec<NativeJunctionSeed> {
+pub(super) fn seed(nodes: usize) -> Vec<NativeJunctionSeed> {
     vec![
         NativeJunctionSeed {
             incoming_admittance: 1,

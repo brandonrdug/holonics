@@ -396,6 +396,12 @@ Its full r is also the relative-entropy potential return; `J_p*r` belongs to squ
 discrepancy. Preserve both and use the declared metric. The receiver is not yet a committed
 morphology update. Supported point constitutive generation now uses native current ingress;
 material-ball ingress remains a separate obligation.
+
+[established-bounded; measured] The [material query return](../../research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_REACHES_BOTH_QUERY_ARGUMENTS.md)
+now supplies the native partial adjoint into both source arguments, including the full internal
+current, with exact-rational controls. Compose it with the paired producing adjoint and finite
+successor. The component holds historical operator factors fixed and does not itself update them.
+
 Brandon has resumed the completion goal. Treat this sequence as a revisable working design;
 report a concrete failed connection and change it when evidence warrants. In execution, complete the next native attachment and inspect its actual consequence before taking
 on unrelated infrastructure. A concrete failure may redirect the corresponding step; it does

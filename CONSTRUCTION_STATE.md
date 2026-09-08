@@ -1,7 +1,7 @@
 # Construction state
 
 **Currency:** September 8, 2026. **Priority:** AC0–AC5 completion resumed by Brandon; flexible native construction with transparent failures.
-**Position:** AC0 complete; AC1 normalized receiver returned at bounded scope, producing-interior attachment next; AC2 failed probes; AC3 apparatus only; AC4–AC5 open.
+**Position:** AC0 complete; AC1 material query adjoint returned at bounded scope, paired-interior/finite successor next; AC2 failed probes; AC3 apparatus only; AC4–AC5 open.
 **Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -9,6 +9,17 @@ orders work; completed history belongs in the linked records and Git. Brandon's 
 instruction governs.
 
 ## Current HNN construction
+
+[established-bounded; measured] The [material query adjoint](research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_REACHES_BOTH_QUERY_ARGUMENTS.md)
+now returns through the producing material operator into both visible-source branches and the
+complete outgoing/internal query current. An independent exact-rational CUDA comparison passes
+for both metrics, phase, reflected factors and delayed reception, with foreign-owner rejection
+and no numerical section readout during construction. It is a partial adjoint with historical
+operator factors held fixed. On the saved 1,930-occurrence model, the return from occurrence
+1,600 reaches 1,599 certified nonzero internal real coordinates in about 26 ms per metric;
+the empty initial material operator returns exact zero. The [receipt](research/records/2026-09-08_material_source_pullback/return.json)
+retains the three producing cuts and exact interval summaries. AC1 step 2 still owes the paired producing return and finite successor;
+no model morphology or language response has changed through this component alone.
 
 [established-bounded; measured] The [normalized material receiver](research/records/2026-09-08_AC1_THE_NORMALIZED_RECEIVER_RETURNS_ITS_COMPLETE_CURRENT_AND_TWO_METRIC_FACES.md)
 now computes grouped p/q faces, their difference and the probability-Jacobian pullback on device
@@ -224,4 +235,4 @@ claim index, equation atlas or blanket gate is revived. Current source checks fo
 changed-example Cargo check passed. That consolidation changed or reran no native kernel, formal proof or corpus cultivation;
 subsequent AC construction and verification are recorded above. Source, documentation and imported testimony are ready for repository pickup;
 the blueprint retains the unfinished conversation product through the native composition in
-[Athena](docs/ATHENA.md#athena-alpha-and-the-next-cultivation), paused for the mathematical review above.
+[Athena](docs/ATHENA.md#athena-alpha-and-the-next-cultivation), active under the resumed AC0–AC5 goal.

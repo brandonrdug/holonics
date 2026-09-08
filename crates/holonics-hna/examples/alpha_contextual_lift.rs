@@ -12,7 +12,7 @@ use serde_json::json;
 use std::{io::Write, path::PathBuf, time::Instant};
 
 fn normalized_returns(
-    path: PathBuf, occurrences: Vec<usize>, group_width: usize, output: PathBuf,
+    path: PathBuf, occurrences: Vec<usize>, group_width: usize, output: PathBuf, source_pullback: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let start=Instant::now();
     let saved=SavedTextField::read(&path)?;
@@ -27,7 +27,23 @@ fn normalized_returns(
             if after.section_read_outs!=before.section_read_outs || field.occurrence_count()!=count {
                 return Err(AlphaMaterialError::Apparatus("receiver read numerical current or changed recurrence".into()));
             }
-            returns.push(json!({"reading":reading,"resident_seconds":seconds,
+            let mut pullbacks=Vec::new();
+            if source_pullback {
+                use holonic_engine::native_ecology::constitutive_fibre::NativeMaterialPullbackMetric;
+                for metric in [NativeMaterialPullbackMetric::RelativeEntropy,NativeMaterialPullbackMetric::SquaredProbability] {
+                    let before=field.census();let clock=Instant::now();
+                    let pulled=field.pull_back_material_source(&returned,metric)?;
+                    let elapsed=clock.elapsed().as_secs_f64();let after=field.census();
+                    if after.section_read_outs!=before.section_read_outs || field.occurrence_count()!=count {
+                        return Err(AlphaMaterialError::Apparatus("material pullback read numerical current or changed recurrence".into()));
+                    }
+                    pullbacks.push(json!({"reading":pulled.inspect()?,"resident_seconds":elapsed,
+                        "resident_deeds":after.deed_launches-before.deed_launches,
+                        "numerical_section_readouts":after.section_read_outs-before.section_read_outs,
+                        "native_ingress_octets":after.ingress_octets-before.ingress_octets}));
+                }
+            }
+            returns.push(json!({"reading":reading,"source_pullbacks":pullbacks,"resident_seconds":seconds,
                 "resident_deeds":after.deed_launches-before.deed_launches,
                 "numerical_section_readouts":after.section_read_outs-before.section_read_outs,
                 "native_ingress_octets":after.ingress_octets-before.ingress_octets}));
@@ -136,7 +152,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let selection = args
         .next()
         .ok_or("receiving occurrences or --material-history required")?;
-    if selection=="--normalized-return" {
+    if selection=="--normalized-return" || selection=="--material-pullback" {
         let occurrences=args.next().ok_or("receiving occurrences required")?
             .split(',').map(str::parse::<usize>).collect::<Result<Vec<_>,_>>()?;
         if args.next().as_deref()!=Some("--group-width"){return Err("--group-width required".into());}
@@ -144,7 +160,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         if args.next().as_deref()!=Some("--report"){return Err("--report required".into());}
         let output=PathBuf::from(args.next().ok_or("report destination required")?);
         if args.next().is_some()||output.exists(){return Err("unexpected arguments or existing destination".into());}
-        return normalized_returns(path,occurrences,group,output);
+        return normalized_returns(path,occurrences,group,output,selection=="--material-pullback");
     }
     if selection == "--material-history" || selection == "--operative-contacts" {
         if args.next().as_deref() != Some("--report") {

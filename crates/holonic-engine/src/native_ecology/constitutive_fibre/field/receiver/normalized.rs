@@ -9,8 +9,9 @@ use num_traits::{One, Zero};
 /// Resident p, q, q-p, and J_p(q-p) for disjoint, caller-declared coordinate groups. This is
 /// the receiver's returned covector, not an automatically committed developmental displacement.
 pub struct NativeNormalizedMaterialReturn<'chart> {
+    owner: Rc<()>,
     surface: &'chart ResidentSurface<'chart>,
-    pub(in super::super) output: ResidentSection<'chart>,
+    pub(in super::super) output: Rc<ResidentSection<'chart>>,
     _prediction: Rc<ResidentSection<'chart>>,
     _observation: Rc<ResidentSection<'chart>>,
     source: NativeFieldLineage,
@@ -134,7 +135,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         }
         let grain = self.transport_grain()?;
         let words = nodes.checked_mul(20).ok_or(ConstitutiveFibreError::Shape)?;
-        let output = surface.fresh_section(1, words, ResidentGrain(0))?;
+        let output = Rc::new(surface.fresh_section(1, words, ResidentGrain(0))?);
         let mut passage = surface.begin_passage(&[vec![]])?;
         {
             let lane = passage.open(0, &[])?;
@@ -158,6 +159,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             )));
         }
         Ok(Some(NativeNormalizedMaterialReturn {
+            owner: self.owner.clone(),
             surface,
             output,
             _prediction: prediction,
@@ -171,6 +173,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
         }))
     }
 }
+
+mod pullback;
+pub use pullback::{NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading};
 
 #[cfg(test)]
 mod tests;
