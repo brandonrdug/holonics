@@ -83,7 +83,13 @@ response's error radius from about 0.321 to 0.00404 without changing its numeric
 The answer still repeats `va` to the 128-symbol work limit. This is a failed language result;
 Athena-alpha and the AC0–AC5 product remain unfinished.
 
-[definition] **Next: AC1 → AC2, generative composition.** The bounded conditional-generator
+[definition] **Next: AC1 → AC2, derive and integrate generative composition.** Brandon has
+explicitly included necessary derivation, formalization and focused review in AC1. The
+[source-boundary review](research/records/2026-09-07_AC1_DERIVATION_IS_PART_OF_THE_GENERATIVE_ATTACHMENT.md)
+has returned; its typed constitutive derivation remains open. No additional user input is
+currently required. No new native execution or model improvement is claimed by that review.
+
+[definition] The bounded conditional-generator
 and Preimage Fibre owners have not been integrated into the conversation recurrence with an
 established consequence for formation, reuse and transformation of subsequent relations.
 Identify and compose that actual attachment in the existing native owners, then inspect its

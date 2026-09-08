@@ -61,10 +61,13 @@ now has its explicit metric and native two-port response. The
 [internal-current/mode return](research/records/2026-09-07_AC1_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE_GENERATORS.md)
 supplies an actual internal source and shared-drive generator, including a mode from the saved
 conversation model. The [material coupling](research/records/2026-09-07_AC1_THE_SHARED_DRIVE_MODE_REACHES_THE_LEARNED_MATERIAL_CURRENT.md)
-now returns its contribution, remainder and actual operator cuts. Next construct the
-[homogeneous phase-moment source](research/records/2026-09-07_AC2_A_HOMOGENEOUS_PHASE_MOMENT_IS_THE_NEXT_MATERIAL_SOURCE_CHART.md)
-through that same material-return owner and exercise actual conversation cultivation. Its
-language benefit is a hypothesis, not a completed alpha. Do not replace enclosures with centres
+now returns its contribution, remainder and actual operator cuts. The
+[homogeneous phase-moment return](research/records/2026-09-07_AC2_THE_HOMOGENEOUS_MOMENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md)
+is implemented; its actual conversation model still fails useful language. Follow the roadmap's
+AC1–AC2 generative attachment, including Brandon's explicitly authorized derivation, formalization
+and focused review. The [source-boundary record](research/records/2026-09-07_AC1_DERIVATION_IS_PART_OF_THE_GENERATIVE_ATTACHMENT.md)
+states the current question; do not demand a new axiom or repeated ontology without identifying
+a material unresolved choice. Do not replace enclosures with centres
 or phase labels, or found a separate learner. Retain the carriers used to produce each prediction; later
 condition inference changes the successor rather than rewriting that prediction's history.
 

@@ -216,6 +216,16 @@ Do not rebuild the completed raw capture. AC0 is data/application integration, n
 
 ### AC1 — Material, contextual current and developing native morphology
 
+[project-postulate] Brandon explicitly includes necessary derivation, formalization, ontological
+reconciliation and focused review within AC1. The [derivation task and source boundaries](../../research/records/2026-09-07_AC1_DERIVATION_IS_PART_OF_THE_GENERATIVE_ATTACHMENT.md)
+make this authorized construction work. Recover the applicable existing relation, state and
+derive its actual source/condition/receiver/continuation maps, then implement that composition
+and exercise it on the conversation material. The deliverable names a precise missing type,
+map, law or consequence where one remains; it does not ask Brandon to restate settled ontology.
+Separate formal verification may resolve a needed lemma, while Lean stays outside every
+cultivation/inference pipeline. The integrated result must continue through AC2's actual useful
+responses; derivation and source review alone do not complete AC1 or Athena-alpha.
+
 [established-bounded; measured] The [conditional-contact return](../../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
 composes the existing local relation with two declared native current roles and their complex
 mixed products. An independently supplied channel condition makes a measured phase action

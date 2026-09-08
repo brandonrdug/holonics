@@ -73,6 +73,14 @@ its numerical current. The resulting answer repeats `va` to the 128-symbol work 
 fails the requested language product. This component is complete at its declared scope;
 Athena-alpha remains unattained.
 
+[project-postulate] **Necessary derivation belongs inside AC1.** The
+[focused source review](../../research/records/2026-09-07_AC1_DERIVATION_IS_PART_OF_THE_GENERATIVE_ATTACHMENT.md)
+locates the current observation/family/current and field-formation boundaries. Recover the
+applicable existing construction, derive the typed connection and its successor consequence,
+then implement and exercise it on actual conversations. Use independent formal verification
+where a specific missing lemma needs it; Lean never enters cultivation/inference. No additional
+user information is currently required. Report the active AC obligation and its actual return.
+
 [definition] **Next construction remains AC1 → AC2.** Compose the existing learned
 conditional/generative transport and Preimage Fibre owners with the productive conversation
 recurrence so that available contextual returns determine subsequent native relation formation,

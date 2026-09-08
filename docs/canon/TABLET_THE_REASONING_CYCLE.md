@@ -69,7 +69,7 @@ emission privately copied back into an input buffer is not a world return.
 realization's internal factorization remains opaque apparatus conduct unless a declared exterior
 reconstruction receiver asks about it. Soulkiller neither requires nor reproduces that
 factorization. An Athena front is an addressed factorization of native incidence, current,
-constitutive response, chronology, receiver consequence, and reconstruction fibre.
+constitutive response, chronology, receiver consequence, and Preimage Fibre.
 
 ## 2. The bra-ket anatomy of local transport
 
