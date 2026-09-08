@@ -368,6 +368,8 @@ fn run_session(
                 json!(field.inspect_complete_material_transport_state()?)
             } else if field.material_transport_source()==Some(NativeMaterialTransportSource::HomogeneousMoment) {
                 json!(final_occurrence.map(|at|field.inspect_moment_material_transport(at)).transpose()?.flatten())
+            } else if matches!(field.material_transport_source(),Some(NativeMaterialTransportSource::Contextual|NativeMaterialTransportSource::BilinearContextual)) {
+                json!(final_occurrence.map(|at|field.inspect_contextual_material_transport(at)).transpose()?.flatten())
             } else {json!(field.inspect_material_transport_state()?)},
             "internal_current_enclosures":if inspect_all_currents { field.inspect_internal_current_enclosures()? } else { None }});
     // Only cold diagnostics copy numerical emission carriers. Product steps above read the
@@ -404,7 +406,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment] [--text-receiver material|constitutive]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum] [--text-receiver material|constitutive]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -440,9 +442,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     "coupled-outgoing" => NativeMaterialTransportSource::CoupledOutgoing,
                     "complete-current" => NativeMaterialTransportSource::CompleteCurrent,
                     "homogeneous-moment" => NativeMaterialTransportSource::HomogeneousMoment,
+                    "contextual" | "bilinear-contextual" => {
+                        NativeMaterialTransportSource::BilinearContextual
+                    }
+                    "contextual-direct-sum" => NativeMaterialTransportSource::Contextual,
                     _ => {
                         return Err(
-                            "material source must be coupled-outgoing, complete-current or homogeneous-moment".into(),
+                            "material source must be coupled-outgoing, complete-current, homogeneous-moment, contextual (alias bilinear-contextual), or contextual-direct-sum".into(),
                         );
                     }
                 })
@@ -577,7 +583,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         report["fractional_bits"] = json!(grain);
         report["families_aperture"] = json!(families);
         let exposure = exposure.to_string_lossy().into_owned();
-        with_text_field_source(grain, material_source.unwrap_or_default(), |field| {
+        with_text_field_source(grain, material_source.unwrap_or(NativeMaterialTransportSource::BilinearContextual), |field| {
             if let Some(path) = &history_archive {
                 field.enable_history_archive(path)?;
             }

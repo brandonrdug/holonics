@@ -108,6 +108,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 match self.material_transport_source() {
                     Some(NativeMaterialTransportSource::CompleteCurrent) => 4,
                     Some(NativeMaterialTransportSource::HomogeneousMoment) => 6,
+                    Some(NativeMaterialTransportSource::Contextual | NativeMaterialTransportSource::BilinearContextual) => 7,
                     _ => 3,
                 },
                 0,

@@ -33,6 +33,9 @@ impl<'c> NativeConstitutiveField<'c> {
         let feature = match self.material_transport_source() {
             Some(NativeMaterialTransportSource::HomogeneousMoment) => 28 * n + 12,
             Some(NativeMaterialTransportSource::CompleteCurrent) => 38 * n + 12,
+            Some(NativeMaterialTransportSource::Contextual | NativeMaterialTransportSource::BilinearContextual) => {
+                material_transport::contextual::offsets(n)[3]
+            }
             _ => return Err(ConstitutiveFibreError::Shape),
         };
         for at in [receiving[0], receiving[1], s0, s1, context[0], context[1]] {

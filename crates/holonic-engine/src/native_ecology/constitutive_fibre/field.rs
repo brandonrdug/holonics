@@ -57,7 +57,7 @@ pub use material_transport::{
     NativeFieldMaterialTransportResidual, NativeFieldMaterialTransportState,
     NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading,
     NativeMaterialModeReturn, NativeMaterialModeUnfolding, NativeMaterialTransportSource,
-    NativeMomentMaterialReading,
+    NativeMomentMaterialReading, NativeContextualMaterialReading,
 };
 pub use receiver::NativeFieldDifferentialReading;
 pub use resident_input::NativeFieldIncoming;
@@ -765,6 +765,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                     .as_ref()
                     .and_then(|p| p.moment.as_ref())
                     .map(|p| (&p.table, p.count, &p.weights)),
+                prepared_transport.as_ref().and_then(|p|p.contextual.as_ref()).map(|p|(&p.table,&p.weights,&p.evaluations,source_at.unwrap_or(0) as u64)),
                 &output,
             )?;
         }

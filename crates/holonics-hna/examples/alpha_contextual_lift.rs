@@ -52,11 +52,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             };
             (serde_json::to_value(p).map_err(|e|AlphaMaterialError::Apparatus(e.to_string()))?,rank,unobserved)
         };
+        let material=occurrences.iter().map(|at|field.inspect_contextual_material_transport(*at)).collect::<Result<Vec<_>,_>>()?;
         let after=field.census();
         if field.occurrence_count()!=count || after.deed_launches!=before.deed_launches{return Err(AlphaMaterialError::Apparatus("cold derivation changed native operation".into()));}
         Ok(json!({"schema":"holonics.contextual-lift-inspection.v1","enclosed_pair":enclosed_pair,"model":path,"native_occurrences":count,
             "native_deeds":after.deed_launches-before.deed_launches,"cold_section_readouts":after.section_read_outs-before.section_read_outs,
-            "demonstrated_context_rank":rank,"unobserved_map_directions":unobserved,"inspection":inspection,"language_quality_established":false}))
+            "demonstrated_context_rank":rank,"unobserved_map_directions":unobserved,"ordinary_material_receipts":material,"inspection":inspection,"language_quality_established":false}))
     })?;
     let mut result = result;
     result["whole_wall_seconds"] = json!(start.elapsed().as_secs_f64());

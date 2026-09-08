@@ -411,6 +411,8 @@ impl NativeFieldRest {
         let mut preceding_rank = 0usize;
         let mut frame_at = 0;
         let mut coefficient_error = 0;
+        // Ephemeral cold validation of native reference frames, not semantic identity.
+        let mut contextual_references = std::collections::BTreeMap::<Vec<(i64, i64)>, usize>::new();
         for (at, (event, rest)) in h.history.iter().zip(&self.history).enumerate() {
             while frame_at < h.recharts.len() && state_count(h.recharts[frame_at].at_state)? <= at {
                 frame_at += 1;
@@ -490,6 +492,10 @@ impl NativeFieldRest {
                         _ => return Err(invalid("complete-current representation")),
                     };
                     match h.transport_source {
+                        NativeMaterialTransportSource::Contextual
+                        | NativeMaterialTransportSource::BilinearContextual => {
+                            material_transport::contextual::validate_report(section, n, grain, at)?
+                        }
                         NativeMaterialTransportSource::HomogeneousMoment => {
                             material_transport::moment::validate_report(section, n, grain, at)?
                         }
@@ -502,6 +508,42 @@ impl NativeFieldRest {
                     return Err(invalid("coefficient error chronology"));
                 }
                 coefficient_error = error;
+                if matches!(
+                    h.transport_source,
+                    NativeMaterialTransportSource::Contextual
+                        | NativeMaterialTransportSource::BilinearContextual
+                ) {
+                    let [_, output, input, context, _, meta, _] =
+                        material_transport::contextual::offsets(n);
+                    let version = if h.transport_source
+                        == NativeMaterialTransportSource::BilinearContextual
+                    {
+                        2
+                    } else {
+                        1
+                    };
+                    if section.intervals[meta + 3].0 != version {
+                        return Err(invalid("contextual chart version"));
+                    }
+                    let source = event.lineage.received_from;
+                    if section.intervals[meta + 1].0 != source.map_or(-1, |v| v as i64) {
+                        return Err(invalid("contextual source lineage"));
+                    }
+                    if let Some(source) = source {
+                        let prior = self.history[source]
+                            .transport
+                            .as_ref()
+                            .ok_or_else(|| invalid("missing contextual source"))?;
+                        if section.intervals[input..context] != prior.intervals[output..input] {
+                            return Err(invalid("changed contextual source profile"));
+                        }
+                        let key = section.intervals[input..input + 8 * n + 2].to_vec();
+                        let reference = *contextual_references.entry(key).or_insert(at);
+                        if section.intervals[meta + 2].0 != reference as i64 {
+                            return Err(invalid("contextual reference frame"));
+                        }
+                    }
+                }
             }
         }
         if preceding_rank != rank || h.history.iter().zip(received).any(|(e, r)| e.returned != r) {
@@ -535,12 +577,16 @@ impl NativeFieldRest {
                     }
                     _ => return Err(invalid("complete-current representation")),
                 };
-                let validate =
-                    if h.transport_source == NativeMaterialTransportSource::HomogeneousMoment {
-                        material_transport::moment::validate_state
-                    } else {
-                        material_transport::complete::validate_state
-                    };
+                let validate = if matches!(
+                    h.transport_source,
+                    NativeMaterialTransportSource::HomogeneousMoment
+                        | NativeMaterialTransportSource::Contextual
+                        | NativeMaterialTransportSource::BilinearContextual
+                ) {
+                    material_transport::moment::validate_state
+                } else {
+                    material_transport::complete::validate_state
+                };
                 validate(state, n, grain, h.history.len(), coefficient_error)?;
             } else {
                 point_section(state, 1, transport_width)?;

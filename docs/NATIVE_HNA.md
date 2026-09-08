@@ -300,6 +300,19 @@ pairing, retains immutable return factors and transports the signed operator-nor
 `inspect_exact_numerical_moment_forward` is the cold rational decoder. The native text receiver
 uses the enclosed forward current. This interface does not establish useful language.
 
+[established-bounded; source-inspected] Fresh `alpha_text` cultivation now defaults to
+`--material-source contextual` (alias `bilinear-contextual`), stored as `BilinearContextual`.
+The [ordinary return](../research/records/2026-09-08_AC1_ORDINARY_RECEPTION_CONDUCTS_THE_SOURCE_AND_ITS_AVAILABLE_CONTEXT.md)
+uses `Q(source) tensor Q(context)` after the complete bilinear source/condition contact. The
+addressed source and context immediately before reception retain separate epochs. Native
+first-reference discovery supplies equal-source contrasts; ordinary and contrast contacts stage
+inside the existing fused field operation. `inspect_contextual_material_transport` exposes those
+currents, native references and error bounds as a cold observer. No historical pair is supplied
+by `alpha_text`. The legacy `contextual-direct-sum` trial retains wire chart 1; new models use
+chart 2. Saved kinds are never silently converted, and older absent tags retain their old default.
+Both versions preserve full historical material factors, with growing residency and cold costs.
+The actual 16-family model and its exact process restart still fail useful language.
+
 [established-bounded; source-inspected] `alpha_contextual_lift MODEL RECEIVING,RECEIVING
 --enclosed-pair --report NEW.json` performs the bounded [AC1 derivation check](../research/records/2026-09-07_AC1_THE_SOURCE_NULL_RETURN_DERIVES_ITS_CONTEXTUAL_LIFT.md)
 on two actual saved returns. It preserves the separate source/context epochs and does not
@@ -314,7 +327,8 @@ preserved by the existing checkpoint. `alpha_contextual_return MODEL A,B --repor
 --checkpoint NEW.hna` runs the declared interaction; its `--continue MODEL --prompt FILE
 --emit-symbols N --report NEW.json` mode resumes the saved successor without repeating that
 interaction. This study envelope is distinct from `alpha_text`’s exposure-only application ledger.
-Automatic ordinary-cultivation integration and useful language remain open.
+The ordinary integration below supersedes the study driver for its declared equal-source families.
+Useful language remains open.
 
 [established-bounded; measured] These commands run the checked-in examples on the standing CUDA
 apparatus. The build uses the repository's usual [development setup](DEVELOPMENT.md).

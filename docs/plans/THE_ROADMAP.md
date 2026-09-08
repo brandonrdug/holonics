@@ -94,28 +94,32 @@ now preserves fixed-source mixed conduct, full forward and inverse families, act
 contact and full-current re-entry into the same conversation field. All 138 constitutive and
 19 SDK alpha tests pass. A real 1,931-occurrence successor and process-separated continuation
 return. Its response is still `v` followed by an unresolved receiver. This is integrated native
-apparatus exercised by a declared study; the historical pair is not yet found and reused by the
-ordinary cultivation operation itself.
+apparatus exercised by a declared study. The ordinary equal-source integration below now
+finds and reuses its references without that driver-selected pair.
 
-[definition] **Next AC1 construction:** integrate contextual formation and reuse into the
-existing continuing owner’s ordinary reception, with actual source-null provenance, retained
-condition/current state and complete staged publication/refusal. Remove the study driver’s
-role in choosing a historical contrast and composing development. Preserve the full family,
-phase, source history and uncertainty; no cause or numerical centre is chosen. Then conduct
-actual corpus development and AC2’s complete responses. A source-chart optimization or another
-isolated extraction cannot replace that integrated product.
+[established-bounded; measured] The [ordinary contextual return](../../research/records/2026-09-08_AC1_ORDINARY_RECEPTION_CONDUCTS_THE_SOURCE_AND_ITS_AVAILABLE_CONTEXT.md)
+now forms and reuses equal-source reference contrasts in the continuing native owner. Both
+parameter contacts stage with the field successor; the driver supplies no historical pair.
+All 141 constitutive and 20 SDK alpha tests pass. Actual 16-family development and a fresh-process
+restart return the same complete body and current history, but the response repeats `~ena` and
+fails the request. This closes the declared ordinary equal-source attachment, not AC1 or AC2.
 
-[definition] **Next construction remains AC1 → AC2.** Compose the existing learned
-conditional/generative transport and Preimage Fibre owners with the productive conversation
-recurrence so that available contextual returns determine subsequent native relation formation,
-reuse and transformation. Name the actual missing source/condition/return attachment and its
-consequence; do not substitute another source chart or representation repair for that composition.
-Exercise it on actual conversation material and inspect complete responses with contextual
-followups. The phase controls, changed coefficients and persistence receipts do not close AC1
-or AC2. The [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
-is an available derived representation option, not a prerequisite scheduled ahead of this gap.
-Use it if the actual composition needs that representation, with its delayed-return and numerical
-obligations intact. Preserve the failed model and the full product standard.
+[definition] **Next AC1 → AC2 construction:** derive and implement the next contextual-organization
+or productive-continuation attachment from the ordinary model's actual source, condition and
+returned differences. Equal visible-source families do not exhaust general class formation.
+Inspect the current-to-text continuation boundary: ordinary generation decodes signs and
+re-enters a unit codeword, while the separate full-current ingress currently takes exact returns.
+Establish the declared contact and uncertainty requirements before changing that path or blaming
+it for the language failure. Compose the existing native owners, retain complete staged refusal
+and actual Preimage Fibres, and inspect full responses with contextual followups. Do not replace
+an enclosure by its centre, install a quotation/template emitter or substitute another isolated
+source extraction. Necessary derivation remains inside AC1; no additional user information is
+required. AC2 useful English/code/mathematics, broad AC3 and AC4–AC5 remain open.
+
+[definition] The [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
+remains an available representation option when the actual composition needs it, with its
+future-generator, delayed-return and numerical obligations. It is not a scheduled prerequisite
+in place of the open product attachment. Preserve the failed models and measured growing costs.
 
 [established-bounded; measured] The [generated-current ingress](../../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
 now reaches the ordinary field operation without numerical readback/remount, preserving paired

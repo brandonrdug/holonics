@@ -6,6 +6,7 @@ use holonic_engine::{
     },
     resident_section::{ResidentGrain, ResidentSectionRest},
 };
+use num_traits::Zero;
 
 fn prepare<'c>(
     session: &mut TextFieldSession<'_, 'c>,
@@ -129,6 +130,58 @@ fn pending_native_input_preserves_amplitude_and_source_capability() {
                 serde_json::to_value(session.pending_native.as_ref().unwrap().rest()?).unwrap(),
                 pending
             );
+            Ok(())
+        })
+        .unwrap();
+}
+
+#[test]
+#[ignore = "requires CUDA; ordinary text intake forms every source-family return with no selected historical pair"]
+fn ordinary_text_intake_forms_contextual_references_and_restarts() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("ordinary-context.hna");
+    with_text_field_source(
+        72,
+        NativeMaterialTransportSource::BilinearContextual,
+        |field| {
+            let mut session = TextFieldSession::on(field)?;
+            let before = session.field().census();
+            for byte in b"ababac" {
+                session.receive(TextSymbol::Octet(*byte))?;
+            }
+            assert_eq!(
+                session.field().census().section_read_outs,
+                before.section_read_outs
+            );
+            let invariant = session
+                .field()
+                .inspect_contextual_material_transport(4)?
+                .unwrap();
+            let changed = session
+                .field()
+                .inspect_contextual_material_transport(5)?
+                .unwrap();
+            assert_eq!(invariant.reference_receiving_occurrence, Some(2));
+            assert_eq!(changed.reference_receiving_occurrence, Some(3));
+            assert_eq!(changed.input_context_occurrence, Some(4));
+            assert_eq!(changed.source_occurrence, Some(4));
+            assert!(changed.condition_change.unwrap().radius.is_zero());
+            assert!(changed.parameter_change.unwrap().radius.is_zero());
+            session.checkpoint(&path, &[], b"ordinary-context")?;
+            Ok(())
+        },
+    )
+    .unwrap();
+    SavedTextField::read(&path)
+        .unwrap()
+        .with_session(|session, _, _, _| {
+            assert_eq!(
+                session.field().material_transport_source(),
+                Some(NativeMaterialTransportSource::BilinearContextual)
+            );
+            assert_eq!(session.field().occurrence_count(), 6);
+            session.receive(TextSymbol::Octet(b'b'))?;
+            assert_eq!(session.field().occurrence_count(), 7);
             Ok(())
         })
         .unwrap();

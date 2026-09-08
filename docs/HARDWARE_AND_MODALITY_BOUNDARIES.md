@@ -22,6 +22,17 @@ neither a perfect inverse nor a copy of every past sample is a general learning 
 
 ## Current common mechanism
 
+[definition] The [ordinary contextual return](../research/records/2026-09-08_AC1_ORDINARY_RECEPTION_CONDUCTS_THE_SOURCE_AND_ITS_AVAILABLE_CONTEXT.md)
+adds native equal-source reference discovery and two ordered contacts inside one field return.
+Its port requires the existing exact complete-current pairing, normalized source/condition moment
+pairings, outward integer division, signed evaluation bounds and atomic refusal/publication.
+The logical report has `150*n+96` i64 words; chart 2 is the bilinear contact and chart 1 remains
+the earlier direct-sum experiment. Preserve their distinct tags and the pre-reception context
+epoch. CUDA pointer tables and packed wide intermediates need target-specific realization.
+This desktop implementation and its failed text response establish no Metal or acoustic result;
+the already available shared generator/condition workflow can continue on the Mac.
+
+
 [definition] The [native contextual-section return](../research/records/2026-09-08_AC1_THE_CONTEXTUAL_SECTION_RETURNS_THROUGH_NATIVE_CONDITION_AND_FIELD_CURRENT.md)
 adds a further shared port. Its generic bilinear section uses the existing exact row calculus
 and condition-image receive/contact kernels. The field-contrast variant additionally requires

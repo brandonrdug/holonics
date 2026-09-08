@@ -56,6 +56,7 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/field_current_history_source.cuh");
     println!("cargo:rerun-if-changed=kernels/field_complete_material_transport.cuh");
     println!("cargo:rerun-if-changed=kernels/field_moment_material.cuh");
+    println!("cargo:rerun-if-changed=kernels/field_contextual_material.cuh");
     println!("cargo:rerun-if-changed=kernels/field_material_mode.cuh");
     println!("cargo:rerun-if-changed=kernels/exact_relation_support.cu");
     println!("cargo:rerun-if-changed=kernels/refine_shell.cu");

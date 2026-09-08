@@ -101,6 +101,15 @@ operator-norm transport and rest/differential receivers are documented in the
 `resident_section/surface_moment.rs` records the older-source evaluation; the fused field kernel
 owns publication. The exact rational factor decoder is an exterior diagnostic.
 
+[established-bounded; source-inspected] `field/material_transport/contextual.rs` owns ordinary
+contextual work carriers, cold readings and report validation; `field_contextual_material.cuh`
+conducts the implicit bilinear phase moment, native equal-source reference discovery and both
+staged coercive returns. `constitutive_field.cuh` remains the sole publication owner.
+`field/rest.rs` verifies chart kind, original source and reference chronology. The
+[ordinary contextual return](../research/records/2026-09-08_AC1_ORDINARY_RECEPTION_CONDUCTS_THE_SOURCE_AND_ITS_AVAILABLE_CONTEXT.md)
+records the rational controls and failed actual conversation result. `alpha_text` selects the
+new source kind; it contains no reference-pair chooser or additional native learning operation.
+
 [established-bounded; source-inspected] `exact_linear/contextual.rs` composes kernel/image and
 preimage algebra into the [contextual lift](../research/records/2026-09-07_AC1_THE_SOURCE_NULL_RETURN_DERIVES_ITS_CONTEXTUAL_LIFT.md).
 `field/contextual_lift.rs` binds its cold inspection to actual source and pre-return context

@@ -1,0 +1,270 @@
+{
+  "truth_status": "established-bounded",
+  "evidence_tags": [
+    "measured"
+  ],
+  "scope": "Ordinary equal-visible-source contextual material integration; all response trials fail useful language.",
+  "prompt": "Explain the difference between a function and its derivative.",
+  "symbol_work_limit": 128,
+  "fractional_bits": 72,
+  "source_chart": "Q(s) tensor Q(c), h=(1,s) tensor (1,c)",
+  "source_chart_versions": {
+    "contextual": 1,
+    "bilinear-contextual": 2
+  },
+  "private_artifact_directory": ".local/artifacts/athena-alpha/ac1-ordinary-context",
+  "runs": [
+    {
+      "name": "first-eight-v1",
+      "report": ".local/artifacts/athena-alpha/ac1-ordinary-context/first-eight-v1.json",
+      "checkpoint": ".local/artifacts/athena-alpha/ac1-ordinary-context/first-eight-v1.hna",
+      "checkpoint_bytes": 70059443,
+      "material_source": "contextual",
+      "families": 8,
+      "development_occurrences": 1930,
+      "material_wall_seconds": 64.143201731,
+      "whole_process_seconds": 82.11732644500444,
+      "max_rss_kib": 276136,
+      "development_census": {
+        "allocations": 42474,
+        "captured_launches": 3860,
+        "control_launches": 0,
+        "deed_launches": 1930,
+        "device_to_device_octets": 0,
+        "egress_receipt_octets": 123520,
+        "egress_section_octets": 0,
+        "ingress_octets": 31852304,
+        "resident_octets_now": 136282960,
+        "resident_octets_peak": 137434580,
+        "section_read_outs": 0,
+        "synchronizations": 1930
+      },
+      "development_section_readouts_outside_history_placement": 0,
+      "response": "n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`n`",
+      "disposition": {
+        "kind": "interrupted"
+      },
+      "language_quality_established": false
+    },
+    {
+      "name": "first-sixteen-v1",
+      "report": ".local/artifacts/athena-alpha/ac1-ordinary-context/first-sixteen-v1.json",
+      "checkpoint": ".local/artifacts/athena-alpha/ac1-ordinary-context/first-sixteen-v1.hna",
+      "checkpoint_bytes": 183509482,
+      "material_source": "contextual",
+      "families": 16,
+      "development_occurrences": 5064,
+      "material_wall_seconds": 128.144559971,
+      "whole_process_seconds": 182.24528837797698,
+      "max_rss_kib": 552440,
+      "development_census": {
+        "allocations": 80540,
+        "captured_launches": 6268,
+        "control_launches": 0,
+        "deed_launches": 3134,
+        "device_to_device_octets": 0,
+        "egress_receipt_octets": 200576,
+        "egress_section_octets": 0,
+        "ingress_octets": 314319232,
+        "resident_octets_now": 356966704,
+        "resident_octets_peak": 358970772,
+        "section_read_outs": 0,
+        "synchronizations": 3134
+      },
+      "development_section_readouts_outside_history_placement": 0,
+      "response": "nananananananananananananananananananananananananananananananananananananananananananananananananananananananananananananananana",
+      "disposition": {
+        "kind": "interrupted"
+      },
+      "language_quality_established": false
+    },
+    {
+      "name": "first-eight-bilinear-v2",
+      "report": ".local/artifacts/athena-alpha/ac1-ordinary-context/first-eight-bilinear-v2.json",
+      "checkpoint": ".local/artifacts/athena-alpha/ac1-ordinary-context/first-eight-bilinear-v2.hna",
+      "checkpoint_bytes": 70059452,
+      "material_source": "bilinear-contextual",
+      "families": 8,
+      "development_occurrences": 1930,
+      "material_wall_seconds": 64.595864683,
+      "whole_process_seconds": 81.98931879503652,
+      "max_rss_kib": 307100,
+      "development_census": {
+        "allocations": 42474,
+        "captured_launches": 3860,
+        "control_launches": 0,
+        "deed_launches": 1930,
+        "device_to_device_octets": 0,
+        "egress_receipt_octets": 123520,
+        "egress_section_octets": 0,
+        "ingress_octets": 31852304,
+        "resident_octets_now": 136282960,
+        "resident_octets_peak": 137434580,
+        "section_read_outs": 0,
+        "synchronizations": 1930
+      },
+      "development_section_readouts_outside_history_placement": 0,
+      "response": "tife~anenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenane",
+      "disposition": {
+        "kind": "interrupted"
+      },
+      "language_quality_established": false
+    },
+    {
+      "name": "first-sixteen-bilinear-v2",
+      "report": ".local/artifacts/athena-alpha/ac1-ordinary-context/first-sixteen-bilinear-v2.json",
+      "checkpoint": ".local/artifacts/athena-alpha/ac1-ordinary-context/first-sixteen-bilinear-v2.hna",
+      "checkpoint_bytes": 183509491,
+      "material_source": "bilinear-contextual",
+      "families": 16,
+      "development_occurrences": 5064,
+      "material_wall_seconds": 134.312727079,
+      "whole_process_seconds": 180.4289117929875,
+      "max_rss_kib": 500528,
+      "development_census": {
+        "allocations": 80540,
+        "captured_launches": 6268,
+        "control_launches": 0,
+        "deed_launches": 3134,
+        "device_to_device_octets": 0,
+        "egress_receipt_octets": 200576,
+        "egress_section_octets": 0,
+        "ingress_octets": 314319232,
+        "resident_octets_now": 356966704,
+        "resident_octets_peak": 358970772,
+        "section_read_outs": 0,
+        "synchronizations": 3134
+      },
+      "development_section_readouts_outside_history_placement": 0,
+      "response": "",
+      "disposition": {
+        "kind": "open"
+      },
+      "language_quality_established": false
+    },
+    {
+      "name": "first-sixteen-bilinear-v3",
+      "report": ".local/artifacts/athena-alpha/ac1-ordinary-context/first-sixteen-bilinear-v3.json",
+      "checkpoint": ".local/artifacts/athena-alpha/ac1-ordinary-context/first-sixteen-bilinear-v3.hna",
+      "checkpoint_bytes": 183509491,
+      "material_source": "bilinear-contextual",
+      "families": 16,
+      "development_occurrences": 5064,
+      "material_wall_seconds": 199.236018126,
+      "whole_process_seconds": 305.7586435569683,
+      "max_rss_kib": 2194532,
+      "development_census": {
+        "allocations": 111422,
+        "captured_launches": 10128,
+        "control_launches": 0,
+        "deed_launches": 5064,
+        "device_to_device_octets": 0,
+        "egress_receipt_octets": 324096,
+        "egress_section_octets": 0,
+        "ingress_octets": 209888576,
+        "resident_octets_now": 356966704,
+        "resident_octets_peak": 358970772,
+        "section_read_outs": 0,
+        "synchronizations": 5064
+      },
+      "development_section_readouts_outside_history_placement": 0,
+      "response": "Wmfa~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena~ena",
+      "disposition": {
+        "kind": "interrupted"
+      },
+      "language_quality_established": false
+    }
+  ],
+  "ordinary_reference_receipts": [
+    {
+      "source_occurrence": 11,
+      "input_context_occurrence": 11,
+      "reference_receiving_occurrence": 12,
+      "source_chart_version": 2
+    },
+    {
+      "source_occurrence": 19,
+      "input_context_occurrence": 19,
+      "reference_receiving_occurrence": 12,
+      "source_chart_version": 2
+    }
+  ],
+  "fresh_process_restart": {
+    "report": ".local/artifacts/athena-alpha/ac1-ordinary-context/first-sixteen-bilinear-v3-restart.json",
+    "development_records": true,
+    "body": true,
+    "generation": true,
+    "emission_current_history": true,
+    "command": [
+      "target/debug/examples/alpha_text",
+      "--resume",
+      ".local/artifacts/athena-alpha/ac1-ordinary-context/first-sixteen-bilinear-v3.hna",
+      "--families",
+      "0",
+      "--prompt",
+      ".local/artifacts/athena-alpha/ac2/first-request.txt",
+      "--emit-symbols",
+      "128",
+      "--report",
+      ".local/artifacts/athena-alpha/ac1-ordinary-context/first-sixteen-bilinear-v3-restart.json"
+    ],
+    "return_code": 0,
+    "whole_process_seconds": 58.63345505401958,
+    "max_rss_kib": 535196
+  },
+  "legacy_restart": {
+    "report": ".local/artifacts/athena-alpha/ac1-ordinary-context/first-eight-v1-current-restart.json",
+    "material_source": "contextual",
+    "generation_equal": true,
+    "lineage_equal": true
+  },
+  "coefficient_error_bound_correction": {
+    "compared": [
+      "first-sixteen-bilinear-v2",
+      "first-sixteen-bilinear-v3"
+    ],
+    "same_development_records": true,
+    "same_lineage_through_first_response": true,
+    "same_first_response_junction": true,
+    "changed_first_material_words": [
+      72,
+      73,
+      146,
+      147,
+      294,
+      295,
+      516,
+      517,
+      590,
+      591,
+      738,
+      739,
+      812,
+      813,
+      2772,
+      2773
+    ],
+    "changes_confined_to_error_radii": true,
+    "old_forward_radius_numerator": "98402900126459490770",
+    "new_forward_radius_numerator": "49211212952927172688",
+    "denominator": "4722366482869645213696"
+  },
+  "checks": {
+    "native_constitutive": {
+      "passed": 141,
+      "failed": 0,
+      "seconds": 35.47
+    },
+    "sdk_alpha": {
+      "passed": 20,
+      "failed": 0,
+      "seconds": 2.86
+    },
+    "alpha_text_actual_parent_and_partial_restart": {
+      "passed": 2,
+      "failed": 0,
+      "seconds": 17.37
+    }
+  },
+  "athena_alpha_attained": false
+}

@@ -161,6 +161,10 @@ impl NativeConstitutiveField<'_> {
                     .inspect_moment_material_transport(at)?
                     .map(|r| r.source)
                     .ok_or_else(|| invalid("missing moment source")),
+                Some(NativeMaterialTransportSource::Contextual | NativeMaterialTransportSource::BilinearContextual) => self
+                    .inspect_contextual_material_transport(at)?
+                    .map(|r| r.context)
+                    .ok_or_else(|| invalid("missing contextual source")),
                 Some(NativeMaterialTransportSource::CompleteCurrent) => self
                     .inspect_complete_material_transport(at)?
                     .map(|r| r.numerical_source)

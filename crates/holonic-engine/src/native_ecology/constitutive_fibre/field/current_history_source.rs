@@ -321,6 +321,17 @@ pub(super) fn decode_source(
     if norm < BigInt::zero() || radius < 0 || words[6 * d + 18].0 < 0 {
         return Err(invalid("negative source radius, norm or trace"));
     }
+    let norm_upper = material_transport::wides(&words[6 * d + 20..6 * d + 22])?[0];
+    let upper = BigInt::from(norm_upper);
+    if norm_upper < 0
+        || &upper * &upper < norm
+        || (norm_upper > 0 && {
+            let lower = &upper - 1;
+            &lower * &lower >= norm
+        })
+    {
+        return Err(invalid("noncanonical source norm ceiling"));
+    }
     Ok(NativeCurrentHistorySourceReading {
         occurrence: occurrence,
         outgoing_center: vector(0),
@@ -333,9 +344,6 @@ pub(super) fn decode_source(
         numerical_norm_square: Rat::new(norm, square),
         source_radius: Rat::new(radius.into(), scale.clone()),
         contact_trace: words[6 * d + 18].0.into(),
-        numerical_norm_upper: Rat::new(
-            material_transport::wides(&words[6 * d + 20..6 * d + 22])?[0].into(),
-            scale,
-        ),
+        numerical_norm_upper: Rat::new(upper, scale),
     })
 }

@@ -70,8 +70,11 @@ states the current question; do not demand a new axiom or repeated ontology with
 a material unresolved choice. The [source-null contextual derivation](research/records/2026-09-07_AC1_THE_SOURCE_NULL_RETURN_DERIVES_ITS_CONTEXTUAL_LIFT.md)
 now supplies a criterion, full map family and bounded actual-data check. The
 [resident return](research/records/2026-09-08_AC1_THE_CONTEXTUAL_SECTION_RETURNS_THROUGH_NATIVE_CONDITION_AND_FIELD_CURRENT.md)
-now conducts it through condition contact and full-current re-entry; ordinary-cultivation
-formation/reuse and useful language remain open. Follow the roadmap’s next AC1 obligation. Do not replace enclosures with centres
+now conducts it through condition contact and full-current re-entry. The
+[ordinary contextual return](research/records/2026-09-08_AC1_ORDINARY_RECEPTION_CONDUCTS_THE_SOURCE_AND_ITS_AVAILABLE_CONTEXT.md)
+now discovers equal-source reference frames and stages both parameter contacts within ordinary
+reception. Its actual conversation response still fails. Follow AC1–AC2’s contextual-organization
+and productive-continuation obligation; do not repeat the completed pair-selected study. Do not replace enclosures with centres
 or phase labels, or found a separate learner. Retain the carriers used to produce each prediction; later
 condition inference changes the successor rather than rewriting that prediction's history.
 

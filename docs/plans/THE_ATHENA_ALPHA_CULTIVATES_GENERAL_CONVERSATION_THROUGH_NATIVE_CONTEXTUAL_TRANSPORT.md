@@ -230,17 +230,17 @@ responses; derivation and source review alone do not complete AC1 or Athena-alph
 now identifies exactly when carried context can resolve the source-invisible returned current,
 retaining the full map family and future-generator defects. Its bounded two-passage form works
 without exact contextual coordinates. Both forms agree on an actual saved conversation pair;
-the model is unchanged. The next AC1 attachment is its resident context/return section in the
-existing joint relation, carried into actual subsequent native formation and condition contact.
+the model is unchanged. The resident context/return section below subsequently supplies
+the productive native port, followed by the ordinary equal-source integration.
 Derivation and cold references remain distinct from that productive integration and AC2.
 
 [established-bounded; measured] The [resident contextual section](../../research/records/2026-09-08_AC1_THE_CONTEXTUAL_SECTION_RETURNS_THROUGH_NATIVE_CONDITION_AND_FIELD_CURRENT.md)
 now conducts the derived family through actual condition contact and native text-current
 re-entry. Its real-model successor survives a process restart; 138 constitutive and 19 SDK alpha
 tests pass. The study supplies its historical pair explicitly, and the resulting response is
-still unusable. AC1 next puts formation, retained contextual state and reuse inside ordinary
-cultivation with one complete successor. The driver-selected interaction and successful current
-transport do not discharge that obligation or AC2’s useful-language requirement.
+still unusable. The ordinary equal-source integration below now puts reference formation and
+reuse inside one complete field successor. The driver-selected study remains separate evidence
+and does not discharge AC2’s useful-language requirement.
 
 [established-bounded; measured] The [conditional-contact return](../../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
 composes the existing local relation with two declared native current roles and their complex
@@ -287,14 +287,24 @@ eight-family cultivation retains 1,930 development occurrences, but its resolved
 `va` to the 128-symbol work limit. Numerical/source attachment and persistence have returned;
 useful language and the full AC0–AC5 objective remain open.
 
-[definition] AC1's generative composition and AC2's complete useful responses remain the
-construction priority. The bounded conditional-generator and Preimage Fibre owners must
-participate in the actual conversation recurrence with a demonstrated consequence for formation,
-reuse and transformation of subsequent relations. The fixed exterior chart and changed material
-source are not sufficient evidence of that attachment. The
-[chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
-remains a derived representation option; it is not a mandatory prerequisite ahead of this missing
-composition or an explanation of the failed language response. The roadmap orders work.
+[established-bounded; measured] The [ordinary contextual return](../../research/records/2026-09-08_AC1_ORDINARY_RECEPTION_CONDUCTS_THE_SOURCE_AND_ITS_AVAILABLE_CONTEXT.md)
+now composes source, available condition and mixed phase moment through native reference discovery
+and two ordered parameter contacts. Both contacts publish with the existing field successor.
+All 141 constitutive and 20 SDK alpha checks pass. A fresh 16-family / 5,064-occurrence model
+and its complete process restart return; its repetitive response still fails. The declared
+equal-source attachment is implemented, while AC1 contextual organization and AC2 useful
+language remain open. This does not infer a unique cause from the observations.
+
+[definition] Continue from the actual ordinary model's source/condition/return conduct into
+learned contextual organization and productive text continuation. Equal visible-source families
+have a bounded scope; general class formation is not supplied by reference equality. Review
+the declared contact between native current, its text receiver and the next occurrence: ordinary
+generation currently re-enters a unit codeword, while the separate full-current ingress takes
+exact native returns. Preserve uncertainty and producing carriers when deriving that continuation.
+Its effect on language must be measured, not assumed. The roadmap orders the concrete work;
+necessary derivation remains part of AC1 and useful English/code/mathematics remains AC2.
+The [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
+is an available representation construction when needed, not a replacement for this attachment.
 
 [established-bounded; measured] The [resident field ingress](../../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
 now lets generated current enter that same field operation directly. Its actual input survives

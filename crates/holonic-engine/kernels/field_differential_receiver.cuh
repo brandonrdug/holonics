@@ -8,12 +8,12 @@ extern "C" __global__ void section_field_differential_receiver(
 ) {
     if (blockIdx.x || threadIdx.x) return;
     if (upstream_refused(census, lineage, lineage_count, slot)) return;
-    if (!dimension || (dimension & 1u) || (mode < 1u || mode > 6u) || !pairs || pairs > 63u
+    if (!dimension || (dimension & 1u) || (mode < 1u || mode > 7u) || !pairs || pairs > 63u
         || first_complex > dimension / 2u || 2u * pairs > dimension / 2u - first_complex) {
         atomicOr(slot, REFUSED_MALFORMED); return;
     }
     const uint64_t stride = (uint64_t)dimension + 1u;
-    const uint64_t words = mode == 6u ? 48u * (uint64_t)dimension + 44u : mode == 5u ? 2u * stride : (mode == 4u ? 37u * (uint64_t)dimension + 44u : (mode == 3u ? 18u * (uint64_t)dimension + 24u : (mode == 1u ? 4u : 12u) * stride));
+    const uint64_t words = mode == 7u ? 75u * (uint64_t)dimension + 96u : mode == 6u ? 48u * (uint64_t)dimension + 44u : mode == 5u ? 2u * stride : (mode == 4u ? 37u * (uint64_t)dimension + 44u : (mode == 3u ? 18u * (uint64_t)dimension + 24u : (mode == 1u ? 4u : 12u) * stride));
     const uint64_t start = mode >= 3u ? 0u : stride;
     for (uint64_t i = 0; i < words; ++i) {
         if (report_lo[i] != report_hi[i]) { atomicOr(slot, REFUSED_MALFORMED); return; }

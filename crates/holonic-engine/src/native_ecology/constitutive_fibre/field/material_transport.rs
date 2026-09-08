@@ -4,12 +4,14 @@ use num_bigint::BigInt;
 use num_traits::One;
 
 pub(super) mod complete;
+pub(super) mod contextual;
 pub(super) mod moment;
 pub use complete::{
     NativeCompleteMaterialTransportReading, NativeCompleteMaterialTransportState,
     NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading,
     NativeMaterialModeReturn, NativeMaterialModeUnfolding,
 };
+pub use contextual::NativeContextualMaterialReading;
 pub use moment::NativeMomentMaterialReading;
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, serde::Deserialize)]
@@ -19,6 +21,10 @@ pub enum NativeMaterialTransportSource {
     CoupledOutgoing,
     CompleteCurrent,
     HomogeneousMoment,
+    /// Retained direct-sum experiment; the complete bilinear contact is `BilinearContextual`.
+    Contextual,
+    /// Ordinary source-null return using the full bound source/context mixed product.
+    BilinearContextual,
 }
 impl NativeMaterialTransportSource {
     pub(super) fn is_outgoing(&self) -> bool {
@@ -29,6 +35,8 @@ impl NativeMaterialTransportSource {
             Self::CoupledOutgoing => 1,
             Self::CompleteCurrent => 2,
             Self::HomogeneousMoment => 3,
+            Self::Contextual => 4,
+            Self::BilinearContextual => 5,
         }
     }
     pub(super) fn state_words(self, n: usize) -> Option<usize> {
@@ -39,10 +47,15 @@ impl NativeMaterialTransportSource {
                 .checked_mul(60)?
                 .checked_add(n.checked_mul(22)?)?
                 .checked_add(12),
-            Self::HomogeneousMoment => n.checked_mul(12)?.checked_add(12),
+            Self::HomogeneousMoment | Self::Contextual | Self::BilinearContextual => {
+                n.checked_mul(12)?.checked_add(12)
+            }
         }
     }
     pub(super) fn report_words(self, n: usize) -> Option<usize> {
+        if matches!(self, Self::Contextual | Self::BilinearContextual) {
+            return n.checked_mul(150)?.checked_add(96);
+        }
         n.checked_mul(if self == Self::HomogeneousMoment {
             96
         } else if self == Self::CoupledOutgoing {
@@ -67,6 +80,7 @@ pub(super) struct PendingMaterialTransport<'chart> {
     pub(super) report: Rc<ResidentSection<'chart>>,
     pub(super) refresh: Option<complete::CurrentSourceRefresh<'chart>>,
     pub(super) moment: Option<moment::MomentFactors<'chart>>,
+    pub(super) contextual: Option<contextual::ContextualWork<'chart>>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -278,6 +292,15 @@ impl<'chart> NativeConstitutiveField<'chart> {
         };
         let surface = self.relation.surface;
         Ok(Some(PendingMaterialTransport {
+            contextual: if matches!(
+                kind,
+                NativeMaterialTransportSource::Contextual
+                    | NativeMaterialTransportSource::BilinearContextual
+            ) {
+                Some(self.prepare_contextual_work()?)
+            } else {
+                None
+            },
             moment: if kind == NativeMaterialTransportSource::HomogeneousMoment {
                 Some(self.moment_factors(0)?)
             } else {
@@ -320,6 +343,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
             Some(
                 NativeMaterialTransportSource::CompleteCurrent
                     | NativeMaterialTransportSource::HomogeneousMoment
+                    | NativeMaterialTransportSource::Contextual
+                    | NativeMaterialTransportSource::BilinearContextual
             )
         ) {
             return Err(ConstitutiveFibreError::Rest(
@@ -380,6 +405,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
             Some(
                 NativeMaterialTransportSource::CompleteCurrent
                     | NativeMaterialTransportSource::HomogeneousMoment
+                    | NativeMaterialTransportSource::Contextual
+                    | NativeMaterialTransportSource::BilinearContextual
             )
         ) {
             return Err(ConstitutiveFibreError::Rest(
