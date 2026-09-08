@@ -101,15 +101,28 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
    The initial unit-response comparison does not itself develop the generator.
    The [response-adjoint return](../../research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md)
    now returns the measured difference through the retained producing convolution, restricted to
-   actual observed support and preserving the original response chart. Next compose the joint compatible family
+   actual observed support and preserving the original response chart. The subsequent
+   [recorded contact](../../research/records/2026-09-07_THE_RECORDED_PREIMAGE_FIBRE_CHANGES_THE_CONTINUING_TEMPORAL_RESPONSE.md)
+   now composes the joint compatible family
    `F_y = {(h,e) : R_S X_x h + e = y_S}`, where `e` is retained unmodelled return, not a discarded
    error score. Under the existing explicitly declared unit-admittance metric, contact of the
    actual prior `(h_0,0)` obeys `h' - h_0 = (R_S X_x)* e'` and `R_S X_x h' + e' = y_S`.
-   This specifies a composition to implement, not a returned acoustic model. Preserve the whole
+   This returns the declared temporal contact, not a useful acoustic model. Preserve the whole
    family and actual normal currents, producing/current operator cuts, and the clock/support
    chart. Reuse the existing projection and certified enclosure arithmetic; a numerical centre
-   cannot silently enter the exact temporal point consumer. Expose the missing structured fibre
-   and enclosure ports before claiming that recorded evidence develops the generator.
+   cannot silently enter the exact temporal point consumer. Preserve the structured fibre
+   and enclosure ports in every subsequent application attachment.
+   The verified structured implementation uses `A=I+(R_S X_x)* R_S X_x`,
+   `U=A^-1 (R_S X_x)*y_S` and `V=A^-1 h_0`: the successor is `U+V`, the incoming normal
+   is `(U,y_S-R_S X_x U)`, and the returned normal is `(h_0-V,R_S X_x V)`.
+   Its complete return must succeed before publication. Retain exact Gram/cross-moment
+   carriers with the immutable prior so the continuing response has an executable cold
+   decoder without requiring an archive of every waveform. The contact itself retains the
+   complete recording-relative graph, both operands and excluded support. Numerical balls
+   continue through an enclosed temporal consumer. Four contact controls, 29 temporal checks,
+   three field-solver regressions and three full source-qualified SoundCam returns pass. Each
+   recorded contact changes the response used by the next recording; the declared four-tap
+   study does not establish learned acoustic grains, a room model or sound usefulness.
 3. Develop and retain acoustic generative standing across source-qualified recordings and
    actual joined returns, then conduct its native emission into the declared acoustic receiver.
    Inspect perception differences and generated sound, preserve the declared reconstruction

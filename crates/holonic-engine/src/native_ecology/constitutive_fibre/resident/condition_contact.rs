@@ -15,6 +15,14 @@ pub enum ConditionContactMetric {
 mod rest;
 pub use rest::ResidentConditionCurrentRest;
 
+mod temporal;
+pub use temporal::{
+    ResidentTemporalConditionContact, ResidentTemporalConditionCurrent,
+    ResidentTemporalConditionPreimage, ResidentTemporalConditionReading,
+    ResidentTemporalConditionSnapshot, ResidentTemporalRestrictedEnclosure,
+    ResidentTemporalWaveReturn, TemporalResponseChart,
+};
+
 #[derive(Debug, PartialEq, Eq, Serialize)]
 pub enum ConditionContactStatus {
     Compatible,

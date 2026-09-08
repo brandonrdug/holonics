@@ -12,8 +12,8 @@ receiver consequences; changing the file codec or naming a frame a holon does no
 The [grain correction](../research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md)
 records the source owners and the revised integration target.
 
-[open] This guide documents application probes. AS4–AS5 are not complete: the current two-node
-specimen and fixed sonification have not learned sound or English communication from a corpus.
+[open] This guide documents application probes and the current temporal acoustic attachment.
+AS4–AS5 are not complete: useful sound and English communication remain unattained.
 The [status correction](../research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md)
 retains the working apparatus and names the missing returns. Recorded conversational/English
 audio is the development material; microphone recording is not a prerequisite. Each current
@@ -57,7 +57,37 @@ operation's response adjoint before any cold readout. `response_return.section` 
 current in the original response chart; it is not rendered as PCM. The observer checks its
 complete source/residual pairing, receiver, clock, lineage and zero native readouts, while still
 accepting v1 receipts. The [adjoint record](../research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md)
-separates that return from the remaining condition-fibre contact and acoustic development.
+separates that return from the subsequent condition-fibre contact and acoustic development.
+
+[definition] `recorded_acoustic_contact` composes the structured temporal Preimage Fibre
+`R_S X h + e = y` with the existing unit-admittance contact law. Each source-qualified pair
+predicts from the actual continuing response before receiving the microphone section. Its
+successor supplies the next pair. The complete waveform difference, unexplained return and
+both normal currents survive; exact initial/Gram/cross-moment carriers reconstruct the response
+in a separate cold observer. The native response remains an enclosure when used in later
+convolution. The tap aperture and grain below are explicit experimental declarations, not
+learned acoustic grains or a physical room model. New report and output paths are required.
+
+```sh
+cargo build -p holonics-hna --example recorded_acoustic_contact
+target/debug/examples/recorded_acoustic_contact NEW_CONTACT.json .local/experiments/NEW_CONTACT 4 72 \
+  .local/datasets/soundcam/wav/row_000/loopback.wav .local/datasets/soundcam/wav/row_000/microphone_00.wav \
+  .local/datasets/soundcam/wav/row_001/loopback.wav .local/datasets/soundcam/wav/row_001/microphone_00.wav \
+  .local/datasets/soundcam/wav/row_002/loopback.wav .local/datasets/soundcam/wav/row_002/microphone_00.wav
+python3 research/experiments/apple_silicon/compare_recorded_acoustic_contact.py \
+  .local/datasets/soundcam/acquisition.json NEW_CONTACT.json --output NEW_CONTACT_COMPARISON.json
+```
+
+[open] This example returns numerical sections and their exact construction; acoustic rendering
+of enclosed currents, durable continuation of this contact and its application/streaming binding
+remain next. The existing controlled conditional checkpoint below has a different declared scope.
+
+[established-bounded; measured] The [recorded contact return](../research/records/2026-09-07_THE_RECORDED_PREIMAGE_FIBRE_CHANGES_THE_CONTINUING_TEMPORAL_RESPONSE.md)
+changes the continuing response on all three complete SoundCam pairs. Independent global-ball,
+exact current/normal/residual and source-provenance checks pass, with zero native hot readouts.
+The whole experiment takes 115.25 seconds for 42 seconds of material and peaks at 392.5 MB native
+residency. These measurements include an explicit four-tap action and do not establish real-time
+sound or English usefulness.
 
 [established-bounded; implemented-exact] `holonics_hna::native::acoustic_field::AcousticFieldChart`
 now supplies complete timed coefficient fields to the shared `NativeConstitutiveField` used by

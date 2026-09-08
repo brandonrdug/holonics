@@ -1621,6 +1621,8 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "field_internal_current.cuh"
 #include "balanced_field_factorization.cuh"
 #include "enclosed_field_junction.cuh"
+#include "phase_current_enclosure.cuh"
+#include "temporal_condition_contact.cuh"
 #include "field_material_transport.cuh"
 #include "field_current_history_source.cuh"
 #include "field_complete_material_transport.cuh"

@@ -1,0 +1,50 @@
+{
+  "verified": true,
+  "controls": [
+    {
+      "control": "global Euclidean radius, not independent coordinate bounds",
+      "rejected": true,
+      "reason": "joint-error control exceeds its global Euclidean radius by coordinate 1"
+    },
+    {
+      "control": "signed-128 limb boundaries",
+      "verified": true,
+      "values": [
+        "-1",
+        "9223372036854775808",
+        "-9223372036854775808",
+        "1267650600228229401496703205387"
+      ]
+    },
+    {
+      "control": "non-dyadic rational arithmetic",
+      "verified": true,
+      "common_denominator": 21
+    },
+    {
+      "control": "unequal W endpoints",
+      "rejected": true,
+      "reason": "uncertain serialized W endpoints: .local/experiments/soundcam-native-temporal-contact/observer-controls/uncertain-endpoint.section"
+    },
+    {
+      "control": "changed exact solve residual with matching checksum",
+      "rejected": true,
+      "reason": "contact solve residual changed"
+    },
+    {
+      "control": "wrong response clock",
+      "rejected": true,
+      "reason": "temporal receiver, clock, lineage or enclosure chart changed"
+    },
+    {
+      "control": "changed producing/current chronology",
+      "rejected": true,
+      "reason": "contact chronology does not continue the previous successor"
+    },
+    {
+      "control": "invented hot numerical readout",
+      "rejected": true,
+      "reason": "hot stage is not resident-only: pair_0_native_temporal_contact"
+    }
+  ]
+}

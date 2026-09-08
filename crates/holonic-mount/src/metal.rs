@@ -867,10 +867,30 @@ impl Module {
                 (&[2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 21], 22)
             }
             "section_phase_convolution_normalize" => (&[1, 5], 6),
-            "section_phase_response_adjoint_validate" | "section_phase_response_adjoint_products" => {
+            "section_phase_response_adjoint_validate"
+            | "section_phase_response_adjoint_products" => {
                 (&[2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20], 21)
             }
             "section_phase_convolution_pack" => (&[1, 7], 8),
+            "section_phase_enclosure_lift" => (&[2, 3, 4, 5, 6, 7, 13], 14),
+            "section_phase_enclosed_convolution_validate" => (&[2, 3, 4, 7, 8, 9, 10, 11, 16], 17),
+            "section_phase_enclosed_convolution_lift" => (&[1, 2, 3, 4, 5, 10], 11),
+            "section_phase_enclosed_convolution_products" => (&[1, 2, 3, 4, 11], 12),
+            "section_phase_enclosed_convolution_finish" => (&[1, 2, 3, 9], 10),
+            "section_phase_enclosed_difference_validate" => {
+                (&[2, 3, 6, 7, 8, 9, 10, 11, 12, 13, 14, 19], 20)
+            }
+            "section_phase_enclosed_difference_products" => (&[1, 3, 4, 5, 6, 7, 14], 15),
+            "section_phase_enclosed_difference_finish" => (&[1, 7], 8),
+            "section_temporal_condition_contact_validate"
+            | "section_temporal_condition_contact_gram"
+            | "section_temporal_condition_contact_rhs"
+            | "section_temporal_condition_contact_solve" => (
+                &[
+                    2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 19, 20, 21, 28, 29,
+                ],
+                30,
+            ),
             "section_field_current_input" => (&[2, 3, 4, 5, 11], 12),
             "section_field_source_frame" => (&[6, 12], 13),
             "section_field_internal_current" => (&[9, 10, 11, 12, 20], 21),
@@ -928,6 +948,11 @@ impl Module {
                         | "section_phase_convolution_pack"
                         | "section_phase_difference_products"
                         | "section_phase_response_adjoint_products"
+                        | "section_phase_enclosed_convolution_lift"
+                        | "section_phase_enclosed_convolution_products"
+                        | "section_phase_enclosed_difference_products"
+                        | "section_temporal_condition_contact_gram"
+                        | "section_temporal_condition_contact_rhs"
                 ) || (cfg!(test) && name == "test_grid"),
                 nullable: if name == "section_constitutive_differential" {
                     &[6, 7]

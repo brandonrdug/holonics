@@ -27,14 +27,17 @@ mod field;
 pub use field::*;
 mod resident;
 mod rest;
-pub use rest::ResidentConstitutiveFibreRest;
 pub use resident::{
     ConditionContactMetric, ConditionContactReading, ConditionContactStatus, ConditionCoverage,
     ConditionImageReading, ConditionPreimageReading, ConstitutiveDifferentialReading,
     ResidentConditionContact, ResidentConditionCurrent, ResidentConditionCurrentRest,
     ResidentConditionImage, ResidentConditionPreimage, ResidentConstitutiveCurrent,
-    ResidentConstitutiveReturn,
+    ResidentConstitutiveReturn, ResidentTemporalConditionContact, ResidentTemporalConditionCurrent,
+    ResidentTemporalConditionPreimage, ResidentTemporalConditionReading,
+    ResidentTemporalConditionSnapshot, ResidentTemporalRestrictedEnclosure,
+    ResidentTemporalWaveReturn, TemporalResponseChart,
 };
+pub use rest::ResidentConstitutiveFibreRest;
 
 /// Declared local source law, bound at founding rather than inferred from an array's width.
 /// These dimensions are the caller's interface chart, not learned semantic capacities.

@@ -5,7 +5,9 @@ circulation and rechart operations as `crates/holonic-engine/kernels/exact_resid
 The Rust owner remains `NativeConstitutiveEcology`; `mount::metal` supplies resident storage,
 ordered device commands and completion. MLX remains independent representation-test apparatus.
 
-[definition] Public carriers are exact signed i64 points with a positive common denominator.
+[definition] Point-current carriers are exact signed i64 points with a positive common denominator.
+Enclosure reports separately retain signed-128 dyadic centres and a numerical radius; those
+centres have no implicit exact point-current port.
 Intermediate carriers use four u32 magnitude limbs and a sign, admitting magnitudes through
 `2^127 - 1`. Overflow, malformed denominators, inverted intervals and inherited refusal are
 explicit status words. The kernel validates every continuing basis/memory word before commit.
@@ -44,6 +46,22 @@ source carrier retained by its producing convolution. It validates complete poin
 conjugate-source products only on the actual receiver support, and shares whole-result
 normalization/publication with convolution. Response lanes have disjoint workspace; every lane
 keeps ascending source order. No condition update or numerical enclosure projection is implied.
+
+[definition] `phase_enclosure.metal` lifts exact phase currents into signed-128 dyadic balls,
+convolves an exact source with an enclosed response and compares an enclosed prediction with
+an exact observation. Directed integer rounding contributes to one global Euclidean error
+radius. Complex products retain both quadratures and complete causal support. Validation
+checks full operands and structural padding before independent coordinate work; no centre
+is exposed as a point current. Source/product error and Young's inequality bound the complete
+output, with no intermediate numerical host readout.
+
+[definition] `temporal_condition_contact.metal` implements the declared unit-admittance law
+on the structured graph `R_S X h + e = y`. It retains the Gram, cross moment and both solve
+residuals, reuses the enclosed field LDL solver, and certifies error from `I+X*X >= I`.
+The report contains the prior, U, V, successor, both response-normal legs and response difference,
+followed by exact continuing-action coefficients. The Rust owner computes the full normal
+waveforms and unexplained return before publishing the successor. Gram/RHS lanes own separate
+coordinates; dependent factorization and publication remain ordered.
 
 [definition] Build arithmetic apparatus explicitly; the probe kernels are absent from production:
 

@@ -85,10 +85,10 @@ use mount::{
 
 #[path = "resident_section/geometry.rs"]
 mod geometry;
-#[path = "resident_section/surface_condition.rs"]
-mod surface_condition;
 #[path = "resident_section/surface_adjoint.rs"]
 mod surface_adjoint;
+#[path = "resident_section/surface_condition.rs"]
+mod surface_condition;
 #[path = "resident_section/surface_intervention.rs"]
 mod surface_intervention;
 #[path = "resident_section/surface_mount.rs"]
@@ -97,10 +97,14 @@ mod surface_mount;
 mod surface_passage;
 #[path = "resident_section/surface_phase_difference.rs"]
 mod surface_phase_difference;
+#[path = "resident_section/surface_phase_enclosure.rs"]
+mod surface_phase_enclosure;
 #[path = "resident_section/surface_phase_response_adjoint.rs"]
 mod surface_phase_response_adjoint;
 #[path = "resident_section/surface_shapes.rs"]
 mod surface_shapes;
+#[path = "resident_section/surface_temporal_condition_contact.rs"]
+mod surface_temporal_condition_contact;
 #[path = "resident_section/surface_tiled.rs"]
 mod surface_tiled;
 
@@ -126,6 +130,10 @@ const METAL_SOURCE: &str = concat!(
     include_str!("../../../accelerators/metal/field_internal_current.metal"),
     "\n",
     include_str!("../../../accelerators/metal/phase_response_adjoint.metal"),
+    "\n",
+    include_str!("../../../accelerators/metal/phase_enclosure.metal"),
+    "\n",
+    include_str!("../../../accelerators/metal/temporal_condition_contact.metal"),
 );
 
 /// The exact accumulator the kernels carry, read off `__int128`; one octave is the hand.
@@ -159,7 +167,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 59] = [
+pub const KERNELS: [&str; 71] = [
     "section_constitutive_field",
     "section_constitutive_field_rechart",
     "section_constitutive_rechart",
@@ -233,6 +241,18 @@ pub const KERNELS: [&str; 59] = [
     "section_internal_mode_unfold",
     "section_phase_response_adjoint_validate",
     "section_phase_response_adjoint_products",
+    "section_phase_enclosure_lift",
+    "section_phase_enclosed_convolution_validate",
+    "section_phase_enclosed_convolution_lift",
+    "section_phase_enclosed_convolution_products",
+    "section_phase_enclosed_convolution_finish",
+    "section_phase_enclosed_difference_validate",
+    "section_phase_enclosed_difference_products",
+    "section_phase_enclosed_difference_finish",
+    "section_temporal_condition_contact_validate",
+    "section_temporal_condition_contact_gram",
+    "section_temporal_condition_contact_rhs",
+    "section_temporal_condition_contact_solve",
 ];
 
 /// `CUdevice_attribute` selectors from `cuda.h`, fixed by the foreign interface.
@@ -639,6 +659,9 @@ impl std::fmt::Debug for ResidentSection<'_> {
 }
 
 impl ResidentSection<'_> {
+    pub(crate) fn belongs_to(&self, surface: &ResidentSurface<'_>) -> bool {
+        std::ptr::eq(self.surface, surface)
+    }
     pub fn rows(&self) -> usize {
         self.rows
     }

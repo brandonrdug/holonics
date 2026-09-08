@@ -1,0 +1,1233 @@
+{
+  "active_stage": "pair_2_cold_contact_report",
+  "contacts": 3,
+  "conversation_model": false,
+  "device": "Apple M1 Pro",
+  "elapsed_seconds": 115.245881,
+  "final_census": {
+    "allocations": 162,
+    "captured_launches": 113,
+    "control_launches": 0,
+    "deed_launches": 25,
+    "device_to_device_octets": 0,
+    "egress_receipt_octets": 1600,
+    "egress_section_octets": 645178512,
+    "ingress_octets": 129024240,
+    "resident_octets_now": 14544,
+    "resident_octets_peak": 392470932,
+    "section_read_outs": 30,
+    "synchronizations": 25
+  },
+  "learned_room": false,
+  "native_response_change_claim": "the successor response is the actual result of the declared native temporal contact; no semantic or physical room interpretation is asserted",
+  "native_response_changed": true,
+  "pairs": [
+    {
+      "chronology": {
+        "current_cut": 0,
+        "pre_contact_cut": 0,
+        "successor_cut": 1
+      },
+      "condition_reading": {
+        "cold": true,
+        "enclosure_contains_exact_current": true,
+        "response": [
+          {
+            "imaginary": "0",
+            "real": "251149007335410750989282025728133140221049/707393258177347558293421329913499446260126"
+          },
+          {
+            "imaginary": "0",
+            "real": "-15137311632075437822340167963277496218637/32154239008061252649700969541522702102733"
+          },
+          {
+            "imaginary": "0",
+            "real": "4851673125626266129071823394295473551222/32154239008061252649700969541522702102733"
+          },
+          {
+            "imaginary": "0",
+            "real": "35194714891818732324162631882547772750187/707393258177347558293421329913499446260126"
+          }
+        ],
+        "response_changed": true
+      },
+      "contact_report": {
+        "grain": 72,
+        "lineage": 22,
+        "origin": "0",
+        "phase_extent": 4,
+        "raw_extent": 4,
+        "receiver": 8,
+        "sample_step": "1/48000",
+        "section_octets": 4744,
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_0_successor_response.section",
+        "section_sha256": "4124e2fe010cbdf73f87e89dc1125a959ab2968d605e7a77796f0b0629a10dea",
+        "section_wire": {
+          "bound_octaves": 64,
+          "grain": 0,
+          "rows": 1,
+          "width": 294
+        },
+        "wide_offset": 27
+      },
+      "difference": {
+        "grain": 72,
+        "lineage": 21,
+        "origin": "0",
+        "phase_extent": 4,
+        "raw_extent": 672000,
+        "receiver": 9,
+        "sample_step": "1/48000",
+        "section_octets": 43008072,
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_0_difference.section",
+        "section_sha256": "ced4b1857c67e035a6037b4010e2b88b4c4e43ed11c728089aeefc6c3c0e2d4d",
+        "section_wire": {
+          "bound_octaves": 64,
+          "grain": 0,
+          "rows": 1,
+          "width": 2688002
+        },
+        "wide_offset": 0
+      },
+      "excitation": {
+        "frames": 672000,
+        "occurrence": "recorded-acoustic-contact-excitation-0",
+        "octets": 1344044,
+        "path": ".local/datasets/soundcam/wav/row_000/loopback.wav",
+        "sample_rate": 48000,
+        "sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
+      },
+      "hot_zero_numerical_reads": true,
+      "incoming_normal_e": {
+        "grain": 72,
+        "lineage": 22,
+        "origin": "0",
+        "phase_extent": 4,
+        "raw_extent": 672000,
+        "receiver": 9,
+        "sample_step": "1/48000",
+        "section_octets": 43008072,
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_0_incoming_normal_e.section",
+        "section_sha256": "b531ecff568d042c9361b9efcc1921d83f19bec559c4c280cdac7d45120b9867",
+        "section_wire": {
+          "bound_octaves": 64,
+          "grain": 0,
+          "rows": 1,
+          "width": 2688002
+        },
+        "wide_offset": 0
+      },
+      "normal_leg_offsets": {
+        "difference_h": {
+          "grain": 72,
+          "wide_offset": 45
+        },
+        "incoming_h": {
+          "grain": 72,
+          "wide_offset": 18
+        },
+        "returned_h": {
+          "grain": 72,
+          "wide_offset": 36
+        },
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_0_successor_response.section",
+        "section_sha256": "4124e2fe010cbdf73f87e89dc1125a959ab2968d605e7a77796f0b0629a10dea",
+        "successor": {
+          "grain": 72,
+          "wide_offset": 27
+        }
+      },
+      "observation": {
+        "frames": 672000,
+        "occurrence": "recorded-acoustic-contact-observed-0",
+        "octets": 1344044,
+        "path": ".local/datasets/soundcam/wav/row_000/microphone_00.wav",
+        "sample_rate": 48000,
+        "sha256": "e20fd5db50601393f2623042ea45cbce163dfd071ad6debb6eda27a9a7b08394"
+      },
+      "pair": 0,
+      "prediction": {
+        "grain": 72,
+        "lineage": 20,
+        "origin": "0",
+        "phase_extent": 4,
+        "raw_extent": 672003,
+        "receiver": 9,
+        "sample_step": "1/48000",
+        "section_octets": 43008264,
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_0_prediction.section",
+        "section_sha256": "951d907b71b3e0419bdbf419d52670e36572a4919606f818a0ccfbc1d2133b56",
+        "section_wire": {
+          "bound_octaves": 64,
+          "grain": 0,
+          "rows": 1,
+          "width": 2688014
+        },
+        "wide_offset": 0
+      },
+      "returned_normal_e": {
+        "grain": 72,
+        "lineage": 22,
+        "normal_support": {
+          "end": 672000,
+          "start": 0
+        },
+        "origin": "0",
+        "phase_extent": 4,
+        "raw_extent": 672003,
+        "receiver": 9,
+        "sample_step": "1/48000",
+        "section_octets": 43008264,
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_0_returned_normal_e.section",
+        "section_sha256": "749a5badbdc896c6ff0abf82c1ce79e6f7a73fc29800c238e076555f38a61294",
+        "section_wire": {
+          "bound_octaves": 64,
+          "grain": 0,
+          "rows": 1,
+          "width": 2688014
+        },
+        "wide_offset": 0
+      },
+      "support": {
+        "begin": [
+          [
+            0,
+            []
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "end": [
+          [
+            1,
+            [
+              14
+            ]
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "observed": {
+          "end": 672000,
+          "start": 0
+        },
+        "predicted": {
+          "end": 672000,
+          "start": 0
+        },
+        "unobserved_prediction": [
+          {
+            "end": 672003,
+            "start": 672000
+          }
+        ],
+        "unpredicted_observation": []
+      },
+      "unexplained": {
+        "grain": 72,
+        "lineage": 22,
+        "origin": "0",
+        "phase_extent": 4,
+        "raw_extent": 672000,
+        "receiver": 9,
+        "sample_step": "1/48000",
+        "section_octets": 43008072,
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_0_unexplained.section",
+        "section_sha256": "541bdf9cc1756ffd16db1c784b46582db1d24915dae14a9b78e571d736fbd771",
+        "section_wire": {
+          "bound_octaves": 64,
+          "grain": 0,
+          "rows": 1,
+          "width": 2688002
+        },
+        "wide_offset": 0
+      }
+    },
+    {
+      "chronology": {
+        "current_cut": 1,
+        "pre_contact_cut": 1,
+        "successor_cut": 2
+      },
+      "condition_reading": {
+        "cold": true,
+        "enclosure_contains_exact_current": true,
+        "response": [
+          {
+            "imaginary": "0",
+            "real": "245640728522202530852746392873847212133730073187482533127330367855476735869909074357/15931735914158858172359550330392938420926579567619210127040568647803028088560457527579"
+          },
+          {
+            "imaginary": "0",
+            "real": "-1704655064286218417008445292696143783433054740948866160428220162303683695108205884004/15931735914158858172359550330392938420926579567619210127040568647803028088560457527579"
+          },
+          {
+            "imaginary": "0",
+            "real": "1442576502884707092839091745984853663474816840099464322899345446251136272928211168552/15931735914158858172359550330392938420926579567619210127040568647803028088560457527579"
+          },
+          {
+            "imaginary": "0",
+            "real": "-36055554095469132175740614520945480055522040284256760472866302747718100046381794648/15931735914158858172359550330392938420926579567619210127040568647803028088560457527579"
+          }
+        ],
+        "response_changed": true
+      },
+      "contact_report": {
+        "grain": 72,
+        "lineage": 32,
+        "origin": "0",
+        "phase_extent": 4,
+        "raw_extent": 4,
+        "receiver": 8,
+        "sample_step": "1/48000",
+        "section_octets": 4744,
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_1_successor_response.section",
+        "section_sha256": "6e3f72f98460cedab62ab3c60775a07a207dc0dcfba24b0ed7b2997775b17eb0",
+        "section_wire": {
+          "bound_octaves": 64,
+          "grain": 0,
+          "rows": 1,
+          "width": 294
+        },
+        "wide_offset": 27
+      },
+      "difference": {
+        "grain": 72,
+        "lineage": 31,
+        "origin": "0",
+        "phase_extent": 4,
+        "raw_extent": 672000,
+        "receiver": 9,
+        "sample_step": "1/48000",
+        "section_octets": 43008072,
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_1_difference.section",
+        "section_sha256": "bcc4c5dc5940932fbde40f09ad4a9c2e4c789bc5037b89cddbd87abd7556aaeb",
+        "section_wire": {
+          "bound_octaves": 64,
+          "grain": 0,
+          "rows": 1,
+          "width": 2688002
+        },
+        "wide_offset": 0
+      },
+      "excitation": {
+        "frames": 672000,
+        "occurrence": "recorded-acoustic-contact-excitation-1",
+        "octets": 1344044,
+        "path": ".local/datasets/soundcam/wav/row_001/loopback.wav",
+        "sample_rate": 48000,
+        "sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
+      },
+      "hot_zero_numerical_reads": true,
+      "incoming_normal_e": {
+        "grain": 72,
+        "lineage": 32,
+        "origin": "0",
+        "phase_extent": 4,
+        "raw_extent": 672000,
+        "receiver": 9,
+        "sample_step": "1/48000",
+        "section_octets": 43008072,
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_1_incoming_normal_e.section",
+        "section_sha256": "7282527172f64213969c946e33a0fbd12c1def62f98378d028091635c3184270",
+        "section_wire": {
+          "bound_octaves": 64,
+          "grain": 0,
+          "rows": 1,
+          "width": 2688002
+        },
+        "wide_offset": 0
+      },
+      "normal_leg_offsets": {
+        "difference_h": {
+          "grain": 72,
+          "wide_offset": 45
+        },
+        "incoming_h": {
+          "grain": 72,
+          "wide_offset": 18
+        },
+        "returned_h": {
+          "grain": 72,
+          "wide_offset": 36
+        },
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_1_successor_response.section",
+        "section_sha256": "6e3f72f98460cedab62ab3c60775a07a207dc0dcfba24b0ed7b2997775b17eb0",
+        "successor": {
+          "grain": 72,
+          "wide_offset": 27
+        }
+      },
+      "observation": {
+        "frames": 672000,
+        "occurrence": "recorded-acoustic-contact-observed-1",
+        "octets": 1344044,
+        "path": ".local/datasets/soundcam/wav/row_001/microphone_00.wav",
+        "sample_rate": 48000,
+        "sha256": "b7a88809e4ba46590c43982b76d0efc5727ad492e88fd9c526c529c28d60c1fd"
+      },
+      "pair": 1,
+      "prediction": {
+        "grain": 72,
+        "lineage": 30,
+        "origin": "0",
+        "phase_extent": 4,
+        "raw_extent": 672003,
+        "receiver": 9,
+        "sample_step": "1/48000",
+        "section_octets": 43008264,
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_1_prediction.section",
+        "section_sha256": "7f168df86cd92256cdf930bfa625465f602cb195b77469a2d7230a42bc2f81fc",
+        "section_wire": {
+          "bound_octaves": 64,
+          "grain": 0,
+          "rows": 1,
+          "width": 2688014
+        },
+        "wide_offset": 0
+      },
+      "returned_normal_e": {
+        "grain": 72,
+        "lineage": 32,
+        "normal_support": {
+          "end": 672000,
+          "start": 0
+        },
+        "origin": "0",
+        "phase_extent": 4,
+        "raw_extent": 672003,
+        "receiver": 9,
+        "sample_step": "1/48000",
+        "section_octets": 43008264,
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_1_returned_normal_e.section",
+        "section_sha256": "98041ea9606fd9dbdb7c3a1917dbbdfc64171462310e77bc393b55ec7e47d814",
+        "section_wire": {
+          "bound_octaves": 64,
+          "grain": 0,
+          "rows": 1,
+          "width": 2688014
+        },
+        "wide_offset": 0
+      },
+      "support": {
+        "begin": [
+          [
+            0,
+            []
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "end": [
+          [
+            1,
+            [
+              14
+            ]
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "observed": {
+          "end": 672000,
+          "start": 0
+        },
+        "predicted": {
+          "end": 672000,
+          "start": 0
+        },
+        "unobserved_prediction": [
+          {
+            "end": 672003,
+            "start": 672000
+          }
+        ],
+        "unpredicted_observation": []
+      },
+      "unexplained": {
+        "grain": 72,
+        "lineage": 32,
+        "origin": "0",
+        "phase_extent": 4,
+        "raw_extent": 672000,
+        "receiver": 9,
+        "sample_step": "1/48000",
+        "section_octets": 43008072,
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_1_unexplained.section",
+        "section_sha256": "11486157254ffd93d608a7003dd6981b26a48ee60c3c443dd4ac0123855d3d29",
+        "section_wire": {
+          "bound_octaves": 64,
+          "grain": 0,
+          "rows": 1,
+          "width": 2688002
+        },
+        "wide_offset": 0
+      }
+    },
+    {
+      "chronology": {
+        "current_cut": 2,
+        "pre_contact_cut": 2,
+        "successor_cut": 3
+      },
+      "condition_reading": {
+        "cold": true,
+        "enclosure_contains_exact_current": true,
+        "response": [
+          {
+            "imaginary": "0",
+            "real": "-8423937295382237515521745650867937548394882859455953234272558938840675274576211626694561940075403431438865621959738969900566703/26501747858984387865358164693629150993273226701854773957172435331617549206085453416952087141175759065853360784721105121256672303"
+          },
+          {
+            "imaginary": "0",
+            "real": "2666870370285366616748344198757330067180064524477502115467887485047939426458346884932086272959087595910529381034620171014638080/26501747858984387865358164693629150993273226701854773957172435331617549206085453416952087141175759065853360784721105121256672303"
+          },
+          {
+            "imaginary": "0",
+            "real": "5998344818288145524327981039170147911959753775570276823094619377294302379164840246206053107793263787487704374783253987709416779/26501747858984387865358164693629150993273226701854773957172435331617549206085453416952087141175759065853360784721105121256672303"
+          },
+          {
+            "imaginary": "0",
+            "real": "-1755060107573818019643087931452941924387259563630356040351479536125867187783539205810454880005106738854175309531230383919021309/8833915952994795955119388231209716997757742233951591319057478443872516402028484472317362380391919688617786928240368373752224101"
+          }
+        ],
+        "response_changed": true
+      },
+      "contact_report": {
+        "grain": 72,
+        "lineage": 42,
+        "origin": "0",
+        "phase_extent": 4,
+        "raw_extent": 4,
+        "receiver": 8,
+        "sample_step": "1/48000",
+        "section_octets": 4744,
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_2_successor_response.section",
+        "section_sha256": "ea79a6662c29a4dc9db3262dc419d4e8291c03688c565e1e8fcf3333138e70f4",
+        "section_wire": {
+          "bound_octaves": 64,
+          "grain": 0,
+          "rows": 1,
+          "width": 294
+        },
+        "wide_offset": 27
+      },
+      "difference": {
+        "grain": 72,
+        "lineage": 41,
+        "origin": "0",
+        "phase_extent": 4,
+        "raw_extent": 672000,
+        "receiver": 9,
+        "sample_step": "1/48000",
+        "section_octets": 43008072,
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_2_difference.section",
+        "section_sha256": "6c9a0aa34fa4509cb054a7f7ffb0d6d066ed2dcfec3833dcb9eea55eb6ad1375",
+        "section_wire": {
+          "bound_octaves": 64,
+          "grain": 0,
+          "rows": 1,
+          "width": 2688002
+        },
+        "wide_offset": 0
+      },
+      "excitation": {
+        "frames": 672000,
+        "occurrence": "recorded-acoustic-contact-excitation-2",
+        "octets": 1344044,
+        "path": ".local/datasets/soundcam/wav/row_002/loopback.wav",
+        "sample_rate": 48000,
+        "sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
+      },
+      "hot_zero_numerical_reads": true,
+      "incoming_normal_e": {
+        "grain": 72,
+        "lineage": 42,
+        "origin": "0",
+        "phase_extent": 4,
+        "raw_extent": 672000,
+        "receiver": 9,
+        "sample_step": "1/48000",
+        "section_octets": 43008072,
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_2_incoming_normal_e.section",
+        "section_sha256": "e3cfd20eb635a9e4a03c57a6cf5990af0dde2e722a1132faa910b6f36ee263a5",
+        "section_wire": {
+          "bound_octaves": 64,
+          "grain": 0,
+          "rows": 1,
+          "width": 2688002
+        },
+        "wide_offset": 0
+      },
+      "normal_leg_offsets": {
+        "difference_h": {
+          "grain": 72,
+          "wide_offset": 45
+        },
+        "incoming_h": {
+          "grain": 72,
+          "wide_offset": 18
+        },
+        "returned_h": {
+          "grain": 72,
+          "wide_offset": 36
+        },
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_2_successor_response.section",
+        "section_sha256": "ea79a6662c29a4dc9db3262dc419d4e8291c03688c565e1e8fcf3333138e70f4",
+        "successor": {
+          "grain": 72,
+          "wide_offset": 27
+        }
+      },
+      "observation": {
+        "frames": 672000,
+        "occurrence": "recorded-acoustic-contact-observed-2",
+        "octets": 1344044,
+        "path": ".local/datasets/soundcam/wav/row_002/microphone_00.wav",
+        "sample_rate": 48000,
+        "sha256": "e5155416859bce4fe7d41ef755741f6af0e28003bf2d9cd776145fccdfbc2121"
+      },
+      "pair": 2,
+      "prediction": {
+        "grain": 72,
+        "lineage": 40,
+        "origin": "0",
+        "phase_extent": 4,
+        "raw_extent": 672003,
+        "receiver": 9,
+        "sample_step": "1/48000",
+        "section_octets": 43008264,
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_2_prediction.section",
+        "section_sha256": "33536423af69f2c865ed4af117fab2c773a5180ad7f9d4ce726a7beb9312e454",
+        "section_wire": {
+          "bound_octaves": 64,
+          "grain": 0,
+          "rows": 1,
+          "width": 2688014
+        },
+        "wide_offset": 0
+      },
+      "returned_normal_e": {
+        "grain": 72,
+        "lineage": 42,
+        "normal_support": {
+          "end": 672000,
+          "start": 0
+        },
+        "origin": "0",
+        "phase_extent": 4,
+        "raw_extent": 672003,
+        "receiver": 9,
+        "sample_step": "1/48000",
+        "section_octets": 43008264,
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_2_returned_normal_e.section",
+        "section_sha256": "fc50edbd98508c7774bb937aab4aa85877edff4a5dd86198f49b6961c213fc15",
+        "section_wire": {
+          "bound_octaves": 64,
+          "grain": 0,
+          "rows": 1,
+          "width": 2688014
+        },
+        "wide_offset": 0
+      },
+      "support": {
+        "begin": [
+          [
+            0,
+            []
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "end": [
+          [
+            1,
+            [
+              14
+            ]
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "observed": {
+          "end": 672000,
+          "start": 0
+        },
+        "predicted": {
+          "end": 672000,
+          "start": 0
+        },
+        "unobserved_prediction": [
+          {
+            "end": 672003,
+            "start": 672000
+          }
+        ],
+        "unpredicted_observation": []
+      },
+      "unexplained": {
+        "grain": 72,
+        "lineage": 42,
+        "origin": "0",
+        "phase_extent": 4,
+        "raw_extent": 672000,
+        "receiver": 9,
+        "sample_step": "1/48000",
+        "section_octets": 43008072,
+        "section_path": ".local/experiments/soundcam-native-temporal-contact/sections/pair_2_unexplained.section",
+        "section_sha256": "5a24ae2a6771806202054cc92a80503ba9edb55e2da61947e0571eb36b34b572",
+        "section_wire": {
+          "bound_octaves": 64,
+          "grain": 0,
+          "rows": 1,
+          "width": 2688002
+        },
+        "wide_offset": 0
+      }
+    }
+  ],
+  "pcm_divisor": 32768,
+  "phase_extent": 4,
+  "response_control": {
+    "grain": 72,
+    "initial": "h[0]=1, all remaining taps=0",
+    "taps": 4
+  },
+  "schema": "holonics.recorded-acoustic-contact.v1",
+  "scope": "controlled digital temporal action over recorded PCM coefficients",
+  "sound_model": false,
+  "stages": {
+    "pair_0_cold_contact_report": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 4704,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258053712,
+      "resident_octets_peak": 392461524,
+      "seconds": 0.0065495,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_0_cold_difference": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 43008032,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258053712,
+      "resident_octets_peak": 392461524,
+      "seconds": 0.321504,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_0_cold_incoming_normal_e": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 43008032,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258053712,
+      "resident_octets_peak": 392461524,
+      "seconds": 0.322518292,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_0_cold_prediction": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 43008224,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258053712,
+      "resident_octets_peak": 392461524,
+      "seconds": 0.330569458,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_0_cold_returned_normal_e": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 43008224,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258053712,
+      "resident_octets_peak": 392461524,
+      "seconds": 0.340034084,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_0_cold_successor_inspection": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 9552,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258053712,
+      "resident_octets_peak": 392461524,
+      "seconds": 0.009521625,
+      "section_readouts": 3,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_0_cold_unexplained": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 43008032,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258053712,
+      "resident_octets_peak": 392461524,
+      "seconds": 0.32553,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_0_compare_observation": {
+      "allocations": 6,
+      "deeds": 1,
+      "gpu_seconds": 4.088693791651167,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 64,
+      "resident_octets_now": 129024720,
+      "resident_octets_peak": 198913028,
+      "seconds": 4.089994542,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_0_mount_observation": {
+      "allocations": 2,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 21504016,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 86016688,
+      "resident_octets_peak": 198913028,
+      "seconds": 0.092593583,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_0_mount_source": {
+      "allocations": 2,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 21504016,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 21504448,
+      "resident_octets_peak": 21504448,
+      "seconds": 0.089794625,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_0_native_temporal_contact": {
+      "allocations": 36,
+      "deeds": 6,
+      "gpu_seconds": 27.259922041906975,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 384,
+      "resident_octets_now": 258053712,
+      "resident_octets_peak": 392461524,
+      "seconds": 27.266432417,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_0_predict_before_observation": {
+      "allocations": 6,
+      "deeds": 1,
+      "gpu_seconds": 4.371181791648269,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 64,
+      "resident_octets_now": 64512672,
+      "resident_octets_peak": 198913028,
+      "seconds": 4.372222125,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_0_snapshot_current": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 21504448,
+      "resident_octets_peak": 21504448,
+      "seconds": 1.708e-6,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_1_cold_contact_report": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 4704,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258058416,
+      "resident_octets_peak": 392466228,
+      "seconds": 0.006204541,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_1_cold_difference": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 43008032,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258058416,
+      "resident_octets_peak": 392466228,
+      "seconds": 0.363243708,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_1_cold_incoming_normal_e": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 43008032,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258058416,
+      "resident_octets_peak": 392466228,
+      "seconds": 0.416654459,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_1_cold_prediction": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 43008224,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258058416,
+      "resident_octets_peak": 392466228,
+      "seconds": 0.349031459,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_1_cold_returned_normal_e": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 43008224,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258058416,
+      "resident_octets_peak": 392466228,
+      "seconds": 0.333827916,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_1_cold_successor_inspection": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 14256,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258058416,
+      "resident_octets_peak": 392466228,
+      "seconds": 0.021804875,
+      "section_readouts": 4,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_1_cold_unexplained": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 43008032,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258058416,
+      "resident_octets_peak": 392466228,
+      "seconds": 0.417864125,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_1_compare_observation": {
+      "allocations": 6,
+      "deeds": 1,
+      "gpu_seconds": 4.0426847082562745,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 64,
+      "resident_octets_now": 129029424,
+      "resident_octets_peak": 392461524,
+      "seconds": 4.043565416,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_1_mount_observation": {
+      "allocations": 2,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 21504016,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 86021392,
+      "resident_octets_peak": 392461524,
+      "seconds": 0.090591791,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_1_mount_source": {
+      "allocations": 2,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 21504016,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 21509152,
+      "resident_octets_peak": 392461524,
+      "seconds": 0.090007833,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_1_native_temporal_contact": {
+      "allocations": 36,
+      "deeds": 6,
+      "gpu_seconds": 27.28782716684509,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 384,
+      "resident_octets_now": 258058416,
+      "resident_octets_peak": 392466228,
+      "seconds": 27.298674083,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_1_predict_before_observation": {
+      "allocations": 6,
+      "deeds": 1,
+      "gpu_seconds": 4.440868499921635,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 64,
+      "resident_octets_now": 64517376,
+      "resident_octets_peak": 392461524,
+      "seconds": 4.441649917,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_1_snapshot_current": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 21509152,
+      "resident_octets_peak": 392461524,
+      "seconds": 1.792e-6,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_2_cold_contact_report": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 4704,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258063120,
+      "resident_octets_peak": 392470932,
+      "seconds": 0.010467584,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_2_cold_difference": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 43008032,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258063120,
+      "resident_octets_peak": 392470932,
+      "seconds": 0.328827125,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_2_cold_incoming_normal_e": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 43008032,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258063120,
+      "resident_octets_peak": 392470932,
+      "seconds": 0.332628792,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_2_cold_prediction": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 43008224,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258063120,
+      "resident_octets_peak": 392470932,
+      "seconds": 0.404453291,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_2_cold_returned_normal_e": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 43008224,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258063120,
+      "resident_octets_peak": 392470932,
+      "seconds": 0.333700208,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_2_cold_successor_inspection": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 18960,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258063120,
+      "resident_octets_peak": 392470932,
+      "seconds": 0.036909792,
+      "section_readouts": 5,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_2_cold_unexplained": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 43008032,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 258063120,
+      "resident_octets_peak": 392470932,
+      "seconds": 0.331552459,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_2_compare_observation": {
+      "allocations": 6,
+      "deeds": 1,
+      "gpu_seconds": 4.102049250039272,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 64,
+      "resident_octets_now": 129034128,
+      "resident_octets_peak": 392466228,
+      "seconds": 4.103022041,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_2_mount_observation": {
+      "allocations": 2,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 21504016,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 86026096,
+      "resident_octets_peak": 392466228,
+      "seconds": 0.090633083,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_2_mount_source": {
+      "allocations": 2,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 21504016,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 21513856,
+      "resident_octets_peak": 392466228,
+      "seconds": 0.089465167,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_2_native_temporal_contact": {
+      "allocations": 36,
+      "deeds": 6,
+      "gpu_seconds": 27.486375999986194,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 384,
+      "resident_octets_now": 258063120,
+      "resident_octets_peak": 392470932,
+      "seconds": 27.49257275,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_2_predict_before_observation": {
+      "allocations": 6,
+      "deeds": 1,
+      "gpu_seconds": 4.2840947499498725,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 64,
+      "resident_octets_now": 64522080,
+      "resident_octets_peak": 392466228,
+      "seconds": 4.285517875,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "pair_2_snapshot_current": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 21513856,
+      "resident_octets_peak": 392466228,
+      "seconds": 1.875e-6,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    }
+  },
+  "status": "returned"
+}

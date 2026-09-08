@@ -25,10 +25,17 @@ pub enum ResidentPhaseCurrentError {
 }
 
 mod difference;
-pub use difference::{compare_resident, PhaseComparisonSupport, ResidentPhaseDifference};
+pub use difference::{PhaseComparisonSupport, ResidentPhaseDifference, compare_resident};
 
 mod response_adjoint;
-pub use response_adjoint::{return_response_resident, ResidentPhaseResponseAdjoint};
+pub use response_adjoint::{ResidentPhaseResponseAdjoint, return_response_resident};
+
+mod enclosure;
+pub use enclosure::{
+    ResidentEnclosedPhaseConvolution, ResidentEnclosedPhaseDifference, ResidentPhaseEnclosure,
+    ResidentPhaseEnclosureView, compare_enclosed_resident, convolve_enclosed_resident,
+    enclose_resident,
+};
 
 impl From<ResidentRefusal> for ResidentPhaseCurrentError {
     fn from(value: ResidentRefusal) -> Self {

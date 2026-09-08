@@ -42,15 +42,43 @@ fn support(
     predicted: &ResidentPhaseCurrentView<'_, '_>,
     observed: &ResidentPhaseCurrentView<'_, '_>,
 ) -> Result<PhaseComparisonSupport, ResidentPhaseCurrentError> {
-    if predicted.sample_step != observed.sample_step
-        || predicted.phase_extent != observed.phase_extent
-        || predicted.receiver != observed.receiver
+    comparison_support(
+        predicted.receiver,
+        &predicted.origin,
+        &predicted.sample_step,
+        predicted.phase_extent,
+        predicted.raw_extent,
+        observed.receiver,
+        &observed.origin,
+        &observed.sample_step,
+        observed.phase_extent,
+        observed.raw_extent,
+    )
+}
+
+/// One clock/support relation shared by point and enclosed temporal receivers.
+#[allow(clippy::too_many_arguments)]
+pub(super) fn comparison_support(
+    predicted_receiver: PhaseCurrentReceiverId,
+    predicted_origin: &Rat,
+    predicted_step: &Rat,
+    predicted_phase: u32,
+    predicted_raw: usize,
+    observed_receiver: PhaseCurrentReceiverId,
+    observed_origin: &Rat,
+    observed_step: &Rat,
+    observed_phase: u32,
+    observed_raw: usize,
+) -> Result<PhaseComparisonSupport, ResidentPhaseCurrentError> {
+    if predicted_step != observed_step
+        || predicted_phase != observed_phase
+        || predicted_receiver != observed_receiver
     {
         return Err(PhaseCurrentError::ChartMismatch.into());
     }
-    let begin = predicted.origin.clone().max(observed.origin.clone());
+    let begin = predicted_origin.clone().max(observed_origin.clone());
     let offset = |origin: &Rat| -> Result<usize, ResidentPhaseCurrentError> {
-        let cells = (&begin - origin) / &predicted.sample_step;
+        let cells = (&begin - origin) / predicted_step;
         if !cells.is_integer() {
             return Err(ResidentPhaseCurrentError::UnalignedSupport);
         }
@@ -59,23 +87,22 @@ fn support(
             .to_usize()
             .ok_or(ResidentPhaseCurrentError::NonOverlappingSupport)
     };
-    let p = offset(&predicted.origin)?;
-    let o = offset(&observed.origin)?;
-    let extent = predicted
-        .raw_extent
+    let p = offset(predicted_origin)?;
+    let o = offset(observed_origin)?;
+    let extent = predicted_raw
         .checked_sub(p)
-        .zip(observed.raw_extent.checked_sub(o))
+        .zip(observed_raw.checked_sub(o))
         .map(|(a, b)| a.min(b))
         .filter(|extent| *extent > 0)
         .ok_or(ResidentPhaseCurrentError::NonOverlappingSupport)?;
     let predicted_range = p..p + extent;
     let observed_range = o..o + extent;
     Ok(PhaseComparisonSupport {
-        unobserved_prediction: outside(&predicted_range, predicted.raw_extent),
-        unpredicted_observation: outside(&observed_range, observed.raw_extent),
+        unobserved_prediction: outside(&predicted_range, predicted_raw),
+        unpredicted_observation: outside(&observed_range, observed_raw),
         predicted: predicted_range,
         observed: observed_range,
-        end: &begin + &predicted.sample_step * Rat::from_integer(extent.into()),
+        end: &begin + predicted_step * Rat::from_integer(extent.into()),
         begin,
     })
 }

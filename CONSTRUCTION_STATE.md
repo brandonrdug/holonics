@@ -28,14 +28,24 @@ binding remains required; the mode's sign progression does not supply physical f
 retains full oriented differences for three actual 14-second SoundCam electrical-loopback/
 microphone pairs on their original clocks. All-coordinate source-qualified comparisons pass.
 Prediction/difference take about 2.4 seconds together; cold audio export takes 14.4–14.7 seconds,
-with 139.8 MB peak native residency. The initial unit response is still a baseline.
+with 139.8 MB peak native residency. That return uses the initial unit-response baseline.
 
 [established-bounded; measured] The [producing-adjoint return](research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md)
 now returns those differences into the original response chart using the retained convolution.
 Twenty-three temporal controls, all three exact recorded comparisons and four negative observer
 controls pass. The adjoint takes 2.53–3.33 seconds per 14-second recording with zero numerical
-readback; the three native stages together take 4.50–5.79 seconds. The full condition-fibre contact
-and persistent acoustic update remain next; the unit response was not developed by this return.
+readback; the three native stages together take 4.50–5.79 seconds. That adjoint return does not
+itself develop the unit response; the subsequent contact below supplies the structured attachment.
+
+[established-bounded; measured] The [recorded Preimage-Fibre contact](research/records/2026-09-07_THE_RECORDED_PREIMAGE_FIBRE_CHANGES_THE_CONTINUING_TEMPORAL_RESPONSE.md)
+now changes the continuing temporal response across all three full SoundCam pairs. It composes
+`R_S X h + e = y` through the existing unit-admittance law, retains both normal currents and the
+unexplained waveform, and carries numerical enclosures into later predictions. Four contact,
+29 temporal and three field-solver checks pass, as do all three independent exact source-qualified
+comparisons and eight observer controls. Contact takes 27.27–27.49 seconds per 14-second pair,
+with zero hot numerical readout. Peak native residency is 392.5 MB; the continuing response and
+its compact exact constructions occupy 14,544 bytes after waveform receipts leave scope.
+The four-tap aperture is an explicit study chart, not learned acoustic organization or usefulness.
 
 [established-bounded; measured] The [complete-recording action](research/records/2026-09-07_APPLE_CONDUCTS_COMPLETE_RECORDINGS_AND_RETURNS_TIMED_AUDIO.md)
 and [conditional restart](research/records/2026-09-07_THE_RECORDED_CONDITIONAL_ACTION_CONTINUES_AFTER_RESTART.md)
@@ -45,10 +55,10 @@ ports resident input and paired/enclosed/balanced field conduct, including histo
 These controlled two-tap and field returns establish their apparatus scope, not cultivated sound
 or English usefulness. Completed measurements and control counts remain in those records.
 
-[open; source-inspected] Next retain the complete compatible-condition fibre and unmodelled
-return, and develop persistent acoustic standing through the native contact law. The bilinear
-preimage owner does not yet supply this structured temporal fibre. Larger material/current-history
-owners remain outside the current Metal port. Actual acoustic/English development and streaming
+[open; source-inspected] Next persist/remount the continuing temporal response and its exact
+construction, bind enclosed emissions to the acoustic codec/receiver, and develop useful sound
+conduct through actual material and conditions. Larger material/current-history
+owners remain outside the current Metal port. Useful acoustic/English conduct and streaming
 completion remain unfinished; AS4–AS5 stay active.
 
 [established-bounded; measured] Local recorded material includes 2,000 ESC-50 WAVs, 100 LibriSpeech

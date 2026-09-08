@@ -393,4 +393,8 @@ mod condition_contact;
 pub use condition_contact::{
     ConditionContactMetric, ConditionContactReading, ConditionContactStatus,
     ResidentConditionContact, ResidentConditionCurrent, ResidentConditionCurrentRest,
+    ResidentTemporalConditionContact, ResidentTemporalConditionCurrent,
+    ResidentTemporalConditionPreimage, ResidentTemporalConditionReading,
+    ResidentTemporalConditionSnapshot, ResidentTemporalRestrictedEnclosure,
+    ResidentTemporalWaveReturn, TemporalResponseChart,
 };

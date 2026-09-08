@@ -500,6 +500,38 @@ inline void field_enclosed_solve(device const W *c_matrix, device const W *diago
   }
 }
 
+// Fraction-free enclosed LDL factorization shared by junction preparation and
+// later condition contacts. Metal keeps this target's existing serial order;
+// CUDA supplies the corresponding block-synchronized row updates.
+inline void field_enclosed_factorize(device W *matrix, device W *diagonal,
+                                     uint dimension, uint grain, device uint *slot) {
+  for (uint k = 0; k < dimension; ++k) {
+    W correction = wzero();
+    for (uint j = 0; j < k; ++j) {
+      W pair = field_enclosed_product_zero(matrix[(ulong)k * dimension + j],
+                                           matrix[(ulong)k * dimension + j], grain, slot);
+      correction = field_add_checked(correction,
+          field_enclosed_product_zero(pair, diagonal[j], grain, slot), slot);
+    }
+    diagonal[k] = field_sub_checked(matrix[(ulong)k * dimension + k], correction, slot);
+    if (wneg_p(diagonal[k]) || wzero_p(diagonal[k]))
+      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_CARRIER, memory_order_relaxed);
+    if (*slot) return;
+    for (uint i = k + 1u; i < dimension; ++i) {
+      W correction_off = wzero();
+      for (uint j = 0; j < k; ++j) {
+        W pair = field_enclosed_product_zero(matrix[(ulong)i * dimension + j],
+                                             matrix[(ulong)k * dimension + j], grain, slot);
+        correction_off = field_add_checked(correction_off,
+            field_enclosed_product_zero(pair, diagonal[j], grain, slot), slot);
+      }
+      W numerator = field_sub_checked(matrix[(ulong)k * dimension + i], correction_off, slot);
+      matrix[(ulong)i * dimension + k] = field_enclosed_toward_zero(numerator, diagonal[k], grain, slot);
+      if (*slot) return;
+    }
+  }
+}
+
 inline void field_enclosed_finish(device const long *next_cov_lo, device const long *held,
                                   uint dimension, ulong occurrence, uint grain, device W *workspace,
                                   device long *report_lo, device long *report_hi, device uint *slot) {
@@ -609,31 +641,8 @@ inline void field_enclosed_junction_prepare(
   device W *diagonal = prefix + dimension;
   (void)u; (void)h; (void)solve; (void)v; (void)prefix;
   uint factor_dimension = d[0].m.x[0];
-  for (uint k = 0; k < factor_dimension; ++k) {
-    W correction = wzero();
-    for (uint j = 0; j < k; ++j) {
-      W pair = field_enclosed_product_zero(matrix[(ulong)k * factor_dimension + j],
-                                           matrix[(ulong)k * factor_dimension + j], grain, slot);
-      correction = field_add_checked(correction,
-          field_enclosed_product_zero(pair, diagonal[j], grain, slot), slot);
-    }
-    diagonal[k] = field_sub_checked(matrix[(ulong)k * factor_dimension + k], correction, slot);
-    if (wneg_p(diagonal[k]) || wzero_p(diagonal[k]))
-      atomic_fetch_or_explicit((device atomic_uint *)slot, REFUSED_CARRIER, memory_order_relaxed);
-    if (*slot) return;
-    for (uint i = k + 1u; i < factor_dimension; ++i) {
-      W correction_off = wzero();
-      for (uint j = 0; j < k; ++j) {
-        W pair = field_enclosed_product_zero(matrix[(ulong)i * factor_dimension + j],
-                                             matrix[(ulong)k * factor_dimension + j], grain, slot);
-        correction_off = field_add_checked(correction_off,
-            field_enclosed_product_zero(pair, diagonal[j], grain, slot), slot);
-      }
-      W numerator = field_sub_checked(matrix[(ulong)k * factor_dimension + i], correction_off, slot);
-      matrix[(ulong)i * factor_dimension + k] = field_enclosed_toward_zero(numerator, diagonal[k], grain, slot);
-      if (*slot) return;
-    }
-  }
+  field_enclosed_factorize(matrix, diagonal, factor_dimension, grain, slot);
+  if (*slot) return;
   if (!*slot) field_enclosed_finish(next_cov_lo, held, dimension, occurrence, grain, workspace,
                                     report_lo, report_hi, slot);
 }

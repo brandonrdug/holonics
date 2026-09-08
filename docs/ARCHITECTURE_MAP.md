@@ -79,7 +79,19 @@ in the original response chart. `resident_section/surface_phase_response_adjoint
 `kernels/phase_current_response_adjoint.cuh` and Metal `phase_response_adjoint.metal` conduct
 the restricted complex adjoint with complete response support and resident normalization.
 The [response-return record](../research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md)
-retains source-qualified measurements and the still-missing temporal condition/contact attachment.
+retains source-qualified measurements of the producing response adjoint.
+
+[established-bounded; measured] The structured temporal attachment is owned by
+`constitutive_fibre/resident/condition_contact/temporal.rs`. It represents the full affine
+graph `R_S X h + e = y`, retains producing/current cuts and stages both normal ports before
+changing the continuing response. `surface_temporal_condition_contact.rs` binds the matching
+CUDA/Metal kernels, reusing the field LDL factorization and residual certification.
+`phase_current/resident/enclosure.rs` and `surface_phase_enclosure.rs` carry numerical
+enclosures through subsequent convolution and comparison. `temporal/inspect.rs` is a cold
+exact decoder of retained initial/Gram/adjoint carriers; its host arithmetic does not feed
+native current. The [recorded contact](../research/records/2026-09-07_THE_RECORDED_PREIMAGE_FIBRE_CHANGES_THE_CONTINUING_TEMPORAL_RESPONSE.md)
+retains four contact controls, 29 temporal checks, three field-solver regressions and three complete
+source-qualified recorded comparisons. Persistence, acoustic rendering and useful sound remain open.
 
 [established-bounded; measured] `native::recorded` exposes
 `native/speech/{recorded.rs,recorded/sections.rs}` for source/target pointer resolution, exact
