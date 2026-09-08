@@ -1,0 +1,136 @@
+{
+  "all_native_contact_and_current_centres_match_reference": true,
+  "contact_population": 5063,
+  "covariance_radius": [
+    [
+      0,
+      []
+    ],
+    [
+      1,
+      [
+        1
+      ]
+    ]
+  ],
+  "field_changed": false,
+  "field_cut": 5064,
+  "internal_radius": [
+    [
+      1,
+      [
+        2177777375,
+        1041886
+      ]
+    ],
+    [
+      1,
+      [
+        0,
+        0,
+        64
+      ]
+    ]
+  ],
+  "language_quality_established": false,
+  "map_radius": [
+    [
+      0,
+      []
+    ],
+    [
+      1,
+      [
+        1
+      ]
+    ]
+  ],
+  "model": ".local/artifacts/athena-alpha/ac1-ordinary-context/first-sixteen-bilinear-v3.hna",
+  "native_joint_return_integrated": false,
+  "native_staging_deeds": 1,
+  "native_staging_ingress_octets": 4941492,
+  "native_staging_section_readouts": 0,
+  "native_staging_wall_seconds": 0.266005462,
+  "numerical_contact_norm_upper": [
+    [
+      1,
+      [
+        2482476715,
+        68248988,
+        94648
+      ]
+    ],
+    [
+      1,
+      [
+        0,
+        0,
+        256
+      ]
+    ]
+  ],
+  "numerical_internal_norm_upper": [
+    [
+      1,
+      [
+        3839156085,
+        2022991683,
+        15957
+      ]
+    ],
+    [
+      1,
+      [
+        0,
+        0,
+        128
+      ]
+    ]
+  ],
+  "resident_octets_after_staging": 374978736,
+  "resident_octets_peak": 415658916,
+  "schema": "holonics.operative-contact-staging.v1",
+  "whole_wall_seconds": 79.112684536,
+  "process": {
+    "command": [
+      "target/debug/examples/alpha_contextual_lift",
+      ".local/artifacts/athena-alpha/ac1-ordinary-context/first-sixteen-bilinear-v3.hna",
+      "--operative-contacts",
+      "--report",
+      ".local/artifacts/athena-alpha/ac2-contextual-diagnosis/native-operative-staging-v1.json"
+    ],
+    "return_code": 0,
+    "whole_process_seconds": 79.17335644102423,
+    "max_rss_kib": 537420
+  },
+  "aggregate_radius": [
+    [
+      1,
+      [
+        3465040401,
+        1540820166
+      ]
+    ],
+    [
+      1,
+      [
+        0,
+        0,
+        256
+      ]
+    ]
+  ],
+  "complete_private_report": ".local/artifacts/athena-alpha/ac2-contextual-diagnosis/native-operative-staging-v1.json",
+  "checks": {
+    "native_constitutive": {
+      "passed": 143,
+      "failed": 0,
+      "seconds": 35.92
+    },
+    "sdk_alpha": {
+      "passed": 20,
+      "failed": 0,
+      "seconds": 2.77
+    }
+  }
+}

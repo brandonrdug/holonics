@@ -8,6 +8,8 @@ use super::*;
 
 mod enclosure;
 mod producer;
+mod operative;
+pub use operative::{NativeOperativeContactBirth, NativeOperativeContactReading, NativeOperativeContactStaging};
 pub use producer::{PairedContactCotangent, PairedJunctionCotangent, PairedJunctionLinearization, PairedJunctionTangent};
 #[cfg(test)]
 mod solver_tests;

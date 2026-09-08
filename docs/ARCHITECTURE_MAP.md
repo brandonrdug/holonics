@@ -125,6 +125,16 @@ includes the exact/native controls and actual-model producer inspection. These a
 owners; the native joint current/morphology update and its changing-contact decoder remain open.
 These remain derivation/reference owners; the resident section below supplies the native port.
 
+[established-bounded; source-inspected] `field/junction/operative.rs` owns borrowed native
+contact/current staging and retained return carriers; `surface_operative_contacts.rs` records its
+resident passages. `field_operative_contacts.cuh` mounts the actual birth/current population,
+stages rank-two returns and computes complete mixed moments and bounds. The
+[native staging return](../research/records/2026-09-08_AC1_OPERATIVE_CONTACTS_STAGE_THEIR_COMPLETE_MAP_AND_CURRENT_ON_DEVICE.md)
+records native controls and actual-model correspondence. `TextFieldSession::stage_operative_contacts`
+and the example observer expose that preparation. Full field publication, the joint constitutive
+producer and changing-contact persistence remain open.
+
+
 [established-bounded; source-inspected] `resident/context_section.rs` and
 `constitutive_context_section.cuh` now derive the fixed-source context/return relation and its
 translated preimage. `field/context_section.rs` with `field_context_section.cuh` constructs the

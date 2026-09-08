@@ -309,17 +309,23 @@ conversation model. A new contact's zero-current constraint reaction is separate
 paired-primitive return; all earlier material dependencies and recurrent overlays remain part
 of the complete word, and no native developmental state was changed by this reference.
 
-[definition] Continue by implementing the joint native material/current/morphology response.
-The existing junction owner must carry the evolving operative contact map separately from
-immutable source/birth testimony, retain its internal-current return and execute the complete
-chronological decoder when contacts change. Include the mixed covariance/aggregate terms,
-producing metrics, prior overlays and time transport before atomic publication. The derived
-coupled tangent contact is available; do not replace it with a covector-as-displacement or a
-current-only/source-drive substitute. This is AC1 construction directed at AC2's complete useful
-language products. The roadmap orders the concrete work. The
+[established-bounded; measured] The [native operative carrier and return staging](../../research/records/2026-09-08_AC1_OPERATIVE_CONTACTS_STAGE_THEIR_COMPLETE_MAP_AND_CURRENT_ON_DEVICE.md)
+now carries the complete contact map and internal currents, rank-two returns, mixed moments and
+bounds on device. It borrows the source field and preserves it through late refusal. All 143 native
+constitutive and 20 SDK alpha tests pass; all 5,063 actual model contacts/currents match the existing
+decoder. This does not publish a developmental field successor or establish useful language.
+
+[definition] Continue the joint native response by transferring that carrier into the existing
+junction owner, adding ordinary birth/growth and reflection, and composing the native
+material/current/morphology constitutive producer. Keep observed source/birth testimony separate
+from evolving operative contacts, retain prior dependencies and chronological transport, and
+execute the complete changing-contact current decoder and material source pairing. Preserve joint
+`(D,b)` geometry in the error law; the aggregate radius is a receiver bound, not an independent
+state uncertainty. Full rest/archive continuation and atomic publication remain owed. The private
+delta staging seam is not a learner. This remains AC1 construction directed at AC2's actual useful
+complete responses. The roadmap orders work; the
 [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
-remains a representation option when the productive composition requires it, with its actual
-future-generator and numerical obligations.
+remains an available representation option with its actual future-generator obligations.
 
 [established-bounded; measured] The [resident field ingress](../../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
 now lets generated current enter that same field operation directly. Its actual input survives

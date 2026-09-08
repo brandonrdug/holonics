@@ -328,6 +328,15 @@ uses this export for an exact source-adjoint receiver with retained uncertainty.
 return into the paired-field/current producer remains unimplemented; the observer is not a model
 or a source of generated answers.
 
+[established-bounded; measured] `NativeConstitutiveField::stage_operative_contacts` and the text
+session wrapper prepare the complete contact/current carrier on device, borrowing the source
+field and its decoder. `NativeOperativeContactStaging::inspect` is a cold read. The private native
+delta seam stages rank-two map/current changes, full mixed moments and their bounds. It is not
+yet supplied by the joint constitutive producer or published into the field successor. The
+[native staging record](../research/records/2026-09-08_AC1_OPERATIVE_CONTACTS_STAGE_THEIR_COMPLETE_MAP_AND_CURRENT_ON_DEVICE.md)
+contains the actual-model comparison. `alpha_contextual_lift MODEL --operative-contacts --report
+NEW.json` runs that comparison without cultivation or source-capability changes.
+
 [established-bounded; implemented-exact] `PairedJunctionLinearization::at` is the exact cold
 reference for the existing junction at declared contact/current operands. Its `pushforward` and
 `pullback` retain current and contact-morphology terms; `PairedContactCotangent` carries two

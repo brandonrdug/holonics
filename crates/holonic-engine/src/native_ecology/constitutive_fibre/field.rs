@@ -49,6 +49,7 @@ pub use junction::{
     NativeFieldInternalCurrent, NativeFieldInternalCurrentBall, NativeFieldJunctionReading,
     NativeFieldJunctionRepresentation, NativeFieldJunctionSolver,
     PairedContactCotangent, PairedJunctionCotangent, PairedJunctionLinearization, PairedJunctionTangent,
+    NativeOperativeContactBirth, NativeOperativeContactReading, NativeOperativeContactStaging,
 };
 use junction::{PairedJunction, PendingJunction};
 use material_transport::{MaterialTransport, PendingMaterialTransport};

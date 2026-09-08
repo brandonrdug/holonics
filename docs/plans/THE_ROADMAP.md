@@ -118,17 +118,23 @@ return at producer 19, with its new-row constraint reaction retained. The phase 
 cold coordinate decoder preserves the earlier scalar cotangent certificate. This completes the
 paired-primitive derivation/reference; the native developmental attachment remains open.
 
-[definition] **Next AC1 → AC2 construction:** implement the joint material/current/morphology
-constitutive return in the existing native field. It needs an evolving operative contact map,
-separate immutable birth/source standing, returned internal current and the complete decoder
-through changing morphology. Retain earlier material-update dependencies, producing maps,
-metrics, old overlays and chronological transfer. Stage the mixed covariance/aggregate terms
-and publish one successor only after the full native return succeeds. Reuse the derived coupled
-tangent contact and exact producer reference; do not install a covector as an arbitrary current
-or replace morphology with an easier current-only/source-drive update. Native arithmetic and
-uncertainty remain required. Then inspect AC2's complete English/code/mathematics responses and
-contextual revision. No additional user information is required. AC2 usefulness, broad AC3 and
-AC4–AC5 remain open.
+[established-bounded; measured] The [native operative-contact staging](../../research/records/2026-09-08_AC1_OPERATIVE_CONTACTS_STAGE_THEIR_COMPLETE_MAP_AND_CURRENT_ON_DEVICE.md)
+now supplies the complete resident map/current, rank-two delta staging, mixed moments and bounds.
+All 143 native constitutive and 20 SDK alpha controls pass. Staging all 5,063 actual model contacts
+matches the independent current decoder, in 0.266 s without numerical readbacks. This borrows the
+one field and retains its decoder; the joint developmental return and publication are not yet
+connected. No phase or language-product completion follows from this staging result.
+
+[definition] **Next AC1 → AC2 construction:** connect the staged operative carrier to the existing
+junction's continuing owner, ordinary birth/growth and reflection, and the native joint
+material/current/morphology constitutive return. Retain immutable births/sources, actual producing
+metrics, prior dependencies/overlays and chronological current transport. Preserve changing-contact
+source pairings and the full decoder, then complete rest/archive continuation and atomic publication.
+Keep the complete `(D,b)` geometry in the reflection error law; an aggregate-only bound must not
+replace its correlation and nonexpansiveness. The private supplied-delta seam is not a learned
+return producer. Then inspect AC2's complete English/code/mathematics responses and contextual
+revision. No additional user information is required. AC2 usefulness, broad AC3 and AC4–AC5 remain
+open; retain all failed models and the original product standard.
 
 [definition] The [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
 remains an available representation option when the actual composition needs it, with its

@@ -1624,6 +1624,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "field_complete_material_transport.cuh"
 #include "field_moment_material.cuh"
 #include "field_contextual_material.cuh"
+#include "field_operative_contacts.cuh"
 #include "field_context_section.cuh"
 #include "field_material_mode.cuh"
 #include "field_differential_receiver.cuh"

@@ -61,17 +61,26 @@ the zero-current birth reaction remains separate. These are partial derivatives 
 paired primitive, not a claim that the full recurrent adjoint or developmental update is complete.
 The cold observer's extra per-birth phase was corrected; the earlier scalar receiver is unchanged.
 
-[definition] **Next: AC1 → AC2, implement the joint native current/morphology return.**
-The concrete missing state is the evolving operative contact map and its returned internal
-current in the existing junction owner. Keep observed contact births/sources immutable. Compose
-the material/current/morphology constitutive response with the actual producing metrics, earlier
-material dependencies, prior overlays and chronological transfer. Stage the mixed moment/aggregate
-terms and preserve the full current decoder when contact maps change; the old fixed-contact
-prefix shortcut is then insufficient. Publish the complete successor atomically, with native exact
-arithmetic and retained numerical bounds. A cold cotangent, current-only change or new source-drive
-port does not replace that morphology attachment. Then inspect AC2's complete responses and
-contextual revisions. The model is unchanged by this derivation and still fails useful language.
-No additional user information is required; the AC0–AC5 goal remains active.
+[established-bounded; measured] The [native operative-contact staging](research/records/2026-09-08_AC1_OPERATIVE_CONTACTS_STAGE_THEIR_COMPLETE_MAP_AND_CURRENT_ON_DEVICE.md)
+now prepares the complete contact map/internal current and stages rank-two map/current returns
+with full mixed covariance/aggregate terms and retained bounds. It borrows the original field;
+it neither publishes another ecology nor changes that field's source capabilities. All **143
+native constitutive and 20 SDK alpha tests pass**, including late-refusal preservation and
+nonzero delta uncertainty. On the actual model, all 5,063 contact columns and internal-current
+centres match the existing decoder. Staging takes 0.266 s with zero numerical readbacks; the
+whole cold process takes 79.17 s. No developmental model update or new language response occurred.
+
+[definition] **Next: AC1 → AC2, connect staging to the continuing native field.**
+Transfer the operative carrier into the existing junction owner, compose ordinary birth/growth
+and reflection, and provide the native joint material/current/morphology constitutive-return
+producer. Keep immutable source/birth testimony, producing metrics, earlier dependencies and
+return chronology. Preserve the complete current decoder and source pairing when contacts change,
+and complete rest/archive continuation with one atomic successor publication. The aggregate
+radius is only a receiver bound: retain the joint `(D,b)` geometry and nonexpansive full reflection
+instead of feeding that radius independently through the old aggregate-only error recurrence.
+The private delta seam and borrowed staging are preparation, not the missing developmental law.
+Then inspect AC2's complete responses and contextual revisions. The source model remains unchanged
+and still fails useful language. No additional user information is required; AC0–AC5 remains active.
 
 [definition] Existing [conditional transport](research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md),
 [condition families](research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md),

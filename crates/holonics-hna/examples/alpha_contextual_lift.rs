@@ -11,6 +11,47 @@ use holonics_hna::{
 use serde_json::json;
 use std::{io::Write, path::PathBuf, time::Instant};
 
+fn operative_contacts(path: PathBuf, output: PathBuf) -> Result<(), Box<dyn std::error::Error>> {
+    let start = Instant::now();
+    let saved = SavedTextField::read(&path)?;
+    let mut report=saved.with_session(|session,_,_,_| {
+        let count=session.field().occurrence_count();
+        let reference=session.field().inspect_internal_current_enclosures()?.ok_or_else(||AlphaMaterialError::Apparatus("enclosed field required".into()))?;
+        let before=session.field().census();
+        let staging_start=Instant::now();let view=session.stage_operative_contacts()?;let staging_seconds=staging_start.elapsed().as_secs_f64();let after=view.census();let reading=view.inspect()?;
+        if reading.births.len()!=reference.len() || reading.contacts_radius!=num_rational::BigRational::from_integer(0.into()) {
+            return Err(AlphaMaterialError::Apparatus("this exact numerical comparison requires exact birth-map coordinates".into()));
+        }
+        for (i,old) in reference.iter().enumerate() {
+            if reading.births[i].source!=old.source_occurrence || reading.births[i].receiving!=old.receiving_occurrence
+                || reading.contacts[i]!=old.contact || reading.internal.center[i]!=old.current.center[0] {
+                return Err(AlphaMaterialError::Apparatus(format!("operative carrier disagrees at contact {i}")));
+            }
+        }
+        if view.field_cut()!=count || after.section_read_outs!=before.section_read_outs {
+            return Err(AlphaMaterialError::Apparatus("staging changed the field cut or read numerical sections".into()));
+        }
+        Ok(json!({"schema":"holonics.operative-contact-staging.v1","model":path,"field_cut":count,"contact_population":reading.births.len(),
+            "all_native_contact_and_current_centres_match_reference":true,"field_changed":false,"native_staging_deeds":after.deed_launches-before.deed_launches,
+            "native_staging_wall_seconds":staging_seconds,"native_staging_section_readouts":after.section_read_outs-before.section_read_outs,
+            "native_staging_ingress_octets":after.ingress_octets-before.ingress_octets,
+            "resident_octets_after_staging":after.resident_octets_now,"resident_octets_peak":after.resident_octets_peak,
+            "map_radius":reading.contacts_radius,"internal_radius":reading.internal.radius,
+            "covariance":reading.covariance,"covariance_radius":reading.covariance_radius,
+            "aggregate":reading.aggregate,"numerical_contact_norm_upper":reading.numerical_contact_norm_upper,
+            "numerical_internal_norm_upper":reading.numerical_internal_norm_upper,"native_joint_return_integrated":false,"language_quality_established":false}))
+    })?;
+    report["whole_wall_seconds"] = json!(start.elapsed().as_secs_f64());
+    publish_new(&output, |file| {
+        file.write_all(&serde_json::to_vec_pretty(&report)?)
+    })?;
+    println!(
+        "{}",
+        json!({"report":output,"contact_population":report["contact_population"],"all_centres_match":report["all_native_contact_and_current_centres_match_reference"],"whole_wall_seconds":report["whole_wall_seconds"]})
+    );
+    Ok(())
+}
+
 // Explicit cold observer over the saved owner. No corpus replay, native development or
 // model-current selection occurs here. One wire codeword is written per exact point pair.
 fn material_history(path: PathBuf, output: PathBuf) -> Result<(), Box<dyn std::error::Error>> {
@@ -58,12 +99,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
     let path = PathBuf::from(
         args.next()
-            .ok_or("usage: alpha_contextual_lift MODEL (RECEIVING,RECEIVING [--enclosed-pair] | --material-history) --report NEW")?,
+            .ok_or("usage: alpha_contextual_lift MODEL (RECEIVING,RECEIVING [--enclosed-pair] | --material-history | --operative-contacts) --report NEW")?,
     );
     let selection = args
         .next()
         .ok_or("receiving occurrences or --material-history required")?;
-    if selection == "--material-history" {
+    if selection == "--material-history" || selection == "--operative-contacts" {
         if args.next().as_deref() != Some("--report") {
             return Err("--report required".into());
         }
@@ -71,7 +112,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         if args.next().is_some() || output.exists() {
             return Err("unexpected arguments or existing destination".into());
         }
-        return material_history(path, output);
+        return if selection == "--material-history" {
+            material_history(path, output)
+        } else {
+            operative_contacts(path, output)
+        };
     }
     let occurrences = selection
         .split(',')

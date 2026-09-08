@@ -22,6 +22,13 @@ neither a perfect inverse nor a copy of every past sample is a general learning 
 
 ## Current common mechanism
 
+[definition] The [operative-contact staging](../research/records/2026-09-08_AC1_OPERATIVE_CONTACTS_STAGE_THEIR_COMPLETE_MAP_AND_CURRENT_ON_DEVICE.md)
+adds native packed-wide map/current carriers and complete mixed covariance/aggregate bounds.
+A target port must preserve their complex orientation, logical wide values and radii, actual
+birth frames and fresh staging on refusal. CUDA's 512-thread register-placement bound is an
+execution choice, not a logical carrier extent or a semantic capacity. This is not yet the joint
+constitutive updater or an Apple execution result; the earlier Mac workflow remains independent.
+
 [definition] The [ordinary contextual return](../research/records/2026-09-08_AC1_ORDINARY_RECEPTION_CONDUCTS_THE_SOURCE_AND_ITS_AVAILABLE_CONTEXT.md)
 adds native equal-source reference discovery and two ordered contacts inside one field return.
 Its port requires the existing exact complete-current pairing, normalized source/condition moment

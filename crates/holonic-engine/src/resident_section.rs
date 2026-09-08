@@ -92,6 +92,7 @@ mod surface_condition;
 mod surface_material_mode;
 mod surface_moment;
 mod surface_context_section;
+mod surface_operative_contacts;
 #[path = "resident_section/surface_adjoint.rs"]
 mod surface_adjoint;
 #[path = "resident_section/surface_intervention.rs"]
