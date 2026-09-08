@@ -163,6 +163,22 @@ fn rational_complex_products_continue_resident() {
 }
 
 #[test]
+#[ignore = "requires native GPU; unequal rational denominators accumulate raw complex products before one exact normalization"]
+fn unequal_denominators_preserve_cancelled_quadrature_and_tail() {
+    let r = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&r).unwrap();
+    // The source denominator is 3 and the response denominator is 5. The first complex
+    // product's imaginary coordinate cancels exactly; the second target retains both signs.
+    let x = mount(&s, &[2, 4, 6, -3, 3]);
+    let c = mount(&s, &[5, -10, 5, 0, 5]);
+    let out = product(&s, &x, &c, 2, 2).unwrap();
+    assert_eq!(
+        values(&s, out.section()),
+        vec![q(10, 3), q(0, 1), q(2, 3), q(-11, 3), q(2, 1), q(-1, 1)]
+    );
+}
+
+#[test]
 #[ignore = "requires native GPU; normalization precedes the final i64 carrier conversion"]
 fn wide_products_normalize_before_word_publication() {
     let r = ResidentReadout::new().unwrap();

@@ -77,17 +77,16 @@ extern "C" __global__ void section_phase_convolution(
         uint32_t source_last = min(target, source_raw_count - 1U);
         for (uint32_t source = source_first; source <= source_last; ++source) {
             uint32_t response = target - source;
-            wide product[3];
-            fibre_phase_product(
-                source_lo[source_at + 2U * source], source_lo[source_at + 2U * source + 1U],
-                source_den,
-                response_lo[response_at + 2U * response],
-                response_lo[response_at + 2U * response + 1U], response_den,
-                product, slot);
-            if (*slot) return;
-            wide factor = common / product[2];
-            real = add_checked(real, product_checked(product[0], factor, slot), slot);
-            imaginary = add_checked(imaginary, product_checked(product[1], factor, slot), slot);
+            wide ar = source_lo[source_at + 2U * source];
+            wide ai = source_lo[source_at + 2U * source + 1U];
+            wide br = response_lo[response_at + 2U * response];
+            wide bi = response_lo[response_at + 2U * response + 1U];
+            wide product_real = sub_checked(product_checked(ar, br, slot),
+                product_checked(ai, bi, slot), slot);
+            wide product_imaginary = add_checked(product_checked(ar, bi, slot),
+                product_checked(ai, br, slot), slot);
+            real = add_checked(real, product_real, slot);
+            imaginary = add_checked(imaginary, product_imaginary, slot);
             if (*slot) return;
         }
         convolution_scratch[2U * target] = real;
@@ -207,17 +206,16 @@ extern "C" __global__ void section_phase_convolution_products(
     uint32_t source_last = min(target, source_raw_count - 1U);
     for (uint32_t source = source_first; source <= source_last; ++source) {
         uint32_t response = target - source;
-        wide product[3];
-        fibre_phase_product(
-            source_lo[source_at + 2U * source], source_lo[source_at + 2U * source + 1U],
-            source_den,
-            response_lo[response_at + 2U * response],
-            response_lo[response_at + 2U * response + 1U], response_den,
-            product, slot);
-        if (*slot) return;
-        wide factor = common / product[2];
-        real = add_checked(real, product_checked(product[0], factor, slot), slot);
-        imaginary = add_checked(imaginary, product_checked(product[1], factor, slot), slot);
+        wide ar = source_lo[source_at + 2U * source];
+        wide ai = source_lo[source_at + 2U * source + 1U];
+        wide br = response_lo[response_at + 2U * response];
+        wide bi = response_lo[response_at + 2U * response + 1U];
+        wide product_real = sub_checked(product_checked(ar, br, slot),
+            product_checked(ai, bi, slot), slot);
+        wide product_imaginary = add_checked(product_checked(ar, bi, slot),
+            product_checked(ai, br, slot), slot);
+        real = add_checked(real, product_real, slot);
+        imaginary = add_checked(imaginary, product_imaginary, slot);
         if (*slot) return;
     }
     workspace[2U * target] = real;

@@ -1,0 +1,192 @@
+{
+  "clock_contract": "caller supplies simultaneously recorded raw channels with common origin; no delay alignment or resampling",
+  "device": "Apple M1 Pro",
+  "difference": {
+    "clipped_sample_population": 0,
+    "frames": 672000,
+    "lineage": 5,
+    "origin": "0",
+    "pcm_gain": 32768,
+    "projection_fibre": "the complete exact section is retained; remainder = current * gain - PCM at each timed quadrature",
+    "receiver": 9,
+    "sample_step": "1/48000",
+    "section_octets": 21504056,
+    "section_path": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/soundcam-native-return/row_001/difference.section",
+    "section_sha256": "c28b95f6e10c2ce6172dbe950aeeb739feedca411e64192d258a2b266194f86f",
+    "wav_path": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/soundcam-native-return/row_001/difference.wav",
+    "wav_sha256": "7855d9b019ccaefc49be18f60f8548a6083099580d21ccea344c234783ecf930"
+  },
+  "divisor": 32768,
+  "excitation": {
+    "frames": 672000,
+    "occurrence": "recorded-excitation",
+    "octets": 1344044,
+    "origin": "0",
+    "path": "/Users/brandonduggan/Workspaces/holonics/.local/datasets/soundcam/wav/row_001/loopback.wav",
+    "sample_rate": 48000,
+    "sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
+  },
+  "initial_response": {
+    "denominator": 1,
+    "extent": 1,
+    "imaginary": 0,
+    "origin": "0",
+    "real": 1
+  },
+  "initial_response_scope": "explicit unit digital starting current, not a measured room transfer or cultivated model",
+  "native_development": "none; this receiver retains the actual defect for subsequent constitutive contact",
+  "observation": {
+    "frames": 672000,
+    "occurrence": "recorded-microphone-return",
+    "octets": 1344044,
+    "origin": "0",
+    "path": "/Users/brandonduggan/Workspaces/holonics/.local/datasets/soundcam/wav/row_001/microphone_00.wav",
+    "sample_rate": 48000,
+    "sha256": "b7a88809e4ba46590c43982b76d0efc5727ad492e88fd9c526c529c28d60c1fd"
+  },
+  "phase_extent": 4,
+  "prediction": {
+    "frames": 672000,
+    "lineage": 4,
+    "origin": "0",
+    "receiver": 9,
+    "sample_step": "1/48000",
+    "section_octets": 21504056,
+    "section_path": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/soundcam-native-return/row_001/prediction.section",
+    "section_sha256": "edd7e4b90bbeb6c79e9fb50575ab1710845083b5ae85dd6c4c0d4ec3f3451ddb"
+  },
+  "schema": "holonics.recorded-acoustic-return.v1",
+  "seconds": 17.921433125,
+  "stages": {
+    "cold_difference_and_audio": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 21504016,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 86016112,
+      "resident_octets_peak": 139776340,
+      "seconds": 14.450937625,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "cold_prediction": {
+      "allocations": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 21504016,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 86016112,
+      "resident_octets_peak": 139776340,
+      "seconds": 0.167959291,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "mount_excitation": {
+      "allocations": 2,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 21504016,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 21504016,
+      "resident_octets_peak": 21504016,
+      "seconds": 0.089434791,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "mount_initial_response": {
+      "allocations": 2,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 48,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 21504064,
+      "resident_octets_peak": 21504064,
+      "seconds": 0.000054042,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "mount_observed_return": {
+      "allocations": 2,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 21504016,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 64512096,
+      "resident_octets_peak": 96768244,
+      "seconds": 0.092522666,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "native_oriented_return": {
+      "allocations": 6,
+      "deeds": 1,
+      "gpu_seconds": 1.3539041249314323,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 64,
+      "resident_octets_now": 86016112,
+      "resident_octets_peak": 139776340,
+      "seconds": 1.355090667,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "predict_before_reception": {
+      "allocations": 6,
+      "deeds": 1,
+      "gpu_seconds": 1.0970738750183955,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 64,
+      "resident_octets_now": 43008080,
+      "resident_octets_peak": 96768244,
+      "seconds": 1.098458042,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    }
+  },
+  "status": "returned",
+  "support": {
+    "begin": [
+      [
+        0,
+        []
+      ],
+      [
+        1,
+        [
+          1
+        ]
+      ]
+    ],
+    "end": [
+      [
+        1,
+        [
+          14
+        ]
+      ],
+      [
+        1,
+        [
+          1
+        ]
+      ]
+    ],
+    "observed": {
+      "end": 672000,
+      "start": 0
+    },
+    "predicted": {
+      "end": 672000,
+      "start": 0
+    },
+    "unobserved_prediction": [],
+    "unpredicted_observation": []
+  }
+}

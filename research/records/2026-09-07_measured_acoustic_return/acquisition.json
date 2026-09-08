@@ -1,0 +1,1386 @@
+{
+  "archive": {
+    "downloaded_archive": false,
+    "etag": "\"6700980d-2753daa6\"",
+    "last_modified": "Sat, 05 Oct 2024 01:36:13 GMT",
+    "selected_ranges": [
+      {
+        "bytes": 1048576,
+        "end": 659806885,
+        "etag": "\"6700980d-2753daa6\"",
+        "purpose": "ZIP central directory",
+        "start": 658758310
+      },
+      {
+        "bytes": 4096,
+        "end": 432808090,
+        "etag": "\"6700980d-2753daa6\"",
+        "purpose": "TreatedRoomSmallSet/Human1/music_audio.npy local header",
+        "start": 432803995
+      },
+      {
+        "bytes": 27658583,
+        "end": 460462677,
+        "etag": "\"6700980d-2753daa6\"",
+        "purpose": "TreatedRoomSmallSet/Human1/music_audio.npy compressed payload",
+        "start": 432804095
+      },
+      {
+        "bytes": 4096,
+        "end": 430182927,
+        "etag": "\"6700980d-2753daa6\"",
+        "purpose": "TreatedRoomSmallSet/Human1/music_directlines.npy local header",
+        "start": 430178832
+      },
+      {
+        "bytes": 2625057,
+        "end": 432803994,
+        "etag": "\"6700980d-2753daa6\"",
+        "purpose": "TreatedRoomSmallSet/Human1/music_directlines.npy compressed payload",
+        "start": 430178938
+      }
+    ],
+    "size_bytes": 659806886,
+    "url": "https://downloads.cs.stanford.edu/viscam/SoundCam/TreatedRoomSmallSet.zip"
+  },
+  "collection_clock": {
+    "citation": "SoundCam paper Appendix D.3: synchronized MOTU 8M interfaces at 48 kHz",
+    "frame_count": 672000,
+    "origin_frame": 0,
+    "origin_seconds": "0",
+    "sample_rate_hz": 48000
+  },
+  "dataset": "SoundCam",
+  "dataset_url": "https://purl.stanford.edu/xq364hd5023",
+  "doi": "https://doi.org/10.25740/xq364hd5023",
+  "entries": {
+    "empty_music_sources_provenance": {
+      "archive_member": "TreatedRoomSmallSet/Empty/music_sources.npy",
+      "downloaded": false,
+      "same_crc_as_human1_source": true,
+      "zip_crc32": "6c3d954c"
+    },
+    "music_audio.npy": {
+      "archive_member": "TreatedRoomSmallSet/Human1/music_audio.npy",
+      "compressed_bytes": 27658583,
+      "dtype": "<i2",
+      "sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+      "shape": [
+        3,
+        10,
+        672000
+      ],
+      "uncompressed_bytes": 40320128,
+      "zip_crc32": "74320442"
+    },
+    "music_directlines.npy": {
+      "archive_member": "TreatedRoomSmallSet/Human1/music_directlines.npy",
+      "compressed_bytes": 2625057,
+      "dtype": "<i2",
+      "sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+      "shape": [
+        3,
+        672000
+      ],
+      "uncompressed_bytes": 4032128,
+      "zip_crc32": "52bf1d9c"
+    },
+    "music_sources.npy": {
+      "archive_member": "TreatedRoomSmallSet/Human1/music_sources.npy",
+      "downloaded": false,
+      "dtype": "<f8",
+      "reason": "float64 digital source intentionally not acquired; electrical loopback is the measured excitation witness",
+      "sha256": null,
+      "sha256_available": false,
+      "sha256_reason": "member intentionally not acquired",
+      "shape": [
+        3,
+        672000
+      ],
+      "uncompressed_bytes": 16128128,
+      "used_as_native_input": false,
+      "zip_crc32": "6c3d954c"
+    }
+  },
+  "license": {
+    "basis": "SoundCam datasheet and Stanford repository metadata",
+    "name": "MIT",
+    "url": "https://opensource.org/license/mit/"
+  },
+  "native_current_formation": false,
+  "not_acquired": [
+    "music_sources.npy",
+    "music_deconvolved.npy",
+    "adjusted_music.npy",
+    "all other archive members"
+  ],
+  "pairs": [
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_000/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 0
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
+      },
+      "microphone": 0,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_000/microphone_00.wav",
+        "selector": {
+          "channel": 0,
+          "row": 0
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "e20fd5db50601393f2623042ea45cbce163dfd071ad6debb6eda27a9a7b08394"
+      },
+      "origin_frame": 0,
+      "row": 0,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_000/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 0
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
+      },
+      "microphone": 1,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_000/microphone_01.wav",
+        "selector": {
+          "channel": 1,
+          "row": 0
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "bd8294218f19b95d33e345e66eb5d5cb38d89adf1be0601369e25254c50ee1a0"
+      },
+      "origin_frame": 0,
+      "row": 0,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_000/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 0
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
+      },
+      "microphone": 2,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_000/microphone_02.wav",
+        "selector": {
+          "channel": 2,
+          "row": 0
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "274a152f92191cb4f335094aa07431664e9569f44a8b669db5207bd8faa15235"
+      },
+      "origin_frame": 0,
+      "row": 0,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_000/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 0
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
+      },
+      "microphone": 3,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_000/microphone_03.wav",
+        "selector": {
+          "channel": 3,
+          "row": 0
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "310fe594e9885bd18aaa178daf25798247ee7e48dae79a32f39d57357b910bf1"
+      },
+      "origin_frame": 0,
+      "row": 0,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_000/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 0
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
+      },
+      "microphone": 4,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_000/microphone_04.wav",
+        "selector": {
+          "channel": 4,
+          "row": 0
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "7aa284e035f06c990965842b72fcc1d5b8354e1f62906c98e4afd64b7b290ceb"
+      },
+      "origin_frame": 0,
+      "row": 0,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_000/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 0
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
+      },
+      "microphone": 5,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_000/microphone_05.wav",
+        "selector": {
+          "channel": 5,
+          "row": 0
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "3afde73585933b5dca6605d243048e14df3228bfd172573e1f7b514552208988"
+      },
+      "origin_frame": 0,
+      "row": 0,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_000/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 0
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
+      },
+      "microphone": 6,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_000/microphone_06.wav",
+        "selector": {
+          "channel": 6,
+          "row": 0
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "f862f3415364f89463f3b402c5e55e975584677a351116b85a9d1819816824cd"
+      },
+      "origin_frame": 0,
+      "row": 0,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_000/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 0
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
+      },
+      "microphone": 7,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_000/microphone_07.wav",
+        "selector": {
+          "channel": 7,
+          "row": 0
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "2751131583997b0d2b9a100438a022c28f2676acb566da544b429a907ae1e301"
+      },
+      "origin_frame": 0,
+      "row": 0,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_000/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 0
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
+      },
+      "microphone": 8,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_000/microphone_08.wav",
+        "selector": {
+          "channel": 8,
+          "row": 0
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "27c0f1a01ddceb9680d43385f4bf7f44a549056c5fbaf63d160a7d1910230ff0"
+      },
+      "origin_frame": 0,
+      "row": 0,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_000/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 0
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
+      },
+      "microphone": 9,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_000/microphone_09.wav",
+        "selector": {
+          "channel": 9,
+          "row": 0
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "1606a0b300d655a44071e42359372b609514d090ab0764296a049356ee5694ac"
+      },
+      "origin_frame": 0,
+      "row": 0,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_001/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 1
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
+      },
+      "microphone": 0,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_001/microphone_00.wav",
+        "selector": {
+          "channel": 0,
+          "row": 1
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "b7a88809e4ba46590c43982b76d0efc5727ad492e88fd9c526c529c28d60c1fd"
+      },
+      "origin_frame": 0,
+      "row": 1,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_001/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 1
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
+      },
+      "microphone": 1,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_001/microphone_01.wav",
+        "selector": {
+          "channel": 1,
+          "row": 1
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "94ca3d1c7cc1a330bf8911310fc7f9b2df7716c389e99d103d16dc6b16771349"
+      },
+      "origin_frame": 0,
+      "row": 1,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_001/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 1
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
+      },
+      "microphone": 2,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_001/microphone_02.wav",
+        "selector": {
+          "channel": 2,
+          "row": 1
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "1e90ff4e77f816ec8600ffaf9a74c712d733cbe2871393e901dfd01f8b1218ed"
+      },
+      "origin_frame": 0,
+      "row": 1,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_001/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 1
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
+      },
+      "microphone": 3,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_001/microphone_03.wav",
+        "selector": {
+          "channel": 3,
+          "row": 1
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "c2a8a87795c35ef0a8eec1a69eda89dc41f1d04d38c18beb08879b2418224021"
+      },
+      "origin_frame": 0,
+      "row": 1,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_001/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 1
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
+      },
+      "microphone": 4,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_001/microphone_04.wav",
+        "selector": {
+          "channel": 4,
+          "row": 1
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "5b890f276a6596f0852999ec2e233d2bf7b23ac96c67e6edbf4c0868debff514"
+      },
+      "origin_frame": 0,
+      "row": 1,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_001/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 1
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
+      },
+      "microphone": 5,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_001/microphone_05.wav",
+        "selector": {
+          "channel": 5,
+          "row": 1
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "2c91b1611553f43c22011aa3124c012f059bf36739dbc5bb48d8627df40dcedb"
+      },
+      "origin_frame": 0,
+      "row": 1,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_001/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 1
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
+      },
+      "microphone": 6,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_001/microphone_06.wav",
+        "selector": {
+          "channel": 6,
+          "row": 1
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "9321b7608ce55714981583c1894e98cb5982670fffc2f0bf989b569e797e6631"
+      },
+      "origin_frame": 0,
+      "row": 1,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_001/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 1
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
+      },
+      "microphone": 7,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_001/microphone_07.wav",
+        "selector": {
+          "channel": 7,
+          "row": 1
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "d2fa9d4921d7075a4f80f8b238cd6eeacc6bef2ac0fbd61f9770bfec6f1b4ba4"
+      },
+      "origin_frame": 0,
+      "row": 1,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_001/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 1
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
+      },
+      "microphone": 8,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_001/microphone_08.wav",
+        "selector": {
+          "channel": 8,
+          "row": 1
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "d144be8a86db06425f95a1b4a50dff006e05b8add8f222d57ae5d2b8a8e7a886"
+      },
+      "origin_frame": 0,
+      "row": 1,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_001/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 1
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
+      },
+      "microphone": 9,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_001/microphone_09.wav",
+        "selector": {
+          "channel": 9,
+          "row": 1
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "b0c65287f721ad05a98fde90f9498d5cdd20bcc1257ac2a8cb01831625d770f9"
+      },
+      "origin_frame": 0,
+      "row": 1,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_002/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 2
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
+      },
+      "microphone": 0,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_002/microphone_00.wav",
+        "selector": {
+          "channel": 0,
+          "row": 2
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "e5155416859bce4fe7d41ef755741f6af0e28003bf2d9cd776145fccdfbc2121"
+      },
+      "origin_frame": 0,
+      "row": 2,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_002/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 2
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
+      },
+      "microphone": 1,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_002/microphone_01.wav",
+        "selector": {
+          "channel": 1,
+          "row": 2
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "4d877f551f5a6e2f3e0b28f4b15295487a9beae55cf22a3a84327ebb331b37c6"
+      },
+      "origin_frame": 0,
+      "row": 2,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_002/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 2
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
+      },
+      "microphone": 2,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_002/microphone_02.wav",
+        "selector": {
+          "channel": 2,
+          "row": 2
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "b6e8ef7382299c386187df8f3bfa86a82c53ec7e545807816ec9d52f42787194"
+      },
+      "origin_frame": 0,
+      "row": 2,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_002/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 2
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
+      },
+      "microphone": 3,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_002/microphone_03.wav",
+        "selector": {
+          "channel": 3,
+          "row": 2
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "3b4b8fd78ff84f7ea61e951c20316802d300967c755173ec81f24cfbfba14658"
+      },
+      "origin_frame": 0,
+      "row": 2,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_002/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 2
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
+      },
+      "microphone": 4,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_002/microphone_04.wav",
+        "selector": {
+          "channel": 4,
+          "row": 2
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "dbc359ccf1f1c6d6eb9d5c0adc7e47d234c2c91aeea6c9867604813688eaf344"
+      },
+      "origin_frame": 0,
+      "row": 2,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_002/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 2
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
+      },
+      "microphone": 5,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_002/microphone_05.wav",
+        "selector": {
+          "channel": 5,
+          "row": 2
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "8ddf94bb62d8f96c78111c3374c3ce6395c4d77f6a40b49cf7b8da743358d252"
+      },
+      "origin_frame": 0,
+      "row": 2,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_002/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 2
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
+      },
+      "microphone": 6,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_002/microphone_06.wav",
+        "selector": {
+          "channel": 6,
+          "row": 2
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "af8c0b03c395b6071f15ff884f34a92cea9f6b1af7d781b844f54b3b99489ac6"
+      },
+      "origin_frame": 0,
+      "row": 2,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_002/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 2
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
+      },
+      "microphone": 7,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_002/microphone_07.wav",
+        "selector": {
+          "channel": 7,
+          "row": 2
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "9ec89049cdfeb9e5397a96008fa24fdcc1f51a90ba3c5da450caa97bda3fc102"
+      },
+      "origin_frame": 0,
+      "row": 2,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_002/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 2
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
+      },
+      "microphone": 8,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_002/microphone_08.wav",
+        "selector": {
+          "channel": 8,
+          "row": 2
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "7c80691eefd708d88d24d71fe6253c8c1a4509b7630e034c3993bf154d1a17fa"
+      },
+      "origin_frame": 0,
+      "row": 2,
+      "sample_rate_hz": 48000
+    },
+    {
+      "loopback": {
+        "frames": 672000,
+        "path": "wav/row_002/loopback.wav",
+        "selector": {
+          "channel": "loopback",
+          "row": 2
+        },
+        "source_array": "music_directlines.npy",
+        "source_array_sha256": "50a911eef6642ffdd459a917052196126cd42e6ba0bfcd78a4772eae529aad98",
+        "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
+      },
+      "microphone": 9,
+      "microphone_recording": {
+        "frames": 672000,
+        "path": "wav/row_002/microphone_09.wav",
+        "selector": {
+          "channel": 9,
+          "row": 2
+        },
+        "source_array": "music_audio.npy",
+        "source_array_sha256": "bf29f1a2f57ff09c102c9973f2f4f86ff2180a3488acec0ee6548e817db03dc6",
+        "wav_sha256": "65879f2a9a10ebe38579704facdf74a30966ab38d34b2424750b91d4fdab8b80"
+      },
+      "origin_frame": 0,
+      "row": 2,
+      "sample_rate_hz": 48000
+    }
+  ],
+  "paper_url": "https://arxiv.org/pdf/2311.03517.pdf",
+  "project_url": "https://masonlwang.com/soundcam/",
+  "raw_outputs": {
+    "music_audio_npy": "raw/TreatedRoomSmallSet/Human1/music_audio.npy",
+    "music_directlines_npy": "raw/TreatedRoomSmallSet/Human1/music_directlines.npy"
+  },
+  "schema": "soundcam-selective-acquisition.v1",
+  "selectors": {
+    "folder": "TreatedRoomSmallSet/Human1",
+    "loopback_channel": "music_directlines.npy",
+    "microphone_channels": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "rows": [
+      0,
+      1,
+      2
+    ]
+  },
+  "semantic_conditions": false,
+  "wav_outputs": [
+    {
+      "array": "music_directlines.npy",
+      "channel": "loopback",
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_000/loopback.wav",
+      "pcm16_sha256": "48b0d8728c8442ff9a847849bbb7dd41ea37cebb47610af1411c01aeb791c8c5",
+      "row": 0,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "4b62c20069d33f923ec51fac6cccdd2e7266d19407f4e9bb8aa57bb0006aac12"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 0,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_000/microphone_00.wav",
+      "pcm16_sha256": "24c88b289eed250cfe6ee28dae72ec16b9ad6a4adcbdf6cd857c2508d62101e0",
+      "row": 0,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "e20fd5db50601393f2623042ea45cbce163dfd071ad6debb6eda27a9a7b08394"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 1,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_000/microphone_01.wav",
+      "pcm16_sha256": "9b9deae640eb89356daa47c47b9516fff5bbc62f4d3f656d9c64d2f6f8641796",
+      "row": 0,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "bd8294218f19b95d33e345e66eb5d5cb38d89adf1be0601369e25254c50ee1a0"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 2,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_000/microphone_02.wav",
+      "pcm16_sha256": "159ac047ce6c63f1aeda6e1bc9651ef6ef6b0943601b16de5b8dc4e4c9f00113",
+      "row": 0,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "274a152f92191cb4f335094aa07431664e9569f44a8b669db5207bd8faa15235"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 3,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_000/microphone_03.wav",
+      "pcm16_sha256": "d1e89c2c61c0ba616f4c77e8082705f007be66b24d7c1b41b0fb441b4caf5306",
+      "row": 0,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "310fe594e9885bd18aaa178daf25798247ee7e48dae79a32f39d57357b910bf1"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 4,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_000/microphone_04.wav",
+      "pcm16_sha256": "54fb6e3ade3821a5c06855bcab30f1cb01a84e928ce4085c3f4472f92a94b78b",
+      "row": 0,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "7aa284e035f06c990965842b72fcc1d5b8354e1f62906c98e4afd64b7b290ceb"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 5,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_000/microphone_05.wav",
+      "pcm16_sha256": "9c5b2a8fd104b1a9e7a9e2091c7329ab22ef70e06d07e5664dc3541084d2f76a",
+      "row": 0,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "3afde73585933b5dca6605d243048e14df3228bfd172573e1f7b514552208988"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 6,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_000/microphone_06.wav",
+      "pcm16_sha256": "682f471829b7867a3d0e2590e5861b784a574b9b70649f5a5babf327369b3312",
+      "row": 0,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "f862f3415364f89463f3b402c5e55e975584677a351116b85a9d1819816824cd"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 7,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_000/microphone_07.wav",
+      "pcm16_sha256": "79608f810524ff749dab08f1c7e98c04bd22a5f69dc26277f12ec2cdf14e87fb",
+      "row": 0,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "2751131583997b0d2b9a100438a022c28f2676acb566da544b429a907ae1e301"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 8,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_000/microphone_08.wav",
+      "pcm16_sha256": "dbb8a77e77d2070a356eaa2fc1cf6aad5346656b9dbcade04a83a42c5c182b1b",
+      "row": 0,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "27c0f1a01ddceb9680d43385f4bf7f44a549056c5fbaf63d160a7d1910230ff0"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 9,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_000/microphone_09.wav",
+      "pcm16_sha256": "940106353d78b7f76c3daf7e0eb8db031546d20eee71feb7397e9b3e1bc88b58",
+      "row": 0,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "1606a0b300d655a44071e42359372b609514d090ab0764296a049356ee5694ac"
+    },
+    {
+      "array": "music_directlines.npy",
+      "channel": "loopback",
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_001/loopback.wav",
+      "pcm16_sha256": "848d85a31b2d7bd829f163cf958cdf9585c82722350b890a98aec8b11b656afa",
+      "row": 1,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "f17f5d7ec7cf8ff2a9593b4feb56566ca22c05501e76c052912e7c31ba0ab7d2"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 0,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_001/microphone_00.wav",
+      "pcm16_sha256": "f02bbaf5b9bef32f06e8eac446678cf62be9919cc8a0275f498ad680665fcce7",
+      "row": 1,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "b7a88809e4ba46590c43982b76d0efc5727ad492e88fd9c526c529c28d60c1fd"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 1,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_001/microphone_01.wav",
+      "pcm16_sha256": "488ce3fe59054d29d18785a08346560c19646d4f611661c68d729f429bed2f49",
+      "row": 1,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "94ca3d1c7cc1a330bf8911310fc7f9b2df7716c389e99d103d16dc6b16771349"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 2,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_001/microphone_02.wav",
+      "pcm16_sha256": "717f4873d4be9347cad7df4757ec9f70863916e7646e28c896cfd2b2ab4d32cb",
+      "row": 1,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "1e90ff4e77f816ec8600ffaf9a74c712d733cbe2871393e901dfd01f8b1218ed"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 3,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_001/microphone_03.wav",
+      "pcm16_sha256": "f6079f94fe03cf758cce6170f50a9a120ce4b3f2bf98775a808033c0fc79c8cb",
+      "row": 1,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "c2a8a87795c35ef0a8eec1a69eda89dc41f1d04d38c18beb08879b2418224021"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 4,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_001/microphone_04.wav",
+      "pcm16_sha256": "258e0ca4ca083a4bd963c927fb7d07b1c76dcce3f069842d103b3a8f1b4173d5",
+      "row": 1,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "5b890f276a6596f0852999ec2e233d2bf7b23ac96c67e6edbf4c0868debff514"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 5,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_001/microphone_05.wav",
+      "pcm16_sha256": "f7f90e17441930b396aa7b7a4a25a4c7e0b50d9ac5660d70d4351067ea95fc75",
+      "row": 1,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "2c91b1611553f43c22011aa3124c012f059bf36739dbc5bb48d8627df40dcedb"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 6,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_001/microphone_06.wav",
+      "pcm16_sha256": "4dfbf3af694544acb842aaebad9c4c4fe2430853bd56df155ea6939e44a47aea",
+      "row": 1,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "9321b7608ce55714981583c1894e98cb5982670fffc2f0bf989b569e797e6631"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 7,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_001/microphone_07.wav",
+      "pcm16_sha256": "96c4bb437b1676b21ab72f7f762354d083938b0967b7eed8d3fae4be2beeabe6",
+      "row": 1,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "d2fa9d4921d7075a4f80f8b238cd6eeacc6bef2ac0fbd61f9770bfec6f1b4ba4"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 8,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_001/microphone_08.wav",
+      "pcm16_sha256": "88f2655e620646632cb85db2574b9c3196c0275b19bc64aa437b35c8230f2770",
+      "row": 1,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "d144be8a86db06425f95a1b4a50dff006e05b8add8f222d57ae5d2b8a8e7a886"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 9,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_001/microphone_09.wav",
+      "pcm16_sha256": "ed34972cf0366220f28f8d049a210adf1475100ad401ce81f960711e2ef01cf0",
+      "row": 1,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "b0c65287f721ad05a98fde90f9498d5cdd20bcc1257ac2a8cb01831625d770f9"
+    },
+    {
+      "array": "music_directlines.npy",
+      "channel": "loopback",
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_002/loopback.wav",
+      "pcm16_sha256": "0aeb736aff3dfc63a5c0902845fdea4309a95855c9128895c3e1dc3bcb51b0ce",
+      "row": 2,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "35282dbc6d4cb4e9baa097d926e301fe4e36894e88058e3c22eff8950a40920b"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 0,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_002/microphone_00.wav",
+      "pcm16_sha256": "21b736da8633f0509cabf356a61df6a60f852ea7786a8f1275c5a43b2a70363a",
+      "row": 2,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "e5155416859bce4fe7d41ef755741f6af0e28003bf2d9cd776145fccdfbc2121"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 1,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_002/microphone_01.wav",
+      "pcm16_sha256": "26c925bf1ad4ec3f3199d9611dee4347ff785eb8a9070993d633b239f59b716e",
+      "row": 2,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "4d877f551f5a6e2f3e0b28f4b15295487a9beae55cf22a3a84327ebb331b37c6"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 2,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_002/microphone_02.wav",
+      "pcm16_sha256": "0aec62fae5e42463155bb25da01e4ca8b27c865e9536e9d9786fffc0148c541f",
+      "row": 2,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "b6e8ef7382299c386187df8f3bfa86a82c53ec7e545807816ec9d52f42787194"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 3,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_002/microphone_03.wav",
+      "pcm16_sha256": "540cab0418ae8f1ae39ac89e494cb136da77f096f52d9e54b365daf9c703099b",
+      "row": 2,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "3b4b8fd78ff84f7ea61e951c20316802d300967c755173ec81f24cfbfba14658"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 4,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_002/microphone_04.wav",
+      "pcm16_sha256": "174c8d015a719b549f2c92ed890e6aaa32425cd30270a2750b239b3781c4256d",
+      "row": 2,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "dbc359ccf1f1c6d6eb9d5c0adc7e47d234c2c91aeea6c9867604813688eaf344"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 5,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_002/microphone_05.wav",
+      "pcm16_sha256": "b4e7d4ebb47c3a1ab7b4b8f3b3370dead8a92ae11575dbaf523726bf0c22633b",
+      "row": 2,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "8ddf94bb62d8f96c78111c3374c3ce6395c4d77f6a40b49cf7b8da743358d252"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 6,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_002/microphone_06.wav",
+      "pcm16_sha256": "f20720549cf05a60950afee8dc71706ecf22d4dca769e279fe8fd54468bf1a4d",
+      "row": 2,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "af8c0b03c395b6071f15ff884f34a92cea9f6b1af7d781b844f54b3b99489ac6"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 7,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_002/microphone_07.wav",
+      "pcm16_sha256": "6183a01a34962e8d331649cfb428848fdbe808870e7205ecf80ac647adb45c1a",
+      "row": 2,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "9ec89049cdfeb9e5397a96008fa24fdcc1f51a90ba3c5da450caa97bda3fc102"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 8,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_002/microphone_08.wav",
+      "pcm16_sha256": "989c1acc27484b7d39962c87d99d38e7f08ea8c81bdea950cb6a1053fc72403c",
+      "row": 2,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "7c80691eefd708d88d24d71fe6253c8c1a4509b7630e034c3993bf154d1a17fa"
+    },
+    {
+      "array": "music_audio.npy",
+      "channel": 9,
+      "frame_count": 672000,
+      "origin_frame": 0,
+      "path": "wav/row_002/microphone_09.wav",
+      "pcm16_sha256": "4c658c7c1035e4c4fe6d73a792967cb16739f777f64c0902c7cb6757cc7c4cda",
+      "row": 2,
+      "sample_rate_hz": 48000,
+      "wav_bytes": 1344044,
+      "wav_sha256": "65879f2a9a10ebe38579704facdf74a30966ab38d34b2424750b91d4fdab8b80"
+    }
+  ]
+}

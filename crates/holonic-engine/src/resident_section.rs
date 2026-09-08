@@ -95,6 +95,8 @@ mod surface_intervention;
 mod surface_mount;
 #[path = "resident_section/surface_passage.rs"]
 mod surface_passage;
+#[path = "resident_section/surface_phase_difference.rs"]
+mod surface_phase_difference;
 #[path = "resident_section/surface_shapes.rs"]
 mod surface_shapes;
 #[path = "resident_section/surface_tiled.rs"]
@@ -116,6 +118,8 @@ const METAL_SOURCE: &str = concat!(
     include_str!("../../../accelerators/metal/field_entry.metal"),
     "\n",
     include_str!("../../../accelerators/metal/phase_convolution.metal"),
+    "\n",
+    include_str!("../../../accelerators/metal/phase_difference.metal"),
 );
 
 /// The exact accumulator the kernels carry, read off `__int128`; one octave is the hand.
@@ -149,7 +153,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 52] = [
+pub const KERNELS: [&str; 54] = [
     "section_constitutive_field",
     "section_constitutive_field_rechart",
     "section_constitutive_rechart",
@@ -216,6 +220,8 @@ pub const KERNELS: [&str; 52] = [
     "section_contract_partial_r1_l32",
     "section_contract_partial_r4_l32",
     "section_contract_join",
+    "section_phase_difference_validate",
+    "section_phase_difference_products",
 ];
 
 /// `CUdevice_attribute` selectors from `cuda.h`, fixed by the foreign interface.

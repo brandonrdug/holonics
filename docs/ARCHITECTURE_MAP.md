@@ -63,6 +63,16 @@ normalization and publication; these remain one native passage.
 Both operand carriers remain borrowed and the complete causal tail returns. This is one declared
 temporal action; useful learned acoustic conduct and general material composition remain open.
 
+[established-bounded; implemented-exact] `phase_current::resident::{compare_resident,
+ResidentPhaseDifference}` returns the full oriented difference on exact common receiver/clock
+support, borrowing both operands and retaining excluded support. Its binding is
+`resident_section/surface_phase_difference.rs`, with CUDA `kernels/phase_current_difference.cuh`
+and Metal `accelerators/metal/phase_difference.metal`; it reuses the existing convolution
+normalization and publication. `recorded_acoustic_return` attaches actual PCM excitation/receiver
+channels, while `fetch_soundcam.py` and `compare_recorded_acoustic_return.py` own exterior
+acquisition and independent comparison. The [measured-return record](../research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md)
+states the initial unit-response scope and remaining generator development.
+
 [established-bounded; measured] `native::recorded` exposes
 `native/speech/{recorded.rs,recorded/sections.rs}` for source/target pointer resolution, exact
 annotation-to-PCM bounds and `RecordedResponseSections::bind`. It uses

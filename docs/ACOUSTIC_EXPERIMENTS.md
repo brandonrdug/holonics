@@ -30,6 +30,28 @@ sound model or timed waveform emission; productive recorded development remains 
 
 ## Shared material field and profiling
 
+[definition] Actual simultaneous playback/receiver evidence is now available through the
+selective SoundCam acquisition. Raw electrical loopback is the excitation witness; microphone
+channels keep the same 48 kHz recording clock. The initial unit-response example returns the
+full native `observed - predicted` current, with an exact section and cold stereo PCM projection.
+Its output is a measured defect, not a fitted acoustic model. The
+[return record](../research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md)
+retains data provenance, source qualification, native checks and actual scope.
+
+```sh
+SSL_CERT_FILE=/etc/ssl/cert.pem python3 research/experiments/apple_silicon/fetch_soundcam.py
+cargo build -p holonics-hna --example recorded_acoustic_return
+target/debug/examples/recorded_acoustic_return .local/datasets/soundcam/wav/row_000/loopback.wav .local/datasets/soundcam/wav/row_000/microphone_00.wav NEW_RETURN.json .local/experiments/NEW_RETURN
+python3 research/experiments/apple_silicon/compare_recorded_acoustic_return.py .local/datasets/soundcam/acquisition.json NEW_RETURN.json --output NEW_COMPARISON.json
+```
+
+[definition] The report/output directory must be new. This command declares the two raw files
+as simultaneous channels with origin zero; it estimates no delay and applies no resampling.
+`compare_resident` also supports integral origin offsets and reports both excluded populations.
+Its subtraction stays native until the cold terminal receiver. The source-qualified observer
+compares WAVs against the original NPY selectors and checks every prediction/difference
+coordinate, clock, PCM sample and reconstruction residual. It supplies no target to development.
+
 [established-bounded; implemented-exact] `holonics_hna::native::acoustic_field::AcousticFieldChart`
 now supplies complete timed coefficient fields to the shared `NativeConstitutiveField` used by
 the desktop material work. The field performs one joint operation, retaining both complex outgoing

@@ -88,6 +88,12 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
    digital gain. The v5 recorded study compares the retained earlier and successor conditions
    across a whole recording. The digital two-tap law remains an explicit experimental control;
    next attach actual acoustic material/receiving conditions and persistent generative standing.
+   The [measured-return construction](../../research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md)
+   now provides actual simultaneous electrical-loopback/microphone evidence from SoundCam and a
+   resident oriented temporal difference. It preserves common support and leaves unmatched tails
+   unobserved. Next use the measured return in the declared acoustic action's condition/contact
+   law, retaining noise and unmodelled transport instead of supplying an invented exact target.
+   The initial unit-response comparison does not itself develop the generator.
 3. Develop and retain acoustic generative standing across source-qualified recordings and
    actual joined returns, then conduct its native emission into the declared acoustic receiver.
    Inspect perception differences and generated sound, preserve the declared reconstruction

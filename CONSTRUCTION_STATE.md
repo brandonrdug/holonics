@@ -10,6 +10,13 @@ instruction governs.
 
 ## Parallel MacBook position
 
+[established-bounded; measured] The [measured acoustic return](research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md)
+now retains full oriented differences for three actual 14-second SoundCam loopback/microphone
+pairs on their original clocks. Nineteen native controls and all-coordinate source-qualified
+comparisons pass. Prediction/difference take about 2.4 s together; cold audio export takes
+14.4–14.7 s, with 139.8 MB peak native residency. The initial unit response remains a baseline;
+using measured differences to develop the acoustic generator is next. AS4–AS5 stay active.
+
 [established-bounded; measured] The [conditional restart return](research/records/2026-09-07_THE_RECORDED_CONDITIONAL_ACTION_CONTINUES_AFTER_RESTART.md)
 now persists the learned local relation, actual condition and complete field history/capabilities.
 Seventeen focused controls and three recorded processes return; cold comparisons verify both

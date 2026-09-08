@@ -72,6 +72,7 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/exact_resident_section.cu");
     println!("cargo:rerun-if-changed=kernels/constitutive_condition_preimage.cuh");
     println!("cargo:rerun-if-changed=kernels/phase_current_convolution.cuh");
+    println!("cargo:rerun-if-changed=kernels/phase_current_difference.cuh");
     println!("cargo:rerun-if-changed=kernels/constitutive_condition_image.cuh");
     println!("cargo:rerun-if-changed=kernels/constitutive_condition_contact.cuh");
     println!("cargo:rerun-if-changed=kernels/constitutive_field.cuh");

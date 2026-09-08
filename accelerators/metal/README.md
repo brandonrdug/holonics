@@ -27,6 +27,12 @@ precedes arithmetic, and no output is admitted after any refusal. The Rust owner
 operands and device workspace until completion. This changes placement, not temporal support
 or native grain, and requires no intermediate numerical readback.
 
+[definition] `phase_difference.metal` receives predicted and observed rational currents over
+their declared common temporal support. It validates both full views, computes the oriented
+coordinate difference with one common denominator, and reuses convolution normalization and
+publication. Independent product lanes have disjoint workspace coordinates. The Rust receiver
+retains both operands and excludes unmatched support explicitly; missing observations are not zeros.
+
 [definition] Build arithmetic apparatus explicitly; the probe kernels are absent from production:
 
 ```sh

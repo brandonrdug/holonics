@@ -97,17 +97,16 @@ kernel void section_phase_convolution(
     uint source_last = min(target, source_raw_count - 1u);
     for (uint source = source_first; source <= source_last; ++source) {
       uint response = target - source;
-      W product[3];
-      field_phase_product(fromword(source_lo[source_at + 2u * source]),
-                fromword(source_lo[source_at + 2u * source + 1u]), source_den,
-                fromword(response_lo[response_at + 2u * response]),
-                fromword(response_lo[response_at + 2u * response + 1u]), response_den,
-                product, slot);
-      if (*slot)
-        return;
-      W factor = wdiv(common, product[2], slot);
-      real = field_add_checked(real, field_product_checked(product[0], factor, slot), slot);
-      imaginary = field_add_checked(imaginary, field_product_checked(product[1], factor, slot), slot);
+      W ar = fromword(source_lo[source_at + 2u * source]);
+      W ai = fromword(source_lo[source_at + 2u * source + 1u]);
+      W br = fromword(response_lo[response_at + 2u * response]);
+      W bi = fromword(response_lo[response_at + 2u * response + 1u]);
+      W product_real = field_sub_checked(field_product_checked(ar, br, slot),
+                                         field_product_checked(ai, bi, slot), slot);
+      W product_imaginary = field_add_checked(field_product_checked(ar, bi, slot),
+                                              field_product_checked(ai, br, slot), slot);
+      real = field_add_checked(real, product_real, slot);
+      imaginary = field_add_checked(imaginary, product_imaginary, slot);
       if (*slot)
         return;
     }
@@ -241,19 +240,16 @@ kernel void section_phase_convolution_products(
   W real = wzero(), imaginary = wzero();
   for (uint source = source_first; source <= source_last; ++source) {
     uint response = gid - source;
-    W product[3];
-    field_phase_product(
-        fromword(source_lo[(ulong)source_at + 2ul * (ulong)source]),
-        fromword(source_lo[(ulong)source_at + 2ul * (ulong)source + 1ul]), source_den,
-        fromword(response_lo[(ulong)response_at + 2ul * (ulong)response]),
-        fromword(response_lo[(ulong)response_at + 2ul * (ulong)response + 1ul]), response_den,
-        product, slot);
-    if (*slot)
-      return;
-    W factor = wdiv(common, product[2], slot);
-    real = field_add_checked(real, field_product_checked(product[0], factor, slot), slot);
-    imaginary = field_add_checked(imaginary,
-                                 field_product_checked(product[1], factor, slot), slot);
+    W ar = fromword(source_lo[(ulong)source_at + 2ul * (ulong)source]);
+    W ai = fromword(source_lo[(ulong)source_at + 2ul * (ulong)source + 1ul]);
+    W br = fromword(response_lo[(ulong)response_at + 2ul * (ulong)response]);
+    W bi = fromword(response_lo[(ulong)response_at + 2ul * (ulong)response + 1ul]);
+    W product_real = field_sub_checked(field_product_checked(ar, br, slot),
+                                       field_product_checked(ai, bi, slot), slot);
+    W product_imaginary = field_add_checked(field_product_checked(ar, bi, slot),
+                                            field_product_checked(ai, br, slot), slot);
+    real = field_add_checked(real, product_real, slot);
+    imaginary = field_add_checked(imaginary, product_imaginary, slot);
     if (*slot)
       return;
   }

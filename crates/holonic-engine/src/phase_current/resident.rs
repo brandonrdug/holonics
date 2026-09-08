@@ -16,7 +16,14 @@ pub enum ResidentPhaseCurrentError {
     Chart(#[from] PhaseCurrentError),
     #[error(transparent)]
     Native(#[from] ConstitutiveFibreError),
+    #[error("temporal observations have no common sampled support")]
+    NonOverlappingSupport,
+    #[error("temporal observation origins do not align on their shared sample clock")]
+    UnalignedSupport,
 }
+
+mod difference;
+pub use difference::{compare_resident, PhaseComparisonSupport, ResidentPhaseDifference};
 
 impl From<ResidentRefusal> for ResidentPhaseCurrentError {
     fn from(value: ResidentRefusal) -> Self {

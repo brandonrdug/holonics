@@ -1,0 +1,29 @@
+{
+  "all_refused": true,
+  "controls": [
+    {
+      "control": "clock",
+      "refused": true,
+      "comparison_line": 70,
+      "condition": "assert rate == claimed[\"sample_rate\"] == pair[\"sample_rate_hz\"]"
+    },
+    {
+      "control": "hot-readout",
+      "refused": true,
+      "comparison_line": 110,
+      "condition": "assert stage[\"section_readouts\"] == stage[\"numerical_egress_octets\"] == stage[\"ingress_octets\"] == 0"
+    },
+    {
+      "control": "exact-tail",
+      "refused": true,
+      "comparison_line": 45,
+      "condition": "assert np.array_equal(coordinates * (32768 // den), expected)"
+    },
+    {
+      "control": "pcm-sample",
+      "refused": true,
+      "comparison_line": 104,
+      "condition": "assert pcm_rate == rate and np.array_equal(actual_pcm, expected_pcm)"
+    }
+  ]
+}
