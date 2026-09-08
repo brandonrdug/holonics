@@ -233,6 +233,14 @@ and reconstruction testimony are retained.
 
 ## 9. Lattice, crystal, fractal, and lightning are distinct morphology regimes
 
+[project-postulate] Brandon's September 8 clarification makes the generative reading explicit:
+fractals concern recurring laws, causal parameters, restriction/rebase and intersections that
+produce geometry. The proposed transport-tube lattice joins local sections, curved passage,
+branching and return; it is not a demand for a rendered fractal or a new named subsystem.
+The [generator/tube synthesis](../../research/records/2026-09-08_FRACTAL_GENERATORS_AND_LATENT_REASONING.md)
+connects the existing tube and clocked-span owners, classification constraints and quantum
+phase receivers to the active construction, including the latent-reasoning paper's bounded scope.
+
 `interpretation`:
 
 ```text

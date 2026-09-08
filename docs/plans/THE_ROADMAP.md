@@ -38,9 +38,21 @@ pins the refreshed Apple branch comparison.
 
 ## Athena-alpha: corrected AC0–AC5 order
 
-[definition] Construction remains paused during delivery of the requested plan/theory revision.
-The prior product authorization stands; no additional approval gate is introduced here. On
-resumption, **start at AC1 step 1**. Each work update names phase/step, actual artifact and returned
+[established-bounded; measured] The [normalized receiver](../../research/records/2026-09-08_AC1_THE_NORMALIZED_RECEIVER_RETURNS_ITS_COMPLETE_CURRENT_AND_TWO_METRIC_FACES.md)
+returns resident p/q/difference and its Jacobian pullback, with three native controls and actual
+model evidence. It does not yet change morphology. Ordinary constitutive generation now carries
+supported point currents through native ingress; four SDK controls pass. Next compose the
+appropriate metric return with the producing ecology and the complete finite successor.
+
+[project-postulate] Brandon's [generator/tube clarification](../../research/records/2026-09-08_FRACTAL_GENERATORS_AND_LATENT_REASONING.md)
+and [active-interior/flux continuation](../../research/records/2026-09-08_BOUNDARY_FLUX_COUPLES_ACTIVE_INTERIORS_AND_TOLERANCE_IS_RECEIVER_RELATIVE.md)
+are part of AC1's return, path and reuse work and wider mathematics. Compose existing span/tube,
+reflection, entropy/action and quantum-path owners. Locality follows actual receiver decay and
+complete population bounds, not an arbitrary radius, discarded current or basin-entropy governor.
+
+[project-postulate] Brandon has resumed completion of AC0–AC5 as the active goal and explicitly
+directs flexible designs and transparent reporting when a composition does not work.
+**Current work: AC1 producing-interior return after the normalized receiver.** Each work update names phase/step, actual artifact and returned
 consequence. Do not resume the preserved joint kernel by default or restart completed foundations.
 
 | Phase | Ordered construction | Return required |

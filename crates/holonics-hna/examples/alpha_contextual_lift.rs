@@ -11,6 +11,38 @@ use holonics_hna::{
 use serde_json::json;
 use std::{io::Write, path::PathBuf, time::Instant};
 
+fn normalized_returns(
+    path: PathBuf, occurrences: Vec<usize>, group_width: usize, output: PathBuf,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let start=Instant::now();
+    let saved=SavedTextField::read(&path)?;
+    let mut result=saved.with_session(|session,_,_,_| {
+        let field=session.field();let count=field.occurrence_count();let mut returns=Vec::new();
+        for at in occurrences.iter().copied() {
+            let before=field.census();let clock=Instant::now();
+            let returned=field.normalized_material_return(at,group_width,holonic_engine::resident_section::SeriesAperture(32))?
+                .ok_or_else(||AlphaMaterialError::Apparatus(format!("occurrence {at} has no received material prediction")))?;
+            let seconds=clock.elapsed().as_secs_f64();let after=field.census();
+            let reading=returned.inspect()?;
+            if after.section_read_outs!=before.section_read_outs || field.occurrence_count()!=count {
+                return Err(AlphaMaterialError::Apparatus("receiver read numerical current or changed recurrence".into()));
+            }
+            returns.push(json!({"reading":reading,"resident_seconds":seconds,
+                "resident_deeds":after.deed_launches-before.deed_launches,
+                "numerical_section_readouts":after.section_read_outs-before.section_read_outs,
+                "native_ingress_octets":after.ingress_octets-before.ingress_octets}));
+        }
+        Ok(json!({"schema":"holonics.normalized-material-return.v1","model":path,
+            "field_cut":count,"group_width":group_width,"returns":returns,
+            "morphology_changed":false,"language_quality_established":false}))
+    })?;
+    result["whole_wall_seconds"]=json!(start.elapsed().as_secs_f64());
+    publish_new(&output,|file|file.write_all(&serde_json::to_vec_pretty(&result)?))?;
+    println!("{}",json!({"report":output,"field_cut":result["field_cut"],
+        "returns":result["returns"].as_array().map(Vec::len),"whole_wall_seconds":result["whole_wall_seconds"]}));
+    Ok(())
+}
+
 fn operative_contacts(path: PathBuf, output: PathBuf) -> Result<(), Box<dyn std::error::Error>> {
     let start = Instant::now();
     let saved = SavedTextField::read(&path)?;
@@ -104,6 +136,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let selection = args
         .next()
         .ok_or("receiving occurrences or --material-history required")?;
+    if selection=="--normalized-return" {
+        let occurrences=args.next().ok_or("receiving occurrences required")?
+            .split(',').map(str::parse::<usize>).collect::<Result<Vec<_>,_>>()?;
+        if args.next().as_deref()!=Some("--group-width"){return Err("--group-width required".into());}
+        let group=args.next().ok_or("group width required")?.parse()?;
+        if args.next().as_deref()!=Some("--report"){return Err("--report required".into());}
+        let output=PathBuf::from(args.next().ok_or("report destination required")?);
+        if args.next().is_some()||output.exists(){return Err("unexpected arguments or existing destination".into());}
+        return normalized_returns(path,occurrences,group,output);
+    }
     if selection == "--material-history" || selection == "--operative-contacts" {
         if args.next().as_deref() != Some("--report") {
             return Err("--report required".into());

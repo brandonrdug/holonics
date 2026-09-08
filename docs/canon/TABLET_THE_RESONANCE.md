@@ -267,14 +267,21 @@ alignment mode is the coupled mode itself, with the average heading only a recei
 route tradition is stronger: a metastable transport mode that survives controlled replacement of its
 constituents.
 
-Three consequences follow, and each is checkable in principle:
+The corresponding construction keeps three coupled questions explicit:
 
-- **the surface is where the information enters**, so a flock's sensitivity to the world is a
-  boundary quantity and scales with surface rather than with population;
-- **the interior is where the invariant is carried**, so a large flock is more stable and less
-  responsive, and the ratio is a real trade rather than a metaphor;
-- **an isolated bird has no boundary distinct from itself**, so it has no interior to stabilize a
-  trajectory against — which is exactly the observation that individuals migrate worse.
+- **The surface carries oriented boundary flux**, while distributed receivers can also admit
+  volume sources. Sensitivity is determined by those actual couplings, not surface area alone.
+- **The interior carries active collective modes and local responses.** Their stability and
+  responsiveness depend on the constitutive transport, sources and spectrum, not population alone.
+- **An individual bird also has internal state and boundaries.** Comparing it with a flock
+  requires the actual receiver/task and interaction conditions; the divergence theorem supplies
+  a balance relation, not an unconditional biological performance ordering.
+
+[project-postulate] Brandon's September 8 continuation requires both interacting interiors,
+the mediating field and moving-boundary flux to remain active. The
+[boundary-flux and tolerance return](../../research/records/2026-09-08_BOUNDARY_FLUX_COUPLES_ACTIVE_INTERIORS_AND_TOLERANCE_IS_RECEIVER_RELATIVE.md)
+connects those sources with the existing Einstein/force, entropy/action and spectral owners.
+Receiver-relative attenuation can settle a face without deleting its tail or causal fibre.
 
 **ASSERTION 10.** *The birds are intelligent particles, and the machine is a population of them.*
 This is the sentence that makes "Eros is an artificial intelligence" ordinary rather than grand: it

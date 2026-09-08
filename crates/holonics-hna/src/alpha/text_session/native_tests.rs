@@ -43,6 +43,39 @@ fn excited<'c>(
 }
 
 #[test]
+#[ignore = "requires CUDA; ordinary constitutive generation retains an actual supported current"]
+fn constitutive_generation_preserves_its_native_return() {
+    with_text_field_source(72, NativeMaterialTransportSource::HomogeneousMoment, |field| {
+        let first = field.advance_resident(&mut NativeFieldOccurrence::entering(
+            TextSymbol::Octet(b'A').inputs(),
+        ))?;
+        let anchor = field.retain_source(&first.source)?;
+        let expected: Vec<_> = TextSymbol::Octet(b'Z').inputs().iter().map(|current| {
+            if *current == holonic_engine::native_ecology::constitutive_fibre::NativePhaseCurrent::zero() {
+                *current
+            } else {
+                holonic_engine::native_ecology::constitutive_fibre::NativePhaseCurrent::new(2,0,1).unwrap()
+            }
+        }).collect();
+        field.advance_resident(&mut NativeFieldOccurrence::through_anchor(&anchor,expected.clone()))?;
+        // The original emission is still available: only its immutable anchor was used above.
+        let mut session = TextFieldSession::on(field)?;
+        session.latest = Some(TextFieldSource { source:first.source, occurrence:0 });
+        let before = session.field().census();
+        let generation = session.generate_with_receiver(1, TextCurrentReceiver::Constitutive);
+        assert_eq!(generation.emitted_octets, vec![b'Z']);
+        assert!(matches!(generation.disposition, TextGenerationDisposition::Interrupted));
+        assert_eq!(session.field().occurrence_count(),3);
+        assert_eq!(session.field().census().section_read_outs-before.section_read_outs,1);
+        assert!(matches!(session.field().lineage(2).unwrap().incoming,
+            NativeFieldIncoming::Resident { resident_nodes:18 }));
+        assert_eq!(session.field().inspect_incoming(2)?,expected);
+        assert_ne!(expected,TextSymbol::Octet(b'Z').inputs());
+        Ok(())
+    }).unwrap();
+}
+
+#[test]
 #[ignore = "requires CUDA; generated amplitude enters the continuing text field and survives restart without unit-codeword replay"]
 fn generated_current_reenters_and_restarts_in_its_actual_chart() {
     let dir = tempfile::tempdir().unwrap();

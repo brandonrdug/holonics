@@ -1,0 +1,39 @@
+{
+  "model": ".local/artifacts/athena-alpha/ac2-operative-context/first-eight-v1.hna",
+  "field_cut": 1930,
+  "group_width": 2,
+  "whole_wall_seconds": 9.162621787,
+  "returns": [
+    {
+      "source": 0,
+      "receiving": 1,
+      "resident_deeds": 1,
+      "resident_seconds": 0.000482454,
+      "numerical_section_readouts": 0,
+      "certified_nonzero_coordinates": 18,
+      "squared_euclidean_pullback_norm_lower": "5357671530407340449321289971380263645087405/22300745198530623141535718272648361505980416"
+    },
+    {
+      "source": 19,
+      "receiving": 20,
+      "resident_deeds": 1,
+      "resident_seconds": 0.000404458,
+      "numerical_section_readouts": 0,
+      "certified_nonzero_coordinates": 18,
+      "squared_euclidean_pullback_norm_lower": "3151720579813853108406737250369089669898723/22300745198530623141535718272648361505980416"
+    },
+    {
+      "source": 1599,
+      "receiving": 1600,
+      "resident_deeds": 1,
+      "resident_seconds": 0.000404678,
+      "numerical_section_readouts": 0,
+      "certified_nonzero_coordinates": 18,
+      "squared_euclidean_pullback_norm_lower": "220688070106816670756731719807945221107377/2787593149816327892691964784081045188247552"
+    }
+  ],
+  "morphology_changed": false,
+  "language_quality_established": false,
+  "full_private_report": ".local/artifacts/athena-alpha/ac1-normalized-receiver/actual-return-v1.json",
+  "command": "target/debug/examples/alpha_contextual_lift .local/artifacts/athena-alpha/ac2-operative-context/first-eight-v1.hna --normalized-return 1,20,1600 --group-width 2 --report .local/artifacts/athena-alpha/ac1-normalized-receiver/actual-return-v1.json"
+}

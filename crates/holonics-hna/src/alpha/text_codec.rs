@@ -4,6 +4,7 @@ use super::material::{AlphaMaterialError, with_matched_field_profile};
 use holonic_engine::native_ecology::constitutive_fibre::{
     NativeConstitutiveField, NativeFieldDifferentialReading, NativeFieldJunctionSolver,
     NativeFieldSourceAnchor, NativeMaterialTransportSource, NativePhaseCurrent,
+    ResidentConstitutiveReturn,
 };
 use serde::Serialize;
 
@@ -110,6 +111,12 @@ pub fn read_constitutive_text_symbol(
         ));
     }
     let returned = field.read_constitutive_source(source)?;
+    present_constitutive_text_return(&returned)
+}
+
+pub(super) fn present_constitutive_text_return(
+    returned: &ResidentConstitutiveReturn<'_>,
+) -> Result<TextCodeReading, AlphaMaterialError> {
     Ok(from_differential(
         returned
             .read_differential_pairs(0, TEXT_BIT_PAIRS)?

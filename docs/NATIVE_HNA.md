@@ -13,6 +13,15 @@ states its bounded scope. Native checkpoints retain the complete phase ecology a
 application-bearing checkpoints also retain the independent world and pending interaction. A seed,
 JSON report or relation inspection is **not a learned-model checkpoint**.
 
+## Source-qualified normalized material receiver
+
+[established-bounded; measured] `NativeConstitutiveField::normalized_material_return` returns
+resident p/q, q-p and `J_p(q-p)` over declared complete material groups. It takes the prediction
+from the receiving occurrence's actual source and retains both complex reports and lineages.
+`inspect` is a separate cold operation. The [record](../research/records/2026-09-08_AC1_THE_NORMALIZED_RECEIVER_RETURNS_ITS_COMPLETE_CURRENT_AND_TWO_METRIC_FACES.md)
+contains the native controls and actual conversation-model receipt. This is a receiver and its
+metric faces, not an already committed developmental change or useful text product.
+
 ## Resident local relation composition
 
 [established-bounded; measured] The same owner now admits an explicit two-current contact through

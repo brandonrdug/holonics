@@ -1,14 +1,43 @@
 # Construction state
 
-**Currency:** September 8, 2026. **Priority:** Revised AC0–AC5 construction and complex-fluid toolkit; native execution remains paused.
-**Position:** AC0 complete; next construction AC1 step 1 (normalized receiver/current attachment); AC2 failed probes; AC3 apparatus only; AC4–AC5 open.
+**Currency:** September 8, 2026. **Priority:** AC0–AC5 completion resumed by Brandon; flexible native construction with transparent failures.
+**Position:** AC0 complete; AC1 normalized receiver returned at bounded scope, producing-interior attachment next; AC2 failed probes; AC3 apparatus only; AC4–AC5 open.
 **Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct
 instruction governs.
 
-## Current direction and paused HNN work
+## Current HNN construction
+
+[established-bounded; measured] The [normalized material receiver](research/records/2026-09-08_AC1_THE_NORMALIZED_RECEIVER_RETURNS_ITS_COMPLETE_CURRENT_AND_TWO_METRIC_FACES.md)
+now computes grouped p/q faces, their difference and the probability-Jacobian pullback on device
+from actual source-qualified material reports. Three focused CUDA controls pass. On the saved
+1,930-occurrence model, all three inspected returns have 18 certified nonzero pullback coordinates,
+one deed and zero numerical readouts during construction, at about 0.4–0.5 ms each. No morphology
+or language output changed in that observer. Next is the producing-interior return and finite
+successor, with relative-entropy and Euclidean-probability metrics kept distinct.
+
+[established-bounded; measured] Ordinary constitutive generation now retains a supported native
+point return through existing current ingress, preserving amplitude/phase with one terminal
+reading. Four SDK native controls pass, including restart and pending-source preservation.
+A plural fibre's fixed exterior word remains an explicit word observation. The default material
+receiver's ball still lacks point ingress; its centre is not selected. This repair does not claim
+that the actual conversation model has gained useful language.
+
+[project-postulate] The [fractal/generator and tube synthesis](research/records/2026-09-08_FRACTAL_GENERATORS_AND_LATENT_REASONING.md)
+incorporates Brandon's generator, tube-lattice and quantum-fibre clarifications. The
+[boundary-flux return](research/records/2026-09-08_BOUNDARY_FLUX_COUPLES_ACTIVE_INTERIORS_AND_TOLERANCE_IS_RECEIVER_RELATIVE.md)
+joins moving boundaries, both active interiors, momentum impulse, entropy/action and force-sector
+scope, receiver-conditioned decay and modular spectral transport. Fixed paired-contact kernel
+modes are undamped; material-receiver backreaction must reach the relevant interior. No fractal
+basin has been measured for Athena and no new universal physical-force identity is claimed.
+
+[project-postulate] Brandon has explicitly resumed completion of AC0–AC5 as a goal. The plan is
+revisable: report concrete mismatches promptly, replace a shallow design when evidence warrants,
+and inspect actual productive consequences. Current work composes the normalized receiver and
+returned current with the existing field; an unchanged output ordering is not a learning result.
+
 
 [established-bounded; source-inspected] The [AC0–AC5 blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 is now revised phase by phase, with actions, owners, artifacts and proportionate checks.
@@ -99,7 +128,7 @@ the retired database stays unused.
 [definition] The Mac's committed shared generator/condition owners and
 [Metal boundary](docs/HARDWARE_AND_MODALITY_BOUNDARIES.md#conditional-generator-port-for-the-mac-workflow)
 remain available for separate research. The new fluid generator is mathematical material, not
-an Apple implementation or a demonstrated general acoustic learner. Desktop cultivation is paused.
+an Apple implementation or a demonstrated general acoustic learner. Desktop construction has resumed under the AC0–AC5 goal.
 
 [established-bounded; measured] [AC0](research/records/2026-09-06_AC0_THE_CONVERSATIONS_ENTER_AS_SEPARATE_OCCURRENCES_AND_THE_COLD_CURSOR_RESTARTS.md)
 retains the 184,572,827-byte private stream: 36,920 families, with 34,046 development / 1,121

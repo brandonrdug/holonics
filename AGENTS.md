@@ -38,8 +38,8 @@ mathematical and physical framework; its purpose is not exhausted by Athena or M
 endpoints. Recover the established classical ML, softmax/sigmoid, adjoint, reflection, leader,
 fractal-packing and compression constructions before declaring missing theory or founding another
 mechanism. The [framework synthesis](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) connects their actual
-owners and scopes. Native work is paused for the current review; only the roadmap schedules its
-resumption. A universal intelligence theorem or a Millennium solution is not a prerequisite for
+owners and scopes. Brandon has resumed the AC0–AC5 completion goal and directs flexible
+construction with transparent failures; the roadmap carries the current step. A universal intelligence theorem or a Millennium solution is not a prerequisite for
 using already-derived local mechanics in a productive construction.
 
 [project-postulate] Use **HNN — Holonic Neural Network** in current prose. Preserve existing

@@ -3,8 +3,8 @@
 **Authority:** Brandon's September 6 instruction to design and deposit this blueprint, update the
 roadmap and position, then immediately construct and complete it as a goal.
 **Status:** AC0–AC5 revised September 8 after the breadth synthesis; AC0 complete, AC1 unfinished,
-AC2 language probes failed. Current delivery is the requested plan/theory revision; native
-construction remains paused. **Order:** [the roadmap](THE_ROADMAP.md).
+AC2 language probes failed. Brandon has resumed construction through completion as a goal,
+with explicit flexibility to revise designs when evidence warrants. **Order:** [the roadmap](THE_ROADMAP.md).
 **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 
 ## 1. The required product
@@ -379,10 +379,25 @@ that product milestone.
 
 ## 6. Execution, research and branch coordination
 
-[definition] **Current entry point: AC1 step 1, the normalized receiver/current attachment.**
-Construction remains paused while this requested plan/theory revision is delivered. The original
-product authorization remains standing; this document creates no new approval gate. On resumed
-execution, complete the next native attachment and inspect its actual consequence before taking
+[project-postulate] Brandon's subsequent fractal/tube clarification is incorporated into AC1's
+return and path/reuse steps through the
+[generator/tube synthesis](../../research/records/2026-09-08_FRACTAL_GENERATORS_AND_LATENT_REASONING.md).
+Recover recurring generator laws and their causal parameters, transported transverse sections,
+ordered restriction/rebase and joining constraints. Retain full discrepancies and the separate
+metric pullbacks; a quiet derivative or stable decoded face is not automatically a settled
+relation. Basin/stability probes answer a specific failure, never govern learning through an
+authored entropy threshold. Use existing tube/span owners at their domains; no new tube engine
+or large fractal sampling campaign is scheduled.
+
+[definition] **Current entry point: AC1 step 2, the producing-interior return and finite successor.**
+The [normalized receiver](../../research/records/2026-09-08_AC1_THE_NORMALIZED_RECEIVER_RETURNS_ITS_COMPLETE_CURRENT_AND_TWO_METRIC_FACES.md)
+has returned resident source-qualified faces and metric covectors with actual-model evidence.
+Its full r is also the relative-entropy potential return; `J_p*r` belongs to squared probability
+discrepancy. Preserve both and use the declared metric. The receiver is not yet a committed
+morphology update. Supported point constitutive generation now uses native current ingress;
+material-ball ingress remains a separate obligation.
+Brandon has resumed the completion goal. Treat this sequence as a revisable working design;
+report a concrete failed connection and change it when evidence warrants. In execution, complete the next native attachment and inspect its actual consequence before taking
 on unrelated infrastructure. A concrete failure may redirect the corresponding step; it does
 not authorize another day of unchanged probes or a growing list of disconnected ports.
 

@@ -1,6 +1,37 @@
 use super::*;
 
 impl<'chart> ResidentSurface<'chart> {
+    /// Reads the first material-current ball of prediction and the third ball of observation.
+    /// The field owner validates the complete report family before calling this prefix primitive.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_field_normalized_receiver(
+        &self, lane: &Lane<'_, 'chart>, prediction: &ResidentSection<'chart>,
+        observation: &ResidentSection<'chart>, nodes: usize, group_width: usize,
+        grain: u32, terms: SeriesAperture, output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || ResidentRefusal::Declaration {
+            operation: "field-normalized-receiver", what: "incompatible material receiver chart".into(),
+        };
+        let output_words = nodes.checked_mul(20).ok_or_else(fail)?;
+        let input_words = nodes.checked_mul(4).and_then(|n|n.checked_add(2)).ok_or_else(fail)?;
+        if nodes == 0 || nodes > u32::MAX as usize / 20 || group_width == 0
+            || nodes % group_width != 0 || !(1..=120).contains(&grain)
+            || terms.0 == 0 || terms.0 == u32::MAX
+            || prediction.rows != 1 || prediction.width < input_words
+            || observation.rows != 1 || observation.width < 3 * input_words
+            || output.rows != 1 || output.width != output_words
+            || [prediction,observation,output].iter().any(|s|s.grain.0!=0) {
+            return Err(fail());
+        }
+        let mut params=Params::new();
+        params.ptr(prediction.lo.device_ptr()).ptr(observation.lo.device_ptr())
+            .u32(nodes as u32).u32(group_width as u32).u32(grain).u32(terms.0)
+            .ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_field_normalized_receiver",nodes/group_width,
+            self.declaration.warp_size.max(1),0,&mut params,"field-normalized-receiver")
+    }
+
     pub(crate) fn record_complete_material_source_reading(
         &self,
         lane: &Lane<'_, 'chart>,

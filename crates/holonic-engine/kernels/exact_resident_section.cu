@@ -1629,6 +1629,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "field_context_section.cuh"
 #include "field_material_mode.cuh"
 #include "field_differential_receiver.cuh"
+#include "field_normalized_receiver.cuh"
 #include "constitutive_field.cuh"
 
 // Candidate finite passive-contact projection.  One block owns one query row and first forms the

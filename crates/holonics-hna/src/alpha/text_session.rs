@@ -4,7 +4,7 @@
 use super::{
     material::AlphaMaterialError,
     text_codec::{
-        read_constitutive_text_symbol, read_text_symbol, TextCodeDisposition, TextCodeReading,
+        present_constitutive_text_return, read_text_symbol, TextCodeDisposition, TextCodeReading,
         TextSymbol, TEXT_INPUT_CHANNELS,
     },
 };
@@ -128,6 +128,19 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
                 "native current lies outside the text codeword chart".into(),
             )
         })?;
+        self.stage_presented_native_return(returned, symbol)?;
+        Ok(symbol)
+    }
+    // Both callers have read this immutable return's supported point and exact codeword.
+    // Keep that reading; generation must not issue a second identical terminal readout.
+    fn stage_presented_native_return(
+        &mut self,
+        returned: ResidentConstitutiveReturn<'chart>,
+        symbol: TextSymbol,
+    ) -> Result<(), AlphaMaterialError> {
+        if self.pending.is_some() || returned.target_width() != 2 * TEXT_INPUT_CHANNELS {
+            return Err(AlphaMaterialError::Apparatus("incompatible pending native return".into()));
+        }
         let occurrence = if let Some(anchor) = self.next_anchor.take() {
             NativeFieldOccurrence::through_anchor(&anchor, vec![])
         } else if let Some(previous) = self.latest.take() {
@@ -137,7 +150,7 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
         };
         self.pending = Some((symbol, occurrence));
         self.pending_native = Some(returned);
-        Ok(symbol)
+        Ok(())
     }
     pub fn receive_native_return(
         &mut self,
@@ -269,13 +282,21 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
                 );
                 break;
             };
+            let mut native_return = None;
             let received = match receiver {
                 TextCurrentReceiver::Material => read_text_symbol(self.field, latest.occurrence),
                 TextCurrentReceiver::Constitutive => self
                     .field
                     .retain_source(&latest.source)
                     .map_err(AlphaMaterialError::from)
-                    .and_then(|source| read_constitutive_text_symbol(self.field, &source)),
+                    .and_then(|source| {
+                        let returned = self.field.read_constitutive_source(&source)?;
+                        let reading = present_constitutive_text_return(&returned)?;
+                        if reading.native.constitutive_status == Some(NativeFieldReceiverStatus::Unique) {
+                            native_return = Some(returned);
+                        }
+                        Ok(reading)
+                    }),
             };
             let reading = match received {
                 Ok(reading) => reading,
@@ -303,7 +324,17 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
             if let TextSymbol::Octet(value) = symbol {
                 result.emitted_octets.push(value);
             }
-            if let Err(error) = self.receive(symbol) {
+            // A supported point return has an existing native ingress; keep its amplitude and
+            // phase instead of replacing it with the decoded codeword's unit impulses.
+            // A plural fibre may still have a fixed exterior word. That case remains an explicit
+            // word observation, not selection of a point from the unprovided native current.
+            let received = if let Some(returned) = native_return {
+                self.stage_presented_native_return(returned, symbol)
+                    .and_then(|_| self.retry_pending())
+            } else {
+                self.receive(symbol)
+            };
+            if let Err(error) = received {
                 result.disposition = TextGenerationDisposition::NativeRefusal(error.to_string());
                 break;
             }

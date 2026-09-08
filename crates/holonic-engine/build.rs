@@ -87,6 +87,7 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/balanced_field_factorization.cuh");
     println!("cargo:rerun-if-changed=kernels/field_material_transport.cuh");
     println!("cargo:rerun-if-changed=kernels/field_differential_receiver.cuh");
+    println!("cargo:rerun-if-changed=kernels/field_normalized_receiver.cuh");
     println!("cargo:rerun-if-changed=kernels/exact_quartic_realizers.cu");
     println!("cargo:rerun-if-changed=kernels/exact_eta_head.cu");
     if env::var("CARGO_CFG_TARGET_OS").as_deref() != Ok("linux") {

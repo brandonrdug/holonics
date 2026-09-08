@@ -1,6 +1,8 @@
 //! A declared terminal differential-current receiver. No alphabet, byte or completion symbol
 //! enters this native owner. Full current reports and numerical residuals remain in history.
 use super::*;
+mod normalized;
+pub use normalized::{NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn};
 
 impl ConstitutiveDifferentialReading {
     /// Convert an actually field-qualified relation receiver, preserving the historical source

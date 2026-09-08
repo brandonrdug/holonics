@@ -129,6 +129,20 @@ the corresponding compression. This gives concrete composition work, not a new s
 
 ## What the broader review changes about AC1
 
+[definition] The [boundary-flux and tolerance return](../research/records/2026-09-08_BOUNDARY_FLUX_COUPLES_ACTIVE_INTERIORS_AND_TOLERANCE_IS_RECEIVER_RELATIVE.md)
+adds the moving-boundary source, two-interior mechanical impulse/decay example, exact
+force/entropy scope and modular spectral placement. Fixed paired-contact kernel modes alternate
+without decay while the material receiver can still read them. Its reaction must reach that
+interior; a boundary reading alone does not implement this coupling. Receiver attenuation retains
+the complete population tail and future scope.
+
+[definition] The [fractal-generator and tube return](../research/records/2026-09-08_FRACTAL_GENERATORS_AND_LATENT_REASONING.md)
+adds the current nonlinear-dynamics source comparison and explicit generator/preimage geometry.
+It relates tube boundaries to field-restriction spans, towers to scale-compatible transport,
+constraint classification to a Galois connection, and unresolved quantum receivers to retained
+coherence. These are actual maps and conditional gluing laws, not a new subsystem. It also
+distinguishes a full normalized discrepancy from its possibly small Jacobian-weighted return.
+
 [established-bounded; source-inspected] AC1 currently composes phase transport, contextual
 material moments, paired reflection, operative current and source history. It also has a real
 bounded shared-drive generator quotient `q T_i=-q` and its material contribution; claiming that
@@ -157,7 +171,7 @@ adds the external theorem-scope comparison and an exact transported-phase Euler 
 Two initial fields with equal modal energies and mean covariance produce opposite new low-mode
 currents. The complete solution has a convergent generator unfolding; its recovery from limited
 observations remains an AC1 question. The external blowup claims have not been independently
-kernel-checked here. Machine-learning construction is paused for this mathematical work.
+kernel-checked here. Brandon subsequently resumed AC0–AC5; these results inform its construction.
 
 ## Standing distinction
 
