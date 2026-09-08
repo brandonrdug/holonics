@@ -30,6 +30,13 @@ microphone pairs on their original clocks. All-coordinate source-qualified compa
 Prediction/difference take about 2.4 seconds together; cold audio export takes 14.4–14.7 seconds,
 with 139.8 MB peak native residency. The initial unit response is still a baseline.
 
+[established-bounded; measured] The [producing-adjoint return](research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md)
+now returns those differences into the original response chart using the retained convolution.
+Twenty-three temporal controls, all three exact recorded comparisons and four negative observer
+controls pass. The adjoint takes 2.53–3.33 seconds per 14-second recording with zero numerical
+readback; the three native stages together take 4.50–5.79 seconds. The full condition-fibre contact
+and persistent acoustic update remain next; the unit response was not developed by this return.
+
 [established-bounded; measured] The [complete-recording action](research/records/2026-09-07_APPLE_CONDUCTS_COMPLETE_RECORDINGS_AND_RETURNS_TIMED_AUDIO.md)
 and [conditional restart](research/records/2026-09-07_THE_RECORDED_CONDITIONAL_ACTION_CONTINUES_AFTER_RESTART.md)
 retain complete timed convolution, both quadratures, actual condition current and the local
@@ -38,8 +45,7 @@ ports resident input and paired/enclosed/balanced field conduct, including histo
 These controlled two-tap and field returns establish their apparatus scope, not cultivated sound
 or English usefulness. Completed measurements and control counts remain in those records.
 
-[open; source-inspected] Next compose the recorded difference through the temporal adjoint of
-its retained producing operator, retain the complete compatible-condition fibre and unmodelled
+[open; source-inspected] Next retain the complete compatible-condition fibre and unmodelled
 return, and develop persistent acoustic standing through the native contact law. The bilinear
 preimage owner does not yet supply this structured temporal fibre. Larger material/current-history
 owners remain outside the current Metal port. Actual acoustic/English development and streaming

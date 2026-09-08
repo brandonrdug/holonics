@@ -47,10 +47,32 @@ def section(metadata, expected):
             "denominator": den}
 
 
+def section_fraction(metadata, expected):
+    """Verify an exact resident section against arbitrary rational coordinates."""
+    path = Path(metadata["section_path"])
+    data = path.read_bytes()
+    assert digest(path) == metadata["section_sha256"]
+    assert len(data) == metadata["section_octets"]
+    assert data[:8] == RESIDENT_SECTION_REST_MAGIC
+    expected = list(expected)
+    rows, width, grain, bound, population = struct.unpack_from("<QQIIQ", data, 8)
+    assert (rows, width, grain, bound, population) == (1, len(expected) + 1, 0, 64, len(expected) + 1)
+    assert len(data) == 40 + 16 * population
+    pairs = np.frombuffer(data, dtype="<i8", offset=40).reshape(population, 2)
+    assert np.array_equal(pairs[:, 0], pairs[:, 1])
+    den = int(pairs[-1, 0])
+    assert den > 0
+    coordinates = [Q(int(value), den) for value in pairs[:-1, 0]]
+    assert coordinates == expected
+    return {"sha256": metadata["section_sha256"], "coordinates_verified": len(expected),
+            "denominator": den, "exact_coordinates": [str(value) for value in coordinates]}
+
+
 def compare(report_path, acquisition_path):
     report = json.loads(report_path.read_text())
     acquisition = json.loads(acquisition_path.read_text())
-    assert report["schema"] == "holonics.recorded-acoustic-return.v1" and report["status"] == "returned"
+    assert report["schema"] in ("holonics.recorded-acoustic-return.v1", "holonics.recorded-acoustic-return.v2")
+    assert report["status"] == "returned"
     assert acquisition["schema"] == "soundcam-selective-acquisition.v1"
     root = acquisition_path.parent
     matches = [pair for pair in acquisition["pairs"]
@@ -109,6 +131,24 @@ def compare(report_path, acquisition_path):
         stage = report["stages"][name]
         assert stage["section_readouts"] == stage["numerical_egress_octets"] == stage["ingress_octets"] == 0
         assert stage["deeds"] == 1
+    response_checked = None
+    if report["schema"] == "holonics.recorded-acoustic-return.v2":
+        assert report["generator_developed"] is False
+        response_stage = report["stages"]["resident_response_adjoint"]
+        assert response_stage["section_readouts"] == response_stage["numerical_egress_octets"] == response_stage["ingress_octets"] == 0
+        assert response_stage["deeds"] == 1
+        response_numerator = sum(int(x) * int(d) for x, d in zip(sources["excitation"], real_difference))
+        response_bound = count * 32768 * 65535
+        assert abs(response_numerator) <= response_bound
+        response_expected = [Q(response_numerator, 32768 * 32768), Q(0)]
+        metadata = report["response_return"]
+        assert metadata["frames"] == 1 and metadata["origin"] == "0"
+        assert Q(metadata["sample_step"]) == Q(1, rate)
+        assert metadata["receiver"] == 8 and metadata["lineage"] == 6
+        response_checked = section_fraction(metadata, response_expected)
+        response_cold_stage = report["stages"]["cold_response_return"]
+        assert response_cold_stage["section_readouts"] == 1 and response_cold_stage["deeds"] == 0
+        assert response_cold_stage["numerical_egress_octets"] == 48
     for name in ("cold_prediction", "cold_difference_and_audio"):
         stage = report["stages"][name]
         assert stage["section_readouts"] == 1 and stage["deeds"] == 0
@@ -121,6 +161,8 @@ def compare(report_path, acquisition_path):
             "zero_native_numerical_readouts": True, "sections": checked,
             "observed_pcm_square_sum": signal_energy, "defect_pcm_square_sum": defect_energy,
             "defect_to_observed_energy_ratio": str(Q(defect_energy, signal_energy)) if signal_energy else None,
+            "response_return": response_checked,
+            "response_numerator_bound": response_bound if response_checked else None,
             "scope": "unit-response baseline versus actual measured channels; no fitted acoustic model"}
 
 

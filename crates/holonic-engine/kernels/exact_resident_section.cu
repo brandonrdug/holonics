@@ -1293,6 +1293,7 @@ extern "C" __global__ void section_constitutive_bilinear_source(
 #include "constitutive_condition_preimage.cuh"
 #include "phase_current_convolution.cuh"
 #include "phase_current_difference.cuh"
+#include "phase_current_response_adjoint.cuh"
 #include "constitutive_condition_image.cuh"
 #include "constitutive_condition_contact.cuh"
 

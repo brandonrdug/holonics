@@ -4,7 +4,9 @@ use holonic_engine::{
     embedding_fiber::ResidentReadout,
     native_ecology::constitutive_fibre::ResidentConstitutiveCurrent,
     phase_current::{
-        resident::{compare_resident, convolve_resident, ResidentPhaseCurrentView},
+        resident::{
+            compare_resident, convolve_resident, return_response_resident, ResidentPhaseCurrentView,
+        },
         PhaseCurrentLineageId, PhaseCurrentReceiverId,
     },
     resident_section::{ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface},
@@ -166,12 +168,14 @@ fn main() -> Result<()> {
     };
     let source_chart = chart(&excitation, 1, 1)?;
     let observed_chart = chart(&observation, 9, 2)?;
-    let mut report = json!({"schema":"holonics.recorded-acoustic-return.v1","status":"running",
+    let mut report = json!({"schema":"holonics.recorded-acoustic-return.v2","status":"running",
         "excitation":source_report(&excitation),"observation":source_report(&observation),
         "clock_contract":"caller supplies simultaneously recorded raw channels with common origin; no delay alignment or resampling",
         "initial_response":{"real":1,"imaginary":0,"denominator":1,"origin":"0","extent":1},
         "initial_response_scope":"explicit unit digital starting current, not a measured room transfer or cultivated model",
-        "phase_extent":PHASE_EXTENT,"divisor":DIVISOR,"stages":{},"native_development":"none; this receiver retains the actual defect for subsequent constitutive contact"});
+        "phase_extent":PHASE_EXTENT,"divisor":DIVISOR,"stages":{},"generator_developed":false,
+        "native_development":"none; this receiver retains the actual defect for subsequent constitutive contact",
+        "response_return_scope":"resident response adjoint returned in the original unit-response chart; no PCM rendering and no developed room model"});
     fs::create_dir_all(directory)?;
     let readout = ResidentReadout::new()?;
     let s = ResidentSurface::on(&readout)?;
@@ -217,6 +221,14 @@ fn main() -> Result<()> {
             PhaseCurrentLineageId(5),
         )?)
     })?;
+    let response_return = stage(&s, &mut report, "resident_response_adjoint", || {
+        Ok(return_response_resident(
+            &s,
+            &prediction,
+            &difference,
+            PhaseCurrentLineageId(6),
+        )?)
+    })?;
     report["support"] = json!(difference.support());
     report["prediction"] = stage(&s, &mut report, "cold_prediction", || {
         publish(
@@ -238,6 +250,17 @@ fn main() -> Result<()> {
             "difference",
             rate,
             true,
+        )
+    })?;
+    report["response_return"] = stage(&s, &mut report, "cold_response_return", || {
+        publish(
+            &s,
+            response_return.section(),
+            response_return.view()?,
+            directory,
+            "response_return",
+            rate,
+            false,
         )
     })?;
     report["seconds"] = json!(started.elapsed().as_secs_f64());

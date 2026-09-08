@@ -52,6 +52,13 @@ Its subtraction stays native until the cold terminal receiver. The source-qualif
 compares WAVs against the original NPY selectors and checks every prediction/difference
 coordinate, clock, PCM sample and reconstruction residual. It supplies no target to development.
 
+[definition] The v2 example also returns the measured difference through the retained forward
+operation's response adjoint before any cold readout. `response_return.section` retains the exact
+current in the original response chart; it is not rendered as PCM. The observer checks its
+complete source/residual pairing, receiver, clock, lineage and zero native readouts, while still
+accepting v1 receipts. The [adjoint record](../research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md)
+separates that return from the remaining condition-fibre contact and acoustic development.
+
 [established-bounded; implemented-exact] `holonics_hna::native::acoustic_field::AcousticFieldChart`
 now supplies complete timed coefficient fields to the shared `NativeConstitutiveField` used by
 the desktop material work. The field performs one joint operation, retaining both complex outgoing

@@ -20,10 +20,15 @@ pub enum ResidentPhaseCurrentError {
     NonOverlappingSupport,
     #[error("temporal observation origins do not align on their shared sample clock")]
     UnalignedSupport,
+    #[error("temporal return does not retain this operation's producing prediction")]
+    PredictionMismatch,
 }
 
 mod difference;
 pub use difference::{compare_resident, PhaseComparisonSupport, ResidentPhaseDifference};
+
+mod response_adjoint;
+pub use response_adjoint::{return_response_resident, ResidentPhaseResponseAdjoint};
 
 impl From<ResidentRefusal> for ResidentPhaseCurrentError {
     fn from(value: ResidentRefusal) -> Self {

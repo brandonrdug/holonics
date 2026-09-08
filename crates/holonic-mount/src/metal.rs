@@ -867,6 +867,9 @@ impl Module {
                 (&[2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 21], 22)
             }
             "section_phase_convolution_normalize" => (&[1, 5], 6),
+            "section_phase_response_adjoint_validate" | "section_phase_response_adjoint_products" => {
+                (&[2, 3, 4, 7, 8, 9, 10, 11, 12, 13, 14, 15, 20], 21)
+            }
             "section_phase_convolution_pack" => (&[1, 7], 8),
             "section_field_current_input" => (&[2, 3, 4, 5, 11], 12),
             "section_field_source_frame" => (&[6, 12], 13),
@@ -924,6 +927,7 @@ impl Module {
                     "section_phase_convolution_products"
                         | "section_phase_convolution_pack"
                         | "section_phase_difference_products"
+                        | "section_phase_response_adjoint_products"
                 ) || (cfg!(test) && name == "test_grid"),
                 nullable: if name == "section_constitutive_differential" {
                     &[6, 7]

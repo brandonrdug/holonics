@@ -99,8 +99,9 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
    unobserved. Next use the measured return in the declared acoustic action's condition/contact
    law, retaining noise and unmodelled transport instead of supplying an invented exact target.
    The initial unit-response comparison does not itself develop the generator.
-   First return the measured difference through the temporal adjoint of the retained producing
-   convolution, restricted to actual observed support. Then compose the joint compatible family
+   The [response-adjoint return](../../research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md)
+   now returns the measured difference through the retained producing convolution, restricted to
+   actual observed support and preserving the original response chart. Next compose the joint compatible family
    `F_y = {(h,e) : R_S X_x h + e = y_S}`, where `e` is retained unmodelled return, not a discarded
    error score. Under the existing explicitly declared unit-admittance metric, contact of the
    actual prior `(h_0,0)` obeys `h' - h_0 = (R_S X_x)* e'` and `R_S X_x h' + e' = y_S`.

@@ -73,6 +73,14 @@ channels, while `fetch_soundcam.py` and `compare_recorded_acoustic_return.py` ow
 acquisition and independent comparison. The [measured-return record](../research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md)
 states the initial unit-response scope and remaining generator development.
 
+[established-bounded; implemented-exact] `phase_current::resident::{return_response_resident,
+ResidentPhaseResponseAdjoint}` returns the comparison through its actual producing convolution,
+in the original response chart. `resident_section/surface_phase_response_adjoint.rs`, CUDA
+`kernels/phase_current_response_adjoint.cuh` and Metal `phase_response_adjoint.metal` conduct
+the restricted complex adjoint with complete response support and resident normalization.
+The [response-return record](../research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md)
+retains source-qualified measurements and the still-missing temporal condition/contact attachment.
+
 [established-bounded; measured] `native::recorded` exposes
 `native/speech/{recorded.rs,recorded/sections.rs}` for source/target pointer resolution, exact
 annotation-to-PCM bounds and `RecordedResponseSections::bind`. It uses

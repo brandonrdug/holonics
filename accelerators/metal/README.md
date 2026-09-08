@@ -39,6 +39,12 @@ and normalization templates for threadgroup carriers. Signed-128 amplitudes reta
 two-i64 wire, numerical radius and point-port guard. Occurrence/step scalars retain their full
 64-bit ABI; the declared sign progression has no implicit acoustic clock.
 
+[definition] `phase_response_adjoint.metal` returns a temporal difference through the exact
+source carrier retained by its producing convolution. It validates complete point views, sums
+conjugate-source products only on the actual receiver support, and shares whole-result
+normalization/publication with convolution. Response lanes have disjoint workspace; every lane
+keeps ascending source order. No condition update or numerical enclosure projection is implied.
+
 [definition] Build arithmetic apparatus explicitly; the probe kernels are absent from production:
 
 ```sh

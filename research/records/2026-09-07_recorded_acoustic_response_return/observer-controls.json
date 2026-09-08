@@ -1,0 +1,38 @@
+{
+  "schema": "holonics.recorded-response-return-observer-controls.v1",
+  "truth_status": "established-bounded",
+  "evidence_tags": [
+    "measured"
+  ],
+  "baseline_verified": true,
+  "controls": [
+    {
+      "control": "changed_real_coordinate",
+      "refused": true,
+      "report": ".local/experiments/soundcam-native-response-return/observer-controls/changed_real_coordinate.json",
+      "rule": "assert coordinates == expected",
+      "observer_line": 66
+    },
+    {
+      "control": "changed_imaginary_coordinate",
+      "refused": true,
+      "report": ".local/experiments/soundcam-native-response-return/observer-controls/changed_imaginary_coordinate.json",
+      "rule": "assert coordinates == expected",
+      "observer_line": 66
+    },
+    {
+      "control": "claimed_hot_readout",
+      "refused": true,
+      "report": ".local/experiments/soundcam-native-response-return/observer-controls/claimed_hot_readout.json",
+      "rule": "assert response_stage[\"section_readouts\"] == response_stage[\"numerical_egress_octets\"] == response_stage[\"ingress_octets\"] == 0",
+      "observer_line": 138
+    },
+    {
+      "control": "changed_response_clock",
+      "refused": true,
+      "report": ".local/experiments/soundcam-native-response-return/observer-controls/changed_response_clock.json",
+      "rule": "assert Q(metadata[\"sample_step\"]) == Q(1, rate)",
+      "observer_line": 146
+    }
+  ]
+}

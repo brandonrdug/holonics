@@ -1,0 +1,145 @@
+{
+  "verified": true,
+  "returns": [
+    {
+      "verified": true,
+      "row": 0,
+      "microphone": 0,
+      "frames": 672000,
+      "sample_rate": 48000,
+      "qualified_raw_arrays_match_wavs": true,
+      "complete_oriented_difference_matches": true,
+      "projection_fibre_reconstructs": true,
+      "zero_native_numerical_readouts": true,
+      "sections": {
+        "prediction": {
+          "sha256": "d70902b9f7d4d943f25da69b6cbedb299a7367d83093d459e02988e6fa68e06a",
+          "coordinates_verified": 1344000,
+          "denominator": 32768
+        },
+        "difference": {
+          "sha256": "bfb3dd38dd4af442e396471dd5868273930e8333c11fdc4fa999ddb1e44a543d",
+          "coordinates_verified": 1344000,
+          "denominator": 32768
+        }
+      },
+      "observed_pcm_square_sum": 624263408838,
+      "defect_pcm_square_sum": 2296313232289,
+      "defect_to_observed_energy_ratio": "2296313232289/624263408838",
+      "response_return": {
+        "sha256": "771e7c9d684827db3c000aee8c2e3d7c6a3202e3c20b4ba8c2eadafd0c22378d",
+        "coordinates_verified": 2,
+        "denominator": 1073741824,
+        "exact_coordinates": [
+          "-1812071716551/1073741824",
+          "0"
+        ]
+      },
+      "response_numerator_bound": 1443086991360000,
+      "scope": "unit-response baseline versus actual measured channels; no fitted acoustic model"
+    },
+    {
+      "verified": true,
+      "row": 1,
+      "microphone": 0,
+      "frames": 672000,
+      "sample_rate": 48000,
+      "qualified_raw_arrays_match_wavs": true,
+      "complete_oriented_difference_matches": true,
+      "projection_fibre_reconstructs": true,
+      "zero_native_numerical_readouts": true,
+      "sections": {
+        "prediction": {
+          "sha256": "edd7e4b90bbeb6c79e9fb50575ab1710845083b5ae85dd6c4c0d4ec3f3451ddb",
+          "coordinates_verified": 1344000,
+          "denominator": 32768
+        },
+        "difference": {
+          "sha256": "c28b95f6e10c2ce6172dbe950aeeb739feedca411e64192d258a2b266194f86f",
+          "coordinates_verified": 1344000,
+          "denominator": 32768
+        }
+      },
+      "observed_pcm_square_sum": 583640951579,
+      "defect_pcm_square_sum": 2559022134613,
+      "defect_to_observed_energy_ratio": "365574590659/83377278797",
+      "response_return": {
+        "sha256": "90bc314691e1cd8cc1c4261b18b6ce2e594e7c18cf361aa18d5935dc1f0c15ef",
+        "coordinates_verified": 2,
+        "denominator": 134217728,
+        "exact_coordinates": [
+          "-245483819625/134217728",
+          "0"
+        ]
+      },
+      "response_numerator_bound": 1443086991360000,
+      "scope": "unit-response baseline versus actual measured channels; no fitted acoustic model"
+    },
+    {
+      "verified": true,
+      "row": 2,
+      "microphone": 0,
+      "frames": 672000,
+      "sample_rate": 48000,
+      "qualified_raw_arrays_match_wavs": true,
+      "complete_oriented_difference_matches": true,
+      "projection_fibre_reconstructs": true,
+      "zero_native_numerical_readouts": true,
+      "sections": {
+        "prediction": {
+          "sha256": "8fa262fb85050bc10cb7738f1d9da883ff8a81810644f6dc66150585c432f993",
+          "coordinates_verified": 1344000,
+          "denominator": 32768
+        },
+        "difference": {
+          "sha256": "7b9db63aef75ee04ef817c15d1fab2b1be3e07edf3f4ba32f814bf2ffbdd77e0",
+          "coordinates_verified": 1344000,
+          "denominator": 32768
+        }
+      },
+      "observed_pcm_square_sum": 1268724676088,
+      "defect_pcm_square_sum": 3953252227199,
+      "defect_to_observed_energy_ratio": "3953252227199/1268724676088",
+      "response_return": {
+        "sha256": "d0bb4246a9f4646be71fd0c22c1bf71fb1a8f8fc29d78ca1737fa8f73df44234",
+        "coordinates_verified": 2,
+        "denominator": 1073741824,
+        "exact_coordinates": [
+          "-2318513610903/1073741824",
+          "0"
+        ]
+      },
+      "response_numerator_bound": 1443086991360000,
+      "scope": "unit-response baseline versus actual measured channels; no fitted acoustic model"
+    },
+    {
+      "verified": true,
+      "row": 0,
+      "microphone": 0,
+      "frames": 672000,
+      "sample_rate": 48000,
+      "qualified_raw_arrays_match_wavs": true,
+      "complete_oriented_difference_matches": true,
+      "projection_fibre_reconstructs": true,
+      "zero_native_numerical_readouts": true,
+      "sections": {
+        "prediction": {
+          "sha256": "d70902b9f7d4d943f25da69b6cbedb299a7367d83093d459e02988e6fa68e06a",
+          "coordinates_verified": 1344000,
+          "denominator": 32768
+        },
+        "difference": {
+          "sha256": "bfb3dd38dd4af442e396471dd5868273930e8333c11fdc4fa999ddb1e44a543d",
+          "coordinates_verified": 1344000,
+          "denominator": 32768
+        }
+      },
+      "observed_pcm_square_sum": 624263408838,
+      "defect_pcm_square_sum": 2296313232289,
+      "defect_to_observed_energy_ratio": "2296313232289/624263408838",
+      "response_return": null,
+      "response_numerator_bound": null,
+      "scope": "unit-response baseline versus actual measured channels; no fitted acoustic model"
+    }
+  ]
+}
