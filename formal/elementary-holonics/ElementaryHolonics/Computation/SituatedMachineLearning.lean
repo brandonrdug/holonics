@@ -1,6 +1,6 @@
 import ElementaryHolonics.Computation.MachineLearningStrictLift
 import ElementaryHolonics.Foundation.Receiver
-import ElementaryHolonics.Millennium.HolonicComplexParametron
+import ElementaryHolonics.Physics.CoupledIncidence
 import ElementaryHolonics.Millennium.SituatedReturnedDifference
 import Mathlib.Tactic
 

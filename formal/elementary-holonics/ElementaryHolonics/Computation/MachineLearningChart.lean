@@ -1,4 +1,4 @@
-import ElementaryHolonics.Millennium.LineageCompression
+import ElementaryHolonics.Foundation.ReceiverHistoryCompression
 
 /-!
 # Traditional machine learning as a dynamic receiver chart

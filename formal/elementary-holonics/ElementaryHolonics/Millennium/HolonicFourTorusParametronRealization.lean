@@ -1,5 +1,5 @@
 import ElementaryHolonics.Millennium.HolonicFourTorusCarrier
-import ElementaryHolonics.Millennium.HolonicComplexParametron
+import ElementaryHolonics.Physics.CoupledIncidence
 
 /-!
 # The finite four-torus realizes a Complex Parametron incidence body

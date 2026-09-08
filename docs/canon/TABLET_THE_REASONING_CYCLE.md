@@ -465,13 +465,13 @@ Complete derivation, sensory-coupling example, source audit and construction bou
 
 ## 8d. The Complex Parametron is the primitive carrier before a locked receiver
 
-`proved-derived; formal-checked`: `HolonicParametron.lean` proves that a parametrically driven
+`proved-derived; formal-checked`: `Physics/PhaseCarrier.lean` (historical `HolonicParametron` namespace) proves that a parametrically driven
 phase carrier has two half-turn-related locked sheets: the pump-storage receiver identifies the
 sheets while the complex carrier changes sign. The binary sign face is therefore an exact quotient
 only on the declared locked population. A full turn already exhibits a nontrivial source fibre, and
 cosine coupling descends to an Ising pairing only after the locked-phase restriction.
 
-`proved-derived; formal-checked`: `HolonicComplexParametron.lean` presents a finite coupled body by
+`proved-derived; formal-checked`: `Physics/CoupledIncidence.lean` (historical `HolonicComplexParametron` namespace) presents a finite coupled body by
 an oriented incidence `B` from node variables to branch current. A receiver constitutive form `M`
 pulls back to node storage `G = B^T M B`. Pure branch reorientation transports both incidence and
 the constitutive chart and preserves storage and generalized LC response; holding the drive or

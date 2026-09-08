@@ -1,5 +1,5 @@
 import ElementaryHolonics.Foundation.MeasuredDifferenceReceiver
-import ElementaryHolonics.Millennium.HolonicComplexParametron
+import ElementaryHolonics.Physics.CoupledIncidence
 
 /-!
 # The coupled parametron coefficients are returned comparisons

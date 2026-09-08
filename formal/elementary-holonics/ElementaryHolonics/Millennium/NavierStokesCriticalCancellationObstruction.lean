@@ -1,4 +1,4 @@
-import ElementaryHolonics.Millennium.HolonicComplexParametron
+import ElementaryHolonics.Physics.CoupledIncidence
 import ElementaryHolonics.Millennium.NavierStokesFourierTriads
 
 /-!

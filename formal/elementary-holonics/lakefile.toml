@@ -1,5 +1,5 @@
 name = "soma_elementary_holonics"
-defaultTargets = ["ElementaryHolonics.Computation.HolonicQuantumTransport"]
+defaultTargets = ["ElementaryHolonics.Framework"]
 
 [[lean_lib]]
 name = "ElementaryHolonics"

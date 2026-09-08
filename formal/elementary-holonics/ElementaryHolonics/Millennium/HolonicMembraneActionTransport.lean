@@ -1,5 +1,5 @@
 import ElementaryHolonics.Foundation.MeasuredDifferenceReceiver
-import ElementaryHolonics.Millennium.HolonicComplexParametron
+import ElementaryHolonics.Physics.CoupledIncidence
 import ElementaryHolonics.Millennium.HolonicEntropyActionInduction
 import ElementaryHolonics.Millennium.SituatedReturnedDifference
 import Mathlib.Analysis.SpecialFunctions.Log.Basic

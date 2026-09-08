@@ -1,21 +1,22 @@
 import Mathlib.Analysis.Calculus.MeanValue
 import Mathlib.GroupTheory.Perm.Basic
-import Mathlib.Data.List.Perm.Basic
 import ElementaryHolonics.Millennium.Swing
+import ElementaryHolonics.Foundation.TransportWord
 
 /-!
-# The chronology — why a transport is a word and not a value
+# The chronology — physical and analytic consequences of ordered transport
 
 An operation that reads as *one* operation in a chart is intrinsically several steps with a
-trajectory parameter whenever the steps fail to commute.  This file makes that precise:
+trajectory parameter whenever the steps fail to commute.  The generic ordered-word action and its
+endpoint order-blindness criterion live in `Foundation.TransportWord`; this file keeps the
+Swing/parity and analytic consequences that use those owners:
 
-**A chain series exists exactly when the transports do not commute.**  `orderBlind_iff_commute`
-proves that a family of transports collapses every word to its multiset — no chronology, no
-series, nothing for a parameter to index — *if and only if* the transports commute pairwise.  So
-the series is not an artifact of a method; it is the record of order that non-commutation forces
-into existence.
+**Endpoint order blindness is equivalent to pairwise commutation.** `orderBlind_iff_commute`
+proves that a family of transports has the same endpoint action for every permutation of a word if
+and only if the generators commute pairwise.  This endpoint property does not erase the word,
+occurrence lineage, or a receiver that records it; it only identifies the resulting endpoint action.
 
-Sections 3 to 6 then rebuild three standard results on that basis: the hand of a configuration is
+The remaining sections connect this action to parity, affine charts, squeeze bounds and closure: the hand of a configuration is
 the parity of the word that produced it, the mean value theorem is the flat statement read out of
 the chart the two constraints declare, the squeeze is a pair of constraints closing on a body,
 and a closed triple of transports has its third member forced.
@@ -27,68 +28,8 @@ namespace Soma.Holonics.Millennium.Chronology
 
 open Soma.Holonics.Millennium.Swing
 
-/-! ## 1. A transport is a word -/
-
-universe u v
-
-variable {ι : Type u} {X : Type v}
-
-/-- The transport a **word** of moves performs, read right to left: the rightmost letter acts
-first, so the list is a chronology and not a set. -/
-def transportWord (T : ι → X → X) : List ι → X → X
-  | [], x => x
-  | i :: w, x => T i (transportWord T w x)
-
-@[simp] theorem transportWord_nil (T : ι → X → X) (x : X) : transportWord T [] x = x := rfl
-
-@[simp] theorem transportWord_cons (T : ι → X → X) (i : ι) (w : List ι) (x : X) :
-    transportWord T (i :: w) x = T i (transportWord T w x) := rfl
-
-/-- **Equivariance on the generators extends to every ordered transport word.**
-
-This is the exact local-to-composite bridge used by a geometric action: if `f` intertwines each
-declared generator `T i` with `S i`, it intertwines the chronology they generate, with its order
-retained. The theorem does not claim that the actions or the intertwiner were recovered from
-material; those are exterior hypotheses. -/
-theorem generatorEquivarianceExtendsToEveryTransportWord
-    {Y : Type*} (T : ι → X → X) (S : ι → Y → Y) (f : X → Y)
-    (h : ∀ i x, f (T i x) = S i (f x)) (w : List ι) (x : X) :
-    f (transportWord T w x) = transportWord S w (f x) := by
-  induction w with
-  | nil => rfl
-  | cons i w ih =>
-      rw [transportWord_cons, h, ih, transportWord_cons]
-
-/-- A family of transports is **order-blind** when every word's result depends only on which
-moves occurred and not on when — that is, when the chronology carries no information. -/
-def OrderBlind (T : ι → X → X) : Prop :=
-  ∀ w v : List ι, w.Perm v → ∀ x : X, transportWord T w x = transportWord T v x
-
-/-! ## 2. The chain series exists exactly because the transports do not commute -/
-
-/-- **Order-blindness is exactly pairwise commutation.**
-
-If the moves commute, every word collapses to its multiset: there is no chronology to record, no
-parameter for a series to run over, and no order-dependent term for a correction to carry.  If any
-two moves fail to commute, the word is irreducible information and a chronology exists.
-
-*Aside: this is the elementary reason the chain series of a non-autonomous linear transport — the
-time-ordered exponential, whose logarithm is a series of nested commutators — has any terms past
-the first.  A commuting family's series terminates immediately.* -/
-theorem orderBlind_iff_commute {T : ι → X → X} :
-    OrderBlind T ↔ ∀ i j : ι, ∀ x : X, T i (T j x) = T j (T i x) := by
-  constructor
-  · intro h i j x
-    have hp : ([j, i] : List ι).Perm [i, j] := List.Perm.swap i j []
-    simpa using (h [j, i] [i, j] hp x).symm
-  · intro hc w v hperm
-    induction hperm with
-    | nil => intro x; rfl
-    | cons a _ ih => intro x; simp [ih x]
-    | swap a b l => intro x; simpa using hc b a (transportWord T l x)
-    | trans _ _ ih₁ ih₂ => intro x; rw [ih₁ x, ih₂ x]
-
-/-- **The swing family is not order-blind**, so the chronology it produces is real.
+/-- **The swing family is not endpoint-order-blind**, so its ordered action has a real endpoint
+effect.
 
 Two swings about different anchors differ by four times the anchor displacement, which is nonzero
 whenever the anchors are.  An abstract order-dependence with no witness would be an untested
@@ -100,7 +41,7 @@ theorem theSwingFamilyIsNotOrderBlind : ¬ OrderBlind (swing : Site → Site →
   simp only [swing, Prod.mk_add_mk, Prod.mk_sub_mk, Prod.mk.injEq] at this
   omega
 
-/-! ## 3. The hand of a configuration is the parity of the word that produced it
+/-! ## 1. The hand of a configuration is the parity of the word that produced it
 
 A single crossing negates the oriented span; the span is only restored after an even number of
 them.  So the "cross product" a configuration exhibits is not a property of the endpoint — it is a
@@ -128,7 +69,7 @@ theorem theOddWordReversesTheHand (a b c : Site) {n : ℕ} (hn : Odd n) :
     orientedSpan ((swing b)^[n] a) b c = - orientedSpan a b c := by
   rw [theHandIsTheParityOfTheWord, hn.neg_one_pow, neg_one_mul]
 
-/-! ## 4. The chart two constraints declare, and what it does to the mean value theorem -/
+/-! ## 2. The chart two constraints declare, and what it does to the mean value theorem -/
 
 /-- The affine transport the two endpoint constraints declare — the chord. -/
 noncomputable def chordLine (f : ℝ → ℝ) (a b : ℝ) : ℝ → ℝ :=
@@ -175,7 +116,7 @@ theorem theFlatAnchorIsTheMeanRateAnchor {f : ℝ → ℝ} {a b c f' : ℝ} (hab
     have hshift := theChordChartShiftsTheRate hab h
     rwa [hmean, sub_self] at hshift
 
-/-! ## 5. Two constraints closing on a body place it
+/-! ## 3. Two constraints closing on a body place it
 
 The squeeze is the pin picture with the gap named: two constraints bound a body, the gap between
 them is the population no receiver in the declared family can separate, and when that population
@@ -202,7 +143,7 @@ theorem theGapCollapses {lo hi : β → ℝ} {l : Filter β} {L : ℝ}
   change Filter.Tendsto (fun x => hi x - lo x) l (nhds 0)
   simpa [sub_self] using this
 
-/-! ## 6. A closed triple forces its third transport
+/-! ## 4. A closed triple forces its third transport
 
 Three transports whose composite returns is the shape a three-constraint transport problem carries.
 Two of them determine the third, which is why such a problem is finite data rather than a search.

@@ -49,8 +49,11 @@ bash tools/lean_check.sh ElementaryHolonics.RH.CriticalChart
 ```
 
 [established-bounded; source-inspected] `formal/elementary-holonics/lean-toolchain` and
-`lake-manifest.json` pin the formal dependencies. The default live engine umbrella and the
-independent RH target are separate declared checks. `.lake/` caches remain ignored and retained.
+`lake-manifest.json` pin the formal dependencies. The default `ElementaryHolonics.Framework`
+target presents the reusable mathematical subjects;
+`ElementaryHolonics` is the complete research umbrella and RH targets may be checked independently.
+The package-local `check.sh` forwards here without updating pinned dependencies. `.lake/` caches
+remain ignored and retained.
 Authored Typst work is under `research/papers/source/`; compile it when editing or using those
 papers. It is not a required check for unrelated Rust work.
 

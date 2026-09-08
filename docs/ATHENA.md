@@ -45,6 +45,12 @@ frames before comparison, and justify condensation for the admitted future opera
 future device and acoustic charts. This consolidation returns synthesis and repairs, not a
 corpus-trained Athena-alpha artifact.
 
+[definition] The parallel [formal framework review](FORMAL_FRAMEWORK.md#the-checked-finite-return-of-changing-conformation)
+proves the complete finite response of changing incidence, material and internal state, with a
+counterexample to replacing that response by tangent cancellation. It reinforces AC1's producing
+adjoint, finite successor and future-receiver compression obligations. The theorem applies to its
+finite coupled-incidence chart; it adds no mandatory LC model, native kernel or product gate.
+
 ## Native-first construction
 
 [established-bounded; measured] NCF1 has returned the ground-up

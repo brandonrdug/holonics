@@ -86,6 +86,7 @@ inference pipelines.
 
 ## Read and explore
 
+- [Holonics in Lean](docs/FORMAL_FRAMEWORK.md) — situated objects, molecular conformation, tubes, physics and computation
 - [The mathematics tablet](docs/canon/THE_MATHEMATICS_TABLET.md) — foundations and subject tablets
 - [Mathematics and native conduct](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) — synthesis across research and implementation
 - [Architecture](docs/ARCHITECTURE.md) — framework, implementations and responsibilities

@@ -20,6 +20,17 @@ contracts and records preserve their completed scope; their old imperatives sche
    reread every completed campaign, rerun unchanged expensive receipts, or reconstruct historical
    capability just to start the next authorized repair.
 
+## Parallel formal framework refinement
+
+[project-postulate] Brandon's subsequent September 8 request authorizes synthesis and refinement
+of the Lean framework independently of the active AC1 session: recover recent direct messages,
+organize and factor reusable mathematics across physical, biological and computational subjects,
+and verify the integrated formal return. This adds no Millennium endpoint or pause to AC1.
+The [framework guide](../FORMAL_FRAMEWORK.md) and
+[dated deposit](../../research/records/2026-09-08_FORMAL_HOLONICS_IS_A_FRAMEWORK_OF_INTERACTING_TRANSPORT.md)
+retain the concrete mathematical return and its implementation implications. Current completion
+status remains in CONSTRUCTION_STATE.
+
 ## Current AC revision and complex-fluid research
 
 [project-postulate] Brandon's latest September 8 request requires the corrected synthesis to

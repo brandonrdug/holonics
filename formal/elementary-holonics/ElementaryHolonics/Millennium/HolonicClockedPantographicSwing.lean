@@ -1,4 +1,4 @@
-import ElementaryHolonics.Millennium.HolonicSensoryWorldTube
+import ElementaryHolonics.Transport.WorldTube
 import ElementaryHolonics.Millennium.HolonicPantographicSwingJets
 import ElementaryHolonics.Millennium.HolonicComposition
 import Mathlib.Tactic

@@ -162,7 +162,8 @@ theorem orderedSwingWord_retains_lineage (word : List Site) (body : Site) :
       (transportWord swing word body)) :=
   ⟨AddressedPassage.wordFibre swing word body⟩
 
-/-- Chronology is discardable exactly for pairwise commuting transports. -/
+/-- Endpoint action is order-blind exactly for pairwise commuting transports.  The addressed word
+and its occurrence fibre remain available even when this endpoint quotient applies. -/
 theorem chronology_discard_iff_commuting {I X : Type*} (T : I → X → X) :
     OrderBlind T ↔ ∀ i j x, T i (T j x) = T j (T i x) :=
   orderBlind_iff_commute

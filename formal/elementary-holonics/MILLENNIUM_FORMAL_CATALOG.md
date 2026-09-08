@@ -3,9 +3,10 @@
 > **ARCHIVE BANNER — 2026-08-28 RESEARCH-STATION SNAPSHOT.** This catalog preserves the measured
 > theorem inventory and open mathematical fibres of that date. It is not a current build report,
 > roadmap, or construction authority; every “next”, “current”, and “present” below is historical
-> testimony. The sole schedule is `blueprint/THE_ROADMAP.md`. The production Lean face is
-> `ElementaryHolonics.Computation.HolonicMachineLearning`; the broader `ElementaryHolonics`
-> research umbrella retains independent Lean 4.33 compatibility work outside the production gate.
+> testimony. The sole schedule is [`docs/plans/THE_ROADMAP.md`](../../docs/plans/THE_ROADMAP.md).
+> The current subject entry point is `ElementaryHolonics.Framework`; `ElementaryHolonics` retains
+> the complete research surface. See the [current Lean guide](README.md) for source organization,
+> pinned verification and scope. Build claims below belong to the snapshot date.
 
 **Date:** 2026-08-28
 **Scope:** exterior Lean theorem station under `ElementaryHolonics`; this document schedules no

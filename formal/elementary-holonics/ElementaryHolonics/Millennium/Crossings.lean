@@ -180,8 +180,9 @@ For vector fields `X` and `Y`, `(X·∇)Y − (Y·∇)X` is the Lie bracket.  Fo
 `X x = A x` and `Y x = B x` it is the matrix commutator, and the whole of the planar/spatial split
 of the named line is that in the planar case one half of it vanishes identically.
 
-`Chronology.orderBlind_iff_commute` is the general form: a chronology exists exactly when the
-transports fail to commute. -/
+`Chronology.orderBlind_iff_commute` is the general endpoint-action form: the endpoint depends on
+the order exactly when the transports fail to commute.  The addressed occurrence word remains
+lineage even when its endpoint action is order-blind. -/
 
 /-- **The bracket of two linear fields is the matrix commutator.**
 

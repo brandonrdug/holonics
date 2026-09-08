@@ -6,6 +6,13 @@ research. It records reusable relations and their actual implementation scopes. 
 breadth review inspected source at `ab5251a6`; the earlier fluid/RH sections retain their cited
 formal receipts and the preceding inspection at `6f547c4a`.
 
+[definition] The [formal framework synthesis](FORMAL_FRAMEWORK.md) now supplies a subject-based
+Lean entry point and connects molecular conformation, twisting/phase, active world-tubes and
+cosmological receivers to the same elementary holon. Its checked finite `Bᵀ M B x` change keeps
+both incidence returns and every mixed term. The
+[deposit](../research/records/2026-09-08_FORMAL_HOLONICS_IS_A_FRAMEWORK_OF_INTERACTING_TRANSPORT.md)
+retains direct-message coordinates, ownership changes and the precise AC1 consequences.
+
 ## One framework, several realizations
 
 [definition] The subsequent [complex-fluid and plan revision](../research/records/2026-09-08_COMPLEX_FLUID_CHARTS_RETAIN_THE_FOLDED_CURRENT_AND_THE_RECEIVER_BOUND.md)

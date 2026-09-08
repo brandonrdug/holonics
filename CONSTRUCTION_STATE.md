@@ -8,6 +8,18 @@
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct
 instruction governs.
 
+## Formal framework synthesis
+
+[established-bounded; process-audit] The [formal framework review](research/records/2026-09-08_FORMAL_HOLONICS_IS_A_FRAMEWORK_OF_INTERACTING_TRANSPORT.md)
+is complete: recent direct messages recovered; six subject entry points, generic source factoring
+and the [physical/biological/computational synthesis](docs/FORMAL_FRAMEWORK.md) returned. The full
+research umbrella and default framework pass. Historical declarations and imports remain available.
+
+[proved-derived; formal-checked] The finite coupled-response return retains both incidence
+changes, material change and internal current, with a counterexample to tangent cancellation
+as finite closure. It informs the parallel AC1 producing return and successor-compression work;
+this formal review changes no native model, kernel or product grade.
+
 ## Current HNN construction
 
 [established-bounded; measured] The [material query adjoint](research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_REACHES_BOTH_QUERY_ARGUMENTS.md)

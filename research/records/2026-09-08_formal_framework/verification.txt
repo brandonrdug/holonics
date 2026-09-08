@@ -1,0 +1,42 @@
+Formal framework verification — September 8, 2026
+Inspection base: d05cc741. Exact changed source is retained by the accompanying Git commit.
+Toolchain: leanprover/lean4:v4.33.0. Dependency/toolchain manifests unchanged.
+
+Primary-agent commands and observed exits:
+1. cwd formal/elementary-holonics:
+   lake build ElementaryHolonics.Physics.ConstitutiveModulation
+   exit 0; Build completed successfully (3012 jobs).
+2. cwd repository root:
+   bash tools/lean_check.sh ElementaryHolonics
+   exit 0; Build completed successfully (9956 jobs).
+3. cwd repository root, after generic chronology prose correction:
+   formal/elementary-holonics/check.sh
+   exit 0; Build completed successfully (3809 jobs).
+4. cwd repository root, complete integration after that correction:
+   bash tools/lean_check.sh ElementaryHolonics
+   exit 0; Build completed successfully (9956 jobs).
+5. cwd repository root, after coupled-response covariance prose clarification:
+   bash tools/lean_check.sh ElementaryHolonics.Physics.ConstitutiveModulation
+   exit 0; Build completed successfully (3012 jobs).
+
+All complete checks include the unchanged problem-specific research declarations as imported.
+No new proof/import change followed command 4; command 5 checked the final explanatory source.
+No command invoked lake update. No sorry declaration warning or sorryAx occurred in these logs.
+Job counts are Lake build jobs, not theorem counts or fresh independent proofs.
+
+Final new-theorem axiom output (verbatim):
+info: ElementaryHolonics/Physics/ConstitutiveModulation.lean:81:0: 'Soma.Holonics.Physics.ConstitutiveModulation.coupledResponse_finite_change' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ConstitutiveModulation.lean:82:0: 'Soma.Holonics.Physics.ConstitutiveModulation.coupledResponse_material_state_change' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ConstitutiveModulation.lean:83:0: 'Soma.Holonics.Physics.ConstitutiveModulation.tangent_cancellation_does_not_close_finite_response' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+
+Relocation comparison: declaration/proof text outside imports/comments unchanged for
+Physics/PhaseCarrier.lean, Physics/CoupledIncidence.lean, Transport/WorldTube.lean.
+
+git diff --check: exit 0.
+Full raw logs retained locally: .local/scratch/lean-framework-*.log.

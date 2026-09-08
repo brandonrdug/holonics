@@ -28,6 +28,29 @@ Each row connects one mathematical relation to its live formal and executable pr
 Paths are stable owner addresses, not line citations. A hash, filename, count, output artifact, or
 test result never upgrades a correspondence.
 
+## Formal framework entry points
+
+[definition] [`ElementaryHolonics.Framework`](../formal/elementary-holonics/ElementaryHolonics/Framework.lean)
+is the default formal import/build face. Its Core, Geometry, Dynamics, Information, Physics and
+Computation subjects compose the existing owners; the complete `ElementaryHolonics` research
+umbrella additionally retains all problem-specific modules. The
+[framework guide](FORMAL_FRAMEWORK.md) connects molecular conformation, active tube interiors,
+phase, geometry, physical boundaries and computation at their declared scopes.
+
+| Relation | Implementation owner | Historical namespace / import compatibility |
+|---|---|---|
+| Ordered generator action and endpoint order blindness | `Foundation/TransportWord.lean` | `Millennium.Chronology` retains its applied material and imports this owner |
+| Future-exact receiver compression | `Foundation/ReceiverHistoryCompression.lean` | `Millennium.LineageCompression` forwards the import |
+| Clocked addressed spans and returned world-tubes | `Transport/WorldTube.lean` | `Millennium.HolonicSensoryWorldTube` forwards the import |
+| Complex phase carrier, locked sheets and winding fibres | `Physics/PhaseCarrier.lean` | `Millennium.HolonicParametron` forwards the import |
+| Oriented incidence, coupled response and phase-bearing holons | `Physics/CoupledIncidence.lean` | `Millennium.HolonicComplexParametron` forwards the import |
+| Complete finite change of incidence, material and internal state | `Physics/ConstitutiveModulation.lean` | New `Soma.Holonics.Physics.ConstitutiveModulation` theorems over the existing `coupledResponse`; formal-only |
+
+[definition] Paths in this table are relative to `formal/elementary-holonics/ElementaryHolonics/`.
+Declaration namespaces remain stable. These source extractions preserve old imports without
+retaining duplicate definitions. Endpoint commutation does not identify carrying histories.
+The finite modulation return supplies no automatic native response law or molecular calibration.
+
 ## Foundation and transport
 
 [definition] **Preimage Fibre** is the governing term for compatible-source families. Some older

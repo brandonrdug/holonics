@@ -22,6 +22,12 @@ adjoints and the mathematics of classical architectures remain available. Read t
 [framework synthesis](../MATHEMATICS_AND_NATIVE_CONDUCT.md) for their connection to reflection,
 leader growth, fractal restriction and Holonic Compression. Current neural terminology is HNN.
 
+[definition] The [formal framework guide](../FORMAL_FRAMEWORK.md) connects this ontology to Lean's
+subject entry points and exact source owners. Molecular conformation, phase/twist, clocked tubes,
+physical boundaries and computation share the elementary interaction calculus while retaining
+their own constitutive laws. The finite coupled-response return now makes simultaneous changes
+of structure and current explicit; the guide states its checked scope and biological interpretation.
+
 **Truth status is per claim.** Standard mathematics is marked `proved-standard` with its citation.
 Holonic readings of it are `interpretation` and are marked. Anything the repository implements is
 `implemented-exact` with its owner. **Nothing here is a Millennium claim.**
