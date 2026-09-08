@@ -498,7 +498,8 @@ impl NativeFieldRest {
                     };
                     match h.transport_source {
                         NativeMaterialTransportSource::Contextual
-                        | NativeMaterialTransportSource::BilinearContextual => {
+                        | NativeMaterialTransportSource::BilinearContextual
+                        | NativeMaterialTransportSource::OperativeContextual => {
                             material_transport::contextual::validate_report(section, n, grain, at)?
                         }
                         NativeMaterialTransportSource::HomogeneousMoment => {
@@ -517,10 +518,11 @@ impl NativeFieldRest {
                     h.transport_source,
                     NativeMaterialTransportSource::Contextual
                         | NativeMaterialTransportSource::BilinearContextual
+                        | NativeMaterialTransportSource::OperativeContextual
                 ) {
                     let [_, output, input, context, _, meta, _] =
                         material_transport::contextual::offsets(n);
-                    let version = if h.transport_source
+                    let version = if h.transport_source==NativeMaterialTransportSource::OperativeContextual {3} else if h.transport_source
                         == NativeMaterialTransportSource::BilinearContextual
                     {
                         2
@@ -529,6 +531,11 @@ impl NativeFieldRest {
                     };
                     if section.intervals[meta + 3].0 != version {
                         return Err(invalid("contextual chart version"));
+                    }
+                    if version==3 {
+                        let op=rest.operative.as_ref().ok_or_else(||invalid("missing operative material source"))?;
+                        material_transport::contextual::validate_operative_profile(&section.intervals[context..context+36*n+22],n,self.header.junction.as_ref().and_then(|j|match j.representation {NativeFieldJunctionRepresentation::EnclosedDyadic{fractional_bits}=>Some(fractional_bits),_=>None}).ok_or_else(||invalid("operative grain"))?,at,Some(&op.b))?;
+                        if material_transport::wides(&section.intervals[context+36*n+16..context+36*n+18])?[0]!=material_transport::wides(&op.bounds.intervals)?[1] {return Err(invalid("operative material source radius"));}
                     }
                     let source = event.lineage.received_from;
                     if section.intervals[meta + 1].0 != source.map_or(-1, |v| v as i64) {
@@ -587,6 +594,7 @@ impl NativeFieldRest {
                     NativeMaterialTransportSource::HomogeneousMoment
                         | NativeMaterialTransportSource::Contextual
                         | NativeMaterialTransportSource::BilinearContextual
+                        | NativeMaterialTransportSource::OperativeContextual
                 ) {
                     material_transport::moment::validate_state
                 } else {
@@ -603,6 +611,7 @@ impl NativeFieldRest {
                 }
             }
         }
+        if h.transport_source==NativeMaterialTransportSource::OperativeContextual && h.operative.as_ref().is_none_or(|o|o.activated_at!=0) {return Err(invalid("operative material requires its complete current history"));}
         if h.operative.is_some()!=self.operative.is_some(){return Err(invalid("operative state presence"));}
         if let Some(wire)=&h.operative {
             if wire.activated_at>h.history.len() || h.junction.as_ref().is_none_or(|j|!matches!(j.representation,NativeFieldJunctionRepresentation::EnclosedDyadic{..})) {
@@ -611,9 +620,10 @@ impl NativeFieldRest {
             let births=h.history.iter().enumerate().filter_map(|(receiving,e)|e.lineage.received_from.map(|source|NativeOperativeContactBirth{source,receiving})).collect::<Vec<_>>();
             if wire.births!=births {return Err(invalid("operative birth lineage"));}
             self.operative.as_ref().unwrap().validate(wire,n)?;
+            if wire.return_frames.iter().any(|r|r.at_cut>h.history.len()){return Err(invalid("operative return beyond field cut"));}
             if let Some(last)=self.history.last().and_then(|h|h.operative.as_ref()) {
                 let current=&self.operative.as_ref().unwrap().current;
-                if current[1]!=last.b || current[2]!=last.bounds {return Err(invalid("operative current/history boundary"));}
+                if current[1]!=last.b || material_transport::wides(&current[2].intervals)?[1]!=material_transport::wides(&last.bounds.intervals)?[1] {return Err(invalid("operative current/history boundary"));}
             }
 
         }

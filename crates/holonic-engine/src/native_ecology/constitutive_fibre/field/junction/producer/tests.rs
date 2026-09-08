@@ -193,3 +193,49 @@ fn producer_primal_matches_native_field_and_complete_internal_decoder() {
         );
     }
 }
+
+#[test]
+fn joint_material_reduction_matches_the_complete_two_receiver_normal_system() {
+    let q = |n: i64, d: i64| Rat::new(n.into(), d.into());
+    let l = ExactRatMatrix::new(vec![
+        vec![q(1, 2), q(-2, 3), q(1, 1)],
+        vec![q(3, 2), q(1, 4), q(-1, 3)],
+    ])
+    .unwrap();
+    let r = vec![q(2, 3), q(-1, 2)];
+    let t = vec![q(-3, 4), q(4, 3)];
+    let g = l.multiply(&l.transpose().unwrap()).unwrap();
+    for k in [q(0, 1), q(2, 5), q(1, 1)] {
+        let result = joint_material_contact(&l, &r, Some((&t, &k))).unwrap();
+        let mut rows = vec![vec![q(0, 1); 4]; 4];
+        for i in 0..2 {
+            for j in 0..2 {
+                let eye = if i == j { q(1, 1) } else { q(0, 1) };
+                rows[i][j] = g.get(i, j).unwrap() + q(2, 1) * &eye;
+                rows[i][j + 2] = g.get(i, j).unwrap() + (q(1, 1) - &k) * &eye;
+                rows[i + 2][j] = rows[i][j + 2].clone();
+                rows[i + 2][j + 2] = g.get(i, j).unwrap() + (q(3, 1) - q(2, 1) * &k) * eye;
+            }
+        }
+        let full = ExactRatMatrix::new(rows)
+            .unwrap()
+            .inverse()
+            .unwrap()
+            .apply(&r.iter().chain(&t).cloned().collect::<Vec<_>>())
+            .unwrap();
+        assert_eq!(&full[..2], result.ordinary.as_slice());
+        assert_eq!(&full[2..], result.contrast.as_ref().unwrap().as_slice());
+        assert!(result.normal_scalar >= q(2, 1));
+    }
+    let z = ExactRatMatrix::zero(2, 3).unwrap();
+    let result = joint_material_contact(&z, &r, Some((&t, &q(1, 1)))).unwrap();
+    // Equal source currents leave the contradictory target contrast explicit; the two
+    // material factors cancel it rather than pretending to fit a zero source difference.
+    assert_eq!(
+        result.ordinary,
+        r.iter().map(|r| r / q(2, 1)).collect::<Vec<_>>()
+    );
+    assert_eq!(result.contrast, Some(t));
+    assert!(result.producer_change.iter().all(|x| x.is_zero()));
+    assert!(joint_material_contact(&l, &r, Some((&r, &q(3, 2)))).is_err());
+}

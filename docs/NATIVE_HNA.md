@@ -300,8 +300,8 @@ pairing, retains immutable return factors and transports the signed operator-nor
 `inspect_exact_numerical_moment_forward` is the cold rational decoder. The native text receiver
 uses the enclosed forward current. This interface does not establish useful language.
 
-[established-bounded; source-inspected] Fresh `alpha_text` cultivation now defaults to
-`--material-source contextual` (alias `bilinear-contextual`), stored as `BilinearContextual`.
+[established-bounded; source-inspected] `--material-source contextual` (alias `bilinear-contextual`) selects the preceding
+`BilinearContextual` source variant.
 The [ordinary return](../research/records/2026-09-08_AC1_ORDINARY_RECEPTION_CONDUCTS_THE_SOURCE_AND_ITS_AVAILABLE_CONTEXT.md)
 uses `Q(source) tensor Q(context)` after the complete bilinear source/condition contact. The
 addressed source and context immediately before reception retain separate epochs. Native
@@ -312,6 +312,15 @@ by `alpha_text`. The legacy `contextual-direct-sum` trial retains wire chart 1; 
 chart 2. Saved kinds are never silently converted, and older absent tags retain their old default.
 Both versions preserve full historical material factors, with growing residency and cold costs.
 The actual 16-family model and its exact process restart still fail useful language.
+
+[established-bounded; measured] Fresh `alpha_text` now defaults to
+`--material-source operative-contextual`, stored as `OperativeContextual`. It enables the operative
+field before material admission and reads the actual outgoing/internal carrier. Source chart 3
+has an `operative_context` reading; the old `context` prefix reading is absent. The native source,
+operator factors and per-return frames survive changed contacts and rest. The
+[source and joint-contact record](../research/records/2026-09-08_AC1_THE_MATERIAL_SOURCE_FOLLOWS_OPERATIVE_CURRENT_AND_THE_JOINT_CONTACT_HAS_ONE_NORMAL_SOLVE.md)
+contains actual-model evidence and the exact normal-response reference. Existing model kinds are
+not converted silently. The native endogenous morphology-return producer remains unfinished.
 
 [established-bounded; source-inspected] `alpha_contextual_lift MODEL RECEIVING,RECEIVING
 --enclosed-pair --report NEW.json` performs the bounded [AC1 derivation check](../research/records/2026-09-07_AC1_THE_SOURCE_NULL_RETURN_DERIVES_ITS_CONTEXTUAL_LIFT.md)
@@ -346,9 +355,9 @@ history placement retain the operative currents and full residuals. `inspect_ope
 and `inspect_operative_contacts` expose their explicit cold receivers; the old raw-covariance
 and fixed-contact exact-decoder methods do not silently reinterpret the new carrier.
 The [operative field record](../research/records/2026-09-08_AC1_THE_OPERATIVE_MAP_CONDUCTS_AND_RESTARTS_IN_THE_FIELD.md)
-retains actual-model and process-restart evidence. The fixed integral-contact material bridge
-remains scoped: changed-map material interpretation and the endogenous morphology return are
-not yet implemented. The resulting text is still unusable.
+retains actual-model and process-restart evidence. The earlier fixed integral-contact material bridge
+retains its scope. The new operative source above covers changed-map current; the endogenous
+morphology-return producer remains unfinished. The resulting text is still unusable.
 
 [established-bounded; implemented-exact] `PairedJunctionLinearization::at` is the exact cold
 reference for the existing junction at declared contact/current operands. Its `pushforward` and

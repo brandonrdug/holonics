@@ -2,12 +2,20 @@ use super::*;
 use crate::native_ecology::constitutive_fibre::circulation::rest::point_section;
 use serde::{Deserialize, Serialize};
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(in super::super::super) struct OperativeReturnFrame {
+    pub at_cut: usize,
+    pub contact_count: usize,
+}
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(in super::super::super) struct OperativeWire {
     pub activated_at: usize,
     pub births: Vec<NativeOperativeContactBirth>,
     pub returns: usize,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub return_frames: Vec<OperativeReturnFrame>,
 }
 #[derive(Debug, PartialEq, Eq)]
 pub(in super::super::super) struct OperativeRest {
@@ -21,6 +29,21 @@ pub(in super::super::super) struct OperativeHistoryRest {
     pub b: ResidentSectionRest,
     pub bounds: ResidentSectionRest,
     pub trace: ResidentSectionRest,
+}
+impl OperativeWire {
+    fn frame(&self, i: usize) -> OperativeReturnFrame {
+        self.return_frames
+            .get(i)
+            .cloned()
+            .unwrap_or_else(|| OperativeReturnFrame {
+                at_cut: self.activated_at,
+                contact_count: self
+                    .births
+                    .iter()
+                    .filter(|b| b.receiving < self.activated_at)
+                    .count(),
+            })
+    }
 }
 impl OperativeHistoryRest {
     pub fn write(
@@ -62,7 +85,7 @@ impl OperativeHistoryRest {
         }
         for w in self.trace.intervals[..18 * d].chunks_exact(18) {
             if ![0, 1].contains(&w[17].0)
-                || (w[17].0==1 && w[..17].iter().all(|v|v.0==0))
+                || (w[17].0 == 1 && w[..17].iter().all(|v| v.0 == 0))
                 || w[..17].iter().any(|v| v.0 < 0 || v.0 > u32::MAX as i64)
             {
                 return Err(invalid("historical residual limb"));
@@ -151,7 +174,24 @@ impl OperativeRest {
         if self.returns.len() != wire.returns {
             return Err(invalid("operative return chronology"));
         }
-        for r in &self.returns {
+        if !wire.return_frames.is_empty() && wire.return_frames.len() != wire.returns {
+            return Err(invalid("operative return frames"));
+        }
+        let mut cut = wire.activated_at;
+        for (i, r) in self.returns.iter().enumerate() {
+            let frame = wire.frame(i);
+            if frame.at_cut < cut
+                || frame.contact_count
+                    != wire
+                        .births
+                        .iter()
+                        .filter(|b| b.receiving < frame.at_cut)
+                        .count()
+            {
+                return Err(invalid("operative return population or order"));
+            }
+            cut = frame.at_cut;
+            let initial = frame.contact_count;
             for (s, rows, w) in [
                 (&r[0], 2, 2 * d),
                 (&r[1], 2, 4 * initial.max(1)),
@@ -173,6 +213,14 @@ impl<'c> OperativeState<'c> {
             activated_at: self.activated_at,
             births: self.births.clone(),
             returns: self.returns.len(),
+            return_frames: self
+                .returns
+                .iter()
+                .map(|r| OperativeReturnFrame {
+                    at_cut: r.at_cut,
+                    contact_count: r.contact_count,
+                })
+                .collect(),
         }
     }
     pub(in super::super::super) fn rest(
@@ -228,9 +276,13 @@ impl<'c> OperativeState<'c> {
         let returns = rest
             .returns
             .into_iter()
-            .map(|r| {
+            .enumerate()
+            .map(|(i, r)| {
+                let frame = wire.frame(i);
                 let [ports, currents, b, bounds] = r;
                 Ok(Rc::new(OperativeReturn {
+                    at_cut: frame.at_cut,
+                    contact_count: frame.contact_count,
                     origin: Rc::new(()),
                     ports: mount(ports)?,
                     currents: mount(currents)?,

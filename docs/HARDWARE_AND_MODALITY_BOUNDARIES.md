@@ -22,6 +22,12 @@ neither a perfect inverse nor a copy of every past sample is a general learning 
 
 ## Current common mechanism
 
+[definition] The [operative material source](../research/records/2026-09-08_AC1_THE_MATERIAL_SOURCE_FOLLOWS_OPERATIVE_CURRENT_AND_THE_JOINT_CONTACT_HAS_ONE_NORMAL_SOLVE.md)
+adds complete outgoing/internal current pairings through changed contacts, with source chart 3
+and explicit internal-carrier joins. A target port must preserve complex orientation, zero future
+birth slots, complete norms/radii and the source/return chronology. The joint normal-response
+reduction is an exact reference, not a new Metal or acoustic execution result.
+
 [definition] The [operative field return](../research/records/2026-09-08_AC1_THE_OPERATIVE_MAP_CONDUCTS_AND_RESTARTS_IN_THE_FIELD.md)
 adds full map/current reflection, birth growth and durable continuation. A target port must retain
 the complete signed residual (seventeen 32-bit magnitude limbs and a sign per real coordinate),

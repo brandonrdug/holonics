@@ -322,13 +322,19 @@ on the fixed integral-contact class uses the joint radius rather than expanding 
 auxiliary prefix. All 145 native constitutive and 20 SDK alpha checks pass. An actual model and
 its exact process restart return, with the same failed language response.
 
-[definition] Continue with the native joint material/current/morphology constitutive producer.
-It must use actual discrepancies, retained producing maps and metrics, prior dependencies and
-chronological transfer, together with the source interpretation and decoder through changing
-operative contacts. The current fixed-prefix material codec does not cover that changed-map case
-and refuses it explicitly. A supplied-delta interface or controlled physics perturbation does not
-establish learned morphology. This remains AC1 work directed at AC2's actual useful complete
-responses. The roadmap orders construction; the
+[established-bounded; measured] The [operative source and joint contact reference](../../research/records/2026-09-08_AC1_THE_MATERIAL_SOURCE_FOLLOWS_OPERATIVE_CURRENT_AND_THE_JOINT_CONTACT_HAS_ONE_NORMAL_SOLVE.md)
+now remove the fixed-prefix source obstruction for the explicit `OperativeContextual` variant,
+with complete native current pairing and per-return chronology. All 146 native constitutive and
+20 SDK alpha tests pass. Fresh eight-family cultivation and process restart return; its repetitive
+response still fails. The joint-contact reference derives a single target-width normal solve that
+retains both receiving terms and their shared producer. Native execution of that joint update is
+still required.
+
+[definition] Continue by implementing the native joint constitutive-return producer using the
+actual discrepancy, producer differential, source/reference currents and the full coupled normal
+response. Retain producing maps, metrics, prior dependencies and chronological transfer; the new
+source chart and private supplied-delta seam are not learned morphology. This remains AC1 work
+directed at AC2's actual complete useful responses. The roadmap orders the work; the
 [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
 remains a representation option with its actual future-generator obligations.
 

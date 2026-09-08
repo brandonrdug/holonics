@@ -11,7 +11,9 @@ pub use complete::{
     NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading,
     NativeMaterialModeReturn, NativeMaterialModeUnfolding,
 };
-pub use contextual::NativeContextualMaterialReading;
+pub use contextual::{
+    NativeContextualMaterialReading, NativeOperativeContextReading, NativeVisibleSourceReading,
+};
 pub use moment::NativeMomentMaterialReading;
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, serde::Deserialize)]
@@ -25,6 +27,8 @@ pub enum NativeMaterialTransportSource {
     Contextual,
     /// Ordinary source-null return using the full bound source/context mixed product.
     BilinearContextual,
+    /// The same bilinear phase moment over explicit operative current carriers.
+    OperativeContextual,
 }
 impl NativeMaterialTransportSource {
     pub(super) fn is_outgoing(&self) -> bool {
@@ -37,6 +41,7 @@ impl NativeMaterialTransportSource {
             Self::HomogeneousMoment => 3,
             Self::Contextual => 4,
             Self::BilinearContextual => 5,
+            Self::OperativeContextual => 6,
         }
     }
     pub(super) fn state_words(self, n: usize) -> Option<usize> {
@@ -47,13 +52,17 @@ impl NativeMaterialTransportSource {
                 .checked_mul(60)?
                 .checked_add(n.checked_mul(22)?)?
                 .checked_add(12),
-            Self::HomogeneousMoment | Self::Contextual | Self::BilinearContextual => {
-                n.checked_mul(12)?.checked_add(12)
-            }
+            Self::HomogeneousMoment
+            | Self::Contextual
+            | Self::BilinearContextual
+            | Self::OperativeContextual => n.checked_mul(12)?.checked_add(12),
         }
     }
     pub(super) fn report_words(self, n: usize) -> Option<usize> {
-        if matches!(self, Self::Contextual | Self::BilinearContextual) {
+        if matches!(
+            self,
+            Self::Contextual | Self::BilinearContextual | Self::OperativeContextual
+        ) {
             return n.checked_mul(150)?.checked_add(96);
         }
         n.checked_mul(if self == Self::HomogeneousMoment {
@@ -241,6 +250,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
         {
             return Err(ConstitutiveFibreError::Shape);
         }
+        if source == NativeMaterialTransportSource::OperativeContextual {
+            self.enable_operative_contacts()?;
+        }
         let width = source
             .state_words(self.nodes())
             .ok_or(ConstitutiveFibreError::Shape)?;
@@ -296,6 +308,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 kind,
                 NativeMaterialTransportSource::Contextual
                     | NativeMaterialTransportSource::BilinearContextual
+                    | NativeMaterialTransportSource::OperativeContextual
             ) {
                 Some(self.prepare_contextual_work()?)
             } else {
@@ -345,6 +358,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                     | NativeMaterialTransportSource::HomogeneousMoment
                     | NativeMaterialTransportSource::Contextual
                     | NativeMaterialTransportSource::BilinearContextual
+                    | NativeMaterialTransportSource::OperativeContextual
             )
         ) {
             return Err(ConstitutiveFibreError::Rest(
@@ -407,6 +421,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                     | NativeMaterialTransportSource::HomogeneousMoment
                     | NativeMaterialTransportSource::Contextual
                     | NativeMaterialTransportSource::BilinearContextual
+                    | NativeMaterialTransportSource::OperativeContextual
             )
         ) {
             return Err(ConstitutiveFibreError::Rest(

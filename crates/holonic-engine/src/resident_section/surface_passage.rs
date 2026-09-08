@@ -329,7 +329,7 @@ impl<'chart> ResidentSurface<'chart> {
         if let Some((state, source_current, source_forward, delta, report, kind, refreshed)) = &transport {
             let state_words=if *kind==1 {nodes.checked_mul(nodes).and_then(|n|n.checked_mul(12)).and_then(|n|n.checked_add(2))}
                 else if *kind==2 {nodes.checked_mul(nodes).and_then(|n|n.checked_mul(60)).and_then(|n|n.checked_add(22*nodes+12))}
-                else if *kind>=3 && *kind<=5 {nodes.checked_mul(12).and_then(|n|n.checked_add(12))} else {None}.ok_or_else(||fail("material state extent or kind"))?;
+                else if *kind>=3 && *kind<=6 {nodes.checked_mul(12).and_then(|n|n.checked_add(12))} else {None}.ok_or_else(||fail("material state extent or kind"))?;
             let report_words=nodes.checked_mul(if *kind==1 {36}else if *kind==2 {74}else if *kind==3 {96}else{150}).and_then(|n|n.checked_add(if *kind==1 {24}else if *kind>=4 {96}else{44})).ok_or_else(||fail("material report extent"))?;
             if refreshed.is_some_and(|s|!matches!(*kind,2|3) || !matches(s,1,if *kind==2 {10*nodes}else{30*nodes})) {return Err(fail("current source contraction extent"));}
             if (*kind==3)!=moment.is_some(){return Err(fail("moment source factors missing or unexpected"));}
@@ -351,7 +351,7 @@ impl<'chart> ResidentSurface<'chart> {
         if let Some((table,weights,evaluations,source))=contextual {
             let at=usize::try_from(occurrence).map_err(|_|fail("contextual chronology extent"))?;
             if occurrence>=u32::MAX as u64 || (origin.is_some() && source>=occurrence)
-                || !matches(table,at.max(1),1) || !matches(weights,at+1,16) || !matches(evaluations,4,30*nodes){return Err(fail("contextual source work extent"));}
+                || !matches(table,at.max(1),3) || !matches(weights,at+1,16) || !matches(evaluations,4,30*nodes){return Err(fail("contextual source work extent"));}
         }
         if operative.is_some_and(|s|!matches(s,1,20) || junction.is_none_or(|j|j.5.0==1)) {return Err(fail("operative contact table or current representation"));}
         let shared = nodes.checked_mul(24).and_then(|v| v.checked_mul(16))

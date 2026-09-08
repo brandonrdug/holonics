@@ -86,16 +86,30 @@ A fresh process with historical carriers initially archived reproduces the compl
 current history and generation exactly. Prompt/continuation takes 89.15 s; the first process takes
 165.14 s and peaks at 496,869,652 bytes of native payload. This is no efficiency or alpha claim.
 
-[definition] **Next: AC1 → AC2, produce learned joint morphology returns natively.**
-The continuing carrier, birth/reaction, publication and persistence are connected. The missing
-native producer must turn actual material discrepancies into the joint parameter/current/contact
-response, using the retained producing maps, metrics, earlier dependencies and chronological
-transfer, with per-occurrence return frames in persistence. Bind the material source family through changed contacts: the current fixed-prefix
-codec is admitted only on the fixed integral-contact class, and refuses a changed operative map.
-Complete that interpretation and its decoder with the endogenous return. A private supplied-delta
-seam or controlled perturbation is not learned morphology. Then inspect complete useful responses
-and contextual revision. No additional user information is required; the full AC0–AC5 goal remains
-active and Athena-alpha remains unattained.
+[established-bounded; measured] The [operative material source](research/records/2026-09-08_AC1_THE_MATERIAL_SOURCE_FOLLOWS_OPERATIVE_CURRENT_AND_THE_JOINT_CONTACT_HAS_ONE_NORMAL_SOLVE.md)
+now follows actual outgoing/internal current through changed contact maps. `OperativeContextual`
+uses source chart 3; fresh `alpha_text` cultivation defaults to it, while older saved kinds retain
+their own charts. Native rest preserves per-return field cuts and contact populations. All **146
+native constitutive and 20 SDK alpha tests pass**, including changed-map material conduct and exact
+numerical factor reconstruction. A cold exact reference also reduces the full joint ordinary/
+contrast normal system to one target-width solve without dropping its cross terms.
+
+[counterexample; measured] Fresh eight-family cultivation returns **1,930 occurrences** and a
+**163,800,816-byte** checkpoint at
+`.local/artifacts/athena-alpha/ac2-operative-context/first-eight-v1.hna`.
+Development takes 241.63 s with zero numerical readbacks. The response still repeats
+`tife~anen…` and fails the question. A fresh process reproduces the complete body, current history
+and generation exactly, with historical carriers initially archived. No endogenous morphology
+update has been performed by this source return.
+
+[definition] **Next: AC1 → AC2, implement the native joint constitutive-return producer.**
+The changed-contact source and per-return chronology are now available. Use the actual discrepancy,
+producer differential, retained source/reference currents and the complete joint normal response
+from the new record. Preserve producing maps, metrics, earlier dependencies and chronological
+transfer; do not replace the coupled response with independent contact solves or install a
+cotangent as a state displacement. Controlled perturbations and the private delta seam are not
+learned morphology. Then inspect actual complete useful responses and contextual revision.
+No additional user information is required; AC0–AC5 remains active and Athena-alpha is unattained.
 
 [definition] Existing [conditional transport](research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md),
 [condition families](research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md),

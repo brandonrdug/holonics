@@ -85,8 +85,10 @@ attachment. The [native staging](research/records/2026-09-08_AC1_OPERATIVE_CONTA
 now preserves the complete contact/current carriers and mixed moments on device. The
 [operative field](research/records/2026-09-08_AC1_THE_OPERATIVE_MAP_CONDUCTS_AND_RESTARTS_IN_THE_FIELD.md)
 now conducts births/reactions and publishes/persists that carrier in the same owner. Complete the
-native joint constitutive producer and its changed-contact source interpretation; the current
-fixed-prefix codec and private supplied-delta seam do not establish learned morphology. Do not repeat the completed pair-selected study or cold derivation. Do not replace enclosures with centres
+native joint constitutive producer. The [operative source](research/records/2026-09-08_AC1_THE_MATERIAL_SOURCE_FOLLOWS_OPERATIVE_CURRENT_AND_THE_JOINT_CONTACT_HAS_ONE_NORMAL_SOLVE.md)
+now carries changed-contact current and per-return chronology, with a complete joint normal
+reference. Use that coupled response; the new source or private supplied-delta seam does not
+establish learned morphology. Do not repeat the completed pair-selected study or cold derivation. Do not replace enclosures with centres
 or phase labels, or found a separate learner. Retain the carriers used to produce each prediction; later
 condition inference changes the successor rather than rewriting that prediction's history.
 

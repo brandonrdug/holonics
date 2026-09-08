@@ -8,6 +8,65 @@ use num_traits::{One, Zero};
 type Wave = ExactComplexWaveCurrent;
 type Error = ExactLinearError;
 
+/// Exact reference for the simultaneous material and producer tangent contact. The caller
+/// supplies the actual real producer differential L; this is not a native learner or a cause
+/// selection. The two residuals share the current context, while the old reference is retained.
+#[derive(Debug, PartialEq, Eq, Serialize)]
+pub struct JointMaterialContactResponse {
+    pub ordinary: Vec<Rat>,
+    pub contrast: Option<Vec<Rat>>,
+    pub producer_covector: Vec<Rat>,
+    pub producer_change: Vec<Rat>,
+    pub normal_scalar: Rat,
+}
+pub fn joint_material_contact(
+    producer: &ExactRatMatrix,
+    residual: &[Rat],
+    contrast: Option<(&[Rat], &Rat)>,
+) -> Result<JointMaterialContactResponse, Error> {
+    let y = producer.rows();
+    if y == 0 || residual.len() != y {
+        return Err(Error::ShapeMismatch);
+    }
+    let gram = producer.multiply(&producer.transpose()?)?;
+    let (alpha, multiple, rhs) = if let Some((returned, k)) = contrast {
+        if returned.len() != y || *k < Rat::zero() || *k > Rat::one() {
+            return Err(Error::ShapeMismatch);
+        }
+        let alpha = Rat::from_integer(5.into()) - k * Rat::from_integer(2.into()) - k * k;
+        let rhs = residual
+            .iter()
+            .zip(returned)
+            .map(|(r, t)| (Rat::from_integer(2.into()) - k) * r + (Rat::one() + k) * t)
+            .collect::<Vec<_>>();
+        (alpha, Rat::from_integer(3.into()), rhs)
+    } else {
+        (Rat::from_integer(2.into()), Rat::one(), residual.to_vec())
+    };
+    let normal = ExactRatMatrix::identity(y)?
+        .scaled(&alpha)
+        .add(&gram.scaled(&multiple))?;
+    let sum = normal.inverse()?.apply(&rhs)?;
+    let contrasting = contrast.map(|(returned, k)| {
+        sum.iter()
+            .zip(residual)
+            .zip(returned)
+            .map(|((w, r), t)| ((Rat::one() + k) * w - r + t) / Rat::from_integer(3.into()))
+            .collect::<Vec<_>>()
+    });
+    let ordinary = contrasting.as_ref().map_or_else(
+        || sum.clone(),
+        |v| sum.iter().zip(v).map(|(a, b)| a - b).collect(),
+    );
+    Ok(JointMaterialContactResponse {
+        producer_change: producer.transpose()?.apply(&sum)?,
+        producer_covector: sum,
+        ordinary,
+        contrast: contrasting,
+        normal_scalar: alpha,
+    })
+}
+
 fn dot(a: &[Wave], b: &[Wave]) -> Wave {
     a.iter()
         .zip(b)

@@ -23,6 +23,7 @@ pub(in super::super) struct OperativeSections<'c> {
 // Only the native joint-return producer may supply these packed carriers and their complete
 // delta radii. There is intentionally no public constructor taking an authored learning delta.
 pub(super) struct OperativeReturn<'c> {
+    at_cut:usize,contact_count:usize,
     origin: Rc<()>,
     ports: ResidentSection<'c>,
     currents: ResidentSection<'c>,
@@ -362,6 +363,10 @@ impl<'c> NativeConstitutiveField<'c> {
     }
 }
 impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
+    // Owner-only adoption after a complete native constitutive return. Birth identity and
+    // activation standing remain in the existing ecology; only its staged differences move.
+    #[cfg(test)]
+    fn into_update(self)->(Rc<OperativeSections<'c>>,Rc<()>,Vec<Rc<OperativeReturn<'c>>>) {(self.sections,self.origin,self.returns)}
     pub(in super::super) fn into_owned(self) -> OperativeState<'c> {
         let activated_at = self.field_cut();
         OperativeState {
@@ -387,7 +392,7 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
     // the borrowed source, its old returns and its exact decoder survive refusal unchanged.
     #[allow(dead_code)]
     pub(super) fn stage_return(&self, returned: Rc<OperativeReturn<'c>>) -> Result<Self, Error> {
-        if !Rc::ptr_eq(&self.origin, &returned.origin) {
+        if !Rc::ptr_eq(&self.origin, &returned.origin) || returned.at_cut!=self.field_cut() || returned.contact_count!=self.births.len() {
             return Err(Error::ForeignOccurrence);
         }
         let surface = self.field.relation.surface;

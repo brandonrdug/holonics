@@ -123,6 +123,8 @@ fn returned<'c>(
         db[2 * i + 1] = -s / 32;
     }
     Rc::new(OperativeReturn {
+        at_cut: source.field_cut(),
+        contact_count: source.births.len(),
         origin: Rc::clone(&source.origin),
         ports: packed(surface, 2, 2 * d, ports),
         currents: packed(surface, 2, 4 * k.max(1), rows),
@@ -487,7 +489,10 @@ fn material_continuation_matches_after_operative_rest() {
                 .unwrap()
                 .unwrap();
             let p = field.inspect_operative_reflection(at).unwrap().unwrap();
-            assert_eq!(m.context.source_radius, p.joint_current_radius);
+            assert_eq!(
+                m.context.as_ref().unwrap().source_radius,
+                p.joint_current_radius
+            );
         }
     }
     let make = || {
@@ -546,4 +551,161 @@ fn material_continuation_matches_after_operative_rest() {
     );
     field.advance_resident(&mut failed).unwrap();
     assert_eq!(field.occurrence_count(), 10);
+}
+
+#[test]
+#[ignore = "requires CUDA; material source follows complete operative currents after a contact change"]
+fn operative_material_reads_changed_contacts_and_keeps_the_source_through_restart() {
+    fn dot(a: &[W], b: &[W]) -> W {
+        a.iter()
+            .zip(b)
+            .fold(W::zero(), |s, (a, b)| s.add(&a.conjugate().multiply(b)))
+    }
+    fn kernel(a: &[W], b: &[W]) -> Rat {
+        let one = W::new(Rat::from_integer(1.into()), Rat::from_integer(0.into()));
+        one.add(&dot(a, b)).norm_square()
+            / ((Rat::from_integer(1.into()) + norm(a)) * (Rat::from_integer(1.into()) + norm(b)))
+    }
+    fn verify(field: &NativeConstitutiveField<'_>) {
+        let readings = (0..field.occurrence_count())
+            .map(|at| {
+                field
+                    .inspect_contextual_material_transport(at)
+                    .unwrap()
+                    .unwrap()
+            })
+            .collect::<Vec<_>>();
+        let contexts = readings
+            .iter()
+            .map(|r| {
+                assert!(r.context.is_none());
+                let c = r.operative_context.as_ref().unwrap();
+                let mut v = c.outgoing_center.clone();
+                v.extend_from_slice(&c.internal_center);
+                assert_eq!(norm(&v), c.numerical_norm_square);
+                v
+            })
+            .collect::<Vec<_>>();
+        for at in 0..readings.len() {
+            let mut expected = vec![W::zero(); field.nodes()];
+            let query = &readings[at];
+            for i in 1..=at {
+                let r = &readings[i];
+                let Some(input) = r.input_source.as_ref() else {
+                    continue;
+                };
+                let k = kernel(&input.center, &query.visible_source.center)
+                    * kernel(&contexts[i - 1], &contexts[at]);
+                let reference = r.reference_receiving_occurrence.unwrap();
+                let kr = if reference < i {
+                    kernel(
+                        &readings[reference].input_source.as_ref().unwrap().center,
+                        &query.visible_source.center,
+                    ) * kernel(&contexts[reference - 1], &contexts[at])
+                } else {
+                    Rat::from_integer(0.into())
+                };
+                for j in 0..field.nodes() {
+                    expected[j] = expected[j]
+                        .add(&r.ordinary_factor[j].add(&r.contextual_factor[j]).scaled(&k))
+                        .subtract(&r.contextual_factor[j].scaled(&kr));
+                }
+            }
+            assert!(
+                norm(&sub(&expected, &query.forward.center))
+                    <= &query.forward_evaluation_error * &query.forward_evaluation_error
+            );
+        }
+    }
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let mut field =
+        NativeConstitutiveField::found_with_enclosed_junction(&surface, seed(), ResidentGrain(72))
+            .unwrap();
+    field
+        .enable_material_transport_source(NativeMaterialTransportSource::OperativeContextual)
+        .unwrap();
+    populate(&mut field);
+    verify(&field);
+    let old = field
+        .inspect_contextual_material_transport(3)
+        .unwrap()
+        .unwrap();
+    let old = json_compatible(&old);
+    let update = {
+        let view = field.stage_operative_contacts().unwrap();
+        let mut delta = returned(&view, false);
+        Rc::get_mut(&mut delta).unwrap().b = packed(
+            &surface,
+            view.births.len().max(1),
+            4,
+            vec![0; 2 * view.births.len().max(1)],
+        );
+        view.stage_return(delta).unwrap().into_update()
+    };
+    {
+        let o = field.junction.as_mut().unwrap().operative.as_mut().unwrap();
+        o.sections = update.0;
+        o.origin = update.1;
+        o.returns = update.2;
+    }
+    assert_eq!(
+        json_compatible(
+            &field
+                .inspect_contextual_material_transport(3)
+                .unwrap()
+                .unwrap()
+        ),
+        old
+    );
+    let mut last = None;
+    let mut anchor = None;
+    for at in 4..9 {
+        if at == 6 {
+            field
+                .rechart(&[NativePhaseCurrent::new(0, 1, 1).unwrap()])
+                .unwrap();
+        }
+        let input = vec![NativePhaseCurrent::new((at % 3) as i64, 1, 3).unwrap()];
+        let mut occurrence = if at == 8 {
+            NativeFieldOccurrence::through_anchor(anchor.as_ref().unwrap(), input)
+        } else if let Some(s) = last.take() {
+            NativeFieldOccurrence::through(s, input)
+        } else {
+            NativeFieldOccurrence::entering(input)
+        };
+        let before = field.census();
+        let next = field.advance_resident(&mut occurrence).unwrap();
+        assert_eq!(field.census().section_read_outs, before.section_read_outs);
+        if at == 4 {
+            anchor = Some(field.retain_source(&next.source).unwrap());
+        }
+        last = Some(next.source);
+    }
+    verify(&field);
+    let expected = field.rest(&[last.as_ref()], &[anchor.as_ref()]).unwrap();
+    let mut bytes = vec![];
+    expected.write(&mut bytes).unwrap();
+    let rest = NativeFieldRest::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
+    drop(field);
+    drop(last);
+    drop(anchor);
+    let (mut field, mut sources, anchors) =
+        NativeConstitutiveField::remount(&surface, rest).unwrap();
+    verify(&field);
+    assert_eq!(
+        field
+            .rest(&[sources[0].as_ref()], &[anchors[0].as_ref()])
+            .unwrap(),
+        expected
+    );
+    let mut occurrence = NativeFieldOccurrence::through(
+        sources[0].take().unwrap(),
+        vec![NativePhaseCurrent::new(1, -1, 3).unwrap()],
+    );
+    field.advance_resident(&mut occurrence).unwrap();
+    verify(&field);
+}
+fn json_compatible(v: &impl serde::Serialize) -> serde_json::Value {
+    serde_json::to_value(v).unwrap()
 }

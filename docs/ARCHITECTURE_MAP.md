@@ -135,8 +135,12 @@ and the example observer expose that preparation. `field_operative_reflection.cu
 now reuses the LDL proposal and retains a full 544-bit residual and joint current bound.
 `operative/rest.rs` preserves operative state/history in field rest and archive placement. The
 [operative field return](../research/records/2026-09-08_AC1_THE_OPERATIVE_MAP_CONDUCTS_AND_RESTARTS_IN_THE_FIELD.md)
-connects birth, reaction and publication. The endogenous joint producer and changed-contact
-material interpretation remain open.
+connects birth, reaction and publication. `OperativeContextual` now binds the actual
+operative current to `field/material_transport/contextual.rs` and `field_contextual_material.cuh`,
+with explicit source readings and per-return frame persistence. `joint_material_contact` in
+`junction/producer.rs` is the exact reference for the coupled target-width normal solve. The
+[source return](../research/records/2026-09-08_AC1_THE_MATERIAL_SOURCE_FOLLOWS_OPERATIVE_CURRENT_AND_THE_JOINT_CONTACT_HAS_ONE_NORMAL_SOLVE.md)
+retains native and actual-data checks; the endogenous joint producer remains open.
 
 
 [established-bounded; source-inspected] `resident/context_section.rs` and

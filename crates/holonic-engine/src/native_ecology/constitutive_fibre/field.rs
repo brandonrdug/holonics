@@ -49,6 +49,7 @@ pub use junction::{
     NativeFieldInternalCurrent, NativeFieldInternalCurrentBall, NativeFieldJunctionReading,
     NativeFieldJunctionRepresentation, NativeFieldJunctionSolver,
     PairedContactCotangent, PairedJunctionCotangent, PairedJunctionLinearization, PairedJunctionTangent,
+    JointMaterialContactResponse,joint_material_contact,
     NativeOperativeContactBirth, NativeOperativeContactReading, NativeOperativeContactStaging, NativeOperativeReflectionReading,
 };
 use junction::{PairedJunction, PendingJunction};
@@ -59,7 +60,7 @@ pub use material_transport::{
     NativeFieldMaterialTransportResidual, NativeFieldMaterialTransportState,
     NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading,
     NativeMaterialModeReturn, NativeMaterialModeUnfolding, NativeMaterialTransportSource,
-    NativeMomentMaterialReading, NativeContextualMaterialReading,
+    NativeMomentMaterialReading, NativeContextualMaterialReading, NativeOperativeContextReading, NativeVisibleSourceReading,
 };
 pub use receiver::NativeFieldDifferentialReading;
 pub use resident_input::NativeFieldIncoming;
@@ -663,7 +664,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .and_then(|v| v.checked_add(9))
             .ok_or(ConstitutiveFibreError::Shape)?;
         let output = surface.fresh_section(1, output_width, ResidentGrain(0))?;
-        if self.transport.is_some() && self.junction.as_ref().and_then(|j|j.operative.as_ref()).is_some_and(|o|!o.is_fixed()) {
+        if self.transport.as_ref().is_some_and(|t|t.source!=NativeMaterialTransportSource::OperativeContextual) && self.junction.as_ref().and_then(|j|j.operative.as_ref()).is_some_and(|o|!o.is_fixed()) {
             return Err(ConstitutiveFibreError::Rest("the fixed-contact material source cannot read changed operative contacts".into()));
         }
         let prepared = self.prepare_junction(source_at.is_some())?;

@@ -1,0 +1,102 @@
+{
+  "truth_status": "established-bounded",
+  "evidence_tags": [
+    "measured"
+  ],
+  "source_kind": "operative-contextual",
+  "source_chart_version": 3,
+  "checkpoint": ".local/artifacts/athena-alpha/ac2-operative-context/first-eight-v1.hna",
+  "checkpoint_bytes": 163800816,
+  "development_occurrences": 1930,
+  "families": 8,
+  "development_seconds": 241.634268727,
+  "development_census": {
+    "allocations": 77234,
+    "captured_launches": 3864,
+    "control_launches": 0,
+    "deed_launches": 1931,
+    "device_to_device_octets": 0,
+    "egress_receipt_octets": 123648,
+    "egress_section_octets": 0,
+    "ingress_octets": 92037572,
+    "resident_octets_now": 322993488,
+    "resident_octets_peak": 331525940,
+    "section_read_outs": 0,
+    "synchronizations": 1931
+  },
+  "prompt": "Explain the difference between a function and its derivative.",
+  "complete_response": "tife~anenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenane",
+  "disposition": {
+    "kind": "interrupted"
+  },
+  "final_occurrences": 2120,
+  "prompt_and_emission_seconds": 43.608172188,
+  "native_joint_return_integrated": false,
+  "language_quality_established": false,
+  "first_process": {
+    "command": [
+      "target/debug/examples/alpha_text",
+      ".local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl",
+      "--families",
+      "8",
+      "--fractional-bits",
+      "72",
+      "--material-source",
+      "operative-contextual",
+      "--prompt",
+      ".local/artifacts/athena-alpha/ac2/first-request.txt",
+      "--emit-symbols",
+      "128",
+      "--checkpoint",
+      ".local/artifacts/athena-alpha/ac2-operative-context/first-eight-v1.hna",
+      "--report",
+      ".local/artifacts/athena-alpha/ac2-operative-context/first-eight-v1.json"
+    ],
+    "return_code": 0,
+    "whole_process_seconds": 292.18895205599256,
+    "max_rss_kib": 504396
+  },
+  "restart_process": {
+    "command": [
+      "target/debug/examples/alpha_text",
+      "--resume",
+      ".local/artifacts/athena-alpha/ac2-operative-context/first-eight-v1.hna",
+      "--families",
+      "0",
+      "--history-archive",
+      ".local/artifacts/athena-alpha/ac2-operative-context/first-eight-restart-v1.history",
+      "--prompt",
+      ".local/artifacts/athena-alpha/ac2/first-request.txt",
+      "--emit-symbols",
+      "128",
+      "--report",
+      ".local/artifacts/athena-alpha/ac2-operative-context/first-eight-restart-v1.json"
+    ],
+    "return_code": 0,
+    "whole_process_seconds": 58.22430719801923,
+    "max_rss_kib": 512148
+  },
+  "restart_comparisons": {
+    "body": true,
+    "generation": true,
+    "emission_current_history": true,
+    "development_records": true
+  },
+  "checks": {
+    "native_constitutive": {
+      "passed": 146,
+      "failed": 0,
+      "seconds": 38.63
+    },
+    "sdk_alpha": {
+      "passed": 20,
+      "failed": 0,
+      "seconds": 2.88
+    },
+    "exact_joint_normal_reduction": {
+      "passed": 1,
+      "failed": 0
+    }
+  },
+  "athena_alpha_attained": false
+}

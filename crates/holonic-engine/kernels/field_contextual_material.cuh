@@ -39,7 +39,7 @@ __device__ wide contextual_source_error(const int64_t *visible,const int64_t *co
     wide es=((const wide *)(visible+16u*n+8u))[0],ec=((const wide *)(context+6u*D+16u))[0];
     wide ns=((const wide *)(visible+16u*n+10u))[0],nc=((const wide *)(context+6u*D+20u))[0];
     if(es<0 || ec<0 || ns<0 || nc<0){atomicOr(slot,REFUSED_MALFORMED);return 0;}
-    if(version==2u){
+    if(version>=2u){
         wide error=add_checked(contextual_normalized_error(es,ns,grain,slot),contextual_normalized_error(ec,nc,grain,slot),slot);
         return error>2*S?2*S:error;
     }
@@ -72,22 +72,57 @@ __device__ wide contextual_fraction(MomentInteger num,const MomentInteger &den,u
         if(num>=den){num=num-den;result|=(wide)((uwide)1u<<bit);}}
     *remainder=!num.is_zero();return result;
 }
+// An operative context is the complete ordered outgoing/internal current carrier.
+// Birth order is the field's actual order; shorter histories have exact zero future slots.
+__device__ void contextual_operative_source(const wide *current,const wide *b,uint32_t count,uint32_t n,uint32_t grain,uint32_t at,
+    wide radius,const int64_t *state,int64_t *next,int64_t *next_hi,int64_t *out,int64_t *hi,uint32_t *slot){
+    uint32_t D=6u*n;size_t stride=D+1u;
+    if(radius<0 || (count && !b) || state[2u*D+5u]!=(int64_t)at || state[2u*D+6u]!=(int64_t)grain){atomicOr(slot,REFUSED_MALFORMED);return;}
+    for(uint32_t i=0;i<6u*D+22u;++i)out[i]=hi[i]=0;
+    for(uint32_t i=0;i<2u*D+8u;++i)next[i]=next_hi[i]=0;
+    next[2u*D+5u]=next_hi[2u*D+5u]=(int64_t)at+1;next[2u*D+6u]=next_hi[2u*D+6u]=grain;
+    wide *v=(wide *)out;HistoryInteger square;
+    for(uint32_t i=0;i<D;++i){v[i]=current[stride+i];square=square+history_integer(v[i])*history_integer(v[i]);}
+    for(uint64_t i=0;i<2u*(uint64_t)count;++i)square=square+history_integer(b[i])*history_integer(b[i]);
+    history_write_integer(square,out+6u*D+10u,hi+6u*D+10u,slot);
+    out[6u*D+15u]=grain;((wide *)(out+6u*D+16u))[0]=radius;out[6u*D+18u]=count;out[6u*D+19u]=at;
+    ((wide *)(out+6u*D+20u))[0]=history_norm_ceiling(square,slot);
+    for(uint32_t i=0;i<6u*D+22u;++i)hi[i]=out[i];
+}
+__device__ void contextual_context_pair(const int64_t *a,const wide *ba,const int64_t *b,const wide *bb,uint32_t D,uint32_t grain,uint32_t version,
+    MomentInteger &num,MomentInteger &den,uint32_t *slot){
+    if(version!=3u){moment_pair(a,b,D,grain,num,den,slot);return;}
+    int64_t ka=a[6u*D+18u],kb=b[6u*D+18u];
+    if(ka<0 || kb<0 || (ka && !ba) || (kb && !bb) || a[6u*D+15u]!=(int64_t)grain || b[6u*D+15u]!=(int64_t)grain){atomicOr(slot,REFUSED_MALFORMED);return;}
+    HistoryInteger re,im;const wide *oa=(const wide *)a,*ob=(const wide *)b;
+    for(uint32_t i=0;i<D;i+=2u)history_complex_add_product(re,im,oa[i],oa[i+1u],ob[i],ob[i+1u],true);
+    for(int64_t i=0;i<(ka<kb?ka:kb);++i)history_complex_add_product(re,im,ba[2u*i],ba[2u*i+1u],bb[2u*i],bb[2u*i+1u],true);
+    MomentInteger unit=moment_lift(complete_power(2u*grain,slot));MomentInteger real=unit+moment_lift(re),imaginary=moment_lift(im);
+    num=real*real+imaginary*imaginary;
+    den=(unit+moment_lift(history_read_integer(a+6u*D+10u,slot)))*(unit+moment_lift(history_read_integer(b+6u*D+10u,slot)));
+    if(num.overflow || den.overflow || den.is_zero() || num.negative || den.negative || den<num)atomicOr(slot,REFUSED_CARRIER);
+}
 __device__ wide contextual_kernel(const int64_t *sa,const int64_t *ca,const int64_t *sb,const int64_t *cb,
-    uint32_t n,uint32_t grain,uint32_t version,uint32_t *remainder,uint32_t *slot){
-    if(version==2u){
+    uint32_t n,uint32_t grain,uint32_t version,uint32_t *remainder,uint32_t *slot,const wide *ba=nullptr,const wide *bb=nullptr){
+    if(version>=2u){
         HistoryInteger sr,si;const wide *a=(const wide *)(sa+8u*n+2u),*b=(const wide *)(sb+8u*n+2u);
         for(uint32_t j=0;j<4u*n;j+=2u)history_complex_add_product(sr,si,a[j],a[j+1],b[j],b[j+1],true);
         MomentInteger real=moment_lift(sr)+moment_lift(complete_power(2u*grain,slot)),imaginary=moment_lift(si);
         MomentInteger num=real*real+imaginary*imaginary;
         MomentInteger den=moment_lift(history_read_integer(sa+16u*n+2u,slot))*moment_lift(history_read_integer(sb+16u*n+2u,slot));
         bool rs=false,rc=false;wide ks=contextual_fraction(num,den,grain,&rs,slot);
-        wide kc=moment_kernel_grid(ca,cb,6u*n,grain,&rc,slot),rounds=0;
+        MomentInteger cn,cd;contextual_context_pair(ca,ba,cb,bb,6u*n,grain,version,cn,cd,slot);
+        wide kc=contextual_fraction(cn,cd,grain,&rc,slot),rounds=0;
         wide product=ft_product(ks,kc,grain,&rounds,slot);*remainder=rs+rc+(rounds?1u:0u);return product;
     }
     MomentInteger num,den;contextual_pair(sa,ca,sb,cb,n,grain,num,den,slot);
     bool rem=false;wide value=*slot?0:contextual_fraction(num,den,grain,&rem,slot);*remainder=rem;return value;
 }
-__device__ const int64_t *contextual_at(const int64_t *table,uint32_t at){return (const int64_t *)(uintptr_t)(uint64_t)table[at];}
+__device__ const int64_t *contextual_at(const int64_t *table,uint32_t at){return (const int64_t *)(uintptr_t)(uint64_t)table[3u*(size_t)at];}
+__device__ const wide *contextual_b_at(const int64_t *table,uint32_t at){return (const wide *)(uintptr_t)(uint64_t)table[3u*(size_t)at+1u];}
+__device__ uint32_t contextual_query_context(const int64_t *now,uint32_t n,uint32_t at,uint32_t q){
+    const int64_t *meta=now+contextual_meta(n);return q==0?at:q==1?at-1u:q==2?(uint32_t)meta[1]:(uint32_t)meta[2]-1u;
+}
 __device__ void contextual_query_parts(const int64_t *table,const int64_t *now,uint32_t n,uint32_t at,uint32_t query,
     const int64_t **visible,const int64_t **context,uint32_t *slot){
     const int64_t *meta=now+contextual_meta(n);int64_t source=meta[1],reference=meta[2];
@@ -144,7 +179,7 @@ __device__ void contextual_material_prepare(
     int64_t *weights,int64_t *evaluations,const int64_t *query,const int64_t *origin,const int64_t *incoming,
     const int64_t *frame,const int64_t *origin_frame,const int64_t *covariance,const wide *before,const wide *current,
     uint32_t n,uint32_t linked,uint32_t grain,uint32_t version,int64_t *next,int64_t *next_hi,int64_t *out,int64_t *out_hi,
-    wide *scratch,uint32_t *slot,wide joint_radius=-1
+    wide *scratch,uint32_t *slot,wide joint_radius=-1,const wide *operative_b=nullptr,uint32_t operative_count=0
 ) {
     uint32_t R=2u*n,D=6u*n,stride=R+1u;size_t ga=2u*D+8u,raw_stride=30u*n;
     wide *ball=(wide *)out,*abs_beta=(wide *)(out+contextual_beta(n)),*ctx_beta=abs_beta+R;
@@ -152,7 +187,8 @@ __device__ void contextual_material_prepare(
     if(threadIdx.x==0){
         for(size_t i=0;i<contextual_extra(n)+24u;++i)out[i]=out_hi[i]=0;
         if((linked && (!at || source_ordinal>=at || !original)) || at>=(uint32_t)INT64_MAX){atomicOr(slot,REFUSED_MALFORMED);}
-        if(!*slot)field_current_history_source_prepare(query,origin,incoming,frame,origin_frame,covariance,before,current,state,
+        if(!*slot && version==3u)contextual_operative_source(current,operative_b,operative_count,n,grain,at,joint_radius,state,next,next_hi,out+contextual_context(n),out_hi+contextual_context(n),slot);
+        else if(!*slot)field_current_history_source_prepare(query,origin,incoming,frame,origin_frame,covariance,before,current,state,
             n,linked,grain,at,next,next_hi,out+contextual_context(n),out_hi+contextual_context(n),scratch,slot,joint_radius);
         wide ud=1,dd=1;
         if(!*slot && field_paired_build_faces(query,origin,incoming,frame,origin_frame,n,linked,scratch,scratch+D,&ud,&dd,slot))
@@ -190,7 +226,9 @@ __device__ void contextual_material_prepare(
             if(q==2 && source_ordinal==(uint64_t)at-1u){for(uint32_t j=0;j<4u;++j)weight[j]=weights[((size_t)i*4u+1u)*4u+j];continue;}
             const int64_t *sv,*cv;contextual_query_parts(table,out,n,at,q,&sv,&cv,slot);if(*slot)continue;
             const int64_t *si=entry+contextual_input_visible(n),*ci=contextual_at(table,i-1u)+contextual_context(n);
-            uint32_t rem=0;wide k=contextual_kernel(si,ci,sv,cv,n,grain,version,&rem,slot);
+            uint32_t context_at=contextual_query_context(out,n,at,q);
+            const wide *bq=context_at==at?operative_b:contextual_b_at(table,context_at);
+            uint32_t rem=0;wide k=contextual_kernel(si,ci,sv,cv,n,grain,version,&rem,slot,contextual_b_at(table,i-1u),bq);
             ((wide *)weight)[0]=k;weight[2]=rem;weight[3]=0;
         }
     }
@@ -262,7 +300,7 @@ __device__ void contextual_material_prepare(
                 ball[10u*stride-1u]=add_checked(product_checked(2,et,slot),add_checked(ft_ceil_product(nt,de,grain,slot),deval,slot),slot);
                 ball[11u*stride-1u]=add_checked(ball[9u*stride-1u],ball[10u*stride-1u],slot);
                 MomentInteger num,den;
-                if(version==2u)moment_pair(ci,contextual_at(table,(uint32_t)meta[2]-1u)+contextual_context(n),D,grain,num,den,slot);
+                if(version>=2u)contextual_context_pair(ci,contextual_b_at(table,at-1u),contextual_at(table,(uint32_t)meta[2]-1u)+contextual_context(n),contextual_b_at(table,(uint32_t)meta[2]-1u),D,grain,version,num,den,slot);
                 else contextual_pair(si,ci,ref+contextual_input_visible(n),contextual_at(table,(uint32_t)meta[2]-1u)+contextual_context(n),n,grain,num,den,slot);
                 bool rem=false;wide gain=contextual_fraction(den,MomentInteger(3)*den-MomentInteger(2)*num,grain,&rem,slot);extra[6]=gain;extra[7]=rem;
                 beta_rounds=0;
