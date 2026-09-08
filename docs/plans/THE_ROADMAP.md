@@ -65,14 +65,21 @@ learner. The real model's contribution is nonzero and its frozen-map unfolding m
 actual source. All 128 constitutive and 16 SDK alpha tests pass. That decomposition does not
 improve the old model's text result.
 
-[definition] Next implement the [homogeneous phase-moment source](../../research/records/2026-09-07_AC2_A_HOMOGENEOUS_PHASE_MOMENT_IS_THE_NEXT_MATERIAL_SOURCE_CHART.md)
-through the existing complete material-return owner. Retain the full contextual current and
-phase-reference chart; construct the implicit normalized Hermitian pairing and its exact
-source/parameter error receipts, then cultivate and inspect the actual conversation variant.
-Its benefit for language is a hypothesis. Preserve the existing variant and do not substitute
-a centre, phase label, sampled tensor population, separate learner or another isolated diagnostic
-for this productive construction. Native generative current remains distinct from whole-family
-evidence, without a universal certainty gate on generation.
+[established-bounded; measured] The [homogeneous phase-moment return](../../research/records/2026-09-07_AC2_THE_HOMOGENEOUS_MOMENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md)
+now joins the complete contextual source to the existing native learner. All 133 constitutive
+and 16 SDK alpha tests pass. Actual four/eight-family cultivation and restart return; the tighter
+signed operator-norm bound removes the eight-family numerical obstruction while preserving
+its numerical current. The resulting answer repeats `va` to the 128-symbol work limit and
+fails the requested language product. This component is complete at its declared scope;
+Athena-alpha remains unattained.
+
+[definition] Next compose the [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
+through this same owner so broader cultivation need not reevaluate every retained factor for
+every new source. Preserve source chronology, delayed-return coverage, exact residuals and the
+complete successor. The derived identity is not yet a finite-word implementation or a language
+result. Cultivate and inspect the resulting actual model through the existing public session;
+continue toward learned contextual progression and useful English/code/mathematics. Do not
+substitute another isolated diagnostic, a centre or a repetition filter for that product.
 
 [established-bounded; measured] The [generated-current ingress](../../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
 now reaches the ordinary field operation without numerical readback/remount, preserving paired

@@ -481,7 +481,7 @@ impl NativeFieldRest {
                 junction_section(section, dimension, wire.representation)?;
             }
             if let Some(section) = &rest.transport {
-                let error = if h.transport_source == NativeMaterialTransportSource::CompleteCurrent
+                let error = if h.transport_source != NativeMaterialTransportSource::CoupledOutgoing
                 {
                     let grain = match h.junction.as_ref().map(|j| j.representation) {
                         Some(NativeFieldJunctionRepresentation::EnclosedDyadic {
@@ -489,7 +489,12 @@ impl NativeFieldRest {
                         }) => fractional_bits,
                         _ => return Err(invalid("complete-current representation")),
                     };
-                    material_transport::complete::validate_report(section, n, grain, at)?
+                    match h.transport_source {
+                        NativeMaterialTransportSource::HomogeneousMoment => {
+                            material_transport::moment::validate_report(section, n, grain, at)?
+                        }
+                        _ => material_transport::complete::validate_report(section, n, grain, at)?,
+                    }
                 } else {
                     transport_section(section, n, linked)?
                 };
@@ -523,20 +528,20 @@ impl NativeFieldRest {
             }
         }
         if let Some(state) = &self.transport {
-            if h.transport_source == NativeMaterialTransportSource::CompleteCurrent {
+            if h.transport_source != NativeMaterialTransportSource::CoupledOutgoing {
                 let grain = match h.junction.as_ref().map(|j| j.representation) {
                     Some(NativeFieldJunctionRepresentation::EnclosedDyadic { fractional_bits }) => {
                         fractional_bits
                     }
                     _ => return Err(invalid("complete-current representation")),
                 };
-                material_transport::complete::validate_state(
-                    state,
-                    n,
-                    grain,
-                    h.history.len(),
-                    coefficient_error,
-                )?;
+                let validate =
+                    if h.transport_source == NativeMaterialTransportSource::HomogeneousMoment {
+                        material_transport::moment::validate_state
+                    } else {
+                        material_transport::complete::validate_state
+                    };
+                validate(state, n, grain, h.history.len(), coefficient_error)?;
             } else {
                 point_section(state, 1, transport_width)?;
                 let values = packed(state)?;

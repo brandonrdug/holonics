@@ -1,0 +1,317 @@
+{
+  "schema": "holonics.moment-material-conversation-return.v1",
+  "truth_status": "established-bounded",
+  "evidence": [
+    "measured",
+    "source-inspected"
+  ],
+  "scope": "CUDA conversation prefix; failed language responses; exact native arithmetic and persistence checks do not establish Athena-alpha",
+  "numerical_bound_comparison": {
+    "same_exposure_records": true,
+    "same_lineage_through_prompt": true,
+    "same_first_response_junction": true,
+    "same_first_response_transport_except_error_and_norm_bounds": true
+  },
+  "fresh_process_restart_matches": {
+    "generation": true,
+    "body": true,
+    "emission_current_history": true,
+    "utf8": true
+  },
+  "verification": {
+    "native_constitutive_tests_passed": 133,
+    "native_seconds": 27.39,
+    "sdk_alpha_tests_passed": 16,
+    "sdk_seconds": 1.49
+  },
+  "cases": [
+    {
+      "private_report": ".local/artifacts/athena-alpha/ac2-moment/first-four-v1.json",
+      "bound_variant": "triangle",
+      "development_occurrences": 732,
+      "development_families": 4,
+      "response_utf8": "vavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavava",
+      "response_disposition": {
+        "kind": "interrupted"
+      },
+      "response_symbols": 128,
+      "first_response_receiver": {
+        "exact_zero": 0,
+        "first_complex": 0,
+        "negative": 393,
+        "occurrence": 793,
+        "pairs": 9,
+        "positive": 118,
+        "unresolved": 0
+      },
+      "all_response_signs_resolved": true,
+      "first_response_error_chart": {
+        "denominator": "4722366482869645213696",
+        "numerators": {
+          "coefficient_error": "10021672515510638766",
+          "coefficient_norm_upper": "3466626062931055122418151",
+          "forward_radius": "10091160610487687313",
+          "forward_evaluation_error": "1196"
+        }
+      },
+      "first_response_error_decimal_observer": {
+        "coefficient_error": 0.0021221717018075985,
+        "coefficient_norm_upper": 734.0866227782658,
+        "forward_radius": 0.0021368863782794726,
+        "forward_evaluation_error": 2.532628512290358e-19
+      },
+      "whole_process_seconds": 29.934675827040337,
+      "max_rss_kib": 218376,
+      "material_wall_seconds": 20.160481911,
+      "prompt_and_emission_wall_seconds": 5.371419549,
+      "development_census": {
+        "allocations": 17582,
+        "captured_launches": 1466,
+        "control_launches": 0,
+        "deed_launches": 732,
+        "device_to_device_octets": 0,
+        "egress_receipt_octets": 46848,
+        "egress_section_octets": 0,
+        "ingress_octets": 9610096,
+        "resident_octets_now": 39931504,
+        "resident_octets_peak": 40593764,
+        "section_read_outs": 0,
+        "synchronizations": 732
+      },
+      "development_numeric_readouts_outside_placement": 0,
+      "native_error": null,
+      "language_quality_established": false,
+      "checkpoint_octets": 20695430
+    },
+    {
+      "private_report": ".local/artifacts/athena-alpha/ac2-moment/first-four-resumed-v1.json",
+      "bound_variant": "triangle",
+      "development_occurrences": 732,
+      "development_families": 4,
+      "response_utf8": "vavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavava",
+      "response_disposition": {
+        "kind": "interrupted"
+      },
+      "response_symbols": 128,
+      "first_response_receiver": {
+        "exact_zero": 0,
+        "first_complex": 0,
+        "negative": 393,
+        "occurrence": 793,
+        "pairs": 9,
+        "positive": 118,
+        "unresolved": 0
+      },
+      "all_response_signs_resolved": true,
+      "first_response_error_chart": {
+        "denominator": "4722366482869645213696",
+        "numerators": {
+          "coefficient_error": "10021672515510638766",
+          "coefficient_norm_upper": "3466626062931055122418151",
+          "forward_radius": "10091160610487687313",
+          "forward_evaluation_error": "1196"
+        }
+      },
+      "first_response_error_decimal_observer": {
+        "coefficient_error": 0.0021221717018075985,
+        "coefficient_norm_upper": 734.0866227782658,
+        "forward_radius": 0.0021368863782794726,
+        "forward_evaluation_error": 2.532628512290358e-19
+      },
+      "whole_process_seconds": 13.157924053957686,
+      "max_rss_kib": 244316,
+      "material_wall_seconds": 7e-08,
+      "prompt_and_emission_wall_seconds": 5.447636642,
+      "development_census": {
+        "allocations": 4404,
+        "captured_launches": 0,
+        "control_launches": 0,
+        "deed_launches": 0,
+        "device_to_device_octets": 0,
+        "egress_receipt_octets": 0,
+        "egress_section_octets": 0,
+        "ingress_octets": 39931504,
+        "resident_octets_now": 39931504,
+        "resident_octets_peak": 39931504,
+        "section_read_outs": 0,
+        "synchronizations": 0
+      },
+      "development_numeric_readouts_outside_placement": 0,
+      "native_error": null,
+      "language_quality_established": false
+    },
+    {
+      "private_report": ".local/artifacts/athena-alpha/ac2-moment/first-eight-v1.json",
+      "bound_variant": "triangle",
+      "development_occurrences": 1930,
+      "development_families": 8,
+      "response_utf8": "",
+      "response_disposition": {
+        "kind": "open"
+      },
+      "response_symbols": 0,
+      "first_response_receiver": {
+        "exact_zero": 0,
+        "first_complex": 0,
+        "negative": 385,
+        "occurrence": 1991,
+        "pairs": 9,
+        "positive": 38,
+        "unresolved": 88
+      },
+      "all_response_signs_resolved": false,
+      "first_response_error_chart": {
+        "denominator": "4722366482869645213696",
+        "numerators": {
+          "coefficient_error": "1511157727415192002983",
+          "coefficient_norm_upper": "8616553077809134536708680",
+          "forward_radius": "1515248534797356921397",
+          "forward_evaluation_error": "2819"
+        }
+      },
+      "first_response_error_decimal_observer": {
+        "coefficient_error": 0.3200000959046502,
+        "coefficient_norm_upper": 1824.626087167446,
+        "forward_radius": 0.32086635806304137,
+        "forward_evaluation_error": 5.969464695774682e-19
+      },
+      "whole_process_seconds": 52.24606016103644,
+      "max_rss_kib": 259028,
+      "material_wall_seconds": 34.280478327,
+      "prompt_and_emission_wall_seconds": 1.829856205,
+      "development_census": {
+        "allocations": 33164,
+        "captured_launches": 2400,
+        "control_launches": 0,
+        "deed_launches": 1198,
+        "device_to_device_octets": 0,
+        "egress_receipt_octets": 76672,
+        "egress_section_octets": 0,
+        "ingress_octets": 92112656,
+        "resident_octets_now": 104661840,
+        "resident_octets_peak": 105439108,
+        "section_read_outs": 0,
+        "synchronizations": 1198
+      },
+      "development_numeric_readouts_outside_placement": 0,
+      "native_error": null,
+      "language_quality_established": false,
+      "checkpoint_octets": 54248891
+    },
+    {
+      "private_report": ".local/artifacts/athena-alpha/ac2-moment/first-eight-energy-v2.json",
+      "bound_variant": "signed-cross-current",
+      "development_occurrences": 1930,
+      "development_families": 8,
+      "response_utf8": "vavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavava",
+      "response_disposition": {
+        "kind": "interrupted"
+      },
+      "response_symbols": 128,
+      "first_response_receiver": {
+        "exact_zero": 0,
+        "first_complex": 0,
+        "negative": 393,
+        "occurrence": 1991,
+        "pairs": 9,
+        "positive": 118,
+        "unresolved": 0
+      },
+      "all_response_signs_resolved": true,
+      "first_response_error_chart": {
+        "denominator": "4722366482869645213696",
+        "numerators": {
+          "coefficient_error": "19048595574583426217",
+          "coefficient_norm_upper": "78572954997327741606475",
+          "forward_radius": "19085898985986925756",
+          "forward_evaluation_error": "2819"
+        }
+      },
+      "first_response_error_decimal_observer": {
+        "coefficient_error": 0.004033697012648656,
+        "coefficient_norm_upper": 16.638470411466507,
+        "forward_radius": 0.004041596317274592,
+        "forward_evaluation_error": 5.969464695774682e-19
+      },
+      "whole_process_seconds": 70.20659000502201,
+      "max_rss_kib": 269100,
+      "material_wall_seconds": 54.808643819,
+      "prompt_and_emission_wall_seconds": 5.652540274,
+      "development_census": {
+        "allocations": 46342,
+        "captured_launches": 3866,
+        "control_launches": 0,
+        "deed_launches": 1930,
+        "device_to_device_octets": 0,
+        "egress_receipt_octets": 123520,
+        "egress_section_octets": 0,
+        "ingress_octets": 61791248,
+        "resident_octets_now": 104661840,
+        "resident_octets_peak": 105439108,
+        "section_read_outs": 0,
+        "synchronizations": 1930
+      },
+      "development_numeric_readouts_outside_placement": 0,
+      "native_error": null,
+      "language_quality_established": false,
+      "checkpoint_octets": 54248891
+    },
+    {
+      "private_report": ".local/artifacts/athena-alpha/ac2-moment/first-eight-energy-resumed-v2.json",
+      "bound_variant": "signed-cross-current",
+      "development_occurrences": 1930,
+      "development_families": 8,
+      "response_utf8": "vavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavava",
+      "response_disposition": {
+        "kind": "interrupted"
+      },
+      "response_symbols": 128,
+      "first_response_receiver": {
+        "exact_zero": 0,
+        "first_complex": 0,
+        "negative": 393,
+        "occurrence": 1991,
+        "pairs": 9,
+        "positive": 118,
+        "unresolved": 0
+      },
+      "all_response_signs_resolved": true,
+      "first_response_error_chart": {
+        "denominator": "4722366482869645213696",
+        "numerators": {
+          "coefficient_error": "19048595574583426217",
+          "coefficient_norm_upper": "78572954997327741606475",
+          "forward_radius": "19085898985986925756",
+          "forward_evaluation_error": "2819"
+        }
+      },
+      "first_response_error_decimal_observer": {
+        "coefficient_error": 0.004033697012648656,
+        "coefficient_norm_upper": 16.638470411466507,
+        "forward_radius": 0.004041596317274592,
+        "forward_evaluation_error": 5.969464695774682e-19
+      },
+      "whole_process_seconds": 23.37855982000474,
+      "max_rss_kib": 272180,
+      "material_wall_seconds": 1.31e-07,
+      "prompt_and_emission_wall_seconds": 5.623576369,
+      "development_census": {
+        "allocations": 11592,
+        "captured_launches": 0,
+        "control_launches": 0,
+        "deed_launches": 0,
+        "device_to_device_octets": 0,
+        "egress_receipt_octets": 0,
+        "egress_section_octets": 0,
+        "ingress_octets": 104661840,
+        "resident_octets_now": 104661840,
+        "resident_octets_peak": 104661840,
+        "section_read_outs": 0,
+        "synchronizations": 0
+      },
+      "development_numeric_readouts_outside_placement": 0,
+      "native_error": null,
+      "language_quality_established": false
+    }
+  ]
+}

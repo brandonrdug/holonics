@@ -52,6 +52,7 @@ pub use material_transport::{
     NativeFieldMaterialTransportResidual, NativeFieldMaterialTransportState,
     NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading,
     NativeMaterialModeReturn, NativeMaterialModeUnfolding, NativeMaterialTransportSource,
+    NativeMomentMaterialReading,
 };
 pub use receiver::NativeFieldDifferentialReading;
 pub use resident_input::NativeFieldIncoming;
@@ -676,18 +677,35 @@ impl<'chart> NativeConstitutiveField<'chart> {
         {
             let lane = passage.open(field_lane, &predecessors)?;
             if let Some(refresh) = prepared_transport.as_ref().and_then(|p| p.refresh.as_ref()) {
-                surface.record_complete_material_source_current(
-                    &lane,
-                    self.history[source_at.expect("refresh source")]
-                        .resident()?
-                        .transport
-                        .as_ref()
-                        .expect("complete source report"),
-                    &refresh.tail,
-                    refresh.count,
-                    self.nodes(),
-                    &refresh.output,
-                )?;
+                if let Some(weights) = &refresh.moment_weights {
+                    surface.record_moment_source_current(
+                        &lane,
+                        self.history[source_at.expect("refresh source")]
+                            .resident()?
+                            .transport
+                            .as_ref()
+                            .expect("source report"),
+                        &refresh.tail,
+                        refresh.count,
+                        weights,
+                        self.nodes(),
+                        self.transport_grain()?,
+                        &refresh.output,
+                    )?;
+                } else {
+                    surface.record_complete_material_source_current(
+                        &lane,
+                        self.history[source_at.expect("refresh source")]
+                            .resident()?
+                            .transport
+                            .as_ref()
+                            .expect("complete source report"),
+                        &refresh.tail,
+                        refresh.count,
+                        self.nodes(),
+                        &refresh.output,
+                    )?;
+                }
             }
             surface.record_constitutive_field(
                 &lane,
@@ -738,6 +756,10 @@ impl<'chart> NativeConstitutiveField<'chart> {
                         )
                     }),
                 at as u64,
+                prepared_transport
+                    .as_ref()
+                    .and_then(|p| p.moment.as_ref())
+                    .map(|p| (&p.table, p.count, &p.weights)),
                 &output,
             )?;
         }

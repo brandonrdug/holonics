@@ -92,6 +92,15 @@ differential kernel receives explicit resident ball views; a frozen material con
 unfold without its source field. The [material return](../research/records/2026-09-07_AC1_THE_SHARED_DRIVE_MODE_REACHES_THE_LEARNED_MATERIAL_CURRENT.md)
 records its actual conversation-model use and unchanged text-differential boundary.
 
+[established-bounded; source-inspected] `field/material_transport/moment.rs` and
+`field_moment_material.cuh` now bind the normalized homogeneous Hermitian source to the same
+field/material-return owner. The complete-source prefix/norm/pairing geometry supplies its
+implicit kernel. Immutable native factors, delayed-source evaluation, signed evaluation defects,
+operator-norm transport and rest/differential receivers are documented in the
+[moment return](../research/records/2026-09-07_AC2_THE_HOMOGENEOUS_MOMENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md).
+`resident_section/surface_moment.rs` records the older-source evaluation; the fused field kernel
+owns publication. The exact rational factor decoder is an exterior diagnostic.
+
 [established-bounded; measured] `native_ecology/constitutive_fibre/resident.rs` now owns borrowed
 resident rational-current input and immutable original-fibre returns for the existing local
 relation. `resident_section::record_constitutive_current` and

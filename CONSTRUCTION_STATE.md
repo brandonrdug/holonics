@@ -75,13 +75,20 @@ contribution and change; its 17-step unfolding matches a later actual source und
 The full and remaining currents have the same nine text signs at that particular cut, so no
 text-quality improvement is claimed.
 
-[definition] Next construct the [homogeneous phase-moment source](research/records/2026-09-07_AC2_A_HOMOGENEOUS_PHASE_MOMENT_IS_THE_NEXT_MATERIAL_SOURCE_CHART.md)
-through the same native material-return owner, retaining the complete current, reference chart,
-lineage and numerical residual scope. Its implicit normalized Hermitian pairing presents mixed
-phase forms without enumerating a tensor population or selecting a centre. Language improvement
-is a construction hypothesis, to be tested by cultivation and complete actual responses. Keep
-the existing source variant and its evidence. Athena-alpha and the full AC0–AC5 product remain
-unfinished; another isolated mode diagnostic is not the next deliverable.
+[established-bounded; measured] The [homogeneous phase-moment return](research/records/2026-09-07_AC2_THE_HOMOGENEOUS_MOMENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md)
+is implemented and verified through the existing native material owner, with 133 constitutive
+and 16 SDK alpha tests passing. Real eight-family cultivation retains 1,930 development
+occurrences and a 54,248,891-byte checkpoint. Signed operator-norm transport lowers the first
+response's error radius from about 0.321 to 0.00404 without changing its numerical current.
+The answer still repeats `va` to the 128-symbol work limit. This is a failed language result;
+Athena-alpha and the AC0–AC5 product remain unfinished.
+
+[definition] Next construct the [chronological future contraction](research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
+in the same native moment owner, retaining delayed-source coverage and the composed residual.
+Its derived parameter form can represent all chronologically new queries without expanding
+the history-sized Hermitian source; numerical realization and cost remain open. Follow it
+through broader actual cultivation and response inspection. Keep the private checkpoints and
+failed responses; a component test or another isolated diagnostic does not complete the goal.
 
 [established-bounded; measured] The [text-parent framing repair](research/records/2026-09-07_AC0_LEADING_MATERIAL_DOES_NOT_DROP_THE_TEXT_PART_PARENT.md)
 preserves an available parent when non-text material precedes the first admitted text part.

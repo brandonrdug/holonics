@@ -75,7 +75,11 @@ data and inspect the resulting complete responses. The old failed responses rema
 This is not the earlier proposal to use a higher polynomial face instead of missing context:
 the complete contextual current remains the operand throughout.
 
-[open] Implement the resident source/receiver and coherent material-return composition, then
-cultivate and inspect the resulting conversation variant through the existing public session.
-Useful English/code/mathematics and the complete AC0–AC5 product remain required. Lean stays
-outside every cultivation/inference pipeline; the retired external database remains unused.
+[established-bounded; measured] The [resident material return](2026-09-07_AC2_THE_HOMOGENEOUS_MOMENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md)
+now implements this source/receiver and exercises it through actual conversation cultivation
+and process restart. All 133 constitutive and 16 SDK alpha tests pass. The final eight-family
+answer repeats `va` to the work limit and does not establish useful language.
+
+[open] Useful English/code/mathematics and the complete AC0–AC5 product remain required.
+Lean stays outside every cultivation/inference pipeline; the retired external database remains
+unused. The live roadmap orders the subsequent representation and cultivation work.

@@ -292,6 +292,14 @@ saved models retain their source mode. Its four-family development checkpoint re
 its subsequent response was `.` followed by a text-receiver obstruction. This bounded coupling
 does not establish the generative contextual attachment or useful language.
 
+[established-bounded; source-inspected] `--material-source homogeneous-moment` selects the
+[normalized phase-moment variant](../research/records/2026-09-07_AC2_THE_HOMOGENEOUS_MOMENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md)
+on a fresh cultivation. It evaluates complete contextual sources through their implicit Hermitian
+pairing, retains immutable return factors and transports the signed operator-norm cross-current.
+`inspect_moment_material_transport` exposes numerical/source error and oriented division bounds;
+`inspect_exact_numerical_moment_forward` is the cold rational decoder. The native text receiver
+uses the enclosed forward current. This interface does not establish useful language.
+
 [established-bounded; measured] These commands run the checked-in examples on the standing CUDA
 apparatus. The build uses the repository's usual [development setup](DEVELOPMENT.md).
 

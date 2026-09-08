@@ -256,10 +256,10 @@ impl<'chart> ResidentSurface<'chart> {
             operation: "field-differential-receiver", what: "incompatible receiver chart".into(),
         };
         let words = if mode >= 3 {
-            dimension.checked_mul(if mode==3 {18}else{37}).and_then(|n| n.checked_add(if mode==3 {24}else{44}))
+            dimension.checked_mul(if mode==3 {18}else if mode==6 {48}else{37}).and_then(|n| n.checked_add(if mode==3 {24}else{44}))
         } else { dimension.checked_add(1).and_then(|n| n.checked_mul(if mode == 1 { 4 } else { 12 })) }.ok_or_else(fail)?;
         if dimension == 0 || dimension % 2 != 0 || dimension > u32::MAX as usize
-            || !(1..=4).contains(&mode) || !(1..=63).contains(&pairs)
+            || !matches!(mode,1..=4|6) || !(1..=63).contains(&pairs)
             || first_complex.checked_add(2 * pairs).is_none_or(|end| end > dimension / 2)
             || report.rows != 1 || report.width != words || report.grain.0 != 0
             || output.rows != 1 || output.width != 4 || output.grain.0 != 0 {
@@ -287,6 +287,7 @@ impl<'chart> ResidentSurface<'chart> {
         transport: Option<(&mut ResidentSection<'chart>, Option<&ResidentSection<'chart>>,
             Option<&ResidentSection<'chart>>, &ResidentSection<'chart>, &ResidentSection<'chart>, u32, Option<&ResidentSection<'chart>>)>,
         occurrence: u64,
+        moment:Option<(&ResidentSection<'chart>,usize,&ResidentSection<'chart>)>,
         output: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
         let fail = |what: &str| ResidentRefusal::Declaration {
@@ -326,9 +327,10 @@ impl<'chart> ResidentSurface<'chart> {
         if let Some((state, source_current, source_forward, delta, report, kind, refreshed)) = &transport {
             let state_words=if *kind==1 {nodes.checked_mul(nodes).and_then(|n|n.checked_mul(12)).and_then(|n|n.checked_add(2))}
                 else if *kind==2 {nodes.checked_mul(nodes).and_then(|n|n.checked_mul(60)).and_then(|n|n.checked_add(22*nodes+12))}
-                else {None}.ok_or_else(||fail("material state extent or kind"))?;
-            let report_words=nodes.checked_mul(if *kind==1 {36}else{74}).and_then(|n|n.checked_add(if *kind==1 {24}else{44})).ok_or_else(||fail("material report extent"))?;
-            if refreshed.is_some_and(|s|*kind!=2 || !matches(s,1,10*nodes)) {return Err(fail("current source contraction extent"));}
+                else if *kind==3 {nodes.checked_mul(12).and_then(|n|n.checked_add(12))} else {None}.ok_or_else(||fail("material state extent or kind"))?;
+            let report_words=nodes.checked_mul(if *kind==1 {36}else if *kind==2 {74}else{96}).and_then(|n|n.checked_add(if *kind==1 {24}else{44})).ok_or_else(||fail("material report extent"))?;
+            if refreshed.is_some_and(|s|!matches!(*kind,2|3) || !matches(s,1,if *kind==2 {10*nodes}else{30*nodes})) {return Err(fail("current source contraction extent"));}
+            if (*kind==3)!=moment.is_some(){return Err(fail("moment source factors missing or unexpected"));}
             let enclosed = junction.is_some_and(|(_,_,_,_,_,(mode,_))| mode != 1);
             if !enclosed || !matches(state, 1, state_words) || !matches(delta, 1, state_words)
                 || !matches(report, 1, report_words)
@@ -336,6 +338,11 @@ impl<'chart> ResidentSurface<'chart> {
                 || source_current.is_some_and(|s| !matches(s, 1, 12 * (width + 1)))
                 || source_forward.is_some_and(|s| !matches(s, 1, report_words)) {
                 return Err(fail("incompatible contextual material transport"));
+            }
+        }
+        if let Some((table,count,weights))=moment {
+            if count>u32::MAX as usize || !matches(table,count.max(1),2) || !matches(weights,count+1,4) {
+                return Err(fail("moment factor chart"));
             }
         }
         let shared = nodes.checked_mul(24).and_then(|v| v.checked_mul(16))
@@ -367,6 +374,7 @@ impl<'chart> ResidentSurface<'chart> {
         } else {
             for _ in 0..9 { params.ptr(0); }
         }
+        params.ptr(moment.map_or(0,|p|p.0.lo.device_ptr())).u32(moment.map_or(0,|p|p.1 as u32)).ptr(moment.map_or(0,|p|p.2.lo.device_ptr()));
         params.ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
             .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
         self.record_blocks(lane, "section_constitutive_field", 1, self.launch.block_x,

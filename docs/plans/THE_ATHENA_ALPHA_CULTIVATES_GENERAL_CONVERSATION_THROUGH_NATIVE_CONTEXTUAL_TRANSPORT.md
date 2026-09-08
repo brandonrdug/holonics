@@ -253,13 +253,19 @@ the existing native factors. Its actual conversation-mode contribution is nonzer
 particular fixed text differential is unchanged by its removal in that linear decomposition.
 This is not a useful-language result or a developmental ablation.
 
-[definition] Next construct the [homogeneous phase-moment source](../../research/records/2026-09-07_AC2_A_HOMOGENEOUS_PHASE_MOMENT_IS_THE_NEXT_MATERIAL_SOURCE_CHART.md)
-`Q(x)=(1,x)(1,x)*/(1+||x||²)` from the complete contextual current. Reuse the native norm/pairing
-and material-return owners; keep its phase reference, lineage, original/current operator cuts
-and source/parameter error. The implicit pairing supplies mixed phase forms without allocating
-every tensor coordinate. Its language benefit remains a hypothesis and must return through
-actual cultivation and complete responses. No source-ID switch, authored semantic selector,
-centre substitution or second learner supplies the construction.
+[established-bounded; measured] The [homogeneous phase-moment material return](../../research/records/2026-09-07_AC2_THE_HOMOGENEOUS_MOMENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md)
+now binds `Q(x)=(1,x)(1,x)*/(1+||x||²)` to the complete contextual current through the existing
+native learner. Source-qualified factors, signed division defects and operator-norm transport
+survive delayed reception and rest. All 133 constitutive and 16 SDK alpha tests pass. Actual
+eight-family cultivation retains 1,930 development occurrences, but its resolved answer repeats
+`va` to the 128-symbol work limit. Numerical/source attachment and persistence have returned;
+useful language and the full AC0–AC5 objective remain open.
+
+[definition] The roadmap now orders the [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
+for broader actual cultivation. Its finite parameter identity preserves the full complete-source
+pairing at chronologically new queries; delayed returns retain their own addressed evaluator.
+Realize and price the composed numerical residual before claiming an efficient native decoder.
+Another isolated diagnostic or a repetition filter does not establish contextual development.
 
 [established-bounded; measured] The [resident field ingress](../../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
 now lets generated current enter that same field operation directly. Its actual input survives

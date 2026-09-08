@@ -105,12 +105,10 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 report,
                 occurrence,
                 2 * self.nodes(),
-                if self.material_transport_source()
-                    == Some(NativeMaterialTransportSource::CompleteCurrent)
-                {
-                    4
-                } else {
-                    3
+                match self.material_transport_source() {
+                    Some(NativeMaterialTransportSource::CompleteCurrent) => 4,
+                    Some(NativeMaterialTransportSource::HomogeneousMoment) => 6,
+                    _ => 3,
                 },
                 0,
                 pairs,

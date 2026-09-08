@@ -22,6 +22,15 @@ neither a perfect inverse nor a copy of every past sample is a general learning 
 
 ## Current common mechanism
 
+[definition] The desktop [homogeneous-moment return](../research/records/2026-09-07_AC2_THE_HOMOGENEOUS_MOMENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md)
+is an additional optional source chart for the existing material learner. Its kernel uses the
+complete-current pairing plus an explicit phase reference and requires exact 544-bit intermediate
+products, checked grid division and signed norm transport. A Metal port must preserve those
+logical carriers and the actual source/error chronology. It is not a prerequisite for resuming
+the shared generator/condition work below, and the failed desktop text trials establish no
+acoustic capability. No new Apple execution or branch comparison was performed for this return.
+
+
 ### Conditional-generator port for the Mac workflow
 
 [established-bounded; measured] The [measured conditional phase return](../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)

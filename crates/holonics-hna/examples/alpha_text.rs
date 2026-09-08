@@ -366,6 +366,8 @@ fn run_session(
             "final_junction":final_occurrence.map(|i| field.inspect_junction(i)).transpose()?.flatten().map(section),
             "material_transport":if field.material_transport_source()==Some(NativeMaterialTransportSource::CompleteCurrent) {
                 json!(field.inspect_complete_material_transport_state()?)
+            } else if field.material_transport_source()==Some(NativeMaterialTransportSource::HomogeneousMoment) {
+                json!(final_occurrence.map(|at|field.inspect_moment_material_transport(at)).transpose()?.flatten())
             } else {json!(field.inspect_material_transport_state()?)},
             "internal_current_enclosures":if inspect_all_currents { field.inspect_internal_current_enclosures()? } else { None }});
     // Only cold diagnostics copy numerical emission carriers. Product steps above read the
@@ -402,7 +404,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current] [--text-receiver material|constitutive]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment] [--text-receiver material|constitutive]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -437,9 +439,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 material_source = Some(match value.as_str() {
                     "coupled-outgoing" => NativeMaterialTransportSource::CoupledOutgoing,
                     "complete-current" => NativeMaterialTransportSource::CompleteCurrent,
+                    "homogeneous-moment" => NativeMaterialTransportSource::HomogeneousMoment,
                     _ => {
                         return Err(
-                            "material source must be coupled-outgoing or complete-current".into(),
+                            "material source must be coupled-outgoing, complete-current or homogeneous-moment".into(),
                         );
                     }
                 })

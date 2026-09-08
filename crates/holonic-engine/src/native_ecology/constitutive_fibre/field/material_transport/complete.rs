@@ -13,6 +13,7 @@ pub use mode::{
 mod tests;
 
 pub(in super::super) struct CurrentSourceRefresh<'chart> {
+    pub(in super::super) moment_weights: Option<ResidentSection<'chart>>,
     pub(in super::super) tail: ResidentSection<'chart>,
     pub(in super::super) count: usize,
     pub(in super::super) output: ResidentSection<'chart>,
@@ -252,6 +253,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         }
         let surface = self.relation.surface;
         Ok(Some(CurrentSourceRefresh {
+            moment_weights: None,
             count: increments.len(),
             tail: surface.mount_section_rest(
                 &ResidentSectionRest::found(increments.len(), 2, ResidentGrain(0), 64, words)

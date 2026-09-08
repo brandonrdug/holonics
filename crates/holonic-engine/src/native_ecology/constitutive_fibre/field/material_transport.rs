@@ -4,11 +4,13 @@ use num_bigint::BigInt;
 use num_traits::One;
 
 pub(super) mod complete;
+pub(super) mod moment;
 pub use complete::{
     NativeCompleteMaterialTransportReading, NativeCompleteMaterialTransportState,
     NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading,
     NativeMaterialModeReturn, NativeMaterialModeUnfolding,
 };
+pub use moment::NativeMomentMaterialReading;
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(rename_all = "kebab-case")]
@@ -16,6 +18,7 @@ pub enum NativeMaterialTransportSource {
     #[default]
     CoupledOutgoing,
     CompleteCurrent,
+    HomogeneousMoment,
 }
 impl NativeMaterialTransportSource {
     pub(super) fn is_outgoing(&self) -> bool {
@@ -25,6 +28,7 @@ impl NativeMaterialTransportSource {
         match self {
             Self::CoupledOutgoing => 1,
             Self::CompleteCurrent => 2,
+            Self::HomogeneousMoment => 3,
         }
     }
     pub(super) fn state_words(self, n: usize) -> Option<usize> {
@@ -35,10 +39,13 @@ impl NativeMaterialTransportSource {
                 .checked_mul(60)?
                 .checked_add(n.checked_mul(22)?)?
                 .checked_add(12),
+            Self::HomogeneousMoment => n.checked_mul(12)?.checked_add(12),
         }
     }
     pub(super) fn report_words(self, n: usize) -> Option<usize> {
-        n.checked_mul(if self == Self::CoupledOutgoing {
+        n.checked_mul(if self == Self::HomogeneousMoment {
+            96
+        } else if self == Self::CoupledOutgoing {
             36
         } else {
             74
@@ -59,6 +66,7 @@ pub(super) struct PendingMaterialTransport<'chart> {
     pub(super) delta: ResidentSection<'chart>,
     pub(super) report: Rc<ResidentSection<'chart>>,
     pub(super) refresh: Option<complete::CurrentSourceRefresh<'chart>>,
+    pub(super) moment: Option<moment::MomentFactors<'chart>>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -223,7 +231,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .state_words(self.nodes())
             .ok_or(ConstitutiveFibreError::Shape)?;
         let mut words = vec![(0, 0); width];
-        if source == NativeMaterialTransportSource::CompleteCurrent {
+        if source != NativeMaterialTransportSource::CoupledOutgoing {
             let grain = self.transport_grain()? as i64;
             words[12 * self.nodes() + 6] = (grain, grain);
         }
@@ -240,7 +248,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
     pub fn material_transport_source(&self) -> Option<NativeMaterialTransportSource> {
         self.transport.as_ref().map(|t| t.source)
     }
-    fn transport_grain(&self) -> Result<u32, ConstitutiveFibreError> {
+    pub(super) fn transport_grain(&self) -> Result<u32, ConstitutiveFibreError> {
         match self.junction_representation() {
             Some(NativeFieldJunctionRepresentation::EnclosedDyadic { fractional_bits }) => {
                 Ok(fractional_bits)
@@ -260,11 +268,21 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 .map(|at| self.prepare_current_source_refresh(at))
                 .transpose()?
                 .flatten()
+        } else if kind == NativeMaterialTransportSource::HomogeneousMoment {
+            source_at
+                .map(|at| self.prepare_moment_refresh(at))
+                .transpose()?
+                .flatten()
         } else {
             None
         };
         let surface = self.relation.surface;
         Ok(Some(PendingMaterialTransport {
+            moment: if kind == NativeMaterialTransportSource::HomogeneousMoment {
+                Some(self.moment_factors(0)?)
+            } else {
+                None
+            },
             delta: surface.fresh_section(
                 1,
                 kind.state_words(self.nodes())
@@ -297,10 +315,15 @@ impl<'chart> NativeConstitutiveField<'chart> {
         &self,
         occurrence: usize,
     ) -> Result<Option<NativeFieldMaterialTransportReading>, ConstitutiveFibreError> {
-        if self.material_transport_source() == Some(NativeMaterialTransportSource::CompleteCurrent)
-        {
+        if matches!(
+            self.material_transport_source(),
+            Some(
+                NativeMaterialTransportSource::CompleteCurrent
+                    | NativeMaterialTransportSource::HomogeneousMoment
+            )
+        ) {
             return Err(ConstitutiveFibreError::Rest(
-                "use the complete-current transport receiver".into(),
+                "use the receiver for the selected material source".into(),
             ));
         }
 
@@ -352,10 +375,15 @@ impl<'chart> NativeConstitutiveField<'chart> {
     pub fn inspect_material_transport_state(
         &self,
     ) -> Result<Option<NativeFieldMaterialTransportState>, ConstitutiveFibreError> {
-        if self.material_transport_source() == Some(NativeMaterialTransportSource::CompleteCurrent)
-        {
+        if matches!(
+            self.material_transport_source(),
+            Some(
+                NativeMaterialTransportSource::CompleteCurrent
+                    | NativeMaterialTransportSource::HomogeneousMoment
+            )
+        ) {
             return Err(ConstitutiveFibreError::Rest(
-                "use the complete-current transport receiver".into(),
+                "use the receiver for the selected material source".into(),
             ));
         }
 
