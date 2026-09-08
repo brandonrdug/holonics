@@ -315,17 +315,22 @@ bounds on device. It borrows the source field and preserves it through late refu
 constitutive and 20 SDK alpha tests pass; all 5,063 actual model contacts/currents match the existing
 decoder. This does not publish a developmental field successor or establish useful language.
 
-[definition] Continue the joint native response by transferring that carrier into the existing
-junction owner, adding ordinary birth/growth and reflection, and composing the native
-material/current/morphology constitutive producer. Keep observed source/birth testimony separate
-from evolving operative contacts, retain prior dependencies and chronological transport, and
-execute the complete changing-contact current decoder and material source pairing. Preserve joint
-`(D,b)` geometry in the error law; the aggregate radius is a receiver bound, not an independent
-state uncertainty. Full rest/archive continuation and atomic publication remain owed. The private
-delta staging seam is not a learner. This remains AC1 construction directed at AC2's actual useful
-complete responses. The roadmap orders work; the
+[established-bounded; measured] The [operative field return](../../research/records/2026-09-08_AC1_THE_OPERATIVE_MAP_CONDUCTS_AND_RESTARTS_IN_THE_FIELD.md)
+now supplies one continuing map/current owner, ordinary birth and full-current reflection,
+nonexpansive error transport, joint publication and rest/archive continuation. The source codec
+on the fixed integral-contact class uses the joint radius rather than expanding it through the
+auxiliary prefix. All 145 native constitutive and 20 SDK alpha checks pass. An actual model and
+its exact process restart return, with the same failed language response.
+
+[definition] Continue with the native joint material/current/morphology constitutive producer.
+It must use actual discrepancies, retained producing maps and metrics, prior dependencies and
+chronological transfer, together with the source interpretation and decoder through changing
+operative contacts. The current fixed-prefix material codec does not cover that changed-map case
+and refuses it explicitly. A supplied-delta interface or controlled physics perturbation does not
+establish learned morphology. This remains AC1 work directed at AC2's actual useful complete
+responses. The roadmap orders construction; the
 [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
-remains an available representation option with its actual future-generator obligations.
+remains a representation option with its actual future-generator obligations.
 
 [established-bounded; measured] The [resident field ingress](../../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
 now lets generated current enter that same field operation directly. Its actual input survives

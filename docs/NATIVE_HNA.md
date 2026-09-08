@@ -332,10 +332,23 @@ or a source of generated answers.
 session wrapper prepare the complete contact/current carrier on device, borrowing the source
 field and its decoder. `NativeOperativeContactStaging::inspect` is a cold read. The private native
 delta seam stages rank-two map/current changes, full mixed moments and their bounds. It is not
-yet supplied by the joint constitutive producer or published into the field successor. The
+yet supplied by the joint constitutive producer. The operative field below now connects the
+carrier itself to ordinary reaction and publication. The
 [native staging record](../research/records/2026-09-08_AC1_OPERATIVE_CONTACTS_STAGE_THEIR_COMPLETE_MAP_AND_CURRENT_ON_DEVICE.md)
 contains the actual-model comparison. `alpha_contextual_lift MODEL --operative-contacts --report
 NEW.json` runs that comparison without cultivation or source-capability changes.
+
+[established-bounded; measured] `enable_operative_contacts` transfers that representation into
+the same field owner. `alpha_text --operative-junction true` activates it before development or
+prompt admission, and restored operative models keep it on ordinary resume. Birth growth,
+reflection, ordinary material return and publication remain one native operation. Field rest and
+history placement retain the operative currents and full residuals. `inspect_operative_reflection`
+and `inspect_operative_contacts` expose their explicit cold receivers; the old raw-covariance
+and fixed-contact exact-decoder methods do not silently reinterpret the new carrier.
+The [operative field record](../research/records/2026-09-08_AC1_THE_OPERATIVE_MAP_CONDUCTS_AND_RESTARTS_IN_THE_FIELD.md)
+retains actual-model and process-restart evidence. The fixed integral-contact material bridge
+remains scoped: changed-map material interpretation and the endogenous morphology return are
+not yet implemented. The resulting text is still unusable.
 
 [established-bounded; implemented-exact] `PairedJunctionLinearization::at` is the exact cold
 reference for the existing junction at declared contact/current operands. Its `pushforward` and

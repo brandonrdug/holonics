@@ -100,13 +100,13 @@ __device__ void moment_material_transport_prepare(
     const int64_t *state,const int64_t *origin_report,const int64_t *refreshed,const int64_t *table,uint32_t count,int64_t *weights,
     const int64_t *query,const int64_t *origin,const int64_t *incoming,const int64_t *frame,const int64_t *origin_frame,
     const int64_t *covariance,const wide *before,const wide *current,uint32_t nodes,uint32_t linked,uint32_t grain,uint64_t occurrence,
-    int64_t *next_lo,int64_t *next_hi,int64_t *report_lo,int64_t *report_hi,wide *scratch,uint32_t *slot
+    int64_t *next_lo,int64_t *next_hi,int64_t *report_lo,int64_t *report_hi,wide *scratch,uint32_t *slot,wide joint_radius=-1
 ) {
     uint32_t R=2u*nodes,D=6u*nodes,stride=R+1u;size_t ga=2u*D+8u;
     wide *report=(wide *)report_lo,*beta=(wide *)(report_lo+moment_beta_at(nodes));
     if(threadIdx.x==0){
         field_current_history_source_prepare(query,origin,incoming,frame,origin_frame,covariance,before,current,state,
-            nodes,linked,grain,occurrence,next_lo,next_hi,report_lo+moment_source_at(nodes),report_hi+moment_source_at(nodes),scratch,slot);
+            nodes,linked,grain,occurrence,next_lo,next_hi,report_lo+moment_source_at(nodes),report_hi+moment_source_at(nodes),scratch,slot,joint_radius);
         for(size_t i=0;i<moment_source_at(nodes);++i)report_lo[i]=report_hi[i]=0;
         for(uint32_t j=0;j<R;++j)report_lo[moment_remainder_at(nodes)+j]=report_hi[moment_remainder_at(nodes)+j]=0;
         const wide *bounds=(const wide *)(state+ga);wide et=bounds[0],nt=bounds[1],target_error=0;

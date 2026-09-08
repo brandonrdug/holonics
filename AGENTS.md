@@ -82,9 +82,11 @@ Continue the native joint constitutive attachment in the existing junction, reta
 operative contact map, immutable birth/source standing, prior dependencies and a complete current
 decoder through changing morphology. The cold reference or a current-only substitute is not that
 attachment. The [native staging](research/records/2026-09-08_AC1_OPERATIVE_CONTACTS_STAGE_THEIR_COMPLETE_MAP_AND_CURRENT_ON_DEVICE.md)
-now preserves the complete contact/current carriers and mixed moments on device. Connect them to
-the continuing field and the native joint constitutive producer; the borrowed staging and private
-supplied-delta seam do not publish a developmental successor. Do not repeat the completed pair-selected study or cold derivation. Do not replace enclosures with centres
+now preserves the complete contact/current carriers and mixed moments on device. The
+[operative field](research/records/2026-09-08_AC1_THE_OPERATIVE_MAP_CONDUCTS_AND_RESTARTS_IN_THE_FIELD.md)
+now conducts births/reactions and publishes/persists that carrier in the same owner. Complete the
+native joint constitutive producer and its changed-contact source interpretation; the current
+fixed-prefix codec and private supplied-delta seam do not establish learned morphology. Do not repeat the completed pair-selected study or cold derivation. Do not replace enclosures with centres
 or phase labels, or found a separate learner. Retain the carriers used to produce each prediction; later
 condition inference changes the successor rather than rewriting that prediction's history.
 

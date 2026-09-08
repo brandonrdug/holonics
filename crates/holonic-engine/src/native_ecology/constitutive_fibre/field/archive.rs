@@ -2,6 +2,7 @@
 //! resident; a later addressed source mounts its original carriers, without developmental replay.
 use super::rest::{HeldRest, point_bytes, read_point};
 use super::*;
+use super::junction::operative::{HeldOperative,rest::OperativeHistoryRest};
 use crate::native_ecology::constitutive_fibre::circulation::rest::{blob, read_blob};
 use sha2::{Digest, Sha256};
 use std::{
@@ -72,7 +73,7 @@ impl FieldArchive {
     pub(super) fn append(&mut self, rest: &HeldRest) -> Result<ArchivedField, Error> {
         let mut bytes = vec![
             u8::from(rest.junction.is_some()),
-            u8::from(rest.transport.is_some()) | (u8::from(rest.incoming.is_some()) << 1),
+            u8::from(rest.transport.is_some()) | (u8::from(rest.incoming.is_some()) << 1) | (u8::from(rest.operative.is_some())<<2),
         ];
         blob(&mut bytes, &point_bytes(&rest.source)?)?;
         for section in [&rest.junction, &rest.transport, &rest.incoming]
@@ -81,6 +82,7 @@ impl FieldArchive {
         {
             blob(&mut bytes, &point_bytes(section)?)?;
         }
+        if let Some(op)=&rest.operative {op.write(&mut |s|blob(&mut bytes,&point_bytes(s)?))?;}
         let digest: [u8; 32] = Sha256::digest(&bytes).into();
         let mut file = self.file.borrow_mut();
         let offset = file.seek(SeekFrom::End(0)).map_err(error)?;
@@ -114,7 +116,7 @@ impl ArchivedField {
         if bytes.len() != count || Sha256::digest(&bytes).as_slice() != self.digest {
             return Err(error("historical section extent or wire checksum"));
         }
-        if bytes.len() < 2 || bytes[0] > 1 || bytes[1] > 3 {
+        if bytes.len() < 2 || bytes[0] > 1 || bytes[1] > 7 {
             return Err(error("historical section presence"));
         }
         let mut input = (&bytes[2..]).take(self.octets - 2);
@@ -128,10 +130,12 @@ impl ArchivedField {
         let incoming = (bytes[1] & 2 != 0)
             .then(|| read_point(&read_blob(&mut input)?))
             .transpose()?;
+        let operative=(bytes[1]&4!=0).then(||OperativeHistoryRest::read(&mut ||read_point(&read_blob(&mut input)?))).transpose()?;
         if input.limit() != 0 {
             return Err(error("trailing historical section bytes"));
         }
         Ok(HeldRest {
+            operative,
             source,
             incoming,
             junction,
@@ -146,6 +150,7 @@ impl<'chart> ResidentFieldHistory<'chart> {
         rest: HeldRest,
     ) -> Result<Self, Error> {
         Ok(Self {
+            operative: rest.operative.map(|op|HeldOperative::mount(surface,op)).transpose()?,
             section: surface.mount_section_rest(&rest.source)?,
             incoming: rest
                 .incoming
@@ -163,6 +168,7 @@ impl<'chart> ResidentFieldHistory<'chart> {
     }
     fn rest(&self, surface: &ResidentSurface<'chart>) -> Result<HeldRest, Error> {
         Ok(HeldRest {
+            operative:self.operative.as_ref().map(|o|o.rest(surface)).transpose()?,
             source: surface.detach_section(&self.section, 64)?,
             incoming: self
                 .incoming

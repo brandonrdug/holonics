@@ -5,19 +5,20 @@
 use super::super::material_transport::wides;
 use super::*;
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 pub struct NativeOperativeContactBirth {
     pub source: usize,
     pub receiving: usize,
 }
+pub(in super::super) mod rest;
 
-pub(super) struct OperativeSections<'c> {
-    map: ResidentSection<'c>,
-    b: ResidentSection<'c>,
-    bounds: ResidentSection<'c>,
-    covariance: ResidentSection<'c>,
-    aggregate: ResidentSection<'c>,
-    moment_bounds: ResidentSection<'c>,
+pub(in super::super) struct OperativeSections<'c> {
+    pub(in super::super) map: Rc<ResidentSection<'c>>,
+    pub(in super::super) b: Rc<ResidentSection<'c>>,
+    pub(in super::super) bounds: Rc<ResidentSection<'c>>,
+    pub(in super::super) covariance: ResidentSection<'c>,
+    pub(in super::super) aggregate: ResidentSection<'c>,
+    pub(in super::super) moment_bounds: ResidentSection<'c>,
 }
 // Only the native joint-return producer may supply these packed carriers and their complete
 // delta radii. There is intentionally no public constructor taking an authored learning delta.
@@ -33,10 +34,121 @@ pub struct NativeOperativeContactStaging<'f, 'c> {
     origin: Rc<()>,
     grain: u32,
     births: Vec<NativeOperativeContactBirth>,
-    sections: OperativeSections<'c>,
+    sections: Rc<OperativeSections<'c>>,
     // Retained return carriers are chronological generators of the new map/current, not
     // rewritten source descriptions. A failed attempt is never appended here.
     returns: Vec<Rc<OperativeReturn<'c>>>,
+}
+
+pub(in super::super) struct OperativeState<'c> {
+    pub(in super::super) sections: Rc<OperativeSections<'c>>,
+    pub(in super::super) initial: Rc<OperativeSections<'c>>,
+    pub(in super::super) activated_at: usize,
+    pub(in super::super) grain: u32,
+    pub(in super::super) births: Vec<NativeOperativeContactBirth>,
+    origin: Rc<()>,
+    returns: Vec<Rc<OperativeReturn<'c>>>,
+}
+pub(in super::super) struct PendingOperative<'c> {
+    origin: Rc<()>,
+    pub(in super::super) sections: Rc<OperativeSections<'c>>,
+    pub(in super::super) trace: Rc<ResidentSection<'c>>,
+    pub(in super::super) table: ResidentSection<'c>,
+    pub(in super::super) _scratch: ResidentSection<'c>,
+    pub(in super::super) count: usize,
+}
+pub(in super::super) struct HeldOperative<'c> {
+    pub(in super::super) b: Rc<ResidentSection<'c>>,
+    pub(in super::super) bounds: Rc<ResidentSection<'c>>,
+    pub(in super::super) trace: Rc<ResidentSection<'c>>,
+    pub(in super::super) count: usize,
+}
+impl<'c> OperativeState<'c> {
+    pub(in super::super) fn is_fixed(&self) -> bool {
+        self.returns.is_empty()
+    }
+    pub(in super::super) fn prepare(
+        &self,
+        surface: &'c ResidentSurface<'c>,
+        nodes: usize,
+        linked: bool,
+    ) -> Result<PendingOperative<'c>, Error> {
+        let d = 6 * nodes;
+        let m = d / 2;
+        let count = self
+            .births
+            .len()
+            .checked_add(usize::from(linked))
+            .ok_or(Error::Shape)?;
+        if count > u32::MAX as usize {
+            return Err(Error::Shape);
+        }
+        let sections = sections(surface, d, count)?;
+        let scratch =
+            surface.fresh_section(1, 2 * (m * m + m) + 12 * count.max(1), ResidentGrain(0))?;
+        let trace = Rc::new(surface.fresh_section(1, 18 * d + 12, ResidentGrain(0))?);
+        let mut words = vec![];
+        for ptr in [
+            self.sections.map.lo_device_ptr(),
+            self.sections.b.lo_device_ptr(),
+            self.sections.bounds.lo_device_ptr(),
+            sections.map.lo_device_ptr(),
+            sections.map.hi_device_ptr(),
+            sections.b.lo_device_ptr(),
+            sections.b.hi_device_ptr(),
+            sections.bounds.lo_device_ptr(),
+            sections.bounds.hi_device_ptr(),
+            sections.covariance.lo_device_ptr(),
+            sections.covariance.hi_device_ptr(),
+            sections.aggregate.lo_device_ptr(),
+            sections.aggregate.hi_device_ptr(),
+            sections.moment_bounds.lo_device_ptr(),
+            sections.moment_bounds.hi_device_ptr(),
+            scratch.lo_device_ptr(),
+            trace.lo_device_ptr(),
+            trace.hi_device_ptr(),
+            self.births.len() as u64,
+            count as u64,
+        ] {
+            words.push((ptr as i64, ptr as i64));
+        }
+        let table = surface.mount_section_rest(
+            &ResidentSectionRest::found(1, 20, ResidentGrain(0), 64, words).map_err(invalid)?,
+        )?;
+        Ok(PendingOperative {
+            origin: Rc::new(()),
+            sections,
+            trace,
+            table,
+            _scratch: scratch,
+            count,
+        })
+    }
+    pub(in super::super) fn receive(
+        &mut self,
+        next: PendingOperative<'c>,
+        source: Option<usize>,
+        at: usize,
+    ) {
+        if let Some(source) = source {
+            self.births.push(NativeOperativeContactBirth {
+                source,
+                receiving: at,
+            });
+        }
+        self.sections = next.sections;
+        self.origin = next.origin;
+    }
+}
+impl<'c> PendingOperative<'c> {
+    pub(in super::super) fn history(&self) -> HeldOperative<'c> {
+        HeldOperative {
+            b: Rc::clone(&self.sections.b),
+            bounds: Rc::clone(&self.sections.bounds),
+            trace: Rc::clone(&self.trace),
+            count: self.count,
+        }
+    }
 }
 #[derive(Debug, Serialize)]
 pub struct NativeOperativeContactReading {
@@ -57,31 +169,54 @@ type Error = ConstitutiveFibreError;
 fn invalid(s: impl std::fmt::Display) -> Error {
     Error::Rest(format!("operative contacts: {s}"))
 }
-fn sections<'c>(
+pub(in super::super) fn sections<'c>(
     surface: &'c ResidentSurface<'c>,
     d: usize,
     k: usize,
-) -> Result<OperativeSections<'c>, Error> {
+) -> Result<Rc<OperativeSections<'c>>, Error> {
     let m = d / 2;
     let sq = m.checked_mul(m).ok_or(Error::Shape)?;
-    Ok(OperativeSections {
-        map: surface.fresh_section(k.max(1), 2 * d, ResidentGrain(0))?,
-        b: surface.fresh_section(k.max(1), 4, ResidentGrain(0))?,
-        bounds: surface.fresh_section(1, 4, ResidentGrain(0))?,
+    Ok(Rc::new(OperativeSections {
+        map: Rc::new(surface.fresh_section(k.max(1), 2 * d, ResidentGrain(0))?),
+        b: Rc::new(surface.fresh_section(k.max(1), 4, ResidentGrain(0))?),
+        bounds: Rc::new(surface.fresh_section(1, 4, ResidentGrain(0))?),
         covariance: surface.fresh_section(1, 4 * sq, ResidentGrain(0))?,
         aggregate: surface.fresh_section(1, 2 * d, ResidentGrain(0))?,
         moment_bounds: surface.fresh_section(1, 8, ResidentGrain(0))?,
-    })
+    }))
 }
 impl<'c> OperativeSections<'c> {
-    fn current(&self) -> [&ResidentSection<'c>; 3] {
+    pub(in super::super) fn current(&self) -> [&ResidentSection<'c>; 3] {
         [&self.map, &self.b, &self.bounds]
     }
-    fn moments(&self) -> [&ResidentSection<'c>; 3] {
+    pub(in super::super) fn moments(&self) -> [&ResidentSection<'c>; 3] {
         [&self.covariance, &self.aggregate, &self.moment_bounds]
     }
 }
 impl<'c> NativeConstitutiveField<'c> {
+    /// Transfer the prepared map/current representation into this same continuing owner.
+    /// Existing sources and past reports retain their producing cut.
+    pub fn enable_operative_contacts(&mut self) -> Result<(), Error> {
+        if !self.relation.usable || self.pending.is_some() {
+            return Err(Error::Uncertain);
+        }
+        if self
+            .junction
+            .as_ref()
+            .is_some_and(|j| j.operative.is_some())
+        {
+            return Ok(());
+        }
+        let owned = self.stage_operative_contacts()?.into_owned();
+        self.junction.as_mut().ok_or(Error::Shape)?.operative = Some(owned);
+        self.junction.as_mut().unwrap().solver = NativeFieldJunctionSolver::Full;
+        Ok(())
+    }
+    pub fn has_operative_contacts(&self) -> bool {
+        self.junction
+            .as_ref()
+            .is_some_and(|j| j.operative.is_some())
+    }
     /// Prepare the existing contact map and full internal-current carrier on the device.
     /// This borrows the one source ecology and issues no source handle or state publication.
     pub fn stage_operative_contacts(
@@ -89,6 +224,16 @@ impl<'c> NativeConstitutiveField<'c> {
     ) -> Result<NativeOperativeContactStaging<'_, 'c>, Error> {
         if !self.relation.usable || self.pending.is_some() {
             return Err(Error::Uncertain);
+        }
+        if let Some(owned) = self.junction.as_ref().and_then(|j| j.operative.as_ref()) {
+            return Ok(NativeOperativeContactStaging {
+                field: self,
+                origin: Rc::clone(&owned.origin),
+                grain: owned.grain,
+                births: owned.births.clone(),
+                sections: Rc::clone(&owned.sections),
+                returns: owned.returns.clone(),
+            });
         }
         let grain = match self.junction_representation() {
             Some(NativeFieldJunctionRepresentation::EnclosedDyadic { fractional_bits }) => {
@@ -217,10 +362,24 @@ impl<'c> NativeConstitutiveField<'c> {
     }
 }
 impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
+    pub(in super::super) fn into_owned(self) -> OperativeState<'c> {
+        let activated_at = self.field_cut();
+        OperativeState {
+            initial: Rc::clone(&self.sections),
+            sections: self.sections,
+            activated_at,
+            grain: self.grain,
+            births: self.births,
+            origin: self.origin,
+            returns: self.returns,
+        }
+    }
     pub fn field_cut(&self) -> usize {
         self.field.occurrence_count()
     }
-    pub fn census(&self) -> TransferCensus { self.field.census() }
+    pub fn census(&self) -> TransferCensus {
+        self.field.census()
+    }
     pub fn births(&self) -> &[NativeOperativeContactBirth] {
         &self.births
     }
@@ -287,51 +446,190 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
         })
     }
     pub fn inspect(&self) -> Result<NativeOperativeContactReading, Error> {
-        let surface = self.field.relation.surface;
-        let d = 6 * self.field.nodes();
-        let m = d / 2;
-        let k = self.births.len();
-        let read = |s: &ResidentSection<'c>| -> Result<Vec<i128>, Error> {
-            wides(&surface.detach_section(s, 64)?.intervals)
-        };
-        let map = read(&self.sections.map)?;
-        let b = read(&self.sections.b)?;
-        let e = read(&self.sections.bounds)?;
-        let cov = read(&self.sections.covariance)?;
-        let h = read(&self.sections.aggregate)?;
-        let bounds = read(&self.sections.moment_bounds)?;
-        if e.iter().chain(&bounds).any(|v| *v < 0) {
-            return Err(invalid("negative enclosure or norm"));
-        }
-        let scale = num_bigint::BigInt::from(1) << self.grain;
-        let q = |v: i128| Rat::new(v.into(), scale.clone());
-        let waves = |v: &[i128]| {
-            v.chunks_exact(2)
-                .map(|v| ExactComplexWaveCurrent::new(q(v[0]), q(v[1])))
-                .collect::<Vec<_>>()
-        };
-        Ok(NativeOperativeContactReading {
-            field_cut: self.field_cut(),
-            fractional_bits: self.grain,
-            births: self.births.clone(),
-            contacts: map[..k * d].chunks_exact(d).map(waves).collect(),
-            contacts_radius: q(e[0]),
-            internal: NativeFieldCurrentBall {
-                center: waves(&b[..2 * k]),
-                radius: q(e[1]),
-            },
-            covariance: cov.chunks_exact(2 * m).map(waves).collect(),
-            covariance_radius: q(bounds[0]),
-            aggregate: NativeFieldCurrentBall {
-                center: waves(&h),
-                radius: q(bounds[1]),
-            },
-            numerical_contact_norm_upper: q(bounds[2]),
-            numerical_internal_norm_upper: q(bounds[3]),
-            staged_returns: self.returns.len(),
-        })
+        inspect_sections(
+            self.field,
+            self.grain,
+            &self.births,
+            &self.sections,
+            self.returns.len(),
+        )
     }
+}
+
+pub(in super::super) fn inspect_sections(
+    field: &NativeConstitutiveField<'_>,
+    grain: u32,
+    births: &[NativeOperativeContactBirth],
+    sections: &OperativeSections<'_>,
+    staged_returns: usize,
+) -> Result<NativeOperativeContactReading, Error> {
+    let surface = field.relation.surface;
+    let d = 6 * field.nodes();
+    let m = d / 2;
+    let k = births.len();
+    let read = |s: &ResidentSection<'_>| -> Result<Vec<i128>, Error> {
+        wides(&surface.detach_section(s, 64)?.intervals)
+    };
+    let map = read(&sections.map)?;
+    let b = read(&sections.b)?;
+    let e = read(&sections.bounds)?;
+    let cov = read(&sections.covariance)?;
+    let h = read(&sections.aggregate)?;
+    let bounds = read(&sections.moment_bounds)?;
+    if e.iter().chain(&bounds).any(|v| *v < 0) {
+        return Err(invalid("negative enclosure or norm"));
+    }
+    let scale = num_bigint::BigInt::from(1) << grain;
+    let q = |v: i128| Rat::new(v.into(), scale.clone());
+    let waves = |v: &[i128]| {
+        v.chunks_exact(2)
+            .map(|v| ExactComplexWaveCurrent::new(q(v[0]), q(v[1])))
+            .collect::<Vec<_>>()
+    };
+    Ok(NativeOperativeContactReading {
+        field_cut: field.occurrence_count(),
+        fractional_bits: grain,
+        births: births.to_vec(),
+        contacts: map[..k * d].chunks_exact(d).map(waves).collect(),
+        contacts_radius: q(e[0]),
+        internal: NativeFieldCurrentBall {
+            center: waves(&b[..2 * k]),
+            radius: q(e[1]),
+        },
+        covariance: cov.chunks_exact(2 * m).map(waves).collect(),
+        covariance_radius: q(bounds[0]),
+        aggregate: NativeFieldCurrentBall {
+            center: waves(&h),
+            radius: q(bounds[1]),
+        },
+        numerical_contact_norm_upper: q(bounds[2]),
+        numerical_internal_norm_upper: q(bounds[3]),
+        staged_returns: staged_returns,
+    })
 }
 
 #[cfg(test)]
 mod tests;
+
+#[derive(Debug, PartialEq, Eq, Serialize)]
+pub struct NativeOperativeReflectionReading {
+    pub potential: NativeFieldCurrentBall,
+    pub outgoing: NativeFieldCurrentBall,
+    pub aggregate: NativeFieldCurrentBall,
+    pub internal: NativeFieldCurrentBall,
+    /// An auxiliary potential sum, not the decoder for changing contact maps.
+    pub potential_prefix: NativeFieldCurrentBall,
+    pub source: NativeFieldCurrentBall,
+    pub numerical_residual: Vec<ExactComplexWaveCurrent>,
+    pub contact_radius: Rat,
+    pub joint_current_radius: Rat,
+    pub input_norm_upper: Rat,
+    pub internal_rounding_upper: Rat,
+    pub residual_rounding_upper: Rat,
+    pub residual_norm_upper: Rat,
+}
+pub(in super::super) fn decode_reflection(
+    surface: &ResidentSurface<'_>,
+    report: &ResidentSection<'_>,
+    op: &HeldOperative<'_>,
+    nodes: usize,
+    grain: u32,
+) -> Result<NativeOperativeReflectionReading, Error> {
+    let d = 6 * nodes;
+    let base =
+        super::enclosure::decode_report(&surface.detach_section(report, 64)?.intervals, d, grain)?;
+    let b = wides(&surface.detach_section(&op.b, 64)?.intervals)?;
+    let bounds = wides(&surface.detach_section(&op.bounds, 64)?.intervals)?;
+    let trace = surface.detach_section(&op.trace, 64)?;
+    if trace.width != 18 * d + 12 || trace.intervals.iter().any(|(a, b)| a != b) {
+        return Err(invalid("reflection trace shape"));
+    }
+    let scalar = wides(&trace.intervals[18 * d..])?;
+    if scalar.iter().chain(&bounds).any(|v| *v < 0) {
+        return Err(invalid("reflection radius or norm"));
+    }
+    let scale = num_bigint::BigInt::from(1) << grain;
+    let cube = num_bigint::BigInt::from(1) << (3 * grain);
+    let q = |x: i128| Rat::new(x.into(), scale.clone());
+    let integer = |row: usize| -> Result<num_bigint::BigInt, Error> {
+        let w = &trace.intervals[18 * row..18 * (row + 1)];
+        if ![0, 1].contains(&w[17].0) || w[..17].iter().any(|(a, _)| *a < 0 || *a > u32::MAX as i64)
+        {
+            return Err(invalid("reflection residual codeword"));
+        }
+        let mut v = num_bigint::BigInt::from(0);
+        for (i, (word, _)) in w[..17].iter().enumerate() {
+            v += num_bigint::BigInt::from(*word) << (32 * i);
+        }
+        if w[17].0 == 1 {
+            v = -v;
+        }
+        Ok(v)
+    };
+    let numerical_residual = (0..d / 2)
+        .map(|j| {
+            Ok(ExactComplexWaveCurrent::new(
+                Rat::new(integer(2 * j)?, cube.clone()),
+                Rat::new(integer(2 * j + 1)?, cube.clone()),
+            ))
+        })
+        .collect::<Result<Vec<_>, Error>>()?;
+    Ok(NativeOperativeReflectionReading {
+        potential: base.potential,
+        outgoing: base.outgoing,
+        aggregate: base.held_current,
+        internal: NativeFieldCurrentBall {
+            center: b[..2 * op.count]
+                .chunks_exact(2)
+                .map(|v| ExactComplexWaveCurrent::new(q(v[0]), q(v[1])))
+                .collect(),
+            radius: q(bounds[1]),
+        },
+        potential_prefix: base.potential_prefix,
+        source: NativeFieldCurrentBall {
+            center: base.source_center,
+            radius: q(scalar[0]),
+        },
+        numerical_residual,
+        contact_radius: q(bounds[0]),
+        joint_current_radius: q(scalar[5]),
+        input_norm_upper: q(scalar[1]),
+        internal_rounding_upper: q(scalar[2]),
+        residual_rounding_upper: q(scalar[3]),
+        residual_norm_upper: q(scalar[4]),
+    })
+}
+impl NativeConstitutiveField<'_> {
+    pub fn inspect_operative_contacts(
+        &self,
+    ) -> Result<Option<NativeOperativeContactReading>, Error> {
+        self.junction
+            .as_ref()
+            .and_then(|j| j.operative.as_ref())
+            .map(|o| inspect_sections(self, o.grain, &o.births, &o.sections, o.returns.len()))
+            .transpose()
+    }
+    pub fn inspect_operative_reflection(
+        &self,
+        at: usize,
+    ) -> Result<Option<NativeOperativeReflectionReading>, Error> {
+        self.history
+            .get(at)
+            .ok_or(Error::ForeignOccurrence)?
+            .with_resident(self.relation.surface, |event| {
+                event
+                    .operative
+                    .as_ref()
+                    .map(|o| {
+                        decode_reflection(
+                            self.relation.surface,
+                            event.junction.as_ref().ok_or(Error::Uncertain)?,
+                            o,
+                            self.nodes(),
+                            self.transport_grain()?,
+                        )
+                    })
+                    .transpose()
+            })
+    }
+}

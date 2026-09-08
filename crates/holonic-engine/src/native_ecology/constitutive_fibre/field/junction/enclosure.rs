@@ -47,6 +47,9 @@ pub struct NativeFieldInternalCurrentBall {
     pub source_occurrence: usize,
     pub receiving_occurrence: usize,
     pub contact: Vec<ExactComplexWaveCurrent>,
+    /// The current operative map is distinct from the immutable birth contact above.
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub operative_contact: Option<NativeFieldCurrentBall>,
     /// A single complex internal current, enclosed without evaluating the exact error trace.
     pub current: NativeFieldCurrentBall,
 }
@@ -175,6 +178,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
         &self,
         occurrence: usize,
     ) -> Result<Option<NativeFieldEnclosedJunctionReading>, ConstitutiveFibreError> {
+        if self.junction.as_ref().and_then(|j|j.operative.as_ref()).is_some_and(|o|occurrence>=o.activated_at) {
+            return Err(ConstitutiveFibreError::Rest("operative reflection has its own complete residual receiver".into()));
+        }
         let Some(NativeFieldJunctionRepresentation::EnclosedDyadic { fractional_bits }) =
             self.junction_representation()
         else {
@@ -195,6 +201,15 @@ impl<'chart> NativeConstitutiveField<'chart> {
     pub fn inspect_internal_current_enclosures(
         &self,
     ) -> Result<Option<Vec<NativeFieldInternalCurrentBall>>, ConstitutiveFibreError> {
+        if let Some(op)=self.junction.as_ref().and_then(|j|j.operative.as_ref()) {
+            let reading=super::operative::inspect_sections(self,op.grain,&op.births,&op.sections,0)?;
+            return Ok(Some(reading.births.iter().enumerate().map(|(i,b)|Ok(NativeFieldInternalCurrentBall {
+                source_occurrence:b.source,receiving_occurrence:b.receiving,
+                contact:self.junction_contact(b.receiving)?.ok_or(ConstitutiveFibreError::Uncertain)?,
+                operative_contact:Some(NativeFieldCurrentBall{center:reading.contacts[i].clone(),radius:reading.contacts_radius.clone()}),
+                current:NativeFieldCurrentBall{center:vec![reading.internal.center[i].clone()],radius:reading.internal.radius.clone()}
+            })).collect::<Result<Vec<_>,ConstitutiveFibreError>>()?));
+        }
         if !self.relation.usable || self.pending.is_some() {
             return Err(ConstitutiveFibreError::Uncertain);
         }
@@ -245,6 +260,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 source_occurrence: source,
                 receiving_occurrence: at,
                 contact,
+                operative_contact: None,
                 current: NativeFieldCurrentBall {
                     center: vec![center],
                     radius,
@@ -275,6 +291,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
         &self,
         until: usize,
     ) -> Result<Vec<NativeFieldExactJunctionReading>, ConstitutiveFibreError> {
+        if self.junction.as_ref().and_then(|j|j.operative.as_ref()).is_some_and(|o|until>=o.activated_at) {
+            return Err(ConstitutiveFibreError::Rest("the fixed-contact residual decoder does not decode operative reflections".into()));
+        }
         if !self.relation.usable || self.pending.is_some() {
             return Err(ConstitutiveFibreError::Uncertain);
         }

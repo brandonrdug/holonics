@@ -8,13 +8,13 @@ use holonics_hna::{
         checkpoint::SavedTextField,
         exposure::{ExposureCursor, ExposureFamily, ExposurePartition, ExposureReader},
         material::AlphaMaterialError,
-        text_codec::{TextSymbol, with_text_field_source},
+        text_codec::{with_text_field_source, TextSymbol},
         text_session::{TextCurrentReceiver, TextFieldSession},
     },
     publish_new,
 };
 use serde::{Deserialize, Serialize};
-use serde_json::{Value, json};
+use serde_json::{json, Value};
 use std::{
     collections::BTreeMap,
     io::{self, Write},
@@ -258,9 +258,14 @@ fn run_session(
     limit: usize,
     text_receiver: TextCurrentReceiver,
     inspect_all_currents: bool,
+    operative: bool,
     checkpoint: Option<&PathBuf>,
     report: &mut Value,
 ) -> Result<(), AlphaMaterialError> {
+    if operative {
+        session.enable_operative_contacts()?;
+    }
+    report["operative_contacts"] = json!(session.field().has_operative_contacts());
     report["junction_solver"] = json!(session.field().junction_solver());
     report["has_material_transport"] = json!(session.field().has_material_transport());
     report["material_source"] = json!(session.field().material_transport_source());
@@ -345,11 +350,9 @@ fn run_session(
         if prompt_error.is_none() {
             let generated = session.generate_with_receiver(limit, text_receiver);
             report["utf8"] = json!(std::str::from_utf8(&generated.emitted_octets).ok());
-            report["utf8_error"] = json!(
-                std::str::from_utf8(&generated.emitted_octets)
-                    .err()
-                    .map(|e| e.to_string())
-            );
+            report["utf8_error"] = json!(std::str::from_utf8(&generated.emitted_octets)
+                .err()
+                .map(|e| e.to_string()));
             report["generation"] = json!(generated);
         }
         report["prompt_and_emission_wall_seconds"] = json!(start.elapsed().as_secs_f64());
@@ -362,7 +365,8 @@ fn run_session(
             "lineage":(0..field.occurrence_count()).map(|i| field.lineage(i)).collect::<Vec<_>>(),
             "pending_lineage":field.pending_lineage(),"pending_symbol":session.pending_symbol(),
             "held":section(field.inspect_held()?),"relation":section(field.inspect_relation()?),
-            "junction_covariance":field.inspect_junction_covariance()?.map(section),
+            "junction_covariance":if field.has_operative_contacts() {None} else {field.inspect_junction_covariance()?.map(section)},
+            "operative_contacts":field.inspect_operative_contacts()?,
             "final_junction":final_occurrence.map(|i| field.inspect_junction(i)).transpose()?.flatten().map(section),
             "material_transport":if field.material_transport_source()==Some(NativeMaterialTransportSource::CompleteCurrent) {
                 json!(field.inspect_complete_material_transport_state()?)
@@ -406,7 +410,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum] [--text-receiver material|constitutive]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum] [--text-receiver material|constitutive] [--operative-junction true|false]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -417,6 +421,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (mut families, mut grain, mut prompt_path, mut limit, mut report_path, mut checkpoint) =
         (None, None, None, None, None, None);
     let mut inspect_all_currents = false;
+    let mut operative = false;
     let mut history_archive = None;
     let mut material_source = None;
     let mut text_receiver = TextCurrentReceiver::Material;
@@ -453,6 +458,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                 })
             }
+            "--operative-junction" => operative = value.parse::<bool>()?,
             "--inspect-all-currents" => inspect_all_currents = value.parse::<bool>()?,
             _ => return Err(format!("unknown option {option}").into()),
         }
@@ -566,6 +572,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 limit,
                 text_receiver,
                 inspect_all_currents,
+                operative,
                 checkpoint.as_ref(),
                 &mut report,
             )
@@ -583,29 +590,34 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         report["fractional_bits"] = json!(grain);
         report["families_aperture"] = json!(families);
         let exposure = exposure.to_string_lossy().into_owned();
-        with_text_field_source(grain, material_source.unwrap_or(NativeMaterialTransportSource::BilinearContextual), |field| {
-            if let Some(path) = &history_archive {
-                field.enable_history_archive(path)?;
-            }
-            let mut session = TextFieldSession::on(field)?;
-            let mut records = Vec::new();
-            let mut anchors = AnchorMap::new();
-            run_session(
-                &mut session,
-                &mut reader,
-                &mut cursor,
-                &exposure,
-                families,
-                &mut records,
-                &mut anchors,
-                prompt.as_deref(),
-                limit,
-                text_receiver,
-                inspect_all_currents,
-                checkpoint.as_ref(),
-                &mut report,
-            )
-        })
+        with_text_field_source(
+            grain,
+            material_source.unwrap_or(NativeMaterialTransportSource::BilinearContextual),
+            |field| {
+                if let Some(path) = &history_archive {
+                    field.enable_history_archive(path)?;
+                }
+                let mut session = TextFieldSession::on(field)?;
+                let mut records = Vec::new();
+                let mut anchors = AnchorMap::new();
+                run_session(
+                    &mut session,
+                    &mut reader,
+                    &mut cursor,
+                    &exposure,
+                    families,
+                    &mut records,
+                    &mut anchors,
+                    prompt.as_deref(),
+                    limit,
+                    text_receiver,
+                    inspect_all_currents,
+                    operative,
+                    checkpoint.as_ref(),
+                    &mut report,
+                )
+            },
+        )
     };
     report["native_error"] = json!(native_result.as_ref().err().map(ToString::to_string));
     publish_new(&report_path, |file| {

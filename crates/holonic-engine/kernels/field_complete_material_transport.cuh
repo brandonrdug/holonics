@@ -109,7 +109,7 @@ __device__ void complete_material_transport_prepare(
     const int64_t *query,const int64_t *origin,const int64_t *incoming,
     const int64_t *frame,const int64_t *origin_frame,const int64_t *covariance,
     const wide *before,const wide *current,uint32_t nodes,uint32_t linked,uint32_t grain,uint64_t occurrence,
-    int64_t *proposal_lo,int64_t *proposal_hi,int64_t *report_lo,int64_t *report_hi,wide *scratch,uint32_t *slot
+    int64_t *proposal_lo,int64_t *proposal_hi,int64_t *report_lo,int64_t *report_hi,wide *scratch,uint32_t *slot,wide joint_radius=-1
 ) {
     const uint32_t D=6u*nodes,R=2u*nodes;
     const size_t ga=2u*D+8u, coefficients=(size_t)R*(D/2u), matrix_words=5u*coefficients;
@@ -119,7 +119,7 @@ __device__ void complete_material_transport_prepare(
     const size_t feature_at=complete_source_at(nodes),extra_at=complete_extra_at(nodes);
     for(size_t i=0;i<extra_at+10u;++i) report_lo[i]=report_hi[i]=0;
     field_current_history_source_prepare(query,origin,incoming,frame,origin_frame,covariance,before,current,
-        state,nodes,linked,grain,occurrence,proposal_lo,proposal_hi,report_lo+feature_at,report_hi+feature_at,scratch,slot);
+        state,nodes,linked,grain,occurrence,proposal_lo,proposal_hi,report_lo+feature_at,report_hi+feature_at,scratch,slot,joint_radius);
     if(*slot) return;
     for(size_t i=ga;i<complete_state_words(nodes);++i) proposal_lo[i]=proposal_hi[i]=state[i];
     wide old_et=((const wide *)(state+state_extra))[0],old_nt=((const wide *)(state+state_extra))[1];

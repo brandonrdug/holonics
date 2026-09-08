@@ -125,16 +125,22 @@ matches the independent current decoder, in 0.266 s without numerical readbacks.
 one field and retains its decoder; the joint developmental return and publication are not yet
 connected. No phase or language-product completion follows from this staging result.
 
-[definition] **Next AC1 → AC2 construction:** connect the staged operative carrier to the existing
-junction's continuing owner, ordinary birth/growth and reflection, and the native joint
-material/current/morphology constitutive return. Retain immutable births/sources, actual producing
-metrics, prior dependencies/overlays and chronological current transport. Preserve changing-contact
-source pairings and the full decoder, then complete rest/archive continuation and atomic publication.
-Keep the complete `(D,b)` geometry in the reflection error law; an aggregate-only bound must not
-replace its correlation and nonexpansiveness. The private supplied-delta seam is not a learned
-return producer. Then inspect AC2's complete English/code/mathematics responses and contextual
-revision. No additional user information is required. AC2 usefulness, broad AC3 and AC4–AC5 remain
-open; retain all failed models and the original product standard.
+[established-bounded; measured] The [operative field return](../../research/records/2026-09-08_AC1_THE_OPERATIVE_MAP_CONDUCTS_AND_RESTARTS_IN_THE_FIELD.md)
+now connects contact growth, full-current reflection, joint numerical bounds, ordinary material
+conduct and atomic publication in the same field. Rest/archive continuation and actual model
+restart return; 145 native constitutive and 20 SDK alpha controls pass. The actual response is
+still the same unusable repetition. Controlled changed-map conduct establishes the operator path,
+not endogenous morphology learning or AC1–AC2 completion.
+
+[definition] **Next AC1 → AC2 construction:** implement the native joint constitutive-return
+producer for material parameters, internal current and contact morphology from actual source-
+qualified discrepancies. Use the actual producing maps, metrics, prior dependencies/overlays and
+chronological transfer. Extend the material source interpretation and decoder through changed
+contacts; do not present a changed operative map through the fixed-prefix source codec. The
+existing fixed integral-contact bridge uses its certified joint current bound and retains its
+scope. The private supplied-delta seam and controlled perturbations do not replace the learned
+return. Then inspect AC2's complete useful English/code/mathematics responses and contextual
+revision. No additional user information is required; broad AC3 and AC4–AC5 remain open.
 
 [definition] The [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
 remains an available representation option when the actual composition needs it, with its

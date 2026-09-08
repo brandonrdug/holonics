@@ -70,17 +70,32 @@ nonzero delta uncertainty. On the actual model, all 5,063 contact columns and in
 centres match the existing decoder. Staging takes 0.266 s with zero numerical readbacks; the
 whole cold process takes 79.17 s. No developmental model update or new language response occurred.
 
-[definition] **Next: AC1 → AC2, connect staging to the continuing native field.**
-Transfer the operative carrier into the existing junction owner, compose ordinary birth/growth
-and reflection, and provide the native joint material/current/morphology constitutive-return
-producer. Keep immutable source/birth testimony, producing metrics, earlier dependencies and
-return chronology. Preserve the complete current decoder and source pairing when contacts change,
-and complete rest/archive continuation with one atomic successor publication. The aggregate
-radius is only a receiver bound: retain the joint `(D,b)` geometry and nonexpansive full reflection
-instead of feeding that radius independently through the old aggregate-only error recurrence.
-The private delta seam and borrowed staging are preparation, not the missing developmental law.
-Then inspect AC2's complete responses and contextual revisions. The source model remains unchanged
-and still fails useful language. No additional user information is required; AC0–AC5 remains active.
+[established-bounded; measured] The [operative field return](research/records/2026-09-08_AC1_THE_OPERATIVE_MAP_CONDUCTS_AND_RESTARTS_IN_THE_FIELD.md)
+now owns the map/current carrier, grows actual contact births, conducts full-current reflection
+and publishes it with the ordinary material return. It retains the complete numerical residual
+and a nonexpansive joint current bound. Operative state/history survives rest, archive placement
+and continuation. All **145 native constitutive and 20 SDK alpha tests pass**, including controlled
+changed-map conduct and refusal after the operative reaction has staged. These controls do not
+supply the endogenous morphology learner.
+
+[counterexample; measured] The actual 16-family model now has an operative checkpoint at
+`.local/artifacts/athena-alpha/ac2-operative-field/first-sixteen-operative-v1.hna`
+(**201,686,795 bytes / 5,064 occurrences**). A prompt and 128 self-emissions reach 5,254 occurrences;
+the answer still repeats `Wmfa~ena~…` and is unusable. No extra development families were admitted.
+A fresh process with historical carriers initially archived reproduces the complete final body,
+current history and generation exactly. Prompt/continuation takes 89.15 s; the first process takes
+165.14 s and peaks at 496,869,652 bytes of native payload. This is no efficiency or alpha claim.
+
+[definition] **Next: AC1 → AC2, produce learned joint morphology returns natively.**
+The continuing carrier, birth/reaction, publication and persistence are connected. The missing
+native producer must turn actual material discrepancies into the joint parameter/current/contact
+response, using the retained producing maps, metrics, earlier dependencies and chronological
+transfer, with per-occurrence return frames in persistence. Bind the material source family through changed contacts: the current fixed-prefix
+codec is admitted only on the fixed integral-contact class, and refuses a changed operative map.
+Complete that interpretation and its decoder with the endogenous return. A private supplied-delta
+seam or controlled perturbation is not learned morphology. Then inspect complete useful responses
+and contextual revision. No additional user information is required; the full AC0–AC5 goal remains
+active and Athena-alpha remains unattained.
 
 [definition] Existing [conditional transport](research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md),
 [condition families](research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md),

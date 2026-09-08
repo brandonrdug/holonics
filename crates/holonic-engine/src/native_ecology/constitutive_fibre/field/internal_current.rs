@@ -117,6 +117,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
         &mut self,
         receiving: usize,
     ) -> Result<NativeResidentInternalCurrent<'chart>, ConstitutiveFibreError> {
+        if self.junction.as_ref().and_then(|j|j.operative.as_ref()).is_some_and(|o|!o.is_fixed()) {
+            return Err(ConstitutiveFibreError::Rest("changed operative contacts require their native current carrier".into()));
+        }
         let at = self
             .history
             .len()

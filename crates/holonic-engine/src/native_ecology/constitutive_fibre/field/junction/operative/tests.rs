@@ -274,3 +274,276 @@ fn coupled_return_stages_map_current_and_moments_without_partial_publication() {
     let staged = view.stage_return(uncertain).unwrap();
     contains(&staged.inspect().unwrap(), &d, &b);
 }
+
+#[test]
+#[ignore = "requires CUDA; ordinary field publication uses changed operative contacts and a joint reflection error"]
+fn changed_contacts_conduct_through_the_same_field_successor() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let mut field =
+        NativeConstitutiveField::found_with_enclosed_junction(&surface, seed(), ResidentGrain(72))
+            .unwrap();
+    populate(&mut field);
+    let old = field.inspect_internal_currents().unwrap().unwrap();
+    let mut d = old.iter().map(|i| i.contact.clone()).collect::<Vec<_>>();
+    let mut b = old.iter().map(|i| i.current.clone()).collect::<Vec<_>>();
+    let owned = {
+        let view = field.stage_operative_contacts().unwrap();
+        let delta = returned(&view, false);
+        let ports = decode(&view, &delta.ports);
+        let rows = decode(&view, &delta.currents);
+        let db = decode(&view, &delta.b);
+        let k = view.births.len();
+        for i in 0..k {
+            for j in 0..3 {
+                d[i][j] = d[i][j]
+                    .add(&ports[j].multiply(&rows[i].conjugate()))
+                    .add(&ports[3 + j].multiply(&rows[k + i].conjugate()));
+            }
+            b[i] = b[i].add(&db[i]);
+        }
+        view.stage_return(delta).unwrap().into_owned()
+    };
+    field.junction.as_mut().unwrap().operative = Some(owned);
+    let mut last = None;
+    let mut anchor = None;
+    for at in 4..8 {
+        if at == 6 {
+            field
+                .rechart(&[NativePhaseCurrent::new(0, 1, 1).unwrap()])
+                .unwrap();
+        }
+        let before = field.stage_operative_contacts().unwrap().inspect().unwrap();
+        let input = vec![NativePhaseCurrent::new(at as i64 - 2, 2, 3).unwrap()];
+        let mut occurrence = if at == 7 {
+            NativeFieldOccurrence::through_anchor(anchor.as_ref().unwrap(), input)
+        } else if let Some(s) = last.take() {
+            NativeFieldOccurrence::through(s, input)
+        } else {
+            NativeFieldOccurrence::entering(input)
+        };
+        let census = field.census();
+        let next = field.advance_resident(&mut occurrence).unwrap();
+        assert_eq!(field.census().section_read_outs, census.section_read_outs);
+        if at == 4 {
+            anchor = Some(field.retain_source(&next.source).unwrap());
+        }
+        last = Some(next.source);
+        if let Some(contact) = field.junction_contact(at).unwrap() {
+            d.push(contact);
+            b.push(W::zero());
+        }
+        let mut u = field.root_junction_source(at).unwrap();
+        u.push(W::zero());
+        let exact = PairedJunctionLinearization::at(d.clone(), &u, &b).unwrap();
+        let reading = field.inspect_operative_reflection(at).unwrap().unwrap();
+        let contacts = field
+            .inspect_internal_current_enclosures()
+            .unwrap()
+            .unwrap();
+        assert_eq!(contacts[0].contact, old[0].contact);
+        assert!(contacts[0]
+            .operative_contact
+            .as_ref()
+            .unwrap()
+            .contains(&d[0]));
+        assert_ne!(
+            contacts[0].contact,
+            contacts[0].operative_contact.as_ref().unwrap().center
+        );
+        if at == 4 {
+            let unchanged = PairedJunctionLinearization::at(
+                old.iter().map(|i| i.contact.clone()).collect(),
+                &u,
+                &b,
+            )
+            .unwrap();
+            assert!(
+                !reading.outgoing.contains(unchanged.outgoing()),
+                "the operative response must distinguish the changed contact map"
+            );
+        }
+        assert!(reading.potential.contains(exact.potential()));
+        assert!(
+            norm(&sub(&reading.outgoing.center, exact.outgoing()))
+                + norm(&sub(&reading.internal.center, exact.internal()))
+                <= &reading.joint_current_radius * &reading.joint_current_radius
+        );
+        b = exact.internal().to_vec();
+        let state = field.stage_operative_contacts().unwrap().inspect().unwrap();
+        contains(&state, &d, &b);
+        let mut b_hat = before.internal.center;
+        if state.births.len() > b_hat.len() {
+            b_hat.push(W::zero());
+        }
+        let q = state
+            .contacts
+            .iter()
+            .map(|d| {
+                d.iter()
+                    .zip(&reading.potential.center)
+                    .fold(W::zero(), |s, (a, b)| s.add(&a.conjugate().multiply(b)))
+            })
+            .collect::<Vec<_>>();
+        let lhs = reading
+            .potential
+            .center
+            .iter()
+            .zip(aggregate(&state.contacts, &q, 3))
+            .map(|(v, h)| v.add(&h))
+            .collect::<Vec<_>>();
+        let rhs = reading
+            .source
+            .center
+            .iter()
+            .zip(aggregate(&state.contacts, &b_hat, 3))
+            .map(|(u, h)| u.add(&h).scaled(&Rat::from_integer(2.into())))
+            .collect::<Vec<_>>();
+        assert_eq!(reading.numerical_residual, sub(&lhs, &rhs));
+        assert!(
+            norm(&reading.numerical_residual)
+                <= &reading.residual_norm_upper * &reading.residual_norm_upper
+        );
+        assert_eq!(field.occurrence_count(), at + 1);
+    }
+    let expected =
+        serde_json::to_value(field.stage_operative_contacts().unwrap().inspect().unwrap()).unwrap();
+    let expected_history = (4..8)
+        .map(|at| field.inspect_operative_reflection(at).unwrap().unwrap())
+        .collect::<Vec<_>>();
+    let saved = field.rest(&[last.as_ref()], &[anchor.as_ref()]).unwrap();
+    let mut bytes = Vec::new();
+    saved.write(&mut bytes).unwrap();
+    let saved = NativeFieldRest::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
+    drop(field);
+    drop(last);
+    drop(anchor);
+    let archive = std::env::temp_dir().join(format!(
+        "holonics-operative-{}-{}.history",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    ));
+    let (mut field, mut sources, anchors) =
+        NativeConstitutiveField::remount_with_history_archive(&surface, saved, &archive).unwrap();
+    assert_eq!(
+        serde_json::to_value(field.stage_operative_contacts().unwrap().inspect().unwrap()).unwrap(),
+        expected
+    );
+    for (offset, expected) in expected_history.into_iter().enumerate() {
+        assert_eq!(
+            field
+                .inspect_operative_reflection(4 + offset)
+                .unwrap()
+                .unwrap(),
+            expected
+        );
+    }
+    let mut occurrence = NativeFieldOccurrence::through(
+        sources[0].take().unwrap(),
+        vec![NativePhaseCurrent::new(2, -1, 3).unwrap()],
+    );
+    field.advance_resident(&mut occurrence).unwrap();
+    d.push(field.junction_contact(8).unwrap().unwrap());
+    b.push(W::zero());
+    let mut u = field.root_junction_source(8).unwrap();
+    u.push(W::zero());
+    let exact = PairedJunctionLinearization::at(d.clone(), &u, &b).unwrap();
+    let reading = field.inspect_operative_reflection(8).unwrap().unwrap();
+    assert!(
+        norm(&sub(&reading.outgoing.center, exact.outgoing()))
+            + norm(&sub(&reading.internal.center, exact.internal()))
+            <= &reading.joint_current_radius * &reading.joint_current_radius
+    );
+    assert_eq!(anchors.len(), 1);
+    drop(field);
+    std::fs::remove_file(archive).unwrap();
+}
+
+#[test]
+#[ignore = "requires CUDA; operative current and the existing contextual material law share a durable successor"]
+fn material_continuation_matches_after_operative_rest() {
+    let r = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&r).unwrap();
+    fn steps<'c>(
+        field: &mut NativeConstitutiveField<'c>,
+        last: &mut Option<NativeFieldEmission>,
+        from: usize,
+        to: usize,
+    ) {
+        for at in from..to {
+            let input =
+                vec![NativePhaseCurrent::new((at % 3) as i64, ((at + 1) % 2) as i64, 1).unwrap()];
+            let mut occurrence = if let Some(source) = last.take() {
+                NativeFieldOccurrence::through(source, input)
+            } else {
+                NativeFieldOccurrence::entering(input)
+            };
+            *last = Some(field.advance_resident(&mut occurrence).unwrap().source);
+            let m = field
+                .inspect_contextual_material_transport(at)
+                .unwrap()
+                .unwrap();
+            let p = field.inspect_operative_reflection(at).unwrap().unwrap();
+            assert_eq!(m.context.source_radius, p.joint_current_radius);
+        }
+    }
+    let make = || {
+        let mut f = NativeConstitutiveField::found_with_enclosed_junction(
+            &surface,
+            seed(),
+            ResidentGrain(72),
+        )
+        .unwrap();
+        f.enable_material_transport_source(NativeMaterialTransportSource::BilinearContextual)
+            .unwrap();
+        f.enable_operative_contacts().unwrap();
+        f
+    };
+    let mut field = make();
+    let mut last = None;
+    steps(&mut field, &mut last, 0, 9);
+    let expected = field.rest(&[last.as_ref()], &[]).unwrap();
+    drop(field);
+    drop(last);
+    let mut field = make();
+    let mut last = None;
+    steps(&mut field, &mut last, 0, 4);
+    let rest = field.rest(&[last.as_ref()], &[]).unwrap();
+    let mut bytes = vec![];
+    rest.write(&mut bytes).unwrap();
+    drop(field);
+    drop(last);
+    let saved = NativeFieldRest::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
+    let (mut field, mut sources, _) = NativeConstitutiveField::remount(&surface, saved).unwrap();
+    let mut last = sources[0].take();
+    steps(&mut field, &mut last, 4, 9);
+    assert_eq!(field.rest(&[last.as_ref()], &[]).unwrap(), expected);
+    // The operative reaction succeeds before this malformed material bound is encountered.
+    // No raw field, operative current, material state, birth or capability may publish partly.
+    let transport = field.transport.as_ref().unwrap();
+    let width = transport.state.width();
+    let mut values = wides(
+        &surface
+            .detach_section(&transport.state, 64)
+            .unwrap()
+            .intervals,
+    )
+    .unwrap();
+    values[6 * field.nodes() + 4] = -1;
+    let replacement = packed(&surface, 1, width, values);
+    let original = std::mem::replace(&mut field.transport.as_mut().unwrap().state, replacement);
+    let mut failed =
+        NativeFieldOccurrence::through(last.take().unwrap(), vec![NativePhaseCurrent::unit()]);
+    assert!(field.advance_resident(&mut failed).is_err());
+    assert_eq!(field.occurrence_count(), 9);
+    field.transport.as_mut().unwrap().state = original;
+    assert_eq!(
+        field.rest(&[failed.source.as_ref()], &[]).unwrap(),
+        expected
+    );
+    field.advance_resident(&mut failed).unwrap();
+    assert_eq!(field.occurrence_count(), 10);
+}

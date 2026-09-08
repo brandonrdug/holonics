@@ -4,8 +4,8 @@
 use super::{
     material::AlphaMaterialError,
     text_codec::{
-        TEXT_INPUT_CHANNELS, TextCodeDisposition, TextCodeReading, TextSymbol,
-        read_constitutive_text_symbol, read_text_symbol,
+        read_constitutive_text_symbol, read_text_symbol, TextCodeDisposition, TextCodeReading,
+        TextSymbol, TEXT_INPUT_CHANNELS,
     },
 };
 use holonic_engine::native_ecology::constitutive_fibre::{
@@ -79,10 +79,18 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
     pub fn field(&self) -> &NativeConstitutiveField<'chart> {
         self.field
     }
+    pub fn enable_operative_contacts(&mut self) -> Result<(), AlphaMaterialError> {
+        Ok(self.field.enable_operative_contacts()?)
+    }
     /// Native contact/current staging over this same borrowed field. It changes no source
     /// capability or developmental occurrence, and cannot outlive the field's decoder.
-    pub fn stage_operative_contacts(&mut self) -> Result<
-        holonic_engine::native_ecology::constitutive_fibre::NativeOperativeContactStaging<'_, 'chart>,
+    pub fn stage_operative_contacts(
+        &mut self,
+    ) -> Result<
+        holonic_engine::native_ecology::constitutive_fibre::NativeOperativeContactStaging<
+            '_,
+            'chart,
+        >,
         AlphaMaterialError,
     > {
         Ok(self.field.stage_operative_contacts()?)

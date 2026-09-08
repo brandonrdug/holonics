@@ -121,6 +121,43 @@ __device__ __forceinline__ bool field_enclosed_junction_initialize(
     return true;
 }
 
+// Shared numerical LDL proposal. Its caller certifies the solved current against the
+// actual operator; this factorization does not seal a numerical matrix as that operator.
+__device__ void field_enclosed_factor(wide *matrix,wide *diagonal,uint32_t factor_dimension,uint32_t grain,uint32_t *slot) {
+    for (uint32_t k = 0; k < factor_dimension; ++k) {
+        if (threadIdx.x == 0) {
+            wide correction = 0;
+            for (uint32_t j = 0; j < k; ++j) {
+                wide pair = field_enclosed_product_zero(matrix[(size_t)k * factor_dimension + j],
+                    matrix[(size_t)k * factor_dimension + j], grain, slot);
+                wide term = field_enclosed_product_zero(pair, diagonal[j], grain, slot);
+                correction = add_checked(correction, term, slot);
+            }
+            diagonal[k] = sub_checked(matrix[(size_t)k * factor_dimension + k], correction, slot);
+            if (diagonal[k] <= 0) atomicOr(slot, REFUSED_CARRIER);
+        }
+        __syncthreads();
+        if (*slot) return;
+        for (uint32_t i = k + 1u + threadIdx.x; i < factor_dimension; i += blockDim.x) {
+            wide correction_off = 0;
+            for (uint32_t j = 0; j < k; ++j) {
+                wide pair = field_enclosed_product_zero(matrix[(size_t)i * factor_dimension + j],
+                    matrix[(size_t)k * factor_dimension + j], grain, slot);
+                wide term = field_enclosed_product_zero(pair, diagonal[j], grain, slot);
+                correction_off = add_checked(correction_off, term, slot);
+                if (*slot) break;
+            }
+            if (!*slot) {
+                wide numerator = sub_checked(matrix[(size_t)k * factor_dimension + i], correction_off, slot);
+                matrix[(size_t)i * factor_dimension + k] = field_enclosed_toward_zero(
+                    numerator, diagonal[k], grain, slot);
+            }
+        }
+        __syncthreads();
+        if (*slot) return;
+    }
+}
+
 __device__ __forceinline__ void field_enclosed_solve(
     const wide *c_matrix, const wide *diagonal, uint32_t dimension, uint32_t grain,
     wide *solve, wide *v, uint32_t *slot
@@ -277,38 +314,8 @@ __device__ __forceinline__ void field_enclosed_junction_prepare(
     wide *diagonal = prefix + dimension;
     (void)u; (void)d; (void)h; (void)solve; (void)v; (void)prefix; (void)diagonal;
     const uint32_t factor_dimension = (uint32_t)d[0];
-    for (uint32_t k = 0; k < factor_dimension; ++k) {
-        if (threadIdx.x == 0) {
-            wide correction = 0;
-            for (uint32_t j = 0; j < k; ++j) {
-                wide pair = field_enclosed_product_zero(matrix[(size_t)k * factor_dimension + j],
-                    matrix[(size_t)k * factor_dimension + j], grain, slot);
-                wide term = field_enclosed_product_zero(pair, diagonal[j], grain, slot);
-                correction = add_checked(correction, term, slot);
-            }
-            diagonal[k] = sub_checked(matrix[(size_t)k * factor_dimension + k], correction, slot);
-            if (diagonal[k] <= 0) atomicOr(slot, REFUSED_CARRIER);
-        }
-        __syncthreads();
-        if (*slot) return;
-        for (uint32_t i = k + 1u + threadIdx.x; i < factor_dimension; i += blockDim.x) {
-            wide correction_off = 0;
-            for (uint32_t j = 0; j < k; ++j) {
-                wide pair = field_enclosed_product_zero(matrix[(size_t)i * factor_dimension + j],
-                    matrix[(size_t)k * factor_dimension + j], grain, slot);
-                wide term = field_enclosed_product_zero(pair, diagonal[j], grain, slot);
-                correction_off = add_checked(correction_off, term, slot);
-                if (*slot) break;
-            }
-            if (!*slot) {
-                wide numerator = sub_checked(matrix[(size_t)k * factor_dimension + i], correction_off, slot);
-                matrix[(size_t)i * factor_dimension + k] = field_enclosed_toward_zero(
-                    numerator, diagonal[k], grain, slot);
-            }
-        }
-        __syncthreads();
-        if (*slot) return;
-    }
+    field_enclosed_factor(matrix,diagonal,factor_dimension,grain,slot);
+    if (*slot) return;
     if (threadIdx.x == 0)
         field_enclosed_junction_finish(next_cov_lo, held, dimension, occurrence, grain,
             workspace, report_lo, report_hi, slot);

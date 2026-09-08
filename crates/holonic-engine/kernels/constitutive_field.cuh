@@ -305,6 +305,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     const int64_t *refreshed_source_current,
     const int64_t *moment_table,uint32_t moment_count,int64_t *moment_weights,
     const int64_t *context_table,int64_t *context_weights,int64_t *context_evaluations,uint64_t source_ordinal,
+    const int64_t *operative_table,
     int64_t *output_lo, int64_t *output_hi,
     uint32_t *slot, const uint32_t *census,
     const uint32_t *lineage, uint32_t lineage_count
@@ -331,7 +332,11 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     }
     __syncthreads();
     if (*slot) return;
-    if (coupled == 2 || coupled == 3) {
+    if(operative_table) {
+        field_operative_reflection_prepare(operative_table,output_lo,origin,incoming,current_frame,origin_frame,covariance,
+            (const wide *)junction_held,nodes,linked,junction_grain,occurrence,next_covariance_lo,next_covariance_hi,
+            (wide *)junction_report_lo,(wide *)junction_report_hi,junction_workspace,slot);
+    } else if (coupled == 2 || coupled == 3) {
         // Every thread participates. Each independent LDL row keeps its original arithmetic
         // order; only a completed pivot column becomes input to the next one.
         field_enclosed_junction_prepare(output_lo, origin, incoming, current_frame, origin_frame,
@@ -346,11 +351,19 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     }
     __syncthreads();
     if (*slot) return;
+    wide operative_radius=-1;
+    if(operative_table && transport_enabled>=2u){
+        const wide *bounds=(const wide *)(uintptr_t)operative_table[7];
+        const wide *details=(const wide *)((const int64_t *)(uintptr_t)operative_table[16]+18u*(size_t)(6u*nodes));
+        if(bounds[0]!=0 || details[2]!=0){if(threadIdx.x==0)atomicOr(slot,REFUSED_MALFORMED);}
+        operative_radius=details[5];
+    }
+    __syncthreads();if(*slot)return;
     if (transport_enabled == 2u && threadIdx.x == 0)
         complete_material_transport_prepare((const int64_t *)transport_lo,(const int64_t *)origin_transport,refreshed_source_current,
             output_lo,origin,incoming,current_frame,origin_frame,next_covariance_lo,(const wide *)junction_held,
             (const wide *)junction_report_lo,nodes,linked,junction_grain,occurrence,
-            (int64_t *)transport_delta_lo,(int64_t *)transport_delta_hi,(int64_t *)transport_report_lo,(int64_t *)transport_report_hi,field_scratch,slot);
+            (int64_t *)transport_delta_lo,(int64_t *)transport_delta_hi,(int64_t *)transport_report_lo,(int64_t *)transport_report_hi,field_scratch,slot,operative_radius);
     else if (transport_enabled == 1u && threadIdx.x == 0)
         field_material_transport_prepare(transport_lo, origin_junction, origin_transport,
             (const wide *)junction_report_lo, incoming, nodes, linked, junction_grain,
@@ -359,12 +372,12 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
         moment_material_transport_prepare((const int64_t *)transport_lo,(const int64_t *)origin_transport,refreshed_source_current,
             moment_table,moment_count,moment_weights,output_lo,origin,incoming,current_frame,origin_frame,next_covariance_lo,
             (const wide *)junction_held,(const wide *)junction_report_lo,nodes,linked,junction_grain,occurrence,
-            (int64_t *)transport_delta_lo,(int64_t *)transport_delta_hi,(int64_t *)transport_report_lo,(int64_t *)transport_report_hi,field_scratch,slot);
+            (int64_t *)transport_delta_lo,(int64_t *)transport_delta_hi,(int64_t *)transport_report_lo,(int64_t *)transport_report_hi,field_scratch,slot,operative_radius);
     if(transport_enabled>=4u)
         contextual_material_prepare((const int64_t *)transport_lo,(const int64_t *)origin_transport,context_table,(uint32_t)occurrence,source_ordinal,
             context_weights,context_evaluations,output_lo,origin,incoming,current_frame,origin_frame,next_covariance_lo,
             (const wide *)junction_held,(const wide *)junction_report_lo,nodes,linked,junction_grain,transport_enabled==5u?2u:1u,
-            (int64_t *)transport_delta_lo,(int64_t *)transport_delta_hi,(int64_t *)transport_report_lo,(int64_t *)transport_report_hi,field_scratch,slot);
+            (int64_t *)transport_delta_lo,(int64_t *)transport_delta_hi,(int64_t *)transport_report_lo,(int64_t *)transport_report_hi,field_scratch,slot,operative_radius);
     __syncthreads();
     if (*slot || threadIdx.x != 0) return;
     const uint32_t width = 6u * nodes;

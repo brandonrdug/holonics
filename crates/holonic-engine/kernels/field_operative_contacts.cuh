@@ -100,12 +100,11 @@ extern "C" __global__ void __launch_bounds__(512) section_field_operative_update
 
 // Recomputed moments include every mixed term of simultaneous D,b changes. C is a complex
 // port matrix; h=D b. The radii refer to these complete objects, not componentwise point seals.
-extern "C" __global__ void __launch_bounds__(512) section_field_operative_moments(
+__device__ void operative_moments_prepare(
     const int64_t *map_wire,const int64_t *b_wire,const int64_t *bounds,uint32_t D,uint32_t count,uint32_t grain,
     int64_t *c_lo,int64_t *c_hi,int64_t *h_lo,int64_t *h_hi,int64_t *out_bounds_lo,int64_t *out_bounds_hi,
-    wide *rounds,uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
+    wide *rounds,uint32_t *slot
 ){
-    if(blockIdx.x)return;if(upstream_refused(census,lineage,lineage_count,slot))return;
     const uint32_t m=D/2u;const wide *map=(const wide *)map_wire,*b=(const wide *)b_wire,*e=(const wide *)bounds;
     wide *C=(wide *)c_lo,*h=(wide *)h_lo;
     if(!D || (D&1u) || grain<1u || grain>120u || e[0]<0 || e[1]<0){if(!threadIdx.x)atomicOr(slot,REFUSED_MALFORMED);return;}
@@ -137,4 +136,12 @@ extern "C" __global__ void __launch_bounds__(512) section_field_operative_moment
     }
     __syncthreads();if(*slot)return;
     operative_copy_point(c_lo,c_hi,4u*(size_t)m*m);operative_copy_point(h_lo,h_hi,2u*D);operative_copy_point(out_bounds_lo,out_bounds_hi,8);
+}
+extern "C" __global__ void __launch_bounds__(512) section_field_operative_moments(
+    const int64_t *map_wire,const int64_t *b_wire,const int64_t *bounds,uint32_t D,uint32_t count,uint32_t grain,
+    int64_t *c_lo,int64_t *c_hi,int64_t *h_lo,int64_t *h_hi,int64_t *out_bounds_lo,int64_t *out_bounds_hi,
+    wide *rounds,uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
+){
+    if(blockIdx.x)return;if(upstream_refused(census,lineage,lineage_count,slot))return;
+    operative_moments_prepare(map_wire,b_wire,bounds,D,count,grain,c_lo,c_hi,h_lo,h_hi,out_bounds_lo,out_bounds_hi,rounds,slot);
 }

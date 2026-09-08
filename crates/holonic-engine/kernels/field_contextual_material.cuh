@@ -144,7 +144,7 @@ __device__ void contextual_material_prepare(
     int64_t *weights,int64_t *evaluations,const int64_t *query,const int64_t *origin,const int64_t *incoming,
     const int64_t *frame,const int64_t *origin_frame,const int64_t *covariance,const wide *before,const wide *current,
     uint32_t n,uint32_t linked,uint32_t grain,uint32_t version,int64_t *next,int64_t *next_hi,int64_t *out,int64_t *out_hi,
-    wide *scratch,uint32_t *slot
+    wide *scratch,uint32_t *slot,wide joint_radius=-1
 ) {
     uint32_t R=2u*n,D=6u*n,stride=R+1u;size_t ga=2u*D+8u,raw_stride=30u*n;
     wide *ball=(wide *)out,*abs_beta=(wide *)(out+contextual_beta(n)),*ctx_beta=abs_beta+R;
@@ -153,7 +153,7 @@ __device__ void contextual_material_prepare(
         for(size_t i=0;i<contextual_extra(n)+24u;++i)out[i]=out_hi[i]=0;
         if((linked && (!at || source_ordinal>=at || !original)) || at>=(uint32_t)INT64_MAX){atomicOr(slot,REFUSED_MALFORMED);}
         if(!*slot)field_current_history_source_prepare(query,origin,incoming,frame,origin_frame,covariance,before,current,state,
-            n,linked,grain,at,next,next_hi,out+contextual_context(n),out_hi+contextual_context(n),scratch,slot);
+            n,linked,grain,at,next,next_hi,out+contextual_context(n),out_hi+contextual_context(n),scratch,slot,joint_radius);
         wide ud=1,dd=1;
         if(!*slot && field_paired_build_faces(query,origin,incoming,frame,origin_frame,n,linked,scratch,scratch+D,&ud,&dd,slot))
             contextual_visible(scratch,ud,n,grain,out+contextual_output_visible(n),slot);

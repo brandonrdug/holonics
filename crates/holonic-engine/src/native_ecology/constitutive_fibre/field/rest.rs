@@ -1,6 +1,7 @@
 //! Complete cold field chart and explicitly supplied capabilities. Remount consumes the rest
 //! and installs its sections directly; it does not replay development or regenerate dropped handles.
 use super::*;
+use super::junction::operative::{OperativeState,rest::{OperativeWire,OperativeRest,OperativeHistoryRest}};
 use crate::native_ecology::constitutive_fibre::circulation::rest::{
     blob, expect, point_section, read_blob,
 };
@@ -66,11 +67,14 @@ struct Header {
         skip_serializing_if = "NativeMaterialTransportSource::is_outgoing"
     )]
     transport_source: NativeMaterialTransportSource,
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    operative:Option<OperativeWire>,
     source_slots: Vec<Option<usize>>,
     anchor_slots: Vec<Option<usize>>,
 }
 #[derive(Debug, PartialEq, Eq)]
 pub(super) struct HeldRest {
+    pub(super) operative:Option<OperativeHistoryRest>,
     pub(super) source: ResidentSectionRest,
     pub(super) incoming: Option<ResidentSectionRest>,
     pub(super) junction: Option<ResidentSectionRest>,
@@ -80,6 +84,7 @@ pub(super) struct HeldRest {
 /// Serialized chart, not another live ecology. Deliberately not Clone.
 #[derive(Debug, PartialEq, Eq)]
 pub struct NativeFieldRest {
+    operative:Option<OperativeRest>,
     header: Header,
     seed: ResidentSectionRest,
     memory: ResidentSectionRest,
@@ -598,6 +603,26 @@ impl NativeFieldRest {
                 }
             }
         }
+        if h.operative.is_some()!=self.operative.is_some(){return Err(invalid("operative state presence"));}
+        if let Some(wire)=&h.operative {
+            if wire.activated_at>h.history.len() || h.junction.as_ref().is_none_or(|j|!matches!(j.representation,NativeFieldJunctionRepresentation::EnclosedDyadic{..})) {
+                return Err(invalid("operative activation or representation"));
+            }
+            let births=h.history.iter().enumerate().filter_map(|(receiving,e)|e.lineage.received_from.map(|source|NativeOperativeContactBirth{source,receiving})).collect::<Vec<_>>();
+            if wire.births!=births {return Err(invalid("operative birth lineage"));}
+            self.operative.as_ref().unwrap().validate(wire,n)?;
+            if let Some(last)=self.history.last().and_then(|h|h.operative.as_ref()) {
+                let current=&self.operative.as_ref().unwrap().current;
+                if current[1]!=last.b || current[2]!=last.bounds {return Err(invalid("operative current/history boundary"));}
+            }
+
+        }
+        let mut contacts=0;
+        for (at,(event,rest)) in h.history.iter().zip(&self.history).enumerate(){
+            contacts+=usize::from(event.lineage.received_from.is_some());
+            if rest.operative.is_some()!=h.operative.as_ref().is_some_and(|o|at>=o.activated_at){return Err(invalid("operative historical presence"));}
+            if let Some(op)=&rest.operative{op.validate(dimension,contacts)?;}
+        }
         let mut supplied = vec![false; h.history.len()];
         for source in h.source_slots.iter().flatten() {
             if *source >= h.history.len() || h.history[*source].returned || supplied[*source] {
@@ -631,6 +656,7 @@ impl NativeFieldRest {
         if let Some(s) = &self.transport {
             section(s)?;
         }
+        if let Some(op)=&self.operative {op.write(&mut section)?;}
         for h in &self.history {
             section(&h.source)?;
             if let Some(s) = &h.junction {
@@ -642,6 +668,7 @@ impl NativeFieldRest {
             if let Some(s) = &h.incoming {
                 section(s)?;
             }
+            if let Some(op)=&h.operative{op.write(&mut section)?;}
         }
         out.write_all(END).map_err(invalid)
     }
@@ -658,8 +685,9 @@ impl NativeFieldRest {
             .then(&mut section)
             .transpose()?;
         let transport = header.transport.then(&mut section).transpose()?;
+        let operative=header.operative.as_ref().map(|w|OperativeRest::read(w,&mut section)).transpose()?;
         let mut history = Vec::new();
-        for event in &header.history {
+        for (at,event) in header.history.iter().enumerate() {
             history.push(HeldRest {
                 source: section()?,
                 junction: header.junction.as_ref().map(|_| section()).transpose()?,
@@ -670,6 +698,7 @@ impl NativeFieldRest {
                     .is_resident()
                     .then(&mut section)
                     .transpose()?,
+                operative:header.operative.as_ref().is_some_and(|o|at>=o.activated_at).then(||OperativeHistoryRest::read(&mut section)).transpose()?,
             });
         }
         expect(&mut input, END)?;
@@ -677,6 +706,7 @@ impl NativeFieldRest {
             return Err(invalid("trailing field rest bytes"));
         }
         let rest = Self {
+            operative,
             header,
             seed,
             memory,
@@ -782,9 +812,11 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 }),
                 transport: self.transport.is_some(),
                 transport_source: self.material_transport_source().unwrap_or_default(),
+                operative:self.junction.as_ref().and_then(|j|j.operative.as_ref()).map(|o|o.wire()),
                 source_slots,
                 anchor_slots,
             },
+            operative:self.junction.as_ref().and_then(|j|j.operative.as_ref()).map(|o|o.rest(self.relation.surface)).transpose()?,
             seed: section(&self.seed)?,
             memory: section(&self.memory)?,
             basis: section(&self.relation.basis)?,
@@ -874,6 +906,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         }
         let NativeFieldRest {
             header: h,
+            operative,
             seed,
             memory,
             basis,
@@ -968,6 +1001,10 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 solver: j.solver,
                 covariance: surface.mount_section_rest(&covariance.expect("covariance"))?,
                 current,
+                operative: match (h.operative,operative) {
+                    (Some(wire),Some(rest))=>Some(OperativeState::remount(surface,wire,rest,match j.representation {NativeFieldJunctionRepresentation::EnclosedDyadic{fractional_bits}=>fractional_bits,_=>return Err(invalid("operative representation"))})?),
+                    (None,None)=>None,_=>return Err(invalid("operative state presence")),
+                },
             })
         } else {
             None

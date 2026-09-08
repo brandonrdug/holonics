@@ -131,8 +131,12 @@ resident passages. `field_operative_contacts.cuh` mounts the actual birth/curren
 stages rank-two returns and computes complete mixed moments and bounds. The
 [native staging return](../research/records/2026-09-08_AC1_OPERATIVE_CONTACTS_STAGE_THEIR_COMPLETE_MAP_AND_CURRENT_ON_DEVICE.md)
 records native controls and actual-model correspondence. `TextFieldSession::stage_operative_contacts`
-and the example observer expose that preparation. Full field publication, the joint constitutive
-producer and changing-contact persistence remain open.
+and the example observer expose that preparation. `field_operative_reflection.cuh`
+now reuses the LDL proposal and retains a full 544-bit residual and joint current bound.
+`operative/rest.rs` preserves operative state/history in field rest and archive placement. The
+[operative field return](../research/records/2026-09-08_AC1_THE_OPERATIVE_MAP_CONDUCTS_AND_RESTARTS_IN_THE_FIELD.md)
+connects birth, reaction and publication. The endogenous joint producer and changed-contact
+material interpretation remain open.
 
 
 [established-bounded; source-inspected] `resident/context_section.rs` and

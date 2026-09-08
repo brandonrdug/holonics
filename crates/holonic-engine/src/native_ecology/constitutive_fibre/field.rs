@@ -49,7 +49,7 @@ pub use junction::{
     NativeFieldInternalCurrent, NativeFieldInternalCurrentBall, NativeFieldJunctionReading,
     NativeFieldJunctionRepresentation, NativeFieldJunctionSolver,
     PairedContactCotangent, PairedJunctionCotangent, PairedJunctionLinearization, PairedJunctionTangent,
-    NativeOperativeContactBirth, NativeOperativeContactReading, NativeOperativeContactStaging,
+    NativeOperativeContactBirth, NativeOperativeContactReading, NativeOperativeContactStaging, NativeOperativeReflectionReading,
 };
 use junction::{PairedJunction, PendingJunction};
 use material_transport::{MaterialTransport, PendingMaterialTransport};
@@ -212,6 +212,7 @@ struct ResidentFieldHistory<'chart> {
     incoming: Option<Rc<ResidentSection<'chart>>>,
     junction: Option<Rc<ResidentSection<'chart>>>,
     transport: Option<Rc<ResidentSection<'chart>>>,
+    operative: Option<junction::operative::HeldOperative<'chart>>,
 }
 
 struct HeldField<'chart> {
@@ -608,6 +609,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .occurrences
             .checked_add(1)
             .ok_or(ConstitutiveFibreError::Shape)?;
+        if source_at.is_some() {if let Some(o)=self.junction.as_mut().and_then(|j|j.operative.as_mut()) {o.births.try_reserve(1).map_err(|_|ConstitutiveFibreError::Shape)?;}}
         self.history
             .try_reserve(1)
             .map_err(|_| ConstitutiveFibreError::Shape)?;
@@ -661,7 +663,10 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .and_then(|v| v.checked_add(9))
             .ok_or(ConstitutiveFibreError::Shape)?;
         let output = surface.fresh_section(1, output_width, ResidentGrain(0))?;
-        let prepared = self.prepare_junction()?;
+        if self.transport.is_some() && self.junction.as_ref().and_then(|j|j.operative.as_ref()).is_some_and(|o|!o.is_fixed()) {
+            return Err(ConstitutiveFibreError::Rest("the fixed-contact material source cannot read changed operative contacts".into()));
+        }
+        let prepared = self.prepare_junction(source_at.is_some())?;
         let prepared_transport = self.prepare_material_transport(source_at)?;
         let lineage_lanes = if resident_current.is_some() {
             vec![vec![], vec![0]]
@@ -768,6 +773,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                     .and_then(|p| p.moment.as_ref())
                     .map(|p| (&p.table, p.count, &p.weights)),
                 prepared_transport.as_ref().and_then(|p|p.contextual.as_ref()).map(|p|(&p.table,&p.weights,&p.evaluations,source_at.unwrap_or(0) as u64)),
+                prepared.as_ref().and_then(|(p,_)|p.operative.as_ref()).map(|p|&p.table),
                 &output,
             )?;
         }
@@ -782,6 +788,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 transport: prepared_transport
                     .as_ref()
                     .map(|next| Rc::clone(&next.report)),
+                operative: prepared.as_ref().and_then(|(p,_)|p.operative.as_ref()).map(|p|p.history()),
             }),
             lineage: lineage.clone(),
             frame: Rc::clone(&self.frame),
@@ -815,17 +822,20 @@ impl<'chart> NativeConstitutiveField<'chart> {
         occurrence.source = None;
         self.history
             .push(self.pending.take().expect("completed field"));
-        if let Some(next) = self.pending_junction.take() {
+        if let Some(mut next) = self.pending_junction.take() {
             let representation = self
                 .junction
                 .as_ref()
                 .expect("existing junction")
                 .representation;
+            let mut operative=self.junction.as_mut().unwrap().operative.take();
+            if let Some(pending)=next.operative.take() {operative.as_mut().unwrap().receive(pending,source_at,at);}
             self.junction = Some(PairedJunction {
                 representation,
                 solver: self.junction.as_ref().expect("existing junction").solver,
                 covariance: next.covariance,
                 current: next.report,
+                operative,
             });
         }
         self.relation.occurrences = next;

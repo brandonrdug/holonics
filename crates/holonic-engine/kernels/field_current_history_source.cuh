@@ -65,7 +65,7 @@ __device__ void field_current_history_source_prepare(
     const wide *before, const wide *current, const int64_t *state,
     uint32_t nodes, uint32_t linked, uint32_t grain, uint64_t occurrence,
     int64_t *next_lo, int64_t *next_hi, int64_t *source_lo, int64_t *source_hi,
-    wide *scratch, uint32_t *slot
+    wide *scratch, uint32_t *slot,wide joint_radius=-1
 ) {
     if (!nodes || grain<1u || grain>120u || linked>1u || occurrence>=(uint64_t)INT64_MAX) {
         atomicOr(slot,REFUSED_MALFORMED); return;
@@ -140,7 +140,7 @@ __device__ void field_current_history_source_prepare(
     source_lo[6u*D+15u]=source_hi[6u*D+15u]=(int64_t)grain;
     wide trace_root=isqrt_floor(trace);
     if (trace_root*trace_root!=trace) trace_root=add_checked(trace_root,1,slot);
-    wide radius=add_checked(current[2u*stride-1u],product_checked(
+    wide radius=joint_radius>=0?joint_radius:add_checked(current[2u*stride-1u],product_checked(
         product_checked(2,current[4u*stride-1u],slot),trace_root,slot),slot);
     ((wide *)(source_lo+6u*D+16u))[0]=((wide *)(source_hi+6u*D+16u))[0]=radius;
     source_lo[6u*D+18u]=source_hi[6u*D+18u]=to_word(trace,slot);

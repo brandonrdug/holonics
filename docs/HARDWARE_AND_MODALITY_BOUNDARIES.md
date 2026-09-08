@@ -22,6 +22,13 @@ neither a perfect inverse nor a copy of every past sample is a general learning 
 
 ## Current common mechanism
 
+[definition] The [operative field return](../research/records/2026-09-08_AC1_THE_OPERATIVE_MAP_CONDUCTS_AND_RESTARTS_IN_THE_FIELD.md)
+adds full map/current reflection, birth growth and durable continuation. A target port must retain
+the complete signed residual (seventeen 32-bit magnitude limbs and a sign per real coordinate),
+the joint current error law and the old producing carriers. The covariance is a numerical solve
+proposal, not a substitute for the operative map. This desktop return establishes no Apple or
+acoustic execution, and the endogenous morphology-return producer remains unfinished.
+
 [definition] The [operative-contact staging](../research/records/2026-09-08_AC1_OPERATIVE_CONTACTS_STAGE_THEIR_COMPLETE_MAP_AND_CURRENT_ON_DEVICE.md)
 adds native packed-wide map/current carriers and complete mixed covariance/aggregate bounds.
 A target port must preserve their complex orientation, logical wide values and radii, actual
