@@ -25,7 +25,9 @@ pub enum ResidentPhaseCurrentError {
 }
 
 mod difference;
-pub use difference::{PhaseComparisonSupport, ResidentPhaseDifference, compare_resident};
+pub use difference::{
+    PhaseComparisonSupport, ResidentPhaseDifference, compare_resident, comparison_support,
+};
 
 mod response_adjoint;
 pub use response_adjoint::{ResidentPhaseResponseAdjoint, return_response_resident};

@@ -78,9 +78,43 @@ python3 research/experiments/apple_silicon/compare_recorded_acoustic_contact.py 
   .local/datasets/soundcam/acquisition.json NEW_CONTACT.json --output NEW_CONTACT_COMPARISON.json
 ```
 
-[open] This example returns numerical sections and their exact construction; acoustic rendering
-of enclosed currents, durable continuation of this contact and its application/streaming binding
-remain next. The existing controlled conditional checkpoint below has a different declared scope.
+[established-bounded; measured] The [continuing application return](../research/records/2026-09-07_THE_TEMPORAL_RESPONSE_RESTARTS_AND_RETURNS_ENCLOSED_SOUND.md)
+adds public temporal response persistence and an enclosed PCM receiver. Separate processes
+return the same 17,926-byte final checkpoint, three PCM files and full reconstruction receipts
+as uninterrupted execution. The response checkpoint holds compact exact construction
+and recording/contact metadata; it does not contain a raw-wave archive or the full acoustic
+ecology. The existing controlled conditional checkpoint below has a different declared scope.
+
+```sh
+cargo build -p holonics-workbench --bin holonics-acoustic
+target/debug/holonics-acoustic temporal start --taps 4 --grain 72 --output NEW_FIRST \
+  .local/datasets/soundcam/wav/row_000/loopback.wav .local/datasets/soundcam/wav/row_000/microphone_00.wav
+target/debug/holonics-acoustic temporal continue NEW_FIRST/response.hna --output NEW_NEXT \
+  .local/datasets/soundcam/wav/row_001/loopback.wav .local/datasets/soundcam/wav/row_001/microphone_00.wav \
+  .local/datasets/soundcam/wav/row_002/loopback.wav .local/datasets/soundcam/wav/row_002/microphone_00.wav
+target/debug/holonics-acoustic temporal predict NEW_NEXT/response.hna \
+  .local/datasets/soundcam/wav/row_000/loopback.wav --occurrence soundcam-after-cut3 --output NEW_PREDICTION
+target/debug/holonics-acoustic temporal inspect NEW_NEXT/response.hna
+python3 research/experiments/apple_silicon/compare_temporal_acoustic_application.py \
+  VERIFIED_CONTACT.json NEW_FIRST/return.json NEW_NEXT/return.json \
+  --prediction NEW_PREDICTION/return.json --output NEW_COMPARISON.json
+python3 research/experiments/apple_silicon/temporal_acoustic_observer_controls.py NEW_OBSERVER_CONTROLS
+```
+
+[definition] This bounded comparison uses the previously source-qualified three-pair contact
+return as its explicit reference. The new observer verifies every source file, contact capsule,
+PCM frame, exact quotient remainder, global error ball and clock; prediction is also checked
+against an independent exact convolution of the final response. Output gain (`--gain`, default
+32768) is separate from PCM ingestion divisor 32768. Each complex coefficient becomes real and
+imaginary PCM channels. The JSON sidecar preserves the entire numerical enclosure and remainder;
+WAV alone is a numerical representative. Both directory and artifact targets must be new.
+
+[established-bounded; measured] In the development build, native prediction takes about
+4.4 seconds per 14-second recording after restart, while its full cold PCM receipt takes about
+75 seconds.
+
+[open] Useful sound/English conduct and streaming remain unfinished. These measured costs
+require further work before a consumer sound application is complete.
 
 [established-bounded; measured] The [recorded contact return](../research/records/2026-09-07_THE_RECORDED_PREIMAGE_FIBRE_CHANGES_THE_CONTINUING_TEMPORAL_RESPONSE.md)
 changes the continuing response on all three complete SoundCam pairs. Independent global-ball,

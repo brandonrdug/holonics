@@ -123,6 +123,14 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
    three field-solver regressions and three full source-qualified SoundCam returns pass. Each
    recorded contact changes the response used by the next recording; the declared four-tap
    study does not establish learned acoustic grains, a room model or sound usefulness.
+   The [temporal rest/application return](../../research/records/2026-09-07_THE_TEMPORAL_RESPONSE_RESTARTS_AND_RETURNS_ENCLOSED_SOUND.md)
+   now verifies separate-process response continuation and enclosed PCM output.
+   A response checkpoint retains the initial point, all compact exact constructions and contact
+   chronology; it is not a complete acoustic-ecology checkpoint or a raw-recording archive.
+   Separate processes return byte-identical checkpoints and sound receipts, and later prediction
+   passes an independent exact source/response comparison. PCM presents a declared numerical
+   representative; keep the global ball, sample clock, gain, quantization remainder and
+   clipping in its output receipt.
 3. Develop and retain acoustic generative standing across source-qualified recordings and
    actual joined returns, then conduct its native emission into the declared acoustic receiver.
    Inspect perception differences and generated sound, preserve the declared reconstruction

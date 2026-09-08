@@ -22,6 +22,7 @@ pub use conditional_checkpoint::{
 };
 mod acoustic;
 pub mod acoustic_field;
+pub mod temporal_acoustic;
 pub use acoustic::{
     AcousticApplication, AcousticInterruption, AcousticPendingReceive, AcousticRun,
     AcousticRunOptions, AcousticSavedApplication, append_acoustic, resume_acoustic,

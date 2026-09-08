@@ -8,8 +8,8 @@
 use std::io::Cursor;
 
 use holonic_engine::{
-    phase_current::{PhaseCurrentLineageId, PhaseCurrentReceiverId},
     ExactComplexWaveCurrent,
+    phase_current::{PhaseCurrentLineageId, PhaseCurrentReceiverId},
 };
 use num_bigint::BigInt;
 use num_rational::BigRational as Rat;
@@ -175,39 +175,19 @@ impl NativeAcousticTemporalPcm16Projection {
     /// Write the exterior two-channel signed-16 presentation, one frame per carrier.
     pub fn wav_bytes(&self) -> Result<Vec<u8>, NativeAcousticError> {
         self.validate()?;
-        let specification = hound::WavSpec {
-            channels: 2,
-            sample_rate: self.sample_rate,
-            bits_per_sample: 16,
-            sample_format: hound::SampleFormat::Int,
-        };
-        let mut bytes = Vec::new();
-        {
-            let cursor = Cursor::new(&mut bytes);
-            let mut writer = hound::WavWriter::new(cursor, specification)
-                .map_err(|error| NativeAcousticError::Pcm(error.to_string()))?;
-            for frame in &self.frames {
-                writer
-                    .write_sample(frame.pcm[0])
-                    .map_err(|error| NativeAcousticError::Pcm(error.to_string()))?;
-                writer
-                    .write_sample(frame.pcm[1])
-                    .map_err(|error| NativeAcousticError::Pcm(error.to_string()))?;
-            }
-            writer
-                .finalize()
-                .map_err(|error| NativeAcousticError::Pcm(error.to_string()))?;
-        }
-        Ok(bytes)
+        pcm_wav_bytes(self.sample_rate, self.frames.iter().map(|frame| frame.pcm))
     }
 }
 
-struct QuantizedCoordinate {
-    sample: i16,
-    remainder: Rat,
+pub(super) struct QuantizedCoordinate {
+    pub(super) sample: i16,
+    pub(super) remainder: Rat,
 }
 
-fn quantize(value: &Rat, gain: &Rat) -> Result<(QuantizedCoordinate, bool), NativeAcousticError> {
+pub(super) fn quantize(
+    value: &Rat,
+    gain: &Rat,
+) -> Result<(QuantizedCoordinate, bool), NativeAcousticError> {
     let scaled = value * gain;
     let toward_zero = scaled.to_integer();
     let minimum = BigInt::from(i16::MIN);
@@ -222,6 +202,36 @@ fn quantize(value: &Rat, gain: &Rat) -> Result<(QuantizedCoordinate, bool), Nati
     let sample = i16::try_from(sample_integer.clone()).map_err(|_| NativeAcousticError::Extent)?;
     let remainder = scaled - Rat::from_integer(sample_integer);
     Ok((QuantizedCoordinate { sample, remainder }, clipped))
+}
+
+pub(super) fn pcm_wav_bytes(
+    sample_rate: u32,
+    pcm: impl IntoIterator<Item = [i16; 2]>,
+) -> Result<Vec<u8>, NativeAcousticError> {
+    let specification = hound::WavSpec {
+        channels: 2,
+        sample_rate,
+        bits_per_sample: 16,
+        sample_format: hound::SampleFormat::Int,
+    };
+    let mut bytes = Vec::new();
+    {
+        let cursor = Cursor::new(&mut bytes);
+        let mut writer = hound::WavWriter::new(cursor, specification)
+            .map_err(|error| NativeAcousticError::Pcm(error.to_string()))?;
+        for [real, imaginary] in pcm {
+            writer
+                .write_sample(real)
+                .map_err(|error| NativeAcousticError::Pcm(error.to_string()))?;
+            writer
+                .write_sample(imaginary)
+                .map_err(|error| NativeAcousticError::Pcm(error.to_string()))?;
+        }
+        writer
+            .finalize()
+            .map_err(|error| NativeAcousticError::Pcm(error.to_string()))?;
+    }
+    Ok(bytes)
 }
 
 #[cfg(test)]
@@ -343,35 +353,41 @@ mod tests {
     #[test]
     fn invalid_gain_clock_and_empty_carrier_are_refused() {
         let coordinate = [current(Rat::one(), Rat::zero())];
-        assert!(NativeAcousticTemporalPcm16Projection::found(
-            PhaseCurrentReceiverId(1),
-            PhaseCurrentLineageId(1),
-            Rat::zero(),
-            q(1, 16_000),
-            16_000,
-            Rat::zero(),
-            &coordinate,
-        )
-        .is_err());
-        assert!(NativeAcousticTemporalPcm16Projection::found(
-            PhaseCurrentReceiverId(1),
-            PhaseCurrentLineageId(1),
-            Rat::zero(),
-            q(1, 8_000),
-            16_000,
-            Rat::one(),
-            &coordinate,
-        )
-        .is_err());
-        assert!(NativeAcousticTemporalPcm16Projection::found(
-            PhaseCurrentReceiverId(1),
-            PhaseCurrentLineageId(1),
-            Rat::zero(),
-            q(1, 16_000),
-            16_000,
-            Rat::one(),
-            &[],
-        )
-        .is_err());
+        assert!(
+            NativeAcousticTemporalPcm16Projection::found(
+                PhaseCurrentReceiverId(1),
+                PhaseCurrentLineageId(1),
+                Rat::zero(),
+                q(1, 16_000),
+                16_000,
+                Rat::zero(),
+                &coordinate,
+            )
+            .is_err()
+        );
+        assert!(
+            NativeAcousticTemporalPcm16Projection::found(
+                PhaseCurrentReceiverId(1),
+                PhaseCurrentLineageId(1),
+                Rat::zero(),
+                q(1, 8_000),
+                16_000,
+                Rat::one(),
+                &coordinate,
+            )
+            .is_err()
+        );
+        assert!(
+            NativeAcousticTemporalPcm16Projection::found(
+                PhaseCurrentReceiverId(1),
+                PhaseCurrentLineageId(1),
+                Rat::zero(),
+                q(1, 16_000),
+                16_000,
+                Rat::one(),
+                &[],
+            )
+            .is_err()
+        );
     }
 }

@@ -24,18 +24,10 @@ to desktop, with all receipt fields equal except path and timing. Source-indepen
 and recipient-field conduct use two deeds and zero numerical readout. Acoustic clock/interaction
 binding remains required; the mode's sign progression does not supply physical frequency.
 
-[established-bounded; measured] The [measured acoustic return](research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md)
-retains full oriented differences for three actual 14-second SoundCam electrical-loopback/
-microphone pairs on their original clocks. All-coordinate source-qualified comparisons pass.
-Prediction/difference take about 2.4 seconds together; cold audio export takes 14.4–14.7 seconds,
-with 139.8 MB peak native residency. That return uses the initial unit-response baseline.
-
-[established-bounded; measured] The [producing-adjoint return](research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md)
-now returns those differences into the original response chart using the retained convolution.
-Twenty-three temporal controls, all three exact recorded comparisons and four negative observer
-controls pass. The adjoint takes 2.53–3.33 seconds per 14-second recording with zero numerical
-readback; the three native stages together take 4.50–5.79 seconds. That adjoint return does not
-itself develop the unit response; the subsequent contact below supplies the structured attachment.
+[established-bounded; measured] The [measured acoustic difference](research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md)
+and [producing adjoint](research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md)
+retain complete oriented returns through the actual source/response carriers. Their original
+unit-response apparatus scope and source-qualified evidence stand in the linked records.
 
 [established-bounded; measured] The [recorded Preimage-Fibre contact](research/records/2026-09-07_THE_RECORDED_PREIMAGE_FIBRE_CHANGES_THE_CONTINUING_TEMPORAL_RESPONSE.md)
 now changes the continuing temporal response across all three full SoundCam pairs. It composes
@@ -55,11 +47,20 @@ ports resident input and paired/enclosed/balanced field conduct, including histo
 These controlled two-tap and field returns establish their apparatus scope, not cultivated sound
 or English usefulness. Completed measurements and control counts remain in those records.
 
-[open; source-inspected] Next persist/remount the continuing temporal response and its exact
-construction, bind enclosed emissions to the acoustic codec/receiver, and develop useful sound
-conduct through actual material and conditions. Larger material/current-history
-owners remain outside the current Metal port. Useful acoustic/English conduct and streaming
-completion remain unfinished; AS4–AS5 stay active.
+[established-bounded; measured] The [temporal response/application return](research/records/2026-09-07_THE_TEMPORAL_RESPONSE_RESTARTS_AND_RETURNS_ENCLOSED_SOUND.md)
+now persists exact response construction and contact chronology. Separate processes return the
+same 17,926-byte final checkpoint, three PCM files and complete reconstruction receipts as
+uninterrupted execution. The public start/continue/predict/inspect commands use the existing
+owner; remount enacts zero native deeds and zero numerical readout. Later target-free prediction
+passes an independent exact convolution/global-ball check. Native prediction takes 4.35 seconds
+for 14 seconds of source material; the explicit cold PCM receipt takes 75.24 seconds. WAV is a
+numerical representative, with its full error ball and quotient remainder in the sidecar.
+
+[open] Next bind actual acoustic conditions and generative standing through the native owners,
+develop and inspect useful sound conduct, and extend the same ecology to useful recorded English
+and conversation. The current four-tap response boundary is not that model. Streaming and consumer
+completion remain unfinished; AS4–AS5 stay active. Larger material/current-history owners remain
+outside the current Metal port where their actual composition requires further native conduct.
 
 [established-bounded; measured] Local recorded material includes 2,000 ESC-50 WAVs, 100 LibriSpeech
 clips, four complete AMI meetings and 30 SoundCam source/receiver pairs. The [interval return](research/records/2026-09-07_RECORDED_RESPONSE_POINTERS_RETAIN_THEIR_ACOUSTIC_INTERVALS.md)

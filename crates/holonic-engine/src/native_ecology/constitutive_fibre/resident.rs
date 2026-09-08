@@ -395,6 +395,6 @@ pub use condition_contact::{
     ResidentConditionContact, ResidentConditionCurrent, ResidentConditionCurrentRest,
     ResidentTemporalConditionContact, ResidentTemporalConditionCurrent,
     ResidentTemporalConditionPreimage, ResidentTemporalConditionReading,
-    ResidentTemporalConditionSnapshot, ResidentTemporalRestrictedEnclosure,
-    ResidentTemporalWaveReturn, TemporalResponseChart,
+    ResidentTemporalConditionRest, ResidentTemporalConditionSnapshot,
+    ResidentTemporalRestrictedEnclosure, ResidentTemporalWaveReturn, TemporalResponseChart,
 };

@@ -6,9 +6,14 @@
 //! foreign runtime. A later PCM rendering is an explicitly lossy exterior receiver which retains
 //! its divisor and every remainder.
 
+mod enclosed_temporal_receiver;
 mod potential_formation;
 mod temporal_receiver;
 
+pub use enclosed_temporal_receiver::{
+    NativeAcousticEnclosedTemporalPcm16Frame, NativeAcousticEnclosedTemporalPcm16Projection,
+    NATIVE_ACOUSTIC_ENCLOSED_TEMPORAL_PCM16_SCHEMA,
+};
 pub use potential_formation::{
     NativeAcousticAudibleProjection, NativeAcousticPotentialComplex, NativeAcousticReceiverChart,
     NativeAcousticSpectralIncidence,
@@ -20,8 +25,8 @@ pub use temporal_receiver::{
 use std::io::Cursor;
 
 use holonic_engine::{
-    ExactComplexWaveCurrent, ExactPhaseTransportSpectrum,
     phase_current::{ExactPhaseCurrentSection, PhaseCurrentLineageId, PhaseCurrentReceiverId},
+    ExactComplexWaveCurrent, ExactPhaseTransportSpectrum,
 };
 use num_bigint::{BigInt, BigUint};
 use num_rational::BigRational as Rat;
@@ -1322,7 +1327,9 @@ pub enum NativeAcousticError {
     MalformedMorphology,
     #[error("the exact acoustic production section is malformed")]
     MalformedProduction,
-    #[error("the exact acoustic projective current lost its primitive ray or reconstruction scale")]
+    #[error(
+        "the exact acoustic projective current lost its primitive ray or reconstruction scale"
+    )]
     MalformedProjectiveCurrent,
     #[error("the acoustic room return lost its exact finite receiver current")]
     MalformedReceiverCurrent,

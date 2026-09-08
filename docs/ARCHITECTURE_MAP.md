@@ -91,7 +91,17 @@ enclosures through subsequent convolution and comparison. `temporal/inspect.rs` 
 exact decoder of retained initial/Gram/adjoint carriers; its host arithmetic does not feed
 native current. The [recorded contact](../research/records/2026-09-07_THE_RECORDED_PREIMAGE_FIBRE_CHANGES_THE_CONTINUING_TEMPORAL_RESPONSE.md)
 retains four contact controls, 29 temporal checks, three field-solver regressions and three complete
-source-qualified recorded comparisons. Persistence, acoustic rendering and useful sound remain open.
+source-qualified recorded comparisons.
+
+[established-bounded; measured] `temporal/rest.rs` now retains the exact initial point, lift and
+chronological compact contact reports, validates their directed residual certificates, and
+remounts the completed sections. `holonics-hna::native::temporal_acoustic` composes this owner
+with original PCM charts and exterior contact chronology. The workbench `holonics-acoustic
+temporal` commands expose start, continuation, target-free prediction and cold inspection.
+`membrane_acoustic/enclosed_temporal_receiver.rs` reuses the exact PCM quantizer/WAV codec
+while retaining the global numerical ball and quotient remainder. The [recorded process return](../research/records/2026-09-07_THE_TEMPORAL_RESPONSE_RESTARTS_AND_RETURNS_ENCLOSED_SOUND.md)
+verifies exact continuation and sound receipt parity. This is a continuing response boundary;
+useful sound/English conduct remains open.
 
 [established-bounded; measured] `native::recorded` exposes
 `native/speech/{recorded.rs,recorded/sections.rs}` for source/target pointer resolution, exact

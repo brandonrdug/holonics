@@ -1,0 +1,49 @@
+{
+  "verified": true,
+  "scope": "cold application/checkpoint/PCM boundary; no sound-model claim",
+  "reference": ".local/experiments/soundcam-native-temporal-contact/return.json",
+  "reference_evidence": {
+    "sha256": "da4131b0b47911fc035fd582064076068ecdc3eec629dacedcaf26a14ba8d157",
+    "assumed_prevalidated_bounded_evidence": true,
+    "assumptions": {
+      "response_taps": 4,
+      "phase_extent": 4,
+      "pcm_divisor": 32768,
+      "original_sample_rate": 48000,
+      "alignment": "caller-declared zero-origin original recording clock"
+    }
+  },
+  "comparisons": [
+    {
+      "report": ".local/experiments/temporal-acoustic-application/first/return.json",
+      "contacts": 1,
+      "checkpoint": ".local/experiments/temporal-acoustic-application/first/response.hna",
+      "checkpoint_reports_byte_equal": true,
+      "projections_checked": 1
+    },
+    {
+      "report": ".local/experiments/temporal-acoustic-application/continued/return.json",
+      "contacts": 3,
+      "checkpoint": ".local/experiments/temporal-acoustic-application/continued/response.hna",
+      "checkpoint_reports_byte_equal": true,
+      "projections_checked": 2
+    }
+  ],
+  "prediction": {
+    "report": ".local/experiments/temporal-acoustic-application/prediction/return.json",
+    "source": ".local/datasets/soundcam/wav/row_000/loopback.wav",
+    "frames": 672000,
+    "sample_rate": 48000,
+    "checkpoint": ".local/experiments/temporal-acoustic-application/continued/response.hna",
+    "exact_response_projection": {
+      "projection": ".local/experiments/temporal-acoustic-application/prediction/prediction.projection.json",
+      "wav": ".local/experiments/temporal-acoustic-application/prediction/prediction.wav",
+      "frames": 672003,
+      "sample_rate": 48000,
+      "projection_sha256": "04ceb833f54f97a00fd2d8faf52ca8e8b8eaeba5c9b88e67482d496abc6c2063",
+      "wav_sha256": "38dd23a36562f088d8f49d891654275337fb1995a4eeef918d118c3d5a8b85aa",
+      "clipped": 0
+    }
+  },
+  "native_execution": false
+}

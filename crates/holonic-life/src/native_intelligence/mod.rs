@@ -144,6 +144,8 @@ pub use membrane_acoustic::{
     NativeAcousticReceiverChart, NativeAcousticReceiverCurrent, NativeAcousticSpectralIncidence,
     NativeAcousticStandingMutation, WithdrawnNativeAcousticProduction,
     NativeAcousticTemporalPcm16Frame, NativeAcousticTemporalPcm16Projection,
+    NativeAcousticEnclosedTemporalPcm16Frame, NativeAcousticEnclosedTemporalPcm16Projection,
+    NATIVE_ACOUSTIC_ENCLOSED_TEMPORAL_PCM16_SCHEMA,
     NATIVE_ACOUSTIC_PRODUCTION_MORPHOLOGY_SCHEMA,
 };
 pub use membrane_cultivation::{

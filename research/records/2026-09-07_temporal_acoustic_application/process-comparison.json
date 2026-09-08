@@ -1,0 +1,50 @@
+{
+  "checkpoint_byte_equal": true,
+  "checkpoint_octets": 17926,
+  "checkpoint_sha256": "50224b1531ce1632bb9183f68198a49d2cd4b8dd63ce3479b207f4e8668eb107",
+  "outputs": [
+    {
+      "cut": 0,
+      "kind": "projection.json",
+      "octets": 123993304,
+      "sha256": "0215c8d611deb5d1c9dae47145bad4fa3914eba3d4110e1115d006d077c713f2",
+      "byte_equal": true
+    },
+    {
+      "cut": 0,
+      "kind": "wav",
+      "octets": 2688056,
+      "sha256": "aa62424e7e8d77b63504392f94e42c526dd6f3f95d89fbd4c61ecbc79cc04ff1",
+      "byte_equal": true
+    },
+    {
+      "cut": 1,
+      "kind": "projection.json",
+      "octets": 152454871,
+      "sha256": "9053ed270e23d624a4559887aafa0beb628866af3d8f7e1f2f58f56ea312c048",
+      "byte_equal": true
+    },
+    {
+      "cut": 1,
+      "kind": "wav",
+      "octets": 2688056,
+      "sha256": "af35c9d2de076dfea5798c5ac7b5db7b9d6c84e89ddcbf6d9437349fc02a3790",
+      "byte_equal": true
+    },
+    {
+      "cut": 2,
+      "kind": "projection.json",
+      "octets": 151230051,
+      "sha256": "635b4c8a30cb0228506a3b82827026e021392dda6edd504c475a25c08101c264",
+      "byte_equal": true
+    },
+    {
+      "cut": 2,
+      "kind": "wav",
+      "octets": 2688056,
+      "sha256": "98697b2eb29e7c6f408cb8ccc7693cd1baf54e292105a955633f8a6cb0d29fb8",
+      "byte_equal": true
+    }
+  ],
+  "scope": "uninterrupted versus process-separated final response and complete exterior output bytes"
+}

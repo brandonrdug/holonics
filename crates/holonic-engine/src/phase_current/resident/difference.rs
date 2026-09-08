@@ -2,12 +2,13 @@
 //! supplies evidence; it neither installs a condition nor asserts an exact constitutive fit.
 use super::*;
 use num_traits::ToPrimitive;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::ops::Range;
 
 /// Exact overlap and the portions excluded from this comparison. Excluded coefficients are
 /// retained in the operand carriers; lack of an observation never supplies a zero target.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct PhaseComparisonSupport {
     pub predicted: Range<usize>,
     pub observed: Range<usize>,
@@ -58,7 +59,7 @@ fn support(
 
 /// One clock/support relation shared by point and enclosed temporal receivers.
 #[allow(clippy::too_many_arguments)]
-pub(super) fn comparison_support(
+pub fn comparison_support(
     predicted_receiver: PhaseCurrentReceiverId,
     predicted_origin: &Rat,
     predicted_step: &Rat,
@@ -70,7 +71,11 @@ pub(super) fn comparison_support(
     observed_phase: u32,
     observed_raw: usize,
 ) -> Result<PhaseComparisonSupport, ResidentPhaseCurrentError> {
-    if predicted_step != observed_step
+    if predicted_step <= &Rat::from_integer(0.into())
+        || predicted_phase == 0
+        || predicted_raw == 0
+        || observed_raw == 0
+        || predicted_step != observed_step
         || predicted_phase != observed_phase
         || predicted_receiver != observed_receiver
     {

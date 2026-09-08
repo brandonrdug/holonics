@@ -16,6 +16,9 @@ use std::{
     time::Instant,
 };
 
+#[path = "holonics-acoustic/temporal.rs"]
+mod temporal;
+
 #[derive(Parser)]
 #[command(about = "Exact sampled-sound experiments through one native phase ecology")]
 struct Cli {
@@ -24,6 +27,11 @@ struct Cli {
 }
 #[derive(Subcommand)]
 enum Action {
+    /// Develop, persist and hear a continuing response over complete recording sections.
+    Temporal {
+        #[command(subcommand)]
+        command: temporal::Action,
+    },
     /// Inspect the sample position and complete last native return without replaying it.
     Inspect { source: PathBuf },
     /// Receive each PCM16 sample in order. Dataset labels never enter this interface.
@@ -194,6 +202,7 @@ fn production(
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let started = Instant::now();
     match Cli::parse().command {
+        Action::Temporal { command } => temporal::run(command)?,
         Action::Inspect { source } => {
             let saved = AcousticSavedApplication::read(&source)?;
             let app = saved.application();

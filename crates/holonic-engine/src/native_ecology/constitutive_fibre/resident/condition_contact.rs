@@ -19,8 +19,8 @@ mod temporal;
 pub use temporal::{
     ResidentTemporalConditionContact, ResidentTemporalConditionCurrent,
     ResidentTemporalConditionPreimage, ResidentTemporalConditionReading,
-    ResidentTemporalConditionSnapshot, ResidentTemporalRestrictedEnclosure,
-    ResidentTemporalWaveReturn, TemporalResponseChart,
+    ResidentTemporalConditionRest, ResidentTemporalConditionSnapshot,
+    ResidentTemporalRestrictedEnclosure, ResidentTemporalWaveReturn, TemporalResponseChart,
 };
 
 #[derive(Debug, PartialEq, Eq, Serialize)]

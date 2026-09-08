@@ -1,0 +1,49 @@
+{
+  "verified": true,
+  "scope": "cold observer controls; no native/product claim",
+  "controls": [
+    {
+      "control": "coordinatewise-membership-does-not-imply-global-membership",
+      "expected": "refused",
+      "returned": "refused"
+    },
+    {
+      "control": "noncentre-compatible-global-point",
+      "returned": "accepted"
+    },
+    {
+      "control": "signed-wide-low-limb-and-large-high-limb",
+      "returned": "accepted"
+    },
+    {
+      "control": "both-quadratures-non-dyadic-clipped-PCM",
+      "returned": "accepted"
+    },
+    {
+      "control": "wrong-remainder",
+      "expected": "refused",
+      "returned": "refused"
+    },
+    {
+      "control": "wrong-clipping",
+      "expected": "refused",
+      "returned": "refused"
+    },
+    {
+      "control": "wrong-radius",
+      "expected": "refused",
+      "returned": "refused"
+    },
+    {
+      "control": "wrong-clock",
+      "expected": "refused",
+      "returned": "refused"
+    },
+    {
+      "control": "wrong-lineage",
+      "expected": "refused",
+      "returned": "refused"
+    }
+  ],
+  "native_execution": false
+}

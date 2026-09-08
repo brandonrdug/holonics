@@ -6,13 +6,13 @@ use super::ConditionContactMetric;
 use crate::{
     native_ecology::constitutive_fibre::{ConstitutiveFibreError, ResidentConstitutiveCurrent},
     phase_current::{
-        PhaseCurrentLineageId, PhaseCurrentReceiverId,
         resident::{
+            compare_enclosed_resident, convolve_enclosed_resident, enclose_resident,
             PhaseComparisonSupport, ResidentEnclosedPhaseConvolution,
             ResidentEnclosedPhaseDifference, ResidentPhaseCurrentError, ResidentPhaseCurrentView,
-            ResidentPhaseEnclosureView, compare_enclosed_resident, convolve_enclosed_resident,
-            enclose_resident,
+            ResidentPhaseEnclosureView,
         },
+        PhaseCurrentLineageId, PhaseCurrentReceiverId,
     },
     resident_section::{ResidentGrain, ResidentSection, ResidentSurface},
 };
@@ -314,6 +314,17 @@ impl<'c> ResidentTemporalConditionCurrent<'c> {
         self.metric
     }
 
+    pub fn rest(&self) -> Result<ResidentTemporalConditionRest, ConstitutiveFibreError> {
+        rest::ResidentTemporalConditionRest::from_current(self)
+    }
+
+    pub fn remount(
+        surface: &'c ResidentSurface<'c>,
+        rest: ResidentTemporalConditionRest,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        rest.remount(surface)
+    }
+
     /// Apply (z,Qa) -> (Pz+Qa,Qz) for z=(current h,0), a=(0,y),
     /// V=ker[R_S X,I]. An older producing cut is allowed, but its operation is not rewritten.
     pub fn contact<'a>(
@@ -492,5 +503,7 @@ impl<'a, 'c> ResidentTemporalConditionContact<'a, 'c> {
 
 mod inspect;
 pub use inspect::ResidentTemporalConditionReading;
+mod rest;
+pub use rest::ResidentTemporalConditionRest;
 #[cfg(test)]
 mod tests;

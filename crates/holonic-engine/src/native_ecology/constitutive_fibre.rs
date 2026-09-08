@@ -34,8 +34,8 @@ pub use resident::{
     ResidentConditionImage, ResidentConditionPreimage, ResidentConstitutiveCurrent,
     ResidentConstitutiveReturn, ResidentTemporalConditionContact, ResidentTemporalConditionCurrent,
     ResidentTemporalConditionPreimage, ResidentTemporalConditionReading,
-    ResidentTemporalConditionSnapshot, ResidentTemporalRestrictedEnclosure,
-    ResidentTemporalWaveReturn, TemporalResponseChart,
+    ResidentTemporalConditionRest, ResidentTemporalConditionSnapshot,
+    ResidentTemporalRestrictedEnclosure, ResidentTemporalWaveReturn, TemporalResponseChart,
 };
 pub use rest::ResidentConstitutiveFibreRest;
 
