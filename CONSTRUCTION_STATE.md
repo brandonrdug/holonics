@@ -1,7 +1,7 @@
 # Construction state
 
-**Currency:** September 8, 2026. **Priority:** Framework synthesis and publication; Athena construction remains paused.
-**Position:** AC0 complete; AC1 unfinished; AC2 language probes failed; AC3 apparatus only; AC4–AC5 open.
+**Currency:** September 8, 2026. **Priority:** Revised AC0–AC5 construction and complex-fluid toolkit; native execution remains paused.
+**Position:** AC0 complete; next construction AC1 step 1 (normalized receiver/current attachment); AC2 failed probes; AC3 apparatus only; AC4–AC5 open.
 **Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -9,6 +9,28 @@ orders work; completed history belongs in the linked records and Git. Brandon's 
 instruction governs.
 
 ## Current direction and paused HNN work
+
+[established-bounded; source-inspected] The [AC0–AC5 blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
+is now revised phase by phase, with actions, owners, artifacts and proportionate checks.
+AC1 first connects actual current to the existing normalized receiver and observed-support
+return; then conducts the producing adjoint/finite successor, path growth/rebase and generator
+reuse. The unfinished joint-normal kernel is a preserved candidate, not the mandated next step.
+No native construction or corpus run occurred during this plan/theory revision.
+
+[proved-derived; computational-witness] The [complex-fluid return](research/records/2026-09-08_COMPLEX_FLUID_CHARTS_RETAIN_THE_FOLDED_CURRENT_AND_THE_RECEIVER_BOUND.md)
+derives the real/imaginary coupled source, the real-projection feedback and the exact memory
+returned by folding a linear state component. Exact symbolic controls verify a nonzero projected
+source behind a zero real field and a folded oscillator's memory equation. The record also gives
+MVT finite-return and squeeze bounds, using existing differential-boundary and norm-calculus
+owners. These are scoped toolkit results, not a new NS endpoint or an established flaw in Clay's
+statement. Brandon's counterexample/formulation concern remains an admitted research hypothesis.
+
+[established-bounded; source-inspected] The refreshed Apple branch is `9b7b4b63`, with common
+ancestor `e577d9b3`. It retains producing-carrier/observed-support temporal adjoints, enclosed
+source views, persistence and Metal complete-current/material-mode ports with reported M1 Pro
+receipts. It lacks the later desktop contextual/operative revision. The complex/branch record
+states its integral-root-contact restriction, unported outgoing-only variant and unfinished
+acoustic usefulness. This desktop review did not execute or merge Apple code.
 
 [project-postulate] Brandon's latest September 8 ruling broadens the review to Holonics as a
 mathematical and physical framework, including existing classical ML, normalization, reflection,
@@ -133,7 +155,7 @@ Safetensors/ONNX package round-trips and standard executable exports are distinc
 [definition] The [moving-frame strategy](docs/plans/THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md)
 remains the mathematical order. MFR0–MFR2 are complete at their recorded scopes. MFR3 follows
 Brandon's complex Euler/Navier–Stokes temporal-source direction; direct RH research in MFR5
-remains deferred. The September 8 framework synthesis includes the external NS/Euler comparison as one reusable research source.
+remains deferred. The September 8 complex-chart construction now connects the existing MVT/squeeze and folded-source owners to that direction.
 
 [proved-derived; formal-checked] MFR1 returns moving physical fluid charts, clocks, source laws
 and conditional endpoint criteria. MFR2 returns the all-time folded RH source, Gaussian remainder,
@@ -147,9 +169,9 @@ local-shape/strain candidates and expose nonclosure of the local-jet-plus-initia
 Their higher currents and residuals remain retained. These refute their stated candidates,
 not all finite receivers or the general continuation programme.
 
-[definition] The standing candidate obligation is the first nonlinear Duhamel return with all
-generated modes and the three feedback residual terms. The external correction/endpoint comparison
-now precedes its continuation. The new exact shear witness does not close the previously selected
+[definition] The next mathematical passage is the complex two-field source and its real receiver defect,
+composed with the existing mild/Duhamel return, pressure and full mixed feedback. The real
+pressure-matching datum and external correction/endpoint arguments remain comparison sources. The new exact shear witness does not close the previously selected
 pressure-matching datum. MFR4 still owes quantitative localized interval control and continuing
 reconstruction; pre-existing untracked flux-lattice work remains preserved separately.
 

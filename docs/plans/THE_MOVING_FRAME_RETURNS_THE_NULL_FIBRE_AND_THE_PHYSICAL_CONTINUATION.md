@@ -1,5 +1,15 @@
 # The moving frame returns the null fibre and the physical continuation
 
+[project-postulate] **September 8 continuation:** the
+[complex-chart and folded-dynamics return](../../research/records/2026-09-08_COMPLEX_FLUID_CHARTS_RETAIN_THE_FOLDED_CURRENT_AND_THE_RECEIVER_BOUND.md)
+now directs the next MFR3 passage. Instantiate the complex-bilinear Euler/NS source as two
+coupled real fields through existing momentum, pressure, oriented-current and mild/Duhamel
+owners. Retain the real-projection defect `Leray((b.grad)b)`, then apply the existing MVT/squeeze
+receivers to a declared remainder and changing reconstruction map. Folding may return memory
+and spectral kernels. Real space with complex values, Fourier representation and complex spatial
+coordinates retain their distinct operators/domains. The official-statement concern remains a
+research hypothesis to test through its actual clauses, not a reason to suppress complex research.
+
 **Founded:** Brandon's 2026-09-04 request to combine Tao's singularity strategy, chart-relative
 nullity, the RH line and the mathematical purpose of Holonics into a research strategy.
 **Current focus:** Brandon's September 5 correction directs complex Euler, Navier–Stokes,

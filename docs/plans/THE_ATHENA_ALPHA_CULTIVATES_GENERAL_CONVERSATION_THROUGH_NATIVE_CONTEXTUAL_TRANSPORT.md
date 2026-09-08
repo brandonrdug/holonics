@@ -2,8 +2,9 @@
 
 **Authority:** Brandon's September 6 instruction to design and deposit this blueprint, update the
 roadmap and position, then immediately construct and complete it as a goal.
-**Status:** paused by Brandon on September 8 for the broader framework synthesis; AC0 returned,
-AC1 unfinished and AC2 language probes failed. **Order:** [the roadmap](THE_ROADMAP.md).
+**Status:** AC0–AC5 revised September 8 after the breadth synthesis; AC0 complete, AC1 unfinished,
+AC2 language probes failed. Current delivery is the requested plan/theory revision; native
+construction remains paused. **Order:** [the roadmap](THE_ROADMAP.md).
 **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 
 ## 1. The required product
@@ -174,389 +175,239 @@ learned emission compose. AC1–AC2 must derive and implement those concrete bin
 above do not prove useful language by themselves; a failing binding is repaired or replaced at its
 actual owner while retaining the counterexample. Its failure cannot close the product goal.
 
-## 4. Existing owners and precise attachment
+## 4. Existing owners and the corrected composition
 
-[established-bounded; source-inspected] These owners were inspected at `ebfe557a`; their scopes are
-preserved, not promoted into a completed alpha:
+[definition] **Revision: September 8, after the breadth review.** AC0–AC5 retain the original
+product obligations, but their implementation order below supersedes the accumulated instructions
+to extend the paired-field prototype. The unfinished joint-normal kernel is a preserved candidate,
+not the mandatory next implementation. Derivation, composition and inspection of actual conduct
+belong in each phase; completed apparatus is reused at its recorded scope.
 
-| Responsibility | Existing source and construction boundary |
+[established-bounded; source-inspected] The source comparison at `90b3ddd6` recovers:
+
+| Responsibility | Existing owners to compose |
 |---|---|
-| Conversation source/projection | `applications/conversation-data/{conversation_data,providers}.py`; extend the exterior export with source-qualified causal exposure, without a native learner. |
-| Native local formation and frames | `holonic-engine::native_ecology::constitutive_fibre`, especially `circulation`, `rechart` and `rest`; extend the same ownership discipline to admitted material/current sections. |
-| Addressed higher incidence and complete fibres | `holonic-engine::native_spool::{thread,scaffold,deposits,situated}`; reuse actual sections, pullbacks, mixed-product identities and source/receiver families. A recorded Boolean receipt is not a device derivation. |
-| Complete returned difference and metric adjoint | `holonic-life::native_intelligence::situated_difference`; reuse its explicit maps, actual section inputs and fibre contract. Its cold exact construction is a reference, not permission for hot CPU semantic replay. |
-| Resident complex and section execution | `holonic-engine::{resident_section,resident_law}` and `cuda_refine::complex_parametron`; retain exact carriers and intermediate residence, stage only attributable changes, and return complete refusal/lineage. |
-| Existing deposit construction | `native_intelligence::{returned_difference_deposit,situated_cultivation}` provides bounded cold/reference algebra. Host-built winding/storage factors, complete pair supports and precomputed expected fronts are not silently inherited as alpha's productive formation law. |
-| Public lifecycle, streaming, persistence | `holonics-hna::{native,stream,publication}` and `native/checkpoint.rs`; expose alpha by composing these owners, with an explicit artifact kind, without making older `AthenaAlphaApplication` packages interchangeable. |
-| Existing exterior text presentation | `holonics-hna::{material_codec,text_session}` and `native_intelligence::{material_ingress,material_emission}` preserve narrower codec/artifact precedents. Neither is an already founded contextual conversation adapter. |
+| Available conversation occurrence | `holonics-hna::alpha::{exposure,material,text_session}` and the prepared private stream; AC0 already returned. |
+| Current, source qualification and one successor | `native_ecology/constitutive_fibre/field.rs`, its source/frame/history owners, `resident_section` and the native session. |
+| Exact normalization and nonlinear receiver | `exponentiated_ratio.rs`, `HolonicAdjointNormalization.lean`, `exact_resident_section.cu`, `exact_resident_adjoint.cuh`, `resident_section/{surface_shapes,surface_adjoint}.rs`. |
+| Actual forward/adjoint and finite update | Existing full-operator retained-overlay return, local constitutive returns, `field/junction/producer.rs` and operative reflection. Preserve each source's metric, target and numerical boundary when composing. |
+| Boundary reduction and state transport | `diffusion.rs`, `sheaf_diffusion.rs`, `HolonicDiffusionCharts.lean`; normalized-exponential Laplacian and Schur/state-space relations. |
+| Local growth and reuse across scale | Existing contact births and local relation extension; `leader_quadrature.rs`, native spool incidence and `FractalPacking.lean` restriction/rebase laws. No prescribed binary tree or layer count. |
+| Generator/decoder and future distinctions | `inverse_transport`, `generative_transport`, `receiver_exact_compression`, `recurrent_condensation`, internal-mode/material-mode and chronological factor owners. |
+| Durable model and application boundary | Native field/rest/archive, `holonics-hna::{native,stream,publication}`, alpha checkpoint/text-session owners. |
 
-[open] The exact initial attachment is from source-qualified available conversation material to
-native material/current sections and their real comparison incidence, then from the changed ecology
-to productive text emission. Growing contextual carrier and learned codec conduct must participate
-in that same operation. The blueprint does not claim these are absent everywhere in the repository;
-it requires their explicit composition and replacement of any incompatible historical assumptions.
+[definition] The immediate composition is **actual source/current -> admitted contact-potential
+section -> normalized receiver and observed-support difference -> retained causal adjoint ->
+finite native successor**. A normalized receiver is not an authored relevance switch. Its source
+map must use the actual produced section; its comparison is the actual next available observation.
+A missing observation supplies no measured target. A selected inherited token ID, corpus quote,
+cache convention or hidden float must not supply any of these maps.
 
-## 5. Ordered construction and returned artifacts
+[definition] Start with the existing finite positive normalized-exponential law, including its
+binary sigmoid restriction where the existing exterior pair chart calls for it. Reuse certified
+resident exponentiation and complete ratio/derivative conduct. Carry the receiver pullback into
+the original complex current: the scalar face does not replace that current. Do not assume that
+adding normalization to the old bit-pair predictor completes the codec or the learning law.
+Compare the actual finite response and useful consequence before expanding the implementation.
 
-### AC0 — Available conversation occurrences
+[definition] The positive normalized receiver has real contact potentials. A complex ratio
+family remains a separate admitted chart: its sum can vanish by phase cancellation while the
+ratios remain regular. Preserve that boundary and its Preimage Fibre; do not normalize a complex
+current by an unproved positive partition or treat a receiver pole as intrinsic system blowup.
 
-[established-bounded; measured] [Returned](../../research/records/2026-09-06_AC0_THE_CONVERSATIONS_ENTER_AS_SEPARATE_OCCURRENCES_AND_THE_COLD_CURSOR_RESTARTS.md):
-all-visible occurrence-family exposure, typed cold reader, complete source comparison and actual
-process-separated cursor continuation. This closes AC0 only; no model was executed.
+## 5. AC0–AC5: ordered construction and returned artifacts
 
-[definition] Extend the preparation owner with a private causal-exposure format and resumable
-source cursor. Preserve actual operands, source/part boundaries, declared views, separate later
-observations and tool/branch availability. A cold reader validates the format without CUDA and
-provides an incremental application boundary. It introduces no current, reward or response target.
+| Phase | Required return | Current standing |
+|---|---|---|
+| AC0 | Source-qualified available conversations and resumable exposure | Complete; preserve and reuse |
+| AC1 | Integrated local receiver/return, developing paths and reusable generators | Open; next construction is the composition below |
+| AC2 | Learned text-codec conduct and complete useful responses | Failed probes only |
+| AC3 | Broader cultivation with a durable, efficiently reused model | Persistence apparatus returned; cultivated product open |
+| AC4 | General contextual use, correction and attributed learning | Open |
+| AC5 | Usable consumer artifact, interface and measured costs | Open |
 
-[definition] Return an actual exposure artifact from the refined package, inspected examples of
-request/response/followup and branch/copy/ambiguity, a declared development/evaluation boundary,
-and focused tests for chronology, view accounting, leakage and interrupted/resumed delivery.
-Do not rebuild the completed raw capture. AC0 is data/application integration, not native learning.
+### AC0 — Preserve the available conversation source
 
-### AC1 — Material, contextual current and developing native morphology
+[established-bounded; measured] The [AC0 return](../../research/records/2026-09-06_AC0_THE_CONVERSATIONS_ENTER_AS_SEPARATE_OCCURRENCES_AND_THE_COLD_CURSOR_RESTARTS.md)
+contains the private exposure, source/view accounting, causal availability, split and cold cursor
+continuation. This revision does not recurate or recapture the dataset.
 
-[project-postulate] Brandon explicitly includes necessary derivation, formalization, ontological
-reconciliation and focused review within AC1. The [derivation task and source boundaries](../../research/records/2026-09-07_AC1_DERIVATION_IS_PART_OF_THE_GENERATIVE_ATTACHMENT.md)
-make this authorized construction work. Recover the applicable existing relation, state and
-derive its actual source/condition/receiver/continuation maps, then implement that composition
-and exercise it on the conversation material. The deliverable names a precise missing type,
-map, law or consequence where one remains; it does not ask Brandon to restate settled ontology.
-Separate formal verification may resolve a needed lemma, while Lean stays outside every
-cultivation/inference pipeline. The integrated result must continue through AC2's actual useful
-responses; derivation and source review alone do not complete AC1 or Athena-alpha.
+[definition] Consume that artifact through the existing exposure owner. Preserve message/part
+origins, available branch/tool relations, unresolved ancestry and the development/evaluation split.
+If a later codec needs a richer observation chart, extend its exterior view with those same
+origins; do not rewrite the historical targets or manufacture feedback for alpha's new answers.
+Only a changed source/availability mapping warrants new AC0 checks.
 
-[established-bounded; measured] The [source-null lift derivation](../../research/records/2026-09-07_AC1_THE_SOURCE_NULL_RETURN_DERIVES_ITS_CONTEXTUAL_LIFT.md)
-now identifies exactly when carried context can resolve the source-invisible returned current,
-retaining the full map family and future-generator defects. Its bounded two-passage form works
-without exact contextual coordinates. Both forms agree on an actual saved conversation pair;
-the model is unchanged. The resident context/return section below subsequently supplies
-the productive native port, followed by the ordinary equal-source integration.
-Derivation and cold references remain distinct from that productive integration and AC2.
+### AC1 — Compose the learned local response and reusable morphology
 
-[established-bounded; measured] The [resident contextual section](../../research/records/2026-09-08_AC1_THE_CONTEXTUAL_SECTION_RETURNS_THROUGH_NATIVE_CONDITION_AND_FIELD_CURRENT.md)
-now conducts the derived family through actual condition contact and native text-current
-re-entry. Its real-model successor survives a process restart; 138 constitutive and 19 SDK alpha
-tests pass. The study supplies its historical pair explicitly, and the resulting response is
-still unusable. The ordinary equal-source integration below now puts reference formation and
-reuse inside one complete field successor. The driver-selected study remains separate evidence
-and does not discharge AC2’s useful-language requirement.
+[definition] Execute the following in order, returning a concrete composition at each step:
 
-[established-bounded; measured] The [conditional-contact return](../../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
-composes the existing local relation with two declared native current roles and their complex
-mixed products. An independently supplied channel condition makes a measured phase action
-identifiable where pooling observations without that condition leaves a plural relation. Its
-native operator and later wave conduct are verified at the declared local family. This returns
-the forward conditional primitive; it does not supply a general conversation context by fiat.
+1. **Connect the normalized receiver to actual native current.** Specify the produced-potential
+   map, admitted population, frame/units, full ratio family, observed support and pullback.
+   Compose the existing resident nonlinear/normalization owner with field reception. Reuse
+   sigmoid for an admitted two-way receiver and full normalization for a larger admitted family.
+   Retain the gauge fibre and all complex/current components outside that receiver. The inherited
+   receiver kernel's source-specific target and deposit grain are explicit adapter obligations.
+   Return the working resident port and an exact independent comparison of its current/adjoint.
+2. **Conduct the actual return through the producing ecology.** Preserve the forward source,
+   reference, overlays, frames and chronological dependencies. Reuse the established causal
+   adjoint and local constitutive response; compare the joint-normal candidate only where its
+   hypotheses match. Form the complete finite successor, including mixed nonlinear terms and
+   numerical remainders, and publish it atomically. A covector is not installed as a displacement
+   without its metric/response law. Return an ordinary observation-induced morphology change
+   that affects subsequent conduct, with refusal preserving the original owner.
+3. **Make formation and reuse operative on the same paths.** Begin with existing local relation
+   enlargement and contact births. Bind an actual local obstruction/return to a retained path
+   extension; later current must ride the changed path and keep its source. Where restriction
+   and rebase expose a reusable law, carry that law and its scale/lineage. Use the leader and
+   packing owners at their actual domains, extending a carrier only when the attempted
+   composition identifies the missing map. A fixed tree, token window or stored-word graph
+   cannot supply learned topology. Return the complete growing/reused path and its consequence.
+4. **Condense the reusable action where its receiver permits it.** Compose the source/condition
+   family with an executable generator and decoder. Preserve future-separating distinctions and
+   any dynamic memory left by boundary elimination. Reuse the existing shared-drive mode and
+   finite quotient owners; do not enumerate all histories as a prerequisite to partial learning.
+   Exact dynamic-condensation claims owe their generator square; an obstruction leaves the
+   uncondensed operation available. Return an actual reduction in repeated work or representation
+   with equivalent admitted conduct and explicit total costs.
 
-[established-bounded; measured] The [condition Preimage Fibre](../../research/records/2026-09-07_AC1_THE_LEARNED_ACTION_RETURNS_ITS_CONDITION_PREIMAGE_FIBRE.md)
-now holds actual source and later reception fixed and derives the compatible condition family
-through native elimination. An unprovided phase conducts into a later prediction; free, partial
-and outside-relation cases keep their scopes. The query changes no learned row or occurrence
-count. The retained condition is not a decoded and remounted host choice.
+[definition] Use the same source-qualified conversation slice for the first integrated return.
+Inspect its actual contextual response after a changed mechanism; retain both successful and
+failed conduct. Newly connected ports get focused exact/native checks, including phase/gauge
+transport, delayed returns, complete differences and late-refusal preservation. Do not repeatedly
+rerun unchanged foundation campaigns or increase corpus size to compensate for the same failed
+response. Every work update names the active AC1 step, changed consequence and next concrete return.
 
-[established-bounded; measured] The [joint condition/output family](../../research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md)
-now returns on device, with the supported domain, output projection, complete joint fibre and
-unsupported-domain witnesses. A later actual observation refines the same producing relation.
-Fixed outputs and receiver faces can conduct while the condition remains plural.
+[established-bounded; measured] The latest [operative field/material receipt](../../research/records/2026-09-08_AC1_THE_MATERIAL_SOURCE_FOLLOWS_OPERATIVE_CURRENT_AND_THE_JOINT_CONTACT_HAS_ONE_NORMAL_SOLVE.md)
+retains the tested current source, persistence and failed eight-family response. Earlier contextual,
+condition, internal-mode and material-mode records retain their scopes. They are prerequisites
+where their actual maps apply, not substitutes for the integration above.
 
-[established-bounded; measured] The [actual condition-current contact](../../research/records/2026-09-07_AC1_THE_RETAINED_CONDITION_CURRENT_MEETS_ITS_PREIMAGE_FIBRE.md)
-now gives that continuing current an explicit unit-admittance two-port law. It retains the prior
-current in free directions, carries the incoming and returned normal currents and full difference,
-and publishes one successor after complete native success. All 114 constitutive tests and the
-public continuing-current example pass. Its metric is declared, and a general frame change
-owes metric transport. No conversation capability follows from this local return alone.
+[definition] AC1 returns a developing native composition exercised on actual conversation
+material, with learned path/generator reuse and complete successor ownership. The local port,
+normalization formula or controlled supplied delta alone does not finish it. AC2 remains the
+explicit useful-response obligation; an unfamiliar mechanism does not acquire a new universal
+proof requirement before it can be exercised.
 
-[established-bounded; measured] The [internal-current/shared-drive return](../../research/records/2026-09-07_AC1_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE_GENERATORS.md)
-now supplies a resident internal source and a source-independent mode generator. The native
-shared-drive condition implies `q T_i = -q`, with the common current retained in its Preimage
-Fibre. The actual four-family conversation field yields a certified nonzero mode without new
-exposure. All 125 constitutive and 16 SDK alpha tests pass; useful conversation remains open.
+### AC2 — Develop the text codec and inspect complete responses
 
-[established-bounded; measured] The [mode/material binding](../../research/records/2026-09-07_AC1_THE_SHARED_DRIVE_MODE_REACHES_THE_LEARNED_MATERIAL_CURRENT.md)
-now returns `M x_mode=(M m)q`, remaining/full currents and producing/current operator cuts from
-the existing native factors. Its actual conversation-mode contribution is nonzero, but the
-particular fixed text differential is unchanged by its removal in that linear decomposition.
-This is not a useful-language result or a developmental ablation.
+[definition] Connect the AC1 emitted section to the existing exterior UTF-8/material presentation,
+then let the same learned relations compose across character, part and larger contextual extents.
+These extents are read from material and consequence, not an authored grammar or fixed semantic
+block size. The exterior codewords remain a transport chart; the learned generator/decoder must
+supply the productive relation. Continuous current, plural alternatives and contextual conditions
+remain available until the admitted receiver presents a face.
 
-[established-bounded; measured] The [homogeneous phase-moment material return](../../research/records/2026-09-07_AC2_THE_HOMOGENEOUS_MOMENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md)
-now binds `Q(x)=(1,x)(1,x)*/(1+||x||²)` to the complete contextual current through the existing
-native learner. Source-qualified factors, signed division defects and operator-norm transport
-survive delayed reception and rest. All 133 constitutive and 16 SDK alpha tests pass. Actual
-eight-family cultivation retains 1,930 development occurrences, but its resolved answer repeats
-`va` to the 128-symbol work limit. Numerical/source attachment and persistence have returned;
-useful language and the full AC0–AC5 objective remain open.
+[definition] Continue a real request through native self-emission, subsequent occurrence and a
+source-grounded completion receiver. A work limit reports interruption and retains pending state.
+A stored sentence, pretrained fallback or template emitter cannot fill an open native response.
+Do not equate a sampled finite output, a normalized distribution or a unique bit with a complete
+contextual answer.
 
-[established-bounded; measured] The [ordinary contextual return](../../research/records/2026-09-08_AC1_ORDINARY_RECEPTION_CONDUCTS_THE_SOURCE_AND_ITS_AVAILABLE_CONTEXT.md)
-now composes source, available condition and mixed phase moment through native reference discovery
-and two ordered parameter contacts. Both contacts publish with the existing field successor.
-All 141 constitutive and 20 SDK alpha checks pass. A fresh 16-family / 5,064-occurrence model
-and its complete process restart return; its repetitive response still fails. The declared
-equal-source attachment is implemented, while AC1 contextual organization and AC2 useful
-language remain open. This does not infer a unique cause from the observations.
+[definition] Return initial useful English explanations, code and mathematical work, including
+an actual followup that revises or conditions the response. Inspect the complete products and
+trace failed conduct to its source/receiver/return. Pair this inspection with targeted codec,
+phase/condition and continuation checks. Preserve overlap with source material as attribution
+information; it is neither a universal ban on quotation nor an interior selection rule.
 
-[established-bounded; computational-witness] The [material context cotangent](../../research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_HAS_A_CONTEXT_COTANGENT.md)
-now supplies the normalized phase-moment differential, its real metric adjoint and a certified
-nonzero receiver from an actual conversation return. The successful native field currently has
-no source-side material cotangent input into its context producer; the material parameter contact
-alone does not supply it. The cold calculation preserves the actual forward factors and their
-uncertainty, and changes no model state.
+[definition] AC2 closes on actual useful native responses and continuing contextual behavior.
+Old repetitions (`d`, `va`, `~ena`, `tife~anen…`) remain counterevidence for their respective
+compositions. Another nonempty output or smaller numerical radius does not change that evidence.
 
-[established-bounded; computational-witness] The [paired-producer return](../../research/records/2026-09-08_AC1_THE_PAIRED_PRODUCER_RETURNS_ITS_CURRENT_AND_CONTACT_MORPHOLOGY.md)
-now supplies the exact current and morphology differential/adjoint, including a rank-two contact
-covector, five passing exact/native controls and certified nonzero components on the actual
-conversation model. A new contact's zero-current constraint reaction is separate. This is the
-paired-primitive return; all earlier material dependencies and recurrent overlays remain part
-of the complete word, and no native developmental state was changed by this reference.
+### AC3 — Cultivate broader material with lawful reuse and durable state
 
-[established-bounded; measured] The [native operative carrier and return staging](../../research/records/2026-09-08_AC1_OPERATIVE_CONTACTS_STAGE_THEIR_COMPLETE_MAP_AND_CURRENT_ON_DEVICE.md)
-now carries the complete contact map and internal currents, rank-two returns, mixed moments and
-bounds on device. It borrows the source field and preserves it through late refusal. All 143 native
-constitutive and 20 SDK alpha tests pass; all 5,063 actual model contacts/currents match the existing
-decoder. This does not publish a developmental field successor or establish useful language.
+[established-bounded; measured] Existing [field persistence](../../research/records/2026-09-07_AC3_THE_CULTIVATED_FIELD_RESTARTS_WITHOUT_SOURCE_REPLAY.md)
+and [exterior history placement](../../research/records/2026-09-07_AC3_THE_COMPLETE_HISTORY_MOVES_TO_AN_EXTERIOR_CHART_AND_ITS_ADDRESSED_SOURCE_RETURNS.md)
+returned restart and source-qualified continuation for the experimental models. Reuse them;
+archived history placement is not itself learned generator compression.
 
-[established-bounded; measured] The [operative field return](../../research/records/2026-09-08_AC1_THE_OPERATIVE_MAP_CONDUCTS_AND_RESTARTS_IN_THE_FIELD.md)
-now supplies one continuing map/current owner, ordinary birth and full-current reflection,
-nonexpansive error transport, joint publication and rest/archive continuation. The source codec
-on the fixed integral-contact class uses the joint radius rather than expanding it through the
-auxiliary prefix. All 145 native constitutive and 20 SDK alpha checks pass. An actual model and
-its exact process restart return, with the same failed language response.
+[definition] Stream the broader declared development population through the productive AC1–AC2
+composition. Retain actual source availability and one continuing successor. Reuse invariant
+local laws, boundary factors and generators; reopen only dependencies changed by a new occurrence.
+Before enlarging the campaign, inspect useful conduct and complete work/residency/decoder costs
+at the current extent. A scale failure changes factorization, restriction, representation or
+placement at its owner; it does not justify discarding current or increasing a hidden bound.
 
-[established-bounded; measured] The [operative source and joint contact reference](../../research/records/2026-09-08_AC1_THE_MATERIAL_SOURCE_FOLLOWS_OPERATIVE_CURRENT_AND_THE_JOINT_CONTACT_HAS_ONE_NORMAL_SOLVE.md)
-now remove the fixed-prefix source obstruction for the explicit `OperativeContextual` variant,
-with complete native current pairing and per-return chronology. All 146 native constitutive and
-20 SDK alpha tests pass. Fresh eight-family cultivation and process restart return; its repetitive
-response still fails. The joint-contact reference derives a single target-width normal solve that
-retains both receiving terms and their shared producer. Native execution of that joint update is
-still required.
+[definition] Save productive morphology, learned codec, generator/decoder, required fibres and
+frames, ongoing context and native pending state. Pair the exposure cursor and partial transport
+with the existing checkpoint so restart neither repeats development nor loses an enacted return.
+Inference must not consult the raw conversations or an exterior quotation store to supply answers.
+Retain cold lineage/witness material separately where its actual evidence claim needs it.
 
-[definition] The native joint constitutive-return producer is paused for the
-[NS/Euler and generative-law review](../../research/records/2026-09-08_THE_NS_EULER_REVIEW_EXPOSES_THE_GENERATOR_GAP_IN_AC1.md).
-The subsequent [breadth review](../../research/records/2026-09-08_HOLONICS_REJOINS_CLASSICAL_LEARNING_REFLECTION_PACKING_AND_COMPRESSION.md)
-recovers the already-owned classical normalization/adjoint, reflection, leader, packing and
-compression mechanisms. Compare and compose those owners before declaring another missing
-learning law; no universal adequacy theorem or Millennium solution is an added production gate.
-The exact tangent reference does not establish the finite nonlinear return or an adequate
-generator-recovery law. Retain the actual discrepancy, producing maps, metrics, source/reference
-currents, prior dependencies and chronological transfer as the candidate's mathematical data.
-The source chart and private supplied-delta seam are not learned morphology. This remains the
-unfinished AC1 obligation directed at AC2's useful responses. The roadmap orders the work; the
-[chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
-remains a representation option with its actual future-generator obligations.
+[definition] Return a broader cultivated artifact, honest admitted/withheld population accounting,
+process-separated inference and further learning, and demonstrated persistence through partial
+input/output. Inspect the restored model's actual conduct, not only its wire integrity. The
+artifact's usefulness and full costs accompany its storage receipt.
 
-[established-bounded; measured] The [resident field ingress](../../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
-now lets generated current enter that same field operation directly. Its actual input survives
-history placement and checkpointing; cold internal/material decoders read the retained carrier.
-All 118 constitutive and 16 SDK alpha controls pass. The contextual-source/conditional-action
-attachment and useful conversation return remain open; this port does not complete AC1–AC2.
+### AC4 — Establish general contextual use and attribution
 
-[established-bounded; measured] The [native field relation port](../../research/records/2026-09-07_AC1_THE_FIELD_RETURNS_A_RESIDENT_RELATION_FACE_AND_A_PLURAL_FIBRE_HAS_FIXED_RECEIVERS.md)
-now returns resident currents/fibres at historical sources through their actual frames, and a
-whole-fibre receiver can expose a fixed class face without selecting a current. Its actual
-conversation diagnostic remains open at every text differential because the represented
-relation contains separating vertical directions. Next derive the applicable local action from
-situated conditions; do not extend the local linear hypothesis across unrelated contexts by fiat.
+[definition] Use held-out human-request families and fresh requests specified before outputs are
+seen. Inspect complete English explanation/comparison, instruction following, code construction
+and repair, and mathematical reasoning, with available conditions and later clarification retained.
+Test transfer of reusable relations across changed circumstances and combinations, including
+plural/open cases. Equal wording never substitutes for an identified situated object.
 
-[definition] The corrected next attachment reuses `inverse_transport`/`generative_transport`
-for constrained law families, `receiver_history_compression` for admitted future consequences,
-`generator_native_rest` for descended execution, and the existing phase-current, native-spool and
-resident complex-incidence owners for the carried action. Their current domains differ: finite
-transition tables, exact host equations/forms and bounded resident section laws are not already
-one continuing field. Derive the actual source/receiver-to-law passage and its resident return
-into contact/reaction; do not supply invented future observations or use a host learner to fill it.
-Limited data can produce operative partial knowledge. Exact all-history quotient claims, when
-made, owe their stated commuting law; that law is not a universal prerequisite for learning.
+[definition] Attribute changed conduct to the actual learned paths/generators by relevant
+withdrawal/restoration or independently owned comparisons when that claim requires it. Compare
+continued development as well as inference. Numerical stability, normalization, persistence and
+compression answer their own questions; useful adaptation is inspected directly. External code
+or arithmetic execution may provide application evidence. Lean is excluded from this pipeline.
 
-[established-bounded; measured] The [first material field return](../../research/records/2026-09-06_AC1_THE_COMPLETE_MATERIAL_FIELD_RETAINS_ITS_CONTEXTUAL_OBSTRUCTION.md)
-composes an exterior octet port chart, separate native per-port excitation, complete outgoing/held
-source branches and actual paired receiving fields. Four development families entered one native
-owner. AC1 remains active: record circumstances, higher contact and learned productive reaction
-are not yet bound by this component.
+[definition] A failure returns to the responsible AC1–AC3 relation with its source-qualified
+counterexample; do not restart every phase, freeze the learner to disguise the failure or lower
+the product standard. Fluid/complex-field and acoustic examples can test a shared transport law
+when useful, but neither a physics label nor a solved theorem stands in for language evidence.
 
-[counterexample; computational-witness] The fixed chart loses a source-side linear distinction
-which a local Hermitian pair receiver preserves, but also presents an identical-field/different-
-arrival collision with separating retained predecessors. Therefore a polynomial lift of that
-same local face is insufficient. The next binding must make the relevant differing standing and
-channels participate through native transport. Source ordinals and retained handles preserve
-lineage; they do not, by themselves, create that operation.
+### AC5 — Deliver the usable consumer implementation
 
-[established-bounded; measured] The subsequent
-[paired-junction binding](../../research/records/2026-09-06_AC1_THE_PAIRED_JUNCTION_RETAINS_ITS_INNER_CURRENT.md)
-forms `C=Σdd*` from actual joined root source/receiving currents and conducts through
-`v=2(I+C)^−1(u+h)`, with the full reflected branches, retained internal aggregate and executable
-birth-prefix decoder. Native controls establish a same-input response distinction under equal
-raw fields and moments but different internal standing. Its exact-word material run matches six
-reference operations and then refuses its word/wide arithmetic. The subsequent
-[residual-bearing enclosure](../../research/records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md)
-continues the same current law through all 728 occurrences and 724 contacts of the four-family
-slice, retaining the complete signed residual and an executable exact-current decoder. All 728
-numerical certificates pass; the first 25 exact current anchors and their 300 internal-current
-comparisons pass. A shared resident continuation preserves this body with zero numerical section
-readouts during admission and explicitly deferred diagnostics. Efficient broader operation,
-lawful history placement, record-level contextual
-channels and learned text emission remain AC1–AC2 obligations.
+[definition] Package the working model through the existing public lifecycle and stream owners.
+Settle the actual development/resume/inspection/conversation interface from the implemented
+behavior, using HNN terminology. Add user-facing CLI recipes only once the interface and product
+justify them; the current main README remains a framework introduction. Package names and wire
+migrations carry explicit compatibility if changed.
 
-[definition] Compose a reversible exterior material chart with native addressed sections,
-conditional channels, NCF formation and the admitted complex/higher contact law. Specify the
-actual source/target maps, seed constitutive laws, conditioning carriers and growth/rebase rule
-before grading their execution. The seed contains no task answer or pretrained semantic organ.
+[definition] Deliver the model/artifact location and requirements, useful complete examples,
+contextual-development and persistence evidence, and measured desktop consumer costs: cold/warm
+latency, response throughput, active/retained extent, generator/decoder/fibre residency, transfer,
+checkpoint work and resource obstructions. Energy claims require actual calibration. Keep
+source preparation, native conduct and exterior projection costs explicit.
 
-[definition] Make a resident operation receive material and actual historical handles, derive
-current/applicability and its complete difference, stage local relation/morphology changes, and
-return the actual successor and an emission or open fibre. Carry source/frame history through
-any admitted carrier enlargement. The driver mounts material and reads results; it does not
-choose developmental factors, invoke organs by expected answers or supply a fixture-local learner.
+[definition] Finish the blueprint when those artifacts return together at the user's product
+standard. Update the position and completion record, commit/push coherent changes and mark an
+active construction goal complete only then. The framework and its research continue beyond
+that product milestone.
 
-[definition] Return actual development over a source-qualified conversation slice and native
-controls for new-current use, distinct circumstances with equal surface words, joint rechart
-versus physical change, full mixed terms, unresolved/contradictory readings, locality, and refusal
-without false rollback or replay. These controls answer the claims of this composition; the
-unchanged two-node foundation need not be rerun as an independent demonstration.
+## 6. Execution, research and branch coordination
 
-### AC2 — Recovered text-codec conduct and complete responses
+[definition] **Current entry point: AC1 step 1, the normalized receiver/current attachment.**
+Construction remains paused while this requested plan/theory revision is delivered. The original
+product authorization remains standing; this document creates no new approval gate. On resumed
+execution, complete the next native attachment and inspect its actual consequence before taking
+on unrelated infrastructure. A concrete failure may redirect the corresponding step; it does
+not authorize another day of unchanged probes or a growing list of disconnected ports.
 
-[established-bounded; measured] The [initial differential text receiver](../../research/records/2026-09-06_AC1_THE_SHARED_SOURCE_MEETS_AN_EXPLICIT_TEXT_CURRENT_RECEIVER.md)
-is composed with the same resident field and shared historical-source port. Four development
-families and a fresh prompt enter an 18-port octet/end-of-part chart. Its first return is 64 copies
-of `d`, interrupted without completion; consecutive native currents remain distinct. This enables
-inspection of actual emitted material and preserves a concrete failed response. Useful text-codec
-conduct and AC2 completion are unestablished.
+[definition] The complex Euler/NS programme is shared toolkit research, specified in the
+[complex-chart and folded-dynamics return](../../research/records/2026-09-08_COMPLEX_FLUID_CHARTS_RETAIN_THE_FOLDED_CURRENT_AND_THE_RECEIVER_BOUND.md).
+MVT, squeeze, phase transport, Schur reduction, spectral generators and retained feedback apply
+through their explicit maps and hypotheses. Neither a Millennium endpoint nor a universal
+intelligence theorem is a prerequisite for productive use of these local mechanics. Lean remains
+separate research verification.
 
-[definition] The [material transport](../../research/records/2026-09-07_AC2_THE_RETAINED_CONTEXT_RECEIVES_A_NATIVE_MATERIAL_TRANSPORT.md)
-uses the complete retained contextual outgoing field as its source. Its actual returned
-difference and chronological co-current remain separate; the native parameter return uses the
-producing source and declared metrics. Its native implementation retains full arithmetic defects
-and an exact coefficient decoder in that same owner. Broader cultivation and useful text conduct
-remain required; its first four-family return emits no text and reports reserved codeword 373.
-The checked balanced solver reduces encoder work while keeping its current law intact.
+[established-bounded; source-inspected] Apple branch `9b7b4b63` retains useful observed-support
+adjoints, temporal response persistence, Metal complete-current/material-mode ports and declared
+execution receipts. Its latest inspected source predates the desktop contextual/operative source
+changes. Reuse its actual source/cut/receiver/lineage view contract; do not import its old roadmap
+or assume parity with later kernels. The new complex/branch record pins the comparison.
 
-[definition] Make the same changing ecology conduct inscription, contextual recurrence and
-text emission at the supported grains. Reuse native Preimage Fibre and receiver-history owners;
-learned transport supplies compositional production. The exterior UTF-8 presentation decodes
-native emission only. A stored passage, nearest sentence, hand-authored morphology/grammar or
-foreign model must not fill the response when native conduct is open.
+[definition] Mac acoustic research can continue within that branch's recorded scope. A shared
+native relation changed by this plan needs an explicit backend-port comparison before claiming
+new parity. Do not port the preserved unfinished joint draft merely because it is newer, and
+no desktop acoustics campaign is required. Use Luna only for bounded independent reviews when
+useful; otherwise work locally. Preserve unrelated flux-lattice work, private material and caches.
+The retired database stays unused.
 
-[definition] Produce and inspect complete responses, including native output continuation and
-an explicit completion receiver. An operator work limit means interruption, never completed thought.
-Preserve pending native state and output. New surface compositions must be explained by retained
-transport, not rewarded merely for being different from the corpus. Literal overlap is an exterior
-attribution observation, not an interior generation rule or a blanket ban on useful quotation.
-
-[definition] Return useful initial English, code and mathematics products with scoped contextual
-followups and later revision. Retain failed outputs and diagnose their actual transport. This
-phase does not pass on fluent inherited text, output length, nonempty bytes or a polished renderer.
-
-[definition] The [complete-current source construction](../../research/records/2026-09-07_AC2_THE_FULL_INTERNAL_CURRENT_HAS_AN_ADDRESSED_PREFIX_PAIRING.md)
-refines the open AC1–AC2 attachment: retain outgoing plus every born internal current, with
-actual source-prefix overlap, and join it to the material/reaction return. The native construction
-receiver and its actual-material comparison now return, including a reachable hidden-current
-distinction behind equal zero boundary output. The [explicit complete-current variant](../../research/records/2026-09-07_AC2_THE_COMPLETE_CURRENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md)
-now supplies the fused material coupling, full source/parameter error and durable state. Its
-actual response remains unusable. The corrected generative/contextual attachment and useful
-language remain open; this bounded coefficient return does not close AC2.
-
-### AC3 — Cultivated model and continuing corpus development
-
-[established-bounded; measured] The [field persistence return](../../research/records/2026-09-07_AC3_THE_CULTIVATED_FIELD_RESTARTS_WITHOUT_SOURCE_REPLAY.md)
-implements complete native/text rest, retained parent capabilities and the paired exposure cursor.
-Actual four-family process-separated continuation and source-unavailable inference match the
-uninterrupted current, lineage, learned coefficients and failed response exactly, with zero native
-deeds on remount. Staged input and partly written output also survive in the declared SDK controls.
-An actual partial-family restart matches its independent reference. The 64-family development
-artifact saves 18,476 native occurrences in 355,146,249 bytes and remounts without native replay.
-Its response still fails. This returns a durability component of AC3; useful broad cultivation and the integrated product
-remain open.
-
-[established-bounded; measured] [Exterior historical placement](../../research/records/2026-09-07_AC3_THE_COMPLETE_HISTORY_MOVES_TO_AN_EXTERIOR_CHART_AND_ITS_ADDRESSED_SOURCE_RETURNS.md)
-now retains complete old carriers outside GPU memory and remounts an actual addressed source
-without native learning replay. At the 64-family cut, resident native payload is 475,104 bytes;
-the final body and failed emission equal the earlier fully resident run. Host persistence memory
-and disk history still grow. Use this placement for broader cultivation while preserving those
-costs and the open contextual/product obligations.
-
-[established-bounded; measured] That placement carries the next 64 families, reaching 128 families
-and 33,628 development occurrences in a durable 646,255,490-byte artifact. The recorded native
-payload peak is 57,741,140 bytes, and the saved state reproduces its complete body and emitted
-result with the original exposure and history backing unavailable. The output `Tm.` plus an
-end-of-part marker still fails the request; no useful response or AC2 completion is established.
-
-[definition] Stream the declared broader development population through the same resident owner,
-retaining changed successors and available source relations. Admission/order follows source
-causality and the declared study; no shuffled-message or token-volume convention defines learning.
-Report which material actually entered and which remained open or withheld.
-
-[definition] Publish a durable alpha artifact containing the productive morphology and learned
-codec, contextual state, retained fibres/frames/lineage needed for continuation, and native pending
-state. Pair the exterior exposure cursor and transport bytes with the native checkpoint so a
-restart neither repeats development nor loses an enacted return. A restored model must operate
-without querying raw logs, the prepared source database or a cold quotation store for its answers.
-Keep separate witnesses where required by the actual reconstruction claim.
-
-[definition] Return real process-separated rest/remount, inference and further development,
-including partial input and broken output, over the actual cultivated artifact. Readback or wire
-integrity alone does not establish that the learned conduct survived.
-
-### AC4 — General use, contextual transport and attribution
-
-[definition] Inspect complete responses to genuinely new English explanations and comparisons,
-instruction-following requests, code construction/repair, and mathematical reasoning. Use held-out
-human-request families and fresh requests stated before their outputs are seen. Retain each request,
-available context, response, later clarification/correction, actual consequence and limitation.
-No evaluation response or later curator knowledge enters the earlier input or selects training.
-
-[definition] Evaluate the requested product itself: does it address the situated request, preserve
-its conditions, form a usable response and respond appropriately to the actual later revision?
-External code execution or arithmetic checks can provide scoped application evidence; their
-success does not become a privileged native learning law. Lean remains excluded entirely from
-this pipeline. Do not resurrect the unrelated “Describe Brandon” probe as a universal gate.
-
-[definition] Establish attribution with actual retained/withdrawn/restored developmental material
-or matched independently owned realizations where the claim requires it. Show contextual transport
-through admitted changed circumstances and explicit open cases. A changed coefficient, a matching
-word, a scalar loss or a count of tests establishes none of those product claims.
-
-[definition] Failed usefulness or instability requires repair and continued cultivation at the
-actual native owner. Keep source-qualified counterexamples. Do not freeze the learner, switch to
-retrieval, lower the product standard to a fixture or call an interrupted run an attained alpha.
-
-### AC5 — Usable consumer release
-
-[definition] Deliver the public Rust interface and CLI for fresh cultivation, resumption, model
-inspection and continuing text conversation. Compose the existing HNN streaming/publication
-owners; a public `alpha` interface is packaging over the native owner, not another engine.
-Provide exact recipes, the actual private model location, portable native artifact requirements
-and a concise report of capability and remaining scope.
-
-[definition] Measure the full model product on the standing RTX 4080 SUPER/desktop: cold/warm
-latency, useful response throughput, active and retained extent, model/decoder/fibre residency,
-transfer, checkpoint costs and actual resource obstructions. Include locality and newly connected
-support where those claims are made. Measure energy only with a calibrated instrument. Source
-preparation, native work and cold rendering keep their separate measured costs.
-
-[definition] Complete the blueprint only after the native implementation, real cultivated model,
-usable interface, complete product examples, contextual development/attribution and persistence
-and cost evidence agree. Update the position and final record, commit and push coherent source
-changes, then mark the goal complete. No phrase in an earlier phase changes that completion rule.
-
-## 6. Execution and verification
-
-[definition] Desktop acoustics is optional research material for the shared generator/phase
-attachment, not a second required product. Tell Brandon to re-engage the dependent Mac workflow
-when a committed, tested native formation/continuation return and its explicit Metal port boundary
-are available. The [handoff definition](../../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md#mac-workflow-handoff)
-precedes full Athena-alpha usefulness; it does not require completing text before acoustic work.
-
-[project-postulate] Brandon has resumed construction after the September 7 corrections.
-The goal remains unfinished across partial returns. A difficult or failed construction is not
-a reason to stop at a report or request renewed authorization. Change the concrete failed
-binding when the evidence warrants it and update this contract without shrinking its product aim.
-
-[definition] Work without agents under Brandon's latest preference. Preserve the
-unrelated flux-lattice work, existing private material and caches. The retired side database is
-neither queried nor written. Repository evidence owns the record of this campaign.
-
-[definition] Run focused data/Rust tests for their changed relations, actual native regressions
-when native conduct changes and separate Lean checks only if formal source/imports change. No
-pipeline depends on those proof checks. Supervise long productive compilation and native runs;
-a timeout remains incomplete. Do not recreate a census, all-repository index, mandatory paper
-build or blanket release gate. Each return states what was inspected, executed and still open.
+[definition] Verification follows the changed relation: focused data/Rust tests, native tests for
+new device conduct, independent exact references where meaningful, and Lean checks only for
+changed formal sources/imports. No proof checker enters cultivation/inference. Supervise long
+runs, retain actual outputs and do not repeat unchanged expensive evidence. Reports state phase,
+step, artifact, result and remaining relation without using test counts as product quality.

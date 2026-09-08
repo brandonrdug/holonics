@@ -1,0 +1,37 @@
+{
+  "scope": "exact initial complex NS/Euler source and linear folded-memory control",
+  "chart": "dimensionless fixed 2*pi periodic spatial chart; complex velocity, real coordinates",
+  "complex_velocity": "i*((1,-1,0)*cos(-x-y)+(0,0,1)*cos(2*x+y))",
+  "real_projection": [
+    "0",
+    "0",
+    "0"
+  ],
+  "real_projected_nonlinear_source": [
+    "0",
+    "0",
+    "-sin(2*x + y)*cos(x + y)"
+  ],
+  "source_is_solenoidal": true,
+  "zero_real_field_source": [
+    "0",
+    "0",
+    "0"
+  ],
+  "folded_linear_system": "r'=h, h'=-r; r(0)=1, h(0)=0",
+  "exact_memory_equation": "r'(t)=-integral_0^t r(s) ds",
+  "solution": "r(t)=cos(t), h(t)=-sin(t)",
+  "complex_normalization": {
+    "weights": [
+      "1",
+      "-1"
+    ],
+    "partition": "0",
+    "ratio": "-1"
+  },
+  "claims_excluded": [
+    "blowup",
+    "defect in Clay statement",
+    "HNN learning"
+  ]
+}

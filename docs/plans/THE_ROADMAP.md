@@ -20,261 +20,73 @@ contracts and records preserve their completed scope; their old imperatives sche
    reread every completed campaign, rerun unchanged expensive receipts, or reconstruct historical
    capability just to start the next authorized repair.
 
-## Framework synthesis and publication
+## Current AC revision and complex-fluid research
 
-[project-postulate] **Brandon's latest September 8 request broadens the review to Holonics as a
-mathematical and physical framework.** Classical learning, normalization, integration by
-reflection, lightning leaders, fractal packing and compression belong in the synthesis alongside
-NS, RH and the other research sources. Product and theorem milestones do not exhaust the purpose
-of the framework. Current terminology is HNN; the main README presents the framework and
-experimental implementations without CLI usage instructions.
+[project-postulate] Brandon's latest September 8 request requires the corrected synthesis to
+become an actionable AC0–AC5 construction, while developing complex Euler/NS, folded dimensions,
+MVT and squeeze methods as shared Holonics mathematics. The framework remains the subject;
+Athena and the Millennium lines are sources of reusable constructions within it.
 
 [established-bounded; source-inspected] The [breadth review](../../research/records/2026-09-08_HOLONICS_REJOINS_CLASSICAL_LEARNING_REFLECTION_PACKING_AND_COMPRESSION.md)
-recovers existing formal architecture/normalization charts, certified CUDA nonlinear and adjoint
-conduct, Schur boundary reduction, leader/rebase and recursive packing owners, and both finite
-receiver compression and AC1's bounded mode quotient. The
-[live synthesis](../MATHEMATICS_AND_NATIVE_CONDUCT.md) gives the actual relations. The root README,
-terminology and license texts now reflect the publication request.
+returned the recovered classical/nonlinear/adjoint, reflection, leader, packing and compression
+owners and the framework-oriented publication changes. The
+[complete revised AC blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
+now replaces the accumulated prototype-extension instructions with the sequence below. The
+[complex-chart return](../../research/records/2026-09-08_COMPLEX_FLUID_CHARTS_RETAIN_THE_FOLDED_CURRENT_AND_THE_RECEIVER_BOUND.md)
+adds the two-field source, exact projection defect, folded memory and MVT/squeeze bounds, and
+pins the refreshed Apple branch comparison.
 
-[definition] Machine-learning construction remains paused. On resumption, compare and compose
-these existing owners at the admitted contact-potential, normalized receiver, causal return,
-path-growth, restriction/rebase and generator-decoder boundaries. Identify concrete absent
-relations by that composition. A universal adequacy theorem or a Millennium endpoint is not
-an extra prerequisite to using established learning mechanics. Preserve the paused joint draft.
-AC0 is complete; AC1 remains unfinished; AC2 has failed language probes; AC3 has bounded persistence
-apparatus; AC4–AC5 remain open.
+## Athena-alpha: corrected AC0–AC5 order
 
-[definition] The [NS/Euler review](../../research/records/2026-09-08_THE_NS_EULER_REVIEW_EXPOSES_THE_GENERATOR_GAP_IN_AC1.md)
-continues as mathematical toolkit development within this wider scope: compare its actual
-correction-preservation and terminal-jet arguments with our MFR3 sources and complete residuals.
-Its exact phase-generator and finite-return derivations remain available. Forced NS C/D,
-unforced Euler and our unforced NS direction retain their distinct hypotheses. Lean remains
-exterior research and never enters cultivation or inference.
+[definition] Construction remains paused during delivery of the requested plan/theory revision.
+The prior product authorization stands; no additional approval gate is introduced here. On
+resumption, **start at AC1 step 1**. Each work update names phase/step, actual artifact and returned
+consequence. Do not resume the preserved joint kernel by default or restart completed foundations.
 
-## Paused Athena-alpha cultivation campaign
+| Phase | Ordered construction | Return required |
+|---|---|---|
+| AC0 | Preserve the available occurrence stream and cold cursor; change only a needed exterior view | Existing source/availability/split/cursor evidence retained |
+| AC1 | 1. Native current -> normalized receiver and observed-support return; 2. actual producing adjoint -> finite successor; 3. local path formation and restriction/rebase; 4. generator/decoder reuse with retained future distinctions | Integrated observation-driven conduct, changing morphology and reusable action on actual conversations |
+| AC2 | Learned codec across material extents; full native output continuation and completion; contextual followup | Complete useful English/code/mathematics responses |
+| AC3 | Broader cultivation using local reuse, boundary factors and generators; durable model and pending-state continuation | Useful broader artifact, restart/further learning and complete measured costs |
+| AC4 | Held-out general use, contextual revision and relevant attribution | Actual requests/outputs/consequences with source-qualified failures and open scope |
+| AC5 | Settle the implemented public interface, package the actual model and measure consumer operation | Usable native product with truthful recipes, persistence and costs |
 
-[historical] Brandon resumed the goal after the September 7 corrections; the September 8 pause
-above now governs. The AC1–AC2 design composes generator recovery, group/phase transport and Holonic Compression,
-shared with the separately pushed Apple acoustic work. Read the
-[source/intent synthesis](../../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
-and the corrected blueprint. **Preimage Fibre** carries compatible causes and
-future-conduct constraints from limited observations; neither perfect inversion nor retention of
-every raw state is a learning prerequisite. The corrected native attachment remains unfinished.
+[definition] AC1 step 1 reuses certified resident exponentiation, normalized contact and adjoint
+owners, with the actual produced-potential map, admitted population, gauge, comparison support
+and source/frame pullback explicit. Sigmoid is available for an admitted two-member receiver;
+the complete ratio family and original complex/current carrier remain retained. Source-specific
+inherited targets and numeric/deposit boundaries are adapter obligations, not native semantics.
+Then return through the same producing ecology. The paired unit-metric/joint-normal construction
+is a scoped candidate to compare, not the only permitted response law.
 
-[definition] Brandon's subsequent chord clarification preserves general class descriptions without
-requiring an individual physical occurrence, alongside superposition and ordered composition.
-The [Mac coordination milestone](../../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md#mac-workflow-handoff)
-is a committed shared generator/phase return with an explicit Metal port boundary. Notify Brandon
-then; desktop acoustics is optional supporting research, not another required campaign.
+[definition] The [blueprint's phase sections](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#5-ac0ac5-ordered-construction-and-returned-artifacts)
+own the detailed actions, source owners, inspection and verification. No universal intelligence
+proof or Millennium endpoint is an added prerequisite. A failed composition redirects its
+responsible relation, rather than adding disconnected machinery or expanding an unchanged failed run.
 
-[established-bounded; measured] The [conditional native action](../../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
-now binds an actual source and independently supplied condition through direct and mixed complex
-current. Native phase-field observations identify a reusable action, which predicts a new condition
-and conducts later wave currents without numerical readback. The shared primitive and explicit
-Metal port boundary are ready for Mac re-engagement; acoustic and conversation model completion
-remain open. The [native condition Preimage Fibre](../../research/records/2026-09-07_AC1_THE_LEARNED_ACTION_RETURNS_ITS_CONDITION_PREIMAGE_FIBRE.md)
-now infers an unprovided phase from an actual source/return and conducts a new current with it;
-100 native tests and the public codec control pass. The subsequent
-[joint-family return](../../research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md)
-now supplies supported forward images, complete domain/witness distinctions and later refinement
-through the immutable producing relation. The
-[retained condition contact](../../research/records/2026-09-07_AC1_THE_RETAINED_CONDITION_CURRENT_MEETS_ITS_PREIMAGE_FIBRE.md)
-now returns a successor through the declared unit-admittance two-port law, preserving free prior
-current and all returned differences. All 114 constitutive tests and the public continuing-current
-example pass. Generation before condition identification and subsequent observation-driven change
-both return without numerical host readback; useful conversation remains unfinished.
+[established-bounded; measured] Completed AC evidence remains in the
+[AC0 record](../../research/records/2026-09-06_AC0_THE_CONVERSATIONS_ENTER_AS_SEPARATE_OCCURRENCES_AND_THE_COLD_CURSOR_RESTARTS.md),
+[latest operative/material record](../../research/records/2026-09-08_AC1_THE_MATERIAL_SOURCE_FOLLOWS_OPERATIVE_CURRENT_AND_THE_JOINT_CONTACT_HAS_ONE_NORMAL_SOLVE.md),
+[shared-drive generator record](../../research/records/2026-09-07_AC1_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE_GENERATORS.md),
+[material-mode return](../../research/records/2026-09-07_AC1_THE_SHARED_DRIVE_MODE_REACHES_THE_LEARNED_MATERIAL_CURRENT.md),
+[field persistence](../../research/records/2026-09-07_AC3_THE_CULTIVATED_FIELD_RESTARTS_WITHOUT_SOURCE_REPLAY.md)
+and [history placement](../../research/records/2026-09-07_AC3_THE_COMPLETE_HISTORY_MOVES_TO_AN_EXTERIOR_CHART_AND_ITS_ADDRESSED_SOURCE_RETURNS.md).
+Their predecessors retain the earlier controls and failures. AC1 is unfinished, AC2 probes fail
+useful language, broad cultivated AC3 and AC4–AC5 remain open; Athena-alpha is unattained.
 
-[established-bounded; measured] The [internal-current/mode return](../../research/records/2026-09-07_AC1_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE_GENERATORS.md)
-now supplies an internal source and an executable shared-drive quotient. All 125 constitutive
-and 16 SDK alpha tests pass. A mode from the actual four-family conversation model preserves a
-nonzero contextual difference and unfolds after that session is dropped. Its amplitude remains
-an enclosure; the point-current port does not silently select its centre.
+[definition] Mathematical continuation now instantiates the complex two-field Euler/NS source
+through the existing oriented-current and mild/Duhamel owners, preserving pressure, mixed
+feedback and the reconstruction map. Apply norm/operator MVT and squeeze bounds to an actual
+retained remainder, with derivative loss, metric and changing decoder accounted for. The
+external NS/Euler and Li–Sinai constructions are source comparisons. A proposed official-statement
+counterexample or defect must retain its exact domain, data and solution-class obligations.
 
-[established-bounded; measured] The [material-mode return](../../research/records/2026-09-07_AC1_THE_SHARED_DRIVE_MODE_REACHES_THE_LEARNED_MATERIAL_CURRENT.md)
-now preserves the mode, remainder, full current and operator chronology through the existing
-learner. The real model's contribution is nonzero and its frozen-map unfolding matches a later
-actual source. All 128 constitutive and 16 SDK alpha tests pass. That decomposition does not
-improve the old model's text result.
-
-[established-bounded; measured] The [homogeneous phase-moment return](../../research/records/2026-09-07_AC2_THE_HOMOGENEOUS_MOMENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md)
-now joins the complete contextual source to the existing native learner. All 133 constitutive
-and 16 SDK alpha tests pass. Actual four/eight-family cultivation and restart return; the tighter
-signed operator-norm bound removes the eight-family numerical obstruction while preserving
-its numerical current. The resulting answer repeats `va` to the 128-symbol work limit and
-fails the requested language product. This component is complete at its declared scope;
-Athena-alpha remains unattained.
-
-[project-postulate] **Necessary derivation belongs inside AC1.** The
-[focused source review](../../research/records/2026-09-07_AC1_DERIVATION_IS_PART_OF_THE_GENERATIVE_ATTACHMENT.md)
-locates the current observation/family/current and field-formation boundaries. Recover the
-applicable existing construction, derive the typed connection and its successor consequence,
-then implement and exercise it on actual conversations. Use independent formal verification
-where a specific missing lemma needs it; Lean never enters cultivation/inference. No additional
-user information is currently required. Report the active AC obligation and its actual return.
-
-[established-bounded; measured] The [source-null contextual lift](../../research/records/2026-09-07_AC1_THE_SOURCE_NULL_RETURN_DERIVES_ITS_CONTEXTUAL_LIFT.md)
-derives a precise criterion and complete map family from actual source/context/return relations.
-Its exact and bounded checks agree on one separating contextual direction in the saved
-conversation model, without installing a cause or changing that model. The bounded construction
-does not need exact historical contextual coordinates. Fourteen exact-linear tests, a native
-field/chronology control and five moment-reference controls pass. This closes one derivation
-obligation; the productive native composition and useful language remain unfinished.
-
-[established-bounded; measured] The [resident contextual-section return](../../research/records/2026-09-08_AC1_THE_CONTEXTUAL_SECTION_RETURNS_THROUGH_NATIVE_CONDITION_AND_FIELD_CURRENT.md)
-now preserves fixed-source mixed conduct, full forward and inverse families, actual condition
-contact and full-current re-entry into the same conversation field. All 138 constitutive and
-19 SDK alpha tests pass. A real 1,931-occurrence successor and process-separated continuation
-return. Its response is still `v` followed by an unresolved receiver. This is integrated native
-apparatus exercised by a declared study. The ordinary equal-source integration below now
-finds and reuses its references without that driver-selected pair.
-
-[established-bounded; measured] The [ordinary contextual return](../../research/records/2026-09-08_AC1_ORDINARY_RECEPTION_CONDUCTS_THE_SOURCE_AND_ITS_AVAILABLE_CONTEXT.md)
-now forms and reuses equal-source reference contrasts in the continuing native owner. Both
-parameter contacts stage with the field successor; the driver supplies no historical pair.
-All 141 constitutive and 20 SDK alpha tests pass. Actual 16-family development and a fresh-process
-restart return the same complete body and current history, but the response repeats `~ena` and
-fails the request. This closes the declared ordinary equal-source attachment, not AC1 or AC2.
-
-[established-bounded; computational-witness] The [material context-cotangent return](../../research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_HAS_A_CONTEXT_COTANGENT.md)
-now derives the normalized phase-moment differential and metric adjoint, and certifies a nonzero
-source-side receiver from the actual ordinary model. The field currently deposits the material
-parameter return without conducting that cotangent through the context producer. Twenty explicit
-born-coordinate pairings, twenty symbolic derivatives, an independent complex adjoint identity
-and the actual forward evaluation bound verify the cold derivation. The model is unchanged.
-
-[established-bounded; computational-witness] The [paired-producer differential and return](../../research/records/2026-09-08_AC1_THE_PAIRED_PRODUCER_RETURNS_ITS_CURRENT_AND_CONTACT_MORPHOLOGY.md)
-now provides the full current adjoint and a rank-two contact-morphology covector. Five exact/native
-controls pass. The actual model has a certified nonzero old internal-current return and morphology
-return at producer 19, with its new-row constraint reaction retained. The phase correction to the
-cold coordinate decoder preserves the earlier scalar cotangent certificate. This completes the
-paired-primitive derivation/reference; the native developmental attachment remains open.
-
-[established-bounded; measured] The [native operative-contact staging](../../research/records/2026-09-08_AC1_OPERATIVE_CONTACTS_STAGE_THEIR_COMPLETE_MAP_AND_CURRENT_ON_DEVICE.md)
-now supplies the complete resident map/current, rank-two delta staging, mixed moments and bounds.
-All 143 native constitutive and 20 SDK alpha controls pass. Staging all 5,063 actual model contacts
-matches the independent current decoder, in 0.266 s without numerical readbacks. This borrows the
-one field and retains its decoder; the joint developmental return and publication are not yet
-connected. No phase or language-product completion follows from this staging result.
-
-[established-bounded; measured] The [operative field return](../../research/records/2026-09-08_AC1_THE_OPERATIVE_MAP_CONDUCTS_AND_RESTARTS_IN_THE_FIELD.md)
-now connects contact growth, full-current reflection, joint numerical bounds, ordinary material
-conduct and atomic publication in the same field. Rest/archive continuation and actual model
-restart return; 145 native constitutive and 20 SDK alpha controls pass. The actual response is
-still the same unusable repetition. Controlled changed-map conduct establishes the operator path,
-not endogenous morphology learning or AC1–AC2 completion.
-
-[established-bounded; measured] The [operative material source and joint normal reduction](../../research/records/2026-09-08_AC1_THE_MATERIAL_SOURCE_FOLLOWS_OPERATIVE_CURRENT_AND_THE_JOINT_CONTACT_HAS_ONE_NORMAL_SOLVE.md)
-now connect the complete outgoing/internal source through changed contacts, with native per-return
-frame persistence. All 146 native constitutive and 20 SDK alpha tests pass. An eight-family model
-and exact process restart return, but language remains unusable. The exact joint-contact reference
-retains ordinary/contrast cross terms in one target-width solve; it is not the native producer.
-
-[definition] **Paused AC1 candidate:** the native joint material/current/contact producer has an
-exact tangent reference and available source/return-frame storage, but no endogenous native
-implementation. Its finite nonlinear return, chronological dependencies and suitability for
-generator recovery are now subjects of the mathematical review above. Preserve its source-qualified
-discrepancy, metrics and reference; neither independent scalar updates nor the private supplied-delta
-seam replace a derived response. Useful English/code/mathematics and contextual revision remain
-AC2 obligations. Broad AC3 and AC4–AC5 remain open; the product standard is unchanged.
-
-[definition] The [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
-remains an available representation option when the actual composition needs it, with its
-future-generator, delayed-return and numerical obligations. It is not a scheduled prerequisite
-in place of the open product attachment. Preserve the failed models and measured growing costs.
-
-[established-bounded; measured] The [generated-current ingress](../../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
-now reaches the ordinary field operation without numerical readback/remount, preserving paired
-internal current, source consumption and actual input through cold rest/history placement.
-All 118 constitutive and 16 SDK alpha controls pass; the public example drives three linked
-paired-field occurrences with no numerical readback. The internal-mode/material binding above
-has subsequently returned; the source construction above continues the same conversation campaign.
-
-[established-bounded; measured] The [resident local return](../../research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md)
-now lets native observations develop the existing local relation and its rational emitted current
-enter subsequent operations directly. Partial source-domain knowledge supports new superposition;
-all 84 constitutive tests pass. Continue the AC1–AC2 attachment from this composable owner into
-the actual conversation ecology, with the appropriate phase-sensitive family and contact law.
-
-[established-bounded; measured] The [field-to-resident return](../../research/records/2026-09-07_AC1_THE_FIELD_RETURNS_A_RESIDENT_RELATION_FACE_AND_A_PLURAL_FIBRE_HAS_FIXED_RECEIVERS.md)
-now crosses both historical source branches into the current frame, reads the learned relation
-on device and exposes fixed receivers of a plural fibre. All 89 native tests and the public codec
-control pass. The actual saved conversation model still emits no text. Its exact vertical
-directions locate the failure in the formed local relation; further precision cannot remove them.
-Continue with the actual contextual conditions and applicable local action. A corpus-wide use of
-one local linear chart is not justified by coherent superposition within a situated carrier.
-
-[definition] Brandon has authorized design followed immediately by construction and completion of
-[the Athena-alpha blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md) as a goal. It orders AC0–AC5:
-source-qualified available conversations; coupled native material/current/formation; learned text
-codec and complete responses; broad development and durable models; general contextual use and
-attribution; then usable consumer release. The actual product is required, not another isolated
-foundation or an inherited text demonstration.
-
-[project-postulate] Athena-alpha remains unattained until that blueprint's model, interface,
-useful English/code/mathematics products, contextual development, persistence and measured costs
-return together. Lean never enters cultivation/inference pipelines. Native owners are composed;
-no conventional trainer, authored semantic classifier, quotation selector or fixture-local learner
-supplies the missing relation. The retired side database stays unused. Apple/audio implementation
-and the inherited-first sequence are not activated by this campaign.
-
-[established-bounded; measured] [AC0 returned](../../research/records/2026-09-06_AC0_THE_CONVERSATIONS_ENTER_AS_SEPARATE_OCCURRENCES_AND_THE_COLD_CURSOR_RESTARTS.md)
-the actual source-qualified occurrence stream, cold Rust reader, complete source comparison and
-process-separated cursor continuation. AC1 is unfinished and paused for the mathematical review:
-the actual native material/current/formation attachment still needs its generative derivation.
-Completed NCF and data preparation remain
-standing and need no repeated orientation or unchanged demonstration to begin useful work.
-
-[established-bounded; measured] AC1's first
-[material field return](../../research/records/2026-09-06_AC1_THE_COMPLETE_MATERIAL_FIELD_RETAINS_ITS_CONTEXTUAL_OBSTRUCTION.md)
-ran four actual conversation families through one native owner and retained its complete plural
-fibre. The fixed local face has an exact identical-field/different-history witness. Continue AC1
-by making the relevant historical standing and channels operative through admitted transport and
-by binding reaction to developing morphology; a higher polynomial face alone does not resolve
-that witness. This refines the current attachment, without changing AC0–AC5 order or declaring
-the field to be a cultivated alpha.
-
-[established-bounded; measured] The [paired junction](../../research/records/2026-09-06_AC1_THE_PAIRED_JUNCTION_RETAINS_ITS_INNER_CURRENT.md)
-now supplies native reaction through a formed Hermitian moment and retained internal current, with
-a complete internal-current decoder and same-input contextual controls. Its word realization
-stopped after six coupled operations. The [enclosed-current return](../../research/records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md)
-now carries all 728 operations of the four-family slice, retaining the full residual and exact
-error decoder. All native certificates and the declared exact anchors pass. Resident continuation
-preserves that body with zero numerical section readouts during material admission; cold diagnostics
-remain separate and the complete launch obstruction is still checked. Continue AC1 with
-efficient broader operation, lawful history placement and productive contextual organization.
-
-[established-bounded; measured] The [shared-source/text receiver](../../research/records/2026-09-06_AC1_THE_SHARED_SOURCE_MEETS_AN_EXPLICIT_TEXT_CURRENT_RECEIVER.md)
-now binds actual common-parent endpoints and conducts an exterior octet/end-of-part chart through
-one native field. Its first fresh-request return repeats `d` for all 64 allowed symbols and remains
-interrupted, with distinct continuing native currents. Repair the current-to-material composition
-and the productive use of historical/contextual standing; inspect actual responses as this grows.
-The scalar error bound for a continuous learned-source attachment is insufficient at its recorded
-scope. AC1 and the full useful alpha product remain open; this byte return does not complete AC2.
-
-[definition] The [September 7 binding](../../research/records/2026-09-07_AC1_THE_BALANCED_FACTOR_RETURNS_THE_FULL_CURRENT_AND_THE_CODEC_OWES_ITS_OWN_TRANSPORT.md)
-keeps the complete native current under a checked balanced factorization. The
-[native material transport](../../research/records/2026-09-07_AC2_THE_RETAINED_CONTEXT_RECEIVES_A_NATIVE_MATERIAL_TRANSPORT.md)
-now receives the source-time contextual current and old forward field, retains the chronological
-change and actual returned difference, and stages its coercive parameter return with the encoder.
-Its first four-family run stops at a reserved codeword without a text response. The
-[field persistence return](../../research/records/2026-09-07_AC3_THE_CULTIVATED_FIELD_RESTARTS_WITHOUT_SOURCE_REPLAY.md)
-now retains the complete cultivated owner, source capabilities and exposure cut across processes.
-The durable state and [exact historical placement](../../research/records/2026-09-07_AC3_THE_COMPLETE_HISTORY_MOVES_TO_AN_EXTERIOR_CHART_AND_ITS_ADDRESSED_SOURCE_RETURNS.md)
-remain available for their demonstrated scopes. Further broad development follows the corrected
-AC1–AC2 attachment. The goal's resumption does not establish that attachment by itself.
-Complete historical carriers now leave GPU residency and remount through actual source handles;
-host persistence and disk size remain growing costs. Archive relocation is not the generative
-compression sought by the current correction. Preserve numerical error and complete defects; do not turn source
-uncertainty into a point. AC1–AC5 completion and the useful alpha product remain open.
-
-[definition] The [complete-current source return](../../research/records/2026-09-07_AC2_THE_FULL_INTERNAL_CURRENT_HAS_AN_ADDRESSED_PREFIX_PAIRING.md)
-now supplies native pairings over the complete born internal-current population and a reachable
-zero-boundary counterexample to outgoing-only source sufficiency. Its 732-source actual-material
-comparison and native controls return at construction-receiver scope. A subsequent working-tree
-variant joins that source to the material return; its diagnostic still fails useful language.
-The September 7 correction now governs the next attachment: constrained generative standing must
-participate in subsequent contact/reaction and emission. Full history and a larger current input
-do not establish that attachment or close a cultivation phase.
+[definition] Apple `9b7b4b63` supplies bounded temporal observed-support adjoints, enclosed
+source-return views, persistence and Metal material-mode conduct. Its reported Apple tests do
+not establish parity with later desktop contextual/operative kernels. Mac research can continue
+within that scope; port each changed shared relation against its matching desktop receipt.
+Desktop acoustics is optional research, not another AC prerequisite.
 
 ## Completed September 6 synthesis before Athena-alpha cultivation
 
@@ -367,6 +179,8 @@ inheritance and standard export. It suspends their use as the route to founding 
 Next construction must make contextual applicability and lawful transport of conditions operative,
 not add a context-window surrogate, relevance classifier or per-language controller. The audit
 does not announce a replacement universal numerical law.
+
+<a id="paused-production-hna-campaign"></a>
 
 ## Paused production-HNN campaign
 
@@ -489,8 +303,9 @@ Direct RH research in MFR5 is deferred. The [heat-current return](../../research
 now supplies an exact periodic fluid control for diffusion of the relation between two currents.
 The [nonlinear current return](../../research/records/2026-09-05_MFR3_THE_NONLINEAR_CROSS_CURRENT_RETURNS_PRESSURE_STRETCHING_AND_CELL_FLUX.md)
 now composes actual pressure, stretching, mixed diffusion, six-face temporal balance and complete
-resolved/remainder feedback. After the September 8 external-source comparison, instantiate the first nonlinear Duhamel candidate with every
-generated mode and its exact three-term feedback residual on a stated interval; MFR4 then pays
+resolved/remainder feedback. The September 8 complex-chart direction now supplies the next
+two-field source and real-receiver comparison. Instantiate its Duhamel candidate with every
+generated mode and complete mixed feedback on a stated interval; MFR4 then pays
 its quantitative residual/tail comparison or names the failed estimate. The complex potential/
 Hodge and logarithmic heat sources remain explicit.
 Full convergence is not a prior condition imposed on MFR3; the earlier exclusions remain standing.

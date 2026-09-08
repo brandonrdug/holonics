@@ -8,6 +8,13 @@ formal receipts and the preceding inspection at `6f547c4a`.
 
 ## One framework, several realizations
 
+[definition] The subsequent [complex-fluid and plan revision](../research/records/2026-09-08_COMPLEX_FLUID_CHARTS_RETAIN_THE_FOLDED_CURRENT_AND_THE_RECEIVER_BOUND.md)
+develops this synthesis into the revised AC0–AC5 order and explicit equations: complex projection
+retains nonlinear feedback, elimination returns a memory kernel, and MVT/squeeze bound the
+actual finite receiver return with its decoder. Complex normalization also distinguishes a
+receiver pole from a regular ratio family. The existing differential-boundary owners supply
+the MVT/squeeze foundation; no new universal theorem is imposed before using those mechanics.
+
 [project-postulate] Brandon's September 8 clarification places the framework first. Research
 develops a calculus of causal construction and receiver-relative comparison that can explain and
 support engineering across mathematics, computation, physics and biology. HNN, Eros, Athena and

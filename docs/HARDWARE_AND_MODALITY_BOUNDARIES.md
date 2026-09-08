@@ -1,5 +1,14 @@
 # Hardware and modality boundaries
 
+[established-bounded; source-inspected] **September 8 branch update:**
+`origin/codex/apple-silicon` was fetched to `9b7b4b63` (September 7, 21:23 PDT), with common
+ancestor `e577d9b3`. It retains temporal observed-support adjoints, producing/current-cut
+enclosed source views, persistence and Metal complete-current/material-mode ports. The
+[branch review](../research/records/2026-09-08_COMPLEX_FLUID_CHARTS_RETAIN_THE_FOLDED_CURRENT_AND_THE_RECEIVER_BOUND.md#apple-branch-useful-source-bounded-execution-evidence)
+records its reported M1 Pro checks, integral-root-contact restriction and unfinished acoustic
+scope. This desktop inspection executed no Apple code; later contextual/operative changes
+require their own port comparison. Mac research can continue at the branch's admitted scope.
+
 [definition] This guide records the desktop execution boundary and the separately developed
 Apple/audio seams. It does not add a backend or schedule an audio campaign. The roadmap and
 `CONSTRUCTION_STATE.md` remain the construction authorities.
