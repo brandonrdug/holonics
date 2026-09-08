@@ -392,5 +392,5 @@ pub use condition_image::{ConditionCoverage, ConditionImageReading, ResidentCond
 mod condition_contact;
 pub use condition_contact::{
     ConditionContactMetric, ConditionContactReading, ConditionContactStatus,
-    ResidentConditionContact, ResidentConditionCurrent,
+    ResidentConditionContact, ResidentConditionCurrent, ResidentConditionCurrentRest,
 };

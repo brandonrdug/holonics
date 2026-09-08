@@ -135,6 +135,15 @@ The [Apple return](../research/records/2026-09-07_APPLE_RETAINS_CONDITION_CURREN
 realizes both kernels in `accelerators/metal/native_phase.metal`; `holonic-mount/src/metal.rs`
 owns their launch ABI and `surface_condition.rs` uses the target's wide scratch layout.
 
+[established-bounded; measured] `constitutive_fibre/rest.rs` and
+`resident/condition_contact/rest.rs` now own exact local relation/current persistence, including
+the declared source chart, full basis/fibre, metric, contact rows and occurrence counts.
+`holonics-hna::native::conditional_checkpoint` composes them with the existing complete field
+rest, explicitly supplied capabilities and application/delivery bytes. The
+[recorded restart return](../research/records/2026-09-07_THE_RECORDED_CONDITIONAL_ACTION_CONTINUES_AFTER_RESTART.md)
+retains its validation, separate-process scope and remaining acoustic binding. This adds no
+native executor or implicit persistence of standalone in-flight conditional receipts.
+
 [established-bounded; measured] `field/resident_input.rs::advance_current_resident` now feeds
 generated current into the same field operation through `section_field_current_input` in
 `constitutive_field.cuh`. `NativeFieldIncoming` distinguishes actual resident input from exterior

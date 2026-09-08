@@ -1,0 +1,85 @@
+{
+  "truth_status": "established-bounded",
+  "evidence_tags": [
+    "measured"
+  ],
+  "scope": "cold Fraction and original PCM comparison; no native execution or learning",
+  "comparisons": [
+    {
+      "report": "research/records/2026-09-07_native_temporal_restart/first.json",
+      "source_sha256": "a0f4ce7fc87c059762daedb43420a9763dd992949271666cca1eff2240dabcc3",
+      "sample_rate": 16000,
+      "pcm_support_and_two_native_convolutions_agree": true,
+      "native_preimage_status": "unique",
+      "condition_direction_count": 0,
+      "native_prediction_status": "unique",
+      "cold_later_image_directions": [],
+      "cold_later_image_is_singleton": true,
+      "native_stages_have_zero_numerical_readouts": true,
+      "native_whole_image_continuation_and_refinement_verified": true,
+      "condition_current_cycle_verified": true,
+      "condition_current_cycle": {
+        "verified": true,
+        "contacts": 2,
+        "before_relation_cut": 36,
+        "after_relation_cut": 37,
+        "preimage_direction_count": 0,
+        "free_successor_is_initial": true,
+        "identified_successor_hidden_convolution": true,
+        "identified_difference_orthogonal_to_preimage": true,
+        "before_prediction_initial_law": true,
+        "after_prediction_later_law": true
+      },
+      "generated_field": {
+        "verified": true,
+        "occurrences": 2,
+        "linked_contacts": 1,
+        "full_covariance_and_oriented_residual": true,
+        "all_four_current_balls_contain_exact_solve": true,
+        "exact_internal_current": true,
+        "native_input_matches_retained_predictions": true
+      },
+      "whole_recording": {
+        "verified": true,
+        "source_frames": 125680,
+        "output_frames": 125681,
+        "source_sample_rate": 16000,
+        "initial_condition": {
+          "verified": true,
+          "condition_contact": "free_contact",
+          "frames": 125681,
+          "clipped_sample_population": 0,
+          "section_sha256": "701b785b7c371c1db40d705a54b24745aeb7596061e55af81c43187ab1786628",
+          "wav_sha256": "d09f3c93b9b838bf5e4109c17663e94734e6c4930526a078ffdfd351527736a5",
+          "section": {
+            "rows": 1,
+            "width": 251363,
+            "grain": 0,
+            "bound_octaves": 64,
+            "population": 251363
+          },
+          "full_real_pcm_convolution_matches": true,
+          "fixed_gain_pcm_and_remainders_reconstruct": true
+        },
+        "successor_condition": {
+          "verified": true,
+          "condition_contact": "identified_contact",
+          "frames": 125681,
+          "clipped_sample_population": 0,
+          "section_sha256": "b3fe05fec7ffb7495841f1dc689d426bf20e5de4a678032b0bc31b498a2acb44",
+          "wav_sha256": "f27c5e4adba98991b90e9da4ba7aa309ea6437f506071aa35cbf43354c36cc8f",
+          "section": {
+            "rows": 1,
+            "width": 251363,
+            "grain": 0,
+            "bound_octaves": 64,
+            "population": 251363
+          },
+          "full_real_pcm_convolution_matches": true,
+          "fixed_gain_pcm_and_remainders_reconstruct": true
+        },
+        "zero_egress_stages": true
+      }
+    }
+  ]
+}

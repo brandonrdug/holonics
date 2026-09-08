@@ -1,0 +1,221 @@
+{
+  "active_stage": "cold_checkpoint",
+  "bounded_prediction": {
+    "coordinates": [
+      "1/4096",
+      "-1/8192",
+      "35/49152",
+      "31/98304",
+      "23/98304",
+      "1/6144",
+      "-5/32768",
+      "1/49152",
+      "-25/98304",
+      "-5/32768"
+    ],
+    "status": "unique"
+  },
+  "checkpoint": {
+    "octets": 53199,
+    "path": ".local/experiments/native-temporal-restart/second.hna"
+  },
+  "conversation_model": false,
+  "elapsed_seconds": 2.731827417,
+  "evidence_tags": [
+    "measured"
+  ],
+  "final_census": {
+    "allocations": 54,
+    "captured_launches": 13,
+    "control_launches": 0,
+    "deed_launches": 3,
+    "device_to_device_octets": 0,
+    "egress_receipt_octets": 320,
+    "egress_section_octets": 1552640,
+    "ingress_octets": 1543112,
+    "resident_octets_now": 3027456,
+    "resident_octets_peak": 6714084,
+    "section_read_outs": 17,
+    "synchronizations": 3
+  },
+  "native_field": {
+    "lineage": {
+      "frame": 0,
+      "incoming": {
+        "resident_nodes": 5
+      },
+      "occurrence": 2,
+      "predecessor_state": 1,
+      "received_from": 1,
+      "source_contact": "emission"
+    },
+    "occurrences": 3,
+    "prior_occurrences": 2
+  },
+  "predecessor_application": {
+    "completed_recordings": 1,
+    "last_source": {
+      "lineage": 1,
+      "occurrence": "recorded-temporal-action:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
+      "octets": 251404,
+      "path": ".local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0007.wav",
+      "receiver": 1,
+      "sample_rate": 16000,
+      "samples": 125680,
+      "sha256": "a0f4ce7fc87c059762daedb43420a9763dd992949271666cca1eff2240dabcc3"
+    },
+    "pcm_divisor": 32768,
+    "pcm_gain": 8192,
+    "phase_extent": 4,
+    "response_complex": 2,
+    "sample_rate": 16000,
+    "schema": "holonics.recorded-temporal-continuation.v1",
+    "scope": "controlled digital two-tap action; acoustic generator binding remains open",
+    "source_complex": 4
+  },
+  "predecessor_checkpoint": ".local/experiments/native-temporal-restart/first.hna",
+  "relation": {
+    "contacts": 2,
+    "occurrences": 39,
+    "prior_contacts": 2,
+    "prior_occurrences": 38,
+    "received_targets": 0
+  },
+  "schema": "holonics.recorded-temporal-continuation.v1",
+  "scope": "persisted controlled digital action on a later recording; no new calibration or target",
+  "sound_model": false,
+  "source": {
+    "lineage": 2,
+    "occurrence": "recorded-temporal-continuation:.local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0008.wav",
+    "octets": 92204,
+    "path": ".local/datasets/librispeech-dev-clean-subset/wav/2277-149897-0008.wav",
+    "receiver": 1,
+    "sample_rate": 16000,
+    "samples": 46080,
+    "sha256": "354d25cdf602b1ec124108eaaec46330837aa429f111748a02c9c035a0a78080"
+  },
+  "stages": {
+    "cold_checkpoint": {
+      "allocations": 0,
+      "completed_command_buffers": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 75760,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 3027456,
+      "resident_octets_peak": 6714084,
+      "seconds": 0.012027625,
+      "section_readouts": 15,
+      "unavailable_gpu_timestamps": 0
+    },
+    "cold_prediction_receiver": {
+      "allocations": 0,
+      "completed_command_buffers": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 2272,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 3027456,
+      "resident_octets_peak": 6714084,
+      "seconds": 0.000074583,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "cold_remount": {
+      "allocations": 26,
+      "completed_command_buffers": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 68384,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 68384,
+      "resident_octets_peak": 68384,
+      "seconds": 0.000404584,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "cold_terminal_receiver": {
+      "allocations": 0,
+      "completed_command_buffers": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 1474608,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 3027456,
+      "resident_octets_peak": 6714084,
+      "seconds": 2.312787041,
+      "section_readouts": 1,
+      "unavailable_gpu_timestamps": 0
+    },
+    "resident_relation_and_field": {
+      "allocations": 20,
+      "completed_command_buffers": 2,
+      "deeds": 2,
+      "gpu_seconds": 0.20359558332711458,
+      "ingress_octets": 152,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 256,
+      "resident_octets_now": 78272,
+      "resident_octets_peak": 138564,
+      "seconds": 0.206190542,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "whole_recording_mount": {
+      "allocations": 2,
+      "completed_command_buffers": 0,
+      "deeds": 0,
+      "gpu_seconds": 0.0,
+      "ingress_octets": 1474576,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 0,
+      "resident_octets_now": 1552848,
+      "resident_octets_peak": 1552848,
+      "seconds": 0.010349375,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    },
+    "whole_recording_successor_condition": {
+      "allocations": 6,
+      "completed_command_buffers": 1,
+      "deeds": 1,
+      "gpu_seconds": 0.10658316663466394,
+      "ingress_octets": 0,
+      "numerical_egress_octets": 0,
+      "receipt_egress_octets": 64,
+      "resident_octets_now": 3027456,
+      "resident_octets_peak": 6714084,
+      "seconds": 0.107999041,
+      "section_readouts": 0,
+      "unavailable_gpu_timestamps": 0
+    }
+  },
+  "truth_status": "established-bounded",
+  "whole_recording": {
+    "gain": "8192",
+    "output_raw_extent": 46081,
+    "response_raw_extent": 2,
+    "source_raw_extent": 46080,
+    "successor_condition": {
+      "clipped_sample_population": 0,
+      "fibre_decoder": "read the canonical ResidentSectionRest rational point; at the declared gain, residual = current * gain - PCM, and current = (PCM + residual) / gain",
+      "frames": 46081,
+      "lineage": 2,
+      "origin": "0",
+      "projection_schema": "soma-life.native-acoustic-temporal-pcm16.v1",
+      "receiver": 5,
+      "sample_rate": 16000,
+      "sample_step": "1/16000",
+      "section_octets": 1474648,
+      "section_path": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/native-temporal-restart/second-audio/successor-condition.section",
+      "section_sha256": "16b57a135894e4b53a8695b2914c529bdc4a40236bb21d13d3ed6869bf97dbc2",
+      "wav_octets": 184368,
+      "wav_path": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/native-temporal-restart/second-audio/successor-condition.wav",
+      "wav_sha256": "dd36f1bc02bb91e79573accd9e4e47d95b418dd7bded310e192889aa195495c6"
+    }
+  }
+}

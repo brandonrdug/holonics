@@ -10,6 +10,13 @@ instruction governs.
 
 ## Parallel MacBook position
 
+[established-bounded; measured] The [conditional restart return](research/records/2026-09-07_THE_RECORDED_CONDITIONAL_ACTION_CONTINUES_AFTER_RESTART.md)
+now persists the learned local relation, actual condition and complete field history/capabilities.
+Seventeen focused controls and three recorded processes return; cold comparisons verify both
+restarts, all waveform coordinates, field contact moments and retained history. Later native
+whole-recording actions take 0.108/0.155 s; cold audio export takes 2.31/3.11 s. Actual acoustic
+constitutive binding and useful sound/English development remain unfinished; AS4–AS5 stay active.
+
 [established-bounded; measured] The [complete-recording return](research/records/2026-09-07_APPLE_CONDUCTS_COMPLETE_RECORDINGS_AND_RETURNS_TIMED_AUDIO.md)
 now conducts whole ESC-50 and LibriSpeech sections through retained earlier/successor conditions
 and publishes timed stereo PCM with the complete exact current. Thirty-eight scoped Rust

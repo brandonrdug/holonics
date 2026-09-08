@@ -93,6 +93,22 @@ their files do not checkpoint the learned ecology or establish useful sound/Engl
 The [complete-recording return](../research/records/2026-09-07_APPLE_CONDUCTS_COMPLETE_RECORDINGS_AND_RETURNS_TIMED_AUDIO.md)
 records the implementation, comparisons and costs. Omitting the third argument retains v4.
 
+[definition] An optional fourth argument now saves the complete controlled relation/current
+and field composition. Continue it with a later WAV at the same sample clock:
+
+```sh
+target/debug/examples/recorded_temporal_action FIRST.wav FIRST.json .local/experiments/FIRST_AUDIO .local/experiments/FIRST.hna
+target/debug/examples/recorded_temporal_action --continue .local/experiments/FIRST.hna NEXT.wav NEXT.json .local/experiments/NEXT_AUDIO .local/experiments/NEXT.hna
+python3 research/experiments/apple_silicon/compare_temporal_continuation.py NEXT.json --output NEXT_COMPARISON.json
+```
+
+[established-bounded; measured] The [restart construction](../research/records/2026-09-07_THE_RECORDED_CONDITIONAL_ACTION_CONTINUES_AFTER_RESTART.md)
+retains the original learned local basis, actual condition, field history/source capabilities,
+stream and application state across three recorded processes. All output paths must be new;
+`--continue` refuses a changed sample clock. Its later processes receive no calibration or
+observed target. They exercise persistence of the controlled digital action; actual acoustic
+generative binding, corpus cultivation and the full streaming application remain open.
+
 [established-bounded; measured] The [recorded interval attachment](../research/records/2026-09-07_RECORDED_RESPONSE_POINTERS_RETAIN_THEIR_ACOUSTIC_INTERVALS.md)
 now supplies `AcousticFieldChart::from_acoustic_range` and `native::recorded` for exact original
 source/target pointers and recording bounds. `RecordedResponseSections::bind` keeps annotation

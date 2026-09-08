@@ -94,6 +94,12 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
    boundary, and continue the same owner after persistence. A stored recording or fixed
    sonification cannot supply the productive emission. Port larger desktop field owners only
    when the actual composition requires their precise conduct.
+   The [conditional restart return](../../research/records/2026-09-07_THE_RECORDED_CONDITIONAL_ACTION_CONTINUES_AFTER_RESTART.md)
+   now persists the existing local bilinear relation and retained condition current, composed
+   with complete field history/capabilities and application delivery state. Separate recorded
+   processes continue that controlled action without recalibration. Actual acoustic generative
+   binding and development across joined recorded returns remain required; a checkpointed
+   digital control does not supply them.
 4. Compose recorded English and conversational audio through the same ecology, retaining actual
    speaker/clock/turn/response relations and the relevant textual chart. Establish useful
    recognition, generation and conversational conduct from the resulting model. Shared text

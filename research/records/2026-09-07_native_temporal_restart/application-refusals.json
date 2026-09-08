@@ -1,0 +1,18 @@
+{
+  "truth_status": "established-bounded",
+  "evidence_tags": [
+    "measured"
+  ],
+  "controls": {
+    "changed_sample_clock": {
+      "refused": true,
+      "exit_code": 1,
+      "error": "Error: \"the saved digital response requires its original sample clock\""
+    },
+    "existing_output": {
+      "refused": true,
+      "exit_code": 1,
+      "error": "Error: \"output already exists: research/records/2026-09-07_native_temporal_restart/second.json\""
+    }
+  }
+}

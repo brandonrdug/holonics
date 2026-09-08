@@ -1,0 +1,33 @@
+{
+  "truth_status": "established-bounded",
+  "evidence_tags": [
+    "measured"
+  ],
+  "controls": {
+    "changed_clock": {
+      "refused": true,
+      "reason": "successor projection metadata",
+      "report": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/native-temporal-restart/observer-controls/changed_clock.json"
+    },
+    "undeclared_native_readout": {
+      "refused": true,
+      "reason": "native stage egress: whole_recording_successor_condition",
+      "report": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/native-temporal-restart/observer-controls/undeclared_native_readout.json"
+    },
+    "changed_historical_carrier": {
+      "refused": true,
+      "reason": "field history carrier prefix changed",
+      "report": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/native-temporal-restart/observer-controls/changed_historical_carrier.json"
+    },
+    "changed_exact_tail": {
+      "refused": true,
+      "reason": "successor exact full-recording convolution",
+      "report": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/native-temporal-restart/observer-controls/changed_exact_tail.json"
+    },
+    "changed_pcm": {
+      "refused": true,
+      "reason": "successor PCM quantization",
+      "report": "/Users/brandonduggan/Workspaces/holonics/.local/experiments/native-temporal-restart/observer-controls/changed_pcm.json"
+    }
+  }
+}

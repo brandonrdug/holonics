@@ -16,6 +16,10 @@ mod batch;
 pub use batch::NativeBatchReceive;
 mod checkpoint;
 pub use checkpoint::NativeSavedSession;
+mod conditional_checkpoint;
+pub use conditional_checkpoint::{
+    save_conditional_checkpoint, ConditionalCheckpointError, NativeSavedConditionalField,
+};
 mod acoustic;
 pub mod acoustic_field;
 pub use acoustic::{

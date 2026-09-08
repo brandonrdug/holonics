@@ -2,14 +2,18 @@
 //! is part of the contact; an affine particular solution is never installed as an inferred cause.
 
 use super::*;
+use serde::{Deserialize, Serialize};
 use std::rc::Rc;
 
 /// Equal unit admittance for each real/imaginary coordinate in the bound local chart.
 /// Orthogonal chart changes preserve this law. General recharting owes the transported metric.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum ConditionContactMetric {
     UnitAdmittanceRealification,
 }
+
+mod rest;
+pub use rest::ResidentConditionCurrentRest;
 
 #[derive(Debug, PartialEq, Eq, Serialize)]
 pub enum ConditionContactStatus {

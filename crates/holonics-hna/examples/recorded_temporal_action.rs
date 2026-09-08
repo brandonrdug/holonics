@@ -17,6 +17,7 @@ use holonic_engine::{
     ExactComplexWaveCurrent,
 };
 use holonics_hna::native::acoustic_field::AcousticFieldChart;
+use holonics_hna::native::{save_conditional_checkpoint, NativeSavedConditionalField};
 use life::{
     mathematical_source::ExactAcousticOccurrence,
     native_intelligence::NativeAcousticTemporalPcm16Projection,
@@ -36,6 +37,8 @@ type Result<T> = std::result::Result<T, Box<dyn Error>>;
 const WIDTH: usize = 4;
 const DIVISOR: i64 = 32768;
 const PCM_GAIN: i64 = 8192;
+#[path = "recorded_temporal_action/continuation.rs"]
+mod continuation;
 const CONTROLS: [[i64; 4]; 5] = [
     [0, 0, 0, 0],
     [1, 0, 0, 0],
@@ -211,6 +214,7 @@ fn experiment<'c>(
     body: &mut ResidentConstitutiveFibre<'c>,
     report: &mut Value,
     audio_directory: Option<&Path>,
+    checkpoint_path: Option<&Path>,
 ) -> Result<()> {
     // Eight interior clock cuts are fixed before any current is observed. Cuts 3/9 and 6/9
     // are held out; the other six train. No silence, amplitude, rank or answer selects a cut.
@@ -367,7 +371,7 @@ fn experiment<'c>(
             .collect(),
         ResidentGrain(72),
     )?;
-    let (first_field_lineage, second_field_lineage) =
+    let (first_field_lineage, second_field_lineage, continuing_source) =
         stage(s, report, "native_generated_field_recurrence", || {
             let mut entering = NativeFieldOccurrence::entering(Vec::new());
             let first =
@@ -376,7 +380,7 @@ fn experiment<'c>(
             let mut linked = NativeFieldOccurrence::through(first.source, Vec::new());
             let second =
                 generated_field.advance_current_resident(&mut linked, generated.current())?;
-            Ok((first_lineage, second.lineage.clone()))
+            Ok((first_lineage, second.lineage.clone(), second.source))
         })?;
     let image = stage(s, report, "whole_condition_image", || {
         Ok(body.read_condition_image(later_cell.rational()?, &preimage)?)
@@ -553,14 +557,48 @@ fn experiment<'c>(
     expected.extend([json!("0"), json!("0")]);
     report["complete_bounded_comparison"] =
         json!(report["observation"]["whole_image_carried"]["coordinates"] == json!(expected));
+    if let Some(path) = checkpoint_path {
+        let application = json!({"schema":"holonics.recorded-temporal-continuation.v1",
+            "source_complex":WIDTH,"response_complex":2,"phase_extent":WIDTH,
+            "pcm_divisor":DIVISOR,"pcm_gain":PCM_GAIN,
+            "sample_rate":recording_rate(report)?,"completed_recordings":1,
+            "last_source":report["source"],
+            "scope":"controlled digital two-tap action; acoustic generator binding remains open"});
+        let receipt = stage(s, report, "cold_checkpoint", || {
+            Ok(save_conditional_checkpoint(
+                path,
+                body,
+                &held,
+                &generated_field,
+                &[Some(&continuing_source)],
+                &[],
+                &holonics_hna::HnaStreamState::default(),
+                &serde_json::to_vec(&application)?,
+            )?)
+        })?;
+        report["checkpoint"] = json!({"path":receipt.path,"octets":receipt.bytes,
+            "relation_occurrences":body.occurrences(),"contacts":held.contacts(),
+            "field_occurrences":generated_field.occurrence_count()});
+    }
     Ok(())
+}
+
+fn recording_rate(report: &Value) -> Result<u32> {
+    Ok(u32::try_from(
+        report["source"]["sample_rate"]
+            .as_u64()
+            .ok_or("missing source clock")?,
+    )?)
 }
 
 fn main() -> Result<()> {
     let args: Vec<_> = std::env::args().skip(1).collect();
-    if !(2..=3).contains(&args.len()) {
+    if args.first().map(String::as_str) == Some("--continue") {
+        return continuation::run(&args[1..]);
+    }
+    if !(2..=4).contains(&args.len()) {
         return Err(
-            "usage: recorded_temporal_action WAV_PATH NEW_REPORT.json [NEW_AUDIO_DIR]".into(),
+            "usage: recorded_temporal_action WAV_PATH NEW_REPORT.json [NEW_AUDIO_DIR [NEW_CHECKPOINT]]; or --continue CHECKPOINT WAV_PATH NEW_REPORT.json NEW_AUDIO_DIR NEW_CHECKPOINT".into(),
         );
     }
     let wav_path = PathBuf::from(&args[0]);
@@ -617,6 +655,7 @@ fn main() -> Result<()> {
                 &mut body,
                 &mut report,
                 audio_directory.as_deref(),
+                args.get(3).map(Path::new),
             ) {
                 report["refusal"] =
                     json!({"stage":report["active_stage"],"error":error.to_string()});

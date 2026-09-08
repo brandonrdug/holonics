@@ -13,7 +13,7 @@
 //! and the wider ecology must still be composed: this local owner alone does not complete NCF1.
 
 use relational_geometry::Rat;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 use crate::resident_section::{
@@ -26,16 +26,19 @@ pub use circulation::*;
 mod field;
 pub use field::*;
 mod resident;
+mod rest;
+pub use rest::ResidentConstitutiveFibreRest;
 pub use resident::{
     ConditionContactMetric, ConditionContactReading, ConditionContactStatus, ConditionCoverage,
     ConditionImageReading, ConditionPreimageReading, ConstitutiveDifferentialReading,
-    ResidentConditionContact, ResidentConditionCurrent, ResidentConditionImage,
-    ResidentConditionPreimage, ResidentConstitutiveCurrent, ResidentConstitutiveReturn,
+    ResidentConditionContact, ResidentConditionCurrent, ResidentConditionCurrentRest,
+    ResidentConditionImage, ResidentConditionPreimage, ResidentConstitutiveCurrent,
+    ResidentConstitutiveReturn,
 };
 
 /// Declared local source law, bound at founding rather than inferred from an array's width.
 /// These dimensions are the caller's interface chart, not learned semantic capacities.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "kebab-case")]
 pub enum ConstitutiveSourceChart {
     Linear,

@@ -1,0 +1,75 @@
+{
+  "truth_status": "established-bounded",
+  "evidence_tags": [
+    "measured"
+  ],
+  "scope": "cold continuation checkpoint and exact controlled digital action comparison; no semantic claim",
+  "comparisons": [
+    {
+      "report": "research/records/2026-09-07_native_temporal_restart/second.json",
+      "predecessor_checkpoint": ".local/experiments/native-temporal-restart/first.hna",
+      "checkpoint": ".local/experiments/native-temporal-restart/second.hna",
+      "source_sha256": "354d25cdf602b1ec124108eaaec46330837aa429f111748a02c9c035a0a78080",
+      "sample_rate": 16000,
+      "completed_recordings": 2,
+      "relation_basis_unchanged": true,
+      "condition_rest_unchanged": true,
+      "transport_unchanged": true,
+      "field": {
+        "prior_occurrences": 2,
+        "occurrences": 3,
+        "consumed_source": 1,
+        "new_source": 2,
+        "history_prefix_retained": true,
+        "joined_contact_moment_verified": true
+      },
+      "native_stages_zero_egress": true,
+      "cold_remount_zero_deeds": true,
+      "whole_recording_exact_convolution": true,
+      "latest_resident_input_matches_bounded_prediction": true,
+      "pcm_gain_clock_tail_remainders_verified": true,
+      "projection_section_sha256": "16b57a135894e4b53a8695b2914c529bdc4a40236bb21d13d3ed6869bf97dbc2",
+      "projection_wav_sha256": "dd36f1bc02bb91e79573accd9e4e47d95b418dd7bded310e192889aa195495c6",
+      "section": {
+        "rows": 1,
+        "width": 92163,
+        "grain": 0,
+        "bound_octaves": 64,
+        "population": 92163
+      }
+    },
+    {
+      "report": "research/records/2026-09-07_native_temporal_restart/third.json",
+      "predecessor_checkpoint": ".local/experiments/native-temporal-restart/second.hna",
+      "checkpoint": ".local/experiments/native-temporal-restart/third.hna",
+      "source_sha256": "bd1782e754e78be1e4dd2f733ad986a39af3b427d673c87a380d7f2d81c3cf83",
+      "sample_rate": 16000,
+      "completed_recordings": 3,
+      "relation_basis_unchanged": true,
+      "condition_rest_unchanged": true,
+      "transport_unchanged": true,
+      "field": {
+        "prior_occurrences": 3,
+        "occurrences": 4,
+        "consumed_source": 2,
+        "new_source": 3,
+        "history_prefix_retained": true,
+        "joined_contact_moment_verified": true
+      },
+      "native_stages_zero_egress": true,
+      "cold_remount_zero_deeds": true,
+      "whole_recording_exact_convolution": true,
+      "latest_resident_input_matches_bounded_prediction": true,
+      "pcm_gain_clock_tail_remainders_verified": true,
+      "projection_section_sha256": "481a04b20c6233e3cedd8483eed584f832e305617d1977a75fd3fbff5a459e97",
+      "projection_wav_sha256": "a26f8728d892c33314de60fb01e5c782e8b40abc59be8eb3ac6e4e9c11638ed0",
+      "section": {
+        "rows": 1,
+        "width": 119203,
+        "grain": 0,
+        "bound_octaves": 64,
+        "population": 119203
+      }
+    }
+  ]
+}

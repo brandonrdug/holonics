@@ -436,7 +436,14 @@ def compare(path):
         assert report["complete_bounded_comparison"] is True
         family_verified = True
     for name, stage in report["stages"].items():
-        if name not in ("terminal_observer", "whole_recording_terminal_receiver"):
+        if name == "cold_checkpoint":
+            # Optional complete-state export is an explicit cold boundary. The separate
+            # continuation observer verifies its components and later process return.
+            assert report["checkpoint"]["octets"] > 0
+            assert Path(report["checkpoint"]["path"]).stat().st_size == report["checkpoint"]["octets"]
+            assert stage["section_readouts"] > 0 and stage["numerical_egress_octets"] > 0
+            assert stage["deeds"] == 0
+        elif name not in ("terminal_observer", "whole_recording_terminal_receiver"):
             assert stage["section_readouts"] == 0 and stage["numerical_egress_octets"] == 0
     return {"report":str(path),"source_sha256":source["sha256"],"sample_rate":rate,
         "pcm_support_and_two_native_convolutions_agree":True,
