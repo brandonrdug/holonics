@@ -1,0 +1,92 @@
+{
+  "scope": "exact finite Fourier source; all-time explicit Euler solution; first NS Duhamel response",
+  "chart": "dimensionless R^3/(2*pi*Z)^3; fixed spatial frame; nu>0 for NS formulas",
+  "initial_fields": "u_plus/minus = b*cos(B) +/- a*cos(A)",
+  "k": [
+    2,
+    1,
+    0
+  ],
+  "ell": [
+    -1,
+    -1,
+    0
+  ],
+  "a": [
+    "0",
+    "0",
+    "1"
+  ],
+  "b": [
+    "1",
+    "-1",
+    "0"
+  ],
+  "same_modal_energy": true,
+  "same_mean_covariance": [
+    [
+      "1/2",
+      "-1/2",
+      "0"
+    ],
+    [
+      "-1/2",
+      "1/2",
+      "0"
+    ],
+    [
+      "0",
+      "0",
+      "1/2"
+    ]
+  ],
+  "initial_low_mode": [
+    "0",
+    "0",
+    "0"
+  ],
+  "plus_low_time_derivative": [
+    "0",
+    "0",
+    "-I/4"
+  ],
+  "minus_low_time_derivative": [
+    "0",
+    "0",
+    "I/4"
+  ],
+  "all_generated_modes": [
+    [
+      -3,
+      -2,
+      0
+    ],
+    [
+      -1,
+      0,
+      0
+    ],
+    [
+      1,
+      0,
+      0
+    ],
+    [
+      3,
+      2,
+      0
+    ]
+  ],
+  "exact_euler_generator": "b*cos(B) + a*cos(A-t*cos(B)); p=0",
+  "euler_divergence_and_momentum_residual": "exactly zero",
+  "first_duhamel_sine_amplitudes": {
+    "1": "((exp(-nu*t) - exp(-7*nu*t))/(6*nu))/2",
+    "13": "(-(-exp(-7*nu*t) + exp(-13*nu*t))/(6*nu))/2"
+  },
+  "viscosity_zero_limit_of_each_sine_amplitude": "t/2",
+  "claims_excluded": [
+    "NS blowup",
+    "HNA learning",
+    "finite closure of the nonlinear spectral ladder"
+  ]
+}

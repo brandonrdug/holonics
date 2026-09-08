@@ -2,8 +2,8 @@
 
 **Authority:** Brandon's September 6 instruction to design and deposit this blueprint, update the
 roadmap and position, then immediately construct and complete it as a goal.
-**Status:** resumed after Brandon's September 7 corrections; AC0 returned, AC1–AC2 generative
-attachment in construction. **Order:** [the roadmap](THE_ROADMAP.md).
+**Status:** paused by Brandon on September 8 for the NS/Euler mathematical review; AC0 returned,
+AC1 unfinished and AC2 language probes failed. **Order:** [the roadmap](THE_ROADMAP.md).
 **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 
 ## 1. The required product
@@ -330,11 +330,13 @@ response still fails. The joint-contact reference derives a single target-width 
 retains both receiving terms and their shared producer. Native execution of that joint update is
 still required.
 
-[definition] Continue by implementing the native joint constitutive-return producer using the
-actual discrepancy, producer differential, source/reference currents and the full coupled normal
-response. Retain producing maps, metrics, prior dependencies and chronological transfer; the new
-source chart and private supplied-delta seam are not learned morphology. This remains AC1 work
-directed at AC2's actual complete useful responses. The roadmap orders the work; the
+[definition] The native joint constitutive-return producer is paused for the
+[NS/Euler and generative-law review](../../research/records/2026-09-08_THE_NS_EULER_REVIEW_EXPOSES_THE_GENERATOR_GAP_IN_AC1.md).
+The exact tangent reference does not establish the finite nonlinear return or an adequate
+generator-recovery law. Retain the actual discrepancy, producing maps, metrics, source/reference
+currents, prior dependencies and chronological transfer as the candidate's mathematical data.
+The source chart and private supplied-delta seam are not learned morphology. This remains the
+unfinished AC1 obligation directed at AC2's useful responses. The roadmap orders the work; the
 [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
 remains a representation option with its actual future-generator obligations.
 

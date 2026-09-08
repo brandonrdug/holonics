@@ -20,15 +20,33 @@ contracts and records preserve their completed scope; their old imperatives sche
    reread every completed campaign, rerun unchanged expensive receipts, or reconstruct historical
    capability just to start the next authorized repair.
 
-## Active Athena-alpha cultivation campaign
+## Active mathematical review: NS/Euler and the AC1 generator gap
 
-[project-postulate] **Brandon has resumed the goal after the September 7 corrections.**
-AC1–AC2 now composes generator recovery, group/phase transport and Holonic Compression,
+[project-postulate] **Brandon's September 8 instruction pauses machine-learning construction.**
+Review [OpenAI's NS/Euler construction](https://github.com/openai/NavierStokesAndEuler), its actual
+theorem scopes and the mathematics missing from AC1 before returning to the machine. The
+[first review and exact phase-generator derivation](../../research/records/2026-09-08_THE_NS_EULER_REVIEW_EXPOSES_THE_GENERATOR_GAP_IN_AC1.md)
+records the source revision, verification limits, failed language product and preserved draft.
+AC0 is complete; AC1 is unfinished; AC2 has failed probes; AC3 has bounded persistence apparatus;
+AC4–AC5 remain open. Do not resume the joint kernel or corpus runs under the earlier instruction.
+
+[definition] Next compare the external correction-preservation and terminal-jet arguments with
+the existing MFR3 pressure, phase-current and complete Duhamel residual. Retain the distinction
+between forced NS C/D, unforced Euler and our unforced NS direction. Recover and check relevant
+mathematical arguments before adapting them. The resulting source/generator and finite-return
+derivation belongs to the existing AC1 obligation when that campaign resumes; another verified
+tangent formula alone does not settle the adequacy of the learning law. Lean remains exterior
+research and never enters cultivation or inference.
+
+## Paused Athena-alpha cultivation campaign
+
+[historical] Brandon resumed the goal after the September 7 corrections; the September 8 pause
+above now governs. The AC1–AC2 design composes generator recovery, group/phase transport and Holonic Compression,
 shared with the separately pushed Apple acoustic work. Read the
 [source/intent synthesis](../../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
 and the corrected blueprint. **Preimage Fibre** carries compatible causes and
 future-conduct constraints from limited observations; neither perfect inversion nor retention of
-every raw state is a learning prerequisite. Continue the corrected native attachment.
+every raw state is a learning prerequisite. The corrected native attachment remains unfinished.
 
 [definition] Brandon's subsequent chord clarification preserves general class descriptions without
 requiring an individual physical occurrence, alongside superposition and ordered composition.
@@ -138,14 +156,13 @@ frame persistence. All 146 native constitutive and 20 SDK alpha tests pass. An e
 and exact process restart return, but language remains unusable. The exact joint-contact reference
 retains ordinary/contrast cross terms in one target-width solve; it is not the native producer.
 
-[definition] **Next AC1 → AC2 construction:** implement that native joint material/current/contact
-constitutive-return producer from the actual source-qualified discrepancy and producer differential.
-The source interpretation and return-frame storage are now available. Use the complete coupled
-normal response with its retained reference and producing maps, prior dependencies, metrics and
-chronological transfer. Independent scalar/contact updates, a current-as-displacement or the private
-supplied-delta seam do not replace it. Then inspect complete useful English/code/mathematics responses
-and contextual revision. No additional user information is required; broad AC3 and AC4–AC5 remain
-open and the full product standard is unchanged.
+[definition] **Paused AC1 candidate:** the native joint material/current/contact producer has an
+exact tangent reference and available source/return-frame storage, but no endogenous native
+implementation. Its finite nonlinear return, chronological dependencies and suitability for
+generator recovery are now subjects of the mathematical review above. Preserve its source-qualified
+discrepancy, metrics and reference; neither independent scalar updates nor the private supplied-delta
+seam replace a derived response. Useful English/code/mathematics and contextual revision remain
+AC2 obligations. Broad AC3 and AC4–AC5 remain open; the product standard is unchanged.
 
 [definition] The [chronological future contraction](../../research/records/2026-09-07_AC2_THE_MOMENT_FACTORS_ADMIT_A_CHRONOLOGICAL_FUTURE_CONTRACTION.md)
 remains an available representation option when the actual composition needs it, with its
@@ -189,8 +206,9 @@ and the inherited-first sequence are not activated by this campaign.
 
 [established-bounded; measured] [AC0 returned](../../research/records/2026-09-06_AC0_THE_CONVERSATIONS_ENTER_AS_SEPARATE_OCCURRENCES_AND_THE_COLD_CURSOR_RESTARTS.md)
 the actual source-qualified occurrence stream, cold Rust reader, complete source comparison and
-process-separated cursor continuation. AC1 is now active: derive and implement the actual native
-material/current/formation attachment. Completed NCF and data preparation remain
+process-separated cursor continuation. AC1 is unfinished and paused for the mathematical review:
+the actual native material/current/formation attachment still needs its generative derivation.
+Completed NCF and data preparation remain
 standing and need no repeated orientation or unchanged demonstration to begin useful work.
 
 [established-bounded; measured] AC1's first
@@ -375,6 +393,10 @@ is about learning organization, not token volume as an alleged sole or primary i
 
 ## Mathematical research strategy: moving frames and continuation
 
+[project-postulate] The September 8 external NS/Euler review at the top of this roadmap is the
+immediate work. The MFR source and residual obligations below remain standing; the new external
+endpoint claims are source-inspected testimony until independently checked and mapped to our scope.
+
 [definition] Brandon's subsequent September 4 request directs the
 [MFR strategy](THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md), connecting
 chart-relative null fibres, Tao's ansatz/residual/stability method, physical information and the
@@ -448,18 +470,19 @@ retains a complete pressure-matching ellipse and a joint pressure/time receiver 
 Jacobian on the retained positive branch. Its exact square completion excludes the fixed-ratio
 second condition throughout that ellipse; the full source, quartic coefficients and viscous/convective split remain explicit.
 
-[definition] Brandon's latest correction focuses MFR3 on complex Euler/Navier–Stokes temporal
+[definition] Brandon's September 5 correction focuses MFR3 on complex Euler/Navier–Stokes temporal
 sources and the existing entropy/action, oriented cross-current and heat-diffusion construction.
 Direct RH research in MFR5 is deferred. The [heat-current return](../../research/records/2026-09-05_MFR3_THE_ORIENTED_ENTROPY_CURRENT_RETURNS_ITS_HEAT_SOURCE_AND_COMPLEX_PHASE.md)
 now supplies an exact periodic fluid control for diffusion of the relation between two currents.
 The [nonlinear current return](../../research/records/2026-09-05_MFR3_THE_NONLINEAR_CROSS_CURRENT_RETURNS_PRESSURE_STRETCHING_AND_CELL_FLUX.md)
 now composes actual pressure, stretching, mixed diffusion, six-face temporal balance and complete
-resolved/remainder feedback. Next instantiate the first nonlinear Duhamel candidate with every
+resolved/remainder feedback. After the September 8 external-source comparison, instantiate the first nonlinear Duhamel candidate with every
 generated mode and its exact three-term feedback residual on a stated interval; MFR4 then pays
 its quantitative residual/tail comparison or names the failed estimate. The complex potential/
 Hodge and logarithmic heat sources remain explicit.
-Full convergence is not a prior condition imposed on MFR3; the earlier exclusions remain standing. The HNA line follows the native-foundations
-priority above, independently of MFR.
+Full convergence is not a prior condition imposed on MFR3; the earlier exclusions remain standing.
+The HNA line is paused while this mathematical review examines its unresolved generator and
+finite-return law, under the current priority above.
 
 [project-postulate] Holonics is the mathematical framework and ontology of which HNA is an
 executable architecture. A research route may return a derivation, a counterexample or a precise

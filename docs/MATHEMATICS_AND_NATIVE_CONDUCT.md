@@ -5,6 +5,13 @@ work to live native HNA owners. It records reusable relations and grades without
 construction or promoting mathematics into a product capability. Source was inspected at
 `6f547c4a`; formal grades below retain the cited records' check scopes, without rerunning proofs.
 
+[definition] The [September 8 NS/Euler review](../research/records/2026-09-08_THE_NS_EULER_REVIEW_EXPOSES_THE_GENERATOR_GAP_IN_AC1.md)
+adds the external theorem-scope comparison and an exact transported-phase Euler generator.
+Two initial fields with equal modal energies and mean covariance produce opposite new low-mode
+currents. The complete solution has a convergent generator unfolding; its recovery from limited
+observations remains an AC1 question. The external blowup claims have not been independently
+kernel-checked here. Machine-learning construction is paused for this mathematical work.
+
 ## Standing distinction
 
 [definition] The native HNA foundation is the bounded local rational-linear phase ecology owned by
@@ -133,7 +140,7 @@ the successor only through its actual supported rows. `decoded_successor_with_ov
 
 [established-bounded; source-inspected] The native condensation owner
 [`recurrent_condensation.rs`](../crates/holonic-engine/src/native_ecology/recurrent_condensation.rs)
-stores compact standing, an executable decoder, complete reconstruction fibres, and shortest
+stores compact standing, an executable decoder, retained preimage fibres, and shortest
 separating histories. Its `CondensedRecurrentRest::validate` checks the admitted bounded
 one-generator passage and refuses malformed fibres or separators.
 

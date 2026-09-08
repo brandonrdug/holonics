@@ -5,6 +5,12 @@ nullity, the RH line and the mathematical purpose of Holonics into a research st
 **Current focus:** Brandon's September 5 correction directs complex Euler, Navier–Stokes,
 temporal evolution and their existing entropy/action, oriented cross-current and heat-diffusion
 relations. Direct RH research is deferred; its completed source and formal standing remain usable.
+[project-postulate] Brandon's September 8 instruction now prioritizes the
+[external NS/Euler review and AC1 generator diagnosis](../../research/records/2026-09-08_THE_NS_EULER_REVIEW_EXPOSES_THE_GENERATOR_GAP_IN_AC1.md)
+before further candidate or machine-learning construction. Compare the actual correction and
+terminal-jet arguments with the source/residual owners below. The first exact shear-generator
+return does not close the pressure-matching candidate or the singularity endpoint.
+
 **Position:** MFR0 strategy deposited; Brandon subsequently activated this plan as the standing
 mathematical goal. MFR1's scalar moving-frame/endpoint and MFR2's folded-source returns are
 complete; MFR3's source-specific fluid concentration conditions are in progress.
