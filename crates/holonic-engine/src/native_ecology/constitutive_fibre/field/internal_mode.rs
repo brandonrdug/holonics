@@ -16,6 +16,7 @@ struct ModeOrigin {
 }
 struct ModeData<'c> {
     surface: &'c ResidentSurface<'c>,
+    owner: Option<Rc<()>>,
     origin: ModeOrigin,
     contact: ResidentSection<'c>,
     amplitude: ResidentSection<'c>,
@@ -123,6 +124,26 @@ impl NativeSharedDriveModeRest {
 }
 
 impl<'c> NativeSharedDriveMode<'c> {
+    pub(super) fn material_origin(&self, owner: &Rc<()>) -> Option<([usize; 2], usize)> {
+        self.inner
+            .owner
+            .as_ref()
+            .filter(|o| Rc::ptr_eq(o, owner))
+            .map(|_| {
+                (
+                    self.inner.origin.receiving_occurrences,
+                    self.inner.origin.captured_at,
+                )
+            })
+    }
+    pub(super) fn share_origin(&self) -> Self {
+        Self {
+            inner: Rc::clone(&self.inner),
+        }
+    }
+    pub(super) fn native_parts(&self) -> (&ResidentSection<'c>, &ResidentSection<'c>) {
+        (&self.inner.contact, &self.inner.amplitude)
+    }
     /// Predict after this many ordinary field occurrences, under the certified shared-drive
     /// family. The forcing and any added contacts may vary; the two old root drives stay fixed.
     /// This predicts a continuation, not a claim that a physical field has executed those steps.
@@ -177,6 +198,7 @@ impl<'c> NativeSharedDriveMode<'c> {
         Ok(Self {
             inner: Rc::new(ModeData {
                 surface,
+                owner: None,
                 origin: rest.origin,
                 contact: surface.mount_section_rest(&rest.contact)?,
                 amplitude: surface.mount_section_rest(&rest.amplitude)?,
@@ -251,6 +273,7 @@ impl<'c> NativeConstitutiveField<'c> {
         Ok(NativeSharedDriveMode {
             inner: Rc::new(ModeData {
                 surface: s,
+                owner: Some(Rc::clone(&self.owner)),
                 origin: ModeOrigin {
                     root_nodes: self.nodes(),
                     source_occurrences: [ls, rs],

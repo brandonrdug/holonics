@@ -75,6 +75,16 @@ the common component is not identified or recovered. The SDK session exposes the
 condensation. See the [internal-mode return](../research/records/2026-09-07_AC1_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE_GENERATORS.md)
 for the actual conversation mode, source-independent execution and numerical limits.
 
+[established-bounded; measured] `read_material_mode_using(source_at,&mode)` receives an already
+admitted in-body mode through the complete-current material operator. It returns producing and
+current coefficients, mode/full/remainder currents, changes and any actual whole reception.
+`read_pairs` applies the existing native differential to a chosen current ball;
+`unfold_current` keeps the current operator frozen while the mode's generator unfolds. This
+does not assume the field's future learning leaves that map unchanged. A standalone mode still
+unfolds independently, but cannot index another body's columns through copied birth numbers.
+The [material-mode evidence](../research/records/2026-09-07_AC1_THE_SHARED_DRIVE_MODE_REACHES_THE_LEARNED_MATERIAL_CURRENT.md)
+retains the exact scopes and the next productive source construction.
+
 [established-bounded; measured] `NativeConstitutiveField::read_constitutive_source` now reads the
 current local relation at an actual historical source anchor. Native frame transport includes
 both original source branches. Its `ResidentConstitutiveReturn` can enter another native port;

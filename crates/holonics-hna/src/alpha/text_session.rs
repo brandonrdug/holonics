@@ -86,6 +86,18 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
     > {
         Ok(self.field.condense_shared_drive_mode(left, right)?)
     }
+    /// Receive this field's already admitted mode through its actual complete material map.
+    /// This reads the existing operator and does not enact another developmental occurrence.
+    pub fn read_material_mode(
+        &mut self,
+        source: usize,
+        mode: &holonic_engine::native_ecology::constitutive_fibre::NativeSharedDriveMode<'chart>,
+    ) -> Result<
+        holonic_engine::native_ecology::constitutive_fibre::NativeMaterialModeReturn<'chart>,
+        AlphaMaterialError,
+    > {
+        Ok(self.field.read_material_mode_using(source, mode)?)
+    }
     /// Exterior placement at a declared application boundary. This does not enact a symbol.
     pub fn archive_history(&mut self) -> Result<(), AlphaMaterialError> {
         let at = self.field.occurrence_count();

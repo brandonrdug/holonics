@@ -85,6 +85,13 @@ rest/unfold owner executes without the source field. The
 [125-test return](../research/records/2026-09-07_AC1_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE_GENERATORS.md)
 includes actual conversation-model capture through the read-only SDK session wrapper.
 
+[established-bounded; measured] `field/material_transport/complete/mode.rs` and
+`field_material_mode.cuh` receive the existing complete material operator on that mode, keeping
+producing/current cuts, the full source remainder and oriented numerical defects. The same
+differential kernel receives explicit resident ball views; a frozen material contribution can
+unfold without its source field. The [material return](../research/records/2026-09-07_AC1_THE_SHARED_DRIVE_MODE_REACHES_THE_LEARNED_MATERIAL_CURRENT.md)
+records its actual conversation-model use and unchanged text-differential boundary.
+
 [established-bounded; measured] `native_ecology/constitutive_fibre/resident.rs` now owns borrowed
 resident rational-current input and immutable original-fibre returns for the existing local
 relation. `resident_section::record_constitutive_current` and

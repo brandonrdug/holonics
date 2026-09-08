@@ -3,7 +3,10 @@
 //! This is not a semantic classifier, a new exposure loop, or a claim of useful language.
 use holonic_engine::{
     embedding_fiber::ResidentReadout,
-    native_ecology::constitutive_fibre::{NativeSharedDriveMode, NativeSharedDriveModeRest},
+    native_ecology::constitutive_fibre::{
+        NativeMaterialModeComponent, NativeMaterialTransportSource, NativeSharedDriveMode,
+        NativeSharedDriveModeRest,
+    },
     resident_section::{ResidentSurface, TransferCensus},
 };
 use holonics_hna::alpha::checkpoint::SavedTextField;
@@ -60,9 +63,30 @@ fn main() -> Result<(), E> {
                     Ok(mode)=>{
                         let capture_work=work(before,session.field().census());
                         let observed=mode.unfold(0)?.inspect()?;
+                        let material=if session.field().material_transport_source()==Some(NativeMaterialTransportSource::CompleteCurrent){
+                            let before=session.field().census();
+                            let projected=session.read_material_mode(at,&mode)?;
+                            let material_work=work(before,session.field().census());
+                            let before=session.field().census();let unfolded=projected.unfold_current(17)?;
+                            let unfold_work=work(before,session.field().census());
+                            let unfolded_reading=unfolded.inspect()?;
+                            let historical_comparison=if at.checked_add(17).is_some_and(|future|future<session.field().occurrence_count()){
+                                let next=session.read_material_mode(at+17,&mode)?.inspect()?.current_mode;
+                                if next!=unfolded_reading{return Err(holonics_hna::alpha::material::AlphaMaterialError::Apparatus(
+                                    "unfolded mode disagrees at the later actual source under the same current map".into()));}
+                                json!({"source_occurrence":at+17,"same_current_operator":true,"equal":true,
+                                    "scope":"retrospective source transport under the current map, not a held-out forecast"})
+                            }else{json!(null)};
+                            json!({"work":material_work,"reading":projected.inspect()?,"unfold_work":unfold_work,
+                                "current_mode_receiver":projected.read_pairs(NativeMaterialModeComponent::CurrentMode,9)?,
+                                "current_full_receiver":projected.read_pairs(NativeMaterialModeComponent::CurrentFull,9)?,
+                                "current_remainder_receiver":projected.read_pairs(NativeMaterialModeComponent::CurrentRemainder,9)?,
+                                "unfolded_receiver":unfolded.read_pairs(9)?,"unfolded_current":unfolded_reading,
+                                "later_actual_source_comparison":historical_comparison})
+                        }else{json!({"unavailable":"the model has no complete-current material source chart"})};
                         let mut bytes=Vec::new();mode.rest()?.write(&mut bytes)?;
                         return Ok((bytes,json!({"receiving_pair":[left,at],"mode_at_capture":observed,
-                            "capture_work":capture_work,"rejected_candidates":refused,
+                            "capture_work":capture_work,"material":material,"rejected_candidates":refused,
                             "experimental_aperture":"first native-admitted pair proposed by repeated exterior input triples",
                             "field_occurrences_unchanged":session.field().occurrence_count()==occurrences})));
                     }
