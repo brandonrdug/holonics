@@ -14,9 +14,9 @@ catalogue of minor decisions or ask him to repeat a settled ruling.
 [project-postulate] Holonics is a mathematical framework and ontology for situated objects,
 causal composition, information transport and physical realization. Its mathematical research
 develops reusable methods of construction and explanation across mathematical, physical,
-biological and learning systems. HNA is its Holonic Neural Network architecture; Athena is a
+biological and learning systems. HNN is its Holonic Neural Network architecture; Athena is a
 model/ecology; Eros composes and develops it; Soulkiller independently dismantles inherited
-realizations. HNA's product goal is frontier-level usefulness on consumer hardware. The “20W
+realizations. HNN's product goal is frontier-level usefulness on consumer hardware. The “20W
 ideology” directs efficient local learning and reuse, not a literal current-machine power claim. Read
 [the architecture](docs/ARCHITECTURE.md), [Soulkiller](docs/SOULKILLER.md),
 [Athena](docs/ATHENA.md) and [interoperability](docs/INTEROPERABILITY.md) before reassessing
@@ -33,85 +33,37 @@ research, a new subsystem, a qualitative gate or destructive/external permission
 
 ## Pickup and authority
 
-[project-postulate] Brandon's September 7 correction makes generator recovery, group/phase
-transport and Holonic Compression the shared AC1–AC2/acoustic attachment question. Use
-**Preimage Fibre**, as already settled September 2: limited observations constrain compatible
-causes and future conduct; cultivation does not require a perfect inverse, singleton source,
-enumerated candidate population or archive of every raw state. Exact persistence and declared
-reversible codec checks retain their narrower scopes. Read the
-[text/acoustic synthesis](research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md).
-Brandon has resumed the goal after those corrections. Continue the corrected construction;
-the earlier fixed-field corpus run is not the new generative attachment.
+[project-postulate] Brandon's September 8 breadth ruling governs: Holonics develops a reusable
+mathematical and physical framework; its purpose is not exhausted by Athena or Millennium
+endpoints. Recover the established classical ML, softmax/sigmoid, adjoint, reflection, leader,
+fractal-packing and compression constructions before declaring missing theory or founding another
+mechanism. The [framework synthesis](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) connects their actual
+owners and scopes. Native work is paused for the current review; only the roadmap schedules its
+resumption. A universal intelligence theorem or a Millennium solution is not a prerequisite for
+using already-derived local mechanics in a productive construction.
 
-[project-postulate] Brandon's chord clarification preserves reusable class identity separately
-from physical occurrence identity. A class description need not specify one performance; its
-Preimage Fibre and the phase-bearing, temporally ordered relations of its instances remain
-distinct. Text holons admit superposition through actual transport charts. Desktop acoustics is
-optional shared research. Notify Brandon when a committed shared native generator/phase return
-and concrete Metal port boundary make the dependent Mac workflow ready to re-engage.
+[project-postulate] Use **HNN — Holonic Neural Network** in current prose. Preserve existing
+`hna` API/wire identifiers and historical HNA campaign labels as source references; do not silently
+rename serialized artifacts. The main README presents the mathematical framework and experimental
+implementations, with no CLI usage instructions while the product interface is unsettled.
 
-[definition] The [measured conditional phase return](research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
-now supplies that shared primitive and port boundary. Mac work can re-engage on its port and
-acoustic generator studies. The [condition Preimage Fibre](research/records/2026-09-07_AC1_THE_LEARNED_ACTION_RETURNS_ITS_CONDITION_PREIMAGE_FIBRE.md)
-now infers compatible conditions from actual source/return currents, and the
-[joint-family return](research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md)
-transports/refines those families with their domain. The
-[retained-current contact](research/records/2026-09-07_AC1_THE_RETAINED_CONDITION_CURRENT_MEETS_ITS_PREIMAGE_FIBRE.md)
-now has its explicit metric and native two-port response. The
-[internal-current/mode return](research/records/2026-09-07_AC1_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE_GENERATORS.md)
-supplies an actual internal source and shared-drive generator, including a mode from the saved
-conversation model. The [material coupling](research/records/2026-09-07_AC1_THE_SHARED_DRIVE_MODE_REACHES_THE_LEARNED_MATERIAL_CURRENT.md)
-now returns its contribution, remainder and actual operator cuts. The
-[homogeneous phase-moment return](research/records/2026-09-07_AC2_THE_HOMOGENEOUS_MOMENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md)
-is implemented; its actual conversation model still fails useful language. Follow the roadmap's
-AC1–AC2 generative attachment, including Brandon's explicitly authorized derivation, formalization
-and focused review. The [source-boundary record](research/records/2026-09-07_AC1_DERIVATION_IS_PART_OF_THE_GENERATIVE_ATTACHMENT.md)
-states the current question; do not demand a new axiom or repeated ontology without identifying
-a material unresolved choice. The [source-null contextual derivation](research/records/2026-09-07_AC1_THE_SOURCE_NULL_RETURN_DERIVES_ITS_CONTEXTUAL_LIFT.md)
-now supplies a criterion, full map family and bounded actual-data check. The
-[resident return](research/records/2026-09-08_AC1_THE_CONTEXTUAL_SECTION_RETURNS_THROUGH_NATIVE_CONDITION_AND_FIELD_CURRENT.md)
-now conducts it through condition contact and full-current re-entry. The
-[ordinary contextual return](research/records/2026-09-08_AC1_ORDINARY_RECEPTION_CONDUCTS_THE_SOURCE_AND_ITS_AVAILABLE_CONTEXT.md)
-now discovers equal-source reference frames and stages both parameter contacts within ordinary
-reception. Its actual conversation response still fails. Follow AC1–AC2’s contextual-organization
-and productive-continuation obligation. The [material context cotangent](research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_HAS_A_CONTEXT_COTANGENT.md)
-now supplies a certified nonzero source-side receiver on the actual model. The
-[paired producer](research/records/2026-09-08_AC1_THE_PAIRED_PRODUCER_RETURNS_ITS_CURRENT_AND_CONTACT_MORPHOLOGY.md)
-now returns current components and a rank-two morphology covector, with actual-data evidence.
-Continue the native joint constitutive attachment in the existing junction, retaining an evolving
-operative contact map, immutable birth/source standing, prior dependencies and a complete current
-decoder through changing morphology. The cold reference or a current-only substitute is not that
-attachment. The [native staging](research/records/2026-09-08_AC1_OPERATIVE_CONTACTS_STAGE_THEIR_COMPLETE_MAP_AND_CURRENT_ON_DEVICE.md)
-now preserves the complete contact/current carriers and mixed moments on device. The
-[operative field](research/records/2026-09-08_AC1_THE_OPERATIVE_MAP_CONDUCTS_AND_RESTARTS_IN_THE_FIELD.md)
-now conducts births/reactions and publishes/persists that carrier in the same owner. Complete the
-native joint constitutive producer. The [operative source](research/records/2026-09-08_AC1_THE_MATERIAL_SOURCE_FOLLOWS_OPERATIVE_CURRENT_AND_THE_JOINT_CONTACT_HAS_ONE_NORMAL_SOLVE.md)
-now carries changed-contact current and per-return chronology, with a complete joint normal
-reference. Use that coupled response; the new source or private supplied-delta seam does not
-establish learned morphology. Do not repeat the completed pair-selected study or cold derivation. Do not replace enclosures with centres
-or phase labels, or found a separate learner. Retain the carriers used to produce each prediction; later
-condition inference changes the successor rather than rewriting that prediction's history.
+[project-postulate] Generator recovery, group/phase transport and Holonic Compression remain the
+shared text/acoustic question. **Preimage Fibre** retains compatible causes and future conduct
+from limited observations, possibly implicitly; no perfect inverse, singleton cause or archive
+of every raw state is required. Reusable class identity and particular occurrence identity are
+distinct. Lean remains exterior mathematical verification and never enters cultivation/inference.
+The [September 7 synthesis](research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
+retains that chronology and the committed shared generator/Metal port boundary for separate Mac
+research. The latest product and construction status belongs in CONSTRUCTION_STATE, not this contract.
 
-[definition] The [generated-current field ingress](research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
-now supplies the direct resident entry to that field operation, including its input provenance,
-history placement and restart. Its boundary branches remain a partial source chart; do not
-substitute them for complete context when internal currents distinguish the sources.
-Whole-family evidence is not a universal certainty gate on generation. Neither full model is complete.
-
-[project-postulate] Brandon's September 6 synthesis ruling records Athena-alpha as planned but
-unattained. Curated conversation material supports the next native cultivation direction for
-English, code and mathematics. Recent mathematical constructions inform native owners; Lean
-never enters cultivation/inference pipelines. Hardware and modality charts share the native
-recurrence; Apple/MLX and audio implementation follow their separately authorized work.
-
-[project-postulate] Brandon's September 5 contextual-transport correction makes **native HNA
+[project-postulate] Brandon's September 5 contextual-transport correction makes **native HNN
 foundations** the present priority, before further Soulkiller/Gemma-led production. Changed
 coefficients or transport do not establish contextual transport; context is the relevant situated
 charts/channels and conditions, not a token window, cache or appended label. A local descriptor
 is not a global property, and equal wording does not identify a holon across contexts. Read the
 [contextual-transport audit](research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md)
-before resuming the HNA line. Do not substitute an authored classifier, score, scene-ID switch
-or per-language rule for contextual transport inside HNA. Reuse existing native owners; ground-up does not mean no
+before resuming the HNN line. Do not substitute an authored classifier, score, scene-ID switch
+or per-language rule for contextual transport inside HNN. Reuse existing native owners; ground-up does not mean no
 foundations. Inherited-model work is deferred, not universally banned.
 
 1. Read this contract, [CONSTRUCTION_STATE.md](CONSTRUCTION_STATE.md), and the complete
@@ -143,7 +95,7 @@ projections, numerical bounds, source inspection and measurements explicit.
 
 ## Native operation and ownership
 
-[definition] One HNA recurrence is:
+[definition] One HNN recurrence is:
 `occurrence -> local current -> reaction -> emission + successor ecology -> next occurrence`.
 The next operation uses that exact successor. Training/development retains a changed successor;
 inference reads recurrence. A self-emission, user message or application response is an ordinary
@@ -212,6 +164,9 @@ engine.
 - Counts, entropy, loss, accuracy, time and energy are receiver measurements, not substitutes for
   current, lineage, morphology or the full defect. Preserve oriented residuals and relative phase
   before a scalar quotient.
+- An enclosed current is not its numerical centre. A point-current port may not silently consume
+  that centre; retain the admitted family, its receiver scope and the remainder. A plural fibre
+  does not impose a universal certainty gate on generation.
 - The GPU owns the admitted hot native operation. CPU work covers process boundaries, codecs,
   durable I/O and declared observer/reference checks. No production semantic/device-core float
   may determine a committed current, topology, coefficient or branch. Exact exterior float
@@ -229,7 +184,7 @@ engine.
   it may not manufacture the desired answer, select developmental material from an evaluation
   target, or implement a fixture-local learner.
 - Lean is separate mathematical proof/verification apparatus. Do not embed its parser, compiler,
-  kernel, theorem emitter or verdict in any HNA cultivation/inference pipeline. Lean discussions
+  kernel, theorem emitter or verdict in any HNN cultivation/inference pipeline. Lean discussions
   already present in source conversations remain ordinary material. Reuse the mathematical
   constructions through their actual native owners, not through a live proof-assistant binding.
 

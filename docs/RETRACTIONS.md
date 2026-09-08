@@ -6,6 +6,14 @@ root construction state records current implementation scope. Paths in code span
 
 ## Capability and retraction record
 
+[historical; source-inspected] September 8: the NS/Euler review's broad emphasis on missing
+generative theory is narrowed. Existing normalization, classical architecture charts, resident
+nonlinear/adjoint kernels, reflection, leaders, recursive packing and compression were underused
+in its AC1 diagnosis. Their absence from that particular composition does not establish their
+absence from Holonics. The [breadth review](../research/records/2026-09-08_HOLONICS_REJOINS_CLASSICAL_LEARNING_REFLECTION_PACKING_AND_COMPRESSION.md)
+restores those owners without claiming the unfinished product or prescribing a Transformer.
+Current public terminology is HNN; earlier HNA identifiers and campaign records remain historical.
+
 [historical; source-inspected] September 7: the synthesis again used “reconstruction fibre” after
 Brandon had replaced that term with **Preimage Fibre** on September 2 and repeated the correction
 on September 3. The terminology and any implied perfect-inverse/raw-past-retention requirement for

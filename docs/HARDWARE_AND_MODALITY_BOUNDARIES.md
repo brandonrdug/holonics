@@ -229,7 +229,7 @@ unconditionally in [`cuda_refine.rs`](../crates/holonic-engine/src/cuda_refine.r
 [`embedding_fiber.rs`](../crates/holonic-engine/src/embedding_fiber.rs), and
 [`cuda_realizer_search.rs`](../crates/holonic-engine/src/cuda_realizer_search.rs).
 
-[open; source-inspected] The inspected engine/HNA dependency closure has no supported macOS build path: non-Linux
+[open; source-inspected] The inspected engine/HNN dependency closure has no supported macOS build path: non-Linux
 PTX generation is skipped while several PTX-bearing modules and the CUDA mount remain in the
 dependency closure. Documentation, formal sources and exterior data tools remain portable
 repository material; this is a source-derived build obstruction, not an executed Mac check.
@@ -246,7 +246,7 @@ this trait; `NativeTransportScaffold` constructs `CudaRefineExecutor` directly a
 [`scaffold.rs`](../crates/holonic-engine/src/native_spool/scaffold.rs).
 
 [open; source-inspected] Implementing `ExactDeviceExecutor` for another device would not by itself
-port native HNA. The native mount, resident carrier, operation scheduling, multiword arithmetic,
+port native HNN. The native mount, resident carrier, operation scheduling, multiword arithmetic,
 and successor commit still need one coherent backend owner.
 
 ## MLX as an architectural comparison
@@ -262,7 +262,7 @@ implementations.
 
 [established-bounded; source-inspected] MLX's documented unified-memory model lets CPU and GPU
 operations address shared arrays without an explicit device move, while its scheduler inserts
-dependencies between streams. Shared storage does not establish HNA identity, lineage, or a
+dependencies between streams. Shared storage does not establish HNN identity, lineage, or a
 semantic successor, and the absence of an explicit copy does not establish zero synchronization
 or energy cost.
 

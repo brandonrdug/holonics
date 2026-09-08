@@ -30,25 +30,26 @@
 //! **`ℚ⁺` is the free abelian group on the primes.** That is the fundamental
 //! theorem of arithmetic stated as a group law, and it says the multiplicative
 //! chart of the positive rationals has the primes as its generators. `log₂` is
-//! the isomorphism onto the additive chart, a ℚ-vector space with `{log₂ p}` as a
-//! basis — and ℚ-linear independence of that basis is what makes the additive
-//! chart's zero test exact.
+//! an isomorphism onto the additive subgroup with integer coefficients in `{log₂ p}`.
+//! Its ℚ-linear span additionally admits rational powers of primes, which need
+//! not be rational. ℚ-linear independence makes the symbolic zero test exact;
+//! integral prime valuations are the rational-output domain of `exponentiate`.
 //!
-//! So **[`SymbolicSurprisal`] is not a Shannon organ. It is the additive chart of
-//! `ℚ⁺`**, and `−log p` is one receiver's reading of it. This module is the
-//! inverse transition:
+//! **[`SymbolicSurprisal`] supplies an additive symbolic chart containing
+//! `log₂(ℚ⁺)`**; `−log p` is one receiver's reading. This module implements the
+//! inverse transition on the integral prime-valuation subdomain:
 //!
 //! ```text
 //!   additive chart          log₂           multiplicative chart
-//!   Σ q_k · log₂ p_k     <---------->      Π p_k^{q_k}
-//!   ℚ-linear form           exp            an exact rational
+//!   Σ n_k · log₂ p_k     <---------->      Π p_k^{n_k}
+//!   integral valuations     exp₂           an exact rational
 //!
-//!   a + b                                  exp(a) · exp(b)
+//!   a + b                                  exp₂(a) · exp₂(b)
 //! ```
 //!
 //! **The homomorphism law is the whole content**, and `the_additive_chart_is_carried_to_the_multiplicative_one_by_a_homomorphism`
-//! is its check. A statistic has no such law; a chart transition is exactly a map
-//! that has it.
+//! is its check. The algebraic chart law is independent of whether a receiver
+//! later uses that construction statistically.
 //!
 //! A **fractional** coefficient does not fail — it lands in a finer chart, the
 //! algebraic extension, which is what a root is. This module refuses it by name
@@ -68,25 +69,24 @@
 //! it is the only division.
 //!
 //! So softmax factors as **a chart transition, then a gauge fixing.** Its
-//! statistical use is one receiver's face of that; the content is the rebase. By
-//! this project's own law the transition is the invariant and the normalisation
-//! is the absolute-volume violation — *every measure must be a ratio against a
-//! declared null so the Jacobian cancels*. **Softmax divides by `Z`. This module
-//! holds the pair.**
+//! statistical use is one receiver's face of that. Normalization declares total
+//! mass one without changing any pairwise ratio; it is a valid receiver chart,
+//! not a forbidden absolute measure. **This module holds the ratio family and
+//! supplies the normalized face when its receiver is declared.**
 //!
-//! ## Temperature is a root, and `T → 0` is the chooser
+//! ## Temperature changes the ratio chart
 //!
 //! `softmax(x/T)` sends every ratio to `ratio^{1/T}`, so **temperature is a root
 //! extraction on the ratio** — a rebase of the winding, not a new quantity, and
 //! the same operation that carries a fractional coefficient into the finer chart.
 //! `T = 1` is the identity; `T → ∞` sends every ratio to one, which is no
-//! distinction at all; and **`T → 0` sends ratios to zero or infinity, which is
-//! argmax.**
+//! distinction at all. As `T → 0+`, ratios tend to zero, one or infinity according
+//! to the ordering of their scores. **The normalized face concentrates on the
+//! maximizing set**, uniformly there for a finite population of fixed scores;
+//! it selects one member only when the maximizer is unique.
 //!
-//! That limit is exactly where softmax becomes a governor, and the standing ban
-//! on a privileged scalar chooser is the ban on taking it. **Nothing here takes
-//! it.** Every member's ratio against every other is returned and none is
-//! discarded.
+//! This owner retains finite positive reciprocal temperatures and every member's
+//! ratio against every other. **It performs no winner selection.**
 //!
 //! ## What is returned
 //!

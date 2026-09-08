@@ -1,5 +1,11 @@
 # The NS/Euler review exposes the generator gap in AC1
 
+[historical] Brandon's subsequent September 8 clarification broadens this review. The
+[classical-learning/reflection/packing synthesis](2026-09-08_HOLONICS_REJOINS_CLASSICAL_LEARNING_REFLECTION_PACKING_AND_COMPRESSION.md)
+corrects this record's overly narrow diagnosis: several needed mechanisms already have formal
+and native owners outside AC1. The mathematics below stands at its stated scope; a universal
+learning-law theorem or a Millennium endpoint is not a prerequisite imposed on production.
+
 [project-postulate] Brandon's September 8 instruction pauses machine-learning construction and
 pivots into mathematics, beginning with [OpenAI's NavierStokesAndEuler](https://github.com/openai/NavierStokesAndEuler).
 This review supersedes the immediate joint-kernel implementation instruction. It does not close

@@ -1,90 +1,102 @@
 # Holonics
 
-[project-postulate] **Holonics is a mathematical framework and ontology for situated objects,
-causal composition, information transport and physical realization.** Its central mathematical
-object is the holon: an addressed occurrence population with source and target ports, a receiver,
-and the full fibre behind its returned face. The framework develops reusable ways to construct,
-explain and compute with mathematical, physical, biological and learning systems.
+[project-postulate] **Holonics is a mathematical framework and ontology for causal composition,
+information transport and physical realization.** It develops a common language for understanding
+how situated things form, interact, change and become observable. Mathematics, computation,
+physics and living systems are subjects of that investigation.
 
-[definition] **HNA** is the Holonic Neural Network architecture within Holonics, implemented in
-Rust with resident CUDA execution. Its product objective is frontier-level usefulness on consumer
-hardware through efficient, continuous learning and reusable local structure—the project's
-“20W ideology”. Lean carries formal mathematical constructions across the framework.
+The ambition is a reusable calculus: methods that make difficult mechanisms understandable and
+constructible across domains. Research on fluid dynamics, geometry, number theory, learning and
+information is undertaken for the tools and explanations it yields. A theorem, counterexample or
+working implementation becomes material for further inquiry; a solved problem is not the end of
+the framework.
 
-**Athena** is a native model/ecology. **Eros** forms and refines it through recurrent operation.
-**Soulkiller** dismantles supported pretrained realizations into reusable native material.
-Training, inference, model persistence and export belong to one explicit framework lifecycle.
+## The perspective
 
-## Start here
+[project-postulate] A **holon** is a causally situated composite with its own internal relations
+and observable faces. Holons compose other holons. The framework treats information as physically
+realized interaction: general relativity, quantum states, waves and material dynamics are part of its subject,
+with their actual laws and conditions. Its ambition is a unified account; the repository records
+which constructions have been derived, implemented or measured, and which remain research.
 
-- [Mathematical framework and executable architectures](docs/ARCHITECTURE.md)
-- [The mathematics tablet](docs/canon/THE_MATHEMATICS_TABLET.md)
-- [Moving frames, singularities and the RH research strategy](docs/plans/THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md)
-- [Soulkiller: intake, excitation, dismantling and model-family support](docs/SOULKILLER.md)
-- [Athena/HNA: training, inference, requests and artifact scopes](docs/ATHENA.md)
-- [Native HNA: live current sessions and the independent application](docs/NATIVE_HNA.md)
-- [Interoperability: Safetensors, ONNX and executable model recompilation](docs/INTEROPERABILITY.md)
-- [Build and development guide](docs/DEVELOPMENT.md)
+[definition] A **face** is what a particular receiver can distinguish. It does not identify the
+entire object or its origin. `2 + 2` and `2²` share the numerical face `4`, while retaining different
+constructions. Comparing those results requires a common chart; it does not merge their causal
+histories. Likewise, a chord class can recur in different performances without making those
+performances one occurrence.
 
-## Run the current native interface
+[project-postulate] The framework's working commitments are:
 
-[project-postulate] Current construction prioritizes **native HNA foundations and contextual
-transport**, before further Soulkiller/Gemma-led production. See the
-[contextual audit](research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md).
+- **Causal origin.** Nothing enters as an unexplained, self-originating object. Composition retains
+  the actual passages and their orientation.
+- **Receiver-relative measurement.** A value is the result of a comparison in a chart. Integers,
+  magnitudes, probabilities and coordinates are faces, not context-free identities.
+- **No floats in native mathematical conduct.** Exact ratios, symbolic generators and certified
+  series retain the remainder of an expansion. A floating-point codeword may be an exterior face;
+  it cannot silently become the underlying holon or decide native conduct.
+- **Bit-purity.** Computational realizations operate through explicit bit encodings and exact
+  operations. A byte is a packet of bits; its file format does not determine semantic identity.
+- **Phase and composition.** Relative orientation, superposition and ordered transport survive
+  until a declared receiver takes a quotient.
+- **Preimage Fibres.** Limited observations constrain compatible causes and future behavior.
+  Learning need not recover a unique original algorithm or a perfectly reversible past.
 
-```sh
-cargo build -p holonics-workbench --bin holonics
-target/debug/holonics hna --help
-target/debug/holonics hna native-session applications/holonics-workbench/examples/native/phase-seed.json --input applications/holonics-workbench/examples/native/current-requests.jsonl --checkpoint .local/artifacts/native-example.hna
-target/debug/holonics hna wave-control applications/holonics-workbench/examples/native/wave-control.json --format json
-```
+## A toolkit that connects disciplines
 
-[established-bounded; measured] The ground-up phase ecology now has a public Rust/JSONL interface
-and an independent current-compensation application. Actual local development changes later
-receiver conduct, with explicit outside-domain/plural readings, live recharting and owned source
-handles. The [native guide](docs/NATIVE_HNA.md) states the local rational-linear family and recipes.
-Native checkpoints preserve the whole phase ecology and stream, with source/frame history and
-outstanding handles; paired application checkpoints retain the independent world and pending
-interaction too. NCF0--NCF4 returned the scoped foundation, process continuation and release-build
-consumer-resource evidence. This is not a language model or a general-context capability claim.
+[definition] **Holonic Compression** changes the representation of a construction together with
+its decoder, retained distinctions and computational cost. A compact generator may describe an
+unbounded family of outputs; a finite unfolding carries its remainder. Recursive restriction and
+rebase supply the structure of **fractal packing**, while **integration by reflection** develops
+boundary responses and the interior consequences they determine. Leader growth and later return
+describe how conduct forms a path that subsequent interaction can reuse.
 
-[established-bounded; source-inspected] The earlier full-operator path executes the supported
-Gemma text realization and restricted Soulkiller bodies on CUDA. The API retains one successor
-session across ordered occurrences and can apply developmental returns through previously
-learned overlays. `hna infer` returns one selected face; `hna train` returns a developmental
-run receipt. Full checkpoints, backpressured sessions and paired text/model continuation are
-available through `HnaModel`, `HnaTextApplication` and `hna session` at their declared scopes.
-Their storage and numerical results do not establish contextual learning or frontier-level
-quality. The tied-head experiment is archived, not the current foundation route.
+[established-bounded; source-inspected] The repository also develops classical machine learning
+within this account. Softmax has a ratio/gauge interpretation and a weighted-Laplacian return;
+sigmoid is its binary restriction. Convolution, graph transport, attention and state-space
+recurrence have explicit mathematical charts. Exact normalization, nonlinear reactions, adjoints,
+boundary elimination and generator reuse have implementations at their documented scopes.
+The [mathematical synthesis](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) connects these owners and
+the remaining integration work.
 
-For Rust clients, `crates/holonics` exposes `holonics::hna`, `holonics::soulkiller` and
-`holonics::interop`. Existing Safetensors/ONNX package exports preserve Holonics artifacts;
-compilation into standard executable model architectures has its own [contract](docs/INTEROPERABILITY.md).
+[project-postulate] The research stance is exploratory. A failed construction can expose a
+missing distinction, a violated hypothesis or a better representation. The purpose is to make
+mechanics clearer and to develop useful tools, including when a particular attempted route fails.
 
-[definition] Athena-alpha remains a planned, unattained product. The
-[September 6 synthesis](research/records/2026-09-06_REPOSITORY_SYNTHESIS_AND_PORTABLE_EVIDENCE.md)
-joins the prepared conversations, recent mathematics and native owners, and imports the needed
-research testimony into this repository. Pickup needs no external memory database. The
-[hardware/modality guide](docs/HARDWARE_AND_MODALITY_BOUNDARIES.md) records the current Linux/CUDA
-build boundary and future Apple/audio composition.
+## Implementations in this repository
 
-## Repository map
+[definition] The software is one realization of the framework:
 
-| Directory | Purpose |
+| Implementation | Role |
 |---|---|
-| [crates](crates/README.md) | Live Rust libraries and public framework API |
-| [applications](applications) | CLI/workspace and standalone research tools |
-| [accelerators](accelerators/README.md) | Independent device-only targets |
-| [formal](formal/README.md) | Live Lean projects |
-| [docs](docs/ARCHITECTURE.md) | Architecture, interfaces, doctrine, active plans and navigation |
-| [research](research/README.md) | Dated evidence, experiments, papers and notebooks |
-| [archive](archive/README.md) | Completed plans and frozen historical bodies |
-| [tools](tools/README.md) | Optional helpers used for relevant work |
+| **Holonic Engine** | Exact carriers, causal relations, transport, reactions and device execution |
+| **HNN — Holonic Neural Network** | The neural architecture explored within Holonics |
+| **Eros** | Composition and development of a continuing neural ecology |
+| **Athena** | A model/ecology cultivated through those operations |
+| **Soulkiller** | Analysis and dismantling of supported inherited models into reusable native material |
 
-[definition] [CONSTRUCTION_STATE.md](CONSTRUCTION_STATE.md) records the current position;
-[the roadmap](docs/plans/THE_ROADMAP.md) orders construction. [AGENTS.md](AGENTS.md) is the
-shared agent contract. History and retired plans do not silently schedule new work.
+[open] **Eros and Athena are experimental and have not attained the intended useful, general
+learning product. Athena-alpha remains unfinished.** Bounded native execution, persistence,
+normalization and model-dismantling results retain their own evidence scopes. They do not make
+the prototypes a production-ready assistant.
 
-Use the [owner map](docs/ARCHITECTURE_MAP.md) for Lean–Rust–CUDA relations, the
-subject guides and dated repository evidence for research navigation, and the
-[repository/recovery guide](docs/REPOSITORY.md) for relocated paths and backups.
+[definition] Current prose uses **HNN**. Existing source identifiers and historical campaign
+labels may still contain `hna` or `HNA`; these remain references to those implementations and
+records. Lean provides separate mathematical verification and never runs inside cultivation or
+inference pipelines.
+
+## Read and explore
+
+- [The mathematics tablet](docs/canon/THE_MATHEMATICS_TABLET.md) — foundations and subject tablets
+- [Mathematics and native conduct](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) — synthesis across research and implementation
+- [Architecture](docs/ARCHITECTURE.md) — framework, implementations and responsibilities
+- [Formal mathematics](formal/README.md) and [research](research/README.md) — proofs, derivations, experiments and papers
+- [Owner map](docs/ARCHITECTURE_MAP.md) — navigation between mathematical and executable sources
+- [Construction state](CONSTRUCTION_STATE.md) and [roadmap](docs/plans/THE_ROADMAP.md) — present position and ordered work
+- [Epistemic grades](docs/canon/EPISTEMIC_GRADES.md) — how to read the scope of a claim
+- [Repository guide](docs/REPOSITORY.md) — libraries, applications, accelerators and historical material
+
+## License
+
+[definition] Holonics is available under either the [MIT License](LICENSE-MIT) or the
+[Apache License, Version 2.0](LICENSE-APACHE), at your option, matching the workspace's existing
+license declaration. Material carrying separate third-party notices retains those terms.

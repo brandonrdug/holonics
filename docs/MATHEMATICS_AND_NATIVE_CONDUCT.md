@@ -1,9 +1,149 @@
 # Mathematics and native conduct
 
-[definition] This note joins recent moving-frame, Navier–Stokes, heat-current and Riemann-source
-work to live native HNA owners. It records reusable relations and grades without scheduling
-construction or promoting mathematics into a product capability. Source was inspected at
-`6f547c4a`; formal grades below retain the cited records' check scopes, without rerunning proofs.
+[definition] This note connects Holonics' causal ontology, classical machine-learning charts,
+normalization, reflection, recursive packing and compression with its physical and mathematical
+research. It records reusable relations and their actual implementation scopes. The September 8
+breadth review inspected source at `ab5251a6`; the earlier fluid/RH sections retain their cited
+formal receipts and the preceding inspection at `6f547c4a`.
+
+## One framework, several realizations
+
+[project-postulate] Brandon's September 8 clarification places the framework first. Research
+develops a calculus of causal construction and receiver-relative comparison that can explain and
+support engineering across mathematics, computation, physics and biology. HNN, Eros, Athena and
+Soulkiller are implementations within that work. Neither their product milestones nor the solved
+status of a Millennium problem is its purpose or endpoint. Physical realizations carry actual
+quantities, constitutive laws, boundaries and measurement conditions.
+
+[definition] A numerical equality is an equality in a receiver chart. The `4` returned by `2+2`
+and the `4` returned by `2^2` share that face; their causal constructions remain distinct. An
+integer is a measurement face as much as a floating-point codeword is. Exact native arithmetic
+preserves the declared construction, generator and remainder rather than making a scalar the
+whole object. Bit-purity concerns the explicit computational realization; it does not make a
+machine word an intrinsic semantic identity.
+
+## Classical learning already supplies useful mathematics and conduct
+
+[proved-derived] For a finite admitted population and beta>0, let
+
+```text
+r_ij=exp(beta*(s_i-s_j)),       p_i=exp(beta*s_i)/sum_j exp(beta*s_j).
+```
+
+Then `r_ij*r_jk=r_ik`, and a common additive shift leaves both ratios and p unchanged.
+Differentiating the numerator and denominator gives
+`dp_i=beta*p_i*(ds_i-sum_j p_j*ds_j)`. Hence
+
+```text
+J=beta*(diag(p)-p p^T),   J*1=0,
+v^T J v=(beta/2)*sum_ij p_i*p_j*(v_i-v_j)^2.
+```
+
+Normalization therefore retains a complete ratio family while forgetting the common additive
+origin. Its local return is a weighted graph Laplacian. Sigmoid is the two-member restriction,
+`softmax(a,b)_1=sigmoid(a-b)`. Neither operation requires random sampling or a privileged winner.
+
+[established-bounded; source-inspected] Formal owners are
+[`HolonicAdjointNormalization`](../formal/elementary-holonics/ElementaryHolonics/Computation/HolonicAdjointNormalization.lean)
+(`face_add_common`, `laplacianReturn`, `quadratic_laplacianReturn`,
+`sigmoid_is_binary_normalized_exponential`) and
+[`HolonicArchitectureCharts`](../formal/elementary-holonics/ElementaryHolonics/Computation/HolonicArchitectureCharts.lean).
+The latter constructs attention as input-conditioned contact, convolution as shared
+translation-relative transport, graph networks as incident message transport, and state-space
+models as retained recurrence with an observation map. Those mathematical constructions do not
+require the neural ecology to adopt an entire Transformer or any other fixed architecture.
+
+[established-bounded; source-inspected] These ideas also have executable owners.
+[`exponentiated_ratio.rs`](../crates/holonic-engine/src/exponentiated_ratio.rs) carries a ratio
+cocycle and exact rational normalization in its symbolic-log domain. General certified
+exponentials, normalized contact and nonlinear reactions already run in
+[`exact_resident_section.cu`](../crates/holonic-engine/kernels/exact_resident_section.cu).
+[`exact_resident_adjoint.cuh`](../crates/holonic-engine/kernels/exact_resident_adjoint.cuh)
+contains `section_receiver_return` and `section_contact_adjoint_queries`, including the
+normalized-exponential return and contact derivatives. Their source-specific comparison,
+numeric grain and deposit rules retain their earlier scopes; they are not installed as AC1's
+general contextual learner. A search for familiar names alone misses these semantic owners.
+
+[definition] The no-float rule preserves exp, log, roots, normalization and nonlinear response
+through exact symbols or certified series. It does not prohibit their mathematics. The ban on
+an authored relevance classifier does not ban an actual contact potential or a normalized
+receiver. A source-specific next-token target, codec grain or inherited head remains a declared
+application chart; it is not silently copied into the native ontology.
+
+## Reflection, leaders and recursive packing belong together
+
+[proved-derived] For positive diagonal capacities C, nonnegative diagonal conductances W,
+incidence d and tau>=0,
+the finite diffusion matrix `M=C+tau*d^* W d` admits an exact boundary reduction. Partition
+the unknowns into boundary b and interior i. Elimination gives
+
+```text
+S=M_bb-M_bi*M_ii^-1*M_ib,
+S*phi_b=f_b-M_bi*M_ii^-1*f_i,
+phi_i=M_ii^-1*(f_i-M_ib*phi_b).
+```
+
+These identities follow by solving the interior row and substituting into the boundary row.
+They preserve the source contribution as well as the boundary operator. For recurrence,
+`f=C*phi_previous+input` includes the retained interior standing; the static boundary map alone
+does not erase that memory.
+
+[established-bounded; source-inspected] This realization of integration by reflection is owned
+by [`diffusion.rs`](../crates/holonic-engine/src/diffusion.rs), with its Schur transfer and
+reconstruction certificate; [`sheaf_diffusion.rs`](../crates/holonic-engine/src/sheaf_diffusion.rs)
+retains typed local restriction maps. The same solve gives a discrete state-space chart
+`phi_next=M^-1*C*phi_previous+M^-1*input`. The current paired-junction graph reflection is
+another declared local law; it is not the entirety of integration by reflection.
+
+[established-bounded; source-inspected] In
+[`leader_quadrature.rs`](../crates/holonic-engine/src/leader_quadrature.rs), local material founds
+an extension and later conduct rides its retained germ. `LocalJet::rebase`, `LeaderLaw`,
+`ScaleWitness` and `integrate_by_leaders` preserve exact restriction/rebase and the declared reach.
+The owner proves no general atmospheric lightning or arbitrary language law. The physical
+[leader/return research](../research/records/2026-07-17_THE_LEADER_GROWS_THE_CHANNEL_THE_RETURN_TRAVELS_THE_FOUND_PATH.md)
+retains the changing medium, branches, attachment and later current. An arc's causal path is
+more information than its endpoints or accumulated integral.
+
+[established-bounded; source-inspected] Formal
+[`FractalPacking`](../formal/elementary-holonics/ElementaryHolonics/Foundation/FractalPacking.lean)
+constructs ordered rational child restrictions with exact scale, containment and sibling
+separation. Left/right order changes the resulting cell. Its Cantor interval is a bounded
+geometric realization of the reusable restriction/rebase law, not a prescribed HNN topology.
+The [hexis tablet](canon/TABLET_THE_HEXIS.md#9-lattice-crystal-fractal-and-lightning-are-distinct-morphology-regimes)
+connects repeating laws, growing populations, phase transport and emitted generators.
+
+[interpretation] Their composition is: an actual local difference extends a path; its changed
+boundary determines a returned current; restriction and rebase expose reusable local laws;
+compression carries those laws with an executable decoder and the distinctions required by
+future receivers. The proposed source/target maps are the retained path, its boundary response,
+its child restrictions and the receiver quotient. Each transfer must preserve the actual return.
+A changed boundary response, unequal restricted conduct or separating future history falsifies
+the corresponding compression. This gives concrete composition work, not a new subsystem name.
+
+## What the broader review changes about AC1
+
+[established-bounded; source-inspected] AC1 currently composes phase transport, contextual
+material moments, paired reflection, operative current and source history. It also has a real
+bounded shared-drive generator quotient `q T_i=-q` and its material contribution; claiming that
+it contains no compression would erase that result. It has not composed the complete
+normalization/receiver-return, leader growth, recursive restriction and future-receiver
+compression machinery into the general conversation product. The historical lexical contact
+graph is separately scoped and does not supply a replacement emitter.
+
+[definition] The [dynamic receiver criterion](../formal/elementary-holonics/ElementaryHolonics/Computation/MachineLearningChart.lean)
+and [`receiver_exact_compression.rs`](../crates/holonic-engine/src/receiver_exact_compression.rs)
+already distinguish a present face from future-equivalent conduct. A compressed presentation
+owes that distinction; ordinary learning from limited data does not require exhaustive histories
+or unique source recovery. The receiver-exact finite-state apparatus is one realization, not
+the only representation of a Preimage Fibre.
+
+[interpretation] The preceding NS review diagnosed the narrow AC1 candidate as if the missing
+production mathematics were largely unexplored. That was too broad. Several essential parts
+already have formal and native owners. The next implementation decision should compare and
+compose those parts at their actual ports, keeping a concrete absent relation visible, rather
+than demand a universal adequacy theorem or a Millennium endpoint before trying productive
+learning. The [breadth review](../research/records/2026-09-08_HOLONICS_REJOINS_CLASSICAL_LEARNING_REFLECTION_PACKING_AND_COMPRESSION.md)
+records this correction and the publication changes.
 
 [definition] The [September 8 NS/Euler review](../research/records/2026-09-08_THE_NS_EULER_REVIEW_EXPOSES_THE_GENERATOR_GAP_IN_AC1.md)
 adds the external theorem-scope comparison and an exact transported-phase Euler generator.
@@ -14,7 +154,7 @@ kernel-checked here. Machine-learning construction is paused for this mathematic
 
 ## Standing distinction
 
-[definition] The native HNA foundation is the bounded local rational-linear phase ecology owned by
+[definition] The native HNN foundation is the bounded local rational-linear phase ecology owned by
 [`NativeConstitutiveEcology`](../crates/holonic-engine/src/native_ecology/constitutive_fibre.rs)
 and exposed through [`NativeSession`](../crates/holonics-hna/src/native.rs). It forms relations
 from actual paired currents, retains outside-domain and plural readings, and advances one owner.
@@ -233,7 +373,7 @@ remaining arithmetic sign is still open. See the
 [DB5 record](../research/records/2026-09-03_DB5_THE_LAST_PORT_IS_DISCHARGED_RH_IS_LAMBDA_DN_EQUALS_ZERO_WITH_NO_PORT_AND_THE_TREE_TIME_IS_THE_STANDARD_TIME_OVER_FOUR.md)
 and [MFR2 record](../research/records/2026-09-04_MFR2_THE_FOLDED_SOURCE_RETURNS_EVERY_HEAT_TIME_WITH_A_GAUSSIAN_REMAINDER_AND_ZERO_COUNT_RECEIVERS.md).
 
-[definition] The reusable HNA consequence is source/tail/receiver robustness: preserve the
+[definition] The reusable HNN consequence is source/tail/receiver robustness: preserve the
 complete source population, oriented remainder, receiver domain, and conditions for commuting
 finite projection. A zero count, symmetry, threshold, or proof equivalence remains a receiver
 result, not a generic neural theorem.

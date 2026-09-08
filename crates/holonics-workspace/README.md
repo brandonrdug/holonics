@@ -1,7 +1,7 @@
 # Holonics persistent snapshot workspace
 
 This library is the presentation-independent boundary for the earlier native circulation/snapshot
-artifact family under an explicit root. The full-operator HNA interface is
+artifact family under an explicit root. The full-operator HNN interface is
 [`holonics::hna`](../holonics-hna/README.md); its run receipt is not one of these snapshots.
 
 It composes existing owners for:

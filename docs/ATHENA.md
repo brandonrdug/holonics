@@ -1,4 +1,4 @@
-# Athena and the HNA training/inference interface
+# Athena and the HNN training/inference interface
 
 [definition] Athena is one continuing native ecology: its constitutive morphology, current,
 incidence, chronology, lineage and admitted receiver domain. Eros is the composition and recurrent
@@ -8,7 +8,7 @@ the application implementations are in [holonics-hna](../crates/holonics-hna/REA
 ## Athena-alpha and the next cultivation
 
 [definition] The [Athena-alpha blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
-is authorized through completion and resumed after Brandon's September 7 corrections. It uses the
+is authorized through completion and currently paused for Brandon's September 8 framework review. It uses the
 prepared conversations and existing native owners, and requires the actual useful model, interface
 and integrated evidence.
 
@@ -183,8 +183,8 @@ available for consumers needing complete emitted interval sections or interactiv
 | Artifact | Meaning and current scope |
 |---|---|
 | Native restricted SKE rest | Executable inherited class/extent material, with declared domain and remainder. |
-| HNA run receipt | Evidence of a completed session; it is **not a trained checkpoint**. |
-| Earlier inherited-operator HNA checkpoint | Actual full-session state and integer factor codewords, with an explicit pinned native-base dependency; process-separated remount and further development returned in HNP3. The dependency-free native phase v1/v2 artifacts are documented separately above. |
+| HNN run receipt | Evidence of a completed session; it is **not a trained checkpoint**. |
+| Earlier inherited-operator HNN checkpoint | Actual full-session state and integer factor codewords, with an explicit pinned native-base dependency; process-separated remount and further development returned in HNP3. The dependency-free native phase v1/v2 artifacts are documented separately above. |
 | Earlier `NativeCirculationSnapshot` / `NativeMorphologyArtifact` | The existing persistent workspace's exact package/snapshot family. It has a specialized lifecycle and does not silently contain the full operator's device overlays. |
 | Standard executable model | Target architecture, parameters, configuration/codecs and validated runtime behavior; see [interop](INTEROPERABILITY.md). |
 
@@ -355,7 +355,7 @@ degraded into repetition, then exceeded the 126-octave carrier boundary during t
 The paired artifact preserved that real interruption. The same native text pipeline with the
 explicit fixed-morphology comparison (`observe`, not the productive default) returned coherent
 prose through 64 cycles; a fresh process then continued its saved text. That comparison is not a
-replacement HNA learning lifecycle and does not close HNP4.
+replacement HNN learning lifecycle and does not close HNP4.
 
 [proved-derived; formal-checked] The existing rectangular-return law admits a reciprocal scalar
 specialization with sum `(1 + eta)^n * (a + b)`. Thus positive current and a correct adjoint do not
@@ -380,7 +380,7 @@ contains the control, resource boundary and reproduction command.
 [historical; source-inspected] The archived `from_native_rest_with_boundary_contact` experiment
 compares selected/received addresses through an inherited tied map and applies a persistent
 map word at its latent input port. The [contextual audit](../research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md)
-withdraws its promotion into native HNA foundations. It supplies no contextual applicability
+withdraws its promotion into native HNN foundations. It supplies no contextual applicability
 relation for that globally applied word. Zero address contrast is zero at that receiver, not
 proof of no relevant internal difference. Its uncommitted API and CLI promotion were removed;
 the [recoverable draft](../archive/experiments/2026-09-05-tied-next-arrival/README.md), finite

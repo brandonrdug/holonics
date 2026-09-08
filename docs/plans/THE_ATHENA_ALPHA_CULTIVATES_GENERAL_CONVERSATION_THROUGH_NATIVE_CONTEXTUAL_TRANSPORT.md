@@ -2,13 +2,13 @@
 
 **Authority:** Brandon's September 6 instruction to design and deposit this blueprint, update the
 roadmap and position, then immediately construct and complete it as a goal.
-**Status:** paused by Brandon on September 8 for the NS/Euler mathematical review; AC0 returned,
+**Status:** paused by Brandon on September 8 for the broader framework synthesis; AC0 returned,
 AC1 unfinished and AC2 language probes failed. **Order:** [the roadmap](THE_ROADMAP.md).
 **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 
 ## 1. The required product
 
-[project-postulate] Athena-alpha is a useful, continuing native HNA cultivated from the actual
+[project-postulate] Athena-alpha is a useful, continuing native HNN cultivated from the actual
 Claude/Codex conversations: it responds in general English, works with code and mathematics,
 uses the relevant circumstances of an exchange, and develops through subsequent ordinary
 occurrences. Its model, learned text-codec conduct, retained contextual organization and live
@@ -332,6 +332,10 @@ still required.
 
 [definition] The native joint constitutive-return producer is paused for the
 [NS/Euler and generative-law review](../../research/records/2026-09-08_THE_NS_EULER_REVIEW_EXPOSES_THE_GENERATOR_GAP_IN_AC1.md).
+The subsequent [breadth review](../../research/records/2026-09-08_HOLONICS_REJOINS_CLASSICAL_LEARNING_REFLECTION_PACKING_AND_COMPRESSION.md)
+recovers the already-owned classical normalization/adjoint, reflection, leader, packing and
+compression mechanisms. Compare and compose those owners before declaring another missing
+learning law; no universal adequacy theorem or Millennium solution is an added production gate.
 The exact tangent reference does not establish the finite nonlinear return or an adequate
 generator-recovery law. Retain the actual discrepancy, producing maps, metrics, source/reference
 currents, prior dependencies and chronological transfer as the candidate's mathematical data.
@@ -518,7 +522,7 @@ retrieval, lower the product standard to a fixture or call an interrupted run an
 ### AC5 — Usable consumer release
 
 [definition] Deliver the public Rust interface and CLI for fresh cultivation, resumption, model
-inspection and continuing text conversation. Compose the existing HNA streaming/publication
+inspection and continuing text conversation. Compose the existing HNN streaming/publication
 owners; a public `alpha` interface is packaging over the native owner, not another engine.
 Provide exact recipes, the actual private model location, portable native artifact requirements
 and a concise report of capability and remaining scope.

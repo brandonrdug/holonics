@@ -6,7 +6,7 @@ apparatus; they are not dependencies that schedule native inference.
 
 ## Rust and CUDA
 
-The current native engine/HNA build is Linux/CUDA-bound, including generated PTX and CUDA
+The current native engine/HNN build is Linux/CUDA-bound, including generated PTX and CUDA
 linkage. A Mac checkout does not yet provide an executable engine backend; see
 [hardware and modality boundaries](HARDWARE_AND_MODALITY_BOUNDARIES.md) for the exact dependency
 seam and MLX comparison. Repository documentation and exterior data tools are independent of

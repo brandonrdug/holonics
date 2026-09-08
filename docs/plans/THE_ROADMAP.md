@@ -11,7 +11,7 @@ contracts and records preserve their completed scope; their old imperatives sche
 2. Read [epistemic grades](../canon/EPISTEMIC_GRADES.md) and consult the
    [universal owner catalog](../ARCHITECTURE_MAP.md).
 3. For Eros/Athena/Soulkiller, use AGENTS.md's orientation/retraction tier, the relevant latest
-   direct messages, and the HNA and SKE contracts below. Read the exact source owners being changed.
+   direct messages, and the HNN and SKE contracts below. Read the exact source owners being changed.
    The spine, reasoning-cycle, hexis, operations, manifold and surface-path tablets supply
    doctrine; their dated capability and world-return prose is subject to the recorded corrections.
 4. For the RH line, use the FT, RT and DB contracts below and their named formal owners. Keep
@@ -20,23 +20,36 @@ contracts and records preserve their completed scope; their old imperatives sche
    reread every completed campaign, rerun unchanged expensive receipts, or reconstruct historical
    capability just to start the next authorized repair.
 
-## Active mathematical review: NS/Euler and the AC1 generator gap
+## Framework synthesis and publication
 
-[project-postulate] **Brandon's September 8 instruction pauses machine-learning construction.**
-Review [OpenAI's NS/Euler construction](https://github.com/openai/NavierStokesAndEuler), its actual
-theorem scopes and the mathematics missing from AC1 before returning to the machine. The
-[first review and exact phase-generator derivation](../../research/records/2026-09-08_THE_NS_EULER_REVIEW_EXPOSES_THE_GENERATOR_GAP_IN_AC1.md)
-records the source revision, verification limits, failed language product and preserved draft.
-AC0 is complete; AC1 is unfinished; AC2 has failed probes; AC3 has bounded persistence apparatus;
-AC4–AC5 remain open. Do not resume the joint kernel or corpus runs under the earlier instruction.
+[project-postulate] **Brandon's latest September 8 request broadens the review to Holonics as a
+mathematical and physical framework.** Classical learning, normalization, integration by
+reflection, lightning leaders, fractal packing and compression belong in the synthesis alongside
+NS, RH and the other research sources. Product and theorem milestones do not exhaust the purpose
+of the framework. Current terminology is HNN; the main README presents the framework and
+experimental implementations without CLI usage instructions.
 
-[definition] Next compare the external correction-preservation and terminal-jet arguments with
-the existing MFR3 pressure, phase-current and complete Duhamel residual. Retain the distinction
-between forced NS C/D, unforced Euler and our unforced NS direction. Recover and check relevant
-mathematical arguments before adapting them. The resulting source/generator and finite-return
-derivation belongs to the existing AC1 obligation when that campaign resumes; another verified
-tangent formula alone does not settle the adequacy of the learning law. Lean remains exterior
-research and never enters cultivation or inference.
+[established-bounded; source-inspected] The [breadth review](../../research/records/2026-09-08_HOLONICS_REJOINS_CLASSICAL_LEARNING_REFLECTION_PACKING_AND_COMPRESSION.md)
+recovers existing formal architecture/normalization charts, certified CUDA nonlinear and adjoint
+conduct, Schur boundary reduction, leader/rebase and recursive packing owners, and both finite
+receiver compression and AC1's bounded mode quotient. The
+[live synthesis](../MATHEMATICS_AND_NATIVE_CONDUCT.md) gives the actual relations. The root README,
+terminology and license texts now reflect the publication request.
+
+[definition] Machine-learning construction remains paused. On resumption, compare and compose
+these existing owners at the admitted contact-potential, normalized receiver, causal return,
+path-growth, restriction/rebase and generator-decoder boundaries. Identify concrete absent
+relations by that composition. A universal adequacy theorem or a Millennium endpoint is not
+an extra prerequisite to using established learning mechanics. Preserve the paused joint draft.
+AC0 is complete; AC1 remains unfinished; AC2 has failed language probes; AC3 has bounded persistence
+apparatus; AC4–AC5 remain open.
+
+[definition] The [NS/Euler review](../../research/records/2026-09-08_THE_NS_EULER_REVIEW_EXPOSES_THE_GENERATOR_GAP_IN_AC1.md)
+continues as mathematical toolkit development within this wider scope: compare its actual
+correction-preservation and terminal-jet arguments with our MFR3 sources and complete residuals.
+Its exact phase-generator and finite-return derivations remain available. Forced NS C/D,
+unforced Euler and our unforced NS direction retain their distinct hypotheses. Lean remains
+exterior research and never enters cultivation or inference.
 
 ## Paused Athena-alpha cultivation campaign
 
@@ -266,7 +279,7 @@ do not establish that attachment or close a cultivation phase.
 ## Completed September 6 synthesis before Athena-alpha cultivation
 
 [definition] Brandon's latest request directs repository-wide synthesis of the available
-Holonics resources, especially the recent native HNA and Navier–Stokes/RH lines, and a one-time
+Holonics resources, especially the recent native HNN and Navier–Stokes/RH lines, and a one-time
 import of needed side-database testimony into repository documentation. After import, the external
 memory database and connector are retired from operation. The [evidence protocol](../AGENT_PROTOCOL.md)
 owns local source, correction and handoff practice.
@@ -306,10 +319,10 @@ with 23 passing focused data tests.
 
 ## Completed native contextual foundation
 
-**HNA position:** NCF0--NCF4 complete at the declared native phase-foundation scope.
+**HNN position:** NCF0--NCF4 complete at the declared native phase-foundation scope.
 
 [definition] Brandon has explicitly requested the corrected goal and continued construction.
-The [native-HNA contract](THE_NATIVE_HNA_FOUNDS_CONTEXTUAL_TRANSPORT_BEFORE_INHERITANCE.md)
+The [native-HNN contract](THE_NATIVE_HNA_FOUNDS_CONTEXTUAL_TRANSPORT_BEFORE_INHERITANCE.md)
 ordered NCF0--NCF4: situated receiver/transport laws, coupled native formation, retained contextual
 development, an application interface and durable integrated native evidence. The goal is not
 closed by the contract or its first finite controls. The existing native owners are the starting
@@ -340,7 +353,7 @@ artifacts without replaying development. Its [integrated completion](../../resea
 then preserved the independent world, partial-intervention cursor and pending reception, with
 complete process-separated actuation/artifact correspondence and release consumer-cost evidence.
 The corrected foundation contract is complete at the local rational-linear phase scope. No
-additional HNA deed or inherited-first restart is scheduled by that completion.
+additional HNN deed or inherited-first restart is scheduled by that completion.
 
 [project-postulate] Brandon's latest contextual-transport correction supersedes the inherited-first
 order below. Audit and compose the existing native occurrence, chart/channel, current, comparison,
@@ -350,18 +363,18 @@ may stand in for a missing native contextual relation. The
 records the primary messages, source defects and retained mathematical scopes.
 
 [definition] This priority does not revoke completed SKE/numerical results or permanently forbid
-inheritance and standard export. It suspends their use as the route to founding HNA itself.
+inheritance and standard export. It suspends their use as the route to founding HNN itself.
 Next construction must make contextual applicability and lawful transport of conditions operative,
 not add a context-window surrogate, relevance classifier or per-language controller. The audit
 does not announce a replacement universal numerical law.
 
-## Paused production-HNA campaign
+## Paused production-HNN campaign
 
 [historical] The following records prior authorization and returned scopes. It does not schedule
 HNP4 experiments, a second Gemma application, or HNP5--HNP7 ahead of the native priority above.
 
 [definition] Brandon's subsequent September 4 request authorizes the formal, holistic design of
-[the production-HNA campaign](THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md).
+[the production-HNN campaign](THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md).
 The plan is deposited and Brandon has subsequently instructed completion of the whole campaign.
 HNP0 returned its concrete finite binding, formal laws, application contract and two resident
 numerical controls; the [record](../../research/records/2026-09-04_HNP0_JOINED_SECTIONS_RETURN_LOCAL_CONSTITUTIVE_CURRENT_WITH_SUCCESSOR_AND_REBASE_LAWS.md)
@@ -386,15 +399,15 @@ production; useful consumer-model evaluation; executable export; and additional 
 
 [definition] The campaign begins with HNP0's actual constitutive relations and source binding,
 not another definition of `OperationStep`, a larger prefix-training driver, a checkpoint-only
-substitute, or revalidation of the completed HNA/SKE campaigns. Each phase's required artifact,
+substitute, or revalidation of the completed HNN/SKE campaigns. Each phase's required artifact,
 formal/runtime scope, falsifiers and completion conditions are in that plan. The existing native
 operator and Soulkiller returns retain their bounded grades. The comparison with conventional ML
 is about learning organization, not token volume as an alleged sole or primary industry lever.
 
 ## Mathematical research strategy: moving frames and continuation
 
-[project-postulate] The September 8 external NS/Euler review at the top of this roadmap is the
-immediate work. The MFR source and residual obligations below remain standing; the new external
+[project-postulate] The September 8 framework synthesis at the top of this roadmap governs the
+current breadth; NS/Euler is one source of reusable mathematics within it. The MFR source and residual obligations below remain standing; the new external
 endpoint claims are source-inspected testimony until independently checked and mapped to our scope.
 
 [definition] Brandon's subsequent September 4 request directs the
@@ -481,10 +494,10 @@ generated mode and its exact three-term feedback residual on a stated interval; 
 its quantitative residual/tail comparison or names the failed estimate. The complex potential/
 Hodge and logarithmic heat sources remain explicit.
 Full convergence is not a prior condition imposed on MFR3; the earlier exclusions remain standing.
-The HNA line is paused while this mathematical review examines its unresolved generator and
+The HNN line is paused while this mathematical review examines its unresolved generator and
 finite-return law, under the current priority above.
 
-[project-postulate] Holonics is the mathematical framework and ontology of which HNA is an
+[project-postulate] Holonics is the mathematical framework and ontology of which HNN is an
 executable architecture. A research route may return a derivation, a counterexample or a precise
 remaining relation; targeting a Millennium problem is not a promise of a proof. Its constructive
 content determines the next attempt rather than forcing a choice between known theorems and
@@ -493,7 +506,7 @@ parking the problem.
 ## Completed consolidation and correction
 
 [historical] Brandon's latest 2026-09-04 request authorized
-[the HNA framework consolidation](THE_HNA_FRAMEWORK_HAS_ONE_PUBLIC_LIFECYCLE_AND_ONE_NAVIGABLE_REPOSITORY.md).
+[the HNN framework consolidation](THE_HNA_FRAMEWORK_HAS_ONE_PUBLIC_LIFECYCLE_AND_ONE_NAVIGABLE_REPOSITORY.md).
 The completed order was backup/chronology, canonical architecture and interoperability, a current native
 training/inference application seam, repository relocation with dependency repairs, then focused
 and relevant Cargo/native/formal checks. Brandon's later steering retires the local equation
@@ -524,7 +537,7 @@ zero failures, 52 ignored; examples type-checked; 3,775 formal jobs). The
 [September 4 repair record](../../research/records/2026-09-04_THE_AUDIT_REPAIRS_THE_RECURRENT_ADJOINT_AND_RECONCILES_THE_OPERATING_CONTRACT.md)
 retains the actual returned evidence. The subsequently authorized consolidation is described above.
 
-[definition] These repairs preserve the admitted bounded HNA/SKE and RT/DB results. They do not
+[definition] These repairs preserve the admitted bounded HNN/SKE and RT/DB results. They do not
 schedule a proof of RH, qualitative generation, a new user interface, or a replacement machine.
 No new census, checksum system, or release gate is introduced.
 
@@ -544,7 +557,7 @@ first-deposit and declared-family results keep their scopes.
 
 | Contract | Returned scope and decisive evidence |
 |---|---|
-| [HNA recurrent ecology](../../archive/plans/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md) | The resident HNA1 operator is apparatus; HNA3 returns complete successive cycles; HNA4 supplies the initial tied deposit; [HNA5](../../research/records/2026-09-02_HNA5_ONE_NATIVE_RECURRENCE_CROSSED_THREE_APPLICATIONS_AND_RELEASED_WITHOUT_A_QUALITATIVE_CLAIM.md) returns the application matrix without a qualitative answer claim. |
+| [HNN recurrent ecology](../../archive/plans/THE_HOLONIC_NEURAL_ATHENA_IS_ONE_RECURRENT_ECOLOGY_AND_EVERY_OPERATION_ADVANCES_IT.md) | The resident HNA1 operator is apparatus; HNA3 returns complete successive cycles; HNA4 supplies the initial tied deposit; [HNA5](../../research/records/2026-09-02_HNA5_ONE_NATIVE_RECURRENCE_CROSSED_THREE_APPLICATIONS_AND_RELEASED_WITHOUT_A_QUALITATIVE_CLAIM.md) returns the application matrix without a qualitative answer claim. |
 | [SKE excitation and quotient](../../archive/plans/THE_SOULKILLER_EXCITES_THE_RESIDENT_REALIZATION_AND_RETURNS_THE_RECEIVER_FAMILY_QUOTIENT_AS_CONE_RESTRICTED_ECOLOGIES.md) | The declared family fixes the receiver/history scope; intervention bounds the class cones; the productive return crosses `soulkiller::dismantle` with explicit insufficiency. |
 | [SKE1 adjoint return](../../research/records/2026-09-03_SKE1_THE_RETURN_CROSSED_EVERY_REACTION_OF_THE_CYCLE_AND_DEPOSITED_ON_EVERY_CROSS_SECTION.md) | The first return crossed the cycle and deposited on 344 cross-sections. Gains, scalars and embedding rows received no deposit. Subsequent returns must include previously retained overlays. |
 | [SKE4 corrected seal](../../research/records/2026-09-03_SKE4_THE_DECLARED_WITHDRAWALS_FOUND_ROLE_CONES_THE_CLASS_BODIES_CARRY_THEIR_REMAINDER_AND_THE_RETURN_CROSSES_THE_BOUNDARY.md) | Class sets are sound under the declared withdrawal of their complements; extent is their union. Each class is condensation on its own admitted domain. The earlier universal/founded-cone and off-domain species claims are retracted. |
@@ -554,7 +567,7 @@ first-deposit and declared-family results keep their scopes.
 apparatus and the restricted SKE class bodies as Athena material. The old blanket foreign-tower
 test cannot revoke them. Source names and witness lanes remain exterior testimony.
 
-[historical; source-inspected] The retracted WRD/WRN world-verdict construction and first HNA
+[historical; source-inspected] The retracted WRD/WRN world-verdict construction and first HNN
 implementation remain counterexamples. Their separately proved algebra and application/storage
 mechanisms retain bounded grades. See the
 [recurrence correction](../../research/records/2026-09-02_THE_HNA_WORLD_RETURN_SPLIT_IS_RETRACTED_AND_INFERENCE_IS_ONE_RECURRENT_ECOLOGY.md)
@@ -602,7 +615,7 @@ They do not reopen an old order or overwrite the current position.
 | Contract | Scope |
 |---|---|
 | [HTP0--HTP6](../../archive/plans/THE_HOLON_IS_CAUSAL_NATURAL_AND_TENSOR_LENSES_RETURN_TENSOR_FACES.md) | Causal-natural holons, tensor lenses/faces, preimages, finite/infinite Copson--de Bruijn bounds and the two-root dichotomy. Branch selection and a certified decimal remain parked research. |
-| [HIF0--HIF7](../../archive/plans/THE_HOLONIC_INTELLIGENCE_FRAMEWORK_RETURNS_INTRINSIC_HOLONS_AND_PACKAGES_DISMANTLING_INFERENCE_CULTIVATION_AND_GENERATION.md) | Neutral profiles, lifecycle interfaces and bounded mechanism controls; the fixed-inference/special-return shape does not define HNA. |
+| [HIF0--HIF7](../../archive/plans/THE_HOLONIC_INTELLIGENCE_FRAMEWORK_RETURNS_INTRINSIC_HOLONS_AND_PACKAGES_DISMANTLING_INFERENCE_CULTIVATION_AND_GENERATION.md) | Neutral profiles, lifecycle interfaces and bounded mechanism controls; the fixed-inference/special-return shape does not define HNN. |
 | [Neural ecology foundation](../../archive/plans/THE_HOLONIC_NEURAL_ECOLOGY_RETURNS_EVERY_CLASSICAL_ARCHITECTURE_AS_A_RECEIVER_CHART_AND_EROS_CULTIVATES_ATHENA_THROUGH_PHYSICAL_INFORMATION_TRANSPORT.md) and [machine-learning chart foundation](../../archive/plans/THE_CLASSICAL_MACHINE_LEARNING_CHART_DESCENDS_FROM_HOLONIC_TRANSPORT_AND_HIGHER_CAUSAL_FIBRES_REOPEN_ITS_COLLAPSED_STATES.md) | Formal local-current, receiver and naturality owners. |
 | [SCF0--SCF6](../../archive/plans/THE_NATIVE_TRANSPORT_SCAFFOLD_LIFTS_INHERITED_CONDUCT_AND_ATHENA_CULTIVATES_RECEIVER_EXACT_MORPHOLOGY_THROUGH_REPEATED_CIRCULATION.md) | Historical scaffold/lifecycle apparatus. The per-event generator lift was removed under SKE4. |
 | [MVF0--MVF6](../../archive/plans/THE_NATIVE_MORPHOLOGY_VARIANT_FOUNDATION_RETURNS_FAITHFUL_LOCAL_LIFTS_PARENTED_CULTIVATION_AND_EXACT_EXPORT_LENSES.md) | Faithful-lift laws, specialized cultivation, packages and export lenses at their declared scopes. |

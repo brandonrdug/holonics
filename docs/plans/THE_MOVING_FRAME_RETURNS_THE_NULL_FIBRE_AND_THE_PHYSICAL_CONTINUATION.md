@@ -7,7 +7,9 @@ temporal evolution and their existing entropy/action, oriented cross-current and
 relations. Direct RH research is deferred; its completed source and formal standing remain usable.
 [project-postulate] Brandon's September 8 instruction now prioritizes the
 [external NS/Euler review and AC1 generator diagnosis](../../research/records/2026-09-08_THE_NS_EULER_REVIEW_EXPOSES_THE_GENERATOR_GAP_IN_AC1.md)
-before further candidate or machine-learning construction. Compare the actual correction and
+within the subsequent [framework breadth review](../../research/records/2026-09-08_HOLONICS_REJOINS_CLASSICAL_LEARNING_REFLECTION_PACKING_AND_COMPRESSION.md).
+NS supplies reusable mechanics alongside the existing classical learning, reflection, packing
+and compression work; its endpoint is not a prerequisite for neural production. Compare the actual correction and
 terminal-jet arguments with the source/residual owners below. The first exact shear-generator
 return does not close the pressure-matching candidate or the singularity endpoint.
 

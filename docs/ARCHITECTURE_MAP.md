@@ -6,17 +6,17 @@ remain the only scheduling authorities.
 
 ## Reading rule
 
-[definition] The public framework entry point is `crates/holonics/src/lib.rs`. Its ground-up HNA
+[definition] The public framework entry point is `crates/holonics/src/lib.rs`. Its ground-up HNN
 adapter is `crates/holonics-hna/src/native.rs`; the earlier inherited-operator adapter is `hna.rs`
 in that crate. Shared delivery is `stream.rs`; CLI entry points are
 `applications/holonics-workbench/src/{adapters/hna,session_stream}.rs`. These compose the native
-owners below. See [native HNA](NATIVE_HNA.md), [Athena](ATHENA.md) and
+owners below. See [native HNN](NATIVE_HNA.md), [Athena](ATHENA.md) and
 [interoperability](INTEROPERABILITY.md) for their distinct artifact boundaries.
 
 The [mathematical synthesis](MATHEMATICS_AND_NATIVE_CONDUCT.md) explains recent cross-line
 consequences, and [hardware/modality boundaries](HARDWARE_AND_MODALITY_BOUNDARIES.md) locates
 future Apple and acoustic composition. These are source comparisons, not implemented backends
-or a Lean runtime inside HNA.
+or a Lean runtime inside HNN.
 
 Each row connects one mathematical relation to its live formal and executable presentations.
 
@@ -246,7 +246,7 @@ counterexample; useful continuing learning and output cost remain open.
 
 [established-bounded; measured] `full_operation::NativeEmissionReadout`,
 `operative_terminal::read_terminal_row` and `ResidentSurface::read_out_terminal_row` now compose
-an exact terminal receiver restriction with the unchanged complete resident successor. The HNA
+an exact terminal receiver restriction with the unchanged complete resident successor. The HNN
 text adapter requests this row explicitly. The [actual-model readout control](../research/records/2026-09-05_HNP4_THE_TERMINAL_RECEIVER_READS_ONE_ROW_AND_PRESERVES_THE_COMPLETE_SUCCESSOR.md)
 returned complete checkpoint equality and lower host transfer without another device kernel.
 
@@ -266,7 +266,7 @@ bound that contrast to retained fields and applied a persistent contact word at 
 port. Its API, inner v2 wire and application integration are now
 [archived](../archive/experiments/2026-09-05-tied-next-arrival/README.md), not active source owners. The
 [actual-model record](../research/records/2026-09-05_HNP4_THE_NEXT_ARRIVAL_DEPOSITS_A_REUSABLE_CONTACT_AND_MATCHED_SELF_RETURN_IS_ZERO.md)
-records numerical changes and full-state restart equality. Its promotion into contextual HNA
+records numerical changes and full-state restart equality. Its promotion into contextual HNN
 foundations and portable-fact test framing are withdrawn by the
 [contextual audit](../research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PRECEDES_INHERITED_MODEL_PRODUCTION.md).
 The draft applies its maps globally at that port; it does not supply the missing scoped relation.
@@ -316,21 +316,36 @@ The draft applies its maps globally at that port; it does not supply the missing
 |---|---|---|---|---|
 | Faithful local lift and projection refusal | `Computation/NativeMorphologyVariant.lean::FaithfulLocalSectionLift`; `separatingReceiver_obstructs_descent` | `native_spool/thread.rs::NativeFactorizedSection` | resident section conduct remains a declared receiver face | **exact-bounded:** exact cold BF16 reconstruction and complete factorized hot section coordinates are distinct obligations; every-word receiver exactness is formal; an old alternating-sum collision now separates; temporal video remains open. [2026-09-03: the Rust lift owner `scaffold_lift.rs` departed without alias under SKE4; only the formal owner and the factorized-section owner remain.] |
 | One Soulkiller boundary | `HolonicIntelligenceLifecycle.DismantlingReturn`; `HolonicExcitationFoundedQuotient.ExcitationFoundedReturn` | `soulkiller/boundary.rs`; `holonic_intelligence/operative_condensation.rs::ResidentExcitationDismantling` | resident excitation precedes the generic three-lane boundary | **exact-bounded:** one consumed input trait and generic productive/cold/insufficiency return. SKE4's actual productive lane is `NativeConeRestrictedEcology`. The old BF16 per-event implementation was removed; generic fixture controls and actual resident excitation are separate inputs, not competing boundaries. |
-| Local deposit and withdrawal apparatus | `NativeMorphologyVariant.lean::LocalCausalConeCultivation` is a specialized formal object, not the HNA primitive | `native_intelligence/scaffold_cultivation.rs`; local open-domain withdrawal deltas in `native_spool` | resident native word/current conduct | **counterexample for learning:** the Rust path accepted or count-derived a rational difference, reversed one edge, allocated one generator, and fitted an identity fibre; its exact deposit/remount/withdrawal mechanics remain bounded data-structure evidence only |
+| Local deposit and withdrawal apparatus | `NativeMorphologyVariant.lean::LocalCausalConeCultivation` is a specialized formal object, not the HNN primitive | `native_intelligence/scaffold_cultivation.rs`; local open-domain withdrawal deltas in `native_spool` | resident native word/current conduct | **counterexample for learning:** the Rust path accepted or count-derived a rational difference, reversed one edge, allocated one generator, and fitted an identity fibre; its exact deposit/remount/withdrawal mechanics remain bounded data-structure evidence only |
 | Derived morphology variant package | `NativeMorphologyVariant.lean::{MorphologyVariantManifest,VariantPackageSeparation}` | `native_intelligence/morphology_package.rs`; intrinsic profile over complete factorized sections | apparatus realization is a replaceable exterior lane | **exact-bounded:** derived anatomy, distinct schema/lineage/capability/realization axes, native/situated hot rest, broad `MorphologyTestimonyLane`, exact package round-trip, and realization replacement invariance; complete preimages remain distinct from evaluation/apparatus/export testimony |
 | Safetensors and ONNX export lenses | `NativeMorphologyVariant.lean::{ExactExportLens,ProjectedExportWitness,ExportDisposition}` | `native_intelligence/morphology_export/` over `NativeMorphologyArtifact`; lossless `ForeignOnnxChart` import | no native apparatus identity; custom ONNX domain is exterior | **exact-bounded:** valid Safetensors artifact/anatomy tensors and ONNX IR 14 `org.holonics` opset 1 round-trip complete artifacts; anatomy-only projections retain both artifacts and a configuration separator; unsupported receiver/cultivation/world requests refuse |
-| Configuration-indexed multimodal evaluation | `NativeMorphologyVariant.lean::{InferenceConfigurationClaim,CrossCodecResonance}` | historical MVF6 receipt; obsolete operator-authored evaluation owner and driver | resident word/current apparatus remains one configuration coordinate | **historical exact-bounded control:** matched text/image/audio/temporal-video/mixed apertures preserved supplied chronology, but their cultivation current was manually constructed; no HNA or qualitative multimodal grade follows |
+| Configuration-indexed multimodal evaluation | `NativeMorphologyVariant.lean::{InferenceConfigurationClaim,CrossCodecResonance}` | historical MVF6 receipt; obsolete operator-authored evaluation owner and driver | resident word/current apparatus remains one configuration coordinate | **historical exact-bounded control:** matched text/image/audio/temporal-video/mixed apertures preserved supplied chronology, but their cultivation current was manually constructed; no HNN or qualitative multimodal grade follows |
+
+## Classical learning, reflection and recursive compression
+
+[established-bounded; source-inspected] These are existing owners recovered by the
+[September 8 breadth review](../research/records/2026-09-08_HOLONICS_REJOINS_CLASSICAL_LEARNING_REFLECTION_PACKING_AND_COMPRESSION.md).
+The [mathematical synthesis](MATHEMATICS_AND_NATIVE_CONDUCT.md) states their relations and limits.
+They are not all composed into AC1's general conversation path.
+
+| Relation | Formal owner | Executable owner | Scope |
+|---|---|---|---|
+| Normalized exponential, sigmoid and adjoint geometry | `Computation/HolonicAdjointNormalization.lean` | `exponentiated_ratio.rs`; `surprisal.rs`; `kernels/exact_resident_section.cu`; `kernels/exact_resident_adjoint.cuh` | Exact symbolic ratio domain and certified resident exponential/contact/return; earlier source-specific targets and grains retain their declared boundaries. |
+| Attention, convolution, graph and state-space charts | `Computation/HolonicArchitectureCharts.lean`; `Computation/MachineLearningChart.lean` | `holonic_intelligence/contact_chart.rs`; existing resident contact and recurrence owners | Formal chart/output identities and bounded schedule comparisons; not a general adapter or completed native learner. |
+| Boundary reduction and integration by reflection | `Computation/HolonicDiffusionCharts.lean` for the finite diffusion/state-space chart | `diffusion.rs`; `sheaf_diffusion.rs` | Exact finite positive-capacity Schur response, source and interior reconstruction; not an undeclared zero-capacity continuum limit. |
+| Leader growth and recursive restriction | `Foundation/FractalPacking.lean` for rational child restriction/separation | `leader_quadrature.rs` for local germ/rebase/ride | Distinct bounded owners: neither the interval packing nor the germ integrator alone constructs a general neural morphology or physical lightning. |
+| Future-receiver compression and generator reuse | `Computation/MachineLearningChart.lean`; `Foundation/ReceiverQuotient.lean` | `receiver_exact_compression.rs`; `native_ecology/recurrent_condensation.rs`; constitutive field internal-mode/material-mode owners | Bounded finite-system quotients and AC1's common-drive mode generator; whole-model learned compression remains open. |
 
 ## Retracted world-return instantiation and active recurrent replacement
 
 | Relation | Lean owner | Rust owner | CUDA owner | Status and exact open fibre |
 |---|---|---|---|---|
-| Junction and route-deposit algebra | `Computation/HolonicWorldReturnDeposit.lean::{JunctionReturn,RouteStep,routeDeposit,Control.threeSiteRouteCultivation}` | `crates/holonic-structure/src/junction.rs::CountedCrossing`; rejected HNA instantiation in `native_intelligence/world_return.rs` | — | **proved/exact algebra; counterexample as HNA:** counts of application-supplied admission faces do not derive neural current, storage, morphology, or termination |
+| Junction and route-deposit algebra | `Computation/HolonicWorldReturnDeposit.lean::{JunctionReturn,RouteStep,routeDeposit,Control.threeSiteRouteCultivation}` | `crates/holonic-structure/src/junction.rs::CountedCrossing`; rejected HNN instantiation in `native_intelligence/world_return.rs` | — | **proved/exact algebra; counterexample as HNN:** counts of application-supplied admission faces do not derive neural current, storage, morphology, or termination |
 | Authored octet-difference chart | causal-tail and tensor-face owners are not its derivation | `holonic_intelligence/material_ingress.rs::NativeMaterialCurrent`; `native_intelligence/material_ingress.rs::NativeMaterialIngress` | none | **counterexample:** adjacent byte differences and an authored zero origin are exterior arithmetic, not native current; exact octets plus a locator are not a preimage fibre without a declared map |
-| World-face/candidate lifecycle | no HNA formal owner; the specialized older lifecycle does not govern recurrence | `native_intelligence/world_return.rs`; `morphology_commit.rs`; application `world_application.rs` | resident conduct is downstream of an authored deposit | **counterexample:** applications supply admission/carriage, one status is duplicated over every grain, carried occurrences do not derive native support, and exact readback is a private echo |
+| World-face/candidate lifecycle | no HNN formal owner; the specialized older lifecycle does not govern recurrence | `native_intelligence/world_return.rs`; `morphology_commit.rs`; application `world_application.rs` | resident conduct is downstream of an authored deposit | **counterexample:** applications supply admission/carriage, one status is duplicated over every grain, carried occurrences do not derive native support, and exact readback is a private echo |
 | Material emission and observation-ID octet face | causal-tail and tensor-face prerequisite owners do not authorize this projection | `native_intelligence/material_emission.rs`; `crates/holonics-hna/material_codec.rs` | address-only scaffold conduct | **counterexample:** material current is unused, one fixed observation is repeated, and the observation identifier is cast to `u8`, yielding `eee` |
 | Excitation-founded quotient (Soulkiller) | `Computation/HolonicExcitationFoundedQuotient.lean::{DeclaredFamily,IsCone,IsConeUnder,FoundedCone,ExcitationFoundedReturn}` | `holonic_intelligence/{operative_identification,operative_condensation}.rs`; `soulkiller/boundary.rs` | resident intervention and segment-session owners | **formal exact; engine bounded:** the SKE4 return crosses the boundary as `NativeConeRestrictedEcology`, with complement-withdrawal soundness, extent as the class-cone union, declared-domain species and explicit insufficiency. Universal `IsCone` and equality with `FoundedCone` are not claimed by the measured sets. Conflicting keyed observations refuse before signature construction; identical repetitions do not change the quotient. |
-| Recurrent HNA operation | `Computation/HolonicRecurrentEcology.lean::{OperationStep,Recurrence,FiniteRecurrentOperation,OperationRebase}`; `HolonicCultivationCharts.lean::FactorizedLinearOverlay` | `holonic_intelligence/{full_operation,operative_segment,operative_return,operative_backward,operative_adjoint}.rs` | `NativeOperatorResidence` over `ResidentSurface`; resident base/factor transposed contractions and re-entry | **formal exact; bounded engine:** the full native operator returns the successor used by the next cycle. SKE1 extends the initial tied deposit to 344 cross-sections; gains, scalars and embedding rows have no deposit. The reverse owner uses retained overlays from the forward morphology and stages new atoms until the return succeeds. The initial first-deposit receipt and subsequent-return regression have distinct scopes. |
+| Recurrent HNN operation | `Computation/HolonicRecurrentEcology.lean::{OperationStep,Recurrence,FiniteRecurrentOperation,OperationRebase}`; `HolonicCultivationCharts.lean::FactorizedLinearOverlay` | `holonic_intelligence/{full_operation,operative_segment,operative_return,operative_backward,operative_adjoint}.rs` | `NativeOperatorResidence` over `ResidentSurface`; resident base/factor transposed contractions and re-entry | **formal exact; bounded engine:** the full native operator returns the successor used by the next cycle. SKE1 extends the initial tied deposit to 344 cross-sections; gains, scalars and embedding rows have no deposit. The reverse owner uses retained overlays from the forward morphology and stages new atoms until the return succeeds. The initial first-deposit receipt and subsequent-return regression have distinct scopes. |
 
 | Composed variant and saturation | `HolonicExcitationFoundedQuotient.DeclaredFamily.Saturated` | `crates/holonics-hna/src/composed_variant.rs` | composed native segment session | **exact-bounded:** pair-identification preservation under a declared enlargement is separate from newly observed consequences. The SKE5 v2 receipt projects those properties from its existing fifteen observations; no new GPU measurements are implied. The deed receiver is explicitly narrower than the complete repository release. |
 
@@ -338,7 +353,7 @@ The draft applies its maps globally at that port; it does not supply the missing
 
 | Relation | Lean owner | Rust owner | ABI/application owner | Status and exact open fibre |
 |---|---|---|---|---|
-| Historical session, commit, snapshot/remount, and diffusive boundary | `Computation/HolonicCirculationSession.lean` remains a specialized fixed-inference/later-cultivation object | `native_intelligence/{circulation_session,morphology_commit,circulation_diffusion,scaffold_cultivation,morphology_package}.rs` over `diffusion.rs` | `crates/holonic-circulation-abi`; `crates/holonics-hna` | **exact-bounded persistence/API apparatus; counterexample as HNA lifecycle:** commit/decline and later exterior return do not define inference, generation, or learning; HNA0 replaces them with one successor recurrence |
+| Historical session, commit, snapshot/remount, and diffusive boundary | `Computation/HolonicCirculationSession.lean` remains a specialized fixed-inference/later-cultivation object | `native_intelligence/{circulation_session,morphology_commit,circulation_diffusion,scaffold_cultivation,morphology_package}.rs` over `diffusion.rs` | `crates/holonic-circulation-abi`; `crates/holonics-hna` | **exact-bounded persistence/API apparatus; counterexample as HNN lifecycle:** commit/decline and later exterior return do not define inference, generation, or learning; HNA0 replaces them with one successor recurrence |
 
 ## Deprecated R0Q correspondence retained as standing
 
@@ -405,7 +420,7 @@ The draft applies its maps globally at that port; it does not supply the missing
 `applications/conversation-data/{conversation_data,providers}.py`. Its private SQLite/JSONL
 boundary preserves source records, actual user-agent comparison, distinct runtime routes and
 source-addressed curation. It invokes no engine, learner or prover; see the
-[data guide](CONVERSATION_DATA.md). This is an exterior data owner, not a second HNA engine.
+[data guide](CONVERSATION_DATA.md). This is an exterior data owner, not a second HNN engine.
 
 [established-bounded; implemented-exact] `applications/conversation-data/exposure.py` now emits
 separate source-qualified occurrence families, with development/evaluation/deferred boundaries,

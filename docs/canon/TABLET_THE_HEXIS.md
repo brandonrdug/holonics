@@ -5,7 +5,7 @@
 `definition` for the lifecycle and receiver-exact condensation criterion; `interpretation` for the
 industry crosswalk, illicium vocabulary, crystal/fractal model morphology, and inherited-model
 dismantling; `established-bounded` only for the individual owners whose own deposits carry that grade;
-`open` for extensions beyond the receiver families of the completed HNA/SKE contracts.
+`open` for extensions beyond the receiver families of the completed HNN/SKE contracts.
 **Derivation:**
 `research/records/2026-08-18_HEXIS_IS_RESTED_CONDITIONAL_TRANSPORT_TUNING_DEFORMS_IT_AND_DISTILLATION_CONDENSES_FAMILIES.md`.
 **Governing documents:** `docs/canon/THE_HOLOBROCHOS_SPINE.md`, `docs/canon/TABLET_THE_REASONING_CYCLE.md`,
@@ -37,7 +37,7 @@ organs may realize hexis. No one representation defines it.
 morphology. Its successor is used by the next operation. Exposure presents material, reference
 consults retained testimony, and prompting presents contemporary material; no special world
 verdict or later commit gives an occurrence its power to change morphology. A changed output
-alone does not establish a changed morphology. The HNA correction of 2026-09-02 governs.
+alone does not establish a changed morphology. The HNN correction of 2026-09-02 governs.
 
 ## 2. The industry cultivates through several distinct cuts
 
@@ -289,7 +289,7 @@ foreign rest
     -> cross-chart maps Phi
     -> candidate holonic transports S_gamma
     -> defect chi_gamma
-    -> retained reconstruction fibre
+    -> retained Preimage Fibre
     -> familywise condensation into source-neutral native spools
     -> sealed spool bundle + cold witness + insufficiency.
 
@@ -360,7 +360,7 @@ Later cultivation asks which joined transports become native, reusable, and abla
 
 `definition`: every spool grade is relative to an explicit receiver/history family. A bounded
 native spool is a real Soulkiller return for that family; an unseparated successor remains an open
-reconstruction fibre and does not license foreign execution inside Athena.
+Preimage Fibre and does not license foreign execution inside Athena.
 
 ## 13. Construction discipline
 
@@ -368,7 +368,7 @@ reconstruction fibre and does not license foreign execution inside Athena.
   logits, autoregression, autograd, multimodal alignment, diffusion training, or inherited model
   dismantling.
 - Keep exposure, training, reference, prompting, and world return distinct.
-- Keep the complete residual and reconstruction fibre before projecting a loss or preference face.
+- Keep the complete residual and Preimage Fibre before projecting a loss or preference face.
 - Derive semantic rank, layer/rank structure, and stopping from material and receiver consequence;
   declare only exterior apparatus and question bounds.
 - Compare source and candidate transports through explicit cross-chart maps and successor histories.

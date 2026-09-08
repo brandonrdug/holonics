@@ -47,7 +47,7 @@ birth of a separate faculty. A continuation organ has been closed inside a recur
 emissions can change an exterior and whose genuinely later returns can alter the same continuing
 body. Conversation is a useful fixture for that recurrence. English dialogue is not the invariant.
 
-The HNA correction of 2026-09-02 makes self-emitted and application-produced occurrences use
+The HNN correction of 2026-09-02 makes self-emitted and application-produced occurrences use
 the same operation. The following older world-interaction chart is one specialized composition,
 not a mandatory inference/learning split:
 
@@ -366,7 +366,7 @@ r(i,j) r(j,k) = r(i,k).
 It factors through the additive-gauge quotient `R^n / span(1,...,1)` and drops no member by itself.
 The common additive frame is the departed coordinate; the complete pairwise-difference family is the
 retained remainder. Sampling, quantization, top-k, argmax, or another later collapse owes its own
-`ReconstructionFiber`.
+Preimage Fibre (legacy source identifiers may still use `ReconstructionFiber`).
 
 The exact differential bridge to diffusion is
 
@@ -514,7 +514,7 @@ Any later construction must keep material-kind routing out of the interior, reta
 as lineage and controls, and grade operation families against their declared receivers and
 histories. Same-value/different-law controls and separating histories test identification;
 source-detached remount and ablation test the particular independence or attribution claims
-that require them. They do not add a second learning law to HNA.
+that require them. They do not add a second learning law to HNN.
 
 The doctrine is falsified as a construction claim if the alleged invariant disappears under symbol
 renaming, is predicted solely by a source label, collapses addition and multiplication from one

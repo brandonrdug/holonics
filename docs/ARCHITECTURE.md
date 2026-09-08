@@ -13,8 +13,8 @@ population; a rebase carries the complete diagram. The
 [causal-natural extension](../formal/elementary-holonics/ElementaryHolonics/Foundation/CausalNaturalHolon.lean)
 transports that construction through parameter changes.
 
-[project-postulate] HNA is an executable architecture within this framework. Its product
-objective is frontier-level usefulness on consumer hardware. Mathematical research and HNA
+[project-postulate] HNN is an executable architecture within this framework. Its product
+objective is frontier-level usefulness on consumer hardware. Mathematical research and HNN
 construction have their own explicit returns and can inform each other. The current
 [moving-frame strategy](plans/THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md)
 joins null fibres, physical continuation and the RH source without making the neural product
@@ -26,14 +26,15 @@ the broader doctrine; the remainder of this guide describes the current executab
 | Name | Responsibility | Current source |
 |---|---|---|
 | **Holonics** | The mathematical framework and ontology, with executable applications | [Holon](../formal/elementary-holonics/ElementaryHolonics/Foundation/Holon.lean), [mathematics](canon/THE_MATHEMATICS_TABLET.md), [public Rust entry point](../crates/holonics/src/lib.rs) |
-| **HNA** | The Holonic Neural Network architecture and recurrent runtime | [native phase session](../crates/holonics-hna/src/native.rs), [constitutive ecology](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [full operator](../crates/holonic-engine/src/holonic_intelligence/full_operation.rs) |
+| **HNN** | The Holonic Neural Network architecture and recurrent runtime | [native phase session](../crates/holonics-hna/src/native.rs), [constitutive ecology](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [full operator](../crates/holonic-engine/src/holonic_intelligence/full_operation.rs) |
 | **Athena** | A particular native model/ecology, its changing morphology and admitted capability domain | [Athena lifecycle](ATHENA.md) |
 | **Eros** | Composition and developmental recurrence that form/refine Athena | [native relation formation](../crates/holonic-engine/src/native_ecology/constitutive_fibre.rs) and [circulation](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [adjoint return](../crates/holonic-engine/src/holonic_intelligence/operative_return.rs) |
 | **Soulkiller** | Independent model-intake, excitation and dismantling apparatus | [Soulkiller](SOULKILLER.md), [consumed-input boundary](../crates/holonic-engine/src/soulkiller/boundary.rs) |
 | **Applications/codecs** | Text, image, audio, files, user protocols and target runtimes | [CLI](../applications/holonics-workbench/src/cli.rs), [interoperability](INTEROPERABILITY.md) |
 
-[definition] HNA is the current product term. Older records use HNN or expand HNA as Holonic
-Neural Athena; their phase labels are historical. A tensor, Transformer, SSM or diffusion process
+[definition] HNN means Holonic Neural Network. Earlier records and source identifiers use HNA,
+sometimes expanded as Holonic Neural Athena; those identifiers and phase labels remain historical
+references. A tensor, Transformer, SSM or diffusion process
 is an admissible mathematical/application chart. None of those labels by itself supplies the
 native topology or proves a particular executable adapter exists.
 
@@ -51,7 +52,7 @@ flowchart LR
     S --> N[Native class ecologies]
     S --> W[Cold witness and insufficiency]
     N -.-> A
-    O[Ordinary occurrence] --> E[Eros / HNA operation]
+    O[Ordinary occurrence] --> E[Eros / HNN operation]
     A --> E
     E --> A2[Successor Athena]
     E --> R[Emission and receiver result]
@@ -69,7 +70,7 @@ definitions of learning.
 
 [established-bounded; source-inspected] The public framework exposes
 `holonics::hna`, `holonics::soulkiller` and `holonics::interop` by composing existing owners.
-The CLI uses that HNA entry point. It does not duplicate the native operation or treat an old
+The CLI uses that HNN entry point. It does not duplicate the native operation or treat an old
 snapshot/commit API as the full neural runtime.
 
 ## What the mathematics buys the implementation
@@ -81,8 +82,9 @@ The forward and reverse passages share the morphology that produced the retained
 new deposits join only after the reverse traversal succeeds. The
 [owner map](ARCHITECTURE_MAP.md) connects the Lean laws with their Rust/CUDA implementations.
 The [mathematical synthesis](MATHEMATICS_AND_NATIVE_CONDUCT.md) carries the recent fluid, moving-frame
-and RH consequences into the native comparison: temporal fibres, full mixed current, transported
-metrics and source/remainder controls. Theorems guide native constructions; Lean does not run in
+and RH consequences together with the existing classical ML charts, normalization, integration by
+reflection, leader growth, fractal restriction and compression. Their productive composition is
+unfinished, but their bounded mathematical and executable returns remain available. Theorems guide native constructions; Lean does not run in
 cultivation or inference pipelines.
 
 [definition] Finite native arithmetic is exact about its declared representation. Transcendental

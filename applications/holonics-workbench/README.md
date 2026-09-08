@@ -151,6 +151,6 @@ Every workspace names these as open:
 - `persistent-configurable-diffusion-open`.
 
 These workspace limitations do not describe the new `hna` command family. This snapshot
-application persists its own morphology variant; it does not persist the full HNA operator's
+application persists its own morphology variant; it does not persist the full HNN operator's
 device overlays. Its ONNX/Safetensors exports are package containers, not standard executable
 model recompilation. See [interoperability](../../docs/INTEROPERABILITY.md).

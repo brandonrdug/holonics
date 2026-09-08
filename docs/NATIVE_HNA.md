@@ -1,10 +1,10 @@
-# Native HNA: development and inference
+# Native HNN: development and inference
 
 [established-bounded; implemented-exact] `holonics::hna::native` exposes the ground-up
 `NativeConstitutiveEcology` through one move-owned session. It uses no pretrained coefficients,
 tokenizer or inherited model. The present backend is a **local rational phase-current ecology**:
 coupled two-port currents and a developing, domain-restricted receiver relation. Its linear
-constitutive hypothesis is not a claim that HNA, language or general contextual conduct is linear.
+constitutive hypothesis is not a claim that HNN, language or general contextual conduct is linear.
 
 [definition] This guide covers the NCF0--NCF4 native foundation and its application. The
 [Athena guide](ATHENA.md) separately documents the earlier inherited-operator interfaces.
@@ -25,7 +25,7 @@ phase checkpoints keep their ordinary linear source chart.
 [established-bounded; measured] The [conditional phase example](../research/records/2026-09-07_AC1_THE_MEASURED_CONDITION_FOUNDS_A_NATIVE_PHASE_ACTION.md)
 uses actual native field observations, identifies a local phase action, and predicts/continues
 under a new rational condition. Its portable operator receipt and Metal port boundary are ready
-for shared Mac work. The local relation report is not a new whole-HNA checkpoint.
+for shared Mac work. The local relation report is not a new whole-HNN checkpoint.
 
 [established-bounded; measured] `ResidentConstitutiveFibre::read_condition_preimage` now derives
 the compatible condition family from a fixed source and observed return. `ResidentConditionPreimage`

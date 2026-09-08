@@ -8,7 +8,7 @@ mathematical subject or a source dependency is obsolete.
 
 | Root | Contents |
 |---|---|
-| `crates/` | All live Rust libraries: public framework/HNA APIs, native engine, lifecycle, geometry, substrate and apparatus. |
+| `crates/` | All live Rust libraries: public framework/HNN APIs, native engine, lifecycle, geometry, substrate and apparatus. |
 | `applications/` | The `holonics` CLI/workspace, private [conversation-data preparation](CONVERSATION_DATA.md), and standalone research/document tools. |
 | `accelerators/` | Device-only Rust-GPU/CUDA targets with their independent toolchains and committed boundary artifacts. |
 | `formal/` | Live project-owned Lean sources: elementary holonics, kernel-witness fixture and the independent RH source-transport project. |
@@ -22,7 +22,7 @@ mathematical subject or a source dependency is obsolete.
 [established-bounded; source-inspected] The Rust package graph is still one root Cargo workspace.
 The old `soma/` parent no longer divides host Rust libraries, device targets, formal projects and
 tools into a parallel tree. Package names for older substrate components remain stable; the
-public HNA library is now `holonics-hna`, and `holonics` is the framework entry point.
+public HNN library is now `holonics-hna`, and `holonics` is the framework entry point.
 
 ## Relocation guide
 
@@ -96,7 +96,7 @@ repository governance.
 [definition] Git supplies the native/formal source, guides, historical records and the
 [imported research testimony](../research/records/2026-09-06_portable_evidence/README.md).
 The retired side database and connector are not required. The
-[hardware/modality guide](HARDWARE_AND_MODALITY_BOUNDARIES.md) states why the current engine/HNA
+[hardware/modality guide](HARDWARE_AND_MODALITY_BOUNDARIES.md) states why the current engine/HNN
 compile path is still Linux/CUDA-bound; Apple support is subsequent implementation work.
 
 [definition] Ignored `.local/` datasets, checkpoints, weights and caches do not travel in a clone.

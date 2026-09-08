@@ -1,4 +1,4 @@
-# HNA application interfaces
+# HNN application interfaces
 
 [definition] Use the public framework through `holonics::hna`; this crate owns its application
 adapters. The [native guide](../../docs/NATIVE_HNA.md) documents the ground-up phase body;

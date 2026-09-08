@@ -9,7 +9,7 @@ and target-execution distinctions. This application composes those owners, not a
 | Family | Implementation and scope |
 |---|---|
 | `holonics hna` | [established-bounded; implemented-exact] `run`, `inspect`, `infer` and `train` use the public `holonics::hna` seam over the full resident native operator or restricted SKE material. Ordered occurrences share one continuing session. |
-| `holonics workspace` | [established-bounded; implemented-exact] Explicit-root persistent workspaces over the earlier snapshot/circulation artifact family. Their staged-return/commit protocol does not define HNA recurrence. |
+| `holonics workspace` | [established-bounded; implemented-exact] Explicit-root persistent workspaces over the earlier snapshot/circulation artifact family. Their staged-return/commit protocol does not define HNN recurrence. |
 | `holonics diagnostic` | [established-bounded; implemented-exact] Bounded owner inspection and probes, including exterior model configuration/index/ONNX charts. These are not production quality claims. |
 
 [definition] A native run receipt, an earlier workspace snapshot, a package stored in
@@ -41,6 +41,6 @@ becomes an acceptance criterion merely by appearing in the application history.
 
 [historical] The September 1 workspace-first disposition and its WB/VWS receipts are retained in
 [the prior application document](../../archive/operations/WORKBENCH_BEFORE_HNA_CONSOLIDATION.md).
-The rejected Ratatui interface and removed per-event Gemma lift are not revived. The native HNA
+The rejected Ratatui interface and removed per-event Gemma lift are not revived. The native HNN
 command now supplies the previously missing full-operator application seam without claiming the
 older workspace stores its device overlays.

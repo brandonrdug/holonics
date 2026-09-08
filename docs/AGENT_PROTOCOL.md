@@ -67,7 +67,7 @@ search rankings, former claim grades and equal wording cannot replace that autho
 [definition] Mathematical derivations retain their source/target constructions, ordered operation,
 receiver, hypotheses, orientation, boundary and reconstruction fibre in the actual formal source
 and its explanatory record. Notation and serialized diagrams remain presentations. Lean verifies
-research separately; no Lean parser, kernel call, theorem emitter or verdict enters HNA cultivation
+research separately; no Lean parser, kernel call, theorem emitter or verdict enters HNN cultivation
 or inference pipelines. Lean text already present in conversation logs remains ordinary material.
 
 [definition] Use the subject guides, maintained [owner map](ARCHITECTURE_MAP.md), dated records,

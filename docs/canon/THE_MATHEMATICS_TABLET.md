@@ -6,11 +6,21 @@ important foundation to our ontology and research."* Sections land as they are g
 with no owner named is a section not yet written, and says so.
 
 [project-postulate] Brandon's 2026-09-04 scope ruling: Holonics is a mathematical framework and
-ontology for causal composition, information transport and physical realization. HNA is one
+ontology for causal composition, information transport and physical realization. HNN is one
 executable architecture within it. Mathematical research develops reusable methods of explaining
 and constructing systems, including physical, biological and learning systems. A research attempt
 toward a Millennium problem is not a promise that its proposed route succeeds. Its actual
 derivations, counterexamples and unresolved relations determine the next construction.
+
+[project-postulate] Brandon's September 8 clarification makes the publication scope explicit:
+Holonics develops a reusable mathematical and physical calculus; neural products and Millennium
+endpoints are applications of that work. Every value is a receiver-relative measurement,
+including an integer. Equal faces do not merge causal origins: `2+2` and `2^2` return the same
+numerical face while retaining different constructions. Bit-pure computation and exact ratios,
+generators and retained remainders realize the no-float discipline; exp, log, sigmoid, softmax,
+adjoints and the mathematics of classical architectures remain available. Read the
+[framework synthesis](../MATHEMATICS_AND_NATIVE_CONDUCT.md) for their connection to reflection,
+leader growth, fractal restriction and Holonic Compression. Current neural terminology is HNN.
 
 **Truth status is per claim.** Standard mathematics is marked `proved-standard` with its citation.
 Holonic readings of it are `interpretation` and are marked. Anything the repository implements is

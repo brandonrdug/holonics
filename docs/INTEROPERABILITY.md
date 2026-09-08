@@ -24,7 +24,7 @@ application ergonomics without treating Burn's tensor/module vocabulary as its i
 [export owner](../crates/holonic-life/src/native_intelligence/morphology_export/mod.rs) operates
 on the older `NativeMorphologyArtifact` package family and returns `Exact`, `Projected` or
 `Refused`. Exact round-trip preserves that package at its declared scope. It does not establish
-that a standard runtime can execute the current full HNA model.
+that a standard runtime can execute the current full HNN model.
 
 | Target | Current wire and executable meaning |
 |---|---|

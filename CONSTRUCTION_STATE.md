@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 8, 2026. **Priority:** NS/Euler mathematical review; Athena construction paused by Brandon.
+**Currency:** September 8, 2026. **Priority:** Framework synthesis and publication; Athena construction remains paused.
 **Position:** AC0 complete; AC1 unfinished; AC2 language probes failed; AC3 apparatus only; AC4–AC5 open.
 **Athena-alpha:** not yet attained.
 
@@ -8,17 +8,24 @@
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct
 instruction governs.
 
-## Current direction and paused HNA work
+## Current direction and paused HNN work
 
-[project-postulate] Brandon's September 8 instruction pauses machine-learning construction and
-pivots into [OpenAI's NavierStokesAndEuler](https://github.com/openai/NavierStokesAndEuler) and the
-missing generative mathematics. The [first review](research/records/2026-09-08_THE_NS_EULER_REVIEW_EXPOSES_THE_GENERATOR_GAP_IN_AC1.md)
-records the AC position, actual implementation effort, external theorem scopes and exact phase
-construction. No joint-kernel implementation or corpus run is currently scheduled.
+[project-postulate] Brandon's latest September 8 ruling broadens the review to Holonics as a
+mathematical and physical framework, including existing classical ML, normalization, reflection,
+leader growth, fractal packing and compression. HNN is the current neural term. The README
+presents the framework and experimental implementations, with no CLI usage instructions.
+
+[established-bounded; source-inspected] The [breadth review](research/records/2026-09-08_HOLONICS_REJOINS_CLASSICAL_LEARNING_REFLECTION_PACKING_AND_COMPRESSION.md)
+and [live synthesis](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) now connect the existing formal
+architecture/normalization charts, certified CUDA nonlinear/adjoint conduct, boundary Schur
+reduction, leader/rebase, recursive packing and compression owners. The earlier diagnosis of
+missing generative theory was too broad: working components exist outside the narrow AC1 path.
+The no-float rule does not prohibit their mathematics. Root license texts now match the existing
+MIT-or-Apache-2.0 workspace declaration. No native or formal algorithm changed in this review.
 
 [open] AC1 has native phase/current transport, material contacts, operative representations and
 partial adjoints. It has not returned observation-driven contact-morphology development or a
-sufficient generative law for general conversation. The exact tangent normal response does not
+productive general-conversation composition of the available mechanisms. The exact tangent normal response does not
 establish the full finite nonlinear successor or the adequacy of the chosen source/formation law.
 AC2 has only failed product probes. AC3's bounded persistence apparatus does not establish broad
 useful-model cultivation; AC4–AC5 remain unfinished.
@@ -49,14 +56,16 @@ solution `u=b*cos(B)+a*cos(A-t*cos(B))`, its exact momentum/divergence check, an
 series generating its entire frequency ladder with an explicit uniform remainder bound.
 Phase-distinct initial fields with identical modal energies and mean covariance have opposite
 new low-mode currents. Both modes of the first viscous Duhamel correction and their zero-viscosity
-limits were checked exactly. This is a generator/receiver derivation, not a singularity or HNA
+limits were checked exactly. This is a generator/receiver derivation, not a singularity or HNN
 learning result; the [receipt](research/experiments/mfr_entropy_heat_current/phase_preimage_receipt.json)
 retains its scope.
 
-[definition] Next compare the external actual correction-preservation and terminal-jet arguments
-with our MFR3 pressure, phase-current and complete residual owners. Preserve forced NS C/D,
-unforced Euler and our unforced NS direction as distinct endpoint scopes. Recover relevant
-hypotheses and estimates before returning to the AC1 generative attachment.
+[definition] On resumption, compare and compose the recovered contact/normalization, causal
+return, path-growth, restriction/rebase and generator-decoder owners. The concrete absent
+relation must come from that attempted composition. No universal intelligence proof or
+Millennium endpoint is required before using established local mechanics. The NS/Euler
+correction/terminal-jet comparison remains a mathematical research source within this broader
+work; neither the neural product nor a solved theorem exhausts the framework's purpose.
 
 [project-postulate] **Preimage Fibre** retains compatible causes and future-conduct constraints
 from limited observations. Neither perfect inversion nor a singleton cause is required. Generator
@@ -95,7 +104,7 @@ The [September 5 correction](research/records/2026-09-05_CONTEXTUAL_TRANSPORT_PR
 requires actual situated conditions and lawful transport. A changed map, context window, shared
 wording or authored relevance switch does not establish it. Reuse existing native owners.
 
-## Earlier HNA, Soulkiller and HNP standing
+## Earlier HNN, Soulkiller and HNP standing
 
 [established-bounded; source-inspected] HNA0–HNA5 and SKE0–SKE5 retain their declared returns.
 Brandon's September 4 ruling admits the source-neutral resident realization as Soulkiller apparatus
@@ -124,7 +133,7 @@ Safetensors/ONNX package round-trips and standard executable exports are distinc
 [definition] The [moving-frame strategy](docs/plans/THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md)
 remains the mathematical order. MFR0–MFR2 are complete at their recorded scopes. MFR3 follows
 Brandon's complex Euler/Navier–Stokes temporal-source direction; direct RH research in MFR5
-remains deferred. The September 8 external NS/Euler review now precedes further candidate construction.
+remains deferred. The September 8 framework synthesis includes the external NS/Euler comparison as one reusable research source.
 
 [proved-derived; formal-checked] MFR1 returns moving physical fluid charts, clocks, source laws
 and conditional endpoint criteria. MFR2 returns the all-time folded RH source, Gaussian remainder,
