@@ -56,6 +56,11 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
    adds desktop `99a921b9`'s resident entry and the paired/enclosed/balanced Metal junctions,
    complete reports and resident-input persistence. Forty-three focused field controls pass;
    the extended public example agrees with desktop at its declared receiver scope.
+   The [internal-current/mode return](../../research/records/2026-09-07_APPLE_RETURNS_THE_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE.md)
+   ports desktop `a5c75c98`'s actual internal source and shared-drive generator. Eight new/focused
+   controls and nineteen temporal regressions pass; the public 391-byte artifact and all
+   non-timing/path receipt fields agree with desktop. Preserve its amplitude fibre when binding
+   an acoustic clock and interaction; an occurrence-parity generator does not establish frequency.
    This is a device composition return, not completion of acoustic development.
 2. Bind actual acoustic sections and returns to that shared owner. Start at
    `AcousticFieldChart`, `ExactPhaseCurrentSection`, the existing clock-transport owners and
@@ -94,6 +99,16 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
    unobserved. Next use the measured return in the declared acoustic action's condition/contact
    law, retaining noise and unmodelled transport instead of supplying an invented exact target.
    The initial unit-response comparison does not itself develop the generator.
+   First return the measured difference through the temporal adjoint of the retained producing
+   convolution, restricted to actual observed support. Then compose the joint compatible family
+   `F_y = {(h,e) : R_S X_x h + e = y_S}`, where `e` is retained unmodelled return, not a discarded
+   error score. Under the existing explicitly declared unit-admittance metric, contact of the
+   actual prior `(h_0,0)` obeys `h' - h_0 = (R_S X_x)* e'` and `R_S X_x h' + e' = y_S`.
+   This specifies a composition to implement, not a returned acoustic model. Preserve the whole
+   family and actual normal currents, producing/current operator cuts, and the clock/support
+   chart. Reuse the existing projection and certified enclosure arithmetic; a numerical centre
+   cannot silently enter the exact temporal point consumer. Expose the missing structured fibre
+   and enclosure ports before claiming that recorded evidence develops the generator.
 3. Develop and retain acoustic generative standing across source-qualified recordings and
    actual joined returns, then conduct its native emission into the declared acoustic receiver.
    Inspect perception differences and generated sound, preserve the declared reconstruction

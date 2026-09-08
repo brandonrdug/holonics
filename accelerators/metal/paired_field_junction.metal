@@ -33,7 +33,8 @@ inline void field_phase_product(W ar, W ai, W ad, W br, W bi, W bd,
   wnorm(out, 2, out + 2, slot);
 }
 
-inline W field_wnorm(device W *row, uint width, thread W *den, device uint *slot) {
+template <typename CarrierPointer>
+inline W field_wnorm(CarrierPointer row, uint width, thread W *den, device uint *slot) {
   W d = den ? (!wzero_p(*den) ? *den : wzero()) : wzero();
   for (uint j = 0; j < width && !ueq(d.m, uone()); ++j)
     d = wgcd(d, row[j], slot);
@@ -69,10 +70,11 @@ inline bool field_exact_divide(W numerator, W denominator, thread W *quotient,
 
 // Common source/contact assembly for exact and enclosed representations. The
 // target half of u is zero and the target half of d is the negative root field.
+template <typename CarrierPointer>
 inline bool field_paired_build_faces(
     device const long *query, device const long *origin, device const long *incoming,
     device const long *frame, device const long *origin_frame,
-    uint nodes, uint linked, device W *u, device W *d,
+    uint nodes, uint linked, CarrierPointer u, CarrierPointer d,
     thread W *u_den_out, thread W *d_den_out, device uint *slot) {
   if (!nodes || linked > 1 || !query || !incoming || !frame || !u || !d
       || !u_den_out || !d_den_out || (linked && (!origin || !origin_frame))) {

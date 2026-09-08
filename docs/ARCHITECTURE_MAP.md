@@ -163,6 +163,18 @@ The prefix source receiver borrows that carrier on device. The
 records 118 native/constitutive and 16 SDK alpha controls. This port does not relabel boundary
 branches as the complete contextual source.
 
+[established-bounded; measured] `field/internal_current.rs` and `field_internal_current.cuh`
+evaluate the existing internal prefix decoder on the device, retaining exact contact geometry
+and any numerical radius. `field/internal_mode.rs` verifies complete shared root drive, cancels
+the current prefix, and returns the descended generator plus one amplitude/fibre. Its separate
+rest/unfold owner executes without the source field. The
+[125-test return](../research/records/2026-09-07_AC1_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE_GENERATORS.md)
+includes actual conversation-model capture through the read-only SDK session wrapper.
+The [Apple port](../research/records/2026-09-07_APPLE_RETURNS_THE_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE.md)
+realizes these three kernels in `accelerators/metal/field_internal_current.metal`, sharing the
+paired helpers across device/threadgroup address spaces. Its public mode wire and all semantic
+receipt fields agree with desktop; the private conversation-model packet was not moved.
+
 [established-bounded; measured] `native_ecology/constitutive_fibre/resident.rs` now owns borrowed
 resident rational-current input and immutable original-fibre returns for the existing local
 relation. `resident_section::record_constitutive_current` and

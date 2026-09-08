@@ -2,6 +2,176 @@ use super::*;
 use crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent;
 
 impl<'chart> ResidentSurface<'chart> {
+    pub(crate) fn record_internal_shared_drive(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        left: &ResidentSection<'chart>,
+        right: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        if left.rows != 1
+            || right.rows != 1
+            || left.width != right.width
+            || left.width == 0
+            || left.width > u32::MAX as usize
+            || [left, right]
+                .iter()
+                .any(|s| s.grain.0 != 0 || !std::ptr::eq(s.surface, self))
+        {
+            return Err(ResidentRefusal::Declaration {
+                operation: "internal-shared-drive",
+                what: "incompatible root contacts".into(),
+            });
+        }
+        let mut p = Params::new();
+        p.ptr(left.lo.device_ptr())
+            .ptr(left.hi.device_ptr())
+            .ptr(right.lo.device_ptr())
+            .ptr(right.hi.device_ptr())
+            .u32(left.width as u32)
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_internal_shared_drive",
+            1,
+            self.declaration.warp_size.max(1),
+            0,
+            &mut p,
+            "internal-shared-drive",
+        )
+    }
+
+    pub(crate) fn record_internal_mode_unfold(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        origin: &ResidentSection<'chart>,
+        steps: u64,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        if [origin, output].iter().any(|s| {
+            s.rows != 1 || s.width != 12 || s.grain.0 != 0 || !std::ptr::eq(s.surface, self)
+        }) {
+            return Err(ResidentRefusal::Declaration {
+                operation: "internal-mode-unfold",
+                what: "incompatible mode amplitude chart".into(),
+            });
+        }
+        let mut p = Params::new();
+        p.ptr(origin.lo.device_ptr())
+            .ptr(origin.hi.device_ptr())
+            .u64(steps)
+            .ptr(output.lo.device_ptr())
+            .ptr(output.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_internal_mode_unfold",
+            1,
+            self.declaration.warp_size.max(1),
+            0,
+            &mut p,
+            "internal-mode-unfold",
+        )
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_field_internal_current(
+        &self,
+        lane: &Lane<'_, 'chart>,
+        birth: &ResidentSection<'chart>,
+        source: &ResidentSection<'chart>,
+        input: &ResidentSection<'chart>,
+        birth_frame: &ResidentSection<'chart>,
+        source_frame: &ResidentSection<'chart>,
+        before: &ResidentSection<'chart>,
+        now: &ResidentSection<'chart>,
+        nodes: usize,
+        representation:crate::native_ecology::constitutive_fibre::NativeFieldJunctionRepresentation,
+        at: u64,
+        contact: &ResidentSection<'chart>,
+        output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        use crate::native_ecology::constitutive_fibre::NativeFieldJunctionRepresentation;
+        let fail = || ResidentRefusal::Declaration {
+            operation: "field-internal-current",
+            what: "incompatible caused contact, prefix or aperture".into(),
+        };
+        let d = nodes.checked_mul(6).ok_or_else(fail)?;
+        let (mode, grain, factor) = match representation {
+            NativeFieldJunctionRepresentation::RationalWords => (1, 0, 4usize),
+            NativeFieldJunctionRepresentation::EnclosedDyadic { fractional_bits }
+                if (1..=120).contains(&fractional_bits) =>
+            {
+                (2, fractional_bits, 12)
+            }
+            _ => return Err(fail()),
+        };
+        let field_words = nodes
+            .checked_mul(16)
+            .and_then(|n| n.checked_add(9))
+            .ok_or_else(fail)?;
+        let prefix_words = d
+            .checked_add(1)
+            .and_then(|n| n.checked_mul(factor))
+            .ok_or_else(fail)?;
+        let contact_words = d
+            .checked_add(1)
+            .and_then(|n| n.checked_mul(2))
+            .ok_or_else(fail)?;
+        let shape = |s: &ResidentSection<'chart>, rows, width| {
+            s.rows == rows && s.width == width && s.grain.0 == 0 && std::ptr::eq(s.surface, self)
+        };
+        if nodes == 0
+            || prefix_words > u32::MAX as usize
+            || !shape(birth, 1, field_words)
+            || !shape(source, 1, field_words)
+            || !shape(input, nodes, 3)
+            || !shape(birth_frame, nodes, 3)
+            || !shape(source_frame, nodes, 3)
+            || !shape(before, 1, prefix_words)
+            || !shape(now, 1, prefix_words)
+            || !shape(contact, 1, contact_words)
+            || !shape(output, 1, 12)
+        {
+            return Err(fail());
+        }
+        let scratch = d
+            .checked_mul(2)
+            .and_then(Self::constitutive_wide_scratch)
+            .and_then(|n| u32::try_from(n).ok())
+            .filter(|n| *n <= self.declaration.max_sectiond_bytes)
+            .ok_or_else(fail)?;
+        let mut p = Params::new();
+        for s in [birth, source, input, birth_frame, source_frame] {
+            p.ptr(s.lo.device_ptr());
+        }
+        for s in [before, now] {
+            p.ptr(s.lo.device_ptr()).ptr(s.hi.device_ptr());
+        }
+        p.u32(nodes as u32).u32(mode).u32(grain).u64(at);
+        for s in [contact, output] {
+            p.ptr(s.lo.device_ptr()).ptr(s.hi.device_ptr());
+        }
+        p.ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_field_internal_current",
+            1,
+            self.declaration.warp_size.max(1),
+            scratch,
+            &mut p,
+            "field-internal-current",
+        )
+    }
+
     pub(crate) fn record_field_current_input(
         &self,
         lane: &Lane<'_, 'chart>,

@@ -10,150 +10,54 @@ instruction governs.
 
 ## Parallel MacBook position
 
+[project-postulate] Brandon's resumed [AS4–AS5 goal](docs/plans/HOLONICS_ON_APPLE_SILICON.md)
+requires useful native sound perception/production, then useful recorded English and conversational
+conduct, with continuing application, persistence, streaming and measured consumer costs.
+Desktop private cultivation remains independent. Recorded material supplies development;
+microphone access is optional. PCM ordinals, fixed sonification and source labels do not define
+native acoustic organization.
+
+[established-bounded; measured] The [internal-current/mode return](research/records/2026-09-07_APPLE_RETURNS_THE_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE.md)
+integrates desktop `a5c75c98` and ports its three kernels to Metal. Eight internal-current/mode
+controls and nineteen temporal regressions pass. The public 391-byte generator is byte-identical
+to desktop, with all receipt fields equal except path and timing. Source-independent unfolding
+and recipient-field conduct use two deeds and zero numerical readout. Acoustic clock/interaction
+binding remains required; the mode's sign progression does not supply physical frequency.
+
 [established-bounded; measured] The [measured acoustic return](research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md)
-now retains full oriented differences for three actual 14-second SoundCam loopback/microphone
-pairs on their original clocks. Nineteen native controls and all-coordinate source-qualified
-comparisons pass. Prediction/difference take about 2.4 s together; cold audio export takes
-14.4–14.7 s, with 139.8 MB peak native residency. The initial unit response remains a baseline;
-using measured differences to develop the acoustic generator is next. AS4–AS5 stay active.
+retains full oriented differences for three actual 14-second SoundCam electrical-loopback/
+microphone pairs on their original clocks. All-coordinate source-qualified comparisons pass.
+Prediction/difference take about 2.4 seconds together; cold audio export takes 14.4–14.7 seconds,
+with 139.8 MB peak native residency. The initial unit response is still a baseline.
 
-[established-bounded; measured] The [conditional restart return](research/records/2026-09-07_THE_RECORDED_CONDITIONAL_ACTION_CONTINUES_AFTER_RESTART.md)
-now persists the learned local relation, actual condition and complete field history/capabilities.
-Seventeen focused controls and three recorded processes return; cold comparisons verify both
-restarts, all waveform coordinates, field contact moments and retained history. Later native
-whole-recording actions take 0.108/0.155 s; cold audio export takes 2.31/3.11 s. Actual acoustic
-constitutive binding and useful sound/English development remain unfinished; AS4–AS5 stay active.
+[established-bounded; measured] The [complete-recording action](research/records/2026-09-07_APPLE_CONDUCTS_COMPLETE_RECORDINGS_AND_RETURNS_TIMED_AUDIO.md)
+and [conditional restart](research/records/2026-09-07_THE_RECORDED_CONDITIONAL_ACTION_CONTINUES_AFTER_RESTART.md)
+retain complete timed convolution, both quadratures, actual condition current and the local
+relation across separate recorded processes. The [complete junction](research/records/2026-09-07_APPLE_CONTINUES_GENERATED_CURRENTS_THROUGH_THE_COMPLETE_JUNCTION.md)
+ports resident input and paired/enclosed/balanced field conduct, including history/capabilities.
+These controlled two-tap and field returns establish their apparatus scope, not cultivated sound
+or English usefulness. Completed measurements and control counts remain in those records.
 
-[established-bounded; measured] The [complete-recording return](research/records/2026-09-07_APPLE_CONDUCTS_COMPLETE_RECORDINGS_AND_RETURNS_TIMED_AUDIO.md)
-now conducts whole ESC-50 and LibriSpeech sections through retained earlier/successor conditions
-and publishes timed stereo PCM with the complete exact current. Thirty-eight scoped Rust
-controls pass; cold comparisons verify all coordinates, clocks, tails and projection fibres.
-Each full native action takes 0.21–0.32 s with zero numerical readback; exporting both outputs
-takes 4.18/9.56 s and whole studies take 6.62/11.35 s. Next bind actual acoustic material and
-receiving conditions to persistent development across recordings. The controlled two-tap study
-does not establish a cultivated sound/English model or streaming completion; AS4–AS5 stay active.
+[open; source-inspected] Next compose the recorded difference through the temporal adjoint of
+its retained producing operator, retain the complete compatible-condition fibre and unmodelled
+return, and develop persistent acoustic standing through the native contact law. The bilinear
+preimage owner does not yet supply this structured temporal fibre. Larger material/current-history
+owners remain outside the current Metal port. Actual acoustic/English development and streaming
+completion remain unfinished; AS4–AS5 stay active.
 
-[definition] Brandon resumed the updated AS4–AS5 goal on September 7. The
-[Apple blueprint](docs/plans/HOLONICS_ON_APPLE_SILICON.md#september-7-resumption-through-shared-native-generators)
-now states the shared generator port, actual acoustic binding and subsequent useful sound/English
-product sequence. AS4–AS5 remain unfinished.
+[established-bounded; measured] Local recorded material includes 2,000 ESC-50 WAVs, 100 LibriSpeech
+clips, four complete AMI meetings and 30 SoundCam source/receiver pairs. The [interval return](research/records/2026-09-07_RECORDED_RESPONSE_POINTERS_RETAIN_THEIR_ACOUSTIC_INTERVALS.md)
+retains all 899 AMI annotations as 844 resolved pairs and 55 refusals. The measured experiments
+used explicit subsets; downloaded corpora do not establish cultivation. AMI speaker annotations
+do not supply separate microphone channels.
 
-[established-bounded; measured] The [conditional Metal return](research/records/2026-09-07_APPLE_LEARNS_THE_SHARED_CONDITIONAL_PHASE_ACTION.md)
-now supplies the four shared current/contact/differential/historical-frame kernels, 54 passing
-engine controls and exact agreement with the desktop forward phase-action receipt. Prediction
-and later resident currents use zero numerical readouts. The subsequent
-[condition-fibre integration](research/records/2026-09-07_APPLE_RETURNS_THE_SHARED_CONDITION_PREIMAGE_FIBRE.md)
-ports desktop `d3820ac3`, passes 22 engine controls and exactly matches its inferred condition,
-constraint graph and subsequent prediction. The public text-codec control reaches the known
-unported paired-field refusal. The subsequent temporal and joint-family returns below extend
-that port; actual material/condition binding remains next. No useful acoustic or English model is claimed.
-
-[established-bounded; measured] The [acoustic resident ingress](research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
-now exposes complete timed PCM cells to the same rational-current port, preserving source
-delivery lineage, zeros and padding without advancing the source cursor. Five acoustic-field
-controls pass. The subsequent [recorded interval return](research/records/2026-09-07_RECORDED_RESPONSE_POINTERS_RETAIN_THEIR_ACOUSTIC_INTERVALS.md)
-now binds exact recording spans to original source/target pointers. Fourteen focused checks pass;
-all 899 AMI records retain 844 resolved pairs and 55 refusals, and one complete 100,800-sample pair
-mounts through the resident current port. These source attachments alone do not define the
-temporal/material action or condition standing; equal cell ordinals are not that passage. No native cultivation ran in this
-source-attachment return. AMI speaker labels still do not supply separate microphone channels.
-
-[established-bounded; measured] The [native temporal return](research/records/2026-09-07_THE_NATIVE_TEMPORAL_ACTION_RETAINS_ITS_CAUSAL_TAIL.md)
-now realizes the existing exact causal convolution on resident currents and binds the acoustic
-clock/support to it. Twenty-one focused controls pass. One LibriSpeech coefficient experiment
-infers a digital two-tap response and predicts a later held-out source exactly; the fixed ESC-50
-cuts retain a plural condition and a native point-consumer refusal. No native stage numerically
-reads a current to the host. The subsequent [whole-family return](research/records/2026-09-07_APPLE_CONDUCTS_THE_SHARED_CONDITION_FAMILY.md)
-integrates desktop `82fef476` and passes 39 resident/temporal controls. Both recorded studies now
-conduct their complete supported output family; silence retains its four free condition directions.
-The subsequent [retained-current contact](research/records/2026-09-07_APPLE_RETAINS_CONDITION_CURRENT_THROUGH_RECORDED_CONTACT.md)
-integrates desktop `2c99351c`, passes 32 resident controls and matches its public phase cycle
-exactly. Both recorded studies now generate before observation, contact inferred evidence and
-generate from the successor while preserving their earlier carriers. Next join this composition
-to productive timed acoustic reception/emission across recordings and persistence. These bounded
-coefficient/contact returns do not establish useful sound or English-model completion.
-
-[established-bounded; measured] The [complete-junction return](research/records/2026-09-07_APPLE_CONTINUES_GENERATED_CURRENTS_THROUGH_THE_COMPLETE_JUNCTION.md)
-integrates desktop `99a921b9` resident field ingress, paired/enclosed/balanced Metal junctions and
-input persistence. Forty-three focused field controls pass, and all eleven compared public phase
-result groups agree with desktop, including exact internal currents. Both recorded studies now
-conduct their retained predictions into two resident field occurrences; cold PCM/algebra receivers
-verify complete covariance, all current bounds, residual and internal current. Their native field
-stages use zero numerical readouts. Contextual material-transport and complete-current history
-receivers remain separate unported owners; productive timed sound and English remain unfinished.
-
-[established-bounded; measured] The September 7 Mac pickup integrates desktop `6ef7bf9d` with
-68 passing engine/public native tests and successful HNA library, application and shared-example
-checks. The [integration record](research/records/2026-09-07_APPLE_INTEGRATES_THE_SHARED_CONDITIONAL_GENERATOR_HANDOFF.md)
-retains the merge repair and initial shared conditional-generator handoff. The subsequent Metal
-return above supersedes its then-unported boundary; learned linguistic/acoustic organization
-and AS4–AS5 remain unfinished.
-
-[definition] Brandon's subsequent September 6 request establishes `codex/apple-silicon` for
-[Holonics on Apple silicon](docs/plans/HOLONICS_ON_APPLE_SILICON.md), independently of the desktop
-Athena-alpha session above. Sound perception and generation precede speech. Desktop private
-conversation data and cultivation remain on that machine.
-
-[established-bounded; process-audit] AS0 specification and apparatus setup returned in the
-[Mac record](research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md): compatible
-Rust, pinned Lean, repaired Xcode setup, Metal tools and an isolated MLX custom-kernel check.
-The native HNA Cargo check reached the known CUDA/PTX/target-gating obstruction on macOS.
-
-[established-bounded; implemented-exact, measured] AS1–AS3 returned the local rational phase
-foundation on Apple Metal: exact formation/circulation/rechart, complete persistence and public
-continuation. The [implementation record](research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md)
-retains 28 engine phase tests, six mount ownership tests, 20 public native tests and four
-separate-process tests. This does not claim every native owner is ported to Apple.
-
-[open] AS4 is partial and AS5 remains open. The two-junction PCM/feedback application, fixed
-sonification, one-WAV-then-transcript experiment and speaker lifecycle checks are apparatus/probe
-returns. They have not produced a corpus-cultivated acoustic or conversational English model,
-useful recognition/synthesis, or real-time native audio. The
+[historical; process-audit] [AS0 setup](research/records/2026-09-06_APPLE_SILICON_SPECIFICATION_AND_MAC_SETUP.md)
+and the [AS1–AS3 foundation](research/records/2026-09-06_APPLE_NATIVE_PHASE_AND_ACOUSTIC_COMPOSITION.md)
+returned the native rational Metal operation, persistence and public continuation. The
 [completion correction](research/records/2026-09-06_AUDIO_APPLICATION_PROBES_DO_NOT_COMPLETE_CONVERSATIONAL_AUDIO.md)
-withdraws the earlier AS1–AS5 completion claim while retaining the actual Apple foundation.
-
-[project-postulate] Brandon's latest clarification requires recorded conversational and English
-audio as development material. His curated-data instruction replaces the proposed microphone
-sample, not the intended product. Microphone access is not a prerequisite for corpus development,
-real-time processing, recognition or synthesis. Continue AS4–AS5 using source-qualified recorded
-material and the same native recurrence; personal samples are optional later adaptation/device
-checks. The desktop Athena-alpha campaign and private conversation data remain independent.
-
-[open] Corrected AS4–AS5 implementation remains active. The
-[continuation return](research/records/2026-09-06_AS4_AS5_CORPUS_CONTINUATION_AND_RESIDENT_PACKETS.md)
-adds consecutive recordings in one native checkpoint, ordered packets with exact refusal
-prefixes, and bounded Metal complex incidence. Four complete AMI meetings retain timed speakers,
-words and original response links, including source annotation refusals. These do not yet return
-learned acoustic/English conduct. Complete recorded inputs still took 7.07–12.65 times their
-source durations; retained per-sample allocation/history remains a concrete cost.
-
-[project-postulate] Brandon's subsequent acoustic-grain correction requires native holonic
-organization, not one PCM sample per recurrence. The existing sample loop remains a probe;
-its timings do not establish the cost of the intended acoustic realization. Next compose the
-exterior acoustic chart with native situated material/transport and receiver-relative reconstruction,
-alongside the shared linguistic formation work. The
-[correction record](research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md)
-locates existing owners and preserves the distinction between an exterior codec and native grain.
-
-[established-bounded; implemented-exact] The Mac branch has integrated desktop `673b8d42` and
-ported the shared complete material field to Metal. Acoustic temporal sections now enter that
-joint field, with exact source support and recoverable source handles. A borrowed structural
-profile exposes material, frame/history and actual chart extents without device readback.
-The [field return](research/records/2026-09-06_APPLE_ACOUSTIC_FIELDS_AND_HOLONIC_PROFILING.md)
-records verification and profiling. This is a shared field/codec construction; learned temporal
-organization, timed acoustic production and useful speech remain unfinished.
-
-[established-bounded; measured] Exact arithmetic fast paths improved matched 32-port field runs
-to 12.35 s for 5 s of sound and 7.79 s for 6.59 s of English. Both remain slower than real time;
-GPU execution accounts for about 86% of loop time. The field retains 85.5 MB after those recordings
-and still reads each terminal result. The field return separates these apparatus measurements
-from intrinsic dimensions and acoustic/linguistic capability.
-
-[established-bounded; measured] Local data comprise 2,000 ESC-50 WAVs and a 100-clip LibriSpeech
-subset, outside Git. The measured examples processed a small selection, not the downloaded
-corpora. A five-second sound continuation took 299.47 s including cold publication and produced
-a 465,125,473-byte checkpoint. These expose execution/storage work; they are not real-time
-performance. The [acoustic guide](docs/ACOUSTIC_EXPERIMENTS.md) documents the existing probe commands.
+and [grain correction](research/records/2026-09-06_ACOUSTIC_HOLONS_ARE_NOT_PCM_SAMPLE_STEPS.md)
+retain earlier apparatus evidence and withdraw its promotion to acoustic/conversational completion.
+The [acoustic guide](docs/ACOUSTIC_EXPERIMENTS.md) locates source-qualified commands and records.
 
 ## Current HNA direction
 
@@ -204,19 +108,28 @@ The public example generates while the condition family is free, receives an act
 then changes its retained current and predicts a later native field response exactly. The contact
 and later generation require no numerical host readback. Conversation capability remains open.
 
-[open] Next compose the continuing condition current with actual field source/condition incidence,
-producing-law chronology and conversation reception. Whole-family evidence receivers are not a
-universal certainty gate on model generation. Retain the carriers used for each prediction;
-later condition inference changes the successor rather than rewriting its history. Bind that native
-owner through the existing conversation exposure/session interface. Athena-alpha still has no
-useful text response; the full AC0–AC5 goal remains unfinished.
+[established-bounded; measured] The [internal source and shared-drive generator](research/records/2026-09-07_AC1_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE_GENERATORS.md)
+now make an actual internal phase available to the learned relation and condense a declared
+future receiver through `q T_i = -q`. The native shared-drive check preserves the two distinct
+birth histories; the common component remains in the Preimage Fibre. All 125 constitutive and
+16 SDK alpha tests pass. A 391-byte public mode restores and generates without its source field.
+The actual four-family conversation model supplies a 2,030-byte mode at contacts `39,43`, with
+a certified nonzero current and fixed numerical amplitude fibre. Its 732 occurrences remain
+unchanged, and the mode unfolds after the source session is dropped.
+
+[open] Next compose the mode through the existing complete-current material transport and its
+actual source/receiving chronology: for `m=(e_l-e_r)/2`, its output contribution is `(M m) q`.
+Preserve the remaining source, producing/current operator cuts, amplitude fibre and returned
+difference. Do not select the numerical centre or substitute a phase label or another learner.
+A mode being available does not establish that the learned emitter uses it. Athena-alpha still
+has no useful text response; the full AC0–AC5 goal remains unfinished.
 
 [established-bounded; measured] The [generated-current ingress](research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
 now feeds the existing field operation directly, retaining its actual input through history
 placement and rest. All 118 constitutive and 16 SDK alpha tests pass, including paired/internal
 equivalence, refusal preservation and restart. The public conditional example drives three linked
 paired-field occurrences with zero numerical readback and retains their full internal currents.
-This closes the ingress port; the contextual-source/conditional-action binding above remains open.
+This closes the ingress port; the mode/material-transport binding above remains open.
 
 [established-bounded; measured] The existing local relation now has a
 [resident rational-current port](research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md).

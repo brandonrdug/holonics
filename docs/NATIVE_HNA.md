@@ -75,6 +75,16 @@ its attachment to the conversation field and useful text/acoustic conduct remain
 
 ## Athena-alpha material field
 
+[established-bounded; measured] `read_internal_current_at` receives an existing contact's internal
+phase on the device, with an exact point port when its representation permits one. Enclosed
+prefixes retain their numerical radius. `condense_shared_drive_mode(l,r)` admits distinct births
+only after native equality of their complete root drives. Its receiver `q=b_l-b_r` then obeys
+`q'=-q` for the declared ordinary field family. `NativeSharedDriveMode::{rest,remount,unfold}`
+stores and executes that generator without the original field. Unfoldings share one amplitude;
+the common component is not identified or recovered. The SDK session exposes the same read-only
+condensation. See the [internal-mode return](../research/records/2026-09-07_AC1_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE_GENERATORS.md)
+for the actual conversation mode, source-independent execution and numerical limits.
+
 [established-bounded; measured] `NativeConstitutiveField::read_constitutive_source` now reads the
 current local relation at an actual historical source anchor. Native frame transport includes
 both original source branches. Its `ResidentConstitutiveReturn` can enter another native port;

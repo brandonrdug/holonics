@@ -1,0 +1,17 @@
+{
+  "schema": "holonics.apple-internal-mode-comparison.v1",
+  "truth_status": "established-bounded",
+  "evidence_tags": [
+    "measured"
+  ],
+  "desktop_receipt": "research/records/2026-09-07_internal_mode/return.json",
+  "apple_receipt": "research/records/2026-09-07_apple_internal_mode/return.json",
+  "all_other_json_fields_equal": true,
+  "excluded_fields": [
+    "whole_seconds",
+    "mode_artifact"
+  ],
+  "mode_wire_equal": true,
+  "mode_octets": 391,
+  "acoustic_model_established": false
+}

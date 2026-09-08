@@ -53,20 +53,25 @@ current and all returned differences. All 114 constitutive tests and the public 
 example pass. Generation before condition identification and subsequent observation-driven change
 both return without numerical host readback; useful conversation remains unfinished.
 
-[definition] Next compose the actual field source/condition incidence, producing-law chronology
-and reception with that continuing current, then bind the native owner to conversation material.
-Retain the carriers used for each prediction; later inference changes the successor rather than
-rewriting that prediction's history. Native current is distinct from a whole-family evidence
-receiver; do not choose an arbitrary particular solution or require universal certainty to define
-all inference.
+[established-bounded; measured] The [internal-current/mode return](../../research/records/2026-09-07_AC1_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE_GENERATORS.md)
+now supplies an internal source and an executable shared-drive quotient. All 125 constitutive
+and 16 SDK alpha tests pass. A mode from the actual four-family conversation model preserves a
+nonzero contextual difference and unfolds after that session is dropped. Its amplitude remains
+an enclosure; the point-current port does not silently select its centre.
+
+[definition] Next compose this actual mode through the existing complete-current material
+transport, retaining source/receiving chronology, the producing/current operator cuts and full
+returned difference. Its mode contribution is `(M m) q`, with `m=(e_l-e_r)/2`; the remaining
+complete source is retained. Establish its productive coupling before repeating corpus exposure.
+Do not replace the amplitude fibre with its centre or a phase label. Native generative current
+remains distinct from whole-family evidence, without a universal certainty gate on generation.
 
 [established-bounded; measured] The [generated-current ingress](../../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
 now reaches the ordinary field operation without numerical readback/remount, preserving paired
 internal current, source consumption and actual input through cold rest/history placement.
 All 118 constitutive and 16 SDK alpha controls pass; the public example drives three linked
-paired-field occurrences with no numerical readback. Next compose actual contextual source and
-receiving charts with the conditional action and its producing-law history, then exercise the
-conversation session.
+paired-field occurrences with no numerical readback. The internal-mode/material binding above
+is now the next source composition within this same conversation campaign.
 
 [established-bounded; measured] The [resident local return](../../research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md)
 now lets native observations develop the existing local relation and its rational emitted current

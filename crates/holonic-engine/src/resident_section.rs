@@ -120,6 +120,8 @@ const METAL_SOURCE: &str = concat!(
     include_str!("../../../accelerators/metal/phase_convolution.metal"),
     "\n",
     include_str!("../../../accelerators/metal/phase_difference.metal"),
+    "\n",
+    include_str!("../../../accelerators/metal/field_internal_current.metal"),
 );
 
 /// The exact accumulator the kernels carry, read off `__int128`; one octave is the hand.
@@ -153,7 +155,7 @@ const CENSUS_MAX_WARPS: u32 = 32;
 
 /// The kernel symbols the module must carry. Loaded at [`ResidentSurface::on`]; a missing symbol
 /// refuses there and never at a launch.
-pub const KERNELS: [&str; 54] = [
+pub const KERNELS: [&str; 57] = [
     "section_constitutive_field",
     "section_constitutive_field_rechart",
     "section_constitutive_rechart",
@@ -222,6 +224,9 @@ pub const KERNELS: [&str; 54] = [
     "section_contract_join",
     "section_phase_difference_validate",
     "section_phase_difference_products",
+    "section_field_internal_current",
+    "section_internal_shared_drive",
+    "section_internal_mode_unfold",
 ];
 
 /// `CUdevice_attribute` selectors from `cuda.h`, fixed by the foreign interface.

@@ -27,6 +27,13 @@ exhaustive source retention and singleton identification are not general learnin
 The [September 7 correction](../../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
 separates those requirements from exact persistence and particular reversible charts.
 
+[established-bounded; measured] The [native internal-mode return](../../research/records/2026-09-07_AC1_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE_GENERATORS.md)
+supplies an executable example: equal complete root drives imply that the difference of two
+distinct internal currents descends through every admitted ordinary occurrence by `q T_i=-q`.
+One generator and its amplitude/fibre replace a history of receiver outputs. The common current
+is not recovered. Exact-word and enclosed amplitudes retain their different receiver scopes;
+the packet does not purport to compress the whole field or establish useful language.
+
 Brandon's own prior hypothesis states the same object from the geometry side and is retained
 verbatim as the origin (`docs/canon/THE_RECOVERED_LAW.md`): *compression is gauge-fixing the flat
 directions and keeping the curvature; information is the gauge-invariant difference between

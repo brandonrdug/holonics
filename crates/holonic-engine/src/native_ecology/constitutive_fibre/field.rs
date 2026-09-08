@@ -17,6 +17,8 @@ use std::rc::Rc;
 
 mod archive;
 mod current_history_source;
+mod internal_current;
+mod internal_mode;
 mod junction;
 mod material_transport;
 mod profile;
@@ -31,6 +33,13 @@ use archive::{ArchivedField, FieldArchive};
 pub use current_history_source::{
     NativeCurrentHistorySource, NativeCurrentHistorySourceReading,
     NativeCurrentHistorySourceReceiver,
+};
+pub use internal_current::{
+    NativeInternalCurrentReading, NativeInternalPointAvailability, NativeResidentInternalCurrent,
+};
+pub use internal_mode::{
+    NativeSharedDriveMode, NativeSharedDriveModeReading, NativeSharedDriveModeRest,
+    NativeSharedDriveModeReturn,
 };
 pub use junction::{
     NativeFieldCurrentBall, NativeFieldEnclosedJunctionReading, NativeFieldExactJunctionReading,

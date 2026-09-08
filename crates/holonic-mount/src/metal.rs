@@ -870,6 +870,9 @@ impl Module {
             "section_phase_convolution_pack" => (&[1, 7], 8),
             "section_field_current_input" => (&[2, 3, 4, 5, 11], 12),
             "section_field_source_frame" => (&[6, 12], 13),
+            "section_field_internal_current" => (&[9, 10, 11, 12, 20], 21),
+            "section_internal_shared_drive" => (&[4, 8], 9),
+            "section_internal_mode_unfold" => (&[2, 8], 9),
             "section_constitutive_circulation" => (&[9, 10, 16], 17),
             "section_constitutive_rechart" => (&[5, 19], 20),
             "section_constitutive_field" => (&[9, 10, 11, 12, 26], 27),
@@ -907,6 +910,10 @@ impl Module {
                 signature,
                 wide_signature: if name == "section_constitutive_field" {
                     &[13]
+                } else if name == "section_field_internal_current" {
+                    &[12]
+                } else if name == "section_internal_mode_unfold" {
+                    &[2]
                 } else {
                     &[]
                 },

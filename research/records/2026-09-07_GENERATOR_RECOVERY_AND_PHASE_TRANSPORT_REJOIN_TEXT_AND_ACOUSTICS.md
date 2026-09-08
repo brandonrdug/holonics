@@ -156,7 +156,7 @@ The engine's affine version fibre generalizes this constraint operation while re
 coordinates when the available equations leave them open. This is an explanatory instance, not a
 new two-example curriculum or a restriction of HNA to affine laws.
 
-[definition] A black-box reconstruction fibre and a coherent phase state carry different
+[definition] A black-box Preimage Fibre and a coherent phase state carry different
 relations. The former retains unresolved candidate realizations under available evidence; the
 latter carries amplitudes, ordered actions and interference under its constitutive law. Neither
 may be substituted for the other. A quotient of present probabilities or scalar magnitudes

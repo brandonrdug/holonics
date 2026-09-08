@@ -33,6 +33,12 @@ coordinate difference with one common denominator, and reuses convolution normal
 publication. Independent product lanes have disjoint workspace coordinates. The Rust receiver
 retains both operands and excludes unmatched support explicitly; missing observations are not zeros.
 
+[definition] `field_internal_current.metal` evaluates the paired-field internal prefix decoder,
+verifies complete shared drive and unfolds the descended mode. It uses the common paired face
+and normalization templates for threadgroup carriers. Signed-128 amplitudes retain the shared
+two-i64 wire, numerical radius and point-port guard. Occurrence/step scalars retain their full
+64-bit ABI; the declared sign progression has no implicit acoustic clock.
+
 [definition] Build arithmetic apparatus explicitly; the probe kernels are absent from production:
 
 ```sh
