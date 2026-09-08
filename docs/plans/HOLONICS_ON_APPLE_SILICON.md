@@ -62,6 +62,11 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
    non-timing/path receipt fields agree with desktop. Preserve its amplitude fibre when binding
    an acoustic clock and interaction; an occurrence-parity generator does not establish frequency.
    This is a device composition return, not completion of acoustic development.
+   The [complete material return](../../research/records/2026-09-07_APPLE_RETURNS_COMPLETE_MATERIAL_CURRENT_TO_THE_TEMPORAL_RECEIVER.md)
+   now ports desktop `e577d9b3`'s history, complete material and learned-mode consumers. Twelve
+   mount and 56 native controls pass; every public receipt field except elapsed time agrees
+   with desktop. Completed full currents and mode components have resident enclosed temporal
+   views retaining the source/component and producing/current cuts.
 2. Bind actual acoustic sections and returns to that shared owner. Start at
    `AcousticFieldChart`, `ExactPhaseCurrentSection`, the existing clock-transport owners and
    native acoustic production/receiver boundary. Carry source support, phase, temporal order
@@ -131,6 +136,11 @@ by a plural fibre; identifying an individual performance or reversing the raw pa
    passes an independent exact source/response comparison. PCM presents a declared numerical
    representative; keep the global ball, sample clock, gain, quantization remainder and
    clipping in its output receipt.
+   The complete material owner now supplies a resident all-node enclosure. Bind it in the
+   actual receiving chart with its source occurrence and operator cuts. A predicted microphone
+   section is not an impulse response unless a founded delay-response chart supplies that role.
+   The integral root-contact domain requires an explicit admitted amplitude chart; retain its
+   units, metric and inverse rather than silently changing normalized PCM to force admission.
 3. Develop and retain acoustic generative standing across source-qualified recordings and
    actual joined returns, then conduct its native emission into the declared acoustic receiver.
    Inspect perception differences and generated sound, preserve the declared reconstruction
@@ -276,14 +286,14 @@ Do not map a file label, expected sound class or arbitrary frame summary straigh
 native current. Derive and implement the exterior acoustic chart's native material/contact passage; report its
 retained fibre and present limitations. A waveform decoder alone is not sound perception.
 
-[definition] The production starting point is native outward port current, preserving its order
-and two quadratures. Reuse `NativeAcousticProductionMorphology` and
-`NativeAcousticPotentialComplex`, followed by `render_pcm16` as an explicitly cold lossy receiver.
-The existing route is `NativeAcousticRadiationInput::from_open_world_tube ->
-AcousticProductRest::radiate -> NativeAcousticPotentialComplex::found -> render_pcm16`.
-The first attachment must derive the current ecology's actual outward-port passage into this
-interface or factor the codec from its older body wrapper. Do not invent an open-world-tube
-receipt, adopt an older acoustic body as the new ecology, or play a stored input as native output.
+[definition] The production starting point is native outward port current, preserving its order,
+two quadratures and actual temporal chart. The current phase and enclosed-phase receivers
+`NativeAcousticTemporalPcm16Projection` and `NativeAcousticEnclosedTemporalPcm16Projection`
+present that timed current as an explicitly cold lossy surface with its reconstruction receipt.
+The older `NativeAcousticProductionMorphology` / `NativeAcousticPotentialComplex` route remains
+available at its declared radiation scope; its fixed frequency assignment does not supply the
+current ecology's learned generator. Do not invent an open-world-tube receipt, adopt an older
+acoustic body as the new ecology, or play a stored input as native output.
 
 [definition] Keep exterior receiver sample rate, time/frequency support, gain/divisor and PCM quantization
 explicit and stable during comparisons. Inspect both the exact emitted current and the audible

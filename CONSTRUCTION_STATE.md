@@ -24,14 +24,17 @@ to desktop, with all receipt fields equal except path and timing. Source-indepen
 and recipient-field conduct use two deeds and zero numerical readout. Acoustic clock/interaction
 binding remains required; the mode's sign progression does not supply physical frequency.
 
-[established-bounded; source-inspected] Desktop `e577d9b3` now supplies the
-[material-mode contribution](research/records/2026-09-07_AC1_THE_SHARED_DRIVE_MODE_REACHES_THE_LEARNED_MATERIAL_CURRENT.md),
-its remaining current and actual producing/current operator cuts on this branch. Its complete
-material/history kernels have not yet returned on Metal.
+[established-bounded; measured] The [complete material/temporal return](research/records/2026-09-07_APPLE_RETURNS_COMPLETE_MATERIAL_CURRENT_TO_THE_TEMPORAL_RECEIVER.md)
+ports desktop `e577d9b3`'s productive complete-current path, exact history pairings and learned
+mode contributions to Metal. Twelve mount and 56 focused native controls pass; every public
+material-mode JSON field except elapsed time matches desktop. Completed full currents and mode
+components now enter the enclosed temporal receiver with their source, component and operator
+cuts, without numerical readout. This closes the bounded port, not AS4–AS5.
 
-[open] Port that productive complete-current material path and expose its retained enclosed
-current directly to the existing temporal acoustic receiver. Keep recording clocks and actual
-source/return contact explicit; a mode's occurrence parity does not define an acoustic frequency.
+[open] Bind actual recorded excitation/receiver contact and temporal support to that material
+owner. Its integral root-contact domain requires an explicit admitted acoustic amplitude chart.
+A predicted microphone section is not automatically an impulse response; preserve its actual
+clock, complete source remainder and enclosure when presenting or continuing it.
 
 [established-bounded; measured] The [measured acoustic difference](research/records/2026-09-07_MEASURED_ACOUSTIC_RETURNS_KEEP_THEIR_ORIENTED_DIFFERENCE.md)
 and [producing adjoint](research/records/2026-09-07_THE_RECORDED_RETURN_USES_ITS_PRODUCING_TEMPORAL_ADJOINT.md)

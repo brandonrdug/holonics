@@ -5,9 +5,11 @@ use num_traits::One;
 
 pub(super) mod complete;
 pub use complete::{
-    NativeCompleteMaterialTransportReading, NativeCompleteMaterialTransportState,
-    NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading,
-    NativeMaterialModeReturn, NativeMaterialModeUnfolding,
+    NativeCompleteMaterialSourceReturn, NativeCompleteMaterialTransportReading,
+    NativeCompleteMaterialTransportState, NativeMaterialModeComponent,
+    NativeMaterialModeComponentTemporalView, NativeMaterialModeDifferential,
+    NativeMaterialModeReading, NativeMaterialModeReturn, NativeMaterialModeUnfolding,
+    NativeMaterialModeUnfoldingTemporalView,
 };
 
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, serde::Deserialize)]

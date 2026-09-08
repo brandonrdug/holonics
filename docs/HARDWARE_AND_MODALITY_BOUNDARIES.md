@@ -115,12 +115,13 @@ changes. The old exterior input JSON remains an array. The extended example's pa
 requires that field representation; the earlier conditional-action receipts remain independently
 usable for the simpler phase port. Desktop controls do not establish Metal parity.
 
-[established-bounded; measured] The Apple field return now passes 43 focused field controls,
+[historical; measured] The Apple field ingress return passed 43 focused field controls,
 including resident-input archive/rest continuation, and agrees with all eleven compared result
 groups of the extended public example. The Metal field ABI has 27 arguments with a 64-bit
 occurrence at index 13. Scratch uses the target's 20-byte wide layout; enclosed held/report
 values retain the common two-i64 signed-128 wire. The separate material/current-history and
-field differential receiver operations remain outside this port's scope.
+field differential receiver operations were outside that return's scope; the later extension
+below supplies the complete-current variant and its receivers.
 
 [established-bounded; implemented-exact] The [complete temporal construction](../research/records/2026-09-07_APPLE_CONDUCTS_COMPLETE_RECORDINGS_AND_RETURNS_TIMED_AUDIO.md)
 adds resident workspace beyond threadgroup storage for full causal convolution. Four dependent
@@ -146,7 +147,7 @@ now realizes all three kernels in `accelerators/metal/field_internal_current.met
 and normalization helpers accept both resident and threadgroup carriers without duplicating
 their law. Twenty-seven focused controls pass. The 391-byte mode wire and every public receipt
 field except path/timing match desktop. This closes that device port; actual acoustic attachment
-and the separate material/current-history consumers remain unfinished.
+remains unfinished; that earlier return did not include material/current-history consumers.
 
 [established-bounded; measured] The [material-mode extension](../research/records/2026-09-07_AC1_THE_SHARED_DRIVE_MODE_REACHES_THE_LEARNED_MATERIAL_CURRENT.md)
 adds `section_complete_material_mode` and `section_material_mode_unfold`, plus the packed-ball
@@ -155,6 +156,16 @@ source supports before/between/after the two births. Port the current/mode/sourc
 the exact numerical coefficient contractions and all enclosure/rounding terms. Mode ownership
 for an in-body coefficient query is distinct from portable standalone unfolding. No Metal
 execution or general backend parity is established by the desktop return.
+
+[established-bounded; measured] The [Apple complete material return](../research/records/2026-09-07_APPLE_RETURNS_COMPLETE_MATERIAL_CURRENT_TO_THE_TEMPORAL_RECEIVER.md)
+now realizes complete history, complete material transport, learned mode and differential
+consumers in five Metal source owners. The field ABI has 37 shared arguments; thirty pointers
+plus seven packed scalar fields fit Metal's 31 buffer slots. Immutable factor tables use GPU
+addresses with captured allocation lifetimes and explicit indirect read residency. Twelve mount
+and 56 focused native controls pass; every public material-mode receipt field except elapsed
+time matches desktop. Completed full currents and mode components expose resident enclosed
+temporal views with their source/component and operator cuts. The outgoing-only variant remains
+unported, and actual recording-clock/contact binding remains acoustic work.
 
 [established-bounded; source-inspected] The public framework enters through
 [`holonics::hna`](../crates/holonics/src/lib.rs). Its native session is exposed by

@@ -155,7 +155,8 @@ impl<'chart> ResidentSurface<'chart> {
             return Err(fail());
         }
         let shared = d
-            .checked_mul(32)
+            .checked_mul(2)
+            .and_then(Self::constitutive_wide_scratch)
             .and_then(|n| u32::try_from(n).ok())
             .filter(|n| *n <= self.declaration.max_sectiond_bytes)
             .ok_or_else(fail)?;
@@ -377,9 +378,9 @@ impl<'chart> ResidentSurface<'chart> {
         }
         #[cfg(target_os = "macos")]
         {
-            if transport.is_some() {
+            if transport.as_ref().is_some_and(|(_, _, _, _, _, kind, _)| *kind != 2) {
                 return Err(fail(
-                    "contextual material transport is not yet implemented on Metal",
+                    "outgoing-current material transport is not yet implemented on Metal",
                 ));
             }
         }
@@ -490,9 +491,7 @@ impl<'chart> ResidentSurface<'chart> {
                 }
             }
         }
-        // Contextual material transport remains a declared obstruction on Metal until its
-        // complete operation is ported; the CUDA launch retains that separate argument block.
-        #[cfg(not(target_os = "macos"))]
+        // Both targets receive the same staged complete-current material operation.
         {
             params.u32(
                 transport

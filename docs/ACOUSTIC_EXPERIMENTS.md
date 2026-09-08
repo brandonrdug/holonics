@@ -139,6 +139,14 @@ padding and parent delivery metadata. It does not advance the chart cursor or su
 The [resident ingress return](../research/records/2026-09-07_ACOUSTIC_SECTIONS_ENTER_THE_SHARED_RESIDENT_CURRENT_PORT.md)
 records five passing acoustic-field controls; the subsequent interval attachment is described below.
 
+[established-bounded; measured] The [complete material receiver](../research/records/2026-09-07_APPLE_RETURNS_COMPLETE_MATERIAL_CURRENT_TO_THE_TEMPORAL_RECEIVER.md)
+now supplies `NativeCompleteMaterialSourceReturn::temporal_view` and the corresponding learned
+mode/component views. They retain all field nodes, numerical enclosure, source and operator cuts
+without numerical readout. The caller binds the actual receiver clock and support. A predicted
+microphone section is not an impulse response merely because it has a temporal view. Actual
+recorded contact must also satisfy the complete-history integral chart or return its obstruction;
+PCM divisor and the metric it induces remain explicit.
+
 [established-bounded; implemented-exact] `AcousticFieldCell::temporal_view()` now borrows the
 cell's exact support, clock and rational coefficients into
 `holonic_engine::phase_current::resident::convolve_resident`. This resident realization of the

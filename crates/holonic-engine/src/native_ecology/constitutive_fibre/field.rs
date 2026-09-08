@@ -49,11 +49,13 @@ pub use junction::{
 use junction::{PairedJunction, PendingJunction};
 use material_transport::{MaterialTransport, PendingMaterialTransport};
 pub use material_transport::{
-    NativeCompleteMaterialTransportReading, NativeCompleteMaterialTransportState,
-    NativeFieldExactMaterialTransport, NativeFieldMaterialTransportReading,
-    NativeFieldMaterialTransportResidual, NativeFieldMaterialTransportState,
-    NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading,
-    NativeMaterialModeReturn, NativeMaterialModeUnfolding, NativeMaterialTransportSource,
+    NativeCompleteMaterialSourceReturn, NativeCompleteMaterialTransportReading,
+    NativeCompleteMaterialTransportState, NativeFieldExactMaterialTransport,
+    NativeFieldMaterialTransportReading, NativeFieldMaterialTransportResidual,
+    NativeFieldMaterialTransportState, NativeMaterialModeComponent,
+    NativeMaterialModeComponentTemporalView, NativeMaterialModeDifferential,
+    NativeMaterialModeReading, NativeMaterialModeReturn, NativeMaterialModeUnfolding,
+    NativeMaterialModeUnfoldingTemporalView, NativeMaterialTransportSource,
 };
 pub use receiver::NativeFieldDifferentialReading;
 pub use resident_input::NativeFieldIncoming;

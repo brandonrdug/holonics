@@ -2,13 +2,21 @@
 //! contraction. Native coefficient updates are performed only by the fused field return.
 use super::super::current_history_source::{decode_source, integer};
 use super::*;
+use crate::phase_current::{
+    PhaseCurrentLineageId, PhaseCurrentReceiverId,
+    resident::{ResidentPhaseCurrentError, ResidentPhaseEnclosureView},
+};
+use num_rational::BigRational as Rat;
 
 mod exact;
 mod mode;
 pub use mode::{
-    NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading,
-    NativeMaterialModeReturn, NativeMaterialModeUnfolding,
+    NativeMaterialModeComponent, NativeMaterialModeComponentTemporalView,
+    NativeMaterialModeDifferential, NativeMaterialModeReading, NativeMaterialModeReturn,
+    NativeMaterialModeUnfolding, NativeMaterialModeUnfoldingTemporalView,
 };
+#[cfg(test)]
+mod temporal_tests;
 #[cfg(test)]
 mod tests;
 
@@ -48,6 +56,84 @@ pub struct NativeCompleteMaterialTransportReading {
     pub parameter_rounding_bound: Rat,
     pub source_dot_rounding_bound: Rat,
     pub forward_dot_rounding_bound: Rat,
+}
+
+/// A completed resident complete-current source read. The return owns its immutable native report
+/// and chronology independently of the continuing field; an explicit cold observer only reads it.
+pub struct NativeCompleteMaterialSourceReturn<'chart> {
+    surface: &'chart ResidentSurface<'chart>,
+    section: ResidentSection<'chart>,
+    source_occurrence: usize,
+    producing_cut: usize,
+    current_cut: usize,
+    provenance: NativeFieldLineage,
+    nodes: usize,
+    grain: u32,
+}
+
+impl<'chart> NativeCompleteMaterialSourceReturn<'chart> {
+    pub fn section(&self) -> &ResidentSection<'chart> {
+        &self.section
+    }
+
+    pub fn source_occurrence(&self) -> usize {
+        self.source_occurrence
+    }
+
+    pub fn producing_cut(&self) -> usize {
+        self.producing_cut
+    }
+
+    pub fn current_cut(&self) -> usize {
+        self.current_cut
+    }
+
+    pub fn provenance(&self) -> &NativeFieldLineage {
+        &self.provenance
+    }
+
+    /// Borrow the complete all-node source carrier as a temporal enclosure. No numerical
+    /// resident value is read and no centre is selected here.
+    pub fn temporal_view(
+        &self,
+        receiver: PhaseCurrentReceiverId,
+        lineage: PhaseCurrentLineageId,
+        origin: Rat,
+        sample_step: Rat,
+        phase_extent: u32,
+    ) -> Result<ResidentPhaseEnclosureView<'_, 'chart>, ResidentPhaseCurrentError> {
+        ResidentPhaseEnclosureView::new(
+            &self.section,
+            0,
+            self.grain,
+            receiver,
+            lineage,
+            origin,
+            sample_step,
+            phase_extent,
+            self.nodes,
+        )
+    }
+
+    /// Cold observation retained for compatibility with the former source receiver.
+    pub fn inspect(&self) -> Result<NativeFieldCurrentBall, ConstitutiveFibreError> {
+        let values = wides(&self.surface.read_out(&self.section)?)?;
+        if values.len() != 2 * self.nodes + 1 || values[2 * self.nodes] < 0 {
+            return Err(invalid("complete source return shape"));
+        }
+        let scale = BigInt::one() << self.grain;
+        Ok(NativeFieldCurrentBall {
+            center: (0..self.nodes)
+                .map(|i| {
+                    ExactComplexWaveCurrent::new(
+                        Rat::new(values[2 * i].into(), scale.clone()),
+                        Rat::new(values[2 * i + 1].into(), scale.clone()),
+                    )
+                })
+                .collect(),
+            radius: Rat::new(values[2 * self.nodes].into(), scale),
+        })
+    }
 }
 fn invalid(e: impl std::fmt::Display) -> ConstitutiveFibreError {
     ConstitutiveFibreError::Rest(format!("complete material transport: {e}"))
@@ -142,6 +228,18 @@ impl<'chart> NativeConstitutiveField<'chart> {
         &mut self,
         source: &NativeFieldSourceAnchor,
     ) -> Result<NativeFieldCurrentBall, ConstitutiveFibreError> {
+        self.read_complete_material_source_resident(source)?
+            .inspect()
+    }
+
+    /// Run the complete-current receiver while retaining its native report and chronology.
+    /// The returned section remains resident; numerical values are available only through its
+    /// explicit cold observer.  The source, producing cut, current cut, and lineage are retained
+    /// as immutable provenance alongside the report.
+    pub fn read_complete_material_source_resident(
+        &mut self,
+        source: &NativeFieldSourceAnchor,
+    ) -> Result<NativeCompleteMaterialSourceReturn<'chart>, ConstitutiveFibreError> {
         if !Rc::ptr_eq(&self.owner, &source.owner) || source.occurrence >= self.history.len() {
             return Err(ConstitutiveFibreError::ForeignOccurrence);
         }
@@ -193,21 +291,15 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 reading.obstruction
             )));
         }
-        let values = wides(&surface.read_out(&output)?)?;
-        let scale = BigInt::one() << self.transport_grain()?;
-        if values[2 * self.nodes()] < 0 {
-            return Err(invalid("negative source-current radius"));
-        }
-        Ok(NativeFieldCurrentBall {
-            center: (0..self.nodes())
-                .map(|i| {
-                    ExactComplexWaveCurrent::new(
-                        Rat::new(values[2 * i].into(), scale.clone()),
-                        Rat::new(values[2 * i + 1].into(), scale.clone()),
-                    )
-                })
-                .collect(),
-            radius: Rat::new(values[2 * self.nodes()].into(), scale),
+        Ok(NativeCompleteMaterialSourceReturn {
+            surface,
+            section: output,
+            source_occurrence: at,
+            producing_cut: at,
+            current_cut: self.history.len() - 1,
+            provenance: self.history[at].lineage.clone(),
+            nodes: self.nodes(),
+            grain: self.transport_grain()?,
         })
     }
     pub(in super::super) fn prepare_current_source_refresh(

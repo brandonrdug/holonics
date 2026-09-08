@@ -1,6 +1,11 @@
 //! The existing complete material operator received on an actual shared-drive source mode.
 //! All coefficients come from retained native update factors. No coefficient is fitted here.
 use super::*;
+use crate::phase_current::{
+    PhaseCurrentLineageId, PhaseCurrentReceiverId,
+    resident::{ResidentPhaseCurrentError, ResidentPhaseEnclosureView},
+};
+use num_rational::BigRational as Rat;
 use std::rc::Rc;
 
 #[derive(Clone, Copy, Debug, Serialize)]
@@ -89,6 +94,91 @@ pub struct NativeMaterialModeUnfolding<'c> {
     steps: u64,
 }
 
+/// A borrowed temporal view of one complete all-node mode component.  The component and field
+/// cuts remain attached to the view; the view itself does not select a numerical centre.
+pub struct NativeMaterialModeComponentTemporalView<'view, 'c> {
+    view: ResidentPhaseEnclosureView<'view, 'c>,
+    component: NativeMaterialModeComponent,
+    source_occurrence: usize,
+    producing_operator_at: usize,
+    current_operator_at: usize,
+    receiving_occurrences: [usize; 2],
+}
+
+impl<'view, 'c> NativeMaterialModeComponentTemporalView<'view, 'c> {
+    pub fn view(&self) -> ResidentPhaseEnclosureView<'_, 'c> {
+        ResidentPhaseEnclosureView::new(
+            self.view.section(),
+            self.view.wide_offset(),
+            self.view.grain(),
+            self.view.receiver(),
+            self.view.lineage(),
+            self.view.origin().clone(),
+            self.view.sample_step().clone(),
+            self.view.phase_extent(),
+            self.view.raw_extent(),
+        )
+        .expect("mode temporal view retains a validated resident carrier")
+    }
+    pub fn component(&self) -> NativeMaterialModeComponent {
+        self.component
+    }
+    pub fn source_occurrence(&self) -> usize {
+        self.source_occurrence
+    }
+    pub fn producing_operator_at(&self) -> usize {
+        self.producing_operator_at
+    }
+    pub fn current_operator_at(&self) -> usize {
+        self.current_operator_at
+    }
+    pub fn receiving_occurrences(&self) -> [usize; 2] {
+        self.receiving_occurrences
+    }
+}
+
+/// A borrowed temporal view of a frozen mode unfolding report.
+pub struct NativeMaterialModeUnfoldingTemporalView<'view, 'c> {
+    view: ResidentPhaseEnclosureView<'view, 'c>,
+    source_occurrence: usize,
+    producing_operator_at: usize,
+    current_operator_at: usize,
+    receiving_occurrences: [usize; 2],
+    steps: u64,
+}
+
+impl<'view, 'c> NativeMaterialModeUnfoldingTemporalView<'view, 'c> {
+    pub fn view(&self) -> ResidentPhaseEnclosureView<'_, 'c> {
+        ResidentPhaseEnclosureView::new(
+            self.view.section(),
+            self.view.wide_offset(),
+            self.view.grain(),
+            self.view.receiver(),
+            self.view.lineage(),
+            self.view.origin().clone(),
+            self.view.sample_step().clone(),
+            self.view.phase_extent(),
+            self.view.raw_extent(),
+        )
+        .expect("unfolded temporal view retains a validated resident carrier")
+    }
+    pub fn source_occurrence(&self) -> usize {
+        self.source_occurrence
+    }
+    pub fn producing_operator_at(&self) -> usize {
+        self.producing_operator_at
+    }
+    pub fn current_operator_at(&self) -> usize {
+        self.current_operator_at
+    }
+    pub fn receiving_occurrences(&self) -> [usize; 2] {
+        self.receiving_occurrences
+    }
+    pub fn steps(&self) -> u64 {
+        self.steps
+    }
+}
+
 fn ball(v: &[i128], n: usize, scale: &BigInt) -> NativeFieldCurrentBall {
     NativeFieldCurrentBall {
         center: v[..2 * n]
@@ -104,6 +194,41 @@ fn ball(v: &[i128], n: usize, scale: &BigInt) -> NativeFieldCurrentBall {
     }
 }
 impl<'c> NativeMaterialModeReturn<'c> {
+    /// Borrow one complete temporal component without reading the native report.  The component
+    /// blocks retain every field node; this is not a centre or a host reconstruction.
+    pub fn temporal_view(
+        &self,
+        component: NativeMaterialModeComponent,
+        receiver: PhaseCurrentReceiverId,
+        lineage: PhaseCurrentLineageId,
+        origin: Rat,
+        sample_step: Rat,
+        phase_extent: u32,
+    ) -> Result<NativeMaterialModeComponentTemporalView<'_, 'c>, ResidentPhaseCurrentError> {
+        let d = &self.inner;
+        let stride = 2 * d.nodes + 1;
+        let wide_offset = 3 + component.block() * stride;
+        let view = ResidentPhaseEnclosureView::new(
+            &d.report,
+            wide_offset,
+            d.grain,
+            receiver,
+            lineage,
+            origin,
+            sample_step,
+            phase_extent,
+            d.nodes,
+        )?;
+        Ok(NativeMaterialModeComponentTemporalView {
+            view,
+            component,
+            source_occurrence: d.source,
+            producing_operator_at: d.source,
+            current_operator_at: d.cut,
+            receiving_occurrences: d.births,
+        })
+    }
+
     pub fn read_pairs(
         &self,
         component: NativeMaterialModeComponent,
@@ -216,6 +341,37 @@ impl<'c> NativeMaterialModeReturn<'c> {
     }
 }
 impl NativeMaterialModeUnfolding<'_> {
+    /// Borrow the complete unfolded all-node carrier without reading its native report.
+    pub fn temporal_view(
+        &self,
+        receiver: PhaseCurrentReceiverId,
+        lineage: PhaseCurrentLineageId,
+        origin: Rat,
+        sample_step: Rat,
+        phase_extent: u32,
+    ) -> Result<NativeMaterialModeUnfoldingTemporalView<'_, '_>, ResidentPhaseCurrentError> {
+        let d = &self.origin;
+        let view = ResidentPhaseEnclosureView::new(
+            &self.report,
+            0,
+            d.grain,
+            receiver,
+            lineage,
+            origin,
+            sample_step,
+            phase_extent,
+            d.nodes,
+        )?;
+        Ok(NativeMaterialModeUnfoldingTemporalView {
+            view,
+            source_occurrence: d.source,
+            producing_operator_at: d.source,
+            current_operator_at: d.cut,
+            receiving_occurrences: d.births,
+            steps: self.steps,
+        })
+    }
+
     pub fn read_pairs(
         &self,
         pairs: usize,

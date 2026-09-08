@@ -5,7 +5,7 @@
 //! only performed by compiled Metal kernels. Shared buffer bytes are touched by
 //! the CPU only at explicit ingress/egress boundaries after GPU completion.
 
-use metal::{MTLCommandBufferStatus, MTLResourceOptions, MTLSize};
+use metal::{MTLCommandBufferStatus, MTLResourceOptions, MTLResourceUsage, MTLSize};
 use objc::{msg_send, sel, sel_impl};
 use std::{
     cell::{Cell, RefCell},
@@ -318,11 +318,13 @@ fn allocation_grain(rt: &Runtime) -> Result<usize> {
 
 struct Allocation {
     buffer: ::metal::Buffer,
+    address: u64,
+    indirect_address: bool,
     runtime: Rc<Runtime>,
 }
 impl Drop for Allocation {
     fn drop(&mut self) {
-        BUFFERS.with(|b| b.borrow_mut().remove(&(self.buffer.contents() as u64)));
+        BUFFERS.with(|b| b.borrow_mut().remove(&self.address));
     }
 }
 fn resolve(pointer: u64, bytes: usize) -> Result<(Rc<Allocation>, u64)> {
@@ -357,6 +359,7 @@ pub struct DeviceBuffer<T> {
     _element: PhantomData<T>,
 }
 impl<T: Copy> DeviceBuffer<T> {
+    #[allow(unexpected_cfgs)] // objc 0.2 selector macros check their legacy cargo-clippy feature.
     pub fn alloc(len: usize) -> Result<Self> {
         let bytes = len
             .checked_mul(size_of::<T>())
@@ -366,17 +369,27 @@ impl<T: Copy> DeviceBuffer<T> {
         if bytes as u64 > rt.device.max_buffer_length() {
             return Err(error("alloc", "Metal maximum buffer extent exceeded"));
         }
+        let buffer = rt
+            .device
+            .new_buffer(bytes as u64, MTLResourceOptions::StorageModeShared);
+        // Direct bindings retain support for older Metal hosts. An indirect factor query below
+        // requires an actual GPU virtual address and explicitly refuses the fallback address.
+        let indirect_address: bool =
+            unsafe { msg_send![buffer.as_ref(), respondsToSelector: sel!(gpuAddress)] };
+        let address = if indirect_address {
+            buffer.gpu_address()
+        } else {
+            buffer.contents() as u64
+        };
         let allocation = Rc::new(Allocation {
-            buffer: rt
-                .device
-                .new_buffer(bytes as u64, MTLResourceOptions::StorageModeShared),
+            buffer,
+            address,
+            indirect_address,
             runtime: rt,
         });
         BUFFERS.with(|b| {
-            b.borrow_mut().insert(
-                allocation.buffer.contents() as u64,
-                Rc::downgrade(&allocation),
-            )
+            b.borrow_mut()
+                .insert(allocation.address, Rc::downgrade(&allocation))
         });
         Ok(Self {
             allocation,
@@ -391,7 +404,7 @@ impl<T: Copy> DeviceBuffer<T> {
         self.len == 0
     }
     pub fn device_ptr(&self) -> u64 {
-        self.allocation.buffer.contents() as u64
+        self.allocation.address
     }
     pub fn copy_from_slice(&self, src: &[T]) -> Result<()> {
         if src.len() != self.len {
@@ -492,6 +505,7 @@ enum Argument {
     NullBuffer,
     U32(u32),
     U32Array(Vec<u32>),
+    U64Array(Vec<u64>),
     U64(u64),
 }
 #[derive(Clone)]
@@ -499,6 +513,7 @@ enum Command {
     Kernel {
         pipeline: ::metal::ComputePipelineState,
         arguments: Vec<Argument>,
+        indirect: Vec<Rc<Allocation>>,
         scratch: u64,
         grid: MTLSize,
         block: MTLSize,
@@ -532,6 +547,7 @@ fn submit_in_pool(rt: &Runtime, commands: &[Command]) -> Result<()> {
             Command::Kernel {
                 pipeline,
                 arguments,
+                indirect,
                 scratch,
                 grid,
                 block,
@@ -551,7 +567,15 @@ fn submit_in_pool(rt: &Runtime, commands: &[Command]) -> Result<()> {
                             (values.len() * size_of::<u32>()) as u64,
                             values.as_ptr().cast(),
                         ),
+                        Argument::U64Array(values) => enc.set_bytes(
+                            i as u64,
+                            (values.len() * size_of::<u64>()) as u64,
+                            values.as_ptr().cast(),
+                        ),
                     }
+                }
+                for buffer in indirect {
+                    enc.use_resource(&buffer.buffer, MTLResourceUsage::Read);
                 }
                 if *scratch > 0 {
                     enc.set_threadgroup_memory_length(0, *scratch);
@@ -819,6 +843,8 @@ pub struct Function<'m> {
     wide_signature: &'static [usize],
     arity: usize,
     pack_scalars: bool,
+    pack_wide_scalars: bool,
+    indirect_table: Option<(usize, usize, usize)>,
     parallel_grid: bool,
     nullable: &'static [usize],
     runtime: Rc<Runtime>,
@@ -849,6 +875,8 @@ impl Module {
         let (signature, arity): (&'static [usize], usize) = match name {
             #[cfg(test)]
             "test_grid" => (&[1], 2),
+            #[cfg(test)]
+            "test_indirect" => (&[1], 3),
             "conduct_complex_incidence" => (&[5, 6, 7], 8),
             "section_constitutive_fibre" => (&[4, 5, 6, 12], 13),
             "section_constitutive_current" => (&[4, 5, 6, 9, 10, 11, 12, 13, 14, 20], 21),
@@ -896,9 +924,16 @@ impl Module {
             "section_field_internal_current" => (&[9, 10, 11, 12, 20], 21),
             "section_internal_shared_drive" => (&[4, 8], 9),
             "section_internal_mode_unfold" => (&[2, 8], 9),
+            "section_field_current_history_source" => (&[10, 11, 12, 21], 22),
+            "section_field_current_history_pairing" => (&[4, 10], 11),
+            "section_complete_material_source_current" => (&[2, 3, 9], 10),
+            "section_complete_material_source_reading" => (&[3, 4, 10], 11),
+            "section_complete_material_mode" => (&[9, 10, 11, 22], 23),
+            "section_material_mode_unfold" => (&[1, 8], 9),
+            "section_field_differential_receiver" => (&[2, 3, 4, 5, 11], 12),
             "section_constitutive_circulation" => (&[9, 10, 16], 17),
             "section_constitutive_rechart" => (&[5, 19], 20),
-            "section_constitutive_field" => (&[9, 10, 11, 12, 26], 27),
+            "section_constitutive_field" => (&[9, 10, 11, 12, 21, 36], 37),
             "section_constitutive_field_rechart" => (&[5, 19], 20),
             "section_census" | "section_census_serial_control" => (&[2, 3], 5),
             "section_carry" => (&[2, 8], 9),
@@ -935,13 +970,27 @@ impl Module {
                     &[13]
                 } else if name == "section_field_internal_current" {
                     &[12]
-                } else if name == "section_internal_mode_unfold" {
+                } else if name == "section_internal_mode_unfold"
+                    || name == "section_material_mode_unfold"
+                {
                     &[2]
+                } else if name == "section_field_current_history_source" {
+                    &[13]
+                } else if name == "section_complete_material_mode" {
+                    &[12, 13, 14, 15, 16]
                 } else {
                     &[]
                 },
                 arity,
                 pack_scalars: name == "section_constitutive_condition_image",
+                pack_wide_scalars: name == "section_constitutive_field",
+                indirect_table: match name {
+                    "section_complete_material_source_current" => Some((1, 2, 2)),
+                    "section_complete_material_mode" => Some((8, 9, 4)),
+                    #[cfg(test)]
+                    "test_indirect" => Some((0, 1, 2)),
+                    _ => None,
+                },
                 parallel_grid: matches!(
                     name,
                     "section_phase_convolution_products"
@@ -957,7 +1006,13 @@ impl Module {
                 nullable: if name == "section_constitutive_differential" {
                     &[6, 7]
                 } else if name == "section_constitutive_field" {
-                    &[14, 15, 16, 17, 18, 19, 20]
+                    &[
+                        14, 15, 16, 17, 18, 19, 20, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+                    ]
+                } else if name == "section_complete_material_source_reading" {
+                    &[2]
+                } else if name == "section_complete_material_mode" {
+                    &[2, 3]
                 } else {
                     &[]
                 },
@@ -1055,6 +1110,7 @@ impl Function<'_> {
             ));
         }
         let mut arguments = Vec::with_capacity(params.len());
+        let mut wide_scalars = Vec::new();
         let mut scalars = if self.pack_scalars {
             Vec::with_capacity(self.signature.len())
         } else {
@@ -1065,11 +1121,18 @@ impl Function<'_> {
                 return Err(invalid("launch", "null argument storage"));
             }
             if self.wide_signature.contains(&index) {
-                arguments.push(Argument::U64(unsafe { *(*pointer as *const u64) }));
+                let value = unsafe { *(*pointer as *const u64) };
+                if self.pack_wide_scalars {
+                    wide_scalars.push(value);
+                } else {
+                    arguments.push(Argument::U64(value));
+                }
             } else if self.signature.contains(&index) {
                 let value = unsafe { *(*pointer as *const u32) };
                 if self.pack_scalars {
                     scalars.push(value);
+                } else if self.pack_wide_scalars {
+                    wide_scalars.push(u64::from(value));
                 } else {
                     arguments.push(Argument::U32(value));
                 }
@@ -1091,12 +1154,65 @@ impl Function<'_> {
         // pointers remain in their original order. No numerical current crosses this boundary.
         if self.pack_scalars {
             arguments.push(Argument::U32Array(scalars));
+        } else if self.pack_wide_scalars {
+            arguments.push(Argument::U64Array(wide_scalars));
+        }
+        // These two native ABIs receive immutable exterior address tables. Inspect only their
+        // pointer columns, never numerical factor/source carriers. Keep the addressed buffers
+        // alive with this command and declare their indirect read residency to Metal.
+        let mut indirect = Vec::new();
+        if let Some((table_index, count_index, stride)) = self.indirect_table {
+            let address = unsafe { *(params[table_index] as *const u64) };
+            let count = unsafe { *(params[count_index] as *const u32) } as usize;
+            let bytes = count
+                .checked_mul(stride)
+                .and_then(|n| n.checked_mul(8))
+                .ok_or_else(|| invalid("indirect table", "address table extent overflow"))?;
+            let (table, offset) = resolve(address, bytes)?;
+            if offset % 8 != 0
+                || self.runtime.device.argument_buffers_support()
+                    != ::metal::MTLArgumentBuffersTier::Tier2
+            {
+                return Err(error(
+                    "indirect table",
+                    "aligned tier-2 GPU address table required",
+                ));
+            }
+            let words = unsafe {
+                std::slice::from_raw_parts(
+                    table
+                        .buffer
+                        .contents()
+                        .cast::<u64>()
+                        .add(offset as usize / 8),
+                    count * stride,
+                )
+            };
+            for row in words.chunks_exact(stride) {
+                for (column, &pointer) in row[..2].iter().enumerate() {
+                    if pointer == 0 && stride == 4 && column == 1 {
+                        continue;
+                    }
+                    let (buffer, offset) = resolve(pointer, 8)?;
+                    if offset % 8 != 0
+                        || !buffer.indirect_address
+                        || !Rc::ptr_eq(&buffer.runtime, &self.runtime)
+                    {
+                        return Err(invalid(
+                            "indirect table",
+                            "foreign or unavailable GPU address",
+                        ));
+                    }
+                    indirect.push(buffer);
+                }
+            }
         }
         record(
             &self.runtime,
             Command::Kernel {
                 pipeline: self.pipeline.clone(),
                 arguments,
+                indirect,
                 scratch: scratch as u64,
                 grid,
                 block,
@@ -1202,6 +1318,70 @@ mod tests {
     }
 
     #[test]
+    fn captured_indirect_factors_keep_their_allocations_and_offsets() {
+        let (_lock, context) = context();
+        let module = Module::load_metal(
+            r#"
+            #include <metal_stdlib>
+            using namespace metal;
+            struct Factor { device const long *left; device const long *right; };
+            kernel void test_indirect(device const Factor *factors [[buffer(0)]],
+                constant uint &count [[buffer(1)]], device long *output [[buffer(2)]]) {
+                long sum = 0;
+                for (uint i=0; i<count; ++i) sum += *factors[i].left + *factors[i].right;
+                *output = sum;
+            }
+        "#,
+        )
+        .unwrap();
+        let function = module.function("test_indirect").unwrap();
+        let left = DeviceBuffer::<i64>::alloc(3).unwrap();
+        left.copy_from_slice(&[3, 5, 7]).unwrap();
+        let right = DeviceBuffer::<i64>::alloc(2).unwrap();
+        right.copy_from_slice(&[11, 13]).unwrap();
+        let left_address = left.device_ptr();
+        let factors = DeviceBuffer::<u64>::alloc(4).unwrap();
+        factors
+            .copy_from_slice(&[
+                left_address + 8,
+                right.device_ptr(),
+                left_address + 16,
+                right.device_ptr() + 8,
+            ])
+            .unwrap();
+        let output = DeviceBuffer::<i64>::alloc(1).unwrap();
+        let mut table_address = factors.device_ptr();
+        let mut count = 2u32;
+        let mut output_address = output.device_ptr();
+        let mut params = [
+            (&mut table_address as *mut u64).cast(),
+            (&mut count as *mut u32).cast(),
+            (&mut output_address as *mut u64).cast(),
+        ];
+        let stream = Stream::create().unwrap();
+        stream.begin_capture().unwrap();
+        function
+            .launch_on(&stream, Dim3::x(1), Dim3::x(1), &mut params)
+            .unwrap();
+        let graph = stream.end_capture().unwrap();
+        drop(left);
+        drop(right);
+        assert!(resolve(left_address, 8).is_ok());
+        let executable = graph.instantiate().unwrap();
+        executable.launch(&stream).unwrap();
+        context.synchronize().unwrap();
+        let mut result = [0];
+        output.copy_to_slice(&mut result).unwrap();
+        assert_eq!(result, [36]);
+        drop(executable);
+        drop(graph);
+        assert!(resolve(left_address, 8).is_err());
+        assert!(function
+            .launch_on(&stream, Dim3::x(1), Dim3::x(1), &mut params)
+            .is_err());
+    }
+
+    #[test]
     fn captured_fill_copy_graph_preserves_order() {
         let (_lock, context) = context();
         let source = DeviceBuffer::<u32>::alloc(4).unwrap();
@@ -1259,21 +1439,17 @@ mod tests {
             (&mut address as *mut u64).cast(),
             (&mut count as *mut u32).cast(),
         ];
-        assert!(
-            function
-                .launch_on(&stream, Dim3::x(0), Dim3::x(32), &mut params)
-                .is_err()
-        );
-        assert!(
-            function
-                .launch_on(
-                    &stream,
-                    Dim3::x(1),
-                    Dim3::x(function.max_threads_per_block().unwrap() + 1),
-                    &mut params
-                )
-                .is_err()
-        );
+        assert!(function
+            .launch_on(&stream, Dim3::x(0), Dim3::x(32), &mut params)
+            .is_err());
+        assert!(function
+            .launch_on(
+                &stream,
+                Dim3::x(1),
+                Dim3::x(function.max_threads_per_block().unwrap() + 1),
+                &mut params
+            )
+            .is_err());
         stream.begin_capture().unwrap();
         function
             .launch_on(&stream, Dim3::x(3), Dim3::x(32), &mut params)
