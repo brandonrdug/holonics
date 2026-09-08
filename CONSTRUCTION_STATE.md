@@ -57,19 +57,28 @@ The public example generates while the condition family is free, receives an act
 then changes its retained current and predicts a later native field response exactly. The contact
 and later generation require no numerical host readback. Conversation capability remains open.
 
-[open] Next compose the continuing condition current with actual field source/condition incidence,
-producing-law chronology and conversation reception. Whole-family evidence receivers are not a
-universal certainty gate on model generation. Retain the carriers used for each prediction;
-later condition inference changes the successor rather than rewriting its history. Bind that native
-owner through the existing conversation exposure/session interface. Athena-alpha still has no
-useful text response; the full AC0–AC5 goal remains unfinished.
+[established-bounded; measured] The [internal source and shared-drive generator](research/records/2026-09-07_AC1_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE_GENERATORS.md)
+now make an actual internal phase available to the learned relation and condense a declared
+future receiver through `q T_i = -q`. The native shared-drive check preserves the two distinct
+birth histories; the common component remains in the Preimage Fibre. All 125 constitutive and
+16 SDK alpha tests pass. A 391-byte public mode restores and generates without its source field.
+The actual four-family conversation model supplies a 2,030-byte mode at contacts `39,43`, with
+a certified nonzero current and fixed numerical amplitude fibre. Its 732 occurrences remain
+unchanged, and the mode unfolds after the source session is dropped.
+
+[open] Next compose the mode through the existing complete-current material transport and its
+actual source/receiving chronology: for `m=(e_l-e_r)/2`, its output contribution is `(M m) q`.
+Preserve the remaining source, producing/current operator cuts, amplitude fibre and returned
+difference. Do not select the numerical centre or substitute a phase label or another learner.
+A mode being available does not establish that the learned emitter uses it. Athena-alpha still
+has no useful text response; the full AC0–AC5 goal remains unfinished.
 
 [established-bounded; measured] The [generated-current ingress](research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
 now feeds the existing field operation directly, retaining its actual input through history
 placement and rest. All 118 constitutive and 16 SDK alpha tests pass, including paired/internal
 equivalence, refusal preservation and restart. The public conditional example drives three linked
 paired-field occurrences with zero numerical readback and retains their full internal currents.
-This closes the ingress port; the contextual-source/conditional-action binding above remains open.
+This closes the ingress port; the mode/material-transport binding above remains open.
 
 [established-bounded; measured] The existing local relation now has a
 [resident rational-current port](research/records/2026-09-07_AC1_THE_LEARNED_LOCAL_RELATION_CONDUCTS_RESIDENT_RATIONAL_RETURNS.md).

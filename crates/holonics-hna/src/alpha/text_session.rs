@@ -74,6 +74,18 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
     pub fn field(&self) -> &NativeConstitutiveField<'chart> {
         self.field
     }
+    /// Read-only condensation of two actual field contacts. This preserves application/source
+    /// chronology and delegates the complete shared-drive condition to the native owner.
+    pub fn condense_shared_drive_mode(
+        &mut self,
+        left: usize,
+        right: usize,
+    ) -> Result<
+        holonic_engine::native_ecology::constitutive_fibre::NativeSharedDriveMode<'chart>,
+        AlphaMaterialError,
+    > {
+        Ok(self.field.condense_shared_drive_mode(left, right)?)
+    }
     /// Exterior placement at a declared application boundary. This does not enact a symbol.
     pub fn archive_history(&mut self) -> Result<(), AlphaMaterialError> {
         let at = self.field.occurrence_count();

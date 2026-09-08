@@ -57,10 +57,14 @@ now infers compatible conditions from actual source/return currents, and the
 [joint-family return](research/records/2026-09-07_AC1_CONDITION_FAMILIES_CONDUCT_AND_RETURN_THROUGH_THEIR_JOINT_FIBRE.md)
 transports/refines those families with their domain. The
 [retained-current contact](research/records/2026-09-07_AC1_THE_RETAINED_CONDITION_CURRENT_MEETS_ITS_PREIMAGE_FIBRE.md)
-now has its explicit metric and native two-port response. Desktop construction next composes
-actual field source/condition incidence and producing-law chronology with that current and
-conversation reception. Retain the carriers used to produce each prediction; later condition
-inference changes the successor rather than rewriting that prediction's history.
+now has its explicit metric and native two-port response. The
+[internal-current/mode return](research/records/2026-09-07_AC1_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE_GENERATORS.md)
+supplies an actual internal source and shared-drive generator, including a mode from the saved
+conversation model. Desktop construction next composes that mode through the existing
+complete-current material transport, preserving the amplitude fibre, source remainder, actual
+operator cuts and returned differences. Do not replace its enclosure with its centre or a phase
+label, or found a separate learner. Retain the carriers used to produce each prediction; later
+condition inference changes the successor rather than rewriting that prediction's history.
 
 [definition] The [generated-current field ingress](research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
 now supplies the direct resident entry to that field operation, including its input provenance,

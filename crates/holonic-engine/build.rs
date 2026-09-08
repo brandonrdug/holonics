@@ -75,6 +75,7 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/constitutive_condition_contact.cuh");
     println!("cargo:rerun-if-changed=kernels/constitutive_field.cuh");
     println!("cargo:rerun-if-changed=kernels/paired_field_junction.cuh");
+    println!("cargo:rerun-if-changed=kernels/field_internal_current.cuh");
     println!("cargo:rerun-if-changed=kernels/enclosed_field_junction.cuh");
     println!("cargo:rerun-if-changed=kernels/balanced_field_factorization.cuh");
     println!("cargo:rerun-if-changed=kernels/field_material_transport.cuh");

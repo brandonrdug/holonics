@@ -241,13 +241,18 @@ and publishes one successor after complete native success. All 114 constitutive 
 public continuing-current example pass. Its metric is declared, and a general frame change
 owes metric transport. No conversation capability follows from this local return alone.
 
-[definition] Next compose actual field source/condition incidence and producing-law chronology
-with reception and this retained current, then bind the existing conversation exposure/session
-interface. Retain the carriers used to produce each prediction; later inference changes the
-successor rather than rewriting that prediction's history. Generative standing is not an arbitrary
-affine particular solution, and whole-family
-evidence receivers do not universally define whether the body may generate. No source-ID switch
-or authored semantic selector supplies the attachment.
+[established-bounded; measured] The [internal-current/shared-drive return](../../research/records/2026-09-07_AC1_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE_GENERATORS.md)
+now supplies a resident internal source and a source-independent mode generator. The native
+shared-drive condition implies `q T_i = -q`, with the common current retained in its Preimage
+Fibre. The actual four-family conversation field yields a certified nonzero mode without new
+exposure. All 125 constitutive and 16 SDK alpha tests pass; useful conversation remains open.
+
+[definition] Next bind the mode through the existing complete-current material transport:
+`x_mode=m q`, `m=(e_l-e_r)/2`, and `M x_mode=(M m) q`. Preserve the source remainder and actual
+producing/current operator cuts through later reception. The numerical amplitude fibre remains
+operative; its centre or a phase label is not a replacement current. Retain the carriers used
+for each prediction, with later inference changing the successor rather than its prior history.
+No source-ID switch, authored semantic selector or second learner supplies the attachment.
 
 [established-bounded; measured] The [resident field ingress](../../research/records/2026-09-07_AC1_GENERATED_CURRENT_ENTERS_THE_EXISTING_FIELD_RECURRENCE.md)
 now lets generated current enter that same field operation directly. Its actual input survives

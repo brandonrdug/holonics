@@ -93,6 +93,16 @@ changes. The old exterior input JSON remains an array. The extended example's pa
 requires that field representation; the earlier conditional-action receipts remain independently
 usable for the simpler phase port. Desktop controls do not establish Metal parity.
 
+[established-bounded; measured] The [internal-current/mode extension](../research/records/2026-09-07_AC1_INTERNAL_CURRENT_AND_SHARED_DRIVE_MODE_GENERATORS.md)
+adds `section_field_internal_current`, `section_internal_shared_drive` and
+`section_internal_mode_unfold`. Capture reuses the actual paired-field contact and prefix owners;
+unfolding needs only the captured mode. Port rational contact normalization, conjugation,
+alternating-prefix orientation, enclosed-radius propagation and point-availability guards.
+The mode/current wire packs signed 128-bit values into little-endian word pairs; it must be
+encoded explicitly against Metal's own wide layout. Its artifact is a declared mode, not a full
+conversation or acoustic model. The public 391-byte mode is available for a source-independent
+port comparison; the conversation-derived packet stays with the private artifacts.
+
 [established-bounded; source-inspected] The public framework enters through
 [`holonics::hna`](../crates/holonics/src/lib.rs). Its native session is exposed by
 [`with_native_session`](NATIVE_HNA.md), while the earlier inherited operator retains a
