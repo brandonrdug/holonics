@@ -389,7 +389,7 @@ relation. Basin/stability probes answer a specific failure, never govern learnin
 authored entropy threshold. Use existing tube/span owners at their domains; no new tube engine
 or large fractal sampling campaign is scheduled.
 
-[definition] **Current entry point: AC1 step 2, the producing-interior return and finite successor.**
+[definition] **Current entry point: AC1 path/reuse and AC2's joint packet receiver, following the bounded finite contact-development return.**
 The [normalized receiver](../../research/records/2026-09-08_AC1_THE_NORMALIZED_RECEIVER_RETURNS_ITS_COMPLETE_CURRENT_AND_TWO_METRIC_FACES.md)
 has returned resident source-qualified faces and metric covectors with actual-model evidence.
 Its full r is also the relative-entropy potential return; `J_p*r` belongs to squared probability
@@ -407,11 +407,21 @@ changes actual contacts and subsequent conduct under a declared unit-Frobenius l
 and persistence controls. Its first corpus composition nevertheless refuses after nine
 occurrences; a tighter contractive adjoint block reaches eleven before the already broad
 material/source covector causes another refusal. This is an enclosure failure, not a measured
-divergence of the numerical trajectory. Step 2 therefore remains open. Follow the complete
-source/parameter error correlation through the constitutive response and its mixed terms;
-compare the existing joint/coercive candidate at those actual dependencies. Neither deleting
-radii nor raising numerical capacity supplies the missing relation. Keep the experiment explicit
-until its ordinary continuing conduct returns at the conversation scope.
+divergence of the numerical trajectory. That `EnclosedFlow` comparison remains open.
+
+[established-bounded; measured] The [new deposit realization](../../research/records/2026-09-08_AC1_THE_DEPOSIT_IS_A_NEW_COEFFICIENT_AND_ITS_DEFECT_REMAINS_A_COMPARISON.md)
+recovers the admitted HNN treatment of exact finite coefficients with retained projection defects.
+It completes the same 1,930-occurrence study and preserves its body/current/generation after
+remount. It retains prior uncertainty and all deposit discrepancies, and does not claim the same
+unrounded trajectory. Language remains unusable; this bounded step does not close AC1 or AC2.
+
+[definition] Next separate the material receiver's codomain from the root field's node count,
+then retain joint packet structure through the learned target current and its receiver. The
+exact `{3,5,6} -> 7` bit-marginal witness in that record must separate at the joint receiver.
+This is an exterior-codec obligation; a packet class never becomes occurrence identity. Preserve
+phase, source qualification and returned differences, and compare actual conversation behavior.
+AC1's local path formation, restriction/rebase and generator reuse remain required as this
+composition grows. A joint codec is neither an authored grammar nor a guarantee of useful language.
 
 Brandon has resumed the completion goal. Treat this sequence as a revisable working design;
 report a concrete failed connection and change it when evidence warrants. In execution, complete the next native attachment and inspect its actual consequence before taking

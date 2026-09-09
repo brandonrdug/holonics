@@ -1,7 +1,7 @@
 //! First public text-codec composition over the resident native field. This driver mounts actual
 //! exposure and reads actual native emission; it contains no learner, target answer or fallback.
 use holonic_engine::native_ecology::constitutive_fibre::{
-    NativeFieldSourceAnchor, NativeMaterialTransportSource,
+    NativeFieldSourceAnchor, NativeMaterialTransportSource, NativeContactRealization,
 };
 use holonics_hna::{
     alpha::{
@@ -49,6 +49,8 @@ struct CultivationCheckpoint {
     anchors: Vec<AnchorPosition>,
     #[serde(default)]
     contact_response: bool,
+    #[serde(default)]
+    contact_realization: NativeContactRealization,
 }
 
 fn cultivate(
@@ -58,6 +60,7 @@ fn cultivate(
     records: &mut Vec<Value>,
     anchors: &mut AnchorMap,
     contact_response: bool,
+    contact_realization: NativeContactRealization,
 ) -> Result<(), AlphaMaterialError> {
     let mut partial = records.last().filter(|r| r["complete"] == false).cloned();
     let mut completed = 0;
@@ -191,8 +194,9 @@ fn cultivate(
                     break;
                 }
                 if contact_response {
-                    if let Err(error)=session.respond_to_latest_material(2,
-                        holonic_engine::native_ecology::constitutive_fibre::NativeMaterialPullbackMetric::RelativeEntropy) {
+                    if let Err(error)=session.respond_to_latest_material_with_realization(2,
+                        holonic_engine::native_ecology::constitutive_fibre::NativeMaterialPullbackMetric::RelativeEntropy,
+                        contact_realization) {
                         failure=Some(json!({"phase":"contact-response","symbol_index":symbol_index,
                             "symbol":symbol,"error":error.to_string()}));
                         break;
@@ -277,6 +281,7 @@ fn run_session(
     inspect_all_currents: bool,
     operative: bool,
     contact_response: bool,
+    contact_realization: NativeContactRealization,
     checkpoint: Option<&PathBuf>,
     report: &mut Value,
 ) -> Result<(), AlphaMaterialError> {
@@ -289,9 +294,10 @@ fn run_session(
     report["material_source"] = json!(session.field().material_transport_source());
     report["text_receiver"] = json!(text_receiver);
     report["contact_response_during_development"] = json!(contact_response);
+    report["contact_realization"] = json!(contact_realization);
     let start = Instant::now();
     let developed = if let Some(reader) = reader.as_mut() {
-        cultivate(reader, session, families, records, anchors, contact_response)
+        cultivate(reader, session, families, records, anchors, contact_response, contact_realization)
     } else {
         Ok(())
     };
@@ -319,6 +325,7 @@ fn run_session(
             cursor: cursor.clone(),
             native_until: session.field().occurrence_count(),
             contact_response,
+            contact_realization,
             records: records.clone(),
             anchors: anchors
                 .iter()
@@ -446,6 +453,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut inspect_all_currents = false;
     let mut operative = false;
     let mut contact_response = None;
+    let mut contact_realization = None;
     let mut history_archive = None;
     let mut material_source = None;
     let mut text_receiver = TextCurrentReceiver::Material;
@@ -485,6 +493,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             "--operative-junction" => operative = value.parse::<bool>()?,
             "--contact-response" => contact_response = Some(value.parse::<bool>()?),
+            "--contact-realization" => contact_realization = Some(match value.as_str() {
+                "enclosed-flow" => NativeContactRealization::EnclosedFlow,
+                "dyadic-deposit" => NativeContactRealization::DyadicDeposit,
+                _ => return Err("contact realization must be enclosed-flow or dyadic-deposit".into()),
+            }),
             "--inspect-all-currents" => inspect_all_currents = value.parse::<bool>()?,
             _ => return Err(format!("unknown option {option}").into()),
         }
@@ -600,6 +613,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 inspect_all_currents,
                 operative,
                 contact_response.unwrap_or(app.contact_response),
+                contact_realization.unwrap_or(app.contact_realization),
                 checkpoint.as_ref(),
                 &mut report,
             )
@@ -641,6 +655,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     inspect_all_currents,
                     operative,
                     contact_response.unwrap_or(false),
+                    contact_realization.unwrap_or(NativeContactRealization::DyadicDeposit),
                     checkpoint.as_ref(),
                     &mut report,
                 )

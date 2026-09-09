@@ -251,3 +251,66 @@ fn material_contact_response_reaches_its_producer_and_changes_subsequent_conduct
         changed_forward
     );
 }
+
+#[test]
+#[ignore="requires CUDA; exact deposited coefficient, retained projection defect and continuation"]
+fn dyadic_contact_deposit_retains_its_defect_and_continues(){
+    let readout=ResidentReadout::new().unwrap();let surface=ResidentSurface::on(&readout).unwrap();
+    let mut field=make(&surface);let mut next=populate(&mut field);
+    let response=returned(&field);let old=field.stage_operative_contacts().unwrap().inspect().unwrap();
+    let r=response.inspect().unwrap();
+    assert!(r.contact_covector_radius>Rat::from_integer(0.into()));
+    let before=field.census();
+    field.apply_material_contact_realization(&response,NativeContactRealization::DyadicDeposit).unwrap();
+    assert_eq!(field.census().section_read_outs,before.section_read_outs);
+    let after=field.stage_operative_contacts().unwrap().inspect().unwrap();
+    assert_eq!(after.contacts_radius,old.contacts_radius);
+    assert_eq!(after.internal.radius,old.internal.radius);
+    let deposit=field.inspect_contact_deposit(0).unwrap();
+    assert_eq!(deposit.realization,NativeContactRealization::DyadicDeposit);
+    assert_eq!(deposit.unrounded_covector_radius,r.contact_covector_radius);
+    assert!(deposit.numerical_projection_residual_norm_square>Rat::from_integer(0.into()));
+    for i in 0..response.query.contacts {
+        let unrounded=r.contact_covector.contact(i).unwrap();
+        for j in 0..unrounded.len(){
+            assert_eq!(after.contacts[i][j].subtract(&old.contacts[i][j]),
+                unrounded[j].add(&deposit.numerical_projection_residual[i][j]));
+        }
+    }
+    // The original response and source retain their nonzero comparison defect after adoption.
+    assert_eq!(response.inspect().unwrap().contact_covector_radius,deposit.unrounded_covector_radius);
+    let rest=field.rest(&[Some(&next)],&[]).unwrap();drop(response);drop(next);drop(field);
+    let (mut field,mut sources,_)=NativeConstitutiveField::remount(&surface,rest).unwrap();next=sources[0].take().unwrap();
+    assert_eq!(serde_json::to_value(field.inspect_contact_deposit(0).unwrap()).unwrap(),serde_json::to_value(deposit).unwrap());
+    for at in 5..40 {
+        let event=field.advance_resident(&mut NativeFieldOccurrence::through(next,
+            vec![phase((at%3) as i64,1),phase(1,-((at%2) as i64))])).unwrap();
+        next=event.source;
+        let normalized=field.normalized_material_return(at,2,SeriesAperture(32)).unwrap().unwrap();
+        let query=field.pull_back_material_source(&normalized,NativeMaterialPullbackMetric::RelativeEntropy).unwrap();
+        let response=field.material_contact_response(query).unwrap();
+        field.apply_material_contact_realization(&response,NativeContactRealization::DyadicDeposit).unwrap();
+    }
+    let state=field.stage_operative_contacts().unwrap().inspect().unwrap();
+    assert_eq!(state.contacts_radius,old.contacts_radius);
+    assert_eq!(state.staged_returns,36);
+    let wire=field.junction.as_ref().unwrap().operative.as_ref().unwrap().wire();
+    assert!(wire.return_frames.iter().all(|r|r.realization==NativeContactRealization::DyadicDeposit));
+    // Older frames with no realization field keep the original enclosure contract.
+    let legacy:super::super::rest::OperativeReturnFrame=serde_json::from_str("{\"at_cut\":1,\"contact_count\":0}").unwrap();
+    assert_eq!(legacy.realization,NativeContactRealization::EnclosedFlow);
+    drop(field);
+    // A non-dyadic birth already has an enclosure. A later exact deposit must not erase it.
+    let mut field=make(&surface);let mut next=None;
+    for at in 0..5 {
+        let input=vec![NativePhaseCurrent::new(1+(at%2),1,3).unwrap(),NativePhaseCurrent::new(1,-1,7).unwrap()];
+        let mut event=match next.take(){Some(source)=>NativeFieldOccurrence::through(source,input),None=>NativeFieldOccurrence::entering(input)};
+        next=Some(field.advance_resident(&mut event).unwrap().source);
+    }
+    let response=returned(&field);let before=field.stage_operative_contacts().unwrap().inspect().unwrap();
+    assert!(before.contacts_radius>Rat::from_integer(0.into()));
+    field.apply_material_contact_realization(&response,NativeContactRealization::DyadicDeposit).unwrap();
+    let after=field.stage_operative_contacts().unwrap().inspect().unwrap();
+    assert_eq!(after.contacts_radius,before.contacts_radius);
+    assert_eq!(after.internal.radius,before.internal.radius);
+}

@@ -1,7 +1,7 @@
 # Construction state
 
 **Currency:** September 8, 2026. **Priority:** AC0–AC5 completion resumed by Brandon; flexible native construction with transparent failures.
-**Position:** AC0 complete; AC1 step 2 has a bounded finite contact response, but continuing enclosure propagation refuses on the corpus; AC2 failed probes; AC3 apparatus only; AC4–AC5 open.
+**Position:** AC0 complete; AC1 finite contact development completes the first corpus slice under a declared dyadic deposit; AC1 path/reuse and AC2 joint-packet generation remain open; AC3 experimental artifacts; AC4–AC5 open.
 **Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -26,6 +26,28 @@ model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction
 
+[established-bounded; measured] The [declared deposit realization](research/records/2026-09-08_AC1_THE_DEPOSIT_IS_A_NEW_COEFFICIENT_AND_ITS_DEFECT_REMAINS_A_COMPARISON.md)
+recovers the existing HNN distinction between a new exact dyadic coefficient and its comparison
+with an unrounded response. `DyadicDeposit` retains the full response factors, their covector
+radius and a decoder for the signed projection residual. Prior map/current uncertainty remains.
+Old checkpoints default to `EnclosedFlow`; no uncertain source/current is silently sealed.
+Seven operative controls pass, including non-dyadic births, forty continuing occurrences and
+rest/remount. This is a declared change of numerical realization, not a proof of the old flow.
+
+[established-bounded; measured] The eight-family study completes 1,930 occurrences and 1,929
+contact deposits in 431.36 seconds, with zero numerical section readouts during development.
+The checkpoint is 349,607,685 bytes; peak native residency is 708,734,132 bytes. A fresh process
+reproduces the reported body, emission currents and generation. Four inspected deposits retain
+their nonzero projection residuals and unrounded-response defects. The
+[receipt](research/records/2026-09-08_dyadic_contact_deposit/return.json) retains commands and costs.
+
+[counterexample; measured] Language remains unusable: `Tife~anenanen…` repeats through the
+128-symbol limit. The numerical continuation return does not complete AC1 or establish Athena.
+The [exact bit-marginal witness](research/experiments/alpha_passive_junction/bit_marginal_receipt.json)
+also shows that the present receiver can decode an absent joint symbol from strict individual
+bit signs. Next: AC2's joint packet receiver/codomain, composed with AC1's path and reuse work.
+This receiver limitation is not established as the sole cause of the language failure.
+
 [established-bounded; measured] The [paired response](research/records/2026-09-08_AC1_THE_PAIRED_RETURN_CHANGES_CONTACTS_AND_THE_NEXT_CURRENT.md)
 now returns through the actual producing contact map, including earlier overlays, and stages
 a constrained unit-Frobenius contact displacement with complete finite covariance/aggregate
@@ -33,7 +55,7 @@ terms. Six focused native controls pass, including changed subsequent material c
 historical-map recovery, refusal without partial publication and rest/remount. The corrected
 adjoint retains a contractive skew-adjoint block and its complete oriented residual.
 
-[counterexample; measured] Actual conversation development remains unusable. The initial
+[counterexample; measured] In the earlier `EnclosedFlow` realization, the initial
 independent-bound composition refuses after 9 occurrences/7 contact responses. The joint-block
 correction reaches 11 occurrences/9 responses, then refuses inside the paired return. Its
 incoming material/current covector intervals are already about `1.86e8` wide; the numerical
@@ -41,9 +63,9 @@ contact norm is only about 16.2. The [receipt](research/records/2026-09-08_paire
 retains exact bounds, checkpoints and costs. No prompt or generation ran. The first pending
 response restarts without replaying its received symbol and saves an identical checkpoint.
 These failures concern the enclosure composition; divergence of the numerical trajectory is
-not established. AC1 step 2 remains open: retain source/parameter error correlation through
-the complete constitutive return, using the existing producer, coercive return and source
-owners. Do not discard radii, raise a carrier limit, or treat another local bound as a product.
+not established. That comparison remains open. The current finite model above uses a separately
+declared deposit realization, with its discrepancy retained; this does not establish equivalent
+unrounded continuation or erase the failed experiment.
 
 [established-bounded; measured] The [material query adjoint](research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_REACHES_BOTH_QUERY_ARGUMENTS.md)
 now returns through the producing material operator into both visible-source branches and the

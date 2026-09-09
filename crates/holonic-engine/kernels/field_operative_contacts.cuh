@@ -65,7 +65,7 @@ extern "C" __global__ void __launch_bounds__(512) section_field_operative_mount(
 extern "C" __global__ void __launch_bounds__(512) section_field_operative_update(
     const int64_t *old_map,const int64_t *old_b,const int64_t *old_bounds,
     const int64_t *ports,const int64_t *currents,const int64_t *delta_b,const int64_t *delta_bounds,
-    uint32_t D,uint32_t count,uint32_t grain,
+    uint32_t D,uint32_t count,uint32_t grain,uint32_t exact_deposit,
     int64_t *map_lo,int64_t *map_hi,int64_t *b_lo,int64_t *b_hi,int64_t *bound_lo,int64_t *bound_hi,
     wide *rounds,uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
 ){
@@ -73,7 +73,7 @@ extern "C" __global__ void __launch_bounds__(512) section_field_operative_update
     const wide *a=(const wide *)old_map,*b=(const wide *)old_b,*p=(const wide *)ports,*r=(const wide *)currents;
     const wide *db=(const wide *)delta_b,*e=(const wide *)old_bounds,*de=(const wide *)delta_bounds;
     wide *out=(wide *)map_lo,*bout=(wide *)b_lo;
-    if(!D || (D&1u) || grain<1u || grain>120u || e[0]<0 || e[1]<0 || de[0]<0 || de[1]<0){if(!threadIdx.x)atomicOr(slot,REFUSED_MALFORMED);return;}
+    if(!D || (D&1u) || grain<1u || grain>120u || exact_deposit>1u || e[0]<0 || e[1]<0 || de[0]<0 || de[1]<0){if(!threadIdx.x)atomicOr(slot,REFUSED_MALFORMED);return;}
     for(uint32_t i=threadIdx.x;i<count;i+=blockDim.x){
         wide omitted=0;
         for(uint32_t j=0;j<D;j+=2u){
@@ -89,7 +89,11 @@ extern "C" __global__ void __launch_bounds__(512) section_field_operative_update
     __syncthreads();if(*slot)return;
     if(!threadIdx.x){
         wide omitted=0;for(uint32_t i=0;i<count;++i)omitted=add_checked(omitted,rounds[i],slot);
-        ((wide *)bound_lo)[0]=add_checked(e[0],add_checked(de[0],omitted,slot),slot);
+        // The exact-deposit chart defines the NEW coefficient by the finite projected product
+        // above. Its unrounded-response defect is retained with the journal's factors/bounds;
+        // it is not silently reinterpreted as uncertainty in the chosen numerical coefficient.
+        // This changes no pre-existing map uncertainty and asserts no exact unrounded flow.
+        ((wide *)bound_lo)[0]=exact_deposit?e[0]:add_checked(e[0],add_checked(de[0],omitted,slot),slot);
         ((wide *)bound_lo)[1]=add_checked(e[1],de[1],slot);
         if(!count){for(uint32_t j=0;j<D;++j)out[j]=0;bout[0]=bout[1]=0;}
     }

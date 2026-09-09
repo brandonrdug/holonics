@@ -63,13 +63,28 @@ pins the refreshed Apple branch comparison.
 
 ## Athena-alpha: corrected AC0–AC5 order
 
+[established-bounded; measured] The [declared dyadic deposit](../../research/records/2026-09-08_AC1_THE_DEPOSIT_IS_A_NEW_COEFFICIENT_AND_ITS_DEFECT_REMAINS_A_COMPARISON.md)
+now completes the first eight-family development: 1,930 occurrences, 1,929 contact deposits,
+retained projection defects, and identical body/current/generation after remount. This recovers
+the standing HNN distinction between exact finite coefficients and comparisons with an unrounded
+response. It preserves prior source/current uncertainty and changes no legacy realization.
+The answer still repeats `Tife~anen…`; AC1 and Athena-alpha are not complete.
+
+[definition] The next construction joins **AC1 path/reuse and AC2's joint packet receiver**.
+First separate the material target codomain from the root field size and retain a packet's joint
+structure through its learned current and receiver. The exact marginal counterexample in the
+deposit record supplies a falsifier: strict bit signs can decode an absent joint symbol.
+Compose the existing source-qualified return with that codec, then test actual continuation.
+Do not replace it with a grammar emitter, observed-word filter, authored semantic classifier or
+larger unchanged corpus run. Keep the path-growth, generator/decoder and cost obligations of
+AC1 steps 3–4 active as that receiver composition develops.
+
 [counterexample; measured] The [paired contact construction](../../research/records/2026-09-08_AC1_THE_PAIRED_RETURN_CHANGES_CONTACTS_AND_THE_NEXT_CURRENT.md)
-has verified local finite conduct, but the corpus still refuses: first at 9 occurrences, then at
+has verified local finite conduct, but its earlier `EnclosedFlow` corpus attempt refuses: first at 9 occurrences, then at
 11 after retaining the adjoint's contractive block. The upstream material/source covector
-enclosure is already unusably wide. **AC1 step 2 remains active:** compose the complete
-source/parameter return with its retained error correlations and coercive structure. The explicit
-unit-metric experiment is not the required productive endpoint. Keep its checkpoints and failure
-evidence; do not spend further runs on unchanged laws or substitute capacity increases.
+enclosure is already unusably wide. That unrounded-flow comparison remains open. The new finite
+model above has an explicitly different deposit realization and retains its discrepancy; it is
+not a silent radius reset or a proof of equivalence to the earlier experiment.
 
 [established-bounded; measured] The [material query adjoint](../../research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_REACHES_BOTH_QUERY_ARGUMENTS.md)
 returns both visible and complete current arguments through the producing material operator,
@@ -90,7 +105,7 @@ complete population bounds, not an arbitrary radius, discarded current or basin-
 
 [project-postulate] Brandon has resumed completion of AC0–AC5 as the active goal and explicitly
 directs flexible designs and transparent reporting when a composition does not work.
-**Current work: AC1 step 2, complete-return error correlation after the finite contact attempt.** Each work update names phase/step, actual artifact and returned
+**Current work: AC1 path/reuse and AC2 joint-packet codec, after the bounded finite development return.** Each work update names phase/step, actual artifact and returned
 consequence. Do not resume the preserved joint kernel by default or restart completed foundations.
 
 | Phase | Ordered construction | Return required |

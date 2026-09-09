@@ -123,6 +123,7 @@ fn returned<'c>(
         db[2 * i + 1] = -s / 32;
     }
     Rc::new(OperativeReturn {
+        realization: NativeContactRealization::EnclosedFlow,
         at_cut: source.field_cut(),
         contact_count: source.births.len(),
         origin: Rc::clone(&source.origin),

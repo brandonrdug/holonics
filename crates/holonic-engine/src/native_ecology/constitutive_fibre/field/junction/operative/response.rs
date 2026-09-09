@@ -85,6 +85,17 @@ impl<'c> NativeConstitutiveField<'c> {
         &mut self,
         response: &NativeMaterialContactResponse<'c>,
     ) -> Result<(), Error> {
+        self.apply_material_contact_realization(response, NativeContactRealization::EnclosedFlow)
+    }
+
+    /// Choose the declared numerical realization of a new contact deposit. DyadicDeposit
+    /// retains the complete response factors and their defect, while the projected increment
+    /// itself is an exact coefficient. It does not seal an uncertain source or current.
+    pub fn apply_material_contact_realization(
+        &mut self,
+        response: &NativeMaterialContactResponse<'c>,
+        realization: NativeContactRealization,
+    ) -> Result<(), Error> {
         if !self.relation.usable || self.pending.is_some() {
             return Err(Error::Uncertain);
         }
@@ -137,6 +148,7 @@ impl<'c> NativeConstitutiveField<'c> {
             (currents, db)
         };
         let returned = Rc::new(OperativeReturn {
+            realization,
             at_cut: self.history.len(),
             contact_count: k,
             origin: op.origin.clone(),

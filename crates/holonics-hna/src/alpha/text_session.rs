@@ -90,6 +90,15 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
         group_width: usize,
         metric: holonic_engine::native_ecology::constitutive_fibre::NativeMaterialPullbackMetric,
     ) -> Result<Option<holonic_engine::native_ecology::constitutive_fibre::NativeMaterialContactResponse<'chart>>, AlphaMaterialError> {
+        self.respond_to_latest_material_with_realization(group_width,metric,
+            holonic_engine::native_ecology::constitutive_fibre::NativeContactRealization::EnclosedFlow)
+    }
+    pub fn respond_to_latest_material_with_realization(
+        &mut self,
+        group_width: usize,
+        metric: holonic_engine::native_ecology::constitutive_fibre::NativeMaterialPullbackMetric,
+        realization: holonic_engine::native_ecology::constitutive_fibre::NativeContactRealization,
+    ) -> Result<Option<holonic_engine::native_ecology::constitutive_fibre::NativeMaterialContactResponse<'chart>>, AlphaMaterialError> {
         if self.pending.is_some() {
             return Err(AlphaMaterialError::Apparatus("native reception is pending".into()));
         }
@@ -98,7 +107,7 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
             holonic_engine::resident_section::SeriesAperture(32))? else {return Ok(None);};
         let query=self.field.pull_back_material_source(&returned,metric)?;
         let response=self.field.material_contact_response(query)?;
-        self.field.apply_material_contact_response(&response)?;
+        self.field.apply_material_contact_realization(&response,realization)?;
         Ok(Some(response))
     }
     /// Native contact/current staging over this same borrowed field. It changes no source

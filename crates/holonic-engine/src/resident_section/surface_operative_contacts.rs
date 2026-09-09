@@ -70,6 +70,7 @@ impl<'c> ResidentSurface<'c> {
         d: usize,
         count: usize,
         grain: u32,
+        exact_deposit: bool,
         old: [&ResidentSection<'c>; 3],
         delta: [&ResidentSection<'c>; 4],
         next: [&ResidentSection<'c>; 3],
@@ -104,7 +105,7 @@ impl<'c> ResidentSurface<'c> {
         for s in old.into_iter().chain(delta) {
             p.ptr(s.lo.device_ptr());
         }
-        p.u32(d as u32).u32(count as u32).u32(grain);
+        p.u32(d as u32).u32(count as u32).u32(grain).u32(u32::from(exact_deposit));
         for s in next {
             p.ptr(s.lo.device_ptr()).ptr(s.hi.device_ptr());
         }

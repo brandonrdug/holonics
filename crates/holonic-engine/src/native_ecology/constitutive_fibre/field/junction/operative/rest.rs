@@ -7,6 +7,8 @@ use serde::{Deserialize, Serialize};
 pub(in super::super::super) struct OperativeReturnFrame {
     pub at_cut: usize,
     pub contact_count: usize,
+    #[serde(default)]
+    pub realization: NativeContactRealization,
 }
 #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -37,6 +39,7 @@ impl OperativeWire {
             .cloned()
             .unwrap_or_else(|| OperativeReturnFrame {
                 at_cut: self.activated_at,
+                realization: NativeContactRealization::EnclosedFlow,
                 contact_count: self
                     .births
                     .iter()
@@ -219,6 +222,7 @@ impl<'c> OperativeState<'c> {
                 .map(|r| OperativeReturnFrame {
                     at_cut: r.at_cut,
                     contact_count: r.contact_count,
+                    realization: r.realization,
                 })
                 .collect(),
         }
@@ -283,6 +287,7 @@ impl<'c> OperativeState<'c> {
                 Ok(Rc::new(OperativeReturn {
                     at_cut: frame.at_cut,
                     contact_count: frame.contact_count,
+                    realization: frame.realization,
                     origin: Rc::new(()),
                     ports: Rc::new(mount(ports)?),
                     currents: Rc::new(mount(currents)?),

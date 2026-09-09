@@ -5,7 +5,22 @@
 use super::super::material_transport::wides;
 use super::*;
 mod response;
+mod deposit;
+pub use deposit::NativeContactDepositReading;
 pub use response::{NativeMaterialContactResponse, NativeMaterialContactResponseReading};
+
+/// The numerical realization of a NEW contact deposit, not an identification of its source.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, serde::Deserialize)]
+#[serde(rename_all="kebab-case")]
+pub enum NativeContactRealization {
+    /// Continue the enclosed unrounded response; its comparison error enters map uncertainty.
+    #[default]
+    EnclosedFlow,
+    /// Install the exact dyadic deposit defined by the retained finite product/projection.
+    /// The unrounded-response defect stays in the journal; it is not uncertainty in this new
+    /// coefficient. Existing map and internal-current uncertainty is preserved.
+    DyadicDeposit,
+}
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 pub struct NativeOperativeContactBirth {
@@ -26,6 +41,7 @@ pub(in super::super) struct OperativeSections<'c> {
 // delta radii. There is intentionally no public constructor taking an authored learning delta.
 pub(super) struct OperativeReturn<'c> {
     at_cut:usize,contact_count:usize,
+    realization: NativeContactRealization,
     origin: Rc<()>,
     ports: Rc<ResidentSection<'c>>,
     currents: Rc<ResidentSection<'c>>,
@@ -416,6 +432,7 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
                 d,
                 k,
                 self.grain,
+                returned.realization == NativeContactRealization::DyadicDeposit,
                 self.sections.current(),
                 [
                     &returned.ports,

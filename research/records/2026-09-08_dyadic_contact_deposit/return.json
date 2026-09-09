@@ -1,0 +1,87 @@
+{
+  "schema": "holonics.dyadic-contact-deposit-receipt.v1",
+  "command": "target/debug/examples/alpha_text .local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl --families 8 --fractional-bits 72 --material-source operative-contextual --contact-response true --contact-realization dyadic-deposit --prompt .local/artifacts/athena-alpha/ac2/first-request.txt --emit-symbols 128 --checkpoint .local/artifacts/athena-alpha/ac1-contact-response/first-eight-dyadic-v3.hna --report .local/artifacts/athena-alpha/ac1-contact-response/first-eight-dyadic-v3.json",
+  "families": 8,
+  "development_occurrences": 1930,
+  "operative_returns": 1929,
+  "realization": "dyadic-deposit",
+  "development_seconds": 431.355374046,
+  "prompt_and_emission_seconds": 43.281288591,
+  "whole_process_seconds": 484.9208505919669,
+  "max_rss_kib": 894656,
+  "checkpoint_octets": 349607685,
+  "development_census": {
+    "allocations": 208406,
+    "captured_launches": 36657,
+    "control_launches": 0,
+    "deed_launches": 11576,
+    "device_to_device_octets": 0,
+    "egress_receipt_octets": 1111296,
+    "egress_section_octets": 0,
+    "ingress_octets": 181504592,
+    "resident_octets_now": 693978832,
+    "resident_octets_peak": 708734132,
+    "section_read_outs": 0,
+    "synchronizations": 11576
+  },
+  "development_error": null,
+  "prompt": "Explain the difference between a function and its derivative.",
+  "output": "Tife~anenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenanenane",
+  "disposition": {
+    "kind": "interrupted"
+  },
+  "language_quality_established": false,
+  "fresh_process_comparison": {
+    "generation_equal": true,
+    "body_equal": true,
+    "emission_current_history_equal": true,
+    "final_occurrences": 2120
+  },
+  "defect_decoder": {
+    "native_deeds": 0,
+    "cold_section_readouts": 12,
+    "deposits": [
+      {
+        "index": 1,
+        "at_cut": 3,
+        "realization": "dyadic-deposit",
+        "contact_count": 2,
+        "covector_radius": "5684877/4722366482869645213696",
+        "projection_residual_norm_square": "315819174146457130007972793371105375128610187/497323236409786642155382248146820840100456150797347717440463976893159497012533375533056",
+        "unrounded_response_distance_upper": "26846161113817873282711707519/22300745198530623141535718272648361505980416"
+      },
+      {
+        "index": 20,
+        "at_cut": 22,
+        "realization": "dyadic-deposit",
+        "contact_count": 21,
+        "covector_radius": "1716940631/2361183241434822606848",
+        "projection_residual_norm_square": "3392670220316765331037214733311278512048752771/248661618204893321077691124073410420050228075398673858720231988446579748506266687766528",
+        "unrounded_response_distance_upper": "4054011989440731247125050189255/5575186299632655785383929568162090376495104"
+      },
+      {
+        "index": 1600,
+        "at_cut": 1602,
+        "realization": "dyadic-deposit",
+        "contact_count": 1601,
+        "covector_radius": "1951323739876865/295147905179352825856",
+        "projection_residual_norm_square": "322286591287084428816541768421340270211458864635/248661618204893321077691124073410420050228075398673858720231988446579748506266687766528",
+        "unrounded_response_distance_upper": "73718926611481096708660912473353382247/11150372599265311570767859136324180752990208"
+      },
+      {
+        "index": 1928,
+        "at_cut": 1930,
+        "realization": "dyadic-deposit",
+        "contact_count": 1929,
+        "covector_radius": "15890630692152383/1180591620717411303424",
+        "projection_residual_norm_square": "773708191919522888769178740339501837253879686545/497323236409786642155382248146820840100456150797347717440463976893159497012533375533056",
+        "unrounded_response_distance_upper": "300165527089366075568520462630449450791/22300745198530623141535718272648361505980416"
+      }
+    ]
+  },
+  "checks": [
+    "7 operative CUDA tests passed in 3.46 s",
+    "alpha_text exposure/SDK boundary control passed",
+    "changed examples built"
+  ]
+}

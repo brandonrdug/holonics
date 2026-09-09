@@ -54,7 +54,7 @@ fn leading_nontext_material_preserves_the_available_native_parent() {
                 2,
                 &mut records,
                 &mut AnchorMap::new(),
-                false,
+                false, NativeContactRealization::EnclosedFlow,
             )?;
             assert_eq!(records[1]["parts"][0]["ordinal"], 1);
             assert_eq!(records[1]["parts"][0]["parent_source_occurrence"], 1);
@@ -69,13 +69,13 @@ fn leading_nontext_material_preserves_the_available_native_parent() {
     with_text_field_source(72,NativeMaterialTransportSource::CompleteCurrent,|field|{
         let mut session=TextFieldSession::on(field)?;let mut reader=ExposureReader::open(&path).map_err(exposure_error)?;
         let mut records=Vec::new();let mut anchors=AnchorMap::new();
-        cultivate(&mut reader,&mut session,1,&mut records,&mut anchors,false)?;
+        cultivate(&mut reader,&mut session,1,&mut records,&mut anchors,false,NativeContactRealization::EnclosedFlow)?;
         session.begin_part(None)?;session.stage(TextSymbol::Octet(b'B'))?;
         let frame=reader.peek().map_err(exposure_error)?.unwrap();
         records.push(json!({"sequence":frame.sequence,"family":frame.family,"native_from":2,"native_until":2,"complete":false,
             "parts":[{"ordinal":1,"pointer":"/text","kind":"human-text","source_octets":1,"native_from":2,"native_until":2,
                 "parent_source_occurrence":null,"failure":{"symbol_index":0,"symbol":TextSymbol::Octet(b'B'),"error":"legacy pending inscription"}}]}));
-        cultivate(&mut reader,&mut session,1,&mut records,&mut anchors,false)?;
+        cultivate(&mut reader,&mut session,1,&mut records,&mut anchors,false,NativeContactRealization::EnclosedFlow)?;
         assert_eq!(session.field().lineage(2).unwrap().received_from,None);
         assert!(records[1]["parts"][0]["parent_source_occurrence"].is_null());Ok(())
     }).unwrap();
@@ -84,7 +84,7 @@ fn leading_nontext_material_preserves_the_available_native_parent() {
     with_text_field_source(72,NativeMaterialTransportSource::OperativeContextual,|field|{
         let mut session=TextFieldSession::on(field)?;let mut reader=ExposureReader::open(&path).map_err(exposure_error)?;
         let mut records=Vec::new();let mut anchors=AnchorMap::new();
-        cultivate(&mut reader,&mut session,1,&mut records,&mut anchors,true)?;
+        cultivate(&mut reader,&mut session,1,&mut records,&mut anchors,true,NativeContactRealization::EnclosedFlow)?;
         let frame=reader.peek().map_err(exposure_error)?.unwrap();
         let parent=frame.shared_prior_parent().unwrap().unwrap();
         session.begin_part(Some(&anchors.get(&parent).unwrap().0))?;
@@ -93,7 +93,7 @@ fn leading_nontext_material_preserves_the_available_native_parent() {
             "parts":[{"ordinal":1,"pointer":"/text","kind":"human-text","source_octets":1,"native_from":2,"native_until":3,
                 "parent_source_occurrence":1,"failure":{"phase":"contact-response","symbol_index":0,
                     "symbol":TextSymbol::Octet(b'B'),"error":"interrupted before response"}}]}));
-        cultivate(&mut reader,&mut session,1,&mut records,&mut anchors,true)?;
+        cultivate(&mut reader,&mut session,1,&mut records,&mut anchors,true,NativeContactRealization::EnclosedFlow)?;
         assert_eq!(session.field().occurrence_count(),4);
         assert_eq!(session.field().lineage(2).unwrap().received_from,Some(1));
         assert_eq!(session.stage_operative_contacts()?.inspect()?.staged_returns,3);
@@ -118,7 +118,7 @@ fn partial_actual_part_keeps_its_parent_and_enacts_the_staged_symbol_once() {
                 2,
                 &mut expected_records,
                 &mut AnchorMap::new(),
-                false,
+                false, NativeContactRealization::EnclosedFlow,
             )?;
             Ok(session.field().rest(&[], &[])?)
         },
@@ -132,7 +132,7 @@ fn partial_actual_part_keeps_its_parent_and_enacts_the_staged_symbol_once() {
     with_text_field_source(72, NativeMaterialTransportSource::CompleteCurrent, |field| {
         let mut session = TextFieldSession::on(field)?;
         let mut anchors = AnchorMap::new();
-        cultivate(&mut reader, &mut session, 1, &mut records, &mut anchors, false)?;
+        cultivate(&mut reader, &mut session, 1, &mut records, &mut anchors, false, NativeContactRealization::EnclosedFlow)?;
         let frame = reader.peek().map_err(exposure_error)?.unwrap().clone();
         let parts = frame.development_parts().map_err(exposure_error)?;
         let part = &parts[0];
@@ -178,7 +178,7 @@ fn partial_actual_part_keeps_its_parent_and_enacts_the_staged_symbol_once() {
                     .zip(restored)
                     .map(|((family, at), source)| (family, (source, at)))
                     .collect();
-                cultivate(&mut reader, session, 1, &mut records, &mut anchors, false)?;
+                cultivate(&mut reader, session, 1, &mut records, &mut anchors, false, NativeContactRealization::EnclosedFlow)?;
                 assert_eq!(records, expected_records);
                 assert_eq!(session.field().rest(&[], &[])?, expected);
                 assert_eq!(

@@ -155,6 +155,26 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let selection = args
         .next()
         .ok_or("receiving occurrences or --material-history required")?;
+    if selection=="--contact-deposits" {
+        let indices=args.next().ok_or("deposit indices required")?.split(',')
+            .map(str::parse::<usize>).collect::<Result<Vec<_>,_>>()?;
+        if args.next().as_deref()!=Some("--report"){return Err("--report required".into());}
+        let output=PathBuf::from(args.next().ok_or("report destination required")?);
+        if args.next().is_some()||output.exists(){return Err("unexpected arguments or existing destination".into());}
+        let saved=SavedTextField::read(&path)?;
+        let report=saved.with_session(|session,_,_,_|{
+            let field=session.field();let before=field.census();
+            let deposits=indices.iter().map(|i|field.inspect_contact_deposit(*i)).collect::<Result<Vec<_>,_>>()?;
+            let after=field.census();
+            Ok(json!({"schema":"holonics.contact-deposit-inspection.v1","model":path,
+                "field_cut":field.occurrence_count(),"indices":indices,"deposits":deposits,
+                "native_deeds":after.deed_launches-before.deed_launches,
+                "cold_section_readouts":after.section_read_outs-before.section_read_outs}))
+        })?;
+        publish_new(&output,|file|file.write_all(&serde_json::to_vec_pretty(&report)?))?;
+        println!("{}",json!({"report":output,"field_cut":report["field_cut"]}));
+        return Ok(());
+    }
     if selection=="--normalized-return" || selection=="--material-pullback" || selection=="--paired-response" {
         let occurrences=args.next().ok_or("receiving occurrences required")?
             .split(',').map(str::parse::<usize>).collect::<Result<Vec<_>,_>>()?;
