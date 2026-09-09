@@ -51,6 +51,12 @@ counterexample to replacing that response by tangent cancellation. It reinforces
 adjoint, finite successor and future-receiver compression obligations. The theorem applies to its
 finite coupled-incidence chart; it adds no mandatory LC model, native kernel or product gate.
 
+[definition] The [continuing formal unification](FORMAL_FRAMEWORK.md#changing-constitution-and-changing-grain-are-one-returned-comparison)
+retains the full addressed difference before scalar bounds, changing receiver charts and the
+finite constitutive response. Its mechanical control separates exact quotient descent from
+energy decrease. A finite numerical law and an unrounded reference law retain separate
+successors and comparison defects; this return mandates no new numerical realization for AC1.
+
 ## Native-first construction
 
 [established-bounded; measured] NCF1 has returned the ground-up

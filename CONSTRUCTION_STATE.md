@@ -8,17 +8,21 @@
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct
 instruction governs.
 
-## Formal framework synthesis
+## Formal framework synthesis and unification
 
-[established-bounded; process-audit] The [formal framework review](research/records/2026-09-08_FORMAL_HOLONICS_IS_A_FRAMEWORK_OF_INTERACTING_TRANSPORT.md)
-is complete: recent direct messages recovered; six subject entry points, generic source factoring
-and the [physical/biological/computational synthesis](docs/FORMAL_FRAMEWORK.md) returned. The full
-research umbrella and default framework pass. Historical declarations and imports remain available.
+[proved-derived; formal-checked] The [continuing unification](research/records/2026-09-08_CHANGING_CONSTITUTION_AND_RECEIVERS_SHARE_ONE_DEFECT_CALCULUS.md)
+returns the shared addressed receiver-defect law, changing histories, moving-chart derivatives
+and constitutive material/prestress response. Mechanical changing-scale histories and the actual
+finite Galerkin fluid source instantiate it; complete hidden feedback and a quantitative finite
+receiver bound remain explicit. Exact coarse descent can coexist with increasing mechanical
+energy.
 
-[proved-derived; formal-checked] The finite coupled-response return retains both incidence
-changes, material change and internal current, with a counterexample to tangent cancellation
-as finite closure. It informs the parallel AC1 producing return and successor-compression work;
-this formal review changes no native model, kernel or product grade.
+[established-bounded; process-audit] The full research build and final framework check pass.
+The [earlier synthesis](research/records/2026-09-08_FORMAL_HOLONICS_IS_A_FRAMEWORK_OF_INTERACTING_TRANSPORT.md)
+retains recovered direct messages, six subject entry points and compatible source factoring.
+The [framework guide](docs/FORMAL_FRAMEWORK.md) connects physical, biological and computational
+instances. This continuation unifies already-engaged elementary patterns; it changes no native
+model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction
 

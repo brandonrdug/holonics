@@ -37,7 +37,9 @@ research, a new subsystem, a qualitative gate or destructive/external permission
 mathematical and physical framework; its purpose is not exhausted by Athena or Millennium
 endpoints. Recover the established classical ML, softmax/sigmoid, adjoint, reflection, leader,
 fractal-packing and compression constructions before declaring missing theory or founding another
-mechanism. The [framework synthesis](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) connects their actual
+mechanism. The [formal framework](docs/FORMAL_FRAMEWORK.md) unifies elementary patterns already
+engaged in specific instances; lead with that recovery and composition when generalizing their
+laws, rather than presenting already-engaged subjects as newly discovered research directions. The [framework synthesis](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) connects their actual
 owners and scopes. Brandon has resumed the AC0–AC5 completion goal and directs flexible
 construction with transparent failures; the roadmap carries the current step. A universal intelligence theorem or a Millennium solution is not a prerequisite for
 using already-derived local mechanics in a productive construction.

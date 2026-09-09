@@ -51,6 +51,15 @@ Declaration namespaces remain stable. These source extractions preserve old impo
 retaining duplicate definitions. Endpoint commutation does not identify carrying histories.
 The finite modulation return supplies no automatic native response law or molecular calibration.
 
+[definition] The continuing unification adds `Transport/ChangingReceiver.lean` for addressed
+finite and moving differential receiver defects; `Physics/ConformationResponse.lean` and
+`Physics/MechanicalReceiver.lean` instantiate prestress and changing-grain mechanical response;
+`Physics/FluidReceiverClosure.lean` instantiates the same defect with the existing finite
+Galerkin Navier–Stokes source. `Physics/ConstitutiveModulation.lean` additionally composes the
+moving receiver with stress/strain pullback. These are formal owners; they add no native engine.
+Their statements and limits are in the
+[continuation](../research/records/2026-09-08_CHANGING_CONSTITUTION_AND_RECEIVERS_SHARE_ONE_DEFECT_CALCULUS.md).
+
 ## Foundation and transport
 
 [definition] **Preimage Fibre** is the governing term for compatible-source families. Some older

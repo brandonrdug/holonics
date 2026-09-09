@@ -1,0 +1,121 @@
+Changing constitution and receiver unification — September 8, 2026 local time
+Inspection base: f6e9679d. Final source is retained by the accompanying Git commit.
+Lean/Mathlib/Cslib v4.33.0; dependency/toolchain manifests unchanged.
+
+Primary-agent checks:
+1. lake build ElementaryHolonics.Transport.ChangingReceiver
+   cwd formal/elementary-holonics; exit 0; 3068 jobs.
+2. lake build ElementaryHolonics.Physics.ConstitutiveModulation
+   cwd formal/elementary-holonics; exit 0; 3075 jobs.
+3. lake build ElementaryHolonics.Physics.MechanicalReceiver ElementaryHolonics.Physics.FluidReceiverClosure
+   cwd formal/elementary-holonics; exit 0; 3867 jobs.
+4. bash tools/lean_check.sh ElementaryHolonics
+   cwd repository root; exit 0; 9960 jobs.
+   Includes final mechanical-to-coupled-response bridge and all prior research imports.
+5. bash tools/lean_check.sh
+   cwd repository root; exit 0; 3985 jobs.
+   Final run includes the subsequently added quantitative finite fluid receiver bound.
+6. git diff --check
+   exit 0.
+
+No sorry declaration warning or sorryAx appears in complete successful logs 4 and 5.
+Job counts are Lake build jobs, not numbers of theorems or independent experiments.
+Initial elaboration errors were repaired before these successful receipts.
+No Cargo/CUDA or unchanged Typst check was run by this formal continuation.
+Full logs retained locally at .local/scratch/constitutive-unification-*.log.
+
+New/extended owner axiom output from final framework check (verbatim):
+info: ElementaryHolonics/Transport/ChangingReceiver.lean:166:0: 'Soma.Holonics.Transport.ChangingReceiver.passage_transformer_exists_iff' depends on axioms: [Classical.choice]
+info: ElementaryHolonics/Transport/ChangingReceiver.lean:167:0: 'Soma.Holonics.Transport.ChangingReceiver.passageDefect_comp' depends on axioms: [propext]
+info: ElementaryHolonics/Transport/ChangingReceiver.lean:168:0: 'Soma.Holonics.Transport.ChangingReceiver.passageDefect_comp_additive' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Transport/ChangingReceiver.lean:169:0: 'Soma.Holonics.Transport.ChangingReceiver.norm_passageDefect_comp_le' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Transport/ChangingReceiver.lean:170:0: 'Soma.Holonics.Transport.ChangingReceiver.word_defect_zero' depends on axioms: [propext]
+info: ElementaryHolonics/Transport/ChangingReceiver.lean:171:0: 'Soma.Holonics.Transport.ChangingReceiver.changing_history_exact' does not depend on any axioms
+info: ElementaryHolonics/Transport/ChangingReceiver.lean:172:0: 'Soma.Holonics.Transport.ChangingReceiver.moving_receiver_rate' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Transport/ChangingReceiver.lean:173:0: 'Soma.Holonics.Transport.ChangingReceiver.opposite_translations_cancel' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ConstitutiveModulation.lean:119:0: 'Soma.Holonics.Physics.ConstitutiveModulation.coupledResponse_finite_change' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ConstitutiveModulation.lean:120:0: 'Soma.Holonics.Physics.ConstitutiveModulation.coupledResponse_material_state_change' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ConstitutiveModulation.lean:121:0: 'Soma.Holonics.Physics.ConstitutiveModulation.tangent_cancellation_does_not_close_finite_response' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ConstitutiveModulation.lean:122:0: 'Soma.Holonics.Physics.ConstitutiveModulation.potential_strain_first_variation' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ConstitutiveModulation.lean:123:0: 'Soma.Holonics.Physics.ConstitutiveModulation.stress_strain_rate_return' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ConformationResponse.lean:159:0: 'Soma.Holonics.Physics.ConformationResponse.hasDerivAt_conformation' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ConformationResponse.lean:160:0: 'Soma.Holonics.Physics.ConformationResponse.hasDerivAt_energy' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ConformationResponse.lean:161:0: 'Soma.Holonics.Physics.ConformationResponse.hasDerivAt_response' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ConformationResponse.lean:162:0: 'Soma.Holonics.Physics.ConformationResponse.tangentStiffness_chain_decomposition' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ConformationResponse.lean:163:0: 'Soma.Holonics.Physics.ConformationResponse.tangentStiffness_at_zero_pos' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ConformationResponse.lean:164:0: 'Soma.Holonics.Physics.ConformationResponse.response_sign_separates' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ConformationResponse.lean:165:0: 'Soma.Holonics.Physics.ConformationResponse.fineUpdate_descends' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/ConformationResponse.lean:166:0: 'Soma.Holonics.Physics.ConformationResponse.fineUpdate_word_descends' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/MechanicalReceiver.lean:103:0: 'Soma.Holonics.Physics.MechanicalReceiver.conformation_stiffness_joins_coupled_response' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/MechanicalReceiver.lean:104:0: 'Soma.Holonics.Physics.MechanicalReceiver.scaled_update_exact' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/MechanicalReceiver.lean:105:0: 'Soma.Holonics.Physics.MechanicalReceiver.updateHolon_defect_zero' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/MechanicalReceiver.lean:106:0: 'Soma.Holonics.Physics.MechanicalReceiver.changing_mechanical_history_exact' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/MechanicalReceiver.lean:107:0: 'Soma.Holonics.Physics.MechanicalReceiver.oriented_response_reopens_extension' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/MechanicalReceiver.lean:108:0: 'Soma.Holonics.Physics.MechanicalReceiver.exact_coarse_step_can_increase_energy' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/FluidReceiverClosure.lean:243:0: 'Soma.Holonics.Physics.FluidReceiverClosure.q_hiddenState_eq_zero' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/FluidReceiverClosure.lean:244:0: 'Soma.Holonics.Physics.FluidReceiverClosure.finiteGalerkin_rateDefect_eq_hidden_feedback' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/FluidReceiverClosure.lean:245:0: 'Soma.Holonics.Physics.FluidReceiverClosure.finiteGalerkin_rateDefect_eq_hidden_feedback_of_section' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/FluidReceiverClosure.lean:246:0: 'Soma.Holonics.Physics.FluidReceiverClosure.finiteGalerkin_rateDefect_eq_chartRate_hidden_feedback' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/FluidReceiverClosure.lean:247:0: 'Soma.Holonics.Physics.FluidReceiverClosure.moving_galerkin_receiver_equation' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/FluidReceiverClosure.lean:248:0: 'Soma.Holonics.Physics.FluidReceiverClosure.full_receiver_retains_chart_motion' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/FluidReceiverClosure.lean:249:0: 'Soma.Holonics.Physics.FluidReceiverClosure.norm_fluid_rateDefect_le' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]

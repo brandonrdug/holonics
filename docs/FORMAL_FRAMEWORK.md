@@ -194,6 +194,74 @@ local differential return through the producing structure. A finite successor mu
 checked under its actual constitutive law. Neither a static structure label nor a scalar loss
 contains those terms.
 
+## Changing constitution and changing grain are one returned comparison
+
+[project-postulate] Brandon's subsequent clarification makes this a unification of elementary
+patterns already engaged in particular instances. The
+[continuation deposit](../research/records/2026-09-08_CHANGING_CONSTITUTION_AND_RECEIVERS_SHARE_ONE_DEFECT_CALCULUS.md)
+joins the existing owners and carries the precise statements, examples and checks.
+
+[definition] [`ChangingReceiver`](../formal/elementary-holonics/ElementaryHolonics/Transport/ChangingReceiver.lean)
+receives an existing addressed passage through before/after charts and a proposed coarse
+operation. Its primary return is the signed defect `returned(w) − U(entering(w))` on the same
+occurrence. Receiver-transformer existence stays restricted to the actual range and complete
+Preimage Fibre. A norm bound is a later receiver of that return.
+
+[proved-derived; formal-checked] Serial composition carries the actual join and the full second
+operation's response to the first defect. For additive second transport V it gives
+`r(Q ∘ P)=r(Q)+V(r(P))`. A shared-parameter translation control retains exact cancellation across
+the join. The changing-history theorem permits different carrier types, charts and transports
+at every cut; matching local squares imply matching complete received histories.
+
+[proved-derived; formal-checked] At a differentiable cut the same comparison reads
+
+```text
+d/dt [Q(t)x(t)] = G(Q(t)x(t)) + [Qdot(x) + Q(F(x)) − G(Q(x))].
+```
+
+Constitutive pullback specializes this law: stress is a moving receiver of strain rate.
+Differentiating the pullback retains both material stiffness and the geometric/prestress term.
+The exact derivative hypotheses are in `ConstitutiveModulation.stress_strain_rate_return`.
+
+[definition] The mechanical instance uses the declared dimensionless strain `c(x)=a+x²` and
+energy `E(x)=k/2 (a+x²)²`. The fluid instance uses the existing finite Fourier Galerkin
+Navier–Stokes vector field, including its actual advective–Leray source. These are mathematical
+realizations with their specified laws; no new molecular calibration is claimed.
+
+[proved-derived; formal-checked] [`MechanicalReceiver`](../formal/elementary-holonics/ElementaryHolonics/Physics/MechanicalReceiver.lean)
+identifies the material stiffness `k(2x)²` with the standing coupled-incidence response and
+retains the additional `2k(a+x²)` prestress term. The explicit finite response step
+`x' = x − 2hkx(a+x²)` descends through squared extension to
+`y' = y(1−2hk(a+y))²`. Changing nonzero receiver scales and changing h, k, a at every cut still
+commute through the shared history theorem. The displacement retains its `BoundaryHolon`.
+
+[counterexample; formal-checked] Squared extension cannot recover the oriented response of
+opposite configurations under the stated positive parameters. Separately, h=k=a=x=1 gives an
+exactly commuting fine/coarse step while energy increases from 2 to 50. Exact descent of a
+receiver chart does not establish energy descent of the finite step.
+
+[proved-derived; formal-checked] [`FluidReceiverClosure`](../formal/elementary-holonics/ElementaryHolonics/Physics/FluidReceiverClosure.lean)
+uses a receiver Q and lift J. For resolved state r=JQx and retained z=x−r, its complete rate defect is
+
+```text
+Qdot(x) + Q(Lz − B(z,r) − B(r,z) − B(z,z)).
+```
+
+Here L is the actual finite viscous rate and B the actual projected nonlinear interaction.
+The coefficient identities hold on the finite complex carrier; real-fluid interpretation retains
+its reality, incompressibility, viscosity and aperture conditions. If QJ=id, z lies in ker Q but its later feedback can remain visible. The moving trajectory theorem
+retains the chart-rate term too. The finite receiver bound is
+`||defect|| <= ||Qdot(x)|| + ||Q|| [||Lz|| + C(2||r||+||z||)||z||]`, with C supplied by the
+existing carrier/aperture-dependent Galerkin cost. Closing a reduced model still requires the
+continuing unresolved state, a descended generator or a memory law; this bound supplies no
+uniform continuum limit.
+
+[definition] For numerical realization, the exact declared finite law and an unrounded reference
+law may have different successors. Their difference is a comparison with retained scope. It does
+not automatically become coefficient uncertainty in the finite law, and it does not erase actual
+uncertainty in the source. This calculus therefore informs the native return without prescribing
+a new numerical policy, an extra certainty condition or another engine.
+
 ## Coarse graining is transport with a declared future
 
 [proved-derived; formal-checked] The factored `ReceiverHistoryCompression` requires the local

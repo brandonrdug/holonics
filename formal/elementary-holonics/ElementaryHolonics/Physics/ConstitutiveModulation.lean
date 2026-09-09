@@ -1,4 +1,6 @@
 import ElementaryHolonics.Physics.CoupledIncidence
+import ElementaryHolonics.Transport.ChangingReceiver
+import Mathlib.Analysis.Calculus.Deriv.Comp
 
 /-!
 # A changing conformation changes the complete coupled response
@@ -74,6 +76,42 @@ theorem tangent_cancellation_does_not_close_finite_response :
       coupledResponse (fun _ _ ↦ 2) B (fun _ ↦ 0) () - coupledResponse M B x () = -1 := by
   norm_num [coupledResponse, branchDrop]
 
+section ConstitutivePullback
+
+variable {Strain : Type*} [NormedAddCommGroup Strain] [NormedSpace ℝ Strain]
+
+/-- The first variation of a declared potential through its actual strain chart. -/
+theorem potential_strain_first_variation
+    (potential : Strain → ℝ) (strain : ℝ → Strain) (time : ℝ)
+    (stress : Strain →L[ℝ] ℝ) (velocity : Strain)
+    (hpotential : HasFDerivAt potential stress (strain time))
+    (hstrain : HasDerivAt strain velocity time) :
+    HasDerivAt (fun t ↦ potential (strain t)) (stress velocity) time :=
+  hpotential.comp_hasDerivAt time hstrain
+
+/-- The derivative of the pulled-back force retains material and geometric/prestress terms.
+`strainRate` is the actual first strain derivative where the potential interpretation is made;
+the displayed hypotheses supply its value and derivative at this cut. `stiffness` is the actual
+derivative of stress, rather than a caller's replacement of the nonlinear geometry by `Bᵀ M B`.
+This is the moving-receiver theorem with stress as receiver and strain rate as its current. -/
+theorem stress_strain_rate_return
+    (stress : Strain → Strain →L[ℝ] ℝ) (strain strainRate : ℝ → Strain)
+    (time : ℝ) (velocity acceleration : Strain)
+    (stiffness : Strain →L[ℝ] Strain →L[ℝ] ℝ)
+    (hstrain : HasDerivAt strain velocity time)
+    (hstrainRate : HasDerivAt strainRate acceleration time)
+    (rate_at : strainRate time = velocity)
+    (hstress : HasFDerivAt stress stiffness (strain time)) :
+    HasDerivAt (fun t ↦ stress (strain t) (strainRate t))
+      (stiffness velocity velocity + stress (strain time) acceleration) time := by
+  have h := Transport.ChangingReceiver.moving_receiver_rate
+    (fun t ↦ stress (strain t)) strainRate time (stiffness velocity)
+    (fun _ ↦ acceleration) (fun _ ↦ 0)
+    (hstress.comp_hasDerivAt time hstrain) hstrainRate
+  simpa [Transport.ChangingReceiver.rateDefect, rate_at] using h
+
+end ConstitutivePullback
+
 end Soma.Holonics.Physics.ConstitutiveModulation
 
 section Audit
@@ -81,4 +119,6 @@ open Soma.Holonics.Physics.ConstitutiveModulation
 #print axioms coupledResponse_finite_change
 #print axioms coupledResponse_material_state_change
 #print axioms tangent_cancellation_does_not_close_finite_response
+#print axioms potential_strain_first_variation
+#print axioms stress_strain_rate_return
 end Audit

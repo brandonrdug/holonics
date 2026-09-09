@@ -13,6 +13,13 @@ both incidence returns and every mixed term. The
 [deposit](../research/records/2026-09-08_FORMAL_HOLONICS_IS_A_FRAMEWORK_OF_INTERACTING_TRANSPORT.md)
 retains direct-message coordinates, ownership changes and the precise AC1 consequences.
 
+[proved-derived; formal-checked] The [continuing formal unification](FORMAL_FRAMEWORK.md#changing-constitution-and-changing-grain-are-one-returned-comparison)
+now joins changing constitutive geometry and dynamic coarse graining. It retains signed defects
+on actual joined occurrences, chart motion, material/prestress response and complete nonlinear
+fluid feedback. Its exact mechanical coarse step can still increase energy: representation
+exactness and finite stability keep separate statements. This is reusable mathematics for the
+native return, not another numerical realization requirement or an AC1 completion.
+
 ## One framework, several realizations
 
 [definition] The subsequent [complex-fluid and plan revision](../research/records/2026-09-08_COMPLEX_FLUID_CHARTS_RETAIN_THE_FOLDED_CURRENT_AND_THE_RECEIVER_BOUND.md)

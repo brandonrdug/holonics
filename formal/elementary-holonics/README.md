@@ -47,6 +47,11 @@ the carrying occurrences. Neither a number nor a theorem's printed name is a hol
 The [new finite modulation theorem](ElementaryHolonics/Physics/ConstitutiveModulation.lean)
 connects changing conformation and internal current to the complete coupled response.
 
+[definition] The [continuing unification](../../docs/FORMAL_FRAMEWORK.md#changing-constitution-and-changing-grain-are-one-returned-comparison)
+adds `Transport/ChangingReceiver`, with mechanical and actual nonlinear-fluid instances in
+`Physics/MechanicalReceiver` and `Physics/FluidReceiverClosure`. They connect changing
+constitutive geometry, receiver scales and retained feedback through one difference calculus.
+
 ## Applications and proof scope
 
 [definition] `ElementaryHolonics.lean` is the complete research import face, including `Framework`

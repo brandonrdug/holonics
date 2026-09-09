@@ -20,6 +20,20 @@ contracts and records preserve their completed scope; their old imperatives sche
    reread every completed campaign, rerun unchanged expensive receipts, or reconstruct historical
    capability just to start the next authorized repair.
 
+## Continuing formal unification
+
+[project-postulate] Brandon authorizes the first continuation of the framework synthesis:
+unify existing elementary patterns of changing constitutive geometry and dynamic coarse graining.
+Compose the shared addressed transport/receiver difference first, bind mechanical and nonlinear
+fluid instances through their actual existing source laws, then verify and deposit the results.
+These are already engaged subjects being joined and formalized, not four newly founded research
+programmes. The parallel AC1 order below continues independently.
+
+[established-bounded; process-audit] The [formal return](../../research/records/2026-09-08_CHANGING_CONSTITUTION_AND_RECEIVERS_SHARE_ONE_DEFECT_CALCULUS.md)
+now supplies the shared addressed/moving defect laws, constitutive pullback and mechanical/fluid
+instances with their complete checks. Reduced-model memory closure and continuum realization
+retain their stated open scope; no such endpoint was substituted for this authorized unification.
+
 ## Parallel formal framework refinement
 
 [project-postulate] Brandon's subsequent September 8 request authorizes synthesis and refinement
