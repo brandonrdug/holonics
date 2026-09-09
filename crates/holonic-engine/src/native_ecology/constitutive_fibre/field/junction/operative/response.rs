@@ -100,7 +100,7 @@ impl<'c> NativeConstitutiveField<'c> {
         let returned = self.prepare_material_contact_return(response, realization)?;
         let (sections, origin, returns) = {
             let view = self.stage_operative_contacts()?;
-            let staged = view.stage_return(returned)?;
+            let staged = view.stage_return_using(returned,&response.currents)?;
             (staged.sections, staged.origin, staged.returns)
         };
         let op = self.junction.as_mut().unwrap().operative.as_mut().unwrap();
@@ -138,6 +138,12 @@ impl<'c> NativeConstitutiveField<'c> {
             return Err(Error::ForeignOccurrence);
         }
         let k = op.births.len();
+        let source=response.query.source.occurrence;
+        let generated=self.condense_operative_current_factors(source,response.query.contacts,&response.currents)?;
+        let (currents,current_difference_source)=match generated {
+            Some(currents)=>(currents,Some(source)),
+            None=>(Rc::clone(&response.currents),None),
+        };
         // Extension by zero is retained as a generator, not allocated per later birth.
         // This constitutive response holds input current fixed, so its internal delta is zero.
         Ok(Rc::new(OperativeReturn {
@@ -147,7 +153,8 @@ impl<'c> NativeConstitutiveField<'c> {
             factor_count: response.query.contacts,
             origin: op.origin.clone(),
             ports: response.ports.clone(),
-            currents: response.currents.clone(),
+            currents,
+            current_difference_source,
             b: None,
             bounds: response.delta_bounds.clone(),
         }))
@@ -188,10 +195,15 @@ impl<'c> NativeConstitutiveField<'c> {
         }
         let cached=op.recent_producers.iter().find(|(at,count,_)|*at==source && *count==k).map(|(_,_,s)|Rc::clone(s));
         let mut recovery=None;
+        let mut recovered_factors=Vec::new();
         let producing=if let Some(cached)=cached {cached} else {
-            let later=op.returns.iter().filter(|r|r.at_cut>=source+1).collect::<Vec<_>>();
+            let later=op.returns.iter().filter(|r|k>0 && r.at_cut>=source+1).collect::<Vec<_>>();
             let mut pointers=Vec::with_capacity(3*later.len().max(1));
-            for r in &later {for v in [r.ports.lo_device_ptr(),r.currents.lo_device_ptr(),r.factor_count as u64]{pointers.push((v as i64,v as i64));}}
+            for r in &later {
+                let (factors,count)=self.resolve_operative_current_factor_prefix(r,k)?;
+                for v in [r.ports.lo_device_ptr(),factors.lo_device_ptr(),count as u64]{pointers.push((v as i64,v as i64));}
+                recovered_factors.push(factors);
+            }
             if pointers.is_empty(){pointers.resize(3,(0,0));}
             let journal=surface.mount_section_rest(&ResidentSectionRest::found(later.len().max(1),3,ResidentGrain(0),64,pointers).map_err(invalid)?)?;
             let mut producing=sections(surface,d,k)?;let p=Rc::get_mut(&mut producing).unwrap();p.b=b;p.bounds=bounds;

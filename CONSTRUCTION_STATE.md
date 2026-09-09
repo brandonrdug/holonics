@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 9, 2026. **Priority:** AC0–AC5 goal remains active; current cultivation seeks identifiable behavioral phenomena, not forced utility. Integer/ratio abstraction is under review.
+**Currency:** September 9, 2026. **Priority:** AC0–AC5 goal remains active; current cultivation seeks identifiable behavioral phenomena, not forced utility. AC1's current-difference generator is integrated; broader exposure is running.
 **Position:** AC0 complete; AC1 accumulated-normal material integrated; AC1 path/generator reuse and AC2 situated feedback/useful continuation open; AC3 experimental artifacts; AC4–AC5 open.
 **Athena-alpha:** not yet attained.
 
@@ -88,6 +88,18 @@ instances. This continuation unifies already-engaged elementary patterns; it cha
 model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction
+
+[established-bounded; implemented-exact; measured] The
+[source-interior difference generator](research/records/2026-09-09_AC1_THE_SOURCE_INTERIOR_CHANGE_GENERATES_A_RETURN_FACTOR.md)
+replaces a retained contact factor with its actual before/after current difference. Field,
+archive/restart, restricted-prefix and causal-source controls pass. All 1,929 saved-model returns
+convert with unchanged reported numerical body. Native factor storage halves to 118,700,992
+bytes; the checkpoint saves 59,287,958 bytes. The scoped representation return is complete.
+
+[definition] A fresh process continues eight further conversation parts from the converted
+1,930-occurrence model, with archive placement and a new sixteen-part checkpoint/output report.
+It is active; its behavioral and cost result has not returned. Current observations are research
+material, without a utility filter. Whole-ecology generator reuse remains open.
 
 [established-bounded; implemented-exact; measured] The
 [integer/abstraction review](research/records/2026-09-09_INTEGER_FACES_RETAIN_THEIR_GENERATING_RELATIONS.md)

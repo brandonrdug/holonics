@@ -45,7 +45,7 @@ pub use internal_mode::{
     NativeSharedDriveMode, NativeSharedDriveModeReading, NativeSharedDriveModeRest,
     NativeSharedDriveModeReturn,
 };
-pub use junction::{NativeOperativeReturnStorage,
+pub use junction::{NativeOperativeCurrentFactorCondensation,NativeOperativeReturnStorage,
     NativeFieldCurrentBall, NativeFieldEnclosedJunctionReading, NativeFieldExactJunctionReading,
     NativeFieldInternalCurrent, NativeFieldInternalCurrentBall, NativeFieldJunctionReading,
     NativeFieldJunctionRepresentation, NativeFieldJunctionSolver,

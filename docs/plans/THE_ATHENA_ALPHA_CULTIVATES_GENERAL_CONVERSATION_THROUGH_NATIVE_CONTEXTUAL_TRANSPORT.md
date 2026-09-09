@@ -439,6 +439,10 @@ full fits. A different fit on historical statistics cannot be substituted in an 
 [definition] Continue local path formation and exact generator/decoder reuse through the joint
 boundary, material-query and changing-contact family. Use the existing shared dependency and
 zero-extension principles where the numerical subcomputation and future family actually factor.
+The [source-interior difference return](../../research/records/2026-09-09_AC1_THE_SOURCE_INTERIOR_CHANGE_GENERATES_A_RETURN_FACTOR.md)
+now stores one contact factor as its addressed before/after generator, including restricted
+decoding and old-model conversion. Its complete numerical factors survive; the remaining factor
+and historical interiors retain their own future-family/decoder work.
 Retain the blind component that later morphology can expose. The completed normalization,
 complex-current adjoint, numerical deposit, source-preserving actuation and journal/covariance
 returns remain dependencies through the records above; their old probes schedule no new run.

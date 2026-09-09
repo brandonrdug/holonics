@@ -328,6 +328,7 @@ fn run_session(
     self_source_mode:Option<TextGenerationSourceMode>,
     inspect_all_currents: bool,
     inspect_normal_objective: bool,
+    condense_current_journal: bool,
     operative: bool,
     contact_response: bool,
     contact_realization: NativeContactRealization,
@@ -339,6 +340,11 @@ fn run_session(
 ) -> Result<(), AlphaMaterialError> {
     if operative {
         session.enable_operative_contacts()?;
+    }
+    if condense_current_journal {
+        let start=Instant::now();
+        report["current_journal_condensation"]=json!(session.condense_current_journal()?);
+        report["current_journal_condensation_seconds"]=json!(start.elapsed().as_secs_f64());
     }
     report["operative_contacts"] = json!(session.field().has_operative_contacts());
     report["junction_solver"] = json!(session.field().junction_solver());
@@ -516,7 +522,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary|operative-linear|operative-normal] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--self-source-mode actuation|observation|withdrawal] [--contact-metric current|relative-entropy|squared-probability] [--inspect-contact-cuts N,...] [--inspect-retained-receivings N,...] [--inspect-normal-objective true|false]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary|operative-linear|operative-normal] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--self-source-mode actuation|observation|withdrawal] [--contact-metric current|relative-entropy|squared-probability] [--inspect-contact-cuts N,...] [--inspect-retained-receivings N,...] [--inspect-normal-objective true|false] [--condense-current-journal true|false]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -528,6 +534,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         (None, None, None, None, None, None);
     let mut inspect_all_currents = false;
     let mut inspect_normal_objective = false;
+    let mut condense_current_journal = false;
     let mut operative = false;
     let mut contact_response = None;
     let mut contact_realization = None;
@@ -605,6 +612,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }),
             "--inspect-all-currents" => inspect_all_currents = value.parse::<bool>()?,
             "--inspect-normal-objective" => inspect_normal_objective = value.parse::<bool>()?,
+            "--condense-current-journal" => condense_current_journal = value.parse::<bool>()?,
             _ => return Err(format!("unknown option {option}").into()),
         }
     }
@@ -627,7 +635,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let report_path = report_path.ok_or("--report required")?;
     let mut report = json!({"schema":"holonics.alpha-text-study.v1","prompt_path":prompt_path,"prompt":prompt,
         "symbol_work_limit":limit,"model_persisted":false,"language_quality_established":false,
-        "all_currents_requested":inspect_all_currents,"normal_objective_requested":inspect_normal_objective,"additional_families_requested":families});
+        "all_currents_requested":inspect_all_currents,"normal_objective_requested":inspect_normal_objective,"current_journal_condensation_requested":condense_current_journal,"additional_families_requested":families});
     let native_result = if let Some(path) = resume {
         let saved = SavedTextField::read(&path)?;
         if duplex.is_some_and(|value|value!=saved.duplex()){return Err("resume cannot relabel the saved text boundary chart".into());}
@@ -721,6 +729,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 self_source_mode,
                 inspect_all_currents,
                 inspect_normal_objective,
+                condense_current_journal,
                 operative,
                 contact_response.unwrap_or(app.contact_response),
                 contact_realization.unwrap_or(app.contact_realization),
@@ -770,6 +779,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     self_source_mode,
                     inspect_all_currents,
                     inspect_normal_objective,
+                    condense_current_journal,
                     operative,
                     contact_response.unwrap_or(false),
                     contact_realization.unwrap_or(NativeContactRealization::DyadicDeposit),

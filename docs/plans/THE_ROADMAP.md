@@ -158,6 +158,10 @@ in this order:
    source/feedback and reuse construction; this diagnostic is not a new quality gate.
 3. The [recent normal-producer reuse](../../research/records/2026-09-09_AC1_THE_RECENT_NORMAL_PRODUCER_IS_SHARED_INSTEAD_OF_RESOLVED.md)
    now returns an identical matched checkpoint with lower work and explicit extra residency.
+   The [source-interior difference generator](../../research/records/2026-09-09_AC1_THE_SOURCE_INTERIOR_CHANGE_GENERATES_A_RETURN_FACTOR.md)
+   now halves the retained current-factor storage and decodes the actual old factor through
+   archive, restart and receiver-requested prefixes. The stored other factor and source interiors
+   remain part of the next generator-reuse question.
    Continue local path formation, restriction/rebase and generator reuse for the actual joint
    boundary, material-query and changing-contact receivers. Keep contributions later morphology
    can expose. Normal rank-one reuse must retain the actual numerical update history/residual or

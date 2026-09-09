@@ -28,6 +28,8 @@ pub struct NativeOperativeContactBirth {
     pub receiving: usize,
 }
 pub(in super::super) mod rest;
+mod current_factor;
+pub use current_factor::NativeOperativeCurrentFactorCondensation;
 
 pub(in super::super) struct OperativeSections<'c> {
     pub(in super::super) map: Rc<ResidentSection<'c>>,
@@ -47,6 +49,8 @@ pub(super) struct OperativeReturn<'c> {
     origin: Rc<()>,
     ports: Rc<ResidentSection<'c>>,
     currents: Rc<ResidentSection<'c>>,
+    // When present, currents stores only ell; k is the addressed source interior difference.
+    current_difference_source: Option<usize>,
     // None is the exact zero generator on contact_count entries, not missing current.
     b: Option<Rc<ResidentSection<'c>>>,
     bounds: Rc<ResidentSection<'c>>,
@@ -98,6 +102,7 @@ pub struct NativeOperativeReturnStorage {
     pub internal_delta_octets:u64,
     pub bound_octets:u64,
     pub implicit_zero_delta_returns:usize,
+    pub current_difference_returns:usize,
     pub logical_internal_delta_octets:u64,
     pub logical_current_factor_octets:u64,
     pub total_octets:u64,
@@ -105,8 +110,8 @@ pub struct NativeOperativeReturnStorage {
 impl NativeConstitutiveField<'_>{
     pub fn operative_return_storage(&self)->Option<NativeOperativeReturnStorage>{
         let op=self.junction.as_ref()?.operative.as_ref()?;
-        let mut out=NativeOperativeReturnStorage{returns:op.returns.len(),port_octets:0,current_factor_octets:0,internal_delta_octets:0,bound_octets:0,implicit_zero_delta_returns:0,logical_internal_delta_octets:0,logical_current_factor_octets:0,total_octets:0};
-        for r in &op.returns {out.port_octets+=r.ports.resident_octets();out.current_factor_octets+=r.currents.resident_octets();out.internal_delta_octets+=r.b.as_ref().map_or(0,|b|b.resident_octets());out.bound_octets+=r.bounds.resident_octets();out.implicit_zero_delta_returns+=usize::from(r.b.is_none());out.logical_internal_delta_octets+=64*r.contact_count.max(1) as u64;out.logical_current_factor_octets+=128*r.contact_count.max(1) as u64;}
+        let mut out=NativeOperativeReturnStorage{returns:op.returns.len(),port_octets:0,current_factor_octets:0,internal_delta_octets:0,bound_octets:0,implicit_zero_delta_returns:0,current_difference_returns:0,logical_internal_delta_octets:0,logical_current_factor_octets:0,total_octets:0};
+        for r in &op.returns {out.port_octets+=r.ports.resident_octets();out.current_factor_octets+=r.currents.resident_octets();out.internal_delta_octets+=r.b.as_ref().map_or(0,|b|b.resident_octets());out.bound_octets+=r.bounds.resident_octets();out.implicit_zero_delta_returns+=usize::from(r.b.is_none());out.current_difference_returns+=usize::from(r.current_difference_source.is_some());out.logical_internal_delta_octets+=64*r.contact_count.max(1) as u64;out.logical_current_factor_octets+=128*r.contact_count.max(1) as u64;}
         out.total_octets=out.port_octets+out.current_factor_octets+out.internal_delta_octets+out.bound_octets;Some(out)
     }
 }
@@ -445,6 +450,11 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
     // The field's material-contact producer stages every component;
     // the borrowed source, its old returns and its exact decoder survive refusal unchanged.
     pub(super) fn stage_return(&self, returned: Rc<OperativeReturn<'c>>) -> Result<Self, Error> {
+        let currents=self.field.resolve_operative_current_factors(&returned)?;
+        self.stage_return_using(returned,&currents)
+    }
+    pub(super) fn stage_return_using(&self, returned: Rc<OperativeReturn<'c>>,
+        currents: &Rc<ResidentSection<'c>>) -> Result<Self, Error> {
         if !Rc::ptr_eq(&self.origin, &returned.origin) || returned.at_cut!=self.field_cut() || returned.contact_count!=self.births.len() {
             return Err(Error::ForeignOccurrence);
         }
@@ -467,7 +477,7 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
                 self.sections.current(),
                 [
                     &returned.ports,
-                    &returned.currents,
+                    currents,
                     &returned.bounds,
                 ],
                 returned.b.as_deref(),

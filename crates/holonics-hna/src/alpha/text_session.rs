@@ -252,6 +252,12 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
     > {
         Ok(self.field.read_material_mode_using(source, mode)?)
     }
+    /// Change only the representation of retained native return factors.
+    pub fn condense_current_journal(&mut self) -> Result<
+        holonic_engine::native_ecology::constitutive_fibre::NativeOperativeCurrentFactorCondensation,
+        AlphaMaterialError> {
+        Ok(self.field.condense_operative_current_journal()?)
+    }
     /// Exterior placement at a declared application boundary. This does not enact a symbol.
     pub fn archive_history(&mut self) -> Result<(), AlphaMaterialError> {
         let at = self.field.occurrence_count();

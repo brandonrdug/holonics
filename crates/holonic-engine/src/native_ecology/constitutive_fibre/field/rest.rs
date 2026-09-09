@@ -658,6 +658,25 @@ impl NativeFieldRest {
             if wire.births!=births {return Err(invalid("operative birth lineage"));}
             self.operative.as_ref().unwrap().validate(wire,n)?;
             if wire.return_frames.iter().any(|r|r.at_cut>h.history.len()){return Err(invalid("operative return beyond field cut"));}
+            for frame in &wire.return_frames {
+                if let Some(source)=frame.current_difference_source {
+                    if source<wire.activated_at || frame.at_cut.checked_sub(1).is_none_or(|receiving|
+                        h.history.get(receiving).is_none_or(|event|event.lineage.observed_source()!=Some(source))) {
+                        return Err(invalid("current-factor source lineage"));
+                    }
+                    let after=self.history.get(source).and_then(|h|h.operative.as_ref())
+                        .ok_or_else(||invalid("current-factor source current"))?;
+                    if after.count!=frame.factor_count.unwrap_or(frame.contact_count) {
+                        return Err(invalid("current-factor source population"));
+                    }
+                    for (i,previous) in wire.return_frames.iter().enumerate().filter(|(_,r)|r.at_cut==source) {
+                        if !previous.zero_internal_delta && self.operative.as_ref().unwrap().returns[i][2]
+                            .intervals.iter().any(|v|*v!=(0,0)) {
+                            return Err(invalid("current-factor source has a separate current deposit"));
+                        }
+                    }
+                }
+            }
             if let Some(last)=self.history.last().and_then(|h|h.operative.as_ref()) {
                 let current=&self.operative.as_ref().unwrap().current;
                 if current[1]!=last.b || material_transport::wides(&current[2].intervals)?[1]!=material_transport::wides(&last.bounds.intervals)?[1] {return Err(invalid("operative current/history boundary"));}

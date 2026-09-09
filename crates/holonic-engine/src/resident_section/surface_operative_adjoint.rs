@@ -2,6 +2,30 @@ use super::*;
 
 impl<'c> ResidentSurface<'c> {
     #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_operative_current_difference(
+        &self, lane: &Lane<'_, 'c>, before: &ResidentSection<'c>, after: &ResidentSection<'c>,
+        factors: &ResidentSection<'c>, before_count: usize, count: usize, prefix_count: usize, encode: bool,
+        output: &ResidentSection<'c>,
+    ) -> Result<(), ResidentRefusal> {
+        let component_words=std::mem::size_of::<i128>()/std::mem::size_of::<i64>();
+        let current_words=2*component_words; // real and imaginary
+        if before_count>count || prefix_count>count || (encode && prefix_count!=count) || count>u32::MAX as usize
+            || !self.operative_shape(before,before_count.max(1),current_words)
+            || !self.operative_shape(after,count.max(1),current_words)
+            || !self.operative_shape(factors,if encode {2}else{1},current_words*count.max(1))
+            || !self.operative_shape(output,if encode {1}else{2},current_words*prefix_count.max(1)) {
+            return Err(Self::operative_error());
+        }
+        let mut p=Params::new();
+        p.ptr(before.lo.device_ptr()).ptr(after.lo.device_ptr()).ptr(factors.lo.device_ptr())
+            .u32(before_count as u32).u32(count as u32).u32(prefix_count as u32).u32(u32::from(encode))
+            .ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr()).ptr(lane.slot)
+            .ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_field_operative_current_difference",
+            (2*prefix_count).max(1).div_ceil(self.launch.block_x as usize),self.launch.block_x,0,&mut p,
+            "operative-current-difference")
+    }
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn record_operative_producing_map(
         &self,
         lane: &Lane<'_, 'c>,

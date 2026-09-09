@@ -30,7 +30,8 @@ impl NativeConstitutiveField<'_> {
             wides(&self.relation.surface.detach_section(s, 64)?.intervals)
         };
         let ports = read(&r.ports)?;
-        let currents = read(&r.currents)?;
+        let factors=self.resolve_operative_current_factors(r)?;
+        let currents = read(&factors)?;
         let bounds = read(&r.bounds)?;
         let scale = BigInt::one() << op.grain;
         let scale_ratio = Rat::from_integer(scale.clone());

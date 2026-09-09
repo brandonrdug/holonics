@@ -1,0 +1,107 @@
+{
+  "grade": "established-bounded",
+  "evidence": [
+    "implemented-exact",
+    "measured"
+  ],
+  "scope": "Conversion of the saved 1930-occurrence normal model; zero new observations and no source replay. Complete reported numerical body comparison at that cut.",
+  "source_revision": "51ae04fb plus accompanying current-factor generator",
+  "complete_reported_body_equal": true,
+  "native_occurrences": 1930,
+  "condensation": {
+    "already_generated": 0,
+    "at_cut": 1930,
+    "converted": 1929,
+    "factor_octets_after": 118700992,
+    "factor_octets_before": 237401984,
+    "retained_materialized": 0
+  },
+  "condensation_seconds": 0.098884484,
+  "journal_before": {
+    "bound_octets": 123456,
+    "current_factor_octets": 237401984,
+    "implicit_zero_delta_returns": 1929,
+    "internal_delta_octets": 0,
+    "logical_current_factor_octets": 238270080,
+    "logical_internal_delta_octets": 119135040,
+    "port_octets": 13333248,
+    "returns": 1929,
+    "total_octets": 250858688
+  },
+  "journal_after": {
+    "bound_octets": 123456,
+    "current_difference_returns": 1929,
+    "current_factor_octets": 118700992,
+    "implicit_zero_delta_returns": 1929,
+    "internal_delta_octets": 0,
+    "logical_current_factor_octets": 238270080,
+    "logical_internal_delta_octets": 119135040,
+    "port_octets": 13333248,
+    "returns": 1929,
+    "total_octets": 132157696
+  },
+  "full_remount_census_before": {
+    "allocations": 34770,
+    "captured_launches": 0,
+    "control_launches": 0,
+    "deed_launches": 0,
+    "device_to_device_octets": 0,
+    "egress_receipt_octets": 0,
+    "egress_section_octets": 0,
+    "ingress_octets": 896095152,
+    "resident_octets_now": 896095152,
+    "resident_octets_peak": 896095152,
+    "section_read_outs": 0,
+    "synchronizations": 0
+  },
+  "full_remount_census_after": {
+    "allocations": 42486,
+    "captured_launches": 3858,
+    "control_launches": 0,
+    "deed_launches": 1929,
+    "device_to_device_octets": 0,
+    "egress_receipt_octets": 123456,
+    "egress_section_octets": 0,
+    "ingress_octets": 896095152,
+    "resident_octets_now": 777394160,
+    "resident_octets_peak": 1014796212,
+    "section_read_outs": 0,
+    "synchronizations": 1929
+  },
+  "checkpoint_bytes_before": 450770927,
+  "checkpoint_bytes_after": 391482969,
+  "process": {
+    "command": [
+      "target/debug/examples/alpha_text",
+      "--resume",
+      ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-normal.hna",
+      "--families",
+      "0",
+      "--condense-current-journal",
+      "true",
+      "--checkpoint",
+      ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-normal-current-difference.hna",
+      "--report",
+      ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-normal-current-difference.json"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 94.91648090700619,
+    "max_rss_kib": 1100400
+  },
+  "checks": {
+    "field_before_prefix_refinement": {
+      "passed": 118,
+      "seconds": 140.54
+    },
+    "prefix_archive_legacy_and_causal_source": {
+      "passed": 2,
+      "seconds": 164.15,
+      "includes_initial_driver_jit": true
+    },
+    "native_alpha_sdk": {
+      "passed": 12,
+      "seconds": 8.21,
+      "pure_cases_not_rerun": true
+    }
+  }
+}

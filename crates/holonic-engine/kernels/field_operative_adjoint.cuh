@@ -1,4 +1,32 @@
 // Recover a producing prefix by undoing later journaled numerical increments exactly.
+// The first adjoint factor k is the addressed interior change b_before-b_after. The
+// same rounded D* v is used in the forward and adjoint owners. Keep ell in the journal;
+// reconstruct k from the source boundaries only when that journal is read.
+extern "C" __global__ void section_field_operative_current_difference(
+    const int64_t *before_wire,const int64_t *after_wire,const int64_t *factors_wire,
+    uint32_t before_count,uint32_t count,uint32_t prefix_count,uint32_t encode,
+    int64_t *lo,int64_t *hi,uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
+){
+    if(upstream_refused(census,lineage,lineage_count,slot))return;
+    size_t component=blockIdx.x*blockDim.x+threadIdx.x;
+    const size_t width=2u*(size_t)count,visible=2u*(size_t)prefix_count;
+    if(component>=visible){
+        const size_t complex_words=2*sizeof(wide)/sizeof(int64_t);
+        if(!prefix_count && !component)for(size_t j=0;j<(encode?1u:2u)*complex_words;++j)lo[j]=hi[j]=0;
+        return;
+    }
+    const wide *before=(const wide *)before_wire,*after=(const wide *)after_wire,*factors=(const wide *)factors_wire;
+    wide difference=sub_checked(component<2u*(size_t)before_count?before[component]:0,after[component],slot);
+    if(encode && difference!=factors[component])atomicOr(slot,REFUSED_MALFORMED);
+    if(*slot)return;
+    if(encode)((wide *)lo)[component]=((wide *)hi)[component]=factors[width+component];
+    else{
+        ((wide *)lo)[component]=((wide *)hi)[component]=difference;
+        ((wide *)lo)[visible+component]=((wide *)hi)[visible+component]=factors[component];
+    }
+}
+
+// Recover a producing prefix by undoing later journaled numerical increments exactly.
 // Each increment is rounded by the same operation that installed it; no inverse of a
 // semantic quotient is asserted. The historical radius is retained by the Rust owner.
 extern "C" __global__ void section_field_operative_producing_map(

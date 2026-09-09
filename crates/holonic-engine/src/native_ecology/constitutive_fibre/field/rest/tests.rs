@@ -14,6 +14,29 @@ fn phase(a: i64) -> NativePhaseCurrent {
 }
 
 #[test]
+#[ignore = "requires CUDA; a current-difference generator keeps the actual observed source"]
+fn current_difference_wire_rejects_a_different_causal_source() {
+    let readout=ResidentReadout::new().unwrap();
+    let surface=ResidentSurface::on(&readout).unwrap();
+    let mut field=NativeConstitutiveField::found_with_enclosed_junction(&surface,seed(),ResidentGrain(72)).unwrap();
+    field.enable_material_transport_source(NativeMaterialTransportSource::OperativeLinear).unwrap();
+    let mut last=None;
+    for value in [1,2,3] {
+        let mut event=match last.take(){Some(source)=>NativeFieldOccurrence::through(source,vec![phase(value)]),None=>NativeFieldOccurrence::entering(vec![phase(value)])};
+        last=Some(field.advance_resident(&mut event).unwrap().source);
+    }
+    let query=field.pull_back_material_current(2).unwrap().unwrap();
+    let response=field.material_contact_response(query).unwrap();
+    field.apply_material_contact_realization(&response,NativeContactRealization::DyadicDeposit).unwrap();
+    let mut rest=field.rest(&[last.as_ref()],&[]).unwrap();
+    assert_eq!(rest.header.operative.as_ref().unwrap().return_frames[0].current_difference_source,Some(1));
+    rest.header.operative.as_mut().unwrap().return_frames[0].current_difference_source=Some(0);
+    assert!(rest.validate().unwrap_err().to_string().contains("current-factor source lineage"));
+    rest.header.operative.as_mut().unwrap().return_frames[0].current_difference_source=Some(1);
+    rest.validate().unwrap();
+}
+
+#[test]
 #[ignore = "requires CUDA; complete rest/remount continues the field and learned transport without replay"]
 fn remount_preserves_current_coefficients_frames_and_live_capabilities() {
     let readout = ResidentReadout::new().unwrap();

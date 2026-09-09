@@ -284,6 +284,13 @@ device bit capacities. `field_normal_material.cuh` derives extents through the a
 report and statistic roles. The [integer review](../research/records/2026-09-09_INTEGER_FACES_RETAIN_THEIR_GENERATING_RELATIONS.md)
 records the recovered basis/series direction and native compatibility checks.
 
+[established-bounded; source-inspected] `junction/operative/current_factor.rs` owns the addressed
+source-interior difference representation of the first adjoint factor. The current-difference
+kernel and `surface_operative_adjoint.rs` encode and decode it; producer recovery restricts only
+the temporary factor domain required by the old map. Operative/field rest validate its actual
+receiving/source lineage. The [source-boundary generator return](../research/records/2026-09-09_AC1_THE_SOURCE_INTERIOR_CHANGE_GENERATES_A_RETURN_FACTOR.md)
+records exact, archive, legacy and prefix controls and model costs.
+
 [established-bounded; source-inspected] `field/receiver/packet.rs::NativePacketQuadrature`
 and `field_normalized_receiver.cuh` expose I/Q projections of the same joint current ball.
 `holonics-hna::alpha::text_codec::TextDirection`, `text_session` and `checkpoint` carry the

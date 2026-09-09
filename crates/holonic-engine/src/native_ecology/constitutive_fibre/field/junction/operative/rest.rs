@@ -10,6 +10,9 @@ pub(in super::super::super) struct OperativeReturnFrame {
     /// Omitted legacy frames store both factors over the complete contact population.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub factor_count: Option<usize>,
+    /// First factor is the source passage's interior difference; payload stores only ell.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub current_difference_source: Option<usize>,
     /// Explicit zero generator; its wire payload is the canonical one-word zero marker.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub zero_internal_delta: bool,
@@ -46,6 +49,7 @@ impl OperativeWire {
             .unwrap_or_else(|| OperativeReturnFrame {
                 at_cut: self.activated_at,
                 factor_count: None,
+                current_difference_source: None,
                 zero_internal_delta: false,
                 realization: NativeContactRealization::EnclosedFlow,
                 contact_count: self
@@ -207,7 +211,7 @@ impl OperativeRest {
             if factors > initial { return Err(invalid("return factor domain")); }
             for (s, rows, w) in [
                 (&r[0], 2, 2 * d),
-                (&r[1], 2, 4 * factors.max(1)),
+                (&r[1], if frame.current_difference_source.is_some(){1}else{2}, 4 * factors.max(1)),
                 (&r[3], 1, 4),
             ] {
                 point_section(s, rows, w)?;
@@ -238,6 +242,7 @@ impl<'c> OperativeState<'c> {
                     at_cut: r.at_cut,
                     contact_count: r.contact_count,
                     factor_count: (r.factor_count != r.contact_count).then_some(r.factor_count),
+                    current_difference_source: r.current_difference_source,
                     zero_internal_delta: r.b.is_none(),
                     realization: r.realization,
                 })
@@ -313,6 +318,7 @@ impl<'c> OperativeState<'c> {
                     at_cut: frame.at_cut,
                     contact_count: frame.contact_count,
                     factor_count: frame.factor_count.unwrap_or(frame.contact_count),
+                    current_difference_source: frame.current_difference_source,
                     realization: frame.realization,
                     origin: Rc::new(()),
                     ports: Rc::new(mount(ports)?),

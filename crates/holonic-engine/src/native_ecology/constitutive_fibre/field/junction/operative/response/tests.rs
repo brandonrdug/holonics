@@ -60,6 +60,82 @@ fn returned<'c>(f: &NativeConstitutiveField<'c>) -> NativeMaterialContactRespons
         .unwrap();
     f.material_contact_response(q).unwrap()
 }
+
+#[test]
+#[ignore = "requires CUDA; source-boundary factors decode after archive and condense a legacy journal"]
+fn current_difference_generator_decodes_archived_boundaries_and_legacy_factors() {
+    let readout=ResidentReadout::new().unwrap();
+    let surface=ResidentSurface::on(&readout).unwrap();
+    let mut field=make(&surface);
+    let mut last=None;
+    let mut early=None;
+    for (at,v) in [[(1,1),(0,1)],[(0,1),(1,0)],[(1,0),(0,-1)],[(0,0),(1,1)],[(1,0),(0,0)]].into_iter().enumerate(){
+        let input=v.into_iter().map(|(r,i)|phase(r,i)).collect();
+        let mut event=match last.take(){Some(s)=>NativeFieldOccurrence::through(s,input),None=>NativeFieldOccurrence::entering(input)};
+        let next=field.advance_resident(&mut event).unwrap();
+        if at==2{early=Some(field.retain_source(&next.source).unwrap());}
+        last=Some(next.source);
+    }
+    let latest=last.unwrap();
+    let response=returned(&field);
+    let original=surface.detach_section(&response.currents,64).unwrap();
+    let generated=field.prepare_material_contact_return(&response,NativeContactRealization::DyadicDeposit).unwrap();
+    assert_eq!(generated.current_difference_source,Some(response.query.source.occurrence));
+    let producing=surface.detach_section(&response._producing.map,64).unwrap();
+    for count in 0..=generated.factor_count {
+        let (prefix,actual)=field.resolve_operative_current_factor_prefix(&generated,count).unwrap();
+        assert_eq!(actual,count);
+        let prefix=surface.detach_section(&prefix,64).unwrap();
+        let expected=if count==0{vec![(0,0);prefix.intervals.len()]}else{
+            original.intervals[..4*count].iter()
+                .chain(&original.intervals[4*generated.factor_count..4*(generated.factor_count+count)])
+                .copied().collect()
+        };
+        assert_eq!(prefix.intervals,expected);
+    }
+    let dense=Rc::new(OperativeReturn{current_difference_source:None,currents:Rc::clone(&response.currents),
+        at_cut:generated.at_cut,contact_count:generated.contact_count,factor_count:generated.factor_count,
+        realization:generated.realization,origin:Rc::clone(&generated.origin),ports:Rc::clone(&generated.ports),
+        b:None,bounds:Rc::clone(&generated.bounds)});
+    {
+        let view=field.stage_operative_contacts().unwrap();
+        let compact=view.stage_return(Rc::clone(&generated)).unwrap();
+        let materialized=view.stage_return(Rc::clone(&dense)).unwrap();
+        assert_eq!(serde_json::to_value(compact.inspect().unwrap()).unwrap(),
+            serde_json::to_value(materialized.inspect().unwrap()).unwrap());
+    }
+    let path=std::env::temp_dir().join(format!("holonics-current-boundary-{}-{}.history",std::process::id(),
+        std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
+    field.enable_history_archive(&path).unwrap();
+    field.archive_history_before(field.occurrence_count()).unwrap();
+    assert!(field.history[response.query.source.occurrence].resident.is_none());
+    let decoded=field.resolve_operative_current_factors(&generated).unwrap();
+    assert_eq!(surface.detach_section(&decoded,64).unwrap(),original);
+    field.apply_material_contact_realization(&response,NativeContactRealization::DyadicDeposit).unwrap();
+    let expected=serde_json::to_value(field.inspect_contact_deposit(0).unwrap()).unwrap();
+    // The same realized state in the older, full-factor journal encoding.
+    field.junction.as_mut().unwrap().operative.as_mut().unwrap().returns[0]=dense;
+    let before=field.census();
+    let converted=field.condense_operative_current_journal().unwrap();
+    assert_eq!(field.census().section_read_outs,before.section_read_outs);
+    assert_eq!(converted.converted,1);
+    assert_eq!(converted.factor_octets_before,2*converted.factor_octets_after);
+    assert_eq!(expected,serde_json::to_value(field.inspect_contact_deposit(0).unwrap()).unwrap());
+    assert_eq!(field.condense_operative_current_journal().unwrap().already_generated,1);
+    let saved=field.rest(&[Some(&latest)],&[early.as_ref()]).unwrap();
+    drop(response);drop(generated);drop(decoded);drop(latest);drop(early);drop(field);
+    let (mut field,_,anchors)=NativeConstitutiveField::remount(&surface,saved).unwrap();
+    assert_eq!(expected,serde_json::to_value(field.inspect_contact_deposit(0).unwrap()).unwrap());
+    let next=field.advance_resident(&mut NativeFieldOccurrence::through_anchor(anchors[0].as_ref().unwrap(),
+        vec![phase(1,-1),phase(0,1)])).unwrap();
+    let query=field.pull_back_material_current(next.lineage.occurrence).unwrap().unwrap();
+    field.junction.as_mut().unwrap().operative.as_mut().unwrap().recent_producers.clear();
+    let returned=field.material_contact_response(query).unwrap();
+    let recovered=surface.detach_section(&returned._producing.map,64).unwrap();
+    assert_eq!(recovered.intervals,producing.intervals[..recovered.intervals.len()]);
+    drop(returned);drop(next);drop(anchors);drop(field);
+    std::fs::remove_file(path).unwrap();
+}
 fn enclosed(actual: &[ExactComplexWaveCurrent], center: &[ExactComplexWaveCurrent], radius: &Rat) {
     let error: Rat = actual
         .iter()
@@ -180,6 +256,10 @@ fn material_contact_response_reaches_its_producer_and_changes_subsequent_conduct
     let prior = field.census();
     field.apply_material_contact_response(&response).unwrap();
     assert_eq!(field.census().section_read_outs, prior.section_read_outs);
+    assert_eq!(field.operative_return_storage().unwrap().current_difference_returns,1);
+    let retained=field.junction.as_ref().unwrap().operative.as_ref().unwrap().returns.last().unwrap();
+    let decoded=field.resolve_operative_current_factors(retained).unwrap();
+    assert_eq!(surface.detach_section(&decoded,64).unwrap(),surface.detach_section(&response.currents,64).unwrap());
     let changed = field.stage_operative_contacts().unwrap().inspect().unwrap();
     assert_ne!(changed.contacts, old.contacts);
     assert_ne!(changed.covariance, old.covariance);
@@ -358,6 +438,7 @@ fn zero_extension_preserves_the_complete_contact_response_and_legacy_delta() {
     let dense_zero = Rc::new(surface.mount_section_rest(&zero).unwrap());
     for realization in [NativeContactRealization::EnclosedFlow, NativeContactRealization::DyadicDeposit] {
         let delta = |dense| Rc::new(OperativeReturn {
+            current_difference_source: None,
             at_cut: view.field_cut(), contact_count: count,
             factor_count: if dense { count } else { source_count },
             realization, origin: Rc::clone(&view.origin), ports: response.ports.clone(),
@@ -390,6 +471,7 @@ fn zero_extension_preserves_the_complete_contact_response_and_legacy_delta() {
     // The original dense wire remains admissible and reduces only exact numerical zeros.
     wire.return_frames[0].factor_count = None;
     wire.return_frames[0].zero_internal_delta = false;
+    wire.return_frames[0].current_difference_source = None;
     rest.returns[0][1] = expanded;
     rest.returns[0][2] = zero;
     rest.validate(&wire, field.nodes()).unwrap();
