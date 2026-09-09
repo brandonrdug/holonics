@@ -112,6 +112,36 @@ __device__ ExactInteger<LimbCount> subtract_magnitude(
     return result;
 }
 
+// Magnitude long division with a positive divisor. One extra limb carries the doubled
+// remainder; the quotient has the numerator's sign and truncates toward zero. This extends
+// the same recurrence to each declared integer carrier instead of encoding a fixed bit width.
+template <int LimbCount>
+__device__ ExactInteger<LimbCount> exact_divide_positive(
+    const ExactInteger<LimbCount> &numerator,const ExactInteger<LimbCount> &denominator,
+    bool *has_remainder
+){
+    using Integer=ExactInteger<LimbCount>;
+    Integer result;*has_remainder=false;
+    if(numerator.overflow || denominator.overflow || denominator.negative || denominator.is_zero()){
+        result.overflow=true;return result;
+    }
+    ExactInteger<LimbCount+1> remainder,divisor;
+    for(int i=0;i<LimbCount;++i)divisor.limb[i]=denominator.limb[i];
+    for(int bit=Integer::BITS-1;bit>=0;--bit){
+        uint32_t carry=(numerator.limb[bit/Integer::LIMB_BITS]>>(bit%Integer::LIMB_BITS))&1u;
+        for(int i=0;i<LimbCount+1;++i){
+            uint32_t next=remainder.limb[i]>>(Integer::LIMB_BITS-1);
+            remainder.limb[i]=(remainder.limb[i]<<1)|carry;carry=next;
+        }
+        if(compare_magnitude(remainder,divisor)>=0){
+            remainder=subtract_magnitude(remainder,divisor);
+            result.limb[bit/Integer::LIMB_BITS]|=(uint32_t)1u<<(bit%Integer::LIMB_BITS);
+        }
+    }
+    *has_remainder=!remainder.is_zero();
+    result.negative=numerator.negative && !result.is_zero();return result;
+}
+
 template <int LimbCount>
 __device__ ExactInteger<LimbCount> operator-(
     const ExactInteger<LimbCount> &value

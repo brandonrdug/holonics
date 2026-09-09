@@ -51,6 +51,7 @@ pub use junction::{NativeOperativeCurrentFactorCondensation,NativeOperativeRetur
     NativeFieldJunctionRepresentation, NativeFieldJunctionSolver,
     PairedContactCotangent, PairedJunctionCotangent, PairedJunctionLinearization, PairedJunctionTangent,
     CausalContactPropagation, CausalContactPropagationCotangent, CausalContactPropagationEnclosure,
+    NativeCausalContactPropagation,NativeCausalContactPropagationReading,NativeCausalContactJoinReading,
     JointMaterialContactResponse,joint_material_contact,
     NativeOperativeContactBirth, NativeOperativeContactReading, NativeOperativeContactStaging, NativeOperativeReflectionReading,
     NativeMaterialContactResponse, NativeMaterialContactResponseReading, NativeRetainedMaterialRelation, NativeMaterialContactStepComparison, NativeFiniteMaterialResponse,

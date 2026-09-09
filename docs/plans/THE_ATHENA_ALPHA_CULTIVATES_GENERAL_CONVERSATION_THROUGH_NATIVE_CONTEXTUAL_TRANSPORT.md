@@ -434,8 +434,11 @@ fixed-contact interior's real relaxation/sign spectrum does not supply an indepe
 advancing internal phase. The [causal-contact connection](../../research/records/2026-09-09_AC1_CAUSAL_CONTACT_JOINS_RETURN_A_PROPAGATION_AND_ITS_MORPHOLOGY_DERIVATIVE.md)
 now composes existing paired reflections along actual source joins with learned contact overlap.
 Its exact/enclosed reference, full derivative and stored-operator comparison return. Integrate
-the resident word/residual and its sparse `D_source H` return together with the historical
-producer, current-factor generator and checkpoint. Retain the newborn zero-input constraint.
+the [now-resident forward/reverse word](../../research/records/2026-09-09_AC1_THE_CAUSAL_CONTACT_WORD_AND_ITS_SPARSE_RETURN_ARE_RESIDENT.md)
+and its sparse `D_source H` return together with the historical producer, current-factor
+generator and checkpoint. Propagate existing interior before forming the newborn zero-input
+branch and applying the same outer reflection. The native suboperator controls and full
+stored-model comparison have returned; the live recurrence is not yet changed by them.
 The material-ball ingress remains a separate concrete family
 obligation. Do not substitute a selected phase, a present tensor quotient or a scalar loss for
 future-stable relevance. Force-sector/exchange mathematics supplies construction dependencies

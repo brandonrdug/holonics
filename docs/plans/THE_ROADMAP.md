@@ -159,9 +159,11 @@ in this order:
    addressed-span, paired and source owners. The tensor-factor phase realization and its pending
    persistence now return. The [causal-contact connection](../../research/records/2026-09-09_AC1_CAUSAL_CONTACT_JOINS_RETURN_A_PROPAGATION_AND_ITS_MORPHOLOGY_DERIVATIVE.md)
    now has exact/enclosed propagation and complete morphology-return references, including an
-   actual stored-operator comparison. Integrate its resident word/residual, propagated input
-   boundary and sparse `D_source H` return with the historical producer, journal and checkpoint.
-   Keep the newborn zero-input constraint and the complete material-family passage. Derive
+   actual stored-operator comparison. Its [resident forward/reverse word](../../research/records/2026-09-09_AC1_THE_CAUSAL_CONTACT_WORD_AND_ITS_SPARSE_RETURN_ARE_RESIDENT.md)
+   now returns without numerical readout or source mutation. Bind its sparse `D_source H` term
+   to the historical producer, journal and checkpoint; retain the propagated input boundary in
+   the current-factor decoder. The existing interior propagates before newborn zero-input
+   formation and outer reflection. Keep the complete material-family passage. Derive
    what sustains, redirects or ends expression without substituting a chosen rotation, a
    codeword's canonical unit input or a scalar entropy penalty for that constitutive relation.
 2. The [stored normal-objective comparison](../../research/records/2026-09-09_AC1_THE_NORMAL_OBJECTIVE_SEPARATES_SOLVE_ERROR_FROM_OBSERVED_SOURCE_FIT.md)

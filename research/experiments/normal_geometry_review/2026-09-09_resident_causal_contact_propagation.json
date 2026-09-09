@@ -1,0 +1,90 @@
+{
+  "grade": "established-bounded",
+  "evidence": [
+    "implemented-exact",
+    "computational-witness",
+    "measured"
+  ],
+  "scope": "One complete stored-model propagation word. Same continuing source is borrowed, not advanced. Cold reference/inspection costs are separate from resident staging.",
+  "model": ".local/artifacts/athena-alpha/ac1-contact-response/first-family-normal-derived-layout.hna",
+  "field_cut": 75,
+  "contacts": 74,
+  "joins": 73,
+  "fractional_bits": 72,
+  "native_staging_seconds": 0.10869336,
+  "inspection_seconds": 0.004411047,
+  "reference_seconds": 0.692110373,
+  "comparison": {
+    "contains_reference_radius": true,
+    "same_current": true,
+    "same_joins": true,
+    "same_rounding": true
+  },
+  "whole_read_remount_and_comparison_seconds": 2.480846959,
+  "source_revision": "669f4476 plus accompanying resident forward/return construction",
+  "native_radius": [
+    [
+      1,
+      [
+        10073
+      ]
+    ],
+    [
+      1,
+      [
+        0,
+        0,
+        32
+      ]
+    ]
+  ],
+  "reference_radius": [
+    [
+      1,
+      [
+        10073
+      ]
+    ],
+    [
+      1,
+      [
+        0,
+        0,
+        32
+      ]
+    ]
+  ],
+  "rounding_radius": [
+    [
+      1,
+      [
+        73
+      ]
+    ],
+    [
+      1,
+      [
+        0,
+        0,
+        128
+      ]
+    ]
+  ],
+  "checks": {
+    "resident_forward_initial_launch": "refused CUDA launch out of resources; corrected one-worker launch",
+    "resident_forward_after_correction": {
+      "passed": 2,
+      "seconds": 0.48
+    },
+    "complete_field_after_shared_division_change": {
+      "passed": 128,
+      "seconds": 139.76,
+      "includes_ignored": true
+    },
+    "resident_forward_and_return": {
+      "passed": 3,
+      "seconds": 134.85,
+      "includes_initial_driver_jit": true
+    }
+  }
+}

@@ -346,8 +346,20 @@ Its enclosed evaluation retains contact/current uncertainty and every dyadic omi
 The `causal_contact_propagation` example applies it to an entire stored operator cut. The
 [source-join return](../research/records/2026-09-09_AC1_CAUSAL_CONTACT_JOINS_RETURN_A_PROPAGATION_AND_ITS_MORPHOLOGY_DERIVATIVE.md)
 records the hidden-current separator, complete learned-operator comparison and costs. Resident
-execution, sparse overlap return and journal/producer integration remain open; this is not a
-new native state owner or an implicit CPU cultivation path.
+execution and sparse overlap return have subsequently returned below; journal/producer
+integration remains open. This reference is not an implicit CPU cultivation path.
+
+[established-bounded; source-inspected] `operative/propagation.rs` and
+`operative/propagation/return_path.rs` stage the native word and its sparse overlap return over
+the same borrowed operative field. `surface_causal_contact_propagation.rs` binds
+`field_causal_contact_{propagation,pullback}.cuh`. The forward trace retains actual joining
+indices, input pairs, exact overlaps, family bounds and rounding; the reverse word retains its
+producing map. Shared `exact_integer.cuh::exact_divide_positive` now supports the operand-derived
+propagation carrier and the existing complete-material division. The public
+`alpha_causal_propagation` example remounts a model and compares these owners with the reference.
+The [resident return](../research/records/2026-09-09_AC1_THE_CAUSAL_CONTACT_WORD_AND_ITS_SPARSE_RETURN_ARE_RESIDENT.md)
+records controls, the repaired launch and actual-model costs. The sparse source-map journal
+and recurrence binding remain open; these staged results do not publish a second ecology.
 
 [established-bounded; source-inspected] `resident/context_section.rs` and
 `constitutive_context_section.cuh` now derive the fixed-source context/return relation and its

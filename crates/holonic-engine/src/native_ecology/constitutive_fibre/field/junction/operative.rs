@@ -29,6 +29,8 @@ pub struct NativeOperativeContactBirth {
 }
 pub(in super::super) mod rest;
 mod current_factor;
+mod propagation;
+pub use propagation::{NativeCausalContactPropagation,NativeCausalContactPropagationReading,NativeCausalContactJoinReading};
 pub use current_factor::NativeOperativeCurrentFactorCondensation;
 
 pub(in super::super) struct OperativeSections<'c> {

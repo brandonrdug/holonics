@@ -27,23 +27,11 @@ __device__ wide complete_to_grid(const HistoryInteger &value, uint32_t shift, wi
 __device__ HistoryInteger complete_divide(
     const HistoryInteger &numerator,const HistoryInteger &denominator,wide *rounds,uint32_t *slot
 ) {
-    HistoryInteger result;
-    if (numerator.overflow || denominator.overflow || denominator.negative || denominator.is_zero()) {
-        atomicOr(slot,REFUSED_CARRIER);return result;
-    }
-    // The extra limb holds the doubled remainder even when the divisor fills all 256 bits.
-    ExactInteger<9> remainder, divisor;
-    for (uint32_t i=0;i<8u;++i) divisor.limb[i]=denominator.limb[i];
-    for (int bit=255;bit>=0;--bit) {
-        uint32_t carry=(numerator.limb[bit/32]>>(bit%32))&1u;
-        for (uint32_t i=0;i<9u;++i) {uint32_t next=remainder.limb[i]>>31;remainder.limb[i]=(remainder.limb[i]<<1)|carry;carry=next;}
-        if (compare_magnitude(remainder,divisor)>=0) {
-            remainder=subtract_magnitude(remainder,divisor);
-            result.limb[bit/32]|=(uint32_t)1u<<(bit%32);
-        }
-    }
-    if (!remainder.is_zero()) *rounds=add_checked(*rounds,1,slot);
-    result.negative=numerator.negative && !result.is_zero();return result;
+    bool remainder=false;
+    HistoryInteger result=exact_divide_positive(numerator,denominator,&remainder);
+    if(result.overflow){atomicOr(slot,REFUSED_CARRIER);return result;}
+    if(remainder)*rounds=add_checked(*rounds,1,slot);
+    return result;
 }
 __device__ __forceinline__ void complete_complex_product(
     const HistoryInteger &ar,const HistoryInteger &ai,const HistoryInteger &br,const HistoryInteger &bi,
