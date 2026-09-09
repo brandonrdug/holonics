@@ -119,21 +119,35 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
         metric: holonic_engine::native_ecology::constitutive_fibre::NativeMaterialPullbackMetric,
         realization: holonic_engine::native_ecology::constitutive_fibre::NativeContactRealization,
     ) -> Result<Option<holonic_engine::native_ecology::constitutive_fibre::NativeMaterialContactResponse<'chart>>, AlphaMaterialError> {
+        self.respond_to_latest_material_observing(group_width, metric, realization, |_, _| ()).map(|r| r.0)
+    }
+    /// A declared read-only observer may inspect the actual response before its ordinary commit.
+    /// Its result does not gate the update. In particular, a diagnostic can return its own error
+    /// as R while the native return still proceeds through the same publication owner.
+    pub fn respond_to_latest_material_observing<R>(
+        &mut self,
+        group_width: usize,
+        metric: holonic_engine::native_ecology::constitutive_fibre::NativeMaterialPullbackMetric,
+        realization: holonic_engine::native_ecology::constitutive_fibre::NativeContactRealization,
+        observer: impl FnOnce(&NativeConstitutiveField<'chart>,
+            &holonic_engine::native_ecology::constitutive_fibre::NativeMaterialContactResponse<'chart>) -> R,
+    ) -> Result<(Option<holonic_engine::native_ecology::constitutive_fibre::NativeMaterialContactResponse<'chart>>, Option<R>), AlphaMaterialError> {
         if self.pending.is_some() {
             return Err(AlphaMaterialError::Apparatus("native reception is pending".into()));
         }
-        let Some(latest)=self.latest.as_ref() else {return Ok(None);};
+        let Some(latest)=self.latest.as_ref() else {return Ok((None,None));};
         let query=if metric==holonic_engine::native_ecology::constitutive_fibre::NativeMaterialPullbackMetric::SquaredCurrent {
-            let Some(query)=self.field.pull_back_material_current(latest.occurrence)? else {return Ok(None);};
+            let Some(query)=self.field.pull_back_material_current(latest.occurrence)? else {return Ok((None,None));};
             query
         } else {
             let Some(returned)=self.field.normalized_material_return(latest.occurrence,group_width,
-                holonic_engine::resident_section::SeriesAperture(32))? else {return Ok(None);};
+                holonic_engine::resident_section::SeriesAperture(32))? else {return Ok((None,None));};
             self.field.pull_back_material_source(&returned,metric)?
         };
         let response=self.field.material_contact_response(query)?;
+        let observed = observer(self.field, &response);
         self.field.apply_material_contact_realization(&response,realization)?;
-        Ok(Some(response))
+        Ok((Some(response),Some(observed)))
     }
     /// Native contact/current staging over this same borrowed field. It changes no source
     /// capability or developmental occurrence, and cannot outlive the field's decoder.

@@ -87,12 +87,21 @@ All 111 field tests pass. Matched development returns an identical checkpoint; t
 body, currents and output also match. Prompt plus generation takes 26.31 seconds versus 36.03
 seconds in the prior run. This is one timing comparison; output remains unusable.
 
-[definition] Next examine AC1's finite contact return and AC2's learned relation directly.
-Compare the actual source-conditioned material response before and after the finite deposit,
-with the producing and current morphologies explicit. Correct local adjoints, exact coefficients
-and reduced cost do not establish finite learning improvement. This diagnostic should identify
-any needed constitutive/step correction; it is not a new universal generation or acceptance gate.
-Path/generator reuse and useful contextual responses remain required.
+[established-bounded; measured] The [finite-response/retention investigation](research/records/2026-09-09_AC1_LOCAL_CONTACT_IMPROVEMENT_COEXISTS_WITH_MATERIAL_FORGETTING.md)
+finds that all five inspected early contact deposits improve their declared source-conditioned
+material response. Nevertheless, five initially fitted relations degrade from loss
+0.0014–0.0022 to 0.556–0.722 after 75 occurrences, and remain badly degraded after 5,064. All
+later intervals exceed the zero-output reference loss 0.5. The observed development preserves the
+complete prior body and checkpoint. All 114 field cases, 26 SDK cases across the full and focused
+runs, and two driver controls pass. This identifies a material-retention failure without claiming
+that it explains every language defect.
+
+[definition] Next construct AC1's accumulated material-normal realization in the existing native
+owner: retain the source geometry H, cross-source statistic B and complete-potential constant C,
+with source/target family bounds; solve on the GPU with a retained normal residual; preserve
+producing operators and persistence. The linked record derives the normal law and its error
+bound. Its native implementation is still pending. AC1 path/generator reuse and AC2 useful
+contextual responses remain required; this is not a universal loss gate or a separate learner.
 
 [established-bounded; source-inspected] The [finite material composition](research/records/2026-09-09_AC1_THE_FINITE_MATERIAL_OPERATOR_RETURNS_THROUGH_ITS_PRODUCER.md)
 now binds the existing complex-current operator to the operative boundary and independent joint

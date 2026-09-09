@@ -16,6 +16,39 @@ fn reference() -> PairedJunctionLinearization {
 }
 
 #[test]
+fn contact_receiver_inverse_matches_the_full_port_solve() {
+    let contact = vec![w(1, 2), w(-3, 1)];
+    let u = [w(2, -1), w(1, 3)];
+    let b = w(1, -2);
+    let compact = PairedJunctionLinearization::at(vec![contact.clone()], &u, &[b.clone()]).unwrap();
+    let full = PairedJunctionLinearization::at(vec![contact, vec![w(0, 0); 2]], &u, &[b, w(0, 0)]).unwrap();
+    assert!(compact.dual);
+    assert!(!full.dual);
+    assert_eq!(compact.potential(), full.potential());
+    assert_eq!(compact.outgoing(), full.outgoing());
+    assert_eq!(compact.internal(), &full.internal()[..1]);
+    let a = compact.pullback(&[w(2, 1), w(-1, 2)], &[w(3, -2)]).unwrap();
+    let b = full.pullback(&[w(2, 1), w(-1, 2)], &[w(3, -2), w(0, 0)]).unwrap();
+    assert_eq!(a.source, b.source);
+    assert_eq!(a.contacts.contact(0).unwrap(), b.contacts.contact(0).unwrap());
+    let empty = PairedJunctionLinearization::at(vec![], &u, &[]).unwrap();
+    assert_eq!(empty.outgoing(), u);
+}
+
+#[test]
+fn a_correct_material_gradient_can_worsen_the_finite_source_response() {
+    let source = PairedJunctionLinearization::at(vec![vec![w(1, 0)]], &[w(1, 0)], &[w(0, 0)]).unwrap();
+    // Material M=4, observed y=1. At D=1 the outgoing current is zero, so M†(y-Mo)=4.
+    let gradient = source.pullback(&[w(4, 0)], &[w(0, 0)]).unwrap();
+    let delta = gradient.contacts.contact(0).unwrap();
+    assert_eq!(delta, [w(-4, 0)]);
+    let after = PairedJunctionLinearization::at(vec![vec![w(1, 0).add(&delta[0])]], &[w(1, 0)], &[w(0, 0)]).unwrap();
+    let loss = |out: &Wave| w(1, 0).subtract(&out.scaled(&Rat::from_integer(4.into()))).norm_square() / Rat::from_integer(2.into());
+    assert_eq!(loss(&source.outgoing()[0]), Rat::new(1.into(), 2.into()));
+    assert_eq!(loss(&after.outgoing()[0]), Rat::new(441.into(), 50.into()));
+}
+
+#[test]
 fn full_complex_differential_and_rank_two_contact_return_are_dual() {
     let p = reference();
     let du = vec![w(-1, 1), w(3, 2)];

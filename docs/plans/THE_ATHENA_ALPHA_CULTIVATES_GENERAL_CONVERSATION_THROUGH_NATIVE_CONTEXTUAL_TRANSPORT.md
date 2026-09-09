@@ -459,12 +459,19 @@ now reuses that standing within the transition while retaining the changed drive
 All 111 field tests pass; matched development/checkpoint and saved-model continuation are exact.
 The observed prompt/generation time falls from 36.03 to 26.31 seconds, with unchanged poor output.
 
-[definition] Next compare AC1's actual finite contact deposit at its source-conditioned material
-receiver, before and after application. Keep producing and current maps explicit and retain the
-oriented differences. The unit Frobenius response and exact local adjoint do not by themselves
-establish finite improvement. Use the comparison to derive any required constitutive correction
-in the existing native owner; do not replace it with a world-verdict learner or universal gate.
-AC1 path/generator reuse and AC2 useful contextual responses remain the required product return.
+[established-bounded; measured] The [finite-return and retention check](../../research/records/2026-09-09_AC1_LOCAL_CONTACT_IMPROVEMENT_COEXISTS_WITH_MATERIAL_FORGETTING.md)
+now returns a concrete distinction: all five inspected early finite contact steps improve their
+source-conditioned response, while later material updates overwrite the fitted relations. The
+initial 0.0014–0.0022 losses become 0.556–0.722 after 75 occurrences. Observing the run preserves
+its body and checkpoint; 114 field tests and the SDK/driver checks pass.
+
+[definition] Next construct the derived accumulated material-normal realization in the existing
+native owner. Retain H=I+sum xx†, B=sum yx† and C=sum ||y||², including the actual source/target
+family bounds and chronology. Use resident exact statistics and the existing factor/solve owners,
+keep the complete normal residual, and preserve the actual producing operator for later adjoints
+and restart. Legacy models keep their declared law. Check exact normal references, the same
+retained relations and actual conversation continuation; do not infer useful language from loss
+alone. This is the next AC1 material correction alongside path/generator reuse and AC2 output.
 
 [definition] Proceed through AC1 steps 3–4: local path formation, restriction/rebase and
 generator reuse. Derive the actively used coordinates and their continuing source/decoder,

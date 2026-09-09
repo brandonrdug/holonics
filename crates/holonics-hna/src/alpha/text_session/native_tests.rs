@@ -317,3 +317,30 @@ fn material_actuation_generation_keeps_source_and_pending_witness(){
         assert_eq!(s.field().rest(&[s.latest.as_ref().map(|v|&v.source)],&[])?,expected);Ok(())
     }).unwrap();
 }
+
+#[test]
+#[ignore = "requires CUDA; observer failure is not a second learning gate"]
+fn diagnostic_error_does_not_change_material_publication() {
+    use holonic_engine::native_ecology::constitutive_fibre::{NativeContactRealization, NativeMaterialPullbackMetric};
+    let run = |observed: bool| {
+        with_text_field_source(72, NativeMaterialTransportSource::OperativeLinear, |field| {
+            let mut session = TextFieldSession::on(field)?;
+            session.receive(TextSymbol::Octet(b'A'))?;
+            session.receive(TextSymbol::Octet(b'B'))?;
+            if observed {
+                let (response, diagnostic) = session.respond_to_latest_material_observing(
+                    2, NativeMaterialPullbackMetric::SquaredCurrent, NativeContactRealization::DyadicDeposit,
+                    |_, _| Err::<(), _>("declared observer failure"),
+                )?;
+                assert!(response.is_some());
+                assert_eq!(diagnostic, Some(Err("declared observer failure")));
+            } else {
+                session.respond_to_latest_material_with_realization(2,
+                    NativeMaterialPullbackMetric::SquaredCurrent, NativeContactRealization::DyadicDeposit)?;
+            }
+            assert_eq!(session.field().operative_return_count(), Some(1));
+            Ok(session.field().rest(&[], &[])?)
+        }).unwrap()
+    };
+    assert_eq!(run(false), run(true));
+}

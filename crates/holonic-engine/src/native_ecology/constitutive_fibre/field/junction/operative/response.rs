@@ -3,6 +3,8 @@
 use super::*;
 use num_bigint::BigInt;
 use num_traits::One;
+mod comparison;
+pub use comparison::{NativeFiniteMaterialResponse, NativeRetainedMaterialRelation, NativeMaterialContactStepComparison};
 
 pub struct NativeMaterialContactResponse<'c> {
     surface: &'c ResidentSurface<'c>,
@@ -95,6 +97,24 @@ impl<'c> NativeConstitutiveField<'c> {
         response: &NativeMaterialContactResponse<'c>,
         realization: NativeContactRealization,
     ) -> Result<(), Error> {
+        let returned = self.prepare_material_contact_return(response, realization)?;
+        let (sections, origin, returns) = {
+            let view = self.stage_operative_contacts()?;
+            let staged = view.stage_return(returned)?;
+            (staged.sections, staged.origin, staged.returns)
+        };
+        let op = self.junction.as_mut().unwrap().operative.as_mut().unwrap();
+        op.sections = sections;
+        op.origin = origin;
+        op.returns = returns;
+        Ok(())
+    }
+
+    fn prepare_material_contact_return(
+        &self,
+        response: &NativeMaterialContactResponse<'c>,
+        realization: NativeContactRealization,
+    ) -> Result<Rc<OperativeReturn<'c>>, Error> {
         if !self.relation.usable || self.pending.is_some() {
             return Err(Error::Uncertain);
         }
@@ -120,7 +140,7 @@ impl<'c> NativeConstitutiveField<'c> {
         let k = op.births.len();
         // Extension by zero is retained as a generator, not allocated per later birth.
         // This constitutive response holds input current fixed, so its internal delta is zero.
-        let returned = Rc::new(OperativeReturn {
+        Ok(Rc::new(OperativeReturn {
             realization,
             at_cut: self.history.len(),
             contact_count: k,
@@ -130,17 +150,7 @@ impl<'c> NativeConstitutiveField<'c> {
             currents: response.currents.clone(),
             b: None,
             bounds: response.delta_bounds.clone(),
-        });
-        let (sections, origin, returns) = {
-            let view = self.stage_operative_contacts()?;
-            let staged = view.stage_return(returned)?;
-            (staged.sections, staged.origin, staged.returns)
-        };
-        let op = self.junction.as_mut().unwrap().operative.as_mut().unwrap();
-        op.sections = sections;
-        op.origin = origin;
-        op.returns = returns;
-        Ok(())
+        }))
     }
 
     pub fn material_contact_response(

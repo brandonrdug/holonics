@@ -233,6 +233,14 @@ covariance preparation after advancing internal current. The compile-time specia
 internal norm and complete aggregate bound. Other moment preparations remain complete. The
 [reflection return](../research/records/2026-09-09_AC1_THE_SAME_CONTACT_COVARIANCE_SERVES_BOTH_SIDES_OF_A_REFLECTION.md) records exact controls and observed runtime.
 
+[established-bounded; source-inspected] `operative/response/comparison.rs` owns cold finite-contact
+and retained-material relation comparisons. It retains source input, both complex quadratures,
+current/producing map distinctions and family bounds. `junction/producer.rs` uses the equivalent
+smaller contact-space exact solve when applicable. The SDK's `respond_to_latest_material_observing`
+keeps inspection separate from ordinary publication; an observer error does not gate learning.
+The [retention return](../research/records/2026-09-09_AC1_LOCAL_CONTACT_IMPROVEMENT_COEXISTS_WITH_MATERIAL_FORGETTING.md) records actual forgetting and derives the
+next accumulated-normal realization. These observers do not implement that new native law.
+
 [established-bounded; source-inspected] `OperativeLinear` reuses the finite current-to-material
 operator through `field_linear_material.cuh`, with an independent joint target and row-parallel
 preparation. `field_linear_material_pullback.cuh` and `receiver/normalized/pullback/linear.rs`

@@ -1,0 +1,18 @@
+$ cargo test -p holonic-engine --lib junction::producer::tests -- --test-threads=1
+warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
+   Compiling holonic-engine v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-engine)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 50.91s
+     Running unittests src/lib.rs (target/debug/deps/holonic_engine-6ae3d245ea632305)
+
+running 8 tests
+test native_ecology::constitutive_fibre::field::junction::producer::tests::a_correct_material_gradient_can_worsen_the_finite_source_response ... ok
+test native_ecology::constitutive_fibre::field::junction::producer::tests::contact_phase_rechart_carries_the_complete_morphology_cotangent ... ok
+test native_ecology::constitutive_fibre::field::junction::producer::tests::contact_receiver_inverse_matches_the_full_port_solve ... ok
+test native_ecology::constitutive_fibre::field::junction::producer::tests::fixed_morphology_reflection_is_its_own_adjoint_and_preserves_full_current ... ok
+test native_ecology::constitutive_fibre::field::junction::producer::tests::full_complex_differential_and_rank_two_contact_return_are_dual ... ok
+test native_ecology::constitutive_fibre::field::junction::producer::tests::joint_material_reduction_matches_the_complete_two_receiver_normal_system ... ok
+test native_ecology::constitutive_fibre::field::junction::producer::tests::producer_primal_matches_native_field_and_complete_internal_decoder ... ignored, requires CUDA; exact producer follows the actual paired field through source reuse and phase rechart
+test native_ecology::constitutive_fibre::field::junction::producer::tests::scalar_reflection_has_its_analytic_contact_derivative_and_empty_family ... ok
+
+test result: ok. 7 passed; 0 failed; 1 ignored; 0 measured; 2264 filtered out; finished in 0.02s
+

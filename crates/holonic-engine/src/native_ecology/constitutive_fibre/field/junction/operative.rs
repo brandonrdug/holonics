@@ -7,7 +7,7 @@ use super::*;
 mod response;
 mod deposit;
 pub use deposit::NativeContactDepositReading;
-pub use response::{NativeMaterialContactResponse, NativeMaterialContactResponseReading};
+pub use response::{NativeMaterialContactResponse, NativeMaterialContactResponseReading, NativeRetainedMaterialRelation, NativeMaterialContactStepComparison, NativeFiniteMaterialResponse};
 
 /// The numerical realization of a NEW contact deposit, not an identification of its source.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, serde::Deserialize)]

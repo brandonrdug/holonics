@@ -51,6 +51,14 @@ scoped tensor/material construction; generator reuse across changing contacts an
 remain open. Complete source-qualified continuation, not equality of selected words alone, is
 its persistence comparison.
 
+[established-bounded; measured] The [finite-contact/retention return](../research/records/2026-09-09_AC1_LOCAL_CONTACT_IMPROVEMENT_COEXISTS_WITH_MATERIAL_FORGETTING.md)
+now applies the distinction between a correct local derivative, a finite step and future reuse.
+Its five early contact steps improve, but subsequent material updates overwrite the fitted
+source relations. It derives the accumulated complex normal statistics H, B and C, the positive
+normal solve and a full source-family residual bound for the next native material construction.
+This is a concrete classical-learning/constitutive correction grounded in actual retained
+currents, with no Lean or exterior evaluator in the learning path.
+
 ## One framework, several realizations
 
 [definition] The subsequent [complex-fluid and plan revision](../research/records/2026-09-08_COMPLEX_FLUID_CHARTS_RETAIN_THE_FOLDED_CURRENT_AND_THE_RECEIVER_BOUND.md)

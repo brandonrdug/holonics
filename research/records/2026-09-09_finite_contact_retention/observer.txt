@@ -1,0 +1,26 @@
+$ cargo test -p holonics-hna --lib diagnostic_error_does_not_change_material_publication -- --include-ignored --test-threads=1
+warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
+warning: struct `SectionContactMaterial` is never constructed
+   --> crates/holonic-engine/src/native_ecology/../holonic_intelligence/operative_return.rs:239:19
+    |
+239 | pub(super) struct SectionContactMaterial<'a, 'chart> {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `enact_section_contact` is never used
+   --> crates/holonic-engine/src/native_ecology/../holonic_intelligence/operative_return.rs:335:15
+    |
+335 | pub(super) fn enact_section_contact<'chart>(
+    |               ^^^^^^^^^^^^^^^^^^^^^
+
+warning: `holonic-engine` (lib) generated 2 warnings
+   Compiling holonics-hna v0.1.0 (/home/b/Workspaces/holonics/crates/holonics-hna)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.88s
+     Running unittests src/lib.rs (target/debug/deps/holonics_hna-5dc87c8819cf4508)
+
+running 1 test
+test alpha::text_session::native_tests::diagnostic_error_does_not_change_material_publication ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 75 filtered out; finished in 0.54s
+

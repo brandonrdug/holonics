@@ -412,3 +412,43 @@ fn zero_extension_preserves_the_complete_contact_response_and_legacy_delta() {
     field.apply_material_contact_realization(&returned, NativeContactRealization::DyadicDeposit).unwrap();
     assert_eq!(field.operative_return_storage().unwrap().implicit_zero_delta_returns, 2);
 }
+
+#[test]
+#[ignore = "requires CUDA; finite response inspection retains source input and leaves development unchanged"]
+fn finite_material_comparison_preserves_source_input_and_native_state() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let seed = vec![NativeJunctionSeed {
+        incoming_admittance: 1, held_admittance: 1,
+        incoming_transport: NativePhaseCurrent::unit(), initial_held: NativePhaseCurrent::zero(),
+    }; 2];
+    let mut field = NativeConstitutiveField::found_with_enclosed_junction(&surface, seed, ResidentGrain(72)).unwrap();
+    field.enable_material_transport_source(NativeMaterialTransportSource::OperativeLinear).unwrap();
+    let mut latest = None;
+    let mut anchor = None;
+    for at in 0..6 {
+        let inputs = vec![NativePhaseCurrent::new(at + 1, 1, 3).unwrap(), phase(1, at % 2)];
+        let mut event = if at == 5 {
+            NativeFieldOccurrence::through_anchor(anchor.as_ref().unwrap(), inputs)
+        } else if let Some(source) = latest.take() {
+            NativeFieldOccurrence::through(source, inputs)
+        } else { NativeFieldOccurrence::entering(inputs) };
+        let next = field.advance_resident(&mut event).unwrap();
+        if at == 1 { anchor = Some(field.retain_source(&next.source).unwrap()); }
+        latest = Some(next.source);
+        let Some(query) = field.pull_back_material_current(at as usize).unwrap() else { continue; };
+        let response = field.material_contact_response(query).unwrap();
+        let before = field.rest(&[latest.as_ref()], &[]).unwrap();
+        let compared = field.inspect_material_contact_step(&response, NativeContactRealization::DyadicDeposit).unwrap();
+        assert_eq!(field.rest(&[latest.as_ref()], &[]).unwrap(), before);
+        assert!(!(compared.strictly_improves && compared.strictly_worsens));
+        let source = field.inspect_operative_reflection(compared.source.occurrence).unwrap().unwrap();
+        let reference = &compared.producing_contacts_with_current_material.outgoing;
+        let square: Rat = reference.center.iter().zip(&source.outgoing.center)
+            .map(|(a,b)| a.subtract(b).norm_square()).sum();
+        assert!(square <= (&reference.radius + &source.outgoing.radius).pow(2));
+        assert_eq!(compared.current_contacts, field.stage_operative_contacts().unwrap().births.len());
+        field.apply_material_contact_realization(&response, NativeContactRealization::DyadicDeposit).unwrap();
+        assert_eq!(field.operative_return_count(), Some(at as usize));
+    }
+}

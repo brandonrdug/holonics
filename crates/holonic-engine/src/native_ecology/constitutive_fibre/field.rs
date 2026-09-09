@@ -51,7 +51,7 @@ pub use junction::{NativeOperativeReturnStorage,
     PairedContactCotangent, PairedJunctionCotangent, PairedJunctionLinearization, PairedJunctionTangent,
     JointMaterialContactResponse,joint_material_contact,
     NativeOperativeContactBirth, NativeOperativeContactReading, NativeOperativeContactStaging, NativeOperativeReflectionReading,
-    NativeMaterialContactResponse, NativeMaterialContactResponseReading,
+    NativeMaterialContactResponse, NativeMaterialContactResponseReading, NativeRetainedMaterialRelation, NativeMaterialContactStepComparison, NativeFiniteMaterialResponse,
     NativeContactRealization,
     NativeContactDepositReading,
 };

@@ -10,7 +10,7 @@ mod enclosure;
 mod producer;
 pub(super) mod operative;
 pub use operative::{NativeOperativeReturnStorage,NativeOperativeReflectionReading,NativeOperativeContactBirth, NativeOperativeContactReading, NativeOperativeContactStaging,
-    NativeMaterialContactResponse, NativeMaterialContactResponseReading, NativeContactRealization, NativeContactDepositReading};
+    NativeMaterialContactResponse, NativeMaterialContactResponseReading, NativeRetainedMaterialRelation, NativeMaterialContactStepComparison, NativeFiniteMaterialResponse, NativeContactRealization, NativeContactDepositReading};
 pub use producer::{PairedContactCotangent, PairedJunctionCotangent, PairedJunctionLinearization, PairedJunctionTangent,JointMaterialContactResponse,joint_material_contact};
 #[cfg(test)]
 mod solver_tests;

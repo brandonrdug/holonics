@@ -1,0 +1,10 @@
+$ cargo test -p holonic-engine --lib finite_material_comparison_preserves_source_input_and_native_state -- --include-ignored --test-threads=1
+warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.20s
+     Running unittests src/lib.rs (target/debug/deps/holonic_engine-6ae3d245ea632305)
+
+running 1 test
+test native_ecology::constitutive_fibre::field::junction::operative::response::tests::finite_material_comparison_preserves_source_input_and_native_state ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2271 filtered out; finished in 6.66s
+

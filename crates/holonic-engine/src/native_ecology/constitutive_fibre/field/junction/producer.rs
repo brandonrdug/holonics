@@ -102,7 +102,8 @@ fn columns(contacts: &[Vec<Wave>], v: &[Wave], width: usize) -> Vec<Wave> {
 pub struct PairedJunctionLinearization {
     contacts: Vec<Vec<Wave>>,
     incoming_internal: Vec<Wave>,
-    inverse: ExactRatMatrix,
+    inverse: Option<ExactRatMatrix>,
+    dual: bool,
     potential: Vec<Wave>,
     outgoing: Vec<Wave>,
     internal: Vec<Wave>,
@@ -168,29 +169,33 @@ impl PairedJunctionLinearization {
         if n == 0 || contacts.iter().any(|d| d.len() != n) || internal.len() != contacts.len() {
             return Err(Error::ShapeMismatch);
         }
-        let d = n.checked_mul(2).ok_or(Error::ExtentOverflow)?;
+        let dual = contacts.len() < n;
+        let dimension = if dual { contacts.len() } else { n };
+        let d = dimension.checked_mul(2).ok_or(Error::ExtentOverflow)?;
         let mut a = vec![vec![Rat::zero(); d]; d];
-        for i in 0..n {
-            for j in 0..n {
+        for i in 0..dimension {
+            for j in 0..dimension {
                 let mut z = if i == j {
                     Wave::new(Rat::one(), Rat::zero())
                 } else {
                     Wave::zero()
                 };
-                for contact in &contacts {
+                if dual { z = z.add(&dot(&contacts[i], &contacts[j])); }
+                else { for contact in &contacts {
                     z = z.add(&contact[i].multiply(&contact[j].conjugate()));
-                }
+                }}
                 a[2 * i][2 * j] = z.real.clone();
                 a[2 * i][2 * j + 1] = -&z.imaginary;
                 a[2 * i + 1][2 * j] = z.imaginary;
                 a[2 * i + 1][2 * j + 1] = z.real;
             }
         }
-        let inverse = ExactRatMatrix::new(a)?.inverse()?;
+        let inverse = if dimension == 0 { None } else { Some(ExactRatMatrix::new(a)?.inverse()?) };
         let mut result = Self {
             contacts,
             incoming_internal: internal.to_vec(),
             inverse,
+            dual,
             potential: vec![],
             outgoing: vec![],
             internal: vec![],
@@ -202,16 +207,14 @@ impl PairedJunctionLinearization {
         Ok(result)
     }
     fn solve(&self, v: &[Wave]) -> Result<Vec<Wave>, Error> {
-        let values = v
-            .iter()
-            .flat_map(|v| [v.real.clone(), v.imaginary.clone()])
-            .collect::<Vec<_>>();
-        Ok(self
-            .inverse
-            .apply(&values)?
-            .chunks_exact(2)
-            .map(|v| Wave::new(v[0].clone(), v[1].clone()))
-            .collect())
+        let Some(inverse) = &self.inverse else { return Ok(v.to_vec()); };
+        // (I + D D†)^-1 v = v - D (I + D† D)^-1 D† v.
+        // Choose the smaller exact receiver chart, retaining all contact columns.
+        let rhs = if self.dual { rows(&self.contacts, v) } else { v.to_vec() };
+        let values = rhs.iter().flat_map(|v| [v.real.clone(), v.imaginary.clone()]).collect::<Vec<_>>();
+        let solved = inverse.apply(&values)?.chunks_exact(2)
+            .map(|v| Wave::new(v[0].clone(), v[1].clone())).collect::<Vec<_>>();
+        Ok(if self.dual { sub(v, &columns(&self.contacts, &solved, v.len())) } else { solved })
     }
     pub fn pushforward(
         &self,

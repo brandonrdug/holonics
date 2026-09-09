@@ -51,6 +51,7 @@ pub struct NativeMaterialSourcePullbackReading {
 }
 
 impl NativeMaterialSourcePullback<'_> {
+    pub fn metric(&self) -> NativeMaterialPullbackMetric { self.metric }
     pub fn inspect(&self) -> Result<NativeMaterialSourcePullbackReading, ConstitutiveFibreError> {
         let rest = self.surface.detach_section(&self.output, 64)?;
         let raw = material_transport::wides(&rest.intervals)?;

@@ -55,6 +55,7 @@ struct CultivationCheckpoint {
     contact_metric: NativeMaterialPullbackMetric,
 }
 
+#[cfg(test)]
 fn cultivate(
     reader: &mut ExposureReader,
     session: &mut TextFieldSession<'_, '_>,
@@ -64,6 +65,22 @@ fn cultivate(
     contact_response: bool,
     contact_realization: NativeContactRealization,
     contact_metric: NativeMaterialPullbackMetric,
+) -> Result<(), AlphaMaterialError> {
+    cultivate_observed(reader, session, families, records, anchors, contact_response,
+        contact_realization, contact_metric, &[], &mut Vec::new())
+}
+
+fn cultivate_observed(
+    reader: &mut ExposureReader,
+    session: &mut TextFieldSession<'_, '_>,
+    families: usize,
+    records: &mut Vec<Value>,
+    anchors: &mut AnchorMap,
+    contact_response: bool,
+    contact_realization: NativeContactRealization,
+    contact_metric: NativeMaterialPullbackMetric,
+    comparison_cuts: &[usize],
+    comparisons: &mut Vec<Value>,
 ) -> Result<(), AlphaMaterialError> {
     let mut partial = records.last().filter(|r| r["complete"] == false).cloned();
     let mut completed = 0;
@@ -199,9 +216,22 @@ fn cultivate(
                 }
                 if contact_response {
                     let group=match session.field().material_target(){Some(NativeMaterialTarget::TensorProduct{..})=>session.field().material_target_dimension().unwrap(),_=>2};
-                    if let Err(error)=session.respond_to_latest_material_with_realization(group,
-                        contact_metric,
-                        contact_realization) {
+                    let cut = session.field().occurrence_count();
+                    let result = session.respond_to_latest_material_observing(group, contact_metric,
+                        contact_realization, |field, response| {
+                            comparison_cuts.contains(&cut).then(|| {
+                                eprintln!("{}", json!({"phase":"finite-contact-comparison","native_cut":cut}));
+                                field.inspect_material_contact_step(response, contact_realization)
+                                    .map(|value| json!(value)).map_err(|error| error.to_string())
+                            })
+                        });
+                    if let Ok((_, Some(Some(compared)))) = &result {
+                        comparisons.push(match compared {
+                            Ok(value) => value.clone(),
+                            Err(error) => json!({"application_cut":cut,"error":error}),
+                        });
+                    }
+                    if let Err(error)=result {
                         failure=Some(json!({"phase":"contact-response","symbol_index":symbol_index,
                             "symbol":symbol,"error":error.to_string()}));
                         break;
@@ -291,6 +321,8 @@ fn run_session(
     contact_metric: NativeMaterialPullbackMetric,
     checkpoint: Option<&PathBuf>,
     report: &mut Value,
+    comparison_cuts: &[usize],
+    retention_receivings: &[usize],
 ) -> Result<(), AlphaMaterialError> {
     if operative {
         session.enable_operative_contacts()?;
@@ -308,9 +340,10 @@ fn run_session(
     report["contact_response_during_development"] = json!(contact_response);
     report["contact_realization"] = json!(contact_realization);
     report["contact_metric"] = json!(contact_metric);
+    let mut comparisons = Vec::new();
     let start = Instant::now();
     let developed = if let Some(reader) = reader.as_mut() {
-        cultivate(reader, session, families, records, anchors, contact_response, contact_realization, contact_metric)
+        cultivate_observed(reader, session, families, records, anchors, contact_response, contact_realization, contact_metric, comparison_cuts, &mut comparisons)
     } else {
         Ok(())
     };
@@ -318,6 +351,8 @@ fn run_session(
         *cursor = reader.cursor();
     }
     report["material_wall_seconds"] = json!(start.elapsed().as_secs_f64());
+    report["finite_contact_comparison_cuts"] = json!(comparison_cuts);
+    report["finite_contact_comparisons"] = json!(comparisons);
     report["development_records"] = json!(&*records);
     report["development_native_until"] = json!(session.field().occurrence_count());
     report["development_operative_returns"] = json!(session.field().operative_return_count());
@@ -402,6 +437,10 @@ fn run_session(
         }
         report["prompt_and_emission_wall_seconds"] = json!(start.elapsed().as_secs_f64());
     }
+    report["retained_material_relations"] = json!(retention_receivings.iter().map(|&receiving| {
+        session.field().inspect_retained_material_relation(receiving).map(|v| json!(v))
+            .unwrap_or_else(|error| json!({"receiving":receiving,"error":error.to_string()}))
+    }).collect::<Vec<_>>());
     let field = session.field();
     report["final_native_census_before_diagnostics"] = json!(field.census());
     let start = Instant::now();
@@ -455,7 +494,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary|operative-linear] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--self-source-mode actuation|observation|withdrawal] [--contact-metric current|relative-entropy|squared-probability]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary|operative-linear] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--self-source-mode actuation|observation|withdrawal] [--contact-metric current|relative-entropy|squared-probability] [--inspect-contact-cuts N,...] [--inspect-retained-receivings N,...]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -476,10 +515,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut material_target = None;
     let mut text_receiver = TextCurrentReceiver::Material;
     let mut self_source_mode=None;
+    let mut comparison_cuts=Vec::new();
+    let mut retention_receivings=Vec::new();
     while let Some(option) = args.next() {
         let value = args.next().ok_or("missing option value")?;
         match option.as_str() {
             "--families" => families = Some(value.parse::<usize>()?),
+            "--inspect-retained-receivings" => retention_receivings=value.split(',').map(str::parse::<usize>).collect::<Result<Vec<_>,_>>()?,
+            "--inspect-contact-cuts" => comparison_cuts=value.split(',').map(str::parse::<usize>).collect::<Result<Vec<_>,_>>()?,
             "--fractional-bits" => grain = Some(value.parse::<u32>()?),
             "--prompt" => prompt_path = Some(PathBuf::from(value)),
             "--emit-symbols" => limit = Some(value.parse::<usize>()?),
@@ -658,6 +701,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 contact_metric.unwrap_or(app.contact_metric),
                 checkpoint.as_ref(),
                 &mut report,
+                &comparison_cuts,
+                &retention_receivings,
             )
         };
         match &history_archive {
@@ -704,6 +749,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     contact_metric.unwrap_or(NativeMaterialPullbackMetric::SquaredCurrent),
                     checkpoint.as_ref(),
                     &mut report,
+                    &comparison_cuts,
+                    &retention_receivings,
                 )
             },
         )
