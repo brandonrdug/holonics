@@ -20,6 +20,13 @@ fluid feedback. Its exact mechanical coarse step can still increase energy: repr
 exactness and finite stability keep separate statements. This is reusable mathematics for the
 native return, not another numerical realization requirement or an AC1 completion.
 
+[definition] The [comprehensive programme](plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)
+now orders formal use of the Reality of Difference notions through the sole roadmap. Its
+[opening return](../research/records/2026-09-08_COMPATIBLE_POTENTIAL_SWINGS_THROUGH_JOINT_RECEIVERS_AND_THE_PROGRAMME_BEGINS.md)
+composes actual compatible source fibres, useful future-face bounds, canonical joint quotients
+and Swing transport, with mechanical and joint-packet instances. Next is their actual clocked
+tube/boundary-scale composition. The existing fluid/MFR and AC lines retain their stated scopes.
+
 ## One framework, several realizations
 
 [definition] The subsequent [complex-fluid and plan revision](../research/records/2026-09-08_COMPLEX_FLUID_CHARTS_RETAIN_THE_FOLDED_CURRENT_AND_THE_RECEIVER_BOUND.md)

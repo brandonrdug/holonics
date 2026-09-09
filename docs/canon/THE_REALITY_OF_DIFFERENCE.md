@@ -57,6 +57,32 @@ that the admitted receiver does not separate the occurrences. It does not establ
 causes, interiors or future consequences coincide. Likewise, cancelling terms in a boundary
 calculation does not delete the histories whose oriented contributions cancel.
 
+## Swing, potential and realized faces
+
+[project-postulate] Difference is the ontological primitive; Swing is the primitive act of
+situated relating and transport to develop through its actual constraints. The source, anchor,
+comparison and invariant travel with the motion. The existing harmonic/projective and affine
+Swing owners state their precise domains; one fixed-chart reflection is not silently given
+universal physical reach.
+
+[definition] Compatible potential is a family of admitted realizations and future faces behind
+a receiver. Its members retain their correlations and causal conditions. A measured face can be
+exact while its source fibre remains plural; a bounded future family can be precise enough for
+an explicitly declared use. Refinement, rebase and subsequent interaction may change the family
+without requiring recovery of the complete microscopic past.
+
+[definition] Complex/tensor coordinates can carry phase and coupled interaction. Philosophical
+potential is not assigned to the imaginary coordinate alone. A translation between presentations
+begins as an addressed correspondence; a functional map, singular chart, physical wormhole or
+holographic duality each owes its particular additional construction. Continuous and discrete
+charts keep their actual comparison, dynamics and remainder.
+
+[project-postulate] [The comprehensive construction programme](../plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)
+now carries these notions into formalization and use through the sole roadmap. It begins with
+joint receiver potential and Swing, continues through active tubes, scale, constitutive dynamics
+and mathematical applications, and develops quantum/geometric, topological and physical
+realizations. Each returned construction is usable at its actual scope as this programme grows.
+
 ## Relevance makes relativity constitutive
 
 [project-postulate] **Everything is oriented and relevant.** Every occurrence participates in

@@ -1,4 +1,7 @@
 import ElementaryHolonics.Framework.Core
+import ElementaryHolonics.Foundation.JointReceiverDescent
+import ElementaryHolonics.Transport.ReceiverPotential
+import ElementaryHolonics.Computation.JointReceiverWitness
 import ElementaryHolonics.Computation.HolonicInformationTheory
 import ElementaryHolonics.Computation.HolonicAdjointNormalization
 import ElementaryHolonics.Millennium.ReceiverHistory

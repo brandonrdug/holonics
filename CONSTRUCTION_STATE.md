@@ -8,6 +8,21 @@
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct
 instruction governs.
 
+## Reality of Difference: active formal programme
+
+[proved-derived; formal-checked] [The programme's first return](research/records/2026-09-08_COMPATIBLE_POTENTIAL_SWINGS_THROUGH_JOINT_RECEIVERS_AND_THE_PROGRAMME_BEGINS.md)
+constructs compatible future families, useful tolerance/convergence, exact rebase, canonical
+joint receiver descent and affine Swing transport. The mechanical instance has an exact future
+with plural sources; the standing bit-marginal failure now has a Lean witness. These are
+mathematical receiver laws, not a new native decoder.
+
+[established-bounded; process-audit] Full research and final framework checks pass.
+
+[definition] The [comprehensive contract](docs/plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)
+is integrated with the sole roadmap. Step 1 and the affine Swing opening are complete; next is
+step 2's actual WorldTube resegmentation/boundary-scale passage with the same future family.
+The wider programme remains active and the parallel AC construction continues independently.
+
 ## Philosophical synthesis
 
 [established-bounded; process-audit] The [philosophical recovery](research/records/2026-09-08_DIFFERENCE_IS_REAL_AND_THE_PHILOSOPHY_GOVERNS_CONSTRUCTION.md)
@@ -258,8 +273,9 @@ Safetensors/ONNX package round-trips and standard executable exports are distinc
 
 ## Mathematical research position
 
-[definition] The [moving-frame strategy](docs/plans/THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md)
-remains the mathematical order. MFR0–MFR2 are complete at their recorded scopes. MFR3 follows
+[definition] The Reality of Difference programme above supplies the shared framework order.
+The [moving-frame strategy](docs/plans/THE_MOVING_FRAME_RETURNS_THE_NULL_FIBRE_AND_THE_PHYSICAL_CONTINUATION.md)
+remains its detailed fluid source/remainder application line. MFR0–MFR2 are complete at their recorded scopes. MFR3 follows
 Brandon's complex Euler/Navier–Stokes temporal-source direction; direct RH research in MFR5
 remains deferred. The September 8 complex-chart construction now connects the existing MVT/squeeze and folded-source owners to that direction.
 

@@ -20,6 +20,41 @@ The [Lean guide](../formal/elementary-holonics/README.md) gives focused imports 
 The [mathematics/native synthesis](MATHEMATICS_AND_NATIVE_CONDUCT.md) connects these laws to
 current executable owners.
 
+## Construction programme and first formal use
+
+[project-postulate] [The Reality of Difference in construction](plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)
+now carries the philosophical account into one ordered programme: compatible potential and
+joint receivers; Swing/tube/scale transport; constitutive continuation; mathematical source
+applications; quantum/geometric comparison; and framed-loop, holographic and physical response.
+The sole roadmap orders those steps and useful applications accompany each returned construction.
+
+[proved-derived; formal-checked] The [opening return](../research/records/2026-09-08_COMPATIBLE_POTENTIAL_SWINGS_THROUGH_JOINT_RECEIVERS_AND_THE_PROGRAMME_BEGINS.md)
+uses the existing preimage fibre to form its complete future image. Additional observations
+refine it; an exact rebase carries it through every ordered history; explicit receiver factors
+can determine one future face while source causes stay plural. Whole-family tolerance transports
+through a declared Lipschitz receiver, and shrinking bounds force compatible readouts to converge.
+
+[proved-derived; formal-checked] The joint additive construction uses
+`N=intersection_i ker(read_i)` and `Q=X/N`. Preservation of N is exactly the receiver-transformer
+criterion for an additive generator. All declared readers and admitted generator words factor
+through Q. The existing affine Swing additionally satisfies `q(S_b x)=S_(q b)(q x)`, including
+its anchor; its isometry transports the receiver tolerance without a source selection.
+
+[proved-derived; formal-checked] The mechanical conformation update now supplies an exact future
+squared extension for every compatible source, while the source fibre at extension one retains
+both orientations. This is a concrete use of the potential construction and does not impose a
+perfect inverse or unique cause.
+
+[counterexample; formal-checked] The recorded `011,101,110` ensemble has every marginal 2/3
+but excludes `111`; even/odd parity supports can also have identical marginals. Its actual joint
+range is the same future-image construction above. This constrains a claimed joint receiver;
+it supplies no support-only generation rule or complete diagnosis of Athena's language failure.
+
+[definition] An actually observed face and an admissible target have different source obligations.
+The potential owner takes an actual-range observation; Hodge source lifting must keep a possibly
+empty target fibre until its source is constructed. The programme keeps that boundary explicit
+as it composes realization, continuation and navigation.
+
 ## Begin with a situated interaction
 
 [definition] An elementary holon presents an occurrence population and three maps:

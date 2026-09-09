@@ -20,6 +20,32 @@ contracts and records preserve their completed scope; their old imperatives sche
    reread every completed campaign, rerun unchanged expensive receipts, or reconstruct historical
    capability just to start the next authorized repair.
 
+## The Reality of Difference: comprehensive construction
+
+[project-postulate] Brandon now authorizes formalizing, using and cementing these notions through
+one continuing programme. [The detailed construction contract](THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)
+connects the existing sources and defines the artifacts and applications of each step. This
+roadmap remains the sole ordering authority; the active AC work continues independently.
+
+| Order | Shared construction | Return and use |
+|---|---|---|
+| 1 | Compatible potential, joint receivers and useful tolerance | Retained future families, exact quotient/transport and concrete mechanical/packet instances |
+| 2 | Swing through tube resegmentation and scale | The same future family through actual joined clocked spans and boundary refinement |
+| 3 | Constitutive continuation and dynamic compression | A continuing reduced realization with complete feedback, decoder and interval comparison |
+| 4 | Mathematical source and continuation applications | Hodge/NS/arithmetic/topological/complexity methods through their actual source objects |
+| 5 | Quantum and relativistic geometric comparison | Actual quantum receivers and controlled discrete/continuous transport |
+| 6 | Framed loops, strings, holography and mass | Concrete invariant, boundary reconstruction and physical/spectral response comparisons |
+| Throughout | Utilization | Carry each returned method into the corresponding authorized HNN, physical or mathematical construction |
+
+[proved-derived; formal-checked] [Step 1 and the affine Swing opening](../../research/records/2026-09-08_COMPATIBLE_POTENTIAL_SWINGS_THROUGH_JOINT_RECEIVERS_AND_THE_PROGRAMME_BEGINS.md)
+now return compatible future images, refinement/rebase, useful tolerance/convergence, canonical
+joint quotient descent, and mechanical/packet instances. **Next: step 2's complete tube
+resegmentation/scale passage**—retain the compatible family and future receiver through the
+actual joined clocked occurrence, then bind its boundary-scale transport.
+The MFR work below remains the fluid application's detailed source/remainder line, and direct
+RH endpoint work retains its stated deferral. A later research step is not an added prerequisite
+for using an earlier result in the current AC construction.
+
 ## Philosophical recovery and articulation
 
 [project-postulate] Brandon's latest September 8 request directs deeper recovery of the
@@ -298,6 +324,11 @@ operator and Soulkiller returns retain their bounded grades. The comparison with
 is about learning organization, not token volume as an alleged sole or primary industry lever.
 
 ## Mathematical research strategy: moving frames and continuation
+
+[definition] This is the fluid application line within the comprehensive framework order above.
+Its actual source, pressure, clock, reconstruction and remainder obligations remain standing;
+the shared programme composes them rather than founding a competing fluid mechanism.
+
 
 [project-postulate] The September 8 framework synthesis at the top of this roadmap governs the
 current breadth; NS/Euler is one source of reusable mathematics within it. The MFR source and residual obligations below remain standing; the new external

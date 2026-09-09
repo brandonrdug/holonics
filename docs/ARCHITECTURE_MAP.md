@@ -60,6 +60,16 @@ moving receiver with stress/strain pullback. These are formal owners; they add n
 Their statements and limits are in the
 [continuation](../research/records/2026-09-08_CHANGING_CONSTITUTION_AND_RECEIVERS_SHARE_ONE_DEFECT_CALCULUS.md).
 
+[definition] The [construction programme](plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)
+now uses `Transport/ReceiverPotential.lean` for complete compatible future images, refinement,
+rebase and useful tolerance/convergence; `Foundation/JointReceiverDescent.lean` constructs the
+canonical additive joint quotient and its exact generator criterion; `Geometry/SwingPotential.lean`
+transports those families and quotient words through the existing affine Swing.
+`Physics/MechanicalReceiver.lean` supplies the plural-source/exact-future use, and
+`Computation/JointReceiverWitness.lean` formalizes the recorded bit-marginal counterexample.
+These are formal owners, not a new native decoder or a claimed implementation of the whole
+programme. Paths are under `formal/elementary-holonics/ElementaryHolonics/`.
+
 ## Foundation and transport
 
 [definition] **Preimage Fibre** is the governing term for compatible-source families. Some older

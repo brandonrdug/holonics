@@ -5,6 +5,7 @@ import ElementaryHolonics.Foundation.BoundaryScalePassage
 import ElementaryHolonics.Foundation.HigherDifferenceTransport
 import ElementaryHolonics.Geometry.CrossRatio
 import ElementaryHolonics.Geometry.Gyrogroup
+import ElementaryHolonics.Geometry.SwingPotential
 import ElementaryHolonics.Millennium.HolonicComposition
 import ElementaryHolonics.Millennium.HolonicConnectionCurvature
 import ElementaryHolonics.Millennium.Rigidity

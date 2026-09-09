@@ -1,0 +1,114 @@
+Reality of Difference programme: opening formal return
+Date: September 8, 2026 local time. Inspection base: 49f28478.
+Final source retained by the accompanying Git commit.
+Pinned Lean/Mathlib/Cslib v4.33.0; manifests/toolchains unchanged.
+
+Primary checks and observed exits:
+- lake build ElementaryHolonics.Transport.ReceiverPotential
+  cwd formal/elementary-holonics; exit 0; 3008 jobs (initial owner).
+- lake build ElementaryHolonics.Geometry.SwingPotential
+  cwd formal/elementary-holonics; exit 0; 3011 jobs (initial rebase/tolerance join).
+- lake build ElementaryHolonics.Geometry.SwingPotential ElementaryHolonics.Physics.MechanicalReceiver ElementaryHolonics.Computation.JointReceiverWitness
+  cwd formal/elementary-holonics; exit 0; 3146 jobs.
+- bash tools/lean_check.sh ElementaryHolonics
+  cwd repository root; exit 0; 9964 jobs (complete research umbrella).
+- bash tools/lean_check.sh
+  cwd repository root; exit 0; 3992 jobs (final framework, including subsequently added convergence theorem).
+- git diff --check
+  exit 0.
+
+These are Lake build-job counts, not counts of new or independent theorems.
+No sorryAx or sorry declaration warning occurs in the successful complete/final logs.
+No native code or model changed in this return; no native or unchanged-paper run was performed.
+Full raw logs retained locally in .local/scratch/reality-programme-*.log.
+
+New/extended owner axiom output from final framework check (verbatim):
+info: ElementaryHolonics/Foundation/JointReceiverDescent.lean:187:0: 'Soma.Holonics.Foundation.JointReceiverDescent.joint_generator_descends_iff' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Foundation/JointReceiverDescent.lean:188:0: 'Soma.Holonics.Foundation.JointReceiverDescent.JointReceiverHistory.factor_quotient' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Foundation/JointReceiverDescent.lean:189:0: 'Soma.Holonics.Foundation.JointReceiverDescent.JointReceiverHistory.quotient_eq_iff_joint_readings_eq' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Foundation/JointReceiverDescent.lean:190:0: 'Soma.Holonics.Foundation.JointReceiverDescent.JointReceiverHistory.quotientTransport_quotient' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Foundation/JointReceiverDescent.lean:191:0: 'Soma.Holonics.Foundation.JointReceiverDescent.JointReceiverHistory.quotient_eq_forces_every_successor_face' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Foundation/JointReceiverDescent.lean:192:0: 'Soma.Holonics.Foundation.JointReceiverDescent.JointReceiverHistory.separating_successor_reopens_quotient' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Transport/ReceiverPotential.lean:224:0: 'Soma.Holonics.Transport.ReceiverPotential.mem_outcomes_iff' does not depend on any axioms
+info: ElementaryHolonics/Transport/ReceiverPotential.lean:225:0: 'Soma.Holonics.Transport.ReceiverPotential.outcomes_nonempty' does not depend on any axioms
+info: ElementaryHolonics/Transport/ReceiverPotential.lean:226:0: 'Soma.Holonics.Transport.ReceiverPotential.outcomes_map' depends on axioms: [propext, Quot.sound]
+info: ElementaryHolonics/Transport/ReceiverPotential.lean:227:0: 'Soma.Holonics.Transport.ReceiverPotential.outcomes_singleton_of_factor' depends on axioms: [propext, Quot.sound]
+info: ElementaryHolonics/Transport/ReceiverPotential.lean:228:0: 'Soma.Holonics.Transport.ReceiverPotential.additional_observation_refines' does not depend on any axioms
+info: ElementaryHolonics/Transport/ReceiverPotential.lean:229:0: 'Soma.Holonics.Transport.ReceiverPotential.outcomes_rebase' depends on axioms: [propext, Quot.sound]
+info: ElementaryHolonics/Transport/ReceiverPotential.lean:230:0: 'Soma.Holonics.Transport.ReceiverPotential.bounded_outcomes_transport' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Transport/ReceiverPotential.lean:231:0: 'Soma.Holonics.Transport.ReceiverPotential.bounded_outcomes_suffice' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Transport/ReceiverPotential.lean:232:0: 'Soma.Holonics.Transport.ReceiverPotential.compatible_outcomes_pairwise_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Transport/ReceiverPotential.lean:233:0: 'Soma.Holonics.Transport.ReceiverPotential.future_observations_converge' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Transport/ReceiverPotential.lean:234:0: 'Soma.Holonics.Transport.ReceiverPotential.historyOutcomes_rebase' depends on axioms: [propext, Quot.sound]
+info: ElementaryHolonics/Geometry/SwingPotential.lean:101:0: 'Soma.Holonics.Geometry.SwingPotential.swing_preserves_history_potential' depends on axioms: [propext, Quot.sound]
+info: ElementaryHolonics/Geometry/SwingPotential.lean:102:0: 'Soma.Holonics.Geometry.SwingPotential.swing_preserves_distance' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Geometry/SwingPotential.lean:103:0: 'Soma.Holonics.Geometry.SwingPotential.swing_transports_tolerance' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Geometry/SwingPotential.lean:104:0: 'Soma.Holonics.Geometry.SwingPotential.joint_quotient_swing' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ElementaryHolonics/Geometry/SwingPotential.lean:105:0: 'Soma.Holonics.Geometry.SwingPotential.swing_word_joint_receiver_exact' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/MechanicalReceiver.lean:122:0: 'Soma.Holonics.Physics.MechanicalReceiver.conformation_stiffness_joins_coupled_response' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/MechanicalReceiver.lean:123:0: 'Soma.Holonics.Physics.MechanicalReceiver.scaled_update_exact' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/MechanicalReceiver.lean:124:0: 'Soma.Holonics.Physics.MechanicalReceiver.updateHolon_defect_zero' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/MechanicalReceiver.lean:125:0: 'Soma.Holonics.Physics.MechanicalReceiver.changing_mechanical_history_exact' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/MechanicalReceiver.lean:126:0: 'Soma.Holonics.Physics.MechanicalReceiver.oriented_response_reopens_extension' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/MechanicalReceiver.lean:127:0: 'Soma.Holonics.Physics.MechanicalReceiver.exact_coarse_step_can_increase_energy' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/MechanicalReceiver.lean:128:0: 'Soma.Holonics.Physics.MechanicalReceiver.mechanical_future_potential_singleton' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/MechanicalReceiver.lean:129:0: 'Soma.Holonics.Physics.MechanicalReceiver.unit_extension_fibre_is_plural' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Computation/JointReceiverWitness.lean:159:0: 'Soma.Holonics.Computation.JointReceiverWitness.marginal_eq_two_thirds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Computation/JointReceiverWitness.lean:160:0: 'Soma.Holonics.Computation.JointReceiverWitness.strictMarginalMajority_is_absent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Computation/JointReceiverWitness.lean:161:0: 'Soma.Holonics.Computation.JointReceiverWitness.jointFace_is_potential' depends on axioms: [propext, Quot.sound]
+info: ElementaryHolonics/Computation/JointReceiverWitness.lean:162:0: 'Soma.Holonics.Computation.JointReceiverWitness.componentwiseTrue_not_mem_jointFace' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Computation/JointReceiverWitness.lean:163:0: 'Soma.Holonics.Computation.JointReceiverWitness.parity_marginals_agree' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Computation/JointReceiverWitness.lean:164:0: 'Soma.Holonics.Computation.JointReceiverWitness.parity_jointFaces_differ' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Computation/JointReceiverWitness.lean:165:0: 'Soma.Holonics.Computation.JointReceiverWitness.source_mem_jointFace' depends on axioms: [propext]

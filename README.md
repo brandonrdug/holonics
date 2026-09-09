@@ -100,6 +100,7 @@ inference pipelines.
 ## Read and explore
 
 - [The reality of difference](docs/canon/THE_REALITY_OF_DIFFERENCE.md) — ontology, philosophy, relevance and constructive reasoning
+- [The construction programme](docs/plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md) — formalization and use across mathematical and physical realizations
 - [Holonics in Lean](docs/FORMAL_FRAMEWORK.md) — situated objects, molecular conformation, tubes, physics and computation
 - [The mathematics tablet](docs/canon/THE_MATHEMATICS_TABLET.md) — foundations and subject tablets
 - [Mathematics and native conduct](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) — synthesis across research and implementation

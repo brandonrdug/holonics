@@ -1,5 +1,6 @@
 import ElementaryHolonics.Physics.ConformationResponse
 import ElementaryHolonics.Physics.ConstitutiveModulation
+import ElementaryHolonics.Transport.ReceiverPotential
 
 /-!
 # Changing-grain receivers of the constitutive conformation passage
@@ -96,6 +97,24 @@ theorem exact_coarse_step_can_increase_energy :
       energy 1 1 1 = 2 ∧ energy 1 1 (fineUpdate 1 1 1 1) = 50 := by
   norm_num [qmap, fineUpdate, coarseUpdate, response, energy, conformation]
 
+/-- The complete squared-extension future is determined for every compatible source in the
+existing conformation fibre, including both orientations. This uses the shared potential owner. -/
+theorem mechanical_future_potential_singleton (h k a : ℝ) (observed : Set.range qmap) :
+    Transport.ReceiverPotential.outcomes qmap observed (qmap ∘ fineUpdate h k a) =
+      {coarseUpdate h k a observed.1} := by
+  apply Transport.ReceiverPotential.outcomes_singleton_of_factor
+  intro source
+  exact fineUpdate_descends h k a source
+
+/-- The exact future above coexists with distinct compatible source occurrences. -/
+theorem unit_extension_fibre_is_plural :
+    ∃ left right : receiverPreimageFibre qmap (⟨1, ⟨1, by norm_num [qmap]⟩⟩ : Set.range qmap),
+      left ≠ right := by
+  refine ⟨⟨1, by norm_num [qmap]⟩, ⟨-1, by norm_num [qmap]⟩, ?_⟩
+  intro h
+  have := congrArg Subtype.val h
+  norm_num at this
+
 end Soma.Holonics.Physics.MechanicalReceiver
 
 section Audit
@@ -106,4 +125,6 @@ open Soma.Holonics.Physics.MechanicalReceiver
 #print axioms changing_mechanical_history_exact
 #print axioms oriented_response_reopens_extension
 #print axioms exact_coarse_step_can_increase_energy
+#print axioms mechanical_future_potential_singleton
+#print axioms unit_extension_fibre_is_plural
 end Audit

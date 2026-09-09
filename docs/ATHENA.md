@@ -64,6 +64,13 @@ finite constitutive response. Its mechanical control separates exact quotient de
 energy decrease. A finite numerical law and an unrounded reference law retain separate
 successors and comparison defects; this return mandates no new numerical realization for AC1.
 
+[proved-derived; formal-checked] The [programme's opening return](../research/records/2026-09-08_COMPATIBLE_POTENTIAL_SWINGS_THROUGH_JOINT_RECEIVERS_AND_THE_PROGRAMME_BEGINS.md)
+now formalizes the recorded strict-bit-marginal/joint-packet counterexample and connects the
+full joint image to compatible future potential. It also returns exact joint quotient/Swing
+transport and tolerance-based consequences with plural sources. These laws inform the existing
+AC1/AC2 receiver and reuse work; they do not install a support-only emitter, an extra certainty
+gate, or a new runtime model.
+
 ## Native-first construction
 
 [established-bounded; measured] NCF1 has returned the ground-up

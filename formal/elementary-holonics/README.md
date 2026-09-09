@@ -52,6 +52,11 @@ adds `Transport/ChangingReceiver`, with mechanical and actual nonlinear-fluid in
 `Physics/MechanicalReceiver` and `Physics/FluidReceiverClosure`. They connect changing
 constitutive geometry, receiver scales and retained feedback through one difference calculus.
 
+[definition] The [comprehensive programme](../../docs/plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)
+now uses `Transport/ReceiverPotential`, `Foundation/JointReceiverDescent` and
+`Geometry/SwingPotential` through the framework subjects. The first use connects exact future
+faces with plural mechanical sources and the formal `Computation/JointReceiverWitness`.
+
 ## Applications and proof scope
 
 [definition] `ElementaryHolonics.lean` is the complete research import face, including `Framework`

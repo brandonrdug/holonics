@@ -43,6 +43,13 @@ status is not its purpose. Develop an intuition into explicit maps and consequen
 failures to locate the mistaken construction or refine the claim. Keep the ambition strong and
 the evidence exact, without repeatedly seeking permission to use established mathematics.
 
+[project-postulate] The [Reality of Difference construction programme](docs/plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)
+now connects the existing Swing, potential/fibre, tube/scale, constitutive, mathematical,
+quantum/geometric and physical-realization work. Its order belongs to the live roadmap.
+Formalize and use the shared relations; retain joint future families and receiver-relative
+tolerance without adding a universal certainty gate to generation. Carry useful returns into
+the corresponding authorized implementation while the wider research continues.
+
 [definition] [The reality of difference](docs/canon/THE_REALITY_OF_DIFFERENCE.md) is the concise
 philosophical reading surface. Its source record recovers Brandon's intuitive reasoning from
 `~/Workspaces/laboratory` and the direct logs. Those records inform interpretation; current
