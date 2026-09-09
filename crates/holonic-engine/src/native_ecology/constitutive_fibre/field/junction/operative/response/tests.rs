@@ -314,3 +314,22 @@ fn dyadic_contact_deposit_retains_its_defect_and_continues(){
     assert_eq!(after.contacts_radius,before.contacts_radius);
     assert_eq!(after.internal.radius,before.internal.radius);
 }
+
+#[test]
+#[ignore="requires CUDA; retained producing carriers equal exact historical reconstruction"]
+fn producing_carrier_reuse_preserves_the_complete_return(){
+    let readout=ResidentReadout::new().unwrap();let surface=ResidentSurface::on(&readout).unwrap();
+    let mut field=make(&surface);let _latest=populate(&mut field);
+    let before=field.rest(&[],&[]).unwrap();
+    let cached=returned(&field);
+    let source=cached.query.source.occurrence;
+    let existing=field.junction.as_ref().unwrap().operative.as_ref().unwrap().recent_producers.iter()
+        .find(|(at,_,_)|*at==source).unwrap().2.clone();
+    assert!(Rc::ptr_eq(&cached._producing,&existing));
+    let expected=serde_json::to_value(cached.inspect().unwrap()).unwrap();
+    field.junction.as_mut().unwrap().operative.as_mut().unwrap().recent_producers.clear();
+    let reconstructed=returned(&field);
+    assert!(!Rc::ptr_eq(&reconstructed._producing,&existing));
+    assert_eq!(serde_json::to_value(reconstructed.inspect().unwrap()).unwrap(),expected);
+    assert_eq!(field.rest(&[],&[]).unwrap(),before);
+}

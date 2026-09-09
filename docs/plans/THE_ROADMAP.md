@@ -147,11 +147,11 @@ state and ordinary self-emission. Native, SDK and driver checks pass. The actual
 unusable, including a seen-request continuation; the first eight families provide only one human
 request's small exposure.
 
-[definition] Next compose the existing finite current-to-material operator with the operative
-current and independent joint target, returning through its actual producing operator and
-current. Its bounded parameter representation addresses repeated historical-factor work. Compare
-this declared model family and its costs before broadening cultivation; it is not an asserted
-quotient of the existing projector kernel. Retain full interior, phase, source lineage and defects.
+[established-bounded; measured] The [producer/source-contact comparison](../../research/records/2026-09-09_AC1_AC2_PRODUCER_REUSE_AND_THE_SELF_CONTACT_COMPARISON.md)
+returns the sixteen-family failure, exact producer reuse and measured journal storage. The next
+AC1–AC2 operation preserves the source edge while distinguishing known native transport application
+from a new observation to fit. Source withdrawal remains a diagnostic intervention. Do not
+substitute it, an output filter or a separate world-verdict law for that construction.
 
 [definition] Proceed with AC1 steps 3–4: local path formation, restriction/rebase and generator
 reuse. Derive the actively used coordinates and their continuing source/decoder through the
@@ -190,7 +190,7 @@ complete population bounds, not an arbitrary radius, discarded current or basin-
 
 [project-postulate] Brandon has resumed completion of AC0–AC5 as the active goal and explicitly
 directs flexible designs and transparent reporting when a composition does not work.
-**Current work: AC1 finite material-operator composition and reuse; AC2 useful continuation remains open after the duplex return.** Each work update names phase/step, actual artifact and returned
+**Current work: AC1–AC2 retained-transport application versus new observation; journal representation and useful generation remain open.** Each work update names phase/step, actual artifact and returned
 consequence. Do not resume the preserved joint kernel by default or restart completed foundations.
 
 | Phase | Ordered construction | Return required |

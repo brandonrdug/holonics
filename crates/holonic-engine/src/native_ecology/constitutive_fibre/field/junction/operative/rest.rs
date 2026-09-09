@@ -297,6 +297,7 @@ impl<'c> OperativeState<'c> {
             })
             .collect::<Result<Vec<_>, Error>>()?;
         Ok(Self {
+            recent_producers:Default::default(),
             sections: sections(rest.current)?,
             initial: sections(rest.initial)?,
             activated_at: wire.activated_at,

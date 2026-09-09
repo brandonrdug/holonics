@@ -60,6 +60,9 @@ pub struct NativeOperativeContactStaging<'f, 'c> {
 }
 
 pub(in super::super) struct OperativeState<'c> {
+    // Immutable producing carriers at the two most recent emission cuts. This is a
+    // performance cache, not a context window: older producers retain their decoder.
+    recent_producers:std::collections::VecDeque<(usize,usize,Rc<OperativeSections<'c>>)>,
     pub(in super::super) sections: Rc<OperativeSections<'c>>,
     pub(in super::super) initial: Rc<OperativeSections<'c>>,
     pub(in super::super) activated_at: usize,
@@ -82,6 +85,26 @@ pub(in super::super) struct HeldOperative<'c> {
     pub(in super::super) trace: Rc<ResidentSection<'c>>,
     pub(in super::super) count: usize,
 }
+/// Storage retained by the operative return journal, separate from historical field reports.
+/// These carriers are distinct per committed return; temporary handles share the same buffers.
+#[derive(Debug,Serialize)]
+pub struct NativeOperativeReturnStorage {
+    pub returns:usize,
+    pub port_octets:u64,
+    pub current_factor_octets:u64,
+    pub internal_delta_octets:u64,
+    pub bound_octets:u64,
+    pub total_octets:u64,
+}
+impl NativeConstitutiveField<'_>{
+    pub fn operative_return_storage(&self)->Option<NativeOperativeReturnStorage>{
+        let op=self.junction.as_ref()?.operative.as_ref()?;
+        let mut out=NativeOperativeReturnStorage{returns:op.returns.len(),port_octets:0,current_factor_octets:0,internal_delta_octets:0,bound_octets:0,total_octets:0};
+        for r in &op.returns {out.port_octets+=r.ports.resident_octets();out.current_factor_octets+=r.currents.resident_octets();out.internal_delta_octets+=r.b.resident_octets();out.bound_octets+=r.bounds.resident_octets();}
+        out.total_octets=out.port_octets+out.current_factor_octets+out.internal_delta_octets+out.bound_octets;Some(out)
+    }
+}
+
 impl<'c> OperativeState<'c> {
     pub(in super::super) fn is_fixed(&self) -> bool {
         self.returns.is_empty()
@@ -155,6 +178,8 @@ impl<'c> OperativeState<'c> {
                 receiving: at,
             });
         }
+        self.recent_producers.push_back((at,next.count,Rc::clone(&next.sections)));
+        while self.recent_producers.len()>2 {self.recent_producers.pop_front();}
         self.sections = next.sections;
         self.origin = next.origin;
     }
@@ -392,6 +417,7 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
     pub(in super::super) fn into_owned(self) -> OperativeState<'c> {
         let activated_at = self.field_cut();
         OperativeState {
+            recent_producers:Default::default(),
             initial: Rc::clone(&self.sections),
             sections: self.sections,
             activated_at,

@@ -204,6 +204,13 @@ with explicit source readings and per-return frame persistence. `joint_material_
 retains native and actual-data checks; the endogenous joint producer remains open.
 
 
+[established-bounded; source-inspected] `junction/operative.rs` retains recent immutable
+producing carriers and exposes return-journal storage. `operative/response.rs` reuses the matching
+producer or reconstructs an older cut. The text session also exposes a declared source-contact
+withdrawal comparison through the existing unlinked-occurrence path; it remains off by default.
+The [producer/source-contact return](../research/records/2026-09-09_AC1_AC2_PRODUCER_REUSE_AND_THE_SELF_CONTACT_COMPARISON.md)
+retains exact checks, costs and the unfinished known-transport/observation distinction.
+
 [established-bounded; source-inspected] `OperativeLinear` reuses the finite current-to-material
 operator through `field_linear_material.cuh`, with an independent joint target and row-parallel
 preparation. `field_linear_material_pullback.cuh` and `receiver/normalized/pullback/linear.rs`

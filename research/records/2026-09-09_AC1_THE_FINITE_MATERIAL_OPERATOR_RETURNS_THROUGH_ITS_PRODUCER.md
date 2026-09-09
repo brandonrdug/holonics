@@ -83,9 +83,7 @@ equal. Development changes from 16.50 to 7.76 seconds in that bounded comparison
 from the eight-family checkpoint also matches body, emission currents, generation and text.
 These measurements do not establish a universal speed bound.
 
-[open] The same model is continuing into the next eight chronological developmental families,
-with archive placement, under process session 20723 in the active construction thread. Logs live
-at `/tmp/athena-linear-sixteen.log`; artifacts use `first-sixteen-linear-v8` in the existing private
-contact-response directory. No sixteen-family result has returned yet. The repeated recovery of
-recent producing maps/moments is also being replaced by shared immutable producing carriers;
-that separate cache change is compiled but its GPU comparison is pending. AC1–AC5 remain open.
+[established-bounded; measured] The [subsequent comparison](2026-09-09_AC1_AC2_PRODUCER_REUSE_AND_THE_SELF_CONTACT_COMPARISON.md)
+returns sixteen-family costs, invalid-byte generation, exact recent-producer reuse and the
+source-contact intervention. It identifies the return journal as the dominant remaining native
+storage. Useful generation and the complete AC0–AC5 obligations remain unfinished.

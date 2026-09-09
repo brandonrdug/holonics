@@ -265,3 +265,25 @@ fn duplex_intake_and_emission_keep_their_boundary_current_across_restart(){
         Ok(())
     }).unwrap();
 }
+
+#[test]
+#[ignore="requires CUDA; explicit source withdrawal keeps learned operators while current continues"]
+fn source_withdrawal_is_an_incidence_intervention_not_a_state_reset(){
+    use crate::alpha::text_codec::{with_text_field_chart,TextDirection};
+    use holonic_engine::native_ecology::constitutive_fibre::NativeMaterialTarget;
+    with_text_field_chart(72,NativeMaterialTransportSource::OperativeLinear,NativeMaterialTarget::TensorProduct{factor_width:2},|field|{
+        let mut s=TextFieldSession::on(field)?;s.enable_duplex()?;
+        s.receive_on(TextSymbol::Octet(b'A'),TextDirection::Outgoing)?;s.receive_on(TextSymbol::Octet(b'B'),TextDirection::Outgoing)?;
+        let matrix=s.field().inspect_material_transport_state()?.unwrap();
+        let before=s.stage_operative_contacts()?.inspect()?;
+        let generated=s.generate_with_source_contact(4,TextCurrentReceiver::Material,false);
+        assert!(generated.native_until>generated.native_from,"the intervention must actually advance current: {:?}",generated.disposition);
+        assert_eq!(s.field().inspect_material_transport_state()?.unwrap(),matrix);
+        let after=s.stage_operative_contacts()?.inspect()?;
+        assert_eq!(after.contacts,before.contacts);assert_eq!(after.births,before.births);
+        for at in generated.native_from..generated.native_until{
+            let lineage=s.field().lineage(at).unwrap();assert_eq!(lineage.received_from,None);assert_eq!(lineage.predecessor_state,Some(at-1));
+        }
+        Ok(())
+    }).unwrap();
+}

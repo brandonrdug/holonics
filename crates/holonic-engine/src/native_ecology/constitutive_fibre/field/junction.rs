@@ -9,7 +9,7 @@ use super::*;
 mod enclosure;
 mod producer;
 pub(super) mod operative;
-pub use operative::{NativeOperativeReflectionReading,NativeOperativeContactBirth, NativeOperativeContactReading, NativeOperativeContactStaging,
+pub use operative::{NativeOperativeReturnStorage,NativeOperativeReflectionReading,NativeOperativeContactBirth, NativeOperativeContactReading, NativeOperativeContactStaging,
     NativeMaterialContactResponse, NativeMaterialContactResponseReading, NativeContactRealization, NativeContactDepositReading};
 pub use producer::{PairedContactCotangent, PairedJunctionCotangent, PairedJunctionLinearization, PairedJunctionTangent,JointMaterialContactResponse,joint_material_contact};
 #[cfg(test)]

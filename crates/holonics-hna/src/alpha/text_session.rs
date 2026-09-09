@@ -322,6 +322,11 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
         work_limit: usize,
         receiver: TextCurrentReceiver,
     ) -> TextGeneration {
+        self.generate_with_source_contact(work_limit,receiver,true)
+    }
+    /// Declared source-incidence intervention for comparison. Withdrawing the self contact
+    /// still advances the same field through an unlinked occurrence; it is not a model default.
+    pub fn generate_with_source_contact(&mut self,work_limit:usize,receiver:TextCurrentReceiver,source_contact:bool)->TextGeneration{
         let mut result = TextGeneration {
             native_from: self.field.occurrence_count(),
             native_until: self.field.occurrence_count(),
@@ -386,6 +391,9 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
             // phase instead of replacing it with the decoded codeword's unit impulses.
             // A plural fibre may still have a fixed exterior word. That case remains an explicit
             // word observation, not selection of a point from the unprovided native current.
+            if !source_contact {
+                if let Err(error)=self.begin_part(None){result.disposition=TextGenerationDisposition::NativeRefusal(error.to_string());break;}
+            }
             let received = if let Some(returned) = native_return {
                 self.stage_presented_native_return(returned, symbol)
                     .and_then(|_| self.retry_pending())

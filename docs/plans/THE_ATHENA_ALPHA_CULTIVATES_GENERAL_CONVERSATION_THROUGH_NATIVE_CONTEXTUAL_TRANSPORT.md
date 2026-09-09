@@ -389,7 +389,7 @@ relation. Basin/stability probes answer a specific failure, never govern learnin
 authored entropy threshold. Use existing tube/span owners at their domains; no new tube engine
 or large fractal sampling campaign is scheduled.
 
-[definition] **Current entry point: AC1 finite material-operator composition and reuse; AC2 useful continuation remains open after the duplex return.**
+[definition] **Current entry point: AC1–AC2 retained-transport application versus new observation; journal representation and useful generation remain open.**
 The [normalized receiver](../../research/records/2026-09-08_AC1_THE_NORMALIZED_RECEIVER_RETURNS_ITS_COMPLETE_CURRENT_AND_TWO_METRIC_FACES.md)
 has returned resident source-qualified faces and metric covectors with actual-model evidence.
 Its full r is also the relative-entropy potential return; `J_p*r` belongs to squared probability
@@ -439,10 +439,11 @@ now preserves that direction in native I/Q currents, reply receivers and pending
 The native and application checks pass, but both the fixed prompt and seen-request response
 remain unusable.
 
-[definition] Next extend the existing finite current-to-material owner to the operative source
-and independent joint target, with its actual producing operator/current adjoint. Compare the
-resulting model family and measured costs before broadening cultivation. This does not identify
-it with the old projector-kernel learner or waive the continuing path/generator obligations.
+[established-bounded; measured] The [producer/source-contact comparison](../../research/records/2026-09-09_AC1_AC2_PRODUCER_REUSE_AND_THE_SELF_CONTACT_COMPARISON.md)
+returns the sixteen-family failure, exact producer reuse and measured journal storage. The next
+AC1–AC2 operation preserves the source edge while distinguishing known native transport application
+from a new observation to fit. Source withdrawal remains a diagnostic intervention. Do not
+substitute it, an output filter or a separate world-verdict law for that construction.
 
 [definition] Proceed through AC1 steps 3–4: local path formation, restriction/rebase and
 generator reuse. Derive the actively used coordinates and their continuing source/decoder,

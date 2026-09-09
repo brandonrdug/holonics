@@ -202,34 +202,18 @@ impl<'c> NativeConstitutiveField<'c> {
         if count != k || k > op.births.len() || query.grain != op.grain {
             return Err(Error::Shape);
         }
-        let later = op
-            .returns
-            .iter()
-            .filter(|r| r.at_cut >= source + 1)
-            .collect::<Vec<_>>();
-        let mut pointers = Vec::with_capacity(3 * later.len().max(1));
-        for r in &later {
-            for v in [
-                r.ports.lo_device_ptr(),
-                r.currents.lo_device_ptr(),
-                r.contact_count as u64,
-            ] {
-                pointers.push((v as i64, v as i64));
-            }
-        }
-        if pointers.is_empty() {
-            pointers.resize(3, (0, 0));
-        }
-        let journal = surface.mount_section_rest(
-            &ResidentSectionRest::found(later.len().max(1), 3, ResidentGrain(0), 64, pointers)
-                .map_err(invalid)?,
-        )?;
-        let mut producing = sections(surface, d, k)?;
-        let p = Rc::get_mut(&mut producing).unwrap();
-        p.b = b;
-        p.bounds = bounds;
-        let moment_rounds =
-            surface.fresh_section(1, 2 * ((d / 2) * (d / 2) + d / 2), ResidentGrain(0))?;
+        let cached=op.recent_producers.iter().find(|(at,count,_)|*at==source && *count==k).map(|(_,_,s)|Rc::clone(s));
+        let mut recovery=None;
+        let producing=if let Some(cached)=cached {cached} else {
+            let later=op.returns.iter().filter(|r|r.at_cut>=source+1).collect::<Vec<_>>();
+            let mut pointers=Vec::with_capacity(3*later.len().max(1));
+            for r in &later {for v in [r.ports.lo_device_ptr(),r.currents.lo_device_ptr(),r.contact_count as u64]{pointers.push((v as i64,v as i64));}}
+            if pointers.is_empty(){pointers.resize(3,(0,0));}
+            let journal=surface.mount_section_rest(&ResidentSectionRest::found(later.len().max(1),3,ResidentGrain(0),64,pointers).map_err(invalid)?)?;
+            let mut producing=sections(surface,d,k)?;let p=Rc::get_mut(&mut producing).unwrap();p.b=b;p.bounds=bounds;
+            let moment_rounds=surface.fresh_section(1,2*((d/2)*(d/2)+d/2),ResidentGrain(0))?;
+            recovery=Some((journal,moment_rounds,later.len()));producing
+        };
         let ports = Rc::new(surface.fresh_section(2, 2 * d, ResidentGrain(0))?);
         let currents = Rc::new(surface.fresh_section(2, 4 * k.max(1), ResidentGrain(0))?);
         let delta_b = Rc::new(surface.fresh_section(k.max(1), 4, ResidentGrain(0))?);
@@ -238,36 +222,17 @@ impl<'c> NativeConstitutiveField<'c> {
         let workspace =
             surface.fresh_section(1, 2 * (d * d + 3 * d + 4 * k + 2), ResidentGrain(0))?;
         let dots = surface.fresh_section(k.max(1), 10, ResidentGrain(0))?;
-        let mut passage = surface.begin_passage(&[vec![], vec![0], vec![1]])?;
-        {
-            let lane = passage.open(0, &[])?;
-            surface.record_operative_producing_map(
-                &lane,
-                &op.sections.map,
-                &journal,
-                later.len(),
-                d,
-                k,
-                query.grain,
-                &producing.map,
-            )?;
+        let lanes=if recovery.is_some(){vec![vec![],vec![0],vec![1]]}else{vec![vec![]]};
+        let final_lane=lanes.len()-1;let predecessors=lanes[final_lane].clone();
+        let mut passage=surface.begin_passage(&lanes)?;
+        if let Some((journal,moment_rounds,later))=&recovery {
+            {let lane=passage.open(0,&[])?;surface.record_operative_producing_map(&lane,&op.sections.map,journal,*later,d,k,query.grain,&producing.map)?;}
+            passage.close(0,&producing.map,64)?;
+            {let lane=passage.open(1,&[0])?;surface.record_operative_moments(&lane,d,k,query.grain,producing.current(),producing.moments(),moment_rounds)?;}
+            passage.close(1,&producing.moment_bounds,64)?;
         }
-        passage.close(0, &producing.map, 64)?;
         {
-            let lane = passage.open(1, &[0])?;
-            surface.record_operative_moments(
-                &lane,
-                d,
-                k,
-                query.grain,
-                producing.current(),
-                producing.moments(),
-                &moment_rounds,
-            )?;
-        }
-        passage.close(1, &producing.moment_bounds, 64)?;
-        {
-            let lane = passage.open(2, &[1])?;
+            let lane=passage.open(final_lane,&predecessors)?;
             surface.record_operative_material_adjoint(
                 &lane,
                 [
@@ -287,7 +252,7 @@ impl<'c> NativeConstitutiveField<'c> {
                 &dots,
             )?;
         }
-        passage.close(2, &diagnostics, 64)?;
+        passage.close(final_lane, &diagnostics, 64)?;
         let receipt = passage.finish()?.launch()?;
         if !receipt.obstruction.is_empty() {
             return Err(Error::Arithmetic(format!(

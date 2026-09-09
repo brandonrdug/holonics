@@ -58,13 +58,24 @@ model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction
 
+[established-bounded; measured] The [producer/source-contact comparison](research/records/2026-09-09_AC1_AC2_PRODUCER_REUSE_AND_THE_SELF_CONTACT_COMPARISON.md)
+returns exact reuse of recent immutable producers, with chronological reconstruction retained
+for older cuts. All 108 field and 24 alpha SDK tests pass. The sixteen-family model reaches
+5,064 occurrences but emits `I’` followed by repeated `0x99` bytes. Its return journal retains
+2,496,666,560 native bytes and dominates remaining memory. Source-contact withdrawal changes the
+response to `I’mn` and `EndPart`; neither response is useful and withdrawal is not the default.
+
+[definition] Next distinguish applying a retained native transport from adding a new observation,
+keeping its source edge, original current/receiver family and pending-state continuation in the
+same recurrence. The withdrawal comparison is attribution evidence, not the replacement law.
+Lawful return-journal representation and useful contextual generation remain open.
+
 [established-bounded; source-inspected] The [finite material composition](research/records/2026-09-09_AC1_THE_FINITE_MATERIAL_OPERATOR_RETURNS_THROUGH_ITS_PRODUCER.md)
 now binds the existing complex-current operator to the operative boundary and independent joint
 target. It recovers the producing matrix from exact retained deposits before the native adjoint.
 All 107 field tests pass. The archived eight-family study completes but emits only `.`. The
 row-parallel matrix implementation matches the scalar body/checkpoint and later continuation
-exactly. The model is now continuing into the next eight families; its result is pending.
-A separate recent-producer reuse change is compiled and awaits its GPU comparison.
+exactly. The sixteen-family result and verified producer reuse are recorded above.
 The bounded material state does not yet establish bounded whole-ecology cost or useful language.
 
 [established-bounded; measured] The [duplex codec](research/records/2026-09-09_AC1_AC2_CONVERSATIONAL_DIRECTION_REACHES_NATIVE_PORTS.md)
@@ -75,10 +86,9 @@ its packed checkpoint is 390,957,790 bytes and fresh-process continuation matche
 
 [counterexample; measured] The duplex model answers `The renry.` and stops. Its seen-request
 continuation repeats `The re re ...` through the work limit. Neither is useful. The slice contains
-74 human bytes and 1,848 agent bytes; it is not broad language exposure. Next compose the existing
-finite current-to-material operator with the operative current, independent joint target and
-producing adjoint, to address scalable learned action before broadening cultivation. This is a
-model-family comparison, not an asserted quotient of the historical projector-kernel learner.
+74 human bytes and 1,848 agent bytes; it is not broad language exposure. The finite-operator
+comparison and its subsequent sixteen-family result are recorded above. Neither model family
+has returned useful language, and no projector-kernel quotient is asserted.
 
 [established-bounded; measured] The [operative-boundary query](research/records/2026-09-08_AC1_THE_MATERIAL_QUERY_FOLLOWS_THE_OPERATIVE_BOUNDARY.md)
 now observes transported outgoing current while retaining the full interior and its producing
@@ -127,8 +137,8 @@ decisions exactly. Neither this repair nor local test success establishes useful
 
 [definition] AC1 steps 3–4 retain local path formation, restriction/rebase and generator reuse
 through the actual receiver family. The boundary-query return above supplies a changed family;
-the duplex codec now preserves conversational direction. The next composition above targets
-a finite learned material operator and its actual producing return. The common-current
+the duplex codec and finite material operator are now implemented. The next composition above
+keeps source lineage while separating retained-transport application from new observation. The common-current
 metric changes native conduct but leaves the language loop unchanged. Its recurrent retained-history
 representation is still far too large for the exposure, despite the report/checkpoint reduction
 above; another scalar receiver adjustment or larger unchanged corpus run is not the next construction.

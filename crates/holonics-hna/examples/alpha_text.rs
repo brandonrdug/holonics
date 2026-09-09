@@ -283,6 +283,7 @@ fn run_session(
     prompt: Option<&str>,
     limit: usize,
     text_receiver: TextCurrentReceiver,
+    self_contact:bool,
     inspect_all_currents: bool,
     operative: bool,
     contact_response: bool,
@@ -300,6 +301,7 @@ fn run_session(
     report["material_source"] = json!(session.field().material_transport_source());
     report["material_target"] = json!(session.field().material_target());
     report["text_receiver"] = json!(text_receiver);
+    report["self_source_contact"] = json!(self_contact);
     report["duplex"] = json!(session.duplex());
     report["contact_response_during_development"] = json!(contact_response);
     report["contact_realization"] = json!(contact_realization);
@@ -318,6 +320,7 @@ fn run_session(
     report["development_native_until"] = json!(session.field().occurrence_count());
     report["development_operative_returns"] = json!(session.field().operative_return_count());
     report["development_census"] = json!(session.field().census());
+    report["development_return_storage"] = json!(session.field().operative_return_storage());
     report["history_placement"] = json!(session.field().history_placement());
     report["development_section_readouts_outside_history_placement"] = json!(
         session.field().census().section_read_outs
@@ -388,7 +391,7 @@ fn run_session(
         report["prompt_native_until"] = json!(session.field().occurrence_count());
         report["prompt_error"] = json!(prompt_error);
         if prompt_error.is_none() {
-            let generated = session.generate_with_receiver(limit, text_receiver);
+            let generated = session.generate_with_source_contact(limit, text_receiver,self_contact);
             report["utf8"] = json!(std::str::from_utf8(&generated.emitted_octets).ok());
             report["utf8_error"] = json!(std::str::from_utf8(&generated.emitted_octets)
                 .err()
@@ -450,7 +453,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary|operative-linear] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--contact-metric current|relative-entropy|squared-probability]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary|operative-linear] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--self-source-contact true|false] [--contact-metric current|relative-entropy|squared-probability]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -470,6 +473,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut material_source = None;
     let mut material_target = None;
     let mut text_receiver = TextCurrentReceiver::Material;
+    let mut self_contact=true;
     while let Some(option) = args.next() {
         let value = args.next().ok_or("missing option value")?;
         match option.as_str() {
@@ -507,6 +511,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 })
             }
             "--operative-junction" => operative = value.parse::<bool>()?,
+            "--self-source-contact" => self_contact=value.parse::<bool>()?,
             "--duplex" => duplex=Some(value.parse::<bool>()?),
             "--contact-response" => contact_response = Some(value.parse::<bool>()?),
             "--material-target" => material_target=Some(match value.as_str(){
@@ -639,6 +644,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 prompt.as_deref(),
                 limit,
                 text_receiver,
+                self_contact,
                 inspect_all_currents,
                 operative,
                 contact_response.unwrap_or(app.contact_response),
@@ -684,6 +690,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     prompt.as_deref(),
                     limit,
                     text_receiver,
+                    self_contact,
                     inspect_all_currents,
                     operative,
                     contact_response.unwrap_or(false),
