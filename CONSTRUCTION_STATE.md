@@ -10,18 +10,26 @@ instruction governs.
 
 ## Reality of Difference: active formal programme
 
-[proved-derived; formal-checked] [The programme's first return](research/records/2026-09-08_COMPATIBLE_POTENTIAL_SWINGS_THROUGH_JOINT_RECEIVERS_AND_THE_PROGRAMME_BEGINS.md)
-constructs compatible future families, useful tolerance/convergence, exact rebase, canonical
-joint receiver descent and affine Swing transport. The mechanical instance has an exact future
-with plural sources; the standing bit-marginal failure now has a Lean witness. These are
-mathematical receiver laws, not a new native decoder.
+[proved-derived; formal-checked] The sustained goal's
+[clocked torus construction](research/records/2026-09-08_CLOCKED_TORUS_CURRENTS_CONTINUE_THROUGH_A_RETAINED_FIBRE.md)
+now returns actual square/winding certificates, exact current extraction, a retained joint kernel,
+fixed-source fine-law uniqueness, complete-state clocked joins, dynamic scale transport and
+receiver factorization for every admitted finite input word. The concrete chart is proved at
+grains 1 and 2 and casts into the existing Parametron response.
 
-[established-bounded; process-audit] Full research and final framework checks pass.
+[established-bounded; implemented-exact; computational-witness] The continuing exterior
+realization agrees with full branch solves on 64- and 324-branch carriers. Fresh-process
+continuation and a retained eight-entry blind-current control pass; decoder, standing and process
+costs are recorded. The sustained construction is complete at this scope; the parallel native
+AC work remains separate.
+
+[established-bounded; process-audit] Full framework/research verification passes (9,972 jobs).
 
 [definition] The [comprehensive contract](docs/plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)
-is integrated with the sole roadmap. Step 1 and the affine Swing opening are complete; next is
-step 2's actual WorldTube resegmentation/boundary-scale passage with the same future family.
-The wider programme remains active and the parallel AC construction continues independently.
+retains the wider construction order. The potential/Swing opening and this concrete tube/scale
+and constitutive continuation are established dependencies. Nonlinear fluid feedback, changing
+morphology, further source applications and physical calibrations retain their declared work;
+this finite current result does not mark the broader programme complete.
 
 ## Philosophical synthesis
 

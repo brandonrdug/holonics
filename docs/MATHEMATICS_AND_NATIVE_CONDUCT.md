@@ -24,8 +24,24 @@ native return, not another numerical realization requirement or an AC1 completio
 now orders formal use of the Reality of Difference notions through the sole roadmap. Its
 [opening return](../research/records/2026-09-08_COMPATIBLE_POTENTIAL_SWINGS_THROUGH_JOINT_RECEIVERS_AND_THE_PROGRAMME_BEGINS.md)
 composes actual compatible source fibres, useful future-face bounds, canonical joint quotients
-and Swing transport, with mechanical and joint-packet instances. Next is their actual clocked
-tube/boundary-scale composition. The existing fluid/MFR and AC lines retain their stated scopes.
+and Swing transport, with mechanical and joint-packet instances. The
+[clocked torus return](../research/records/2026-09-08_CLOCKED_TORUS_CURRENTS_CONTINUE_THROUGH_A_RETAINED_FIBRE.md)
+adds actual tube/scale composition and a continuing constitutive realization. The existing
+fluid/MFR and AC lines retain their stated scopes.
+
+[proved-derived; formal-checked] Four torus cuts alone leave the local square currents unseen.
+The actual two-face constitutive response supplies two further coordinates and an explicit
+jointly blind remainder. Its six-coordinate decoder and source law compose with complete-state
+clocked joins. A fixed complete source has a unique fine successor, while limited receiver
+observations can still leave several compatible sources. These statements are compatible and
+must not be exchanged when deciding whether an implementation can continue.
+
+[established-bounded; implemented-exact; computational-witness] The exact exterior comparison
+returns complete currents through varying material/source steps, scale comparison and fresh
+process continuation. Its reduced coordinates are derived from the operative incidence and
+response; the cold remainder stays available to a separating branch receiver. This supplies a
+concrete instance of the existing native condensation discipline. It does not prescribe six
+HNN channels or replace the native contextual construction with this exterior law.
 
 ## One framework, several realizations
 

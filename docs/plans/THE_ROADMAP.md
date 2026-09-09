@@ -27,6 +27,12 @@ one continuing programme. [The detailed construction contract](THE_REALITY_OF_DI
 connects the existing sources and defines the artifacts and applications of each step. This
 roadmap remains the sole ordering authority; the active AC work continues independently.
 
+[project-postulate] Brandon has now established a sustained goal through the WorldTube/scale
+construction and its continuing reduced four-torus constitutive realization, including decoder,
+retained fibre, source-qualified future comparison and verification. Continue through those
+returns; do not end the goal at planning or isolated next-step notes. The detailed contract
+states the completion boundary and the current position records progress.
+
 | Order | Shared construction | Return and use |
 |---|---|---|
 | 1 | Compatible potential, joint receivers and useful tolerance | Retained future families, exact quotient/transport and concrete mechanical/packet instances |
@@ -39,9 +45,12 @@ roadmap remains the sole ordering authority; the active AC work continues indepe
 
 [proved-derived; formal-checked] [Step 1 and the affine Swing opening](../../research/records/2026-09-08_COMPATIBLE_POTENTIAL_SWINGS_THROUGH_JOINT_RECEIVERS_AND_THE_PROGRAMME_BEGINS.md)
 now return compatible future images, refinement/rebase, useful tolerance/convergence, canonical
-joint quotient descent, and mechanical/packet instances. **Next: step 2's complete tube
-resegmentation/scale passage**—retain the compatible family and future receiver through the
-actual joined clocked occurrence, then bind its boundary-scale transport.
+joint quotient descent, and mechanical/packet instances. The
+[sustained torus return](../../research/records/2026-09-08_CLOCKED_TORUS_CURRENTS_CONTINUE_THROUGH_A_RETAINED_FIBRE.md)
+now supplies the concrete tube/scale and continuing constitutive instance for steps 2–3:
+actual incidence, full-current decoder, retained fibre, varying-input history factorization,
+clocked composition and source-qualified executable comparison. Use these returned owners
+when extending morphology or nonlinear feedback; do not restart an interface-only construction.
 The MFR work below remains the fluid application's detailed source/remainder line, and direct
 RH endpoint work retains its stated deferral. A later research step is not an added prerequisite
 for using an earlier result in the current AC construction.

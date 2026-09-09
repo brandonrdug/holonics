@@ -1,0 +1,98 @@
+{
+  "grade": "established-bounded",
+  "evidence": [
+    "computational-witness",
+    "implemented-exact"
+  ],
+  "source": "crates/holonic-engine/examples/four_torus_current.rs",
+  "commands": [
+    [
+      "/home/b/Workspaces/holonics/.local/targets/tube-current/release/examples/four_torus_current",
+      "run",
+      "2",
+      "12",
+      "/home/b/Workspaces/holonics/research/experiments/four_torus_current/2026-09-08/run1/side2-direct"
+    ],
+    [
+      "/home/b/Workspaces/holonics/.local/targets/tube-current/release/examples/four_torus_current",
+      "run",
+      "2",
+      "5",
+      "/home/b/Workspaces/holonics/research/experiments/four_torus_current/2026-09-08/run1/side2-prefix"
+    ],
+    [
+      "/home/b/Workspaces/holonics/.local/targets/tube-current/release/examples/four_torus_current",
+      "resume",
+      "/home/b/Workspaces/holonics/research/experiments/four_torus_current/2026-09-08/run1/side2-prefix/state.json",
+      "7",
+      "/home/b/Workspaces/holonics/research/experiments/four_torus_current/2026-09-08/run1/side2-resumed"
+    ],
+    [
+      "/home/b/Workspaces/holonics/.local/targets/tube-current/release/examples/four_torus_current",
+      "run",
+      "2",
+      "12",
+      "/home/b/Workspaces/holonics/research/experiments/four_torus_current/2026-09-08/run1/side2-blind",
+      "blind"
+    ],
+    [
+      "/home/b/Workspaces/holonics/.local/targets/tube-current/release/examples/four_torus_current",
+      "run",
+      "2",
+      "5",
+      "/home/b/Workspaces/holonics/research/experiments/four_torus_current/2026-09-08/run1/side2-blind-prefix",
+      "blind"
+    ],
+    [
+      "/home/b/Workspaces/holonics/.local/targets/tube-current/release/examples/four_torus_current",
+      "resume",
+      "/home/b/Workspaces/holonics/research/experiments/four_torus_current/2026-09-08/run1/side2-blind-prefix/state.json",
+      "7",
+      "/home/b/Workspaces/holonics/research/experiments/four_torus_current/2026-09-08/run1/side2-blind-resumed"
+    ],
+    [
+      "/home/b/Workspaces/holonics/.local/targets/tube-current/release/examples/four_torus_current",
+      "run",
+      "3",
+      "6",
+      "/home/b/Workspaces/holonics/research/experiments/four_torus_current/2026-09-08/run1/side3-direct"
+    ]
+  ],
+  "resume": "fresh processes reproduce uninterrupted 12-event state and full current, with and without cold residual",
+  "scale": "six matching clocked events on side 2 and 3 preserve four cuts, active face readings and declared material energy",
+  "retained_fibre": "12 matching events preserve joint readings while full currents remain separated",
+  "separating_edge": 2,
+  "unshifted_edge_codeword": [
+    [
+      1,
+      [
+        539638471,
+        924035103
+      ]
+    ],
+    [
+      1,
+      [
+        4075305216,
+        1523879229
+      ]
+    ]
+  ],
+  "shifted_edge_codeword": [
+    [
+      1,
+      [
+        3476170695,
+        416075359
+      ]
+    ],
+    [
+      1,
+      [
+        4075305216,
+        1523879229
+      ]
+    ]
+  ],
+  "boundary": "two active faces, declared source/material sequence, rational current chart; no arbitrary geometric refinement or HNN execution"
+}

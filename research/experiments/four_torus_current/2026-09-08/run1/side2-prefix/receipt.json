@@ -1,0 +1,832 @@
+{
+  "active_dimension": 6,
+  "blind_residual_entries": 0,
+  "branches": 64,
+  "checkpoint_json_bytes": 281,
+  "cut_face_coupling": [
+    [
+      1,
+      -1,
+      0,
+      0
+    ],
+    [
+      1,
+      0,
+      -1,
+      0
+    ]
+  ],
+  "dense_decoder_standing_json_bytes": 11325,
+  "end_clock": "31/15",
+  "end_step": 5,
+  "evidence": [
+    "implemented-exact",
+    "computational-witness",
+    "measured"
+  ],
+  "four_cut_only_current_separator": [
+    0,
+    "-3160753/10092000"
+  ],
+  "full_current_json_bytes": 1244,
+  "geometry_certificate_setup_ns": 1697398,
+  "grade": "established-bounded",
+  "grain": 1,
+  "gram": [
+    [
+      4,
+      1
+    ],
+    [
+      1,
+      4
+    ]
+  ],
+  "reference_inverse_certificate_setup_ns": 201459012,
+  "reference_inverse_standing_json_bytes": 209652,
+  "run_through_state_and_current_write_ns": 223843551,
+  "scope": "exterior rational two-face constitutive law; dimensionless chart; no HNN or hardware power claim",
+  "side": 2,
+  "source_owner": "crates/holonic-engine/examples/four_torus_current.rs",
+  "start_clock": "0",
+  "start_step": 0,
+  "steps": [
+    {
+      "active_material_energy": "3626136061/1566972225",
+      "clock_after": "1/2",
+      "clock_before": "0",
+      "compact_advance_ns": 20047,
+      "cuts": [
+        "4/3",
+        "-9/5",
+        "5/14",
+        "34/11"
+      ],
+      "decoder_ns": 90781,
+      "face_readings": [
+        "61211/39585",
+        "-664/5655"
+      ],
+      "fine_solve_ns": 852912,
+      "full_decoder_exact": true,
+      "full_law_exact": true,
+      "input": {
+        "face_source": [
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                2
+              ]
+            ]
+          ],
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                3
+              ]
+            ]
+          ]
+        ],
+        "mu": [
+          [
+            1,
+            [
+              2
+            ]
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "nu": [
+          [
+            1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              2
+            ]
+          ]
+        ],
+        "ordinal": 0,
+        "tau": [
+          [
+            1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              2
+            ]
+          ]
+        ],
+        "winding_source": [
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                3
+              ]
+            ]
+          ],
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                5
+              ]
+            ]
+          ],
+          [
+            [
+              -1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                7
+              ]
+            ]
+          ],
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                11
+              ]
+            ]
+          ]
+        ]
+      },
+      "operator_assembly_ns": 2038889,
+      "source_assembly_ns": 80271
+    },
+    {
+      "active_material_energy": "8979846297/178286617600",
+      "clock_after": "5/6",
+      "clock_before": "1/2",
+      "compact_advance_ns": 19657,
+      "cuts": [
+        "1",
+        "-8/5",
+        "1/2",
+        "35/11"
+      ],
+      "decoder_ns": 89428,
+      "face_readings": [
+        "-19129/84448",
+        "30099/422240"
+      ],
+      "fine_solve_ns": 813478,
+      "full_decoder_exact": true,
+      "full_law_exact": true,
+      "input": {
+        "face_source": [
+          [
+            [
+              -1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                2
+              ]
+            ]
+          ],
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                3
+              ]
+            ]
+          ]
+        ],
+        "mu": [
+          [
+            1,
+            [
+              3
+            ]
+          ],
+          [
+            1,
+            [
+              2
+            ]
+          ]
+        ],
+        "nu": [
+          [
+            -1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              2
+            ]
+          ]
+        ],
+        "ordinal": 1,
+        "tau": [
+          [
+            1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              3
+            ]
+          ]
+        ],
+        "winding_source": [
+          [
+            [
+              -1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                3
+              ]
+            ]
+          ],
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                5
+              ]
+            ]
+          ],
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                7
+              ]
+            ]
+          ],
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                11
+              ]
+            ]
+          ]
+        ]
+      },
+      "operator_assembly_ns": 1882125,
+      "source_assembly_ns": 82575
+    },
+    {
+      "active_material_energy": "50684867689/118681920000",
+      "clock_after": "37/30",
+      "clock_before": "5/6",
+      "compact_advance_ns": 20248,
+      "cuts": [
+        "4/3",
+        "-7/5",
+        "5/14",
+        "36/11"
+      ],
+      "decoder_ns": 108264,
+      "face_readings": [
+        "2481289/6333600",
+        "3372169/6333600"
+      ],
+      "fine_solve_ns": 854054,
+      "full_decoder_exact": true,
+      "full_law_exact": true,
+      "input": {
+        "face_source": [
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                2
+              ]
+            ]
+          ],
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                3
+              ]
+            ]
+          ]
+        ],
+        "mu": [
+          [
+            1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "nu": [
+          [
+            1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "ordinal": 2,
+        "tau": [
+          [
+            1,
+            [
+              2
+            ]
+          ],
+          [
+            1,
+            [
+              5
+            ]
+          ]
+        ],
+        "winding_source": [
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                3
+              ]
+            ]
+          ],
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                5
+              ]
+            ]
+          ],
+          [
+            [
+              -1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                7
+              ]
+            ]
+          ],
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                11
+              ]
+            ]
+          ]
+        ]
+      },
+      "operator_assembly_ns": 1919374,
+      "source_assembly_ns": 81824
+    },
+    {
+      "active_material_energy": "38260946951296009/142535805034896000",
+      "clock_after": "26/15",
+      "clock_before": "37/30",
+      "compact_advance_ns": 19075,
+      "cuts": [
+        "1",
+        "-6/5",
+        "1/2",
+        "37/11"
+      ],
+      "decoder_ns": 114314,
+      "face_readings": [
+        "-285578603/596941800",
+        "209938597/596941800"
+      ],
+      "fine_solve_ns": 915299,
+      "full_decoder_exact": true,
+      "full_law_exact": true,
+      "input": {
+        "face_source": [
+          [
+            [
+              -1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                2
+              ]
+            ]
+          ],
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                3
+              ]
+            ]
+          ]
+        ],
+        "mu": [
+          [
+            1,
+            [
+              2
+            ]
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "nu": [
+          [
+            1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              2
+            ]
+          ]
+        ],
+        "ordinal": 3,
+        "tau": [
+          [
+            1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              2
+            ]
+          ]
+        ],
+        "winding_source": [
+          [
+            [
+              -1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                3
+              ]
+            ]
+          ],
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                5
+              ]
+            ]
+          ],
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                7
+              ]
+            ]
+          ],
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                11
+              ]
+            ]
+          ]
+        ]
+      },
+      "operator_assembly_ns": 1921469,
+      "source_assembly_ns": 80071
+    },
+    {
+      "active_material_energy": "17906016740878096001/22805728805583360000",
+      "clock_after": "31/15",
+      "clock_before": "26/15",
+      "compact_advance_ns": 19747,
+      "cuts": [
+        "4/3",
+        "-1",
+        "5/14",
+        "38/11"
+      ],
+      "decoder_ns": 104457,
+      "face_readings": [
+        "518226503/682219200",
+        "4698817681/4775534400"
+      ],
+      "fine_solve_ns": 970573,
+      "full_decoder_exact": true,
+      "full_law_exact": true,
+      "input": {
+        "face_source": [
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                2
+              ]
+            ]
+          ],
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                3
+              ]
+            ]
+          ]
+        ],
+        "mu": [
+          [
+            1,
+            [
+              3
+            ]
+          ],
+          [
+            1,
+            [
+              2
+            ]
+          ]
+        ],
+        "nu": [
+          [
+            -1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              2
+            ]
+          ]
+        ],
+        "ordinal": 4,
+        "tau": [
+          [
+            1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              3
+            ]
+          ]
+        ],
+        "winding_source": [
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                3
+              ]
+            ]
+          ],
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                5
+              ]
+            ]
+          ],
+          [
+            [
+              -1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                7
+              ]
+            ]
+          ],
+          [
+            [
+              1,
+              [
+                1
+              ]
+            ],
+            [
+              1,
+              [
+                11
+              ]
+            ]
+          ]
+        ]
+      },
+      "operator_assembly_ns": 1946105,
+      "source_assembly_ns": 83527
+    }
+  ],
+  "vertices": 16
+}

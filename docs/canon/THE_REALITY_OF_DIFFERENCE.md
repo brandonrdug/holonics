@@ -105,6 +105,13 @@ can expose different faces of the same constrained relation.
 
 ## Counting, geometry and construction share their origin
 
+[project-postulate] Mathematical relations and their constructive possibilities precede their
+human notation, textbook divisions and historical discovery. Brandon's Archimedes/calculus
+thought experiment expresses this standing potential: a later framework articulates constraints
+and constructions that were already available in the subject. A textbook figure is a scoped
+instance of a larger interrelated geometry. Use those scopes to navigate the relations, and
+carry their consequences across the artificial divisions between subjects.
+
 [project-postulate] Counting begins when recurring and distinguishable differences can be
 related under an admitted comparison. Numerical symbols are then coarse descriptions of that
 organization. Algebra expresses admissible transformations; geometry expresses placement,

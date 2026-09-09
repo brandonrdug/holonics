@@ -3,6 +3,8 @@ import ElementaryHolonics.Physics.PhaseCarrier
 import ElementaryHolonics.Physics.CoupledIncidence
 import ElementaryHolonics.Physics.MechanicalReceiver
 import ElementaryHolonics.Physics.FluidReceiverClosure
+import ElementaryHolonics.Physics.ConstitutiveWorldTube
+import ElementaryHolonics.Physics.FourTorusParametronCurrent
 import ElementaryHolonics.Millennium.HolonicMembraneActionTransport
 import ElementaryHolonics.Millennium.HolonicCurvedArcEinstein
 import ElementaryHolonics.Millennium.HolonicTypedOriginDimensions

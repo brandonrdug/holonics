@@ -12,6 +12,32 @@ and string comparisons, holography, mass and constructive navigation.
 unify patterns already engaged in specific sources. They do not establish another engine,
 reactivate a predecessor implementation or replace the independent AC0–AC5 construction.
 
+## Sustained goal and completion boundary
+
+[project-postulate] Brandon's subsequent request establishes a longer-running goal so this work
+continues through its consequences rather than ending at repeated next-step notes. Carry steps
+2–3 through an actual four-torus/Parametron realization: exact clocked resegmentation and boundary
+scale; a constitutive current derived from the actual incidence; a continuing reduced state;
+an explicit executable decoder with its retained fibre; and verified future comparisons and
+complete scoped costs. Integrate the result and its useful implementation consequences, commit
+and push coherent verified returns. Planning and isolated interface lemmas do not complete this
+goal. If a proposed reduction fails, retain the counterexample and develop its replacement to a
+verified returned scope before treating this construction as complete.
+
+[definition] The current concrete continuation uses the four axis currents and actual oriented
+square-face currents. Their kernel and constitutive coupling determine which coordinates can
+be condensed and which interior contribution must remain. It does not assume the four winding
+readings reconstruct every branch current. The broader programme remains available beyond this
+sustained construction; its open physical and mathematical endpoints are not claimed complete.
+
+[established-bounded; formal-checked; implemented-exact] The
+[clocked torus return](../../research/records/2026-09-08_CLOCKED_TORUS_CURRENTS_CONTINUE_THROUGH_A_RETAINED_FIBRE.md)
+supplies this sustained construction's artifact and checks. It derives the concrete two-square
+response and its six-coordinate continuation, retains a jointly blind source remainder, proves
+the scale/generator and complete-state tube laws, and compares full currents through continued
+execution and rest/remount. The later Galerkin/morphology and calibrated physical applications
+below reuse this method while retaining their own unsolved source/feedback obligations.
+
 ## The mathematical subject
 
 [definition] The continuing subject is a situated source population, its constrained oriented

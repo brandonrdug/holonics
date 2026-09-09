@@ -1,5 +1,6 @@
 import ElementaryHolonics.Framework.Core
 import ElementaryHolonics.Transport.WorldTube
+import ElementaryHolonics.Transport.WorldTubePotential
 import ElementaryHolonics.Transport.ChangingReceiver
 import ElementaryHolonics.Millennium.HolonicDifferenceCalculus
 import ElementaryHolonics.Millennium.HolonicDirectedPassage

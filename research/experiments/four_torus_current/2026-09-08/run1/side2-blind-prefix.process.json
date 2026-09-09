@@ -1,0 +1,17 @@
+{
+  "command": [
+    "/home/b/Workspaces/holonics/.local/targets/tube-current/release/examples/four_torus_current",
+    "run",
+    "2",
+    "5",
+    "/home/b/Workspaces/holonics/research/experiments/four_torus_current/2026-09-08/run1/side2-blind-prefix",
+    "blind"
+  ],
+  "exit_code": 0,
+  "wall_ns": 233136133,
+  "user_seconds": 0.229825,
+  "system_seconds": 0.002018,
+  "maximum_resident_kib_linux": 12804,
+  "major_page_faults": 0,
+  "minor_page_faults": 1257
+}

@@ -117,6 +117,22 @@ and `ClockedPantographicSwing.toHolon` return elementary holons. The new subject
 these constructions alongside differential and world-tube calculus, rather than making them
 appear to depend conceptually on a named conjecture.
 
+[proved-derived; formal-checked] The
+[continuing torus construction](../research/records/2026-09-08_CLOCKED_TORUS_CURRENTS_CONTINUE_THROUGH_A_RETAINED_FIBRE.md)
+now binds the actual four-axis currents and two square-face currents to a constitutive response.
+`FourTorusTwoFace.constitutiveChart` derives its Gram and cut coupling at grains 1 and 2.
+`ConstitutiveCurrentReduction` extracts six active coordinates and a jointly blind remainder,
+with an exact decoder. `ConstitutiveWorldTube` carries the actual step, material, forcing,
+clock and remainder; an addressed join requires the complete successor to equal the next source.
+The response also casts into the existing Parametron `coupledResponse` owner.
+
+[established-bounded; implemented-exact; computational-witness] The
+[exterior executable](../research/experiments/four_torus_current/README.md) advances those
+coordinates while comparing against a full branch solve on 64- and 324-branch carriers.
+Fresh-process continuation reproduces the complete current. Equal declared receiver futures
+coexist with a retained branch-separating remainder. This gives a usable finite transport and
+compression construction; decoder and standing costs accompany its smaller continuing state.
+
 ## Molecular structures are constitutive geometry over time
 
 [definition] Here *molecular structure* covers the intended biological family—protein, DNA, RNA,

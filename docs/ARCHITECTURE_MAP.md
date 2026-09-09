@@ -70,6 +70,25 @@ transports those families and quotient words through the existing affine Swing.
 These are formal owners, not a new native decoder or a claimed implementation of the whole
 programme. Paths are under `formal/elementary-holonics/ElementaryHolonics/`.
 
+[definition] The continuing current construction adds the following owners. Its
+[record](../research/records/2026-09-08_CLOCKED_TORUS_CURRENTS_CONTINUE_THROUGH_A_RETAINED_FIBRE.md)
+and [exact executable comparison](../research/experiments/four_torus_current/README.md) retain
+the geometry, clock, source family, full-current decoder, blind fibre and costs.
+
+| Relation | Formal owner under `ElementaryHolonics/` | Executable scope |
+|---|---|---|
+| Complete clocked resegmentation and boundary-family images | `Transport/WorldTubePotential.lean` | Formal-only equivalence of addressed fibres and carried future families |
+| Rational cut/current chart and full four-cut remainder | `Physics/FourTorusCurrentChart.lean` | Exact rational axis/square incidence in `holonic-engine/examples/four_torus_current.rs` |
+| Explicit material response and fixed-source uniqueness | `Physics/TwoFaceConstitutive.lean` | Exact two-face advance in the same exterior example |
+| Six-coordinate extraction, decoder and retained joint kernel | `Physics/ConstitutiveCurrentReduction.lean` | Exact extraction and cold residual checkpoint; full reference uses public `exact_linear::ExactRatMatrix` |
+| Actual square Gram/cut matrices and constitutive chart | `Physics/FourTorusTwoFace.lean` | Formal and computational certificates at grains 1 and 2 |
+| Real cast into existing Parametron coupled response | `Physics/FourTorusParametronCurrent.lean` | Rational response chart; no complete LC/phase-network execution claim |
+| Actual constitutive steps with complete-state pullback joins | `Physics/ConstitutiveWorldTube.lean` | Example retains rational chronology and source inputs; exact fresh-process continuation comparison |
+| Typed scale passage and all-input-word future receiver family | `Physics/ConstitutiveScale.lean` | Formal all-word law; finite varying-input comparison in the same exterior example |
+
+[definition] These executable correspondences concern a finite exterior constitutive experiment.
+No Lean/runtime binding, new HNN engine or anatomical/continuum identity is introduced.
+
 ## Foundation and transport
 
 [definition] **Preimage Fibre** is the governing term for compatible-source families. Some older
