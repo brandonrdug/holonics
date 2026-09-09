@@ -1,7 +1,7 @@
 //! First public text-codec composition over the resident native field. This driver mounts actual
 //! exposure and reads actual native emission; it contains no learner, target answer or fallback.
 use holonic_engine::native_ecology::constitutive_fibre::{
-    NativeFieldSourceAnchor, NativeMaterialTransportSource, NativeContactRealization, NativeMaterialTarget,
+    NativeFieldSourceAnchor, NativeMaterialTransportSource, NativeContactRealization, NativeMaterialTarget, NativeMaterialPullbackMetric,
 };
 use holonics_hna::{
     alpha::{
@@ -51,6 +51,8 @@ struct CultivationCheckpoint {
     contact_response: bool,
     #[serde(default)]
     contact_realization: NativeContactRealization,
+    #[serde(default)]
+    contact_metric: NativeMaterialPullbackMetric,
 }
 
 fn cultivate(
@@ -61,6 +63,7 @@ fn cultivate(
     anchors: &mut AnchorMap,
     contact_response: bool,
     contact_realization: NativeContactRealization,
+    contact_metric: NativeMaterialPullbackMetric,
 ) -> Result<(), AlphaMaterialError> {
     let mut partial = records.last().filter(|r| r["complete"] == false).cloned();
     let mut completed = 0;
@@ -196,7 +199,7 @@ fn cultivate(
                 if contact_response {
                     let group=match session.field().material_target(){Some(NativeMaterialTarget::TensorProduct{..})=>session.field().material_target_dimension().unwrap(),_=>2};
                     if let Err(error)=session.respond_to_latest_material_with_realization(group,
-                        holonic_engine::native_ecology::constitutive_fibre::NativeMaterialPullbackMetric::RelativeEntropy,
+                        contact_metric,
                         contact_realization) {
                         failure=Some(json!({"phase":"contact-response","symbol_index":symbol_index,
                             "symbol":symbol,"error":error.to_string()}));
@@ -283,6 +286,7 @@ fn run_session(
     operative: bool,
     contact_response: bool,
     contact_realization: NativeContactRealization,
+    contact_metric: NativeMaterialPullbackMetric,
     checkpoint: Option<&PathBuf>,
     report: &mut Value,
 ) -> Result<(), AlphaMaterialError> {
@@ -297,9 +301,10 @@ fn run_session(
     report["text_receiver"] = json!(text_receiver);
     report["contact_response_during_development"] = json!(contact_response);
     report["contact_realization"] = json!(contact_realization);
+    report["contact_metric"] = json!(contact_metric);
     let start = Instant::now();
     let developed = if let Some(reader) = reader.as_mut() {
-        cultivate(reader, session, families, records, anchors, contact_response, contact_realization)
+        cultivate(reader, session, families, records, anchors, contact_response, contact_realization, contact_metric)
     } else {
         Ok(())
     };
@@ -328,6 +333,7 @@ fn run_session(
             native_until: session.field().occurrence_count(),
             contact_response,
             contact_realization,
+            contact_metric,
             records: records.clone(),
             anchors: anchors
                 .iter()
@@ -442,7 +448,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--contact-metric current|relative-entropy|squared-probability]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -456,6 +462,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut operative = false;
     let mut contact_response = None;
     let mut contact_realization = None;
+    let mut contact_metric = None;
     let mut history_archive = None;
     let mut material_source = None;
     let mut material_target = None;
@@ -500,6 +507,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 "direct-current"=>NativeMaterialTarget::DirectCurrent,
                 "joint-packet"=>NativeMaterialTarget::TensorProduct{factor_width:2},
                 _=>return Err("material target must be direct-current or joint-packet".into()),
+            }),
+            "--contact-metric" => contact_metric=Some(match value.as_str(){
+                "current"=>NativeMaterialPullbackMetric::SquaredCurrent,
+                "relative-entropy"=>NativeMaterialPullbackMetric::RelativeEntropy,
+                "squared-probability"=>NativeMaterialPullbackMetric::SquaredProbability,
+                _=>return Err("contact metric must be current, relative-entropy or squared-probability".into()),
             }),
             "--contact-realization" => contact_realization = Some(match value.as_str() {
                 "enclosed-flow" => NativeContactRealization::EnclosedFlow,
@@ -623,6 +636,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 operative,
                 contact_response.unwrap_or(app.contact_response),
                 contact_realization.unwrap_or(app.contact_realization),
+                contact_metric.unwrap_or(app.contact_metric),
                 checkpoint.as_ref(),
                 &mut report,
             )
@@ -666,6 +680,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     operative,
                     contact_response.unwrap_or(false),
                     contact_realization.unwrap_or(NativeContactRealization::DyadicDeposit),
+                    contact_metric.unwrap_or(NativeMaterialPullbackMetric::SquaredCurrent),
                     checkpoint.as_ref(),
                     &mut report,
                 )

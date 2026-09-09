@@ -1,6 +1,19 @@
 use super::*;
 
 impl<'chart> ResidentSurface<'chart> {
+    pub(crate) fn record_field_material_current_covector(&self,lane:&Lane<'_,'chart>,
+        prediction:&ResidentSection<'chart>,observation:&ResidentSection<'chart>,targets:usize,
+        output:&ResidentSection<'chart>)->Result<(),ResidentRefusal>{
+        if targets==0 || targets>u32::MAX as usize/12 || prediction.rows!=1 || prediction.width<4*targets+2
+            || observation.rows!=1 || observation.width<12*targets+6 || output.rows!=1 || output.width!=8*targets
+            || [prediction,observation,output].iter().any(|s|s.grain.0!=0){
+            return Err(ResidentRefusal::Declaration{operation:"material-current-covector",what:"incompatible complex current chart".into()});
+        }
+        let mut p=Params::new();p.ptr(prediction.lo.device_ptr()).ptr(observation.lo.device_ptr()).u32(targets as u32)
+            .ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        let block=self.declaration.warp_size.max(1);
+        self.record_blocks(lane,"section_field_material_current_covector",(2*targets).div_ceil(block as usize),block,0,&mut p,"material-current-covector")
+    }
     pub(crate) fn record_field_material_packet_receiver(&self,lane:&Lane<'_,'chart>,input:&ResidentSection<'chart>,
         targets:usize,scratch:&ResidentSection<'chart>,output:&ResidentSection<'chart>)->Result<(),ResidentRefusal>{
         if targets==0||targets>u32::MAX as usize/4||input.rows!=1||input.width<4*targets+2
@@ -23,8 +36,8 @@ impl<'chart> ResidentSurface<'chart> {
         };
         let coordinates=nodes.checked_mul(10).and_then(|v|contacts.checked_mul(2).and_then(|k|v.checked_add(k))).ok_or_else(fail)?;
         if nodes==0 || targets==0 || targets>u32::MAX as usize/82 || coordinates>u32::MAX as usize/4 || source>=u32::MAX as usize/2
-            || !(1..=120).contains(&grain) || metric>1 || table.rows!=source+1 || table.width!=3
-            || returned.rows!=1 || returned.width!=20*targets
+            || !(1..=120).contains(&grain) || metric>2 || table.rows!=source+1 || table.width!=3
+            || returned.rows!=1 || returned.width!=(if metric==2{8}else{20})*targets
             || factors.rows!=2*(source+1) || factors.width!=20
             || output.rows!=1 || output.width!=4*coordinates
             || [table,returned,factors,output].iter().any(|s|s.grain.0!=0) { return Err(fail()); }

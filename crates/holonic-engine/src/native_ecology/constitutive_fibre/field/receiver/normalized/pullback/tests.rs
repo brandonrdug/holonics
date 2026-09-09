@@ -67,12 +67,13 @@ fn reference(
                 .ordinary_factor
                 .iter()
                 .zip(&row.contextual_factor)
-                .zip(r)
-                .map(|((a, b), r)| {
+                .enumerate()
+                .map(|(j, (a, b))| {
                     if reflected {
-                        -&b.real * r
+                        -&b.real * &r[2 * j] - &b.imaginary * &r[2 * j + 1]
                     } else {
-                        (&a.real + &b.real) * r
+                        (&a.real + &b.real) * &r[2 * j]
+                            + (&a.imaginary + &b.imaginary) * &r[2 * j + 1]
                     }
                 })
                 .sum();
@@ -148,6 +149,7 @@ fn material_source_pullback_keeps_both_arguments_and_the_producing_cut() {
     );
     let mut certified_internal = false;
     let mut certified_visible = false;
+    let mut phase_consequence = false;
     for receiving in [4, 5] {
         let normalized = field
             .normalized_material_return(receiving, 2, SeriesAperture(32))
@@ -158,21 +160,52 @@ fn material_source_pullback_keeps_both_arguments_and_the_producing_cut() {
         for metric in [
             NativeMaterialPullbackMetric::RelativeEntropy,
             NativeMaterialPullbackMetric::SquaredProbability,
+            NativeMaterialPullbackMetric::SquaredCurrent,
         ] {
             let before = field.census();
-            let resident = field
-                .pull_back_material_source(&normalized, metric)
-                .unwrap();
+            let resident = if metric == NativeMaterialPullbackMetric::SquaredCurrent {
+                field
+                    .pull_back_material_current(receiving)
+                    .unwrap()
+                    .unwrap()
+            } else {
+                field
+                    .pull_back_material_source(&normalized, metric)
+                    .unwrap()
+            };
             assert_eq!(field.census().section_read_outs, before.section_read_outs);
             let result = resident.inspect().unwrap();
             assert_eq!(result.source.occurrence, 3);
             assert_eq!(result.receiving.occurrence, receiving);
-            let intervals = match metric {
-                NativeMaterialPullbackMetric::RelativeEntropy => &q.returned_difference,
-                NativeMaterialPullbackMetric::SquaredProbability => &q.potential_pullback,
+            let intervals: Vec<ExactInterval> = match metric {
+                NativeMaterialPullbackMetric::RelativeEntropy
+                | NativeMaterialPullbackMetric::SquaredProbability => {
+                    let values = if metric == NativeMaterialPullbackMetric::RelativeEntropy {
+                        &q.returned_difference
+                    } else {
+                        &q.potential_pullback
+                    };
+                    values
+                        .iter()
+                        .flat_map(|x| {
+                            [
+                                x.clone(),
+                                ExactInterval::new(Rat::zero(), Rat::zero()).unwrap(),
+                            ]
+                        })
+                        .collect()
+                }
+                NativeMaterialPullbackMetric::SquaredCurrent => {
+                    let error = &rows[receiving].observed.radius + &rows[3].forward.radius;
+                    coordinates(&rows[receiving].observed.center)
+                        .iter()
+                        .zip(coordinates(&rows[3].forward.center))
+                        .map(|(y, p)| ExactInterval::new(y - &p - &error, y - p + &error).unwrap())
+                        .collect()
+                }
             };
-            // Every corner of the two-dimensional covector box, not just its centre.
-            for mask in 0..4 {
+            // Every corner of the complete real/imaginary covector box.
+            for mask in 0..16 {
                 let r = intervals
                     .iter()
                     .enumerate()
@@ -198,6 +231,15 @@ fn material_source_pullback_keeps_both_arguments_and_the_producing_cut() {
                 ] {
                     for (j, bound) in values.iter().enumerate() {
                         let exact = reference(&rows, 3, &r, visible, j);
+                        if metric == NativeMaterialPullbackMetric::SquaredCurrent {
+                            let real_only = r
+                                .iter()
+                                .enumerate()
+                                .map(|(j, v)| if j % 2 == 0 { v.clone() } else { Rat::zero() })
+                                .collect::<Vec<_>>();
+                            let wrong = reference(&rows, 3, &real_only, visible, j);
+                            phase_consequence |= wrong < bound.lower || wrong > bound.upper;
+                        }
                         assert!(
                             bound.lower <= exact && exact <= bound.upper,
                             "metric {metric:?}, visible {visible}, coordinate {j}: {exact} outside {bound:?}"
@@ -221,7 +263,80 @@ fn material_source_pullback_keeps_both_arguments_and_the_producing_cut() {
         }
     }
     assert!(
+        phase_consequence,
+        "the imaginary material return must have a separating source consequence"
+    );
+    assert!(
         certified_internal && certified_visible,
         "both query arguments must return nonzero conduct"
     );
+}
+
+#[test]
+#[ignore = "requires CUDA; a zero observed tensor packet is in the current metric domain"]
+fn material_current_pullback_accepts_zero_observation_without_a_probability_face() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let mut field =
+        NativeConstitutiveField::found_with_enclosed_junction(&surface, seed(2), ResidentGrain(72))
+            .unwrap();
+    field
+        .enable_material_transport_chart(
+            NativeMaterialTransportSource::OperativeContextual,
+            NativeMaterialTarget::TensorProduct { factor_width: 2 },
+        )
+        .unwrap();
+    let first = field
+        .advance_resident(&mut NativeFieldOccurrence::entering(vec![
+            phase(1, 1),
+            phase(1, 0),
+        ]))
+        .unwrap();
+    assert!(field.pull_back_material_current(0).unwrap().is_none());
+    let second = field
+        .advance_resident(&mut NativeFieldOccurrence::through(
+            first.source,
+            vec![phase(0, 1), phase(1, 1)],
+        ))
+        .unwrap();
+    let third = field
+        .advance_resident(&mut NativeFieldOccurrence::through(
+            second.source,
+            vec![phase(0, 0), phase(0, 0)],
+        ))
+        .unwrap();
+    assert!(
+        field
+            .normalized_material_return(2, 2, SeriesAperture(32))
+            .is_err()
+    );
+    let before = field.census();
+    let pulled = field.pull_back_material_current(2).unwrap().unwrap();
+    assert_eq!(field.census().section_read_outs, before.section_read_outs);
+    let reading = pulled.inspect().unwrap();
+    assert_eq!(reading.metric, NativeMaterialPullbackMetric::SquaredCurrent);
+    assert_eq!((reading.group_width, reading.series_terms), (0, 0));
+    let response = field.material_contact_response(pulled).unwrap();
+    field
+        .apply_material_contact_realization(&response, NativeContactRealization::DyadicDeposit)
+        .unwrap();
+    assert_eq!(field.operative_return_count(), Some(1));
+    let saved = field.rest(&[Some(&third.source)], &[]).unwrap();
+    let next = field
+        .advance_resident(&mut NativeFieldOccurrence::through(
+            third.source,
+            vec![phase(1, 0), phase(0, -1)],
+        ))
+        .unwrap();
+    let expected = field.rest(&[Some(&next.source)], &[]).unwrap();
+    drop(response);
+    drop(field);
+    let (mut field, mut sources, _) = NativeConstitutiveField::remount(&surface, saved).unwrap();
+    let next = field
+        .advance_resident(&mut NativeFieldOccurrence::through(
+            sources[0].take().unwrap(),
+            vec![phase(1, 0), phase(0, -1)],
+        ))
+        .unwrap();
+    assert_eq!(field.rest(&[Some(&next.source)], &[]).unwrap(), expected);
 }

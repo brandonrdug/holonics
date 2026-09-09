@@ -1,12 +1,15 @@
 //! The material source derivative uses the producing M and query, never a later surrogate.
 use super::*;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, serde::Deserialize)]
 pub enum NativeMaterialPullbackMetric {
     /// Negative derivative of KL(q || p) in the declared real-potential chart.
+    #[default]
     RelativeEntropy,
     /// Negative derivative of one half the squared probability discrepancy.
     SquaredProbability,
+    /// Negative derivative of half squared complex-current discrepancy, including phase.
+    SquaredCurrent,
 }
 
 /// Resident partial adjoint with historical operator factors held fixed. This carries both
@@ -16,7 +19,7 @@ pub struct NativeMaterialSourcePullback<'chart> {
     surface: &'chart ResidentSurface<'chart>,
     pub(in super::super::super) _owner: Rc<()>,
     _observation: Rc<ResidentSection<'chart>>,
-    _normalized: Rc<ResidentSection<'chart>>,
+    _covector_input: Rc<ResidentSection<'chart>>,
     _history: Vec<(Rc<ResidentSection<'chart>>, Rc<ResidentSection<'chart>>)>,
     pub(in super::super::super) output: ResidentSection<'chart>,
     pub(in super::super::super) source: NativeFieldLineage,
@@ -34,7 +37,9 @@ pub struct NativeMaterialSourcePullbackReading {
     pub source: NativeFieldLineage,
     pub receiving: NativeFieldLineage,
     pub metric: NativeMaterialPullbackMetric,
+    /// Zero for the ungrouped complex-current metric.
     pub group_width: usize,
+    /// Zero when the metric needs no exponential series.
     pub series_terms: u32,
     pub grain: u32,
     /// Interleaved real/imaginary coordinates of the two visible branches per node.
@@ -90,6 +95,30 @@ impl<'chart> NativeConstitutiveField<'chart> {
         if !Rc::ptr_eq(&self.owner, &returned.owner) {
             return Err(ConstitutiveFibreError::ForeignOccurrence);
         }
+        if metric == NativeMaterialPullbackMetric::SquaredCurrent {
+            return self
+                .pull_back_material_current(returned.receiving.occurrence)?
+                .ok_or(ConstitutiveFibreError::ForeignOccurrence);
+        }
+        self.material_query_pullback(
+            returned.output.clone(),
+            returned._observation.clone(),
+            returned.source.clone(),
+            returned.receiving.clone(),
+            metric,
+            returned.group_width,
+            returned.series_terms,
+            returned.grain,
+        )
+    }
+
+    /// Return the full complex-current discrepancy through its actual producing material
+    /// operator. No exponential observation or nonzero packet mass is required by this metric.
+    /// The same unit complex-current metric drives the ordinary material coefficient fit.
+    pub fn pull_back_material_current(
+        &self,
+        receiving: usize,
+    ) -> Result<Option<NativeMaterialSourcePullback<'chart>>, ConstitutiveFibreError> {
         if self.material_transport_source()
             != Some(NativeMaterialTransportSource::OperativeContextual)
         {
@@ -97,7 +126,80 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 "material source pullback requires the operative contextual carrier".into(),
             ));
         }
-        let source = returned.source.occurrence;
+        let event = self
+            .history
+            .get(receiving)
+            .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
+        let Some(source) = event.lineage.received_from else {
+            return Ok(None);
+        };
+        let producer = self
+            .history
+            .get(source)
+            .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
+        let surface = self.relation.surface;
+        let prediction = producer.with_resident(surface, |r| {
+            r.transport.clone().ok_or(ConstitutiveFibreError::Uncertain)
+        })?;
+        let observation = event.with_resident(surface, |r| {
+            r.transport.clone().ok_or(ConstitutiveFibreError::Uncertain)
+        })?;
+        let targets = self
+            .material_target_dimension()
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let output = Rc::new(surface.fresh_section(1, 8 * targets, ResidentGrain(0))?);
+        let mut passage = surface.begin_passage(&[vec![]])?;
+        {
+            let lane = passage.open(0, &[])?;
+            surface.record_field_material_current_covector(
+                &lane,
+                &prediction,
+                &observation,
+                targets,
+                &output,
+            )?;
+        }
+        passage.close(0, &output, 64)?;
+        let receipt = passage.finish()?.launch()?;
+        if !receipt.obstruction.is_empty() {
+            return Err(ConstitutiveFibreError::Arithmetic(format!(
+                "material current covector: {:?}",
+                receipt.obstruction
+            )));
+        }
+        self.material_query_pullback(
+            output,
+            observation,
+            producer.lineage.clone(),
+            event.lineage.clone(),
+            NativeMaterialPullbackMetric::SquaredCurrent,
+            0,
+            0,
+            self.transport_grain()?,
+        )
+        .map(Some)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn material_query_pullback(
+        &self,
+        covector: Rc<ResidentSection<'chart>>,
+        observation: Rc<ResidentSection<'chart>>,
+        source_lineage: NativeFieldLineage,
+        receiving: NativeFieldLineage,
+        metric: NativeMaterialPullbackMetric,
+        group_width: usize,
+        series_terms: u32,
+        grain: u32,
+    ) -> Result<NativeMaterialSourcePullback<'chart>, ConstitutiveFibreError> {
+        if self.material_transport_source()
+            != Some(NativeMaterialTransportSource::OperativeContextual)
+        {
+            return Err(ConstitutiveFibreError::Arithmetic(
+                "material source pullback requires the operative contextual carrier".into(),
+            ));
+        }
+        let source = source_lineage.occurrence;
         let surface = self.relation.surface;
         let mut held = Vec::with_capacity(source + 1);
         let mut pointers = Vec::with_capacity(3 * (source + 1));
@@ -118,7 +220,13 @@ impl<'chart> NativeConstitutiveField<'chart> {
                         .ok_or(ConstitutiveFibreError::Uncertain)?;
                     Ok((report.clone(), op.b.clone(), op.count))
                 })?;
-            if report.width() != self.material_transport_source().unwrap().report_words_for(self.nodes(),self.material_target().unwrap()).ok_or(ConstitutiveFibreError::Shape)? {
+            if report.width()
+                != self
+                    .material_transport_source()
+                    .unwrap()
+                    .report_words_for(self.nodes(), self.material_target().unwrap())
+                    .ok_or(ConstitutiveFibreError::Shape)?
+            {
                 return Err(ConstitutiveFibreError::Shape);
             }
             for word in [
@@ -144,15 +252,17 @@ impl<'chart> NativeConstitutiveField<'chart> {
             surface.record_field_material_pullback(
                 &lane,
                 &table,
-                &returned.output,
+                &covector,
                 source,
                 self.nodes(),
-                self.material_target_dimension().ok_or(ConstitutiveFibreError::Shape)?,
+                self.material_target_dimension()
+                    .ok_or(ConstitutiveFibreError::Shape)?,
                 contacts,
-                returned.grain,
+                grain,
                 match metric {
                     NativeMaterialPullbackMetric::RelativeEntropy => 0,
                     NativeMaterialPullbackMetric::SquaredProbability => 1,
+                    NativeMaterialPullbackMetric::SquaredCurrent => 2,
                 },
                 &factors,
                 &output,
@@ -169,18 +279,18 @@ impl<'chart> NativeConstitutiveField<'chart> {
         Ok(NativeMaterialSourcePullback {
             surface,
             _owner: self.owner.clone(),
-            _observation: returned._observation.clone(),
-            _normalized: returned.output.clone(),
+            _observation: observation,
+            _covector_input: covector,
             _history: held,
             output,
-            source: returned.source.clone(),
-            receiving: returned.receiving.clone(),
+            source: source_lineage,
+            receiving,
             metric,
-            group_width: returned.group_width,
-            series_terms: returned.series_terms,
+            group_width,
+            series_terms,
             nodes: self.nodes(),
             contacts,
-            grain: returned.grain,
+            grain,
         })
     }
 }

@@ -58,6 +58,17 @@ model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction
 
+[established-bounded; source-inspected] The [complete current return](research/records/2026-09-08_AC1_THE_MATERIAL_AND_CONTACT_RETURN_SHARE_THE_COMPLEX_CURRENT_METRIC.md)
+now supplies `SquaredCurrent` through the existing source/paired adjoints, using both real and
+imaginary target differences. This matches the ordinary material fit's local metric. The text
+development driver records the choice and preserves the legacy metric on old checkpoints.
+Two focused CUDA tests pass, including exact complex derivatives, delayed producers, a zero
+packet observation, contact development and rest/remount. The matched eight-family comparison completes 1,930 occurrences/1,929 deposits in 600.65 seconds
+with zero numerical development readouts. Its checkpoint is 975,051,301 bytes. The body and
+emission currents change, but all 128 output decisions still repeat `The its the its ...`.
+A fresh process preserves the selected metric and reproduces the body, emission currents and
+generation exactly. This has not returned useful language or a global finite-descent proof.
+
 [established-bounded; measured] The [joint-packet target](research/records/2026-09-08_AC2_THE_MATERIAL_TARGET_RETAINS_THE_JOINT_PACKET.md)
 separates eighteen root channels from 512 target coordinates and carries complex phase, native
 material/adjoint returns and persistence. The 1,930-occurrence study completes in 718.61 seconds
@@ -73,9 +84,11 @@ identifies the additional material-query and changing-contact receivers required
 A fresh process with that receiver reproduces the body, emission currents and all 128 output
 decisions exactly. Neither this repair nor local test success establishes useful language.
 
-[definition] Current AC1–AC2 work must join the actual material coefficient return and contact
-response: the present amplitude-fit and normalized-potential objectives are different. Derive
-and implement their compatible return, including its numerical defect, and inspect continuation.
+[definition] Current work moves to AC1 steps 3–4: local path formation, restriction/rebase and
+generator reuse through the actual joint boundary/material/return family. The common-current
+metric changes native conduct but leaves the language loop unchanged. Its retained-history
+representation is still far too large for the exposure; another scalar receiver adjustment or
+larger unchanged corpus run is not the next construction.
 Use the parallel joint-receiver/constitutive calculus for path and generator reuse; preserve
 internal contributions seen by material queries and later morphology. AC3 remains experimental;
 AC4–AC5 and useful Athena-alpha remain open.

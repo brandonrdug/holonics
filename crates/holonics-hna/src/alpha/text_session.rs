@@ -104,9 +104,14 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
             return Err(AlphaMaterialError::Apparatus("native reception is pending".into()));
         }
         let Some(latest)=self.latest.as_ref() else {return Ok(None);};
-        let Some(returned)=self.field.normalized_material_return(latest.occurrence,group_width,
-            holonic_engine::resident_section::SeriesAperture(32))? else {return Ok(None);};
-        let query=self.field.pull_back_material_source(&returned,metric)?;
+        let query=if metric==holonic_engine::native_ecology::constitutive_fibre::NativeMaterialPullbackMetric::SquaredCurrent {
+            let Some(query)=self.field.pull_back_material_current(latest.occurrence)? else {return Ok(None);};
+            query
+        } else {
+            let Some(returned)=self.field.normalized_material_return(latest.occurrence,group_width,
+                holonic_engine::resident_section::SeriesAperture(32))? else {return Ok(None);};
+            self.field.pull_back_material_source(&returned,metric)?
+        };
         let response=self.field.material_contact_response(query)?;
         self.field.apply_material_contact_realization(&response,realization)?;
         Ok(Some(response))

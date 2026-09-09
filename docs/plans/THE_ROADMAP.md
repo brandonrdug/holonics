@@ -125,8 +125,15 @@ through the native material/adjoint owners. The same 1,930-occurrence study comp
 answer repeats `The its the its ...`. The parallel-mathematics refinement reads the complete
 Euclidean current ball, with exact joint-cone comparisons, rather than coordinate boxes.
 
-[definition] Next join the native material coefficient and contact returns under compatible
-receiver objectives, retaining the numerical defect and actual producing morphology. The
+[established-bounded; measured] The [complete-current metric return](../../research/records/2026-09-08_AC1_THE_MATERIAL_AND_CONTACT_RETURN_SHARE_THE_COMPLEX_CURRENT_METRIC.md)
+now aligns the ordinary material fit and contact response locally, including both phase
+quadratures and retained defects. Two focused CUDA controls pass. The matched 1,930-occurrence
+comparison completes; native body/current conduct changes but terminal output still loops
+identically. Normalized receiver metrics remain explicit alternatives.
+
+[definition] Proceed with AC1 steps 3–4: local path formation, restriction/rebase and generator
+reuse. Derive the actively used coordinates and their continuing source/decoder through the
+actual receiver family. Retain the numerical defect and actual producing morphology. The
 [parallel calculus integration](../../research/records/2026-09-08_AC_THE_PARALLEL_RECEIVER_CALCULUS_REFINES_NATIVE_CONTINUATION.md)
 identifies the current amplitude-fit/normalized-potential mismatch and derives AC1's fixed-contact
 aggregate/parity reuse law. Continue path growth and generator reuse through the joint boundary,
@@ -161,7 +168,7 @@ complete population bounds, not an arbitrary radius, discarded current or basin-
 
 [project-postulate] Brandon has resumed completion of AC0–AC5 as the active goal and explicitly
 directs flexible designs and transparent reporting when a composition does not work.
-**Current work: AC1 material/contact return and path/reuse, with AC2 productive continuation after the joint-packet receiver return.** Each work update names phase/step, actual artifact and returned
+**Current work: AC1 steps 3–4, path/reuse and generator compression; AC2 productive continuation remains open after the current-metric comparison.** Each work update names phase/step, actual artifact and returned
 consequence. Do not resume the preserved joint kernel by default or restart completed foundations.
 
 | Phase | Ordered construction | Return required |

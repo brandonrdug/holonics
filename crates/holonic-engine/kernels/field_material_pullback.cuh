@@ -3,6 +3,22 @@
 // query current return. Numerical intervals and the operator/source defect remain separate
 // from a finite developmental displacement; this kernel does not select interval centres.
 struct MaterialInterval { wide lo,hi; };
+// Negative derivative of 1/2 ||observed-prediction||^2 in the complete complex
+// current chart. Each real/imaginary coordinate carries its outward interval;
+// the original joint balls remain retained by the field owner.
+extern "C" __global__ void section_field_material_current_covector(
+    const int64_t *prediction,const int64_t *observation,uint32_t targets,
+    int64_t *out_lo,int64_t *out_hi,uint32_t *slot,const uint32_t *census,
+    const uint32_t *lineage,uint32_t lineage_count
+){
+    if(upstream_refused(census,lineage,lineage_count,slot))return;
+    uint32_t j=blockIdx.x*blockDim.x+threadIdx.x;if(j>=2u*targets)return;
+    const wide *p=(const wide *)prediction,*q=(const wide *)observation+2u*(2u*targets+1u);
+    if(p[2u*targets]<0 || q[2u*targets]<0){atomicOr(slot,REFUSED_MALFORMED);return;}
+    wide error=add_checked(p[2u*targets],q[2u*targets],slot),value=sub_checked(q[j],p[j],slot);
+    wide *out=(wide *)out_lo;out[2u*j]=sub_checked(value,error,slot);out[2u*j+1u]=add_checked(value,error,slot);
+    if(!*slot)for(uint32_t i=0;i<4u;++i)out_hi[4u*j+i]=out_lo[4u*j+i];
+}
 __device__ MaterialInterval mp_point(wide x){return {x,x};}
 __device__ MaterialInterval mp_add(MaterialInterval a,MaterialInterval b,uint32_t *slot){
     return {add_checked(a.lo,b.lo,slot),add_checked(a.hi,b.hi,slot)};
@@ -75,10 +91,11 @@ extern "C" __global__ __launch_bounds__(512) void section_field_material_pullbac
     mp_pair(c,contextual_b_at(table,query-1u),cq,contextual_b_at(table,source),n,g,false,cr,ci,cn,cqn,slot);
     MaterialInterval ks=mp_kernel(sr,si,sn,sqn,g,slot),kc=mp_kernel(cr,ci,cn,cqn,g,slot),alpha={0,0};
     const wide *beta=(const wide *)(entry+contextual_beta(n,targets)),*r=(const wide *)returned;
-    for(uint32_t j=0;j<targets;++j){
-        wide b=(f&1u)?sub_checked(0,beta[2u*targets+2u*j],slot):add_checked(beta[2u*j],beta[2u*targets+2u*j],slot);
-        uint32_t offset=metric==0?4u:6u;
-        alpha=mp_add(alpha,mp_mul(mp_point(b),{r[10u*j+offset],r[10u*j+offset+1u]},g,slot),slot);
+    for(uint32_t j=0;j<targets;++j)for(uint32_t axis=0;axis<(metric==2?2u:1u);++axis){
+        uint32_t coordinate=2u*j+axis;
+        wide b=(f&1u)?sub_checked(0,beta[2u*targets+coordinate],slot):add_checked(beta[coordinate],beta[2u*targets+coordinate],slot);
+        uint32_t offset=metric==2?2u*coordinate:10u*j+(metric==0?4u:6u);
+        alpha=mp_add(alpha,mp_mul(mp_point(b),{r[offset],r[offset+1u]},g,slot),slot);
     }
     MaterialInterval as=mp_mul(alpha,kc,g,slot),ac=mp_mul(alpha,ks,g,slot);
     MaterialInterval coefficients[5]={mp_mul(as,mp_ratio(sr,sn,g,slot),g,slot),mp_mul(as,mp_ratio(si,sn,g,slot),g,slot),
@@ -123,7 +140,7 @@ extern "C" __global__ __launch_bounds__(512) void section_field_material_pullbac
     const wide *bounds=(const wide *)(now+contextual_extra(n,targets)),*r=(const wide *)returned;
     wide es=((const wide *)(s+16u*n+8u))[0],ec=((const wide *)(c+36u*n+16u))[0],rn=0;
     if(es<0||ec<0||bounds[0]<0||bounds[1]<0){atomicOr(slot,REFUSED_MALFORMED);return;}
-    for(uint32_t i=0;i<targets;++i){uint32_t off=10u*i+(metric==0?4u:6u);wide a=r[off],b=r[off+1];
+    for(uint32_t i=0;i<(metric==2?2u*targets:targets);++i){uint32_t off=metric==2?2u*i:10u*i+(metric==0?4u:6u);wide a=r[off],b=r[off+1];
         if(a>b){atomicOr(slot,REFUSED_MALFORMED);return;}wide m=a<0?sub_checked(0,a,slot):a;wide t=b<0?sub_checked(0,b,slot):b;
         rn=add_checked(rn,m>t?m:t,slot);
     }

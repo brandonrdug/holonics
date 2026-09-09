@@ -389,7 +389,7 @@ relation. Basin/stability probes answer a specific failure, never govern learnin
 authored entropy threshold. Use existing tube/span owners at their domains; no new tube engine
 or large fractal sampling campaign is scheduled.
 
-[definition] **Current entry point: AC1 compatible material/contact return and path/reuse, with AC2 productive continuation after the joint-packet receiver return.**
+[definition] **Current entry point: AC1 steps 3–4, path/reuse and generator compression; AC2 productive continuation remains open after the current-metric comparison.**
 The [normalized receiver](../../research/records/2026-09-08_AC1_THE_NORMALIZED_RECEIVER_RETURNS_ITS_COMPLETE_CURRENT_AND_TWO_METRIC_FACES.md)
 has returned resident source-qualified faces and metric covectors with actual-model evidence.
 Its full r is also the relative-entropy potential return; `J_p*r` belongs to squared probability
@@ -420,8 +420,14 @@ now separate target extent from root extent and retain the packet phase. The sam
 completes, but generation repeats `The its the its ...`. The subsequent receiver refinement
 transports the joint Euclidean ball exactly at the maximizing-coordinate face.
 
-[definition] Next join the native material coefficient return and contact response under
-compatible receiver objectives, including their actual numerical error/deposit law. The present
+[established-bounded; measured] The [complete-current return](../../research/records/2026-09-08_AC1_THE_MATERIAL_AND_CONTACT_RETURN_SHARE_THE_COMPLEX_CURRENT_METRIC.md)
+now aligns their local metric and retains both phase quadratures. The focused native controls
+pass and the matched conversation study completes, but its changed body/current conduct still
+produces the identical terminal loop.
+
+[definition] Proceed through AC1 steps 3–4: local path formation, restriction/rebase and
+generator reuse. Derive the actively used coordinates and their continuing source/decoder,
+including its numerical error/deposit law. The present
 amplitude-fit material update and normalized-potential contact response do not establish a common
 descent. The [parallel mathematics integration](../../research/records/2026-09-08_AC_THE_PARALLEL_RECEIVER_CALCULUS_REFINES_NATIVE_CONTINUATION.md)
 also derives the paired fixed-contact aggregate/parity law and identifies the additional

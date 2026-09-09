@@ -204,6 +204,13 @@ with explicit source readings and per-return frame persistence. `joint_material_
 retains native and actual-data checks; the endogenous joint producer remains open.
 
 
+[established-bounded; source-inspected] `field/receiver/normalized/pullback.rs` also owns
+`pull_back_material_current` and the `SquaredCurrent` metric. `field_material_pullback.cuh`
+constructs the complete complex covector and pairs both quadratures with historical material
+factors before the existing source/paired adjoints. The text SDK and cultivation checkpoint
+carry the explicit metric choice. The [current-metric return](../research/records/2026-09-08_AC1_THE_MATERIAL_AND_CONTACT_RETURN_SHARE_THE_COMPLEX_CURRENT_METRIC.md)
+retains exact derivative and persistence checks, without a global finite-descent claim.
+
 [established-bounded; source-inspected] `field/material_transport.rs::NativeMaterialTarget`
 separates the material codomain from the root field. `field_contextual_material.cuh` generates
 ordered complex tensor packets; contextual layouts, source adjoints and rest carry their target
