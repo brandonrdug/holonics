@@ -4,14 +4,21 @@
 relative-holon clause is `definition`; historical compact spellings are `historical`. Standard
 chain/sheaf assertions apply only under their explicitly declared hypotheses.
 
+[project-postulate] **Difference is the primary reality.** A value is a measured face of an
+oriented, situated difference; measurement always compares through frames/receivers. Holonics
+is pursued as a theory of everything, with relevance and relativity constituting how things
+can participate in and affect one another. [The reality of difference](THE_REALITY_OF_DIFFERENCE.md)
+connects this philosophical starting point to counting, geometry, construction and navigation.
+
 ## The elementary commitments
 
 1. **Situated occurrence.** A datum occurs as `x : X_(θ,e)` in a declared type/fiber, parameter,
    event cut, source boundary, and incidence context. Equal coordinate, value, text, bytes, or hash
    does not imply the same occurrence.
 2. **Participating receiver.** Every observation or comparison crosses a declared receiver
-   `ρ : X -> Y` or relation `ρ ⊆ X × Y`. The face `ρ(x)` is testimony about `x` through `ρ`; it is
-   not the absolute identity of `x`.
+   `ρ : X -> Y` or relation `ρ ⊆ X × Y`. The comparison's reference and conditions belong to
+   this chart even when its notation suppresses them. The face `ρ(x)` is a measured difference
+   through `ρ`, not the absolute identity of `x`.
 3. **Caused relation.** Structure enters standing only through an admitted occurrence, interaction,
    or inherited organ with retained lineage. Address proximity and correlation do not manufacture
    causation.

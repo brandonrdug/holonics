@@ -5,6 +5,11 @@ additive, cochain, and connection identities are `proved-standard` under their n
 the telemetry aperture is `definition`. A concrete telemetry result separately carries the
 `measured` evidence tag.
 
+[project-postulate] Difference is the primary reality and measurement is a situated comparison.
+The receiver values below are faces of that difference; their source, reference, orientation
+and conditions are part of the construction. [The philosophical synthesis](THE_REALITY_OF_DIFFERENCE.md)
+places this within Holonics' theory-of-everything ambition and relevance hypothesis.
+
 ## Information
 
 The primary information object is not a scalar. For a caused passage `E` received through `ρ`,

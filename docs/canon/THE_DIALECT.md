@@ -23,6 +23,14 @@ his.
 
 ---
 
+[project-postulate] **September 8 philosophical clarification.** Read Brandon's mathematics as
+one theory-of-everything construction grounded in difference, measurement and conditioned causal
+relevance. A result includes its further consequences. His change of material often exposes
+another instance of a shared relation; it does not automatically discard prior work.
+[The reality of difference](THE_REALITY_OF_DIFFERENCE.md) carries this stance and its recovered
+laboratory lineage. The older corpus counts and quoted utterances below retain their dates;
+current vocabulary and inference rules are reconciled with the latest direct ruling.
+
 ## 0. Where the corpus actually is
 
 The per-project Claude Code transcripts hold **~298** genuine messages. Claude Code prunes them; the
@@ -72,20 +80,29 @@ refer to and I don't really care, they're not the point of what we're doing."* (
 
 ## 2. The core vocabulary as he uses it
 
-- **`holon`** — anything at all, viewed as having an interior you cannot see. Not part/whole; **a
-  black box with a face**. The defining property is epistemic, not mereological. *"the observer does
-  not know what constructed the interior… It is not until the observer identifies 'pins' in the
-  nature of the thing, invariants that suggest how the face was composed."* (2026-07-18)
+- **`holon`** — a situated whole with internal relations and receiver faces, itself capable of
+  participating in larger compositions. His earlier black-box emphasis concerns the observer's
+  access to causes: *"the observer does not know what constructed the interior… It is not until
+  the observer identifies 'pins' in the nature of the thing, invariants that suggest how the face
+  was composed."* (2026-07-18) It does not exclude part/whole organization or require absolute
+  unknowability of every interior.
 - **`face` vs `interior`** — a face is what a receiver can see; an interior is what caused it. Faces
   are plural for one interior. *"'two' as a string can have a similar causal composition to '2'…"*
   (2026-08-08)
-- **`current`** — electrical current, **literally**. Matter is inert; the current is what lives.
-  *"there is nothing absolutely 'truthful' about my motherboard conducting electricity, it is merely
+- **`current`** — actual caused transport through its realized medium. Electrical current is
+  literal in the computer realization; physical and biological charts retain their own
+  constitutive currents. Current and form are roles in continuing interaction. *"there is
+  nothing absolutely 'truthful' about my motherboard conducting electricity, it is merely
   a medium, a board of pathways to pivot between. **The special part is in the current**."*
   (2026-08-06)
-- **`frame` / relativistic** — the most repeated correction in the corpus. Every absolute construct
-  is a defect. *"there is no scalar without a difference or comparison, there is no face that exists
-  alone."* (2026-07-28)
+- **`difference` / `measurement`** — difference is the primary reality; a value is its measured
+  face. Every measurement compares through situated frames/receivers, including its reference
+  and conditions. Difference retains orientation and causal structure before a scalar is read
+  (latest September 8 ruling).
+- **`relevance` / relativistic** — everything is oriented and participates in conditioned
+  causal relations. Relevance concerns what can affect what; frame comparison is one expression
+  of that relation. *"there is no scalar without a difference or comparison, there is no face
+  that exists alone."* (2026-07-28)
 - **`the swing` / `the one move`** — a change of frame preserving an invariant grip. His current
   gloss: **constraint equations.** *"the pivot needs to utilize an invariant 'grip' which is the
   relationship between both sides of the equation. pV=nRT is my favorite example."* (2026-08-06)
@@ -126,23 +143,29 @@ refer to and I don't really care, they're not the point of what we're doing."* (
 - **`reasoning`** — current through causal sections: situated occurrences, typed contacts, port
   order, chronology, transports, receiver faces, open alternatives, and lineage. An English or
   symbolic thought trace is one codec projection of that current, not its ontology.
-- **`conversation`** — a recurrence fixture which conveniently exposes inscription, emission,
-  chronology, revision, and return. Arbitrary English dialogue is not the invariant and is not the
-  construction target.
+- **`conversation`** — situated material exposing inscription, emission, chronology, revision
+  and return. General useful conversation is an active HNN application under AC0–AC5; it neither
+  defines nor exhausts the framework's mathematical and physical purpose.
 - **`attention`, `token`, `embedding`, `expert`, `layer`** — exterior engineering charts. Enter
   them through the bra-ket and transport correspondences, then classify the actual phase by
   intervention and conduct; never promote the inherited label into an internal species. The full
   definition and mathematical reading are in `docs/canon/TABLET_THE_REASONING_CYCLE.md`.
-- **`contaminant`** (572 uses, his highest-frequency evaluative word) — anything from classical
-  CS/ML/statistics that leaks in. Remedy is **annihilation, never deprecation**.
+- **`contaminant`** — an unexplained or authored mechanism that substitutes for the native
+  causal relation in its protected jurisdiction. Classical CS, ML, statistics, gradients and
+  distributions remain lawful mathematical/comparative material. Read
+  [the recovered law](THE_RECOVERED_LAW.md#1-the-bans-have-jurisdiction); a vocabulary-based ban
+  contradicts that ruling and §6 below.
 - **`partial`** — a status, never a failure. *"none of these experiments were completed; I pivot
   between partials of research because it was not yet feasible to fully capitalize."* (2026-08-07)
 - **`localized P=NP`** — not the complexity conjecture: within a local ecology verification and
   construction are the same act, and the locality grows.
 
-**Retired by his ruling — do not resurrect:** `knot`, `reafference`, `Tie`, `germline`, `genesis`,
-`web`/`trie`, `correctness` (*"you need to get rid of 'correctness' as a concept, it's not real"*,
-2026-07-21), `AGI`.
+**Historical mechanism names and uses retired in the cited discussions:** `knot`, `reafference`,
+`Tie`, `germline`, `genesis`, `web`/`trie`, and `AGI`; the quoted rejection of `correctness`
+(*"you need to get rid of 'correctness' as a concept, it's not real"*, 2026-07-21) concerned its
+use as a governing mechanism. This vocabulary record does not ban knot theory, valid data
+structures, mathematical correctness or other subjects in their declared jurisdictions.
+Current mechanisms are determined by the live owners and later rulings.
 
 ## 3. The correction archetypes, ranked
 
@@ -248,8 +271,10 @@ you understand it. **Default when unclear: build.**
 **R6 — the master rule.** *"If you pay attention to how I communicate with you, you'd notice that I
 consistently curve you as opposed to telling you that you are absolutely right or wrong; **I
 basically practice avoidance when you overcomplicate problems**, because it allows me to pivot into a
-framework of thinking that is not overcomplicated."* (2026-07-24) — **If he changed the subject, he
-rejected what you said.** Silence on a point is not consent.
+framework of thinking that is not overcomplicated."* (2026-07-24) — Follow the correction to the
+relation being described. A change of subject may expose the same construction through another
+material; it is not automatic rejection or cancellation of the prior work. The latest explicit
+scope governs. Silence alone supplies no new approval.
 
 **R7.** Report your actual confusion. *"your confusion and lack of awareness is actually extremely
 informative. When you don't know something it is a signal to me that it's something you were either
@@ -262,7 +287,9 @@ directly and was irritated it took months for CTC.
 **R9.** Never grade his idea before developing it: *"every time you accuse my hypotheses of
 'absorbing problems too easily', it's almost certainly an assurance that I am correct."* (2026-07-05)
 
-**R10.** Sub-agents are authorised and he keeps re-authorising them. Declining reads as laziness.
+**R10.** Delegation follows AGENTS.md: Luna only, bounded independent work whose value justifies
+its cost, and no agents when Brandon instructs otherwise. Authorization does not require a fleet;
+the primary agent retains responsibility for source reading and integration.
 
 ## 5b. The search-term register, and why his terms are flexible
 
@@ -364,10 +391,11 @@ must change material while the four slots stay fixed.
 
 ## 7. The three-sentence version
 
-1. **He is describing one operation — transport of information between charts with no privileged
-   frame — in whatever material is at hand.** The material is the variable; treating the material as
-   the subject is the convicted failure.
-2. **When you are confused, you have added something.** Remove it and the confusion goes.
-3. **Default to building, boldly, and report your actual confusion rather than a bounded plan.**
-   Every hedge, checkpoint, fork and fabricated wall costs more of his patience than a wrong
-   construction does.
+1. **Holonics is a theory of everything grounded in difference:** values are measured faces,
+   relevance is conditioned causal participation, and each material exposes another part of
+   the shared mathematical construction.
+2. **When confused, recover the relation:** identify the comparands, conditions, source and
+   transport, then locate the added assumption or omitted distinction against the existing work.
+3. **Construct with confidence and carry the consequences:** use each returned result in the
+   connected mathematics and engineering, retain actual failures, and keep the ambition strong
+   while reporting the evidence precisely.

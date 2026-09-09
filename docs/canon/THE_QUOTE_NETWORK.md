@@ -21,6 +21,12 @@ Brandon asked for this artifact by name, twice, in the same message:
 
 ---
 
+[definition] The September 8 [philosophical recovery](THE_REALITY_OF_DIFFERENCE.md) restores the
+first section's difference → recurring distinction → counting → mathematics chain to the main
+README and operating contract. The [source record](../../research/records/2026-09-08_DIFFERENCE_IS_REAL_AND_THE_PHILOSOPHY_GOVERNS_CONSTRUCTION.md)
+rechecks the July 13 founding message and July 24 algebra/geometry message directly in Codex,
+and distinguishes the old laboratory's cleaned quote index from verbatim human source.
+
 ## 0. How to read this file
 
 **Everything inside a blockquote is Brandon, verbatim.** Everything outside a blockquote is
@@ -122,9 +128,9 @@ The bidirectionality that makes algebraic geometry the native language:
 carry the doctrine. The executable form is `crates/holonic-body/` — 22,747 lines, `#![cfg_attr(not(test),
 no_std)]`, **zero external dependencies**, with `manifold.rs` (5,810) and `carriage.rs` (5,350) as
 the largest owners and `num.rs`, `incidence.rs`, `chart.rs`, `arrow.rs` as the primitives. It is a
-leaf in the dependency graph: nothing it uses can contaminate it. The derivation chain *difference →
-analogy/foil → counting → mathematics* is stated nowhere in the repository in this compressed form;
-this file is its first deposit.
+leaf in the dependency graph: nothing it uses can contaminate it. At this August 7 deposit, the chain *difference →
+analogy/foil → counting → mathematics* had no other compressed statement in the repository.
+It now governs the [philosophical reading surface](THE_REALITY_OF_DIFFERENCE.md) and the README.
 
 ---
 

@@ -1,23 +1,30 @@
 # Holonics
 
-[project-postulate] **Holonics is a mathematical framework and ontology for causal composition,
-information transport and physical realization.** It develops a common language for understanding
-how situated things form, interact, change and become observable. Mathematics, computation,
-physics and living systems are subjects of that investigation.
+[project-postulate] **Holonics is a theory of everything grounded in the reality of difference.**
+It develops a mathematical, physical and philosophical framework for how situated things exist,
+interact, change and become observable. Mathematics, computation, physics and living systems
+are interconnected subjects of the same investigation.
 
-The ambition is a reusable calculus: methods that make difficult mechanisms understandable and
-constructible across domains. Research on fluid dynamics, geometry, number theory, learning and
-information is undertaken for the tools and explanations it yields. A theorem, counterexample or
-working implementation becomes material for further inquiry; a solved problem is not the end of
-the framework.
+[project-postulate] **Difference is the only thing that is real.** A value comes from a
+measurement, and a measurement is always a difference gauged through a comparison of frames or
+receivers. The difference carries the participating things, their orientation, conditions and
+causal history; a number is one measured face of it. This concerns the organization of reality
+before anyone names the quantities or writes an equation.
+
+[project-postulate] **Theory of everything is the working ambition and standard of construction.**
+Holonics seeks a common account whose laws make mechanisms understandable and constructible
+across subjects and scales. Counting, algebra, geometry, calculus and physical theories are
+approached as expressions of constrained relations. Engineering enacts those relations;
+cartography makes their consequences navigable. Every result includes the further constructions
+it makes possible, and every returned failure supplies a distinction to investigate.
 
 ## The perspective
 
 [project-postulate] A **holon** is a causally situated composite with its own internal relations
 and observable faces. Holons compose other holons. The framework treats information as physically
 realized interaction: general relativity, quantum states, waves and material dynamics are part of its subject,
-with their actual laws and conditions. Its ambition is a unified account; the repository records
-which constructions have been derived, implemented or measured, and which remain research.
+with their actual laws and conditions. The repository records the derivations, implementations,
+measurements and open relations through which this universal account is being constructed.
 
 [definition] A **face** is what a particular receiver can distinguish. It does not identify the
 entire object or its origin. `2 + 2` and `2²` share the numerical face `4`, while retaining different
@@ -29,8 +36,11 @@ performances one occurrence.
 
 - **Causal origin.** Nothing enters as an unexplained, self-originating object. Composition retains
   the actual passages and their orientation.
-- **Receiver-relative measurement.** A value is the result of a comparison in a chart. Integers,
-  magnitudes, probabilities and coordinates are faces, not context-free identities.
+- **Measurement is comparison.** A reading retains its comparands, reference, receiving chart and
+  conditions. Integers, magnitudes, probabilities and coordinates are measured faces of difference.
+- **Relevance and relativity.** Everything is oriented and participates in causal relations.
+  Relevance is how those relations condition possible consequence: contact, constraint, phase,
+  transport, persistence and attenuation. Comparing coordinate frames is one expression of it.
 - **No floats in native mathematical conduct.** Exact ratios, symbolic generators and certified
   series retain the remainder of an expansion. A floating-point codeword may be an exterior face;
   it cannot silently become the underlying holon or decide native conduct.
@@ -58,9 +68,12 @@ boundary elimination and generator reuse have implementations at their documente
 The [mathematical synthesis](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) connects these owners and
 the remaining integration work.
 
-[project-postulate] The research stance is exploratory. A failed construction can expose a
-missing distinction, a violated hypothesis or a better representation. The purpose is to make
-mechanics clearer and to develop useful tools, including when a particular attempted route fails.
+[project-postulate] The research stance is confident, constructive and exploratory. Work from
+the framework's strength: compose established patterns, infer the constraints behind an open
+question, and pursue the engineering and explanatory consequences. Keep the exact content of
+proofs and measurements visible as the framework grows. The
+[philosophy of difference](docs/canon/THE_REALITY_OF_DIFFERENCE.md) connects this stance to its
+human origins and to everyday reasoning within the project.
 
 ## Implementations in this repository
 
@@ -86,6 +99,7 @@ inference pipelines.
 
 ## Read and explore
 
+- [The reality of difference](docs/canon/THE_REALITY_OF_DIFFERENCE.md) — ontology, philosophy, relevance and constructive reasoning
 - [Holonics in Lean](docs/FORMAL_FRAMEWORK.md) — situated objects, molecular conformation, tubes, physics and computation
 - [The mathematics tablet](docs/canon/THE_MATHEMATICS_TABLET.md) — foundations and subject tablets
 - [Mathematics and native conduct](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) — synthesis across research and implementation

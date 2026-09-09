@@ -19,6 +19,11 @@ circulation.
 
 ---
 
+[project-postulate] The [reality of difference](THE_REALITY_OF_DIFFERENCE.md) is the philosophical
+starting point for this tablet: construction and cartography enact and expose constrained
+relations; compression, intelligence and navigation describe their continuing reuse. Results
+carry their consequences immediately into the next authorized construction.
+
 ## 1. Cartography is continuing morphology
 
 `project-postulate`: a living map is not a representation beside the navigator. It is the

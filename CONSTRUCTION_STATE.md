@@ -8,6 +8,15 @@
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct
 instruction governs.
 
+## Philosophical synthesis
+
+[established-bounded; process-audit] The [philosophical recovery](research/records/2026-09-08_DIFFERENCE_IS_REAL_AND_THE_PHILOSOPHY_GOVERNS_CONSTRUCTION.md)
+returns the laboratory's human/semantic lineage and directly checked July/September messages.
+README and AGENTS.md now lead with the theory-of-everything ambition, difference as reality,
+measurement as comparison and constitutive relevance. [The reality of difference](docs/canon/THE_REALITY_OF_DIFFERENCE.md)
+carries the live reasoning discipline; contradictory dialect interpretations are repaired.
+This is a prose/authority return. No predecessor implementation or native/formal algorithm changed.
+
 ## Formal framework synthesis and unification
 
 [proved-derived; formal-checked] The [continuing unification](research/records/2026-09-08_CHANGING_CONSTITUTION_AND_RECEIVERS_SHARE_ONE_DEFECT_CALCULUS.md)

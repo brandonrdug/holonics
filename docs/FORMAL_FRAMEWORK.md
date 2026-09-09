@@ -7,6 +7,11 @@ Neither determines the framework's endpoint. Brandon's September 7–8 direct me
 review's exact source coordinates are retained in the
 [formal synthesis deposit](../research/records/2026-09-08_FORMAL_HOLONICS_IS_A_FRAMEWORK_OF_INTERACTING_TRANSPORT.md).
 
+[project-postulate] The [reality of difference](canon/THE_REALITY_OF_DIFFERENCE.md) supplies the
+philosophical starting point: Holonics is a theory of everything, difference is primary, every
+value comes from a situated comparison, and relevance concerns causal participation. These
+commitments guide how the formalized instances below are composed and developed.
+
 [definition] The Lean entry point is
 [`ElementaryHolonics.Framework`](../formal/elementary-holonics/ElementaryHolonics/Framework.lean).
 Its six subject imports—Core, Geometry, Dynamics, Information, Physics and Computation—compose

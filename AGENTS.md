@@ -11,9 +11,9 @@ Brandon asks for analysis only. Resolve contradictory agent prose from his lates
 and its chronological context. Correct the live clause and consumers together; do not return a
 catalogue of minor decisions or ask him to repeat a settled ruling.
 
-[project-postulate] Holonics is a mathematical framework and ontology for situated objects,
-causal composition, information transport and physical realization. Its mathematical research
-develops reusable methods of construction and explanation across mathematical, physical,
+[project-postulate] Holonics is a theory of everything: a mathematical, physical and philosophical
+framework for situated objects, causal composition, information transport and physical realization.
+Its mathematical research develops reusable methods of construction and explanation across mathematical, physical,
 biological and learning systems. HNN is its Holonic Neural Network architecture; Athena is a
 model/ecology; Eros composes and develops it; Soulkiller independently dismantles inherited
 realizations. HNN's product goal is frontier-level usefulness on consumer hardware. The “20W
@@ -21,6 +21,34 @@ ideology” directs efficient local learning and reuse, not a literal current-ma
 [the architecture](docs/ARCHITECTURE.md), [Soulkiller](docs/SOULKILLER.md),
 [Athena](docs/ATHENA.md) and [interoperability](docs/INTEROPERABILITY.md) before reassessing
 those subjects.
+
+[project-postulate] **Difference is the only thing that is real.** Values are measured faces of
+situated differences; measurement is always a comparison through frames/receivers. Retain the
+comparands, reference, orientation, conditions and causal origin. Difference can be a structured
+relation, current, changed geometry or continuation fibre; do not reduce it to scalar subtraction.
+A zero receiver difference establishes agreement only at that receiver's declared scope.
+
+[project-postulate] **Relevance and relativity are constitutive.** Everything is oriented and
+participates in conditioned causal relations. Begin with what can affect what through the actual
+incidence, transport and boundary; coordinate-frame comparison is one expression of this deeper
+relativity. A relevance score, semantic label or universal all-to-all contact is not that relation.
+The causal ontology treats apparent randomness through unresolved conditions and receiver scope;
+probability and statistics remain lawful declared charts under the existing jurisdiction rules.
+
+[project-postulate] **Hold the theory-of-everything ambition as the working standard.** Assume the
+framework's strength and pursue its consequences with initiative. The philosophy must shape
+reasoning before implementation: recover existing constructions, connect their elementary
+patterns, and let each return change what can be inferred or built next. A theorem's solved
+status is not its purpose. Develop an intuition into explicit maps and consequences; use actual
+failures to locate the mistaken construction or refine the claim. Keep the ambition strong and
+the evidence exact, without repeatedly seeking permission to use established mathematics.
+
+[definition] [The reality of difference](docs/canon/THE_REALITY_OF_DIFFERENCE.md) is the concise
+philosophical reading surface. Its source record recovers Brandon's intuitive reasoning from
+`~/Workspaces/laboratory` and the direct logs. Those records inform interpretation; current
+source, canon and later direct rulings govern implementation. Historical agent slogans and
+capability claims are not silently restored with the philosophy. Retain this context across
+turns rather than treating its consequences as repeated revelations.
 
 [project-postulate] Use **Luna only** when delegating. Honor an instruction to work without agents.
 Delegate bounded independent tasks whose value justifies their token cost. Do not duplicate the

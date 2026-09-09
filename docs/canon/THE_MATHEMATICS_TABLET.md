@@ -5,6 +5,13 @@ for: *"a thorough holonic synopsis that acts as an authoritative mathematics tab
 important foundation to our ontology and research."* Sections land as they are grounded; a section
 with no owner named is a section not yet written, and says so.
 
+[project-postulate] Brandon's latest September 8 articulation makes the philosophy explicit:
+Holonics is a theory of everything grounded in difference. Values arise through measurement;
+measurement is comparison through situated frames/receivers. Relevance and relativity concern
+causal participation before coordinate notation. The [reality of difference](THE_REALITY_OF_DIFFERENCE.md)
+carries the recovered human intuition and the reasoning discipline it establishes. Mathematical
+results include their further constructive consequences; use that continuity as the starting point.
+
 [project-postulate] Brandon's 2026-09-04 scope ruling: Holonics is a mathematical framework and
 ontology for causal composition, information transport and physical realization. HNN is one
 executable architecture within it. Mathematical research develops reusable methods of explaining

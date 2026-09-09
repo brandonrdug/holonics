@@ -1,10 +1,16 @@
 # Holonics: mathematical framework and executable architectures
 
-[project-postulate] Holonics is a mathematical framework and ontology for situated objects,
-causal composition, information transport and physical realization. Its research develops
+[project-postulate] Holonics is a theory of everything grounded in the reality of difference:
+a mathematical, physical and philosophical framework for situated objects, causal composition,
+information transport and physical realization. Its research develops
 methods for constructing and explaining mathematical, physical, biological and learning
 systems. The Millennium lines investigate those methods through exact source problems;
 their purpose includes reusable explanation and computational application.
+
+[definition] [The reality of difference](canon/THE_REALITY_OF_DIFFERENCE.md) explains the
+philosophical starting point: every value is a measured difference through a situated comparison,
+and relevance concerns how actual relations condition consequence. That philosophy governs how
+existing mathematical and executable owners are interpreted, composed and developed.
 
 [definition] The elementary [holon](../formal/elementary-holonics/ElementaryHolonics/Foundation/Holon.lean)
 retains an occurrence population, oriented source and target ports, and a receiver. Its preimage

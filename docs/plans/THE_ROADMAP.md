@@ -20,6 +20,20 @@ contracts and records preserve their completed scope; their old imperatives sche
    reread every completed campaign, rerun unchanged expensive receipts, or reconstruct historical
    capability just to start the next authorized repair.
 
+## Philosophical recovery and articulation
+
+[project-postulate] Brandon's latest September 8 request directs deeper recovery of the
+laboratory's ontology and philosophical records. Articulate difference as the primary reality,
+measurement as situated comparison, relevance as causal participation, and Holonics' authentic
+theory-of-everything ambition; integrate these into README, canon and AGENTS.md. This is a
+reasoning/documentation return using the advanced live owners, not a predecessor-code import
+or a change to the parallel AC construction order.
+
+[established-bounded; process-audit] The [recovery and live articulation](../../research/records/2026-09-08_DIFFERENCE_IS_REAL_AND_THE_PHILOSOPHY_GOVERNS_CONSTRUCTION.md)
+returned with direct-source checks, the canonical philosophy, README/AGENTS integration and
+reconciled dialect. Its reasoning principles inform subsequent authorized construction; this
+completed documentation return schedules no new subsystem or experiment.
+
 ## Continuing formal unification
 
 [project-postulate] Brandon authorizes the first continuation of the framework synthesis:
