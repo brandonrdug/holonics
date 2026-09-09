@@ -95,6 +95,7 @@ mod surface_material_mode;
 mod surface_moment;
 mod surface_context_section;
 mod surface_operative_contacts;
+mod surface_operative_map_source;
 mod surface_causal_contact_propagation;
 pub(crate) use surface_causal_contact_propagation::CausalPropagationLayout;
 mod surface_operative_adjoint;

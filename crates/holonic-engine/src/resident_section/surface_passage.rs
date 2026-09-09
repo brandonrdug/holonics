@@ -469,7 +469,7 @@ impl<'chart> ResidentSurface<'chart> {
             if occurrence>=u32::MAX as u64 || (origin.is_some() && source>=occurrence)
                 || !matches(table,at.max(1),3) || !matches(weights,at+1,16) || !matches(evaluations,4,30*targets){return Err(fail("contextual source work extent"));}
         }
-        if operative.is_some_and(|s|!matches(s,1,20) || junction.is_none_or(|j|j.5.0==1)) {return Err(fail("operative contact table or current representation"));}
+        if operative.is_some_and(|s|!matches(s,1,22) || junction.is_none_or(|j|j.5.0==1)) {return Err(fail("operative contact table or current representation"));}
         let shared = nodes.checked_mul(24).and_then(|v| v.checked_mul(16))
             .and_then(|v| u32::try_from(v).ok())
             .filter(|v| *v <= self.declaration.max_sectiond_bytes)

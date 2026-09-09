@@ -33,6 +33,10 @@ impl NativeConstitutiveField<'_> {
         let factors=self.resolve_operative_current_factors(r)?;
         let currents = read(&factors)?;
         let bounds = read(&r.bounds)?;
+        let source=r.source_overlap.as_ref().map(|h| {
+            let map=self.operative_producing_map(h.source)?;
+            Ok::<_,Error>((read(&map)?,read(&h.coefficients)?,h.count))
+        }).transpose()?;
         let scale = BigInt::one() << op.grain;
         let scale_ratio = Rat::from_integer(scale.clone());
         let wave = |v: &[i128]| {
@@ -54,6 +58,15 @@ impl NativeConstitutiveField<'_> {
                     value = value.add(&wave(&ports[f * d + j..f * d + j + 2]).multiply(
                         &wave(&currents[2 * (f * r.factor_count + i)..2 * (f * r.factor_count + i) + 2]).conjugate(),
                     ));
+                }
+                if let Some((source,h,count))=&source {
+                    for after in 0..*count {
+                        let joined=op.births[after].source;
+                        let Ok(before)=op.births[..after].binary_search_by_key(&joined,|b|b.receiving) else{continue;};
+                        let z=wave(&h[2*after..2*after+2]);
+                        if i==before {value=value.add(&wave(&source[after*d+j..after*d+j+2]).multiply(&z.conjugate()));}
+                        if i==after {value=value.add(&wave(&source[before*d+j..before*d+j+2]).multiply(&z));}
+                    }
                 }
                 let quantize = |x: &Rat| Rat::new((x * &scale_ratio).to_integer(), scale.clone());
                 let difference = ExactComplexWaveCurrent::new(

@@ -93,7 +93,7 @@ fn current_difference_generator_decodes_archived_boundaries_and_legacy_factors()
         };
         assert_eq!(prefix.intervals,expected);
     }
-    let dense=Rc::new(OperativeReturn{current_difference_source:None,currents:Rc::clone(&response.currents),
+    let dense=Rc::new(OperativeReturn{source_overlap:None,current_difference_source:None,currents:Rc::clone(&response.currents),
         at_cut:generated.at_cut,contact_count:generated.contact_count,factor_count:generated.factor_count,
         realization:generated.realization,origin:Rc::clone(&generated.origin),ports:Rc::clone(&generated.ports),
         b:None,bounds:Rc::clone(&generated.bounds)});
@@ -438,6 +438,7 @@ fn zero_extension_preserves_the_complete_contact_response_and_legacy_delta() {
     let dense_zero = Rc::new(surface.mount_section_rest(&zero).unwrap());
     for realization in [NativeContactRealization::EnclosedFlow, NativeContactRealization::DyadicDeposit] {
         let delta = |dense| Rc::new(OperativeReturn {
+            source_overlap:None,
             current_difference_source: None,
             at_cut: view.field_cut(), contact_count: count,
             factor_count: if dense { count } else { source_count },

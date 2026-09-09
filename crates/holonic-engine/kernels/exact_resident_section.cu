@@ -1627,6 +1627,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "field_linear_material.cuh"
 #include "field_material_support.cuh"
 #include "field_operative_contacts.cuh"
+#include "field_operative_map_source.cuh"
 #include "field_causal_contact_propagation.cuh"
 #include "field_causal_contact_pullback.cuh"
 #include "field_operative_reflection.cuh"

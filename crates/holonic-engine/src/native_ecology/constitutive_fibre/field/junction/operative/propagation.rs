@@ -4,7 +4,7 @@ use super::*;
 use crate::resident_section::CausalPropagationLayout as Layout;
 use num_bigint::BigInt;
 use num_traits::One;
-mod return_path;
+pub(super) mod return_path;
 
 pub struct NativeCausalContactPropagation<'f, 'c> {
     field: &'f NativeConstitutiveField<'c>,

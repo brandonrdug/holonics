@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 9, 2026. **Priority:** AC0–AC5 goal remains active; current cultivation seeks identifiable behavioral phenomena, not forced utility. Causal-contact forward and reverse words are resident; AC1–AC2 now bind their sparse return to the historical journal and recurrence.
+**Currency:** September 9, 2026. **Priority:** AC0–AC5 goal remains active; current cultivation seeks identifiable behavioral phenomena, not forced utility. The historical source-map journal is implemented and verified; AC1–AC2 now connect propagation to the continuing recurrence.
 **Position:** AC0 complete; AC1 accumulated-normal material integrated; AC1 path/generator reuse and AC2 situated feedback/useful continuation open; AC3 experimental artifacts; AC4–AC5 open.
 **Athena-alpha:** not yet attained.
 
@@ -90,12 +90,20 @@ model or product grade and adds no numerical policy to the parallel AC1 work.
 ## Current HNN construction
 
 [established-bounded; implemented-exact; measured] The
+[source-map journal return](research/records/2026-09-09_AC1_THE_JOURNAL_GENERATES_ITS_HISTORICAL_SOURCE_MAPS.md)
+retains one map anchor, actual later birth columns and source-dependent sparse returns. Its
+native decoder recovers historical producers after further changes, archive and restart; late
+overflow preserves the field and false source lineage refuses. All 130 field cases pass and
+the old conversation checkpoint remains readable. The propagation recurrence is still unchanged;
+its source-bound current-factor and live feedback binding are the current work.
+
+[established-bounded; implemented-exact; measured] The
 [resident causal-word return](research/records/2026-09-09_AC1_THE_CAUSAL_CONTACT_WORD_AND_ITS_SPARSE_RETURN_ARE_RESIDENT.md)
 stages forward current and the sparse morphology adjoint through actual source joins, without
 numerical section readout or source mutation. Three native controls pass; the shared division
 change passes all 128 field cases. The complete stored 74-contact model agrees with its enclosed
 reference; resident staging takes 0.109 seconds. The first launch configuration error is repaired.
-Generation is unchanged until the source-map journal and recurrence integration return.
+Generation is unchanged until the recurrence binding below returns.
 
 [established-bounded; implemented-exact; computational-witness] The
 [causal-contact propagation return](research/records/2026-09-09_AC1_CAUSAL_CONTACT_JOINS_RETURN_A_PROPAGATION_AND_ITS_MORPHOLOGY_DERIVATIVE.md)
@@ -175,10 +183,11 @@ and useful responses remain open.
 
 [definition] **Current work: AC1 steps 3–4 and AC2's situated feedback/continuation.** Compose
 source-qualified propagation, reflection, exchange and the material/current boundary through
-existing owners. The declared causal-contact connection now has resident forward/reverse operators.
-Bind the sparse `D_source H` return to its historical producer and executable journal decoder.
-Propagate the existing interior before forming the newborn zero-input branch, then use the same
-outer reflection. Preserve the propagated input boundary in its current-factor generator.
+existing owners. Resident forward/reverse operators and the `D_source H` journal/decoder now
+return. Connect propagation of the existing interior before newborn zero-input formation and
+the same outer reflection. Retain original propagation input bounds, reuse recent forward words,
+and regenerate older words through their actual source maps/current boundaries. Pass the
+available producer into current-factor decoding so it does not rebuild the same dependency.
 Relevance is future receiver consequence, not present tensor agreement or a scalar
 loss alone. Research retains unusual behavior;
 useful response completion remains a later product requirement.

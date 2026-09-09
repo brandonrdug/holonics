@@ -30,6 +30,8 @@ pub struct NativeOperativeContactBirth {
 pub(in super::super) mod rest;
 mod current_factor;
 mod propagation;
+mod map_source;
+use map_source::{OperativeMapProgram,OperativeSourceOverlap};
 pub use propagation::{NativeCausalContactPropagation,NativeCausalContactPropagationReading,NativeCausalContactJoinReading};
 pub use current_factor::NativeOperativeCurrentFactorCondensation;
 
@@ -53,6 +55,7 @@ pub(super) struct OperativeReturn<'c> {
     currents: Rc<ResidentSection<'c>>,
     // When present, currents stores only ell; k is the addressed source interior difference.
     current_difference_source: Option<usize>,
+    source_overlap: Option<OperativeSourceOverlap<'c>>,
     // None is the exact zero generator on contact_count entries, not missing current.
     b: Option<Rc<ResidentSection<'c>>>,
     bounds: Rc<ResidentSection<'c>>,
@@ -66,6 +69,7 @@ pub struct NativeOperativeContactStaging<'f, 'c> {
     // Retained return carriers are chronological generators of the new map/current, not
     // rewritten source descriptions. A failed attempt is never appended here.
     returns: Vec<Rc<OperativeReturn<'c>>>,
+    program:Option<OperativeMapProgram<'c>>,
 }
 
 pub(in super::super) struct OperativeState<'c> {
@@ -79,6 +83,7 @@ pub(in super::super) struct OperativeState<'c> {
     pub(in super::super) births: Vec<NativeOperativeContactBirth>,
     origin: Rc<()>,
     returns: Vec<Rc<OperativeReturn<'c>>>,
+    program:Option<OperativeMapProgram<'c>>,
 }
 pub(in super::super) struct PendingOperative<'c> {
     origin: Rc<()>,
@@ -87,6 +92,7 @@ pub(in super::super) struct PendingOperative<'c> {
     pub(in super::super) table: ResidentSection<'c>,
     pub(in super::super) _scratch: ResidentSection<'c>,
     pub(in super::super) count: usize,
+    birth:Option<Rc<ResidentSection<'c>>>,
 }
 pub(in super::super) struct HeldOperative<'c> {
     pub(in super::super) b: Rc<ResidentSection<'c>>,
@@ -108,17 +114,27 @@ pub struct NativeOperativeReturnStorage {
     pub logical_internal_delta_octets:u64,
     pub logical_current_factor_octets:u64,
     pub total_octets:u64,
+    pub source_overlap_octets:u64,
+    /// Referenced anchor/birth storage; the anchor can share the current map before its change.
+    pub map_source_octets:u64,
 }
 impl NativeConstitutiveField<'_>{
     pub fn operative_return_storage(&self)->Option<NativeOperativeReturnStorage>{
         let op=self.junction.as_ref()?.operative.as_ref()?;
-        let mut out=NativeOperativeReturnStorage{returns:op.returns.len(),port_octets:0,current_factor_octets:0,internal_delta_octets:0,bound_octets:0,implicit_zero_delta_returns:0,current_difference_returns:0,logical_internal_delta_octets:0,logical_current_factor_octets:0,total_octets:0};
+        let mut out=NativeOperativeReturnStorage{returns:op.returns.len(),port_octets:0,current_factor_octets:0,internal_delta_octets:0,bound_octets:0,implicit_zero_delta_returns:0,current_difference_returns:0,logical_internal_delta_octets:0,logical_current_factor_octets:0,total_octets:0,source_overlap_octets:0,map_source_octets:0};
         for r in &op.returns {out.port_octets+=r.ports.resident_octets();out.current_factor_octets+=r.currents.resident_octets();out.internal_delta_octets+=r.b.as_ref().map_or(0,|b|b.resident_octets());out.bound_octets+=r.bounds.resident_octets();out.implicit_zero_delta_returns+=usize::from(r.b.is_none());out.current_difference_returns+=usize::from(r.current_difference_source.is_some());out.logical_internal_delta_octets+=64*r.contact_count.max(1) as u64;out.logical_current_factor_octets+=128*r.contact_count.max(1) as u64;}
-        out.total_octets=out.port_octets+out.current_factor_octets+out.internal_delta_octets+out.bound_octets;Some(out)
+        out.source_overlap_octets=op.returns.iter().filter_map(|r|r.source_overlap.as_ref()).map(|h|h.coefficients.resident_octets()+h.errors.resident_octets()).sum();
+        out.map_source_octets=op.program.as_ref().map_or(0,|p|p.map.resident_octets()+p.births.iter().map(|b|b.resident_octets()).sum::<u64>());
+        out.total_octets=out.port_octets+out.current_factor_octets+out.internal_delta_octets+out.bound_octets+out.source_overlap_octets;Some(out)
     }
 }
 
 impl<'c> OperativeState<'c> {
+    pub(in super::super) fn reserve_birth(&mut self) -> Result<(),Error> {
+        self.births.try_reserve(1).map_err(|_|Error::Shape)?;
+        if let Some(program)=&mut self.program {program.births.try_reserve(1).map_err(|_|Error::Shape)?;}
+        Ok(())
+    }
     pub(in super::super) fn is_fixed(&self) -> bool {
         self.returns.is_empty()
     }
@@ -142,6 +158,7 @@ impl<'c> OperativeState<'c> {
         let scratch =
             surface.fresh_section(1, 2 * (m * m + m) + 12 * count.max(1), ResidentGrain(0))?;
         let trace = Rc::new(surface.fresh_section(1, 18 * d + 12, ResidentGrain(0))?);
+        let birth=(linked && self.program.is_some()).then(||surface.fresh_section(1,2*d,ResidentGrain(0)).map(Rc::new)).transpose()?;
         let mut words = vec![];
         for ptr in [
             self.sections.map.lo_device_ptr(),
@@ -164,11 +181,13 @@ impl<'c> OperativeState<'c> {
             trace.hi_device_ptr(),
             self.births.len() as u64,
             count as u64,
+            birth.as_ref().map_or(0,|b|b.lo_device_ptr()),
+            birth.as_ref().map_or(0,|b|b.hi_device_ptr()),
         ] {
             words.push((ptr as i64, ptr as i64));
         }
         let table = surface.mount_section_rest(
-            &ResidentSectionRest::found(1, 20, ResidentGrain(0), 64, words).map_err(invalid)?,
+            &ResidentSectionRest::found(1, 22, ResidentGrain(0), 64, words).map_err(invalid)?,
         )?;
         Ok(PendingOperative {
             origin: Rc::new(()),
@@ -177,6 +196,7 @@ impl<'c> OperativeState<'c> {
             table,
             _scratch: scratch,
             count,
+            birth,
         })
     }
     pub(in super::super) fn receive(
@@ -186,6 +206,7 @@ impl<'c> OperativeState<'c> {
         at: usize,
     ) {
         if let Some(source) = source {
+            if let Some(program)=&mut self.program {program.births.push(next.birth.as_ref().expect("prepared birth column").clone());}
             self.births.push(NativeOperativeContactBirth {
                 source,
                 receiving: at,
@@ -294,6 +315,7 @@ impl<'c> NativeConstitutiveField<'c> {
                 births: owned.births.clone(),
                 sections: Rc::clone(&owned.sections),
                 returns: owned.returns.clone(),
+                program:owned.program.clone(),
             });
         }
         let grain = match self.junction_representation() {
@@ -419,6 +441,7 @@ impl<'c> NativeConstitutiveField<'c> {
             births,
             sections: staged,
             returns: vec![],
+            program:None,
         })
     }
 }
@@ -426,7 +449,7 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
     // Owner-only adoption after a complete native constitutive return. Birth identity and
     // activation standing remain in the existing ecology; only its staged differences move.
     #[cfg(test)]
-    fn into_update(self)->(Rc<OperativeSections<'c>>,Rc<()>,Vec<Rc<OperativeReturn<'c>>>) {(self.sections,self.origin,self.returns)}
+    fn into_update(self)->(Rc<OperativeSections<'c>>,Rc<()>,Vec<Rc<OperativeReturn<'c>>>,Option<OperativeMapProgram<'c>>) {(self.sections,self.origin,self.returns,self.program)}
     pub(in super::super) fn into_owned(self) -> OperativeState<'c> {
         let activated_at = self.field_cut();
         OperativeState {
@@ -438,6 +461,7 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
             births: self.births,
             origin: self.origin,
             returns: self.returns,
+            program:self.program,
         }
     }
     pub fn field_cut(&self) -> usize {
@@ -457,6 +481,7 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
     }
     pub(super) fn stage_return_using(&self, returned: Rc<OperativeReturn<'c>>,
         currents: &Rc<ResidentSection<'c>>) -> Result<Self, Error> {
+        if returned.source_overlap.is_some(){return self.stage_source_return(returned,currents);}
         if !Rc::ptr_eq(&self.origin, &returned.origin) || returned.at_cut!=self.field_cut() || returned.contact_count!=self.births.len() {
             return Err(Error::ForeignOccurrence);
         }
@@ -515,6 +540,7 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
             births: self.births.clone(),
             sections: staged,
             returns,
+            program:self.program.clone(),
         })
     }
     pub fn inspect(&self) -> Result<NativeOperativeContactReading, Error> {

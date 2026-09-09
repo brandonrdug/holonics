@@ -1,0 +1,45 @@
+{
+  "grade": "established-bounded",
+  "evidence": [
+    "implemented-exact",
+    "process-audit",
+    "measured"
+  ],
+  "scope": "Source-map coefficient journal controls and legacy model remount; propagation recurrence remains unchanged.",
+  "source_revision": "339c7991 plus accompanying source-map journal implementation",
+  "source_program_control": {
+    "passed": 1,
+    "seconds": 0.7,
+    "occurrences": 10,
+    "anchor_cut": 6,
+    "later_birth_columns": 4,
+    "checks": [
+      "once-projected complete coefficient sum",
+      "historical maps with recent cache cleared",
+      "older source re-engagement",
+      "archive and restart",
+      "late overflow preserves state",
+      "false source lineage rejected"
+    ]
+  },
+  "complete_field_suite": {
+    "passed": 130,
+    "seconds": 142.21,
+    "includes_ignored": true
+  },
+  "sdk_example_build": "passed",
+  "legacy_model": {
+    "model": ".local/artifacts/athena-alpha/ac1-contact-response/first-family-normal-derived-layout.hna",
+    "field_cut": 75,
+    "contacts": 74,
+    "joins": 73,
+    "fractional_bits": 72,
+    "comparison": {
+      "contains_reference_radius": true,
+      "same_current": true,
+      "same_joins": true,
+      "same_rounding": true
+    },
+    "whole_read_remount_and_comparison_seconds": 2.617142234
+  }
+}

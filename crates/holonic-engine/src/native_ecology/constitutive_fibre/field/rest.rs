@@ -652,7 +652,14 @@ impl NativeFieldRest {
             if wire.births!=births {return Err(invalid("operative birth lineage"));}
             self.operative.as_ref().unwrap().validate(wire,n)?;
             if wire.return_frames.iter().any(|r|r.at_cut>h.history.len()){return Err(invalid("operative return beyond field cut"));}
+            if wire.map_program.as_ref().is_some_and(|p|p.at_cut>h.history.len()){return Err(invalid("map program beyond field cut"));}
             for frame in &wire.return_frames {
+                if let Some(overlap)=&frame.source_overlap {
+                    if frame.at_cut.checked_sub(1).is_none_or(|receiving|h.history.get(receiving)
+                        .is_none_or(|event|event.lineage.observed_source()!=Some(overlap.source))) {
+                        return Err(invalid("source-map return lineage"));
+                    }
+                }
                 if let Some(source)=frame.current_difference_source {
                     if source<wire.activated_at || frame.at_cut.checked_sub(1).is_none_or(|receiving|
                         h.history.get(receiving).is_none_or(|event|event.lineage.observed_source()!=Some(source))) {

@@ -435,8 +435,9 @@ advancing internal phase. The [causal-contact connection](../../research/records
 now composes existing paired reflections along actual source joins with learned contact overlap.
 Its exact/enclosed reference, full derivative and stored-operator comparison return. Integrate
 the [now-resident forward/reverse word](../../research/records/2026-09-09_AC1_THE_CAUSAL_CONTACT_WORD_AND_ITS_SPARSE_RETURN_ARE_RESIDENT.md)
-and its sparse `D_source H` return together with the historical producer, current-factor
-generator and checkpoint. Propagate existing interior before forming the newborn zero-input
+and its sparse `D_source H` return through the [verified source-map journal](../../research/records/2026-09-09_AC1_THE_JOURNAL_GENERATES_ITS_HISTORICAL_SOURCE_MAPS.md).
+Connect the current-factor generator and live recurrence, retaining original input bounds and
+using the available source map when an older propagation word is decoded. Propagate existing interior before forming the newborn zero-input
 branch and applying the same outer reflection. The native suboperator controls and full
 stored-model comparison have returned; the live recurrence is not yet changed by them.
 The material-ball ingress remains a separate concrete family

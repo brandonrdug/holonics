@@ -98,19 +98,20 @@ impl<'c> NativeConstitutiveField<'c> {
         realization: NativeContactRealization,
     ) -> Result<(), Error> {
         let returned = self.prepare_material_contact_return(response, realization)?;
-        let (sections, origin, returns) = {
+        let (sections, origin, returns, program) = {
             let view = self.stage_operative_contacts()?;
             let staged = view.stage_return_using(returned,&response.currents)?;
-            (staged.sections, staged.origin, staged.returns)
+            (staged.sections, staged.origin, staged.returns, staged.program)
         };
         let op = self.junction.as_mut().unwrap().operative.as_mut().unwrap();
         op.sections = sections;
         op.origin = origin;
         op.returns = returns;
+        op.program = program;
         Ok(())
     }
 
-    fn prepare_material_contact_return(
+    pub(super) fn prepare_material_contact_return(
         &self,
         response: &NativeMaterialContactResponse<'c>,
         realization: NativeContactRealization,
@@ -155,6 +156,7 @@ impl<'c> NativeConstitutiveField<'c> {
             ports: response.ports.clone(),
             currents,
             current_difference_source,
+            source_overlap:None,
             b: None,
             bounds: response.delta_bounds.clone(),
         }))
@@ -196,7 +198,17 @@ impl<'c> NativeConstitutiveField<'c> {
         let cached=op.recent_producers.iter().find(|(at,count,_)|*at==source && *count==k).map(|(_,_,s)|Rc::clone(s));
         let mut recovery=None;
         let mut recovered_factors=Vec::new();
-        let producing=if let Some(cached)=cached {cached} else {
+        let producing=if let Some(cached)=cached {cached} else if op.program.is_some() {
+            let map=self.operative_producing_map(source)?;
+            let mut producing=sections(surface,d,k)?;let p=Rc::get_mut(&mut producing).unwrap();p.map=map;p.b=b;p.bounds=bounds;
+            let rounds=surface.fresh_section(1,2*((d/2)*(d/2)+d/2),ResidentGrain(0))?;
+            let mut passage=surface.begin_passage(&[vec![]])?;
+            {let lane=passage.open(0,&[])?;surface.record_operative_moments(&lane,d,k,query.grain,producing.current(),producing.moments(),&rounds)?;}
+            passage.close(0,&producing.moment_bounds,64)?;
+            let receipt=passage.finish()?.launch()?;
+            if !receipt.obstruction.is_empty(){return Err(Error::Arithmetic(format!("source-map moments: {:?}",receipt.obstruction)));}
+            producing
+        } else {
             let later=op.returns.iter().filter(|r|k>0 && r.at_cut>=source+1).collect::<Vec<_>>();
             let mut pointers=Vec::with_capacity(3*later.len().max(1));
             for r in &later {

@@ -58,6 +58,7 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/field_moment_material.cuh");
     println!("cargo:rerun-if-changed=kernels/field_contextual_material.cuh");
     println!("cargo:rerun-if-changed=kernels/field_operative_contacts.cuh");
+    println!("cargo:rerun-if-changed=kernels/field_operative_map_source.cuh");
     println!("cargo:rerun-if-changed=kernels/field_causal_contact_propagation.cuh");
     println!("cargo:rerun-if-changed=kernels/field_causal_contact_pullback.cuh");
     println!("cargo:rerun-if-changed=kernels/field_operative_reflection.cuh");

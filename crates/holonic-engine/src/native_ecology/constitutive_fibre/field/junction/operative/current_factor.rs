@@ -239,6 +239,7 @@ impl<'c> NativeConstitutiveField<'c> {
                 ports: Rc::clone(&r.ports),
                 currents,
                 current_difference_source: Some(source),
+                source_overlap:r.source_overlap.clone(),
                 b: r.b.clone(),
                 bounds: Rc::clone(&r.bounds),
             }));

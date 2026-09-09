@@ -2,23 +2,23 @@
 //! It is not a publication API: the field's joined journal must carry these dependencies.
 use super::*;
 
-pub(super) struct NativeCausalContactReturn<'c> {
+pub(in super::super) struct NativeCausalContactReturn<'c> {
     surface: &'c ResidentSurface<'c>,
     _owner: Rc<()>,
     _origin: Rc<()>,
     producing: Rc<OperativeSections<'c>>,
     forward: Rc<ResidentSection<'c>>,
     pub(super) incoming: Rc<ResidentSection<'c>>,
-    pub(super) overlaps: Rc<ResidentSection<'c>>,
-    errors: Rc<ResidentSection<'c>>,
-    pub(super) bounds: Rc<ResidentSection<'c>>,
+    pub(in super::super) overlaps: Rc<ResidentSection<'c>>,
+    pub(in super::super) errors: Rc<ResidentSection<'c>>,
+    pub(in super::super) bounds: Rc<ResidentSection<'c>>,
     count: usize,
     d: usize,
     grain: u32,
 }
 
 #[derive(Debug, Serialize)]
-pub(super) struct CausalContactReturnReading {
+pub(in super::super) struct CausalContactReturnReading {
     pub incoming_internal: NativeFieldCurrentBall,
     pub contact_covector: Vec<Vec<ExactComplexWaveCurrent>>,
     pub contact_covector_radius: Rat,
@@ -29,7 +29,7 @@ pub(super) struct CausalContactReturnReading {
 impl<'f, 'c> NativeCausalContactPropagation<'f, 'c> {
     /// A native ball covector supplied by the enclosing producer. No authored learning delta
     /// or selected face enters here. The source field remains borrowed by the forward owner.
-    pub(super) fn pull_back(
+    pub(in super::super) fn pull_back(
         &self,
         covector: &ResidentSection<'c>,
     ) -> Result<NativeCausalContactReturn<'c>, Error> {
@@ -84,7 +84,7 @@ impl<'f, 'c> NativeCausalContactPropagation<'f, 'c> {
 
 impl NativeCausalContactReturn<'_> {
     /// Cold dense projection of D_source H; resident factors remain sparse and source-qualified.
-    pub(super) fn inspect(&self) -> Result<CausalContactReturnReading, Error> {
+    pub(in super::super) fn inspect(&self) -> Result<CausalContactReturnReading, Error> {
         let read = |s: &ResidentSection<'_>| -> Result<Vec<i128>, Error> {
             wides(&self.surface.detach_section(s, 64)?.intervals)
         };

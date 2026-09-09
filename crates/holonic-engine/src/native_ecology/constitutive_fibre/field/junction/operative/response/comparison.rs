@@ -260,6 +260,7 @@ impl<'c> NativeConstitutiveField<'c> {
             .inspect_material_transport_state()?
             .ok_or(Error::Uncertain)?;
         let view = NativeOperativeContactStaging {
+            program:op.program.clone(),
             field: self,
             origin: op.origin.clone(),
             grain: op.grain,

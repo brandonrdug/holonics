@@ -2,6 +2,25 @@ use super::*;
 use crate::native_ecology::constitutive_fibre::circulation::rest::point_section;
 use serde::{Deserialize, Serialize};
 
+#[derive(Clone,Debug,PartialEq,Eq,Serialize,Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(in super::super::super) struct OperativeSourceOverlapFrame {
+    pub source:usize,
+    pub count:usize,
+}
+#[derive(Clone,Debug,PartialEq,Eq,Serialize,Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(in super::super::super) struct OperativeMapProgramFrame {
+    pub at_cut:usize,
+    pub return_count:usize,
+    pub contact_count:usize,
+}
+#[derive(Debug,PartialEq,Eq)]
+pub(in super::super::super) struct OperativeMapProgramRest {
+    pub map:ResidentSectionRest,
+    pub births:Vec<ResidentSectionRest>,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(in super::super::super) struct OperativeReturnFrame {
@@ -13,6 +32,8 @@ pub(in super::super::super) struct OperativeReturnFrame {
     /// First factor is the source passage's interior difference; payload stores only ell.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub current_difference_source: Option<usize>,
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    pub source_overlap:Option<OperativeSourceOverlapFrame>,
     /// Explicit zero generator; its wire payload is the canonical one-word zero marker.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub zero_internal_delta: bool,
@@ -27,12 +48,16 @@ pub(in super::super::super) struct OperativeWire {
     pub returns: usize,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub return_frames: Vec<OperativeReturnFrame>,
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    pub map_program:Option<OperativeMapProgramFrame>,
 }
 #[derive(Debug, PartialEq, Eq)]
 pub(in super::super::super) struct OperativeRest {
     pub current: [ResidentSectionRest; 6],
     pub initial: [ResidentSectionRest; 6],
     pub returns: Vec<[ResidentSectionRest; 4]>,
+    pub source_overlaps:Vec<Option<[ResidentSectionRest;2]>>,
+    pub program:Option<OperativeMapProgramRest>,
 }
 #[derive(Debug, PartialEq, Eq)]
 pub(in super::super::super) struct OperativeHistoryRest {
@@ -50,6 +75,7 @@ impl OperativeWire {
                 at_cut: self.activated_at,
                 factor_count: None,
                 current_difference_source: None,
+                source_overlap:None,
                 zero_internal_delta: false,
                 realization: NativeContactRealization::EnclosedFlow,
                 contact_count: self
@@ -132,13 +158,20 @@ impl OperativeRest {
         };
         let current = six()?;
         let initial = six()?;
-        let returns = (0..wire.returns)
-            .map(|_| Ok([section()?, section()?, section()?, section()?]))
-            .collect::<Result<Vec<_>, Error>>()?;
+        let program=wire.map_program.as_ref().map(|p| {
+            let count=wire.births.len().checked_sub(p.contact_count).ok_or_else(||invalid("program birth domain"))?;
+            Ok::<_,Error>(OperativeMapProgramRest{map:section()?,births:(0..count).map(|_|section()).collect::<Result<_,_>>()?})
+        }).transpose()?;
+        let mut returns=Vec::new();let mut source_overlaps=Vec::new();
+        for i in 0..wire.returns {
+            returns.push([section()?,section()?,section()?,section()?]);
+            source_overlaps.push(wire.frame(i).source_overlap.is_some().then(||Ok::<_,Error>([section()?,section()?])).transpose()?);
+        }
         Ok(Self {
             current,
             initial,
             returns,
+            source_overlaps,program,
         })
     }
     pub fn write(
@@ -149,9 +182,12 @@ impl OperativeRest {
             .current
             .iter()
             .chain(&self.initial)
-            .chain(self.returns.iter().flatten())
         {
             section(s)?;
+        }
+        if let Some(program)=&self.program {section(&program.map)?;for birth in &program.births {section(birth)?;}}
+        for (r,h) in self.returns.iter().zip(&self.source_overlaps) {
+            for s in r {section(s)?;}if let Some(h)=h {for s in h {section(s)?;}}
         }
         Ok(())
     }
@@ -186,8 +222,23 @@ impl OperativeRest {
         };
         validate(&self.current, k)?;
         validate(&self.initial, initial)?;
-        if self.returns.len() != wire.returns {
+        if self.returns.len() != wire.returns || self.source_overlaps.len()!=wire.returns {
             return Err(invalid("operative return chronology"));
+        }
+        match (&wire.map_program,&self.program) {
+            (Some(p),Some(rest))=>{
+                if p.at_cut<wire.activated_at || p.return_count>wire.returns
+                    || p.contact_count!=wire.births.partition_point(|b|b.receiving<p.at_cut)
+                    || rest.births.len()!=wire.births.len()-p.contact_count {return Err(invalid("map program anchor"));}
+                point_section(&rest.map,p.contact_count.max(1),2*d)?;
+                for birth in &rest.births {point_section(birth,1,2*d)?;}
+                for i in 0..wire.returns {
+                    let frame=wire.frame(i);
+                    if (i<p.return_count && (frame.at_cut>p.at_cut || frame.source_overlap.is_some()))
+                        || (i>=p.return_count && frame.at_cut<p.at_cut) {return Err(invalid("map program return cut"));}
+                }
+            },
+            (None,None)=>{},_=>return Err(invalid("map program presence")),
         }
         if !wire.return_frames.is_empty() && wire.return_frames.len() != wire.returns {
             return Err(invalid("operative return frames"));
@@ -225,6 +276,19 @@ impl OperativeRest {
             if wides(&r[3].intervals)?.iter().any(|v| *v < 0) {
                 return Err(invalid("returned radius"));
             }
+            match (&frame.source_overlap,&self.source_overlaps[i]) {
+                (Some(h),Some(values))=>{
+                    if wire.map_program.is_none() || h.source<wire.activated_at
+                        || h.source.checked_add(1).is_none_or(|s|s>=frame.at_cut)
+                        || h.count>factors || h.count>wire.births.partition_point(|b|b.receiving<=h.source) {
+                        return Err(invalid("source overlap domain"));
+                    }
+                    point_section(&values[0],h.count.max(1),4)?;
+                    point_section(&values[1],h.count.max(1),2)?;
+                    if wides(&values[1].intervals)?.iter().any(|v|*v<0) {return Err(invalid("source overlap radius"));}
+                },
+                (None,None)=>{},_=>return Err(invalid("source overlap presence")),
+            }
         }
         Ok(())
     }
@@ -235,6 +299,7 @@ impl<'c> OperativeState<'c> {
             activated_at: self.activated_at,
             births: self.births.clone(),
             returns: self.returns.len(),
+            map_program:self.program.as_ref().map(|p|OperativeMapProgramFrame{at_cut:p.at_cut,return_count:p.return_count,contact_count:p.contact_count}),
             return_frames: self
                 .returns
                 .iter()
@@ -243,6 +308,7 @@ impl<'c> OperativeState<'c> {
                     contact_count: r.contact_count,
                     factor_count: (r.factor_count != r.contact_count).then_some(r.factor_count),
                     current_difference_source: r.current_difference_source,
+                    source_overlap:r.source_overlap.as_ref().map(|h|OperativeSourceOverlapFrame{source:h.source,count:h.count}),
                     zero_internal_delta: r.b.is_none(),
                     realization: r.realization,
                 })
@@ -265,6 +331,11 @@ impl<'c> OperativeState<'c> {
             ])
         };
         Ok(OperativeRest {
+            program:self.program.as_ref().map(|p|Ok::<_,Error>(OperativeMapProgramRest {
+                map:read(&p.map)?,births:p.births.iter().map(|b|read(b)).collect::<Result<_,_>>()?,
+            })).transpose()?,
+            source_overlaps:self.returns.iter().map(|r|r.source_overlap.as_ref().map(|h|
+                Ok::<_,Error>([read(&h.coefficients)?,read(&h.errors)?])).transpose()).collect::<Result<_,_>>()?,
             current: sections(&self.sections)?,
             initial: sections(&self.initial)?,
             returns: self
@@ -302,11 +373,18 @@ impl<'c> OperativeState<'c> {
                 moment_bounds: mount(moment_bounds)?,
             }))
         };
+        let program=match (wire.map_program.as_ref(),rest.program) {
+            (Some(p),Some(rest))=>Some(OperativeMapProgram{at_cut:p.at_cut,return_count:p.return_count,
+                contact_count:p.contact_count,map:Rc::new(mount(rest.map)?),
+                births:rest.births.into_iter().map(|b|mount(b).map(Rc::new)).collect::<Result<_,_>>()?}),
+            (None,None)=>None,_=>return Err(invalid("map program presence")),
+        };
         let returns = rest
             .returns
             .into_iter()
+            .zip(rest.source_overlaps)
             .enumerate()
-            .map(|(i, r)| {
+            .map(|(i, (r,h))| {
                 let frame = wire.frame(i);
                 let [ports, currents, b, bounds] = r;
                 // Cold-wire inspection is a representation check. It changes no current,
@@ -315,6 +393,11 @@ impl<'c> OperativeState<'c> {
                     None
                 } else { Some(Rc::new(mount(b)?)) };
                 Ok(Rc::new(OperativeReturn {
+                    source_overlap:match (frame.source_overlap,h) {
+                        (Some(h),Some([coefficients,errors]))=>Some(OperativeSourceOverlap{source:h.source,count:h.count,
+                            coefficients:Rc::new(mount(coefficients)?),errors:Rc::new(mount(errors)?)}),
+                        (None,None)=>None,_=>return Err(invalid("source overlap presence")),
+                    },
                     at_cut: frame.at_cut,
                     contact_count: frame.contact_count,
                     factor_count: frame.factor_count.unwrap_or(frame.contact_count),
@@ -337,6 +420,7 @@ impl<'c> OperativeState<'c> {
             births: wire.births,
             origin: Rc::new(()),
             returns,
+            program,
         })
     }
 }

@@ -133,5 +133,11 @@ __device__ void field_operative_reflection_prepare(
     if(threadIdx.x==0){for(uint32_t j=0;j<d;++j)report[2u*stride+j]=((const wide *)h_lo)[j];report[3u*stride-1u]=mb[1];}
     __syncthreads();if(*slot)return;
     operative_copy_point(map_lo,map_hi,2u*(size_t)(count?count:1u)*d);operative_copy_point(b_lo,b_hi,4u*(size_t)(count?count:1u));operative_copy_point(e_lo,e_hi,4);
+    // The new column is immutable founding material for the coefficient generator. Capture it
+    // while this complete passage still owns fresh staging, before the field commit.
+    if(linked && table[20] && table[21]){
+        int64_t *birth_lo=(int64_t *)(uintptr_t)table[20],*birth_hi=(int64_t *)(uintptr_t)table[21];
+        for(size_t j=threadIdx.x;j<2u*d;j+=blockDim.x)birth_lo[j]=birth_hi[j]=map_lo[2u*(size_t)old_count*d+j];
+    }
     operative_copy_point((int64_t *)report,(int64_t *)report_hi,12u*stride);operative_copy_point(trace,trace_hi,18u*(size_t)d+12u);
 }

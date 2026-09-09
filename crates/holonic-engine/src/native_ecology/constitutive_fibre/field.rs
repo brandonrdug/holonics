@@ -644,7 +644,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .occurrences
             .checked_add(1)
             .ok_or(ConstitutiveFibreError::Shape)?;
-        if observed_source_at.is_some() {if let Some(o)=self.junction.as_mut().and_then(|j|j.operative.as_mut()) {o.births.try_reserve(1).map_err(|_|ConstitutiveFibreError::Shape)?;}}
+        if observed_source_at.is_some() {if let Some(o)=self.junction.as_mut().and_then(|j|j.operative.as_mut()) {
+            o.reserve_birth()?;
+        }}
         self.history
             .try_reserve(1)
             .map_err(|_| ConstitutiveFibreError::Shape)?;

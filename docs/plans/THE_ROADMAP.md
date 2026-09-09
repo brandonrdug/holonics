@@ -161,8 +161,10 @@ in this order:
    now has exact/enclosed propagation and complete morphology-return references, including an
    actual stored-operator comparison. Its [resident forward/reverse word](../../research/records/2026-09-09_AC1_THE_CAUSAL_CONTACT_WORD_AND_ITS_SPARSE_RETURN_ARE_RESIDENT.md)
    now returns without numerical readout or source mutation. Bind its sparse `D_source H` term
-   to the historical producer, journal and checkpoint; retain the propagated input boundary in
-   the current-factor decoder. The existing interior propagates before newborn zero-input
+   through the [now-verified historical map journal](../../research/records/2026-09-09_AC1_THE_JOURNAL_GENERATES_ITS_HISTORICAL_SOURCE_MAPS.md).
+   Connect the live recurrence and retain original propagation input bounds and the propagated
+   boundary in current-factor decoding. Reuse recent words and regenerate older ones through
+   the available source-map dependency. The existing interior propagates before newborn zero-input
    formation and outer reflection. Keep the complete material-family passage. Derive
    what sustains, redirects or ends expression without substituting a chosen rotation, a
    codeword's canonical unit input or a scalar entropy penalty for that constitutive relation.

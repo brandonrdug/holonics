@@ -359,7 +359,17 @@ propagation carrier and the existing complete-material division. The public
 `alpha_causal_propagation` example remounts a model and compares these owners with the reference.
 The [resident return](../research/records/2026-09-09_AC1_THE_CAUSAL_CONTACT_WORD_AND_ITS_SPARSE_RETURN_ARE_RESIDENT.md)
 records controls, the repaired launch and actual-model costs. The sparse source-map journal
-and recurrence binding remain open; these staged results do not publish a second ecology.
+has subsequently returned below; the live propagation binding remains open.
+
+[established-bounded; source-inspected] `operative/map_source.rs` extends the same return
+journal with a map anchor, actual subsequent birth columns and `D_source H` dependencies.
+`surface_operative_map_source.rs` binds the native anchor, complete expression, bound and
+current-return operations in `field_operative_map_source.cuh`. The field's existing birth
+passage captures a new column before commit. `operative/rest.rs`, `field/rest.rs`, the historical
+material adjoint and deposit observer carry the same source expression and lineage. The
+[journal return](../research/records/2026-09-09_AC1_THE_JOURNAL_GENERATES_ITS_HISTORICAL_SOURCE_MAPS.md)
+records exact historical maps, archive/restart, refusal and legacy-model checks. This is an
+executable coefficient representation, not a second learner or an archive of every map state.
 
 [established-bounded; source-inspected] `resident/context_section.rs` and
 `constitutive_context_section.cuh` now derive the fixed-source context/return relation and its
