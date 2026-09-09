@@ -2,43 +2,24 @@ import ElementaryHolonics.Millennium.Crossings
 import ElementaryHolonics.Millennium.RealizedMillenniumForms
 
 /-!
-# Helicity as linking: the circulation form of a crossing population
+# A circulation-weighted receiver on addressed crossing populations
 
-Moffatt's theorem (1969) reads the helicity `∫ u · ω` of a flow whose vorticity is concentrated on
-closed filaments `Cᵢ` with circulations `Γᵢ` as a quadratic form in the circulations,
+[definition] This owner forms `Σ_i,j linkingNet(p,i,j) Γ_i Γ_j` on the actual finite crossing
+population. It proves how insertion/deletion and a cancelling signed pair change that form.
+The coefficient is the declared signed diagram-crossing count. Identifying it with physical
+helicity requires the actual velocity/vorticity fields, Gauss-linking normalization, spatial
+embedding, framing/internal twist and boundary assumptions.
 
-```
-    H = Σᵢ Γᵢ² Wr(Cᵢ) + 2 Σ_{i<j} Γᵢ Γⱼ Lk(Cᵢ, Cⱼ),
-```
+[proved-derived] `helicity_cons` and `helicity_reconnect_single` are exact changes of this finite
+form under the named population operation. `helicity_insertCancellingPair` is invariance under
+that particular cancelling move. These are not proofs that every diagram move is an ambient
+isotopy or a physical reconnection. Diagram writhe alone is not an ambient-isotopy invariant;
+self-linking and physical helicity require their additional geometric data.
 
-the writhes on the diagonal and the Gauss linking numbers off it — a topological invariant of the
-ideal flow that changes only when filaments reconnect.  `Crossings` already owns the finite carrier
-of that statement: a crossing population retained by address with a hand at each crossing, the
-pairwise linking readings `linkingNet` (the signed crossing count over a pair of strands, the
-classical linking number up to the factor `½`), the reconnection move and the cancelling-pair
-move.  This file puts the circulations on it.
-
-* `helicity p Γ = Σᵢⱼ linkingNet p i j · Γᵢ Γⱼ` is Moffatt's form at the finite grain, and
-  `helicityForm p` is the same object as a `ReceiverForm` on the circulation carrier through the
-  constructor of `RealizedMillenniumForms` — so helicity is a receiver reading in the coupling's
-  own shape, beside the Stokes dissipation form of the same row.
-* `helicity_cons` — **the reconnection jump**: adding one crossing between strands `o, u` with
-  hand `s` changes the helicity by `s · 2 Γₒ Γᵤ` (`s · Γₒ²` for a self-crossing, the writhe term).
-  Removing it — `reconnect` — subtracts the same, `helicity_reconnect_single`.  That is Moffatt's
-  "helicity changes only through reconnection" as an exact identity on the population.
-* `helicity_insertCancellingPair` — the representational move is invisible: helicity is a reading
-  of the configuration, not of the diagram.
-* `helicity_borromean` — **helicity is blind to Borromean linking**: every circulation returns `0`
-  on the six-crossing Borromean table, though the table is inhabited; one flipped hand returns `4`
-  at unit circulations.  The classical remark that helicity, being quadratic, cannot see
-  higher-order (Massey) linking, stated on the declared table.
-* `helicityForm_not_positive` — **the hand is the sign of the reading**: on the flipped table the
-  form returns `4` at `(1, 1, 0)` and `−4` at `(1, −1, 0)`.  Helicity is an indefinite receiver
-  form; the Stokes form of `RealizedMillenniumForms` is coercive.  The two readings of one flow are
-  the magnitude face and the phase face, and only the second carries the topology.
-
-Every theorem is discharged with no `sorryAx`.  Nothing here evolves a fluid: the flow enters only
-through the crossing population its filaments present, which is where Moffatt's theorem lives.
+[proved-derived] `helicity_borromean` exhibits a nonempty crossing table invisible to the
+quadratic receiver; a changed hand separates it. `helicityForm_not_positive` shows the finite
+form is indefinite. The topology of a spatial Borromean embedding and an actual fluid evolution
+are separate source realizations, not conclusions from that table.
 -/
 
 noncomputable section
@@ -70,8 +51,8 @@ theorem linkingArray_symm (p : Population) : ∀ i j, linkingArray p i j = linki
   intro i j
   simp only [linkingArray, linkingNet_symm p i j]
 
-/-- [definition] **Helicity of circulations on a crossing population**: Moffatt's form at the
-finite grain, `Σᵢⱼ Lᵢⱼ Γᵢ Γⱼ`, the self-crossings carrying the writhe and the pairs the linking. -/
+/-- The declared circulation-weighted signed-crossing form. A physical helicity interpretation
+additionally needs its geometry, normalization and framing. -/
 def helicity (p : Population) (Γ : Fin 3 → ℝ) : ℝ :=
   ∑ i, ∑ j, linkingArray p i j * Γ i * Γ j
 

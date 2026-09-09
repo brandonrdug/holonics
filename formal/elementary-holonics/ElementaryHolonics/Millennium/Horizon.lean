@@ -11,31 +11,21 @@ Brandon, 2026-08-23: why a curved surface collapses to a plane region with bound
 perceived horizon is a *finite curve*, and how "focal lengths capture infinities" — with the Smith
 chart named as the shape of it.
 
-**The map is one map, and this file proves its three properties.**  The Möbius transformation
+[definition] The Smith/Cayley coordinate is `f(z)=(z-1)/(z+1)`, with pole at -1. For normalized
+complex impedance it is the reflection chart at reference impedance 1. The right half-plane maps
+into the open unit disc, and finite points of the imaginary axis lie on its rim. In the projective
+extension, infinity maps to the missing rim point 1. A bounded coordinate does not make the source
+population finite or discard its distinctions; a physical horizon additionally needs its metric,
+causal and receiver construction.
 
-```text
-f(z) = (z − 1)/(z + 1)
-```
+[proved-derived] Away from the stated intermediate poles, `f(f(z))=-1/z` and `f^4(z)=z`.
+This is composition of a coordinate map, not four physical evolution steps. The matched load
+maps to the chart centre: `f(1)=0`. It is not a fixed point of f.
 
-is the transmission-line reflection coefficient `Γ = (Z − Z₀)/(Z + Z₀)` at `Z₀ = 1`, the Smith
-chart, the Cayley transform, and — read projectively — a camera.  It carries the right half-plane
-*into* the open unit disc, the imaginary axis *onto* the unit circle, and the ideal point `∞` to
-`1`, which sits **on the boundary**.  So an unbounded family of directions arrives at a finite
-locus, and that locus is the rim.  **A horizon is the image of the ideal points under a projective
-chart, at finite distance, and that is why it can be seen at all.**
-
-**And the chart has order `2²`.**  `f(f(z)) = −1/z`, so `f⁴ = id`: the Smith transform is a
-*quarter turn* in the Möbius group and its square is inversion.  That is the same `2²` the towers
-have been returning — one half-turn is inversion, two is the identity — and it is why a matched
-load sits at the centre (`f(1) = 0`) with everything else circulating around it.
-
-**Where the degrees-of-freedom question lands, stated as citation and not proved here.**  The
-eleven of M-theory is a representation bound, not a convenience: the spinor of `Spin(1, d−1)` has
-dimension `2^{⌊d/2⌋}`, maximal supersymmetry allows at most `32` supercharges before the multiplet
-is forced to contain massless fields of spin `> 2`, and no interacting theory of those exists
-(Weinberg–Witten; Nahm's classification).  `2^{⌊11/2⌋} = 2^5 = 32` is the largest that fits, and
-`2^{⌊12/2⌋} = 2^6 = 64` does not — so **the ceiling is a 2-tower height**, decided below by
-arithmetic.  Nothing here claims anything about physics; the arithmetic is what is checked.
+[definition] The spinor section checks the declared count `2^(d/2)` and its comparison with 32.
+The interpretation as a spacetime or supersymmetry bound requires a specified representation,
+reality/chirality conditions and physical theory. These arithmetic lemmas do not prohibit all
+higher-spin interactions or prove a universal maximum dimension.
 -/
 
 namespace Soma.Holonics.Millennium.Horizon
@@ -67,8 +57,8 @@ theorem theRightHalfPlaneMapsIntoTheDisc {z : ℂ} (hz : 0 < z.re) : ‖smith z�
     ring
   nlinarith [norm_nonneg (z - 1), norm_nonneg (z + 1), h1, h2, hz]
 
-/-- **THE IMAGINARY AXIS MAPS ONTO THE RIM.**  The boundary of the half-plane becomes the boundary
-of the disc — the collapse is a homeomorphism on boundaries, which is why the rim is a curve. -/
+/-- Finite imaginary-axis points have unit-norm Smith coordinates. Surjectivity onto the
+projective rim additionally includes the point at infinity. -/
 theorem theImaginaryAxisMapsToTheRim {z : ℂ} (hz : z.re = 0) : ‖smith z‖ = 1 := by
   have hne : z + 1 ≠ 0 := by
     intro h
@@ -93,10 +83,8 @@ theorem theDefectFromTheRim {z : ℂ} (hz : z + 1 ≠ 0) : smith z - 1 = -2 / (z
   field_simp
   ring
 
-/-- **THE HORIZON IS THE IMAGE OF THE IDEAL POINTS, AT FINITE DISTANCE.**  Every direction of
-escape arrives within `2/(‖z‖ − 1)` of the single boundary point `1`, so an infinity of unbounded
-directions is compressed onto a finite locus.  That is the focal-length statement, and the reason
-a horizon is a curve one can look at rather than a place one can reach. -/
+/-- The exact remainder from the rim point is bounded along large-modulus sources.
+This is coordinate convergence, not a physical-horizon or finite-information theorem. -/
 theorem theIdealPointsLandOnTheRim {z : ℂ} (hz : 1 < ‖z‖) :
     ‖smith z - 1‖ ≤ 2 / (‖z‖ - 1) := by
   have hne : z + 1 ≠ 0 := by
@@ -136,8 +124,8 @@ theorem theChartHasOrderTwoSquared {z : ℂ} (hz : z ≠ 0) (h1 : z + 1 ≠ 0) (
   rw [hstep, theSquareOfTheChartIsInversion hz' h1']
   field_simp
 
-/-- **THE MATCHED LOAD IS THE CENTRE.**  `f(1) = 0`: the unique impedance that reflects nothing is
-the fixed point everything else circulates around. -/
+/-- The matched normalized impedance maps to zero reflection. This is an image, not a fixed
+point of the Smith map. -/
 theorem theMatchedLoadIsTheCentre : smith 1 = 0 := by simp [smith]
 
 /-! ## 4.  The dimension ceiling is a tower height -/
@@ -145,10 +133,8 @@ theorem theMatchedLoadIsTheCentre : smith 1 = 0 := by simp [smith]
 /-- The Dirac spinor dimension in `d` spacetime dimensions is `2^{⌊d/2⌋}`. -/
 def spinorDim (d : ℕ) : ℕ := 2 ^ (d / 2)
 
-/-- **ELEVEN IS THE LAST DIMENSION WHOSE SPINOR FITS UNDER `2^5`.**  `2^{⌊11/2⌋} = 32` and
-`2^{⌊12/2⌋} = 64`, so the supercharge ceiling of `32` — itself forced by the absence of interacting
-massless spin `> 2` fields — is crossed exactly between eleven and twelve.  The ceiling is a
-**2-tower height**, not a round number. -/
+/-- The declared spinor-count expression crosses the chosen comparison 32 between 11 and 12.
+The arithmetic alone supplies no physical dimensional ceiling. -/
 theorem theSpinorCeilingIsCrossedBetweenElevenAndTwelve :
     spinorDim 11 = 2 ^ 5 ∧ spinorDim 12 = 2 ^ 6 ∧ spinorDim 11 ≤ 32 ∧ ¬ (spinorDim 12 ≤ 32) := by
   refine ⟨by decide, by decide, by decide, by decide⟩

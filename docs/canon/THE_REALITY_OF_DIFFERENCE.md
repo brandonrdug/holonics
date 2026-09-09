@@ -106,6 +106,13 @@ The relevance hypothesis concerns that participation itself. Comparison of coord
 is one formal expression of relativity, within a broader account of what can affect what and
 under which conditions.
 
+[proved-derived; formal-checked] The [derived relevance principle](THE_RELEVANCE_HYPOTHESIS.md)
+now gives the greatest future-stable receiver agreement and, in additive charts, the greatest
+generator-invariant invisible-difference subgroup. Its nonlinear and additive statements retain
+actual source families; they do not turn a small present reading into universal absence.
+The same canon connects situated loss, diffusion/entropy, Hodge realization, gravity/quantum
+receivers, knots, circuits and the actual fluid continuation question.
+
 [definition] Relevance can be carried by contact, constraint, phase, coupling, transmission,
 delay, persistence, attenuation or a returned null at a particular cut. Actual direct contact
 requires its interaction law. Co-presence does not manufacture it. A quiet receiver or dormant

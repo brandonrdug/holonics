@@ -109,10 +109,10 @@
 //!   M P − P M  =  (1−ρ)/2 · [[ 0 , p − p̄ ], [ p̄ − p , 0 ]]
 //! ```
 //!
-//! so `M` and `P` commute **iff `sin φ = 0` or `ρ = 1`** — iff the phase is a whole turn, or the
-//! junction is matched. A phase across a matched junction is invisible and a whole turn across a
-//! mismatch is invisible; only a real phase across a real mismatch turns. That is a condition on the
-//! material rather than a property of the carrier, and both controls are exhibited in
+//! so `M` and `P` commute **iff `sin φ = 0` or `ρ = 1`** — an integer multiple of a half-turn,
+//! or a matched junction. This is invisibility to the commutator receiver; the propagated phase
+//! can still matter to another phase-sensitive receiver. A nonzero sine together with a mismatch
+//! makes the order visible. Both controls are exhibited in
 //! `the_phase_and_the_mismatch_are_BOTH_required_for_the_family_to_turn`.
 //!
 //! **The conservation law survives it, and that is the check that the wire is physical.** `P` is

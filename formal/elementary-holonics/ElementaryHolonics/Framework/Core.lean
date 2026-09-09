@@ -2,6 +2,8 @@ import ElementaryHolonics.Foundation.Holon
 import ElementaryHolonics.Foundation.CausalNaturalHolon
 import ElementaryHolonics.Foundation.HolonTensorLens
 import ElementaryHolonics.Foundation.ComparisonCell
+import ElementaryHolonics.Foundation.ComparisonLoss
+import ElementaryHolonics.Foundation.CausalRelevance
 import ElementaryHolonics.Foundation.ReceiverQuotient
 import ElementaryHolonics.Foundation.TransportWord
 import ElementaryHolonics.Foundation.ReceiverHistoryCompression

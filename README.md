@@ -50,6 +50,13 @@ performances one occurrence.
   until a declared receiver takes a quotient.
 - **Preimage Fibres.** Limited observations constrain compatible causes and future behavior.
   Learning need not recover a unique original algorithm or a perfectly reversible past.
+- **The relevance hypothesis.** A distinction matters through the difference it can make under
+  admitted interactions and receivers, including future ones. The
+  [derived principle](docs/canon/THE_RELEVANCE_HYPOTHESIS.md) characterizes lawful future agreement
+  and retains the differences that a later interaction can expose.
+- **Loss as comparison.** Mechanical mismatch, information discrepancy, action difference and
+  learning loss are receiver-relative measurements of situated comparisons. Their comparands,
+  orientation, baseline and units belong to the construction.
 
 ## A toolkit that connects disciplines
 

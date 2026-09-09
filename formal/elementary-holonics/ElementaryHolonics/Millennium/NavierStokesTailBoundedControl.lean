@@ -8,7 +8,8 @@ interval-integrable on a terminal tail.  A constant budget needs none of that.  
 at one radius stays below `M` on `[s, T)`, the aligned strain budget is the constant
 `3² · (2π · G(N) · 3√(2E(0)) + M)`, and the periodic official alternative follows.
 
-This is the form of the relevance control that the weighted tail energy bound will discharge.
+A suitable weighted tail estimate can supply this sufficient control. The uniform bound remains
+an assumption in this owner.
 -/
 
 noncomputable section

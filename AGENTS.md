@@ -35,6 +35,12 @@ relativity. A relevance score, semantic label or universal all-to-all contact is
 The causal ontology treats apparent randomness through unresolved conditions and receiver scope;
 probability and statistics remain lawful declared charts under the existing jurisdiction rules.
 
+[project-postulate] The [relevance hypothesis](docs/canon/THE_RELEVANCE_HYPOTHESIS.md) supplies the
+derived future-receiver principle and its cross-domain source maps. Loss is a measurement of a
+situated comparison across mathematics, physics and computation, not an exclusively ML technique.
+Keep exact invisibility, positive tolerance and causal admissibility distinct; the full difference
+and source fibre precede any scalar loss or claim of disappearance.
+
 [project-postulate] **Hold the theory-of-everything ambition as the working standard.** Assume the
 framework's strength and pursue its consequences with initiative. The philosophy must shape
 reasoning before implementation: recover existing constructions, connect their elementary

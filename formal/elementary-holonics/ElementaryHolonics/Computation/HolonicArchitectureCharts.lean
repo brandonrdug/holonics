@@ -1,4 +1,5 @@
 import ElementaryHolonics.Computation.HolonicAdjointNormalization
+import ElementaryHolonics.Computation.HolonicNeuralEcology
 
 /-!
 # Classical neural architectures as configurations of one local-current ecology

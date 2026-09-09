@@ -8,6 +8,17 @@
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct
 instruction governs.
 
+## Relevance, loss and realized classes
+
+[proved-derived; formal-checked] The [framework foundation return](research/records/2026-09-09_RELEVANCE_LOSS_AND_REALIZED_CLASSES.md)
+recovers the direct-message lineage and establishes the greatest future-stable receiver agreement,
+its additive invariant kernel and canonical quotient. General situated loss, cross-entropy/KL
+baseline, finite Gibbs free-energy difference and two-cell entropy production are now explicit
+formal owners. General information definitions are factored into Foundation with compatible names.
+The [relevance canon](docs/canon/THE_RELEVANCE_HYPOTHESIS.md) connects the actual Hodge, GR, quantum,
+force-sector, molecular, knot, circuit and fluid sources. The repaired source prose distinguishes
+finite tolerance from exact invisibility and topology change from loss of smooth continuation.
+
 ## September 9 mathematical architecture review
 
 [proved-derived; formal-checked] The [normal-geometry and closed-return review](research/records/2026-09-09_MATHEMATICAL_REVIEW_NORMAL_GEOMETRY_AND_CLOSED_RETURNS.md)

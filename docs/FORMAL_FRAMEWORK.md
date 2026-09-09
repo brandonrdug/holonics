@@ -57,6 +57,34 @@ as it composes realization, continuation and navigation.
 
 ## Begin with a situated interaction
 
+[project-postulate] [The relevance hypothesis](canon/THE_RELEVANCE_HYPOTHESIS.md) is the shared
+foundation for what an interaction can change at a receiver. Its source reconstruction recovers
+Brandon's repeated framework directions and keeps class realization, causal admissibility,
+exact future agreement and quantitative tolerance distinct.
+
+[proved-derived; formal-checked] `Foundation/CausalRelevance` now constructs the largest
+future-stable agreement relation for arbitrary deterministic source maps. In additive charts it
+constructs the greatest invariant subgroup inside the present joint receiver kernel, supplies
+the canonical history quotient, and proves that unequal quotient faces have a separating future
+receiver. The nonlinear control distinguishes a presently hidden component from one that remains
+hidden through the whole admitted generator family.
+
+[definition] Loss belongs to the same framework. `Foundation/ComparisonLoss` reads an existing
+addressed comparison cell through a declared gauge, with both comparands and the signed
+difference retained. General entropy and probability receivers now live in
+`Foundation/InformationReceiver`; the old computation import preserves declaration compatibility.
+`Physics/InformationDifference` identifies cross-entropy's baseline and KL excess.
+Its finite log-Gibbs theorem also identifies excess free energy with θ times KL under the
+declared equilibrium relation, with energies and thermal scale retained.
+`Physics/TwoCellEntropyTransport` differentiates actual constitutive mass trajectories and proves
+their logarithmic entropy production. No ML-specific state is required by those constructions.
+
+[definition] The relevance canon also connects the actual Hodge cycle-class source, the
+Einstein/Bianchi conservation interface, quantum operator/analyzer receivers, Smith/impedance
+transport and knot/circulation geometry. Its fluid section distinguishes topology change, scale
+transfer and failure of smooth continuation. The diagrams carry the hypotheses of each physical
+realization; they supply reusable relations rather than universal force identities by naming.
+
 [definition] An elementary holon presents an occurrence population and three maps:
 
 ```text

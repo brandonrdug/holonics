@@ -64,6 +64,15 @@ currents, with no Lean or exterior evaluator in the learning path.
 
 ## One framework, several realizations
 
+[proved-derived; formal-checked] The
+[relevance and loss foundation](../research/records/2026-09-09_RELEVANCE_LOSS_AND_REALIZED_CLASSES.md)
+now derives the greatest stable future receiver agreement, with an additive invariant-kernel
+specialization. A present null can become relevant under a later generator; a permitted quotient
+keeps its entire future family and source fibre. Situated comparison loss and the finite
+Gibbs/KL free-energy identity are general mathematical/physical receivers. The two-cell flux law
+supplies an actual non-ML entropy-production theorem. These reinforce source/return fidelity and
+lawful reuse without making useful output or monotonically decreasing loss a cultivation gate.
+
 [proved-derived; formal-checked] The September 9
 [mathematical architecture review](../research/records/2026-09-09_MATHEMATICAL_REVIEW_NORMAL_GEOMETRY_AND_CLOSED_RETURNS.md)
 adds `Physics/AccumulatedNormalResponse.lean`: a rank-one normal response retains its complete

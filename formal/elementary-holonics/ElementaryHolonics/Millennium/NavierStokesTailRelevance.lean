@@ -1,31 +1,20 @@
 import ElementaryHolonics.Millennium.NavierStokesExteriorFaceGenerator
 
 /-!
-# The relevance theorem: the unaddressed tail is irrelevant at every event, and the periodic
-# finish line asks only that it stay irrelevant up to the terminal time
+# Receiver-relative tail tolerance and a terminal integrability criterion
 
-Brandon's relevance hypothesis: a value stands only when a receiver reaches it; the population
-beyond an addressed band is a potential face, not an actual one, until some receiver acquires a
-separating word for it.  On the torus this is not a doctrine but an equation.  The full strain
-reading at an event is exactly its finite addressed band plus its addressed convergent tail
-(`openPeriodicFullStrainReading_eq_finite_add_tail`), and the exterior face is paid at `t = 0`
-(`alignedStrain_le_exterior_add_interior`).
+The full strain receiver is its finite addressed band plus a convergent tail. At each fixed
+interior time, the tail bound tends to zero as the band grows. Thus every positive tolerance is
+eventually met at that time. This is neither exact zero at a finite radius nor invisibility to
+every possible receiver, and the required radius can depend on time and tolerance.
 
-This owner proves the two halves of the relevance theorem.
+`TailRelevanceControl` is a separate terminal-time integrability hypothesis for a fixed radius,
+with measurability and continuity. It returns the aligned-strain budget and the periodic official
+alternative. Integrability does not say that the tail is zero or that no future receiver can
+separate it. Pointwise convergence in radius does not prove that terminal control.
 
-* **At every event the tail is irrelevant.**  For each interior time the tail mass at cube
-  radius `N` tends to zero as `N` grows: no receiver at that event separates the tail once the
-  band is wide enough.  This spends only the absolute summability Sol already proved and the
-  cofinality of the cubes among finite frequency populations.
-* **The finish line is uniform relevance.**  If, for every admitted solution, one radius exists
-  whose tail mass stays interval-integrable up to `T`, then the aligned strain budget is
-  inhabited and the periodic official alternative `StatementB` follows.  The continuum
-  hypothesis of the Clay posing is therefore consumed at exactly one place: the uniformity of the
-  tail's irrelevance in time.  "The tail never acquires a separating word before `T`" is that
-  integrability.
-
-Nothing here inhabits the uniform control.  It is the sole remaining obligation on this route,
-now stated as relevance rather than as regularity.
+This is a quantitative fluid instance of relevance, with the actual unforced periodic solution
+and receiver retained. The control itself is not proved in this owner.
 -/
 
 noncomputable section
@@ -85,11 +74,10 @@ theorem tendsto_frequencyCube_atTop : Tendsto frequencyCube atTop atTop := by
       (Finset.le_sup (f := fun k => Finset.univ.sup fun c => (k c).natAbs) hk)) hn
   omega
 
-/-! ## At every event the tail is irrelevant -/
+/-! ## Tail tolerance at a fixed interior event -/
 
-/-- **Per-event irrelevance.**  At each interior time the tail mass tends to zero as the cube
-radius grows: once the addressed band is wide enough no receiver at that event separates the
-tail. -/
+/-- At each fixed interior time, the tail bound eventually lies below every positive tolerance.
+The statement supplies no exact finite cutoff or uniform terminal-time bound. -/
 theorem tendsto_tailMass_atTop
     (solution : OpenPeriodicSolutionOn T nu initial (0 : VelocityField) velocity pressure)
     {t : ℝ} (ht : t ∈ Ioo 0 T) :
@@ -119,7 +107,7 @@ theorem tendsto_tailMass_atTop
   filter_upwards with radius
   simp [tailMass, ht, openPeriodicJacobianCoefficientTailMass]
 
-/-! ## The finish line is uniform relevance -/
+/-! ## A separate terminal-time integrability criterion -/
 
 /-- The relevance budget at radius `N`: the exterior face paid by the initial energy plus the
 tail mass, times the interior coordinate comparison `3²`. -/
@@ -139,9 +127,9 @@ theorem alignedStrain_le_relevanceBudget
   convert h using 1
   ring
 
-/-- **The relevance hypothesis as a control.**  For every admitted positive-viscosity solution some
-cube radius has a tail mass that stays measurable, continuous, and interval-integrable on a
-terminal tail.  This is "the tail never acquires a separating word before `T`". -/
+/-- Every admitted positive-viscosity solution has a fixed cube radius with a measurable,
+continuous, interval-integrable tail bound on a terminal interval. This is an additional
+hypothesis, not exact invisibility or a consequence of the pointwise tail limit. -/
 def TailRelevanceControl : Prop :=
   ∀ {T nu : ℝ} {initial : InitialVelocity} {velocity : VelocityField} {pressure : PressureField},
     0 < nu →
@@ -177,8 +165,7 @@ theorem alignedStrainTerminalControl_of_tailRelevance (h : TailRelevanceControl)
   obtain ⟨radius, s, hs, hsT, hmeas, hcont, hint⟩ := h hnu solution
   exact ⟨AlignedStrainBudget.ofTailRelevance solution hnu.le radius hs hsT hmeas hcont hint⟩
 
-/-- **The relevance theorem.**  Uniform irrelevance of the tail returns the periodic official
-alternative. -/
+/-- The stated terminal integrability control returns the periodic official alternative. -/
 theorem statementB_of_tailRelevance (h : TailRelevanceControl) : StatementB :=
   statementB_of_alignedStrainTerminalControl (alignedStrainTerminalControl_of_tailRelevance h)
 

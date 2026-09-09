@@ -22,6 +22,13 @@ contracts and records preserve their completed scope; their old imperatives sche
 
 ## The Reality of Difference: comprehensive construction
 
+[project-postulate] The [relevance hypothesis](../canon/THE_RELEVANCE_HYPOTHESIS.md) now supplies
+its derived foundation across the steps below: actual source realization, future-stable receiver
+agreement, general loss and constitutive information transport. Use those returned owners and
+their source-qualified physical maps as dependencies of the continuing framework. They add no
+universal loss, hard radius, utility gate or new prerequisite to the active native research.
+
+
 [project-postulate] Brandon now authorizes formalizing, using and cementing these notions through
 one continuing programme. [The detailed construction contract](THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md)
 connects the existing sources and defines the artifacts and applications of each step. This

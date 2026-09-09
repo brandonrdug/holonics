@@ -11,11 +11,11 @@ radius `a + b`; hence a mode beyond twice the band radius `N` has no triad with 
 band, and the tail beyond `2N` is fed only through the tail.  Iterating, `m` interactions from the
 band reach at most radius `2^m · N`.
 
-This is the directionality Brandon named: the leader must step through the shells; there is no
-any-to-any transfer.  Relevance propagates outward one face at a time, and the open obligation of
-`NavierStokesTailRelevance.TailRelevanceControl` is exactly whether infinitely many shell steps can
-be completed before the terminal time.  Nothing here bounds the cost of a step; it proves that the
-steps exist and are ordered.
+These are algebraic support restrictions on the admitted nonlinear interactions. They do not
+prove that every permitted channel carries nonzero flux, assign a physical duration to a shell
+step, or exclude arbitrarily high frequencies at positive time. The terminal integrability
+condition in `NavierStokesTailRelevance.TailRelevanceControl` remains a separate analytic
+obligation; it is not identified here with a count of steps before the terminal time.
 -/
 
 namespace Soma.Holonics.Millennium.NavierStokesFrequencyReach

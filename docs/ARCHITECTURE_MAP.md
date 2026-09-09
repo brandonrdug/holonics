@@ -96,6 +96,15 @@ defect. It reuses `LinearMap.dualMap` and imports Mathlib's smooth `extDeriv_pul
 The [Stokes/pullback return](../research/records/2026-09-09_STOKES_AND_PULLBACK_NATURALITY_ARE_FRAMEWORK_LAWS.md)
 connects these to addressed boundaries, four-torus currents and the existing smooth flux sources.
 
+[definition] The [relevance/loss foundation return](../research/records/2026-09-09_RELEVANCE_LOSS_AND_REALIZED_CLASSES.md)
+adds `Foundation/CausalRelevance.lean` (greatest stable future relation and additive kernel),
+`Foundation/ComparisonLoss.lean` (situated comparison gauges), and
+`Foundation/InformationReceiver.lean` (the moved generic information implementation; old names
+and `Computation.HolonicInformationTheory` import preserved). `Physics/InformationDifference.lean`
+proves the baseline/KL and finite Gibbs free-energy relation; `Physics/TwoCellEntropyTransport.lean`
+proves mass and logarithmic entropy returns for actual constitutive trajectories. These formal
+owners add no native learner or physical identity outside their stated hypotheses.
+
 ## Foundation and transport
 
 [definition] **Preimage Fibre** is the governing term for compatible-source families. Some older
