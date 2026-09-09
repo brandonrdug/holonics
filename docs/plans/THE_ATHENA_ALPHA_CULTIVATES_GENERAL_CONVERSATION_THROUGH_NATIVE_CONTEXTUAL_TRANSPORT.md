@@ -425,6 +425,11 @@ now aligns their local metric and retains both phase quadratures. The focused na
 pass and the matched conversation study completes, but its changed body/current conduct still
 produces the identical terminal loop.
 
+[established-bounded; measured] The [material report support return](../../research/records/2026-09-08_AC1_MATERIAL_REPORTS_REUSE_THEIR_COORDINATE_SUPPORT.md)
+now supplies a native restriction/decoder and a checkpoint about 60% smaller, with identical
+fresh-process continuation. This is finite report/storage reuse. The complete recurrent learner
+still consumes dense resident history, and the language loop remains.
+
 [definition] Proceed through AC1 steps 3–4: local path formation, restriction/rebase and
 generator reuse. Derive the actively used coordinates and their continuing source/decoder,
 including its numerical error/deposit law. The present

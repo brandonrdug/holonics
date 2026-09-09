@@ -155,6 +155,32 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let selection = args
         .next()
         .ok_or("receiving occurrences or --material-history required")?;
+    if selection=="--material-packing" {
+        let indices=args.next().ok_or("occurrence indices required")?.split(',').map(str::parse::<usize>).collect::<Result<Vec<_>,_>>()?;
+        if args.next().as_deref()!=Some("--report"){return Err("--report required".into());}
+        let output=PathBuf::from(args.next().ok_or("report destination required")?);
+        if args.next().is_some()||output.exists(){return Err("unexpected arguments or existing destination".into());}
+        let saved=SavedTextField::read(&path)?;
+        let report=saved.with_session(|session,_,_,_|{
+            let field=session.field();let mut entries=vec![];
+            for at in &indices {
+                let before=field.census();let start=Instant::now();let packing=field.pack_material_report(*at)?;
+                let seconds=start.elapsed().as_secs_f64();let after=field.census();
+                let receiver=packing.read_packet()?;let same_receiver=receiver==field.read_material_packet(*at)?.ok_or_else(||AlphaMaterialError::Apparatus("missing packet receiver".into()))?;
+                let same_report=packing.unfold()?==field.inspect_material_transport_wire(*at)?.ok_or_else(||AlphaMaterialError::Apparatus("missing report".into()))?;
+                let mut bytes=vec![];packing.rest()?.write(&mut bytes)?;
+                entries.push(json!({"occurrence":at,"coordinates":packing.coordinates(),"dense_report_words":packing.dense_report_words(),
+                    "packed_report_words":packing.packed_report_words(),"packed_resident_octets_including_inventory":packing.resident_octets(),
+                    "packed_rest_octets":bytes.len(),"packing_seconds":seconds,"packing_deeds":after.deed_launches-before.deed_launches,
+                    "coordinate_inventory_readouts":after.section_read_outs-before.section_read_outs,"same_complete_report":same_report,
+                    "same_packet_receiver":same_receiver,"receiver":receiver}));
+            }
+            Ok(json!({"schema":"holonics.native-material-support.v1","model":path,"field_cut":field.occurrence_count(),"entries":entries,
+                "whole_field_residency_reduced":false,"language_quality_established":false}))
+        })?;
+        publish_new(&output,|file|file.write_all(&serde_json::to_vec_pretty(&report)?))?;
+        println!("{}",json!({"report":output}));return Ok(());
+    }
     if selection=="--contact-deposits" {
         let indices=args.next().ok_or("deposit indices required")?.split(',')
             .map(str::parse::<usize>).collect::<Result<Vec<_>,_>>()?;

@@ -131,6 +131,11 @@ quadratures and retained defects. Two focused CUDA controls pass. The matched 1,
 comparison completes; native body/current conduct changes but terminal output still loops
 identically. Normalized receiver metrics remain explicit alternatives.
 
+[established-bounded; measured] AC1 step 4's [finite report restriction](../../research/records/2026-09-08_AC1_MATERIAL_REPORTS_REUSE_THEIR_COORDINATE_SUPPORT.md)
+now supplies native support discovery, exact decoding and packet-receiver reuse. The checkpoint
+shrinks by 584,093,523 bytes with identical fresh-process continuation. The full recurrent
+operator still mounts dense history; path formation and whole-model native reuse remain open.
+
 [definition] Proceed with AC1 steps 3–4: local path formation, restriction/rebase and generator
 reuse. Derive the actively used coordinates and their continuing source/decoder through the
 actual receiver family. Retain the numerical defect and actual producing morphology. The

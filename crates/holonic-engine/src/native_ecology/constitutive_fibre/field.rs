@@ -58,6 +58,7 @@ pub use junction::{
 use junction::{PairedJunction, PendingJunction};
 use material_transport::{MaterialTransport, PendingMaterialTransport};
 pub use material_transport::{
+    NativeMaterialReportPacking, NativeMaterialReportPackingRest,
     NativeCompleteMaterialTransportReading, NativeCompleteMaterialTransportState,
     NativeFieldExactMaterialTransport, NativeFieldMaterialTransportReading,
     NativeFieldMaterialTransportResidual, NativeFieldMaterialTransportState,

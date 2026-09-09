@@ -30,14 +30,25 @@ impl NativeConstitutiveField<'_> {
         let report = event.with_resident(surface, |r| {
             r.transport.clone().ok_or(ConstitutiveFibreError::Uncertain)
         })?;
+        NativeMaterialPacketReading::read_from(surface, &report, occurrence, chart, targets)
+            .map(Some)
+    }
+}
+impl NativeMaterialPacketReading {
+    pub(in super::super) fn read_from<'c>(
+        surface: &'c ResidentSurface<'c>,
+        report: &ResidentSection<'c>,
+        occurrence: usize,
+        chart: NativeMaterialTarget,
+        targets: usize,
+    ) -> Result<Self, ConstitutiveFibreError> {
         let output = surface.fresh_section(1, targets + 2, ResidentGrain(0))?;
         let scratch = surface.fresh_section(1, 2 * targets, ResidentGrain(0))?;
         let mut passage = surface.begin_passage(&[vec![]])?;
         {
             let lane = passage.open(0, &[])?;
-            surface.record_field_material_packet_receiver(
-                &lane, &report, targets, &scratch, &output,
-            )?;
+            surface
+                .record_field_material_packet_receiver(&lane, report, targets, &scratch, &output)?;
         }
         passage.close(0, &output, 64)?;
         let receipt = passage.finish()?.launch()?;
@@ -66,12 +77,12 @@ impl NativeConstitutiveField<'_> {
         if words[1].0 != selected.map_or(-1, |i| i as i64) {
             return Err(ConstitutiveFibreError::Uncertain);
         }
-        Ok(Some(NativeMaterialPacketReading {
+        Ok(Self {
             occurrence,
             target_chart: chart,
             target_dimension: targets,
             selected,
             unexcluded,
-        }))
+        })
     }
 }

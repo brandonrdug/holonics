@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 use std::io::{Read, Write};
 
 const MAGIC: &[u8] = b"HNA-NATIVE-FIELD-REST\x01";
+const PACKED_MAGIC: &[u8] = b"HNA-NATIVE-FIELD-REST\x02";
 const END: &[u8] = b"HNA-NATIVE-FIELD-END\x01";
 type Error = ConstitutiveFibreError;
 fn invalid(detail: impl std::fmt::Display) -> Error {
@@ -655,83 +656,72 @@ impl NativeFieldRest {
     }
     pub fn write(&self, out: &mut impl Write) -> Result<(), Error> {
         self.validate()?;
-        out.write_all(MAGIC).map_err(invalid)?;
+        let packing=self.header.transport_source==NativeMaterialTransportSource::OperativeContextual
+            && !self.header.transport_target.is_direct();
+        out.write_all(if packing{PACKED_MAGIC}else{MAGIC}).map_err(invalid)?;
         blob(out, &serde_json::to_vec(&self.header).map_err(invalid)?)?;
-        let mut section = |s: &ResidentSectionRest| blob(out, &point_bytes(s)?);
-        section(&self.seed)?;
-        section(&self.memory)?;
-        section(&self.basis)?;
-        if let Some(s) = &self.covariance {
-            section(s)?;
-        }
-        if let Some(s) = &self.initial_junction {
-            section(s)?;
-        }
-        if let Some(s) = &self.transport {
-            section(s)?;
-        }
-        if let Some(op)=&self.operative {op.write(&mut section)?;}
-        for h in &self.history {
-            section(&h.source)?;
-            if let Some(s) = &h.junction {
-                section(s)?;
+        fn section(out:&mut impl Write,s:&ResidentSectionRest)->Result<(),Error>{blob(out,&point_bytes(s)?)}
+        section(out,&self.seed)?;section(out,&self.memory)?;section(out,&self.basis)?;
+        for s in [&self.covariance,&self.initial_junction,&self.transport].into_iter().flatten(){section(out,s)?;}
+        if let Some(op)=&self.operative {op.write(&mut |s|section(out,s))?;}
+        for (at,h) in self.history.iter().enumerate() {
+            section(out,&h.source)?;
+            if let Some(s)=&h.junction{section(out,s)?;}
+            if let Some(s)=&h.transport{
+                if packing {
+                    let packed=NativeMaterialReportPackingRest::from_report(self.header.history[at].lineage.clone(),
+                        self.header.transport_target,self.header.nodes,s)?;
+                    let mut encoded=vec![1];packed.write(&mut encoded)?;
+                    if encoded.len()<s.intervals.len().checked_mul(8).and_then(|n|n.checked_add(25)).ok_or(Error::Shape)? {blob(out,&encoded)?;}
+                    else {let mut bytes=vec![0];bytes.extend(point_bytes(s)?);blob(out,&bytes)?;}
+                } else {section(out,s)?;}
             }
-            if let Some(s) = &h.transport {
-                section(s)?;
-            }
-            if let Some(s) = &h.incoming {
-                section(s)?;
-            }
-            if let Some(op)=&h.operative{op.write(&mut section)?;}
+            if let Some(s)=&h.incoming{section(out,s)?;}
+            if let Some(op)=&h.operative{op.write(&mut |s|section(out,s))?;}
         }
         out.write_all(END).map_err(invalid)
     }
     pub fn read(input: &mut impl Read, octets: u64) -> Result<Self, Error> {
-        let mut input = input.take(octets);
-        expect(&mut input, MAGIC)?;
-        let header: Header = serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
-        let mut section = || read_point(&read_blob(&mut input)?);
-        let seed = section()?;
-        let memory = section()?;
-        let basis = section()?;
-        let covariance = header.junction.as_ref().map(|_| section()).transpose()?;
-        let initial_junction = (header.junction.is_some() && header.history.is_empty())
-            .then(&mut section)
-            .transpose()?;
-        let transport = header.transport.then(&mut section).transpose()?;
-        let operative=header.operative.as_ref().map(|w|OperativeRest::read(w,&mut section)).transpose()?;
-        let mut history = Vec::new();
-        for (at,event) in header.history.iter().enumerate() {
-            history.push(HeldRest {
-                source: section()?,
-                junction: header.junction.as_ref().map(|_| section()).transpose()?,
-                transport: header.transport.then(&mut section).transpose()?,
-                incoming: event
-                    .lineage
-                    .incoming
-                    .is_resident()
-                    .then(&mut section)
-                    .transpose()?,
-                operative:header.operative.as_ref().is_some_and(|o|at>=o.activated_at).then(||OperativeHistoryRest::read(&mut section)).transpose()?,
-            });
+        let mut input=input.take(octets);let mut magic=vec![0;MAGIC.len()];input.read_exact(&mut magic).map_err(invalid)?;
+        let packing=magic==PACKED_MAGIC;
+        if !packing && magic!=MAGIC{return Err(invalid("unsupported field rest version"));}
+        let header: Header=serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
+        if packing && (header.transport_source!=NativeMaterialTransportSource::OperativeContextual || header.transport_target.is_direct()){
+            return Err(invalid("packed field target chart"));
         }
-        expect(&mut input, END)?;
-        if input.limit() != 0 {
-            return Err(invalid("trailing field rest bytes"));
+        fn section(input:&mut std::io::Take<impl Read>)->Result<ResidentSectionRest,Error>{read_point(&read_blob(input)?)}
+        let seed=section(&mut input)?;let memory=section(&mut input)?;let basis=section(&mut input)?;
+        let covariance=header.junction.as_ref().map(|_|section(&mut input)).transpose()?;
+        let initial_junction=(header.junction.is_some() && header.history.is_empty()).then(||section(&mut input)).transpose()?;
+        let transport=header.transport.then(||section(&mut input)).transpose()?;
+        let operative=header.operative.as_ref().map(|w|OperativeRest::read(w,&mut ||section(&mut input))).transpose()?;
+        let mut history=Vec::new();
+        for (at,event) in header.history.iter().enumerate(){
+            let source=section(&mut input)?;
+            let junction=header.junction.as_ref().map(|_|section(&mut input)).transpose()?;
+            let transport=if header.transport {
+                Some(if packing {
+                    let bytes=read_blob(&mut input)?;
+                    match bytes.first(){
+                        Some(0)=>read_point(&bytes[1..])?,
+                        Some(1)=>{
+                            let packed=NativeMaterialReportPackingRest::read(&mut &bytes[1..],(bytes.len()-1) as u64)?;
+                            if packed.lineage!=event.lineage || packed.nodes!=header.nodes || packed.target_chart!=header.transport_target{
+                                return Err(invalid("packed material source/chart mismatch"));
+                            }
+                            packed.unfold_rest()?
+                        },
+                        _=>return Err(invalid("unknown material report codec")),
+                    }
+                } else {section(&mut input)?})
+            } else {None};
+            let incoming=event.lineage.incoming.is_resident().then(||section(&mut input)).transpose()?;
+            let op=header.operative.as_ref().is_some_and(|o|at>=o.activated_at).then(||OperativeHistoryRest::read(&mut ||section(&mut input))).transpose()?;
+            history.push(HeldRest{source,junction,transport,incoming,operative:op});
         }
-        let rest = Self {
-            operative,
-            header,
-            seed,
-            memory,
-            basis,
-            covariance,
-            initial_junction,
-            transport,
-            history,
-        };
-        rest.validate()?;
-        Ok(rest)
+        expect(&mut input,END)?;
+        if input.limit()!=0{return Err(invalid("trailing field rest bytes"));}
+        let rest=Self{operative,header,seed,memory,basis,covariance,initial_junction,transport,history};rest.validate()?;Ok(rest)
     }
 }
 

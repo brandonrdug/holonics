@@ -5,6 +5,8 @@ use num_traits::One;
 
 pub(super) mod complete;
 pub(super) mod contextual;
+mod support;
+pub use support::{NativeMaterialReportPacking, NativeMaterialReportPackingRest};
 pub(super) mod moment;
 pub use complete::{
     NativeCompleteMaterialTransportReading, NativeCompleteMaterialTransportState,

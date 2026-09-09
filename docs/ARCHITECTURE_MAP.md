@@ -204,6 +204,14 @@ with explicit source readings and per-return frame persistence. `joint_material_
 retains native and actual-data checks; the endogenous joint producer remains open.
 
 
+[established-bounded; source-inspected] `field/material_transport/support.rs` and
+`field_material_support.cuh` own the native report-coordinate restriction, common standing,
+full/current-face decoder and packed packet receiver. `surface_material_support.rs` binds those
+passages. `field/rest.rs` integrates the same cold representation into version-2 tensor-field
+checkpoints and retains version-1 reading. The [support return](../research/records/2026-09-08_AC1_MATERIAL_REPORTS_REUSE_THEIR_COORDINATE_SUPPORT.md)
+records exact native/cold comparisons, smaller actual-model storage and unchanged continuation.
+The complete recurrent material operator still uses dense resident reports.
+
 [established-bounded; source-inspected] `field/receiver/normalized/pullback.rs` also owns
 `pull_back_material_current` and the `SquaredCurrent` metric. `field_material_pullback.cuh`
 constructs the complete complex covector and pairs both quadratures with historical material
