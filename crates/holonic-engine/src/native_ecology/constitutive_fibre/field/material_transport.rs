@@ -54,8 +54,13 @@ pub enum NativeMaterialTransportSource {
     BilinearContextual,
     /// The same bilinear phase moment over explicit operative current carriers.
     OperativeContextual,
+    /// The same developing junction, queried through its transported outgoing boundary.
+    /// The complete interior remains in the field and in the producing contact adjoint.
+    OperativeBoundary,
 }
 impl NativeMaterialTransportSource {
+    pub(super) fn is_operative(self)->bool {matches!(self,Self::OperativeContextual|Self::OperativeBoundary)}
+
     pub(super) fn is_outgoing(&self) -> bool {
         *self == Self::CoupledOutgoing
     }
@@ -67,6 +72,7 @@ impl NativeMaterialTransportSource {
             Self::Contextual => 4,
             Self::BilinearContextual => 5,
             Self::OperativeContextual => 6,
+            Self::OperativeBoundary => 7,
         }
     }
     pub(super) fn state_words(self, n: usize) -> Option<usize> {
@@ -80,15 +86,15 @@ impl NativeMaterialTransportSource {
             Self::HomogeneousMoment
             | Self::Contextual
             | Self::BilinearContextual
-            | Self::OperativeContextual => n.checked_mul(12)?.checked_add(12),
+            | Self::OperativeContextual | Self::OperativeBoundary => n.checked_mul(12)?.checked_add(12),
         }
     }
     pub(super) fn report_words_for(self,n:usize,target:NativeMaterialTarget)->Option<usize>{
         let targets=target.dimension(n)?;
-        if !target.is_direct() && self!=Self::OperativeContextual {return None;}
+        if !target.is_direct() && !self.is_operative() {return None;}
         if matches!(
             self,
-            Self::Contextual | Self::BilinearContextual | Self::OperativeContextual
+            Self::Contextual | Self::BilinearContextual | Self::OperativeContextual | Self::OperativeBoundary
         ) {
             return n.checked_mul(68)?.checked_add(targets.checked_mul(82)?)?.checked_add(96);
         }
@@ -283,7 +289,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         {
             return Err(ConstitutiveFibreError::Shape);
         }
-        if source == NativeMaterialTransportSource::OperativeContextual {
+        if source.is_operative() {
             self.enable_operative_contacts()?;
         }
         let width = source
@@ -343,7 +349,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 kind,
                 NativeMaterialTransportSource::Contextual
                     | NativeMaterialTransportSource::BilinearContextual
-                    | NativeMaterialTransportSource::OperativeContextual
+                    | NativeMaterialTransportSource::OperativeContextual | NativeMaterialTransportSource::OperativeBoundary
             ) {
                 Some(self.prepare_contextual_work()?)
             } else {
@@ -393,7 +399,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                     | NativeMaterialTransportSource::HomogeneousMoment
                     | NativeMaterialTransportSource::Contextual
                     | NativeMaterialTransportSource::BilinearContextual
-                    | NativeMaterialTransportSource::OperativeContextual
+                    | NativeMaterialTransportSource::OperativeContextual | NativeMaterialTransportSource::OperativeBoundary
             )
         ) {
             return Err(ConstitutiveFibreError::Rest(
@@ -456,7 +462,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                     | NativeMaterialTransportSource::HomogeneousMoment
                     | NativeMaterialTransportSource::Contextual
                     | NativeMaterialTransportSource::BilinearContextual
-                    | NativeMaterialTransportSource::OperativeContextual
+                    | NativeMaterialTransportSource::OperativeContextual | NativeMaterialTransportSource::OperativeBoundary
             )
         ) {
             return Err(ConstitutiveFibreError::Rest(

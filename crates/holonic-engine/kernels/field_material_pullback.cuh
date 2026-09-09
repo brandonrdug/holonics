@@ -80,7 +80,7 @@ extern "C" __global__ __launch_bounds__(512) void section_field_material_pullbac
     wide *out=(wide *)out_lo+10u*f;for(uint32_t j=0;j<20u;++j)out_lo[20u*f+j]=out_hi[20u*f+j]=0;
     const int64_t *entry=contextual_at(table,at),*meta=entry+contextual_meta(n,targets);
     if(meta[1]<0)return;
-    int64_t reference=meta[2];if(!at||reference<1||reference>(int64_t)at||meta[3]!=3){atomicOr(slot,REFUSED_MALFORMED);return;}
+    int64_t reference=meta[2];if(!at||reference<1||reference>(int64_t)at||(meta[3]!=3 && meta[3]!=4)){atomicOr(slot,REFUSED_MALFORMED);return;}
     if((f&1u)&&reference==(int64_t)at)return;
     uint32_t query=(f&1u)?(uint32_t)reference:at;
     const int64_t *basis=contextual_at(table,query),*now=contextual_at(table,source);
@@ -116,6 +116,12 @@ extern "C" __global__ __launch_bounds__(512) void section_field_material_pullbac
     if(upstream_refused(census,lineage,lineage_count,slot))return;
     uint32_t coordinate=blockIdx.x*blockDim.x+threadIdx.x;if(coordinate>=10u*n+2u*k)return;
     bool visible=coordinate<4u*n;uint32_t j=visible?coordinate:coordinate-4u*n;
+    // This receiver factors through the outgoing projection. Its partial derivative with
+    // respect to a separately varied internal query coordinate is identically zero, even
+    // when the retained outgoing current is uncertain. The paired producer still sees b.
+    if(contextual_at(table,source)[contextual_meta(n,targets)+3u]==4 && coordinate>=10u*n){
+        for(uint32_t i=0;i<4u;++i)out_lo[4u*coordinate+i]=out_hi[4u*coordinate+i]=0;return;
+    }
     MaterialInterval sum={0,0},z={0,0};
     for(uint32_t f=0;f<2u*(source+1u);++f){
         uint32_t at=f/2u;const int64_t *entry=contextual_at(table,at),*meta=entry+contextual_meta(n,targets);if(meta[1]<0)continue;

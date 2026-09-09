@@ -1,7 +1,7 @@
 # Construction state
 
 **Currency:** September 8, 2026. **Priority:** AC0–AC5 completion resumed by Brandon; flexible native construction with transparent failures.
-**Position:** AC0 complete; AC1 finite contact development completes the first corpus slice; AC2 joint-packet transport and receiver are implemented, but output loops; AC1 path/reuse and AC2 productive continuation remain open; AC3 experimental artifacts; AC4–AC5 open.
+**Position:** AC0 complete; AC1 finite contact development completes the first corpus slice; AC2 joint-packet transport and receiver are implemented, but responses remain unusable; AC1 path/reuse and AC2 productive continuation remain open; AC3 experimental artifacts; AC4–AC5 open.
 **Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -58,6 +58,19 @@ model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction
 
+[established-bounded; measured] The [operative-boundary query](research/records/2026-09-08_AC1_THE_MATERIAL_QUERY_FOLLOWS_THE_OPERATIVE_BOUNDARY.md)
+now observes transported outgoing current while retaining the full interior and its producing
+contact return. All 105 field CUDA tests pass. The matched 1,930-occurrence study completes in
+585.57 seconds; its packed checkpoint is 390,957,776 bytes. Output is `The itive.` followed by
+`EndPart`, and a fresh process reproduces the complete declared state and continuation.
+The response is still unusable; ending a part does not establish useful Athena-alpha.
+
+[established-bounded; source-inspected] The codec retains human/agent attribution in cold
+receipts but mounts both through identical symbol intake. Next carry actual conversational
+direction through native boundary ports and matching receivers, including pending state and
+ordinary self-emission. This is a missing operative condition, not a proof of the sole cause of
+language failure. AC1 recurrent reuse and AC2 complete useful responses remain open.
+
 [established-bounded; measured] The [material report restriction](research/records/2026-09-08_AC1_MATERIAL_REPORTS_REUSE_THEIR_COORDINATE_SUPPORT.md)
 now retains a native coordinate inventory, common standing and exact decoder. Its packet receiver
 can reuse the packed report after the source field is dropped. All 103 field CUDA tests pass.
@@ -92,8 +105,9 @@ identifies the additional material-query and changing-contact receivers required
 A fresh process with that receiver reproduces the body, emission currents and all 128 output
 decisions exactly. Neither this repair nor local test success establishes useful language.
 
-[definition] Current work moves to AC1 steps 3–4: local path formation, restriction/rebase and
-generator reuse through the actual joint boundary/material/return family. The common-current
+[definition] AC1 steps 3–4 retain local path formation, restriction/rebase and generator reuse
+through the actual receiver family. The boundary-query return above supplies a changed family;
+the next AC1–AC2 codec correction preserves the missing conversational direction. The common-current
 metric changes native conduct but leaves the language loop unchanged. Its recurrent retained-history
 representation is still far too large for the exposure, despite the report/checkpoint reduction
 above; another scalar receiver adjustment or larger unchanged corpus run is not the next construction.

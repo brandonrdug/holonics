@@ -204,6 +204,13 @@ with explicit source readings and per-return frame persistence. `joint_material_
 retains native and actual-data checks; the endogenous joint producer remains open.
 
 
+[established-bounded; source-inspected] `OperativeBoundary` is source kind 7 / contextual
+version 4 in the existing material owners. `field_contextual_material.cuh` retains the outgoing
+projection and its bound; `field_material_pullback.cuh` returns its exactly zero direct-interior
+partial covector before the complete paired producing adjoint. Rest validates this source chart
+and its projected norm. The [boundary-query return](../research/records/2026-09-08_AC1_THE_MATERIAL_QUERY_FOLLOWS_THE_OPERATIVE_BOUNDARY.md)
+records the changed receiver family, tests, actual response and missing conversational direction.
+
 [established-bounded; source-inspected] `field/material_transport/support.rs` and
 `field_material_support.cuh` own the native report-coordinate restriction, common standing,
 full/current-face decoder and packed packet receiver. `surface_material_support.rs` binds those

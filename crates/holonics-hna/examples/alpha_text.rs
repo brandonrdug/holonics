@@ -410,7 +410,7 @@ fn run_session(
                 json!(field.inspect_complete_material_transport_state()?)
             } else if field.material_transport_source()==Some(NativeMaterialTransportSource::HomogeneousMoment) {
                 json!(final_occurrence.map(|at|field.inspect_moment_material_transport(at)).transpose()?.flatten())
-            } else if matches!(field.material_transport_source(),Some(NativeMaterialTransportSource::Contextual|NativeMaterialTransportSource::BilinearContextual|NativeMaterialTransportSource::OperativeContextual)) {
+            } else if matches!(field.material_transport_source(),Some(NativeMaterialTransportSource::Contextual|NativeMaterialTransportSource::BilinearContextual|NativeMaterialTransportSource::OperativeContextual|NativeMaterialTransportSource::OperativeBoundary)) {
                 json!(final_occurrence.map(|at|field.inspect_contextual_material_transport(at)).transpose()?.flatten())
             } else {json!(field.inspect_material_transport_state()?)},
             "internal_current_enclosures":if inspect_all_currents { field.inspect_internal_current_enclosures()? } else { None }});
@@ -448,7 +448,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--contact-metric current|relative-entropy|squared-probability]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--contact-metric current|relative-entropy|squared-probability]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -494,9 +494,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                     "contextual-direct-sum" => NativeMaterialTransportSource::Contextual,
                     "operative-contextual" => NativeMaterialTransportSource::OperativeContextual,
+                    "operative-boundary" => NativeMaterialTransportSource::OperativeBoundary,
                     _ => {
                         return Err(
-                            "material source must be coupled-outgoing, complete-current, homogeneous-moment, contextual (alias bilinear-contextual), contextual-direct-sum, or operative-contextual".into(),
+                            "material source must be coupled-outgoing, complete-current, homogeneous-moment, contextual (alias bilinear-contextual), contextual-direct-sum, operative-contextual, or operative-boundary".into(),
                         );
                     }
                 })
@@ -657,7 +658,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         with_text_field_chart(
             grain,
             material_source.unwrap_or(NativeMaterialTransportSource::OperativeContextual),
-            material_target.unwrap_or(if material_source.is_some_and(|s|s!=NativeMaterialTransportSource::OperativeContextual){NativeMaterialTarget::DirectCurrent}else{NativeMaterialTarget::TensorProduct{factor_width:2}}),
+            material_target.unwrap_or(if material_source.is_some_and(|s|!matches!(s,NativeMaterialTransportSource::OperativeContextual|NativeMaterialTransportSource::OperativeBoundary)){NativeMaterialTarget::DirectCurrent}else{NativeMaterialTarget::TensorProduct{factor_width:2}}),
             |field| {
                 if let Some(path) = &history_archive {
                     field.enable_history_archive(path)?;

@@ -389,7 +389,7 @@ relation. Basin/stability probes answer a specific failure, never govern learnin
 authored entropy threshold. Use existing tube/span owners at their domains; no new tube engine
 or large fractal sampling campaign is scheduled.
 
-[definition] **Current entry point: AC1 steps 3–4, path/reuse and generator compression; AC2 productive continuation remains open after the current-metric comparison.**
+[definition] **Current entry point: AC1–AC2 conversational boundary direction, with path/reuse and generator compression still required.**
 The [normalized receiver](../../research/records/2026-09-08_AC1_THE_NORMALIZED_RECEIVER_RETURNS_ITS_COMPLETE_CURRENT_AND_TWO_METRIC_FACES.md)
 has returned resident source-qualified faces and metric covectors with actual-model evidence.
 Its full r is also the relative-entropy potential return; `J_p*r` belongs to squared probability
@@ -429,6 +429,16 @@ produces the identical terminal loop.
 now supplies a native restriction/decoder and a checkpoint about 60% smaller, with identical
 fresh-process continuation. This is finite report/storage reuse. The complete recurrent learner
 still consumes dense resident history, and the language loop remains.
+
+[established-bounded; measured] The [boundary-query comparison](../../research/records/2026-09-08_AC1_THE_MATERIAL_QUERY_FOLLOWS_THE_OPERATIVE_BOUNDARY.md)
+retains the full interior while observing its transported boundary. The native/tensor/persistence
+checks pass. The actual answer ends as `The itive.` and remains unusable.
+
+[definition] Next preserve the actual conversational direction at native ingress and reply
+receivers. The existing codec erases that operational distinction while retaining it in cold
+metadata. Bind declared boundary ports, preserve source lineage and pending state, and keep
+self-emission in the same recurrence. No authored intent rule or new world-verdict law supplies
+the correction. The existing path/generator obligations continue alongside this AC1–AC2 repair.
 
 [definition] Proceed through AC1 steps 3–4: local path formation, restriction/rebase and
 generator reuse. Derive the actively used coordinates and their continuing source/decoder,

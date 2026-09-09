@@ -197,8 +197,7 @@ impl<'c> NativeConstitutiveField<'c> {
         &self,
         at: usize,
     ) -> Result<NativeMaterialReportPacking<'c>, ConstitutiveFibreError> {
-        if self.material_transport_source()
-            != Some(NativeMaterialTransportSource::OperativeContextual)
+        if !self.material_transport_source().is_some_and(NativeMaterialTransportSource::is_operative)
         {
             return Err(ConstitutiveFibreError::Shape);
         }

@@ -119,6 +119,14 @@ pub(in super::super) fn validate_operative_profile(
     }
     Ok(())
 }
+pub(in super::super) fn validate_boundary_profile(words:&[(i64,i64)],n:usize,grain:u32,at:usize)
+    ->Result<(),ConstitutiveFibreError>{
+    validate_operative_profile(words,n,grain,at,None)?;
+    if words[36*n+18].0!=0{return Err(invalid("boundary query retains an internal coordinate"));}
+    let actual=wides(&words[..12*n])?.iter().map(|v|{let v=BigInt::from(*v);&v*&v}).sum::<BigInt>();
+    if integer(&words[36*n+10..36*n+15])?!=actual{return Err(invalid("boundary query norm"));}
+    Ok(())
+}
 fn invalid(s: impl std::fmt::Display) -> ConstitutiveFibreError {
     ConstitutiveFibreError::Rest(format!("contextual material: {s}"))
 }
@@ -197,7 +205,7 @@ pub(in super::super) fn validate_report_for(rest:&ResidentSectionRest,n:usize,ta
         return Err(invalid("negative current radius"));
     }
     if w[meta].0 != at as i64
-        || !matches!(w[meta + 3].0, 1 | 2 | 3)
+        || !matches!(w[meta + 3].0, 1 | 2 | 3 | 4)
         || w[meta + 1].0 < -1
         || w[meta + 1].0 >= at as i64
     {
@@ -216,7 +224,9 @@ pub(in super::super) fn validate_report_for(rest:&ResidentSectionRest,n:usize,ta
     if linked {
         visible(&w[input..context], n, grain)?;
     }
-    if w[meta + 3].0 == 3 {
+    if w[meta + 3].0 == 4 {
+        validate_boundary_profile(&w[context..raw],n,grain,at)?;
+    } else if w[meta + 3].0 == 3 {
         validate_operative_profile(&w[context..raw], n, grain, at, None)?;
     } else {
         decode_source(&w[context..raw], n, grain, at)?;
@@ -265,8 +275,7 @@ impl<'c> NativeConstitutiveField<'c> {
                 .operative
                 .as_ref()
                 .map_or((0, 0), |o| (o.b.lo_device_ptr() as i64, o.count as i64));
-            if self.material_transport_source()
-                == Some(NativeMaterialTransportSource::OperativeContextual)
+            if self.material_transport_source().is_some_and(NativeMaterialTransportSource::is_operative)
                 && b == 0
             {
                 return Err(invalid(
@@ -297,7 +306,7 @@ impl<'c> NativeConstitutiveField<'c> {
             Some(
                 NativeMaterialTransportSource::Contextual
                     | NativeMaterialTransportSource::BilinearContextual
-                    | NativeMaterialTransportSource::OperativeContextual
+                    | NativeMaterialTransportSource::OperativeContextual | NativeMaterialTransportSource::OperativeBoundary
             )
         ) {
             return Ok(None);
@@ -356,12 +365,12 @@ impl<'c> NativeConstitutiveField<'c> {
             } else {
                 None
             },
-            context: if w[meta + 3].0 == 3 {
+            context: if w[meta + 3].0 >= 3 {
                 None
             } else {
                 Some(decode_source(&w[context..raw], n, grain, at)?)
             },
-            operative_context: if w[meta + 3].0 == 3 {
+            operative_context: if w[meta + 3].0 >= 3 {
                 Some(
                     self.history
                         .get(at)
@@ -371,11 +380,16 @@ impl<'c> NativeConstitutiveField<'c> {
                                 .operative
                                 .as_ref()
                                 .ok_or_else(|| invalid("missing operative current"))?;
-                            let b = self.relation.surface.detach_section(&op.b, 64)?;
-                            validate_operative_profile(&w[context..raw], n, grain, at, Some(&b))?;
+                            let boundary=w[meta+3].0==4;
+                            let values=if boundary {
+                                validate_boundary_profile(&w[context..raw],n,grain,at)?;vec![]
+                            } else {
+                                let b=self.relation.surface.detach_section(&op.b,64)?;
+                                validate_operative_profile(&w[context..raw],n,grain,at,Some(&b))?;
+                                wides(&b.intervals)?
+                            };
                             let d = 6 * n;
                             let out = wides(&w[context..context + 2 * d])?;
-                            let values = wides(&b.intervals)?;
                             let radius = wides(&w[context + 6 * d + 16..context + 6 * d + 18])?[0];
                             let op_bounds = wides(
                                 &self
@@ -385,7 +399,7 @@ impl<'c> NativeConstitutiveField<'c> {
                                     .intervals,
                             )?;
                             if radius != op_bounds[1]
-                                || op.count != w[context + 6 * d + 18].0 as usize
+                                || (if boundary{0}else{op.count}) != w[context + 6 * d + 18].0 as usize
                             {
                                 return Err(invalid("operative source/current cut"));
                             }
@@ -395,7 +409,7 @@ impl<'c> NativeConstitutiveField<'c> {
                             Ok(NativeOperativeContextReading {
                                 occurrence: at,
                                 outgoing_center: vec(&out),
-                                internal_center: vec(&values[..2 * op.count]),
+                                internal_center: vec(&values[..if boundary{0}else{2 * op.count}]),
                                 source_radius: Rat::new(radius.into(), scale.clone()),
                                 numerical_norm_square: Rat::new(
                                     integer(&w[context + 6 * d + 10..context + 6 * d + 15])?,

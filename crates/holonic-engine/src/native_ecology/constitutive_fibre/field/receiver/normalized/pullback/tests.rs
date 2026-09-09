@@ -50,6 +50,7 @@ fn reference(
 ) -> Rat {
     let sq = coordinates(&rows[source].visible_source.center);
     let cq = context(&rows[source]);
+    if !visible && j>=cq.len(){return Rat::zero();}
     let mut answer = Rat::zero();
     for (at, row) in rows.iter().enumerate().take(source + 1) {
         if row.source_occurrence.is_none() {
@@ -88,6 +89,14 @@ fn reference(
 #[test]
 #[ignore = "requires CUDA; actual producing factors against independent exact quotient derivatives"]
 fn material_source_pullback_keeps_both_arguments_and_the_producing_cut() {
+    check_pullback(NativeMaterialTransportSource::OperativeContextual);
+}
+#[test]
+#[ignore="requires CUDA; outgoing receiver projection and complete producing contact adjoint"]
+fn operative_boundary_source_returns_through_the_retained_interior(){
+    check_pullback(NativeMaterialTransportSource::OperativeBoundary);
+}
+fn check_pullback(source_kind:NativeMaterialTransportSource){
     let readout = ResidentReadout::new().unwrap();
     let surface = ResidentSurface::on(&readout).unwrap();
     let make = || {
@@ -97,7 +106,7 @@ fn material_source_pullback_keeps_both_arguments_and_the_producing_cut() {
             ResidentGrain(72),
         )
         .unwrap();
-        f.enable_material_transport_source(NativeMaterialTransportSource::OperativeContextual)
+        f.enable_material_transport_source(source_kind)
             .unwrap();
         f
     };
@@ -266,10 +275,31 @@ fn material_source_pullback_keeps_both_arguments_and_the_producing_cut() {
         phase_consequence,
         "the imaginary material return must have a separating source consequence"
     );
-    assert!(
-        certified_internal && certified_visible,
-        "both query arguments must return nonzero conduct"
-    );
+    assert!(certified_visible,"the visible query must return");
+    if source_kind==NativeMaterialTransportSource::OperativeBoundary {
+        let before=field.stage_operative_contacts().unwrap().inspect().unwrap();
+        assert!(!before.internal.center.is_empty());
+        assert!(before.internal.center.iter().any(|z|!z.norm_square().is_zero()));
+        let query=field.pull_back_material_current(5).unwrap().unwrap();
+        assert!(query.inspect().unwrap().internal_current.iter().all(|v|v.lower.is_zero() && v.upper.is_zero()));
+        let response=field.material_contact_response(query).unwrap();
+        let reaction=response.inspect().unwrap();
+        assert!(!reaction.incoming_internal.center.is_empty());
+        assert!(reaction.incoming_internal.center.iter().any(|z|!z.norm_square().is_zero()));
+        field.apply_material_contact_realization(&response,NativeContactRealization::DyadicDeposit).unwrap();
+        let after=field.stage_operative_contacts().unwrap().inspect().unwrap();
+        assert_ne!(before.contacts,after.contacts);
+        let saved=field.rest(&[previous.as_ref()],&[]).unwrap();
+        let mut bytes=vec![];saved.write(&mut bytes).unwrap();
+        let saved=NativeFieldRest::read(&mut bytes.as_slice(),bytes.len() as u64).unwrap();
+        assert_eq!(saved.material_transport_source(),Some(source_kind));
+        let expected=field.advance_resident(&mut NativeFieldOccurrence::through(previous.take().unwrap(),vec![phase(1,-1),phase(0,1)])).unwrap();
+        let expected=field.rest(&[Some(&expected.source)],&[]).unwrap();
+        drop(response);drop(field);
+        let (mut field,mut sources,_)=NativeConstitutiveField::remount(&surface,saved).unwrap();
+        let next=field.advance_resident(&mut NativeFieldOccurrence::through(sources[0].take().unwrap(),vec![phase(1,-1),phase(0,1)])).unwrap();
+        assert_eq!(field.rest(&[Some(&next.source)],&[]).unwrap(),expected);
+    } else {assert!(certified_internal,"the full query must reach its internal argument");}
 }
 
 #[test]

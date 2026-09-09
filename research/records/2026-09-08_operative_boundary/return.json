@@ -1,0 +1,104 @@
+{
+  "schema": "holonics.operative-boundary-conversation.v1",
+  "source": "operative-boundary",
+  "target": {
+    "factor_width": 2,
+    "kind": "tensor-product"
+  },
+  "metric": "SquaredCurrent",
+  "families": 8,
+  "development_occurrences": 1930,
+  "contact_deposits": 1929,
+  "development_seconds": 585.569239663,
+  "prompt_and_emission_seconds": 22.236605217,
+  "checkpoint_octets": 390957776,
+  "development_census": {
+    "allocations": 208406,
+    "captured_launches": 36657,
+    "control_launches": 0,
+    "deed_launches": 11576,
+    "device_to_device_octets": 0,
+    "egress_receipt_octets": 1111296,
+    "egress_section_octets": 0,
+    "ingress_octets": 181504592,
+    "resident_octets_now": 1944865872,
+    "resident_octets_peak": 1959680948,
+    "section_read_outs": 0,
+    "synchronizations": 11576
+  },
+  "development_error": null,
+  "native_error": null,
+  "prompt": "Explain the difference between a function and its derivative.",
+  "output": "The itive.",
+  "generation_disposition": {
+    "kind": "completed-part"
+  },
+  "generated_occurrences": 11,
+  "fresh_process_comparison": {
+    "body": true,
+    "emission_current_history": true,
+    "generation": true,
+    "utf8": true,
+    "contact_metric": true,
+    "material_source": true
+  },
+  "process": {
+    "command": [
+      "target/debug/examples/alpha_text",
+      ".local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl",
+      "--families",
+      "8",
+      "--fractional-bits",
+      "72",
+      "--material-source",
+      "operative-boundary",
+      "--material-target",
+      "joint-packet",
+      "--contact-response",
+      "true",
+      "--contact-realization",
+      "dyadic-deposit",
+      "--contact-metric",
+      "current",
+      "--prompt",
+      ".local/artifacts/athena-alpha/ac2/first-request.txt",
+      "--emit-symbols",
+      "128",
+      "--checkpoint",
+      ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-operative-boundary-v6.hna",
+      "--report",
+      ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-operative-boundary-v6.json"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 626.5529280009796,
+    "max_rss_kib": 2122164,
+    "cpu_seconds": 623.577666
+  },
+  "resume_process": {
+    "command": [
+      "target/debug/examples/alpha_text",
+      "--resume",
+      ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-operative-boundary-v6.hna",
+      "--families",
+      "0",
+      "--prompt",
+      ".local/artifacts/athena-alpha/ac2/first-request.txt",
+      "--emit-symbols",
+      "128",
+      "--report",
+      ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-operative-boundary-v6-resumed.json"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 48.44983549398603,
+    "max_rss_kib": 2118292,
+    "cpu_seconds": 48.196877
+  },
+  "checks": [
+    "105 constitutive-field CUDA tests passed in 127.28 s",
+    "Boundary projection checked against independent exact source derivatives for all three metrics, including phase and delayed reception",
+    "Direct interior query covector is exactly zero; paired reaction retains nonzero interior response and changes contacts",
+    "Tensor target, packed checkpoint and post-deposit restart controls passed",
+    "Both affected examples compiled"
+  ],
+  "language_quality_established": false
+}

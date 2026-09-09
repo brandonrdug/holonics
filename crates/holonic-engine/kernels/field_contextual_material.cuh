@@ -91,7 +91,7 @@ __device__ void contextual_operative_source(const wide *current,const wide *b,ui
 }
 __device__ void contextual_context_pair(const int64_t *a,const wide *ba,const int64_t *b,const wide *bb,uint32_t D,uint32_t grain,uint32_t version,
     MomentInteger &num,MomentInteger &den,uint32_t *slot){
-    if(version!=3u){moment_pair(a,b,D,grain,num,den,slot);return;}
+    if(version<3u){moment_pair(a,b,D,grain,num,den,slot);return;}
     int64_t ka=a[6u*D+18u],kb=b[6u*D+18u];
     if(ka<0 || kb<0 || (ka && !ba) || (kb && !bb) || a[6u*D+15u]!=(int64_t)grain || b[6u*D+15u]!=(int64_t)grain){atomicOr(slot,REFUSED_MALFORMED);return;}
     HistoryInteger re,im;const wide *oa=(const wide *)a,*ob=(const wide *)b;
@@ -219,7 +219,7 @@ __device__ void contextual_material_prepare(
     if(threadIdx.x==0){
         for(size_t i=0;i<contextual_extra(n,targets)+24u;++i)out[i]=out_hi[i]=0;
         if((linked && (!at || source_ordinal>=at || !original)) || at>=(uint32_t)INT64_MAX){atomicOr(slot,REFUSED_MALFORMED);}
-        if(!*slot && version==3u)contextual_operative_source(current,operative_b,operative_count,n,grain,at,joint_radius,state,next,next_hi,out+contextual_context(n,targets),out_hi+contextual_context(n,targets),slot);
+        if(!*slot && version>=3u)contextual_operative_source(current,version==4u?nullptr:operative_b,version==4u?0u:operative_count,n,grain,at,joint_radius,state,next,next_hi,out+contextual_context(n,targets),out_hi+contextual_context(n,targets),slot);
         else if(!*slot)field_current_history_source_prepare(query,origin,incoming,frame,origin_frame,covariance,before,current,state,
             n,linked,grain,at,next,next_hi,out+contextual_context(n,targets),out_hi+contextual_context(n,targets),scratch,slot,joint_radius);
         wide ud=1,dd=1;

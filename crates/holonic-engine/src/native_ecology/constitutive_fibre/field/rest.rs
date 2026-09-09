@@ -504,7 +504,7 @@ impl NativeFieldRest {
                     match h.transport_source {
                         NativeMaterialTransportSource::Contextual
                         | NativeMaterialTransportSource::BilinearContextual
-                        | NativeMaterialTransportSource::OperativeContextual => {
+                        | NativeMaterialTransportSource::OperativeContextual | NativeMaterialTransportSource::OperativeBoundary => {
                             material_transport::contextual::validate_report_for(section, n, h.transport_target.dimension(n).ok_or_else(||invalid("material target extent"))?, grain, at)?
                         }
                         NativeMaterialTransportSource::HomogeneousMoment => {
@@ -523,11 +523,11 @@ impl NativeFieldRest {
                     h.transport_source,
                     NativeMaterialTransportSource::Contextual
                         | NativeMaterialTransportSource::BilinearContextual
-                        | NativeMaterialTransportSource::OperativeContextual
+                        | NativeMaterialTransportSource::OperativeContextual | NativeMaterialTransportSource::OperativeBoundary
                 ) {
                     let [_, output, input, context, _, meta, _] =
                         material_transport::contextual::offsets_for(n,h.transport_target.dimension(n).ok_or_else(||invalid("material target extent"))?);
-                    let version = if h.transport_source==NativeMaterialTransportSource::OperativeContextual {3} else if h.transport_source
+                    let version = if h.transport_source==NativeMaterialTransportSource::OperativeBoundary {4} else if h.transport_source==NativeMaterialTransportSource::OperativeContextual {3} else if h.transport_source
                         == NativeMaterialTransportSource::BilinearContextual
                     {
                         2
@@ -537,9 +537,11 @@ impl NativeFieldRest {
                     if section.intervals[meta + 3].0 != version {
                         return Err(invalid("contextual chart version"));
                     }
-                    if version==3 {
+                    if version>=3 {
                         let op=rest.operative.as_ref().ok_or_else(||invalid("missing operative material source"))?;
-                        material_transport::contextual::validate_operative_profile(&section.intervals[context..context+36*n+22],n,self.header.junction.as_ref().and_then(|j|match j.representation {NativeFieldJunctionRepresentation::EnclosedDyadic{fractional_bits}=>Some(fractional_bits),_=>None}).ok_or_else(||invalid("operative grain"))?,at,Some(&op.b))?;
+                        let grain=self.header.junction.as_ref().and_then(|j|match j.representation {NativeFieldJunctionRepresentation::EnclosedDyadic{fractional_bits}=>Some(fractional_bits),_=>None}).ok_or_else(||invalid("operative grain"))?;
+                        if version==4 {material_transport::contextual::validate_boundary_profile(&section.intervals[context..context+36*n+22],n,grain,at)?;}
+                        else {material_transport::contextual::validate_operative_profile(&section.intervals[context..context+36*n+22],n,grain,at,Some(&op.b))?;}
                         if material_transport::wides(&section.intervals[context+36*n+16..context+36*n+18])?[0]!=material_transport::wides(&op.bounds.intervals)?[1] {return Err(invalid("operative material source radius"));}
                     }
                     let source = event.lineage.received_from;
@@ -599,7 +601,7 @@ impl NativeFieldRest {
                     NativeMaterialTransportSource::HomogeneousMoment
                         | NativeMaterialTransportSource::Contextual
                         | NativeMaterialTransportSource::BilinearContextual
-                        | NativeMaterialTransportSource::OperativeContextual
+                        | NativeMaterialTransportSource::OperativeContextual | NativeMaterialTransportSource::OperativeBoundary
                 ) {
                     material_transport::moment::validate_state
                 } else {
@@ -616,7 +618,7 @@ impl NativeFieldRest {
                 }
             }
         }
-        if h.transport_source==NativeMaterialTransportSource::OperativeContextual && h.operative.as_ref().is_none_or(|o|o.activated_at!=0) {return Err(invalid("operative material requires its complete current history"));}
+        if h.transport_source.is_operative() && h.operative.as_ref().is_none_or(|o|o.activated_at!=0) {return Err(invalid("operative material requires its complete current history"));}
         if h.operative.is_some()!=self.operative.is_some(){return Err(invalid("operative state presence"));}
         if let Some(wire)=&h.operative {
             if wire.activated_at>h.history.len() || h.junction.as_ref().is_none_or(|j|!matches!(j.representation,NativeFieldJunctionRepresentation::EnclosedDyadic{..})) {
@@ -656,7 +658,7 @@ impl NativeFieldRest {
     }
     pub fn write(&self, out: &mut impl Write) -> Result<(), Error> {
         self.validate()?;
-        let packing=self.header.transport_source==NativeMaterialTransportSource::OperativeContextual
+        let packing=self.header.transport_source.is_operative()
             && !self.header.transport_target.is_direct();
         out.write_all(if packing{PACKED_MAGIC}else{MAGIC}).map_err(invalid)?;
         blob(out, &serde_json::to_vec(&self.header).map_err(invalid)?)?;
@@ -686,7 +688,7 @@ impl NativeFieldRest {
         let packing=magic==PACKED_MAGIC;
         if !packing && magic!=MAGIC{return Err(invalid("unsupported field rest version"));}
         let header: Header=serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
-        if packing && (header.transport_source!=NativeMaterialTransportSource::OperativeContextual || header.transport_target.is_direct()){
+        if packing && (!header.transport_source.is_operative() || header.transport_target.is_direct()){
             return Err(invalid("packed field target chart"));
         }
         fn section(input:&mut std::io::Take<impl Read>)->Result<ResidentSectionRest,Error>{read_point(&read_blob(input)?)}

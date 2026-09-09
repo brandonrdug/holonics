@@ -119,8 +119,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         &self,
         receiving: usize,
     ) -> Result<Option<NativeMaterialSourcePullback<'chart>>, ConstitutiveFibreError> {
-        if self.material_transport_source()
-            != Some(NativeMaterialTransportSource::OperativeContextual)
+        if !self.material_transport_source().is_some_and(NativeMaterialTransportSource::is_operative)
         {
             return Err(ConstitutiveFibreError::Arithmetic(
                 "material source pullback requires the operative contextual carrier".into(),
@@ -192,8 +191,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         series_terms: u32,
         grain: u32,
     ) -> Result<NativeMaterialSourcePullback<'chart>, ConstitutiveFibreError> {
-        if self.material_transport_source()
-            != Some(NativeMaterialTransportSource::OperativeContextual)
+        if !self.material_transport_source().is_some_and(NativeMaterialTransportSource::is_operative)
         {
             return Err(ConstitutiveFibreError::Arithmetic(
                 "material source pullback requires the operative contextual carrier".into(),

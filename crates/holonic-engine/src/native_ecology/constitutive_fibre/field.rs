@@ -671,7 +671,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .and_then(|v| v.checked_add(9))
             .ok_or(ConstitutiveFibreError::Shape)?;
         let output = surface.fresh_section(1, output_width, ResidentGrain(0))?;
-        if self.transport.as_ref().is_some_and(|t|t.source!=NativeMaterialTransportSource::OperativeContextual) && self.junction.as_ref().and_then(|j|j.operative.as_ref()).is_some_and(|o|!o.is_fixed()) {
+        if self.transport.as_ref().is_some_and(|t|!t.source.is_operative()) && self.junction.as_ref().and_then(|j|j.operative.as_ref()).is_some_and(|o|!o.is_fixed()) {
             return Err(ConstitutiveFibreError::Rest("the fixed-contact material source cannot read changed operative contacts".into()));
         }
         let material_target=self.transport.as_ref().map_or((self.nodes(),0),|t|(t.target.dimension(self.nodes()).unwrap(),t.target.kernel()));

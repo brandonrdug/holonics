@@ -14,7 +14,7 @@ fn packet(word: usize) -> Vec<NativePhaseCurrent> {
         })
         .collect()
 }
-fn make<'c>(surface: &'c ResidentSurface<'c>) -> NativeConstitutiveField<'c> {
+fn make<'c>(surface: &'c ResidentSurface<'c>,source:NativeMaterialTransportSource) -> NativeConstitutiveField<'c> {
     let seed = vec![
         NativeJunctionSeed {
             incoming_admittance: 1,
@@ -28,7 +28,7 @@ fn make<'c>(surface: &'c ResidentSurface<'c>) -> NativeConstitutiveField<'c> {
         NativeConstitutiveField::found_with_enclosed_junction(surface, seed, ResidentGrain(72))
             .unwrap();
     f.enable_material_transport_chart(
-        NativeMaterialTransportSource::OperativeContextual,
+        source,
         NativeMaterialTarget::TensorProduct { factor_width: 2 },
     )
     .unwrap();
@@ -41,9 +41,17 @@ fn point(r: i64, i: i64, d: i64) -> NativePhaseCurrent {
 #[test]
 #[ignore = "requires CUDA; tensor phase, separate material codomain, actual observation and adjoint"]
 fn packet_target_retains_joint_phase_and_restarts_with_its_own_codomain() {
+    check_packet_target(NativeMaterialTransportSource::OperativeContextual);
+}
+#[test]
+#[ignore="requires CUDA; tensor target through a boundary query and packed checkpoint"]
+fn operative_boundary_packet_target_retains_phase_and_restarts(){
+    check_packet_target(NativeMaterialTransportSource::OperativeBoundary);
+}
+fn check_packet_target(source:NativeMaterialTransportSource){
     let readout = ResidentReadout::new().unwrap();
     let surface = ResidentSurface::on(&readout).unwrap();
-    let mut field = make(&surface);
+    let mut field = make(&surface,source);
     assert_eq!(field.nodes(), 6);
     assert_eq!(field.material_target_dimension(), Some(8));
     let incoming = vec![

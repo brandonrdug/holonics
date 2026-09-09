@@ -136,6 +136,17 @@ now supplies native support discovery, exact decoding and packet-receiver reuse.
 shrinks by 584,093,523 bytes with identical fresh-process continuation. The full recurrent
 operator still mounts dense history; path formation and whole-model native reuse remain open.
 
+[established-bounded; measured] The [operative-boundary source](../../research/records/2026-09-08_AC1_THE_MATERIAL_QUERY_FOLLOWS_THE_OPERATIVE_BOUNDARY.md)
+now routes the material query through actual outgoing transport while retaining its active
+interior and contact response. All 105 field tests pass. The matched model ends its answer as
+`The itive.`; this is still unusable. Its complete continuation restarts exactly.
+
+[definition] Next repair the text codec's missing conversational direction: mount actual
+incoming versus demonstrated-emission ports and use matching receivers, preserving source
+lineage, pending input and ordinary self-emission. The current driver retains human/agent kind
+only in cold receipts. This correction is part of AC1–AC2's situated transport; it does not replace
+path/generator reuse with a label, classifier or separate world-verdict law.
+
 [definition] Proceed with AC1 steps 3–4: local path formation, restriction/rebase and generator
 reuse. Derive the actively used coordinates and their continuing source/decoder through the
 actual receiver family. Retain the numerical defect and actual producing morphology. The
@@ -173,7 +184,7 @@ complete population bounds, not an arbitrary radius, discarded current or basin-
 
 [project-postulate] Brandon has resumed completion of AC0–AC5 as the active goal and explicitly
 directs flexible designs and transparent reporting when a composition does not work.
-**Current work: AC1 steps 3–4, path/reuse and generator compression; AC2 productive continuation remains open after the current-metric comparison.** Each work update names phase/step, actual artifact and returned
+**Current work: AC1–AC2 conversational boundary direction, with path/reuse and generator compression still required.** Each work update names phase/step, actual artifact and returned
 consequence. Do not resume the preserved joint kernel by default or restart completed foundations.
 
 | Phase | Ordered construction | Return required |
