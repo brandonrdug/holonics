@@ -198,7 +198,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 "material source pullback requires the operative contextual carrier".into(),
             ));
         }
-        if self.material_transport_source()==Some(NativeMaterialTransportSource::OperativeLinear){
+        if matches!(self.material_transport_source(),Some(NativeMaterialTransportSource::OperativeLinear|NativeMaterialTransportSource::OperativeNormal)){
             return self.linear_material_query_pullback(covector,observation,source_lineage,receiving,metric,group_width,series_terms,grain);
         }
         let source = source_lineage.occurrence;

@@ -135,7 +135,7 @@ impl<'c> NativeConstitutiveField<'c> {
         &self,
         receiving: usize,
     ) -> Result<NativeRetainedMaterialRelation, Error> {
-        if self.material_transport_source() != Some(NativeMaterialTransportSource::OperativeLinear)
+        if !matches!(self.material_transport_source(),Some(NativeMaterialTransportSource::OperativeLinear|NativeMaterialTransportSource::OperativeNormal))
         {
             return Err(Error::Rest(
                 "material retention comparison requires the operative linear chart".into(),
@@ -160,11 +160,11 @@ impl<'c> NativeConstitutiveField<'c> {
             .ok_or(Error::Uncertain)?
             .outgoing;
         let observed = self
-            .inspect_material_transport(receiving)?
+            .inspect_material_common(receiving)?
             .ok_or(Error::Uncertain)?
             .observed;
         let original_material = self
-            .inspect_material_transport(source)?
+            .inspect_material_common(source)?
             .ok_or(Error::Uncertain)?
             .forward;
         let matrix = self
@@ -190,7 +190,7 @@ impl<'c> NativeConstitutiveField<'c> {
         realization: NativeContactRealization,
     ) -> Result<NativeMaterialContactStepComparison, Error> {
         let returned = self.prepare_material_contact_return(response, realization)?;
-        if self.material_transport_source() != Some(NativeMaterialTransportSource::OperativeLinear)
+        if !matches!(self.material_transport_source(),Some(NativeMaterialTransportSource::OperativeLinear|NativeMaterialTransportSource::OperativeNormal))
         {
             return Err(Error::Rest(
                 "finite contact comparison currently requires the operative linear material chart"
@@ -249,11 +249,11 @@ impl<'c> NativeConstitutiveField<'c> {
             .ok_or(Error::Uncertain)?
             .source;
         let observed = self
-            .inspect_material_transport(response.query.receiving.occurrence)?
+            .inspect_material_common(response.query.receiving.occurrence)?
             .ok_or(Error::Uncertain)?
             .observed;
         let original_material = self
-            .inspect_material_transport(source)?
+            .inspect_material_common(source)?
             .ok_or(Error::Uncertain)?
             .forward;
         let material = self

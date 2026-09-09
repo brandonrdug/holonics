@@ -226,3 +226,28 @@ fn duplex_exposure_preserves_direction_and_parent_incidence(){
         assert_eq!(records[1]["parts"][0]["kind"],"agent-text");Ok(())
     }).unwrap();
 }
+
+
+#[test]
+#[ignore = "requires CUDA; prompt observations use the configured contact return"]
+fn prompt_observations_use_the_same_configured_return_as_development() {
+    let run = |prompt: bool, enabled: bool| {
+        with_text_field_source(72, NativeMaterialTransportSource::OperativeLinear, |field| {
+            let mut session=TextFieldSession::on(field)?;
+            session.begin_part(None)?;
+            for symbol in [TextSymbol::Octet(b'A'),TextSymbol::Octet(b'B'),TextSymbol::EndPart] {
+                if prompt { receive_prompt_symbol(&mut session,symbol,enabled,
+                    NativeContactRealization::DyadicDeposit,NativeMaterialPullbackMetric::SquaredCurrent)?; }
+                else {
+                    session.receive(symbol)?;
+                    if enabled {session.respond_to_latest_material_with_realization(2,
+                        NativeMaterialPullbackMetric::SquaredCurrent,NativeContactRealization::DyadicDeposit)?;}
+                }
+            }
+            assert_eq!(session.field().operative_return_count(),Some(if enabled {2}else{0}));
+            Ok(session.field().rest(&[],&[])?)
+        }).unwrap()
+    };
+    assert_eq!(run(true,true),run(false,true));
+    assert_eq!(run(true,false),run(false,false));
+}

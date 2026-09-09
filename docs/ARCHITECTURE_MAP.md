@@ -249,6 +249,15 @@ recover the actual producing matrix from retained deposits and return its comple
 `surface_linear_material.rs` binds that return. The [finite-operator record](../research/records/2026-09-09_AC1_THE_FINITE_MATERIAL_OPERATOR_RETURNS_THROUGH_ITS_PRODUCER.md)
 retains exact comparisons, costs, the failed response and the ongoing broader study.
 
+[established-bounded; source-inspected] `OperativeNormal` binds the same operative outgoing
+source to accumulated exact H/B/C through `field_normal_material.cuh` and
+`field/material_transport/normal.rs`. The latter owns layouts, cold state/report validation and
+signed normal-residual decoding. `surface_linear_material.rs` and the existing linear pullback
+owner recover the actual historical finite fit from its retained statistic prefix. The
+[normal return](../research/records/2026-09-09_AC1_THE_MATERIAL_OPERATOR_RETAINS_ITS_ACCUMULATED_SOURCE_GEOMETRY.md)
+records native controls, retention improvement and the still-unusable text. Its proposed rank-one
+update optimization remains separate from this full-fit realization.
+
 [established-bounded; source-inspected] `field/receiver/packet.rs::NativePacketQuadrature`
 and `field_normalized_receiver.cuh` expose I/Q projections of the same joint current ball.
 `holonics-hna::alpha::text_codec::TextDirection`, `text_session` and `checkpoint` carry the

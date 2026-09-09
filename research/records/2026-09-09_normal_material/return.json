@@ -1,0 +1,3883 @@
+{
+  "schema": "holonics.accumulated-normal-material.v1",
+  "source_revision": "5167e325 plus accompanying OperativeNormal implementation",
+  "comparison_scope": "Matched external exposures; each model is evaluated on its own original native source family. Latent source identity across distinct learners is not asserted.",
+  "retention": [
+    {
+      "external_receiving_position": 2,
+      "normal": {
+        "lower": [
+          [
+            1,
+            [
+              810601729,
+              1055997105,
+              181726194,
+              791689033,
+              1534458976,
+              2151654527,
+              21947885,
+              3163520340,
+              76392474
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              536870912
+            ]
+          ]
+        ],
+        "upper": [
+          [
+            1,
+            [
+              2601420425,
+              2887198930,
+              590629333,
+              3162174475,
+              1266756024,
+              835340377,
+              1511627500,
+              3186695765,
+              76392474
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              536870912
+            ]
+          ]
+        ]
+      },
+      "projection": {
+        "lower": [
+          [
+            1,
+            [
+              298545477,
+              2926076693,
+              1244393749,
+              3429783112,
+              152047714,
+              2927863491,
+              945568917,
+              2280111522,
+              3033227177
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        ],
+        "upper": [
+          [
+            1,
+            [
+              785101063,
+              2170273960,
+              2901303962,
+              794660231,
+              2093171900,
+              3989774077,
+              2323212006,
+              2324926638,
+              3033227177
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        ]
+      },
+      "normal_upper_below_projection_lower": true
+    },
+    {
+      "external_receiving_position": 3,
+      "normal": {
+        "lower": [
+          [
+            1,
+            [
+              2140780213,
+              212809532,
+              1686029900,
+              474860581,
+              852458768,
+              777725974,
+              4020467440,
+              220674749,
+              469201742
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2147483648
+            ]
+          ]
+        ],
+        "upper": [
+          [
+            1,
+            [
+              2048129465,
+              3505807258,
+              3795367923,
+              1528249589,
+              1533364072,
+              549165503,
+              3864469117,
+              322124469,
+              469201742
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2147483648
+            ]
+          ]
+        ]
+      },
+      "projection": {
+        "lower": [
+          [
+            1,
+            [
+              1301637017,
+              1860011917,
+              572383045,
+              978122117,
+              3624473039,
+              1769357029,
+              2675047994,
+              184892621,
+              1528008127
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2147483648
+            ]
+          ]
+        ],
+        "upper": [
+          [
+            1,
+            [
+              3293124037,
+              1472661917,
+              1996426136,
+              2006476813,
+              3344359534,
+              1373148642,
+              3980027138,
+              204305076,
+              1528008127
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2147483648
+            ]
+          ]
+        ]
+      },
+      "normal_upper_below_projection_lower": true
+    },
+    {
+      "external_receiving_position": 4,
+      "normal": {
+        "lower": [
+          [
+            1,
+            [
+              1433513121,
+              921196095,
+              67222751,
+              624828333,
+              1490212345,
+              1533913442,
+              70705169,
+              1874091165,
+              733746086
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2147483648
+            ]
+          ]
+        ],
+        "upper": [
+          [
+            1,
+            [
+              1944874273,
+              2482391372,
+              3814177064,
+              536073232,
+              289857529,
+              3990051565,
+              1713801280,
+              1978297051,
+              733746086
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2147483648
+            ]
+          ]
+        ]
+      },
+      "projection": {
+        "lower": [
+          [
+            1,
+            [
+              2032538841,
+              877238736,
+              572059582,
+              424984733,
+              3396212734,
+              3218141507,
+              1380136885,
+              915198524,
+              1398623598
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2147483648
+            ]
+          ]
+        ],
+        "upper": [
+          [
+            1,
+            [
+              502486293,
+              2788763854,
+              1354333086,
+              308453363,
+              3865697579,
+              2807786652,
+              1336644846,
+              932913964,
+              1398623598
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2147483648
+            ]
+          ]
+        ]
+      },
+      "normal_upper_below_projection_lower": true
+    },
+    {
+      "external_receiving_position": 5,
+      "normal": {
+        "lower": [
+          [
+            1,
+            [
+              2264829319,
+              1394246442,
+              1936799855,
+              3199168502,
+              1969838424,
+              1488460650,
+              2586422388,
+              3082711658,
+              1197665620
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        ],
+        "upper": [
+          [
+            1,
+            [
+              1609530183,
+              3573183526,
+              452230441,
+              3675522049,
+              3961074597,
+              2527407996,
+              2528222279,
+              3286078607,
+              1197665620
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        ]
+      },
+      "projection": {
+        "lower": [
+          [
+            1,
+            [
+              856440741,
+              3823788082,
+              845911139,
+              170232150,
+              3427624385,
+              2746071037,
+              4052252770,
+              1189334875,
+              3101630021
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        ],
+        "upper": [
+          [
+            1,
+            [
+              4292606221,
+              923675719,
+              753823409,
+              4180789442,
+              121095079,
+              1955774189,
+              4071600225,
+              1226567649,
+              3101630021
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        ]
+      },
+      "normal_upper_below_projection_lower": true
+    },
+    {
+      "external_receiving_position": 7,
+      "normal": {
+        "lower": [
+          [
+            1,
+            [
+              1280627963,
+              2851387947,
+              204261042,
+              1576159485,
+              2706099911,
+              783064192,
+              805091934,
+              1888727360,
+              2663308511
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ]
+          ]
+        ],
+        "upper": [
+          [
+            1,
+            [
+              3548361627,
+              2479405384,
+              1838516679,
+              4036150382,
+              2444728134,
+              1765882195,
+              2988126823,
+              2341616285,
+              2663308511
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2
+            ]
+          ]
+        ]
+      },
+      "projection": {
+        "lower": [
+          [
+            1,
+            [
+              1725069629,
+              3009634400,
+              3564553446,
+              2679014147,
+              2972153608,
+              2453370518,
+              3266762100,
+              1923325116,
+              2388201673
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        ],
+        "upper": [
+          [
+            1,
+            [
+              869484647,
+              488873422,
+              50714672,
+              3812862082,
+              3660764783,
+              1973579511,
+              3315361241,
+              1961495636,
+              2388201673
+            ]
+          ],
+          [
+            1,
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ]
+          ]
+        ]
+      },
+      "normal_upper_below_projection_lower": true
+    }
+  ],
+  "normal_finite_steps": [
+    {
+      "cut": 3,
+      "strictly_improves": true,
+      "strictly_worsens": false
+    },
+    {
+      "cut": 4,
+      "strictly_improves": true,
+      "strictly_worsens": false
+    },
+    {
+      "cut": 5,
+      "strictly_improves": true,
+      "strictly_worsens": false
+    },
+    {
+      "cut": 6,
+      "strictly_improves": true,
+      "strictly_worsens": false
+    },
+    {
+      "cut": 8,
+      "strictly_improves": true,
+      "strictly_worsens": false
+    }
+  ],
+  "observed_and_clean_complete_body_equal": true,
+  "observed_and_clean_checkpoint_byte_equal": true,
+  "checkpoint_bytes": 20526964,
+  "clean_development_seconds": 21.889087312,
+  "clean_development_nonarchive_readouts": 0,
+  "clean_development_census": {
+    "allocations": 6138,
+    "captured_launches": 1042,
+    "control_launches": 0,
+    "deed_launches": 372,
+    "device_to_device_octets": 0,
+    "egress_receipt_octets": 33344,
+    "egress_section_octets": 0,
+    "ingress_octets": 19864820,
+    "resident_octets_now": 41722752,
+    "resident_octets_peak": 64525588,
+    "section_read_outs": 0,
+    "synchronizations": 372
+  },
+  "processes": {
+    "initial_refusal": {
+      "command": [
+        "target/debug/examples/alpha_text",
+        ".local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl",
+        "--families",
+        "1",
+        "--fractional-bits",
+        "72",
+        "--material-source",
+        "operative-normal",
+        "--material-target",
+        "joint-packet",
+        "--duplex",
+        "true",
+        "--contact-response",
+        "true",
+        "--contact-realization",
+        "dyadic-deposit",
+        "--contact-metric",
+        "current",
+        "--inspect-contact-cuts",
+        "3,4,5,6,8",
+        "--inspect-retained-receivings",
+        "2,3,4,5,7",
+        "--checkpoint",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-family-normal.hna",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-family-normal.json"
+      ],
+      "exit_code": 1,
+      "wall_seconds": 0.9518691179691814,
+      "max_rss_kib": 230872
+    },
+    "pending_resume": {
+      "command": [
+        "target/debug/examples/alpha_text",
+        "--resume",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-family-normal.hna",
+        "--families",
+        "1",
+        "--inspect-contact-cuts",
+        "3,4,5,6,8",
+        "--inspect-retained-receivings",
+        "2,3,4,5,7",
+        "--checkpoint",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-family-normal-resumed.hna",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-family-normal-resumed.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 77.49692334700376,
+      "max_rss_kib": 316740
+    },
+    "clean_development": {
+      "command": [
+        "target/debug/examples/alpha_text",
+        ".local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl",
+        "--families",
+        "1",
+        "--fractional-bits",
+        "72",
+        "--material-source",
+        "operative-normal",
+        "--material-target",
+        "joint-packet",
+        "--duplex",
+        "true",
+        "--contact-response",
+        "true",
+        "--contact-realization",
+        "dyadic-deposit",
+        "--contact-metric",
+        "current",
+        "--checkpoint",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-family-normal-clean.hna",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-family-normal-clean.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 23.498421480995603,
+      "max_rss_kib": 244056
+    }
+  },
+  "language_quality_established": false,
+  "eight_family": {
+    "process": {
+      "command": [
+        "target/debug/examples/alpha_text",
+        "--resume",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-family-normal-clean.hna",
+        "--families",
+        "7",
+        "--history-archive",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-normal.history",
+        "--checkpoint",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-normal.hna",
+        "--prompt",
+        ".local/artifacts/athena-alpha/ac2/first-request.txt",
+        "--emit-symbols",
+        "128",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-normal.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 885.0219611729844,
+      "max_rss_kib": 1021840
+    },
+    "starting_occurrences": 75,
+    "development_until": 1930,
+    "development_seconds": 794.779843109,
+    "checkpoint_bytes": 450770927,
+    "archive_bytes": 309415515,
+    "development_census": {
+      "allocations": 162482,
+      "captured_launches": 25998,
+      "control_launches": 0,
+      "deed_launches": 9275,
+      "device_to_device_octets": 0,
+      "egress_receipt_octets": 831936,
+      "egress_section_octets": 598615920,
+      "ingress_octets": 1003118304,
+      "resident_octets_now": 292000608,
+      "resident_octets_peak": 540320388,
+      "section_read_outs": 11130,
+      "synchronizations": 9275
+    },
+    "history_placement": {
+      "archive_egress_section_octets": 598615920,
+      "archive_section_read_outs": 11130,
+      "archive_written_octets": 309415515,
+      "archived_occurrences": 1929,
+      "resident_occurrences": 1,
+      "restored_sources": 6
+    },
+    "nonarchive_development_readouts": 0,
+    "journal": {
+      "bound_octets": 123456,
+      "current_factor_octets": 237401984,
+      "implicit_zero_delta_returns": 1929,
+      "internal_delta_octets": 0,
+      "logical_current_factor_octets": 238270080,
+      "logical_internal_delta_octets": 119135040,
+      "port_octets": 13333248,
+      "returns": 1929,
+      "total_octets": 250858688
+    },
+    "prompt_and_emission_seconds": 48.219162009,
+    "generation": {
+      "disposition": {
+        "kind": "interrupted"
+      },
+      "emitted_octets": [
+        226,
+        128,
+        153,
+        109,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101,
+        32,
+        116,
+        104,
+        101
+      ],
+      "native_from": 1992,
+      "native_until": 2120,
+      "pending_return": null,
+      "readings": [
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 226
+            }
+          },
+          "native": {
+            "occurrence": 1991,
+            "quadrature": "imaginary",
+            "selected": 226,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              226
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 128
+            }
+          },
+          "native": {
+            "occurrence": 1992,
+            "quadrature": "imaginary",
+            "selected": 128,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              128
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 153
+            }
+          },
+          "native": {
+            "occurrence": 1993,
+            "quadrature": "imaginary",
+            "selected": 153,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              153
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 109
+            }
+          },
+          "native": {
+            "occurrence": 1994,
+            "quadrature": "imaginary",
+            "selected": 109,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              109
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 1995,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 1996,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 1997,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 1998,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 1999,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2000,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2001,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2002,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2003,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2004,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2005,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2006,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2007,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2008,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2009,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2010,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2011,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2012,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2013,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2014,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2015,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2016,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2017,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2018,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2019,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2020,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2021,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2022,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2023,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2024,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2025,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2026,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2027,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2028,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2029,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2030,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2031,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2032,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2033,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2034,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2035,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2036,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2037,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2038,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2039,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2040,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2041,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2042,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2043,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2044,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2045,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2046,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2047,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2048,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2049,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2050,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2051,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2052,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2053,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2054,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2055,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2056,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2057,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2058,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2059,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2060,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2061,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2062,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2063,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2064,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2065,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2066,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2067,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2068,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2069,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2070,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2071,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2072,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2073,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2074,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2075,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2076,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2077,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2078,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2079,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2080,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2081,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2082,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2083,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2084,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2085,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2086,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2087,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2088,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2089,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2090,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2091,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2092,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2093,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2094,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2095,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2096,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2097,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2098,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2099,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2100,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2101,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2102,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2103,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2104,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2105,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2106,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2107,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2108,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2109,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2110,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2111,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2112,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2113,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2114,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 32
+            }
+          },
+          "native": {
+            "occurrence": 2115,
+            "quadrature": "imaginary",
+            "selected": 32,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              32
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 116
+            }
+          },
+          "native": {
+            "occurrence": 2116,
+            "quadrature": "imaginary",
+            "selected": 116,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              116
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 104
+            }
+          },
+          "native": {
+            "occurrence": 2117,
+            "quadrature": "imaginary",
+            "selected": 104,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              104
+            ]
+          }
+        },
+        {
+          "disposition": {
+            "kind": "symbol",
+            "symbol": {
+              "kind": "octet",
+              "value": 101
+            }
+          },
+          "native": {
+            "occurrence": 2118,
+            "quadrature": "imaginary",
+            "selected": 101,
+            "target_chart": {
+              "factor_width": 2,
+              "kind": "tensor-product"
+            },
+            "target_dimension": 512,
+            "unexcluded": [
+              101
+            ]
+          }
+        }
+      ]
+    },
+    "utf8": "\u2019m the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the",
+    "prompt_contact_response_applied": false
+  },
+  "checks": {
+    "full_field_before_joint_admission_repair": {
+      "passed": 115,
+      "seconds": 132.46,
+      "log": "/tmp/athena-normal-field.log"
+    },
+    "focused_normal_after_admission_and_zero_increment_repair": {
+      "passed": 2,
+      "seconds": 149.08,
+      "includes_initial_cuda_jit": true,
+      "log": "/tmp/athena-normal-controls-final.log"
+    },
+    "focused_normal_with_signed_residual_decoder": {
+      "passed": 2,
+      "seconds": 1.34,
+      "command": "cargo test -p holonic-engine normal_material_ -- --ignored --test-threads=1",
+      "log": "/tmp/athena-normal-controls-residual-native.log"
+    },
+    "alpha_sdk": {
+      "passed": 26,
+      "seconds": 8.17,
+      "log": "/tmp/athena-normal-sdk-final.log"
+    },
+    "alpha_driver": {
+      "passed": 3,
+      "seconds": 2.7,
+      "excluded": "partial_actual_part",
+      "log": "/tmp/athena-normal-driver-final.log"
+    }
+  },
+  "saved_model_prompt_comparison": {
+    "receipt": "feedback.json",
+    "false": {
+      "command": [
+        "target/debug/examples/alpha_text",
+        "--resume",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-normal.hna",
+        "--families",
+        "0",
+        "--contact-response",
+        "false",
+        "--prompt",
+        ".local/artifacts/athena-alpha/ac2/first-request.txt",
+        "--emit-symbols",
+        "128",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-normal-prompt-false.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 119.24745007301681,
+      "max_child_rss_kib_so_far": 1086968
+    },
+    "true": {
+      "command": [
+        "target/debug/examples/alpha_text",
+        "--resume",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-normal.hna",
+        "--families",
+        "0",
+        "--contact-response",
+        "true",
+        "--prompt",
+        ".local/artifacts/athena-alpha/ac2/first-request.txt",
+        "--emit-symbols",
+        "128",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-normal-prompt-true.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 131.1552726169466,
+      "max_child_rss_kib_so_far": 1101680
+    }
+  }
+}

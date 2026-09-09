@@ -55,7 +55,10 @@ its persistence comparison.
 now applies the distinction between a correct local derivative, a finite step and future reuse.
 Its five early contact steps improve, but subsequent material updates overwrite the fitted
 source relations. It derives the accumulated complex normal statistics H, B and C, the positive
-normal solve and a full source-family residual bound for the next native material construction.
+normal solve and a full source-family residual bound. The
+[native normal return](../research/records/2026-09-09_AC1_THE_MATERIAL_OPERATOR_RETAINS_ITS_ACCUMULATED_SOURCE_GEOMETRY.md)
+now implements those statistics and the actual historical finite producer. It improves bounded
+retention while its actual text remains unusable.
 This is a concrete classical-learning/constitutive correction grounded in actual retained
 currents, with no Lean or exterior evaluator in the learning path.
 
@@ -73,6 +76,14 @@ and recovers the distinct acoustic CTC path-fibre sharing construction.
 cold diagnostic. H/B/C retain the objective, while the actual producing numerical operator remains
 required by delayed adjoints; changing the numerical update also changes that decoder obligation.
 This is a concrete handoff to the active native owner, not another optimizer or a new AC gate.
+
+[counterexample; measured; computational-witness] The [feedback review](../research/records/2026-09-09_AC_THE_REPEATED_TEXT_FACE_IS_A_DRIVEN_OPEN_RETURN.md)
+now applies the complete/open distinction to the saved text runs: all 120 compared equal
+coordinates four bytes apart have disjoint outgoing-current balls. The canonical codeword
+actuation supplies a fresh exterior norm at every step. Repeated presentation therefore cannot
+diagnose a complete-state cycle here. Source, conducting path, outward transfer/load and changing
+receiver determine distinct ways an expression can continue or cease; useful answer completion
+remains a further situated consequence. AC1–AC2's revised plan now uses this actual boundary.
 
 [definition] The subsequent [complex-fluid and plan revision](../research/records/2026-09-08_COMPLEX_FLUID_CHARTS_RETAIN_THE_FOLDED_CURRENT_AND_THE_RECEIVER_BOUND.md)
 develops this synthesis into the revised AC0–AC5 order and explicit equations: complex projection

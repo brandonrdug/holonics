@@ -302,7 +302,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     uint32_t transport_enabled, wide *transport_lo, wide *transport_hi,
     const wide *origin_junction, const wide *origin_transport,
     wide *transport_delta_lo, wide *transport_delta_hi, wide *transport_report_lo, wide *transport_report_hi,
-    const int64_t *refreshed_source_current,
+    const int64_t *material_auxiliary,
     const int64_t *moment_table,uint32_t moment_count,int64_t *moment_weights,
     const int64_t *context_table,int64_t *context_weights,int64_t *context_evaluations,uint64_t source_ordinal,
     const int64_t *operative_table,
@@ -316,7 +316,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     // The dependent field word is prepared once. All continuing writes remain after the complete
     // coupled return; early returns inside this helper cannot strand a block barrier.
     if (threadIdx.x == 0) {
-        if (coupled > 3 || transport_enabled > 8u || !material_targets
+        if (coupled > 3 || transport_enabled > 9u || !material_targets
             || (target_factor_width && transport_enabled<6u) || (!target_factor_width && material_targets!=nodes)
             || (transport_enabled>=6u && !operative_table)
             || (transport_enabled>=4u && transport_enabled<=7u && (!context_table || !context_weights || !context_evaluations || occurrence>=UINT32_MAX))
@@ -363,7 +363,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     }
     __syncthreads();if(*slot)return;
     if (transport_enabled == 2u && threadIdx.x == 0)
-        complete_material_transport_prepare((const int64_t *)transport_lo,(const int64_t *)origin_transport,refreshed_source_current,
+        complete_material_transport_prepare((const int64_t *)transport_lo,(const int64_t *)origin_transport,material_auxiliary,
             output_lo,origin,incoming,current_frame,origin_frame,next_covariance_lo,(const wide *)junction_held,
             (const wide *)junction_report_lo,nodes,linked,junction_grain,occurrence,
             (int64_t *)transport_delta_lo,(int64_t *)transport_delta_hi,(int64_t *)transport_report_lo,(int64_t *)transport_report_hi,field_scratch,slot,operative_radius);
@@ -375,8 +375,13 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
         field_linear_material_parallel(transport_lo,origin_junction,origin_transport,(const wide *)junction_report_lo,
             incoming,nodes,linked,junction_grain,transport_delta_lo,transport_delta_hi,transport_report_lo,transport_report_hi,slot,
             material_targets,target_factor_width);
+    if(transport_enabled==9u)
+        field_normal_material_prepare((const int64_t *)transport_lo,origin_junction,origin_transport,(const wide *)junction_report_lo,
+            incoming,nodes,linked,junction_grain,(int64_t *)transport_delta_lo,(int64_t *)transport_delta_hi,
+            (int64_t *)transport_report_lo,(int64_t *)transport_report_hi,(int64_t *)material_auxiliary,
+            material_targets,target_factor_width,slot);
     if(transport_enabled==3u)
-        moment_material_transport_prepare((const int64_t *)transport_lo,(const int64_t *)origin_transport,refreshed_source_current,
+        moment_material_transport_prepare((const int64_t *)transport_lo,(const int64_t *)origin_transport,material_auxiliary,
             moment_table,moment_count,moment_weights,output_lo,origin,incoming,current_frame,origin_frame,next_covariance_lo,
             (const wide *)junction_held,(const wide *)junction_report_lo,nodes,linked,junction_grain,occurrence,
             (int64_t *)transport_delta_lo,(int64_t *)transport_delta_hi,(int64_t *)transport_report_lo,(int64_t *)transport_report_hi,field_scratch,slot,operative_radius);
@@ -389,7 +394,12 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
             transport_enabled>=6u?(const wide *)(uintptr_t)operative_table[5]:nullptr,transport_enabled>=6u?(uint32_t)operative_table[19]:0u,
             material_targets,target_factor_width);
     __syncthreads();
-    if (*slot || threadIdx.x != 0) return;
+    if (*slot) return;
+    // All normal-state computation and checks have completed. Copy the new state in parallel;
+    // the same successful kernel publishes memory and basis below before any later reader.
+    if(transport_enabled==9u)for(size_t i=threadIdx.x;i<normal_state_words(nodes,material_targets);i+=blockDim.x)
+        ((int64_t *)transport_lo)[i]=((int64_t *)transport_hi)[i]=((const int64_t *)transport_delta_lo)[i];
+    if(threadIdx.x != 0)return;
     const uint32_t width = 6u * nodes;
     const uint32_t current_at = 4u * nodes + 1u;
     const int64_t inserted = output_lo[current_at + width + 2u];

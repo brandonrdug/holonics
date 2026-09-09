@@ -55,8 +55,10 @@ impl TextSymbol {
             _ => None,
         }
     }
-    /// Exactly nine identical unit impulses: one in each addressed pair. The ninth bit carries
-    /// a real application part boundary; it is not a native thought-completion measurement.
+    /// Exactly nine identical unit impulses: one in each addressed pair. Every application,
+    /// including self-actuation, supplies that fixed exterior norm again. This does not decode
+    /// the amplitude of a prior material current. The ninth bit carries a real application part
+    /// boundary; it is not a native thought-completion measurement.
     pub fn inputs(self) -> Vec<NativePhaseCurrent> {
         self.inputs_on(TextDirection::Incoming)
     }

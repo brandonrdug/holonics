@@ -1,6 +1,21 @@
 use super::*;
 impl<'c> ResidentSurface<'c> {
     #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_normal_material_prefix(&self, lane: &Lane<'_, 'c>, state: &ResidentSection<'c>,
+        journal: &ResidentSection<'c>, later: usize, n: usize, t: usize, grain: u32,
+        output: &ResidentSection<'c>, work: &ResidentSection<'c>) -> Result<(), ResidentRefusal> {
+        let fail=||Self::operative_error();
+        let words=crate::native_ecology::constitutive_fibre::normal_material_state_words(n,t).ok_or_else(fail)?;
+        let scratch=crate::native_ecology::constitutive_fibre::normal_material_workspace_words(n,t).ok_or_else(fail)?;
+        if n==0 || t==0 || n>u32::MAX as usize/6 || t>u32::MAX as usize/82 || later>u32::MAX as usize
+            || !(1..=120).contains(&grain) || !self.operative_shape(state,1,words) || !self.operative_shape(output,1,words)
+            || !self.operative_shape(work,1,scratch) || !self.operative_shape(journal,later.max(1),2) {return Err(fail());}
+        let mut p=Params::new();p.ptr(state.lo.device_ptr()).ptr(journal.lo.device_ptr()).u32(later as u32)
+            .u32(n as u32).u32(t as u32).u32(grain).ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr()).ptr(work.lo.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_field_normal_material_prefix",1,self.launch.block_x,0,&mut p,"normal-material-prefix")
+    }
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn record_linear_material_pullback(
         &self,
         lane: &Lane<'_, 'c>,
@@ -14,6 +29,7 @@ impl<'c> ResidentSurface<'c> {
         later: usize,
         grain: u32,
         metric: u32,
+        normal: bool,
         output: &ResidentSection<'c>,
     ) -> Result<(), ResidentRefusal> {
         let fail = || ResidentRefusal::Declaration {
@@ -37,11 +53,11 @@ impl<'c> ResidentSurface<'c> {
             || !(1..=120).contains(&grain)
             || metric > 2
             || state.rows != 1
-            || state.width != coefficients
+            || state.width != if normal {crate::native_ecology::constitutive_fibre::normal_material_state_words(nodes,targets).unwrap_or(0)}else{coefficients}
             || journal.rows != later.max(1)
             || journal.width != 2
             || source.rows != 1
-            || source.width != 24 * targets + 12 * nodes + 24
+            || source.width != 24 * targets + 12 * nodes + 24 + if normal {72}else{0}
             || returned.rows != 1
             || returned.width != (if metric == 2 { 8 } else { 20 }) * targets
             || output.rows != 1
@@ -60,7 +76,7 @@ impl<'c> ResidentSurface<'c> {
             .u32(nodes as u32)
             .u32(targets as u32)
             .u32(contacts as u32)
-            .u32(later as u32)
+            .u32(if normal {0}else{later as u32})
             .u32(grain)
             .u32(metric)
             .ptr(output.lo.device_ptr())

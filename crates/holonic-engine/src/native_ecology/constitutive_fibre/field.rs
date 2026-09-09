@@ -26,6 +26,7 @@ mod internal_current;
 mod internal_mode;
 mod junction;
 mod material_transport;
+pub(crate) use material_transport::normal::{state_words as normal_material_state_words, workspace_words as normal_material_workspace_words};
 mod receiver;
 mod rechart;
 mod relation_current;
@@ -65,7 +66,7 @@ pub use material_transport::{
     NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading,
     NativeMaterialModeReturn, NativeMaterialModeUnfolding, NativeMaterialTransportSource,
     NativeMaterialTarget,
-    NativeMomentMaterialReading, NativeContextualMaterialReading, NativeOperativeContextReading, NativeVisibleSourceReading,
+    NativeNormalMaterialReading, NativeNormalMaterialState, NativeMomentMaterialReading, NativeContextualMaterialReading, NativeOperativeContextReading, NativeVisibleSourceReading,
 };
 pub use receiver::{NativeFieldDifferentialReading, NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn,
     NativeMaterialPacketReading, NativePacketQuadrature, NativeMaterialActuation,
@@ -801,7 +802,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                             &next.delta,
                             next.report.as_ref(),
                             old.source.kernel(),
-                            next.refresh.as_ref().map(|r| &r.output),
+                            next.normal_workspace.as_ref().or_else(||next.refresh.as_ref().map(|r| &r.output)),
                         )
                     }),
                 at as u64,

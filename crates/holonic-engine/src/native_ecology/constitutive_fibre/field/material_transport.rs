@@ -5,6 +5,8 @@ use num_traits::One;
 
 pub(super) mod complete;
 pub(super) mod contextual;
+pub(super) mod normal;
+pub use normal::{NativeNormalMaterialReading, NativeNormalMaterialState};
 mod support;
 pub use support::{NativeMaterialReportPacking, NativeMaterialReportPackingRest};
 pub(super) mod moment;
@@ -59,14 +61,16 @@ pub enum NativeMaterialTransportSource {
     OperativeBoundary,
     /// Finite complex-linear operator on the actual operative outgoing current.
     OperativeLinear,
+    /// The same boundary with accumulated source-normal and cross-source statistics.
+    OperativeNormal,
 }
 impl NativeMaterialTransportSource {
-    pub(super) fn is_operative(self)->bool {matches!(self,Self::OperativeContextual|Self::OperativeBoundary|Self::OperativeLinear)}
+    pub(super) fn is_operative(self)->bool {matches!(self,Self::OperativeContextual|Self::OperativeBoundary|Self::OperativeLinear|Self::OperativeNormal)}
 
-    pub(super) fn is_linear(self)->bool{matches!(self,Self::CoupledOutgoing|Self::OperativeLinear)}
+    pub(super) fn is_linear(self)->bool{matches!(self,Self::CoupledOutgoing|Self::OperativeLinear|Self::OperativeNormal)}
     pub(super) fn is_projector(self)->bool{matches!(self,Self::Contextual|Self::BilinearContextual|Self::OperativeContextual|Self::OperativeBoundary)}
     pub(super) fn state_words_for(self,n:usize,target:NativeMaterialTarget)->Option<usize>{
-        if self==Self::OperativeLinear {n.checked_mul(target.dimension(n)?)?.checked_mul(12)?.checked_add(2)}else{self.state_words(n)}
+        if self==Self::OperativeNormal {normal::state_words(n,target.dimension(n)?)}else if self==Self::OperativeLinear {n.checked_mul(target.dimension(n)?)?.checked_mul(12)?.checked_add(2)}else{self.state_words(n)}
     }
     pub(super) fn is_outgoing(&self) -> bool {
         *self == Self::CoupledOutgoing
@@ -81,10 +85,12 @@ impl NativeMaterialTransportSource {
             Self::OperativeContextual => 6,
             Self::OperativeBoundary => 7,
             Self::OperativeLinear => 8,
+            Self::OperativeNormal => 9,
         }
     }
     pub(super) fn state_words(self, n: usize) -> Option<usize> {
         match self {
+            Self::OperativeNormal => normal::state_words(n,n),
             Self::CoupledOutgoing | Self::OperativeLinear => n.checked_mul(n)?.checked_mul(12)?.checked_add(2),
             Self::CompleteCurrent => n
                 .checked_mul(n)?
@@ -100,6 +106,7 @@ impl NativeMaterialTransportSource {
     pub(super) fn report_words_for(self,n:usize,target:NativeMaterialTarget)->Option<usize>{
         let targets=target.dimension(n)?;
         if !target.is_direct() && !self.is_operative() {return None;}
+        if self==Self::OperativeNormal {return normal::report_words(n,targets);}
         if self.is_linear(){return targets.checked_mul(24)?.checked_add(n.checked_mul(12)?)?.checked_add(24);}
         if matches!(
             self,
@@ -122,12 +129,17 @@ impl NativeMaterialTransportSource {
     }
 }
 
+pub(super) struct NativeMaterialCommonReading {
+    pub forward: NativeFieldCurrentBall,
+    pub observed: NativeFieldCurrentBall,
+}
 pub(super) struct MaterialTransport<'chart> {
     pub(super) state: ResidentSection<'chart>,
     pub(super) source: NativeMaterialTransportSource,
     pub(super) target: NativeMaterialTarget,
 }
 pub(super) struct PendingMaterialTransport<'chart> {
+    pub(super) normal_workspace: Option<ResidentSection<'chart>>,
     pub(super) delta: ResidentSection<'chart>,
     pub(super) report: Rc<ResidentSection<'chart>>,
     pub(super) refresh: Option<complete::CurrentSourceRefresh<'chart>>,
@@ -304,7 +316,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         let width = source
             .state_words_for(self.nodes(),target)
             .ok_or(ConstitutiveFibreError::Shape)?;
-        let mut words = vec![(0, 0); width];
+        let mut words = if source==NativeMaterialTransportSource::OperativeNormal {normal::initial_words(self.nodes(),target.dimension(self.nodes()).unwrap(),self.transport_grain()?)?} else {vec![(0, 0); width]};
         if !source.is_linear() {
             let grain = self.transport_grain()? as i64;
             words[12 * self.nodes() + 6] = (grain, grain);
@@ -354,6 +366,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         };
         let surface = self.relation.surface;
         Ok(Some(PendingMaterialTransport {
+            normal_workspace: if kind==NativeMaterialTransportSource::OperativeNormal {Some(surface.fresh_section(1,normal::workspace_words(self.nodes(),self.material_target_dimension().unwrap()).ok_or(ConstitutiveFibreError::Shape)?,ResidentGrain(0))?)}else{None},
             contextual: if matches!(
                 kind,
                 NativeMaterialTransportSource::Contextual
@@ -397,6 +410,13 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
         event.transport_rest(self.relation.surface)
     }
+    /// Internal common prediction/observation view; source-specific suffixes stay with their decoder.
+    pub(super) fn inspect_material_common(&self,at:usize)->Result<Option<NativeMaterialCommonReading>,ConstitutiveFibreError>{
+        if self.material_transport_source()==Some(NativeMaterialTransportSource::OperativeNormal){
+            return Ok(self.inspect_normal_material_transport(at)?.map(|r|NativeMaterialCommonReading{forward:r.forward,observed:r.observed}));
+        }
+        Ok(self.inspect_material_transport(at)?.map(|r|NativeMaterialCommonReading{forward:r.forward,observed:r.observed}))
+    }
     pub fn inspect_material_transport(
         &self,
         occurrence: usize,
@@ -404,7 +424,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
         if matches!(
             self.material_transport_source(),
             Some(
-                NativeMaterialTransportSource::CompleteCurrent
+                NativeMaterialTransportSource::OperativeNormal
+                    | NativeMaterialTransportSource::CompleteCurrent
                     | NativeMaterialTransportSource::HomogeneousMoment
                     | NativeMaterialTransportSource::Contextual
                     | NativeMaterialTransportSource::BilinearContextual
@@ -485,9 +506,13 @@ impl<'chart> NativeConstitutiveField<'chart> {
         let Some(transport) = &self.transport else {
             return Ok(None);
         };
-        let values = wides(&self.relation.surface.read_out(&transport.state)?)?;
         let rows = self.material_target_dimension().ok_or(ConstitutiveFibreError::Shape)?;
         let columns = 3 * self.nodes();
+        let wire = self.relation.surface.read_out(&transport.state)?;
+        let prefix = if transport.source==NativeMaterialTransportSource::OperativeNormal {
+            &wire[..12*self.nodes()*rows+2]
+        } else { &wire[..] };
+        let values = wides(prefix)?;
         if values.len() != 2 * rows * columns + 1 || values[2 * rows * columns] < 0 {
             return Err(ConstitutiveFibreError::Uncertain);
         }

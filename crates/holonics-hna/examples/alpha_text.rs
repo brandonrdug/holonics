@@ -302,6 +302,18 @@ fn cultivate_observed(
 #[path = "alpha_text/tests.rs"]
 mod tests;
 
+fn receive_prompt_symbol(session: &mut TextFieldSession<'_, '_>, symbol: TextSymbol,
+    contact_response: bool, realization: NativeContactRealization, metric: NativeMaterialPullbackMetric)
+    -> Result<(), AlphaMaterialError> {
+    session.receive(symbol)?;
+    if contact_response {
+        let group=match session.field().material_target(){Some(NativeMaterialTarget::TensorProduct{..})=>session.field().material_target_dimension().unwrap(),_=>2};
+        session.respond_to_latest_material_with_realization(group,metric,realization)
+            .map_err(|error| exposure_error(format!("contact response: {error}")))?;
+    }
+    Ok(())
+}
+
 fn run_session(
     session: &mut TextFieldSession<'_, '_>,
     reader: &mut Option<ExposureReader>,
@@ -338,6 +350,7 @@ fn run_session(
     report["self_source_mode"] = json!(source_mode);
     report["duplex"] = json!(session.duplex());
     report["contact_response_during_development"] = json!(contact_response);
+    report["contact_response_during_prompt"] = json!(contact_response);
     report["contact_realization"] = json!(contact_realization);
     report["contact_metric"] = json!(contact_metric);
     let mut comparisons = Vec::new();
@@ -419,13 +432,13 @@ fn run_session(
             .map(TextSymbol::Octet)
             .chain([TextSymbol::EndPart])
         {
-            if let Err(error) = session.receive(symbol) {
-                prompt_error = Some(error.to_string());
-                break;
+            if let Err(error)=receive_prompt_symbol(session,symbol,contact_response,contact_realization,contact_metric) {
+                prompt_error=Some(error.to_string());break;
             }
         }
         report["prompt_native_from"] = json!(prompt_from);
         report["prompt_native_until"] = json!(session.field().occurrence_count());
+        report["prompt_operative_returns"] = json!(session.field().operative_return_count());
         report["prompt_error"] = json!(prompt_error);
         if prompt_error.is_none() {
             let generated = session.generate_with_source_mode(limit,text_receiver,source_mode);
@@ -494,7 +507,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary|operative-linear] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--self-source-mode actuation|observation|withdrawal] [--contact-metric current|relative-entropy|squared-probability] [--inspect-contact-cuts N,...] [--inspect-retained-receivings N,...]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary|operative-linear|operative-normal] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--self-source-mode actuation|observation|withdrawal] [--contact-metric current|relative-entropy|squared-probability] [--inspect-contact-cuts N,...] [--inspect-retained-receivings N,...]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -548,9 +561,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     "operative-contextual" => NativeMaterialTransportSource::OperativeContextual,
                     "operative-boundary" => NativeMaterialTransportSource::OperativeBoundary,
                     "operative-linear" => NativeMaterialTransportSource::OperativeLinear,
+                    "operative-normal" => NativeMaterialTransportSource::OperativeNormal,
                     _ => {
                         return Err(
-                            "material source must be coupled-outgoing, complete-current, homogeneous-moment, contextual (alias bilinear-contextual), contextual-direct-sum, operative-contextual, operative-boundary, or operative-linear".into(),
+                            "material source must be coupled-outgoing, complete-current, homogeneous-moment, contextual (alias bilinear-contextual), contextual-direct-sum, operative-contextual, operative-boundary, operative-linear, or operative-normal".into(),
                         );
                     }
                 })
@@ -721,7 +735,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         with_text_field_chart(
             grain,
             material_source.unwrap_or(NativeMaterialTransportSource::OperativeContextual),
-            material_target.unwrap_or(if material_source.is_some_and(|s|!matches!(s,NativeMaterialTransportSource::OperativeContextual|NativeMaterialTransportSource::OperativeBoundary|NativeMaterialTransportSource::OperativeLinear)){NativeMaterialTarget::DirectCurrent}else{NativeMaterialTarget::TensorProduct{factor_width:2}}),
+            material_target.unwrap_or(if material_source.is_some_and(|s|!matches!(s,NativeMaterialTransportSource::OperativeContextual|NativeMaterialTransportSource::OperativeBoundary|NativeMaterialTransportSource::OperativeLinear|NativeMaterialTransportSource::OperativeNormal)){NativeMaterialTarget::DirectCurrent}else{NativeMaterialTarget::TensorProduct{factor_width:2}}),
             |field| {
                 if let Some(path) = &history_archive {
                     field.enable_history_archive(path)?;

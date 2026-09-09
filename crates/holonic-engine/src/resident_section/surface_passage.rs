@@ -406,7 +406,7 @@ impl<'chart> ResidentSurface<'chart> {
         let nodes = seed.rows;
         let (targets,target_factor_width)=material_target;
         if targets==0 || targets>u32::MAX as usize/82 || (target_factor_width==0 && targets!=nodes)
-            || (target_factor_width!=0 && transport.as_ref().is_none_or(|t|!matches!(t.5,6|7|8))) {
+            || (target_factor_width!=0 && transport.as_ref().is_none_or(|t|!matches!(t.5,6|7|8|9))) {
             return Err(fail("incompatible material target chart"));
         }
         let width = nodes.checked_mul(6).filter(|v| *v <= u32::MAX as usize / 4)
@@ -440,13 +440,14 @@ impl<'chart> ResidentSurface<'chart> {
             }
         }
         if let Some((state, source_current, source_forward, delta, report, kind, refreshed)) = &transport {
-            let state_words=if *kind==1 || *kind==8 {nodes.checked_mul(targets).and_then(|n|n.checked_mul(12)).and_then(|n|n.checked_add(2))}
+            let state_words=if *kind==9 {crate::native_ecology::constitutive_fibre::normal_material_state_words(nodes,targets)}else if *kind==1 || *kind==8 {nodes.checked_mul(targets).and_then(|n|n.checked_mul(12)).and_then(|n|n.checked_add(2))}
                 else if *kind==2 {nodes.checked_mul(nodes).and_then(|n|n.checked_mul(60)).and_then(|n|n.checked_add(22*nodes+12))}
                 else if *kind>=3 && *kind<=7 {nodes.checked_mul(12).and_then(|n|n.checked_add(12))} else {None}.ok_or_else(||fail("material state extent or kind"))?;
-            let report_words=if *kind==8 {targets.checked_mul(24).and_then(|n|n.checked_add(12*nodes+24))}
+            let report_words=if *kind==9 {targets.checked_mul(24).and_then(|n|n.checked_add(12*nodes+96))}else if *kind==8 {targets.checked_mul(24).and_then(|n|n.checked_add(12*nodes+24))}
                 else if *kind>=4 {nodes.checked_mul(68).and_then(|n|targets.checked_mul(82).and_then(|t|n.checked_add(t))).and_then(|n|n.checked_add(96))}
                 else {nodes.checked_mul(if *kind==1 {36}else if *kind==2 {74}else{96}).and_then(|n|n.checked_add(if *kind==1 {24}else{44}))}.ok_or_else(||fail("material report extent"))?;
-            if refreshed.is_some_and(|s|!matches!(*kind,2|3) || !matches(s,1,if *kind==2 {10*nodes}else{30*nodes})) {return Err(fail("current source contraction extent"));}
+            if refreshed.is_some_and(|s|!matches!(*kind,2|3|9) || !matches(s,1,if *kind==9 {crate::native_ecology::constitutive_fibre::normal_material_workspace_words(nodes,targets).unwrap_or(0)}else if *kind==2 {10*nodes}else{30*nodes})) {return Err(fail("current source contraction extent"));}
+            if *kind==9 && refreshed.is_none(){return Err(fail("normal material work missing"));}
             if (*kind==3)!=moment.is_some(){return Err(fail("moment source factors missing or unexpected"));}
             if (*kind>=4 && *kind<=7)!=contextual.is_some(){return Err(fail("contextual source work missing or unexpected"));}
             let enclosed = junction.is_some_and(|(_,_,_,_,_,(mode,_))| mode != 1);

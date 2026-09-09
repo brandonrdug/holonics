@@ -510,7 +510,16 @@ impl NativeFieldRest {
                 junction_section(section, dimension, wire.representation)?;
             }
             if let Some(section) = &rest.transport {
-                let error = if !h.transport_source.is_linear()
+                let error = if h.transport_source==NativeMaterialTransportSource::OperativeNormal {
+                    let t=h.transport_target.dimension(n).ok_or(Error::Shape)?;
+                    let error=material_transport::normal::validate_report(section,n,t,linked)?;
+                    if let Some(source)=event.lineage.observed_source(){
+                        let origin=self.history[source].junction.as_ref().ok_or(Error::Shape)?;
+                        let d=6*n;let start=2*(d+1);let at=12*(2*t+1);
+                        if section.intervals[at..at+2*(d+1)]!=origin.intervals[start..start+2*(d+1)]{return Err(invalid("normal source incidence"));}
+                    }
+                    error
+                } else if !h.transport_source.is_linear()
                 {
                     let grain = match h.junction.as_ref().map(|j| j.representation) {
                         Some(NativeFieldJunctionRepresentation::EnclosedDyadic {
@@ -532,7 +541,7 @@ impl NativeFieldRest {
                 } else {
                     transport_section(section, n, h.transport_target.dimension(n).ok_or_else(||invalid("material target extent"))?, linked)?
                 };
-                if error < coefficient_error {
+                if h.transport_source!=NativeMaterialTransportSource::OperativeNormal && error < coefficient_error {
                     return Err(invalid("coefficient error chronology"));
                 }
                 coefficient_error = error;
@@ -606,7 +615,11 @@ impl NativeFieldRest {
             }
         }
         if let Some(state) = &self.transport {
-            if !h.transport_source.is_linear() {
+            if h.transport_source==NativeMaterialTransportSource::OperativeNormal {
+                let grain=match h.junction.as_ref().map(|j|j.representation){Some(NativeFieldJunctionRepresentation::EnclosedDyadic{fractional_bits})=>fractional_bits,_=>return Err(invalid("normal material grain"))};
+                material_transport::normal::validate_state(state,n,h.transport_target.dimension(n).ok_or(Error::Shape)?,grain,coefficient_error,
+                    h.history.iter().zip(&self.history).map(|(event,row)|(event.lineage.observed_source().is_some(),row.transport.as_ref().unwrap())))?;
+            } else if !h.transport_source.is_linear() {
                 let grain = match h.junction.as_ref().map(|j| j.representation) {
                     Some(NativeFieldJunctionRepresentation::EnclosedDyadic { fractional_bits }) => {
                         fractional_bits

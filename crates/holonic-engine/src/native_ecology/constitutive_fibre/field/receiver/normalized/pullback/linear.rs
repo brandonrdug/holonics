@@ -62,17 +62,26 @@ impl<'c> NativeConstitutiveField<'c> {
             &ResidentSectionRest::found(later.max(1), 2, ResidentGrain(0), 64, pointers)
                 .map_err(|_| ConstitutiveFibreError::Shape)?,
         )?;
+        let normal = self.material_transport_source()==Some(NativeMaterialTransportSource::OperativeNormal);
+        let recovered = if normal {Some(surface.fresh_section(1,
+            material_transport::normal::state_words(n,targets).ok_or(ConstitutiveFibreError::Shape)?,ResidentGrain(0))?)}else{None};
+        let normal_work = if normal {Some(surface.fresh_section(1,
+            material_transport::normal::workspace_words(n,targets).ok_or(ConstitutiveFibreError::Shape)?,ResidentGrain(0))?)}else{None};
         let output = surface.fresh_section(1, 4 * (10 * n + 2 * contacts), ResidentGrain(0))?;
-        let mut passage = surface.begin_passage(&[vec![]])?;
+        let lanes=if normal {vec![vec![],vec![0]]}else{vec![vec![]]};
+        let final_lane=lanes.len()-1;let predecessors=lanes[final_lane].clone();
+        let mut passage = surface.begin_passage(&lanes)?;
+        if normal {
+            {let lane=passage.open(0,&[])?;
+                surface.record_normal_material_prefix(&lane,&self.transport.as_ref().unwrap().state,&table,later,n,targets,grain,
+                    recovered.as_ref().unwrap(),normal_work.as_ref().unwrap())?;}
+            passage.close(0,recovered.as_ref().unwrap(),64)?;
+        }
         {
-            let lane = passage.open(0, &[])?;
+            let lane = passage.open(final_lane, &predecessors)?;
             surface.record_linear_material_pullback(
                 &lane,
-                &self
-                    .transport
-                    .as_ref()
-                    .ok_or(ConstitutiveFibreError::Shape)?
-                    .state,
+                recovered.as_ref().unwrap_or(&self.transport.as_ref().unwrap().state),
                 &table,
                 &source_report,
                 &covector,
@@ -86,10 +95,11 @@ impl<'c> NativeConstitutiveField<'c> {
                     NativeMaterialPullbackMetric::SquaredProbability => 1,
                     NativeMaterialPullbackMetric::SquaredCurrent => 2,
                 },
+                normal,
                 &output,
             )?;
         }
-        passage.close(0, &output, 64)?;
+        passage.close(final_lane, &output, 64)?;
         let receipt = passage.finish()?.launch()?;
         if !receipt.obstruction.is_empty() {
             return Err(ConstitutiveFibreError::Arithmetic(format!(

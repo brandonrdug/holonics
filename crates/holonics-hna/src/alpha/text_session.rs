@@ -258,6 +258,9 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
         self.field.archive_history_before(at)?;
         Ok(())
     }
+    /// Apply a caused codec face with fresh canonical input impulses. This is a driven exterior
+    /// boundary, not amplitude transport of the retained material ball. Source lineage survives
+    /// the presentation; a repeated face does not establish a complete-current cycle or closure.
     pub fn stage_material_actuation(&mut self,actuation:holonic_engine::native_ecology::constitutive_fibre::NativeMaterialActuation)
         ->Result<TextSymbol,AlphaMaterialError>{
         if self.pending.is_some() || self.next_anchor.is_some(){return Err(AlphaMaterialError::Apparatus("incompatible pending material actuation".into()));}
@@ -349,6 +352,9 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
         self.pending_direction=TextDirection::Incoming;
         Ok(())
     }
+    /// Continue the same ecology through its declared feedback boundary. `work_limit` reports
+    /// interruption; a learned EndPart reports the codec's part boundary. Neither is a general
+    /// extinction law or proof that the produced answer fulfills its situated request.
     pub fn generate(&mut self, work_limit: usize) -> TextGeneration {
         self.generate_with_receiver(work_limit, TextCurrentReceiver::Material)
     }
