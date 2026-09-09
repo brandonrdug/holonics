@@ -1,10 +1,10 @@
 use super::*;
 
 impl<'c> ResidentSurface<'c> {
-    fn operative_shape(&self, s: &ResidentSection<'c>, rows: usize, width: usize) -> bool {
+    pub(super) fn operative_shape(&self, s: &ResidentSection<'c>, rows: usize, width: usize) -> bool {
         s.rows == rows && s.width == width && s.grain.0 == 0 && std::ptr::eq(s.surface, self)
     }
-    fn operative_error() -> ResidentRefusal {
+    pub(super) fn operative_error() -> ResidentRefusal {
         ResidentRefusal::Declaration {
             operation: "operative-contacts",
             what: "incompatible contact/current carrier".into(),

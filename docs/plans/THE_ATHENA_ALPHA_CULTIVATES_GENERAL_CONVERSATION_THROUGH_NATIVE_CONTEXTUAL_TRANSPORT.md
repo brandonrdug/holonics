@@ -402,6 +402,17 @@ now supplies the native partial adjoint into both source arguments, including th
 current, with exact-rational controls. Compose it with the paired producing adjoint and finite
 successor. The component holds historical operator factors fixed and does not itself update them.
 
+[counterexample; measured] The [paired finite response](../../research/records/2026-09-08_AC1_THE_PAIRED_RETURN_CHANGES_CONTACTS_AND_THE_NEXT_CURRENT.md)
+changes actual contacts and subsequent conduct under a declared unit-Frobenius law, with native
+and persistence controls. Its first corpus composition nevertheless refuses after nine
+occurrences; a tighter contractive adjoint block reaches eleven before the already broad
+material/source covector causes another refusal. This is an enclosure failure, not a measured
+divergence of the numerical trajectory. Step 2 therefore remains open. Follow the complete
+source/parameter error correlation through the constitutive response and its mixed terms;
+compare the existing joint/coercive candidate at those actual dependencies. Neither deleting
+radii nor raising numerical capacity supplies the missing relation. Keep the experiment explicit
+until its ordinary continuing conduct returns at the conversation scope.
+
 Brandon has resumed the completion goal. Treat this sequence as a revisable working design;
 report a concrete failed connection and change it when evidence warrants. In execution, complete the next native attachment and inspect its actual consequence before taking
 on unrelated infrastructure. A concrete failure may redirect the corresponding step; it does

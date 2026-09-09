@@ -1,0 +1,136 @@
+{
+  "schema": "holonics.paired-contact-response-receipt.v1",
+  "status": "refused-before-eighth-contact-response",
+  "requested_families": 8,
+  "admitted_occurrences": 9,
+  "committed_operative_returns": 7,
+  "development_wall_seconds": 0.484113446,
+  "checkpoint_boundary": "pending-contact-response",
+  "checkpoint_octets": 899593,
+  "development_numeric_section_readouts": 0,
+  "census": {
+    "allocations": 938,
+    "captured_launches": 158,
+    "control_launches": 0,
+    "deed_launches": 50,
+    "device_to_device_octets": 0,
+    "egress_receipt_octets": 4800,
+    "egress_section_octets": 0,
+    "ingress_octets": 415764,
+    "resident_octets_now": 1764288,
+    "resident_octets_peak": 2705460,
+    "section_read_outs": 0,
+    "synchronizations": 50
+  },
+  "responses": [
+    {
+      "receiving": 1,
+      "source": 0,
+      "metric": "RelativeEntropy",
+      "nominal_contact_covector_norm_square": "0",
+      "contact_covector_radius": "0",
+      "potential_covector_radius": "0"
+    },
+    {
+      "receiving": 2,
+      "source": 1,
+      "metric": "RelativeEntropy",
+      "nominal_contact_covector_norm_square": "16214789712953264657497875464226436029403939775364999628353260973387346618144744843/497323236409786642155382248146820840100456150797347717440463976893159497012533375533056",
+      "contact_covector_radius": "26292803/4722366482869645213696",
+      "potential_covector_radius": "737341/4722366482869645213696"
+    },
+    {
+      "receiving": 3,
+      "source": 2,
+      "metric": "RelativeEntropy",
+      "nominal_contact_covector_norm_square": "336549089883108737648257927774514590743647531824746243546074349779812518985415475479/497323236409786642155382248146820840100456150797347717440463976893159497012533375533056",
+      "contact_covector_radius": "35100087/590295810358705651712",
+      "potential_covector_radius": "2873933/2361183241434822606848"
+    },
+    {
+      "receiving": 4,
+      "source": 3,
+      "metric": "RelativeEntropy",
+      "nominal_contact_covector_norm_square": "130578054521151335496003194798512141273312467495624917134578354589483892267150705037/15541351137805832567355695254588151253139254712417116170014499277911234281641667985408",
+      "contact_covector_radius": "197290553930507/2361183241434822606848",
+      "potential_covector_radius": "3853940352423/2361183241434822606848"
+    },
+    {
+      "receiving": 5,
+      "source": 4,
+      "metric": "RelativeEntropy",
+      "nominal_contact_covector_norm_square": "3866595278442613906175513899821841539489138635469748742651660061460837794014266311311/248661618204893321077691124073410420050228075398673858720231988446579748506266687766528",
+      "contact_covector_radius": "8097273498574361/4722366482869645213696",
+      "potential_covector_radius": "66044694639997/2361183241434822606848"
+    },
+    {
+      "receiving": 6,
+      "source": 5,
+      "metric": "RelativeEntropy",
+      "nominal_contact_covector_norm_square": "237131989020233333634035590352000050740171380960639594076094480872442010019082021291/248661618204893321077691124073410420050228075398673858720231988446579748506266687766528",
+      "contact_covector_radius": "4170109779268043331455/1180591620717411303424",
+      "potential_covector_radius": "28722162298026376425/590295810358705651712"
+    },
+    {
+      "receiving": 7,
+      "source": 6,
+      "metric": "RelativeEntropy",
+      "nominal_contact_covector_norm_square": "7702794452700326124012472435394246319788793630221045737973206745265294992569718704161/497323236409786642155382248146820840100456150797347717440463976893159497012533375533056",
+      "contact_covector_radius": "30423251491920499219309/295147905179352825856",
+      "potential_covector_radius": "2999523117195972429275/2361183241434822606848"
+    },
+    {
+      "receiving": 8,
+      "source": 7,
+      "metric": "RelativeEntropy",
+      "nominal_contact_covector_norm_square": "7586470900976870157148572309560501920982624338196676954790823645062844409312690800979/248661618204893321077691124073410420050228075398673858720231988446579748506266687766528",
+      "contact_covector_radius": "87866608580951801323191221826585/4722366482869645213696",
+      "potential_covector_radius": "62585043206963246738475794889/4722366482869645213696"
+    }
+  ],
+  "language_probe_executed": false,
+  "language_quality_established": false,
+  "native_check": "6 operative tests passed in 3.34 s; SDK/exposure boundary control passed in 1.03 s",
+  "refusal_diagnosis": {
+    "current_contact_norm_upper": "67965399867427407647381/4722366482869645213696",
+    "current_contact_radius": "15732889733739221073891/147573952589676412928",
+    "current_internal_norm_upper": "3852224486161841241755/1180591620717411303424",
+    "current_internal_radius": "2659090837409032901249853/2361183241434822606848",
+    "prospective_contact_radius_lower": "87866609084404272802846296191097/4722366482869645213696",
+    "prospective_covariance_radius_lower": "7720540991991515479718140456419917720520005640530653289942063409/22300745198530623141535718272648361505980416",
+    "largest_signed_wide_value_at_grain_72": "170141183460469231731687303715884105727/4722366482869645213696",
+    "prospective_covariance_radius_exceeds_carrier": true,
+    "refusal_lane": 1,
+    "refusal_flags": 1,
+    "scope": "The retained radius already exceeds the carrier after covariance formation, independently of the nonnegative extra norm/rounding terms. This does not establish divergence of the nominal trajectory."
+  },
+  "pending_response_restart": {
+    "admitted_occurrences": 9,
+    "committed_operative_returns": 7,
+    "checkpoint_boundary": "pending-contact-response",
+    "checkpoint_bytes_equal": true,
+    "numeric_readouts": 0,
+    "same_refusal": true
+  },
+  "joint_block_comparison": {
+    "admitted_occurrences": 11,
+    "committed_operative_returns": 9,
+    "development_wall_seconds": 0.579105408,
+    "numeric_section_readouts": 0,
+    "checkpoint_boundary": "pending-contact-response",
+    "checkpoint_octets": 1016743,
+    "failure": "native constitutive field: native constitutive arithmetic refused without depositing a row: paired material adjoint: ObstructionLineage { refusals: [OccurrenceRefusal { index: 2, flags: 1, origin: true, upstream_flags: 0, upstream_first: None, upstream_count: 0 }] }",
+    "current_contact_norm_upper": "76315684130423581941607/4722366482869645213696",
+    "current_contact_radius": "1198062729226375451128110109/2361183241434822606848",
+    "current_internal_radius": "27234013414531253029563922157/4722366482869645213696",
+    "incoming_covector_maximum_width": {
+      "visible_source": "175982867975164112743728287789/4722366482869645213696",
+      "outgoing_current": "879913119057978742648320384875/4722366482869645213696",
+      "internal_current": "879913120721973512246541750663/4722366482869645213696"
+    },
+    "language_probe_executed": false,
+    "command": "target/debug/examples/alpha_text .local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl --families 8 --fractional-bits 72 --material-source operative-contextual --contact-response true --prompt .local/artifacts/athena-alpha/ac2/first-request.txt --emit-symbols 128 --checkpoint .local/artifacts/athena-alpha/ac1-contact-response/first-eight-joint-v2.hna --report .local/artifacts/athena-alpha/ac1-contact-response/first-eight-joint-v2.json",
+    "native_check": "6 operative tests passed in 2.89 s; SDK/exposure boundary control passed in 0.99 s"
+  },
+  "command": "target/debug/examples/alpha_text .local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl --families 8 --fractional-bits 72 --material-source operative-contextual --contact-response true --prompt .local/artifacts/athena-alpha/ac2/first-request.txt --emit-symbols 128 --checkpoint .local/artifacts/athena-alpha/ac1-contact-response/first-eight-v1.hna --report .local/artifacts/athena-alpha/ac1-contact-response/first-eight-v1.json"
+}

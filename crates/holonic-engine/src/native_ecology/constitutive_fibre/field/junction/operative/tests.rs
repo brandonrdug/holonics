@@ -126,10 +126,10 @@ fn returned<'c>(
         at_cut: source.field_cut(),
         contact_count: source.births.len(),
         origin: Rc::clone(&source.origin),
-        ports: packed(surface, 2, 2 * d, ports),
-        currents: packed(surface, 2, 4 * k.max(1), rows),
-        b: packed(surface, k.max(1), 4, db),
-        bounds: packed(surface, 1, 4, vec![0, 0]),
+        ports: Rc::new(packed(surface, 2, 2 * d, ports)),
+        currents: Rc::new(packed(surface, 2, 4 * k.max(1), rows)),
+        b: Rc::new(packed(surface, k.max(1), 4, db)),
+        bounds: Rc::new(packed(surface, 1, 4, vec![0, 0])),
     })
 }
 fn decode<'c>(
@@ -258,7 +258,7 @@ fn coupled_return_stages_map_current_and_moments_without_partial_publication() {
     // A second admitted return in the same declared enclosure: perturb one port factor
     // and every internal increment. The full covariance/aggregate must enclose the mixed terms.
     let mut uncertain = returned(&view, false);
-    Rc::get_mut(&mut uncertain).unwrap().bounds = packed(
+    Rc::get_mut(&mut uncertain).unwrap().bounds = Rc::new(packed(
         view.field.relation.surface,
         1,
         4,
@@ -266,7 +266,7 @@ fn coupled_return_stages_map_current_and_moments_without_partial_publication() {
             (1i128 << view.grain) / 4,
             (k as i128) * (1i128 << view.grain) / 32,
         ],
-    );
+    ));
     let eta = W::new(Rat::new(1.into(), 16.into()), Rat::from_integer(0.into()));
     let mu = W::new(Rat::from_integer(0.into()), Rat::new(1.into(), 32.into()));
     for i in 0..k {
@@ -635,12 +635,12 @@ fn operative_material_reads_changed_contacts_and_keeps_the_source_through_restar
     let update = {
         let view = field.stage_operative_contacts().unwrap();
         let mut delta = returned(&view, false);
-        Rc::get_mut(&mut delta).unwrap().b = packed(
+        Rc::get_mut(&mut delta).unwrap().b = Rc::new(packed(
             &surface,
             view.births.len().max(1),
             4,
             vec![0; 2 * view.births.len().max(1)],
-        );
+        ));
         view.stage_return(delta).unwrap().into_update()
     };
     {

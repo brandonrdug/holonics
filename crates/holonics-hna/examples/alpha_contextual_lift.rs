@@ -12,11 +12,12 @@ use serde_json::json;
 use std::{io::Write, path::PathBuf, time::Instant};
 
 fn normalized_returns(
-    path: PathBuf, occurrences: Vec<usize>, group_width: usize, output: PathBuf, source_pullback: bool,
+    path: PathBuf, occurrences: Vec<usize>, group_width: usize, output: PathBuf, source_pullback: bool, paired_response: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let start=Instant::now();
     let saved=SavedTextField::read(&path)?;
     let mut result=saved.with_session(|session,_,_,_| {
+        let contact_state=if paired_response {Some(session.stage_operative_contacts()?.inspect()?)} else {None};
         let field=session.field();let count=field.occurrence_count();let mut returns=Vec::new();
         for at in occurrences.iter().copied() {
             let before=field.census();let clock=Instant::now();
@@ -37,7 +38,9 @@ fn normalized_returns(
                     if after.section_read_outs!=before.section_read_outs || field.occurrence_count()!=count {
                         return Err(AlphaMaterialError::Apparatus("material pullback read numerical current or changed recurrence".into()));
                     }
-                    pullbacks.push(json!({"reading":pulled.inspect()?,"resident_seconds":elapsed,
+                    let reading=pulled.inspect()?;
+                    let paired=if paired_response {Some(field.material_contact_response(pulled)?.inspect()?)}else{None};
+                    pullbacks.push(json!({"reading":reading,"paired":paired,"resident_seconds":elapsed,
                         "resident_deeds":after.deed_launches-before.deed_launches,
                         "numerical_section_readouts":after.section_read_outs-before.section_read_outs,
                         "native_ingress_octets":after.ingress_octets-before.ingress_octets}));
@@ -49,7 +52,7 @@ fn normalized_returns(
                 "native_ingress_octets":after.ingress_octets-before.ingress_octets}));
         }
         Ok(json!({"schema":"holonics.normalized-material-return.v1","model":path,
-            "field_cut":count,"group_width":group_width,"returns":returns,
+            "field_cut":count,"group_width":group_width,"returns":returns,"contact_state":contact_state,
             "morphology_changed":false,"language_quality_established":false}))
     })?;
     result["whole_wall_seconds"]=json!(start.elapsed().as_secs_f64());
@@ -152,7 +155,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let selection = args
         .next()
         .ok_or("receiving occurrences or --material-history required")?;
-    if selection=="--normalized-return" || selection=="--material-pullback" {
+    if selection=="--normalized-return" || selection=="--material-pullback" || selection=="--paired-response" {
         let occurrences=args.next().ok_or("receiving occurrences required")?
             .split(',').map(str::parse::<usize>).collect::<Result<Vec<_>,_>>()?;
         if args.next().as_deref()!=Some("--group-width"){return Err("--group-width required".into());}
@@ -160,7 +163,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         if args.next().as_deref()!=Some("--report"){return Err("--report required".into());}
         let output=PathBuf::from(args.next().ok_or("report destination required")?);
         if args.next().is_some()||output.exists(){return Err("unexpected arguments or existing destination".into());}
-        return normalized_returns(path,occurrences,group,output,selection=="--material-pullback");
+        return normalized_returns(path,occurrences,group,output,selection!="--normalized-return",selection=="--paired-response");
     }
     if selection == "--material-history" || selection == "--operative-contacts" {
         if args.next().as_deref() != Some("--report") {

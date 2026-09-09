@@ -4,6 +4,8 @@
 //! separate obligations; these carriers never mutate the borrowed field.
 use super::super::material_transport::wides;
 use super::*;
+mod response;
+pub use response::{NativeMaterialContactResponse, NativeMaterialContactResponseReading};
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 pub struct NativeOperativeContactBirth {
@@ -25,10 +27,10 @@ pub(in super::super) struct OperativeSections<'c> {
 pub(super) struct OperativeReturn<'c> {
     at_cut:usize,contact_count:usize,
     origin: Rc<()>,
-    ports: ResidentSection<'c>,
-    currents: ResidentSection<'c>,
-    b: ResidentSection<'c>,
-    bounds: ResidentSection<'c>,
+    ports: Rc<ResidentSection<'c>>,
+    currents: Rc<ResidentSection<'c>>,
+    b: Rc<ResidentSection<'c>>,
+    bounds: Rc<ResidentSection<'c>>,
 }
 pub struct NativeOperativeContactStaging<'f, 'c> {
     field: &'f NativeConstitutiveField<'c>,
@@ -217,6 +219,10 @@ impl<'c> NativeConstitutiveField<'c> {
         self.junction
             .as_ref()
             .is_some_and(|j| j.operative.is_some())
+    }
+    /// Number of committed operative return generators; this is chronology, not a quality score.
+    pub fn operative_return_count(&self) -> Option<usize> {
+        self.junction.as_ref().and_then(|j|j.operative.as_ref()).map(|o|o.returns.len())
     }
     /// Prepare the existing contact map and full internal-current carrier on the device.
     /// This borrows the one source ecology and issues no source handle or state publication.

@@ -82,6 +82,25 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
     pub fn enable_operative_contacts(&mut self) -> Result<(), AlphaMaterialError> {
         Ok(self.field.enable_operative_contacts()?)
     }
+    /// Apply the native constrained contact response to the latest actual reception. This
+    /// supplies no application-authored delta or new occurrence. Failure preserves the field
+    /// as it stood after that reception, and success preserves its available emission.
+    pub fn respond_to_latest_material(
+        &mut self,
+        group_width: usize,
+        metric: holonic_engine::native_ecology::constitutive_fibre::NativeMaterialPullbackMetric,
+    ) -> Result<Option<holonic_engine::native_ecology::constitutive_fibre::NativeMaterialContactResponse<'chart>>, AlphaMaterialError> {
+        if self.pending.is_some() {
+            return Err(AlphaMaterialError::Apparatus("native reception is pending".into()));
+        }
+        let Some(latest)=self.latest.as_ref() else {return Ok(None);};
+        let Some(returned)=self.field.normalized_material_return(latest.occurrence,group_width,
+            holonic_engine::resident_section::SeriesAperture(32))? else {return Ok(None);};
+        let query=self.field.pull_back_material_source(&returned,metric)?;
+        let response=self.field.material_contact_response(query)?;
+        self.field.apply_material_contact_response(&response)?;
+        Ok(Some(response))
+    }
     /// Native contact/current staging over this same borrowed field. It changes no source
     /// capability or developmental occurrence, and cannot outlive the field's decoder.
     pub fn stage_operative_contacts(

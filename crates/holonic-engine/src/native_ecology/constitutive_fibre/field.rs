@@ -51,6 +51,7 @@ pub use junction::{
     PairedContactCotangent, PairedJunctionCotangent, PairedJunctionLinearization, PairedJunctionTangent,
     JointMaterialContactResponse,joint_material_contact,
     NativeOperativeContactBirth, NativeOperativeContactReading, NativeOperativeContactStaging, NativeOperativeReflectionReading,
+    NativeMaterialContactResponse, NativeMaterialContactResponseReading,
 };
 use junction::{PairedJunction, PendingJunction};
 use material_transport::{MaterialTransport, PendingMaterialTransport};

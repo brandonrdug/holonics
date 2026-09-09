@@ -1,7 +1,7 @@
 # Construction state
 
 **Currency:** September 8, 2026. **Priority:** AC0–AC5 completion resumed by Brandon; flexible native construction with transparent failures.
-**Position:** AC0 complete; AC1 material query adjoint returned at bounded scope, paired-interior/finite successor next; AC2 failed probes; AC3 apparatus only; AC4–AC5 open.
+**Position:** AC0 complete; AC1 step 2 has a bounded finite contact response, but continuing enclosure propagation refuses on the corpus; AC2 failed probes; AC3 apparatus only; AC4–AC5 open.
 **Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -22,6 +22,25 @@ this formal review changes no native model, kernel or product grade.
 
 ## Current HNN construction
 
+[established-bounded; measured] The [paired response](research/records/2026-09-08_AC1_THE_PAIRED_RETURN_CHANGES_CONTACTS_AND_THE_NEXT_CURRENT.md)
+now returns through the actual producing contact map, including earlier overlays, and stages
+a constrained unit-Frobenius contact displacement with complete finite covariance/aggregate
+terms. Six focused native controls pass, including changed subsequent material conduct,
+historical-map recovery, refusal without partial publication and rest/remount. The corrected
+adjoint retains a contractive skew-adjoint block and its complete oriented residual.
+
+[counterexample; measured] Actual conversation development remains unusable. The initial
+independent-bound composition refuses after 9 occurrences/7 contact responses. The joint-block
+correction reaches 11 occurrences/9 responses, then refuses inside the paired return. Its
+incoming material/current covector intervals are already about `1.86e8` wide; the numerical
+contact norm is only about 16.2. The [receipt](research/records/2026-09-08_paired_contact_response/return.json)
+retains exact bounds, checkpoints and costs. No prompt or generation ran. The first pending
+response restarts without replaying its received symbol and saves an identical checkpoint.
+These failures concern the enclosure composition; divergence of the numerical trajectory is
+not established. AC1 step 2 remains open: retain source/parameter error correlation through
+the complete constitutive return, using the existing producer, coercive return and source
+owners. Do not discard radii, raise a carrier limit, or treat another local bound as a product.
+
 [established-bounded; measured] The [material query adjoint](research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_REACHES_BOTH_QUERY_ARGUMENTS.md)
 now returns through the producing material operator into both visible-source branches and the
 complete outgoing/internal query current. An independent exact-rational CUDA comparison passes
@@ -30,7 +49,7 @@ and no numerical section readout during construction. It is a partial adjoint wi
 operator factors held fixed. On the saved 1,930-occurrence model, the return from occurrence
 1,600 reaches 1,599 certified nonzero internal real coordinates in about 26 ms per metric;
 the empty initial material operator returns exact zero. The [receipt](research/records/2026-09-08_material_source_pullback/return.json)
-retains the three producing cuts and exact interval summaries. AC1 step 2 still owes the paired producing return and finite successor;
+retains the three producing cuts and exact interval summaries. The subsequent paired-return attempt is recorded above;
 no model morphology or language response has changed through this component alone.
 
 [established-bounded; measured] The [normalized material receiver](research/records/2026-09-08_AC1_THE_NORMALIZED_RECEIVER_RETURNS_ITS_COMPLETE_CURRENT_AND_TWO_METRIC_FACES.md)

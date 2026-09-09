@@ -14,19 +14,19 @@ pub enum NativeMaterialPullbackMetric {
 /// the adjoint of the entire chronology by itself.
 pub struct NativeMaterialSourcePullback<'chart> {
     surface: &'chart ResidentSurface<'chart>,
-    _owner: Rc<()>,
+    pub(in super::super::super) _owner: Rc<()>,
     _observation: Rc<ResidentSection<'chart>>,
     _normalized: Rc<ResidentSection<'chart>>,
     _history: Vec<(Rc<ResidentSection<'chart>>, Rc<ResidentSection<'chart>>)>,
-    output: ResidentSection<'chart>,
-    source: NativeFieldLineage,
-    receiving: NativeFieldLineage,
+    pub(in super::super::super) output: ResidentSection<'chart>,
+    pub(in super::super::super) source: NativeFieldLineage,
+    pub(in super::super::super) receiving: NativeFieldLineage,
     metric: NativeMaterialPullbackMetric,
     group_width: usize,
     series_terms: u32,
     nodes: usize,
-    contacts: usize,
-    grain: u32,
+    pub(in super::super::super) contacts: usize,
+    pub(in super::super::super) grain: u32,
 }
 
 #[derive(Clone, Debug, Serialize)]

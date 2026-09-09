@@ -49,6 +49,14 @@ pins the refreshed Apple branch comparison.
 
 ## Athena-alpha: corrected AC0–AC5 order
 
+[counterexample; measured] The [paired contact construction](../../research/records/2026-09-08_AC1_THE_PAIRED_RETURN_CHANGES_CONTACTS_AND_THE_NEXT_CURRENT.md)
+has verified local finite conduct, but the corpus still refuses: first at 9 occurrences, then at
+11 after retaining the adjoint's contractive block. The upstream material/source covector
+enclosure is already unusably wide. **AC1 step 2 remains active:** compose the complete
+source/parameter return with its retained error correlations and coercive structure. The explicit
+unit-metric experiment is not the required productive endpoint. Keep its checkpoints and failure
+evidence; do not spend further runs on unchanged laws or substitute capacity increases.
+
 [established-bounded; measured] The [material query adjoint](../../research/records/2026-09-08_AC1_THE_MATERIAL_RETURN_REACHES_BOTH_QUERY_ARGUMENTS.md)
 returns both visible and complete current arguments through the producing material operator,
 with independent exact-rational native verification. AC1 step 2 now composes that partial adjoint
@@ -68,7 +76,7 @@ complete population bounds, not an arbitrary radius, discarded current or basin-
 
 [project-postulate] Brandon has resumed completion of AC0–AC5 as the active goal and explicitly
 directs flexible designs and transparent reporting when a composition does not work.
-**Current work: AC1 producing-interior return after the normalized receiver.** Each work update names phase/step, actual artifact and returned
+**Current work: AC1 step 2, complete-return error correlation after the finite contact attempt.** Each work update names phase/step, actual artifact and returned
 consequence. Do not resume the preserved joint kernel by default or restart completed foundations.
 
 | Phase | Ordered construction | Return required |

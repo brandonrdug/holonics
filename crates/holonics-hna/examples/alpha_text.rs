@@ -47,6 +47,8 @@ struct CultivationCheckpoint {
     native_until: usize,
     records: Vec<Value>,
     anchors: Vec<AnchorPosition>,
+    #[serde(default)]
+    contact_response: bool,
 }
 
 fn cultivate(
@@ -55,6 +57,7 @@ fn cultivate(
     families: usize,
     records: &mut Vec<Value>,
     anchors: &mut AnchorMap,
+    contact_response: bool,
 ) -> Result<(), AlphaMaterialError> {
     let mut partial = records.last().filter(|r| r["complete"] == false).cloned();
     let mut completed = 0;
@@ -165,7 +168,13 @@ fn cultivate(
                 if symbol_index < skip {
                     continue;
                 }
-                let result = if resume_part.is_some() && symbol_index == skip {
+                let retry_contact = resume_part.is_some_and(|p|p["failure"]["phase"]=="contact-response") && symbol_index==skip;
+                let result = if retry_contact {
+                    if session.pending_symbol().is_some() || !contact_response {
+                        return Err(exposure_error("pending contact response disagrees with session or configured law"));
+                    }
+                    Ok(())
+                } else if resume_part.is_some() && symbol_index == skip {
                     if session.pending_symbol() != Some(symbol) {
                         return Err(exposure_error(
                             "saved pending symbol disagrees with source material",
@@ -177,9 +186,17 @@ fn cultivate(
                 };
                 if let Err(error) = result {
                     failure = Some(
-                        json!({"symbol_index":symbol_index,"symbol":symbol,"error":error.to_string()}),
+                        json!({"phase":"reception","symbol_index":symbol_index,"symbol":symbol,"error":error.to_string()}),
                     );
                     break;
+                }
+                if contact_response {
+                    if let Err(error)=session.respond_to_latest_material(2,
+                        holonic_engine::native_ecology::constitutive_fibre::NativeMaterialPullbackMetric::RelativeEntropy) {
+                        failure=Some(json!({"phase":"contact-response","symbol_index":symbol_index,
+                            "symbol":symbol,"error":error.to_string()}));
+                        break;
+                    }
                 }
                 if last_progress.elapsed().as_secs() >= 10 {
                     eprintln!(
@@ -211,7 +228,7 @@ fn cultivate(
                 break;
             }
         }
-        let failed = session.pending_symbol().is_some();
+        let failed = session.pending_symbol().is_some() || part_receipts.iter().any(|p|!p["failure"].is_null());
         if resumed.is_some() {
             records.pop();
         }
@@ -221,7 +238,7 @@ fn cultivate(
             "native_until":session.field().occurrence_count(),"parts":part_receipts,"complete":!failed}));
         if failed {
             return Err(exposure_error(
-                "native material reception remains pending; source coordinate is in the record",
+                "native reception or its contact response remains pending; source coordinate is in the record",
             ));
         }
         if session.field().occurrence_count() > native_from {
@@ -259,6 +276,7 @@ fn run_session(
     text_receiver: TextCurrentReceiver,
     inspect_all_currents: bool,
     operative: bool,
+    contact_response: bool,
     checkpoint: Option<&PathBuf>,
     report: &mut Value,
 ) -> Result<(), AlphaMaterialError> {
@@ -270,9 +288,10 @@ fn run_session(
     report["has_material_transport"] = json!(session.field().has_material_transport());
     report["material_source"] = json!(session.field().material_transport_source());
     report["text_receiver"] = json!(text_receiver);
+    report["contact_response_during_development"] = json!(contact_response);
     let start = Instant::now();
     let developed = if let Some(reader) = reader.as_mut() {
-        cultivate(reader, session, families, records, anchors)
+        cultivate(reader, session, families, records, anchors, contact_response)
     } else {
         Ok(())
     };
@@ -282,6 +301,7 @@ fn run_session(
     report["material_wall_seconds"] = json!(start.elapsed().as_secs_f64());
     report["development_records"] = json!(&*records);
     report["development_native_until"] = json!(session.field().occurrence_count());
+    report["development_operative_returns"] = json!(session.field().operative_return_count());
     report["development_census"] = json!(session.field().census());
     report["history_placement"] = json!(session.field().history_placement());
     report["development_section_readouts_outside_history_placement"] = json!(
@@ -298,6 +318,7 @@ fn run_session(
             exposure: exposure.to_owned(),
             cursor: cursor.clone(),
             native_until: session.field().occurrence_count(),
+            contact_response,
             records: records.clone(),
             anchors: anchors
                 .iter()
@@ -320,6 +341,8 @@ fn run_session(
                 report["checkpoint_native_occurrences"] = json!(session.field().occurrence_count());
                 report["checkpoint_boundary"] = json!(if session.pending_symbol().is_some() {
                     "pending-development-symbol"
+                } else if developed.is_err() {
+                    "pending-contact-response"
                 } else {
                     "after-development-before-prompt"
                 });
@@ -410,7 +433,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual] [--text-receiver material|constitutive] [--operative-junction true|false]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -422,6 +445,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         (None, None, None, None, None, None);
     let mut inspect_all_currents = false;
     let mut operative = false;
+    let mut contact_response = None;
     let mut history_archive = None;
     let mut material_source = None;
     let mut text_receiver = TextCurrentReceiver::Material;
@@ -460,6 +484,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 })
             }
             "--operative-junction" => operative = value.parse::<bool>()?,
+            "--contact-response" => contact_response = Some(value.parse::<bool>()?),
             "--inspect-all-currents" => inspect_all_currents = value.parse::<bool>()?,
             _ => return Err(format!("unknown option {option}").into()),
         }
@@ -574,6 +599,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 text_receiver,
                 inspect_all_currents,
                 operative,
+                contact_response.unwrap_or(app.contact_response),
                 checkpoint.as_ref(),
                 &mut report,
             )
@@ -614,6 +640,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     text_receiver,
                     inspect_all_currents,
                     operative,
+                    contact_response.unwrap_or(false),
                     checkpoint.as_ref(),
                     &mut report,
                 )

@@ -284,10 +284,10 @@ impl<'c> OperativeState<'c> {
                     at_cut: frame.at_cut,
                     contact_count: frame.contact_count,
                     origin: Rc::new(()),
-                    ports: mount(ports)?,
-                    currents: mount(currents)?,
-                    b: mount(b)?,
-                    bounds: mount(bounds)?,
+                    ports: Rc::new(mount(ports)?),
+                    currents: Rc::new(mount(currents)?),
+                    b: Rc::new(mount(b)?),
+                    bounds: Rc::new(mount(bounds)?),
                 }))
             })
             .collect::<Result<Vec<_>, Error>>()?;
