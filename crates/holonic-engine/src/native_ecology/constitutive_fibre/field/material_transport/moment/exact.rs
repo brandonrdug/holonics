@@ -36,7 +36,7 @@ impl NativeConstitutiveField<'_> {
             .source;
         let mut sum = vec![ExactComplexWaveCurrent::zero(); self.nodes()];
         for at in 0..=operator_at {
-            if let Some(origin) = self.history[at].lineage.received_from {
+            if let Some(origin) = self.history[at].lineage.observed_source() {
                 let factor = self
                     .inspect_moment_material_transport(at)?
                     .ok_or_else(|| invalid("factor absent"))?;

@@ -4,7 +4,7 @@
 use super::{
     material::AlphaMaterialError,
     text_codec::{
-        present_constitutive_text_return, read_text_symbol_on, TextDirection, TextCodeDisposition, TextCodeReading,
+        present_constitutive_text_return, present_material_packet, read_text_symbol_on, TextDirection, TextCodeDisposition, TextCodeReading,
         TextSymbol, TEXT_INPUT_CHANNELS,
     },
 };
@@ -25,6 +25,12 @@ pub enum TextCurrentReceiver {
     Material,
     Constitutive,
 }
+
+/// A native application is the normal joint-packet path. The other modes retain explicit
+/// observation and withdrawal controls for comparisons.
+#[derive(Clone,Copy,Debug,PartialEq,Eq,Serialize)]
+#[serde(rename_all="kebab-case")]
+pub enum TextGenerationSourceMode { Actuation, Observation, Withdrawal }
 
 #[derive(Debug, Serialize)]
 #[serde(tag = "kind", content = "reason", rename_all = "kebab-case")]
@@ -238,6 +244,22 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
         self.field.archive_history_before(at)?;
         Ok(())
     }
+    pub fn stage_material_actuation(&mut self,actuation:holonic_engine::native_ecology::constitutive_fibre::NativeMaterialActuation)
+        ->Result<TextSymbol,AlphaMaterialError>{
+        if self.pending.is_some() || self.next_anchor.is_some(){return Err(AlphaMaterialError::Apparatus("incompatible pending material actuation".into()));}
+        let latest=self.latest.as_ref().ok_or_else(||AlphaMaterialError::Apparatus("no available material source".into()))?;
+        if !actuation.describes_source(&latest.source){return Err(AlphaMaterialError::Apparatus("foreign material actuation".into()));}
+        let direction=match actuation.reading().quadrature {
+            holonic_engine::native_ecology::constitutive_fibre::NativePacketQuadrature::Real=>TextDirection::Incoming,
+            holonic_engine::native_ecology::constitutive_fibre::NativePacketQuadrature::Imaginary=>TextDirection::Outgoing,
+        };
+        if !self.duplex && direction!=TextDirection::Incoming{return Err(AlphaMaterialError::Apparatus("actuation is outside the text boundary chart".into()));}
+        let reading=present_material_packet(actuation.reading().clone())?;
+        let TextCodeDisposition::Symbol{symbol}=reading.disposition else{return Err(AlphaMaterialError::Apparatus("material actuation has no text face".into()));};
+        let latest=self.latest.take().unwrap();
+        let occurrence=NativeFieldOccurrence::actuating(latest.source,symbol.inputs_on(direction),actuation);
+        self.pending=Some((symbol,occurrence));self.pending_direction=direction;Ok(symbol)
+    }
     pub fn pending_symbol(&self) -> Option<TextSymbol> {
         self.pending.as_ref().map(|v| v.0)
     }
@@ -322,11 +344,17 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
         work_limit: usize,
         receiver: TextCurrentReceiver,
     ) -> TextGeneration {
-        self.generate_with_source_contact(work_limit,receiver,true)
+        let source_mode=if matches!(receiver,TextCurrentReceiver::Material) && matches!(self.field.material_target(),Some(holonic_engine::native_ecology::constitutive_fibre::NativeMaterialTarget::TensorProduct{..})){
+            TextGenerationSourceMode::Actuation
+        }else{TextGenerationSourceMode::Observation};
+        self.generate_with_source_mode(work_limit,receiver,source_mode)
     }
     /// Declared source-incidence intervention for comparison. Withdrawing the self contact
     /// still advances the same field through an unlinked occurrence; it is not a model default.
     pub fn generate_with_source_contact(&mut self,work_limit:usize,receiver:TextCurrentReceiver,source_contact:bool)->TextGeneration{
+        self.generate_with_source_mode(work_limit,receiver,if source_contact{TextGenerationSourceMode::Observation}else{TextGenerationSourceMode::Withdrawal})
+    }
+    pub fn generate_with_source_mode(&mut self,work_limit:usize,receiver:TextCurrentReceiver,source_mode:TextGenerationSourceMode)->TextGeneration{
         let mut result = TextGeneration {
             native_from: self.field.occurrence_count(),
             native_until: self.field.occurrence_count(),
@@ -346,8 +374,16 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
                 break;
             };
             let mut native_return = None;
+            let mut material_actuation = None;
             let received = match receiver {
-                TextCurrentReceiver::Material => read_text_symbol_on(self.field,latest.occurrence,if self.duplex{TextDirection::Outgoing}else{TextDirection::Incoming}),
+                TextCurrentReceiver::Material => {
+                    let direction=if self.duplex{TextDirection::Outgoing}else{TextDirection::Incoming};
+                    if source_mode==TextGenerationSourceMode::Actuation {
+                        self.field.read_material_actuation(&latest.source,direction.quadrature()).map_err(AlphaMaterialError::from).and_then(|actuation|{
+                            let reading=present_material_packet(actuation.reading().clone())?;material_actuation=Some(actuation);Ok(reading)
+                        })
+                    }else{read_text_symbol_on(self.field,latest.occurrence,direction)}
+                },
                 TextCurrentReceiver::Constitutive => self
                     .field
                     .retain_source(&latest.source)
@@ -389,12 +425,14 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
             }
             // A supported point return has an existing native ingress; keep its amplitude and
             // phase instead of replacing it with the decoded codeword's unit impulses.
-            // A plural fibre may still have a fixed exterior word. That case remains an explicit
-            // word observation, not selection of a point from the unprovided native current.
-            if !source_contact {
+            // A material actuation carries the selected receiver face and its actual source.
+            // Its tensor-basis realization is not an observed target or a recovered latent point.
+            if source_mode==TextGenerationSourceMode::Withdrawal {
                 if let Err(error)=self.begin_part(None){result.disposition=TextGenerationDisposition::NativeRefusal(error.to_string());break;}
             }
-            let received = if let Some(returned) = native_return {
+            let received = if let Some(actuation)=material_actuation {
+                self.stage_material_actuation(actuation).and_then(|_|self.retry_pending())
+            } else if let Some(returned) = native_return {
                 self.stage_presented_native_return(returned, symbol)
                     .and_then(|_| self.retry_pending())
             } else {

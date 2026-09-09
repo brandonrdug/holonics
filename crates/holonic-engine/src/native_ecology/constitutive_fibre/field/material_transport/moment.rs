@@ -111,7 +111,7 @@ impl<'c> NativeConstitutiveField<'c> {
         from: usize,
     ) -> Result<MomentFactors<'c>, ConstitutiveFibreError> {
         let refs = (from..self.history.len())
-            .filter_map(|i| self.history[i].lineage.received_from.map(|s| (i, s)))
+            .filter_map(|i| self.history[i].lineage.observed_source().map(|s| (i, s)))
             .collect::<Vec<_>>();
         for &(i, s) in &refs {
             self.mount_history_source(i)?;
@@ -219,7 +219,7 @@ impl<'c> NativeConstitutiveField<'c> {
                 .collect()
         };
         let half_scale = &scale * 2;
-        let linked = self.history[at].lineage.received_from.is_some();
+        let linked = self.history[at].lineage.observed_source().is_some();
         let e = wides(&w[extra..])?;
         Ok(Some(NativeMomentMaterialReading {
             forward: ball(0),

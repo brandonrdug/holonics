@@ -222,7 +222,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .filter_map(|i| {
                 self.history[i]
                     .lineage
-                    .received_from
+                    .observed_source()
                     .map(|source| (i, source))
             })
             .collect::<Vec<_>>();
@@ -307,7 +307,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 radius: Rat::new(values[at + r].into(), scale.clone()),
             })
         };
-        let linked = self.history[at].lineage.received_from.is_some();
+        let linked = self.history[at].lineage.observed_source().is_some();
         let extra = wides(&words[extra_at..])?;
         if extra.iter().any(|v| *v < 0) {
             return Err(invalid("negative material error"));

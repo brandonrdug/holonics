@@ -6,6 +6,7 @@ use crate::native_ecology::constitutive_fibre::circulation::rest::{
     blob, expect, point_section, read_blob,
 };
 use serde::{Deserialize, Serialize};
+use num_bigint::BigInt;
 use std::io::{Read, Write};
 
 const MAGIC: &[u8] = b"HNA-NATIVE-FIELD-REST\x01";
@@ -448,7 +449,7 @@ impl NativeFieldRest {
             match (event.lineage.received_from, event.lineage.source_contact) {
                 (None, None) => {}
                 (Some(source), Some(kind)) if source < at => {
-                    if kind == NativeFieldSourceContact::Emission {
+                    if matches!(kind,NativeFieldSourceContact::Emission|NativeFieldSourceContact::MaterialActuation{..}) {
                         if received[source] {
                             return Err(invalid("reused linear emission"));
                         }
@@ -457,13 +458,34 @@ impl NativeFieldRest {
                 }
                 _ => return Err(invalid("field receiving source")),
             }
+            if let Some(NativeFieldSourceContact::MaterialActuation{quadrature,coordinate})=event.lineage.source_contact {
+                let NativeMaterialTarget::TensorProduct{factor_width}=h.transport_target else{return Err(invalid("actuation target chart"));};
+                let targets=h.transport_target.dimension(n).ok_or(Error::Shape)?;
+                if !h.transport_source.is_operative() || coordinate>=targets{return Err(invalid("actuation source chart"));}
+                let source=event.lineage.received_from.ok_or_else(||invalid("missing actuation source"))?;
+                let original=self.history[source].transport.as_ref().ok_or_else(||invalid("missing source material"))?;
+                let raw=packed(original)?;let axis=if quadrature==NativePacketQuadrature::Real{0}else{1};
+                let radius=BigInt::from(raw[2*targets]);let selected=BigInt::from(raw[2*coordinate+axis]);
+                for j in 0..targets {if j!=coordinate {let gap=&selected-BigInt::from(raw[2*j+axis]);
+                    if gap<=BigInt::from(0) || &gap*&gap<=BigInt::from(2)*&radius*&radius{return Err(invalid("actuation source face is not fixed"));}}}
+                let NativeFieldIncoming::Exterior(input)=&event.lineage.incoming else{return Err(invalid("actuation input chart"));};
+                let mut address=coordinate;let mut amplitude=ExactComplexWaveCurrent::one();
+                for factor in input.chunks_exact(factor_width){
+                    let selected=address%factor_width;address/=factor_width;
+                    for (j,value) in factor.iter().enumerate(){let value=value.current();
+                        if j==selected {if value.norm_square()!=Rat::from_integer(1.into()){return Err(invalid("actuation is not a unit tensor basis"));} amplitude=amplitude.multiply(&value);}
+                        else if value!=ExactComplexWaveCurrent::zero(){return Err(invalid("actuation coordinate disagrees with its input"));}}
+                }
+                let projection=if axis==0{amplitude.real}else{amplitude.imaginary};
+                if projection<=Rat::from_integer(0.into()){return Err(invalid("actuation receiving quadrature"));}
+            }
             point_section(&rest.source, 1, report_width)?;
             let w = &rest.source.intervals;
             let current = source_width + 1;
             let prior = current + dimension + 4;
             let pivot = w[current + dimension + 2].0;
             let current_rank = w[current + dimension + 3].0;
-            let linked = event.lineage.received_from.is_some();
+            let linked = event.lineage.observed_source().is_some();
             if w[source_width].0 <= 0
                 || w[current + dimension].0 <= 0
                 || w[prior + dimension].0 <= 0
@@ -539,7 +561,7 @@ impl NativeFieldRest {
                         else {material_transport::contextual::validate_operative_profile(&section.intervals[context..context+36*n+22],n,grain,at,Some(&op.b))?;}
                         if material_transport::wides(&section.intervals[context+36*n+16..context+36*n+18])?[0]!=material_transport::wides(&op.bounds.intervals)?[1] {return Err(invalid("operative material source radius"));}
                     }
-                    let source = event.lineage.received_from;
+                    let source = event.lineage.observed_source();
                     if section.intervals[meta + 1].0 != source.map_or(-1, |v| v as i64) {
                         return Err(invalid("contextual source lineage"));
                     }
@@ -619,7 +641,7 @@ impl NativeFieldRest {
             if wire.activated_at>h.history.len() || h.junction.as_ref().is_none_or(|j|!matches!(j.representation,NativeFieldJunctionRepresentation::EnclosedDyadic{..})) {
                 return Err(invalid("operative activation or representation"));
             }
-            let births=h.history.iter().enumerate().filter_map(|(receiving,e)|e.lineage.received_from.map(|source|NativeOperativeContactBirth{source,receiving})).collect::<Vec<_>>();
+            let births=h.history.iter().enumerate().filter_map(|(receiving,e)|e.lineage.observed_source().map(|source|NativeOperativeContactBirth{source,receiving})).collect::<Vec<_>>();
             if wire.births!=births {return Err(invalid("operative birth lineage"));}
             self.operative.as_ref().unwrap().validate(wire,n)?;
             if wire.return_frames.iter().any(|r|r.at_cut>h.history.len()){return Err(invalid("operative return beyond field cut"));}
@@ -631,7 +653,7 @@ impl NativeFieldRest {
         }
         let mut contacts=0;
         for (at,(event,rest)) in h.history.iter().zip(&self.history).enumerate(){
-            contacts+=usize::from(event.lineage.received_from.is_some());
+            contacts+=usize::from(event.lineage.observed_source().is_some());
             if rest.operative.is_some()!=h.operative.as_ref().is_some_and(|o|at>=o.activated_at){return Err(invalid("operative historical presence"));}
             if let Some(op)=&rest.operative{op.validate(dimension,contacts)?;}
         }

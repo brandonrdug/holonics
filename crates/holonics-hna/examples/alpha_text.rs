@@ -9,7 +9,7 @@ use holonics_hna::{
         exposure::{ExposureCursor, ExposureFamily, ExposurePartition, ExposureReader},
         material::AlphaMaterialError,
         text_codec::{with_text_field_chart, TextSymbol, TextDirection},
-        text_session::{TextCurrentReceiver, TextFieldSession},
+        text_session::{TextCurrentReceiver, TextFieldSession, TextGenerationSourceMode},
     },
     publish_new,
 };
@@ -283,7 +283,7 @@ fn run_session(
     prompt: Option<&str>,
     limit: usize,
     text_receiver: TextCurrentReceiver,
-    self_contact:bool,
+    self_source_mode:Option<TextGenerationSourceMode>,
     inspect_all_currents: bool,
     operative: bool,
     contact_response: bool,
@@ -301,7 +301,9 @@ fn run_session(
     report["material_source"] = json!(session.field().material_transport_source());
     report["material_target"] = json!(session.field().material_target());
     report["text_receiver"] = json!(text_receiver);
-    report["self_source_contact"] = json!(self_contact);
+    let source_mode=self_source_mode.unwrap_or(if matches!(session.field().material_target(),Some(NativeMaterialTarget::TensorProduct{..})) && matches!(text_receiver,TextCurrentReceiver::Material){TextGenerationSourceMode::Actuation}else{TextGenerationSourceMode::Observation});
+    report["self_source_contact"] = json!(source_mode!=TextGenerationSourceMode::Withdrawal);
+    report["self_source_mode"] = json!(source_mode);
     report["duplex"] = json!(session.duplex());
     report["contact_response_during_development"] = json!(contact_response);
     report["contact_realization"] = json!(contact_realization);
@@ -391,7 +393,7 @@ fn run_session(
         report["prompt_native_until"] = json!(session.field().occurrence_count());
         report["prompt_error"] = json!(prompt_error);
         if prompt_error.is_none() {
-            let generated = session.generate_with_source_contact(limit, text_receiver,self_contact);
+            let generated = session.generate_with_source_mode(limit,text_receiver,source_mode);
             report["utf8"] = json!(std::str::from_utf8(&generated.emitted_octets).ok());
             report["utf8_error"] = json!(std::str::from_utf8(&generated.emitted_octets)
                 .err()
@@ -453,7 +455,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary|operative-linear] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--self-source-contact true|false] [--contact-metric current|relative-entropy|squared-probability]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary|operative-linear] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--self-source-mode actuation|observation|withdrawal] [--contact-metric current|relative-entropy|squared-probability]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -473,7 +475,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut material_source = None;
     let mut material_target = None;
     let mut text_receiver = TextCurrentReceiver::Material;
-    let mut self_contact=true;
+    let mut self_source_mode=None;
     while let Some(option) = args.next() {
         let value = args.next().ok_or("missing option value")?;
         match option.as_str() {
@@ -511,7 +513,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 })
             }
             "--operative-junction" => operative = value.parse::<bool>()?,
-            "--self-source-contact" => self_contact=value.parse::<bool>()?,
+            "--self-source-contact" => self_source_mode=Some(if value.parse::<bool>()?{TextGenerationSourceMode::Observation}else{TextGenerationSourceMode::Withdrawal}),
+            "--self-source-mode" => self_source_mode=Some(match value.as_str(){
+                "actuation"=>TextGenerationSourceMode::Actuation,"observation"=>TextGenerationSourceMode::Observation,"withdrawal"=>TextGenerationSourceMode::Withdrawal,
+                _=>return Err("self source mode must be actuation, observation or withdrawal".into()),
+            }),
             "--duplex" => duplex=Some(value.parse::<bool>()?),
             "--contact-response" => contact_response = Some(value.parse::<bool>()?),
             "--material-target" => material_target=Some(match value.as_str(){
@@ -644,7 +650,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 prompt.as_deref(),
                 limit,
                 text_receiver,
-                self_contact,
+                self_source_mode,
                 inspect_all_currents,
                 operative,
                 contact_response.unwrap_or(app.contact_response),
@@ -690,7 +696,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     prompt.as_deref(),
                     limit,
                     text_receiver,
-                    self_contact,
+                    self_source_mode,
                     inspect_all_currents,
                     operative,
                     contact_response.unwrap_or(false),

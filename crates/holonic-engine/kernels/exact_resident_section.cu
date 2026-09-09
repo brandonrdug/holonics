@@ -1632,6 +1632,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "field_material_mode.cuh"
 #include "field_differential_receiver.cuh"
 #include "field_normalized_receiver.cuh"
+#include "field_material_actuation.cuh"
 #include "field_material_pullback.cuh"
 #include "field_linear_material_pullback.cuh"
 #include "field_operative_adjoint.cuh"

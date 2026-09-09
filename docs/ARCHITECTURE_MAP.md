@@ -209,7 +209,16 @@ producing carriers and exposes return-journal storage. `operative/response.rs` r
 producer or reconstructs an older cut. The text session also exposes a declared source-contact
 withdrawal comparison through the existing unlinked-occurrence path; it remains off by default.
 The [producer/source-contact return](../research/records/2026-09-09_AC1_AC2_PRODUCER_REUSE_AND_THE_SELF_CONTACT_COMPARISON.md)
-retains exact checks, costs and the unfinished known-transport/observation distinction.
+retains exact checks and costs. The known-transport/observation distinction is implemented below.
+
+[established-bounded; source-inspected] `field/receiver/packet.rs::NativeMaterialActuation`,
+`field.rs::NativeFieldOccurrence::actuating` and `field_material_actuation.cuh` carry an available
+source and its material receiver face through native tensor-basis application. `observed_source()`
+separates observation-specific fitting from the retained causal edge. `field/rest.rs` and
+`holonics-hna/src/alpha/{text_session,checkpoint}.rs` preserve applied and pending source/receiver
+state. `alpha_actuation_restart.rs` exercises post-generation checkpoints through the public
+session. The [mathematical integration](../research/records/2026-09-09_PARALLEL_MATHEMATICS_DISTINGUISHES_A_MATERIAL_ACTUATION_FROM_A_NEW_OBSERVATION.md)
+records the tests, actual unusable output and scope; it claims no new source inverse.
 
 [established-bounded; source-inspected] `OperativeLinear` reuses the finite current-to-material
 operator through `field_linear_material.cuh`, with an independent joint target and row-parallel

@@ -29,9 +29,18 @@ fn error(value: impl std::fmt::Display) -> AlphaMaterialError {
     AlphaMaterialError::Apparatus(format!("text field checkpoint: {value}"))
 }
 
+#[derive(Debug,Serialize,Deserialize)]
+#[serde(deny_unknown_fields)]
+struct PendingMaterialActuation {
+    quadrature:holonic_engine::native_ecology::constitutive_fibre::NativePacketQuadrature,
+    coordinate:usize,
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct SessionWire {
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    pending_material_actuation:Option<PendingMaterialActuation>,
     #[serde(default,skip_serializing_if="std::ops::Not::not")]
     duplex:bool,
     #[serde(default,skip_serializing_if="super::text_codec::TextDirection::is_incoming")]
@@ -134,6 +143,13 @@ impl SavedTextField {
             || (self.session.pending.is_some() && (sources[0].is_some() || anchors[0].is_some()))
         {
             return Err(error("session/capability correspondence"));
+        }
+        if let Some(actuation)=&self.session.pending_material_actuation {
+            if self.session.pending_native.is_some() || self.session.pending.map(|s|s.codeword() as usize)!=Some(actuation.coordinate)
+                || sources[1].is_none() || anchors[1].is_some()
+                || actuation.quadrature!=(if self.session.duplex{self.session.pending_direction}else{super::text_codec::TextDirection::Incoming}).quadrature(){
+                return Err(error("incompatible pending material actuation"));
+            }
         }
         Ok(())
     }
@@ -241,7 +257,11 @@ impl SavedTextField {
                 symbol.inputs_on(if self.session.duplex{self.session.pending_direction}else{super::text_codec::TextDirection::Incoming})
             };
             let occurrence = if let Some(source) = sources[1].take() {
-                NativeFieldOccurrence::through(source, inputs)
+                if let Some(expected)=&self.session.pending_material_actuation {
+                    let actuation=session.field().read_material_actuation(&source,expected.quadrature)?;
+                    if actuation.reading().selected!=Some(expected.coordinate){return Err(error("pending actuation source face changed"));}
+                    NativeFieldOccurrence::actuating(source,inputs,actuation)
+                }else{NativeFieldOccurrence::through(source,inputs)}
             } else if let Some(anchor) = anchors[1].take() {
                 NativeFieldOccurrence::through_anchor(&anchor, inputs)
             } else {
@@ -296,7 +316,12 @@ impl TextFieldSession<'_, '_> {
         ];
         kept.extend(anchors.iter().map(|a| Some(*a)));
         let field = self.field.rest(&sources, &kept)?;
+        let pending_material_actuation=self.pending.as_ref().and_then(|(_,p)|p.material_actuation()).map(|a|{
+            Ok::<_,AlphaMaterialError>(PendingMaterialActuation{quadrature:a.reading().quadrature,
+                coordinate:a.reading().selected.ok_or_else(||error("pending material face is not fixed"))?})
+        }).transpose()?;
         let session = SessionWire {
+            pending_material_actuation,
             duplex:self.duplex,
             pending_direction:self.pending_direction,
             schema: "holonics.native-text-session.v1".into(),

@@ -187,7 +187,7 @@ impl<'chart> NativeCurrentHistorySourceReceiver<'chart> {
         let source = self
             .surface
             .fresh_section(1, 6 * d + 22, ResidentGrain(0))?;
-        let origin = event.lineage.received_from.map(|i| &field.history[i]);
+        let origin = event.lineage.observed_source().map(|i| &field.history[i]);
         let junction = field
             .junction
             .as_ref()

@@ -1,0 +1,250 @@
+{
+  "schema": "holonics.material-actuation-comparison.v1",
+  "source_revision": "b325d013 plus accompanying material-actuation changes",
+  "mathematical_revisions": [
+    "ef47e263",
+    "04064e78",
+    "b1010d49"
+  ],
+  "process": {
+    "command": [
+      "target/debug/examples/alpha_text",
+      "--resume",
+      ".local/artifacts/athena-alpha/ac1-contact-response/first-sixteen-linear-v8.hna",
+      "--families",
+      "0",
+      "--self-source-mode",
+      "actuation",
+      "--prompt",
+      ".local/artifacts/athena-alpha/ac2/first-request.txt",
+      "--emit-symbols",
+      "128",
+      "--report",
+      ".local/artifacts/athena-alpha/ac1-contact-response/first-sixteen-actuation.json"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 76.6883606389747,
+    "max_rss_kib": 4757544
+  },
+  "comparison_process": {
+    "command": [
+      "target/debug/examples/alpha_text",
+      "--resume",
+      ".local/artifacts/athena-alpha/ac1-contact-response/first-sixteen-linear-v8.hna",
+      "--families",
+      "0",
+      "--self-source-contact",
+      "false",
+      "--prompt",
+      ".local/artifacts/athena-alpha/ac2/first-request.txt",
+      "--emit-symbols",
+      "128",
+      "--report",
+      ".local/artifacts/athena-alpha/ac1-contact-response/first-sixteen-withdrawal.json"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 76.22372992394958,
+    "max_rss_kib": 4757292
+  },
+  "checks": {
+    "complete_generation_equal_to_withdrawal": true,
+    "emission_current_history_equal_to_withdrawal": true,
+    "body_numerical_receivers_equal_to_withdrawal": true,
+    "prior_lineage_equal_to_withdrawal": true,
+    "all_generated_sources_retained": true,
+    "all_generated_contacts_are_material_actuation": true
+  },
+  "generation": {
+    "utf8": "I\u2019mn",
+    "octets": [
+      73,
+      226,
+      128,
+      153,
+      109,
+      110
+    ],
+    "disposition": {
+      "kind": "completed-part"
+    },
+    "native_from": 5126,
+    "native_until": 5133
+  },
+  "generation_lineage": [
+    {
+      "frame": 0,
+      "occurrence": 5126,
+      "predecessor_state": 5125,
+      "received_from": 5125,
+      "source_contact": {
+        "material-actuation": {
+          "coordinate": 73,
+          "quadrature": "imaginary"
+        }
+      }
+    },
+    {
+      "frame": 0,
+      "occurrence": 5127,
+      "predecessor_state": 5126,
+      "received_from": 5126,
+      "source_contact": {
+        "material-actuation": {
+          "coordinate": 226,
+          "quadrature": "imaginary"
+        }
+      }
+    },
+    {
+      "frame": 0,
+      "occurrence": 5128,
+      "predecessor_state": 5127,
+      "received_from": 5127,
+      "source_contact": {
+        "material-actuation": {
+          "coordinate": 128,
+          "quadrature": "imaginary"
+        }
+      }
+    },
+    {
+      "frame": 0,
+      "occurrence": 5129,
+      "predecessor_state": 5128,
+      "received_from": 5128,
+      "source_contact": {
+        "material-actuation": {
+          "coordinate": 153,
+          "quadrature": "imaginary"
+        }
+      }
+    },
+    {
+      "frame": 0,
+      "occurrence": 5130,
+      "predecessor_state": 5129,
+      "received_from": 5129,
+      "source_contact": {
+        "material-actuation": {
+          "coordinate": 109,
+          "quadrature": "imaginary"
+        }
+      }
+    },
+    {
+      "frame": 0,
+      "occurrence": 5131,
+      "predecessor_state": 5130,
+      "received_from": 5130,
+      "source_contact": {
+        "material-actuation": {
+          "coordinate": 110,
+          "quadrature": "imaginary"
+        }
+      }
+    },
+    {
+      "frame": 0,
+      "occurrence": 5132,
+      "predecessor_state": 5131,
+      "received_from": 5131,
+      "source_contact": {
+        "material-actuation": {
+          "coordinate": 256,
+          "quadrature": "imaginary"
+        }
+      }
+    }
+  ],
+  "prompt_and_emission_wall_seconds": 36.029461224,
+  "return_storage": {
+    "bound_octets": 324032,
+    "current_factor_octets": 1640898048,
+    "internal_delta_octets": 820449024,
+    "port_octets": 34995456,
+    "returns": 5063,
+    "total_octets": 2496666560
+  },
+  "final_native_census_before_diagnostics": {
+    "allocations": 103710,
+    "captured_launches": 159,
+    "control_launches": 0,
+    "deed_launches": 76,
+    "device_to_device_octets": 0,
+    "egress_receipt_octets": 4864,
+    "egress_section_octets": 57568,
+    "ingress_octets": 4641468336,
+    "resident_octets_now": 4699445344,
+    "resident_octets_peak": 4720814036,
+    "section_read_outs": 7,
+    "synchronizations": 76
+  },
+  "language_quality_established": false,
+  "restart": {
+    "split_process": {
+      "command": [
+        "target/debug/examples/alpha_actuation_restart",
+        "split",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-sixteen-linear-v8.hna",
+        ".local/artifacts/athena-alpha/ac2/first-request.txt",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-sixteen-actuation-split.hna",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-sixteen-actuation-final.hna",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-sixteen-actuation-split.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 103.1180646540015,
+      "max_rss_kib": 4998832
+    },
+    "resume_process": {
+      "command": [
+        "target/debug/examples/alpha_actuation_restart",
+        "resume",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-sixteen-actuation-split.hna",
+        "-",
+        "-",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-sixteen-actuation-resumed-final.hna",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-sixteen-actuation-resumed.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 51.249949597986415,
+      "max_rss_kib": 5043012
+    },
+    "split_occurrences": 5129,
+    "final_occurrences": 5133,
+    "complete_continuation_equal": true,
+    "complete_final_checkpoint_byte_equal": true,
+    "final_checkpoint_bytes": 2347870790,
+    "split_checkpoint_bytes": 2346695218,
+    "split_after_generated_occurrences": 3,
+    "remaining_octets": [
+      153,
+      109,
+      110
+    ],
+    "remaining_disposition": {
+      "kind": "completed-part"
+    }
+  },
+  "verification": [
+    {
+      "log": "field-suite.txt",
+      "command": "cargo test -p holonic-engine --lib native_ecology::constitutive_fibre::field -- --include-ignored --test-threads=1"
+    },
+    {
+      "log": "field-retry.txt",
+      "command": "cargo test -p holonic-engine --lib shared_drive_mode_cancels_future_forcing_before_numerical_projection -- --include-ignored --test-threads=1"
+    },
+    {
+      "log": "alpha-sdk.txt",
+      "command": "cargo test -p holonics-hna --lib 'alpha::' -- --include-ignored --test-threads=1"
+    },
+    {
+      "log": "driver-controls.txt",
+      "command": "cargo test -p holonics-hna --example alpha_text -- --include-ignored --skip partial_actual_part --test-threads=1"
+    },
+    {
+      "log": "restart-build.txt",
+      "command": "cargo build -p holonics-hna --example alpha_actuation_restart"
+    }
+  ]
+}

@@ -347,7 +347,7 @@ impl<'c> NativeConstitutiveField<'c> {
             .filter_map(|at| {
                 self.history[at]
                     .lineage
-                    .received_from
+                    .observed_source()
                     .filter(|s| *s >= minimum)
                     .map(|s| (at, s))
             })
@@ -397,7 +397,7 @@ impl<'c> NativeConstitutiveField<'c> {
                 .map_err(invalid)?,
         )?;
         let output = surface.fresh_section(1, 92 * n + 32, ResidentGrain(0))?;
-        let direct = self.history[cut].lineage.received_from == Some(source);
+        let direct = self.history[cut].lineage.observed_source() == Some(source);
         let src = self.history[source]
             .resident()?
             .transport

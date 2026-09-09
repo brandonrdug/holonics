@@ -445,7 +445,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 .collect(),
             radius: rat(values[at + real]),
         };
-        let linked = self.history[occurrence].lineage.received_from.is_some();
+        let linked = self.history[occurrence].lineage.observed_source().is_some();
         Ok(Some(NativeFieldMaterialTransportReading {
             forward: ball(0, target),
             observed: ball(2 * stride, target),
@@ -524,7 +524,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 .ok_or(ConstitutiveFibreError::Uncertain)?;
             let delta = numerical_delta(&reading, grain);
             if at == occurrence {
-                let Some(source) = self.history[at].lineage.received_from else {
+                let Some(source) = self.history[at].lineage.observed_source() else {
                     return Ok(None);
                 };
                 let source = self
@@ -574,7 +574,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             let reading = self
                 .inspect_material_transport(at)?
                 .ok_or(ConstitutiveFibreError::Uncertain)?;
-            if let Some(source) = self.history[at].lineage.received_from {
+            if let Some(source) = self.history[at].lineage.observed_source() {
                 let x = &encoder[source].outgoing;
                 let y = self
                     .inspect_incoming(at)?

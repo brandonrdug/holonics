@@ -1,6 +1,20 @@
 use super::*;
 
 impl<'chart> ResidentSurface<'chart> {
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_material_actuation(&self,lane:&Lane<'_,'chart>,input:&ResidentSection<'chart>,
+        nodes:usize,targets:usize,width:u32,grain:u32,quadrature:crate::native_ecology::constitutive_fibre::NativePacketQuadrature,
+        coordinate:usize,output:&ResidentSection<'chart>)->Result<(),ResidentRefusal>{
+        if nodes==0||targets==0||targets>u32::MAX as usize/4||coordinate>=targets||width<2||nodes%(width as usize)!=0
+            ||!(1..=120).contains(&grain)||input.rows!=nodes||input.width!=3||input.grain.0!=0||output.rows!=1||output.width!=4*targets+2||output.grain.0!=0{
+            return Err(ResidentRefusal::Declaration{operation:"material-actuation",what:"incompatible tensor-basis actuation".into()});
+        }
+        let mut p=Params::new();p.ptr(input.lo.device_ptr()).u32(nodes as u32).u32(targets as u32).u32(width).u32(grain)
+            .u32(if matches!(quadrature,crate::native_ecology::constitutive_fibre::NativePacketQuadrature::Real){0}else{1})
+            .u32(coordinate as u32).ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr()).ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_field_material_actuation",1,self.declaration.warp_size.max(1),0,&mut p,"material-actuation")
+    }
+
     pub(crate) fn record_field_material_current_covector(&self,lane:&Lane<'_,'chart>,
         prediction:&ResidentSection<'chart>,observation:&ResidentSection<'chart>,targets:usize,
         output:&ResidentSection<'chart>)->Result<(),ResidentRefusal>{

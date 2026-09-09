@@ -43,6 +43,14 @@ response; the cold remainder stays available to a separating branch receiver. Th
 concrete instance of the existing native condensation discipline. It does not prescribe six
 HNN channels or replace the native contextual construction with this exterior law.
 
+[established-bounded; source-inspected] The [native actuation refinement](../research/records/2026-09-09_PARALLEL_MATHEMATICS_DISTINGUISHES_A_MATERIAL_ACTUATION_FROM_A_NEW_OBSERVATION.md)
+uses these parallel owners to distinguish applying a fixed receiver face from adding an observed
+relation. The original current family and causal source remain available, while the known
+application advances the same native recurrence without fitting its own projection. This is a
+scoped tensor/material construction; generator reuse across changing contacts and useful language
+remain open. Complete source-qualified continuation, not equality of selected words alone, is
+its persistence comparison.
+
 ## One framework, several realizations
 
 [definition] The subsequent [complex-fluid and plan revision](../research/records/2026-09-08_COMPLEX_FLUID_CHARTS_RETAIN_THE_FOLDED_CURRENT_AND_THE_RECEIVER_BOUND.md)

@@ -68,7 +68,7 @@ pub use material_transport::{
     NativeMomentMaterialReading, NativeContextualMaterialReading, NativeOperativeContextReading, NativeVisibleSourceReading,
 };
 pub use receiver::{NativeFieldDifferentialReading, NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn,
-    NativeMaterialPacketReading, NativePacketQuadrature,
+    NativeMaterialPacketReading, NativePacketQuadrature, NativeMaterialActuation,
     NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading};
 pub use resident_input::NativeFieldIncoming;
 pub use rest::NativeFieldRest;
@@ -94,6 +94,7 @@ pub struct NativeFieldSourceAnchor {
 pub enum NativeFieldSourceContact {
     Emission,
     RetainedAnchor,
+    MaterialActuation { quadrature:NativePacketQuadrature, coordinate:usize },
 }
 
 #[derive(Debug)]
@@ -101,12 +102,19 @@ pub struct NativeFieldOccurrence {
     incoming: Vec<NativePhaseCurrent>,
     source: Option<NativeFieldEmission>,
     anchor: Option<NativeFieldSourceAnchor>,
+    actuation:Option<NativeMaterialActuation>,
 }
 
 impl NativeFieldOccurrence {
+    pub fn actuating(source:NativeFieldEmission,incoming:Vec<NativePhaseCurrent>,actuation:NativeMaterialActuation)->Self{
+        Self{incoming,source:Some(source),anchor:None,actuation:Some(actuation)}
+    }
+    pub fn material_actuation(&self)->Option<&NativeMaterialActuation>{self.actuation.as_ref()}
+
     pub fn entering(incoming: Vec<NativePhaseCurrent>) -> Self {
         Self {
             incoming,
+            actuation:None,
             source: None,
             anchor: None,
         }
@@ -114,6 +122,7 @@ impl NativeFieldOccurrence {
     pub fn through(source: NativeFieldEmission, incoming: Vec<NativePhaseCurrent>) -> Self {
         Self {
             incoming,
+            actuation:None,
             source: Some(source),
             anchor: None,
         }
@@ -126,6 +135,7 @@ impl NativeFieldOccurrence {
     ) -> Self {
         Self {
             incoming,
+            actuation:None,
             source: None,
             anchor: Some(anchor.clone()),
         }
@@ -154,6 +164,13 @@ pub struct NativeFieldLineage {
     pub source_contact: Option<NativeFieldSourceContact>,
     /// Complete exterior excitation field, not a semantic feature vector or a fitted source.
     pub incoming: NativeFieldIncoming,
+}
+
+impl NativeFieldLineage {
+    /// An applied transport retains its source edge without adding an observed relation.
+    pub fn observed_source(&self)->Option<usize>{
+        if matches!(self.source_contact,Some(NativeFieldSourceContact::MaterialActuation{..})){None}else{self.received_from}
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, Serialize)]
@@ -480,7 +497,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             receiver: receiver(current_at)?,
             former_receiver: event
                 .lineage
-                .received_from
+                .observed_source()
                 .map(|_| receiver(current_at + width + 4))
                 .transpose()?,
             formed_pivot,
@@ -609,6 +626,13 @@ impl<'chart> NativeConstitutiveField<'chart> {
         } else {
             None
         };
+        let actuation=if let Some(a)=&occurrence.actuation {
+            let source=occurrence.source.as_ref().ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
+            if resident_current.is_some() || !a.describes_source(source) || !Rc::ptr_eq(&self.owner,&a.owner)
+                || Some(a.reading.target_chart)!=self.material_target(){return Err(ConstitutiveFibreError::ForeignOccurrence);}
+            Some((a.reading.quadrature,a.reading.selected.ok_or(ConstitutiveFibreError::Uncertain)?))
+        }else{None};
+        let observed_source_at=if actuation.is_some(){None}else{source_at};
         if let Some(at) = source_at {
             self.mount_history_source(at)?;
         }
@@ -617,7 +641,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .occurrences
             .checked_add(1)
             .ok_or(ConstitutiveFibreError::Shape)?;
-        if source_at.is_some() {if let Some(o)=self.junction.as_mut().and_then(|j|j.operative.as_mut()) {o.births.try_reserve(1).map_err(|_|ConstitutiveFibreError::Shape)?;}}
+        if observed_source_at.is_some() {if let Some(o)=self.junction.as_mut().and_then(|j|j.operative.as_mut()) {o.births.try_reserve(1).map_err(|_|ConstitutiveFibreError::Shape)?;}}
         self.history
             .try_reserve(1)
             .map_err(|_| ConstitutiveFibreError::Shape)?;
@@ -627,7 +651,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             frame: self.frame.view.ordinal,
             predecessor_state: at.checked_sub(1),
             received_from: source_at,
-            source_contact: occurrence
+            source_contact: if let Some((quadrature,coordinate))=actuation {Some(NativeFieldSourceContact::MaterialActuation{quadrature,coordinate})}else{occurrence
                 .source
                 .as_ref()
                 .map(|_| NativeFieldSourceContact::Emission)
@@ -636,7 +660,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                         .anchor
                         .as_ref()
                         .map(|_| NativeFieldSourceContact::RetainedAnchor)
-                }),
+                })},
             incoming: if resident_current.is_some() {
                 NativeFieldIncoming::Resident {
                     resident_nodes: self.nodes(),
@@ -675,8 +699,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
             return Err(ConstitutiveFibreError::Rest("the fixed-contact material source cannot read changed operative contacts".into()));
         }
         let material_target=self.transport.as_ref().map_or((self.nodes(),0),|t|(t.target.dimension(self.nodes()).unwrap(),t.target.kernel()));
-        let prepared = self.prepare_junction(source_at.is_some())?;
-        let prepared_transport = self.prepare_material_transport(source_at)?;
+        let prepared = self.prepare_junction(observed_source_at.is_some())?;
+        let prepared_transport = self.prepare_material_transport(observed_source_at)?;
+        let actuation_target=actuation.map(|_|surface.fresh_section(1,4*material_target.0+2,ResidentGrain(0))).transpose()?;
         let lineage_lanes = if resident_current.is_some() {
             vec![vec![], vec![0]]
         } else {
@@ -697,11 +722,14 @@ impl<'chart> NativeConstitutiveField<'chart> {
         };
         {
             let lane = passage.open(field_lane, &predecessors)?;
+            if let Some((quadrature,coordinate))=actuation {
+                surface.record_material_actuation(&lane,&input,self.nodes(),material_target.0,material_target.1,self.transport_grain()?,quadrature,coordinate,actuation_target.as_ref().unwrap())?;
+            }
             if let Some(refresh) = prepared_transport.as_ref().and_then(|p| p.refresh.as_ref()) {
                 if let Some(weights) = &refresh.moment_weights {
                     surface.record_moment_source_current(
                         &lane,
-                        self.history[source_at.expect("refresh source")]
+                        self.history[observed_source_at.expect("refresh source")]
                             .resident()?
                             .transport
                             .as_ref()
@@ -716,7 +744,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 } else {
                     surface.record_complete_material_source_current(
                         &lane,
-                        self.history[source_at.expect("refresh source")]
+                        self.history[observed_source_at.expect("refresh source")]
                             .resident()?
                             .transport
                             .as_ref()
@@ -734,11 +762,11 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 &mut self.memory,
                 &mut self.relation.basis,
                 &input,
-                source_at
+                observed_source_at
                     .map(|i| self.history[i].resident().map(|h| &h.section))
                     .transpose()?,
                 &self.frame.native,
-                source_at.map(|i| &self.history[i].frame.native),
+                observed_source_at.map(|i| &self.history[i].frame.native),
                 self.junction
                     .as_ref()
                     .zip(prepared.as_ref())
@@ -758,13 +786,13 @@ impl<'chart> NativeConstitutiveField<'chart> {
                     .map(|(old, next)| {
                         (
                             &mut old.state,
-                            source_at.and_then(|i| {
+                            observed_source_at.and_then(|i| {
                                 self.history[i]
                                     .resident
                                     .as_ref()
                                     .and_then(|h| h.junction.as_deref())
                             }),
-                            source_at.and_then(|i| {
+                            observed_source_at.and_then(|i| {
                                 self.history[i]
                                     .resident
                                     .as_ref()
@@ -781,7 +809,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                     .as_ref()
                     .and_then(|p| p.moment.as_ref())
                     .map(|p| (&p.table, p.count, &p.weights)),
-                prepared_transport.as_ref().and_then(|p|p.contextual.as_ref()).map(|p|(&p.table,&p.weights,&p.evaluations,source_at.unwrap_or(0) as u64)),
+                prepared_transport.as_ref().and_then(|p|p.contextual.as_ref()).map(|p|(&p.table,&p.weights,&p.evaluations,observed_source_at.unwrap_or(0) as u64)),
                 prepared.as_ref().and_then(|(p,_)|p.operative.as_ref()).map(|p|&p.table),
                 material_target,
                 &output,
@@ -825,7 +853,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         }
         // Observer failure retains the existing pending/uncertain state; it is not rollback.
         // The resident callback is unit-valued and performs no section readout.
-        let observed = observe(self, source_at, occurrence)?;
+        let observed = observe(self, observed_source_at, occurrence)?;
         if occurrence.source.is_some() {
             self.history[source_at.expect("linear source")].returned = true;
         }
@@ -839,7 +867,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 .expect("existing junction")
                 .representation;
             let mut operative=self.junction.as_mut().unwrap().operative.take();
-            if let Some(pending)=next.operative.take() {operative.as_mut().unwrap().receive(pending,source_at,at);}
+            if let Some(pending)=next.operative.take() {operative.as_mut().unwrap().receive(pending,observed_source_at,at);}
             self.junction = Some(PairedJunction {
                 representation,
                 solver: self.junction.as_ref().expect("existing junction").solver,

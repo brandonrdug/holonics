@@ -253,7 +253,7 @@ impl<'c> NativeConstitutiveField<'c> {
         let right_prefix = right
             .checked_sub(1)
             .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
-        if right >= self.history.len() || self.history[right].lineage.received_from.is_none() {
+        if right >= self.history.len() || self.history[right].lineage.observed_source().is_none() {
             return Err(ConstitutiveFibreError::ForeignOccurrence);
         }
         // Cancel the shared CURRENT prefix symbolically. Only the two birth prefixes remain.

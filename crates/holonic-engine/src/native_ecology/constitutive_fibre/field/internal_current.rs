@@ -152,7 +152,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         }
         let source = self.history[receiving]
             .lineage
-            .received_from
+            .observed_source()
             .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
         let before = receiving
             .checked_sub(1)

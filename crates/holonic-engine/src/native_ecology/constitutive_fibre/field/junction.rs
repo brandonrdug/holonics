@@ -310,7 +310,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         let sign = Rat::from_integer(if self.history.len() % 2 == 1 { 1 } else { -1 }.into());
         let mut internal = Vec::new();
         for (receiving, event) in self.history.iter().enumerate() {
-            let Some(source_at) = event.lineage.received_from else {
+            let Some(source_at) = event.lineage.observed_source() else {
                 continue;
             };
             let source = &self.history[source_at];

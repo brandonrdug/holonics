@@ -148,17 +148,20 @@ unusable, including a seen-request continuation; the first eight families provid
 request's small exposure.
 
 [established-bounded; measured] The [producer/source-contact comparison](../../research/records/2026-09-09_AC1_AC2_PRODUCER_REUSE_AND_THE_SELF_CONTACT_COMPARISON.md)
-returns the sixteen-family failure, exact producer reuse and measured journal storage. The next
-AC1–AC2 operation preserves the source edge while distinguishing known native transport application
-from a new observation to fit. Source withdrawal remains a diagnostic intervention. Do not
-substitute it, an output filter or a separate world-verdict law for that construction.
+returns the sixteen-family failure, exact producer reuse and measured journal storage. The
+[parallel-mathematics actuation refinement](../../research/records/2026-09-09_PARALLEL_MATHEMATICS_DISTINGUISHES_A_MATERIAL_ACTUATION_FROM_A_NEW_OBSERVATION.md)
+now preserves the source edge while applying a retained material face without inventing a new
+observation to fit. Native and pending-session controls pass. The actual model still emits
+`I’mn` and stops; this is unusable. Source withdrawal remains a diagnostic intervention.
+Continue AC1's path/generator reuse and AC2's productive response construction through the same
+native ecology; do not substitute an output filter or separate world-verdict law.
 
 [definition] Proceed with AC1 steps 3–4: local path formation, restriction/rebase and generator
 reuse. Derive the actively used coordinates and their continuing source/decoder through the
 actual receiver family. Retain the numerical defect and actual producing morphology. The
 [parallel calculus integration](../../research/records/2026-09-08_AC_THE_PARALLEL_RECEIVER_CALCULUS_REFINES_NATIVE_CONTINUATION.md)
-identifies the current amplitude-fit/normalized-potential mismatch and derives AC1's fixed-contact
-aggregate/parity reuse law. Continue path growth and generator reuse through the joint boundary,
+records the earlier metric mismatch, since aligned locally by `SquaredCurrent`, and derives
+AC1's fixed-contact aggregate/parity reuse law. Continue path growth and generator reuse through the joint boundary,
 material-query and changing-contact family; its internal remainder cannot be discarded merely
 because the current boundary is blind to it. Inspect actual continuation after the changed law.
 Do not substitute a grammar emitter, observed-word filter, authored classifier or larger unchanged
@@ -190,7 +193,7 @@ complete population bounds, not an arbitrary radius, discarded current or basin-
 
 [project-postulate] Brandon has resumed completion of AC0–AC5 as the active goal and explicitly
 directs flexible designs and transparent reporting when a composition does not work.
-**Current work: AC1–AC2 retained-transport application versus new observation; journal representation and useful generation remain open.** Each work update names phase/step, actual artifact and returned
+**Current work: AC1 steps 3–4 journal/generator reuse and AC2 useful continuation; source-preserving material actuation is implemented.** Each work update names phase/step, actual artifact and returned
 consequence. Do not resume the preserved joint kernel by default or restart completed foundations.
 
 | Phase | Ordered construction | Return required |

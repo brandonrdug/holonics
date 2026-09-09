@@ -297,7 +297,7 @@ impl<'c> NativeConstitutiveField<'c> {
             .enumerate()
             .filter_map(|(receiving, h)| {
                 h.lineage
-                    .received_from
+                    .observed_source()
                     .map(|source| NativeOperativeContactBirth { source, receiving })
             })
             .collect::<Vec<_>>();

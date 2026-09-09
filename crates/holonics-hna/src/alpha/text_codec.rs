@@ -158,21 +158,7 @@ pub fn read_text_symbol_on(
         let reading = field
             .read_material_packet_quadrature(occurrence, direction.quadrature())?
             .ok_or_else(|| AlphaMaterialError::Apparatus("missing material packet".into()))?;
-        let disposition = match reading.selected {
-            Some(code) => match TextSymbol::from_codeword(u16::try_from(code).map_err(|_| {
-                AlphaMaterialError::Apparatus("packet coordinate outside text chart".into())
-            })?) {
-                Some(symbol) => TextCodeDisposition::Symbol { symbol },
-                None => TextCodeDisposition::Reserved {
-                    codeword: code as u16,
-                },
-            },
-            None => TextCodeDisposition::Open,
-        };
-        return Ok(TextCodeReading {
-            native: TextNativeReading::Packet(reading),
-            disposition,
-        });
+        return present_material_packet(reading);
     }
     if direction != TextDirection::Incoming {
         return Err(AlphaMaterialError::Apparatus(
@@ -188,6 +174,16 @@ pub fn read_text_symbol_on(
         AlphaMaterialError::Apparatus("text codec requires a junction outgoing current".into())
     })?;
     Ok(from_differential(native))
+}
+
+pub(crate) fn present_material_packet(reading:NativeMaterialPacketReading)->Result<TextCodeReading,AlphaMaterialError>{
+    let disposition=match reading.selected {
+        Some(code)=>match TextSymbol::from_codeword(u16::try_from(code).map_err(|_|AlphaMaterialError::Apparatus("packet coordinate outside text chart".into()))?){
+            Some(symbol)=>TextCodeDisposition::Symbol{symbol},None=>TextCodeDisposition::Reserved{codeword:code as u16},
+        },
+        None=>TextCodeDisposition::Open,
+    };
+    Ok(TextCodeReading{native:TextNativeReading::Packet(reading),disposition})
 }
 
 /// Present the whole local constitutive fibre at an actual source. Differential signs can be

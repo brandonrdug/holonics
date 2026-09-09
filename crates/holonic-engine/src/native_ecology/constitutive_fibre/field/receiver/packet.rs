@@ -27,7 +27,49 @@ pub struct NativeMaterialPacketReading {
     pub selected: Option<usize>,
     pub unexcluded: Vec<usize>,
 }
+/// Source-qualified actuation witness, issued from an actual retained material reading.
+#[derive(Debug)]
+pub struct NativeMaterialActuation {
+    pub(in super::super) owner: Rc<()>,
+    pub(in super::super) reading: NativeMaterialPacketReading,
+}
+impl NativeMaterialActuation {
+    pub fn reading(&self) -> &NativeMaterialPacketReading {
+        &self.reading
+    }
+    pub fn describes_source(&self, source: &NativeFieldEmission) -> bool {
+        Rc::ptr_eq(&self.owner, &source.owner) && self.reading.occurrence == source.occurrence
+    }
+}
 impl NativeConstitutiveField<'_> {
+    pub fn read_material_actuation(
+        &self,
+        source: &NativeFieldEmission,
+        quadrature: NativePacketQuadrature,
+    ) -> Result<NativeMaterialActuation, ConstitutiveFibreError> {
+        if !Rc::ptr_eq(&self.owner, &source.owner)
+            || self
+                .history
+                .get(source.occurrence)
+                .is_none_or(|h| h.returned)
+        {
+            return Err(ConstitutiveFibreError::ForeignOccurrence);
+        }
+        if !matches!(
+            self.material_target(),
+            Some(NativeMaterialTarget::TensorProduct { .. })
+        ) {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let reading = self
+            .read_material_packet_quadrature(source.occurrence, quadrature)?
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        Ok(NativeMaterialActuation {
+            owner: self.owner.clone(),
+            reading,
+        })
+    }
+
     pub fn read_material_packet(
         &self,
         occurrence: usize,
@@ -123,3 +165,6 @@ impl NativeMaterialPacketReading {
         })
     }
 }
+
+#[cfg(test)]
+mod tests;

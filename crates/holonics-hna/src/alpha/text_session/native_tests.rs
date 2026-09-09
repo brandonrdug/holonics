@@ -287,3 +287,33 @@ fn source_withdrawal_is_an_incidence_intervention_not_a_state_reset(){
         Ok(())
     }).unwrap();
 }
+
+#[test]
+#[ignore="requires CUDA; source-preserving material actuation and pending witness restart"]
+fn material_actuation_generation_keeps_source_and_pending_witness(){
+    use crate::alpha::text_codec::with_text_field_chart;
+    use holonic_engine::native_ecology::constitutive_fibre::{NativeMaterialTarget,NativePacketQuadrature,NativeFieldSourceContact};
+    let dir=tempfile::tempdir().unwrap();let path=dir.path().join("pending-actuation.hna");
+    let (expected,generation)=with_text_field_chart(72,NativeMaterialTransportSource::OperativeBoundary,NativeMaterialTarget::TensorProduct{factor_width:2},|field|{
+        let mut s=TextFieldSession::on(field)?;s.enable_duplex()?;
+        s.receive(TextSymbol::Octet(b'A'))?;s.receive_on(TextSymbol::Octet(b'B'),TextDirection::Outgoing)?;
+        let witness=s.field().read_material_actuation(&s.latest.as_ref().unwrap().source,NativePacketQuadrature::Imaginary)?;
+        assert_eq!(s.stage_material_actuation(witness)?,TextSymbol::Octet(b'B'));
+        assert!(s.pending.as_ref().unwrap().1.material_actuation().is_some());
+        s.checkpoint(&path,&[],b"material actuation")?;
+        let before=s.stage_operative_contacts()?.inspect()?;
+        s.retry_pending()?;let generation=s.generate(4);
+        assert!(generation.native_until>generation.native_from);
+        for at in 2..generation.native_until {
+            let row=s.field().lineage(at).unwrap();assert_eq!(row.received_from,Some(at-1));assert!(row.observed_source().is_none());
+            assert!(matches!(row.source_contact,Some(NativeFieldSourceContact::MaterialActuation{quadrature:NativePacketQuadrature::Imaginary,..})));
+        }
+        let after=s.stage_operative_contacts()?.inspect()?;assert_eq!(after.births,before.births);assert_eq!(after.contacts,before.contacts);
+        Ok((s.field().rest(&[s.latest.as_ref().map(|v|&v.source)],&[])?,serde_json::to_value(generation).unwrap()))
+    }).unwrap();
+    SavedTextField::read(&path).unwrap().with_session(|s,_,_,app|{
+        assert_eq!(app,b"material actuation");assert!(s.pending.as_ref().unwrap().1.material_actuation().is_some());
+        s.retry_pending()?;assert_eq!(serde_json::to_value(s.generate(4)).unwrap(),generation);
+        assert_eq!(s.field().rest(&[s.latest.as_ref().map(|v|&v.source)],&[])?,expected);Ok(())
+    }).unwrap();
+}

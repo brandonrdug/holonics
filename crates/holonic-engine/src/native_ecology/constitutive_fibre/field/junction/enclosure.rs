@@ -161,7 +161,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .history
             .get(receiving)
             .ok_or(ConstitutiveFibreError::ForeignOccurrence)?;
-        let Some(source) = event.lineage.received_from else {
+        let Some(source) = event.lineage.observed_source() else {
             return Ok(None);
         };
         let mut d = self.root_junction_source(source)?;
@@ -233,7 +233,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         };
         let mut values = Vec::new();
         for (at, event) in self.history.iter().enumerate() {
-            let Some(source) = event.lineage.received_from else {
+            let Some(source) = event.lineage.observed_source() else {
                 continue;
             };
             let contact = self.junction_contact(at)?.expect("linked contact");
@@ -398,7 +398,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         let zero = vec![ExactComplexWaveCurrent::zero(); 3 * self.nodes()];
         let mut values = Vec::new();
         for (at, event) in self.history.iter().enumerate() {
-            let Some(source) = event.lineage.received_from else {
+            let Some(source) = event.lineage.observed_source() else {
                 continue;
             };
             let contact = self.junction_contact(at)?.expect("linked contact");

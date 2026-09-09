@@ -132,7 +132,7 @@ impl NativeConstitutiveField<'_> {
                 .map(|v| v.current())
                 .collect::<Vec<_>>();
             check_ball(&observed, &reading.observed)?;
-            if let Some(source) = self.history[at].lineage.received_from {
+            if let Some(source) = self.history[at].lineage.observed_source() {
                 let old = apply(&exact, &exact_sources[source]);
                 check_ball(&old, reading.contemporary_source_forward.as_ref().unwrap())?;
                 check_ball(

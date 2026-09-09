@@ -16,7 +16,7 @@ impl<'c> NativeConstitutiveField<'c> {
         if receiving[0] >= receiving[1] {
             return Err(ConstitutiveFibreError::Shape);
         }
-        let source = receiving.map(|at| self.history.get(at).and_then(|h| h.lineage.received_from));
+        let source = receiving.map(|at| self.history.get(at).and_then(|h| h.lineage.observed_source()));
         let [Some(s0), Some(s1)] = source else {
             return Err(ConstitutiveFibreError::ForeignOccurrence);
         };
@@ -131,7 +131,7 @@ impl<'c> NativeConstitutiveField<'c> {
             ambient_context_complex: 3 * n
                 + self.history[..=context[1]]
                     .iter()
-                    .filter(|h| h.lineage.received_from.is_some())
+                    .filter(|h| h.lineage.observed_source().is_some())
                     .count(),
             fractional_bits: grain,
         };

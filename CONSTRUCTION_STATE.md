@@ -65,10 +65,19 @@ for older cuts. All 108 field and 24 alpha SDK tests pass. The sixteen-family mo
 2,496,666,560 native bytes and dominates remaining memory. Source-contact withdrawal changes the
 response to `I’mn` and `EndPart`; neither response is useful and withdrawal is not the default.
 
-[definition] Next distinguish applying a retained native transport from adding a new observation,
-keeping its source edge, original current/receiver family and pending-state continuation in the
-same recurrence. The withdrawal comparison is attribution evidence, not the replacement law.
-Lawful return-journal representation and useful contextual generation remain open.
+[established-bounded; measured] The [parallel-mathematics actuation refinement](research/records/2026-09-09_PARALLEL_MATHEMATICS_DISTINGUISHES_A_MATERIAL_ACTUATION_FROM_A_NEW_OBSERVATION.md)
+now applies a retained material face with its actual source edge, without fitting that selection
+as a new observation. All 110 field cases pass across the suite and one isolated allocation retry;
+25 alpha SDK tests and two driver controls pass. The saved sixteen-family model emits `I’mn`
+and `EndPart`: numerical continuation matches withdrawal, while all seven generated source edges
+are retained. Pending-witness continuation passes; a checkpoint taken during generation also
+restarts in a fresh process with identical continuation and complete final checkpoint bytes.
+This is a bounded causal-source repair, not useful Athena-alpha.
+
+[definition] Next continue AC1 steps 3–4 through the journal's repeated response carriers and
+actual generator/decoder family; retain contributions exposed by changing morphology. AC2 useful
+contextual generation remains open. The parallel torus, joint-receiver and changing-defect laws
+supply concrete reuse criteria, not a license to discard internal current.
 
 [established-bounded; source-inspected] The [finite material composition](research/records/2026-09-09_AC1_THE_FINITE_MATERIAL_OPERATOR_RETURNS_THROUGH_ITS_PRODUCER.md)
 now binds the existing complex-current operator to the operative boundary and independent joint
@@ -137,7 +146,7 @@ decisions exactly. Neither this repair nor local test success establishes useful
 
 [definition] AC1 steps 3–4 retain local path formation, restriction/rebase and generator reuse
 through the actual receiver family. The boundary-query return above supplies a changed family;
-the duplex codec and finite material operator are now implemented. The next composition above
+the duplex codec and finite material operator are now implemented. The actuation composition above
 keeps source lineage while separating retained-transport application from new observation. The common-current
 metric changes native conduct but leaves the language loop unchanged. Its recurrent retained-history
 representation is still far too large for the exposure, despite the report/checkpoint reduction

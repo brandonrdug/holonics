@@ -145,7 +145,7 @@ impl NativeConstitutiveField<'_> {
         if receiving[0] >= receiving[1] {
             return Err(ConstitutiveFibreError::Shape);
         }
-        let source = receiving.map(|at| self.history.get(at).and_then(|h| h.lineage.received_from));
+        let source = receiving.map(|at| self.history.get(at).and_then(|h| h.lineage.observed_source()));
         let [Some(s0), Some(s1)] = source else {
             return Err(ConstitutiveFibreError::ForeignOccurrence);
         };
@@ -241,7 +241,7 @@ impl NativeConstitutiveField<'_> {
             .map(|at| {
                 self.history
                     .get(*at)
-                    .and_then(|h| h.lineage.received_from)
+                    .and_then(|h| h.lineage.observed_source())
                     .ok_or(ConstitutiveFibreError::ForeignOccurrence)
             })
             .collect::<Result<Vec<_>, _>>()?;
@@ -255,7 +255,7 @@ impl NativeConstitutiveField<'_> {
         let until = *contexts.iter().max().expect("nonempty contexts");
         let trace = self.decode_junction_residual_trace(until)?;
         let contacts = (0..=until)
-            .filter(|at| self.history[*at].lineage.received_from.is_some())
+            .filter(|at| self.history[*at].lineage.observed_source().is_some())
             .map(|at| {
                 self.junction_contact(at)
                     .map(|d| (at, d.expect("linked contact")))

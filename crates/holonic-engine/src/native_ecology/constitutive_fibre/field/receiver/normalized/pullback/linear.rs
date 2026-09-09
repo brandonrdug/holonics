@@ -50,7 +50,7 @@ impl<'c> NativeConstitutiveField<'c> {
                 )
             };
             let p = report.lo_device_ptr() as i64;
-            let linked = i64::from(h.lineage.received_from.is_some());
+            let linked = i64::from(h.lineage.observed_source().is_some());
             pointers.extend([(p, p), (linked, linked)]);
             held.push(report);
         }

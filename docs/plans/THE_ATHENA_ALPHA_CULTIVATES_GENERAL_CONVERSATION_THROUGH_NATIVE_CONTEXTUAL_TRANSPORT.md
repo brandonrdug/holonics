@@ -440,16 +440,19 @@ The native and application checks pass, but both the fixed prompt and seen-reque
 remain unusable.
 
 [established-bounded; measured] The [producer/source-contact comparison](../../research/records/2026-09-09_AC1_AC2_PRODUCER_REUSE_AND_THE_SELF_CONTACT_COMPARISON.md)
-returns the sixteen-family failure, exact producer reuse and measured journal storage. The next
-AC1–AC2 operation preserves the source edge while distinguishing known native transport application
-from a new observation to fit. Source withdrawal remains a diagnostic intervention. Do not
-substitute it, an output filter or a separate world-verdict law for that construction.
+returns the sixteen-family failure, exact producer reuse and measured journal storage. The
+[parallel-mathematics actuation refinement](../../research/records/2026-09-09_PARALLEL_MATHEMATICS_DISTINGUISHES_A_MATERIAL_ACTUATION_FROM_A_NEW_OBSERVATION.md)
+now preserves the source edge while applying a retained material face without inventing a new
+observation to fit. Native and pending-session controls pass. The actual model still emits
+`I’mn` and stops; this is unusable. Source withdrawal remains a diagnostic intervention.
+Continue AC1's path/generator reuse and AC2's productive response construction through the same
+native ecology; do not substitute an output filter or separate world-verdict law.
 
 [definition] Proceed through AC1 steps 3–4: local path formation, restriction/rebase and
 generator reuse. Derive the actively used coordinates and their continuing source/decoder,
-including its numerical error/deposit law. The present
-amplitude-fit material update and normalized-potential contact response do not establish a common
-descent. The [parallel mathematics integration](../../research/records/2026-09-08_AC_THE_PARALLEL_RECEIVER_CALCULUS_REFINES_NATIVE_CONTINUATION.md)
+including its numerical error/deposit law. `SquaredCurrent` now aligns the local complex-current
+comparison of material and contact returns; neither that alignment nor the exact numerical
+deposit establishes a global descent or useful response. The [parallel mathematics integration](../../research/records/2026-09-08_AC_THE_PARALLEL_RECEIVER_CALCULUS_REFINES_NATIVE_CONTINUATION.md)
 also derives the paired fixed-contact aggregate/parity law and identifies the additional
 material-query and changing-contact receivers that AC1's restriction/rebase and generator reuse
 must carry. Use this concrete family when deriving the decoder and reopening changed contacts.
