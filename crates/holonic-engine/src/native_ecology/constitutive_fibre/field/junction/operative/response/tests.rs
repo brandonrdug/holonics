@@ -333,3 +333,82 @@ fn producing_carrier_reuse_preserves_the_complete_return(){
     assert_eq!(serde_json::to_value(reconstructed.inspect().unwrap()).unwrap(),expected);
     assert_eq!(field.rest(&[],&[]).unwrap(),before);
 }
+
+#[test]
+#[ignore = "requires CUDA; native response generators equal their full zero extension"]
+fn zero_extension_preserves_the_complete_contact_response_and_legacy_delta() {
+    let readout = ResidentReadout::new().unwrap();
+    let surface = ResidentSurface::on(&readout).unwrap();
+    let mut field = make(&surface);
+    let latest = populate(&mut field);
+    let response = returned(&field);
+    let source_count = response.query.contacts;
+    let view = field.stage_operative_contacts().unwrap();
+    let count = view.births.len();
+    assert!(source_count < count);
+    let original = surface.detach_section(&response.currents, 64).unwrap();
+    let mut expanded = vec![(0, 0); 8 * count.max(1)];
+    for factor in 0..2 {
+        expanded[4 * factor * count..4 * (factor * count + source_count)]
+            .copy_from_slice(&original.intervals[4 * factor * source_count..4 * (factor + 1) * source_count]);
+    }
+    let expanded = ResidentSectionRest::found(2, 4 * count.max(1), ResidentGrain(0), 64, expanded).unwrap();
+    let zero = ResidentSectionRest::found(count.max(1), 4, ResidentGrain(0), 64, vec![(0, 0); 4 * count.max(1)]).unwrap();
+    let dense_factors = Rc::new(surface.mount_section_rest(&expanded).unwrap());
+    let dense_zero = Rc::new(surface.mount_section_rest(&zero).unwrap());
+    for realization in [NativeContactRealization::EnclosedFlow, NativeContactRealization::DyadicDeposit] {
+        let delta = |dense| Rc::new(OperativeReturn {
+            at_cut: view.field_cut(), contact_count: count,
+            factor_count: if dense { count } else { source_count },
+            realization, origin: Rc::clone(&view.origin), ports: response.ports.clone(),
+            currents: if dense { dense_factors.clone() } else { response.currents.clone() },
+            b: dense.then(|| dense_zero.clone()), bounds: response.delta_bounds.clone(),
+        });
+        let before = view.field.census();
+        let compact = view.stage_return(delta(false)).unwrap();
+        assert_eq!(view.field.census().section_read_outs, before.section_read_outs);
+        let dense = view.stage_return(delta(true)).unwrap();
+        assert_eq!(serde_json::to_value(compact.inspect().unwrap()).unwrap(),
+            serde_json::to_value(dense.inspect().unwrap()).unwrap());
+        // These are read-only candidate sections over the same unmodified source field.
+        assert!(view.returns.is_empty());
+    }
+    drop(view);
+    field.apply_material_contact_realization(&response, NativeContactRealization::DyadicDeposit).unwrap();
+    drop(response);
+    let storage = field.operative_return_storage().unwrap();
+    assert_eq!(storage.internal_delta_octets, 0);
+    assert_eq!(storage.implicit_zero_delta_returns, 1);
+    assert!(storage.current_factor_octets < storage.logical_current_factor_octets);
+    let op = field.junction.as_ref().unwrap().operative.as_ref().unwrap();
+    let mut wire = op.wire();
+    let mut rest = op.rest(&surface).unwrap();
+    rest.validate(&wire, field.nodes()).unwrap();
+    assert!(wire.return_frames[0].zero_internal_delta);
+    rest.returns[0][2].intervals[0] = (1, 1);
+    assert!(rest.validate(&wire, field.nodes()).is_err());
+    // The original dense wire remains admissible and reduces only exact numerical zeros.
+    wire.return_frames[0].factor_count = None;
+    wire.return_frames[0].zero_internal_delta = false;
+    rest.returns[0][1] = expanded;
+    rest.returns[0][2] = zero;
+    rest.validate(&wire, field.nodes()).unwrap();
+    let mounted = OperativeState::remount(&surface, wire, rest, op.grain).unwrap();
+    assert!(mounted.returns[0].b.is_none());
+    assert_eq!(mounted.returns[0].contact_count, count);
+    assert_eq!(mounted.returns[0].factor_count, count);
+    assert_eq!(surface.detach_section(&mounted.sections.b, 64).unwrap(),
+        surface.detach_section(&op.sections.b, 64).unwrap());
+    drop(mounted);
+    // The compact wire also preserves actual later recurrence and producing-map recovery.
+    let saved = field.rest(&[Some(&latest)], &[]).unwrap();
+    drop(latest); drop(field);
+    let (mut field, mut sources, _) = NativeConstitutiveField::remount(&surface, saved).unwrap();
+    let next = field.advance_resident(&mut NativeFieldOccurrence::through(sources[0].take().unwrap(),
+        vec![phase(0, 1), phase(1, -1)])).unwrap();
+    let query = field.pull_back_material_current(next.lineage.occurrence).unwrap().unwrap();
+    field.junction.as_mut().unwrap().operative.as_mut().unwrap().recent_producers.clear();
+    let returned = field.material_contact_response(query).unwrap();
+    field.apply_material_contact_realization(&returned, NativeContactRealization::DyadicDeposit).unwrap();
+    assert_eq!(field.operative_return_storage().unwrap().implicit_zero_delta_returns, 2);
+}

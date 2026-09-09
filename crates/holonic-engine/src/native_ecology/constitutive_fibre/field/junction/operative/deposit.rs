@@ -49,9 +49,9 @@ impl NativeConstitutiveField<'_> {
             let mut row = Vec::with_capacity(d / 2);
             for j in (0..d).step_by(2) {
                 let mut value = ExactComplexWaveCurrent::zero();
-                for f in 0..2 {
+                for f in 0..if i<r.factor_count {2}else{0} {
                     value = value.add(&wave(&ports[f * d + j..f * d + j + 2]).multiply(
-                        &wave(&currents[2 * (f * k + i)..2 * (f * k + i) + 2]).conjugate(),
+                        &wave(&currents[2 * (f * r.factor_count + i)..2 * (f * r.factor_count + i) + 2]).conjugate(),
                     ));
                 }
                 let quantize = |x: &Rat| Rat::new((x * &scale_ratio).to_integer(), scale.clone());

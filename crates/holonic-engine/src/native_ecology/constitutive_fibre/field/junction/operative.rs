@@ -41,11 +41,14 @@ pub(in super::super) struct OperativeSections<'c> {
 // delta radii. There is intentionally no public constructor taking an authored learning delta.
 pub(super) struct OperativeReturn<'c> {
     at_cut:usize,contact_count:usize,
+    // Zero extension beyond the actual producing contact population.
+    factor_count:usize,
     realization: NativeContactRealization,
     origin: Rc<()>,
     ports: Rc<ResidentSection<'c>>,
     currents: Rc<ResidentSection<'c>>,
-    b: Rc<ResidentSection<'c>>,
+    // None is the exact zero generator on contact_count entries, not missing current.
+    b: Option<Rc<ResidentSection<'c>>>,
     bounds: Rc<ResidentSection<'c>>,
 }
 pub struct NativeOperativeContactStaging<'f, 'c> {
@@ -94,13 +97,16 @@ pub struct NativeOperativeReturnStorage {
     pub current_factor_octets:u64,
     pub internal_delta_octets:u64,
     pub bound_octets:u64,
+    pub implicit_zero_delta_returns:usize,
+    pub logical_internal_delta_octets:u64,
+    pub logical_current_factor_octets:u64,
     pub total_octets:u64,
 }
 impl NativeConstitutiveField<'_>{
     pub fn operative_return_storage(&self)->Option<NativeOperativeReturnStorage>{
         let op=self.junction.as_ref()?.operative.as_ref()?;
-        let mut out=NativeOperativeReturnStorage{returns:op.returns.len(),port_octets:0,current_factor_octets:0,internal_delta_octets:0,bound_octets:0,total_octets:0};
-        for r in &op.returns {out.port_octets+=r.ports.resident_octets();out.current_factor_octets+=r.currents.resident_octets();out.internal_delta_octets+=r.b.resident_octets();out.bound_octets+=r.bounds.resident_octets();}
+        let mut out=NativeOperativeReturnStorage{returns:op.returns.len(),port_octets:0,current_factor_octets:0,internal_delta_octets:0,bound_octets:0,implicit_zero_delta_returns:0,logical_internal_delta_octets:0,logical_current_factor_octets:0,total_octets:0};
+        for r in &op.returns {out.port_octets+=r.ports.resident_octets();out.current_factor_octets+=r.currents.resident_octets();out.internal_delta_octets+=r.b.as_ref().map_or(0,|b|b.resident_octets());out.bound_octets+=r.bounds.resident_octets();out.implicit_zero_delta_returns+=usize::from(r.b.is_none());out.logical_internal_delta_octets+=64*r.contact_count.max(1) as u64;out.logical_current_factor_octets+=128*r.contact_count.max(1) as u64;}
         out.total_octets=out.port_octets+out.current_factor_octets+out.internal_delta_octets+out.bound_octets;Some(out)
     }
 }
@@ -436,9 +442,8 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
     pub fn births(&self) -> &[NativeOperativeContactBirth] {
         &self.births
     }
-    // Not yet called by the field's joint constitutive producer. It stages every component;
+    // The field's material-contact producer stages every component;
     // the borrowed source, its old returns and its exact decoder survive refusal unchanged.
-    #[allow(dead_code)]
     pub(super) fn stage_return(&self, returned: Rc<OperativeReturn<'c>>) -> Result<Self, Error> {
         if !Rc::ptr_eq(&self.origin, &returned.origin) || returned.at_cut!=self.field_cut() || returned.contact_count!=self.births.len() {
             return Err(Error::ForeignOccurrence);
@@ -463,9 +468,10 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
                 [
                     &returned.ports,
                     &returned.currents,
-                    &returned.b,
                     &returned.bounds,
                 ],
+                returned.b.as_deref(),
+                returned.factor_count,
                 staged.current(),
                 &update_rounds,
             )?;

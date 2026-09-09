@@ -156,6 +156,17 @@ observation to fit. Native and pending-session controls pass. The actual model s
 Continue AC1's path/generator reuse and AC2's productive response construction through the same
 native ecology; do not substitute an output filter or separate world-verdict law.
 
+[established-bounded; measured] The [journal zero-generator return](../../research/records/2026-09-09_AC1_THE_RETURN_JOURNAL_KEEPS_ZERO_EXTENSION_AS_A_GENERATOR.md)
+now retains unexpanded producing factors and the exact zero internal-delta generator. The
+sixteen-family journal saves 820,449,024 native bytes, with complete old/new continuation equality.
+Fresh development preserves the prior body and uses no numerical development readouts. All
+111 field and 25 alpha SDK tests pass. The actual output remains unusable.
+
+[definition] Next reuse contact covariance within the operative reflection: the map and its
+bound stay fixed while internal current changes. Carry the changed aggregate and its bound;
+do not omit either interior feedback or the actual producing map. This is existing-owner reuse
+inside AC1, while AC2's learned contextual response remains a separate unfinished product return.
+
 [definition] Proceed with AC1 steps 3–4: local path formation, restriction/rebase and generator
 reuse. Derive the actively used coordinates and their continuing source/decoder through the
 actual receiver family. Retain the numerical defect and actual producing morphology. The

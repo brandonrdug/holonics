@@ -220,6 +220,13 @@ state. `alpha_actuation_restart.rs` exercises post-generation checkpoints throug
 session. The [mathematical integration](../research/records/2026-09-09_PARALLEL_MATHEMATICS_DISTINGUISHES_A_MATERIAL_ACTUATION_FROM_A_NEW_OBSERVATION.md)
 records the tests, actual unusable output and scope; it claims no new source inverse.
 
+[established-bounded; source-inspected] `OperativeReturn` retains its producing `factor_count`
+separately from the application contact population and uses an explicit zero internal-delta
+generator. `field_operative_contacts.cuh`, `field_operative_adjoint.cuh` and `operative/deposit.rs`
+decode the same zero extension in update, historical recovery and the full defect receiver.
+`operative/rest.rs` carries its validated wire descriptors and admits expanded legacy deltas.
+The [journal return](../research/records/2026-09-09_AC1_THE_RETURN_JOURNAL_KEEPS_ZERO_EXTENSION_AS_A_GENERATOR.md) records exact comparisons and measured savings.
+
 [established-bounded; source-inspected] `OperativeLinear` reuses the finite current-to-material
 operator through `field_linear_material.cuh`, with an independent joint target and row-parallel
 preparation. `field_linear_material_pullback.cuh` and `receiver/normalized/pullback/linear.rs`

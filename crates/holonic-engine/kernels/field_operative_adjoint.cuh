@@ -25,18 +25,6 @@ __device__ wide oa_mid(wide lo,wide hi,wide *error,uint32_t *slot){
     wide distance=sub_checked(hi,lo,slot),mid=add_checked(lo,distance/2,slot);
     *error=add_checked(*error,div_ceil(distance,2,slot),slot);return mid;
 }
-// Extend only along actual later births. The historical response has no fictitious
-// covector on a contact that did not exist at its producing cut.
-extern "C" __global__ void section_field_operative_extend_response(
-    const int64_t *input,uint32_t old_count,uint32_t count,int64_t *lo,int64_t *hi,int64_t *db_lo,int64_t *db_hi,
-    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
-){
-    if(upstream_refused(census,lineage,lineage_count,slot))return;
-    uint32_t j=blockIdx.x*blockDim.x+threadIdx.x;if(j>=8u*(count?count:1u))return;
-    uint32_t factor=j/(4u*(count?count:1u)),within=j%(4u*(count?count:1u));
-    lo[j]=hi[j]=within<4u*old_count?input[4u*old_count*factor+within]:0;
-    if(j<4u*(count?count:1u))db_lo[j]=db_hi[j]=0;
-}
 // Exact original paired producer: lambda=(I+DD*)^-1(go+D gb),
 // G_D=lambda (D*v-2bplus)* + v(gb-D*lambda)*. Only D is free in the
 // constrained contact response; all incoming-current reactions are still returned below.
@@ -45,7 +33,7 @@ extern "C" __global__ __launch_bounds__(512) void section_field_operative_materi
     const int64_t *moment_bounds,const int64_t *forward_wire,const int64_t *query_wire,
     uint32_t n,uint32_t k,uint32_t grain,
     int64_t *ports_lo,int64_t *ports_hi,int64_t *currents_lo,int64_t *currents_hi,
-    int64_t *db_lo,int64_t *db_hi,int64_t *de_lo,int64_t *de_hi,int64_t *out_lo,int64_t *out_hi,
+    int64_t *de_lo,int64_t *de_hi,int64_t *out_lo,int64_t *out_hi,
     wide *workspace,int64_t *dots,uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
 ){
     if(blockIdx.x||upstream_refused(census,lineage,lineage_count,slot))return;
@@ -62,9 +50,8 @@ extern "C" __global__ __launch_bounds__(512) void section_field_operative_materi
         for(uint32_t j=0;j<d;++j)go[j]=oa_mid(query[2u*(4u*n+j)],query[2u*(4u*n+j)+1u],&eo,slot);
         for(uint32_t j=0;j<2u*k;++j)gb[j]=oa_mid(query[2u*(10u*n+j)],query[2u*(10u*n+j)+1u],&eb,slot);
         rounds[2u*k]=eo;rounds[2u*k+1u]=eb;
-        for(uint32_t j=0;j<2u*k;++j)((wide *)db_lo)[j]=0;
         ((wide *)de_lo)[0]=((wide *)de_lo)[1]=0;
-        if(!k){((wide *)db_lo)[0]=((wide *)db_lo)[1]=0;for(uint32_t j=0;j<4;++j)f[j]=0;}
+        if(!k){for(uint32_t j=0;j<4;++j)f[j]=0;}
     }
     __syncthreads();if(*slot)return;
     for(size_t ij=threadIdx.x;ij<(size_t)d*d;ij+=blockDim.x){
@@ -140,6 +127,6 @@ extern "C" __global__ __launch_bounds__(512) void section_field_operative_materi
     }
     __syncthreads();if(*slot)return;
     operative_copy_point(ports_lo,ports_hi,4u*d);operative_copy_point(currents_lo,currents_hi,8u*(k?k:1u));
-    operative_copy_point(db_lo,db_hi,4u*(k?k:1u));operative_copy_point(de_lo,de_hi,4);
+    operative_copy_point(de_lo,de_hi,4);
     operative_copy_point(out_lo,out_hi,2u*(2u*d+4u*k+8u));
 }

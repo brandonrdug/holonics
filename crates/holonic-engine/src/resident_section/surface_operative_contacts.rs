@@ -72,7 +72,9 @@ impl<'c> ResidentSurface<'c> {
         grain: u32,
         exact_deposit: bool,
         old: [&ResidentSection<'c>; 3],
-        delta: [&ResidentSection<'c>; 4],
+        delta: [&ResidentSection<'c>; 3],
+        delta_b: Option<&ResidentSection<'c>>,
+        factor_count: usize,
         next: [&ResidentSection<'c>; 3],
         rounds: &ResidentSection<'c>,
     ) -> Result<(), ResidentRefusal> {
@@ -81,6 +83,7 @@ impl<'c> ResidentSurface<'c> {
             || d % 2 != 0
             || d > u32::MAX as usize
             || count > u32::MAX as usize
+            || factor_count > count
             || !(1..=120).contains(&grain)
         {
             return Err(fail());
@@ -94,18 +97,19 @@ impl<'c> ResidentSurface<'c> {
             }
         }
         if !self.operative_shape(delta[0], 2, 2 * d)
-            || !self.operative_shape(delta[1], 2, 4 * count.max(1))
-            || !self.operative_shape(delta[2], count.max(1), 4)
-            || !self.operative_shape(delta[3], 1, 4)
+            || !self.operative_shape(delta[1], 2, 4 * factor_count.max(1))
+            || delta_b.is_some_and(|b| !self.operative_shape(b, count.max(1), 4))
+            || !self.operative_shape(delta[2], 1, 4)
             || !self.operative_shape(rounds, count.max(1), 2)
         {
             return Err(fail());
         }
         let mut p = Params::new();
-        for s in old.into_iter().chain(delta) {
+        for s in old.into_iter().chain([delta[0],delta[1]]) {
             p.ptr(s.lo.device_ptr());
         }
-        p.u32(d as u32).u32(count as u32).u32(grain).u32(u32::from(exact_deposit));
+        p.ptr(delta_b.map_or(0,|b|b.lo.device_ptr())).ptr(delta[2].lo.device_ptr());
+        p.u32(d as u32).u32(count as u32).u32(factor_count as u32).u32(grain).u32(u32::from(exact_deposit));
         for s in next {
             p.ptr(s.lo.device_ptr()).ptr(s.hi.device_ptr());
         }

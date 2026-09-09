@@ -13,7 +13,6 @@ pub struct NativeMaterialContactResponse<'c> {
     _forward: Rc<ResidentSection<'c>>,
     ports: Rc<ResidentSection<'c>>,
     currents: Rc<ResidentSection<'c>>,
-    delta_b: Rc<ResidentSection<'c>>,
     delta_bounds: Rc<ResidentSection<'c>>,
     diagnostics: ResidentSection<'c>,
 }
@@ -119,42 +118,17 @@ impl<'c> NativeConstitutiveField<'c> {
             return Err(Error::ForeignOccurrence);
         }
         let k = op.births.len();
-        let surface = self.relation.surface;
-        let (currents, db) = if k == response.query.contacts {
-            (response.currents.clone(), response.delta_b.clone())
-        } else {
-            let currents = Rc::new(surface.fresh_section(2, 4 * k.max(1), ResidentGrain(0))?);
-            let db = Rc::new(surface.fresh_section(k.max(1), 4, ResidentGrain(0))?);
-            let mut passage = surface.begin_passage(&[vec![]])?;
-            {
-                let lane = passage.open(0, &[])?;
-                surface.record_operative_extend_response(
-                    &lane,
-                    &response.currents,
-                    response.query.contacts,
-                    k,
-                    &currents,
-                    &db,
-                )?;
-            }
-            passage.close(0, &currents, 64)?;
-            let r = passage.finish()?.launch()?;
-            if !r.obstruction.is_empty() {
-                return Err(Error::Arithmetic(format!(
-                    "contact response extension: {:?}",
-                    r.obstruction
-                )));
-            }
-            (currents, db)
-        };
+        // Extension by zero is retained as a generator, not allocated per later birth.
+        // This constitutive response holds input current fixed, so its internal delta is zero.
         let returned = Rc::new(OperativeReturn {
             realization,
             at_cut: self.history.len(),
             contact_count: k,
+            factor_count: response.query.contacts,
             origin: op.origin.clone(),
             ports: response.ports.clone(),
-            currents,
-            b: db,
+            currents: response.currents.clone(),
+            b: None,
             bounds: response.delta_bounds.clone(),
         });
         let (sections, origin, returns) = {
@@ -207,7 +181,7 @@ impl<'c> NativeConstitutiveField<'c> {
         let producing=if let Some(cached)=cached {cached} else {
             let later=op.returns.iter().filter(|r|r.at_cut>=source+1).collect::<Vec<_>>();
             let mut pointers=Vec::with_capacity(3*later.len().max(1));
-            for r in &later {for v in [r.ports.lo_device_ptr(),r.currents.lo_device_ptr(),r.contact_count as u64]{pointers.push((v as i64,v as i64));}}
+            for r in &later {for v in [r.ports.lo_device_ptr(),r.currents.lo_device_ptr(),r.factor_count as u64]{pointers.push((v as i64,v as i64));}}
             if pointers.is_empty(){pointers.resize(3,(0,0));}
             let journal=surface.mount_section_rest(&ResidentSectionRest::found(later.len().max(1),3,ResidentGrain(0),64,pointers).map_err(invalid)?)?;
             let mut producing=sections(surface,d,k)?;let p=Rc::get_mut(&mut producing).unwrap();p.b=b;p.bounds=bounds;
@@ -216,7 +190,6 @@ impl<'c> NativeConstitutiveField<'c> {
         };
         let ports = Rc::new(surface.fresh_section(2, 2 * d, ResidentGrain(0))?);
         let currents = Rc::new(surface.fresh_section(2, 4 * k.max(1), ResidentGrain(0))?);
-        let delta_b = Rc::new(surface.fresh_section(k.max(1), 4, ResidentGrain(0))?);
         let delta_bounds = Rc::new(surface.fresh_section(1, 4, ResidentGrain(0))?);
         let diagnostics = surface.fresh_section(1, 2 * (2 * d + 4 * k + 8), ResidentGrain(0))?;
         let workspace =
@@ -247,7 +220,7 @@ impl<'c> NativeConstitutiveField<'c> {
                 n,
                 k,
                 query.grain,
-                [&ports, &currents, &delta_b, &delta_bounds, &diagnostics],
+                [&ports, &currents, &delta_bounds, &diagnostics],
                 &workspace,
                 &dots,
             )?;
@@ -269,7 +242,6 @@ impl<'c> NativeConstitutiveField<'c> {
             _forward: forward,
             ports,
             currents,
-            delta_b,
             delta_bounds,
             diagnostics,
         })

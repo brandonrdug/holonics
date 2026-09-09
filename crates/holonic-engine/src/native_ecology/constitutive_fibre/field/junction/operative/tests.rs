@@ -126,10 +126,11 @@ fn returned<'c>(
         realization: NativeContactRealization::EnclosedFlow,
         at_cut: source.field_cut(),
         contact_count: source.births.len(),
+        factor_count: source.births.len(),
         origin: Rc::clone(&source.origin),
         ports: Rc::new(packed(surface, 2, 2 * d, ports)),
         currents: Rc::new(packed(surface, 2, 4 * k.max(1), rows)),
-        b: Rc::new(packed(surface, k.max(1), 4, db)),
+        b: Some(Rc::new(packed(surface, k.max(1), 4, db))),
         bounds: Rc::new(packed(surface, 1, 4, vec![0, 0])),
     })
 }
@@ -221,7 +222,7 @@ fn coupled_return_stages_map_current_and_moments_without_partial_publication() {
     let delta = returned(&view, false);
     let p = decode(&view, &delta.ports);
     let r = decode(&view, &delta.currents);
-    let db = decode(&view, &delta.b);
+    let db = decode(&view, delta.b.as_deref().unwrap());
     let m = 3 * view.field.nodes();
     let k = view.births.len();
     let mut d = exact.iter().map(|i| i.contact.clone()).collect::<Vec<_>>();
@@ -295,7 +296,7 @@ fn changed_contacts_conduct_through_the_same_field_successor() {
         let delta = returned(&view, false);
         let ports = decode(&view, &delta.ports);
         let rows = decode(&view, &delta.currents);
-        let db = decode(&view, &delta.b);
+        let db = decode(&view, delta.b.as_deref().unwrap());
         let k = view.births.len();
         for i in 0..k {
             for j in 0..3 {
@@ -636,12 +637,7 @@ fn operative_material_reads_changed_contacts_and_keeps_the_source_through_restar
     let update = {
         let view = field.stage_operative_contacts().unwrap();
         let mut delta = returned(&view, false);
-        Rc::get_mut(&mut delta).unwrap().b = Rc::new(packed(
-            &surface,
-            view.births.len().max(1),
-            4,
-            vec![0; 2 * view.births.len().max(1)],
-        ));
+        Rc::get_mut(&mut delta).unwrap().b = None;
         view.stage_return(delta).unwrap().into_update()
     };
     {

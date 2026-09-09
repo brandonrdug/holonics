@@ -7,6 +7,12 @@ use serde::{Deserialize, Serialize};
 pub(in super::super::super) struct OperativeReturnFrame {
     pub at_cut: usize,
     pub contact_count: usize,
+    /// Omitted legacy frames store both factors over the complete contact population.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub factor_count: Option<usize>,
+    /// Explicit zero generator; its wire payload is the canonical one-word zero marker.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub zero_internal_delta: bool,
     #[serde(default)]
     pub realization: NativeContactRealization,
 }
@@ -39,6 +45,8 @@ impl OperativeWire {
             .cloned()
             .unwrap_or_else(|| OperativeReturnFrame {
                 at_cut: self.activated_at,
+                factor_count: None,
+                zero_internal_delta: false,
                 realization: NativeContactRealization::EnclosedFlow,
                 contact_count: self
                     .births
@@ -195,13 +203,20 @@ impl OperativeRest {
             }
             cut = frame.at_cut;
             let initial = frame.contact_count;
+            let factors = frame.factor_count.unwrap_or(initial);
+            if factors > initial { return Err(invalid("return factor domain")); }
             for (s, rows, w) in [
                 (&r[0], 2, 2 * d),
-                (&r[1], 2, 4 * initial.max(1)),
-                (&r[2], initial.max(1), 4),
+                (&r[1], 2, 4 * factors.max(1)),
                 (&r[3], 1, 4),
             ] {
                 point_section(s, rows, w)?;
+            }
+            if frame.zero_internal_delta {
+                point_section(&r[2], 1, 1)?;
+                if r[2].intervals != [(0,0)] { return Err(invalid("nonzero implicit internal delta")); }
+            } else {
+                point_section(&r[2], initial.max(1), 4)?;
             }
             if wides(&r[3].intervals)?.iter().any(|v| *v < 0) {
                 return Err(invalid("returned radius"));
@@ -222,6 +237,8 @@ impl<'c> OperativeState<'c> {
                 .map(|r| OperativeReturnFrame {
                     at_cut: r.at_cut,
                     contact_count: r.contact_count,
+                    factor_count: (r.factor_count != r.contact_count).then_some(r.factor_count),
+                    zero_internal_delta: r.b.is_none(),
                     realization: r.realization,
                 })
                 .collect(),
@@ -252,7 +269,10 @@ impl<'c> OperativeState<'c> {
                     Ok([
                         read(&r.ports)?,
                         read(&r.currents)?,
-                        read(&r.b)?,
+                        match &r.b {
+                            Some(b) => read(b)?,
+                            None => ResidentSectionRest::found(1,1,ResidentGrain(0),64,vec![(0,0)]).map_err(invalid)?,
+                        },
                         read(&r.bounds)?,
                     ])
                 })
@@ -284,14 +304,20 @@ impl<'c> OperativeState<'c> {
             .map(|(i, r)| {
                 let frame = wire.frame(i);
                 let [ports, currents, b, bounds] = r;
+                // Cold-wire inspection is a representation check. It changes no current,
+                // coefficient, error bound or chronology, and never reads hot semantic state.
+                let b = if frame.zero_internal_delta || b.intervals.iter().all(|v| *v == (0,0)) {
+                    None
+                } else { Some(Rc::new(mount(b)?)) };
                 Ok(Rc::new(OperativeReturn {
                     at_cut: frame.at_cut,
                     contact_count: frame.contact_count,
+                    factor_count: frame.factor_count.unwrap_or(frame.contact_count),
                     realization: frame.realization,
                     origin: Rc::new(()),
                     ports: Rc::new(mount(ports)?),
                     currents: Rc::new(mount(currents)?),
-                    b: Rc::new(mount(b)?),
+                    b,
                     bounds: Rc::new(mount(bounds)?),
                 }))
             })

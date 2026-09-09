@@ -74,10 +74,19 @@ are retained. Pending-witness continuation passes; a checkpoint taken during gen
 restarts in a fresh process with identical continuation and complete final checkpoint bytes.
 This is a bounded causal-source repair, not useful Athena-alpha.
 
-[definition] Next continue AC1 steps 3–4 through the journal's repeated response carriers and
-actual generator/decoder family; retain contributions exposed by changing morphology. AC2 useful
-contextual generation remains open. The parallel torus, joint-receiver and changing-defect laws
-supply concrete reuse criteria, not a license to discard internal current.
+[established-bounded; measured] The [journal zero-generator return](research/records/2026-09-09_AC1_THE_RETURN_JOURNAL_KEEPS_ZERO_EXTENSION_AS_A_GENERATOR.md)
+reduces the sixteen-family return journal from 2.497 GB to 1.676 GB and its checkpoint by
+410,047,307 bytes. Legacy and compact fresh-process continuation preserve the complete recorded
+body, currents and generation exactly. A matched 75-occurrence development preserves its body
+with no numerical development readouts. All 111 field and 25 SDK tests pass. Output remains
+`I’mn`; the nonzero factor journal and useful contextual generation remain open.
+
+[definition] Continue AC1 steps 3–4 with the actual generator/decoder dependencies. The operative
+reflection currently recomputes contact covariance before and after internal-current motion,
+although its contact map is unchanged between those computations. Reuse that standing within the
+transition while retaining the changed internal drive and its full error bound. AC2 useful
+contextual generation still requires progress in the learned relation; storage reduction alone
+cannot supply it.
 
 [established-bounded; source-inspected] The [finite material composition](research/records/2026-09-09_AC1_THE_FINITE_MATERIAL_OPERATOR_RETURNS_THROUGH_ITS_PRODUCER.md)
 now binds the existing complex-current operator to the operative boundary and independent joint

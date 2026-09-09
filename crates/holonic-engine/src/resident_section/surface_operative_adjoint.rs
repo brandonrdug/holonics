@@ -1,46 +1,6 @@
 use super::*;
 
 impl<'c> ResidentSurface<'c> {
-    pub(crate) fn record_operative_extend_response(
-        &self,
-        lane: &Lane<'_, 'c>,
-        input: &ResidentSection<'c>,
-        old: usize,
-        count: usize,
-        out: &ResidentSection<'c>,
-        db: &ResidentSection<'c>,
-    ) -> Result<(), ResidentRefusal> {
-        let fail = Self::operative_error;
-        if old > count
-            || count > u32::MAX as usize / 8
-            || !self.operative_shape(input, 2, 4 * old.max(1))
-            || !self.operative_shape(out, 2, 4 * count.max(1))
-            || !self.operative_shape(db, count.max(1), 4)
-        {
-            return Err(fail());
-        }
-        let mut p = Params::new();
-        p.ptr(input.lo.device_ptr())
-            .u32(old as u32)
-            .u32(count as u32)
-            .ptr(out.lo.device_ptr())
-            .ptr(out.hi.device_ptr())
-            .ptr(db.lo.device_ptr())
-            .ptr(db.hi.device_ptr())
-            .ptr(lane.slot)
-            .ptr(lane.census)
-            .ptr(lane.lineage)
-            .u32(lane.lineage_count);
-        self.record_blocks(
-            lane,
-            "section_field_operative_extend_response",
-            (8 * count.max(1)).div_ceil(self.launch.block_x as usize),
-            self.launch.block_x,
-            0,
-            &mut p,
-            "operative-extend-response",
-        )
-    }
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn record_operative_producing_map(
         &self,
@@ -99,7 +59,7 @@ impl<'c> ResidentSurface<'c> {
         n: usize,
         k: usize,
         grain: u32,
-        output: [&ResidentSection<'c>; 5],
+        output: [&ResidentSection<'c>; 4],
         workspace: &ResidentSection<'c>,
         dots: &ResidentSection<'c>,
     ) -> Result<(), ResidentRefusal> {
@@ -119,9 +79,8 @@ impl<'c> ResidentSurface<'c> {
             || !self.operative_shape(input[6], 1, 4 * (10 * n + 2 * k))
             || !self.operative_shape(output[0], 2, 2 * d)
             || !self.operative_shape(output[1], 2, 4 * k.max(1))
-            || !self.operative_shape(output[2], k.max(1), 4)
-            || !self.operative_shape(output[3], 1, 4)
-            || !self.operative_shape(output[4], 1, 2 * (2 * d + 4 * k + 8))
+            || !self.operative_shape(output[2], 1, 4)
+            || !self.operative_shape(output[3], 1, 2 * (2 * d + 4 * k + 8))
             || !self.operative_shape(workspace, 1, 2 * (d * d + 3 * d + 4 * k + 2))
             || !self.operative_shape(dots, k.max(1), 10)
         {

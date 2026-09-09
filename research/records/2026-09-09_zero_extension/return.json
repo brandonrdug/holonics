@@ -1,0 +1,192 @@
+{
+  "schema": "holonics.return-zero-extension.v1",
+  "source_revision": "0802fa42 plus accompanying zero-extension changes",
+  "full_model_checks": {
+    "legacy_mount": {
+      "body": true,
+      "generation": true,
+      "emission_current_history": true
+    },
+    "compact_remount": {
+      "body": true,
+      "generation": true,
+      "emission_current_history": true
+    }
+  },
+  "processes": {
+    "conversion": {
+      "command": [
+        "target/debug/examples/alpha_text",
+        "--resume",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-sixteen-linear-v8.hna",
+        "--families",
+        "0",
+        "--checkpoint",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-sixteen-zero-extension.hna",
+        "--self-source-mode",
+        "actuation",
+        "--prompt",
+        ".local/artifacts/athena-alpha/ac2/first-request.txt",
+        "--emit-symbols",
+        "128",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-sixteen-zero-extension.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 91.27841737598646,
+      "max_rss_kib": 4758388
+    },
+    "compact_remount": {
+      "command": [
+        "target/debug/examples/alpha_text",
+        "--resume",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-sixteen-zero-extension.hna",
+        "--families",
+        "0",
+        "--self-source-mode",
+        "actuation",
+        "--prompt",
+        ".local/artifacts/athena-alpha/ac2/first-request.txt",
+        "--emit-symbols",
+        "128",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-sixteen-zero-extension-resumed.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 71.82390377600677,
+      "max_rss_kib": 3954196
+    },
+    "fresh_development": {
+      "command": [
+        "target/debug/examples/alpha_text",
+        ".local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl",
+        "--families",
+        "1",
+        "--fractional-bits",
+        "72",
+        "--material-source",
+        "operative-linear",
+        "--material-target",
+        "joint-packet",
+        "--duplex",
+        "true",
+        "--contact-response",
+        "true",
+        "--contact-realization",
+        "dyadic-deposit",
+        "--contact-metric",
+        "current",
+        "--checkpoint",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-family-zero-extension.hna",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-family-zero-extension.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 8.620556720008608,
+      "max_rss_kib": 242216
+    }
+  },
+  "full_model": {
+    "occurrences": 5064,
+    "old_journal": {
+      "bound_octets": 324032,
+      "current_factor_octets": 1640898048,
+      "internal_delta_octets": 820449024,
+      "port_octets": 34995456,
+      "returns": 5063,
+      "total_octets": 2496666560
+    },
+    "journal": {
+      "bound_octets": 324032,
+      "current_factor_octets": 1640898048,
+      "implicit_zero_delta_returns": 5063,
+      "internal_delta_octets": 0,
+      "logical_current_factor_octets": 1640898048,
+      "logical_internal_delta_octets": 820449024,
+      "port_octets": 34995456,
+      "returns": 5063,
+      "total_octets": 1676217536
+    },
+    "old_checkpoint_bytes": 2327563760,
+    "checkpoint_bytes": 1917516453,
+    "old_census": {
+      "allocations": 103710,
+      "captured_launches": 159,
+      "control_launches": 0,
+      "deed_launches": 76,
+      "device_to_device_octets": 0,
+      "egress_receipt_octets": 4864,
+      "egress_section_octets": 57568,
+      "ingress_octets": 4641468336,
+      "resident_octets_now": 4699445344,
+      "resident_octets_peak": 4720814036,
+      "section_read_outs": 7,
+      "synchronizations": 76
+    },
+    "census_after_compact_remount": {
+      "allocations": 93584,
+      "captured_launches": 159,
+      "control_launches": 0,
+      "deed_launches": 76,
+      "device_to_device_octets": 0,
+      "egress_receipt_octets": 4864,
+      "egress_section_octets": 57568,
+      "ingress_octets": 3821019312,
+      "resident_octets_now": 3878996320,
+      "resident_octets_peak": 3900365012,
+      "section_read_outs": 7,
+      "synchronizations": 76
+    },
+    "utf8": "I\u2019mn",
+    "disposition": {
+      "kind": "completed-part"
+    }
+  },
+  "fresh_development": {
+    "complete_body_equal": true,
+    "occurrences": 75,
+    "old_journal": {
+      "bound_octets": 4736,
+      "current_factor_octets": 355200,
+      "internal_delta_octets": 177600,
+      "port_octets": 511488,
+      "returns": 74,
+      "total_octets": 1049024
+    },
+    "journal": {
+      "bound_octets": 4736,
+      "current_factor_octets": 345856,
+      "implicit_zero_delta_returns": 74,
+      "internal_delta_octets": 0,
+      "logical_current_factor_octets": 355200,
+      "logical_internal_delta_octets": 177600,
+      "port_octets": 511488,
+      "returns": 74,
+      "total_octets": 862080
+    },
+    "old_development_seconds": 7.615398575,
+    "development_seconds": 7.628481589,
+    "nonarchive_section_readouts": 0,
+    "old_checkpoint_bytes": 11770284,
+    "checkpoint_bytes": 11680724
+  },
+  "language_quality_established": false,
+  "verification": [
+    {
+      "log": "focused.txt",
+      "command": "cargo test -p holonic-engine --lib zero_extension_preserves -- --include-ignored --test-threads=1"
+    },
+    {
+      "log": "field.txt",
+      "command": "cargo test -p holonic-engine --lib native_ecology::constitutive_fibre::field -- --include-ignored --test-threads=1"
+    },
+    {
+      "log": "sdk.txt",
+      "command": "cargo test -p holonics-hna --lib 'alpha::' -- --include-ignored --test-threads=1"
+    },
+    {
+      "log": "examples.txt",
+      "command": "cargo build -p holonics-hna --example alpha_text --example alpha_actuation_restart"
+    }
+  ]
+}
