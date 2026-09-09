@@ -20,7 +20,7 @@ pub struct NativeMaterialSourcePullback<'chart> {
     pub(in super::super::super) _owner: Rc<()>,
     _observation: Rc<ResidentSection<'chart>>,
     _covector_input: Rc<ResidentSection<'chart>>,
-    _history: Vec<(Rc<ResidentSection<'chart>>, Rc<ResidentSection<'chart>>)>,
+    _history: Vec<Rc<ResidentSection<'chart>>>,
     pub(in super::super::super) output: ResidentSection<'chart>,
     pub(in super::super::super) source: NativeFieldLineage,
     pub(in super::super::super) receiving: NativeFieldLineage,
@@ -197,6 +197,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 "material source pullback requires the operative contextual carrier".into(),
             ));
         }
+        if self.material_transport_source()==Some(NativeMaterialTransportSource::OperativeLinear){
+            return self.linear_material_query_pullback(covector,observation,source_lineage,receiving,metric,group_width,series_terms,grain);
+        }
         let source = source_lineage.occurrence;
         let surface = self.relation.surface;
         let mut held = Vec::with_capacity(source + 1);
@@ -234,7 +237,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             ] {
                 pointers.push((word, word));
             }
-            held.push((report, b));
+            held.push(report);held.push(b);
             contacts = count;
         }
         let table = surface.mount_section_rest(
@@ -295,3 +298,5 @@ impl<'chart> NativeConstitutiveField<'chart> {
 
 #[cfg(test)]
 mod tests;
+
+mod linear;

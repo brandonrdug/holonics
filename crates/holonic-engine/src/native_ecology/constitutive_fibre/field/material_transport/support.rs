@@ -200,7 +200,7 @@ impl<'c> NativeConstitutiveField<'c> {
         &self,
         at: usize,
     ) -> Result<NativeMaterialReportPacking<'c>, ConstitutiveFibreError> {
-        if !self.material_transport_source().is_some_and(NativeMaterialTransportSource::is_operative)
+        if !self.material_transport_source().is_some_and(|s|s.is_operative() && s.is_projector())
         {
             return Err(ConstitutiveFibreError::Shape);
         }

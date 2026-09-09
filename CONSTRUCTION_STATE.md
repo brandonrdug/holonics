@@ -58,6 +58,15 @@ model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction
 
+[established-bounded; source-inspected] The [finite material composition](research/records/2026-09-09_AC1_THE_FINITE_MATERIAL_OPERATOR_RETURNS_THROUGH_ITS_PRODUCER.md)
+now binds the existing complex-current operator to the operative boundary and independent joint
+target. It recovers the producing matrix from exact retained deposits before the native adjoint.
+All 107 field tests pass. The archived eight-family study completes but emits only `.`. The
+row-parallel matrix implementation matches the scalar body/checkpoint and later continuation
+exactly. The model is now continuing into the next eight families; its result is pending.
+A separate recent-producer reuse change is compiled and awaits its GPU comparison.
+The bounded material state does not yet establish bounded whole-ecology cost or useful language.
+
 [established-bounded; measured] The [duplex codec](research/records/2026-09-09_AC1_AC2_CONVERSATIONAL_DIRECTION_REACHES_NATIVE_PORTS.md)
 now carries incoming and demonstrated-emission currents in distinct I/Q ports, with a matching
 reply receiver and persisted pending direction. All 106 field tests, 23 alpha SDK tests and two

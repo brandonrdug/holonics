@@ -87,6 +87,7 @@ mod geometry;
 mod surface_mount;
 #[path = "resident_section/surface_passage.rs"]
 mod surface_passage;
+mod surface_linear_material;
 mod surface_material_support;
 #[path = "resident_section/surface_condition.rs"]
 mod surface_condition;

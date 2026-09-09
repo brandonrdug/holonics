@@ -182,11 +182,12 @@ fn junction_section(
 fn transport_section(
     rest: &ResidentSectionRest,
     nodes: usize,
+    targets:usize,
     linked: bool,
 ) -> Result<i128, Error> {
-    point_section(rest, 1, 36 * nodes + 24)?;
+    point_section(rest, 1, 24 * targets + 12 * nodes + 24)?;
     let values = packed(rest)?;
-    let target = 2 * nodes;
+    let target = 2 * targets;
     let stride = target + 1;
     let gain = 6 * stride;
     let extra = gain + 6 * nodes + 1;
@@ -239,12 +240,6 @@ impl NativeFieldRest {
         let covariance_width = dimension
             .checked_mul(dimension)
             .and_then(|v| v.checked_add(1))
-            .ok_or(Error::Shape)?;
-        let transport_width = n
-            .checked_mul(n)
-            .and_then(|v| v.checked_mul(6))
-            .and_then(|v| v.checked_add(1))
-            .and_then(|v| v.checked_mul(2))
             .ok_or(Error::Shape)?;
         if n == 0
             || h.material.len() != n
@@ -493,7 +488,7 @@ impl NativeFieldRest {
                 junction_section(section, dimension, wire.representation)?;
             }
             if let Some(section) = &rest.transport {
-                let error = if h.transport_source != NativeMaterialTransportSource::CoupledOutgoing
+                let error = if !h.transport_source.is_linear()
                 {
                     let grain = match h.junction.as_ref().map(|j| j.representation) {
                         Some(NativeFieldJunctionRepresentation::EnclosedDyadic {
@@ -513,7 +508,7 @@ impl NativeFieldRest {
                         _ => material_transport::complete::validate_report(section, n, grain, at)?,
                     }
                 } else {
-                    transport_section(section, n, linked)?
+                    transport_section(section, n, h.transport_target.dimension(n).ok_or_else(||invalid("material target extent"))?, linked)?
                 };
                 if error < coefficient_error {
                     return Err(invalid("coefficient error chronology"));
@@ -589,7 +584,7 @@ impl NativeFieldRest {
             }
         }
         if let Some(state) = &self.transport {
-            if h.transport_source != NativeMaterialTransportSource::CoupledOutgoing {
+            if !h.transport_source.is_linear() {
                 let grain = match h.junction.as_ref().map(|j| j.representation) {
                     Some(NativeFieldJunctionRepresentation::EnclosedDyadic { fractional_bits }) => {
                         fractional_bits
@@ -609,7 +604,7 @@ impl NativeFieldRest {
                 };
                 validate(state, n, grain, h.history.len(), coefficient_error)?;
             } else {
-                point_section(state, 1, transport_width)?;
+                point_section(state, 1, h.transport_source.state_words_for(n,h.transport_target).ok_or_else(||invalid("material state extent"))?)?;
                 let values = packed(state)?;
                 if values.last().copied() != Some(coefficient_error)
                     || (h.history.is_empty() && values.iter().any(|v| *v != 0))
@@ -658,7 +653,7 @@ impl NativeFieldRest {
     }
     pub fn write(&self, out: &mut impl Write) -> Result<(), Error> {
         self.validate()?;
-        let packing=self.header.transport_source.is_operative()
+        let packing=self.header.transport_source.is_operative() && self.header.transport_source.is_projector()
             && !self.header.transport_target.is_direct();
         out.write_all(if packing{PACKED_MAGIC}else{MAGIC}).map_err(invalid)?;
         blob(out, &serde_json::to_vec(&self.header).map_err(invalid)?)?;
@@ -688,7 +683,7 @@ impl NativeFieldRest {
         let packing=magic==PACKED_MAGIC;
         if !packing && magic!=MAGIC{return Err(invalid("unsupported field rest version"));}
         let header: Header=serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
-        if packing && (!header.transport_source.is_operative() || header.transport_target.is_direct()){
+        if packing && (!header.transport_source.is_operative() || !header.transport_source.is_projector() || header.transport_target.is_direct()){
             return Err(invalid("packed field target chart"));
         }
         fn section(input:&mut std::io::Take<impl Read>)->Result<ResidentSectionRest,Error>{read_point(&read_blob(input)?)}

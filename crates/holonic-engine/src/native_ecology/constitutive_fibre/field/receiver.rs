@@ -111,12 +111,9 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 report,
                 occurrence,
                 2 * targets,
-                match self.material_transport_source() {
-                    Some(NativeMaterialTransportSource::CompleteCurrent) => 4,
-                    Some(NativeMaterialTransportSource::HomogeneousMoment) => 6,
-                    Some(NativeMaterialTransportSource::Contextual | NativeMaterialTransportSource::BilinearContextual | NativeMaterialTransportSource::OperativeContextual | NativeMaterialTransportSource::OperativeBoundary) => 7,
-                    _ => 3,
-                },
+                // Material families share the first complex-current ball. Its extent is
+                // independent of source geometry and the rest of the report layout.
+                5,
                 0,
                 pairs,
             )

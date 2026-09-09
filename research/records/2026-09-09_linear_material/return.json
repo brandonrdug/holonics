@@ -1,0 +1,184 @@
+{
+  "schema": "holonics.finite-material-operator.v1",
+  "source": "operative-linear",
+  "duplex": true,
+  "development_occurrences": 1930,
+  "development_seconds": 728.245156456,
+  "development_census": {
+    "allocations": 202736,
+    "captured_launches": 34728,
+    "control_launches": 0,
+    "deed_launches": 11576,
+    "device_to_device_octets": 0,
+    "egress_receipt_octets": 1111296,
+    "egress_section_octets": 615706000,
+    "ingress_octets": 978363136,
+    "resident_octets_now": 380562848,
+    "resident_octets_peak": 583883428,
+    "section_read_outs": 11574,
+    "synchronizations": 11576
+  },
+  "history_placement": {
+    "archive_egress_section_octets": 615706000,
+    "archive_section_read_outs": 11574,
+    "archive_written_octets": 308304411,
+    "archived_occurrences": 1929,
+    "resident_occurrences": 1,
+    "restored_sources": 6
+  },
+  "checkpoint_octets": 500752799,
+  "output": ".",
+  "disposition": {
+    "kind": "completed-part"
+  },
+  "fresh_process_comparison": {
+    "body": true,
+    "emission_current_history": true,
+    "generation": true,
+    "utf8": true
+  },
+  "parallel_family_comparison": {
+    "body_equal": true,
+    "checkpoint_equal": true
+  },
+  "parallel_resume_comparison": {
+    "body": true,
+    "emission_current_history": true,
+    "generation": true,
+    "utf8": true
+  },
+  "processes": {
+    "linear-conversation": {
+      "command": [
+        "target/debug/examples/alpha_text",
+        ".local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl",
+        "--families",
+        "8",
+        "--fractional-bits",
+        "72",
+        "--material-source",
+        "operative-linear",
+        "--material-target",
+        "joint-packet",
+        "--contact-response",
+        "true",
+        "--contact-realization",
+        "dyadic-deposit",
+        "--contact-metric",
+        "current",
+        "--duplex",
+        "true",
+        "--history-archive",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-linear-v8.history",
+        "--prompt",
+        ".local/artifacts/athena-alpha/ac2/first-request.txt",
+        "--emit-symbols",
+        "128",
+        "--checkpoint",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-linear-v8.hna",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-linear-v8.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 761.3542420520098,
+      "max_rss_kib": 1187128,
+      "cpu_seconds": 758.230269
+    },
+    "linear-resume": {
+      "command": [
+        "target/debug/examples/alpha_text",
+        "--resume",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-linear-v8.hna",
+        "--families",
+        "0",
+        "--prompt",
+        ".local/artifacts/athena-alpha/ac2/first-request.txt",
+        "--emit-symbols",
+        "128",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-linear-v8-resumed.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 34.70705709204776,
+      "max_rss_kib": 1185584,
+      "cpu_seconds": 34.528171
+    },
+    "linear-scalar-family": {
+      "command": [
+        ".local/artifacts/athena-alpha/ac1-contact-response/alpha-text-linear-scalar-v8",
+        ".local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl",
+        "--families",
+        "1",
+        "--fractional-bits",
+        "72",
+        "--material-source",
+        "operative-linear",
+        "--material-target",
+        "joint-packet",
+        "--contact-response",
+        "true",
+        "--contact-realization",
+        "dyadic-deposit",
+        "--contact-metric",
+        "current",
+        "--duplex",
+        "true",
+        "--checkpoint",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-family-linear-scalar.hna",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-family-linear-scalar.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 17.528640804986935,
+      "max_rss_kib": 237492
+    },
+    "linear-parallel-family": {
+      "command": [
+        "target/debug/examples/alpha_text",
+        ".local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl",
+        "--families",
+        "1",
+        "--fractional-bits",
+        "72",
+        "--material-source",
+        "operative-linear",
+        "--material-target",
+        "joint-packet",
+        "--contact-response",
+        "true",
+        "--contact-realization",
+        "dyadic-deposit",
+        "--contact-metric",
+        "current",
+        "--duplex",
+        "true",
+        "--checkpoint",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-family-linear-parallel.hna",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-family-linear-parallel.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 8.65589325298788,
+      "max_rss_kib": 239100
+    },
+    "linear-parallel-resume": {
+      "command": [
+        "target/debug/examples/alpha_text",
+        "--resume",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-linear-v8.hna",
+        "--families",
+        "0",
+        "--prompt",
+        ".local/artifacts/athena-alpha/ac2/first-request.txt",
+        "--emit-symbols",
+        "128",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-linear-v8-parallel-resumed.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 27.58979374100454,
+      "max_rss_kib": 1188060
+    }
+  },
+  "language_quality_established": false
+}

@@ -204,6 +204,13 @@ with explicit source readings and per-return frame persistence. `joint_material_
 retains native and actual-data checks; the endogenous joint producer remains open.
 
 
+[established-bounded; source-inspected] `OperativeLinear` reuses the finite current-to-material
+operator through `field_linear_material.cuh`, with an independent joint target and row-parallel
+preparation. `field_linear_material_pullback.cuh` and `receiver/normalized/pullback/linear.rs`
+recover the actual producing matrix from retained deposits and return its complex adjoint.
+`surface_linear_material.rs` binds that return. The [finite-operator record](../research/records/2026-09-09_AC1_THE_FINITE_MATERIAL_OPERATOR_RETURNS_THROUGH_ITS_PRODUCER.md)
+retains exact comparisons, costs, the failed response and the ongoing broader study.
+
 [established-bounded; source-inspected] `field/receiver/packet.rs::NativePacketQuadrature`
 and `field_normalized_receiver.cuh` expose I/Q projections of the same joint current ball.
 `holonics-hna::alpha::text_codec::TextDirection`, `text_session` and `checkpoint` carry the

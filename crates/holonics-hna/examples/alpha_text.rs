@@ -450,7 +450,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--contact-metric current|relative-entropy|squared-probability]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary|operative-linear] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--contact-metric current|relative-entropy|squared-probability]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -498,9 +498,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     "contextual-direct-sum" => NativeMaterialTransportSource::Contextual,
                     "operative-contextual" => NativeMaterialTransportSource::OperativeContextual,
                     "operative-boundary" => NativeMaterialTransportSource::OperativeBoundary,
+                    "operative-linear" => NativeMaterialTransportSource::OperativeLinear,
                     _ => {
                         return Err(
-                            "material source must be coupled-outgoing, complete-current, homogeneous-moment, contextual (alias bilinear-contextual), contextual-direct-sum, operative-contextual, or operative-boundary".into(),
+                            "material source must be coupled-outgoing, complete-current, homogeneous-moment, contextual (alias bilinear-contextual), contextual-direct-sum, operative-contextual, operative-boundary, or operative-linear".into(),
                         );
                     }
                 })
@@ -663,7 +664,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         with_text_field_chart(
             grain,
             material_source.unwrap_or(NativeMaterialTransportSource::OperativeContextual),
-            material_target.unwrap_or(if material_source.is_some_and(|s|!matches!(s,NativeMaterialTransportSource::OperativeContextual|NativeMaterialTransportSource::OperativeBoundary)){NativeMaterialTarget::DirectCurrent}else{NativeMaterialTarget::TensorProduct{factor_width:2}}),
+            material_target.unwrap_or(if material_source.is_some_and(|s|!matches!(s,NativeMaterialTransportSource::OperativeContextual|NativeMaterialTransportSource::OperativeBoundary|NativeMaterialTransportSource::OperativeLinear)){NativeMaterialTarget::DirectCurrent}else{NativeMaterialTarget::TensorProduct{factor_width:2}}),
             |field| {
                 if let Some(path) = &history_archive {
                     field.enable_history_archive(path)?;

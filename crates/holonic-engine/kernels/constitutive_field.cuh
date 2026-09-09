@@ -316,10 +316,10 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     // The dependent field word is prepared once. All continuing writes remain after the complete
     // coupled return; early returns inside this helper cannot strand a block barrier.
     if (threadIdx.x == 0) {
-        if (coupled > 3 || transport_enabled > 7u || !material_targets
+        if (coupled > 3 || transport_enabled > 8u || !material_targets
             || (target_factor_width && transport_enabled<6u) || (!target_factor_width && material_targets!=nodes)
             || (transport_enabled>=6u && !operative_table)
-            || (transport_enabled>=4u && (!context_table || !context_weights || !context_evaluations || occurrence>=UINT32_MAX))
+            || (transport_enabled>=4u && transport_enabled<=7u && (!context_table || !context_weights || !context_evaluations || occurrence>=UINT32_MAX))
             || (transport_enabled==3u && (!moment_table || !moment_weights))
             || (transport_enabled && (coupled < 2u || !transport_lo || !transport_hi
                 || !transport_delta_lo || !transport_delta_hi || !transport_report_lo || !transport_report_hi
@@ -370,13 +370,17 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     else if (transport_enabled == 1u && threadIdx.x == 0)
         field_material_transport_prepare(transport_lo, origin_junction, origin_transport,
             (const wide *)junction_report_lo, incoming, nodes, linked, junction_grain,
-            transport_delta_lo, transport_delta_hi, transport_report_lo, transport_report_hi, slot);
+            transport_delta_lo, transport_delta_hi, transport_report_lo, transport_report_hi, slot,material_targets,target_factor_width);
+    if(transport_enabled==8u)
+        field_linear_material_parallel(transport_lo,origin_junction,origin_transport,(const wide *)junction_report_lo,
+            incoming,nodes,linked,junction_grain,transport_delta_lo,transport_delta_hi,transport_report_lo,transport_report_hi,slot,
+            material_targets,target_factor_width);
     if(transport_enabled==3u)
         moment_material_transport_prepare((const int64_t *)transport_lo,(const int64_t *)origin_transport,refreshed_source_current,
             moment_table,moment_count,moment_weights,output_lo,origin,incoming,current_frame,origin_frame,next_covariance_lo,
             (const wide *)junction_held,(const wide *)junction_report_lo,nodes,linked,junction_grain,occurrence,
             (int64_t *)transport_delta_lo,(int64_t *)transport_delta_hi,(int64_t *)transport_report_lo,(int64_t *)transport_report_hi,field_scratch,slot,operative_radius);
-    if(transport_enabled>=4u)
+    if(transport_enabled>=4u && transport_enabled<=7u)
         contextual_material_prepare((const int64_t *)transport_lo,(const int64_t *)origin_transport,context_table,(uint32_t)occurrence,source_ordinal,
             context_weights,context_evaluations,output_lo,origin,incoming,current_frame,origin_frame,next_covariance_lo,
             (const wide *)junction_held,(const wide *)junction_report_lo,nodes,linked,junction_grain,transport_enabled==7u?4u:transport_enabled==6u?3u:transport_enabled==5u?2u:1u,
@@ -402,11 +406,11 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     if (transport_enabled == 2u) {
         for (size_t i=0;i<complete_state_words(nodes);++i)
             ((int64_t *)transport_lo)[i]=((int64_t *)transport_hi)[i]=((const int64_t *)transport_delta_lo)[i];
-    } else if(transport_enabled>=3u) {
+    } else if(transport_enabled>=3u && transport_enabled<=7u) {
         for(size_t i=0;i<moment_state_words(nodes);++i)
             ((int64_t *)transport_lo)[i]=((int64_t *)transport_hi)[i]=((const int64_t *)transport_delta_lo)[i];
-    } else if (transport_enabled == 1u) {
-        const size_t coefficients = (size_t)6u * nodes * nodes;
+    } else if (transport_enabled == 1u || transport_enabled==8u) {
+        const size_t coefficients = (size_t)6u * nodes * material_targets;
         // All sums and the complete current return were checked before any continuing write.
         for (size_t i = 0; i < coefficients; ++i)
             transport_lo[i] = transport_hi[i] = transport_lo[i] + transport_delta_lo[i];

@@ -57,10 +57,17 @@ pub enum NativeMaterialTransportSource {
     /// The same developing junction, queried through its transported outgoing boundary.
     /// The complete interior remains in the field and in the producing contact adjoint.
     OperativeBoundary,
+    /// Finite complex-linear operator on the actual operative outgoing current.
+    OperativeLinear,
 }
 impl NativeMaterialTransportSource {
-    pub(super) fn is_operative(self)->bool {matches!(self,Self::OperativeContextual|Self::OperativeBoundary)}
+    pub(super) fn is_operative(self)->bool {matches!(self,Self::OperativeContextual|Self::OperativeBoundary|Self::OperativeLinear)}
 
+    pub(super) fn is_linear(self)->bool{matches!(self,Self::CoupledOutgoing|Self::OperativeLinear)}
+    pub(super) fn is_projector(self)->bool{matches!(self,Self::Contextual|Self::BilinearContextual|Self::OperativeContextual|Self::OperativeBoundary)}
+    pub(super) fn state_words_for(self,n:usize,target:NativeMaterialTarget)->Option<usize>{
+        if self==Self::OperativeLinear {n.checked_mul(target.dimension(n)?)?.checked_mul(12)?.checked_add(2)}else{self.state_words(n)}
+    }
     pub(super) fn is_outgoing(&self) -> bool {
         *self == Self::CoupledOutgoing
     }
@@ -73,11 +80,12 @@ impl NativeMaterialTransportSource {
             Self::BilinearContextual => 5,
             Self::OperativeContextual => 6,
             Self::OperativeBoundary => 7,
+            Self::OperativeLinear => 8,
         }
     }
     pub(super) fn state_words(self, n: usize) -> Option<usize> {
         match self {
-            Self::CoupledOutgoing => n.checked_mul(n)?.checked_mul(12)?.checked_add(2),
+            Self::CoupledOutgoing | Self::OperativeLinear => n.checked_mul(n)?.checked_mul(12)?.checked_add(2),
             Self::CompleteCurrent => n
                 .checked_mul(n)?
                 .checked_mul(60)?
@@ -92,6 +100,7 @@ impl NativeMaterialTransportSource {
     pub(super) fn report_words_for(self,n:usize,target:NativeMaterialTarget)->Option<usize>{
         let targets=target.dimension(n)?;
         if !target.is_direct() && !self.is_operative() {return None;}
+        if self.is_linear(){return targets.checked_mul(24)?.checked_add(n.checked_mul(12)?)?.checked_add(24);}
         if matches!(
             self,
             Self::Contextual | Self::BilinearContextual | Self::OperativeContextual | Self::OperativeBoundary
@@ -293,10 +302,10 @@ impl<'chart> NativeConstitutiveField<'chart> {
             self.enable_operative_contacts()?;
         }
         let width = source
-            .state_words(self.nodes())
+            .state_words_for(self.nodes(),target)
             .ok_or(ConstitutiveFibreError::Shape)?;
         let mut words = vec![(0, 0); width];
-        if source != NativeMaterialTransportSource::CoupledOutgoing {
+        if !source.is_linear() {
             let grain = self.transport_grain()? as i64;
             words[12 * self.nodes() + 6] = (grain, grain);
         }
@@ -362,7 +371,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             },
             delta: surface.fresh_section(
                 1,
-                kind.state_words(self.nodes())
+                kind.state_words_for(self.nodes(),self.material_target().unwrap())
                     .ok_or(ConstitutiveFibreError::Shape)?,
                 ResidentGrain(0),
             )?,
@@ -411,7 +420,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             return Ok(None);
         };
         let values = wides(&rest.intervals)?;
-        let target = 2 * self.nodes();
+        let target = 2 * self.material_target_dimension().ok_or(ConstitutiveFibreError::Shape)?;
         let source = 6 * self.nodes();
         let stride = target + 1;
         let gain_at = 6 * stride;
@@ -477,8 +486,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
             return Ok(None);
         };
         let values = wides(&self.relation.surface.read_out(&transport.state)?)?;
-        let rows = self.nodes();
-        let columns = 3 * rows;
+        let rows = self.material_target_dimension().ok_or(ConstitutiveFibreError::Shape)?;
+        let columns = 3 * self.nodes();
         if values.len() != 2 * rows * columns + 1 || values[2 * rows * columns] < 0 {
             return Err(ConstitutiveFibreError::Uncertain);
         }
@@ -635,3 +644,6 @@ impl<'chart> NativeConstitutiveField<'chart> {
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod linear_tests;
