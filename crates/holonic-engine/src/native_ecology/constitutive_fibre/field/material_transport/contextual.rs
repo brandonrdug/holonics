@@ -7,13 +7,17 @@ pub(in super::super) struct ContextualWork<'c> {
     pub(in super::super) weights: ResidentSection<'c>,
     pub(in super::super) evaluations: ResidentSection<'c>,
 }
+#[cfg(test)]
 pub(in super::super) fn offsets(n: usize) -> [usize; 7] {
-    let beta = 22 * (2 * n + 1);
-    let output = beta + 8 * n;
+    offsets_for(n,n)
+}
+pub(in super::super) fn offsets_for(n:usize,targets:usize)->[usize;7]{
+    let beta = 22 * (2 * targets + 1);
+    let output = beta + 8 * targets;
     let input = output + 16 * n + 12;
     let context = input + 16 * n + 12;
     let raw = context + 36 * n + 22;
-    let meta = raw + 30 * n;
+    let meta = raw + 30 * targets;
     [beta, output, input, context, raw, meta, meta + 4]
 }
 #[derive(Debug, Serialize)]
@@ -26,6 +30,7 @@ pub struct NativeVisibleSourceReading {
 }
 #[derive(Debug, Serialize)]
 pub struct NativeContextualMaterialReading {
+    pub target_chart: NativeMaterialTarget,
     pub source_chart_version: u32,
     pub forward: NativeFieldCurrentBall,
     pub effective_source_forward: Option<NativeFieldCurrentBall>,
@@ -176,16 +181,11 @@ fn visible(
         numerical_norm_upper_with_reference: Rat::new(bounds[1].into(), scale),
     })
 }
-pub(in super::super) fn validate_report(
-    rest: &ResidentSectionRest,
-    n: usize,
-    grain: u32,
-    at: usize,
-) -> Result<i128, ConstitutiveFibreError> {
-    let [beta, output, input, context, raw, meta, extra] = offsets(n);
-    let r = 2 * n;
+pub(in super::super) fn validate_report_for(rest:&ResidentSectionRest,n:usize,targets:usize,grain:u32,at:usize)->Result<i128,ConstitutiveFibreError>{
+    let [beta, output, input, context, raw, meta, extra] = offsets_for(n,targets);
+    let r = 2 * targets;
     if rest.rows != 1
-        || rest.width != 150 * n + 96
+        || rest.width != 68 * n + 82 * targets + 96
         || rest.grain.0 != 0
         || rest.intervals.iter().any(|(a, b)| a != b)
     {
@@ -285,7 +285,7 @@ impl<'c> NativeConstitutiveField<'c> {
                     .map_err(invalid)?,
             )?,
             weights: s.fresh_section(count + 1, 16, ResidentGrain(0))?,
-            evaluations: s.fresh_section(4, 30 * self.nodes(), ResidentGrain(0))?,
+            evaluations: s.fresh_section(4, 30 * self.material_target_dimension().ok_or(ConstitutiveFibreError::Shape)?, ResidentGrain(0))?,
         })
     }
     pub fn inspect_contextual_material_transport(
@@ -306,12 +306,14 @@ impl<'c> NativeConstitutiveField<'c> {
             .inspect_material_transport_wire(at)?
             .ok_or_else(|| invalid("missing report"))?;
         let n = self.nodes();
-        let r = 2 * n;
+        let target_chart=self.material_target().ok_or(ConstitutiveFibreError::Shape)?;
+        let targets=target_chart.dimension(n).ok_or(ConstitutiveFibreError::Shape)?;
+        let r = 2 * targets;
         let stride = r + 1;
         let grain = self.transport_grain()?;
-        validate_report(&wire, n, grain, at)?;
+        validate_report_for(&wire, n, targets, grain, at)?;
         let w = &wire.intervals;
-        let [beta, output, input, context, raw, meta, extra] = offsets(n);
+        let [beta, output, input, context, raw, meta, extra] = offsets_for(n,targets);
         let values = wides(&w[..output])?;
         let scale = BigInt::one() << grain;
         let complex = |r: i128, i: i128| {
@@ -321,7 +323,7 @@ impl<'c> NativeConstitutiveField<'c> {
             )
         };
         let vector = |start: usize| {
-            (0..n)
+            (0..targets)
                 .map(|j| complex(values[start + 2 * j], values[start + 2 * j + 1]))
                 .collect::<Vec<_>>()
         };
@@ -333,6 +335,7 @@ impl<'c> NativeConstitutiveField<'c> {
         let contrasted = linked && w[meta + 2].0 < at as i64;
         let b = wides(&w[extra..])?;
         Ok(Some(NativeContextualMaterialReading {
+            target_chart,
             source_chart_version: w[meta + 3].0 as u32,
             forward: ball(0),
             effective_source_forward: linked.then(|| ball(1)),
@@ -423,3 +426,5 @@ impl<'c> NativeConstitutiveField<'c> {
 
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod packet_tests;

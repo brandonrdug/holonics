@@ -63,7 +63,8 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
     pub fn on(
         field: &'field mut NativeConstitutiveField<'chart>,
     ) -> Result<Self, AlphaMaterialError> {
-        if field.nodes() != TEXT_INPUT_CHANNELS || !field.has_paired_junction() {
+        if field.nodes() != TEXT_INPUT_CHANNELS || !field.has_paired_junction()
+            || matches!(field.material_target(),Some(holonic_engine::native_ecology::constitutive_fibre::NativeMaterialTarget::TensorProduct{factor_width}) if factor_width!=2) {
             return Err(AlphaMaterialError::Apparatus(
                 "text session requires the declared paired text field".into(),
             ));
@@ -320,7 +321,7 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
                     .and_then(|source| {
                         let returned = self.field.read_constitutive_source(&source)?;
                         let reading = present_constitutive_text_return(&returned)?;
-                        if reading.native.constitutive_status == Some(NativeFieldReceiverStatus::Unique) {
+                        if reading.native.constitutive_status() == Some(NativeFieldReceiverStatus::Unique) {
                             native_return = Some(returned);
                         }
                         Ok(reading)

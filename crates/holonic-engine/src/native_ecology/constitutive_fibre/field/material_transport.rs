@@ -16,6 +16,29 @@ pub use contextual::{
 };
 pub use moment::NativeMomentMaterialReading;
 
+/// Exterior target chart of the same native material operator. Its extent is independent
+/// of the root junction. Tensor factors follow incoming order; the first factor is the
+/// least-significant radix digit of the resulting coordinate.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, serde::Deserialize)]
+#[serde(tag="kind", rename_all="kebab-case")]
+pub enum NativeMaterialTarget {
+    #[default]
+    DirectCurrent,
+    TensorProduct { factor_width: usize },
+}
+impl NativeMaterialTarget {
+    pub fn dimension(self, roots:usize)->Option<usize>{
+        match self {
+            Self::DirectCurrent=>Some(roots),
+            Self::TensorProduct{factor_width} if factor_width>=2 && roots%factor_width==0=>
+                factor_width.checked_pow(u32::try_from(roots/factor_width).ok()?),
+            _=>None,
+        }.filter(|n|*n>0 && *n<=u32::MAX as usize/82)
+    }
+    pub(super) fn kernel(self)->u32 {match self {Self::DirectCurrent=>0,Self::TensorProduct{factor_width}=>factor_width as u32}}
+    pub(super) fn is_direct(&self)->bool{*self==Self::DirectCurrent}
+}
+
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum NativeMaterialTransportSource {
@@ -58,12 +81,14 @@ impl NativeMaterialTransportSource {
             | Self::OperativeContextual => n.checked_mul(12)?.checked_add(12),
         }
     }
-    pub(super) fn report_words(self, n: usize) -> Option<usize> {
+    pub(super) fn report_words_for(self,n:usize,target:NativeMaterialTarget)->Option<usize>{
+        let targets=target.dimension(n)?;
+        if !target.is_direct() && self!=Self::OperativeContextual {return None;}
         if matches!(
             self,
             Self::Contextual | Self::BilinearContextual | Self::OperativeContextual
         ) {
-            return n.checked_mul(150)?.checked_add(96);
+            return n.checked_mul(68)?.checked_add(targets.checked_mul(82)?)?.checked_add(96);
         }
         n.checked_mul(if self == Self::HomogeneousMoment {
             96
@@ -83,6 +108,7 @@ impl NativeMaterialTransportSource {
 pub(super) struct MaterialTransport<'chart> {
     pub(super) state: ResidentSection<'chart>,
     pub(super) source: NativeMaterialTransportSource,
+    pub(super) target: NativeMaterialTarget,
 }
 pub(super) struct PendingMaterialTransport<'chart> {
     pub(super) delta: ResidentSection<'chart>,
@@ -238,6 +264,11 @@ impl<'chart> NativeConstitutiveField<'chart> {
         &mut self,
         source: NativeMaterialTransportSource,
     ) -> Result<(), ConstitutiveFibreError> {
+        self.enable_material_transport_chart(source,NativeMaterialTarget::DirectCurrent)
+    }
+    pub fn enable_material_transport_chart(&mut self,source:NativeMaterialTransportSource,target:NativeMaterialTarget)
+        ->Result<(),ConstitutiveFibreError>{
+        source.report_words_for(self.nodes(),target).ok_or(ConstitutiveFibreError::Shape)?;
         if !self.relation.usable || self.pending.is_some() {
             return Err(ConstitutiveFibreError::Uncertain);
         }
@@ -265,7 +296,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             &ResidentSectionRest::found(1, width, ResidentGrain(0), 64, words)
                 .map_err(|_| ConstitutiveFibreError::Shape)?,
         )?;
-        self.transport = Some(MaterialTransport { state, source });
+        self.transport = Some(MaterialTransport { state, source, target });
         Ok(())
     }
     pub fn has_material_transport(&self) -> bool {
@@ -274,6 +305,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
     pub fn material_transport_source(&self) -> Option<NativeMaterialTransportSource> {
         self.transport.as_ref().map(|t| t.source)
     }
+    pub fn material_target(&self)->Option<NativeMaterialTarget>{self.transport.as_ref().map(|t|t.target)}
+    pub fn material_target_dimension(&self)->Option<usize>{self.material_target()?.dimension(self.nodes())}
     pub(super) fn transport_grain(&self) -> Result<u32, ConstitutiveFibreError> {
         match self.junction_representation() {
             Some(NativeFieldJunctionRepresentation::EnclosedDyadic { fractional_bits }) => {
@@ -328,7 +361,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             report: Rc::new(
                 surface.fresh_section(
                     1,
-                    kind.report_words(self.nodes())
+                    kind.report_words_for(self.nodes(),self.material_target().unwrap())
                         .ok_or(ConstitutiveFibreError::Shape)?,
                     ResidentGrain(0),
                 )?,

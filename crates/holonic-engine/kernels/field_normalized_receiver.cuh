@@ -14,6 +14,46 @@ __device__ void normalized_interval_product(wide a,wide b,wide c,wide d,uint32_t
     for(uint32_t i=1;i<4;++i){if(lows[i]<*lo)*lo=lows[i];if(highs[i]>*hi)*hi=highs[i];}
 }
 
+// Joint coordinate receiver of a material-current ball. Softmax preserves real-potential
+// ordering, so no exponential is needed to certify a unique maximum. All unexcluded
+// coordinates are retained. For each i, project the real centre onto the closed cone
+// x_i >= x_j for every j. Pool i with the descending coordinates above their pooled
+// mean. Its exact squared distance is sum(x_j^2) - sum(x_j)^2/k. The cone intersects
+// the joint Euclidean ball iff that distance is <= radius^2. Imaginary coordinates
+// stay unchanged at the minimizer; no independent coordinate-box relaxation is used.
+extern "C" __global__ void section_field_material_packet_receiver(
+    const int64_t *wire,uint32_t targets,int64_t *scratch,int64_t *lo,int64_t *hi,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
+){
+    if(blockIdx.x||threadIdx.x||upstream_refused(census,lineage,lineage_count,slot))return;
+    if(!targets){atomicOr(slot,REFUSED_MALFORMED);return;}
+    const wide *v=(const wide *)wire;wide radius=v[2u*targets];
+    if(radius<0){atomicOr(slot,REFUSED_MALFORMED);return;}
+    wide *ordered=(wide *)scratch;
+    for(uint32_t i=0;i<targets;++i){
+        wide value=v[2u*i];uint32_t j=i;
+        while(j && ordered[j-1u]<value){ordered[j]=ordered[j-1u];--j;}
+        ordered[j]=value;
+    }
+    MomentInteger r=moment_lift(history_integer(radius)),radius_square=r*r;
+    int64_t count=0,selected=-1;
+    for(uint32_t i=0;i<targets;++i){
+        HistoryInteger sum=history_integer(v[2u*i]);
+        MomentInteger c=moment_lift(sum),squares=c*c;uint32_t k=1;
+        for(uint32_t j=0;j<targets;++j){
+            HistoryInteger next=history_integer(ordered[j]);
+            if(next*HistoryInteger(k)<=sum)break;
+            sum=sum+next;MomentInteger value=moment_lift(next);
+            squares=squares+value*value;++k;
+        }
+        MomentInteger total=moment_lift(sum),distance=squares*MomentInteger(k)-total*total;
+        MomentInteger bound=radius_square*MomentInteger(k);
+        if(sum.overflow || distance.overflow || bound.overflow || distance.negative){atomicOr(slot,REFUSED_CARRIER);return;}
+        bool candidate=distance<=bound;
+        lo[2u+i]=hi[2u+i]=candidate?1:0;if(candidate){++count;selected=i;}}
+    lo[0]=hi[0]=count;lo[1]=hi[1]=count==1?selected:-1;
+}
+
 __device__ void normalized_current_face(const wide *input,uint32_t nodes,uint32_t first,
     uint32_t width,uint32_t grain,uint32_t terms,wide *output,uint32_t offset,uint32_t *slot) {
     wide radius=input[2u*nodes],unit=(wide)1<<grain;
@@ -44,14 +84,41 @@ __device__ void normalized_current_face(const wide *input,uint32_t nodes,uint32_
     }
 }
 
+__device__ void normalized_square_interval(wide lo,wide hi,uint32_t grain,wide *lower,wide *upper,uint32_t *slot){
+    wide a=ft_abs(lo,slot),b=ft_abs(hi,slot),big=a>b?a:b,small=a<b?a:b;
+    *upper=product_shift(big,big,grain,1,slot);
+    *lower=lo<=0 && hi>=0?0:product_shift(small,small,grain,0,slot);
+}
+// The observed packet is a complete complex amplitude carrier. Its observed face is
+// normalized squared modulus, not an exponentiated target logit. Zero total amplitude
+// supplies no packet probability face and is an explicit receiver-domain obstruction.
+__device__ void normalized_packet_face(const wide *input,uint32_t nodes,uint32_t first,
+    uint32_t width,uint32_t grain,wide *output,uint32_t *slot){
+    wide radius=input[2u*nodes],unit=(wide)1<<grain,total_lo=0,total_hi=0;
+    if(radius<0){atomicOr(slot,REFUSED_MALFORMED);return;}
+    for(uint32_t j=first;j<first+width;++j){
+        wide lo=0,hi=0;
+        for(uint32_t part=0;part<2;++part){wide a,b;normalized_square_interval(
+            sub_checked(input[2u*j+part],radius,slot),add_checked(input[2u*j+part],radius,slot),grain,&a,&b,slot);
+            lo=add_checked(lo,a,slot);hi=add_checked(hi,b,slot);}
+        output[10u*j+2u]=lo;output[10u*j+3u]=hi;total_lo=add_checked(total_lo,lo,slot);total_hi=add_checked(total_hi,hi,slot);
+    }
+    if(!total_hi){atomicOr(slot,REFUSED_BOUND);return;}
+    for(uint32_t j=first;j<first+width;++j){
+        wide lo=signed_product_divide_2(output[10u*j+2u],unit/2,total_hi,0,slot);
+        wide hi=total_lo?signed_product_divide_2(output[10u*j+3u],unit/2,total_lo,1,slot):unit;
+        output[10u*j+2u]=lo;output[10u*j+3u]=hi<unit?hi:unit;
+    }
+}
+
 extern "C" __global__ __launch_bounds__(512) void section_field_normalized_receiver(
     const int64_t *prediction,const int64_t *observation,uint32_t nodes,uint32_t group_width,
-    uint32_t grain,uint32_t terms,int64_t *out_lo,int64_t *out_hi,
+    uint32_t grain,uint32_t terms,uint32_t packet_observation,int64_t *out_lo,int64_t *out_hi,
     uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
 ) {
     if(threadIdx.x)return;
     if(upstream_refused(census,lineage,lineage_count,slot))return;
-    if(!nodes||!group_width||nodes%group_width||grain<1||grain>120||!terms||terms==UINT32_MAX){
+    if(!nodes||!group_width||nodes%group_width||grain<1||grain>120||!terms||terms==UINT32_MAX||packet_observation>1u){
         atomicOr(slot,REFUSED_MALFORMED);return;
     }
     uint32_t first=blockIdx.x*group_width;if(first>=nodes)return;
@@ -60,11 +127,12 @@ extern "C" __global__ __launch_bounds__(512) void section_field_normalized_recei
     const wide *q=(const wide *)observation+2u*(2u*nodes+1u);
     wide *out=(wide *)out_lo;
     normalized_current_face(p,nodes,first,group_width,grain,terms,out,0,slot);
-    normalized_current_face(q,nodes,first,group_width,grain,terms,out,2,slot);
+    if(packet_observation)normalized_packet_face(q,nodes,first,group_width,grain,out,slot);
+    else normalized_current_face(q,nodes,first,group_width,grain,terms,out,2,slot);
     if(*slot)return;
     // For point currents, a common additive shift is exactly invisible even when 1/group_width
     // needs a numerical interval. This proves equality of faces, never identity of occurrences.
-    bool same=p[2u*nodes]==0 && q[2u*nodes]==0;
+    bool same=!packet_observation && p[2u*nodes]==0 && q[2u*nodes]==0;
     wide common=0;
     if(same){
         common=sub_checked(p[2u*first],q[2u*first],slot);

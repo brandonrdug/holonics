@@ -118,7 +118,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                         .ok_or(ConstitutiveFibreError::Uncertain)?;
                     Ok((report.clone(), op.b.clone(), op.count))
                 })?;
-            if report.width() != 150 * self.nodes() + 96 {
+            if report.width() != self.material_transport_source().unwrap().report_words_for(self.nodes(),self.material_target().unwrap()).ok_or(ConstitutiveFibreError::Shape)? {
                 return Err(ConstitutiveFibreError::Shape);
             }
             for word in [
@@ -147,6 +147,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 &returned.output,
                 source,
                 self.nodes(),
+                self.material_target_dimension().ok_or(ConstitutiveFibreError::Shape)?,
                 contacts,
                 returned.grain,
                 match metric {

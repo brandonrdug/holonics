@@ -306,6 +306,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     const int64_t *moment_table,uint32_t moment_count,int64_t *moment_weights,
     const int64_t *context_table,int64_t *context_weights,int64_t *context_evaluations,uint64_t source_ordinal,
     const int64_t *operative_table,
+    uint32_t material_targets,uint32_t target_factor_width,
     int64_t *output_lo, int64_t *output_hi,
     uint32_t *slot, const uint32_t *census,
     const uint32_t *lineage, uint32_t lineage_count
@@ -315,7 +316,9 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     // The dependent field word is prepared once. All continuing writes remain after the complete
     // coupled return; early returns inside this helper cannot strand a block barrier.
     if (threadIdx.x == 0) {
-        if (coupled > 3 || transport_enabled > 6u || (transport_enabled==6u && !operative_table)
+        if (coupled > 3 || transport_enabled > 6u || !material_targets
+            || (target_factor_width && transport_enabled!=6u) || (!target_factor_width && material_targets!=nodes)
+            || (transport_enabled==6u && !operative_table)
             || (transport_enabled>=4u && (!context_table || !context_weights || !context_evaluations || occurrence>=UINT32_MAX))
             || (transport_enabled==3u && (!moment_table || !moment_weights))
             || (transport_enabled && (coupled < 2u || !transport_lo || !transport_hi
@@ -379,7 +382,8 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
             (const wide *)junction_held,(const wide *)junction_report_lo,nodes,linked,junction_grain,transport_enabled==6u?3u:transport_enabled==5u?2u:1u,
             (int64_t *)transport_delta_lo,(int64_t *)transport_delta_hi,(int64_t *)transport_report_lo,(int64_t *)transport_report_hi,field_scratch,slot,
             transport_enabled==6u?((const wide *)(uintptr_t)operative_table[7])[1]:operative_radius,
-            transport_enabled==6u?(const wide *)(uintptr_t)operative_table[5]:nullptr,transport_enabled==6u?(uint32_t)operative_table[19]:0u);
+            transport_enabled==6u?(const wide *)(uintptr_t)operative_table[5]:nullptr,transport_enabled==6u?(uint32_t)operative_table[19]:0u,
+            material_targets,target_factor_width);
     __syncthreads();
     if (*slot || threadIdx.x != 0) return;
     const uint32_t width = 6u * nodes;

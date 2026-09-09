@@ -1,0 +1,77 @@
+{
+  "schema": "holonics.joint-packet-conversation.v1",
+  "command": "target/debug/examples/alpha_text .local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl --families 8 --fractional-bits 72 --material-source operative-contextual --material-target joint-packet --contact-response true --contact-realization dyadic-deposit --prompt .local/artifacts/athena-alpha/ac2/first-request.txt --emit-symbols 128 --checkpoint .local/artifacts/athena-alpha/ac1-contact-response/first-eight-joint-packet-v4.hna --report .local/artifacts/athena-alpha/ac1-contact-response/first-eight-joint-packet-v4.json",
+  "root_channels": 18,
+  "target_chart": {
+    "factor_width": 2,
+    "kind": "tensor-product"
+  },
+  "target_extent": 512,
+  "families": 8,
+  "development_occurrences": 1930,
+  "contact_deposits": 1929,
+  "development_seconds": 718.609851575,
+  "prompt_and_emission_seconds": 62.66117909,
+  "checkpoint_seconds": 17.005248167,
+  "whole_process_seconds": 807.9812039640383,
+  "max_rss_kib": 2124160,
+  "checkpoint_octets": 975051267,
+  "development_census": {
+    "allocations": 208406,
+    "captured_launches": 36657,
+    "control_launches": 0,
+    "deed_launches": 11576,
+    "device_to_device_octets": 0,
+    "egress_receipt_octets": 1111296,
+    "egress_section_octets": 0,
+    "ingress_octets": 181504592,
+    "resident_octets_now": 1944865872,
+    "resident_octets_peak": 1959779252,
+    "section_read_outs": 0,
+    "synchronizations": 11576
+  },
+  "development_error": null,
+  "native_error": null,
+  "prompt": "Explain the difference between a function and its derivative.",
+  "output": "The its the its the its the its the its the its the its the its the its the its the its the its the its the its the its the its ",
+  "disposition": {
+    "kind": "interrupted"
+  },
+  "language_quality_established": false,
+  "receiver_at_original_run": "independent coordinate enclosure of joint packet potentials",
+  "checks": [
+    "99 field tests passed in 39.12 s before joint-ball refinement",
+    "21 alpha SDK tests passed in 3.24 s before joint-ball refinement",
+    "3 joint-packet CUDA tests passed in 110.64 s, including first module load and 102 exact active-set comparisons"
+  ],
+  "joint_ball_fresh_process_comparison": {
+    "body": true,
+    "emission_current_history": true,
+    "generation": true,
+    "utf8": true,
+    "output": "The its the its the its the its the its the its the its the its the its the its the its the its the its the its the its the its ",
+    "disposition": {
+      "kind": "interrupted"
+    },
+    "prompt_and_emission_seconds": 64.415299352,
+    "native_error": null
+  },
+  "joint_ball_resume_process": {
+    "command": [
+      "target/debug/examples/alpha_text",
+      "--resume",
+      ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-joint-packet-v4.hna",
+      "--families",
+      "0",
+      "--prompt",
+      ".local/artifacts/athena-alpha/ac2/first-request.txt",
+      "--emit-symbols",
+      "128",
+      "--report",
+      ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-joint-packet-v4-joint-ball-resumed.json"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 103.79200992599363,
+    "max_rss_kib": 2108984
+  }
+}

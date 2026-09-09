@@ -204,6 +204,16 @@ with explicit source readings and per-return frame persistence. `joint_material_
 retains native and actual-data checks; the endogenous joint producer remains open.
 
 
+[established-bounded; source-inspected] `field/material_transport.rs::NativeMaterialTarget`
+separates the material codomain from the root field. `field_contextual_material.cuh` generates
+ordered complex tensor packets; contextual layouts, source adjoints and rest carry their target
+extent. `field/receiver/packet.rs` and `field_normalized_receiver.cuh` receive the full Euclidean
+ball through exact maximum-cone distances. The normalized observer uses complete packet mass
+for tensor targets, and the text SDK persists its declared target chart. The
+[joint-target return](../research/records/2026-09-08_AC2_THE_MATERIAL_TARGET_RETAINS_THE_JOINT_PACKET.md)
+and [parallel-mathematics refinement](../research/records/2026-09-08_AC_THE_PARALLEL_RECEIVER_CALCULUS_REFINES_NATIVE_CONTINUATION.md)
+retain checks, actual output and the unfinished AC1–AC2 obligations.
+
 [established-bounded; source-inspected] `resident/context_section.rs` and
 `constitutive_context_section.cuh` now derive the fixed-source context/return relation and its
 translated preimage. `field/context_section.rs` with `field_context_section.cuh` constructs the

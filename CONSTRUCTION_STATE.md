@@ -1,7 +1,7 @@
 # Construction state
 
 **Currency:** September 8, 2026. **Priority:** AC0–AC5 completion resumed by Brandon; flexible native construction with transparent failures.
-**Position:** AC0 complete; AC1 finite contact development completes the first corpus slice under a declared dyadic deposit; AC1 path/reuse and AC2 joint-packet generation remain open; AC3 experimental artifacts; AC4–AC5 open.
+**Position:** AC0 complete; AC1 finite contact development completes the first corpus slice; AC2 joint-packet transport and receiver are implemented, but output loops; AC1 path/reuse and AC2 productive continuation remain open; AC3 experimental artifacts; AC4–AC5 open.
 **Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -58,6 +58,29 @@ model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction
 
+[established-bounded; measured] The [joint-packet target](research/records/2026-09-08_AC2_THE_MATERIAL_TARGET_RETAINS_THE_JOINT_PACKET.md)
+separates eighteen root channels from 512 target coordinates and carries complex phase, native
+material/adjoint returns and persistence. The 1,930-occurrence study completes in 718.61 seconds
+with zero numerical development readouts. Its checkpoint is 975,051,267 bytes and developmental
+peak native residency is 1,959,779,252 bytes. The original implementation passes 99 field and
+21 SDK tests; the subsequent joint-ball refinement passes its three focused native controls.
+
+[counterexample; measured] Output still repeats `The its the its ...` through 128 symbols.
+The [parallel mathematics integration](research/records/2026-09-08_AC_THE_PARALLEL_RECEIVER_CALCULUS_REFINES_NATIVE_CONTINUATION.md)
+corrects the terminal receiver to transport the joint Euclidean ball, rather than separate
+coordinate intervals. It also derives the fixed-contact aggregate/parity decomposition and
+identifies the additional material-query and changing-contact receivers required by AC1 reuse.
+A fresh process with that receiver reproduces the body, emission currents and all 128 output
+decisions exactly. Neither this repair nor local test success establishes useful language.
+
+[definition] Current AC1–AC2 work must join the actual material coefficient return and contact
+response: the present amplitude-fit and normalized-potential objectives are different. Derive
+and implement their compatible return, including its numerical defect, and inspect continuation.
+Use the parallel joint-receiver/constitutive calculus for path and generator reuse; preserve
+internal contributions seen by material queries and later morphology. AC3 remains experimental;
+AC4–AC5 and useful Athena-alpha remain open.
+
+
 [established-bounded; measured] The [declared deposit realization](research/records/2026-09-08_AC1_THE_DEPOSIT_IS_A_NEW_COEFFICIENT_AND_ITS_DEFECT_REMAINS_A_COMPARISON.md)
 recovers the existing HNN distinction between a new exact dyadic coefficient and its comparison
 with an unrounded response. `DyadicDeposit` retains the full response factors, their covector
@@ -77,7 +100,7 @@ their nonzero projection residuals and unrounded-response defects. The
 128-symbol limit. The numerical continuation return does not complete AC1 or establish Athena.
 The [exact bit-marginal witness](research/experiments/alpha_passive_junction/bit_marginal_receipt.json)
 also shows that the present receiver can decode an absent joint symbol from strict individual
-bit signs. Next: AC2's joint packet receiver/codomain, composed with AC1's path and reuse work.
+bit signs. The joint packet receiver/codomain has since returned above; AC1 path and reuse work remains open.
 This receiver limitation is not established as the sole cause of the language failure.
 
 [established-bounded; measured] The [paired response](research/records/2026-09-08_AC1_THE_PAIRED_RETURN_CHANGES_CONTACTS_AND_THE_NEXT_CURRENT.md)
@@ -175,13 +198,13 @@ The no-float rule does not prohibit their mathematics. Root license texts now ma
 MIT-or-Apache-2.0 workspace declaration. No native or formal algorithm changed in this review.
 
 [open] AC1 has native phase/current transport, material contacts, operative representations and
-partial adjoints. It has not returned observation-driven contact-morphology development or a
-productive general-conversation composition of the available mechanisms. The exact tangent normal response does not
+partial adjoints. Its bounded observation-driven contact-morphology development is recorded above; it has not
+returned a productive general-conversation composition of the available mechanisms. The exact tangent normal response does not
 establish the full finite nonlinear successor or the adequacy of the chosen source/formation law.
 AC2 has only failed product probes. AC3's bounded persistence apparatus does not establish broad
 useful-model cultivation; AC4–AC5 remain unfinished.
 
-[counterexample; measured] The latest eight-family model has 1,930 developmental occurrences,
+[counterexample; measured] The earlier fixed-contact eight-family model has 1,930 developmental occurrences,
 took 241.63 seconds to develop, and occupies 163,800,816 bytes. The function/derivative answer
 repeats `tife~anen…` through the 128-symbol work limit and is unusable. A fresh process reproduces
 the body, current history and generation exactly. The

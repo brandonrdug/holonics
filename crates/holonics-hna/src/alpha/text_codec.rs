@@ -5,6 +5,7 @@ use holonic_engine::native_ecology::constitutive_fibre::{
     NativeConstitutiveField, NativeFieldDifferentialReading, NativeFieldJunctionSolver,
     NativeFieldSourceAnchor, NativeMaterialTransportSource, NativePhaseCurrent,
     ResidentConstitutiveReturn,
+    NativeMaterialTarget, NativeMaterialPacketReading,
 };
 use serde::Serialize;
 
@@ -73,8 +74,20 @@ pub enum TextCodeDisposition {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[serde(untagged)]
+pub enum TextNativeReading {
+    Differential(NativeFieldDifferentialReading),
+    Packet(NativeMaterialPacketReading),
+}
+impl TextNativeReading {
+    pub fn constitutive_status(&self)->Option<holonic_engine::native_ecology::constitutive_fibre::NativeFieldReceiverStatus>{
+        match self {Self::Differential(r)=>r.constitutive_status,Self::Packet(_)=>None}
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct TextCodeReading {
-    pub native: NativeFieldDifferentialReading,
+    pub native: TextNativeReading,
     pub disposition: TextCodeDisposition,
 }
 
@@ -86,6 +99,19 @@ pub fn read_text_symbol(
         return Err(AlphaMaterialError::Apparatus(
             "text codec requires its declared 18-channel chart".into(),
         ));
+    }
+    if matches!(field.material_target(),Some(NativeMaterialTarget::TensorProduct{factor_width}) if factor_width!=2){
+        return Err(AlphaMaterialError::Apparatus("text receiver requires the declared binary packet chart".into()));
+    }
+    if field.material_target()==Some(NativeMaterialTarget::TensorProduct{factor_width:2}) {
+        let reading=field.read_material_packet(occurrence)?.ok_or_else(||AlphaMaterialError::Apparatus("missing material packet".into()))?;
+        let disposition=match reading.selected {
+            Some(code)=>match TextSymbol::from_codeword(u16::try_from(code).map_err(|_|AlphaMaterialError::Apparatus("packet coordinate outside text chart".into()))?) {
+                Some(symbol)=>TextCodeDisposition::Symbol{symbol},None=>TextCodeDisposition::Reserved{codeword:code as u16},
+            },
+            None=>TextCodeDisposition::Open,
+        };
+        return Ok(TextCodeReading{native:TextNativeReading::Packet(reading),disposition});
     }
     let native = (if field.has_material_transport() {
         field.read_material_transport_pairs(occurrence, TEXT_BIT_PAIRS)?
@@ -135,7 +161,7 @@ fn from_differential(native: NativeFieldDifferentialReading) -> TextCodeReading 
         }
     };
     TextCodeReading {
-        native,
+        native: TextNativeReading::Differential(native),
         disposition,
     }
 }
@@ -156,9 +182,13 @@ pub fn with_text_field_source<R>(
     source: NativeMaterialTransportSource,
     operation: impl FnOnce(&mut NativeConstitutiveField<'_>) -> Result<R, AlphaMaterialError>,
 ) -> Result<R, AlphaMaterialError> {
+    with_text_field_chart(fractional_bits,source,NativeMaterialTarget::DirectCurrent,operation)
+}
+pub fn with_text_field_chart<R>(fractional_bits:u32,source:NativeMaterialTransportSource,target:NativeMaterialTarget,
+    operation:impl FnOnce(&mut NativeConstitutiveField<'_>)->Result<R,AlphaMaterialError>)->Result<R,AlphaMaterialError>{
     with_matched_field_profile(TEXT_INPUT_CHANNELS, true, Some(fractional_bits), |field| {
         field.set_junction_solver(NativeFieldJunctionSolver::BalancedPairs)?;
-        field.enable_material_transport_source(source)?;
+        field.enable_material_transport_chart(source,target)?;
         operation(field)
     })
 }

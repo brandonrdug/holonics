@@ -164,6 +164,7 @@ fn raw_return(pred: &[i128], pr: i128, obs: &[i128], qr: i128, group: usize) -> 
                 group,
                 72,
                 SeriesAperture(32),
+                false,
                 &output,
             )
             .unwrap();

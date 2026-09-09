@@ -63,9 +63,11 @@ pub use material_transport::{
     NativeFieldMaterialTransportResidual, NativeFieldMaterialTransportState,
     NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading,
     NativeMaterialModeReturn, NativeMaterialModeUnfolding, NativeMaterialTransportSource,
+    NativeMaterialTarget,
     NativeMomentMaterialReading, NativeContextualMaterialReading, NativeOperativeContextReading, NativeVisibleSourceReading,
 };
 pub use receiver::{NativeFieldDifferentialReading, NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn,
+    NativeMaterialPacketReading,
     NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading};
 pub use resident_input::NativeFieldIncoming;
 pub use rest::NativeFieldRest;
@@ -671,6 +673,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         if self.transport.as_ref().is_some_and(|t|t.source!=NativeMaterialTransportSource::OperativeContextual) && self.junction.as_ref().and_then(|j|j.operative.as_ref()).is_some_and(|o|!o.is_fixed()) {
             return Err(ConstitutiveFibreError::Rest("the fixed-contact material source cannot read changed operative contacts".into()));
         }
+        let material_target=self.transport.as_ref().map_or((self.nodes(),0),|t|(t.target.dimension(self.nodes()).unwrap(),t.target.kernel()));
         let prepared = self.prepare_junction(source_at.is_some())?;
         let prepared_transport = self.prepare_material_transport(source_at)?;
         let lineage_lanes = if resident_current.is_some() {
@@ -779,6 +782,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                     .map(|p| (&p.table, p.count, &p.weights)),
                 prepared_transport.as_ref().and_then(|p|p.contextual.as_ref()).map(|p|(&p.table,&p.weights,&p.evaluations,source_at.unwrap_or(0) as u64)),
                 prepared.as_ref().and_then(|(p,_)|p.operative.as_ref()).map(|p|&p.table),
+                material_target,
                 &output,
             )?;
         }

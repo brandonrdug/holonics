@@ -46,6 +46,9 @@ pub struct SavedTextField {
     application: Vec<u8>,
 }
 impl SavedTextField {
+    pub fn material_target(&self)->Option<holonic_engine::native_ecology::constitutive_fibre::NativeMaterialTarget>{
+        self.field.material_target()
+    }
     pub fn occurrences(&self) -> usize {
         self.field.occurrences()
     }
@@ -72,6 +75,9 @@ impl SavedTextField {
     }
     fn validate(&self) -> Result<(), AlphaMaterialError> {
         self.field.validate()?;
+        if matches!(self.field.material_target(),Some(holonic_engine::native_ecology::constitutive_fibre::NativeMaterialTarget::TensorProduct{factor_width}) if factor_width!=2){
+            return Err(error("text checkpoint has an incompatible packet target"));
+        }
         self.stream.validate().map_err(error)?;
         let sources = self.field.source_slots();
         let anchors = self.field.anchor_slots();

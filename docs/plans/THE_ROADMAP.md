@@ -119,14 +119,21 @@ the standing HNN distinction between exact finite coefficients and comparisons w
 response. It preserves prior source/current uncertainty and changes no legacy realization.
 The answer still repeats `Tife~anen…`; AC1 and Athena-alpha are not complete.
 
-[definition] The next construction joins **AC1 path/reuse and AC2's joint packet receiver**.
-First separate the material target codomain from the root field size and retain a packet's joint
-structure through its learned current and receiver. The exact marginal counterexample in the
-deposit record supplies a falsifier: strict bit signs can decode an absent joint symbol.
-Compose the existing source-qualified return with that codec, then test actual continuation.
-Do not replace it with a grammar emitter, observed-word filter, authored semantic classifier or
-larger unchanged corpus run. Keep the path-growth, generator/decoder and cost obligations of
-AC1 steps 3–4 active as that receiver composition develops.
+[established-bounded; measured] The [joint-packet return](../../research/records/2026-09-08_AC2_THE_MATERIAL_TARGET_RETAINS_THE_JOINT_PACKET.md)
+now separates the target codomain from the root field and transports its complete packet phase
+through the native material/adjoint owners. The same 1,930-occurrence study completes, but its
+answer repeats `The its the its ...`. The parallel-mathematics refinement reads the complete
+Euclidean current ball, with exact joint-cone comparisons, rather than coordinate boxes.
+
+[definition] Next join the native material coefficient and contact returns under compatible
+receiver objectives, retaining the numerical defect and actual producing morphology. The
+[parallel calculus integration](../../research/records/2026-09-08_AC_THE_PARALLEL_RECEIVER_CALCULUS_REFINES_NATIVE_CONTINUATION.md)
+identifies the current amplitude-fit/normalized-potential mismatch and derives AC1's fixed-contact
+aggregate/parity reuse law. Continue path growth and generator reuse through the joint boundary,
+material-query and changing-contact family; its internal remainder cannot be discarded merely
+because the current boundary is blind to it. Inspect actual continuation after the changed law.
+Do not substitute a grammar emitter, observed-word filter, authored classifier or larger unchanged
+corpus run. AC1 steps 3–4 and AC2 productive continuation remain required.
 
 [counterexample; measured] The [paired contact construction](../../research/records/2026-09-08_AC1_THE_PAIRED_RETURN_CHANGES_CONTACTS_AND_THE_NEXT_CURRENT.md)
 has verified local finite conduct, but its earlier `EnclosedFlow` corpus attempt refuses: first at 9 occurrences, then at
@@ -154,7 +161,7 @@ complete population bounds, not an arbitrary radius, discarded current or basin-
 
 [project-postulate] Brandon has resumed completion of AC0–AC5 as the active goal and explicitly
 directs flexible designs and transparent reporting when a composition does not work.
-**Current work: AC1 path/reuse and AC2 joint-packet codec, after the bounded finite development return.** Each work update names phase/step, actual artifact and returned
+**Current work: AC1 material/contact return and path/reuse, with AC2 productive continuation after the joint-packet receiver return.** Each work update names phase/step, actual artifact and returned
 consequence. Do not resume the preserved joint kernel by default or restart completed foundations.
 
 | Phase | Ordered construction | Return required |

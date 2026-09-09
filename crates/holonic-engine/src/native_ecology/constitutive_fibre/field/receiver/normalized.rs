@@ -20,6 +20,7 @@ pub struct NativeNormalizedMaterialReturn<'chart> {
     grain: u32,
     series_terms: u32,
     nodes: usize,
+    target_chart: NativeMaterialTarget,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -29,6 +30,7 @@ pub struct NativeNormalizedMaterialReading {
     pub group_width: usize,
     pub grain: u32,
     pub series_terms: u32,
+    pub target_chart: NativeMaterialTarget,
     pub prediction: Vec<ExactInterval>,
     pub observation: Vec<ExactInterval>,
     /// q-p. In this unit potential chart this is also the negative potential derivative of
@@ -84,6 +86,7 @@ impl NativeNormalizedMaterialReturn<'_> {
             group_width: self.group_width,
             grain: self.grain,
             series_terms: self.series_terms,
+            target_chart: self.target_chart,
             prediction,
             observation,
             returned_difference: read(4)?,
@@ -96,7 +99,8 @@ impl NativeNormalizedMaterialReturn<'_> {
 impl<'chart> NativeConstitutiveField<'chart> {
     /// Compare an actual received material occurrence with the prediction of its actual source.
     /// Grouping is an exterior receiver declaration, not native topology or an alphabet.
-    /// Within each group, p=softmax(Re prediction), q=softmax(Re observed current).
+    /// Within each group p=softmax(Re prediction). Direct current retains its historical
+    /// exponentiated-observation chart; a tensor packet uses its observed squared-modulus mass.
     /// The returned potential covector J_p(q-p) is the negative derivative of half squared
     /// receiver discrepancy with the observed face fixed. Original complex carriers stay held.
     pub fn normalized_material_return(
@@ -105,7 +109,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
         group_width: usize,
         terms: SeriesAperture,
     ) -> Result<Option<NativeNormalizedMaterialReturn<'chart>>, ConstitutiveFibreError> {
-        let nodes = self.nodes();
+        let target_chart=self.material_target().unwrap_or_default();
+        let nodes = target_chart.dimension(self.nodes()).ok_or(ConstitutiveFibreError::Shape)?;
         if group_width == 0 || nodes % group_width != 0 || terms.0 == 0 || terms.0 == u32::MAX {
             return Err(ConstitutiveFibreError::Shape);
         }
@@ -128,7 +133,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
         };
         let report_words = self
             .material_transport_source()
-            .and_then(|source| source.report_words(nodes))
+            .and_then(|source| source.report_words_for(self.nodes(),target_chart))
             .ok_or(ConstitutiveFibreError::Shape)?;
         if prediction.width() != report_words || observation.width() != report_words {
             return Err(ConstitutiveFibreError::Shape);
@@ -147,6 +152,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 group_width,
                 grain,
                 terms,
+                !target_chart.is_direct(),
                 &output,
             )?;
         }
@@ -170,6 +176,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             grain,
             series_terms: terms.0,
             nodes,
+            target_chart,
         }))
     }
 }

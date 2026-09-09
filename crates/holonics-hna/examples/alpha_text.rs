@@ -1,14 +1,14 @@
 //! First public text-codec composition over the resident native field. This driver mounts actual
 //! exposure and reads actual native emission; it contains no learner, target answer or fallback.
 use holonic_engine::native_ecology::constitutive_fibre::{
-    NativeFieldSourceAnchor, NativeMaterialTransportSource, NativeContactRealization,
+    NativeFieldSourceAnchor, NativeMaterialTransportSource, NativeContactRealization, NativeMaterialTarget,
 };
 use holonics_hna::{
     alpha::{
         checkpoint::SavedTextField,
         exposure::{ExposureCursor, ExposureFamily, ExposurePartition, ExposureReader},
         material::AlphaMaterialError,
-        text_codec::{with_text_field_source, TextSymbol},
+        text_codec::{with_text_field_chart, TextSymbol},
         text_session::{TextCurrentReceiver, TextFieldSession},
     },
     publish_new,
@@ -194,7 +194,8 @@ fn cultivate(
                     break;
                 }
                 if contact_response {
-                    if let Err(error)=session.respond_to_latest_material_with_realization(2,
+                    let group=match session.field().material_target(){Some(NativeMaterialTarget::TensorProduct{..})=>session.field().material_target_dimension().unwrap(),_=>2};
+                    if let Err(error)=session.respond_to_latest_material_with_realization(group,
                         holonic_engine::native_ecology::constitutive_fibre::NativeMaterialPullbackMetric::RelativeEntropy,
                         contact_realization) {
                         failure=Some(json!({"phase":"contact-response","symbol_index":symbol_index,
@@ -292,6 +293,7 @@ fn run_session(
     report["junction_solver"] = json!(session.field().junction_solver());
     report["has_material_transport"] = json!(session.field().has_material_transport());
     report["material_source"] = json!(session.field().material_transport_source());
+    report["material_target"] = json!(session.field().material_target());
     report["text_receiver"] = json!(text_receiver);
     report["contact_response_during_development"] = json!(contact_response);
     report["contact_realization"] = json!(contact_realization);
@@ -440,7 +442,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -456,6 +458,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut contact_realization = None;
     let mut history_archive = None;
     let mut material_source = None;
+    let mut material_target = None;
     let mut text_receiver = TextCurrentReceiver::Material;
     while let Some(option) = args.next() {
         let value = args.next().ok_or("missing option value")?;
@@ -493,6 +496,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             "--operative-junction" => operative = value.parse::<bool>()?,
             "--contact-response" => contact_response = Some(value.parse::<bool>()?),
+            "--material-target" => material_target=Some(match value.as_str(){
+                "direct-current"=>NativeMaterialTarget::DirectCurrent,
+                "joint-packet"=>NativeMaterialTarget::TensorProduct{factor_width:2},
+                _=>return Err("material target must be direct-current or joint-packet".into()),
+            }),
             "--contact-realization" => contact_realization = Some(match value.as_str() {
                 "enclosed-flow" => NativeContactRealization::EnclosedFlow,
                 "dyadic-deposit" => NativeContactRealization::DyadicDeposit,
@@ -569,6 +577,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         if material_source.is_some() && material_source != saved.material_transport_source() {
             return Err("resume cannot silently change the saved material source".into());
         }
+        if material_target.is_some() && material_target!=saved.material_target(){return Err("resume cannot silently change the saved material target".into());}
         if grain.is_some_and(|g| g != actual_grain) {
             return Err("resume cannot silently change the saved numerical chart".into());
         }
@@ -631,9 +640,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         report["fractional_bits"] = json!(grain);
         report["families_aperture"] = json!(families);
         let exposure = exposure.to_string_lossy().into_owned();
-        with_text_field_source(
+        with_text_field_chart(
             grain,
             material_source.unwrap_or(NativeMaterialTransportSource::OperativeContextual),
+            material_target.unwrap_or(if material_source.is_some_and(|s|s!=NativeMaterialTransportSource::OperativeContextual){NativeMaterialTarget::DirectCurrent}else{NativeMaterialTarget::TensorProduct{factor_width:2}}),
             |field| {
                 if let Some(path) = &history_archive {
                     field.enable_history_archive(path)?;

@@ -56,27 +56,27 @@ __device__ MaterialInterval mp_kernel(HistoryInteger re,HistoryInteger im,Histor
 }
 
 extern "C" __global__ __launch_bounds__(512) void section_field_material_pullback_factors(
-    const int64_t *table,const int64_t *returned,uint32_t source,uint32_t n,uint32_t g,uint32_t metric,
+    const int64_t *table,const int64_t *returned,uint32_t source,uint32_t n,uint32_t targets,uint32_t g,uint32_t metric,
     int64_t *out_lo,int64_t *out_hi,uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
 ){
     if(threadIdx.x||upstream_refused(census,lineage,lineage_count,slot))return;
     uint32_t f=blockIdx.x,at=f/2u;if(at>source)return;
     wide *out=(wide *)out_lo+10u*f;for(uint32_t j=0;j<20u;++j)out_lo[20u*f+j]=out_hi[20u*f+j]=0;
-    const int64_t *entry=contextual_at(table,at),*meta=entry+contextual_meta(n);
+    const int64_t *entry=contextual_at(table,at),*meta=entry+contextual_meta(n,targets);
     if(meta[1]<0)return;
     int64_t reference=meta[2];if(!at||reference<1||reference>(int64_t)at||meta[3]!=3){atomicOr(slot,REFUSED_MALFORMED);return;}
     if((f&1u)&&reference==(int64_t)at)return;
     uint32_t query=(f&1u)?(uint32_t)reference:at;
     const int64_t *basis=contextual_at(table,query),*now=contextual_at(table,source);
-    const int64_t *s=basis+contextual_input_visible(n),*c=contextual_at(table,query-1u)+contextual_context(n);
-    const int64_t *sq=now+contextual_output_visible(n),*cq=now+contextual_context(n);
+    const int64_t *s=basis+contextual_input_visible(n,targets),*c=contextual_at(table,query-1u)+contextual_context(n,targets);
+    const int64_t *sq=now+contextual_output_visible(n,targets),*cq=now+contextual_context(n,targets);
     HistoryInteger sr,si,sn,sqn,cr,ci,cn,cqn;
     mp_pair(s,nullptr,sq,nullptr,n,g,true,sr,si,sn,sqn,slot);
     mp_pair(c,contextual_b_at(table,query-1u),cq,contextual_b_at(table,source),n,g,false,cr,ci,cn,cqn,slot);
     MaterialInterval ks=mp_kernel(sr,si,sn,sqn,g,slot),kc=mp_kernel(cr,ci,cn,cqn,g,slot),alpha={0,0};
-    const wide *beta=(const wide *)(entry+contextual_beta(n)),*r=(const wide *)returned;
-    for(uint32_t j=0;j<n;++j){
-        wide b=(f&1u)?sub_checked(0,beta[2u*n+2u*j],slot):add_checked(beta[2u*j],beta[2u*n+2u*j],slot);
+    const wide *beta=(const wide *)(entry+contextual_beta(n,targets)),*r=(const wide *)returned;
+    for(uint32_t j=0;j<targets;++j){
+        wide b=(f&1u)?sub_checked(0,beta[2u*targets+2u*j],slot):add_checked(beta[2u*j],beta[2u*targets+2u*j],slot);
         uint32_t offset=metric==0?4u:6u;
         alpha=mp_add(alpha,mp_mul(mp_point(b),{r[10u*j+offset],r[10u*j+offset+1u]},g,slot),slot);
     }
@@ -86,14 +86,14 @@ extern "C" __global__ __launch_bounds__(512) void section_field_material_pullbac
     for(uint32_t j=0;j<5;++j){out[2u*j]=coefficients[j].lo;out[2u*j+1u]=coefficients[j].hi;}
     if(!*slot)for(uint32_t j=0;j<20u;++j)out_hi[20u*f+j]=out_lo[20u*f+j];
 }
-__device__ wide mp_coordinate(const int64_t *table,uint32_t at,uint32_t n,uint32_t j,bool visible,bool output){
+__device__ wide mp_coordinate(const int64_t *table,uint32_t at,uint32_t n,uint32_t j,bool visible,bool output,uint32_t targets){
     const int64_t *r=contextual_at(table,at);
-    if(visible)return ((const wide *)(r+(output?contextual_output_visible(n):contextual_input_visible(n))+8u*n+2u))[j];
-    const int64_t *c=r+contextual_context(n);if(j<6u*n)return ((const wide *)c)[j];
+    if(visible)return ((const wide *)(r+(output?contextual_output_visible(n,targets):contextual_input_visible(n,targets))+8u*n+2u))[j];
+    const int64_t *c=r+contextual_context(n,targets);if(j<6u*n)return ((const wide *)c)[j];
     j-=6u*n;return j<2u*(uint64_t)c[36u*n+18u]?contextual_b_at(table,at)[j]:0;
 }
 extern "C" __global__ __launch_bounds__(512) void section_field_material_pullback_return(
-    const int64_t *table,const int64_t *factors,const int64_t *returned,uint32_t source,uint32_t n,uint32_t k,uint32_t g,uint32_t metric,
+    const int64_t *table,const int64_t *factors,const int64_t *returned,uint32_t source,uint32_t n,uint32_t k,uint32_t targets,uint32_t g,uint32_t metric,
     int64_t *out_lo,int64_t *out_hi,uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
 ){
     if(upstream_refused(census,lineage,lineage_count,slot))return;
@@ -101,29 +101,29 @@ extern "C" __global__ __launch_bounds__(512) void section_field_material_pullbac
     bool visible=coordinate<4u*n;uint32_t j=visible?coordinate:coordinate-4u*n;
     MaterialInterval sum={0,0},z={0,0};
     for(uint32_t f=0;f<2u*(source+1u);++f){
-        uint32_t at=f/2u;const int64_t *entry=contextual_at(table,at),*meta=entry+contextual_meta(n);if(meta[1]<0)continue;
+        uint32_t at=f/2u;const int64_t *entry=contextual_at(table,at),*meta=entry+contextual_meta(n,targets);if(meta[1]<0)continue;
         if((f&1u)&&meta[2]==(int64_t)at)continue;
         uint32_t q=(f&1u)?(uint32_t)meta[2]:at;
         const wide *a=(const wide *)factors+10u*f;uint32_t offset=visible?0u:4u;
         MaterialInterval ar={a[offset],a[offset+1]},ai={a[offset+2],a[offset+3]};
-        wide x=mp_coordinate(table,visible?q:q-1u,n,j&~1u,visible,false);
-        wide y=mp_coordinate(table,visible?q:q-1u,n,(j&~1u)+1u,visible,false);
+        wide x=mp_coordinate(table,visible?q:q-1u,n,j&~1u,visible,false,targets);
+        wide y=mp_coordinate(table,visible?q:q-1u,n,(j&~1u)+1u,visible,false,targets);
         MaterialInterval value=(j&1u)?mp_add(mp_mul(ar,mp_point(y),g,slot),mp_mul(ai,mp_point(x),g,slot),slot):
             mp_add(mp_mul(ar,mp_point(x),g,slot),mp_neg(mp_mul(ai,mp_point(y),g,slot),slot),slot);
         sum=mp_add(sum,value,slot);z=mp_add(z,{a[8],a[9]},slot);
     }
-    const int64_t *now=contextual_at(table,source),*s=now+contextual_output_visible(n),*c=now+contextual_context(n);
-    wide x=mp_coordinate(table,source,n,j,visible,true);
+    const int64_t *now=contextual_at(table,source),*s=now+contextual_output_visible(n,targets),*c=now+contextual_context(n,targets);
+    wide x=mp_coordinate(table,source,n,j,visible,true,targets);
     sum=mp_add(sum,mp_neg(mp_mul(z,mp_point(x),g,slot),slot),slot);
     HistoryInteger unit=complete_power(2u*g,slot);
     HistoryInteger norm=visible?history_read_integer(s+16u*n+2u,slot):unit+history_read_integer(c+36u*n+10u,slot);
     sum=mp_mul(sum,mp_ratio(HistoryInteger(2)*unit,norm,g,slot),g,slot);
     // ||DQ||<=2, ||D²Q||<=20, and the other tensor factor changes by <=2*distance.
     // M's retained coefficient defect includes the immutable historical factor uncertainty.
-    const wide *bounds=(const wide *)(now+contextual_extra(n)),*r=(const wide *)returned;
+    const wide *bounds=(const wide *)(now+contextual_extra(n,targets)),*r=(const wide *)returned;
     wide es=((const wide *)(s+16u*n+8u))[0],ec=((const wide *)(c+36u*n+16u))[0],rn=0;
     if(es<0||ec<0||bounds[0]<0||bounds[1]<0){atomicOr(slot,REFUSED_MALFORMED);return;}
-    for(uint32_t i=0;i<n;++i){uint32_t off=10u*i+(metric==0?4u:6u);wide a=r[off],b=r[off+1];
+    for(uint32_t i=0;i<targets;++i){uint32_t off=10u*i+(metric==0?4u:6u);wide a=r[off],b=r[off+1];
         if(a>b){atomicOr(slot,REFUSED_MALFORMED);return;}wide m=a<0?sub_checked(0,a,slot):a;wide t=b<0?sub_checked(0,b,slot):b;
         rn=add_checked(rn,m>t?m:t,slot);
     }

@@ -1,32 +1,43 @@
 use super::*;
 
 impl<'chart> ResidentSurface<'chart> {
+    pub(crate) fn record_field_material_packet_receiver(&self,lane:&Lane<'_,'chart>,input:&ResidentSection<'chart>,
+        targets:usize,scratch:&ResidentSection<'chart>,output:&ResidentSection<'chart>)->Result<(),ResidentRefusal>{
+        if targets==0||targets>u32::MAX as usize/4||input.rows!=1||input.width<4*targets+2
+            ||output.rows!=1||output.width!=targets+2||scratch.rows!=1||scratch.width!=2*targets
+            ||input.grain.0!=0||output.grain.0!=0||scratch.grain.0!=0{
+            return Err(ResidentRefusal::Declaration{operation:"material-packet-receiver",what:"incompatible joint target chart".into()});
+        }
+        let mut p=Params::new();p.ptr(input.lo.device_ptr()).u32(targets as u32).ptr(scratch.lo.device_ptr()).ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_field_material_packet_receiver",1,self.declaration.warp_size.max(1),0,&mut p,"material-packet-receiver")
+    }
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn record_field_material_pullback(
         &self, lane: &Lane<'_, 'chart>, table: &ResidentSection<'chart>,
-        returned: &ResidentSection<'chart>, source: usize, nodes: usize, contacts: usize,
+        returned: &ResidentSection<'chart>, source: usize, nodes: usize, targets: usize, contacts: usize,
         grain: u32, metric: u32, factors: &ResidentSection<'chart>, output: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
         let fail = || ResidentRefusal::Declaration {
             operation: "field-material-pullback", what: "incompatible producing material chart".into(),
         };
         let coordinates=nodes.checked_mul(10).and_then(|v|contacts.checked_mul(2).and_then(|k|v.checked_add(k))).ok_or_else(fail)?;
-        if nodes==0 || coordinates>u32::MAX as usize/4 || source>=u32::MAX as usize/2
+        if nodes==0 || targets==0 || targets>u32::MAX as usize/82 || coordinates>u32::MAX as usize/4 || source>=u32::MAX as usize/2
             || !(1..=120).contains(&grain) || metric>1 || table.rows!=source+1 || table.width!=3
-            || returned.rows!=1 || returned.width!=20*nodes
+            || returned.rows!=1 || returned.width!=20*targets
             || factors.rows!=2*(source+1) || factors.width!=20
             || output.rows!=1 || output.width!=4*coordinates
             || [table,returned,factors,output].iter().any(|s|s.grain.0!=0) { return Err(fail()); }
         let mut params=Params::new();
         params.ptr(table.lo.device_ptr()).ptr(returned.lo.device_ptr())
-            .u32(source as u32).u32(nodes as u32).u32(grain).u32(metric)
+            .u32(source as u32).u32(nodes as u32).u32(targets as u32).u32(grain).u32(metric)
             .ptr(factors.lo.device_ptr()).ptr(factors.hi.device_ptr())
             .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
         self.record_blocks(lane,"section_field_material_pullback_factors",2*(source+1),
             self.declaration.warp_size.max(1),0,&mut params,"field-material-pullback-factors")?;
         let mut params=Params::new();
         params.ptr(table.lo.device_ptr()).ptr(factors.lo.device_ptr()).ptr(returned.lo.device_ptr())
-            .u32(source as u32).u32(nodes as u32).u32(contacts as u32).u32(grain).u32(metric)
+            .u32(source as u32).u32(nodes as u32).u32(contacts as u32).u32(targets as u32).u32(grain).u32(metric)
             .ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
             .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
         let block=self.declaration.warp_size.max(1);
@@ -40,7 +51,7 @@ impl<'chart> ResidentSurface<'chart> {
     pub(crate) fn record_field_normalized_receiver(
         &self, lane: &Lane<'_, 'chart>, prediction: &ResidentSection<'chart>,
         observation: &ResidentSection<'chart>, nodes: usize, group_width: usize,
-        grain: u32, terms: SeriesAperture, output: &ResidentSection<'chart>,
+        grain: u32, terms: SeriesAperture, packet_observation: bool, output: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
         let fail = || ResidentRefusal::Declaration {
             operation: "field-normalized-receiver", what: "incompatible material receiver chart".into(),
@@ -58,7 +69,7 @@ impl<'chart> ResidentSurface<'chart> {
         }
         let mut params=Params::new();
         params.ptr(prediction.lo.device_ptr()).ptr(observation.lo.device_ptr())
-            .u32(nodes as u32).u32(group_width as u32).u32(grain).u32(terms.0)
+            .u32(nodes as u32).u32(group_width as u32).u32(grain).u32(terms.0).u32(u32::from(packet_observation))
             .ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
             .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
         self.record_blocks(lane,"section_field_normalized_receiver",nodes/group_width,
@@ -354,12 +365,18 @@ impl<'chart> ResidentSurface<'chart> {
         moment:Option<(&ResidentSection<'chart>,usize,&ResidentSection<'chart>)>,
         contextual:Option<(&ResidentSection<'chart>,&ResidentSection<'chart>,&ResidentSection<'chart>,u64)>,
         operative:Option<&ResidentSection<'chart>>,
+        material_target:(usize,u32),
         output: &ResidentSection<'chart>,
     ) -> Result<(), ResidentRefusal> {
         let fail = |what: &str| ResidentRefusal::Declaration {
             operation: "constitutive-field", what: what.into(),
         };
         let nodes = seed.rows;
+        let (targets,target_factor_width)=material_target;
+        if targets==0 || targets>u32::MAX as usize/82 || (target_factor_width==0 && targets!=nodes)
+            || (target_factor_width!=0 && transport.as_ref().is_none_or(|t|t.5!=6)) {
+            return Err(fail("incompatible material target chart"));
+        }
         let width = nodes.checked_mul(6).filter(|v| *v <= u32::MAX as usize / 4)
             .ok_or_else(|| fail("field relation extent overflow"))?;
         let output_width = nodes.checked_mul(16).and_then(|v| v.checked_add(9))
@@ -394,7 +411,8 @@ impl<'chart> ResidentSurface<'chart> {
             let state_words=if *kind==1 {nodes.checked_mul(nodes).and_then(|n|n.checked_mul(12)).and_then(|n|n.checked_add(2))}
                 else if *kind==2 {nodes.checked_mul(nodes).and_then(|n|n.checked_mul(60)).and_then(|n|n.checked_add(22*nodes+12))}
                 else if *kind>=3 && *kind<=6 {nodes.checked_mul(12).and_then(|n|n.checked_add(12))} else {None}.ok_or_else(||fail("material state extent or kind"))?;
-            let report_words=nodes.checked_mul(if *kind==1 {36}else if *kind==2 {74}else if *kind==3 {96}else{150}).and_then(|n|n.checked_add(if *kind==1 {24}else if *kind>=4 {96}else{44})).ok_or_else(||fail("material report extent"))?;
+            let report_words=if *kind>=4 {nodes.checked_mul(68).and_then(|n|targets.checked_mul(82).and_then(|t|n.checked_add(t))).and_then(|n|n.checked_add(96))}
+                else {nodes.checked_mul(if *kind==1 {36}else if *kind==2 {74}else{96}).and_then(|n|n.checked_add(if *kind==1 {24}else{44}))}.ok_or_else(||fail("material report extent"))?;
             if refreshed.is_some_and(|s|!matches!(*kind,2|3) || !matches(s,1,if *kind==2 {10*nodes}else{30*nodes})) {return Err(fail("current source contraction extent"));}
             if (*kind==3)!=moment.is_some(){return Err(fail("moment source factors missing or unexpected"));}
             if (*kind>=4)!=contextual.is_some(){return Err(fail("contextual source work missing or unexpected"));}
@@ -415,7 +433,7 @@ impl<'chart> ResidentSurface<'chart> {
         if let Some((table,weights,evaluations,source))=contextual {
             let at=usize::try_from(occurrence).map_err(|_|fail("contextual chronology extent"))?;
             if occurrence>=u32::MAX as u64 || (origin.is_some() && source>=occurrence)
-                || !matches(table,at.max(1),3) || !matches(weights,at+1,16) || !matches(evaluations,4,30*nodes){return Err(fail("contextual source work extent"));}
+                || !matches(table,at.max(1),3) || !matches(weights,at+1,16) || !matches(evaluations,4,30*targets){return Err(fail("contextual source work extent"));}
         }
         if operative.is_some_and(|s|!matches(s,1,20) || junction.is_none_or(|j|j.5.0==1)) {return Err(fail("operative contact table or current representation"));}
         let shared = nodes.checked_mul(24).and_then(|v| v.checked_mul(16))
@@ -451,6 +469,7 @@ impl<'chart> ResidentSurface<'chart> {
         params.ptr(contextual.map_or(0,|p|p.0.lo.device_ptr())).ptr(contextual.map_or(0,|p|p.1.lo.device_ptr()))
             .ptr(contextual.map_or(0,|p|p.2.lo.device_ptr())).u64(contextual.map_or(0,|p|p.3));
         params.ptr(operative.map_or(0,|p|p.lo.device_ptr()));
+        params.u32(targets as u32).u32(target_factor_width);
         params.ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
             .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
         self.record_blocks(lane, "section_constitutive_field", 1, self.launch.block_x,

@@ -67,6 +67,8 @@ struct Header {
         skip_serializing_if = "NativeMaterialTransportSource::is_outgoing"
     )]
     transport_source: NativeMaterialTransportSource,
+    #[serde(default,skip_serializing_if="NativeMaterialTarget::is_direct")]
+    transport_target: NativeMaterialTarget,
     #[serde(default,skip_serializing_if="Option::is_none")]
     operative:Option<OperativeWire>,
     source_slots: Vec<Option<usize>>,
@@ -198,6 +200,7 @@ fn transport_section(
 }
 
 impl NativeFieldRest {
+    pub fn material_target(&self)->Option<NativeMaterialTarget>{self.header.transport.then_some(self.header.transport_target)}
     pub fn nodes(&self) -> usize {
         self.header.nodes
     }
@@ -248,7 +251,8 @@ impl NativeFieldRest {
             || h.history.len() != self.history.len()
             || h.junction.is_some() != self.covariance.is_some()
             || h.transport != self.transport.is_some()
-            || (!h.transport && !h.transport_source.is_outgoing())
+            || (!h.transport && (!h.transport_source.is_outgoing() || !h.transport_target.is_direct()))
+            || h.transport_source.report_words_for(n,h.transport_target).is_none()
             || self.initial_junction.is_some() != (h.junction.is_some() && h.history.is_empty())
         {
             return Err(invalid("field populations"));
@@ -500,7 +504,7 @@ impl NativeFieldRest {
                         NativeMaterialTransportSource::Contextual
                         | NativeMaterialTransportSource::BilinearContextual
                         | NativeMaterialTransportSource::OperativeContextual => {
-                            material_transport::contextual::validate_report(section, n, grain, at)?
+                            material_transport::contextual::validate_report_for(section, n, h.transport_target.dimension(n).ok_or_else(||invalid("material target extent"))?, grain, at)?
                         }
                         NativeMaterialTransportSource::HomogeneousMoment => {
                             material_transport::moment::validate_report(section, n, grain, at)?
@@ -521,7 +525,7 @@ impl NativeFieldRest {
                         | NativeMaterialTransportSource::OperativeContextual
                 ) {
                     let [_, output, input, context, _, meta, _] =
-                        material_transport::contextual::offsets(n);
+                        material_transport::contextual::offsets_for(n,h.transport_target.dimension(n).ok_or_else(||invalid("material target extent"))?);
                     let version = if h.transport_source==NativeMaterialTransportSource::OperativeContextual {3} else if h.transport_source
                         == NativeMaterialTransportSource::BilinearContextual
                     {
@@ -822,6 +826,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 }),
                 transport: self.transport.is_some(),
                 transport_source: self.material_transport_source().unwrap_or_default(),
+                transport_target: self.material_target().unwrap_or_default(),
                 operative:self.junction.as_ref().and_then(|j|j.operative.as_ref()).map(|o|o.wire()),
                 source_slots,
                 anchor_slots,
@@ -1067,6 +1072,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                         .map(|state| MaterialTransport {
                             state,
                             source: h.transport_source,
+                            target: h.transport_target,
                         })
                 })
                 .transpose()?,

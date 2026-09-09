@@ -389,7 +389,7 @@ relation. Basin/stability probes answer a specific failure, never govern learnin
 authored entropy threshold. Use existing tube/span owners at their domains; no new tube engine
 or large fractal sampling campaign is scheduled.
 
-[definition] **Current entry point: AC1 path/reuse and AC2's joint packet receiver, following the bounded finite contact-development return.**
+[definition] **Current entry point: AC1 compatible material/contact return and path/reuse, with AC2 productive continuation after the joint-packet receiver return.**
 The [normalized receiver](../../research/records/2026-09-08_AC1_THE_NORMALIZED_RECEIVER_RETURNS_ITS_COMPLETE_CURRENT_AND_TWO_METRIC_FACES.md)
 has returned resident source-qualified faces and metric covectors with actual-model evidence.
 Its full r is also the relative-entropy potential return; `J_p*r` belongs to squared probability
@@ -415,13 +415,20 @@ It completes the same 1,930-occurrence study and preserves its body/current/gene
 remount. It retains prior uncertainty and all deposit discrepancies, and does not claim the same
 unrounded trajectory. Language remains unusable; this bounded step does not close AC1 or AC2.
 
-[definition] Next separate the material receiver's codomain from the root field's node count,
-then retain joint packet structure through the learned target current and its receiver. The
-exact `{3,5,6} -> 7` bit-marginal witness in that record must separate at the joint receiver.
-This is an exterior-codec obligation; a packet class never becomes occurrence identity. Preserve
-phase, source qualification and returned differences, and compare actual conversation behavior.
-AC1's local path formation, restriction/rebase and generator reuse remain required as this
-composition grows. A joint codec is neither an authored grammar nor a guarantee of useful language.
+[established-bounded; measured] The [joint target and receiver](../../research/records/2026-09-08_AC2_THE_MATERIAL_TARGET_RETAINS_THE_JOINT_PACKET.md)
+now separate target extent from root extent and retain the packet phase. The same corpus slice
+completes, but generation repeats `The its the its ...`. The subsequent receiver refinement
+transports the joint Euclidean ball exactly at the maximizing-coordinate face.
+
+[definition] Next join the native material coefficient return and contact response under
+compatible receiver objectives, including their actual numerical error/deposit law. The present
+amplitude-fit material update and normalized-potential contact response do not establish a common
+descent. The [parallel mathematics integration](../../research/records/2026-09-08_AC_THE_PARALLEL_RECEIVER_CALCULUS_REFINES_NATIVE_CONTINUATION.md)
+also derives the paired fixed-contact aggregate/parity law and identifies the additional
+material-query and changing-contact receivers that AC1's restriction/rebase and generator reuse
+must carry. Use this concrete family when deriving the decoder and reopening changed contacts.
+Retain the actual current and phase; inspect changed continuing behavior before broadening the
+corpus. A sharper receiver alone supplies no useful-language guarantee.
 
 Brandon has resumed the completion goal. Treat this sequence as a revisable working design;
 report a concrete failed connection and change it when evidence warrants. In execution, complete the next native attachment and inspect its actual consequence before taking

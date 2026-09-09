@@ -2,6 +2,8 @@
 //! enters this native owner. Full current reports and numerical residuals remain in history.
 use super::*;
 mod normalized;
+mod packet;
+pub use packet::NativeMaterialPacketReading;
 pub use normalized::{NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn,
     NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading};
 
@@ -93,7 +95,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
         occurrence: usize,
         pairs: usize,
     ) -> Result<Option<NativeFieldDifferentialReading>, ConstitutiveFibreError> {
-        if !(1..=63).contains(&pairs) || 2 * pairs > self.nodes() {
+        let targets=self.material_target_dimension().unwrap_or(self.nodes());
+        if !(1..=63).contains(&pairs) || 2 * pairs > targets {
             return Err(ConstitutiveFibreError::Shape);
         }
         let event = self
@@ -107,7 +110,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             self.read_differential_report(
                 report,
                 occurrence,
-                2 * self.nodes(),
+                2 * targets,
                 match self.material_transport_source() {
                     Some(NativeMaterialTransportSource::CompleteCurrent) => 4,
                     Some(NativeMaterialTransportSource::HomogeneousMoment) => 6,
