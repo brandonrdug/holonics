@@ -454,10 +454,17 @@ sixteen-family journal saves 820,449,024 native bytes, with complete old/new con
 Fresh development preserves the prior body and uses no numerical development readouts. All
 111 field and 25 alpha SDK tests pass. The actual output remains unusable.
 
-[definition] Next reuse contact covariance within the operative reflection: the map and its
-bound stay fixed while internal current changes. Carry the changed aggregate and its bound;
-do not omit either interior feedback or the actual producing map. This is existing-owner reuse
-inside AC1, while AC2's learned contextual response remains a separate unfinished product return.
+[established-bounded; measured] The [reflection covariance return](../../research/records/2026-09-09_AC1_THE_SAME_CONTACT_COVARIANCE_SERVES_BOTH_SIDES_OF_A_REFLECTION.md)
+now reuses that standing within the transition while retaining the changed drive and its bound.
+All 111 field tests pass; matched development/checkpoint and saved-model continuation are exact.
+The observed prompt/generation time falls from 36.03 to 26.31 seconds, with unchanged poor output.
+
+[definition] Next compare AC1's actual finite contact deposit at its source-conditioned material
+receiver, before and after application. Keep producing and current maps explicit and retain the
+oriented differences. The unit Frobenius response and exact local adjoint do not by themselves
+establish finite improvement. Use the comparison to derive any required constitutive correction
+in the existing native owner; do not replace it with a world-verdict learner or universal gate.
+AC1 path/generator reuse and AC2 useful contextual responses remain the required product return.
 
 [definition] Proceed through AC1 steps 3–4: local path formation, restriction/rebase and
 generator reuse. Derive the actively used coordinates and their continuing source/decoder,

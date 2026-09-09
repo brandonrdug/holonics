@@ -104,6 +104,9 @@ extern "C" __global__ void __launch_bounds__(512) section_field_operative_update
 
 // Recomputed moments include every mixed term of simultaneous D,b changes. C is a complex
 // port matrix; h=D b. The radii refer to these complete objects, not componentwise point seals.
+// Reuse is only admitted within a reflection after the same map and map bound were prepared.
+// Internal current, its norm and the complete aggregate bound are always recomputed.
+template <bool RefreshCovariance = true>
 __device__ void operative_moments_prepare(
     const int64_t *map_wire,const int64_t *b_wire,const int64_t *bounds,uint32_t D,uint32_t count,uint32_t grain,
     int64_t *c_lo,int64_t *c_hi,int64_t *h_lo,int64_t *h_hi,int64_t *out_bounds_lo,int64_t *out_bounds_hi,
@@ -112,7 +115,7 @@ __device__ void operative_moments_prepare(
     const uint32_t m=D/2u;const wide *map=(const wide *)map_wire,*b=(const wide *)b_wire,*e=(const wide *)bounds;
     wide *C=(wide *)c_lo,*h=(wide *)h_lo;
     if(!D || (D&1u) || grain<1u || grain>120u || e[0]<0 || e[1]<0){if(!threadIdx.x)atomicOr(slot,REFUSED_MALFORMED);return;}
-    for(size_t ij=threadIdx.x;ij<(size_t)m*m+m;ij+=blockDim.x){
+    for(size_t ij=(RefreshCovariance?0:(size_t)m*m)+threadIdx.x;ij<(size_t)m*m+m;ij+=blockDim.x){
         HistoryInteger re,im;wide omitted=0;
         if(ij<(size_t)m*m){
             uint32_t i=ij/m,j=ij%m;
@@ -128,18 +131,19 @@ __device__ void operative_moments_prepare(
     __syncthreads();if(*slot)return;
     if(!threadIdx.x){
         HistoryInteger dn,bn;wide rc=0,rh=0;
-        for(size_t i=0;i<(size_t)count*D;++i)dn=dn+history_integer(map[i])*history_integer(map[i]);
+        if constexpr(RefreshCovariance)for(size_t i=0;i<(size_t)count*D;++i)dn=dn+history_integer(map[i])*history_integer(map[i]);
         for(size_t i=0;i<2u*(size_t)count;++i)bn=bn+history_integer(b[i])*history_integer(b[i]);
-        wide nd=history_norm_ceiling(dn,slot),nb=history_norm_ceiling(bn,slot);
-        for(size_t i=0;i<(size_t)m*m;++i)rc=add_checked(rc,rounds[i],slot);
+        wide nd=RefreshCovariance?history_norm_ceiling(dn,slot):((wide *)out_bounds_lo)[2],nb=history_norm_ceiling(bn,slot);
+        if constexpr(RefreshCovariance)for(size_t i=0;i<(size_t)m*m;++i)rc=add_checked(rc,rounds[i],slot);
         for(size_t i=(size_t)m*m;i<(size_t)m*m+m;++i)rh=add_checked(rh,rounds[i],slot);
-        wide ec=add_checked(ft_ceil_product(add_checked(product_checked(2,nd,slot),e[0],slot),e[0],grain,slot),rc,slot);
+        wide ec=RefreshCovariance?add_checked(ft_ceil_product(add_checked(product_checked(2,nd,slot),e[0],slot),e[0],grain,slot),rc,slot):((wide *)out_bounds_lo)[0];
         wide eh=add_checked(ft_ceil_product(nd,e[1],grain,slot),add_checked(ft_ceil_product(nb,e[0],grain,slot),ft_ceil_product(e[0],e[1],grain,slot),slot),slot);
         ((wide *)out_bounds_lo)[0]=ec;((wide *)out_bounds_lo)[1]=add_checked(eh,rh,slot);
         ((wide *)out_bounds_lo)[2]=nd;((wide *)out_bounds_lo)[3]=nb;
     }
     __syncthreads();if(*slot)return;
-    operative_copy_point(c_lo,c_hi,4u*(size_t)m*m);operative_copy_point(h_lo,h_hi,2u*D);operative_copy_point(out_bounds_lo,out_bounds_hi,8);
+    if constexpr(RefreshCovariance)operative_copy_point(c_lo,c_hi,4u*(size_t)m*m);
+    operative_copy_point(h_lo,h_hi,2u*D);operative_copy_point(out_bounds_lo,out_bounds_hi,8);
 }
 extern "C" __global__ void __launch_bounds__(512) section_field_operative_moments(
     const int64_t *map_wire,const int64_t *b_wire,const int64_t *bounds,uint32_t D,uint32_t count,uint32_t grain,

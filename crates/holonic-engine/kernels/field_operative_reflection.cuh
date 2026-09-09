@@ -126,7 +126,9 @@ __device__ void field_operative_reflection_prepare(
         report[d]=ev;report[2u*stride-1u]=ec;report[4u*stride-1u]=ep;report[5u*stride-1u]=extra[0];report[6u*stride-1u]=1;
     }
     __syncthreads();if(*slot)return;
-    operative_moments_prepare(map_lo,b_lo,e_lo,d,count,grain,cov_lo,cov_hi,h_lo,h_hi,mb_lo,mb_hi,moment_rounds,slot);
+    // Reflection has changed b and its bound, while D and its bound are unchanged.
+    // Keep the covariance and its exact numerical/error chart from the first preparation.
+    operative_moments_prepare<false>(map_lo,b_lo,e_lo,d,count,grain,cov_lo,cov_hi,h_lo,h_hi,mb_lo,mb_hi,moment_rounds,slot);
     __syncthreads();if(*slot)return;
     if(threadIdx.x==0){for(uint32_t j=0;j<d;++j)report[2u*stride+j]=((const wide *)h_lo)[j];report[3u*stride-1u]=mb[1];}
     __syncthreads();if(*slot)return;

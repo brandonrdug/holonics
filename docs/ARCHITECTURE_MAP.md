@@ -227,6 +227,12 @@ decode the same zero extension in update, historical recovery and the full defec
 `operative/rest.rs` carries its validated wire descriptors and admits expanded legacy deltas.
 The [journal return](../research/records/2026-09-09_AC1_THE_RETURN_JOURNAL_KEEPS_ZERO_EXTENSION_AS_A_GENERATOR.md) records exact comparisons and measured savings.
 
+[established-bounded; source-inspected] `field_operative_reflection.cuh` reuses its first
+covariance preparation after advancing internal current. The compile-time specialization in
+`field_operative_contacts.cuh` retains covariance and map norm while recomputing the aggregate,
+internal norm and complete aggregate bound. Other moment preparations remain complete. The
+[reflection return](../research/records/2026-09-09_AC1_THE_SAME_CONTACT_COVARIANCE_SERVES_BOTH_SIDES_OF_A_REFLECTION.md) records exact controls and observed runtime.
+
 [established-bounded; source-inspected] `OperativeLinear` reuses the finite current-to-material
 operator through `field_linear_material.cuh`, with an independent joint target and row-parallel
 preparation. `field_linear_material_pullback.cuh` and `receiver/normalized/pullback/linear.rs`

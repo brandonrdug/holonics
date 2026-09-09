@@ -1,0 +1,22 @@
+$ cargo build -p holonics-hna --example alpha_text
+   Compiling holonic-engine v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-engine)
+warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
+warning: struct `SectionContactMaterial` is never constructed
+   --> crates/holonic-engine/src/native_ecology/../holonic_intelligence/operative_return.rs:239:19
+    |
+239 | pub(super) struct SectionContactMaterial<'a, 'chart> {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `enact_section_contact` is never used
+   --> crates/holonic-engine/src/native_ecology/../holonic_intelligence/operative_return.rs:335:15
+    |
+335 | pub(super) fn enact_section_contact<'chart>(
+    |               ^^^^^^^^^^^^^^^^^^^^^
+
+   Compiling life v0.0.0 (/home/b/Workspaces/holonics/crates/holonic-life)
+warning: `holonic-engine` (lib) generated 2 warnings
+   Compiling holonics-hna v0.1.0 (/home/b/Workspaces/holonics/crates/holonics-hna)
+   Compiling holonics-circulation-abi v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-circulation-abi)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 29s

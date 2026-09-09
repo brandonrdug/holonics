@@ -1,0 +1,106 @@
+{
+  "schema": "holonics.reflection-covariance-reuse.v1",
+  "source_revision": "1fed5a09 plus accompanying covariance reuse",
+  "checks": {
+    "development_body_equal": true,
+    "development_checkpoint_byte_equal": true,
+    "no_numerical_development_readouts": true,
+    "body_equal": true,
+    "generation_equal": true,
+    "emission_current_history_equal": true
+  },
+  "development": {
+    "occurrences": 75,
+    "checkpoint_bytes": 11680724,
+    "seconds": 7.486247124,
+    "prior_seconds": 7.628481589,
+    "process": {
+      "command": [
+        "target/debug/examples/alpha_text",
+        ".local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl",
+        "--families",
+        "1",
+        "--fractional-bits",
+        "72",
+        "--material-source",
+        "operative-linear",
+        "--material-target",
+        "joint-packet",
+        "--duplex",
+        "true",
+        "--contact-response",
+        "true",
+        "--contact-realization",
+        "dyadic-deposit",
+        "--contact-metric",
+        "current",
+        "--checkpoint",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-family-covariance-reuse.hna",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-family-covariance-reuse.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 8.447323157044593,
+      "max_child_rss_kib_so_far": 241076
+    }
+  },
+  "continuation": {
+    "model_occurrences": 5064,
+    "final_occurrences": 5133,
+    "prompt_and_emission_seconds": 26.312452566,
+    "prior_prompt_and_emission_seconds": 36.031728588,
+    "utf8": "I\u2019mn",
+    "disposition": {
+      "kind": "completed-part"
+    },
+    "process": {
+      "command": [
+        "target/debug/examples/alpha_text",
+        "--resume",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-sixteen-zero-extension.hna",
+        "--families",
+        "0",
+        "--self-source-mode",
+        "actuation",
+        "--prompt",
+        ".local/artifacts/athena-alpha/ac2/first-request.txt",
+        "--emit-symbols",
+        "128",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-sixteen-covariance-reuse.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 62.176055790972896,
+      "max_child_rss_kib_so_far": 3953660
+    },
+    "final_native_census_before_diagnostics": {
+      "allocations": 93584,
+      "captured_launches": 159,
+      "control_launches": 0,
+      "deed_launches": 76,
+      "device_to_device_octets": 0,
+      "egress_receipt_octets": 4864,
+      "egress_section_octets": 57568,
+      "ingress_octets": 3821019312,
+      "resident_octets_now": 3878996320,
+      "resident_octets_peak": 3900365012,
+      "section_read_outs": 7,
+      "synchronizations": 76
+    }
+  },
+  "language_quality_established": false,
+  "verification": [
+    {
+      "log": "focused.txt",
+      "command": "cargo test -p holonic-engine --lib changed_contacts_conduct_through_the_same_field_successor -- --include-ignored --test-threads=1"
+    },
+    {
+      "log": "field.txt",
+      "command": "cargo test -p holonic-engine --lib native_ecology::constitutive_fibre::field -- --include-ignored --test-threads=1"
+    },
+    {
+      "log": "example.txt",
+      "command": "cargo build -p holonics-hna --example alpha_text"
+    }
+  ]
+}

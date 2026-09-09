@@ -81,12 +81,18 @@ body, currents and generation exactly. A matched 75-occurrence development prese
 with no numerical development readouts. All 111 field and 25 SDK tests pass. Output remains
 `I’mn`; the nonzero factor journal and useful contextual generation remain open.
 
-[definition] Continue AC1 steps 3–4 with the actual generator/decoder dependencies. The operative
-reflection currently recomputes contact covariance before and after internal-current motion,
-although its contact map is unchanged between those computations. Reuse that standing within the
-transition while retaining the changed internal drive and its full error bound. AC2 useful
-contextual generation still requires progress in the learned relation; storage reduction alone
-cannot supply it.
+[established-bounded; measured] The [reflection covariance reuse](research/records/2026-09-09_AC1_THE_SAME_CONTACT_COVARIANCE_SERVES_BOTH_SIDES_OF_A_REFLECTION.md)
+now retains the unchanged covariance while recomputing the active interior drive and its bound.
+All 111 field tests pass. Matched development returns an identical checkpoint; the saved-model
+body, currents and output also match. Prompt plus generation takes 26.31 seconds versus 36.03
+seconds in the prior run. This is one timing comparison; output remains unusable.
+
+[definition] Next examine AC1's finite contact return and AC2's learned relation directly.
+Compare the actual source-conditioned material response before and after the finite deposit,
+with the producing and current morphologies explicit. Correct local adjoints, exact coefficients
+and reduced cost do not establish finite learning improvement. This diagnostic should identify
+any needed constitutive/step correction; it is not a new universal generation or acceptance gate.
+Path/generator reuse and useful contextual responses remain required.
 
 [established-bounded; source-inspected] The [finite material composition](research/records/2026-09-09_AC1_THE_FINITE_MATERIAL_OPERATOR_RETURNS_THROUGH_ITS_PRODUCER.md)
 now binds the existing complex-current operator to the operative boundary and independent joint

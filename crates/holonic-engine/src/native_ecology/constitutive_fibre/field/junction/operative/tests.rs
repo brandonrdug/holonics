@@ -50,6 +50,29 @@ fn contains(read: &NativeOperativeContactReading, d: &[Vec<W>], b: &[W]) {
     );
     assert!(read.aggregate.contains(&aggregate(d, b, width)));
 }
+
+// Independent full recomputation checks reuse of only the unchanged covariance within the
+// actual reflection. The aggregate and both moment radii must still match bit for bit.
+fn assert_fresh_moments(field: &NativeConstitutiveField<'_>) {
+    let op = field.junction.as_ref().unwrap().operative.as_ref().unwrap();
+    let surface = field.relation.surface;
+    let d = 6 * field.nodes();
+    let m = d / 2;
+    let rebuilt = sections(surface, d, op.births.len()).unwrap();
+    let rounds = surface.fresh_section(1, 2 * (m * m + m), ResidentGrain(0)).unwrap();
+    let mut passage = surface.begin_passage(&[vec![]]).unwrap();
+    {
+        let lane = passage.open(0, &[]).unwrap();
+        surface.record_operative_moments(&lane, d, op.births.len(), op.grain,
+            op.sections.current(), rebuilt.moments(), &rounds).unwrap();
+    }
+    passage.close(0, &rebuilt.moment_bounds, 64).unwrap();
+    assert!(passage.finish().unwrap().launch().unwrap().obstruction.is_empty());
+    for (actual, full) in op.sections.moments().into_iter().zip(rebuilt.moments()) {
+        assert_eq!(surface.detach_section(actual, 64).unwrap(),
+            surface.detach_section(full, 64).unwrap());
+    }
+}
 fn seed() -> Vec<NativeJunctionSeed> {
     vec![NativeJunctionSeed {
         incoming_admittance: 1,
@@ -329,6 +352,7 @@ fn changed_contacts_conduct_through_the_same_field_successor() {
         let census = field.census();
         let next = field.advance_resident(&mut occurrence).unwrap();
         assert_eq!(field.census().section_read_outs, census.section_read_outs);
+        assert_fresh_moments(&field);
         if at == 4 {
             anchor = Some(field.retain_source(&next.source).unwrap());
         }
