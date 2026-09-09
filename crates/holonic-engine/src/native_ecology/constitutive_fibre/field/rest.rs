@@ -459,7 +459,7 @@ impl NativeFieldRest {
                 _ => return Err(invalid("field receiving source")),
             }
             if let Some(NativeFieldSourceContact::MaterialActuation{quadrature,coordinate})=event.lineage.source_contact {
-                let NativeMaterialTarget::TensorProduct{factor_width}=h.transport_target else{return Err(invalid("actuation target chart"));};
+                let NativeMaterialTarget::TensorProduct{..}=h.transport_target else{return Err(invalid("actuation target chart"));};
                 let targets=h.transport_target.dimension(n).ok_or(Error::Shape)?;
                 if !h.transport_source.is_operative() || coordinate>=targets{return Err(invalid("actuation source chart"));}
                 let source=event.lineage.received_from.ok_or_else(||invalid("missing actuation source"))?;
@@ -469,13 +469,7 @@ impl NativeFieldRest {
                 for j in 0..targets {if j!=coordinate {let gap=&selected-BigInt::from(raw[2*j+axis]);
                     if gap<=BigInt::from(0) || &gap*&gap<=BigInt::from(2)*&radius*&radius{return Err(invalid("actuation source face is not fixed"));}}}
                 let NativeFieldIncoming::Exterior(input)=&event.lineage.incoming else{return Err(invalid("actuation input chart"));};
-                let mut address=coordinate;let mut amplitude=ExactComplexWaveCurrent::one();
-                for factor in input.chunks_exact(factor_width){
-                    let selected=address%factor_width;address/=factor_width;
-                    for (j,value) in factor.iter().enumerate(){let value=value.current();
-                        if j==selected {if value.norm_square()!=Rat::from_integer(1.into()){return Err(invalid("actuation is not a unit tensor basis"));} amplitude=amplitude.multiply(&value);}
-                        else if value!=ExactComplexWaveCurrent::zero(){return Err(invalid("actuation coordinate disagrees with its input"));}}
-                }
+                let amplitude=h.transport_target.tensor_basis_amplitude(coordinate,input)?;
                 let projection=if axis==0{amplitude.real}else{amplitude.imaginary};
                 if projection<=Rat::from_integer(0.into()){return Err(invalid("actuation receiving quadrature"));}
             }

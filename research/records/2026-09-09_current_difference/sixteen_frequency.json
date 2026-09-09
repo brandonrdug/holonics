@@ -1,0 +1,33 @@
+{
+  "grade": "established-bounded",
+  "evidence": [
+    "measured"
+  ],
+  "scope": "Actual exposed octets only, before prompt and generation. ASCII words are lowercased; curly apostrophes split words. No corpus-wide frequency or causal claim.",
+  "native_development_until": 5064,
+  "word_pattern": "[A-Za-z]+(?:'[A-Za-z]+)?",
+  "measurement": {
+    "incoming": {
+      "parts": 2,
+      "source_octets": 138,
+      "ascii_word_occurrences": 24,
+      "queried_word": "the",
+      "queried_count": 3,
+      "largest_other_count": 2,
+      "largest_other_words": [
+        "and"
+      ]
+    },
+    "outgoing": {
+      "parts": 14,
+      "source_octets": 4910,
+      "ascii_word_occurrences": 793,
+      "queried_word": "the",
+      "queried_count": 91,
+      "largest_other_count": 22,
+      "largest_other_words": [
+        "is"
+      ]
+    }
+  }
+}

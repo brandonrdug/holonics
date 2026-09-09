@@ -330,6 +330,15 @@ for tensor targets, and the text SDK persists its declared target chart. The
 and [parallel-mathematics refinement](../research/records/2026-09-08_AC_THE_PARALLEL_RECEIVER_CALCULUS_REFINES_NATIVE_CONTINUATION.md)
 retain checks, actual output and the unfinished AC1–AC2 obligations.
 
+[established-bounded; source-inspected] The same `NativeMaterialTarget` owns
+`tensor_basis_amplitude` and `transport_factor_phases`: unit factor transports with joint
+product identity preserve the tensor receiver while retaining distinct root inputs.
+`alpha/text_session.rs` stages this declared realization with its material-actuation source;
+`alpha/checkpoint.rs` saves the actual pending input. The
+[phase/relevance return](../research/records/2026-09-09_AC1_AC2_REPEATED_FACES_RETAIN_PHASE_AND_EXCHANGE.md)
+retains native continuation/restart and stored-model comparisons. This exterior actuation
+facility does not implement a separate internal propagation law or learn a phase profile.
+
 [established-bounded; source-inspected] `resident/context_section.rs` and
 `constitutive_context_section.cuh` now derive the fixed-source context/return relation and its
 translated preimage. `field/context_section.rs` with `field_context_section.cuh` constructs the

@@ -6,11 +6,20 @@ Only derived current comparisons and the already reported failed output are expo
 """
 import json
 import sys
+from enum import IntEnum
 from fractions import Fraction as Q
 from pathlib import Path
 
 
-def outgoing(entry, grain, roots):
+class JunctionPart(IntEnum):
+    POTENTIAL = 0
+    OUTGOING = 1
+    HELD = 2
+    POTENTIAL_PREFIX = 3
+    SOURCE = 4
+
+
+def junction_ball(entry, grain, roots, part):
     words = entry["junction"]["intervals"]
     width = 6 * roots
     stride = width + 1
@@ -22,10 +31,14 @@ def outgoing(entry, grain, roots):
         )
         return Q(raw - (1 << 128) if raw >= (1 << 127) else raw, 1 << grain)
 
-    center = [value(stride + j) for j in range(width)]
-    radius = value(stride + width)
+    center = [value(part * stride + j) for j in range(width)]
+    radius = value(part * stride + width)
     assert radius >= 0
     return center, radius
+
+
+def outgoing(entry, grain, roots):
+    return junction_ball(entry, grain, roots, JunctionPart.OUTGOING)
 
 
 def inspect(document):

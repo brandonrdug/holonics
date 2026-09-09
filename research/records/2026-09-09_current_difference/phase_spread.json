@@ -1,0 +1,461 @@
+{
+  "grade": "established-bounded",
+  "evidence": [
+    "measured",
+    "computational-witness"
+  ],
+  "scope": "Matched stored-model study with distinct actuation histories. Equality is at the declared tensor/word receivers, not source identity or universal future agreement.",
+  "comparison": {
+    "matched_actuations": 128,
+    "same_complete_tensor_inputs": 23,
+    "different_root_inputs": 128,
+    "same_emitted_octets": false,
+    "identical_outgoing_balls": 1,
+    "disjoint_outgoing_balls": 127,
+    "first_separating_witness": {
+      "baseline_occurrence": 5126,
+      "intervention_occurrence": 5126,
+      "squared_center_distance": "5264235975034805036259309113302995251499765/348449143727040986586495598010130648530944",
+      "squared_sum_of_radii": "11409055208086041/87112285931760246646623899502532662132736"
+    },
+    "same_material_operator": true,
+    "same_contact_map": true,
+    "intervention": [
+      {
+        "first_factor": 0,
+        "second_factor": 8,
+        "slope_denominator": 1,
+        "slope_numerator": 1
+      },
+      {
+        "first_factor": 1,
+        "second_factor": 8,
+        "slope_denominator": 1,
+        "slope_numerator": 1
+      },
+      {
+        "first_factor": 2,
+        "second_factor": 8,
+        "slope_denominator": 1,
+        "slope_numerator": 1
+      },
+      {
+        "first_factor": 3,
+        "second_factor": 8,
+        "slope_denominator": 1,
+        "slope_numerator": 1
+      },
+      {
+        "first_factor": 4,
+        "second_factor": 8,
+        "slope_denominator": 1,
+        "slope_numerator": 1
+      },
+      {
+        "first_factor": 5,
+        "second_factor": 8,
+        "slope_denominator": 1,
+        "slope_numerator": 1
+      },
+      {
+        "first_factor": 6,
+        "second_factor": 8,
+        "slope_denominator": 1,
+        "slope_numerator": 1
+      },
+      {
+        "first_factor": 7,
+        "second_factor": 8,
+        "slope_denominator": 1,
+        "slope_numerator": 1
+      }
+    ],
+    "factor_phases": [
+      {
+        "cosine": [
+          [
+            0,
+            []
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "sine": [
+          [
+            1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ]
+      },
+      {
+        "cosine": [
+          [
+            0,
+            []
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "sine": [
+          [
+            1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ]
+      },
+      {
+        "cosine": [
+          [
+            0,
+            []
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "sine": [
+          [
+            1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ]
+      },
+      {
+        "cosine": [
+          [
+            0,
+            []
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "sine": [
+          [
+            1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ]
+      },
+      {
+        "cosine": [
+          [
+            0,
+            []
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "sine": [
+          [
+            1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ]
+      },
+      {
+        "cosine": [
+          [
+            0,
+            []
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "sine": [
+          [
+            1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ]
+      },
+      {
+        "cosine": [
+          [
+            0,
+            []
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "sine": [
+          [
+            1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ]
+      },
+      {
+        "cosine": [
+          [
+            0,
+            []
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "sine": [
+          [
+            1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ]
+      },
+      {
+        "cosine": [
+          [
+            1,
+            [
+              1
+            ]
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ],
+        "sine": [
+          [
+            0,
+            []
+          ],
+          [
+            1,
+            [
+              1
+            ]
+          ]
+        ]
+      }
+    ],
+    "emitted_octets": [
+      226,
+      84,
+      153,
+      153,
+      153,
+      153,
+      153,
+      153,
+      153,
+      115,
+      84,
+      153,
+      115,
+      84,
+      153,
+      109,
+      84,
+      109,
+      84,
+      109,
+      84,
+      109,
+      84,
+      109,
+      84,
+      109,
+      84,
+      109,
+      84,
+      109,
+      84,
+      109,
+      84,
+      109,
+      84,
+      109,
+      84,
+      109,
+      84,
+      104,
+      84,
+      104,
+      109,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104,
+      104
+    ],
+    "disposition": {
+      "kind": "interrupted"
+    }
+  }
+}

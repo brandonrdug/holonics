@@ -91,7 +91,10 @@ is the native material-return law without an intervening interior-current deposi
 fallback and full numerical producer/defect preserved. It does not finish whole-ecology
 compression or change the generation law.
 
-[open] A fresh process is continuing eight further conversation parts from the converted model,
-with declared archive placement, a new checkpoint and observed generation. Its behavioral and
-cost result is pending.
-Whole-ecology generator reuse, broader behavioral cultivation and the later AC product remain open.
+[established-bounded; measured] The subsequent
+[sixteen-family and phase return](2026-09-09_AC1_AC2_REPEATED_FACES_RETAIN_PHASE_AND_EXCHANGE.md)
+completes the eight-family continuation with archive placement, checkpoint and actual generation.
+All 5,063 contact returns use the generator. Its complete behavior and costs live in that record.
+
+[open] Whole-ecology generator reuse, constitutive/source composition, broader behavioral
+cultivation and the later AC product remain open.

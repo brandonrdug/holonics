@@ -269,6 +269,12 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
     /// the presentation; a repeated face does not establish a complete-current cycle or closure.
     pub fn stage_material_actuation(&mut self,actuation:holonic_engine::native_ecology::constitutive_fibre::NativeMaterialActuation)
         ->Result<TextSymbol,AlphaMaterialError>{
+        self.stage_material_actuation_with_phases(actuation,None)
+    }
+    /// A declared input-phase realization, with unchanged complete tensor target. Its actual
+    /// input is retained on refusal/restart; no phase is inferred from an expected text answer.
+    pub fn stage_material_actuation_with_phases(&mut self,actuation:holonic_engine::native_ecology::constitutive_fibre::NativeMaterialActuation,
+        phases:Option<&[holonic_engine::ExactWavePhaseTransport]>) ->Result<TextSymbol,AlphaMaterialError>{
         if self.pending.is_some() || self.next_anchor.is_some(){return Err(AlphaMaterialError::Apparatus("incompatible pending material actuation".into()));}
         let latest=self.latest.as_ref().ok_or_else(||AlphaMaterialError::Apparatus("no available material source".into()))?;
         if !actuation.describes_source(&latest.source){return Err(AlphaMaterialError::Apparatus("foreign material actuation".into()));}
@@ -279,8 +285,13 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
         if !self.duplex && direction!=TextDirection::Incoming{return Err(AlphaMaterialError::Apparatus("actuation is outside the text boundary chart".into()));}
         let reading=present_material_packet(actuation.reading().clone())?;
         let TextCodeDisposition::Symbol{symbol}=reading.disposition else{return Err(AlphaMaterialError::Apparatus("material actuation has no text face".into()));};
+        let canonical=symbol.inputs_on(direction);
+        let input=match phases {
+            Some(phases)=>actuation.reading().target_chart.transport_factor_phases(&canonical,phases)?,
+            None=>canonical,
+        };
         let latest=self.latest.take().unwrap();
-        let occurrence=NativeFieldOccurrence::actuating(latest.source,symbol.inputs_on(direction),actuation);
+        let occurrence=NativeFieldOccurrence::actuating(latest.source,input,actuation);
         self.pending=Some((symbol,occurrence));self.pending_direction=direction;Ok(symbol)
     }
     pub fn pending_symbol(&self) -> Option<TextSymbol> {
@@ -381,6 +392,15 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
         self.generate_with_source_mode(work_limit,receiver,if source_contact{TextGenerationSourceMode::Observation}else{TextGenerationSourceMode::Withdrawal})
     }
     pub fn generate_with_source_mode(&mut self,work_limit:usize,receiver:TextCurrentReceiver,source_mode:TextGenerationSourceMode)->TextGeneration{
+        self.generate_in_actuation_chart(work_limit,receiver,source_mode,None)
+    }
+    /// Apply the same declared phase transports to each generated tensor factor. The field
+    /// keeps its current chart and coefficients; this is an exterior actuation intervention.
+    pub fn generate_with_factor_phases(&mut self,work_limit:usize,phases:&[holonic_engine::ExactWavePhaseTransport])->TextGeneration{
+        self.generate_in_actuation_chart(work_limit,TextCurrentReceiver::Material,TextGenerationSourceMode::Actuation,Some(phases))
+    }
+    fn generate_in_actuation_chart(&mut self,work_limit:usize,receiver:TextCurrentReceiver,
+        source_mode:TextGenerationSourceMode,phases:Option<&[holonic_engine::ExactWavePhaseTransport]>)->TextGeneration{
         let mut result = TextGeneration {
             native_from: self.field.occurrence_count(),
             native_until: self.field.occurrence_count(),
@@ -389,6 +409,15 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
             disposition: TextGenerationDisposition::Interrupted,
             pending_return: self.pending_symbol(),
         };
+        if let Some(phases)=phases {
+            let validation=self.field.material_target().ok_or_else(||AlphaMaterialError::Apparatus("missing phase target".into()))
+                .and_then(|target|target.transport_factor_phases(
+                    &vec![holonic_engine::native_ecology::constitutive_fibre::NativePhaseCurrent::unit();self.field.nodes()],phases)
+                    .map_err(AlphaMaterialError::from));
+            if let Err(error)=validation {
+                result.disposition=TextGenerationDisposition::NativeRefusal(error.to_string());return result;
+            }
+        }
         if self.duplex && matches!(receiver,TextCurrentReceiver::Constitutive){
             result.disposition=TextGenerationDisposition::NativeRefusal("duplex text uses its joint material receiver".into());return result;
         }
@@ -457,7 +486,7 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
                 if let Err(error)=self.begin_part(None){result.disposition=TextGenerationDisposition::NativeRefusal(error.to_string());break;}
             }
             let received = if let Some(actuation)=material_actuation {
-                self.stage_material_actuation(actuation).and_then(|_|self.retry_pending())
+                self.stage_material_actuation_with_phases(actuation,phases).and_then(|_|self.retry_pending())
             } else if let Some(returned) = native_return {
                 self.stage_presented_native_return(returned, symbol)
                     .and_then(|_| self.retry_pending())

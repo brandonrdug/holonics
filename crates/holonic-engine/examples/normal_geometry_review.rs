@@ -3,6 +3,7 @@
 use holonic_engine::exact_linear::ExactRatMatrix as Matrix;
 use holonic_engine::native_ecology::constitutive_fibre::PairedJunctionLinearization;
 use holonic_engine::ExactComplexWaveCurrent as Wave;
+use holonic_engine::{causal_reflection::RationalCirclePoint, ExactWavePhaseTransport};
 use num_traits::{One, Zero};
 use relational_geometry::Rat;
 use serde_json::json;
@@ -198,11 +199,35 @@ fn reflection_witnesses() -> Result<serde_json::Value> {
     let reopened =
         PairedJunctionLinearization::at(vec![vec![wave(1, 1)], vec![wave(2, 1)]], &zero, &hidden)?;
     assert_eq!(reopened.outgoing(), [wave(-1, 3)]);
+    // Propagation is a different operation from reflection. A Cayley quarter-turn changes
+    // emitted phase while preserving the same scalar decay. Four steps are one orbit of
+    // this chosen phase generator, not a general lifetime or semantic work bound.
+    let circle = RationalCirclePoint::from_slope(&Rat::one());
+    let phase = ExactWavePhaseTransport::new(circle.real().clone(), circle.imaginary().clone())?;
+    let mut plain = vec![wave(1, 1)];
+    let mut rotating = plain.clone();
+    let mut propagation = Vec::new();
+    for step in 0..4 {
+        let plain_next = PairedJunctionLinearization::at(vec![vec![wave(2, 1)]], &zero, &plain)?;
+        let arrived = rotating.iter().map(|v| phase.transport(v)).collect::<Vec<_>>();
+        let phase_next = PairedJunctionLinearization::at(vec![vec![wave(2, 1)]], &zero, &arrived)?;
+        assert_eq!(norm(plain_next.internal()), norm(phase_next.internal()));
+        assert_eq!(norm(plain_next.outgoing()), norm(phase_next.outgoing()));
+        assert_eq!(norm(phase_next.internal()) + norm(phase_next.outgoing()), norm(&rotating));
+        if step == 0 { assert_ne!(plain_next.outgoing(), phase_next.outgoing()); }
+        propagation.push(json!({"step":step,"plain_outgoing":waves(plain_next.outgoing()),
+            "propagated_outgoing":waves(phase_next.outgoing()),
+            "shared_interior_squared_norm":norm(phase_next.internal()).to_string(),
+            "shared_outgoing_squared_norm":norm(phase_next.outgoing()).to_string()}));
+        plain = plain_next.internal().to_vec();
+        rotating = phase_next.internal().to_vec();
+    }
     Ok(json!({"complete_complex_reflection_returns_source": true,
         "open_zero_input_steps": [{"outgoing": waves(first.outgoing()), "internal": waves(first.internal())},
             {"outgoing": waves(second.outgoing()), "internal": waves(second.internal())}],
         "joint_current_energy_exact": true, "blind_internal_successor": waves(blind.internal()),
         "changed_contact_separates": waves(reopened.outgoing()),
+        "same_scalar_decay_different_propagated_phase":propagation,
         "scope": "existing exact passive producer; no closed timelike spacetime or periodic whole Athena ecology is assumed"}))
 }
 

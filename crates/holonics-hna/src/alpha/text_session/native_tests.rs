@@ -344,3 +344,57 @@ fn diagnostic_error_does_not_change_material_publication() {
     };
     assert_eq!(run(false), run(true));
 }
+
+#[test]
+#[ignore = "requires CUDA; equal tensor faces retain phase-dependent future currents and pending realization"]
+fn balanced_factor_phases_keep_the_packet_and_change_later_transport() {
+    use crate::alpha::text_codec::{with_text_field_chart,TEXT_BIT_PAIRS};
+    use holonic_engine::{causal_reflection::RationalCirclePoint,ExactWavePhaseTransport};
+    use holonic_engine::native_ecology::constitutive_fibre::{NativeMaterialTarget,NativePacketQuadrature};
+    let parameter=num_rational::BigRational::new(1.into(),2.into());
+    let point=RationalCirclePoint::from_slope(&parameter);
+    let turn=ExactWavePhaseTransport::new(point.real().clone(),point.imaginary().clone()).unwrap();
+    let mut phases=vec![ExactWavePhaseTransport::identity();TEXT_BIT_PAIRS];
+    phases[0]=turn.clone();phases[1]=turn.inverse();
+    let dir=tempfile::tempdir().unwrap();let path=dir.path().join("pending-factor-phases.hna");
+    let target=NativeMaterialTarget::TensorProduct{factor_width:2};
+    let canonical=TextSymbol::Octet(b'B').inputs_on(TextDirection::Outgoing);
+    let moved=target.transport_factor_phases(&canonical,&phases).unwrap();
+    assert_ne!(canonical,moved);
+    assert_eq!(target.tensor_basis_amplitude(b'B' as usize,&canonical).unwrap(),
+        target.tensor_basis_amplitude(b'B' as usize,&moved).unwrap());
+    let (expected,changed)=with_text_field_chart(72,NativeMaterialTransportSource::OperativeBoundary,target,|field|{
+        let mut s=TextFieldSession::on(field)?;s.enable_duplex()?;
+        s.receive(TextSymbol::Octet(b'A'))?;s.receive_on(TextSymbol::Octet(b'B'),TextDirection::Outgoing)?;
+        let witness=s.field().read_material_actuation(&s.latest.as_ref().unwrap().source,NativePacketQuadrature::Imaginary)?;
+        assert_eq!(s.stage_material_actuation_with_phases(witness,Some(&phases))?,TextSymbol::Octet(b'B'));
+        assert_eq!(s.pending.as_ref().unwrap().1.incoming(),moved);
+        s.checkpoint(&path,&[],b"factor phases")?;
+        s.retry_pending()?;
+        s.receive(TextSymbol::Octet(b'C'))?;
+        let changed=s.field().inspect_operative_reflection(3)?.unwrap().outgoing;
+        Ok((s.field().rest(&[s.latest.as_ref().map(|v|&v.source)],&[])?,changed))
+    }).unwrap();
+    SavedTextField::read(&path).unwrap().with_session(|s,_,_,app|{
+        assert_eq!(app,b"factor phases");
+        assert_eq!(s.pending.as_ref().unwrap().1.incoming(),moved);
+        s.retry_pending()?;s.receive(TextSymbol::Octet(b'C'))?;
+        assert_eq!(s.field().rest(&[s.latest.as_ref().map(|v|&v.source)],&[])?,expected);
+        Ok(())
+    }).unwrap();
+    let original=with_text_field_chart(72,NativeMaterialTransportSource::OperativeBoundary,target,|field|{
+        let mut s=TextFieldSession::on(field)?;s.enable_duplex()?;
+        s.receive(TextSymbol::Octet(b'A'))?;s.receive_on(TextSymbol::Octet(b'B'),TextDirection::Outgoing)?;
+        let witness=s.field().read_material_actuation(&s.latest.as_ref().unwrap().source,NativePacketQuadrature::Imaginary)?;
+        s.stage_material_actuation(witness)?;s.retry_pending()?;s.receive(TextSymbol::Octet(b'C'))?;
+        let mut invalid=phases.clone();invalid[1]=ExactWavePhaseTransport::identity();
+        let rejected=s.generate_with_factor_phases(1,&invalid);
+        assert!(rejected.emitted_octets.is_empty());
+        assert_eq!(rejected.native_from,rejected.native_until);
+        Ok(s.field().inspect_operative_reflection(3)?.unwrap().outgoing)
+    }).unwrap();
+    let distance:num_rational::BigRational=original.center.iter().zip(&changed.center)
+        .map(|(a,b)|a.subtract(b).norm_square()).sum();
+    let radius=&original.radius+&changed.radius;
+    assert!(distance>&radius*&radius);
+}

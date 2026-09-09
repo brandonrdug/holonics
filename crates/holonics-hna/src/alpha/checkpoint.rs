@@ -34,6 +34,8 @@ fn error(value: impl std::fmt::Display) -> AlphaMaterialError {
 struct PendingMaterialActuation {
     quadrature:holonic_engine::native_ecology::constitutive_fibre::NativePacketQuadrature,
     coordinate:usize,
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    incoming:Option<Vec<holonic_engine::native_ecology::constitutive_fibre::NativePhaseCurrent>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -150,6 +152,15 @@ impl SavedTextField {
                 || actuation.quadrature!=(if self.session.duplex{self.session.pending_direction}else{super::text_codec::TextDirection::Incoming}).quadrature(){
                 return Err(error("incompatible pending material actuation"));
             }
+            if let Some(input)=&actuation.incoming {
+                if input.len()!=self.nodes(){return Err(error("pending actuation input extent"));}
+                let amplitude=self.material_target().ok_or_else(||error("missing actuation target"))?
+                    .tensor_basis_amplitude(actuation.coordinate,input)?;
+                let coordinate=if actuation.quadrature==holonic_engine::native_ecology::constitutive_fibre::NativePacketQuadrature::Real {
+                    amplitude.real
+                }else{amplitude.imaginary};
+                if coordinate<=num_rational::BigRational::from_integer(0.into()) {return Err(error("pending actuation phase"));}
+            }
         }
         Ok(())
     }
@@ -251,7 +262,9 @@ impl SavedTextField {
         });
         session.next_anchor = anchors[0].take();
         if let Some(symbol) = self.session.pending {
-            let inputs = if self.session.pending_native.is_some() {
+            let inputs = if let Some(input)=self.session.pending_material_actuation.as_ref().and_then(|a|a.incoming.as_ref()) {
+                input.clone()
+            } else if self.session.pending_native.is_some() {
                 vec![]
             } else {
                 symbol.inputs_on(if self.session.duplex{self.session.pending_direction}else{super::text_codec::TextDirection::Incoming})
@@ -316,9 +329,10 @@ impl TextFieldSession<'_, '_> {
         ];
         kept.extend(anchors.iter().map(|a| Some(*a)));
         let field = self.field.rest(&sources, &kept)?;
-        let pending_material_actuation=self.pending.as_ref().and_then(|(_,p)|p.material_actuation()).map(|a|{
+        let pending_material_actuation=self.pending.as_ref().and_then(|(symbol,p)|p.material_actuation().map(|a|(symbol,p,a))).map(|(symbol,p,a)|{
             Ok::<_,AlphaMaterialError>(PendingMaterialActuation{quadrature:a.reading().quadrature,
-                coordinate:a.reading().selected.ok_or_else(||error("pending material face is not fixed"))?})
+                coordinate:a.reading().selected.ok_or_else(||error("pending material face is not fixed"))?,
+                incoming:(p.incoming()!=symbol.inputs_on(self.pending_direction).as_slice()).then(||p.incoming().to_vec())})
         }).transpose()?;
         let session = SessionWire {
             pending_material_actuation,

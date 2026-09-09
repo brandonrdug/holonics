@@ -143,15 +143,25 @@ finds repeated text over demonstrably different outgoing currents. The canonical
 fresh unit impulses at each actuation. A learned EndPart, an open receiver, a work interruption,
 physical release and useful answer completion remain different consequences.
 
+[established-bounded; implemented-exact; measured] The
+[phase/relevance return](../../research/records/2026-09-09_AC1_AC2_REPEATED_FACES_RETAIN_PHASE_AND_EXCHANGE.md)
+completes sixteen-family exposure and source-qualified factor-phase comparisons. Equal present
+tensor inputs can have different later currents; a broader phase profile changes generated text
+with the same learned operators. The fixed-contact interior's real relaxation/sign modes and an
+exact propagation-before-reflection control identify the next composition. The force-sector,
+exchange and situated-loss sources are included at their actual mathematical scopes.
+
 [definition] **Current entry: AC1 steps 3–4 together with AC2's situated feedback.** Use the
 [parallel normal/closed-return mathematics](../../research/records/2026-09-09_MATHEMATICAL_REVIEW_NORMAL_GEOMETRY_AND_CLOSED_RETURNS.md)
 in this order:
 
-1. Compose the actual source, supplied actuation/load, interior, outgoing current and receiver.
-   The cold repeated-face comparison has returned; now derive the contextual feedback relation
-   through existing paired/reflection and source owners. Retain the whole ball/fibre across its
-   passage. Establish what sustains, redirects or ends expression without treating a codeword's
-   canonical re-encoding as amplitude transport or requiring universal physical rest.
+1. Compose source-qualified propagation, reflection and exchange through the existing phase,
+   addressed-span, paired and source owners. The tensor-factor phase realization and its pending
+   persistence now return; an internal propagation/source law and the complete material-family
+   passage remain open. Retain the whole ball/fibre and actual boundary across this composition.
+   New transport belongs in the historical producer, adjoint and current-factor decoder. Derive
+   what sustains, redirects or ends expression without substituting a chosen rotation, a
+   codeword's canonical unit input or a scalar entropy penalty for that constitutive relation.
 2. The [stored normal-objective comparison](../../research/records/2026-09-09_AC1_THE_NORMAL_OBJECTIVE_SEPARATES_SOLVE_ERROR_FROM_OBSERVED_SOURCE_FIT.md)
    now rules out a material benefit from additional solve precision at the measured cuts.
    Keep data discrepancy, unit-prior cost and source-family uncertainty separate. Continue the
@@ -167,7 +177,7 @@ in this order:
    can expose. Normal rank-one reuse must retain the actual numerical update history/residual or
    a producer snapshot; historical H/B alone cannot recover a different approximate update law.
 4. Inspect the changed conduct on actual requests and followups at the stated exposure. AC2
-   and AC3 may develop together: the eight-part slice contains one human request, so useful
+   and AC3 may develop together: the completed sixteen-part slice contains two incoming parts, so useful
    general language is not a prerequisite to providing broader material through an affordable,
    lawful recurrence. Preserve source/continuation controls and actual cost; a larger run does
    not repair an identified defect by itself. Investigate repetition and deformation without

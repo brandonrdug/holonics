@@ -421,6 +421,24 @@ consequence. EndPart remains a learned exterior part boundary. Do not infer usef
 from a quiet current or suppress an active generator merely because its text repeats. A proposed
 boundary change must preserve plural families, phase and its source, not feed a chosen centre.
 
+[established-bounded; implemented-exact; measured] The
+[phase/relevance return](../../research/records/2026-09-09_AC1_AC2_REPEATED_FACES_RETAIN_PHASE_AND_EXCHANGE.md)
+completes sixteen-family exposure at 5,064 occurrences and integrates factor-phase actuation with
+pending persistence. The same tensor packet need not have the same future current; a broader
+input-phase profile changes the generated trajectory with the same learned operators. Frequency
+and periodic-drive measurements retain their receiver scope. The separate exact propagation
+control changes emitted phase at unchanged scalar decay.
+
+[definition] The next source composition includes propagation, reflection and exchange. The
+fixed-contact interior's real relaxation/sign spectrum does not supply an independently
+advancing internal phase. Derive the actual propagation/source law from existing phase,
+addressed-span/connection and source owners, retaining its family, clock and complete return.
+If the propagated interior changes, the historical producer, adjoint and current-factor
+generator must change together. The material-ball ingress remains a separate concrete family
+obligation. Do not substitute a selected phase, a present tensor quotient or a scalar loss for
+future-stable relevance. Force-sector/exchange mathematics supplies construction dependencies
+at its stated scopes, without requiring calibration of all physical applications before AC work.
+
 [established-bounded; measured] The [normal material implementation](../../research/records/2026-09-09_AC1_THE_MATERIAL_OPERATOR_RETAINS_ITS_ACCUMULATED_SOURCE_GEOMETRY.md)
 now accumulates exact H/B/C with complete residual and family bounds, recovers its actual producing
 operator and restarts. It improves retained relations at 75 occurrences, but its eight-family

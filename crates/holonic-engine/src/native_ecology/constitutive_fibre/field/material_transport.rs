@@ -31,6 +31,48 @@ pub enum NativeMaterialTarget {
     TensorProduct { factor_width: usize },
 }
 impl NativeMaterialTarget {
+    /// Read a unit tensor-basis realization in this exterior chart. Relative factor phases
+    /// remain present even when their product gives the same complete target current.
+    pub fn tensor_basis_amplitude(self, coordinate:usize, input:&[NativePhaseCurrent])
+        ->Result<ExactComplexWaveCurrent,ConstitutiveFibreError>{
+        let Self::TensorProduct{factor_width}=self else{return Err(ConstitutiveFibreError::Shape);};
+        let targets=self.dimension(input.len()).ok_or(ConstitutiveFibreError::Shape)?;
+        if coordinate>=targets{return Err(ConstitutiveFibreError::Shape);}
+        let mut address=coordinate;
+        let mut amplitude=ExactComplexWaveCurrent::one();
+        for factor in input.chunks_exact(factor_width){
+            let selected=address%factor_width;address/=factor_width;
+            for (j,value) in factor.iter().enumerate(){
+                let value=value.current();
+                if j==selected {
+                    if value.norm_square()!=Rat::one(){return Err(ConstitutiveFibreError::Rest("actuation is not a unit tensor basis".into()));}
+                    amplitude=amplitude.multiply(&value);
+                }else if !value.is_zero(){return Err(ConstitutiveFibreError::Rest("actuation coordinate disagrees with its input".into()));}
+            }
+        }
+        Ok(amplitude)
+    }
+
+    /// Apply an explicit factor-phase transport whose product is identity. The tensor receiver
+    /// is unchanged for every input, while the actual root currents can differ. This changes
+    /// the supplied realization; it does not rechart the field's morphology or select an answer.
+    pub fn transport_factor_phases(self,input:&[NativePhaseCurrent],phases:&[crate::ExactWavePhaseTransport])
+        ->Result<Vec<NativePhaseCurrent>,ConstitutiveFibreError>{
+        let Self::TensorProduct{factor_width}=self else{return Err(ConstitutiveFibreError::Shape);};
+        self.dimension(input.len()).ok_or(ConstitutiveFibreError::Shape)?;
+        if phases.len()!=input.len()/factor_width{return Err(ConstitutiveFibreError::Shape);}
+        let mut joint=crate::ExactWavePhaseTransport::identity();
+        for phase in phases {
+            if !phase.is_unit(){return Err(ConstitutiveFibreError::Uncertain);}
+            joint=joint.compose(phase);
+        }
+        if joint!=crate::ExactWavePhaseTransport::identity(){
+            return Err(ConstitutiveFibreError::Rest("factor phases change the joint tensor current".into()));
+        }
+        input.chunks_exact(factor_width).zip(phases).flat_map(|(factor,phase)|factor.iter()
+            .map(|value|NativePhaseCurrent::from_current(&phase.transport(&value.current())))).collect()
+    }
+
     pub fn dimension(self, roots:usize)->Option<usize>{
         match self {
             Self::DirectCurrent=>Some(roots),

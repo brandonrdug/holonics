@@ -314,6 +314,29 @@ fn receive_prompt_symbol(session: &mut TextFieldSession<'_, '_>, symbol: TextSym
     Ok(())
 }
 
+#[derive(Clone,Debug,Serialize)]
+struct ActuationPhasePair {
+    first_factor:usize,
+    second_factor:usize,
+    slope_numerator:i64,
+    slope_denominator:i64,
+}
+impl ActuationPhasePair {
+    fn phases(&self, factors:usize)->Result<Vec<holonic_engine::ExactWavePhaseTransport>,AlphaMaterialError>{
+        if self.first_factor>=factors || self.second_factor>=factors || self.slope_denominator<=0 {
+            return Err(AlphaMaterialError::Apparatus("phase pair is outside its factor/ratio chart".into()));
+        }
+        let slope=num_rational::BigRational::new(self.slope_numerator.into(),self.slope_denominator.into());
+        let point=holonic_engine::causal_reflection::RationalCirclePoint::from_slope(&slope);
+        let phase=holonic_engine::ExactWavePhaseTransport::new(point.real().clone(),point.imaginary().clone())
+            .map_err(|e|AlphaMaterialError::Apparatus(e.to_string()))?;
+        let mut phases=vec![holonic_engine::ExactWavePhaseTransport::identity();factors];
+        phases[self.first_factor]=phase.clone();
+        phases[self.second_factor]=phases[self.second_factor].compose(&phase.inverse());
+        Ok(phases)
+    }
+}
+
 fn run_session(
     session: &mut TextFieldSession<'_, '_>,
     reader: &mut Option<ExposureReader>,
@@ -329,6 +352,7 @@ fn run_session(
     inspect_all_currents: bool,
     inspect_normal_objective: bool,
     condense_current_journal: bool,
+    actuation_phase_pairs: &[ActuationPhasePair],
     operative: bool,
     contact_response: bool,
     contact_realization: NativeContactRealization,
@@ -355,6 +379,21 @@ fn run_session(
     let source_mode=self_source_mode.unwrap_or(if matches!(session.field().material_target(),Some(NativeMaterialTarget::TensorProduct{..})) && matches!(text_receiver,TextCurrentReceiver::Material){TextGenerationSourceMode::Actuation}else{TextGenerationSourceMode::Observation});
     report["self_source_contact"] = json!(source_mode!=TextGenerationSourceMode::Withdrawal);
     report["self_source_mode"] = json!(source_mode);
+    if !actuation_phase_pairs.is_empty() && (source_mode!=TextGenerationSourceMode::Actuation || !matches!(text_receiver,TextCurrentReceiver::Material)) {
+        return Err(AlphaMaterialError::Apparatus("phase-pair study requires material actuation".into()));
+    }
+    let phases=if actuation_phase_pairs.is_empty(){None}else{
+        let factors=holonics_hna::alpha::text_codec::TEXT_BIT_PAIRS;
+        let mut profile=vec![holonic_engine::ExactWavePhaseTransport::identity();factors];
+        for pair in actuation_phase_pairs {
+            for (accumulated,next) in profile.iter_mut().zip(pair.phases(factors)?) {
+                *accumulated=accumulated.compose(&next);
+            }
+        }
+        Some(profile)
+    };
+    report["actuation_phase_pairs"]=json!(actuation_phase_pairs);
+    report["actuation_factor_phases"]=json!(phases);
     report["duplex"] = json!(session.duplex());
     report["contact_response_during_development"] = json!(contact_response);
     report["contact_response_during_prompt"] = json!(contact_response);
@@ -448,7 +487,10 @@ fn run_session(
         report["prompt_operative_returns"] = json!(session.field().operative_return_count());
         report["prompt_error"] = json!(prompt_error);
         if prompt_error.is_none() {
-            let generated = session.generate_with_source_mode(limit,text_receiver,source_mode);
+            let generated = match &phases {
+                Some(phases)=>session.generate_with_factor_phases(limit,phases),
+                None=>session.generate_with_source_mode(limit,text_receiver,source_mode),
+            };
             report["utf8"] = json!(std::str::from_utf8(&generated.emitted_octets).ok());
             report["utf8_error"] = json!(std::str::from_utf8(&generated.emitted_octets)
                 .err()
@@ -522,7 +564,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary|operative-linear|operative-normal] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--self-source-mode actuation|observation|withdrawal] [--contact-metric current|relative-entropy|squared-probability] [--inspect-contact-cuts N,...] [--inspect-retained-receivings N,...] [--inspect-normal-objective true|false] [--condense-current-journal true|false]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary|operative-linear|operative-normal] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--self-source-mode actuation|observation|withdrawal] [--contact-metric current|relative-entropy|squared-probability] [--inspect-contact-cuts N,...] [--inspect-retained-receivings N,...] [--inspect-normal-objective true|false] [--condense-current-journal true|false] [--actuation-phase-pair I,J,NUM,DEN (repeatable)]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -535,6 +577,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut inspect_all_currents = false;
     let mut inspect_normal_objective = false;
     let mut condense_current_journal = false;
+    let mut actuation_phase_pairs = Vec::new();
     let mut operative = false;
     let mut contact_response = None;
     let mut contact_realization = None;
@@ -613,6 +656,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "--inspect-all-currents" => inspect_all_currents = value.parse::<bool>()?,
             "--inspect-normal-objective" => inspect_normal_objective = value.parse::<bool>()?,
             "--condense-current-journal" => condense_current_journal = value.parse::<bool>()?,
+            "--actuation-phase-pair" => {
+                let values=value.split(',').collect::<Vec<_>>();
+                if values.len()!=4{return Err("phase pair requires first-factor,second-factor,slope-numerator,slope-denominator".into());}
+                actuation_phase_pairs.push(ActuationPhasePair{first_factor:values[0].parse()?,second_factor:values[1].parse()?,
+                    slope_numerator:values[2].parse()?,slope_denominator:values[3].parse()?});
+            },
             _ => return Err(format!("unknown option {option}").into()),
         }
     }
@@ -730,6 +779,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 inspect_all_currents,
                 inspect_normal_objective,
                 condense_current_journal,
+                &actuation_phase_pairs,
                 operative,
                 contact_response.unwrap_or(app.contact_response),
                 contact_realization.unwrap_or(app.contact_realization),
@@ -780,6 +830,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     inspect_all_currents,
                     inspect_normal_objective,
                     condense_current_journal,
+                    &actuation_phase_pairs,
                     operative,
                     contact_response.unwrap_or(false),
                     contact_realization.unwrap_or(NativeContactRealization::DyadicDeposit),

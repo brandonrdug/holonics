@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 9, 2026. **Priority:** AC0–AC5 goal remains active; current cultivation seeks identifiable behavioral phenomena, not forced utility. AC1's current-difference generator is integrated; broader exposure is running.
+**Currency:** September 9, 2026. **Priority:** AC0–AC5 goal remains active; current cultivation seeks identifiable behavioral phenomena, not forced utility. Sixteen-family exposure and phase comparisons have returned; AC1–AC2 now address constitutive propagation and exchange.
 **Position:** AC0 complete; AC1 accumulated-normal material integrated; AC1 path/generator reuse and AC2 situated feedback/useful continuation open; AC3 experimental artifacts; AC4–AC5 open.
 **Athena-alpha:** not yet attained.
 
@@ -90,16 +90,25 @@ model or product grade and adds no numerical policy to the parallel AC1 work.
 ## Current HNN construction
 
 [established-bounded; implemented-exact; measured] The
+[phase/relevance return](research/records/2026-09-09_AC1_AC2_REPEATED_FACES_RETAIN_PHASE_AND_EXCHANGE.md)
+completes sixteen-family exposure at 5,064 occurrences. The output still repeats ` the`; the
+actual outgoing material contains 91 occurrences of `the`, versus 22 for the next word. A paired
+factor-phase intervention preserves the tensor packets and text while separating later currents;
+a broader profile changes the emitted trajectory with the same learned operators. Native pending
+input/restart and packet controls pass. The exact exterior propagation control separates phase
+advance from scalar decay. No native internal propagation law is claimed by that control.
+
+[established-bounded; implemented-exact; measured] The
 [source-interior difference generator](research/records/2026-09-09_AC1_THE_SOURCE_INTERIOR_CHANGE_GENERATES_A_RETURN_FACTOR.md)
 replaces a retained contact factor with its actual before/after current difference. Field,
 archive/restart, restricted-prefix and causal-source controls pass. All 1,929 saved-model returns
 convert with unchanged reported numerical body. Native factor storage halves to 118,700,992
 bytes; the checkpoint saves 59,287,958 bytes. The scoped representation return is complete.
 
-[definition] A fresh process continues eight further conversation parts from the converted
-1,930-occurrence model, with archive placement and a new sixteen-part checkpoint/output report.
-It is active; its behavioral and cost result has not returned. Current observations are research
-material, without a utility filter. Whole-ecology generator reuse remains open.
+[established-bounded; measured] The completed continuation adds eight families in 1,889.64
+seconds and saves a 1,518,483,970-byte checkpoint before its prompt. All development numerical
+section readouts belong to archive placement. The linked phase/relevance record retains full
+costs, exact cycle comparisons and the frequency observer; whole-ecology reuse remains open.
 
 [established-bounded; implemented-exact; measured] The
 [integer/abstraction review](research/records/2026-09-09_INTEGER_FACES_RETAIN_THEIR_GENERATING_RELATIONS.md)
@@ -148,11 +157,13 @@ There are still zero numerical development readouts. Larger journal/source-repre
 and useful responses remain open.
 
 [definition] **Current work: AC1 steps 3–4 and AC2's situated feedback/continuation.** Compose
-source, actuation/load, retained interior and changing receiver through the existing owners.
-Explain what sustains, redirects or ends expression; distinguish that from whether an answer is
-useful. Use normal square completion to separate solve discrepancy from the attainable fit of
-the observed source geometry. Retain numerical producers in any rank-one reuse. No repetition
-filter, universal damping constant or physical-equilibrium gate is authorized by this review.
+source-qualified propagation, reflection, exchange and the material/current boundary through
+existing owners. The fixed-junction interior has real relaxation/sign modes; the separate
+propagation/source law and complete family passage remain concrete work. Carry any new transport
+through the actual producer, adjoint and current-factor generator. Relevance is future receiver
+consequence, not present tensor agreement or a scalar loss alone. Neither a chosen rotation nor
+a repetition filter supplies the missing constitutive law. Research retains unusual behavior;
+useful response completion remains a later product requirement.
 AC0 is complete; AC1/AC2 remain open, AC3 is experimental and AC4–AC5 remain open.
 
 [established-bounded; source-inspected] The preceding [retention record](research/records/2026-09-09_AC1_LOCAL_CONTACT_IMPROVEMENT_COEXISTS_WITH_MATERIAL_FORGETTING.md)
