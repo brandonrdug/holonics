@@ -133,6 +133,14 @@ Fresh-process continuation reproduces the complete current. Equal declared recei
 coexist with a retained branch-separating remainder. This gives a usable finite transport and
 compression construction; decoder and standing costs accompany its smaller continuing state.
 
+[proved-derived; formal-checked] `Physics/AccumulatedNormalResponse` extends the same complete
+finite-change discipline to accumulated material geometry. Its rank-one response retains both
+the gain defect and the finite deposit defect against the new Gram matrix, even when the previous
+fit was inexact. Its complex square-completion theorem supplies the algebra for separating solve
+error from the declared objective. The
+[Athena/CTC review](../research/records/2026-09-09_MATHEMATICAL_REVIEW_NORMAL_GEOMETRY_AND_CLOSED_RETURNS.md)
+connects these reusable laws to the active implementation and its producing-history requirement.
+
 ## Molecular structures are constitutive geometry over time
 
 [definition] Here *molecular structure* covers the intended biological family—protein, DNA, RNA,

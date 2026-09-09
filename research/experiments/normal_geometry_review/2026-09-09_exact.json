@@ -1,0 +1,284 @@
+{
+  "evidence": [
+    "implemented-exact",
+    "computational-witness"
+  ],
+  "grade": "established-bounded",
+  "normal": {
+    "conflicting_source_control": {
+      "best_regularized_potential": "2/3",
+      "data_term": "5/9",
+      "prior_term": "1/9",
+      "same_source": [
+        [
+          "1"
+        ],
+        [
+          "0"
+        ]
+      ],
+      "scope": "constructed collision; no claim that these are the Athena model's actual sources",
+      "targets": [
+        [
+          [
+            "1"
+          ],
+          [
+            "0"
+          ]
+        ],
+        [
+          [
+            "0"
+          ],
+          [
+            "1"
+          ]
+        ]
+      ]
+    },
+    "events": [
+      {
+        "B": [
+          [
+            "1",
+            "0"
+          ],
+          [
+            "0",
+            "0"
+          ]
+        ],
+        "C": "1",
+        "H": [
+          [
+            "2",
+            "0"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        "attained_regularized_potential": "525435/2004002",
+        "best_regularized_potential": "1/4",
+        "gain_and_deposit_defect_return": [
+          [
+            "9/32",
+            "-145/1232"
+          ],
+          [
+            "0",
+            "115/1664"
+          ]
+        ],
+        "ordinal": 0,
+        "retained_normal_residual": [
+          [
+            "1/7",
+            "-1/11"
+          ],
+          [
+            "0",
+            "1/13"
+          ]
+        ],
+        "solve_gap": "48869/4008004"
+      },
+      {
+        "B": [
+          [
+            "1",
+            "0"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        "C": "2",
+        "H": [
+          [
+            "2",
+            "0"
+          ],
+          [
+            "0",
+            "2"
+          ]
+        ],
+        "attained_regularized_potential": "2038661/4008004",
+        "best_regularized_potential": "1/2",
+        "gain_and_deposit_defect_return": [
+          [
+            "457/2464",
+            "-17/176"
+          ],
+          [
+            "3/26",
+            "3/832"
+          ]
+        ],
+        "ordinal": 1,
+        "retained_normal_residual": [
+          [
+            "1/7",
+            "-1/11"
+          ],
+          [
+            "0",
+            "1/13"
+          ]
+        ],
+        "solve_gap": "34659/4008004"
+      },
+      {
+        "B": [
+          [
+            "2",
+            "1"
+          ],
+          [
+            "-1",
+            "0"
+          ]
+        ],
+        "C": "4",
+        "H": [
+          [
+            "3",
+            "1"
+          ],
+          [
+            "1",
+            "3"
+          ]
+        ],
+        "attained_regularized_potential": "18166021/16032016",
+        "best_regularized_potential": "9/8",
+        "gain_and_deposit_defect_return": [
+          [
+            "325/1232",
+            "-111/1232"
+          ],
+          [
+            "-413/1664",
+            "13/128"
+          ]
+        ],
+        "ordinal": 2,
+        "retained_normal_residual": [
+          [
+            "1/7",
+            "-1/11"
+          ],
+          [
+            "0",
+            "1/13"
+          ]
+        ],
+        "solve_gap": "130003/16032016"
+      },
+      {
+        "B": [
+          [
+            "2",
+            "1"
+          ],
+          [
+            "0",
+            "0"
+          ]
+        ],
+        "C": "5",
+        "H": [
+          [
+            "4",
+            "1"
+          ],
+          [
+            "1",
+            "3"
+          ]
+        ],
+        "attained_regularized_potential": "21615128/11022011",
+        "best_regularized_potential": "43/22",
+        "gain_and_deposit_defect_return": [
+          [
+            "1073/19712",
+            "-1059/19712"
+          ],
+          [
+            "491/1664",
+            "17/1664"
+          ]
+        ],
+        "ordinal": 3,
+        "retained_normal_residual": [
+          [
+            "1/7",
+            "-1/11"
+          ],
+          [
+            "0",
+            "1/13"
+          ]
+        ],
+        "solve_gap": "144213/22044022"
+      }
+    ],
+    "source_rotation_preserves_potential": true
+  },
+  "reflection": {
+    "blind_internal_successor": [
+      [
+        "-1",
+        "0"
+      ],
+      [
+        "1",
+        "0"
+      ]
+    ],
+    "changed_contact_separates": [
+      [
+        "-1/3",
+        "0"
+      ]
+    ],
+    "complete_complex_reflection_returns_source": true,
+    "joint_current_energy_exact": true,
+    "open_zero_input_steps": [
+      {
+        "internal": [
+          [
+            "3/5",
+            "0"
+          ]
+        ],
+        "outgoing": [
+          [
+            "4/5",
+            "0"
+          ]
+        ]
+      },
+      {
+        "internal": [
+          [
+            "9/25",
+            "0"
+          ]
+        ],
+        "outgoing": [
+          [
+            "12/25",
+            "0"
+          ]
+        ]
+      }
+    ],
+    "scope": "existing exact passive producer; no closed timelike spacetime or periodic whole Athena ecology is assumed"
+  },
+  "scope": "exterior exact architecture controls; no model training or production semantic readout"
+}

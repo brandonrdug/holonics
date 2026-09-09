@@ -85,6 +85,7 @@ the geometry, clock, source family, full-current decoder, blind fibre and costs.
 | Real cast into existing Parametron coupled response | `Physics/FourTorusParametronCurrent.lean` | Rational response chart; no complete LC/phase-network execution claim |
 | Actual constitutive steps with complete-state pullback joins | `Physics/ConstitutiveWorldTube.lean` | Example retains rational chronology and source inputs; exact fresh-process continuation comparison |
 | Typed scale passage and all-input-word future receiver family | `Physics/ConstitutiveScale.lean` | Formal all-word law; finite varying-input comparison in the same exterior example |
+| Accumulated normal residual, finite source drift and square completion | `Physics/AccumulatedNormalResponse.lean` | Exact cold `normal_geometry_review.rs` controls over the public matrix/paired owners; the active `field/material_transport/normal.rs` remains the native normal realization |
 
 [definition] These executable correspondences concern a finite exterior constitutive experiment.
 No Lean/runtime binding, new HNN engine or anatomical/continuum identity is introduced.

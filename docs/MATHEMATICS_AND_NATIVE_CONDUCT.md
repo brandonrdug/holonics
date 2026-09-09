@@ -61,6 +61,19 @@ currents, with no Lean or exterior evaluator in the learning path.
 
 ## One framework, several realizations
 
+[proved-derived; formal-checked] The September 9
+[mathematical architecture review](../research/records/2026-09-09_MATHEMATICAL_REVIEW_NORMAL_GEOMETRY_AND_CLOSED_RETURNS.md)
+adds `Physics/AccumulatedNormalResponse.lean`: a rank-one normal response retains its complete
+residual, including gain/deposit errors; an exact gain preserves even a nonzero preceding residual.
+Square completion separates the solve discrepancy from the best fit in the declared source chart.
+The same record connects complete/open paired reflection to the closed-timelike-curve comparison
+and recovers the distinct acoustic CTC path-fibre sharing construction.
+
+[conditional] These laws support cheaper `OperativeNormal` continuation and a more informative
+cold diagnostic. H/B/C retain the objective, while the actual producing numerical operator remains
+required by delayed adjoints; changing the numerical update also changes that decoder obligation.
+This is a concrete handoff to the active native owner, not another optimizer or a new AC gate.
+
 [definition] The subsequent [complex-fluid and plan revision](../research/records/2026-09-08_COMPLEX_FLUID_CHARTS_RETAIN_THE_FOLDED_CURRENT_AND_THE_RECEIVER_BOUND.md)
 develops this synthesis into the revised AC0–AC5 order and explicit equations: complex projection
 retains nonlinear feedback, elimination returns a memory kernel, and MVT/squeeze bound the

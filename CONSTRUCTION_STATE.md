@@ -8,6 +8,19 @@
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct
 instruction governs.
 
+## September 9 mathematical architecture review
+
+[proved-derived; formal-checked] The [normal-geometry and closed-return review](research/records/2026-09-09_MATHEMATICAL_REVIEW_NORMAL_GEOMETRY_AND_CLOSED_RETURNS.md)
+returns a residual-aware rank-one normal identity, exact finite source/target changes and complex
+square completion. These distinguish solve error, declared fit limits and the producing numerical
+history required for reuse. The framework check passes (4,001 jobs).
+
+[established-bounded; implemented-exact; computational-witness] Exact public matrix/paired controls
+return nonzero-residual reuse, gain/deposit defects, objective separation and complete versus open
+reflection. The review also recovers the repository's acoustic CTC path-fibre sharing owner.
+This is a verified mathematical handoff; the proposed GPU rank-one optimization is not yet applied
+by this parallel review. The live Athena work below retains its own current position.
+
 ## Reality of Difference: active formal programme
 
 [proved-derived; formal-checked] The sustained goal's
