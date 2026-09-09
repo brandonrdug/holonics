@@ -1,11 +1,27 @@
 use super::*;
 
+/// A declared orthogonal receiver of the complete complex current, not a source identity.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, serde::Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum NativePacketQuadrature {
+    #[default]
+    Real,
+    Imaginary,
+}
+impl NativePacketQuadrature {
+    fn is_real(&self) -> bool {
+        *self == Self::Real
+    }
+}
+
 /// Complete set of possible maximizing coordinates over the retained Euclidean current ball.
 /// The ball may enclose a smaller causal family: this does not identify its complete source
 /// Preimage Fibre, and a selected coordinate does not select a unique source current.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct NativeMaterialPacketReading {
     pub occurrence: usize,
+    #[serde(skip_serializing_if = "NativePacketQuadrature::is_real")]
+    pub quadrature: NativePacketQuadrature,
     pub target_chart: NativeMaterialTarget,
     pub target_dimension: usize,
     pub selected: Option<usize>,
@@ -15,6 +31,13 @@ impl NativeConstitutiveField<'_> {
     pub fn read_material_packet(
         &self,
         occurrence: usize,
+    ) -> Result<Option<NativeMaterialPacketReading>, ConstitutiveFibreError> {
+        self.read_material_packet_quadrature(occurrence, NativePacketQuadrature::Real)
+    }
+    pub fn read_material_packet_quadrature(
+        &self,
+        occurrence: usize,
+        quadrature: NativePacketQuadrature,
     ) -> Result<Option<NativeMaterialPacketReading>, ConstitutiveFibreError> {
         let Some(chart) = self.material_target() else {
             return Ok(None);
@@ -30,25 +53,38 @@ impl NativeConstitutiveField<'_> {
         let report = event.with_resident(surface, |r| {
             r.transport.clone().ok_or(ConstitutiveFibreError::Uncertain)
         })?;
-        NativeMaterialPacketReading::read_from(surface, &report, occurrence, chart, targets)
-            .map(Some)
+        NativeMaterialPacketReading::read_in_quadrature(
+            surface, &report, occurrence, chart, targets, quadrature,
+        )
+        .map(Some)
     }
 }
 impl NativeMaterialPacketReading {
-    pub(in super::super) fn read_from<'c>(
+    pub(in super::super) fn read_in_quadrature<'c>(
         surface: &'c ResidentSurface<'c>,
         report: &ResidentSection<'c>,
         occurrence: usize,
         chart: NativeMaterialTarget,
         targets: usize,
+        quadrature: NativePacketQuadrature,
     ) -> Result<Self, ConstitutiveFibreError> {
         let output = surface.fresh_section(1, targets + 2, ResidentGrain(0))?;
         let scratch = surface.fresh_section(1, 2 * targets, ResidentGrain(0))?;
         let mut passage = surface.begin_passage(&[vec![]])?;
         {
             let lane = passage.open(0, &[])?;
-            surface
-                .record_field_material_packet_receiver(&lane, report, targets, &scratch, &output)?;
+            surface.record_field_material_packet_quadrature(
+                &lane,
+                report,
+                targets,
+                if quadrature == NativePacketQuadrature::Real {
+                    0
+                } else {
+                    1
+                },
+                &scratch,
+                &output,
+            )?;
         }
         passage.close(0, &output, 64)?;
         let receipt = passage.finish()?.launch()?;
@@ -79,6 +115,7 @@ impl NativeMaterialPacketReading {
         }
         Ok(Self {
             occurrence,
+            quadrature,
             target_chart: chart,
             target_dimension: targets,
             selected,

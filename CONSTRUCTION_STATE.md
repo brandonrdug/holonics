@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 8, 2026. **Priority:** AC0–AC5 completion resumed by Brandon; flexible native construction with transparent failures.
+**Currency:** September 9, 2026. **Priority:** AC0–AC5 completion resumed by Brandon; flexible native construction with transparent failures.
 **Position:** AC0 complete; AC1 finite contact development completes the first corpus slice; AC2 joint-packet transport and receiver are implemented, but responses remain unusable; AC1 path/reuse and AC2 productive continuation remain open; AC3 experimental artifacts; AC4–AC5 open.
 **Athena-alpha:** not yet attained.
 
@@ -58,6 +58,19 @@ model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction
 
+[established-bounded; measured] The [duplex codec](research/records/2026-09-09_AC1_AC2_CONVERSATIONAL_DIRECTION_REACHES_NATIVE_PORTS.md)
+now carries incoming and demonstrated-emission currents in distinct I/Q ports, with a matching
+reply receiver and persisted pending direction. All 106 field tests, 23 alpha SDK tests and two
+executed driver controls pass. The matched 1,930-occurrence study completes in 611.68 seconds;
+its packed checkpoint is 390,957,790 bytes and fresh-process continuation matches exactly.
+
+[counterexample; measured] The duplex model answers `The renry.` and stops. Its seen-request
+continuation repeats `The re re ...` through the work limit. Neither is useful. The slice contains
+74 human bytes and 1,848 agent bytes; it is not broad language exposure. Next compose the existing
+finite current-to-material operator with the operative current, independent joint target and
+producing adjoint, to address scalable learned action before broadening cultivation. This is a
+model-family comparison, not an asserted quotient of the historical projector-kernel learner.
+
 [established-bounded; measured] The [operative-boundary query](research/records/2026-09-08_AC1_THE_MATERIAL_QUERY_FOLLOWS_THE_OPERATIVE_BOUNDARY.md)
 now observes transported outgoing current while retaining the full interior and its producing
 contact return. All 105 field CUDA tests pass. The matched 1,930-occurrence study completes in
@@ -65,11 +78,9 @@ contact return. All 105 field CUDA tests pass. The matched 1,930-occurrence stud
 `EndPart`, and a fresh process reproduces the complete declared state and continuation.
 The response is still unusable; ending a part does not establish useful Athena-alpha.
 
-[established-bounded; source-inspected] The codec retains human/agent attribution in cold
-receipts but mounts both through identical symbol intake. Next carry actual conversational
-direction through native boundary ports and matching receivers, including pending state and
-ordinary self-emission. This is a missing operative condition, not a proof of the sole cause of
-language failure. AC1 recurrent reuse and AC2 complete useful responses remain open.
+[historical; source-inspected] The earlier codec retained direction only in cold receipts. The
+duplex construction above repairs its native intake/receiver path; the old undirected chart
+remains available. AC1 recurrent reuse and AC2 complete useful responses remain open.
 
 [established-bounded; measured] The [material report restriction](research/records/2026-09-08_AC1_MATERIAL_REPORTS_REUSE_THEIR_COORDINATE_SUPPORT.md)
 now retains a native coordinate inventory, common standing and exact decoder. Its packet receiver
@@ -107,7 +118,8 @@ decisions exactly. Neither this repair nor local test success establishes useful
 
 [definition] AC1 steps 3–4 retain local path formation, restriction/rebase and generator reuse
 through the actual receiver family. The boundary-query return above supplies a changed family;
-the next AC1–AC2 codec correction preserves the missing conversational direction. The common-current
+the duplex codec now preserves conversational direction. The next composition above targets
+a finite learned material operator and its actual producing return. The common-current
 metric changes native conduct but leaves the language loop unchanged. Its recurrent retained-history
 representation is still far too large for the exposure, despite the report/checkpoint reduction
 above; another scalar receiver adjustment or larger unchanged corpus run is not the next construction.

@@ -3,7 +3,7 @@
 use super::*;
 mod normalized;
 mod packet;
-pub use packet::NativeMaterialPacketReading;
+pub use packet::{NativeMaterialPacketReading,NativePacketQuadrature};
 pub use normalized::{NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn,
     NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading};
 

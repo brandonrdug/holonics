@@ -219,3 +219,49 @@ fn ordinary_text_intake_forms_contextual_references_and_restarts() {
         })
         .unwrap();
 }
+
+#[test]
+#[ignore="requires CUDA; directed native intake, quadrature replies and pending-direction persistence"]
+fn duplex_intake_and_emission_keep_their_boundary_current_across_restart(){
+    use crate::alpha::text_codec::{with_text_field_chart,read_text_symbol_on,TextDirection};
+    use holonic_engine::native_ecology::constitutive_fibre::{NativeMaterialTarget,NativePacketQuadrature};
+    let dir=tempfile::tempdir().unwrap();let path=dir.path().join("duplex.hna");
+    let (expected,generation)=with_text_field_chart(72,NativeMaterialTransportSource::OperativeBoundary,
+        NativeMaterialTarget::TensorProduct{factor_width:2},|field|{
+        let mut session=TextFieldSession::on(field)?;session.enable_duplex()?;
+        session.receive(TextSymbol::Octet(b'A'))?;
+        session.receive_on(TextSymbol::Octet(b'B'),TextDirection::Outgoing)?;
+        let observed=session.field().inspect_contextual_material_transport(1)?.unwrap().observed;
+        assert_eq!(observed.center[b'B' as usize].real,num_rational::BigRational::from_integer(0.into()));
+        assert_eq!(observed.center[b'B' as usize].imaginary,num_rational::BigRational::from_integer(1.into()));
+        assert!(matches!(read_text_symbol_on(session.field(),1,TextDirection::Outgoing)?.disposition,
+            TextCodeDisposition::Symbol{symbol:TextSymbol::Octet(b'B')}));
+        assert!(matches!(read_text_symbol_on(session.field(),1,TextDirection::Incoming)?.disposition,TextCodeDisposition::Open));
+        let packed=session.field().pack_material_report(1)?;
+        assert_eq!(packed.read_packet_quadrature(NativePacketQuadrature::Imaginary)?.selected,Some(b'B' as usize));
+        session.stage_on(TextSymbol::Octet(b'C'),TextDirection::Outgoing)?;
+        assert_eq!(session.pending.as_ref().unwrap().1.incoming(),TextSymbol::Octet(b'C').inputs_on(TextDirection::Outgoing));
+        session.checkpoint(&path,&[],b"directional pending input")?;
+        session.retry_pending()?;
+        let generation=session.generate(4);
+        assert!(!generation.readings.is_empty());
+        for reading in &generation.readings {
+            let crate::alpha::text_codec::TextNativeReading::Packet(native)=&reading.native else{panic!("joint packet receiver required")};
+            assert_eq!(native.quadrature,NativePacketQuadrature::Imaginary);
+        }
+        for at in generation.native_from..generation.native_until {
+            assert!(TextSymbol::from_inputs_on(&session.field().inspect_incoming(at)?,TextDirection::Outgoing).is_some());
+        }
+        Ok((session.field().rest(&[session.latest.as_ref().map(|s|&s.source)],&[])?,serde_json::to_value(generation).unwrap()))
+    }).unwrap();
+    let saved=SavedTextField::read(&path).unwrap();assert!(saved.duplex());
+    saved.with_session(|session,_,_,app|{
+        assert_eq!(app,b"directional pending input");assert!(session.duplex());
+        assert_eq!(session.pending_direction(),Some(TextDirection::Outgoing));
+        assert_eq!(session.pending.as_ref().unwrap().1.incoming(),TextSymbol::Octet(b'C').inputs_on(TextDirection::Outgoing));
+        session.retry_pending()?;
+        assert_eq!(serde_json::to_value(session.generate(4)).unwrap(),generation);
+        assert_eq!(session.field().rest(&[session.latest.as_ref().map(|s|&s.source)],&[])?,expected);
+        Ok(())
+    }).unwrap();
+}

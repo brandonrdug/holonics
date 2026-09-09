@@ -142,13 +142,16 @@ impl<'c> NativeMaterialReportPacking<'c> {
     /// Reuse the packet receiver with only the required first-current face unfolded on device.
     /// The other ten current balls, factors and raw evaluation reports stay packed.
     pub fn read_packet(&self) -> Result<NativeMaterialPacketReading, ConstitutiveFibreError> {
+        self.read_packet_quadrature(NativePacketQuadrature::Real)
+    }
+    pub fn read_packet_quadrature(&self,quadrature:NativePacketQuadrature)->Result<NativeMaterialPacketReading,ConstitutiveFibreError>{
         let current = self.enact(3)?;
-        NativeMaterialPacketReading::read_from(
+        NativeMaterialPacketReading::read_in_quadrature(
             self.surface,
             &current,
             self.lineage.occurrence,
             self.target_chart,
-            self.targets,
+            self.targets,quadrature,
         )
     }
 

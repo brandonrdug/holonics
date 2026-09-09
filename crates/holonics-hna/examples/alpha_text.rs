@@ -8,7 +8,7 @@ use holonics_hna::{
         checkpoint::SavedTextField,
         exposure::{ExposureCursor, ExposureFamily, ExposurePartition, ExposureReader},
         material::AlphaMaterialError,
-        text_codec::{with_text_field_chart, TextSymbol},
+        text_codec::{with_text_field_chart, TextSymbol, TextDirection},
         text_session::{TextCurrentReceiver, TextFieldSession},
     },
     publish_new,
@@ -164,6 +164,7 @@ fn cultivate(
                 session.begin_part(parent_anchor)?;
                 session.field().occurrence_count()
             };
+            let direction=if part.kind=="agent-text"{TextDirection::Outgoing}else{TextDirection::Incoming};
             let mut failure = None;
             for (symbol_index, symbol) in text
                 .bytes()
@@ -181,14 +182,14 @@ fn cultivate(
                     }
                     Ok(())
                 } else if resume_part.is_some() && symbol_index == skip {
-                    if session.pending_symbol() != Some(symbol) {
+                    if session.pending_symbol() != Some(symbol) || (session.duplex() && session.pending_direction()!=Some(direction)) {
                         return Err(exposure_error(
                             "saved pending symbol disagrees with source material",
                         ));
                     }
                     session.retry_pending()
                 } else {
-                    session.receive(symbol)
+                    session.receive_on(symbol,direction)
                 };
                 if let Err(error) = result {
                     failure = Some(
@@ -299,6 +300,7 @@ fn run_session(
     report["material_source"] = json!(session.field().material_transport_source());
     report["material_target"] = json!(session.field().material_target());
     report["text_receiver"] = json!(text_receiver);
+    report["duplex"] = json!(session.duplex());
     report["contact_response_during_development"] = json!(contact_response);
     report["contact_realization"] = json!(contact_realization);
     report["contact_metric"] = json!(contact_metric);
@@ -448,7 +450,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--contact-metric current|relative-entropy|squared-probability]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--contact-metric current|relative-entropy|squared-probability]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -463,6 +465,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut contact_response = None;
     let mut contact_realization = None;
     let mut contact_metric = None;
+    let mut duplex = None;
     let mut history_archive = None;
     let mut material_source = None;
     let mut material_target = None;
@@ -503,6 +506,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 })
             }
             "--operative-junction" => operative = value.parse::<bool>()?,
+            "--duplex" => duplex=Some(value.parse::<bool>()?),
             "--contact-response" => contact_response = Some(value.parse::<bool>()?),
             "--material-target" => material_target=Some(match value.as_str(){
                 "direct-current"=>NativeMaterialTarget::DirectCurrent,
@@ -546,6 +550,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "all_currents_requested":inspect_all_currents,"additional_families_requested":families});
     let native_result = if let Some(path) = resume {
         let saved = SavedTextField::read(&path)?;
+        if duplex.is_some_and(|value|value!=saved.duplex()){return Err("resume cannot relabel the saved text boundary chart".into());}
         let mut app: CultivationCheckpoint = serde_json::from_slice(saved.application_state())?;
         if app.schema != "holonics.text-cultivation-checkpoint.v1"
             || app.native_until != saved.occurrences()
@@ -664,6 +669,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     field.enable_history_archive(path)?;
                 }
                 let mut session = TextFieldSession::on(field)?;
+                if duplex.unwrap_or(false){session.enable_duplex()?;}
                 let mut records = Vec::new();
                 let mut anchors = AnchorMap::new();
                 run_session(

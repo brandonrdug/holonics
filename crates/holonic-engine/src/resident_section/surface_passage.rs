@@ -14,14 +14,19 @@ impl<'chart> ResidentSurface<'chart> {
         let block=self.declaration.warp_size.max(1);
         self.record_blocks(lane,"section_field_material_current_covector",(2*targets).div_ceil(block as usize),block,0,&mut p,"material-current-covector")
     }
+    #[cfg(test)]
     pub(crate) fn record_field_material_packet_receiver(&self,lane:&Lane<'_,'chart>,input:&ResidentSection<'chart>,
         targets:usize,scratch:&ResidentSection<'chart>,output:&ResidentSection<'chart>)->Result<(),ResidentRefusal>{
-        if targets==0||targets>u32::MAX as usize/4||input.rows!=1||input.width<4*targets+2
+        self.record_field_material_packet_quadrature(lane,input,targets,0,scratch,output)
+    }
+    pub(crate) fn record_field_material_packet_quadrature(&self,lane:&Lane<'_,'chart>,input:&ResidentSection<'chart>,
+        targets:usize,quadrature:u32,scratch:&ResidentSection<'chart>,output:&ResidentSection<'chart>)->Result<(),ResidentRefusal>{
+        if quadrature>1||targets==0||targets>u32::MAX as usize/4||input.rows!=1||input.width<4*targets+2
             ||output.rows!=1||output.width!=targets+2||scratch.rows!=1||scratch.width!=2*targets
             ||input.grain.0!=0||output.grain.0!=0||scratch.grain.0!=0{
             return Err(ResidentRefusal::Declaration{operation:"material-packet-receiver",what:"incompatible joint target chart".into()});
         }
-        let mut p=Params::new();p.ptr(input.lo.device_ptr()).u32(targets as u32).ptr(scratch.lo.device_ptr()).ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
+        let mut p=Params::new();p.ptr(input.lo.device_ptr()).u32(targets as u32).u32(quadrature).ptr(scratch.lo.device_ptr()).ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
             .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
         self.record_blocks(lane,"section_field_material_packet_receiver",1,self.declaration.warp_size.max(1),0,&mut p,"material-packet-receiver")
     }

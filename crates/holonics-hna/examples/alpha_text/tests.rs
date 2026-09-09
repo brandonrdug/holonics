@@ -54,7 +54,7 @@ fn leading_nontext_material_preserves_the_available_native_parent() {
                 2,
                 &mut records,
                 &mut AnchorMap::new(),
-                false, NativeContactRealization::EnclosedFlow,
+                false, NativeContactRealization::EnclosedFlow,NativeMaterialPullbackMetric::RelativeEntropy,
             )?;
             assert_eq!(records[1]["parts"][0]["ordinal"], 1);
             assert_eq!(records[1]["parts"][0]["parent_source_occurrence"], 1);
@@ -69,13 +69,13 @@ fn leading_nontext_material_preserves_the_available_native_parent() {
     with_text_field_source(72,NativeMaterialTransportSource::CompleteCurrent,|field|{
         let mut session=TextFieldSession::on(field)?;let mut reader=ExposureReader::open(&path).map_err(exposure_error)?;
         let mut records=Vec::new();let mut anchors=AnchorMap::new();
-        cultivate(&mut reader,&mut session,1,&mut records,&mut anchors,false,NativeContactRealization::EnclosedFlow)?;
+        cultivate(&mut reader,&mut session,1,&mut records,&mut anchors,false,NativeContactRealization::EnclosedFlow,NativeMaterialPullbackMetric::RelativeEntropy)?;
         session.begin_part(None)?;session.stage(TextSymbol::Octet(b'B'))?;
         let frame=reader.peek().map_err(exposure_error)?.unwrap();
         records.push(json!({"sequence":frame.sequence,"family":frame.family,"native_from":2,"native_until":2,"complete":false,
             "parts":[{"ordinal":1,"pointer":"/text","kind":"human-text","source_octets":1,"native_from":2,"native_until":2,
                 "parent_source_occurrence":null,"failure":{"symbol_index":0,"symbol":TextSymbol::Octet(b'B'),"error":"legacy pending inscription"}}]}));
-        cultivate(&mut reader,&mut session,1,&mut records,&mut anchors,false,NativeContactRealization::EnclosedFlow)?;
+        cultivate(&mut reader,&mut session,1,&mut records,&mut anchors,false,NativeContactRealization::EnclosedFlow,NativeMaterialPullbackMetric::RelativeEntropy)?;
         assert_eq!(session.field().lineage(2).unwrap().received_from,None);
         assert!(records[1]["parts"][0]["parent_source_occurrence"].is_null());Ok(())
     }).unwrap();
@@ -84,7 +84,7 @@ fn leading_nontext_material_preserves_the_available_native_parent() {
     with_text_field_source(72,NativeMaterialTransportSource::OperativeContextual,|field|{
         let mut session=TextFieldSession::on(field)?;let mut reader=ExposureReader::open(&path).map_err(exposure_error)?;
         let mut records=Vec::new();let mut anchors=AnchorMap::new();
-        cultivate(&mut reader,&mut session,1,&mut records,&mut anchors,true,NativeContactRealization::EnclosedFlow)?;
+        cultivate(&mut reader,&mut session,1,&mut records,&mut anchors,true,NativeContactRealization::EnclosedFlow,NativeMaterialPullbackMetric::RelativeEntropy)?;
         let frame=reader.peek().map_err(exposure_error)?.unwrap();
         let parent=frame.shared_prior_parent().unwrap().unwrap();
         session.begin_part(Some(&anchors.get(&parent).unwrap().0))?;
@@ -93,7 +93,7 @@ fn leading_nontext_material_preserves_the_available_native_parent() {
             "parts":[{"ordinal":1,"pointer":"/text","kind":"human-text","source_octets":1,"native_from":2,"native_until":3,
                 "parent_source_occurrence":1,"failure":{"phase":"contact-response","symbol_index":0,
                     "symbol":TextSymbol::Octet(b'B'),"error":"interrupted before response"}}]}));
-        cultivate(&mut reader,&mut session,1,&mut records,&mut anchors,true,NativeContactRealization::EnclosedFlow)?;
+        cultivate(&mut reader,&mut session,1,&mut records,&mut anchors,true,NativeContactRealization::EnclosedFlow,NativeMaterialPullbackMetric::RelativeEntropy)?;
         assert_eq!(session.field().occurrence_count(),4);
         assert_eq!(session.field().lineage(2).unwrap().received_from,Some(1));
         assert_eq!(session.stage_operative_contacts()?.inspect()?.staged_returns,3);
@@ -118,7 +118,7 @@ fn partial_actual_part_keeps_its_parent_and_enacts_the_staged_symbol_once() {
                 2,
                 &mut expected_records,
                 &mut AnchorMap::new(),
-                false, NativeContactRealization::EnclosedFlow,
+                false, NativeContactRealization::EnclosedFlow,NativeMaterialPullbackMetric::RelativeEntropy,
             )?;
             Ok(session.field().rest(&[], &[])?)
         },
@@ -132,7 +132,7 @@ fn partial_actual_part_keeps_its_parent_and_enacts_the_staged_symbol_once() {
     with_text_field_source(72, NativeMaterialTransportSource::CompleteCurrent, |field| {
         let mut session = TextFieldSession::on(field)?;
         let mut anchors = AnchorMap::new();
-        cultivate(&mut reader, &mut session, 1, &mut records, &mut anchors, false, NativeContactRealization::EnclosedFlow)?;
+        cultivate(&mut reader, &mut session, 1, &mut records, &mut anchors, false, NativeContactRealization::EnclosedFlow,NativeMaterialPullbackMetric::RelativeEntropy)?;
         let frame = reader.peek().map_err(exposure_error)?.unwrap().clone();
         let parts = frame.development_parts().map_err(exposure_error)?;
         let part = &parts[0];
@@ -178,7 +178,7 @@ fn partial_actual_part_keeps_its_parent_and_enacts_the_staged_symbol_once() {
                     .zip(restored)
                     .map(|((family, at), source)| (family, (source, at)))
                     .collect();
-                cultivate(&mut reader, session, 1, &mut records, &mut anchors, false, NativeContactRealization::EnclosedFlow)?;
+                cultivate(&mut reader, session, 1, &mut records, &mut anchors, false, NativeContactRealization::EnclosedFlow,NativeMaterialPullbackMetric::RelativeEntropy)?;
                 assert_eq!(records, expected_records);
                 assert_eq!(session.field().rest(&[], &[])?, expected);
                 assert_eq!(
@@ -191,4 +191,38 @@ fn partial_actual_part_keeps_its_parent_and_enacts_the_staged_symbol_once() {
             },
         )
         .unwrap();
+}
+
+#[test]
+#[ignore="requires CUDA; actual exposure direction reaches native currents without changing parent incidence"]
+fn duplex_exposure_preserves_direction_and_parent_incidence(){
+    let dir=tempfile::tempdir().unwrap();let path=dir.path().join("duplex-source.jsonl");
+    let manifest=json!({"schema":"holonics.conversation-exposure.v1","kind":"manifest",
+        "temporal_cut":"2026-09-04T00:00:00Z","temporal_cut_normalized":"2026-09-04T00:00:00.000000+00:00",
+        "private_sources":[{"source":1,"provider":"codex","private_path":"fixture/source.jsonl","captured_octets":1000,"records":2}],
+        "visible_parts":{"human":["human-text"],"agent":["agent-text"]},"boundary":{}});
+    let frame=|sequence:u64,role:&str,kind:&str|json!({
+        "schema":"holonics.conversation-exposure.v1","kind":"occurrence-family","sequence":sequence,
+        "position":{"first_source":1,"first_record":sequence+1,"first_event":sequence+1},"conflicts":[],
+        "family":{"provider":"codex","record_group":format!("declared:p{sequence}")},"partition":"development","partition_reasons":[],
+        "views":[{"event":sequence+1,"source":1,"provider":"codex","record":{"number":sequence+1,"byte_start":sequence*100,"byte_end":(sequence+1)*100},
+        "timestamp":format!("2026-09-03T00:00:0{sequence}.000000+00:00"),"normalized_timestamp":format!("2026-09-03T00:00:0{sequence}.000000+00:00"),
+        "native_id":format!("p{sequence}"),"parent_id":null,"session_id":"fixture","branch_id":null,"workspace":null,"phase":null,"turn_id":null,"model":null,
+        "author_class":role,"record_kind":"message","flags":[],"provider_metadata":{},"previous_record":null,
+        "visible_parts":[{"ordinal":0,"pointer":"/text","kind":kind,"text":"A"}],"nonvisible_part_references":[],"links":[]}]});
+    let first=frame(0,"human","human-text");let mut second=frame(1,"agent-visible","agent-text");
+    second["views"][0]["links"]=json!([{"kind":"provider-parent","target_event":1,"reference":null,"evidence":"fixture parent",
+        "target":{"event":1,"source":1,"provider":"codex","record_group":"declared:p0","timestamp":"2026-09-03T00:00:00.000000+00:00",
+        "normalized_timestamp":"2026-09-03T00:00:00.000000+00:00"},"availability":"prior"}]);
+    let mut bytes=vec![];for row in [manifest,first,second]{bytes.extend(serde_json::to_vec(&row).unwrap());bytes.push(b'\n');}std::fs::write(&path,bytes).unwrap();
+    with_text_field_chart(72,NativeMaterialTransportSource::OperativeBoundary,NativeMaterialTarget::TensorProduct{factor_width:2},|field|{
+        let mut session=TextFieldSession::on(field)?;session.enable_duplex()?;
+        let mut reader=ExposureReader::open(&path).map_err(exposure_error)?;let mut records=vec![];
+        cultivate(&mut reader,&mut session,2,&mut records,&mut AnchorMap::new(),false,NativeContactRealization::DyadicDeposit,NativeMaterialPullbackMetric::SquaredCurrent)?;
+        assert_eq!(session.field().occurrence_count(),4);
+        assert_eq!(session.field().inspect_incoming(0)?,TextSymbol::Octet(b'A').inputs_on(TextDirection::Incoming));
+        assert_eq!(session.field().inspect_incoming(2)?,TextSymbol::Octet(b'A').inputs_on(TextDirection::Outgoing));
+        assert_eq!(session.field().lineage(2).unwrap().received_from,Some(1));
+        assert_eq!(records[1]["parts"][0]["kind"],"agent-text");Ok(())
+    }).unwrap();
 }

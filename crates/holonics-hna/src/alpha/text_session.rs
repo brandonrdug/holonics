@@ -4,7 +4,7 @@
 use super::{
     material::AlphaMaterialError,
     text_codec::{
-        present_constitutive_text_return, read_text_symbol, TextCodeDisposition, TextCodeReading,
+        present_constitutive_text_return, read_text_symbol_on, TextDirection, TextCodeDisposition, TextCodeReading,
         TextSymbol, TEXT_INPUT_CHANNELS,
     },
 };
@@ -53,6 +53,8 @@ pub(super) struct TextFieldSource {
 
 pub struct TextFieldSession<'field, 'chart> {
     pub(super) field: &'field mut NativeConstitutiveField<'chart>,
+    pub(super) duplex:bool,
+    pub(super) pending_direction:TextDirection,
     pub(super) latest: Option<TextFieldSource>,
     pub(super) next_anchor: Option<NativeFieldSourceAnchor>,
     pub(super) pending: Option<(TextSymbol, NativeFieldOccurrence)>,
@@ -71,12 +73,23 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
         }
         Ok(Self {
             field,
+            duplex:false,
+            pending_direction:TextDirection::Incoming,
             latest: None,
             next_anchor: None,
             pending: None,
             pending_native: None,
         })
     }
+    pub fn duplex(&self)->bool{self.duplex}
+    /// Declare the two-port codec before cultivation. Old models keep their recorded chart.
+    pub fn enable_duplex(&mut self)->Result<(),AlphaMaterialError>{
+        if self.field.occurrence_count()!=0 || self.pending.is_some() || self.field.material_target()!=Some(holonic_engine::native_ecology::constitutive_fibre::NativeMaterialTarget::TensorProduct{factor_width:2}){
+            return Err(AlphaMaterialError::Apparatus("duplex text must be founded on an empty binary packet field".into()));
+        }
+        self.duplex=true;Ok(())
+    }
+    pub fn pending_direction(&self)->Option<TextDirection>{self.pending.as_ref().map(|_|self.pending_direction)}
     pub fn field(&self) -> &NativeConstitutiveField<'chart> {
         self.field
     }
@@ -172,7 +185,7 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
         returned: ResidentConstitutiveReturn<'chart>,
         symbol: TextSymbol,
     ) -> Result<(), AlphaMaterialError> {
-        if self.pending.is_some() || returned.target_width() != 2 * TEXT_INPUT_CHANNELS {
+        if self.duplex || self.pending.is_some() || returned.target_width() != 2 * TEXT_INPUT_CHANNELS {
             return Err(AlphaMaterialError::Apparatus("incompatible pending native return".into()));
         }
         let occurrence = if let Some(anchor) = self.next_anchor.take() {
@@ -184,6 +197,7 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
         };
         self.pending = Some((symbol, occurrence));
         self.pending_native = Some(returned);
+        self.pending_direction=TextDirection::Incoming;
         Ok(())
     }
     pub fn receive_native_return(
@@ -250,25 +264,31 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
         Ok(self.field.retain_source(&latest.source)?)
     }
     pub fn receive(&mut self, symbol: TextSymbol) -> Result<(), AlphaMaterialError> {
-        self.stage(symbol)?;
-        self.retry_pending()
+        self.receive_on(symbol,TextDirection::Incoming)
+    }
+    pub fn receive_on(&mut self,symbol:TextSymbol,direction:TextDirection)->Result<(),AlphaMaterialError>{
+        self.stage_on(symbol,direction)?;self.retry_pending()
     }
     /// Retain one decoded exterior symbol and its actual source before native enactment.
     /// This boundary can be checkpointed; another input cannot overwrite it.
     pub fn stage(&mut self, symbol: TextSymbol) -> Result<(), AlphaMaterialError> {
+        self.stage_on(symbol,TextDirection::Incoming)
+    }
+    pub fn stage_on(&mut self,symbol:TextSymbol,direction:TextDirection)->Result<(),AlphaMaterialError>{
         if self.pending.is_some() {
             return Err(AlphaMaterialError::Apparatus(
                 "native reception is pending".into(),
             ));
         }
         let occurrence = if let Some(anchor) = self.next_anchor.take() {
-            NativeFieldOccurrence::through_anchor(&anchor, symbol.inputs())
+            NativeFieldOccurrence::through_anchor(&anchor, symbol.inputs_on(if self.duplex{direction}else{TextDirection::Incoming}))
         } else if let Some(previous) = self.latest.take() {
-            NativeFieldOccurrence::through(previous.source, symbol.inputs())
+            NativeFieldOccurrence::through(previous.source, symbol.inputs_on(if self.duplex{direction}else{TextDirection::Incoming}))
         } else {
-            NativeFieldOccurrence::entering(symbol.inputs())
+            NativeFieldOccurrence::entering(symbol.inputs_on(if self.duplex{direction}else{TextDirection::Incoming}))
         };
         self.pending = Some((symbol, occurrence));
+        self.pending_direction=direction;
         Ok(())
     }
     /// A known arithmetic refusal keeps this exact occurrence; unknown completion is refused
@@ -290,6 +310,7 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
         });
         self.pending = None;
         self.pending_native = None;
+        self.pending_direction=TextDirection::Incoming;
         Ok(())
     }
     pub fn generate(&mut self, work_limit: usize) -> TextGeneration {
@@ -309,6 +330,9 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
             disposition: TextGenerationDisposition::Interrupted,
             pending_return: self.pending_symbol(),
         };
+        if self.duplex && matches!(receiver,TextCurrentReceiver::Constitutive){
+            result.disposition=TextGenerationDisposition::NativeRefusal("duplex text uses its joint material receiver".into());return result;
+        }
         for _ in 0..work_limit {
             let Some(latest) = &self.latest else {
                 result.disposition = TextGenerationDisposition::NativeRefusal(
@@ -318,7 +342,7 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
             };
             let mut native_return = None;
             let received = match receiver {
-                TextCurrentReceiver::Material => read_text_symbol(self.field, latest.occurrence),
+                TextCurrentReceiver::Material => read_text_symbol_on(self.field,latest.occurrence,if self.duplex{TextDirection::Outgoing}else{TextDirection::Incoming}),
                 TextCurrentReceiver::Constitutive => self
                     .field
                     .retain_source(&latest.source)
@@ -366,7 +390,7 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
                 self.stage_presented_native_return(returned, symbol)
                     .and_then(|_| self.retry_pending())
             } else {
-                self.receive(symbol)
+                self.receive_on(symbol,TextDirection::Outgoing)
             };
             if let Err(error) = received {
                 result.disposition = TextGenerationDisposition::NativeRefusal(error.to_string());

@@ -32,6 +32,10 @@ fn error(value: impl std::fmt::Display) -> AlphaMaterialError {
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 struct SessionWire {
+    #[serde(default,skip_serializing_if="std::ops::Not::not")]
+    duplex:bool,
+    #[serde(default,skip_serializing_if="super::text_codec::TextDirection::is_incoming")]
+    pending_direction:super::text_codec::TextDirection,
     schema: String,
     pending: Option<TextSymbol>,
     external_anchors: usize,
@@ -46,6 +50,7 @@ pub struct SavedTextField {
     application: Vec<u8>,
 }
 impl SavedTextField {
+    pub fn duplex(&self)->bool{self.session.duplex}
     pub fn material_target(&self)->Option<holonic_engine::native_ecology::constitutive_fibre::NativeMaterialTarget>{
         self.field.material_target()
     }
@@ -78,6 +83,10 @@ impl SavedTextField {
         if matches!(self.field.material_target(),Some(holonic_engine::native_ecology::constitutive_fibre::NativeMaterialTarget::TensorProduct{factor_width}) if factor_width!=2){
             return Err(error("text checkpoint has an incompatible packet target"));
         }
+        if self.session.duplex && (self.field.material_target()!=Some(holonic_engine::native_ecology::constitutive_fibre::NativeMaterialTarget::TensorProduct{factor_width:2}) || self.session.pending_native.is_some()){
+            return Err(error("duplex checkpoint requires its joint packet chart"));
+        }
+        if self.session.pending.is_none() && !self.session.pending_direction.is_incoming(){return Err(error("direction without a pending occurrence"));}
         self.stream.validate().map_err(error)?;
         let sources = self.field.source_slots();
         let anchors = self.field.anchor_slots();
@@ -218,6 +227,8 @@ impl SavedTextField {
             None => NativeConstitutiveField::remount(&surface, self.field)?,
         };
         let mut session = TextFieldSession::on(&mut field)?;
+        session.duplex=self.session.duplex;
+        session.pending_direction=self.session.pending_direction;
         session.latest = latest.map(|occurrence| TextFieldSource {
             occurrence,
             source: sources[0].take().expect("validated latest source"),
@@ -227,7 +238,7 @@ impl SavedTextField {
             let inputs = if self.session.pending_native.is_some() {
                 vec![]
             } else {
-                symbol.inputs()
+                symbol.inputs_on(if self.session.duplex{self.session.pending_direction}else{super::text_codec::TextDirection::Incoming})
             };
             let occurrence = if let Some(source) = sources[1].take() {
                 NativeFieldOccurrence::through(source, inputs)
@@ -286,6 +297,8 @@ impl TextFieldSession<'_, '_> {
         kept.extend(anchors.iter().map(|a| Some(*a)));
         let field = self.field.rest(&sources, &kept)?;
         let session = SessionWire {
+            duplex:self.duplex,
+            pending_direction:self.pending_direction,
             schema: "holonics.native-text-session.v1".into(),
             pending: self.pending_symbol(),
             external_anchors: anchors.len(),

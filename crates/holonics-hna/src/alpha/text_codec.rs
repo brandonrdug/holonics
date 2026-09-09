@@ -3,14 +3,36 @@
 use super::material::{AlphaMaterialError, with_matched_field_profile};
 use holonic_engine::native_ecology::constitutive_fibre::{
     NativeConstitutiveField, NativeFieldDifferentialReading, NativeFieldJunctionSolver,
-    NativeFieldSourceAnchor, NativeMaterialTransportSource, NativePhaseCurrent,
+    NativeFieldSourceAnchor, NativeMaterialPacketReading, NativeMaterialTarget,
+    NativeMaterialTransportSource, NativePacketQuadrature, NativePhaseCurrent,
     ResidentConstitutiveReturn,
-    NativeMaterialTarget, NativeMaterialPacketReading,
 };
 use serde::Serialize;
 
 pub const TEXT_BIT_PAIRS: usize = 9;
 pub const TEXT_INPUT_CHANNELS: usize = 2 * TEXT_BIT_PAIRS;
+
+/// Application boundary direction. The duplex realization uses independent I/Q ports;
+/// this is not a semantic identity for a speaker or an additional learning rule.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, serde::Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum TextDirection {
+    #[default]
+    Incoming,
+    Outgoing,
+}
+impl TextDirection {
+    pub fn is_incoming(&self) -> bool {
+        *self == Self::Incoming
+    }
+    pub fn quadrature(self) -> NativePacketQuadrature {
+        if self == Self::Incoming {
+            NativePacketQuadrature::Real
+        } else {
+            NativePacketQuadrature::Imaginary
+        }
+    }
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(tag = "kind", content = "value", rename_all = "kebab-case")]
@@ -36,23 +58,37 @@ impl TextSymbol {
     /// Exactly nine identical unit impulses: one in each addressed pair. The ninth bit carries
     /// a real application part boundary; it is not a native thought-completion measurement.
     pub fn inputs(self) -> Vec<NativePhaseCurrent> {
+        self.inputs_on(TextDirection::Incoming)
+    }
+    pub fn inputs_on(self, direction: TextDirection) -> Vec<NativePhaseCurrent> {
+        let unit = if direction == TextDirection::Incoming {
+            NativePhaseCurrent::unit()
+        } else {
+            NativePhaseCurrent::new(0, 1, 1).expect("unit quadrature")
+        };
         let mut inputs = vec![NativePhaseCurrent::zero(); TEXT_INPUT_CHANNELS];
         for bit in 0..TEXT_BIT_PAIRS {
-            inputs[2 * bit + usize::from((self.codeword() >> bit) & 1)] =
-                NativePhaseCurrent::unit();
+            inputs[2 * bit + usize::from((self.codeword() >> bit) & 1)] = unit.clone();
         }
         inputs
     }
     pub fn from_inputs(inputs: &[NativePhaseCurrent]) -> Option<Self> {
+        Self::from_inputs_on(inputs, TextDirection::Incoming)
+    }
+    pub fn from_inputs_on(inputs: &[NativePhaseCurrent], direction: TextDirection) -> Option<Self> {
+        let unit = if direction == TextDirection::Incoming {
+            NativePhaseCurrent::unit()
+        } else {
+            NativePhaseCurrent::new(0, 1, 1).ok()?
+        };
         if inputs.len() != TEXT_INPUT_CHANNELS {
             return None;
         }
         let mut codeword = 0u16;
         for (bit, pair) in inputs.chunks_exact(2).enumerate() {
-            if pair[0] == NativePhaseCurrent::zero() && pair[1] == NativePhaseCurrent::unit() {
+            if pair[0] == NativePhaseCurrent::zero() && pair[1] == unit {
                 codeword |= 1 << bit;
-            } else if pair[0] != NativePhaseCurrent::unit() || pair[1] != NativePhaseCurrent::zero()
-            {
+            } else if pair[0] != unit || pair[1] != NativePhaseCurrent::zero() {
                 return None;
             }
         }
@@ -80,8 +116,13 @@ pub enum TextNativeReading {
     Packet(NativeMaterialPacketReading),
 }
 impl TextNativeReading {
-    pub fn constitutive_status(&self)->Option<holonic_engine::native_ecology::constitutive_fibre::NativeFieldReceiverStatus>{
-        match self {Self::Differential(r)=>r.constitutive_status,Self::Packet(_)=>None}
+    pub fn constitutive_status(
+        &self,
+    ) -> Option<holonic_engine::native_ecology::constitutive_fibre::NativeFieldReceiverStatus> {
+        match self {
+            Self::Differential(r) => r.constitutive_status,
+            Self::Packet(_) => None,
+        }
     }
 }
 
@@ -95,23 +136,48 @@ pub fn read_text_symbol(
     field: &NativeConstitutiveField<'_>,
     occurrence: usize,
 ) -> Result<TextCodeReading, AlphaMaterialError> {
+    read_text_symbol_on(field, occurrence, TextDirection::Incoming)
+}
+pub fn read_text_symbol_on(
+    field: &NativeConstitutiveField<'_>,
+    occurrence: usize,
+    direction: TextDirection,
+) -> Result<TextCodeReading, AlphaMaterialError> {
     if field.nodes() != TEXT_INPUT_CHANNELS {
         return Err(AlphaMaterialError::Apparatus(
             "text codec requires its declared 18-channel chart".into(),
         ));
     }
-    if matches!(field.material_target(),Some(NativeMaterialTarget::TensorProduct{factor_width}) if factor_width!=2){
-        return Err(AlphaMaterialError::Apparatus("text receiver requires the declared binary packet chart".into()));
+    if matches!(field.material_target(),Some(NativeMaterialTarget::TensorProduct{factor_width}) if factor_width!=2)
+    {
+        return Err(AlphaMaterialError::Apparatus(
+            "text receiver requires the declared binary packet chart".into(),
+        ));
     }
-    if field.material_target()==Some(NativeMaterialTarget::TensorProduct{factor_width:2}) {
-        let reading=field.read_material_packet(occurrence)?.ok_or_else(||AlphaMaterialError::Apparatus("missing material packet".into()))?;
-        let disposition=match reading.selected {
-            Some(code)=>match TextSymbol::from_codeword(u16::try_from(code).map_err(|_|AlphaMaterialError::Apparatus("packet coordinate outside text chart".into()))?) {
-                Some(symbol)=>TextCodeDisposition::Symbol{symbol},None=>TextCodeDisposition::Reserved{codeword:code as u16},
+    if field.material_target() == Some(NativeMaterialTarget::TensorProduct { factor_width: 2 }) {
+        let reading = field
+            .read_material_packet_quadrature(occurrence, direction.quadrature())?
+            .ok_or_else(|| AlphaMaterialError::Apparatus("missing material packet".into()))?;
+        let disposition = match reading.selected {
+            Some(code) => match TextSymbol::from_codeword(u16::try_from(code).map_err(|_| {
+                AlphaMaterialError::Apparatus("packet coordinate outside text chart".into())
+            })?) {
+                Some(symbol) => TextCodeDisposition::Symbol { symbol },
+                None => TextCodeDisposition::Reserved {
+                    codeword: code as u16,
+                },
             },
-            None=>TextCodeDisposition::Open,
+            None => TextCodeDisposition::Open,
         };
-        return Ok(TextCodeReading{native:TextNativeReading::Packet(reading),disposition});
+        return Ok(TextCodeReading {
+            native: TextNativeReading::Packet(reading),
+            disposition,
+        });
+    }
+    if direction != TextDirection::Incoming {
+        return Err(AlphaMaterialError::Apparatus(
+            "duplex text requires the joint packet receiver".into(),
+        ));
     }
     let native = (if field.has_material_transport() {
         field.read_material_transport_pairs(occurrence, TEXT_BIT_PAIRS)?
@@ -182,13 +248,22 @@ pub fn with_text_field_source<R>(
     source: NativeMaterialTransportSource,
     operation: impl FnOnce(&mut NativeConstitutiveField<'_>) -> Result<R, AlphaMaterialError>,
 ) -> Result<R, AlphaMaterialError> {
-    with_text_field_chart(fractional_bits,source,NativeMaterialTarget::DirectCurrent,operation)
+    with_text_field_chart(
+        fractional_bits,
+        source,
+        NativeMaterialTarget::DirectCurrent,
+        operation,
+    )
 }
-pub fn with_text_field_chart<R>(fractional_bits:u32,source:NativeMaterialTransportSource,target:NativeMaterialTarget,
-    operation:impl FnOnce(&mut NativeConstitutiveField<'_>)->Result<R,AlphaMaterialError>)->Result<R,AlphaMaterialError>{
+pub fn with_text_field_chart<R>(
+    fractional_bits: u32,
+    source: NativeMaterialTransportSource,
+    target: NativeMaterialTarget,
+    operation: impl FnOnce(&mut NativeConstitutiveField<'_>) -> Result<R, AlphaMaterialError>,
+) -> Result<R, AlphaMaterialError> {
     with_matched_field_profile(TEXT_INPUT_CHANNELS, true, Some(fractional_bits), |field| {
         field.set_junction_solver(NativeFieldJunctionSolver::BalancedPairs)?;
-        field.enable_material_transport_chart(source,target)?;
+        field.enable_material_transport_chart(source, target)?;
         operation(field)
     })
 }
@@ -245,5 +320,27 @@ mod tests {
             assert_eq!(field.occurrence_count(),before);
             Ok(())
         }).unwrap();
+    }
+}
+
+#[test]
+fn duplex_codec_preserves_the_word_and_distinguishes_the_two_ports() {
+    for code in 0..=256 {
+        let symbol = TextSymbol::from_codeword(code).unwrap();
+        for direction in [TextDirection::Incoming, TextDirection::Outgoing] {
+            let input = symbol.inputs_on(direction);
+            assert_eq!(TextSymbol::from_inputs_on(&input, direction), Some(symbol));
+            let other = if direction == TextDirection::Incoming {
+                TextDirection::Outgoing
+            } else {
+                TextDirection::Incoming
+            };
+            assert_eq!(TextSymbol::from_inputs_on(&input, other), None);
+            let energy = input
+                .iter()
+                .map(|v| v.current().norm_square())
+                .sum::<num_rational::BigRational>();
+            assert_eq!(energy, num_rational::BigRational::from_integer(9.into()));
+        }
     }
 }

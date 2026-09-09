@@ -389,7 +389,7 @@ relation. Basin/stability probes answer a specific failure, never govern learnin
 authored entropy threshold. Use existing tube/span owners at their domains; no new tube engine
 or large fractal sampling campaign is scheduled.
 
-[definition] **Current entry point: AC1–AC2 conversational boundary direction, with path/reuse and generator compression still required.**
+[definition] **Current entry point: AC1 finite material-operator composition and reuse; AC2 useful continuation remains open after the duplex return.**
 The [normalized receiver](../../research/records/2026-09-08_AC1_THE_NORMALIZED_RECEIVER_RETURNS_ITS_COMPLETE_CURRENT_AND_TWO_METRIC_FACES.md)
 has returned resident source-qualified faces and metric covectors with actual-model evidence.
 Its full r is also the relative-entropy potential return; `J_p*r` belongs to squared probability
@@ -434,11 +434,15 @@ still consumes dense resident history, and the language loop remains.
 retains the full interior while observing its transported boundary. The native/tensor/persistence
 checks pass. The actual answer ends as `The itive.` and remains unusable.
 
-[definition] Next preserve the actual conversational direction at native ingress and reply
-receivers. The existing codec erases that operational distinction while retaining it in cold
-metadata. Bind declared boundary ports, preserve source lineage and pending state, and keep
-self-emission in the same recurrence. No authored intent rule or new world-verdict law supplies
-the correction. The existing path/generator obligations continue alongside this AC1–AC2 repair.
+[established-bounded; measured] The [duplex codec](../../research/records/2026-09-09_AC1_AC2_CONVERSATIONAL_DIRECTION_REACHES_NATIVE_PORTS.md)
+now preserves that direction in native I/Q currents, reply receivers and pending-state rest.
+The native and application checks pass, but both the fixed prompt and seen-request response
+remain unusable.
+
+[definition] Next extend the existing finite current-to-material owner to the operative source
+and independent joint target, with its actual producing operator/current adjoint. Compare the
+resulting model family and measured costs before broadening cultivation. This does not identify
+it with the old projector-kernel learner or waive the continuing path/generator obligations.
 
 [definition] Proceed through AC1 steps 3–4: local path formation, restriction/rebase and
 generator reuse. Derive the actively used coordinates and their continuing source/decoder,

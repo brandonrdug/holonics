@@ -1,0 +1,144 @@
+{
+  "schema": "holonics.duplex-conversation.v1",
+  "source": "operative-boundary",
+  "target": {
+    "factor_width": 2,
+    "kind": "tensor-product"
+  },
+  "metric": "SquaredCurrent",
+  "duplex": true,
+  "families": 8,
+  "exposure_octets_by_direction": {
+    "incoming": 74,
+    "demonstrated_outgoing": 1848
+  },
+  "development_occurrences": 1930,
+  "contact_deposits": 1929,
+  "development_seconds": 611.67954007,
+  "prompt_and_emission_seconds": 22.524217458,
+  "checkpoint_octets": 390957790,
+  "development_census": {
+    "allocations": 208406,
+    "captured_launches": 36657,
+    "control_launches": 0,
+    "deed_launches": 11576,
+    "device_to_device_octets": 0,
+    "egress_receipt_octets": 1111296,
+    "egress_section_octets": 0,
+    "ingress_octets": 181504592,
+    "resident_octets_now": 1944865872,
+    "resident_octets_peak": 1959680948,
+    "section_read_outs": 0,
+    "synchronizations": 11576
+  },
+  "development_error": null,
+  "native_error": null,
+  "prompt": "Explain the difference between a function and its derivative.",
+  "output": "The renry.",
+  "disposition": {
+    "kind": "completed-part"
+  },
+  "reply_quadratures": [
+    "imaginary"
+  ],
+  "fresh_process_comparison": {
+    "body": true,
+    "emission_current_history": true,
+    "generation": true,
+    "utf8": true,
+    "duplex": true,
+    "material_source": true,
+    "contact_metric": true
+  },
+  "seen_request": {
+    "scope": "seen source string, not a tool-execution or held-out test",
+    "prompt": "Read @src/holobrochos/CURRENT_STATE.md and acquire the full context trace.",
+    "output": "The re re re re re re re re re re re re re re re re re re re re re re re re re re re re re re re re re re re re re re re re re r",
+    "disposition": {
+      "kind": "interrupted"
+    },
+    "native_error": null
+  },
+  "processes": {
+    "duplex-conversation": {
+      "command": [
+        "target/debug/examples/alpha_text",
+        ".local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl",
+        "--families",
+        "8",
+        "--fractional-bits",
+        "72",
+        "--material-source",
+        "operative-boundary",
+        "--material-target",
+        "joint-packet",
+        "--contact-response",
+        "true",
+        "--contact-realization",
+        "dyadic-deposit",
+        "--contact-metric",
+        "current",
+        "--duplex",
+        "true",
+        "--prompt",
+        ".local/artifacts/athena-alpha/ac2/first-request.txt",
+        "--emit-symbols",
+        "128",
+        "--checkpoint",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-duplex-v7.hna",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-duplex-v7.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 654.4787913979962,
+      "max_rss_kib": 2122616,
+      "cpu_seconds": 651.9333079999999
+    },
+    "duplex-resume": {
+      "command": [
+        "target/debug/examples/alpha_text",
+        "--resume",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-duplex-v7.hna",
+        "--families",
+        "0",
+        "--prompt",
+        ".local/artifacts/athena-alpha/ac2/first-request.txt",
+        "--emit-symbols",
+        "128",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-duplex-v7-resumed.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 50.997507322987076,
+      "max_rss_kib": 2118772,
+      "cpu_seconds": 50.762702000000004
+    },
+    "duplex-seen-request": {
+      "command": [
+        "target/debug/examples/alpha_text",
+        "--resume",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-duplex-v7.hna",
+        "--families",
+        "0",
+        "--prompt",
+        ".local/artifacts/athena-alpha/ac2/first-source-request.txt",
+        "--emit-symbols",
+        "128",
+        "--report",
+        ".local/artifacts/athena-alpha/ac1-contact-response/first-eight-duplex-v7-seen.json"
+      ],
+      "exit_code": 0,
+      "wall_seconds": 101.48802435200196,
+      "max_rss_kib": 2120764,
+      "cpu_seconds": 101.07597700000001
+    }
+  },
+  "checks": [
+    "106 native field tests passed in 125.59 s",
+    "23 alpha SDK tests passed in 4.96 s",
+    "2 exposure-driver controls passed in 1.53 s; private partial-exposure test compiled but was not executed",
+    "Nonzero-radius I/Q receiver covariance under a quarter turn passed",
+    "Pending outgoing current and generated current restart exactly"
+  ],
+  "language_quality_established": false
+}

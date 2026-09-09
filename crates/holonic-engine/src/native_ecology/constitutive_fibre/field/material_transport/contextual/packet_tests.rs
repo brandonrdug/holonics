@@ -349,3 +349,22 @@ fn packet_target_receiver_transports_the_joint_ball_without_box_relaxation() {
         );
     }
 }
+
+#[test]
+#[ignore="requires CUDA; I/Q receiver covariance with a nonzero joint-ball radius"]
+fn packet_quadrature_preserves_the_joint_ball_under_a_quarter_turn(){
+    let readout=ResidentReadout::new().unwrap();let surface=ResidentSurface::on(&readout).unwrap();
+    let read=|values:Vec<i128>,quadrature|{
+        let words=values.into_iter().flat_map(|x|[x as i64,(x>>64) as i64]).map(|v|(v,v)).collect::<Vec<_>>();
+        let input=surface.mount_section_rest(&ResidentSectionRest::found(1,words.len(),ResidentGrain(0),64,words).unwrap()).unwrap();
+        let output=surface.fresh_section(1,5,ResidentGrain(0)).unwrap();let scratch=surface.fresh_section(1,6,ResidentGrain(0)).unwrap();
+        let mut passage=surface.begin_passage(&[vec![]]).unwrap();
+        {let lane=passage.open(0,&[]).unwrap();surface.record_field_material_packet_quadrature(&lane,&input,3,quadrature,&scratch,&output).unwrap();}
+        passage.close(0,&output,64).unwrap();assert!(passage.finish().unwrap().launch().unwrap().obstruction.is_empty());
+        let values=surface.read_out(&output).unwrap();values[2..].iter().enumerate().filter_map(|(i,v)|(v.0==1).then_some(i)).collect::<Vec<_>>()
+    };
+    let original=vec![5,0,5,6,0,6,4];let rotated=vec![0,5,-6,5,-6,0,4];
+    assert_eq!(read(original.clone(),0),vec![0,1]);
+    assert_eq!(read(original,1),vec![1,2]);
+    assert_eq!(read(rotated,1),vec![0,1]);
+}

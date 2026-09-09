@@ -204,6 +204,13 @@ with explicit source readings and per-return frame persistence. `joint_material_
 retains native and actual-data checks; the endogenous joint producer remains open.
 
 
+[established-bounded; source-inspected] `field/receiver/packet.rs::NativePacketQuadrature`
+and `field_normalized_receiver.cuh` expose I/Q projections of the same joint current ball.
+`holonics-hna::alpha::text_codec::TextDirection`, `text_session` and `checkpoint` carry the
+explicit duplex application chart and pending direction. The exposure driver mounts its actual
+human/agent part kinds through those ports. The [duplex return](../research/records/2026-09-09_AC1_AC2_CONVERSATIONAL_DIRECTION_REACHES_NATIVE_PORTS.md)
+records the native/SDK/driver checks, actual failed responses and unchanged whole-goal scope.
+
 [established-bounded; source-inspected] `OperativeBoundary` is source kind 7 / contextual
 version 4 in the existing material owners. `field_contextual_material.cuh` retains the outgoing
 projection and its bound; `field_material_pullback.cuh` returns its exactly zero direct-interior

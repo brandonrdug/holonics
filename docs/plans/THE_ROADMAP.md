@@ -141,11 +141,17 @@ now routes the material query through actual outgoing transport while retaining 
 interior and contact response. All 105 field tests pass. The matched model ends its answer as
 `The itive.`; this is still unusable. Its complete continuation restarts exactly.
 
-[definition] Next repair the text codec's missing conversational direction: mount actual
-incoming versus demonstrated-emission ports and use matching receivers, preserving source
-lineage, pending input and ordinary self-emission. The current driver retains human/agent kind
-only in cold receipts. This correction is part of AC1–AC2's situated transport; it does not replace
-path/generator reuse with a label, classifier or separate world-verdict law.
+[established-bounded; measured] The [duplex return](../../research/records/2026-09-09_AC1_AC2_CONVERSATIONAL_DIRECTION_REACHES_NATIVE_PORTS.md)
+now mounts actual direction through I/Q currents and matching reply receivers, including pending
+state and ordinary self-emission. Native, SDK and driver checks pass. The actual responses remain
+unusable, including a seen-request continuation; the first eight families provide only one human
+request's small exposure.
+
+[definition] Next compose the existing finite current-to-material operator with the operative
+current and independent joint target, returning through its actual producing operator and
+current. Its bounded parameter representation addresses repeated historical-factor work. Compare
+this declared model family and its costs before broadening cultivation; it is not an asserted
+quotient of the existing projector kernel. Retain full interior, phase, source lineage and defects.
 
 [definition] Proceed with AC1 steps 3–4: local path formation, restriction/rebase and generator
 reuse. Derive the actively used coordinates and their continuing source/decoder through the
@@ -184,7 +190,7 @@ complete population bounds, not an arbitrary radius, discarded current or basin-
 
 [project-postulate] Brandon has resumed completion of AC0–AC5 as the active goal and explicitly
 directs flexible designs and transparent reporting when a composition does not work.
-**Current work: AC1–AC2 conversational boundary direction, with path/reuse and generator compression still required.** Each work update names phase/step, actual artifact and returned
+**Current work: AC1 finite material-operator composition and reuse; AC2 useful continuation remains open after the duplex return.** Each work update names phase/step, actual artifact and returned
 consequence. Do not resume the preserved joint kernel by default or restart completed foundations.
 
 | Phase | Ordered construction | Return required |

@@ -68,7 +68,7 @@ pub use material_transport::{
     NativeMomentMaterialReading, NativeContextualMaterialReading, NativeOperativeContextReading, NativeVisibleSourceReading,
 };
 pub use receiver::{NativeFieldDifferentialReading, NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn,
-    NativeMaterialPacketReading,
+    NativeMaterialPacketReading, NativePacketQuadrature,
     NativeMaterialPullbackMetric, NativeMaterialSourcePullback, NativeMaterialSourcePullbackReading};
 pub use resident_input::NativeFieldIncoming;
 pub use rest::NativeFieldRest;

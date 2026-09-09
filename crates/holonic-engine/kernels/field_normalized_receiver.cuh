@@ -14,31 +14,32 @@ __device__ void normalized_interval_product(wide a,wide b,wide c,wide d,uint32_t
     for(uint32_t i=1;i<4;++i){if(lows[i]<*lo)*lo=lows[i];if(highs[i]>*hi)*hi=highs[i];}
 }
 
-// Joint coordinate receiver of a material-current ball. Softmax preserves real-potential
+// Joint coordinate receiver of a material-current ball in a declared I/Q quadrature.
+// Softmax preserves projected-potential
 // ordering, so no exponential is needed to certify a unique maximum. All unexcluded
 // coordinates are retained. For each i, project the real centre onto the closed cone
 // x_i >= x_j for every j. Pool i with the descending coordinates above their pooled
 // mean. Its exact squared distance is sum(x_j^2) - sum(x_j)^2/k. The cone intersects
-// the joint Euclidean ball iff that distance is <= radius^2. Imaginary coordinates
-// stay unchanged at the minimizer; no independent coordinate-box relaxation is used.
+// the joint Euclidean ball iff that distance is <= radius^2. The other quadrature
+// stays unchanged at the minimizer; no independent coordinate-box relaxation is used.
 extern "C" __global__ void section_field_material_packet_receiver(
-    const int64_t *wire,uint32_t targets,int64_t *scratch,int64_t *lo,int64_t *hi,
+    const int64_t *wire,uint32_t targets,uint32_t quadrature,int64_t *scratch,int64_t *lo,int64_t *hi,
     uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
 ){
     if(blockIdx.x||threadIdx.x||upstream_refused(census,lineage,lineage_count,slot))return;
-    if(!targets){atomicOr(slot,REFUSED_MALFORMED);return;}
+    if(!targets || quadrature>1u){atomicOr(slot,REFUSED_MALFORMED);return;}
     const wide *v=(const wide *)wire;wide radius=v[2u*targets];
     if(radius<0){atomicOr(slot,REFUSED_MALFORMED);return;}
     wide *ordered=(wide *)scratch;
     for(uint32_t i=0;i<targets;++i){
-        wide value=v[2u*i];uint32_t j=i;
+        wide value=v[2u*i+quadrature];uint32_t j=i;
         while(j && ordered[j-1u]<value){ordered[j]=ordered[j-1u];--j;}
         ordered[j]=value;
     }
     MomentInteger r=moment_lift(history_integer(radius)),radius_square=r*r;
     int64_t count=0,selected=-1;
     for(uint32_t i=0;i<targets;++i){
-        HistoryInteger sum=history_integer(v[2u*i]);
+        HistoryInteger sum=history_integer(v[2u*i+quadrature]);
         MomentInteger c=moment_lift(sum),squares=c*c;uint32_t k=1;
         for(uint32_t j=0;j<targets;++j){
             HistoryInteger next=history_integer(ordered[j]);
