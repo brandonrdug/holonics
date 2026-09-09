@@ -3,18 +3,18 @@
 __device__ wide operative_moment_grid(const MomentInteger &a,uint32_t shift,wide *rounds,uint32_t *slot){
     HistoryInteger q;bool omitted=false;
     if(a.overflow){atomicOr(slot,REFUSED_CARRIER);return 0;}
-    for(uint32_t bit=0;bit<544u;++bit)if((a.limb[bit/32u]>>(bit%32u))&1u){
+    for(uint32_t bit=0;bit<MomentInteger::BITS;++bit)if((a.limb[bit/MomentInteger::LIMB_BITS]>>(bit%MomentInteger::LIMB_BITS))&1u){
         if(bit<shift)omitted=true;
-        else if(bit-shift>=256u)atomicOr(slot,REFUSED_CARRIER);
-        else q.limb[(bit-shift)/32u]|=(uint32_t)1u<<((bit-shift)%32u);
+        else if(bit-shift>=HistoryInteger::BITS)atomicOr(slot,REFUSED_CARRIER);
+        else q.limb[(bit-shift)/HistoryInteger::LIMB_BITS]|=(uint32_t)1u<<((bit-shift)%HistoryInteger::LIMB_BITS);
     }
     q.negative=a.negative && !q.is_zero();if(omitted)*rounds=add_checked(*rounds,1,slot);
     return history_narrow(q,slot);
 }
 __device__ void operative_write_moment(const MomentInteger &a,int64_t *lo,int64_t *hi,uint32_t *slot){
     if(a.overflow){atomicOr(slot,REFUSED_CARRIER);return;}
-    for(uint32_t i=0;i<17u;++i)lo[i]=hi[i]=(int64_t)a.limb[i];
-    lo[17]=hi[17]=a.negative && !a.is_zero()?1:0;
+    for(uint32_t i=0;i<MomentInteger::LIMBS;++i)lo[i]=hi[i]=(int64_t)a.limb[i];
+    lo[MomentInteger::LIMBS]=hi[MomentInteger::LIMBS]=a.negative && !a.is_zero()?1:0;
 }
 
 __device__ void field_operative_reflection_prepare(

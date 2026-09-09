@@ -66,7 +66,7 @@ pub use material_transport::{
     NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading,
     NativeMaterialModeReturn, NativeMaterialModeUnfolding, NativeMaterialTransportSource,
     NativeMaterialTarget,
-    NativeNormalMaterialReading, NativeNormalMaterialState, NativeMomentMaterialReading, NativeContextualMaterialReading, NativeOperativeContextReading, NativeVisibleSourceReading,
+    NativeNormalMaterialObjective, NativeNormalMaterialReading, NativeNormalMaterialState, NativeMomentMaterialReading, NativeContextualMaterialReading, NativeOperativeContextReading, NativeVisibleSourceReading,
 };
 pub use receiver::{NativeFieldDifferentialReading, NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn,
     NativeMaterialPacketReading, NativePacketQuadrature, NativeMaterialActuation,
@@ -878,7 +878,17 @@ impl<'chart> NativeConstitutiveField<'chart> {
             });
         }
         self.relation.occurrences = next;
-        self.pending_transport = None;
+        if let Some(pending) = self.pending_transport.take() {
+            let transport = self.transport.as_mut().expect("completed material transport");
+            if transport.source == NativeMaterialTransportSource::OperativeNormal {
+                // The successful kernel has already produced this complete finite normal fit.
+                // Transfer its immutable staging, rather than solving it again in the adjoint.
+                transport.recent_normal_producers.push_back((at, Rc::new(pending.delta)));
+                while transport.recent_normal_producers.len() > 2 {
+                    transport.recent_normal_producers.pop_front();
+                }
+            }
+        }
         self.relation.usable = true;
         Ok((
             NativeFieldContinuation {

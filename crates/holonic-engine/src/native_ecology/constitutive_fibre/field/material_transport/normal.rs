@@ -4,36 +4,31 @@ use super::*;
 use crate::native_ecology::constitutive_fibre::circulation::rest::point_section;
 use num_traits::{Signed, Zero};
 
-pub(crate) fn matrix_words(n: usize, t: usize) -> Option<usize> {
-    n.checked_mul(t)?.checked_mul(12)?.checked_add(6)
-}
+mod layout;
+use layout::{MomentWire, NormalLayout, ReportBall, STATISTIC_SCALARS};
+
 pub(crate) fn state_words(n: usize, t: usize) -> Option<usize> {
-    let m = n.checked_mul(3)?;
-    matrix_words(n, t)?
-        .checked_add(m.checked_mul(m.checked_add(t)?)?.checked_mul(36)?)?
-        .checked_add(72)
+    Some(NormalLayout::new(n, t)?.state_words)
 }
 pub(crate) fn report_words(n: usize, t: usize) -> Option<usize> {
-    t.checked_mul(24)?
-        .checked_add(n.checked_mul(12)?)?
-        .checked_add(96)
+    Some(NormalLayout::new(n, t)?.report_words)
 }
 pub(crate) fn workspace_words(n: usize, t: usize) -> Option<usize> {
-    let d = n.checked_mul(6)?;
-    d.checked_mul(d.checked_add(t)?.checked_add(1)?)?
-        .checked_mul(2)?
-        .checked_add(t.checked_mul(20)?)
+    Some(NormalLayout::new(n, t)?.workspace_words)
 }
 pub(super) fn initial_words(
     n: usize,
     t: usize,
     grain: u32,
 ) -> Result<Vec<(i64, i64)>, ConstitutiveFibreError> {
-    let mut out = vec![(0, 0); state_words(n, t).ok_or(ConstitutiveFibreError::Shape)?];
-    let h = matrix_words(n, t).ok_or(ConstitutiveFibreError::Shape)?;
-    for i in 0..3 * n {
-        let at = h + 36 * (i * 3 * n + i) + (2 * grain / 32) as usize;
-        let v = 1i64 << (2 * grain % 32);
+    let layout = NormalLayout::new(n, t).ok_or(ConstitutiveFibreError::Shape)?;
+    let mut out = vec![(0, 0); layout.state_words];
+    let square_scale_bit = 2 * grain as usize;
+    for i in 0..layout.sources {
+        let at = layout.matrix_words
+            + MomentWire::COMPLEX_WORDS * (i * layout.sources + i)
+            + square_scale_bit / MomentWire::LIMB_BITS;
+        let v = 1i64 << (square_scale_bit % MomentWire::LIMB_BITS);
         out[at] = (v, v);
     }
     Ok(out)
@@ -42,18 +37,20 @@ fn invalid(s: impl std::fmt::Display) -> ConstitutiveFibreError {
     ConstitutiveFibreError::Rest(format!("normal material: {s}"))
 }
 pub(super) fn integer(words: &[(i64, i64)]) -> Result<BigInt, ConstitutiveFibreError> {
-    if words.len() != 18
+    if words.len() != MomentWire::WORDS
         || words.iter().any(|(a, b)| a != b)
-        || ![0, 1].contains(&words[17].0)
-        || words[..17].iter().any(|v| v.0 < 0 || v.0 > u32::MAX as i64)
+        || ![0, 1].contains(&words[MomentWire::LIMBS].0)
+        || words[..MomentWire::LIMBS]
+            .iter()
+            .any(|v| v.0 < 0 || v.0 > u32::MAX as i64)
     {
         return Err(invalid("moment encoding"));
     }
     let mut n = BigInt::zero();
-    for (i, v) in words[..17].iter().enumerate() {
-        n += BigInt::from(v.0) << (32 * i);
+    for (i, v) in words[..MomentWire::LIMBS].iter().enumerate() {
+        n += BigInt::from(v.0) << (MomentWire::LIMB_BITS * i);
     }
-    if words[17].0 == 1 {
+    if words[MomentWire::LIMBS].0 == 1 {
         if n.is_zero() {
             return Err(invalid("negative zero moment"));
         }
@@ -66,12 +63,12 @@ fn ceil_norm(values: &[i128]) -> BigInt {
     let s = q.sqrt();
     if &s * &s < q { s + 1 } else { s }
 }
-pub(super) fn increments(raw: &[i128], n: usize, t: usize) -> [BigInt; 4] {
-    let stride = 2 * t + 1;
-    let x = &raw[6 * stride..6 * stride + 6 * n];
-    let y = &raw[2 * stride..2 * stride + 2 * t];
-    let ex = BigInt::from(raw[6 * stride + 6 * n]);
-    let ey = BigInt::from(raw[3 * stride - 1]);
+fn increments(raw: &[i128], layout: &NormalLayout) -> [BigInt; STATISTIC_SCALARS] {
+    let x = &raw[layout.source_at..layout.source_at + layout.source_components];
+    let observed = layout.ball_at(ReportBall::Observed);
+    let y = &raw[observed..observed + layout.target_components];
+    let ex = BigInt::from(raw[layout.source_at + layout.source_components]);
+    let ey = BigInt::from(raw[layout.ball_radius_at(ReportBall::Observed)]);
     let nx = ceil_norm(x);
     let ny = ceil_norm(y);
     [
@@ -92,28 +89,32 @@ pub(in super::super) fn validate_report(
         1,
         report_words(n, t).ok_or(ConstitutiveFibreError::Shape)?,
     )?;
-    let base = 24 * t + 12 * n + 24;
+    let layout = NormalLayout::new(n, t).ok_or(ConstitutiveFibreError::Shape)?;
+    let base = layout.report_moments_at;
     let v = wides(&s.intervals[..base])?;
-    let stride = 2 * t + 1;
-    let extra = 6 * stride + 6 * n + 1;
-    if (0..6).any(|i| v[i * stride + 2 * t] < 0)
-        || v[6 * stride + 6 * n] < 0
+    let extra = layout.metadata_at;
+    if ReportBall::ALL
+        .iter()
+        .any(|&ball| v[layout.ball_radius_at(ball)] < 0)
+        || v[layout.source_at + layout.source_components] < 0
         || v[extra..].iter().any(|v| *v < 0)
     {
         return Err(invalid("report bound"));
     }
     let expected = if linked {
-        increments(&v, n, t)
+        increments(&v, &layout)
     } else {
         std::array::from_fn(|_| BigInt::zero())
     };
     for (i, want) in expected.iter().enumerate() {
-        if integer(&s.intervals[base + 18 * i..base + 18 * (i + 1)])? != *want {
+        if integer(&s.intervals[base + MomentWire::WORDS * i..base + MomentWire::WORDS * (i + 1)])?
+            != *want
+        {
             return Err(invalid("observation increment"));
         }
     }
     if !linked
-        && v[6 * stride..6 * stride + 6 * n + 1]
+        && v[layout.source_at..layout.source_at + layout.source_components + 1]
             .iter()
             .any(|v| *v != 0)
     {
@@ -137,13 +138,14 @@ pub(in super::super) fn validate_state<'a>(
         1,
         state_words(n, t).ok_or(ConstitutiveFibreError::Shape)?,
     )?;
-    let m = 3 * n;
-    let h = matrix_words(n, t).ok_or(ConstitutiveFibreError::Shape)?;
-    let hh = 2 * m * m;
-    let bb = 2 * m * t;
+    let layout = NormalLayout::new(n, t).ok_or(ConstitutiveFibreError::Shape)?;
+    let m = layout.sources;
+    let h = layout.matrix_words;
+    let hh = layout.gram_values;
+    let bb = layout.cross_values;
     let scale = BigInt::one() << grain;
     let square = &scale * &scale;
-    let mut expected = vec![BigInt::zero(); hh + bb + 4];
+    let mut expected = vec![BigInt::zero(); hh + bb + STATISTIC_SCALARS];
     for i in 0..m {
         expected[2 * (i * m + i)] = square.clone();
     }
@@ -151,11 +153,11 @@ pub(in super::super) fn validate_state<'a>(
         if !linked {
             continue;
         }
-        let base = 24 * t + 12 * n + 24;
+        let base = layout.report_moments_at;
         let v = wides(&r.intervals[..base])?;
-        let stride = 2 * t + 1;
-        let x = &v[6 * stride..6 * stride + 2 * m];
-        let y = &v[2 * stride..2 * stride + 2 * t];
+        let x = &v[layout.source_at..layout.source_at + layout.source_components];
+        let observed = layout.ball_at(ReportBall::Observed);
+        let y = &v[observed..observed + layout.target_components];
         let xs = (0..m)
             .filter(|&i| x[2 * i] != 0 || x[2 * i + 1] != 0)
             .collect::<Vec<_>>();
@@ -179,12 +181,16 @@ pub(in super::super) fn validate_state<'a>(
                 expected[hh + 2 * (i * m + j) + 1] += &ai * &br - &ar * &bi;
             }
         }
-        for i in 0..4 {
-            expected[hh + bb + i] += integer(&r.intervals[base + 18 * i..base + 18 * (i + 1)])?;
+        for i in 0..STATISTIC_SCALARS {
+            expected[hh + bb + i] += integer(
+                &r.intervals[base + MomentWire::WORDS * i..base + MomentWire::WORDS * (i + 1)],
+            )?;
         }
     }
     for (i, want) in expected.iter().enumerate() {
-        if integer(&s.intervals[h + 18 * i..h + 18 * (i + 1)])? != *want {
+        if integer(&s.intervals[h + MomentWire::WORDS * i..h + MomentWire::WORDS * (i + 1)])?
+            != *want
+        {
             return Err(invalid(
                 "standing does not equal its observed normal increments",
             ));
@@ -269,21 +275,141 @@ pub struct NativeNormalMaterialState {
     pub target_energy_error: Rat,
     pub normal_residual_upper: Rat,
 }
+
+/// Cold objective comparison in the unit-prior source chart. This describes the observed
+/// geometry, not language quality or a unique source selected from the retained family.
+#[derive(Debug, Serialize)]
+pub struct NativeNormalMaterialObjective {
+    pub nominal_data_term: Rat,
+    pub prior_term: Rat,
+    pub nominal_regularized_objective: Rat,
+    pub normal_residual_squared: Rat,
+    /// H >= I implies 0 <= Phi(M) - min Phi <= ||M H - B||_F^2 / 2.
+    pub solve_gap_upper: Rat,
+    pub nominal_minimum: crate::ExactInterval,
+    /// Bounds at the stored numerical M over every admitted observed-source/target family.
+    pub family_data_term: crate::ExactInterval,
+    pub family_regularized_objective: crate::ExactInterval,
+    /// Minimum for each admitted source geometry, including its unit prior.
+    pub family_minimum: crate::ExactInterval,
+}
+
 impl NativeNormalMaterialState {
     /// Decode the signed numerical normal residual from its retained exact factors.
     /// Source/target family uncertainty remains in the separate normal and cross-source bounds.
-    pub fn normal_residual(&self) -> Result<Vec<Vec<ExactComplexWaveCurrent>>, ConstitutiveFibreError> {
+    pub fn normal_residual(
+        &self,
+    ) -> Result<Vec<Vec<ExactComplexWaveCurrent>>, ConstitutiveFibreError> {
         let m = self.source_normal.len();
-        if m == 0 || self.source_normal.iter().any(|r| r.len() != m)
+        if m == 0
+            || self.source_normal.iter().any(|r| r.len() != m)
             || self.material.coefficients.len() != self.cross_source.len()
-            || self.material.coefficients.iter().chain(&self.cross_source).any(|r| r.len() != m) {
+            || self
+                .material
+                .coefficients
+                .iter()
+                .chain(&self.cross_source)
+                .any(|r| r.len() != m)
+        {
             return Err(ConstitutiveFibreError::Shape);
         }
-        Ok(self.material.coefficients.iter().zip(&self.cross_source).map(|(row, b)| {
-            (0..m).map(|j| row.iter().zip(&self.source_normal)
-                .fold(ExactComplexWaveCurrent::zero(), |sum, (a, h)| sum.add(&a.multiply(&h[j])))
-                .subtract(&b[j])).collect()
-        }).collect())
+        Ok(self
+            .material
+            .coefficients
+            .iter()
+            .zip(&self.cross_source)
+            .map(|(row, b)| {
+                (0..m)
+                    .map(|j| {
+                        row.iter()
+                            .zip(&self.source_normal)
+                            .fold(ExactComplexWaveCurrent::zero(), |sum, (a, h)| {
+                                sum.add(&a.multiply(&h[j]))
+                            })
+                            .subtract(&b[j])
+                    })
+                    .collect()
+            })
+            .collect())
+    }
+
+    /// Observe a state returned by `inspect_normal_material_state`. Its exact accumulated
+    /// Gram and every admitted source Gram are at least I. No inverse, raw-source replay,
+    /// source-centre selection for learning, or native coefficient change occurs here.
+    pub fn objective(&self) -> Result<NativeNormalMaterialObjective, ConstitutiveFibreError> {
+        if [
+            &self.source_normal_error,
+            &self.cross_source_error,
+            &self.target_energy_error,
+        ]
+        .iter()
+        .any(|q| q.is_negative())
+        {
+            return Err(invalid("negative objective family bound"));
+        }
+        let residual = self.normal_residual()?;
+        let two = Rat::from_integer(2.into());
+        let mut norm_square = Rat::zero();
+        let mut norm_upper = Rat::zero();
+        let mut cross_norm_upper = Rat::zero();
+        let mut paired = Rat::zero();
+        let mut residual_square = Rat::zero();
+        for ((m, b), r) in self
+            .material
+            .coefficients
+            .iter()
+            .flatten()
+            .zip(self.cross_source.iter().flatten())
+            .zip(residual.iter().flatten())
+        {
+            norm_square += m.norm_square();
+            norm_upper += m.real.abs() + m.imaginary.abs();
+            cross_norm_upper += b.real.abs() + b.imaginary.abs();
+            // M H = B + R: avoids a second matrix multiplication for the objective.
+            paired += m.multiply(&r.subtract(b).conjugate()).real;
+            residual_square += r.norm_square();
+        }
+        let prior = &norm_square / &two;
+        let attained = (&self.target_energy + paired) / &two;
+        let data = &attained - &prior;
+        if data.is_negative() || attained.is_negative() {
+            return Err(invalid(
+                "objective incompatible with accumulated unit-prior geometry",
+            ));
+        }
+        let gap = &residual_square / &two;
+        let lower = (&attained - &gap).max(Rat::zero());
+        let family_error = (&norm_square * &self.source_normal_error
+            + &two * &norm_upper * &self.cross_source_error
+            + &self.target_energy_error)
+            / &two;
+        // Both minimizers have norm <= ||B_nominal||_F + EB. L1 is an exact upper bound.
+        let k = cross_norm_upper + &self.cross_source_error;
+        let minimum_error = (&k * &k * &self.source_normal_error
+            + &two * &k * &self.cross_source_error
+            + &self.target_energy_error)
+            / &two;
+        let around = |value: &Rat, error: &Rat| crate::ExactInterval {
+            lower: (value - error).max(Rat::zero()),
+            upper: value + error,
+        };
+        Ok(NativeNormalMaterialObjective {
+            family_data_term: around(&data, &family_error),
+            family_regularized_objective: around(&attained, &family_error),
+            family_minimum: crate::ExactInterval {
+                lower: (&lower - &minimum_error).max(Rat::zero()),
+                upper: &attained + &minimum_error,
+            },
+            nominal_minimum: crate::ExactInterval {
+                lower,
+                upper: attained.clone(),
+            },
+            nominal_data_term: data,
+            prior_term: prior,
+            nominal_regularized_objective: attained,
+            normal_residual_squared: residual_square,
+            solve_gap_upper: gap,
+        })
     }
 }
 impl NativeConstitutiveField<'_> {
@@ -311,10 +437,10 @@ impl NativeConstitutiveField<'_> {
             .observed_source()
             .is_some();
         validate_report(&s, n, t, linked)?;
-        let base = 24 * t + 12 * n + 24;
+        let layout = NormalLayout::new(n, t).ok_or(ConstitutiveFibreError::Shape)?;
+        let base = layout.report_moments_at;
         let v = wides(&s.intervals[..base])?;
-        let stride = 2 * t + 1;
-        let extra = 6 * stride + 6 * n + 1;
+        let extra = layout.metadata_at;
         let scale = BigInt::one() << g;
         let q = |x: i128| Rat::new(x.into(), scale.clone());
         let ball = |start: usize, width: usize| NativeFieldCurrentBall {
@@ -324,20 +450,48 @@ impl NativeConstitutiveField<'_> {
                 .collect(),
             radius: q(v[start + width]),
         };
-        let raw = (0..4)
+        let raw = (0..STATISTIC_SCALARS)
             .map(|i| {
-                integer(&s.intervals[base + 18 * i..base + 18 * (i + 1)])
-                    .map(|v| Rat::new(v, &scale * &scale))
+                integer(
+                    &s.intervals[base + MomentWire::WORDS * i..base + MomentWire::WORDS * (i + 1)],
+                )
+                .map(|v| Rat::new(v, &scale * &scale))
             })
             .collect::<Result<Vec<_>, _>>()?;
         Ok(Some(NativeNormalMaterialReading {
-            forward: ball(0, 2 * t),
-            observed: ball(2 * stride, 2 * t),
-            contemporary_source_forward: linked.then(|| ball(stride, 2 * t)),
-            returned_difference: linked.then(|| ball(3 * stride, 2 * t)),
-            chronological_current: linked.then(|| ball(4 * stride, 2 * t)),
-            contemporary_difference: linked.then(|| ball(5 * stride, 2 * t)),
-            source_current: linked.then(|| ball(6 * stride, 6 * n)),
+            forward: ball(
+                layout.ball_at(ReportBall::Forward),
+                layout.target_components,
+            ),
+            observed: ball(
+                layout.ball_at(ReportBall::Observed),
+                layout.target_components,
+            ),
+            contemporary_source_forward: linked.then(|| {
+                ball(
+                    layout.ball_at(ReportBall::ContemporarySource),
+                    layout.target_components,
+                )
+            }),
+            returned_difference: linked.then(|| {
+                ball(
+                    layout.ball_at(ReportBall::ReturnedDifference),
+                    layout.target_components,
+                )
+            }),
+            chronological_current: linked.then(|| {
+                ball(
+                    layout.ball_at(ReportBall::Chronological),
+                    layout.target_components,
+                )
+            }),
+            contemporary_difference: linked.then(|| {
+                ball(
+                    layout.ball_at(ReportBall::ContemporaryDifference),
+                    layout.target_components,
+                )
+            }),
+            source_current: linked.then(|| ball(layout.source_at, layout.source_components)),
             coefficient_error: q(v[extra]),
             normal_residual_upper: q(v[extra + 1]),
             coefficient_norm_upper: q(v[extra + 2]),
@@ -354,7 +508,6 @@ impl NativeConstitutiveField<'_> {
             return Err(invalid("wrong material law"));
         }
         let n = self.nodes();
-        let m = 3 * n;
         let t = self
             .material_target_dimension()
             .ok_or(ConstitutiveFibreError::Shape)?;
@@ -363,12 +516,16 @@ impl NativeConstitutiveField<'_> {
             .relation
             .surface
             .detach_section(&self.transport.as_ref().unwrap().state, 64)?;
-        let h = matrix_words(n, t).ok_or(ConstitutiveFibreError::Shape)?;
-        let b = h + 36 * m * m;
-        let e = b + 36 * m * t;
+        let layout = NormalLayout::new(n, t).ok_or(ConstitutiveFibreError::Shape)?;
+        let m = layout.sources;
+        let h = layout.matrix_words;
+        let b = layout.cross_words_at();
+        let e = layout.scalar_words_at();
         let scale = BigInt::one() << (2 * g);
-        let q =
-            |at: usize| integer(&state.intervals[at..at + 18]).map(|v| Rat::new(v, scale.clone()));
+        let q = |at: usize| {
+            integer(&state.intervals[at..at + MomentWire::WORDS])
+                .map(|v| Rat::new(v, scale.clone()))
+        };
         let matrix = |at: usize,
                       rows: usize|
          -> Result<Vec<Vec<ExactComplexWaveCurrent>>, ConstitutiveFibreError> {
@@ -377,8 +534,9 @@ impl NativeConstitutiveField<'_> {
                     (0..m)
                         .map(|j| {
                             Ok(ExactComplexWaveCurrent::new(
-                                q(at + 36 * (i * m + j))?,
-                                q(at + 36 * (i * m + j) + 18)?,
+                                q(at + MomentWire::COMPLEX_WORDS * (i * m + j))?,
+                                q(at + MomentWire::COMPLEX_WORDS * (i * m + j)
+                                    + MomentWire::WORDS)?,
                             ))
                         })
                         .collect()
@@ -392,9 +550,9 @@ impl NativeConstitutiveField<'_> {
             source_normal: matrix(h, m)?,
             cross_source: matrix(b, t)?,
             source_normal_error: q(e)?,
-            cross_source_error: q(e + 18)?,
-            target_energy: q(e + 36)?,
-            target_energy_error: q(e + 54)?,
+            cross_source_error: q(e + MomentWire::WORDS)?,
+            target_energy: q(e + 2 * MomentWire::WORDS)?,
+            target_energy_error: q(e + 3 * MomentWire::WORDS)?,
             normal_residual_upper: Rat::new(
                 wides(&state.intervals[h - 4..h - 2])?[0].into(),
                 BigInt::one() << g,

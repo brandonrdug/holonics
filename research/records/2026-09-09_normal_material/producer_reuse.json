@@ -1,0 +1,111 @@
+{
+  "grade": "established-bounded",
+  "evidence": [
+    "implemented-exact",
+    "measured"
+  ],
+  "scope": "One matched 75-occurrence development. Recent immutable normal producer reuse; no numerical learning-law change.",
+  "complete_body_equal": true,
+  "complete_checkpoint_byte_equal": true,
+  "checkpoint_bytes": 20526964,
+  "runs": [
+    {
+      "kind": "prefix-solve",
+      "development_seconds": 21.889087312,
+      "native_until": 75,
+      "nonarchive_section_readouts": 0,
+      "development_census": {
+        "allocations": 6138,
+        "captured_launches": 1042,
+        "control_launches": 0,
+        "deed_launches": 372,
+        "device_to_device_octets": 0,
+        "egress_receipt_octets": 33344,
+        "egress_section_octets": 0,
+        "ingress_octets": 19864820,
+        "resident_octets_now": 41722752,
+        "resident_octets_peak": 64525588,
+        "section_read_outs": 0,
+        "synchronizations": 372
+      },
+      "process": {
+        "command": [
+          "target/debug/examples/alpha_text",
+          ".local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl",
+          "--families",
+          "1",
+          "--fractional-bits",
+          "72",
+          "--material-source",
+          "operative-normal",
+          "--material-target",
+          "joint-packet",
+          "--duplex",
+          "true",
+          "--contact-response",
+          "true",
+          "--contact-realization",
+          "dyadic-deposit",
+          "--contact-metric",
+          "current",
+          "--checkpoint",
+          ".local/artifacts/athena-alpha/ac1-contact-response/first-family-normal-clean.hna",
+          "--report",
+          ".local/artifacts/athena-alpha/ac1-contact-response/first-family-normal-clean.json"
+        ],
+        "exit_code": 0,
+        "wall_seconds": 23.498421480995603,
+        "max_rss_kib": 244056
+      }
+    },
+    {
+      "kind": "reused-producer",
+      "development_seconds": 14.497817456,
+      "native_until": 75,
+      "nonarchive_section_readouts": 0,
+      "development_census": {
+        "allocations": 5842,
+        "captured_launches": 894,
+        "control_launches": 0,
+        "deed_launches": 372,
+        "device_to_device_octets": 0,
+        "egress_receipt_octets": 28608,
+        "egress_section_octets": 0,
+        "ingress_octets": 19864524,
+        "resident_octets_now": 80473920,
+        "resident_octets_peak": 103276756,
+        "section_read_outs": 0,
+        "synchronizations": 372
+      },
+      "process": {
+        "command": [
+          "target/debug/examples/alpha_text",
+          ".local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl",
+          "--families",
+          "1",
+          "--fractional-bits",
+          "72",
+          "--material-source",
+          "operative-normal",
+          "--material-target",
+          "joint-packet",
+          "--duplex",
+          "true",
+          "--contact-response",
+          "true",
+          "--contact-realization",
+          "dyadic-deposit",
+          "--contact-metric",
+          "current",
+          "--checkpoint",
+          ".local/artifacts/athena-alpha/ac1-contact-response/first-family-normal-producer-reuse.hna",
+          "--report",
+          ".local/artifacts/athena-alpha/ac1-contact-response/first-family-normal-producer-reuse.json"
+        ],
+        "exit_code": 0,
+        "wall_seconds": 16.1754870180157,
+        "max_rss_kib": 243304
+      }
+    }
+  ]
+}

@@ -1,7 +1,8 @@
 // Complete internal-current source geometry in an integral root-contact chart.
 // Birth moments are exact on the numerical prefix representatives, with their existing
 // uncertainty retained. C is the actual paired-junction covariance; no model update occurs here.
-using HistoryInteger = ExactInteger<8>;
+// A history pairing multiplies two complete wide current components.
+using HistoryInteger = ExactInteger<2 * sizeof(wide) / sizeof(uint32_t)>;
 
 __device__ __forceinline__ HistoryInteger history_integer(wide value) {
     uwide m = magnitude(value);

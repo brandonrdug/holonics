@@ -112,6 +112,13 @@ pins the refreshed Apple branch comparison.
 
 ## Athena-alpha: corrected AC0–AC5 order
 
+[project-postulate] **September 9 research steering:** Brandon now prioritizes clear, interesting
+behavioral phenomena during cultivation, including unconstrained repetition and changing phase
+patterns. Utility is not an acceptance condition or selection pressure at this stage. Observe
+what the native ecology does under actual source/context changes; do not force useful prose or
+manufacture unusual behavior. The later product objective remains distinct from this research
+criterion. AC1–AC3 may develop together as their actual conduct and costs permit.
+
 [project-postulate] Brandon has resumed AC0–AC5 as the active completion goal. His September 9
 clarification makes continued generators and their contextual cessation explicit. Repetition
 is not itself a defect or a completion test. Every update names the active step, actual return
@@ -120,7 +127,8 @@ and concrete remaining relation; flexible derivation belongs inside this constru
 [established-bounded; measured] The [accumulated-normal material return](../../research/records/2026-09-09_AC1_THE_MATERIAL_OPERATOR_RETAINS_ITS_ACCUMULATED_SOURCE_GEOMETRY.md)
 now supplies resident exact H/B/C, source-family bounds, numerical residual, historical producer
 and restart. It improves five retained relations on the first 75 occurrences and completes the
-eight-family study. Output remains unusable. The linked records retain the earlier source,
+eight-family study. The recorded output/current patterns remain research material. The linked
+records retain the earlier source,
 joint receiver, contact, actuation and storage returns without making their old probes a schedule.
 
 [counterexample; measured; computational-witness] The [feedback-boundary review](../../research/records/2026-09-09_AC_THE_REPEATED_TEXT_FACE_IS_A_DRIVEN_OPEN_RETURN.md)
@@ -137,16 +145,22 @@ in this order:
    through existing paired/reflection and source owners. Retain the whole ball/fibre across its
    passage. Establish what sustains, redirects or ends expression without treating a codeword's
    canonical re-encoding as amplitude transport or requiring universal physical rest.
-2. Use the stored normal geometry when deciding whether to change its solve or its source
-   representation. Separate numerical solve error, data discrepancy, unit-prior cost and family
-   uncertainty through square completion. A tighter solve cannot resolve a distinction absent
-   from the source. This is a diagnostic for that decision, not a new quality gate.
-3. Continue local path formation, restriction/rebase and generator reuse for the actual joint
+2. The [stored normal-objective comparison](../../research/records/2026-09-09_AC1_THE_NORMAL_OBJECTIVE_SEPARATES_SOLVE_ERROR_FROM_OBSERVED_SOURCE_FIT.md)
+   now rules out a material benefit from additional solve precision at the measured cuts.
+   Keep data discrepancy, unit-prior cost and source-family uncertainty separate. Continue the
+   source/feedback and reuse construction; this diagnostic is not a new quality gate.
+3. The [recent normal-producer reuse](../../research/records/2026-09-09_AC1_THE_RECENT_NORMAL_PRODUCER_IS_SHARED_INSTEAD_OF_RESOLVED.md)
+   now returns an identical matched checkpoint with lower work and explicit extra residency.
+   Continue local path formation, restriction/rebase and generator reuse for the actual joint
    boundary, material-query and changing-contact receivers. Keep contributions later morphology
    can expose. Normal rank-one reuse must retain the actual numerical update history/residual or
    a producer snapshot; historical H/B alone cannot recover a different approximate update law.
-4. Inspect the changed conduct on an actual request and followup before broadening cultivation.
-   Repetition may be lawful while the response is unhelpful. Do not install a phrase filter,
+4. Inspect the changed conduct on actual requests and followups at the stated exposure. AC2
+   and AC3 may develop together: the eight-part slice contains one human request, so useful
+   general language is not a prerequisite to providing broader material through an affordable,
+   lawful recurrence. Preserve source/continuation controls and actual cost; a larger run does
+   not repair an identified defect by itself. Investigate repetition and deformation without
+   requiring utility at this stage. Do not install a phrase filter,
    periodicity penalty, global damping constant or face-count stop, or rerun the unchanged
    128-byte study as a substitute for the identified construction.
 

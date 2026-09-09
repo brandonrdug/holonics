@@ -1,5 +1,6 @@
 #pragma once
 #include <stdint.h>
+#include <limits.h>
 
 // Shared exact signed-magnitude arithmetic, extracted without changing the conic operators.
 struct ExactCoefficient {
@@ -20,6 +21,8 @@ struct ExactCoefficient {
 template <int LimbCount>
 struct ExactInteger {
     static constexpr int LIMBS = LimbCount;
+    static constexpr int LIMB_BITS = sizeof(uint32_t) * CHAR_BIT;
+    static constexpr int BITS = LIMBS * LIMB_BITS;
     uint32_t limb[LIMBS];
     bool negative;
     bool overflow;

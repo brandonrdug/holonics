@@ -32,9 +32,16 @@ impl<'c> NativeConstitutiveField<'c> {
                         .count,
                 ))
             })?;
+        let normal = self.material_transport_source()==Some(NativeMaterialTransportSource::OperativeNormal);
+        let cached = self.transport.as_ref().and_then(|t| t.recent_normal_producers.iter()
+            .find(|(at, _)| *at == source.occurrence).map(|(_, state)| Rc::clone(state)));
+        let recover_normal = normal && cached.is_none();
         let mut pointers = vec![];
         let mut held = vec![source_report.clone()];
-        for h in &self.history[source.occurrence + 1..] {
+        if let Some(state) = &cached { held.push(Rc::clone(state)); }
+        let later_history = if cached.is_some() { &self.history[0..0] }
+            else { &self.history[source.occurrence + 1..] };
+        for h in later_history {
             // Material return factors suffice for this journal. An archived row need not
             // restore its historical interior to the device just to recover a matrix entry.
             let report = if let Some(r) = h.resident.as_ref() {
@@ -54,7 +61,7 @@ impl<'c> NativeConstitutiveField<'c> {
             pointers.extend([(p, p), (linked, linked)]);
             held.push(report);
         }
-        let later = held.len() - 1;
+        let later = later_history.len();
         if pointers.is_empty() {
             pointers.resize(2, (0, 0));
         }
@@ -62,16 +69,15 @@ impl<'c> NativeConstitutiveField<'c> {
             &ResidentSectionRest::found(later.max(1), 2, ResidentGrain(0), 64, pointers)
                 .map_err(|_| ConstitutiveFibreError::Shape)?,
         )?;
-        let normal = self.material_transport_source()==Some(NativeMaterialTransportSource::OperativeNormal);
-        let recovered = if normal {Some(surface.fresh_section(1,
+        let recovered = if recover_normal {Some(surface.fresh_section(1,
             material_transport::normal::state_words(n,targets).ok_or(ConstitutiveFibreError::Shape)?,ResidentGrain(0))?)}else{None};
-        let normal_work = if normal {Some(surface.fresh_section(1,
+        let normal_work = if recover_normal {Some(surface.fresh_section(1,
             material_transport::normal::workspace_words(n,targets).ok_or(ConstitutiveFibreError::Shape)?,ResidentGrain(0))?)}else{None};
         let output = surface.fresh_section(1, 4 * (10 * n + 2 * contacts), ResidentGrain(0))?;
-        let lanes=if normal {vec![vec![],vec![0]]}else{vec![vec![]]};
+        let lanes=if recover_normal {vec![vec![],vec![0]]}else{vec![vec![]]};
         let final_lane=lanes.len()-1;let predecessors=lanes[final_lane].clone();
         let mut passage = surface.begin_passage(&lanes)?;
-        if normal {
+        if recover_normal {
             {let lane=passage.open(0,&[])?;
                 surface.record_normal_material_prefix(&lane,&self.transport.as_ref().unwrap().state,&table,later,n,targets,grain,
                     recovered.as_ref().unwrap(),normal_work.as_ref().unwrap())?;}
@@ -81,7 +87,7 @@ impl<'c> NativeConstitutiveField<'c> {
             let lane = passage.open(final_lane, &predecessors)?;
             surface.record_linear_material_pullback(
                 &lane,
-                recovered.as_ref().unwrap_or(&self.transport.as_ref().unwrap().state),
+                cached.as_deref().or(recovered.as_ref()).unwrap_or(&self.transport.as_ref().unwrap().state),
                 &table,
                 &source_report,
                 &covector,

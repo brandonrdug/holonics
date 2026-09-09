@@ -77,6 +77,15 @@ cold diagnostic. H/B/C retain the objective, while the actual producing numerica
 required by delayed adjoints; changing the numerical update also changes that decoder obligation.
 This is a concrete handoff to the active native owner, not another optimizer or a new AC gate.
 
+[established-bounded; measured] The [cold objective return](../research/records/2026-09-09_AC1_THE_NORMAL_OBJECTIVE_SEPARATES_SOLVE_ERROR_FROM_OBSERVED_SOURCE_FIT.md)
+now applies that separation to the saved models; additional solve precision cannot materially
+change their declared objectives. The [recent-producer reuse](../research/records/2026-09-09_AC1_THE_RECENT_NORMAL_PRODUCER_IS_SHARED_INSTEAD_OF_RESOLVED.md)
+shares the already produced numerical fit with its old adjoint and preserves the matched complete
+checkpoint at lower work and higher standing memory. The
+[integer/abstraction return](../research/records/2026-09-09_INTEGER_FACES_RETAIN_THEIR_GENERATING_RELATIONS.md)
+then makes the carried bit/layout relationships explicit. Current cultivation studies the actual
+behavioral phenomena; Brandon's September 9 direction does not impose utility at this stage.
+
 [counterexample; measured; computational-witness] The [feedback review](../research/records/2026-09-09_AC_THE_REPEATED_TEXT_FACE_IS_A_DRIVEN_OPEN_RETURN.md)
 now applies the complete/open distinction to the saved text runs: all 120 compared equal
 coordinates four bytes apart have disjoint outgoing-current balls. The canonical codeword

@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 9, 2026. **Priority:** AC0–AC5 completion resumed by Brandon; flexible native construction with transparent failures.
+**Currency:** September 9, 2026. **Priority:** AC0–AC5 goal remains active; current cultivation seeks identifiable behavioral phenomena, not forced utility. Integer/ratio abstraction is under review.
 **Position:** AC0 complete; AC1 accumulated-normal material integrated; AC1 path/generator reuse and AC2 situated feedback/useful continuation open; AC3 experimental artifacts; AC4–AC5 open.
 **Athena-alpha:** not yet attained.
 
@@ -78,6 +78,18 @@ model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction
 
+[established-bounded; implemented-exact; measured] The
+[integer/abstraction review](research/records/2026-09-09_INTEGER_FACES_RETAIN_THEIR_GENERATING_RELATIONS.md)
+recovers the August basis/series directions and derives native bit capacities, normal layouts
+and text-boundary coordinates from their carried relations. All 117 field cases and two pure
+codec cases pass. Matched cultivation preserves the complete body/checkpoint byte-for-byte.
+The final compile check passes; the wider framework remains active.
+
+[project-postulate] Brandon's latest instruction prioritizes unconstrained, identifiable native
+behavior during research. Repetition and unusual output are observations to understand, not
+failures to suppress for usefulness. Exact source/return, ownership and declared apparatus
+constraints remain. The later consumer-product objective has not been relabeled complete.
+
 [established-bounded; measured] The [accumulated-normal return](research/records/2026-09-09_AC1_THE_MATERIAL_OPERATOR_RETAINS_ITS_ACCUMULATED_SOURCE_GEOMETRY.md)
 implements resident exact H/B/C statistics, complete numerical residual and source-family bounds,
 producing-operator recovery and rest/remount. Five retained early relations improve from losses
@@ -88,7 +100,8 @@ more than the previous 7.49-second run at this scope.
 [established-bounded; measured] The eight-family continuation completes 1,930 occurrences.
 Its checkpoint is 450,770,927 bytes; the additional seven families take 794.78 seconds. All
 11,130 development section readouts belong to declared history placement. Its answer is
-`’m the the the ...` through the 128-byte work limit. It is unusable. The latest two native
+`’m the the the ...` through the 128-byte work limit; the accompanying current pattern is
+now research material under Brandon’s latest direction. The latest two native
 normal controls, 26 SDK controls and three driver controls pass at the linked execution scopes.
 No test count establishes Athena-alpha.
 
@@ -98,6 +111,18 @@ all 120 compared equal text coordinates four bytes apart have disjoint outgoing-
 The repeated face is not a four-step complete-state cycle. Every generated occurrence supplies
 nine fresh unit impulses through the canonical codec; the current adapter is a driven boundary.
 Prompt contact development changes the body but leaves this output unchanged.
+
+[established-bounded; implemented-exact; computational-witness] The
+[normal-objective observer](research/records/2026-09-09_AC1_THE_NORMAL_OBJECTIVE_SEPARATES_SOLVE_ERROR_FROM_OBSERVED_SOURCE_FIT.md)
+now separates data, prior and solve discrepancy with retained source-family bounds. Its exact
+control passes. Both saved-model readings return: at 1,930 occurrences the data term is
+836.69, prior cost 0.49 and further solve improvement is bounded by 1.76 × 10⁻³³. This
+redirects work from solve accuracy to the actual source/feedback representation. The recent
+[normal-producer reuse](research/records/2026-09-09_AC1_THE_RECENT_NORMAL_PRODUCER_IS_SHARED_INSTEAD_OF_RESOLVED.md)
+passes cached/decoded covector and restart controls. Matched development returns an identical
+complete checkpoint in 14.50 seconds versus 21.89, retaining 38.75 MB more native standing.
+There are still zero numerical development readouts. Larger journal/source-representation work
+and useful responses remain open.
 
 [definition] **Current work: AC1 steps 3–4 and AC2's situated feedback/continuation.** Compose
 source, actuation/load, retained interior and changing receiver through the existing owners.

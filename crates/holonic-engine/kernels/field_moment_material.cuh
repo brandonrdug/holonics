@@ -1,14 +1,19 @@
 // The normalized homogeneous Hermitian source is generated from the COMPLETE current.
 // k_Q(x,y)=|1+<x,y>|^2/((1+||x||^2)(1+||y||^2)). No matrix population is expanded.
-// A 256-bit source value plus its reference needs 257 bits; the products need 514.
-// Seventeen 32-bit limbs cover those products and the doubled division remainder.
-using MomentInteger=ExactInteger<17>;
+// Adding the reference may carry one bit; multiplying two such values doubles that width.
+// The division recurrence also doubles its remainder, requiring one further carry bit.
+constexpr uint32_t MOMENT_PRODUCT_BITS = 2 * (HistoryInteger::BITS + 1);
+constexpr uint32_t MOMENT_CARRIER_BITS = MOMENT_PRODUCT_BITS + 1;
+using MomentInteger=ExactInteger<(MOMENT_CARRIER_BITS + HistoryInteger::LIMB_BITS - 1)
+    / HistoryInteger::LIMB_BITS>;
+constexpr size_t MOMENT_WIRE_WORDS = MomentInteger::LIMBS + 1; // magnitude, then sign
+constexpr size_t COMPLEX_MOMENT_WIRE_WORDS = 2 * MOMENT_WIRE_WORDS; // real and imaginary
 __device__ MomentInteger moment_lift(const HistoryInteger &a) {
-    MomentInteger b;for(uint32_t j=0;j<8;++j)b.limb[j]=a.limb[j];b.negative=a.negative;b.overflow=a.overflow;return b;
+    MomentInteger b;for(uint32_t j=0;j<HistoryInteger::LIMBS;++j)b.limb[j]=a.limb[j];b.negative=a.negative;b.overflow=a.overflow;return b;
 }
 __device__ MomentInteger moment_twice(const MomentInteger &a) {
     MomentInteger b=a;uint32_t carry=0;
-    for(uint32_t j=0;j<17;++j){uint32_t next=b.limb[j]>>31;b.limb[j]=(b.limb[j]<<1)|carry;carry=next;}
+    for(uint32_t j=0;j<MomentInteger::LIMBS;++j){uint32_t next=b.limb[j]>>(MomentInteger::LIMB_BITS-1);b.limb[j]=(b.limb[j]<<1)|carry;carry=next;}
     b.overflow=b.overflow || carry;return b;
 }
 __device__ void moment_pair(const int64_t *a,const int64_t *b,uint32_t D,uint32_t grain,

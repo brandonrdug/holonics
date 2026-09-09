@@ -1092,6 +1092,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                     surface
                         .mount_section_rest(&s)
                         .map(|state| MaterialTransport {
+                            recent_normal_producers: Default::default(),
                             state,
                             source: h.transport_source,
                             target: h.transport_target,

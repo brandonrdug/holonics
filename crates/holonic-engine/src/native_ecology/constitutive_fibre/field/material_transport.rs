@@ -6,7 +6,7 @@ use num_traits::One;
 pub(super) mod complete;
 pub(super) mod contextual;
 pub(super) mod normal;
-pub use normal::{NativeNormalMaterialReading, NativeNormalMaterialState};
+pub use normal::{NativeNormalMaterialObjective, NativeNormalMaterialReading, NativeNormalMaterialState};
 mod support;
 pub use support::{NativeMaterialReportPacking, NativeMaterialReportPackingRest};
 pub(super) mod moment;
@@ -137,6 +137,9 @@ pub(super) struct MaterialTransport<'chart> {
     pub(super) state: ResidentSection<'chart>,
     pub(super) source: NativeMaterialTransportSource,
     pub(super) target: NativeMaterialTarget,
+    // Immutable normal fits at recent emission cuts, retained from already completed staging.
+    // Older cuts keep the exact statistic-prefix decoder; this is not a context window.
+    pub(super) recent_normal_producers: std::collections::VecDeque<(usize, Rc<ResidentSection<'chart>>)>,
 }
 pub(super) struct PendingMaterialTransport<'chart> {
     pub(super) normal_workspace: Option<ResidentSection<'chart>>,
@@ -325,7 +328,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
             &ResidentSectionRest::found(1, width, ResidentGrain(0), 64, words)
                 .map_err(|_| ConstitutiveFibreError::Shape)?,
         )?;
-        self.transport = Some(MaterialTransport { state, source, target });
+        self.transport = Some(MaterialTransport { state, source, target, recent_normal_producers: Default::default() });
         Ok(())
     }
     pub fn has_material_transport(&self) -> bool {

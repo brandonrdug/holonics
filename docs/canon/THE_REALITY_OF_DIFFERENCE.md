@@ -59,6 +59,21 @@ calculation does not delete the histories whose oriented contributions cancel.
 
 ## Swing, potential and realized faces
 
+[project-postulate] Integers and numeral bases are measured presentations too. Decimal glyphs
+do not found a constant's meaning, and writing the same value in binary does not restore its
+causal construction. Retain the partition, composition, reference, orientation or generating
+series that makes the value relevant. Equal evaluated integers need not identify those paths.
+Exact rational arithmetic preserves a ratio's value; its owner must still preserve what the
+ratio compares and how it changes with the chart.
+
+[definition] Encapsulation follows that distinction. A wire extent is derived from the carried
+ports, components and representation; a constitutive coefficient belongs to its declared law
+and metric; an experimental aperture belongs to its caller; a series face retains its generating
+recurrence and remainder. Coincident counts from unrelated constructions are not one shared
+semantic constant. Do not replace this structure with renamed literals or a central number registry.
+The [integer/abstraction review](../../research/records/2026-09-09_INTEGER_FACES_RETAIN_THEIR_GENERATING_RELATIONS.md)
+recovers Brandon's direct messages and the corresponding native repairs.
+
 [project-postulate] Difference is the ontological primitive; Swing is the primitive act of
 situated relating and transport to develop through its actual constraints. The source, anchor,
 comparison and invariant travel with the motion. The existing harmonic/projective and affine

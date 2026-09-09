@@ -1,0 +1,76 @@
+{
+  "grade": "established-bounded",
+  "evidence": [
+    "implemented-exact",
+    "measured"
+  ],
+  "scope": "Derived layouts and capacities preserve the preceding normal model; one matched 75-occurrence development.",
+  "complete_body_equal": true,
+  "checkpoint_byte_equal": true,
+  "checkpoint_bytes": 20526964,
+  "development_seconds": 14.494774505,
+  "development_census": {
+    "allocations": 5842,
+    "captured_launches": 894,
+    "control_launches": 0,
+    "deed_launches": 372,
+    "device_to_device_octets": 0,
+    "egress_receipt_octets": 28608,
+    "egress_section_octets": 0,
+    "ingress_octets": 19864524,
+    "resident_octets_now": 80473920,
+    "resident_octets_peak": 103276756,
+    "section_read_outs": 0,
+    "synchronizations": 372
+  },
+  "nonarchive_readouts": 0,
+  "process": {
+    "command": [
+      "target/debug/examples/alpha_text",
+      ".local/datasets/athena-alpha-exposure-source-context-2026-09-06.jsonl",
+      "--families",
+      "1",
+      "--fractional-bits",
+      "72",
+      "--material-source",
+      "operative-normal",
+      "--material-target",
+      "joint-packet",
+      "--duplex",
+      "true",
+      "--contact-response",
+      "true",
+      "--contact-realization",
+      "dyadic-deposit",
+      "--contact-metric",
+      "current",
+      "--checkpoint",
+      ".local/artifacts/athena-alpha/ac1-contact-response/first-family-normal-derived-layout.hna",
+      "--report",
+      ".local/artifacts/athena-alpha/ac1-contact-response/first-family-normal-derived-layout.json"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 16.11791746702511,
+    "max_rss_kib": 245404
+  },
+  "checks": {
+    "field": {
+      "passed": 117,
+      "seconds": 285.48,
+      "includes_initial_driver_jit": true,
+      "command": "cargo test -p holonic-engine --lib native_ecology::constitutive_fibre::field:: -- --include-ignored --test-threads=1"
+    },
+    "text_codec": {
+      "passed": 2,
+      "ignored": 1,
+      "seconds": 0.02,
+      "scope": "all octet/part codewords and duplex direction; separate native fibre test not rerun"
+    },
+    "final_compile": {
+      "command": "cargo check -p holonic-engine --lib",
+      "exit_code": 0,
+      "seconds": 46.1,
+      "scope": "final report-role slice declaration and formatting cleanup"
+    }
+  }
+}

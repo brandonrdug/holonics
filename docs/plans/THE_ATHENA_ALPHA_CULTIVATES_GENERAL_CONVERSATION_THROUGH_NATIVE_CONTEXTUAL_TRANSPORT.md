@@ -3,7 +3,7 @@
 **Authority:** Brandon's September 6 instruction to design and deposit this blueprint, update the
 roadmap and position, then immediately construct and complete it as a goal.
 **Status:** AC0–AC5 revised September 9 after the normal/feedback synthesis; AC0 complete, AC1 unfinished,
-AC2 language probes failed. Brandon has resumed construction through completion as a goal,
+AC2 has recorded text/current phenomena; useful language is a later product return. Brandon has resumed construction through completion as a goal,
 with explicit flexibility to revise designs when evidence warrants. **Order:** [the roadmap](THE_ROADMAP.md).
 **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 
@@ -208,7 +208,7 @@ binary sigmoid restriction where the existing exterior pair chart calls for it. 
 resident exponentiation and complete ratio/derivative conduct. Carry the receiver pullback into
 the original complex current: the scalar face does not replace that current. Do not assume that
 adding normalization to the old bit-pair predictor completes the codec or the learning law.
-Compare the actual finite response and useful consequence before expanding the implementation.
+Compare the actual finite response and its situated consequences before expanding the implementation.
 
 [definition] The positive normalized receiver has real contact potentials. A complex ratio
 family remains a separate admitted chart: its sum can vanish by phase cancellation while the
@@ -217,11 +217,17 @@ current by an unproved positive partition or treat a receiver pole as intrinsic 
 
 ## 5. AC0–AC5: ordered construction and returned artifacts
 
+[project-postulate] Brandon's September 9 clarification makes behavioral research the immediate
+criterion: seek clear patterns, recurring generators, transformations, persistence and responses
+to changing causal conditions. Do not force utility, punish repetition or select native mechanisms
+for prettier prose during this stage. AC2's useful product and AC4–AC5 remain later obligations;
+they do not gate current AC1–AC3 cultivation or erase interesting observations.
+
 | Phase | Required return | Current standing |
 |---|---|---|
 | AC0 | Source-qualified available conversations and resumable exposure | Complete; preserve and reuse |
 | AC1 | Integrated local receiver/return, developing paths and reusable generators | Open; next construction is the composition below |
-| AC2 | Learned text-codec conduct and complete useful responses | Failed probes only |
+| AC2 | Learned text-codec conduct; situated behavioral study, later useful responses | Observed phenomena; broader cultivation open |
 | AC3 | Broader cultivation with a durable, efficiently reused model | Persistence apparatus returned; cultivated product open |
 | AC4 | General contextual use, correction and attributed learning | Open |
 | AC5 | Usable consumer artifact, interface and measured costs | Open |
@@ -324,11 +330,11 @@ and [exterior history placement](../../research/records/2026-09-07_AC3_THE_COMPL
 returned restart and source-qualified continuation for the experimental models. Reuse them;
 archived history placement is not itself learned generator compression.
 
-[definition] Stream the broader declared development population through the productive AC1–AC2
+[definition] Stream the broader declared development population through the integrated AC1–AC2
 composition. Retain actual source availability and one continuing successor. Reuse invariant
 local laws, boundary factors and generators; reopen only dependencies changed by a new occurrence.
-Before enlarging the campaign, inspect useful conduct and complete work/residency/decoder costs
-at the current extent. A scale failure changes factorization, restriction, representation or
+Before enlarging the campaign, inspect the actual behavioral phenomena and complete
+work/residency/decoder costs at the current extent. Utility does not gate this research stage. A scale failure changes factorization, restriction, representation or
 placement at its owner; it does not justify discarding current or increasing a hidden bound.
 
 [definition] Save productive morphology, learned codec, generator/decoder, required fibres and
@@ -340,7 +346,14 @@ Retain cold lineage/witness material separately where its actual evidence claim 
 [definition] Return a broader cultivated artifact, honest admitted/withheld population accounting,
 process-separated inference and further learning, and demonstrated persistence through partial
 input/output. Inspect the restored model's actual conduct, not only its wire integrity. The
-artifact's usefulness and full costs accompany its storage receipt.
+artifact's actual behaviors and full costs accompany its storage receipt; later utility is reported
+when that product claim is assessed.
+
+[definition] AC2 and AC3 may develop together. Bounded source/return and persistence checks
+make broader exposure reviewable; a general answer from the single-request eight-part slice
+is not a prerequisite to supplying broader development material. Report its actual learning,
+output and cost as exposure grows. This changes no AC2/AC3 completion requirement and does not
+justify extending an unchanged run past an identified mechanism or resource obstruction.
 
 ### AC4 — Establish general contextual use and attribution
 
@@ -415,8 +428,9 @@ response is still `’m the the ...`. The record retains its runtime/storage cos
 Prompt observations now use the same configured native contact return as development; changing
 that prompt return does not change the recorded text, although the currents and body differ.
 
-[definition] Use square completion on the stored geometry to distinguish numerical solve error
-from attainable fit. Report data discrepancy, prior cost and source-family uncertainty separately;
+[definition] The [stored-objective return](../../research/records/2026-09-09_AC1_THE_NORMAL_OBJECTIVE_SEPARATES_SOLVE_ERROR_FROM_OBSERVED_SOURCE_FIT.md)
+now rules out a material benefit from more solve precision at its measured cuts. Use square
+completion to distinguish numerical solve error from attainable fit. Report data discrepancy, prior cost and source-family uncertainty separately;
 do not infer a missing topology from a large regularized objective alone. The residual-aware
 rank-one identity is available for AC1 reuse. Any numerical update optimization owes the actual
 historical producer, using retained ordered updates/residuals or snapshots, before it replaces
@@ -429,8 +443,8 @@ Retain the blind component that later morphology can expose. The completed norma
 complex-current adjoint, numerical deposit, source-preserving actuation and journal/covariance
 returns remain dependencies through the records above; their old probes schedule no new run.
 
-[definition] Inspect the changed actual response and followup, then broaden through AC3's lawful
-reuse. This remains the AC0–AC5 product goal. Derivation can change the design; another unchanged
+[definition] Inspect the changed actual response and followup while broadening through AC3's lawful
+reuse when its conduct and cost permit. This remains the AC0–AC5 product goal. Derivation can change the design; another unchanged
 128-byte experiment, phrase filter, global decay constant or universal completion theorem does
 not discharge the concrete feedback and productive-continuation work. The roadmap orders it.
 

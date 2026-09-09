@@ -65,7 +65,7 @@ necessary context in the repository record, without committing private raw logs.
 search rankings, former claim grades and equal wording cannot replace that authority.
 
 [definition] Mathematical derivations retain their source/target constructions, ordered operation,
-receiver, hypotheses, orientation, boundary and reconstruction fibre in the actual formal source
+receiver, hypotheses, orientation, boundary and Preimage Fibre in the actual formal source
 and its explanatory record. Notation and serialized diagrams remain presentations. Lean verifies
 research separately; no Lean parser, kernel call, theorem emitter or verdict enters HNN cultivation
 or inference pipelines. Lean text already present in conversation logs remains ordinary material.

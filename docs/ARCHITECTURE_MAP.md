@@ -262,7 +262,18 @@ signed normal-residual decoding. `surface_linear_material.rs` and the existing l
 owner recover the actual historical finite fit from its retained statistic prefix. The
 [normal return](../research/records/2026-09-09_AC1_THE_MATERIAL_OPERATOR_RETAINS_ITS_ACCUMULATED_SOURCE_GEOMETRY.md)
 records native controls, retention improvement and the still-unusable text. Its proposed rank-one
-update optimization remains separate from this full-fit realization.
+update optimization remains separate from this full-fit realization. The
+[recent-producer return](../research/records/2026-09-09_AC1_THE_RECENT_NORMAL_PRODUCER_IS_SHARED_INSTEAD_OF_RESOLVED.md)
+retains immutable completed fits through `MaterialTransport::recent_normal_producers`; the
+same pullback owner uses them before the historical decoder. `NativeNormalMaterialState::objective`
+exposes the optional exact data/prior/solve/source-family comparison.
+
+[established-bounded; source-inspected] `normal/layout.rs` owns the host normal wire geometry:
+named report balls, source/target components, exact moment words and factor/solve workspace.
+`ExactInteger::{LIMB_BITS,BITS}` and the derived history/moment aliases own the corresponding
+device bit capacities. `field_normal_material.cuh` derives extents through the actual source,
+report and statistic roles. The [integer review](../research/records/2026-09-09_INTEGER_FACES_RETAIN_THEIR_GENERATING_RELATIONS.md)
+records the recovered basis/series direction and native compatibility checks.
 
 [established-bounded; source-inspected] `field/receiver/packet.rs::NativePacketQuadrature`
 and `field_normalized_receiver.cuh` expose I/Q projections of the same joint current ball.

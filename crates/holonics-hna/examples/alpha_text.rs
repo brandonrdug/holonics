@@ -327,6 +327,7 @@ fn run_session(
     text_receiver: TextCurrentReceiver,
     self_source_mode:Option<TextGenerationSourceMode>,
     inspect_all_currents: bool,
+    inspect_normal_objective: bool,
     operative: bool,
     contact_response: bool,
     contact_realization: NativeContactRealization,
@@ -458,6 +459,14 @@ fn run_session(
     report["final_native_census_before_diagnostics"] = json!(field.census());
     let start = Instant::now();
     let final_occurrence = field.occurrence_count().checked_sub(1);
+    if inspect_normal_objective {
+        let objective = field.inspect_normal_material_state().and_then(|state| state.objective());
+        report["normal_objective"] = match objective {
+            Ok(value) => json!(value),
+            Err(error) => json!({"error":error.to_string()}),
+        };
+        report["normal_objective_native_until"] = json!(field.occurrence_count());
+    }
     report["body"] = json!({"occurrences":field.occurrence_count(),
             "lineage":(0..field.occurrence_count()).map(|i| field.lineage(i)).collect::<Vec<_>>(),
             "pending_lineage":field.pending_lineage(),"pending_symbol":session.pending_symbol(),
@@ -507,7 +516,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary|operative-linear|operative-normal] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--self-source-mode actuation|observation|withdrawal] [--contact-metric current|relative-entropy|squared-probability] [--inspect-contact-cuts N,...] [--inspect-retained-receivings N,...]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary|operative-linear|operative-normal] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--self-source-mode actuation|observation|withdrawal] [--contact-metric current|relative-entropy|squared-probability] [--inspect-contact-cuts N,...] [--inspect-retained-receivings N,...] [--inspect-normal-objective true|false]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -518,6 +527,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (mut families, mut grain, mut prompt_path, mut limit, mut report_path, mut checkpoint) =
         (None, None, None, None, None, None);
     let mut inspect_all_currents = false;
+    let mut inspect_normal_objective = false;
     let mut operative = false;
     let mut contact_response = None;
     let mut contact_realization = None;
@@ -594,6 +604,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 _ => return Err("contact realization must be enclosed-flow or dyadic-deposit".into()),
             }),
             "--inspect-all-currents" => inspect_all_currents = value.parse::<bool>()?,
+            "--inspect-normal-objective" => inspect_normal_objective = value.parse::<bool>()?,
             _ => return Err(format!("unknown option {option}").into()),
         }
     }
@@ -616,7 +627,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let report_path = report_path.ok_or("--report required")?;
     let mut report = json!({"schema":"holonics.alpha-text-study.v1","prompt_path":prompt_path,"prompt":prompt,
         "symbol_work_limit":limit,"model_persisted":false,"language_quality_established":false,
-        "all_currents_requested":inspect_all_currents,"additional_families_requested":families});
+        "all_currents_requested":inspect_all_currents,"normal_objective_requested":inspect_normal_objective,"additional_families_requested":families});
     let native_result = if let Some(path) = resume {
         let saved = SavedTextField::read(&path)?;
         if duplex.is_some_and(|value|value!=saved.duplex()){return Err("resume cannot relabel the saved text boundary chart".into());}
@@ -709,6 +720,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 text_receiver,
                 self_source_mode,
                 inspect_all_currents,
+                inspect_normal_objective,
                 operative,
                 contact_response.unwrap_or(app.contact_response),
                 contact_realization.unwrap_or(app.contact_realization),
@@ -757,6 +769,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     text_receiver,
                     self_source_mode,
                     inspect_all_currents,
+                    inspect_normal_objective,
                     operative,
                     contact_response.unwrap_or(false),
                     contact_realization.unwrap_or(NativeContactRealization::DyadicDeposit),

@@ -9,7 +9,10 @@ use holonic_engine::native_ecology::constitutive_fibre::{
 };
 use serde::Serialize;
 
-pub const TEXT_BIT_PAIRS: usize = 9;
+/// An octet's bits plus one bit for the exterior part-boundary coordinate.
+pub const TEXT_BIT_PAIRS: usize = u8::BITS as usize + 1;
+const END_PART_CODEWORD: u16 = 1 << u8::BITS;
+const LAST_OCTET_CODEWORD: u16 = u8::MAX as u16;
 pub const TEXT_INPUT_CHANNELS: usize = 2 * TEXT_BIT_PAIRS;
 
 /// Application boundary direction. The duplex realization uses independent I/Q ports;
@@ -45,13 +48,13 @@ impl TextSymbol {
     pub fn codeword(self) -> u16 {
         match self {
             Self::Octet(value) => u16::from(value),
-            Self::EndPart => 256,
+            Self::EndPart => END_PART_CODEWORD,
         }
     }
     pub fn from_codeword(value: u16) -> Option<Self> {
         match value {
-            0..=255 => Some(Self::Octet(value as u8)),
-            256 => Some(Self::EndPart),
+            0..=LAST_OCTET_CODEWORD => Some(Self::Octet(value as u8)),
+            END_PART_CODEWORD => Some(Self::EndPart),
             _ => None,
         }
     }
