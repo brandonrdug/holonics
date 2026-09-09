@@ -11,7 +11,7 @@ mod producer;
 pub(super) mod operative;
 pub use operative::{NativeOperativeCurrentFactorCondensation,NativeOperativeReturnStorage,NativeOperativeReflectionReading,NativeOperativeContactBirth, NativeOperativeContactReading, NativeOperativeContactStaging,
     NativeMaterialContactResponse, NativeMaterialContactResponseReading, NativeRetainedMaterialRelation, NativeMaterialContactStepComparison, NativeFiniteMaterialResponse, NativeContactRealization, NativeContactDepositReading};
-pub use producer::{PairedContactCotangent, PairedJunctionCotangent, PairedJunctionLinearization, PairedJunctionTangent,JointMaterialContactResponse,joint_material_contact};
+pub use producer::{CausalContactPropagation, CausalContactPropagationCotangent, CausalContactPropagationEnclosure, PairedContactCotangent, PairedJunctionCotangent, PairedJunctionLinearization, PairedJunctionTangent,JointMaterialContactResponse,joint_material_contact};
 #[cfg(test)]
 mod solver_tests;
 pub use enclosure::{

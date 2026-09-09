@@ -157,9 +157,11 @@ in this order:
 
 1. Compose source-qualified propagation, reflection and exchange through the existing phase,
    addressed-span, paired and source owners. The tensor-factor phase realization and its pending
-   persistence now return; an internal propagation/source law and the complete material-family
-   passage remain open. Retain the whole ball/fibre and actual boundary across this composition.
-   New transport belongs in the historical producer, adjoint and current-factor decoder. Derive
+   persistence now return. The [causal-contact connection](../../research/records/2026-09-09_AC1_CAUSAL_CONTACT_JOINS_RETURN_A_PROPAGATION_AND_ITS_MORPHOLOGY_DERIVATIVE.md)
+   now has exact/enclosed propagation and complete morphology-return references, including an
+   actual stored-operator comparison. Integrate its resident word/residual, propagated input
+   boundary and sparse `D_source H` return with the historical producer, journal and checkpoint.
+   Keep the newborn zero-input constraint and the complete material-family passage. Derive
    what sustains, redirects or ends expression without substituting a chosen rotation, a
    codeword's canonical unit input or a scalar entropy penalty for that constitutive relation.
 2. The [stored normal-objective comparison](../../research/records/2026-09-09_AC1_THE_NORMAL_OBJECTIVE_SEPARATES_SOLVE_ERROR_FROM_OBSERVED_SOURCE_FIT.md)

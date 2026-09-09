@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 9, 2026. **Priority:** AC0–AC5 goal remains active; current cultivation seeks identifiable behavioral phenomena, not forced utility. Sixteen-family exposure and phase comparisons have returned; AC1–AC2 now address constitutive propagation and exchange.
+**Currency:** September 9, 2026. **Priority:** AC0–AC5 goal remains active; current cultivation seeks identifiable behavioral phenomena, not forced utility. Causal-contact propagation now has an exact/enclosed reference and complete morphology return; AC1–AC2 native integration remains active.
 **Position:** AC0 complete; AC1 accumulated-normal material integrated; AC1 path/generator reuse and AC2 situated feedback/useful continuation open; AC3 experimental artifacts; AC4–AC5 open.
 **Athena-alpha:** not yet attained.
 
@@ -89,6 +89,15 @@ model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction
 
+[established-bounded; implemented-exact; computational-witness] The
+[causal-contact propagation return](research/records/2026-09-09_AC1_CAUSAL_CONTACT_JOINS_RETURN_A_PROPAGATION_AND_ITS_MORPHOLOGY_DERIVATIVE.md)
+composes paired reflections along actual source joins using learned contact overlap. It returns
+the full point differential/adjoint and a complete family bound. A previously invisible interior
+becomes visible through a joined path with D fixed. On all 74 contacts of the stored first-family
+model, both internal and boundary balls separate; the enclosed reference takes 1.54 seconds
+versus 269.56 for full rational unfolding. Fourteen producer tests pass. These are exterior
+reference results; native execution and historical return integration remain open.
+
 [established-bounded; implemented-exact; measured] The
 [phase/relevance return](research/records/2026-09-09_AC1_AC2_REPEATED_FACES_RETAIN_PHASE_AND_EXCHANGE.md)
 completes sixteen-family exposure at 5,064 occurrences. The output still repeats ` the`; the
@@ -158,11 +167,11 @@ and useful responses remain open.
 
 [definition] **Current work: AC1 steps 3–4 and AC2's situated feedback/continuation.** Compose
 source-qualified propagation, reflection, exchange and the material/current boundary through
-existing owners. The fixed-junction interior has real relaxation/sign modes; the separate
-propagation/source law and complete family passage remain concrete work. Carry any new transport
-through the actual producer, adjoint and current-factor generator. Relevance is future receiver
-consequence, not present tensor agreement or a scalar loss alone. Neither a chosen rotation nor
-a repetition filter supplies the missing constitutive law. Research retains unusual behavior;
+existing owners. The declared causal-contact connection now has a verified reference; native
+evaluation must retain its family/residual, propagated input boundary and sparse `D_source H`
+adjoint term in the actual producer and journal. The original newborn zero-input constraint
+remains. Relevance is future receiver consequence, not present tensor agreement or a scalar
+loss alone. Research retains unusual behavior;
 useful response completion remains a later product requirement.
 AC0 is complete; AC1/AC2 remain open, AC3 is experimental and AC4–AC5 remain open.
 

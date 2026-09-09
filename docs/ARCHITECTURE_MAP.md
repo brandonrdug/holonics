@@ -339,6 +339,16 @@ product identity preserve the tensor receiver while retaining distinct root inpu
 retains native continuation/restart and stored-model comparisons. This exterior actuation
 facility does not implement a separate internal propagation law or learn a phase profile.
 
+[established-bounded; source-inspected] `field/junction/producer/propagation.rs` owns the
+`CausalContactPropagation` reference: chronological joins of `NativeOperativeContactBirth`,
+producing-column overlaps, composed paired reflections and the complete point tangent/adjoint.
+Its enclosed evaluation retains contact/current uncertainty and every dyadic omission.
+The `causal_contact_propagation` example applies it to an entire stored operator cut. The
+[source-join return](../research/records/2026-09-09_AC1_CAUSAL_CONTACT_JOINS_RETURN_A_PROPAGATION_AND_ITS_MORPHOLOGY_DERIVATIVE.md)
+records the hidden-current separator, complete learned-operator comparison and costs. Resident
+execution, sparse overlap return and journal/producer integration remain open; this is not a
+new native state owner or an implicit CPU cultivation path.
+
 [established-bounded; source-inspected] `resident/context_section.rs` and
 `constitutive_context_section.cuh` now derive the fixed-source context/return relation and its
 translated preimage. `field/context_section.rs` with `field_context_section.cuh` constructs the

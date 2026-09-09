@@ -8,6 +8,9 @@ use num_traits::{One, Zero};
 type Wave = ExactComplexWaveCurrent;
 type Error = ExactLinearError;
 
+mod propagation;
+pub use propagation::{CausalContactPropagation, CausalContactPropagationCotangent, CausalContactPropagationEnclosure};
+
 /// Exact reference for the simultaneous material and producer tangent contact. The caller
 /// supplies the actual real producer differential L; this is not a native learner or a cause
 /// selection. The two residuals share the current context, while the old reference is retained.

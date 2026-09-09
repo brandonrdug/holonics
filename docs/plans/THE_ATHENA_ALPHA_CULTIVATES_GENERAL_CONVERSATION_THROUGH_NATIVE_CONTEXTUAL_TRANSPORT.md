@@ -431,10 +431,12 @@ control changes emitted phase at unchanged scalar decay.
 
 [definition] The next source composition includes propagation, reflection and exchange. The
 fixed-contact interior's real relaxation/sign spectrum does not supply an independently
-advancing internal phase. Derive the actual propagation/source law from existing phase,
-addressed-span/connection and source owners, retaining its family, clock and complete return.
-If the propagated interior changes, the historical producer, adjoint and current-factor
-generator must change together. The material-ball ingress remains a separate concrete family
+advancing internal phase. The [causal-contact connection](../../research/records/2026-09-09_AC1_CAUSAL_CONTACT_JOINS_RETURN_A_PROPAGATION_AND_ITS_MORPHOLOGY_DERIVATIVE.md)
+now composes existing paired reflections along actual source joins with learned contact overlap.
+Its exact/enclosed reference, full derivative and stored-operator comparison return. Integrate
+the resident word/residual and its sparse `D_source H` return together with the historical
+producer, current-factor generator and checkpoint. Retain the newborn zero-input constraint.
+The material-ball ingress remains a separate concrete family
 obligation. Do not substitute a selected phase, a present tensor quotient or a scalar loss for
 future-stable relevance. Force-sector/exchange mathematics supplies construction dependencies
 at its stated scopes, without requiring calibration of all physical applications before AC work.
