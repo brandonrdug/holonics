@@ -86,6 +86,83 @@ constructs a pair population. It proves no execution independence. Ordered words
 transport; addressed spans additionally retain the carrying population. Even when all generators
 commute and their final-state receiver is order-blind, their histories remain distinct.
 
+## Exterior change, boundary reception and change of chart
+
+[proved-standard] For a smooth k-form ω and an oriented compact (k+1)-dimensional manifold Ω
+with boundary, with the induced boundary orientation, generalized Stokes states
+
+\[
+\int_\Omega d\omega=\int_{\partial\Omega}\omega.
+\]
+
+The compact-support/integrability variants keep their stated hypotheses. The fundamental theorem
+of calculus, Green's theorem and the classical curl/divergence integral formulas are instances.
+See [Conrad's Stokes treatment](https://math.stanford.edu/~conrad/diffgeomPage/handouts/stokescorners.pdf).
+
+[definition] In coordinate coframes the local expression is most clearly written on its argument:
+
+\[
+d\omega=\sum_i dq^i\wedge\partial_i\omega.
+\]
+
+The derivative acts on the coefficients of ω in the coordinate wedge basis. The wedge retains
+degree and antisymmetric orientation; d is not scalar subtraction. The coordinate expression
+describes an intrinsic operation. In a general moving coframe θ, the derivatives dθ also
+contribute. This matters for twisting and changing morphology: coordinate-basis formulas cannot
+silently erase the motion of the frame. The [coordinate-free formula](https://math.stanford.edu/~conrad/diffgeomPage/handouts/dmap.pdf)
+makes the corresponding vector-field bracket terms explicit.
+
+[proved-standard; formal-checked] For a sufficiently smooth map f:M→N, pullback commutes with
+exterior differentiation:
+
+\[
+d_M f^*\omega=f^*d_N\omega.
+\]
+
+Pullback evaluates the form on tangent vectors carried by Df. It does not require f to be an
+invertible coordinate change. The checked local normed-space owner is Mathlib's
+[`extDeriv_pullback`](https://leanprover-community.github.io/mathlib4_docs/Mathlib/Analysis/Calculus/DifferentialForm/Basic.html#extDeriv_pullback),
+with explicit differentiability/smoothness assumptions. Its `extDeriv_extDeriv` proves d²=0.
+This names the implemented local theorem rather than claiming a complete bundled manifold
+integration development in Holonics.
+
+[definition] The discrete pairing is `⟨dω,c⟩=⟨ω,∂c⟩`, with cochains given by the dual of the
+chain module and d=∂*. If transport maps F_k preserve boundary,
+`∂_N F_(k+1)=F_k ∂_M`, their duals preserve the cochain differential. For a proposed coarse or
+transport map, the exact failure seen by a receiver is
+
+```text
+⟨d_M F_k*ω - F_(k+1)* d_Nω, c⟩
+  = ⟨ω, (F_k ∂_M - ∂_N F_(k+1)) c⟩.
+```
+
+[proved-derived; formal-checked] `Geometry/ExteriorBoundary.lean` reuses `LinearMap.dualMap`
+to prove this pairing, square-zero under the actual chain condition, the commuting square and
+its signed defect. It imports the smooth differential-form owner. Existing instances include
+`Polarisation.theAdjointnessIsStokes`, `AddressedPassage.boundary_join`, the four-torus square
+boundary/cut pairings and the actual six-face smooth flux identities in `NavierStokesPeriodicFlux`.
+These share a construction; their different scopes remain explicit.
+
+[project-postulate] This is part of the framework's elementary organization: local changes
+compose through oriented faces, and a faithful change of chart or resolution carries their
+boundary relation. The full paired result comes before a scalar error bound. Boundary agreement
+can retain an active interior kernel, as the torus current already demonstrates. Stokes identifies
+the paired readings; reconstruction still needs its decoder and source conditions.
+
+[conditional] Given an actual space-time current form J and a source law dJ=S, Stokes on a
+world-tube returns **final stored quantity − initial stored quantity + outward lateral flux =
+integrated source**. The temporal caps carry opposite induced orientations. This joins changing
+interior storage and external interaction in one boundary calculation. The current, units and
+constitutive source law are supplied by the realization; the theorem then transports that balance
+through compatible charts. The discrete stored-current balance in the information-physics canon
+has the corresponding incidence form.
+
+[definition] The exterior derivative needs no metric. Vector gradient/curl/divergence charts,
+Hodge adjoints, material response and physical flux units add their own geometry and constitutive
+laws. A connection's covariant exterior derivative has curvature in its square, whereas ordinary
+d satisfies d²=0. Closed forms need not be globally exact; nontrivial periods and the retained
+winding/cohomology classes remain part of the framework.
+
 ## Tubes, clocks and networks of active interiors
 
 [definition] [`Transport/WorldTube`](../formal/elementary-holonics/ElementaryHolonics/Transport/WorldTube.lean)

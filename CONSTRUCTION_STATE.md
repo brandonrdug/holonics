@@ -21,6 +21,13 @@ reflection. The review also recovers the repository's acoustic CTC path-fibre sh
 This is a verified mathematical handoff; the proposed GPU rank-one optimization is not yet applied
 by this parallel review. The live Athena work below retains its own current position.
 
+## Exterior change and boundary reception
+
+[proved-derived; formal-checked] The [Stokes/pullback return](research/records/2026-09-09_STOKES_AND_PULLBACK_NATURALITY_ARE_FRAMEWORK_LAWS.md)
+exposes the dual boundary calculus, commuting transport square and its exact signed defect.
+README, canon and the framework guide now present this relation explicitly. The older triangle
+owner's prose has been corrected to preserve its actual algebraic scope and the interior fibre.
+
 ## Reality of Difference: active formal programme
 
 [proved-derived; formal-checked] The sustained goal's

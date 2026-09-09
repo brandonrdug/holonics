@@ -90,6 +90,12 @@ the geometry, clock, source family, full-current decoder, blind fibre and costs.
 [definition] These executable correspondences concern a finite exterior constitutive experiment.
 No Lean/runtime binding, new HNN engine or anatomical/continuum identity is introduced.
 
+[definition] `Geometry/ExteriorBoundary.lean` exposes the cochain/boundary pairing, induced
+pullback naturality, square-zero under the chain condition, and the exact boundary-transport
+defect. It reuses `LinearMap.dualMap` and imports Mathlib's smooth `extDeriv_pullback` owner.
+The [Stokes/pullback return](../research/records/2026-09-09_STOKES_AND_PULLBACK_NATURALITY_ARE_FRAMEWORK_LAWS.md)
+connects these to addressed boundaries, four-torus currents and the existing smooth flux sources.
+
 ## Foundation and transport
 
 [definition] **Preimage Fibre** is the governing term for compatible-source families. Some older

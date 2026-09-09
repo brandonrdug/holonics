@@ -66,6 +66,14 @@ cochain `a`, discrete Stokes gives `<a,∂Σ>=<da,Σ>`. For a nonabelian connect
 domain laws instantiated over the same causal grammar; they are not metaphors imported into
 software.
 
+[project-postulate] Stokes' pairing and pullback naturality are elementary organizing relations
+of Holonics. Local exterior change, oriented boundary reception and chart transport compose in
+one diagram. Preserve the full boundary/transport defect when a proposed restriction fails that
+diagram. Equal paired readings do not identify whole interiors. The
+[exterior-calculus presentation](../FORMAL_FRAMEWORK.md#exterior-change-boundary-reception-and-change-of-chart)
+connects ordinary forms, discrete cochains, moving frames, metric/constitutive additions and the
+existing formal owners; it does not identify every abstract receiver with a differential form.
+
 ## Physical apparatus
 
 Computation, transit, cache, and storage are receiver-relative physical retention under distinct

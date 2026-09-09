@@ -53,6 +53,11 @@ performances one occurrence.
 
 ## A toolkit that connects disciplines
 
+[project-postulate] **Exterior change and boundary reception belong together.** Stokes' pairing
+`⟨dω,c⟩ = ⟨ω,∂c⟩` and pullback naturality `d(f*ω) = f*(dω)` express local change, oriented
+composition and compatible change of chart. Their [framework presentation](docs/FORMAL_FRAMEWORK.md#exterior-change-boundary-reception-and-change-of-chart)
+connects smooth forms, discrete incidence, scale transport and retained boundary fibres.
+
 [definition] **Holonic Compression** changes the representation of a construction together with
 its decoder, retained distinctions and computational cost. A compact generator may describe an
 unbounded family of outputs; a finite unfolding carries its remainder. Recursive restriction and
