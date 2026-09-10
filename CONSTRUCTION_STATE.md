@@ -35,12 +35,12 @@ maps shared material, current contact and fresh response to existing HNN owners.
 witnesses expose the local source stencil's loss of larger ordering and separate present agreement
 from future agreement. This is an architecture review; native implementation and AC order are unchanged.
 
-[established-bounded; source-inspected] The [diagrammatic architecture return](research/records/2026-09-10_HNN_DIAGRAMS_EXPOSE_COMPOSITION_DEVELOPMENT_AND_SOULKILLER_LIFTS.md)
-now has twelve [Typst/Fletcher visual plates](research/papers/rendered/hnn-information-chemistry.pdf).
-The color receiver and triangular height surfaces expose local relations; the revised modal binding
-commutes under input swap and transported view. Exact color/incidence controls and the Typst build
-pass. The heat-fusion control and learned-diffusion comparison retain their separate scopes.
-No native adapter or AC implementation changed in this review.
+[established-bounded; source-inspected; computational-witness] The [diagrammatic architecture return](research/records/2026-09-10_HNN_DIAGRAMS_EXPOSE_COMPOSITION_DEVELOPMENT_AND_SOULKILLER_LIFTS.md)
+now has eighteen [Typst/Fletcher visual plates](research/papers/rendered/hnn-information-chemistry.pdf).
+Closed circulation, source-addressed manifold differences and intersecting-volume flux extend the
+color/covariance work. Möbius bridges retain orientation transport; exact incidence distinguishes
+the orientation cover from the surrounding closed shell. Exterior witnesses and the rendered
+Typst build pass. No native adapter or AC implementation changed in this review.
 
 [proved-derived; formal-checked] The [normal-geometry and closed-return review](research/records/2026-09-09_MATHEMATICAL_REVIEW_NORMAL_GEOMETRY_AND_CLOSED_RETURNS.md)
 returns a residual-aware rank-one normal identity, exact finite source/target changes and complex

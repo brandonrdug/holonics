@@ -2,10 +2,13 @@
 #import "../../lib/elements.typ": by-blue, by-red, by-yellow, by-black, by-rule, by-muted
 #import "geometry.typ": solid, simplex, chambers, relu-fold, wave-tile, tetrahedron-example, arithmetic-data, string-field, lattice-count, intensity-reference, intensity-difference-reference, surface-tile, primary-color
 
-#set document(title: "HNN - Information Chemistry", author: "Brandon Duggan / Holonics", description: "Twelve diagram plates: HNN, relational color, simplicial surfaces, covariant diffusion, reflection, and learned diffusion models.")
+#import "manifold-geometry.typ": torus, cube-net, root-action, overlap, flux-faces, manifold-data
+#import "orientation-geometry.typ": ribbon-surface, cover-seam, thickened-shorts, transport-square, orientation-data
+
+#set document(title: "HNN - Information Chemistry", author: "Brandon Duggan / Holonics", description: "Eighteen diagram plates: HNN, closed cartography, manifold differences, intersecting fields, and non-orientable bridges.")
 #set page(width: 320mm, height: 210mm, margin: (x:16mm,y:13mm), footer: context {
   set text(size:8pt,fill:by-muted)
-  [HOLONICS #h(1fr) HNN / INFORMATION CHEMISTRY #h(1fr) #counter(page).display("1") / 12]
+  [HOLONICS #h(1fr) HNN / INFORMATION CHEMISTRY #h(1fr) #counter(page).display("1") / 18]
 })
 #set text(font: "Libertinus Serif", size:11pt, fill:by-black)
 #set math.equation(numbering:none)
@@ -419,3 +422,170 @@
  #link("https://arxiv.org/abs/2208.09392")[Bansal et al., Cold Diffusion] /
  #link("https://arxiv.org/abs/2112.10752")[Rombach et al., latent diffusion].
  Local recovery: July 13 color law; August 9 spectral-receiver synthesis; August 18 geometric-autoencoder review; #raw("HolonicDiffusionCharts.lean").]
+
+#pagebreak()
+#title("13","A face state survives a change of alphabet","Recover the held cube's actual n = 17; carry the null, generators, ordering and face receiver together.")
+#grid(columns:(1fr,1fr,1fr),gutter:12mm,align:center,
+ [#text(size:13pt,weight:"semibold")[The original face map]\
+  #v(5mm)#cube-net()\
+  #v(4mm)
+  #text(size:10pt)[#raw(manifold-data.cube.face_word)]
+ ],
+ [#text(size:13pt,weight:"semibold")[Re-encoded colors and letters]\
+  #v(5mm)#cube-net(renamed:true)\
+  #v(4mm)
+  $rho^(-1)" decodes the same state"$
+ ],
+ [#text(size:13pt,weight:"semibold")[The action travels too]
+  #eq[$r(g dot s)=(r g r^(-1)) dot r(s)$]
+  #eq[$phi'=rho compose phi compose r^(-1)$]
+  #v(3mm)#caption([*Recovered computational witness.* The board returns #raw("R U'") at index 17 and birth moment 2. A color relabeling moves no source sticker. A spatial rechart conjugates the move alphabet. The enumeration order travels when the numerical address is retained.])
+ ],
+)
+#v(8mm)
+#grid(columns:(1fr,2fr),gutter:16mm,
+ [#align(center,root-action())],
+ [#text(size:13pt,weight:"semibold")[An actual Galois action on the geometric coefficients]
+  #eq[$K=QQ(zeta_(16)), quad zeta_(16)^8=-1, quad sigma_5:zeta_(16) mapsto zeta_(16)^5$]
+  #eq[$sigma_5^4=I, quad sigma_(5)(u v)=sigma_(5)(u)sigma_(5)(v)$]
+  #caption([*Exact cyclotomic witness.* The visible orbit is $1 arrow.r 5 arrow.r 9 arrow.r 13 arrow.r 1$. This field automorphism preserves the rational relations used on plate 15. It acts on coefficients and is not assumed to preserve geometric distance.])
+ ],
+)
+#v(5mm)
+#caption([*Definition.* God's number is the maximal shortest-word distance for the declared finite group and move alphabet. The board's 17 is an enumeration address. Its generator-relative depth is 2. Sources: the recovered #raw("RubikBoard.dc.html"), the August 30 action/shell records, and #link("https://leanprover-community.github.io/mathlib4_docs/Mathlib/NumberTheory/Cyclotomic/Gal.html")[Mathlib's cyclotomic Galois construction].])
+
+#pagebreak()
+#title("14","Closed cartography carries independent circulation","A periodic triangular complex: no outer square boundary, two noncontractible cycles, and a local curl return.")
+#grid(columns:(1fr,1fr,1fr),gutter:8mm,align:center,
+ [*Exact current*\ $j=d f$\
+  #v(3mm)#torus(kind:"exact",side:72mm)],
+ [*Add the two cycle currents*\ $j=d f+p omega_theta+q omega_phi$\
+  #v(3mm)#torus(kind:"cycles",side:72mm,loops:true)],
+ [*Add a coexact local current*\ $j=d f+p omega_theta+q omega_phi+s kappa$\
+  #v(3mm)#torus(kind:"full",side:72mm,loops:true)],
+)
+#eq[$V=N^2=256, quad E=3N^2=768, quad F=2N^2=512, quad chi=V-E+F=0, quad partial K=0$]
+#eq[$∮_(gamma_theta) omega_theta=∮_(gamma_phi) omega_phi=1, quad d omega_theta=d omega_phi=0, quad kappa=partial_2[f_0]$]
+#eq[$U_e=e^(2 pi upright(i) j_e), quad cal(H)_f=product_(e in partial f) U_e^(epsilon_(f,e))=e^(2 pi upright(i)(d j)_f)$]
+#v(3mm)
+#grid(columns:(1fr,1fr,1fr),gutter:8mm,align:center,
+ [*Edge heat: k = 0*\
+  #torus(k:0,side:43mm)],
+ [*k = 1*\
+  #torus(k:1,side:43mm)],
+ [*k = 4*\
+  #torus(k:4,side:43mm)],
+)
+#eq[$j_(k+1)=(I-L_1/10)j_k, quad L_1=partial_1^top partial_1+partial_2 partial_2^top$]
+#caption([*Exact incidence/Hodge witness; curved realization.* Indices are periodic modulo $N$, with angles $2 pi i/N$. Unit cochain metric; $10$ is the derived absolute-row-sum bound. The harmonic coordinates $(p,q)=(1/7,2/7)$ use Gram matrix $mat(2,1;1,2)$ against $(omega_theta,omega_phi)$ and survive; the local curvature diffuses. Initially $d kappa$ has values $(3,-1,-1,-1)$ on four faces. Color reads intrinsic edge components; blue/red traces mark complete cycles, including occluded segments. The embedding follows $f_k$; its induced metric is separate from this unit cochain metric and is compared on plate 15.])
+
+#pagebreak()
+#title("15","Compare the manifolds themselves","One source-addressed torus carrier; retain signed displacement, induced metric change, and the full comparison.")
+#grid(columns:(1fr,1fr),gutter:14mm,align:center,
+ [*Difference from 1+2=3 to 1+2=2*\ $Delta X_2=X_2-X_3$\
+  #torus(difference:2,side:90mm)],
+ [*Difference from 1+2=3 to 1+2=4*\ $Delta X_4=X_4-X_3$\
+  #torus(difference:4,side:90mm)],
+)
+#eq[$X_(c)(theta,phi)=((R+r_c cos phi)cos theta,(R+r_c cos phi)sin theta,r_c sin phi), quad R=2, quad r_c=1+f_c/4$]
+#eq[$f_c=frac(cos theta+2cos phi+c cos(theta+phi)+cos(theta-phi),c+4), quad c in {2,3,4}$]
+#eq[$6X_2+8X_4=14X_3, quad Delta X_2=-frac(4,3)Delta X_4$]
+#caption([*Proved-derived / exact cyclotomic witness.* The embeddings are compared at the same source parameters. The declared reference has tube radius $1$ and $R=2$, with $epsilon=1/(2R)=1/4$; $3/4<=r_c<=5/4<R$ keeps the smooth family embedded. Blue arrows point outward, red inward; lengths are explicitly magnified by $42/(8 epsilon)$ and $56/(8 epsilon)$ with $epsilon=1/4$. These are differences of parametrized embeddings, not subtraction of unlabeled point sets.])
+#v(4mm)
+#grid(columns:(1fr,1fr),gutter:12mm,
+ [#text(size:12pt,weight:"semibold")[The metric keeps the nonlinear remainder]
+  #eq[$g_c=(D X_c)^top D X_c, quad Q=(D Delta X_2)^top D Delta X_2$]
+  #eq[$Delta g_4+frac(3,4)Delta g_2=frac(21,16)Q$]
+  #caption([Point displacement is proportional, but metric change also contains the quadratic term. The exact nonzero matrix is retained in the source receipt.])],
+ [#text(size:12pt,weight:"semibold")[The rational relation survives Galois transport]
+  #eq[$sigma_(5)(Delta X_2)=-frac(4,3)sigma_(5)(Delta X_4)$]
+  #caption([At the 16th-root mesh, the coordinates lie in $QQ(zeta_(16))$ and $sigma_5$ fixes the rational comparison coefficients. All 256 sampled vector identities and the metric remainder at one declared point are checked exactly.])],
+)
+
+#pagebreak()
+#title("16","Intersecting fields: interior paths and boundary faces","Two source volumes meet in an actual overlap. A declared local operation relates their currents there.")
+#grid(columns:(1.15fr,1fr),gutter:14mm,
+ [#align(center,overlap())
+  #eq[$V_L={abs(x+1)+abs(y)+abs(z)<=2}, quad V_R={abs(x-1)+abs(y)+abs(z)<=2}$]
+  #eq[$K=V_L inter V_R={abs(x)+abs(y)+abs(z)<=1}, quad op("Vol")(K)=4/3$]
+ ],
+ [#text(size:13pt,weight:"semibold")[The full signed face map]
+  #v(4mm)#align(center,flux-faces())
+  #eq[$J_L=(x+1,y,z), quad J_R=(x-1,y,z), quad Delta J=(-2,0,0)$]
+  #eq[$Phi_(L)(sigma)=frac(1+sigma_x,2), quad Phi_(R)(sigma)=frac(1-sigma_x,2)$]
+  #eq[$Delta Phi(sigma)=-sigma_x, quad sum_sigma Delta Phi(sigma)=0$]
+  #caption([Every triangle retains its outward sign triple. Four faces read $+1$ and four read $-1$ although the aggregate vanishes. The declared overlap operation can retain the pair, add it, or read this difference.])
+ ],
+)
+#v(4mm)
+#grid(columns:(1fr,1fr),gutter:14mm,
+ [#text(size:12pt,weight:"semibold")[Gauss: volume source to surface flux]
+  #eq[$integral_K nabla dot J_L dif V=3(4/3)=4=integral_(partial K) J_L dot n dif A$]
+  #eq[$partial[V_L]+partial[V_R]=partial[V_L union V_R]+partial[K]$]
+  #caption([*Exact polyhedral calibration.* Common refinement cancels internal faces with their orientations. The same identity gives flux 8 for $J_L+J_R$ and 0 for $Delta J$.])],
+ [#text(size:12pt,weight:"semibold")[Stokes: compare actual paths with the same ends]
+  #eq[$integral_(gamma_("inside")) Delta J dot dif l=integral_(gamma_("surface")) Delta J dot dif l=-4$]
+  #eq[$Delta J=nabla(-2x), quad ∮_(partial S) Delta J dot dif l=0$]
+  #caption([The dashed diameter $P arrow.r Q$ and the surface path $P arrow.r R arrow.r Q$ have the same integral because this difference field is exact. Zero total flux alone would not establish this path equality or reconstruct the interior.])],
+)
+#v(3mm)
+#caption([*Proved-derived / exact rational witness.* Dimensionless Euclidean volumes; outward area vectors $sigma/2$ and face centroids $sigma/3$. Source, overlap, operation and receiver are explicit. The exterior script verifies all eight face returns, the volume identity and both path integrals.])
+
+#pagebreak()
+#title("17","A bridge can reverse the frame it carries","The same disk-and-ribbon construction: preserve incidence, then change the attachment and the available loops.")
+#grid(columns:(1fr,1fr,1fr),gutter:7mm,align:center,
+ [*Annulus: an untwisted passage*\
+  #v(3mm)#ribbon-surface(kind:"annulus",side:78mm)\
+  $chi=0, quad b=2, quad epsilon(a)=+1$],
+ [*Möbius band: an orientation-reversing passage*\
+  #v(3mm)#ribbon-surface(kind:"mobius",side:78mm)\
+  $chi=0, quad b=1, quad epsilon(a)=-1$],
+ [*Möbius shorts: add a second loop*\
+  #v(3mm)#ribbon-surface(kind:"shorts",side:78mm)\
+  $chi=-1, quad b=1, quad (epsilon(a),epsilon(b))=(-1,+1)$],
+)
+#v(3mm)
+#grid(columns:(1fr,1fr),gutter:12mm,
+ [#text(size:12pt,weight:"semibold")[Read the reversal from adjoining triangles]
+  #eq[$epsilon_g=-h_(f e)h_(g e)epsilon_f, quad epsilon(gamma)=product_(e in gamma)(-h_(f e)h_(g e))$]
+  #caption([*Exact incidence witness.* Shared-edge signs $h$ transport local face orientation. A loop product $-1$ prevents a global choice; it does not break local transport. Black traces show the complete boundary; red cross-arrows show the ribbon frame. The upper ribbon is $a$, the lower added ribbon is $b$.])],
+ [#text(size:12pt,weight:"semibold")[The “bridge” has declared contact ports]
+  #eq[$X arrow.l W arrow.r Y, quad T_gamma:V_X arrow.r V_Y, quad det(T_a)=-1$]
+  #caption([*Construction.* Mark attachment arcs as ports. The passage retains its local charts and reversing transport. Shorts have one boundary component: its two apparent legs are independent loops. The disk and both ribbons are embedded in three dimensions; a projected crossing introduces no new contact.])],
+)
+#v(4mm)
+#eq[$c_a(t)=(-cos t,0,2sin t), quad e_a(t)=(frac(-2sin t cos t,ell),cos t,frac(sin^2 t,ell)), quad ell=sqrt(sin^2 t+4cos^2 t)$]
+#eq[$c_b(t)=(0,-cos t,-2sin t), quad e_b=(1,0,0), quad X_a=c_a+v e_a, quad X_b=c_b+v e_b, quad abs(v)<=1/3$]
+#caption([*Defined realization.* $0<=t<=pi$; the untwisted control uses $e_a=(0,1,0)$. The upper/lower ribbons meet the square disk only at their attachments. Opaque color reads the unoriented face-normal line through $g=(n_x+n_z,n_y+n_z)$ and the prior primary response: $C(n)=C(-n)$. Both sides are drawn. Color therefore retains local shape while its sign fibre remains explicit. Möbius shorts are a Klein bottle with an open disk removed: #link("https://archive.bridgesmathart.org/2020/bridges2020-121.pdf")[Bridges 2020, figure 11].])
+
+#pagebreak()
+#title("18","One-sided interior, orientable surrounding boundary","Carry orientation as transport data; thicken the embedded object when the receiver needs an ordinary outward flux.")
+#grid(columns:(1fr,1fr,1fr),gutter:9mm,align:center,
+ [*The orientation cover*\
+  #v(6mm)#cover-seam()\
+  #eq[$pi:tilde(S) arrow.r S, quad tau^2=I$]
+  #caption([A Möbius circuit exchanges sheets. For shorts the connected cover is a torus with two boundary circles: $chi=-2$, $g=1$, $b=2$. The sheets record local orientation over one object.])],
+ [*Close the cover's two rims*\
+  #thickened-shorts(side:65mm)\
+  #eq[$partial N(S)=tilde(S) union_(partial tilde(S)) (partial S times I)$]
+  #caption([The boundary of a regular neighborhood of shorts is a closed orientable genus-2 surface. Yellow triangles join the cover along the original boundary. Offset $1/12$ is a quarter of ribbon half-width $1/3$; its picture illustrates the exactly checked shell incidence.])],
+ [*Two paths can return different currents*\
+  #v(4mm)#transport-square()\
+  #eq[$A=mat(1,0;0,-1), quad B=mat(0,-1;1,0)$]
+  #eq[$(B A-A B)(1,2)=(4,2)$]
+  #caption([*Exact declared connection.* The two returns are $(2,1)$ and $(-2,-1)$. Both have squared norm 5 and the same quadratic primary color. The retained oriented difference separates them.])],
+)
+#v(5mm)
+#grid(columns:(1fr,1fr),gutter:12mm,
+ [#text(size:12pt,weight:"semibold")[Generalize through a transported local system]
+  #eq[$T:Pi_1(S) arrow.r "Vect", quad T_(gamma_2 gamma_1)=T_(gamma_2)T_(gamma_1)$]
+  #eq[$epsilon:pi_1(S) arrow.r {+1,-1}, quad z(theta+2pi)=-z(theta)$]
+  #eq[$L tau^*=tau^* L, quad tau^*u=plus.minus u ⇒ tau^*((I-h L)u)=plus.minus (I-h L)u$]
+  #caption([*Construction / exact incidence witness.* $L$ is the cover's unit vertex Laplacian, $h=1/(2d_(max))$ from its maximal degree. Diffusion preserves even scalars or odd orientation-valued coefficients. A continuous real odd section on a reversing loop must have a zero. The flat connection $T$ carries paths; its noncommutativity is not forced by reversal alone.])],
+ [#text(size:12pt,weight:"semibold")[Gauss survives with the appropriate carrier]
+  #eq[$integral_S op("div")J dif mu=integral_(partial S) ⟨J,nu⟩ dif s$]
+  #eq[$integral_(N(S)) nabla dot J dif V=integral_(partial N(S)) J dot n dif A$]
+  #caption([*Proved-derived.* Riemannian intrinsic divergence uses a density and outward boundary conormal $nu$, so it needs no global surface normal. Ambient Gauss uses the orientable shell of the thickening. Orientation-valued forms on $S$ can be represented on its cover with the corresponding deck sign.])],
+)
+#v(4mm)
+#caption([*Source-inspected precedent.* #link("https://www.nature.com/articles/s41586-023-06022-7")[Guo et al., Nature 618 (2023)] construct non-orientable order and order-sensitive mechanical responses. The matrices here are a separate exterior calibration. *HNN interpretation:* retain the path, local frame and return through the addressed passage; a condensation owes $q_Y T_gamma=U_gamma q_X$ for the admitted future family. Source incidence and the orientation cover establish topology; no learned semantic bridge is inferred from a rendering.])

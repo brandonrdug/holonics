@@ -11,7 +11,8 @@ boundaries. Rendered appearance is presentation testimony, not proof.
 
 See `source/README.md` for build commands and paper-by-paper descriptions.
 
-- [HNN / Information Chemistry](rendered/hnn-information-chemistry.pdf): twelve visual plates in
+- [HNN / Information Chemistry](rendered/hnn-information-chemistry.pdf): eighteen visual plates in
   [Typst with Fletcher](source/papers/hnn-information-chemistry/main.typ), covering architecture,
-  layer maps, geometric strata, composition, source-model lifts, real-string diffusion images
-  exact reflection, relational color, covariant simplicial views and learned-diffusion comparisons.
+  layer maps, geometric strata, composition, source-model lifts, real-string diffusion images,
+  exact reflection, relational color, covariant simplicial views, learned-diffusion comparisons,
+  closed circulation, manifold differences, intersecting volumes and Möbius bridges.

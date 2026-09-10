@@ -15,13 +15,15 @@ order or installing a DeepSeek architecture.
 
 ## The architecture as explicit passages
 
-[definition] The visual presentation is now the twelve [Typst/Fletcher plates](../research/papers/rendered/hnn-information-chemistry.pdf),
+[definition] The visual presentation is now the eighteen [Typst/Fletcher plates](../research/papers/rendered/hnn-information-chemistry.pdf),
 with [editable source](../research/papers/source/papers/hnn-information-chemistry/main.typ).
 They show Athena/Eros, the categorical effects of layer operations, selection and rank strata,
 Information Chemistry through boundary cells and lattice-mode interference, Soulkiller's
 commuting lift, and actual arithmetic-string fields through diffusion, receiver images and
 face-conserving reflection. The color/simplicial and diffusion-model comparisons recover the
-existing primary-response law and repair the input-swap transport. The earlier [derivation record](../research/records/2026-09-10_HNN_DIAGRAMS_EXPOSE_COMPOSITION_DEVELOPMENT_AND_SOULKILLER_LIFTS.md)
+existing primary-response law and repair the input-swap transport. Closed triangular surfaces now
+carry independent circulation; signed manifold and overlap differences lead into orientable and
+Möbius bridges, orientation covers and surrounding flux boundaries. The earlier [derivation record](../research/records/2026-09-10_HNN_DIAGRAMS_EXPOSE_COMPOSITION_DEVELOPMENT_AND_SOULKILLER_LIFTS.md)
 retains the detailed source analysis. This concise visual entry replaces the fragile Mermaid diagrams.
 
 ## The assembly has several distinct roles

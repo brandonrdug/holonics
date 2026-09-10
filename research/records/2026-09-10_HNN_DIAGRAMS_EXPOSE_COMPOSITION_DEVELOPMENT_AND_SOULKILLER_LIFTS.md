@@ -10,7 +10,7 @@ documentation integration, alongside the separately running AC implementation.
 ## Return
 
 [definition] The maintained [HNN composition guide](../../docs/HNN_COMPOSITION.md#the-architecture-as-explicit-passages)
-now contains four diagrams:
+links the eighteen Typst/Fletcher plates. The initial source analysis below resolves four roles:
 
 1. Complete HNN passage, with Athena's standing/material, ordinary occurrence, local source/condition
    interaction, emitted receiver and Eros's producing-comparison return into one successor.
@@ -207,3 +207,66 @@ source determinism nor visual smoothing alone establishes that learned return.
 Typst build returns, and the changed image/comparison plates are visually inspected with PNG
 exports. Runtime source and the parallel session's active-position edits are preserved separately;
 this review changes only its own presentation and evidence.
+
+
+[project-postulate] The next visual continuation follows Brandon's held-cube face map, curved
+cartography, intersecting-field operators and differences of manifolds, then his request for
+orientable/non-orientable objects, especially Möbius shorts, as embedded bridges. Plates 13–18
+retain these constructions in the existing presentation.
+
+[established-bounded; source-inspected; computational-witness] `manifold-example.py` executes the
+original `research/design/holonic-cad-2026-08-30/expression-manipulator/artboards/RubikBoard.dc.html`
+storm functions: index 17 has word `R U'`, depth 2 and face string
+`FFUUDBDBLLFDRRUBFDRRUBLL`. An invertible face relabeling preserves that state. A spatial rechart
+conjugates the generators; enumeration address requires the corresponding transported ordering.
+
+[proved-derived; computational-witness] The periodic triangular carrier has `(V,E,F)=(256,768,512)`,
+zero boundary, two harmonic cochains with Gram matrix `[[2,1],[1,2]]`, and a coexact local current
+with nonzero face curvature. Exact edge heat uses the derived row bound 10 and retains harmonic
+coordinates. This composes the existing FourTorusCurrentChart and ExteriorBoundary/Stokes patterns.
+The displayed unit cochain metric is separate from the embedding's induced metric.
+
+[proved-derived; computational-witness] The source-addressed torus embeddings obey
+`6 X_2 + 8 X_4 = 14 X_3`; their metric differences retain the nonzero quadratic remainder
+`Δg_4 + (3/4)Δg_2 = (21/16)(DΔX_2)^T DΔX_2`. Exact arithmetic in `Q(ζ_16)` checks all 256
+sampled shape identities and the metric at the declared sample. The Galois automorphism
+`ζ_16 -> ζ_16^5` preserves rational relations, without an isometry claim. The intersecting
+translated octahedra have unit-octahedral overlap: the two currents return total flux 4 each;
+their difference retains eight signed face fluxes despite total zero. Its two displayed path
+integrals both equal -4 because the difference is exact, a stronger condition than zero total flux.
+
+[proved-derived; computational-witness] `orientation-example.py` builds a disk and actual ribbon
+attachments. It checks every vertex link, edge incidence, boundary square and boundary cycle,
+and constructs orientation covers by joining lifted corners with the shared-edge transition
+`ε_g = -h_fe h_ge ε_f`. The annulus returns `(χ,b)=(0,2)` and coherent orientation; the Möbius
+band returns `(0,1)` with a reversing loop; shorts return `(-1,1)` with a reversing loop.
+The cover deck involution preserves every adjacency row, so its unit vertex Laplacian
+commutes with deck transport and heat retains even scalars and odd orientation-valued coefficients.
+The step is derived as `1/(2 d_max)` from the actual cover graph.
+Their connected orientation covers are respectively annulus and twice-punctured torus for the
+two non-orientable cases. Joining lifted boundary pairs by annuli gives closed orientable shells
+of genus 1 and 2. The renderer's normal offset illustrates that checked incidence; the exact
+witness does not certify every floating display coordinate as an embedding. The smooth ribbon
+formula is given separately. These recover `contact_gluing.rs::orient`'s sign relation and the
+orientation/parity reading in `traversible_chain.rs`, without promoting a source test to this
+new topology witness.
+
+[established-bounded; source-inspected] The classification of shorts as Klein bottle minus a disk
+is recovered from [Bridges 2020, figure 11](https://archive.bridgesmathart.org/2020/bridges2020-121.pdf).
+[Guo et al. (2023)](https://www.nature.com/articles/s41586-023-06022-7) supply a physical precedent
+for non-orientable order and order-sensitive response. Our matrices are a separate declared flat
+connection: `BA(1,2)=(2,1)`, `AB(1,2)=(-2,-1)`. Their difference is `(4,2)` although squared norms
+and quadratic colors agree. Orientation reversal alone does not imply this noncommutativity.
+
+[interpretation] An embedded one-sided surface supplies an orientation-reversing passage between
+marked local ports. Its orientation cover retains frame data over one object; its regular
+neighborhood has an orientable outer boundary for ordinary ambient Gauss. Intrinsic divergence
+uses Riemannian densities and the outward boundary conormal. The HNN consequence is addressed
+transport with the complete returned difference; condensation owes the naturality square for
+every admitted future path. This is exterior construction and explanation, not a newly learned
+native bridge or a changed AC schedule.
+
+[established-bounded; process-audit] Both new exterior witnesses return successfully. The complete
+eighteen-page Typst build passes; all six added plates are visually inspected, including the final
+orientation/diffusion revision. Nine PNG plate exports match the current presentation. Only this
+review's presentation, witnesses, navigation and position paragraph are integrated.
