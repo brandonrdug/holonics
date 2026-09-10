@@ -1,7 +1,7 @@
 # Construction state
 
-**Currency:** September 9, 2026. **Priority:** AC0–AC5 goal remains active; current cultivation seeks identifiable behavioral phenomena, not forced utility. The historical source-map journal is implemented and verified; AC1–AC2 now connect propagation to the continuing recurrence.
-**Position:** AC0 complete; AC1 accumulated-normal material integrated; AC1 path/generator reuse and AC2 situated feedback/useful continuation open; AC3 experimental artifacts; AC4–AC5 open.
+**Currency:** September 9, 2026. **Priority:** AC construction and cultivation remain paused under Brandon’s September 9 direction. The source/history, mathematical composition and public Rust framework review has returned with in-scope repairs. No cultivation run is active.
+**Position at pause:** AC0 data preparation complete; AC1 accumulated-normal material implemented, with path/generator reuse open; AC2 learned codec and contextual continuation open; AC3 experimental artifacts; AC4–AC5 open. Exact component checks do not establish the adequacy of the assembled learning architecture.
 **Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -87,134 +87,42 @@ The [framework guide](docs/FORMAL_FRAMEWORK.md) connects physical, biological an
 instances. This continuation unifies already-engaged elementary patterns; it changes no native
 model or product grade and adds no numerical policy to the parallel AC1 work.
 
-## Current HNN construction
+## Current HNN construction — paused for review
 
-[established-bounded; implemented-exact; measured] The
-[source-map journal return](research/records/2026-09-09_AC1_THE_JOURNAL_GENERATES_ITS_HISTORICAL_SOURCE_MAPS.md)
-retains one map anchor, actual later birth columns and source-dependent sparse returns. Its
-native decoder recovers historical producers after further changes, archive and restart; late
-overflow preserves the field and false source lineage refuses. All 130 field cases pass and
-the old conversation checkpoint remains readable. The propagation recurrence is still unchanged;
-its source-bound current-factor and live feedback binding are the current work.
+[established-bounded; source-inspected] The [source/history and framework review](research/records/2026-09-09_THE_BYTE_FIELD_IS_NOT_THE_COMPLETE_HNN_COMPOSITION.md)
+finds that the active experimental profile is a finite complex-linear byte predictor over an
+operative boundary, with a source-qualified local return and fixed byte actuation. A complete
+historical producer is not a sequence-wide learning return; the journal's numerical reuse is
+not learned semantic generator reuse. Existing normalization, conditioned contact, nonlinear
+reaction, leader/rebase and future-receiver mathematics remain concrete composition dependencies.
+The source-parent attachment is present in the recorded run; a blanket disconnection diagnosis
+was checked and rejected. The AC entry has been revised around these distinctions.
 
-[established-bounded; implemented-exact; measured] The
-[resident causal-word return](research/records/2026-09-09_AC1_THE_CAUSAL_CONTACT_WORD_AND_ITS_SPARSE_RETURN_ARE_RESIDENT.md)
-stages forward current and the sparse morphology adjoint through actual source joins, without
-numerical section readout or source mutation. Three native controls pass; the shared division
-change passes all 128 field cases. The complete stored 74-contact model agrees with its enclosed
-reference; resident staging takes 0.109 seconds. The first launch configuration error is repaired.
-Generation is unchanged until the recurrence binding below returns.
+[established-bounded; computational-witness] Cold inspection of the two completed live-propagation
+runs finds identical reported bodies, generation and current histories. After the same emitted
+`t`, later states select `h`, `e` or a space. Every selected byte has a margin exceeding the
+retained uncertainty. Capitalization and fragments do not establish grammar or word generators.
+No further cultivation or prompt run is active. The [inspection receipt](research/experiments/normal_geometry_review/2026-09-09_paused_feedback_review.json)
+retains the exact output and comparisons.
 
-[established-bounded; implemented-exact; computational-witness] The
-[causal-contact propagation return](research/records/2026-09-09_AC1_CAUSAL_CONTACT_JOINS_RETURN_A_PROPAGATION_AND_ITS_MORPHOLOGY_DERIVATIVE.md)
-composes paired reflections along actual source joins using learned contact overlap. It returns
-the full point differential/adjoint and a complete family bound. A previously invisible interior
-becomes visible through a joined path with D fixed. On all 74 contacts of the stored first-family
-model, both internal and boundary balls separate; the enclosed reference takes 1.54 seconds
-versus 269.56 for full rational unfolding. Fourteen producer tests pass. These are exterior
-reference results; the subsequent native suboperator return is above, with historical integration open.
+[established-bounded; implemented-exact; computational-witness] The [live propagation return](research/records/2026-09-09_AC1_AC2_CAUSAL_PROPAGATION_ENTERS_THE_CONTINUING_RECURRENCE.md)
+retains its 132-case field check, source/restart comparison and exact-divider control. Prompt/emission
+work fell from 815.413 to 228.188 seconds with the same reported numerical body. These verify
+bounded implementation and cost, not adequacy of the assembled learning architecture.
 
-[established-bounded; implemented-exact; measured] The
-[phase/relevance return](research/records/2026-09-09_AC1_AC2_REPEATED_FACES_RETAIN_PHASE_AND_EXCHANGE.md)
-completes sixteen-family exposure at 5,064 occurrences. The output still repeats ` the`; the
-actual outgoing material contains 91 occurrences of `the`, versus 22 for the next word. A paired
-factor-phase intervention preserves the tensor packets and text while separating later currents;
-a broader profile changes the emitted trajectory with the same learned operators. Native pending
-input/restart and packet controls pass. The exact exterior propagation control separates phase
-advance from scalar decay. No native internal propagation law is claimed by that control.
+[established-bounded; process-audit] The public Rust facade now exposes existing `structure`
+and `geometry` without CUDA dependencies, with default `native` retaining the application APIs.
+Both Cargo configurations pass. The [Rust guide](docs/RUST_FRAMEWORK.md) explains the limited
+portable scope; advanced engine mathematics and desktop HNN remain CUDA-bound.
 
-[established-bounded; implemented-exact; measured] The
-[source-interior difference generator](research/records/2026-09-09_AC1_THE_SOURCE_INTERIOR_CHANGE_GENERATES_A_RETURN_FACTOR.md)
-replaces a retained contact factor with its actual before/after current difference. Field,
-archive/restart, restricted-prefix and causal-source controls pass. All 1,929 saved-model returns
-convert with unchanged reported numerical body. Native factor storage halves to 118,700,992
-bytes; the checkpoint saves 59,287,958 bytes. The scoped representation return is complete.
-
-[established-bounded; measured] The completed continuation adds eight families in 1,889.64
-seconds and saves a 1,518,483,970-byte checkpoint before its prompt. All development numerical
-section readouts belong to archive placement. The linked phase/relevance record retains full
-costs, exact cycle comparisons and the frequency observer; whole-ecology reuse remains open.
-
-[established-bounded; implemented-exact; measured] The
+[definition] Completed intermediate evidence remains in the
+[normal-material record](research/records/2026-09-09_AC1_THE_MATERIAL_OPERATOR_RETAINS_ITS_ACCUMULATED_SOURCE_GEOMETRY.md),
+[feedback review](research/records/2026-09-09_AC_THE_REPEATED_TEXT_FACE_IS_A_DRIVEN_OPEN_RETURN.md),
+[phase/relevance return](research/records/2026-09-09_AC1_AC2_REPEATED_FACES_RETAIN_PHASE_AND_EXCHANGE.md),
 [integer/abstraction review](research/records/2026-09-09_INTEGER_FACES_RETAIN_THEIR_GENERATING_RELATIONS.md)
-recovers the August basis/series directions and derives native bit capacities, normal layouts
-and text-boundary coordinates from their carried relations. All 117 field cases and two pure
-codec cases pass. Matched cultivation preserves the complete body/checkpoint byte-for-byte.
-The final compile check passes; the wider framework remains active.
-
-[project-postulate] Brandon's latest instruction prioritizes unconstrained, identifiable native
-behavior during research. Repetition and unusual output are observations to understand, not
-failures to suppress for usefulness. Exact source/return, ownership and declared apparatus
-constraints remain. The later consumer-product objective has not been relabeled complete.
-
-[established-bounded; measured] The [accumulated-normal return](research/records/2026-09-09_AC1_THE_MATERIAL_OPERATOR_RETAINS_ITS_ACCUMULATED_SOURCE_GEOMETRY.md)
-implements resident exact H/B/C statistics, complete numerical residual and source-family bounds,
-producing-operator recovery and rest/remount. Five retained early relations improve from losses
-0.556–0.722 to 0.142–0.342 after 75 occurrences. A clean development returns the same complete
-checkpoint with zero numerical development readouts, taking 21.89 seconds. The new law costs
-more than the previous 7.49-second run at this scope.
-
-[established-bounded; measured] The eight-family continuation completes 1,930 occurrences.
-Its checkpoint is 450,770,927 bytes; the additional seven families take 794.78 seconds. All
-11,130 development section readouts belong to declared history placement. Its answer is
-`’m the the the ...` through the 128-byte work limit; the accompanying current pattern is
-now research material under Brandon’s latest direction. The latest two native
-normal controls, 26 SDK controls and three driver controls pass at the linked execution scopes.
-No test count establishes Athena-alpha.
-
-[counterexample; measured; computational-witness] The [generation-boundary review](research/records/2026-09-09_AC_THE_REPEATED_TEXT_FACE_IS_A_DRIVEN_OPEN_RETURN.md)
-uses the parallel mathematical deposit and existing recorded currents. In both prompt variants,
-all 120 compared equal text coordinates four bytes apart have disjoint outgoing-current balls.
-The repeated face is not a four-step complete-state cycle. Every generated occurrence supplies
-nine fresh unit impulses through the canonical codec; the current adapter is a driven boundary.
-Prompt contact development changes the body but leaves this output unchanged.
-
-[established-bounded; implemented-exact; computational-witness] The
-[normal-objective observer](research/records/2026-09-09_AC1_THE_NORMAL_OBJECTIVE_SEPARATES_SOLVE_ERROR_FROM_OBSERVED_SOURCE_FIT.md)
-now separates data, prior and solve discrepancy with retained source-family bounds. Its exact
-control passes. Both saved-model readings return: at 1,930 occurrences the data term is
-836.69, prior cost 0.49 and further solve improvement is bounded by 1.76 × 10⁻³³. This
-redirects work from solve accuracy to the actual source/feedback representation. The recent
-[normal-producer reuse](research/records/2026-09-09_AC1_THE_RECENT_NORMAL_PRODUCER_IS_SHARED_INSTEAD_OF_RESOLVED.md)
-passes cached/decoded covector and restart controls. Matched development returns an identical
-complete checkpoint in 14.50 seconds versus 21.89, retaining 38.75 MB more native standing.
-There are still zero numerical development readouts. Larger journal/source-representation work
-and useful responses remain open.
-
-[definition] **Current work: AC1 steps 3–4 and AC2's situated feedback/continuation.** Compose
-source-qualified propagation, reflection, exchange and the material/current boundary through
-existing owners. Resident forward/reverse operators and the `D_source H` journal/decoder now
-return. Connect propagation of the existing interior before newborn zero-input formation and
-the same outer reflection. Retain original propagation input bounds, reuse recent forward words,
-and regenerate older words through their actual source maps/current boundaries. Pass the
-available producer into current-factor decoding so it does not rebuild the same dependency.
-Relevance is future receiver consequence, not present tensor agreement or a scalar
-loss alone. Research retains unusual behavior;
-useful response completion remains a later product requirement.
-AC0 is complete; AC1/AC2 remain open, AC3 is experimental and AC4–AC5 remain open.
-
-[established-bounded; source-inspected] The preceding [retention record](research/records/2026-09-09_AC1_LOCAL_CONTACT_IMPROVEMENT_COEXISTS_WITH_MATERIAL_FORGETTING.md)
-and its source chain retain the local contact improvements, failed text, source-preserving
-actuation, joint phase receiver, numerical-deposit boundary and exact historical returns.
-The [journal generator](research/records/2026-09-09_AC1_THE_RETURN_JOURNAL_KEEPS_ZERO_EXTENSION_AS_A_GENERATOR.md)
-and [reflection covariance reuse](research/records/2026-09-09_AC1_THE_SAME_CONTACT_COVARIANCE_SERVES_BOTH_SIDES_OF_A_REFLECTION.md)
-retain their measured storage/work reductions. These completed narratives now live in their
-records; their past probes do not schedule another unchanged run.
-
-[definition] The [mathematics/native guide](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) connects
-classical ML, normalization, reflection, leader/rebase, packing, tube and generator owners.
-The complex-fluid and boundary-flux records retain their actual source/receiver scope. No
-Millennium endpoint or universal intelligence theorem is a prerequisite to using these methods.
-External NS/Euler proof verification has not returned as a new Holonics endpoint.
-
-[established-bounded; source-inspected] The last reviewed Apple revision remains `9b7b4b63`.
-Mac research can continue within its documented temporal/acoustic and Metal scope; the later
-desktop owners have not been ported. The [hardware boundary](docs/HARDWARE_AND_MODALITY_BOUNDARIES.md)
-retains the comparison. No desktop acoustic campaign is required by the current AC work.
-
-[project-postulate] Preimage Fibre retains compatible causes and future-conduct constraints
-from limited observations. Perfect inversion and a singleton cause are not required. Lean remains
-outside cultivation/inference; the retired side database remains unused.
+and [historical map journal](research/records/2026-09-09_AC1_THE_JOURNAL_GENERATES_ITS_HISTORICAL_SOURCE_MAPS.md).
+Those returns schedule no experiments during this pause. No utility gate, repetition filter,
+singleton-cause requirement or live Lean binding has been introduced.
 
 ## Completed foundation and data preparation
 

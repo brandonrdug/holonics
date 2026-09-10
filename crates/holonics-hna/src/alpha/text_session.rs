@@ -102,6 +102,10 @@ impl<'field, 'chart> TextFieldSession<'field, 'chart> {
     pub fn enable_operative_contacts(&mut self) -> Result<(), AlphaMaterialError> {
         Ok(self.field.enable_operative_contacts()?)
     }
+    pub fn enable_causal_contact_propagation(&mut self) -> Result<(),AlphaMaterialError> {
+        if self.pending.is_some(){return Err(AlphaMaterialError::Apparatus("native reception is pending".into()));}
+        Ok(self.field.enable_causal_contact_propagation()?)
+    }
     /// Apply the native constrained contact response to the latest actual reception. This
     /// supplies no application-authored delta or new occurrence. Failure preserves the field
     /// as it stood after that reception, and success preserves its available emission.

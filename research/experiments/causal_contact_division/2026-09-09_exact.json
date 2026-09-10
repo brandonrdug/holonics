@@ -1,0 +1,15 @@
+{
+  "grade": "established-bounded",
+  "evidence": [
+    "implemented-exact",
+    "computational-witness"
+  ],
+  "scope": "Production shared header compiled on CPU; signed quotient and remainder compared with Python integers at limb boundaries and complete carrier widths. Native model regressions remain separate.",
+  "carrier_bits": [
+    256,
+    672
+  ],
+  "cases": 83456,
+  "refusals": 8,
+  "all_comparisons_passed": true
+}

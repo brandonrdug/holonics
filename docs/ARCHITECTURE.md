@@ -74,8 +74,10 @@ is retained. Application-produced and self-emitted occurrences use the same port
 and external compilation are separate operations over the resulting model, not alternative
 definitions of learning.
 
-[established-bounded; source-inspected] The public framework exposes
-`holonics::hna`, `holonics::soulkiller` and `holonics::interop` by composing existing owners.
+[established-bounded; source-inspected] The public framework exposes `holonics::structure`
+and `holonics::geometry` independently of the device runtime. Default `native` adds
+`holonics::{engine,hna,soulkiller,interop}` by composing existing owners; the
+[Rust guide](RUST_FRAMEWORK.md) states the exact scopes.
 The CLI uses that HNN entry point. It does not duplicate the native operation or treat an old
 snapshot/commit API as the full neural runtime.
 

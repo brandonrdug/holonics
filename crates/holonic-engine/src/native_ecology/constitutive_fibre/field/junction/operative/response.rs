@@ -3,6 +3,7 @@
 use super::*;
 use num_bigint::BigInt;
 use num_traits::One;
+use super::propagation::return_path::NativeCausalContactReturn;
 mod comparison;
 pub use comparison::{NativeFiniteMaterialResponse, NativeRetainedMaterialRelation, NativeMaterialContactStepComparison};
 
@@ -17,6 +18,7 @@ pub struct NativeMaterialContactResponse<'c> {
     currents: Rc<ResidentSection<'c>>,
     delta_bounds: Rc<ResidentSection<'c>>,
     diagnostics: ResidentSection<'c>,
+    propagation:Option<NativeCausalContactReturn<'c>>,
 }
 
 #[derive(Debug, Serialize)]
@@ -24,6 +26,9 @@ pub struct NativeMaterialContactResponseReading {
     pub query: NativeMaterialSourcePullbackReading,
     pub application_cut: usize,
     pub contact_covector: PairedContactCotangent,
+    /// Additional source-qualified term; the paired factors alone are not the full covector.
+    #[serde(skip_serializing_if="Option::is_none")]
+    pub propagation_contacts:Option<Vec<Vec<ExactComplexWaveCurrent>>>,
     pub contact_covector_radius: Rat,
     pub incoming_source: NativeFieldCurrentBall,
     /// The reaction includes a newborn's zero-input constraint; it is not a free birth value.
@@ -31,6 +36,16 @@ pub struct NativeMaterialContactResponseReading {
     pub potential_covector_radius: Rat,
     pub contact_factor_radii: [Rat; 2],
     pub solve_residual: NativeFieldCurrentBall,
+}
+impl NativeMaterialContactResponseReading {
+    pub fn contact(&self,at:usize) -> Result<Vec<ExactComplexWaveCurrent>,crate::exact_linear::ExactLinearError> {
+        let mut value=self.contact_covector.contact(at)?;
+        if let Some(extra)=self.propagation_contacts.as_ref().and_then(|v|v.get(at)) {
+            if extra.len()!=value.len(){return Err(crate::exact_linear::ExactLinearError::ShapeMismatch);}
+            for (a,b) in value.iter_mut().zip(extra){*a=a.add(b);}
+        }
+        Ok(value)
+    }
 }
 impl NativeMaterialContactResponse<'_> {
     pub fn inspect(&self) -> Result<NativeMaterialContactResponseReading, Error> {
@@ -50,6 +65,7 @@ impl NativeMaterialContactResponse<'_> {
         };
         let e = &out[2 * d + 4 * k..];
         Ok(NativeMaterialContactResponseReading {
+            propagation_contacts:self.propagation.as_ref().map(|p|p.inspect().map(|r|r.contact_covector)).transpose()?,
             query,
             application_cut: self.at_cut,
             contact_covector: PairedContactCotangent {
@@ -140,7 +156,7 @@ impl<'c> NativeConstitutiveField<'c> {
         }
         let k = op.births.len();
         let source=response.query.source.occurrence;
-        let generated=self.condense_operative_current_factors(source,response.query.contacts,&response.currents)?;
+        let generated=self.condense_operative_current_factors_using(source,response.query.contacts,&response.currents,Some(&response._producing.map))?;
         let (currents,current_difference_source)=match generated {
             Some(currents)=>(currents,Some(source)),
             None=>(Rc::clone(&response.currents),None),
@@ -156,7 +172,8 @@ impl<'c> NativeConstitutiveField<'c> {
             ports: response.ports.clone(),
             currents,
             current_difference_source,
-            source_overlap:None,
+            source_overlap:response.propagation.as_ref().map(|p|OperativeSourceOverlap{source,count:p.count,
+                coefficients:Rc::clone(&p.overlaps),errors:Rc::clone(&p.errors)}),
             b: None,
             bounds: response.delta_bounds.clone(),
         }))
@@ -267,7 +284,24 @@ impl<'c> NativeConstitutiveField<'c> {
                 receipt.obstruction
             )));
         }
+        let propagation=if let Some(word)=self.operative_source_propagation(source,Some(&producing.map))? {
+            let old_count=word.word.count;
+            let covector=surface.fresh_section(1,2*(2*old_count+1),ResidentGrain(0))?;
+            let mut passage=surface.begin_passage(&[vec![]])?;
+            {let lane=passage.open(0,&[])?;surface.record_operative_propagation_covector(&lane,&diagnostics,d,k,old_count,&covector)?;}
+            passage.close(0,&covector,64)?;
+            let receipt=passage.finish()?.launch()?;
+            if !receipt.obstruction.is_empty(){return Err(Error::Arithmetic(format!("propagation covector: {:?}",receipt.obstruction)));}
+            let returned=word.pull_back(&covector)?;
+            let mut passage=surface.begin_passage(&[vec![]])?;
+            {let lane=passage.open(0,&[])?;surface.record_operative_propagation_return(&lane,&returned.incoming,&returned.bounds,d,k,old_count,&diagnostics,&delta_bounds)?;}
+            passage.close(0,&diagnostics,64)?;
+            let receipt=passage.finish()?.launch()?;
+            if !receipt.obstruction.is_empty(){return Err(Error::Arithmetic(format!("joined propagation return: {:?}",receipt.obstruction)));}
+            Some(returned)
+        }else{None};
         Ok(NativeMaterialContactResponse {
+            propagation,
             surface,
             query,
             origin: op.origin.clone(),

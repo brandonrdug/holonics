@@ -904,8 +904,10 @@ name = "holonics"
 version = "0.1.0"
 dependencies = [
  "holonic-engine",
+ "holonic-structure",
  "holonics-hna",
  "life",
+ "relational-geometry",
 ]
 
 [[package]]

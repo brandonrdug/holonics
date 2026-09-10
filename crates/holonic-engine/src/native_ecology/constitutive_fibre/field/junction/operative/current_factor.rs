@@ -12,21 +12,12 @@ pub struct NativeOperativeCurrentFactorCondensation {
     pub factor_octets_after: u64,
 }
 
-impl OperativeState<'_> {
-    fn has_current_deposit_at(&self, cut: usize) -> bool {
-        let first = self.returns.partition_point(|r| r.at_cut < cut);
-        self.returns[first..]
-            .iter()
-            .take_while(|r| r.at_cut == cut)
-            .any(|r| r.b.is_some())
-    }
-}
-
 impl<'c> NativeConstitutiveField<'c> {
     fn operative_current_boundary(
         &self,
         source: usize,
         count: usize,
+        source_map:Option<&Rc<ResidentSection<'c>>>,
     ) -> Result<(Rc<ResidentSection<'c>>, Rc<ResidentSection<'c>>, usize), Error> {
         let op = self
             .junction
@@ -52,26 +43,11 @@ impl<'c> NativeConstitutiveField<'c> {
             ))
         };
         let (after, after_count) = read(source)?;
-        let (before, before_count) = if source == op.activated_at {
-            (
-                Rc::clone(&op.initial.b),
-                op.births
-                    .iter()
-                    .filter(|b| b.receiving < op.activated_at)
-                    .count(),
-            )
-        } else {
-            read(source - 1)?
-        };
+        let (before,before_count)=if let Some(word)=self.operative_source_propagation(source,source_map)? {
+            (Rc::clone(&word.word.current),word.word.count)
+        }else{self.operative_before_current(source)?};
         if after_count != count || before_count > count {
             return Err(Error::Shape);
-        }
-        // A separate nonzero current deposit between these boundaries has its own source.
-        // Such returns retain their materialized factor until that larger generator is bound.
-        if op.has_current_deposit_at(source) {
-            return Err(Error::Arithmetic(
-                "source interior has an intervening current deposit".into(),
-            ));
         }
         Ok((before, after, before_count))
     }
@@ -82,15 +58,11 @@ impl<'c> NativeConstitutiveField<'c> {
         count: usize,
         factors: &Rc<ResidentSection<'c>>,
     ) -> Result<Option<Rc<ResidentSection<'c>>>, Error> {
-        let op = self
-            .junction
-            .as_ref()
-            .and_then(|j| j.operative.as_ref())
-            .ok_or(Error::Shape)?;
-        if op.has_current_deposit_at(source) {
-            return Ok(None);
-        }
-        let (before, after, before_count) = self.operative_current_boundary(source, count)?;
+        self.condense_operative_current_factors_using(source,count,factors,None)
+    }
+    pub(super) fn condense_operative_current_factors_using(&self,source:usize,count:usize,
+        factors:&Rc<ResidentSection<'c>>,source_map:Option<&Rc<ResidentSection<'c>>>) -> Result<Option<Rc<ResidentSection<'c>>>,Error> {
+        let (before, after, before_count) = self.operative_current_boundary(source, count,source_map)?;
         self.transcode_operative_current_factors(
             &before,
             &after,
@@ -116,12 +88,16 @@ impl<'c> NativeConstitutiveField<'c> {
         returned: &OperativeReturn<'c>,
         limit: usize,
     ) -> Result<(Rc<ResidentSection<'c>>, usize), Error> {
+        self.resolve_operative_current_factor_prefix_using(returned,limit,None)
+    }
+    pub(super) fn resolve_operative_current_factor_prefix_using(&self,returned:&OperativeReturn<'c>,limit:usize,
+        source_map:Option<&Rc<ResidentSection<'c>>>) -> Result<(Rc<ResidentSection<'c>>,usize),Error> {
         let Some(source) = returned.current_difference_source else {
             return Ok((Rc::clone(&returned.currents), returned.factor_count));
         };
         let count = returned.factor_count.min(limit);
         let (before, after, before_count) =
-            self.operative_current_boundary(source, returned.factor_count)?;
+            self.operative_current_boundary(source, returned.factor_count,source_map)?;
         let factors = self.transcode_operative_current_factors(
             &before,
             &after,

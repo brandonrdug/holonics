@@ -6,13 +6,13 @@ pub(in super::super) struct NativeCausalContactReturn<'c> {
     surface: &'c ResidentSurface<'c>,
     _owner: Rc<()>,
     _origin: Rc<()>,
-    producing: Rc<OperativeSections<'c>>,
+    producing: Rc<ResidentSection<'c>>,
     forward: Rc<ResidentSection<'c>>,
-    pub(super) incoming: Rc<ResidentSection<'c>>,
+    pub(in super::super) incoming: Rc<ResidentSection<'c>>,
     pub(in super::super) overlaps: Rc<ResidentSection<'c>>,
     pub(in super::super) errors: Rc<ResidentSection<'c>>,
     pub(in super::super) bounds: Rc<ResidentSection<'c>>,
-    count: usize,
+    pub(in super::super) count: usize,
     d: usize,
     grain: u32,
 }
@@ -46,9 +46,9 @@ impl<'f, 'c> NativeCausalContactPropagation<'f, 'c> {
             surface.record_causal_contact_pullback(
                 &lane,
                 [
-                    &self._producing.map,
-                    &self._producing.bounds,
-                    &self.trace,
+                    &self.source_map,
+                    &self.source_bounds,
+                    &self.word.trace,
                     covector,
                 ],
                 d,
@@ -69,8 +69,8 @@ impl<'f, 'c> NativeCausalContactPropagation<'f, 'c> {
             surface,
             _owner: Rc::clone(&self.field.owner),
             _origin: Rc::clone(&self._origin),
-            producing: Rc::clone(&self._producing),
-            forward: Rc::clone(&self.trace),
+            producing: Rc::clone(&self.source_map),
+            forward: Rc::clone(&self.word.trace),
             incoming,
             overlaps,
             errors,
@@ -92,7 +92,7 @@ impl NativeCausalContactReturn<'_> {
         let overlaps = read(&self.overlaps)?;
         let errors = read(&self.errors)?;
         let bounds = read(&self.bounds)?;
-        let map = read(&self.producing.map)?;
+        let map = read(&self.producing)?;
         let trace = self.surface.detach_section(&self.forward, 64)?;
         let scale = BigInt::one() << self.grain;
         let rat = |value: i128| Rat::new(value.into(), scale.clone());

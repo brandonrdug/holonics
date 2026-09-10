@@ -112,9 +112,9 @@ __device__ ExactInteger<LimbCount> subtract_magnitude(
     return result;
 }
 
-// Magnitude long division with a positive divisor. One extra limb carries the doubled
-// remainder; the quotient has the numerator's sign and truncates toward zero. This extends
-// the same recurrence to each declared integer carrier instead of encoding a fixed bit width.
+// Magnitude long division with a positive divisor. Align the divisor's leading bit with
+// the numerator and visit only possible quotient positions. The remainder never grows past
+// the original numerator. The signed quotient truncates toward zero in every carrier.
 template <int LimbCount>
 __device__ ExactInteger<LimbCount> exact_divide_positive(
     const ExactInteger<LimbCount> &numerator,const ExactInteger<LimbCount> &denominator,
@@ -125,17 +125,29 @@ __device__ ExactInteger<LimbCount> exact_divide_positive(
     if(numerator.overflow || denominator.overflow || denominator.negative || denominator.is_zero()){
         result.overflow=true;return result;
     }
-    ExactInteger<LimbCount+1> remainder,divisor;
-    for(int i=0;i<LimbCount;++i)divisor.limb[i]=denominator.limb[i];
-    for(int bit=Integer::BITS-1;bit>=0;--bit){
-        uint32_t carry=(numerator.limb[bit/Integer::LIMB_BITS]>>(bit%Integer::LIMB_BITS))&1u;
-        for(int i=0;i<LimbCount+1;++i){
-            uint32_t next=remainder.limb[i]>>(Integer::LIMB_BITS-1);
-            remainder.limb[i]=(remainder.limb[i]<<1)|carry;carry=next;
-        }
+    int numerator_bits=0,denominator_bits=0;
+    for(int i=LimbCount-1;i>=0;--i){
+        if(!numerator_bits && numerator.limb[i])numerator_bits=i*Integer::LIMB_BITS+Integer::LIMB_BITS-__clz(numerator.limb[i]);
+        if(!denominator_bits && denominator.limb[i])denominator_bits=i*Integer::LIMB_BITS+Integer::LIMB_BITS-__clz(denominator.limb[i]);
+    }
+    if(numerator_bits<denominator_bits){*has_remainder=!numerator.is_zero();return result;}
+    const int shift=numerator_bits-denominator_bits,words=shift/Integer::LIMB_BITS,bits=shift%Integer::LIMB_BITS;
+    Integer remainder=numerator,divisor;remainder.negative=false;
+    for(int i=0;i<LimbCount-words;++i){
+        uint64_t value=(uint64_t)denominator.limb[i]<<bits;
+        divisor.limb[i+words]|=(uint32_t)value;
+        if(i+words+1<LimbCount)divisor.limb[i+words+1]|=(uint32_t)(value>>Integer::LIMB_BITS);
+        else if(value>>Integer::LIMB_BITS){result.overflow=true;return result;}
+    }
+    for(int bit=shift;bit>=0;--bit){
         if(compare_magnitude(remainder,divisor)>=0){
             remainder=subtract_magnitude(remainder,divisor);
             result.limb[bit/Integer::LIMB_BITS]|=(uint32_t)1u<<(bit%Integer::LIMB_BITS);
+        }
+        uint32_t carry=0;
+        for(int i=LimbCount-1;i>=0;--i){
+            uint32_t next=divisor.limb[i]&1u;
+            divisor.limb[i]=(divisor.limb[i]>>1)|(carry<<(Integer::LIMB_BITS-1));carry=next;
         }
     }
     *has_remainder=!remainder.is_zero();

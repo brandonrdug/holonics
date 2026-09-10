@@ -4,7 +4,15 @@ version = "0.1.0"
 edition = "2024"
 publish = false
 
+[features]
+default = ["native"]
+# Preserve the existing runtime API by default. Exact geometry and structural carriers can
+# also be used without compiling or linking the desktop device implementation.
+native = ["dep:holonics-hna", "dep:holonic-engine", "dep:life"]
+
 [dependencies]
-holonics-hna = { path = "../holonics-hna" }
-holonic-engine = { path = "../holonic-engine", default-features = false }
-life = { path = "../holonic-life" }
+holonic-structure = { workspace = true }
+relational-geometry = { workspace = true }
+holonics-hna = { path = "../holonics-hna", optional = true }
+holonic-engine = { path = "../holonic-engine", default-features = false, optional = true }
+life = { path = "../holonic-life", optional = true }

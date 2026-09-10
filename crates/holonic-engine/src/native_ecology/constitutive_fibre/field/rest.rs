@@ -653,6 +653,8 @@ impl NativeFieldRest {
             self.operative.as_ref().unwrap().validate(wire,n)?;
             if wire.return_frames.iter().any(|r|r.at_cut>h.history.len()){return Err(invalid("operative return beyond field cut"));}
             if wire.map_program.as_ref().is_some_and(|p|p.at_cut>h.history.len()){return Err(invalid("map program beyond field cut"));}
+            if wire.propagate_from.is_some_and(|at|at<wire.activated_at || at>h.history.len()
+                || wire.map_program.as_ref().is_none_or(|p|p.at_cut>at)) {return Err(invalid("propagation activation"));}
             for frame in &wire.return_frames {
                 if let Some(overlap)=&frame.source_overlap {
                     if frame.at_cut.checked_sub(1).is_none_or(|receiving|h.history.get(receiving)
@@ -661,6 +663,10 @@ impl NativeFieldRest {
                     }
                 }
                 if let Some(source)=frame.current_difference_source {
+                    if wire.propagate_from.is_some_and(|from|source>=from)
+                        && frame.source_overlap.as_ref().is_none_or(|h|h.source!=source) {
+                        return Err(invalid("propagated current-factor source dependency"));
+                    }
                     if source<wire.activated_at || frame.at_cut.checked_sub(1).is_none_or(|receiving|
                         h.history.get(receiving).is_none_or(|event|event.lineage.observed_source()!=Some(source))) {
                         return Err(invalid("current-factor source lineage"));
@@ -669,12 +675,6 @@ impl NativeFieldRest {
                         .ok_or_else(||invalid("current-factor source current"))?;
                     if after.count!=frame.factor_count.unwrap_or(frame.contact_count) {
                         return Err(invalid("current-factor source population"));
-                    }
-                    for (i,previous) in wire.return_frames.iter().enumerate().filter(|(_,r)|r.at_cut==source) {
-                        if !previous.zero_internal_delta && self.operative.as_ref().unwrap().returns[i][2]
-                            .intervals.iter().any(|v|*v!=(0,0)) {
-                            return Err(invalid("current-factor source has a separate current deposit"));
-                        }
                     }
                 }
             }
@@ -688,7 +688,12 @@ impl NativeFieldRest {
         for (at,(event,rest)) in h.history.iter().zip(&self.history).enumerate(){
             contacts+=usize::from(event.lineage.observed_source().is_some());
             if rest.operative.is_some()!=h.operative.as_ref().is_some_and(|o|at>=o.activated_at){return Err(invalid("operative historical presence"));}
-            if let Some(op)=&rest.operative{op.validate(dimension,contacts)?;}
+            if let Some(op)=&rest.operative{
+                op.validate(dimension,contacts)?;
+                if op.propagation_input_bounds.is_some()!=h.operative.as_ref().and_then(|o|o.propagate_from).is_some_and(|from|at>=from){
+                    return Err(invalid("historical propagation presence"));
+                }
+            }
         }
         let mut supplied = vec![false; h.history.len()];
         for source in h.source_slots.iter().flatten() {

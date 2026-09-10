@@ -224,6 +224,13 @@ the corresponding compression. This gives concrete composition work, not a new s
 
 ## What the broader review changes about AC1
 
+[definition] The [September 9 paused source review](../research/records/2026-09-09_THE_BYTE_FIELD_IS_NOT_THE_COMPLETE_HNN_COMPOSITION.md)
+compares the actual byte adapter with these owners. A historical producer decoder is not a
+sequence-wide adjoint, a finite normal fit does not establish a sufficient learned source chart,
+and a maximum-coordinate byte actuator does not implement the full conditioned-contact and
+generator composition. Those distinctions now govern the revised AC entry. Existing bounded
+normalization, reflection and compression returns remain available at their declared scopes.
+
 [definition] The [boundary-flux and tolerance return](../research/records/2026-09-08_BOUNDARY_FLUX_COUPLES_ACTIVE_INTERIORS_AND_TOLERANCE_IS_RECEIVER_RELATIVE.md)
 adds the moving-boundary source, two-interior mechanical impulse/decay example, exact
 force/entropy scope and modular spectral placement. Fixed paired-contact kernel modes alternate

@@ -1,8 +1,10 @@
 //! Exact causal execution and receiver-relative visibility.
 //!
-//! This crate is deliberately not a graphics framework.  It contains no
-//! window, camera, raster pipeline, physics package, floating-point scalar,
-//! or implicit world coordinate system.  It provides:
+//! This crate combines exact mathematical owners, resident native execution and exterior
+//! application/device charts. Raster, display and physical source modules retain their declared
+//! receiver scopes; their presence does not supply an implicit world coordinate system or a
+//! floating-point native learning law. The desktop build currently requires CUDA even when a
+//! client selects a purely mathematical module. It provides:
 //!
 //! - an abstract evolution shape with typed interaction;
 //! - arbitrary-grade causal incidence and exact local coordinate algebras;

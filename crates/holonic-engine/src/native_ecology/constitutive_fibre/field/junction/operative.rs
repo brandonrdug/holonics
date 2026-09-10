@@ -32,6 +32,7 @@ mod current_factor;
 mod propagation;
 mod map_source;
 use map_source::{OperativeMapProgram,OperativeSourceOverlap};
+use propagation::CausalPropagationSections;
 pub use propagation::{NativeCausalContactPropagation,NativeCausalContactPropagationReading,NativeCausalContactJoinReading};
 pub use current_factor::NativeOperativeCurrentFactorCondensation;
 
@@ -76,6 +77,8 @@ pub(in super::super) struct OperativeState<'c> {
     // Immutable producing carriers at the two most recent emission cuts. This is a
     // performance cache, not a context window: older producers retain their decoder.
     recent_producers:std::collections::VecDeque<(usize,usize,Rc<OperativeSections<'c>>)>,
+    recent_propagations:std::collections::VecDeque<(usize,Rc<CausalPropagationSections<'c>>)>,
+    pub(in super::super) propagate_from:Option<usize>,
     pub(in super::super) sections: Rc<OperativeSections<'c>>,
     pub(in super::super) initial: Rc<OperativeSections<'c>>,
     pub(in super::super) activated_at: usize,
@@ -93,12 +96,15 @@ pub(in super::super) struct PendingOperative<'c> {
     pub(in super::super) _scratch: ResidentSection<'c>,
     pub(in super::super) count: usize,
     birth:Option<Rc<ResidentSection<'c>>>,
+    pub(in super::super) propagation:Option<Rc<CausalPropagationSections<'c>>>,
+    propagation_input_bounds:Option<Rc<ResidentSection<'c>>>,
 }
 pub(in super::super) struct HeldOperative<'c> {
     pub(in super::super) b: Rc<ResidentSection<'c>>,
     pub(in super::super) bounds: Rc<ResidentSection<'c>>,
     pub(in super::super) trace: Rc<ResidentSection<'c>>,
     pub(in super::super) count: usize,
+    pub(in super::super) propagation_input_bounds:Option<Rc<ResidentSection<'c>>>,
 }
 /// Storage retained by the operative return journal, separate from historical field reports.
 /// These carriers are distinct per committed return; temporary handles share the same buffers.
@@ -135,8 +141,10 @@ impl<'c> OperativeState<'c> {
         if let Some(program)=&mut self.program {program.births.try_reserve(1).map_err(|_|Error::Shape)?;}
         Ok(())
     }
-    pub(in super::super) fn is_fixed(&self) -> bool {
-        self.returns.is_empty()
+    /// The older alternating-prefix current decoder needs unchanged contacts and no separate
+    /// propagation. This is not a claim that propagation alone changes the contact matrix.
+    pub(in super::super) fn has_legacy_current_decoder(&self) -> bool {
+        self.returns.is_empty() && self.propagate_from.is_none()
     }
     pub(in super::super) fn prepare(
         &self,
@@ -159,11 +167,13 @@ impl<'c> OperativeState<'c> {
             surface.fresh_section(1, 2 * (m * m + m) + 12 * count.max(1), ResidentGrain(0))?;
         let trace = Rc::new(surface.fresh_section(1, 18 * d + 12, ResidentGrain(0))?);
         let birth=(linked && self.program.is_some()).then(||surface.fresh_section(1,2*d,ResidentGrain(0)).map(Rc::new)).transpose()?;
+        let propagation=self.propagate_from.map(|_|CausalPropagationSections::prepare(surface,&self.births)).transpose()?;
+        let propagation_input_bounds=propagation.as_ref().map(|_|Rc::clone(&self.sections.bounds));
         let mut words = vec![];
         for ptr in [
             self.sections.map.lo_device_ptr(),
-            self.sections.b.lo_device_ptr(),
-            self.sections.bounds.lo_device_ptr(),
+            propagation.as_ref().map_or_else(||self.sections.b.lo_device_ptr(),|p|p.current.lo_device_ptr()),
+            propagation.as_ref().map_or_else(||self.sections.bounds.lo_device_ptr(),|p|p.bounds.lo_device_ptr()),
             sections.map.lo_device_ptr(),
             sections.map.hi_device_ptr(),
             sections.b.lo_device_ptr(),
@@ -197,6 +207,7 @@ impl<'c> OperativeState<'c> {
             _scratch: scratch,
             count,
             birth,
+            propagation,propagation_input_bounds,
         })
     }
     pub(in super::super) fn receive(
@@ -214,6 +225,8 @@ impl<'c> OperativeState<'c> {
         }
         self.recent_producers.push_back((at,next.count,Rc::clone(&next.sections)));
         while self.recent_producers.len()>2 {self.recent_producers.pop_front();}
+        if let Some(word)=next.propagation {self.recent_propagations.push_back((at,word));}
+        while self.recent_propagations.len()>2 {self.recent_propagations.pop_front();}
         self.sections = next.sections;
         self.origin = next.origin;
     }
@@ -225,6 +238,7 @@ impl<'c> PendingOperative<'c> {
             bounds: Rc::clone(&self.sections.bounds),
             trace: Rc::clone(&self.trace),
             count: self.count,
+            propagation_input_bounds:self.propagation_input_bounds.clone(),
         }
     }
 }
@@ -454,6 +468,7 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
         let activated_at = self.field_cut();
         OperativeState {
             recent_producers:Default::default(),
+            recent_propagations:Default::default(),propagate_from:None,
             initial: Rc::clone(&self.sections),
             sections: self.sections,
             activated_at,

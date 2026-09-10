@@ -247,7 +247,7 @@ fn material_contact_response_reaches_its_producer_and_changes_subsequent_conduct
     let mut actual = Vec::new();
     for i in 0..k {
         expected.extend(reference.contacts.contact(i).unwrap());
-        actual.extend(reading.contact_covector.contact(i).unwrap());
+        actual.extend(reading.contact(i).unwrap());
     }
     enclosed(&expected, &actual, &reading.contact_covector_radius);
     let norm: Rat = actual.iter().map(|v| v.norm_square()).sum();
@@ -351,7 +351,7 @@ fn dyadic_contact_deposit_retains_its_defect_and_continues(){
     assert_eq!(deposit.unrounded_covector_radius,r.contact_covector_radius);
     assert!(deposit.numerical_projection_residual_norm_square>Rat::from_integer(0.into()));
     for i in 0..response.query.contacts {
-        let unrounded=r.contact_covector.contact(i).unwrap();
+        let unrounded=r.contact(i).unwrap();
         for j in 0..unrounded.len(){
             assert_eq!(after.contacts[i][j].subtract(&old.contacts[i][j]),
                 unrounded[j].add(&deposit.numerical_projection_residual[i][j]));

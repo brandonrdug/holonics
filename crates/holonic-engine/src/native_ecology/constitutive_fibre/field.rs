@@ -700,18 +700,22 @@ impl<'chart> NativeConstitutiveField<'chart> {
             .and_then(|v| v.checked_add(9))
             .ok_or(ConstitutiveFibreError::Shape)?;
         let output = surface.fresh_section(1, output_width, ResidentGrain(0))?;
-        if self.transport.as_ref().is_some_and(|t|!t.source.is_operative()) && self.junction.as_ref().and_then(|j|j.operative.as_ref()).is_some_and(|o|!o.is_fixed()) {
-            return Err(ConstitutiveFibreError::Rest("the fixed-contact material source cannot read changed operative contacts".into()));
+        if self.transport.as_ref().is_some_and(|t|!t.source.is_operative()) && self.junction.as_ref().and_then(|j|j.operative.as_ref()).is_some_and(|o|!o.has_legacy_current_decoder()) {
+            return Err(ConstitutiveFibreError::Rest("this material source requires the operative current decoder".into()));
         }
         let material_target=self.transport.as_ref().map_or((self.nodes(),0),|t|(t.target.dimension(self.nodes()).unwrap(),t.target.kernel()));
         let prepared = self.prepare_junction(observed_source_at.is_some())?;
         let prepared_transport = self.prepare_material_transport(observed_source_at)?;
         let actuation_target=actuation.map(|_|surface.fresh_section(1,4*material_target.0+2,ResidentGrain(0))).transpose()?;
-        let lineage_lanes = if resident_current.is_some() {
-            vec![vec![], vec![0]]
-        } else {
-            vec![vec![]]
-        };
+        let propagation=prepared.as_ref().and_then(|(p,_)|p.operative.as_ref()).and_then(|p|p.propagation.as_ref());
+        let mut lineage_lanes=Vec::new();
+        if resident_current.is_some(){lineage_lanes.push(vec![]);}
+        let propagation_lane=propagation.map(|_| {
+            let index=lineage_lanes.len();lineage_lanes.push(index.checked_sub(1).into_iter().collect());index
+        });
+        let field_lane=lineage_lanes.len();
+        let predecessors=field_lane.checked_sub(1).into_iter().collect::<Vec<_>>();
+        lineage_lanes.push(predecessors.clone());
         let mut passage = surface.begin_passage(&lineage_lanes)?;
         if let Some(current) = resident_current {
             {
@@ -720,11 +724,14 @@ impl<'chart> NativeConstitutiveField<'chart> {
             }
             passage.close(0, &input, 64)?;
         }
-        let (field_lane, predecessors) = if resident_current.is_some() {
-            (1, vec![0])
-        } else {
-            (0, vec![])
-        };
+        if let Some(index)=propagation_lane {
+            let word=propagation.unwrap();
+            {let lane=passage.open(index,&lineage_lanes[index])?;
+                let op=self.junction.as_ref().unwrap().operative.as_ref().unwrap();
+                word.record(surface,&lane,op.sections.current(),self.nodes(),op.grain)?;
+            }
+            passage.close(index,&word.bounds,64)?;
+        }
         {
             let lane = passage.open(field_lane, &predecessors)?;
             if let Some((quadrature,coordinate))=actuation {

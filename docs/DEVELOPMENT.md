@@ -22,9 +22,10 @@ target/debug/holonics --help
 target/debug/holonics hna --help
 ```
 
-For Rust clients, depend on the local `crates/holonics` package and use
-`holonics::{hna,soulkiller,interop}`. The framework re-exports its implementation owners; it
-does not create a second neural engine.
+For Rust clients, the local `crates/holonics` package exposes `structure` and `geometry` even
+with default features disabled. Default `native` also exposes `engine`, `hna`, `soulkiller`
+and `interop`, preserving the existing runtime API. The [Rust framework guide](RUST_FRAMEWORK.md)
+states the dependency and implementation boundaries. The facade re-exports its owners.
 
 ## Training and inference
 

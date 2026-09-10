@@ -1,9 +1,10 @@
-//! Athena-alpha application construction over the existing native HNA owners.
+//! Experimental conversation apparatus over the existing native HNN owners.
 //!
-//! This module supplies cold conversation exposure and a declared octet excitation chart for
-//! the native port-field owner, with shared historical sources and an exterior differential text
-//! receiver. The first native text return repeats a byte; useful contextual conversation remains
-//! construction in the active Athena-alpha blueprint.
+//! `exposure` retains cold source-qualified occurrences; `text_codec` declares UTF-8 octet and
+//! part-marker excitation; `text_session` advances one borrowed field; `checkpoint` preserves
+//! that session. These are separate from the field's learned material operator. The codec's
+//! fixed bit-pair layout and maximum-coordinate receiver are not learned word/phrase generators.
+//! General conversation and a shared learned multimodal codec remain open construction.
 
 pub mod checkpoint;
 pub mod exposure;

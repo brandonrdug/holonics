@@ -281,7 +281,7 @@ impl<'c> NativeConstitutiveField<'c> {
             } else {
                 None
             };
-            let (factors, factor_count) = self.resolve_operative_current_factor_prefix(r, count)?;
+            let (factors, factor_count) = self.resolve_operative_current_factor_prefix_using(r, count,source_map.as_ref())?;
             let output = Rc::new(surface.fresh_section(count.max(1), 2 * d, ResidentGrain(0))?);
             let mut passage = surface.begin_passage(&[vec![]])?;
             {

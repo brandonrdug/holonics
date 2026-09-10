@@ -1,0 +1,68 @@
+{
+  "grade": "established-bounded",
+  "evidence": [
+    "computational-witness"
+  ],
+  "scope": "Cold inspection of two completed live-propagation reports. No source-passage attribution, model run or asymptotic claim.",
+  "same_complete_reported_body": true,
+  "same_generation": true,
+  "same_recorded_current_history": true,
+  "prompt_and_emission_seconds": [
+    815.412920391,
+    228.187970062
+  ],
+  "feedback": {
+    "output": "The the the the the the the the the the the the the te te te te t t the the the the te te te te t t t t the the the the te te te",
+    "disposition": {
+      "kind": "interrupted"
+    },
+    "every_recorded_selection_has_separating_margin": true,
+    "distinct_next_octets_after_same_emitted_t": [
+      32,
+      101,
+      104
+    ],
+    "witnesses": [
+      {
+        "emission_index": 0,
+        "source_occurrence": 1991,
+        "selected_octet": 84,
+        "previous_emitted_octet": null,
+        "gap_grid_numerator": "108636973630670821727",
+        "radius_grid_numerator": "1328763640296379",
+        "grain": 72,
+        "strict_maximum_over_full_ball": true
+      },
+      {
+        "emission_index": 5,
+        "source_occurrence": 1996,
+        "selected_octet": 104,
+        "previous_emitted_octet": 116,
+        "gap_grid_numerator": "424827015728891355914",
+        "radius_grid_numerator": "996562845398998",
+        "grain": 72,
+        "strict_maximum_over_full_ball": true
+      },
+      {
+        "emission_index": 53,
+        "source_occurrence": 2044,
+        "selected_octet": 101,
+        "previous_emitted_octet": 116,
+        "gap_grid_numerator": "68448814478445471468",
+        "radius_grid_numerator": "973287230270405",
+        "grain": 72,
+        "strict_maximum_over_full_ball": true
+      },
+      {
+        "emission_index": 65,
+        "source_occurrence": 2056,
+        "selected_octet": 32,
+        "previous_emitted_octet": 116,
+        "gap_grid_numerator": "18480671912550784496",
+        "radius_grid_numerator": "924825694795046",
+        "grain": 72,
+        "strict_maximum_over_full_ball": true
+      }
+    ]
+  }
+}

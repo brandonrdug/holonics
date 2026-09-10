@@ -23,6 +23,8 @@ mathematical subject or a source dependency is obsolete.
 The old `soma/` parent no longer divides host Rust libraries, device targets, formal projects and
 tools into a parallel tree. Package names for older substrate components remain stable; the
 public HNN library is now `holonics-hna`, and `holonics` is the framework entry point.
+Its [Rust API](RUST_FRAMEWORK.md) exposes the existing structural and geometric libraries
+without default features; the default native implementation retains its device dependencies.
 
 ## Relocation guide
 

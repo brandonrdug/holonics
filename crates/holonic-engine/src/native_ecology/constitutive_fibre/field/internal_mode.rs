@@ -244,8 +244,8 @@ impl<'c> NativeConstitutiveField<'c> {
         left: usize,
         right: usize,
     ) -> Result<NativeSharedDriveMode<'c>, ConstitutiveFibreError> {
-        if self.junction.as_ref().and_then(|j|j.operative.as_ref()).is_some_and(|o|!o.is_fixed()) {
-            return Err(ConstitutiveFibreError::Rest("the fixed-drive quotient does not cover changed operative contacts".into()));
+        if self.junction.as_ref().and_then(|j|j.operative.as_ref()).is_some_and(|o|!o.has_legacy_current_decoder()) {
+            return Err(ConstitutiveFibreError::Rest("the alternating-prefix quotient does not cover this operative current law".into()));
         }
         if left == right {
             return Err(ConstitutiveFibreError::Shape);

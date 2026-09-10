@@ -22,6 +22,7 @@ pub struct NativeMaterialContactStepComparison {
     pub gradient_metric: NativeMaterialPullbackMetric,
     pub producing_contacts: usize,
     pub current_contacts: usize,
+    pub propagated_source_contacts:Option<usize>,
     pub source_input: NativeFieldCurrentBall,
     /// Actual entering source current, extended by zero at contacts born afterwards.
     /// This declared diagnostic excitation does not reset the continuing ecology's interior.
@@ -49,17 +50,26 @@ fn evaluate(
     internal: &NativeFieldCurrentBall,
     material: &NativeFieldMaterialTransportState,
     observed: &NativeFieldCurrentBall,
+    propagated_count:Option<usize>,
 ) -> Result<NativeFiniteMaterialResponse, Error> {
-    let input = &internal.center[..contacts.contacts.len()];
-    let exact = PairedJunctionLinearization::at(contacts.contacts.clone(), &source.center, input)
+    let mut input=internal.center[..contacts.contacts.len()].to_vec();
+    let mut internal_radius=internal.radius.clone();
+    if let Some(count)=propagated_count {
+        if count>contacts.contacts.len(){return Err(Error::Shape);}
+        let word=CausalContactPropagation::at(&contacts.births[..count],contacts.contacts[..count].to_vec(),&input[..count])
+            .map_err(|e|Error::Arithmetic(e.to_string()))?;
+        let family=word.enclosed_internal(&contacts.contacts_radius,&internal.radius).map_err(|e|Error::Arithmetic(e.to_string()))?;
+        input[..count].clone_from_slice(&family.center);internal_radius=family.radius;
+    }
+    let exact = PairedJunctionLinearization::at(contacts.contacts.clone(), &source.center, &input)
         .map_err(|e| Error::Arithmetic(e.to_string()))?;
     // The paired scattering operator is unitary. Its map variation is bounded by 2||delta D||,
     // via the two resolvents of the skew-adjoint block I+[0,-D;D†,0], each of norm at most one.
     let output_radius = &source.radius
-        + &internal.radius
+        + &internal_radius
         + Rat::from_integer(2.into())
             * &contacts.contacts_radius
-            * (l1(&source.center) + l1(input));
+            * (l1(&source.center) + l1(&input));
     let outgoing = NativeFieldCurrentBall {
         center: exact.outgoing().to_vec(),
         radius: output_radius,
@@ -216,6 +226,7 @@ impl<'c> NativeConstitutiveField<'c> {
             .iter()
             .filter(|birth| birth.receiving < source)
             .count();
+        let propagated_count=op.propagate_from.filter(|from|source>=*from).map(|_|old_count);
         let (input, input_bounds) = if source == op.activated_at {
             (op.initial.b.clone(), op.initial.bounds.clone())
         } else {
@@ -282,6 +293,7 @@ impl<'c> NativeConstitutiveField<'c> {
             &internal,
             &material,
             &observed,
+            propagated_count,
         )?;
         let after = evaluate(
             &proposed.inspect()?,
@@ -289,6 +301,7 @@ impl<'c> NativeConstitutiveField<'c> {
             &internal,
             &material,
             &observed,
+            propagated_count,
         )?;
         Ok(NativeMaterialContactStepComparison {
             source: response.query.source.clone(),
@@ -298,6 +311,7 @@ impl<'c> NativeConstitutiveField<'c> {
             gradient_metric: response.query.metric(),
             producing_contacts: response.query.contacts,
             current_contacts: op.births.len(),
+            propagated_source_contacts:propagated_count,
             original_material,
             observed: observed.clone(),
             producing_contacts_with_current_material: evaluate(
@@ -306,6 +320,7 @@ impl<'c> NativeConstitutiveField<'c> {
                 &internal,
                 &material,
                 &observed,
+                propagated_count,
             )?,
             strictly_improves: after.half_squared_difference.upper
                 < before.half_squared_difference.lower,

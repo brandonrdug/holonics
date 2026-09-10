@@ -6,7 +6,9 @@ remain the only scheduling authorities.
 
 ## Reading rule
 
-[definition] The public framework entry point is `crates/holonics/src/lib.rs`. Its ground-up HNN
+[definition] The public framework entry point is `crates/holonics/src/lib.rs`. `structure` and
+`geometry` re-export their existing crates without default features; default `native` includes
+the engine and application owners. See [the Rust guide](RUST_FRAMEWORK.md). Its ground-up HNN
 adapter is `crates/holonics-hna/src/native.rs`; the earlier inherited-operator adapter is `hna.rs`
 in that crate. Shared delivery is `stream.rs`; CLI entry points are
 `applications/holonics-workbench/src/{adapters/hna,session_stream}.rs`. These compose the native
@@ -370,6 +372,16 @@ material adjoint and deposit observer carry the same source expression and linea
 [journal return](../research/records/2026-09-09_AC1_THE_JOURNAL_GENERATES_ITS_HISTORICAL_SOURCE_MAPS.md)
 records exact historical maps, archive/restart, refusal and legacy-model checks. This is an
 executable coefficient representation, not a second learner or an archive of every map state.
+
+[established-bounded; source-inspected] `CausalPropagationSections` now enters the field's
+ordinary passage before newborn formation and paired reflection. `operative/rest.rs` retains
+the activation cut and original input-bound carrier; `propagation.rs` regenerates older words
+from their source maps and actual current boundaries. `current_factor.rs` accepts the available
+producer, including separate current deposits. `response.rs` joins the propagated input reaction
+and sparse contact covector; its observer's `contact` method exposes the complete sum.
+`holonics-hna::alpha::text_session` delegates activation to the same owner. The
+[live return](../research/records/2026-09-09_AC1_AC2_CAUSAL_PROPAGATION_ENTERS_THE_CONTINUING_RECURRENCE.md)
+records source/restart checks and the active actual-conversation comparison.
 
 [established-bounded; source-inspected] `resident/context_section.rs` and
 `constitutive_context_section.cuh` now derive the fixed-source context/return relation and its

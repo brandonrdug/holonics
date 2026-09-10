@@ -353,6 +353,7 @@ fn run_session(
     inspect_normal_objective: bool,
     condense_current_journal: bool,
     actuation_phase_pairs: &[ActuationPhasePair],
+    causal_propagation:Option<bool>,
     operative: bool,
     contact_response: bool,
     contact_realization: NativeContactRealization,
@@ -376,6 +377,11 @@ fn run_session(
     report["material_source"] = json!(session.field().material_transport_source());
     report["material_target"] = json!(session.field().material_target());
     report["text_receiver"] = json!(text_receiver);
+    if causal_propagation==Some(true){session.enable_causal_contact_propagation()?;}
+    if causal_propagation==Some(false) && session.field().causal_contact_propagation_from().is_some(){
+        return Err(AlphaMaterialError::Apparatus("cannot omit the saved propagation law from this continuing field".into()));
+    }
+    report["causal_contact_propagation_from"]=json!(session.field().causal_contact_propagation_from());
     let source_mode=self_source_mode.unwrap_or(if matches!(session.field().material_target(),Some(NativeMaterialTarget::TensorProduct{..})) && matches!(text_receiver,TextCurrentReceiver::Material){TextGenerationSourceMode::Actuation}else{TextGenerationSourceMode::Observation});
     report["self_source_contact"] = json!(source_mode!=TextGenerationSourceMode::Withdrawal);
     report["self_source_mode"] = json!(source_mode);
@@ -504,6 +510,7 @@ fn run_session(
             .unwrap_or_else(|error| json!({"receiving":receiving,"error":error.to_string()}))
     }).collect::<Vec<_>>());
     let field = session.field();
+    report["final_return_storage"]=json!(field.operative_return_storage());
     report["final_native_census_before_diagnostics"] = json!(field.census());
     let start = Instant::now();
     let final_occurrence = field.occurrence_count().checked_sub(1);
@@ -564,7 +571,7 @@ fn run_session(
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut args = std::env::args().skip(1);
-    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary|operative-linear|operative-normal] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--self-source-mode actuation|observation|withdrawal] [--contact-metric current|relative-entropy|squared-probability] [--inspect-contact-cuts N,...] [--inspect-retained-receivings N,...] [--inspect-normal-objective true|false] [--condense-current-journal true|false] [--actuation-phase-pair I,J,NUM,DEN (repeatable)]")?;
+    let first=args.next().ok_or("usage: alpha_text EXPOSURE | --resume CHECKPOINT [--families N] [--fractional-bits G] [--prompt FILE --emit-symbols N] --report NEW.json [--checkpoint NEW.hna] [--history-archive NEW.history] [--material-source coupled-outgoing|complete-current|homogeneous-moment|contextual|bilinear-contextual|contextual-direct-sum|operative-contextual|operative-boundary|operative-linear|operative-normal] [--material-target direct-current|joint-packet] [--text-receiver material|constitutive] [--operative-junction true|false] [--contact-response true|false] [--duplex true|false] [--self-source-mode actuation|observation|withdrawal] [--contact-metric current|relative-entropy|squared-probability] [--inspect-contact-cuts N,...] [--inspect-retained-receivings N,...] [--inspect-normal-objective true|false] [--condense-current-journal true|false] [--causal-propagation true|false] [--actuation-phase-pair I,J,NUM,DEN (repeatable)]")?;
     let resume = if first == "--resume" {
         Some(PathBuf::from(
             args.next().ok_or("missing resume checkpoint")?,
@@ -578,6 +585,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut inspect_normal_objective = false;
     let mut condense_current_journal = false;
     let mut actuation_phase_pairs = Vec::new();
+    let mut causal_propagation=None;
     let mut operative = false;
     let mut contact_response = None;
     let mut contact_realization = None;
@@ -656,6 +664,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "--inspect-all-currents" => inspect_all_currents = value.parse::<bool>()?,
             "--inspect-normal-objective" => inspect_normal_objective = value.parse::<bool>()?,
             "--condense-current-journal" => condense_current_journal = value.parse::<bool>()?,
+            "--causal-propagation" => causal_propagation=Some(value.parse::<bool>()?),
             "--actuation-phase-pair" => {
                 let values=value.split(',').collect::<Vec<_>>();
                 if values.len()!=4{return Err("phase pair requires first-factor,second-factor,slope-numerator,slope-denominator".into());}
@@ -780,6 +789,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 inspect_normal_objective,
                 condense_current_journal,
                 &actuation_phase_pairs,
+                causal_propagation,
                 operative,
                 contact_response.unwrap_or(app.contact_response),
                 contact_realization.unwrap_or(app.contact_realization),
@@ -831,6 +841,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     inspect_normal_objective,
                     condense_current_journal,
                     &actuation_phase_pairs,
+                    causal_propagation,
                     operative,
                     contact_response.unwrap_or(false),
                     contact_realization.unwrap_or(NativeContactRealization::DyadicDeposit),

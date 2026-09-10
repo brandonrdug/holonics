@@ -4,6 +4,12 @@
 [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md) is the sole current-position record. Dated
 contracts and records preserve their completed scope; their old imperatives schedule no new work.
 
+[project-postulate] **September 9 superseding pause:** Brandon has paused AC construction and
+cultivation. The current authorized work is a source/history review, synthesis with the parallel
+mathematical framework, and justified abstraction/encapsulation repairs to the public Rust
+framework. The AC order below is retained for revision, not permission to continue experiments.
+Explain the actual text learning/feedback mechanism and its modality boundary before resuming.
+
 ## Fresh-session pickup
 
 1. Read [AGENTS.md](../../AGENTS.md), [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md), and this
@@ -126,8 +132,8 @@ what the native ecology does under actual source/context changes; do not force u
 manufacture unusual behavior. The later product objective remains distinct from this research
 criterion. AC1–AC3 may develop together as their actual conduct and costs permit.
 
-[project-postulate] Brandon has resumed AC0–AC5 as the active completion goal. His September 9
-clarification makes continued generators and their contextual cessation explicit. Repetition
+[historical] Brandon resumed the AC0–AC5 completion objective before the superseding review
+pause above. His September 9 clarification makes continued generators and their contextual cessation explicit. Repetition
 is not itself a defect or a completion test. Every update names the active step, actual return
 and concrete remaining relation; flexible derivation belongs inside this construction.
 
@@ -148,48 +154,36 @@ physical release and useful answer completion remain different consequences.
 completes sixteen-family exposure and source-qualified factor-phase comparisons. Equal present
 tensor inputs can have different later currents; a broader phase profile changes generated text
 with the same learned operators. The fixed-contact interior's real relaxation/sign modes and an
-exact propagation-before-reflection control identify the next composition. The force-sector,
+exact propagation-before-reflection control motivated the subsequently implemented candidate. The force-sector,
 exchange and situated-loss sources are included at their actual mathematical scopes.
 
-[definition] **Current entry: AC1 steps 3–4 together with AC2's situated feedback.** Use the
-[parallel normal/closed-return mathematics](../../research/records/2026-09-09_MATHEMATICAL_REVIEW_NORMAL_GEOMETRY_AND_CLOSED_RETURNS.md)
-in this order:
+[definition] **Paused entry: revisit AC1 steps 1–2, then compose steps 3–4 with AC2.**
+The [source/history review](../../research/records/2026-09-09_THE_BYTE_FIELD_IS_NOT_THE_COMPLETE_HNN_COMPOSITION.md)
+rejects advancing from a verified local derivative directly to broader cultivation. On resumption,
+use these existing obligations in order:
 
-1. Compose source-qualified propagation, reflection and exchange through the existing phase,
-   addressed-span, paired and source owners. The tensor-factor phase realization and its pending
-   persistence now return. The [causal-contact connection](../../research/records/2026-09-09_AC1_CAUSAL_CONTACT_JOINS_RETURN_A_PROPAGATION_AND_ITS_MORPHOLOGY_DERIVATIVE.md)
-   now has exact/enclosed propagation and complete morphology-return references, including an
-   actual stored-operator comparison. Its [resident forward/reverse word](../../research/records/2026-09-09_AC1_THE_CAUSAL_CONTACT_WORD_AND_ITS_SPARSE_RETURN_ARE_RESIDENT.md)
-   now returns without numerical readout or source mutation. Bind its sparse `D_source H` term
-   through the [now-verified historical map journal](../../research/records/2026-09-09_AC1_THE_JOURNAL_GENERATES_ITS_HISTORICAL_SOURCE_MAPS.md).
-   Connect the live recurrence and retain original propagation input bounds and the propagated
-   boundary in current-factor decoding. Reuse recent words and regenerate older ones through
-   the available source-map dependency. The existing interior propagates before newborn zero-input
-   formation and outer reflection. Keep the complete material-family passage. Derive
-   what sustains, redirects or ends expression without substituting a chosen rotation, a
-   codeword's canonical unit input or a scalar entropy penalty for that constitutive relation.
-2. The [stored normal-objective comparison](../../research/records/2026-09-09_AC1_THE_NORMAL_OBJECTIVE_SEPARATES_SOLVE_ERROR_FROM_OBSERVED_SOURCE_FIT.md)
-   now rules out a material benefit from additional solve precision at the measured cuts.
-   Keep data discrepancy, unit-prior cost and source-family uncertainty separate. Continue the
-   source/feedback and reuse construction; this diagnostic is not a new quality gate.
-3. The [recent normal-producer reuse](../../research/records/2026-09-09_AC1_THE_RECENT_NORMAL_PRODUCER_IS_SHARED_INSTEAD_OF_RESOLVED.md)
-   now returns an identical matched checkpoint with lower work and explicit extra residency.
-   The [source-interior difference generator](../../research/records/2026-09-09_AC1_THE_SOURCE_INTERIOR_CHANGE_GENERATES_A_RETURN_FACTOR.md)
-   now halves the retained current-factor storage and decodes the actual old factor through
-   archive, restart and receiver-requested prefixes. The stored other factor and source interiors
-   remain part of the next generator-reuse question.
-   Continue local path formation, restriction/rebase and generator reuse for the actual joint
-   boundary, material-query and changing-contact receivers. Keep contributions later morphology
-   can expose. Normal rank-one reuse must retain the actual numerical update history/residual or
-   a producer snapshot; historical H/B alone cannot recover a different approximate update law.
-4. Inspect the changed conduct on actual requests and followups at the stated exposure. AC2
-   and AC3 may develop together: the completed sixteen-part slice contains two incoming parts, so useful
-   general language is not a prerequisite to providing broader material through an affordable,
-   lawful recurrence. Preserve source/continuation controls and actual cost; a larger run does
-   not repair an identified defect by itself. Investigate repetition and deformation without
-   requiring utility at this stage. Do not install a phrase filter,
-   periodicity penalty, global damping constant or face-count stop, or rerun the unchanged
-   128-byte study as a substitute for the identified construction.
+1. Specify the source section, actual incidence and joint continuation receivers that learning
+   must distinguish. The fixed octet chart is exterior apparatus. Compose conditioned contact,
+   relative normalization and local constitutive reaction where their actual hypotheses apply;
+   a maximum-codeword receiver alone does not provide that composition.
+2. Connect the returned difference to the earlier relations responsible for the measured
+   continuation. The current material/paired/propagation adjoint is local to its producing step.
+   Its incoming covector and the prior producers are explicit remaining dependencies. Preserve
+   the one continuing owner and actual source-qualified factors; no historical coefficient
+   decoder is silently promoted to a full temporal learning law.
+3. Form, restrict and rebase reusable local generators through the existing leader/packing and
+   future-receiver owners. Use shared dependency evaluation and the returned map/current journal
+   where their numerical subcomputations agree. A learned family may remain plural; exact reuse
+   preserves the admitted future distinctions and its executable decoder.
+4. Derive the text receiver/actuator's attachment to that conduct, including source-conditioned
+   continuation and part completion. Read the complete recurrence, not merely a selected byte
+   re-encoded as fixed impulses. Repetition remains research material. Broader exposure follows
+   an affordable, explicit composition without requiring useful language first.
+
+[definition] The prior propagation, normal-fit, source-factor and journal receipts remain
+bounded implementation evidence. No additional run, precision increase, phase intervention or
+new physical-force constant is scheduled by this review. The superseding pause above remains
+in force; AC0 is preserved and AC1/AC2 remain incomplete.
 
 | Phase | Ordered construction | Return required |
 |---|---|---|

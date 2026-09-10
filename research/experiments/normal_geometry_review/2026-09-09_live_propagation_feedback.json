@@ -1,0 +1,64 @@
+{
+  "grade": "established-bounded",
+  "evidence": [
+    "measured",
+    "computational-witness"
+  ],
+  "scope": "Two saved-model prompt continuations; exact cold wire arithmetic. Unit-chart input norm is not calibrated physical energy. Equal text is not complete-state equality. No arbitrary-period or asymptotic claim.",
+  "same_output": false,
+  "same_complete_reported_body": false,
+  "runs": [
+    {
+      "prompt_contact_response": true,
+      "prompt_contact_deposits": 61,
+      "prompt_and_emission_wall_seconds": 61.780049559,
+      "generation_from": 1992,
+      "generation_until": 2120,
+      "disposition": {
+        "kind": "interrupted"
+      },
+      "output": "\u2019m the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the the",
+      "observed_byte_lag": 4,
+      "same_selected_coordinate_comparisons": 120,
+      "unequal_outgoing_centers": 120,
+      "disjoint_outgoing_balls": 120,
+      "separating_witness": {
+        "first_occurrence": 1995,
+        "later_occurrence": 1999,
+        "selected_coordinate": 32,
+        "outgoing_center_square_distance": "275956761544198427847287317046505477201678949/22300745198530623141535718272648361505980416",
+        "sum_radii_squared": "4727566990863025/1393796574908163946345982392040522594123776"
+      },
+      "exterior_input_norm_squares": [
+        "9"
+      ],
+      "every_generated_source_is_material_actuation": true
+    },
+    {
+      "prompt_contact_response": true,
+      "prompt_contact_deposits": 61,
+      "prompt_and_emission_wall_seconds": 815.412920391,
+      "generation_from": 1992,
+      "generation_until": 2120,
+      "disposition": {
+        "kind": "interrupted"
+      },
+      "output": "The the the the the the the the the the the the the te te te te t t the the the the te te te te t t t t the the the the te te te",
+      "observed_byte_lag": 4,
+      "same_selected_coordinate_comparisons": 81,
+      "unequal_outgoing_centers": 81,
+      "disjoint_outgoing_balls": 81,
+      "separating_witness": {
+        "first_occurrence": 1995,
+        "later_occurrence": 1999,
+        "selected_coordinate": 116,
+        "outgoing_center_square_distance": "29664130851061438819496835734425430307257819/22300745198530623141535718272648361505980416",
+        "sum_radii_squared": "18059512870461969/5575186299632655785383929568162090376495104"
+      },
+      "exterior_input_norm_squares": [
+        "9"
+      ],
+      "every_generated_source_is_material_actuation": true
+    }
+  ]
+}

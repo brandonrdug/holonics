@@ -2,6 +2,32 @@
 // x=B_g^-1 b, y=B_g^{-*} lambda, z=2(x_e conj(y_f)-y_e conj(x_f)).
 // The input reaction is 2y-lambda. Keep the joint unitary error instead of multiplying the
 // incoming uncertainty by a per-join gain. z supplies the sparse Hermitian morphology return.
+extern "C" __global__ void section_field_operative_propagation_covector(
+    const wide *paired,uint32_t d,uint32_t count,uint32_t old_count,wide *lo,wide *hi,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
+){
+    if(upstream_refused(census,lineage,lineage_count,slot))return;
+    size_t at=blockIdx.x*blockDim.x+threadIdx.x;
+    if(old_count>count){if(!at)atomicOr(slot,REFUSED_MALFORMED);return;}
+    if(at<2u*(size_t)old_count)lo[at]=hi[at]=paired[d+at];
+    if(!at){wide error=paired[2u*(size_t)d+4u*(size_t)count+2u];if(error<0)atomicOr(slot,REFUSED_MALFORMED);lo[2u*(size_t)old_count]=hi[2u*(size_t)old_count]=error;}
+}
+
+extern "C" __global__ void section_field_operative_propagation_return(
+    const wide *incoming,const wide *extra,uint32_t d,uint32_t count,uint32_t old_count,
+    wide *paired_lo,wide *paired_hi,wide *bounds_lo,wide *bounds_hi,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
+){
+    if(upstream_refused(census,lineage,lineage_count,slot))return;
+    size_t at=blockIdx.x*blockDim.x+threadIdx.x;
+    if(old_count>count || extra[0]<0 || extra[1]<0){if(!at)atomicOr(slot,REFUSED_MALFORMED);return;}
+    if(at<2u*(size_t)old_count)paired_lo[d+at]=paired_hi[d+at]=incoming[at];
+    if(!at){size_t e=2u*(size_t)d+4u*(size_t)count;
+        paired_lo[e+2u]=paired_hi[e+2u]=extra[0];
+        paired_lo[e+5u]=paired_hi[e+5u]=add_checked(paired_lo[e+5u],extra[1],slot);
+        bounds_lo[0]=bounds_hi[0]=add_checked(bounds_lo[0],extra[1],slot);
+    }
+}
 __device__ void cp_inverse_pair(const PropagationInteger &gr,const PropagationInteger &gi,
     const PropagationInteger &unit,const PropagationInteger &den,const wide *b,wide *out,
     wide *rounds,uint32_t *slot){

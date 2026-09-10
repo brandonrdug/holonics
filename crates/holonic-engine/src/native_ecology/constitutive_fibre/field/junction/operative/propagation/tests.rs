@@ -152,14 +152,14 @@ fn resident_causal_propagation_refuses_a_false_join_chronology() {
                     6,
                     1,
                     view.grain,
-                    &candidate.current,
-                    &candidate.bounds,
-                    &candidate.trace,
-                    &candidate.summary,
+                    &candidate.word.current,
+                    &candidate.word.bounds,
+                    &candidate.word.trace,
+                    &candidate.word.summary,
                 )
                 .unwrap();
         }
-        passage.close(0, &candidate.bounds, 64).unwrap();
+        passage.close(0, &candidate.word.bounds, 64).unwrap();
         assert!(!passage
             .finish()
             .unwrap()

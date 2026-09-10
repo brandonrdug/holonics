@@ -1,22 +1,122 @@
-//! Resident propagation on the existing borrowed operative source. This stages the actual
-//! word and its forward carriers; publication awaits the complete joined field return.
+//! Causal propagation and source-qualified history under the existing field owner.
+//! Standalone staging, live passages and historical decoding share the same native word.
 use super::*;
 use crate::resident_section::CausalPropagationLayout as Layout;
 use num_bigint::BigInt;
 use num_traits::One;
 pub(super) mod return_path;
 
+impl NativeConstitutiveField<'_> {
+    pub fn causal_contact_propagation_from(&self) -> Option<usize> {
+        self.junction.as_ref().and_then(|j|j.operative.as_ref()).and_then(|o|o.propagate_from)
+    }
+    /// Admit causal contact propagation from the next occurrence. The existing interior
+    /// propagates before a new zero-input contact is born; the same field owns the successor.
+    pub fn enable_causal_contact_propagation(&mut self) -> Result<(),Error> {
+        if !self.relation.usable || self.pending.is_some(){return Err(Error::Uncertain);}
+        if self.transport.as_ref().is_some_and(|t|!t.source.is_operative()){
+            return Err(invalid("causal propagation requires an operative material-source chart"));
+        }
+        self.enable_operative_contacts()?;self.retain_operative_map_program()?;
+        let cut=self.history.len();let op=self.junction.as_mut().unwrap().operative.as_mut().unwrap();
+        op.propagate_from.get_or_insert(cut);Ok(())
+    }
+}
+
+impl<'c> NativeConstitutiveField<'c> {
+    pub(super) fn operative_before_current(&self,source:usize) -> Result<(Rc<ResidentSection<'c>>,usize),Error> {
+        let op=self.junction.as_ref().and_then(|j|j.operative.as_ref()).ok_or(Error::Shape)?;
+        if source<op.activated_at || source>=self.history.len(){return Err(Error::ForeignOccurrence);}
+        let count=op.births.partition_point(|b|b.receiving<source);let surface=self.relation.surface;
+        let mut before=if source==op.activated_at {Rc::clone(&op.initial.b)} else {
+            self.history[source-1].with_resident(surface,|r| {
+                let state=r.operative.as_ref().ok_or(Error::Uncertain)?;
+                if state.count!=count{return Err(Error::Shape);}Ok(Rc::clone(&state.b))
+            })?
+        };
+        for r in op.returns.iter().filter(|r|r.at_cut==source) {
+            if let Some(delta)=&r.b {
+                if r.contact_count!=count{return Err(Error::Shape);}
+                let out=Rc::new(surface.fresh_section(count.max(1),4,ResidentGrain(0))?);
+                let mut passage=surface.begin_passage(&[vec![]])?;
+                {let lane=passage.open(0,&[])?;surface.record_operative_input_current_add(&lane,&before,delta,count,&out)?;}
+                passage.close(0,&out,64)?;
+                let receipt=passage.finish()?.launch()?;
+                if !receipt.obstruction.is_empty(){return Err(Error::Arithmetic(format!("source input current: {:?}",receipt.obstruction)));}
+                before=out;
+            }
+        }
+        Ok((before,count))
+    }
+
+    pub(super) fn operative_source_propagation(&self,source:usize,source_map:Option<&Rc<ResidentSection<'c>>>)
+        -> Result<Option<NativeCausalContactPropagation<'_,'c>>,Error> {
+        let op=self.junction.as_ref().and_then(|j|j.operative.as_ref()).ok_or(Error::Shape)?;
+        if source>=self.history.len(){return Err(Error::ForeignOccurrence);}
+        if op.propagate_from.is_none_or(|from|source<from){return Ok(None);}
+        let surface=self.relation.surface;
+        let count=op.births.partition_point(|b|b.receiving<source);
+        let bounds=self.history[source].with_resident(surface,|r|r.operative.as_ref()
+            .and_then(|o|o.propagation_input_bounds.clone()).ok_or(Error::Uncertain))?;
+        let map=match source_map {Some(map)=>Rc::clone(map),None=>self.operative_producing_map(source)?};
+        let word=if let Some((_,word))=op.recent_propagations.iter().find(|(at,_)|*at==source) {
+            if word.count!=count{return Err(Error::Shape);}Rc::clone(word)
+        }else{
+            let (before,before_count)=self.operative_before_current(source)?;
+            if before_count!=count{return Err(Error::Shape);}
+            let word=CausalPropagationSections::prepare(surface,&op.births[..count])?;
+            let mut passage=surface.begin_passage(&[vec![]])?;
+            {let lane=passage.open(0,&[])?;word.record(surface,&lane,[&map,&before,&bounds],self.nodes(),op.grain)?;}
+            passage.close(0,&word.bounds,64)?;
+            let receipt=passage.finish()?.launch()?;
+            if !receipt.obstruction.is_empty(){return Err(Error::Arithmetic(format!("source propagation: {:?}",receipt.obstruction)));}
+            word
+        };
+        Ok(Some(NativeCausalContactPropagation{field:self,at_cut:source,_origin:Rc::new(()),source_map:map,source_bounds:bounds,
+            births:op.births[..count].to_vec(),grain:op.grain,word}))
+    }
+}
+
+pub(in super::super::super) struct CausalPropagationSections<'c> {
+    births:Rc<ResidentSection<'c>>,
+    pub(in super::super::super) current:Rc<ResidentSection<'c>>,
+    pub(in super::super::super) bounds:Rc<ResidentSection<'c>>,
+    pub(super) trace:Rc<ResidentSection<'c>>,
+    summary:Rc<ResidentSection<'c>>,
+    pub(super) count:usize,
+}
+
+impl<'c> CausalPropagationSections<'c> {
+    pub(in super::super::super) fn prepare(surface:&'c ResidentSurface<'c>,births:&[NativeOperativeContactBirth]) -> Result<Rc<Self>,Error> {
+        let count=births.len();let mut addresses=Vec::with_capacity(2*count.max(1));
+        for birth in births {for at in [birth.source,birth.receiving] {
+            let at=i64::try_from(at).map_err(invalid)?;addresses.push((at,at));
+        }}
+        if addresses.is_empty(){addresses.resize(2,(0,0));}
+        Ok(Rc::new(Self {
+            births:Rc::new(surface.mount_section_rest(&ResidentSectionRest::found(count.max(1),2,ResidentGrain(0),64,addresses).map_err(invalid)?)?),
+            current:Rc::new(surface.fresh_section(count.max(1),4,ResidentGrain(0))?),
+            bounds:Rc::new(surface.fresh_section(1,4,ResidentGrain(0))?),
+            trace:Rc::new(surface.fresh_section(count.max(1),Layout::WORDS,ResidentGrain(0))?),
+            summary:Rc::new(surface.fresh_section(1,4,ResidentGrain(0))?),count,
+        }))
+    }
+    pub(in super::super::super) fn record(&self,surface:&'c ResidentSurface<'c>,lane:&crate::resident_section::Lane<'_,'c>,
+        input:[&ResidentSection<'c>;3],nodes:usize,grain:u32) -> Result<(),Error> {
+        Ok(surface.record_causal_contact_propagation(lane,&self.births,input,6*nodes,self.count,grain,
+            &self.current,&self.bounds,&self.trace,&self.summary)?)
+    }
+}
+
 pub struct NativeCausalContactPropagation<'f, 'c> {
     field: &'f NativeConstitutiveField<'c>,
+    at_cut:usize,
     _origin: Rc<()>,
-    _producing: Rc<OperativeSections<'c>>,
+    source_map:Rc<ResidentSection<'c>>,
+    source_bounds:Rc<ResidentSection<'c>>,
     births: Vec<NativeOperativeContactBirth>,
     grain: u32,
-    _births: ResidentSection<'c>,
-    pub(super) current: Rc<ResidentSection<'c>>,
-    pub(super) bounds: Rc<ResidentSection<'c>>,
-    pub(super) trace: Rc<ResidentSection<'c>>,
-    summary: ResidentSection<'c>,
+    pub(super) word:Rc<CausalPropagationSections<'c>>,
 }
 
 #[derive(Debug, Serialize)]
@@ -48,44 +148,13 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
         &self,
     ) -> Result<NativeCausalContactPropagation<'f, 'c>, Error> {
         let surface = self.field.relation.surface;
-        let count = self.births.len();
-        let d = 6 * self.field.nodes();
-        let mut addresses = Vec::with_capacity(2 * count.max(1));
-        for birth in &self.births {
-            for at in [birth.source, birth.receiving] {
-                let at = i64::try_from(at).map_err(invalid)?;
-                addresses.push((at, at));
-            }
-        }
-        if addresses.is_empty() {
-            addresses.resize(2, (0, 0));
-        }
-        let births = surface.mount_section_rest(
-            &ResidentSectionRest::found(count.max(1), 2, ResidentGrain(0), 64, addresses)
-                .map_err(invalid)?,
-        )?;
-        let current = Rc::new(surface.fresh_section(count.max(1), 4, ResidentGrain(0))?);
-        let bounds = Rc::new(surface.fresh_section(1, 4, ResidentGrain(0))?);
-        let trace =
-            Rc::new(surface.fresh_section(count.max(1), Layout::WORDS, ResidentGrain(0))?);
-        let summary = surface.fresh_section(1, 4, ResidentGrain(0))?;
+        let word=CausalPropagationSections::prepare(surface,&self.births)?;
         let mut passage = surface.begin_passage(&[vec![]])?;
         {
             let lane = passage.open(0, &[])?;
-            surface.record_causal_contact_propagation(
-                &lane,
-                &births,
-                self.sections.current(),
-                d,
-                count,
-                self.grain,
-                &current,
-                &bounds,
-                &trace,
-                &summary,
-            )?;
+            word.record(surface,&lane,self.sections.current(),self.field.nodes(),self.grain)?;
         }
-        passage.close(0, &bounds, 64)?;
+        passage.close(0, &word.bounds, 64)?;
         let receipt = passage.finish()?.launch()?;
         if !receipt.obstruction.is_empty() {
             return Err(Error::Arithmetic(format!(
@@ -95,15 +164,12 @@ impl<'f, 'c> NativeOperativeContactStaging<'f, 'c> {
         }
         Ok(NativeCausalContactPropagation {
             field: self.field,
+            at_cut:self.field_cut(),
             _origin: Rc::clone(&self.origin),
-            _producing: Rc::clone(&self.sections),
+            source_map:Rc::clone(&self.sections.map),source_bounds:Rc::clone(&self.sections.bounds),
             births: self.births.clone(),
             grain: self.grain,
-            _births: births,
-            current,
-            bounds,
-            trace,
-            summary,
+            word,
         })
     }
 }
@@ -113,10 +179,10 @@ impl NativeCausalContactPropagation<'_, '_> {
     pub fn inspect(&self) -> Result<NativeCausalContactPropagationReading, Error> {
         let surface = self.field.relation.surface;
         let read = |s: &ResidentSection<'_>| surface.detach_section(s, 64).map_err(Error::from);
-        let current = wides(&read(&self.current)?.intervals)?;
-        let bounds = wides(&read(&self.bounds)?.intervals)?;
-        let summary = wides(&read(&self.summary)?.intervals)?;
-        let trace = read(&self.trace)?;
+        let current = wides(&read(&self.word.current)?.intervals)?;
+        let bounds = wides(&read(&self.word.bounds)?.intervals)?;
+        let summary = wides(&read(&self.word.summary)?.intervals)?;
+        let trace = read(&self.word.trace)?;
         let scale = BigInt::one() << self.grain;
         let rat = |v: i128| Rat::new(v.into(), scale.clone());
         let waves = |values: &[i128]| {
@@ -190,7 +256,7 @@ impl NativeCausalContactPropagation<'_, '_> {
             return Err(Error::Shape);
         }
         Ok(NativeCausalContactPropagationReading {
-            field_cut: self.field.occurrence_count(),
+            field_cut: self.at_cut,
             fractional_bits: self.grain,
             internal: NativeFieldCurrentBall {
                 center: waves(&current[..2 * self.births.len()]),
@@ -205,3 +271,5 @@ impl NativeCausalContactPropagation<'_, '_> {
 
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod live_tests;

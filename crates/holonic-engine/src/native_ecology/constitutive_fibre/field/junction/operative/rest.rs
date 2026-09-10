@@ -50,6 +50,8 @@ pub(in super::super::super) struct OperativeWire {
     pub return_frames: Vec<OperativeReturnFrame>,
     #[serde(default,skip_serializing_if="Option::is_none")]
     pub map_program:Option<OperativeMapProgramFrame>,
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    pub propagate_from:Option<usize>,
 }
 #[derive(Debug, PartialEq, Eq)]
 pub(in super::super::super) struct OperativeRest {
@@ -65,6 +67,7 @@ pub(in super::super::super) struct OperativeHistoryRest {
     pub b: ResidentSectionRest,
     pub bounds: ResidentSectionRest,
     pub trace: ResidentSectionRest,
+    pub propagation_input_bounds:Option<ResidentSectionRest>,
 }
 impl OperativeWire {
     fn frame(&self, i: usize) -> OperativeReturnFrame {
@@ -92,26 +95,33 @@ impl OperativeHistoryRest {
         section: &mut impl FnMut(&ResidentSectionRest) -> Result<(), Error>,
     ) -> Result<(), Error> {
         let count = i64::try_from(self.count).map_err(invalid)?;
+        let mut header=vec![(count,count)];
+        if self.propagation_input_bounds.is_some(){header.push((1,1));}
         section(
-            &ResidentSectionRest::found(1, 1, ResidentGrain(0), 64, vec![(count, count)])
+            &ResidentSectionRest::found(1, header.len(), ResidentGrain(0), 64, header)
                 .map_err(invalid)?,
         )?;
         for s in [&self.b, &self.bounds, &self.trace] {
             section(s)?;
         }
+        if let Some(bounds)=&self.propagation_input_bounds {section(bounds)?;}
         Ok(())
     }
     pub fn read(
         section: &mut impl FnMut() -> Result<ResidentSectionRest, Error>,
     ) -> Result<Self, Error> {
         let count = section()?;
-        point_section(&count, 1, 1)?;
+        if !matches!(count.width,1|2){return Err(invalid("historical propagation header"));}
+        point_section(&count, 1, count.width)?;
+        let propagated=count.width==2;
+        if propagated && count.intervals[1]!=(1,1){return Err(invalid("historical propagation flag"));}
         let count = usize::try_from(count.intervals[0].0).map_err(invalid)?;
         Ok(Self {
             count,
             b: section()?,
             bounds: section()?,
             trace: section()?,
+            propagation_input_bounds:propagated.then(||section()).transpose()?,
         })
     }
     pub fn validate(&self, d: usize, expected: usize) -> Result<(), Error> {
@@ -121,6 +131,10 @@ impl OperativeHistoryRest {
         point_section(&self.b, expected.max(1), 4)?;
         point_section(&self.bounds, 1, 4)?;
         point_section(&self.trace, 1, 18 * d + 12)?;
+        if let Some(bounds)=&self.propagation_input_bounds {
+            point_section(bounds,1,4)?;
+            if wides(&bounds.intervals)?.iter().any(|v|*v<0){return Err(invalid("propagation input radius"));}
+        }
         if wides(&self.bounds.intervals)?.iter().any(|v| *v < 0) {
             return Err(invalid("historical map/current radius"));
         }
@@ -297,6 +311,7 @@ impl<'c> OperativeState<'c> {
     pub(in super::super::super) fn wire(&self) -> OperativeWire {
         OperativeWire {
             activated_at: self.activated_at,
+            propagate_from:self.propagate_from,
             births: self.births.clone(),
             returns: self.returns.len(),
             map_program:self.program.as_ref().map(|p|OperativeMapProgramFrame{at_cut:p.at_cut,return_count:p.return_count,contact_count:p.contact_count}),
@@ -413,6 +428,7 @@ impl<'c> OperativeState<'c> {
             .collect::<Result<Vec<_>, Error>>()?;
         Ok(Self {
             recent_producers:Default::default(),
+            recent_propagations:Default::default(),propagate_from:wire.propagate_from,
             sections: sections(rest.current)?,
             initial: sections(rest.initial)?,
             activated_at: wire.activated_at,
@@ -434,6 +450,7 @@ impl<'c> HeldOperative<'c> {
             b: surface.detach_section(&self.b, 64)?,
             bounds: surface.detach_section(&self.bounds, 64)?,
             trace: surface.detach_section(&self.trace, 64)?,
+            propagation_input_bounds:self.propagation_input_bounds.as_ref().map(|b|surface.detach_section(b,64)).transpose()?,
         })
     }
     pub(in super::super::super) fn mount(
@@ -445,6 +462,7 @@ impl<'c> HeldOperative<'c> {
             b: Rc::new(surface.mount_section_rest(&rest.b)?),
             bounds: Rc::new(surface.mount_section_rest(&rest.bounds)?),
             trace: Rc::new(surface.mount_section_rest(&rest.trace)?),
+            propagation_input_bounds:rest.propagation_input_bounds.map(|b|surface.mount_section_rest(&b).map(Rc::new)).transpose()?,
         })
     }
 }

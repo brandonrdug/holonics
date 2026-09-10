@@ -2,9 +2,10 @@
 
 **Authority:** Brandon's September 6 instruction to design and deposit this blueprint, update the
 roadmap and position, then immediately construct and complete it as a goal.
-**Status:** AC0–AC5 revised September 9 after the normal/feedback synthesis; AC0 complete, AC1 unfinished,
-AC2 has recorded text/current phenomena; useful language is a later product return. Brandon has resumed construction through completion as a goal,
-with explicit flexibility to revise designs when evidence warrants. **Order:** [the roadmap](THE_ROADMAP.md).
+**Status:** AC construction and cultivation paused September 9 by Brandon for source/history,
+mathematical composition and framework review. AC0 complete; AC1/AC2 partial; AC3 experimental;
+AC4–AC5 open. The retained completion objective does not override this pause.
+**Order:** [the roadmap](THE_ROADMAP.md).
 **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 
 ## 1. The required product
@@ -246,7 +247,16 @@ Only a changed source/availability mapping warrants new AC0 checks.
 
 ### AC1 — Compose the learned local response and reusable morphology
 
-[definition] Execute the following in order, returning a concrete composition at each step:
+[definition] The [paused review](../../research/records/2026-09-09_THE_BYTE_FIELD_IS_NOT_THE_COMPLETE_HNN_COMPOSITION.md)
+returns this entry to steps 1–2. A finite byte readout and faithful local adjoint do not establish
+the complete learned composition. The material map currently reads a fixed-width outgoing
+boundary; its local return exposes an incoming covector but does not traverse the earlier
+sequence. Source/section representation, conditioned interaction and temporal consequence must
+be joined explicitly before treating the journal's storage reuse as learned generator reuse.
+The existing formal and native owners remain foundations; a new mechanism is not presumed.
+
+[definition] On resumption, execute the following in order, returning a concrete composition
+at each step:
 
 1. **Connect the normalized receiver to actual native current.** Specify the produced-potential
    map, admitted population, frame/units, full ratio family, observed support and pullback.
@@ -256,7 +266,9 @@ Only a changed source/availability mapping warrants new AC0 checks.
    receiver kernel's source-specific target and deposit grain are explicit adapter obligations.
    Return the working resident port and an exact independent comparison of its current/adjoint.
 2. **Conduct the actual return through the producing ecology.** Preserve the forward source,
-   reference, overlays, frames and chronological dependencies. Reuse the established causal
+   reference, overlays, frames and chronological dependencies. Carry the returned difference
+   through the prior dependencies needed by the declared continuation receiver; reconstructing
+   a producing M or D alone is not that temporal return. Reuse the established causal
    adjoint and local constitutive response; compare the joint-normal candidate only where its
    hypotheses match. Form the complete finite successor, including mixed nonlinear terms and
    numerical remainders, and publish it atomically. A covector is not installed as a displacement
@@ -436,10 +448,11 @@ now composes existing paired reflections along actual source joins with learned 
 Its exact/enclosed reference, full derivative and stored-operator comparison return. Integrate
 the [now-resident forward/reverse word](../../research/records/2026-09-09_AC1_THE_CAUSAL_CONTACT_WORD_AND_ITS_SPARSE_RETURN_ARE_RESIDENT.md)
 and its sparse `D_source H` return through the [verified source-map journal](../../research/records/2026-09-09_AC1_THE_JOURNAL_GENERATES_ITS_HISTORICAL_SOURCE_MAPS.md).
-Connect the current-factor generator and live recurrence, retaining original input bounds and
-using the available source map when an older propagation word is decoded. Propagate existing interior before forming the newborn zero-input
+The [live binding](../../research/records/2026-09-09_AC1_AC2_CAUSAL_PROPAGATION_ENTERS_THE_CONTINUING_RECURRENCE.md)
+now connects the current-factor generator and recurrence, retaining original input bounds and
+using the available source map when an older word is decoded. Existing interior propagates before newborn zero-input
 branch and applying the same outer reflection. The native suboperator controls and full
-stored-model comparison have returned; the live recurrence is not yet changed by them.
+stored-model comparison have returned; the matched live conversation study is active.
 The material-ball ingress remains a separate concrete family
 obligation. Do not substitute a selected phase, a present tensor quotient or a scalar loss for
 future-stable relevance. Force-sector/exchange mathematics supplies construction dependencies

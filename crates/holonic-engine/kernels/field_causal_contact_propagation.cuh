@@ -11,6 +11,16 @@ constexpr size_t CP_OVERLAP_ERROR=CP_RADIUS+CP_WIDE_WORDS;
 constexpr size_t CP_ROUNDS=(CP_OVERLAP_ERROR+CP_HISTORY_WORDS+CP_WIDE_WORDS-1)/CP_WIDE_WORDS*CP_WIDE_WORDS;
 constexpr size_t CP_TRACE_WORDS=CP_ROUNDS+CP_WIDE_WORDS;
 
+extern "C" __global__ void section_field_operative_input_current_add(
+    const wide *before,const wide *delta,uint32_t count,wide *lo,wide *hi,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
+){
+    if(upstream_refused(census,lineage,lineage_count,slot))return;
+    size_t at=blockIdx.x*blockDim.x+threadIdx.x;
+    if(at<2u*(size_t)count)lo[at]=hi[at]=add_checked(before[at],delta[at],slot);
+    if(!count && !at){lo[0]=hi[0]=0;lo[1]=hi[1]=0;}
+}
+
 __device__ PropagationInteger cp_lift(const HistoryInteger &value){
     PropagationInteger out;for(int i=0;i<HistoryInteger::LIMBS;++i)out.limb[i]=value.limb[i];
     out.negative=value.negative;out.overflow=value.overflow;return out;
