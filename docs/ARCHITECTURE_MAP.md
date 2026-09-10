@@ -563,6 +563,14 @@ The draft applies its maps globally at that port; it does not supply the missing
 
 ## Classical learning, reflection and recursive compression
 
+[established-bounded; implemented-exact; formal-checked] The deeper September 9 review extends
+`FiniteLocalCurrentEcology.reaction` with actual local standing. `Graph.ecology` uses it instead
+of zero; `Graph.ecology_step_eq_update`, `no_contact_can_retain_state` and `update_relabel`
+verify the complete update and its covariance. Existing attention/convolution/oriented/excitation
+specializations retain their prior laws. The [composition guide](HNN_COMPOSITION.md) connects
+these mathematical roles to the existing Rust owners without claiming native implementation
+of the new graph reaction or arbitrary source-model equivalence.
+
 [established-bounded; source-inspected] These are existing owners recovered by the
 [September 8 breadth review](../research/records/2026-09-08_HOLONICS_REJOINS_CLASSICAL_LEARNING_REFLECTION_PACKING_AND_COMPRESSION.md).
 The [mathematical synthesis](MATHEMATICS_AND_NATIVE_CONDUCT.md) states their relations and limits.

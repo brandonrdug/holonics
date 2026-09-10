@@ -508,6 +508,13 @@ using its already established local constructions.
 
 ## Computation and the contribution to Athena
 
+[established-bounded; implemented-exact; formal-checked] The common finite local-current
+ecology now passes prior local standing into its constitutive reaction. The graph specialization
+had accepted that argument but supplied zero; the complete graph update and covariance are
+now explicit, with a retention control. The [deeper architecture review](../research/records/2026-09-09_ARCHITECTURE_CHARTS_REQUIRE_COMPOSED_MECHANISMS_AND_FINITE_CONSTRUCTION_RETURNS.md)
+connects this repair, classical/tensor mechanism charts and bounded approximation to the revised
+native construction. It does not make a full-history adjoint a prerequisite for local learning.
+
 [definition] Classical architecture charts expose attention as conditional contact, convolution
 as shared transported structure, graph computation as incident current and state-space models as
 retained recurrence. The normalized-exponential receiver has an exact Jacobian and a binary

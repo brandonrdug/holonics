@@ -7,6 +7,12 @@ and receiver-exact recompilation are distinct capabilities.
 
 ## What the standard formats supply
 
+[definition] Tensor charts also describe mechanism: axes, contractions, dual maps, shared
+coefficients and their composition with local reactions/state. A native realization may commute
+with that mathematical chart even though the file format remains exterior. The
+[composition guide](HNN_COMPOSITION.md) distinguishes recharting, source realization and
+future-receiver compression. This connection is relevant during construction, not only export.
+
 [established-bounded; source-inspected] [Safetensors](https://huggingface.co/docs/safetensors/main/index)
 stores named tensor values and their shapes/dtypes. Architecture and runtime behavior require
 additional configuration/code. [ONNX](https://onnx.ai/onnx/intro/concepts.html) can specify an

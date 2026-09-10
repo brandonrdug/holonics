@@ -1,5 +1,11 @@
 # The byte field is not the complete HNN composition
 
+[definition] The subsequent [deeper review](2026-09-09_ARCHITECTURE_CHARTS_REQUIRE_COMPOSED_MECHANISMS_AND_FINITE_CONSTRUCTION_RETURNS.md)
+narrows this diagnosis. A local return, finite carrier, linear readout or discrete byte emission
+is not independently a defect, and a full-history adjoint is not a general learning prerequisite.
+The factual source/feedback observations below stand; they do not establish the whole cause of
+the loop. The later review and live roadmap supersede the proposed construction sequence here.
+
 [project-postulate] Brandon has paused AC construction and cultivation to review repetition,
 Git chronology, elementary mathematics, modality composition and Rust framework organization.
 This review changes the construction diagnosis; it does not resume cultivation. AC0's data

@@ -788,7 +788,7 @@ conducts site 1 to site 0.  The receiver reads site 0. -/
 def ecology : FiniteLocalCurrentEcology (Fin 2) ℤ Unit Bool Unit ℤ where
   localCurrent _ generator state target source :=
     if target = 0 ∧ source = (if generator then 1 else 0) then state source else 0
-  reaction _ _ _ current := current
+  reaction _ _ _ _ current := current
   observe _ state := state 0
 
 /-- The presented state has equal magnitude at both sites. -/

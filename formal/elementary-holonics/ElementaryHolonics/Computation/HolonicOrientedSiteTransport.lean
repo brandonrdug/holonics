@@ -104,7 +104,7 @@ def ecology :
       (OrientedPortSiteTransport Scalar Site Incidence Port) Port Unit (Site → Scalar) where
   localCurrent morphology port state target source :=
     morphology.pairCurrent port state target source
-  reaction _ _ _ current := current
+  reaction _ _ _ _ current := current
   observe _ state := state
 
 /-- HNN aggregation is precisely the oriented returned-site current. -/
@@ -429,7 +429,7 @@ theorem physicalCrossing_current {Source Middle Target : Type*}
 /-- The cross-section is the existing source--target current ecology, with identity reaction. -/
 def neural : FiniteLocalCurrentEcology Site K (Matrix Site Site K) (Site → K) Unit (Site → K) where
   localCurrent morphology _ presented target source := pairCurrent morphology presented target source
-  reaction _ _ _ joined := joined
+  reaction _ _ _ _ joined := joined
   observe _ carrier := carrier
 
 theorem neural_step (morphology : Matrix Site Site K) (presented arrived : Site → K) :

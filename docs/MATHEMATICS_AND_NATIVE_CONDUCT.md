@@ -224,6 +224,13 @@ the corresponding compression. This gives concrete composition work, not a new s
 
 ## What the broader review changes about AC1
 
+[definition] The [deeper September 9 return](../research/records/2026-09-09_ARCHITECTURE_CHARTS_REQUIRE_COMPOSED_MECHANISMS_AND_FINITE_CONSTRUCTION_RETURNS.md)
+recovers direct mathematics/architecture messages and separates a fixed linear state-space
+passage from joint interaction, a valid local learning law from a full-history gradient claim,
+and productive approximation from exact chart equivalence. It repairs the common formal
+reaction's lost local standing and defines finite construction returns with comparison and
+interface work throughout. The [composition guide](HNN_COMPOSITION.md) binds the actual owners.
+
 [definition] The [September 9 paused source review](../research/records/2026-09-09_THE_BYTE_FIELD_IS_NOT_THE_COMPLETE_HNN_COMPOSITION.md)
 compares the actual byte adapter with these owners. A historical producer decoder is not a
 sequence-wide adjoint, a finite normal fit does not establish a sufficient learned source chart,

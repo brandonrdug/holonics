@@ -5,6 +5,11 @@ owners; it supplies no second event model, numeric system or learner. The packag
 used as a path dependency (`publish = false`). HNN application and wire names retain `hna` for
 compatibility.
 
+[definition] The [HNN composition guide](HNN_COMPOSITION.md) describes the model's semantic
+assembly and its actual remaining attachment. The dependency split below improves library
+access; it does not make distinct field/full-operator states interchangeable or complete the
+general model architecture.
+
 | Public path | Owner and scope |
 |---|---|
 | `holonics::structure` | `holonic-structure`: typed relational carriers, incidence, lineage and atomic membranes; `no_std` with allocation |

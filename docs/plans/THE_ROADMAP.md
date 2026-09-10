@@ -123,83 +123,55 @@ now replaces the accumulated prototype-extension instructions with the sequence 
 adds the two-field source, exact projection defect, folded memory and MVT/squeeze bounds, and
 pins the refreshed Apple branch comparison.
 
-## Athena-alpha: corrected AC0–AC5 order
+## Athena-alpha: finite construction returns, product ambition retained
 
-[project-postulate] **September 9 research steering:** Brandon now prioritizes clear, interesting
-behavioral phenomena during cultivation, including unconstrained repetition and changing phase
-patterns. Utility is not an acceptance condition or selection pressure at this stage. Observe
-what the native ecology does under actual source/context changes; do not force useful prose or
-manufacture unusual behavior. The later product objective remains distinct from this research
-criterion. AC1–AC3 may develop together as their actual conduct and costs permit.
+[project-postulate] **September 9 deeper revision:** The [direct-message and architecture review](../../research/records/2026-09-09_ARCHITECTURE_CHARTS_REQUIRE_COMPOSED_MECHANISMS_AND_FINITE_CONSTRUCTION_RETURNS.md)
+replaces the overloaded old AC1–AC3 grouping. The prior phase definitions remain in Git at
+`468973ea`; their evidence and open product obligations are not erased. Construction and
+cultivation remain paused. This revised order does not itself resume the goal.
 
-[historical] Brandon resumed the AC0–AC5 completion objective before the superseding review
-pause above. His September 9 clarification makes continued generators and their contextual cessation explicit. Repetition
-is not itself a defect or a completion test. Every update names the active step, actual return
-and concrete remaining relation; flexible derivation belongs inside this construction.
+[definition] The [blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
+now distinguishes finite construction returns from Athena-alpha attainment. Useful general
+English/code/mathematics and ongoing contextual development remain the product objective.
+Completing a finite packet or this construction cycle is not sufficient to mark that objective
+achieved. Current research seeks identifiable behavior and learning without a utility gate.
 
-[established-bounded; measured] The [accumulated-normal material return](../../research/records/2026-09-09_AC1_THE_MATERIAL_OPERATOR_RETAINS_ITS_ACCUMULATED_SOURCE_GEOMETRY.md)
-now supplies resident exact H/B/C, source-family bounds, numerical residual, historical producer
-and restart. It improves five retained relations on the first 75 occurrences and completes the
-eight-family study. The recorded output/current patterns remain research material. The linked
-records retain the earlier source,
-joint receiver, contact, actuation and storage returns without making their old probes a schedule.
-
-[counterexample; measured; computational-witness] The [feedback-boundary review](../../research/records/2026-09-09_AC_THE_REPEATED_TEXT_FACE_IS_A_DRIVEN_OPEN_RETURN.md)
-finds repeated text over demonstrably different outgoing currents. The canonical codec supplies
-fresh unit impulses at each actuation. A learned EndPart, an open receiver, a work interruption,
-physical release and useful answer completion remain different consequences.
-
-[established-bounded; implemented-exact; measured] The
-[phase/relevance return](../../research/records/2026-09-09_AC1_AC2_REPEATED_FACES_RETAIN_PHASE_AND_EXCHANGE.md)
-completes sixteen-family exposure and source-qualified factor-phase comparisons. Equal present
-tensor inputs can have different later currents; a broader phase profile changes generated text
-with the same learned operators. The fixed-contact interior's real relaxation/sign modes and an
-exact propagation-before-reflection control motivated the subsequently implemented candidate. The force-sector,
-exchange and situated-loss sources are included at their actual mathematical scopes.
-
-[definition] **Paused entry: revisit AC1 steps 1–2, then compose steps 3–4 with AC2.**
-The [source/history review](../../research/records/2026-09-09_THE_BYTE_FIELD_IS_NOT_THE_COMPLETE_HNN_COMPOSITION.md)
-rejects advancing from a verified local derivative directly to broader cultivation. On resumption,
-use these existing obligations in order:
-
-1. Specify the source section, actual incidence and joint continuation receivers that learning
-   must distinguish. The fixed octet chart is exterior apparatus. Compose conditioned contact,
-   relative normalization and local constitutive reaction where their actual hypotheses apply;
-   a maximum-codeword receiver alone does not provide that composition.
-2. Connect the returned difference to the earlier relations responsible for the measured
-   continuation. The current material/paired/propagation adjoint is local to its producing step.
-   Its incoming covector and the prior producers are explicit remaining dependencies. Preserve
-   the one continuing owner and actual source-qualified factors; no historical coefficient
-   decoder is silently promoted to a full temporal learning law.
-3. Form, restrict and rebase reusable local generators through the existing leader/packing and
-   future-receiver owners. Use shared dependency evaluation and the returned map/current journal
-   where their numerical subcomputations agree. A learned family may remain plural; exact reuse
-   preserves the admitted future distinctions and its executable decoder.
-4. Derive the text receiver/actuator's attachment to that conduct, including source-conditioned
-   continuation and part completion. Read the complete recurrence, not merely a selected byte
-   re-encoded as fixed impulses. Repetition remains research material. Broader exposure follows
-   an affordable, explicit composition without requiring useful language first.
-
-[definition] The prior propagation, normal-fit, source-factor and journal receipts remain
-bounded implementation evidence. No additional run, precision increase, phase intervention or
-new physical-force constant is scheduled by this review. The superseding pause above remains
-in force; AC0 is preserved and AC1/AC2 remain incomplete.
-
-| Phase | Ordered construction | Return required |
+| Phase | Construction return | Entry/dependency |
 |---|---|---|
-| AC0 | Preserve the available occurrence stream and cold cursor | Existing source/availability/split/cursor evidence retained |
-| AC1 | Native receiver and causal return; finite successor; local path formation/rebase; generator/decoder reuse | Integrated observation-driven conduct, changing morphology and reusable action on actual conversations |
-| AC2 | Learned codec, situated self-emission/feedback and completion, contextual followup | Complete useful English/code/mathematics responses; continuing ecology |
-| AC3 | Broader cultivation through lawful reuse and durable state | Useful broader artifact, restart/further learning and complete costs |
-| AC4 | Held-out general use, contextual revision and attributed learning | Actual requests/outputs/consequences with source-qualified failures |
-| AC5 | Settle the implemented interface, package the model and measure consumer operation | Usable native product with truthful recipes, persistence and costs |
+| AC0 | Existing source-qualified stream, availability and cursor | Complete; preserve |
+| AC1 | One native interaction/reaction with local standing and a source-qualified tensor/classical chart comparison | First packet on resumption; existing formal/native owners |
+| AC2 | Observation-founded local development of that interaction and a later measured consequence | AC1 passage; no universal whole-history gradient requirement |
+| AC3 | Broader conversation exposure, retained joint continuation and experimental checkpoint/costs | Lawful affordable recurrence; useful language is not a prerequisite |
+| AC4 | Behavioral comparison throughout, plus one local restriction/rebase or generator reuse with explicit receiver scope | Begins with AC1; does not wait for a complete model |
+| AC5 | Public Rust invocation, model anatomy, persistence and delivery of the current research artifact | Begins with AC1; product capability and standard exports remain honestly graded |
 
-[definition] The [blueprint's phase sections](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#5-ac0ac5-ordered-construction-and-returned-artifacts)
-retain the detailed owners and checks. Existing exact normalization/sigmoid, causal adjoints,
-reflection, leader/rebase, packing and shared generators remain foundations. The unfinished old
-joint kernel is not mandatory. A Millennium solution, physical calibration of all applications,
-or universal termination theorem is not an added prerequisite to useful native conduct.
-AC0 is complete, AC1/AC2 remain open, AC3 is experimental and AC4–AC5 remain open.
+[definition] **First finite packet on resumption: AC1's standing–interaction–reaction passage.**
+Use the [composition guide](../HNN_COMPOSITION.md): one finite neighborhood, actual section and
+incidence, retained local standing, one joint/conditioned interaction and one constitutive
+reaction. Exhibit the map into the existing resident operator, its forward result and numerical
+boundary; expose it through the current field/session owner. The fixed paired state-space law
+is the comparison. An additional fixed propagation word does not create mixed input dependence.
+A failed attachment names its precise absent argument or map before another owner is introduced.
+AC4 records the response and AC5 carries its public assembly description in this same packet.
+
+[definition] The corrected formal `FiniteLocalCurrentEcology.reaction` now retains local
+standing; graph update and complete covariance return. The native attachment remains open.
+The local field/material return, full-operator generic primitives and corrected joined-passage
+learning are existing candidates, each with its own source, metric and scope. Neither the old
+lexical atlas nor the retracted foreign-tower exclusion is restored.
+
+[project-postulate] Derivation belongs to the finite packet it changes. A partial/local learner
+may develop identifiable behavior without a universal HNN theorem, all six architecture adapters,
+all-history exact quotient or complete sequence adjoint. Add a longer return only for an actual
+required dependency. Exact compression/export claims retain their stronger commuting obligations;
+receiver-bounded defects remain lawful comparisons. No repetition filter, arbitrary damping,
+semantic capacity constant or live Lean binding follows from this revision.
+
+[definition] Previously returned normal-fit, phase, propagation and historical-journal records
+remain bounded evidence. They do not prove learned semantic generator reuse or explain the full
+loop. Source/current variation and finite retained-family comparison guide the next choice;
+rerunning the same output, narrowing the plan to a single word, or seeking more solve precision
+without a new question supplies no progress. The paused position remains in CONSTRUCTION_STATE.
 
 [definition] Mathematical continuation now instantiates the complex two-field Euler/NS source
 through the existing oriented-current and mild/Duhamel owners, preserving pressure, mixed

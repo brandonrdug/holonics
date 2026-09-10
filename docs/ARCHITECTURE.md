@@ -83,6 +83,12 @@ snapshot/commit API as the full neural runtime.
 
 ## What the mathematics buys the implementation
 
+[definition] The [HNN composition guide](HNN_COMPOSITION.md) binds section/incidence, actual
+local standing, interaction/reaction, returned difference, chart and model-realization owners.
+Its [deeper source review](../research/records/2026-09-09_ARCHITECTURE_CHARTS_REQUIRE_COMPOSED_MECHANISMS_AND_FINITE_CONSTRUCTION_RETURNS.md)
+recovers the classical architecture mechanisms and tensor commuting maps. These are concrete
+construction comparisons, not merely I/O conventions or a requirement to implement a Transformer.
+
 [established-bounded; source-inspected] Current owners retain typed incidence and chronology,
 exact dyadic coefficient interpretation, interval-certified reactions, receiver-indexed
 comparison, quotient/reopening laws, factorized morphology overlays, and resident execution.

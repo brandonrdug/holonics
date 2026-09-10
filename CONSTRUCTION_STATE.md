@@ -1,7 +1,7 @@
 # Construction state
 
-**Currency:** September 9, 2026. **Priority:** AC construction and cultivation remain paused under Brandon’s September 9 direction. The source/history, mathematical composition and public Rust framework review has returned with in-scope repairs. No cultivation run is active.
-**Position at pause:** AC0 data preparation complete; AC1 accumulated-normal material implemented, with path/generator reuse open; AC2 learned codec and contextual continuation open; AC3 experimental artifacts; AC4–AC5 open. Exact component checks do not establish the adequacy of the assembled learning architecture.
+**Currency:** September 9, 2026. **Priority:** AC construction and cultivation remain paused. The deeper direct-message, classical-architecture and model-composition review has returned; its formal repair and revised finite construction order are deposited.
+**Position:** AC0 source return complete. The revised next packet is AC1's native standing–interaction–reaction passage; its formal standing repair is complete, its native attachment is open. Existing local-learning, exposure, journal and packaging receipts retain bounded credit; no later phase is claimed complete under the revised scope. AC4 comparison and AC5 interface work now accompany each construction increment.
 **Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -87,42 +87,38 @@ The [framework guide](docs/FORMAL_FRAMEWORK.md) connects physical, biological an
 instances. This continuation unifies already-engaged elementary patterns; it changes no native
 model or product grade and adds no numerical policy to the parallel AC1 work.
 
-## Current HNN construction — paused for review
+## Current HNN construction — paused after deeper review
 
-[established-bounded; source-inspected] The [source/history and framework review](research/records/2026-09-09_THE_BYTE_FIELD_IS_NOT_THE_COMPLETE_HNN_COMPOSITION.md)
-finds that the active experimental profile is a finite complex-linear byte predictor over an
-operative boundary, with a source-qualified local return and fixed byte actuation. A complete
-historical producer is not a sequence-wide learning return; the journal's numerical reuse is
-not learned semantic generator reuse. Existing normalization, conditioned contact, nonlinear
-reaction, leader/rebase and future-receiver mathematics remain concrete composition dependencies.
-The source-parent attachment is present in the recorded run; a blanket disconnection diagnosis
-was checked and rejected. The AC entry has been revised around these distinctions.
+[established-bounded; source-inspected] The [deeper architecture return](research/records/2026-09-09_ARCHITECTURE_CHARTS_REQUIRE_COMPOSED_MECHANISMS_AND_FINITE_CONSTRUCTION_RETURNS.md)
+recovers the recent mathematics thread and August/September direct directions about classical
+architectures, tensors, local learning and model anatomy. It corrects the earlier review's
+emphasis: finite carriers, a linear readout, byte emission and local learning are not independently
+defects, and missing full-history differentiation has not been shown to cause the loop. The
+[composition guide](docs/HNN_COMPOSITION.md) names the actual shared owners and native attachment.
+The roadmap now gives finite construction returns with comparison/interface work throughout.
 
-[established-bounded; computational-witness] Cold inspection of the two completed live-propagation
-runs finds identical reported bodies, generation and current histories. After the same emitted
-`t`, later states select `h`, `e` or a space. Every selected byte has a margin exceeding the
-retained uncertainty. Capitalization and fragments do not establish grammar or word generators.
-No further cultivation or prompt run is active. The [inspection receipt](research/experiments/normal_geometry_review/2026-09-09_paused_feedback_review.json)
-retains the exact output and comparisons.
+[established-bounded; implemented-exact; formal-checked] The common formal reaction now receives
+local standing beside incoming current. `Graph.ecology` previously substituted zero for that
+standing. Complete graph update/relabeling and a retaining-state control pass; unary charts
+keep their laws. The affected framework/oriented/excitation build passes (4,008 jobs). This is
+an elementary formal-interface repair, not a change to the desktop learner or a new language claim.
 
-[established-bounded; implemented-exact; computational-witness] The [live propagation return](research/records/2026-09-09_AC1_AC2_CAUSAL_PROPAGATION_ENTERS_THE_CONTINUING_RECURRENCE.md)
-retains its 132-case field check, source/restart comparison and exact-divider control. Prompt/emission
-work fell from 815.413 to 228.188 seconds with the same reported numerical body. These verify
-bounded implementation and cost, not adequacy of the assembled learning architecture.
+[established-bounded; computational-witness] The [earlier cold feedback inspection](research/experiments/normal_geometry_review/2026-09-09_paused_feedback_review.json)
+retains equal complete reported bodies/current histories after division optimization. The same
+emitted `t` is followed by `h`, `e` or a space at different states; all choices separate beyond
+the recorded numerical uncertainty. No source passage was traced and no further model run occurred.
+The complete architectural cause of the restricted trajectory remains open.
 
-[established-bounded; process-audit] The public Rust facade now exposes existing `structure`
-and `geometry` without CUDA dependencies, with default `native` retaining the application APIs.
-Both Cargo configurations pass. The [Rust guide](docs/RUST_FRAMEWORK.md) explains the limited
-portable scope; advanced engine mathematics and desktop HNN remain CUDA-bound.
+[established-bounded; implemented-exact; computational-witness] The [live propagation record](research/records/2026-09-09_AC1_AC2_CAUSAL_PROPAGATION_ENTERS_THE_CONTINUING_RECURRENCE.md)
+retains its 132-case native check, source/restart comparison and exact-divider control.
+Prompt/emission work fell from 815.413 to 228.188 seconds with the same reported numerical body.
+These are local implementation and cost results. Normal, phase, source-factor and map-journal
+records remain reusable at their declared scopes, not generic model-completion evidence.
 
-[definition] Completed intermediate evidence remains in the
-[normal-material record](research/records/2026-09-09_AC1_THE_MATERIAL_OPERATOR_RETAINS_ITS_ACCUMULATED_SOURCE_GEOMETRY.md),
-[feedback review](research/records/2026-09-09_AC_THE_REPEATED_TEXT_FACE_IS_A_DRIVEN_OPEN_RETURN.md),
-[phase/relevance return](research/records/2026-09-09_AC1_AC2_REPEATED_FACES_RETAIN_PHASE_AND_EXCHANGE.md),
-[integer/abstraction review](research/records/2026-09-09_INTEGER_FACES_RETAIN_THEIR_GENERATING_RELATIONS.md)
-and [historical map journal](research/records/2026-09-09_AC1_THE_JOURNAL_GENERATES_ITS_HISTORICAL_SOURCE_MAPS.md).
-Those returns schedule no experiments during this pause. No utility gate, repetition filter,
-singleton-cause requirement or live Lean binding has been introduced.
+[established-bounded; process-audit] The [Rust facade](docs/RUST_FRAMEWORK.md) exposes existing
+structural and geometric owners without the default CUDA runtime dependency; both Cargo
+configurations pass at the prior review. That access repair does not itself unify the field
+and full-operator model assemblies. No Rust numerical law changed in the deeper review.
 
 ## Completed foundation and data preparation
 

@@ -36,7 +36,8 @@ structure FiniteLocalCurrentEcology
     (Generator : Type uG) (Receiver : Type uR) (Face : Type uF)
     [Fintype Site] [AddCommMonoid Carrier] where
   localCurrent : Morphology → Generator → (Site → Carrier) → Site → Site → Carrier
-  reaction : Morphology → Generator → Site → Carrier → Carrier
+  /-- Local standing and arriving current are distinct arguments of the constitutive response. -/
+  reaction : Morphology → Generator → Site → Carrier → Carrier → Carrier
   observe : Receiver → (Site → Carrier) → Face
 
 namespace FiniteLocalCurrentEcology
@@ -54,13 +55,13 @@ def aggregateCurrent (morphology : Morphology) (generator : Generator)
 /-- One complete native transport through fixed contemporary morphology. -/
 def step (morphology : Morphology) (generator : Generator)
     (state : Site → Carrier) : Site → Carrier :=
-  fun target ↦ N.reaction morphology generator target
+  fun target ↦ N.reaction morphology generator target (state target)
     (N.aggregateCurrent morphology generator state target)
 
 @[simp] theorem step_apply (morphology : Morphology) (generator : Generator)
     (state : Site → Carrier) (target : Site) :
     N.step morphology generator state target =
-      N.reaction morphology generator target
+      N.reaction morphology generator target (state target)
         (∑ source : Site, N.localCurrent morphology generator state target source) := rfl
 
 /-- Ordered inference through one rested morphology. -/
@@ -162,7 +163,7 @@ namespace Control
 def oneSiteEcology : FiniteLocalCurrentEcology (Fin 1) ℤ ℤ Bool Unit ℤ where
   localCurrent gain generator state _ source :=
     if generator then gain * state source else state source
-  reaction _ _ _ current := current
+  reaction _ _ _ _ current := current
   observe _ state := state 0
 
 theorem oneSite_true_step (gain current : ℤ) :
@@ -177,7 +178,7 @@ def conditionedTwoSiteEcology :
     FiniteLocalCurrentEcology (Fin 2) ℤ Unit Unit Unit (Fin 2 → ℤ) where
   localCurrent _ _ state target source :=
     if state target = state source then state source else 0
-  reaction _ _ _ current := current
+  reaction _ _ _ _ current := current
   observe _ state := state
 
 theorem conditionedTwoSite_step_uses_contemporary_state (left right : ℤ)

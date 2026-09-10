@@ -71,7 +71,7 @@ def ecology : FiniteLocalCurrentEcology Site ℝ Unit Unit Unit (Site → ℝ) w
     if source ∈ A.admitted target then
       A.weight state target source * A.value state source
     else 0
-  reaction _ _ _ current := current
+  reaction _ _ _ _ current := current
   observe _ state := state
 
 theorem ecology_step_eq_output (state : Site → ℝ) :
@@ -153,7 +153,7 @@ def Block.ecology (block : Block (Site := Site)) :
       if source ∈ A.admitted target then
         A.weight state target source * A.value state source
       else 0
-  reaction _ _ target current := block.reaction target current
+  reaction _ _ target _ current := block.reaction target current
   observe _ state := state
 
 theorem Block.ecology_step_eq_output (block : Block (Site := Site)) (state : Site → ℝ) :
@@ -232,7 +232,7 @@ def apply (kernel values : Site → ℝ) (site : Site) : ℝ :=
 def ecology (kernel : Site → ℝ) :
     FiniteLocalCurrentEcology Site ℝ Unit Unit Unit (Site → ℝ) where
   localCurrent _ _ values target offset := kernel offset * values (target - offset)
-  reaction _ _ _ current := current
+  reaction _ _ _ _ current := current
   observe _ values := values
 
 theorem ecology_step_eq_apply (kernel values : Site → ℝ) :
@@ -267,8 +267,27 @@ def ecology (incident : Vertex → Vertex → Bool) (message : ℝ → ℝ → �
     FiniteLocalCurrentEcology Vertex ℝ Unit Unit Unit (Vertex → ℝ) where
   localCurrent _ _ state target source :=
     if incident target source then message (state target) (state source) else 0
-  reaction _ _ target current := reaction target 0 current
+  reaction _ _ target standing current := reaction target standing current
   observe _ state := state
+
+/-- A graph update responds to the actual local standing and its incident aggregate. -/
+def update (incident : Vertex → Vertex → Bool) (message : ℝ → ℝ → ℝ)
+    (reaction : Vertex → ℝ → ℝ → ℝ) (state : Vertex → ℝ) (target : Vertex) : ℝ :=
+  reaction target (state target) (aggregate incident message state target)
+
+omit [DecidableEq Vertex] in
+theorem ecology_step_eq_update
+    (incident : Vertex → Vertex → Bool) (message : ℝ → ℝ → ℝ)
+    (reaction : Vertex → ℝ → ℝ → ℝ) (state : Vertex → ℝ) :
+    (ecology incident message reaction).step () () state =
+      update incident message reaction state := rfl
+
+omit [DecidableEq Vertex] in
+/-- With no incoming contacts, a retaining reaction still sees the node's own standing.
+The former zero substitution erased it; this controls that exact interface defect. -/
+theorem no_contact_can_retain_state (state : Vertex → ℝ) :
+    (ecology (fun _ _ ↦ false) (fun source target ↦ source + target)
+      (fun _ standing _ ↦ standing)).step () () state = state := rfl
 
 def relabel (reindex : Vertex ≃ Vertex) (state : Vertex → ℝ) (vertex : Vertex) : ℝ :=
   state (reindex.symm vertex)
@@ -302,6 +321,23 @@ theorem aggregate_relabel
           apply Finset.sum_congr rfl
           intro source hsource
           simp [relabel, incidentCovariant]
+
+/-- Complete graph response commutes with an admitted relabeling when the reaction's
+site dependence is transported together with incidence. Aggregate covariance alone is weaker. -/
+theorem update_relabel
+    (incident : Vertex → Vertex → Bool) (message : ℝ → ℝ → ℝ)
+    (reaction : Vertex → ℝ → ℝ → ℝ) (reindex : Vertex ≃ Vertex)
+    (incidentCovariant : ∀ target source,
+      incident (reindex target) (reindex source) = incident target source)
+    (reactionCovariant : ∀ target standing current,
+      reaction (reindex target) standing current = reaction target standing current)
+    (state : Vertex → ℝ) (target : Vertex) :
+    update incident message reaction (relabel reindex state) (reindex target) =
+      update incident message reaction state target := by
+  unfold update
+  rw [aggregate_relabel incident message reindex incidentCovariant state target]
+  simp only [relabel, Equiv.symm_apply_apply]
+  exact reactionCovariant target (state target) (aggregate incident message state target)
 
 end Graph
 
@@ -369,6 +405,9 @@ section Audit
 #print axioms Autoregressive.invalid_cache_control
 #print axioms Convolution.translate_equivariant
 #print axioms Graph.aggregate_relabel
+#print axioms Graph.ecology_step_eq_update
+#print axioms Graph.no_contact_can_retain_state
+#print axioms Graph.update_relabel
 #print axioms StateSpace.Chart.fold_append
 #print axioms StateSpace.LinearChart.advance_eq_A_add_B
 

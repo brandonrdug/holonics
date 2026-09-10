@@ -6,6 +6,16 @@ root construction state records current implementation scope. Paths in code span
 
 ## Capability and retraction record
 
+[historical; source-inspected] September 9: the first paused byte-field review correctly
+identified its local return and fixed codec, but overemphasized their absence of full-history
+differentiation as an architectural diagnosis. Finite state, linear readouts, discrete emission
+and local learning can support restricted learned behavior. No full-history adjoint has been
+established as necessary to resolve this loop. The [deeper source review](../research/records/2026-09-09_ARCHITECTURE_CHARTS_REQUIRE_COMPOSED_MECHANISMS_AND_FINITE_CONSTRUCTION_RETURNS.md)
+recovers the classical mechanisms, commuting tensor maps and actual local-learning directions.
+It also repairs `Graph.ecology`'s zero substitution for prior local state in the shared formal
+reaction. The former aggregate theorem did not prove that complete stateful graph update.
+Existing aggregate, unary-current and bounded native receipts retain their scopes.
+
 [historical; source-inspected] September 8: the NS/Euler review's broad emphasis on missing
 generative theory is narrowed. Existing normalization, classical architecture charts, resident
 nonlinear/adjoint kernels, reflection, leaders, recursive packing and compression were underused
