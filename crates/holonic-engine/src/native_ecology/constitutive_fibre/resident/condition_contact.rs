@@ -6,7 +6,7 @@ use std::rc::Rc;
 
 /// Equal unit admittance for each real/imaginary coordinate in the bound local chart.
 /// Orthogonal chart changes preserve this law. General recharting owes the transported metric.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 pub enum ConditionContactMetric {
     UnitAdmittanceRealification,
 }
@@ -50,6 +50,49 @@ pub struct ResidentConditionContact<'chart> {
     contact: u64,
     width: usize,
 }
+
+/// Immutable actual standing used by a producing passage. Sharing its resident section does
+/// not create another move owner or retain a chain of earlier states.
+pub struct ResidentConditionStanding<'chart> {
+    section: Rc<ResidentSection<'chart>>,
+    width: usize,
+    source_chart: ConstitutiveSourceChart,
+    metric: ConditionContactMetric,
+    contacts: u64,
+}
+impl<'chart> ResidentConditionStanding<'chart> {
+    pub fn current(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
+        current_view(&self.section, self.width, self.width)
+    }
+    pub fn source_chart(&self) -> ConstitutiveSourceChart {
+        self.source_chart
+    }
+    pub fn metric(&self) -> ConditionContactMetric {
+        self.metric
+    }
+    pub fn contacts(&self) -> u64 {
+        self.contacts
+    }
+}
+
+pub struct PreparedConditionContact<'chart> {
+    predecessor: Rc<ResidentSection<'chart>>,
+    returned: ResidentConditionContact<'chart>,
+}
+impl<'chart> PreparedConditionContact<'chart> {
+    pub fn successor(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
+        self.returned.successor()
+    }
+    pub fn family(&self) -> &ResidentConditionPreimage<'chart> {
+        self.returned.family()
+    }
+    pub fn inspect(&self) -> Result<ConditionContactReading, ConstitutiveFibreError> {
+        self.returned.inspect()
+    }
+}
+
+mod rest;
+pub use rest::ConditionCurrentRest;
 
 fn current_view<'a, 'c>(
     section: &'a ResidentSection<'c>,
@@ -128,6 +171,15 @@ impl<'chart> ResidentConditionCurrent<'chart> {
 }
 
 impl<'chart> ResidentConditionCurrent<'chart> {
+    pub fn standing(&self) -> ResidentConditionStanding<'chart> {
+        ResidentConditionStanding {
+            section: Rc::clone(&self.section),
+            width: self.width,
+            source_chart: self.source_chart,
+            metric: self.metric,
+            contacts: self.contacts,
+        }
+    }
     pub fn current(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {
         current_view(&self.section, self.width, self.width)
     }
@@ -146,6 +198,17 @@ impl<'chart> ResidentConditionCurrent<'chart> {
         &mut self,
         family: &ResidentConditionPreimage<'chart>,
     ) -> Result<ResidentConditionContact<'chart>, ConstitutiveFibreError> {
+        let prepared = self.prepare_contact(family)?;
+        self.commit_contact(prepared)
+    }
+
+    /// Compute the complete native reaction into fresh material, without changing standing.
+    /// The proposal retains the exact predecessor section; it cannot be committed to another
+    /// current or after another contact changed this one.
+    pub fn prepare_contact(
+        &self,
+        family: &ResidentConditionPreimage<'chart>,
+    ) -> Result<PreparedConditionContact<'chart>, ConstitutiveFibreError> {
         let f = &family.inner.returned;
         if family.source_chart() != self.source_chart
             || f.target_width != self.width
@@ -187,18 +250,48 @@ impl<'chart> ResidentConditionCurrent<'chart> {
             )));
         }
         let section = Rc::new(section);
-        // Atomic publication after the complete return. Only immutable standing is shared.
-        self.section = Rc::clone(&section);
-        self.contacts = next;
-        Ok(ResidentConditionContact {
-            section,
-            family: ResidentConditionPreimage {
-                inner: Rc::clone(&family.inner),
+        Ok(PreparedConditionContact {
+            predecessor: Rc::clone(&self.section),
+            returned: ResidentConditionContact {
+                section,
+                family: ResidentConditionPreimage {
+                    inner: Rc::clone(&family.inner),
+                },
+                metric: self.metric,
+                contact: next,
+                width: c,
             },
-            metric: self.metric,
-            contact: next,
-            width: c,
         })
+    }
+
+    pub fn commit_contact(
+        &mut self,
+        prepared: PreparedConditionContact<'chart>,
+    ) -> Result<ResidentConditionContact<'chart>, ConstitutiveFibreError> {
+        if !self.can_commit(&prepared) {
+            return Err(ConstitutiveFibreError::ForeignOccurrence);
+        }
+        Ok(self.publish_prepared(prepared))
+    }
+
+    pub(super) fn can_commit(&self, prepared: &PreparedConditionContact<'chart>) -> bool {
+        Rc::ptr_eq(&self.section, &prepared.predecessor)
+            && self.contacts.checked_add(1) == Some(prepared.returned.contact)
+            && self.source_chart == prepared.returned.family.source_chart()
+            && self.width == prepared.returned.width
+            && self.metric == prepared.returned.metric
+    }
+
+    /// The neighborhood preflights this predicate under exclusive ownership before its only
+    /// other mutation (the local law deposit). That mutation cannot change this current.
+    pub(super) fn publish_prepared(
+        &mut self,
+        prepared: PreparedConditionContact<'chart>,
+    ) -> ResidentConditionContact<'chart> {
+        debug_assert!(self.can_commit(&prepared));
+        self.section = Rc::clone(&prepared.returned.section);
+        self.contacts = prepared.returned.contact;
+        prepared.returned
     }
 }
 

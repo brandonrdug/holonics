@@ -1,7 +1,7 @@
 # Construction state
 
-**Currency:** September 9, 2026. **Priority:** Corrected AC0–AC5 construction is the active goal. Native HNN cultivation uses Holons as situated state, incidence, transported differences and compatible continuations; text/audio/visual media are exterior measurement charts.
-**Position:** The byte-cultivation assembly remains retired. AC1–AC2 now compose learned local generators through joint affine current families; an actual received observation refines the source and changes retained condition current and subsequent conduct without a history chain. Forty resident CUDA tests and the public composed example pass. Whole-neighborhood ownership/state persistence and the conversation-codec attachment remain unfinished; AC0–AC5 is not complete. No cultivation process is running.
+**Currency:** September 10, 2026. **Priority:** Corrected AC0–AC5 construction is the active goal. Native HNN cultivation uses Holons as situated state, incidence, transported differences and compatible continuations; text/audio/visual media are exterior measurement charts.
+**Position:** The byte-cultivation assembly remains retired. AC1–AC2 now have a continuing local-generator neighborhood with shared condition current, atomic observed return and compact evidence persistence. Forty-four resident CUDA tests pass; process-separated continuation matches the complete uninterrupted body and second return. AC0's source reader remains complete. AC3's corrected conversation attachment is next; wider AC4 composition and AC5 product delivery remain unfinished. AC0–AC5 is not complete. No cultivation process is running.
 **Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -89,6 +89,16 @@ model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction — representation repair
 
+[established-bounded; implemented-exact; computational-witness] The [continuing-neighborhood return](research/records/2026-09-10_LOCAL_GENERATORS_SHARE_CONDITION_CURRENT_AND_THE_WHOLE_BODY_RESUMES.md)
+binds existing local laws, actual shared condition current and latest predecessor-law evidence
+under one move owner. A late material refusal preserves the whole body; source-sensitive return
+changes the dependent receiver while leaving an independent receiver unchanged. Compact rest
+decodes the retained Preimage Fibre from its constraints, including plural and empty cases.
+The public two-generator example resumes into exactly the same second return and 5,540-byte
+complete rest as uninterrupted operation. The final four-case refinement, host wire check,
+public example build and framework facade check also pass. This is a local generator/ecology
+return; it does not establish a conversation learner or a cumulative world posterior.
+
 [established-bounded; implemented-exact; computational-witness] The [joint-family and retained-current return](research/records/2026-09-09_LEARNED_GENERATORS_COMPOSE_THROUGH_JOINT_FIBRES_AND_RETURNS_REFINE_THE_SOURCE.md)
 adds `read_image`, `read_change_image`, received source refinement and an actual-source-checked
 return to the existing condition-current contact. Plural inputs can have fixed later receivers;
@@ -107,11 +117,11 @@ numerical host readouts. A separate process returns the same current and law pro
 Seventeen host, 35 resident CUDA, six existing native-wire and ten source-reader tests pass;
 the public facade checks. These are local-law and removal results, not a general HNN or language claim.
 
-[definition] Continue AC1–AC2 by binding these actual generator, condition-current and compact
-evidence owners into one continuing neighborhood with declared incidence and recoverable state.
-The individual composition/contact ports are now established; do not rebuild them as a second
-learner. Apply restriction/rebase to the admitted generator family, then attach actual source
-material through its codec. The source reader remains available for AC3 and the byte loop stays retired.
+[definition] Continue into AC3's actual source attachment using the established generator,
+condition-current and compact evidence owners. State the exterior source-to-current/receiver map
+and its native consequence before mounting broader conversation material. Apply existing
+restriction/rebase where that admitted source family requires it; do not found another learner
+or restore the byte loop. The source-qualified reader remains available.
 
 [established-bounded; source-inspected; computational-witness] The [representation audit](research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)
 finds one new persistent contact coordinate per source-linked observation and a contextual

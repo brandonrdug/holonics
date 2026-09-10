@@ -146,11 +146,11 @@ achieved. Current research seeks identifiable behavior and learning without a ut
 | Phase | Construction return | Entry/dependency |
 |---|---|---|
 | AC0 | Existing source-qualified stream, availability and cursor | Complete; preserve |
-| AC1 | A productive conditional-generator carrier, its local interaction/reaction and source/receiver chart | Existing joint-field arithmetic is a diagnostic return; generic API factoring did not finish this carrier |
-| AC2 | Observation-founded development of reusable conduct and a later measured consequence | Existing local-return controls stand; compose that return with the productive carrier |
+| AC1 | A productive conditional-generator carrier, its local interaction/reaction and source/receiver chart | Learned local laws now share actual condition standing in one move-owned neighborhood; continue into the source attachment |
+| AC2 | Observation-founded development of reusable conduct and a later measured consequence | Local material formation and condition reaction return atomically and change later conduct; carry them into the source attachment |
 | AC3 | Conversation exposure and retained joint continuation through the generator-bearing body | The sixteen-family history expansion is diagnostic evidence; useful language is not an entry gate |
 | AC4 | Restriction/rebase or generator reuse that participates in the next operation | Current-factor savings stand at their numerical scope; they do not close generative organization |
-| AC5 | Public invocation, model anatomy and persistence of the actual productive body | Existing generic access and full-history rest stand; do not label the archive compact learned material |
+| AC5 | Public invocation, model anatomy and persistence of the actual productive body | Whole local-generator rest and continued return now agree across processes; extend delivery to the cultivated conversation body |
 
 [definition] The first replacement packet uses `ResidentConstitutiveFibre`, its actual
 source/condition contact and `ConstitutiveFibreRest`. That compact learned law now conducts
@@ -158,10 +158,13 @@ later resident currents after the observation apparatus is released and after pr
 The [joint-family/actual-current return](../../research/records/2026-09-09_LEARNED_GENERATORS_COMPOSE_THROUGH_JOINT_FIBRES_AND_RETURNS_REFINE_THE_SOURCE.md)
 now composes whole affine families, retains domain coverage and refines an actual source from a
 downstream observation. Its return changes the existing move-owned condition current and later
-conduct. Next bind those established owners into one continuing generator neighborhood with
-declared incidence and recoverable state; carry its local refinements and reusable restrictions
-into source-codec attachment. The earlier projective field remains diagnostic evidence, not the
-productive carrier for resumed conversation cultivation.
+conduct. The [continuing-neighborhood return](../../research/records/2026-09-10_LOCAL_GENERATORS_SHARE_CONDITION_CURRENT_AND_THE_WHOLE_BODY_RESUMES.md)
+now binds local laws, actual shared condition standing and compact latest-received evidence under
+one move owner. Whole-body rest/remount preserves the next received return. Continue into the
+source-codec attachment: state the exterior source-to-current and receiver maps, then carry actual
+conversation material through these generators. Wider incidence and scale changes retain their
+own source laws. The earlier projective field remains diagnostic evidence, not the productive
+carrier for resumed conversation cultivation.
 
 [definition] The corrected formal `FiniteLocalCurrentEcology.reaction` retains local
 standing. The [native field assembly and observed return](../../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)

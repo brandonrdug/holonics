@@ -3,6 +3,8 @@
 
 use super::*;
 use std::rc::Rc;
+mod rest;
+pub use rest::ConditionPreimageRest;
 
 #[derive(Debug, PartialEq, Eq, Serialize)]
 #[serde(tag = "kind", rename_all = "kebab-case")]

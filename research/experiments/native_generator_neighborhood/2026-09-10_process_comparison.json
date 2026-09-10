@@ -1,0 +1,208 @@
+{
+  "schema": "holonics.generator-neighborhood-process-comparison.v1",
+  "profile": "dev",
+  "complete_rest_equality": true,
+  "second_return_equality": true,
+  "runs": [
+    {
+      "condition_words": [
+        3,
+        4,
+        3,
+        0,
+        5
+      ],
+      "epoch": 1,
+      "latest_received_fibre_count": 1,
+      "law_observations": [
+        11,
+        10
+      ],
+      "members": 2,
+      "mode": "learn",
+      "probe_outputs": [
+        [
+          "-6/5",
+          "17/5"
+        ],
+        [
+          "6/5",
+          "9/5"
+        ]
+      ],
+      "probe_source": [
+        2,
+        3
+      ],
+      "ranks": [
+        10,
+        10
+      ],
+      "rest_octets": 5539,
+      "returns": [
+        {
+          "condition_after": [
+            "3/5",
+            "4/5",
+            "3/5",
+            "0"
+          ],
+          "condition_before": [
+            "0",
+            "4/5",
+            "3/5",
+            "0"
+          ],
+          "ingress_octets_during_return": 8,
+          "member": 0,
+          "predecessor_epoch": 0,
+          "section_readouts_during_return": 0,
+          "successor_epoch": 1
+        }
+      ],
+      "scope": "two learned local relations sharing one declared condition field",
+      "source_archive_in_model": false,
+      "process_wall_seconds": 0.290700739948079
+    },
+    {
+      "condition_words": [
+        3,
+        4,
+        -4,
+        3,
+        5
+      ],
+      "epoch": 2,
+      "latest_received_fibre_count": 1,
+      "law_observations": [
+        11,
+        11
+      ],
+      "members": 2,
+      "mode": "resume",
+      "probe_outputs": [
+        [
+          "-6/5",
+          "17/5"
+        ],
+        [
+          "-17/5",
+          "-6/5"
+        ]
+      ],
+      "probe_source": [
+        2,
+        3
+      ],
+      "ranks": [
+        10,
+        10
+      ],
+      "rest_octets": 5540,
+      "returns": [
+        {
+          "condition_after": [
+            "3/5",
+            "4/5",
+            "-4/5",
+            "3/5"
+          ],
+          "condition_before": [
+            "3/5",
+            "4/5",
+            "3/5",
+            "0"
+          ],
+          "ingress_octets_during_return": 8,
+          "member": 1,
+          "predecessor_epoch": 1,
+          "section_readouts_during_return": 0,
+          "successor_epoch": 2
+        }
+      ],
+      "scope": "two learned local relations sharing one declared condition field",
+      "source_archive_in_model": false,
+      "process_wall_seconds": 0.2348706410266459
+    },
+    {
+      "condition_words": [
+        3,
+        4,
+        -4,
+        3,
+        5
+      ],
+      "epoch": 2,
+      "latest_received_fibre_count": 1,
+      "law_observations": [
+        11,
+        11
+      ],
+      "members": 2,
+      "mode": "full",
+      "probe_outputs": [
+        [
+          "-6/5",
+          "17/5"
+        ],
+        [
+          "-17/5",
+          "-6/5"
+        ]
+      ],
+      "probe_source": [
+        2,
+        3
+      ],
+      "ranks": [
+        10,
+        10
+      ],
+      "rest_octets": 5540,
+      "returns": [
+        {
+          "condition_after": [
+            "3/5",
+            "4/5",
+            "3/5",
+            "0"
+          ],
+          "condition_before": [
+            "0",
+            "4/5",
+            "3/5",
+            "0"
+          ],
+          "ingress_octets_during_return": 8,
+          "member": 0,
+          "predecessor_epoch": 0,
+          "section_readouts_during_return": 0,
+          "successor_epoch": 1
+        },
+        {
+          "condition_after": [
+            "3/5",
+            "4/5",
+            "-4/5",
+            "3/5"
+          ],
+          "condition_before": [
+            "3/5",
+            "4/5",
+            "3/5",
+            "0"
+          ],
+          "ingress_octets_during_return": 8,
+          "member": 1,
+          "predecessor_epoch": 1,
+          "section_readouts_during_return": 0,
+          "successor_epoch": 2
+        }
+      ],
+      "scope": "two learned local relations sharing one declared condition field",
+      "source_archive_in_model": false,
+      "process_wall_seconds": 0.23701187898404896
+    }
+  ],
+  "scope": "Two measured phase-dependent local laws; no conversation codec or language attainment."
+}

@@ -44,6 +44,32 @@ conditional laws and nonlinear interactions; a local chart does not assert that 
 language or every context is globally linear. The [composition guide](HNN_COMPOSITION.md) and
 [owner map](ARCHITECTURE_MAP.md) locate existing source, phase, receiver, scale and return owners.
 
+## Continuing local-generator neighborhood
+
+[definition] `ResidentGeneratorNeighborhood::with_shared_condition` moves existing learned
+relations into one owner with an explicitly shared condition chart. Each law's actual dependence
+determines which directions of that current can affect its receiver. Common membership alone
+does not install a coupling. This owner currently admits matching bilinear source/condition charts;
+it does not infer arbitrary incidence or a universal model topology.
+
+[definition] `advance(member, source, observed)` returns the predecessor prediction, the actual
+prior condition standing, and any contact/material return. A received current first determines
+its compatible condition family under the old law. The existing contact law prepares a proposed
+current; that proposed current participates in local relation formation. Only a successful
+complete return publishes the new condition and epoch. An ordinary read uses the actual current
+and preserves a plural receiver family; it neither appends a source record nor changes the law.
+
+[definition] `GeneratorNeighborhoodRest` stores the local laws, current, epoch and latest received
+condition evidence. `ConditionPreimageRest` stores a constraint generator and right-hand side;
+the existing resident query decodes the affine fibre on remount. This last received evidence is
+scoped to its producing predecessor law, not a cumulative world posterior. `ConditionCurrentRest`
+restores actual current, not an invented prior contact report. A saved object does not contain
+the source apparatus, waveform history or a solved duplicate of the fibre.
+
+[definition] The public [`native_neighborhood` example](../crates/holonics-hna/examples/native_neighborhood.rs)
+compares two learned local receivers, a shared condition change, and process-separated continuation
+of the whole body. The source-qualified conversation attachment remains a separate construction.
+
 ## Conversation source
 
 [established-bounded; source-inspected] `holonics::hna::alpha::exposure` remains the source-qualified

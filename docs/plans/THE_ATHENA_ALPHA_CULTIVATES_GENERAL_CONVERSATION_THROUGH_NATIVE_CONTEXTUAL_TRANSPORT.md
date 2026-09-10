@@ -53,8 +53,8 @@ Its bilinear-contact chart composes source, condition and mixed complex products
 returns already feed subsequent operations without a host numerical read or codeword reset.
 These are scoped local hypotheses, not a claim that all language is linear or bilinear.
 
-[definition] The first AC1 packet makes that learned law independently restorable and uses it
-as an actual continuing generator. The absent port is a validated rest/remount of the existing
+[definition] The first AC1 packet uses `ConstitutiveFibreRest` to make that learned law independently
+restorable and applicable as a continuing generator. Its validated rest retains the existing
 relation itself, with source chart, learned basis and chronology but no source waveform archive.
 A driver may retain only the current return needed for the next operation. Its source observation
 apparatus is separate and can be dropped after development. There is no second learner in the
@@ -81,6 +81,21 @@ precondition for emission. A particular point-current port retains its own point
 [project-postulate] A missing port or failing composition is recorded as that concrete problem.
 It is not evidence of missing Holonics theory in general. Do not keep optimizing a representation
 which the source/receiver comparison has already shown to be the wrong object.
+
+[definition] The next ownership increment is `ResidentGeneratorNeighborhood`: existing local
+relations share a declared condition field, react to an observed return through their compatible
+family, and form local material before publishing one successor. Rest contains applicable laws,
+actual current, chronology and a constraint generator for the latest received evidence. That
+evidence belongs to the predecessor law that produced it; it is not a cumulative posterior over
+all observations. Full family composition remains available through the existing image owners.
+
+[definition] This neighborhood supplies a concrete attachment boundary for AC3: an exterior
+source chart must produce situated excitation/condition currents and observed receiver relations.
+Its delivery cursor and original text remain outside the learned body. Before broader exposure,
+identify the source-to-current map and the generator/receiver it excites; show what a changed
+source comparison changes in native conduct. Merely mapping byte positions to independent
+coordinates, copying each source section into a basis, or renaming a token window as conditions
+does not supply that map. Useful prose and complete identification are not prerequisites.
 
 ## AC0–AC5 construction order
 

@@ -387,18 +387,29 @@ mod contact_tests;
 #[cfg(test)]
 mod law_rest_tests;
 
+mod neighborhood;
+mod read;
+pub use neighborhood::{
+    GeneratorNeighborhoodRest, GeneratorNeighborhoodStep, NeighborhoodEvidence,
+    NeighborhoodEvidenceRest, ResidentGeneratorNeighborhood,
+};
+
 mod preimage;
-pub use preimage::{ConditionPreimageReading, ResidentConditionPreimage};
+pub use preimage::{ConditionPreimageReading, ConditionPreimageRest, ResidentConditionPreimage};
 
 mod condition_image;
 mod image;
-pub use image::{ConstitutiveImageReceiver, ConstitutiveImageReading, ResidentConstitutiveImage, ResidentConstitutiveRefinement};
 pub use condition_image::{ConditionCoverage, ConditionImageReading, ResidentConditionImage};
+pub use image::{
+    ConstitutiveImageReading, ConstitutiveImageReceiver, ResidentConstitutiveImage,
+    ResidentConstitutiveRefinement,
+};
 
 mod condition_contact;
 mod context_section;
-pub use context_section::{ContextualSectionOrigin, ResidentContextualSection};
 pub use condition_contact::{
-    ConditionContactMetric, ConditionContactReading, ConditionContactStatus,
-    ResidentConditionContact, ResidentConditionCurrent,
+    ConditionContactMetric, ConditionContactReading, ConditionContactStatus, ConditionCurrentRest,
+    PreparedConditionContact, ResidentConditionContact, ResidentConditionCurrent,
+    ResidentConditionStanding,
 };
+pub use context_section::{ContextualSectionOrigin, ResidentContextualSection};

@@ -123,6 +123,14 @@ coverage parsing and homogenized reception are shared with the original conditio
 `ResidentConditionPreimage::refined_by` checks the actual source before returning constraints
 to the existing `ResidentConditionCurrent::contact`; it adds no new metric or learner.
 
+[definition] `constitutive_fibre/resident/neighborhood.rs` owns a continuing set of local learned
+relations with explicitly shared condition standing. `resident/read.rs` queries the existing law
+without material deposition. `condition_contact.rs` prepares contact against the actual immutable
+predecessor and commits only to that owner. `neighborhood/rest.rs`, `condition_contact/rest.rs`
+and `preimage/rest.rs` store laws/current/epoch/latest evidence; the last decoder reuses the resident
+constraint query. The public `native_neighborhood` example calls these owners directly. No new
+CUDA learning rule, token lookup or historical predictor enters this composition.
+
 [historical] The SDK field/model wrapper, text adapters and eight alpha examples were
 [retired recoverably](../archive/implementations/2026-09-09-byte-field-cultivation/README.md).
 Core field/operative/receiver owners below remain mathematical and diagnostic constructions;

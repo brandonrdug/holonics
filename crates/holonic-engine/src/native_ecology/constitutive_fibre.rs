@@ -25,16 +25,19 @@ mod circulation;
 pub use circulation::*;
 mod field;
 pub use field::*;
-mod resident;
 mod law_rest;
+mod resident;
 pub use law_rest::ConstitutiveFibreRest;
 pub use resident::{
     ConditionContactMetric, ConditionContactReading, ConditionContactStatus, ConditionCoverage,
-    ConditionImageReading, ConditionPreimageReading, ConstitutiveDifferentialReading,
-    ResidentConditionContact, ResidentConditionCurrent, ResidentConditionImage,
-    ResidentConditionPreimage, ResidentConstitutiveCurrent, ResidentConstitutiveReturn,
-    ConstitutiveReturnRest, ContextualSectionOrigin, ResidentContextualSection,
-    ConstitutiveImageReceiver, ConstitutiveImageReading, ResidentConstitutiveImage, ResidentConstitutiveRefinement,
+    ConditionCurrentRest, ConditionImageReading, ConditionPreimageReading, ConditionPreimageRest,
+    ConstitutiveDifferentialReading, ConstitutiveImageReading, ConstitutiveImageReceiver,
+    ConstitutiveReturnRest, ContextualSectionOrigin, GeneratorNeighborhoodRest,
+    GeneratorNeighborhoodStep, NeighborhoodEvidence, NeighborhoodEvidenceRest,
+    PreparedConditionContact, ResidentConditionContact, ResidentConditionCurrent,
+    ResidentConditionImage, ResidentConditionPreimage, ResidentConditionStanding,
+    ResidentConstitutiveCurrent, ResidentConstitutiveImage, ResidentConstitutiveRefinement,
+    ResidentConstitutiveReturn, ResidentContextualSection, ResidentGeneratorNeighborhood,
 };
 
 /// Declared local source law, bound at founding rather than inferred from an array's width.

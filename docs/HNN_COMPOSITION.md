@@ -103,6 +103,14 @@ check permits its returned constraint to meet existing actual condition current;
 current determines the still-free component. This changes subsequent native conduct without
 selecting an external cause or retaining a chain of past image/current objects.
 
+[definition] `ResidentGeneratorNeighborhood` now composes those local owners around an explicitly
+shared condition field. The particular law supplies dependence; membership supplies no coefficient.
+Its received passage prepares condition reaction, forms local material, and publishes the complete
+successor under one move owner. This is a declared neighborhood chart, not a claim that every Holon
+contacts every other Holon. Its rest separates applicable laws, actual current and latest received
+constraint evidence. Wider incidence, scale changes and source attachments retain their own maps;
+the local construction does not replace them with a source archive.
+
 ## Partial conduct and comparison
 
 [definition] Useful restricted behavior can arise before every mechanism learns or every chart
