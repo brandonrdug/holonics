@@ -1,5 +1,32 @@
 // A fixed learned normal response restricted to S(p,c)=(c-p,c,p).
 // The top companion block is an exact join, not a learned approximation to c.
+extern "C" __global__ void section_normal_wave_joint_seed(
+    const int64_t *joint,const int64_t *joint_hi,uint32_t n,uint32_t grain,
+    int64_t *previous,int64_t *previous_hi,int64_t *current,int64_t *current_hi,
+    int64_t *power,int64_t *power_hi,int64_t *meta,int64_t *meta_hi,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    if(blockIdx.x)return;if(upstream_refused(census,lineage,lineage_count,slot))return;
+    uint32_t r=2u*n,d=2u*n;size_t cells=2u*(size_t)d*d;
+    const wide *z=(const wide *)joint;
+    for(size_t j=threadIdx.x;j<2u*(2u*r+1u);j+=blockDim.x)
+        if(joint[j]!=joint_hi[j])atomicOr(slot,REFUSED_MALFORMED);
+    if(!threadIdx.x&&z[2u*r]<0)atomicOr(slot,REFUSED_MALFORMED);
+    __syncthreads();if(*slot)return;
+    for(uint32_t j=threadIdx.x;j<r;j+=blockDim.x){
+        ((wide *)previous)[j]=z[j];((wide *)current)[j]=z[r+j];
+    }
+    if(!threadIdx.x){
+        ((wide *)previous)[r]=((wide *)current)[r]=z[2u*r];
+        ((wide *)meta)[0]=1;((wide *)meta)[1]=((wide *)meta)[2]=0;((wide *)meta)[3]=z[2u*r];
+    }
+    for(size_t j=threadIdx.x;j<cells;j+=blockDim.x)
+        ((wide *)power)[j]=((j&1u)==0&&(j/2u)/d==(j/2u)%d)?(wide)1<<grain:0;
+    __syncthreads();
+    for(size_t j=threadIdx.x;j<2u*(r+1u);j+=blockDim.x){previous_hi[j]=previous[j];current_hi[j]=current[j];}
+    for(size_t j=threadIdx.x;j<2u*cells;j+=blockDim.x)power_hi[j]=power[j];
+    for(size_t j=threadIdx.x;j<8u;j+=blockDim.x)meta_hi[j]=meta[j];
+}
+
 __device__ void normal_wave_entry(const wide *M,uint32_t n,uint32_t row,uint32_t col,
     uint32_t grain,wide *re,wide *im,uint32_t *slot){
     *re=*im=0;

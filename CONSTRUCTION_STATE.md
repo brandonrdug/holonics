@@ -1,18 +1,17 @@
 # Construction state
 
 **Currency:** September 10, 2026. **Priority:** Corrected AC0–AC5 construction is the active goal. Native HNN cultivation uses Holons as situated state, incidence, transported differences and compatible continuations; text/audio/visual media are exterior measurement charts.
-**Position:** The byte-cultivation assembly remains retired. Actual reception now stages a shared source/target comparison, changed normal material and the next joined pair atomically. AC2 development, AC4 bounded rebase and AC5 mixed-seed restart now return on the conversation-prefix model; 21 normal and 67 inertia checks pass. Broader AC3 contextual ecology/cultivation remains unfinished. AC0–AC5 is not complete. No cultivation process is running.
+**Position:** The byte-cultivation assembly remains retired. Whole source fields now develop the same continuing generator across intake, generation, rest and further intake. AC3's source attachment returns on 64 frames with 18,120 comparisons; 22 normal checks and the extended development control pass. The next gap is ordinary source-field actuation under fixed material, followed by richer contextual/local-generator composition. AC0–AC5 is not complete. No cultivation process is running.
 **Athena-alpha:** not yet attained.
 
-**Active implementation:** `ResidentNormalWave::receive` forms source `(c-p,c,p)` and observed
-difference `v-c` from the same joint current, then starts a new generator word at `(c,v)`.
-The actual preceding c supplies the join. The continuing seed retains c's enclosure and exact v;
-it does not retain a chain of prior material or source observations. This is an explicit bounded
-rebase, not an exact future-receiver quotient. The [reception record](research/records/2026-09-10_RECEIVED_CURRENTS_CHANGE_THE_GENERATOR_WITHOUT_A_HISTORY_CHAIN.md)
-retains its scope and checks. Four steps, rest and four more steps match the full returns and
-complete saved state of eight uninterrupted steps. Shared exact validation reduces this dense
-cold check from an interrupted 586-second attempt to a returned 23.586 seconds. Broader contextual
-source currents and source continuation remain next.
+**Active implementation:** `ResidentNormalWave::develop_section` stages the existing normal
+section update and any required joint-seed rebase before publication. Actual current occurrences
+remain; section intake changes material, while requested generation advances the current epoch.
+The [whole-field return](research/records/2026-09-10_WHOLE_SOURCE_FIELDS_DEVELOP_THE_CONTINUING_GENERATOR.md)
+records the public source driver, separate native rest/exterior chart/cursor, complete process
+comparison and fixed source scope. Four steps, rest and four more steps match an uninterrupted
+second word after further intake. This is material development, not yet the missing source-field
+action on current at fixed material. Local source adjacency does not exhaust context.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct

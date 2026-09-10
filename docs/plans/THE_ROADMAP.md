@@ -148,7 +148,7 @@ achieved. Current research seeks identifiable behavior and learning without a ut
 | AC0 | Existing source-qualified stream, availability and cursor | Complete; preserve |
 | AC1 | A productive conditional-generator carrier, its local interaction/reaction and source/receiver chart | Learned local laws now share actual condition standing in one move-owned neighborhood; continue into the source attachment |
 | AC2 | Observation-founded development of reusable conduct and a later measured consequence | Local material formation and condition reaction return atomically and change later conduct; carry them into the source attachment |
-| AC3 | Conversation exposure and retained joint continuation through the generator-bearing body | Sixteen source fields develop the normal response and its joined generator; extend contextual source currents and cross-message ecology |
+| AC3 | Conversation exposure and retained joint continuation through the generator-bearing body | Whole-field development now continues across source intake and generation; compose ordinary source-field actuation and richer contextual relations |
 | AC4 | Restriction/rebase or generator reuse that participates in the next operation | Apply reusable generators and explicit bounded rebase in the next operation; distinguish this from an exact future-receiver quotient |
 | AC5 | Public invocation, model anatomy and persistence of the actual productive body | Persist the actual material, seed/fibre and chronology; verify generated and received continuation on the cultivated conversation body |
 
@@ -183,6 +183,16 @@ including the conversation-prefix model. Continue into contextual source current
 source continuation. This bounded local rebase does not close the surrounding ecology or prove
 an exact future-receiver quotient. Do not turn codec storage coordinates into native cadence
 or consume an enclosure's centre as an exact current. Local adjacency is not all context.
+
+[established-bounded; implemented-exact; computational-witness] The
+[whole-source-field return](../../research/records/2026-09-10_WHOLE_SOURCE_FIELDS_DEVELOP_THE_CONTINUING_GENERATOR.md)
+now develops material inside the continuing wave and persists its bounded joint seed. The source
+application intakes, generates, restarts and intakes more material through that same body. Next,
+compose an actual source/receiver action from incoming Holons into the current under fixed
+material, using the existing conditional/nonlinear/reflection owners. Show that a changed source
+changes later conduct without treating the stimulus as a required fitting target or retrieving
+parent text. This is the concrete missing source binding, not a requirement for a universal
+intelligence theorem or a pause on broader exposure.
 
 [definition] The corrected formal `FiniteLocalCurrentEcology.reaction` retains local
 standing. The [native field assembly and observed return](../../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)

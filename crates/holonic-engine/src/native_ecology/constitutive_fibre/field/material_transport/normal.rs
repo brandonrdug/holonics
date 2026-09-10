@@ -622,4 +622,4 @@ fn decode_state(
 }
 
 mod direct;
-pub use direct::{ResidentNormalMaterial, NormalMaterialRest, NormalRealizationRefinement, ResidentNormalReturn, ResidentNormalWave, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, NormalWaveSeedKind, NormalWaveReception, NormalWaveReceptionReading, ResidentNormalSectionReturn, ResidentNormalInput, ResidentNormalEnclosure, ResidentNormalEnclosureView};
+pub use direct::{ResidentNormalMaterial, NormalMaterialRest, NormalRealizationRefinement, ResidentNormalReturn, ResidentNormalWave, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, NormalWaveSeedKind, NormalWaveReception, NormalWaveReceptionReading, NormalWaveDevelopment, ResidentNormalSectionReturn, ResidentNormalInput, ResidentNormalEnclosure, ResidentNormalEnclosureView};

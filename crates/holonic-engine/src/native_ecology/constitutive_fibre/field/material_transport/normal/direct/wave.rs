@@ -2,6 +2,8 @@
 //! The continuing state is a generator word with its original seed, resident power cache and
 //! certified remainder. Current faces are observations of that state, not its history archive.
 use super::*;
+mod develop;
+pub use develop::NormalWaveDevelopment;
 mod receive;
 pub use receive::{NormalWaveReception, NormalWaveReceptionReading};
 mod rest;
@@ -11,6 +13,7 @@ pub use rest::NormalWaveRest;
 pub enum NormalWaveSeedKind {
     ExactPair,
     ReceivedCurrent,
+    JointEnclosure,
 }
 
 struct WaveCurrent<'c> {
@@ -91,6 +94,17 @@ impl<'c> NormalWaveFibre<'c> {
                     .row(2)
                     .expect("received current"),
             )
+        })
+    }
+    pub fn initial_joint(&self) -> Option<ResidentNormalEnclosureView<'_, 'c>> {
+        (self.seed_kind == NormalWaveSeedKind::JointEnclosure).then(|| {
+            ResidentNormalEnclosureView {
+                surface: self.surface,
+                section: &self.seed,
+                offset: 0,
+                width: 4 * self.roots,
+                grain: self.grain,
+            }
         })
     }
     pub fn inspect_material(&self) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {

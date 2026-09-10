@@ -112,6 +112,19 @@ impl<'c> ResidentNormalMaterial<'c> {
         source: ResidentConstitutiveSection<'a, 'c>,
         observed: ResidentConstitutiveSection<'a, 'c>,
     ) -> Result<ResidentNormalSectionReturn<'a, 'c>, ConstitutiveFibreError> {
+        let returned = self.prepare_section(source, observed)?;
+        self.publish_section(&returned);
+        Ok(returned)
+    }
+    pub(super) fn publish_section(&mut self, returned: &ResidentNormalSectionReturn<'_, 'c>) {
+        self.state = Rc::clone(&returned.successor);
+        self.observations = returned.successor_observations;
+    }
+    pub(super) fn prepare_section<'a>(
+        &self,
+        source: ResidentConstitutiveSection<'a, 'c>,
+        observed: ResidentConstitutiveSection<'a, 'c>,
+    ) -> Result<ResidentNormalSectionReturn<'a, 'c>, ConstitutiveFibreError> {
         let layout =
             NormalLayout::new(self.roots, self.targets).ok_or(ConstitutiveFibreError::Shape)?;
         if source.rows() != observed.rows()
@@ -166,8 +179,7 @@ impl<'c> ResidentNormalMaterial<'c> {
         }
         let predecessor_observations = self.observations;
         let successor = Rc::new(next);
-        let prior = std::mem::replace(&mut self.state, Rc::clone(&successor));
-        self.observations = count;
+        let prior = Rc::clone(&self.state);
         Ok(ResidentNormalSectionReturn {
             surface: self.surface,
             prior,

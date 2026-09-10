@@ -13,7 +13,7 @@ pub use enclosure::{ResidentNormalEnclosure, ResidentNormalEnclosureView, Reside
 mod section;
 pub use section::ResidentNormalSectionReturn;
 mod wave;
-pub use wave::{ResidentNormalWave, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, NormalWaveSeedKind, NormalWaveReception, NormalWaveReceptionReading};
+pub use wave::{ResidentNormalWave, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, NormalWaveSeedKind, NormalWaveReception, NormalWaveReceptionReading, NormalWaveDevelopment};
 
 pub struct ResidentNormalMaterial<'c> {
     surface: &'c ResidentSurface<'c>,

@@ -153,6 +153,10 @@ current joins; `normal_wave.cuh` compiles the source-plane action and bounds its
 `normal/direct/wave/receive.rs` and `normal_wave_receive.cuh` join a received current to the
 preceding joint family, stage its normal-material update and rebase to an enclosed/exact seed.
 The receipt retains the producing fibre; the continuing wave does not retain a receipt chain.
+`normal/direct/wave/develop.rs` stages whole-section normal development with joint-seed rebase
+while preserving current occurrence identity. The section owner separates preparation from
+publication; `crates/holonics-hna/examples/conversation_wave.rs` composes the native body with
+exterior source/chart/cursor I/O.
 `surface_normal_wave.rs` records the resident passages. `normal/direct/rest.rs` and
 `wave/rest.rs` own complete normal material and generator/seed/word persistence.
 `inertia/source_energy.rs` checks positive source geometry, source-kernel compatibility and

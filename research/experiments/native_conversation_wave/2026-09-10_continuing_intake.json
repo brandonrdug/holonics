@@ -1,0 +1,107 @@
+{
+  "schema": "holonics.conversation-wave-process-comparison.v1",
+  "scope": "64 source frames develop one continuing local generator, with generation before and after further intake; not general contextual language",
+  "alphabet_coordinates": 85,
+  "grain": 64,
+  "source_frames": 64,
+  "source_fields": 64,
+  "source_scalars": 18248,
+  "source_octets": 18412,
+  "observations": 18120,
+  "schedule": [
+    "intake frames 0..31",
+    "generate 4 currents",
+    "rest/restart",
+    "intake frames 32..63",
+    "generate 4 currents",
+    "rest/restart",
+    "generate 4 more currents"
+  ],
+  "complete_model_rest_equal_to_uninterrupted_second_word": true,
+  "complete_bounded_returns_equal_to_uninterrupted_second_word": true,
+  "source_delivery_cursor_equal": true,
+  "final_current_epoch": 12,
+  "current_epochs_during_first_intake": [
+    0
+  ],
+  "current_epochs_during_second_intake": [
+    4
+  ],
+  "rebase_count_during_second_intake": 1,
+  "numerical_readouts_during_development": 0,
+  "ingress_octets_during_development": 0,
+  "development_seconds": [
+    91.31130239,
+    92.166417539
+  ],
+  "steady_resident_octets": 53210144,
+  "model_rest_octets": 25669477,
+  "trajectory": [
+    {
+      "epoch": 1,
+      "word_step": 1,
+      "joint_radius": "4599991075/576460752303423488"
+    },
+    {
+      "epoch": 2,
+      "word_step": 2,
+      "joint_radius": "36799928605/2305843009213693952"
+    },
+    {
+      "epoch": 3,
+      "word_step": 3,
+      "joint_radius": "55199892915/2305843009213693952"
+    },
+    {
+      "epoch": 4,
+      "word_step": 4,
+      "joint_radius": "73599857225/2305843009213693952"
+    },
+    {
+      "epoch": 5,
+      "word_step": 1,
+      "joint_radius": "14621629881429/18446744073709551616"
+    },
+    {
+      "epoch": 6,
+      "word_step": 2,
+      "joint_radius": "15112087175951/18446744073709551616"
+    },
+    {
+      "epoch": 7,
+      "word_step": 3,
+      "joint_radius": "15602544470633/18446744073709551616"
+    },
+    {
+      "epoch": 8,
+      "word_step": 4,
+      "joint_radius": "16093001765609/18446744073709551616"
+    },
+    {
+      "epoch": 9,
+      "word_step": 5,
+      "joint_radius": "8291729530415/9223372036854775808"
+    },
+    {
+      "epoch": 10,
+      "word_step": 6,
+      "joint_radius": "17073916356345/18446744073709551616"
+    },
+    {
+      "epoch": 11,
+      "word_step": 7,
+      "joint_radius": "17564373652105/18446744073709551616"
+    },
+    {
+      "epoch": 12,
+      "word_step": 8,
+      "joint_radius": "9027415474055/9223372036854775808"
+    }
+  ],
+  "checks": {
+    "normal_suite": 22,
+    "extended_development_control": "passed",
+    "public_example_build": "passed"
+  },
+  "cost_scope": "wall-clock observations; final continuation comparison processes overlapped, so generation timings are not isolated hardware calibration"
+}

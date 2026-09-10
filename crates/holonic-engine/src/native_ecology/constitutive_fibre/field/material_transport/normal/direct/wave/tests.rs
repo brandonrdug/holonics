@@ -324,3 +324,114 @@ fn received_seed_rest_and_atomic_refusal_preserve_the_whole_successor() {
     bytes[b"HOLONIC-NORMAL-WAVE".len()] = u8::MAX;
     assert!(NormalWaveRest::read(&mut bytes.as_slice(), bytes.len() as u64).is_err());
 }
+
+#[test]
+#[ignore = "requires CUDA; section development keeps current identity, changes its next conduct and rests the joint seed"]
+fn a_measured_section_develops_the_continuing_generator() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let p = point(&s, &[0, 0]);
+    let c = point(&s, &[1, 0]);
+    let mut body = material(&s, 0)
+        .into_difference_wave(current(&p), current(&c))
+        .unwrap();
+    body.advance().unwrap();
+    let previous = body.previous().snapshot();
+    let joining = body.current().snapshot();
+    let measured = s
+        .mount_section_rest(
+            &ResidentSectionRest::found(
+                3,
+                2,
+                ResidentGrain(0),
+                i64::BITS,
+                [1, 0, 2, 0, 4, 0].into_iter().map(|v| (v, v)).collect(),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+    let field = ResidentConstitutiveSection::integers(&measured)
+        .unwrap()
+        .differences(&s)
+        .unwrap();
+    let reads = s.census().section_read_outs;
+    let developed = body
+        .develop_section(field.source(), field.observed())
+        .unwrap();
+    assert_eq!(s.census().section_read_outs, reads);
+    assert!(body.previous().same_occurrence(&previous));
+    assert!(body.current().same_occurrence(&joining));
+    assert!(developed.rebased_joint_enclosure);
+    assert_eq!(body.epoch(), 1);
+    assert_eq!(body.steps(), 0);
+    assert_eq!(developed.successor_fibre.material_observations, 4);
+    assert_eq!(developed.predecessor_fibre.material_observations, 3);
+    assert!(developed.successor_fibre.initial_joint().is_some());
+    let saved = body.rest().unwrap();
+    let mut bytes = Vec::new();
+    saved.write(&mut bytes).unwrap();
+    assert_eq!(bytes[b"HOLONIC-NORMAL-WAVE".len()], 3);
+    let next = body.advance().unwrap();
+    assert!(next.previous.same_occurrence(&joining));
+    // The source (1,2,1), target 2 changes (0,-1/2,0) into (3/8,1/4,3/8).
+    // On the actual source (-1/2,1/2,1), the change is 5/16 and current is 13/16.
+    contains(&next.current.view().inspect().unwrap(), &[wave(13, 0, 16)]);
+    let expected = serde_json::to_value(next.inspect().unwrap()).unwrap();
+    drop(next);
+    drop(developed);
+    drop(body);
+    let loaded = NormalWaveRest::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
+    assert_eq!(loaded, saved);
+    let mut resumed = loaded.remount(&s, |_| {}).unwrap();
+    assert_eq!(
+        serde_json::to_value(resumed.advance().unwrap().inspect().unwrap()).unwrap(),
+        expected
+    );
+    let changed = resumed
+        .develop_section(field.source(), field.observed())
+        .unwrap();
+    assert!(changed.rebased_joint_enclosure);
+    drop(changed);
+    let before = resumed.rest().unwrap();
+    let bad = s
+        .mount_section_rest(
+            &ResidentSectionRest::found(1, 2, ResidentGrain(0), i64::BITS, vec![(0, 1), (0, 0)])
+                .unwrap(),
+        )
+        .unwrap();
+    assert!(
+        resumed
+            .develop_section(
+                field.source(),
+                ResidentConstitutiveSection::integers(&bad).unwrap()
+            )
+            .is_err()
+    );
+    assert_eq!(resumed.rest().unwrap(), before);
+    let untouched = resumed.current().snapshot();
+    let developed = resumed
+        .develop_section(field.source(), field.observed())
+        .unwrap();
+    assert!(!developed.rebased_joint_enclosure);
+    assert!(resumed.current().same_occurrence(&untouched));
+    drop(developed);
+    let residency = s.census().resident_octets_now;
+    for _ in 0..4 {
+        resumed
+            .develop_section(field.source(), field.observed())
+            .unwrap();
+        assert_eq!(s.census().resident_octets_now, residency);
+    }
+    resumed.advance().unwrap();
+    let before = resumed.rest().unwrap();
+    let mut corrupt = s.detach_section(&resumed.joint, i64::BITS).unwrap();
+    let last = corrupt.intervals.len() - 1;
+    corrupt.intervals[last] = (-1, -1);
+    resumed.joint = Rc::new(s.mount_section_rest(&corrupt).unwrap());
+    assert!(
+        resumed
+            .develop_section(field.source(), field.observed())
+            .is_err()
+    );
+    assert_eq!(resumed.rest().unwrap(), before);
+}

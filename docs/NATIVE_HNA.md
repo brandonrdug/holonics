@@ -119,6 +119,20 @@ does not assert equality to the finer old generator fibre or supply all contextu
 `epoch` counts generated and received occurrences; `steps` counts the current fixed-material
 word. Rest v2 preserves this mixed seed and chronology; v1 exact-seed rests remain readable.
 
+[definition] `ResidentNormalWave::develop_section` develops material from complete measured
+source/target sections while preserving the actual previous/current occurrences. It creates no
+new emitted current; observation count changes, while the current epoch remains. An existing
+word is rebased to its joint enclosure before the new material is published. Rest v3 retains
+that productive joint seed and its next operation. Earlier marginal observations may be sharper
+than the joint enclosure; v3 does not reconstruct discarded finer historical observation cuts.
+
+[definition] The public `conversation_wave` example composes this owner with the source reader
+and exterior symbol chart. Intake count and requested generation count are separate application
+arguments. It saves `model.wave`, `exterior-chart.json` and `source-cursor.json` separately,
+followed by the completed run summary. A partial directory without that summary is not a
+resumable run. Source sections are released after development; no textual adjacency is fabricated
+between separate sections or inferred from exposure ordering.
+
 [definition] `NormalMaterialRest` checks the source Gram, cross-source kernel and compatible
 target energy with `inertia::positive_source_energy`, and checks the actual numerical witness.
 `refine_realization` changes only the numerical grain and recomputes that witness from unchanged

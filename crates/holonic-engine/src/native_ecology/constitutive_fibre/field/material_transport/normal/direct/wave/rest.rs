@@ -30,14 +30,14 @@ impl NormalWaveRest {
     }
     pub fn write(&self, out: &mut impl Write) -> Result<(), ConstitutiveFibreError> {
         out.write_all(MAGIC).map_err(invalid)?;
-        let version = if self.seed_kind == NormalWaveSeedKind::ExactPair {
-            1
-        } else {
-            2
+        let version = match self.seed_kind {
+            NormalWaveSeedKind::ExactPair => 1,
+            NormalWaveSeedKind::ReceivedCurrent => 2,
+            NormalWaveSeedKind::JointEnclosure => 3,
         };
         out.write_all(&[version]).map_err(invalid)?;
         out.write_all(&self.steps.to_le_bytes()).map_err(invalid)?;
-        if version == 2 {
+        if version >= 2 {
             out.write_all(&self.epoch.to_le_bytes()).map_err(invalid)?;
         }
         let mut material = Vec::new();
@@ -50,7 +50,7 @@ impl NormalWaveRest {
         expect(&mut input, MAGIC)?;
         let mut version = [0];
         input.read_exact(&mut version).map_err(invalid)?;
-        if version[0] != 1 && version[0] != 2 {
+        if !(1..=3).contains(&version[0]) {
             return Err(invalid("normal wave version"));
         }
         let mut bytes = [0; 8];
@@ -61,10 +61,17 @@ impl NormalWaveRest {
         } else {
             input.read_exact(&mut bytes).map_err(invalid)?;
             let epoch = u64::from_le_bytes(bytes);
-            if epoch <= steps {
+            if epoch < steps || (version[0] == 2 && epoch == steps) {
                 return Err(invalid("received wave chronology"));
             }
-            (epoch, NormalWaveSeedKind::ReceivedCurrent)
+            (
+                epoch,
+                if version[0] == 2 {
+                    NormalWaveSeedKind::ReceivedCurrent
+                } else {
+                    NormalWaveSeedKind::JointEnclosure
+                },
+            )
         };
         let m = read_blob(&mut input)?;
         let material = NormalMaterialRest::read(&mut m.as_slice(), m.len() as u64)?;
@@ -88,6 +95,13 @@ impl NormalWaveRest {
                     return Err(invalid("wave enclosed seed"));
                 }
             }
+            NormalWaveSeedKind::JointEnclosure => {
+                let components = 4 * material.roots();
+                point_section(&seed, 1, 2 * (components + 1))?;
+                if wides(&seed.intervals)?[components] < 0 {
+                    return Err(invalid("negative joint seed radius"));
+                }
+            }
         }
         Ok(Self {
             material,
@@ -106,33 +120,41 @@ impl NormalWaveRest {
         mut progress: impl FnMut(u64),
     ) -> Result<ResidentNormalWave<'c>, ConstitutiveFibreError> {
         let initial = surface.mount_section_rest(&self.seed)?;
-        let view = ResidentConstitutiveSection::rationals(&initial)?;
         let material = self.material.remount(surface)?;
-        let (previous, current) = match self.seed_kind {
-            NormalWaveSeedKind::ExactPair => (view.row(0)?.into(), view.row(1)?),
-            NormalWaveSeedKind::ReceivedCurrent => (
-                ResidentNormalInput::Enclosed(ResidentNormalEnclosureView {
-                    surface,
-                    section: &initial,
-                    offset: 0,
-                    width: 2 * material.roots,
-                    grain: material.grain,
-                }),
-                view.row(2)?,
-            ),
-        };
-        let mut body = material
-            .into_difference_wave_source(previous, current)
-            .map_err(|r| r.reason)?;
         let base = self.epoch - self.steps;
-        body.epoch = base;
-        Rc::get_mut(&mut body.current.inner)
-            .expect("unpublished decoded current")
-            .at = Some(base);
-        Rc::get_mut(&mut body.previous.inner)
-            .expect("unpublished decoded previous")
-            .at = base.checked_sub(1);
-        drop(initial);
+        let mut body = if self.seed_kind == NormalWaveSeedKind::JointEnclosure {
+            material
+                .into_joint_wave(Rc::new(initial), base)
+                .map_err(|r| r.reason)?
+        } else {
+            let view = ResidentConstitutiveSection::rationals(&initial)?;
+            let (previous, current) = match self.seed_kind {
+                NormalWaveSeedKind::ExactPair => (view.row(0)?.into(), view.row(1)?),
+                NormalWaveSeedKind::ReceivedCurrent => (
+                    ResidentNormalInput::Enclosed(ResidentNormalEnclosureView {
+                        surface,
+                        section: &initial,
+                        offset: 0,
+                        width: 2 * material.roots,
+                        grain: material.grain,
+                    }),
+                    view.row(2)?,
+                ),
+                NormalWaveSeedKind::JointEnclosure => unreachable!("handled enclosed joint"),
+            };
+            let mut body = material
+                .into_difference_wave_source(previous, current)
+                .map_err(|r| r.reason)?;
+            body.epoch = base;
+            Rc::get_mut(&mut body.current.inner)
+                .expect("unpublished decoded current")
+                .at = Some(base);
+            Rc::get_mut(&mut body.previous.inner)
+                .expect("unpublished decoded previous")
+                .at = base.checked_sub(1);
+            drop(initial);
+            body
+        };
         while body.steps() < self.steps {
             body.advance()?;
             progress(body.steps());

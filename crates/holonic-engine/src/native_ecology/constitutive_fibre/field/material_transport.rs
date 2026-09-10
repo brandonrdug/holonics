@@ -6,7 +6,7 @@ use num_traits::One;
 pub(super) mod complete;
 pub(super) mod contextual;
 pub(super) mod normal;
-pub use normal::{NativeNormalMaterialObjective, NativeNormalMaterialReading, NativeNormalMaterialState, ResidentNormalMaterial, NormalMaterialRest, NormalRealizationRefinement, ResidentNormalReturn, ResidentNormalWave, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, NormalWaveSeedKind, NormalWaveReception, NormalWaveReceptionReading, ResidentNormalSectionReturn, ResidentNormalInput, ResidentNormalEnclosure, ResidentNormalEnclosureView};
+pub use normal::{NativeNormalMaterialObjective, NativeNormalMaterialReading, NativeNormalMaterialState, ResidentNormalMaterial, NormalMaterialRest, NormalRealizationRefinement, ResidentNormalReturn, ResidentNormalWave, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, NormalWaveSeedKind, NormalWaveReception, NormalWaveReceptionReading, NormalWaveDevelopment, ResidentNormalSectionReturn, ResidentNormalInput, ResidentNormalEnclosure, ResidentNormalEnclosureView};
 mod support;
 pub use support::{NativeMaterialReportPacking, NativeMaterialReportPackingRest};
 pub(super) mod moment;

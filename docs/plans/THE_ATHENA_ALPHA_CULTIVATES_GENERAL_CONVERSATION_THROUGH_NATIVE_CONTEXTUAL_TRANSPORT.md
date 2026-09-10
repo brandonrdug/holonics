@@ -135,6 +135,28 @@ the continuing body retains no chain of old material or source records. This bou
 is not an exact future-receiver quotient. AC5 must restore its material, mixed seed, chronology
 and next operation; failed reception must preserve the entire existing successor.
 
+[definition] Whole-field development now joins the same continuing generator. Supplied source
+and observed sections update its normal geometry atomically while its actual previous/current
+occurrences remain. If a word has already run, retain its complete joint enclosure as the new
+seed; this is the declared bounded rebase, not replay of its original waveform. With no word
+since the last material change, reuse the existing seed directly. The current epoch counts actual
+generated/received currents; section development changes material and its observation count.
+
+[definition] The source application keeps its exterior alphabet and delivery cursor separate
+from the productive generator rest. It can intake a declared population, request generation,
+restart and intake more material through that same body. Source sections contain only their
+own measured differences: neither exposure order nor original parent metadata invents a
+cross-section textual adjacency. This supplies a continuing cultivation attachment without
+claiming that the local source stencil exhausts relevant contextual conditions. Broader exposure
+does not wait for such a claim or for useful prose.
+
+[definition] The next source binding supplies ordinary current actuation from an incoming Holon
+under fixed material. Whole-field development alone does not supply that interaction. Compose
+actual source/receiver and conditional/nonlinear/reflection owners, retaining their joint family,
+and compare changed source action and later conduct. Do not make a fit, semantic label or
+parent-text retrieval stand in for the source-current relation. This is a construction step,
+not a new qualitative gate on exposure or a separate world-verdict learning law.
+
 ## AC0–AC5 construction order
 
 | Phase | Construction and concrete return |

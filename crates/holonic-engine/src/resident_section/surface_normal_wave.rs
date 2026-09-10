@@ -5,6 +5,56 @@ use crate::native_ecology::constitutive_fibre::{
 };
 impl<'c> ResidentSurface<'c> {
     #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_normal_wave_joint_seed(
+        &self,
+        lane: &Lane<'_, 'c>,
+        joint: &ResidentSection<'c>,
+        n: usize,
+        grain: u32,
+        previous: &ResidentSection<'c>,
+        current: &ResidentSection<'c>,
+        power: &ResidentSection<'c>,
+        meta: &ResidentSection<'c>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || Self::operative_error();
+        let r = n.checked_mul(2).filter(|r| *r > 0).ok_or_else(fail)?;
+        let pw = r
+            .checked_mul(r)
+            .and_then(|v| v.checked_mul(4))
+            .ok_or_else(fail)?;
+        if !(1..=120).contains(&grain)
+            || pw > u32::MAX as usize
+            || !self.operative_shape(joint, 1, 2 * (2 * r + 1))
+            || !self.operative_shape(previous, 1, 2 * (r + 1))
+            || !self.operative_shape(current, 1, 2 * (r + 1))
+            || !self.operative_shape(power, 1, pw)
+            || !self.operative_shape(meta, 1, 8)
+        {
+            return Err(fail());
+        }
+        let mut p = Params::new();
+        p.ptr(joint.lo.device_ptr())
+            .ptr(joint.hi.device_ptr())
+            .u32(n as u32)
+            .u32(grain);
+        for v in [previous, current, power, meta] {
+            p.ptr(v.lo.device_ptr()).ptr(v.hi.device_ptr());
+        }
+        p.ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_normal_wave_joint_seed",
+            1,
+            self.launch.block_x,
+            0,
+            &mut p,
+            "normal-wave-joint-seed",
+        )
+    }
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn record_normal_wave_receive(
         &self,
         lane: &Lane<'_, 'c>,
