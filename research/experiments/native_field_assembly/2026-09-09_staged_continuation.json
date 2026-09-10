@@ -146,5 +146,21 @@
   "comparison_report_paths": [
     ".local/artifacts/athena-alpha/ac3-joint-field-2026-09-09/report.json",
     ".local/artifacts/athena-alpha/ac3-joint-field-2026-09-09/report-staged.json"
-  ]
+  ],
+  "excitation_protocol": {
+    "input": "Explain the difference between a function and its derivative.",
+    "input_utf8_octets": 61,
+    "input_with_part_marker_occurrences": 62,
+    "input_native_from": 5064,
+    "input_native_until": 5126,
+    "contact_response_during_input": true,
+    "additional_contact_returns_during_input": 61,
+    "first_input_retained_interior_source": null,
+    "first_input_predecessor_state": 5063,
+    "feedback": "Material receiver face with retained source witness, actuated as fresh canonical unit impulses in the outgoing chart.",
+    "stop": "Native-selected EndPart ends the exterior driver; not undriven-current extinction.",
+    "comparison_scope": "One input retained for implementation/restart equality, not excitation-response characterization.",
+    "exposed_text_octets": 5048,
+    "exposed_part_markers": 16
+  }
 }

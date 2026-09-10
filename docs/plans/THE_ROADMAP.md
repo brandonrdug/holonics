@@ -165,12 +165,16 @@ generator savings, staged independent device work with one final commit, complet
 and the actual model's fresh-process reported-state comparison. Public Rust invocation, model
 anatomy and native/application persistence are delivered with their receiver and backend scope.
 
-[definition] Further Athena-alpha development begins from this retained research body and the
-shared Holon field. The returned cost question is concrete: multi-block execution preserves
-conduct but still leaves substantial historical source transfer and serial work. Improve an
-identified dependency/representation before repeating a larger exposure; keep behavior and
-current-family comparisons attached to that changed construction. This is the wider product
-continuation, not another hidden acceptance condition added to the finite AC0–AC5 cycle.
+[definition] Brandon's follow-up places elementary excitation and its situated response first.
+Use the retained body and existing paired/phase/current controls; identify the source, local
+standing, supplied current and declared future receiver, then vary an elementary excitation or
+its composition and inspect reflection, interior change and later conduct. The single driven
+function/derivative input was an execution comparison, not this research return. Read the
+[protocol correction](../../research/records/2026-09-09_AC4_AC5_THE_JOINT_OPERATION_SPANS_BLOCKS_AND_THE_RESEARCH_MODEL_CONTINUES.md#correction-the-actual-excitation-and-the-meaning-of-the-cost-report).
+Keep cost attached to the historical pairings, growing return factors and placement that incur
+it; neither “large corpus” nor a further optimization-first gate replaces this causal question.
+Compose existing receiver/source generators where that actual dependency admits reuse. This
+continues the scientific work beyond the finite engineering returns without revoking them.
 
 [project-postulate] Derivation belongs to the finite packet it changes. A partial/local learner
 may develop identifiable behavior without a universal HNN theorem, all six architecture adapters,

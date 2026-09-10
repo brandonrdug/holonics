@@ -1,7 +1,7 @@
 # Construction state
 
 **Currency:** September 9, 2026. **Priority:** Native HNN cultivation through Holons as situated state, incidence, transported differences and compatible continuations; text/audio/visual media are exterior measurement charts.
-**Position:** The revised finite AC0–AC5 construction cycle has returned. The sixteen-family joint-field artifact, generic Rust assembly/local return/persistence and actual fresh-process continuation are verified. Large-corpus cost and the original useful Athena-alpha objective remain open; no cultivation process is running.
+**Position:** The finite AC0–AC5 assembly, local-return, execution and persistence artifacts are verified. Brandon's follow-up directs explanation through elementary excitations: the single driven text continuation does not establish the learned response law. The joint implementation already takes about 46 minutes on 5,048 text bytes; this is retained-history/return work, not a newly established corpus-scale obstruction. No cultivation process is running.
 **Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -88,6 +88,13 @@ instances. This continuation unifies already-engaged elementary patterns; it cha
 model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction — finite AC0–AC5 return
+
+[established-bounded; source-inspected; measured] The [excitation/reporting correction](research/records/2026-09-09_AC4_AC5_THE_JOINT_OPERATION_SPANS_BLOCKS_AND_THE_RESEARCH_MODEL_CONTINUES.md#correction-the-actual-excitation-and-the-meaning-of-the-cost-report)
+states the actual input, its 62 arrivals and 61 local learning returns, and the fresh unit drive
+used for output feedback. Restart equality is established; an account of learned elementary
+excitation/response is not. Existing phase/current controls supply the starting point. The cost
+belongs to concrete historical pairings, growing current factors and placement already measured
+in earlier variants, not an intrinsic limitation of Holons.
 
 [established-bounded; implemented-exact; computational-witness] The [AC4–AC5 return](research/records/2026-09-09_AC4_AC5_THE_JOINT_OPERATION_SPANS_BLOCKS_AND_THE_RESEARCH_MODEL_CONTINUES.md)
 completes staged multi-block execution of the same joint operation and public research-model

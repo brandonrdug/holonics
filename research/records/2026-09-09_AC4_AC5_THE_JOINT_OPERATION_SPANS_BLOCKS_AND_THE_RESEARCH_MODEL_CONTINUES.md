@@ -122,3 +122,53 @@ observed-response and rest interfaces. The operative contextual/target/return st
 concrete backend comparison targets; CUDA agreement does not establish Metal parity. Acoustic
 section/clock work can inform their shared source laws without waiting for useful English and
 without adding an acoustic-specific learner to the desktop.
+
+## Correction: the actual excitation and the meaning of the cost report
+
+[established-bounded; source-inspected; measured] Brandon challenged the single-output report
+after this return. The actual input was `Explain the difference between a function and its derivative.`
+It contains 61 UTF-8 bytes. `alpha_text::run_session` calls `begin_part(None)`, receives those
+bytes and one EndPart in the real/incoming chart, then requests imaginary/outgoing material
+readings. The 62 arrivals advance the field from 5,064 to 5,126 occurrences. The first has no
+retained interior source handle but retains predecessor state 5,063; it is a supplied exterior
+excitation, not a causeless event. Later bytes use the preceding actual emission as source.
+Observed local response is enabled and adds 61 contact returns, reaching 5,124. This is not a
+frozen-coefficient prompt evaluation.
+
+[definition] Here “prompt” names an exterior file and a driver schedule. The driver constructs
+no distinguished native question object or understood function/derivative relation. Each input
+uses nine one-of-two unit impulses, its declared orientation and the receiving field's standing.
+The computational Holon includes the situated occurrence, source relation, current and successor;
+the string alone does not supply that identity. A source/receiver-grounded account of elementary
+excitation must therefore describe those operations before interpreting the displayed sentence.
+
+[established-bounded; source-inspected] The selected output face is actuated through fresh
+canonical unit impulses in `TextFieldSession::stage_material_actuation_with_phases`. The actual
+material current and source witness remain retained; arbitrary amplitude/phase from that current
+is not thereby transported into the next input. EndPart ends this exterior drive loop. It does
+not measure extinction of an undriven current. The single sentence was reused for an execution/
+restart comparison; it does not establish the learned model's excitation-response behavior or
+explain why this particular sequence occurs.
+
+[established-bounded; source-inspected; measured] “Unresolved large-corpus cost” was an imprecise
+description of a concrete implementation cost already visible on very little material. The
+sixteen exposed parts contain 5,048 text bytes plus sixteen part markers. Development took
+2,753.900 seconds, with a 1,257,518,630-byte checkpoint and about 5.55 GB peak native residency.
+`prepare_contextual_work` traverses and ensures residency of historical source sections; each
+weight row pairs historical source/context, and every evaluated target coordinate reduces past
+contributions. Stored operative currents/return factors also carry growing contact domains.
+Multi-block execution preserves this dependency population. These choices explain sources of
+work, not a measured attribution of every second. No full-corpus limit was tested or proved.
+
+[established-bounded; measured] This cost did not first appear at the last return. The earlier
+[sixteen-family normal study](2026-09-09_AC1_AC2_REPEATED_FACES_RETAIN_PHASE_AND_EXCHANGE.md)
+already took 1,889.64 seconds for its eight additional families and saved a 1,518,483,970-byte
+checkpoint. The profiles and workflows differ, so these figures are not a matched performance
+comparison; they establish that growing implementation cost was previously recorded.
+
+[definition] The finite AC return stands as scoped assembly, local-return, execution and
+persistence evidence. It does not close the explanation of learned elementary conduct. The
+next research comparison must build on the existing phase/paired-current controls: declare
+source and local standing, vary an elementary excitation or its composition, and inspect the
+retained current, reflection, return and later receiver difference. Repeated natural-language
+questions or a new optimization-first gate would not answer Brandon's present question.
