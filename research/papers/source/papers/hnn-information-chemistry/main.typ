@@ -5,10 +5,12 @@
 #import "manifold-geometry.typ": torus, cube-net, root-action, overlap, flux-faces, manifold-data
 #import "orientation-geometry.typ": ribbon-surface, cover-seam, thickened-shorts, transport-square, orientation-data
 
-#set document(title: "HNN - Information Chemistry", author: "Brandon Duggan / Holonics", description: "Eighteen diagram plates: HNN, closed cartography, manifold differences, intersecting fields, and non-orientable bridges.")
+#import "law-geometry.typ": linked-bodies, swept-triangle
+
+#set document(title: "HNN - Information Chemistry", author: "Brandon Duggan / Holonics", description: "Twenty diagram plates: HNN, equational transport, manifold differences, non-orientable bridges, and moving polygonal world tubes.")
 #set page(width: 320mm, height: 210mm, margin: (x:16mm,y:13mm), footer: context {
   set text(size:8pt,fill:by-muted)
-  [HOLONICS #h(1fr) HNN / INFORMATION CHEMISTRY #h(1fr) #counter(page).display("1") / 18]
+  [HOLONICS #h(1fr) HNN / INFORMATION CHEMISTRY #h(1fr) #counter(page).display("1") / 20]
 })
 #set text(font: "Libertinus Serif", size:11pt, fill:by-black)
 #set math.equation(numbering:none)
@@ -556,7 +558,7 @@
 #v(4mm)
 #eq[$c_a(t)=(-cos t,0,2sin t), quad e_a(t)=(frac(-2sin t cos t,ell),cos t,frac(sin^2 t,ell)), quad ell=sqrt(sin^2 t+4cos^2 t)$]
 #eq[$c_b(t)=(0,-cos t,-2sin t), quad e_b=(1,0,0), quad X_a=c_a+v e_a, quad X_b=c_b+v e_b, quad abs(v)<=1/3$]
-#caption([*Defined realization.* $0<=t<=pi$; the untwisted control uses $e_a=(0,1,0)$. The upper/lower ribbons meet the square disk only at their attachments. Opaque color reads the unoriented face-normal line through $g=(n_x+n_z,n_y+n_z)$ and the prior primary response: $C(n)=C(-n)$. Both sides are drawn. Color therefore retains local shape while its sign fibre remains explicit. Möbius shorts are a Klein bottle with an open disk removed: #link("https://archive.bridgesmathart.org/2020/bridges2020-121.pdf")[Bridges 2020, figure 11].])
+#caption([*Defined realization.* $0<=t<=pi$; the untwisted control uses $e_a=(0,1,0)$. Half-width $w=1/3$ is a declared embedding parameter. The ribbons meet the disk only at their attachments. Opaque color reads the unoriented face-normal line through $g=(n_x+n_z,n_y+n_z)$ and the prior primary response: $C(n)=C(-n)$. Both sides are drawn. Color therefore retains local shape while its sign fibre remains explicit. Möbius shorts are a Klein bottle with an open disk removed: #link("https://archive.bridgesmathart.org/2020/bridges2020-121.pdf")[Bridges 2020, figure 11].])
 
 #pagebreak()
 #title("18","One-sided interior, orientable surrounding boundary","Carry orientation as transport data; thicken the embedded object when the receiver needs an ordinary outward flux.")
@@ -568,7 +570,7 @@
  [*Close the cover's two rims*\
   #thickened-shorts(side:65mm)\
   #eq[$partial N(S)=tilde(S) union_(partial tilde(S)) (partial S times I)$]
-  #caption([The boundary of a regular neighborhood of shorts is a closed orientable genus-2 surface. Yellow triangles join the cover along the original boundary. Offset $1/12$ is a quarter of ribbon half-width $1/3$; its picture illustrates the exactly checked shell incidence.])],
+  #caption([The boundary of a regular neighborhood of shorts is a closed orientable genus-2 surface. Yellow triangles join the cover along the original boundary. The chosen offset is $w/4=1/12$ for $w=1/3$, not a recovered thickness law. Plate 20 continues into actual volumes and world tubes.])],
  [*Two paths can return different currents*\
   #v(4mm)#transport-square()\
   #eq[$A=mat(1,0;0,-1), quad B=mat(0,-1;1,0)$]
@@ -589,3 +591,65 @@
 )
 #v(4mm)
 #caption([*Source-inspected precedent.* #link("https://www.nature.com/articles/s41586-023-06022-7")[Guo et al., Nature 618 (2023)] construct non-orientable order and order-sensitive mechanical responses. The matrices here are a separate exterior calibration. *HNN interpretation:* retain the path, local frame and return through the addressed passage; a condensation owes $q_Y T_gamma=U_gamma q_X$ for the admitted future family. Source incidence and the orientation cover establish topology; no learned semantic bridge is inferred from a rendering.])
+
+#pagebreak()
+#title("19","The compared response keeps its producing state","Equational congruence becomes useful architecture equality through typed sources, receivers and successor transport.")
+#align(center,diagram(
+ node-outset:1pt,edge-stroke:.7pt+by-black,label-size:9pt,
+ n((0mm,0mm),<source19>,[Incoming source section],$o$,width:46mm),
+ n((66mm,0mm),<state19>,[Act on the actual joint],$z_s=T_(M,o) z$,width:52mm),
+ n((132mm,0mm),<predict19>,[Generate its response],$hat(v)=c_s+M phi(z_s)$,width:58mm),
+ n((204mm,0mm),<emit19>,[Read the emitted face],$y=b(hat(v))$,width:54mm,tone:by-red),
+ n((66mm,-25mm),<producer19>,[Retain the producing passage],$(z_s,M,b,kappa)$,width:57mm,tone:by-red),
+ n((204mm,-25mm),<observed19>,[Addressed observed return],$(v,b_v;"producer")$,width:54mm,tone:by-red),
+ n((132mm,-50mm),<difference19>,[Compare in the common chart],$delta=b_(v)(v)-b(hat(v))$,width:59mm,tone:by-red),
+ n((66mm,-75mm),<develop19>,[Develop one complete successor],$(M^+,z^+,cal(F)^+,kappa^+)$,width:65mm,tone:by-red),
+ arr(<source19>,<state19>),arr(<state19>,<predict19>),
+ edge(<state19>,<producer19>,"-->",stroke:by-red),
+ edge(<predict19>,<emit19>,"-->",stroke:by-red),
+ edge(<emit19>,<observed19>,"-->",stroke:by-red),
+ edge(<observed19>,<difference19>,"-->",stroke:by-red),
+ edge(<producer19>,<difference19>,"-->",stroke:by-red),
+ edge(<difference19>,<develop19>,"-->",stroke:by-red),
+ edge("-->",vertices:(<develop19>,(0mm,-75mm),(0mm,-25mm),<state19>),stroke:by-red,label:[next occurrence]),
+))
+#v(2mm)
+#caption([*Source-inspected architecture / construction.* Blue boxes have returned local owners. Red paths name the next composed receiver/development binding. A later correction of $hat(v)$ retains its producing $z_s$; the current #raw("receive(v)") method instead means an actual next current. The same ordinary occurrence can carry source and comparison with one final successor.])
+#v(4mm)
+#grid(columns:(1fr,1fr),gutter:12mm,
+ [*One observed value, two different causal equations*
+  #eq[$z=(0,1), quad P=(1/2,1/2,0), quad hat(v)=2, quad v=3$]
+  #eq[$P_("correction")^+=(7/10,7/10,0), quad P_("next")^+=(1/2,3/8,-1/8)$]
+  #caption([*Exact normal-reference witness.* Prior $phi_0=(1,1,0),eta_0=3/2$ gives $H=I+phi_0 phi_0^top$, $P=B H^(-1)$. Correction uses $phi=(1,1,0),eta=2$; next-current reception uses $phi=(1,2,1),eta=1$.])],
+ [*A law survives only in the right carrier*
+  #eq[$a diamond b=(a+b)/2, quad (0 diamond 0)diamond 4=2 != 1=0 diamond(0 diamond 4)$]
+  #eq[$(s,m)+(t,n)=(s+t,m+n), quad q(s,m)=s/m, quad m,n>0$]
+  #caption([*Exact witness.* Means are commutative but lose associativity when weight is discarded. Retaining weight restores the join. #link("https://github.com/teorth/equational_theories")[ETP] supplies implication/congruence and explicit countermodels; our future-receiver law supplies the admitted dynamic scope.])],
+)
+
+#pagebreak()
+#title("20","Polygonal bodies continue as world tubes","Exact vertices, triangular faces, an internal material current, and a source law that moves the complete body.")
+#grid(columns:(1fr,1fr,1fr),gutter:8mm,align:center,
+ [*Two linked polyhedral bodies*\ $tau=0$\
+  #linked-bodies(t:0,side:72mm)],
+ [*Material shear*\ $tau=1/2$\
+  #linked-bodies(t:1/2,side:72mm)],
+ [*Same linking; changed embedding*\ $tau=1$\
+  #linked-bodies(t:1,side:72mm)],
+)
+#eq[$F_(tau)(x,y,z)=(x+tau z,y,z), quad det D F_tau=1, quad u=(z,0,0), quad p="constant"$]
+#eq[$partial_tau u+(u dot nabla)u=-nabla p+nu Delta u=0, quad nabla dot u=0$]
+#caption([*Proved-derived / exact rational witness.* Both centerlines are integral rectangles; one pierces the other's oriented spanning disk once, so $op("lk")=-1$. Minimum $ell_infinity$ separation is $d=1$; choose $r=d/4$ with $2r<d$. Each shell encloses a solid torus, with volumes $4$ and $5/2$. White dashed lines expose the interior loops; yellow vertices are their actual corners. Triangles subdivide exact planar faces; color reads the same unoriented normal receiver as plate 17.])
+#v(3mm)
+#grid(columns:(.8fr,1.2fr),gutter:12mm,
+ [#align(center,swept-triangle())
+  #eq[$partial W=K_t-K_s+Sigma_("lat"), quad partial^2 W=0$]
+  #caption([*Exact chain witness.* A swept triangular face contains three tetrahedra. Internal faces cancel; the two end caps and six lateral triangles remain. A swept spatial volume is one dimension higher.])],
+ [*The same current through changing sections*
+  #eq[$W={ (tau,x):s<=tau<=t, x in K_tau }$]
+  #eq[$integral_(K_t) rho-integral_(K_s)rho+integral_(Sigma_("lat"))J dot n=integral_W op("div")_(tau,x)J$]
+  #eq[$∮_(F_tau A)u dot dif l=0, quad ∮_(F_tau B)u dot dif l=-6$]
+  #caption([*Conditional Stokes; explicit shear realization.* The lateral flux includes boundary motion. For this shear, polygonal circulation is constant because its change is $tau ∮ z dif z=0$. These are material loops. The example is a local/whole-space Euler–NS source, not periodic finite-energy Millennium data.])],
+)
+#v(2mm)
+#caption([*Recovered owners.* #raw("WorldTube") and #raw("WorldTubePotential") carry addressed clocks and full boundary faces; #raw("ConstitutiveWorldTube") and #raw("FourTorusParametronCurrent") carry their actual current realization. A Möbius band thickens to a solid torus; shorts thicken to a genus-two handlebody. Spatial framing and motion live inside the corresponding world tube. #link("https://www.cs.columbia.edu/cg/rods/")[Discrete Elastic Rods] provides a polygonal-frame dynamics precedent.])

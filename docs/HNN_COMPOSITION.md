@@ -15,7 +15,7 @@ order or installing a DeepSeek architecture.
 
 ## The architecture as explicit passages
 
-[definition] The visual presentation is now the eighteen [Typst/Fletcher plates](../research/papers/rendered/hnn-information-chemistry.pdf),
+[definition] The visual presentation is now the twenty [Typst/Fletcher plates](../research/papers/rendered/hnn-information-chemistry.pdf),
 with [editable source](../research/papers/source/papers/hnn-information-chemistry/main.typ).
 They show Athena/Eros, the categorical effects of layer operations, selection and rank strata,
 Information Chemistry through boundary cells and lattice-mode interference, Soulkiller's
@@ -144,6 +144,28 @@ it does not install a new source coordinate for each observation. Its returned b
 fields retain actual operator cuts. Bounded outputs can enter the normal current port intact.
 The exterior Unicode/symbol-basis attachment is one declared source chart; its local stencil
 does not define every medium's geometry or all language context.
+
+## Producing comparison and architecture laws
+
+[definition] The [equational/world-tube review](../research/records/2026-09-10_EQUATIONAL_LAWS_AND_WORLD_TUBES_MAKE_ATHENAS_NEXT_PASSAGE_EXPLICIT.md)
+connects ETP's congruence/implication/countermodel method with the existing future-stable receiver
+relation. MLP, convolution, graph, attention, SSM and diffusion charts share elementary passages,
+while incidence, parameter sharing, nonlinearity and retained state determine which laws apply.
+A fixed linear SSM has an exact convolutional realization including initial state; a selective
+transition need not. The review returns exact examples instead of asserting universal equivalence.
+
+[established-bounded; source-inspected] `ResidentNormalWave::actuate_section` now transports the
+actual joint current under fixed material. Its conversation caller has separate local-stencil
+development and numerical generation, but no paired reply to the produced situated response or
+native-to-symbol emission. The [blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
+now starts at this binding. `receive(v)` addresses the next current; a correction of a prior
+prediction requires that prediction's producing joint and receiver. Existing normal staging,
+wave fibres and section/current owners are reused rather than a new learner or wrapper.
+
+[definition] The geometric continuation uses existing `WorldTube`, `WorldTubePotential`,
+`ConstitutiveWorldTube` and clocked torus owners. Local frames, material currents and complete
+boundary faces travel together. A Hodge reconstruction, knot framing or arithmetic spectral map
+is used when its actual source and receiver call for it; none is a compulsory block in every HNN.
 
 ## Partial conduct and comparison
 

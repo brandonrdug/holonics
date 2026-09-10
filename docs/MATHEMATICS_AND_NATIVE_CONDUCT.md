@@ -124,6 +124,21 @@ preserves the declared construction, generator and remainder rather than making 
 whole object. Bit-purity concerns the explicit computational realization; it does not make a
 machine word an intrinsic semantic identity.
 
+## Equational continuation, arithmetic characters and the producing return
+
+[definition] The [September 10 equational/world-tube synthesis](../research/records/2026-09-10_EQUATIONAL_LAWS_AND_WORLD_TUBES_MAKE_ATHENAS_NEXT_PASSAGE_EXPLICIT.md)
+connects equational congruence and countermodels to the existing future-stable receiver relation.
+Its exact witnesses distinguish normalized means from retained weighted joins, a fixed SSM from
+a selective recurrence, and an observation of the next current from a correction at an earlier
+producing joint. The revised Athena blueprint makes that last missing composition explicit.
+
+[proved-derived] The same review constructs an exact polygonal link and polyhedral volumes under
+Euler/NS shear, reusing the existing world-tube/boundary owners. It also derives the quadratic-twist
+sign relation `a_p(E_2)=χ_p(2)a_p(E_1)` for `E_n:y²=x³−n²x` at odd primes by a change of finite-field
+variable. Over `Q(√2)`, the curve isomorphism changes by the elliptic sign involution under Galois
+conjugation. This is an actual arithmetic character passage to compare with orientation transport,
+with its distinct source group retained; it proves no RH/BSD endpoint or universal spectral identity.
+
 ## Classical learning already supplies useful mathematics and conduct
 
 [proved-derived] For a finite admitted population and beta>0, let

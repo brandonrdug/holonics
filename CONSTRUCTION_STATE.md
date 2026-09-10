@@ -1,7 +1,7 @@
 # Construction state
 
-**Currency:** September 10, 2026. **Priority:** Corrected AC0–AC5 construction is the active goal. Native HNN cultivation uses Holons as situated state, incidence, transported differences and compatible continuations; text/audio/visual media are exterior measurement charts.
-**Position:** Incoming source fields now change the held joint current through learned arrivals, union and passive contact, with material held fixed. The native source-map collision is separated; all 26 normal checks pass. Corpus source actuation preserves material bytes and resumes with identical complete state and bounded returns. Continue into receiver/developmental composition over the actual situated current. AC0–AC5 is not complete. No cultivation process is running.
+**Currency:** September 10, 2026. **Priority:** AC0–AC5 implementation remains paused; the equational/world-tube architecture revision has returned a concrete handoff. Existing native returns are preserved.
+**Position:** The research review now supplies a source-backed implementation handoff: pair a returned observation with its producing situated prediction, compose that development on the normal-wave owner, then expose the actual emission and further relevant local transport. The [revised blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md) names the operands, owner changes and finite checks. Current source actuation remains returned; no new cultivation process has started. AC0–AC5 is not complete.
 **Athena-alpha:** not yet attained.
 
 **Active implementation:** `ResidentNormalWave::actuate_section` composes learned joined source
@@ -27,6 +27,15 @@ The [relevance canon](docs/canon/THE_RELEVANCE_HYPOTHESIS.md) connects the actua
 force-sector, molecular, knot, circuit and fluid sources. The repaired source prose distinguishes
 finite tolerance from exact invisibility and topology change from loss of smooth continuation.
 
+## September 10 equational and world-tube review
+
+[established-bounded; source-inspected; computational-witness] The [synthesis and exact witnesses](research/records/2026-09-10_EQUATIONAL_LAWS_AND_WORLD_TUBES_MAKE_ATHENAS_NEXT_PASSAGE_EXPLICIT.md)
+connect ETP's law/countermodel method to future-stable receiver congruence and return concrete
+normal producing-cut and SSM/convolution distinctions. Existing world-tube owners now explain
+thickening and moving polygonal linked bodies, with exact boundary, shear/circulation and elliptic
+point-count controls. The blueprint and live architecture consumers identify the actual missing
+comparison/emission bindings. No native implementation or formal imports changed in this review.
+
 ## September 9 mathematical architecture review
 
 [established-bounded; source-inspected; computational-witness] The September 10
@@ -36,7 +45,7 @@ witnesses expose the local source stencil's loss of larger ordering and separate
 from future agreement. This is an architecture review; native implementation and AC order are unchanged.
 
 [established-bounded; source-inspected; computational-witness] The [diagrammatic architecture return](research/records/2026-09-10_HNN_DIAGRAMS_EXPOSE_COMPOSITION_DEVELOPMENT_AND_SOULKILLER_LIFTS.md)
-now has eighteen [Typst/Fletcher visual plates](research/papers/rendered/hnn-information-chemistry.pdf).
+now has twenty [Typst/Fletcher visual plates](research/papers/rendered/hnn-information-chemistry.pdf).
 Closed circulation, source-addressed manifold differences and intersecting-volume flux extend the
 color/covariance work. Möbius bridges retain orientation transport; exact incidence distinguishes
 the orientation cover from the surrounding closed shell. Exterior witnesses and the rendered

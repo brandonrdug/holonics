@@ -10,7 +10,7 @@ documentation integration, alongside the separately running AC implementation.
 ## Return
 
 [definition] The maintained [HNN composition guide](../../docs/HNN_COMPOSITION.md#the-architecture-as-explicit-passages)
-links the eighteen Typst/Fletcher plates. The initial source analysis below resolves four roles:
+links the maintained Typst/Fletcher plates. The initial source analysis below resolves four roles:
 
 1. Complete HNN passage, with Athena's standing/material, ordinary occurrence, local source/condition
    interaction, emitted receiver and Eros's producing-comparison return into one successor.
@@ -270,3 +270,9 @@ native bridge or a changed AC schedule.
 eighteen-page Typst build passes; all six added plates are visually inspected, including the final
 orientation/diffusion revision. Nine PNG plate exports match the current presentation. Only this
 review's presentation, witnesses, navigation and position paragraph are integrated.
+
+[definition] The next two plates connect the producing-state comparison to the revised Athena
+plan and continue exact polygonal volumes through the existing world-tube owners. Their ETP,
+architecture, fluid and arithmetic derivations belong to the separate
+[equational/world-tube review](2026-09-10_EQUATIONAL_LAWS_AND_WORLD_TUBES_MAKE_ATHENAS_NEXT_PASSAGE_EXPLICIT.md).
+The ribbon width and shell offset are now explicitly identified as chosen geometric parameters.

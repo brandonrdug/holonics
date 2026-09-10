@@ -29,8 +29,11 @@ retains its distinct 1,930-occurrence scope and receiver limitation. Current con
 belongs in [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md).
 
 [definition] The [Athena-alpha blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
-is authorized through completion and resumed after Brandon's framework review. It now separates
-finite construction returns from the useful-model attainment objective. It uses the prepared
+is authorized through completion. Brandon paused the parallel implementation for the September 10
+[equational/world-tube review](../research/records/2026-09-10_EQUATIONAL_LAWS_AND_WORLD_TUBES_MAKE_ATHENAS_NEXT_PASSAGE_EXPLICIT.md).
+The revised next packet binds a returned observation to its producing situated current, then
+exposes the actual emission and further contextual composition. It separates finite construction
+returns from the useful-model attainment objective. It uses the prepared
 conversations and existing native owners, with comparison, interface and persistence accompanying
 each return; broader exposure does not wait for useful language.
 
