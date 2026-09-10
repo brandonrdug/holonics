@@ -115,6 +115,12 @@ its `checkpoint` module owns `NativeSavedField` on the existing field wire. The 
 adapters delegate these operations and retain their exterior cursor/delivery state separately.
 The [Rust guide](RUST_FRAMEWORK.md) links the compiled invocation and persistence boundary.
 
+[established-bounded; source-inspected] The [representation audit](../research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)
+qualifies these owners: `OperativeState::prepare` allocates per observed contact,
+`prepare_contextual_work` mounts historical predictors, and `NativeFieldRest` retains the input
+and numerical history. Generic access is not a learned generator organization; the audit maps
+the existing shared-mode, observable-form, leader/rebase and cycle/scale constructions to that gap.
+
 [definition] Contextual execution stages reside in `kernels/field_contextual_material.cuh`:
 independent historical weight rows and receiver coordinates follow the prepared current profile.
 `section_constitutive_field_context_finish` in `constitutive_field.cuh` completes bounds and

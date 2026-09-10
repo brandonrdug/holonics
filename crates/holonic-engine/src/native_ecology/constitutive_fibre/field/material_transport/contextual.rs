@@ -1,4 +1,7 @@
 //! Ordinary source/condition material conduct and native source-null reference frames.
+//! This realization evaluates a kernel expansion over retained occurrences. Its historical
+//! profiles are productive inputs, not only audit records; it does not learn a compact
+//! generator/scale chart by virtue of using complex projective features.
 use super::super::current_history_source::{decode_source, integer};
 use super::*;
 

@@ -1,0 +1,21 @@
+{
+  "grade": "established-bounded",
+  "evidence": [
+    "computational-witness",
+    "source-inspected"
+  ],
+  "scope": "Cold reported lineage and material of the existing staged continuation. Exact exposed byte recovery is checked against every captured view of its selected source parts. No claim that all current/history distinctions may be deleted; no cultivation or inference performed.",
+  "source_revision": "cf6d5b6b",
+  "report": ".local/artifacts/athena-alpha/ac3-joint-field-2026-09-09/report-staged.json",
+  "exposed_parts": 16,
+  "exposed_text_octets": 5048,
+  "all_exposed_bytes_recovered_exactly_from_native_lineage": true,
+  "development_occurrences": 5064,
+  "development_contact_births": 5063,
+  "every_source_linked_development_observation_has_a_contact_birth": true,
+  "final_occurrences": 5138,
+  "final_contact_coordinates": 5124,
+  "final_contact_complex_rows": 54,
+  "instantaneous_contact_kernel_dimension_lower_bound": 5070,
+  "kernel_scope": "Algebraic dimension bound for the current numerical contact matrix only. Changing contacts can expose its current kernel; this is not permission to discard it or a dynamic compression certificate."
+}

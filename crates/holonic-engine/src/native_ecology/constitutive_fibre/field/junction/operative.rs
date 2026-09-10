@@ -154,6 +154,8 @@ impl<'c> OperativeState<'c> {
     ) -> Result<PendingOperative<'c>, Error> {
         let d = 6 * nodes;
         let m = d / 2;
+        // This realization allocates one coordinate per observed source contact. Birth count
+        // is not effective rank or evidence of a newly learned reusable generator class.
         let count = self
             .births
             .len()

@@ -1,5 +1,10 @@
 # AC4–AC5: the joint operation spans blocks and the research model continues
 
+[historical] **Subsequent correction:** the [representation audit](2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)
+withdraws this record's finite-cycle completion as completion of generator-bearing HNN
+construction. Its execution, numerical-factor and persistence results remain bounded evidence;
+the delivered body is an occurrence-expanded diagnostic realization.
+
 [definition] This follows the [joint-field exposure](2026-09-09_AC3_THE_JOINT_FIELD_CONTINUES_AND_ITS_NATIVE_ARTIFACT_IS_GENERIC.md)
 and [generic assembly/local return](2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md).
 The construction retains one native Holon field. Its source, local standing, joint current,

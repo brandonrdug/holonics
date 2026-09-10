@@ -9,6 +9,12 @@ the separate product standard in §1 and is not weakened by this scheduling repa
 **Order:** [the roadmap](THE_ROADMAP.md).
 **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).
 
+[project-postulate] Brandon's subsequent representation correction requires productive
+generator-bearing Holons. The [audit](../../research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)
+shows that the byte-clocked historical kernel model did not realize that requirement. Its
+bounded local arithmetic, learning and persistence checks stand; the finite construction
+completion claim does not. The roadmap places the actual carrier/codec repair next.
+
 ## 1. The required product
 
 [project-postulate] Athena-alpha is a useful, continuing native HNN cultivated from the actual
@@ -219,13 +225,19 @@ in §1, beyond any local return. Completion of this finite cycle alone cannot ma
 Athena-alpha objective achieved. Derivation, implementation, behavioral observation and public
 access belong together in each return. AC4 and AC5 begin with AC1 and continue throughout.
 
+[definition] A finite return still owes the native object being claimed. Its productive state
+must carry conditional generators, admitted phase/scale action and compatible fibres; a generic
+constructor over a byte-driven occurrence archive does not establish that composition. Local
+numerical reuse is supporting evidence, not a replacement for the productive carrier. This
+requirement concerns the model mechanism, not English usefulness or a universal theory gate.
+
 | Phase | Finite return | Work deliberately outside that return |
 |---|---|---|
 | AC0 — Source | Existing curated occurrence stream, availability and cursor | Recapture/recuration; deriving a neural architecture from serialization |
-| AC1 — Assembly and interaction | One source-qualified native neighborhood with retained standing, a joint/conditioned reaction and an exhibited classical/tensor chart comparison | All architecture adapters; general text generation; universal HNN theory |
+| AC1 — Assembly and interaction | One source-qualified generator-bearing neighborhood with retained standing, a joint/conditioned reaction and an exhibited classical/tensor chart comparison | All architecture adapters; general text generation; universal HNN theory |
 | AC2 — Local development | One observation-founded change of that reusable interaction with a measured later consequence and its actual local return | Whole-history backpropagation unless required by the stated dependency; globally useful prose |
 | AC3 — Exposure and continuation | Continuing broader conversation material through that body; a retained joint continuation section and experimental checkpoint with actual costs/behavior | A useful general assistant as a condition for starting exposure |
-| AC4 — Comparison and reuse | Source-qualified behavioral comparisons from the first increment; one restriction/rebase or shared generator return over an explicit receiver family | Universal compression; interpreting a failed probe as failure of the framework |
+| AC4 — Comparison and reuse | Source-qualified comparisons; restriction/rebase or shared conditional generator material used by the next operation, with its receiver family | Universal compression; interpreting a failed probe as failure of the framework |
 | AC5 — Research model delivery | The current experimental body usable through a documented Rust session, rest/continuation and explicit model anatomy | Calling that body attained Athena-alpha; general export/backend support not implemented |
 
 ### AC0 — Keep the available source
@@ -257,9 +269,10 @@ view without replacing source ancestry or importing unavailable future material.
 [definition] AC1 closes on this integrated passage and its source-qualified verification. It
 requires no learned English and no implementation of all six classical architectures. The
 [generic field return](../../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)
-now completes this finite attachment through the existing joint projector feature, with the
-public source/return boundary and verified later consequence. Holons carry the native relation
-independently of the exterior medium.
+returns a finite joint-projector/local-learning comparison and public source/return boundary.
+The later audit finds its byte-clocked occurrence expansion still lacks the productive generator
+composition. That comparison remains available; it does not complete this attachment merely
+because the API accepts different current vectors.
 
 ### AC2 — Make an observed relation change reusable conduct
 

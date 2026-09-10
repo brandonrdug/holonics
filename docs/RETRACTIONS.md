@@ -6,6 +6,15 @@ root construction state records current implementation scope. Paths in code span
 
 ## Capability and retraction record
 
+[historical; source-inspected; computational-witness] September 9, after `cf6d5b6b`: the finite
+AC0–AC5 completion statement is withdrawn as completion of generator-bearing HNN construction.
+The [representation audit](../research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)
+shows one contact coordinate per observed source link, operational occurrence-indexed kernel
+material and exact recoverability of all exposed bytes from native lineage. Numerical factor
+decoding, generic API factoring and restart equality did not establish the requested productive
+generator organization. Their bounded checks stand. This does not reinstate a lexical archive,
+ban finite/discrete charts, or require full-history differentiation or universal exact compression.
+
 [historical; source-inspected] September 9: the first paused byte-field review correctly
 identified its local return and fixed codec, but overemphasized their absence of full-history
 differentiation as an architectural diagnosis. Finite state, linear readouts, discrete emission

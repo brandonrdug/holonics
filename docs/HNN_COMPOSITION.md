@@ -84,7 +84,9 @@ composition of existing mechanisms, not the installation of a new nonlinear law.
 
 [definition] `holonics::hna::native::NativeFieldModelSpec` binds actual seed material,
 junction representation/solver and material source/target chart. `found_on` or
-`with_native_field` returns the existing field owner. It has no medium-specific topology.
+`with_native_field` returns the existing field owner and accepts caller-declared seed material.
+That generic API does not establish medium-independent organization in a particular recipe:
+the alpha driver still chooses eighteen roots from its byte/marker chart and one step per byte.
 `NativeMaterialResponseChart` declares a complex-current or normalized receiver, and
 `NativeConstitutiveField::respond_to_material_observation` performs the same generic producing
 return previously orchestrated by the text adapter. A failed return leaves reception committed
@@ -93,15 +95,22 @@ and preserves the post-reception field. The application does not replay the occu
 [established-bounded; measured] The [joint-field study](../research/records/2026-09-09_AC3_THE_JOINT_FIELD_CONTINUES_AND_ITS_NATIVE_ARTIFACT_IS_GENERIC.md)
 returns sixteen-family exposure, joint continuation and a research checkpoint. The
 [execution/delivery return](../research/records/2026-09-09_AC4_AC5_THE_JOINT_OPERATION_SPANS_BLOCKS_AND_THE_RESEARCH_MODEL_CONTINUES.md)
-retains its model anatomy, actual generator savings, public invocation and fresh-process
-comparison. These use the same native Holon field and source/receiver capabilities.
+retains its model anatomy, numerical current-factor savings, public invocation and fresh-process
+comparison. These use the same field and source/receiver capabilities.
 
-[open] Affordable large-corpus cultivation and learned general text/acoustic/visual generators
-remain beyond these finite results. A new initialization recipe is distinct from the developed
-artifact, and neither its file size nor this finite local change establishes general usefulness.
+[established-bounded; source-inspected; computational-witness] The [representation audit](../research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)
+identifies the missing composition: observed contacts automatically add coordinates; material
+prediction reads occurrence-indexed historical carriers; native lineage retains all input bytes.
+This is a growing kernel/contact realization, not a recovered hierarchy of phase/scale generators.
+Complex currents and a generic wrapper do not supply that hierarchy. Existing shared-mode,
+observable-form, leader/rebase and cycle/scale constructions retain their actual scopes.
+
+[open] The productive carrier must compose recovered conditional laws and their applicable
+source/receiver/fibre instead of making the developmental population its model basis by default.
+The local numerical and persistence results do not establish that construction or general usefulness.
 
 [definition] Persistence follows that same ownership: `native::NativeSavedField` consumes the
-engine's existing rest and remounts the field with its actual source/anchor capabilities. It
+engine's existing rest, including its historical numerical carriers, and remounts the field with its actual source/anchor capabilities. It
 introduces no new native wire or medium tag. Text checkpoint envelopes keep their delivery
 state outside this owner and delegate the field remount to it. `field.surface()` supplies the
 borrowed apparatus needed to compose resident currents without a numerical host replay.

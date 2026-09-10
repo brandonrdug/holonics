@@ -1,5 +1,7 @@
 //! Native field persistence through the engine's existing wire. Exterior codec/delivery state
 //! remains with its application; a saved field is not an implicit saved text or audio session.
+//! The existing field wire retains per-occurrence numerical history. This wrapper does not
+//! condense that history into learned generators or make it optional for contextual prediction.
 use super::*;
 use crate::publication::{publish_new, PublicationReceipt};
 use holonic_engine::native_ecology::constitutive_fibre::{

@@ -4,10 +4,12 @@
 [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md) is the sole current-position record. Dated
 contracts and records preserve their completed scope; their old imperatives schedule no new work.
 
-[project-postulate] **September 9 resumption:** Brandon has resumed the revised AC0–AC5 goal.
-Start with the finite AC1 interaction assembly below, with comparison/reuse and public access
-throughout. Holons encapsulate the situated objects being transported; no medium defines a
-special native learner or semantic topology. The completed deeper review remains a dependency.
+[project-postulate] **Latest September 9 correction:** Brandon requires identification and
+repair of the byte-clock/occurrence-history model's failure to realize generator-bearing Holons.
+The [representation audit](../../research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)
+governs the next AC construction. Preserve the bounded local and execution returns, but do not
+resume their exposure loop as if generic packaging completed native generator organization.
+No medium defines a special native learner or semantic topology.
 
 ## Fresh-session pickup
 
@@ -138,11 +140,11 @@ achieved. Current research seeks identifiable behavior and learning without a ut
 | Phase | Construction return | Entry/dependency |
 |---|---|---|
 | AC0 | Existing source-qualified stream, availability and cursor | Complete; preserve |
-| AC1 | One native interaction/reaction with local standing and a source-qualified tensor/classical chart comparison | Finite return complete; use the shared field assembly |
-| AC2 | Observation-founded local development of that interaction and a later measured consequence | Finite local return complete; continue its use in AC3 |
-| AC3 | Broader conversation exposure, retained joint continuation and experimental checkpoint/costs | Lawful affordable recurrence; useful language is not a prerequisite |
-| AC4 | Behavioral comparison throughout, plus one local restriction/rebase or generator reuse with explicit receiver scope | Begins with AC1; does not wait for a complete model |
-| AC5 | Public Rust invocation, model anatomy, persistence and delivery of the current research artifact | Begins with AC1; product capability and standard exports remain honestly graded |
+| AC1 | A productive conditional-generator carrier, its local interaction/reaction and source/receiver chart | Existing joint-field arithmetic is a diagnostic return; generic API factoring did not finish this carrier |
+| AC2 | Observation-founded development of reusable conduct and a later measured consequence | Existing local-return controls stand; compose that return with the productive carrier |
+| AC3 | Conversation exposure and retained joint continuation through the generator-bearing body | The sixteen-family history expansion is diagnostic evidence; useful language is not an entry gate |
+| AC4 | Restriction/rebase or generator reuse that participates in the next operation | Current-factor savings stand at their numerical scope; they do not close generative organization |
+| AC5 | Public invocation, model anatomy and persistence of the actual productive body | Existing generic access and full-history rest stand; do not label the archive compact learned material |
 
 [definition] The first finite packet returns through the existing projective joint field,
 its producing source/current family and observed contact response. The [composition guide](../HNN_COMPOSITION.md)
@@ -153,28 +155,37 @@ a valid distinct comparison. No new nonlinear law or general-language capability
 [definition] The corrected formal `FiniteLocalCurrentEcology.reaction` retains local
 standing. The [native field assembly and observed return](../../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)
 now return through the existing `OperativeContextual` joint feature and actual field successor.
-AC1 and AC2 close at that finite scope. AC3's exposure and retained continuation compose with
-research-artifact delivery in AC5 and receiver-scoped reuse/comparison in AC4.
+These are bounded local AC1/AC2 evidence. The later representation audit identifies the
+uncompleted productive carrier; AC3–AC5 must use that actual carrier rather than count the
+diagnostic history expansion as the generator-bearing construction.
 The local field/material return, full-operator generic primitives and corrected joined-passage
 learning are existing candidates, each with its own source, metric and scope. Neither the old
 lexical atlas nor the retracted foreign-tower exclusion is restored.
 
-[established-bounded; implemented-exact; computational-witness] The [finite AC4–AC5 return](../../research/records/2026-09-09_AC4_AC5_THE_JOINT_OPERATION_SPANS_BLOCKS_AND_THE_RESEARCH_MODEL_CONTINUES.md)
-closes that construction cycle: sixteen-family joint continuation, actual current-factor
+[established-bounded; implemented-exact; computational-witness] The [finite AC4–AC5 record](../../research/records/2026-09-09_AC4_AC5_THE_JOINT_OPERATION_SPANS_BLOCKS_AND_THE_RESEARCH_MODEL_CONTINUES.md)
+retains sixteen-family joint continuation, actual current-factor
 generator savings, staged independent device work with one final commit, complete-rest controls
 and the actual model's fresh-process reported-state comparison. Public Rust invocation, model
 anatomy and native/application persistence are delivered with their receiver and backend scope.
 
+[historical] Completion of the generator-bearing HNN construction was not established by those
+returns. The audit withdraws that completion assessment without withdrawing the measurements.
+
 [definition] Brandon's follow-up places elementary excitation and its situated response first.
-Use the retained body and existing paired/phase/current controls; identify the source, local
+Use the preserved body as diagnostic evidence and existing paired/phase/current controls; identify the source, local
 standing, supplied current and declared future receiver, then vary an elementary excitation or
 its composition and inspect reflection, interior change and later conduct. The single driven
 function/derivative input was an execution comparison, not this research return. Read the
 [protocol correction](../../research/records/2026-09-09_AC4_AC5_THE_JOINT_OPERATION_SPANS_BLOCKS_AND_THE_RESEARCH_MODEL_CONTINUES.md#correction-the-actual-excitation-and-the-meaning-of-the-cost-report).
 Keep cost attached to the historical pairings, growing return factors and placement that incur
 it; neither “large corpus” nor a further optimization-first gate replaces this causal question.
-Compose existing receiver/source generators where that actual dependency admits reuse. This
-continues the scientific work beyond the finite engineering returns without revoking them.
+Compose the existing shared-mode, observable-form, leader/rebase and cycle/scale relations into
+the productive carrier at their admitted source scope. Exhibit its next ordinary operation and
+local refinement from an actual returned difference. Do not allocate new learned coordinates
+merely because another occurrence was recorded, or mistake complex bit-pair arithmetic for
+recovered phase/scale classes. A compact conditional family can remain uncertain and useful;
+no universal exact compression or single-cause gate precedes local learning. The operator must
+carry its applicable fibre, not a mandatory archive of every past state.
 
 [project-postulate] Derivation belongs to the finite packet it changes. A partial/local learner
 may develop identifiable behavior without a universal HNN theorem, all six architecture adapters,

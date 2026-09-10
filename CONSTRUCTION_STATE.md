@@ -1,7 +1,7 @@
 # Construction state
 
 **Currency:** September 9, 2026. **Priority:** Native HNN cultivation through Holons as situated state, incidence, transported differences and compatible continuations; text/audio/visual media are exterior measurement charts.
-**Position:** The finite AC0–AC5 assembly, local-return, execution and persistence artifacts are verified. Brandon's follow-up directs explanation through elementary excitations: the single driven text continuation does not establish the learned response law. The joint implementation already takes about 46 minutes on 5,048 text bytes; this is retained-history/return work, not a newly established corpus-scale obstruction. No cultivation process is running.
+**Position:** The representation audit identifies a byte-clocked, occurrence-expanded predictor with operational historical carriers, not the requested generator-bearing HNN composition. The AC0–AC5 completion claim is withdrawn at that construction scope; source preparation and bounded local-learning, CUDA and persistence checks stand. Native object/generator composition needs repair. No cultivation process is running.
 **Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -87,7 +87,15 @@ The [framework guide](docs/FORMAL_FRAMEWORK.md) connects physical, biological an
 instances. This continuation unifies already-engaged elementary patterns; it changes no native
 model or product grade and adds no numerical policy to the parallel AC1 work.
 
-## Current HNN construction — finite AC0–AC5 return
+## Current HNN construction — representation repair
+
+[established-bounded; source-inspected; computational-witness] The [representation audit](research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)
+finds one new persistent contact coordinate per source-linked observation and a contextual
+predictor that sums occurrence-indexed historical contributions. All 5,048 exposed bytes are
+exactly recoverable from native input lineage. Generic assembly/persistence APIs did not turn
+this representation into recovered generator material. The audit recovers the actual shared-mode,
+observable-form, leader/rebase, fractal/cycle and torus owners that were not composed into its
+productive state. No replacement native passage has been implemented by this audit.
 
 [established-bounded; source-inspected; measured] The [excitation/reporting correction](research/records/2026-09-09_AC4_AC5_THE_JOINT_OPERATION_SPANS_BLOCKS_AND_THE_RESEARCH_MODEL_CONTINUES.md#correction-the-actual-excitation-and-the-meaning-of-the-cost-report)
 states the actual input, its 62 arrivals and 61 local learning returns, and the fresh unit drive
@@ -97,8 +105,8 @@ belongs to concrete historical pairings, growing current factors and placement a
 in earlier variants, not an intrinsic limitation of Holons.
 
 [established-bounded; implemented-exact; computational-witness] The [AC4–AC5 return](research/records/2026-09-09_AC4_AC5_THE_JOINT_OPERATION_SPANS_BLOCKS_AND_THE_RESEARCH_MODEL_CONTINUES.md)
-completes staged multi-block execution of the same joint operation and public research-model
-delivery. All 119 CUDA field tests, sixteen host tests and the public Rust example compile pass.
+returns staged multi-block execution of the same joint operation and access to the diagnostic
+artifact. All 119 CUDA field tests, sixteen host tests and the public Rust example compile pass.
 The actual saved model remounts with zero developmental deeds and matches the complete reported
 body, lineage, emission currents and generation. Prompt/emission took 67.800 seconds versus
 80.978 in the earlier workflow; this is not an isolated kernel benchmark. The record retains
@@ -109,9 +117,9 @@ occurrences and saved a 1,257,518,630-byte pre-prompt checkpoint. It emitted `I�
 by EndPart; this is a bounded trajectory, not a useful answer. Development took 2,753.900
 seconds. The [exposure/persistence return](research/records/2026-09-09_AC3_THE_JOINT_FIELD_CONTINUES_AND_ITS_NATIVE_ARTIFACT_IS_GENERIC.md)
 retains the full workflow, source-factor savings and generic remount checks. These finite
-construction returns establish a continuing research model, not affordable full-corpus
-cultivation or useful Athena-alpha. Further development should use this retained body and the
-shared source/current owners; another large run needs a concrete new construction question.
+construction returns establish a continuing diagnostic realization. They do not close the
+generator-bearing HNN construction. Preserve this body for scoped comparisons while repairing
+the productive object and codec boundary; increasing exposure on it is not the repair.
 
 [established-bounded; implemented-exact; computational-witness] The [generic field return](research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)
 recovers the existing projective joint-source/context mechanism and moves generic assembly and

@@ -66,6 +66,11 @@ a fresh archive without depending on an old machine's archive path. This saves n
 state. A text application's cursor, delivery and pending symbol remain in its exterior session
 envelope, whose remount now delegates to the same generic field owner.
 
+[established-bounded; source-inspected] This rest still includes the field's per-occurrence
+history. The generic wrapper is not a conversion into compact learned generators. The
+[representation audit](../research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)
+states the byte-driven recipe, operational history and incomplete HNN composition explicitly.
+
 [definition] `NativeConstitutiveField::surface` exposes a borrowed resident apparatus for typed
 current-section composition. It creates no source capability or second field. Use this for
 existing resident wave/section ingress; a numeric section remains qualified by the receiving

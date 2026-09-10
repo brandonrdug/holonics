@@ -7,6 +7,12 @@ the application implementations are in [holonics-hna](../crates/holonics-hna/REA
 
 ## Athena-alpha and the finite construction programme
 
+[established-bounded; source-inspected; computational-witness] The [representation audit](../research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)
+identifies the current byte-clocked field as an occurrence-expanded kernel/contact realization.
+Its native checkpoint retains a reversible input trace and historical carriers used by prediction.
+This has not realized the requested productive generator organization. The AC completion
+assessment is corrected; local arithmetic, learning and persistence evidence retain their scope.
+
 [established-bounded; measured] The [joint-field exposure](../research/records/2026-09-09_AC3_THE_JOINT_FIELD_CONTINUES_AND_ITS_NATIVE_ARTIFACT_IS_GENERIC.md)
 returns a sixteen-family experimental body, source-qualified local development, joint-current
 continuation and a native checkpoint. Its output `I’m ante.` followed by EndPart is an observed
