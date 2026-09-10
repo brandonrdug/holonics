@@ -2,6 +2,8 @@
 //! The continuing state is a generator word with its original seed, resident power cache and
 //! certified remainder. Current faces are observations of that state, not its history archive.
 use super::*;
+mod actuate;
+pub use actuate::NormalSourceActuation;
 mod develop;
 pub use develop::NormalWaveDevelopment;
 mod receive;
@@ -66,6 +68,7 @@ pub struct NormalWaveFibre<'c> {
     pub epoch: u64,
     pub seed_kind: NormalWaveSeedKind,
     pub steps: u64,
+    pub seed_epochs: [Option<u64>; 2],
 }
 impl<'c> NormalWaveFibre<'c> {
     /// Exact point initials are available only before a bounded received-state rebase.
@@ -177,6 +180,7 @@ pub struct ResidentNormalWave<'c> {
     previous: NormalWaveCurrent<'c>,
     current: NormalWaveCurrent<'c>,
     steps: u64,
+    seed_epochs: [Option<u64>; 2],
 }
 impl<'c> ResidentNormalMaterial<'c> {
     /// Declare the binding R(c-p,c,p) as a change in c's receiver chart. Matching dimensions
@@ -221,6 +225,7 @@ impl<'c> ResidentNormalMaterial<'c> {
                     steps: 0,
                     epoch: 0,
                     seed_kind,
+                    seed_epochs: [None, Some(0)],
                 })
             }
             Err(reason) => Err(NormalWaveSeedRefusal {
@@ -336,6 +341,7 @@ impl<'c> ResidentNormalWave<'c> {
             epoch: self.epoch,
             seed_kind: self.seed_kind,
             steps: self.steps,
+            seed_epochs: self.seed_epochs,
         }
     }
     pub fn advance(&mut self) -> Result<NormalWaveStep<'c>, ConstitutiveFibreError> {

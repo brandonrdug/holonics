@@ -157,6 +157,13 @@ The receipt retains the producing fibre; the continuing wave does not retain a r
 while preserving current occurrence identity. The section owner separates preparation from
 publication; `crates/holonics-hna/examples/conversation_wave.rs` composes the native body with
 exterior source/chart/cursor I/O.
+
+[definition] `normal/direct/wave/actuate.rs` owns fixed-material source action. The
+`normal_source_actuation.cuh` source word reuses the learned normal response and the enclosed
+finite contact in `passive_current_ball.cuh`. Source union retains the incoming current;
+the queried joint section changes under one owner. The exact H/B/M zero-subspace certificate
+refines a source-specific bound without declaring global irrelevance or replacing applied M.
+Rest v4 retains both seed-component epochs after this transport.
 `surface_normal_wave.rs` records the resident passages. `normal/direct/rest.rs` and
 `wave/rest.rs` own complete normal material and generator/seed/word persistence.
 `inertia/source_energy.rs` checks positive source geometry, source-kernel compatibility and

@@ -140,6 +140,20 @@ exact moments and source-family bounds. Source uncertainty is not erased by refi
 
 ## Conversation source
 
+[definition] `ResidentNormalWave::actuate_section` supplies an incoming source field to the
+held joint current with material fixed. Each measured pair has a learned joined arrival;
+the existing passive contact acts on the union of that source and standing. The source/standing
+map is `y + A q`, with A the finite normalized reflection. Its implicit rank-one action needs
+no per-occurrence coefficient matrix. The returned source section is borrowed evidence;
+it is not retained as model history.
+
+[definition] This actuation transports both held reference/current components at one source
+epoch. Their previous objects remain immutable; ordinary generation still joins the actual old
+current into its next reference. Rest v4 records both component epochs, including equal epochs
+for distinct images, and retains older reads. The `conversation_wave actuate` mode delivers
+these fields without fitting them. The source envelope includes realization/reference error;
+it is not semantic confidence. See the [source return](../research/records/2026-09-10_SOURCE_PASSAGES_ACT_THROUGH_UNION_AND_PASSIVE_REFLECTION.md).
+
 [established-bounded; source-inspected] `holonics::hna::alpha::exposure` remains the source-qualified
 conversation reader. It retains available material, captured views, actual parent relations and
 delivery cursor. The `alpha_exposure` example inspects that source boundary. It is not a learner

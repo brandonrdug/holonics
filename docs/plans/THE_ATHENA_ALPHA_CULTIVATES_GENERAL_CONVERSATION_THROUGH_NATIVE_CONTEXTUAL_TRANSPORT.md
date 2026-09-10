@@ -150,12 +150,21 @@ cross-section textual adjacency. This supplies a continuing cultivation attachme
 claiming that the local source stencil exhausts relevant contextual conditions. Broader exposure
 does not wait for such a claim or for useful prose.
 
-[definition] The next source binding supplies ordinary current actuation from an incoming Holon
+[definition] The source binding must supply ordinary current actuation from an incoming Holon
 under fixed material. Whole-field development alone does not supply that interaction. Compose
 actual source/receiver and conditional/nonlinear/reflection owners, retaining their joint family,
 and compare changed source action and later conduct. Do not make a fit, semantic label or
 parent-text retrieval stand in for the source-current relation. This is a construction step,
 not a new qualitative gate on exposure or a separate world-verdict learning law.
+
+[definition] The returned source action composes the existing normal arrival with passive
+contact on source union: G(x,y,q)=F(x,y,x+q)=y+Aq. Its rank-one mixed action remains factored;
+no coefficient matrix is allocated per source occurrence. The complete held joint family is
+transported under fixed material, and one source field creates one successor. This supplies the
+previously missing source/current binding. Continue by composing receivers and development with
+the actual situated current and producing relation, rather than substituting local-stencil
+fitting for the whole learner. The [source return](../../research/records/2026-09-10_SOURCE_PASSAGES_ACT_THROUGH_UNION_AND_PASSIVE_REFLECTION.md)
+states its finite comparison, error scope and persistence contract.
 
 ## AC0–AC5 construction order
 

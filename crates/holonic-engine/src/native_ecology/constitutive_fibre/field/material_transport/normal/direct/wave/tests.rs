@@ -1,6 +1,332 @@
 use super::*;
 use crate::embedding_fiber::ResidentReadout;
 
+fn symbol_field<'c>(s: &'c ResidentSurface<'c>, word: &str) -> ResidentSection<'c> {
+    let values = word
+        .bytes()
+        .flat_map(|b| {
+            if b == b'0' {
+                [1, 0, 0, 0]
+            } else {
+                [0, 0, 1, 0]
+            }
+        })
+        .map(|v| (v, v))
+        .collect();
+    s.mount_section_rest(
+        &ResidentSectionRest::found(word.len(), 4, ResidentGrain(0), i64::BITS, values).unwrap(),
+    )
+    .unwrap()
+}
+fn common_source_model<'c>(s: &'c ResidentSurface<'c>) -> ResidentNormalWave<'c> {
+    let field = symbol_field(s, "000100");
+    let points = ResidentConstitutiveSection::integers(&field).unwrap();
+    let comparisons = points.differences(s).unwrap();
+    let mut material = ResidentNormalMaterial::found(s, 2, 2, ResidentGrain(u64::BITS)).unwrap();
+    material
+        .receive_section(comparisons.source(), comparisons.observed())
+        .unwrap();
+    material
+        .into_difference_wave(points.row(0).unwrap(), points.row(1).unwrap())
+        .unwrap()
+}
+
+#[test]
+#[ignore = "requires CUDA; conditioned source passages distinguish the local-stencil collision without refitting material"]
+fn source_action_separates_arrangement_at_fixed_material() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let mut a = common_source_model(&s);
+    let mut b = common_source_model(&s);
+    let left = symbol_field(&s, "000100");
+    let right = symbol_field(&s, "001000");
+    let before = a.material.rest().unwrap();
+    assert_eq!(before, b.material.rest().unwrap());
+    let reads = s.census().section_read_outs;
+    let aa = a
+        .actuate_section(ResidentConstitutiveSection::integers(&left).unwrap())
+        .unwrap();
+    let bb = b
+        .actuate_section(ResidentConstitutiveSection::integers(&right).unwrap())
+        .unwrap();
+    assert_eq!(s.census().section_read_outs, reads);
+    assert_eq!(a.material.rest().unwrap(), before);
+    assert_eq!(b.material.rest().unwrap(), before);
+    let x = aa.after().inspect().unwrap();
+    let y = bb.after().inspect().unwrap();
+    contains(
+        &x,
+        &[
+            wave(1417763, 0, 288827),
+            wave(315199, 0, 288827),
+            wave(942725082, 0, 244636469),
+            wave(525093732, 0, 244636469),
+        ],
+    );
+    contains(
+        &y,
+        &[
+            wave(3264589, 0, 630168),
+            wave(516419, 0, 630168),
+            wave(20889068633, 0, 5871275256),
+            wave(14338582903, 0, 5871275256),
+        ],
+    );
+    let separation: Rat = x
+        .center
+        .iter()
+        .zip(&y.center)
+        .map(|(a, b)| a.subtract(b).norm_square())
+        .sum();
+    assert!(separation > (&x.radius + &y.radius) * (&x.radius + &y.radius));
+    assert_eq!(a.epoch(), 1);
+    assert_eq!(a.steps(), 0);
+    assert_eq!(a.previous().at(), Some(1));
+    assert_eq!(a.current().at(), Some(1));
+    assert!(!a.previous().same_occurrence(a.current()));
+    let saved = a.rest().unwrap();
+    let mut bytes = Vec::new();
+    saved.write(&mut bytes).unwrap();
+    assert_eq!(bytes[b"HOLONIC-NORMAL-WAVE".len()], 4);
+    let expected = serde_json::to_value(a.advance().unwrap().inspect().unwrap()).unwrap();
+    let loaded = NormalWaveRest::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
+    assert_eq!(loaded, saved);
+    let mut resumed = loaded.remount(&s, |_| {}).unwrap();
+    assert_eq!(resumed.previous().at(), Some(1));
+    assert_eq!(resumed.current().at(), Some(1));
+    assert_eq!(
+        serde_json::to_value(resumed.advance().unwrap().inspect().unwrap()).unwrap(),
+        expected
+    );
+}
+
+fn passive_exact(x: &[Rat], y: &[Rat], q: &[Rat]) -> Vec<Rat> {
+    let dot = |a: &[Rat], b: &[Rat]| a.iter().zip(b).map(|(a, b)| a * b).sum::<Rat>();
+    let d = x.iter().zip(y).map(|(x, y)| x - y).collect::<Vec<_>>();
+    let gap = dot(y, y) - dot(x, x);
+    let den = dot(&d, &d) + gap.abs();
+    if den.is_zero() {
+        return q.to_vec();
+    }
+    let gain = (dot(&d, q) + gap.max(Rat::zero())) * Rat::from_integer(2.into()) / den;
+    q.iter().zip(d).map(|(q, d)| q - &gain * d).collect()
+}
+
+#[test]
+#[ignore = "requires CUDA; source union supplies actual current even when its passive contact is the identity"]
+fn source_union_does_not_erase_an_arriving_current() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let zero = point(&s, &[0, 0]);
+    let mut body = ResidentNormalMaterial::found(&s, 1, 1, ResidentGrain(u64::BITS))
+        .unwrap()
+        .into_difference_wave(current(&zero), current(&zero))
+        .unwrap();
+    let field = s
+        .mount_section_rest(
+            &ResidentSectionRest::found(
+                2,
+                2,
+                ResidentGrain(0),
+                i64::BITS,
+                vec![(1, 1), (0, 0), (1, 1), (0, 0)],
+            )
+            .unwrap(),
+        )
+        .unwrap();
+    let received = body
+        .actuate_section(ResidentConstitutiveSection::integers(&field).unwrap())
+        .unwrap();
+    let reading = received.after().inspect().unwrap();
+    contains(&reading, &[wave(1, 0, 1), wave(1, 0, 1)]);
+    assert_eq!(reading.radius, Rat::zero());
+    assert_eq!(body.material.observations(), 0);
+}
+
+#[test]
+#[ignore = "requires CUDA; exact normal-kernel directions do not acquire spurious parameter uncertainty, and new observations reopen them"]
+fn source_annihilator_is_exact_and_material_relative() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let make = |symbols: &[usize]| {
+        let mut values = vec![(0, 0); symbols.len() * 6];
+        for (row, axis) in symbols.iter().enumerate() {
+            values[row * 6 + 2 * axis] = (1, 1);
+        }
+        s.mount_section_rest(
+            &ResidentSectionRest::found(symbols.len(), 6, ResidentGrain(0), i64::BITS, values)
+                .unwrap(),
+        )
+        .unwrap()
+    };
+    let training = make(&[0, 0, 0, 1, 0, 0]);
+    let points = ResidentConstitutiveSection::integers(&training).unwrap();
+    let fields = points.differences(&s).unwrap();
+    let mut material = ResidentNormalMaterial::found(&s, 3, 3, ResidentGrain(u64::BITS)).unwrap();
+    material
+        .receive_section(fields.source(), fields.observed())
+        .unwrap();
+    assert!(material.inspect().unwrap().material.radius > Rat::zero());
+    // A valid but non-optimal applied matrix must not be silently replaced by ideal P.
+    let mut proposal = material.state_wire().unwrap();
+    let layout = NormalLayout::new(3, 3).unwrap();
+    let mut scalars = wides(&proposal.intervals[..layout.matrix_words]).unwrap();
+    let unused_column = 3 + 2;
+    assert_eq!(scalars[2 * unused_column], 0);
+    scalars[2 * unused_column] = 1;
+    for bound in &mut scalars[layout.cross_values..layout.cross_values + 3] {
+        *bound += 1;
+    }
+    for (i, value) in scalars.into_iter().enumerate() {
+        let bytes = value.to_le_bytes();
+        let lo = i64::from_le_bytes(bytes[..8].try_into().unwrap());
+        let hi = i64::from_le_bytes(bytes[8..].try_into().unwrap());
+        proposal.intervals[2 * i] = (lo, lo);
+        proposal.intervals[2 * i + 1] = (hi, hi);
+    }
+    let different =
+        NormalMaterialRest::from_state_data(3, 3, ResidentGrain(u64::BITS), 4, proposal).unwrap();
+    let mut different = different
+        .remount(&s)
+        .unwrap()
+        .into_difference_wave(points.row(0).unwrap(), points.row(1).unwrap())
+        .unwrap();
+    let single = make(&[2, 2]);
+    let reflected = different
+        .actuate_section(ResidentConstitutiveSection::integers(&single).unwrap())
+        .unwrap();
+    assert_eq!(
+        reflected.after().inspect().unwrap().center[3].real,
+        Rat::new(1.into(), BigInt::one() << u64::BITS)
+    );
+    let mut body = material
+        .into_difference_wave(points.row(0).unwrap(), points.row(1).unwrap())
+        .unwrap();
+    let stimulus = make(&[2, 2, 2]);
+    let input = ResidentConstitutiveSection::integers(&stimulus).unwrap();
+    let returned = body.actuate_section(input).unwrap();
+    let reading = returned.after().inspect().unwrap();
+    contains(
+        &reading,
+        &[
+            wave(1, 0, 1),
+            wave(0, 0, 1),
+            wave(2, 0, 1),
+            wave(1, 0, 1),
+            wave(0, 0, 1),
+            wave(2, 0, 1),
+        ],
+    );
+    assert_eq!(reading.radius, Rat::zero());
+    drop(returned);
+    let new_source = make(&[2, 2, 1]);
+    let new_fields = ResidentConstitutiveSection::integers(&new_source)
+        .unwrap()
+        .differences(&s)
+        .unwrap();
+    body.develop_section(new_fields.source(), new_fields.observed())
+        .unwrap();
+    let returned = body.actuate_section(input).unwrap();
+    let reading = returned.after().inspect().unwrap();
+    let blind = [
+        wave(1, 0, 1),
+        wave(0, 0, 1),
+        wave(4, 0, 1),
+        wave(1, 0, 1),
+        wave(0, 0, 1),
+        wave(4, 0, 1),
+    ];
+    let change: Rat = reading
+        .center
+        .iter()
+        .zip(&blind)
+        .map(|(a, b)| a.subtract(b).norm_square())
+        .sum();
+    assert!(change > &reading.radius * &reading.radius);
+}
+#[test]
+#[ignore = "requires CUDA; rational source/arrival families remain enclosed, including their phase and late refusal"]
+fn source_action_retains_rational_bounds_and_atomic_refusal() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let p = point(&s, &[1, 0]);
+    let c = point(&s, &[3, 4, 5]);
+    let mut body = material(&s, 0)
+        .into_difference_wave(
+            current(&p),
+            ResidentConstitutiveCurrent::rational(&c).unwrap(),
+        )
+        .unwrap();
+    let source = s
+        .mount_section_rest(
+            &ResidentSectionRest::found(
+                4,
+                3,
+                ResidentGrain(0),
+                i64::BITS,
+                [1, 0, 3, 0, 1, 3, -1, 0, 3, 0, -1, 3]
+                    .into_iter()
+                    .map(|v| (v, v))
+                    .collect(),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+    let mut expected = vec![
+        Rat::one(),
+        Rat::zero(),
+        Rat::new(3.into(), 5.into()),
+        Rat::new(4.into(), 5.into()),
+    ];
+    let points =
+        [[1, 0], [0, 1], [-1, 0], [0, -1]].map(|v| v.map(|v| Rat::new(v.into(), 3.into())));
+    for pair in points.windows(2) {
+        let x = pair[0].iter().chain(&pair[1]).cloned().collect::<Vec<_>>();
+        let y = pair[1]
+            .iter()
+            .cloned()
+            .chain(pair[1].iter().map(|v| v / Rat::from_integer(2.into())))
+            .collect::<Vec<_>>();
+        let union = expected
+            .iter()
+            .zip(&x)
+            .map(|(q, x)| q + x)
+            .collect::<Vec<_>>();
+        expected = passive_exact(&x, &y, &union);
+    }
+    let returned = body
+        .actuate_section(ResidentConstitutiveSection::rationals(&source).unwrap())
+        .unwrap();
+    let ball = returned.after().inspect().unwrap();
+    contains(
+        &ball,
+        &expected
+            .chunks_exact(2)
+            .map(|p| ExactComplexWaveCurrent::new(p[0].clone(), p[1].clone()))
+            .collect::<Vec<_>>(),
+    );
+    assert!(ball.radius > Rat::zero());
+    drop(returned);
+    let saved = body.rest().unwrap();
+    let current = body.current().snapshot();
+    let mut bad = s.detach_section(&source, i64::BITS).unwrap();
+    bad.intervals.last_mut().unwrap().clone_from(&(0, 0));
+    let bad = s.mount_section_rest(&bad).unwrap();
+    assert!(
+        body.actuate_section(ResidentConstitutiveSection::rationals(&bad).unwrap())
+            .is_err()
+    );
+    assert_eq!(body.rest().unwrap(), saved);
+    assert!(body.current().same_occurrence(&current));
+    drop(current);
+    let residency = s.census().resident_octets_now;
+    for _ in 0..4 {
+        body.actuate_section(ResidentConstitutiveSection::rationals(&source).unwrap())
+            .unwrap();
+        assert_eq!(s.census().resident_octets_now, residency);
+    }
+}
+
 fn point<'c>(s: &'c ResidentSurface<'c>, v: &[i64]) -> ResidentSection<'c> {
     s.mount_section_rest(
         &ResidentSectionRest::found(

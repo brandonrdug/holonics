@@ -31,6 +31,7 @@ fn json<T: serde::Serialize>(path: impl AsRef<Path>, value: &T) -> Result<()> {
 }
 fn main() -> Result<()> {
     let args = std::env::args().skip(1).collect::<Vec<_>>();
+    let actuating = args.first().is_some_and(|mode| mode == "actuate");
     let (chart,mut reader,rest,grain,take,steps,output)=match args.as_slice() {
         [mode,source,calibration,take,grain,steps,output] if mode=="start"=>{
             let calibration=calibration.parse::<u64>()?;
@@ -53,7 +54,7 @@ fn main() -> Result<()> {
             (SymbolCurrentChart::declared(alphabet),ExposureReader::resume(origin)?,None,
                 ResidentGrain(grain.parse::<u32>()?),take,steps.parse::<u64>()?,output)
         }
-        [mode,previous,take,steps,output] if mode=="resume"=>{
+        [mode,previous,take,steps,output] if mode=="resume"||mode=="actuate"=>{
             let previous=Path::new(previous);
             let summary:serde_json::Value=serde_json::from_reader(File::open(previous.join("summary.json"))?)?;
             if summary["schema"]!="holonics.conversation-wave.v1" {
@@ -71,7 +72,7 @@ fn main() -> Result<()> {
             (SymbolCurrentChart::declared(alphabet),ExposureReader::resume(cursor)?,Some(rest),grain,
                 take.parse::<u64>()?,steps.parse::<u64>()?,output)
         }
-        _=>return Err("usage: conversation_wave start SOURCE CALIBRATE_FRAMES TAKE_FRAMES GRAIN GENERATE_STEPS NEW_DIRECTORY | resume PREVIOUS_DIRECTORY TAKE_FRAMES GENERATE_STEPS NEW_DIRECTORY".into()),
+        _=>return Err("usage: conversation_wave start SOURCE CALIBRATE_FRAMES TAKE_FRAMES GRAIN GENERATE_STEPS NEW_DIRECTORY | resume PREVIOUS_DIRECTORY TAKE_FRAMES GENERATE_STEPS NEW_DIRECTORY | actuate PREVIOUS_DIRECTORY TAKE_FRAMES GENERATE_STEPS NEW_DIRECTORY".into()),
     };
     let output = Path::new(output);
     if output.exists() {
@@ -122,6 +123,29 @@ fn main() -> Result<()> {
                             .into_difference_wave(input.row(0)?, input.row(1)?)
                             .map_err(|r| r.reason)?,
                     );
+                }
+                if actuating {
+                    let body = body.as_mut().expect("restored source-action body");
+                    let before = surface.census();
+                    let clock = Instant::now();
+                    let returned = body.actuate_section(input)?;
+                    let seconds = clock.elapsed().as_secs_f64();
+                    let after = surface.census();
+                    let joint = returned.after().inspect()?;
+                    fields.push(serde_json::json!({"sequence":frame.sequence,"part":part.ordinal,
+                        "source_scalars":symbols.len(),"source_octets":text.len(),"source_contacts":symbols.len()-1,
+                        "observations":returned.successor_fibre().material_observations,"current_epoch":body.epoch(),
+                        "joint_radius":joint.radius,"seconds":seconds,"native_deeds":after.deed_launches-before.deed_launches,
+                        "numerical_readouts_during_actuation":after.section_read_outs-before.section_read_outs,
+                        "ingress_octets_during_actuation":after.ingress_octets-before.ingress_octets}));
+                    eprintln!(
+                        "source {} part {}: {} contacts, {:.3}s",
+                        frame.sequence,
+                        part.ordinal,
+                        symbols.len() - 1,
+                        seconds
+                    );
+                    continue;
                 }
                 if symbols.len() < 3 {
                     short_parts += 1;
@@ -186,7 +210,8 @@ fn main() -> Result<()> {
     json(output.join("fields.json"), &fields)?;
     json(output.join("trajectory.json"), &trajectory)?;
     let summary = serde_json::json!({"schema":"holonics.conversation-wave.v1",
-        "scope":"whole-field development of a continuing local generator; not general contextual language",
+        "scope":"source action and development of a continuing local generator; not general contextual language",
+        "intake_operation":if actuating {"actuation"} else {"development"},
         "first_sequence":first_sequence,"next_sequence":reader.cursor().next_sequence,"frames":frames,
         "fields":fields.len(),"short_parts_without_local_comparison":short_parts,"source_scalars":scalars,"source_octets":octets,
         "alphabet_coordinates":chart.alphabet().len(),"grain":grain.0,"observations":saved.material().observations(),

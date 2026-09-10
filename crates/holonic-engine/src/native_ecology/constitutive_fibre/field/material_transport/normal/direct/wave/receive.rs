@@ -118,6 +118,7 @@ impl<'c> ResidentNormalWave<'c> {
         self.steps = 0;
         self.epoch = epoch;
         self.seed_kind = NormalWaveSeedKind::ReceivedCurrent;
+        self.seed_epochs = [self.previous.at(), self.current.at()];
         Ok(NormalWaveReception {
             previous: self.previous.snapshot(),
             current: self.current.snapshot(),

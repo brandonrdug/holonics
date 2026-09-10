@@ -4,6 +4,14 @@ use crate::native_ecology::constitutive_fibre::circulation::rest::{
 };
 use std::io::{Read, Write};
 const MAGIC: &[u8] = b"HOLONIC-NORMAL-WAVE";
+#[derive(serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Header {
+    steps: u64,
+    epoch: u64,
+    seed_kind: NormalWaveSeedKind,
+    seed_epochs: [Option<u64>; 2],
+}
 
 /// A generator, its typed seed and word. After reception the seed retains an enclosed
 /// previous current and exact received point. Powers and emitted faces remain caches.
@@ -14,6 +22,7 @@ pub struct NormalWaveRest {
     steps: u64,
     epoch: u64,
     seed_kind: NormalWaveSeedKind,
+    seed_epochs: [Option<u64>; 2],
 }
 impl NormalWaveRest {
     pub fn steps(&self) -> u64 {
@@ -30,15 +39,34 @@ impl NormalWaveRest {
     }
     pub fn write(&self, out: &mut impl Write) -> Result<(), ConstitutiveFibreError> {
         out.write_all(MAGIC).map_err(invalid)?;
-        let version = match self.seed_kind {
-            NormalWaveSeedKind::ExactPair => 1,
-            NormalWaveSeedKind::ReceivedCurrent => 2,
-            NormalWaveSeedKind::JointEnclosure => 3,
+        let base = self.epoch - self.steps;
+        let canonical = [base.checked_sub(1), Some(base)];
+        let version = if self.seed_epochs != canonical {
+            4
+        } else {
+            match self.seed_kind {
+                NormalWaveSeedKind::ExactPair => 1,
+                NormalWaveSeedKind::ReceivedCurrent => 2,
+                NormalWaveSeedKind::JointEnclosure => 3,
+            }
         };
         out.write_all(&[version]).map_err(invalid)?;
-        out.write_all(&self.steps.to_le_bytes()).map_err(invalid)?;
-        if version >= 2 {
-            out.write_all(&self.epoch.to_le_bytes()).map_err(invalid)?;
+        if version == 4 {
+            blob(
+                out,
+                &serde_json::to_vec(&Header {
+                    steps: self.steps,
+                    epoch: self.epoch,
+                    seed_kind: self.seed_kind,
+                    seed_epochs: self.seed_epochs,
+                })
+                .map_err(invalid)?,
+            )?;
+        } else {
+            out.write_all(&self.steps.to_le_bytes()).map_err(invalid)?;
+            if version >= 2 {
+                out.write_all(&self.epoch.to_le_bytes()).map_err(invalid)?;
+            }
         }
         let mut material = Vec::new();
         self.material.write(&mut material)?;
@@ -50,28 +78,57 @@ impl NormalWaveRest {
         expect(&mut input, MAGIC)?;
         let mut version = [0];
         input.read_exact(&mut version).map_err(invalid)?;
-        if !(1..=3).contains(&version[0]) {
+        if !(1..=4).contains(&version[0]) {
             return Err(invalid("normal wave version"));
         }
-        let mut bytes = [0; 8];
-        input.read_exact(&mut bytes).map_err(invalid)?;
-        let steps = u64::from_le_bytes(bytes);
-        let (epoch, seed_kind) = if version[0] == 1 {
-            (steps, NormalWaveSeedKind::ExactPair)
-        } else {
-            input.read_exact(&mut bytes).map_err(invalid)?;
-            let epoch = u64::from_le_bytes(bytes);
-            if epoch < steps || (version[0] == 2 && epoch == steps) {
-                return Err(invalid("received wave chronology"));
+        let Header {
+            steps,
+            epoch,
+            seed_kind,
+            seed_epochs,
+        } = if version[0] == 4 {
+            let h: Header = serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
+            let base = h
+                .epoch
+                .checked_sub(h.steps)
+                .ok_or_else(|| invalid("wave chronology"))?;
+            if h.seed_epochs[1].is_none()
+                || h.seed_epochs.iter().flatten().any(|at| *at > base)
+                || h.seed_epochs[0]
+                    .zip(h.seed_epochs[1])
+                    .is_some_and(|(p, c)| p > c)
+            {
+                return Err(invalid("wave seed chronology"));
             }
-            (
+            h
+        } else {
+            let mut bytes = [0; 8];
+            input.read_exact(&mut bytes).map_err(invalid)?;
+            let steps = u64::from_le_bytes(bytes);
+            let (epoch, seed_kind) = if version[0] == 1 {
+                (steps, NormalWaveSeedKind::ExactPair)
+            } else {
+                input.read_exact(&mut bytes).map_err(invalid)?;
+                let epoch = u64::from_le_bytes(bytes);
+                if epoch < steps || (version[0] == 2 && epoch == steps) {
+                    return Err(invalid("received wave chronology"));
+                }
+                (
+                    epoch,
+                    if version[0] == 2 {
+                        NormalWaveSeedKind::ReceivedCurrent
+                    } else {
+                        NormalWaveSeedKind::JointEnclosure
+                    },
+                )
+            };
+            let base = epoch - steps;
+            Header {
+                steps,
                 epoch,
-                if version[0] == 2 {
-                    NormalWaveSeedKind::ReceivedCurrent
-                } else {
-                    NormalWaveSeedKind::JointEnclosure
-                },
-            )
+                seed_kind,
+                seed_epochs: [base.checked_sub(1), Some(base)],
+            }
         };
         let m = read_blob(&mut input)?;
         let material = NormalMaterialRest::read(&mut m.as_slice(), m.len() as u64)?;
@@ -109,6 +166,7 @@ impl NormalWaveRest {
             steps,
             epoch,
             seed_kind,
+            seed_epochs,
         })
     }
     /// Recompute the bounded generator word from its definition, never from source records.
@@ -155,6 +213,13 @@ impl NormalWaveRest {
             drop(initial);
             body
         };
+        body.seed_epochs = self.seed_epochs;
+        Rc::get_mut(&mut body.previous.inner)
+            .expect("unpublished reference")
+            .at = self.seed_epochs[0];
+        Rc::get_mut(&mut body.current.inner)
+            .expect("unpublished current")
+            .at = self.seed_epochs[1];
         while body.steps() < self.steps {
             body.advance()?;
             progress(body.steps());
@@ -173,6 +238,7 @@ impl ResidentNormalWave<'_> {
             steps: self.steps,
             epoch: self.epoch,
             seed_kind: self.seed_kind,
+            seed_epochs: self.seed_epochs,
         })
     }
 }

@@ -148,7 +148,7 @@ achieved. Current research seeks identifiable behavior and learning without a ut
 | AC0 | Existing source-qualified stream, availability and cursor | Complete; preserve |
 | AC1 | A productive conditional-generator carrier, its local interaction/reaction and source/receiver chart | Learned local laws now share actual condition standing in one move-owned neighborhood; continue into the source attachment |
 | AC2 | Observation-founded development of reusable conduct and a later measured consequence | Local material formation and condition reaction return atomically and change later conduct; carry them into the source attachment |
-| AC3 | Conversation exposure and retained joint continuation through the generator-bearing body | Whole-field development now continues across source intake and generation; compose ordinary source-field actuation and richer contextual relations |
+| AC3 | Conversation exposure and retained joint continuation through the generator-bearing body | Whole-field development and fixed-material source actuation return; continue receiver/developmental composition over situated current |
 | AC4 | Restriction/rebase or generator reuse that participates in the next operation | Apply reusable generators and explicit bounded rebase in the next operation; distinguish this from an exact future-receiver quotient |
 | AC5 | Public invocation, model anatomy and persistence of the actual productive body | Persist the actual material, seed/fibre and chronology; verify generated and received continuation on the cultivated conversation body |
 
@@ -187,12 +187,11 @@ or consume an enclosure's centre as an exact current. Local adjacency is not all
 [established-bounded; implemented-exact; computational-witness] The
 [whole-source-field return](../../research/records/2026-09-10_WHOLE_SOURCE_FIELDS_DEVELOP_THE_CONTINUING_GENERATOR.md)
 now develops material inside the continuing wave and persists its bounded joint seed. The source
-application intakes, generates, restarts and intakes more material through that same body. Next,
-compose an actual source/receiver action from incoming Holons into the current under fixed
-material, using the existing conditional/nonlinear/reflection owners. Show that a changed source
-changes later conduct without treating the stimulus as a required fitting target or retrieving
-parent text. This is the concrete missing source binding, not a requirement for a universal
-intelligence theorem or a pause on broader exposure.
+application intakes, generates, restarts and intakes more material through that same body. The
+subsequent source-union return below supplies the fixed-material source/current action through
+the existing reflection owner. The standing requirement is changed source/condition causing
+changed later conduct through actual maps, without a required fit or parent-text retrieval.
+A universal intelligence theorem is not a prerequisite or a reason to pause broader exposure.
 
 [definition] The parallel [contextual-transformation study](../../research/records/2026-09-10_DEEPSEEK_V41_SEPARATES_SHARED_STANDING_CONTACT_AND_CONTEXTUAL_TRANSFORMATION.md)
 now sharpens that source binding: `000100` and `001000` have equal local normal statistics and
@@ -201,6 +200,15 @@ construction session. This is a source-map limit, not numerical solve error or a
 comparison. Compose fresh source/standing interaction before quotienting distinctions needed by
 a later receiver; do not substitute more fitting, a larger stencil or an operational history
 archive. The existing conditional-contact and nonlinear owners remain the starting points.
+
+[established-bounded; implemented-exact; computational-witness] The [source-union return](../../research/records/2026-09-10_SOURCE_PASSAGES_ACT_THROUGH_UNION_AND_PASSIVE_REFLECTION.md)
+now supplies that fixed-material source/current binding through the existing passive contact
+and learned normal arrival. The stencil collision is separated by native conditioned conduct;
+corpus source actuation preserves material and complete continuation across rest. The next
+composition joins receivers and observation-founded development to these actual situated
+currents and producing maps. Local source-stencil fitting is not the entire learning system.
+Keep the applied matrix, its normal-optimizer comparison and source uncertainty distinct; no
+reference-error envelope becomes a universal certainty gate or semantic confidence score.
 
 [definition] The corrected formal `FiniteLocalCurrentEcology.reaction` retains local
 standing. The [native field assembly and observed return](../../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)

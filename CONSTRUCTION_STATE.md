@@ -1,17 +1,16 @@
 # Construction state
 
 **Currency:** September 10, 2026. **Priority:** Corrected AC0–AC5 construction is the active goal. Native HNN cultivation uses Holons as situated state, incidence, transported differences and compatible continuations; text/audio/visual media are exterior measurement charts.
-**Position:** The byte-cultivation assembly remains retired. Whole source fields now develop the same continuing generator across intake, generation, rest and further intake. AC3's source attachment returns on 64 frames with 18,120 comparisons; 22 normal checks and the extended development control pass. The next gap is ordinary source-field actuation under fixed material, followed by richer contextual/local-generator composition. AC0–AC5 is not complete. No cultivation process is running.
+**Position:** Incoming source fields now change the held joint current through learned arrivals, union and passive contact, with material held fixed. The native source-map collision is separated; all 26 normal checks pass. Corpus source actuation preserves material bytes and resumes with identical complete state and bounded returns. Continue into receiver/developmental composition over the actual situated current. AC0–AC5 is not complete. No cultivation process is running.
 **Athena-alpha:** not yet attained.
 
-**Active implementation:** `ResidentNormalWave::develop_section` stages the existing normal
-section update and any required joint-seed rebase before publication. Actual current occurrences
-remain; section intake changes material, while requested generation advances the current epoch.
-The [whole-field return](research/records/2026-09-10_WHOLE_SOURCE_FIELDS_DEVELOP_THE_CONTINUING_GENERATOR.md)
-records the public source driver, separate native rest/exterior chart/cursor, complete process
-comparison and fixed source scope. Four steps, rest and four more steps match an uninterrupted
-second word after further intake. This is material development, not yet the missing source-field
-action on current at fixed material. Local source adjacency does not exhaust context.
+**Active implementation:** `ResidentNormalWave::actuate_section` composes learned joined source
+passages and publishes one transported joint successor per source field. Rest v4 retains both
+components' occurrence epochs. The [source return](research/records/2026-09-10_SOURCE_PASSAGES_ACT_THROUGH_UNION_AND_PASSIVE_REFLECTION.md)
+records 32 fields/9,189 contacts under unchanged material and exact continuation across restart.
+The source bound is refined from about 15,536 to 0.01846 by exact H/B/M zero-response certificates,
+with unchanged nominal currents. It includes realization/normal-reference comparison error;
+it is not semantic confidence. Applied M, ideal optimizer P and source uncertainty stay distinct.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct

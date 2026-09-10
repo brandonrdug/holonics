@@ -9,14 +9,14 @@ pub struct NormalWaveDevelopment<'a, 'c> {
     pub rebased_joint_enclosure: bool,
 }
 
-struct JointSeed<'c> {
-    power: ResidentSection<'c>,
-    metadata: ResidentSection<'c>,
-    previous: NormalWaveCurrent<'c>,
-    current: NormalWaveCurrent<'c>,
+pub(super) struct JointSeed<'c> {
+    pub(super) power: ResidentSection<'c>,
+    pub(super) metadata: ResidentSection<'c>,
+    pub(super) previous: NormalWaveCurrent<'c>,
+    pub(super) current: NormalWaveCurrent<'c>,
 }
 impl<'c> ResidentNormalMaterial<'c> {
-    fn prepare_joint_seed(
+    pub(super) fn prepare_joint_seed(
         &self,
         joint: &ResidentSection<'c>,
         epoch: u64,
@@ -86,6 +86,7 @@ impl<'c> ResidentNormalMaterial<'c> {
                 previous,
                 current,
                 steps: 0,
+                seed_epochs: [epoch.checked_sub(1), Some(epoch)],
             }),
             Err(reason) => Err(NormalWaveSeedRefusal {
                 material: self,
@@ -123,6 +124,7 @@ impl<'c> ResidentNormalWave<'c> {
             self.power = power;
             self.metadata = Rc::new(metadata);
             self.steps = 0;
+            self.seed_epochs = [self.previous.at(), self.current.at()];
         }
         self.material.publish_section(&comparison);
         Ok(NormalWaveDevelopment {

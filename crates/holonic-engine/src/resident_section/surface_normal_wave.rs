@@ -5,6 +5,72 @@ use crate::native_ecology::constitutive_fibre::{
 };
 impl<'c> ResidentSurface<'c> {
     #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_normal_source_actuation(
+        &self,
+        lane: &Lane<'_, 'c>,
+        material: &ResidentSection<'c>,
+        joint: &ResidentSection<'c>,
+        source: crate::native_ecology::constitutive_fibre::ResidentConstitutiveSection<'_, 'c>,
+        n: usize,
+        grain: u32,
+        out: &ResidentSection<'c>,
+        anchors: &ResidentSection<'c>,
+        frame: &ResidentSection<'c>,
+        work: &ResidentSection<'c>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || Self::operative_error();
+        let sw = normal_material_state_words(n, n).ok_or_else(fail)?;
+        let r = n.checked_mul(2).filter(|r| *r > 0).ok_or_else(fail)?;
+        let w = r.checked_mul(2).ok_or_else(fail)?;
+        let d = r.checked_mul(3).ok_or_else(fail)?;
+        if !(1..=120).contains(&grain)
+            || sw > u32::MAX as usize
+            || source.rows() < 2
+            || source.components() != r
+            || source
+                .rows()
+                .checked_mul(source.section.width())
+                .is_none_or(|v| v > u32::MAX as usize)
+            || !std::ptr::eq(source.section.surface, self)
+            || source.section.grain.0 != 0
+            || !self.operative_shape(material, 1, sw)
+            || !self.operative_shape(joint, 1, 2 * (w + 1))
+            || !self.operative_shape(out, 1, 2 * (w + 1))
+            || !self.operative_shape(anchors, 1, 2 * (2 * (w + 1) + (r + 1)))
+            || !self.operative_shape(frame, 1, 4 * (d + 1))
+            || !self.operative_shape(work, 1, 4 * n)
+        {
+            return Err(fail());
+        }
+        let mut p = Params::new();
+        p.ptr(material.lo.device_ptr())
+            .ptr(joint.lo.device_ptr())
+            .ptr(source.section.lo.device_ptr())
+            .ptr(source.section.hi.device_ptr())
+            .u32(source.rows() as u32)
+            .u32(u32::from(source.rational))
+            .u32(n as u32)
+            .u32(grain)
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(anchors.lo.device_ptr())
+            .ptr(frame.lo.device_ptr())
+            .ptr(work.lo.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_normal_source_actuation",
+            1,
+            self.launch.block_x,
+            0,
+            &mut p,
+            "normal-source-actuation",
+        )
+    }
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn record_normal_wave_joint_seed(
         &self,
         lane: &Lane<'_, 'c>,

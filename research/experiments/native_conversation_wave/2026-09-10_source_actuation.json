@@ -1,0 +1,80 @@
+{
+  "schema": "holonics.native-source-actuation.v1",
+  "scope": "fixed-material source union and passive contact; native arrangement separation and corpus continuation, not language attainment",
+  "source_frames": 32,
+  "source_contacts": 9189,
+  "source_scalars": 9221,
+  "alphabet_coordinates": 85,
+  "grain": 64,
+  "material_observations_before_and_after": 8963,
+  "complete_material_bytes_unchanged": true,
+  "complete_rest_equal_after_source_independent_resume": true,
+  "complete_bounded_returns_equal_after_resume": true,
+  "source_cursor_equal": true,
+  "native_readouts_during_actuation": 0,
+  "native_ingress_during_actuation": 0,
+  "source_current_epochs": [
+    5,
+    36
+  ],
+  "final_epoch": 44,
+  "generation_word_length": 8,
+  "source_seconds": 88.587536484,
+  "resident_octets": 53210144,
+  "rest_octets": 25669541,
+  "source_bound_before_zero_certificate": "286585543046425941707293/18446744073709551616",
+  "source_bound_after_zero_certificate": "170224301162375511/9223372036854775808",
+  "nominal_currents_unchanged_by_zero_certificate": true,
+  "generation": [
+    {
+      "epoch": 37,
+      "word_step": 1,
+      "joint_radius": "851295465692635019/2305843009213693952"
+    },
+    {
+      "epoch": 38,
+      "word_step": 2,
+      "joint_radius": "6811755404587518037/18446744073709551616"
+    },
+    {
+      "epoch": 39,
+      "word_step": 3,
+      "joint_radius": "106455423181786469/288230376151711744"
+    },
+    {
+      "epoch": 40,
+      "word_step": 4,
+      "joint_radius": "6814538762681149995/18446744073709551616"
+    },
+    {
+      "epoch": 41,
+      "word_step": 5,
+      "joint_radius": "1703982610432086037/4611686018427387904"
+    },
+    {
+      "epoch": 42,
+      "word_step": 6,
+      "joint_radius": "1704330530193979119/4611686018427387904"
+    },
+    {
+      "epoch": 43,
+      "word_step": 7,
+      "joint_radius": "3409356899911933489/9223372036854775808"
+    },
+    {
+      "epoch": 44,
+      "word_step": 8,
+      "joint_radius": "852513184858977185/2305843009213693952"
+    }
+  ],
+  "checks": {
+    "normal_native_tests": 26,
+    "source_collision": "disjoint bounded native outputs at fixed material",
+    "rational_source_and_late_refusal": "passed",
+    "zero_source_and_reopening": "passed",
+    "non_optimal_applied_matrix_preserved": "passed",
+    "legacy_and_v4_rest": "passed"
+  },
+  "bound_scope": "current/source and numerical realization envelope, including normal-reference comparison; not semantic confidence",
+  "timing_scope": "wall-clock observations; final control processes overlapped, not isolated power or throughput calibration"
+}

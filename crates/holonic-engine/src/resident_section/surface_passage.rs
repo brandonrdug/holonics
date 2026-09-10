@@ -1632,7 +1632,7 @@ impl<'chart> ResidentSurface<'chart> {
     /// declared charts. This records its projected map, not a learned model binding, an inferred
     /// metric, or the lifted axis. A one-row founding section is broadcast immutably over later
     /// query rows; equal source/query rows retain row-paired behavior. Inputs remain owned by
-    /// their caller as the reconstruction fibre.
+    /// their caller as actual comparands; the source fibre is not identified with the projection.
     /// Non-point founding observations and unsupported arithmetic refuse on the device; no
     /// midpoint, learning gain, clipping or hidden wider ecology is substituted.
     pub fn record_passive_contact(
