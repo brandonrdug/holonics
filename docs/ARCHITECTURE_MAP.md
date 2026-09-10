@@ -566,6 +566,8 @@ The draft applies its maps globally at that port; it does not supply the missing
 [established-bounded; implemented-exact] `holonics-hna/src/native/field.rs` owns the public
 finite field recipe/mount; `field/junction/operative/response/observation.rs` owns generic
 observed-response orchestration and its typed receiver chart. Text delegates to these owners.
+`holonics-hna/src/native/field/checkpoint.rs` owns generic native-field file publication and
+consuming remount; text's envelope retains its own delivery metadata and delegates to it.
 The [AC1/AC2 return](../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)
 retains complete-successor comparisons, actual source/standing separation and a later current
 family changed by one local return. Existing native mathematical laws and rest formats stand.

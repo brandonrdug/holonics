@@ -53,6 +53,18 @@ The field's actual occurrence, source/anchor, return, rest and current-family AP
 `NativeMaterialResponseChart` makes normalized group/series apertures explicit; generic observed
 return belongs to the field rather than `TextFieldSession`. See [composition](HNN_COMPOSITION.md).
 
+[definition] `native::NativeSavedField` consumes the existing `NativeFieldRest` into one
+remounted field and its actual linear/shared source slots. `read` and `publish` use the existing
+native wire and no-overwrite publication; `with_field_archived` places older source carriers in
+a fresh archive without depending on an old machine's archive path. This saves native model
+state. A text application's cursor, delivery and pending symbol remain in its exterior session
+envelope, whose remount now delegates to the same generic field owner.
+
+[definition] `NativeConstitutiveField::surface` exposes a borrowed resident apparatus for typed
+current-section composition. It creates no source capability or second field. Use this for
+existing resident wave/section ingress; a numeric section remains qualified by the receiving
+field's actual chart and lineage.
+
 ## Choosing an implementation
 
 [definition] `hna::alpha::exposure` owns the cold conversation source/cursor;

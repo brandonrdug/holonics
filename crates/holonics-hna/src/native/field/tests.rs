@@ -244,3 +244,65 @@ fn local_return_has_a_separated_later_consequence() {
         })
     );
 }
+
+#[test]
+#[ignore = "requires CUDA; generic native artifact retains its actual field and linear/shared source slots"]
+fn native_saved_field_continues_the_same_conditioned_body() {
+    let directory = tempfile::tempdir().unwrap();
+    let path = directory.path().join("model.field");
+    let expected = with_native_field(&spec(), |field| -> Result<_, NativeSessionError> {
+        let source = receive(field);
+        field.respond_to_material_observation(
+            field.occurrence_count() - 1,
+            NativeMaterialResponseChart::ComplexCurrent,
+            NativeContactRealization::DyadicDeposit,
+            |_, _| (),
+        )?;
+        let anchor = field.retain_source(&source)?;
+        let saved =
+            NativeSavedField::from_rest(field.rest(&[Some(&source), None], &[Some(&anchor)])?);
+        saved.publish(&path)?;
+        assert!(saved.publish(&path).is_err());
+        field.advance_resident(&mut NativeFieldOccurrence::through(
+            source,
+            vec![
+                NativePhaseCurrent::unit(),
+                NativePhaseCurrent::new(0, 1, 1)?,
+            ],
+        ))?;
+        Ok(field.rest(&[], &[Some(&anchor)])?)
+    })
+    .unwrap();
+    let saved = NativeSavedField::read(&path).unwrap();
+    assert_eq!(saved.nodes(), 2);
+    assert_eq!(saved.occurrences(), 5);
+    assert_eq!(saved.source_slots(), &[Some(4), None]);
+    assert_eq!(saved.anchor_slots(), &[Some(4)]);
+    assert_eq!(
+        saved.material_source(),
+        Some(NativeMaterialTransportSource::OperativeContextual)
+    );
+    assert_eq!(
+        saved.material_target(),
+        Some(NativeMaterialTarget::DirectCurrent)
+    );
+    let actual = saved
+        .with_field_archived(
+            directory.path().join("history"),
+            |field, mut sources, anchors| -> Result<_, NativeSessionError> {
+                assert_eq!(field.occurrence_count(), 5);
+                let source = sources[0].take().unwrap();
+                assert!(sources[1].is_none());
+                field.advance_resident(&mut NativeFieldOccurrence::through(
+                    source,
+                    vec![
+                        NativePhaseCurrent::unit(),
+                        NativePhaseCurrent::new(0, 1, 1)?,
+                    ],
+                ))?;
+                Ok(field.rest(&[], &[anchors[0].as_ref()])?)
+            },
+        )
+        .unwrap();
+    assert_eq!(actual, expected);
+}

@@ -12,6 +12,8 @@ use holonic_engine::{
     resident_section::{ResidentGrain, ResidentSurface},
 };
 use serde::{Deserialize, Serialize};
+mod checkpoint;
+pub use checkpoint::NativeSavedField;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

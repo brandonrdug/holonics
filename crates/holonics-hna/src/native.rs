@@ -13,7 +13,7 @@ use thiserror::Error;
 mod wire;
 pub use wire::*;
 mod field;
-pub use field::{NativeFieldJunctionSpec, NativeFieldMaterialSpec, NativeFieldModelSpec, with_native_field};
+pub use field::{NativeFieldJunctionSpec, NativeFieldMaterialSpec, NativeFieldModelSpec, NativeSavedField, with_native_field};
 mod checkpoint;
 pub use checkpoint::NativeSavedSession;
 mod wave_control;

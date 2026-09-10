@@ -95,6 +95,12 @@ next construction. A new initialization recipe is not a trained artifact, and th
 finite local change does not establish a learned general text/acoustic/visual generator.
 The same native Holon field and source/receiver capabilities remain the shared assembly.
 
+[definition] Persistence follows that same ownership: `native::NativeSavedField` consumes the
+engine's existing rest and remounts the field with its actual source/anchor capabilities. It
+introduces no new native wire or medium tag. Text checkpoint envelopes keep their delivery
+state outside this owner and delegate the field remount to it. `field.surface()` supplies the
+borrowed apparatus needed to compose resident currents without a numerical host replay.
+
 ## Partial conduct and comparison
 
 [definition] Useful restricted behavior can arise before every mechanism learns or every chart

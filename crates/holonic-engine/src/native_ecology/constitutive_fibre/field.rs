@@ -352,6 +352,11 @@ impl<'chart> NativeConstitutiveField<'chart> {
     pub fn nodes(&self) -> usize {
         self.material.len()
     }
+    /// Borrow the actual resident apparatus for composing typed current sections. This grants
+    /// no second field owner or source capability; the field still validates every reception.
+    pub fn surface(&self) -> &'chart ResidentSurface<'chart> {
+        self.relation.surface
+    }
     pub fn material(&self) -> &[NativeJunctionSeed] {
         &self.material
     }

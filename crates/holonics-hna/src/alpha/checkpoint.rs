@@ -9,12 +9,10 @@ use crate::checkpoint::{hash_prefix, read_blob, read_transport, write_len, write
 use crate::publication::PublicationReceipt;
 use crate::{HnaStream, HnaStreamState, publish_new};
 use holonic_engine::{
-    embedding_fiber::ResidentReadout,
     native_ecology::constitutive_fibre::{
-        ConstitutiveReturnRest, NativeConstitutiveField, NativeFieldOccurrence, NativeFieldRest,
+        ConstitutiveReturnRest, NativeFieldOccurrence, NativeFieldRest,
         NativeFieldSourceAnchor,
     },
-    resident_section::ResidentSurface,
 };
 use serde::{Deserialize, Serialize};
 use std::{
@@ -245,55 +243,67 @@ impl SavedTextField {
     ) -> Result<R, AlphaMaterialError> {
         self.validate()?;
         let latest = self.field.source_slots()[0];
-        let readout = ResidentReadout::new().map_err(error)?;
-        let surface = ResidentSurface::on(&readout).map_err(error)?;
-        let (mut field, mut sources, mut anchors) = match archive_path {
-            Some(path) => {
-                NativeConstitutiveField::remount_with_history_archive(&surface, self.field, path)?
-            }
-            None => NativeConstitutiveField::remount(&surface, self.field)?,
-        };
-        let mut session = TextFieldSession::on(&mut field)?;
-        session.duplex=self.session.duplex;
-        session.pending_direction=self.session.pending_direction;
-        session.latest = latest.map(|occurrence| TextFieldSource {
-            occurrence,
-            source: sources[0].take().expect("validated latest source"),
-        });
-        session.next_anchor = anchors[0].take();
-        if let Some(symbol) = self.session.pending {
-            let inputs = if let Some(input)=self.session.pending_material_actuation.as_ref().and_then(|a|a.incoming.as_ref()) {
-                input.clone()
-            } else if self.session.pending_native.is_some() {
-                vec![]
-            } else {
-                symbol.inputs_on(if self.session.duplex{self.session.pending_direction}else{super::text_codec::TextDirection::Incoming})
-            };
-            let occurrence = if let Some(source) = sources[1].take() {
-                if let Some(expected)=&self.session.pending_material_actuation {
-                    let actuation=session.field().read_material_actuation(&source,expected.quadrature)?;
-                    if actuation.reading().selected!=Some(expected.coordinate){return Err(error("pending actuation source face changed"));}
-                    NativeFieldOccurrence::actuating(source,inputs,actuation)
-                }else{NativeFieldOccurrence::through(source,inputs)}
-            } else if let Some(anchor) = anchors[1].take() {
-                NativeFieldOccurrence::through_anchor(&anchor, inputs)
-            } else {
-                NativeFieldOccurrence::entering(inputs)
-            };
-            session.pending = Some((symbol, occurrence));
-            session.pending_native = self
-                .session
-                .pending_native
-                .map(|v| v.remount(&surface))
-                .transpose()?;
-        }
-        let external = anchors
-            .into_iter()
-            .skip(2)
-            .map(|a| a.expect("validated exterior anchor"))
-            .collect();
-        let mut stream = HnaStream::from_state(self.stream).map_err(error)?;
-        operation(&mut session, &mut stream, external, self.application)
+        crate::native::NativeSavedField::from_rest(self.field).with_field_placed(
+            archive_path,
+            |field, mut sources, mut anchors| {
+                let mut session = TextFieldSession::on(field)?;
+                session.duplex = self.session.duplex;
+                session.pending_direction = self.session.pending_direction;
+                session.latest = latest.map(|occurrence| TextFieldSource {
+                    occurrence,
+                    source: sources[0].take().expect("validated latest source"),
+                });
+                session.next_anchor = anchors[0].take();
+                if let Some(symbol) = self.session.pending {
+                    let inputs = if let Some(input) = self
+                        .session
+                        .pending_material_actuation
+                        .as_ref()
+                        .and_then(|a| a.incoming.as_ref())
+                    {
+                        input.clone()
+                    } else if self.session.pending_native.is_some() {
+                        vec![]
+                    } else {
+                        symbol.inputs_on(if self.session.duplex {
+                            self.session.pending_direction
+                        } else {
+                            super::text_codec::TextDirection::Incoming
+                        })
+                    };
+                    let occurrence = if let Some(source) = sources[1].take() {
+                        if let Some(expected) = &self.session.pending_material_actuation {
+                            let actuation = session
+                                .field()
+                                .read_material_actuation(&source, expected.quadrature)?;
+                            if actuation.reading().selected != Some(expected.coordinate) {
+                                return Err(error("pending actuation source face changed"));
+                            }
+                            NativeFieldOccurrence::actuating(source, inputs, actuation)
+                        } else {
+                            NativeFieldOccurrence::through(source, inputs)
+                        }
+                    } else if let Some(anchor) = anchors[1].take() {
+                        NativeFieldOccurrence::through_anchor(&anchor, inputs)
+                    } else {
+                        NativeFieldOccurrence::entering(inputs)
+                    };
+                    session.pending = Some((symbol, occurrence));
+                    session.pending_native = self
+                        .session
+                        .pending_native
+                        .map(|v| v.remount(session.field().surface()))
+                        .transpose()?;
+                }
+                let external = anchors
+                    .into_iter()
+                    .skip(2)
+                    .map(|a| a.expect("validated exterior anchor"))
+                    .collect();
+                let mut stream = HnaStream::from_state(self.stream).map_err(error)?;
+                operation(&mut session, &mut stream, external, self.application)
+            },
+        )
     }
 }
 

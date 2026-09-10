@@ -89,6 +89,15 @@ model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction — resumed after deeper review
 
+[established-bounded; measured] AC3's joint-field variant completed sixteen families at 5,064
+occurrences and saved a 1,257,518,630-byte pre-prompt checkpoint. It emitted `I’m ante.` followed
+by EndPart; this is a bounded trajectory, not a useful answer. Development took 2,753.900
+seconds. The [exposure/persistence return](research/records/2026-09-09_AC3_THE_JOINT_FIELD_CONTINUES_AND_ITS_NATIVE_ARTIFACT_IS_GENERIC.md)
+retains the full workflow, source-factor savings and generic remount checks. Active work is AC4
+execution reuse across blocks, with one preserved mathematical operation and final commit, then
+fresh-process comparison of the actual model for AC5. No further large exposure is scheduled
+before this concrete cost question returns.
+
 [established-bounded; implemented-exact; computational-witness] The [generic field return](research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)
 recovers the existing projective joint-source/context mechanism and moves generic assembly and
 observed-response orchestration out of the text adapter. Four native controls preserve complete

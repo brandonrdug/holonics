@@ -159,6 +159,14 @@ The local field/material return, full-operator generic primitives and corrected 
 learning are existing candidates, each with its own source, metric and scope. Neither the old
 lexical atlas nor the retracted foreign-tower exclusion is restored.
 
+[definition] **Active AC4 packet:** the joint-field study has returned its sixteen families,
+current-factor generator savings and actual EndPart trajectory. Its contextual weight and
+coordinate evaluations still share one CUDA block with field preparation/commit. Factor these
+independent evaluations into staged multi-block work while retaining the original arithmetic,
+remainders, source lineage and one final commit. Compare with the preserved fused implementation;
+a late refusal must leave the complete predecessor unchanged. Then use the actual pre-prompt
+checkpoint for the AC5 fresh-process comparison. This changes execution, not the learning law.
+
 [project-postulate] Derivation belongs to the finite packet it changes. A partial/local learner
 may develop identifiable behavior without a universal HNN theorem, all six architecture adapters,
 all-history exact quotient or complete sequence adjoint. Add a longer return only for an actual
