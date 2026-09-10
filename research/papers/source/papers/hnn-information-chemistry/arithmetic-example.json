@@ -26,6 +26,24 @@
     "lattice_bits": 4,
     "basis_modes": [
       [
+        2,
+        1
+      ],
+      [
+        1,
+        2
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        2
+      ]
+    ],
+    "historical_basis_modes": [
+      [
         1,
         1
       ],
@@ -98,7 +116,7 @@
       21
     ],
     "current_difference_display_gain": 42,
-    "intensity_display": "I_N / the shared source-and-reflection family maximum",
+    "intensity_display": "I_N with fixed reference 1, independent of the source population",
     "intensity_difference_display": "difference / its infinity norm at N steps"
   },
   "rows": [
@@ -187,6 +205,125 @@
       "residual": -1
     }
   ],
+  "receiver_controls": {
+    "port_swap": [
+      1,
+      0,
+      2,
+      3
+    ],
+    "transpose_commutes_with_all_grid_rows": true,
+    "primary_response": [
+      {
+        "gradient": {
+          "num": [
+            1,
+            0
+          ],
+          "den": 1
+        },
+        "primaries": {
+          "num": [
+            1,
+            0,
+            1
+          ],
+          "den": 3
+        },
+        "alpha": [
+          2,
+          3
+        ]
+      },
+      {
+        "gradient": {
+          "num": [
+            0,
+            1
+          ],
+          "den": 1
+        },
+        "primaries": {
+          "num": [
+            0,
+            1,
+            1
+          ],
+          "den": 3
+        },
+        "alpha": [
+          2,
+          3
+        ]
+      },
+      {
+        "gradient": {
+          "num": [
+            1,
+            -1
+          ],
+          "den": 1
+        },
+        "primaries": {
+          "num": [
+            1,
+            1,
+            0
+          ],
+          "den": 3
+        },
+        "alpha": [
+          2,
+          3
+        ]
+      },
+      {
+        "gradient": {
+          "num": [
+            1,
+            1
+          ],
+          "den": 1
+        },
+        "primaries": {
+          "num": [
+            1,
+            1,
+            4
+          ],
+          "den": 7
+        },
+        "alpha": [
+          6,
+          7
+        ]
+      },
+      {
+        "gradient": {
+          "num": [
+            10,
+            -3
+          ],
+          "den": 15
+        },
+        "primaries": {
+          "num": [
+            100,
+            9,
+            49
+          ],
+          "den": 383
+        },
+        "alpha": [
+          158,
+          383
+        ]
+      }
+    ],
+    "scalar_gradient_triangle_circulation": 0,
+    "opaque_display": "quadratic primaries divided by their largest channel; zero is neutral",
+    "surface": "piecewise affine graph z=u over two triangles per grid square"
+  },
   "reflection": {
     "source": [
       1,

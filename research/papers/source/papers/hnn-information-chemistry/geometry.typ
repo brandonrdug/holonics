@@ -178,18 +178,7 @@
 
 
 // Shared display receivers. They change image contrast only, not field evolution.
-#let intensity-reference = {
-  let peak=0
-  let population=arithmetic-data.rows.map(r=>r.barycentric)+arithmetic-data.field.reflection_cases
-  for wire in population {
-    let weights=rational-vector(wire)
-    for j in range(1,lattice-count+1) {for i in range(1,lattice-count+1) {
-      let u=field-value(weights,i,j,lattice-count,lattice-count)
-      peak=calc.max(peak,u*u)
-    }}
-  }
-  peak
-}
+#let intensity-reference = 1
 #let intensity-difference-reference = {
   let peak=0
   let a=rational-vector(arithmetic-data.field.reflection_cases.at(3))
@@ -201,3 +190,47 @@
   }}
   peak
 }
+
+// Source: dimensional_wave.rs::ExactReceiverPrimaryDoctrine. The complex
+// receiver here is the local oriented slope, g_x + i g_y. Removing coverage
+// and dividing by the largest primary is an explicitly declared opaque gauge.
+#let primary-color(gx,gy)={
+  let p=(gx*gx,gy*gy,(gx+gy)*(gx+gy))
+  let peak=calc.max(..p)
+  if peak==0 {rgb("858585")} else {rgb(..p.map(v=>v/peak*100%))}
+}
+#let surface-tile(wire,steps,side:55mm,rechart:false,flat:false,leading-normalized:false) = cetz.canvas(length:side/2,padding:1/20,{
+  import cetz.draw: *
+  let N=lattice-count
+  let weights=rational-vector(wire)
+  let values=()
+  for j in range(N+2) {
+    let row=()
+    for i in range(N+2) {
+      row.push(if i==0 or j==0 or i==N+1 or j==N+1 {0}
+        else if rechart {field-value(weights,j,i,steps,N)}
+        else {field-value(weights,i,j,steps,N)})
+    }
+    values.push(row)
+  }
+  let val(i,j)=values.at(j).at(i)
+  let lead=if leading-normalized {weights.at(2)*calc.pow(calc.cos(calc.pi/(N+1)),steps)} else {1}
+  let position(i,j)=(i/(N+1),j/(N+1),val(i,j)/lead)
+  let screen(p)=if flat {(p.at(0),p.at(1))} else {(p.at(0)-p.at(1),p.at(2)-(p.at(0)+p.at(1))/2)}
+  let faces=()
+  for j in range(N+1) {for i in range(N+1) {
+    let a=position(i,j);let b=position(i+1,j);let c=position(i+1,j+1);let d=position(i,j+1)
+    let h=1/(N+1)
+    let ga=((b.at(2)-a.at(2))/h,(c.at(2)-b.at(2))/h)
+    let gb=((c.at(2)-d.at(2))/h,(d.at(2)-a.at(2))/h)
+    for (pts,g) in (((a,b,c),ga),((a,c,d),gb)) {
+      let depth=pts.map(p=>p.at(0)+p.at(1)+p.at(2)).sum()/3
+      faces.push((depth:depth,points:pts.map(screen),paint:primary-color(..g)))
+    }
+  }}
+  for f in faces.sorted(key:f=>f.depth) {
+    line(..f.points,close:true,fill:f.paint,stroke:(1pt/10)+rgb("303040"))
+  }
+  // The drawn outer boundary is the same Dirichlet boundary in every panel.
+  line(screen((0,0,0)),screen((1,0,0)),screen((1,1,0)),screen((0,1,0)),close:true,stroke:.5pt+by-black)
+})

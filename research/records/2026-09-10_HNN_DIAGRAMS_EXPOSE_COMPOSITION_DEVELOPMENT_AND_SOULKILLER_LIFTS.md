@@ -163,3 +163,47 @@ complete difference fields. Exact coefficient closure gives the current bound `1
 bound `1/21`; display normalization is labeled separately. The rational witness and nine-page
 Typst build return successfully, and all pages are visually checked. The PNG exports expose the
 two image plates directly. No native cultivation, inference or formal source changed.
+
+[established-bounded; source-inspected] The color/simplicial continuation recovers
+`dimensional_wave.rs::ExactReceiverPrimaryDoctrine`, `presentation_gauge.rs` and
+`simplicial.rs::OrientedFace::boundary`, alongside the July 13 color, August 9 spectral-receiver
+and August 18 geometric-autoencoder records. The exterior surface receiver coherently forms
+`A = d_x u + i d_y u` on each affine triangle, then uses the existing quadratic responses
+`P=(g_x^2,g_y^2,(g_x+g_y)^2)`. Opaque `P/max(P)` is a declared chromatic display gauge;
+height retains signed u. The triangles interpolate the existing samples, with unchanged D.
+No physical wavelength, independent curl, added native degrees of freedom or learned color organ
+is inferred. Fixed intensity calibration replaces the prior population-maximum display reference.
+
+[proved-derived; computational-witness] The prior mode assignment was not equivariant under input
+swap: it exchanged unequal decay factors `eta_11` and `eta_21`. Its apparent arithmetic-dependent
+fusion was therefore not a valid correspondence. Inputs now use `(2,1)` and `(1,2)`, while output
+and reference use `(1,1)` and `(2,2)`. Source permutation P, spatial transpose J, diffusion D and
+the transported camera/color receiver obey `EP=JE`, `DJ=JD`, `rho_B J=rho_A`.
+The exact witness checks every grid-row incidence under transpose, the mode permutation, primary
+sum/coverage laws, channel covariance and the exhibited `g`/`-g` color fibre.
+
+[counterexample; computational-witness] For positive leading coefficient, all three displayed
+output candidates 2, 3 and 4 approach the same normalized `(1,1)` mode; raw amplitude tends to zero.
+The law is not arithmetic-selective. The mesh is a graph over a fixed disk throughout, while
+its level sets may change. A scalar-gradient edge current has zero circulation by telescoping.
+These facts separate visible contour merging from actual gluing or vortical/phase dynamics.
+Plate 11 displays the controls, including the explicitly leading-mode-normalized comparison.
+
+[proved-derived] On the admitted four-mode field, finite sine orthogonality gives
+`E^+ = 4/(N+1)^2 E^T`, `E^+ E=I_4` and `DE=EH`, with H the displayed diagonal decay.
+This is a generator/decoder instance of exact future transport at its stated family, not a
+learned autoencoder or a quotient preserving arbitrary field/color receivers outside that family.
+
+[established-bounded; source-inspected] Plate 12 compares the actual roles in
+[DDPM](https://arxiv.org/abs/2006.11239),
+[score SDEs/probability flow](https://arxiv.org/abs/2011.13456),
+[Cold Diffusion](https://arxiv.org/abs/2208.09392), and
+[latent diffusion](https://arxiv.org/abs/2112.10752): declared corruption, learned conditional
+restoration, deterministic sampling options, and learned representation/decoder. The native HNN
+comparison remains observation-founded development of reusable conditional conduct. Neither
+source determinism nor visual smoothing alone establishes that learned return.
+
+[established-bounded; process-audit] The extended exact rational witness exits 0. The full twelve-page
+Typst build returns, and the changed image/comparison plates are visually inspected with PNG
+exports. Runtime source and the parallel session's active-position edits are preserved separately;
+this review changes only its own presentation and evidence.

@@ -103,21 +103,59 @@ l_difference = tuple(a-b for a, b in zip(l_naive, l_closed, strict=True))
 assert sum(abs(x) for x in l_difference) == Q(1, 42)
 assert tuple((m*a+mr*b)/(m+mr) for a,b in zip(l_source,l_reflected,strict=True)) == l_closed
 
+# The input-port swap is realized by coordinate transpose for this modal binding.
+new_modes = ((2,1),(1,2),(1,1),(2,2))
+port_swap = (1,0,2,3)
+assert tuple((n,m) for m,n in new_modes) == tuple(new_modes[k] for k in port_swap)
+N = 2**4
+neighbors = lambda i,j: {(x,y) for x,y in ((i-1,j),(i+1,j),(i,j-1),(i,j+1)) if 1<=x<=N and 1<=y<=N}
+for i in range(1,N+1):
+    for j in range(1,N+1):
+        assert {(y,x) for x,y in neighbors(i,j)} == neighbors(j,i)
+
+# The native primary doctrine's algebra, at an explicit exterior complex receiver.
+def primary(x,y):
+    p=(x*x,y*y,(x+y)*(x+y))
+    total=sum(p)
+    return tuple(z/(1+total) for z in p), total/(1+total), 1/(1+total)
+color_controls=[]
+for gx,gy in ((Q(1),Q(0)),(Q(0),Q(1)),(Q(1),Q(-1)),(Q(1),Q(1)),(Q(2,3),Q(-1,5))):
+    rgb,alpha,transmittance=primary(gx,gy)
+    assert sum(rgb)==alpha and alpha+transmittance==1
+    swapped=primary(gy,gx)[0]
+    assert swapped==(rgb[1],rgb[0],rgb[2])
+    assert primary(-gx,-gy)==primary(gx,gy)
+    color_controls.append({"gradient": vector_wire((gx,gy)), "primaries": vector_wire(rgb),
+                           "alpha": [alpha.numerator,alpha.denominator]})
+
+# Boundary of every oriented triangle cancels; a scalar gradient has zero circulation.
+for tri in (((0,0),(1,0),(1,1)),((0,0),(1,1),(0,1))):
+    f=lambda p: Q(p[0]*p[0]+2*p[1]+p[0]*p[1])
+    assert sum(f(tri[(k+1)%3])-f(tri[k]) for k in range(3))==0
+
 result = {
     "scope": "exact rational exterior arithmetic chart; no learned HNN arithmetic claim",
     "vertices": VERTICES,
     "field": {
         "lattice_bits": 4,
-        "basis_modes": [[1,1],[2,1],[1,2],[2,2]],
+        "basis_modes": [[2,1],[1,2],[1,1],[2,2]],
+        "historical_basis_modes": [[1,1],[2,1],[1,2],[2,2]],
         "reflection_cases": [vector_wire(w) for w in (l_source,l_reflected,l_closed,l_naive)],
         "difference_weights": vector_wire(l_difference),
         "current_difference_bound": [1,42],
         "intensity_difference_bound": [1,21],
         "current_difference_display_gain": 42,
-        "intensity_display": "I_N / the shared source-and-reflection family maximum",
+        "intensity_display": "I_N with fixed reference 1, independent of the source population",
         "intensity_difference_display": "difference / its infinity norm at N steps",
     },
     "rows": rows,
+    "receiver_controls": {
+        "port_swap": port_swap, "transpose_commutes_with_all_grid_rows": True,
+        "primary_response": color_controls,
+        "scalar_gradient_triangle_circulation": 0,
+        "opaque_display": "quadratic primaries divided by their largest channel; zero is neutral",
+        "surface": "piecewise affine graph z=u over two triangles per grid square",
+    },
     "reflection": {
         "source": list(map(int, x)), "reflected": list(map(int, reflected)),
         "closed": list(map(int, closed)), "mass_source": int(m), "mass_reflected": int(mr),
@@ -128,4 +166,4 @@ result = {
     },
 }
 Path(__file__).with_name("arithmetic-example.json").write_text(json.dumps(result, indent=2)+"\n")
-print("Returned: regular tetrahedron; three source round trips; exact face map; reflection closure; transported update commutes; naive midpoint defect = 1/7; field coefficient closure and difference bounds = 1/42, 1/21.")
+print("Returned: regular tetrahedron; three source round trips; exact face map; reflection closure; transported update commutes; naive midpoint defect = 1/7; field bounds = 1/42, 1/21; modal/transport transpose; primary-response covariance; scalar-gradient circulation = 0.")

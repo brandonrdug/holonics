@@ -1,11 +1,11 @@
 #import "@preview/fletcher:0.5.8": diagram, node, edge
 #import "../../lib/elements.typ": by-blue, by-red, by-yellow, by-black, by-rule, by-muted
-#import "geometry.typ": solid, simplex, chambers, relu-fold, wave-tile, tetrahedron-example, arithmetic-data, string-field, lattice-count, intensity-reference, intensity-difference-reference
+#import "geometry.typ": solid, simplex, chambers, relu-fold, wave-tile, tetrahedron-example, arithmetic-data, string-field, lattice-count, intensity-reference, intensity-difference-reference, surface-tile, primary-color
 
-#set document(title: "HNN - Information Chemistry", author: "Brandon Duggan / Holonics", description: "Nine diagram plates: HNN, Information Chemistry, real-string diffusion images, exact geometry, and reflection.")
+#set document(title: "HNN - Information Chemistry", author: "Brandon Duggan / Holonics", description: "Twelve diagram plates: HNN, relational color, simplicial surfaces, covariant diffusion, reflection, and learned diffusion models.")
 #set page(width: 320mm, height: 210mm, margin: (x:16mm,y:13mm), footer: context {
   set text(size:8pt,fill:by-muted)
-  [HOLONICS #h(1fr) HNN / INFORMATION CHEMISTRY #h(1fr) #counter(page).display("1") / 9]
+  [HOLONICS #h(1fr) HNN / INFORMATION CHEMISTRY #h(1fr) #counter(page).display("1") / 12]
 })
 #set text(font: "Libertinus Serif", size:11pt, fill:by-black)
 #set math.equation(numbering:none)
@@ -193,21 +193,21 @@
 ]
 
 #pagebreak()
-#title("06","Real strings diffuse into different images","The tetrahedral port weights drive actual fields; each row follows the same diffusion law.")
+#title("06","Real strings diffuse into different images","A covariant port-to-mode binding, opaque relational color, and the signed current as height.")
 #grid(columns:(34mm,1fr,1fr,1fr,1fr),gutter:(6mm,4mm),align:center,
  [Source inscription],[$u_0$],[$u_(N/4)$],[$u_N$],[$I_N/I_star$],
  ..arithmetic-data.rows.map(row=>(
    [#text(size:12pt,weight:"semibold")[#raw(row.source)]#v(2mm)#caption([chart weight $m=$#row.mass])],
-   string-field(row.barycentric,0),
-   string-field(row.barycentric,lattice-count/4),
-   string-field(row.barycentric,lattice-count),
+   surface-tile(row.barycentric,0,side:37mm),
+   surface-tile(row.barycentric,lattice-count/4,side:37mm),
+   surface-tile(row.barycentric,lattice-count,side:37mm),
    string-field(row.barycentric,lattice-count,intensity:true,display-reference:intensity-reference),
  )).flatten(),
 )
 #v(4mm)
-#eq[$lambda=frac((a,b,c,1),a+b+c+1), quad u_0=lambda_a psi_(1,1)+lambda_b psi_(2,1)+lambda_c psi_(1,2)+lambda_r psi_(2,2)$]
+#eq[$lambda=frac((a,b,c,1),a+b+c+1), quad u_0=lambda_a psi_(2,1)+lambda_b psi_(1,2)+lambda_c psi_(1,1)+lambda_r psi_(2,2)$]
 #eq[$(D u)_(i,j)=frac(u_(i-1,j)+u_(i+1,j)+u_(i,j-1)+u_(i,j+1),4), quad u_k=D^k u_0$]
-#caption([*Definition / explicit lattice realization.* $N=2^4$; exterior samples vanish at the Dirichlet boundary. The factor $1/4$ comes from four neighboring ports. Columns show $0$, $N/4=4$, and $N=16$ steps. Blue/red: signed current on $[-1,1]$. Gray: $I_N/I_star$, where $I_star$ is the maximum over the displayed source/reflection family and all lattice sites; one reference is shared by every intensity tile.])
+#caption([*Definition / explicit lattice realization.* $N=2^4$; exterior samples vanish at the Dirichlet boundary. The factor $1/4$ comes from four neighboring ports. Columns show $0$, $N/4=4$, and $N=16$ steps. Height: signed current. Opaque color: the quadratic local-gradient receiver on plate 10. Gray: $I_N/I_star$, with fixed $I_star=1$ for every source and time. This calibration is independent of the plotted population.])
 
 #pagebreak()
 #title("07","Reflection and union are visible in the images","Same four modes, same diffusion, different source combinations. The difference is retained as a field.")
@@ -220,11 +220,11 @@
  [*Difference field*\ $"ordinary" - "transported"$],
 )
 #v(4mm)
-#text(size:10pt,fill:by-muted)[Current at the initial cut]
+#text(size:10pt,fill:by-muted)[Current as a triangulated surface at the initial cut]
 #v(2mm)
 #grid(columns:(1fr,1fr,1fr,1fr,1fr),gutter:5mm,align:center,
- string-field(rc.at(0),0,side:38mm),string-field(rc.at(1),0,side:38mm),
- string-field(rc.at(2),0,side:38mm),string-field(rc.at(3),0,side:38mm),
+ surface-tile(rc.at(0),0,side:42mm),surface-tile(rc.at(1),0,side:42mm),
+ surface-tile(rc.at(2),0,side:42mm),surface-tile(rc.at(3),0,side:42mm),
  [#string-field(rc.at(3),0,side:38mm,comparison:rc.at(2),gain:arithmetic-data.field.current_difference_display_gain)\ $42 Delta u_0$],
 )
 #v(3mm)
@@ -237,7 +237,7 @@
 )
 #v(3mm)
 #eq[$u_(3,k)=frac(8u_(4,k)+6u_(2,k),14), quad Delta u_k=frac(u_(4,k)+u_(2,k),2)-u_(3,k)$]
-#caption([*Proved-derived / exact coefficient witness.* Here $c=2,3,4$ selects the displayed output port and $k$ counts diffusion steps. Linear diffusion preserves the weighted union at every step. Intensity is read after currents combine. The last column shows $42 Delta u_0$ and $frac(Delta I_N,norm(Delta I_N)_infinity)$; gray uses the same $I_star$ as plate 6. The exact bound $norm(Delta lambda)_1=1/42$ gives $abs(Delta u_k)<=1/42$ and $abs(Delta I_k)<=1/21$.])
+#caption([*Proved-derived / exact coefficient witness.* Here $c=2,3,4$ selects the displayed output port and $k$ counts diffusion steps. Linear diffusion preserves the weighted union at every step. Intensity is read after currents combine. The signed difference retains the blue/red comparison gauge. The last column shows $42 Delta u_0$ and $frac(Delta I_N,norm(Delta I_N)_infinity)$; gray uses the same $I_star$ as plate 6. The exact bound $norm(Delta lambda)_1=1/42$ gives $abs(Delta u_k)<=1/42$ and $abs(Delta I_k)<=1/21$.])
 
 #let qpoint(w)=math.frac(math.vec(..w.num.map(k=>[#k])),[#w.den])
 #pagebreak()
@@ -321,3 +321,101 @@
 )
 #v(4mm)
 #caption([*Exact rational witness.* #raw("arithmetic-example.py") generates the source receipt used by the figure and verifies reconstruction, reflection, closure, and the $1/7$ control. This is an exterior arithmetic construction, not a claim of learned HNN parsing or a general native training algorithm.])
+
+#pagebreak()
+#title("10","Color from relations; depth from the current","An opaque realization of the existing quadratic color receiver, over oriented triangular faces.")
+#grid(columns:(1fr,1.2fr,1fr),gutter:10mm,
+ [#text(size:13pt,weight:"semibold")[Same field, top view]
+  #v(4mm)#align(center,surface-tile(arithmetic-data.rows.at(0).barycentric,0,side:150mm,flat:true))
+ ],
+ [#text(size:13pt,weight:"semibold")[Signed height $z=u$]
+  #v(7mm)#align(center,surface-tile(arithmetic-data.rows.at(0).barycentric,0,side:95mm))
+ ],
+ [#text(size:13pt,weight:"semibold")[One declared receiver]
+  #eq[$g=(partial_x u,partial_y u), quad A=g_x+upright(i)g_y$]
+  #eq[$P=(g_x^2,g_y^2,(g_x+g_y)^2)$]
+  #eq[$C=frac(P,max_j P_j)$]
+  #grid(columns:(1fr,1fr),gutter:4mm,
+    [#rect(width:13mm,height:6mm,fill:primary-color(1,0),stroke:none)\ $(g_x,g_y)=(1,0)$],
+    [#rect(width:13mm,height:6mm,fill:primary-color(0,1),stroke:none)\ $(0,1)$],
+    [#rect(width:13mm,height:6mm,fill:primary-color(1,-1),stroke:none)\ $(1,-1)$],
+    [#rect(width:13mm,height:6mm,fill:primary-color(1,1),stroke:none)\ $(1,1)$],
+  )
+  #v(4mm)#caption([Base-chart slopes on each affine triangle combine before the quadratic response. No hue is assigned by string or correctness. Zero slope is neutral; opacity is fixed.])
+ ],
+)
+#v(5mm)
+#grid(columns:(1fr,1fr),gutter:12mm,
+ [#eq[$partial [a,b,c]=[b,c]-[a,c]+[a,b], quad partial^2=0$]
+  #caption([*Source-inspected construction.* Two oriented triangles per grid square, sharing the original samples. The graph has height $u$; its diagonal seams are presentation edges, not added diffusion contacts. An intrinsic simplicial solver would also need its incidence, metric and Hodge weights.])],
+ [#eq[$r_j=frac(P_j,kappa+sum P), quad sum r_j=alpha, quad alpha+tau=1$]
+  #caption([*Existing receiver law.* This is the one-current specialization of #raw("ExactReceiverPrimaryDoctrine"). The opaque display removes coverage and calibrates chromatic ratios. $C(g)=C(-g)$ remains an exhibited color fibre; height and the retained current carry the missing distinction.])],
+)
+#v(5mm)
+#caption([*Interpretation / exterior realization.* Color shows a receiver-relative relation between face slopes, not physical wavelengths. The camera is $(x,y,z) mapsto (x-y,z-(x+y)/2)$. Source owners: #raw("dimensional_wave.rs"), #raw("presentation_gauge.rs"), and #raw("simplicial.rs"). Changing this color gauge changes no source coefficient or transition.])
+
+#pagebreak()
+#title("11","Transport the camera and the dynamics together","The repaired input binding makes addition's input swap an actual geometric symmetry.")
+#grid(columns:(1fr,1fr,1fr),gutter:10mm,align:center,
+ [*1+2=3: reference view*\ #surface-tile(arithmetic-data.rows.at(0).barycentric,lattice-count,side:80mm)],
+ [*2+1=3: same fixed camera*\ #surface-tile(arithmetic-data.rows.at(1).barycentric,lattice-count,side:80mm)],
+ [*2+1=3: transported view and receiver*\ #surface-tile(arithmetic-data.rows.at(1).barycentric,lattice-count,side:80mm,rechart:true)],
+)
+#eq[$u_(a,b,c)=frac(a psi_(2,1)+b psi_(1,2)+c psi_(1,1)+psi_(2,2),a+b+c+1)$]
+#eq[$E P=J E, quad (J u)(i,j)=u(j,i), quad D J=J D, quad rho_B J=rho_A$]
+#caption([*Proved-derived / exact incidence witness.* Here $E$ maps port weights to fields and $P$ swaps the inputs. Their modes have equal decay, $eta_(2,1)=eta_(1,2)$. The earlier binding exchanged $psi_(1,1)$ and $psi_(2,1)$, whose decay differs; camera motion alone could not repair that. Reindexing the face chart also transports the two color channels.])
+#v(3mm)
+#grid(columns:(1fr,1fr,1fr),gutter:10mm,align:center,
+ [*1+2=2*\ #surface-tile(arithmetic-data.field.reflection_cases.at(1),8*lattice-count,side:50mm,leading-normalized:true)],
+ [*1+2=3*\ #surface-tile(arithmetic-data.field.reflection_cases.at(2),8*lattice-count,side:50mm,leading-normalized:true)],
+ [*1+2=4*\ #surface-tile(arithmetic-data.field.reflection_cases.at(0),8*lattice-count,side:50mm,leading-normalized:true)],
+)
+#eq[$frac(u_k,lambda_c eta_(1,1)^k) arrow.r psi_(1,1), quad eta_(m,n)=frac(cos(m pi/(N+1))+cos(n pi/(N+1)),2)$]
+#caption([*Counterexample to fusion as an arithmetic test.* For $lambda_c>0$, this lower diagnostic divides by the stated leading mode. All three cases approach the same normalized shape; raw amplitude decays to zero. The mesh remains one disk throughout. Visible level sets are not its outer boundary, and scalar-gradient circulation is $d(d u)=0$: curved contours alone do not establish vortical current.])
+
+#pagebreak()
+#title("12","Diffusion, stimulus, and learned reconstruction","The informative comparison is what changes a conditional continuation, and what the retained state preserves.")
+#grid(columns:(1fr,1fr),gutter:16mm,
+ [#text(size:14pt,weight:"semibold")[The present exact field family]
+  #align(center,diagram(spacing:(16mm,12mm),label-size:10pt,
+    node((0,0),[$lambda$\ four port weights]),node((1,0),[$u=E lambda$\ current field]),
+    node((0,1),[$H lambda$\ retained modes]),node((1,1),[$D u$\ diffused field]),
+    arr((0,0),(1,0),label:[$E$]),arr((0,0),(0,1),label:[$H$]),
+    arr((1,0),(1,1),label:[$D$]),arr((0,1),(1,1),label:[$E$]),
+  ))
+  #eq[$D E=E H, quad H=op("diag")(eta_(2,1),eta_(1,2),eta_(1,1),eta_(2,2))$]
+  #eq[$E^+=frac(4,(N+1)^2)E^top, quad E^+ E=I_4$]
+  #caption([*Proved-derived.* Four coefficients retain this complete admitted field family and its future diffusion. Finite sine orthogonality gives the displayed decoder, exact on $op("im")E$. Other modes are outside this family. The RGB image is a further quotient.])
+  #v(5mm)
+  #text(size:12pt,weight:"semibold")[What “noise” means here]
+  #v(2mm)
+  #text(size:10pt)[The inscription is actual stimulus. Its unseparated distinctions are relative to the receiver. This example supplies an arithmetic chart and a diffusion law; it does not learn the chart or a denoising law from exposure.]
+ ],
+ [#text(size:14pt,weight:"semibold")[Classical learned diffusion]
+  #align(center,diagram(spacing:(18mm,10mm),label-size:10pt,
+    node((0,0),[$x_0$\ observed data]),node((1,0),[$x_t$\ corrupted state]),
+    node((1,1),[$epsilon_(theta)(x_t,t,c)$\ learned conditional response]),
+    node((0,1),[$x_(t-1)$\ next generated state]),
+    arr((0,0),(1,0),label:[declared corruption]),arr((1,0),(1,1)),arr((1,1),(0,1),label:[reverse step]),
+  ))
+  #eq[$x_t=sqrt(overline(alpha)_t)x_0+sqrt(1-overline(alpha)_t)epsilon, quad epsilon tilde cal(N)(0,I)$]
+  #eq[$overline(alpha)_t=product_(s=1)^t (1-beta_s)$]
+  #text(size:10pt)[DDPM trains the reverse response across noise levels. Its success comes from the learned data-dependent return, not the forward smoothing alone. Probability-flow ODEs also admit deterministic generation once the initial state is fixed.]
+  #v(3mm)
+  #text(size:10pt)[Cold Diffusion studies learned reversal of deterministic corruptions, including blur. Latent diffusion learns an autoencoder, then models the latent distribution; reconstruction quality alone does not certify topology or future-state equivalence.]
+ ],
+)
+#v(7mm)
+#align(center,diagram(spacing:(14mm,7mm),node-inset:2mm,
+ node((0,0),[Actual stimulus]),node((1,0),[Conditioned local relation]),node((2,0),[Returned difference]),node((3,0),[Eros: changed reusable conduct]),
+ arr((0,0),(1,0)),arr((1,0),(2,0)),arr((2,0),(3,0)),
+))
+#v(5mm)
+#caption([*Interpretation to develop.* A meaningful “fusion” must be founded by the admitted interaction, changing incidence or compatible continuation. It can guide generator recovery and Holonic Compression when the relevant future faces survive. Generic blur, visual roundness and byte reconstruction do not supply that law.])
+#v(5mm)
+#text(size:8.5pt,fill:by-muted)[Primary comparisons:
+ #link("https://arxiv.org/abs/2006.11239")[Ho et al., DDPM] /
+ #link("https://arxiv.org/abs/2011.13456")[Song et al., score SDEs / probability flow] /
+ #link("https://arxiv.org/abs/2208.09392")[Bansal et al., Cold Diffusion] /
+ #link("https://arxiv.org/abs/2112.10752")[Rombach et al., latent diffusion].
+ Local recovery: July 13 color law; August 9 spectral-receiver synthesis; August 18 geometric-autoencoder review; #raw("HolonicDiffusionCharts.lean").]
