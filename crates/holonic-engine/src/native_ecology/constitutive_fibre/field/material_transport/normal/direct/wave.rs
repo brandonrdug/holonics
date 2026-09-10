@@ -2,8 +2,16 @@
 //! The continuing state is a generator word with its original seed, resident power cache and
 //! certified remainder. Current faces are observations of that state, not its history archive.
 use super::*;
+mod receive;
+pub use receive::{NormalWaveReception, NormalWaveReceptionReading};
 mod rest;
 pub use rest::NormalWaveRest;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum NormalWaveSeedKind {
+    ExactPair,
+    ReceivedCurrent,
+}
 
 struct WaveCurrent<'c> {
     section: ResidentSection<'c>,
@@ -28,7 +36,7 @@ impl<'c> NormalWaveCurrent<'c> {
     pub fn same_occurrence(&self, other: &Self) -> bool {
         Rc::ptr_eq(&self.inner, &other.inner)
     }
-    /// None is the initial previous current; Some(k) is this generator's current at k.
+    /// None is the initial previous current; Some(k) is the continuing occurrence epoch.
     pub fn at(&self) -> Option<u64> {
         self.inner.at
     }
@@ -52,11 +60,38 @@ pub struct NormalWaveFibre<'c> {
     roots: usize,
     grain: ResidentGrain,
     pub material_observations: u64,
+    pub epoch: u64,
+    pub seed_kind: NormalWaveSeedKind,
     pub steps: u64,
 }
 impl<'c> NormalWaveFibre<'c> {
-    pub fn initial(&self) -> ResidentConstitutiveSection<'_, 'c> {
-        ResidentConstitutiveSection::rationals(&self.seed).expect("completed wave seed")
+    /// Exact point initials are available only before a bounded received-state rebase.
+    pub fn initial(&self) -> Option<ResidentConstitutiveSection<'_, 'c>> {
+        (self.seed_kind == NormalWaveSeedKind::ExactPair).then(|| {
+            ResidentConstitutiveSection::rationals(&self.seed).expect("completed wave seed")
+        })
+    }
+    pub fn initial_received(
+        &self,
+    ) -> Option<(
+        ResidentNormalEnclosureView<'_, 'c>,
+        ResidentConstitutiveCurrent<'_, 'c>,
+    )> {
+        (self.seed_kind == NormalWaveSeedKind::ReceivedCurrent).then(|| {
+            (
+                ResidentNormalEnclosureView {
+                    surface: self.surface,
+                    section: &self.seed,
+                    offset: 0,
+                    width: 2 * self.roots,
+                    grain: self.grain,
+                },
+                ResidentConstitutiveSection::rationals(&self.seed)
+                    .expect("completed received seed")
+                    .row(2)
+                    .expect("received current"),
+            )
+        })
     }
     pub fn inspect_material(&self) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
         decode_state(
@@ -80,7 +115,7 @@ pub struct NormalWaveStep<'c> {
     pub previous: NormalWaveCurrent<'c>,
     pub current: NormalWaveCurrent<'c>,
     pub fibre: NormalWaveFibre<'c>,
-    joint: ResidentSection<'c>,
+    joint: Rc<ResidentSection<'c>>,
     metadata: Rc<ResidentSection<'c>>,
 }
 impl NormalWaveStep<'_> {
@@ -119,7 +154,10 @@ impl std::fmt::Debug for NormalWaveSeedRefusal<'_> {
 pub struct ResidentNormalWave<'c> {
     material: ResidentNormalMaterial<'c>,
     seed: Rc<ResidentSection<'c>>,
-    seed_bound: ResidentSection<'c>,
+    seed_bound: Rc<ResidentSection<'c>>,
+    joint: Rc<ResidentSection<'c>>,
+    seed_kind: NormalWaveSeedKind,
+    epoch: u64,
     power: ResidentSection<'c>,
     metadata: Rc<ResidentSection<'c>>,
     previous: NormalWaveCurrent<'c>,
@@ -135,69 +173,42 @@ impl<'c> ResidentNormalMaterial<'c> {
         previous: ResidentConstitutiveCurrent<'_, 'c>,
         current: ResidentConstitutiveCurrent<'_, 'c>,
     ) -> Result<ResidentNormalWave<'c>, NormalWaveSeedRefusal<'c>> {
-        let staged = (|| -> Result<_, ConstitutiveFibreError> {
-            if self.roots != self.targets
-                || previous.width != 2 * self.roots
-                || current.width != previous.width
-            {
-                return Err(ConstitutiveFibreError::Shape);
-            }
-            let s = self.surface;
-            let r = previous.width;
-            let d = 2 * self.roots;
-            let fresh = |width| s.fresh_section(1, width, ResidentGrain(0));
-            let seed = s.fresh_section(2, r + 1, ResidentGrain(0))?;
-            let seed_bound = fresh(2 * (2 * r + 1))?;
-            let p = fresh(2 * (r + 1))?;
-            let c = fresh(2 * (r + 1))?;
-            let power = fresh(4 * d * d)?;
-            let metadata = fresh(8)?;
-            let mut passage = s.begin_passage(&[vec![]])?;
-            {
-                let lane = passage.open(0, &[])?;
-                s.record_normal_wave_seed(
-                    &lane,
-                    previous,
-                    current,
-                    self.roots,
-                    self.grain.0,
-                    &seed,
-                    &seed_bound,
-                    &p,
-                    &c,
-                    &power,
-                    &metadata,
-                )?;
-            }
-            passage.close(0, &seed_bound, i64::BITS)?;
-            let returned = passage.finish()?.launch()?;
-            if !returned.obstruction.is_empty() {
-                return Err(ConstitutiveFibreError::Arithmetic(format!(
-                    "wave seed: {:?}",
-                    returned.obstruction
-                )));
-            }
-            let wrap = |section, at| NormalWaveCurrent {
-                inner: Rc::new(WaveCurrent { section, at }),
-                surface: s,
-                width: r,
-                grain: self.grain,
-            };
-            let previous = wrap(p, None);
-            let current = wrap(c, Some(0));
-            Ok((seed, seed_bound, power, metadata, previous, current))
-        })();
+        self.into_difference_wave_source(previous.into(), current)
+    }
+    fn into_difference_wave_source(
+        self,
+        previous: ResidentNormalInput<'_, 'c>,
+        current: ResidentConstitutiveCurrent<'_, 'c>,
+    ) -> Result<ResidentNormalWave<'c>, NormalWaveSeedRefusal<'c>> {
+        let seed_kind = match previous {
+            ResidentNormalInput::Point(_) => NormalWaveSeedKind::ExactPair,
+            ResidentNormalInput::Enclosed(_) => NormalWaveSeedKind::ReceivedCurrent,
+        };
+        let staged = self.prepare_wave_seed(previous, current);
         match staged {
-            Ok((seed, seed_bound, power, metadata, previous, current)) => Ok(ResidentNormalWave {
-                material: self,
-                seed: Rc::new(seed),
+            Ok(StagedWaveSeed {
+                seed,
                 seed_bound,
                 power,
-                metadata: Rc::new(metadata),
+                metadata,
                 previous,
                 current,
-                steps: 0,
-            }),
+            }) => {
+                let seed_bound = Rc::new(seed_bound);
+                Ok(ResidentNormalWave {
+                    material: self,
+                    seed: Rc::new(seed),
+                    joint: Rc::clone(&seed_bound),
+                    seed_bound,
+                    power,
+                    metadata: Rc::new(metadata),
+                    previous,
+                    current,
+                    steps: 0,
+                    epoch: 0,
+                    seed_kind,
+                })
+            }
             Err(reason) => Err(NormalWaveSeedRefusal {
                 material: self,
                 reason,
@@ -205,7 +216,92 @@ impl<'c> ResidentNormalMaterial<'c> {
         }
     }
 }
+struct StagedWaveSeed<'c> {
+    seed: ResidentSection<'c>,
+    seed_bound: ResidentSection<'c>,
+    power: ResidentSection<'c>,
+    metadata: ResidentSection<'c>,
+    previous: NormalWaveCurrent<'c>,
+    current: NormalWaveCurrent<'c>,
+}
+impl<'c> ResidentNormalMaterial<'c> {
+    fn prepare_wave_seed(
+        &self,
+        previous: ResidentNormalInput<'_, 'c>,
+        current: ResidentConstitutiveCurrent<'_, 'c>,
+    ) -> Result<StagedWaveSeed<'c>, ConstitutiveFibreError> {
+        let seed_kind = match previous {
+            ResidentNormalInput::Point(_) => NormalWaveSeedKind::ExactPair,
+            ResidentNormalInput::Enclosed(_) => NormalWaveSeedKind::ReceivedCurrent,
+        };
+        if self.roots != self.targets
+            || previous.width() != 2 * self.roots
+            || current.width != previous.width()
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let s = self.surface;
+        let r = previous.width();
+        let d = 2 * self.roots;
+        let fresh = |width| s.fresh_section(1, width, ResidentGrain(0));
+        let rows = if seed_kind == NormalWaveSeedKind::ExactPair {
+            2
+        } else {
+            3
+        };
+        let seed = s.fresh_section(rows, r + 1, ResidentGrain(0))?;
+        let seed_bound = fresh(2 * (2 * r + 1))?;
+        let p = fresh(2 * (r + 1))?;
+        let c = fresh(2 * (r + 1))?;
+        let power = fresh(4 * d * d)?;
+        let metadata = fresh(8)?;
+        let mut passage = s.begin_passage(&[vec![]])?;
+        {
+            let lane = passage.open(0, &[])?;
+            s.record_normal_wave_seed(
+                &lane,
+                previous,
+                current,
+                self.roots,
+                self.grain.0,
+                &seed,
+                &seed_bound,
+                &p,
+                &c,
+                &power,
+                &metadata,
+            )?;
+        }
+        passage.close(0, &seed_bound, i64::BITS)?;
+        let returned = passage.finish()?.launch()?;
+        if !returned.obstruction.is_empty() {
+            return Err(ConstitutiveFibreError::Arithmetic(format!(
+                "wave seed: {:?}",
+                returned.obstruction
+            )));
+        }
+        let wrap = |section, at| NormalWaveCurrent {
+            inner: Rc::new(WaveCurrent { section, at }),
+            surface: s,
+            width: r,
+            grain: self.grain,
+        };
+        let previous = wrap(p, None);
+        let current = wrap(c, Some(0));
+        Ok(StagedWaveSeed {
+            seed,
+            seed_bound,
+            power,
+            metadata,
+            previous,
+            current,
+        })
+    }
+}
 impl<'c> ResidentNormalWave<'c> {
+    pub fn epoch(&self) -> u64 {
+        self.epoch
+    }
     pub fn steps(&self) -> u64 {
         self.steps
     }
@@ -223,12 +319,18 @@ impl<'c> ResidentNormalWave<'c> {
             roots: self.material.roots,
             grain: self.material.grain,
             material_observations: self.material.observations,
+            epoch: self.epoch,
+            seed_kind: self.seed_kind,
             steps: self.steps,
         }
     }
     pub fn advance(&mut self) -> Result<NormalWaveStep<'c>, ConstitutiveFibreError> {
         let steps = self
             .steps
+            .checked_add(1)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let epoch = self
+            .epoch
             .checked_add(1)
             .ok_or(ConstitutiveFibreError::Shape)?;
         let s = self.material.surface;
@@ -282,7 +384,7 @@ impl<'c> ResidentNormalWave<'c> {
         let current = NormalWaveCurrent {
             inner: Rc::new(WaveCurrent {
                 section: current,
-                at: Some(steps),
+                at: Some(epoch),
             }),
             surface: s,
             width: r,
@@ -293,11 +395,13 @@ impl<'c> ResidentNormalWave<'c> {
         self.power = power;
         self.metadata = Rc::new(metadata);
         self.steps = steps;
+        self.epoch = epoch;
+        self.joint = Rc::new(joint);
         Ok(NormalWaveStep {
             previous: self.previous.snapshot(),
             current: self.current.snapshot(),
             fibre: self.fibre(),
-            joint,
+            joint: Rc::clone(&self.joint),
             metadata: Rc::clone(&self.metadata),
         })
     }

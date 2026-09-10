@@ -53,6 +53,7 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/normal_material_section.cuh");
     println!("cargo:rerun-if-changed=kernels/current_difference_section.cuh");
     println!("cargo:rerun-if-changed=kernels/normal_wave.cuh");
+    println!("cargo:rerun-if-changed=kernels/normal_wave_receive.cuh");
     println!("cargo:rerun-if-changed=kernels/field_normal_material.cuh");
     println!("cargo:rerun-if-changed=kernels/exact_resident_adjoint.cuh");
     println!("cargo:rerun-if-changed=kernels/exact_resident_intervention.cuh");

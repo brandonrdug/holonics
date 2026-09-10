@@ -200,6 +200,22 @@ pub(in super::super) fn validate_state<'a>(
             ));
         }
     }
+    validate_numerical_witness(s, n, t, grain, error, &expected)
+}
+
+// Shared exact wire-scale comparison. This avoids reducing millions of intermediate
+// rational products when a cold material already supplies one common dyadic chart.
+fn validate_numerical_witness(
+    s: &ResidentSectionRest, n: usize, t: usize, grain: u32,
+    error: i128, expected: &[BigInt],
+) -> Result<(), ConstitutiveFibreError> {
+    let layout=NormalLayout::new(n,t).ok_or(ConstitutiveFibreError::Shape)?;
+    let m=layout.sources;
+    let h=layout.matrix_words;
+    let hh=layout.gram_values;
+    let bb=layout.cross_values;
+    let scale=BigInt::one()<<grain;
+    let square=&scale*&scale;
     let matrix = wides(&s.intervals[..h])?;
     if matrix[bb] != error || matrix[bb..].iter().any(|v| *v < 0) {
         return Err(invalid("coefficient/error standing"));
@@ -606,4 +622,4 @@ fn decode_state(
 }
 
 mod direct;
-pub use direct::{ResidentNormalMaterial, NormalMaterialRest, NormalRealizationRefinement, ResidentNormalReturn, ResidentNormalWave, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, ResidentNormalSectionReturn, ResidentNormalInput, ResidentNormalEnclosure, ResidentNormalEnclosureView};
+pub use direct::{ResidentNormalMaterial, NormalMaterialRest, NormalRealizationRefinement, ResidentNormalReturn, ResidentNormalWave, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, NormalWaveSeedKind, NormalWaveReception, NormalWaveReceptionReading, ResidentNormalSectionReturn, ResidentNormalInput, ResidentNormalEnclosure, ResidentNormalEnclosureView};

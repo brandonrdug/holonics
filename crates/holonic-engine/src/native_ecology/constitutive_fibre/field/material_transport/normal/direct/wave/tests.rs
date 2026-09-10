@@ -21,6 +21,7 @@ fn wave(r: i64, i: i64, d: i64) -> ExactComplexWaveCurrent {
     ExactComplexWaveCurrent::new(Rat::new(r.into(), d.into()), Rat::new(i.into(), d.into()))
 }
 fn contains(ball: &NativeFieldCurrentBall, expected: &[ExactComplexWaveCurrent]) {
+    assert_eq!(ball.center.len(), expected.len());
     let square: Rat = ball
         .center
         .iter()
@@ -63,7 +64,7 @@ fn learned_decay_keeps_the_join_and_complete_joint_current() {
     drop(p);
     drop(c);
     let reads = s.census().section_read_outs;
-    let residency = s.census().resident_octets_now;
+    let mut residency = s.census().resident_octets_now;
     let mut denominator = 5;
     for at in 1..=32 {
         let joining = generator.current().snapshot();
@@ -83,10 +84,15 @@ fn learned_decay_keeps_the_join_and_complete_joint_current() {
         assert!(reading.maximum_computed_power_norm >= Rat::one());
         drop(returned);
         drop(joining);
+        // The initial word aliases its seed bound. Its first generated joint is one
+        // additional fixed-size cache; subsequent steps must not accumulate more.
+        if at == 1 {
+            residency = s.census().resident_octets_now;
+        }
         assert_eq!(s.census().resident_octets_now, residency);
     }
     assert_eq!(generator.fibre().material_observations, 3);
-    assert_eq!(generator.fibre().initial().rows(), 2);
+    assert_eq!(generator.fibre().initial().unwrap().rows(), 2);
 }
 
 #[test]
@@ -186,4 +192,135 @@ fn generator_rest_decodes_the_word_and_rejoins_the_next_return() {
         expected
     );
     assert!(!returned.current.same_occurrence(&old_current));
+}
+
+#[test]
+#[ignore = "requires CUDA; actual reception changes reusable material, preserves the join and retains the shared source/target family"]
+fn reception_changes_the_next_generator_without_archiving_its_past() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let p = point(&s, &[0, 0]);
+    let c = point(&s, &[1, 0]);
+    let v = point(&s, &[2, 0]);
+    let mut body = material(&s, 0)
+        .into_difference_wave(current(&p), current(&c))
+        .unwrap();
+    body.advance().unwrap();
+    let joining = body.current().snapshot();
+    let before = s.census();
+    let received = body.receive(current(&v)).unwrap();
+    assert_eq!(s.census().section_read_outs, before.section_read_outs);
+    assert_eq!(s.census().ingress_octets, before.ingress_octets);
+    assert!(body.previous().same_occurrence(&joining));
+    assert!(received.previous.same_occurrence(&joining));
+    assert_eq!(body.steps(), 0);
+    assert_eq!(body.epoch(), 2);
+    assert_eq!(received.current.at(), Some(2));
+    assert_eq!(received.predecessor_fibre.material_observations, 3);
+    assert_eq!(received.successor_fibre.material_observations, 4);
+    assert!(received.successor_fibre.initial().is_none());
+    let reading = received.inspect().unwrap();
+    contains(&reading.source_joint, &[wave(1, 0, 1), wave(1, 0, 2)]);
+    contains(
+        reading.comparison.source_current.as_ref().unwrap(),
+        &[wave(-1, 0, 2), wave(1, 0, 2), wave(1, 0, 1)],
+    );
+    contains(&reading.comparison.observed, &[wave(3, 0, 2)]);
+    assert!(reading.comparison.observed.radius > Rat::zero());
+    let old = received.predecessor_fibre.inspect_material().unwrap();
+    let new = received.successor_fibre.inspect_material().unwrap();
+    assert_ne!(old.cross_source, new.cross_source);
+    // H=2I+xx*, B=(0,-1,0)+(3/2)x*: its exact response has coefficients
+    // (-1/4,-1/4,1/2), so the next current is 2-5/8=11/8.
+    let next = body.advance().unwrap();
+    assert!(next.previous.same_occurrence(&received.current));
+    contains(&next.current.view().inspect().unwrap(), &[wave(11, 0, 8)]);
+    assert_eq!(next.current.at(), Some(3));
+    // Saved evidence refers to immutable producing material, even after further development.
+    let evidence = serde_json::to_value(received.inspect().unwrap()).unwrap();
+    body.receive(current(&c)).unwrap();
+    assert_eq!(
+        serde_json::to_value(received.inspect().unwrap()).unwrap(),
+        evidence
+    );
+    drop(received);
+    drop(next);
+    drop(joining);
+    let residency = s.census().resident_octets_now;
+    for _ in 0..4 {
+        body.advance().unwrap();
+        body.receive(current(&v)).unwrap();
+        assert_eq!(s.census().resident_octets_now, residency);
+    }
+}
+
+#[test]
+#[ignore = "requires CUDA; bounded reception rest restores the next generated and received operations; refusal changes no live state"]
+fn received_seed_rest_and_atomic_refusal_preserve_the_whole_successor() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let p = point(&s, &[0, 0]);
+    let c = point(&s, &[3, 4, 5]);
+    let v = point(&s, &[-1, 1]);
+    let mut body = material(&s, 1)
+        .into_difference_wave(
+            current(&p),
+            ResidentConstitutiveCurrent::rational(&c).unwrap(),
+        )
+        .unwrap();
+    for _ in 0..3 {
+        body.advance().unwrap();
+    }
+    body.receive(current(&v)).unwrap();
+    for _ in 0..2 {
+        body.advance().unwrap();
+    }
+    let saved = body.rest().unwrap();
+    let joining = body.current().snapshot();
+    let bad = s
+        .mount_section_rest(
+            &ResidentSectionRest::found(1, 2, ResidentGrain(0), 64, vec![(0, 1), (0, 0)]).unwrap(),
+        )
+        .unwrap();
+    assert!(body.receive(current(&bad)).is_err());
+    assert_eq!(body.rest().unwrap(), saved);
+    assert!(body.current().same_occurrence(&joining));
+    // Enlarge only the private numerical joint cache to a valid but unrepresentably broad
+    // source image. Seed preparation succeeds; the later 2*radius calculation must refuse.
+    let fine_joint = Rc::clone(&body.joint);
+    let mut broad = s.detach_section(&body.joint, i64::BITS).unwrap();
+    let radius = 2 * (2 * body.current.width);
+    broad.intervals[radius] = (-1, -1);
+    broad.intervals[radius + 1] = (i64::MAX, i64::MAX);
+    body.joint = Rc::new(s.mount_section_rest(&broad).unwrap());
+    assert!(body.receive(current(&v)).is_err());
+    assert_eq!(body.rest().unwrap(), saved);
+    assert!(body.current().same_occurrence(&joining));
+    assert_eq!(s.detach_section(&body.joint, i64::BITS).unwrap(), broad);
+    body.joint = fine_joint;
+    let mut bytes = Vec::new();
+    saved.write(&mut bytes).unwrap();
+    assert_eq!(saved.seed_kind(), NormalWaveSeedKind::ReceivedCurrent);
+    assert_eq!(saved.epoch(), 6);
+    let expected = serde_json::to_value(body.advance().unwrap().inspect().unwrap()).unwrap();
+    let expected_receive =
+        serde_json::to_value(body.receive(current(&p)).unwrap().inspect().unwrap()).unwrap();
+    let expected_rest = body.rest().unwrap();
+    drop(body);
+    let loaded = NormalWaveRest::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
+    assert_eq!(loaded, saved);
+    let mut resumed = loaded.remount(&s, |_| {}).unwrap();
+    assert_eq!(resumed.epoch(), 6);
+    assert_eq!(
+        serde_json::to_value(resumed.advance().unwrap().inspect().unwrap()).unwrap(),
+        expected
+    );
+    assert_eq!(
+        serde_json::to_value(resumed.receive(current(&p)).unwrap().inspect().unwrap()).unwrap(),
+        expected_receive
+    );
+    assert_eq!(resumed.rest().unwrap(), expected_rest);
+    // Version refusal occurs at the cold wire boundary before mounting any state.
+    bytes[b"HOLONIC-NORMAL-WAVE".len()] = u8::MAX;
+    assert!(NormalWaveRest::read(&mut bytes.as_slice(), bytes.len() as u64).is_err());
 }

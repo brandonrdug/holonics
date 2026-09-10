@@ -68,41 +68,23 @@ impl NormalMaterialRest {
         validate_geometry(&value, h.observations)?;
         let layout = NormalLayout::new(h.roots, h.targets).ok_or(ConstitutiveFibreError::Shape)?;
         let numeric = wides(&self.state.intervals[..layout.matrix_words])?;
-        let scale = BigInt::one() << h.grain;
-        let ceil = |v: Rat| -> Rat {
-            let scaled = v * Rat::from_integer(scale.clone());
-            let whole = scaled.numer() / scaled.denom();
-            Rat::new(
-                if scaled.numer() % scaled.denom() == BigInt::zero() {
-                    whole
-                } else {
-                    whole + 1
-                },
-                scale.clone(),
-            )
-        };
-        let norm: Rat = value
-            .material
-            .coefficients
-            .iter()
-            .flatten()
-            .map(|z| z.real.abs() + z.imaginary.abs())
-            .sum();
-        let residual: Rat = value
-            .normal_residual()?
-            .iter()
-            .flatten()
-            .map(|z| z.real.abs() + z.imaginary.abs())
-            .sum();
-        if value.normal_residual_upper != ceil(residual.clone())
-            || Rat::new(numeric[layout.cross_values + 2].into(), scale.clone()) != norm
-            || value.material.radius
-                != ceil(residual + norm * value.source_normal_error + value.cross_source_error)
-        {
-            return Err(invalid("normal material numerical witness"));
-        }
-        Ok(())
+        let values = layout.gram_values + layout.cross_values + STATISTIC_SCALARS;
+        let moments = (0..values)
+            .map(|i| {
+                let start = layout.matrix_words + MomentWire::WORDS * i;
+                integer(&self.state.intervals[start..start + MomentWire::WORDS])
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        validate_numerical_witness(
+            &self.state,
+            h.roots,
+            h.targets,
+            h.grain,
+            numeric[layout.cross_values],
+            &moments,
+        )
     }
+
     pub fn write(&self, out: &mut impl Write) -> Result<(), ConstitutiveFibreError> {
         out.write_all(MAGIC).map_err(invalid)?;
         blob(out, &serde_json::to_vec(&self.header).map_err(invalid)?)?;
@@ -168,7 +150,7 @@ fn validate_geometry(
     value: &NativeNormalMaterialState,
     observations: u64,
 ) -> Result<(), ConstitutiveFibreError> {
-    use crate::inertia::{positive_source_energy, SymmetricForm};
+    use crate::inertia::{SymmetricForm, positive_source_energy};
     let m = value.source_normal.len();
     if [
         &value.source_normal_error,

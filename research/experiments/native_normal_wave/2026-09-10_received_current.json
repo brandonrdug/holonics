@@ -1,0 +1,43 @@
+{
+  "schema": "holonics.normal-wave-reception-comparison.v1",
+  "scope": "one actual received current and continuing bounded generator; not all contextual ecology",
+  "source_model_observations": 4963,
+  "successor_observations": 4964,
+  "source_coordinates": 74,
+  "grain": 64,
+  "received_current": "unit coordinate 1 at epoch 9, after eight generated occurrences",
+  "final_epoch": 17,
+  "generated_steps_after_reception": 8,
+  "complete_rest_equal_after_resume": true,
+  "complete_bounded_returns_equal_after_resume": true,
+  "repeated_reception_comparison_equal": true,
+  "received_passage_numerical_readouts": 0,
+  "received_passage_ingress_octets": 0,
+  "generation_passage_numerical_readouts": 0,
+  "generation_passage_ingress_octets": 4,
+  "generation_ingress_source": "one u32 passage dependency, uploaded by begin_passage_scheduled; no numerical current ingress",
+  "reception_seconds": 1.582364245,
+  "initial_received_resident_octets": 40330928,
+  "continuing_resident_octets": 40340432,
+  "rest_octets": 19455148,
+  "post_reception_coefficient_error": "29251206436161/9223372036854775808",
+  "trajectory_joint_radii": [
+    "59968037598658261/18446744073709551616",
+    "119939488208997947/18446744073709551616",
+    "179917025052528881/18446744073709551616",
+    "119950324373457797/9223372036854775808",
+    "299890359909885257/18446744073709551616",
+    "359886159159227697/18446744073709551616",
+    "419888047112795491/18446744073709551616",
+    "479896024388503867/18446744073709551616"
+  ],
+  "final_validation_seconds_from_stderr": 23.586,
+  "final_resume_process_seconds": 24.052757619,
+  "original_validation": {
+    "scope": "original dense cold validator",
+    "status": "interrupted; incomplete check",
+    "elapsed_seconds": 586,
+    "reason": "replace redundant rational-product validation with the existing exact integer witness, after relevant tests passed"
+  },
+  "cost_scope": "wall-clock observations; uninterrupted control overlapped the original cold validation; no calibrated physical power claim"
+}

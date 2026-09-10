@@ -1,16 +1,18 @@
 # Construction state
 
 **Currency:** September 10, 2026. **Priority:** Corrected AC0–AC5 construction is the active goal. Native HNN cultivation uses Holons as situated state, incidence, transported differences and compatible continuations; text/audio/visual media are exterior measurement charts.
-**Position:** The byte-cultivation assembly remains retired. The 16-frame source model now has a fixed difference-generator word with actual current joins, bounded joint emission, normal-material rest and executable generator restart. Numerical refinement preserves its exact source geometry. Cross-message ecology, changing material during generation and broader cultivation remain unfinished. AC0–AC5 is not complete. No cultivation process is running.
+**Position:** The byte-cultivation assembly remains retired. Actual reception now stages a shared source/target comparison, changed normal material and the next joined pair atomically. AC2 development, AC4 bounded rebase and AC5 mixed-seed restart now return on the conversation-prefix model; 21 normal and 67 inertia checks pass. Broader AC3 contextual ecology/cultivation remains unfinished. AC0–AC5 is not complete. No cultivation process is running.
 **Athena-alpha:** not yet attained.
 
-**Active implementation:** The local join `(p,c) -> (c,c+R(c-p,c,p))` now returns through a
-generator/seed/word representation with fixed residency. Nineteen normal checks pass, including
-restart and source-preserving numerical refinement. The corpus model's grain-32 joint bounds
-were too broad to interpret from their centres; grain 64 preserves the source moments and sharply
-reduces the numerical remainder. Independent-process corpus continuation returns identical
-complete rest files and joint-current readings; all sixteen refined radii are below `1/10^7`.
-This fixed local generator does not supply the wider changing/contextual ecology by itself.
+**Active implementation:** `ResidentNormalWave::receive` forms source `(c-p,c,p)` and observed
+difference `v-c` from the same joint current, then starts a new generator word at `(c,v)`.
+The actual preceding c supplies the join. The continuing seed retains c's enclosure and exact v;
+it does not retain a chain of prior material or source observations. This is an explicit bounded
+rebase, not an exact future-receiver quotient. The [reception record](research/records/2026-09-10_RECEIVED_CURRENTS_CHANGE_THE_GENERATOR_WITHOUT_A_HISTORY_CHAIN.md)
+retains its scope and checks. Four steps, rest and four more steps match the full returns and
+complete saved state of eight uninterrupted steps. Shared exact validation reduces this dense
+cold check from an interrupted 586-second attempt to a returned 23.586 seconds. Broader contextual
+source currents and source continuation remain next.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct

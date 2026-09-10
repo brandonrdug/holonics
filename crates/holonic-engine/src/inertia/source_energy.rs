@@ -107,6 +107,42 @@ pub fn positive_source_energy(
             g[i][k] = BigInt::zero();
         }
         previous = pivot;
+        // The active Schur data represent (g,b,remaining)/(previous*scale).
+        // Cancel shared dyadic content from ALL those numerators and previous together.
+        // A dense rational rank-one update otherwise carries growing, irrelevant powers
+        // of the codec denominator through every minor. This changes no represented ratio.
+        let previous_shift = previous.trailing_zeros().unwrap_or(0);
+        let mut shift = previous_shift;
+        if shift > 0 {
+            for v in std::iter::once(&remaining)
+                .chain(g[k + 1..].iter().flat_map(|r| &r[k + 1..]))
+                .chain(b.iter().flat_map(|r| &r[k + 1..]))
+            {
+                if let Some(bits) = v.trailing_zeros() {
+                    shift = shift.min(bits);
+                }
+                if shift == 0 {
+                    break;
+                }
+            }
+            // Remove the full dyadic part of the divisor or none. An odd remaining
+            // divisor is coprime to the cancelled factor, preserving exact divisibility
+            // in subsequent Bareiss steps. A merely partial cancellation need not do so.
+            if shift == previous_shift {
+                previous >>= shift;
+                remaining >>= shift;
+                for row in &mut g[k + 1..] {
+                    for v in &mut row[k + 1..] {
+                        *v >>= shift;
+                    }
+                }
+                for row in &mut b {
+                    for v in &mut row[k + 1..] {
+                        *v >>= shift;
+                    }
+                }
+            }
+        }
         rank += 1;
     }
     Ok(PositiveSourceEnergy {
@@ -120,6 +156,39 @@ mod tests {
     use super::*;
     fn q(n: i64, d: i64) -> Rat {
         Rat::new(n.into(), d.into())
+    }
+
+    #[test]
+    fn dense_dyadic_update_preserves_the_exact_schur_energy() {
+        let denominator: BigInt = BigInt::one() << 80;
+        let a: Vec<Rat> = [1, 3, 5]
+            .into_iter()
+            .map(|n| Rat::new(n.into(), denominator.clone()))
+            .collect();
+        let y = Rat::new(2.into(), denominator);
+        let g = SymmetricForm::from_rows(
+            (0..a.len())
+                .map(|i| {
+                    (0..a.len())
+                        .map(|j| &a[i] * &a[j] + if i == j { Rat::one() } else { Rat::zero() })
+                        .collect()
+                })
+                .collect(),
+        )
+        .unwrap();
+        let b: Vec<Rat> = a
+            .iter()
+            .enumerate()
+            .map(|(i, v)| &y * v + if i == 0 { Rat::one() } else { Rat::zero() })
+            .collect();
+        let energy = Rat::one() + &y * &y;
+        let norm: Rat = a.iter().map(|v| v * v).sum();
+        let cross: Rat = a.iter().zip(&b).map(|(a, b)| a * b).sum();
+        let expected =
+            &energy - b.iter().map(|v| v * v).sum::<Rat>() + &cross * &cross / (Rat::one() + norm);
+        let returned = positive_source_energy(&g, &[b], &energy).unwrap();
+        assert_eq!(returned.source_rank, 3);
+        assert_eq!(returned.remaining_target_energy, expected);
     }
     #[test]
     fn source_energy_returns_exact_schur_trace_and_preserves_zero_pivots() {

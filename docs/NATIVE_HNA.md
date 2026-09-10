@@ -96,11 +96,11 @@ difference/comparand and observed-difference sections. `receive_section` integra
 observations and fits once, returning the two response fields and actual immutable operator cuts.
 These row coordinates are not native identity or a clock, and the source fields are not model history.
 
-## Fixed difference generators and rest
+## Difference generators, received currents and rest
 
 [definition] `ResidentNormalMaterial::into_difference_wave` binds the normal response to the
 declared source plane `(c-p,c,p)` and returns `(c,c+R(c-p,c,p))`. `ResidentNormalWave` owns the
-fixed material, exact initial conditions and current operator word. The next previous current
+material, typed initial conditions and current operator word. The next previous current
 shares the actual old current occurrence. An observed equality of coordinates cannot supply
 that join. Seed refusal returns its material owner; later refusal preserves the current successor.
 
@@ -108,7 +108,16 @@ that join. Seed refusal returns its material owner; later refusal preserves the 
 power cache carries a complete operator-word error bound; generated joint currents are evaluated
 from the seed rather than from a history of rounded current faces. `NormalWaveRest` stores the
 material, seed and word and has an executable decoder without conversation-source access.
-The generator's material remains fixed during this word; this is not the whole changing ecology.
+The generator's material remains fixed during each word; reception starts a new word.
+
+[definition] `ResidentNormalWave::receive(v)` uses the actual joint `(p,c)` to form source
+`(c-p,c,p)` and observed difference `v-c`. It stages the normal update and new `(c,v)` before
+publishing either; the previous c remains the same occurrence. `NormalWaveReception` retains
+the producing fibre, shared joint source and complete comparison. The continuing wave retains
+only its new material and seed: c's full enclosure with exact received v. This bounded rebase
+does not assert equality to the finer old generator fibre or supply all contextual ecology.
+`epoch` counts generated and received occurrences; `steps` counts the current fixed-material
+word. Rest v2 preserves this mixed seed and chronology; v1 exact-seed rests remain readable.
 
 [definition] `NormalMaterialRest` checks the source Gram, cross-source kernel and compatible
 target energy with `inertia::positive_source_energy`, and checks the actual numerical witness.

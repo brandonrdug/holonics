@@ -1,13 +1,76 @@
 use super::*;
 use crate::native_ecology::constitutive_fibre::{
-    normal_material_state_words, ResidentConstitutiveCurrent,
+    ResidentConstitutiveCurrent, ResidentNormalInput, normal_material_report_words,
+    normal_material_state_words, normal_material_workspace_words,
 };
 impl<'c> ResidentSurface<'c> {
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_normal_wave_receive(
+        &self,
+        lane: &Lane<'_, 'c>,
+        material: &ResidentSection<'c>,
+        joint: &ResidentSection<'c>,
+        received: ResidentConstitutiveCurrent<'_, 'c>,
+        n: usize,
+        grain: u32,
+        next: &ResidentSection<'c>,
+        report: &ResidentSection<'c>,
+        work: &ResidentSection<'c>,
+        input: &ResidentSection<'c>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || Self::operative_error();
+        let r = n.checked_mul(2).filter(|r| *r > 0).ok_or_else(fail)?;
+        let d = r.checked_mul(3).ok_or_else(fail)?;
+        let sw = normal_material_state_words(n, n).ok_or_else(fail)?;
+        let rw = normal_material_report_words(n, n).ok_or_else(fail)?;
+        let ww = normal_material_workspace_words(n, n).ok_or_else(fail)?;
+        if !(1..=120).contains(&grain)
+            || sw > u32::MAX as usize
+            || received.width != r
+            || !self.operative_shape(material, 1, sw)
+            || !self.operative_shape(next, 1, sw)
+            || !self.operative_shape(joint, 1, 2 * (2 * r + 1))
+            || !self.operative_shape(report, 1, rw)
+            || !self.operative_shape(work, 1, ww)
+            || !self.operative_shape(input, 1, 4 * (d + 1))
+        {
+            return Err(fail());
+        }
+        self.validate_constitutive_current_view(received)?;
+        let mut p = Params::new();
+        p.ptr(material.lo.device_ptr())
+            .ptr(joint.lo.device_ptr())
+            .ptr(received.section.lo.device_ptr())
+            .ptr(received.section.hi.device_ptr())
+            .u32(received.offset as u32)
+            .u32(received.denominator.map_or(u32::MAX, |v| v as u32))
+            .u32(received.disposition.map_or(u32::MAX, |v| v as u32))
+            .u32(n as u32)
+            .u32(grain);
+        for s in [next, report] {
+            p.ptr(s.lo.device_ptr()).ptr(s.hi.device_ptr());
+        }
+        p.ptr(work.lo.device_ptr())
+            .ptr(input.lo.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_normal_wave_receive",
+            1,
+            self.launch.block_x,
+            0,
+            &mut p,
+            "normal-wave-receive",
+        )
+    }
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn record_normal_wave_seed(
         &self,
         lane: &Lane<'_, 'c>,
-        p: ResidentConstitutiveCurrent<'_, 'c>,
+        p: ResidentNormalInput<'_, 'c>,
         c: ResidentConstitutiveCurrent<'_, 'c>,
         n: usize,
         grain: u32,
@@ -25,10 +88,18 @@ impl<'c> ResidentSurface<'c> {
             .and_then(|v| v.checked_mul(4))
             .ok_or_else(fail)?;
         if !(1..=120).contains(&grain)
-            || p.width != r
+            || p.width() != r
             || c.width != r
             || pw > u32::MAX as usize
-            || !self.operative_shape(seed, 2, r + 1)
+            || !self.operative_shape(
+                seed,
+                if matches!(p, ResidentNormalInput::Enclosed(_)) {
+                    3
+                } else {
+                    2
+                },
+                r + 1,
+            )
             || !self.operative_shape(bound, 1, 2 * (2 * r + 1))
             || !self.operative_shape(previous, 1, 2 * (r + 1))
             || !self.operative_shape(current, 1, 2 * (r + 1))
@@ -37,17 +108,45 @@ impl<'c> ResidentSurface<'c> {
         {
             return Err(fail());
         }
-        self.validate_constitutive_current_view(p)?;
-        self.validate_constitutive_current_view(c)?;
         let mut params = Params::new();
-        for v in [p, c] {
-            params
-                .ptr(v.section.lo.device_ptr())
-                .ptr(v.section.hi.device_ptr())
-                .u32(v.offset as u32)
-                .u32(v.denominator.map_or(u32::MAX, |d| d as u32))
-                .u32(v.disposition.map_or(u32::MAX, |d| d as u32));
+        match p {
+            ResidentNormalInput::Point(v) => {
+                self.validate_constitutive_current_view(v)?;
+                params
+                    .ptr(v.section.lo.device_ptr())
+                    .ptr(v.section.hi.device_ptr())
+                    .u32(v.offset as u32)
+                    .u32(v.denominator.map_or(u32::MAX, |d| d as u32))
+                    .u32(v.disposition.map_or(u32::MAX, |d| d as u32))
+                    .u32(0);
+            }
+            ResidentNormalInput::Enclosed(v) => {
+                if v.grain.0 != grain
+                    || v.offset % 2 != 0
+                    || v.section.grain.0 != 0
+                    || !std::ptr::eq(v.section.surface, self)
+                    || v.offset
+                        .checked_add(2 * (r + 1))
+                        .is_none_or(|end| end > v.section.count() || end > u32::MAX as usize)
+                {
+                    return Err(fail());
+                }
+                params
+                    .ptr(v.section.lo.device_ptr())
+                    .ptr(v.section.hi.device_ptr())
+                    .u32(v.offset as u32)
+                    .u32(u32::MAX)
+                    .u32(u32::MAX)
+                    .u32(1);
+            }
         }
+        self.validate_constitutive_current_view(c)?;
+        params
+            .ptr(c.section.lo.device_ptr())
+            .ptr(c.section.hi.device_ptr())
+            .u32(c.offset as u32)
+            .u32(c.denominator.map_or(u32::MAX, |d| d as u32))
+            .u32(c.disposition.map_or(u32::MAX, |d| d as u32));
         params.u32(n as u32).u32(grain);
         for s in [seed, bound, previous, current, power, meta] {
             params.ptr(s.lo.device_ptr()).ptr(s.hi.device_ptr());

@@ -123,6 +123,18 @@ difference at one receiver is not a universal stopping rule or proof of source e
 chart. If a generated internal current and the emitted current use different charts, compose
 their explicit source/receiver maps first. Matching dimensions or names supplies no joining equality.
 
+[definition] The next AC2/AC4 increment receives an actual current v into the continuing pair
+(p,c). Its comparison is x=(c-p,c,p), y=v-c: both operands share the same c. Stage the normal
+material update and new pair (c,v) before publishing either. The joined c remains the actual
+preceding occurrence. Numerical enclosures remain enclosures throughout this passage.
+
+[definition] Changing the material starts a new generator word. A bounded rebase retains the
+preceding current enclosure and exact received current, explicitly enlarging the finer old
+generator family. The returned receipt retains that producing family and the joint comparison;
+the continuing body retains no chain of old material or source records. This bounded operation
+is not an exact future-receiver quotient. AC5 must restore its material, mixed seed, chronology
+and next operation; failed reception must preserve the entire existing successor.
+
 ## AC0–AC5 construction order
 
 | Phase | Construction and concrete return |

@@ -1645,6 +1645,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "direct_normal_material.cuh"
 #include "normal_material_section.cuh"
 #include "normal_wave.cuh"
+#include "normal_wave_receive.cuh"
 #include "constitutive_field.cuh"
 
 // Candidate finite passive-contact projection.  One block owns one query row and first forms the

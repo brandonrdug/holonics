@@ -109,9 +109,9 @@ fn main() -> Result<()> {
         return Ok(());
     }
     let (mode,input,steps,coordinate,output)=match args.as_slice(){
-        [mode,input,steps,coordinate,output] if mode=="start"=>(mode.as_str(),input,steps.parse::<u64>()?,Some(coordinate.parse::<usize>()?),output),
+        [mode,input,steps,coordinate,output] if mode=="start"||mode=="receive"=>(mode.as_str(),input,steps.parse::<u64>()?,Some(coordinate.parse::<usize>()?),output),
         [mode,input,steps,output] if mode=="resume"=>(mode.as_str(),input,steps.parse::<u64>()?,None,output),
-        _=>return Err("usage: normal_wave import SOURCE_RUN NEW.normal | refine MODEL.normal GRAIN NEW.normal | start MODEL.normal STEPS COORDINATE NEW.wave | resume SAVED.wave EXTRA_STEPS NEW.wave".into()),
+        _=>return Err("usage: normal_wave import SOURCE_RUN NEW.normal | refine MODEL.normal GRAIN NEW.normal | start MODEL.normal STEPS COORDINATE NEW.wave | receive SAVED.wave STEPS COORDINATE NEW.wave | resume SAVED.wave EXTRA_STEPS NEW.wave".into()),
     };
     let output = PathBuf::from(output);
     let report = output.with_extension("json");
@@ -122,7 +122,13 @@ fn main() -> Result<()> {
     let readout = ResidentReadout::new()?;
     let surface = ResidentSurface::on(&readout)?;
     let mut wave = if mode == "start" {
+        eprintln!("validating saved normal material");
+        let validation = Instant::now();
         let rest = read_material(Path::new(input))?;
+        eprintln!(
+            "material validation returned in {:.3}s",
+            validation.elapsed().as_secs_f64()
+        );
         let n = rest.roots();
         let coordinate = coordinate.unwrap();
         if coordinate >= n {
@@ -153,11 +159,49 @@ fn main() -> Result<()> {
     } else {
         let file = File::open(input)?;
         let length = file.metadata()?.len();
+        eprintln!("validating saved generator and normal material");
+        let validation = Instant::now();
         let rest = NormalWaveRest::read(&mut BufReader::new(file), length)?;
+        eprintln!(
+            "generator validation returned in {:.3}s",
+            validation.elapsed().as_secs_f64()
+        );
         rest.remount(&surface, |step| eprintln!("decoded generator word {step}"))?
     };
+    let reception = if mode == "receive" {
+        let width = wave.current().view().components();
+        let coordinate = coordinate.unwrap();
+        if coordinate >= width / 2 {
+            return Err("received excitation outside current chart".into());
+        }
+        let mut values = vec![(0, 0); width];
+        values[2 * coordinate] = (1, 1);
+        let observed = surface.mount_section_rest(&ResidentSectionRest::found(
+            1,
+            width,
+            ResidentGrain(0),
+            i64::BITS,
+            values,
+        )?)?;
+        let predecessor_observations = wave.fibre().material_observations;
+        let before = surface.census();
+        let clock = Instant::now();
+        let returned = wave.receive(ResidentConstitutiveCurrent::integers(&observed)?)?;
+        let seconds = clock.elapsed().as_secs_f64();
+        let after = surface.census();
+        Some(
+            serde_json::json!({"reading":returned.inspect()?,"seconds":seconds,
+            "coordinate":coordinate,"predecessor_observations":predecessor_observations,
+            "successor_observations":wave.fibre().material_observations,
+            "numerical_readouts_during_passage":after.section_read_outs-before.section_read_outs,
+            "ingress_octets_during_passage":after.ingress_octets-before.ingress_octets}),
+        )
+    } else {
+        None
+    };
     let first = wave.steps();
-    let standing = surface.census().resident_octets_now;
+    let initial_residency = surface.census().resident_octets_now;
+    let mut standing = initial_residency;
     let mut trajectory = Vec::new();
     for _ in 0..steps {
         let before = surface.census();
@@ -175,15 +219,21 @@ fn main() -> Result<()> {
             seconds
         );
         drop(returned);
+        // The zero-length word shares its seed enclosure; a generated joint adds one
+        // fixed-size cache. Later steps must not retain earlier currents or workspaces.
+        if first == 0 && wave.steps() == 1 {
+            standing = surface.census().resident_octets_now;
+        }
         if surface.census().resident_octets_now != standing {
             return Err("wave retained an earlier current or workspace".into());
         }
     }
     let rest = wave.rest()?;
     publish_new(&output, |file| rest.write(file).map_err(io::Error::other))?;
-    let result = serde_json::json!({"scope":"fixed learned normal generator and bounded joint current; not language attainment",
+    let result = serde_json::json!({"scope":"normal generator, actual reception and bounded rebase; not language attainment",
         "mode":mode,"first_word":first,"last_word":wave.steps(),"coordinate":coordinate,
-        "resident_octets":standing,"rest_octets":std::fs::metadata(&output)?.len(),
+        "resident_octets":standing,"initial_resident_octets":initial_residency,"epoch":wave.epoch(),
+        "reception":reception,"rest_octets":std::fs::metadata(&output)?.len(),
         "process_seconds":started.elapsed().as_secs_f64(),"trajectory":trajectory});
     publish_new(&report, |file| {
         serde_json::to_writer(file, &result).map_err(io::Error::other)

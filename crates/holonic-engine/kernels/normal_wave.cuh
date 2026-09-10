@@ -11,7 +11,7 @@ __device__ void normal_wave_entry(const wide *M,uint32_t n,uint32_t row,uint32_t
 }
 
 extern "C" __global__ void section_normal_wave_seed(
-    const int64_t *plo,const int64_t *phi,uint32_t pa,uint32_t pd,uint32_t ps,
+    const int64_t *plo,const int64_t *phi,uint32_t pa,uint32_t pd,uint32_t ps,uint32_t previous_kind,
     const int64_t *clo,const int64_t *chi,uint32_t ca,uint32_t cd,uint32_t cs,
     uint32_t n,uint32_t grain,int64_t *seed,int64_t *seed_hi,int64_t *bound,int64_t *bound_hi,
     int64_t *previous,int64_t *previous_hi,int64_t *current,int64_t *current_hi,
@@ -22,26 +22,49 @@ extern "C" __global__ void section_normal_wave_seed(
     for(size_t i=threadIdx.x;i<cells;i+=blockDim.x)((wide *)power)[i]=((i&1u)==0 && (i/2u)/d==(i/2u)%d)?(wide)1<<grain:0;
     __syncthreads();
     if(!threadIdx.x){
-        wide den[2]={fibre_current_denominator(plo,phi,pd,ps,slot),fibre_current_denominator(clo,chi,cd,cs,slot)};
-        const int64_t *low[2]={plo,clo},*high[2]={phi,chi};uint32_t at[2]={pa,ca};
-        wide *out[2]={(wide *)previous,(wide *)current};wide S=(wide)1<<grain,total=0;
-        for(uint32_t part=0;part<2u&&! *slot;++part){
-            wide error=0;seed[(size_t)part*(r+1u)+r]=(int64_t)den[part];
-            for(uint32_t j=0;j<r;++j){
-                if(low[part][at[part]+j]!=high[part][at[part]+j]){atomicOr(slot,REFUSED_MALFORMED);break;}
-                wide v=low[part][at[part]+j];seed[(size_t)part*(r+1u)+j]=(int64_t)v;
-                wide a=signed_product_divide_2(v,S/2,den[part],0,slot),b=signed_product_divide_2(v,S/2,den[part],1,slot);
-                out[part][j]=v<0?b:a;((wide *)bound)[part*r+j]=out[part][j];
+        wide S=(wide)1<<grain,total=0;
+        if(previous_kind>1u){atomicOr(slot,REFUSED_MALFORMED);}
+        uint32_t current_seed_at=previous_kind?2u*(r+1u):r+1u;
+        if(previous_kind&&! *slot){
+            for(uint32_t j=0;j<2u*(r+1u);++j){
+                if(plo[pa+j]!=phi[pa+j])atomicOr(slot,REFUSED_MALFORMED);
+                seed[j]=previous[j]=plo[pa+j];
+            }
+            const wide *v=(const wide *)(plo+pa);
+            if(v[r]<0)atomicOr(slot,REFUSED_MALFORMED);
+            for(uint32_t j=0;j<=r;++j)((wide *)bound)[j]=v[j];
+            total=v[r];
+        }else if(!*slot){
+            wide den=fibre_current_denominator(plo,phi,pd,ps,slot),error=0;
+            seed[r]=(int64_t)den;
+            for(uint32_t j=0;j<r&&! *slot;++j){
+                if(plo[pa+j]!=phi[pa+j]){atomicOr(slot,REFUSED_MALFORMED);break;}
+                wide v=plo[pa+j];seed[j]=(int64_t)v;
+                wide a=signed_product_divide_2(v,S/2,den,0,slot),b=signed_product_divide_2(v,S/2,den,1,slot);
+                ((wide *)previous)[j]=v<0?b:a;((wide *)bound)[j]=((wide *)previous)[j];
                 if(a!=b)error=add_checked(error,1,slot);
             }
-            out[part][r]=error;total=add_checked(total,error,slot);
+            ((wide *)previous)[r]=error;total=error;
+        }
+        if(!*slot){
+            wide den=fibre_current_denominator(clo,chi,cd,cs,slot),error=0;
+            seed[current_seed_at+r]=(int64_t)den;
+            for(uint32_t j=0;j<r&&! *slot;++j){
+                if(clo[ca+j]!=chi[ca+j]){atomicOr(slot,REFUSED_MALFORMED);break;}
+                wide v=clo[ca+j];seed[current_seed_at+j]=(int64_t)v;
+                wide a=signed_product_divide_2(v,S/2,den,0,slot),b=signed_product_divide_2(v,S/2,den,1,slot);
+                ((wide *)current)[j]=v<0?b:a;((wide *)bound)[r+j]=((wide *)current)[j];
+                if(a!=b)error=add_checked(error,1,slot);
+            }
+            ((wide *)current)[r]=error;total=add_checked(total,error,slot);
         }
         ((wide *)bound)[2u*r]=total;
         ((wide *)meta)[0]=1;((wide *)meta)[1]=0;((wide *)meta)[2]=0;((wide *)meta)[3]=total;
     }
     __syncthreads();if(*slot)return;
     for(size_t i=threadIdx.x;i<2u*cells;i+=blockDim.x)power_hi[i]=power[i];
-    for(size_t i=threadIdx.x;i<2u*(r+1u);i+=blockDim.x){seed_hi[i]=seed[i];previous_hi[i]=previous[i];current_hi[i]=current[i];}
+    for(size_t i=threadIdx.x;i<(previous_kind?3u:2u)*(r+1u);i+=blockDim.x)seed_hi[i]=seed[i];
+    for(size_t i=threadIdx.x;i<2u*(r+1u);i+=blockDim.x){previous_hi[i]=previous[i];current_hi[i]=current[i];}
     for(size_t i=threadIdx.x;i<2u*(2u*r+1u);i+=blockDim.x)bound_hi[i]=bound[i];
     for(size_t i=threadIdx.x;i<8u;i+=blockDim.x)meta_hi[i]=meta[i];
 }

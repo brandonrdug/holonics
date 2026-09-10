@@ -150,10 +150,15 @@ published source run is a local normal-response construction, not a completed ge
 
 [definition] `normal/direct/wave.rs` owns the fixed difference-generator word and its actual
 current joins; `normal_wave.cuh` compiles the source-plane action and bounds its composed powers.
+`normal/direct/wave/receive.rs` and `normal_wave_receive.cuh` join a received current to the
+preceding joint family, stage its normal-material update and rebase to an enclosed/exact seed.
+The receipt retains the producing fibre; the continuing wave does not retain a receipt chain.
 `surface_normal_wave.rs` records the resident passages. `normal/direct/rest.rs` and
 `wave/rest.rs` own complete normal material and generator/seed/word persistence.
 `inertia/source_energy.rs` checks positive source geometry, source-kernel compatibility and
-target energy by fraction-free Schur elimination. `normal/direct/refine.rs` and the normal
+target energy by fraction-free Schur elimination, cancelling admissible common dyadic content.
+Cold rest and normal-state validation share `normal.rs`'s exact wire-scale numerical witness.
+`normal/direct/refine.rs` and the normal
 kernel refine numerical realization without changing exact moments or source-family bounds.
 
 [historical] The SDK field/model wrapper, text adapters and eight alpha examples were

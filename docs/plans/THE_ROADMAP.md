@@ -148,9 +148,9 @@ achieved. Current research seeks identifiable behavior and learning without a ut
 | AC0 | Existing source-qualified stream, availability and cursor | Complete; preserve |
 | AC1 | A productive conditional-generator carrier, its local interaction/reaction and source/receiver chart | Learned local laws now share actual condition standing in one move-owned neighborhood; continue into the source attachment |
 | AC2 | Observation-founded development of reusable conduct and a later measured consequence | Local material formation and condition reaction return atomically and change later conduct; carry them into the source attachment |
-| AC3 | Conversation exposure and retained joint continuation through the generator-bearing body | Sixteen actual source fields now develop the direct normal response; joined generative state and cross-message ecology remain next |
-| AC4 | Restriction/rebase or generator reuse that participates in the next operation | Current-factor savings stand at their numerical scope; they do not close generative organization |
-| AC5 | Public invocation, model anatomy and persistence of the actual productive body | Whole local-generator rest and continued return now agree across processes; extend delivery to the cultivated conversation body |
+| AC3 | Conversation exposure and retained joint continuation through the generator-bearing body | Sixteen source fields develop the normal response and its joined generator; extend contextual source currents and cross-message ecology |
+| AC4 | Restriction/rebase or generator reuse that participates in the next operation | Apply reusable generators and explicit bounded rebase in the next operation; distinguish this from an exact future-receiver quotient |
+| AC5 | Public invocation, model anatomy and persistence of the actual productive body | Persist the actual material, seed/fibre and chronology; verify generated and received continuation on the cultivated conversation body |
 
 [definition] The first replacement packet uses `ResidentConstitutiveFibre`, its actual
 source/condition contact and `ConstitutiveFibreRest`. That compact learned law now conducts
@@ -175,9 +175,13 @@ resident bounded-current consumption have now returned through the
 The [operator-word return](../../research/records/2026-09-10_THE_DIFFERENCE_GENERATOR_KEEPS_ITS_JOIN_AND_RESTS_AS_AN_OPERATOR_WORD.md)
 now implements the local generative state z=(p,c), source S(z)=(c-p,c,p), and successor
 z'=(c,c+R(S(z))), retaining the actual join and a bound for the whole generator word.
-Normal material and generator/seed/word restart are available. Continue into the surrounding
-changing ecology, contextual source currents and broader source continuation; one fixed local
-word is not that entire construction. Do not turn codec storage coordinates into native cadence
+Normal material and generator/seed/word restart are available. The
+[received-current increment](../../research/records/2026-09-10_RECEIVED_CURRENTS_CHANGE_THE_GENERATOR_WITHOUT_A_HISTORY_CHAIN.md)
+joins an actual observation to the same preceding current, stages the changed material and
+rebases to an enclosed/exact seed. Generated and received continuation now returns across rest,
+including the conversation-prefix model. Continue into contextual source currents and broader
+source continuation. This bounded local rebase does not close the surrounding ecology or prove
+an exact future-receiver quotient. Do not turn codec storage coordinates into native cadence
 or consume an enclosure's centre as an exact current. Local adjacency is not all context.
 
 [definition] The corrected formal `FiniteLocalCurrentEcology.reaction` retains local

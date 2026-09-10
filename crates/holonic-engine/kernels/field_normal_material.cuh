@@ -136,6 +136,23 @@ extern "C" __global__ __launch_bounds__(512) void section_normal_refine(
     for(size_t i=threadIdx.x;i<state_words;i+=blockDim.x)next_hi[i]=next[i];
 }
 
+// The source and target may be correlated members of a shared return. These bounds use
+// the complete supplied radii and do not assume independence or select their centres.
+__device__ void normal_observation_moments(const wide *x,const wide *y,uint32_t n,uint32_t targets,
+    int64_t *report,uint32_t *slot){
+    uint32_t d=normal_source_components(n),R=NORMAL_QUADRATURES*targets;
+    wide ey=y[R];
+            wide ex=x[d],nx=complete_norm(x,d,slot),ny=complete_norm(y,R,slot);
+            if(ex<0||ey<0)atomicOr(slot,REFUSED_MALFORMED);
+            MomentInteger eh=(MomentInteger(2)*normal_wide(nx)+normal_wide(ex))*normal_wide(ex);
+            MomentInteger eb=normal_wide(ny)*normal_wide(ex)+normal_wide(nx)*normal_wide(ey)+normal_wide(ex)*normal_wide(ey),cy;
+            for(uint32_t j=0;j<R;++j)cy=cy+normal_wide(y[j])*normal_wide(y[j]);
+            MomentInteger ec=(MomentInteger(2)*normal_wide(ny)+normal_wide(ey))*normal_wide(ey);
+            int64_t *e=report+normal_report_base(n,targets);
+            operative_write_moment(eh,e,e,slot);operative_write_moment(eb,e+MOMENT_WIRE_WORDS,e+MOMENT_WIRE_WORDS,slot);
+            operative_write_moment(cy,e+NORMAL_TARGET_ENERGY*MOMENT_WIRE_WORDS,e+NORMAL_TARGET_ENERGY*MOMENT_WIRE_WORDS,slot);operative_write_moment(ec,e+NORMAL_TARGET_ENERGY_ERROR*MOMENT_WIRE_WORDS,e+NORMAL_TARGET_ENERGY_ERROR*MOMENT_WIRE_WORDS,slot);
+}
+
 // One observation's bounded source/target geometry, shared by field and direct section intake.
 // Called by one thread; the enclosing passage supplies synchronization and publication.
 __device__ void normal_observation_frame(const wide *origin_current,const int64_t *incoming,
@@ -151,15 +168,7 @@ __device__ void normal_observation_frame(const wide *origin_current,const int64_
         y[R]=ey;
         if(linked&&! *slot){
             const wide *x=origin_current+d+1u;for(uint32_t j=0;j<=d;++j)out[gain+j]=x[j];
-            wide ex=x[d],nx=complete_norm(x,d,slot),ny=complete_norm(y,R,slot);
-            if(ex<0)atomicOr(slot,REFUSED_MALFORMED);
-            MomentInteger eh=(MomentInteger(2)*normal_wide(nx)+normal_wide(ex))*normal_wide(ex);
-            MomentInteger eb=normal_wide(ny)*normal_wide(ex)+normal_wide(nx)*normal_wide(ey)+normal_wide(ex)*normal_wide(ey),cy;
-            for(uint32_t j=0;j<R;++j)cy=cy+normal_wide(y[j])*normal_wide(y[j]);
-            MomentInteger ec=(MomentInteger(2)*normal_wide(ny)+normal_wide(ey))*normal_wide(ey);
-            int64_t *e=report+normal_report_base(n,targets);
-            operative_write_moment(eh,e,e,slot);operative_write_moment(eb,e+MOMENT_WIRE_WORDS,e+MOMENT_WIRE_WORDS,slot);
-            operative_write_moment(cy,e+NORMAL_TARGET_ENERGY*MOMENT_WIRE_WORDS,e+NORMAL_TARGET_ENERGY*MOMENT_WIRE_WORDS,slot);operative_write_moment(ec,e+NORMAL_TARGET_ENERGY_ERROR*MOMENT_WIRE_WORDS,e+NORMAL_TARGET_ENERGY_ERROR*MOMENT_WIRE_WORDS,slot);
+            normal_observation_moments(x,y,n,targets,report,slot);
         }
 }
 
