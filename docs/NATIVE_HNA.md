@@ -70,6 +70,20 @@ the source apparatus, waveform history or a solved duplicate of the fibre.
 compares two learned local receivers, a shared condition change, and process-separated continuation
 of the whole body. The source-qualified conversation attachment remains a separate construction.
 
+## Direct accumulated normal response
+
+[definition] `ResidentNormalMaterial` exposes the existing unit-prior accumulated normal law
+through resident source/observed currents. Its three complex source port blocks and output width
+are declared at founding. `read` preserves material; `receive` stages the existing native normal
+increment and finite fit before publishing its successor. The object retains moments and the
+numerical witness, without field history handles or an observation archive.
+
+[definition] `ResidentNormalReturn` keeps its actual borrowed operands and complete bounded
+before/after response. A numerical centre is not a point-current output. `inspect` reuses the
+normal geometry/objective decoder; `state_wire` is boundary data, not yet a restart protocol.
+The [direct-port return](../research/records/2026-09-10_THE_NORMAL_RESPONSE_ACCEPTS_RESIDENT_CURRENTS_WITHOUT_A_SOURCE_ARCHIVE.md)
+records phase, fit/solve separation, source-family and native-generator composition evidence.
+
 ## Conversation source
 
 [established-bounded; source-inspected] `holonics::hna::alpha::exposure` remains the source-qualified

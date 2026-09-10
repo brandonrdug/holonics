@@ -131,6 +131,14 @@ and `preimage/rest.rs` store laws/current/epoch/latest evidence; the last decode
 constraint query. The public `native_neighborhood` example calls these owners directly. No new
 CUDA learning rule, token lookup or historical predictor enters this composition.
 
+[definition] `field/material_transport/normal/direct.rs` exposes `ResidentNormalMaterial` and
+`ResidentNormalReturn`, the existing accumulated normal law with supplied resident currents.
+`surface_direct_normal.rs` validates the passage; `direct_normal_material.cuh` adapts its operands
+to the existing normal increment/fit and bounded linear response. `normal.rs` now shares the
+report/state decoders with the old field owner. No historical-source adapter is needed by this
+direct local response; its section-level codec attachment and full bounded-output consumer
+remain separate construction work.
+
 [historical] The SDK field/model wrapper, text adapters and eight alpha examples were
 [retired recoverably](../archive/implementations/2026-09-09-byte-field-cultivation/README.md).
 Core field/operative/receiver owners below remain mathematical and diagnostic constructions;

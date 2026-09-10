@@ -61,7 +61,11 @@ pub(super) fn integer(words: &[(i64, i64)]) -> Result<BigInt, ConstitutiveFibreE
 fn ceil_norm(values: &[i128]) -> BigInt {
     let q: BigInt = values.iter().map(|v| BigInt::from(*v).pow(2)).sum();
     let s = q.sqrt();
-    if &s * &s < q { s + 1 } else { s }
+    if &s * &s < q {
+        s + 1
+    } else {
+        s
+    }
 }
 fn increments(raw: &[i128], layout: &NormalLayout) -> [BigInt; STATISTIC_SCALARS] {
     let x = &raw[layout.source_at..layout.source_at + layout.source_components];
@@ -436,73 +440,14 @@ impl NativeConstitutiveField<'_> {
             .lineage
             .observed_source()
             .is_some();
-        validate_report(&s, n, t, linked)?;
-        let layout = NormalLayout::new(n, t).ok_or(ConstitutiveFibreError::Shape)?;
-        let base = layout.report_moments_at;
-        let v = wides(&s.intervals[..base])?;
-        let extra = layout.metadata_at;
-        let scale = BigInt::one() << g;
-        let q = |x: i128| Rat::new(x.into(), scale.clone());
-        let ball = |start: usize, width: usize| NativeFieldCurrentBall {
-            center: v[start..start + width]
-                .chunks_exact(2)
-                .map(|x| ExactComplexWaveCurrent::new(q(x[0]), q(x[1])))
-                .collect(),
-            radius: q(v[start + width]),
-        };
-        let raw = (0..STATISTIC_SCALARS)
-            .map(|i| {
-                integer(
-                    &s.intervals[base + MomentWire::WORDS * i..base + MomentWire::WORDS * (i + 1)],
-                )
-                .map(|v| Rat::new(v, &scale * &scale))
-            })
-            .collect::<Result<Vec<_>, _>>()?;
-        Ok(Some(NativeNormalMaterialReading {
-            forward: ball(
-                layout.ball_at(ReportBall::Forward),
-                layout.target_components,
-            ),
-            observed: ball(
-                layout.ball_at(ReportBall::Observed),
-                layout.target_components,
-            ),
-            contemporary_source_forward: linked.then(|| {
-                ball(
-                    layout.ball_at(ReportBall::ContemporarySource),
-                    layout.target_components,
-                )
-            }),
-            returned_difference: linked.then(|| {
-                ball(
-                    layout.ball_at(ReportBall::ReturnedDifference),
-                    layout.target_components,
-                )
-            }),
-            chronological_current: linked.then(|| {
-                ball(
-                    layout.ball_at(ReportBall::Chronological),
-                    layout.target_components,
-                )
-            }),
-            contemporary_difference: linked.then(|| {
-                ball(
-                    layout.ball_at(ReportBall::ContemporaryDifference),
-                    layout.target_components,
-                )
-            }),
-            source_current: linked.then(|| ball(layout.source_at, layout.source_components)),
-            coefficient_error: q(v[extra]),
-            normal_residual_upper: q(v[extra + 1]),
-            coefficient_norm_upper: q(v[extra + 2]),
-            source_normal_error_upper: q(v[extra + 3]),
-            cross_source_error_upper: q(v[extra + 4]),
-            increments: raw.try_into().map_err(|_| ConstitutiveFibreError::Shape)?,
-        }))
+        decode_report(&s, n, t, g, linked).map(Some)
     }
     pub fn inspect_normal_material_state(
         &self,
     ) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
+        if !self.relation.usable || self.pending.is_some() {
+            return Err(ConstitutiveFibreError::Uncertain);
+        }
         if self.material_transport_source() != Some(NativeMaterialTransportSource::OperativeNormal)
         {
             return Err(invalid("wrong material law"));
@@ -516,50 +461,149 @@ impl NativeConstitutiveField<'_> {
             .relation
             .surface
             .detach_section(&self.transport.as_ref().unwrap().state, 64)?;
-        let layout = NormalLayout::new(n, t).ok_or(ConstitutiveFibreError::Shape)?;
-        let m = layout.sources;
-        let h = layout.matrix_words;
-        let b = layout.cross_words_at();
-        let e = layout.scalar_words_at();
-        let scale = BigInt::one() << (2 * g);
-        let q = |at: usize| {
-            integer(&state.intervals[at..at + MomentWire::WORDS])
-                .map(|v| Rat::new(v, scale.clone()))
-        };
-        let matrix = |at: usize,
-                      rows: usize|
-         -> Result<Vec<Vec<ExactComplexWaveCurrent>>, ConstitutiveFibreError> {
-            (0..rows)
-                .map(|i| {
-                    (0..m)
-                        .map(|j| {
-                            Ok(ExactComplexWaveCurrent::new(
-                                q(at + MomentWire::COMPLEX_WORDS * (i * m + j))?,
-                                q(at + MomentWire::COMPLEX_WORDS * (i * m + j)
-                                    + MomentWire::WORDS)?,
-                            ))
-                        })
-                        .collect()
-                })
-                .collect()
-        };
-        Ok(NativeNormalMaterialState {
-            material: self
-                .inspect_material_transport_state()?
-                .ok_or(ConstitutiveFibreError::Shape)?,
-            source_normal: matrix(h, m)?,
-            cross_source: matrix(b, t)?,
-            source_normal_error: q(e)?,
-            cross_source_error: q(e + MomentWire::WORDS)?,
-            target_energy: q(e + 2 * MomentWire::WORDS)?,
-            target_energy_error: q(e + 3 * MomentWire::WORDS)?,
-            normal_residual_upper: Rat::new(
-                wides(&state.intervals[h - 4..h - 2])?[0].into(),
-                BigInt::one() << g,
-            ),
-        })
+        decode_state(&state, n, t, g)
     }
 }
 
 #[cfg(test)]
 mod tests;
+
+fn decode_report(
+    s: &ResidentSectionRest,
+    n: usize,
+    t: usize,
+    g: u32,
+    linked: bool,
+) -> Result<NativeNormalMaterialReading, ConstitutiveFibreError> {
+    validate_report(s, n, t, linked)?;
+    let layout = NormalLayout::new(n, t).ok_or(ConstitutiveFibreError::Shape)?;
+    let base = layout.report_moments_at;
+    let v = wides(&s.intervals[..base])?;
+    let extra = layout.metadata_at;
+    let scale = BigInt::one() << g;
+    let q = |x: i128| Rat::new(x.into(), scale.clone());
+    let ball = |start: usize, width: usize| NativeFieldCurrentBall {
+        center: v[start..start + width]
+            .chunks_exact(2)
+            .map(|x| ExactComplexWaveCurrent::new(q(x[0]), q(x[1])))
+            .collect(),
+        radius: q(v[start + width]),
+    };
+    let raw = (0..STATISTIC_SCALARS)
+        .map(|i| {
+            integer(&s.intervals[base + MomentWire::WORDS * i..base + MomentWire::WORDS * (i + 1)])
+                .map(|v| Rat::new(v, &scale * &scale))
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(NativeNormalMaterialReading {
+        forward: ball(
+            layout.ball_at(ReportBall::Forward),
+            layout.target_components,
+        ),
+        observed: ball(
+            layout.ball_at(ReportBall::Observed),
+            layout.target_components,
+        ),
+        contemporary_source_forward: linked.then(|| {
+            ball(
+                layout.ball_at(ReportBall::ContemporarySource),
+                layout.target_components,
+            )
+        }),
+        returned_difference: linked.then(|| {
+            ball(
+                layout.ball_at(ReportBall::ReturnedDifference),
+                layout.target_components,
+            )
+        }),
+        chronological_current: linked.then(|| {
+            ball(
+                layout.ball_at(ReportBall::Chronological),
+                layout.target_components,
+            )
+        }),
+        contemporary_difference: linked.then(|| {
+            ball(
+                layout.ball_at(ReportBall::ContemporaryDifference),
+                layout.target_components,
+            )
+        }),
+        source_current: linked.then(|| ball(layout.source_at, layout.source_components)),
+        coefficient_error: q(v[extra]),
+        normal_residual_upper: q(v[extra + 1]),
+        coefficient_norm_upper: q(v[extra + 2]),
+        source_normal_error_upper: q(v[extra + 3]),
+        cross_source_error_upper: q(v[extra + 4]),
+        increments: raw.try_into().map_err(|_| ConstitutiveFibreError::Shape)?,
+    })
+}
+
+fn decode_state(
+    state: &ResidentSectionRest,
+    n: usize,
+    t: usize,
+    g: u32,
+) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
+    let layout = NormalLayout::new(n, t).ok_or(ConstitutiveFibreError::Shape)?;
+    point_section(state, 1, layout.state_words)?;
+    let numeric = wides(&state.intervals[..layout.matrix_words])?;
+    let unit = BigInt::one() << g;
+    if numeric[layout.cross_values] < 0 {
+        return Err(ConstitutiveFibreError::Uncertain);
+    }
+    let m = layout.sources;
+    let h = layout.matrix_words;
+    let b = layout.cross_words_at();
+    let e = layout.scalar_words_at();
+    let scale = BigInt::one() << (2 * g);
+    let q = |at: usize| {
+        integer(&state.intervals[at..at + MomentWire::WORDS]).map(|v| Rat::new(v, scale.clone()))
+    };
+    let matrix = |at: usize,
+                  rows: usize|
+     -> Result<Vec<Vec<ExactComplexWaveCurrent>>, ConstitutiveFibreError> {
+        (0..rows)
+            .map(|i| {
+                (0..m)
+                    .map(|j| {
+                        Ok(ExactComplexWaveCurrent::new(
+                            q(at + MomentWire::COMPLEX_WORDS * (i * m + j))?,
+                            q(at + MomentWire::COMPLEX_WORDS * (i * m + j) + MomentWire::WORDS)?,
+                        ))
+                    })
+                    .collect()
+            })
+            .collect()
+    };
+    Ok(NativeNormalMaterialState {
+        material: NativeFieldMaterialTransportState {
+            coefficients: numeric[..layout.cross_values]
+                .chunks_exact(2 * m)
+                .map(|row| {
+                    row.chunks_exact(2)
+                        .map(|z| {
+                            ExactComplexWaveCurrent::new(
+                                Rat::new(z[0].into(), unit.clone()),
+                                Rat::new(z[1].into(), unit.clone()),
+                            )
+                        })
+                        .collect()
+                })
+                .collect(),
+            radius: Rat::new(numeric[layout.cross_values].into(), unit.clone()),
+        },
+        source_normal: matrix(h, m)?,
+        cross_source: matrix(b, t)?,
+        source_normal_error: q(e)?,
+        cross_source_error: q(e + MomentWire::WORDS)?,
+        target_energy: q(e + 2 * MomentWire::WORDS)?,
+        target_energy_error: q(e + 3 * MomentWire::WORDS)?,
+        normal_residual_upper: Rat::new(
+            wides(&state.intervals[h - 4..h - 2])?[0].into(),
+            BigInt::one() << g,
+        ),
+    })
+}
+
+mod direct;
+pub use direct::{ResidentNormalMaterial, ResidentNormalReturn};

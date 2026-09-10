@@ -166,6 +166,14 @@ conversation material through these generators. Wider incidence and scale change
 own source laws. The earlier projective field remains diagnostic evidence, not the productive
 carrier for resumed conversation cultivation.
 
+[established-bounded; implemented-exact; computational-witness] The [direct normal-response
+attachment](../../research/records/2026-09-10_THE_NORMAL_RESPONSE_ACCEPTS_RESIDENT_CURRENTS_WITHOUT_A_SOURCE_ARCHIVE.md)
+now composes a generated resident current with the existing accumulated normal law. This removes
+the historical-source-handle requirement for that calculation. Continue with section-level
+source intake and resident bounded-current consumption, then the actual conversation exposure;
+do not turn a codec's storage coordinates into native cadence or consume an enclosure's centre
+as an exact current. The existing normal/fibre laws remain local hypotheses with distinct scopes.
+
 [definition] The corrected formal `FiniteLocalCurrentEcology.reaction` retains local
 standing. The [native field assembly and observed return](../../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)
 now return through the existing `OperativeContextual` joint feature and actual field successor.

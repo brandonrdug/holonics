@@ -97,6 +97,15 @@ source comparison changes in native conduct. Merely mapping byte positions to in
 coordinates, copying each source section into a basis, or renaming a token window as conditions
 does not supply that map. Useful prose and complete identification are not prerequisites.
 
+[definition] The accumulated normal-response owner is another existing local construction for
+the source attachment. It retains `H = I + sum x x†`, `B = sum y x†`, target energy and the
+source-family bounds; its numerical operator is judged against the exact normal residual.
+Direct source/observed currents must enter that calculation without requiring field history
+handles. The normal objective distinguishes incompatible observations in a source chart from
+numerical solve error. Its bounded response does not select a unique external cause or silently
+become an exact point-current input. The [parallel normal-geometry return](../../research/records/2026-09-09_MATHEMATICAL_REVIEW_NORMAL_GEOMETRY_AND_CLOSED_RETURNS.md)
+supplies the existing derivation; no new learning theory is needed to expose this port.
+
 ## AC0–AC5 construction order
 
 | Phase | Construction and concrete return |

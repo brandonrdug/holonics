@@ -4,6 +4,12 @@
 **Position:** The byte-cultivation assembly remains retired. AC1–AC2 now have a continuing local-generator neighborhood with shared condition current, atomic observed return and compact evidence persistence. Forty-four resident CUDA tests pass; process-separated continuation matches the complete uninterrupted body and second return. AC0's source reader remains complete. AC3's corrected conversation attachment is next; wider AC4 composition and AC5 product delivery remain unfinished. AC0–AC5 is not complete. No cultivation process is running.
 **Athena-alpha:** not yet attained.
 
+**Active implementation:** AC3 now has a verified direct-current attachment to the existing
+accumulated normal response. Seven normal checks, 45 resident checks and the public facade
+check pass. Section-level source intake, resident consumption of the complete bounded output
+and the actual conversation exposure remain unfinished. Its moments and signed residual
+do not replace the required source/receiver map or establish a completed model.
+
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct
 instruction governs.
@@ -88,6 +94,14 @@ instances. This continuation unifies already-engaged elementary patterns; it cha
 model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction — representation repair
+
+[established-bounded; implemented-exact; computational-witness] The [direct normal-response return](research/records/2026-09-10_THE_NORMAL_RESPONSE_ACCEPTS_RESIDENT_CURRENTS_WITHOUT_A_SOURCE_ARCHIVE.md)
+exposes the existing normal increment/fit through current operands, with no field source handle
+or observation archive. A learned resident generator supplies its input without numeric readout;
+observed return changes later bounded conduct. Conflicting observations keep their fit discrepancy
+separate from solve error, and rational-source bounds remain explicit. The old field and direct
+port share the normal report/state decoder. This supplies a local source attachment, not AC3's
+completed conversation learner. `state_wire` is not yet a restart protocol for this new owner.
 
 [established-bounded; implemented-exact; computational-witness] The [continuing-neighborhood return](research/records/2026-09-10_LOCAL_GENERATORS_SHARE_CONDITION_CURRENT_AND_THE_WHOLE_BODY_RESUMES.md)
 binds existing local laws, actual shared condition current and latest predecessor-law evidence

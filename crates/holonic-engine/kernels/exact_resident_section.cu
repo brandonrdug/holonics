@@ -1641,6 +1641,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "field_linear_material_pullback.cuh"
 #include "field_operative_adjoint.cuh"
 #include "field_normal_material.cuh"
+#include "direct_normal_material.cuh"
 #include "constitutive_field.cuh"
 
 // Candidate finite passive-contact projection.  One block owns one query row and first forms the

@@ -111,6 +111,13 @@ contacts every other Holon. Its rest separates applicable laws, actual current a
 constraint evidence. Wider incidence, scale changes and source attachments retain their own maps;
 the local construction does not replace them with a source archive.
 
+[definition] `ResidentNormalMaterial` attaches the already-derived accumulated normal response
+to resident current operands. It retains exact source geometry and cross-source phase, with
+fit discrepancy separate from numerical solve error. Its reports retain the complete bounded
+response, and its update stages the existing normal calculation before publication. The actual
+source/receiver chart still determines what a supplied observation means; this objective is not
+an authored semantic score or proof that an observed response is a correct answer.
+
 ## Partial conduct and comparison
 
 [definition] Useful restricted behavior can arise before every mechanism learns or every chart

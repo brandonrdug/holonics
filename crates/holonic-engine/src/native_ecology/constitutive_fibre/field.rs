@@ -26,7 +26,7 @@ mod internal_current;
 mod internal_mode;
 mod junction;
 mod material_transport;
-pub(crate) use material_transport::normal::{state_words as normal_material_state_words, workspace_words as normal_material_workspace_words};
+pub(crate) use material_transport::normal::{state_words as normal_material_state_words, report_words as normal_material_report_words, workspace_words as normal_material_workspace_words};
 mod receiver;
 mod rechart;
 mod relation_current;
@@ -68,7 +68,7 @@ pub use material_transport::{
     NativeMaterialModeComponent, NativeMaterialModeDifferential, NativeMaterialModeReading,
     NativeMaterialModeReturn, NativeMaterialModeUnfolding, NativeMaterialTransportSource,
     NativeMaterialTarget,
-    NativeNormalMaterialObjective, NativeNormalMaterialReading, NativeNormalMaterialState, NativeMomentMaterialReading, NativeContextualMaterialReading, NativeOperativeContextReading, NativeVisibleSourceReading,
+    NativeNormalMaterialObjective, NativeNormalMaterialReading, NativeNormalMaterialState, ResidentNormalMaterial, ResidentNormalReturn, NativeMomentMaterialReading, NativeContextualMaterialReading, NativeOperativeContextReading, NativeVisibleSourceReading,
 };
 pub use receiver::{NativeFieldDifferentialReading, NativeNormalizedMaterialReading, NativeNormalizedMaterialReturn,
     NativeMaterialPacketReading, NativePacketQuadrature, NativeMaterialActuation,
