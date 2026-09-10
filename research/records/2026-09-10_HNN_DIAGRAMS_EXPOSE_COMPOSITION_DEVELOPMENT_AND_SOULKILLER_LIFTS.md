@@ -137,3 +137,10 @@ explicit grid to keep their two paths legible. The preview apparatus remains pri
 `.local/scratch/hnn-diagram-preview/`. No Rust or Lean source was changed; no Cargo,
 CUDA or Lean execution result is claimed. The previous turn's exterior map witnesses remain
 available in its linked record and were not rerun without a new question.
+
+[established-bounded; process-audit] Brandon's follow-up replaces the Markdown presentation with
+five [Typst/Fletcher plates](../papers/rendered/hnn-information-chemistry.pdf), compiled with Typst
+0.15.1 and visually checked page by page. The compact [source](../papers/source/papers/hnn-information-chemistry/main.typ)
+and geometric figures retain the layer equations, Information Chemistry interpretation and explicit
+16-by-16 lattice-mode receiver. The longer guide insertion was replaced by its visual link; the
+derivations above and their Git history remain preserved. No runtime or formal source changed.

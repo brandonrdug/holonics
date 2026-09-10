@@ -5,7 +5,7 @@ from a foreign realization under a declared family of exposures. Its output is m
 can compose into Athena. It is broader in purpose than model-file conversion or one Transformer
 family; the implementation support for each step is stated separately below.
 
-[definition] The [expanded lift diagram](HNN_COMPOSITION.md#soulkiller-lifts-the-expanded-operations)
+[definition] The [expanded lift diagram](HNN_COMPOSITION.md#the-architecture-as-explicit-passages)
 shows how source contractions, joint interactions, nonlinear reactions and shared state map to
 native passages before excitation-founded restriction. Its complete-state commuting square
 distinguishes re-expression, receiver-relative reduction and approximation; source-model equivalence

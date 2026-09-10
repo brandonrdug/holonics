@@ -10,3 +10,7 @@ The mathematical spine begins at `source/synopsis/README.md`, `source/holonics/r
 boundaries. Rendered appearance is presentation testimony, not proof.
 
 See `source/README.md` for build commands and paper-by-paper descriptions.
+
+- [HNN / Information Chemistry](rendered/hnn-information-chemistry.pdf): five visual plates in
+  [Typst with Fletcher](source/papers/hnn-information-chemistry/main.typ), covering architecture,
+  layer maps, geometric strata, composition and source-model lifts.
