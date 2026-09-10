@@ -31,6 +31,12 @@ finite tolerance from exact invisibility and topology change from loss of smooth
 
 ## September 9 mathematical architecture review
 
+[established-bounded; source-inspected; computational-witness] The September 10
+[DeepSeek V4.1 study](research/records/2026-09-10_DEEPSEEK_V41_SEPARATES_SHARED_STANDING_CONTACT_AND_CONTEXTUAL_TRANSFORMATION.md)
+maps shared material, current contact and fresh response to existing HNN owners. Exact exterior
+witnesses expose the local source stencil's loss of larger ordering and separate present agreement
+from future agreement. This is an architecture review; native implementation and AC order are unchanged.
+
 [proved-derived; formal-checked] The [normal-geometry and closed-return review](research/records/2026-09-09_MATHEMATICAL_REVIEW_NORMAL_GEOMETRY_AND_CLOSED_RETURNS.md)
 returns a residual-aware rank-one normal identity, exact finite source/target changes and complex
 square completion. These distinguish solve error, declared fit limits and the producing numerical

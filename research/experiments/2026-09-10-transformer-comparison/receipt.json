@@ -1,0 +1,121 @@
+{
+  "scope": "exact exterior map witnesses; no native execution or model-quality claim",
+  "local_stencil_collision": {
+    "words": [
+      "000100",
+      "001000"
+    ],
+    "trigram_population": {
+      "000": 1,
+      "001": 1,
+      "010": 1,
+      "100": 1
+    },
+    "same_normal_geometry_energy_count_seed": true,
+    "separating_exterior_third_symbols": [
+      "0",
+      "1"
+    ],
+    "normal_signature": {
+      "H": [
+        [
+          3,
+          -2,
+          1,
+          -1,
+          -1,
+          1
+        ],
+        [
+          -2,
+          3,
+          -1,
+          1,
+          1,
+          -1
+        ],
+        [
+          1,
+          -1,
+          4,
+          0,
+          2,
+          1
+        ],
+        [
+          -1,
+          1,
+          0,
+          2,
+          1,
+          0
+        ],
+        [
+          -1,
+          1,
+          2,
+          1,
+          4,
+          0
+        ],
+        [
+          1,
+          -1,
+          1,
+          0,
+          0,
+          2
+        ]
+      ],
+      "B": [
+        [
+          -1,
+          1,
+          -1,
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          -1,
+          1,
+          -1,
+          0,
+          0
+        ]
+      ],
+      "target_energy": 4,
+      "observations": 4,
+      "seed": [
+        [
+          1,
+          0
+        ],
+        [
+          1,
+          0
+        ]
+      ]
+    }
+  },
+  "same_standing_and_support_new_response": [
+    "-1/2",
+    "1/2"
+  ],
+  "finite_attention_difference": {
+    "value_term": "9/4",
+    "contact_term": "1",
+    "complete_difference": "13/4"
+  },
+  "present_receiver_is_not_future_receiver": {
+    "present": [
+      0,
+      0
+    ],
+    "after_swap": [
+      0,
+      1
+    ]
+  }
+}

@@ -6,6 +6,13 @@ mathematical assembly and its actual owners. It is not a new runtime or a propos
 `Holon` wrapper around unrelated implementations. The [deep review](../research/records/2026-09-09_ARCHITECTURE_CHARTS_REQUIRE_COMPOSED_MECHANISMS_AND_FINITE_CONSTRUCTION_RETURNS.md)
 retains direct-message provenance, architecture comparisons and the repaired formal reaction.
 
+[interpretation] The [DeepSeek V4.1 comparison](../research/records/2026-09-10_DEEPSEEK_V41_SEPARATES_SHARED_STANDING_CONTACT_AND_CONTEXTUAL_TRANSFORMATION.md)
+separates reusable material, current interaction and fresh response, and maps them to these
+existing owners. Its exact local-stencil collision identifies a limit of the current conversation
+source chart; its finite attention difference separates changes to transported values from changes
+to their participation. This informs the existing contextual attachment work without changing AC
+order or installing a DeepSeek architecture.
+
 ## The assembly has several distinct roles
 
 | Role | Carried relation | Existing owner and implementation boundary |
