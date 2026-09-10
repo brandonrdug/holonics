@@ -148,6 +148,14 @@ attachment in `holonics-hna::native::section_input` uses the existing exterior `
 The public `conversation_difference_field` example calls these native owners directly. Its
 published source run is a local normal-response construction, not a completed generative ecology.
 
+[definition] `normal/direct/wave.rs` owns the fixed difference-generator word and its actual
+current joins; `normal_wave.cuh` compiles the source-plane action and bounds its composed powers.
+`surface_normal_wave.rs` records the resident passages. `normal/direct/rest.rs` and
+`wave/rest.rs` own complete normal material and generator/seed/word persistence.
+`inertia/source_energy.rs` checks positive source geometry, source-kernel compatibility and
+target energy by fraction-free Schur elimination. `normal/direct/refine.rs` and the normal
+kernel refine numerical realization without changing exact moments or source-family bounds.
+
 [historical] The SDK field/model wrapper, text adapters and eight alpha examples were
 [retired recoverably](../archive/implementations/2026-09-09-byte-field-cultivation/README.md).
 Core field/operative/receiver owners below remain mathematical and diagnostic constructions;

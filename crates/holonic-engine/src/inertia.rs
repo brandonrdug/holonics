@@ -95,6 +95,8 @@ use thiserror::Error;
 use crate::exact_linear::{ExactLinearError, ExactRatMatrix};
 use crate::exact_work::ExactWork;
 use crate::rebase_invariants::IntegerMatrix;
+mod source_energy;
+pub use source_energy::{positive_source_energy, PositiveSourceEnergy, SourceEnergyError};
 
 // -------------------------------------------------------------------------------------------
 // the form

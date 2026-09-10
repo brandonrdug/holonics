@@ -1,0 +1,307 @@
+//! A fixed normal generator on the admitted difference/comparand source plane.
+//! The continuing state is a generator word with its original seed, resident power cache and
+//! certified remainder. Current faces are observations of that state, not its history archive.
+use super::*;
+mod rest;
+pub use rest::NormalWaveRest;
+
+struct WaveCurrent<'c> {
+    section: ResidentSection<'c>,
+    at: Option<u64>,
+}
+/// A shareable immutable current occurrence. Equality of coordinates is not this identity.
+pub struct NormalWaveCurrent<'c> {
+    inner: Rc<WaveCurrent<'c>>,
+    surface: &'c ResidentSurface<'c>,
+    width: usize,
+    grain: ResidentGrain,
+}
+impl<'c> NormalWaveCurrent<'c> {
+    pub fn snapshot(&self) -> Self {
+        Self {
+            inner: Rc::clone(&self.inner),
+            surface: self.surface,
+            width: self.width,
+            grain: self.grain,
+        }
+    }
+    pub fn same_occurrence(&self, other: &Self) -> bool {
+        Rc::ptr_eq(&self.inner, &other.inner)
+    }
+    /// None is the initial previous current; Some(k) is this generator's current at k.
+    pub fn at(&self) -> Option<u64> {
+        self.inner.at
+    }
+    pub fn view(&self) -> ResidentNormalEnclosureView<'_, 'c> {
+        ResidentNormalEnclosureView {
+            surface: self.surface,
+            section: &self.inner.section,
+            offset: 0,
+            width: self.width,
+            grain: self.grain,
+        }
+    }
+}
+
+/// The implicit joint family is the repeated same normal-law action on the original rational
+/// pair. Its source chart and shared material are retained; no inverse of a source history is used.
+pub struct NormalWaveFibre<'c> {
+    material: Rc<ResidentSection<'c>>,
+    seed: Rc<ResidentSection<'c>>,
+    surface: &'c ResidentSurface<'c>,
+    roots: usize,
+    grain: ResidentGrain,
+    pub material_observations: u64,
+    pub steps: u64,
+}
+impl<'c> NormalWaveFibre<'c> {
+    pub fn initial(&self) -> ResidentConstitutiveSection<'_, 'c> {
+        ResidentConstitutiveSection::rationals(&self.seed).expect("completed wave seed")
+    }
+    pub fn inspect_material(&self) -> Result<NativeNormalMaterialState, ConstitutiveFibreError> {
+        decode_state(
+            &self.surface.detach_section(&self.material, i64::BITS)?,
+            self.roots,
+            self.roots,
+            self.grain.0,
+        )
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct NormalWaveReading {
+    pub steps: u64,
+    pub maximum_computed_power_norm: Rat,
+    pub uniform_power_equation_defect: Rat,
+    pub operator_word_error: Rat,
+    pub joint_current: NativeFieldCurrentBall,
+}
+pub struct NormalWaveStep<'c> {
+    pub previous: NormalWaveCurrent<'c>,
+    pub current: NormalWaveCurrent<'c>,
+    pub fibre: NormalWaveFibre<'c>,
+    joint: ResidentSection<'c>,
+    metadata: Rc<ResidentSection<'c>>,
+}
+impl NormalWaveStep<'_> {
+    pub fn inspect(&self) -> Result<NormalWaveReading, ConstitutiveFibreError> {
+        let surface = self.current.surface;
+        let meta = wides(&surface.read_out(&self.metadata)?)?;
+        let scale = BigInt::one() << self.current.grain.0;
+        let joint = ResidentNormalEnclosureView {
+            surface,
+            section: &self.joint,
+            offset: 0,
+            width: 2 * self.current.width,
+            grain: self.current.grain,
+        }
+        .inspect()?;
+        Ok(NormalWaveReading {
+            steps: self.fibre.steps,
+            maximum_computed_power_norm: Rat::from_integer(meta[0].into()),
+            uniform_power_equation_defect: Rat::new(meta[1].into(), scale.clone()),
+            operator_word_error: Rat::new(meta[2].into(), scale),
+            joint_current: joint,
+        })
+    }
+}
+
+pub struct NormalWaveSeedRefusal<'c> {
+    pub material: ResidentNormalMaterial<'c>,
+    pub reason: ConstitutiveFibreError,
+}
+impl std::fmt::Debug for NormalWaveSeedRefusal<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.reason.fmt(f)
+    }
+}
+
+pub struct ResidentNormalWave<'c> {
+    material: ResidentNormalMaterial<'c>,
+    seed: Rc<ResidentSection<'c>>,
+    seed_bound: ResidentSection<'c>,
+    power: ResidentSection<'c>,
+    metadata: Rc<ResidentSection<'c>>,
+    previous: NormalWaveCurrent<'c>,
+    current: NormalWaveCurrent<'c>,
+    steps: u64,
+}
+impl<'c> ResidentNormalMaterial<'c> {
+    /// Declare the binding R(c-p,c,p) as a change in c's receiver chart. Matching dimensions
+    /// alone does not establish that application-level chart; the caller supplies this binding.
+    /// The learned material moves into the generator and remains fixed during its word.
+    pub fn into_difference_wave(
+        self,
+        previous: ResidentConstitutiveCurrent<'_, 'c>,
+        current: ResidentConstitutiveCurrent<'_, 'c>,
+    ) -> Result<ResidentNormalWave<'c>, NormalWaveSeedRefusal<'c>> {
+        let staged = (|| -> Result<_, ConstitutiveFibreError> {
+            if self.roots != self.targets
+                || previous.width != 2 * self.roots
+                || current.width != previous.width
+            {
+                return Err(ConstitutiveFibreError::Shape);
+            }
+            let s = self.surface;
+            let r = previous.width;
+            let d = 2 * self.roots;
+            let fresh = |width| s.fresh_section(1, width, ResidentGrain(0));
+            let seed = s.fresh_section(2, r + 1, ResidentGrain(0))?;
+            let seed_bound = fresh(2 * (2 * r + 1))?;
+            let p = fresh(2 * (r + 1))?;
+            let c = fresh(2 * (r + 1))?;
+            let power = fresh(4 * d * d)?;
+            let metadata = fresh(8)?;
+            let mut passage = s.begin_passage(&[vec![]])?;
+            {
+                let lane = passage.open(0, &[])?;
+                s.record_normal_wave_seed(
+                    &lane,
+                    previous,
+                    current,
+                    self.roots,
+                    self.grain.0,
+                    &seed,
+                    &seed_bound,
+                    &p,
+                    &c,
+                    &power,
+                    &metadata,
+                )?;
+            }
+            passage.close(0, &seed_bound, i64::BITS)?;
+            let returned = passage.finish()?.launch()?;
+            if !returned.obstruction.is_empty() {
+                return Err(ConstitutiveFibreError::Arithmetic(format!(
+                    "wave seed: {:?}",
+                    returned.obstruction
+                )));
+            }
+            let wrap = |section, at| NormalWaveCurrent {
+                inner: Rc::new(WaveCurrent { section, at }),
+                surface: s,
+                width: r,
+                grain: self.grain,
+            };
+            let previous = wrap(p, None);
+            let current = wrap(c, Some(0));
+            Ok((seed, seed_bound, power, metadata, previous, current))
+        })();
+        match staged {
+            Ok((seed, seed_bound, power, metadata, previous, current)) => Ok(ResidentNormalWave {
+                material: self,
+                seed: Rc::new(seed),
+                seed_bound,
+                power,
+                metadata: Rc::new(metadata),
+                previous,
+                current,
+                steps: 0,
+            }),
+            Err(reason) => Err(NormalWaveSeedRefusal {
+                material: self,
+                reason,
+            }),
+        }
+    }
+}
+impl<'c> ResidentNormalWave<'c> {
+    pub fn steps(&self) -> u64 {
+        self.steps
+    }
+    pub fn previous(&self) -> &NormalWaveCurrent<'c> {
+        &self.previous
+    }
+    pub fn current(&self) -> &NormalWaveCurrent<'c> {
+        &self.current
+    }
+    pub fn fibre(&self) -> NormalWaveFibre<'c> {
+        NormalWaveFibre {
+            material: Rc::clone(&self.material.state),
+            seed: Rc::clone(&self.seed),
+            surface: self.material.surface,
+            roots: self.material.roots,
+            grain: self.material.grain,
+            material_observations: self.material.observations,
+            steps: self.steps,
+        }
+    }
+    pub fn advance(&mut self) -> Result<NormalWaveStep<'c>, ConstitutiveFibreError> {
+        let steps = self
+            .steps
+            .checked_add(1)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let s = self.material.surface;
+        let n = self.material.roots;
+        let d = 2 * n;
+        let r = 2 * n;
+        let fresh = |width| s.fresh_section(1, width, ResidentGrain(0));
+        let power = fresh(4 * d * d)?;
+        let metadata = fresh(8)?;
+        let joint = fresh(2 * (2 * r + 1))?;
+        let current = fresh(2 * (r + 1))?;
+        let work = fresh(6 * d)?;
+        let mut passage = s.begin_passage(&[vec![], vec![0]])?;
+        {
+            let lane = passage.open(0, &[])?;
+            s.record_normal_wave_power(
+                &lane,
+                &self.material.state,
+                &self.power,
+                n,
+                self.material.grain.0,
+                &power,
+            )?;
+        }
+        passage.close(0, &power, i64::BITS)?;
+        {
+            let lane = passage.open(1, &[0])?;
+            s.record_normal_wave_evaluate(
+                &lane,
+                &self.material.state,
+                &power,
+                &self.seed_bound,
+                &self.metadata,
+                n,
+                self.material.grain.0,
+                steps,
+                &metadata,
+                &joint,
+                &current,
+                &work,
+            )?;
+        }
+        passage.close(1, &joint, i64::BITS)?;
+        let returned = passage.finish()?.launch()?;
+        if !returned.obstruction.is_empty() {
+            return Err(ConstitutiveFibreError::Arithmetic(format!(
+                "wave continuation: {:?}",
+                returned.obstruction
+            )));
+        }
+        let current = NormalWaveCurrent {
+            inner: Rc::new(WaveCurrent {
+                section: current,
+                at: Some(steps),
+            }),
+            surface: s,
+            width: r,
+            grain: self.material.grain,
+        };
+        let previous = std::mem::replace(&mut self.current, current);
+        self.previous = previous;
+        self.power = power;
+        self.metadata = Rc::new(metadata);
+        self.steps = steps;
+        Ok(NormalWaveStep {
+            previous: self.previous.snapshot(),
+            current: self.current.snapshot(),
+            fibre: self.fibre(),
+            joint,
+            metadata: Rc::clone(&self.metadata),
+        })
+    }
+}
+
+#[cfg(test)]
+mod tests;

@@ -115,6 +115,27 @@ __device__ void normal_increment(int64_t *stats,const wide *x,const wide *y,cons
     __syncthreads();
 }
 
+// Refine only the numerical realization. Every exact moment and family bound retains
+// its exact value; the same normal solver recomputes its proposal at the finer dyadic grain.
+extern "C" __global__ __launch_bounds__(512) void section_normal_refine(
+    const int64_t *old,uint32_t n,uint32_t targets,uint32_t old_grain,uint32_t grain,
+    int64_t *next,int64_t *next_hi,int64_t *workspace,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    if(blockIdx.x)return;if(upstream_refused(census,lineage,lineage_count,slot))return;
+    if(grain<=old_grain||grain>120){atomicOr(slot,REFUSED_MALFORMED);return;}
+    size_t matrix_words=normal_matrix_words(n,targets),state_words=normal_state_words(n,targets);
+    for(size_t i=threadIdx.x;i<matrix_words;i+=blockDim.x)next[i]=0;
+    MomentInteger scale=moment_lift(complete_power(2u*(grain-old_grain),slot));
+    for(size_t i=threadIdx.x;i<normal_stat_values(n,targets);i+=blockDim.x){
+        MomentInteger value=normal_read(old+matrix_words+MOMENT_WIRE_WORDS*i,slot)*scale;
+        operative_write_moment(value,next+matrix_words+MOMENT_WIRE_WORDS*i,next+matrix_words+MOMENT_WIRE_WORDS*i,slot);
+    }
+    __syncthreads();if(*slot)return;
+    normal_fit(next,n,targets,grain,workspace,nullptr,slot);
+    __syncthreads();if(*slot)return;
+    for(size_t i=threadIdx.x;i<state_words;i+=blockDim.x)next_hi[i]=next[i];
+}
+
 // One observation's bounded source/target geometry, shared by field and direct section intake.
 // Called by one thread; the enclosing passage supplies synchronization and publication.
 __device__ void normal_observation_frame(const wide *origin_current,const int64_t *incoming,

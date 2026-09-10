@@ -172,11 +172,13 @@ now composes a generated resident current with the existing accumulated normal l
 the historical-source-handle requirement for that calculation. Section-level source intake and
 resident bounded-current consumption have now returned through the
 [conversation difference fields](../../research/records/2026-09-10_CONVERSATION_DIFFERENCE_FIELDS_REACH_THE_NATIVE_RESPONSE_WITHOUT_A_SOURCE_ARCHIVE.md).
-Continue into the shared generative state: for z=(p,c), form S(z)=(c-p,c,p), apply the learned
-difference response R, and retain z'=(c,c+R(S(z))). Preserve the actual joining current, full
-bounded/joint conduct and the source-plane restriction. Then extend the surrounding ecology,
-source continuation and normal-state restart. Do not turn codec storage coordinates into native
-cadence or consume an enclosure's centre as an exact current. Local adjacency is not all context.
+The [operator-word return](../../research/records/2026-09-10_THE_DIFFERENCE_GENERATOR_KEEPS_ITS_JOIN_AND_RESTS_AS_AN_OPERATOR_WORD.md)
+now implements the local generative state z=(p,c), source S(z)=(c-p,c,p), and successor
+z'=(c,c+R(S(z))), retaining the actual join and a bound for the whole generator word.
+Normal material and generator/seed/word restart are available. Continue into the surrounding
+changing ecology, contextual source currents and broader source continuation; one fixed local
+word is not that entire construction. Do not turn codec storage coordinates into native cadence
+or consume an enclosure's centre as an exact current. Local adjacency is not all context.
 
 [definition] The corrected formal `FiniteLocalCurrentEcology.reaction` retains local
 standing. The [native field assembly and observed return](../../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)

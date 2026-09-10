@@ -80,7 +80,8 @@ numerical witness, without field history handles or an observation archive.
 
 [definition] `ResidentNormalReturn` keeps its actual borrowed operands and complete bounded
 before/after response. A numerical centre is not a point-current output. `inspect` reuses the
-normal geometry/objective decoder; `state_wire` is boundary data, not yet a restart protocol.
+normal geometry/objective decoder; `state_wire` is raw boundary data and `NormalMaterialRest`
+is the validated restart chart.
 The [direct-port return](../research/records/2026-09-10_THE_NORMAL_RESPONSE_ACCEPTS_RESIDENT_CURRENTS_WITHOUT_A_SOURCE_ARCHIVE.md)
 records phase, fit/solve separation, source-family and native-generator composition evidence.
 
@@ -94,6 +95,25 @@ method returns `ResidentDifferenceSection`, with the original field and the exac
 difference/comparand and observed-difference sections. `receive_section` integrates the supplied
 observations and fits once, returning the two response fields and actual immutable operator cuts.
 These row coordinates are not native identity or a clock, and the source fields are not model history.
+
+## Fixed difference generators and rest
+
+[definition] `ResidentNormalMaterial::into_difference_wave` binds the normal response to the
+declared source plane `(c-p,c,p)` and returns `(c,c+R(c-p,c,p))`. `ResidentNormalWave` owns the
+fixed material, exact initial conditions and current operator word. The next previous current
+shares the actual old current occurrence. An observed equality of coordinates cannot supply
+that join. Seed refusal returns its material owner; later refusal preserves the current successor.
+
+[definition] `NormalWaveFibre` retains the source generator and initial conditions. Its resident
+power cache carries a complete operator-word error bound; generated joint currents are evaluated
+from the seed rather than from a history of rounded current faces. `NormalWaveRest` stores the
+material, seed and word and has an executable decoder without conversation-source access.
+The generator's material remains fixed during this word; this is not the whole changing ecology.
+
+[definition] `NormalMaterialRest` checks the source Gram, cross-source kernel and compatible
+target energy with `inertia::positive_source_energy`, and checks the actual numerical witness.
+`refine_realization` changes only the numerical grain and recomputes that witness from unchanged
+exact moments and source-family bounds. Source uncertainty is not erased by refinement.
 
 ## Conversation source
 

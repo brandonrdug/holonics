@@ -3,11 +3,17 @@
 //! needed to develop or query this local material; exact moments own its continuing geometry.
 use super::*;
 use std::rc::Rc;
+mod rest;
+pub use rest::NormalMaterialRest;
+mod refine;
+pub use refine::NormalRealizationRefinement;
 
 mod enclosure;
 pub use enclosure::{ResidentNormalEnclosure, ResidentNormalEnclosureView, ResidentNormalInput};
 mod section;
 pub use section::ResidentNormalSectionReturn;
+mod wave;
+pub use wave::{ResidentNormalWave, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal};
 
 pub struct ResidentNormalMaterial<'c> {
     surface: &'c ResidentSurface<'c>,

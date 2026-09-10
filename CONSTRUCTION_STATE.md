@@ -1,14 +1,16 @@
 # Construction state
 
 **Currency:** September 10, 2026. **Priority:** Corrected AC0–AC5 construction is the active goal. Native HNN cultivation uses Holons as situated state, incidence, transported differences and compatible continuations; text/audio/visual media are exterior measurement charts.
-**Position:** The byte-cultivation assembly remains retired. AC3's first source-field attachment has processed 16 curated conversation frames through the existing normal response, with 4,963 local comparisons and fixed learned-state residency. Native bounded continuation and whole-section returns are verified. The continuing generative state, cross-message ecology and broader AC4–AC5 delivery remain unfinished. AC0–AC5 is not complete. No cultivation process is running.
+**Position:** The byte-cultivation assembly remains retired. The 16-frame source model now has a fixed difference-generator word with actual current joins, bounded joint emission, normal-material rest and executable generator restart. Numerical refinement preserves its exact source geometry. Cross-message ecology, changing material during generation and broader cultivation remain unfinished. AC0–AC5 is not complete. No cultivation process is running.
 **Athena-alpha:** not yet attained.
 
-**Active implementation:** The source map is explicitly local: difference plus its current/previous
-comparands predicts the next observed difference. Twelve normal checks, two codec checks and
-45 resident checks pass. Continue with joined generative state `(p,c) -> (c,c+R(c-p,c,p))`,
-preserving full bounded conduct and the actual joining current. The source-field result is not
-general semantic context. The new normal owner's state data still lacks a standalone restart protocol.
+**Active implementation:** The local join `(p,c) -> (c,c+R(c-p,c,p))` now returns through a
+generator/seed/word representation with fixed residency. Nineteen normal checks pass, including
+restart and source-preserving numerical refinement. The corpus model's grain-32 joint bounds
+were too broad to interpret from their centres; grain 64 preserves the source moments and sharply
+reduces the numerical remainder. Independent-process corpus continuation returns identical
+complete rest files and joint-current readings; all sixteen refined radii are below `1/10^7`.
+This fixed local generator does not supply the wider changing/contextual ecology by itself.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct
@@ -94,6 +96,14 @@ instances. This continuation unifies already-engaged elementary patterns; it cha
 model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction — representation repair
+
+[established-bounded; implemented-exact; computational-witness] The [operator-word and rest return](research/records/2026-09-10_THE_DIFFERENCE_GENERATOR_KEEPS_ITS_JOIN_AND_RESTS_AS_AN_OPERATOR_WORD.md)
+retains the original rational seed and normal material, compiles the source-plane action, and
+propagates a residual bound for the complete generator word. The actual old current becomes
+the next previous current. Normal rest validates compatible source geometry and its numerical
+witness without replaying observations; wave rest decodes the word and reproduces its next
+return. Exact source-energy validation uses the shared fraction-free inertia owner. Numerical
+refinement changes no observations, moments or source-family uncertainty.
 
 [established-bounded; implemented-exact; measured] The [conversation difference-field return](research/records/2026-09-10_CONVERSATION_DIFFERENCE_FIELDS_REACH_THE_NATIVE_RESPONSE_WITHOUT_A_SOURCE_ARCHIVE.md)
 supplies native whole-section integration, addressed current rows, bounded-output continuation

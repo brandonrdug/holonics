@@ -1,0 +1,162 @@
+{
+  "schema": "holonics.normal-wave-process-comparison.v1",
+  "source_model_observations": 4963,
+  "source_coordinates": 74,
+  "grain": 64,
+  "excitation": {
+    "previous": "zero current",
+    "current": "unit source coordinate 0"
+  },
+  "first_word": 0,
+  "last_word": 16,
+  "resident_octets": 40328544,
+  "rest_octets": 19453948,
+  "complete_rest_equal_after_resume": true,
+  "complete_return_equal_after_resume": true,
+  "source_access_during_generation": false,
+  "numerical_readouts_in_generation_passages": 0,
+  "generation_seconds_range": [
+    0.010034982,
+    0.011195853
+  ],
+  "refinement": {
+    "after_grain": 64,
+    "before_grain": 32,
+    "coefficient_error_after": "20390345/9223372036854775808",
+    "coefficient_error_before": "40897509/4294967296",
+    "mode": "refine",
+    "observations": 4963,
+    "source_geometry_unchanged": true
+  },
+  "trajectory_receivers": [
+    {
+      "word": 1,
+      "joint_radius": "163122797/144115188075855872",
+      "current_sum_real": "9223372036854771055/9223372036854775808",
+      "current_squared_norm": "94198362259422455472911347629700960565/170141183460469231731687303715884105728",
+      "power_norm_bound": "16",
+      "operator_word_error": "163122797/144115188075855872"
+    },
+    {
+      "word": 2,
+      "joint_radius": "2609964753/1152921504606846976",
+      "current_sum_real": "288230376151711599/288230376151711744",
+      "current_squared_norm": "39623811758763268787567776085863327933/170141183460469231731687303715884105728",
+      "power_norm_bound": "16",
+      "operator_word_error": "2609964753/1152921504606846976"
+    },
+    {
+      "word": 3,
+      "joint_radius": "1957473565/576460752303423488",
+      "current_sum_real": "18446744073709541895/18446744073709551616",
+      "current_squared_norm": "22435720782487882028342456729835311599/340282366920938463463374607431768211456",
+      "power_norm_bound": "16",
+      "operator_word_error": "1957473565/576460752303423488"
+    },
+    {
+      "word": 4,
+      "joint_radius": "5219929507/1152921504606846976",
+      "current_sum_real": "18446744073709542745/18446744073709551616",
+      "current_squared_norm": "12831736882973784901271517352310664457/340282366920938463463374607431768211456",
+      "power_norm_bound": "16",
+      "operator_word_error": "5219929507/1152921504606846976"
+    },
+    {
+      "word": 5,
+      "joint_radius": "1631227971/288230376151711744",
+      "current_sum_real": "144115188075855803/144115188075855872",
+      "current_squared_norm": "7713768730776354270381332771129435919/170141183460469231731687303715884105728",
+      "power_norm_bound": "16",
+      "operator_word_error": "1631227971/288230376151711744"
+    },
+    {
+      "word": 6,
+      "joint_radius": "7829894261/1152921504606846976",
+      "current_sum_real": "18446744073709542307/18446744073709551616",
+      "current_squared_norm": "17777409573798963493555727162884986919/340282366920938463463374607431768211456",
+      "power_norm_bound": "16",
+      "operator_word_error": "7829894261/1152921504606846976"
+    },
+    {
+      "word": 7,
+      "joint_radius": "9134876639/1152921504606846976",
+      "current_sum_real": "9223372036854771077/9223372036854775808",
+      "current_squared_norm": "932931239594376420860020410114943955/21267647932558653966460912964485513216",
+      "power_norm_bound": "16",
+      "operator_word_error": "9134876639/1152921504606846976"
+    },
+    {
+      "word": 8,
+      "joint_radius": "1304982377/144115188075855872",
+      "current_sum_real": "18446744073709542111/18446744073709551616",
+      "current_squared_norm": "15488737812023569165600759488410551191/340282366920938463463374607431768211456",
+      "power_norm_bound": "16",
+      "operator_word_error": "1304982377/144115188075855872"
+    },
+    {
+      "word": 9,
+      "joint_radius": "11744841393/1152921504606846976",
+      "current_sum_real": "18446744073709541999/18446744073709551616",
+      "current_squared_norm": "15840687761114548979605339122216467965/340282366920938463463374607431768211456",
+      "power_norm_bound": "16",
+      "operator_word_error": "11744841393/1152921504606846976"
+    },
+    {
+      "word": 10,
+      "joint_radius": "13049823771/1152921504606846976",
+      "current_sum_real": "18446744073709541875/18446744073709551616",
+      "current_squared_norm": "16240581161760110815747447580882149859/340282366920938463463374607431768211456",
+      "power_norm_bound": "16",
+      "operator_word_error": "13049823771/1152921504606846976"
+    },
+    {
+      "word": 11,
+      "joint_radius": "14354806149/1152921504606846976",
+      "current_sum_real": "2305843009213692721/2305843009213693952",
+      "current_squared_norm": "4055308580551404206511380451094084455/85070591730234615865843651857942052864",
+      "power_norm_bound": "16",
+      "operator_word_error": "14354806149/1152921504606846976"
+    },
+    {
+      "word": 12,
+      "joint_radius": "7829894263/576460752303423488",
+      "current_sum_real": "4611686018427385417/4611686018427387904",
+      "current_squared_norm": "8123022814328677233883551898460252401/170141183460469231731687303715884105728",
+      "power_norm_bound": "16",
+      "operator_word_error": "7829894263/576460752303423488"
+    },
+    {
+      "word": 13,
+      "joint_radius": "2120596363/144115188075855872",
+      "current_sum_real": "288230376151711587/288230376151711744",
+      "current_squared_norm": "8201674911387376170477629225436111305/170141183460469231731687303715884105728",
+      "power_norm_bound": "16",
+      "operator_word_error": "2120596363/144115188075855872"
+    },
+    {
+      "word": 14,
+      "joint_radius": "9134876641/576460752303423488",
+      "current_sum_real": "18446744073709541461/18446744073709551616",
+      "current_squared_norm": "16571015875741158003772529058538032465/340282366920938463463374607431768211456",
+      "power_norm_bound": "16",
+      "operator_word_error": "9134876641/576460752303423488"
+    },
+    {
+      "word": 15,
+      "joint_radius": "19574735661/1152921504606846976",
+      "current_sum_real": "9223372036854770677/9223372036854775808",
+      "current_squared_norm": "8317801591476005488404870570812963323/170141183460469231731687303715884105728",
+      "power_norm_bound": "16",
+      "operator_word_error": "19574735661/1152921504606846976"
+    },
+    {
+      "word": 16,
+      "joint_radius": "10439859019/576460752303423488",
+      "current_sum_real": "4611686018427385313/4611686018427387904",
+      "current_squared_norm": "4177761843563331402165426384596282549/85070591730234615865843651857942052864",
+      "power_norm_bound": "16",
+      "operator_word_error": "10439859019/576460752303423488"
+    }
+  ],
+  "scope": "Fixed learned difference generator; no cross-message or language-attainment claim."
+}
