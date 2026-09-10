@@ -109,6 +109,19 @@ owners add no native learner or physical identity outside their stated hypothese
 
 ## Foundation and transport
 
+[definition] `holonics-hna::native::field` owns the medium-neutral field recipe and callback;
+its `checkpoint` module owns `NativeSavedField` on the existing field wire. The engine's
+`field/junction/operative/response/observation.rs` owns observed-return orchestration. Text
+adapters delegate these operations and retain their exterior cursor/delivery state separately.
+The [Rust guide](RUST_FRAMEWORK.md) links the compiled invocation and persistence boundary.
+
+[definition] Contextual execution stages reside in `kernels/field_contextual_material.cuh`:
+independent historical weight rows and receiver coordinates follow the prepared current profile.
+`section_constitutive_field_context_finish` in `constitutive_field.cuh` completes bounds and
+commits the field once. `resident_section/surface_passage.rs` records all stages in one ordered
+device passage; `field/material_transport/contextual.rs::ContextualWork` retains their scratch.
+These are execution owners for the same source-qualified joint operation, not a second ecology.
+
 [definition] **Preimage Fibre** is the governing term for compatible-source families. Some older
 source symbols retain reconstruction names; those names do not require an inverse or raw-state
 archive for learning. The [September 7 synthesis](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)

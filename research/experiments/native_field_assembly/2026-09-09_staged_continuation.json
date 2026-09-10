@@ -1,0 +1,150 @@
+{
+  "grade": "established-bounded",
+  "evidence": [
+    "implemented-exact",
+    "computational-witness",
+    "measured"
+  ],
+  "scope": "Existing 16-family checkpoint resumed in a fresh process without opening the exposure stream. Complete reported body and all reported emitted-current/generation data agree; this is not equality of every unreported historical section. Timings compare the original development/checkpoint workflow with a fresh-process remount, not isolated kernel timings.",
+  "process": {
+    "command": [
+      "target/debug/examples/alpha_text",
+      "--resume",
+      ".local/artifacts/athena-alpha/ac3-joint-field-2026-09-09/model.hna",
+      "--families",
+      "0",
+      "--history-archive",
+      ".local/artifacts/athena-alpha/ac3-joint-field-2026-09-09/staged.history",
+      "--report",
+      ".local/artifacts/athena-alpha/ac3-joint-field-2026-09-09/report-staged.json",
+      "--prompt",
+      ".local/artifacts/athena-alpha/ac2/first-request.txt",
+      "--emit-symbols",
+      "128"
+    ],
+    "status": "completed",
+    "exit_code": 0,
+    "wall_seconds": 238.33166224393062,
+    "peak_rss_kib": 5612060
+  },
+  "native_control_checks": {
+    "cuda_field_tests": 119,
+    "cuda_field_seconds": 155.1,
+    "host_field_tests": 16,
+    "public_field_rustdoc_compile_tests": 1,
+    "cross_block_occurrences": 514,
+    "derived_block_threads": 512
+  },
+  "comparison": {
+    "body": true,
+    "emission_current_history": true,
+    "generation": true,
+    "development_records": true,
+    "final_return_storage": true,
+    "exposure_cursor": true,
+    "prompt_native_from": true,
+    "prompt_native_until": true,
+    "prompt_operative_returns": true
+  },
+  "families": 16,
+  "original_prompt_and_emission_seconds": 80.978041541,
+  "resumed_prompt_and_emission_seconds": 67.799689202,
+  "observed_prompt_time_ratio": 0.8372601746323086,
+  "results": {
+    "resume_native_from": 5064,
+    "remount_native_deeds": 0,
+    "fractional_bits": 72,
+    "material_source": "operative-contextual",
+    "material_target": {
+      "factor_width": 2,
+      "kind": "tensor-product"
+    },
+    "duplex": true,
+    "contact_metric": "SquaredCurrent",
+    "contact_realization": "dyadic-deposit",
+    "development_census": {
+      "allocations": 30426,
+      "captured_launches": 0,
+      "control_launches": 0,
+      "deed_launches": 0,
+      "device_to_device_octets": 0,
+      "egress_receipt_octets": 0,
+      "egress_section_octets": 0,
+      "ingress_octets": 873840448,
+      "resident_octets_now": 873840448,
+      "resident_octets_peak": 873840448,
+      "section_read_outs": 0,
+      "synchronizations": 0
+    },
+    "history_placement": {
+      "archive_egress_section_octets": 0,
+      "archive_section_read_outs": 0,
+      "archive_written_octets": 2309629271,
+      "archived_occurrences": 5063,
+      "resident_occurrences": 1,
+      "restored_sources": 0
+    },
+    "final_return_storage": {
+      "bound_octets": 327936,
+      "current_difference_returns": 5124,
+      "current_factor_octets": 838744192,
+      "implicit_zero_delta_returns": 5124,
+      "internal_delta_octets": 0,
+      "logical_current_factor_octets": 1680672000,
+      "logical_internal_delta_octets": 840336000,
+      "map_source_octets": 0,
+      "port_octets": 35417088,
+      "returns": 5124,
+      "source_overlap_octets": 0,
+      "total_octets": 874489216
+    },
+    "final_native_census_before_diagnostics": {
+      "allocations": 97314,
+      "captured_launches": 1199,
+      "control_launches": 0,
+      "deed_launches": 391,
+      "device_to_device_octets": 0,
+      "egress_receipt_octets": 28928,
+      "egress_section_octets": 98688,
+      "ingress_octets": 5523854820,
+      "resident_octets_now": 5608462672,
+      "resident_octets_peak": 5636976788,
+      "section_read_outs": 12,
+      "synchronizations": 391
+    },
+    "diagnostics_wall_seconds": 6.524681933,
+    "native_error": null,
+    "development_error": null,
+    "prompt_error": null,
+    "utf8": "I\u2019m ante.",
+    "utf8_error": null
+  },
+  "generation": {
+    "disposition": {
+      "kind": "completed-part"
+    },
+    "emitted_octets": [
+      73,
+      226,
+      128,
+      153,
+      109,
+      32,
+      97,
+      110,
+      116,
+      101,
+      46
+    ],
+    "native_from": 5126,
+    "native_until": 5138,
+    "pending_return": null
+  },
+  "extra_temporary_commit_storage_octets": 2592,
+  "private_checkpoint": ".local/artifacts/athena-alpha/ac3-joint-field-2026-09-09/model.hna",
+  "checkpoint_octets": 1257518630,
+  "comparison_report_paths": [
+    ".local/artifacts/athena-alpha/ac3-joint-field-2026-09-09/report.json",
+    ".local/artifacts/athena-alpha/ac3-joint-field-2026-09-09/report-staged.json"
+  ]
+}

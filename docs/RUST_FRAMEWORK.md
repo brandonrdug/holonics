@@ -53,6 +53,12 @@ The field's actual occurrence, source/anchor, return, rest and current-family AP
 `NativeMaterialResponseChart` makes normalized group/series apertures explicit; generic observed
 return belongs to the field rather than `TextFieldSession`. See [composition](HNN_COMPOSITION.md).
 
+[established-bounded; computational-witness] The [compiled Rust example](../crates/holonics-hna/src/native/field.rs)
+accepts a caller's field recipe, incoming currents and receiver/realization, then performs serial
+source-qualified reception, observed local return and native rest through those public owners.
+Its serial incidence is an explicit example, not a requirement on other clients. Application
+code can handle a response error inside the callback and retain the already-received successor.
+
 [definition] `native::NativeSavedField` consumes the existing `NativeFieldRest` into one
 remounted field and its actual linear/shared source slots. `read` and `publish` use the existing
 native wire and no-overwrite publication; `with_field_archived` places older source carriers in
@@ -70,10 +76,12 @@ field's actual chart and lineage.
 [definition] `hna::alpha::exposure` owns the cold conversation source/cursor;
 `text_codec` owns the declared byte/part-marker chart; `text_session` borrows one constitutive
 field; `checkpoint` preserves that particular session. The field owns learning and recurrence.
-The current `OperativeNormal` profile fits a finite complex-linear material operator from
-observed source currents. Its fixed byte chart is experimental apparatus, not a learned
-general text codec or the definition of HNN. The [paused construction review](../research/records/2026-09-09_THE_BYTE_FIELD_IS_NOT_THE_COMPLETE_HNN_COMPOSITION.md)
-spells out this distinction and the local return's scope.
+`OperativeNormal` fits a finite complex-linear material operator; `OperativeContextual` uses
+the existing joint projective source/condition feature. Neither profile name describes the
+complete model anatomy. The [joint-field artifact](../research/records/2026-09-09_AC3_THE_JOINT_FIELD_CONTINUES_AND_ITS_NATIVE_ARTIFACT_IS_GENERIC.md)
+retains the exposed body's scope. Its fixed byte chart is experimental apparatus, not a learned
+general text codec or the definition of HNN. The [deeper construction review](../research/records/2026-09-09_ARCHITECTURE_CHARTS_REQUIRE_COMPOSED_MECHANISMS_AND_FINITE_CONSTRUCTION_RETURNS.md)
+recovers the classical/tensor mechanisms and local return's scope.
 
 [definition] A mathematical client should import the relevant owner through these qualified
 paths. A codec supplies an exterior realization and receiver; it does not define semantic

@@ -6,6 +6,8 @@ pub(in super::super) struct ContextualWork<'c> {
     pub(in super::super) table: ResidentSection<'c>,
     pub(in super::super) weights: ResidentSection<'c>,
     pub(in super::super) evaluations: ResidentSection<'c>,
+    // Staged normalized relation row and held-current words survive across kernel boundaries.
+    pub(in super::super) commit: ResidentSection<'c>,
 }
 #[cfg(test)]
 pub(in super::super) fn offsets(n: usize) -> [usize; 7] {
@@ -289,6 +291,8 @@ impl<'c> NativeConstitutiveField<'c> {
         }
         let s = self.relation.surface;
         Ok(ContextualWork {
+            commit: s.fresh_section(1, self.relation.source_width + self.relation.target_width
+                + self.memory.rows() * self.memory.width(), ResidentGrain(0))?,
             table: s.mount_section_rest(
                 &ResidentSectionRest::found(count.max(1), 3, ResidentGrain(0), 64, pointers)
                     .map_err(invalid)?,
@@ -440,5 +444,7 @@ impl<'c> NativeConstitutiveField<'c> {
 
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod staged_tests;
 #[cfg(test)]
 mod packet_tests;

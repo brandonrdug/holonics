@@ -5,19 +5,20 @@ incidence, chronology, lineage and admitted receiver domain. Eros is the composi
 operation that forms and refines it. The current public Rust entry point is `holonics::hna`;
 the application implementations are in [holonics-hna](../crates/holonics-hna/README.md).
 
-## Athena-alpha and the next cultivation
+## Athena-alpha and the finite construction programme
 
-[established-bounded; measured] The [declared dyadic-contact realization](../research/records/2026-09-08_AC1_THE_DEPOSIT_IS_A_NEW_COEFFICIENT_AND_ITS_DEFECT_REMAINS_A_COMPARISON.md)
-completes the 1,930-occurrence conversation slice with 1,929 deposits, retained comparison defects
-and matching body/current/generation after remount. Seven operative controls pass. Its answer
-still repeats `Tife~anen…`; Athena-alpha is not attained. The live construction now joins AC1
-path/reuse with AC2's joint packet receiver. The record includes an exact limitation of the
-current independent-bit receiver and distinguishes finite coefficients from unrounded-flow claims.
+[established-bounded; measured] The [joint-field exposure](../research/records/2026-09-09_AC3_THE_JOINT_FIELD_CONTINUES_AND_ITS_NATIVE_ARTIFACT_IS_GENERIC.md)
+returns a sixteen-family experimental body, source-qualified local development, joint-current
+continuation and a native checkpoint. Its output `I’m ante.` followed by EndPart is an observed
+trajectory, not useful Athena-alpha. The earlier [dyadic-contact study](../research/records/2026-09-08_AC1_THE_DEPOSIT_IS_A_NEW_COEFFICIENT_AND_ITS_DEFECT_REMAINS_A_COMPARISON.md)
+retains its distinct 1,930-occurrence scope and receiver limitation. Current construction position
+belongs in [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md).
 
 [definition] The [Athena-alpha blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
-is authorized through completion and resumed after Brandon's September 8 framework review. It uses the
-prepared conversations and existing native owners, and requires the actual useful model, interface
-and integrated evidence.
+is authorized through completion and resumed after Brandon's framework review. It now separates
+finite construction returns from the useful-model attainment objective. It uses the prepared
+conversations and existing native owners, with comparison, interface and persistence accompanying
+each return; broader exposure does not wait for useful language.
 
 [project-postulate] The [September 7 correction](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
 places generator recovery, phase transport and Holonic Compression inside the developing
@@ -38,19 +39,19 @@ theorem emitter or verdict enters cultivation/inference; Lean text in the logs r
 [established-bounded; source-inspected] Preparation exports actual message operands and their
 relations. The public native phase session consumes exact currents and real source handles;
 `HnaTextApplication` consumes the earlier inherited address/lookup chart. The prepared comparison
-record is not directly either kind of occurrence. The composition must mount available message
-material and its actual incidence through the native material/returned-difference owners, then
-carry native emission into an exterior text receiver. The
+record is not directly either kind of occurrence. The [shared field assembly](HNN_COMPOSITION.md)
+mounts available message material and its actual incidence through the native material/returned-
+difference owners, then carries native emission into an exterior text receiver. The historical
 [September 6 synthesis](../research/records/2026-09-06_REPOSITORY_SYNTHESIS_AND_PORTABLE_EVIDENCE.md)
-names those owners and the remaining attachment; it does not install a second learner or turn
+names the owners and the attachment then outstanding; it does not install a second learner or turn
 arbitrary token differences into native current.
 
 [definition] The [mathematical synthesis](MATHEMATICS_AND_NATIVE_CONDUCT.md) supplies concrete
 reuse constraints: preserve temporal fibres and both mixed contributions, transport historical
 frames before comparison, and justify condensation for the admitted future operations. The
 [hardware/modality boundary](HARDWARE_AND_MODALITY_BOUNDARIES.md) carries that same contract into
-future device and acoustic charts. This consolidation returns synthesis and repairs, not a
-corpus-trained Athena-alpha artifact.
+future device and acoustic charts. A bounded conversation-exposed research artifact and an
+attained useful Athena-alpha remain distinct claims.
 
 [definition] The parallel [formal framework review](FORMAL_FRAMEWORK.md#the-checked-finite-return-of-changing-conformation)
 proves the complete finite response of changing incidence, material and internal state, with a

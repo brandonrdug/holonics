@@ -1125,6 +1125,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
                 })
                 .transpose()?,
             pending_transport: None,
+            #[cfg(test)]
+            fused_contextual: false,
         };
         Ok((body, sources, anchors))
     }

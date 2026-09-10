@@ -395,7 +395,7 @@ impl<'chart> ResidentSurface<'chart> {
             Option<&ResidentSection<'chart>>, &ResidentSection<'chart>, &ResidentSection<'chart>, u32, Option<&ResidentSection<'chart>>)>,
         occurrence: u64,
         moment:Option<(&ResidentSection<'chart>,usize,&ResidentSection<'chart>)>,
-        contextual:Option<(&ResidentSection<'chart>,&ResidentSection<'chart>,&ResidentSection<'chart>,u64)>,
+        contextual:Option<(&ResidentSection<'chart>,&ResidentSection<'chart>,&ResidentSection<'chart>,u64,Option<&ResidentSection<'chart>>)>,
         operative:Option<&ResidentSection<'chart>>,
         material_target:(usize,u32),
         output: &ResidentSection<'chart>,
@@ -464,16 +464,45 @@ impl<'chart> ResidentSurface<'chart> {
                 return Err(fail("moment factor chart"));
             }
         }
-        if let Some((table,weights,evaluations,source))=contextual {
+        if let Some((table,weights,evaluations,source,commit))=contextual {
             let at=usize::try_from(occurrence).map_err(|_|fail("contextual chronology extent"))?;
             if occurrence>=u32::MAX as u64 || (origin.is_some() && source>=occurrence)
-                || !matches(table,at.max(1),3) || !matches(weights,at+1,16) || !matches(evaluations,4,30*targets){return Err(fail("contextual source work extent"));}
+                || !matches(table,at.max(1),3) || !matches(weights,at+1,16) || !matches(evaluations,4,30*targets)
+                || commit.is_some_and(|c| !matches(c,1,width+memory.rows*memory.width)){return Err(fail("contextual source work extent"));}
         }
         if operative.is_some_and(|s|!matches(s,1,22) || junction.is_none_or(|j|j.5.0==1)) {return Err(fail("operative contact table or current representation"));}
         let shared = nodes.checked_mul(24).and_then(|v| v.checked_mul(16))
             .and_then(|v| u32::try_from(v).ok())
             .filter(|v| *v <= self.declaration.max_sectiond_bytes)
             .ok_or_else(|| fail("field exact scratch exceeds the mounted aperture"))?;
+        let contextual_dispatch = if let Some((table, weights, evaluations, source, Some(commit))) = contextual {
+            let (state, _, original, next, report, kind, _) = transport.as_ref().unwrap();
+            let grain = junction.unwrap().5.1;
+            let version = match kind { 7 => 4, 6 => 3, 5 => 2, _ => 1 };
+            let at = occurrence as u32;
+            let linked = u32::from(origin.is_some());
+            let mut weights_params = Params::new();
+            weights_params.ptr(table.lo.device_ptr()).ptr(report.lo.device_ptr()).u32(at).u64(source)
+                .u32(nodes as u32).u32(grain).u32(version).ptr(weights.lo.device_ptr())
+                .ptr(operative.map_or(0,|p|p.lo.device_ptr()))
+                .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count).u32(targets as u32);
+            let mut evaluation_params = Params::new();
+            evaluation_params.ptr(table.lo.device_ptr()).ptr(report.lo.device_ptr()).u32(at)
+                .u32(nodes as u32).u32(linked).u32(targets as u32)
+                .ptr(weights.lo.device_ptr()).ptr(evaluations.lo.device_ptr())
+                .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+            let mut finish_params = Params::new();
+            finish_params.ptr(memory.lo.device_ptr()).ptr(memory.hi.device_ptr())
+                .ptr(basis.lo.device_ptr()).ptr(basis.hi.device_ptr())
+                .ptr(state.lo.device_ptr()).ptr(state.hi.device_ptr())
+                .ptr(original.map_or(0,|p|p.lo.device_ptr())).ptr(table.lo.device_ptr())
+                .ptr(weights.lo.device_ptr()).ptr(evaluations.lo.device_ptr()).u32(at).u64(source)
+                .u32(nodes as u32).u32(linked).u32(grain).u32(version)
+                .ptr(next.lo.device_ptr()).ptr(next.hi.device_ptr()).ptr(report.lo.device_ptr()).ptr(report.hi.device_ptr())
+                .u32(targets as u32).u32(target_factor_width).ptr(commit.lo.device_ptr()).ptr(output.lo.device_ptr())
+                .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+            Some((weights_params, evaluation_params, finish_params, at+1))
+        } else { None };
         let mut params = Params::new();
         params.ptr(seed.lo.device_ptr()).ptr(memory.lo.device_ptr()).ptr(memory.hi.device_ptr())
             .ptr(basis.lo.device_ptr()).ptr(basis.hi.device_ptr()).ptr(incoming.lo.device_ptr())
@@ -504,10 +533,20 @@ impl<'chart> ResidentSurface<'chart> {
             .ptr(contextual.map_or(0,|p|p.2.lo.device_ptr())).u64(contextual.map_or(0,|p|p.3));
         params.ptr(operative.map_or(0,|p|p.lo.device_ptr()));
         params.u32(targets as u32).u32(target_factor_width);
+        params.ptr(contextual.and_then(|p|p.4).map_or(0,|p|p.lo.device_ptr()));
         params.ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
             .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
         self.record_blocks(lane, "section_constitutive_field", 1, self.launch.block_x,
-            shared, &mut params, "constitutive-field")
+            shared, &mut params, "constitutive-field")?;
+        if let Some((mut weights, mut evaluations, mut finish, rows)) = contextual_dispatch {
+            self.record_blocks(lane, "section_field_contextual_weights", (rows as usize).div_ceil(self.launch.block_x as usize),
+                self.launch.block_x, 0, &mut weights, "constitutive-field-weights")?;
+            self.record_blocks(lane, "section_field_contextual_evaluations", (8*targets).div_ceil(self.launch.block_x as usize),
+                self.launch.block_x, 0, &mut evaluations, "constitutive-field-evaluations")?;
+            self.record_blocks(lane, "section_constitutive_field_context_finish", 1,
+                self.launch.block_x, 0, &mut finish, "constitutive-field-commit")?;
+        }
+        Ok(())
     }
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn record_constitutive_field_rechart(

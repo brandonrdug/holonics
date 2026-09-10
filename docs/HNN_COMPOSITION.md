@@ -90,10 +90,15 @@ junction representation/solver and material source/target chart. `found_on` or
 return previously orchestrated by the text adapter. A failed return leaves reception committed
 and preserves the post-reception field. The application does not replay the occurrence.
 
-[open] Broader continuing behavior, affordable reuse and research-model delivery remain the
-next construction. A new initialization recipe is not a trained artifact, and the reported
-finite local change does not establish a learned general text/acoustic/visual generator.
-The same native Holon field and source/receiver capabilities remain the shared assembly.
+[established-bounded; measured] The [joint-field study](../research/records/2026-09-09_AC3_THE_JOINT_FIELD_CONTINUES_AND_ITS_NATIVE_ARTIFACT_IS_GENERIC.md)
+returns sixteen-family exposure, joint continuation and a research checkpoint. The
+[execution/delivery return](../research/records/2026-09-09_AC4_AC5_THE_JOINT_OPERATION_SPANS_BLOCKS_AND_THE_RESEARCH_MODEL_CONTINUES.md)
+retains its model anatomy, actual generator savings, public invocation and fresh-process
+comparison. These use the same native Holon field and source/receiver capabilities.
+
+[open] Affordable large-corpus cultivation and learned general text/acoustic/visual generators
+remain beyond these finite results. A new initialization recipe is distinct from the developed
+artifact, and neither its file size nor this finite local change establishes general usefulness.
 
 [definition] Persistence follows that same ownership: `native::NativeSavedField` consumes the
 engine's existing rest and remounts the field with its actual source/anchor capabilities. It

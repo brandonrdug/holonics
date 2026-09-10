@@ -153,19 +153,24 @@ a valid distinct comparison. No new nonlinear law or general-language capability
 [definition] The corrected formal `FiniteLocalCurrentEcology.reaction` retains local
 standing. The [native field assembly and observed return](../../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)
 now return through the existing `OperativeContextual` joint feature and actual field successor.
-AC1 and AC2 close at that finite scope. Continue with AC3 exposure and retained continuation,
-with research-artifact delivery in AC5 and receiver-scoped reuse/comparison in AC4.
+AC1 and AC2 close at that finite scope. AC3's exposure and retained continuation compose with
+research-artifact delivery in AC5 and receiver-scoped reuse/comparison in AC4.
 The local field/material return, full-operator generic primitives and corrected joined-passage
 learning are existing candidates, each with its own source, metric and scope. Neither the old
 lexical atlas nor the retracted foreign-tower exclusion is restored.
 
-[definition] **Active AC4 packet:** the joint-field study has returned its sixteen families,
-current-factor generator savings and actual EndPart trajectory. Its contextual weight and
-coordinate evaluations still share one CUDA block with field preparation/commit. Factor these
-independent evaluations into staged multi-block work while retaining the original arithmetic,
-remainders, source lineage and one final commit. Compare with the preserved fused implementation;
-a late refusal must leave the complete predecessor unchanged. Then use the actual pre-prompt
-checkpoint for the AC5 fresh-process comparison. This changes execution, not the learning law.
+[established-bounded; implemented-exact; computational-witness] The [finite AC4–AC5 return](../../research/records/2026-09-09_AC4_AC5_THE_JOINT_OPERATION_SPANS_BLOCKS_AND_THE_RESEARCH_MODEL_CONTINUES.md)
+closes that construction cycle: sixteen-family joint continuation, actual current-factor
+generator savings, staged independent device work with one final commit, complete-rest controls
+and the actual model's fresh-process reported-state comparison. Public Rust invocation, model
+anatomy and native/application persistence are delivered with their receiver and backend scope.
+
+[definition] Further Athena-alpha development begins from this retained research body and the
+shared Holon field. The returned cost question is concrete: multi-block execution preserves
+conduct but still leaves substantial historical source transfer and serial work. Improve an
+identified dependency/representation before repeating a larger exposure; keep behavior and
+current-family comparisons attached to that changed construction. This is the wider product
+continuation, not another hidden acceptance condition added to the finite AC0–AC5 cycle.
 
 [project-postulate] Derivation belongs to the finite packet it changes. A partial/local learner
 may develop identifiable behavior without a universal HNN theorem, all six architecture adapters,

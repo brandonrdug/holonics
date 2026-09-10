@@ -1,6 +1,46 @@
 //! Assembly of the existing constitutive field, independent of an exterior medium.
 //! The field owns occurrence lineage, current, learned material and its one successor.
 //! This recipe is immutable apparatus/law data, not another model state or learner.
+//!
+//! A client supplies its actual material and incoming current chart. This example declares
+//! a serial source chain; other incidence uses the same field's source/anchor APIs. Numerical
+//! grain, receiver metric and contact realization belong to the caller's declared experiment.
+//! The cold result preserves the final source capability for later continuation.
+//!
+//! ```no_run
+//! use holonics_hna::native::{with_native_field, NativeFieldModelSpec,
+//!     NativeSavedField, NativeSessionError};
+//! use holonic_engine::native_ecology::constitutive_fibre::{NativeFieldOccurrence,
+//!     NativeMaterialResponseChart, NativeContactRealization, NativePhaseCurrent};
+//!
+//! fn develop_serial(
+//!     spec: &NativeFieldModelSpec,
+//!     arrivals: impl IntoIterator<Item = Vec<NativePhaseCurrent>>,
+//!     receiver: NativeMaterialResponseChart,
+//!     realization: NativeContactRealization,
+//! ) -> Result<NativeSavedField, NativeSessionError> {
+//!     with_native_field(spec, |field| {
+//!         let mut source = None;
+//!         for incoming in arrivals {
+//!             let mut occurrence = match source.take() {
+//!                 Some(prior) => NativeFieldOccurrence::through(prior, incoming),
+//!                 None => NativeFieldOccurrence::entering(incoming),
+//!             };
+//!             let receiving = field.occurrence_count();
+//!             let next = field.advance_resident(&mut occurrence)?;
+//!             source = Some(next.source);
+//!             field.respond_to_material_observation(
+//!                 receiving, receiver, realization, |_, _| (),
+//!             )?;
+//!         }
+//!         Ok(NativeSavedField::from_rest(field.rest(&[source.as_ref()], &[])?))
+//!     })
+//! }
+//! ```
+//!
+//! The source-free first arrival supplies no observed material target. A returned error is
+//! propagated here; an interactive application can instead handle it inside the callback and
+//! retain the post-reception field and source. It must not replay a committed reception.
 
 use super::NativeSessionError;
 use holonic_engine::{

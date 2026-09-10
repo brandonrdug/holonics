@@ -1,7 +1,7 @@
 # Construction state
 
-**Currency:** September 9, 2026. **Priority:** Brandon has resumed AC0–AC5 as the active goal. Holons carry situated state, incidence, transported differences and compatible continuations; text/audio/visual media are exterior measurement charts.
-**Position:** AC0 source complete. The revised AC1 finite joint-field assembly and AC2 local observed-return/later-consequence packets have returned. AC4 comparison and AC5 generic public access accompany them. Active next work: AC3 broader exposure/continuation and AC5 research-artifact delivery through the same Holon field, with scoped reuse in AC4.
+**Currency:** September 9, 2026. **Priority:** Native HNN cultivation through Holons as situated state, incidence, transported differences and compatible continuations; text/audio/visual media are exterior measurement charts.
+**Position:** The revised finite AC0–AC5 construction cycle has returned. The sixteen-family joint-field artifact, generic Rust assembly/local return/persistence and actual fresh-process continuation are verified. Large-corpus cost and the original useful Athena-alpha objective remain open; no cultivation process is running.
 **Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -87,16 +87,24 @@ The [framework guide](docs/FORMAL_FRAMEWORK.md) connects physical, biological an
 instances. This continuation unifies already-engaged elementary patterns; it changes no native
 model or product grade and adds no numerical policy to the parallel AC1 work.
 
-## Current HNN construction — resumed after deeper review
+## Current HNN construction — finite AC0–AC5 return
+
+[established-bounded; implemented-exact; computational-witness] The [AC4–AC5 return](research/records/2026-09-09_AC4_AC5_THE_JOINT_OPERATION_SPANS_BLOCKS_AND_THE_RESEARCH_MODEL_CONTINUES.md)
+completes staged multi-block execution of the same joint operation and public research-model
+delivery. All 119 CUDA field tests, sixteen host tests and the public Rust example compile pass.
+The actual saved model remounts with zero developmental deeds and matches the complete reported
+body, lineage, emission currents and generation. Prompt/emission took 67.800 seconds versus
+80.978 in the earlier workflow; this is not an isolated kernel benchmark. The record retains
+model anatomy, scoped generator savings, private artifact location and the Mac interface handoff.
 
 [established-bounded; measured] AC3's joint-field variant completed sixteen families at 5,064
 occurrences and saved a 1,257,518,630-byte pre-prompt checkpoint. It emitted `I’m ante.` followed
 by EndPart; this is a bounded trajectory, not a useful answer. Development took 2,753.900
 seconds. The [exposure/persistence return](research/records/2026-09-09_AC3_THE_JOINT_FIELD_CONTINUES_AND_ITS_NATIVE_ARTIFACT_IS_GENERIC.md)
-retains the full workflow, source-factor savings and generic remount checks. Active work is AC4
-execution reuse across blocks, with one preserved mathematical operation and final commit, then
-fresh-process comparison of the actual model for AC5. No further large exposure is scheduled
-before this concrete cost question returns.
+retains the full workflow, source-factor savings and generic remount checks. These finite
+construction returns establish a continuing research model, not affordable full-corpus
+cultivation or useful Athena-alpha. Further development should use this retained body and the
+shared source/current owners; another large run needs a concrete new construction question.
 
 [established-bounded; implemented-exact; computational-witness] The [generic field return](research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)
 recovers the existing projective joint-source/context mechanism and moves generic assembly and

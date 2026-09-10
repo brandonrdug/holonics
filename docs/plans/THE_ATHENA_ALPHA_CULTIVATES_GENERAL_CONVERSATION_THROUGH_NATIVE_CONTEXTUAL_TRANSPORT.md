@@ -3,8 +3,8 @@
 **Authority:** Brandon's September 6 instruction to design and deposit this blueprint, update the
 roadmap and position, then immediately construct and complete it as a goal.
 **Status:** Revised September 9 after direct-message and classical-architecture recovery.
-Brandon has resumed construction as the active AC0–AC5 goal. The labels below identify finite construction
-returns; the previous phase definitions remain in Git at `468973ea`. Athena-alpha attainment is
+Brandon authorized resumption of AC0–AC5. The labels below identify finite construction returns;
+the previous phase definitions remain in Git at `468973ea`. Athena-alpha attainment is
 the separate product standard in §1 and is not weakened by this scheduling repair.
 **Order:** [the roadmap](THE_ROADMAP.md).
 **Position:** [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md).

@@ -307,6 +307,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     const int64_t *context_table,int64_t *context_weights,int64_t *context_evaluations,uint64_t source_ordinal,
     const int64_t *operative_table,
     uint32_t material_targets,uint32_t target_factor_width,
+    int64_t *context_commit,
     int64_t *output_lo, int64_t *output_hi,
     uint32_t *slot, const uint32_t *census,
     const uint32_t *lineage, uint32_t lineage_count
@@ -316,7 +317,8 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
     // The dependent field word is prepared once. All continuing writes remain after the complete
     // coupled return; early returns inside this helper cannot strand a block barrier.
     if (threadIdx.x == 0) {
-        if (coupled > 3 || transport_enabled > 9u || !material_targets
+        if ((context_commit && (transport_enabled<4u || transport_enabled>7u))
+            || coupled > 3 || transport_enabled > 9u || !material_targets
             || (target_factor_width && transport_enabled<6u) || (!target_factor_width && material_targets!=nodes)
             || (transport_enabled>=6u && !operative_table)
             || (transport_enabled>=4u && transport_enabled<=7u && (!context_table || !context_weights || !context_evaluations || occurrence>=UINT32_MAX))
@@ -385,6 +387,15 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
             moment_table,moment_count,moment_weights,output_lo,origin,incoming,current_frame,origin_frame,next_covariance_lo,
             (const wide *)junction_held,(const wide *)junction_report_lo,nodes,linked,junction_grain,occurrence,
             (int64_t *)transport_delta_lo,(int64_t *)transport_delta_hi,(int64_t *)transport_report_lo,(int64_t *)transport_report_hi,field_scratch,slot,operative_radius);
+    // The exact relation row and held departure were checked during field preparation.
+    // Retain them outside block-local scratch until all contextual stages have succeeded.
+    if(context_commit && threadIdx.x==0){
+        const uint32_t width=6u*nodes,current_at=4u*nodes+1u;
+        const wide *formed=field_scratch+2u*width,*held_departure=field_scratch+3u*width;
+        bool inserted=output_lo[current_at+width+2u]>=0;
+        for(uint32_t j=0;j<width;++j)context_commit[j]=inserted?(int64_t)formed[j]:0;
+        for(uint32_t j=0;j<3u*nodes;++j)context_commit[width+j]=(int64_t)held_departure[j];
+    }
     if(transport_enabled>=4u && transport_enabled<=7u)
         contextual_material_prepare((const int64_t *)transport_lo,(const int64_t *)origin_transport,context_table,(uint32_t)occurrence,source_ordinal,
             context_weights,context_evaluations,output_lo,origin,incoming,current_frame,origin_frame,next_covariance_lo,
@@ -392,9 +403,9 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
             (int64_t *)transport_delta_lo,(int64_t *)transport_delta_hi,(int64_t *)transport_report_lo,(int64_t *)transport_report_hi,field_scratch,slot,
             transport_enabled>=6u?((const wide *)(uintptr_t)operative_table[7])[1]:operative_radius,
             transport_enabled>=6u?(const wide *)(uintptr_t)operative_table[5]:nullptr,transport_enabled>=6u?(uint32_t)operative_table[19]:0u,
-            material_targets,target_factor_width);
+            material_targets,target_factor_width,context_commit?1u:0u);
     __syncthreads();
-    if (*slot) return;
+    if (*slot || context_commit) return;
     // All normal-state computation and checks have completed. Copy the new state in parallel;
     // the same successful kernel publishes memory and basis below before any later reader.
     if(transport_enabled==9u)for(size_t i=threadIdx.x;i<normal_state_words(nodes,material_targets);i+=blockDim.x)
@@ -426,6 +437,33 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_field(
             transport_lo[i] = transport_hi[i] = transport_lo[i] + transport_delta_lo[i];
         transport_lo[coefficients] = transport_hi[coefficients] = transport_delta_lo[coefficients];
     }
+}
+
+// Finish the same contextual operation after independent multi-block weight/evaluation work.
+// No continuing field write occurs until this complete return and all prior stages succeed.
+extern "C" __global__ void __launch_bounds__(512) section_constitutive_field_context_finish(
+    int64_t *memory_lo,int64_t *memory_hi,int64_t *basis_lo,int64_t *basis_hi,
+    int64_t *state,int64_t *state_hi,const int64_t *original,const int64_t *table,
+    int64_t *weights,int64_t *evaluations,uint32_t at,uint64_t source_ordinal,
+    uint32_t nodes,uint32_t linked,uint32_t grain,uint32_t version,
+    int64_t *next,int64_t *next_hi,int64_t *out,int64_t *out_hi,
+    uint32_t targets,uint32_t target_factor_width,const int64_t *commit,const int64_t *field_report,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
+){
+    if(blockIdx.x || upstream_refused(census,lineage,lineage_count,slot) || *slot)return;
+    contextual_material_prepare(state,original,table,at,source_ordinal,weights,evaluations,
+        nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,
+        nodes,linked,grain,version,next,next_hi,out,out_hi,nullptr,slot,
+        -1,nullptr,0,targets,target_factor_width,2u);
+    __syncthreads();if(*slot || threadIdx.x)return;
+    const uint32_t width=6u*nodes,current_at=4u*nodes+1u;
+    int64_t inserted=field_report[current_at+width+2u];
+    if(inserted>=0)for(uint32_t j=0;j<width;++j){
+        size_t position=(size_t)inserted*width+j;
+        basis_lo[position]=basis_hi[position]=commit[j];
+    }
+    for(uint32_t j=0;j<3u*nodes;++j)memory_lo[j]=memory_hi[j]=commit[width+j];
+    for(size_t j=0;j<moment_state_words(nodes);++j)state[j]=state_hi[j]=next[j];
 }
 
 // Re-express the same fixed-node field relation under a rational unit-phase gauge.  The source

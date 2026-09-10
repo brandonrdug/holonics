@@ -205,18 +205,109 @@ __device__ void contextual_tensor_target(const int64_t *incoming,uint32_t n,uint
     }
 }
 
+__device__ void contextual_material_weight_row(
+    const int64_t *table,const int64_t *out,uint32_t at,uint64_t source_ordinal,
+    uint32_t i,uint32_t n,uint32_t grain,uint32_t version,int64_t *weights,
+    uint32_t *slot,const wide *operative_b=nullptr,uint32_t targets=0
+) {
+    if(!targets)targets=n;
+    const int64_t *entry=i==at?out:contextual_at(table,i);
+    const int64_t *meta=out+contextual_meta(n,targets);
+    bool linked=meta[1]>=0,contrasted=linked && meta[2]<(int64_t)at;
+    bool valid=entry[contextual_meta(n,targets)+1u]>=0;
+    for(uint32_t q=0;q<4u;++q){
+        int64_t *weight=weights+((size_t)i*4u+q)*4u;
+        for(uint32_t j=0;j<4u;++j)weight[j]=0;
+        if(!valid || (q>0 && !linked) || (q==3 && !contrasted))continue;
+        if(q==2 && source_ordinal==(uint64_t)at-1u){
+            for(uint32_t j=0;j<4u;++j)weight[j]=weights[((size_t)i*4u+1u)*4u+j];
+            continue;
+        }
+        const int64_t *sv,*cv;
+        contextual_query_parts(table,out,n,at,q,&sv,&cv,slot,targets);
+        if(*slot)continue;
+        const int64_t *si=entry+contextual_input_visible(n,targets),
+            *ci=contextual_at(table,i-1u)+contextual_context(n,targets);
+        uint32_t context_at=contextual_query_context(out,n,at,q,targets);
+        const wide *bq=context_at==at?operative_b:contextual_b_at(table,context_at);
+        uint32_t rem=0;
+        wide k=contextual_kernel(si,ci,sv,cv,n,grain,version,&rem,slot,
+            contextual_b_at(table,i-1u),bq);
+        ((wide *)weight)[0]=k;weight[2]=rem;weight[3]=0;
+    }
+}
+
+__device__ void contextual_material_evaluation_coordinate(
+    const int64_t *table,const int64_t *out,uint32_t at,uint32_t n,uint32_t linked,
+    uint32_t q,uint32_t j,uint32_t targets,int64_t *weights,int64_t *evaluations,
+    uint32_t *slot
+) {
+    uint32_t R=2u*targets,raw_stride=30u*targets;
+    const int64_t *meta=out+contextual_meta(n,targets);
+    bool contrasted=linked && meta[2]<(int64_t)at;
+    HistoryInteger sum,pos,neg;
+    if(q==0 || (linked && (q<3 || contrasted))){
+        for(uint32_t i=0;i<at;++i){
+            const int64_t *old=contextual_at(table,i),*m=old+contextual_meta(n,targets);
+            if(m[1]<0)continue;
+            const wide *b=(const wide *)(old+contextual_beta(n,targets));
+            contextual_factor_add(history_integer(b[j])+history_integer(b[R+j]),
+                weights+((size_t)i*4u+q)*4u,sum,pos,neg);
+            if(m[2]<(int64_t)i)
+                contextual_factor_add(-history_integer(b[R+j]),
+                    weights+((size_t)m[2]*4u+q)*4u,sum,pos,neg);
+        }
+    }
+    int64_t *raw=evaluations+(size_t)q*raw_stride;
+    history_write_integer(sum,raw+5u*j,raw+5u*j,slot);
+    history_write_integer(pos,raw+5u*(R+j),raw+5u*(R+j),slot);
+    history_write_integer(neg,raw+5u*(2u*R+j),raw+5u*(2u*R+j),slot);
+}
+
+extern "C" __global__ void __launch_bounds__(512) section_field_contextual_weights(
+    const int64_t *table,const int64_t *out,uint32_t at,uint64_t source_ordinal,
+    uint32_t n,uint32_t grain,uint32_t version,int64_t *weights,
+    const int64_t *operative_table,uint32_t *slot,const uint32_t *census,
+    const uint32_t *lineage,uint32_t lineage_count,uint32_t targets=0
+) {
+    if(upstream_refused(census,lineage,lineage_count,slot) || *slot)return;
+    const wide *operative_b=operative_table?(const wide *)(uintptr_t)operative_table[5]:nullptr;
+    uint64_t stride=(uint64_t)blockDim.x*(uint64_t)gridDim.x;
+    for(uint64_t row=(uint64_t)blockIdx.x*blockDim.x+threadIdx.x;row<=at;row+=stride){
+        contextual_material_weight_row(table,out,at,source_ordinal,(uint32_t)row,n,grain,version,
+            weights,slot,operative_b,targets);
+    }
+}
+
+extern "C" __global__ void __launch_bounds__(512) section_field_contextual_evaluations(
+    const int64_t *table,const int64_t *out,uint32_t at,uint32_t n,uint32_t linked,
+    uint32_t targets,int64_t *weights,int64_t *evaluations,uint32_t *slot,
+    const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
+) {
+    if(upstream_refused(census,lineage,lineage_count,slot) || *slot)return;
+    uint32_t R=2u*targets;
+    uint64_t total=(uint64_t)4u*R,stride=(uint64_t)blockDim.x*(uint64_t)gridDim.x;
+    for(uint64_t coordinate=(uint64_t)blockIdx.x*blockDim.x+threadIdx.x;
+        coordinate<total;coordinate+=stride){
+        uint32_t q=(uint32_t)(coordinate/R),j=(uint32_t)(coordinate%R);
+        contextual_material_evaluation_coordinate(table,out,at,n,linked,q,j,targets,weights,evaluations,slot);
+    }
+}
+
+// phase is an execution tag: 0 composes all stages in one block, 1 prepares shared inputs,
+// and 2 consumes completed row/coordinate work. It changes no numerical aperture or law.
 __device__ void contextual_material_prepare(
     const int64_t *state,const int64_t *original,const int64_t *table,uint32_t at,uint64_t source_ordinal,
     int64_t *weights,int64_t *evaluations,const int64_t *query,const int64_t *origin,const int64_t *incoming,
     const int64_t *frame,const int64_t *origin_frame,const int64_t *covariance,const wide *before,const wide *current,
     uint32_t n,uint32_t linked,uint32_t grain,uint32_t version,int64_t *next,int64_t *next_hi,int64_t *out,int64_t *out_hi,
-    wide *scratch,uint32_t *slot,wide joint_radius=-1,const wide *operative_b=nullptr,uint32_t operative_count=0,uint32_t targets=0,uint32_t target_factor_width=0
+    wide *scratch,uint32_t *slot,wide joint_radius=-1,const wide *operative_b=nullptr,uint32_t operative_count=0,uint32_t targets=0,uint32_t target_factor_width=0,uint32_t phase=0
 ) {
     if(!targets)targets=n;
     uint32_t R=2u*targets,D=6u*n,stride=R+1u;size_t ga=2u*D+8u,raw_stride=30u*targets;
     wide *ball=(wide *)out,*abs_beta=(wide *)(out+contextual_beta(n,targets)),*ctx_beta=abs_beta+R;
     wide S=(wide)((uwide)1u<<grain);int64_t *meta=out+contextual_meta(n,targets);wide *extra=(wide *)(out+contextual_extra(n,targets));
-    if(threadIdx.x==0){
+    if(phase!=2u && threadIdx.x==0){
         for(size_t i=0;i<contextual_extra(n,targets)+24u;++i)out[i]=out_hi[i]=0;
         if((linked && (!at || source_ordinal>=at || !original)) || at>=(uint32_t)INT64_MAX){atomicOr(slot,REFUSED_MALFORMED);}
         if(!*slot && version>=3u)contextual_operative_source(current,version==4u?nullptr:operative_b,version==4u?0u:operative_count,n,grain,at,joint_radius,state,next,next_hi,out+contextual_context(n,targets),out_hi+contextual_context(n,targets),slot);
@@ -249,38 +340,12 @@ __device__ void contextual_material_prepare(
     }
     __syncthreads();if(*slot)return;
     bool contrasted=linked && meta[2]<(int64_t)at;
-    // One kernel row per immutable input source and query. Reflected factors reuse the
-    // reference row's weights rather than recomputing the same source pairing.
-    for(uint32_t i=threadIdx.x;i<=at;i+=blockDim.x){
-        const int64_t *entry=i==at?out:contextual_at(table,i);bool valid=entry[contextual_meta(n,targets)+1u]>=0;
-        for(uint32_t q=0;q<4u;++q){
-            int64_t *weight=weights+((size_t)i*4u+q)*4u;for(uint32_t j=0;j<4u;++j)weight[j]=0;
-            if(!valid || (q>0 && !linked) || (q==3 && !contrasted))continue;
-            if(q==2 && source_ordinal==(uint64_t)at-1u){for(uint32_t j=0;j<4u;++j)weight[j]=weights[((size_t)i*4u+1u)*4u+j];continue;}
-            const int64_t *sv,*cv;contextual_query_parts(table,out,n,at,q,&sv,&cv,slot,targets);if(*slot)continue;
-            const int64_t *si=entry+contextual_input_visible(n,targets),*ci=contextual_at(table,i-1u)+contextual_context(n,targets);
-            uint32_t context_at=contextual_query_context(out,n,at,q,targets);
-            const wide *bq=context_at==at?operative_b:contextual_b_at(table,context_at);
-            uint32_t rem=0;wide k=contextual_kernel(si,ci,sv,cv,n,grain,version,&rem,slot,contextual_b_at(table,i-1u),bq);
-            ((wide *)weight)[0]=k;weight[2]=rem;weight[3]=0;
-        }
-    }
+    if(phase==1u)return;
+    if(phase!=2u)for(uint32_t i=threadIdx.x;i<=at;i+=blockDim.x)
+        contextual_material_weight_row(table,out,at,source_ordinal,i,n,grain,version,weights,slot,operative_b,targets);
     __syncthreads();if(*slot)return;
-    for(uint32_t coordinate=threadIdx.x;coordinate<4u*R;coordinate+=blockDim.x){
-        uint32_t q=coordinate/R,j=coordinate%R;HistoryInteger sum,pos,neg;
-        if(q==0 || (linked && (q<3 || contrasted))){
-            for(uint32_t i=0;i<at;++i){
-                const int64_t *old=contextual_at(table,i),*m=old+contextual_meta(n,targets);if(m[1]<0)continue;
-                const wide *b=(const wide *)(old+contextual_beta(n,targets));
-                contextual_factor_add(history_integer(b[j])+history_integer(b[R+j]),weights+((size_t)i*4u+q)*4u,sum,pos,neg);
-                if(m[2]<(int64_t)i)contextual_factor_add(-history_integer(b[R+j]),weights+((size_t)m[2]*4u+q)*4u,sum,pos,neg);
-            }
-        }
-        int64_t *raw=evaluations+q*raw_stride;
-        history_write_integer(sum,raw+5u*j,raw+5u*j,slot);
-        history_write_integer(pos,raw+5u*(R+j),raw+5u*(R+j),slot);
-        history_write_integer(neg,raw+5u*(2u*R+j),raw+5u*(2u*R+j),slot);
-    }
+    if(phase!=2u)for(uint32_t coordinate=threadIdx.x;coordinate<4u*R;coordinate+=blockDim.x)
+        contextual_material_evaluation_coordinate(table,out,at,n,linked,coordinate/R,coordinate%R,targets,weights,evaluations,slot);
     __syncthreads();if(*slot)return;
     if(threadIdx.x==0){
         const wide *old_bounds=(const wide *)(state+ga);wide et=old_bounds[0],nt=old_bounds[1];

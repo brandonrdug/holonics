@@ -270,6 +270,8 @@ pub struct NativeConstitutiveField<'chart> {
     pending_junction: Option<PendingJunction<'chart>>,
     transport: Option<MaterialTransport<'chart>>,
     pending_transport: Option<PendingMaterialTransport<'chart>>,
+    #[cfg(test)]
+    fused_contextual: bool,
 }
 
 impl<'chart> NativeConstitutiveField<'chart> {
@@ -346,6 +348,8 @@ impl<'chart> NativeConstitutiveField<'chart> {
             pending_junction: None,
             transport: None,
             pending_transport: None,
+            #[cfg(test)]
+            fused_contextual: false,
         })
     }
 
@@ -708,6 +712,10 @@ impl<'chart> NativeConstitutiveField<'chart> {
         if self.transport.as_ref().is_some_and(|t|!t.source.is_operative()) && self.junction.as_ref().and_then(|j|j.operative.as_ref()).is_some_and(|o|!o.has_legacy_current_decoder()) {
             return Err(ConstitutiveFibreError::Rest("this material source requires the operative current decoder".into()));
         }
+        #[cfg(test)]
+        let fused_contextual = self.fused_contextual;
+        #[cfg(not(test))]
+        let fused_contextual = false;
         let material_target=self.transport.as_ref().map_or((self.nodes(),0),|t|(t.target.dimension(self.nodes()).unwrap(),t.target.kernel()));
         let prepared = self.prepare_junction(observed_source_at.is_some())?;
         let prepared_transport = self.prepare_material_transport(observed_source_at)?;
@@ -826,7 +834,7 @@ impl<'chart> NativeConstitutiveField<'chart> {
                     .as_ref()
                     .and_then(|p| p.moment.as_ref())
                     .map(|p| (&p.table, p.count, &p.weights)),
-                prepared_transport.as_ref().and_then(|p|p.contextual.as_ref()).map(|p|(&p.table,&p.weights,&p.evaluations,observed_source_at.unwrap_or(0) as u64)),
+                prepared_transport.as_ref().and_then(|p|p.contextual.as_ref()).map(|p|(&p.table,&p.weights,&p.evaluations,observed_source_at.unwrap_or(0) as u64,(!fused_contextual).then_some(&p.commit))),
                 prepared.as_ref().and_then(|(p,_)|p.operative.as_ref()).map(|p|&p.table),
                 material_target,
                 &output,
