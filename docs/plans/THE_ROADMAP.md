@@ -11,6 +11,12 @@ governs the next AC construction. Preserve the bounded local and execution retur
 resume their exposure loop as if generic packaging completed native generator organization.
 No medium defines a special native learner or semantic topology.
 
+[established-bounded; implemented-exact; computational-witness] The authorized
+[retirement and first construction return](../../research/records/2026-09-09_THE_BYTE_CAMPAIGN_RETIRES_AND_A_LEARNED_LOCAL_GENERATOR_RESTS_WITHOUT_HISTORY.md)
+now removes the old assembly from live use and implements compact rest/remount of the existing
+learned local law. Its public example conducts new and repeated currents without an occurrence
+archive. Continue with actual local-generator composition; this first attachment does not close AC.
+
 ## Fresh-session pickup
 
 1. Read [AGENTS.md](../../AGENTS.md), [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md), and this
@@ -146,11 +152,12 @@ achieved. Current research seeks identifiable behavior and learning without a ut
 | AC4 | Restriction/rebase or generator reuse that participates in the next operation | Current-factor savings stand at their numerical scope; they do not close generative organization |
 | AC5 | Public invocation, model anatomy and persistence of the actual productive body | Existing generic access and full-history rest stand; do not label the archive compact learned material |
 
-[definition] The first finite packet returns through the existing projective joint field,
-its producing source/current family and observed contact response. The [composition guide](../HNN_COMPOSITION.md)
-names the actual public owners and tensor map. Complete-successor comparisons and a later
-separated current family retain their source/receiver scope; the original linear field remains
-a valid distinct comparison. No new nonlinear law or general-language capability is claimed.
+[definition] The first replacement packet uses `ResidentConstitutiveFibre`, its actual
+source/condition contact and `ConstitutiveFibreRest`. That compact learned law now conducts
+later resident currents after the observation apparatus is released and after process remount.
+Next compose these generator/current owners into the continuing ecology and local refinement,
+retaining domain and plural fibres. The earlier projective field remains diagnostic evidence;
+it is not the productive carrier for resumed conversation cultivation.
 
 [definition] The corrected formal `FiniteLocalCurrentEcology.reaction` retains local
 standing. The [native field assembly and observed return](../../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)

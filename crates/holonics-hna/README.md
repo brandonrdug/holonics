@@ -19,6 +19,12 @@ and `resume_wave_control` expose bounded process cuts; generic application-beari
 opaque exterior bytes without typing the engine interior. Actual process comparisons and the
 scoped release `native_resources` receiver returned at the guide's declared limits.
 
+[definition] `alpha::exposure` remains the conversation source reader. The former byte-field
+material/text/checkpoint adapters and field/model wrapper were [retired](../../archive/implementations/2026-09-09-byte-field-cultivation/README.md).
+The `native_generator` example now exercises the engine's learned local law and
+`ConstitutiveFibreRest` through resident current composition, with no text codec or observation
+archive in its learned material. Its declared phase-source example does not establish a general model.
+
 ## Earlier inherited-operator interface
 
 [established-bounded; source-inspected] These interfaces retain their existing bounded scope:

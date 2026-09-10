@@ -31,13 +31,13 @@ and held-state writes. Arithmetic refusal preserves the live owner and source ha
 device completion retains pending lineage and prevents replay. No host float, token difference,
 semantic selector or fitted input/output array determines the native source.
 
-[definition] [`OctetExcitation`](../../crates/holonics-hna/src/alpha/material.rs) is an exterior
+[definition] [`OctetExcitation`](../../archive/implementations/2026-09-09-byte-field-cultivation/crates/holonics-hna/src/alpha/material.rs) is an exterior
 reversible port chart: eight bit positions with two channels each, and one unit impulse per bit.
 Every octet therefore supplies eight unit impulses to sixteen addressed input ports. Source bytes
 choose their channel, not a numerical amplitude or semantic vector. This fixed calibration is an
 application declaration; sixteen is not a discovered native semantic capacity.
 
-[definition] [`alpha_material`](../../crates/holonics-hna/examples/alpha_material.rs) streams a
+[definition] [`alpha_material`](../../archive/implementations/2026-09-09-byte-field-cultivation/crates/holonics-hna/examples/alpha_material.rs) streams a
 declared number of complete AC0 development families through one field owner. It preserves the
 complete source coordinates and opaque material. Actual emission handles link consecutive octets
 within one text part; part boundaries break that source comparison without resetting the ecology.

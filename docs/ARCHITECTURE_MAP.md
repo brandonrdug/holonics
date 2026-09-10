@@ -109,11 +109,17 @@ owners add no native learner or physical identity outside their stated hypothese
 
 ## Foundation and transport
 
-[definition] `holonics-hna::native::field` owns the medium-neutral field recipe and callback;
-its `checkpoint` module owns `NativeSavedField` on the existing field wire. The engine's
-`field/junction/operative/response/observation.rs` owns observed-return orchestration. Text
-adapters delegate these operations and retain their exterior cursor/delivery state separately.
-The [Rust guide](RUST_FRAMEWORK.md) links the compiled invocation and persistence boundary.
+[definition] `constitutive_fibre/law_rest.rs` owns `ConstitutiveFibreRest`, the learned local
+relation's source chart, basis and chronology without an occurrence archive. It remounts into
+`ResidentConstitutiveFibre`; existing resident current/condition ports conduct the learned law.
+`circulation/rest.rs` owns the shared exact point-section wire used by both local-law and older
+field rests. The [Rust guide](RUST_FRAMEWORK.md) and public `native_generator` example expose
+this scoped generator construction.
+
+[historical] The SDK field/model wrapper, text adapters and eight alpha examples were
+[retired recoverably](../archive/implementations/2026-09-09-byte-field-cultivation/README.md).
+Core field/operative/receiver owners below remain mathematical and diagnostic constructions;
+references to alpha text drivers name historical consumers, not current cultivation entrypoints.
 
 [established-bounded; source-inspected] The [representation audit](../research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)
 qualifies these owners: `OperativeState::prepare` allocates per observed contact,
@@ -205,8 +211,8 @@ conducts the implicit bilinear phase moment, native equal-source reference disco
 staged coercive returns. `constitutive_field.cuh` remains the sole publication owner.
 `field/rest.rs` verifies chart kind, original source and reference chronology. The
 [ordinary contextual return](../research/records/2026-09-08_AC1_ORDINARY_RECEPTION_CONDUCTS_THE_SOURCE_AND_ITS_AVAILABLE_CONTEXT.md)
-records the rational controls and failed actual conversation result. `alpha_text` selects the
-new source kind; it contains no reference-pair chooser or additional native learning operation.
+records the rational controls and failed actual conversation result. The retired `alpha_text` driver selected the
+source kind; it contained no reference-pair chooser or additional native learning operation.
 
 [established-bounded; source-inspected] `exact_linear/contextual.rs` composes kernel/image and
 preimage algebra into the [contextual lift](../research/records/2026-09-07_AC1_THE_SOURCE_NULL_RETURN_DERIVES_ITS_CONTEXTUAL_LIFT.md).
@@ -314,8 +320,8 @@ records exact, archive, legacy and prefix controls and model costs.
 
 [established-bounded; source-inspected] `field/receiver/packet.rs::NativePacketQuadrature`
 and `field_normalized_receiver.cuh` expose I/Q projections of the same joint current ball.
-`holonics-hna::alpha::text_codec::TextDirection`, `text_session` and `checkpoint` carry the
-explicit duplex application chart and pending direction. The exposure driver mounts its actual
+The retired SDK `TextDirection`, `text_session` and `checkpoint` carried the
+explicit duplex application chart and pending direction. The former exposure driver mounted its actual
 human/agent part kinds through those ports. The [duplex return](../research/records/2026-09-09_AC1_AC2_CONVERSATIONAL_DIRECTION_REACHES_NATIVE_PORTS.md)
 records the native/SDK/driver checks, actual failed responses and unchanged whole-goal scope.
 
@@ -398,7 +404,7 @@ the activation cut and original input-bound carrier; `propagation.rs` regenerate
 from their source maps and actual current boundaries. `current_factor.rs` accepts the available
 producer, including separate current deposits. `response.rs` joins the propagated input reaction
 and sparse contact covector; its observer's `contact` method exposes the complete sum.
-`holonics-hna::alpha::text_session` delegates activation to the same owner. The
+The retired alpha text session delegated activation to the same owner. The
 [live return](../research/records/2026-09-09_AC1_AC2_CAUSAL_PROPAGATION_ENTERS_THE_CONTINUING_RECURRENCE.md)
 records source/restart checks and the active actual-conversation comparison.
 
@@ -422,7 +428,7 @@ numerical readback. General conversation-field attachment and Metal realization 
 [established-bounded; measured] `field/relation_current.rs` now queries that same resident owner
 at an actual source of `NativeConstitutiveField`, with both branches transported by
 `section_field_source_frame`. `section_constitutive_differential` implements fixed differential
-faces of a whole affine fibre; `alpha::{text_codec,text_session}` and `alpha_text` expose it as
+faces of a whole affine fibre; the retired alpha text adapters exposed it as
 an explicit exterior receiver. The [89-test and actual-model return](../research/records/2026-09-07_AC1_THE_FIELD_RETURNS_A_RESIDENT_RELATION_FACE_AND_A_PLURAL_FIBRE_HAS_FIXED_RECEIVERS.md)
 keeps the historical source distinct from the contemporary relation cut. The contextual
 generator/formation attachment remains open.
@@ -535,7 +541,7 @@ The draft applies its maps globally at that port; it does not supply the missing
 | Exact finite diffusion and state-space chart | `Computation/HolonicDiffusionCharts.lean` | `diffusion.rs`; `sheaf_diffusion.rs`; `causal_body.rs` | `cuda_refine/membrane_boundary_*`; `membrane_factored_transport.rs` | **partial:** Lean Markov/deterministic separation is broader than one resident runtime owner |
 | Finite neural ecology local-current step | `Computation/HolonicNeuralEcology.lean` | `crates/holonic-life/src/dialogue_native_spool.rs`; `crates/holonic-life/src/native_intelligence/rest.rs`; `crates/holonic-life/src/native_intelligence/conduct.rs`; `native_ecology/mod.rs`; `native_ecology/inference_ecology.rs`; `native_ecology/recurrent.rs`; `native_ecology/continuation.rs` | `cuda_refine/device_recurrence.rs`; `cuda_refine/complex_parametron.rs`; `device_ecology_types.rs` | **exact-bounded** for the complete visible-exchange native spool, compact K3 batch, direct source-neutral cycle, and declared receiver returns |
 | Local constitutive relation and phase ecology | `Computation/{HolonicConstitutiveFibre,HolonicConstitutiveCirculation,HolonicConstitutiveRechart}.lean` | `native_ecology/constitutive_fibre.rs`; `constitutive_fibre/circulation.rs`; `circulation/{rechart,rest}.rs`; public `holonics-hna::native` including `native/checkpoint.rs`, shared `stream` and exterior `native/wave_control/session.rs` | `exact_resident_section.cu::{section_constitutive_fibre,section_constitutive_circulation,section_constitutive_rechart}` | [established-bounded; measured] Native current/formation/successor, full held pullbacks, fixed-node unit-phase recharting, old-source frames and open/plural fibres. NCF0--NCF4 returned the interface/current application, complete native/handle/stream and world persistence, actual process continuation without replay and release resource evidence. The [native guide](NATIVE_HNA.md) keeps its local linear-family scope distinct from broader architecture/language/performance claims |
-| Complete material port field and alpha exposure | Same local relation/junction construction at a wider declared source/receiver chart; no new formal claim | `native_ecology/constitutive_fibre/field.rs`, `field/{rechart,junction,receiver,material_transport,current_history_source,rest,archive}.rs`, `junction/enclosure.rs`; `holonics-hna::alpha::{exposure,material,text_codec,text_session,checkpoint}`; examples `alpha_exposure`, `alpha_material`, `alpha_text`, `alpha_current_source` | `constitutive_field.cuh::{section_constitutive_field,section_constitutive_field_rechart}`; `paired_field_junction.cuh`, `enclosed_field_junction.cuh`, `balanced_field_factorization.cuh`, `field_differential_receiver.cuh`, `field_material_transport.cuh`, `field_complete_material_transport.cuh`, `field_current_history_source.cuh`; shared `exact_integer.cuh` (also used by the unchanged conic law) | [established-bounded; measured] Complete raw source/receiving fields, linear handles and shared immutable source anchors, frame transport, paired moment/internal current and [certified residual representation](../research/records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md). The [text-current return](../research/records/2026-09-06_AC1_THE_SHARED_SOURCE_MEETS_AN_EXPLICIT_TEXT_CURRENT_RECEIVER.md) binds three actual parent contacts and presents differential current through an octet/end-of-part chart. A [checked balanced factorization](../research/records/2026-09-07_AC1_THE_BALANCED_FACTOR_RETURNS_THE_FULL_CURRENT_AND_THE_CODEC_OWES_ITS_OWN_TRANSPORT.md) retains the full root current. The [native material transport](../research/records/2026-09-07_AC2_THE_RETAINED_CONTEXT_RECEIVES_A_NATIVE_MATERIAL_TRANSPORT.md) now receives the retained contextual source and old forward carrier and stages a coefficient return with the encoder. The [field rest](../research/records/2026-09-07_AC3_THE_CULTIVATED_FIELD_RESTARTS_WITHOUT_SOURCE_REPLAY.md) and text checkpoint preserve complete state, parent capabilities, staged input and delivery; actual process-separated continuation matches uninterrupted current and emission. The [exterior history chart](../research/records/2026-09-07_AC3_THE_COMPLETE_HISTORY_MOVES_TO_AN_EXTERIOR_CHART_AND_ITS_ADDRESSED_SOURCE_RETURNS.md) retains complete historical carriers off the device and remounts an actual addressed source without developmental replay. The [complete-current source construction](../research/records/2026-09-07_AC2_THE_FULL_INTERNAL_CURRENT_HAS_AN_ADDRESSED_PREFIX_PAIRING.md) now returns full internal-source pairings and a strict zero-boundary witness; its explicit `CompleteCurrent` variant now joins the fused material return with full parameter/source error and persistence. The [material-return record](../research/records/2026-09-07_AC2_THE_COMPLETE_CURRENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md) retains that bounded coupling and the failed actual response. Responses remain unusable; useful broad cultivation remains open |
+| Complete material port field and alpha exposure | Same local relation/junction construction at a wider declared source/receiver chart; no new formal claim | `native_ecology/constitutive_fibre/field.rs`, `field/{rechart,junction,receiver,material_transport,current_history_source,rest,archive}.rs`, `junction/enclosure.rs`; live `holonics-hna::alpha::exposure` / `alpha_exposure`; retired material/text/checkpoint adapters in the byte-field archive | `constitutive_field.cuh::{section_constitutive_field,section_constitutive_field_rechart}`; `paired_field_junction.cuh`, `enclosed_field_junction.cuh`, `balanced_field_factorization.cuh`, `field_differential_receiver.cuh`, `field_material_transport.cuh`, `field_complete_material_transport.cuh`, `field_current_history_source.cuh`; shared `exact_integer.cuh` (also used by the unchanged conic law) | [established-bounded; measured] Complete raw source/receiving fields, linear handles and shared immutable source anchors, frame transport, paired moment/internal current and [certified residual representation](../research/records/2026-09-06_AC1_THE_RESIDUAL_CARRIES_THE_CONTINUING_JUNCTION_WITHOUT_A_POINT_SEAL.md). The [text-current return](../research/records/2026-09-06_AC1_THE_SHARED_SOURCE_MEETS_AN_EXPLICIT_TEXT_CURRENT_RECEIVER.md) binds three actual parent contacts and presents differential current through an octet/end-of-part chart. A [checked balanced factorization](../research/records/2026-09-07_AC1_THE_BALANCED_FACTOR_RETURNS_THE_FULL_CURRENT_AND_THE_CODEC_OWES_ITS_OWN_TRANSPORT.md) retains the full root current. The [native material transport](../research/records/2026-09-07_AC2_THE_RETAINED_CONTEXT_RECEIVES_A_NATIVE_MATERIAL_TRANSPORT.md) now receives the retained contextual source and old forward carrier and stages a coefficient return with the encoder. The [field rest](../research/records/2026-09-07_AC3_THE_CULTIVATED_FIELD_RESTARTS_WITHOUT_SOURCE_REPLAY.md) and text checkpoint preserve complete state, parent capabilities, staged input and delivery; actual process-separated continuation matches uninterrupted current and emission. The [exterior history chart](../research/records/2026-09-07_AC3_THE_COMPLETE_HISTORY_MOVES_TO_AN_EXTERIOR_CHART_AND_ITS_ADDRESSED_SOURCE_RETURNS.md) retains complete historical carriers off the device and remounts an actual addressed source without developmental replay. The [complete-current source construction](../research/records/2026-09-07_AC2_THE_FULL_INTERNAL_CURRENT_HAS_AN_ADDRESSED_PREFIX_PAIRING.md) now returns full internal-source pairings and a strict zero-boundary witness; its explicit `CompleteCurrent` variant now joins the fused material return with full parameter/source error and persistence. The [material-return record](../research/records/2026-09-07_AC2_THE_COMPLETE_CURRENT_JOINS_THE_NATIVE_MATERIAL_RETURN.md) retains that bounded coupling and the failed actual response. Responses remain unusable; useful broad cultivation remains open |
 | Dynamic receiver quotient and every-word law | `Computation/MachineLearningChart.lean` | `receiver_history_compression.rs`; `receiver_history_cultivation.rs`; `receiver_exact_compression.rs` | `cuda_refine/membrane_receiver_completion.rs` | **exact-bounded** for admitted quotient systems and the retained R0Q3 full-complex realization section |
 | Dependent changing carrier | `Computation/DependentMachineLearningCarrier.lean` | `native_ecology/heterogeneous_fusion.rs`; `native_ecology/factor_complex.rs`; `crates/holonic-life/src/native_intelligence/source_neutral_relational/pair_current.rs` | `device_ecology_types.rs`; `complex_parametron.rs`; `addressed_complex_junction.rs` | **exact-bounded:** response/source/target incidence and full complex current reach resident realization with the complete declared preimage fibre |
 | Situated returned difference | `Computation/SituatedMachineLearning.lean` | `crates/holonic-life/src/native_intelligence/situated_difference.rs`; `exchange_situated_product.rs`; `source_neutral_relational/realization.rs` | `cuda_refine/complex_parametron.rs`; `integrated_front.rs` | **exact-bounded:** actual emission/later-return differences, nontrivial charts, source-detached remount, withdrawal, and restoration return |
@@ -582,15 +588,10 @@ The draft applies its maps globally at that port; it does not supply the missing
 
 ## Classical learning, reflection and recursive compression
 
-[established-bounded; implemented-exact] `holonics-hna/src/native/field.rs` owns the public
-finite field recipe/mount; `field/junction/operative/response/observation.rs` owns generic
-observed-response orchestration and its typed receiver chart. Text delegates to these owners.
-`holonics-hna/src/native/field/checkpoint.rs` owns generic native-field file publication and
-consuming remount; text's envelope retains its own delivery metadata and delegates to it.
-The [AC1/AC2 return](../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)
-retains complete-successor comparisons, actual source/standing separation and a later current
-family changed by one local return. Existing native mathematical laws and rest formats stand.
-
+[historical] The [AC1/AC2 field-wrapper return](../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)
+retains complete-successor and local-return comparisons. Its SDK assembly/archive wrapper is
+now retired. `field/junction/operative/response/observation.rs` remains a generic observed-response
+owner for its declared field law. New local generator persistence is `constitutive_fibre/law_rest.rs`.
 
 [established-bounded; implemented-exact; formal-checked] The deeper September 9 review extends
 `FiniteLocalCurrentEcology.reaction` with actual local standing. `Graph.ecology` uses it instead

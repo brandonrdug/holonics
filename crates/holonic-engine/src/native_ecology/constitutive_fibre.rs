@@ -26,6 +26,8 @@ pub use circulation::*;
 mod field;
 pub use field::*;
 mod resident;
+mod law_rest;
+pub use law_rest::ConstitutiveFibreRest;
 pub use resident::{
     ConditionContactMetric, ConditionContactReading, ConditionContactStatus, ConditionCoverage,
     ConditionImageReading, ConditionPreimageReading, ConstitutiveDifferentialReading,
@@ -108,11 +110,11 @@ pub struct ResidentConstitutiveFibre<'chart> {
 }
 
 impl<'chart> ResidentConstitutiveFibre<'chart> {
-    pub fn found(
+    fn check_extent(
         surface: &'chart ResidentSurface<'chart>,
         source_width: usize,
         target_width: usize,
-    ) -> Result<Self, ConstitutiveFibreError> {
+    ) -> Result<(usize, usize), ConstitutiveFibreError> {
         let width = source_width
             .checked_add(target_width)
             .ok_or(ConstitutiveFibreError::Shape)?;
@@ -130,6 +132,15 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
                 available,
             });
         }
+        Ok((width, count))
+    }
+
+    pub fn found(
+        surface: &'chart ResidentSurface<'chart>,
+        source_width: usize,
+        target_width: usize,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        let (width, count) = Self::check_extent(surface, source_width, target_width)?;
         let mut zeros = Vec::new();
         zeros
             .try_reserve_exact(count)

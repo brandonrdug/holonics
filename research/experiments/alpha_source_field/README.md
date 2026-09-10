@@ -1,7 +1,7 @@
 # Exact observers of the first alpha material field
 
 [definition] `inspect_linear_fibre.py` reads the private report produced by
-[`alpha_material`](../../../crates/holonics-hna/examples/alpha_material.rs). It reconstructs the
+[`alpha_material`](../../../archive/implementations/2026-09-09-byte-field-cultivation/crates/holonics-hna/examples/alpha_material.rs). It reconstructs the
 declared matched, unit-admittance junction with exact Python fractions, checks saved native source
 sections, and returns two finite witnesses. It performs no native learning, output selection or
 proof-assistant execution.

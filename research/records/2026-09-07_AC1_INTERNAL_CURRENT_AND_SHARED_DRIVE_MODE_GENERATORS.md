@@ -119,7 +119,7 @@ of predecessor metadata ingress. The example's own whole-run clock reads `0.1448
 
 [established-bounded; measured] The SDK's read-only `TextFieldSession::condense_shared_drive_mode`
 delegates to that native owner. The
-[`alpha_internal_mode`](../../crates/holonics-hna/examples/alpha_internal_mode.rs) study loaded the
+[`alpha_internal_mode`](../../archive/implementations/2026-09-09-byte-field-cultivation/crates/holonics-hna/examples/alpha_internal_mode.rs) study loaded the
 actual saved four-family, 732-occurrence `CompleteCurrent` model. Its declared experimental
 aperture proposes chronological pairs from repeated **exterior** input triples; this is a cold
 probe proposal, not morphology, semantic identity, a language rule or an inference selector.

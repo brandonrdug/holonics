@@ -1,7 +1,7 @@
 # Construction state
 
-**Currency:** September 9, 2026. **Priority:** Native HNN cultivation through Holons as situated state, incidence, transported differences and compatible continuations; text/audio/visual media are exterior measurement charts.
-**Position:** The representation audit identifies a byte-clocked, occurrence-expanded predictor with operational historical carriers, not the requested generator-bearing HNN composition. The AC0–AC5 completion claim is withdrawn at that construction scope; source preparation and bounded local-learning, CUDA and persistence checks stand. Native object/generator composition needs repair. No cultivation process is running.
+**Currency:** September 9, 2026. **Priority:** Corrected AC0–AC5 construction is the active goal. Native HNN cultivation uses Holons as situated state, incidence, transported differences and compatible continuations; text/audio/visual media are exterior measurement charts.
+**Position:** The defective byte-cultivation assembly is retired from the live SDK/examples and preserved recoverably. The blueprint is rewritten. AC1's first replacement attachment now returns: a learned local conditional law rests without observation history and carries later resident currents after remount. Whole-ecology generator composition and the conversation-codec attachment remain unfinished; AC0–AC5 is not complete. No cultivation process is running.
 **Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -89,13 +89,28 @@ model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction — representation repair
 
+[established-bounded; implemented-exact; computational-witness] The [retirement and first generator return](research/records/2026-09-09_THE_BYTE_CAMPAIGN_RETIRES_AND_A_LEARNED_LOCAL_GENERATOR_RESTS_WITHOUT_HISTORY.md)
+removes eighteen source files/eight old example entrypoints from the live campaign, preserving
+source, data and evidence. `ConstitutiveFibreRest` remounts the existing learned local relation,
+not a historical field archive. The public source/phase example retains a 739-byte law, returns
+a new superposition and composes 257 operations with fixed 1,392-byte native residency and zero
+numerical host readouts. A separate process returns the same current and law properties.
+Seventeen host, 35 resident CUDA, six existing native-wire and ten source-reader tests pass;
+the public facade checks. These are local-law and removal results, not a general HNN or language claim.
+
+[definition] Continue AC1 with composition of these actual local generator/current/condition
+owners into a continuing ecology, with AC2's observed local refinement and AC4's restriction/
+rebase applied to their admitted source families. The source reader remains available for AC3;
+it does not itself supply the missing generator-based codec. Do not resume the retired byte loop.
+
 [established-bounded; source-inspected; computational-witness] The [representation audit](research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)
 finds one new persistent contact coordinate per source-linked observation and a contextual
 predictor that sums occurrence-indexed historical contributions. All 5,048 exposed bytes are
 exactly recoverable from native input lineage. Generic assembly/persistence APIs did not turn
 this representation into recovered generator material. The audit recovers the actual shared-mode,
 observable-form, leader/rebase, fractal/cycle and torus owners that were not composed into its
-productive state. No replacement native passage has been implemented by this audit.
+productive state. The audit itself implemented no replacement; the subsequent return above
+now supplies the first local-law persistence and continuing-use attachment.
 
 [established-bounded; source-inspected; measured] The [excitation/reporting correction](research/records/2026-09-09_AC4_AC5_THE_JOINT_OPERATION_SPANS_BLOCKS_AND_THE_RESEARCH_MODEL_CONTINUES.md#correction-the-actual-excitation-and-the-meaning-of-the-cost-report)
 states the actual input, its 62 arrivals and 61 local learning returns, and the fresh unit drive

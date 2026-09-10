@@ -1,0 +1,87 @@
+{
+  "grade": "established-bounded",
+  "evidence": [
+    "implemented-exact",
+    "computational-witness",
+    "measured"
+  ],
+  "scope": "First compact resident constitutive law attachment: six actual native phase-source observations, a new rational condition and superposition, 257 composed operations, and independent process remount. This is not conversation cultivation or a complete HNN ecology.",
+  "source_observations": 6,
+  "learn_process": {
+    "command": [
+      "target/debug/examples/native_generator",
+      "learn",
+      ".local/artifacts/native-generator-law-2026-09-09/phase.law"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 0.26682067196816206,
+    "stderr": "",
+    "return": {
+      "basis_words": 64,
+      "composed_operations": 257,
+      "current": [
+        "-6/5",
+        "17/5"
+      ],
+      "law_file_octets": 739,
+      "law_unchanged": true,
+      "learned_rank": 6,
+      "mode": "learn",
+      "native_ingress_octets_during_continuation": 1028,
+      "numerical_section_readouts_during_continuation": 0,
+      "resident_octets_during_continuation": 1392,
+      "retained_observation_population": 0,
+      "scope": "measured local bilinear phase generator; not a language model",
+      "source_chart": {
+        "condition_complex": 1,
+        "kind": "bilinear-contact",
+        "source_complex": 1
+      }
+    }
+  },
+  "resume_process": {
+    "command": [
+      "target/debug/examples/native_generator",
+      "resume",
+      ".local/artifacts/native-generator-law-2026-09-09/phase.law"
+    ],
+    "exit_code": 0,
+    "wall_seconds": 0.2371550239622593,
+    "stderr": "",
+    "return": {
+      "basis_words": 64,
+      "composed_operations": 257,
+      "current": [
+        "-6/5",
+        "17/5"
+      ],
+      "law_file_octets": 739,
+      "law_unchanged": true,
+      "learned_rank": 6,
+      "mode": "resume",
+      "native_ingress_octets_during_continuation": 1028,
+      "numerical_section_readouts_during_continuation": 0,
+      "resident_octets_during_continuation": 1392,
+      "retained_observation_population": 0,
+      "scope": "measured local bilinear phase generator; not a language model",
+      "source_chart": {
+        "condition_complex": 1,
+        "kind": "bilinear-contact",
+        "source_complex": 1
+      }
+    }
+  },
+  "identical_reported_current_and_law_properties_after_fresh_process": true,
+  "public_law_artifact": "research/experiments/native_generator_law/2026-09-09_phase.law",
+  "checks": {
+    "constitutive_host_tests": 17,
+    "resident_constitutive_cuda_tests": 35,
+    "conversation_source_tests": 10,
+    "existing_native_ecology_wire_cuda_tests": 6,
+    "public_holonics_all_targets_check": "passed",
+    "retired_examples_absent_from_cargo_targets": 8
+  },
+  "resident_scope": "Resident allocations counted by the native surface; excludes CUDA context, compiled program and host process overhead.",
+  "ingress_scope": "1028 bytes are the 4-byte operation-lineage indices for 257 bilinear passages, not numerical current uploads.",
+  "wire_scope": "739 bytes at the six-observation cut; 741 after 257 queries because the serialized chronology integer has two more decimal digits. Learned basis remains identical."
+}

@@ -17,7 +17,7 @@ output can influence later exterior inputs; those are distinct effects.
 
 [established-bounded; measured] The direct-sum and bilinear sixteen-family trials have identical
 development records, lineage through the prompt end, and complete junction at the first response,
-despite their different material charts and answers. The [cold history observer](../../crates/holonics-hna/examples/alpha_contextual_lift.rs)
+despite their different material charts and answers. The [cold history observer](../../archive/implementations/2026-09-09-byte-field-cultivation/crates/holonics-hna/examples/alpha_contextual_lift.rs)
 reads the current bilinear checkpoint through `SavedTextField` and the existing field inspector.
 It exports 5,064 historical material reports with **zero native deeds**, 5,064 explicit cold
 section reads and 226,543,104 readout bytes, in 49.51 seconds. The model is unchanged.

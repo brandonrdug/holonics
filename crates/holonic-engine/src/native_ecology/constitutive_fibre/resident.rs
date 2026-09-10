@@ -384,6 +384,8 @@ mod tests;
 
 #[cfg(test)]
 mod contact_tests;
+#[cfg(test)]
+mod law_rest_tests;
 
 mod preimage;
 pub use preimage::{ConditionPreimageReading, ResidentConditionPreimage};

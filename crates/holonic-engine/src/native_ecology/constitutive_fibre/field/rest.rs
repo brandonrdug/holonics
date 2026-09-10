@@ -110,48 +110,8 @@ fn packed(rest: &ResidentSectionRest) -> Result<Vec<i128>, Error> {
         .collect())
 }
 
-// Every admitted section in this field wire has exact i64 codewords. Store each codeword once
-// and reconstruct both identical endpoints. This does not quotient a current ball or a fibre.
-pub(super) fn point_bytes(section: &ResidentSectionRest) -> Result<Vec<u8>, Error> {
-    point_section(section, section.rows, section.width)?;
-    let extent = section
-        .intervals
-        .len()
-        .checked_mul(8)
-        .and_then(|n| n.checked_add(24))
-        .ok_or(Error::Shape)?;
-    let mut bytes = Vec::new();
-    bytes.try_reserve_exact(extent).map_err(invalid)?;
-    for value in [section.rows, section.width, section.intervals.len()] {
-        bytes.extend_from_slice(&u64::try_from(value).map_err(invalid)?.to_le_bytes());
-    }
-    for (value, _) in &section.intervals {
-        bytes.extend_from_slice(&value.to_le_bytes());
-    }
-    Ok(bytes)
-}
-pub(super) fn read_point(bytes: &[u8]) -> Result<ResidentSectionRest, Error> {
-    if bytes.len() < 24 {
-        return Err(invalid("point section header"));
-    }
-    let word = |at| u64::from_le_bytes(bytes[at..at + 8].try_into().expect("checked header"));
-    let rows = usize::try_from(word(0)).map_err(invalid)?;
-    let width = usize::try_from(word(8)).map_err(invalid)?;
-    let count = usize::try_from(word(16)).map_err(invalid)?;
-    if rows.checked_mul(width) != Some(count)
-        || count.checked_mul(8).and_then(|n| n.checked_add(24)) != Some(bytes.len())
-    {
-        return Err(invalid("point section extent"));
-    }
-    let intervals = bytes[24..]
-        .chunks_exact(8)
-        .map(|v| {
-            let value = i64::from_le_bytes(v.try_into().expect("word"));
-            (value, value)
-        })
-        .collect();
-    ResidentSectionRest::found(rows, width, ResidentGrain(0), 64, intervals).map_err(invalid)
-}
+pub(super) use super::super::circulation::rest::{point_bytes, read_point};
+
 fn junction_section(
     rest: &ResidentSectionRest,
     dimension: usize,

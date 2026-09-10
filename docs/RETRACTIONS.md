@@ -6,6 +6,14 @@ root construction state records current implementation scope. Paths in code span
 
 ## Capability and retraction record
 
+[historical; process-audit] September 9, following explicit removal authorization: the
+byte-field material/text/session/checkpoint adapters, their generic field/model wrapper and
+eight alpha examples were moved out of the live SDK/build into the
+[recoverable source archive](../archive/implementations/2026-09-09-byte-field-cultivation/README.md).
+The source reader and native mathematical owners remain. The new local-law rest uses the
+existing constitutive relation, not an archived-source prediction path; its first returned
+scope is in the [construction record](../research/records/2026-09-09_THE_BYTE_CAMPAIGN_RETIRES_AND_A_LEARNED_LOCAL_GENERATOR_RESTS_WITHOUT_HISTORY.md).
+
 [historical; source-inspected; computational-witness] September 9, after `cf6d5b6b`: the finite
 AC0–AC5 completion statement is withdrawn as completion of generator-bearing HNN construction.
 The [representation audit](../research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)
