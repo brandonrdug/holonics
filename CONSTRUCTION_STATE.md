@@ -36,6 +36,11 @@ maps shared material, current contact and fresh response to existing HNN owners.
 witnesses expose the local source stencil's loss of larger ordering and separate present agreement
 from future agreement. This is an architecture review; native implementation and AC order are unchanged.
 
+[established-bounded; source-inspected] The [diagrammatic architecture return](research/records/2026-09-10_HNN_DIAGRAMS_EXPOSE_COMPOSITION_DEVELOPMENT_AND_SOULKILLER_LIFTS.md)
+now expands HNN's local passage, Eros's union/development phase, conventional Transformer blocks
+and Soulkiller's realization/restriction maps. Complete-state equivalence, receiver reduction and
+approximation have distinct diagrams and conditions. No native adapter or AC implementation changed.
+
 [proved-derived; formal-checked] The [normal-geometry and closed-return review](research/records/2026-09-09_MATHEMATICAL_REVIEW_NORMAL_GEOMETRY_AND_CLOSED_RETURNS.md)
 returns a residual-aware rank-one normal identity, exact finite source/target changes and complex
 square completion. These distinguish solve error, declared fit limits and the producing numerical

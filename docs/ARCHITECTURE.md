@@ -34,7 +34,7 @@ the broader doctrine; the remainder of this guide describes the current executab
 | **Holonics** | The mathematical framework and ontology, with executable applications | [Holon](../formal/elementary-holonics/ElementaryHolonics/Foundation/Holon.lean), [mathematics](canon/THE_MATHEMATICS_TABLET.md), [public Rust entry point](../crates/holonics/src/lib.rs) |
 | **HNN** | The Holonic Neural Network architecture and recurrent runtime | [native phase session](../crates/holonics-hna/src/native.rs), [constitutive ecology](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [full operator](../crates/holonic-engine/src/holonic_intelligence/full_operation.rs) |
 | **Athena** | A particular native model/ecology, its changing morphology and admitted capability domain | [Athena lifecycle](ATHENA.md) |
-| **Eros** | Composition and developmental recurrence that form/refine Athena | [native relation formation](../crates/holonic-engine/src/native_ecology/constitutive_fibre.rs) and [circulation](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [adjoint return](../crates/holonic-engine/src/holonic_intelligence/operative_return.rs) |
+| **Eros** | The union/composition and developmental phase that forms and refines Athena's reusable material | [native relation formation](../crates/holonic-engine/src/native_ecology/constitutive_fibre.rs) and [circulation](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [adjoint return](../crates/holonic-engine/src/holonic_intelligence/operative_return.rs) |
 | **Soulkiller** | Independent model-intake, excitation and dismantling apparatus | [Soulkiller](SOULKILLER.md), [consumed-input boundary](../crates/holonic-engine/src/soulkiller/boundary.rs) |
 | **Applications/codecs** | Text, image, audio, files, user protocols and target runtimes | [CLI](../applications/holonics-workbench/src/cli.rs), [interoperability](INTEROPERABILITY.md) |
 
@@ -58,7 +58,7 @@ flowchart LR
     S --> N[Native class ecologies]
     S --> W[Cold witness and insufficiency]
     N -.-> A
-    O[Ordinary occurrence] --> E[Eros / HNN operation]
+    O[Ordinary occurrence] --> E[HNN operation: conduct and admitted development]
     A --> E
     E --> A2[Successor Athena]
     E --> R[Emission and receiver result]
@@ -66,6 +66,12 @@ flowchart LR
     A2 --> P[Native persistence or target export]
     P --> T[Declared external runtime]
 ```
+
+[definition] Eros names union and development within this recurrence; Athena carries the formed
+structure and current. The [expanded architecture diagrams](HNN_COMPOSITION.md#the-architecture-as-explicit-passages)
+show the local passage, developmental return, classical block arithmetic and Soulkiller's
+commuting realization/restriction maps. Their full assembly is a construction account, with the
+implemented bindings and remaining contextual attachments stated separately.
 
 [definition] One operation consumes an occurrence and the contemporary ecology and returns
 an emission, trace and successor. The next operation uses that successor. Inference is a
