@@ -391,6 +391,8 @@ mod preimage;
 pub use preimage::{ConditionPreimageReading, ResidentConditionPreimage};
 
 mod condition_image;
+mod image;
+pub use image::{ConstitutiveImageReceiver, ConstitutiveImageReading, ResidentConstitutiveImage, ResidentConstitutiveRefinement};
 pub use condition_image::{ConditionCoverage, ConditionImageReading, ResidentConditionImage};
 
 mod condition_contact;

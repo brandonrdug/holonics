@@ -116,6 +116,13 @@ relation's source chart, basis and chronology without an occurrence archive. It 
 field rests. The [Rust guide](RUST_FRAMEWORK.md) and public `native_generator` example expose
 this scoped generator construction.
 
+[definition] `constitutive_fibre/resident/image.rs` owns full current-family images and received
+source refinements. `constitutive_relation_image.cuh` composes the existing fibre/affine row
+calculus; `surface_fibre_image.rs` validates and records its resident passage. Condition-image
+coverage parsing and homogenized reception are shared with the original condition owner.
+`ResidentConditionPreimage::refined_by` checks the actual source before returning constraints
+to the existing `ResidentConditionCurrent::contact`; it adds no new metric or learner.
+
 [historical] The SDK field/model wrapper, text adapters and eight alpha examples were
 [retired recoverably](../archive/implementations/2026-09-09-byte-field-cultivation/README.md).
 Core field/operative/receiver owners below remain mathematical and diagnostic constructions;

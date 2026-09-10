@@ -155,9 +155,13 @@ achieved. Current research seeks identifiable behavior and learning without a ut
 [definition] The first replacement packet uses `ResidentConstitutiveFibre`, its actual
 source/condition contact and `ConstitutiveFibreRest`. That compact learned law now conducts
 later resident currents after the observation apparatus is released and after process remount.
-Next compose these generator/current owners into the continuing ecology and local refinement,
-retaining domain and plural fibres. The earlier projective field remains diagnostic evidence;
-it is not the productive carrier for resumed conversation cultivation.
+The [joint-family/actual-current return](../../research/records/2026-09-09_LEARNED_GENERATORS_COMPOSE_THROUGH_JOINT_FIBRES_AND_RETURNS_REFINE_THE_SOURCE.md)
+now composes whole affine families, retains domain coverage and refines an actual source from a
+downstream observation. Its return changes the existing move-owned condition current and later
+conduct. Next bind those established owners into one continuing generator neighborhood with
+declared incidence and recoverable state; carry its local refinements and reusable restrictions
+into source-codec attachment. The earlier projective field remains diagnostic evidence, not the
+productive carrier for resumed conversation cultivation.
 
 [definition] The corrected formal `FiniteLocalCurrentEcology.reaction` retains local
 standing. The [native field assembly and observed return](../../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)

@@ -436,8 +436,6 @@ impl<'chart> ResidentSurface<'chart> {
             .ok_or_else(fail)?;
         if c == 0
             || y == 0
-            || c % 2 != 0
-            || y % 2 != 0
             || k > u32::MAX as usize - 4
             || joint_source_width > u32::MAX as usize
             || observed.width != y

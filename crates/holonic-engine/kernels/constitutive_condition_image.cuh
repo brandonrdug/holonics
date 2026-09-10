@@ -148,7 +148,8 @@ extern "C" __global__ void section_constitutive_condition_image(
     safe[y]=safe_hi[y]=out[w+y];safe[y+1]=safe_hi[y+1]=partial?1:out[w+y+1];
 }
 
-// Restrict a complete-domain joint affine family by an actual later output. Homogenization
+// Restrict a complete-domain joint affine family by an actual later output. This row law
+// also applies to real-coordinate receivers; no complex-pair parity is used. Homogenization
 // pins the base-point coefficient to one, retaining absolute condition coordinates.
 extern "C" __global__ void section_constitutive_condition_receive(
     const int64_t *joint,const int64_t *joint_hi,uint32_t js,uint32_t c,uint32_t y,
@@ -159,7 +160,7 @@ extern "C" __global__ void section_constitutive_condition_receive(
 ){
     if(blockIdx.x || threadIdx.x)return;if(upstream_refused(census,lineage,lineage_count,slot))return;
     uint64_t k64=1u+(uint64_t)c+y,jk64=(uint64_t)js+c+y;
-    if(!c || !y || c%2 || y%2 || k64>UINT32_MAX-4u || jk64>UINT32_MAX-4u
+    if(!c || !y || k64>UINT32_MAX-4u || jk64>UINT32_MAX-4u
         || coverage[0]!=coverage_hi[0] || coverage[0]!=0){atomicOr(slot,REFUSED_MALFORMED);return;}
     uint32_t j=c+y,jk=(uint32_t)jk64,k=(uint32_t)k64,s=1+y;
     for(size_t i=0;i<(size_t)jk+4+(size_t)j*j;++i)if(joint[i]!=joint_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}

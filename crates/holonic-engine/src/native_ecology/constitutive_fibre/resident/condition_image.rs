@@ -30,6 +30,47 @@ pub struct ConditionImageReading {
     pub joint: ConstitutiveReading,
 }
 
+pub(super) fn read_coverage<'c>(
+    surface: &ResidentSurface<'c>,
+    section: &ResidentSection<'c>,
+    c: usize,
+    w: usize,
+) -> Result<ConditionCoverage, ConstitutiveFibreError> {
+    let words = surface.read_out(section)?;
+    if words.iter().any(|(lo, hi)| lo != hi) || words[2].0 <= 0 || words[3 + c].0 <= 0 {
+        return Err(ConstitutiveFibreError::Uncertain);
+    }
+    let condition = || {
+        (0..c)
+            .map(|i| Rat::new(words[3 + i].0.into(), words[2].0.into()))
+            .collect()
+    };
+    let residual = |length| {
+        (0..length)
+            .map(|i| Rat::new(words[4 + c + i].0.into(), words[3 + c].0.into()))
+            .collect()
+    };
+    let coverage = match words[0].0 {
+        0 => ConditionCoverage::Complete,
+        1 => ConditionCoverage::Partial {
+            direction: match words[1].0 {
+                -1 => None,
+                n if n >= 0 && (n as usize) < c => Some(n as usize),
+                _ => return Err(ConstitutiveFibreError::Uncertain),
+            },
+            condition: condition(),
+            residual: residual(c),
+        },
+        2 => ConditionCoverage::NoSupportedCondition {
+            condition: condition(),
+            residual: residual(w),
+        },
+        3 => ConditionCoverage::EmptyConditionFibre,
+        _ => return Err(ConstitutiveFibreError::Uncertain),
+    };
+    Ok(coverage)
+}
+
 pub struct ResidentConditionImage<'chart> {
     condition: ResidentConditionPreimage<'chart>,
     joint: ResidentConstitutiveReturn<'chart>,
@@ -71,38 +112,7 @@ impl<'chart> ResidentConditionImage<'chart> {
     pub fn inspect(&self) -> Result<ConditionImageReading, ConstitutiveFibreError> {
         let c = self.domain.target_width;
         let w = self.joint.source_width;
-        let words = self.joint.surface.read_out(&self.coverage)?;
-        if words.iter().any(|(lo, hi)| lo != hi) || words[2].0 <= 0 || words[3 + c].0 <= 0 {
-            return Err(ConstitutiveFibreError::Uncertain);
-        }
-        let condition = || {
-            (0..c)
-                .map(|i| Rat::new(words[3 + i].0.into(), words[2].0.into()))
-                .collect()
-        };
-        let residual = |length| {
-            (0..length)
-                .map(|i| Rat::new(words[4 + c + i].0.into(), words[3 + c].0.into()))
-                .collect()
-        };
-        let coverage = match words[0].0 {
-            0 => ConditionCoverage::Complete,
-            1 => ConditionCoverage::Partial {
-                direction: match words[1].0 {
-                    -1 => None,
-                    n if n >= 0 && (n as usize) < c => Some(n as usize),
-                    _ => return Err(ConstitutiveFibreError::Uncertain),
-                },
-                condition: condition(),
-                residual: residual(c),
-            },
-            2 => ConditionCoverage::NoSupportedCondition {
-                condition: condition(),
-                residual: residual(w),
-            },
-            3 => ConditionCoverage::EmptyConditionFibre,
-            _ => return Err(ConstitutiveFibreError::Uncertain),
-        };
+        let coverage = read_coverage(self.joint.surface, &self.coverage, c, w)?;
         Ok(ConditionImageReading {
             condition_width: c,
             output_width: self.output.target_width,

@@ -1,0 +1,118 @@
+{
+  "grade": "established-bounded",
+  "evidence": [
+    "implemented-exact",
+    "computational-witness",
+    "measured"
+  ],
+  "scope": "Joint-family generator composition, actual received-source refinement, and changed retained condition/current. Not a whole HNN or conversation result.",
+  "command": [
+    "target/debug/examples/native_generator",
+    "compose",
+    "research/experiments/native_generator_law/2026-09-09_phase.law"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 0.2620496259769425,
+  "stderr": "",
+  "return": {
+    "actual_condition_after": [
+      "1",
+      "4/5"
+    ],
+    "actual_condition_before": [
+      "0",
+      "4/5"
+    ],
+    "condition_contacts": 1,
+    "external_received_real_component": "1",
+    "first_coverage": {
+      "kind": "complete"
+    },
+    "joint_rotated_family": {
+      "directions": [
+        [
+          "0",
+          "5",
+          "-4",
+          "3"
+        ]
+      ],
+      "kind": "plural",
+      "particular": [
+        "1",
+        "-4/3",
+        "5/3",
+        "0"
+      ]
+    },
+    "law_unchanged": true,
+    "mode": "compose",
+    "native_ingress_octets_during_composition": 0,
+    "numerical_section_readouts_during_composition": 0,
+    "prior_output": {
+      "current": [
+        "-12/5",
+        "8/5"
+      ],
+      "kind": "unique"
+    },
+    "returned_family": {
+      "directions": [
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "kind": "plural",
+      "particular": [
+        "1",
+        "0"
+      ]
+    },
+    "rotated_family": {
+      "directions": [
+        [
+          "4",
+          "-3"
+        ]
+      ],
+      "kind": "plural",
+      "particular": [
+        "5/3",
+        "0"
+      ]
+    },
+    "scope": "native joint-family composition and received source refinement; not a language model",
+    "second_coverage": {
+      "kind": "complete"
+    },
+    "source_family": {
+      "directions": [
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "kind": "plural",
+      "particular": [
+        "1",
+        "0"
+      ]
+    },
+    "subsequent_output": {
+      "current": [
+        "-2/5",
+        "23/5"
+      ],
+      "kind": "unique"
+    }
+  },
+  "checks": {
+    "resident_constitutive_cuda_tests": 40,
+    "resident_suite_seconds": 9.68,
+    "final_image_source_release_tests": 5,
+    "final_image_source_release_seconds": 1.04,
+    "final_selection_is_subset": true,
+    "public_holonics_all_targets_check": "passed"
+  }
+}

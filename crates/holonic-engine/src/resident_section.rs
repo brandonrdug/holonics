@@ -91,6 +91,8 @@ mod surface_linear_material;
 mod surface_material_support;
 #[path = "resident_section/surface_condition.rs"]
 mod surface_condition;
+#[path = "resident_section/surface_fibre_image.rs"]
+mod surface_fibre_image;
 mod surface_material_mode;
 mod surface_moment;
 mod surface_context_section;

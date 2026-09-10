@@ -2,11 +2,11 @@
 //! `learn NEW.law` measures an existing native source apparatus; `resume FILE.law` needs only
 //! the compact learned law. Neither mode contains a local learner or stored observation list.
 use holonic_engine::{
-    embedding_fiber::ResidentReadout,
+    embedding_fiber::{AlignedMaterial, ResidentReadout},
     native_ecology::constitutive_fibre::{
-        ConstitutiveFibreRest, ConstitutiveReading, NativeConstitutiveField, NativeFieldOccurrence,
-        NativeJunctionSeed, NativePhaseCurrent, ResidentConstitutiveCurrent,
-        ResidentConstitutiveFibre,
+        ConditionContactMetric, ConstitutiveFibreRest, ConstitutiveReading,
+        NativeConstitutiveField, NativeFieldOccurrence, NativeJunctionSeed, NativePhaseCurrent,
+        ResidentConstitutiveCurrent, ResidentConstitutiveFibre,
     },
     resident_section::{ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface},
 };
@@ -70,10 +70,113 @@ fn learn<'c>(s: &'c ResidentSurface<'c>) -> Result<ResidentConstitutiveFibre<'c>
     // The source apparatus and its finite diagnostic history leave scope here.
     Ok(law)
 }
+fn family(reading: &ConstitutiveReading) -> serde_json::Value {
+    let values =
+        |v: &[num_rational::BigRational]| v.iter().map(ToString::to_string).collect::<Vec<_>>();
+    match reading {
+        ConstitutiveReading::Unique { current } => {
+            serde_json::json!({"kind":"unique","current":values(current)})
+        }
+        ConstitutiveReading::Plural {
+            particular,
+            directions,
+        } => serde_json::json!({"kind":"plural","particular":values(particular),
+            "directions":directions.iter().map(|d|values(d)).collect::<Vec<_>>()}),
+        ConstitutiveReading::OutsideDomain { source_remainder } => {
+            serde_json::json!({"kind":"outside-domain","source_remainder":values(source_remainder)})
+        }
+    }
+}
+
+fn compose<'c>(
+    readout: &'c ResidentReadout,
+    s: &'c ResidentSurface<'c>,
+    law: &ResidentConstitutiveFibre<'c>,
+) -> Result<()> {
+    // A declared real-component receiver is calibrated through actual native contractions.
+    // This is a sensor chart, not a manually installed learned phase operator.
+    let detector = readout.mount(
+        &AlignedMaterial {
+            entries: vec![1, 0],
+            exponent: 0,
+            entry_octaves: 1,
+            negatives: 0,
+        },
+        2,
+    )?;
+    let mut receiver = ResidentConstitutiveFibre::found(s, 2, 1)?;
+    for v in [[1, 0], [0, 1]] {
+        let input = point(s, &v)?;
+        let output = s.fresh_section(1, 1, ResidentGrain(0))?;
+        let mut passage = s.begin_passage(&[vec![]])?;
+        {
+            let lane = passage.open(0, &[])?;
+            s.record_contract(&lane, &input, &detector, &output)?;
+        }
+        passage.close(0, &output, 64)?;
+        if !passage.finish()?.launch()?.obstruction.is_empty() {
+            return Err("component receiver refused".into());
+        }
+        receiver.advance_resident(current(&input)?, Some(current(&output)?))?;
+    }
+    drop(detector);
+    let zero = point(s, &[0, 0])?;
+    let observed_component = point(s, &[1])?; // This experiment's supplied exterior observation.
+    let p = point(s, &[3, 4, 5])?;
+    let inverse = point(s, &[3, -4, 5])?;
+    let left = law.contextual_section(ResidentConstitutiveCurrent::rational(&p)?)?;
+    let right = law.contextual_section(ResidentConstitutiveCurrent::rational(&inverse)?)?;
+    let initial_condition = point(s, &[0, 4, 5])?;
+    let actual_input = point(s, &[2, 3])?;
+    let mut standing = law.retain_condition_current(
+        ResidentConstitutiveCurrent::rational(&initial_condition)?,
+        ConditionContactMetric::UnitAdmittanceRealification,
+    )?;
+    let output_generator = law.contextual_section(current(&actual_input)?)?;
+    let before = law.rest()?;
+    let hot = s.census();
+    let prior_output = output_generator.read_change(standing.current())?;
+    // Zero source and zero return leave the condition unresolved in this learned local law.
+    let unknown = law.read_condition_preimage(current(&zero)?, current(&zero)?)?;
+    let measured = receiver.read_image(unknown.family())?;
+    let restriction = measured.receive(current(&observed_component)?)?;
+    let restricted = unknown.refined_by(restriction)?;
+    let phase_image = left.read_change_image(restricted.family())?;
+    let roundtrip = right.read_change_image(phase_image.output())?;
+    let contact = standing.contact(&restricted)?;
+    let subsequent_output = output_generator.read_change(standing.current())?;
+    let after = s.census();
+    let source = restricted.family().inspect()?.predecessor_reading;
+    let contact_reading = contact.inspect()?;
+    let rotated = phase_image.inspect()?;
+    let returned = roundtrip.inspect()?;
+    if returned.output != source || law.rest()?.relation() != before.relation() {
+        return Err("composed family or learned material changed unexpectedly".into());
+    }
+    println!(
+        "{}",
+        serde_json::json!({"scope":"native joint-family composition and received source refinement; not a language model",
+        "mode":"compose","external_received_real_component":"1","source_family":family(&source),
+        "rotated_family":family(&rotated.output),"returned_family":family(&returned.output),
+        "joint_rotated_family":family(&rotated.joint),"first_coverage":rotated.coverage,"second_coverage":returned.coverage,
+        "law_unchanged":true,
+        "actual_condition_before":contact_reading.predecessor.iter().map(ToString::to_string).collect::<Vec<_>>(),
+        "actual_condition_after":contact_reading.successor.iter().map(ToString::to_string).collect::<Vec<_>>(),
+        "prior_output":family(&prior_output.inspect()?.predecessor_reading),
+        "subsequent_output":family(&subsequent_output.inspect()?.predecessor_reading),
+        "condition_contacts":standing.contacts(),
+        "numerical_section_readouts_during_composition":after.section_read_outs-hot.section_read_outs,
+        "native_ingress_octets_during_composition":after.ingress_octets-hot.ingress_octets})
+    );
+    Ok(())
+}
+
 fn main() -> Result<()> {
     let args = std::env::args().skip(1).collect::<Vec<_>>();
-    if args.len() != 2 || !matches!(args[0].as_str(), "learn" | "resume") {
-        return Err("usage: native_generator learn NEW.law | resume SAVED.law".into());
+    if args.len() != 2 || !matches!(args[0].as_str(), "learn" | "resume" | "compose") {
+        return Err(
+            "usage: native_generator learn NEW.law | resume SAVED.law | compose SAVED.law".into(),
+        );
     }
     let readout = ResidentReadout::new()?;
     let surface = ResidentSurface::on(&readout)?;
@@ -94,6 +197,9 @@ fn main() -> Result<()> {
         let n = file.metadata()?.len();
         ConstitutiveFibreRest::read(&mut BufReader::new(file), n)?.remount(&surface)?
     };
+    if args[0] == "compose" {
+        return compose(&readout, &surface, &law);
+    }
     let before = law.rest()?;
     let input = point(&surface, &[2, 3])?;
     let condition = point(&surface, &[3, 4, 5])?;

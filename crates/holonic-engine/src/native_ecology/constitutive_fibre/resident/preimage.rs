@@ -37,6 +37,11 @@ impl<'chart> ResidentConditionPreimage<'chart> {
         self.inner.returned.source_chart()
     }
 
+    /// Borrow the complete affine condition family for another native relation/image. This
+    /// retains the producing preimage object and supplies no selected point.
+    pub fn family(&self) -> &ResidentConstitutiveReturn<'chart> {
+        &self.inner.returned
+    }
     /// Carry a uniquely supported condition into another native operation. The consumer checks
     /// the original fibre disposition on device; a plural fibre is never silently a point.
     pub fn current(&self) -> ResidentConstitutiveCurrent<'_, 'chart> {

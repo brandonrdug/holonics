@@ -19,6 +19,20 @@ that particular point hypothesis holds. Differential and condition/image receive
 read plural families at their own scope; plurality is not a universal prohibition on conduct.
 The condition-preimage/image/contact and contextual-section owners retain their existing laws.
 
+[definition] `ResidentConstitutiveFibre::read_image` and
+`ResidentContextualSection::read_change_image` compose full affine current families, retaining
+the actual borrowed source/receiver, joint input/output fibre and source-domain coverage.
+`ResidentConstitutiveImage::receive` restricts that joint fibre by an actual observation.
+`ResidentConditionPreimage::refined_by` returns the new constraints to the original condition
+port only when the actual source object matches. The existing condition-current contact then
+changes actual standing and later conduct, preserving its unmeasured component.
+
+[definition] An image's `output` is its supported marginal; its unqualified point port also
+requires full source coverage. The original source, joint fibre and partial-domain witness
+remain available. A particular affine origin is not a selected cause. The public
+[`native_generator` example](../crates/holonics-hna/examples/native_generator.rs) includes a
+composed mode using the compact learned law, a calibrated receiver and retained condition current.
+
 [definition] `ConstitutiveFibreRest` stores the declared source chart, paired basis and chronology
 cut. It does not contain observed text, a list of occurrences or earlier current sections. Its
 reader validates the chart/echelon material, and `remount` consumes the cold object into the

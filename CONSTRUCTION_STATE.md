@@ -1,7 +1,7 @@
 # Construction state
 
 **Currency:** September 9, 2026. **Priority:** Corrected AC0–AC5 construction is the active goal. Native HNN cultivation uses Holons as situated state, incidence, transported differences and compatible continuations; text/audio/visual media are exterior measurement charts.
-**Position:** The defective byte-cultivation assembly is retired from the live SDK/examples and preserved recoverably. The blueprint is rewritten. AC1's first replacement attachment now returns: a learned local conditional law rests without observation history and carries later resident currents after remount. Whole-ecology generator composition and the conversation-codec attachment remain unfinished; AC0–AC5 is not complete. No cultivation process is running.
+**Position:** The byte-cultivation assembly remains retired. AC1–AC2 now compose learned local generators through joint affine current families; an actual received observation refines the source and changes retained condition current and subsequent conduct without a history chain. Forty resident CUDA tests and the public composed example pass. Whole-neighborhood ownership/state persistence and the conversation-codec attachment remain unfinished; AC0–AC5 is not complete. No cultivation process is running.
 **Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -89,6 +89,15 @@ model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction — representation repair
 
+[established-bounded; implemented-exact; computational-witness] The [joint-family and retained-current return](research/records/2026-09-09_LEARNED_GENERATORS_COMPOSE_THROUGH_JOINT_FIBRES_AND_RETURNS_REFINE_THE_SOURCE.md)
+adds `read_image`, `read_change_image`, received source refinement and an actual-source-checked
+return to the existing condition-current contact. Plural inputs can have fixed later receivers;
+partial domain coverage and free source directions remain explicit. Earlier image/family/receipt
+objects can be released before the changed current conducts again. The complete 40-case native
+suite passes, as does the final five-case source-release selection and public facade check.
+The public example changes retained condition `(0,4/5)` to `(1,4/5)` and later output while
+preserving the unmeasured direction, with no numerical host readout or ingress in the passage.
+
 [established-bounded; implemented-exact; computational-witness] The [retirement and first generator return](research/records/2026-09-09_THE_BYTE_CAMPAIGN_RETIRES_AND_A_LEARNED_LOCAL_GENERATOR_RESTS_WITHOUT_HISTORY.md)
 removes eighteen source files/eight old example entrypoints from the live campaign, preserving
 source, data and evidence. `ConstitutiveFibreRest` remounts the existing learned local relation,
@@ -98,10 +107,11 @@ numerical host readouts. A separate process returns the same current and law pro
 Seventeen host, 35 resident CUDA, six existing native-wire and ten source-reader tests pass;
 the public facade checks. These are local-law and removal results, not a general HNN or language claim.
 
-[definition] Continue AC1 with composition of these actual local generator/current/condition
-owners into a continuing ecology, with AC2's observed local refinement and AC4's restriction/
-rebase applied to their admitted source families. The source reader remains available for AC3;
-it does not itself supply the missing generator-based codec. Do not resume the retired byte loop.
+[definition] Continue AC1–AC2 by binding these actual generator, condition-current and compact
+evidence owners into one continuing neighborhood with declared incidence and recoverable state.
+The individual composition/contact ports are now established; do not rebuild them as a second
+learner. Apply restriction/rebase to the admitted generator family, then attach actual source
+material through its codec. The source reader remains available for AC3 and the byte loop stays retired.
 
 [established-bounded; source-inspected; computational-witness] The [representation audit](research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)
 finds one new persistent contact coordinate per source-linked observation and a contextual

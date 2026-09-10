@@ -95,6 +95,14 @@ its full receiver fibre; independent relation formation, not occurrence count, c
 Current returns compose through the existing resident current ports. A whole HNN must still
 compose these local generators, incidence, nonlinear response, scale and applicable fibres.
 
+[established-bounded; implemented-exact; computational-witness] The [joint-family return](../research/records/2026-09-09_LEARNED_GENERATORS_COMPOSE_THROUGH_JOINT_FIBRES_AND_RETURNS_REFINE_THE_SOURCE.md)
+now supplies composition through plural currents: the source and receiver remain actual objects,
+their joint affine fibre preserves correlation, and partial source coverage is explicit. A
+downstream observation restricts the source through that joint object. The original-condition
+check permits its returned constraint to meet existing actual condition current; the prior
+current determines the still-free component. This changes subsequent native conduct without
+selecting an external cause or retaining a chain of past image/current objects.
+
 ## Partial conduct and comparison
 
 [definition] Useful restricted behavior can arise before every mechanism learns or every chart
