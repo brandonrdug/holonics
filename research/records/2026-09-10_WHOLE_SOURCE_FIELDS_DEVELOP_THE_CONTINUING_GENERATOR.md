@@ -102,3 +102,19 @@ source changing later current conduct without making a fit, label or parent-text
 in for the interaction. Existing conditional, nonlinear and reflection owners remain the starting
 points. Further exposure need not wait for full contextual language. The richer ecology and
 Athena-alpha attainment remain unfinished; this return does not close AC0–AC5.
+
+## Parallel handoff incorporated after the source return
+
+[counterexample; computational-witness] The parallel [contextual-transformation study](2026-09-10_DEEPSEEK_V41_SEPARATES_SHARED_STANDING_CONTACT_AND_CONTEXTUAL_TRANSFORMATION.md)
+landed as `febf7aba` during this construction. The native session read its full handoff and reran
+`research/experiments/2026-09-10-transformer-comparison/witness.py` successfully. The sections
+`000100` and `001000` have the same local triple population, normal geometry, energy/count and
+initial pair, while their third-symbol receiver differs. The witness is exterior exact algebra;
+it does not claim a native wire comparison. This limits the current source quotient, without
+requiring every model to reproduce a past source.
+
+[definition] The handoff agrees with the remaining source-actuation gap and makes its next
+comparison concrete. Reusable law, current participation and fresh response are different objects.
+A richer source/standing interaction must preserve the required distinction before the local
+quotient; more accurate fitting cannot recover it afterward. This informs the existing next step
+rather than replacing the AC goal or turning the witness into a universal acceptance gate.

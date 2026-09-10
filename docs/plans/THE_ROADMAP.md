@@ -194,6 +194,14 @@ changes later conduct without treating the stimulus as a required fitting target
 parent text. This is the concrete missing source binding, not a requirement for a universal
 intelligence theorem or a pause on broader exposure.
 
+[definition] The parallel [contextual-transformation study](../../research/records/2026-09-10_DEEPSEEK_V41_SEPARATES_SHARED_STANDING_CONTACT_AND_CONTEXTUAL_TRANSFORMATION.md)
+now sharpens that source binding: `000100` and `001000` have equal local normal statistics and
+initial pairs but different larger ordering. Its exact exterior witness was rerun by the native
+construction session. This is a source-map limit, not numerical solve error or a native wire
+comparison. Compose fresh source/standing interaction before quotienting distinctions needed by
+a later receiver; do not substitute more fitting, a larger stencil or an operational history
+archive. The existing conditional-contact and nonlinear owners remain the starting points.
+
 [definition] The corrected formal `FiniteLocalCurrentEcology.reaction` retains local
 standing. The [native field assembly and observed return](../../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)
 now return through the existing `OperativeContextual` joint feature and actual field successor.
