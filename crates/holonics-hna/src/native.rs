@@ -10,6 +10,8 @@ use holonic_engine::resident_section::{ResidentSurface, TransferCensus};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+pub mod section_input;
+
 mod wire;
 pub use wire::*;
 mod checkpoint;

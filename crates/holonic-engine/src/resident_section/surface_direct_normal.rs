@@ -1,7 +1,7 @@
 use super::*;
 use crate::native_ecology::constitutive_fibre::{
     normal_material_report_words, normal_material_state_words, normal_material_workspace_words,
-    ResidentConstitutiveCurrent,
+    ResidentConstitutiveCurrent, ResidentNormalInput,
 };
 impl<'c> ResidentSurface<'c> {
     #[allow(clippy::too_many_arguments)]
@@ -9,7 +9,7 @@ impl<'c> ResidentSurface<'c> {
         &self,
         lane: &Lane<'_, 'c>,
         state: &ResidentSection<'c>,
-        source: ResidentConstitutiveCurrent<'_, 'c>,
+        source: ResidentNormalInput<'_, 'c>,
         observed: Option<ResidentConstitutiveCurrent<'_, 'c>>,
         roots: usize,
         targets: usize,
@@ -39,7 +39,7 @@ impl<'c> ResidentSurface<'c> {
             || d > u32::MAX as usize
             || r > u32::MAX as usize
             || !(1..=120).contains(&grain)
-            || source.width != d
+            || source.width() != d
             || observed.is_some_and(|v| v.width != r)
             || observed.is_some() != next.is_some()
             || observed.is_some() != after.is_some()
@@ -52,18 +52,56 @@ impl<'c> ResidentSurface<'c> {
         {
             return Err(fail());
         }
-        self.validate_constitutive_current_view(source)?;
+        match source {
+            ResidentNormalInput::Point(v) => self.validate_constitutive_current_view(v)?,
+            ResidentNormalInput::Enclosed(v) => {
+                if v.grain.0 != grain
+                    || v.section.grain.0 != 0
+                    || !std::ptr::eq(v.section.surface, self)
+                    || v.offset % 2 != 0
+                    || v.offset
+                        .checked_add(2 * (d + 1))
+                        .is_none_or(|end| end > v.section.rows * v.section.width)
+                {
+                    return Err(fail());
+                }
+            }
+        }
         if let Some(v) = observed {
             self.validate_constitutive_current_view(v)?;
         }
         let mut p = Params::new();
         p.ptr(state.lo.device_ptr());
-        for v in [source, observed.unwrap_or(source)] {
+        match source {
+            ResidentNormalInput::Point(v) => {
+                p.ptr(v.section.lo.device_ptr())
+                    .ptr(v.section.hi.device_ptr())
+                    .u32(v.offset as u32)
+                    .u32(v.denominator.map_or(u32::MAX, |n| n as u32))
+                    .u32(v.disposition.map_or(u32::MAX, |n| n as u32))
+                    .u32(0);
+            }
+            ResidentNormalInput::Enclosed(v) => {
+                p.ptr(v.section.lo.device_ptr())
+                    .ptr(v.section.hi.device_ptr())
+                    .u32(v.offset as u32)
+                    .u32(u32::MAX)
+                    .u32(u32::MAX)
+                    .u32(1);
+            }
+        }
+        if let Some(v) = observed {
             p.ptr(v.section.lo.device_ptr())
                 .ptr(v.section.hi.device_ptr())
                 .u32(v.offset as u32)
                 .u32(v.denominator.map_or(u32::MAX, |n| n as u32))
                 .u32(v.disposition.map_or(u32::MAX, |n| n as u32));
+        } else {
+            p.ptr(before.lo.device_ptr())
+                .ptr(before.hi.device_ptr())
+                .u32(0)
+                .u32(u32::MAX)
+                .u32(u32::MAX);
         }
         p.u32(roots as u32)
             .u32(targets as u32)

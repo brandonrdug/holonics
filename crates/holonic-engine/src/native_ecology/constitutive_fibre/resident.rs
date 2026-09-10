@@ -5,6 +5,8 @@
 //! A point-current consumer checks uniqueness on device; it never chooses from a plural fibre.
 
 use super::*;
+mod section;
+pub use section::{ResidentConstitutiveSection, ResidentDifferenceSection};
 mod return_rest;
 pub use return_rest::ConstitutiveReturnRest;
 

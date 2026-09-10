@@ -606,4 +606,4 @@ fn decode_state(
 }
 
 mod direct;
-pub use direct::{ResidentNormalMaterial, ResidentNormalReturn};
+pub use direct::{ResidentNormalMaterial, ResidentNormalReturn, ResidentNormalSectionReturn, ResidentNormalInput, ResidentNormalEnclosure, ResidentNormalEnclosureView};

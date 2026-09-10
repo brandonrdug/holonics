@@ -177,3 +177,61 @@ fn a_learned_generator_enters_the_normal_response_on_device() {
     );
     assert_eq!(normal.observations(), 1);
 }
+
+#[test]
+#[ignore = "requires CUDA; complete forward enclosures conduct repeatedly without a source-history chain or numeric readout"]
+fn bounded_forward_current_continues_with_fixed_residency() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let mut body = ResidentNormalMaterial::found(&s, 1, 3, ResidentGrain(u32::BITS)).unwrap();
+    for channel in 0..3 {
+        let mut v = [0; 6];
+        v[2 * channel] = 1;
+        let x = point(&s, &v);
+        body.receive(current(&x), current(&x)).unwrap();
+    }
+    let x = point(&s, &[1, 0, 0, 1, -1, 0]);
+    let mut carried = body.read(current(&x)).unwrap().into_forward();
+    drop(x);
+    let before = s.census();
+    let mut denominator = 2;
+    for _ in 0..16 {
+        let next = body.read(carried.view()).unwrap().into_forward();
+        carried = next;
+        denominator *= 2;
+        assert_eq!(s.census().resident_octets_now, before.resident_octets_now);
+    }
+    assert_eq!(s.census().section_read_outs, before.section_read_outs);
+    contains(
+        &carried.inspect().unwrap(),
+        &[
+            wave(1, 0, denominator),
+            wave(0, 1, denominator),
+            wave(-1, 0, denominator),
+        ],
+    );
+    assert_eq!(body.observations(), 3);
+}
+
+#[test]
+#[ignore = "requires CUDA; receiving an enclosed source pays its whole uncertainty and an incompatible grain refuses before mutation"]
+fn enclosed_source_uncertainty_enters_the_normal_geometry() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let mut producer = ResidentNormalMaterial::found(&s, 1, 3, ResidentGrain(u32::BITS)).unwrap();
+    let x = point(&s, &[1, 0, 0, 0, 0, 0]);
+    producer.receive(current(&x), current(&x)).unwrap();
+    let incoming = producer.read(current(&x)).unwrap().into_forward();
+    assert!(incoming.inspect().unwrap().radius > Rat::zero());
+    let y = point(&s, &[1, 0]);
+    let mut receiver = ResidentNormalMaterial::found(&s, 1, 1, ResidentGrain(u32::BITS)).unwrap();
+    let reads = s.census().section_read_outs;
+    receiver.receive(incoming.view(), current(&y)).unwrap();
+    assert_eq!(s.census().section_read_outs, reads);
+    assert!(receiver.inspect().unwrap().source_normal_error > Rat::zero());
+    let mut wrong = ResidentNormalMaterial::found(&s, 1, 1, ResidentGrain(u32::BITS / 2)).unwrap();
+    let before = wrong.state_wire().unwrap();
+    assert!(wrong.receive(incoming.view(), current(&y)).is_err());
+    assert_eq!(wrong.state_wire().unwrap(), before);
+    assert_eq!(wrong.observations(), 0);
+}

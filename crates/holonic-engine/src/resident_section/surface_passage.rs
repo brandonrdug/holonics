@@ -727,11 +727,13 @@ impl<'chart> ResidentSurface<'chart> {
         &self,
         current: crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent<'_, 'chart>,
     ) -> Result<(), ResidentRefusal> {
-        if !std::ptr::eq(current.section.surface,self) || current.section.rows != 1
-            || current.section.grain.0 != 0 || current.section.width > u32::MAX as usize
-            || current.offset.checked_add(current.width).is_none_or(|n| n > current.section.width)
-            || current.denominator.is_some_and(|n| n >= current.section.width)
-            || current.disposition.is_some_and(|n| n >= current.section.width)
+        let capacity = current.section.rows.checked_mul(current.section.width)
+            .filter(|n| *n > 0 && *n <= u32::MAX as usize);
+        if !std::ptr::eq(current.section.surface,self)
+            || current.section.grain.0 != 0 || capacity.is_none()
+            || current.offset.checked_add(current.width).is_none_or(|n| n > capacity.unwrap_or(0))
+            || current.denominator.is_some_and(|n| n >= capacity.unwrap_or(0))
+            || current.disposition.is_some_and(|n| n >= capacity.unwrap_or(0))
         {
             return Err(ResidentRefusal::Declaration { operation: "constitutive-current",
                 what: "incompatible resident surface or rational current view".into() });

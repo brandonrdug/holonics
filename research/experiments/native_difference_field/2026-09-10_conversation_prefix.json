@@ -1,0 +1,68 @@
+{
+  "alphabet_coordinates": 74,
+  "body_resident_octets": 38902752,
+  "calibrated_frames": 16,
+  "calibration_seconds": 0.167675749,
+  "development_frames": 16,
+  "grain": 32,
+  "observed_local_comparisons": 4963,
+  "observed_receiver": "next-minus-current",
+  "parts": 16,
+  "reported_sites_per_part": 4,
+  "schema": "holonics.conversation-difference-field.v1",
+  "scope": "local source-difference response; no semantic-context or language-attainment claim",
+  "short_parts_without_three_site_support": 0,
+  "source_octets": 5048,
+  "source_port_components": 444,
+  "source_ports": [
+    "current-minus-previous",
+    "current",
+    "previous"
+  ],
+  "source_scalars": 4995,
+  "state_words": 2431422,
+  "target_components": 148,
+  "objective": {
+    "family_data_term": {
+      "lower": "71924560963279114813289/36893488147419103232",
+      "upper": "71924560963279114813289/36893488147419103232"
+    },
+    "family_minimum": {
+      "lower": "72991906221447180410641/36893488147419103232",
+      "upper": "18247976555503789512561/9223372036854775808"
+    },
+    "family_regularized_objective": {
+      "lower": "18247976555503789512561/9223372036854775808",
+      "upper": "18247976555503789512561/9223372036854775808"
+    },
+    "nominal_data_term": "71924560963279114813289/36893488147419103232",
+    "nominal_minimum": {
+      "lower": "72991906221447180410641/36893488147419103232",
+      "upper": "18247976555503789512561/9223372036854775808"
+    },
+    "nominal_regularized_objective": "18247976555503789512561/9223372036854775808",
+    "normal_residual_squared": "567977639603/18446744073709551616",
+    "prior_term": "1067345258736043236955/36893488147419103232",
+    "solve_gap_upper": "567977639603/36893488147419103232"
+  },
+  "native_field_seconds_sum": 37.158086559,
+  "native_field_seconds_range": [
+    1.6589868239999999,
+    5.882188403
+  ],
+  "native_deeds_total": 32,
+  "numerical_section_readouts_during_operations": 0,
+  "ingress_octets_during_operations": 0,
+  "exact_cross_source_constant_receiver_zero": true,
+  "constant_receiver_probe_enclosure_checks": 128,
+  "native_state_file_octets": 14842480,
+  "comparison_receivers": {
+    "scope": "In-sample squared-error data terms on the same eligible source sites; no source choice or coefficient enters native development from these references.",
+    "unchanged_current_data_term": "4901",
+    "unconditional_next_face_mean_data_term": "11665187/4963",
+    "current_face_conditional_mean_data_term": "144312253132772709664250893667893/70110938577029005937706024600",
+    "native_difference_response_data_term": "71924560963279114813289/36893488147419103232",
+    "native_below_unconditional_mean": true,
+    "native_below_current_face_conditional_mean": true
+  }
+}

@@ -36,7 +36,7 @@ pub use resident::{
     GeneratorNeighborhoodStep, NeighborhoodEvidence, NeighborhoodEvidenceRest,
     PreparedConditionContact, ResidentConditionContact, ResidentConditionCurrent,
     ResidentConditionImage, ResidentConditionPreimage, ResidentConditionStanding,
-    ResidentConstitutiveCurrent, ResidentConstitutiveImage, ResidentConstitutiveRefinement,
+    ResidentConstitutiveCurrent, ResidentConstitutiveSection, ResidentDifferenceSection, ResidentConstitutiveImage, ResidentConstitutiveRefinement,
     ResidentConstitutiveReturn, ResidentContextualSection, ResidentGeneratorNeighborhood,
 };
 

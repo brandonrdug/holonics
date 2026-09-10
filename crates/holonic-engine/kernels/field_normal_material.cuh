@@ -115,18 +115,14 @@ __device__ void normal_increment(int64_t *stats,const wide *x,const wide *y,cons
     __syncthreads();
 }
 
-__device__ void field_normal_material_prepare(const int64_t *old,const wide *origin_current,const wide *origin_forward,
-    const wide *current,const int64_t *incoming,uint32_t n,uint32_t linked,uint32_t grain,
-    int64_t *next,int64_t *next_hi,int64_t *report,int64_t *report_hi,int64_t *workspace,
-    uint32_t targets,uint32_t factor_width,uint32_t *slot){
-    uint32_t d=normal_source_components(n),R=NORMAL_QUADRATURES*targets;size_t stride=normal_ball_stride(targets),gain=normal_source_at(targets),extra=normal_metadata_at(n,targets);
-    size_t state_words=normal_state_words(n,targets),report_words=normal_report_words(n,targets);
-    wide *out=(wide *)report;const wide *M=(const wide *)old;wide S=(wide)1<<grain;
-    for(size_t i=threadIdx.x;i<state_words;i+=blockDim.x)next[i]=old[i];
-    for(size_t i=threadIdx.x;i<report_words;i+=blockDim.x)report[i]=report_hi[i]=0;
-    __syncthreads();
-    if(!threadIdx.x){
-        if(!n||!targets||!workspace||grain<1||grain>120||linked>1||(linked&&(!origin_current||!origin_forward)))atomicOr(slot,REFUSED_MALFORMED);
+// One observation's bounded source/target geometry, shared by field and direct section intake.
+// Called by one thread; the enclosing passage supplies synchronization and publication.
+__device__ void normal_observation_frame(const wide *origin_current,const int64_t *incoming,
+    uint32_t n,uint32_t targets,uint32_t linked,uint32_t grain,uint32_t factor_width,
+    int64_t *report,uint32_t *slot){
+    uint32_t d=normal_source_components(n),R=NORMAL_QUADRATURES*targets;
+    size_t stride=normal_ball_stride(targets),gain=normal_source_at(targets);
+    wide *out=(wide *)report;wide S=(wide)1<<grain;
         wide *y=out+NORMAL_OBSERVED*stride,ey=0;
         if(!*slot && factor_width)contextual_tensor_target(incoming,n,factor_width,targets,grain,y,&ey,slot);
         else if(!*slot)for(uint32_t j=0;j<R;++j){const int64_t *v=incoming+3u*(j/2u);if(v[2]<=0){atomicOr(slot,REFUSED_MALFORMED);break;}
@@ -144,6 +140,21 @@ __device__ void field_normal_material_prepare(const int64_t *old,const wide *ori
             operative_write_moment(eh,e,e,slot);operative_write_moment(eb,e+MOMENT_WIRE_WORDS,e+MOMENT_WIRE_WORDS,slot);
             operative_write_moment(cy,e+NORMAL_TARGET_ENERGY*MOMENT_WIRE_WORDS,e+NORMAL_TARGET_ENERGY*MOMENT_WIRE_WORDS,slot);operative_write_moment(ec,e+NORMAL_TARGET_ENERGY_ERROR*MOMENT_WIRE_WORDS,e+NORMAL_TARGET_ENERGY_ERROR*MOMENT_WIRE_WORDS,slot);
         }
+}
+
+__device__ void field_normal_material_prepare(const int64_t *old,const wide *origin_current,const wide *origin_forward,
+    const wide *current,const int64_t *incoming,uint32_t n,uint32_t linked,uint32_t grain,
+    int64_t *next,int64_t *next_hi,int64_t *report,int64_t *report_hi,int64_t *workspace,
+    uint32_t targets,uint32_t factor_width,uint32_t *slot){
+    uint32_t d=normal_source_components(n),R=NORMAL_QUADRATURES*targets;size_t stride=normal_ball_stride(targets),gain=normal_source_at(targets),extra=normal_metadata_at(n,targets);
+    size_t state_words=normal_state_words(n,targets),report_words=normal_report_words(n,targets);
+    wide *out=(wide *)report;const wide *M=(const wide *)old;wide S=(wide)1<<grain;
+    for(size_t i=threadIdx.x;i<state_words;i+=blockDim.x)next[i]=old[i];
+    for(size_t i=threadIdx.x;i<report_words;i+=blockDim.x)report[i]=report_hi[i]=0;
+    __syncthreads();
+    if(!threadIdx.x){
+        if(!n||!targets||!workspace||grain<1||grain>120||linked>1||(linked&&(!origin_current||!origin_forward)))atomicOr(slot,REFUSED_MALFORMED);
+        normal_observation_frame(origin_current,incoming,n,targets,linked,grain,factor_width,report,slot);
     }
     __syncthreads();if(*slot)return;
     if(linked){normal_increment(next+normal_matrix_words(n,targets),out+gain,out+NORMAL_OBSERVED*stride,report+normal_report_base(n,targets),n,targets,false,slot);

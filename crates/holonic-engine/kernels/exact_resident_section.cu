@@ -1295,6 +1295,7 @@ extern "C" __global__ void section_constitutive_bilinear_source(
 #include "constitutive_relation_image.cuh"
 #include "constitutive_context_section.cuh"
 #include "constitutive_condition_contact.cuh"
+#include "current_difference_section.cuh"
 
 // Push both actual source branches through their producing-to-current unit-phase frame.
 // This does not read the paired-junction enclosure or substitute its numerical centre.
@@ -1642,6 +1643,7 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "field_operative_adjoint.cuh"
 #include "field_normal_material.cuh"
 #include "direct_normal_material.cuh"
+#include "normal_material_section.cuh"
 #include "constitutive_field.cuh"
 
 // Candidate finite passive-contact projection.  One block owns one query row and first forms the

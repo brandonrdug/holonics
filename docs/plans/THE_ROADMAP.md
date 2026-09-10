@@ -148,7 +148,7 @@ achieved. Current research seeks identifiable behavior and learning without a ut
 | AC0 | Existing source-qualified stream, availability and cursor | Complete; preserve |
 | AC1 | A productive conditional-generator carrier, its local interaction/reaction and source/receiver chart | Learned local laws now share actual condition standing in one move-owned neighborhood; continue into the source attachment |
 | AC2 | Observation-founded development of reusable conduct and a later measured consequence | Local material formation and condition reaction return atomically and change later conduct; carry them into the source attachment |
-| AC3 | Conversation exposure and retained joint continuation through the generator-bearing body | The sixteen-family history expansion is diagnostic evidence; useful language is not an entry gate |
+| AC3 | Conversation exposure and retained joint continuation through the generator-bearing body | Sixteen actual source fields now develop the direct normal response; joined generative state and cross-message ecology remain next |
 | AC4 | Restriction/rebase or generator reuse that participates in the next operation | Current-factor savings stand at their numerical scope; they do not close generative organization |
 | AC5 | Public invocation, model anatomy and persistence of the actual productive body | Whole local-generator rest and continued return now agree across processes; extend delivery to the cultivated conversation body |
 
@@ -169,10 +169,14 @@ carrier for resumed conversation cultivation.
 [established-bounded; implemented-exact; computational-witness] The [direct normal-response
 attachment](../../research/records/2026-09-10_THE_NORMAL_RESPONSE_ACCEPTS_RESIDENT_CURRENTS_WITHOUT_A_SOURCE_ARCHIVE.md)
 now composes a generated resident current with the existing accumulated normal law. This removes
-the historical-source-handle requirement for that calculation. Continue with section-level
-source intake and resident bounded-current consumption, then the actual conversation exposure;
-do not turn a codec's storage coordinates into native cadence or consume an enclosure's centre
-as an exact current. The existing normal/fibre laws remain local hypotheses with distinct scopes.
+the historical-source-handle requirement for that calculation. Section-level source intake and
+resident bounded-current consumption have now returned through the
+[conversation difference fields](../../research/records/2026-09-10_CONVERSATION_DIFFERENCE_FIELDS_REACH_THE_NATIVE_RESPONSE_WITHOUT_A_SOURCE_ARCHIVE.md).
+Continue into the shared generative state: for z=(p,c), form S(z)=(c-p,c,p), apply the learned
+difference response R, and retain z'=(c,c+R(S(z))). Preserve the actual joining current, full
+bounded/joint conduct and the source-plane restriction. Then extend the surrounding ecology,
+source continuation and normal-state restart. Do not turn codec storage coordinates into native
+cadence or consume an enclosure's centre as an exact current. Local adjacency is not all context.
 
 [definition] The corrected formal `FiniteLocalCurrentEcology.reaction` retains local
 standing. The [native field assembly and observed return](../../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)

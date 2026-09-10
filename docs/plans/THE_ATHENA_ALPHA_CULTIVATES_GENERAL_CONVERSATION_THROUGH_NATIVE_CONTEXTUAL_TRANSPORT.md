@@ -106,6 +106,23 @@ numerical solve error. Its bounded response does not select a unique external ca
 become an exact point-current input. The [parallel normal-geometry return](../../research/records/2026-09-09_MATHEMATICAL_REVIEW_NORMAL_GEOMETRY_AND_CLOSED_RETURNS.md)
 supplies the existing derivation; no new learning theory is needed to expose this port.
 
+[definition] The first source-field attachment uses an exterior symbol basis and the generic
+ordered-current comparison `x_j=(c_j-c_(j-1),c_j,c_(j-1))`, `y_j=c_(j+1)-c_j`. One section
+integrates its observations into the existing normal law and fits once. This local stencil is a
+declared receiver hypothesis, not the native Holon grain or all semantic context. The original
+source remains exterior and returned comparison operands remain explicit.
+
+[definition] Its continuing generative state is z=(p,c). The admitted source map S(z)=(c-p,c,p)
+has a known source-plane relation. The learned response supplies a change, while actual c supplies
+the join: z'=(c,c+R(S(z))). Implement that shared passage with complete bounded/joint conduct;
+do not train a proxy for the joining identity or project an uncertain current to its centre.
+Restriction/rebase must preserve this actual source map and admitted future family. A zero
+difference at one receiver is not a universal stopping rule or proof of source equality.
+
+[definition] That joining formula applies when R returns a difference in c's actual receiver
+chart. If a generated internal current and the emitted current use different charts, compose
+their explicit source/receiver maps first. Matching dimensions or names supplies no joining equality.
+
 ## AC0–AC5 construction order
 
 | Phase | Construction and concrete return |

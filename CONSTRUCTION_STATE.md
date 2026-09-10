@@ -1,14 +1,14 @@
 # Construction state
 
 **Currency:** September 10, 2026. **Priority:** Corrected AC0–AC5 construction is the active goal. Native HNN cultivation uses Holons as situated state, incidence, transported differences and compatible continuations; text/audio/visual media are exterior measurement charts.
-**Position:** The byte-cultivation assembly remains retired. AC1–AC2 now have a continuing local-generator neighborhood with shared condition current, atomic observed return and compact evidence persistence. Forty-four resident CUDA tests pass; process-separated continuation matches the complete uninterrupted body and second return. AC0's source reader remains complete. AC3's corrected conversation attachment is next; wider AC4 composition and AC5 product delivery remain unfinished. AC0–AC5 is not complete. No cultivation process is running.
+**Position:** The byte-cultivation assembly remains retired. AC3's first source-field attachment has processed 16 curated conversation frames through the existing normal response, with 4,963 local comparisons and fixed learned-state residency. Native bounded continuation and whole-section returns are verified. The continuing generative state, cross-message ecology and broader AC4–AC5 delivery remain unfinished. AC0–AC5 is not complete. No cultivation process is running.
 **Athena-alpha:** not yet attained.
 
-**Active implementation:** AC3 now has a verified direct-current attachment to the existing
-accumulated normal response. Seven normal checks, 45 resident checks and the public facade
-check pass. Section-level source intake, resident consumption of the complete bounded output
-and the actual conversation exposure remain unfinished. Its moments and signed residual
-do not replace the required source/receiver map or establish a completed model.
+**Active implementation:** The source map is explicitly local: difference plus its current/previous
+comparands predicts the next observed difference. Twelve normal checks, two codec checks and
+45 resident checks pass. Continue with joined generative state `(p,c) -> (c,c+R(c-p,c,p))`,
+preserving full bounded conduct and the actual joining current. The source-field result is not
+general semantic context. The new normal owner's state data still lacks a standalone restart protocol.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct
@@ -95,6 +95,15 @@ model or product grade and adds no numerical policy to the parallel AC1 work.
 
 ## Current HNN construction — representation repair
 
+[established-bounded; implemented-exact; measured] The [conversation difference-field return](research/records/2026-09-10_CONVERSATION_DIFFERENCE_FIELDS_REACH_THE_NATIVE_RESPONSE_WITHOUT_A_SOURCE_ARCHIVE.md)
+supplies native whole-section integration, addressed current rows, bounded-output continuation
+and a modality-neutral local difference receiver. The exterior Unicode/symbol chart neither
+assigns ordinal amplitudes nor defines native clock ticks. The 16-frame run reads 5,048 octets /
+4,995 scalars, executes 32 native field deeds in 37.158 seconds and retains 38,902,752 bytes of
+learned sections after every source occurrence is released. No numerical host readout or ingress
+occurs inside those field operations. The in-sample data term improves over both unconditional
+and current-face conditional reference means; no language or generalization grade is inferred.
+
 [established-bounded; implemented-exact; computational-witness] The [direct normal-response return](research/records/2026-09-10_THE_NORMAL_RESPONSE_ACCEPTS_RESIDENT_CURRENTS_WITHOUT_A_SOURCE_ARCHIVE.md)
 exposes the existing normal increment/fit through current operands, with no field source handle
 or observation archive. A learned resident generator supplies its input without numeric readout;
@@ -131,11 +140,11 @@ numerical host readouts. A separate process returns the same current and law pro
 Seventeen host, 35 resident CUDA, six existing native-wire and ten source-reader tests pass;
 the public facade checks. These are local-law and removal results, not a general HNN or language claim.
 
-[definition] Continue into AC3's actual source attachment using the established generator,
-condition-current and compact evidence owners. State the exterior source-to-current/receiver map
-and its native consequence before mounting broader conversation material. Apply existing
-restriction/rebase where that admitted source family requires it; do not found another learner
-or restore the byte loop. The source-qualified reader remains available.
+[definition] Continue from the measured source fields into their joined generative state and
+surrounding ecology. The learned difference response supplies the next current change; the
+existing current itself supplies the join. Apply restriction/rebase to the actual source plane
+and admitted future family. Broader exposure and normal-state restart remain work; the byte
+loop and historical-source predictor remain retired.
 
 [established-bounded; source-inspected; computational-witness] The [representation audit](research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)
 finds one new persistent contact coordinate per source-linked observation and a contextual

@@ -136,8 +136,17 @@ CUDA learning rule, token lookup or historical predictor enters this composition
 `surface_direct_normal.rs` validates the passage; `direct_normal_material.cuh` adapts its operands
 to the existing normal increment/fit and bounded linear response. `normal.rs` now shares the
 report/state decoders with the old field owner. No historical-source adapter is needed by this
-direct local response; its section-level codec attachment and full bounded-output consumer
-remain separate construction work.
+direct local response. `normal/direct/enclosure.rs` now carries bounded output into later native
+input; `normal/direct/section.rs` integrates supplied sections and retains actual operator cuts.
+`surface_normal_section.rs` records those passages and the generic current difference receiver.
+`normal_material_section.cuh` shares the existing observation increment, fit and response helpers;
+`current_difference_section.cuh` constructs local differences with their comparands.
+
+[definition] `constitutive_fibre/resident/section.rs` owns addressed point-current section views;
+`section/difference.rs` retains their original path and local comparison fields. The source
+attachment in `holonics-hna::native::section_input` uses the existing exterior `SymbolAlphabet`.
+The public `conversation_difference_field` example calls these native owners directly. Its
+published source run is a local normal-response construction, not a completed generative ecology.
 
 [historical] The SDK field/model wrapper, text adapters and eight alpha examples were
 [retired recoverably](../archive/implementations/2026-09-09-byte-field-cultivation/README.md).

@@ -2,10 +2,16 @@
 //! The current three-port source chart is explicit. No occurrence archive or field handle is
 //! needed to develop or query this local material; exact moments own its continuing geometry.
 use super::*;
+use std::rc::Rc;
+
+mod enclosure;
+pub use enclosure::{ResidentNormalEnclosure, ResidentNormalEnclosureView, ResidentNormalInput};
+mod section;
+pub use section::ResidentNormalSectionReturn;
 
 pub struct ResidentNormalMaterial<'c> {
     surface: &'c ResidentSurface<'c>,
-    state: ResidentSection<'c>,
+    state: Rc<ResidentSection<'c>>,
     roots: usize,
     targets: usize,
     grain: ResidentGrain,
@@ -18,7 +24,7 @@ pub struct ResidentNormalReturn<'a, 'c> {
     surface: &'c ResidentSurface<'c>,
     before: ResidentSection<'c>,
     after: Option<ResidentSection<'c>>,
-    source: ResidentConstitutiveCurrent<'a, 'c>,
+    source: ResidentNormalInput<'a, 'c>,
     observed: Option<ResidentConstitutiveCurrent<'a, 'c>>,
     roots: usize,
     targets: usize,
@@ -27,7 +33,7 @@ pub struct ResidentNormalReturn<'a, 'c> {
     pub successor_observations: u64,
 }
 impl<'a, 'c> ResidentNormalReturn<'a, 'c> {
-    pub fn source(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
+    pub fn source(&self) -> ResidentNormalInput<'_, 'c> {
         self.source
     }
     pub fn observed(&self) -> Option<ResidentConstitutiveCurrent<'_, 'c>> {
@@ -69,7 +75,7 @@ impl<'c> ResidentNormalMaterial<'c> {
         )?;
         Ok(Self {
             surface,
-            state,
+            state: Rc::new(state),
             roots,
             targets,
             grain,
@@ -94,29 +100,29 @@ impl<'c> ResidentNormalMaterial<'c> {
     }
     pub fn read<'a>(
         &self,
-        source: ResidentConstitutiveCurrent<'a, 'c>,
+        source: impl Into<ResidentNormalInput<'a, 'c>>,
     ) -> Result<ResidentNormalReturn<'a, 'c>, ConstitutiveFibreError> {
-        Ok(self.prepare(source, None)?.0)
+        Ok(self.prepare(source.into(), None)?.0)
     }
     pub fn receive<'a>(
         &mut self,
-        source: ResidentConstitutiveCurrent<'a, 'c>,
+        source: impl Into<ResidentNormalInput<'a, 'c>>,
         observed: ResidentConstitutiveCurrent<'a, 'c>,
     ) -> Result<ResidentNormalReturn<'a, 'c>, ConstitutiveFibreError> {
-        let (returned, next) = self.prepare(source, Some(observed))?;
-        self.state = next.ok_or(ConstitutiveFibreError::Shape)?;
+        let (returned, next) = self.prepare(source.into(), Some(observed))?;
+        self.state = Rc::new(next.ok_or(ConstitutiveFibreError::Shape)?);
         self.observations = returned.successor_observations;
         Ok(returned)
     }
     fn prepare<'a>(
         &self,
-        source: ResidentConstitutiveCurrent<'a, 'c>,
+        source: ResidentNormalInput<'a, 'c>,
         observed: Option<ResidentConstitutiveCurrent<'a, 'c>>,
     ) -> Result<(ResidentNormalReturn<'a, 'c>, Option<ResidentSection<'c>>), ConstitutiveFibreError>
     {
         let layout =
             NormalLayout::new(self.roots, self.targets).ok_or(ConstitutiveFibreError::Shape)?;
-        if source.width != layout.source_components
+        if source.width() != layout.source_components
             || observed.is_some_and(|y| y.width != layout.target_components)
         {
             return Err(ConstitutiveFibreError::Shape);

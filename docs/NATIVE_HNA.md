@@ -84,12 +84,30 @@ normal geometry/objective decoder; `state_wire` is boundary data, not yet a rest
 The [direct-port return](../research/records/2026-09-10_THE_NORMAL_RESPONSE_ACCEPTS_RESIDENT_CURRENTS_WITHOUT_A_SOURCE_ARCHIVE.md)
 records phase, fit/solve separation, source-family and native-generator composition evidence.
 
+[definition] `ResidentNormalInput::Enclosed` consumes a full joint current ball at the matching
+grain. `ResidentNormalReturn::into_forward` transfers its outer enclosure into continuing use;
+it does not identify that outer family with the original joint source/output fibre. Repeated
+native use can release previous source/return objects. No centre-to-point port is supplied.
+
+[definition] `ResidentConstitutiveSection` supplies addressed current rows. Its `differences`
+method returns `ResidentDifferenceSection`, with the original field and the exact local
+difference/comparand and observed-difference sections. `receive_section` integrates the supplied
+observations and fits once, returning the two response fields and actual immutable operator cuts.
+These row coordinates are not native identity or a clock, and the source fields are not model history.
+
 ## Conversation source
 
 [established-bounded; source-inspected] `holonics::hna::alpha::exposure` remains the source-qualified
 conversation reader. It retains available material, captured views, actual parent relations and
 delivery cursor. The `alpha_exposure` example inspects that source boundary. It is not a learner
 and supplies neither semantic identity nor a native topology. See [conversation data](CONVERSATION_DATA.md).
+
+[established-bounded; implemented-exact; measured] The public
+[`conversation_difference_field` example](../crates/holonics-hna/examples/conversation_difference_field.rs)
+now attaches the verified source prefix through `native::section_input::SymbolCurrentChart` and
+the generic difference receiver. The [source-field record](../research/records/2026-09-10_CONVERSATION_DIFFERENCE_FIELDS_REACH_THE_NATIVE_RESPONSE_WITHOUT_A_SOURCE_ARCHIVE.md)
+states its 16-frame return and local hypothesis. It is not a cross-message context mechanism or
+a useful language-generation claim. The script's optional probes are exterior receivers only.
 
 ## Earlier phase-session and field apparatus
 

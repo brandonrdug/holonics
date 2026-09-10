@@ -118,6 +118,13 @@ response, and its update stages the existing normal calculation before publicati
 source/receiver chart still determines what a supplied observation means; this objective is not
 an authored semantic score or proof that an observed response is a correct answer.
 
+[definition] Whole-section input now uses `ResidentConstitutiveSection` and the generic local
+difference receiver. `receive_section` fits the common successor after all supplied observations;
+it does not install a new source coordinate for each observation. Its returned before/after
+fields retain actual operator cuts. Bounded outputs can enter the normal current port intact.
+The exterior Unicode/symbol-basis attachment is one declared source chart; its local stencil
+does not define every medium's geometry or all language context.
+
 ## Partial conduct and comparison
 
 [definition] Useful restricted behavior can arise before every mechanism learns or every chart
