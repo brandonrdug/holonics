@@ -1,7 +1,7 @@
 # Construction state
 
-**Currency:** September 9, 2026. **Priority:** AC construction and cultivation remain paused. The deeper direct-message, classical-architecture and model-composition review has returned; its formal repair and revised finite construction order are deposited.
-**Position:** AC0 source return complete. The revised next packet is AC1's native standing–interaction–reaction passage; its formal standing repair is complete, its native attachment is open. Existing local-learning, exposure, journal and packaging receipts retain bounded credit; no later phase is claimed complete under the revised scope. AC4 comparison and AC5 interface work now accompany each construction increment.
+**Currency:** September 9, 2026. **Priority:** Brandon has resumed AC0–AC5 as the active goal. Holons carry situated state, incidence, transported differences and compatible continuations; text/audio/visual media are exterior measurement charts.
+**Position:** AC0 source complete. The revised AC1 finite joint-field assembly and AC2 local observed-return/later-consequence packets have returned. AC4 comparison and AC5 generic public access accompany them. Active next work: AC3 broader exposure/continuation and AC5 research-artifact delivery through the same Holon field, with scoped reuse in AC4.
 **Athena-alpha:** not yet attained.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -87,7 +87,15 @@ The [framework guide](docs/FORMAL_FRAMEWORK.md) connects physical, biological an
 instances. This continuation unifies already-engaged elementary patterns; it changes no native
 model or product grade and adds no numerical policy to the parallel AC1 work.
 
-## Current HNN construction — paused after deeper review
+## Current HNN construction — resumed after deeper review
+
+[established-bounded; implemented-exact; computational-witness] The [generic field return](research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)
+recovers the existing projective joint-source/context mechanism and moves generic assembly and
+observed-response orchestration out of the text adapter. Four native controls preserve complete
+successors across three receiver charts and separate a later current family after one local
+return. The native text publication control and 14 non-native alpha cases pass. This closes the
+revised finite AC1/AC2 packets, not general conversation or Athena-alpha attainment.
+
 
 [established-bounded; source-inspected] The [deeper architecture return](research/records/2026-09-09_ARCHITECTURE_CHARTS_REQUIRE_COMPOSED_MECHANISMS_AND_FINITE_CONSTRUCTION_RETURNS.md)
 recovers the recent mathematics thread and August/September direct directions about classical

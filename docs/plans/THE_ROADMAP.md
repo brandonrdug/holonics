@@ -4,11 +4,10 @@
 [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md) is the sole current-position record. Dated
 contracts and records preserve their completed scope; their old imperatives schedule no new work.
 
-[project-postulate] **September 9 superseding pause:** Brandon has paused AC construction and
-cultivation. The current authorized work is a source/history review, synthesis with the parallel
-mathematical framework, and justified abstraction/encapsulation repairs to the public Rust
-framework. The AC order below is retained for revision, not permission to continue experiments.
-Explain the actual text learning/feedback mechanism and its modality boundary before resuming.
+[project-postulate] **September 9 resumption:** Brandon has resumed the revised AC0–AC5 goal.
+Start with the finite AC1 interaction assembly below, with comparison/reuse and public access
+throughout. Holons encapsulate the situated objects being transported; no medium defines a
+special native learner or semantic topology. The completed deeper review remains a dependency.
 
 ## Fresh-session pickup
 
@@ -127,8 +126,8 @@ pins the refreshed Apple branch comparison.
 
 [project-postulate] **September 9 deeper revision:** The [direct-message and architecture review](../../research/records/2026-09-09_ARCHITECTURE_CHARTS_REQUIRE_COMPOSED_MECHANISMS_AND_FINITE_CONSTRUCTION_RETURNS.md)
 replaces the overloaded old AC1–AC3 grouping. The prior phase definitions remain in Git at
-`468973ea`; their evidence and open product obligations are not erased. Construction and
-cultivation remain paused. This revised order does not itself resume the goal.
+`468973ea`; their evidence and open product obligations are not erased. Brandon has now
+explicitly resumed construction under this revised order.
 
 [definition] The [blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 now distinguishes finite construction returns from Athena-alpha attainment. Useful general
@@ -139,23 +138,23 @@ achieved. Current research seeks identifiable behavior and learning without a ut
 | Phase | Construction return | Entry/dependency |
 |---|---|---|
 | AC0 | Existing source-qualified stream, availability and cursor | Complete; preserve |
-| AC1 | One native interaction/reaction with local standing and a source-qualified tensor/classical chart comparison | First packet on resumption; existing formal/native owners |
-| AC2 | Observation-founded local development of that interaction and a later measured consequence | AC1 passage; no universal whole-history gradient requirement |
+| AC1 | One native interaction/reaction with local standing and a source-qualified tensor/classical chart comparison | Finite return complete; use the shared field assembly |
+| AC2 | Observation-founded local development of that interaction and a later measured consequence | Finite local return complete; continue its use in AC3 |
 | AC3 | Broader conversation exposure, retained joint continuation and experimental checkpoint/costs | Lawful affordable recurrence; useful language is not a prerequisite |
 | AC4 | Behavioral comparison throughout, plus one local restriction/rebase or generator reuse with explicit receiver scope | Begins with AC1; does not wait for a complete model |
 | AC5 | Public Rust invocation, model anatomy, persistence and delivery of the current research artifact | Begins with AC1; product capability and standard exports remain honestly graded |
 
-[definition] **First finite packet on resumption: AC1's standing–interaction–reaction passage.**
-Use the [composition guide](../HNN_COMPOSITION.md): one finite neighborhood, actual section and
-incidence, retained local standing, one joint/conditioned interaction and one constitutive
-reaction. Exhibit the map into the existing resident operator, its forward result and numerical
-boundary; expose it through the current field/session owner. The fixed paired state-space law
-is the comparison. An additional fixed propagation word does not create mixed input dependence.
-A failed attachment names its precise absent argument or map before another owner is introduced.
-AC4 records the response and AC5 carries its public assembly description in this same packet.
+[definition] The first finite packet returns through the existing projective joint field,
+its producing source/current family and observed contact response. The [composition guide](../HNN_COMPOSITION.md)
+names the actual public owners and tensor map. Complete-successor comparisons and a later
+separated current family retain their source/receiver scope; the original linear field remains
+a valid distinct comparison. No new nonlinear law or general-language capability is claimed.
 
-[definition] The corrected formal `FiniteLocalCurrentEcology.reaction` now retains local
-standing; graph update and complete covariance return. The native attachment remains open.
+[definition] The corrected formal `FiniteLocalCurrentEcology.reaction` retains local
+standing. The [native field assembly and observed return](../../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)
+now return through the existing `OperativeContextual` joint feature and actual field successor.
+AC1 and AC2 close at that finite scope. Continue with AC3 exposure and retained continuation,
+with research-artifact delivery in AC5 and receiver-scoped reuse/comparison in AC4.
 The local field/material return, full-operator generic primitives and corrected joined-passage
 learning are existing candidates, each with its own source, metric and scope. Neither the old
 lexical atlas nor the retracted foreign-tower exclusion is restored.
@@ -171,7 +170,7 @@ semantic capacity constant or live Lean binding follows from this revision.
 remain bounded evidence. They do not prove learned semantic generator reuse or explain the full
 loop. Source/current variation and finite retained-family comparison guide the next choice;
 rerunning the same output, narrowing the plan to a single word, or seeking more solve precision
-without a new question supplies no progress. The paused position remains in CONSTRUCTION_STATE.
+without a new question supplies no progress. The current position remains in CONSTRUCTION_STATE.
 
 [definition] Mathematical continuation now instantiates the complex two-field Euler/NS source
 through the existing oriented-current and mild/Duhamel owners, preserving pressure, mixed

@@ -563,6 +563,14 @@ The draft applies its maps globally at that port; it does not supply the missing
 
 ## Classical learning, reflection and recursive compression
 
+[established-bounded; implemented-exact] `holonics-hna/src/native/field.rs` owns the public
+finite field recipe/mount; `field/junction/operative/response/observation.rs` owns generic
+observed-response orchestration and its typed receiver chart. Text delegates to these owners.
+The [AC1/AC2 return](../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)
+retains complete-successor comparisons, actual source/standing separation and a later current
+family changed by one local return. Existing native mathematical laws and rest formats stand.
+
+
 [established-bounded; implemented-exact; formal-checked] The deeper September 9 review extends
 `FiniteLocalCurrentEcology.reaction` with actual local standing. `Graph.ecology` uses it instead
 of zero; `Graph.ecology_step_eq_update`, `no_contact_can_retain_state` and `update_relabel`

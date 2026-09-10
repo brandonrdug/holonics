@@ -54,7 +54,7 @@ pub use junction::{NativeOperativeCurrentFactorCondensation,NativeOperativeRetur
     NativeCausalContactPropagation,NativeCausalContactPropagationReading,NativeCausalContactJoinReading,
     JointMaterialContactResponse,joint_material_contact,
     NativeOperativeContactBirth, NativeOperativeContactReading, NativeOperativeContactStaging, NativeOperativeReflectionReading,
-    NativeMaterialContactResponse, NativeMaterialContactResponseReading, NativeRetainedMaterialRelation, NativeMaterialContactStepComparison, NativeFiniteMaterialResponse,
+    NativeMaterialResponseChart, NativeMaterialContactResponse, NativeMaterialContactResponseReading, NativeRetainedMaterialRelation, NativeMaterialContactStepComparison, NativeFiniteMaterialResponse,
     NativeContactRealization,
     NativeContactDepositReading,
 };

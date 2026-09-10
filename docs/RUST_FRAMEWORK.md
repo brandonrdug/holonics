@@ -43,6 +43,16 @@ not execution of the default backend on a Mac. Many advanced mathematical module
 inside the CUDA-bound engine. Porting them or the runtime requires their actual dependency
 boundaries, not a claim that all formal Holonics is already available in a portable Rust crate.
 
+## Generic field assembly
+
+[established-bounded; implemented-exact] `holonics::hna::native::{NativeFieldModelSpec,
+with_native_field}` now constructs the existing constitutive field independently of the
+medium. The recipe carries seed material, numerical junction and material source/target charts;
+it is not a model checkpoint. `NativeFieldModelSpec::found_on` shares a caller's resident surface.
+The field's actual occurrence, source/anchor, return, rest and current-family APIs remain in use.
+`NativeMaterialResponseChart` makes normalized group/series apertures explicit; generic observed
+return belongs to the field rather than `TextFieldSession`. See [composition](HNN_COMPOSITION.md).
+
 ## Choosing an implementation
 
 [definition] `hna::alpha::exposure` owns the cold conversation source/cursor;

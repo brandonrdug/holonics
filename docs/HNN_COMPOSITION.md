@@ -76,19 +76,24 @@ law. The full operator assembles a richer word of generic primitives but retains
 source graph and artifact dependencies. The `holonics` facade exposes both owners; it does not
 make their model states interchangeable.
 
-[open] The next native assembly needs a concrete passage that connects the field's actual
-section/standing and incidence to a supported interaction/reaction, returns through the same
-producing passage, and preserves one complete successor. The proposed first scope is one finite
-neighborhood with retained state and one joint or conditioned interaction, using the existing
-resident laws. The exact formal/current chart and any numerical defect must be exhibited.
-Do not begin with a new universal trait, all six architecture adapters or a whole-model rewrite.
+[established-bounded; implemented-exact] The [first finite native assembly](../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)
+now uses the existing `OperativeContextual` feature `Q(1,s) tensor Q(1,c)`, where c is the actual
+operative standing including interior current. Its material factors, joint source/condition
+pullback and producing paired return retain their original scope. This is recovery and
+composition of existing mechanisms, not the installation of a new nonlinear law.
 
-[definition] The public boundary for that first composition must expose the model's declared
-law, source/receiver charts, occurrence application, retained state and rest/inspection through
-the existing field/session owners. A driver mounts material and reads consequences; it does not
-implement the learner. Experimental variants remain explicit comparison profiles. A new public
-type is warranted only if an actual ownership or semantic distinction cannot be expressed by
-the existing owners. Converting the names in this guide into empty structs would not satisfy it.
+[definition] `holonics::hna::native::NativeFieldModelSpec` binds actual seed material,
+junction representation/solver and material source/target chart. `found_on` or
+`with_native_field` returns the existing field owner. It has no medium-specific topology.
+`NativeMaterialResponseChart` declares a complex-current or normalized receiver, and
+`NativeConstitutiveField::respond_to_material_observation` performs the same generic producing
+return previously orchestrated by the text adapter. A failed return leaves reception committed
+and preserves the post-reception field. The application does not replay the occurrence.
+
+[open] Broader continuing behavior, affordable reuse and research-model delivery remain the
+next construction. A new initialization recipe is not a trained artifact, and the reported
+finite local change does not establish a learned general text/acoustic/visual generator.
+The same native Holon field and source/receiver capabilities remain the shared assembly.
 
 ## Partial conduct and comparison
 

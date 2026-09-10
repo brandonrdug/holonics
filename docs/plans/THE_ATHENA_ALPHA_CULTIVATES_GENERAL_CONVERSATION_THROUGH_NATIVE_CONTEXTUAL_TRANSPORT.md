@@ -3,7 +3,7 @@
 **Authority:** Brandon's September 6 instruction to design and deposit this blueprint, update the
 roadmap and position, then immediately construct and complete it as a goal.
 **Status:** Revised September 9 after direct-message and classical-architecture recovery.
-Construction and cultivation remain paused. The AC labels below now identify finite construction
+Brandon has resumed construction as the active AC0–AC5 goal. The labels below identify finite construction
 returns; the previous phase definitions remain in Git at `468973ea`. Athena-alpha attainment is
 the separate product standard in §1 and is not weakened by this scheduling repair.
 **Order:** [the roadmap](THE_ROADMAP.md).
@@ -256,8 +256,10 @@ view without replacing source ancestry or importing unavailable future material.
 
 [definition] AC1 closes on this integrated passage and its source-qualified verification. It
 requires no learned English and no implementation of all six classical architectures. The
-formal local-standing repair and existing resident kernels are dependencies, not completion of
-this native attachment. No new corpus run is implied while the current pause remains in force.
+[generic field return](../../research/records/2026-09-09_AC1_AC2_THE_HOLON_FIELD_OWNS_ASSEMBLY_AND_OBSERVED_RETURN.md)
+now completes this finite attachment through the existing joint projector feature, with the
+public source/return boundary and verified later consequence. Holons carry the native relation
+independently of the exterior medium.
 
 ### AC2 — Make an observed relation change reusable conduct
 
@@ -363,4 +365,4 @@ The retired database stays unused.
 [definition] Verify the changed relation: native runs for changed native conduct, relevant Cargo
 checks for Rust interfaces and Lean builds for changed formal owners/imports. Observe useful or
 unusual behavior at its actual source/configuration; do not replace it with test counts, a byte
-hash or a new universal qualitative gate. No native experiment is scheduled during the pause.
+hash or a new universal qualitative gate. The current native packet and its comparison belong to the resumed goal.

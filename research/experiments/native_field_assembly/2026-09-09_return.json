@@ -1,0 +1,61 @@
+{
+  "after": {
+    "center": [
+      {
+        "imaginary": "-1096554017060464707/295147905179352825856",
+        "real": "413513848703100011739/4722366482869645213696"
+      },
+      {
+        "imaginary": "-26041546090561741581/2361183241434822606848",
+        "real": "38486302485093147243/4722366482869645213696"
+      }
+    ],
+    "radius": "595/2361183241434822606848"
+  },
+  "before": {
+    "center": [
+      {
+        "imaginary": "-15411111733767203621/4722366482869645213696",
+        "real": "203572475404980970005/2361183241434822606848"
+      },
+      {
+        "imaginary": "-22544239500251624283/2361183241434822606848",
+        "real": "20525496193469050763/2361183241434822606848"
+      }
+    ],
+    "radius": "579/2361183241434822606848"
+  },
+  "current_chart": "complex-current",
+  "distance_square": "100618008110893801010679498644865096227/22300745198530623141535718272648361505980416",
+  "evidence": [
+    "implemented-exact",
+    "computational-witness"
+  ],
+  "grade": "established-bounded",
+  "scope": "Two independently founded matched fields; same situated current occurrences, one local contact return withheld. Complete later material balls separate. No medium or semantic label is supplied.",
+  "source_profile": "operative-contextual",
+  "sum_radius_square": "344569/1393796574908163946345982392040522594123776",
+  "verification": {
+    "native_field_controls": 4,
+    "text_adapter_native_control": 1,
+    "alpha_non_native_tests_passed": 14,
+    "alpha_ignored": 13,
+    "command": "cargo test -p holonics-hna --lib native::field::tests -- --ignored --test-threads=1 --nocapture",
+    "reported_native_test_seconds": "2.58"
+  },
+  "construction": {
+    "occurrences_before_contact": 5,
+    "local_contact_returns": 1,
+    "later_occurrence": 5,
+    "retained_source_join": {
+      "receiving": 2,
+      "source": 0,
+      "predecessor_state": 1
+    },
+    "factory_matches_explicit_successor_for": [
+      "complex-current",
+      "relative-entropy",
+      "squared-probability"
+    ]
+  }
+}

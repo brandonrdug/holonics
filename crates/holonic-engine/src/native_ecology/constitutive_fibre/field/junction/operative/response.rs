@@ -5,6 +5,8 @@ use num_bigint::BigInt;
 use num_traits::One;
 use super::propagation::return_path::NativeCausalContactReturn;
 mod comparison;
+mod observation;
+pub use observation::NativeMaterialResponseChart;
 pub use comparison::{NativeFiniteMaterialResponse, NativeRetainedMaterialRelation, NativeMaterialContactStepComparison};
 
 pub struct NativeMaterialContactResponse<'c> {

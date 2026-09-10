@@ -6,11 +6,9 @@
 //! text emission, assign semantic values to bytes, or select a response.
 
 use holonic_engine::{
-    embedding_fiber::ResidentReadout,
     native_ecology::constitutive_fibre::{
         ConstitutiveFibreError, NativeConstitutiveField, NativeJunctionSeed,
     },
-    resident_section::{ResidentGrain, ResidentSurface},
 };
 use thiserror::Error;
 
@@ -195,22 +193,30 @@ pub(super) fn with_matched_field_profile<R>(
     enclosed: Option<u32>,
     operation: impl FnOnce(&mut NativeConstitutiveField<'_>) -> Result<R, AlphaMaterialError>,
 ) -> Result<R, AlphaMaterialError> {
-    let readout =
-        ResidentReadout::new().map_err(|error| AlphaMaterialError::Apparatus(error.to_string()))?;
-    let surface = ResidentSurface::on(&readout)
-        .map_err(|error| AlphaMaterialError::Apparatus(error.to_string()))?;
-    let mut field = if let Some(grain) = enclosed {
-        NativeConstitutiveField::found_with_enclosed_junction(
-            &surface,
-            matched_unit_seed(channels),
-            ResidentGrain(grain),
-        )?
-    } else if paired {
-        NativeConstitutiveField::found_with_paired_junction(&surface, matched_unit_seed(channels))?
-    } else {
-        NativeConstitutiveField::found(&surface, matched_unit_seed(channels))?
+    use crate::native::{NativeFieldJunctionSpec, NativeFieldModelSpec, with_native_field};
+    use holonic_engine::native_ecology::constitutive_fibre::{
+        NativeFieldJunctionRepresentation, NativeFieldJunctionSolver,
     };
-    operation(&mut field)
+    let representation = enclosed.map(|fractional_bits| {
+        NativeFieldJunctionRepresentation::EnclosedDyadic { fractional_bits }
+    }).or_else(|| paired.then_some(NativeFieldJunctionRepresentation::RationalWords));
+    let spec = NativeFieldModelSpec {
+        material: matched_unit_seed(channels),
+        junction: representation.map(|representation| NativeFieldJunctionSpec {
+            representation, solver: NativeFieldJunctionSolver::Full,
+        }),
+        material_transport: None,
+    };
+    with_native_field(&spec, operation)
+}
+
+impl From<crate::native::NativeSessionError> for AlphaMaterialError {
+    fn from(error: crate::native::NativeSessionError) -> Self {
+        match error {
+            crate::native::NativeSessionError::Engine(error) => Self::Native(error),
+            other => Self::Apparatus(other.to_string()),
+        }
+    }
 }
 
 #[cfg(test)]
