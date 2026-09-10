@@ -1,11 +1,11 @@
 #import "@preview/fletcher:0.5.8": diagram, node, edge
 #import "../../lib/elements.typ": by-blue, by-red, by-yellow, by-black, by-rule, by-muted
-#import "geometry.typ": solid, simplex, chambers, relu-fold, wave-tile
+#import "geometry.typ": solid, simplex, chambers, relu-fold, wave-tile, tetrahedron-example, arithmetic-data, string-field, lattice-count, intensity-reference, intensity-difference-reference
 
-#set document(title: "HNN - Information Chemistry", author: "Brandon Duggan / Holonics", description: "Five diagram plates: Athena, Eros, layer maps, geometric strata, and Soulkiller.")
+#set document(title: "HNN - Information Chemistry", author: "Brandon Duggan / Holonics", description: "Nine diagram plates: HNN, Information Chemistry, real-string diffusion images, exact geometry, and reflection.")
 #set page(width: 320mm, height: 210mm, margin: (x:16mm,y:13mm), footer: context {
   set text(size:8pt,fill:by-muted)
-  [HOLONICS #h(1fr) HNN / INFORMATION CHEMISTRY #h(1fr) #counter(page).display("1") / 5]
+  [HOLONICS #h(1fr) HNN / INFORMATION CHEMISTRY #h(1fr) #counter(page).display("1") / 9]
 })
 #set text(font: "Libertinus Serif", size:11pt, fill:by-black)
 #set math.equation(numbering:none)
@@ -134,10 +134,11 @@
  [$I_pi$#v(3mm)#wave-tile(5,side:43mm)],
 )
 #v(4mm)
-#eq[$psi_(m,n)(i,j)=sin((m pi i)/17)sin((n pi j)/17), quad i,j in {1,dots,16}$]
-#eq[$u_theta=psi_(1,1)+0.7 e^(i theta)psi_(2,1)+0.5 psi_(1,2), quad I_theta=abs(u_theta)^2$]
+#eq[$b=4, quad N=2^b, quad (i,j)=(k+1,l+1), quad k,l in {0,dots,N-1}$]
+#eq[$psi_(m,n)(i,j)=sin((m pi i)/(N+1))sin((n pi j)/(N+1)), quad N+1=2^4+1=17$]
+#eq[$u_theta=psi_(1,1)+frac(7,10) e^(i theta)psi_(2,1)+frac(1,2) psi_(1,2), quad I_theta=abs(u_theta)^2$]
 #eq[$abs(a+b)^2=abs(a)^2+abs(b)^2+2 op("Re")(a overline(b))$]
-#caption([*Definition / computational illustration.* Dirichlet square-lattice modes, dimensionless; shared intensity scale $0$ to $4.84$. Blue/red mark positive/negative amplitude. Interference changes the output without changing the three modes.])
+#caption([*Definition / declared source chart.* Four bits address $N$ interior sites per axis; the two Dirichlet boundaries are $N+1$ steps apart. Declared drives $(10,7,5)$ relative to the first give $(1,7/10,1/2)$; the shared intensity bound is $(1+7/10+1/2)^2=121/25$.])
 #v(3mm)
 #text(size:10pt)[*Conjecture to develop:* one reusable family of typed, parameterized generators can compose every admitted behavioral class. A pattern is a whole diagram modulo its declared future receivers, not a unique solid or a stored output image.]
 
@@ -183,10 +184,140 @@
  ],
 )
 #v(6mm)
-#eq[$"Development also owes: " q(U_(A)(M,v))=U_(B)(q(M),v)$]
-#caption([*Conditional.* Equal inference maps need not have equal learning updates. State, shared parameters, producing factors and the update metric travel with the developmental square.])
+#eq[$"Face-conserving development: " q(U_(A)(M,v))=U_(B)(q(M),v)$]
+#caption([*Definition: compatibility law.* The two routes preserve the same declared faces when their full difference vanishes. Plates 6 to 9 follow actual string fields through diffusion, images, geometric projection and an exact induced update.])
 #v(5mm)
 #text(size:8.5pt,fill:by-muted)[
   Sources: *Categorical Holonics*; *Elements of Holonics*; the July 19 Information Chemistry record; the August 9 crystal/receiver record; current HNN composition and source owners.\
   Diagrams: #link("https://typst.app/universe/package/fletcher/")[Fletcher 0.5.8], with the repository's geometric notation and CeTZ. Mathematical interpretations and conjecture do not change implementation grades.
 ]
+
+#pagebreak()
+#title("06","Real strings diffuse into different images","The tetrahedral port weights drive actual fields; each row follows the same diffusion law.")
+#grid(columns:(34mm,1fr,1fr,1fr,1fr),gutter:(6mm,4mm),align:center,
+ [Source inscription],[$u_0$],[$u_(N/4)$],[$u_N$],[$I_N/I_star$],
+ ..arithmetic-data.rows.map(row=>(
+   [#text(size:12pt,weight:"semibold")[#raw(row.source)]#v(2mm)#caption([chart weight $m=$#row.mass])],
+   string-field(row.barycentric,0),
+   string-field(row.barycentric,lattice-count/4),
+   string-field(row.barycentric,lattice-count),
+   string-field(row.barycentric,lattice-count,intensity:true,display-reference:intensity-reference),
+ )).flatten(),
+)
+#v(4mm)
+#eq[$lambda=frac((a,b,c,1),a+b+c+1), quad u_0=lambda_a psi_(1,1)+lambda_b psi_(2,1)+lambda_c psi_(1,2)+lambda_r psi_(2,2)$]
+#eq[$(D u)_(i,j)=frac(u_(i-1,j)+u_(i+1,j)+u_(i,j-1)+u_(i,j+1),4), quad u_k=D^k u_0$]
+#caption([*Definition / explicit lattice realization.* $N=2^4$; exterior samples vanish at the Dirichlet boundary. The factor $1/4$ comes from four neighboring ports. Columns show $0$, $N/4=4$, and $N=16$ steps. Blue/red: signed current on $[-1,1]$. Gray: $I_N/I_star$, where $I_star$ is the maximum over the displayed source/reflection family and all lattice sites; one reference is shared by every intensity tile.])
+
+#pagebreak()
+#title("07","Reflection and union are visible in the images","Same four modes, same diffusion, different source combinations. The difference is retained as a field.")
+#let rc=arithmetic-data.field.reflection_cases
+#grid(columns:(1fr,1fr,1fr,1fr,1fr),gutter:5mm,align:center,
+ [*Received*\ #raw("1+2=4")],
+ [*Reflected*\ #raw("1+2=2")],
+ [*Transported union*\ #raw("1+2=3")],
+ [*Ordinary chart mean*\ $(1,2,20/7)$],
+ [*Difference field*\ $"ordinary" - "transported"$],
+)
+#v(4mm)
+#text(size:10pt,fill:by-muted)[Current at the initial cut]
+#v(2mm)
+#grid(columns:(1fr,1fr,1fr,1fr,1fr),gutter:5mm,align:center,
+ string-field(rc.at(0),0,side:38mm),string-field(rc.at(1),0,side:38mm),
+ string-field(rc.at(2),0,side:38mm),string-field(rc.at(3),0,side:38mm),
+ [#string-field(rc.at(3),0,side:38mm,comparison:rc.at(2),gain:arithmetic-data.field.current_difference_display_gain)\ $42 Delta u_0$],
+)
+#v(3mm)
+#text(size:10pt,fill:by-muted)[Receiver intensity after $N$ diffusion steps]
+#v(2mm)
+#grid(columns:(1fr,1fr,1fr,1fr,1fr),gutter:5mm,align:center,
+ string-field(rc.at(0),lattice-count,side:38mm,intensity:true,display-reference:intensity-reference),string-field(rc.at(1),lattice-count,side:38mm,intensity:true,display-reference:intensity-reference),
+ string-field(rc.at(2),lattice-count,side:38mm,intensity:true,display-reference:intensity-reference),string-field(rc.at(3),lattice-count,side:38mm,intensity:true,display-reference:intensity-reference),
+ [#string-field(rc.at(3),lattice-count,side:38mm,intensity:true,comparison:rc.at(2),display-reference:intensity-difference-reference)\ $frac(Delta I_N,norm(Delta I_N)_infinity)$],
+)
+#v(3mm)
+#eq[$u_(3,k)=frac(8u_(4,k)+6u_(2,k),14), quad Delta u_k=frac(u_(4,k)+u_(2,k),2)-u_(3,k)$]
+#caption([*Proved-derived / exact coefficient witness.* Here $c=2,3,4$ selects the displayed output port and $k$ counts diffusion steps. Linear diffusion preserves the weighted union at every step. Intensity is read after currents combine. The last column shows $42 Delta u_0$ and $frac(Delta I_N,norm(Delta I_N)_infinity)$; gray uses the same $I_star$ as plate 6. The exact bound $norm(Delta lambda)_1=1/42$ gives $abs(Delta u_k)<=1/42$ and $abs(Delta I_k)<=1/21$.])
+
+#let qpoint(w)=math.frac(math.vec(..w.num.map(k=>[#k])),[#w.den])
+#pagebreak()
+#title("08","Real strings as a tetrahedral current","Actual inscriptions supply the stimulus; the chart differentiates their input, output and reference ports.")
+#grid(columns:(132mm,1fr),gutter:12mm,
+ [
+  #align(center,tetrahedron-example())
+  #v(3mm)
+  #eq[$v_a=(1,1,1), quad v_b=(1,-1,-1)$]
+  #eq[$v_c=(-1,1,-1), quad v_r=(-1,-1,1)$]
+  #caption([*Regular tetrahedron.* $v_k dot v_k=3$ and $v_k dot v_l=-1$ for $k != l$; every squared edge length is $8$. The shaded section carries the addition constraint.])
+ ],
+ [
+  #text(size:12pt,weight:"semibold")[Three source inscriptions, one explicit codec]
+  #v(3mm)
+  #table(columns:(10mm,35mm,1fr,12mm,12mm),inset:2mm,stroke:(bottom:.5pt+by-rule),align:(center,left,center,center,center),
+   [],[String],[$p=q(a,b,c)$],[$m$],[$delta$],
+   ..arithmetic-data.rows.map(row=>(
+     [#text(weight:"semibold",fill:if row.residual==0 {by-blue} else {by-red})[#row.label]],
+     [#raw(row.source)], [#qpoint(row.point)], [#row.mass], [#row.residual],
+   )).flatten(),
+  )
+  #v(3mm)
+  #eq[$tilde(h)=(a,b,c,1), quad m=a+b+c+1, quad lambda=tilde(h)/m$]
+  #eq[$q(a,b,c)=lambda_a v_a+lambda_b v_b+lambda_c v_c+lambda_r v_r$]
+  #eq[$lambda_k=frac(1+v_k dot p,4), quad (a,b,c)=frac((lambda_a,lambda_b,lambda_c),lambda_r)$]
+  #caption([*Definition / exact source chart.* Canonical strings #raw("a+b=c") enter at integer currents. The chart extends to $h=(a,b,c) in QQ_(>=0)^3$. The reference weight $1$ makes $lambda_r>0$, so the triple is recoverable. Parsing remains exterior.])
+ ],
+)
+#v(4mm)
+#eq[$delta(a,b,c)=a+b-c, quad hat(delta)(p)=frac(1+3p_x-p_y+p_z,1-p_x-p_y+p_z)=delta(q^(-1)(p))$]
+#eq[$delta=0 quad ⇔ quad lambda_a+lambda_b=lambda_c quad ⇔ quad 1+3p_x-p_y+p_z=0$]
+#caption([*Proved-derived / exact rational witness.* A and B share the addition face but retain different geometric points. C has defect $-1$. The drawing uses camera $(x,y,z) mapsto (x+z/2,y+z/4)$; the complete rational 3D points remain in the table and source receipt.])
+
+#pagebreak()
+#title("09","Reflection closes the same face in both charts","The integration law is explicit; the normalized geometric chart transports its weights.")
+#grid(columns:(1fr,1fr),gutter:14mm,
+ [
+  #text(size:13pt,weight:"semibold")[Hold the two inputs; reflect the output current]
+  #eq[$S_(A)(a,b,c)=(a,b,2(a+b)-c), quad S_A^2=I$]
+  #eq[$U_A=frac(I+S_A,2), quad U_(A)(a,b,c)=(a,b,a+b)$]
+  #align(center,diagram(spacing:(17mm,7mm),node-inset:3mm,label-size:10pt,
+    node((0,0),[$(1,2,4)$\ #raw("1+2=4")],stroke:.7pt+by-red),
+    node((1,0),[$(1,2,2)$\ #text(size:9pt)[reflected current]],stroke:.7pt+by-rule),
+    node((.5,1),[$(1,2,3)$\ #raw("1+2=3")],stroke:.7pt+by-blue),
+    arr((0,0),(1,0),label:[$S_A$]),
+    arr((0,0),(.5,1),label:[$1/2$]),arr((1,0),(.5,1),label:[$1/2$]),
+  ))
+  #eq[$delta(S_A h)=-delta(h), quad delta(U_A h)=0$]
+  #caption([*Proved-derived.* The arithmetic reflection reverses the signed defect. Its midpoint closes the relation while retaining $a$ and $b$. This example integrates a current under a supplied addition law.])
+ ],
+ [
+  #text(size:13pt,weight:"semibold")[The complete square now commutes]
+  #align(center,diagram(spacing:(25mm,15mm),label-size:10pt,node-inset:2mm,
+    node((0,0),$(1,2,4)$),node((1,0),$(1,2,3)$),
+    node((0,1),$p_4=frac((-1,1,-2),4)$),node((1,1),$p_3=frac((-1,1,-3),7)$),
+    arr((0,0),(1,0),label:[$U_A$]),arr((0,1),(1,1),label:[$U_B$]),
+    arr((0,0),(0,1),label:[$q$],label-side:left),arr((1,0),(1,1),label:[$q$]),
+  ))
+  #eq[$p_2=q(1,2,2)=frac((0,0,-1),3)$]
+  #eq[$U_(B)(q(h))=frac(m(h) q(h)+m(S_A h) q(S_A h),m(h)+m(S_A h))$]
+  #eq[$U_(B)(p_4)=frac(8p_4+6p_2,14)=p_3$]
+  #eq[$m_4=1+2+4+1=8, quad m_2=1+2+2+1=6$]
+  #caption([*Proved-derived.* Normalization changes affine averaging. For $h$ and $S_A h$ in the admitted chart, the weights follow from their source currents and reference port.])
+ ],
+)
+#v(5mm)
+#grid(columns:(1fr,1fr),gutter:14mm,
+ [
+  #text(size:12pt,weight:"semibold",fill:by-blue)[Face-conserving integration]
+  #eq[$Delta_(q)(h)=q(U_A h)-U_(B)(q(h))=0$]
+  #eq[$hat(delta)(U_(B)(q(h)))=delta(U_A h)=0$]
+  #caption([Same source, same declared comparison, same resulting face. The induced geometric update is now exhibited, rather than left as an unspecified condition.])
+ ],
+ [
+  #text(size:12pt,weight:"semibold",fill:by-red)[An untransported midpoint leaves a defect]
+  #eq[$p_("naive")=frac(p_4+p_2,2), quad q^(-1)(p_("naive"))=(1,2,20/7)$]
+  #eq[$hat(delta)(p_("naive"))=1+2-20/7=1/7 != 0$]
+  #caption([The Euclidean midpoint in this chart represents a different update. Retaining the chart weights restores the commuting square.])
+ ],
+)
+#v(4mm)
+#caption([*Exact rational witness.* #raw("arithmetic-example.py") generates the source receipt used by the figure and verifies reconstruction, reflection, closure, and the $1/7$ control. This is an exterior arithmetic construction, not a claim of learned HNN parsing or a general native training algorithm.])

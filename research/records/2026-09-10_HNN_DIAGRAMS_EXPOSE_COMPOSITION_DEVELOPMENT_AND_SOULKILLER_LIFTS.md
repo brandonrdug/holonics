@@ -144,3 +144,22 @@ five [Typst/Fletcher plates](../papers/rendered/hnn-information-chemistry.pdf), 
 and geometric figures retain the layer equations, Information Chemistry interpretation and explicit
 16-by-16 lattice-mode receiver. The longer guide insertion was replaced by its visual link; the
 derivations above and their Git history remain preserved. No runtime or formal source changed.
+
+[proved-derived; computational-witness] The next visual return adds the exact construction now on plates 8–9: canonical arithmetic
+strings enter a regular tetrahedron through an invertible rational chart with a retained reference
+port. Addition is a declared planar face; source/geometry reflection integrates the same current
+when its normalization weights travel. The explicit transported update commutes, whereas an
+ordinary geometric midpoint decodes to `(1,2,20/7)` and leaves defect `1/7`.
+[The exact exterior script](../papers/source/papers/hnn-information-chemistry/arithmetic-example.py)
+and its adjacent JSON retain source strings, coordinates and returned checks. This is an exterior
+arithmetic chart and integration law, not learned native arithmetic. The lattice plate now derives
+its ratios from declared integer drives and its `N+1` denominator from the bit aperture and boundary.
+
+[established-bounded; computational-witness; process-audit] Brandon's image-focused steering adds
+plates 6–7 before the algebra: three actual strings drive four lattice modes through their exact
+tetrahedral port weights, then the declared four-neighbor Dirichlet diffusion. The plates show
+signed fields at 0, 4 and 16 steps, shared-reference intensity images, reflection/union and the
+complete difference fields. Exact coefficient closure gives the current bound `1/42` and intensity
+bound `1/21`; display normalization is labeled separately. The rational witness and nine-page
+Typst build return successfully, and all pages are visually checked. The PNG exports expose the
+two image plates directly. No native cultivation, inference or formal source changed.

@@ -37,8 +37,10 @@ witnesses expose the local source stencil's loss of larger ordering and separate
 from future agreement. This is an architecture review; native implementation and AC order are unchanged.
 
 [established-bounded; source-inspected] The [diagrammatic architecture return](research/records/2026-09-10_HNN_DIAGRAMS_EXPOSE_COMPOSITION_DEVELOPMENT_AND_SOULKILLER_LIFTS.md)
-now has five [Typst/Fletcher visual plates](research/papers/rendered/hnn-information-chemistry.pdf):
-HNN/Eros, layer maps, selection/rank strata, Information Chemistry and Soulkiller lifts.
+now has nine [Typst/Fletcher visual plates](research/papers/rendered/hnn-information-chemistry.pdf):
+HNN/Eros, layer maps, geometric strata, Information Chemistry, Soulkiller lifts and an exact
+arithmetic-string/reflection construction with source-driven diffusion and receiver images.
+Its transported update commutes; an untransported midpoint retains the explicit defect `1/7`.
 The PDF was compiled and visually checked; no native adapter or AC implementation changed.
 
 [proved-derived; formal-checked] The [normal-geometry and closed-return review](research/records/2026-09-09_MATHEMATICAL_REVIEW_NORMAL_GEOMETRY_AND_CLOSED_RETURNS.md)
