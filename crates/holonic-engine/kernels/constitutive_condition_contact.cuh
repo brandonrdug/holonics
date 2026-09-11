@@ -16,6 +16,47 @@ extern "C" __global__ void section_constitutive_condition_current_found(
     out[5u*c+1]=out_hi[5u*c+1]=0;
 }
 
+// Recover the target-vertical directions from the lower-right block of a
+// producing local law, then embed them in the joined arrival (c,c+eta).  The source block is already an exact echelon carrier;
+// retain its coordinates verbatim and stage the same Gram rows used by contact.
+extern "C" __global__ void section_constitutive_wave_source_geometry(
+    const int64_t *basis,const int64_t *basis_hi,uint32_t f,uint32_t r,
+    int64_t *directions,int64_t *directions_hi,int64_t *graph,int64_t *graph_hi,
+    int64_t *workspace,uint32_t *slot,const uint32_t *census,const uint32_t *lineage,
+    uint32_t lineage_count
+) {
+    if(blockIdx.x||threadIdx.x)return;
+    if(upstream_refused(census,lineage,lineage_count,slot))return;
+    uint32_t l=f+r,c=2u*r,k=2u*c;
+    if(!f||!r||l<r||c>UINT32_MAX/2u){atomicOr(slot,REFUSED_MALFORMED);return;}
+    for(size_t i=0;i<(size_t)l*l;++i)if(basis[i]!=basis_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+    for(uint32_t p=0;p<l;++p){
+        const int64_t *row=basis+(size_t)p*l;
+        if(row[p]<0){atomicOr(slot,REFUSED_MALFORMED);return;}
+        for(uint32_t j=0;j<l;++j)if((j<p||!row[p])&&row[j]){atomicOr(slot,REFUSED_MALFORMED);return;}
+    }
+    for(size_t i=0;i<(size_t)c*c;++i)directions[i]=directions_hi[i]=0;
+    for(uint32_t i=0;i<r;++i)for(uint32_t j=0;j<r;++j){
+        int64_t v=basis[(size_t)(f+i)*l+f+j];
+        directions[(size_t)(r+i)*c+r+j]=directions_hi[(size_t)(r+i)*c+r+j]=v;
+    }
+    for(size_t i=0;i<(size_t)k*k;++i)graph[i]=graph_hi[i]=0;
+    wide *row=(wide*)workspace;
+    for(uint32_t i=0;i<c;++i){
+        for(uint32_t j=0;j<k;++j)row[j]=0;
+        bool nonzero=false;
+        for(uint32_t n=0;n<c;++n){
+            int64_t vi=directions[(size_t)i*c+n];if(!vi)continue;
+            nonzero=true;row[c+n]=vi;
+            for(uint32_t j=0;j<c;++j){int64_t vj=directions[(size_t)j*c+n];
+                if(vj)row[j]=add_checked(row[j],product_checked(vj,vi,slot),slot);
+            }
+        }
+        if(*slot)return;if(nonzero)condition_stage_row(graph,graph_hi,k,row,slot);
+        if(*slot)return;
+    }
+}
+
 extern "C" __global__ void section_constitutive_condition_contact(
     const int64_t *lo, const int64_t *hi, uint32_t at, uint32_t den_at, uint32_t status_at,
     const int64_t *pf, const int64_t *pf_hi, uint32_t ps, uint32_t c,
@@ -101,4 +142,49 @@ extern "C" __global__ void section_constitutive_condition_contact(
     for(uint32_t j=0;j<5u*c;++j) out[j]=out_hi[j]=(int64_t)values[j];
     out[5u*c]=out_hi[5u*c]=(int64_t)den;
     out[5u*c+1]=out_hi[5u*c+1]=pf[pk+1]==1 ? 1 : 0;
+}
+
+// Contact using an immutable geometry cache.  The report is the ordinary return
+// layout (source width ps, target width c); its direction matrix is checked against
+// the cache before any nonempty-family reaction is admitted.
+extern "C" __global__ void section_constitutive_condition_contact_prepared(
+    const int64_t *lo,const int64_t *hi,uint32_t at,uint32_t den_at,uint32_t status_at,
+    const int64_t *pf,const int64_t *pf_hi,uint32_t ps,const int64_t *directions,
+    const int64_t *directions_hi,const int64_t *graph,const int64_t *graph_hi,uint32_t c,
+    int64_t *out,int64_t *out_hi,uint32_t *slot,const uint32_t *census,
+    const uint32_t *lineage,uint32_t lineage_count
+) {
+    if(blockIdx.x||threadIdx.x)return;
+    if(upstream_refused(census,lineage,lineage_count,slot))return;
+    uint32_t k=2u*c; size_t pk=(size_t)ps+c, fw=pk+4+(size_t)c*c;
+    if(!ps||!c||c%2u||k>UINT32_MAX/2u){atomicOr(slot,REFUSED_MALFORMED);return;}
+    for(size_t j=0;j<fw;++j)if(pf[j]!=pf_hi[j]){atomicOr(slot,REFUSED_MALFORMED);return;}
+    if(pf[pk]<=0||pf[pk+1]<0||pf[pk+1]>2){atomicOr(slot,REFUSED_MALFORMED);return;}
+    wide hd=fibre_current_denominator(lo,hi,den_at,status_at,slot);
+    for(uint32_t j=0;j<c;++j)if(lo[at+j]!=hi[at+j]){atomicOr(slot,REFUSED_MALFORMED);return;}
+    if(*slot)return;
+    extern __shared__ wide scratch[]; wide *query=scratch,*values=query+k;
+    for(uint32_t j=0;j<5u*c;++j)values[j]=j<2u*c?lo[at+j%c]:0;
+    wide den=hd;
+    // Empty compatible-family status is preserved while the actual current is kept.
+    if(pf[pk+1]!=1){
+        for(size_t j=0;j<(size_t)k*k;++j)if(graph[j]!=graph_hi[j]){atomicOr(slot,REFUSED_MALFORMED);return;}
+        for(size_t j=0;j<(size_t)c*c;++j)if(directions[j]!=directions_hi[j]||
+            directions[j]!=pf[pk+4+j]){atomicOr(slot,REFUSED_MALFORMED);return;}
+        wide pd0=hd,pd1=pf[pk];
+        for(uint32_t which=0;which<2;++which){
+            const int64_t *input=which?pf+ps:lo+at; wide pd=which?pf[pk]:hd;
+            for(uint32_t j=0;j<c;++j){query[j]=0;query[c+j]=0;
+                for(uint32_t n=0;n<c;++n)query[j]=add_checked(query[j],product_checked(directions[(size_t)j*c+n],input[n],slot),slot);}
+            if(*slot)return;uint32_t disposition=0,rank=0;
+            fibre_query(graph,c,k,query,&pd,nullptr,-1,&disposition,&rank,slot);
+            if(*slot)return;if(disposition!=0){atomicOr(slot,REFUSED_MALFORMED);return;}
+            for(uint32_t j=0;j<c;++j)values[(which+1u)*c+j]=sub_checked(0,query[c+j],slot);
+            if(which==0)pd0=pd;else pd1=pd;
+        }
+        den=fibre_lcm(hd,pf[pk],slot);den=fibre_lcm(den,pd0,slot);den=fibre_lcm(den,pd1,slot);if(*slot)return;
+        for(uint32_t j=0;j<c;++j){wide h=product_checked(lo[at+j],den/hd,slot),ph=product_checked(values[c+j],den/pd0,slot),pa=product_checked(values[2u*c+j],den/pd1,slot);wide incoming=sub_checked(product_checked(pf[ps+j],den/pf[pk],slot),pa,slot),returned=sub_checked(h,ph,slot);values[j]=h;values[c+j]=add_checked(ph,incoming,slot);values[2u*c+j]=incoming;values[3u*c+j]=returned;values[4u*c+j]=sub_checked(incoming,returned,slot);}
+    }
+    fibre_normalize(values,5u*c,&den,slot);for(uint32_t j=0;j<5u*c;++j)to_word(values[j],slot);to_word(den,slot);if(*slot)return;
+    for(uint32_t j=0;j<5u*c;++j)out[j]=out_hi[j]=(int64_t)values[j];out[5u*c]=out_hi[5u*c]=(int64_t)den;out[5u*c+1]=out_hi[5u*c+1]=pf[pk+1]==1?1:0;
 }

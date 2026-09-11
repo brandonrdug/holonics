@@ -413,6 +413,7 @@ impl NormalWaveRelationRest {
                 self.header.receiver,
                 ResidentConstitutiveCurrent::rational(&snapshot)?,
                 source.prediction.remount(s)?,
+                None,
             )?;
             if contact.arrival.rest()? != source.arrival
                 || s.detach_section(&contact.reaction, 64)? != source.reaction

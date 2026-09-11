@@ -27,6 +27,7 @@ pub struct ResidentWaveRelation<'c> {
     receiver: WaveSourceReceiver,
     source: Option<ResidentWaveSourceContact<'c>>,
     observation: Option<ResidentSection<'c>>,
+    source_geometry: Rc<std::cell::OnceCell<super::condition_contact::ResidentWaveSourceGeometry<'c>>>,
 }
 impl<'c> ResidentWaveRelation<'c> {
     pub(in super::super) fn new(
@@ -50,6 +51,7 @@ impl<'c> ResidentWaveRelation<'c> {
             receiver,
             source: None,
             observation: None,
+            source_geometry: Rc::new(std::cell::OnceCell::new()),
         }
     }
     pub fn source_receiver(&self) -> WaveSourceReceiver {

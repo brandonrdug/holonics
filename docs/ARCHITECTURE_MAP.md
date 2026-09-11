@@ -118,7 +118,10 @@ owners add no native learner or physical identity outside their stated hypothese
 relation's source chart, basis and chronology without an occurrence archive. It remounts into
 `ResidentConstitutiveFibre`; existing resident current/condition ports conduct the learned law.
 `circulation/rest.rs` owns the shared exact point-section wire used by both local-law and older
-field rests. The [Rust guide](RUST_FRAMEWORK.md) and public `native_generator` example expose
+field rests. `Computation/HolonicConstitutiveFibreCollapse.lean` supplies the local vertical-span/
+mass-fibre theorem used by the [fixed-condition audit](../research/records/2026-09-11_FIXED_CONDITION_COLLAPSE_IS_EXACT_AND_ITS_PROJECTION_IS_REUSABLE.md).
+The audit checks the actual saved law and signed source witnesses; it does not change native
+incidence or assume arbitrary observations form a single global linear chart. The [Rust guide](RUST_FRAMEWORK.md) and public `native_generator` example expose
 this scoped generator construction.
 
 [definition] `constitutive_fibre/resident/image.rs` owns full current-family images and received
@@ -226,6 +229,13 @@ An empty learned arrival retains the actual offered current and its original obs
 field under one public successor and returns all local prediction fibres. Relation rest v3 and
 coupled remount reconstruct the source reaction/map and rebind it to the actual restored local
 law. These source maps preserve the original anchor, and are distinct from conditional joins.
+
+[definition] `condition_contact/affine.rs::ResidentWaveSourceGeometry` compiles the producing
+law's target-vertical matrix and its Gram projection. `ResidentWaveRelation` shares that derived
+geometry through a lazy immutable holder. `constitutive_condition_contact.cuh` and
+`surface_condition.rs` check every incoming direction and reuse the graph in the complete affine
+contact; empty evidence preserves standing. The cache is rebuilt from actual law material on
+remount and adds no semantic rest fields.
 
 [definition] `resident/wave_relation/observation.rs` and `section_wave_observed_next` derive the
 total actual-next-current graph `(p,c)→(c,v)` while preserving lambda and anchor. The family reuses

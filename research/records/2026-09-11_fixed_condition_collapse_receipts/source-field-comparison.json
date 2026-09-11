@@ -1,0 +1,35 @@
+{
+  "scope": "one same-input199-passage field, prior recorded baseline vs compiled geometry",
+  "before_path": ".local/athena-coupled-source-2026-09-11-actuated-66-validated",
+  "after_path": ".local/athena-coupled-source-2026-09-11-actuated-66-geometry",
+  "exact_files_equal": {
+    "model.wave": true,
+    "exterior-chart.json": true,
+    "source-cursor.json": true,
+    "source-progress.json": true,
+    "source-66-0.predictions.json": true
+  },
+  "model_octets": 78858045,
+  "before_field_ms": 287069,
+  "after_field_ms": 148563,
+  "before_total_ms": 310622,
+  "after_total_ms": 171764,
+  "before_resident_peak_octets": 385550120,
+  "after_resident_peak_octets": 394798120,
+  "extra_retained_geometry_octets": 9248000,
+  "intermediate_numerical_readouts": 0,
+  "material_before": [
+    8965,
+    9254
+  ],
+  "material_after": [
+    8965,
+    9254
+  ],
+  "epoch": 11,
+  "source_passages": 199,
+  "prediction_statuses": {
+    "outside-domain": 2,
+    "plural": 197
+  }
+}

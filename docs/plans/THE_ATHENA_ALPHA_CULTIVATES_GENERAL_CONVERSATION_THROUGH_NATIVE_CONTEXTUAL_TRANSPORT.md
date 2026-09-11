@@ -425,6 +425,16 @@ source and observed operand survive the native join and rest v4. This current-on
 not the family-aware material correction owed above. Its two-observation annihilation of old
 current dependence also prevents silently using it as the unpaired message source law.
 
+[established-bounded; computational-witness; formal-checked] The [fixed-condition collapse audit](../../research/records/2026-09-11_FIXED_CONDITION_COLLAPSE_IS_EXACT_AND_ITS_PROJECTION_IS_REUSABLE.md)
+now identifies the actual source-assay limitation. Its 9,254 unit-source/h=1 rows span a relation
+whose vertical space contains every zero-mass return direction on 73 symbols. Each admitted
+unit-mass fibre therefore has the same 1/73 minimum-norm current. The stored source equations
+also force the old condition to remain one under that reception. Further rows cannot shrink an
+existing vertical subspace. Continue with actual situated source/condition distinctions and the
+family-aware material return, not further cultivation of this unchanged single chart. Any
+refinement must retain its coarse receiver map and compatible source fibre; changing a tie
+breaker or selecting one conflicting observation supplies no such construction.
+
 ### 4. Form and reuse local generators with their future conduct
 
 [definition] Use the existing independent relation-basis formation and condition domain before

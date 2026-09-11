@@ -80,6 +80,10 @@ impl<'c> ResidentWaveRelation<'c> {
         {
             return Err(ConstitutiveFibreError::ForeignOccurrence);
         }
+        if self.source_geometry.get().is_none() {
+            let geometry = super::super::condition_contact::ResidentWaveSourceGeometry::compile(law)?;
+            self.source_geometry.set(geometry).map_err(|_|ConstitutiveFibreError::ForeignOccurrence)?;
+        }
         let prediction = law.read_bilinear(source, self.fixed_condition())?;
         self.source_contact_from_prediction(source, prediction)
     }
@@ -90,7 +94,7 @@ impl<'c> ResidentWaveRelation<'c> {
     ) -> Result<Self, ConstitutiveFibreError> {
         let s = self.surface;
         let n = self.roots;
-        let source = prepare_source_contact(s, n, self.receiver, source, prediction)?;
+        let source = prepare_source_contact(s, n, self.receiver, source, prediction, self.source_geometry.get())?;
         let basis = source_basis(s, n, &source.reaction)?;
         Ok(Self {
             surface: s,
@@ -103,6 +107,7 @@ impl<'c> ResidentWaveRelation<'c> {
             receiver: self.receiver,
             source: Some(source),
             observation: None,
+            source_geometry: Rc::clone(&self.source_geometry),
         })
     }
 }
@@ -112,6 +117,7 @@ pub(super) fn prepare_source_contact<'c>(
     receiver: WaveSourceReceiver,
     source: ResidentConstitutiveCurrent<'_, 'c>,
     prediction: ResidentConstitutiveReturn<'c>,
+    geometry: Option<&super::super::condition_contact::ResidentWaveSourceGeometry<'c>>,
 ) -> Result<ResidentWaveSourceContact<'c>, ConstitutiveFibreError> {
     let r = 2 * n;
     let w = 2 * r;
@@ -152,12 +158,13 @@ pub(super) fn prepare_source_contact<'c>(
             received.obstruction
         )));
     }
-    let reaction = arrival
-        .read_contact(
-            ResidentConstitutiveCurrent::rational(&offered)?,
-            ConditionContactMetric::UnitAdmittanceRealification,
-        )?
-        .into_section();
+    let offered = ResidentConstitutiveCurrent::rational(&offered)?;
+    let metric = ConditionContactMetric::UnitAdmittanceRealification;
+    let reaction = if let Some(geometry) = geometry {
+        arrival.read_contact_with_geometry(offered,metric,geometry)?
+    } else {
+        arrival.read_contact(offered,metric)?
+    }.into_section();
     if let Some(row) = prediction.source_occurrence {
         arrival.qualify_field_source(row);
     }
@@ -280,3 +287,6 @@ impl<'c> ResidentWaveRelation<'c> {
         Ok((output, coverage))
     }
 }
+
+#[cfg(test)]
+mod tests;

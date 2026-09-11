@@ -26,6 +26,7 @@ impl<'c> ResidentWaveRelation<'c> {
             receiver: self.receiver,
             source: None,
             observation: Some(snapshot),
+            source_geometry: Rc::clone(&self.source_geometry),
         })
     }
 }

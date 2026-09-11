@@ -6,6 +6,7 @@ use std::rc::Rc;
 
 mod affine;
 use affine::affine_contact_section;
+pub(crate) use affine::ResidentWaveSourceGeometry;
 pub(super) use affine::read_affine_contact;
 pub use affine::{AffineContactReading, ResidentAffineContact};
 

@@ -95,6 +95,12 @@ Requests use the existing HnaStream schema with `project-symbol`, `emit-symbol`,
 of an already admitted contact without publishing it. An operation refusal is an event and leaves the session
 available; inspect its returned epoch and pending phase before retrying.
 
+[established-bounded; computational-witness; formal-checked] The [fixed-condition audit](../research/records/2026-09-11_FIXED_CONDITION_COLLAPSE_IS_EXACT_AND_ITS_PROJECTION_IS_REUSABLE.md)
+explains the later coupled assay's 73-way ties: its single calibrated relation has the complete
+zero-mass vertical return space on those symbols. This is a proved limitation of that source
+assembly. The local relation and projection owners retain their mathematical scope; Athena still
+requires the situated source/condition and material-development bindings in the blueprint.
+
 [project-postulate] The [September 7 correction](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
 places generator recovery, phase transport and Holonic Compression inside the developing
 recurrence shared with acoustics. A **Preimage Fibre** can carry useful constraints from limited

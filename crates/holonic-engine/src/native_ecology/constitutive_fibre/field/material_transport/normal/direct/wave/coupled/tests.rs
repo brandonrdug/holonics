@@ -178,7 +178,7 @@ fn coupled_late_refusal_preserves_both_predecessors() {
     assert_eq!(wave.epoch(), 1);
 }
 
-fn wire(w: &ResidentNormalWave<'_, NormalWaveCoupled<'_>>) -> Vec<u8> {
+fn wire<'c>(w: &ResidentNormalWave<'c, NormalWaveCoupled<'c>>) -> Vec<u8> {
     let mut out = Vec::new();
     w.rest().unwrap().write(&mut out).unwrap();
     out

@@ -1,0 +1,2365 @@
+{
+  "scope": "exact fixed-condition local-relation collapse witness",
+  "observations": 9254,
+  "source_pairs": 686,
+  "conflicting_source_pairs": 361,
+  "source_symbols": 74,
+  "target_symbols": [
+    "\n",
+    " ",
+    "#",
+    "&",
+    "(",
+    ")",
+    "*",
+    "+",
+    ",",
+    "-",
+    ".",
+    "/",
+    "1",
+    "3",
+    "4",
+    "5",
+    "6",
+    "8",
+    ":",
+    ";",
+    "<",
+    "=",
+    ">",
+    "A",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "[",
+    "]",
+    "_",
+    "`",
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+    "r",
+    "s",
+    "t",
+    "u",
+    "v",
+    "w",
+    "x",
+    "y",
+    "z",
+    "×",
+    "’"
+  ],
+  "direct_contrast_rank": 71,
+  "witness_rank": 72,
+  "native_vertical_rank": 72,
+  "native_relation_rank": 218,
+  "presented_source_rank": 146,
+  "native_equals_presented_span_by_inclusion_and_rank": true,
+  "all_presented_rows_in_native_relation": true,
+  "unit_source_condition_forced": "h=(1,0)",
+  "unit_mass_fibre_minimum_norm_coordinate": "1/73",
+  "witnesses": [
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "i",
+          "v"
+        ],
+        "target": "e",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 107,
+          "event": 269373
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "i",
+          "v"
+        ],
+        "target": "o",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 1,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "v",
+          "o"
+        ],
+        "target": "i",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 1009,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "v",
+          "o"
+        ],
+        "target": "t",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 2,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "o",
+          "t"
+        ],
+        "target": "i",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 7,
+          "event": 269373
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "o",
+          "t"
+        ],
+        "target": " ",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 3,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "o",
+          "t"
+        ],
+        "target": "o",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 462,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "o",
+          "t"
+        ],
+        "target": " ",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 3,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "o",
+          "t"
+        ],
+        "target": "y",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 464,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "o",
+          "t"
+        ],
+        "target": " ",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 3,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "o",
+          "t"
+        ],
+        "target": "s",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 1754,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "o",
+          "t"
+        ],
+        "target": " ",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 3,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "o",
+          "t"
+        ],
+        "target": ",",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 2218,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "o",
+          "t"
+        ],
+        "target": " ",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 3,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "o",
+          "t"
+        ],
+        "target": "h",
+        "occurrence": {
+          "sequence": 44,
+          "part": 0,
+          "row": 184,
+          "event": 269432
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "o",
+          "t"
+        ],
+        "target": " ",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 3,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "t",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 53,
+          "event": 269373
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "b",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 4,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "`",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 197,
+          "event": 269373
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "b",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 4,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "c",
+        "occurrence": {
+          "sequence": 36,
+          "part": 0,
+          "row": 58,
+          "event": 269376
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "b",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 4,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "d",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 145,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "b",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 4,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "l",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 599,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "b",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 4,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "a",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 1085,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "b",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 4,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "p",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 1346,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "b",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 4,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "r",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 1401,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "b",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 4,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "f",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 1478,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "b",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 4,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "w",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 1853,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "b",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 4,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "P",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 2446,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "b",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 4,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "-",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 2491,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "b",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 4,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "g",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 3366,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "b",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 4,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "m",
+        "occurrence": {
+          "sequence": 41,
+          "part": 0,
+          "row": 264,
+          "event": 269408
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "b",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 4,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "I",
+        "occurrence": {
+          "sequence": 44,
+          "part": 0,
+          "row": 3,
+          "event": 269432
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "b",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 4,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "k",
+        "occurrence": {
+          "sequence": 45,
+          "part": 0,
+          "row": 155,
+          "event": 269449
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "b",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 4,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "n",
+        "occurrence": {
+          "sequence": 46,
+          "part": 0,
+          "row": 20,
+          "event": 269456
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "b",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 4,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          " ",
+          "b"
+        ],
+        "target": "u",
+        "occurrence": {
+          "sequence": 36,
+          "part": 0,
+          "row": 272,
+          "event": 269376
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          " ",
+          "b"
+        ],
+        "target": "a",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 5,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          "o"
+        ],
+        "target": "v",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 61,
+          "event": 269373
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          "o"
+        ],
+        "target": " ",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 11,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          "h"
+        ],
+        "target": "_",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 773,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          "h"
+        ],
+        "target": "e",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 14,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          "h"
+        ],
+        "target": ";",
+        "occurrence": {
+          "sequence": 50,
+          "part": 0,
+          "row": 31,
+          "event": 269521
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          "h"
+        ],
+        "target": "e",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 14,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "e",
+          " "
+        ],
+        "target": "G",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 128,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "e",
+          " "
+        ],
+        "target": "p",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 16,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "e",
+          " "
+        ],
+        "target": "*",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 1049,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "e",
+          " "
+        ],
+        "target": "p",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 16,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "e",
+          " "
+        ],
+        "target": "1",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 3142,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "e",
+          " "
+        ],
+        "target": "p",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 16,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "e",
+          " "
+        ],
+        "target": "A",
+        "occurrence": {
+          "sequence": 52,
+          "part": 0,
+          "row": 149,
+          "event": 269543
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "e",
+          " "
+        ],
+        "target": "p",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 16,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "e",
+          " "
+        ],
+        "target": "H",
+        "occurrence": {
+          "sequence": 58,
+          "part": 0,
+          "row": 144,
+          "event": 269628
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "e",
+          " "
+        ],
+        "target": "p",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 16,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "e",
+          " "
+        ],
+        "target": "R",
+        "occurrence": {
+          "sequence": 64,
+          "part": 0,
+          "row": 68,
+          "event": 269673
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "e",
+          " "
+        ],
+        "target": "p",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 16,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "a",
+          "n"
+        ],
+        "target": ":",
+        "occurrence": {
+          "sequence": 36,
+          "part": 0,
+          "row": 49,
+          "event": 269376
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "a",
+          "n"
+        ],
+        "target": " ",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 20,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "a",
+          "n"
+        ],
+        "target": ">",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 12,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "a",
+          "n"
+        ],
+        "target": " ",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 20,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "a",
+          "n"
+        ],
+        "target": "\n",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 2450,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "a",
+          "n"
+        ],
+        "target": " ",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 20,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "a",
+          "n"
+        ],
+        "target": ".",
+        "occurrence": {
+          "sequence": 38,
+          "part": 0,
+          "row": 16,
+          "event": 269385
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "a",
+          "n"
+        ],
+        "target": " ",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 20,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "n",
+          " "
+        ],
+        "target": "C",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 3224,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "n",
+          " "
+        ],
+        "target": "f",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 21,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          " ",
+          "C"
+        ],
+        "target": "h",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 422,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          " ",
+          "C"
+        ],
+        "target": "U",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 27,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "C",
+          "U"
+        ],
+        "target": "T",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 3130,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "C",
+          "U"
+        ],
+        "target": "R",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 28,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "R",
+          "E"
+        ],
+        "target": "S",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 88,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "R",
+          "E"
+        ],
+        "target": "N",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 31,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "R",
+          "E"
+        ],
+        "target": "C",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 570,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "R",
+          "E"
+        ],
+        "target": "N",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 31,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "_",
+          "S"
+        ],
+        "target": "L",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 540,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "_",
+          "S"
+        ],
+        "target": "T",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 35,
+          "event": 269369
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          " ",
+          "`"
+        ],
+        "target": "M",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 449,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          " ",
+          "`"
+        ],
+        "target": "C",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 24,
+          "event": 269373
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          " ",
+          "`"
+        ],
+        "target": "F",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 534,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          " ",
+          "`"
+        ],
+        "target": "C",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 24,
+          "event": 269373
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          " ",
+          "`"
+        ],
+        "target": "(",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 758,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          " ",
+          "`"
+        ],
+        "target": "C",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 24,
+          "event": 269373
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          " ",
+          "`"
+        ],
+        "target": "[",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 940,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          " ",
+          "`"
+        ],
+        "target": "C",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 24,
+          "event": 269373
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          " ",
+          "`"
+        ],
+        "target": "W",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 1409,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          " ",
+          "`"
+        ],
+        "target": "C",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 24,
+          "event": 269373
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          " ",
+          "`"
+        ],
+        "target": "8",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 1861,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          " ",
+          "`"
+        ],
+        "target": "C",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 24,
+          "event": 269373
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          " ",
+          "`"
+        ],
+        "target": "3",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 1895,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          " ",
+          "`"
+        ],
+        "target": "C",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 24,
+          "event": 269373
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          " ",
+          "`"
+        ],
+        "target": "O",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 2119,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          " ",
+          "`"
+        ],
+        "target": "C",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 24,
+          "event": 269373
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          " ",
+          "`"
+        ],
+        "target": "E",
+        "occurrence": {
+          "sequence": 53,
+          "part": 0,
+          "row": 136,
+          "event": 269561
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          " ",
+          "`"
+        ],
+        "target": "C",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 24,
+          "event": 269373
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "o",
+          "n"
+        ],
+        "target": "/",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 391,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "o",
+          "n"
+        ],
+        "target": "t",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 43,
+          "event": 269373
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          ":",
+          " "
+        ],
+        "target": "4",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 921,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          ":",
+          " "
+        ],
+        "target": "p",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 73,
+          "event": 269373
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "n",
+          "e"
+        ],
+        "target": "x",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 1704,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "n",
+          "e"
+        ],
+        "target": "t",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 89,
+          "event": 269373
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "n",
+          "e"
+        ],
+        "target": "’",
+        "occurrence": {
+          "sequence": 51,
+          "part": 0,
+          "row": 10,
+          "event": 269536
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "n",
+          "e"
+        ],
+        "target": "t",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 89,
+          "event": 269373
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "l",
+          "i"
+        ],
+        "target": "z",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 1623,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "l",
+          "i"
+        ],
+        "target": "v",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 106,
+          "event": 269373
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          ".",
+          " "
+        ],
+        "target": "K",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 192,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          ".",
+          " "
+        ],
+        "target": "T",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 123,
+          "event": 269373
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "d",
+          " "
+        ],
+        "target": "+",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 781,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "d",
+          " "
+        ],
+        "target": "o",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 210,
+          "event": 269373
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "d",
+          " "
+        ],
+        "target": "×",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 1784,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "d",
+          " "
+        ],
+        "target": "o",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 210,
+          "event": 269373
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "l",
+          " "
+        ],
+        "target": "&",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 2822,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "l",
+          " "
+        ],
+        "target": "c",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 220,
+          "event": 269373
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          " ",
+          "I"
+        ],
+        "target": "D",
+        "occurrence": {
+          "sequence": 40,
+          "part": 0,
+          "row": 217,
+          "event": 269402
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          " ",
+          "I"
+        ],
+        "target": "’",
+        "occurrence": {
+          "sequence": 36,
+          "part": 0,
+          "row": 25,
+          "event": 269376
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          " ",
+          "1"
+        ],
+        "target": ")",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 784,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          " ",
+          "1"
+        ],
+        "target": "5",
+        "occurrence": {
+          "sequence": 36,
+          "part": 0,
+          "row": 319,
+          "event": 269376
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "\n",
+          "#"
+        ],
+        "target": "#",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 40,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "\n",
+          "#"
+        ],
+        "target": " ",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 15,
+          "event": 269379
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          ".",
+          "\n"
+        ],
+        "target": "<",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 3383,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          ".",
+          "\n"
+        ],
+        "target": "\n",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 413,
+          "event": 269379
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          "s"
+        ],
+        "target": ")",
+        "occurrence": {
+          "sequence": 40,
+          "part": 0,
+          "row": 76,
+          "event": 269402
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          "s"
+        ],
+        "target": ":",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 512,
+          "event": 269379
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "T",
+          "S"
+        ],
+        "target": " ",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 1061,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "T",
+          "S"
+        ],
+        "target": "=",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 544,
+          "event": 269379
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "S",
+          "="
+        ],
+        "target": "6",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 581,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "S",
+          "="
+        ],
+        "target": "1",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 545,
+          "event": 269379
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "g",
+          "s"
+        ],
+        "target": ".",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 1327,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "g",
+          "s"
+        ],
+        "target": "]",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 960,
+          "event": 269379
+        }
+      }
+    ],
+    [
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "T",
+          "O"
+        ],
+        "target": "V",
+        "occurrence": {
+          "sequence": 37,
+          "part": 0,
+          "row": 3132,
+          "event": 269379
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "T",
+          "h"
+        ],
+        "target": "e",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 125,
+          "event": 269373
+        }
+      },
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "t",
+          "h"
+        ],
+        "target": "e",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 14,
+          "event": 269369
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "t",
+          " "
+        ],
+        "target": "b",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 4,
+          "event": 269369
+        }
+      },
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "o",
+          " "
+        ],
+        "target": "t",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 12,
+          "event": 269369
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "o",
+          "t"
+        ],
+        "target": " ",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 3,
+          "event": 269369
+        }
+      },
+      {
+        "coefficient": 1,
+        "source_pair": [
+          " ",
+          "t"
+        ],
+        "target": "o",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 10,
+          "event": 269369
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          " ",
+          "T"
+        ],
+        "target": "h",
+        "occurrence": {
+          "sequence": 35,
+          "part": 0,
+          "row": 124,
+          "event": 269373
+        }
+      },
+      {
+        "coefficient": 1,
+        "source_pair": [
+          "N",
+          "T"
+        ],
+        "target": "_",
+        "occurrence": {
+          "sequence": 34,
+          "part": 0,
+          "row": 33,
+          "event": 269369
+        }
+      },
+      {
+        "coefficient": -1,
+        "source_pair": [
+          "N",
+          "O"
+        ],
+        "target": "D",
+        "occurrence": {
+          "sequence": 36,
+          "part": 0,
+          "row": 70,
+          "event": 269376
+        }
+      }
+    ]
+  ]
+}

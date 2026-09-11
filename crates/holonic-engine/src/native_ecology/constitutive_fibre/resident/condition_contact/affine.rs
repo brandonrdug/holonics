@@ -22,7 +22,48 @@ pub struct ResidentAffineContact<'a, 'c> {
     section: ResidentSection<'c>,
     metric: ConditionContactMetric,
 }
+/// Immutable target-vertical geometry compiled from one producing local law. This is
+/// derived standing, not another learner. Every use checks the complete incoming directions.
+pub(crate) struct ResidentWaveSourceGeometry<'c> {
+    surface: &'c ResidentSurface<'c>,
+    width: usize,
+    directions: ResidentSection<'c>,
+    graph: ResidentSection<'c>,
+}
+impl<'c> ResidentWaveSourceGeometry<'c> {
+    pub(crate) fn compile(law:&ResidentConstitutiveFibre<'c>) -> Result<Self,ConstitutiveFibreError> {
+        law.require_usable_geometry()?;
+        let s=law.surface;let c=law.target_width.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?;
+        let k=c.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?;
+        let directions=s.fresh_section(c,c,ResidentGrain(0))?;
+        let graph=s.fresh_section(k,k,ResidentGrain(0))?;
+        let workspace=s.fresh_section(1,2*k,ResidentGrain(0))?;
+        let mut passage=s.begin_passage(&[vec![]])?;
+        {let lane=passage.open(0,&[])?;s.record_wave_source_geometry(&lane,&law.basis,law.source_width,law.target_width,&directions,&graph,&workspace)?;}
+        passage.close(0,&graph,64)?;let receipt=passage.finish()?.launch()?;
+        if !receipt.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("wave source geometry: {:?}",receipt.obstruction)));}
+        Ok(Self{surface:s,width:c,directions,graph})
+    }
+}
+impl ResidentConstitutiveFibre<'_> {
+    fn require_usable_geometry(&self)->Result<(),ConstitutiveFibreError>{
+        if self.usable {Ok(())}else{Err(ConstitutiveFibreError::Uncertain)}
+    }
+}
 impl<'c> ResidentConstitutiveReturn<'c> {
+    pub(crate) fn read_contact_with_geometry<'a>(&'a self,
+        actual:ResidentConstitutiveCurrent<'_, 'c>, metric:ConditionContactMetric,
+        geometry:&ResidentWaveSourceGeometry<'c>) -> Result<ResidentAffineContact<'a,'c>,ConstitutiveFibreError> {
+        if !std::ptr::eq(self.surface,geometry.surface) || self.target_width!=geometry.width || actual.width!=geometry.width {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let s=self.surface;let section=s.fresh_section(1,5*geometry.width+2,ResidentGrain(0))?;
+        let mut passage=s.begin_passage(&[vec![]])?;
+        {let lane=passage.open(0,&[])?;s.record_prepared_condition_contact(&lane,actual,&self.report,self.source_width,&geometry.directions,&geometry.graph,&section)?;}
+        passage.close(0,&section,64)?;let receipt=passage.finish()?.launch()?;
+        if !receipt.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("prepared affine contact: {:?}",receipt.obstruction)));}
+        Ok(ResidentAffineContact{family:self,section,metric})
+    }
     /// For F=a+V and actual h, react by h'=P_V h+(I-P_V)a. The realified metric is
     /// declared by the caller. This is a new contact operation, not a point cast of F.
     pub fn read_contact<'a>(

@@ -2,6 +2,50 @@ use super::*;
 use crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent;
 
 impl<'chart> ResidentSurface<'chart> {
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_wave_source_geometry(
+        &self, lane: &Lane<'_, 'chart>, basis: &ResidentSection<'chart>, source_width: usize,
+        target_width: usize, directions: &ResidentSection<'chart>, graph: &ResidentSection<'chart>,
+        workspace: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || ResidentRefusal::Declaration { operation: "wave-source-geometry", what: "incompatible producing basis or geometry cache".into() };
+        let l=source_width.checked_add(target_width).ok_or_else(fail)?;
+        let c=target_width.checked_mul(2).ok_or_else(fail)?; let k=c.checked_mul(2).ok_or_else(fail)?;
+        if source_width==0||target_width==0||l.checked_mul(l).is_none_or(|v|v>u32::MAX as usize)||k.checked_mul(k).is_none_or(|v|v>u32::MAX as usize)
+            ||!self.operative_shape(basis,l,l)||!self.operative_shape(directions,c,c)
+            ||!self.operative_shape(graph,k,k)||!self.operative_shape(workspace,1,2*k){return Err(fail());}
+        let mut p=Params::new(); p.ptr(basis.lo.device_ptr()).ptr(basis.hi.device_ptr())
+            .u32(source_width as u32).u32(target_width as u32)
+            .ptr(directions.lo.device_ptr()).ptr(directions.hi.device_ptr())
+            .ptr(graph.lo.device_ptr()).ptr(graph.hi.device_ptr()).ptr(workspace.lo.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_constitutive_wave_source_geometry",1,self.launch.block_x,0,&mut p,"wave-source-geometry")
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_prepared_condition_contact(
+        &self, lane: &Lane<'_, 'chart>, current: ResidentConstitutiveCurrent<'_, 'chart>,
+        family: &ResidentSection<'chart>, ps: usize, directions: &ResidentSection<'chart>,
+        graph: &ResidentSection<'chart>, output: &ResidentSection<'chart>,
+    ) -> Result<(), ResidentRefusal> {
+        self.validate_constitutive_current_view(current)?;
+        let fail=||ResidentRefusal::Declaration{operation:"prepared-condition-contact",what:"incompatible cached condition contact charts".into()};
+        let c=current.width; let k=c.checked_mul(2).ok_or_else(fail)?;
+        let fw=ps.checked_add(c).and_then(|n|n.checked_add(4)).and_then(|n|n.checked_add(c.checked_mul(c)?)).ok_or_else(fail)?;
+        let out=c.checked_mul(5).and_then(|n|n.checked_add(2)).ok_or_else(fail)?;
+        if ps==0||c==0||c%2!=0||fw>u32::MAX as usize||!self.operative_shape(family,1,fw)
+            ||!self.operative_shape(directions,c,c)||!self.operative_shape(graph,k,k)
+            ||!self.operative_shape(output,1,out){return Err(fail());}
+        let shared=c.checked_mul(7*16).and_then(|n|u32::try_from(n).ok()).filter(|n|*n<=self.declaration.max_sectiond_bytes).ok_or_else(fail)?;
+        let mut p=Params::new(); p.ptr(current.section.lo.device_ptr()).ptr(current.section.hi.device_ptr())
+            .u32(current.offset as u32).u32(current.denominator.map_or(u32::MAX,|n|n as u32)).u32(current.disposition.map_or(u32::MAX,|n|n as u32))
+            .ptr(family.lo.device_ptr()).ptr(family.hi.device_ptr()).u32(ps as u32)
+            .ptr(directions.lo.device_ptr()).ptr(directions.hi.device_ptr()).ptr(graph.lo.device_ptr()).ptr(graph.hi.device_ptr()).u32(c as u32)
+            .ptr(output.lo.device_ptr()).ptr(output.hi.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_constitutive_condition_contact_prepared",1,self.launch.block_x,shared,&mut p,"prepared-condition-contact")
+    }
+
     pub(crate) fn record_internal_shared_drive(
         &self,
         lane: &Lane<'_, 'chart>,
