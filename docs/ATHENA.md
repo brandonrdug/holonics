@@ -156,6 +156,13 @@ gate, or a new runtime model.
 
 ## Native-first construction
 
+[definition] The [Holonic Encoding handoff](HNN_COMPOSITION.md#holonic-encoding) makes the
+cross-modal representation direction explicit. Current text uses a declared symbol-basis chart,
+not a learned autoencoder. Encoding development must bind actual source/condition contact,
+reusable transformation material, its receiver/decoder and the producing chart cut in the same
+continuing ecology. Complex phase and local clocks remain part of the admitted carrier; fixed
+symbol segmentation is not the model's intrinsic grain.
+
 [established-bounded; measured] NCF1 has returned the ground-up
 `holonic_engine::native_ecology::constitutive_fibre::NativeConstitutiveEcology`: one resident
 phase/current body and developing receiver relation, with actual emitted-source handles and

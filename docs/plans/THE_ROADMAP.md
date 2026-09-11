@@ -4,6 +4,16 @@
 [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md) is the sole current-position record. Dated
 contracts and records preserve their completed scope; their old imperatives schedule no new work.
 
+[project-postulate] **September 11 Holonic Encoding clarification:** The π/e study now informs
+the general source/encoding question for text, vision, acoustics and other modalities. Recover
+the laboratory's encoder/path folds through the later recurring-transformation ruling; compose
+autoencoding, complex phase and clocked receiver transport through existing owners. The
+[encoding return](../../research/records/2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md)
+and revised Athena blueprint make the source/condition-family, encoding-cut, decoder and
+observation bindings concrete. This is the immediate mathematical/implementation handoff;
+native expansion remains paused. Do not turn completion of all π tail proofs or all modality
+products into prerequisites for applying the returned local mechanics to Athena.
+
 [project-postulate] **September 11 π/e focus:** Brandon's latest clarification treats every
 attained generator as constitutively caused and relevant; task warrant was the agent's different
 question. Study π and e as constraint identities, their exact algorithms and receiver windows,

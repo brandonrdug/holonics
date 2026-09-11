@@ -1,7 +1,8 @@
 # Athena-alpha: composed current, receiver and developmental return
 
-**Authority:** Brandon's September 6–10 directions. His latest September 10 request closes the
-illustration pass and finalizes Athena construction from the returned tension/transport mathematics.
+**Authority:** Brandon's September 6–11 directions. The September 10 request closes the illustration
+pass; the later π/e and Holonic Encoding directions refine the mathematical/source attachment
+before further native expansion. The full Athena objective remains standing.
 **Order:** [the roadmap](THE_ROADMAP.md). **Position:** [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md).
 **Derivations and source audit:** [equational transport review](../../research/records/2026-09-10_EQUATIONAL_LAWS_AND_WORLD_TUBES_MAKE_ATHENAS_NEXT_PASSAGE_EXPLICIT.md).
 **Final computational review:** [tension, kinetics and native ownership](../../research/records/2026-09-10_TENSION_DYNAMICS_BECOME_ATHENAS_COMPUTATIONAL_CONSTRUCTION.md).
@@ -41,6 +42,58 @@ rounding remain in applied enclosures. The unit-prior energy certificate bounds 
 without changing coefficients. This refines the numerical/source distinction below; it does not
 reinterpret older rests or narrow the held source when the future scope changes. Current packet
 position remains in CONSTRUCTION_STATE and the roadmap.
+
+## Holonic Encoding in the existing packets
+
+[project-postulate] Brandon's September 11 direction makes encoding general across modalities.
+Recover and compose the existing path-fold, recurring-transformation, autoencoding, Complex
+Parametron and clocked-torus constructions. The
+[source review and encoding contract](../../research/records/2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md)
+states the historical corrections, current code and exact reference law. A learned tokenizer
+pre-pass or an authored semantic grammar is not the missing source attachment.
+
+[definition] **AC3 source/condition attachment:** Keep `SymbolCurrentChart` as an exterior text
+instrument. Its symbols address supplied coordinates; they do not determine internal grain,
+clock or morphology. Preserve the actual source section, order, part boundaries and
+source/return links. Derive contextual conduct through existing source preimages, condition
+contact and local formation. The concrete absent conversion is from the held wave's joint
+source/observed family to those native ports, retaining all common parameters. A point port
+may consume an actual point source; it may not consume the centre of a plural source family.
+Use the existing family-image/lift owners where the input is plural and state any remaining
+unrepresented mixed terms. Merely changing coefficients or appending a context label is not
+this binding.
+
+[definition] **AC3 producing return:** Retain the encoding/receiver chart cut with the existing
+producing current/material cut. Reconstructing a present source face and predicting an actual
+later face are separate comparisons. Return each through the morphology that produced it;
+stage encoding/material changes into the same successor after that complete return. Reuse
+immutable standing, rather than cloning the ecology or remounting a full source archive.
+
+[definition] **AC4 formation and reuse:** A reusable encoded constituent carries a local
+transformation, domain, exposed ports, conditions, clock, receiver decoder and compatible
+source fibre. Several overlapping grains may remain available. Compose serial bodies by the
+actual joining occurrence; couple other bodies through their actual incidence. Use existing
+material formation, restriction/rebase and decoder owners. The finite observable-moment
+closure is an exterior reference for deriving E and U under its local hypotheses; native
+productive execution must remain resident. An exact compression serves E′T=UE and DE=ρ;
+partial learned conduct retains its defect/family without waiting for universal certainty.
+
+[definition] **AC4 emission and persistence:** The internal encoded carrier may change shape
+while the alphabet remains an exterior output chart. Bind its actual native receiver map to
+`NormalWaveBasisChart` where that chart applies, or the existing appropriate section receiver.
+Equal dimensions are not a conversion. Rest retains the generator/decoder, changed material,
+clock and required fibre, plus any still-pending producing chart. Account for decoder work and
+standing as well as encoded size. A coefficient list with no executable receiver is not the return.
+
+[definition] **AC5 observation:** Inspect complete source → encoded passage → conducted boundary
+→ decoded output → actual later comparison → successor cycles. Report reconstruction and
+prediction differences separately, their receiver losses when defined, and the actual emitted
+text. Compare compressed and expanded conduct at the claimed future scope; inspect a changed
+condition/order, a covariant reorientation and a contact exposing a previously blind component.
+These comparisons answer the encoding claim, not a universal product gate. Optical/acoustic
+checks use their existing source and receiver owners over the shared passage law; a successful
+codec rechart does not by itself establish learned semantic translation. Full audio/vision
+products are not prerequisites to the next useful text return.
 
 ## Returned owners: preserve and compose
 

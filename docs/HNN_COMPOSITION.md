@@ -13,6 +13,40 @@ source chart; its finite attention difference separates changes to transported v
 to their participation. This informs the existing contextual attachment work without changing AC
 order or installing a DeepSeek architecture.
 
+## Holonic Encoding
+
+[definition] **Holonic Encoding** names the situated formation and reuse of causal
+transformation representations through the existing occurrence, current, interaction, receiver
+and compression owners. It is HNN's general counterpart of tokenization. An encoded constituent
+carries addressed ports, actual joining incidence, conditions, chronology, receiver/decoder and
+Preimage Fibre. Its grain can be a path, loop, coupled field or region; overlapping grains remain
+available through their actual shared occurrences. A serialized symbol handle is an exterior face.
+
+[project-postulate] The operative grain is recurring transformation, as retained in the
+[encoding recovery](../research/records/2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md).
+The historical BPE/path-fold and autoencoding constructions inform this composition; global
+frequency, a permanent segmentation or a manually authored semantic classifier does not found it.
+Text, vision and acoustics supply different source/receiver charts to the same developing ecology.
+
+[definition] Static reconstruction and continuing conduct have separate comparisons. The encoder
+E and receiver decoder D serve D E=ρ at their admitted scope; exact dynamic compression also
+serves E′ T=U E across the actual material/clock change. A partial learned relation retains its
+comparison and compatible family. π's analytic remainder is one instance of a retained omitted
+contribution; language does not inherit a known π-like continuation law.
+
+[established-bounded; source-inspected] Current text uses `SymbolCurrentChart`'s supplied unit
+symbol basis and `NativeCoupledWaveSession`; it is not a learned autoencoder or general encoding
+faculty. The existing host observable-moment closure gives an exact local reference, while
+`ResidentGeneratorNeighborhood` supplies native condition contact and local formation. Their
+needed wave/source/receiver binding is specified in the Athena blueprint; it is not supplied by
+a shared row width or by adding a token table.
+
+[definition] The Complex Parametron retains quadratures and coupled incidence before taking a
+phase/sign/intensity receiver. The clocked torus cut retains (q,z,r,clock) and its actual passage
+law. Those constructions guide phase-sensitive encoding, with real source timing and receiver
+orientation retained. They do not assign a pump frequency to a character or impose a torus on
+every datum. The recovered record names exact formal, resident, optical and acoustic owners.
+
 ## The architecture as explicit passages
 
 [definition] The current [receiver edition](../research/papers/rendered/hnn-information-chemistry.pdf)

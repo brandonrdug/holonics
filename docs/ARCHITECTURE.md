@@ -144,6 +144,12 @@ against frontier models.
 
 ## Cultivation direction
 
+[definition] [Holonic Encoding](HNN_COMPOSITION.md#holonic-encoding) is the shared perception and
+representation construction: form and reuse situated transformation passages, retaining their
+receiver faces and Preimage Fibres across changed conditions and clocks. Its tokenizer analogue
+extends to optical, acoustic and other material through source/receiver charts. The current
+symbol-basis text attachment is one exterior chart; it does not establish that complete faculty.
+
 [project-postulate] The [September 7 correction](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
 joins black-box generator recovery, group/phase transport and Holonic Compression in native
 formation. A Preimage Fibre represents compatible causes at the available observation scope;
