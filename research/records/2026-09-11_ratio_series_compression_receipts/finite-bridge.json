@@ -1,0 +1,60 @@
+{
+  "scope": "exact finite ratio-transport witness; convergence/tail/window-cost claims remain separate",
+  "canonical_ratios": [
+    "-1/75",
+    "-3/125",
+    "-1/35"
+  ],
+  "alternative_ratios": [
+    "-3/125",
+    "-103/225",
+    "-3/3605"
+  ],
+  "block": {
+    "length": 3,
+    "alpha": "-1/109375",
+    "beta": "-4273/328125"
+  },
+  "canonical_states": [
+    {
+      "term": "1/5",
+      "sum": "1/5"
+    },
+    {
+      "term": "-1/375",
+      "sum": "74/375"
+    },
+    {
+      "term": "1/15625",
+      "sum": "9253/46875"
+    },
+    {
+      "term": "-1/546875",
+      "sum": "323852/1640625"
+    }
+  ],
+  "alternative_states": [
+    {
+      "term": "1/5",
+      "sum": "1/5"
+    },
+    {
+      "term": "-3/625",
+      "sum": "122/625"
+    },
+    {
+      "term": "103/46875",
+      "sum": "9253/46875"
+    },
+    {
+      "term": "-1/546875",
+      "sum": "323852/1640625"
+    }
+  ],
+  "same_sum_at_second_event": true,
+  "different_next_sums_under_same_ratio": [
+    "323852/1640625",
+    "323752/1640625"
+  ],
+  "complete_final_states_equal": true
+}

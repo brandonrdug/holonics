@@ -4,6 +4,16 @@
 [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md) is the sole current-position record. Dated
 contracts and records preserve their completed scope; their old imperatives schedule no new work.
 
+[project-postulate] **September 11 observation/compression correction:** Brandon requests a full
+status account and recovery of his transcendental/mantissa-window discussions. The observed
+native returns have not established useful language, improving full-cycle loss or emergent HNN
+layers. Immediate work therefore returns to a Lean study of ratio-series generators, their
+intersections, complete-state compression and certified receiver windows before further native
+expansion. Preserve the tested native work and full Athena objective; do not equate interface,
+persistence, basis-rank or timing results with learned computational organization. The
+[status/research return](../../research/records/2026-09-11_ATHENA_STATUS_RETURNS_TO_TRANSCENDENTAL_GENERATOR_COMPRESSION.md)
+retains the measured outputs, missing observations and recovered August directions.
+
 [project-postulate] **Athena goal activated:** Brandon now directs proceeding through the finalized
 implementation plan as a goal. Start at its producing-comparison packet and continue through native
 emission, coupled organization, formation/reuse and product returns. The earlier review-only pause

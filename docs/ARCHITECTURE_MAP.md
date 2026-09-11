@@ -114,6 +114,12 @@ owners add no native learner or physical identity outside their stated hypothese
 
 ## Foundation and transport
 
+[definition] `Mathematics/RatioSeriesTransport.lean` owns exact signed ratio-series block
+composition, preserved clocks, arctangent recurrence and parameterized alternative routes with
+the same complete action. The [September 11 study](../research/records/2026-09-11_ATHENA_STATUS_RETURNS_TO_TRANSCENDENTAL_GENERATOR_COMPRESSION.md)
+connects it to recovered transcendental/compression material; certified window/whole-decoder
+cost comparisons remain open.
+
 [definition] `constitutive_fibre/law_rest.rs` owns `ConstitutiveFibreRest`, the learned local
 relation's source chart, basis and chronology without an occurrence archive. It remounts into
 `ResidentConstitutiveFibre`; existing resident current/condition ports conduct the learned law.
