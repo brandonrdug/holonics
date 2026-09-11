@@ -238,6 +238,8 @@ pub struct NormalWaveRelationRest {
     observation: Option<ResidentSectionRest>,
 }
 impl NormalWaveRelationRest {
+    pub(crate) fn is_conditional(&self)->bool { !self.header.source && !self.header.observation }
+    pub(crate) fn condition_components(&self)->usize { 2*self.header.conditions }
     pub fn roots(&self) -> usize {
         self.header.roots
     }

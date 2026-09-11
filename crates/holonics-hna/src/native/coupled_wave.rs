@@ -20,6 +20,7 @@ use std::{
 };
 
 const MAGIC: &[u8] = b"HNA-COUPLED-WAVE-SESSION\x01";
+const MAGIC_V2: &[u8] = b"HNA-COUPLED-WAVE-SESSION\x02";
 fn invalid(message: impl ToString) -> NativeSessionError {
     NativeSessionError::Application(message.to_string())
 }
@@ -30,13 +31,22 @@ struct Action {
     ordinal: u64,
     generation: u64,
     symbol: Symbol,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    prediction: Option<u64>,
 }
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 enum Cursor {
     Ready,
-    AwaitSelection { generation: u64 },
-    AwaitReentry { generation: u64, action: Action },
+    AwaitSelection {
+        generation: u64,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        prediction: Option<u64>,
+    },
+    AwaitReentry {
+        generation: u64,
+        action: Action,
+    },
 }
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -124,7 +134,7 @@ impl<'c> NativeCoupledWaveSession<'c> {
     }
     fn pending_generation(&self) -> Result<u64, NativeSessionError> {
         let g = match &self.cursor {
-            Cursor::AwaitSelection { generation } | Cursor::AwaitReentry { generation, .. } => {
+            Cursor::AwaitSelection { generation, .. } | Cursor::AwaitReentry { generation, .. } => {
                 *generation
             }
             Cursor::Ready => return Err(invalid("no pending emission")),
@@ -187,24 +197,42 @@ impl<'c> NativeCoupledWaveSession<'c> {
         )
     }
     pub fn next_symbol(&mut self, full: bool) -> Result<Value, NativeSessionError> {
+        self.emit_symbol(full, false)
+    }
+    pub fn predict_symbol(&mut self, full: bool) -> Result<Value, NativeSessionError> {
+        self.emit_symbol(full, true)
+    }
+    fn emit_symbol(&mut self, full: bool, retain: bool) -> Result<Value, NativeSessionError> {
         let ordinal = self
             .emission_ordinal
             .checked_add(1)
             .ok_or_else(|| invalid("emission ordinal overflow"))?;
         if matches!(self.cursor, Cursor::Ready) {
             let contact = self.contact()?;
-            let step = self.wave.advance_contact(&contact)?;
+            let prediction = if retain {
+                Some(self.wave.predict_contact(&contact)?.handle.id())
+            } else {
+                self.wave.advance_contact(&contact)?;
+                None
+            };
             self.cursor = Cursor::AwaitSelection {
-                generation: step.successor_epoch,
+                generation: self.wave.epoch(),
+                prediction,
             };
         }
         let generation = self.pending_generation()?;
         let face = self.wave.read_basis_face(&self.basis)?;
         let emitted = self.chart.emit_family(face)?;
+        let prediction = match &self.cursor {
+            Cursor::AwaitSelection { prediction, .. } => *prediction,
+            Cursor::AwaitReentry { action, .. } => action.prediction,
+            Cursor::Ready => unreachable!(),
+        };
         let action = Action {
             ordinal,
             generation,
             symbol: emitted.symbol(),
+            prediction,
         };
         if let Cursor::AwaitReentry { action: prior, .. } = &self.cursor {
             if *prior != action {
@@ -246,6 +274,46 @@ impl<'c> NativeCoupledWaveSession<'c> {
             json!({"receiver_scope":"projected-family-joint","action":action,"octets":octets,"text":std::str::from_utf8(&octets).ok(),"selection":emitted.selection(),"detail":detail,"reentry":reentry,"successor_epoch":self.wave.epoch()}),
         )
     }
+    pub fn compare_symbol(
+        &self,
+        source: u64,
+        text: &str,
+        coefficient_row: Option<usize>,
+    ) -> Result<Value, NativeSessionError> {
+        let symbols = self.chart.decode_text(text)?;
+        if symbols.len() != 1 {
+            return Err(invalid(
+                "comparison requires one actual symbol in its declared receiver chart",
+            ));
+        }
+        let observed = self.chart.mount(self.surface, &symbols)?;
+        let handle = self.wave.pending_coupled_prediction(source)?;
+        let paired=self.wave.compare_coupled_prediction(&handle,
+            holonic_engine::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent::integers(&observed)?)?;
+        let row = coefficient_row.map(|i| paired.inspect_row(i)).transpose()?;
+        Ok(
+            json!({"scope":"joint-producing-family-comparison","prediction":source,"member":paired.member(),
+            "receiver":paired.relation().source_receiver(),"producing_material_cut":paired.relation().relation_cut(),
+            "source_epoch":source-1,"produced_epoch":source,"contemporary_epoch":self.wave.epoch(),
+            "parameter_rows":paired.parameter_rows(),"feature_components":paired.feature_components(),
+            "material_deposited":false,"pending_retained":true,"coefficient_row":row}),
+        )
+    }
+    pub fn release_symbol_comparison(&mut self, source: u64) -> Result<Value, NativeSessionError> {
+        let pending = match &self.cursor {
+            Cursor::AwaitSelection { prediction, .. } => *prediction,
+            Cursor::AwaitReentry { action, .. } => action.prediction,
+            Cursor::Ready => None,
+        };
+        if pending == Some(source) {
+            return Err(invalid(
+                "finish the pending emission before releasing its producing comparison",
+            ));
+        }
+        let handle = self.wave.pending_coupled_prediction(source)?;
+        self.wave.release_coupled_prediction(&handle)?;
+        Ok(json!({"released":source,"epoch":self.wave.epoch()}))
+    }
     /// An explicitly observed next current, not an unpaired message or an evaluation target.
     pub fn receive_next_symbol(&mut self, text: &str) -> Result<Value, NativeSessionError> {
         self.ready()?;
@@ -283,7 +351,7 @@ impl<'c> NativeCoupledWaveSession<'c> {
         )
     }
     pub fn inspect(&self) -> Value {
-        json!({"model_kind":"coupled-normal-wave","member":self.member,"receiver":self.receiver,"epoch":self.wave.epoch(),"passages":self.wave.current().passages(),"observations":self.wave.normal_material().observations(),"cursor":self.cursor,"emission_ordinal":self.emission_ordinal,"last_source":self.last})
+        json!({"model_kind":"coupled-normal-wave","member":self.member,"receiver":self.receiver,"epoch":self.wave.epoch(),"passages":self.wave.current().passages(),"observations":self.wave.normal_material().observations(),"cursor":self.cursor,"emission_ordinal":self.emission_ordinal,"last_source":self.last,"pending_comparisons":self.wave.pending_coupled_prediction_ids().collect::<Vec<_>>()})
     }
     pub fn checkpoint_stream(
         &self,
@@ -304,7 +372,7 @@ impl<'c> NativeCoupledWaveSession<'c> {
         };
         let bytes = serde_json::to_vec(&header)?;
         Ok(publish_new(path, |file| {
-            file.write_all(MAGIC)?;
+            file.write_all(MAGIC_V2)?;
             file.write_all(&(bytes.len() as u64).to_le_bytes())?;
             file.write_all(&bytes)?;
             rest.write(file).map_err(io::Error::other)
@@ -361,6 +429,7 @@ impl NativeCoupledWaveSavedSession {
             };
             if a.ordinal != h.emission_ordinal
                 || a.generation == 0
+                || a.prediction.is_some_and(|id| id != a.generation)
                 || !admitted_age
                 || a.symbol.0 as usize >= h.alphabet.len()
             {
@@ -368,7 +437,7 @@ impl NativeCoupledWaveSavedSession {
             }
         }
         match &h.cursor {
-            Cursor::AwaitSelection { generation } | Cursor::AwaitReentry { generation, .. }
+            Cursor::AwaitSelection { generation, .. } | Cursor::AwaitReentry { generation, .. }
                 if h.last
                     .as_ref()
                     .is_some_and(|last| last.generation >= *generation) =>
@@ -378,7 +447,7 @@ impl NativeCoupledWaveSavedSession {
                 ))
             }
             Cursor::Ready => {}
-            Cursor::AwaitSelection { generation } => {
+            Cursor::AwaitSelection { generation, .. } => {
                 if *generation == 0 || *generation != r.epoch() {
                     return Err(invalid("saved pending emission cut"));
                 }
@@ -397,6 +466,14 @@ impl NativeCoupledWaveSavedSession {
                 }
             }
         }
+        let pending = match &h.cursor {
+            Cursor::AwaitSelection { prediction, .. } => *prediction,
+            Cursor::AwaitReentry { action, .. } => action.prediction,
+            Cursor::Ready => None,
+        };
+        if pending.is_some_and(|id| id != r.epoch() || !r.has_coupled_prediction(id)) {
+            return Err(invalid("pending emission loses its coupled producing cut"));
+        }
         Ok(())
     }
     pub fn read(path: impl AsRef<Path>) -> Result<Self, NativeSessionError> {
@@ -408,7 +485,7 @@ impl NativeCoupledWaveSavedSession {
         }
         let mut m = vec![0; MAGIC.len()];
         f.read_exact(&mut m)?;
-        if m != MAGIC {
+        if m != MAGIC && m != MAGIC_V2 {
             return Err(invalid("coupled session magic"));
         }
         let mut n = [0; 8];

@@ -140,11 +140,13 @@ fn coupled_session_pending_phases_retain_the_producing_cut() {
     session.chart =
         SymbolCurrentChart::recharted(SymbolAlphabet::from_chars(&['a', 'b']).unwrap(), vec![1, 0])
             .unwrap();
-    assert!(session.next_symbol(false).is_err());
+    assert!(session.predict_symbol(false).is_err());
+    assert_eq!(session.wave.pending_coupled_predictions(),1);
+    assert!(session.release_symbol_comparison(1).is_err());
     assert_eq!(session.wave.epoch(), 1);
     assert!(matches!(
         session.cursor,
-        Cursor::AwaitSelection { generation: 1 }
+        Cursor::AwaitSelection { generation: 1, .. }
     ));
     session.chart = SymbolCurrentChart::declared(SymbolAlphabet::from_chars(&['a', 'b']).unwrap());
     let pending = path("selection");
@@ -172,6 +174,7 @@ fn coupled_session_pending_phases_retain_the_producing_cut() {
             ordinal: 2,
             generation: session.wave.epoch(),
             symbol: emission.symbol(),
+            prediction: None,
         },
     };
     let pending = path("reentry");
@@ -314,4 +317,25 @@ fn coupled_session_observed_next_is_distinct_from_unpaired_source_and_correction
             Ok(())
         })
         .unwrap();
+}
+
+#[test]
+#[ignore="requires CUDA; producing comparisons stay pending through later emissions and complete rest"]
+fn coupled_session_keeps_and_compares_its_producing_family(){
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();let mut session=session(&s);
+    let first=session.predict_symbol(false).unwrap();let id=first["action"]["prediction"].as_u64().unwrap();
+    assert_eq!(session.wave.pending_coupled_predictions(),1);
+    session.next_symbol(false).unwrap();let before=session.wave.rest().unwrap();
+    let comparison=session.compare_symbol(id,"b",Some(0)).unwrap();
+    assert_eq!(comparison["material_deposited"],false);assert_eq!(comparison["source_epoch"],0);
+    assert_eq!(comparison["contemporary_epoch"],3);assert_eq!(session.wave.rest().unwrap(),before);
+    let saved=path("producing-family");session.checkpoint_stream(&saved,&HnaStreamState::default()).unwrap();
+    NativeCoupledWaveSavedSession::read(saved).unwrap().with_session(|loaded,stream|{
+        assert_eq!(loaded.compare_symbol(id,"b",Some(0))?,comparison);
+        let input=json!({"schema":crate::HNA_STREAM_REQUEST_SCHEMA,"command":{"action":"compare-symbol","source":id,"text":"b","coefficient_row":0}}).to_string()+"\n";
+        let mut out=Vec::new();stream.pump_coupled_wave(loaded,&mut std::io::Cursor::new(input),&mut out).unwrap();
+        let event:Value=serde_json::from_slice(&out).unwrap();assert_eq!(event["event"],"symbol-comparison");assert_eq!(event["value"],comparison);
+        loaded.release_symbol_comparison(id)?;assert!(loaded.compare_symbol(id,"b",None).is_err());
+        assert_eq!(loaded.wave().pending_coupled_predictions(),0);Ok(())
+    }).unwrap();
 }

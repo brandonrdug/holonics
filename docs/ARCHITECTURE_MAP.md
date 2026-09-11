@@ -252,7 +252,10 @@ are not robust-winner bounds. `native/coupled_wave.rs::NativeCoupledWaveSession`
 generation, actual symbol-pair source re-entry, pending phases and complete coupled session rest.
 `stream.rs::pump_coupled_wave` and `session_stream.rs::run_coupled_wave_session_stream` expose
 that same owner. Pure `project-symbol` reads the current; `emit-symbol` first advances the
-conditional law. Producing-family observed-symbol development remains an explicit missing port.
+conditional law. `wave/coupled/comparison.rs` now retains producing handles and maps the complete source's
+ordered parameters into paired Ψ/η coefficients through `section_wave_source_family_comparison`.
+Wave rest v8 and coupled session v2 retain those pending cuts and their actual image lineage.
+`compare-symbol` prepares the comparison; producing-family material development remains open.
 
 [definition] `normal/direct/wave/actuate.rs` owns fixed-material source action. The
 `normal_source_actuation.cuh` source word reuses the learned normal response and the enclosed

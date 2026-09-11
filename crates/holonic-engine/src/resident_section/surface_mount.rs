@@ -457,6 +457,19 @@ impl<'chart> ResidentSurface<'chart> {
         Ok(lo.into_iter().zip(hi).collect())
     }
 
+    /// A cold coefficient-row reading. Other rows and their native source remain resident.
+    pub fn read_out_row(&self, section:&ResidentSection<'chart>, row:usize)
+        ->Result<Vec<(i64,i64)>,ResidentRefusal>{
+        let fail=||ResidentRefusal::Declaration{operation:"read-section-row",what:"row outside its resident source".into()};
+        if !std::ptr::eq(section.surface,self)||row>=section.rows||section.width==0{return Err(fail());}
+        let offset=row.checked_mul(section.width).ok_or_else(fail)?;
+        self.context.make_current()?;
+        let mut lo=vec![0;section.width];let mut hi=vec![0;section.width];
+        section.lo.copy_range_to_slice(offset,&mut lo)?;section.hi.copy_range_to_slice(offset,&mut hi)?;
+        let mut census=self.census.borrow_mut();census.egress_section_octets+=(section.width*16) as u64;census.section_read_outs+=1;
+        Ok(lo.into_iter().zip(hi).collect())
+    }
+
     /// Exact terminal-row receiver. The earlier rows stay resident as reconstruction fibre;
     /// no projection buffer or native mutation is needed to read this contiguous interval span.
     pub fn read_out_terminal_row(&self,section:&ResidentSection<'chart>)

@@ -1,5 +1,8 @@
 use super::*;
 pub(super) mod rest;
+mod comparison;
+use comparison::CoupledProducingCut;
+pub use comparison::{NormalCoupledProducingHandle,NormalCoupledPrediction,NormalCoupledComparison,NormalFamilyComparisonRow};
 use crate::native_ecology::constitutive_fibre::{
     GeneratorNeighborhoodStep, ResidentGeneratorNeighborhood, ResidentSourcePairs,
     ResidentWaveRelation, WaveSourceReceiver,
@@ -15,6 +18,7 @@ pub struct NormalWaveCoupled<'c> {
     next_contact: u64,
     active_member: Option<usize>,
     bindings: BTreeMap<u64, Rc<CoupledBinding<'c>>>,
+    pending: BTreeMap<u64,Rc<CoupledProducingCut<'c>>>,
 }
 struct CoupledBinding<'c> {
     member: usize,
@@ -147,6 +151,7 @@ impl<'c> ResidentNormalWave<'c> {
                     next_contact: 1,
                     active_member: None,
                     bindings: BTreeMap::new(),
+                    pending: BTreeMap::new(),
                 };
                 Ok(self.with_continuation(mode))
             }

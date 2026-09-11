@@ -3,6 +3,95 @@ use crate::native_ecology::constitutive_fibre::{
     ResidentConstitutiveCurrent, ResidentConstitutiveSection, WaveSourceReceiver,
 };
 impl<'c> ResidentSurface<'c> {
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_family_comparison(
+        &self,
+        lane: &Lane<'_, 'c>,
+        family: &ResidentSection<'c>,
+        ps: usize,
+        n: usize,
+        condition: ResidentConstitutiveCurrent<'_, 'c>,
+        observed: ResidentConstitutiveCurrent<'_, 'c>,
+        receiver: WaveSourceReceiver,
+        output: &ResidentSection<'c>,
+        snapshot: &ResidentSection<'c>,
+    ) -> Result<(), ResidentRefusal> {
+        self.validate_constitutive_current_view(condition)?;
+        self.validate_constitutive_current_view(observed)?;
+        let fail = || Self::operative_error();
+        let t = n
+            .checked_mul(8)
+            .and_then(|v| v.checked_add(2))
+            .ok_or_else(fail)?;
+        let k = condition.width.checked_div(2).ok_or_else(fail)?;
+        let f = 3usize
+            .checked_mul(n)
+            .and_then(|v| v.checked_add(k))
+            .and_then(|v| v.checked_add(3usize.checked_mul(n).and_then(|z| z.checked_mul(k))?))
+            .and_then(|v| v.checked_mul(2))
+            .ok_or_else(fail)?;
+        let m = f
+            .checked_add(2 * n)
+            .and_then(|v| v.checked_add(1))
+            .ok_or_else(fail)?;
+        let ow = m.checked_mul(2).ok_or_else(fail)?;
+        let fw = ps
+            .checked_add(t)
+            .and_then(|v| v.checked_add(4))
+            .and_then(|v| v.checked_add(t.checked_mul(t)?))
+            .ok_or_else(fail)?;
+        if n == 0
+            || k == 0
+            || condition.width != 2 * k
+            || observed.width != 2 * n
+            || !self.operative_shape(family, 1, fw)
+            || !self.operative_shape(output, t + 1, ow)
+            || !self.operative_shape(snapshot, 1, 2 * n + 1)
+            || [family, output, snapshot]
+                .iter()
+                .any(|s| s.grain.0 != 0 || !std::ptr::eq(s.surface, self))
+            || [family, output, snapshot].iter().any(|s| {
+                s.rows
+                    .checked_mul(s.width)
+                    .is_none_or(|v| v > u32::MAX as usize)
+            })
+        {
+            return Err(fail());
+        }
+        let mut p = Params::new();
+        p.ptr(family.lo.device_ptr())
+            .ptr(family.hi.device_ptr())
+            .u32(ps as u32)
+            .u32(n as u32)
+            .u32(k as u32)
+            .ptr(condition.section.lo.device_ptr())
+            .ptr(condition.section.hi.device_ptr())
+            .u32(condition.offset as u32)
+            .u32(condition.denominator.map_or(u32::MAX, |v| v as u32))
+            .u32(condition.disposition.map_or(u32::MAX, |v| v as u32))
+            .ptr(observed.section.lo.device_ptr())
+            .ptr(observed.section.hi.device_ptr())
+            .u32(observed.offset as u32)
+            .u32(observed.denominator.map_or(u32::MAX, |v| v as u32))
+            .u32(observed.disposition.map_or(u32::MAX, |v| v as u32))
+            .u32(u32::from(receiver == WaveSourceReceiver::UnitRealSum))
+            .ptr(output.lo.device_ptr())
+            .ptr(output.hi.device_ptr())
+            .ptr(snapshot.lo.device_ptr())
+            .ptr(snapshot.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_flat(
+            lane,
+            "section_wave_source_family_comparison",
+            t + 1,
+            &mut p,
+            "wave-source-family-comparison",
+        )
+    }
+
     pub(crate) fn record_wave_source_pairs(
         &self,
         lane: &Lane<'_, 'c>,
@@ -299,23 +388,55 @@ impl<'c> ResidentSurface<'c> {
 }
 
 impl<'c> ResidentSurface<'c> {
-    pub(crate) fn record_wave_observed_next(&self, lane:&Lane<'_, 'c>,
-        observed:ResidentConstitutiveCurrent<'_, 'c>, n:usize, basis:&ResidentSection<'c>,
-        snapshot:&ResidentSection<'c>, workspace:&ResidentSection<'c>) -> Result<(),ResidentRefusal> {
+    pub(crate) fn record_wave_observed_next(
+        &self,
+        lane: &Lane<'_, 'c>,
+        observed: ResidentConstitutiveCurrent<'_, 'c>,
+        n: usize,
+        basis: &ResidentSection<'c>,
+        snapshot: &ResidentSection<'c>,
+        workspace: &ResidentSection<'c>,
+    ) -> Result<(), ResidentRefusal> {
         self.validate_constitutive_current_view(observed)?;
-        let fail=||Self::operative_error();
-        let r=n.checked_mul(2).ok_or_else(fail)?;
-        let k=n.checked_mul(16).and_then(|v|v.checked_add(4)).ok_or_else(fail)?;
-        if n==0 || observed.width!=r || k.checked_mul(k).is_none_or(|v|v>u32::MAX as usize)
-            || !self.operative_shape(basis,k,k) || !self.operative_shape(snapshot,1,r+1)
-            || !self.operative_shape(workspace,1,2*(k+r)) {return Err(fail());}
-        let mut p=Params::new();
-        p.ptr(observed.section.lo.device_ptr()).ptr(observed.section.hi.device_ptr())
-            .u32(observed.offset as u32).u32(observed.denominator.map_or(u32::MAX,|v|v as u32))
-            .u32(observed.disposition.map_or(u32::MAX,|v|v as u32)).u32(n as u32)
-            .ptr(basis.lo.device_ptr()).ptr(basis.hi.device_ptr())
-            .ptr(snapshot.lo.device_ptr()).ptr(snapshot.hi.device_ptr()).ptr(workspace.lo.device_ptr())
-            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
-        self.record_blocks(lane,"section_wave_observed_next",1,self.launch.block_x,0,&mut p,"wave-observed-next")
+        let fail = || Self::operative_error();
+        let r = n.checked_mul(2).ok_or_else(fail)?;
+        let k = n
+            .checked_mul(16)
+            .and_then(|v| v.checked_add(4))
+            .ok_or_else(fail)?;
+        if n == 0
+            || observed.width != r
+            || k.checked_mul(k).is_none_or(|v| v > u32::MAX as usize)
+            || !self.operative_shape(basis, k, k)
+            || !self.operative_shape(snapshot, 1, r + 1)
+            || !self.operative_shape(workspace, 1, 2 * (k + r))
+        {
+            return Err(fail());
+        }
+        let mut p = Params::new();
+        p.ptr(observed.section.lo.device_ptr())
+            .ptr(observed.section.hi.device_ptr())
+            .u32(observed.offset as u32)
+            .u32(observed.denominator.map_or(u32::MAX, |v| v as u32))
+            .u32(observed.disposition.map_or(u32::MAX, |v| v as u32))
+            .u32(n as u32)
+            .ptr(basis.lo.device_ptr())
+            .ptr(basis.hi.device_ptr())
+            .ptr(snapshot.lo.device_ptr())
+            .ptr(snapshot.hi.device_ptr())
+            .ptr(workspace.lo.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_wave_observed_next",
+            1,
+            self.launch.block_x,
+            0,
+            &mut p,
+            "wave-observed-next",
+        )
     }
 }

@@ -1,7 +1,7 @@
 use super::*;
-mod receiver;
 mod basis;
-pub use basis::{NormalFamilyBasisFace,FamilyBasisSelection,FamilyBasisReading};
+mod receiver;
+pub use basis::{FamilyBasisReading, FamilyBasisSelection, NormalFamilyBasisFace};
 mod rest;
 use crate::native_ecology::constitutive_fibre::{ResidentConstitutiveReturn, ResidentWaveRelation};
 pub use receiver::{NormalFamilyReceiverReading, NormalFamilySupport, NormalWaveFamilyReceiver};
@@ -52,6 +52,9 @@ impl<'c> NormalWaveFamily<'c> {
     }
     pub fn last_relation(&self) -> Option<&ResidentWaveRelation<'c>> {
         self.last_relation.as_deref()
+    }
+    pub(crate) fn last_relation_shared(&self) -> Option<Rc<ResidentWaveRelation<'c>>> {
+        self.last_relation.as_ref().map(Rc::clone)
     }
     pub fn inspect_affine_coverage(
         &self,

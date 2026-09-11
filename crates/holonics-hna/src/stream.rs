@@ -28,6 +28,8 @@ pub enum HnaStreamCommand {
     ProjectSymbol { #[serde(default)] full_emission:bool },
     EmitSymbol { #[serde(default)] full_emission:bool, #[serde(default)] retain_comparison:bool },
     ObserveSymbol { source:u64, text:String },
+    CompareSymbol {source:u64,text:String,#[serde(default)] coefficient_row:Option<usize>},
+    ReleaseSymbolComparison {source:u64},
     ReceiveNextSymbol { text:String },
     ReceiveCurrent {
         current: crate::native::CurrentWire,
@@ -266,6 +268,14 @@ impl HnaStream {
             self.state.input.clear();
             self.state.input_complete = false;
             match request.command {
+                HnaStreamCommand::CompareSymbol{source,text,coefficient_row}=>match target.compare_symbol(source,&text,coefficient_row){
+                    Ok(value)=>self.emit("symbol-comparison",value)?,
+                    Err(error)=>self.emit("refused",json!({"error":error,"anatomy":target.inspect()}))?,
+                },
+                HnaStreamCommand::ReleaseSymbolComparison{source}=>match target.release_symbol_comparison(source){
+                    Ok(value)=>self.emit("symbol-comparison-released",value)?,
+                    Err(error)=>self.emit("refused",json!({"error":error,"anatomy":target.inspect()}))?,
+                },
                 HnaStreamCommand::ReceiveNextSymbol{text}=>match target.receive_next_symbol(&text){
                     Ok(value)=>self.emit("next-symbol-received",value)?,
                     Err(error)=>self.emit("refused",json!({"error":error,"anatomy":target.inspect()}))?,
@@ -376,6 +386,8 @@ impl Default for HnaStream {
 /// Only an exterior effect seam for I/O tests. Native current and learning are never callbacks
 /// supplied through the public stream protocol; actual adapters use HnaSession or NativeSession.
 trait StreamTarget {
+    fn compare_symbol(&self,_:u64,_:&str,_:Option<usize>)->Result<Value,String>{Err("joint producing-family comparison unsupported by this model".into())}
+    fn release_symbol_comparison(&mut self,_:u64)->Result<Value,String>{Err("coupled comparison release unsupported by this model".into())}
     fn receive_next_symbol(&mut self,_:&str)->Result<Value,String>{Err("actual next-symbol receiver unsupported by this model".into())}
     fn project_symbol(&self,_:bool)->Result<Value,String>{Err("projected family receiver unsupported by this model".into())}
     fn actuate_text(&mut self,_:&str)->Result<Value,String>{Err("text source chart unsupported by this model".into())}
@@ -802,15 +814,16 @@ impl StreamTarget for crate::native::NativeWaveSession<'_> {
 }
 
 impl StreamTarget for crate::native::NativeCoupledWaveSession<'_>{
+    fn compare_symbol(&self,id:u64,text:&str,row:Option<usize>)->Result<Value,String>{self.compare_symbol(id,text,row).map_err(|e|e.to_string())}
+    fn release_symbol_comparison(&mut self,id:u64)->Result<Value,String>{self.release_symbol_comparison(id).map_err(|e|e.to_string())}
     fn receive_next_symbol(&mut self,text:&str)->Result<Value,String>{self.receive_next_symbol(text).map_err(|e|e.to_string())}
     fn inspect_relation(&self)->Result<Value,String>{self.inspect_relation().map_err(|e|e.to_string())}
     fn project_symbol(&self,full:bool)->Result<Value,String>{self.project_current(full).map_err(|e|e.to_string())}
     fn actuate_text(&mut self,text:&str)->Result<Value,String>{self.actuate_text(text).map_err(|e|e.to_string())}
     fn emit_symbol(&mut self,full:bool,retain:bool)->Result<Value,String>{
-        if retain{return Err("the coupled producing-family observation port is not yet bound".into());}
-        self.next_symbol(full).map_err(|e|e.to_string())
+        if retain{self.predict_symbol(full)}else{self.next_symbol(full)}.map_err(|e|e.to_string())
     }
-    fn observe_symbol(&mut self,_:u64,_:&str)->Result<Value,String>{Err("the coupled observed-symbol receiver lift is not yet bound".into())}
+    fn observe_symbol(&mut self,_:u64,_:&str)->Result<Value,String>{Err("joint comparison is available through compare-symbol; its material-development return is not yet bound".into())}
     fn advance(&mut self,_:&HnaOccurrence,_:bool)->Result<Value,String>{Err("use the coupled wave's declared source/receiver commands".into())}
     fn advance_native(&mut self,_:&HnaOccurrence,_:bool)->Result<Value,String>{Err("use the coupled wave's declared source/receiver commands".into())}
     fn inspect(&self)->Value{crate::native::NativeCoupledWaveSession::inspect(self)}

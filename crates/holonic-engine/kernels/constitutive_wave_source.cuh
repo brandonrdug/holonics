@@ -175,3 +175,64 @@ extern "C" __global__ void section_wave_observed_next(
  }
  for(uint32_t i=0;i<q;++i)if(basis[(size_t)i*k+i]<=0){atomicOr(slot,REFUSED_MALFORMED);return;}
 }
+
+// One ordered affine origin/direction image per CUDA row. The original anchor constraints
+// and the correspondence of these parameters remain in the owned producing-family packet.
+extern "C" __global__ void section_wave_source_family_comparison(
+ const int64_t *family,const int64_t *family_hi,uint32_t ps,uint32_t n,uint32_t kc,
+ const int64_t *condition,const int64_t *condition_hi,uint32_t cat,uint32_t cden,uint32_t cdisp,
+ const int64_t *observed,const int64_t *observed_hi,uint32_t vat,uint32_t vden,uint32_t vdisp,
+ uint32_t receiver,int64_t *out,int64_t *out_hi,int64_t *snapshot,int64_t *snapshot_hi,
+ uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+ uint64_t t64=2u+8u*(uint64_t)n,f64=2u*(3u*(uint64_t)n+kc+3u*(uint64_t)n*kc);
+ uint64_t width64=f64+2u*n+1u;
+ if(!n||!kc||receiver>1u||t64>UINT32_MAX||width64>UINT32_MAX/2u){atomicOr(slot,REFUSED_MALFORMED);return;}
+ uint32_t t=(uint32_t)t64,f=(uint32_t)f64,r=2u*n,width=(uint32_t)width64;
+ uint32_t row=blockIdx.x*blockDim.x+threadIdx.x;if(row>t)return;
+ if(upstream_refused(census,lineage,lineage_count,slot))return;
+ size_t pk=(size_t)ps+t;
+ if(family[pk]!=family_hi[pk]||family[pk]<=0||family[pk+1u]<0||family[pk+1u]>2){atomicOr(slot,REFUSED_MALFORMED);return;}
+ if(family[pk+1u]==1){atomicOr(slot,REFUSED_BOUND);return;}
+ wide hd=fibre_current_denominator(condition,condition_hi,cden,cdisp,slot);
+ wide vd=fibre_current_denominator(observed,observed_hi,vden,vdisp,slot);if(*slot)return;
+ if(row==0){
+   for(size_t i=0;i<pk+4u+(size_t)t*t;++i)if(family[i]!=family_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+   for(uint32_t i=0;i<ps;++i)if(family[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+   for(uint32_t i=0;i<2u*kc;++i)if(condition[cat+i]!=condition_hi[cat+i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+   for(uint32_t i=0;i<r;++i)if(observed[vat+i]!=observed_hi[vat+i]){atomicOr(slot,REFUSED_MALFORMED);return;}
+   if(receiver){wide sum=0;for(uint32_t i=0;i<n;++i)sum=add_checked(sum,observed[vat+2u*i],slot);
+     if(*slot)return;if(sum!=vd){atomicOr(slot,REFUSED_MALFORMED);return;}}
+ }
+ const int64_t *a=row?family+pk+4u+(size_t)(row-1u)*t:family+ps;
+ wide dp=row?1:family[pk],lambda=a[0];
+ if(a[1]||lambda!=(row?0:dp)){atomicOr(slot,REFUSED_MALFORMED);return;}
+ wide *w=(wide*)out+(size_t)row*width;
+ if(row==0){
+   for(uint32_t j=0;j<r;++j)w[j]=observed[vat+j];wide sd=vd;
+   fibre_normalize(w,r,&sd,slot);to_word(sd,slot);for(uint32_t j=0;j<r;++j)to_word(w[j],slot);if(*slot)return;
+   for(uint32_t j=0;j<r;++j)snapshot[j]=snapshot_hi[j]=(int64_t)w[j];snapshot[r]=snapshot_hi[r]=(int64_t)sd;
+ }
+ for(uint32_t j=0;j<width;++j)w[j]=0;
+ wide N=receiver?n:1,L=fibre_lcm(hd,vd,slot),sum_p=0,sum_c=0;if(*slot)return;
+ uint32_t p_at=2u+4u*n,c_at=2u+6u*n;
+ if(receiver)for(uint32_t i=0;i<n;++i){sum_p=add_checked(sum_p,a[p_at+2u*i],slot);sum_c=add_checked(sum_c,a[c_at+2u*i],slot);}
+ for(uint32_t j=0;j<r;++j){
+   wide p=product_checked(N,a[p_at+j],slot),c=product_checked(N,a[c_at+j],slot);
+   if(receiver&&!(j&1u)){p=add_checked(sub_checked(p,sum_p,slot),lambda,slot);c=add_checked(sub_checked(c,sum_c,slot),lambda,slot);}
+   w[j]=sub_checked(c,p,slot);w[r+j]=c;w[2u*r+j]=p;
+ }
+ if(*slot)return;
+ uint32_t h_at=3u*r,mixed=h_at+2u*kc;wide hs=L/hd,vs=L/vd;
+ for(uint32_t j=0;j<2u*kc;++j)w[h_at+j]=product_checked(product_checked(product_checked(N,lambda,slot),condition[cat+j],slot),hs,slot);
+ for(uint32_t j=0;j<kc;++j)for(uint32_t i=0;i<3u*n;++i){
+   wide ar=w[2u*i],ai=w[2u*i+1u],hr=condition[cat+2u*j],hi=condition[cat+2u*j+1u];
+   uint32_t at=mixed+2u*(j*3u*n+i);
+   w[at]=product_checked(sub_checked(product_checked(ar,hr,slot),product_checked(ai,hi,slot),slot),hs,slot);
+   w[at+1u]=product_checked(add_checked(product_checked(ar,hi,slot),product_checked(ai,hr,slot),slot),hs,slot);
+ }
+ for(uint32_t j=0;j<r;++j)w[f+j]=sub_checked(product_checked(product_checked(product_checked(N,lambda,slot),observed[vat+j],slot),vs,slot),product_checked(w[r+j],L,slot),slot);
+ for(uint32_t j=0;j<h_at;++j)w[j]=product_checked(w[j],L,slot);
+ wide den=product_checked(product_checked(dp,N,slot),L,slot);if(*slot)return;
+ fibre_normalize(w,width-1u,&den,slot);if(*slot)return;w[width-1u]=den;
+ size_t first=(size_t)row*2u*width;for(uint32_t j=0;j<2u*width;++j)out_hi[first+j]=out[first+j];
+}

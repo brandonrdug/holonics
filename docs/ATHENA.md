@@ -75,8 +75,9 @@ conditional generation and actual emitted-symbol re-entry. `project-symbol` is a
 retains its producing family; the reported score and tie count do not claim a robust winner over
 the family. The first symbol is held as an output-part prefix; subsequent actual ordered pairs
 use the existing source actuation. No padding or self-target deposition is supplied. Session rest
-retains pending selection/re-entry and the shared delivery cursor. `retain_comparison` and
-`observe-symbol` currently return the precise missing producing-family observation port.
+retains pending selection/re-entry and the shared delivery cursor. `retain_comparison` now captures a producing family. The [joint comparison return](../research/records/2026-09-11_PRODUCING_FAMILIES_KEEP_JOINT_COMPARISON_PARAMETERS.md)
+exposes `compare-symbol` and `release-symbol-comparison`; comparison preserves the shared source
+parameters without material deposition. `observe-symbol` still refuses the unbound material update.
 
 [definition] The [actual-continuation return](../research/records/2026-09-11_ACTUAL_CONTINUATIONS_JOIN_THE_COMPLETE_COUPLED_FAMILY.md)
 adds `receive-next-symbol` for an explicitly observed next current in this symbol chart. It joins

@@ -409,7 +409,7 @@ fn coupled_reception_forms_material_before_admitting_the_new_current() {
 
 // This local specimen is learned from actual declared unit-source rows; the receiver chart
 // must lift its response to raw currents with different common real offsets.
-fn unit_swap<'c>(
+pub(super) fn unit_swap<'c>(
     s: &'c ResidentSurface<'c>,
 ) -> crate::native_ecology::constitutive_fibre::ResidentConstitutiveFibre<'c> {
     use crate::native_ecology::constitutive_fibre::ResidentConstitutiveFibre;
