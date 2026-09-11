@@ -5,7 +5,7 @@ use crate::{
 };
 
 // Exact exterior operator specimens for testing this native algebraic pullback only.
-fn law<'c>(s: &'c ResidentSurface<'c>, cancel: bool) -> ResidentConstitutiveFibre<'c> {
+pub(super) fn law<'c>(s: &'c ResidentSurface<'c>, cancel: bool) -> ResidentConstitutiveFibre<'c> {
     let mut law = ResidentConstitutiveFibre::found_bilinear_contact(s, 3, 1, 1).unwrap();
     let mut sources = vec![[0i64; 6]];
     for j in 0..6 {
@@ -29,7 +29,7 @@ fn law<'c>(s: &'c ResidentSurface<'c>, cancel: bool) -> ResidentConstitutiveFibr
     }
     law
 }
-fn body<'c>(s: &'c ResidentSurface<'c>) -> ResidentNormalWave<'c> {
+pub(super) fn body<'c>(s: &'c ResidentSurface<'c>) -> ResidentNormalWave<'c> {
     let m = ResidentNormalMaterial::found(s, 1, 1, ResidentGrain(32)).unwrap();
     let p = point(s, &[1, 0]);
     let c = point(s, &[2, 1]);

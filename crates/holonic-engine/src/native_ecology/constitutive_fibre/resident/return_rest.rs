@@ -62,6 +62,21 @@ impl ConstitutiveReturnRest {
         }
         Ok(())
     }
+    pub(crate) fn source_width(&self)->usize{self.source_width}
+    pub(crate) fn occurrence(&self)->u64{self.occurrence}
+    pub(crate) fn outside_domain(&self)->bool{self.words[self.source_width+self.target_width+1]==1}
+    /// Validate a fixed homogeneous prefix without treating a plural target as a point.
+    pub(crate) fn validate_constant_prefix(&self,prefix:&[i64])->Result<(),ConstitutiveFibreError>{
+        self.validate()?;
+        if prefix.len()>self.target_width{return Err(ConstitutiveFibreError::Shape);}
+        let w=self.source_width+self.target_width;
+        if self.words[w+1]==1{return Ok(());}
+        for (j,value) in prefix.iter().enumerate(){
+            if (self.words[self.source_width+j] as i128)!=(*value as i128)*(self.words[w] as i128)
+                ||(0..self.target_width).any(|i|self.words[w+4+i*self.target_width+j]!=0){return Err(ConstitutiveFibreError::Shape);}
+        }
+        Ok(())
+    }
     pub fn is_unique_current(&self) -> bool {
         self.validate().is_ok() && self.words[self.source_width + self.target_width + 1] == 0
     }

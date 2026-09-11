@@ -196,6 +196,12 @@ individual basis through `PreparedConstitutiveFormation`; `resident/neighborhood
 complete member/condition return before publication. These foundations do not yet replace the
 normal wave's current with a coupled state or supply its complete checkpoint.
 
+[definition] `wave/family/receiver.rs`, `surface_normal_family_receiver.rs` and
+`normal_family_receiver.cuh` own constrained-family support and the declared minimum-norm joint
+receiver. `wave/family/rest.rs` and `resident/wave_relation/rest.rs` retain the original source,
+anchor, affine relation and last map through process exit. These are exact family interfaces;
+the continuing coupled ecology/session remains the next integration owner.
+
 [definition] `normal/direct/wave/actuate.rs` owns fixed-material source action. The
 `normal_source_actuation.cuh` source word reuses the learned normal response and the enclosed
 finite contact in `passive_current_ball.cuh`. Source union retains the incoming current;

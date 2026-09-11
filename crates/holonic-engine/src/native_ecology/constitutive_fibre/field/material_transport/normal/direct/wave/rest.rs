@@ -439,3 +439,15 @@ impl ResidentNormalWave<'_> {
         })
     }
 }
+
+impl NormalWaveFibre<'_> {
+    /// Exterior serialization of immutable producing standing, with no continuing owner clone.
+    pub(super) fn rest_source(&self)->Result<NormalWaveRest,ConstitutiveFibreError>{
+        Ok(NormalWaveRest {
+            material:NormalMaterialRest::from_native_state(self.roots,self.roots,self.grain,self.material_observations,
+                self.surface.detach_section(&self.material,64)?)?,
+            seed:self.surface.detach_section(&self.seed,64)?,steps:self.steps,epoch:self.epoch,
+            seed_kind:self.seed_kind,seed_epochs:self.seed_epochs,transport:self.transport,pending:BTreeMap::new(),
+        })
+    }
+}

@@ -114,6 +114,7 @@ impl<'chart> ResidentConstitutiveReturn<'chart> {
     pub(super) fn qualify_field_source(&mut self, source_occurrence: usize) {
         self.source_occurrence = Some(source_occurrence);
     }
+    pub(crate) fn source_width(&self) -> usize { self.source_width }
     pub(super) fn report(&self) -> &ResidentSection<'chart> {
         &self.report
     }
@@ -487,4 +488,4 @@ pub use condition_contact::{
 pub use context_section::{ContextualSectionOrigin, ResidentContextualSection};
 
 mod wave_relation;
-pub use wave_relation::ResidentWaveRelation;
+pub use wave_relation::{ResidentWaveRelation,NormalWaveRelationRest};

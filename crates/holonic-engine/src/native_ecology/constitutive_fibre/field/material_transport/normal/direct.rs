@@ -13,7 +13,7 @@ pub use enclosure::{ResidentNormalEnclosure, ResidentNormalEnclosureView, Reside
 mod section;
 pub use section::ResidentNormalSectionReturn;
 mod wave;
-pub use wave::{ResidentNormalWave, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, NormalWaveSeedKind, NormalWaveReception, NormalWaveReceptionReading, NormalWaveDevelopment, NormalSourceActuation, NormalProducingHandle, NormalWavePrediction, NormalWaveComparison, NormalWaveComparisonReading, NormalWaveTransport, NormalWaveTransportChange, NormalWaveReference, NormalWaveReferenceReading, NormalWaveBasisChart, NormalWaveBasisFace, NormalWaveBasisReading, NormalBasisSelection, NormalBasisScore, NormalWaveSource, NormalWaveFamily};
+pub use wave::{ResidentNormalWave, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, NormalWaveSeedKind, NormalWaveReception, NormalWaveReceptionReading, NormalWaveDevelopment, NormalSourceActuation, NormalProducingHandle, NormalWavePrediction, NormalWaveComparison, NormalWaveComparisonReading, NormalWaveTransport, NormalWaveTransportChange, NormalWaveReference, NormalWaveReferenceReading, NormalWaveBasisChart, NormalWaveBasisFace, NormalWaveBasisReading, NormalBasisSelection, NormalBasisScore, NormalWaveSource, NormalWaveJointSource, NormalWaveFamily, NormalWaveFamilyRest, NormalFamilySupport, NormalFamilyReceiverReading, NormalWaveFamilyReceiver};
 
 pub struct ResidentNormalMaterial<'c> {
     surface: &'c ResidentSurface<'c>,

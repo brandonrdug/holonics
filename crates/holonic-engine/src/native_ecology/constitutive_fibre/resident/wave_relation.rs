@@ -1,4 +1,6 @@
 use super::*;
+mod rest;
+pub use rest::NormalWaveRelationRest;
 
 /// Immutable fixed-condition pullback of one bilinear law into the wave family chart.
 /// The basis is a derived relation; it owns no learned material and no continuing ecology.

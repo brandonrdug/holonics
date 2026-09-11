@@ -38,7 +38,7 @@ pub use resident::{
     PreparedConditionContact, ResidentConditionContact, ResidentConditionCurrent,
     ResidentConditionImage, ResidentConditionPreimage, ResidentConditionStanding,
     ResidentConstitutiveCurrent, ResidentConstitutiveSection, ResidentDifferenceSection, ResidentConstitutiveImage, ResidentConstitutiveRefinement,
-    ResidentConstitutiveReturn, ResidentContextualSection, ResidentWaveRelation, ResidentGeneratorNeighborhood,
+    ResidentConstitutiveReturn, ResidentContextualSection, ResidentWaveRelation, NormalWaveRelationRest, ResidentGeneratorNeighborhood,
 };
 
 /// Declared local source law, bound at founding rather than inferred from an array's width.

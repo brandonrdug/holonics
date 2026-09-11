@@ -1,18 +1,22 @@
 use super::*;
+mod receiver;
+mod rest;
+pub use rest::NormalWaveFamilyRest;
+pub use receiver::{NormalFamilySupport,NormalFamilyReceiverReading,NormalWaveFamilyReceiver};
 use crate::native_ecology::constitutive_fibre::{ResidentConstitutiveReturn, ResidentWaveRelation};
 
 /// A constrained affine family, not a normal ball and not a point-current operand.
 /// The relation targets (lambda,anchor,p,c); lambda=1 and the anchor retains the producing
 /// joint ball. Conditional composition eliminates intermediate variables but keeps that bound.
 pub struct NormalWaveFamily<'c> {
-    origin: Rc<NormalWaveSource<'c>>,
+    origin: Rc<NormalWaveJointSource<'c>>,
     relation: ResidentConstitutiveReturn<'c>,
     last_relation: Option<Rc<ResidentWaveRelation<'c>>>,
     affine_coverage: Option<ResidentSection<'c>>,
     passages: u64,
 }
 impl<'c> NormalWaveFamily<'c> {
-    pub fn origin(&self) -> &NormalWaveSource<'c> {
+    pub fn origin(&self) -> &NormalWaveJointSource<'c> {
         &self.origin
     }
     pub fn anchor(&self) -> ResidentNormalEnclosureView<'_, 'c> {
@@ -57,6 +61,7 @@ impl<'c> NormalWaveFamily<'c> {
             .passages
             .checked_add(1)
             .ok_or(ConstitutiveFibreError::Shape)?;
+        self.origin.fibre().epoch.checked_add(passages).ok_or(ConstitutiveFibreError::Shape)?;
         let image = law.read_image(&self.relation)?;
         let (relation, coverage) = image.into_output();
         Ok(Self {
@@ -71,7 +76,7 @@ impl<'c> NormalWaveFamily<'c> {
 impl<'c> ResidentNormalWave<'c> {
     /// Lift this actual joint into an anchored affine carrier without selecting the centre.
     pub fn read_family(&self) -> Result<NormalWaveFamily<'c>, ConstitutiveFibreError> {
-        let origin = self.read_source()?;
+        let origin = self.joint_source();
         let n = self.material.roots;
         let t = n
             .checked_mul(8)
