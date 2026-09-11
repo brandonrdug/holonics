@@ -89,6 +89,13 @@ snapshot/commit API as the full neural runtime.
 
 ## What the mathematics buys the implementation
 
+[project-postulate] “Learning” is not a capability grade inferred from a changed state. Describe
+the actual conditional association, applicable transformation, receiver reconstruction or
+predictive/product result. The [named Athena phases](plans/THE_ROADMAP.md#athena-construction-order)
+separate those outcomes and their code changes. Attention-like interaction, covector pullback,
+diffusion, phase resonance and physical gravity retain their actual operators and realization
+maps; shared mathematical structure is developed through those maps rather than synonym labels.
+
 [definition] The [HNN composition guide](HNN_COMPOSITION.md) binds section/incidence, actual
 local standing, interaction/reaction, returned difference, chart and model-realization owners.
 Its [deeper source review](../research/records/2026-09-09_ARCHITECTURE_CHARTS_REQUIRE_COMPOSED_MECHANISMS_AND_FINITE_CONSTRUCTION_RETURNS.md)

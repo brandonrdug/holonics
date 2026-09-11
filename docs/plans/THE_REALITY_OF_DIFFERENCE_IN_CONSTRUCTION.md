@@ -10,33 +10,22 @@ and string comparisons, holography, mass and constructive navigation.
 [THE_ROADMAP](THE_ROADMAP.md), the sole ordering authority.
 [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) alone records current position. The steps below
 unify patterns already engaged in specific sources. They do not establish another engine,
-reactivate a predecessor implementation or replace the independent AC0–AC5 construction.
+reactivate a predecessor implementation or replace the named Athena construction phases in the live roadmap.
 
-## Sustained goal and completion boundary
+## Returned foundation and continuing work
 
-[project-postulate] Brandon's subsequent request establishes a longer-running goal so this work
-continues through its consequences rather than ending at repeated next-step notes. Carry steps
-2–3 through an actual four-torus/Parametron realization: exact clocked resegmentation and boundary
-scale; a constitutive current derived from the actual incidence; a continuing reduced state;
-an explicit executable decoder with its retained fibre; and verified future comparisons and
-complete scoped costs. Integrate the result and its useful implementation consequences, commit
-and push coherent verified returns. Planning and isolated interface lemmas do not complete this
-goal. If a proposed reduction fails, retain the counterexample and develop its replacement to a
-verified returned scope before treating this construction as complete.
+[established-bounded; formal-checked; implemented-exact] The earlier sustained objective through
+clocked resegmentation, boundary scale and a continuing finite four-torus/Parametron realization
+returned in the [September 8 construction](../../research/records/2026-09-08_CLOCKED_TORUS_CURRENTS_CONTINUE_THROUGH_A_RETAINED_FIBRE.md).
+Its explicit decoder, retained fibre, variable-input continuation and scoped comparisons remain
+standing. The original objective is not reopened by the broader programme below.
 
-[definition] The current concrete continuation uses the four axis currents and actual oriented
-square-face currents. Their kernel and constitutive coupling determine which coordinates can
-be condensed and which interior contribution must remain. It does not assume the four winding
-readings reconstruct every branch current. The broader programme remains available beyond this
-sustained construction; its open physical and mathematical endpoints are not claimed complete.
-
-[established-bounded; formal-checked; implemented-exact] The
-[clocked torus return](../../research/records/2026-09-08_CLOCKED_TORUS_CURRENTS_CONTINUE_THROUGH_A_RETAINED_FIBRE.md)
-supplies this sustained construction's artifact and checks. It derives the concrete two-square
-response and its six-coordinate continuation, retains a jointly blind source remainder, proves
-the scale/generator and complete-state tube laws, and compares full currents through continued
-execution and rest/remount. The later Galerkin/morphology and calibrated physical applications
-below reuse this method while retaining their own unsolved source/feedback obligations.
+[definition] The continuing work is changed morphology/nonlinear feedback, source-specific
+mathematical applications and physical realization. The roadmap orders those uses alongside
+Athena. Sections 1–2 describe returned foundations; section 3's general nonlinear closure and
+sections 4–6's source-specific extensions retain their open work. The latest Holonic Encoding,
+conditional-relation and gap-residue directions compose these owners; no completed theorem is
+made a fresh prerequisite.
 
 ## The mathematical subject
 
@@ -78,9 +67,9 @@ The [owner map](../ARCHITECTURE_MAP.md) supplies the matching executable source 
 | Quantum and geometric transport | `Computation/HolonicEvolutionKinds`, `HolonicQuantumTransport`, `HolonicFermiHubbard`; `Millennium/HolonicConnectionCurvature`, `HolonicGaugeCovariance` | Transport complete quantum receivers and quantify discrete/continuous geometric comparisons |
 | Winding, topology and physical response | torus, winding, monodromy, Parametron-realization, mass-shell and typed-origin owners | Compose loop/section/boundary invariants with actual dynamics and calibrated response where a physical claim is made |
 
-## 1. Compatible potential and useful receiver consequences
+## 1. Compatible potential and useful receiver consequences — returned foundation
 
-[definition] First compose the existing preimage and receiver-history owners into one source
+[definition] The returned foundation composes the existing preimage and receiver-history owners into one source
 family whose future image can be carried, refined and used without selecting a unique cause.
 
 - Admit an actually observed entering face with its source-domain evidence. Keep the existing
@@ -107,10 +96,10 @@ cycle-class map before that existence is paid. Conversely, a recorded observatio
 inhabited source fibre for the future-image construction. This distinction makes the realization
 and navigation questions compose without assuming the desired realization.
 
-## 2. Swing, restriction and the same potential across tube charts
+## 2. Swing, restriction and the same potential across tube charts — returned foundation
 
 [definition] The affine Swing and its exact history/tolerance transport are the opening case.
-The next formal construction joins **WorldTube resegmentation and BoundaryScalePassage** to the
+The returned construction joins **WorldTube resegmentation and BoundaryScalePassage** to the
 potential family from step 1.
 
 - Use an actual joined `ClockedSpan` occurrence and the existing split/rejoin equivalence.
@@ -227,7 +216,7 @@ remain distinct later conclusions, not assumptions inserted into these finite re
 parked until every step of this programme is finished.
 
 - **HNN/Athena:** offer the exact receiver, future-family, correlation, rebase or decoder law to
-  the existing native owner and the active AC phase. The packet witness constrains the claimed
+  the existing native owner and its named Athena phase. The packet witness constrains the claimed
   receiver scope; it is not a grammar, support-only emitter or explanation of all language
   failure. Keep source-free synthesis and new combinations possible when the model's admitted
   future family supports them.

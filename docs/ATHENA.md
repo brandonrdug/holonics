@@ -137,7 +137,7 @@ attained useful Athena-alpha remain distinct claims.
 
 [definition] The parallel [formal framework review](FORMAL_FRAMEWORK.md#the-checked-finite-return-of-changing-conformation)
 proves the complete finite response of changing incidence, material and internal state, with a
-counterexample to replacing that response by tangent cancellation. It reinforces AC1's producing
+counterexample to replacing that response by tangent cancellation. It reinforces the producing
 adjoint, finite successor and future-receiver compression obligations. The theorem applies to its
 finite coupled-incidence chart; it adds no mandatory LC model, native kernel or product gate.
 
@@ -145,13 +145,13 @@ finite coupled-incidence chart; it adds no mandatory LC model, native kernel or 
 retains the full addressed difference before scalar bounds, changing receiver charts and the
 finite constitutive response. Its mechanical control separates exact quotient descent from
 energy decrease. A finite numerical law and an unrounded reference law retain separate
-successors and comparison defects; this return mandates no new numerical realization for AC1.
+successors and comparison defects; this return mandates no new numerical realization for native conditional conduct.
 
 [proved-derived; formal-checked] The [programme's opening return](../research/records/2026-09-08_COMPATIBLE_POTENTIAL_SWINGS_THROUGH_JOINT_RECEIVERS_AND_THE_PROGRAMME_BEGINS.md)
 now formalizes the recorded strict-bit-marginal/joint-packet counterexample and connects the
 full joint image to compatible future potential. It also returns exact joint quotient/Swing
 transport and tolerance-based consequences with plural sources. These laws inform the existing
-AC1/AC2 receiver and reuse work; they do not install a support-only emitter, an extra certainty
+producing-return and receiver-reuse work; they do not install a support-only emitter, an extra certainty
 gate, or a new runtime model.
 
 ## Native-first construction

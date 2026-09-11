@@ -111,6 +111,27 @@ family; they do not refute the causal relevance of any generator that the system
 
 ## Loss is a measurement of difference
 
+[project-postulate] Brandon's September 11 clarification rejects “learning” as a qualitative
+grade supplied merely by a changed current or later standing. That establishes causal response.
+A stronger claim names the actual coupled classes of difference, conditions of applicability,
+retained transformation and tested future consequence. Recognition, conditional association,
+reconstruction, predictive usefulness and comprehension are not interchangeable measurements.
+The active plans state what must be observed for each claimed return.
+
+[definition] A locally consistent face belongs to its source ecology and receiver scope. For
+a finite or measured population X with finite positive total measure μ(X), a classification receiver R
+has the distribution `p(c)=μ({x in X | R(x)=c})/μ(X)`. Population, measure, classification,
+conditioning and chronology are part of that face. A common character or approximately constant
+field reading does not become an unconditional property by suppressing those arguments. Exact
+constraint identities such as π/e and a scoped empirical regularity have different constructions.
+
+[interpretation] Gap statistics can read causal residues when the ordered source, intervening
+constraints and transport are retained. The existing prime-wheel cut/join, prime-power phase
+and folded ζ source give concrete instances for the
+[plan/source synthesis](../../research/records/2026-09-11_THE_PLANS_NAME_CONDITIONAL_RELATIONS_AND_OBSERVABLE_OUTCOMES.md).
+A histogram is then one receiver of the residual family, not its full replacement. This
+programme pursues the actual arithmetic/spectral bridge; a spacing fit alone does not supply it.
+
 [definition] A loss is a declared receiver of a situated comparison. The original comparands,
 their common comparison chart and their causal passages remain available. A loss may read an
 oriented residual, a tensor discrepancy, a norm, a distribution contrast, a work difference or

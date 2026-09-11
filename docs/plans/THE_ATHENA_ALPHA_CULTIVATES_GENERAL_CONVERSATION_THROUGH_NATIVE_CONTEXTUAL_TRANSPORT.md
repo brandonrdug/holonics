@@ -1,572 +1,286 @@
-# Athena-alpha: composed current, receiver and developmental return
+# Athena: conditional relations, Holonic Encoding and useful conduct
 
-**Authority:** Brandon's September 6–11 directions. The September 10 request closes the illustration
-pass; the later π/e and Holonic Encoding directions refine the mathematical/source attachment
-before further native expansion. The full Athena objective remains standing.
-**Order:** [the roadmap](THE_ROADMAP.md). **Position:** [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md).
-**Derivations and source audit:** [equational transport review](../../research/records/2026-09-10_EQUATIONAL_LAWS_AND_WORLD_TUBES_MAKE_ATHENAS_NEXT_PASSAGE_EXPLICIT.md).
-**Final computational review:** [tension, kinetics and native ownership](../../research/records/2026-09-10_TENSION_DYNAMICS_BECOME_ATHENAS_COMPUTATIONAL_CONSTRUCTION.md).
-Earlier blueprints remain in Git; they schedule no repeated foundation packets.
+[definition] This is the active native implementation specification. [The roadmap](THE_ROADMAP.md)
+alone orders construction; [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) alone records the
+position. September 11 consolidates the old AC responsibility labels into named work phases.
+The file path, source names and existing wire identifiers remain stable. The native pause is
+unchanged by this planning review.
 
-## Product and the object being built
+## Product and evidence
 
-[project-postulate] Holonics is the framework. HNN conducts situated Holons; Athena is the
-continuing ecology, and Eros composes and develops its material. The objective remains useful
-general English, code and mathematics on consumer hardware, with continuing contextual learning.
-Finite construction returns do not establish Athena-alpha attainment. Broader source exposure
-and partial useful conduct require no universal intelligence, compression or Millennium theorem.
+[project-postulate] HNN conducts situated Holons; Athena is the continuing ecology and Eros its
+composition/development phase. The product goal is useful conversation, code, mathematics and
+other modalities on consumer hardware. A changed current, independent basis row, loss scalar,
+rest file or successful kernel is not that product. Report the actual conditional relation,
+its applicability, its composed consequences and the output that demonstrates the claimed use.
 
-[definition] Write one complete operative state as
+[definition] The local operation remains
+`occurrence -> local current -> reaction -> emission + successor ecology -> next occurrence`.
+That describes causal operation. It does not by itself establish recognition or comprehension.
+Use the outcome definitions in the roadmap and the full compared faces in the return.
 
-\[
-\mathcal A=(K,M,z,\mathcal F,\kappa),\qquad
-(\mathcal A,o)\longmapsto(y,\mathcal A^+,\mathcal P).
-\]
+## Exact source map
 
-K is actual addressed incidence and source/receiver charts; M is reusable constitutive material;
-z is situated current; F retains the compatible joint family; κ retains occurrence chronology.
-P is the producing passage evidence needed by the admitted comparison, including source and
-receiver maps and the material cut. These are mathematical responsibilities in existing owners,
-not five new modules or a proposed generic model wrapper. The next operation consumes A⁺.
+[definition] In the paths below, **C** is
+`crates/holonic-engine/src/native_ecology/constitutive_fibre/`, and **W** is
+`C/field/material_transport/normal/direct/wave/`. **A** is
+`crates/holonics-hna/src/native/`. These abbreviations are navigation only.
 
-[project-postulate] Text, acoustics, images and files supply exterior charts. Their ordinals,
-packet boundaries and sample counts do not determine semantic identity, contact or native cadence.
-GPU execution owns committed current, coefficients and branches. Preserve exact codewords and
-joint enclosures; numerical realization error, source uncertainty and observed fit discrepancy
-have different meanings. Lean and equational proof search remain exterior research apparatus.
+[established-bounded; source-inspected] Review base `9f237c9d` has the following owners:
 
-[definition] The active implementation now has an [initial producing-return](../../research/records/2026-09-10_ATHENA_RETURNS_OBSERVATIONS_TO_THEIR_PRODUCING_JOINT.md).
-Use `Applied` scope for transport by the selected stored M; retain `NormalReference` and the
-read-only `reference_next` for their distinct ideal-normal comparison. Source and operation
-rounding remain in applied enclosures. The unit-prior energy certificate bounds the reference
-without changing coefficients. This refines the numerical/source distinction below; it does not
-reinterpret older rests or narrow the held source when the future scope changes. Current packet
-position remains in CONSTRUCTION_STATE and the roadmap.
-
-## Holonic Encoding in the existing packets
-
-[project-postulate] Brandon's September 11 direction makes encoding general across modalities.
-Recover and compose the existing path-fold, recurring-transformation, autoencoding, Complex
-Parametron and clocked-torus constructions. The
-[source review and encoding contract](../../research/records/2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md)
-states the historical corrections, current code and exact reference law. A learned tokenizer
-pre-pass or an authored semantic grammar is not the missing source attachment.
-
-[definition] **AC3 source/condition attachment:** Keep `SymbolCurrentChart` as an exterior text
-instrument. Its symbols address supplied coordinates; they do not determine internal grain,
-clock or morphology. Preserve the actual source section, order, part boundaries and
-source/return links. Derive contextual conduct through existing source preimages, condition
-contact and local formation. The concrete absent conversion is from the held wave's joint
-source/observed family to those native ports, retaining all common parameters. A point port
-may consume an actual point source; it may not consume the centre of a plural source family.
-Use the existing family-image/lift owners where the input is plural and state any remaining
-unrepresented mixed terms. Merely changing coefficients or appending a context label is not
-this binding.
-
-[definition] **AC3 producing return:** Retain the encoding/receiver chart cut with the existing
-producing current/material cut. Reconstructing a present source face and predicting an actual
-later face are separate comparisons. Return each through the morphology that produced it;
-stage encoding/material changes into the same successor after that complete return. Reuse
-immutable standing, rather than cloning the ecology or remounting a full source archive.
-
-[definition] **AC4 formation and reuse:** A reusable encoded constituent carries a local
-transformation, domain, exposed ports, conditions, clock, receiver decoder and compatible
-source fibre. Several overlapping grains may remain available. Compose serial bodies by the
-actual joining occurrence; couple other bodies through their actual incidence. Use existing
-material formation, restriction/rebase and decoder owners. The finite observable-moment
-closure is an exterior reference for deriving E and U under its local hypotheses; native
-productive execution must remain resident. An exact compression serves E′T=UE and DE=ρ;
-partial learned conduct retains its defect/family without waiting for universal certainty.
-
-[definition] **AC4 emission and persistence:** The internal encoded carrier may change shape
-while the alphabet remains an exterior output chart. Bind its actual native receiver map to
-`NormalWaveBasisChart` where that chart applies, or the existing appropriate section receiver.
-Equal dimensions are not a conversion. Rest retains the generator/decoder, changed material,
-clock and required fibre, plus any still-pending producing chart. Account for decoder work and
-standing as well as encoded size. A coefficient list with no executable receiver is not the return.
-
-[definition] **AC5 observation:** Inspect complete source → encoded passage → conducted boundary
-→ decoded output → actual later comparison → successor cycles. Report reconstruction and
-prediction differences separately, their receiver losses when defined, and the actual emitted
-text. Compare compressed and expanded conduct at the claimed future scope; inspect a changed
-condition/order, a covariant reorientation and a contact exposing a previously blind component.
-These comparisons answer the encoding claim, not a universal product gate. Optical/acoustic
-checks use their existing source and receiver owners over the shared passage law; a successful
-codec rechart does not by itself establish learned semantic translation. Full audio/vision
-products are not prerequisites to the next useful text return.
-
-## Returned owners: preserve and compose
-
-[established-bounded; source-inspected] At final review base `9fceb915`, the following paths exist.
-The linked records retain their executed checks; source inspection here does not rerun them.
-
-| Operation | Actual owner and effect | Remaining composition |
+| Existing owner | Actual return | Remaining work |
 |---|---|---|
-| Source availability and ancestry | `alpha::exposure::{ExposureReader, ExposureCursor}`; declared partitions, parts and relationships | Use the actual relation carried by a frame when forming a comparison |
-| Exterior symbol chart | `native/section_input.rs::SymbolCurrentChart`; symbols mount unit basis sections | Generated bounded currents have no matching native-to-symbol emission in `conversation_wave` |
-| Reusable local relation | `ResidentConstitutiveFibre`, `ConstitutiveFibreRest`; independent relation basis and compatible target fibre | Use for an actually typed local relation; do not reimplement its rest or infer a wave-to-member conversion |
-| Shared condition ecology | `ResidentGeneratorNeighborhood`; local laws, condition reaction, atomic successor and rest | Its member/source/target charts must be connected explicitly to any wave current used there |
-| Accumulated normal material | `ResidentNormalMaterial`; H, B, target energy, source bounds, applied realization M and normal-reference comparison | Bind an observation to the source that actually produced the compared response |
-| Incoming source action | `ResidentNormalWave::actuate_section`; transforms held joint current under fixed material, one source-field successor | Compose the resulting situated state with prediction, its receiver and a returned comparison |
-| Generation | `ResidentNormalWave::advance`; actual joined successor and retained generator/fibre | Expose a declared receiver and emission, not just the diagnostic trajectory |
-| Next observed current | `ResidentNormalWave::receive`; updates material and replaces (p,c) by (c,v) atomically | Keep its next-current meaning distinct from the producing-addressed return |
-| Producing-addressed return | `predict` / `receive_prediction`; retains source joint/material and stages a contemporary material update without replacing current occurrences | Use the actual observation/source relation; broader receiver lifts retain their domains |
-| Section development | `ResidentNormalWave::develop_section`; updates material from supplied section pairs, preserves current occurrences | Its present caller uses local source differences, not a reply paired with a situated prediction |
-| Productive rest | `NormalWaveRest`; material, seed/joint, word, epochs, pending cuts and applied/reference scope | Extend for the new emission receiver and coupled body through their actual owners |
+| `alpha::exposure::{ExposureReader,ExposureCursor}` and prepared source records | Source/part relationships, partitions and resumable delivery | Bind actual mounted material and its comparison relation to the producing native occurrence |
+| `A/section_input.rs::SymbolCurrentChart` | Supplied symbol basis, exact mount, device-selected symbol decoding | Keep as exterior codec; bind a changing internal encoded carrier through an actual receiver map |
+| `W/receive.rs` and normal producing-return owners | Actual next-current and normal addressed material return | Preserve these distinct meanings when composing the family operation |
+| `W/coupled/comparison.rs::{predict_contact,compare_coupled_prediction}` | Retained producing cut and joint source/observed-difference coefficient sections | Add the consuming family/condition/material transaction; inspection currently mutates nothing |
+| `C/resident/neighborhood.rs::{prepare_advance,publish_advance}` | Point-source condition preimage, contact, staged member formation and publication | Generalize the precise family incorporation relation without casting a family centre to a point |
+| `C/resident/{preimage,condition_contact}.rs` | Compatible conditions and actual contact with that family | Retain common source/condition parameters when the source is itself a family |
+| `C/resident/wave_relation/{source,observation}.rs` | Complete source arrivals, affine source action and actual-next observation | Compose with the producing-family return rather than treat source actuation as material formation |
+| `W/coupled.rs` and `W/family/` | One coupled wave, conditional current families, actual source-field actuation, joined continuation | Publish changed material/condition/current and comparison disposition as one complete successor |
+| `A/coupled_wave.rs::NativeCoupledWaveSession` | Prediction, emission, ordinary re-entry, read-only `compare_symbol`, release and rest | Consuming return API, actual source-part association, full-cycle product observation |
+| `W/rest.rs`, `W/coupled/rest.rs`, `C/resident/neighborhood/rest.rs` | Versioned normal/coupled and pending comparison persistence | Extend only for new committed payloads and encoding cuts; retain version compatibility |
+| `receiver_history_compression/{observable,compression}.rs` | Exact quotient, receiver decoder, fibres and ordered-word conduct | Bind the actual continuing coupled-wave generators, conditions and emission; general ownership is not that binding |
+| `field/internal_mode.rs`, leader/scale and diffusion owners | Existing local mode, restriction and reduced-boundary constructions | Compose where domains match, retaining source/memory and actual complete successor |
 
-[established-bounded; source-inspected] `examples/conversation_wave.rs` chooses actuation or
-within-part difference development, then calls `advance` and writes numerical trajectory/rest.
-It does not emit symbols or pair a conversation reply with the prediction that reply addresses.
-The completed neighborhood and the older `NativeCirculationSession` are separate semantic
-assemblies. No exact conversion among them follows from their shared resident storage or names.
+[established-bounded; source-inspected] `compare_symbol` explicitly reports
+`material_deposited: false`. Its output is a comparison, not a completed material return.
+Emission and pending rest already exist. The old blueprint's instructions to first invent those
+owners are superseded; their implementation evidence remains standing.
 
-## The existing local law, with each comparison typed
+## Mathematical contract at the immediate boundary
 
-[definition] In the current difference chart, z=(p,c), φ(z)=(c−p,c,p), and the applied learned
-response supplies a change. The join is the actual c:
-
-\[
-\widehat v=c+M\phi(z),\qquad G_M(z)=(c,\widehat v).
-\]
-
-[definition] P denotes the normal-reference minimizer of the declared regularized quadratic
-objective; M is its applied numeric realization, with a retained comparison to P. The existing
-`normal.rs::NativeNormalMaterialState::objective` and accumulated-normal source supply the
-scoped reference comparison; the tension theorems do not establish an additional minimization law. They are not silently
-identified. Source action composes learned arrivals and passive contact on source union,
-`G(x,y,q)=F(x,y,x+q)=y+Aq`, transporting both held components under fixed material. The
-[source return](../../research/records/2026-09-10_SOURCE_PASSAGES_ACT_THROUGH_UNION_AND_PASSIVE_REFLECTION.md)
-already separates the earlier source-stencil collision. Do not repeat that packet as missing work.
-
-[definition] For an actual next-current observation v in c's chart, the local normal target is
-η=v−c at the same producing z. With conjugate transpose †:
+[definition] With complex current pair z=(p,c), retained condition h and actual contact j,
 
 \[
-H^+=H+\phi\phi^\dagger,\quad
-B^+=B+\eta\phi^\dagger,\quad
-E^+=E+\eta^\dagger\eta.
+a=\phi(z)=(c-p,c,p),\quad \eta\in L_j(a,h),\quad v=c+\eta,\quad z^+=(c,v).
 \]
 
-These are the existing normal observation laws, not a new optimizer. Complete correlated source
-families and numeric bounds follow the existing bounded ports. A receiver in another chart first
-needs its declared transport; an absent lift remains a fibre, not an invented point target.
+For n current components and k condition components, the existing bilinear chart derives
+`source_complex=3n`, `condition_complex=k`, `target_complex=n`, and
+`2(3nk+3n+k)` real feature coordinates. These are chart dimensions, not a fixed semantic capacity.
+The normal-only response `v=c+Mφ(z)` remains a separate admitted operation. Do not add both
+responses or deposit one observation into both laws without its explicit mathematical relation.
 
-[definition] A correction addressed to an already-produced prediction retains its producing
-source and material cut. Calling `receive(v)` on the later current instead asserts a different,
-next-current relation. Both are lawful when actually supplied; the application must distinguish
-their causal addresses without creating a privileged world-verdict learning law. One incoming
-occurrence may carry both source actuation and an addressed comparison, with one final successor.
+[definition] An actual next-current observation uses `(p,c)->(c,v)`. A correction addressed to
+an earlier prediction compares against its retained `p_s,c_s,h_s` and receiver cut, even if the
+contemporary ecology has advanced. Unpaired incoming material acts through its actual source
+section. A parent link alone is not a target, and two message positions are not zipped into
+semantic pairs. Self-emission is an ordinary source occurrence, not fabricated human testimony.
 
-[counterexample; computational-witness] One prior observation φ₀=(1,1,0), η₀=3/2 gives H=I+φ₀φ₀ᵀ,
-B=η₀φ₀ᵀ and exact normal reference P=BH⁻¹=(1/2,1/2,0). From p=0,c=1 it predicts 2.
-A return of 3 addressed to that prediction supplies φ=(1,1,0), η=2 and updates P to
-(7/10,7/10,0). Treating 3 as the next current after generation instead supplies φ=(1,2,1), η=1
-and updates P to (1/2,3/8,−1/8). The [exact witness](../../research/experiments/athena_equational_transport/witness.py)
-exhibits the difference. The current `receive` method is correct for its documented next-current contract.
-
-[definition] This first normal return conditions on the retained situated source z_s. It is a
-local observation law, not a claim to differentiate through every earlier use of M in source
-actuation. For a complete material intervention, compare both the changed source action and
-changed local response: with δM=M⁺−M,
+[definition] For a point normal observation, η=v−c_s and the existing moment increments are
+`H+=φφ†`, `B+=ηφ†`, `E+=η†η`. Applied M, normal-reference minimizer P, numeric enclosure,
+source-family uncertainty and observation discrepancy remain distinct. A full intervention on
+material also changes the source action when applicable:
 
 \[
-\delta\widehat v=\delta c_s+\delta M\,\phi(z_s)
-+M^+\bigl(\phi(z_s^+)−\phi(z_s)\bigr).
+\delta\widehat v=\delta c_s+\delta M\phi(z_s)
++M^+\bigl(\phi(z_s^+)-\phi(z_s)\bigr).
 \]
 
-The exact finite identity includes the indirect current change. If an admitted objective requires
-its adjoint, compose the existing retained-source/adjoint owners over that actual dependency.
-Do not describe the local normal increment as that full return, or require an all-history return
-before the local law can be used.
+The local moment increment is not a claim to have computed that complete dependency return.
+An adjoint uses the actual producing morphology, including retained overlays.
 
-## Next implementation packets
+[open] The family incorporation law must state what an observation constrains. For a source
+family x(θ), observation v and condition h, retain the joint relation among θ, h and the local
+law yielding v−c(θ). Existential compatibility, imposing a law on every family member, and
+averaging over a supplied measure are different operations. Do not deposit every compatible
+source as if each were actually observed, or invent a probability measure to pick one. Derive
+which family/constraint the existing incorporation owns before implementing its kernel.
 
-### Sequence, fold and kinetic conduct are part of this construction
+[definition] In the affine specialization, use existing coefficient-image and preimage owners
+with their shared parameters. If both source and condition vary and the required product is
+not affine in those parameters, retain the mixed terms in an admitted richer family or return
+that precise representation obstruction. The family may still support projected generation;
+an unavailable point conversion is not a universal certainty gate.
 
-[project-postulate] Brandon's later September 10 ruling places sequence-to-fold and biochemical
-kinetics among HNN's foundational construction domains. A causal chain of thought is the joined
-operation history of a changing body: its organization determines which later interactions can
-occur and how they proceed. A verbal trace is a receiver of that conduct. The molecular and text
-charts instantiate shared relations; text does not pass through a mandatory protein intermediary.
+## 1. Situated reception and visible cycles
 
-[established-bounded; implemented-exact] The
-[sequence/kinetic return](../../research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)
-constructs sequence-dependent fold populations, geometric ligand access, sterically conditioned
-next moves and reaction currents. Equal energy/contact bins fail to preserve the next kinetic
-return; equal fold and chemical marginals can conceal different binding current. These are
-concrete tests of the joint-state/future-receiver contract, not protein-prediction product grades.
+[definition] Extend the public coupled session and exposure attachment, using actual visible
+source parts and their many-to-many associations. Retain source occurrence, part/view, chart,
+producing handle and observation relation. Preserve the distinction between serial delivery,
+source chronology and the local native clock. An alphabet row never creates a new native clock
+or permanent constituent merely because it occupies a position in a file.
 
-[definition] Carry this consequence into the existing packets below. Preserve the declared
-many-to-many association among exposure occurrences/views/parts, codec sections, actual native
-source/current occurrences and the producing joint. The present symbol chart happens to mount one
-row per supplied symbol; that does not establish a universal sequence-position/native-row
-bijection or make ordinals a topology. Molecular testimony can supply an actual constraint chart;
-text and acoustics retain their own source/condition maps. Compose existing source and return
-owners before introducing another address wrapper; hashes alone do not preserve the association.
+[definition] Add terminal inspection of complete cycles: source face and relation; producing
+current/condition and encoding cut; applicable passage; predicted/emitted face; actual return;
+full comparison/fibre; changed successor. Compose existing readers and receipts. Keep intermediate
+sections resident and expose only the requested terminal observer projection. This is output
+inspection, not a new trace archive or a reason to clone the ecology.
 
-[definition] A kinetic continuation includes the admitted transition and its conditioning
-material, contact, occupancy and clock—not just a preferred endpoint. Reuse an applicable local
-constitutive/bilinear relation and `ResidentGeneratorNeighborhood` through explicit source,
-condition and output conversions. Shared row width is insufficient. The normal-wave source action,
-continuation and development retain their existing different effects; changing a coefficient
-alone is not the requested contextual transport. The next producing-comparison packet should
-expose a later dependent operation changed by the returned relation, with its causal source and
-complete successor, instead of grading a plausible verbal sequence.
+[definition] **Expected outcome:** a reader can see exactly what was predicted and what arrived,
+which source relation was used and why the next operation differs. Inspect actual text alongside
+its receiver. Report projected choice, exact ties and optional robust-choice evidence separately.
+The existing smeared/tied output is a failure observation, not a baseline to repeatedly rerun
+without a new diagnostic question.
 
-[conditional] A compressed kinetic chart must transport its actual generators and receivers:
-`q P_i = U_i q` (or `q K_i = K̄_i q` in a continuous-rate chart). A failed closure retains the
-separating fibre or declared defect; a histogram, mean conformation, free/bound marginal or
-rendered fold cannot silently replace the joint current. The reference enumerator is exterior
-evidence, not the proposed native inference algorithm or an obligation to archive all raw states.
-This clarification adds no phase before the producing comparison below. The final implementation
-order includes coupled organization as a required return, with source exposure throughout.
+[definition] **Checks:** source/part and producing-address integrity; unpaired vs next-current
+vs correction semantics; delayed comparison after intervening occurrences; output and cursor
+recovery. Extend `A/coupled_wave/tests.rs` and the actual exposure integration tests only where
+these bindings change. Preserve evaluation material outside developmental selection.
 
-[proved-derived; formal-checked] The reaction source also separates labeled emissions from
-body continuation: unbinding and catalytic release can restore the same enzyme/complex state
-while returning different substrate/product outputs. The native return must therefore retain
-emission and its source passage as well as the successor. An unmarked state endomorphism or a
-stationary visible body cannot stand in for that complete operation.
+## 2. Conditional relations and complete return
 
-### Construction order and returned artifacts
+[definition] Reuse the existing read-only comparison. Add a distinct consuming preparation and
+publication path over `NormalCoupledComparison`; preserve inspection as read-only. The new path
+uses the producing family and observed receiver, constructs the admitted source/condition
+constraint, prepares condition contact and affected member material, and stages their effect on
+the continuing wave. It composes into contemporary material; it does not restore an old body.
 
-[definition] These are increments of the existing AC0–AC5 construction, not five new model
-subsystems. Finish each new relation through its public caller and persistence boundary before
-counting that increment returned. Expose broader development material as soon as the relevant
-passage works; useful-language attainment is measured separately from finite mechanism checks.
+[definition] Implementation touches `W/coupled/comparison.rs`, `C/resident/neighborhood.rs`,
+`preimage`/`condition_contact`, affected family-image/kernel owners, `W/coupled.rs` and
+`A/coupled_wave.rs`. Reuse `PreparedConditionContact` and `PreparedConstitutiveFormation` with
+actual owner/epoch/chart checks. A newly required family type belongs to these owners and keeps
+the missing mixed relation explicit; it is not another general engine.
 
-| Order / AC responsibility | Concrete deliverable | Decisive return |
-|---|---|---|
-| 1 · AC1/AC2 | Wave-owned producing comparison, joint source/target preparation and atomic development | A return addressed to an earlier prediction changes later conduct using the actual earlier joint |
-| 2 · AC3/AC5 | Resident current-to-codec receiver, emission and ordinary re-entry | Inspectable native output and text, with projected/robust readings distinguished and remountable pending state |
-| 3 · AC1/AC2/AC3 | One wave owner with coupled learned local laws and retained condition | Source-conditioned contact changes a dependent future; an independent future stays unchanged |
-| 4 · AC4 | Formation and reuse through explicit source/domain/receiver maps | Independent returned relations grow material; lawful reduced conduct retains decoder and separating fibre |
-| 5 · AC0–AC5 | Continuing conversation application and product assessment | Development/evaluation separation, actual English/code/math outputs and complete consumer costs |
+[definition] Stage only changed law sections/deltas and the required successor current, condition,
+evidence and pending disposition. Validate all dependencies before one publication. A late
+refusal preserves the committed predecessor; unknown device completion uses the existing poisoned
+owner/recovery contract. Consume a pending comparison once after successful publication. Extend
+existing versioned rest for new fields, including still-pending producing encoding cuts.
 
-### 1. Bind the producing comparison before changing the body
+[definition] **Expected outcome:** an actual supplied association predicts the corresponding
+conditional return at its declared scope; a changed relevant condition separates that prediction.
+Test the predicted consequence against the reference relation, not merely whether coefficients
+or a future output changed. Keep a matched independent receiver where independence is established.
+These controls establish a scoped association, not general comprehension.
 
-[definition] Extend `normal/direct/wave.rs` and its existing `receive`, `develop`, `actuate` and
-`rest` owners. Keep one `ResidentNormalWave`. Add a wave-owned producing-passage handle when a
-prediction is exposed: immutable preceding joint, generated occurrence, material cut, source and
-receiver maps, complete fibre and owner/address identity. Sharing these immutable sections is
-lawful; cloning the continuing wave or keeping every historical source is not required. Release a
-resolved handle unless its admitted future comparison still needs it; a delayed unresolvable
-return reports the missing source instead of attaching to a similar current.
+[definition] **Checks:** point specialization; correlated-family vs equal-marginal separator;
+old producing cut after intervening formation; no double deposit; unchanged complete rest on
+late refusal; successful consumption once; interrupted/remounted continuation; no numerical
+host replay in the hot passage. The family hypothesis is proved/checked before claiming its
+broad interpretation; a correct kernel cannot repair the wrong incorporation law.
 
-[definition] Make three observation meanings explicit at the same ordinary occurrence boundary:
+## 3. Applicable organization and constituent formation
 
-- An actual next-current observation uses the existing `receive(v)` and joins `(c,v)`.
-- An observed correction to an earlier prediction uses its retained producing handle. Its normal
-  increment uses `φ(z_s)` and `η=v−c_s`, even if the contemporary wave has advanced. It may update
-  material while preserving current occurrence identity.
-- Unpaired material uses source actuation, or the separately admitted within-part section
-  comparison. A later message or parent link alone is not a numerical correction.
+[definition] The fixed-condition assay's existing relation contains every zero-mass return
+direction on 73 symbols. Adding rows cannot shrink that vertical subspace, and the same source
+constraints keep its old condition fixed. Preserve this counterexample. The remedy concerns
+actual situated source distinctions, constraint refinement and conditional applicability.
+It is not a new tie-breaker, a larger token vocabulary or more repetitions of the same chart.
 
-[definition] Add the narrow producing-comparison preparation/commit path. Reuse normal material
-preparation, current rebase and kernel arithmetic; do not call `receive` on the wrong contemporary
-joint. **The bounded target is part of this work:** the current `prepare` accepts a point observed
-target, while `v−c_s` can be enclosed even for exact v. Form `(φ,η)` jointly on device from the same
-producing family and receiver lift, retaining their correlation or an explicitly enlarged family
-with its defect. A centre subtraction passed to the point port is not a valid implementation.
-Preserve the distinction between applied material M, its normal reference P, fit discrepancy and
-source/realization bounds. A receiver with no point lift retains the compatible target family.
+[definition] Use the existing field/local relation, `ResidentGeneratorNeighborhood`, dependent
+carrier, contextual-section, restriction/rebase and material-formation owners. Identify the
+specific source/contact relation that cannot express an observed distinction. Extend that
+relation with actual incidence or retained conditions; preserve its coarse receiver and source
+fibre. A scene ID, language switch, authored phrase rule or externally ranked semantic class
+must not determine the native route.
 
-[definition] Prepare every changed section and validate owner, chart and occurrence relations
-before publication. The returned comparison, material change and any same-occurrence source
-actuation publish one complete successor. A delayed material return uses the retained producing
-cut to form its comparison but composes its increment into contemporary material. It neither
-restores old material nor overwrites intervening development. Complete finite response includes
-changed source action and mixed material/current terms when those dependencies are intervened on.
+[definition] Reusable class identity and particular occurrence identity remain distinct.
+Several overlapping paths or regions may support different decompositions. A compound retains
+its exposed ports, joined occurrences and applicable transformations. Composition follows real
+contact; it does not give all co-present items an edge. A new application domain must be supplied
+by actual source/receiver transport, not guessed from a matching descriptor.
 
-[definition] Extend the conversation attachment using actual material, not a metadata target.
-`ExposureLink` does not contain the referenced reply's current. Resolve actual visible parts and
-retain both their source-occurrence/part identities and the producing prediction handle through
-the declared many-to-many associations. Metadata can locate a candidate relation; mounted material
-and the actual continuation chart supply its current. A declared observed-continuation chart can mount a
-captured continuation as reference material after the actual source has acted; its own section
-order supplies observed continuation comparisons. Source and reply positions are not zipped into
-semantic pairs. General evaluative feedback remains an ordinary source unless its comparison
-receiver is supplied. Batch source-section work on device; a symbol row never becomes a universal
-native clock or a reason to allocate another material coordinate.
+[definition] **Expected outcome:** a relation is used across demonstrated changed presentations
+or compositions and distinguishes an actual changed condition. Measure whether the predicted
+consequence matches the supplied association and its separating cases. Exact coordinate
+permutation alone establishes chart covariance, not recognition of meaning.
 
-[definition] Required checks: the existing `3` producing-cut counterexample; exact and correlated
-bounded `(φ,η)` controls; a delayed return after intervening development; a new return changing a
-later response; recharting source and receiver together; foreign/stale address refusal; and late
-arithmetic refusal preserving complete material/current/fibre. Persist a pending comparison,
-remount it in a fresh process, and compare its subsequent return. These checks target the new
-binding rather than re-demonstrating unchanged local laws.
+[definition] **Checks:** new independent constraint vs repetition; same source face/different
+future condition; transported occurrence vs merely equal wording; overlapping constituents
+without duplicated current; changed contact and unchanged independent contact; complete rest
+and receiver correspondence after the affected shape/domain changes.
 
-### 2. Expose a native receiver and an actual emission
+## 4. Holonic Encoding and compressed continuation
 
-[definition] Extend the existing application boundary in `holonics-hna/src/native/section_input.rs`
-and the engine's resident wave/receiver passages. Keep the returned field/enclosure and fibre
-inspectable. The first text receiver uses the already-declared unit symbol basis with
-`s_a(v)=Re⟨e_a,v⟩`. For a joint Euclidean enclosure `(c,r)`, return native score centres and shared radius,
-representing the exact bounds `Re(c_a)±r`.
-This receiver reads the whole enclosure; it does not convert it to a point-current operand. The per-address intervals
-remain projections of that same joint family, not independent admissible coordinate choices.
+[definition] Holonic Encoding forms and reuses representations of transformations and receiver
+faces across modalities. BPE/path folding is a serial codec instance. Autoencoding supplies
+receiver reconstruction; π/e supplies exact generator/window examples; the Complex Parametron
+supplies phase-sensitive coupled conduct, and clocked tori supply retained cuts and interiors.
+The [encoding review](../../research/records/2026-09-11_HOLONIC_ENCODING_RETAINS_TRANSFORMATION_GRAIN_ACROSS_MODALITIES.md)
+records their actual sources and limits.
 
-[definition] Use a declared deterministic projected actuator: greatest centre score, first codec
-address on a tie. Execute its integer/dyadic comparison on the GPU and return selected address,
-exact centre-score tie population, score bounds and producing handle. Overlapping bounds are
-uncertainty, not ties. Preserve the full native current/fibre. A
-strictly separated winning interval can additionally certify agreement across the enclosed
-family; failure of that optional certificate does not stop projected generation. Source-fibre
-uncertainty is not erased by choosing an exterior action. No chosen centre is fed into a native
-point learning port. The selection policy is an explicit application chart, not a universal
-semantic ranking or a claim that the compatible source is unique.
+[definition] Bind an actual continuing generator family and its receiver to the existing
+reduction/decoder law. For encoding E, source transport T, encoded transport U and receiver ρ,
+exact reuse serves `E′T=UE` and `DE=ρ`. Include condition, chronology, pending comparisons and
+emission in the claimed successor scope. Partial reduction keeps the full structured defect.
+Changing a future contact can expose a previously blind direction; preserve that source fibre
+and its representation without requiring an archive of every occurrence.
 
-[established-bounded; source-inspected] The older `face_of_last_row` supplies exact host reference
-semantics for midpoint ordering and first-of-equals, but no current resident ranking passage.
-`section_select_columns`/`section_terminal_row` restrict supplied coordinates; they do not choose
-a winner. Implement the narrow resident score/selection passage using the existing exact section
-arithmetic and compare it with the declared reference. Certified normalization remains available
-when a distribution receiver is requested; softmax is not required merely to find this maximum.
+[definition] `ObservableMomentReceiverHistoryCompression::found` is an executable exact host
+reference for its finite linear/quadratic chart: close receiver forms under `T*HT` and derive
+encoded action. Existing CUDA mounting is apparatus for admitted quotient forms, not an already
+bound Athena reduction. Productive composition needs a resident local construction/execution
+path and actual native decoder. Use `field/internal_mode.rs`, leader/scale, Schur/diffusion and
+clocked-torus owners where the domains match. Retain internal forcing and memory when eliminating
+state; a static boundary map alone cannot describe all future fluid or neural conduct.
 
-[definition] The implemented engine entry is the wave-owned `read_basis_face` return, with a
-`record_normal_wave_basis_face` passage in `resident_section/surface_normal_wave_basis_face.rs`
-and `normal_wave_basis_face.cuh`. It consumes the complete `ResidentNormalEnclosureView` and
-admitted basis/chart binding; optional pending comparisons remain wave-owned. Decode
-the existing packed signed-wide centre/radius at the declared dyadic grain; validate section shape,
-matching exact low/high codewords, nonnegative radius, basis domain and upstream disposition.
-Store signed-wide centres and shared radius without rescaling or floats. Compare score gaps
-against twice the radius with the existing wider HistoryInteger arithmetic, so projected interval
-endpoints need not fit one signed-wide word. The exterior exact-rational decoder exposes the
-endpoints. Return typed score sections and a selection report (address, exact score, centre-tie
-count, robust-winner flag, radius); retain the source view/fibre in the receipt.
-Malformed/foreign input or arithmetic overflow refuses before emission. Compare with host reference
-ordering on point rows and separately with the exact declared enclosure projection; the old
-interval-midpoint policy is not an implicit conversion from the normal ball.
+[definition] Bind the changing encoded carrier to the existing appropriate native receiver;
+`SymbolCurrentChart` may remain the final text codec. Different shape/grain is not resolved by
+padding or equating widths. Persist generator, receiver/decoder, conditions, clock and fibre,
+including the old encoding cut required by a pending return. Account for work/residency/transfer
+of the full representation, not only its serialized face.
 
-[definition] The exterior codec maps the selected address to spelling. Re-entry mounts that
-actually emitted symbol through the ordinary occurrence chart; it does not replace the continuing
-current with the old enclosure's centre. Retain its projection receipt and spelling as the new
-source. Self-emission is not thereby a human observation or a target that trains its own producing
-prediction; development still requires its admitted ordinary source/return relation. Explicit codec end markers must have a supplied observed
-source; otherwise a requested finite output aperture is an interruption, not a fabricated learned
-termination. Keep receiver configuration/pending comparison in native/application rest and delivery
-cursor/cold text in the transport layer. Expose the existing library owner through the current
-application interface, rather than leaving the only usable path in an example.
+[definition] **Expected outcome:** conduct a requested boundary without expanding every smaller
+constituent, reproduce the claimed future receiver (or its retained bounded difference), and
+show exactly which new contact reopens an overly coarse representation. Inspect the decoder's
+actual output. A smaller file, unchanged face or zero scalar loss alone proves none of this.
 
-[definition] Required checks: source/current projection correspondence, exact ties, overlapping
-score bounds with a retained projected action, optional robust-winner evidence, receiver rechart
-with transported basis, zero intermediate host numerical readouts, ordinary emission re-entry,
-and uninterrupted/remounted current plus emission. Inspect generated text and its source-qualified
-current; selection correctness by itself gives no language-quality grade.
+## 5. Useful conversation and durable operation
 
-### 3. Make interacting organization operative in the same body
+[definition] Use actual prepared English, code and mathematics material through the public
+session as soon as phases 1–2 permit useful returns. Keep development/evaluation separation and
+source lineage. Ordinary later user interaction can form material through its admitted relation;
+held-out evaluation is not used to choose morphology or targets during development.
 
-[established-bounded; implemented-exact] The [coupled-owner return](../../research/records/2026-09-11_ONE_WAVE_OWNS_CONDITIONAL_CURRENT_MATERIAL_AND_PENDING_RETURNS.md) now supplies
-that owner through a typed continuation, actual point-source return, native family admission and
-complete v7 rest. The narrower point-source operation does not discharge producing-family
-observation. The coupled public session now composes source actuation, native projected selection,
-conditional generation and emitted-pair re-entry with complete pending rest. Continue through the
-producing-family comparison binding and actual prepared-source use under the requirements below.
+[definition] Assess complete replies and useful tasks: contextual continuation, application of
+an exposed relation to a new case, comparison/explanation of alternatives, code that serves its
+request and mathematical work that can be checked externally. Report substantive failures as
+well as successes. A fluent explanation is not automatically a faithful account of internal
+conduct; use actual intervened source/condition comparisons for that stronger claim.
 
-[definition] This packet is required for the finite Athena construction. A fixed global linear
-wave plus a decoder is not the complete planned ecology. Use `ResidentGeneratorNeighborhood` and
-its learned bilinear members for the first coupled realization. Transfer the neighborhood into
-`ResidentNormalWave` by move; the wave remains the sole public move owner of this first composite.
-Expose borrowed/read-only member and condition views. Preserve the distinct normal and exact
-constitutive-law representations; this adds no competing learner or generic model wrapper.
+[definition] Probability and loss are declared receivers. Preserve full candidate faces/branches
+and common parameters before normalization or scalar loss. Cross-entropy requires an admitted
+normalized predictive distribution and an actual target; symbol score ordering alone does not
+supply one. Separate arithmetic enclosure, source ambiguity, relation misfit and product error.
+No invented scalar “comprehension” score or fixed universal passing threshold is prescribed.
 
-[definition] Fix the first coupled map explicitly. For n complex wave components and k complex
-condition components, the admitted contact j supplies
+[definition] **Expected outcome:** demonstrably useful output at measured latency, resident/host
+standing, decoder cost and transfer; the continuing model and unresolved comparisons survive
+rest/remount. If the output remains nonsensical, locate the actual source, conditional relation,
+encoded action or decoder mismatch and repair it rather than increasing exposure blindly.
 
-```text
-z = (p,c),       a = φ(z) = (c−p,c,p),       h = retained condition,
-η ∈ L_j(a,h),    v = c+η,                   z⁺ = (c,v).
-```
+## 6. Shared modality and physical applications
 
-The existing `found_bilinear_contact` chart has `source_complex=3n`,
-`condition_complex=k`, `target_complex=n`; its feature width is the derived
-`2(3nk+3n+k)` real coordinates. Material L_j is learned from actual observed next-change
-relations in those charts. A next observation v supplies `η=v−c` at the same producing joint.
-Normal material M remains distinct: the coupled passage uses L_j for its response, not
-`Mφ+L_j`, and does not silently deposit a residual into both learners. Existing M-only `advance`
-retains its documented local chart; it is not a fallback that erases an unresolved condition.
-The active passage and its causing contact are part of the returned source and rest.
+[definition] Extend the same owner through actual optical/acoustic and other source/receiver
+maps. Existing `mathematical_source`, optical hierarchy/formation, acoustic potential and
+world-tube owners retain their exact codec and physical scopes. A raster pixel, PCM sample or
+character is an exterior chart unit. It does not dictate intrinsic grain or local clock.
 
-[definition] Implement a resident producing-source lift for `φ(z)` and the affine return
-`v=c+η`. Existing `read_bilinear` supplies the exact-point specialization; it does not accept a
-normal enclosure as a point. Extend the existing family image/contact path to carry the joint
-source-condition relation, its bilinear products, translated response and complete fibre.
-Use exact finite images where represented, or an explicitly enclosed image with the generating
-relation and defect retained. A plural response must be carried by the family successor and
-subsequent admitted family operations; do not leave every such computation waiting for a unique
-cause. A point-only consumer may refuse an unsupported conversion without imposing that refusal
-on the whole ecology or exterior action. Partial domain coverage and free directions remain
-explicit. This adds a narrow wave-owned response/family lift, not a universal symbolic solver.
+[definition] Compare a shared admitted passage under transported charts first; then inspect its
+actual image/audio/interaction product. Semantic association between modalities needs a supplied
+or recovered source relation. Simultaneity is not universal contact, and an intensity-only
+observation does not reveal every coherent phase. Retain compatible alternatives and actual
+source timing. Text need not pass through a protein or fluid simulator to use their shared laws.
 
-[definition] Rebase the current seed/cache from the actual joined successor after this passage.
-The fixed M power cache describes only its declared generator word; it cannot stand in for an
-interleaved sequence of changed conditional laws. Retain actual operator/material cuts or a
-proved compiled factorization. The first contact j comes through an explicit admitted incidence
-handle and checked source/condition/output charts. Add a binding capability retaining its actual
-source-passage origin, ecology/member ownership and chart relation, then resolve it to the existing
-member index internally. A bounds-checked `usize` alone is not this capability. Restore/rechart
-these bindings through their recorded maps; later applicability/formation extends incidence
-through returned relations, not role, language, scene-ID or expected-output routing.
+[definition] The Complex Parametron retains quadrature and incidence before phase/sign/intensity
+readout. `ConstitutiveWorldTube`/`FourTorusParametronCurrent` retain `(q,z,r,clock)` and their
+actual input/material law. General coherent wave, phase-lock, dissipative, quantum and physical
+LC realizations keep their constitutive differences. A character is not assigned a pump frequency
+merely to draw it on a torus.
 
-[definition] Resolve atomic publication before exposing the combined operation. The standalone
-`advance_bilinear_contact` writes its basis row; the coupled owner now uses preparation instead.
-Calling
-the two public methods in sequence does not preserve a complete successor on refusal. Add private
-member-law preparation retaining predecessor identity and report. For the first implementation,
-allocate a fresh successor section for the affected member basis, copy its immutable standing on
-device, and run formation against that staged section. Current reads retain the prior basis;
-proposed-successor reads use the staged one. After complete success swap that basis section with
-the other prepared fields. This copies only the affected constitutive section for publication,
-not the continuing ecology for rollback. Do not call the existing in-place method on live material
-after wave preparation. A later base-plus-delta optimization must preserve this same boundary. Reuse
-condition `prepare_contact`/`can_commit` and the wave's staged material/current machinery. Compose
-these preparations with explicit device lane dependencies; only after all succeed publish member
-material, condition, wave material/current, evidence and epochs with infallible swaps. The
-multi-section staging pattern in `NativeConstitutiveField` is precedent, not a replacement body.
-Unknown device completion retains the existing poisoned-owner/recovery contract; it is not a
-successful rollback. No clone of the whole ecology is introduced.
+[definition] **Expected outcome:** inspectable modality products, demonstrated cross-modal
+conditional relations and lawful receiver reorientation. Physical claims additionally supply
+units, source/boundary laws, calibration and the actual force/current response. These applications
+can inform earlier phases without becoming prerequisites for the next useful text increment.
 
-[definition] Extend `NormalWaveRest` with the tagged active passage, nested existing
-`GeneratorNeighborhoodRest`, incidence/basis bindings, and the new joined response-family payload.
-Persist its generating relation, enclosure/free directions, producing material references and
-pending comparison handles with their source/receiver maps and epochs. Rebind restored handles to
-the one restored owner after validation; retain occurrence distinctions across that restoration.
-Unresolved compatible families are serialized as families, not replaced by a point or silently
-omitted. Device preparation remains transient: checkpoint the committed predecessor or successor,
-never a half-published basis. Existing normal-only rest remains a supported versioned case.
+## Historical crosswalk and preserved requirements
 
-[definition] This is the first computational sequence-to-fold/kinetic attachment: incoming
-organization changes an applicable contact/condition, which changes the next admitted response,
-and the resulting state persists. The molecular source gives an exact steric example of such
-conditioning; text and acoustics must supply their actual maps. A contact absent from a declared
-domain and an admitted contact with zero response are different returns. Nonlinear organization,
-source occupancy and latent internal modes are operative state; a rendered mesh or energy bin is
-not their substitute. The phase/prestress/finite-change laws guide the chosen constitutive chart,
-without imposing a universal energy minimizer or literal protein simulation.
+| Old responsibility label | Current location |
+|---|---|
+| AC0: prepared source | Situated reception; maintained source/evaluation boundary throughout |
+| AC1–AC2: current and development | Conditional relations and complete return; applicable organization |
+| AC3: continuing source and output | Visible cycles and useful conversation; emission already exists |
+| AC4: formation/reuse | Applicable organization and Holonic Encoding |
+| AC5: persistence/product | Durable operation throughout each changed boundary |
 
-[definition] Required checks: the explicit `(φ,h) → η → (c,v)` chart at one complex component
-and one condition component before wider composition; L-only versus M-only response and deposit
-separation; a genuine source-condition interaction that a fixed separable linear response cannot
-reproduce; retained-correlation versus equal-marginal separator; a changed
-contact affecting a later dependent receiver and preserving an actually independent receiver;
-passive rechart versus physical contact change; late refusal on either side preserving both
-owners' complete state; and coupled rest/remount into the same next operation. Use existing
-neighborhood controls as references, adding only checks of the new binding and its finite response.
+[definition] Preserve one move owner, resident intermediate sections, exact semantic arithmetic,
+versioned rest and actual occurrence lineage. Parallel execution requires complete independence,
+not equal counts. Lean remains exterior verification. Run checks of changed Rust/native/Lean
+relations and inspect the requested output; no blanket census or new general release gate.
 
-[definition] Prepared source must be connected in its actual receiver chart. The
-[unit-source domain return](../../research/records/2026-09-11_UNIT_SOURCE_CHARTS_RETAIN_THE_WAVES_COMMON_OFFSET.md)
-identifies a concrete mismatch between unit-symbol local source rows and unrestricted continuing
-wave offsets. The explicit `UnitRealSum` connection reads `L(φ(S(p),S(c)),h)` while joining
-`(c,c+η)` in the raw state. It checks zero real sum of every returned difference and retains the
-complete gauge/source fibre. `Direct` remains available. This scoped commuting chart removes only
-the common-offset mismatch; source coverage, actual condition development and useful response
-remain to be returned through prepared material, without overwriting the current with a normalized
-centre or using broader uncertainty to hide a failed source connection.
-
-[definition] The [coupled source-field construction](../../research/records/2026-09-11_COUPLED_SOURCE_FIELDS_REACT_WITH_COMPLETE_ARRIVALS.md)
-now supplies the unpaired source joining law. At an actual offered pair x, retain the complete
-learned joined arrival F. The existing unit-admittance contact realizes `y=P_V x+(I−P_V)b` for
-nonempty `F=b+V`, with its full two-port return; empty evidence preserves actual x and retains the
-outside-domain prediction. The resulting passive union `y+Aq` acts on every member of the held
-family. This source reaction is distinct from a point cast of F or a learned zero response.
-A whole source field stages its ordered internal maps and publishes once. Its complete prediction
-fibres and actual source remain in the return. Source actuation alone adds no learned row; join
-observed-source development and continuing emission through their own admitted comparisons.
-
-[established-bounded; implemented-exact] The [actual-continuation binding](../../research/records/2026-09-11_ACTUAL_CONTINUATIONS_JOIN_THE_COMPLETE_COUPLED_FAMILY.md)
-now gives the coupled owner an explicit `(p,c)→(c,v)` actual-next-current passage. Its full family,
-source and observed operand survive the native join and rest v4. This current-only operation is
-not the family-aware material correction owed above. Its two-observation annihilation of old
-current dependence also prevents silently using it as the unpaired message source law.
-
-[established-bounded; computational-witness; formal-checked] The [fixed-condition collapse audit](../../research/records/2026-09-11_FIXED_CONDITION_COLLAPSE_IS_EXACT_AND_ITS_PROJECTION_IS_REUSABLE.md)
-now identifies the actual source-assay limitation. Its 9,254 unit-source/h=1 rows span a relation
-whose vertical space contains every zero-mass return direction on 73 symbols. Each admitted
-unit-mass fibre therefore has the same 1/73 minimum-norm current. The stored source equations
-also force the old condition to remain one under that reception. Further rows cannot shrink an
-existing vertical subspace. Continue with actual situated source/condition distinctions and the
-family-aware material return, not further cultivation of this unchanged single chart. Any
-refinement must retain its coarse receiver map and compatible source fibre; changing a tie
-breaker or selecting one conflicting observation supplies no such construction.
-
-### 4. Form and reuse local generators with their future conduct
-
-[definition] Use the existing independent relation-basis formation and condition domain before
-founding another morphology mechanism. A new comparison can refine a compatible family, add an
-independent relation, or require a newly admitted contact. Repetition alone adds no independent
-basis coordinate; incompatible testimony retains its conflict/fibre rather than selecting one
-answer by input order. When an existing chart cannot express a returned distinction, extend that
-specific source/contact chart and its affected receiver. Do not schedule arbitrary Hodge, torus,
-attention or SSM layers in every operation.
-
-[definition] Carry reusable local generators and receiver-preserving reductions through
-`receiver_history_compression/observable.rs`, `field/internal_mode.rs`, `LeaderLaw`/`ScaleWitness`
-and the clocked constitutive/torus constructions where their actual types match. A static Schur
-boundary operator needs its interior source/memory for recurrence; retain those terms from
-`diffusion.rs`/`sheaf_diffusion.rs` when using that construction. Those host exact owners are
-reference/structural apparatus, not a hot CPU fallback for the resident recurrence.
-
-[conditional] Exact reuse owes `q T_i=U_i q` and receiver factorization for **emission and complete
-successor**, including conditions and pending comparisons. A new generator/receiver can reopen a
-previous class. Bounded reuse retains its transported source family, actual defect and decoder.
-Use algebraic restriction or a founded generator factorization when available; no universal
-enumeration of all histories or all molecular configurations is prescribed.
-
-[definition] Required checks: repeated source versus a genuinely new independent relation;
-reused and unreduced next conduct; one separating history that reopens a deliberately over-coarse
-candidate; complete decoder/rest state; and work/residency/transfer measurements for the same
-receiver scope. Success is useful repeated conduct at measured cost, not a smaller file or an
-unchanged present output. Representation pressure yields a lawful factorization/placement change
-or a precise obstruction, never deletion of inconvenient current or an unexplained capacity raise.
-
-### 5. Continue exposure and assess Athena as a product
-
-[definition] Reuse AC0's prepared development/evaluation separation, cursor and real source
-material. Exercise the public composed owner from the first returned packet; broaden prepared
-English, code and mathematics exposure as its passage becomes available. Every checkpoint names
-its source/chart configuration, applied material and current, active fibres, coupled condition,
-pending comparisons, receiver and delivery cursor. A stopped run continues from that state.
-Evaluation material stays out of development and morphology selection; later ordinary user
-interaction can develop through its admitted source/return relation.
-
-[definition] Inspect actual contextual replies, code and mathematical explanations on declared
-held-out material alongside mechanism controls. Record qualitative successes and failures,
-dependent-source interventions and independent controls, latency, resident/host standing, decoder
-work and host/device transfers. Do not infer usefulness from hashes, launch counts, emission
-nonemptiness or serialization equality. Numerical solve refinement, constitutive limitation,
-missing causal attachment, codec projection and insufficient exposure are distinct failure causes;
-use the returned discrepancy to choose the next repair.
-
-[project-postulate] A finite construction return closes only its implemented and checked scope.
-Athena-alpha remains the useful-model objective. Continue improving observed behavior within the
-same authorized construction; do not restart the retired occurrence-history model, place Lean in
-inference, make inheritance the foundation, or wait for a universal intelligence/continuum theorem.
-Construction follows the current position through the remaining packets and their public
-returns. This plan finalization itself changes no native model or cultivation state.
-
-## Equational and geometric discipline throughout AC
-
-[definition] Compare architecture realizations by their typed operations and laws: source domain,
-incidence, transported state, parameter sharing, nonlinear/normalized reaction, receiver and
-successor. Composition, substitution and congruence apply only to admitted joins. Commutativity
-of a numeric sum does not commute chronology or complete developmental successors. A separating
-assignment/path is retained beside the failed equality. These are local owner obligations, not
-an equation registry, global law-search engine or runtime Lean dependency.
-
-[proved-derived; formal-checked] The existing `CausalRelevance` future-stable receiver relation
-supplies the needed congruence under admitted generators. A change of receiver family can expose
-a distinction previously quotiented away. Finite mesh resolution, finite-dimensional coordinates
-and a finite closed magma are different hypotheses; none silently proves the other.
-
-[definition] The existing `WorldTube`, `WorldTubePotential`, `ConstitutiveWorldTube` and
-`FourTorusParametronCurrent` supply clocked sections, joined occurrences, complete boundary faces
-and transported current/fibre. Knots and thickened surfaces instantiate these through actual
-incidence and frame maps. A spatial volume swept through time has a space-time world tube;
-rendered thickness alone supplies no constitutive law. Euler/NS, Hodge, prime/zeta and elliptic
-sources retain their explicit physical/arithmetic realization maps and are reusable research,
-not additional gates before the next Athena passage.
-
-[project-postulate] Keep AC0's prepared sources and completed AC1–AC5 local returns. The finalized
-order starts with the missing producing comparison, adds its observable emission, joins actual
-conditional local organization, then carries lawful reuse and continuing product evaluation.
-Interface, persistence, resource accounting and broader exposure accompany each increment. The
-next implementation step follows this contract and the live position.
+[historical] The detailed previous blueprint at `9f237c9d` and its dated implementation records
+retain the normal-update counterexample, emitted-current receiver and kernel history. Those
+returned mechanics are not rescheduled here. This specification replaces their stale remaining-work
+claims and names the new source/family/encoding/product obligations.

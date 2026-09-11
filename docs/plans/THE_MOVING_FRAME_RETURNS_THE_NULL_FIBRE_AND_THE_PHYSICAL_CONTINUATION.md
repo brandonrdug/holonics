@@ -1,82 +1,39 @@
-# The moving frame returns the null fibre and the physical continuation
+# Holonic Fluid Dynamics: moving frames, retained interiors and continuation
 
-[project-postulate] **September 8 continuation:** the
-[complex-chart and folded-dynamics return](../../research/records/2026-09-08_COMPLEX_FLUID_CHARTS_RETAIN_THE_FOLDED_CURRENT_AND_THE_RECEIVER_BOUND.md)
-now directs the next MFR3 passage. Instantiate the complex-bilinear Euler/NS source as two
-coupled real fields through existing momentum, pressure, oriented-current and mild/Duhamel
-owners. Retain the real-projection defect `Leray((b.grad)b)`, then apply the existing MVT/squeeze
-receivers to a declared remainder and changing reconstruction map. Folding may return memory
-and spectral kernels. Real space with complex values, Fourier representation and complex spatial
-coordinates retain their distinct operators/domains. The official-statement concern remains a
-research hypothesis to test through its actual clauses, not a reason to suppress complex research.
+[definition] This is the detailed fluid source/residual contract within the
+[Reality of Difference programme](THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md).
+[The roadmap](THE_ROADMAP.md) alone orders work and [construction state](../../CONSTRUCTION_STATE.md)
+records position. MFR labels below remain source coordinates into that research, not a competing
+Athena campaign.
 
-**Founded:** Brandon's 2026-09-04 request to combine Tao's singularity strategy, chart-relative
-nullity, the RH line and the mathematical purpose of Holonics into a research strategy.
-**Current focus:** Brandon's September 5 correction directs complex Euler, Navier–Stokes,
-temporal evolution and their existing entropy/action, oriented cross-current and heat-diffusion
-relations. Direct RH research is deferred; its completed source and formal standing remain usable.
-[project-postulate] Brandon's September 8 instruction now prioritizes the
-[external NS/Euler review and AC1 generator diagnosis](../../research/records/2026-09-08_THE_NS_EULER_REVIEW_EXPOSES_THE_GENERATOR_GAP_IN_AC1.md)
-within the subsequent [framework breadth review](../../research/records/2026-09-08_HOLONICS_REJOINS_CLASSICAL_LEARNING_REFLECTION_PACKING_AND_COMPRESSION.md).
-NS supplies reusable mechanics alongside the existing classical learning, reflection, packing
-and compression work; its endpoint is not a prerequisite for neural production. Compare the actual correction and
-terminal-jet arguments with the source/residual owners below. The first exact shear-generator
-return does not close the pressure-matching candidate or the singularity endpoint.
+[project-postulate] The September 11 direction names the common programme **Holonic Fluid
+Dynamics**: complex/current fields, situated incidence, constitutive transport, pressure and
+memory, local clocks, receivers and retained interiors. Points may be receiver faces of tori or
+other extended sources; the actual source-to-face map and later contact must remain available.
+Local regularities and gap statistics are receiver faces of that structure. Their source laws
+and residuals supply the useful comparison, rather than a scalar statistic replacing the field.
 
-**Position:** MFR0 strategy deposited; Brandon subsequently activated this plan as the standing
-mathematical goal. MFR1's scalar moving-frame/endpoint and MFR2's folded-source returns are
-complete; MFR3's source-specific fluid concentration conditions are in progress.
-**Authority:** [the roadmap](THE_ROADMAP.md) alone orders construction;
-[the position](../../CONSTRUCTION_STATE.md) records completed work. The
-[MFR1 record](../../research/records/2026-09-04_MFR1_THE_MOVING_FLUID_CHART_RETURNS_ITS_PDE_AND_ITS_PHYSICAL_ENDPOINT.md)
-and [MFR2 record](../../research/records/2026-09-04_MFR2_THE_FOLDED_SOURCE_RETURNS_EVERY_HEAT_TIME_WITH_A_GAUSSIAN_REMAINDER_AND_ZERO_COUNT_RECEIVERS.md)
-state their returned scopes. The
-[MFR3 progress record](../../research/records/2026-09-04_MFR3_THE_PERIODIC_SOURCE_REJECTS_FIXED_PROFILES_AND_RETURNS_ITS_ENERGY_AND_COHERENT_FEEDS.md)
-retains the first exclusions and controls; its
-[continuation](../../research/records/2026-09-04_MFR3_THE_COHERENT_SOURCE_REACHES_A_PHYSICAL_FIELD_AND_THE_LOCAL_FRAME_RETURNS_ITS_FLUX.md)
-returns physical reconstruction, local energy flux and a two-receiver modulated-core obstruction;
-the [radial continuation](../../research/records/2026-09-05_MFR3_THE_AXIS_RETURNS_ITS_RADIAL_PRESSURE_JET_AND_THE_UNPAID_SWIRL_REMAINDER.md)
-then constructs the first pressure correction of the replacement algebraic axis and retains its
-unpaid swirl coefficient. The
-[resonance return](../../research/records/2026-09-05_MFR3_THE_RESONANT_ROW_RETURNS_A_COMPATIBILITY_POLYNOMIAL_AND_TWO_AXIS_REPAIRS.md)
-continues the finite rows, exposes their compatibility polynomial, and returns two repairs of
-the first resonant row. The amplitude branch retains a free axial coefficient after mode 15.
-The [analytic and circulation return](../../research/records/2026-09-05_MFR3_THE_ANALYTIC_INVERSE_RETAINS_ITS_RESONANCE_AND_THE_CIRCULATION_DEMANDS_AN_EXTERIOR.md)
-then constructs its analytic inverse and homogeneous carrier, certifies a positive next
-sensitivity, and derives the circulation condition that the actual exterior must respect.
-The [second-resonance and moving-source return](../../research/records/2026-09-05_MFR3_THE_SECOND_RESONANCE_CLOSES_AND_THE_MOVING_SWIRL_RETURNS_ITS_VISCOUS_SOURCE.md)
-closes the full retained Euler rows through mode 28 and derives the actual viscous circulation
-source, physical reconstruction and a necessary leading shape current.
-The [forced-axis and inner-chart return](../../research/records/2026-09-05_MFR3_THE_FORCED_AXIS_RETURNS_A_VISCOUS_RESPONSE_AND_THE_INNER_CHART_RETAINS_PRESSURE.md)
-constructs that axis shape and first viscous response, derives the inner source chart and
-retains the pressure trace. A quadratic viscosity source remains. The
-[periodic-source return](../../research/records/2026-09-05_MFR3_THE_LOCAL_CORE_HAS_A_PERIODIC_REALIZATION_AND_ITS_PRESSURE_RETAINS_EXTERIOR_TORQUE.md)
-constructs a smooth periodic realization of the finite core with an actual local lifespan, and
-retains arbitrary pressure torque in the circulation law. An exact periodic pressure witness
-separates fields with the same finite local velocity jets. The
-[compact-cutoff return](../../research/records/2026-09-05_MFR3_THE_COMPACT_RADIAL_CUTOFF_RETURNS_A_PRESSURE_INDEPENDENT_RESIDUAL_OBSTRUCTION.md)
-then derives a pressure-independent positive residual for the explicit radial completion and its
-affine viscosity response, changing the next attempt to an anisotropic source chart. The
-[anisotropic-source return](../../research/records/2026-09-05_MFR3_THE_ANISOTROPIC_FRAME_RETURNS_ITS_PRESSURE_METRIC_AND_RADIAL_VISCOUS_CLOCK.md)
-constructs that actual source and its radial viscous clock, retaining the pressure metric,
-tensor diffusion, energy law and physical reconstruction. The
-[axial-pressure return](../../research/records/2026-09-05_MFR3_THE_AXIAL_PRESSURE_MEAN_RETURNS_THE_COMPLETE_QUADRATIC_SOURCE_THROUGH_THE_MOVING_CELL.md)
-then derives the complete pressure mean from the actual quadratic velocity source and transports
-its derivative through the exact moving horizontal cell. The
-[viscous-core return](../../research/records/2026-09-05_MFR3_THE_VISCOUS_CORE_RETURNS_ITS_PERIODIC_STRAIN_SOURCE_AND_CUBIC_RESPONSE.md)
-constructs the regular Gaussian comparison and actual periodic source, then returns the complete
-cubic pressure deformation that must join the continuing profile. The
-[pressure-evolution return](../../research/records/2026-09-05_MFR3_THE_PRESSURE_TIME_SOURCE_RETURNS_THE_MOVING_QUARTIC_CHART_AND_RELATIVE_STRAIN_CURVATURE.md)
-then pays its actual time source and moving five-coefficient force, and excludes the same datum's
-fixed relative-strain trajectory at the second-time receiver.
-Later phase requirements are not asserted as results. The concurrent HNP campaign continues.
-**Grades:** per claim; written derivations, finite symbolic witnesses and kernel-checked returns
-retain their separate scopes.
+[definition] Continue the existing complex two-field Euler/NS source and its real-receiver
+projection defect; compose the mild/Duhamel representation with pressure and all mixed feedback,
+then derive a quantitative localized residual/tail and reconstruction result. The earlier
+moving scalar frame and folded all-time RH source are returned dependencies. Exact shear and
+finite pressure controls do not close a general nonlinear continuation.
+
+[definition] Prime-wheel gap interiors, prime-power phase transport, null-family polarity and
+folded ζ source/zero receivers now inform this shared investigation. They do not restart the
+separately deferred direct RH endpoint phase. The actual source/heat coordinate maps and global
+remainder obligations in section 8 remain standing. No fluid or arithmetic endpoint is a
+prerequisite to using a returned local construction in Athena.
+
+[historical] The earlier source/pressure/axis-resonance chronology is preserved in the dated MFR
+records and this file at `9f237c9d`; the source equations and detailed obligations below remain.
+The inherited HNP campaign is deferred. Native work follows the named phases in the Athena
+blueprint, under its current pause and latest direct instruction.
 
 ## 1. Purpose and the latest ruling
 
 [project-postulate] Holonics is a mathematical framework and ontology for situated objects,
-causal composition, information transport and physical realization. HNA is an executable
+causal composition, information transport and physical realization. HNN is an executable
 architecture within it. Mathematical investigation supplies reusable methods of constructing,
 comparing and explaining systems, including learning systems, biological models and physical
 phenomena. Its scope is not exhausted by the current neural product.
@@ -340,28 +297,22 @@ of calling the system passive. `RH/GlobalWeilFinishLine.lean` retains the additi
 explicit-formula, convergence and complete-separator obligations. A zero old gap requires
 the appropriate range/kernel shorting law, not division by zero.
 
-## 9. Construction order
+## 9. Detailed source and residual requirements
 
-[definition] Brandon's subsequent instruction activates this strategy as the standing goal.
-The roadmap carries the next construction; phase entries below specify required returns rather
-than asserting they have already been produced. MFR1 and MFR2 have independent mathematical owners;
-neither is a prerequisite to the other's first lemma.
+[definition] The roadmap supplies the order; the former MFR labels remain evidence coordinates.
+Moving-frame/clock construction and the folded RH source are returned prerequisites (MFR1–MFR2).
+The three remaining specifications are:
 
-| Phase | Required return | Failure that changes the next attempt |
+| Construction | Required return | Failure that changes the next attempt |
 |---|---|---|
-| **MFR0 — strategy** | This source-grounded design, scope correction, exact scale/clock derivations and retained counterexamples | A missing owner or invalid calculation must be repaired in the design |
-| **MFR1 — fluid rescaling and endpoint** | Compose `OpenPeriodicSolutionOn` with the moving scalar/matrix chart and physical clock; derive the actual normalized PDE, period/pressure transport, inverse-domain law, and sufficient finite-time divergence receiver | An omitted Jacobian, zero fibre, boundary current, or uncontrolled clock falsifies the proposed transport; no new wrapper may conceal the missing law |
-| **MFR2 — folded RH source** | Extend the existing kernel/event owners with the half-line all-time expansion, compact-uniform remainder, then justified derivative/zero-count receivers | A failed integrable majorant or missing reflection/limit interchange narrows the decomposition; the whole-line divergence theorem remains standing |
-| **MFR3 — locating admissible fluid conditions** | Use MFR1 to derive source-specific exclusions and surviving modulated families; instantiate the actual pressure/triad and coherence-defect relation before numerical search | Energy/viscosity/critical-norm conflict or wrong periodicity rejects the family with the violated equation retained |
-| **MFR4 — residual and stability** | One specified family, approximate profile and complete residual, quantitative linear/nonlinear control, then an exact solution and physical endpoint if the stability threshold closes | Return the actual unstable mode, tail, pressure coupling or residual term; repair the family at that relation |
-| **MFR5 — arithmetic sign (deferred)** | Use MFR2 to derive a source-specific positive form or a separating negative direction; compose a returned positivity theorem with the complete Weil or Foster passage | An unsigned cross term, unresolved range condition, or absent global limit is the next analytic task |
+| **Complex fluid source (MFR3)** | Actual two-field pressure/triad dynamics, generated modes and complete resolved/hidden feedback on a declared interval | Wrong pressure, periodicity, source or clock; retain the violated equation and revise that construction |
+| **Residual and reconstruction (MFR4)** | Quantitative residual/tail and linear/nonlinear stability comparison for the specified source, with its physical reconstruction | Return the unstable mode, memory contribution, boundary term or failed estimate rather than another assumed bound |
+| **Arithmetic sign endpoint (MFR5, deferred)** | Source-specific sign/positivity or a separating direction, composed with the complete Weil/Foster and global limit passage | Retain unsigned cross terms, range defects and missing convergence; gap statistics alone do not pay these conditions |
 
-[definition] MFR1 returned the varying scalar length/amplitude chart with a moving centre.
-MFR2 returned its folded source, uniform remainder, derivatives and retained zero-count passage.
-MFR3 is the current construction. The later ansatz and sign phases are adaptive
-research: their models and estimates are determined by the preceding source returns. They do
-not authorize an unbounded simulation, a new general search subsystem, or a claimed solution
-assembled from assumed stability/positivity fields.
+[definition] The first two are adaptive source work: actual returned equations and failures
+choose the next construction. The shared arithmetic gap/phase comparison can inform them while
+the direct sign endpoint stays deferred. No unbounded simulation or new general search engine
+is prescribed. The standing source returns below locate the concrete mathematical dependencies.
 
 [proved-derived; formal-checked] MFR3's first return excludes a nonzero globally stationary
 exponential profile using actual periodicity and pressure; binds the energy exponent condition
@@ -589,9 +540,9 @@ residual work would move MFR4's task into MFR3.
 
 [interpretation] A successful mathematical operation becomes reusable material when its source,
 chart, hypotheses, full defect, successor and reconstruction can participate in another problem.
-A biological or learned system can reuse the frame, residual or continuation method after its
+A biological system or HNN can reuse the frame, residual or continuation method after its
 own constitutive mapping is supplied. This is how the mathematical framework can improve the
-construction of learning systems, while those systems can assist the next investigation.
+construction of conditional and generative HNN conduct, while those systems can assist further investigation.
 The source-specific PDE or arithmetic inequality is the part that does not transfer for free.
 
 [project-postulate] Treating information as physical makes locality, admissible transport,

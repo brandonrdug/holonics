@@ -1,5 +1,9 @@
 # Conversation data integration
 
+[definition] Role: completed preparation contract and maintained input boundary. The active
+Athena source/part attachment is specified in its blueprint; the ordered preparation below
+is historical scope, not a request to rerun or rebuild the dataset. The roadmap governs.
+
 **Authority:** Brandon's September 6 request to integrate/synthesize the foundation and refine
 Claude Code/Codex conversation material. **Status:** completed data-preparation and curation pass. This does not
 reactivate the inherited-first training campaign or schedule a model-training run.

@@ -81,8 +81,10 @@ fractal-packing and compression constructions before declaring missing theory or
 mechanism. The [formal framework](docs/FORMAL_FRAMEWORK.md) unifies elementary patterns already
 engaged in specific instances; lead with that recovery and composition when generalizing their
 laws, rather than presenting already-engaged subjects as newly discovered research directions. The [framework synthesis](docs/MATHEMATICS_AND_NATIVE_CONDUCT.md) connects their actual
-owners and scopes. Brandon has resumed the AC0–AC5 completion goal and directs flexible
-construction with transparent failures; the roadmap carries the current step. A universal intelligence theorem or a Millennium solution is not a prerequisite for
+owners and scopes. Brandon's Athena completion objective remains standing; the September 11
+plan consolidation uses named phases, with AC0–AC5 retained only as historical responsibility
+labels. Construction carries transparent failures; the roadmap carries the current step.
+A universal intelligence theorem or a Millennium solution is not a prerequisite for
 using already-derived local mechanics in a productive construction.
 
 [project-postulate] Use **HNN — Holonic Neural Network** in current prose. Preserve existing
@@ -223,6 +225,10 @@ engine.
 - A probe stays a probe unless the user or admitted contract makes it an acceptance condition.
   Do not grade qualitative usefulness from a hash, unchanged surface, nonempty output or test
   count. Inspect the requested product itself.
+- A changed current or later standing establishes causal response, not a qualitative “learning”
+  result. Name and observe the conditional association, applicability, composed consequence,
+  reconstruction or predictive usefulness actually claimed. Local regularities retain their
+  source population, receiver, conditions and chronology.
 - Experiments use the standing body and public owners. A driver may mount inputs and read results;
   it may not manufacture the desired answer, select developmental material from an evaluation
   target, or implement a fixture-local learner.
