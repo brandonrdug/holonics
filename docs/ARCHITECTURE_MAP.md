@@ -48,6 +48,7 @@ phase, geometry, physical boundaries and computation at their declared scopes.
 | Oriented incidence, coupled response and phase-bearing holons | `Physics/CoupledIncidence.lean` | `Millennium.HolonicComplexParametron` forwards the import |
 | Quadratic port dynamics and retained heat | `Physics/PortEnergyHeat.lean` | Chain-rule storage/source/dissipation balance; nonnegative conductance and explicit heat law |
 | Complex scattering power and attenuation return | `Physics/ScatteringWaveHeat.lean` | Two-port norm preservation and complementary heat; finite constitutive channel |
+| Phase-connected contact, reorientation and intensity defect | `Physics/PhaseContactPassage.lean` | Passive seam/heat and transported sum, gauge covariance, signed-cycle section and amplitude/intensity interpolation difference |
 | Observer stress, angular derivative jets and positive rest energy | `Physics/ReceiverStressEnergy.lean` | Both Lorentz indices, perfect-fluid and boosted dust/vacuum readings; mass-shell owner reused |
 | Complete finite change of incidence, material and internal state | `Physics/ConstitutiveModulation.lean` | New `Soma.Holonics.Physics.ConstitutiveModulation` theorems over the existing `coupledResponse`; formal-only |
 
@@ -795,6 +796,14 @@ adds exact annular braid geometry, triangular embedding checks and finite wave/h
 `verify_stress_waves.py` compares the returned packets to their actual source evolution.
 `knot-scenes.json` is the exterior Typst/SVG packet; its optional dyadic entropy enclosures retain
 their error radius and do not round the source current or geometry.
+
+[established-bounded; source-inspected] The [woven ecology return](../research/records/2026-09-10_WOVEN_FIELD_ECOLOGIES_RETURN_OPTICAL_HORIZONS_AND_REMOTE_CONFORMATION.md)
+composes `woven_ecology.py`, `woven_bridge.py`, `constitutive_lobes.py` and `ecology_details.py`
+in that same exterior directory. These own the radial tetrahedral receiver, witnessed torus
+contacts, supported shorts embedding, and finite remote conformation response.
+`verify_woven.py` checks their source/receiver binding; `verify_closed_receiver.py` checks the
+closed-boundary visibility option against the prior exact renderer. Native protein/constraint,
+Snell, conformation and constitutive owners remain the sources of their distinct relations.
 
 ## Maintenance law
 

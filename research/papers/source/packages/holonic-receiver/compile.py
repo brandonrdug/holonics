@@ -160,6 +160,7 @@ def remove_intervals(intervals):
 class Visibility:
     def __init__(self,triangles,cell=Q(1,2)):
         self.triangles=triangles; self.cell=cell; self.buckets=defaultdict(set)
+        self.bounds=[tuple((min(p[k] for p in t),max(p[k] for p in t)) for k in range(3)) for t in triangles]
         for i,t in enumerate(triangles):
             if wedge(sub(t[1],t[0]),sub(t[2],t[0]))==0: continue
             for address in self.addresses(t): self.buckets[address].add(i)
@@ -170,7 +171,11 @@ class Visibility:
     def intervals(self,p,q,own):
         candidates=set().union(*(self.buckets[k] for k in self.addresses((p,q))))
         hidden=[]
+        bounds=tuple((min(p[k],q[k]),max(p[k],q[k])) for k in range(3))
         for f in candidates-own:
+            box=self.bounds[f]
+            if box[2][1]<=bounds[2][0]: continue
+            if any(box[k][1]<bounds[k][0] or bounds[k][1]<box[k][0] for k in (0,1)): continue
             t=self.triangles[f]
             span=cover_interval(p,q,t)
             if span is None: continue
@@ -194,7 +199,7 @@ def level_segment(points,values,level):
 
 def compile_scene(vertices,faces,receiver=Receiver(),tau=Q(0),step=Q(1,8),
                   style='phase',potential='current',source=None,contours=True,bounds=None,currents=None,
-                  log_display_bits=None):
+                  log_display_bits=None,closed_outward=False):
     if style not in ('phase','mono','stipple'): raise ValueError('unsupported engraving style')
     if potential not in ('current','entropy'): raise ValueError('supply a declared receiver potential')
     if currents is None: raise ValueError('supply the actual complex current at every source vertex')
@@ -212,6 +217,19 @@ def compile_scene(vertices,faces,receiver=Receiver(),tau=Q(0),step=Q(1,8),
     # The present mesh API retains any unsupported straddling triangle explicitly.
     rejected=[i for i,f in enumerate(faces) if any(projected[v] is None for v in f)]
     active=[(i,f) for i,f in enumerate(faces) if i not in set(rejected)]
+    back_faces=[]
+    if closed_outward:
+        # Caller supplies a closed embedded outward-oriented boundary, viewed from outside.
+        # Its back faces cannot be the first opaque intersection of an incoming ray.
+        axis=cross(receiver.right,receiver.up)
+        eye=add(receiver.origin,mul(axis,receiver.distance/dot(receiver.view,axis)))
+        front=[]
+        for i,f in active:
+            a,b,c=(real[v] for v in f);normal=cross(sub(b,a),sub(c,a))
+            ray=sub(eye,a) if receiver.perspective else receiver.view
+            if dot(normal,ray)>0: front.append((i,f))
+            else: back_faces.append(i)
+        active=front
     triangles=[tuple(projected[v] for v in f) for _,f in active]
     visible=Visibility(triangles)
     amps=[receiver.amplitude(tuple(pair(v) for v in p)) for p in currents]
@@ -330,6 +348,7 @@ def compile_scene(vertices,faces,receiver=Receiver(),tau=Q(0),step=Q(1,8),
                           rank_deficient_projection_faces=[active[i][0] for i,t in enumerate(triangles) if wedge(sub(t[1],t[0]),sub(t[2],t[0]))==0],
                           log_station_radius=wire(max(errors,default=Q(0))),
                           log_display_bits=log_display_bits,
+                          closed_outward=closed_outward,back_faces=back_faces,
                           decimal_coordinate_error=wire(view_error),
                           visibility='exact rational affine/reciprocal-depth clipping',
                           color='premultiplied primaries P/(aperture+sum P); opaque marks on black'))

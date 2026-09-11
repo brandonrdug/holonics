@@ -29,9 +29,14 @@ finite tolerance from exact invisibility and topology change from loss of smooth
 
 ## September 10 receiver engraving and complex-current presentation
 
+[established-bounded; formal-checked; implemented-exact] The [woven ecology continuation](research/records/2026-09-10_WOVEN_FIELD_ECOLOGIES_RETURN_OPTICAL_HORIZONS_AND_REMOTE_CONFORMATION.md)
+returns exact field/overlap/conformation sources, phase-contact/gauge/intensity-defect proofs and
+the verified twenty-four-plate presentation. Three illumination ports, sixty-seven witnessed
+contacts, a supported shorts embedding, the remote-response ablation and two lossless animations
+are retained. The Physics build and exact source/receiver checks pass. Native AC remains paused.
+
 [established-bounded; formal-checked; implemented-exact] The [stress/current return](research/records/2026-09-10_STRESS_ENERGY_AND_SCATTERING_WAVES_RETAIN_THE_KNOT_AND_ITS_RECEIVERS.md)
-extends the receiver presentation to eighteen plates, retaining the earlier twenty-plate composition
-atlas. Three new Lean owners derive port energy/heat, complex scattering power, and observer
+supplied the preceding eighteen plates; the twenty-plate composition atlas remains preserved. Three new Lean owners derive port energy/heat, complex scattering power, and observer
 stress/angular-current returns; `ElementaryHolonics.Framework.Physics` builds. Thirty-four new
 packets are checked against rational knot/chain geometry, forced C³ material flow, finite complex
 wave/heat states and bounded entropy receivers. Three lossless animations retain five computed

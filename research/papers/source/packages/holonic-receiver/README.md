@@ -101,7 +101,7 @@ python research/experiments/receiver_engraving/build.py
 python research/experiments/receiver_engraving/relations.py
 python research/experiments/receiver_engraving/friction.py
 python research/experiments/receiver_engraving/finalize.py
-typst compile --root research/papers/source research/papers/source/papers/hnn-information-chemistry/main.typ research/papers/rendered/hnn-information-chemistry.pdf
+typst compile --root research/papers research/papers/source/papers/hnn-information-chemistry/main.typ research/papers/rendered/hnn-information-chemistry.pdf
 ```
 
 `build.py NAME ...` regenerates selected scenes. Common comparison viewports are fixed across
@@ -146,3 +146,34 @@ measurement controls denominator growth during clipping and changes neither
 source vertices, directional currents nor their evolution. The knot-wave figures
 use `N=20`; their complete source/measurement comparison is checked by
 `research/experiments/receiver_engraving/verify_stress_waves.py`.
+
+### Closed boundaries and the woven continuation
+
+`compile_scene(..., closed_outward=True)` is an optional visibility specialization
+for a closed outward-oriented real boundary, viewed from outside. A union of such
+opaque bodies is also admissible. Back faces cannot be the first ray intersection;
+the full source remains in the packet and `meta.back_faces` records the omitted
+population. The general two-sided path remains the default for open ribbons,
+nonorientable surfaces and unsupported geometry. The caller supplies the geometric
+certificate; the woven level surfaces derive it from their conforming tetrahedral
+atlas and oriented boundary. Exact depth/AABB rejection changes no visibility
+predicate. `verify_closed_receiver.py` compares the specialization and optimized
+rejection to the prior renderer, including a skew pinhole chart.
+
+The woven figures use the same packet-to-SVG backend inside Typst. Compile the
+current paper with `--root research/papers` so it can include those rendered vector
+faces. To regenerate only this continuation from the repository root:
+
+```sh
+python research/experiments/receiver_engraving/woven_bridge.py
+python research/experiments/receiver_engraving/woven_ecology.py
+python research/experiments/receiver_engraving/constitutive_lobes.py
+python research/experiments/receiver_engraving/ecology_details.py
+python research/experiments/receiver_engraving/verify_woven.py
+python research/experiments/receiver_engraving/verify_closed_receiver.py
+```
+
+Its source lives in `woven-scenes.json` and `ecology-detail-scenes.json`; it does
+not overwrite the earlier receiver or knot packets. The functions retain phase
+storage, source work, contact heat, material flow, exact tetrahedral level cuts and
+the difference between interpolated intensity and coherent amplitude.
