@@ -17,9 +17,12 @@ order or installing a DeepSeek architecture.
 
 [definition] The current [receiver edition](../research/papers/rendered/hnn-information-chemistry.pdf)
 uses the repository-local [receiver](../research/papers/source/packages/holonic-receiver/README.md)
-and [engraving](../research/papers/source/packages/holonic-engraving/README.md) packages. Its eleven
+and [engraving](../research/papers/source/packages/holonic-engraving/README.md) packages. Its eighteen
 plates expose complex source/current, projection and visibility, field-derived hatching,
 orientation, entropy, curved GR reception and shadows on white paper with black phase fields.
+The [stress/knot continuation](../research/records/2026-09-10_STRESS_ENERGY_AND_SCATTERING_WAVES_RETAIN_THE_KNOT_AND_ITS_RECEIVERS.md)
+adds prime knots, a chain, exact propagating wave/heat states, fluid/circuit and stress-energy
+diagrams, quantum/Feynman attachments, and three Lean energy/observer owners.
 The [twenty-plate composition atlas](../research/papers/rendered/hnn-composition-atlas.pdf) preserves
 the preceding Athena/Eros, layer, arithmetic, diffusion, manifold and source-return diagrams,
 with [editable companion source](../research/papers/source/papers/hnn-information-chemistry/composition-atlas.typ).

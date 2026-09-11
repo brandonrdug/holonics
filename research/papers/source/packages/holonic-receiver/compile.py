@@ -193,10 +193,13 @@ def level_segment(points,values,level):
 
 
 def compile_scene(vertices,faces,receiver=Receiver(),tau=Q(0),step=Q(1,8),
-                  style='phase',potential='current',source=None,contours=True,bounds=None,currents=None):
+                  style='phase',potential='current',source=None,contours=True,bounds=None,currents=None,
+                  log_display_bits=None):
     if style not in ('phase','mono','stipple'): raise ValueError('unsupported engraving style')
     if potential not in ('current','entropy'): raise ValueError('supply a declared receiver potential')
     if currents is None: raise ValueError('supply the actual complex current at every source vertex')
+    if log_display_bits is not None and (not isinstance(log_display_bits,int) or log_display_bits<1):
+        raise ValueError('positive integer precision for the exterior logarithm enclosure')
     if len(currents)!=len(vertices): raise ValueError('source/current incidence disagreement')
     if any(len(p)!=3 for p in vertices): raise ValueError('supply the declared C^3 geometric projection')
     if any(len(f)!=3 or len(set(f))!=3 or any(v<0 or v>=len(vertices) for v in f) for f in faces): raise ValueError('invalid triangle incidence')
@@ -220,6 +223,11 @@ def compile_scene(vertices,faces,receiver=Receiver(),tau=Q(0),step=Q(1,8),
             # Reference p=(1/3,1/3,1/3). Each family is a distributed
             # cross-entropy contribution -p_i log q_i at packet stations.
             logs=[log_interval(q) for q in probabilities]
+            if log_display_bits is not None:
+                # A declared exterior measurement enclosure, never a source-state rounding.
+                # Dyadic centers avoid carrying series denominators into geometric clipping.
+                scale=2**log_display_bits
+                logs=[(Q(x*scale//1,scale),e+Q(1,scale)) for x,e in logs]
             potentials.append(tuple(-x*receiver.reference[i] for i,(x,_) in enumerate(logs[:2])))
             errors.extend(e*receiver.reference[i] for i,(_,e) in enumerate(logs))
         else: potentials.append(amp)
@@ -321,6 +329,7 @@ def compile_scene(vertices,faces,receiver=Receiver(),tau=Q(0),step=Q(1,8),
                           near_face_details=[dict(face=i,depth_interval=[wire(min(receiver.distance-dot(receiver.view,sub(real[v],receiver.origin)) for v in faces[i])),wire(max(receiver.distance-dot(receiver.view,sub(real[v],receiver.origin)) for v in faces[i]))],reason='outside-near' if all(receiver.distance-dot(receiver.view,sub(real[v],receiver.origin))<=receiver.near for v in faces[i]) else 'straddles-near') for i in rejected],
                           rank_deficient_projection_faces=[active[i][0] for i,t in enumerate(triangles) if wedge(sub(t[1],t[0]),sub(t[2],t[0]))==0],
                           log_station_radius=wire(max(errors,default=Q(0))),
+                          log_display_bits=log_display_bits,
                           decimal_coordinate_error=wire(view_error),
                           visibility='exact rational affine/reciprocal-depth clipping',
                           color='premultiplied primaries P/(aperture+sum P); opaque marks on black'))

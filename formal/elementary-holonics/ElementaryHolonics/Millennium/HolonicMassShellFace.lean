@@ -103,9 +103,9 @@ theorem lorentzPairing_self_eq_faces (c : ℝ) (P : FourMomentum) :
   conv_lhs => rw [← P.timeFace_add_spaceFace]
   rw [lorentzPairing_add_add, lorentzPairing_timeFace_spaceFace, mul_zero, add_zero]
 
-/-- The dust face reading: density times the diagonal Lorentz reading of the carrier momentum.
-On the mass shell it returns the rest mass, which is what a stress-energy measurement at a face
-reports. -/
+/-- A dust-style algebraic face reading: density times the diagonal Lorentz reading of the carrier
+momentum. On the mass shell it is exactly `density * (m₀ * c ^ 2) ^ 2`;
+this scalar identity alone does not constitute a physical stress-energy measurement. -/
 def dustFaceReading (c density : ℝ) (P : FourMomentum) : ℝ := density * lorentzPairing c P P
 
 theorem dustFaceReading_massShell (c m₀ density : ℝ) (P : FourMomentum)

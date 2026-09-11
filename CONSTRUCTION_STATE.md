@@ -29,12 +29,16 @@ finite tolerance from exact invisibility and topology change from loss of smooth
 
 ## September 10 receiver engraving and complex-current presentation
 
-[established-bounded; source-inspected; computational-witness] The [receiver/engraving return](research/records/2026-09-10_RECEIVER_ENGRAVING_RETAINS_COMPLEX_CURRENT_AND_SUPERSEDES_THE_PAINTED_ATLAS.md)
-implements two local Typst packages and a shared exact-source SVG packet. The current eleven-plate
-presentation supersedes the painted rendering layer; the twenty-plate composition atlas remains
-a companion. Exact C³ flow/curl, receiver-rank, Lorentz/Wigner, Schwarzschild, hatch-flux and linked-contact
-friction/heat/complex-propagation controls return. Source comments about projective shadows are narrowed to their proved scope;
-no theorem body or native cultivation operation changes. AC implementation remains paused.
+[established-bounded; formal-checked; implemented-exact] The [stress/current return](research/records/2026-09-10_STRESS_ENERGY_AND_SCATTERING_WAVES_RETAIN_THE_KNOT_AND_ITS_RECEIVERS.md)
+extends the receiver presentation to eighteen plates, retaining the earlier twenty-plate composition
+atlas. Three new Lean owners derive port energy/heat, complex scattering power, and observer
+stress/angular-current returns; `ElementaryHolonics.Framework.Physics` builds. Thirty-four new
+packets are checked against rational knot/chain geometry, forced C³ material flow, finite complex
+wave/heat states and bounded entropy receivers. Three lossless animations retain five computed
+slices each. The physical fluid/circuit/GR/quantum coupling and tensile dark-sector comparisons
+carry their explicit constitutive scope; free fluid–elastic-body/GR feedback is not claimed.
+The earlier receiver/engraving packages and exact source fibre remain the presentation owners.
+Native AC implementation remains paused.
 
 ## September 10 equational and world-tube review
 

@@ -134,3 +134,15 @@ curl-vector chart. Three display primaries do not impose a three-dimensional sou
 complex interface-diffusion response. These use the same generic packet compiler rather than
 the polynomial-fluid generator. The internal contact image is an explicit receiver reconstruction
 of four boundary-node states; source statistics and the contact/energy laws remain in its receipt.
+
+### Bounded logarithm stations
+
+`compile_scene(..., log_display_bits=N)` optionally encloses each entropy logarithm
+at a dyadic center of denominator `2^N`. It adds `2^-N` to the existing rigorous
+series remainder before applying the reference weight. `meta.log_station_radius`
+retains the resulting bound; `meta.log_display_bits` declares the chosen chart.
+The default preserves the prior exact-series centers. This exterior receiver
+measurement controls denominator growth during clipping and changes neither
+source vertices, directional currents nor their evolution. The knot-wave figures
+use `N=20`; their complete source/measurement comparison is checked by
+`research/experiments/receiver_engraving/verify_stress_waves.py`.

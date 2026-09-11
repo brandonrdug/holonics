@@ -1,6 +1,9 @@
 import ElementaryHolonics.Framework.Dynamics
 import ElementaryHolonics.Physics.PhaseCarrier
 import ElementaryHolonics.Physics.CoupledIncidence
+import ElementaryHolonics.Physics.PortEnergyHeat
+import ElementaryHolonics.Physics.ScatteringWaveHeat
+import ElementaryHolonics.Physics.ReceiverStressEnergy
 import ElementaryHolonics.Physics.MechanicalReceiver
 import ElementaryHolonics.Physics.FluidReceiverClosure
 import ElementaryHolonics.Physics.ConstitutiveWorldTube

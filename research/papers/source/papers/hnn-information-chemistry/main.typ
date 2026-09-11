@@ -3,10 +3,10 @@
 #import "../../packages/holonic-receiver/lib.typ": receiver,primary-response
 #import "receiver-diagrams.typ": event-cone,pinhole,receiver-slice
 #let scenes=json("receiver-scenes.json")
-#set document(title:"HNN — Information Chemistry: receiver edition",author:"Brandon Duggan / Holonics",description:"Eleven plates: receiver-derived engraving, complex flow, orientation, entropy, causal frames and shadows.")
+#set document(title:"HNN — Information Chemistry: receiver edition",author:"Brandon Duggan / Holonics",description:"Eighteen plates: receiver-derived engraving, complex flow, orientation, entropy, causal frames and shadows.")
 #set page(width:320mm,height:210mm,margin:(x:15mm,y:12mm),fill:white,footer:context [
  #set text(size:8pt,fill:rgb("555555"))
- HOLONICS #h(1fr) INFORMATION CHEMISTRY · RECEIVER EDITION #h(1fr) #counter(page).display("1") / 11
+ HOLONICS #h(1fr) INFORMATION CHEMISTRY · RECEIVER EDITION #h(1fr) #counter(page).display("1") / 18
 ])
 #set text(font:"Libertinus Serif",size:11pt,fill:black)
 #set par(leading:0.55em,spacing:0pt)
@@ -212,3 +212,72 @@
 #note([*Exact finite propagation.* Four boundary nodes have unit thermal capacity and unit diffusivity at their actual spacing. Frictional power enters one declared port; the operator transports it along contact edges. $Psi$ is the complex diffusing response to transmitted tangential force, with its sum equal to the delivered impulse. It is a history receiver, not an additional uncounted mechanical energy store.])
 #v(3mm)
 #note([*Declared interface image.* Four fan triangles interpolate the boundary readings; the center is their mean, not a fifth dynamical state. Ink reads normalized impulse rate together with stored heat. The fixed receiver aperture is the per-node quarter-area $1/16$, and the field-level spacing is $1/256$. This internal receiver has access to the contact patch; the outer views on plate 10 do not pretend to see through opaque bodies. The finite interface law accompanies the C³ bulk constructions above without claiming a complete continuum fluid/contact solver.])
+
+#let knots=json("knot-scenes.json")
+#let knotfig(name,width:90mm,mode:"phase")=engrave(knots.at(name),width:width,mode:mode,line-width:1pt/2)
+#pagebreak()
+#title("12","The knot is retained while its measured face changes","Prime knots and an unknot are explicit closed polygonal carriers, with triangular transverse faces.")
+#grid(columns:(1fr,1fr,1fr),gutter:8mm,align:center,
+ [*Unknot · $0_1$*\ #v(2mm)#knotfig("unknot_0_mono",mode:"mono")\ $Delta(t)=1$],
+ [*Trefoil · $3_1$*\ #v(2mm)#knotfig("trefoil_3_1_0_mono",mode:"mono")\ $Delta(t)=t^(-1)-1+t$],
+ [*Figure-eight · $4_1$*\ #v(2mm)#knotfig("figure_eight_4_1_0_mono",mode:"mono")\ $Delta(t)=-t^(-1)+3-t$],
+)
+#v(3mm)
+#eq[$"convex spanning disk", quad op("closure")(sigma_1^3), quad op("closure")((sigma_1 sigma_2^(-1))^2)$]
+#grid(columns:(1fr,1fr),gutter:14mm,
+ [*A crossing is a measured difference in depth.*
+ #note([*Established-bounded.* Rational annular braid cells return exactly 0, 3 and 4 projected crossings. The generator checks every nonincident segment pair, the angular cell and the actual over/under sign. The prime labels and Alexander polynomials are standard identifications of these certified diagrams; they are not inferred from hue.])],
+ [*Thickness retains the actual joints.*
+ #note([*Established-bounded.* Rational transverse hexagons form a closed oriented triangular tube. All triangle pairs are checked for intersections beyond their shared combinatorial face, including coplanar joints. Each component has $chi=0$. The affine fluid map moves entire faces exactly; it cannot undo the knot.])],
+)
+#v(4mm)
+#note([The current Lean torus-slope owner proves coprime embedded circles and the quandle owner supplies local transport laws. Ambient knot classification is carried here by the explicit standard braid diagram and exterior exact checks. Source: #link("https://katlas.org/wiki/4_1")[Knot Atlas].])
+
+#pagebreak()
+#title("13","An impulse travels while the trefoil is perturbed","One causal source, two counterpropagating complex ports, a moving body, and an explicitly retained heat return.")
+#grid(columns:(1fr,1fr,1fr),gutter:6mm,align:center,
+ [*$k=0, t=0$*\ #v(1mm)#knotfig("trefoil_3_1_0",width:60mm)],
+ [*Joint face · $k=12$*\ #v(1mm)#knotfig("trefoil_3_1_12",width:60mm)],
+ [*Joint face · $k=24$*\ #v(1mm)#knotfig("trefoil_3_1_24",width:60mm)],
+ [*Impulse difference · $k=12$*\ #v(1mm)#knotfig("trefoil_impulse_12",width:60mm)],
+ [*Deposited heat / edge flux · $k=12$*\ #v(1mm)#knotfig("trefoil_heat_12",width:60mm)],
+ [*Same final state · entropy level families*\ #v(1mm)#knotfig("trefoil_3_1_24_entropy",width:60mm)],
+)
+#v(2mm)
+#note([*Exact source.* Scatter $R=mat(3/5,-4/5;4/5,3/5)$; attenuate by $d=15/16$; move one incident edge per step. Initial ports are $(1,upright(i))$ at one station, zero elsewhere. Heat receives $(1-d^2)P_i$ and diffuses through self/neighbor weights $(1/2,1/4,1/4)$. Every step checks total wave energy plus heat $=2$. Here $t=k/24$. The lower receivers expose the source-relative impulse, heat/edge flux in units $2/N$, and final cross-entropy. Black omission does not erase the retained carrier.])
+
+#pagebreak()
+#title("14","The figure-eight keeps its crossing law through the flow","A different prime carrier, the same constitutive wave law and the same receiver; topology does not supply a new palette.")
+#grid(columns:(1fr,1fr,1fr),gutter:8mm,align:center,
+ [*$k=0, t=0$*\ #v(2mm)#knotfig("figure_eight_4_1_0")],
+ [*$k=12, t=1/2$*\ #v(2mm)#knotfig("figure_eight_4_1_12")],
+ [*$k=24, t=1$*\ #v(2mm)#knotfig("figure_eight_4_1_24")],
+)
+#eq[$F_(t)(x,y,z)=(x+frac(t z,2),y+frac(t^2x,4)+frac(t^3z,8),z), quad det D F_t=1$]
+#eq[$U_t=(z/2,t x/2+t^2z/8,0), quad f_t=(0,x/2+t z/2,0), quad P=0, quad op("curl")U_t=(-t^2/8,1/2,t/2)$]
+#eq[$partial_t U+(U dot nabla)U=nu Delta U-nabla P+f, quad nabla dot U=0, quad Delta U=0$]
+#grid(columns:(1fr,1fr),gutter:13mm,
+ [#note([*Proved-derived · exact polynomial check.* These identities hold holomorphically on C³. The displayed mesh lies in the invariant real slice. $F_t$ is spatially affine and invertible, so it transports the actual triangular faces and preserves the knot for all real $t$. The external source $f$ is displayed; this is a forced material-flow realization.])],
+ [#note([*Declared joint receiver.* The complex face reads $U+upright(i)ell op("curl")U+(Psi^++Psi^-)D F_t v_i$, with material tangent $v_i$ and lane-length chart $ell=1$. Velocity, rotation and internal propagation remain separately recoverable. The same coherent primary law gives the colors, with aperture $1/16$.])],
+)
+
+#pagebreak()
+#title("15","A chain restricts motion before a contact is excited","Three unknotted components retain their linking under the same bulk perturbation; an impulse starts on the first component.")
+#grid(columns:(1fr,1fr,1fr),gutter:8mm,align:center,
+ [*$k=0, t=0$*\ #v(2mm)#knotfig("chain_0")],
+ [*$k=12, t=1/2$*\ #v(2mm)#knotfig("chain_12")],
+ [*$k=24, t=1$*\ #v(2mm)#knotfig("chain_24")],
+)
+#eq[$"adjacent pair: Hopf link", quad "end pair: separated", quad F_t^(-1)F_t=I$]
+#grid(columns:(1fr,1fr),gutter:14mm,
+ [*Linking constrains admissible relative continuation.*
+ #note([*Established-bounded.* Three planar polygonal cores have adjacent spanning-disk intersections. Their closed triangular tubes are disjoint. The common volume-preserving flow carries the chain without crossing. This fixes topology while allowing its receiver shape and orientation to change.])],
+ [*Contact supplies the actual exchange law.*
+ #note([*Definition.* Internal wave incidence stays on each separated component; an impulse does not jump across a projected crossing. Once an admitted contact is reached, its grip/slip and work ports couple the bodies. Plates 10–11 already derive that exchange, frictional heat and diffusion from a real common patch.])],
+)
+#v(4mm)
+#eq[$Q_i^(k+1)=frac(Q_(i-1)^k+2Q_i^k+Q_(i+1)^k,4)+(1-d^2)P_i^k, quad sum_i(P_i^k+Q_i^k)=2$]
+#note([*Proved-derived · exact finite passage.* A local wave impulse, dissipated heat and receiver cross-entropy have distinct returns. Entropy hatching measures the emitted channel distribution; it does not govern topology or replace the signed wave current. The displayed chain is carried by the prescribed bulk source, not a solved free fluid–elastic-body feedback system.])
+
+#import "stress-plates.typ": stress-plates
+#stress-plates(title,eq,note)

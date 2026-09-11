@@ -46,6 +46,9 @@ phase, geometry, physical boundaries and computation at their declared scopes.
 | Clocked addressed spans and returned world-tubes | `Transport/WorldTube.lean` | `Millennium.HolonicSensoryWorldTube` forwards the import |
 | Complex phase carrier, locked sheets and winding fibres | `Physics/PhaseCarrier.lean` | `Millennium.HolonicParametron` forwards the import |
 | Oriented incidence, coupled response and phase-bearing holons | `Physics/CoupledIncidence.lean` | `Millennium.HolonicComplexParametron` forwards the import |
+| Quadratic port dynamics and retained heat | `Physics/PortEnergyHeat.lean` | Chain-rule storage/source/dissipation balance; nonnegative conductance and explicit heat law |
+| Complex scattering power and attenuation return | `Physics/ScatteringWaveHeat.lean` | Two-port norm preservation and complementary heat; finite constitutive channel |
+| Observer stress, angular derivative jets and positive rest energy | `Physics/ReceiverStressEnergy.lean` | Both Lorentz indices, perfect-fluid and boosted dust/vacuum readings; mass-shell owner reused |
 | Complete finite change of incidence, material and internal state | `Physics/ConstitutiveModulation.lean` | New `Soma.Holonics.Physics.ConstitutiveModulation` theorems over the existing `coupledResponse`; formal-only |
 
 [definition] Paths in this table are relative to `formal/elementary-holonics/ElementaryHolonics/`.
@@ -785,6 +788,13 @@ Typst and SVG paint that packet. Existing `relational-geometry::{projection,rece
 native/design owners. This adds no GPU semantic renderer or live proof assistant to HNN operation.
 The [receiver review](../research/records/2026-09-10_RECEIVER_ENGRAVING_RETAINS_COMPLEX_CURRENT_AND_SUPERSEDES_THE_PAINTED_ATLAS.md)
 records source methods, C³/GR examples and exact checks.
+
+[established-bounded; source-inspected] The [stress/knot return](../research/records/2026-09-10_STRESS_ENERGY_AND_SCATTERING_WAVES_RETAIN_THE_KNOT_AND_ITS_RECEIVERS.md)
+adds exact annular braid geometry, triangular embedding checks and finite wave/heat propagation in
+`research/experiments/receiver_engraving/{knot_geometry,knot_waves,triangle_embedding}.py`.
+`verify_stress_waves.py` compares the returned packets to their actual source evolution.
+`knot-scenes.json` is the exterior Typst/SVG packet; its optional dyadic entropy enclosures retain
+their error radius and do not round the source current or geometry.
 
 ## Maintenance law
 
