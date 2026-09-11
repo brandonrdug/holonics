@@ -46,6 +46,12 @@ fn inspect(model: &str, output: &str) -> Result<()> {
     let ro = ResidentReadout::new()?;
     let s = ResidentSurface::on(&ro)?;
     let wave = rest.remount_coupled(&s, |n| eprintln!("source word {n}"))?;
+    eprintln!("reading the current family's receiver");
+    let current = match wave.current().read_receiver().and_then(|r| r.inspect()) {
+        Ok(reading) => serde_json::json!({"epoch":wave.epoch(),"reading":reading}),
+        Err(error) => serde_json::json!({"epoch":wave.epoch(),"error":error.to_string()}),
+    };
+    json(output.join("current.receiver.json"), &current)?;
     let anchor = wave.current().anchor().inspect()?;
     let n = anchor.center.len() / 2;
     let zero = &anchor.radius - &anchor.radius;
@@ -111,8 +117,160 @@ fn inspect(model: &str, output: &str) -> Result<()> {
     }
     Ok(())
 }
+
+#[derive(Default, serde::Serialize, serde::Deserialize)]
+struct SourceProgress {
+    next_part: u64,
+}
+fn actuate(model: &str, take: &str, output: &str, receiver: WaveSourceReceiver) -> Result<()> {
+    let take = take.parse::<u64>()?;
+    if take == 0 {
+        return Err("declare a nonempty frame aperture".into());
+    }
+    let model = Path::new(model);
+    let output = Path::new(output);
+    fs::create_dir(output)?;
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(output, fs::Permissions::from_mode(0o700))?;
+    }
+    let chart = SymbolCurrentChart::declared(serde_json::from_reader::<_, SymbolAlphabet>(
+        File::open(model.join("exterior-chart.json"))?,
+    )?);
+    let cursor: ExposureCursor =
+        serde_json::from_reader(File::open(model.join("source-cursor.json"))?)?;
+    let mut progress: SourceProgress = if model.join("source-progress.json").exists() {
+        serde_json::from_reader(File::open(model.join("source-progress.json"))?)?
+    } else {
+        SourceProgress::default()
+    };
+    let mut reader = ExposureReader::resume(cursor)?;
+    let mut file = File::open(model.join("model.wave"))?;
+    let size = file.metadata()?.len();
+    eprintln!("validating coupled source model");
+    let rest = NormalWaveRest::read(&mut file, size)?;
+    if !rest.is_coupled() || rest.material().roots() != chart.alphabet().len() {
+        return Err("coupled model/source chart mismatch".into());
+    }
+    let ro = ResidentReadout::new()?;
+    let surface = ResidentSurface::on(&ro)?;
+    let mut wave = rest.remount_coupled(&surface, |n| eprintln!("source word {n}"))?;
+    let initial_material = (
+        wave.normal_material().observations(),
+        wave.neighborhood().generator(0)?.occurrences(),
+    );
+    let started = Instant::now();
+    let mut frames = 0;
+    let mut fields = Vec::new();
+    let mut position = serde_json::json!(null);
+    let operation: Result<()> = (|| {
+        while frames < take {
+            let Some(frame) = reader.peek()? else { break };
+            if frame.partition == ExposurePartition::Development {
+                for part in frame.development_parts()? {
+                    if part.ordinal < progress.next_part {
+                        continue;
+                    }
+                    position = serde_json::json!({"sequence":frame.sequence,"part":part.ordinal});
+                    let next_part = part.ordinal.checked_add(1).ok_or("part cursor overflow")?;
+                    if let Some(text) = &part.text {
+                        let symbols = chart.decode_text(text)?;
+                        if symbols.len() < 2 {
+                            return Err("this part has no adjacent source passage in the declared field chart".into());
+                        }
+                        let input = chart.mount(&surface, &symbols)?;
+                        let existing = wave.contact_ids().find(|id| {
+                            wave.contact(*id).is_ok_and(|h| {
+                                h.member() == 0 && h.relation().source_receiver() == receiver
+                            })
+                        });
+                        let contact = if let Some(id) = existing {
+                            wave.contact(id)?
+                        } else {
+                            wave.admit_contact_in_chart(0, receiver)?
+                        };
+                        eprintln!(
+                            "acting source {} part {}: {} scalars at epoch {}",
+                            frame.sequence,
+                            part.ordinal,
+                            symbols.len(),
+                            wave.epoch()
+                        );
+                        let before = surface.census();
+                        let clock = Instant::now();
+                        let total = symbols.len() - 1;
+                        let action = wave.actuate_contact_section_with_progress(
+                            &contact,
+                            ResidentConstitutiveSection::integers(&input)?,
+                            |done| eprintln!("source passages {done}/{total}"),
+                        )?;
+                        progress.next_part = next_part;
+                        let after = surface.census();
+                        fields.push(serde_json::json!({"sequence":frame.sequence,"part":part.ordinal,"scalars":symbols.len(),
+                            "source_passages":action.source().source().rows(),"predecessor_epoch":action.predecessor_epoch,"successor_epoch":action.successor_epoch,
+                            "milliseconds":clock.elapsed().as_millis(),"numerical_readouts":after.section_read_outs-before.section_read_outs,"ingress_octets":after.ingress_octets-before.ingress_octets}));
+                        let observer = Instant::now();
+                        let predictions = action
+                            .predictions()
+                            .map(|p| p.rest())
+                            .collect::<std::result::Result<Vec<_>, _>>()?;
+                        let statuses = predictions
+                            .iter()
+                            .map(|p| p.receiver_status())
+                            .collect::<std::result::Result<Vec<_>, _>>()?;
+                        let name = format!(
+                            "source-{}-{}.predictions.json",
+                            frame.sequence, part.ordinal
+                        );
+                        json(output.join(&name), &predictions)?;
+                        let field = fields.last_mut().expect("published source field");
+                        field["prediction_statuses"] = serde_json::to_value(statuses)?;
+                        field["prediction_file"] = serde_json::json!(name);
+                        field["observer_milliseconds"] =
+                            serde_json::json!(observer.elapsed().as_millis());
+                    }
+                    progress.next_part =
+                        part.ordinal.checked_add(1).ok_or("part cursor overflow")?;
+                }
+            }
+            let sequence = frame.sequence;
+            reader.acknowledge(sequence)?;
+            progress.next_part = 0;
+            frames += 1;
+        }
+        Ok(())
+    })();
+    eprintln!("saving source-actuated body at epoch {}", wave.epoch());
+    publish_new(output.join("model.wave"), |f| {
+        wave.rest()
+            .and_then(|r| r.write(f))
+            .map_err(io::Error::other)
+    })?;
+    json(output.join("source-cursor.json"), &reader.cursor())?;
+    json(output.join("source-progress.json"), &progress)?;
+    json(output.join("exterior-chart.json"), chart.alphabet())?;
+    json(
+        output.join("summary.json"),
+        &serde_json::json!({"schema":"holonics.coupled-source-actuation.v1","source_receiver":receiver,
+        "epoch":wave.epoch(),"frames":frames,"fields":fields,"position":position,"milliseconds":started.elapsed().as_millis(),
+        "error":operation.as_ref().err().map(ToString::to_string),"resident":surface.census(),
+        "material_before":initial_material,"material_after":[wave.normal_material().observations(),wave.neighborhood().generator(0)?.occurrences()]}),
+    )?;
+    operation
+}
 fn main() -> Result<()> {
     let args = std::env::args().skip(1).collect::<Vec<_>>();
+    if let [mode, chart, model, take, output] = args.as_slice() {
+        if mode == "actuate" {
+            let receiver = match chart.as_str() {
+                "unit-real-sum" => WaveSourceReceiver::UnitRealSum,
+                "direct" => WaveSourceReceiver::Direct,
+                _ => return Err("declare direct or unit-real-sum source receiver".into()),
+            };
+            return actuate(model, take, output, receiver);
+        }
+    }
     if let [mode, model, output] = args.as_slice() {
         if mode == "inspect" {
             return inspect(model, output);

@@ -1,0 +1,51 @@
+{
+  "schema": "holonics.coupled-source-field-run.v1",
+  "variant": "general-image",
+  "scope": "Prepared-source field 66, part 0, on its declared 85-coordinate symbol chart. Timings include host orchestration; no calibrated-power claim.",
+  "run": {
+    "epoch": 11,
+    "error": null,
+    "fields": [
+      {
+        "ingress_octets": 796,
+        "milliseconds": 667783,
+        "numerical_readouts": 0,
+        "observer_milliseconds": 21889,
+        "part": 0,
+        "predecessor_epoch": 10,
+        "prediction_file": "source-66-0.predictions.json",
+        "scalars": 200,
+        "sequence": 66,
+        "source_passages": 199,
+        "successor_epoch": 11,
+        "prediction_counts": {
+          "plural": 197,
+          "outside-domain": 2
+        }
+      }
+    ],
+    "frames": 1,
+    "milliseconds": 690387,
+    "position": {
+      "part": 0,
+      "sequence": 66
+    },
+    "resident": {
+      "allocations": 10070,
+      "captured_launches": 2418,
+      "control_launches": 0,
+      "deed_launches": 1006,
+      "device_to_device_octets": 0,
+      "egress_receipt_octets": 77376,
+      "egress_section_octets": 298127232,
+      "ingress_octets": 133408924,
+      "resident_octets_now": 166952224,
+      "resident_octets_peak": 512347588,
+      "section_read_outs": 218,
+      "synchronizations": 1006
+    },
+    "schema": "holonics.coupled-source-actuation.v1",
+    "source_receiver": "UnitRealSum"
+  },
+  "private_artifacts": ".local/athena-coupled-source-2026-09-11-actuated-66-unresolved"
+}

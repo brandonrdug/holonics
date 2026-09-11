@@ -408,6 +408,16 @@ the common-offset mismatch; source coverage, actual condition development and us
 remain to be returned through prepared material, without overwriting the current with a normalized
 centre or using broader uncertainty to hide a failed source connection.
 
+[definition] The [coupled source-field construction](../../research/records/2026-09-11_COUPLED_SOURCE_FIELDS_REACT_WITH_COMPLETE_ARRIVALS.md)
+now supplies the unpaired source joining law. At an actual offered pair x, retain the complete
+learned joined arrival F. The existing unit-admittance contact realizes `y=P_V x+(I−P_V)b` for
+nonempty `F=b+V`, with its full two-port return; empty evidence preserves actual x and retains the
+outside-domain prediction. The resulting passive union `y+Aq` acts on every member of the held
+family. This source reaction is distinct from a point cast of F or a learned zero response.
+A whole source field stages its ordered internal maps and publishes once. Its complete prediction
+fibres and actual source remain in the return. Source actuation alone adds no learned row; join
+observed-source development and continuing emission through their own admitted comparisons.
+
 ### 4. Form and reuse local generators with their future conduct
 
 [definition] Use the existing independent relation-basis formation and condition domain before

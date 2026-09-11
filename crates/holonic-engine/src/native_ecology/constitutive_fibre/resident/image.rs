@@ -1,6 +1,6 @@
 //! Serial affine current-family transport through existing local relations. The retained joint
 //! input/output carrier records the joining fibre; no particular member is selected to compose.
-use super::condition_image::{read_coverage, ConditionCoverage};
+use super::condition_image::{ConditionCoverage, read_coverage};
 use super::*;
 
 /// Actual borrowed producing relation, not equality inferred from endpoint values or cuts.
@@ -8,6 +8,7 @@ pub enum ConstitutiveImageReceiver<'a, 'c> {
     Linear(&'a ResidentConstitutiveFibre<'c>),
     ContextChange(&'a ResidentContextualSection<'c>),
     WaveConditional(&'a ResidentWaveRelation<'c>),
+    WaveSourceContact(&'a ResidentWaveRelation<'c>),
 }
 
 #[derive(Debug, PartialEq, Eq, Serialize)]
@@ -361,7 +362,11 @@ impl<'c> ResidentWaveRelation<'c> {
             self.width(),
             self.relation_cut,
             source,
-            ConstitutiveImageReceiver::WaveConditional(self),
+            if self.source_contact().is_some() {
+                ConstitutiveImageReceiver::WaveSourceContact(self)
+            } else {
+                ConstitutiveImageReceiver::WaveConditional(self)
+            },
         )
     }
 }

@@ -30,17 +30,18 @@ mod law_rest;
 mod resident;
 pub use law_rest::ConstitutiveFibreRest;
 pub use resident::{
-    ConditionContactMetric, ConditionContactReading, ConditionContactStatus, ConditionCoverage,
-    ConditionCurrentRest, ConditionImageReading, ConditionPreimageReading, ConditionPreimageRest,
-    ConstitutiveDifferentialReading, ConstitutiveImageReading, ConstitutiveImageReceiver,
-    ConstitutiveReturnRest, ContextualSectionOrigin, GeneratorNeighborhoodRest,
-    GeneratorNeighborhoodStep, NeighborhoodEvidence, NeighborhoodEvidenceRest,
-    NormalWaveRelationRest, PreparedConditionContact, ResidentConditionContact,
-    ResidentConditionCurrent, ResidentConditionImage, ResidentConditionPreimage,
-    ResidentConditionStanding, ResidentConstitutiveCurrent, ResidentConstitutiveImage,
-    ResidentConstitutiveRefinement, ResidentConstitutiveReturn, ResidentConstitutiveSection,
-    ResidentContextualSection, ResidentDifferenceSection, ResidentGeneratorNeighborhood,
-    ResidentWaveRelation, WaveSourceReceiver,
+    AffineContactReading, ConditionContactMetric, ConditionContactReading, ConditionContactStatus,
+    ConditionCoverage, ConditionCurrentRest, ConditionImageReading, ConditionPreimageReading,
+    ConditionPreimageRest, ConstitutiveDifferentialReading, ConstitutiveImageReading,
+    ConstitutiveImageReceiver, ConstitutiveReturnRest, ContextualSectionOrigin,
+    GeneratorNeighborhoodRest, GeneratorNeighborhoodStep, NeighborhoodEvidence,
+    NeighborhoodEvidenceRest, NormalWaveRelationRest, PreparedConditionContact,
+    ResidentAffineContact, ResidentConditionContact, ResidentConditionCurrent,
+    ResidentConditionImage, ResidentConditionPreimage, ResidentConditionStanding,
+    ResidentConstitutiveCurrent, ResidentConstitutiveImage, ResidentConstitutiveRefinement,
+    ResidentConstitutiveReturn, ResidentConstitutiveSection, ResidentContextualSection,
+    ResidentDifferenceSection, ResidentGeneratorNeighborhood, ResidentSourcePairs,
+    ResidentWaveRelation, ResidentWaveSourceContact, WaveSourceReceiver,
 };
 
 /// Declared local source law, bound at founding rather than inferred from an array's width.
@@ -84,6 +85,12 @@ pub struct ConstitutiveFibreReturn {
 
 #[derive(Debug, Error)]
 pub enum ConstitutiveFibreError {
+    #[error("source field passage {row}: {source}")]
+    SourcePassage {
+        row: usize,
+        #[source]
+        source: Box<ConstitutiveFibreError>,
+    },
     #[error("native ecology rest: {0}")]
     Rest(String),
     #[error("the receiving edge does not carry an available emission from this ecology")]

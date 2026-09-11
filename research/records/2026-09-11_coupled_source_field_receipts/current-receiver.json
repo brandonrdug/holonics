@@ -1,0 +1,9 @@
+{
+  "schema": "holonics.coupled-current-receiver.v1",
+  "scope": "Fresh-process receiver of the saved complete source-actuated family. Its projected joint is a receiver witness, not a substituted current; absence of vertical directions does not eliminate anchor-ball uncertainty.",
+  "epoch": 11,
+  "support": "Supported",
+  "anchor_difference_zero": true,
+  "anchor_independent_free_coordinates": 0,
+  "full_private_receiver": ".local/athena-coupled-source-2026-09-11-actuated-66-current/current.receiver.json"
+}

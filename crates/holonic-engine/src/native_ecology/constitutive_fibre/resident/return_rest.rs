@@ -62,20 +62,68 @@ impl ConstitutiveReturnRest {
         }
         Ok(())
     }
-    pub(crate) fn source_width(&self)->usize{self.source_width}
-    pub(crate) fn occurrence(&self)->u64{self.occurrence}
-    pub(crate) fn outside_domain(&self)->bool{self.words[self.source_width+self.target_width+1]==1}
+    pub(crate) fn field_source(&self) -> Option<usize> {
+        self.source_occurrence
+    }
+    pub(crate) fn source_chart(&self) -> ConstitutiveSourceChart {
+        self.source_chart
+    }
+    pub(crate) fn source_width(&self) -> usize {
+        self.source_width
+    }
+    pub(crate) fn occurrence(&self) -> u64 {
+        self.occurrence
+    }
+    pub(crate) fn outside_domain(&self) -> bool {
+        self.words[self.source_width + self.target_width + 1] == 1
+    }
     /// Validate a fixed homogeneous prefix without treating a plural target as a point.
-    pub(crate) fn validate_constant_prefix(&self,prefix:&[i64])->Result<(),ConstitutiveFibreError>{
+    pub(crate) fn validate_constant_prefix(
+        &self,
+        prefix: &[i64],
+    ) -> Result<(), ConstitutiveFibreError> {
         self.validate()?;
-        if prefix.len()>self.target_width{return Err(ConstitutiveFibreError::Shape);}
-        let w=self.source_width+self.target_width;
-        if self.words[w+1]==1{return Ok(());}
-        for (j,value) in prefix.iter().enumerate(){
-            if (self.words[self.source_width+j] as i128)!=(*value as i128)*(self.words[w] as i128)
-                ||(0..self.target_width).any(|i|self.words[w+4+i*self.target_width+j]!=0){return Err(ConstitutiveFibreError::Shape);}
+        if prefix.len() > self.target_width {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let w = self.source_width + self.target_width;
+        if self.words[w + 1] == 1 {
+            return Ok(());
+        }
+        for (j, value) in prefix.iter().enumerate() {
+            if (self.words[self.source_width + j] as i128)
+                != (*value as i128) * (self.words[w] as i128)
+                || (0..self.target_width)
+                    .any(|i| self.words[w + 4 + i * self.target_width + j] != 0)
+            {
+                return Err(ConstitutiveFibreError::Shape);
+            }
         }
         Ok(())
+    }
+    /// Cold disposition only; the complete stored return remains this object's evidence.
+    pub(crate) fn validate_zero_real_sum(&self)->Result<(),ConstitutiveFibreError>{
+        self.validate()?;
+        if self.target_width%2!=0{return Err(ConstitutiveFibreError::Shape);}
+        if self.outside_domain(){return Ok(());}
+        let w=self.source_width+self.target_width;
+        // A validated u32 extent of signed-i64 coordinates fits a signed-i128 sum.
+        let sum=|values:&[i64]|values.iter().step_by(2).map(|v|*v as i128).sum::<i128>();
+        if sum(&self.words[self.source_width..w])!=0||self.words[w+4..].chunks_exact(self.target_width).any(|row|sum(row)!=0){
+            return Err(ConstitutiveFibreError::Rest("source difference family has a nonzero real sum".into()));
+        }
+        Ok(())
+    }
+    pub fn receiver_status(&self) -> Result<NativeFieldReceiverStatus, ConstitutiveFibreError> {
+        self.validate()?;
+        Ok(
+            match self.words[self.source_width + self.target_width + 1] {
+                0 => NativeFieldReceiverStatus::Unique,
+                1 => NativeFieldReceiverStatus::OutsideDomain,
+                2 => NativeFieldReceiverStatus::Plural,
+                _ => return Err(ConstitutiveFibreError::Shape),
+            },
+        )
     }
     pub fn is_unique_current(&self) -> bool {
         self.validate().is_ok() && self.words[self.source_width + self.target_width + 1] == 0

@@ -43,15 +43,19 @@ extern "C" __global__ void section_constitutive_condition_contact(
         // Graph of V restricted to span(V^T): rows (V v_i, v_i). This also handles
         // zero-padded rows. Existing exact elimination supplies P, not a second solver.
         for(uint32_t i=0;i<c;++i) {
-            for(uint32_t j=0;j<c;++j) {
-                row[j]=0;
-                for(uint32_t n=0;n<c;++n)
-                    row[j]=add_checked(row[j],product_checked(directions[(size_t)j*c+n],
-                        directions[(size_t)i*c+n],slot),slot);
-                row[c+j]=directions[(size_t)i*c+j];
+            for(uint32_t j=0;j<k;++j)row[j]=0;
+            bool nonzero=false;
+            // Same Gram sums, in the same per-coordinate order. Exact zero coefficients
+            // contribute nothing; sparse/padded families need no dense cubic zero work.
+            for(uint32_t n=0;n<c;++n){
+                int64_t vi=directions[(size_t)i*c+n];if(!vi)continue;
+                nonzero=true;row[c+n]=vi;
+                for(uint32_t j=0;j<c;++j){int64_t vj=directions[(size_t)j*c+n];
+                    if(vj)row[j]=add_checked(row[j],product_checked(vj,vi,slot),slot);
+                }
             }
-            if(*slot) return;
-            condition_stage_row(graph,graph_hi,k,row,slot); if(*slot) return;
+            if(*slot)return;
+            if(nonzero){condition_stage_row(graph,graph_hi,k,row,slot);if(*slot)return;}
         }
         wide projection_den[2];
         for(uint32_t which=0;which<2;++which) {

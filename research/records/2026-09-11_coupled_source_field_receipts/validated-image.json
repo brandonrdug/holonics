@@ -1,0 +1,59 @@
+{
+  "schema": "holonics.coupled-source-field-run.v1",
+  "variant": "validation-then-parallel-total-image",
+  "scope": "Final source-image admission/row/reduction pipeline, prepared Development sequence 66 part 0. Wall time includes host orchestration and progress callback; no calibrated-power claim.",
+  "run": {
+    "epoch": 11,
+    "error": null,
+    "fields": [
+      {
+        "ingress_octets": 2388,
+        "milliseconds": 287069,
+        "numerical_readouts": 0,
+        "observer_milliseconds": 22854,
+        "part": 0,
+        "predecessor_epoch": 10,
+        "prediction_file": "source-66-0.predictions.json",
+        "scalars": 200,
+        "sequence": 66,
+        "source_passages": 199,
+        "successor_epoch": 11,
+        "prediction_counts": {
+          "plural": 197,
+          "outside-domain": 2
+        }
+      }
+    ],
+    "frames": 1,
+    "material_after": [
+      8965,
+      9254
+    ],
+    "material_before": [
+      8965,
+      9254
+    ],
+    "milliseconds": 310622,
+    "position": {
+      "part": 0,
+      "sequence": 66
+    },
+    "resident": {
+      "allocations": 8478,
+      "captured_launches": 3214,
+      "control_launches": 0,
+      "deed_launches": 1006,
+      "device_to_device_octets": 0,
+      "egress_receipt_octets": 102848,
+      "egress_section_octets": 298127232,
+      "ingress_octets": 133410516,
+      "resident_octets_now": 166952224,
+      "resident_octets_peak": 385550120,
+      "section_read_outs": 218,
+      "synchronizations": 1006
+    },
+    "schema": "holonics.coupled-source-actuation.v1",
+    "source_receiver": "UnitRealSum"
+  },
+  "private_artifacts": ".local/athena-coupled-source-2026-09-11-actuated-66-validated"
+}

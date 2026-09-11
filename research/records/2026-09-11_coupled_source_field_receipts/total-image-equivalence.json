@@ -1,0 +1,196 @@
+{
+  "schema": "holonics.source-field-affine-equivalence.v1",
+  "scope": "Full constrained current family for this declared source field, with all other persisted components and source witnesses unchanged. This is not universal arithmetic-aperture or performance equivalence.",
+  "model_bytes_identical": false,
+  "unchanged_components": {
+    "normal_bank": true,
+    "coupled_header": true,
+    "neighborhood": true,
+    "family_header": true,
+    "origin": true,
+    "anchor": true,
+    "last_map": true,
+    "coverage": true
+  },
+  "delivery_and_prediction_files_identical": {
+    "source-cursor.json": true,
+    "source-progress.json": true,
+    "exterior-chart.json": true,
+    "source-66-0.predictions.json": true
+  },
+  "affine_metadata_identical": true,
+  "direction_basis_identical": true,
+  "direction_rank": 340,
+  "changed_origin_coordinates": 82,
+  "origin_difference_in_span": true,
+  "origin_difference_coefficients": [
+    {
+      "pivot": 32,
+      "coefficient": "-1"
+    },
+    {
+      "pivot": 44,
+      "coefficient": "-161"
+    },
+    {
+      "pivot": 90,
+      "coefficient": "-37"
+    },
+    {
+      "pivot": 174,
+      "coefficient": "-29"
+    },
+    {
+      "pivot": 186,
+      "coefficient": "-1"
+    },
+    {
+      "pivot": 190,
+      "coefficient": "-1"
+    },
+    {
+      "pivot": 192,
+      "coefficient": "-2"
+    },
+    {
+      "pivot": 194,
+      "coefficient": "-2"
+    },
+    {
+      "pivot": 202,
+      "coefficient": "-1"
+    },
+    {
+      "pivot": 204,
+      "coefficient": "-1"
+    },
+    {
+      "pivot": 214,
+      "coefficient": "-2"
+    },
+    {
+      "pivot": 242,
+      "coefficient": "-2"
+    },
+    {
+      "pivot": 254,
+      "coefficient": "-1"
+    },
+    {
+      "pivot": 256,
+      "coefficient": "-1"
+    },
+    {
+      "pivot": 258,
+      "coefficient": "-1"
+    },
+    {
+      "pivot": 264,
+      "coefficient": "-1"
+    },
+    {
+      "pivot": 274,
+      "coefficient": "-1"
+    },
+    {
+      "pivot": 276,
+      "coefficient": "-2"
+    },
+    {
+      "pivot": 278,
+      "coefficient": "-8"
+    },
+    {
+      "pivot": 280,
+      "coefficient": "-1"
+    },
+    {
+      "pivot": 282,
+      "coefficient": "-6"
+    },
+    {
+      "pivot": 284,
+      "coefficient": "-5"
+    },
+    {
+      "pivot": 286,
+      "coefficient": "-17"
+    },
+    {
+      "pivot": 288,
+      "coefficient": "-2"
+    },
+    {
+      "pivot": 290,
+      "coefficient": "-6"
+    },
+    {
+      "pivot": 292,
+      "coefficient": "-9"
+    },
+    {
+      "pivot": 294,
+      "coefficient": "-15"
+    },
+    {
+      "pivot": 298,
+      "coefficient": "-1"
+    },
+    {
+      "pivot": 300,
+      "coefficient": "-10"
+    },
+    {
+      "pivot": 302,
+      "coefficient": "-2"
+    },
+    {
+      "pivot": 304,
+      "coefficient": "-10"
+    },
+    {
+      "pivot": 306,
+      "coefficient": "-9"
+    },
+    {
+      "pivot": 308,
+      "coefficient": "-4"
+    },
+    {
+      "pivot": 312,
+      "coefficient": "-11"
+    },
+    {
+      "pivot": 314,
+      "coefficient": "-7"
+    },
+    {
+      "pivot": 316,
+      "coefficient": "-15"
+    },
+    {
+      "pivot": 318,
+      "coefficient": "-5"
+    },
+    {
+      "pivot": 322,
+      "coefficient": "-5"
+    },
+    {
+      "pivot": 324,
+      "coefficient": "-1"
+    },
+    {
+      "pivot": 326,
+      "coefficient": "-1"
+    },
+    {
+      "pivot": 336,
+      "coefficient": "-1"
+    }
+  ],
+  "original_anchor_identical": true,
+  "constrained_families_equal": true,
+  "before": ".local/athena-coupled-source-2026-09-11-actuated-66-unresolved",
+  "after": ".local/athena-coupled-source-2026-09-11-actuated-66-total-image"
+}

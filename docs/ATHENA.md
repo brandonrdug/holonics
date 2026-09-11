@@ -37,6 +37,13 @@ connects the exact tension, finite-change, kinetic and future-receiver laws to t
 Source exposure, interface and persistence accompany each usable return; current execution status
 belongs in CONSTRUCTION_STATE.
 
+[definition] The [coupled source-field return](../research/records/2026-09-11_COUPLED_SOURCE_FIELDS_REACT_WITH_COMPLETE_ARRIVALS.md)
+uses the complete learned arrival as incoming evidence for an actual source reaction. Its passive
+union transports the full held family, and a complete source field publishes one successor.
+Missing learned arrival remains explicit while the actual offered current is preserved. Source
+actuation, observed development and conditional generation keep their distinct meanings under
+the same wave owner; their public conversation composition remains the live construction task.
+
 [definition] Sequence-to-fold and biochemical kinetics are foundational HNN questions. Their
 [exact source construction](../research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)
 shows why organization, occupancy and joint correlation must survive into later conduct. The

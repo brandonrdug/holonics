@@ -1,0 +1,33 @@
+{
+  "schema": "holonics.coupled-source-field-run.v1",
+  "variant": "compatibility-gate-refusal",
+  "scope": "Prepared-source field 66, part 0, on its declared 85-coordinate symbol chart. Timings include host orchestration; no calibrated-power claim.",
+  "run": {
+    "epoch": 10,
+    "error": "native constitutive arithmetic refused without depositing a row: source union map: ObstructionLineage { refusals: [OccurrenceRefusal { index: 0, flags: 16, origin: true, upstream_flags: 0, upstream_first: None, upstream_count: 0 }] }",
+    "fields": [],
+    "frames": 0,
+    "milliseconds": 307537,
+    "position": {
+      "part": 0,
+      "sequence": 66
+    },
+    "resident": {
+      "allocations": 1948,
+      "captured_launches": 472,
+      "control_launches": 0,
+      "deed_launches": 195,
+      "device_to_device_octets": 0,
+      "egress_receipt_octets": 15104,
+      "egress_section_octets": 199874880,
+      "ingress_octets": 133408276,
+      "resident_octets_now": 164525536,
+      "resident_octets_peak": 416521924,
+      "section_read_outs": 14,
+      "synchronizations": 195
+    },
+    "schema": "holonics.coupled-source-actuation.v1",
+    "source_receiver": "UnitRealSum"
+  },
+  "private_artifacts": ".local/athena-coupled-source-2026-09-11-actuated-66"
+}

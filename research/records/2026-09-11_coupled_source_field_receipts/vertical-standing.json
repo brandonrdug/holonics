@@ -1,0 +1,16 @@
+{
+  "schema": "holonics.source-field-vertical-standing.v1",
+  "scope": "Exact cold equality of the admitted local law's target-direction table over this fixed-material source field; not a semantic source identity.",
+  "source_sequence": 66,
+  "source_part": 0,
+  "source_passages": 199,
+  "nonempty_predictions": 197,
+  "outside_predictions": 2,
+  "target_real_width": 170,
+  "unchanged_direction_table": true,
+  "material_cuts": [
+    9254
+  ],
+  "private_predictions": ".local/athena-coupled-source-2026-09-11-actuated-66-total-image/source-66-0.predictions.json",
+  "consequence": "The same vertical projector can be reused across these nonempty source reactions, while each particular, source and full obstruction remains distinct."
+}

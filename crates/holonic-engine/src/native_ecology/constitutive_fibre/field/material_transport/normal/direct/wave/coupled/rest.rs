@@ -196,12 +196,16 @@ impl NormalWaveRest {
                 .last_relation()
                 .ok_or(ConstitutiveFibreError::Shape)?
                 .source_receiver();
-            family.rebind_decoded_relation(Rc::new(neighborhood.read_wave_relation_in_chart(
-                j,
-                base.material.roots,
-                receiver,
-                None,
-            )?))?;
+            let mut relation =
+                neighborhood.read_wave_relation_in_chart(j, base.material.roots, receiver, None)?;
+            if let Some(contact) = family.last_relation().and_then(|v| v.source_contact()) {
+                relation =
+                    relation.read_source_contact(neighborhood.generator(j)?, contact.source())?;
+                if let Some(row) = contact.source_row() {
+                    relation = relation.with_source_row(row);
+                }
+            }
+            family.rebind_decoded_relation(Rc::new(relation))?;
         }
         family.read_receiver()?.require_supported()?;
         let current = Rc::new(family);

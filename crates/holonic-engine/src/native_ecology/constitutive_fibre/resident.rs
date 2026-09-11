@@ -6,7 +6,7 @@
 
 use super::*;
 mod section;
-pub use section::{ResidentConstitutiveSection, ResidentDifferenceSection};
+pub use section::{ResidentConstitutiveSection, ResidentDifferenceSection, ResidentSourcePairs};
 mod return_rest;
 pub use return_rest::ConstitutiveReturnRest;
 
@@ -486,11 +486,13 @@ pub use image::{
 mod condition_contact;
 mod context_section;
 pub use condition_contact::{
-    ConditionContactMetric, ConditionContactReading, ConditionContactStatus, ConditionCurrentRest,
-    PreparedConditionContact, ResidentConditionContact, ResidentConditionCurrent,
-    ResidentConditionStanding,
+    AffineContactReading, ConditionContactMetric, ConditionContactReading, ConditionContactStatus,
+    ConditionCurrentRest, PreparedConditionContact, ResidentAffineContact,
+    ResidentConditionContact, ResidentConditionCurrent, ResidentConditionStanding,
 };
 pub use context_section::{ContextualSectionOrigin, ResidentContextualSection};
 
 mod wave_relation;
-pub use wave_relation::{NormalWaveRelationRest, ResidentWaveRelation, WaveSourceReceiver};
+pub use wave_relation::{
+    NormalWaveRelationRest, ResidentWaveRelation, ResidentWaveSourceContact, WaveSourceReceiver,
+};

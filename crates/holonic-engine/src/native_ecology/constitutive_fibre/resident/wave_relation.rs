@@ -1,6 +1,8 @@
 use super::*;
 mod rest;
+mod source;
 pub use rest::NormalWaveRelationRest;
+pub use source::ResidentWaveSourceContact;
 
 /// The receiver chart in which the local law was founded. UnitRealSum is a mean-offset
 /// section for a maximum/softmax receiver; actual source offsets stay in the lifted state.
@@ -11,17 +13,18 @@ pub enum WaveSourceReceiver {
     UnitRealSum,
 }
 
-/// Immutable fixed-condition pullback of one bilinear law into the wave family chart.
+/// Immutable conditional pullback or source-contact map in the wave family chart.
 /// The basis is a derived relation; it owns no learned material and no continuing ecology.
 pub struct ResidentWaveRelation<'c> {
     pub(in super::super) surface: &'c ResidentSurface<'c>,
     pub(in super::super) basis: ResidentSection<'c>,
-    pub(in super::super) fixed: ResidentSection<'c>,
+    pub(in super::super) fixed: Rc<ResidentSection<'c>>,
     pub(in super::super) roots: usize,
     pub(in super::super) condition_complex: usize,
     pub(in super::super) relation_cut: u64,
     producing_owner: Rc<()>,
     receiver: WaveSourceReceiver,
+    source: Option<ResidentWaveSourceContact<'c>>,
 }
 impl<'c> ResidentWaveRelation<'c> {
     pub(in super::super) fn new(
@@ -37,12 +40,13 @@ impl<'c> ResidentWaveRelation<'c> {
         Self {
             surface,
             basis,
-            fixed,
+            fixed: Rc::new(fixed),
             roots,
             condition_complex,
             relation_cut,
             producing_owner,
             receiver,
+            source: None,
         }
     }
     pub fn source_receiver(&self) -> WaveSourceReceiver {

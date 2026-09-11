@@ -1,9 +1,9 @@
 use super::*;
 mod receiver;
 mod rest;
-pub use rest::NormalWaveFamilyRest;
-pub use receiver::{NormalFamilySupport,NormalFamilyReceiverReading,NormalWaveFamilyReceiver};
 use crate::native_ecology::constitutive_fibre::{ResidentConstitutiveReturn, ResidentWaveRelation};
+pub use receiver::{NormalFamilyReceiverReading, NormalFamilySupport, NormalWaveFamilyReceiver};
+pub use rest::NormalWaveFamilyRest;
 
 /// A constrained affine family, not a normal ball and not a point-current operand.
 /// The relation targets (lambda,anchor,p,c); lambda=1 and the anchor retains the producing
@@ -17,10 +17,21 @@ pub struct NormalWaveFamily<'c> {
 }
 impl<'c> NormalWaveFamily<'c> {
     /// Cold coupled decoding binds the stored last map to its restored actual member/condition.
-    pub(crate) fn rebind_decoded_relation(&mut self,relation:Rc<ResidentWaveRelation<'c>>)->Result<(),ConstitutiveFibreError>{
-        let old=self.last_relation.as_ref().ok_or(ConstitutiveFibreError::Shape)?;
-        if old.rest()?!=relation.rest()?{return Err(invalid("stored wave map disagrees with its restored member/condition"));}
-        self.last_relation=Some(relation);Ok(())
+    pub(crate) fn rebind_decoded_relation(
+        &mut self,
+        relation: Rc<ResidentWaveRelation<'c>>,
+    ) -> Result<(), ConstitutiveFibreError> {
+        let old = self
+            .last_relation
+            .as_ref()
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        if old.rest()? != relation.rest()? {
+            return Err(invalid(
+                "stored wave map disagrees with its restored member/condition",
+            ));
+        }
+        self.last_relation = Some(relation);
+        Ok(())
     }
 
     pub fn origin(&self) -> &NormalWaveJointSource<'c> {
@@ -61,16 +72,39 @@ impl<'c> NormalWaveFamily<'c> {
         &self,
         law: Rc<ResidentWaveRelation<'c>>,
     ) -> Result<Self, ConstitutiveFibreError> {
-        if law.roots() != self.origin.fibre().roots {
-            return Err(ConstitutiveFibreError::Shape);
-        }
         let passages = self
             .passages
             .checked_add(1)
             .ok_or(ConstitutiveFibreError::Shape)?;
-        self.origin.fibre().epoch.checked_add(passages).ok_or(ConstitutiveFibreError::Shape)?;
-        let image = law.read_image(&self.relation)?;
-        let (relation, coverage) = image.into_output();
+        self.read_through_at(law, passages)
+    }
+    /// Internal factors of one source-field occurrence share its successor clock. Their
+    /// joining populations are still composed by the resident affine image operation.
+    pub(in super::super) fn read_through_at(
+        &self,
+        law: Rc<ResidentWaveRelation<'c>>,
+        passages: u64,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        if law.roots() != self.origin.fibre().roots
+            || !(passages
+                == self
+                    .passages
+                    .checked_add(1)
+                    .ok_or(ConstitutiveFibreError::Shape)?
+                || (passages == self.passages && law.source_contact().is_some()))
+        {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        self.origin
+            .fibre()
+            .epoch
+            .checked_add(passages)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let (relation, coverage) = if law.source_contact().is_some() {
+            law.read_source_image(&self.relation)?
+        } else {
+            law.read_image(&self.relation)?.into_output()
+        };
         Ok(Self {
             origin: Rc::clone(&self.origin),
             relation,

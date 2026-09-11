@@ -1,0 +1,18 @@
+{
+  "schema": "holonics.unpaired-source-material-invariance.v1",
+  "scope": "Complete immutable material/condition bytes before and after the actual source field; counts alone are not the witness.",
+  "normal_bank_identical": true,
+  "condition_identical": true,
+  "all_local_laws_identical": true,
+  "condition_evidence_identical": true,
+  "wave_epochs": [
+    10,
+    11
+  ],
+  "neighborhood_epochs": [
+    0,
+    1
+  ],
+  "before": ".local/athena-coupled-source-2026-09-11-unit-real-sum-32/model.wave",
+  "after": ".local/athena-coupled-source-2026-09-11-actuated-66-validated/model.wave"
+}

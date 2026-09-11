@@ -97,6 +97,7 @@ mod surface_normal_wave_family;
 mod surface_normal_family_receiver;
 mod surface_normal_coupled;
 mod surface_wave_relation;
+mod surface_wave_source;
 mod surface_material_support;
 #[path = "resident_section/surface_condition.rs"]
 mod surface_condition;

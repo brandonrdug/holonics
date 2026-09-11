@@ -8,7 +8,11 @@ use relational_geometry::Rat;
 use std::io::{Read, Write};
 const MAGIC_V1: &[u8] = b"HOLONIC-WAVE-RELATION\x01";
 const MAGIC_V2: &[u8] = b"HOLONIC-WAVE-RELATION\x02";
+const MAGIC_V3: &[u8] = b"HOLONIC-WAVE-RELATION\x03";
 const END: &[u8] = b"HOLONIC-WAVE-RELATION-END\x01";
+fn false_flag(value: &bool) -> bool {
+    !*value
+}
 fn invalid(e: impl ToString) -> ConstitutiveFibreError {
     ConstitutiveFibreError::Rest(e.to_string())
 }
@@ -97,12 +101,95 @@ struct Header {
     cut: u64,
     #[serde(default)]
     receiver: WaveSourceReceiver,
+    #[serde(default, skip_serializing_if = "false_flag")]
+    source: bool,
+}
+#[derive(Debug, PartialEq, Eq)]
+struct SourceContactRest {
+    source: ResidentSectionRest,
+    prediction: ConstitutiveReturnRest,
+    arrival: ConstitutiveReturnRest,
+    reaction: ResidentSectionRest,
+}
+
+fn validate_source_contact(
+    source: &SourceContactRest,
+    n: usize,
+    receiver: WaveSourceReceiver,
+    cut: u64,
+    conditions: usize,
+) -> Result<(), ConstitutiveFibreError> {
+    let r = n.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?;
+    let w = r.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?;
+    point_section(&source.source, 1, 3 * r + 1)?;
+    source.prediction.validate()?;
+    let f = (3 * n)
+        .checked_mul(conditions)
+        .and_then(|v| {
+            v.checked_add(3 * n)?
+                .checked_add(conditions)?
+                .checked_mul(2)
+        })
+        .ok_or(ConstitutiveFibreError::Shape)?;
+    if source.prediction.source_width() != f
+        || source.prediction.target_width() != r
+        || source.prediction.occurrence() != cut
+        || source.prediction.source_chart()
+            != (ConstitutiveSourceChart::BilinearContact {
+                source_complex: 3 * n,
+                condition_complex: conditions,
+            })
+    {
+        return Err(invalid("source prediction does not carry its local chart"));
+    }
+    source.arrival.validate()?;
+    if source.arrival.source_width() != 2
+        || source.arrival.target_width() != w
+        || source.arrival.source_chart() != ConstitutiveSourceChart::Linear
+        || source.arrival.occurrence() != cut
+        || source.arrival.outside_domain() != source.prediction.outside_domain()
+        || source.arrival.field_source() != source.prediction.field_source()
+    {
+        return Err(invalid("source contact arrival has the wrong linear chart"));
+    }
+    point_section(&source.reaction, 1, 5 * w + 2)?;
+    let a = &source.source.intervals;
+    let h = &source.reaction.intervals;
+    let sd = BigInt::from(a[3 * r].0);
+    let hd = BigInt::from(h[5 * w].0);
+    if sd <= BigInt::zero()
+        || hd <= BigInt::zero()
+        || h[5 * w + 1].0 != i64::from(source.arrival.outside_domain())
+    {
+        return Err(invalid("source reaction is not admitted"));
+    }
+    for i in 0..r {
+        if BigInt::from(a[i].0) != BigInt::from(a[r + i].0) - BigInt::from(a[2 * r + i].0)
+            || BigInt::from(a[2 * r + i].0) * &hd != BigInt::from(h[i].0) * &sd
+            || BigInt::from(a[r + i].0) * &hd != BigInt::from(h[r + i].0) * &sd
+        {
+            return Err(invalid("source reaction loses its actual offered joint"));
+        }
+    }
+    if receiver == WaveSourceReceiver::UnitRealSum {
+        source.prediction.validate_zero_real_sum()?;
+        for start in [r, 2 * r] {
+            let sum: BigInt = (0..n).map(|i| BigInt::from(a[start + 2 * i].0)).sum();
+            if sum != sd {
+                return Err(invalid(
+                    "source reaction is outside its unit-real-sum chart",
+                ));
+            }
+        }
+    }
+    Ok(())
 }
 #[derive(Debug, PartialEq, Eq)]
 pub struct NormalWaveRelationRest {
     header: Header,
     basis: ResidentSectionRest,
     fixed: ResidentSectionRest,
+    source: Option<SourceContactRest>,
 }
 impl NormalWaveRelationRest {
     pub fn roots(&self) -> usize {
@@ -150,40 +237,85 @@ impl NormalWaveRelationRest {
                     return Err(invalid("wave relation changes the retained anchor"));
                 }
             }
-            for j in 0..2 * n {
-                if row[q + 2 + 4 * n + j].0 != row[2 + 6 * n + j].0 {
-                    return Err(invalid("wave relation loses its current join"));
+            if !self.header.source {
+                for j in 0..2 * n {
+                    if row[q + 2 + 4 * n + j].0 != row[2 + 6 * n + j].0 {
+                        return Err(invalid("wave relation loses its current join"));
+                    }
                 }
+            } else if (p < q && row[p].0 <= 0) || (p >= q && row.iter().any(|v| v.0 != 0)) {
+                return Err(invalid("source passage is not a total functional graph"));
             }
         }
-        if self.header.receiver == WaveSourceReceiver::UnitRealSum {
+        if !self.header.source && self.header.receiver == WaveSourceReceiver::UnitRealSum {
             validate_unit_real_sum(&self.basis, n, q)?;
+        }
+        if self.header.source {
+            validate_source_contact(
+                self.source.as_ref().ok_or(ConstitutiveFibreError::Shape)?,
+                n,
+                self.header.receiver,
+                self.header.cut,
+                self.header.conditions,
+            )?;
+        } else if self.source.is_some() {
+            return Err(invalid("wave relation source evidence is not declared"));
         }
         Ok(())
     }
     pub fn write(&self, out: &mut impl Write) -> Result<(), ConstitutiveFibreError> {
         self.validate()?;
-        out.write_all(MAGIC_V2).map_err(invalid)?;
+        out.write_all(if self.source.is_some() {
+            MAGIC_V3
+        } else {
+            MAGIC_V2
+        })
+        .map_err(invalid)?;
         blob(out, &serde_json::to_vec(&self.header).map_err(invalid)?)?;
         blob(out, &point_bytes(&self.basis)?)?;
         blob(out, &point_bytes(&self.fixed)?)?;
+        if let Some(source) = &self.source {
+            blob(out, &point_bytes(&source.source)?)?;
+            blob(
+                out,
+                &serde_json::to_vec(&source.prediction).map_err(invalid)?,
+            )?;
+            blob(out, &serde_json::to_vec(&source.arrival).map_err(invalid)?)?;
+            blob(out, &point_bytes(&source.reaction)?)?;
+        }
         out.write_all(END).map_err(invalid)
     }
     pub fn read(input: &mut impl Read, octets: u64) -> Result<Self, ConstitutiveFibreError> {
         let mut input = input.take(octets);
         let mut magic = vec![0u8; MAGIC_V1.len()];
         input.read_exact(&mut magic).map_err(invalid)?;
-        if magic != MAGIC_V1 && magic != MAGIC_V2 {
+        if magic != MAGIC_V1 && magic != MAGIC_V2 && magic != MAGIC_V3 {
             return Err(invalid("wave relation magic is absent"));
         }
         let header: Header = serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
-        if magic == MAGIC_V1 && header.receiver != WaveSourceReceiver::Direct {
+        if magic == MAGIC_V1 && (header.receiver != WaveSourceReceiver::Direct || header.source) {
             return Err(invalid(
                 "legacy wave relation declares an unknown receiver chart",
             ));
         }
         let basis = read_point(&read_blob(&mut input)?)?;
         let fixed = read_point(&read_blob(&mut input)?)?;
+        let source = if magic == MAGIC_V3 {
+            if !header.source {
+                return Err(invalid("v3 wave relation omits its source evidence"));
+            }
+            Some(SourceContactRest {
+                source: read_point(&read_blob(&mut input)?)?,
+                prediction: serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?,
+                arrival: serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?,
+                reaction: read_point(&read_blob(&mut input)?)?,
+            })
+        } else {
+            if header.source {
+                return Err(invalid("source evidence requires wave relation wire v3"));
+            }
+            None
+        };
         expect(&mut input, END)?;
         let mut extra = [0u8; 1];
         if input.read(&mut extra).map_err(invalid)? != 0 {
@@ -193,6 +325,7 @@ impl NormalWaveRelationRest {
             header,
             basis,
             fixed,
+            source,
         };
         rest.validate()?;
         Ok(rest)
@@ -202,16 +335,47 @@ impl NormalWaveRelationRest {
         s: &'c ResidentSurface<'c>,
     ) -> Result<ResidentWaveRelation<'c>, ConstitutiveFibreError> {
         self.validate()?;
-        Ok(ResidentWaveRelation::new(
+        let source = if let Some(source) = self.source {
+            let snapshot = s.mount_section_rest(&source.source)?;
+            let contact = super::source::prepare_source_contact(
+                s,
+                self.header.roots,
+                self.header.receiver,
+                ResidentConstitutiveCurrent::rational(&snapshot)?,
+                source.prediction.remount(s)?,
+            )?;
+            if contact.arrival.rest()? != source.arrival
+                || s.detach_section(&contact.reaction, 64)? != source.reaction
+            {
+                return Err(invalid(
+                    "source reaction does not follow its complete prediction",
+                ));
+            }
+            let basis = super::source::source_basis(s, self.header.roots, &contact.reaction)?;
+            if s.detach_section(&basis, 64)? != self.basis {
+                return Err(invalid("source map does not follow its actual reaction"));
+            }
+            Some((basis, contact))
+        } else {
+            None
+        };
+        let (basis, source) = if let Some((basis, source)) = source {
+            (basis, Some(source))
+        } else {
+            (s.mount_section_rest(&self.basis)?, None)
+        };
+        let mut relation = ResidentWaveRelation::new(
             s,
-            s.mount_section_rest(&self.basis)?,
+            basis,
             s.mount_section_rest(&self.fixed)?,
             self.header.roots,
             self.header.conditions,
             self.header.cut,
             Rc::new(()),
             self.header.receiver,
-        ))
+        );
+        relation.source = source;
+        Ok(relation)
     }
 }
 impl ResidentWaveRelation<'_> {
@@ -222,9 +386,24 @@ impl ResidentWaveRelation<'_> {
                 conditions: self.condition_complex,
                 cut: self.relation_cut,
                 receiver: self.receiver,
+                source: self.source.is_some(),
             },
             basis: self.surface.detach_section(&self.basis, 64)?,
             fixed: self.surface.detach_section(&self.fixed, 64)?,
+            source: self
+                .source
+                .as_ref()
+                .map(
+                    |source| -> Result<SourceContactRest, ConstitutiveFibreError> {
+                        Ok(SourceContactRest {
+                            source: self.surface.detach_section(&source.source, 64)?,
+                            prediction: source.prediction.rest()?,
+                            arrival: source.arrival.rest()?,
+                            reaction: self.surface.detach_section(&source.reaction, 64)?,
+                        })
+                    },
+                )
+                .transpose()?,
         };
         rest.validate()?;
         Ok(rest)
@@ -254,7 +433,9 @@ mod tests {
                 conditions: 1,
                 cut: 0,
                 receiver: WaveSourceReceiver::UnitRealSum,
+                source: false,
             },
+            source: None,
             basis: ResidentSectionRest::found(w, w, ResidentGrain(0), 64, rows).unwrap(),
             fixed: ResidentSectionRest::found(
                 1,
@@ -307,5 +488,52 @@ mod tests {
                 assert!(decoded.is_err());
             }
         }
+    }
+    #[test]
+    #[ignore = "requires CUDA; rest must recover complete source reactions, not only matching endpoints"]
+    fn source_rest_rejects_changed_returned_normal() {
+        use crate::embedding_fiber::ResidentReadout;
+        let ro = ResidentReadout::new().unwrap();
+        let surface = ResidentSurface::on(&ro).unwrap();
+        let point = |v: &[i64]| {
+            surface
+                .mount_section_rest(
+                    &ResidentSectionRest::found(
+                        1,
+                        v.len(),
+                        ResidentGrain(0),
+                        64,
+                        v.iter().map(|v| (*v, *v)).collect(),
+                    )
+                    .unwrap(),
+                )
+                .unwrap()
+        };
+        let mut local =
+            ResidentConstitutiveFibre::found_bilinear_contact(&surface, 3, 1, 1).unwrap();
+        let source = point(&[0, 0, 1, 0, 1, 0]);
+        let h = point(&[1, 0]);
+        let eta = point(&[0, 0]);
+        local
+            .advance_bilinear_contact(
+                ResidentConstitutiveCurrent::integers(&source).unwrap(),
+                ResidentConstitutiveCurrent::integers(&h).unwrap(),
+                Some(ResidentConstitutiveCurrent::integers(&eta).unwrap()),
+            )
+            .unwrap();
+        let relation = local
+            .read_wave_relation(ResidentConstitutiveCurrent::integers(&h).unwrap(), 1)
+            .unwrap();
+        let map = relation
+            .read_source_contact(
+                &local,
+                ResidentConstitutiveCurrent::integers(&source).unwrap(),
+            )
+            .unwrap();
+        let mut rest = map.rest().unwrap();
+        let wire = rest.source.as_mut().unwrap();
+        wire.reaction.intervals[12] = (2, 2);
+        rest.validate().unwrap();
+        assert!(rest.remount(&surface).is_err());
     }
 }

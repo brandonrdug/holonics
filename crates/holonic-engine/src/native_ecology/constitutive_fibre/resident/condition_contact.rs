@@ -4,6 +4,11 @@
 use super::*;
 use std::rc::Rc;
 
+mod affine;
+use affine::affine_contact_section;
+pub(super) use affine::read_affine_contact;
+pub use affine::{AffineContactReading, ResidentAffineContact};
+
 /// Equal unit admittance for each real/imaginary coordinate in the bound local chart.
 /// Orthogonal chart changes preserve this law. General recharting owes the transported metric.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
@@ -221,34 +226,7 @@ impl<'chart> ResidentConditionCurrent<'chart> {
             .checked_add(1)
             .ok_or(ConstitutiveFibreError::Shape)?;
         let c = self.width;
-        let required = c.checked_mul(9 * 16).ok_or(ConstitutiveFibreError::Shape)?;
-        let available = self.surface.declaration().max_sectiond_bytes;
-        if required > available as usize {
-            return Err(ConstitutiveFibreError::ScratchAperture {
-                required,
-                available,
-            });
-        }
-        let graph = self.surface.fresh_section(2 * c, 2 * c, ResidentGrain(0))?;
-        let section = self.surface.fresh_section(1, 5 * c + 2, ResidentGrain(0))?;
-        let mut passage = self.surface.begin_passage(&[vec![]])?;
-        {
-            let lane = passage.open(0, &[])?;
-            self.surface.record_condition_contact(
-                &lane,
-                self.current(),
-                Some((&f.report, f.source_width, &graph)),
-                &section,
-            )?;
-        }
-        passage.close(0, &section, 64)?;
-        let receipt = passage.finish()?.launch()?;
-        if !receipt.obstruction.is_empty() {
-            return Err(ConstitutiveFibreError::Arithmetic(format!(
-                "condition contact: {:?}",
-                receipt.obstruction
-            )));
-        }
+        let section = affine_contact_section(self.surface, self.current(), f)?;
         let section = Rc::new(section);
         Ok(PreparedConditionContact {
             predecessor: Rc::clone(&self.section),

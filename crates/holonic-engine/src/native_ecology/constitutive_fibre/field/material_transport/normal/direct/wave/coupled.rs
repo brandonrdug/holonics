@@ -1,8 +1,8 @@
 use super::*;
 pub(super) mod rest;
 use crate::native_ecology::constitutive_fibre::{
-    GeneratorNeighborhoodStep, ResidentGeneratorNeighborhood, ResidentWaveRelation,
-    WaveSourceReceiver,
+    GeneratorNeighborhoodStep, ResidentGeneratorNeighborhood, ResidentSourcePairs,
+    ResidentWaveRelation, WaveSourceReceiver,
 };
 
 /// The same wave owner continuing through a conditional family. Its fixed normal bank remains
@@ -64,13 +64,50 @@ impl<'c> NormalCoupledStep<'c> {
     pub fn applied_relation(&self) -> &ResidentWaveRelation<'c> {
         self.successor
             .last_relation()
-            .expect("completed conditional passage")
+            .expect("completed wave passage")
     }
     pub fn source(&self) -> &NormalWaveFamily<'c> {
         self.contact.source()
     }
     pub fn successor(&self) -> &NormalWaveFamily<'c> {
         &self.successor
+    }
+}
+/// One supplied source field, its ordered internal passages, and one published successor.
+/// The receipt borrows the actual original field; current standing retains its composed image.
+pub struct NormalCoupledSourceActuation<'a, 'c> {
+    pub predecessor_epoch: u64,
+    pub successor_epoch: u64,
+    pub member: usize,
+    source: ResidentSourcePairs<'a, 'c>,
+    predictions: Vec<Rc<crate::native_ecology::constitutive_fibre::ResidentConstitutiveReturn<'c>>>,
+    predecessor: Rc<NormalWaveFamily<'c>>,
+    successor: Rc<NormalWaveFamily<'c>>,
+}
+impl<'a, 'c> NormalCoupledSourceActuation<'a, 'c> {
+    pub fn source(&self) -> &ResidentSourcePairs<'a, 'c> {
+        &self.source
+    }
+    pub fn predictions(
+        &self,
+    ) -> impl Iterator<Item = &crate::native_ecology::constitutive_fibre::ResidentConstitutiveReturn<'c>>
+    {
+        self.predictions.iter().map(Rc::as_ref)
+    }
+    pub fn predecessor(&self) -> &NormalWaveFamily<'c> {
+        &self.predecessor
+    }
+    pub fn successor(&self) -> &NormalWaveFamily<'c> {
+        &self.successor
+    }
+    /// The last internal source reaction; the complete field image is successor().
+    pub fn last_source_contact(
+        &self,
+    ) -> &crate::native_ecology::constitutive_fibre::ResidentWaveSourceContact<'c> {
+        self.successor
+            .last_relation()
+            .and_then(|v| v.source_contact())
+            .expect("completed source field")
     }
 }
 pub struct NormalCoupledReception<'i, 'c> {
@@ -232,6 +269,126 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         self.check_contact(contact)?;
         self.current()
             .read_through(Rc::clone(&contact.binding.relation))
+    }
+    /// The actual offered source meets its whole learned arrival family by unit-admittance
+    /// contact. That reaction founds a passive union acting on this complete held family.
+    /// This is source actuation, not an observation deposited into either learned body.
+    pub fn read_source_contact(
+        &self,
+        contact: &NormalCoupledContact<'c>,
+        source: ResidentConstitutiveCurrent<'_, 'c>,
+    ) -> Result<NormalWaveFamily<'c>, ConstitutiveFibreError> {
+        self.check_contact(contact)?;
+        let map = contact
+            .binding
+            .relation
+            .read_source_contact(self.neighborhood().generator(contact.member())?, source)?;
+        contact.binding.source.read_through(Rc::new(map))
+    }
+    pub fn actuate_contact_source(
+        &mut self,
+        contact: &NormalCoupledContact<'c>,
+        source: ResidentConstitutiveCurrent<'_, 'c>,
+    ) -> Result<NormalCoupledStep<'c>, ConstitutiveFibreError> {
+        self.check_contact(contact)?;
+        let next = self
+            .epoch()
+            .checked_add(1)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        if !self
+            .neighborhood()
+            .can_publish_wave_read(contact.binding.neighborhood_epoch)
+        {
+            return Err(ConstitutiveFibreError::ForeignOccurrence);
+        }
+        let successor = Rc::new(self.read_source_contact(contact, source)?);
+        // The checked source graph is total and copies the anchor. The current family is
+        // already admitted, so its image retains support without a new nearest-point solve.
+        self.continuation
+            .neighborhood
+            .publish_wave_read(contact.binding.neighborhood_epoch);
+        Ok(self.publish_coupled(contact, next, successor))
+    }
+    /// Stage the complete supplied field in order, then publish one source occurrence. Local
+    /// learned material/condition are read at the admitted cut throughout this unpaired input.
+    pub fn actuate_contact_section<'a>(
+        &mut self,
+        contact: &NormalCoupledContact<'c>,
+        source: ResidentConstitutiveSection<'a, 'c>,
+    ) -> Result<NormalCoupledSourceActuation<'a, 'c>, ConstitutiveFibreError> {
+        self.actuate_contact_section_with_progress(contact, source, |_| {})
+    }
+    /// The callback reports completed internal source factors. It cannot observe or choose a
+    /// numerical state, and publication still occurs only after the entire field succeeds.
+    pub fn actuate_contact_section_with_progress<'a>(
+        &mut self,
+        contact: &NormalCoupledContact<'c>,
+        source: ResidentConstitutiveSection<'a, 'c>,
+        mut progress: impl FnMut(usize),
+    ) -> Result<NormalCoupledSourceActuation<'a, 'c>, ConstitutiveFibreError> {
+        self.check_contact(contact)?;
+        if source.components() != 2 * self.material.roots {
+            return Err(ConstitutiveFibreError::Shape);
+        }
+        let next = self
+            .epoch()
+            .checked_add(1)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        if !self
+            .neighborhood()
+            .can_publish_wave_read(contact.binding.neighborhood_epoch)
+        {
+            return Err(ConstitutiveFibreError::ForeignOccurrence);
+        }
+        let pairs = source.source_pairs(self.material.surface)?;
+        let passage = contact
+            .binding
+            .source
+            .passages()
+            .checked_add(1)
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let mut successor = Rc::clone(&contact.binding.source);
+        let mut predictions = Vec::new();
+        for row in 0..pairs.source().rows() {
+            let (next, prediction) = (|| {
+                let map = contact
+                    .binding
+                    .relation
+                    .read_source_contact(
+                        self.neighborhood().generator(contact.member())?,
+                        pairs.source().row(row)?,
+                    )?
+                    .with_source_row(row);
+                let prediction = map
+                    .source_contact()
+                    .expect("source map")
+                    .retained_prediction();
+                Ok::<_, ConstitutiveFibreError>((
+                    successor.read_through_at(Rc::new(map), passage)?,
+                    prediction,
+                ))
+            })()
+            .map_err(|source| ConstitutiveFibreError::SourcePassage {
+                row,
+                source: Box::new(source),
+            })?;
+            successor = Rc::new(next);
+            predictions.push(prediction);
+            progress(row + 1);
+        }
+        self.continuation
+            .neighborhood
+            .publish_wave_read(contact.binding.neighborhood_epoch);
+        let step = self.publish_coupled(contact, next, Rc::clone(&successor));
+        Ok(NormalCoupledSourceActuation {
+            predecessor_epoch: step.predecessor_epoch,
+            successor_epoch: step.successor_epoch,
+            member: contact.member(),
+            source: pairs,
+            predictions,
+            predecessor: Rc::clone(&contact.binding.source),
+            successor,
+        })
     }
     pub fn advance_contact(
         &mut self,

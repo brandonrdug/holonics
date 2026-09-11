@@ -217,6 +217,16 @@ and validates the chart and its complete gauge directions; coupled remount deriv
 from its actual material/condition. The relation derivation and generic affine-image kernels
 use resident workspace sections rather than per-block shared scratch for their working vectors.
 
+[definition] `resident/condition_contact/affine.rs` exposes the existing unit-admittance
+reaction of actual standing with a complete affine return. `resident/wave_relation/source.rs`,
+`surface_wave_source.rs` and `constitutive_wave_source.cuh` join the learned arrival, retain the
+original prediction, realize that source reaction, and derive its total passive source-union map.
+An empty learned arrival retains the actual offered current and its original obstruction.
+`ResidentSourcePairs` prepares every adjacent field pair; `wave/coupled.rs` stages the ordered
+field under one public successor and returns all local prediction fibres. Relation rest v3 and
+coupled remount reconstruct the source reaction/map and rebind it to the actual restored local
+law. These source maps preserve the original anchor, and are distinct from conditional joins.
+
 [definition] `normal/direct/wave/actuate.rs` owns fixed-material source action. The
 `normal_source_actuation.cuh` source word reuses the learned normal response and the enclosed
 finite contact in `passive_current_ball.cuh`. Source union retains the incoming current;
