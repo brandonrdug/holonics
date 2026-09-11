@@ -246,6 +246,15 @@ error from the declared objective. The
 [Athena/CTC review](../research/records/2026-09-09_MATHEMATICAL_REVIEW_NORMAL_GEOMETRY_AND_CLOSED_RETURNS.md)
 connects these reusable laws to the active implementation and its producing-history requirement.
 
+[proved-derived; formal-checked] The same normal-response owner now derives a finite unit-prior
+minimizer's Frobenius norm bound from its actual sample objective: comparison with the zero
+operator gives `||P||_F ≤ sqrt(E_upper)`. The applied/reference triangle and minimum of two valid
+bounds give an additional native error certificate. The
+[producing-return construction](../research/records/2026-09-10_ATHENA_RETURNS_OBSERVATIONS_TO_THEIR_PRODUCING_JOINT.md)
+uses this without changing fitted coefficients, source moments or carrier width. The hypothesis is
+a compatible normal-objective source family; this is not a bound for arbitrary independently
+perturbed moment triples or a universal physical-energy law.
+
 ## Molecular structures are constitutive geometry over time
 
 [definition] Here *molecular structure* covers the intended biological family—protein, DNA, RNA,

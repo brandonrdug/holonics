@@ -2,6 +2,7 @@
 //! The continuing state is a generator word with its original seed, resident power cache and
 //! certified remainder. Current faces are observations of that state, not its history archive.
 use super::*;
+use std::collections::BTreeMap;
 mod actuate;
 pub use actuate::NormalSourceActuation;
 mod develop;
@@ -10,6 +11,30 @@ mod receive;
 pub use receive::{NormalWaveReception, NormalWaveReceptionReading};
 mod rest;
 pub use rest::NormalWaveRest;
+mod reference;
+pub use reference::{NormalWaveReference, NormalWaveReferenceReading};
+mod comparison;
+use comparison::ProducingCut;
+pub use comparison::{NormalProducingHandle, NormalWavePrediction, NormalWaveComparison, NormalWaveComparisonReading};
+
+/// Which operator family the transported enclosure describes. Applied uses the actual stored
+/// dyadic M, retaining source uncertainty and numerical realization error. NormalReference also
+/// transports the comparison with the compatible normal minimizer P. These are different
+/// receivers; the reference certificate is not uncertainty in the chosen coefficients themselves.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum NormalWaveTransport {
+    Applied,
+    #[default]
+    NormalReference,
+}
+impl NormalWaveTransport {
+    fn is_reference(self) -> bool { self == Self::NormalReference }
+}
+
+pub struct NormalWaveTransportChange<'c> {
+    pub predecessor: NormalWaveFibre<'c>,
+    pub successor: NormalWaveFibre<'c>,
+}
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum NormalWaveSeedKind {
@@ -59,6 +84,7 @@ impl<'c> NormalWaveCurrent<'c> {
 /// The implicit joint family is the repeated same normal-law action on the original rational
 /// pair. Its source chart and shared material are retained; no inverse of a source history is used.
 pub struct NormalWaveFibre<'c> {
+    pub transport: NormalWaveTransport,
     material: Rc<ResidentSection<'c>>,
     seed: Rc<ResidentSection<'c>>,
     surface: &'c ResidentSurface<'c>,
@@ -122,6 +148,7 @@ impl<'c> NormalWaveFibre<'c> {
 
 #[derive(Debug, Serialize)]
 pub struct NormalWaveReading {
+    pub transport: NormalWaveTransport,
     pub steps: u64,
     pub maximum_computed_power_norm: Rat,
     pub uniform_power_equation_defect: Rat,
@@ -149,6 +176,7 @@ impl NormalWaveStep<'_> {
         }
         .inspect()?;
         Ok(NormalWaveReading {
+            transport: self.fibre.transport,
             steps: self.fibre.steps,
             maximum_computed_power_norm: Rat::from_integer(meta[0].into()),
             uniform_power_equation_defect: Rat::new(meta[1].into(), scale.clone()),
@@ -169,6 +197,9 @@ impl std::fmt::Debug for NormalWaveSeedRefusal<'_> {
 }
 
 pub struct ResidentNormalWave<'c> {
+    transport: NormalWaveTransport,
+    owner: Rc<()>,
+    pending: BTreeMap<u64, Rc<ProducingCut<'c>>>,
     material: ResidentNormalMaterial<'c>,
     seed: Rc<ResidentSection<'c>>,
     seed_bound: Rc<ResidentSection<'c>>,
@@ -193,6 +224,17 @@ impl<'c> ResidentNormalMaterial<'c> {
     ) -> Result<ResidentNormalWave<'c>, NormalWaveSeedRefusal<'c>> {
         self.into_difference_wave_source(previous.into(), current)
     }
+    /// Found transport by the selected stored M from the supplied actual initial pair.
+    /// The normal-reference certificate remains on material; it is not input uncertainty.
+    pub fn into_applied_difference_wave(
+        self,
+        previous: ResidentConstitutiveCurrent<'_, 'c>,
+        current: ResidentConstitutiveCurrent<'_, 'c>,
+    ) -> Result<ResidentNormalWave<'c>, NormalWaveSeedRefusal<'c>> {
+        let mut body = self.into_difference_wave(previous,current)?;
+        body.transport = NormalWaveTransport::Applied;
+        Ok(body)
+    }
     fn into_difference_wave_source(
         self,
         previous: ResidentNormalInput<'_, 'c>,
@@ -214,6 +256,9 @@ impl<'c> ResidentNormalMaterial<'c> {
             }) => {
                 let seed_bound = Rc::new(seed_bound);
                 Ok(ResidentNormalWave {
+                    transport: NormalWaveTransport::NormalReference,
+                    owner: Rc::new(()),
+                    pending: BTreeMap::new(),
                     material: self,
                     seed: Rc::new(seed),
                     joint: Rc::clone(&seed_bound),
@@ -318,6 +363,29 @@ impl<'c> ResidentNormalMaterial<'c> {
     }
 }
 impl<'c> ResidentNormalWave<'c> {
+    pub fn transport(&self) -> NormalWaveTransport { self.transport }
+
+    /// Change the future operator-family receiver, never reinterpret or narrow the held joint.
+    /// Rebase at this cut so a reference word is not silently re-read as an applied word.
+    pub fn set_transport(
+        &mut self,
+        transport: NormalWaveTransport,
+    ) -> Result<NormalWaveTransportChange<'c>, ConstitutiveFibreError> {
+        let predecessor = self.fibre();
+        if self.transport != transport {
+            let staged = self.material.prepare_joint_seed(&self.joint,self.epoch)?;
+            self.seed = Rc::clone(&self.joint);
+            self.seed_bound = Rc::clone(&self.joint);
+            self.seed_kind = NormalWaveSeedKind::JointEnclosure;
+            self.power = staged.power;
+            self.metadata = Rc::new(staged.metadata);
+            self.steps = 0;
+            self.seed_epochs = [self.previous.at(),self.current.at()];
+            self.transport = transport;
+        }
+        Ok(NormalWaveTransportChange { predecessor, successor:self.fibre() })
+    }
+
     pub fn epoch(&self) -> u64 {
         self.epoch
     }
@@ -332,6 +400,7 @@ impl<'c> ResidentNormalWave<'c> {
     }
     pub fn fibre(&self) -> NormalWaveFibre<'c> {
         NormalWaveFibre {
+            transport: self.transport,
             material: Rc::clone(&self.material.state),
             seed: Rc::clone(&self.seed),
             surface: self.material.surface,
@@ -391,6 +460,7 @@ impl<'c> ResidentNormalWave<'c> {
                 &joint,
                 &current,
                 &work,
+                self.transport.is_reference(),
             )?;
         }
         passage.close(1, &joint, i64::BITS)?;
@@ -429,3 +499,9 @@ impl<'c> ResidentNormalWave<'c> {
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod comparison_tests;
+
+#[cfg(test)]
+mod transport_tests;

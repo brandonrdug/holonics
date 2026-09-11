@@ -12,6 +12,7 @@ pub struct NormalWaveReception<'c> {
 }
 #[derive(Debug, Serialize)]
 pub struct NormalWaveReceptionReading {
+    pub transport: NormalWaveTransport,
     pub epoch: u64,
     pub source_joint: NativeFieldCurrentBall,
     pub comparison: NativeNormalMaterialReading,
@@ -29,6 +30,7 @@ impl<'c> NormalWaveReception<'c> {
     pub fn inspect(&self) -> Result<NormalWaveReceptionReading, ConstitutiveFibreError> {
         let fibre = &self.successor_fibre;
         Ok(NormalWaveReceptionReading {
+            transport: fibre.transport,
             epoch: fibre.epoch,
             source_joint: self.source_joint().inspect()?,
             comparison: decode_report(
@@ -83,6 +85,7 @@ impl<'c> ResidentNormalWave<'c> {
                 &report,
                 &work,
                 &input,
+                self.transport.is_reference(),
             )?;
         }
         passage.close(0, &report, i64::BITS)?;

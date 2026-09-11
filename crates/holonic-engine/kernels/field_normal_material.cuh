@@ -88,6 +88,25 @@ __device__ void normal_fit(int64_t *state,uint32_t n,uint32_t targets,uint32_t g
         MomentInteger eh=normal_read(scalars,slot),eb=normal_read(scalars+MOMENT_WIRE_WORDS,slot),S=moment_lift(complete_power(grain,slot));
         if(eh.negative||eb.negative)atomicOr(slot,REFUSED_MALFORMED);
         MomentInteger bound=residual+normal_wide(norm)*eh+S*eb;
+        // A unit-prior minimizer P satisfies ||P||_F^2 <= target energy: compare its
+        // objective with the zero operator. Hence ||M-P|| <= ||M||_1+sqrt(C+EC),
+        // independently of source conditioning. Keep the tighter of two valid bounds.
+        // Reuse the exact integer norm owner for an outward square root. The energy
+        // numerator is at S^2, so its root is already at S. Compare before narrowing:
+        // an irrelevant unrepresentable cap must not refuse a smaller residual bound.
+        MomentInteger energy=normal_read(scalars+NORMAL_TARGET_ENERGY*MOMENT_WIRE_WORDS,slot);
+        MomentInteger energy_error=normal_read(scalars+NORMAL_TARGET_ENERGY_ERROR*MOMENT_WIRE_WORDS,slot);
+        if(energy.negative||energy_error.negative)atomicOr(slot,REFUSED_MALFORMED);
+        energy=energy+energy_error;
+        const wide maximum=(wide)(((uwide)1<<127)-1u);
+        MomentInteger root_limit=normal_wide(maximum)*normal_wide(maximum);
+        if(!energy.overflow&&energy<=root_limit){
+            HistoryInteger energy_square;
+            for(uint32_t j=0;j<HistoryInteger::LIMBS;++j)energy_square.limb[j]=energy.limb[j];
+            wide root=history_norm_ceiling(energy_square,slot);
+            MomentInteger energy_bound=(normal_wide(norm)+normal_wide(root))*S*S;
+            if(!energy_bound.overflow&&(bound.overflow||energy_bound<bound))bound=energy_bound;
+        }
         M[2u*coefficients]=normal_grid(bound,2u*grain,true,slot);
         M[2u*coefficients+1u]=normal_grid(residual,2u*grain,true,slot);M[2u*coefficients+2u]=norm;
         if(diagnostic){diagnostic[0]=M[2u*coefficients];diagnostic[1]=normal_grid(residual,2u*grain,true,slot);diagnostic[2]=norm;

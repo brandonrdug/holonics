@@ -163,6 +163,23 @@ while preserving current occurrence identity. The section owner separates prepar
 publication; `crates/holonics-hna/examples/conversation_wave.rs` composes the native body with
 exterior source/chart/cursor I/O.
 
+[definition] `normal/direct/wave/comparison.rs` now owns `NormalProducingHandle`, `predict` and
+`receive_prediction`: an addressed return keeps the actual producing joint/material while
+incrementing contemporary material and preserving current occurrence identity. The shared
+`normal_wave_receive.cuh` helper has separate producing/contemporary inputs for this comparison;
+ordinary next-current reception keeps its original ABI. `wave/rest.rs` v5 stores active producing
+cuts, rejects malformed lineage and reconstructs their source words across process exit. Completed
+or released handles leave the active population; legacy normal-only rests remain supported.
+
+[definition] `NormalWaveTransport` distinguishes the stored-M applied word from the wider
+normal-reference family. Source and numerical-rounding bounds remain in both; the M/P comparison
+is not reinjected into the applied source. `wave/reference.rs` reads one reference continuation
+without creating a current occurrence. Rest v6 records the scope, including mixed pending cuts;
+scope changes rebase the complete held enclosure without narrowing it. `field_normal_material.cuh`
+now also caps its reference-operator error by the unit-prior target-energy law in
+`Physics/AccumulatedNormalResponse.lean`, using the existing exact integer norm owner. The fitted
+coefficients and moments are unchanged; cold validation accepts legacy and tightened certificates.
+
 [definition] `normal/direct/wave/actuate.rs` owns fixed-material source action. The
 `normal_source_actuation.cuh` source word reuses the learned normal response and the enclosed
 finite contact in `passive_current_ball.cuh`. Source union retains the incoming current;

@@ -41,8 +41,9 @@ __device__ void direct_normal_pack(
 }
 
 // Parallel target rows, followed by their complete joint-radius bound.
-__device__ void direct_normal_predict(const int64_t *old,const wide *current,
-    uint32_t roots,uint32_t targets,uint32_t grain,wide *out,int64_t *work,bool full_report,uint32_t *slot){
+__device__ void direct_normal_predict_mode(const int64_t *old,const wide *current,
+    uint32_t roots,uint32_t targets,uint32_t grain,wide *out,int64_t *work,bool full_report,
+    bool reference,uint32_t *slot){
     const uint32_t d=normal_source_components(roots),R=2u*targets;
     // Read the old operator using the same contraction and certified family bound as the field.
     const wide *M=(const wide *)old;
@@ -60,17 +61,24 @@ __device__ void direct_normal_predict(const int64_t *old,const wide *current,
             norm=add_checked(norm,((wide *)work)[2u*row],slot);
             remainder=add_checked(remainder,((wide *)work)[2u*row+1u],slot);
         }
-        wide error=M[(size_t)R*normal_sources(roots)];
+        // Reference transport pays the retained coefficient defect. Applied transport uses
+        // the stored operator as the law, while retaining source enclosure and rounding.
+        wide error=reference?M[(size_t)R*normal_sources(roots)]:0;
         out[R]=ft_prediction_error(error,norm,current+d+1u,d,current[2u*(d+1u)-1u],remainder,grain,slot);
         if(full_report){
         size_t at=normal_metadata_at(roots,targets);
-        out[at]=error;out[at+1u]=M[(size_t)R*normal_sources(roots)+1u];out[at+2u]=norm;
+        out[at]=M[(size_t)R*normal_sources(roots)];out[at+1u]=M[(size_t)R*normal_sources(roots)+1u];out[at+2u]=norm;
         const int64_t *errors=old+normal_state_words(roots,targets)-NORMAL_STATISTIC_COUNT*MOMENT_WIRE_WORDS;
         out[at+3u]=normal_grid(normal_read(errors,slot),grain,true,slot);
         out[at+4u]=normal_grid(normal_read(errors+MOMENT_WIRE_WORDS,slot),grain,true,slot);
         }
     }
     __syncthreads();if(*slot)return;
+}
+
+__device__ void direct_normal_predict(const int64_t *old,const wide *current,
+    uint32_t roots,uint32_t targets,uint32_t grain,wide *out,int64_t *work,bool full_report,uint32_t *slot){
+    direct_normal_predict_mode(old,current,roots,targets,grain,out,work,full_report,true,slot);
 }
 
 extern "C" __global__ __launch_bounds__(512) void section_direct_normal_material(
@@ -96,7 +104,7 @@ extern "C" __global__ __launch_bounds__(512) void section_direct_normal_material
             roots,targets,grain,observed,input,slot);
     }
     __syncthreads();if(*slot)return;
-    direct_normal_predict(old,current,roots,targets,grain,out,work,true,slot);
+    direct_normal_predict_mode(old,current,roots,targets,grain,out,work,true,true,slot);
     if(*slot)return;
     for(size_t j=threadIdx.x;j<report_words;j+=blockDim.x)before_hi[j]=before[j];
     __syncthreads();

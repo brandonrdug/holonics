@@ -46,6 +46,14 @@ current point/exact and bounded-family ports still require the explicit conversi
 Its text receiver is a declared native projection with the full source fibre retained, not a
 claim that a selected word identifies the source or proves useful language.
 
+[established-bounded; implemented-exact] The goal's [first producing-return implementation](../research/records/2026-09-10_ATHENA_RETURNS_OBSERVATIONS_TO_THEIR_PRODUCING_JOINT.md)
+now exposes `ResidentNormalWave::predict` and `receive_prediction` with source-qualified pending
+handles, contemporary material accumulation and correlated source/target envelopes. Pending rest
+v5 preserves reference cuts; v6 additionally preserves explicit Applied/NormalReference scope.
+Applied transport retains source uncertainty and rounding while its ideal-normal comparison remains
+a separate read-only receiver and material certificate. Ordinary next-current reception remains separate. Phase, late-refusal and fresh-process
+controls pass; native text emission and coupled conditional organization remain the next packets.
+
 [project-postulate] The [September 7 correction](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
 places generator recovery, phase transport and Holonic Compression inside the developing
 recurrence shared with acoustics. A **Preimage Fibre** can carry useful constraints from limited

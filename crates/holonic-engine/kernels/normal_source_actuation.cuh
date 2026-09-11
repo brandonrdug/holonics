@@ -1,10 +1,10 @@
 // A source section acts through its learned joined passages on the complete held joint current.
 // Source rows are transient measured incidence. One section produces one successor ecology.
-extern "C" __global__ __launch_bounds__(512) void section_normal_source_actuation(
+__device__ void section_normal_source_actuation_impl(
     const int64_t *material,const int64_t *joint,const int64_t *field_lo,const int64_t *field_hi,
     uint32_t rows,uint32_t rational,uint32_t n,uint32_t grain,
     int64_t *out,int64_t *out_hi,int64_t *anchors,int64_t *frame,int64_t *work,
-    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    bool reference,uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
     if(blockIdx.x)return;if(upstream_refused(census,lineage,lineage_count,slot))return;
     uint32_t r=2u*n,w=2u*r,d=3u*r,stride=r+rational;
     wide *q=(wide *)out,*x=(wide *)anchors,*y=x+w+1u,*delta=y+w+1u,*input=(wide *)frame;
@@ -18,23 +18,23 @@ extern "C" __global__ __launch_bounds__(512) void section_normal_source_actuatio
     const uint32_t m=normal_sources(n);
     const int64_t *H=material+normal_matrix_words(n,n),*B=H+COMPLEX_MOMENT_WIRE_WORDS*(size_t)m*m;
     const int64_t *errors=material+normal_state_words(n,n)-NORMAL_STATISTIC_COUNT*MOMENT_WIRE_WORDS;
-    if(!threadIdx.x)exact_geometry=normal_read(errors,slot).is_zero()&&normal_read(errors+MOMENT_WIRE_WORDS,slot).is_zero();
+    if(!threadIdx.x)exact_geometry=!reference||(normal_read(errors,slot).is_zero()&&normal_read(errors+MOMENT_WIRE_WORDS,slot).is_zero());
     __syncthreads();if(*slot)return;
     for(uint32_t j=threadIdx.x;j<m;j+=blockDim.x){
         bool invisible=exact_geometry;
         MomentInteger unit=normal_wide((wide)1<<grain)*normal_wide((wide)1<<grain);
-        if(invisible){
+        if(invisible&&reference){
             const int64_t *diagonal=H+COMPLEX_MOMENT_WIRE_WORDS*((size_t)j*m+j);
             invisible=normal_read(diagonal,slot)==unit&&normal_read(diagonal+MOMENT_WIRE_WORDS,slot).is_zero();
         }
-        if(invisible)for(uint32_t i=0;i<m&&invisible;++i)if(i!=j){
+        if(invisible&&reference)for(uint32_t i=0;i<m&&invisible;++i)if(i!=j){
             const int64_t *h=H+COMPLEX_MOMENT_WIRE_WORDS*((size_t)i*m+j);
             invisible=normal_read(h,slot).is_zero()&&normal_read(h+MOMENT_WIRE_WORDS,slot).is_zero();
         }
         if(invisible)for(uint32_t i=0;i<n&&invisible;++i){
             const int64_t *b=B+COMPLEX_MOMENT_WIRE_WORDS*((size_t)i*m+j);
             const wide *coefficient=(const wide *)material+2u*((size_t)i*m+j);
-            invisible=normal_read(b,slot).is_zero()&&normal_read(b+MOMENT_WIRE_WORDS,slot).is_zero()
+            invisible=(!reference||(normal_read(b,slot).is_zero()&&normal_read(b+MOMENT_WIRE_WORDS,slot).is_zero()))
                 &&coefficient[0]==0&&coefficient[1]==0;
         }
         input[j]=invisible?0:1;
@@ -64,7 +64,7 @@ extern "C" __global__ __launch_bounds__(512) void section_normal_source_actuatio
         }
         __syncthreads();if(*slot)return;
         if(zero_response){for(uint32_t j=threadIdx.x;j<=r;j+=blockDim.x)delta[j]=0;}
-        else direct_normal_predict(material,input,n,n,grain,delta,work,false,slot);
+        else direct_normal_predict_mode(material,input,n,n,grain,delta,work,false,reference,slot);
         __syncthreads();
         if(*slot)return;
         for(uint32_t j=threadIdx.x;j<r;j+=blockDim.x){y[j]=x[r+j];y[r+j]=add_checked(x[r+j],delta[j],slot);}
@@ -74,4 +74,24 @@ extern "C" __global__ __launch_bounds__(512) void section_normal_source_actuatio
         if(*slot)return;
     }
     for(uint32_t j=threadIdx.x;j<2u*(w+1u);j+=blockDim.x)out_hi[j]=out[j];
+}
+
+extern "C" __global__ __launch_bounds__(512) void section_normal_source_actuation(
+    const int64_t *material,const int64_t *joint,const int64_t *field_lo,const int64_t *field_hi,
+    uint32_t rows,uint32_t rational,uint32_t n,uint32_t grain,
+    int64_t *out,int64_t *out_hi,int64_t *anchors,int64_t *frame,int64_t *work,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    if(blockIdx.x)return;
+    section_normal_source_actuation_impl(material,joint,field_lo,field_hi,rows,rational,n,grain,
+        out,out_hi,anchors,frame,work,true,slot,census,lineage,lineage_count);
+}
+
+extern "C" __global__ __launch_bounds__(512) void section_normal_source_actuation_applied(
+    const int64_t *material,const int64_t *joint,const int64_t *field_lo,const int64_t *field_hi,
+    uint32_t rows,uint32_t rational,uint32_t n,uint32_t grain,
+    int64_t *out,int64_t *out_hi,int64_t *anchors,int64_t *frame,int64_t *work,
+    uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    if(blockIdx.x)return;
+    section_normal_source_actuation_impl(material,joint,field_lo,field_hi,rows,rational,n,grain,
+        out,out_hi,anchors,frame,work,false,slot,census,lineage,lineage_count);
 }

@@ -169,12 +169,15 @@ A fixed linear SSM has an exact convolutional realization including initial stat
 transition need not. The review returns exact examples instead of asserting universal equivalence.
 
 [established-bounded; source-inspected] `ResidentNormalWave::actuate_section` now transports the
-actual joint current under fixed material. Its conversation caller has separate local-stencil
-development and numerical generation, but no paired reply to the produced situated response or
-native-to-symbol emission. The [blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
-now starts at this binding. `receive(v)` addresses the next current; a correction of a prior
-prediction requires that prediction's producing joint and receiver. Existing normal staging,
-wave fibres and section/current owners are reused rather than a new learner or wrapper.
+actual joint current under fixed material. `predict`/`receive_prediction` now bind an observed
+return to its producing joint and material cut, including pending rest. The conversation example
+exercises an explicit same-part observed-tail chart; general reply relations still require their
+actual source/receiver association. Native-to-symbol emission is the next binding in the
+[blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md).
+`receive(v)` keeps its distinct next-current meaning. Applied transport carries stored M and
+actual source/rounding bounds; the normal-reference family remains a separate declared receiver.
+The [source return](../research/records/2026-09-10_ATHENA_RETURNS_OBSERVATIONS_TO_THEIR_PRODUCING_JOINT.md)
+records the exact checks and wider-run scope.
 
 [definition] The [final computational review](../research/records/2026-09-10_TENSION_DYNAMICS_BECOME_ATHENAS_COMPUTATIONAL_CONSTRUCTION.md)
 now fixes the first conditional response as `η ∈ L_j((c−p,c,p),h)` with actual join `(c,c+η)`.

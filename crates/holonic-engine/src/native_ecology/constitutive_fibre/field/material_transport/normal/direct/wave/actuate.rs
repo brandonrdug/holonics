@@ -76,6 +76,7 @@ impl<'c> ResidentNormalWave<'c> {
                 &anchors,
                 &frame,
                 &work,
+                self.transport.is_reference(),
             )?;
         }
         passage.close(0, &joint, i64::BITS)?;

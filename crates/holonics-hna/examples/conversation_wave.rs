@@ -4,7 +4,7 @@ use holonic_engine::{
     codec_recovery::SymbolAlphabet,
     embedding_fiber::ResidentReadout,
     native_ecology::constitutive_fibre::{
-        NormalWaveRest, ResidentConstitutiveSection, ResidentNormalMaterial,
+        NormalWaveRest, NormalWaveTransport, ResidentConstitutiveSection, ResidentNormalMaterial,
     },
     resident_section::{ResidentGrain, ResidentSurface},
 };
@@ -32,8 +32,10 @@ fn json<T: serde::Serialize>(path: impl AsRef<Path>, value: &T) -> Result<()> {
 fn main() -> Result<()> {
     let args = std::env::args().skip(1).collect::<Vec<_>>();
     let actuating = args.first().is_some_and(|mode| mode == "actuate");
+    let comparing = args.first().is_some_and(|mode| mode == "compare" || mode == "compare-start" || mode == "compare-applied" || mode == "compare-applied-start");
+    let applied = args.first().is_some_and(|mode| mode == "compare-applied" || mode == "compare-applied-start");
     let (chart,mut reader,rest,grain,take,steps,output)=match args.as_slice() {
-        [mode,source,calibration,take,grain,steps,output] if mode=="start"=>{
+        [mode,source,calibration,take,grain,steps,output] if mode=="start"||mode=="compare-start"||mode=="compare-applied-start"=>{
             let calibration=calibration.parse::<u64>()?;
             let take=take.parse::<u64>()?;
             if take==0||calibration<take {return Err("declare nonempty intake within the calibration aperture".into());}
@@ -54,7 +56,7 @@ fn main() -> Result<()> {
             (SymbolCurrentChart::declared(alphabet),ExposureReader::resume(origin)?,None,
                 ResidentGrain(grain.parse::<u32>()?),take,steps.parse::<u64>()?,output)
         }
-        [mode,previous,take,steps,output] if mode=="resume"||mode=="actuate"=>{
+        [mode,previous,take,steps,output] if mode=="resume"||mode=="actuate"||mode=="compare"||mode=="compare-applied"=>{
             let previous=Path::new(previous);
             let summary:serde_json::Value=serde_json::from_reader(File::open(previous.join("summary.json"))?)?;
             if summary["schema"]!="holonics.conversation-wave.v1" {
@@ -72,7 +74,7 @@ fn main() -> Result<()> {
             (SymbolCurrentChart::declared(alphabet),ExposureReader::resume(cursor)?,Some(rest),grain,
                 take.parse::<u64>()?,steps.parse::<u64>()?,output)
         }
-        _=>return Err("usage: conversation_wave start SOURCE CALIBRATE_FRAMES TAKE_FRAMES GRAIN GENERATE_STEPS NEW_DIRECTORY | resume PREVIOUS_DIRECTORY TAKE_FRAMES GENERATE_STEPS NEW_DIRECTORY | actuate PREVIOUS_DIRECTORY TAKE_FRAMES GENERATE_STEPS NEW_DIRECTORY".into()),
+        _=>return Err("usage: conversation_wave start SOURCE CALIBRATE_FRAMES TAKE_FRAMES GRAIN GENERATE_STEPS NEW_DIRECTORY | resume PREVIOUS_DIRECTORY TAKE_FRAMES GENERATE_STEPS NEW_DIRECTORY | actuate PREVIOUS_DIRECTORY TAKE_FRAMES GENERATE_STEPS NEW_DIRECTORY | compare PREVIOUS_DIRECTORY TAKE_FRAMES GENERATE_STEPS NEW_DIRECTORY | compare-start SOURCE CALIBRATE_FRAMES TAKE_FRAMES GRAIN GENERATE_STEPS NEW_DIRECTORY | compare-applied PREVIOUS_DIRECTORY TAKE_FRAMES GENERATE_STEPS NEW_DIRECTORY | compare-applied-start SOURCE CALIBRATE_FRAMES TAKE_FRAMES GRAIN GENERATE_STEPS NEW_DIRECTORY".into()),
     };
     let output = Path::new(output);
     if output.exists() {
@@ -89,6 +91,9 @@ fn main() -> Result<()> {
     let mut body = rest
         .map(|r| r.remount(&surface, |step| eprintln!("decoded word {step}")))
         .transpose()?;
+    if applied {
+        if let Some(body)=body.as_mut() { body.set_transport(NormalWaveTransport::Applied)?; }
+    }
     let first_sequence = reader.cursor().next_sequence;
     let mut short_parts = 0usize;
     let mut fields = Vec::new();
@@ -103,11 +108,15 @@ fn main() -> Result<()> {
                 let symbols = chart.decode_text(text)?;
                 scalars += symbols.len();
                 octets += text.len();
-                if symbols.len() < 2 {
+                if symbols.len() < if comparing { 3 } else { 2 } {
                     short_parts += 1;
                     continue;
                 }
-                let section = chart.mount(&surface, &symbols)?;
+                // In the declared part-tail comparison chart the last actual source symbol is
+                // an observed continuation. It is withheld from actuation, not inferred from
+                // a reply label or aligned to another part by position.
+                let source_symbols = if comparing { &symbols[..symbols.len()-1] } else { &symbols[..] };
+                let section = chart.mount(&surface, source_symbols)?;
                 let input = ResidentConstitutiveSection::integers(&section)?;
                 if body.is_none() {
                     // Actual first source currents define the initial receiver chart. Their
@@ -118,11 +127,58 @@ fn main() -> Result<()> {
                         chart.alphabet().len(),
                         grain,
                     )?;
-                    body = Some(
-                        material
-                            .into_difference_wave(input.row(0)?, input.row(1)?)
-                            .map_err(|r| r.reason)?,
-                    );
+                    body = Some(if applied {
+                        material.into_applied_difference_wave(input.row(0)?,input.row(1)?)
+                    } else {
+                        material.into_difference_wave(input.row(0)?,input.row(1)?)
+                    }.map_err(|r| r.reason)?);
+                }
+                if comparing {
+                    let body = body.as_mut().expect("actual source seed");
+                    let observed = chart.mount(&surface, &symbols[symbols.len()-1..])?;
+                    let observed = ResidentConstitutiveSection::integers(&observed)?;
+                    let before = surface.census();
+                    let clock = Instant::now();
+                    // These are three explicitly joined cuts. The correction is addressed to
+                    // the prediction, rather than pretending the last generated c is its source.
+                    let actuation = body.actuate_section(input)?;
+                    let prediction = body.predict()?;
+                    let comparison = match body.receive_prediction(&prediction.handle, observed.row(0)?) {
+                        Ok(returned) => returned,
+                        Err(error) => {
+                            // Preserve the complete committed state and unresolved address. This
+                            // failed directory is evidence, not a completed/acknowledged intake.
+                            publish_new(output.join("failed-comparison.wave"), |file|
+                                body.rest().and_then(|r| r.write(file)).map_err(io::Error::other))?;
+                            json(output.join("exterior-chart.json"), chart.alphabet())?;
+                            json(output.join("failed-comparison.json"), &serde_json::json!({
+                                "schema":"holonics.failed-producing-comparison.v1",
+                                "sequence":frame.sequence,"part":part.ordinal,
+                                "prediction_id":prediction.handle.id(),
+                                "observed_symbol":text.chars().last(),
+                                "error":error.to_string(),"prediction":prediction.step.inspect()?,
+                                "material":body.fibre().inspect_material()?,
+                                "completed_fields":fields}))?;
+                            return Err(error.into());
+                        }
+                    };
+                    let seconds = clock.elapsed().as_secs_f64();
+                    let after = surface.census();
+                    fields.push(serde_json::json!({"sequence":frame.sequence,"part":part.ordinal,
+                        "source_scalars":symbols.len(),"source_octets":text.len(),
+                        "comparison_chart":"same-part observed tail after prefix actuation",
+                        "actuated_rows":source_symbols.len(),"observed_row":symbols.len()-1,
+                        "source_epoch":actuation.successor_fibre().epoch,
+                        "prediction_id":prediction.handle.id(),"prediction":prediction.step.inspect()?,
+                        "returned_comparison":comparison.inspect()?,
+                        "observations":comparison.successor_fibre.material_observations,
+                        "current_epoch":body.epoch(),"seconds":seconds,
+                        "native_deeds":after.deed_launches-before.deed_launches,
+                        "numerical_readouts_during_comparison":after.section_read_outs-before.section_read_outs,
+                        "ingress_octets_during_comparison":after.ingress_octets-before.ingress_octets}));
+                    eprintln!("source {} part {}: producing comparison {}, {:.3}s",
+                        frame.sequence, part.ordinal, prediction.handle.id(), seconds);
+                    continue;
                 }
                 if actuating {
                     let body = body.as_mut().expect("restored source-action body");
@@ -211,7 +267,8 @@ fn main() -> Result<()> {
     json(output.join("trajectory.json"), &trajectory)?;
     let summary = serde_json::json!({"schema":"holonics.conversation-wave.v1",
         "scope":"source action and development of a continuing local generator; not general contextual language",
-        "intake_operation":if actuating {"actuation"} else {"development"},
+        "transport":body.transport(),
+        "intake_operation":if comparing {"producing-comparison"} else if actuating {"actuation"} else {"development"},
         "first_sequence":first_sequence,"next_sequence":reader.cursor().next_sequence,"frames":frames,
         "fields":fields.len(),"short_parts_without_local_comparison":short_parts,"source_scalars":scalars,"source_octets":octets,
         "alphabet_coordinates":chart.alphabet().len(),"grain":grain.0,"observations":saved.material().observations(),

@@ -34,6 +34,14 @@ GPU execution owns committed current, coefficients and branches. Preserve exact 
 joint enclosures; numerical realization error, source uncertainty and observed fit discrepancy
 have different meanings. Lean and equational proof search remain exterior research apparatus.
 
+[definition] The active implementation now has an [initial producing-return](../../research/records/2026-09-10_ATHENA_RETURNS_OBSERVATIONS_TO_THEIR_PRODUCING_JOINT.md).
+Use `Applied` scope for transport by the selected stored M; retain `NormalReference` and the
+read-only `reference_next` for their distinct ideal-normal comparison. Source and operation
+rounding remain in applied enclosures. The unit-prior energy certificate bounds the reference
+without changing coefficients. This refines the numerical/source distinction below; it does not
+reinterpret older rests or narrow the held source when the future scope changes. Current packet
+position remains in CONSTRUCTION_STATE and the roadmap.
+
 ## Returned owners: preserve and compose
 
 [established-bounded; source-inspected] At final review base `9fceb915`, the following paths exist.
@@ -48,9 +56,10 @@ The linked records retain their executed checks; source inspection here does not
 | Accumulated normal material | `ResidentNormalMaterial`; H, B, target energy, source bounds, applied realization M and normal-reference comparison | Bind an observation to the source that actually produced the compared response |
 | Incoming source action | `ResidentNormalWave::actuate_section`; transforms held joint current under fixed material, one source-field successor | Compose the resulting situated state with prediction, its receiver and a returned comparison |
 | Generation | `ResidentNormalWave::advance`; actual joined successor and retained generator/fibre | Expose a declared receiver and emission, not just the diagnostic trajectory |
-| Next observed current | `ResidentNormalWave::receive`; updates material and replaces (p,c) by (c,v) atomically | This is specifically a next-current observation; it is not automatically a correction to an earlier output |
+| Next observed current | `ResidentNormalWave::receive`; updates material and replaces (p,c) by (c,v) atomically | Keep its next-current meaning distinct from the producing-addressed return |
+| Producing-addressed return | `predict` / `receive_prediction`; retains source joint/material and stages a contemporary material update without replacing current occurrences | Use the actual observation/source relation; broader receiver lifts retain their domains |
 | Section development | `ResidentNormalWave::develop_section`; updates material from supplied section pairs, preserves current occurrences | Its present caller uses local source differences, not a reply paired with a situated prediction |
-| Productive rest | `NormalWaveRest`; material, seed/joint enclosure, generator word and component epochs | Extend only for new pending comparison/receiver state introduced by the next packet |
+| Productive rest | `NormalWaveRest`; material, seed/joint, word, epochs, pending cuts and applied/reference scope | Extend for the new emission receiver and coupled body through their actual owners |
 
 [established-bounded; source-inspected] `examples/conversation_wave.rs` chooses actuation or
 within-part difference development, then calls `advance` and writes numerical trajectory/rest.

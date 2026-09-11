@@ -235,3 +235,50 @@ fn enclosed_source_uncertainty_enters_the_normal_geometry() {
     assert_eq!(wrong.state_wire().unwrap(), before);
     assert_eq!(wrong.observations(), 0);
 }
+
+#[test]
+#[ignore = "requires CUDA; unit-prior target energy bounds the reference without a carrier raise"]
+fn target_energy_caps_a_large_source_family_and_keeps_legacy_rest() {
+    use num_traits::ToPrimitive;
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let grain = ResidentGrain(64);
+    let scale = 1i128 << grain.0;
+    // This is a declared source aperture, not a material capacity. The old residual/source
+    // product overflows on its response; the energy bound remains valid for the entire ball.
+    let radius = (1i128 << 27) * scale;
+    let values = [scale,0,scale,0,0,0,radius];
+    let words = values.into_iter().flat_map(|v| [v as i64,(v >> 64) as i64])
+        .map(|v| (v,v)).collect();
+    let source = s.mount_section_rest(&ResidentSectionRest::found(
+        1,14,ResidentGrain(0),64,words).unwrap()).unwrap();
+    let input = ResidentNormalEnclosureView {
+        surface: &s, section: &source, offset:0, width:6, grain,
+    };
+    let target = point(&s,&[1,0]);
+    let mut body = ResidentNormalMaterial::found(&s,1,1,grain).unwrap();
+    let reads = s.census().section_read_outs;
+    body.receive(input,current(&target)).unwrap();
+    assert_eq!(s.census().section_read_outs,reads);
+    let state = body.inspect().unwrap();
+    let norm: Rat = state.material.coefficients.iter().flatten()
+        .map(|v| v.real.abs()+v.imaginary.abs()).sum();
+    let residual: Rat = state.normal_residual().unwrap().iter().flatten()
+        .map(|v| v.real.abs()+v.imaginary.abs()).sum();
+    let legacy = residual + &norm * &state.source_normal_error + &state.cross_source_error;
+    assert!(state.material.radius < legacy);
+    assert!(state.material.radius <= &norm + Rat::one());
+    assert_eq!(state.target_energy,Rat::one());
+    assert!(state.target_energy_error.is_zero());
+    let rest = body.rest().unwrap();
+    rest.validate().unwrap();
+    let mut legacy_state = rest.state().clone();
+    let raw = legacy * Rat::from_integer(BigInt::one() << grain.0);
+    let floor = raw.numer() / raw.denom();
+    let ceil = if raw.numer() % raw.denom() == BigInt::zero() { floor } else { floor+1 };
+    let old_error = ceil.to_i128().unwrap();
+    let at = 2 * NormalLayout::new(1,1).unwrap().cross_values;
+    legacy_state.intervals[at]=(old_error as i64,old_error as i64);
+    legacy_state.intervals[at+1]=((old_error >> 64) as i64,(old_error >> 64) as i64);
+    NormalMaterialRest::from_state_data(1,1,grain,1,legacy_state).unwrap();
+}

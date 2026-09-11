@@ -117,10 +117,10 @@ extern "C" __global__ void section_normal_wave_power(const int64_t *material,con
 __device__ wide normal_wave_multiply_upper(wide a,wide b,uint32_t grain,uint32_t *slot){
     return normal_grid(normal_wide(a)*normal_wide(b),grain,true,slot);
 }
-extern "C" __global__ void section_normal_wave_evaluate(const int64_t *material,const int64_t *power,
+__device__ void section_normal_wave_evaluate_impl(const int64_t *material,const int64_t *power,
     const int64_t *seed_bound,const int64_t *old_meta,uint32_t n,uint32_t grain,uint64_t steps,
     int64_t *meta,int64_t *meta_hi,int64_t *joint,int64_t *joint_hi,int64_t *current,int64_t *current_hi,
-    int64_t *work,uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    int64_t *work,bool reference,uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
     if(blockIdx.x)return;if(upstream_refused(census,lineage,lineage_count,slot))return;
     uint32_t d=2u*n,r=2u*n;wide S=(wide)1<<grain;
     const wide *Q=(const wide *)power,*z=(const wide *)seed_bound;wide *out=(wide *)joint,*scratch=(wide *)work;
@@ -139,7 +139,7 @@ extern "C" __global__ void section_normal_wave_evaluate(const int64_t *material,
     if(!threadIdx.x){
         wide B=((const wide *)old_meta)[0];
         for(uint32_t j=0;j<2u*d;++j){wide v=scratch[j]/S+(scratch[j]%S!=0);if(v>B)B=v;}
-        wide coefficient_error=((const wide *)material)[6u*(size_t)n*n];
+        wide coefficient_error=reference?((const wide *)material)[6u*(size_t)n*n]:0;
         if(coefficient_error<0||B<1){atomicOr(slot,REFUSED_MALFORMED);}
         wide defect=add_checked(product_checked(product_checked(2,coefficient_error,slot),B,slot),(wide)2u*d,slot);
         wide base=add_checked(S,defect,slot),growth=S;uint64_t exponent=steps;
@@ -159,4 +159,22 @@ extern "C" __global__ void section_normal_wave_evaluate(const int64_t *material,
     for(size_t j=threadIdx.x;j<2u*(2u*r+1u);j+=blockDim.x)joint_hi[j]=joint[j];
     for(size_t j=threadIdx.x;j<2u*(r+1u);j+=blockDim.x)current_hi[j]=current[j];
     for(size_t j=threadIdx.x;j<8u;j+=blockDim.x)meta_hi[j]=meta[j];
+}
+
+extern "C" __global__ void section_normal_wave_evaluate(const int64_t *material,const int64_t *power,
+    const int64_t *seed_bound,const int64_t *old_meta,uint32_t n,uint32_t grain,uint64_t steps,
+    int64_t *meta,int64_t *meta_hi,int64_t *joint,int64_t *joint_hi,int64_t *current,int64_t *current_hi,
+    int64_t *work,uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    if(blockIdx.x)return;
+    section_normal_wave_evaluate_impl(material,power,seed_bound,old_meta,n,grain,steps,meta,meta_hi,joint,joint_hi,
+        current,current_hi,work,true,slot,census,lineage,lineage_count);
+}
+
+extern "C" __global__ void section_normal_wave_evaluate_applied(const int64_t *material,const int64_t *power,
+    const int64_t *seed_bound,const int64_t *old_meta,uint32_t n,uint32_t grain,uint64_t steps,
+    int64_t *meta,int64_t *meta_hi,int64_t *joint,int64_t *joint_hi,int64_t *current,int64_t *current_hi,
+    int64_t *work,uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+    if(blockIdx.x)return;
+    section_normal_wave_evaluate_impl(material,power,seed_bound,old_meta,n,grain,steps,meta,meta_hi,joint,joint_hi,
+        current,current_hi,work,false,slot,census,lineage,lineage_count);
 }

@@ -71,3 +71,11 @@ restart without printing private material. The [data guide](../../docs/CONVERSAT
 documents its partition and availability boundary; the
 [active blueprint](../../docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 still requires the actual native attachment, learned codec, model and useful product.
+
+[established-bounded; implemented-exact] The continuing normal-wave example now has `compare` and
+`compare-applied` modes over actual same-part prefix/tail source material. They use the public
+`ResidentNormalWave::predict` / `receive_prediction` passage, not a driver-local learner. Pending
+comparisons and explicit applied/reference scope persist in normal-wave rest; the
+[construction record](../../research/records/2026-09-10_ATHENA_RETURNS_OBSERVATIONS_TO_THEIR_PRODUCING_JOINT.md)
+states the exact source aperture and the retained wider reference-family refusal. Symbol emission
+and the coupled local ecology remain separate subsequent bindings in the active plan.

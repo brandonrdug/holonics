@@ -259,9 +259,18 @@ fn validate_numerical_witness(
             q + 1
         }
     };
+    let residual_bound = ceil(&(&residual + &norm * &expected[hh + bb]
+        + &scale * &expected[hh + bb + 1]));
+    let energy = &expected[hh + bb + 2] + &expected[hh + bb + 3];
+    if energy.is_negative() { return Err(invalid("negative target energy family")); }
+    let root = energy.sqrt();
+    let root_upper = if &root * &root == energy { root } else { root + 1 };
+    let energy_bound = &norm + root_upper;
+    let tightened_bound = residual_bound.clone().min(energy_bound);
+    // Retain legacy residual-only rests as well as the new independently certified minimum.
+    // Both bounds describe the same source-qualified reference, not different coefficients.
     if BigInt::from(matrix[bb + 1]) != ceil(&residual)
-        || BigInt::from(error)
-            != ceil(&(residual + norm * &expected[hh + bb] + &scale * &expected[hh + bb + 1]))
+        || (BigInt::from(error) != residual_bound && BigInt::from(error) != tightened_bound)
     {
         return Err(invalid("normal residual or family bound"));
     }
@@ -622,4 +631,4 @@ fn decode_state(
 }
 
 mod direct;
-pub use direct::{ResidentNormalMaterial, NormalMaterialRest, NormalRealizationRefinement, ResidentNormalReturn, ResidentNormalWave, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, NormalWaveSeedKind, NormalWaveReception, NormalWaveReceptionReading, NormalWaveDevelopment, NormalSourceActuation, ResidentNormalSectionReturn, ResidentNormalInput, ResidentNormalEnclosure, ResidentNormalEnclosureView};
+pub use direct::{ResidentNormalMaterial, NormalMaterialRest, NormalRealizationRefinement, ResidentNormalReturn, ResidentNormalWave, NormalWaveCurrent, NormalWaveFibre, NormalWaveStep, NormalWaveReading, NormalWaveRest, NormalWaveSeedRefusal, NormalWaveSeedKind, NormalWaveReception, NormalWaveReceptionReading, NormalWaveDevelopment, NormalSourceActuation, NormalProducingHandle, NormalWavePrediction, NormalWaveComparison, NormalWaveComparisonReading, NormalWaveTransport, NormalWaveTransportChange, NormalWaveReference, NormalWaveReferenceReading, ResidentNormalSectionReturn, ResidentNormalInput, ResidentNormalEnclosure, ResidentNormalEnclosureView};

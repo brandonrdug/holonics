@@ -62,6 +62,22 @@ impl NormalMaterialRest {
         result.validate()?;
         Ok(result)
     }
+    /// Snapshot an already admitted native material cut. Cold wire ingress still uses
+    /// `from_state_data` and validates its mathematical domain; a retained producing cut need
+    /// not solve that domain again merely to be written at rest.
+    pub(super) fn from_native_state(
+        roots: usize,
+        targets: usize,
+        grain: ResidentGrain,
+        observations: u64,
+        state: ResidentSectionRest,
+    ) -> Result<Self, ConstitutiveFibreError> {
+        point_section(&state, 1, state_words(roots, targets).ok_or(ConstitutiveFibreError::Shape)?)?;
+        Ok(Self {
+            header: Header { roots, targets, grain: grain.0, observations },
+            state,
+        })
+    }
     pub fn validate(&self) -> Result<(), ConstitutiveFibreError> {
         let h = &self.header;
         let value = decode_state(&self.state, h.roots, h.targets, h.grain)?;

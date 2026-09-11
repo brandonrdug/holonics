@@ -1,16 +1,14 @@
 # Construction state
 
-**Currency:** September 10, 2026. **Priority:** Athena implementation handoff finalized from the returned tension, transport and sequence/kinetic mathematics; the illustration pass is complete.
-**Position:** The [finalized blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md) specifies producing comparison, resident emission, coupled conditional organization, lawful formation/reuse and continuing product evaluation. The next implementation begins with the wave-owned producing handle and joint source/target preparation. No new cultivation process has started; AC0–AC5 is not complete.
+**Currency:** September 10, 2026. **Priority:** Brandon has activated completion of the finalized Athena implementation plan as a goal.
+**Position:** Packet 1 has returned: producing-addressed development, pending-source persistence, unit-prior energy bound and explicit Applied/NormalReference transport. All 35 normal CUDA and two host cases pass; the two-field applied source run and process-split continuation return byte-identical rests and identical trajectories. The earlier wider reference-family refusal is retained in the record. Next: resident basis receiver, native emission and ordinary re-entry. The goal remains active; AC0–AC5 is not complete.
 **Athena-alpha:** not yet attained.
 
-**Active implementation:** `ResidentNormalWave::actuate_section` composes learned joined source
-passages and publishes one transported joint successor per source field. Rest v4 retains both
-components' occurrence epochs. The [source return](research/records/2026-09-10_SOURCE_PASSAGES_ACT_THROUGH_UNION_AND_PASSIVE_REFLECTION.md)
-records 32 fields/9,189 contacts under unchanged material and exact continuation across restart.
-The source bound is refined from about 15,536 to 0.01846 by exact H/B/M zero-response certificates,
-with unchanged nominal currents. It includes realization/normal-reference comparison error;
-it is not semantic confidence. Applied M, ideal optimizer P and source uncertainty stay distinct.
+**Returned native operation:** `ResidentNormalWave::predict` / `receive_prediction` preserve the
+producing joint/material cut while developing contemporary material. Applied transport uses the
+stored M with source/rounding bounds; `reference_next` retains the independent normal comparison.
+Rest v6 preserves transport scope and mixed pending cuts. The [first implementation record](research/records/2026-09-10_ATHENA_RETURNS_OBSERVATIONS_TO_THEIR_PRODUCING_JOINT.md)
+states the exact controls, prepared-source aperture, costs and retained reference-family refusal.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct

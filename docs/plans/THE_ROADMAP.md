@@ -4,6 +4,17 @@
 [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md) is the sole current-position record. Dated
 contracts and records preserve their completed scope; their old imperatives schedule no new work.
 
+[project-postulate] **Athena goal activated:** Brandon now directs proceeding through the finalized
+implementation plan as a goal. Start at its producing-comparison packet and continue through native
+emission, coupled organization, formation/reuse and product returns. The earlier review-only pause
+is superseded by this implementation instruction. Current work and returned checks belong in
+CONSTRUCTION_STATE; no packet is complete merely because it has been planned.
+
+[established-bounded; implemented-exact] The [producing-return packet](../../research/records/2026-09-10_ATHENA_RETURNS_OBSERVATIONS_TO_THEIR_PRODUCING_JOINT.md)
+now returns the first native binding, explicit applied/reference scope and checked source/process
+continuation. Continue with the resident basis receiver and emission/re-entry, then the coupled
+conditional and formation/reuse packets. The current position carries ongoing verification.
+
 [project-postulate] **September 10 finalized Athena handoff:** Brandon has closed the illustration
 pass and re-engaged Athena planning. The [computational tension review](../../research/records/2026-09-10_TENSION_DYNAMICS_BECOME_ATHENAS_COMPUTATIONAL_CONSTRUCTION.md)
 and finalized [blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)

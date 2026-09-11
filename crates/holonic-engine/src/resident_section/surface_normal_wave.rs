@@ -17,6 +17,7 @@ impl<'c> ResidentSurface<'c> {
         anchors: &ResidentSection<'c>,
         frame: &ResidentSection<'c>,
         work: &ResidentSection<'c>,
+        reference: bool,
     ) -> Result<(), ResidentRefusal> {
         let fail = || Self::operative_error();
         let sw = normal_material_state_words(n, n).ok_or_else(fail)?;
@@ -62,7 +63,7 @@ impl<'c> ResidentSurface<'c> {
             .u32(lane.lineage_count);
         self.record_blocks(
             lane,
-            "section_normal_source_actuation",
+            if reference { "section_normal_source_actuation" } else { "section_normal_source_actuation_applied" },
             1,
             self.launch.block_x,
             0,
@@ -133,6 +134,7 @@ impl<'c> ResidentSurface<'c> {
         report: &ResidentSection<'c>,
         work: &ResidentSection<'c>,
         input: &ResidentSection<'c>,
+        reference: bool,
     ) -> Result<(), ResidentRefusal> {
         let fail = || Self::operative_error();
         let r = n.checked_mul(2).filter(|r| *r > 0).ok_or_else(fail)?;
@@ -174,12 +176,81 @@ impl<'c> ResidentSurface<'c> {
             .u32(lane.lineage_count);
         self.record_blocks(
             lane,
-            "section_normal_wave_receive",
+            if reference { "section_normal_wave_receive" } else { "section_normal_wave_receive_applied" },
             1,
             self.launch.block_x,
             0,
             &mut p,
             "normal-wave-receive",
+        )
+    }
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_normal_wave_comparison(
+        &self,
+        lane: &Lane<'_, 'c>,
+        material: &ResidentSection<'c>,
+        producing: &ResidentSection<'c>,
+        joint: &ResidentSection<'c>,
+        received: ResidentConstitutiveCurrent<'_, 'c>,
+        n: usize,
+        grain: u32,
+        producing_reference: bool,
+        updated_reference: bool,
+        next: &ResidentSection<'c>,
+        report: &ResidentSection<'c>,
+        work: &ResidentSection<'c>,
+        input: &ResidentSection<'c>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || Self::operative_error();
+        let r = n.checked_mul(2).filter(|r| *r > 0).ok_or_else(fail)?;
+        let d = r.checked_mul(3).ok_or_else(fail)?;
+        let sw = normal_material_state_words(n, n).ok_or_else(fail)?;
+        let rw = normal_material_report_words(n, n).ok_or_else(fail)?;
+        let ww = normal_material_workspace_words(n, n).ok_or_else(fail)?;
+        if !(1..=120).contains(&grain)
+            || sw > u32::MAX as usize
+            || received.width != r
+            || !self.operative_shape(material, 1, sw)
+            || !self.operative_shape(producing, 1, sw)
+            || !self.operative_shape(next, 1, sw)
+            || !self.operative_shape(joint, 1, 2 * (2 * r + 1))
+            || !self.operative_shape(report, 1, rw)
+            || !self.operative_shape(work, 1, ww)
+            || !self.operative_shape(input, 1, 4 * (d + 1))
+        {
+            return Err(fail());
+        }
+        self.validate_constitutive_current_view(received)?;
+        let mut p = Params::new();
+        p.ptr(material.lo.device_ptr())
+            .ptr(producing.lo.device_ptr())
+            .ptr(joint.lo.device_ptr())
+            .ptr(received.section.lo.device_ptr())
+            .ptr(received.section.hi.device_ptr())
+            .u32(received.offset as u32)
+            .u32(received.denominator.map_or(u32::MAX, |v| v as u32))
+            .u32(received.disposition.map_or(u32::MAX, |v| v as u32))
+            .u32(n as u32)
+            .u32(grain)
+            .u32(u32::from(producing_reference))
+            .u32(u32::from(updated_reference));
+        for s in [next, report] {
+            p.ptr(s.lo.device_ptr()).ptr(s.hi.device_ptr());
+        }
+        p.ptr(work.lo.device_ptr())
+            .ptr(input.lo.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_normal_wave_comparison",
+            1,
+            self.launch.block_x,
+            0,
+            &mut p,
+            "normal-wave-comparison",
         )
     }
     #[allow(clippy::too_many_arguments)]
@@ -338,6 +409,7 @@ impl<'c> ResidentSurface<'c> {
         joint: &ResidentSection<'c>,
         current: &ResidentSection<'c>,
         work: &ResidentSection<'c>,
+        reference: bool,
     ) -> Result<(), ResidentRefusal> {
         let fail = || Self::operative_error();
         let d = n.checked_mul(2).filter(|n| *n > 0).ok_or_else(fail)?;
@@ -378,7 +450,7 @@ impl<'c> ResidentSurface<'c> {
             .u32(lane.lineage_count);
         self.record_blocks(
             lane,
-            "section_normal_wave_evaluate",
+            if reference { "section_normal_wave_evaluate" } else { "section_normal_wave_evaluate_applied" },
             1,
             self.launch.block_x,
             0,

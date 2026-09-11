@@ -1,0 +1,64 @@
+{
+  "schema": "holonics.athena-producing-return-evidence.v1",
+  "scope": "two actual development fields, applied-M source/prediction/addressed return, two generated currents, process-split continuation",
+  "summary": {
+    "alphabet_coordinates": 85,
+    "fields": 2,
+    "final_current_epoch": 10,
+    "first_current_epoch": 8,
+    "first_sequence": 32,
+    "frames": 2,
+    "generation_obstruction": null,
+    "grain": 64,
+    "intake_operation": "producing-comparison",
+    "model_rest_octets": 25669574,
+    "next_sequence": 34,
+    "observations": 8965,
+    "requested_generated_steps": 2,
+    "resident_octets": 53210144,
+    "returned_generated_steps": 2,
+    "schema": "holonics.conversation-wave.v1",
+    "scope": "source action and development of a continuing local generator; not general contextual language",
+    "short_parts_without_local_comparison": 0,
+    "source_octets": 324,
+    "source_scalars": 322,
+    "transport": "Applied",
+    "word_steps": 2
+  },
+  "fields": [
+    {
+      "sequence": 32,
+      "part": 0,
+      "actuated_rows": 146,
+      "observed_row": 146,
+      "source_epoch": 5,
+      "prediction_id": 6,
+      "observations": 8964,
+      "native_deeds": 5,
+      "numerical_readouts_during_comparison": 0,
+      "ingress_octets_during_comparison": 4,
+      "seconds": 3.389882906
+    },
+    {
+      "sequence": 33,
+      "part": 0,
+      "actuated_rows": 174,
+      "observed_row": 174,
+      "source_epoch": 7,
+      "prediction_id": 8,
+      "observations": 8965,
+      "native_deeds": 5,
+      "numerical_readouts_during_comparison": 0,
+      "ingress_octets_during_comparison": 4,
+      "seconds": 3.647973153
+    }
+  ],
+  "model_rest_equal": true,
+  "trajectory_equal": true,
+  "private_runs": [
+    ".local/athena-applied-comparison-2026-09-10-full",
+    ".local/athena-applied-comparison-2026-09-10-first",
+    ".local/athena-applied-comparison-2026-09-10-resumed"
+  ],
+  "reference_refusal_retained": ".local/athena-producing-comparison-2026-09-10-stage"
+}
