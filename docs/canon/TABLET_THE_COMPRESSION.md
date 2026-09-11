@@ -139,12 +139,20 @@ returns empty. The bit axis lives in six files, the work axis in two, and no fil
 
 ## 6. Where the identity holds and where it stops
 
-**Holds, as an identity rather than an analogy.** By Kraft and Shannon source coding, code-length
-functions and sub-probability distributions correspond up to one bit, and
-`E_p[ℓ_q] − E_p[ℓ_p] = D_KL(p‖q)`. **Minimizing expected cross-entropy IS minimizing expected
-description length.** So *training aggregates transport mechanisms* has an exact receipt: every nat
-of loss reduction is `1/ln 2` bits of corpus compression. Arithmetic coding realizes it with ≤2 bits
-of total overhead.
+[proved-standard] **Ideal lengths and literal codewords have distinct receipts.** For
+`ℓ_q(x) = −log₂ q(x)`, the exact identity is
+`E_p[ℓ_q] − E_p[ℓ_p] = D_KL(p‖q)` whenever the expressions are defined. This is the
+ideal information-length reading. An actual binary prefix code has integer lengths L(x)
+with Kraft sum `Σ 2^-L(x) ≤ 1`. For positive q, the Shannon choice
+`L_q(x) = ceil(−log₂ q(x))` admits such a code and obeys
+`E_p[ℓ_q] ≤ E_p[L_q] < E_p[ℓ_q] + 1`. The literal expected-length difference includes
+the two codes' rounding/redundancy differences; it is not automatically KL. Block/arithmetic
+coding also retains its actual decoder, framing, termination and finite-precision overhead.
+One nat of **ideal** cross-entropy reduction is `1/ln 2` bits under the same receiver and
+measure. [Shannon, §§9–10](https://www.princeton.edu/~wbialek/rome/refs/shannon_48.pdf)
+provides the source-coding construction. The
+[September 11 generator/code return](../../research/records/2026-09-11_GENERATOR_CODES_RETAIN_PHASE_LIFTS_AND_REMAINDERS.md)
+keeps ideal surprise and literal packet lengths together without replacing either.
 
 **Stops, and the stopping point is precise.** *Compression is prediction* is a theorem —
 Solomonoff's dominance bound gives total KL `≤ K(μ)·ln 2`. *Compression is intelligence* is a

@@ -7,20 +7,24 @@ AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/p
 is the sole order and [the blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 names actual code changes and outcomes.
 
-[established-bounded; implemented-exact; formal-checked] The latest
-[ζ/phase information return](research/records/2026-09-11_ZETA_PHASE_SWING_AND_INFORMATION_RATES_ARE_MEASURED.md)
-executes the existing exact η atlas over the declared strip `[2/5,3/5] × [12,36]`, returning
-five isolated zeros, interval gaps, transported Swing cross-ratios, phase-signature entropy and
-reference-code loss. Localization gain is exactly two bits per measured occurrence. The first
-window's phase code performs worse on later windows than the uniform signature code. The new
-Lean rate owner proves transported-measure and subdivision laws; 16 surprisal and 50 geometry
-tests and the Information target build passed. The full atlas and receiver return are retained.
-This is exterior mathematical measurement; no native model or hot operation changed.
+[established-bounded; implemented-exact] The latest
+[generator/code return](research/records/2026-09-11_GENERATOR_CODES_RETAIN_PHASE_LIFTS_AND_REMAINDERS.md)
+compares three analytic routes at five fixed ζ/η receivers. Doubling the Euler–Maclaurin head
+reduces source tails by a ratio strictly between `2^-20` and `2^-19`; the direct alternating
+route at comparable extent retains too broad a tail to resolve phase. Prime addresses,
+amplitudes, winding/residue charts and complete analytic differences are retained. A literal
+prefix code returns 152 payload bits for 60 head-term signatures, with all 153 packet cuts
+reconstructing through retained partial words. Three focused tests passed; the prior information
+return is unchanged after sharing its phase receiver. No native model or Lean source changed.
 
-[definition] The next Hephaestus comparison varies admitted generator routes at a fixed analytic
-receiver, then transports the receiver/measure, keeping tails, phase and work visible. The
-[application design](docs/HEPHAESTUS_AUTOMATA.md) names these boundaries and subsequent executable
-lowering. Eros is formative union at nested scopes; Athena remains the wider wisdom/model ecology.
+[definition] Surprise and literal integer code-length are now separated in the compression
+canon, with their actual redundancy retained. The
+[earlier information return](research/records/2026-09-11_ZETA_PHASE_SWING_AND_INFORMATION_RATES_ARE_MEASURED.md)
+retains zero localization, Swing, contour-signature loss and the checked information-rate laws.
+Next compose reusable operator requests and returned factors/words with these receiver, clock,
+remainder and code-cost observations. The [application design](docs/HEPHAESTUS_AUTOMATA.md)
+connects the recovered causal-length/gyro and sequence/fold/kinetic owners; the roadmap keeps
+native incorporation and subsequent executable lowering in their actual order.
 
 ## Immediate native boundary
 

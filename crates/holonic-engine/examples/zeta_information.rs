@@ -11,6 +11,10 @@ use relational_geometry::{
 };
 use serde_json::{Value, json};
 
+#[path = "support/phase_signature.rs"]
+mod phase_receiver;
+use phase_receiver::phase_signature;
+
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 fn q(n: i64, d: i64) -> Rat {
     Rat::new(n.into(), d.into())
@@ -87,28 +91,6 @@ fn final_winding(lineage: &ZeroLineage) -> &WindingReceipt {
     }
 }
 
-// Closed quadrant signatures. Axis uncertainty is retained as a set of possible quadrants.
-fn phase_signature(z: &ComplexInterval) -> u64 {
-    let mut mask = 0;
-    for re_negative in 0..2 {
-        for im_negative in 0..2 {
-            let re = if re_negative == 1 {
-                z.re.lower <= Rat::zero()
-            } else {
-                z.re.upper >= Rat::zero()
-            };
-            let im = if im_negative == 1 {
-                z.im.lower <= Rat::zero()
-            } else {
-                z.im.upper >= Rat::zero()
-            };
-            if re && im {
-                mask |= 1 << (2 * re_negative + im_negative);
-            }
-        }
-    }
-    mask
-}
 fn conjugate_signature(mask: u64) -> u64 {
     let mut result = 0;
     for i in 0..4 {

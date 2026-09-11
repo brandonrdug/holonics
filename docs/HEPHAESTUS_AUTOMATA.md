@@ -143,14 +143,30 @@ application checks ordinate reflection and complex-conjugate phase transport exp
 Information-per-measure is a rate, not automatically a projective cross-ratio. For a changed
 chart carry the source measure as well; a freshly uniform measure defines a changed experiment.
 
-[definition] The immediate next use compares alternative admitted analytic head/tail generator
-routes at one receiver, then compares transported receivers. Preserve index clock, full
-complex residual and remainder, and distinguish newly resolved uncertainty from changed source
-conduct. The π/e/Gamma factor words are parallel examples of the same generator-versus-face
-question. A later code-producing application lowers those admitted words into existing exact
-native primitives, preserving domain, arithmetic/overflow behavior and complete successor.
-Search cost and resulting execution cost are measured separately. The native family formation
-boundary remains required for resident HNN conduct.
+[established-bounded; implemented-exact] The
+[three-route return](../research/records/2026-09-11_GENERATOR_CODES_RETAIN_PHASE_LIFTS_AND_REMAINDERS.md)
+now compares different analytic head/tail constructions at the same receivers. It retains
+prime words, amplitude, phase lift and modulo residue; a literal prefix codec for the measured
+phase-signature face survives every packet cut with its partial word retained. Ideal surprise,
+integer code length, decoder/framing cost and analytic remainder remain distinct. This codec
+is an exterior receiver chart; it does not replace native Holonic Encoding.
+
+[definition] “Constituents per receiving holon” names a family over a situated parent; the
+singular denominator establishes the unit, while aggregate rates retain the parent measure.
+The existing addressed causal-length tower supplies quotient/residue reconstruction; gyrogroup
+and polygon-winding owners retain transported frames and route defects. The sequence/fold/
+kinetics construction supplies an actual separator: equal coarse contact faces can have
+different future currents. Compression must preserve those relevant source associations.
+Codon length, codon surprise, polymer length and reaction work are distinct receivers of the
+biological chain; no literal wavelength follows without a physical phase/carrier map.
+
+[definition] Next compose the returned factors and generator/receiver relations through
+operator-scoped requests, keeping source clock, full residual/remainder and code costs. The
+π/e/Gamma factor words are parallel examples of the same generator-versus-face question.
+A later code-producing application lowers admitted words into existing exact native primitives,
+preserving domain, arithmetic/overflow behavior and complete successor. Search cost and resulting
+execution cost are measured separately. Native family formation remains required for resident
+HNN conduct.
 
 ## From a fixed demo to reusable automata
 

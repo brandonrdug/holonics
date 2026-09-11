@@ -18,7 +18,9 @@ RH or reopen five endpoint campaigns. Brandon's subsequent Hephaestus direction 
 elementary mathematical solver applications; the named Athena phases retain the native
 integration requirements. The application design and immediate work below state that direction. The latest request
 places ζ spectral phase/gaps, situated information/loss and Swing first, with executable
-algorithm/code construction following those encoding comparisons.
+algorithm/code construction following those encoding comparisons. The bounded three-route
+comparison and literal code/remainder return are now complete; operator-scoped reusable
+factors/words are the next increment, carrying those measurements.
 
 ## All current plan documents and their roles
 
@@ -46,7 +48,7 @@ Useful mathematical tools need not await general conversation or an official Mil
 
 | Increment | Concrete code/design work | Expected useful return |
 |---|---|---|
-| **Spectral generators and situated information** | Extend the returned exact ζ/η phase and gap receiver to alternative admitted analytic generator routes; retain head/tail, full complex residual, transported measure, symbolic information and actual work | Compare the same face across generators and changed receiver charts; distinguish analytic refinement from source change and show when a local code transfers or fails |
+| **Spectral generators and situated information** | Returned at five fixed receivers: two Euler–Maclaurin head/tail splits and direct alternating η; reuse their retained head/tail, phase lifts, literal code, symbolic surprise and scoped work in the next operator increment | Compare the same face across generators and changed receiver charts; distinguish analytic refinement from source change and show when a local code transfers or fails |
 | **Operator-scoped requests** | Factor the fixed example into a cohesive exact factorization capability using the existing preimage owner; retain field, shape, support, receiver and cost aperture | Different requested mathematical operators use the same construction machinery and return scoped values, families or executable factors |
 | **Shared constructions and changed receivers** | Keep typed returned factors; solve a new receiver, compose existing operator/recurrence words and preserve clocks/fibres | The complex-multiplication product core serves polynomial multiplication; a receiver requiring a discarded distinction returns its actual obstruction |
 | **Returned constraints and available material** | Compose actual source-qualified comparisons with contextual factorization, factor covers and existing material owners | New constraints refine applicability or enable a new construction, with meaningful before/after conduct and cost |
@@ -54,8 +56,10 @@ Useful mathematical tools need not await general conversation or an official Mil
 
 [definition] The [first ζ information application](../../research/records/2026-09-11_ZETA_PHASE_SWING_AND_INFORMATION_RATES_ARE_MEASURED.md)
 now returns interval placements, gaps, Swing transport and exact information/loss over a declared
-phase receiver. Continue changed-generator/receiver comparisons, then reuse exact relations,
-bilinear/polynomial operations and indexed recurrence blocks. Executable code lowering retains
+phase receiver. The [generator/code return](../../research/records/2026-09-11_GENERATOR_CODES_RETAIN_PHASE_LIFTS_AND_REMAINDERS.md)
+now compares three routes, retains phase and packet remainders, and measures literal codeword
+length alongside surprise. Continue operator-scoped exact relations, bilinear/polynomial
+operations and indexed recurrence blocks, retaining these same receiver comparisons. Executable code lowering retains
 the admitted domain, arithmetic/overflow behavior, clock, decoder and successor; it is the
 application continuation of these constructions, not a separate tokenizer or engine. Add
 boundary-energy tasks through their existing source and remainder owners as usable. The ordered increments

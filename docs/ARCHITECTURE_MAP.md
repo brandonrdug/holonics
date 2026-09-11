@@ -121,6 +121,10 @@ interval marks directly; `holonic-engine/examples/zeta_information.rs` composes 
 gap, Swing and information receivers as exterior Hephaestus apparatus. The
 [measured return](../research/records/2026-09-11_ZETA_PHASE_SWING_AND_INFORMATION_RATES_ARE_MEASURED.md)
 records the exact analytic and verifier scopes; these are not native formation owners.
+`examples/support/phase_signature.rs` shares that enclosure receiver with
+`examples/eta_generator_comparison.rs`, which compares existing analytic routes and retains
+prime/phase lifts, analytic tails and a literal exterior prefix-code packet. Its code-length
+and remainder observations feed operator reuse without installing a native tokenizer.
 
 ## Foundation and transport
 
