@@ -297,3 +297,25 @@ impl<'c> ResidentSurface<'c> {
         )
     }
 }
+
+impl<'c> ResidentSurface<'c> {
+    pub(crate) fn record_wave_observed_next(&self, lane:&Lane<'_, 'c>,
+        observed:ResidentConstitutiveCurrent<'_, 'c>, n:usize, basis:&ResidentSection<'c>,
+        snapshot:&ResidentSection<'c>, workspace:&ResidentSection<'c>) -> Result<(),ResidentRefusal> {
+        self.validate_constitutive_current_view(observed)?;
+        let fail=||Self::operative_error();
+        let r=n.checked_mul(2).ok_or_else(fail)?;
+        let k=n.checked_mul(16).and_then(|v|v.checked_add(4)).ok_or_else(fail)?;
+        if n==0 || observed.width!=r || k.checked_mul(k).is_none_or(|v|v>u32::MAX as usize)
+            || !self.operative_shape(basis,k,k) || !self.operative_shape(snapshot,1,r+1)
+            || !self.operative_shape(workspace,1,2*(k+r)) {return Err(fail());}
+        let mut p=Params::new();
+        p.ptr(observed.section.lo.device_ptr()).ptr(observed.section.hi.device_ptr())
+            .u32(observed.offset as u32).u32(observed.denominator.map_or(u32::MAX,|v|v as u32))
+            .u32(observed.disposition.map_or(u32::MAX,|v|v as u32)).u32(n as u32)
+            .ptr(basis.lo.device_ptr()).ptr(basis.hi.device_ptr())
+            .ptr(snapshot.lo.device_ptr()).ptr(snapshot.hi.device_ptr()).ptr(workspace.lo.device_ptr())
+            .ptr(lane.slot).ptr(lane.census).ptr(lane.lineage).u32(lane.lineage_count);
+        self.record_blocks(lane,"section_wave_observed_next",1,self.launch.block_x,0,&mut p,"wave-observed-next")
+    }
+}

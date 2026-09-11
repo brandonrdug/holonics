@@ -900,3 +900,43 @@ fn coupled_basis_face_does_not_turn_a_projected_tie_into_a_bounded_score() {
     assert_eq!(reading.anchor_independent_free, vec![true, true]);
     assert!(std::ptr::eq(face.source(), wave.current()));
 }
+
+#[test]
+#[ignore = "requires CUDA; actual next observations carry plural predecessors without point conversion"]
+fn coupled_observed_next_joins_the_family_and_preserves_its_anchor() {
+    let ro=ResidentReadout::new().unwrap(); let s=ResidentSurface::on(&ro).unwrap();
+    let mut local=law(&s,false);
+    let zero=point(&s,&[0,0,0,0,0,0]);let h0=point(&s,&[0,0]);
+    for eta in [[1,0],[0,1]] {let y=point(&s,&eta);local.advance_bilinear_contact(current(&zero),current(&h0),Some(current(&y))).unwrap();}
+    let h=point(&s,&[1,0]);
+    let neighborhood=ResidentGeneratorNeighborhood::with_shared_condition(vec![local],current(&h),ConditionContactMetric::UnitAdmittanceRealification).unwrap();
+    let mut wave=body(&s).with_neighborhood(neighborhood).unwrap();
+    let contact=wave.admit_contact(0).unwrap(); wave.advance_contact(&contact).unwrap();
+    let anchor=wave.current().anchor().inspect().unwrap();
+    assert_eq!(wave.current().read_receiver().unwrap().inspect().unwrap().anchor_independent_free,vec![false,false,true,true]);
+    let material=wave.neighborhood().generator(0).unwrap().rest().unwrap();let normal=wave.material.rest().unwrap();
+    let observed=point(&s,&[3,4]);let contact=wave.admit_contact(0).unwrap();
+    let reads=s.census().section_read_outs;
+    let received=wave.receive_contact_next(&contact,current(&observed)).unwrap();
+    assert_eq!(s.census().section_read_outs,reads);
+    assert!(std::ptr::eq(wave.current(),received.successor()));
+    assert!(received.applied_relation().observed_next().is_some());
+    compare_source_images(&received);
+    let flags=wave.current().read_receiver().unwrap().inspect().unwrap().anchor_independent_free;
+    assert_eq!(flags,vec![true,true,false,false]);
+    assert_eq!(&face(wave.current())[2..],&[r(3),r(4)]);
+    assert_eq!(received.source().read_receiver().unwrap().inspect().unwrap().anchor_independent_free,vec![false,false,true,true]);
+    assert_eq!(wave.current().anchor().inspect().unwrap(),anchor);
+    let rest=wire(&wave);assert!(wave.receive_contact_next(&contact,current(&observed)).is_err());assert_eq!(wire(&wave),rest);
+    let contact=wave.admit_contact(0).unwrap();let next=point(&s,&[-1,2]);
+    wave.receive_contact_next(&contact,current(&next)).unwrap();
+    assert_eq!(face(wave.current()),vec![r(3),r(4),r(-1),r(2)]);
+    assert_eq!(wave.current().anchor().inspect().unwrap(),anchor);
+    assert_eq!(wave.neighborhood().generator(0).unwrap().rest().unwrap(),material);
+    assert_eq!(wave.material.rest().unwrap(),normal);
+    let original=wire(&wave);
+    let mut restored=NormalWaveRest::read(&mut original.as_slice(),original.len() as u64).unwrap().remount_coupled(&s, |_|{}).unwrap();
+    assert_eq!(wire(&restored),original);
+    let a=wave.admit_contact(0).unwrap();let b=restored.admit_contact(0).unwrap();
+    wave.advance_contact(&a).unwrap();restored.advance_contact(&b).unwrap();assert_eq!(wire(&restored),wire(&wave));
+}

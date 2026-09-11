@@ -246,6 +246,24 @@ impl<'c> NativeCoupledWaveSession<'c> {
             json!({"receiver_scope":"projected-family-joint","action":action,"octets":octets,"text":std::str::from_utf8(&octets).ok(),"selection":emitted.selection(),"detail":detail,"reentry":reentry,"successor_epoch":self.wave.epoch()}),
         )
     }
+    /// An explicitly observed next current, not an unpaired message or an evaluation target.
+    pub fn receive_next_symbol(&mut self, text: &str) -> Result<Value, NativeSessionError> {
+        self.ready()?;
+        let symbols = self.chart.decode_text(text)?;
+        if symbols.len() != 1 {
+            return Err(invalid(
+                "next-symbol observation requires one actual symbol",
+            ));
+        }
+        let source = self.chart.mount(self.surface, &symbols)?;
+        let contact = self.contact()?;
+        let returned = self.wave.receive_contact_next(&contact,
+            holonic_engine::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent::integers(&source)?)?;
+        self.last = None;
+        Ok(json!({"scope":"actual-next-current","symbol":symbols[0],
+            "before_epoch":returned.predecessor_epoch,"after_epoch":returned.successor_epoch,
+            "material_deposited":false}))
+    }
     pub fn actuate_text(&mut self, text: &str) -> Result<Value, NativeSessionError> {
         self.ready()?;
         let symbols = self.chart.decode_text(text)?;

@@ -147,3 +147,31 @@ extern "C" __global__ void section_wave_source_image_finish(
  out[ok+3u]=out_hi[ok+3u]=rank;
  for(size_t i=0;i<(size_t)q*q;++i)out[ok+4u+i]=out_hi[ok+4u+i]=basis[i];
 }
+
+// Actual observation, not a fitted target or a predicted response: (p,c) -> (c,v).
+// Its total homogeneous graph preserves lambda and the original anchor exactly.
+extern "C" __global__ void section_wave_observed_next(
+ const int64_t *v,const int64_t *hi,uint32_t at,uint32_t den_at,uint32_t disposition,uint32_t n,
+ int64_t *basis,int64_t *basis_hi,int64_t *snapshot,int64_t *snapshot_hi,int64_t *workspace,
+ uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count){
+ if(blockIdx.x||threadIdx.x)return;if(upstream_refused(census,lineage,lineage_count,slot))return;
+ if(!n||n>(UINT32_MAX-4u)/16u){atomicOr(slot,REFUSED_MALFORMED);return;}
+ uint32_t r=2u*n,z=2u+4u*n,q=2u+8u*n,k=2u*q;
+ wide den=fibre_current_denominator(v,hi,den_at,disposition,slot);if(*slot)return;
+ wide *row=(wide*)workspace,*values=row+k;
+ for(uint32_t i=0;i<r;++i){if(v[at+i]!=hi[at+i]){atomicOr(slot,REFUSED_MALFORMED);return;}values[i]=v[at+i];}
+ fibre_normalize(values,r,&den,slot);to_word(den,slot);
+ for(uint32_t i=0;i<r;++i)to_word(values[i],slot);if(*slot)return;
+ for(uint32_t i=0;i<r;++i)snapshot[i]=snapshot_hi[i]=(int64_t)values[i];
+ snapshot[r]=snapshot_hi[r]=(int64_t)den;
+ for(size_t i=0;i<(size_t)k*k;++i)basis[i]=basis_hi[i]=0;
+ for(uint32_t col=0;col<q;++col){
+  for(uint32_t j=0;j<k;++j)row[j]=0;
+  row[col]=col==0?den:1;
+  if(col<z)row[q+col]=row[col];
+  if(col>=z+r)row[q+col-r]=1;
+  if(col==0)for(uint32_t i=0;i<r;++i)row[q+z+r+i]=values[i];
+  condition_stage_row(basis,basis_hi,k,row,slot);if(*slot)return;
+ }
+ for(uint32_t i=0;i<q;++i)if(basis[(size_t)i*k+i]<=0){atomicOr(slot,REFUSED_MALFORMED);return;}
+}

@@ -261,3 +261,57 @@ fn coupled_session_process_resume_drains_the_pending_emission_once() {
         })
         .unwrap();
 }
+
+#[test]
+#[ignore = "requires CUDA; actual observations enter the same coupled owner and persist through the public stream"]
+fn coupled_session_observed_next_is_distinct_from_unpaired_source_and_correction() {
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let mut session = session(&s);
+    let mut stream = HnaStream::default();
+    let mut output = Vec::new();
+    let requests = [
+        json!({"schema":crate::HNA_STREAM_REQUEST_SCHEMA,"command":{"action":"receive-next-symbol","text":"a"}}),
+        json!({"schema":crate::HNA_STREAM_REQUEST_SCHEMA,"command":{"action":"receive-next-symbol","text":"b"}}),
+        json!({"schema":crate::HNA_STREAM_REQUEST_SCHEMA,"command":{"action":"emit-symbol"}}),
+    ];
+    let input = requests
+        .iter()
+        .map(|v| format!("{v}\n"))
+        .collect::<String>();
+    stream
+        .pump_coupled_wave(&mut session, &mut std::io::Cursor::new(input), &mut output)
+        .unwrap();
+    let values = String::from_utf8(output)
+        .unwrap()
+        .lines()
+        .map(|v| serde_json::from_str::<Value>(v).unwrap())
+        .collect::<Vec<_>>();
+    assert_eq!(values[0]["event"], "next-symbol-received");
+    assert_eq!(values[1]["event"], "next-symbol-received");
+    assert_eq!(values[2]["value"]["text"], "a");
+    assert_eq!(session.wave.epoch(), 3);
+    assert_eq!(
+        session
+            .wave
+            .neighborhood()
+            .generator(0)
+            .unwrap()
+            .occurrences(),
+        39
+    );
+    let checkpoint = path("observation");
+    session
+        .checkpoint_stream(&checkpoint, stream.state())
+        .unwrap();
+    let expected = session.next_symbol(false).unwrap();
+    let rest = session.wave.rest().unwrap();
+    NativeCoupledWaveSavedSession::read(checkpoint)
+        .unwrap()
+        .with_session(|loaded, _| {
+            assert_eq!(loaded.next_symbol(false)?, expected);
+            assert_eq!(loaded.wave.rest()?, rest);
+            Ok(())
+        })
+        .unwrap();
+}

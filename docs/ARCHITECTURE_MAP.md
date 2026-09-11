@@ -227,6 +227,14 @@ field under one public successor and returns all local prediction fibres. Relati
 coupled remount reconstruct the source reaction/map and rebind it to the actual restored local
 law. These source maps preserve the original anchor, and are distinct from conditional joins.
 
+[definition] `resident/wave_relation/observation.rs` and `section_wave_observed_next` derive the
+total actual-next-current graph `(p,c)→(c,v)` while preserving lambda and anchor. The family reuses
+the exact total-map image. `wave/coupled.rs::receive_contact_next` stages that current-only
+observation under one admitted source cut; its step retains both the predecessor family and
+observed map. Relation rest v4 persists the actual observation and reconstructs the graph.
+`NativeCoupledWaveSession::receive_next_symbol` binds the explicit `receive-next-symbol` stream
+command. This is distinct from delayed observed-symbol material development, which remains open.
+
 [definition] `wave/family/basis.rs::NormalFamilyBasisFace` retains the complete producing family
 beside its projected minimum-norm joint receiver. `section_family_basis_face` in
 `normal_wave_basis_face.cuh` selects a real unit-basis score on device; its free-direction flags

@@ -394,6 +394,26 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
             successor,
         })
     }
+    /// Join an actual next-current observation with the entire preceding c family.
+    /// This is the declared (p,c)->(c,v) receiver, distinct from a delayed material correction.
+    /// Both original source and observation remain on the return; no source member is selected
+    /// and neither local nor normal material is deposited by this current-only passage.
+    pub fn receive_contact_next(
+        &mut self,
+        contact: &NormalCoupledContact<'c>,
+        observed: ResidentConstitutiveCurrent<'_, 'c>,
+    ) -> Result<NormalCoupledStep<'c>, ConstitutiveFibreError> {
+        self.check_contact(contact)?;
+        let next = self.epoch().checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
+        if !self.neighborhood().can_publish_wave_read(contact.binding.neighborhood_epoch) {
+            return Err(ConstitutiveFibreError::ForeignOccurrence);
+        }
+        let relation = contact.binding.relation.read_observed_next(observed)?;
+        let successor = Rc::new(contact.binding.source.read_through(Rc::new(relation))?);
+        // This checked total map preserves the admitted anchor domain of the predecessor.
+        self.continuation.neighborhood.publish_wave_read(contact.binding.neighborhood_epoch);
+        Ok(self.publish_coupled(contact, next, successor))
+    }
     pub fn advance_contact(
         &mut self,
         contact: &NormalCoupledContact<'c>,

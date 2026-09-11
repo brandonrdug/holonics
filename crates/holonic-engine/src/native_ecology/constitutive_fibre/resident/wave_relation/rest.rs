@@ -9,6 +9,7 @@ use std::io::{Read, Write};
 const MAGIC_V1: &[u8] = b"HOLONIC-WAVE-RELATION\x01";
 const MAGIC_V2: &[u8] = b"HOLONIC-WAVE-RELATION\x02";
 const MAGIC_V3: &[u8] = b"HOLONIC-WAVE-RELATION\x03";
+const MAGIC_V4: &[u8] = b"HOLONIC-WAVE-RELATION\x04";
 const END: &[u8] = b"HOLONIC-WAVE-RELATION-END\x01";
 fn false_flag(value: &bool) -> bool {
     !*value
@@ -103,6 +104,8 @@ struct Header {
     receiver: WaveSourceReceiver,
     #[serde(default, skip_serializing_if = "false_flag")]
     source: bool,
+    #[serde(default, skip_serializing_if = "false_flag")]
+    observation: bool,
 }
 #[derive(Debug, PartialEq, Eq)]
 struct SourceContactRest {
@@ -110,6 +113,48 @@ struct SourceContactRest {
     prediction: ConstitutiveReturnRest,
     arrival: ConstitutiveReturnRest,
     reaction: ResidentSectionRest,
+}
+
+fn validate_observation(
+    basis: &ResidentSectionRest,
+    observed: &ResidentSectionRest,
+    n: usize,
+) -> Result<(), ConstitutiveFibreError> {
+    let q = n.checked_mul(8).and_then(|v| v.checked_add(2)).ok_or(ConstitutiveFibreError::Shape)?;
+    let w = q.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?;
+    point_section(basis, w, w)?;
+    point_section(observed, 1, 2 * n + 1)?;
+    if observed.intervals[2 * n].0 <= 0 {
+        return Err(invalid("observed-next snapshot has a nonpositive denominator"));
+    }
+    for p in 0..q {
+        let row = &basis.intervals[p * w..(p + 1) * w];
+        if row[p].0 <= 0 || row[..p].iter().any(|v| v.0 != 0) {
+            return Err(invalid("observed-next relation is not a total positive-pivot graph"));
+        }
+        for j in 0..2 + 4 * n {
+            if row[q + j].0 != row[j].0 {
+                return Err(invalid("observed-next relation changes lambda or anchor"));
+            }
+        }
+        for j in 0..2 * n {
+            if row[q + 2 + 4 * n + j].0 != row[2 + 6 * n + j].0 {
+                return Err(invalid("observed-next relation loses its current join"));
+            }
+        }
+    }
+    // Check every row, including quadrature and anchor generators, against c'=v*lambda.real.
+    let d = BigInt::from(observed.intervals[2 * n].0);
+    for row in basis.intervals.chunks_exact(w) {
+        for i in 0..2*n {
+            if BigInt::from(row[q+2+6*n+i].0)*&d
+                != BigInt::from(observed.intervals[i].0)*BigInt::from(row[0].0) {
+                return Err(invalid("observed-next relation does not carry c'=v*lambda.real"));
+            }
+        }
+    }
+
+    Ok(())
 }
 
 fn validate_source_contact(
@@ -190,6 +235,7 @@ pub struct NormalWaveRelationRest {
     basis: ResidentSectionRest,
     fixed: ResidentSectionRest,
     source: Option<SourceContactRest>,
+    observation: Option<ResidentSectionRest>,
 }
 impl NormalWaveRelationRest {
     pub fn roots(&self) -> usize {
@@ -216,6 +262,12 @@ impl NormalWaveRelationRest {
         if n == 0 || k == 0 || w > u32::MAX as usize {
             return Err(ConstitutiveFibreError::Shape);
         }
+        if (self.header.source && self.header.observation)
+            || (self.header.observation && self.observation.is_none())
+            || (!self.header.observation && self.observation.is_some())
+        {
+            return Err(invalid("wave relation source and observation are mutually exclusive"));
+        }
         point_section(&self.basis, w, w)?;
         point_section(&self.fixed, 1, hw)?;
         if self.fixed.intervals[hw - 1].0 <= 0 {
@@ -237,7 +289,7 @@ impl NormalWaveRelationRest {
                     return Err(invalid("wave relation changes the retained anchor"));
                 }
             }
-            if !self.header.source {
+            if !self.header.source && !self.header.observation {
                 for j in 0..2 * n {
                     if row[q + 2 + 4 * n + j].0 != row[2 + 6 * n + j].0 {
                         return Err(invalid("wave relation loses its current join"));
@@ -247,7 +299,7 @@ impl NormalWaveRelationRest {
                 return Err(invalid("source passage is not a total functional graph"));
             }
         }
-        if !self.header.source && self.header.receiver == WaveSourceReceiver::UnitRealSum {
+        if !self.header.source && !self.header.observation && self.header.receiver == WaveSourceReceiver::UnitRealSum {
             validate_unit_real_sum(&self.basis, n, q)?;
         }
         if self.header.source {
@@ -261,11 +313,16 @@ impl NormalWaveRelationRest {
         } else if self.source.is_some() {
             return Err(invalid("wave relation source evidence is not declared"));
         }
+        if let Some(observed) = &self.observation {
+            validate_observation(&self.basis, observed, n)?;
+        }
         Ok(())
     }
     pub fn write(&self, out: &mut impl Write) -> Result<(), ConstitutiveFibreError> {
         self.validate()?;
-        out.write_all(if self.source.is_some() {
+        out.write_all(if self.observation.is_some() {
+            MAGIC_V4
+        } else if self.source.is_some() {
             MAGIC_V3
         } else {
             MAGIC_V2
@@ -283,13 +340,16 @@ impl NormalWaveRelationRest {
             blob(out, &serde_json::to_vec(&source.arrival).map_err(invalid)?)?;
             blob(out, &point_bytes(&source.reaction)?)?;
         }
+        if let Some(observed) = &self.observation {
+            blob(out, &point_bytes(observed)?)?;
+        }
         out.write_all(END).map_err(invalid)
     }
     pub fn read(input: &mut impl Read, octets: u64) -> Result<Self, ConstitutiveFibreError> {
         let mut input = input.take(octets);
         let mut magic = vec![0u8; MAGIC_V1.len()];
         input.read_exact(&mut magic).map_err(invalid)?;
-        if magic != MAGIC_V1 && magic != MAGIC_V2 && magic != MAGIC_V3 {
+        if magic != MAGIC_V1 && magic != MAGIC_V2 && magic != MAGIC_V3 && magic != MAGIC_V4 {
             return Err(invalid("wave relation magic is absent"));
         }
         let header: Header = serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
@@ -316,6 +376,15 @@ impl NormalWaveRelationRest {
             }
             None
         };
+        let observation = if magic == MAGIC_V4 {
+            if !header.observation || header.source {
+                return Err(invalid("v4 wave relation has invalid observation declaration"));
+            }
+            Some(read_point(&read_blob(&mut input)?)?)
+        } else {
+            if header.observation { return Err(invalid("observation requires wave relation wire v4")); }
+            None
+        };
         expect(&mut input, END)?;
         let mut extra = [0u8; 1];
         if input.read(&mut extra).map_err(invalid)? != 0 {
@@ -326,6 +395,7 @@ impl NormalWaveRelationRest {
             basis,
             fixed,
             source,
+            observation,
         };
         rest.validate()?;
         Ok(rest)
@@ -359,10 +429,20 @@ impl NormalWaveRelationRest {
         } else {
             None
         };
-        let (basis, source) = if let Some((basis, source)) = source {
-            (basis, Some(source))
-        } else {
-            (s.mount_section_rest(&self.basis)?, None)
+        let observation = if let Some(observed) = self.observation {
+            let snapshot = s.mount_section_rest(&observed)?;
+            let (basis, normalized) = super::observation::observation_basis(s, self.header.roots, ResidentConstitutiveCurrent::rational(&snapshot)?)?;
+            if s.detach_section(&basis, 64)? != self.basis
+                || s.detach_section(&normalized, 64)? != observed {
+                return Err(invalid("observed-next map does not follow its normalized snapshot"));
+            }
+            Some((basis, snapshot))
+        } else { None };
+        let (basis, source, observation) = match (source, observation) {
+            (Some((basis, source)), None) => (basis, Some(source), None),
+            (None, Some((basis, snapshot))) => (basis, None, Some(snapshot)),
+            (None, None) => (s.mount_section_rest(&self.basis)?, None, None),
+            (Some(_), Some(_)) => return Err(invalid("wave relation source and observation are mutually exclusive")),
         };
         let mut relation = ResidentWaveRelation::new(
             s,
@@ -375,6 +455,9 @@ impl NormalWaveRelationRest {
             self.header.receiver,
         );
         relation.source = source;
+        if let Some(snapshot) = observation {
+            relation.observation = Some(snapshot);
+        }
         Ok(relation)
     }
 }
@@ -387,6 +470,7 @@ impl ResidentWaveRelation<'_> {
                 cut: self.relation_cut,
                 receiver: self.receiver,
                 source: self.source.is_some(),
+                observation: self.observation.is_some(),
             },
             basis: self.surface.detach_section(&self.basis, 64)?,
             fixed: self.surface.detach_section(&self.fixed, 64)?,
@@ -403,6 +487,11 @@ impl ResidentWaveRelation<'_> {
                         })
                     },
                 )
+                .transpose()?,
+            observation: self
+                .observation
+                .as_ref()
+                .map(|v| self.surface.detach_section(v, 64))
                 .transpose()?,
         };
         rest.validate()?;
@@ -434,8 +523,10 @@ mod tests {
                 cut: 0,
                 receiver: WaveSourceReceiver::UnitRealSum,
                 source: false,
+                observation: false,
             },
             source: None,
+            observation: None,
             basis: ResidentSectionRest::found(w, w, ResidentGrain(0), 64, rows).unwrap(),
             fixed: ResidentSectionRest::found(
                 1,
@@ -446,6 +537,25 @@ mod tests {
             )
             .unwrap(),
         }
+    }
+    fn observation_specimen() -> NormalWaveRelationRest {
+        let mut rest = specimen();
+        rest.header.observation = true;
+        rest.observation = Some(ResidentSectionRest::found(1,3,ResidentGrain(0),64,
+            vec![(3,3),(4,4),(1,1)]).unwrap());
+        for row in rest.basis.intervals.chunks_exact_mut(20) {row[18]=(0,0);row[19]=(0,0);}
+        rest.basis.intervals[18]=(3,3);rest.basis.intervals[19]=(4,4);
+        rest
+    }
+    #[test]
+    fn observation_rest_checks_all_rows_and_round_trips_its_payload() {
+        let rest=observation_specimen();rest.validate().unwrap();
+        let mut bytes=Vec::new();rest.write(&mut bytes).unwrap();
+        assert_eq!(NormalWaveRelationRest::read(&mut bytes.as_slice(),bytes.len() as u64).unwrap(),rest);
+        let mut wrong=observation_specimen();wrong.basis.intervals[20+18]=(1,1);
+        assert!(wrong.validate().is_err());
+        let mut wrong=observation_specimen();wrong.header.source=true;assert!(wrong.validate().is_err());
+        let mut wrong=observation_specimen();wrong.basis.intervals[6*20+6]=(0,0);assert!(wrong.validate().is_err());
     }
     #[test]
     fn receiver_rest_checks_complete_gauge_and_increment() {

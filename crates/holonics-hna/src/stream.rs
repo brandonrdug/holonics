@@ -28,6 +28,7 @@ pub enum HnaStreamCommand {
     ProjectSymbol { #[serde(default)] full_emission:bool },
     EmitSymbol { #[serde(default)] full_emission:bool, #[serde(default)] retain_comparison:bool },
     ObserveSymbol { source:u64, text:String },
+    ReceiveNextSymbol { text:String },
     ReceiveCurrent {
         current: crate::native::CurrentWire,
         #[serde(default)]
@@ -265,6 +266,10 @@ impl HnaStream {
             self.state.input.clear();
             self.state.input_complete = false;
             match request.command {
+                HnaStreamCommand::ReceiveNextSymbol{text}=>match target.receive_next_symbol(&text){
+                    Ok(value)=>self.emit("next-symbol-received",value)?,
+                    Err(error)=>self.emit("refused",json!({"error":error,"anatomy":target.inspect()}))?,
+                },
                 HnaStreamCommand::ProjectSymbol{full_emission}=>match target.project_symbol(full_emission){
                     Ok(value)=>self.emit("symbol-projection",value)?,
                     Err(error)=>self.emit("refused",json!({"error":error,"anatomy":target.inspect()}))?,
@@ -371,6 +376,7 @@ impl Default for HnaStream {
 /// Only an exterior effect seam for I/O tests. Native current and learning are never callbacks
 /// supplied through the public stream protocol; actual adapters use HnaSession or NativeSession.
 trait StreamTarget {
+    fn receive_next_symbol(&mut self,_:&str)->Result<Value,String>{Err("actual next-symbol receiver unsupported by this model".into())}
     fn project_symbol(&self,_:bool)->Result<Value,String>{Err("projected family receiver unsupported by this model".into())}
     fn actuate_text(&mut self,_:&str)->Result<Value,String>{Err("text source chart unsupported by this model".into())}
     fn emit_symbol(&mut self,_:bool,_:bool)->Result<Value,String>{Err("symbol receiver unsupported by this model".into())}
@@ -796,6 +802,7 @@ impl StreamTarget for crate::native::NativeWaveSession<'_> {
 }
 
 impl StreamTarget for crate::native::NativeCoupledWaveSession<'_>{
+    fn receive_next_symbol(&mut self,text:&str)->Result<Value,String>{self.receive_next_symbol(text).map_err(|e|e.to_string())}
     fn inspect_relation(&self)->Result<Value,String>{self.inspect_relation().map_err(|e|e.to_string())}
     fn project_symbol(&self,full:bool)->Result<Value,String>{self.project_current(full).map_err(|e|e.to_string())}
     fn actuate_text(&mut self,text:&str)->Result<Value,String>{self.actuate_text(text).map_err(|e|e.to_string())}

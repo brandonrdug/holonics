@@ -102,6 +102,7 @@ impl<'c> ResidentWaveRelation<'c> {
             producing_owner: Rc::clone(&self.producing_owner),
             receiver: self.receiver,
             source: Some(source),
+            observation: None,
         })
     }
 }
@@ -202,7 +203,7 @@ impl<'c> ResidentWaveRelation<'c> {
         &self,
         family: &ResidentConstitutiveReturn<'c>,
     ) -> Result<(ResidentConstitutiveReturn<'c>, ResidentSection<'c>), ConstitutiveFibreError> {
-        if self.source.is_none()
+        if !self.is_total_current_map()
             || family.target_width != self.width()
             || !std::ptr::eq(family.surface, self.surface)
         {

@@ -199,7 +199,9 @@ impl NormalWaveRest {
                 .source_receiver();
             let mut relation =
                 neighborhood.read_wave_relation_in_chart(j, base.material.roots, receiver, None)?;
-            if let Some(contact) = family.last_relation().and_then(|v| v.source_contact()) {
+            if let Some(observed) = family.last_relation().and_then(|v| v.observed_next()) {
+                relation = relation.read_observed_next(observed)?;
+            } else if let Some(contact) = family.last_relation().and_then(|v| v.source_contact()) {
                 relation =
                     relation.read_source_contact(neighborhood.generator(j)?, contact.source())?;
                 if let Some(row) = contact.source_row() {

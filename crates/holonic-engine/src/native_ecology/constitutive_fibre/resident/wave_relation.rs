@@ -1,6 +1,7 @@
 use super::*;
 mod rest;
 mod source;
+mod observation;
 pub use rest::NormalWaveRelationRest;
 pub use source::ResidentWaveSourceContact;
 
@@ -25,6 +26,7 @@ pub struct ResidentWaveRelation<'c> {
     producing_owner: Rc<()>,
     receiver: WaveSourceReceiver,
     source: Option<ResidentWaveSourceContact<'c>>,
+    observation: Option<ResidentSection<'c>>,
 }
 impl<'c> ResidentWaveRelation<'c> {
     pub(in super::super) fn new(
@@ -47,6 +49,7 @@ impl<'c> ResidentWaveRelation<'c> {
             producing_owner,
             receiver,
             source: None,
+            observation: None,
         }
     }
     pub fn source_receiver(&self) -> WaveSourceReceiver {

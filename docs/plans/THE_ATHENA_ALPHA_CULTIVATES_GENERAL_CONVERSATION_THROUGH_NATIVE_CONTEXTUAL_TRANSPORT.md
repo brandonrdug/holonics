@@ -419,6 +419,12 @@ A whole source field stages its ordered internal maps and publishes once. Its co
 fibres and actual source remain in the return. Source actuation alone adds no learned row; join
 observed-source development and continuing emission through their own admitted comparisons.
 
+[established-bounded; implemented-exact] The [actual-continuation binding](../../research/records/2026-09-11_ACTUAL_CONTINUATIONS_JOIN_THE_COMPLETE_COUPLED_FAMILY.md)
+now gives the coupled owner an explicit `(p,c)→(c,v)` actual-next-current passage. Its full family,
+source and observed operand survive the native join and rest v4. This current-only operation is
+not the family-aware material correction owed above. Its two-observation annihilation of old
+current dependence also prevents silently using it as the unpaired message source law.
+
 ### 4. Form and reuse local generators with their future conduct
 
 [definition] Use the existing independent relation-basis formation and condition domain before

@@ -1,0 +1,12 @@
+{
+  "schema": "athena.actual-continuation-aperture.v1",
+  "sequence": 67,
+  "partition": "development",
+  "event": 269700,
+  "part": 0,
+  "role": "declared within-part actual-next-current chart",
+  "observed_prefix": "I ",
+  "comparison_suffix": "fo",
+  "comparison_used_by_native": false,
+  "requested_emissions": 2
+}

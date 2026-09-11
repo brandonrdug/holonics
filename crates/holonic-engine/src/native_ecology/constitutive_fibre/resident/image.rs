@@ -9,6 +9,7 @@ pub enum ConstitutiveImageReceiver<'a, 'c> {
     ContextChange(&'a ResidentContextualSection<'c>),
     WaveConditional(&'a ResidentWaveRelation<'c>),
     WaveSourceContact(&'a ResidentWaveRelation<'c>),
+    WaveObservation(&'a ResidentWaveRelation<'c>),
 }
 
 #[derive(Debug, PartialEq, Eq, Serialize)]
@@ -362,7 +363,9 @@ impl<'c> ResidentWaveRelation<'c> {
             self.width(),
             self.relation_cut,
             source,
-            if self.source_contact().is_some() {
+            if self.observed_next().is_some() {
+                ConstitutiveImageReceiver::WaveObservation(self)
+            } else if self.source_contact().is_some() {
                 ConstitutiveImageReceiver::WaveSourceContact(self)
             } else {
                 ConstitutiveImageReceiver::WaveConditional(self)

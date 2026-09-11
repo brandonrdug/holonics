@@ -1,0 +1,40 @@
+{
+  "scope": "declared development continuation, not held-out quality",
+  "observed_prefix": "I ",
+  "source_comparison": "fo",
+  "emitted": "\n\n",
+  "emissions": [
+    {
+      "generation": 14,
+      "symbol": 0,
+      "text": "\n",
+      "projected_score": "1/73",
+      "projected_ties": 73,
+      "score_population": {
+        "0": 12,
+        "1/73": 73
+      },
+      "anchor_independent_free_scores": 73,
+      "reentry": false
+    },
+    {
+      "generation": 15,
+      "symbol": 0,
+      "text": "\n",
+      "projected_score": "1/73",
+      "projected_ties": 73,
+      "score_population": {
+        "0": 12,
+        "1/73": 73
+      },
+      "anchor_independent_free_scores": 73,
+      "reentry": true
+    }
+  ],
+  "generation_epochs": [
+    13,
+    16
+  ],
+  "conditional_admission_succeeded": true,
+  "useful_continuation_established": false
+}

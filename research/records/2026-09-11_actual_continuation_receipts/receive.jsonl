@@ -1,0 +1,3 @@
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "receive-next-symbol", "text": "I"}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "receive-next-symbol", "text": " "}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "inspect"}}

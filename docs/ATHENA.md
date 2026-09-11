@@ -78,11 +78,19 @@ use the existing source actuation. No padding or self-target deposition is suppl
 retains pending selection/re-entry and the shared delivery cursor. `retain_comparison` and
 `observe-symbol` currently return the precise missing producing-family observation port.
 
+[definition] The [actual-continuation return](../research/records/2026-09-11_ACTUAL_CONTINUATIONS_JOIN_THE_COMPLETE_COUPLED_FAMILY.md)
+adds `receive-next-symbol` for an explicitly observed next current in this symbol chart. It joins
+the whole family as `(c,v)` and retains the old source/anchor, with no material deposition. This
+current-only receipt does not fulfill delayed producing-family correction. Ordinary unpaired
+messages continue through `actuate-text`; their meaning is not changed to a succession of fixed
+internal-state observations. Complete observation maps use relation rest v4.
+
 [definition] The workbench entry is `hna coupled-wave-session MODEL_DIRECTORY --member N
 --receiver direct|unit-real-sum --input requests.jsonl --checkpoint NEW_SESSION`. A fresh source
 contains `model.wave` and `exterior-chart.json`. Resume uses `hna coupled-wave-session SESSION
 --resume --input more.jsonl --checkpoint NEW_SESSION`; its saved member and receiver govern.
 Requests use the existing HnaStream schema with `project-symbol`, `emit-symbol`, `actuate-text`,
+`receive-next-symbol`,
 `inspect`, `inspect-relation`, `checkpoint` and `close`. `inspect-relation` reads the candidate
 of an already admitted contact without publishing it. An operation refusal is an event and leaves the session
 available; inspect its returned epoch and pending phase before retrying.

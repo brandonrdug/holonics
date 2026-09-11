@@ -93,7 +93,7 @@ impl<'c> NormalWaveFamily<'c> {
                     .passages
                     .checked_add(1)
                     .ok_or(ConstitutiveFibreError::Shape)?
-                || (passages == self.passages && law.source_contact().is_some()))
+                || (passages == self.passages && law.is_total_current_map()))
         {
             return Err(ConstitutiveFibreError::Shape);
         }
@@ -102,7 +102,7 @@ impl<'c> NormalWaveFamily<'c> {
             .epoch
             .checked_add(passages)
             .ok_or(ConstitutiveFibreError::Shape)?;
-        let (relation, coverage) = if law.source_contact().is_some() {
+        let (relation, coverage) = if law.is_total_current_map() {
             law.read_source_image(&self.relation)?
         } else {
             law.read_image(&self.relation)?.into_output()
