@@ -10,6 +10,7 @@ impl<'c> ResidentSurface<'c> {
         c: usize,
         y: usize,
         buffers: [&ResidentSection<'c>; 9],
+        workspace: &ResidentSection<'c>,
     ) -> Result<(), ResidentRefusal> {
         let fail = || ResidentRefusal::Declaration {
             operation: "constitutive-family-image",
@@ -54,13 +55,13 @@ impl<'c> ResidentSurface<'c> {
         if !valid {
             return Err(fail());
         }
-        let shared = k
+        let words = k
             .checked_mul(2)
-            .and_then(|n| n.checked_add(w))
-            .and_then(|n| n.checked_mul(16))
-            .and_then(|n| u32::try_from(n).ok())
-            .filter(|n| *n <= self.declaration.max_sectiond_bytes)
+            .and_then(|v| v.checked_add(w)?.checked_mul(2))
             .ok_or_else(fail)?;
+        if words > u32::MAX as usize || !shape(workspace, 1, Some(words)) {
+            return Err(fail());
+        }
         let mut p = Params::new();
         p.ptr(basis.lo.device_ptr())
             .ptr(basis.hi.device_ptr())
@@ -72,7 +73,8 @@ impl<'c> ResidentSurface<'c> {
         for section in buffers {
             p.ptr(section.lo.device_ptr()).ptr(section.hi.device_ptr());
         }
-        p.ptr(lane.slot)
+        p.ptr(workspace.lo.device_ptr())
+            .ptr(lane.slot)
             .ptr(lane.census)
             .ptr(lane.lineage)
             .u32(lane.lineage_count);
@@ -81,7 +83,7 @@ impl<'c> ResidentSurface<'c> {
             "section_constitutive_relation_image",
             1,
             self.declaration.warp_size.max(1),
-            shared,
+            0,
             &mut p,
             "constitutive-family-image",
         )

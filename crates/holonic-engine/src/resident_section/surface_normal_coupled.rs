@@ -1,5 +1,5 @@
 use super::*;
-use crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent;
+use crate::native_ecology::constitutive_fibre::{ResidentConstitutiveCurrent, WaveSourceReceiver};
 impl<'c> ResidentSurface<'c> {
     pub(crate) fn record_normal_family_admit(
         &self,
@@ -39,6 +39,7 @@ impl<'c> ResidentSurface<'c> {
         lane: &Lane<'_, 'c>,
         source: ResidentConstitutiveCurrent<'_, 'c>,
         n: usize,
+        receiver: WaveSourceReceiver,
         out: &ResidentSection<'c>,
     ) -> Result<(), ResidentRefusal> {
         self.validate_constitutive_current_view(source)?;
@@ -56,6 +57,7 @@ impl<'c> ResidentSurface<'c> {
             .u32(source.denominator.map_or(u32::MAX, |v| v as u32))
             .u32(source.disposition.map_or(u32::MAX, |v| v as u32))
             .u32(n as u32)
+            .u32(u32::from(receiver == WaveSourceReceiver::UnitRealSum))
             .ptr(out.lo.device_ptr())
             .ptr(out.hi.device_ptr())
             .ptr(lane.slot)

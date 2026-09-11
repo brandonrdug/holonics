@@ -209,6 +209,14 @@ source-plane and family-support admission. `wave/coupled/rest.rs` and `wave/rest
 that owner, including its distinct normal bank and pending normal comparisons. Rest validates and
 rebinds current contacts through their restored member/condition; it does not run a second learner.
 
+[definition] `WaveSourceReceiver` in `resident/wave_relation.rs` declares the local source chart.
+`Direct` keeps the original pullback; `UnitRealSum` applies the common-real-offset section to the
+source of L and retains the raw residual state. The native derivation checks zero real returned
+increment; `normal_coupled.cuh` checks observed unit-source reception. Relation rest v2 retains
+and validates the chart and its complete gauge directions; coupled remount derives the saved map
+from its actual material/condition. The relation derivation and generic affine-image kernels
+use resident workspace sections rather than per-block shared scratch for their working vectors.
+
 [definition] `normal/direct/wave/actuate.rs` owns fixed-material source action. The
 `normal_source_actuation.cuh` source word reuses the learned normal response and the enclosed
 finite contact in `passive_current_ball.cuh`. Source union retains the incoming current;

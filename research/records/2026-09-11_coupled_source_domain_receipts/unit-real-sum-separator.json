@@ -1,0 +1,22 @@
+{
+  "schema": "holonics.affine-source-separation.v1",
+  "scope": "Exact exterior diagnostic of the saved complete affine candidate, not a host native support decision.",
+  "source_receiver": "UnitRealSum",
+  "roots": 85,
+  "affine_directions": 41,
+  "anchor_real_width": 340,
+  "separator": {
+    "plus_coordinate": 150,
+    "minus_coordinate": 146,
+    "affine_value": "0",
+    "particular_annihilated": true,
+    "every_direction_annihilated": true,
+    "squared_norm": "2"
+  },
+  "source_gap": "21919652719988313527/2305843009213693952",
+  "distance_squared_lower_bound": "480471175364891071540636823453651179729/10633823966279326983230456482242756608",
+  "anchor_radius_squared": "32485145313177722350722170365281/340282366920938463463374607431768211456",
+  "strictly_separates": true,
+  "native_receiver": "REFUSED_CARRIER=1; this diagnostic does not supply a native receiver or publish a successor",
+  "private_source": ".local/athena-coupled-source-2026-09-11-unit-real-sum-difference"
+}

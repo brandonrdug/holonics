@@ -398,6 +398,16 @@ passive rechart versus physical contact change; late refusal on either side pres
 owners' complete state; and coupled rest/remount into the same next operation. Use existing
 neighborhood controls as references, adding only checks of the new binding and its finite response.
 
+[definition] Prepared source must be connected in its actual receiver chart. The
+[unit-source domain return](../../research/records/2026-09-11_UNIT_SOURCE_CHARTS_RETAIN_THE_WAVES_COMMON_OFFSET.md)
+identifies a concrete mismatch between unit-symbol local source rows and unrestricted continuing
+wave offsets. The explicit `UnitRealSum` connection reads `L(φ(S(p),S(c)),h)` while joining
+`(c,c+η)` in the raw state. It checks zero real sum of every returned difference and retains the
+complete gauge/source fibre. `Direct` remains available. This scoped commuting chart removes only
+the common-offset mismatch; source coverage, actual condition development and useful response
+remain to be returned through prepared material, without overwriting the current with a normalized
+centre or using broader uncertainty to hide a failed source connection.
+
 ### 4. Form and reuse local generators with their future conduct
 
 [definition] Use the existing independent relation-basis formation and condition domain before

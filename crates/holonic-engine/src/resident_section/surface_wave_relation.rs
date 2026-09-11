@@ -1,5 +1,5 @@
 use super::*;
-use crate::native_ecology::constitutive_fibre::ResidentConstitutiveCurrent;
+use crate::native_ecology::constitutive_fibre::{ResidentConstitutiveCurrent, WaveSourceReceiver};
 impl<'c> ResidentSurface<'c> {
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn record_constitutive_wave_relation(
@@ -12,6 +12,8 @@ impl<'c> ResidentSurface<'c> {
         graph: &ResidentSection<'c>,
         derived: &ResidentSection<'c>,
         fixed: &ResidentSection<'c>,
+        workspace: &ResidentSection<'c>,
+        receiver: WaveSourceReceiver,
     ) -> Result<(), ResidentRefusal> {
         let fail = || Self::operative_error();
         let ns = n.checked_mul(3).ok_or_else(fail)?;
@@ -47,12 +49,13 @@ impl<'c> ResidentSurface<'c> {
             return Err(fail());
         }
         self.validate_constitutive_current_view(condition)?;
-        let shared = l
+        let words = l
             .checked_add(g.max(d))
-            .and_then(|v| v.checked_mul(16))
-            .and_then(|v| u32::try_from(v).ok())
-            .filter(|v| *v <= self.declaration().max_sectiond_bytes)
+            .and_then(|v| v.checked_mul(2))
             .ok_or_else(fail)?;
+        if words > u32::MAX as usize || !self.operative_shape(workspace, 1, words) {
+            return Err(fail());
+        }
         let mut p = Params::new();
         p.ptr(basis.lo.device_ptr())
             .ptr(basis.hi.device_ptr())
@@ -63,12 +66,14 @@ impl<'c> ResidentSurface<'c> {
             .u32(condition.disposition.map_or(u32::MAX, |v| v as u32))
             .u32(n as u32)
             .u32(k as u32)
+            .u32(u32::from(receiver == WaveSourceReceiver::UnitRealSum))
             .ptr(graph.lo.device_ptr())
             .ptr(graph.hi.device_ptr())
             .ptr(derived.lo.device_ptr())
             .ptr(derived.hi.device_ptr())
             .ptr(fixed.lo.device_ptr())
             .ptr(fixed.hi.device_ptr())
+            .ptr(workspace.lo.device_ptr())
             .ptr(lane.slot)
             .ptr(lane.census)
             .ptr(lane.lineage)
@@ -78,7 +83,7 @@ impl<'c> ResidentSurface<'c> {
             "section_constitutive_wave_relation",
             1,
             self.launch.block_x,
-            shared,
+            0,
             &mut p,
             "constitutive-wave-relation",
         )

@@ -69,12 +69,11 @@ fn coupled_source_return_changes_condition_and_joint_atomically() {
     assert_eq!(face(wave.current()), vec![r(2), r(1), r(4), r(3)]);
     assert_ne!(wave.neighborhood().rest().unwrap(), before);
     assert_eq!(wave.material.rest().unwrap(), bank);
-    assert!(
-        wave.current()
-            .last_relation()
-            .unwrap()
-            .same_producing_cut(&wave.neighborhood().read_wave_relation(0, 1, None).unwrap())
-    );
+    assert!(wave
+        .current()
+        .last_relation()
+        .unwrap()
+        .same_producing_cut(&wave.neighborhood().read_wave_relation(0, 1, None).unwrap()));
 }
 #[test]
 #[ignore = "requires CUDA; a late arithmetic refusal discards both prepared condition and member material"]
@@ -163,10 +162,9 @@ fn coupled_domain_and_source_plane_refusals_preserve_complete_rest() {
     let before = wire(&wave);
     let malformed = point(&s, &[2, 0, 1, 0, 0, 0]);
     let eta = point(&s, &[1, 0]);
-    assert!(
-        wave.receive_contact_source(&contact, current(&malformed), current(&eta))
-            .is_err()
-    );
+    assert!(wave
+        .receive_contact_source(&contact, current(&malformed), current(&eta))
+        .is_err());
     assert_eq!(wire(&wave), before);
 }
 #[test]
@@ -321,17 +319,122 @@ fn coupled_reception_forms_material_before_admitting_the_new_current() {
     assert_eq!(wave.neighborhood().rest().unwrap().laws()[0].rank(), 1);
     assert_eq!(face(wave.current()), vec![r(2), r(1), r(3), r(1)]);
     assert_eq!(wave.material.rest().unwrap(), bank);
-    assert!(
-        !returned
-            .step
-            .contact
-            .relation()
-            .same_producing_cut(returned.step.applied_relation())
-    );
+    assert!(!returned
+        .step
+        .contact
+        .relation()
+        .same_producing_cut(returned.step.applied_relation()));
     let saved = wire(&wave);
     let restored = NormalWaveRest::read(&mut saved.as_slice(), saved.len() as u64)
         .unwrap()
         .remount_coupled(&s, |_| {})
         .unwrap();
     assert_eq!(wire(&restored), saved);
+}
+
+// This local specimen is learned from actual declared unit-source rows; the receiver chart
+// must lift its response to raw currents with different common real offsets.
+fn unit_swap<'c>(
+    s: &'c ResidentSurface<'c>,
+) -> crate::native_ecology::constitutive_fibre::ResidentConstitutiveFibre<'c> {
+    use crate::native_ecology::constitutive_fibre::ResidentConstitutiveFibre;
+    let mut law = ResidentConstitutiveFibre::found_bilinear_contact(s, 6, 1, 2).unwrap();
+    let h = point(s, &[1, 0]);
+    for p in [[1, 0, 0, 0], [0, 0, 1, 0]] {
+        for c in [[1, 0, 0, 0], [0, 0, 1, 0]] {
+            let mut source = [0; 12];
+            for j in 0..4 {
+                source[j] = c[j] - p[j];
+                source[4 + j] = c[j];
+                source[8 + j] = p[j];
+            }
+            let x = point(s, &source);
+            let eta = point(s, &[c[2] - c[0], 0, c[0] - c[2], 0]);
+            law.advance_bilinear_contact(current(&x), current(&h), Some(current(&eta)))
+                .unwrap();
+        }
+    }
+    law
+}
+#[test]
+#[ignore = "requires CUDA; declared unit-real-sum chart transports the full offset fibre and survives rest"]
+fn coupled_unit_real_sum_lifts_source_offsets_and_retains_chart() {
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let material = ResidentNormalMaterial::found(&s, 2, 2, ResidentGrain(32)).unwrap();
+    let p = point(&s, &[4, 0, 2, 0]);
+    let c = point(&s, &[7, 0, 3, 0]);
+    let h = point(&s, &[1, 0]);
+    let body = material
+        .into_applied_difference_wave(current(&p), current(&c))
+        .unwrap();
+    let neighborhood = ResidentGeneratorNeighborhood::with_shared_condition(
+        vec![unit_swap(&s)],
+        current(&h),
+        ConditionContactMetric::UnitAdmittanceRealification,
+    )
+    .unwrap();
+    let mut wave = body.with_neighborhood(neighborhood).unwrap();
+    let direct = wave.admit_contact(0).unwrap();
+    let before = wave.rest().unwrap();
+    assert!(wave.advance_contact(&direct).is_err());
+    assert_eq!(wave.rest().unwrap(), before);
+    let contact = wave
+        .admit_contact_in_chart(0, WaveSourceReceiver::UnitRealSum)
+        .unwrap();
+    let reads = s.census().section_read_outs;
+    wave.advance_contact(&contact).unwrap();
+    assert_eq!(s.census().section_read_outs, reads);
+    assert_eq!(
+        face(wave.current()),
+        vec![r(7), r(0), r(3), r(0), r(3), r(0), r(7), r(0)]
+    );
+    let chart = wave.current().last_relation().unwrap();
+    assert_eq!(chart.source_receiver(), WaveSourceReceiver::UnitRealSum);
+    chart.rest().unwrap().validate().unwrap();
+    // Every affine row has the same swap law, including directions that vary the raw offset.
+    let inspected = wave.current().affine_relation().inspect().unwrap();
+    if let ConstitutiveReading::Plural {
+        particular,
+        directions,
+    } = inspected.predecessor_reading
+    {
+        for row in std::iter::once(&particular).chain(directions.iter()) {
+            assert_eq!(row[14], row[8]);
+            assert_eq!(row[16], row[6]);
+            assert_eq!(row[10], row[6]);
+            assert_eq!(row[12], row[8]);
+        }
+    } else {
+        panic!("expected complete affine family");
+    }
+    let mut bytes = Vec::new();
+    wave.rest().unwrap().write(&mut bytes).unwrap();
+    let restored = NormalWaveRest::read(&mut bytes.as_slice(), bytes.len() as u64).unwrap();
+    let mut restored = restored.remount_coupled(&s, |_| {}).unwrap();
+    assert_eq!(face(restored.current()), face(wave.current()));
+    let next = restored
+        .admit_contact_in_chart(0, WaveSourceReceiver::UnitRealSum)
+        .unwrap();
+    restored.advance_contact(&next).unwrap();
+    assert_eq!(
+        face(restored.current()),
+        vec![r(3), r(0), r(7), r(0), r(7), r(0), r(3), r(0)]
+    );
+    // Invalid observed source, and a valid source with nonconserving return, both preserve owner.
+    let next = restored
+        .admit_contact_in_chart(0, WaveSourceReceiver::UnitRealSum)
+        .unwrap();
+    let before = restored.rest().unwrap();
+    let wrong = point(&s, &[0; 12]);
+    let eta = point(&s, &[1, 0, 0, 0]);
+    assert!(restored
+        .receive_contact_source(&next, current(&wrong), current(&eta))
+        .is_err());
+    assert_eq!(restored.rest().unwrap(), before);
+    let source = point(&s, &[0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0]);
+    assert!(restored
+        .receive_contact_source(&next, current(&source), current(&eta))
+        .is_err());
+    assert_eq!(restored.rest().unwrap(), before);
 }

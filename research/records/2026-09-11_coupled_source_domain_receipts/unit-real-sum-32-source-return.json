@@ -1,0 +1,356 @@
+{
+  "schema": "holonics.unit-real-sum-source-return.v1",
+  "scope": "32-frame declared Development source assay; native family support refused; epoch unchanged.",
+  "run": {
+    "epoch": 10,
+    "error": "native constitutive arithmetic refused without depositing a row: conditional family admission: ObstructionLineage { refusals: [OccurrenceRefusal { index: 0, flags: 16, origin: true, upstream_flags: 0, upstream_first: None, upstream_count: 0 }] }",
+    "fields": [
+      {
+        "ingress_octets": 160,
+        "milliseconds": 106,
+        "numerical_readouts": 0,
+        "observations": 40,
+        "octets": 42,
+        "part": 0,
+        "scalars": 42,
+        "sequence": 34
+      },
+      {
+        "ingress_octets": 908,
+        "milliseconds": 998,
+        "numerical_readouts": 0,
+        "observations": 227,
+        "octets": 231,
+        "part": 0,
+        "scalars": 229,
+        "sequence": 35
+      },
+      {
+        "ingress_octets": 1456,
+        "milliseconds": 1909,
+        "numerical_readouts": 0,
+        "observations": 364,
+        "octets": 368,
+        "part": 0,
+        "scalars": 366,
+        "sequence": 36
+      },
+      {
+        "ingress_octets": 13596,
+        "milliseconds": 20504,
+        "numerical_readouts": 0,
+        "observations": 3399,
+        "octets": 3404,
+        "part": 0,
+        "scalars": 3401,
+        "sequence": 37
+      },
+      {
+        "ingress_octets": 68,
+        "milliseconds": 76,
+        "numerical_readouts": 0,
+        "observations": 17,
+        "octets": 19,
+        "part": 0,
+        "scalars": 19,
+        "sequence": 38
+      },
+      {
+        "ingress_octets": 1128,
+        "milliseconds": 1599,
+        "numerical_readouts": 0,
+        "observations": 282,
+        "octets": 288,
+        "part": 0,
+        "scalars": 284,
+        "sequence": 39
+      },
+      {
+        "ingress_octets": 1156,
+        "milliseconds": 1704,
+        "numerical_readouts": 0,
+        "observations": 289,
+        "octets": 291,
+        "part": 0,
+        "scalars": 291,
+        "sequence": 40
+      },
+      {
+        "ingress_octets": 1116,
+        "milliseconds": 1591,
+        "numerical_readouts": 0,
+        "observations": 279,
+        "octets": 283,
+        "part": 0,
+        "scalars": 281,
+        "sequence": 41
+      },
+      {
+        "ingress_octets": 644,
+        "milliseconds": 900,
+        "numerical_readouts": 0,
+        "observations": 161,
+        "octets": 165,
+        "part": 0,
+        "scalars": 163,
+        "sequence": 42
+      },
+      {
+        "ingress_octets": 796,
+        "milliseconds": 1161,
+        "numerical_readouts": 0,
+        "observations": 199,
+        "octets": 203,
+        "part": 0,
+        "scalars": 201,
+        "sequence": 43
+      },
+      {
+        "ingress_octets": 812,
+        "milliseconds": 1156,
+        "numerical_readouts": 0,
+        "observations": 203,
+        "octets": 207,
+        "part": 0,
+        "scalars": 205,
+        "sequence": 44
+      },
+      {
+        "ingress_octets": 1000,
+        "milliseconds": 1332,
+        "numerical_readouts": 0,
+        "observations": 250,
+        "octets": 254,
+        "part": 0,
+        "scalars": 252,
+        "sequence": 45
+      },
+      {
+        "ingress_octets": 868,
+        "milliseconds": 1219,
+        "numerical_readouts": 0,
+        "observations": 217,
+        "octets": 221,
+        "part": 0,
+        "scalars": 219,
+        "sequence": 46
+      },
+      {
+        "ingress_octets": 868,
+        "milliseconds": 1229,
+        "numerical_readouts": 0,
+        "observations": 217,
+        "octets": 221,
+        "part": 0,
+        "scalars": 219,
+        "sequence": 47
+      },
+      {
+        "ingress_octets": 804,
+        "milliseconds": 1165,
+        "numerical_readouts": 0,
+        "observations": 201,
+        "octets": 205,
+        "part": 0,
+        "scalars": 203,
+        "sequence": 48
+      },
+      {
+        "ingress_octets": 692,
+        "milliseconds": 986,
+        "numerical_readouts": 0,
+        "observations": 173,
+        "octets": 179,
+        "part": 0,
+        "scalars": 175,
+        "sequence": 49
+      },
+      {
+        "ingress_octets": 536,
+        "milliseconds": 770,
+        "numerical_readouts": 0,
+        "observations": 134,
+        "octets": 140,
+        "part": 0,
+        "scalars": 136,
+        "sequence": 50
+      },
+      {
+        "ingress_octets": 1020,
+        "milliseconds": 1482,
+        "numerical_readouts": 0,
+        "observations": 255,
+        "octets": 261,
+        "part": 0,
+        "scalars": 257,
+        "sequence": 51
+      },
+      {
+        "ingress_octets": 692,
+        "milliseconds": 998,
+        "numerical_readouts": 0,
+        "observations": 173,
+        "octets": 177,
+        "part": 0,
+        "scalars": 175,
+        "sequence": 52
+      },
+      {
+        "ingress_octets": 832,
+        "milliseconds": 1117,
+        "numerical_readouts": 0,
+        "observations": 208,
+        "octets": 212,
+        "part": 0,
+        "scalars": 210,
+        "sequence": 53
+      },
+      {
+        "ingress_octets": 908,
+        "milliseconds": 1337,
+        "numerical_readouts": 0,
+        "observations": 227,
+        "octets": 231,
+        "part": 0,
+        "scalars": 229,
+        "sequence": 54
+      },
+      {
+        "ingress_octets": 952,
+        "milliseconds": 1384,
+        "numerical_readouts": 0,
+        "observations": 238,
+        "octets": 242,
+        "part": 0,
+        "scalars": 240,
+        "sequence": 55
+      },
+      {
+        "ingress_octets": 696,
+        "milliseconds": 1013,
+        "numerical_readouts": 0,
+        "observations": 174,
+        "octets": 178,
+        "part": 0,
+        "scalars": 176,
+        "sequence": 56
+      },
+      {
+        "ingress_octets": 476,
+        "milliseconds": 630,
+        "numerical_readouts": 0,
+        "observations": 119,
+        "octets": 127,
+        "part": 0,
+        "scalars": 121,
+        "sequence": 57
+      },
+      {
+        "ingress_octets": 664,
+        "milliseconds": 914,
+        "numerical_readouts": 0,
+        "observations": 166,
+        "octets": 172,
+        "part": 0,
+        "scalars": 168,
+        "sequence": 58
+      },
+      {
+        "ingress_octets": 492,
+        "milliseconds": 660,
+        "numerical_readouts": 0,
+        "observations": 123,
+        "octets": 127,
+        "part": 0,
+        "scalars": 125,
+        "sequence": 59
+      },
+      {
+        "ingress_octets": 728,
+        "milliseconds": 993,
+        "numerical_readouts": 0,
+        "observations": 182,
+        "octets": 188,
+        "part": 0,
+        "scalars": 184,
+        "sequence": 60
+      },
+      {
+        "ingress_octets": 388,
+        "milliseconds": 551,
+        "numerical_readouts": 0,
+        "observations": 97,
+        "octets": 101,
+        "part": 0,
+        "scalars": 99,
+        "sequence": 61
+      },
+      {
+        "ingress_octets": 624,
+        "milliseconds": 821,
+        "numerical_readouts": 0,
+        "observations": 156,
+        "octets": 160,
+        "part": 0,
+        "scalars": 158,
+        "sequence": 62
+      },
+      {
+        "ingress_octets": 276,
+        "milliseconds": 373,
+        "numerical_readouts": 0,
+        "observations": 69,
+        "octets": 73,
+        "part": 0,
+        "scalars": 71,
+        "sequence": 63
+      },
+      {
+        "ingress_octets": 784,
+        "milliseconds": 1136,
+        "numerical_readouts": 0,
+        "observations": 196,
+        "octets": 200,
+        "part": 0,
+        "scalars": 198,
+        "sequence": 64
+      },
+      {
+        "ingress_octets": 876,
+        "milliseconds": 1251,
+        "numerical_readouts": 0,
+        "observations": 219,
+        "octets": 225,
+        "part": 0,
+        "scalars": 221,
+        "sequence": 65
+      }
+    ],
+    "frames": 32,
+    "milliseconds": 89121,
+    "normal_observations": 8965,
+    "observations": 9254,
+    "resident": {
+      "allocations": 55878,
+      "captured_launches": 37102,
+      "control_launches": 0,
+      "deed_launches": 9295,
+      "device_to_device_octets": 0,
+      "egress_receipt_octets": 1187264,
+      "egress_section_octets": 185376832,
+      "ingress_octets": 99454400,
+      "resident_octets_now": 113165152,
+      "resident_octets_peak": 292165972,
+      "section_read_outs": 11,
+      "synchronizations": 9295
+    },
+    "returned": [],
+    "schema": "holonics.conversation-coupled-source.v1",
+    "source_receiver": "UnitRealSum",
+    "stage": "conditional passage"
+  },
+  "calibration_milliseconds": 53065,
+  "calibration_numerical_readouts": 0,
+  "private_artifacts": ".local/athena-coupled-source-2026-09-11-unit-real-sum-32",
+  "private_candidate_artifacts": ".local/athena-coupled-source-2026-09-11-unit-real-sum-32-difference"
+}

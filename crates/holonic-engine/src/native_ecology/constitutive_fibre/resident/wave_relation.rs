@@ -2,6 +2,15 @@ use super::*;
 mod rest;
 pub use rest::NormalWaveRelationRest;
 
+/// The receiver chart in which the local law was founded. UnitRealSum is a mean-offset
+/// section for a maximum/softmax receiver; actual source offsets stay in the lifted state.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, serde::Deserialize)]
+pub enum WaveSourceReceiver {
+    #[default]
+    Direct,
+    UnitRealSum,
+}
+
 /// Immutable fixed-condition pullback of one bilinear law into the wave family chart.
 /// The basis is a derived relation; it owns no learned material and no continuing ecology.
 pub struct ResidentWaveRelation<'c> {
@@ -12,6 +21,7 @@ pub struct ResidentWaveRelation<'c> {
     pub(in super::super) condition_complex: usize,
     pub(in super::super) relation_cut: u64,
     producing_owner: Rc<()>,
+    receiver: WaveSourceReceiver,
 }
 impl<'c> ResidentWaveRelation<'c> {
     pub(in super::super) fn new(
@@ -22,6 +32,7 @@ impl<'c> ResidentWaveRelation<'c> {
         condition_complex: usize,
         relation_cut: u64,
         producing_owner: Rc<()>,
+        receiver: WaveSourceReceiver,
     ) -> Self {
         Self {
             surface,
@@ -31,7 +42,11 @@ impl<'c> ResidentWaveRelation<'c> {
             condition_complex,
             relation_cut,
             producing_owner,
+            receiver,
         }
+    }
+    pub fn source_receiver(&self) -> WaveSourceReceiver {
+        self.receiver
     }
     pub fn width(&self) -> usize {
         2 + 8 * self.roots
@@ -61,6 +76,14 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
         condition: ResidentConstitutiveCurrent<'_, 'chart>,
         roots: usize,
     ) -> Result<ResidentWaveRelation<'chart>, ConstitutiveFibreError> {
+        self.read_wave_relation_in_chart(condition, roots, WaveSourceReceiver::Direct)
+    }
+    pub fn read_wave_relation_in_chart(
+        &self,
+        condition: ResidentConstitutiveCurrent<'_, 'chart>,
+        roots: usize,
+        receiver: WaveSourceReceiver,
+    ) -> Result<ResidentWaveRelation<'chart>, ConstitutiveFibreError> {
         if !self.usable {
             return Err(ConstitutiveFibreError::Uncertain);
         }
@@ -73,6 +96,7 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
             Rc::clone(&self.basis_owner),
             condition,
             roots,
+            receiver,
         )
     }
 }
@@ -81,6 +105,7 @@ impl<'chart> PreparedConstitutiveFormation<'chart> {
         &self,
         condition: ResidentConstitutiveCurrent<'_, 'chart>,
         roots: usize,
+        receiver: WaveSourceReceiver,
     ) -> Result<ResidentWaveRelation<'chart>, ConstitutiveFibreError> {
         ResidentWaveRelation::derive(
             self.returned.surface,
@@ -91,6 +116,7 @@ impl<'chart> PreparedConstitutiveFormation<'chart> {
             Rc::clone(&self.successor_owner),
             condition,
             roots,
+            receiver,
         )
     }
 }
@@ -105,6 +131,7 @@ impl<'chart> ResidentWaveRelation<'chart> {
         producing_owner: Rc<()>,
         condition: ResidentConstitutiveCurrent<'_, 'chart>,
         roots: usize,
+        receiver: WaveSourceReceiver,
     ) -> Result<Self, ConstitutiveFibreError> {
         let ConstitutiveSourceChart::BilinearContact {
             source_complex,
@@ -153,6 +180,11 @@ impl<'chart> ResidentWaveRelation<'chart> {
         let graph = surface.fresh_section(relation, relation, ResidentGrain(0))?;
         let derived = surface.fresh_section(2 * q, 2 * q, ResidentGrain(0))?;
         let fixed = surface.fresh_section(1, 2 * condition_complex + 1, ResidentGrain(0))?;
+        let words = l
+            .checked_add(relation.max(d))
+            .and_then(|v| v.checked_mul(2))
+            .ok_or(ConstitutiveFibreError::Shape)?;
+        let workspace = surface.fresh_section(1, words, ResidentGrain(0))?;
         let mut passage = surface.begin_passage(&[vec![]])?;
         {
             let lane = passage.open(0, &[])?;
@@ -165,6 +197,8 @@ impl<'chart> ResidentWaveRelation<'chart> {
                 &graph,
                 &derived,
                 &fixed,
+                &workspace,
+                receiver,
             )?;
         }
         passage.close(0, &derived, i64::BITS)?;
@@ -183,6 +217,7 @@ impl<'chart> ResidentWaveRelation<'chart> {
             condition_complex,
             occurrence,
             producing_owner,
+            receiver,
         ))
     }
 }

@@ -192,9 +192,14 @@ impl NormalWaveRest {
         let neighborhood = data.neighborhood.remount(s)?;
         let mut family = data.family.remount(s)?;
         if let Some(j) = data.header.active_member {
-            family.rebind_decoded_relation(Rc::new(neighborhood.read_wave_relation(
+            let receiver = family
+                .last_relation()
+                .ok_or(ConstitutiveFibreError::Shape)?
+                .source_receiver();
+            family.rebind_decoded_relation(Rc::new(neighborhood.read_wave_relation_in_chart(
                 j,
                 base.material.roots,
+                receiver,
                 None,
             )?))?;
         }
@@ -202,7 +207,12 @@ impl NormalWaveRest {
         let current = Rc::new(family);
         let mut bindings = BTreeMap::new();
         for c in data.header.contacts {
-            let relation = neighborhood.read_wave_relation(c.member, base.material.roots, None)?;
+            let relation = neighborhood.read_wave_relation_in_chart(
+                c.member,
+                base.material.roots,
+                data.relations[&c.id].source_receiver(),
+                None,
+            )?;
             if relation.rest()? != data.relations[&c.id] {
                 return Err(invalid(
                     "contact map does not derive from its restored member/condition",

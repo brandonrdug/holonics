@@ -2,6 +2,7 @@ use super::*;
 pub(super) mod rest;
 use crate::native_ecology::constitutive_fibre::{
     GeneratorNeighborhoodStep, ResidentGeneratorNeighborhood, ResidentWaveRelation,
+    WaveSourceReceiver,
 };
 
 /// The same wave owner continuing through a conditional family. Its fixed normal bank remains
@@ -146,12 +147,23 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         &mut self,
         member: usize,
     ) -> Result<NormalCoupledContact<'c>, ConstitutiveFibreError> {
+        self.admit_contact_in_chart(member, WaveSourceReceiver::Direct)
+    }
+    /// Read the local law in its declared source chart, retaining the raw residual state.
+    pub fn admit_contact_in_chart(
+        &mut self,
+        member: usize,
+        receiver: WaveSourceReceiver,
+    ) -> Result<NormalCoupledContact<'c>, ConstitutiveFibreError> {
         let mode = &mut self.continuation;
         let id = mode.next_contact;
         let next = id.checked_add(1).ok_or(ConstitutiveFibreError::Shape)?;
-        let relation = mode
-            .neighborhood
-            .read_wave_relation(member, self.material.roots, None)?;
+        let relation = mode.neighborhood.read_wave_relation_in_chart(
+            member,
+            self.material.roots,
+            receiver,
+            None,
+        )?;
         let binding = Rc::new(CoupledBinding {
             member,
             epoch: mode.epoch,
@@ -178,6 +190,9 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
             id,
             binding: Rc::clone(binding),
         })
+    }
+    pub fn contact_ids(&self) -> impl Iterator<Item = u64> + '_ {
+        self.continuation.bindings.keys().copied()
     }
     pub fn pending_contacts(&self) -> usize {
         self.continuation.bindings.len()
@@ -259,7 +274,13 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         let mut passage = s.begin_passage(&[vec![]])?;
         {
             let lane = passage.open(0, &[])?;
-            s.record_normal_source_plane(&lane, source, self.material.roots, &out)?;
+            s.record_normal_source_plane(
+                &lane,
+                source,
+                self.material.roots,
+                contact.binding.relation.source_receiver(),
+                &out,
+            )?;
         }
         passage.close(0, &out, 64)?;
         let received = passage.finish()?.launch()?;
@@ -274,9 +295,10 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
             source,
             Some(observed_difference),
         )?;
-        let relation = self.neighborhood().read_wave_relation(
+        let relation = self.neighborhood().read_wave_relation_in_chart(
             contact.member(),
             self.material.roots,
+            contact.binding.relation.source_receiver(),
             Some(&prepared),
         )?;
         let successor = Rc::new(self.current().read_through(Rc::new(relation))?);

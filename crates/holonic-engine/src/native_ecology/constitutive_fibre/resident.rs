@@ -115,7 +115,9 @@ impl<'chart> ResidentConstitutiveReturn<'chart> {
     pub(super) fn qualify_field_source(&mut self, source_occurrence: usize) {
         self.source_occurrence = Some(source_occurrence);
     }
-    pub(crate) fn source_width(&self) -> usize { self.source_width }
+    pub(crate) fn source_width(&self) -> usize {
+        self.source_width
+    }
     pub(super) fn report(&self) -> &ResidentSection<'chart> {
         &self.report
     }
@@ -268,7 +270,7 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
         let predecessor_owner = Rc::clone(&self.basis_owner);
         let predecessor_occurrences = self.occurrences;
         let staged_basis = self.surface.copy_section_device(&self.basis)?;
-        let successor_owner=Rc::new(());
+        let successor_owner = Rc::new(());
         let mut staged = Self {
             basis: staged_basis,
             basis_owner: Rc::clone(&successor_owner),
@@ -491,4 +493,4 @@ pub use condition_contact::{
 pub use context_section::{ContextualSectionOrigin, ResidentContextualSection};
 
 mod wave_relation;
-pub use wave_relation::{ResidentWaveRelation,NormalWaveRelationRest};
+pub use wave_relation::{NormalWaveRelationRest, ResidentWaveRelation, WaveSourceReceiver};

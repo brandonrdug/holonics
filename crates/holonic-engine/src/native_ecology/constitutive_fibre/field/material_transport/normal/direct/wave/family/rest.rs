@@ -13,7 +13,7 @@ struct Header {
 }
 /// Complete immutable family chart, including its normal producing fibre, actual anchor ball,
 /// current affine relation and last fixed-condition passage. It contains no observation archive.
-#[derive(Debug,PartialEq,Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct NormalWaveFamilyRest {
     origin: NormalWaveRest,
     anchor: ResidentSectionRest,
@@ -23,12 +23,25 @@ pub struct NormalWaveFamilyRest {
     passages: u64,
 }
 impl NormalWaveFamilyRest {
-    pub(crate) fn roots(&self)->usize{self.origin.material().roots()}
-    pub(crate) fn grain(&self)->ResidentGrain{self.origin.material().grain()}
-    pub(crate) fn source_transport(&self)->NormalWaveTransport{self.origin.transport()}
+    pub(crate) fn roots(&self) -> usize {
+        self.origin.material().roots()
+    }
+    pub(crate) fn grain(&self) -> ResidentGrain {
+        self.origin.material().grain()
+    }
+    pub(crate) fn source_transport(&self) -> NormalWaveTransport {
+        self.origin.transport()
+    }
 
-    pub(crate) fn current_epoch(&self)->Result<u64,ConstitutiveFibreError>{self.origin.epoch().checked_add(self.passages).ok_or(ConstitutiveFibreError::Shape)}
-    pub(crate) fn last_relation(&self)->Option<&NormalWaveRelationRest>{self.last.as_ref()}
+    pub(crate) fn current_epoch(&self) -> Result<u64, ConstitutiveFibreError> {
+        self.origin
+            .epoch()
+            .checked_add(self.passages)
+            .ok_or(ConstitutiveFibreError::Shape)
+    }
+    pub(crate) fn last_relation(&self) -> Option<&NormalWaveRelationRest> {
+        self.last.as_ref()
+    }
 
     pub fn passages(&self) -> u64 {
         self.passages
@@ -48,7 +61,10 @@ impl NormalWaveFamilyRest {
             .epoch()
             .checked_add(self.passages)
             .ok_or(ConstitutiveFibreError::Shape)?;
-        self.origin.material().validate()?;
+        // NormalMaterialRest is private admitted material: native snapshots and wire ingress
+        // establish its invariant. Rechecking its full moment domain here repeats the same
+        // expensive exterior solve on every write; ingress remains validated by read_normal.
+
         self.relation.validate_constant_prefix(&[1, 0])?;
         point_section(&self.anchor, 1, aw)?;
         if self.origin.pending_count() != 0

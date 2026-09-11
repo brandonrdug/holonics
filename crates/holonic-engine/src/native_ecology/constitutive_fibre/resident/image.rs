@@ -1,6 +1,6 @@
 //! Serial affine current-family transport through existing local relations. The retained joint
 //! input/output carrier records the joining fibre; no particular member is selected to compose.
-use super::condition_image::{ConditionCoverage, read_coverage};
+use super::condition_image::{read_coverage, ConditionCoverage};
 use super::*;
 
 /// Actual borrowed producing relation, not equality inferred from endpoint values or cuts.
@@ -51,7 +51,7 @@ impl<'a, 'c> ResidentConstitutiveImage<'a, 'c> {
     /// Consume this derived image into its output relation and affine-domain receipt. Callers
     /// that carry additional constraints must retain those alongside the returned family.
     pub(crate) fn into_output(self) -> (ResidentConstitutiveReturn<'c>, ResidentSection<'c>) {
-        (self.output,self.coverage)
+        (self.output, self.coverage)
     }
 
     /// The point port requires full source coverage and a unique output, not a unique input.
@@ -243,18 +243,11 @@ pub(super) fn image<'a, 'c>(
     }
     let w = c.checked_add(y).ok_or(ConstitutiveFibreError::Shape)?;
     let k = w.checked_mul(2).ok_or(ConstitutiveFibreError::Shape)?;
-    let scratch = k
+    let words = k
         .checked_mul(2)
-        .and_then(|n| n.checked_add(w))
-        .and_then(|n| n.checked_mul(16))
+        .and_then(|v| v.checked_add(w)?.checked_mul(2))
         .ok_or(ConstitutiveFibreError::Shape)?;
-    let available = surface.declaration().max_sectiond_bytes;
-    if scratch > available as usize {
-        return Err(ConstitutiveFibreError::ScratchAperture {
-            required: scratch,
-            available,
-        });
-    }
+    let workspace = surface.fresh_section(1, words, ResidentGrain(0))?;
     let joint =
         ResidentConstitutiveReturn::allocate(surface, w, w, cut, ConstitutiveSourceChart::Linear)?;
     let domain =
@@ -288,6 +281,7 @@ pub(super) fn image<'a, 'c>(
                 &coverage,
                 &safe,
             ],
+            &workspace,
         )?;
     }
     passage.close(0, joint.report(), 64)?;
@@ -356,9 +350,18 @@ impl<'c> ResidentContextualSection<'c> {
 mod tests;
 
 impl<'c> ResidentWaveRelation<'c> {
-    pub fn read_image<'a>(&'a self,source:&'a ResidentConstitutiveReturn<'c>)
-        ->Result<ResidentConstitutiveImage<'a,'c>,ConstitutiveFibreError>{
-        image(self.surface,&self.basis,self.width(),self.width(),self.relation_cut,source,
-            ConstitutiveImageReceiver::WaveConditional(self))
+    pub fn read_image<'a>(
+        &'a self,
+        source: &'a ResidentConstitutiveReturn<'c>,
+    ) -> Result<ResidentConstitutiveImage<'a, 'c>, ConstitutiveFibreError> {
+        image(
+            self.surface,
+            &self.basis,
+            self.width(),
+            self.width(),
+            self.relation_cut,
+            source,
+            ConstitutiveImageReceiver::WaveConditional(self),
+        )
     }
 }

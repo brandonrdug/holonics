@@ -1,0 +1,17 @@
+{
+  "schema": "holonics.unit-real-sum-bounded-source-difference.v1",
+  "scope": "Exact native receiver of the complete affine candidate, compared with its original ball; no successor committed.",
+  "source_frames": 32,
+  "observed_passages": 9254,
+  "affine_directions": 219,
+  "support": "OutsideAnchorBall",
+  "distance_squared": "9567151779190909740438499005748959566689159/2297756682633636974536437036683014847856640",
+  "anchor_radius_squared": "32485145313177722350722170365281/340282366920938463463374607431768211456",
+  "strictly_excluded": true,
+  "nearest_real_sums": [
+    "28178352288076087489/18446744073709551616",
+    "-54261987610524825651/4611686018427387904"
+  ],
+  "anchor_independent_free_coordinates": 73,
+  "private_candidate": ".local/athena-coupled-source-2026-09-11-unit-real-sum-32-difference"
+}

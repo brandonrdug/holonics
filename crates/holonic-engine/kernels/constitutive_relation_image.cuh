@@ -7,7 +7,7 @@ extern "C" __global__ void section_constitutive_relation_image(
     int64_t *graph,int64_t *graph_hi,int64_t *rhs,int64_t *rhs_hi,int64_t *joint,int64_t *joint_hi,
     int64_t *domain_basis,int64_t *domain_basis_hi,int64_t *out_basis,int64_t *out_basis_hi,
     int64_t *domain,int64_t *domain_hi,int64_t *out,int64_t *out_hi,int64_t *coverage,int64_t *coverage_hi,
-    int64_t *safe,int64_t *safe_hi,uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
+    int64_t *safe,int64_t *safe_hi,int64_t *workspace,uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count
 ){
     if(blockIdx.x || threadIdx.x)return;
     if(upstream_refused(census,lineage,lineage_count,slot))return;
@@ -17,7 +17,7 @@ extern "C" __global__ void section_constitutive_relation_image(
     for(size_t i=0;i<(size_t)w*w;++i)if(basis[i]!=basis_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
     for(size_t i=0;i<(size_t)pk+4u+(size_t)c*c;++i)if(pf[i]!=pf_hi[i]){atomicOr(slot,REFUSED_MALFORMED);return;}
     if(pf[pk]<=0 || pf[pk+1]<0 || pf[pk+1]>2){atomicOr(slot,REFUSED_MALFORMED);return;}
-    extern __shared__ wide scratch[];wide *r=scratch,*row=r+w,*q=row+k;
+    wide *r=(wide *)workspace,*row=r+w,*q=row+k;
     for(size_t i=0;i<(size_t)k*k;++i)graph[i]=graph_hi[i]=0;
     for(uint32_t i=0;i<=w;++i)rhs[i]=rhs_hi[i]=0;rhs[w]=rhs_hi[w]=1;
     condition_empty_report(joint,joint_hi,w,w);condition_empty_report(domain,domain_hi,w,c);condition_empty_report(out,out_hi,w,y);

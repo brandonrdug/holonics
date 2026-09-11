@@ -1,0 +1,44 @@
+{
+  "schema": "holonics.unit-real-sum-source-return.v1",
+  "scope": "Prepared-source finite receiver obstruction; no supported passage or conversation result claimed.",
+  "run": {
+    "epoch": 10,
+    "error": "native constitutive arithmetic refused without depositing a row: family receiver: ObstructionLineage { refusals: [OccurrenceRefusal { index: 0, flags: 1, origin: true, upstream_flags: 0, upstream_first: None, upstream_count: 0 }] }",
+    "fields": [
+      {
+        "ingress_octets": 160,
+        "milliseconds": 106,
+        "numerical_readouts": 0,
+        "observations": 40,
+        "octets": 42,
+        "part": 0,
+        "scalars": 42,
+        "sequence": 34
+      }
+    ],
+    "frames": 1,
+    "milliseconds": 12852,
+    "normal_observations": 8965,
+    "observations": 40,
+    "resident": {
+      "allocations": 342,
+      "captured_launches": 182,
+      "control_launches": 0,
+      "deed_launches": 49,
+      "device_to_device_octets": 0,
+      "egress_receipt_octets": 5824,
+      "egress_section_octets": 185376832,
+      "ingress_octets": 74186824,
+      "resident_octets_now": 113165152,
+      "resident_octets_peak": 292165972,
+      "section_read_outs": 11,
+      "synchronizations": 49
+    },
+    "returned": [],
+    "schema": "holonics.conversation-coupled-source.v1",
+    "source_receiver": "UnitRealSum",
+    "stage": "conditional passage"
+  },
+  "private_artifacts": ".local/athena-coupled-source-2026-09-11-unit-real-sum",
+  "private_candidate_artifacts": ".local/athena-coupled-source-2026-09-11-unit-real-sum-difference"
+}

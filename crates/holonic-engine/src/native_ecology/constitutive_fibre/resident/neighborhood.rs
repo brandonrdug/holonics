@@ -94,8 +94,12 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
             usable: true,
         })
     }
-    pub(crate) fn require_usable(&self)->Result<(),ConstitutiveFibreError>{
-        if self.usable {Ok(())}else{Err(ConstitutiveFibreError::Uncertain)}
+    pub(crate) fn require_usable(&self) -> Result<(), ConstitutiveFibreError> {
+        if self.usable {
+            Ok(())
+        } else {
+            Err(ConstitutiveFibreError::Uncertain)
+        }
     }
     pub fn members(&self) -> usize {
         self.laws.len()
@@ -119,20 +123,51 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
         self.laws.get(member).ok_or(ConstitutiveFibreError::Shape)
     }
 
-    pub(crate) fn read_wave_relation(&self,member:usize,roots:usize,
-        proposed:Option<&PreparedNeighborhoodAdvance<'_, 'c>>)->Result<ResidentWaveRelation<'c>,ConstitutiveFibreError>{
-        if let Some(p)=proposed {
-            if !self.can_commit_advance(p){return Err(ConstitutiveFibreError::ForeignOccurrence);}
-            let condition=p.condition.as_ref().map_or_else(||self.condition.current(),|v|v.successor());
-            if p.member==member {if let Some(formation)=&p.formation{return formation.read_wave_relation(condition,roots);}}
-            self.generator(member)?.read_wave_relation(condition,roots)
-        }else{self.generator(member)?.read_wave_relation(self.condition.current(),roots)}
+    #[cfg(test)]
+    pub(crate) fn read_wave_relation(
+        &self,
+        member: usize,
+        roots: usize,
+        proposed: Option<&PreparedNeighborhoodAdvance<'_, 'c>>,
+    ) -> Result<ResidentWaveRelation<'c>, ConstitutiveFibreError> {
+        self.read_wave_relation_in_chart(member, roots, WaveSourceReceiver::Direct, proposed)
     }
-    pub(crate) fn can_publish_wave_read(&self,epoch:u64)->bool{
-        self.usable && self.epoch==epoch && self.epoch.checked_add(1).is_some()
+    pub(crate) fn read_wave_relation_in_chart(
+        &self,
+        member: usize,
+        roots: usize,
+        receiver: WaveSourceReceiver,
+        proposed: Option<&PreparedNeighborhoodAdvance<'_, 'c>>,
+    ) -> Result<ResidentWaveRelation<'c>, ConstitutiveFibreError> {
+        if let Some(p) = proposed {
+            if !self.can_commit_advance(p) {
+                return Err(ConstitutiveFibreError::ForeignOccurrence);
+            }
+            let condition = p
+                .condition
+                .as_ref()
+                .map_or_else(|| self.condition.current(), |v| v.successor());
+            if p.member == member {
+                if let Some(formation) = &p.formation {
+                    return formation.read_wave_relation(condition, roots, receiver);
+                }
+            }
+            self.generator(member)?
+                .read_wave_relation_in_chart(condition, roots, receiver)
+        } else {
+            self.generator(member)?.read_wave_relation_in_chart(
+                self.condition.current(),
+                roots,
+                receiver,
+            )
+        }
     }
-    pub(crate) fn publish_wave_read(&mut self,epoch:u64){
-        debug_assert!(self.can_publish_wave_read(epoch));self.epoch=epoch+1;
+    pub(crate) fn can_publish_wave_read(&self, epoch: u64) -> bool {
+        self.usable && self.epoch == epoch && self.epoch.checked_add(1).is_some()
+    }
+    pub(crate) fn publish_wave_read(&mut self, epoch: u64) {
+        debug_assert!(self.can_publish_wave_read(epoch));
+        self.epoch = epoch + 1;
     }
     pub fn read(
         &self,

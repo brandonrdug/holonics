@@ -14,8 +14,8 @@
 
 use relational_geometry::Rat;
 use serde::Serialize;
-use thiserror::Error;
 use std::rc::Rc;
+use thiserror::Error;
 
 use crate::resident_section::{
     ResidentGrain, ResidentRefusal, ResidentSection, ResidentSectionRest, ResidentSurface,
@@ -35,10 +35,12 @@ pub use resident::{
     ConstitutiveDifferentialReading, ConstitutiveImageReading, ConstitutiveImageReceiver,
     ConstitutiveReturnRest, ContextualSectionOrigin, GeneratorNeighborhoodRest,
     GeneratorNeighborhoodStep, NeighborhoodEvidence, NeighborhoodEvidenceRest,
-    PreparedConditionContact, ResidentConditionContact, ResidentConditionCurrent,
-    ResidentConditionImage, ResidentConditionPreimage, ResidentConditionStanding,
-    ResidentConstitutiveCurrent, ResidentConstitutiveSection, ResidentDifferenceSection, ResidentConstitutiveImage, ResidentConstitutiveRefinement,
-    ResidentConstitutiveReturn, ResidentContextualSection, ResidentWaveRelation, NormalWaveRelationRest, ResidentGeneratorNeighborhood,
+    NormalWaveRelationRest, PreparedConditionContact, ResidentConditionContact,
+    ResidentConditionCurrent, ResidentConditionImage, ResidentConditionPreimage,
+    ResidentConditionStanding, ResidentConstitutiveCurrent, ResidentConstitutiveImage,
+    ResidentConstitutiveRefinement, ResidentConstitutiveReturn, ResidentConstitutiveSection,
+    ResidentContextualSection, ResidentDifferenceSection, ResidentGeneratorNeighborhood,
+    ResidentWaveRelation, WaveSourceReceiver,
 };
 
 /// Declared local source law, bound at founding rather than inferred from an array's width.

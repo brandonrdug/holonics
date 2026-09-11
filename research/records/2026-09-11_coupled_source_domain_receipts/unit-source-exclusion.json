@@ -1,0 +1,108 @@
+{
+  "schema": "holonics.coupled-source-domain-witness.v1",
+  "source_model": ".local/athena-applied-comparison-2026-09-10-full",
+  "source_sequence": 34,
+  "source_part": 0,
+  "scalars": 42,
+  "observed_passages": 40,
+  "roots": 85,
+  "condition_complex": 1,
+  "basis_rank": 40,
+  "source_space_real_width": 1022,
+  "target_real_width": 170,
+  "basis_invariants": {
+    "previous_sum_equals_condition": true,
+    "current_sum_equals_condition": true,
+    "observed_difference_sum_zero": true
+  },
+  "previous_real_sum": "28178352288076087489/18446744073709551616",
+  "current_real_sum": "-54261987610524825651/4611686018427387904",
+  "anchor_radius_squared": "32485145313177722350722170365281/340282366920938463463374607431768211456",
+  "distance_squared": "744894366040099643596583761705845948929451131/3292231899960079634008149326902357445836800",
+  "unit_source_plane_exclusion": {
+    "previous": true,
+    "current": true,
+    "joint": true
+  },
+  "nearest_real_sums": [
+    "1",
+    "1"
+  ],
+  "support": "OutsideAnchorBall",
+  "before": {
+    "epoch": 10,
+    "error": "operative-contacts: incompatible contact/current carrier",
+    "fields": [
+      {
+        "ingress_octets": 160,
+        "milliseconds": 104,
+        "numerical_readouts": 0,
+        "observations": 40,
+        "octets": 42,
+        "part": 0,
+        "scalars": 42,
+        "sequence": 34
+      }
+    ],
+    "frames": 1,
+    "milliseconds": 171165,
+    "normal_observations": 8965,
+    "observations": 40,
+    "resident": {
+      "allocations": 306,
+      "captured_launches": 176,
+      "control_launches": 0,
+      "deed_launches": 46,
+      "device_to_device_octets": 0,
+      "egress_receipt_octets": 5632,
+      "egress_section_octets": 155608848,
+      "ingress_octets": 74186824,
+      "resident_octets_now": 83397236,
+      "resident_octets_peak": 180012196,
+      "section_read_outs": 9,
+      "synchronizations": 46
+    },
+    "returned": [],
+    "schema": "holonics.conversation-coupled-source.v1",
+    "stage": "contact admission"
+  },
+  "after": {
+    "epoch": 10,
+    "error": "native constitutive arithmetic refused without depositing a row: conditional family admission: ObstructionLineage { refusals: [OccurrenceRefusal { index: 0, flags: 16, origin: true, upstream_flags: 0, upstream_first: None, upstream_count: 0 }] }",
+    "fields": [
+      {
+        "ingress_octets": 160,
+        "milliseconds": 106,
+        "numerical_readouts": 0,
+        "observations": 40,
+        "octets": 42,
+        "part": 0,
+        "scalars": 42,
+        "sequence": 34
+      }
+    ],
+    "frames": 1,
+    "milliseconds": 9720,
+    "normal_observations": 8965,
+    "observations": 40,
+    "resident": {
+      "allocations": 346,
+      "captured_launches": 184,
+      "control_launches": 0,
+      "deed_launches": 50,
+      "device_to_device_octets": 0,
+      "egress_receipt_octets": 5888,
+      "egress_section_octets": 185376832,
+      "ingress_octets": 74186824,
+      "resident_octets_now": 113165152,
+      "resident_octets_peak": 292165972,
+      "section_read_outs": 11,
+      "synchronizations": 50
+    },
+    "returned": [],
+    "schema": "holonics.conversation-coupled-source.v1",
+    "stage": "conditional passage"
+  },
+  "private_difference_artifacts": ".local/athena-coupled-source-2026-09-11-difference",
+  "scope": "Exact finite source/domain witness. The real-coordinate sum is a codec functional, not physical mass."
+}
