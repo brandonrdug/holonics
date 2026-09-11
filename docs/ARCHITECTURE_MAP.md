@@ -114,6 +114,11 @@ owners add no native learner or physical identity outside their stated hypothese
 
 ## Foundation and transport
 
+[definition] `Computation/GeneratorObservationScope.lean` supplies finite-observation ambiguity,
+exact identification within a declared multiplier family, and excitation of a previously blind
+generator difference. The [causal-entanglement/interface return](../research/records/2026-09-11_CAUSAL_ENTANGLEMENT_NEEDS_FUTURE_INTERFACES_AND_FOUNDED_GENERATORS.md)
+connects those scopes to the existing future-receiver and compression owners.
+
 [definition] `Mathematics/RatioSeriesTransport.lean` owns exact signed ratio-series block
 composition, preserved clocks, arctangent recurrence and parameterized alternative routes with
 the same complete action. The [September 11 study](../research/records/2026-09-11_ATHENA_STATUS_RETURNS_TO_TRANSCENDENTAL_GENERATOR_COMPRESSION.md)

@@ -78,6 +78,29 @@ be nonlocal even when it is an effective model of locally interacting physical m
 causal-cone assertion needs that model's spacetime and transport law. It is not supplied by
 declaring a finite pixel, band, token, particle or generator count.
 
+## Causal entanglement and retained interfaces
+
+[definition] Brandon's September 11 **Holonic causal entanglement** names dependence retained
+through actual causal histories, interactions, joint constraints and receiver consequences.
+Received signals, shared histories and directed interventions carry different witnesses; the
+term does not infer contact from co-presence or independence from distance. Quantum realization
+additionally owes its joint-state and measurement laws. The [scope return](../../research/records/2026-09-11_CAUSAL_ENTANGLEMENT_NEEDS_FUTURE_INTERFACES_AND_FOUNDED_GENERATORS.md)
+retains these distinctions and the intended active-joint computation.
+
+[project-postulate] Compress an interior through its sufficient future interface, including
+needed memory, source terms, boundary response and conditions. Reuse its transport while those
+hypotheses persist. Zero present drive does not authorize deleting a latent response law; a new
+admitted excitation or receiver can expose its difference. Generator admission must carry its
+construction and evidential relation to observed transitions; causal provenance alone is not
+a guarantee of correct extrapolation.
+
+[proved-derived; formal-checked] `GeneratorObservationScope` supplies both boundaries: finite
+prefixes admit differing future generators, while a nonzero excitation identifies a constant
+multiplier in that declared law family. An arbitrarily small nonzero rational excitation exposes
+a difference hidden at zero drive to an exact receiver. Positive measurement tolerance remains
+a separate condition. These controls neither impose a certainty gate nor establish a universal
+error-free learning theorem.
+
 ## Loss is a measurement of difference
 
 [definition] A loss is a declared receiver of a situated comparison. The original comparands,
