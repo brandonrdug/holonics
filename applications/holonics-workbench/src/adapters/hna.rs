@@ -23,6 +23,7 @@ pub fn execute(command: HnaCommand) -> Result<AdapterReturn, WorkbenchError> {
     match command {
         HnaCommand::Session { .. } => Err(owner("streaming HNA sessions require the process stream entry point or holonics::hna::HnaStream, not a batch response collector")),
         HnaCommand::NativeSession { .. } => Err(owner("native streaming sessions require the process stream entry point or holonics::hna::HnaStream, not a batch response collector")),
+        HnaCommand::WaveSession { .. } => Err(owner("wave streaming sessions require the process stream entry point or holonics::hna::HnaStream, not a batch response collector")),
         HnaCommand::WaveControl {
             source,
             resume,

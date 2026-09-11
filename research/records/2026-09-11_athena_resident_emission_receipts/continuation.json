@@ -1,0 +1,142 @@
+{
+  "schema": "org.holonics.research.athena-resident-emission.v1",
+  "source": ".local/athena-applied-comparison-2026-09-10-full",
+  "source_commit": "74886e32",
+  "transport": "Applied",
+  "input": "Hello",
+  "requested_emissions": 8,
+  "emitted_text": "tht44444",
+  "generation_epochs": [
+    12,
+    13,
+    15,
+    17,
+    19,
+    21,
+    23,
+    25
+  ],
+  "centre_ties": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  ],
+  "robust": [
+    true,
+    true,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false
+  ],
+  "reentries": 7,
+  "observations": [
+    8965,
+    8965,
+    8965,
+    8965,
+    8965,
+    8965,
+    8965,
+    8965
+  ],
+  "events_equal": true,
+  "checkpoint_equal": true,
+  "processes": {
+    "full": {
+      "schema": "org.holonics.hna.wave-stream-process.v1",
+      "disposition": "input-exhausted",
+      "stream_error": null,
+      "checkpoint": ".local/athena-emission-2026-09-11/full.hna",
+      "checkpoint_octets": 25670966,
+      "checkpoint_error": null,
+      "transport_sequence": 9,
+      "epochs": {
+        "before": 10,
+        "after": 26
+      },
+      "inspect": {
+        "cursor": "Ready",
+        "emission_ordinal": 8,
+        "epoch": 26,
+        "last_source": {
+          "generation": 25,
+          "ordinal": 8,
+          "prediction": null,
+          "symbol": 17
+        },
+        "model_kind": "applied-normal-wave",
+        "observations": 8965,
+        "pending_predictions": 0,
+        "steps": 0,
+        "transport": "Applied"
+      }
+    },
+    "first": {
+      "schema": "org.holonics.hna.wave-stream-process.v1",
+      "disposition": "input-exhausted",
+      "stream_error": null,
+      "checkpoint": ".local/athena-emission-2026-09-11/first.hna",
+      "checkpoint_octets": 25670966,
+      "checkpoint_error": null,
+      "transport_sequence": 4,
+      "epochs": {
+        "before": 10,
+        "after": 16
+      },
+      "inspect": {
+        "cursor": "Ready",
+        "emission_ordinal": 3,
+        "epoch": 16,
+        "last_source": {
+          "generation": 15,
+          "ordinal": 3,
+          "prediction": null,
+          "symbol": 72
+        },
+        "model_kind": "applied-normal-wave",
+        "observations": 8965,
+        "pending_predictions": 0,
+        "steps": 0,
+        "transport": "Applied"
+      }
+    },
+    "rest": {
+      "schema": "org.holonics.hna.wave-stream-process.v1",
+      "disposition": "input-exhausted",
+      "stream_error": null,
+      "checkpoint": ".local/athena-emission-2026-09-11/resumed.hna",
+      "checkpoint_octets": 25670966,
+      "checkpoint_error": null,
+      "transport_sequence": 9,
+      "epochs": {
+        "before": 16,
+        "after": 26
+      },
+      "inspect": {
+        "cursor": "Ready",
+        "emission_ordinal": 8,
+        "epoch": 26,
+        "last_source": {
+          "generation": 25,
+          "ordinal": 8,
+          "prediction": null,
+          "symbol": 17
+        },
+        "model_kind": "applied-normal-wave",
+        "observations": 8965,
+        "pending_predictions": 0,
+        "steps": 0,
+        "transport": "Applied"
+      }
+    }
+  },
+  "scope": "Finite receiver/continuation witness. Output is not useful language; no Athena-alpha claim."
+}

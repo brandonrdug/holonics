@@ -3,11 +3,15 @@
 use super::NativeSessionError;
 use holonic_engine::{
     codec_recovery::{Symbol, SymbolAlphabet},
+    native_ecology::constitutive_fibre::{
+        NormalBasisSelection, NormalWaveBasisChart, NormalWaveBasisFace,
+    },
     resident_section::{ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface},
 };
 
 pub struct SymbolCurrentChart {
     alphabet: SymbolAlphabet,
+    coordinates: Vec<usize>,
 }
 
 #[cfg(test)]
@@ -81,7 +85,68 @@ mod tests {
 }
 impl SymbolCurrentChart {
     pub fn declared(alphabet: SymbolAlphabet) -> Self {
-        Self { alphabet }
+        let coordinates = (0..alphabet.len()).collect();
+        Self {
+            alphabet,
+            coordinates,
+        }
+    }
+    /// A declared simultaneous source/receiver rechart. The permutation acts on actual unit
+    /// coordinates; symbol spelling and occurrence identity do not supply its coefficients.
+    pub fn recharted(
+        alphabet: SymbolAlphabet,
+        coordinates: Vec<usize>,
+    ) -> Result<Self, NativeSessionError> {
+        let mut sorted = coordinates.clone();
+        sorted.sort_unstable();
+        if coordinates.len() != alphabet.len() || !sorted.iter().copied().eq(0..alphabet.len()) {
+            return Err(NativeSessionError::Application(
+                "symbol basis is not a complete permutation".into(),
+            ));
+        }
+        Ok(Self {
+            alphabet,
+            coordinates,
+        })
+    }
+    pub fn coordinates(&self) -> &[usize] {
+        &self.coordinates
+    }
+    pub fn receiver<'c>(
+        &self,
+        surface: &'c ResidentSurface<'c>,
+    ) -> Result<NormalWaveBasisChart<'c>, NativeSessionError> {
+        Ok(NormalWaveBasisChart::from_permutation(
+            surface,
+            &self.coordinates,
+        )?)
+    }
+    /// Decode a face already selected on device. No score or centre is ranked on the host.
+    pub fn emit<'c>(
+        &self,
+        source: NormalWaveBasisFace<'c>,
+    ) -> Result<SymbolEmission<'c>, NativeSessionError> {
+        if source.basis_coordinates() != self.coordinates {
+            return Err(NativeSessionError::Application(
+                "emission and symbol source charts differ".into(),
+            ));
+        }
+        let selection = source.selection()?;
+        let symbol = Symbol(
+            u32::try_from(selection.selected)
+                .map_err(|e| NativeSessionError::Application(e.to_string()))?,
+        );
+        let octets = self
+            .alphabet
+            .octets(symbol)
+            .ok_or_else(|| NativeSessionError::Application("selected symbol outside codec".into()))?
+            .to_vec();
+        Ok(SymbolEmission {
+            symbol,
+            octets,
+            selection,
+            source,
+        })
     }
     pub fn alphabet(&self) -> &SymbolAlphabet {
         &self.alphabet
@@ -109,7 +174,7 @@ impl SymbolCurrentChart {
             .map_err(|e| NativeSessionError::Application(e.to_string()))?;
         values.resize(words, (0, 0));
         for (row, symbol) in symbols.iter().enumerate() {
-            values[row * self.components() + 2 * symbol.0 as usize] = (1, 1);
+            values[row * self.components() + 2 * self.coordinates[symbol.0 as usize]] = (1, 1);
         }
         let rest = ResidentSectionRest::found(
             symbols.len(),
@@ -135,5 +200,29 @@ impl SymbolCurrentChart {
                 })
             })
             .collect()
+    }
+}
+
+/// A known emitted action and its complete producing receiver. Re-entry may mount this action
+/// as a new ordinary source; it does not turn the earlier wave family into a singleton or label
+/// the action as a human observation. The old receiver remains available while this is retained.
+pub struct SymbolEmission<'c> {
+    symbol: Symbol,
+    octets: Vec<u8>,
+    selection: NormalBasisSelection,
+    source: NormalWaveBasisFace<'c>,
+}
+impl<'c> SymbolEmission<'c> {
+    pub fn symbol(&self) -> Symbol {
+        self.symbol
+    }
+    pub fn octets(&self) -> &[u8] {
+        &self.octets
+    }
+    pub fn selection(&self) -> &NormalBasisSelection {
+        &self.selection
+    }
+    pub fn source(&self) -> &NormalWaveBasisFace<'c> {
+        &self.source
     }
 }

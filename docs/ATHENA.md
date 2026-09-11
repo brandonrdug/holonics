@@ -52,7 +52,14 @@ handles, contemporary material accumulation and correlated source/target envelop
 v5 preserves reference cuts; v6 additionally preserves explicit Applied/NormalReference scope.
 Applied transport retains source uncertainty and rounding while its ideal-normal comparison remains
 a separate read-only receiver and material certificate. Ordinary next-current reception remains separate. Phase, late-refusal and fresh-process
-controls pass; native text emission and coupled conditional organization remain the next packets.
+controls pass; the resident emission return follows below.
+
+[established-bounded; implemented-exact; computational-witness] The [resident emission return](../research/records/2026-09-11_ATHENA_EMITS_THROUGH_A_RESIDENT_RECEIVER_AND_REENTERS_ITS_SUCCESSOR.md)
+now exposes GPU basis selection, exterior decoding and ordinary emitted-source re-entry through
+`NativeWaveSession` and the shared stream. Pending selection/re-entry and delivery survive rest;
+a fresh-process continuation returns identical events and final artifact. The observed eight-symbol
+output is `tht44444`; this establishes the interface/continuation scope, not useful conversation.
+Coupled conditional organization and formation/reuse remain required construction.
 
 [project-postulate] The [September 7 correction](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
 places generator recovery, phase transport and Holonic Compression inside the developing

@@ -4,7 +4,7 @@ use crate::HnaCommand;
 use holonics::hna::{
     native::{
         with_native_session, NativeModelSpec, NativeSavedSession, NativeSessionAnatomy,
-        NativeSessionError,
+        NativeSessionError, NativeWaveSavedSession,
     },
     HnaCultivationAperture, HnaModel, HnaSessionAnatomy, HnaSessionError, HnaStream,
     HnaStreamDisposition,
@@ -38,6 +38,25 @@ pub struct NativeHnaStreamProcessReceipt {
     pub checkpoint_octets: Option<u64>,
     pub checkpoint_error: Option<String>,
     pub persistent: bool,
+}
+
+#[derive(Debug, Serialize)]
+pub struct WaveHnaStreamProcessReceipt {
+    pub schema: &'static str,
+    pub disposition: Option<HnaStreamDisposition>,
+    pub stream_error: Option<String>,
+    pub checkpoint: PathBuf,
+    pub checkpoint_octets: Option<u64>,
+    pub checkpoint_error: Option<String>,
+    pub transport_sequence: u64,
+    pub epochs: WaveEpochReceipt,
+    pub inspect: serde_json::Value,
+}
+
+#[derive(Debug, Serialize)]
+pub struct WaveEpochReceipt {
+    pub before: u64,
+    pub after: u64,
 }
 
 pub fn run_native_session_stream(
@@ -126,6 +145,93 @@ pub fn run_native_session_stream(
         stream.open_new_connection();
         let result = stream.pump_native(session, &mut input, &mut output);
         Ok(finish_native_stream(session, &stream, result, &checkpoint))
+    })
+}
+
+pub fn run_wave_session_stream(
+    command: HnaCommand,
+) -> Result<WaveHnaStreamProcessReceipt, NativeSessionError> {
+    let HnaCommand::WaveSession {
+        source,
+        resume,
+        input,
+        checkpoint,
+    } = command
+    else {
+        return Err(NativeSessionError::Application(
+            "expected a wave streaming session command".into(),
+        ));
+    };
+    if checkpoint.exists() {
+        return Err(NativeSessionError::Application(format!(
+            "wave checkpoint already exists: {:?}",
+            checkpoint
+        )));
+    }
+    if let Some(parent) = checkpoint.parent().filter(|p| !p.as_os_str().is_empty()) {
+        fs::create_dir_all(parent).map_err(|error| {
+            NativeSessionError::Application(format!(
+                "cannot create wave checkpoint directory {:?}: {error}",
+                parent
+            ))
+        })?;
+    }
+    let mut input: Box<dyn BufRead> = if input.as_os_str() == "-" {
+        Box::new(io::stdin().lock())
+    } else {
+        Box::new(BufReader::new(File::open(&input).map_err(|error| {
+            NativeSessionError::Application(format!("cannot read wave input {:?}: {error}", input))
+        })?))
+    };
+    let mut output = io::stdout().lock();
+
+    fn finish_wave_stream(
+        session: &mut holonics::hna::native::NativeWaveSession<'_>,
+        stream: &HnaStream,
+        pump: Result<HnaStreamDisposition, holonics::hna::HnaStreamError>,
+        checkpoint: &PathBuf,
+        before: u64,
+    ) -> WaveHnaStreamProcessReceipt {
+        let (disposition, stream_error) = match pump {
+            Ok(disposition) => (Some(disposition), None),
+            Err(error) => (None, Some(error.to_string())),
+        };
+        let publication = session.checkpoint_stream(checkpoint, stream.state());
+        let (checkpoint_octets, checkpoint_error) = match publication {
+            Ok(receipt) => (Some(receipt.bytes), None),
+            Err(error) => (None, Some(error.to_string())),
+        };
+        let inspect = session.inspect();
+        let after = session.wave().epoch();
+        WaveHnaStreamProcessReceipt {
+            schema: "org.holonics.hna.wave-stream-process.v1",
+            disposition,
+            stream_error,
+            checkpoint: checkpoint.clone(),
+            checkpoint_octets,
+            checkpoint_error,
+            transport_sequence: stream.state().sequence,
+            epochs: WaveEpochReceipt { before, after },
+            inspect,
+        }
+    }
+
+    let saved = if resume {
+        NativeWaveSavedSession::read(&source)?
+    } else {
+        NativeWaveSavedSession::from_model_directory(&source)?
+    };
+    saved.with_session(|session, stream| {
+        stream.open_new_connection();
+        let before = session.wave().epoch();
+        let pump = stream.pump_wave(session, &mut input, &mut output);
+        Ok(finish_wave_stream(
+            session,
+            stream,
+            pump,
+            &checkpoint,
+            before,
+        ))
     })
 }
 

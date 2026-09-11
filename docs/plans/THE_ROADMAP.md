@@ -12,8 +12,10 @@ CONSTRUCTION_STATE; no packet is complete merely because it has been planned.
 
 [established-bounded; implemented-exact] The [producing-return packet](../../research/records/2026-09-10_ATHENA_RETURNS_OBSERVATIONS_TO_THEIR_PRODUCING_JOINT.md)
 now returns the first native binding, explicit applied/reference scope and checked source/process
-continuation. Continue with the resident basis receiver and emission/re-entry, then the coupled
-conditional and formation/reuse packets. The current position carries ongoing verification.
+continuation. The [resident emission/re-entry return](../../research/records/2026-09-11_ATHENA_EMITS_THROUGH_A_RESIDENT_RECEIVER_AND_REENTERS_ITS_SUCCESSOR.md)
+now includes native selection, public session and byte-identical process continuation. Continue
+with coupled conditional organization, then formation/reuse and product evaluation. The current
+position carries ongoing verification; the observed emitted text is not useful Athena-alpha.
 
 [project-postulate] **September 10 finalized Athena handoff:** Brandon has closed the illustration
 pass and re-engaged Athena planning. The [computational tension review](../../research/records/2026-09-10_TENSION_DYNAMICS_BECOME_ATHENAS_COMPUTATIONAL_CONSTRUCTION.md)

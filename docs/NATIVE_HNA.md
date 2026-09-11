@@ -138,6 +138,43 @@ target energy with `inertia::positive_source_energy`, and checks the actual nume
 `refine_realization` changes only the numerical grain and recomputes that witness from unchanged
 exact moments and source-family bounds. Source uncertainty is not erased by refinement.
 
+## Resident symbol receiver and continuing wave session
+
+[definition] `ResidentNormalWave::read_basis_face` projects the complete current enclosure onto a
+supplied permutation of the unit complex basis: `s_a = Re(c_coordinate(a))`. Its native report
+selects the greatest exact centre score, first receiver address on equality, and retains exact
+tie count and shared radius. Score endpoints are represented by centre and radius; the cold
+receiver decodes their exact rational sum/difference. Native wider-integer gap comparison
+certifies strict separation from every competing interval when possible. Overlap permits the
+declared projected action and does not erase the source family. `NormalWaveBasisFace` retains
+the original current, fibre and receiver chart. This chart supports permutations; arbitrary
+phase/basis changes require their actual projection maps.
+
+[definition] `SymbolCurrentChart::emit` decodes that selected address to existing alphabet octets.
+`NativeWaveSession` owns one moved Applied `ResidentNormalWave`, that chart and emission progress.
+The first actual emitted symbol is retained; each following emitted pair in the same output part
+re-enters through ordinary source actuation. There is no padding symbol or self-observation
+material deposit. New `actuate_text` input supplies at least two real symbols and starts a new
+exterior output-part adjacency. Explicit `predict_symbol` retains a producing comparison;
+`receive_symbol` addresses a supplied observed symbol to that handle.
+
+[definition] `NativeWaveSavedSession` persists the native rest, alphabet/permutation, completed
+emission adjacency, pending selection/re-entry phase and shared `HnaStreamState`. A retry resumes
+that phase without generating the same native occurrence twice. The stream drains its pending
+reply before the next request. A new connection can replay the same event identifier; peer
+exactly-once delivery is not inferred. The public workbench attachment is:
+
+```text
+holonics hna wave-session MODEL_DIRECTORY --input REQUESTS.jsonl --checkpoint NEW.hna
+holonics hna wave-session SAVED.hna --resume --input REQUESTS.jsonl --checkpoint NEXT.hna
+```
+
+[definition] Requests use `org.holonics.hna.stream-request.v1` and commands `actuate-text`,
+`emit-symbol` (`full_emission`, `retain_comparison`), `observe-symbol` (`source`, `text`) and the
+existing inspect/checkpoint stream commands. MODEL_DIRECTORY is an admitted Applied
+`conversation_wave` model and its exterior chart; SAVED.hna is this complete wave-session format.
+See [the emission return](../research/records/2026-09-11_ATHENA_EMITS_THROUGH_A_RESIDENT_RECEIVER_AND_REENTERS_ITS_SUCCESSOR.md) for exact checked source and quality scope.
+
 ## Conversation source
 
 [definition] `ResidentNormalWave::actuate_section` supplies an incoming source field to the

@@ -105,6 +105,20 @@ pub enum HnaCli {
         #[arg(long)]
         checkpoint: PathBuf,
     },
+    /// Stream JSONL wave emissions through a completed packet-1 model or saved wave session.
+    WaveSession {
+        /// Completed packet-1 directory, or a saved wave session when resuming.
+        source: PathBuf,
+        /// Resume the positional source as a saved wave session artifact.
+        #[arg(long)]
+        resume: bool,
+        /// JSONL input path, or `-` for standard input.
+        #[arg(long, default_value = "-")]
+        input: PathBuf,
+        /// Destination wave session checkpoint; it must not already exist.
+        #[arg(long)]
+        checkpoint: PathBuf,
+    },
     /// Run the declared native wave-control adapter from a JSON specification.
     WaveControl {
         /// Wave-control specification JSON, or a native wave checkpoint when resuming.
@@ -165,6 +179,17 @@ impl From<HnaCli> for HnaCommand {
                 input,
                 checkpoint,
             } => Self::NativeSession {
+                source,
+                resume,
+                input,
+                checkpoint,
+            },
+            HnaCli::WaveSession {
+                source,
+                resume,
+                input,
+                checkpoint,
+            } => Self::WaveSession {
                 source,
                 resume,
                 input,
@@ -673,10 +698,22 @@ mod tests {
 
     #[test]
     fn hna_session_parses_checkpoint_and_mode_constraints() {
-        let material=parse_cli(["holonics","hna","session","model.hna","--resume",
-            "--checkpoint","next.hna","--input-material","inputs.safetensors"]).unwrap();
-        assert!(matches!(material.command,Some(WorkbenchCommand::Hna(HnaCommand::Session {input_material,..}))
-            if input_material==vec![PathBuf::from("inputs.safetensors")]));
+        let material = parse_cli([
+            "holonics",
+            "hna",
+            "session",
+            "model.hna",
+            "--resume",
+            "--checkpoint",
+            "next.hna",
+            "--input-material",
+            "inputs.safetensors",
+        ])
+        .unwrap();
+        assert!(
+            matches!(material.command,Some(WorkbenchCommand::Hna(HnaCommand::Session {input_material,..}))
+            if input_material==vec![PathBuf::from("inputs.safetensors")])
+        );
         assert!(parse_cli([
             "holonics",
             "hna",
@@ -751,8 +788,17 @@ mod tests {
 
     #[test]
     fn native_session_and_wave_control_parse_their_positional_specs() {
-        let earlier: HnaCommand=serde_json::from_str(r#"{"action":"wave-control","spec":"wave.json"}"#).unwrap();
-        assert!(matches!(earlier,HnaCommand::WaveControl {resume:false,cycles:None,checkpoint:None,..}));
+        let earlier: HnaCommand =
+            serde_json::from_str(r#"{"action":"wave-control","spec":"wave.json"}"#).unwrap();
+        assert!(matches!(
+            earlier,
+            HnaCommand::WaveControl {
+                resume: false,
+                cycles: None,
+                checkpoint: None,
+                ..
+            }
+        ));
         let native = parse_cli([
             "holonics",
             "hna",
@@ -761,7 +807,7 @@ mod tests {
             "--checkpoint",
             "next.hna",
         ])
-            .expect("native session parse");
+        .expect("native session parse");
         assert!(matches!(
             native.command,
             Some(WorkbenchCommand::Hna(HnaCommand::NativeSession {
@@ -835,13 +881,47 @@ mod tests {
             if source == &PathBuf::from("saved.hna")
                 && checkpoint == &Some(PathBuf::from("next.hna"))
         ));
-        assert!(parse_cli([
+        assert!(parse_cli(["holonics", "hna", "wave-control", "saved.hna", "--resume"]).is_err());
+    }
+
+    #[test]
+    fn wave_session_parses_packet_one_source_and_resume_input() {
+        let fresh = parse_cli([
             "holonics",
             "hna",
-            "wave-control",
-            "saved.hna",
-            "--resume"
+            "wave-session",
+            "packet-one",
+            "--input",
+            "events.jsonl",
+            "--checkpoint",
+            "saved.wave",
         ])
-        .is_err());
+        .expect("wave session parse");
+        assert!(matches!(
+            fresh.command,
+            Some(WorkbenchCommand::Hna(HnaCommand::WaveSession {
+                ref source, resume: false, ref input, ref checkpoint
+            })) if source == &PathBuf::from("packet-one")
+                && input == &PathBuf::from("events.jsonl")
+                && checkpoint == &PathBuf::from("saved.wave")
+        ));
+        let resumed = parse_cli([
+            "holonics",
+            "hna",
+            "wave-session",
+            "saved.wave",
+            "--resume",
+            "--checkpoint",
+            "next.wave",
+        ])
+        .expect("wave session resume parse");
+        assert!(matches!(
+            resumed.command,
+            Some(WorkbenchCommand::Hna(HnaCommand::WaveSession {
+                ref source, resume: true, ref input, ref checkpoint
+            })) if source == &PathBuf::from("saved.wave")
+                && input == &PathBuf::from("-")
+                && checkpoint == &PathBuf::from("next.wave")
+        ));
     }
 }

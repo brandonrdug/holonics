@@ -89,6 +89,25 @@ fn run(arguments: Vec<OsString>) -> i32 {
             }
         };
     }
+    if let holonics_workbench::WorkbenchCommand::Hna(
+        stream @ holonics_workbench::HnaCommand::WaveSession { .. },
+    ) = command
+    {
+        return match holonics_workbench::run_wave_session_stream(stream) {
+            Ok(receipt) => {
+                let failed = receipt.stream_error.is_some() || receipt.checkpoint_error.is_some();
+                eprintln!(
+                    "{}",
+                    serde_json::to_string(&receipt).expect("structured wave process receipt")
+                );
+                i32::from(failed)
+            }
+            Err(error) => {
+                eprintln!("holonics hna wave-session: {error}");
+                1
+            }
+        };
+    }
     let events = WorkbenchRuntime::new().execute(command.clone());
     let response = WorkbenchResponse::new(command, events);
     if let Err(error) = emit_response(invocation.format, &response) {

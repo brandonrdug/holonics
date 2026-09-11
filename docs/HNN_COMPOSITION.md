@@ -172,8 +172,9 @@ transition need not. The review returns exact examples instead of asserting univ
 actual joint current under fixed material. `predict`/`receive_prediction` now bind an observed
 return to its producing joint and material cut, including pending rest. The conversation example
 exercises an explicit same-part observed-tail chart; general reply relations still require their
-actual source/receiver association. Native-to-symbol emission is the next binding in the
-[blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md).
+actual source/receiver association. Native basis selection, exterior symbol emission and ordinary emitted-source re-entry now share
+`NativeWaveSession`; its [verified return](../research/records/2026-09-11_ATHENA_EMITS_THROUGH_A_RESIDENT_RECEIVER_AND_REENTERS_ITS_SUCCESSOR.md) retains the full source family, pending phase and delivery cursor. Coupled organization remains
+the next binding in the [blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md).
 `receive(v)` keeps its distinct next-current meaning. Applied transport carries stored M and
 actual source/rounding bounds; the normal-reference family remains a separate declared receiver.
 The [source return](../research/records/2026-09-10_ATHENA_RETURNS_OBSERVATIONS_TO_THEIR_PRODUCING_JOINT.md)

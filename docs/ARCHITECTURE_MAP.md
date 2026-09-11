@@ -180,6 +180,14 @@ now also caps its reference-operator error by the unit-prior target-energy law i
 `Physics/AccumulatedNormalResponse.lean`, using the existing exact integer norm owner. The fitted
 coefficients and moments are unchanged; cold validation accepts legacy and tightened certificates.
 
+[definition] `normal/direct/wave/basis.rs` owns the read-only `NormalWaveBasisChart` and
+`NormalWaveBasisFace`; `resident_section/surface_normal_wave_basis_face.rs` records its exact
+projection/selection in `normal_wave_basis_face.cuh`. The native report carries selected address,
+score, tie population, robust separation and shared radius; the full source/fibre remains resident.
+`holonics-hna/src/native/section_input.rs` supplies the exterior symbol chart and spelling.
+`native/normal_wave.rs` owns the moved wave, emission/re-entry phase and complete session rest;
+`stream.rs::pump_wave` and the workbench `session_stream.rs` reuse the existing delivery owner.
+
 [definition] `normal/direct/wave/actuate.rs` owns fixed-material source action. The
 `normal_source_actuation.cuh` source word reuses the learned normal response and the enclosed
 finite contact in `passive_current_ball.cuh`. Source union retains the incoming current;

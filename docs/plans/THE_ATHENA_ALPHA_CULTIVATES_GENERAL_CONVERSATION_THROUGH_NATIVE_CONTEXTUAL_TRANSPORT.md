@@ -247,7 +247,8 @@ binding rather than re-demonstrating unchanged local laws.
 [definition] Extend the existing application boundary in `holonics-hna/src/native/section_input.rs`
 and the engine's resident wave/receiver passages. Keep the returned field/enclosure and fibre
 inspectable. The first text receiver uses the already-declared unit symbol basis with
-`s_a(v)=Re⟨e_a,v⟩`. For a joint Euclidean enclosure `(c,r)`, return score bounds `Re(c_a)±r` on device.
+`s_a(v)=Re⟨e_a,v⟩`. For a joint Euclidean enclosure `(c,r)`, return native score centres and shared radius,
+representing the exact bounds `Re(c_a)±r`.
 This receiver reads the whole enclosure; it does not convert it to a point-current operand. The per-address intervals
 remain projections of that same joint family, not independent admissible coordinate choices.
 
@@ -268,15 +269,17 @@ a winner. Implement the narrow resident score/selection passage using the existi
 arithmetic and compare it with the declared reference. Certified normalization remains available
 when a distribution receiver is requested; softmax is not required merely to find this maximum.
 
-[definition] The proposed engine entry is a wave-owned `read_basis_face` return, with a
-`record_normal_wave_basis_face` passage in `resident_section/surface_normal_wave.rs` and its kernel
-beside `normal_wave.cuh`. These are new names to implement, not present APIs. It consumes the
-complete `ResidentNormalEnclosureView`, producing handle and admitted basis/chart binding. Decode
+[definition] The implemented engine entry is the wave-owned `read_basis_face` return, with a
+`record_normal_wave_basis_face` passage in `resident_section/surface_normal_wave_basis_face.rs`
+and `normal_wave_basis_face.cuh`. It consumes the complete `ResidentNormalEnclosureView` and
+admitted basis/chart binding; optional pending comparisons remain wave-owned. Decode
 the existing packed signed-wide centre/radius at the declared dyadic grain; validate section shape,
 matching exact low/high codewords, nonnegative radius, basis domain and upstream disposition.
-Compute checked signed-wide `centre ± radius` and score comparisons without rescaling or floats.
-Return typed sections for per-address score/bounds and a selection report (address, exact score,
-centre-tie count, optional robust-winner flag); retain the source view/fibre in the receipt.
+Store signed-wide centres and shared radius without rescaling or floats. Compare score gaps
+against twice the radius with the existing wider HistoryInteger arithmetic, so projected interval
+endpoints need not fit one signed-wide word. The exterior exact-rational decoder exposes the
+endpoints. Return typed score sections and a selection report (address, exact score, centre-tie
+count, robust-winner flag, radius); retain the source view/fibre in the receipt.
 Malformed/foreign input or arithmetic overflow refuses before emission. Compare with host reference
 ordering on point rows and separately with the exact declared enclosure projection; the old
 interval-midpoint policy is not an implicit conversion from the normal ball.
@@ -440,7 +443,7 @@ use the returned discrepancy to choose the next repair.
 Athena-alpha remains the useful-model objective. Continue improving observed behavior within the
 same authorized construction; do not restart the retired occurrence-history model, place Lean in
 inference, make inheritance the foundation, or wait for a universal intelligence/continuum theorem.
-The next implementation session starts at packet 1 and carries these packets through their public
+Construction follows the current position through the remaining packets and their public
 returns. This plan finalization itself changes no native model or cultivation state.
 
 ## Equational and geometric discipline throughout AC
@@ -469,4 +472,4 @@ not additional gates before the next Athena passage.
 order starts with the missing producing comparison, adds its observable emission, joins actual
 conditional local organization, then carries lawful reuse and continuing product evaluation.
 Interface, persistence, resource accounting and broader exposure accompany each increment. The
-next session resumes implementation from packet 1 using this contract and the live position.
+next implementation step follows this contract and the live position.

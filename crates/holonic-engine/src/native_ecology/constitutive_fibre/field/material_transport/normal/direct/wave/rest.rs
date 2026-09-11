@@ -60,6 +60,7 @@ impl NormalWaveRest {
     pub fn seed_kind(&self) -> NormalWaveSeedKind {
         self.seed_kind
     }
+    pub fn has_pending_prediction(&self, id:u64) -> bool { self.pending.contains_key(&id) }
     pub fn pending_count(&self) -> usize {
         self.pending.len()
     }

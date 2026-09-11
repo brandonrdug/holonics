@@ -1,7 +1,7 @@
 # Construction state
 
-**Currency:** September 10, 2026. **Priority:** Brandon has activated completion of the finalized Athena implementation plan as a goal.
-**Position:** Packet 1 has returned: producing-addressed development, pending-source persistence, unit-prior energy bound and explicit Applied/NormalReference transport. All 35 normal CUDA and two host cases pass; the two-field applied source run and process-split continuation return byte-identical rests and identical trajectories. The earlier wider reference-family refusal is retained in the record. Next: resident basis receiver, native emission and ordinary re-entry. The goal remains active; AC0–AC5 is not complete.
+**Currency:** September 11, 2026. **Priority:** Brandon has activated completion of the finalized Athena implementation plan as a goal.
+**Position:** Packet 1 is committed at `74886e32`. Packet 2 has returned native basis projection, public emission/re-entry, retryable pending phases and complete session persistence. Seven native receiver tests, five native session tests, host/CLI checks and byte-identical fresh-process continuation pass. Its observed output is `tht44444`, not useful conversation. Packet 3 is active: stage learned member formation and compose its condition/family response with the wave under one move owner. The goal remains active; AC0–AC5 is not complete.
 **Athena-alpha:** not yet attained.
 
 **Returned native operation:** `ResidentNormalWave::predict` / `receive_prediction` preserve the
@@ -9,6 +9,7 @@ producing joint/material cut while developing contemporary material. Applied tra
 stored M with source/rounding bounds; `reference_next` retains the independent normal comparison.
 Rest v6 preserves transport scope and mixed pending cuts. The [first implementation record](research/records/2026-09-10_ATHENA_RETURNS_OBSERVATIONS_TO_THEIR_PRODUCING_JOINT.md)
 states the exact controls, prepared-source aperture, costs and retained reference-family refusal.
+The [emission return](research/records/2026-09-11_ATHENA_EMITS_THROUGH_A_RESIDENT_RECEIVER_AND_REENTERS_ITS_SUCCESSOR.md) records packet 2 and its product limitation.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct

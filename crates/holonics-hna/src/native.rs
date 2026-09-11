@@ -11,6 +11,8 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 pub mod section_input;
+mod normal_wave;
+pub use normal_wave::{NativeWaveSession,NativeWaveSavedSession,NativeWaveAttachRefusal};
 
 mod wire;
 pub use wire::*;

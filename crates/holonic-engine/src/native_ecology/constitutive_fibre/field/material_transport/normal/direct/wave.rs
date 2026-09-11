@@ -11,6 +11,8 @@ mod receive;
 pub use receive::{NormalWaveReception, NormalWaveReceptionReading};
 mod rest;
 pub use rest::NormalWaveRest;
+mod basis;
+pub use basis::{NormalWaveBasisChart, NormalWaveBasisFace, NormalWaveBasisReading, NormalBasisSelection, NormalBasisScore};
 mod reference;
 pub use reference::{NormalWaveReference, NormalWaveReferenceReading};
 mod comparison;
@@ -97,6 +99,14 @@ pub struct NormalWaveFibre<'c> {
     pub seed_epochs: [Option<u64>; 2],
 }
 impl<'c> NormalWaveFibre<'c> {
+    /// Share immutable standing and its generating recipe; this never clones a continuing body.
+    pub fn snapshot(&self) -> Self {
+        Self { material:Rc::clone(&self.material),seed:Rc::clone(&self.seed),
+            surface:self.surface,roots:self.roots,grain:self.grain,
+            material_observations:self.material_observations,epoch:self.epoch,
+            seed_kind:self.seed_kind,steps:self.steps,seed_epochs:self.seed_epochs,
+            transport:self.transport }
+    }
     /// Exact point initials are available only before a bounded received-state rebase.
     pub fn initial(&self) -> Option<ResidentConstitutiveSection<'_, 'c>> {
         (self.seed_kind == NormalWaveSeedKind::ExactPair).then(|| {
@@ -505,3 +515,6 @@ mod comparison_tests;
 
 #[cfg(test)]
 mod transport_tests;
+
+#[cfg(test)]
+mod basis_tests;
