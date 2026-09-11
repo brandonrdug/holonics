@@ -60,14 +60,17 @@ This does not make cross-entropy a monotone function of distance. Channel/source
 conditioning, amplification and refocusing require their own analysis. The relevance canon
 already separates exact invisibility, tolerance and causal admissibility.
 
-## Generator admission is stronger than bare causal provenance
+## Correction: constitutive relevance and receiver identification
 
-[project-postulate] A proposed generator must have a construction and an evidential relationship
-to the source transitions and constraints it is meant to describe. A caused computation alone
-is insufficient: an erroneous assertion also has a causal history. The enforceable aim is to
-exclude unsupported admission and preserve unresolved alternatives, rather than silently
-asserting that every future prediction must be correct. This does not impose a universal
-certainty gate on useful action.
+[project-postulate] Brandon's later September 11 message corrects this record's former
+interpretation. He means that every attained algorithm/output is constitutively constrained by
+its actual causal origin, including outputs measured as mistaken. The agent's former phrase
+“exclude unsupported admission” answered a different question about task warrant. It is
+withdrawn as an interpretation of his claim. Error remains a receiver's difference measurement;
+apparent randomness reflects unresolved conditions, with statistical charts retaining their
+declared scope. The directed study is algorithms for π and e as constraint identities, coupled
+to prime arithmetic, ζ and receiver-oriented tori. The following identification results remain
+valid at their stated scope and do not contest that constitutive relevance.
 
 [proved-derived; formal-checked] `Computation/GeneratorObservationScope.lean` proves that adding
 observations restricts a declared compatible generator family. It also proves an explicit

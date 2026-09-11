@@ -122,8 +122,15 @@ connects those scopes to the existing future-receiver and compression owners.
 [definition] `Mathematics/RatioSeriesTransport.lean` owns exact signed ratio-series block
 composition, preserved clocks, arctangent recurrence and parameterized alternative routes with
 the same complete action. The [September 11 study](../research/records/2026-09-11_ATHENA_STATUS_RETURNS_TO_TRANSCENDENTAL_GENERATOR_COMPRESSION.md)
-connects it to recovered transcendental/compression material; certified window/whole-decoder
-cost comparisons remain open.
+connects it to recovered transcendental/compression material.
+`Mathematics/RadixWindowReceiver.lean` owns interval-floor certification, integer-shift
+invariance and the exact fractional-phase sector receiver; `Mathematics/MachinPhaseConstraint.lean` connects the lifted π identity to Gaussian
+closure; `Mathematics/PiIterationConstraint.lean` owns the sine iteration's fixed points,
+period transport, interval branches and local derivatives. The
+[π/e return](../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md)
+links these to the existing torus/prime owners and exact exterior window observations in
+`research/experiments/transcendental_constraint_windows/exact_windows.py`. Complete analytic
+tail/block/decoder composition and whole-decoder cost comparisons remain open.
 
 [definition] `constitutive_fibre/law_rest.rs` owns `ConstitutiveFibreRest`, the learned local
 relation's source chart, basis and chronology without an occurrence archive. It remounts into

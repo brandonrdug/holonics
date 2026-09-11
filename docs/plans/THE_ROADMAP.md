@@ -4,6 +4,15 @@
 [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md) is the sole current-position record. Dated
 contracts and records preserve their completed scope; their old imperatives schedule no new work.
 
+[project-postulate] **September 11 π/e focus:** Brandon's latest clarification treats every
+attained generator as constitutively caused and relevant; task warrant was the agent's different
+question. Study π and e as constraint identities, their exact algorithms and receiver windows,
+with prime/ζ transport and oriented data-bearing tori. The
+[constraint-identity return](../../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md)
+provides actual rational window outputs and checked phase/receiver laws. Continue by composing
+the existing complete block action with analytic tails and changed future receivers. This is
+the immediate mathematical step before further native Athena expansion, within the full goal.
+
 [project-postulate] **September 11 observation/compression correction:** Brandon requests a full
 status account and recovery of his transcendental/mantissa-window discussions. The observed
 native returns have not established useful language, improving full-cycle loss or emergent HNN

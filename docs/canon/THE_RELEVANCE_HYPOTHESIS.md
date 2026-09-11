@@ -90,16 +90,24 @@ retains these distinctions and the intended active-joint computation.
 [project-postulate] Compress an interior through its sufficient future interface, including
 needed memory, source terms, boundary response and conditions. Reuse its transport while those
 hypotheses persist. Zero present drive does not authorize deleting a latent response law; a new
-admitted excitation or receiver can expose its difference. Generator admission must carry its
-construction and evidential relation to observed transitions; causal provenance alone is not
-a guarantee of correct extrapolation.
+admitted excitation or receiver can expose its difference.
+
+[project-postulate] Brandon's subsequent September 11 correction makes the constitutive claim
+explicit: every attained generator and output arises through the actual system's conditions and
+stimulus. Even a mistaken output is causally relevant in this sense; its error is a situated
+receiver difference. Apparent randomness belongs to unresolved conditions and receiver scope,
+with probability remaining a lawful declared chart. The earlier agent response substituted
+task suitability and evidential warrant for this claim. Those are different questions, not a
+correction to constitutive relevance. The
+[π/e study](../../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md)
+applies this reading to constraint identities, executable generators and oriented receiver faces.
 
 [proved-derived; formal-checked] `GeneratorObservationScope` supplies both boundaries: finite
 prefixes admit differing future generators, while a nonzero excitation identifies a constant
 multiplier in that declared law family. An arbitrarily small nonzero rational excitation exposes
 a difference hidden at zero drive to an exact receiver. Positive measurement tolerance remains
-a separate condition. These controls neither impose a certainty gate nor establish a universal
-error-free learning theorem.
+a separate condition. These controls concern identification within a declared observation/law
+family; they do not refute the causal relevance of any generator that the system actually attains.
 
 ## Loss is a measurement of difference
 
