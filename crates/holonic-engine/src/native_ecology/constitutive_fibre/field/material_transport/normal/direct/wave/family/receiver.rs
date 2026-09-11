@@ -24,6 +24,7 @@ pub struct NormalWaveFamilyReceiver<'a, 'c> {
     vertical: ResidentSection<'c>,
 }
 impl<'a, 'c> NormalWaveFamilyReceiver<'a, 'c> {
+    pub(super) fn into_report(self)->ResidentSection<'c>{self.report}
     pub(crate) fn require_supported(&self)->Result<(),ConstitutiveFibreError>{
         let s=self.source.origin.fibre().surface;let out=s.fresh_section(1,1,ResidentGrain(0))?;
         let mut passage=s.begin_passage(&[vec![]])?;

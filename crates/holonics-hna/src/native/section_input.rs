@@ -4,7 +4,8 @@ use super::NativeSessionError;
 use holonic_engine::{
     codec_recovery::{Symbol, SymbolAlphabet},
     native_ecology::constitutive_fibre::{
-        NormalBasisSelection, NormalWaveBasisChart, NormalWaveBasisFace,
+        FamilyBasisSelection, NormalBasisSelection, NormalFamilyBasisFace, NormalWaveBasisChart,
+        NormalWaveBasisFace,
     },
     resident_section::{ResidentGrain, ResidentSection, ResidentSectionRest, ResidentSurface},
 };
@@ -148,6 +149,34 @@ impl SymbolCurrentChart {
             source,
         })
     }
+    /// Decode an already-selected projected family action. Its producing family remains owned
+    /// by the emission; this is not a bounded-score or unique-current assertion.
+    pub fn emit_family<'c>(
+        &self,
+        source: NormalFamilyBasisFace<'c>,
+    ) -> Result<FamilySymbolEmission<'c>, NativeSessionError> {
+        if source.basis_coordinates() != self.coordinates {
+            return Err(NativeSessionError::Application(
+                "emission and symbol source charts differ".into(),
+            ));
+        }
+        let selection = source.selection()?;
+        let symbol = Symbol(
+            u32::try_from(selection.selected)
+                .map_err(|e| NativeSessionError::Application(e.to_string()))?,
+        );
+        let octets = self
+            .alphabet
+            .octets(symbol)
+            .ok_or_else(|| NativeSessionError::Application("selected symbol outside codec".into()))?
+            .to_vec();
+        Ok(FamilySymbolEmission {
+            symbol,
+            octets,
+            selection,
+            source,
+        })
+    }
     pub fn alphabet(&self) -> &SymbolAlphabet {
         &self.alphabet
     }
@@ -223,6 +252,28 @@ impl<'c> SymbolEmission<'c> {
         &self.selection
     }
     pub fn source(&self) -> &NormalWaveBasisFace<'c> {
+        &self.source
+    }
+}
+
+/// A known codec action from a declared family projection, with its complete source retained.
+pub struct FamilySymbolEmission<'c> {
+    symbol: Symbol,
+    octets: Vec<u8>,
+    selection: FamilyBasisSelection,
+    source: NormalFamilyBasisFace<'c>,
+}
+impl<'c> FamilySymbolEmission<'c> {
+    pub fn symbol(&self) -> Symbol {
+        self.symbol
+    }
+    pub fn octets(&self) -> &[u8] {
+        &self.octets
+    }
+    pub fn selection(&self) -> &FamilyBasisSelection {
+        &self.selection
+    }
+    pub fn source(&self) -> &NormalFamilyBasisFace<'c> {
         &self.source
     }
 }

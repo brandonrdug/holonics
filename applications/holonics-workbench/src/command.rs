@@ -53,6 +53,11 @@ pub enum HnaCommand {
         input: PathBuf,
         checkpoint: PathBuf,
     },
+    CoupledWaveSession {
+        source:PathBuf,resume:bool,input:PathBuf,checkpoint:PathBuf,
+        #[serde(default)] member:Option<usize>,
+        #[serde(default)] receiver:Option<String>,
+    },
     WaveControl {
         #[serde(alias = "spec")]
         source: PathBuf,

@@ -49,6 +49,7 @@ pub struct NormalWaveRest {
     pending: BTreeMap<u64, NormalWaveRest>,
 }
 impl NormalWaveRest {
+    pub fn coupled_members(&self)->Option<usize>{self.coupled.as_ref().map(|v|v.members())}
     pub fn steps(&self) -> u64 { self.coupled.as_ref().map_or(self.steps,|v|v.passages()) }
     pub fn is_coupled(&self)->bool{self.coupled.is_some()}
     pub(super) fn normal_bank_epoch(&self)->u64{self.epoch}

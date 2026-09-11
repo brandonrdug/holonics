@@ -1,0 +1,12 @@
+{
+  "scope": "exact cold receiver arithmetic and native-rest wire comparison",
+  "support": "OutsideAnchorBall",
+  "squared_anchor_distance": "1380214468236498628976339373035121781561100491/7812372720954365713423885924722250482712576",
+  "squared_anchor_radius": "32485145313177722350722170365281/340282366920938463463374607431768211456",
+  "strictly_outside": true,
+  "nonzero_anchor_difference_coordinates": 170,
+  "anchor_independent_free_coordinates": 73,
+  "native_rest_byte_identical": true,
+  "native_rest_octets": 93742247,
+  "native_epoch": 11
+}

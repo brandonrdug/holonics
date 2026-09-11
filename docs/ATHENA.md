@@ -42,7 +42,8 @@ uses the complete learned arrival as incoming evidence for an actual source reac
 union transports the full held family, and a complete source field publishes one successor.
 Missing learned arrival remains explicit while the actual offered current is preserved. Source
 actuation, observed development and conditional generation keep their distinct meanings under
-the same wave owner; their public conversation composition remains the live construction task.
+the same wave owner. The coupled session below exposes source actuation and conditional emission;
+producing-family observation remains the next comparison binding.
 
 [definition] Sequence-to-fold and biochemical kinetics are foundational HNN questions. Their
 [exact source construction](../research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)
@@ -67,6 +68,24 @@ now exposes GPU basis selection, exterior decoding and ordinary emitted-source r
 a fresh-process continuation returns identical events and final artifact. The observed eight-symbol
 output is `tht44444`; this establishes the interface/continuation scope, not useful conversation.
 Coupled conditional organization and formation/reuse remain required construction.
+
+[definition] The [coupled session return](../research/records/2026-09-11_COUPLED_FAMILY_EMISSION_CONTINUES_THROUGH_ONE_SESSION.md) exposes the coupled family's declared projected receiver through `NativeCoupledWaveSession`,
+conditional generation and actual emitted-symbol re-entry. `project-symbol` is a pure reading;
+`emit-symbol` advances the admitted local law before selecting. Selection runs on the GPU and
+retains its producing family; the reported score and tie count do not claim a robust winner over
+the family. The first symbol is held as an output-part prefix; subsequent actual ordered pairs
+use the existing source actuation. No padding or self-target deposition is supplied. Session rest
+retains pending selection/re-entry and the shared delivery cursor. `retain_comparison` and
+`observe-symbol` currently return the precise missing producing-family observation port.
+
+[definition] The workbench entry is `hna coupled-wave-session MODEL_DIRECTORY --member N
+--receiver direct|unit-real-sum --input requests.jsonl --checkpoint NEW_SESSION`. A fresh source
+contains `model.wave` and `exterior-chart.json`. Resume uses `hna coupled-wave-session SESSION
+--resume --input more.jsonl --checkpoint NEW_SESSION`; its saved member and receiver govern.
+Requests use the existing HnaStream schema with `project-symbol`, `emit-symbol`, `actuate-text`,
+`inspect`, `inspect-relation`, `checkpoint` and `close`. `inspect-relation` reads the candidate
+of an already admitted contact without publishing it. An operation refusal is an event and leaves the session
+available; inspect its returned epoch and pending phase before retrying.
 
 [project-postulate] The [September 7 correction](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
 places generator recovery, phase transport and Holonic Compression inside the developing

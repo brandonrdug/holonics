@@ -76,3 +76,57 @@ impl<'c> ResidentSurface<'c> {
         )
     }
 }
+
+impl<'c> ResidentSurface<'c> {
+    pub(crate) fn record_family_basis_face(
+        &self,
+        lane: &Lane<'_, 'c>,
+        family: &ResidentSection<'c>,
+        permutation: &ResidentSection<'c>,
+        n: usize,
+        scores: &ResidentSection<'c>,
+        selection: &ResidentSection<'c>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || Self::operative_error();
+        let fw = n
+            .checked_mul(32)
+            .and_then(|v| v.checked_add(8))
+            .ok_or_else(fail)?;
+        let sw = n
+            .checked_mul(4)
+            .and_then(|v| v.checked_add(2))
+            .ok_or_else(fail)?;
+        if n == 0
+            || fw > u32::MAX as usize
+            || !self.operative_shape(family, 1, fw)
+            || !self.operative_shape(permutation, 1, n)
+            || !self.operative_shape(scores, 1, sw)
+            || !self.operative_shape(selection, 1, 8)
+        {
+            return Err(fail());
+        }
+        let mut p = Params::new();
+        p.ptr(family.lo.device_ptr())
+            .ptr(family.hi.device_ptr())
+            .ptr(permutation.lo.device_ptr())
+            .ptr(permutation.hi.device_ptr())
+            .u32(n as u32)
+            .ptr(scores.lo.device_ptr())
+            .ptr(scores.hi.device_ptr())
+            .ptr(selection.lo.device_ptr())
+            .ptr(selection.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_family_basis_face",
+            1,
+            self.launch.block_x,
+            0,
+            &mut p,
+            "family-basis-face",
+        )
+    }
+}

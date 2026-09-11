@@ -200,7 +200,7 @@ normal wave's current by themselves; the coupled owner below now binds them.
 `normal_family_receiver.cuh` own constrained-family support and the declared minimum-norm joint
 receiver. `wave/family/rest.rs` and `resident/wave_relation/rest.rs` retain the original source,
 anchor, affine relation and last map through process exit. These are exact family interfaces;
-the continuing owner below now retains them, while the public session remains to be joined.
+the continuing owner below now retains them; its public session is described below.
 
 [definition] `wave/coupled.rs` transfers the neighborhood into a typed continuation of
 `ResidentNormalWave`, owns its current family and admitted source/member bindings, and publishes
@@ -226,6 +226,15 @@ An empty learned arrival retains the actual offered current and its original obs
 field under one public successor and returns all local prediction fibres. Relation rest v3 and
 coupled remount reconstruct the source reaction/map and rebind it to the actual restored local
 law. These source maps preserve the original anchor, and are distinct from conditional joins.
+
+[definition] `wave/family/basis.rs::NormalFamilyBasisFace` retains the complete producing family
+beside its projected minimum-norm joint receiver. `section_family_basis_face` in
+`normal_wave_basis_face.cuh` selects a real unit-basis score on device; its free-direction flags
+are not robust-winner bounds. `native/coupled_wave.rs::NativeCoupledWaveSession` owns conditional
+generation, actual symbol-pair source re-entry, pending phases and complete coupled session rest.
+`stream.rs::pump_coupled_wave` and `session_stream.rs::run_coupled_wave_session_stream` expose
+that same owner. Pure `project-symbol` reads the current; `emit-symbol` first advances the
+conditional law. Producing-family observed-symbol development remains an explicit missing port.
 
 [definition] `normal/direct/wave/actuate.rs` owns fixed-material source action. The
 `normal_source_actuation.cuh` source word reuses the learned normal response and the enclosed

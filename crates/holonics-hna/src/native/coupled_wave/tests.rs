@@ -1,0 +1,263 @@
+use super::*;
+use holonic_engine::{
+    native_ecology::constitutive_fibre::{
+        ConditionContactMetric, ResidentConstitutiveCurrent, ResidentConstitutiveFibre,
+        ResidentGeneratorNeighborhood, ResidentNormalMaterial,
+    },
+    resident_section::{ResidentGrain, ResidentSection, ResidentSectionRest},
+};
+fn point<'c>(s: &'c ResidentSurface<'c>, v: &[i64]) -> ResidentSection<'c> {
+    s.mount_section_rest(
+        &ResidentSectionRest::found(
+            1,
+            v.len(),
+            ResidentGrain(0),
+            64,
+            v.iter().map(|v| (*v, *v)).collect(),
+        )
+        .unwrap(),
+    )
+    .unwrap()
+}
+fn current<'a, 'c>(v: &'a ResidentSection<'c>) -> ResidentConstitutiveCurrent<'a, 'c> {
+    ResidentConstitutiveCurrent::integers(v).unwrap()
+}
+// An exterior exact operator specimen for session mechanics, not a conversation learner.
+fn session<'c>(s: &'c ResidentSurface<'c>) -> NativeCoupledWaveSession<'c> {
+    let mut law = ResidentConstitutiveFibre::found_bilinear_contact(s, 6, 1, 2).unwrap();
+    let mut sources = vec![vec![0; 12]];
+    for i in 0..12 {
+        let mut a = vec![0; 12];
+        a[i] = 1;
+        sources.push(a);
+    }
+    for a in sources {
+        for h in [[0, 0], [1, 0], [0, 1]] {
+            let eta = [a[6] - a[4], a[7] - a[5], a[4] - a[6], a[5] - a[7]];
+            let a = point(s, &a);
+            let h = point(s, &h);
+            let y = point(s, &eta);
+            law.advance_bilinear_contact(current(&a), current(&h), Some(current(&y)))
+                .unwrap();
+        }
+    }
+    let p = point(s, &[1, 0, 0, 0]);
+    let c = point(s, &[0, 0, 1, 0]);
+    let h = point(s, &[1, 0]);
+    let neighborhood = ResidentGeneratorNeighborhood::with_shared_condition(
+        vec![law],
+        current(&h),
+        ConditionContactMetric::UnitAdmittanceRealification,
+    )
+    .unwrap();
+    let wave = ResidentNormalMaterial::found(s, 2, 2, ResidentGrain(32))
+        .unwrap()
+        .into_applied_difference_wave(current(&p), current(&c))
+        .unwrap()
+        .with_neighborhood(neighborhood)
+        .unwrap();
+    NativeCoupledWaveSession::from_wave(
+        s,
+        wave,
+        SymbolCurrentChart::declared(SymbolAlphabet::from_chars(&['a', 'b']).unwrap()),
+        0,
+        WaveSourceReceiver::Direct,
+    )
+    .unwrap()
+}
+fn path(label: &str) -> std::path::PathBuf {
+    std::env::temp_dir().join(format!(
+        "holonics-coupled-{label}-{}-{}",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    ))
+}
+#[test]
+#[ignore = "requires CUDA; conditional generation emits and actual symbol pairs re-enter the same owner"]
+fn coupled_session_generates_and_reenters_without_self_deposition() {
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let mut session = session(&s);
+    assert!(session.inspect_relation().is_err());
+    session.contact().unwrap();
+    let before = session.wave.rest().unwrap();
+    assert_eq!(
+        session.inspect_relation().unwrap()["reading"]["support"],
+        "Supported"
+    );
+    assert_eq!(session.wave.rest().unwrap(), before);
+    let projection = session.project_current(true).unwrap();
+    assert_eq!(projection["text"], "b");
+    assert_eq!(session.wave.rest().unwrap(), before);
+    let first = session.next_symbol(true).unwrap();
+    assert_eq!(first["text"], "a");
+    assert!(first["reentry"].is_null());
+    assert_eq!(session.wave.epoch(), 1);
+    let second = session.next_symbol(true).unwrap();
+    assert_eq!(second["text"], "b");
+    assert_eq!(session.wave.epoch(), 3);
+    assert_eq!(
+        session
+            .wave
+            .neighborhood()
+            .generator(0)
+            .unwrap()
+            .occurrences(),
+        39
+    );
+    assert_eq!(session.wave.normal_material().observations(), 0);
+    assert_eq!(session.inspect()["emission_ordinal"], 2);
+    let saved = path("live");
+    session
+        .checkpoint_stream(&saved, &HnaStreamState::default())
+        .unwrap();
+    let checked = NativeCoupledWaveSavedSession::read(&saved).unwrap();
+    let mut stale = checked.header.clone();
+    stale.last.as_mut().unwrap().generation = 0;
+    assert!(NativeCoupledWaveSavedSession::validate(&stale, &checked.rest).is_err());
+    stale.last.as_mut().unwrap().generation = 1;
+    assert!(NativeCoupledWaveSavedSession::validate(&stale, &checked.rest).is_err());
+    let next = session.next_symbol(false).unwrap();
+    let rest = session.wave.rest().unwrap();
+    NativeCoupledWaveSavedSession::read(&saved)
+        .unwrap()
+        .with_session(|loaded, _| {
+            assert_eq!(loaded.next_symbol(false)?, next);
+            assert_eq!(loaded.wave.rest()?, rest);
+            Ok(())
+        })
+        .unwrap();
+}
+#[test]
+#[ignore = "requires CUDA; pending selection and re-entry resume without regenerating their source"]
+fn coupled_session_pending_phases_retain_the_producing_cut() {
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let mut session = session(&s);
+    session.chart =
+        SymbolCurrentChart::recharted(SymbolAlphabet::from_chars(&['a', 'b']).unwrap(), vec![1, 0])
+            .unwrap();
+    assert!(session.next_symbol(false).is_err());
+    assert_eq!(session.wave.epoch(), 1);
+    assert!(matches!(
+        session.cursor,
+        Cursor::AwaitSelection { generation: 1 }
+    ));
+    session.chart = SymbolCurrentChart::declared(SymbolAlphabet::from_chars(&['a', 'b']).unwrap());
+    let pending = path("selection");
+    session
+        .checkpoint_stream(&pending, &HnaStreamState::default())
+        .unwrap();
+    NativeCoupledWaveSavedSession::read(&pending)
+        .unwrap()
+        .with_session(|loaded, _| {
+            assert_eq!(loaded.next_symbol(false)?["text"], "a");
+            assert_eq!(loaded.wave.epoch(), 1);
+            Ok(())
+        })
+        .unwrap();
+    assert_eq!(session.next_symbol(false).unwrap()["text"], "a");
+    let contact = session.contact().unwrap();
+    session.wave.advance_contact(&contact).unwrap();
+    let emission = session
+        .chart
+        .emit_family(session.wave.read_basis_face(&session.basis).unwrap())
+        .unwrap();
+    session.cursor = Cursor::AwaitReentry {
+        generation: session.wave.epoch(),
+        action: Action {
+            ordinal: 2,
+            generation: session.wave.epoch(),
+            symbol: emission.symbol(),
+        },
+    };
+    let pending = path("reentry");
+    session
+        .checkpoint_stream(&pending, &HnaStreamState::default())
+        .unwrap();
+    let expected = session.next_symbol(false).unwrap();
+    let rest = session.wave.rest().unwrap();
+    NativeCoupledWaveSavedSession::read(&pending)
+        .unwrap()
+        .with_session(|loaded, _| {
+            assert_eq!(loaded.next_symbol(false)?, expected);
+            assert_eq!(loaded.wave.rest()?, rest);
+            Ok(())
+        })
+        .unwrap();
+}
+#[test]
+#[ignore = "requires CUDA; partial output delivery survives process exit without repeating native generation"]
+fn coupled_session_process_resume_drains_the_pending_emission_once() {
+    const CHILD: &str = "HOLONICS_COUPLED_EMISSION_CHILD";
+    if let Some(directory) = std::env::var_os(CHILD) {
+        let directory = std::path::PathBuf::from(directory);
+        NativeCoupledWaveSavedSession::read(directory.join("saved.session"))
+            .unwrap()
+            .with_session(|session, stream| {
+                stream.open_new_connection();
+                let mut input = std::io::Cursor::new(Vec::<u8>::new());
+                let mut output = Vec::new();
+                stream
+                    .pump_coupled_wave(session, &mut input, &mut output)
+                    .map_err(invalid)?;
+                std::fs::write(directory.join("delivered.jsonl"), output)?;
+                session.checkpoint_stream(directory.join("resumed.session"), stream.state())?;
+                Ok(())
+            })
+            .unwrap();
+        return;
+    }
+    struct Broken;
+    impl Write for Broken {
+        fn write(&mut self, _: &[u8]) -> io::Result<usize> {
+            Err(io::Error::new(io::ErrorKind::BrokenPipe, "test writer"))
+        }
+        fn flush(&mut self) -> io::Result<()> {
+            Ok(())
+        }
+    }
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let mut session = session(&s);
+    let mut stream = HnaStream::new();
+    let request=b"{\"schema\":\"org.holonics.hna.stream-request.v1\",\"command\":{\"action\":\"emit-symbol\"}}\n";
+    assert!(stream
+        .pump_coupled_wave(
+            &mut session,
+            &mut std::io::Cursor::new(request),
+            &mut Broken
+        )
+        .is_err());
+    assert_eq!(session.wave.epoch(), 1);
+    let native = session.wave.rest().unwrap();
+    let frame = stream.state().output.clone().unwrap();
+    let directory = path("process");
+    std::fs::create_dir(&directory).unwrap();
+    session
+        .checkpoint_stream(directory.join("saved.session"), stream.state())
+        .unwrap();
+    let child=std::process::Command::new(std::env::current_exe().unwrap()).args(["--exact","native::coupled_wave::tests::coupled_session_process_resume_drains_the_pending_emission_once","--ignored","--test-threads=1"]).env(CHILD,&directory).output().unwrap();
+    assert!(
+        child.status.success(),
+        "{}\n{}",
+        String::from_utf8_lossy(&child.stdout),
+        String::from_utf8_lossy(&child.stderr)
+    );
+    assert_eq!(
+        std::fs::read(directory.join("delivered.jsonl")).unwrap(),
+        frame
+    );
+    NativeCoupledWaveSavedSession::read(directory.join("resumed.session"))
+        .unwrap()
+        .with_session(|loaded, stream| {
+            assert_eq!(loaded.wave.rest()?, native);
+            assert_eq!(loaded.emission_ordinal, 1);
+            assert!(stream.state().output.is_none());
+            Ok(())
+        })
+        .unwrap();
+}

@@ -1,0 +1,3 @@
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "project-symbol", "full_emission": true}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "emit-symbol", "full_emission": true}}
+{"schema": "org.holonics.hna.stream-request.v1", "command": {"action": "inspect"}}

@@ -25,6 +25,7 @@ pub struct HnaStreamRequest {
 #[serde(tag = "action", rename_all = "kebab-case", deny_unknown_fields)]
 pub enum HnaStreamCommand {
     ActuateText { text:String },
+    ProjectSymbol { #[serde(default)] full_emission:bool },
     EmitSymbol { #[serde(default)] full_emission:bool, #[serde(default)] retain_comparison:bool },
     ObserveSymbol { source:u64, text:String },
     ReceiveCurrent {
@@ -167,6 +168,8 @@ impl HnaStream {
         self.pump_target(session,input,output)
     }
 
+    pub fn pump_coupled_wave(&mut self,session:&mut crate::native::NativeCoupledWaveSession<'_>,input:&mut impl BufRead,output:&mut impl Write)->Result<HnaStreamDisposition,HnaStreamError>{self.pump_target(session,input,output)}
+
     fn emit(&mut self, event: &str, value: Value) -> Result<(), HnaStreamError> {
         let mut bytes = serde_json::to_vec(&json!({"schema":HNA_STREAM_EVENT_SCHEMA,
             "sequence":self.state.sequence,"event":event,"value":value}))?;
@@ -262,6 +265,10 @@ impl HnaStream {
             self.state.input.clear();
             self.state.input_complete = false;
             match request.command {
+                HnaStreamCommand::ProjectSymbol{full_emission}=>match target.project_symbol(full_emission){
+                    Ok(value)=>self.emit("symbol-projection",value)?,
+                    Err(error)=>self.emit("refused",json!({"error":error,"anatomy":target.inspect()}))?,
+                },
                 HnaStreamCommand::ActuateText {text}=>match target.actuate_text(&text) {
                     Ok(value)=>self.emit("source-actuated",value)?,
                     Err(error)=>self.emit("refused",json!({"error":error,"anatomy":target.inspect()}))?,
@@ -364,6 +371,7 @@ impl Default for HnaStream {
 /// Only an exterior effect seam for I/O tests. Native current and learning are never callbacks
 /// supplied through the public stream protocol; actual adapters use HnaSession or NativeSession.
 trait StreamTarget {
+    fn project_symbol(&self,_:bool)->Result<Value,String>{Err("projected family receiver unsupported by this model".into())}
     fn actuate_text(&mut self,_:&str)->Result<Value,String>{Err("text source chart unsupported by this model".into())}
     fn emit_symbol(&mut self,_:bool,_:bool)->Result<Value,String>{Err("symbol receiver unsupported by this model".into())}
     fn observe_symbol(&mut self,_:u64,_:&str)->Result<Value,String>{Err("symbol observation chart unsupported by this model".into())}
@@ -785,4 +793,20 @@ impl StreamTarget for crate::native::NativeWaveSession<'_> {
     fn inspect(&self)->Value{crate::native::NativeWaveSession::inspect(self)}
     fn checkpoint(&self,path:&Path,transport:&HnaStreamState)->Result<(),String>{self.checkpoint_stream(path,transport).map(|_|()).map_err(|e|e.to_string())}
     fn supply_input_material(&mut self,_:&Path)->Result<(),String>{Err("a file path is not a native wave source conversion".into())}
+}
+
+impl StreamTarget for crate::native::NativeCoupledWaveSession<'_>{
+    fn inspect_relation(&self)->Result<Value,String>{self.inspect_relation().map_err(|e|e.to_string())}
+    fn project_symbol(&self,full:bool)->Result<Value,String>{self.project_current(full).map_err(|e|e.to_string())}
+    fn actuate_text(&mut self,text:&str)->Result<Value,String>{self.actuate_text(text).map_err(|e|e.to_string())}
+    fn emit_symbol(&mut self,full:bool,retain:bool)->Result<Value,String>{
+        if retain{return Err("the coupled producing-family observation port is not yet bound".into());}
+        self.next_symbol(full).map_err(|e|e.to_string())
+    }
+    fn observe_symbol(&mut self,_:u64,_:&str)->Result<Value,String>{Err("the coupled observed-symbol receiver lift is not yet bound".into())}
+    fn advance(&mut self,_:&HnaOccurrence,_:bool)->Result<Value,String>{Err("use the coupled wave's declared source/receiver commands".into())}
+    fn advance_native(&mut self,_:&HnaOccurrence,_:bool)->Result<Value,String>{Err("use the coupled wave's declared source/receiver commands".into())}
+    fn inspect(&self)->Value{crate::native::NativeCoupledWaveSession::inspect(self)}
+    fn checkpoint(&self,path:&Path,transport:&HnaStreamState)->Result<(),String>{self.checkpoint_stream(path,transport).map(|_|()).map_err(|e|e.to_string())}
+    fn supply_input_material(&mut self,_:&Path)->Result<(),String>{Err("a file path is not a coupled wave source conversion".into())}
 }

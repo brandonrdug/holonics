@@ -4,9 +4,9 @@ use super::*;
 /// chart, not to semantic classes or native incidence. The first chart supports permutations;
 /// an arbitrary change of phase/basis requires its actual additional projection map.
 pub struct NormalWaveBasisChart<'c> {
-    surface: &'c ResidentSurface<'c>,
-    permutation: Rc<ResidentSection<'c>>,
-    coordinates: Vec<usize>,
+    pub(super) surface: &'c ResidentSurface<'c>,
+    pub(super) permutation: Rc<ResidentSection<'c>>,
+    pub(super) coordinates: Vec<usize>,
 }
 impl<'c> NormalWaveBasisChart<'c> {
     pub fn identity(

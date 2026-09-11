@@ -1,5 +1,7 @@
 use super::*;
 mod receiver;
+mod basis;
+pub use basis::{NormalFamilyBasisFace,FamilyBasisSelection,FamilyBasisReading};
 mod rest;
 use crate::native_ecology::constitutive_fibre::{ResidentConstitutiveReturn, ResidentWaveRelation};
 pub use receiver::{NormalFamilyReceiverReading, NormalFamilySupport, NormalWaveFamilyReceiver};

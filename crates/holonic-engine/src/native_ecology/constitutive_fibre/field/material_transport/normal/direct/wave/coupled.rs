@@ -176,6 +176,10 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
         self.neighborhood().require_usable()?;
         self.receive_normal_prediction(handle, observed)
     }
+    /// Native projected action; the face retains this complete source family.
+    pub fn read_basis_face(&self,chart:&NormalWaveBasisChart<'c>)->Result<NormalFamilyBasisFace<'c>,ConstitutiveFibreError>{
+        chart.read_family(Rc::clone(&self.continuation.current),self.epoch())
+    }
     pub fn normal_source_epoch(&self) -> u64 {
         self.epoch
     }

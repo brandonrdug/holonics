@@ -305,8 +305,9 @@ current; selection correctness by itself gives no language-quality grade.
 [established-bounded; implemented-exact] The [coupled-owner return](../../research/records/2026-09-11_ONE_WAVE_OWNS_CONDITIONAL_CURRENT_MATERIAL_AND_PENDING_RETURNS.md) now supplies
 that owner through a typed continuation, actual point-source return, native family admission and
 complete v7 rest. The narrower point-source operation does not discharge producing-family
-observation or public source/emission integration. Continue through those bindings and actual
-prepared-source use under the remaining requirements below.
+observation. The coupled public session now composes source actuation, native projected selection,
+conditional generation and emitted-pair re-entry with complete pending rest. Continue through the
+producing-family comparison binding and actual prepared-source use under the requirements below.
 
 [definition] This packet is required for the finite Athena construction. A fixed global linear
 wave plus a decoder is not the complete planned ecology. Use `ResidentGeneratorNeighborhood` and

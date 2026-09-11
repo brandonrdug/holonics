@@ -811,3 +811,92 @@ fn coupled_source_field_has_one_public_successor_and_exact_internal_composition(
     );
     assert_eq!(word.rest().unwrap(), before);
 }
+
+#[test]
+#[ignore = "requires CUDA; family projection selects natively and retains its producing family through later conduct"]
+fn coupled_basis_face_keeps_its_source_and_transports_the_receiver_order() {
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let p = point(&s, &[1, 0, 0, 0]);
+    let c = point(&s, &[4, 0, 1, 0]);
+    let h = point(&s, &[1, 0]);
+    let m = ResidentNormalMaterial::found(&s, 2, 2, ResidentGrain(32)).unwrap();
+    let neighborhood = ResidentGeneratorNeighborhood::with_shared_condition(
+        vec![unit_swap(&s)],
+        current(&h),
+        ConditionContactMetric::UnitAdmittanceRealification,
+    )
+    .unwrap();
+    let mut wave = m
+        .into_applied_difference_wave(current(&p), current(&c))
+        .unwrap()
+        .with_neighborhood(neighborhood)
+        .unwrap();
+    let chart = NormalWaveBasisChart::from_permutation(&s, &[1, 0]).unwrap();
+    let reads = s.census().section_read_outs;
+    let face = wave.read_basis_face(&chart).unwrap();
+    assert_eq!(s.census().section_read_outs, reads);
+    assert!(std::ptr::eq(face.source(), wave.current()));
+    let selected = face.selection().unwrap();
+    assert_eq!(selected.selected, 1);
+    assert_eq!(selected.selected_coordinate, 0);
+    assert_eq!(selected.projected_score, r(4));
+    let contact = wave
+        .admit_contact_in_chart(0, WaveSourceReceiver::UnitRealSum)
+        .unwrap();
+    wave.advance_contact(&contact).unwrap();
+    assert_eq!(
+        wave.read_basis_face(&chart)
+            .unwrap()
+            .selection()
+            .unwrap()
+            .selected,
+        0
+    );
+    assert_eq!(face.selection().unwrap(), selected);
+    assert!(!std::ptr::eq(face.source(), wave.current()));
+}
+#[test]
+#[ignore = "requires CUDA; unbounded family directions survive a tied projected action"]
+fn coupled_basis_face_does_not_turn_a_projected_tie_into_a_bounded_score() {
+    let ro = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&ro).unwrap();
+    let mut local = unit_swap(&s);
+    let zero = point(&s, &[0; 12]);
+    let h0 = point(&s, &[0, 0]);
+    let eta = point(&s, &[1, 0, -1, 0]);
+    local
+        .advance_bilinear_contact(current(&zero), current(&h0), Some(current(&eta)))
+        .unwrap();
+    let p = point(&s, &[1, 0, 0, 0]);
+    let c = point(&s, &[4, 0, 1, 0]);
+    let h = point(&s, &[1, 0]);
+    let neighborhood = ResidentGeneratorNeighborhood::with_shared_condition(
+        vec![local],
+        current(&h),
+        ConditionContactMetric::UnitAdmittanceRealification,
+    )
+    .unwrap();
+    let mut wave = ResidentNormalMaterial::found(&s, 2, 2, ResidentGrain(32))
+        .unwrap()
+        .into_applied_difference_wave(current(&p), current(&c))
+        .unwrap()
+        .with_neighborhood(neighborhood)
+        .unwrap();
+    let contact = wave
+        .admit_contact_in_chart(0, WaveSourceReceiver::UnitRealSum)
+        .unwrap();
+    wave.advance_contact(&contact).unwrap();
+    let face = wave
+        .read_basis_face(&NormalWaveBasisChart::identity(&s, 2).unwrap())
+        .unwrap();
+    let reading = face.inspect().unwrap();
+    assert_eq!(reading.selection.projected_ties, 2);
+    assert_eq!(reading.selection.selected, 0);
+    assert_eq!(
+        reading.projected_scores,
+        vec![Rat::new(5.into(), 2.into()); 2]
+    );
+    assert_eq!(reading.anchor_independent_free, vec![true, true]);
+    assert!(std::ptr::eq(face.source(), wave.current()));
+}

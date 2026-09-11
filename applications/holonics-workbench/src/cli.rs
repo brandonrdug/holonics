@@ -119,6 +119,15 @@ pub enum HnaCli {
         #[arg(long)]
         checkpoint: PathBuf,
     },
+    /// Continue a coupled wave through its native source and projected symbol receivers.
+    CoupledWaveSession {
+        source:PathBuf,
+        #[arg(long)] resume:bool,
+        #[arg(long,default_value="-")] input:PathBuf,
+        #[arg(long)] checkpoint:PathBuf,
+        #[arg(long,conflicts_with="resume")] member:Option<usize>,
+        #[arg(long,value_parser=["direct","unit-real-sum"],conflicts_with="resume")] receiver:Option<String>,
+    },
     /// Run the declared native wave-control adapter from a JSON specification.
     WaveControl {
         /// Wave-control specification JSON, or a native wave checkpoint when resuming.
@@ -195,6 +204,7 @@ impl From<HnaCli> for HnaCommand {
                 input,
                 checkpoint,
             },
+            HnaCli::CoupledWaveSession{source,resume,input,checkpoint,member,receiver}=>Self::CoupledWaveSession{source,resume,input,checkpoint,member,receiver},
             HnaCli::WaveControl {
                 source,
                 resume,
@@ -924,4 +934,12 @@ mod tests {
                 && checkpoint == &PathBuf::from("next.wave")
         ));
     }
+    #[test]
+    fn coupled_wave_session_preserves_configuration_and_resume_authority(){
+        let fresh=parse_cli(["holonics","hna","coupled-wave-session","model","--member","2","--receiver","unit-real-sum","--checkpoint","saved.session"]).unwrap();
+        assert!(matches!(fresh.command,Some(WorkbenchCommand::Hna(HnaCommand::CoupledWaveSession{member:Some(2),receiver:Some(ref receiver),resume:false,..})) if receiver=="unit-real-sum"));
+        assert!(parse_cli(["holonics","hna","coupled-wave-session","saved.session","--resume","--member","2","--checkpoint","next.session"]).is_err());
+        assert!(parse_cli(["holonics","hna","coupled-wave-session","model","--receiver","unknown","--checkpoint","saved.session"]).is_err());
+    }
+
 }

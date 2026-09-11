@@ -27,6 +27,7 @@ pub(in super::super) struct CoupledRestData {
     relations: BTreeMap<u64, NormalWaveRelationRest>,
 }
 impl CoupledRestData {
+    pub(in super::super) fn members(&self)->usize{self.neighborhood.members()}
     pub(in super::super) fn epoch(&self) -> u64 {
         self.header.epoch
     }
