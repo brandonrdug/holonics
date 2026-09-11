@@ -6,6 +6,13 @@ position. September 11 consolidates the old AC responsibility labels into named 
 The file path, source names and existing wire identifiers remain stable. The native pause is
 unchanged by this planning review.
 
+[project-postulate] Brandon's subsequent direction prioritizes elementary mathematical
+applications as **Hephaestus Automata**, described in the [application design](../HEPHAESTUS_AUTOMATA.md).
+The roadmap now orders that application line. These native phases supply its HNN integration
+requirements; general conversation remains a standing product objective rather than an entrance
+condition for every mathematical device. Eros's composition acts inside nested automata and
+their wider ecology, not only in a separate top-level training phase.
+
 ## Product and evidence
 
 [project-postulate] HNN conducts situated Holons; Athena is the continuing ecology and Eros its

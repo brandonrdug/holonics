@@ -156,6 +156,13 @@ gate, or a new runtime model.
 
 ## Native-first construction
 
+[definition] [Hephaestus Automata](HEPHAESTUS_AUTOMATA.md) are operator-scoped mathematical
+application instances of the general HNN/Holonic Encoding construction. Elementary solver
+products are now the immediate application focus. Athena remains the general wisdom/model
+ecology; this specialization neither replaces that objective nor requires general conversation
+before a mathematical tool can be useful. Current exact solver examples are exterior references,
+with their native source/family/material handoff still explicit.
+
 [definition] The [Holonic Encoding handoff](HNN_COMPOSITION.md#holonic-encoding) makes the
 cross-modal representation direction explicit. Current text uses a declared symbol-basis chart,
 not a learned autoencoder. Encoding development must bind actual source/condition contact,

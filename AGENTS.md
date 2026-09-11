@@ -14,10 +14,14 @@ catalogue of minor decisions or ask him to repeat a settled ruling.
 [project-postulate] Holonics is a theory of everything: a mathematical, physical and philosophical
 framework for situated objects, causal composition, information transport and physical realization.
 Its mathematical research develops reusable methods of construction and explanation across mathematical, physical,
-biological and learning systems. HNN is its Holonic Neural Network architecture; Athena is a
-model/ecology; Eros composes and develops it; Soulkiller independently dismantles inherited
-realizations. HNN's product goal is frontier-level usefulness on consumer hardware. The “20W
-ideology” directs efficient local learning and reuse, not a literal current-machine power claim. Read
+biological and computational systems. HNN is its Holonic Neural Network architecture; Athena
+is the general wisdom/model ecology; Eros names union, composition and formative activity at
+every nested holonic scope; Soulkiller independently dismantles inherited realizations.
+Hephaestus Automata are operator-scoped mathematical application instances/products of HNNs
+and Holonic Encoding; “Holonic Solver” describes that constructive activity, not another engine.
+See [the application design](docs/HEPHAESTUS_AUTOMATA.md). HNN's product goal is frontier-level
+usefulness on consumer hardware. The “20W ideology” directs efficient local formation and reuse,
+not a literal current-machine power claim. Read
 [the architecture](docs/ARCHITECTURE.md), [Soulkiller](docs/SOULKILLER.md),
 [Athena](docs/ATHENA.md) and [interoperability](docs/INTEROPERABILITY.md) before reassessing
 those subjects.

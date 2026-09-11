@@ -95,8 +95,9 @@ human origins and to everyday reasoning within the project.
 |---|---|
 | **Holonic Engine** | Exact carriers, causal relations, transport, reactions and device execution |
 | **HNN — Holonic Neural Network** | The neural architecture explored within Holonics |
-| **Eros** | Composition and development of a continuing neural ecology |
-| **Athena** | A model/ecology cultivated through those operations |
+| **Eros** | Union, composition and formative activity at every nested holonic scope |
+| **Athena** | The general wisdom/model ecology carrying available constructions and their applicability |
+| **Hephaestus Automata** | Task-scoped mathematical applications; exact solver references and a native integration design |
 | **Soulkiller** | Analysis and dismantling of supported inherited models into reusable native material |
 
 [open] **Eros and Athena are experimental and have not attained the intended useful, general
@@ -113,6 +114,7 @@ inference pipelines.
 
 - [Rust framework](docs/RUST_FRAMEWORK.md) — public mathematical carriers and implementation boundaries
 - [HNN composition](docs/HNN_COMPOSITION.md) — model assembly, local standing, interaction and commuting architecture charts
+- [Hephaestus Automata](docs/HEPHAESTUS_AUTOMATA.md) — mathematical requests, reusable constructions and operator-scoped application design
 - [The reality of difference](docs/canon/THE_REALITY_OF_DIFFERENCE.md) — ontology, philosophy, relevance and constructive reasoning
 - [The construction programme](docs/plans/THE_REALITY_OF_DIFFERENCE_IN_CONSTRUCTION.md) — formalization and use across mathematical and physical realizations
 - [Holonics in Lean](docs/FORMAL_FRAMEWORK.md) — situated objects, molecular conformation, tubes, physics and computation

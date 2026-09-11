@@ -14,8 +14,9 @@ new cultivation run; the current native pause remains in force during this plann
 [threshold-refinement and partitioned-energy laws](../../research/records/2026-09-11_THRESHOLD_REFINEMENT_AND_PARTITIONED_ENERGY_RETURN_HOLONIC_TOOLKITS.md).
 Use their retained mixed terms, actual clock maps and source-specific refinement requirements
 in the matching native/physical construction below. It does not create a prerequisite to solve
-RH or reopen five endpoint campaigns. A further mathematical branch follows its actual useful
-return and the latest direction; the named Athena code work remains the standing next application.
+RH or reopen five endpoint campaigns. Brandon's subsequent Hephaestus direction now prioritizes
+elementary mathematical solver applications; the named Athena phases retain the native
+integration requirements. The application design and immediate work below state that direction.
 
 ## All current plan documents and their roles
 
@@ -29,6 +30,30 @@ return and the latest direction; the named Athena code work remains the standing
 | [Framework consolidation](THE_HNA_FRAMEWORK_HAS_ONE_PUBLIC_LIFECYCLE_AND_ONE_NAVIGABLE_REPOSITORY.md) | Completed repository/interface contract | Maintain its public ownership and layout; its old ordered tasks schedule nothing |
 | [Inherited production and export](THE_HNA_PRODUCTION_CAMPAIGN_COMPOSES_LOCAL_LEARNING_PERSISTENT_MODELS_AND_EXECUTABLE_EXPORT.md) | Deferred production branch | Preserve admitted Soulkiller/HNP material; resume inheritance/export after the native foundations justify that application |
 | This roadmap | Sole order and cross-domain dependency account | Reconcile new returns here rather than appending another competing campaign |
+
+[definition] [Hephaestus Automata](../HEPHAESTUS_AUTOMATA.md) is the current application design,
+not another ordering authority. It gives the operator contract, concrete mathematical use cases,
+catalytic/ecological correspondence and code/evidence boundaries for the following work.
+
+## Hephaestus Automata: immediate mathematical applications
+
+[project-postulate] Focus directly on elementary solving and reusable mathematical applications
+of Holonic Encoding/HNNs. Eros names union and formative composition at nested scopes, Athena
+the general wisdom/model ecology, and Hephaestus Automata the task-scoped application instances.
+Useful mathematical tools need not await general conversation or an official Millennium endpoint.
+
+| Increment | Concrete code/design work | Expected useful return |
+|---|---|---|
+| **Operator-scoped requests** | Factor the fixed example into a cohesive exact factorization capability using the existing preimage owner; retain field, shape, support, receiver and cost aperture | Different requested mathematical operators use the same construction machinery and return scoped values, families or executable factors |
+| **Shared constructions and changed receivers** | Keep typed returned factors; solve a new receiver, compose existing operator/recurrence words and preserve clocks/fibres | The complex-multiplication product core serves polynomial multiplication; a receiver requiring a discarded distinction returns its actual obstruction |
+| **Returned constraints and available material** | Compose actual source-qualified comparisons with contextual factorization, factor covers and existing material owners | New constraints refine applicability or enable a new construction, with meaningful before/after conduct and cost |
+| **Resident mathematical instances** | Bind a demonstrated automaton and receiver to the existing HNN owner, staged formation and rest; preserve the native family incorporation obligation | A native mathematical application continues through its actual successor without host semantic replay or a second engine |
+
+[definition] Begin with exact relations, bilinear/polynomial operations and indexed recurrence
+blocks. Add analytic window/jet and boundary-energy tasks through their existing source and
+remainder owners as the corresponding construction becomes usable. The ordered increments
+describe progressive integration; they do not prevent a useful exterior reference return before
+the native bridge is complete. The current position distinguishes those evidence scopes.
 
 [definition] The completed NCF, HNA, SKE, HNP, FT, RT and DB labels identify evidence families. Their finite returns
 are dependencies, not the next work simply because an old plan contains an imperative.
@@ -68,7 +93,7 @@ mathematical obligations. The position identifies what has already returned.
 | **5. Useful conversation and durable operation** | Continue prepared exposure through the public owner, evaluate held-out behavior, and persist every new encoding/material/pending cut | Useful English/code/mathematics at reported costs, or concrete observed failure directing the next repair; source-qualified continuation after restart |
 | **6. Shared modality and physical applications** | Bind existing optical/acoustic/source and world-tube receivers to the same conditional/encoding construction | Actual image/audio/interaction products and source-qualified cross-modal associations, with their physical/codec scope explicit |
 
-[definition] Phases 1–2 share the immediate implementation boundary: the read-only family
+[definition] For native coupled-wave integration, phases 1–2 share the immediate boundary: the read-only family
 comparison already exists, but its consuming condition/material transaction and complete source
 association do not. Do not restart implemented emission, normal producing comparison, coupled
 ownership or rest. Phase 3 must address the fixed-condition relation's collapse rather than
@@ -114,9 +139,9 @@ the source; another named theorem or a successful render does not settle them.
 
 [definition] The [bounded solver return](../../research/records/2026-09-11_HOLONIC_SOLVER_NAVIGATES_EXACT_GENERATOR_FACTORIZATIONS.md)
 supplies actual exact bilinear and recurrence-factorization results through standing owners.
-Its next native use belongs to Holonic Encoding above; it does not start a separate universal
-solver campaign or make AlphaTensor training a prerequisite. Analytic source/domain/remainder
-certificates remain part of a transcendental or RH solver target.
+Its next application use belongs to the Hephaestus increments above; native integration remains
+part of Holonic Encoding and the named HNN phases. AlphaTensor training is not a prerequisite.
+Analytic source/domain/remainder certificates remain part of a transcendental or RH solver target.
 
 <a id="paused-production-hna-campaign"></a>
 

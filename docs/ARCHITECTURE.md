@@ -33,8 +33,9 @@ the broader doctrine; the remainder of this guide describes the current executab
 |---|---|---|
 | **Holonics** | The mathematical framework and ontology, with executable applications | [Holon](../formal/elementary-holonics/ElementaryHolonics/Foundation/Holon.lean), [mathematics](canon/THE_MATHEMATICS_TABLET.md), [public Rust entry point](../crates/holonics/src/lib.rs) |
 | **HNN** | The Holonic Neural Network architecture and recurrent runtime | [native phase session](../crates/holonics-hna/src/native.rs), [constitutive ecology](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [full operator](../crates/holonic-engine/src/holonic_intelligence/full_operation.rs) |
-| **Athena** | A particular native model/ecology, its changing morphology and admitted capability domain | [Athena lifecycle](ATHENA.md) |
-| **Eros** | The union/composition and developmental phase that forms and refines Athena's reusable material | [native relation formation](../crates/holonic-engine/src/native_ecology/constitutive_fibre.rs) and [circulation](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [adjoint return](../crates/holonic-engine/src/holonic_intelligence/operative_return.rs) |
+| **Athena** | The general wisdom/model ecology, its available constructions, changing morphology and admitted capability domain | [Athena lifecycle](ATHENA.md) |
+| **Eros** | Union, composition and formative activity throughout the holonic organization, including nested constituents | [native relation formation](../crates/holonic-engine/src/native_ecology/constitutive_fibre.rs) and [circulation](../crates/holonic-engine/src/native_ecology/constitutive_fibre/circulation.rs); earlier [adjoint return](../crates/holonic-engine/src/holonic_intelligence/operative_return.rs) |
+| **Hephaestus Automata** | Operator-scoped mathematical applications and returned working constructions of Holonic Encoding/HNNs | [application design](HEPHAESTUS_AUTOMATA.md); existing [exact synthesis reference](../crates/holonic-engine/examples/generator_factorization.rs) |
 | **Soulkiller** | Independent model-intake, excitation and dismantling apparatus | [Soulkiller](SOULKILLER.md), [consumed-input boundary](../crates/holonic-engine/src/soulkiller/boundary.rs) |
 | **Applications/codecs** | Text, image, audio, files, user protocols and target runtimes | [CLI](../applications/holonics-workbench/src/cli.rs), [interoperability](INTEROPERABILITY.md) |
 
@@ -72,6 +73,12 @@ structure and current. The [expanded architecture diagrams](HNN_COMPOSITION.md#t
 show the local passage, developmental return, classical block arithmetic and Soulkiller's
 commuting realization/restriction maps. Their full assembly is a construction account, with the
 implemented bindings and remaining contextual attachments stated separately.
+
+[definition] Eros operates at nested scopes as well as the whole ecology; it is not restricted
+to a separate training program. Hephaestus Automata are application instances obtained by
+confining the general construction capability to a requested mathematical domain and receiver.
+“Holonic Solver” describes that activity. The current exact synthesis reference remains exterior
+apparatus; the product naming does not promote it to an already complete native HNN application.
 
 [definition] One operation consumes an occurrence and the contemporary ecology and returns
 an emission, trace and successor. The next operation uses that successor. Inference is a

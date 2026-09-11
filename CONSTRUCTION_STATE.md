@@ -1,11 +1,19 @@
 # Construction state
 
-**Currency:** September 11, 2026. **Current work:** exact Holonic Solver/factorization return.
+**Currency:** September 11, 2026. **Current work:** Hephaestus Automata application design.
 **Athena objective:** standing; useful Athena-alpha has not been attained. **Native runs:** paused
 while the requested mathematical/encoding handoff is organized. The active phases now have names;
 AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/plans/THE_ROADMAP.md)
 is the sole order and [the blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 names actual code changes and outcomes.
+
+[definition] The latest direction prioritizes elementary mathematical applications and names
+their task-scoped instances **Hephaestus Automata**. The
+[application design](docs/HEPHAESTUS_AUTOMATA.md) now specifies operator requests, reusable
+construction/receiver boundaries, catalytic morphology and the next code increments. Eros's
+union/formation is explicit at nested scopes; Athena remains the wider wisdom/model ecology.
+This is a design return: the existing factorization prototype remains the latest executed solver
+evidence. No new native operation, model or application interface was implemented in this pass.
 
 ## Immediate native boundary
 

@@ -58,6 +58,12 @@ transfer blocks. For HNN use, a factorization of a pure local operation does not
 preserve an entire mutable ecology: source, clock, emission, material and successor must cross
 the actual implementation map. Lean remains exterior to native conduct.
 
+[definition] **Hephaestus Automata** names the task-scoped application instances of this
+construction. The [design](HEPHAESTUS_AUTOMATA.md) connects reusable mathematical requests,
+shared constituent actions, changed receivers, catalytic morphology and resident handoff.
+An operator's application constraint does not create another learning law or an independent
+engine. Eros composes at each nested scope; Athena retains the wider available construction.
+
 [definition] The current [receiver edition](../research/papers/rendered/hnn-information-chemistry.pdf)
 uses the repository-local [receiver](../research/papers/source/packages/holonic-receiver/README.md)
 and [engraving](../research/papers/source/packages/holonic-engraving/README.md) packages. Its twenty-eight
