@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 11, 2026. **Current work:** comprehensive plan/source reconciliation.
+**Currency:** September 11, 2026. **Current work:** bounded Holonic toolkit/refinement return.
 **Athena objective:** standing; useful Athena-alpha has not been attained. **Native runs:** paused
 while the requested mathematical/encoding handoff is organized. The active phases now have names;
 AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -58,6 +58,16 @@ for the current prose/plan changes.
 These returned pieces remain dependencies rather than repeated implementation phases.
 
 ## Shared mathematical and modality position
+
+[proved-derived; formal-checked] The
+[threshold and energy-cut return](research/records/2026-09-11_THRESHOLD_REFINEMENT_AND_PARTITIONED_ENERGY_RETURN_HOLONIC_TOOLKITS.md)
+traces 1/8 to the strip/Gaussian clock, proves square closure of the actual seam set equivalent
+to RH, and supplies a sharp quadratic heat control. The checked ξ bound remains 1/8; the
+published external 1/20 bound in our coordinate is not imported into Lean. The new finite
+real/complex partition-energy law retains mixed terms and paired cut boundaries. Its exact
+four-cycle diffusion reference returns complete local/global energy ledgers. The Physics and
+new RH targets build successfully; no native model changed. These are useful dependencies for
+the existing encoding/family and fluid work, not five new endpoint prerequisites.
 
 [established-bounded; implemented-exact; formal-checked] The
 [π/e study](research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md)

@@ -10,6 +10,13 @@ named phases below. **AC0–AC5 remain historical responsibility labels**, not t
 six claims of capability. Source/API/wire names are preserved. The review itself authorizes no
 new cultivation run; the current native pause remains in force during this planning handoff.
 
+[definition] Brandon's subsequent bounded toolkit study returns
+[threshold-refinement and partitioned-energy laws](../../research/records/2026-09-11_THRESHOLD_REFINEMENT_AND_PARTITIONED_ENERGY_RETURN_HOLONIC_TOOLKITS.md).
+Use their retained mixed terms, actual clock maps and source-specific refinement requirements
+in the matching native/physical construction below. It does not create a prerequisite to solve
+RH or reopen five endpoint campaigns. A further mathematical branch follows its actual useful
+return and the latest direction; the named Athena code work remains the standing next application.
+
 ## All current plan documents and their roles
 
 | Plan | Role in construction | What to do with it |

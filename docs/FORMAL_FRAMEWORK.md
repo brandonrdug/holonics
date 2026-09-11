@@ -57,6 +57,15 @@ as it composes realization, continuation and navigation.
 
 ## Begin with a situated interaction
 
+[proved-derived; formal-checked] The
+[bounded toolkit return](../research/records/2026-09-11_THRESHOLD_REFINEMENT_AND_PARTITIONED_ENERGY_RETURN_HOLONIC_TOOLKITS.md)
+adds the phase-sensitive energy ledger for arbitrary finite cuts and an explicit cycle whose
+globally cancelling mixed terms remain locally measurable. `PartitionedHodgeEnergy` belongs to
+the Physics entry point. `RH/ThresholdRefinement` states the exact square-closure criterion on
+the actual seam set and checks a sharp polynomial heat witness; the ξ bound is unchanged.
+These are reusable source/receiver constructions, with the larger Hodge, fluid, spectral and
+arithmetic realizations retaining their own domains.
+
 [project-postulate] [The relevance hypothesis](canon/THE_RELEVANCE_HYPOTHESIS.md) is the shared
 foundation for what an interaction can change at a receiver. Its source reconstruction recovers
 Brandon's repeated framework directions and keeps class realization, causal admissibility,

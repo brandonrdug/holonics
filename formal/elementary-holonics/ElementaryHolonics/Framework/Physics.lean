@@ -2,6 +2,7 @@ import ElementaryHolonics.Framework.Dynamics
 import ElementaryHolonics.Physics.PhaseCarrier
 import ElementaryHolonics.Physics.CoupledIncidence
 import ElementaryHolonics.Physics.PortEnergyHeat
+import ElementaryHolonics.Physics.PartitionedHodgeEnergy
 import ElementaryHolonics.Physics.ScatteringWaveHeat
 import ElementaryHolonics.Physics.PhaseContactPassage
 import ElementaryHolonics.Physics.ReactionCurrent

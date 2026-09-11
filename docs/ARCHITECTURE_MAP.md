@@ -47,6 +47,7 @@ phase, geometry, physical boundaries and computation at their declared scopes.
 | Complex phase carrier, locked sheets and winding fibres | `Physics/PhaseCarrier.lean` | `Millennium.HolonicParametron` forwards the import |
 | Oriented incidence, coupled response and phase-bearing holons | `Physics/CoupledIncidence.lean` | `Millennium.HolonicComplexParametron` forwards the import |
 | Quadratic port dynamics and retained heat | `Physics/PortEnergyHeat.lean` | Chain-rule storage/source/dissipation balance; nonnegative conductance and explicit heat law |
+| Partitioned Hodge/complex energy and paired cut boundaries | `Physics/PartitionedHodgeEnergy.lean` | Arbitrary finite section mixed-energy law; exact four-cycle harmonic/exact and diffusion reference; imported by `Framework.Physics` |
 | Complex scattering power and attenuation return | `Physics/ScatteringWaveHeat.lean` | Two-port norm preservation and complementary heat; finite constitutive channel |
 | Phase-connected contact, reorientation and intensity defect | `Physics/PhaseContactPassage.lean` | Passive seam/heat and transported sum, gauge covariance, signed-cycle section and amplitude/intensity interpolation difference |
 | Biochemical reaction current and joint fold/occupancy receiver | `Physics/ReactionCurrent.lean` | Stoichiometric enzyme/substrate conservation, positive mass-action rates, equal-marginal binding separator and distinct labeled emissions from the same body return |
@@ -113,6 +114,12 @@ proves mass and logarithmic entropy returns for actual constitutive trajectories
 owners add no native learner or physical identity outside their stated hypotheses.
 
 ## Foundation and transport
+
+[definition] `RH/ThresholdRefinement.lean` derives square-closure equivalence on the actual
+seam-time set and the conditional halving limit. Its quadratic control is the existing polynomial
+heat operator, with explicit off-real roots below its sharp time. It proves no improved ξ bound.
+The [toolkit return](../research/records/2026-09-11_THRESHOLD_REFINEMENT_AND_PARTITIONED_ENERGY_RETURN_HOLONIC_TOOLKITS.md)
+connects this to partitioned energy, the stronger external bound and the physical/arithmetical routes.
 
 [definition] `Computation/GeneratorObservationScope.lean` supplies finite-observation ambiguity,
 exact identification within a declared multiplier family, and excitation of a previously blind

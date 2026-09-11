@@ -148,6 +148,8 @@ import ElementaryHolonics.RH.StripAverage
 import ElementaryHolonics.RH.DeBruijnIterate
 import ElementaryHolonics.RH.DeBruijnLimit
 import ElementaryHolonics.RH.DeBruijnSeal
+import ElementaryHolonics.RH.ThresholdRefinement
+import ElementaryHolonics.Physics.PartitionedHodgeEnergy
 import ElementaryHolonics.RH.CriticalChart
 import ElementaryHolonics.RH.FoldedSourceZeros
 import ElementaryHolonics.RH.LogDerivativeRemainder
