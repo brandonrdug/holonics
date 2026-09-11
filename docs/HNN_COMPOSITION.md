@@ -49,6 +49,15 @@ every datum. The recovered record names exact formal, resident, optical and acou
 
 ## The architecture as explicit passages
 
+[definition] A **Holonic Solver** navigates admitted representations of a source constraint,
+returns their executable action and receiver/decoder with its domain and fibre, and compares
+their complete work in a declared resource chart. The
+[first exact synthesis return](../research/records/2026-09-11_HOLONIC_SOLVER_NAVIGATES_EXACT_GENERATOR_FACTORIZATIONS.md)
+composes existing rational preimage solving with bilinear tensor certificates and π/e/Gamma
+transfer blocks. For HNN use, a factorization of a pure local operation does not automatically
+preserve an entire mutable ecology: source, clock, emission, material and successor must cross
+the actual implementation map. Lean remains exterior to native conduct.
+
 [definition] The current [receiver edition](../research/papers/rendered/hnn-information-chemistry.pdf)
 uses the repository-local [receiver](../research/papers/source/packages/holonic-receiver/README.md)
 and [engraving](../research/papers/source/packages/holonic-engraving/README.md) packages. Its twenty-eight

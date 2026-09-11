@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 11, 2026. **Current work:** bounded Holonic toolkit/refinement return.
+**Currency:** September 11, 2026. **Current work:** exact Holonic Solver/factorization return.
 **Athena objective:** standing; useful Athena-alpha has not been attained. **Native runs:** paused
 while the requested mathematical/encoding handoff is organized. The active phases now have names;
 AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -58,6 +58,15 @@ for the current prose/plan changes.
 These returned pieces remain dependencies rather than repeated implementation phases.
 
 ## Shared mathematical and modality position
+
+[established-bounded; implemented-exact; formal-checked] The
+[Holonic Solver return](research/records/2026-09-11_HOLONIC_SOLVER_NAVIGATES_EXACT_GENERATOR_FACTORIZATIONS.md)
+uses the existing rational preimage owner to check 696 bilinear supports and return 16 exact
+three-product complex-multiplication decompositions. It solves six alternative π/e block routes
+with the same action/clock and compiles a Gamma value/derivative shift block. The generic
+bilinear, matrix-block and jet certificates are checked in Lean. This is executed exterior
+algorithm synthesis, not a new native learner or a stronger RH bound. The Gamma classification
+prose is corrected; the encoding phase now names this construction's native reuse boundary.
 
 [proved-derived; formal-checked] The
 [threshold and energy-cut return](research/records/2026-09-11_THRESHOLD_REFINEMENT_AND_PARTITIONED_ENERGY_RETURN_HOLONIC_TOOLKITS.md)

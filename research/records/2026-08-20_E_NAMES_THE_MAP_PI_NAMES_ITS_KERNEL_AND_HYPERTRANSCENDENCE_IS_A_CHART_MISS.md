@@ -219,13 +219,19 @@ the alternating sign carrying the hand. Then:
 
 ### 5.2 Hypertranscendence is a chart miss, and it names a ladder
 
-A function is **hypertranscendental** when it satisfies no algebraic differential equation. Hölder
-(1886): Γ is hypertranscendental. Through the functional equation, so is ζ.
+A function is **hypertranscendental over a declared differential field** when it satisfies no
+nonzero algebraic differential equation over that field. Hölder's theorem gives this for Γ over
+ℂ(z); the corresponding differential-transcendence statement for ζ follows through its functional
+equation and the relevant closure properties. This is a differential-algebraic classification,
+not a statement that the function lacks a finite algorithmic description.
 
-The reading this record deposits: **hypertranscendence is not "more transcendental". It is the
-statement that the function is native to a chart other than the differential one, and that the
-transition to the differential chart is `σ = e^∂`, an infinite-order operator — which is precisely
-why no finite-order algebraic ODE exists.** Γ is *first order* in the difference chart.
+[interpretation] Γ has a compact first-order **shift** relation, Γ(z+1)=zΓ(z), despite its
+differential transcendence. This is a useful chart change for generator construction. The formal
+notation σ=exp(∂) does not prove Hölder's theorem, and a shift relation alone does not preclude
+a finite differential equation (the exponential satisfies both). Hypertranscendence does not
+universally assert a finite difference equation either. The
+[September 11 generator-factorization return](2026-09-11_HOLONIC_SOLVER_NAVIGATES_EXACT_GENERATOR_FACTORIZATIONS.md)
+retains the shift algebra, normalization/base fibre and executable finite blocks explicitly.
 
 This produces a ladder in which every rung is the same kind of step:
 
@@ -233,13 +239,13 @@ This produces a ladder in which every rung is the same kind of step:
 algebraic                  closed under field operations and roots
 transcendental             beyond the polynomial chart; needs an analytic one
 differentially algebraic   satisfies an algebraic ODE; has a differential Galois group (Kolchin)
-hypertranscendental        beyond the differential chart; native to the difference chart
+hypertranscendental        no algebraic ODE over the declared field; Γ still has its shift law
 ```
 
-The third rung is the one this body already works in: `hypergeometric_closure.rs` decides finiteness
-of a return group; `elementary_chart.rs` returns non-elementarity as a rank deficiency. **The fourth
-rung has no owner here, and difference Galois theory (Picard–Vessiot for difference equations) is
-its standing exterior name.**
+The third rung connects to the scoped `hypergeometric_closure.rs` and `elementary_chart.rs`
+owners. Existing modulus/shift material also bears on the fourth; the later correction below
+withdraws the original claim that it had no owner. A full difference-Galois classification keeps
+its declared difference field, constants and Picard–Vessiot hypotheses.
 
 ### 5.3 The circle diagram is one quantity, and smoothness is a receiver face
 

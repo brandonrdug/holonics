@@ -115,6 +115,15 @@ owners add no native learner or physical identity outside their stated hypothese
 
 ## Foundation and transport
 
+[definition] `Mathematics/GeneratorFactorization.lean` owns the arbitrary finite commutative-ring
+bilinear coefficient certificate, selected three-product identity, ratio-block matrix bridge,
+shift/coordinate commutator and first-jet product composition. `Framework.Computation` imports
+it. `crates/holonic-engine/examples/generator_factorization.rs` performs bounded exterior
+algorithm/route synthesis using `ExactRatMatrix::preimage_fibre` and its obstruction/verification
+owners; it is not a native HNN synthesizer. The
+[solver return](../research/records/2026-09-11_HOLONIC_SOLVER_NAVIGATES_EXACT_GENERATOR_FACTORIZATIONS.md)
+retains its grammar, exact factors, coefficient fibres and work scope.
+
 [definition] `RH/ThresholdRefinement.lean` derives square-closure equivalence on the actual
 seam-time set and the conditional halving limit. Its quadratic control is the existing polynomial
 heat operator, with explicit off-real roots below its sharp time. It proves no improved ξ bound.

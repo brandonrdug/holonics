@@ -88,7 +88,7 @@ returns into the matching authorized native work without replacing it with anoth
 | Construction order within each line | Actual source work | Return to the framework and application |
 |---|---|---|
 | **Conditioned difference and null families** | Compose receiver-family polarity, future closure, actual joint comparisons and changing chart/clock maps | Explicit class applicability, retained null fibres, recognition/separation and scoped probability/loss receivers |
-| **Holonic Encoding reference** | Compose the existing ratio-series blocks, analytic remainders and phase-sector receivers; reuse observable-form closure and clocked torus cuts | Executable generator/decoder comparisons with retained alternatives, phase and cost; reference for native phase 4 |
+| **Holonic Encoding and solver reference** | Compose ratio-series blocks, analytic remainders, phase-sector receivers and exact generator factorization; reuse observable-form closure and clocked torus cuts | Executable generator/decoder synthesis and comparison with retained alternatives, phase and cost; reference for native phase 4 |
 | **Holonic Fluid Dynamics: source then residual** | Instantiate the complex two-field Euler/NS source with pressure and every generated interaction; continue its Duhamel/memory representation | Finite-interval full/reduced comparison, unresolved feedback and quantitative remainder; actual failed terms guide revision |
 | **Geometry and physical realization** | Extend existing conformation, knot/torus, world-tube, optical/acoustic, circuit, quantum and stress-current constructions | Changing incidence, transported receivers and calibrated/constitutive consequences; physical force identities keep their own units/laws |
 | **Arithmetic regularity and spectral residues** | Use exact prime-wheel gap interiors, prime-power phase currents, receiver polarity and the existing folded ζ source/tails | Compare ordered residuals and their statistics through declared apertures; relate arithmetic and spectral receivers through actual explicit-formula maps |
@@ -111,6 +111,12 @@ names remain coordinates into its detailed contract. Failed pressure or tail est
 the source; another named theorem or a successful render does not settle them.
 
 ## Scope of deferred and completed work
+
+[definition] The [bounded solver return](../../research/records/2026-09-11_HOLONIC_SOLVER_NAVIGATES_EXACT_GENERATOR_FACTORIZATIONS.md)
+supplies actual exact bilinear and recurrence-factorization results through standing owners.
+Its next native use belongs to Holonic Encoding above; it does not start a separate universal
+solver campaign or make AlphaTensor training a prerequisite. Analytic source/domain/remainder
+certificates remain part of a transcendental or RH solver target.
 
 <a id="paused-production-hna-campaign"></a>
 

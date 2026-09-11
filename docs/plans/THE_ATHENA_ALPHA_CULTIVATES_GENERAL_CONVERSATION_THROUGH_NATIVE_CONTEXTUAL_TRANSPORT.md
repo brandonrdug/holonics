@@ -184,6 +184,15 @@ and receiver correspondence after the affected shape/domain changes.
 
 ## 4. Holonic Encoding and compressed continuation
 
+[definition] The [Holonic Solver return](../../research/records/2026-09-11_HOLONIC_SOLVER_NAVIGATES_EXACT_GENERATOR_FACTORIZATIONS.md)
+now provides an executed exterior method for this phase: specify the local action tensor or
+complete recurrence block, solve compatible factorizations through the existing exact preimage
+owner, verify the full coefficient/clock relation, and retain decoder and cost alternatives.
+The first native target is a pure admitted local segment. Port its productive construction or
+reuse through resident owners; do not insert the host search or Lean checker into inference.
+Before applying it to a developing segment, include its complete material/successor action in
+the target. This method does not choose the unresolved family incorporation semantics of phase 2.
+
 [definition] Holonic Encoding forms and reuses representations of transformations and receiver
 faces across modalities. BPE/path folding is a serial codec instance. Autoencoding supplies
 receiver reconstruction; π/e supplies exact generator/window examples; the Complex Parametron
