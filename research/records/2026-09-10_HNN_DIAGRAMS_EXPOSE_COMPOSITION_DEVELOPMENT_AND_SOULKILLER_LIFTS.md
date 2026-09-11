@@ -276,3 +276,9 @@ plan and continue exact polygonal volumes through the existing world-tube owners
 architecture, fluid and arithmetic derivations belong to the separate
 [equational/world-tube review](2026-09-10_EQUATIONAL_LAWS_AND_WORLD_TUBES_MAKE_ATHENAS_NEXT_PASSAGE_EXPLICIT.md).
 The ribbon width and shell offset are now explicitly identified as chosen geometric parameters.
+
+[definition] The subsequent [receiver-engraving return](2026-09-10_RECEIVER_ENGRAVING_RETAINS_COMPLEX_CURRENT_AND_SUPERSEDES_THE_PAINTED_ATLAS.md)
+supersedes the presentation renderer with the eleven-plate receiver edition. This twenty-plate
+composition atlas is preserved at `research/papers/rendered/hnn-composition-atlas.pdf` and
+`research/papers/source/papers/hnn-information-chemistry/composition-atlas.typ`; its prior checks and source
+examples retain their stated scope.

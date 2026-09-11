@@ -16,11 +16,14 @@ through the cross-ratio swing.
 
 ## 0. The identification that orders the rest
 
-A shadow is a projection. What survives one is **incidence and cross ratio**; every metric quantity
-dies. So the projective content of the positivity work is where its invariants live, and the
+[definition; source-inspected] September 10 scope correction: a receiver projection preserves
+collinearity and cross-ratio on a line where its restriction is a nondegenerate projectivity.
+It can coalesce source points, and metric quantities are not generally preserved; special
+restrictions can preserve some. The earlier blanket “every metric quantity dies” wording was
+too strong. The formal owner proves the bilinear identities below, not a general projection theorem. So the projective content of the positivity work is where its invariants live, and the
 identification is classical and exact:
 
-> **A symmetric form induces a polarity. Two classes are conjugate with respect to the quadric
+> **A nondegenerate symmetric form induces a projective polarity. Two classes are conjugate with respect to the quadric
 > `q = 0` exactly when `q(ω,w) = 0`. So the perp relation the reverse inequality is about IS
 > conjugacy with respect to a conic — and the swing is its involution, not a neighbouring topic.**
 
@@ -33,7 +36,8 @@ theorem theSwingExchangesTheNullParameters (t : R) : Swing.swing (0 : R) t = -t
 theorem theAnchorAndTheDirectionAreHarmonic (t : R) : 2 * (0 : R) - t - (-t) = 0
 ```
 
-The two parameters at which the line meets the null cone are `±t₀`; the swing about `ω` exchanges
+Over the real numbers, with opposite nonzero signs on the conjugate directions, the null
+parameters are `±t₀`; the swing about `ω` exchanges
 them; and `harmonicConjugate`'s denominator vanishes there, which is the projective statement that
 the harmonic conjugate of the anchor is the point at infinity. **Cross ratio `−1`, and the
 configuration is the optical one: a class, a direction, and the two rays.** Where the form pays on

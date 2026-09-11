@@ -1,0 +1,7 @@
+[package]
+name = "holonic-engraving"
+version = "0.1.0"
+entrypoint = "lib.typ"
+authors = ["Brandon Duggan / Holonics"]
+description = "Vector engraving of declared receiver packets on white paper or black phase fields"
+compiler = "0.15.1"

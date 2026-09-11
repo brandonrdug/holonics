@@ -1,0 +1,7 @@
+[package]
+name = "holonic-receiver"
+version = "0.1.0"
+entrypoint = "lib.typ"
+authors = ["Brandon Duggan / Holonics"]
+description = "Receiver maps and exact exterior packet compilation for Holonic scientific figures"
+compiler = "0.15.1"

@@ -4,16 +4,18 @@ import ElementaryHolonics.Millennium.Swing
 /-!
 # Shadows of holonic interactions
 
-A shadow is a projection.  What survives one is incidence and cross ratio; what dies is every
-metric quantity.  This file is the projective reading of the two lines the development is focused
+A shadow is a receiver projection. On a line where the map restricts to a nondegenerate
+projectivity, collinearity and cross ratio survive. General projection can coalesce distinct
+source points; metric quantities are not generally preserved, although special restrictions
+can preserve some of them.  This file is the projective reading of the two lines the development is focused
 on, and its point is that the move the framework calls **the swing** — harmonic conjugation — is not
 a neighbour of the positivity work but its primitive.
 
-**The classical identification, and it is exact.**  A symmetric form `q` induces a polarity: each
+**The classical identification, and it is exact.**  A nondegenerate symmetric form `q` induces a projective polarity: each
 class `ω` has a polar `ω^⊥`.  Two classes are **conjugate** with respect to the quadric `q = 0`
 exactly when `q(ω,w) = 0` — so *the perp relation the reverse inequality is about IS conjugacy with
 respect to a conic*.  Along the line `ω + t·w` the cross term drops out, the form is even in `t`, and
-the two parameters at which the line meets the null cone are `±t₀`: a pair exchanged by the swing
+over the real numbers with opposite nonzero signs the null parameters are `±t₀`: a pair exchanged by the swing
 about `ω`, whose harmonic conjugate is the point at infinity.  **The cross ratio is `−1` and the
 configuration is the optical one — a class, a direction, and the two rays.**
 
@@ -38,7 +40,9 @@ Four steps run on that reading.
 a rank-four lattice.  No curve, divisor, cycle class map, Frobenius or L-function appears, and the
 classical inputs — that an ample class supplies a positive form, and that the archimedean estimate
 holds — are imported, cited, and not proved here.  Every `theorem` is discharged and none depends on
-`sorryAx`.
+`sorryAx`. The ring-level conjugacy identities below also apply to degenerate forms. The
+positive-square theorem assumes a supplied null parameter; it does not construct roots in an
+arbitrary ordered ring. No general projective-projection theorem is implemented in this file.
 -/
 
 namespace Soma.Holonics.Millennium.Shadows

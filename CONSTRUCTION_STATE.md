@@ -27,6 +27,15 @@ The [relevance canon](docs/canon/THE_RELEVANCE_HYPOTHESIS.md) connects the actua
 force-sector, molecular, knot, circuit and fluid sources. The repaired source prose distinguishes
 finite tolerance from exact invisibility and topology change from loss of smooth continuation.
 
+## September 10 receiver engraving and complex-current presentation
+
+[established-bounded; source-inspected; computational-witness] The [receiver/engraving return](research/records/2026-09-10_RECEIVER_ENGRAVING_RETAINS_COMPLEX_CURRENT_AND_SUPERSEDES_THE_PAINTED_ATLAS.md)
+implements two local Typst packages and a shared exact-source SVG packet. The current eleven-plate
+presentation supersedes the painted rendering layer; the twenty-plate composition atlas remains
+a companion. Exact C³ flow/curl, receiver-rank, Lorentz/Wigner, Schwarzschild, hatch-flux and linked-contact
+friction/heat/complex-propagation controls return. Source comments about projective shadows are narrowed to their proved scope;
+no theorem body or native cultivation operation changes. AC implementation remains paused.
+
 ## September 10 equational and world-tube review
 
 [established-bounded; source-inspected; computational-witness] The [synthesis and exact witnesses](research/records/2026-09-10_EQUATIONAL_LAWS_AND_WORLD_TUBES_MAKE_ATHENAS_NEXT_PASSAGE_EXPLICIT.md)
@@ -45,7 +54,8 @@ witnesses expose the local source stencil's loss of larger ordering and separate
 from future agreement. This is an architecture review; native implementation and AC order are unchanged.
 
 [established-bounded; source-inspected; computational-witness] The [diagrammatic architecture return](research/records/2026-09-10_HNN_DIAGRAMS_EXPOSE_COMPOSITION_DEVELOPMENT_AND_SOULKILLER_LIFTS.md)
-now has twenty [Typst/Fletcher visual plates](research/papers/rendered/hnn-information-chemistry.pdf).
+retains twenty [Typst/Fletcher composition plates](research/papers/rendered/hnn-composition-atlas.pdf),
+with the current receiver edition linked above.
 Closed circulation, source-addressed manifold differences and intersecting-volume flux extend the
 color/covariance work. Möbius bridges retain orientation transport; exact incidence distinguishes
 the orientation cover from the surrounding closed shell. Exterior witnesses and the rendered

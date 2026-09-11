@@ -1,0 +1,6664 @@
+{
+  "sphere_stipple": {
+    "source": {
+      "name": "sphere_stipple",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "0",
+        "1"
+      ]
+    },
+    "vertices": 170,
+    "faces": 336,
+    "marks": 3113,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "0",
+      "1"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "3",
+          "5"
+        ],
+        [
+          "-4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "up": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "12"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 3101,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "103",
+      "928867423145164800"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "stipple"
+  },
+  "sphere_mono": {
+    "source": {
+      "name": "sphere_mono",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "0",
+        "1"
+      ]
+    },
+    "vertices": 170,
+    "faces": 336,
+    "marks": 1871,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "0",
+      "1"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "3",
+          "5"
+        ],
+        [
+          "-4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "up": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "10"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 2178,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "467",
+      "4210865651591413760"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "mono"
+  },
+  "sphere_phase": {
+    "source": {
+      "name": "sphere_phase",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "0",
+        "1"
+      ]
+    },
+    "vertices": 170,
+    "faces": 336,
+    "marks": 1907,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "0",
+      "1"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "3",
+          "5"
+        ],
+        [
+          "-4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "up": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "8"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 2053,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "467",
+      "4210865651591413760"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "phase"
+  },
+  "torus_phase": {
+    "source": {
+      "name": "torus_phase",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "0",
+        "1"
+      ]
+    },
+    "vertices": 384,
+    "faces": 768,
+    "marks": 4221,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "0",
+      "1"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "3",
+          "5"
+        ],
+        [
+          "-4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "up": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "8"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 4250,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "387",
+      "1745144855606067200"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "phase"
+  },
+  "torus_mono": {
+    "source": {
+      "name": "torus_mono",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "0",
+        "1"
+      ]
+    },
+    "vertices": 384,
+    "faces": 768,
+    "marks": 3720,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "0",
+      "1"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "3",
+          "5"
+        ],
+        [
+          "-4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "up": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "8"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 3512,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "387",
+      "1745144855606067200"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "mono"
+  },
+  "shorts_phase": {
+    "source": {
+      "name": "shorts_phase",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "0",
+        "1"
+      ]
+    },
+    "vertices": 231,
+    "faces": 384,
+    "marks": 2384,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "0",
+      "1"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "3",
+          "5"
+        ],
+        [
+          "-4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "up": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "12"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 536,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "35058013",
+      "315809857319775240192000"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "phase"
+  },
+  "shorts_mono": {
+    "source": {
+      "name": "shorts_mono",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "0",
+        "1"
+      ]
+    },
+    "vertices": 231,
+    "faces": 384,
+    "marks": 2007,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "0",
+      "1"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "3",
+          "5"
+        ],
+        [
+          "-4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "up": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "12"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 536,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "35058013",
+      "315809857319775240192000"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "mono"
+  },
+  "mobius_phase": {
+    "source": {
+      "name": "mobius_phase",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "0",
+        "1"
+      ]
+    },
+    "vertices": 156,
+    "faces": 256,
+    "marks": 1660,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "0",
+      "1"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "3",
+          "5"
+        ],
+        [
+          "-4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "up": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "12"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 259,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "35058013",
+      "315809857319775240192000"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "phase"
+  },
+  "annulus_mono": {
+    "source": {
+      "name": "annulus_mono",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "0",
+        "1"
+      ]
+    },
+    "vertices": 156,
+    "faces": 256,
+    "marks": 1336,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "0",
+      "1"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "3",
+          "5"
+        ],
+        [
+          "-4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "up": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "12"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 274,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "1411",
+      "12722668947321651200"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "mono"
+  },
+  "torus_entropy": {
+    "source": {
+      "name": "torus_entropy",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "0",
+        "1"
+      ]
+    },
+    "vertices": 384,
+    "faces": 768,
+    "marks": 5258,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "0",
+      "1"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "3",
+          "5"
+        ],
+        [
+          "-4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "up": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "32"
+    ],
+    "potential": "entropy",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 5460,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "120937380715222615072358506232507025242178975526460941572583",
+      "101817441220192285748364533610285791807944140237946078250930207496"
+    ],
+    "decimal_coordinate_error": [
+      "2440359101025411108823004641357850887233263031093732228005413614350013562151505509103488474455264580533313505809634115769",
+      "10994044652904116309974239890410438422317605214375667552856721508384292759730901949463139316788072453686154713341939858848633763083059200"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "phase"
+  },
+  "torus_pinhole": {
+    "source": {
+      "name": "torus_pinhole",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "0",
+        "1"
+      ]
+    },
+    "vertices": 384,
+    "faces": 768,
+    "marks": 3567,
+    "projection": "pinhole",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "0",
+      "1"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "3",
+          "5"
+        ],
+        [
+          "-4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "up": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "8",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "8"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 4885,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "4993",
+      "11255621368705712128"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "phase"
+  },
+  "flow_0_1": {
+    "source": {
+      "name": "flow_0_1",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "0",
+        "1"
+      ]
+    },
+    "vertices": 384,
+    "faces": 768,
+    "marks": 3184,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "0",
+      "1"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "up": [
+        [
+          "-3",
+          "5"
+        ],
+        [
+          "4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "6"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 3190,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "223",
+      "1004865666857041920"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "phase"
+  },
+  "flow_1_2": {
+    "source": {
+      "name": "flow_1_2",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "0",
+        "1"
+      ]
+    },
+    "vertices": 384,
+    "faces": 768,
+    "marks": 4599,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "1",
+      "2"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "up": [
+        [
+          "-3",
+          "5"
+        ],
+        [
+          "4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "6"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 4666,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "2279",
+      "5135159106365030400"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "phase"
+  },
+  "flow_1_1": {
+    "source": {
+      "name": "flow_1_1",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "0",
+        "1"
+      ]
+    },
+    "vertices": 384,
+    "faces": 768,
+    "marks": 6366,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "1",
+      "1"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "up": [
+        [
+          "-3",
+          "5"
+        ],
+        [
+          "4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "6"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 6408,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [
+      48,
+      49,
+      432,
+      433
+    ],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "281",
+      "633318697598976000"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "phase"
+  },
+  "receiver_real": {
+    "source": {
+      "name": "receiver_real",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "0",
+        "1"
+      ]
+    },
+    "vertices": 384,
+    "faces": 768,
+    "marks": 6366,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "1",
+      "1"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "up": [
+        [
+          "-3",
+          "5"
+        ],
+        [
+          "4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "6"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 6408,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [
+      48,
+      49,
+      432,
+      433
+    ],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "281",
+      "633318697598976000"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "phase"
+  },
+  "receiver_turned": {
+    "source": {
+      "name": "receiver_turned",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "0",
+        "1"
+      ]
+    },
+    "vertices": 384,
+    "faces": 768,
+    "marks": 5659,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "3",
+        "5"
+      ],
+      [
+        "4",
+        "5"
+      ]
+    ],
+    "tau": [
+      "1",
+      "1"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "up": [
+        [
+          "-3",
+          "5"
+        ],
+        [
+          "4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "6"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 7155,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "1343",
+      "3025855999639552000"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "phase"
+  },
+  "near_fold": {
+    "source": {
+      "name": "near_fold",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "0",
+        "1"
+      ]
+    },
+    "vertices": 384,
+    "faces": 768,
+    "marks": 5287,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "7",
+      "5"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "up": [
+        [
+          "-3",
+          "5"
+        ],
+        [
+          "4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "4"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 5273,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "126673",
+      "142936511610880000000"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "phase"
+  },
+  "reopened": {
+    "source": {
+      "name": "reopened",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "0",
+        "1"
+      ]
+    },
+    "vertices": 384,
+    "faces": 768,
+    "marks": 5006,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "3",
+        "5"
+      ],
+      [
+        "4",
+        "5"
+      ]
+    ],
+    "tau": [
+      "7",
+      "5"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "up": [
+        [
+          "-3",
+          "5"
+        ],
+        [
+          "4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "4"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 5555,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "1851",
+      "2093470139285504000"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "phase"
+  },
+  "curl_1_2": {
+    "source": {
+      "name": "curl_1_2",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "1",
+            "2"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "-1",
+            "2",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "-1",
+            "2"
+          ],
+          [
+            "1",
+            "2",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "1",
+        "2"
+      ]
+    },
+    "vertices": 384,
+    "faces": 768,
+    "marks": 4524,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "7",
+      "5"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "up": [
+        [
+          "-3",
+          "5"
+        ],
+        [
+          "4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "32",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "4"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 7114,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "9157",
+      "10316057896445542400"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "phase"
+  },
+  "curl_1_1": {
+    "source": {
+      "name": "curl_1_1",
+      "generator": [
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ],
+          [
+            "-1",
+            "1",
+            "1",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1",
+            "-1",
+            "1"
+          ],
+          [
+            "1",
+            "1",
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1",
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "swirl": [
+        "1",
+        "1"
+      ]
+    },
+    "vertices": 384,
+    "faces": 768,
+    "marks": 6325,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "7",
+      "5"
+    ],
+    "receiver": {
+      "right": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "up": [
+        [
+          "-3",
+          "5"
+        ],
+        [
+          "4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "32",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ],
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "4"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 9809,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "285109",
+      "321057395310592000000"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black",
+    "style": "phase"
+  },
+  "friction_1_1": {
+    "source": {
+      "kind": "affine-by-region",
+      "a": [
+        "1",
+        "1"
+      ],
+      "clock": "t=-log(a)/2",
+      "regions": [
+        {
+          "start": 0,
+          "end": 96,
+          "row": [
+            [
+              [
+                "-1",
+                "2"
+              ],
+              [
+                "-27",
+                "25"
+              ]
+            ],
+            [
+              [
+                "-1",
+                "1"
+              ],
+              [
+                "47",
+                "50"
+              ]
+            ],
+            [
+              [
+                "-1",
+                "1"
+              ],
+              [
+                "-2",
+                "5"
+              ]
+            ]
+          ],
+          "offset": [
+            [
+              "9",
+              "8"
+            ],
+            [
+              "243",
+              "100"
+            ]
+          ]
+        },
+        {
+          "start": 96,
+          "end": 192,
+          "row": [
+            [
+              [
+                "1",
+                "2"
+              ],
+              [
+                "27",
+                "25"
+              ]
+            ],
+            [
+              [
+                "1",
+                "1"
+              ],
+              [
+                "-47",
+                "50"
+              ]
+            ],
+            [
+              [
+                "1",
+                "1"
+              ],
+              [
+                "2",
+                "5"
+              ]
+            ]
+          ],
+          "offset": [
+            [
+              "-9",
+              "8"
+            ],
+            [
+              "-243",
+              "100"
+            ]
+          ]
+        }
+      ],
+      "contact_center": [
+        [
+          "9",
+          "4"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "kinetic": [
+        "2",
+        "1"
+      ],
+      "heat": [
+        "0",
+        "1"
+      ]
+    },
+    "style": "phase",
+    "vertices": 192,
+    "faces": 384,
+    "marks": 1941,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "1",
+      "1"
+    ],
+    "receiver": {
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "right": [
+        [
+          "3",
+          "5"
+        ],
+        [
+          "-4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "up": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "32",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "8"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 2903,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "107",
+      "484136959942328320"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black"
+  },
+  "friction_1_2": {
+    "source": {
+      "kind": "affine-by-region",
+      "a": [
+        "1",
+        "2"
+      ],
+      "clock": "t=-log(a)/2",
+      "regions": [
+        {
+          "start": 0,
+          "end": 96,
+          "row": [
+            [
+              [
+                "-1",
+                "2"
+              ],
+              [
+                "-27",
+                "50"
+              ]
+            ],
+            [
+              [
+                "-1",
+                "2"
+              ],
+              [
+                "31",
+                "50"
+              ]
+            ],
+            [
+              [
+                "-1",
+                "2"
+              ],
+              [
+                "-2",
+                "25"
+              ]
+            ]
+          ],
+          "offset": [
+            [
+              "9",
+              "8"
+            ],
+            [
+              "139",
+              "100"
+            ]
+          ]
+        },
+        {
+          "start": 96,
+          "end": 192,
+          "row": [
+            [
+              [
+                "1",
+                "2"
+              ],
+              [
+                "27",
+                "50"
+              ]
+            ],
+            [
+              [
+                "1",
+                "2"
+              ],
+              [
+                "-31",
+                "50"
+              ]
+            ],
+            [
+              [
+                "1",
+                "2"
+              ],
+              [
+                "2",
+                "25"
+              ]
+            ]
+          ],
+          "offset": [
+            [
+              "-9",
+              "8"
+            ],
+            [
+              "-139",
+              "100"
+            ]
+          ]
+        }
+      ],
+      "contact_center": [
+        [
+          "9",
+          "4"
+        ],
+        [
+          "-1",
+          "4"
+        ],
+        [
+          "1",
+          "4"
+        ]
+      ],
+      "kinetic": [
+        "1",
+        "2"
+      ],
+      "heat": [
+        "3",
+        "2"
+      ]
+    },
+    "style": "phase",
+    "vertices": 192,
+    "faces": 384,
+    "marks": 1209,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "1",
+      "2"
+    ],
+    "receiver": {
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "right": [
+        [
+          "3",
+          "5"
+        ],
+        [
+          "-4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "up": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "32",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "8"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 1603,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "671",
+      "3025855999639552000"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black"
+  },
+  "friction_1_8": {
+    "source": {
+      "kind": "affine-by-region",
+      "a": [
+        "1",
+        "8"
+      ],
+      "clock": "t=-log(a)/2",
+      "regions": [
+        {
+          "start": 0,
+          "end": 96,
+          "row": [
+            [
+              [
+                "-1",
+                "2"
+              ],
+              [
+                "-27",
+                "200"
+              ]
+            ],
+            [
+              [
+                "-1",
+                "8"
+              ],
+              [
+                "19",
+                "50"
+              ]
+            ],
+            [
+              [
+                "-1",
+                "8"
+              ],
+              [
+                "4",
+                "25"
+              ]
+            ]
+          ],
+          "offset": [
+            [
+              "9",
+              "8"
+            ],
+            [
+              "2",
+              "5"
+            ]
+          ]
+        },
+        {
+          "start": 96,
+          "end": 192,
+          "row": [
+            [
+              [
+                "1",
+                "2"
+              ],
+              [
+                "27",
+                "200"
+              ]
+            ],
+            [
+              [
+                "1",
+                "8"
+              ],
+              [
+                "-19",
+                "50"
+              ]
+            ],
+            [
+              [
+                "1",
+                "8"
+              ],
+              [
+                "-4",
+                "25"
+              ]
+            ]
+          ],
+          "offset": [
+            [
+              "-9",
+              "8"
+            ],
+            [
+              "-2",
+              "5"
+            ]
+          ]
+        }
+      ],
+      "contact_center": [
+        [
+          "9",
+          "4"
+        ],
+        [
+          "-7",
+          "16"
+        ],
+        [
+          "7",
+          "16"
+        ]
+      ],
+      "kinetic": [
+        "1",
+        "32"
+      ],
+      "heat": [
+        "63",
+        "32"
+      ]
+    },
+    "style": "phase",
+    "vertices": 192,
+    "faces": 384,
+    "marks": 761,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "1",
+      "8"
+    ],
+    "receiver": {
+      "origin": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "right": [
+        [
+          "3",
+          "5"
+        ],
+        [
+          "-4",
+          "5"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "up": [
+        [
+          "12",
+          "25"
+        ],
+        [
+          "9",
+          "25"
+        ],
+        [
+          "4",
+          "5"
+        ]
+      ],
+      "view": [
+        [
+          "-16",
+          "25"
+        ],
+        [
+          "-12",
+          "25"
+        ],
+        [
+          "3",
+          "5"
+        ]
+      ],
+      "distance": [
+        "32",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "1"
+    ],
+    "hatch_step": [
+      "1",
+      "8"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 914,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "77",
+      "349028971121213440"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black"
+  },
+  "contact_255_256": {
+    "source": {
+      "kind": "vertex-values",
+      "a": [
+        "255",
+        "256"
+      ],
+      "clock": "t=-log(a)/2",
+      "values": [
+        [
+          [
+            "255",
+            "1024"
+          ],
+          [
+            "65791",
+            "262144"
+          ]
+        ],
+        [
+          [
+            "63314346786313467905",
+            "64563604257983430656"
+          ],
+          [
+            "510510797542609812827",
+            "516508834063867445248"
+          ]
+        ],
+        [
+          [
+            "496583131858733055",
+            "64563604257983430656"
+          ],
+          [
+            "3988284683369677477",
+            "516508834063867445248"
+          ]
+        ],
+        [
+          [
+            "3889628819748865",
+            "64563604257983430656"
+          ],
+          [
+            "31198488232361307",
+            "516508834063867445248"
+          ]
+        ],
+        [
+          [
+            "496583131858733055",
+            "64563604257983430656"
+          ],
+          [
+            "3988284683369677477",
+            "516508834063867445248"
+          ]
+        ]
+      ],
+      "carrier_vertices": [
+        [
+          [
+            "9",
+            "4"
+          ],
+          [
+            "-1",
+            "512"
+          ],
+          [
+            "1",
+            "512"
+          ]
+        ],
+        [
+          [
+            "9",
+            "4"
+          ],
+          [
+            "-129",
+            "512"
+          ],
+          [
+            "-127",
+            "512"
+          ]
+        ],
+        [
+          [
+            "9",
+            "4"
+          ],
+          [
+            "127",
+            "512"
+          ],
+          [
+            "-127",
+            "512"
+          ]
+        ],
+        [
+          [
+            "9",
+            "4"
+          ],
+          [
+            "127",
+            "512"
+          ],
+          [
+            "129",
+            "512"
+          ]
+        ],
+        [
+          [
+            "9",
+            "4"
+          ],
+          [
+            "-129",
+            "512"
+          ],
+          [
+            "129",
+            "512"
+          ]
+        ]
+      ],
+      "carrier_faces": [
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          2,
+          3
+        ],
+        [
+          0,
+          3,
+          4
+        ],
+        [
+          0,
+          4,
+          1
+        ]
+      ],
+      "boundary_adjacency": [
+        [
+          1,
+          3
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "theta": [
+        [
+          "570860464586009941",
+          "36893488147419103232"
+        ],
+        [
+          "2231375499973291",
+          "36893488147419103232"
+        ],
+        [
+          "11636810624341",
+          "36893488147419103232"
+        ],
+        [
+          "2231375499973291",
+          "36893488147419103232"
+        ]
+      ],
+      "impulse": [
+        [
+          "2001931811481192447",
+          "516508834063867445248"
+        ],
+        [
+          "7820026406762497",
+          "516508834063867445248"
+        ],
+        [
+          "40768767264767",
+          "516508834063867445248"
+        ],
+        [
+          "7820026406762497",
+          "516508834063867445248"
+        ]
+      ],
+      "impulse_rate": [
+        [
+          "63314346786313467905",
+          "32281802128991715328"
+        ],
+        [
+          "496583131858733055",
+          "32281802128991715328"
+        ],
+        [
+          "3889628819748865",
+          "32281802128991715328"
+        ],
+        [
+          "496583131858733055",
+          "32281802128991715328"
+        ]
+      ],
+      "rate": [
+        "4",
+        "1"
+      ],
+      "patch_area": [
+        "1",
+        "4"
+      ],
+      "node_aperture": [
+        "1",
+        "16"
+      ]
+    },
+    "style": "phase",
+    "vertices": 5,
+    "faces": 4,
+    "marks": 1262,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "255",
+      "256"
+    ],
+    "receiver": {
+      "origin": [
+        [
+          "9",
+          "4"
+        ],
+        [
+          "-1",
+          "512"
+        ],
+        [
+          "1",
+          "512"
+        ]
+      ],
+      "right": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "1",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "up": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "1",
+          "1"
+        ]
+      ],
+      "view": [
+        [
+          "1",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "16"
+    ],
+    "hatch_step": [
+      "1",
+      "256"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 0,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "300328891067102371735964057915576643109985980706123081818055087467491183423582531187966923",
+      "5424862365397614357117835421077390942247594354140349346542546458095310277591638127669321979788536154423296"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black"
+  },
+  "contact_15_16": {
+    "source": {
+      "kind": "vertex-values",
+      "a": [
+        "15",
+        "16"
+      ],
+      "clock": "t=-log(a)/2",
+      "values": [
+        [
+          [
+            "15",
+            "64"
+          ],
+          [
+            "271",
+            "1024"
+          ]
+        ],
+        [
+          [
+            "10975419265",
+            "15032385536"
+          ],
+          [
+            "100671560667",
+            "120259084288"
+          ]
+        ],
+        [
+          [
+            "1463641215",
+            "15032385536"
+          ],
+          [
+            "12521825317",
+            "120259084288"
+          ]
+        ],
+        [
+          [
+            "190159745",
+            "15032385536"
+          ],
+          [
+            "1590303707",
+            "120259084288"
+          ]
+        ],
+        [
+          [
+            "1463641215",
+            "15032385536"
+          ],
+          [
+            "12521825317",
+            "120259084288"
+          ]
+        ]
+      ],
+      "carrier_vertices": [
+        [
+          [
+            "9",
+            "4"
+          ],
+          [
+            "-1",
+            "32"
+          ],
+          [
+            "1",
+            "32"
+          ]
+        ],
+        [
+          [
+            "9",
+            "4"
+          ],
+          [
+            "-9",
+            "32"
+          ],
+          [
+            "-7",
+            "32"
+          ]
+        ],
+        [
+          [
+            "9",
+            "4"
+          ],
+          [
+            "7",
+            "32"
+          ],
+          [
+            "-7",
+            "32"
+          ]
+        ],
+        [
+          [
+            "9",
+            "4"
+          ],
+          [
+            "7",
+            "32"
+          ],
+          [
+            "9",
+            "32"
+          ]
+        ],
+        [
+          [
+            "9",
+            "4"
+          ],
+          [
+            "-9",
+            "32"
+          ],
+          [
+            "9",
+            "32"
+          ]
+        ]
+      ],
+      "carrier_faces": [
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          2,
+          3
+        ],
+        [
+          0,
+          3,
+          4
+        ],
+        [
+          0,
+          4,
+          1
+        ]
+      ],
+      "boundary_adjacency": [
+        [
+          1,
+          3
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "theta": [
+        [
+          "1838315221",
+          "8589934592"
+        ],
+        [
+          "116099371",
+          "8589934592"
+        ],
+        [
+          "9860821",
+          "8589934592"
+        ],
+        [
+          "116099371",
+          "8589934592"
+        ]
+      ],
+      "impulse": [
+        [
+          "6650291327",
+          "120259084288"
+        ],
+        [
+          "415406977",
+          "120259084288"
+        ],
+        [
+          "35087487",
+          "120259084288"
+        ],
+        [
+          "415406977",
+          "120259084288"
+        ]
+      ],
+      "impulse_rate": [
+        [
+          "10975419265",
+          "7516192768"
+        ],
+        [
+          "1463641215",
+          "7516192768"
+        ],
+        [
+          "190159745",
+          "7516192768"
+        ],
+        [
+          "1463641215",
+          "7516192768"
+        ]
+      ],
+      "rate": [
+        "4",
+        "1"
+      ],
+      "patch_area": [
+        "1",
+        "4"
+      ],
+      "node_aperture": [
+        "1",
+        "16"
+      ]
+    },
+    "style": "phase",
+    "vertices": 5,
+    "faces": 4,
+    "marks": 944,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "15",
+      "16"
+    ],
+    "receiver": {
+      "origin": [
+        [
+          "9",
+          "4"
+        ],
+        [
+          "-1",
+          "32"
+        ],
+        [
+          "1",
+          "32"
+        ]
+      ],
+      "right": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "1",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "up": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "1",
+          "1"
+        ]
+      ],
+      "view": [
+        [
+          "1",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "16"
+    ],
+    "hatch_step": [
+      "1",
+      "256"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 0,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "36209301461220655689635080593701608651082969",
+      "652597629674243751734224133951718629787115449934363207139328"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black"
+  },
+  "contact_1_2": {
+    "source": {
+      "kind": "vertex-values",
+      "a": [
+        "1",
+        "2"
+      ],
+      "clock": "t=-log(a)/2",
+      "values": [
+        [
+          [
+            "1",
+            "8"
+          ],
+          [
+            "5",
+            "16"
+          ]
+        ],
+        [
+          [
+            "179",
+            "2688"
+          ],
+          [
+            "7921",
+            "21504"
+          ]
+        ],
+        [
+          [
+            "127",
+            "896"
+          ],
+          [
+            "2213",
+            "7168"
+          ]
+        ],
+        [
+          [
+            "403",
+            "2688"
+          ],
+          [
+            "5681",
+            "21504"
+          ]
+        ],
+        [
+          [
+            "127",
+            "896"
+          ],
+          [
+            "2213",
+            "7168"
+          ]
+        ]
+      ],
+      "carrier_vertices": [
+        [
+          [
+            "9",
+            "4"
+          ],
+          [
+            "-1",
+            "4"
+          ],
+          [
+            "1",
+            "4"
+          ]
+        ],
+        [
+          [
+            "9",
+            "4"
+          ],
+          [
+            "-1",
+            "2"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "9",
+            "4"
+          ],
+          [
+            "0",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "9",
+            "4"
+          ],
+          [
+            "0",
+            "1"
+          ],
+          [
+            "1",
+            "2"
+          ]
+        ],
+        [
+          [
+            "9",
+            "4"
+          ],
+          [
+            "-1",
+            "2"
+          ],
+          [
+            "1",
+            "2"
+          ]
+        ]
+      ],
+      "carrier_faces": [
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          0,
+          2,
+          3
+        ],
+        [
+          0,
+          3,
+          4
+        ],
+        [
+          0,
+          4,
+          1
+        ]
+      ],
+      "boundary_adjacency": [
+        [
+          1,
+          3
+        ],
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          3
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "theta": [
+        [
+          "309",
+          "512"
+        ],
+        [
+          "171",
+          "512"
+        ],
+        [
+          "117",
+          "512"
+        ],
+        [
+          "171",
+          "512"
+        ]
+      ],
+      "impulse": [
+        [
+          "4637",
+          "21504"
+        ],
+        [
+          "769",
+          "7168"
+        ],
+        [
+          "1501",
+          "21504"
+        ],
+        [
+          "769",
+          "7168"
+        ]
+      ],
+      "impulse_rate": [
+        [
+          "179",
+          "1344"
+        ],
+        [
+          "127",
+          "448"
+        ],
+        [
+          "403",
+          "1344"
+        ],
+        [
+          "127",
+          "448"
+        ]
+      ],
+      "rate": [
+        "4",
+        "1"
+      ],
+      "patch_area": [
+        "1",
+        "4"
+      ],
+      "node_aperture": [
+        "1",
+        "16"
+      ]
+    },
+    "style": "phase",
+    "vertices": 5,
+    "faces": 4,
+    "marks": 108,
+    "projection": "orthographic",
+    "phase": [
+      [
+        "1",
+        "1"
+      ],
+      [
+        "0",
+        "1"
+      ]
+    ],
+    "tau": [
+      "1",
+      "2"
+    ],
+    "receiver": {
+      "origin": [
+        [
+          "9",
+          "4"
+        ],
+        [
+          "-1",
+          "4"
+        ],
+        [
+          "1",
+          "4"
+        ]
+      ],
+      "right": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "1",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "up": [
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "1",
+          "1"
+        ]
+      ],
+      "view": [
+        [
+          "1",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ],
+        [
+          "0",
+          "1"
+        ]
+      ],
+      "distance": [
+        "12",
+        "1"
+      ],
+      "focal": [
+        "8",
+        "1"
+      ],
+      "near": [
+        "1",
+        "16"
+      ],
+      "analyzer": [
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ],
+        [
+          [
+            "1",
+            "1"
+          ],
+          [
+            "0",
+            "1"
+          ]
+        ]
+      ]
+    },
+    "aperture": [
+      "1",
+      "16"
+    ],
+    "hatch_step": [
+      "1",
+      "256"
+    ],
+    "potential": "current",
+    "entropy_reference": [
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ],
+      [
+        "1",
+        "3"
+      ]
+    ],
+    "clipped_marks": 0,
+    "unresolved_near_faces": [],
+    "degenerate_faces": [],
+    "near_face_details": [],
+    "rank_deficient_projection_faces": [],
+    "log_station_radius": [
+      "0",
+      "1"
+    ],
+    "decimal_coordinate_error": [
+      "1860553393916763",
+      "33540134037932626084235438981120"
+    ],
+    "visibility": "exact rational affine/reciprocal-depth clipping",
+    "color": "premultiplied primaries P/(aperture+sum P); opaque marks on black"
+  }
+}

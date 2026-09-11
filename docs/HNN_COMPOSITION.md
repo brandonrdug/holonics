@@ -15,16 +15,21 @@ order or installing a DeepSeek architecture.
 
 ## The architecture as explicit passages
 
-[definition] The visual presentation is now the twenty [Typst/Fletcher plates](../research/papers/rendered/hnn-information-chemistry.pdf),
-with [editable source](../research/papers/source/papers/hnn-information-chemistry/main.typ).
-They show Athena/Eros, the categorical effects of layer operations, selection and rank strata,
-Information Chemistry through boundary cells and lattice-mode interference, Soulkiller's
-commuting lift, and actual arithmetic-string fields through diffusion, receiver images and
-face-conserving reflection. The color/simplicial and diffusion-model comparisons recover the
-existing primary-response law and repair the input-swap transport. Closed triangular surfaces now
-carry independent circulation; signed manifold and overlap differences lead into orientable and
-Möbius bridges, orientation covers and surrounding flux boundaries. The earlier [derivation record](../research/records/2026-09-10_HNN_DIAGRAMS_EXPOSE_COMPOSITION_DEVELOPMENT_AND_SOULKILLER_LIFTS.md)
-retains the detailed source analysis. This concise visual entry replaces the fragile Mermaid diagrams.
+[definition] The current [receiver edition](../research/papers/rendered/hnn-information-chemistry.pdf)
+uses the repository-local [receiver](../research/papers/source/packages/holonic-receiver/README.md)
+and [engraving](../research/papers/source/packages/holonic-engraving/README.md) packages. Its eleven
+plates expose complex source/current, projection and visibility, field-derived hatching,
+orientation, entropy, curved GR reception and shadows on white paper with black phase fields.
+The [twenty-plate composition atlas](../research/papers/rendered/hnn-composition-atlas.pdf) preserves
+the preceding Athena/Eros, layer, arithmetic, diffusion, manifold and source-return diagrams,
+with [editable companion source](../research/papers/source/papers/hnn-information-chemistry/composition-atlas.typ).
+
+[established-bounded; implemented-exact] The [receiver return](../research/records/2026-09-10_RECEIVER_ENGRAVING_RETAINS_COMPLEX_CURRENT_AND_SUPERSEDES_THE_PAINTED_ATLAS.md)
+keeps complex vertices, supplied currents, incidence, camera/analyzer data, exact source mark
+parameters and omitted fibres in a shared Typst/SVG packet. It exhibits a regular C³ flow with a
+singular real receiver, a curl-bearing extension, and a present-color equality separated by later
+contact with a reference. These are exterior receiver realizations; the native emission binding
+in the Athena blueprint remains its own implementation packet.
 
 ## The assembly has several distinct roles
 
@@ -166,6 +171,13 @@ wave fibres and section/current owners are reused rather than a new learner or w
 `ConstitutiveWorldTube` and clocked torus owners. Local frames, material currents and complete
 boundary faces travel together. A Hodge reconstruction, knot framing or arithmetic spectral map
 is used when its actual source and receiver call for it; none is a compulsory block in every HNN.
+
+[definition] The [linked-contact rendering return](../research/records/2026-09-10_RECEIVER_ENGRAVING_RETAINS_COMPLEX_CURRENT_AND_SUPERSEDES_THE_PAINTED_ATLAS.md)
+now instantiates the Turn tablet's friction-as-coupling relation: rounded links share a real contact
+patch, equal/opposite forces constrain their movement, and their relative current supplies an
+exact heat/complex-interface return. Zero total force retains nonzero dissipative work. This is
+an exterior constitutive instance of the need for a paired source and future receiver; it does
+not prescribe a fixed viscosity or energy-decrease gate for native learning.
 
 ## Partial conduct and comparison
 

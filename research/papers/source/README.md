@@ -145,3 +145,13 @@ This volume does not supersede the live mathematical orientation, external resea
 `FORMULA.md`, historical research deposits, or measured results. It reconstructs selected
 relations into dependency-ordered mathematical manuscripts. Every claim remains restricted by
 its named source, hypotheses, receiver, parameter region, evidence grade, and open boundary.
+
+## Receiver and engraving packages
+
+The current Information Chemistry presentation imports the local
+[holonic-receiver](packages/holonic-receiver/README.md) and
+[holonic-engraving](packages/holonic-engraving/README.md) packages. Their exact Python companion
+compiles a source/receiver packet; Typst and SVG draw its marks. The receiver edition's source
+is `papers/hnn-information-chemistry/main.typ`; the preserved twenty-plate architecture companion
+is `papers/hnn-information-chemistry/composition-atlas.typ`. Neither package is published to
+Typst Universe. Build commands and source/visibility boundaries are in the package README.

@@ -11,9 +11,11 @@ boundaries. Rendered appearance is presentation testimony, not proof.
 
 See `source/README.md` for build commands and paper-by-paper descriptions.
 
-- [HNN / Information Chemistry](rendered/hnn-information-chemistry.pdf): twenty visual plates in
-  [Typst with Fletcher](source/papers/hnn-information-chemistry/main.typ), covering architecture,
-  layer maps, geometric strata, composition, source-model lifts, real-string diffusion images,
-  exact reflection, relational color, covariant simplicial views, learned-diffusion comparisons,
-  closed circulation, manifold differences, intersecting volumes, Möbius bridges,
-  producing-state comparisons and polygonal world tubes.
+- [HNN / Information Chemistry — receiver edition](rendered/hnn-information-chemistry.pdf): eleven
+  plates using the local [receiver](source/packages/holonic-receiver/README.md) and
+  [engraving](source/packages/holonic-engraving/README.md) packages. Complex current, curvature,
+  orientation, entropy, GR and shadows are rendered as field-derived marks on white paper or
+  black phase frames. [Editable source](source/papers/hnn-information-chemistry/main.typ).
+- [HNN composition atlas](rendered/hnn-composition-atlas.pdf): the preserved twenty-plate
+  architecture, layer-map, real-string, diffusion and manifold presentation.
+  [Editable source](source/papers/hnn-information-chemistry/composition-atlas.typ).

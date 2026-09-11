@@ -773,6 +773,19 @@ checks. These owners supply no native current or learned model; AC1 owns that at
 | Persistent morphology-variant workspace | `crates/holonics-workspace/src/{artifact,evaluation,manifest,workspace}.rs`; `applications/holonics-workbench/src/adapters/workspace.rs` | admitted dismantling return -> earlier `AthenaAlphaApplication` adapter -> bounded circulation/cultivation/snapshot/evaluation -> package export | **exact-bounded application lifecycle, not attained Athena-alpha:** explicit-root manifest and artifacts return native snapshot import, resolved experiments, persisted conduct and actual continuation, staged candidate, atomic commit/decline, current-withdrawn-restored evaluation, and exact ONNX/Safetensors round trips. The CLI resolves the visible root from `--root` or the current directory. Open fibres are raw model-directory lift, qualitative multimodal emission, and persistent configurable diffusion. [2026-09-03: the per-event construction departed under SKE4 and `lift-gemma-receipt` went with it; the workspace is founded by `import-snapshot`.] |
 | Holonics diagnostic command/event protocol | `applications/holonics-workbench/src/{command,event,protocol,presentation,cli,runtime,adapters/*}.rs` | bounded Athena session mechanisms; Eros material mouth/atlas; Soulkiller exterior chart inspection; engine package/export/probe owners | **exact-bounded diagnostic surface:** versioned human/JSON/JSONL requests and returns expose low-level mechanisms beneath `diagnostic`. The rejected Ratatui body and hidden artifact root are absent. Diagnostic process-memory sessions, demos, and probes are not the persistent model-building application and do not grade qualitative capability. [2026-09-03: the per-event construction departed under SKE4 and the workbench demo went with it; `demo-open` and the scripted `diagnostic demo` flow are absent, and a session opens from a snapshot.] |
 
+## Receiver engraving and scientific presentation
+
+[established-bounded; source-inspected] The repository-local Typst packages
+[`holonic-receiver`](../research/papers/source/packages/holonic-receiver/README.md) and
+[`holonic-engraving`](../research/papers/source/packages/holonic-engraving/README.md) consume supplied
+complex source/current/incidence and return vector faces. The exact exterior companion supplies
+projection, depth clipping, field level traces, primary response and retained mark/source data;
+Typst and SVG paint that packet. Existing `relational-geometry::{projection,receiver_atlas}`,
+`holonic-engine::{dimensional_wave,display}` and the CAD rendering sources remain their distinct
+native/design owners. This adds no GPU semantic renderer or live proof assistant to HNN operation.
+The [receiver review](../research/records/2026-09-10_RECEIVER_ENGRAVING_RETAINS_COMPLEX_CURRENT_AND_SUPERSEDES_THE_PAINTED_ATLAS.md)
+records source methods, C³/GR examples and exact checks.
+
 ## Maintenance law
 
 Update a row in the same coherent change that moves, adds, or removes one of its owners. Do not
