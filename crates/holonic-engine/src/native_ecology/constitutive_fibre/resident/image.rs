@@ -7,6 +7,7 @@ use super::*;
 pub enum ConstitutiveImageReceiver<'a, 'c> {
     Linear(&'a ResidentConstitutiveFibre<'c>),
     ContextChange(&'a ResidentContextualSection<'c>),
+    WaveConditional(&'a ResidentWaveRelation<'c>),
 }
 
 #[derive(Debug, PartialEq, Eq, Serialize)]
@@ -47,6 +48,12 @@ impl<'a, 'c> ResidentConstitutiveImage<'a, 'c> {
     pub fn output(&self) -> &ResidentConstitutiveReturn<'c> {
         &self.output
     }
+    /// Consume this derived image into its output relation and affine-domain receipt. Callers
+    /// that carry additional constraints must retain those alongside the returned family.
+    pub(crate) fn into_output(self) -> (ResidentConstitutiveReturn<'c>, ResidentSection<'c>) {
+        (self.output,self.coverage)
+    }
+
     /// The point port requires full source coverage and a unique output, not a unique input.
     pub fn current(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
         ResidentConstitutiveCurrent {
@@ -222,7 +229,7 @@ impl<'c> ResidentConditionPreimage<'c> {
     }
 }
 
-fn image<'a, 'c>(
+pub(super) fn image<'a, 'c>(
     surface: &'c ResidentSurface<'c>,
     basis: &ResidentSection<'c>,
     c: usize,
@@ -347,3 +354,11 @@ impl<'c> ResidentContextualSection<'c> {
 }
 #[cfg(test)]
 mod tests;
+
+impl<'c> ResidentWaveRelation<'c> {
+    pub fn read_image<'a>(&'a self,source:&'a ResidentConstitutiveReturn<'c>)
+        ->Result<ResidentConstitutiveImage<'a,'c>,ConstitutiveFibreError>{
+        image(self.surface,&self.basis,self.width(),self.width(),self.relation_cut,source,
+            ConstitutiveImageReceiver::WaveConditional(self))
+    }
+}

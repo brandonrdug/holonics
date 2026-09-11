@@ -618,6 +618,7 @@ impl<'chart> NativeConstitutiveEcology<'chart> {
             relation: ResidentConstitutiveFibre {
                 source_chart: ConstitutiveSourceChart::Linear,
                 basis: surface.mount_section_rest(&basis)?,
+                basis_owner: Rc::new(()),
                 surface,
                 source_width: 2 * h.nodes,
                 target_width: 2,

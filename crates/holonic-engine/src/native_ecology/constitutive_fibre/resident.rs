@@ -10,6 +10,15 @@ pub use section::{ResidentConstitutiveSection, ResidentDifferenceSection};
 mod return_rest;
 pub use return_rest::ConstitutiveReturnRest;
 
+/// A member-law successor whose basis was formed in fresh resident material.  The predecessor
+/// identity is checked again when the neighborhood publishes its joint successor.
+pub(crate) struct PreparedConstitutiveFormation<'chart> {
+    pub(crate) basis: ResidentSection<'chart>,
+    predecessor_owner: Rc<()>,
+    predecessor_occurrences: u64,
+    pub(crate) returned: ResidentConstitutiveReturn<'chart>,
+}
+
 /// A local relation's receiver result. Only field-qualified queries have a field source;
 /// a relation cut never stands in for an invented source occurrence.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
@@ -245,6 +254,67 @@ impl<'chart> ResidentConstitutiveReturn<'chart> {
 }
 
 impl<'chart> ResidentConstitutiveFibre<'chart> {
+    pub(crate) fn prepare_bilinear_contact(
+        &mut self,
+        source: ResidentConstitutiveCurrent<'_, 'chart>,
+        condition: ResidentConstitutiveCurrent<'_, 'chart>,
+        receiving: Option<ResidentConstitutiveCurrent<'_, 'chart>>,
+    ) -> Result<PreparedConstitutiveFormation<'chart>, ConstitutiveFibreError> {
+        if !self.usable {
+            return Err(ConstitutiveFibreError::Uncertain);
+        }
+        let predecessor_owner = Rc::clone(&self.basis_owner);
+        let predecessor_occurrences = self.occurrences;
+        let staged_basis = self.surface.copy_section_device(&self.basis)?;
+        let mut staged = Self {
+            basis: staged_basis,
+            basis_owner: Rc::clone(&self.basis_owner),
+            surface: self.surface,
+            source_width: self.source_width,
+            target_width: self.target_width,
+            source_chart: self.source_chart,
+            occurrences: self.occurrences,
+            usable: true,
+        };
+        match staged.advance_bilinear_contact(source, condition, receiving) {
+            Ok(returned) => Ok(PreparedConstitutiveFormation {
+                basis: staged.basis,
+                predecessor_owner,
+                predecessor_occurrences,
+                returned,
+            }),
+            Err(error) => {
+                // A device completion that cannot be classified leaves the live owner poisoned;
+                // arithmetic refusal has already preserved the staged and live predecessors.
+                if !staged.usable || matches!(error, ConstitutiveFibreError::Uncertain) {
+                    self.usable = false;
+                }
+                Err(error)
+            }
+        }
+    }
+
+    pub(crate) fn can_commit_formation(
+        &self,
+        prepared: &PreparedConstitutiveFormation<'chart>,
+    ) -> bool {
+        self.usable
+            && self.occurrences == prepared.predecessor_occurrences
+            && Rc::ptr_eq(&self.basis_owner, &prepared.predecessor_owner)
+    }
+
+    pub(crate) fn publish_formation(
+        &mut self,
+        prepared: PreparedConstitutiveFormation<'chart>,
+    ) -> ResidentConstitutiveReturn<'chart> {
+        debug_assert!(self.can_commit_formation(&prepared));
+        let old = std::mem::replace(&mut self.basis, prepared.basis);
+        drop(old);
+        self.basis_owner = Rc::new(());
+        self.occurrences = prepared.returned.occurrence;
+        prepared.returned
+    }
+
     pub(super) fn allocate_current_return(
         &self,
         occurrence: u64,
@@ -415,3 +485,6 @@ pub use condition_contact::{
     ResidentConditionStanding,
 };
 pub use context_section::{ContextualSectionOrigin, ResidentContextualSection};
+
+mod wave_relation;
+pub use wave_relation::ResidentWaveRelation;

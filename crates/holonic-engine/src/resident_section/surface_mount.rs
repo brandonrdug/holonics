@@ -205,6 +205,29 @@ impl<'chart> ResidentSurface<'chart> {
         Ok(())
     }
 
+    /// Copy one complete resident section without crossing through the host.  This is used for
+    /// a narrow speculative successor: the destination is a fresh owner and both interval
+    /// endpoints are copied exactly before any kernel is allowed to write it.
+    pub(crate) fn copy_section_device(
+        &'chart self,
+        source: &ResidentSection<'chart>,
+    ) -> Result<ResidentSection<'chart>, ResidentRefusal> {
+        if !std::ptr::eq(source.surface, self) {
+            return Err(ResidentRefusal::Declaration {
+                operation: "copy-section-device",
+                what: "source and destination belong to different resident surfaces".into(),
+            });
+        }
+        let destination = self.fresh_section(source.rows, source.width, source.grain)?;
+        self.context.make_current()?;
+        let elements = source.rows * source.width;
+        let octets = elements * std::mem::size_of::<i64>();
+        destination.lo.copy_range_from_buffer(0, &source.lo, 0, elements)?;
+        destination.hi.copy_range_from_buffer(0, &source.hi, 0, elements)?;
+        self.census.borrow_mut().device_to_device_octets += (2 * octets) as u64;
+        Ok(destination)
+    }
+
     /// Release a pooled allocation's octets from the resident census. The buffer's own `Drop`
     /// frees the card; this is the census half, which a `DeviceBuffer` cannot do for itself
     /// because it does not know the surface.

@@ -38,6 +38,21 @@ pub struct GeneratorNeighborhoodStep<'input, 'c> {
     source: ResidentConstitutiveCurrent<'input, 'c>,
     observed: Option<ResidentConstitutiveCurrent<'input, 'c>>,
 }
+
+/// Complete neighborhood successor held before publication.  The wave coordinator can retain
+/// this object while preparing its own successor; dropping it leaves both live predecessors.
+pub(crate) struct PreparedNeighborhoodAdvance<'input, 'c> {
+    owner: Rc<()>,
+    member: usize,
+    predecessor_epoch: u64,
+    successor_epoch: u64,
+    prediction: ResidentConstitutiveReturn<'c>,
+    prior_condition: ResidentConditionStanding<'c>,
+    source: ResidentConstitutiveCurrent<'input, 'c>,
+    observed: Option<ResidentConstitutiveCurrent<'input, 'c>>,
+    condition: Option<PreparedConditionContact<'c>>,
+    formation: Option<PreparedConstitutiveFormation<'c>>,
+}
 impl<'input, 'c> GeneratorNeighborhoodStep<'input, 'c> {
     pub fn source(&self) -> ResidentConstitutiveCurrent<'_, 'c> {
         self.source
@@ -118,6 +133,16 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
         source: ResidentConstitutiveCurrent<'i, 'c>,
         observed: Option<ResidentConstitutiveCurrent<'i, 'c>>,
     ) -> Result<GeneratorNeighborhoodStep<'i, 'c>, ConstitutiveFibreError> {
+        let prepared = self.prepare_advance(member, source, observed)?;
+        Ok(self.publish_advance(prepared))
+    }
+
+    pub(crate) fn prepare_advance<'i>(
+        &mut self,
+        member: usize,
+        source: ResidentConstitutiveCurrent<'i, 'c>,
+        observed: Option<ResidentConstitutiveCurrent<'i, 'c>>,
+    ) -> Result<PreparedNeighborhoodAdvance<'i, 'c>, ConstitutiveFibreError> {
         if !self.usable {
             return Err(ConstitutiveFibreError::Uncertain);
         }
@@ -131,52 +156,95 @@ impl<'c> ResidentGeneratorNeighborhood<'c> {
             .ok_or(ConstitutiveFibreError::Shape)?;
         let prior_condition = self.condition.standing();
         let prediction = law.read_bilinear(source, prior_condition.current())?;
-        let (contact, formation) = if let Some(observed) = observed {
+        let (condition, formation) = if let Some(observed) = observed {
             let family = law.read_condition_preimage(source, observed)?;
             let proposed = self.condition.prepare_contact(&family)?;
             if !self.condition.can_commit(&proposed) {
                 return Err(ConstitutiveFibreError::ForeignOccurrence);
             }
-            // Declaration failures and known arithmetic refusal preserve the law; uncertain
-            // device completion poisons this owner rather than permitting a partial replay.
             self.usable = false;
-            let formed =
-                match law.advance_bilinear_contact(source, proposed.successor(), Some(observed)) {
-                    Ok(formed) => formed,
+            let prepared =
+                match law.prepare_bilinear_contact(source, proposed.successor(), Some(observed)) {
+                    Ok(value) => value,
                     Err(error) => {
                         self.usable = law.usable;
                         return Err(error);
                     }
                 };
-            // Exclusive neighborhood ownership and the completed law operation leave the
-            // preflighted condition predecessor untouched. Publication cannot now fail.
-            let contact = self.condition.publish_prepared(proposed);
+            if !law.can_commit_formation(&prepared) {
+                self.usable = true;
+                return Err(ConstitutiveFibreError::ForeignOccurrence);
+            }
             self.usable = true;
+            (Some(proposed), Some(prepared))
+        } else {
+            (None, None)
+        };
+        Ok(PreparedNeighborhoodAdvance {
+            owner: Rc::clone(&self.owner),
+            member,
+            predecessor_epoch: self.epoch,
+            successor_epoch: next,
+            prediction,
+            prior_condition,
+            source,
+            observed,
+            condition,
+            formation,
+        })
+    }
+
+    pub(crate) fn can_commit_advance(
+        &self,
+        prepared: &PreparedNeighborhoodAdvance<'_, 'c>,
+    ) -> bool {
+        self.usable
+            && Rc::ptr_eq(&self.owner, &prepared.owner)
+            && self.epoch == prepared.predecessor_epoch
+            && prepared
+                .condition
+                .as_ref()
+                .map_or(true, |c| self.condition.can_commit(c))
+            && prepared
+                .formation
+                .as_ref()
+                .map_or(true, |f| self.laws[prepared.member].can_commit_formation(f))
+    }
+
+    pub(crate) fn publish_advance<'i>(
+        &mut self,
+        prepared: PreparedNeighborhoodAdvance<'i, 'c>,
+    ) -> GeneratorNeighborhoodStep<'i, 'c> {
+        debug_assert!(self.can_commit_advance(&prepared));
+        let contact = prepared
+            .condition
+            .map(|c| self.condition.publish_prepared(c));
+        let formation = prepared
+            .formation
+            .map(|f| self.laws[prepared.member].publish_formation(f));
+        self.usable = true;
+        if let Some(contact) = &contact {
             self.evidence = Some(NeighborhoodEvidence {
-                member,
-                epoch: next,
+                member: prepared.member,
+                epoch: prepared.successor_epoch,
                 family: ResidentConditionPreimage {
                     inner: Rc::clone(&contact.family().inner),
                 },
             });
-            (Some(contact), Some(formed))
-        } else {
-            (None, None)
-        };
-        let predecessor_epoch = self.epoch;
-        self.epoch = next;
-        Ok(GeneratorNeighborhoodStep {
+        }
+        self.epoch = prepared.successor_epoch;
+        GeneratorNeighborhoodStep {
             owner: Rc::clone(&self.owner),
-            member,
-            predecessor_epoch,
-            successor_epoch: next,
-            prediction,
-            prior_condition,
+            member: prepared.member,
+            predecessor_epoch: prepared.predecessor_epoch,
+            successor_epoch: prepared.successor_epoch,
+            prediction: prepared.prediction,
+            prior_condition: prepared.prior_condition,
             contact,
             formation,
-            source,
-            observed,
-        })
+            source: prepared.source,
+            observed: prepared.observed,
+        }
     }
 }
 #[cfg(test)]

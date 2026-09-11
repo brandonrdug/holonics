@@ -188,6 +188,14 @@ score, tie population, robust separation and shared radius; the full source/fibr
 `native/normal_wave.rs` owns the moved wave, emission/re-entry phase and complete session rest;
 `stream.rs::pump_wave` and the workbench `session_stream.rs` reuse the existing delivery owner.
 
+[definition] `wave/source.rs` and `normal_wave_source.cuh` retain the shared `(c−p,c,p)` map;
+`wave/family.rs` carries its anchor ball beside a complete homogeneous affine relation.
+`resident/wave_relation.rs` and `constitutive_wave_relation.cuh` derive the fixed-condition
+pullback and reuse `resident/image.rs` for serial family composition. `resident.rs` stages an
+individual basis through `PreparedConstitutiveFormation`; `resident/neighborhood.rs` stages the
+complete member/condition return before publication. These foundations do not yet replace the
+normal wave's current with a coupled state or supply its complete checkpoint.
+
 [definition] `normal/direct/wave/actuate.rs` owns fixed-material source action. The
 `normal_source_actuation.cuh` source word reuses the learned normal response and the enclosed
 finite contact in `passive_current_ball.cuh`. Source union retains the incoming current;

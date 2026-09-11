@@ -29,15 +29,14 @@ __device__ void section_normal_wave_receive_impl(
     if(!threadIdx.x){
         wide *x=out+normal_source_at(n),*y=out+NORMAL_OBSERVED*stride;
         wide radius=pair[2u*r];
-        if(radius<0){atomicOr(slot,REFUSED_MALFORMED);}
+        normal_wave_source_lift(pair,r,x,slot);
         wide den=fibre_current_denominator(received_lo,received_hi,received_den,received_disposition,slot),S=(wide)1<<grain,rounds=0;
         for(uint32_t j=0;j<r&&! *slot;++j){
-            x[j]=sub_checked(pair[r+j],pair[j],slot);x[r+j]=pair[r+j];x[2u*r+j]=pair[j];
             if(received_lo[received_at+j]!=received_hi[received_at+j]){atomicOr(slot,REFUSED_MALFORMED);break;}
             wide v=received_lo[received_at+j],lo=signed_product_divide_2(v,S/2,den,0,slot),hi=signed_product_divide_2(v,S/2,den,1,slot);
             y[j]=sub_checked(v<0?hi:lo,pair[r+j],slot);if(lo!=hi)rounds=add_checked(rounds,1,slot);
         }
-        x[d]=product_checked(2,radius,slot);y[r]=add_checked(radius,rounds,slot);
+        y[r]=add_checked(radius,rounds,slot);
         for(uint32_t j=0;j<=d;++j)frame[d+1u+j]=x[j];
         if(!*slot)normal_observation_moments(x,y,n,n,report,slot);
     }

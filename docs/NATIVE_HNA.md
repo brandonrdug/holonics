@@ -138,6 +138,14 @@ target energy with `inertia::positive_source_energy`, and checks the actual nume
 `refine_realization` changes only the numerical grain and recomputes that witness from unchanged
 exact moments and source-family bounds. Source uncertainty is not erased by refinement.
 
+[established-bounded; implemented-exact] The [conditional-family foundation](../research/records/2026-09-11_CONDITIONAL_WAVE_FAMILIES_RETAIN_THE_ANCHOR_AND_STAGE_THEIR_LOCAL_LAWS.md)
+adds `read_source` and `read_family` as immutable receivers. A `NormalWaveFamily` carries the
+anchor ball alongside its affine relation; `ResidentConstitutiveFibre::read_wave_relation` derives
+fixed-condition conduct from an existing bilinear law, and `read_through` composes complete
+families. Affine inspection alone does not certify bounded feasibility. Staged neighborhood
+publication is available internally; the public normal session remains the packet-2 owner until
+the coupled state/receiver/rest join returns.
+
 ## Resident symbol receiver and continuing wave session
 
 [definition] `ResidentNormalWave::read_basis_face` projects the complete current enclosure onto a

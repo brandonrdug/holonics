@@ -15,6 +15,7 @@
 use relational_geometry::Rat;
 use serde::Serialize;
 use thiserror::Error;
+use std::rc::Rc;
 
 use crate::resident_section::{
     ResidentGrain, ResidentRefusal, ResidentSection, ResidentSectionRest, ResidentSurface,
@@ -37,7 +38,7 @@ pub use resident::{
     PreparedConditionContact, ResidentConditionContact, ResidentConditionCurrent,
     ResidentConditionImage, ResidentConditionPreimage, ResidentConditionStanding,
     ResidentConstitutiveCurrent, ResidentConstitutiveSection, ResidentDifferenceSection, ResidentConstitutiveImage, ResidentConstitutiveRefinement,
-    ResidentConstitutiveReturn, ResidentContextualSection, ResidentGeneratorNeighborhood,
+    ResidentConstitutiveReturn, ResidentContextualSection, ResidentWaveRelation, ResidentGeneratorNeighborhood,
 };
 
 /// Declared local source law, bound at founding rather than inferred from an array's width.
@@ -105,6 +106,7 @@ pub enum ConstitutiveFibreError {
 /// elimination stages at most one new row, and commits it only after every arithmetic check.
 pub struct ResidentConstitutiveFibre<'chart> {
     basis: ResidentSection<'chart>,
+    basis_owner: Rc<()>,
     surface: &'chart ResidentSurface<'chart>,
     source_width: usize,
     target_width: usize,
@@ -156,6 +158,7 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
         )?;
         Ok(Self {
             basis,
+            basis_owner: Rc::new(()),
             surface,
             source_width,
             target_width,

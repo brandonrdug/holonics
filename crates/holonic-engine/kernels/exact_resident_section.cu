@@ -1292,6 +1292,7 @@ extern "C" __global__ void section_constitutive_bilinear_source(
 
 #include "constitutive_condition_preimage.cuh"
 #include "constitutive_condition_image.cuh"
+#include "constitutive_wave_relation.cuh"
 #include "constitutive_relation_image.cuh"
 #include "constitutive_context_section.cuh"
 #include "constitutive_condition_contact.cuh"
@@ -1645,6 +1646,8 @@ extern "C" __global__ void __launch_bounds__(512) section_constitutive_circulati
 #include "direct_normal_material.cuh"
 #include "normal_material_section.cuh"
 #include "normal_wave.cuh"
+#include "normal_wave_source.cuh"
+#include "normal_wave_family.cuh"
 #include "normal_wave_receive.cuh"
 #include "normal_wave_basis_face.cuh"
 #include "passive_current_ball.cuh"

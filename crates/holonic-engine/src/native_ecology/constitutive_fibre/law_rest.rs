@@ -123,6 +123,7 @@ impl ConstitutiveFibreRest {
         )?;
         Ok(ResidentConstitutiveFibre {
             basis: surface.mount_section_rest(&self.basis)?,
+            basis_owner: Rc::new(()),
             surface,
             source_width: self.chart.source_width,
             target_width: self.chart.target_width,

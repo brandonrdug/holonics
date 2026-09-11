@@ -159,9 +159,10 @@ fn failed_material_return_preserves_the_complete_neighborhood() {
     );
     drop(prepared);
     let before = body.rest().unwrap();
-    assert!(body
-        .advance(0, current(&source), Some(current(&received)))
-        .is_err());
+    assert!(
+        body.advance(0, current(&source), Some(current(&received)))
+            .is_err()
+    );
     assert_eq!(body.rest().unwrap(), before);
     body.advance(0, current(&received), Some(current(&received)))
         .unwrap();
@@ -200,14 +201,15 @@ fn neighborhood_development_forms_an_independent_local_relation() {
         step.prediction.inspect().unwrap().predecessor_reading,
         ConstitutiveReading::OutsideDomain { .. }
     ));
-    assert!(step
-        .formation
-        .as_ref()
-        .unwrap()
-        .inspect()
-        .unwrap()
-        .formed_pivot
-        .is_some());
+    assert!(
+        step.formation
+            .as_ref()
+            .unwrap()
+            .inspect()
+            .unwrap()
+            .formed_pivot
+            .is_some()
+    );
     assert_eq!(
         value(&body.read(0, current(&source)).unwrap()),
         vec![Rat::from_integer(2.into()), Rat::from_integer(0.into())]
@@ -269,4 +271,69 @@ fn prepared_contact_rejects_other_and_stale_standing() {
     assert_eq!(left.rest().unwrap(), after);
     let decoded = family.rest().unwrap().remount(&s).unwrap();
     assert_eq!(decoded.inspect().unwrap(), family.inspect().unwrap());
+}
+
+#[test]
+#[ignore = "requires CUDA; discarding a complete prepared member/condition successor preserves conduct and rest"]
+fn staged_neighborhood_discard_and_stale_publication_keep_the_predecessor() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let laws = learned_pair(&s);
+    let h = points(&s, &[0, 1, 1, 0]);
+    let mut body = ResidentGeneratorNeighborhood::with_shared_condition(
+        laws,
+        current(&h),
+        ConditionContactMetric::UnitAdmittanceRealification,
+    )
+    .unwrap();
+    let x = points(&s, &[1, 0]);
+    let y = points(&s, &[1, 0]);
+    let before = body.rest().unwrap();
+    let prior = value(&body.read(0, current(&x)).unwrap());
+    let reads = s.census().section_read_outs;
+    let prepared = body
+        .prepare_advance(0, current(&x), Some(current(&y)))
+        .unwrap();
+    assert!(body.can_commit_advance(&prepared));
+    assert_eq!(s.census().section_read_outs, reads);
+    assert_eq!(body.rest().unwrap(), before);
+    assert_eq!(value(&body.read(0, current(&x)).unwrap()), prior);
+    drop(prepared);
+    assert_eq!(body.rest().unwrap(), before);
+    let stale = body
+        .prepare_advance(0, current(&x), Some(current(&y)))
+        .unwrap();
+    let committed = body
+        .prepare_advance(0, current(&x), Some(current(&y)))
+        .unwrap();
+    body.publish_advance(committed);
+    assert!(!body.can_commit_advance(&stale));
+    let after = body.rest().unwrap();
+    assert_ne!(after, before);
+    drop(stale);
+    assert_eq!(body.rest().unwrap(), after);
+}
+
+#[test]
+#[ignore = "requires CUDA; preparation identity survives absent observations and independent equal-shaped bodies"]
+fn staged_neighborhood_read_only_proposal_is_owner_qualified() {
+    let readout = ResidentReadout::new().unwrap();
+    let s = ResidentSurface::on(&readout).unwrap();
+    let h = points(&s, &[0, 0]);
+    let x = points(&s, &[0, 0]);
+    let make = || {
+        ResidentGeneratorNeighborhood::with_shared_condition(
+            vec![ResidentConstitutiveFibre::found_bilinear_contact(&s, 1, 1, 1).unwrap()],
+            current(&h),
+            ConditionContactMetric::UnitAdmittanceRealification,
+        )
+        .unwrap()
+    };
+    let mut a = make();
+    let b = make();
+    let pending = a.prepare_advance(0, current(&x), None).unwrap();
+    assert!(a.can_commit_advance(&pending));
+    assert!(!b.can_commit_advance(&pending));
+    a.advance(0, current(&x), None).unwrap();
+    assert!(!a.can_commit_advance(&pending));
 }

@@ -92,6 +92,9 @@ mod surface_direct_normal;
 mod surface_normal_section;
 mod surface_normal_wave;
 mod surface_normal_wave_basis_face;
+mod surface_normal_wave_source;
+mod surface_normal_wave_family;
+mod surface_wave_relation;
 mod surface_material_support;
 #[path = "resident_section/surface_condition.rs"]
 mod surface_condition;
