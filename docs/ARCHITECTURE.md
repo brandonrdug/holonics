@@ -113,6 +113,13 @@ not turn source assumptions, external calibration or model quality into theorems
 can report the complete declared defect instead of silently treating a projected scalar as the
 whole causal object.
 
+[definition] The [final tension/kinetic handoff](../research/records/2026-09-10_TENSION_DYNAMICS_BECOME_ATHENAS_COMPUTATIONAL_CONSTRUCTION.md)
+makes computational use explicit: preserve joint constraints, let actual contact/condition change
+later response, return labeled emission and the complete successor, and reuse generators only
+through their admitted future receivers. The [Athena blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
+specifies the next bounded source/target, native emission and atomic coupled-ownership work. A
+rendered manifold is a receiver of these constructions; the runtime need not render its state.
+
 ## Consumer hardware and the 20W ideology
 
 [historical; source-inspected] Brandon's May 2026 messages state the aim of a fast, continuously

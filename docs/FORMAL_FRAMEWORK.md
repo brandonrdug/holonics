@@ -313,6 +313,13 @@ proves that equal marginals can have different binding current. These laws attac
 source/condition and producing-return ports described in the Athena blueprint; they introduce no
 molecular classifier or runtime proof assistant into HNN.
 
+[definition] The [computational handoff](../research/records/2026-09-10_TENSION_DYNAMICS_BECOME_ATHENAS_COMPUTATIONAL_CONSTRUCTION.md)
+now reviews these laws with passive phase contact, prestress, world-tube composition and
+future-stable receiver agreement. The finalized Athena plan uses their consequences for jointly
+bounded return, conditional local conduct, emitted output and dynamic reuse. Formal conservation
+or conformation identities do not themselves supply the native port conversion or training rule;
+the plan names the existing owners and new composed passages that must realize them.
+
 ## Twist, curvature and phase keep their different meanings
 
 [definition] A framed filament can be presented by a centreline `r(s,t)` and oriented material

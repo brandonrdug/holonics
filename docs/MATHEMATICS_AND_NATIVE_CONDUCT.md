@@ -139,6 +139,17 @@ variable. Over `Q(√2)`, the curve isomorphism changes by the elliptic sign inv
 conjugation. This is an actual arithmetic character passage to compare with orientation transport,
 with its distinct source group retained; it proves no RH/BSD endpoint or universal spectral identity.
 
+## Tension and kinetic state now have an implementation handoff
+
+[definition] The [final September 10 review](../research/records/2026-09-10_TENSION_DYNAMICS_BECOME_ATHENAS_COMPUTATIONAL_CONSTRUCTION.md)
+connects compatible constraints, connection-aware passive contact, prestress, complete finite
+constitutive change, joint kinetic state and future-preserving reduction to Athena's existing
+owners. Their computational uses are relational completion, state-dependent response, retained
+latent conduct, local development, labeled emission and generator reuse. The blueprint now names
+the jointly enclosed producing-target port, resident text projection, staged member-law/condition
+publication and first coupled wave ownership. These are implementation obligations informed by
+returned laws, not a new physical identity or an unimplemented mechanism promoted to capability.
+
 ## Classical learning already supplies useful mathematics and conduct
 
 [proved-derived] For a finite admitted population and beta>0, let

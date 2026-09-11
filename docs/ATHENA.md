@@ -29,21 +29,22 @@ retains its distinct 1,930-occurrence scope and receiver limitation. Current con
 belongs in [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md).
 
 [definition] The [Athena-alpha blueprint](plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
-is authorized through completion. Brandon paused the parallel implementation for the September 10
-[equational/world-tube review](../research/records/2026-09-10_EQUATIONAL_LAWS_AND_WORLD_TUBES_MAKE_ATHENAS_NEXT_PASSAGE_EXPLICIT.md).
-The revised next packet binds a returned observation to its producing situated current, then
-exposes the actual emission and further contextual composition. It separates finite construction
-returns from the useful-model attainment objective. It uses the prepared
-conversations and existing native owners, with comparison, interface and persistence accompanying
-each return; broader exposure does not wait for useful language.
+is authorized through completion. Brandon's latest September 10 direction closes the illustration
+review and finalizes the next implementation handoff. Its order is producing comparison, resident
+emission, coupled conditional organization, lawful formation/reuse and continuing product evaluation.
+The [computational review](../research/records/2026-09-10_TENSION_DYNAMICS_BECOME_ATHENAS_COMPUTATIONAL_CONSTRUCTION.md)
+connects the exact tension, finite-change, kinetic and future-receiver laws to those owner changes.
+Source exposure, interface and persistence accompany each usable return; current execution status
+belongs in CONSTRUCTION_STATE.
 
-[definition] Brandon's later sequence-to-fold/biochemical-kinetics clarification now has an
+[definition] Sequence-to-fold and biochemical kinetics are foundational HNN questions. Their
 [exact source construction](../research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)
-and an expanded blueprint clause. Sequence-conditioned organization, occupancy-dependent
-continuation and labeled emission are foundational HNN questions. The common causal thought chain
-retains source, reaction, actual joins and successor; its biological and text/acoustic charts keep
-their own supplied maps. The finite source's energy-bin and joint-marginal counterexamples inform
-the current producing-return and compression obligations without restarting native cultivation.
+shows why organization, occupancy and joint correlation must survive into later conduct. The
+first planned composite keeps one wave move owner, transfers in the existing learned local
+neighborhood, and stages its member/condition changes with the complete wave successor. The
+current point/exact and bounded-family ports still require the explicit conversions in the plan.
+Its text receiver is a declared native projection with the full source fibre retained, not a
+claim that a selected word identifies the source or proves useful language.
 
 [project-postulate] The [September 7 correction](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
 places generator recovery, phase transport and Holonic Compression inside the developing

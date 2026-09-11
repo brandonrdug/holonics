@@ -176,6 +176,12 @@ now starts at this binding. `receive(v)` addresses the next current; a correctio
 prediction requires that prediction's producing joint and receiver. Existing normal staging,
 wave fibres and section/current owners are reused rather than a new learner or wrapper.
 
+[definition] The [final computational review](../research/records/2026-09-10_TENSION_DYNAMICS_BECOME_ATHENAS_COMPUTATIONAL_CONSTRUCTION.md)
+now fixes the first conditional response as `η ∈ L_j((c−p,c,p),h)` with actual join `(c,c+η)`.
+The blueprint makes the bounded source/target lift, resident basis receiver, single move owner and
+staged local-law/condition publication explicit. Coupled organization is part of the construction;
+its first finite chart does not claim that a fixed linear wave is the entire HNN architecture.
+
 [definition] The geometric continuation uses existing `WorldTube`, `WorldTubePotential`,
 `ConstitutiveWorldTube` and clocked torus owners. Local frames, material currents and complete
 boundary faces travel together. A Hodge reconstruction, knot framing or arithmetic spectral map

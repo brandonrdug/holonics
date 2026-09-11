@@ -4,22 +4,21 @@
 [CONSTRUCTION_STATE.md](../../CONSTRUCTION_STATE.md) is the sole current-position record. Dated
 contracts and records preserve their completed scope; their old imperatives schedule no new work.
 
-[project-postulate] **September 10 equational/world-tube revision:** Brandon paused the parallel
-AC implementation to use the diagrammatic and equational research to clarify Athena's architecture.
-The [source-backed synthesis](../../research/records/2026-09-10_EQUATIONAL_LAWS_AND_WORLD_TUBES_MAKE_ATHENAS_NEXT_PASSAGE_EXPLICIT.md)
-and revised [blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
-make the next order explicit: bind the producing situated comparison and developmental return;
-expose the actual emission; compose further local/scale transport as returned distinctions require.
-The existing world-tube owners supply clocked current and boundary composition. The review does
-not start cultivation, repeat returned foundation packets, or add a Millennium prerequisite.
+[project-postulate] **September 10 finalized Athena handoff:** Brandon has closed the illustration
+pass and re-engaged Athena planning. The [computational tension review](../../research/records/2026-09-10_TENSION_DYNAMICS_BECOME_ATHENAS_COMPUTATIONAL_CONSTRUCTION.md)
+and finalized [blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
+now govern the next implementation session. Preserve returned native/formal material and proceed
+from the producing comparison through native emission, coupled conditional organization, lawful
+formation/reuse and continuing product evaluation. Source exposure, public interface, persistence
+and consumer-cost measurement accompany usable increments. This plan return starts no cultivation
+process and requires no further illustration or universal physics/intelligence theorem.
 
-[project-postulate] **September 10 sequence/kinetic clarification:** Brandon identifies
-sequence-to-fold and biochemical kinetics as keystone HNN construction domains and models for
-causal chains of thought. The [finite source return](../../research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)
-and blueprint now make sequence-conditioned organization, actual kinetic admissibility, joint
-state and labeled emission explicit. These results inform the producing-comparison and local
-transport bindings in the existing order; they add no universal molecular intermediary or new
-prerequisite and do not resume the paused native implementation.
+[project-postulate] Sequence-to-fold and biochemical kinetics remain keystone HNN construction
+domains. The [finite source return](../../research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)
+makes organization-dependent contact, joint state and labeled emission explicit. The first native
+coupled chart uses the existing learned bilinear local laws and retained condition; it does not
+place a molecular simulator between text and native conduct. The earlier implementation pause
+is preserved as review chronology, not an instruction to repeat the completed review.
 
 [project-postulate] **September 9 representation correction retained:** Brandon requires identification and
 repair of the byte-clock/occurrence-history model's failure to realize generator-bearing Holons.
@@ -158,9 +157,9 @@ different scopes; broader exposure and partial conduct need no universal intelli
 | Phase | Standing construction | Ordered next use |
 |---|---|---|
 | AC0 | Prepared source-qualified stream, ancestry, partitions and cursor | Preserve and use the actual source/return relation |
-| AC1 | Local generators, normal-wave current and fixed-material source action | Retain the source/current/material cut that produces the compared response |
-| AC2 | Local normal/relation development and atomic next-current reception | Bind the addressed observation to its producing joint; stage one complete successor |
-| AC3 | Whole-field development, source actuation and numerical continuation | Run the composed source/prediction/return passage; expose its native receiver and exterior emission |
+| AC1 | Local generators, normal-wave current and fixed-material source action | Retain the producing cut; join learned conditional organization through actual source/contact maps |
+| AC2 | Local normal/relation development and atomic next-current reception | Bind the joint source/target family; stage material, condition and current before one publication |
+| AC3 | Whole-field development, source actuation and numerical continuation | Expose native emission and ordinary re-entry; conduct the required coupled conditional passage |
 | AC4 | Bounded rebase, local family composition and separate exact future-quotient owners | Reuse applicable generators and transported joint fibres in the next operation |
 | AC5 | Productive normal-wave and neighborhood rest; public finite examples | Persist the newly composed receiver/pending comparison and inspect actual continued behavior |
 
@@ -173,8 +172,8 @@ prediction's source. The exact normal-update counterexample and source coordinat
 This is the next concrete join, not a reason to restart the local foundation.
 
 [definition] Implement the blueprint's producing-comparison packet first, then its emission
-receiver, with meaningful persistence and current/return checks at the new boundary. Extend
-neighborhood/nonlinear/scale composition when an actual source distinction requires it. Neither
+receiver, with meaningful persistence and current/return checks at the new boundary. Then return the required
+coupled neighborhood/source chart, its staged publication, and applicable formation/reuse. Neither
 matching dimensions nor an architecture name supplies the conversion between normal-wave,
 constitutive-neighborhood and older native-circulation states. Native branch decisions and
 current updates stay resident; exact and enclosed ports keep their declared hypotheses.

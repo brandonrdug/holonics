@@ -1,7 +1,7 @@
 # Construction state
 
-**Currency:** September 10, 2026. **Priority:** AC0–AC5 implementation remains paused; the equational/world-tube architecture revision has returned a concrete handoff. Existing native returns are preserved.
-**Position:** The research review now supplies a source-backed implementation handoff: pair a returned observation with its producing situated prediction, compose that development on the normal-wave owner, then expose the actual emission and further relevant local transport. The [revised blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md) names the operands, owner changes and finite checks. Current source actuation remains returned; no new cultivation process has started. AC0–AC5 is not complete.
+**Currency:** September 10, 2026. **Priority:** Athena implementation handoff finalized from the returned tension, transport and sequence/kinetic mathematics; the illustration pass is complete.
+**Position:** The [finalized blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md) specifies producing comparison, resident emission, coupled conditional organization, lawful formation/reuse and continuing product evaluation. The next implementation begins with the wave-owned producing handle and joint source/target preparation. No new cultivation process has started; AC0–AC5 is not complete.
 **Athena-alpha:** not yet attained.
 
 **Active implementation:** `ResidentNormalWave::actuate_section` composes learned joined source
@@ -15,6 +15,16 @@ it is not semantic confidence. Applied M, ideal optimizer P and source uncertain
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct
 instruction governs.
+
+## Final Athena computational handoff
+
+[established-bounded; source-inspected] The [tension-to-computation review](research/records/2026-09-10_TENSION_DYNAMICS_BECOME_ATHENAS_COMPUTATIONAL_CONSTRUCTION.md)
+checks the formal consequences against native source, including bounded target correlation,
+in-place member formation and the host-only terminal selector. The finalized plan names the
+new resident basis receiver, first coupled law `η ∈ L_j((c−p,c,p),h)`, actual `(c,c+η)` join,
+family successor, single move owner and staged publication. Source exposure and complete rest
+accompany each usable return. This is a completed source/design review; native/formal source and
+all rendered artifacts are unchanged. Existing executed evidence retains its recorded scope.
 
 ## Relevance, loss and realized classes
 
@@ -366,4 +376,4 @@ claim index, equation atlas or blanket gate is revived. Current source checks fo
 changed-example Cargo check passed. That consolidation changed or reran no native kernel, formal proof or corpus cultivation;
 subsequent AC construction and verification are recorded above. Source, documentation and imported testimony are ready for repository pickup;
 the blueprint retains the unfinished conversation product through the native composition in
-[Athena](docs/ATHENA.md#athena-alpha-and-the-next-cultivation), active under the resumed AC0–AC5 goal.
+[Athena](docs/ATHENA.md#athena-alpha-and-the-finite-construction-programme), active under the resumed AC0–AC5 goal.
