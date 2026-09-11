@@ -168,6 +168,29 @@ preserving domain, arithmetic/overflow behavior and complete successor. Search c
 execution cost are measured separately. Native family formation remains required for resident
 HNN conduct.
 
+## Relative optimality and boundary cost
+
+[definition] A locally optimal representation admits no improving variation within its declared
+admissible family and resource aperture. Its objects can be literal packets, executable
+generator words or residual-bearing hybrids. Shared decoder/standing belongs to the conditioning
+boundary; new decoder, parameter and framing material is charged. Preserve the cost vector
+(description, work, clock, residency, calibrated energy and defect), then select an explicit
+objective/budget. Neither a minimum nor an efficient search follows from naming this family.
+
+[proved-derived; formal-checked] The
+[code-cost boundary law](../research/records/2026-09-11_RELATIVE_CODE_COST_HAS_AN_ADDRESSED_BOUNDARY_LAW.md)
+now composes `ell = C cost + V_source − V_target + residual` through existing holon joins.
+Positive C and bounds on endpoint/residual terms give explicit lower and upper cost bounds;
+exact candidate equivalence transports a feasible minimum. Unequal-cost source coding supplies
+one concrete instance. A manifold's circulating remainder cannot be deleted by declaring a
+scalar potential; clock, stress-energy and cosmological receivers keep their physical maps.
+
+[definition] These laws refine the operator work below. RH use needs a source-specific uniform
+zero/strip certificate with retained analytic tail and the original heat clock. Complexity use
+needs a fixed encoding and actual machine-step bounds, for which the existing causal-length
+bridge already supplies the formal interface. A shorter generator is not automatically faster,
+and no generic code-cost theorem establishes either endpoint by itself.
+
 ## From a fixed demo to reusable automata
 
 [definition] The next code increments extend existing owners; the roadmap supplies their order.

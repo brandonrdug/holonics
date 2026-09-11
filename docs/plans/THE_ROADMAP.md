@@ -20,7 +20,10 @@ integration requirements. The application design and immediate work below state 
 places ζ spectral phase/gaps, situated information/loss and Swing first, with executable
 algorithm/code construction following those encoding comparisons. The bounded three-route
 comparison and literal code/remainder return are now complete; operator-scoped reusable
-factors/words are the next increment, carrying those measurements.
+factors/words are the next increment, carrying those measurements. The subsequent
+[code-cost boundary return](../../research/records/2026-09-11_RELATIVE_CODE_COST_HAS_AN_ADDRESSED_BOUNDARY_LAW.md)
+adds exact joined-boundary cost bounds and transported optimality to that increment. Physical
+and endpoint applications still owe their source-specific constitutive/certificate maps.
 
 ## All current plan documents and their roles
 

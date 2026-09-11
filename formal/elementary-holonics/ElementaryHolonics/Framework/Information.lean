@@ -4,6 +4,7 @@ import ElementaryHolonics.Transport.ReceiverPotential
 import ElementaryHolonics.Computation.JointReceiverWitness
 import ElementaryHolonics.Foundation.InformationReceiver
 import ElementaryHolonics.Foundation.SituatedInformationRate
+import ElementaryHolonics.Foundation.ReceiverCodeCost
 import ElementaryHolonics.Computation.HolonicAdjointNormalization
 import ElementaryHolonics.Millennium.ReceiverHistory
 import ElementaryHolonics.Millennium.PhysicalRealization

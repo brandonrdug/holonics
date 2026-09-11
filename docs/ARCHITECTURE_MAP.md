@@ -126,6 +126,13 @@ records the exact analytic and verifier scopes; these are not native formation o
 prime/phase lifts, analytic tails and a literal exterior prefix-code packet. Its code-length
 and remainder observations feed operator reuse without installing a native tokenizer.
 
+[definition] `Foundation/ReceiverCodeCost.lean`, imported by `Framework.Information`, composes
+code/cost balances through `Holon.Interaction`, bounds cost from endpoint/residual bounds, and
+transports a feasible optimum under a cost-preserving candidate equivalence. The exterior
+`holonic-engine/examples/receiver_code_cost.rs` instantiates unequal-cost channel paths and
+transported clock readings. The [boundary return](../research/records/2026-09-11_RELATIVE_CODE_COST_HAS_AN_ADDRESSED_BOUNDARY_LAW.md)
+connects it to the existing addressed causal-length, physical and complexity owners.
+
 ## Foundation and transport
 
 [definition] `Mathematics/GeneratorFactorization.lean` owns the arbitrary finite commutative-ring

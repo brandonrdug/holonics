@@ -1,30 +1,33 @@
 # Construction state
 
-**Currency:** September 11, 2026. **Current work:** Hephaestus ζ/phase and information receivers.
+**Currency:** September 11, 2026. **Current work:** receiver-relative code cost and operator reuse.
 **Athena objective:** standing; useful Athena-alpha has not been attained. **Native runs:** paused
 during the requested mathematical/encoding applications. The active phases now have names;
 AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/plans/THE_ROADMAP.md)
 is the sole order and [the blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 names actual code changes and outcomes.
 
-[established-bounded; implemented-exact] The latest
-[generator/code return](research/records/2026-09-11_GENERATOR_CODES_RETAIN_PHASE_LIFTS_AND_REMAINDERS.md)
-compares three analytic routes at five fixed ζ/η receivers. Doubling the Euler–Maclaurin head
-reduces source tails by a ratio strictly between `2^-20` and `2^-19`; the direct alternating
-route at comparable extent retains too broad a tail to resolve phase. Prime addresses,
-amplitudes, winding/residue charts and complete analytic differences are retained. A literal
-prefix code returns 152 payload bits for 60 head-term signatures, with all 153 packet cuts
-reconstructing through retained partial words. Three focused tests passed; the prior information
-return is unchanged after sharing its phase receiver. No native model or Lean source changed.
+[proved-derived; formal-checked] The latest
+[relative code-cost return](research/records/2026-09-11_RELATIVE_CODE_COST_HAS_AN_ADDRESSED_BOUNDARY_LAW.md)
+composes code/cost balances through actual holon pullback joins, retains endpoint potential
+and residual, derives a two-sided cost bound and transports a feasible minimum under an exact
+candidate equivalence. These are conditional algebraic laws, not new physical identities or
+a stronger RH bound. The new owner is imported by `Framework.Information`.
 
-[definition] Surprise and literal integer code-length are now separated in the compression
-canon, with their actual redundancy retained. The
-[earlier information return](research/records/2026-09-11_ZETA_PHASE_SWING_AND_INFORMATION_RATES_ARE_MEASURED.md)
-retains zero localization, Swing, contour-signature loss and the checked information-rate laws.
-Next compose reusable operator requests and returned factors/words with these receiver, clock,
-remainder and code-cost observations. The [application design](docs/HEPHAESTUS_AUTOMATA.md)
-connects the recovered causal-length/gyro and sequence/fold/kinetic owners; the roadmap keeps
-native incorporation and subsequent executable lowering in their actual order.
+[established-bounded; implemented-exact] Its unequal-cost channel control checks 143 complete
+histories and an exact rescaled clock. Stationary entropy and cost both read `4/3`; transient
+readings retain the nonzero endpoint term. The prior
+[generator/code comparison](research/records/2026-09-11_GENERATOR_CODES_RETAIN_PHASE_LIFTS_AND_REMAINDERS.md)
+retains the five analytic receivers, phase lifts and 152-bit packet; the
+[information return](research/records/2026-09-11_ZETA_PHASE_SWING_AND_INFORMATION_RATES_ARE_MEASURED.md)
+retains Swing and measured information rates. No native model or GPU operation changed.
+
+[definition] Next compose reusable operator requests and returned factors/words with these
+admissibility, cost, clock and remainder relations. Description length, executed work and
+physical quantities retain separate units. The [application design](docs/HEPHAESTUS_AUTOMATA.md)
+now states the optimality/physical and RH/complexity bridges precisely; their missing source
+bounds do not create new endpoint prerequisites. The roadmap keeps the actual native
+incorporation and subsequent executable lowering in order.
 
 ## Immediate native boundary
 
