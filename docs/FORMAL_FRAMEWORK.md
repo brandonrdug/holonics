@@ -296,8 +296,22 @@ chemical kinetics, molecular calibration or a protein-folding result.
 constraints at a shared junction retain `ker F ∩ ker G`, with an explicit separator when removing
 one constraint enlarges the fibre. It also carries finite stressed-framework controls. These are
 useful local conformation mechanics, not a theorem that constraint counts determine a fold.
-The inspected live owners supply no calibrated protein/DNA/RNA dynamics or complete molecular
-folding construction; those are precise realization work, not a missing elementary holon.
+[project-postulate] Sequence-to-fold and biochemical kinetics are foundational construction
+domains for HNN under Brandon's later September 10 direction. The local conformation example
+does not set the boundary of that programme.
+
+[established-bounded; implemented-exact] The
+[sequence/kinetic construction](../research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)
+now supplies a complete finite anchored FCC fold population, sequence-conditioned transition law,
+actual ligand-access geometry and bound-state steric feedback. It retains exact joint reaction
+currents and an explicit failure of energy-bin closure. Calibrated full-protein/DNA/RNA dynamics
+remain distinct realization work; the finite construction is an implemented foundation to use.
+
+[proved-derived; formal-checked] `Physics/ReactionCurrent` derives enzyme and substrate-moiety
+conservation from the mass-action stoichiometric source. Its joint fold/free-bound counterexample
+proves that equal marginals can have different binding current. These laws attach to the actual
+source/condition and producing-return ports described in the Athena blueprint; they introduce no
+molecular classifier or runtime proof assistant into HNN.
 
 ## Twist, curvature and phase keep their different meanings
 

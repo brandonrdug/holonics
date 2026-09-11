@@ -116,6 +116,52 @@ before the local law can be used.
 
 ## Next implementation packets
 
+### Sequence, fold and kinetic conduct are part of this construction
+
+[project-postulate] Brandon's later September 10 ruling places sequence-to-fold and biochemical
+kinetics among HNN's foundational construction domains. A causal chain of thought is the joined
+operation history of a changing body: its organization determines which later interactions can
+occur and how they proceed. A verbal trace is a receiver of that conduct. The molecular and text
+charts instantiate shared relations; text does not pass through a mandatory protein intermediary.
+
+[established-bounded; implemented-exact] The
+[sequence/kinetic return](../../research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)
+constructs sequence-dependent fold populations, geometric ligand access, sterically conditioned
+next moves and reaction currents. Equal energy/contact bins fail to preserve the next kinetic
+return; equal fold and chemical marginals can conceal different binding current. These are
+concrete tests of the joint-state/future-receiver contract, not protein-prediction product grades.
+
+[definition] Carry this consequence into the existing packets below. Preserve the declared
+many-to-many association among exposure occurrences/views/parts, codec sections, actual native
+source/current occurrences and the producing joint. The present symbol chart happens to mount one
+row per supplied symbol; that does not establish a universal sequence-position/native-row
+bijection or make ordinals a topology. Molecular testimony can supply an actual constraint chart;
+text and acoustics retain their own source/condition maps. Compose existing source and return
+owners before introducing another address wrapper; hashes alone do not preserve the association.
+
+[definition] A kinetic continuation includes the admitted transition and its conditioning
+material, contact, occupancy and clock—not just a preferred endpoint. Reuse an applicable local
+constitutive/bilinear relation and `ResidentGeneratorNeighborhood` through explicit source,
+condition and output conversions. Shared row width is insufficient. The normal-wave source action,
+continuation and development retain their existing different effects; changing a coefficient
+alone is not the requested contextual transport. The next producing-comparison packet should
+expose a later dependent operation changed by the returned relation, with its causal source and
+complete successor, instead of grading a plausible verbal sequence.
+
+[conditional] A compressed kinetic chart must transport its actual generators and receivers:
+`q P_i = U_i q` (or `q K_i = K̄_i q` in a continuous-rate chart). A failed closure retains the
+separating fibre or declared defect; a histogram, mean conformation, free/bound marginal or
+rendered fold cannot silently replace the joint current. The reference enumerator is exterior
+evidence, not the proposed native inference algorithm or an obligation to archive all raw states.
+This clarification adds no phase before the producing comparison below and does not resume the
+paused implementation.
+
+[proved-derived; formal-checked] The reaction source also separates labeled emissions from
+body continuation: unbinding and catalytic release can restore the same enzyme/complex state
+while returning different substrate/product outputs. The native return must therefore retain
+emission and its source passage as well as the successor. An unmarked state endomorphism or a
+stationary visible body cannot stand in for that complete operation.
+
 ### AC1/AC2/AC3 — bind the producing comparison to situated conduct
 
 [definition] Extend the existing normal-wave return ownership and conversation caller, keeping

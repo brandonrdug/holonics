@@ -49,6 +49,7 @@ phase, geometry, physical boundaries and computation at their declared scopes.
 | Quadratic port dynamics and retained heat | `Physics/PortEnergyHeat.lean` | Chain-rule storage/source/dissipation balance; nonnegative conductance and explicit heat law |
 | Complex scattering power and attenuation return | `Physics/ScatteringWaveHeat.lean` | Two-port norm preservation and complementary heat; finite constitutive channel |
 | Phase-connected contact, reorientation and intensity defect | `Physics/PhaseContactPassage.lean` | Passive seam/heat and transported sum, gauge covariance, signed-cycle section and amplitude/intensity interpolation difference |
+| Biochemical reaction current and joint fold/occupancy receiver | `Physics/ReactionCurrent.lean` | Stoichiometric enzyme/substrate conservation, positive mass-action rates, equal-marginal binding separator and distinct labeled emissions from the same body return |
 | Observer stress, angular derivative jets and positive rest energy | `Physics/ReceiverStressEnergy.lean` | Both Lorentz indices, perfect-fluid and boosted dust/vacuum readings; mass-shell owner reused |
 | Complete finite change of incidence, material and internal state | `Physics/ConstitutiveModulation.lean` | New `Soma.Holonics.Physics.ConstitutiveModulation` theorems over the existing `coupledResponse`; formal-only |
 
@@ -804,6 +805,13 @@ contacts, supported shorts embedding, and finite remote conformation response.
 `verify_woven.py` checks their source/receiver binding; `verify_closed_receiver.py` checks the
 closed-boundary visibility option against the prior exact renderer. Native protein/constraint,
 Snell, conformation and constitutive owners remain the sources of their distinct relations.
+
+[established-bounded; source-inspected] The [sequence/kinetic return](../research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)
+adds `sequence_folding.py`, `sequence_kinetics.py`, `sequence_figures.py` and `verify_sequence.py`
+in the same exterior experiment directory. They construct a finite anchored FCC conformation
+population, sequence-conditioned kinetic generators, geometric ligand occupancy and exact
+reaction moments. The Athena blueprint uses their joint-state and marked-emission consequences;
+these reference programs are not native inference or a text-to-protein routing layer.
 
 ## Maintenance law
 

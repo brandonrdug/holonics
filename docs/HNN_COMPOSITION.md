@@ -17,7 +17,7 @@ order or installing a DeepSeek architecture.
 
 [definition] The current [receiver edition](../research/papers/rendered/hnn-information-chemistry.pdf)
 uses the repository-local [receiver](../research/papers/source/packages/holonic-receiver/README.md)
-and [engraving](../research/papers/source/packages/holonic-engraving/README.md) packages. Its twenty-four
+and [engraving](../research/papers/source/packages/holonic-engraving/README.md) packages. Its twenty-eight
 plates expose complex source/current, projection and visibility, field-derived hatching,
 orientation, entropy, curved GR reception and shadows on white paper with black phase fields.
 The [stress/knot continuation](../research/records/2026-09-10_STRESS_ENERGY_AND_SCATTERING_WAVES_RETAIN_THE_KNOT_AND_ITS_RECEIVERS.md)
@@ -26,6 +26,9 @@ diagrams, quantum/Feynman attachments, and three Lean energy/observer owners.
 The [woven ecology continuation](../research/records/2026-09-10_WOVEN_FIELD_ECOLOGIES_RETURN_OPTICAL_HORIZONS_AND_REMOTE_CONFORMATION.md)
 adds a collective field horizon, actual four-field shorts passage, optical/local-gravity receiver
 comparisons and abstract allosteric domains, with phase-contact/gauge and intensity-defect laws.
+The [sequence/kinetic return](../research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)
+makes sequence-conditioned folding, steric feedback and biochemical turnover explicit, and maps
+their causal-chain consequences into the existing Athena producing-return handoff.
 The [twenty-plate composition atlas](../research/papers/rendered/hnn-composition-atlas.pdf) preserves
 the preceding Athena/Eros, layer, arithmetic, diffusion, manifold and source-return diagrams,
 with [editable companion source](../research/papers/source/papers/hnn-information-chemistry/composition-atlas.typ).

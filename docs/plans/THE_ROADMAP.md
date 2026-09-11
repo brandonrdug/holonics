@@ -13,6 +13,14 @@ expose the actual emission; compose further local/scale transport as returned di
 The existing world-tube owners supply clocked current and boundary composition. The review does
 not start cultivation, repeat returned foundation packets, or add a Millennium prerequisite.
 
+[project-postulate] **September 10 sequence/kinetic clarification:** Brandon identifies
+sequence-to-fold and biochemical kinetics as keystone HNN construction domains and models for
+causal chains of thought. The [finite source return](../../research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)
+and blueprint now make sequence-conditioned organization, actual kinetic admissibility, joint
+state and labeled emission explicit. These results inform the producing-comparison and local
+transport bindings in the existing order; they add no universal molecular intermediary or new
+prerequisite and do not resume the paused native implementation.
+
 [project-postulate] **September 9 representation correction retained:** Brandon requires identification and
 repair of the byte-clock/occurrence-history model's failure to realize generator-bearing Holons.
 The [representation audit](../../research/records/2026-09-09_THE_BYTE_CLOCK_AND_OCCURRENCE_EXPANSION_ARE_NOT_GENERATOR_CULTIVATION.md)

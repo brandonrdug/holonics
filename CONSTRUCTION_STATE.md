@@ -29,6 +29,14 @@ finite tolerance from exact invisibility and topology change from loss of smooth
 
 ## September 10 receiver engraving and complex-current presentation
 
+[established-bounded; formal-checked; implemented-exact] The [sequence/fold/kinetic return](research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)
+now treats those domains as HNN foundations, following Brandon's later direct clarification.
+Exact FCC fold populations, ligand-dependent admissibility, reaction currents and joint-state
+closure separators are returned; the Physics build and exact source checks pass. The verified
+twenty-eight-plate presentation and fold-history animation are returned. The existing Athena
+blueprint carries the causal-chain and labeled-emission consequences into its producing-return
+handoff. Native AC remains paused.
+
 [established-bounded; formal-checked; implemented-exact] The [woven ecology continuation](research/records/2026-09-10_WOVEN_FIELD_ECOLOGIES_RETURN_OPTICAL_HORIZONS_AND_REMOTE_CONFORMATION.md)
 returns exact field/overlap/conformation sources, phase-contact/gauge/intensity-defect proofs and
 the verified twenty-four-plate presentation. Three illumination ports, sixty-seven witnessed

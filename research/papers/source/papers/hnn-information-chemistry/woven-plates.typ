@@ -102,6 +102,6 @@
  #eq[$q'=q-frac(1,8)nabla E, quad H=F Delta q_1-Delta U=E-E'>0$]
  #eq[$K_i^"domain"=2(a+3q_i^2)=k(2q_i)^2+2k(a+q_i^2) quad (k=1)$]
  #note([*Proved-derived · exact instance.* The existing conformation owner separates material stiffness and prestress; the finite source keeps the contact cross term. Every displayed step stays within $abs(q_i)<=1/2$ and returns positive finite dissipation. The even receiver $q^2$ can agree while the oriented responses are opposite.])
- #v(3mm)#note([*Biological interpretation.* This recovers the protein constraint ecology: chains, contact cells, flexible modes, self-stress and an active-site receiver. The construction models remote mechanical consequence and changing constraints. It makes no sequence-to-fold, biochemical kinetic or calibrated protein claim.])],
+ #v(3mm)#note([*Biological interpretation.* This recovers the protein constraint ecology: chains, contact cells, flexible modes, self-stress and an active-site receiver. The construction models remote mechanical consequence and changing constraints. Plates 25–28 now add sequence-conditioned folding and reaction kinetics to this programme.])],
 )
 ]

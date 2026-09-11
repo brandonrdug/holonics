@@ -177,3 +177,22 @@ Its source lives in `woven-scenes.json` and `ecology-detail-scenes.json`; it doe
 not overwrite the earlier receiver or knot packets. The functions retain phase
 storage, source work, contact heat, material flow, exact tetrahedral level cuts and
 the difference between interpolated intensity and coherent amplitude.
+
+### Sequence, fold and biochemical source
+
+The sequence continuation supplies its actual FCC conformation and mechanochemical
+population source. It uses the same receiver/engraving backend and retains kinetic
+mobility/energy readings independently of H/P names. Regenerate this source with:
+
+```sh
+python research/experiments/receiver_engraving/sequence_folding.py
+python research/experiments/receiver_engraving/sequence_kinetics.py
+python research/experiments/receiver_engraving/sequence_figures.py
+python research/experiments/receiver_engraving/verify_sequence.py
+```
+
+`sequence-scenes.json` contains the returned geometric packets. The bound-site hop
+locator is an annotation with its world source/target retained, separate from phase
+ink. The kinetic source retains catalyst reuse, net substrate uptake, exact product
+moments and source-dependent transition rows; its reference enumerator is not the
+native HNN inference algorithm.

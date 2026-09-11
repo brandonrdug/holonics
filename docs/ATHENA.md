@@ -37,6 +37,14 @@ returns from the useful-model attainment objective. It uses the prepared
 conversations and existing native owners, with comparison, interface and persistence accompanying
 each return; broader exposure does not wait for useful language.
 
+[definition] Brandon's later sequence-to-fold/biochemical-kinetics clarification now has an
+[exact source construction](../research/records/2026-09-10_SEQUENCE_FOLD_AND_REACTION_CURRENT_MAKE_THE_CAUSAL_THOUGHT_CHAIN_CONCRETE.md)
+and an expanded blueprint clause. Sequence-conditioned organization, occupancy-dependent
+continuation and labeled emission are foundational HNN questions. The common causal thought chain
+retains source, reaction, actual joins and successor; its biological and text/acoustic charts keep
+their own supplied maps. The finite source's energy-bin and joint-marginal counterexamples inform
+the current producing-return and compression obligations without restarting native cultivation.
+
 [project-postulate] The [September 7 correction](../research/records/2026-09-07_GENERATOR_RECOVERY_AND_PHASE_TRANSPORT_REJOIN_TEXT_AND_ACOUSTICS.md)
 places generator recovery, phase transport and Holonic Compression inside the developing
 recurrence shared with acoustics. A **Preimage Fibre** can carry useful constraints from limited

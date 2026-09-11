@@ -1,0 +1,24 @@
+{
+  "sequence": "HHPHPH",
+  "source": 2650,
+  "target": 2676,
+  "moved": 4,
+  "hop": [
+    1,
+    1,
+    0
+  ],
+  "ligand_direction": [
+    0,
+    1,
+    -1
+  ],
+  "unbound_move_probability": [
+    "1",
+    "96"
+  ],
+  "bound_move_probability": [
+    "0",
+    "1"
+  ]
+}

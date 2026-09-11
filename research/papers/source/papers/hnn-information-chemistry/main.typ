@@ -3,10 +3,10 @@
 #import "../../packages/holonic-receiver/lib.typ": receiver,primary-response
 #import "receiver-diagrams.typ": event-cone,pinhole,receiver-slice
 #let scenes=json("receiver-scenes.json")
-#set document(title:"HNN — Information Chemistry: receiver edition",author:"Brandon Duggan / Holonics",description:"Twenty-four plates: receiver-derived engraving, complex flow, orientation, entropy, causal frames and shadows.")
+#set document(title:"HNN — Information Chemistry: receiver edition",author:"Brandon Duggan / Holonics",description:"Twenty-eight plates: receiver-derived engraving, complex flow, orientation, entropy, causal frames and shadows.")
 #set page(width:320mm,height:210mm,margin:(x:15mm,y:12mm),fill:white,footer:context [
  #set text(size:8pt,fill:rgb("555555"))
- HOLONICS #h(1fr) INFORMATION CHEMISTRY · RECEIVER EDITION #h(1fr) #counter(page).display("1") / 24
+ HOLONICS #h(1fr) INFORMATION CHEMISTRY · RECEIVER EDITION #h(1fr) #counter(page).display("1") / 28
 ])
 #set text(font:"Libertinus Serif",size:11pt,fill:black)
 #set par(leading:0.55em,spacing:0pt)
@@ -284,3 +284,6 @@
 
 #import "woven-plates.typ": woven-plates
 #woven-plates(title,eq,note)
+
+#import "sequence-plates.typ": sequence-plates
+#sequence-plates(title,eq,note)
