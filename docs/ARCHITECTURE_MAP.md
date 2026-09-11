@@ -113,6 +113,15 @@ proves the baseline/KL and finite Gibbs free-energy relation; `Physics/TwoCellEn
 proves mass and logarithmic entropy returns for actual constitutive trajectories. These formal
 owners add no native learner or physical identity outside their stated hypotheses.
 
+[definition] `Foundation/SituatedInformationRate.lean`, imported by `Framework.Information`,
+owns finite measured-occurrence information rates, transported-measure invariance, conserved
+subdivision and nats/bits conversion. The existing `holonic_engine::surprisal` owner retains
+exact prime-log forms and code-missing fibres. `eta_atlas::derive_ordinate_relations` reads
+interval marks directly; `holonic-engine/examples/zeta_information.rs` composes atlas phase,
+gap, Swing and information receivers as exterior Hephaestus apparatus. The
+[measured return](../research/records/2026-09-11_ZETA_PHASE_SWING_AND_INFORMATION_RATES_ARE_MEASURED.md)
+records the exact analytic and verifier scopes; these are not native formation owners.
+
 ## Foundation and transport
 
 [definition] `Mathematics/GeneratorFactorization.lean` owns the arbitrary finite commutative-ring

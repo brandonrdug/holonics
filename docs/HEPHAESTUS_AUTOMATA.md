@@ -121,6 +121,37 @@ general English conversation is attained. Natural-language formulation can later
 Athena application chart. The language product remains standing rather than becoming a
 prerequisite to every mathematical tool.
 
+## Spectral application and information units
+
+[established-bounded; implemented-exact; formal-checked] The
+[ζ/phase application](../research/records/2026-09-11_ZETA_PHASE_SWING_AND_INFORMATION_RATES_ARE_MEASURED.md)
+now reads five exact zero-localization boxes in the declared strip, complete interval gaps,
+Swing cross-ratios and complex phase-enclosure signatures. It returns symbolic entropy,
+reference-code loss and full point residuals. The first spectral window's phase code fails to
+outperform a uniform signature code on later windows. This is a useful application result
+about contextual reuse, not native HNN prediction or a global RH result.
+
+[definition] Information per holon means `Σ μ(h) I_R(h) / Σ μ(h)` for a declared receiver,
+occurrence family and positive measure. A mesh refinement must retain parent mass before
+comparing rates. The new Lean owner proves transported-measure and inherited-information
+subdivision laws. Phase entropy, reference-code loss, analytic residual, serialized size and
+execution work remain separate measurements. Code-missing events retain their source fibre;
+no smoothing or universal relevance gate is added.
+
+[definition] Swing compares four ordered marks and transports receivers/history. The spectral
+application checks ordinate reflection and complex-conjugate phase transport explicitly.
+Information-per-measure is a rate, not automatically a projective cross-ratio. For a changed
+chart carry the source measure as well; a freshly uniform measure defines a changed experiment.
+
+[definition] The immediate next use compares alternative admitted analytic head/tail generator
+routes at one receiver, then compares transported receivers. Preserve index clock, full
+complex residual and remainder, and distinguish newly resolved uncertainty from changed source
+conduct. The π/e/Gamma factor words are parallel examples of the same generator-versus-face
+question. A later code-producing application lowers those admitted words into existing exact
+native primitives, preserving domain, arithmetic/overflow behavior and complete successor.
+Search cost and resulting execution cost are measured separately. The native family formation
+boundary remains required for resident HNN conduct.
+
 ## From a fixed demo to reusable automata
 
 [definition] The next code increments extend existing owners; the roadmap supplies their order.

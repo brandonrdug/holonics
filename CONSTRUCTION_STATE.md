@@ -1,19 +1,26 @@
 # Construction state
 
-**Currency:** September 11, 2026. **Current work:** Hephaestus Automata application design.
+**Currency:** September 11, 2026. **Current work:** Hephaestus ζ/phase and information receivers.
 **Athena objective:** standing; useful Athena-alpha has not been attained. **Native runs:** paused
-while the requested mathematical/encoding handoff is organized. The active phases now have names;
+during the requested mathematical/encoding applications. The active phases now have names;
 AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/plans/THE_ROADMAP.md)
 is the sole order and [the blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 names actual code changes and outcomes.
 
-[definition] The latest direction prioritizes elementary mathematical applications and names
-their task-scoped instances **Hephaestus Automata**. The
-[application design](docs/HEPHAESTUS_AUTOMATA.md) now specifies operator requests, reusable
-construction/receiver boundaries, catalytic morphology and the next code increments. Eros's
-union/formation is explicit at nested scopes; Athena remains the wider wisdom/model ecology.
-This is a design return: the existing factorization prototype remains the latest executed solver
-evidence. No new native operation, model or application interface was implemented in this pass.
+[established-bounded; implemented-exact; formal-checked] The latest
+[ζ/phase information return](research/records/2026-09-11_ZETA_PHASE_SWING_AND_INFORMATION_RATES_ARE_MEASURED.md)
+executes the existing exact η atlas over the declared strip `[2/5,3/5] × [12,36]`, returning
+five isolated zeros, interval gaps, transported Swing cross-ratios, phase-signature entropy and
+reference-code loss. Localization gain is exactly two bits per measured occurrence. The first
+window's phase code performs worse on later windows than the uniform signature code. The new
+Lean rate owner proves transported-measure and subdivision laws; 16 surprisal and 50 geometry
+tests and the Information target build passed. The full atlas and receiver return are retained.
+This is exterior mathematical measurement; no native model or hot operation changed.
+
+[definition] The next Hephaestus comparison varies admitted generator routes at a fixed analytic
+receiver, then transports the receiver/measure, keeping tails, phase and work visible. The
+[application design](docs/HEPHAESTUS_AUTOMATA.md) names these boundaries and subsequent executable
+lowering. Eros is formative union at nested scopes; Athena remains the wider wisdom/model ecology.
 
 ## Immediate native boundary
 
@@ -55,7 +62,7 @@ Its repair is source/applicability/constraint representation, not more exposure 
 [producing-family return](research/records/2026-09-11_PRODUCING_FAMILIES_KEEP_JOINT_COMPARISON_PARAMETERS.md)
 passed 18 coupled and five session checks serially. The actual pending-family capture is retained;
 its large-model consuming material follow-up has not run. No CUDA tests or cultivation were rerun
-for the current prose/plan changes.
+for the current exterior mathematical application.
 
 [definition] Detailed native chronology remains in the
 [normal producing return](research/records/2026-09-10_ATHENA_RETURNS_OBSERVATIONS_TO_THEIR_PRODUCING_JOINT.md),

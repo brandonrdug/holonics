@@ -1,0 +1,695 @@
+{
+  "artifact_verification": "VERIFIED schema=laboratory.holonic-eta-ratio-atlas.v2 apparatus=serial BigRational (exact_analysis) bands=24 winding_sum=5 closures=5 refinements=10 workers=4\nPATH zero=0 tau=[14,57/4] turns=+91/-4/open0 negative_turn_edges=[1, 2, 3, 4] axis_crossings=real:73/imaginary:78 nearest_partial_returns=[96, 94, 77, 75, 83, 92, 88, 90]\nPATH zero=1 tau=[21,85/4] turns=+91/-4/open0 negative_turn_edges=[3, 4, 5, 6] axis_crossings=real:2/imaginary:15 nearest_partial_returns=[11, 15, 27, 32, 37, 42, 24, 49]\nPATH zero=2 tau=[25,101/4] turns=+89/-6/open0 negative_turn_edges=[1, 2, 4, 5, 6, 7] axis_crossings=real:3/imaginary:2 nearest_partial_returns=[13, 17, 21, 24, 32, 14, 27, 40]\nPATH zero=3 tau=[121/4,61/2] turns=+89/-6/open0 negative_turn_edges=[2, 5, 6, 7, 8, 9] axis_crossings=real:5/imaginary:65 nearest_partial_returns=[28, 39, 59, 31, 89, 80, 25, 73]\nPATH zero=4 tau=[131/4,33] turns=+88/-7/open0 negative_turn_edges=[1, 3, 5, 6, 7, 8, 9] axis_crossings=real:2/imaginary:55 nearest_partial_returns=[18, 29, 32, 35, 22, 43, 26, 63]\nRELATION successive_gap [0, 1]=[27/4,29/4] cf=[]\nRELATION successive_ordinate_ratio [0, 1]=[28/19,85/56] cf=[1]\nRELATION successive_gap [1, 2]=[15/4,17/4] cf=[]\nRELATION successive_ordinate_ratio [1, 2]=[20/17,101/84] cf=[1]\nRELATION successive_gap [2, 3]=[5,11/2] cf=[5]\nRELATION successive_ordinate_ratio [2, 3]=[121/101,61/50] cf=[1]\nRELATION successive_gap [3, 4]=[9/4,11/4] cf=[2]\nRELATION successive_ordinate_ratio [3, 4]=[131/122,12/11] cf=[1]\nRELATION successive_gap_ratio [0, 1, 2]=[15/29,17/27] cf=[0, 1, 1]\nRELATION successive_gap_ratio [1, 2, 3]=[20/17,22/15] cf=[1]\nRELATION successive_gap_ratio [2, 3, 4]=[9/22,11/20] cf=[0]\nRELATION ordered_projective_cross_ratio [0, 1, 2, 3]=[258/187,57/32] cf=[1]\nRELATION ordered_projective_cross_ratio [1, 2, 3, 4]=[45/44,152/115] cf=[1]\nMOMENT order=1 dyadic_outer=[89765/8388608,92231/8388608] cf=[0]\nMOMENT order=2 dyadic_outer=[563/16777216,601/16777216] cf=[0]\nMOMENT order=3 dyadic_outer=[1/8388608,3/16777216] cf=[0]\nMOMENT order=4 dyadic_outer=[0,1/16777216] cf=[0]\n",
+  "gap_comparison": {
+    "counts": {
+      "0": "2",
+      "1": "1"
+    },
+    "entropy_bits_per_resolved_comparison": {
+      "display_bits": 8,
+      "display_enclosure": [
+        "235/256",
+        "59/64"
+      ],
+      "enclosure_bits": 96,
+      "enclosure_terms": 32,
+      "exact_bits": "-2/3*log2(2) + log2(3)"
+    },
+    "events": [
+      {
+        "difference": [
+          "-7/2",
+          "-5/2"
+        ],
+        "label": 0,
+        "source_marks": [
+          0,
+          1,
+          2
+        ]
+      },
+      {
+        "difference": [
+          "3/4",
+          "7/4"
+        ],
+        "label": 1,
+        "source_marks": [
+          1,
+          2,
+          3
+        ]
+      },
+      {
+        "difference": [
+          "-13/4",
+          "-9/4"
+        ],
+        "label": 0,
+        "source_marks": [
+          2,
+          3,
+          4
+        ]
+      }
+    ],
+    "excess_bits": {
+      "display_bits": 8,
+      "display_enclosure": [
+        "5/64",
+        "21/256"
+      ],
+      "enclosure_bits": 96,
+      "enclosure_terms": 32,
+      "exact_bits": "5/3*log2(2) + -1*log2(3)"
+    },
+    "reference_code_loss": {
+      "disposition": "full",
+      "form": {
+        "display_bits": 8,
+        "display_enclosure": [
+          "1",
+          "1"
+        ],
+        "enclosure_bits": 96,
+        "enclosure_terms": 32,
+        "exact_bits": "log2(2)"
+      }
+    },
+    "scope": "overlapping spectral triples; not an independent-process entropy rate or an HNN prediction",
+    "unresolved": 0
+  },
+  "localization_rate": {
+    "bits_per_zero_localization_holon": {
+      "display_bits": 8,
+      "display_enclosure": [
+        "2",
+        "2"
+      ],
+      "enclosure_bits": 96,
+      "enclosure_terms": 32,
+      "exact_bits": "2*log2(2)"
+    },
+    "measure": "5",
+    "reference": "uniform height measure inside each root band; resolution gain, not a probability of RH",
+    "total_information": {
+      "display_bits": 8,
+      "display_enclosure": [
+        "10",
+        "10"
+      ],
+      "enclosure_bits": 96,
+      "enclosure_terms": 32,
+      "exact_bits": "10*log2(2)"
+    }
+  },
+  "native_model_changed": false,
+  "ordered_relations": [
+    {
+      "enclosure": [
+        "27/4",
+        "29/4"
+      ],
+      "kind": "successive_gap",
+      "members": [
+        0,
+        1
+      ]
+    },
+    {
+      "enclosure": [
+        "28/19",
+        "85/56"
+      ],
+      "kind": "successive_ordinate_ratio",
+      "members": [
+        0,
+        1
+      ]
+    },
+    {
+      "enclosure": [
+        "15/4",
+        "17/4"
+      ],
+      "kind": "successive_gap",
+      "members": [
+        1,
+        2
+      ]
+    },
+    {
+      "enclosure": [
+        "20/17",
+        "101/84"
+      ],
+      "kind": "successive_ordinate_ratio",
+      "members": [
+        1,
+        2
+      ]
+    },
+    {
+      "enclosure": [
+        "5",
+        "11/2"
+      ],
+      "kind": "successive_gap",
+      "members": [
+        2,
+        3
+      ]
+    },
+    {
+      "enclosure": [
+        "121/101",
+        "61/50"
+      ],
+      "kind": "successive_ordinate_ratio",
+      "members": [
+        2,
+        3
+      ]
+    },
+    {
+      "enclosure": [
+        "9/4",
+        "11/4"
+      ],
+      "kind": "successive_gap",
+      "members": [
+        3,
+        4
+      ]
+    },
+    {
+      "enclosure": [
+        "131/122",
+        "12/11"
+      ],
+      "kind": "successive_ordinate_ratio",
+      "members": [
+        3,
+        4
+      ]
+    },
+    {
+      "enclosure": [
+        "15/29",
+        "17/27"
+      ],
+      "kind": "successive_gap_ratio",
+      "members": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "enclosure": [
+        "20/17",
+        "22/15"
+      ],
+      "kind": "successive_gap_ratio",
+      "members": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "enclosure": [
+        "9/22",
+        "11/20"
+      ],
+      "kind": "successive_gap_ratio",
+      "members": [
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "enclosure": [
+        "258/187",
+        "57/32"
+      ],
+      "kind": "ordered_projective_cross_ratio",
+      "members": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "enclosure": [
+        "45/44",
+        "152/115"
+      ],
+      "kind": "ordered_projective_cross_ratio",
+      "members": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "phase_measurement": {
+    "bits_per_zero_localization_holon": {
+      "display_bits": 8,
+      "display_enclosure": [
+        "351/128",
+        "703/256"
+      ],
+      "enclosure_bits": 96,
+      "enclosure_terms": 32,
+      "exact_bits": "451/180*log2(2) + 413/240*log2(3) + -25/48*log2(5) + -7/60*log2(7) + -77/720*log2(11) + -13/240*log2(13) + -19/720*log2(19) + -37/720*log2(37)"
+    },
+    "later_spectral_windows_under_first_window_code": {
+      "disposition": "full",
+      "form": {
+        "display_bits": 8,
+        "display_enclosure": [
+          "195/64",
+          "781/256"
+        ],
+        "enclosure_bits": 96,
+        "enclosure_terms": 32,
+        "exact_bits": "401/144*log2(2) + 871/576*log2(3) + -73/96*log2(5) + -61/576*log2(11)"
+      }
+    },
+    "parent_signature_mutual_information": {
+      "display_bits": 8,
+      "display_enclosure": [
+        "49/256",
+        "25/128"
+      ],
+      "enclosure_bits": 96,
+      "enclosure_terms": 32,
+      "exact_bits": "43/60*log2(2) + -11/240*log2(3) + 59/48*log2(5) + -7/40*log2(7) + 77/720*log2(11) + -13/120*log2(13) + -17/180*log2(17) + 19/720*log2(19) + -37/720*log2(37) + -59/720*log2(59) + -83/720*log2(83) + -109/720*log2(109)"
+    },
+    "per_parent_normalized_contour_L1_measure": true,
+    "phase_signature_mass": {
+      "1": "83/144",
+      "10": "109/144",
+      "12": "37/72",
+      "2": "59/144",
+      "3": "35/36",
+      "4": "35/72",
+      "5": "13/16",
+      "8": "17/36"
+    },
+    "pooled_signature_entropy": {
+      "display_bits": 8,
+      "display_enclosure": [
+        "47/16",
+        "753/256"
+      ],
+      "enclosure_bits": 96,
+      "enclosure_terms": 32,
+      "exact_bits": "29/9*log2(2) + 67/40*log2(3) + 17/24*log2(5) + -7/24*log2(7) + -13/80*log2(13) + -17/180*log2(17) + -37/360*log2(37) + -59/720*log2(59) + -83/720*log2(83) + -109/720*log2(109)"
+    },
+    "reference_code_loss": {
+      "disposition": "full",
+      "form": {
+        "display_bits": 8,
+        "display_enclosure": [
+          "3",
+          "3"
+        ],
+        "enclosure_bits": 96,
+        "enclosure_terms": 32,
+        "exact_bits": "3*log2(2)"
+      }
+    },
+    "scope": "entropy of certified enclosure signatures; ambiguous phase sectors remain set-valued",
+    "total_conditional_bits": {
+      "display_bits": 8,
+      "display_enclosure": [
+        "1757/128",
+        "3515/256"
+      ],
+      "enclosure_bits": 96,
+      "enclosure_terms": 32,
+      "exact_bits": "451/36*log2(2) + 413/48*log2(3) + -125/48*log2(5) + -7/12*log2(7) + -77/144*log2(11) + -13/48*log2(13) + -19/144*log2(19) + -37/144*log2(37)"
+    },
+    "total_mass": "5"
+  },
+  "representation_cost": {
+    "scope": "serialized exterior witness size, not entropy or native compression",
+    "source_ron_bytes": 2086595
+  },
+  "schema": "holonics.hephaestus.zeta-information.v1",
+  "source_atlas": ".local/artifacts/hephaestus-zeta-information/atlas-12-36.ron",
+  "source_scope": {
+    "atlas_elapsed_milliseconds": 40903,
+    "global_RH_or_complete_strip_claim": false,
+    "integer_bands": 24,
+    "sigma": [
+      "2/5",
+      "3/5"
+    ],
+    "source_apparatus": "serial BigRational (exact_analysis)",
+    "tau": [
+      "12",
+      "36"
+    ],
+    "zero_localization_occurrences": 5
+  },
+  "swing": [
+    {
+      "ordered_marks": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "pair": [
+        "258/187",
+        "57/32"
+      ],
+      "scope": "interval cross-ratio in the transported chart",
+      "swung_pair": [
+        "258/187",
+        "57/32"
+      ]
+    },
+    {
+      "ordered_marks": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "pair": [
+        "45/44",
+        "152/115"
+      ],
+      "scope": "interval cross-ratio in the transported chart",
+      "swung_pair": [
+        "45/44",
+        "152/115"
+      ]
+    }
+  ],
+  "work": {
+    "additional_point_eta_evaluations": 10,
+    "distinct_boundary_segments_measured": 148,
+    "full_internal_arithmetic_work": "not counted by this existing analytic owner",
+    "no_fabricated_ExactWork": true
+  },
+  "zero_returns": [
+    {
+      "boundary_segments": 27,
+      "conjugate_phase_covariance": true,
+      "eta_remainder_radius": "72402504427034102011849026409055512430786791444477091830369685/10782157467212953158724282784042967990422230786751310469160962822766592",
+      "eta_residual": {
+        "im": [
+          "-90520222188797750760804067/4951760157141521099596496896",
+          "-362080136849971384951864565/19807040628566084398385987584"
+        ],
+        "re": [
+          "-38333931280570835543428677/39614081257132168796771975168",
+          "-19166213735065799680362583/19807040628566084398385987584"
+        ]
+      },
+      "eta_residual_norm_squared": [
+        "65734684625116115476555178880149855560676474224535557/196159429230833773869868419475239575503198607639501078528",
+        "525879770294419537392629672430180476855150332265361625/1569275433846670190958947355801916604025588861116008628224"
+      ],
+      "phase_entropy": {
+        "display_bits": 8,
+        "display_enclosure": [
+          "747/256",
+          "187/64"
+        ],
+        "enclosure_bits": 96,
+        "enclosure_terms": 32,
+        "exact_bits": "43/18*log2(2) + 19/12*log2(3) + -5/8*log2(5) + -11/72*log2(11)"
+      },
+      "phase_signature_mass": {
+        "1": "11/72",
+        "10": "2/9",
+        "12": "5/48",
+        "2": "5/48",
+        "3": "5/48",
+        "4": "5/72",
+        "5": "5/36",
+        "8": "5/48"
+      },
+      "representative_is_not_asserted_to_be_zero": true,
+      "representative_tau": "113/8",
+      "resolution_information": {
+        "display_bits": 8,
+        "display_enclosure": [
+          "2",
+          "2"
+        ],
+        "enclosure_bits": 96,
+        "enclosure_terms": 32,
+        "exact_bits": "2*log2(2)"
+      },
+      "sigma": "1/2 by unique-zero reflection",
+      "source_lineage": 0,
+      "tau": [
+        "14",
+        "57/4"
+      ],
+      "winding": 1
+    },
+    {
+      "boundary_segments": 30,
+      "conjugate_phase_covariance": true,
+      "eta_remainder_radius": "20307796154215921951778874721984141870936544869418800009098808715/3944544740291369207326365292133975082206002381033648796401753579327586304",
+      "eta_residual": {
+        "im": [
+          "9047532628142002294693380811/39614081257132168796771975168",
+          "4523766910043299036803505413/19807040628566084398385987584"
+        ],
+        "re": [
+          "-1654044945665708888325246819/19807040628566084398385987584",
+          "-6616177398773643995473727185/79228162514264337593543950336"
+        ]
+      },
+      "eta_residual_norm_squared": [
+        "371205190001219690930496432992168435205255176864060095109/6277101735386680763835789423207666416102355444464034512896",
+        "11600165869342487734225035541471237413381412360994959665/196159429230833773869868419475239575503198607639501078528"
+      ],
+      "phase_entropy": {
+        "display_bits": 8,
+        "display_enclosure": [
+          "673/256",
+          "337/128"
+        ],
+        "enclosure_bits": 96,
+        "enclosure_terms": 32,
+        "exact_bits": "179/72*log2(2) + 29/16*log2(3) + -35/144*log2(5) + -7/36*log2(7) + -11/36*log2(11) + -19/144*log2(19)"
+      },
+      "phase_signature_mass": {
+        "1": "5/48",
+        "10": "1/36",
+        "12": "5/36",
+        "2": "1/72",
+        "3": "19/144",
+        "4": "7/36",
+        "5": "11/36",
+        "8": "1/12"
+      },
+      "representative_is_not_asserted_to_be_zero": true,
+      "representative_tau": "169/8",
+      "resolution_information": {
+        "display_bits": 8,
+        "display_enclosure": [
+          "2",
+          "2"
+        ],
+        "enclosure_bits": 96,
+        "enclosure_terms": 32,
+        "exact_bits": "2*log2(2)"
+      },
+      "sigma": "1/2 by unique-zero reflection",
+      "source_lineage": 1,
+      "tau": [
+        "21",
+        "85/4"
+      ],
+      "winding": 1
+    },
+    {
+      "boundary_segments": 35,
+      "conjugate_phase_covariance": true,
+      "eta_remainder_radius": "459184609739243196329418428979539946582829572042217963535895081167/35006036345339634083858548352834484527934675821948246409704462007578656768",
+      "eta_residual": {
+        "im": [
+          "14275866733384133882937697711/79228162514264337593543950336",
+          "7137935661914020013893374687/39614081257132168796771975168"
+        ],
+        "re": [
+          "1810571289721536747659439741/9903520314283042199192993792",
+          "14484574908216200126124569689/79228162514264337593543950336"
+        ]
+      },
+      "eta_residual_norm_squared": [
+        "413603148279833954974003028519105765562597058065864052705/6277101735386680763835789423207666416102355444464034512896",
+        "413603412326222098411627104676676491344328040008906948597/6277101735386680763835789423207666416102355444464034512896"
+      ],
+      "phase_entropy": {
+        "display_bits": 8,
+        "display_enclosure": [
+          "39/16",
+          "625/256"
+        ],
+        "enclosure_bits": 96,
+        "enclosure_terms": 32,
+        "exact_bits": "175/72*log2(2) + 43/24*log2(3) + -25/72*log2(5) + -7/18*log2(7) + -11/144*log2(11) + -13/72*log2(13)"
+      },
+      "phase_signature_mass": {
+        "1": "13/72",
+        "10": "1/36",
+        "12": "1/16",
+        "2": "1/12",
+        "3": "7/18",
+        "4": "11/144",
+        "5": "25/144",
+        "8": "1/144"
+      },
+      "representative_is_not_asserted_to_be_zero": true,
+      "representative_tau": "201/8",
+      "resolution_information": {
+        "display_bits": 8,
+        "display_enclosure": [
+          "2",
+          "2"
+        ],
+        "enclosure_bits": 96,
+        "enclosure_terms": 32,
+        "exact_bits": "2*log2(2)"
+      },
+      "sigma": "1/2 by unique-zero reflection",
+      "source_lineage": 2,
+      "tau": [
+        "25",
+        "101/4"
+      ],
+      "winding": 1
+    },
+    {
+      "boundary_segments": 28,
+      "conjugate_phase_covariance": true,
+      "eta_remainder_radius": "32660511165132284214126797940377889573863453437164187428754330897/2335639675912286136450744140407905458667179239896948670464000000000000000",
+      "eta_residual": {
+        "im": [
+          "-1405820504714424013591810289/9903520314283042199192993792",
+          "-702909840066908916372903533/4951760157141521099596496896"
+        ],
+        "re": [
+          "320271069094448976655415371/39614081257132168796771975168",
+          "160137183708436850019714121/19807040628566084398385987584"
+        ]
+      },
+      "eta_residual_norm_squared": [
+        "31723837126523699480622336205689699257817269559671521337/1569275433846670190958947355801916604025588861116008628224",
+        "7930969083508141133393323208891826983781422075231856725/392318858461667547739736838950479151006397215279002157056"
+      ],
+      "phase_entropy": {
+        "display_bits": 8,
+        "display_enclosure": [
+          "93/32",
+          "745/256"
+        ],
+        "enclosure_bits": 96,
+        "enclosure_terms": 32,
+        "exact_bits": "41/18*log2(2) + 13/8*log2(3) + -25/36*log2(5) + -13/144*log2(13)"
+      },
+      "phase_signature_mass": {
+        "1": "1/12",
+        "10": "2/9",
+        "12": "5/48",
+        "2": "5/48",
+        "3": "25/144",
+        "4": "13/144",
+        "5": "1/12",
+        "8": "5/36"
+      },
+      "representative_is_not_asserted_to_be_zero": true,
+      "representative_tau": "243/8",
+      "resolution_information": {
+        "display_bits": 8,
+        "display_enclosure": [
+          "2",
+          "2"
+        ],
+        "enclosure_bits": 96,
+        "enclosure_terms": 32,
+        "exact_bits": "2*log2(2)"
+      },
+      "sigma": "1/2 by unique-zero reflection",
+      "source_lineage": 3,
+      "tau": [
+        "121/4",
+        "61/2"
+      ],
+      "winding": 1
+    },
+    {
+      "boundary_segments": 28,
+      "conjugate_phase_covariance": true,
+      "eta_remainder_radius": "73434380627752970464665409560837595069030208397839392658413797004283/5427754182999196660479889922282245680622030531201901439349574250370927951872",
+      "eta_residual": {
+        "im": [
+          "-3565903423417442993802348499/19807040628566084398385987584",
+          "-14263607262445896010785098807/79228162514264337593543950336"
+        ],
+        "re": [
+          "276276799919869657048484765/9903520314283042199192993792",
+          "1105110415291416610406086719/39614081257132168796771975168"
+        ]
+      },
+      "eta_residual_norm_squared": [
+        "208335539828432983993778050793935150446996227152727557649/6277101735386680763835789423207666416102355444464034512896",
+        "52083937930546526208366784262423496585586904114738396965/1569275433846670190958947355801916604025588861116008628224"
+      ],
+      "phase_entropy": {
+        "display_bits": 8,
+        "display_enclosure": [
+          "725/256",
+          "363/128"
+        ],
+        "enclosure_bits": 96,
+        "enclosure_terms": 32,
+        "exact_bits": "53/18*log2(2) + 43/24*log2(3) + -25/36*log2(5) + -37/144*log2(37)"
+      },
+      "phase_signature_mass": {
+        "1": "1/18",
+        "10": "37/144",
+        "12": "5/48",
+        "2": "5/48",
+        "3": "25/144",
+        "4": "1/18",
+        "5": "1/9",
+        "8": "5/36"
+      },
+      "representative_is_not_asserted_to_be_zero": true,
+      "representative_tau": "263/8",
+      "resolution_information": {
+        "display_bits": 8,
+        "display_enclosure": [
+          "2",
+          "2"
+        ],
+        "enclosure_bits": 96,
+        "enclosure_terms": 32,
+        "exact_bits": "2*log2(2)"
+      },
+      "sigma": "1/2 by unique-zero reflection",
+      "source_lineage": 4,
+      "tau": [
+        "131/4",
+        "33"
+      ],
+      "winding": 1
+    }
+  ]
+}

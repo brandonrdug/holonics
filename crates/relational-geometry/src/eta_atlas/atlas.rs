@@ -489,6 +489,15 @@ pub fn derive_relations(
         .iter()
         .map(|lineage| lineage.final_receiver.tau.clone())
         .collect::<Vec<_>>();
+    derive_ordinate_relations(&ordinates)
+}
+
+/// Read ordered interval marks through the atlas's existing gap and Swing receivers.
+/// A caller may transport the marks to another chart without cloning zero certificates or
+/// claiming that the transported chart is a freshly certified zero atlas.
+pub fn derive_ordinate_relations(
+    ordinates: &[RatInterval],
+) -> Result<(Vec<IntervalRelation>, Vec<ReciprocalMoment>), String> {
     let mut relations = Vec::new();
     for index in 0..ordinates.len().saturating_sub(1) {
         let gap = ordinates[index + 1].subtract(&ordinates[index]);
@@ -526,7 +535,7 @@ pub fn derive_relations(
     let mut moments = Vec::new();
     for order in 1..=4u32 {
         let mut sum = RatInterval::point(Rat::zero());
-        for ordinate in &ordinates {
+        for ordinate in ordinates {
             let powered = interval_power(ordinate, 2 * order);
             sum = sum.add(
                 &RatInterval::point(Rat::one())
@@ -537,6 +546,27 @@ pub fn derive_relations(
         moments.push(ReciprocalMoment { order, value: sum });
     }
     Ok((relations, moments))
+}
+
+#[cfg(test)]
+mod ordinate_receiver_tests {
+    use super::*;
+
+    #[test]
+    fn swung_intervals_reverse_gaps_and_preserve_projective_reading() {
+        let marks = [1, 3, 7, 12].map(|n| RatInterval::new(integer(n), integer(n) + rat(1, 8)));
+        let swung = marks.each_ref().map(RatInterval::neg);
+        let (before, _) = derive_ordinate_relations(&marks).unwrap();
+        let (after, _) = derive_ordinate_relations(&swung).unwrap();
+        for (left, right) in before.iter().zip(after.iter()) {
+            assert_eq!(left.members, right.members);
+            if left.kind == "successive_gap" {
+                assert_eq!(left.value.neg(), right.value);
+            } else {
+                assert_eq!(left.value, right.value);
+            }
+        }
+    }
 }
 
 #[allow(clippy::too_many_arguments)]

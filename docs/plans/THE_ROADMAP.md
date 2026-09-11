@@ -16,7 +16,9 @@ Use their retained mixed terms, actual clock maps and source-specific refinement
 in the matching native/physical construction below. It does not create a prerequisite to solve
 RH or reopen five endpoint campaigns. Brandon's subsequent Hephaestus direction now prioritizes
 elementary mathematical solver applications; the named Athena phases retain the native
-integration requirements. The application design and immediate work below state that direction.
+integration requirements. The application design and immediate work below state that direction. The latest request
+places ζ spectral phase/gaps, situated information/loss and Swing first, with executable
+algorithm/code construction following those encoding comparisons.
 
 ## All current plan documents and their roles
 
@@ -44,14 +46,19 @@ Useful mathematical tools need not await general conversation or an official Mil
 
 | Increment | Concrete code/design work | Expected useful return |
 |---|---|---|
+| **Spectral generators and situated information** | Extend the returned exact ζ/η phase and gap receiver to alternative admitted analytic generator routes; retain head/tail, full complex residual, transported measure, symbolic information and actual work | Compare the same face across generators and changed receiver charts; distinguish analytic refinement from source change and show when a local code transfers or fails |
 | **Operator-scoped requests** | Factor the fixed example into a cohesive exact factorization capability using the existing preimage owner; retain field, shape, support, receiver and cost aperture | Different requested mathematical operators use the same construction machinery and return scoped values, families or executable factors |
 | **Shared constructions and changed receivers** | Keep typed returned factors; solve a new receiver, compose existing operator/recurrence words and preserve clocks/fibres | The complex-multiplication product core serves polynomial multiplication; a receiver requiring a discarded distinction returns its actual obstruction |
 | **Returned constraints and available material** | Compose actual source-qualified comparisons with contextual factorization, factor covers and existing material owners | New constraints refine applicability or enable a new construction, with meaningful before/after conduct and cost |
 | **Resident mathematical instances** | Bind a demonstrated automaton and receiver to the existing HNN owner, staged formation and rest; preserve the native family incorporation obligation | A native mathematical application continues through its actual successor without host semantic replay or a second engine |
 
-[definition] Begin with exact relations, bilinear/polynomial operations and indexed recurrence
-blocks. Add analytic window/jet and boundary-energy tasks through their existing source and
-remainder owners as the corresponding construction becomes usable. The ordered increments
+[definition] The [first ζ information application](../../research/records/2026-09-11_ZETA_PHASE_SWING_AND_INFORMATION_RATES_ARE_MEASURED.md)
+now returns interval placements, gaps, Swing transport and exact information/loss over a declared
+phase receiver. Continue changed-generator/receiver comparisons, then reuse exact relations,
+bilinear/polynomial operations and indexed recurrence blocks. Executable code lowering retains
+the admitted domain, arithmetic/overflow behavior, clock, decoder and successor; it is the
+application continuation of these constructions, not a separate tokenizer or engine. Add
+boundary-energy tasks through their existing source and remainder owners as usable. The ordered increments
 describe progressive integration; they do not prevent a useful exterior reference return before
 the native bridge is complete. The current position distinguishes those evidence scopes.
 

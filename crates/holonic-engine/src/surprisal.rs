@@ -45,9 +45,11 @@
 //! `qᵢ ∈ ℚ`, clear denominators to get `Π pᵢ^{nᵢ} = 1` with `nᵢ ∈ ℤ`; unique factorization forces
 //! every `nᵢ = 0`. So `{log₂ p : p prime}` is ℚ-linearly independent and the zero test is integer
 //! arithmetic on the coefficients. This is elementary — **no transcendence theory is invoked and
-//! none is needed.** It is why `S(P) = S(Q)` is decidable here while `S(P) < S(Q)` is not.
+//! none is needed.** Equality is decided directly; the strict-comparison API below uses
+//! enclosures at a declared grain and may return `Open`. This is an algorithmic scope, not
+//! a claim that ordering finite rational logarithmic forms is mathematically undecidable.
 //!
-//! **Ordering two distinct forms is not exact, and says so.** [`SymbolicSurprisal::compare`] returns
+//! **Strict comparison retains its enclosure grain.** [`SymbolicSurprisal::compare`] returns
 //! [`ExactOrdering`], whose `Open` variant is the honest answer when the certified enclosures
 //! overlap. From `exact_value`'s own opening: *"Values which cannot yet be ordered from their exact
 //! certificates return `Open` rather than falling through to an epsilon comparison."*
@@ -247,9 +249,21 @@ impl SymbolicSurprisal {
     pub fn enclosure_at(&self, terms: u32, bits: u32) -> Result<ExactInterval, SurprisalError> {
         let mut lower = Rat::zero();
         let mut upper = Rat::zero();
+        // log2(2)=1 is the exact rational bit coordinate. It does not require
+        // division of separately enclosed copies of ln(2).
+        if self.terms.keys().all(|prime| *prime == 2) {
+            return Ok(ExactInterval::point(
+                self.terms.get(&2).cloned().unwrap_or_else(Rat::zero),
+            ));
+        }
         let log_two = log_rational_interval(&Rat::from_integer(2.into()), terms, bits)
             .map_err(|_| SurprisalError::EnclosureUnavailable)?;
         for (prime, coefficient) in &self.terms {
+            if *prime == 2 {
+                lower += coefficient;
+                upper += coefficient;
+                continue;
+            }
             // log2(p) = ln(p) / ln(2), enclosed by dividing the two enclosures outward.
             let natural =
                 log_rational_interval(&Rat::from_integer(BigInt::from(*prime)), terms, bits)
@@ -940,6 +954,23 @@ mod tests {
 
     fn rat(numerator: i64, denominator: i64) -> Rat {
         Rat::new(BigInt::from(numerator), BigInt::from(denominator))
+    }
+
+    #[test]
+    fn dyadic_information_is_an_exact_bit_coordinate_at_coarse_grain() {
+        let information = SymbolicSurprisal::of_probability(&rat(1, 8)).unwrap();
+        assert_eq!(
+            information.enclosure_at(1, 4).unwrap(),
+            ExactInterval::point(rat(3, 1))
+        );
+        assert_eq!(
+            information.scaled(&rat(-1, 2)).enclosure_at(1, 4).unwrap(),
+            ExactInterval::point(rat(-3, 2))
+        );
+        assert_eq!(
+            SymbolicSurprisal::zero().enclosure_at(1, 4).unwrap(),
+            ExactInterval::point(rat(0, 1))
+        );
     }
 
     fn population(entries: &[(u64, u32)]) -> BTreeMap<u64, BigUint> {
