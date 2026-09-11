@@ -302,6 +302,12 @@ current; selection correctness by itself gives no language-quality grade.
 
 ### 3. Make interacting organization operative in the same body
 
+[established-bounded; implemented-exact] The [coupled-owner return](../../research/records/2026-09-11_ONE_WAVE_OWNS_CONDITIONAL_CURRENT_MATERIAL_AND_PENDING_RETURNS.md) now supplies
+that owner through a typed continuation, actual point-source return, native family admission and
+complete v7 rest. The narrower point-source operation does not discharge producing-family
+observation or public source/emission integration. Continue through those bindings and actual
+prepared-source use under the remaining requirements below.
+
 [definition] This packet is required for the finite Athena construction. A fixed global linear
 wave plus a decoder is not the complete planned ecology. Use `ResidentGeneratorNeighborhood` and
 its learned bilinear members for the first coupled realization. Transfer the neighborhood into
@@ -347,8 +353,9 @@ member index internally. A bounds-checked `usize` alone is not this capability. 
 these bindings through their recorded maps; later applicability/formation extends incidence
 through returned relations, not role, language, scene-ID or expected-output routing.
 
-[definition] Resolve atomic publication before exposing the combined operation. Currently
-`advance_bilinear_contact` may write its basis row before a later fallible wave operation; calling
+[definition] Resolve atomic publication before exposing the combined operation. The standalone
+`advance_bilinear_contact` writes its basis row; the coupled owner now uses preparation instead.
+Calling
 the two public methods in sequence does not preserve a complete successor on refusal. Add private
 member-law preparation retaining predecessor identity and report. For the first implementation,
 allocate a fresh successor section for the affected member basis, copy its immutable standing on

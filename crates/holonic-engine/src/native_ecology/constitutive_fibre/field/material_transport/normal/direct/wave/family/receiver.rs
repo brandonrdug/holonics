@@ -24,6 +24,14 @@ pub struct NormalWaveFamilyReceiver<'a, 'c> {
     vertical: ResidentSection<'c>,
 }
 impl<'a, 'c> NormalWaveFamilyReceiver<'a, 'c> {
+    pub(crate) fn require_supported(&self)->Result<(),ConstitutiveFibreError>{
+        let s=self.source.origin.fibre().surface;let out=s.fresh_section(1,1,ResidentGrain(0))?;
+        let mut passage=s.begin_passage(&[vec![]])?;
+        {let lane=passage.open(0,&[])?;s.record_normal_family_admit(&lane,&self.report,&out)?;}
+        passage.close(0,&out,64)?;let result=passage.finish()?.launch()?;
+        if !result.obstruction.is_empty(){return Err(ConstitutiveFibreError::Arithmetic(format!("conditional family admission: {:?}",result.obstruction)));}
+        Ok(())
+    }
     pub fn source(&self) -> &NormalWaveFamily<'c> {
         self.source
     }

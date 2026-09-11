@@ -15,6 +15,7 @@ pub use return_rest::ConstitutiveReturnRest;
 pub(crate) struct PreparedConstitutiveFormation<'chart> {
     pub(crate) basis: ResidentSection<'chart>,
     predecessor_owner: Rc<()>,
+    successor_owner: Rc<()>,
     predecessor_occurrences: u64,
     pub(crate) returned: ResidentConstitutiveReturn<'chart>,
 }
@@ -267,9 +268,10 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
         let predecessor_owner = Rc::clone(&self.basis_owner);
         let predecessor_occurrences = self.occurrences;
         let staged_basis = self.surface.copy_section_device(&self.basis)?;
+        let successor_owner=Rc::new(());
         let mut staged = Self {
             basis: staged_basis,
-            basis_owner: Rc::clone(&self.basis_owner),
+            basis_owner: Rc::clone(&successor_owner),
             surface: self.surface,
             source_width: self.source_width,
             target_width: self.target_width,
@@ -281,6 +283,7 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
             Ok(returned) => Ok(PreparedConstitutiveFormation {
                 basis: staged.basis,
                 predecessor_owner,
+                successor_owner,
                 predecessor_occurrences,
                 returned,
             }),
@@ -311,7 +314,7 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
         debug_assert!(self.can_commit_formation(&prepared));
         let old = std::mem::replace(&mut self.basis, prepared.basis);
         drop(old);
-        self.basis_owner = Rc::new(());
+        self.basis_owner = prepared.successor_owner;
         self.occurrences = prepared.returned.occurrence;
         prepared.returned
     }

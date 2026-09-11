@@ -38,6 +38,7 @@ struct TransportHeader {
 /// previous current and exact received point. Powers and emitted faces remain caches.
 #[derive(Debug, PartialEq, Eq)]
 pub struct NormalWaveRest {
+    pub(super) coupled:Option<Box<super::coupled::rest::CoupledRestData>>,
     material: NormalMaterialRest,
     seed: ResidentSectionRest,
     steps: u64,
@@ -48,15 +49,14 @@ pub struct NormalWaveRest {
     pending: BTreeMap<u64, NormalWaveRest>,
 }
 impl NormalWaveRest {
-    pub fn steps(&self) -> u64 {
-        self.steps
-    }
+    pub fn steps(&self) -> u64 { self.coupled.as_ref().map_or(self.steps,|v|v.passages()) }
+    pub fn is_coupled(&self)->bool{self.coupled.is_some()}
+    pub(super) fn normal_bank_epoch(&self)->u64{self.epoch}
+
     pub fn material(&self) -> &NormalMaterialRest {
         &self.material
     }
-    pub fn epoch(&self) -> u64 {
-        self.epoch
-    }
+    pub fn epoch(&self) -> u64 {self.coupled.as_ref().map_or(self.epoch,|v|v.epoch())}
     pub fn seed_kind(&self) -> NormalWaveSeedKind {
         self.seed_kind
     }
@@ -67,7 +67,16 @@ impl NormalWaveRest {
     pub fn transport(&self) -> NormalWaveTransport {
         self.transport
     }
-    pub fn write(&self, out: &mut impl Write) -> Result<(), ConstitutiveFibreError> {
+    pub fn write(&self,out:&mut impl Write)->Result<(),ConstitutiveFibreError>{
+        if let Some(data)=&self.coupled {
+            data.validate(self)?;
+            out.write_all(MAGIC).map_err(invalid)?;out.write_all(&[7]).map_err(invalid)?;
+            let mut bank=Vec::new();self.write_normal(&mut bank)?;blob(out,&bank)?;
+            return data.write(out);
+        }
+        self.write_normal(out)
+    }
+    fn write_normal(&self, out: &mut impl Write) -> Result<(), ConstitutiveFibreError> {
         out.write_all(MAGIC).map_err(invalid)?;
         let base = self.epoch - self.steps;
         let canonical = [base.checked_sub(1), Some(base)];
@@ -145,17 +154,27 @@ impl NormalWaveRest {
         Ok(())
     }
     pub fn read(input: &mut impl Read, octets: u64) -> Result<Self, ConstitutiveFibreError> {
-        Self::read_inner(input, octets, true)
+        Self::read_inner(input, octets, true,true)
     }
+    pub(super) fn read_normal(input:&mut impl Read,octets:u64)->Result<Self,ConstitutiveFibreError>{Self::read_inner(input,octets,true,false)}
     fn read_inner(
         input: &mut impl Read,
         octets: u64,
         allow_pending: bool,
+        allow_coupled: bool,
     ) -> Result<Self, ConstitutiveFibreError> {
         let mut input = input.take(octets);
         expect(&mut input, MAGIC)?;
         let mut version = [0];
         input.read_exact(&mut version).map_err(invalid)?;
+        if version[0]==7 {
+            if !allow_coupled{return Err(invalid("coupled state is not a normal source bank"));}
+            let bytes=read_blob(&mut input)?;
+            let mut bank=Self::read_normal(&mut bytes.as_slice(),bytes.len()as u64)?;
+            let data=super::coupled::rest::CoupledRestData::read(&mut input)?;
+            if input.limit()!=0{return Err(invalid("trailing coupled wave state"));}
+            data.validate(&bank)?;bank.coupled=Some(Box::new(data));return Ok(bank);
+        }
         if !(1..=6).contains(&version[0]) {
             return Err(invalid("normal wave version"));
         }
@@ -293,6 +312,7 @@ impl NormalWaveRest {
                 &mut source_bytes.as_slice(),
                 source_bytes.len() as u64,
                 false,
+                false,
             )?;
             if !source.pending.is_empty()
                 || source.epoch.checked_add(1) != Some(id)
@@ -310,6 +330,7 @@ impl NormalWaveRest {
             return Err(ConstitutiveFibreError::Shape);
         }
         Ok(Self {
+            coupled:None,
             material,
             seed,
             steps,
@@ -335,6 +356,7 @@ impl NormalWaveRest {
         surface: &'c ResidentSurface<'c>,
         progress: &mut dyn FnMut(u64),
     ) -> Result<ResidentNormalWave<'c>, ConstitutiveFibreError> {
+        if self.coupled.is_some(){return Err(invalid("coupled wave requires remount_coupled"));}
         let initial = surface.mount_section_rest(&self.seed)?;
         let material = self.material.remount(surface)?;
         let base = self.epoch - self.steps;
@@ -397,11 +419,15 @@ impl NormalWaveRest {
     }
 }
 impl ResidentNormalWave<'_> {
-    pub fn rest(&self) -> Result<NormalWaveRest, ConstitutiveFibreError> {
+    pub fn rest(&self) -> Result<NormalWaveRest,ConstitutiveFibreError>{self.rest_normal_bank()}
+}
+impl<C> ResidentNormalWave<'_,C> {
+    pub(super) fn rest_normal_bank(&self) -> Result<NormalWaveRest, ConstitutiveFibreError> {
         let mut pending = BTreeMap::new();
         for (id, cut) in &self.pending {
             let fibre = &cut.fibre;
             let source = NormalWaveRest {
+                coupled:None,
                 material: NormalMaterialRest::from_native_state(
                     fibre.roots,
                     fibre.roots,
@@ -425,6 +451,7 @@ impl ResidentNormalWave<'_> {
             pending.insert(*id, source);
         }
         Ok(NormalWaveRest {
+            coupled:None,
             material: self.material.rest()?,
             seed: self
                 .material
@@ -444,6 +471,7 @@ impl NormalWaveFibre<'_> {
     /// Exterior serialization of immutable producing standing, with no continuing owner clone.
     pub(super) fn rest_source(&self)->Result<NormalWaveRest,ConstitutiveFibreError>{
         Ok(NormalWaveRest {
+            coupled:None,
             material:NormalMaterialRest::from_native_state(self.roots,self.roots,self.grain,self.material_observations,
                 self.surface.detach_section(&self.material,64)?)?,
             seed:self.surface.detach_section(&self.seed,64)?,steps:self.steps,epoch:self.epoch,

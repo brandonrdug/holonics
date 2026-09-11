@@ -56,9 +56,6 @@ impl<'c> ResidentWaveRelation<'c> {
 }
 
 impl<'chart> ResidentConstitutiveFibre<'chart> {
-    /// Pull one actual fixed condition through the bilinear law into the wave family chart.
-    /// This allocates only derived relation sections; the learned basis and this move owner are
-    /// never changed. The fixed condition is copied to a resident snapshot by the same passage.
     pub fn read_wave_relation(
         &self,
         condition: ResidentConstitutiveCurrent<'_, 'chart>,
@@ -67,16 +64,58 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
         if !self.usable {
             return Err(ConstitutiveFibreError::Uncertain);
         }
+        ResidentWaveRelation::derive(
+            self.surface,
+            &self.basis,
+            self.source_chart,
+            self.target_width,
+            self.occurrences,
+            Rc::clone(&self.basis_owner),
+            condition,
+            roots,
+        )
+    }
+}
+impl<'chart> PreparedConstitutiveFormation<'chart> {
+    pub(crate) fn read_wave_relation(
+        &self,
+        condition: ResidentConstitutiveCurrent<'_, 'chart>,
+        roots: usize,
+    ) -> Result<ResidentWaveRelation<'chart>, ConstitutiveFibreError> {
+        ResidentWaveRelation::derive(
+            self.returned.surface,
+            &self.basis,
+            self.returned.source_chart,
+            self.returned.target_width,
+            self.returned.occurrence,
+            Rc::clone(&self.successor_owner),
+            condition,
+            roots,
+        )
+    }
+}
+impl<'chart> ResidentWaveRelation<'chart> {
+    #[allow(clippy::too_many_arguments)]
+    fn derive(
+        surface: &'chart ResidentSurface<'chart>,
+        basis: &ResidentSection<'chart>,
+        source_chart: ConstitutiveSourceChart,
+        target_width: usize,
+        occurrence: u64,
+        producing_owner: Rc<()>,
+        condition: ResidentConstitutiveCurrent<'_, 'chart>,
+        roots: usize,
+    ) -> Result<Self, ConstitutiveFibreError> {
         let ConstitutiveSourceChart::BilinearContact {
             source_complex,
             condition_complex,
-        } = self.source_chart
+        } = source_chart
         else {
             return Err(ConstitutiveFibreError::Shape);
         };
         if roots == 0
             || roots.checked_mul(3) != Some(source_complex)
-            || roots.checked_mul(2) != Some(self.target_width)
+            || roots.checked_mul(2) != Some(target_width)
             || condition_complex.checked_mul(2) != Some(condition.width)
         {
             return Err(ConstitutiveFibreError::Shape);
@@ -111,19 +150,15 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
         if relation > u32::MAX as usize || d > u32::MAX as usize {
             return Err(ConstitutiveFibreError::Shape);
         }
-        let graph = self
-            .surface
-            .fresh_section(relation, relation, ResidentGrain(0))?;
-        let derived = self.surface.fresh_section(2 * q, 2 * q, ResidentGrain(0))?;
-        let fixed = self
-            .surface
-            .fresh_section(1, 2 * condition_complex + 1, ResidentGrain(0))?;
-        let mut passage = self.surface.begin_passage(&[vec![]])?;
+        let graph = surface.fresh_section(relation, relation, ResidentGrain(0))?;
+        let derived = surface.fresh_section(2 * q, 2 * q, ResidentGrain(0))?;
+        let fixed = surface.fresh_section(1, 2 * condition_complex + 1, ResidentGrain(0))?;
+        let mut passage = surface.begin_passage(&[vec![]])?;
         {
             let lane = passage.open(0, &[])?;
-            self.surface.record_constitutive_wave_relation(
+            surface.record_constitutive_wave_relation(
                 &lane,
-                &self.basis,
+                basis,
                 condition,
                 roots,
                 condition_complex,
@@ -141,13 +176,13 @@ impl<'chart> ResidentConstitutiveFibre<'chart> {
             )));
         }
         Ok(ResidentWaveRelation::new(
-            self.surface,
+            surface,
             derived,
             fixed,
             roots,
             condition_complex,
-            self.occurrences,
-            Rc::clone(&self.basis_owner),
+            occurrence,
+            producing_owner,
         ))
     }
 }

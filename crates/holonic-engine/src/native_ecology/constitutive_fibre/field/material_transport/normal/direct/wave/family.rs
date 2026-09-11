@@ -16,6 +16,13 @@ pub struct NormalWaveFamily<'c> {
     passages: u64,
 }
 impl<'c> NormalWaveFamily<'c> {
+    /// Cold coupled decoding binds the stored last map to its restored actual member/condition.
+    pub(crate) fn rebind_decoded_relation(&mut self,relation:Rc<ResidentWaveRelation<'c>>)->Result<(),ConstitutiveFibreError>{
+        let old=self.last_relation.as_ref().ok_or(ConstitutiveFibreError::Shape)?;
+        if old.rest()?!=relation.rest()?{return Err(invalid("stored wave map disagrees with its restored member/condition"));}
+        self.last_relation=Some(relation);Ok(())
+    }
+
     pub fn origin(&self) -> &NormalWaveJointSource<'c> {
         &self.origin
     }
@@ -113,4 +120,4 @@ impl<'c> ResidentNormalWave<'c> {
     }
 }
 #[cfg(test)]
-mod tests;
+pub(super) mod tests;

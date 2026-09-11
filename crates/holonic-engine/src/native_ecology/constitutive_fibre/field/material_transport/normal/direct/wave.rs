@@ -3,6 +3,8 @@
 //! certified remainder. Current faces are observations of that state, not its history archive.
 use super::*;
 use std::collections::BTreeMap;
+mod coupled;
+pub use coupled::{NormalWaveCoupled,NormalCoupledAttachRefusal,NormalCoupledContact,NormalCoupledStep,NormalCoupledReception};
 mod actuate;
 pub use actuate::NormalSourceActuation;
 mod develop;
@@ -210,7 +212,11 @@ impl std::fmt::Debug for NormalWaveSeedRefusal<'_> {
     }
 }
 
-pub struct ResidentNormalWave<'c> {
+/// Fixed-normal-word continuation. Coupling transfers the same owner into a family continuation.
+pub struct NormalWaveWord;
+
+pub struct ResidentNormalWave<'c, C = NormalWaveWord> {
+    continuation: C,
     transport: NormalWaveTransport,
     owner: Rc<()>,
     pending: BTreeMap<u64, Rc<ProducingCut<'c>>>,
@@ -270,6 +276,7 @@ impl<'c> ResidentNormalMaterial<'c> {
             }) => {
                 let seed_bound = Rc::new(seed_bound);
                 Ok(ResidentNormalWave {
+                    continuation: NormalWaveWord,
                     transport: NormalWaveTransport::NormalReference,
                     owner: Rc::new(()),
                     pending: BTreeMap::new(),
@@ -412,21 +419,7 @@ impl<'c> ResidentNormalWave<'c> {
     pub fn current(&self) -> &NormalWaveCurrent<'c> {
         &self.current
     }
-    pub fn fibre(&self) -> NormalWaveFibre<'c> {
-        NormalWaveFibre {
-            transport: self.transport,
-            material: Rc::clone(&self.material.state),
-            seed: Rc::clone(&self.seed),
-            surface: self.material.surface,
-            roots: self.material.roots,
-            grain: self.material.grain,
-            material_observations: self.material.observations,
-            epoch: self.epoch,
-            seed_kind: self.seed_kind,
-            steps: self.steps,
-            seed_epochs: self.seed_epochs,
-        }
-    }
+    pub fn fibre(&self) -> NormalWaveFibre<'c> { self.normal_bank_fibre() }
     pub fn advance(&mut self) -> Result<NormalWaveStep<'c>, ConstitutiveFibreError> {
         let steps = self
             .steps
@@ -522,3 +515,28 @@ mod transport_tests;
 
 #[cfg(test)]
 mod basis_tests;
+
+impl<'c,C> ResidentNormalWave<'c,C> {
+    pub(super) fn normal_bank_fibre(&self) -> NormalWaveFibre<'c> {
+        NormalWaveFibre {
+            transport: self.transport,
+            material: Rc::clone(&self.material.state),
+            seed: Rc::clone(&self.seed),
+            surface: self.material.surface,
+            roots: self.material.roots,
+            grain: self.material.grain,
+            material_observations: self.material.observations,
+            epoch: self.epoch,
+            seed_kind: self.seed_kind,
+            steps: self.steps,
+            seed_epochs: self.seed_epochs,
+        }
+    }
+
+    fn with_continuation<D>(self, continuation:D)->ResidentNormalWave<'c,D>{
+        ResidentNormalWave{continuation,transport:self.transport,owner:self.owner,pending:self.pending,
+            material:self.material,seed:self.seed,seed_bound:self.seed_bound,joint:self.joint,
+            seed_kind:self.seed_kind,epoch:self.epoch,power:self.power,metadata:self.metadata,
+            previous:self.previous,current:self.current,steps:self.steps,seed_epochs:self.seed_epochs}
+    }
+}

@@ -100,6 +100,8 @@ impl<'c> ResidentNormalWave<'c> {
         })
     }
 
+}
+impl<'c,C> ResidentNormalWave<'c,C> {
     pub fn pending_predictions(&self) -> usize {
         self.pending.len()
     }
@@ -147,7 +149,7 @@ impl<'c> ResidentNormalWave<'c> {
     /// The existing correlated reception kernel forms φ=(c_s-p_s,c_s,p_s), η=v-c_s on device.
     /// Its forward reading uses producing material; the increment joins contemporary material.
     /// No enclosed centre enters a point-current port and no earlier material is restored.
-    pub fn receive_prediction<'a>(
+    pub(super) fn receive_normal_prediction<'a>(
         &mut self,
         handle: &NormalProducingHandle,
         observed: ResidentConstitutiveCurrent<'a, 'c>,
@@ -209,7 +211,7 @@ impl<'c> ResidentNormalWave<'c> {
         }
         // Every fallible operation precedes this publication. Retain both contemporary current
         // occurrence handles while rebasing the word onto their actual joint enclosure.
-        let predecessor_fibre = self.fibre();
+        let predecessor_fibre = self.normal_bank_fibre();
         if let Some(super::develop::JointSeed {
             power, metadata, ..
         }) = staged
@@ -231,7 +233,12 @@ impl<'c> ResidentNormalWave<'c> {
             observed,
             report,
             predecessor_fibre,
-            successor_fibre: self.fibre(),
+            successor_fibre: self.normal_bank_fibre(),
         })
     }
+}
+
+impl<'c> ResidentNormalWave<'c>{
+    pub fn receive_prediction<'a>(&mut self,handle:&NormalProducingHandle,observed:ResidentConstitutiveCurrent<'a,'c>)
+        ->Result<NormalWaveComparison<'a,'c>,ConstitutiveFibreError>{self.receive_normal_prediction(handle,observed)}
 }

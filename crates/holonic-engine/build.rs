@@ -57,6 +57,7 @@ fn main() {
     println!("cargo:rerun-if-changed=kernels/normal_wave_source.cuh");
     println!("cargo:rerun-if-changed=kernels/normal_wave_family.cuh");
     println!("cargo:rerun-if-changed=kernels/normal_family_receiver.cuh");
+    println!("cargo:rerun-if-changed=kernels/normal_coupled.cuh");
     println!("cargo:rerun-if-changed=kernels/constitutive_wave_relation.cuh");
     println!("cargo:rerun-if-changed=kernels/normal_wave_basis_face.cuh");
     println!("cargo:rerun-if-changed=kernels/passive_current_ball.cuh");

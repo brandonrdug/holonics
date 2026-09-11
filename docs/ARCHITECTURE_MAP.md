@@ -194,13 +194,20 @@ score, tie population, robust separation and shared radius; the full source/fibr
 pullback and reuse `resident/image.rs` for serial family composition. `resident.rs` stages an
 individual basis through `PreparedConstitutiveFormation`; `resident/neighborhood.rs` stages the
 complete member/condition return before publication. These foundations do not yet replace the
-normal wave's current with a coupled state or supply its complete checkpoint.
+normal wave's current by themselves; the coupled owner below now binds them.
 
 [definition] `wave/family/receiver.rs`, `surface_normal_family_receiver.rs` and
 `normal_family_receiver.cuh` own constrained-family support and the declared minimum-norm joint
 receiver. `wave/family/rest.rs` and `resident/wave_relation/rest.rs` retain the original source,
 anchor, affine relation and last map through process exit. These are exact family interfaces;
-the continuing coupled ecology/session remains the next integration owner.
+the continuing owner below now retains them, while the public session remains to be joined.
+
+[definition] `wave/coupled.rs` transfers the neighborhood into a typed continuation of
+`ResidentNormalWave`, owns its current family and admitted source/member bindings, and publishes
+prepared local material/condition with the complete next family. `normal_coupled.cuh` checks
+source-plane and family-support admission. `wave/coupled/rest.rs` and `wave/rest.rs` v7 persist
+that owner, including its distinct normal bank and pending normal comparisons. Rest validates and
+rebinds current contacts through their restored member/condition; it does not run a second learner.
 
 [definition] `normal/direct/wave/actuate.rs` owns fixed-material source action. The
 `normal_source_actuation.cuh` source word reuses the learned normal response and the enclosed

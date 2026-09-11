@@ -13,6 +13,7 @@ struct Header {
 }
 /// Complete immutable family chart, including its normal producing fibre, actual anchor ball,
 /// current affine relation and last fixed-condition passage. It contains no observation archive.
+#[derive(Debug,PartialEq,Eq)]
 pub struct NormalWaveFamilyRest {
     origin: NormalWaveRest,
     anchor: ResidentSectionRest,
@@ -22,6 +23,13 @@ pub struct NormalWaveFamilyRest {
     passages: u64,
 }
 impl NormalWaveFamilyRest {
+    pub(crate) fn roots(&self)->usize{self.origin.material().roots()}
+    pub(crate) fn grain(&self)->ResidentGrain{self.origin.material().grain()}
+    pub(crate) fn source_transport(&self)->NormalWaveTransport{self.origin.transport()}
+
+    pub(crate) fn current_epoch(&self)->Result<u64,ConstitutiveFibreError>{self.origin.epoch().checked_add(self.passages).ok_or(ConstitutiveFibreError::Shape)}
+    pub(crate) fn last_relation(&self)->Option<&NormalWaveRelationRest>{self.last.as_ref()}
+
     pub fn passages(&self) -> u64 {
         self.passages
     }
@@ -102,7 +110,7 @@ impl NormalWaveFamilyRest {
         expect(&mut input, MAGIC)?;
         let header: Header = serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
         let bytes = read_blob(&mut input)?;
-        let origin = NormalWaveRest::read(&mut bytes.as_slice(), bytes.len() as u64)?;
+        let origin = NormalWaveRest::read_normal(&mut bytes.as_slice(), bytes.len() as u64)?;
         let anchor = read_point(&read_blob(&mut input)?)?;
         let relation = serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
         let (last, coverage) = if header.passages > 0 {

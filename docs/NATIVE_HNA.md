@@ -147,8 +147,13 @@ families. `read_receiver` now compares the actual ball with the affine anchor do
 projection or explicit empty/missing-domain witness while retaining all free directions.
 `NormalWaveFamilyRest` and `NormalWaveRelationRest` preserve their complete source and next map;
 see the [receiver/rest return](../research/records/2026-09-11_ANCHORED_FAMILIES_HAVE_BOUNDED_RECEIVERS_AND_RESUME_WITH_THEIR_SOURCE.md). Staged neighborhood
-publication is available internally; the public normal session remains the packet-2 owner until
-the coupled state/receiver/rest join returns.
+publication now serves `ResidentNormalWave<NormalWaveCoupled>`. `with_neighborhood` transfers the
+local laws and condition into that same move owner. `admit_contact` / `advance_contact` operate
+on its full current family; `receive_contact_source` develops actual point-source testimony and
+stages the next family with the changed neighborhood. Rest v7 and `remount_coupled` preserve the
+whole owner and its live contact/normal-comparison handles. The public text session remains the
+packet-2 normal-word adapter while coupled source/emission integration continues. See the
+[coupled-owner return](../research/records/2026-09-11_ONE_WAVE_OWNS_CONDITIONAL_CURRENT_MATERIAL_AND_PENDING_RETURNS.md) for that distinction.
 
 ## Resident symbol receiver and continuing wave session
 

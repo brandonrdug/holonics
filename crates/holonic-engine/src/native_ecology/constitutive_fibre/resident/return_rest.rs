@@ -1,7 +1,7 @@
 //! Portable immutable return, used when a native current is pending at an exterior boundary.
 use super::*;
 
-#[derive(Clone, Debug, Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 pub struct ConstitutiveReturnRest {
     schema: String,
     source_width: usize,

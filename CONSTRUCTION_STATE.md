@@ -1,7 +1,7 @@
 # Construction state
 
 **Currency:** September 11, 2026. **Priority:** Brandon has activated completion of the finalized Athena implementation plan as a goal.
-**Position:** Packets 1 and 2 are committed at `74886e32` and `9db7f1fa`. Native emission/re-entry and byte-identical process continuation pass; observed output `tht44444` is not useful conversation. Packet 3 is active: source lifting, anchored conditional-family composition and discardable member/condition preparation now return focused native controls. The constrained-family receiver and complete immutable-family rest now return eleven native controls, including byte-identical fresh-process continuation and a source-bound refusal that leaves the wider family usable. The remaining join is the coupled move owner and complete session persistence, followed by formation/reuse and product use. The goal remains active; AC0–AC5 is not complete.
+**Position:** Packets 1 and 2 are committed at `74886e32` and `9db7f1fa`; conditional families and their receivers/rest followed at `46695f43` and `63c2175e`. Packet 3 now returns one typed wave owner, staged conditional current/material publication and complete v7 rest with live contacts and pending normal comparisons. Eight coupled controls and the scoped wave/public-consumer regressions pass. Next are prepared-source use, coupled source/emission/session integration and producing-family observations, followed by broader formation/reuse and product evaluation. Observed packet-2 output `tht44444` remains the last conversation return. The goal is active; AC0–AC5 is incomplete.
 **Athena-alpha:** not yet attained.
 
 **Returned native operation:** `ResidentNormalWave::predict` / `receive_prediction` preserve the
@@ -12,6 +12,7 @@ states the exact controls, prepared-source aperture, costs and retained referenc
 The [emission return](research/records/2026-09-11_ATHENA_EMITS_THROUGH_A_RESIDENT_RECEIVER_AND_REENTERS_ITS_SUCCESSOR.md) records packet 2 and its product limitation.
 The [conditional-family foundation](research/records/2026-09-11_CONDITIONAL_WAVE_FAMILIES_RETAIN_THE_ANCHOR_AND_STAGE_THEIR_LOCAL_LAWS.md) records the active packet 3 return and its remaining join.
 The [bounded receiver and family-rest return](research/records/2026-09-11_ANCHORED_FAMILIES_HAVE_BOUNDED_RECEIVERS_AND_RESUME_WITH_THEIR_SOURCE.md) carries that family into exact support/obstruction receivers and source-qualified process continuation.
+The [coupled-owner return](research/records/2026-09-11_ONE_WAVE_OWNS_CONDITIONAL_CURRENT_MATERIAL_AND_PENDING_RETURNS.md) records the complete owner/state join and its remaining source/product work.
 
 [definition] This is the sole current-position record. [The roadmap](docs/plans/THE_ROADMAP.md)
 orders work; completed history belongs in the linked records and Git. Brandon's latest direct

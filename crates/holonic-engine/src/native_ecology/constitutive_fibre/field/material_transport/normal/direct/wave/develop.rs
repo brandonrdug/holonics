@@ -75,6 +75,7 @@ impl<'c> ResidentNormalMaterial<'c> {
                 previous,
                 current,
             }) => Ok(ResidentNormalWave {
+                continuation: NormalWaveWord,
                 transport: NormalWaveTransport::NormalReference,
                 owner: Rc::new(()),
                 pending: BTreeMap::new(),
