@@ -1,6 +1,8 @@
 //! Exterior exact algorithm synthesis through the standing rational preimage owner.
 //! No native ecology, foreign model, floating arithmetic or replacement elimination engine.
-use holonic_engine::exact_linear::ExactRatMatrix;
+use holonic_engine::exact_linear::{
+    BilinearOperator, BilinearSupportSearch, ExactRatMatrix, ReceiverFactorization,
+};
 use num_traits::{One, Zero};
 use relational_geometry::Rat;
 use serde_json::{Value, json};
@@ -10,23 +12,6 @@ fn q(n: i64, d: i64) -> Rat {
 }
 fn strings(xs: &[Rat]) -> Vec<String> {
     xs.iter().map(ToString::to_string).collect()
-}
-fn selections(
-    n: usize,
-    r: usize,
-    start: usize,
-    prefix: &mut Vec<usize>,
-    out: &mut Vec<Vec<usize>>,
-) {
-    if prefix.len() == r {
-        out.push(prefix.clone());
-        return;
-    }
-    for i in start..n {
-        prefix.push(i);
-        selections(n, r, i + 1, prefix, out);
-        prefix.pop();
-    }
 }
 fn additions(form: &[Rat]) -> usize {
     form.iter()
@@ -41,84 +26,56 @@ fn multiplication_search() -> Result<Value, Box<dyn std::error::Error>> {
         .into_iter()
         .map(|v| v.into_iter().map(|x| q(x, 1)).collect())
         .collect();
-    let atoms: Vec<(usize, usize, Vec<Rat>)> = (0..forms.len())
-        .flat_map(|i| (0..forms.len()).map(move |j| (i, j)))
-        .map(|(i, j)| {
-            (
-                i,
-                j,
-                forms[i]
-                    .iter()
-                    .flat_map(|a| forms[j].iter().map(move |b| a * b))
-                    .collect(),
-            )
-        })
-        .collect();
     // Coefficients of ac,ad,bc,bd in the two coordinates of complex multiplication.
     let targets = [
         vec![q(1, 1), q(0, 1), q(0, 1), q(-1, 1)],
         vec![q(0, 1), q(1, 1), q(1, 1), q(0, 1)],
     ];
+    let target = BilinearOperator::new(2, 2, ExactRatMatrix::new(targets.to_vec())?)?;
+    let grammar = ExactRatMatrix::new(forms.clone())?;
     let mut reports = Vec::new();
     let mut certificates = Vec::new();
     for rank in 1..=3 {
-        let mut choices = Vec::new();
-        selections(atoms.len(), rank, 0, &mut Vec::new(), &mut choices);
+        let mut count = 0;
         let mut found = 0;
         let mut first_obstruction = None;
-        for selected in &choices {
-            let matrix = ExactRatMatrix::new(
-                (0..4)
-                    .map(|row| selected.iter().map(|i| atoms[*i].2[row].clone()).collect())
-                    .collect(),
-            )?;
-            let mut output = Vec::new();
-            let mut fibres = Vec::new();
-            for (coordinate, target) in targets.iter().enumerate() {
-                if let Some((particular, kernel)) = matrix.preimage_fibre(target)? {
-                    assert_eq!(matrix.apply(&particular)?, *target);
-                    output.push(particular);
-                    fibres.push(kernel);
-                } else {
-                    if first_obstruction.is_none() {
-                        let separator = matrix
-                            .preimage_obstruction(target)?
-                            .expect("outside image has separator");
-                        assert!(
-                            matrix
-                                .transpose()?
-                                .apply(&separator)?
-                                .iter()
-                                .all(Zero::is_zero)
-                        );
-                        let paired: Rat = separator.iter().zip(target).map(|(a, b)| a * b).sum();
-                        assert!(!paired.is_zero());
-                        first_obstruction = Some(json!({"atoms":selected,"output":coordinate,
-                            "annihilator":strings(&separator),"target_pairing":paired.to_string()}));
-                    }
-                    break;
+        let search = BilinearSupportSearch::new(
+            target.clone(),
+            grammar.clone(),
+            grammar.clone(),
+            rank..=rank,
+        )?;
+        for returned in search {
+            let returned = returned?;
+            count += 1;
+            let support = returned.support().to_vec();
+            let atom_indices: Vec<_> = support.iter().map(|(i, j)| i * forms.len() + j).collect();
+            if let ReceiverFactorization::Obstructed {
+                source_null,
+                returned: response,
+            } = returned.receiver()
+            {
+                if first_obstruction.is_none() {
+                    let output = response
+                        .iter()
+                        .position(|v| !v.is_zero())
+                        .expect("verified separator");
+                    first_obstruction = Some(
+                        json!({"atoms":atom_indices,"annihilator":strings(source_null),
+                        "output":output,"target_pairing":response[output].to_string(),
+                        "returned_direction":strings(response)}),
+                    );
                 }
-            }
-            if output.len() != 2 {
                 continue;
             }
-            let residuals = output
-                .iter()
-                .zip(&targets)
-                .map(|(weights, target)| {
-                    let returned = matrix.apply(weights).expect("checked factor shape");
-                    returned
-                        .iter()
-                        .zip(target)
-                        .map(|(a, b)| a - b)
-                        .collect::<Vec<_>>()
-                })
-                .collect::<Vec<_>>();
-            assert!(residuals.iter().flatten().all(Zero::is_zero));
+            let realized = returned.into_realization().expect("factored return");
+            let output = realized.receiver().particular.to_rows();
+            let residuals = realized.tensor_residual(&target)?;
+            assert!(residuals.entries().iter().all(Zero::is_zero));
             found += 1;
-            let linear_additions: usize = selected
+            let linear_additions = support
                 .iter()
-                .map(|i| additions(&forms[atoms[*i].0]) + additions(&forms[atoms[*i].1]))
+                .map(|(i, j)| additions(&forms[*i]) + additions(&forms[*j]))
                 .sum::<usize>()
                 + output.iter().map(|row| additions(row)).sum::<usize>();
             let nonunit_scales = output
@@ -128,15 +85,15 @@ fn multiplication_search() -> Result<Value, Box<dyn std::error::Error>> {
                 .count();
             certificates.push(json!({"products":rank,"linear_additions":linear_additions,
                 "nonunit_output_scales":nonunit_scales,
-                "atoms":selected.iter().map(|i| json!({"left":strings(&forms[atoms[*i].0]),
-                    "right":strings(&forms[atoms[*i].1])})).collect::<Vec<_>>(),
-                "output_coefficients":output.iter().map(|row| strings(row)).collect::<Vec<_>>(),
-                "output_coefficient_fibres":fibres.iter().map(|basis|
-                    basis.iter().map(|row| strings(row)).collect::<Vec<_>>()).collect::<Vec<_>>(),
-                "tensor_residual":residuals.iter().map(|r|strings(r)).collect::<Vec<_>>()}));
+                "atoms":support.iter().map(|(i,j)|json!({"left":strings(&forms[*i]),"right":strings(&forms[*j])})).collect::<Vec<_>>(),
+                "output_coefficients":output.iter().map(|r|strings(r)).collect::<Vec<_>>(),
+                "output_coefficient_fibres":output.iter().map(|_|realized.receiver().free_row_directions.iter().map(|r|strings(r)).collect::<Vec<_>>()).collect::<Vec<_>>(),
+                "tensor_residual":residuals.to_rows().iter().map(|r|strings(r)).collect::<Vec<_>>()}));
         }
-        reports.push(json!({"products":rank,"candidate_supports":choices.len(),
-            "valid_supports":found,"first_rejected_support":first_obstruction}));
+        reports.push(
+            json!({"products":rank,"candidate_supports":count,"valid_supports":found,
+            "first_rejected_support":first_obstruction}),
+        );
     }
     assert!(!certificates.is_empty());
     certificates.sort_by_key(|c| {

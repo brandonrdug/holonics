@@ -1,0 +1,79 @@
+{
+  "complex_receiver": [
+    "-7",
+    "22"
+  ],
+  "composed_middle_receiver": [
+    "22"
+  ],
+  "construction": {
+    "examined_supports": 191,
+    "products": 3,
+    "scope": "first available support in declared enumeration, not global optimum"
+  },
+  "lifted_face": [
+    "-7",
+    "22",
+    "8",
+    "15",
+    "45"
+  ],
+  "lost_distinction": {
+    "returned": [
+      "1",
+      "0",
+      "1"
+    ],
+    "source_null": [
+      "1",
+      "0",
+      "0",
+      "1"
+    ]
+  },
+  "native": {
+    "complex": [
+      "-7",
+      "22"
+    ],
+    "intermediate_readouts": 0,
+    "polynomial": [
+      "8",
+      "22",
+      "15"
+    ],
+    "retained_product_reused": true
+  },
+  "native_material_deposited": false,
+  "observed_source_parameter_fibre": {
+    "null_directions": [],
+    "particular": [
+      "2",
+      "3"
+    ]
+  },
+  "polynomial_receiver": [
+    "8",
+    "22",
+    "15"
+  ],
+  "restored_context_rank": 1,
+  "retained_product_face": [
+    "8",
+    "15",
+    "45"
+  ],
+  "schema": "holonics.hephaestus.operator-cycle.v1",
+  "scope": "reusable exact engine owners and pure resident execution; developing family incorporation remains unbound",
+  "shared_immutable_core": true,
+  "source": {
+    "left": [
+      "2",
+      "3"
+    ],
+    "right": [
+      "4",
+      "5"
+    ]
+  }
+}

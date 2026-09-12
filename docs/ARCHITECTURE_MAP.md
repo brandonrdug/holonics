@@ -135,6 +135,16 @@ connects it to the existing addressed causal-length, physical and complexity own
 
 ## Foundation and transport
 
+[definition] `exact_linear/bilinear.rs` owns reusable bilinear operators, immutable product cores,
+streaming support search, receiver families and fixed-port affine-source preimages.
+`ExactRatMatrix::factor_receiver` in `exact_linear/contextual.rs` is their shared exact decoder/
+separator owner, also used by contextual factorization. `resident_section/bilinear.rs` mounts
+an admitted realization and retains its exact rational product/current sections; its changed
+receiver reads that product directly. `kernels/exact_packet_linear.cuh` supplies the two checked
+packet primitives, included by `exact_resident_section.cu`. The
+[application return](../research/records/2026-09-11_REUSABLE_GENERATORS_REACH_RESIDENT_RECEIVERS.md)
+records native scope and the still-open varying-family Eros incorporation relation.
+
 [definition] `Mathematics/GeneratorFactorization.lean` owns the arbitrary finite commutative-ring
 bilinear coefficient certificate, selected three-product identity, ratio-block matrix bridge,
 shift/coordinate commutator and first-jet product composition. `Framework.Computation` imports

@@ -30,6 +30,13 @@ Use the outcome definitions in the roadmap and the full compared faces in the re
 
 ## The shared mathematical-to-native construction
 
+[interpretation] A reusable machine can support a family of admitted orientations before a
+contemporary application selects source ports, held conditions and receiver. The non-orientable
+surface picture motivates retaining transition maps and route differences; it is not a claim
+that every function's parameter space is a non-orientable manifold. Reverse use returns a
+preimage family or obstruction, not an assumed inverse. Items 1–4 below are interacting aspects
+of this complete application/return cycle, with no imposed serial completion order.
+
 [definition] The target is one continuing ecology of applicable generators. A mathematical
 operator request, a text occurrence, an acoustic event and a kinetic observation enter through
 their source/receiver charts. Athena carries the available organization; Eros changes that
@@ -113,6 +120,15 @@ Emission and pending rest already exist. The old blueprint's instructions to fir
 owners are superseded; their implementation evidence remains standing.
 
 ## Mathematical contract at the immediate boundary
+
+[established-bounded; implemented-exact] The
+[reusable mathematical return](../../research/records/2026-09-11_REUSABLE_GENERATORS_REACH_RESIDENT_RECEIVERS.md)
+now provides public bilinear target/core/receiver/search owners and a pure resident rational
+binding. `ResidentBilinearMap::read_product` consumes the same retained product under a new
+receiver. `BilinearOperator::left_family_preimage` supplies the fixed-port affine-family
+reference. The native wave's developing transaction below is still unbound; when both source
+and condition vary it must retain their mixed-product consistency. The pure binding is usable
+without asserting that stronger material return.
 
 [definition] With complex current pair z=(p,c), retained condition h and actual contact j,
 

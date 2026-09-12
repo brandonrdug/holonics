@@ -1,21 +1,27 @@
 # Construction state
 
-**Currency:** September 11, 2026. **Current work:** unified programme articulated; reusable operator and Eros family integration next.
+**Currency:** September 11, 2026. **Current work:** reusable bilinear construction and resident receiver reuse returned; joint family incorporation continues.
 **Athena objective:** standing; useful Athena-alpha has not been attained. **Broad native cultivation:** paused while the consuming family/source binding is repaired;
 authorized native implementation continues within the shared programme. The active phases now have names;
 AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/plans/THE_ROADMAP.md)
 is the sole order and [the blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 names actual code changes and outcomes.
 
-[definition] Brandon's latest ruling joins the mathematical work and Athena into one sustained
-construction programme. The [roadmap](docs/plans/THE_ROADMAP.md#sustained-objective-and-construction-rhythm)
-and [native binding table](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#the-shared-mathematical-to-native-construction)
-now connect reusable generators, Eros incorporation, applicable constituent formation, Holonic
-Encoding, useful durable applications and shared physical/modality work. Next implement reusable
-operator/factor requests alongside the correlated family-incorporation law and native transaction;
-carry their returns into complete observed successor cycles. A new example alone does not finish
-an authorized consuming implementation. This pass reconciled the plans and product guides;
-no native run, source-code change or new product capability is claimed.
+[established-bounded; implemented-exact] The
+[reusable generator return](research/records/2026-09-11_REUSABLE_GENERATORS_REACH_RESIDENT_RECEIVERS.md)
+now connects engine bilinear target/core/receiver/search owners to exact rational GPU execution.
+The inspected application returns complex `(-7,22)` and polynomial `(8,22,15)` faces from the
+same resident product, with zero intermediate readouts. The native output also enters the
+existing constitutive relation directly. Fixed-port affine-source preimages retain correlated
+parameters. The 26-test exact-linear filter and four packet tests passed; the strengthened
+native existing-consumer regression also passed. No broad cultivation or native material
+incorporation is claimed.
+
+[definition] Items 1–4 are coupled responsibilities of a complete cycle. Continue the returned
+operator/receiver owners through recurrence/action composition and the actual Eros joint. With
+both source and condition varying, mixed tensor variables must retain their consistency rather
+than become independent coordinates. The consuming family/material transaction remains the
+specific open native boundary; the pure binding is already productive and reused.
 
 [proved-derived; formal-checked] The latest
 [relative code-cost return](research/records/2026-09-11_RELATIVE_CODE_COST_HAS_AN_ADDRESSED_BOUNDARY_LAW.md)
@@ -71,8 +77,8 @@ Its repair is source/applicability/constraint representation, not more exposure 
 [established-bounded; process-audit] The latest
 [producing-family return](research/records/2026-09-11_PRODUCING_FAMILIES_KEEP_JOINT_COMPARISON_PARAMETERS.md)
 passed 18 coupled and five session checks serially. The actual pending-family capture is retained;
-its large-model consuming material follow-up has not run. No CUDA tests or cultivation were rerun
-for the current exterior mathematical application.
+its large-model consuming material follow-up has not run. The coupled-wave suite and broad cultivation were not rerun in the pure bilinear return;
+its new native checks are scoped separately above.
 
 [definition] Detailed native chronology remains in the
 [normal producing return](research/records/2026-09-10_ATHENA_RETURNS_OBSERVATIONS_TO_THEIR_PRODUCING_JOINT.md),

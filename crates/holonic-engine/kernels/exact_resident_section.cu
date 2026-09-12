@@ -1290,6 +1290,7 @@ extern "C" __global__ void section_constitutive_bilinear_source(
     output_lo[width]=output_hi[width]=(int64_t)common;
 }
 
+#include "exact_packet_linear.cuh"
 #include "constitutive_condition_preimage.cuh"
 #include "constitutive_condition_image.cuh"
 #include "constitutive_wave_relation.cuh"

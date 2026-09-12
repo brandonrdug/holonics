@@ -50,28 +50,68 @@ fn stack(a: &ExactRatMatrix, b: &ExactRatMatrix) -> Result<ExactRatMatrix, Exact
     rows.extend(b.to_rows());
     ExactRatMatrix::shaped(a.rows() + b.rows(), a.columns(), rows)
 }
+/// All linear receivers of a retained carrier, or a direction it erased that the target reads.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum ReceiverFactorization {
+    Factored(LinearMapFamily),
+    Obstructed {
+        source_null: Vec<Rat>,
+        returned: Vec<Rat>,
+    },
+}
+
 fn factor_family(
     source: &ExactRatMatrix,
     target: &ExactRatMatrix,
 ) -> Result<Option<LinearMapFamily>, ExactLinearError> {
-    if source.columns() != target.columns() {
-        return Err(ExactLinearError::ShapeMismatch);
-    }
-    let equations = source.transpose()?;
-    let mut rows = Vec::with_capacity(target.rows());
-    for row in target.to_rows() {
-        let Some((particular, _)) = equations.preimage_fibre(&row)? else {
-            return Ok(None);
-        };
-        rows.push(particular);
-    }
-    Ok(Some(LinearMapFamily {
-        particular: ExactRatMatrix::shaped(target.rows(), source.rows(), rows)?,
-        free_row_directions: equations.kernel_basis()?,
-    }))
+    Ok(match source.factor_receiver(target)? {
+        ReceiverFactorization::Factored(family) => Some(family),
+        ReceiverFactorization::Obstructed { .. } => None,
+    })
 }
 
 impl ExactRatMatrix {
+    /// Solve D self = target over the complete declared input carrier. The affine decoder
+    /// family is retained; a particular is a coordinate representative, not an inferred cause.
+    pub fn factor_receiver(
+        &self,
+        target: &Self,
+    ) -> Result<ReceiverFactorization, ExactLinearError> {
+        if self.columns() != target.columns() {
+            return Err(ExactLinearError::ShapeMismatch);
+        }
+        let equations = self.transpose()?;
+        let mut rows = Vec::with_capacity(target.rows());
+        for row in target.to_rows() {
+            match equations.preimage_fibre(&row)? {
+                Some((particular, _)) => rows.push(particular),
+                None => {
+                    let null = equations
+                        .preimage_obstruction(&row)?
+                        .ok_or(ExactLinearError::RankFactorizationCertificateFailure)?;
+                    let returned = target.apply(&null)?;
+                    if self.apply(&null)?.iter().any(|v| !v.is_zero())
+                        || returned.iter().all(Zero::is_zero)
+                    {
+                        return Err(ExactLinearError::RankFactorizationCertificateFailure);
+                    }
+                    return Ok(ReceiverFactorization::Obstructed {
+                        source_null: null,
+                        returned,
+                    });
+                }
+            }
+        }
+        let particular = Self::shaped(target.rows(), self.rows(), rows)?;
+        if particular.multiply(self)? != *target {
+            return Err(ExactLinearError::RankFactorizationCertificateFailure);
+        }
+        Ok(ReceiverFactorization::Factored(LinearMapFamily {
+            particular,
+            free_row_directions: equations.kernel_basis()?,
+        }))
+    }
+
     /// Columns are actual, ordered observations in a declared local rational-linear chart.
     /// `self=S`, `context=C`, `returned=Y`. A lift exists precisely when
     /// ker(S) intersect ker(C) is contained in ker(Y). The returned witness or quotient

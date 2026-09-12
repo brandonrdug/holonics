@@ -23,12 +23,14 @@ are scopes of the same formative activity. Athena's generality and a Hephaestus 
 specificity are compatible: a calculator request fixes a domain and receiver over a general
 construction capability. Existing API/wire names retain their compatibility.
 
-[established-bounded; source-inspected] The current
-[exact factorization example](../crates/holonic-engine/examples/generator_factorization.rs)
-is exterior mathematical apparatus. It searches exact bilinear realizations, solves alternative
-π/e blocks and compiles a Gamma jet through existing rational operators. It is the first bounded
-reference for this direction; it does not yet supply a general operator-facing application or
-demonstrate a native HNN solving those tasks.
+[established-bounded; implemented-exact] The
+[reusable operator return](../research/records/2026-09-11_REUSABLE_GENERATORS_REACH_RESIDENT_RECEIVERS.md)
+now has shared engine owners for bilinear construction, receiver factorization and source-family
+preimages. A pure resident consumer executes the returned exact rational factors and applies a
+changed receiver to the same GPU product without intermediate host readout. The earlier fixed
+factorization example now calls those reusable owners. This is productive mathematical/native
+application; the coupled developing-family material transaction remains a separate unbound
+consumer, rather than an implied completed Athena faculty.
 
 ## Direct contribution to Athena and Eros
 
@@ -111,9 +113,8 @@ the new admissible consequence or work reduction it enables, not merely a change
 | Multiply polynomials a+bx and c+dx | Coefficients `(p, r−p−q, q)` |
 
 Expansion gives both identities over their respective commutative scalar charts. The first
-receiver is already returned by the exact search. The second is the next proposed reuse test:
-retain the product factors and solve only for the new output map through the existing preimage
-owner. A third receiver can request just the cross coefficient ad+bc. This tests shared
+receiver is already returned by the exact search. Both now execute through one retained product core: the changed output map is solved through
+the existing preimage owner and applied to the same resident product. A third receiver can request just the cross coefficient ad+bc. This tests shared
 construction and receiver-specific work while preserving the distinct application occurrences.
 
 [definition] The use retains the original factor/source occurrence, new receiver and each
@@ -219,11 +220,10 @@ and no generic code-cost theorem establishes either endpoint by itself.
 
 [definition] The next code increments extend existing owners; the roadmap supplies their order.
 
-1. **Expose the mathematical contract.** Factor the example's target-specific wiring into a
-   cohesive exact factorization capability beside `exact_linear`. Accept explicit input/output
-   shape, coefficient domain, candidate support and cost aperture. Reuse preimage solving and
-   obstruction construction. Keep the current example as a reference caller; compare complex
-   and polynomial multiplication through the same machinery.
+1. **Use the returned mathematical contract.** `exact_linear` now exposes bilinear target,
+   product core, receiver family and streaming support search over a declared grammar. Extend
+   this same ownership to the recurrence/block actions as their consumers require; preserve
+   full input/output and clock relations.
 2. **Reuse a returned construction.** Retain typed factors and receiver maps, not only the JSON
    report. Solve a new receiver over the retained action, compose with an existing operator word,
    and preserve domain, clock and occurrence lineage. Reuse `ExactRatMatrix` and existing
@@ -234,8 +234,8 @@ and no generic code-cost theorem establishes either endpoint by itself.
    `SupportedDefectSection`, `DerivedFactorCover` and material-factorization owners provide
    reference constructions. A solver identity alone is not an observed native event. Keep the
    joint family and the producing cut in the handoff.
-4. **Make the relevant passage resident.** Bind one demonstrated construction and its receiver
-   to existing resident current/formation owners. Reuse immutable standing, stage changed
+4. **Continue the resident passage.** The pure rational factor/receiver binding now exists.
+   Bind its relevant source/return to existing formation owners when the joint law is supplied. Reuse immutable standing, stage changed
    sections and publish one complete successor. The native family incorporation gap remains
    explicit. Do not put exterior search, CPU semantic replay or Lean inside inference.
 

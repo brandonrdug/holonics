@@ -48,9 +48,15 @@ use relational_geometry::Rat;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
+mod bilinear;
 mod contextual;
+pub use bilinear::{
+    BilinearOperator, BilinearProductCore, BilinearRealization, BilinearSupportReturn,
+    BilinearSupportSearch,
+};
 pub use contextual::{
     ContextualFactorization, ContextualObstruction, ExactContextualLift, LinearMapFamily,
+    ReceiverFactorization,
 };
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]

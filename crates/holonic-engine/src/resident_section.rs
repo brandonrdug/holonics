@@ -81,6 +81,10 @@ use mount::{
     MemoryInfo, Module, Stream,
 };
 
+#[path = "resident_section/bilinear.rs"]
+mod bilinear;
+pub use bilinear::{ResidentBilinearMap, ResidentBilinearReturn};
+
 #[path = "resident_section/geometry.rs"]
 mod geometry;
 #[path = "resident_section/surface_mount.rs"]

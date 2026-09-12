@@ -9,10 +9,15 @@ specifies native changes. Dated research supplies evidence, not additional sched
 formal mathematics, engine construction, Eros, Athena and Hephaestus develop one framework.
 The mathematical applications must return reusable constructions into the engine; native
 observations must in turn refine the mathematics and its representation. AC0–AC5 remain historical
-labels. The named Athena phases below are the shared implementation order, not a separate
+labels. The named Athena responsibilities below express shared dependencies, not a separate
 language project waiting behind an indefinitely expanding list of mathematical experiments.
 
 ## Sustained objective and construction rhythm
+
+[project-postulate] Brandon's subsequent ruling makes items 1–4 coupled responsibilities of a
+complete cycle, not a serial stage gate. Recover/compose a generator, apply it in a contemporary
+orientation, receive its difference, incorporate the admitted constraint and reuse its encoded
+continuation as their actual dependencies permit. Work may move among all four in one return.
 
 [project-postulate] Build a continuing ecology that can recover applicable generating relations,
 compose them into useful actions, represent their relevant futures economically, and change its
@@ -48,7 +53,7 @@ return already composes lawfully, implement its authorized consumer while wider 
 continues. A newly exposed missing law is worked through explicitly; unrelated experiments do
 not discharge it. This direction does not authorize unrelated subsystems or destructive actions.
 
-| Existing phase | Shared construction and engine consequence | Hephaestus/Athena outcome |
+| Coupled responsibility | Shared construction and engine consequence | Hephaestus/Athena outcome |
 |---|---|---|
 | **1. Situated reception and visible cycles** | Public mathematical requests and source/part relationships enter existing owners; retain domain, conditions, receiver, source clock and returned difference. Reusable factors/words replace fixed example wiring. | Inspect a complete requested operation and actual returned face; distinguish a prediction, a supplied correction and an ordinary incoming source. Mathematical results become available constructions, not only printed answers. |
 | **2. Conditional relations and complete return** | Bind producing-family comparisons to correlated condition/preimage and material formation, then publish one successor. | Eros incorporates an observed mathematical/textual relation; a later suitable request uses the changed relation. A separating condition retains its different consequence. |
@@ -66,9 +71,17 @@ nested automata that construct, compare and refine further automata.
 
 ## Immediate integrated implementation
 
-[definition] The present work joins two responsibilities in phases 1–2. First, factor the exact
-operator/recurrence construction into reusable source owners and retain its typed executable
-returns; serve a changed receiver and a new composition. Second, derive and implement the
+[established-bounded; implemented-exact] The
+[bilinear return](../../research/records/2026-09-11_REUSABLE_GENERATORS_REACH_RESIDENT_RECEIVERS.md)
+now covers reusable target/core/receiver/search, fixed-port source-family preimage and pure
+resident evaluation with changed-receiver product reuse. Continue these owners through
+recurrence/block applications and actual source/material incorporation. The remaining varying
+source/condition relation must keep tensor-product consistency; independent lifted coordinates
+cannot substitute for that joint.
+
+[definition] The present work joins two responsibilities in phases 1–2. Use the returned reusable
+bilinear owners and extend the needed recurrence/action composition with typed executable
+returns; preserve changed receivers and complete source/clock relations. Second, derive and implement the
 producing-family incorporation through existing condition/contact and formation owners. Their
 shared handoff is an admitted source/action/receiver relation with its correlated parameters,
 clock, residual and return—not a JSON result imported as semantic material.
@@ -115,7 +128,7 @@ The increments below detail applications of phases 1–4 above; they are not a s
 | Increment | Concrete code/design work | Expected useful return |
 |---|---|---|
 | **Returned spectral generators and situated information** | Returned at five fixed receivers: two Euler–Maclaurin head/tail splits and direct alternating η; reuse their retained head/tail, phase lifts, literal code, symbolic surprise and scoped work in the next operator increment | Compare the same face across generators and changed receiver charts; distinguish analytic refinement from source change and show when a local code transfers or fails |
-| **Operator-scoped requests** | Factor the fixed example into a cohesive exact factorization capability using the existing preimage owner; retain field, shape, support, receiver and cost aperture | Different requested mathematical operators use the same construction machinery and return scoped values, families or executable factors |
+| **Operator-scoped requests** | The bilinear capability is now shared and natively bound; extend required recurrence/action requests through the same preimage and receiver owners, retaining domain, clock and cost aperture | Different requested mathematical operators use the same construction machinery and return scoped values, families or executable factors |
 | **Shared constructions and changed receivers** | Keep typed returned factors; solve a new receiver, compose existing operator/recurrence words and preserve clocks/fibres | The complex-multiplication product core serves polynomial multiplication; a receiver requiring a discarded distinction returns its actual obstruction |
 | **Returned constraints and available material** | Compose actual source-qualified comparisons with contextual factorization, factor covers and existing material owners | New constraints refine applicability or enable a new construction, with meaningful before/after conduct and cost |
 | **Resident mathematical instances** | Bind a demonstrated automaton and receiver to the existing HNN owner, staged formation and rest; preserve the native family incorporation obligation | A native mathematical application continues through its actual successor without host semantic replay or a second engine |
@@ -158,7 +171,7 @@ certainty gate. A finite mechanism can be used while its wider range remains unr
 
 ## Native responsibilities within the shared order
 
-[definition] The phase table in the sustained programme above is the common order. The
+[definition] The responsibility table in the sustained programme above is the common dependency account. The
 [blueprint](THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 details its exact native files, ports, missing relations and verification. Source-visible output,
 persistence and resource accounting accompany usable increments. CONSTRUCTION_STATE identifies
