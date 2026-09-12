@@ -958,6 +958,17 @@ They are not all composed into AC1's general conversation path.
 
 ## Quantum and physical formalizations
 
+[definition] `Physics/DirectionalPolarization.lean` extends existing `JonesSection` and
+`FiniteCoherentPathFamily.analyze` with directional kets, density mixtures, Malus response,
+Stokes determinant and the four-ray alternating cross-ratio. `HolonicPolarizedCrystalTransport`
+now owns `transportBetween` for distinct source and target frames. `HolonicFermionicOccupation`
+owns `superposedCreation` and its CAR/nilpotency; `Physics/FermionicModeReceiver` joins its binary
+occupation chart to the existing normalized-exponential/sigmoid law and vacant-mode receiver.
+Both new physics owners are imported by `Framework.Physics`. The exact exterior application is
+`crates/holonic-engine/examples/optical_receiver_frames.rs`, using shared matrix and ratio owners.
+The [source/theorem return](../research/records/2026-09-12_DIRECTIONAL_OPTICS_MODE_EXCLUSION_AND_MOVING_SWING_SHARE_TRANSPORT.md)
+records the physical and information/emulator interpretation without promoting it to a new backend.
+
 | Relation | Lean owner | Rust owner | CUDA owner | Status and exact open fibre |
 |---|---|---|---|---|
 | Dynamic fluid rescaling and finite physical endpoint | `Millennium/NavierStokesRescalingSpace.lean`; `Millennium/NavierStokesDynamicRescaling.lean`; `Millennium/NavierStokesRescalingClock.lean`; `Millennium/NavierStokesRescalingEndpoint.lean` | — | — | **formal-only:** actual momentum, pressure, force and divergence transport through varying scalar amplitude/length and centre, changed periodicity, inverse-domain laws, explicit finite clocks, and sufficient value/derivative criteria excluding compatible smooth extension; no profile satisfying those criteria, stability estimate or blowup solution is constructed |

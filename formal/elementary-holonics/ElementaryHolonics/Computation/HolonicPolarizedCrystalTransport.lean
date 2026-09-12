@@ -128,6 +128,22 @@ theorem transport_mulVec_forward
 
 end PolarizationRebase
 
+/-- Distinct frames at the two ends carry a nonautonomous operation. The second frame need not
+equal the first, so exact transport does not freeze either the coordinates or the physical law. -/
+def transportBetween
+    (before after : PolarizationRebase (Polarization := Polarization))
+    (operator : Matrix Polarization Polarization ℂ) : Matrix Polarization Polarization ℂ :=
+  after.forward * operator * before.backward
+
+theorem transportBetween_mulVec_forward
+    (before after : PolarizationRebase (Polarization := Polarization))
+    (operator : Matrix Polarization Polarization ℂ) (input : Polarization → ℂ) :
+    transportBetween before after operator *ᵥ (before.forward *ᵥ input) =
+      after.forward *ᵥ (operator *ᵥ input) := by
+  simp only [transportBetween, Matrix.mulVec_mulVec]
+  rw [Matrix.mul_assoc (after.forward * operator) before.backward before.forward,
+    before.backward_forward, Matrix.mul_one]
+
 /-! ## Crystalline phase on any finite path population -/
 
 variable {Path : Type uPath} [Fintype Path]

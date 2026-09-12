@@ -89,10 +89,18 @@ the many-fermion state.  In exterior-algebra form, repeating the same one-partic
 produce a second independent occurrence.  This is a precise nullity-of-repetition law, not a
 claim that a prime occupies a spacetime position.  Source: https://arxiv.org/abs/0904.2009
 
-[project-postulate] A holonic exclusion theorem should therefore begin with an alternating
+[historical] A holonic exclusion theorem was proposed to begin with an alternating
 interaction carrier and prove that repeated complete causal state produces a zero exterior
 population.  Different positions, spins, colours, times, or receiver histories are different
 typed states and are not excluded merely because one scalar coordinate agrees.
+
+[definition] September 12 clarification: the preceding appeal to different receiver histories
+does not by itself establish different one-particle quantum modes. Distinct preparation
+occurrences may prepare the same state. The
+[superposed-mode CAR return](2026-09-12_DIRECTIONAL_OPTICS_MODE_EXCLUSION_AND_MOVING_SWING_SHARE_TRANSPORT.md)
+preserves exclusion at that physical mode, while actual spin/motional and other receiver
+distinctions retain their specified source maps. Historical origin is not an escape from the
+mode-equivalence relation; the alternating construction and its scoped exclusion remain standing.
 
 ## Gravitational and thermal species
 

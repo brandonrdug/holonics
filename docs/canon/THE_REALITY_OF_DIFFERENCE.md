@@ -160,6 +160,14 @@ the useful return is a counterexample to an earlier proposed description.
 
 ## Current changes form; later current encounters that form
 
+[definition] Swing also compares changing families of frames, receivers and constitutive
+relations. An invariant is relative to its declared transport; it need not be a scalar held
+constant throughout physical evolution. The relation `q_(t+1)T_t=U_tq_t` can remain exact while
+q, T, U and their measured parameters all vary. At a differential cut the frame contributes
+`q̇_t x` as well as `q_t ẋ`. A channel may supply the held boundary in one description and the
+evolving object in another. Carry the changing source and boundary laws through that comparison;
+a coordinate rebase and a physical change remain distinguishable operations on the same account.
+
 [project-postulate] The laboratory's river, riverbed, cavern, loom and star images express a
 continuous line of thought. Passage changes the structure through which later passage occurs.
 A record of that change can become reusable form; a new occurrence conducts through the changed

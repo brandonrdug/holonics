@@ -1,0 +1,18 @@
+Command: bash tools/lean_check.sh ElementaryHolonics.Framework.Physics
+Complete local output: .local/scratch/2026-09-12-optics-physics-framework.log
+The successful framework build includes DirectionalPolarization, superposed CAR, transportBetween, and FermionicModeReceiver.
+ℹ [9086/9087] Built ElementaryHolonics.Physics.FermionicModeReceiver (1.7s)
+info: ElementaryHolonics/Physics/FermionicModeReceiver.lean:55:0: 'Soma.Holonics.Physics.FermionicModeReceiver.occupation_is_sigmoid' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/FermionicModeReceiver.lean:56:0: 'Soma.Holonics.Physics.FermionicModeReceiver.fermi_dirac_receiver' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/FermionicModeReceiver.lean:57:0: 'Soma.Holonics.Physics.FermionicModeReceiver.vacancy_is_one_minus_occupation' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Physics/FermionicModeReceiver.lean:58:0: 'Soma.Holonics.Physics.FermionicModeReceiver.common_energy_reference' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+✔ [9087/9087] Built ElementaryHolonics.Framework.Physics (4.2s)
+Build completed successfully (9087 jobs).

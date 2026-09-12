@@ -156,6 +156,15 @@ prerequisite to every mathematical tool.
 
 ## Spectral application and information units
 
+[proved-derived; formal-checked] The [optical application return](../research/records/2026-09-12_DIRECTIONAL_OPTICS_MODE_EXCLUSION_AND_MOVING_SWING_SHARE_TRANSPORT.md)
+provides directional analyzer, phase/coherence, mode-exclusion and changing-frame tasks for the
+same operator machinery. Optical ray cross-ratios carry a projective receiver; Stokes congruence
+exposes spherical/hyperbolic charts; the thermal fermionic mode reuses the binary normalized
+exponential. A nonnegative Hadamard-mask inverse supplies a concrete decoder-noise comparison.
+Use the actual matrix/mode domain, source and receiver in each request, including higher moments
+where the supplied quantum state requires them. Physical emulation and algorithmic encoding
+share a generator/decoder correspondence; their calibration and work accounts remain explicit.
+
 [established-bounded; implemented-exact; formal-checked] The
 [ζ/phase application](../research/records/2026-09-11_ZETA_PHASE_SWING_AND_INFORMATION_RATES_ARE_MEASURED.md)
 now reads five exact zero-localization boxes in the declared strip, complete interval gaps,

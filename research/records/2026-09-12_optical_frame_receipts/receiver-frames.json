@@ -1,0 +1,70 @@
+{
+  "directional_density": {
+    "diagonal_coherent": "1",
+    "diagonal_mixed": "1/2",
+    "horizontal_coherent": "1/2",
+    "horizontal_mixed": "1/2"
+  },
+  "fermionic_mode": {
+    "coefficients": [
+      "3/5",
+      "4/5"
+    ],
+    "exchanged_pair": [
+      "0",
+      "0",
+      "0",
+      "-1"
+    ],
+    "ordered_pair": [
+      "0",
+      "0",
+      "0",
+      "1"
+    ],
+    "repeated_creation_zero": true
+  },
+  "four_ray_cross_ratio": {
+    "after": "-1",
+    "before": "-1"
+  },
+  "hadamard_decoder": {
+    "bound_squared": "9/4",
+    "inverse": [
+      [
+        "-1/2",
+        "1/2",
+        "1/2"
+      ],
+      [
+        "1/2",
+        "-1/2",
+        "1/2"
+      ],
+      [
+        "1/2",
+        "1/2",
+        "-1/2"
+      ]
+    ],
+    "isotropic_unit_noise_mass": "9/4"
+  },
+  "moving_frame_return": [
+    "10",
+    "3/2"
+  ],
+  "rotation_only_horizontal_transmission": "9/25",
+  "schema": "holonics.optical-receiver-frames.v1",
+  "scope": "exact finite rational operator comparisons; no calibrated optical or Fermi-gas apparatus",
+  "state_and_analyzer_covariance": true,
+  "stokes_boost": {
+    "contrast": "15/8",
+    "minkowski_square": "1",
+    "trace": "17/8"
+  },
+  "thermal_fermionic_mode": {
+    "logit": "ln 2",
+    "occupied": "2/3",
+    "vacant": "1/3"
+  }
+}

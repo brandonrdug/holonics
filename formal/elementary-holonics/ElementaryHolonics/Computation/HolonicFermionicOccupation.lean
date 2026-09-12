@@ -523,6 +523,43 @@ theorem annihilation_comp_creation_add_creation_comp_annihilation
       create first (annihilate first state) occupation = state occupation
     exact congrFun (annihilate_create_add_create_annihilate_same first state) occupation
 
+section SuperposedModes
+
+variable [Fintype Mode]
+
+/-- A one-particle mode may be any complex superposition of the presentation basis. -/
+def superposedCreation (coefficients : Mode → ℂ) : Module.End ℂ (FockState Mode) :=
+  ∑ mode, coefficients mode • creation mode
+
+/-- Exchange antisymmetry is preserved for arbitrary superposed modes. -/
+theorem superposedCreation_anticommute (left right : Mode → ℂ) :
+    superposedCreation left * superposedCreation right +
+      superposedCreation right * superposedCreation left = 0 := by
+  unfold superposedCreation
+  simp_rw [Finset.sum_mul, Finset.mul_sum, smul_mul_assoc, mul_smul_comm, smul_smul]
+  rw [Finset.sum_comm (f := fun j i =>
+    (right j * left i) • (creation j * creation i))]
+  rw [← Finset.sum_add_distrib]
+  apply Finset.sum_eq_zero
+  intro i _
+  rw [← Finset.sum_add_distrib]
+  apply Finset.sum_eq_zero
+  intro j _
+  rw [mul_comm (right j) (left i), ← smul_add]
+  have exchange : creation i * creation j + creation j * creation i = 0 :=
+    creation_comp_creation_add_swap i j
+  rw [exchange, smul_zero]
+
+/-- Exclusion concerns the complete one-particle mode, not a chosen spatial/basis label. -/
+theorem superposedCreation_square_zero (coefficients : Mode → ℂ) :
+    superposedCreation coefficients * superposedCreation coefficients = 0 := by
+  have exchange := superposedCreation_anticommute coefficients coefficients
+  have doubled : (2 : ℂ) • (superposedCreation coefficients * superposedCreation coefficients) = 0 := by
+    simpa only [two_smul ℂ] using exchange
+  exact (smul_eq_zero.mp doubled).resolve_left (by norm_num)
+
+end SuperposedModes
+
 /-- A concrete two-mode control simultaneously exhibits exclusion and the distinct mixed CAR
 return on the finite vacuum. -/
 theorem twoMode_exclusion_and_mixed_control :
@@ -558,6 +595,8 @@ section Audit
 #print axioms card_occupation
 #print axioms annihilationMatrix_eq_conjTranspose_creationMatrix
 #print axioms creation_comp_creation_add_swap
+#print axioms superposedCreation_anticommute
+#print axioms superposedCreation_square_zero
 #print axioms annihilation_comp_annihilation_add_swap
 #print axioms annihilation_comp_creation_add_creation_comp_annihilation
 #print axioms twoMode_exclusion_and_mixed_control

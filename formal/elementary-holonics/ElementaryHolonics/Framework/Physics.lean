@@ -1,5 +1,7 @@
 import ElementaryHolonics.Framework.Dynamics
 import ElementaryHolonics.Physics.PhaseCarrier
+import ElementaryHolonics.Physics.DirectionalPolarization
+import ElementaryHolonics.Physics.FermionicModeReceiver
 import ElementaryHolonics.Physics.CoupledIncidence
 import ElementaryHolonics.Physics.PortEnergyHeat
 import ElementaryHolonics.Physics.PartitionedHodgeEnergy

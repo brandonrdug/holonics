@@ -57,6 +57,22 @@ as it composes realization, continuation and navigation.
 
 ## Begin with a situated interaction
 
+[proved-derived; formal-checked] The [directional optics and moving-frame construction](../research/records/2026-09-12_DIRECTIONAL_OPTICS_MODE_EXCLUSION_AND_MOVING_SWING_SHARE_TRANSPORT.md)
+uses the existing Jones sections to give local notation `|↔⟩_F`, `|↕⟩_F`,
+`|↗⟩_F=(|↔⟩_F+|↕⟩_F)/√2` and `|↖⟩_F=(-|↔⟩_F+|↕⟩_F)/√2`.
+`Physics/DirectionalPolarization` supplies scoped arrows, analyzers and density projectors.
+It proves the rotated-mixture identity, relative-angle Malus law, Stokes determinant and
+invariance of the four-ray wedge cross-ratio under a common invertible frame. These rays and
+their invariant readings may evolve physically; the covariance theorem compares their charts.
+
+[proved-derived; formal-checked] `HolonicFermionicOccupation` now lifts its existing CAR to
+arbitrary complex mode superpositions, proving `c†(v)²=0` without a privileged position label.
+`Physics/FermionicModeReceiver` composes the allowed binary occupation chart with the existing
+normalized exponential to derive the Fermi–Dirac/sigmoid and vacancy receivers. The polarized
+transport owner admits distinct source/target frames; `ChangingReceiver` and
+`ConstitutiveModulation` retain frame velocity and material/current mixed terms. Their emulator
+map is the same indexed generator/decoder relation used for source-qualified encoding.
+
 [proved-derived; formal-checked] The [generator-inference construction](../research/records/2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md)
 connects exact solving, MDL/MAP, Gibbs variational inference and sufficient representations.
 `Foundation/GeneratorInference.lean`, imported by `Framework.Information`, reads a finite admitted

@@ -7,6 +7,18 @@ AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/p
 is the sole order and [the blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 names actual code changes and outcomes.
 
+[proved-derived; formal-checked] The [optics/exclusion/Swing return](research/records/2026-09-12_DIRECTIONAL_OPTICS_MODE_EXCLUSION_AND_MOVING_SWING_SHARE_TRANSPORT.md)
+adds directional Jones/density notation, Malus and mixture laws, the Stokes determinant and
+four-ray projective invariance, arbitrary superposed-mode fermionic exclusion, a thermal
+Fermi–Dirac/sigmoid receiver, and transport between distinct endpoint frames. It recovers the
+existing changing-receiver and full constitutive mixed-term laws. Framework.Physics builds.
+
+[established-bounded; implemented-exact] Its exact operator application distinguishes coherent
+and mixed analyzer faces, retains a changing-frame return, reads a Stokes boost, checks
+superposed fermion exchange, and returns the order-three Hadamard decoder noise mass `9/4`.
+The source review connects Fermi-gas emulation and quantum relative entropy to the preceding
+information work; the physical neck/CTC correspondence keeps its explicit unproved source map.
+
 [project-postulate] Brandon's September 12 clarification identifies solver inference and
 generator construction as mathematical learning/reasoning. The requested unknown can be an
 algorithm or representation of π/e, a bilinear action or another admitted mathematical future.

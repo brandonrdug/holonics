@@ -222,6 +222,13 @@ symbol basis does not define the common interior or its clock.
 
 ## Shared mathematics and its productive use
 
+[project-postulate] Brandon's September 12 optical/Swing clarification makes the frame family
+and constitutive boundary dynamic in the shared construction. Use the
+[returned directional, mode-exchange and endpoint-frame laws](../../research/records/2026-09-12_DIRECTIONAL_OPTICS_MODE_EXCLUSION_AND_MOVING_SWING_SHARE_TRANSPORT.md)
+as mathematical source/receiver applications of the operator and encoding work. Connect their
+thermal/information and emulator maps through the existing owners. The fluid neck and CTC
+comparison retain distinct physical source obligations; they add no new prerequisite queue.
+
 [project-postulate] Holonics remains the mathematical, physical and philosophical framework.
 HNN/Athena is one application. Research develops reusable constructions and feeds their actual
 returns into the matching authorized native work without replacing it with another abstract noun.
