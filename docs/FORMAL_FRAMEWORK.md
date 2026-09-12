@@ -57,6 +57,22 @@ as it composes realization, continuation and navigation.
 
 ## Begin with a situated interaction
 
+[proved-derived; formal-checked] The [generator-inference construction](../research/records/2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md)
+connects exact solving, MDL/MAP, Gibbs variational inference and sufficient representations.
+`Foundation/GeneratorInference.lean`, imported by `Framework.Information`, reads a finite admitted
+candidate objective `J=L_description+L_data` through the existing normalized-exponential owner.
+Its minimizing predicate is exactly the posterior-mode predicate, including on an exact feasible
+subtype. Its variational excess is KL in bits. Candidate objects can be programs or parameter
+vectors; their mathematical type does not establish a division between solving and learning.
+
+[proved-derived; formal-checked] Equal complete inference faces are equivalent to equal
+pairwise objective differences. Hence a factorization `J(D,g)=j(S(D),g)+a(D)` makes S sufficient
+for that receiver. If S has a closed update, the existing receiver-history theorem preserves
+inference through every ordered future. For noninjective candidate compression, the effective
+class objective is the negative log of the sum of all fibre weights. These are exact gauge,
+sufficiency and coarse-graining maps; they replace an assumed need to reconstruct history with
+the specific representation law that a consuming application must establish.
+
 [proved-derived; formal-checked] The
 [bounded toolkit return](../research/records/2026-09-11_THRESHOLD_REFINEMENT_AND_PARTITIONED_ENERGY_RETURN_HOLONIC_TOOLKITS.md)
 adds the phase-sensitive energy ledger for arbitrary finite cuts and an explicit cycle whose

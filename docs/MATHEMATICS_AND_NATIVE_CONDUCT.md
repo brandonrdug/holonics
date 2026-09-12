@@ -152,6 +152,27 @@ returned laws, not a new physical identity or an unimplemented mechanism promote
 
 ## Classical learning already supplies useful mathematics and conduct
 
+[proved-derived; formal-checked] The [September 12 generator-inference return](../research/records/2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md)
+composes those existing subjects at the level of candidate representations. A code/likelihood
+objective gives `Π(g)=2^(-J(g))/Z`; minimum-description solving and MAP have the same minimizing
+predicate on the declared feasible candidates. The Gibbs variational identity gives
+`(E_q J-H₂(q))-(E_Π J-H₂(Π))=KL₂(q||Π)`. The finite positive-support hypotheses and units are
+explicit, while exact solving retains its actual solution fibre before any probability chart.
+
+[proved-derived; formal-checked] The complete inference face factors through pairwise objective
+differences, so a candidate-independent offset is a gauge. An objective sufficient statistic
+with a closed update is a `ReceiverHistoryCompression`, preserving all admitted future inference
+without recovering the past. Coarse candidate classes instead carry the summed fibre mass,
+with effective log-sum-exp cost. The previous addressed code-cost balance contributes work,
+endpoint and residual differences directly to log posterior odds. `GeneratorInference` and the
+extended normalization/information owners supply these checked bridges.
+
+[established-bounded; implemented-exact] `receiver_code_cost.rs` now consumes the existing
+`SymbolicSurprisal` and `RatioFamily` owners for exact finite generator inference, closed count
+updates and prefix-code refinement. The complete receipt retains both the old unequal-cost
+channel and the new variational/sufficiency comparisons. This is reusable exterior apparatus;
+no new semantic probability rule is installed in the native runtime.
+
 [proved-derived] For a finite admitted population and beta>0, let
 
 ```text

@@ -32,6 +32,16 @@ test result never upgrades a correspondence.
 
 ## Formal framework entry points
 
+[definition] `Foundation/GeneratorInference.lean` composes `ReceiverCodeCost`,
+`HolonicAdjointNormalization`, `InformationDifference` and `ReceiverHistoryCompression` in
+`Framework.Information`. It owns the finite description/data posterior, exact feasible-solver
+mode equivalence, Gibbs/KL variational gap, pairwise-objective gauge, recursively sufficient
+statistics, candidate-fibre log-sum-exp and addressed cost log-odds. `InformationReceiver` now
+supplies KL nonnegativity; the existing normalization owner supplies log mass, order and the
+converse of common-shift invariance. `receiver_code_cost.rs` consumes existing symbolic-log
+and ratio owners for the exact application. The [returned proof and execution](../research/records/2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md)
+state their finite source and native implementation scopes.
+
 [definition] [`ElementaryHolonics.Framework`](../formal/elementary-holonics/ElementaryHolonics/Framework.lean)
 is the default formal import/build face. Its Core, Geometry, Dynamics, Information, Physics and
 Computation subjects compose the existing owners; the complete `ElementaryHolonics` research

@@ -78,6 +78,14 @@ nested automata that construct, compare and refine further automata.
 
 ## Immediate mathematical application and implementation
 
+[proved-derived; formal-checked] The [generator-inference bridge](../../research/records/2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md)
+now supplies the shared MDL/MAP, variational, sufficient-statistic and fibre-coarse-graining laws
+for finite admitted candidate representations. Use their source/measure/decoder hypotheses in
+the operator and encoding work below. The native operation-sequence representation must earn
+its proposed reduction through the applicable sufficient-update or generator/receiver law;
+historical reconstruction is not the default target. These laws extend the returned code-cost
+construction and do not introduce a second optimizer or another prerequisite campaign.
+
 [established-bounded; implemented-exact; formal-checked; computational-witness] The
 [complete native return](../../research/records/2026-09-12_OLD_AND_NEW_PENDING_SOURCES_RETURN_THROUGH_ONE_GENERATOR.md)
 now joins actual pending source comparisons, original bounds/frames, constitutive contact and

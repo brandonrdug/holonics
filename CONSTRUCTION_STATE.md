@@ -15,6 +15,18 @@ objective with state-change demonstrations or exact historical replay. The
 [correction](research/records/2026-09-12_SOLVER_INFERENCE_AND_GENERATOR_COMPRESSION_ARE_INTELLIGENCE.md)
 records the governing interpretation and current representation limits.
 
+[proved-derived; formal-checked] The [generator-inference bridge](research/records/2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md)
+now composes the existing description/code-cost, normalized-exponential, Gibbs/KL and dynamic
+receiver owners. It proves exact-solver/MAP ordering, the variational gap, inference equivalence
+through pairwise objective differences, sufficient-statistic continuation and fibre log-sum-exp
+coarse graining on finite positive candidate charts. Framework.Information builds successfully.
+
+[established-bounded; implemented-exact] The existing code-cost application now verifies those
+relations through exact symbolic logs and ratio normalization. Its two-generator posterior is
+`(6/7,1/7)`; a closed count update yields `(2/3,1/3)`, and a split prefix description preserves
+the pushed-forward inference. Its previous 143 channel histories still pass. This supplies a
+mathematical application/encoding return; the native dependent programme's representation is unchanged.
+
 [established-bounded; implemented-exact; formal-checked; computational-witness] The
 [complete native return](research/records/2026-09-12_OLD_AND_NEW_PENDING_SOURCES_RETURN_THROUGH_ONE_GENERATOR.md)
 now incorporates actual pending predictions from both the original affine word and the later

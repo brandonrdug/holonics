@@ -229,6 +229,15 @@ either one a prerequisite for intelligence.
 
 ## Relative optimality and boundary cost
 
+[proved-derived; formal-checked] The [generator-inference bridge](../research/records/2026-09-12_GENERATOR_INFERENCE_CODES_FREE_ENERGY_AND_SUFFICIENT_CONTINUATION.md)
+now relates this optimization to learning explicitly. Exact feasible generator search and
+MAP share their minimizing predicate in the finite description chart. The expected total
+description/data cost minus candidate entropy has KL as its variational gap. A shared cost
+offset is invisible to inference; candidate-dependent endpoint and remainder terms remain in
+the odds. Coarse generator classes carry their full fibre weight via log-sum-exp, while a
+recursively sufficient source statistic preserves inference without retaining its event history.
+Use these actual laws when transporting a solver's candidate, code or source representation.
+
 [definition] A locally optimal representation admits no improving variation within its declared
 admissible family and resource aperture. Its objects can be literal packets, executable
 generator words or residual-bearing hybrids. Shared decoder/standing belongs to the conditioning

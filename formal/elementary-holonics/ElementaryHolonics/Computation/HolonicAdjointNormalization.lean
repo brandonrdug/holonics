@@ -125,6 +125,39 @@ theorem face_add_common (potential : Index → ℝ) (common : ℝ) :
   simp only [face, partition_add_common, Real.exp_add]
   field_simp [partition_ne_zero potential, Real.exp_ne_zero]
 
+/-- Log mass retains its potential and the common normalization boundary. -/
+theorem log_face_mass (potential : Index → ℝ) (index : Index) :
+    Real.log ((face potential).mass index) = potential index - Real.log (partition potential) := by
+  simp only [face, Real.log_div (Real.exp_ne_zero _) (partition_ne_zero _), Real.log_exp]
+
+/-- Normalization preserves the ordering of the complete potential population. -/
+theorem face_mass_le_iff (potential : Index → ℝ) (left right : Index) :
+    (face potential).mass left ≤ (face potential).mass right ↔
+      potential left ≤ potential right := by
+  change Real.exp (potential left) / partition potential ≤
+    Real.exp (potential right) / partition potential ↔ _
+  rw [div_le_div_iff_of_pos_right (partition_pos potential), Real.exp_le_exp]
+
+/-- Pairwise potential differences are a complete invariant of this normalized receiver. -/
+theorem face_eq_iff_pairwise_differences (left right : Index → ℝ) :
+    (face left).mass = (face right).mass ↔
+      ∀ i j, left i - left j = right i - right j := by
+  constructor
+  · intro equal i j
+    have hi := congrArg Real.log (congrFun equal i)
+    have hj := congrArg Real.log (congrFun equal j)
+    rw [log_face_mass, log_face_mass] at hi hj
+    linarith
+  · intro differences
+    classical
+    let anchor : Index := Classical.choice inferInstance
+    have shifted : left = fun i => right i + (left anchor - right anchor) := by
+      funext i
+      have h := differences i anchor
+      linarith
+    rw [shifted]
+    exact face_add_common right _
+
 /-- The expected receiver reading of one finite section. -/
 def expectation (probability : PositiveProbabilitySection Index) (values : Index → ℝ) : ℝ :=
   ∑ index, probability.mass index * values index

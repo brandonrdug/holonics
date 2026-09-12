@@ -1,0 +1,30 @@
+Command: bash tools/lean_check.sh ElementaryHolonics.Framework.Information
+Complete local output: .local/scratch/2026-09-12-generator-inference-framework.log
+Final completion and named theorem axiom output:
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+info: ElementaryHolonics/Foundation/GeneratorInference.lean:295:0: 'Soma.Holonics.Foundation.GeneratorInference.exact_solver_iff_posterior_mode' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Foundation/GeneratorInference.lean:296:0: 'Soma.Holonics.Foundation.GeneratorInference.posterior_of_log_description_and_likelihood' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Foundation/GeneratorInference.lean:297:0: 'Soma.Holonics.Foundation.GeneratorInference.variational_gap_eq_kl_bits' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Foundation/GeneratorInference.lean:298:0: 'Soma.Holonics.Foundation.GeneratorInference.variational_minimum' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Foundation/GeneratorInference.lean:299:0: 'Soma.Holonics.Foundation.GeneratorInference.posterior_eq_iff_objective_differences' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Foundation/GeneratorInference.lean:300:0: 'Soma.Holonics.Foundation.GeneratorInference.sufficient_statistic_every_future' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Foundation/GeneratorInference.lean:301:0: 'Soma.Holonics.Foundation.GeneratorInference.code_cost_log_odds' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ElementaryHolonics/Foundation/GeneratorInference.lean:302:0: 'Soma.Holonics.Foundation.GeneratorInference.posterior_coarse_eq_pushforward' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+✔ [3754/3754] Built ElementaryHolonics.Framework.Information (1.2s)
+Build completed successfully (3754 jobs).

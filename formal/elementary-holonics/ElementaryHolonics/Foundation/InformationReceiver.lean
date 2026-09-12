@@ -76,6 +76,25 @@ theorem crossEntropy_eq_entropy_add_kl
   rw [Finset.sum_sub_distrib]
   ring
 
+/-- Gibbs' inequality on the declared common positive support. -/
+theorem klDivergence_nonnegative (reference emitted : PositiveProbabilitySection Index) :
+    0 ≤ reference.klDivergence emitted := by
+  have bound (index : Index) : reference.mass index - emitted.mass index ≤
+      reference.mass index * (Real.log (reference.mass index) - Real.log (emitted.mass index)) := by
+    have hlog := Real.log_le_sub_one_of_pos
+      (div_pos (emitted.positive index) (reference.positive index))
+    have h := mul_le_mul_of_nonneg_left hlog (reference.nonnegative index)
+    have cancel : reference.mass index *
+        (emitted.mass index / reference.mass index - 1) =
+        emitted.mass index - reference.mass index := by
+      field_simp [reference.ne_zero index]
+    rw [cancel] at h
+    rw [Real.log_div (emitted.ne_zero index) (reference.ne_zero index)] at h
+    nlinarith
+  rw [klDivergence_eq_logDifference]
+  have summed := Finset.sum_le_sum (fun index (_ : index ∈ Finset.univ) => bound index)
+  simpa only [Finset.sum_sub_distrib, reference.normalized, emitted.normalized, sub_self] using summed
+
 /-- A probability receiver over native occurrences.  Equal returned sections define one
 receiver fibre while retaining every native occurrence in that fibre. -/
 structure ProbabilityReceiver (Native : Type uN) where
