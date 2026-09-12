@@ -2,23 +2,24 @@
 // These compose the existing checked wide arithmetic and rational normalization owners.
 extern "C" __global__ void section_packet_contract(
  const int64_t *ml,const int64_t *mh,const int64_t *xl,const int64_t *xh,
- uint32_t rows,uint32_t cols,int64_t *ol,int64_t *oh,
+ uint32_t rows,uint32_t cols,uint32_t affine,int64_t *ol,int64_t *oh,
  uint32_t *slot,const uint32_t *census,const uint32_t *lineage,uint32_t lineage_count) {
  if(blockIdx.x||threadIdx.x) return;
  if(upstream_refused(census,lineage,lineage_count,slot)) return;
- if(!rows||!cols) {atomicOr(slot,REFUSED_MALFORMED);return;}
+ if(!rows||!cols||affine>1u) {atomicOr(slot,REFUSED_MALFORMED);return;}
  uint32_t size=rows*cols;
  wide md=fibre_current_denominator(ml,mh,size,UINT32_MAX,slot);
- wide xd=fibre_current_denominator(xl,xh,cols,UINT32_MAX,slot);
+ uint32_t input_width=cols-affine;
+ wide xd=fibre_current_denominator(xl,xh,input_width,UINT32_MAX,slot);
  if(*slot)return;
  for(uint32_t i=0;i<size;++i)if(ml[i]!=mh[i])atomicOr(slot,REFUSED_MALFORMED);
- for(uint32_t i=0;i<cols;++i)if(xl[i]!=xh[i])atomicOr(slot,REFUSED_MALFORMED);
+ for(uint32_t i=0;i<input_width;++i)if(xl[i]!=xh[i])atomicOr(slot,REFUSED_MALFORMED);
  if(*slot)return;
  extern __shared__ wide scratch[];
  wide den=product_checked(md,xd,slot);
  for(uint32_t r=0;r<rows;++r){
   wide sum=0;
-  for(uint32_t c=0;c<cols;++c)sum=add_checked(sum,product_checked(ml[r*cols+c],xl[c],slot),slot);
+  for(uint32_t c=0;c<cols;++c)sum=add_checked(sum,product_checked(ml[r*cols+c],(affine && c==input_width)?xd:xl[c],slot),slot);
   scratch[r]=sum;
  }
  if(*slot)return;

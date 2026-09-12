@@ -136,9 +136,17 @@ impl<'c> ResidentBilinearMap<'c> {
         x: &ResidentSection<'c>,
         z: &ResidentSection<'c>,
     ) -> Result<ResidentBilinearReturn<'c>, ResidentRefusal> {
+        self.apply_ports(x, z, false)
+    }
+    fn apply_ports(
+        &self,
+        x: &ResidentSection<'c>,
+        z: &ResidentSection<'c>,
+        affine: bool,
+    ) -> Result<ResidentBilinearReturn<'c>, ResidentRefusal> {
         let s = self.surface;
-        s.validate_packet(x, self.left.columns)?;
-        s.validate_packet(z, self.right.columns)?;
+        s.validate_packet(x, self.left.columns - usize::from(affine))?;
+        s.validate_packet(z, self.right.columns - usize::from(affine))?;
         let rank = self.left.rows;
         let a = s.fresh_section(1, rank + 1, ResidentGrain(0))?;
         let b = s.fresh_section(1, rank + 1, ResidentGrain(0))?;
@@ -147,12 +155,12 @@ impl<'c> ResidentBilinearMap<'c> {
         let mut passage = s.begin_passage(&[vec![], vec![], vec![0, 1], vec![2]])?;
         {
             let lane = passage.open(0, &[])?;
-            s.record_packet_contract(&lane, &self.left, x, &a)?;
+            s.record_packet_contract_mode(&lane, &self.left, x, &a, affine)?;
         }
         passage.close(0, &a, 64)?;
         {
             let lane = passage.open(1, &[])?;
-            s.record_packet_contract(&lane, &self.right, z, &b)?;
+            s.record_packet_contract_mode(&lane, &self.right, z, &b, affine)?;
         }
         passage.close(1, &b, 64)?;
         {
@@ -235,12 +243,22 @@ impl<'c> ResidentSurface<'c> {
         input: &ResidentSection<'c>,
         out: &ResidentSection<'c>,
     ) -> Result<(), ResidentRefusal> {
+        self.record_packet_contract_mode(lane, matrix, input, out, false)
+    }
+    fn record_packet_contract_mode(
+        &self,
+        lane: &Lane<'_, 'c>,
+        matrix: &MatrixPacket<'c>,
+        input: &ResidentSection<'c>,
+        out: &ResidentSection<'c>,
+        affine: bool,
+    ) -> Result<(), ResidentRefusal> {
         let size = matrix
             .rows
             .checked_mul(matrix.columns)
             .ok_or_else(|| refusal("matrix extent overflow"))?;
         self.validate_packet(&matrix.section, size)?;
-        self.validate_packet(input, matrix.columns)?;
+        self.validate_packet(input, matrix.columns - usize::from(affine))?;
         self.validate_packet(out, matrix.rows)?;
         let mut p = Params::new();
         p.ptr(matrix.section.lo.device_ptr())
@@ -249,6 +267,7 @@ impl<'c> ResidentSurface<'c> {
             .ptr(input.hi.device_ptr())
             .u32(matrix.rows as u32)
             .u32(matrix.columns as u32)
+            .u32(u32::from(affine))
             .ptr(out.lo.device_ptr())
             .ptr(out.hi.device_ptr())
             .ptr(lane.slot)
@@ -441,5 +460,242 @@ mod tests {
         let x = s.mount_exact_rational_packet(&[q(1, 1), q(0, 1)]).unwrap();
         let valid = map.apply(&x, &z).unwrap();
         assert_eq!(read(&s, valid.output()), vec![q(2, 1), q(0, 1)]);
+    }
+}
+
+/// A resident evaluator of an implicit joint observation fibre. Both affine ports read one
+/// parameter occurrence. The output is a residual current, not an automatic material commit.
+pub struct ResidentJointBilinearFibre<'c> {
+    model: std::sync::Arc<crate::exact_linear::JointBilinearSystem>,
+    residual: ResidentBilinearMap<'c>,
+}
+/// A residual reading retains the actual parameter occurrence and complete implicit model.
+/// This borrow does not clone the continuing source or identify it by equal coordinates.
+pub struct ResidentJointBilinearEvaluation<'a, 'c> {
+    parameters: &'a ResidentSection<'c>,
+    model: std::sync::Arc<crate::exact_linear::JointBilinearSystem>,
+    returned: ResidentBilinearReturn<'c>,
+}
+impl<'a, 'c> ResidentJointBilinearEvaluation<'a, 'c> {
+    pub fn parameters(&self) -> &'a ResidentSection<'c> {
+        self.parameters
+    }
+    pub fn model(&self) -> &crate::exact_linear::JointBilinearSystem {
+        &self.model
+    }
+    pub fn residual(&self) -> &ResidentBilinearReturn<'c> {
+        &self.returned
+    }
+    pub fn output(&self) -> &ResidentSection<'c> {
+        self.returned.output()
+    }
+}
+impl<'c> ResidentJointBilinearFibre<'c> {
+    pub fn mount(
+        surface: &'c ResidentSurface<'c>,
+        model: std::sync::Arc<crate::exact_linear::JointBilinearFibre>,
+    ) -> Result<Self, ResidentRefusal> {
+        let system = crate::exact_linear::JointBilinearSystem::new(vec![model])
+            .map_err(|e| refusal(e.to_string()))?;
+        Self::mount_system(surface, std::sync::Arc::new(system))
+    }
+    pub fn mount_system(
+        surface: &'c ResidentSurface<'c>,
+        model: std::sync::Arc<crate::exact_linear::JointBilinearSystem>,
+    ) -> Result<Self, ResidentRefusal> {
+        let residual = ResidentBilinearMap::mount(surface, model.residual_realization())?;
+        Ok(Self { model, residual })
+    }
+    pub fn model(&self) -> &crate::exact_linear::JointBilinearSystem {
+        &self.model
+    }
+    pub fn evaluate<'a>(
+        &self,
+        parameters: &'a ResidentSection<'c>,
+    ) -> Result<ResidentJointBilinearEvaluation<'a, 'c>, ResidentRefusal> {
+        self.residual
+            .surface
+            .validate_packet(parameters, self.model.parameters())?;
+        let returned = self.residual.apply_ports(parameters, parameters, true)?;
+        Ok(ResidentJointBilinearEvaluation {
+            parameters,
+            model: std::sync::Arc::clone(&self.model),
+            returned,
+        })
+    }
+}
+
+#[cfg(test)]
+mod joint_tests {
+    use super::*;
+    use crate::exact_linear::{
+        BilinearOperator, BilinearProductCore, JointBilinearFibre, JointPreimageReduction,
+    };
+    fn q(n: i64, d: i64) -> Rat {
+        Rat::new(n.into(), d.into())
+    }
+    fn m(rows: &[&[i64]]) -> ExactRatMatrix {
+        ExactRatMatrix::new(
+            rows.iter()
+                .map(|r| r.iter().map(|&v| q(v, 1)).collect())
+                .collect(),
+        )
+        .unwrap()
+    }
+    fn read(s: &ResidentSurface<'_>, section: &ResidentSection<'_>) -> Vec<Rat> {
+        let data = s.read_out(section).unwrap();
+        assert!(data.iter().all(|(a, b)| a == b));
+        let d = data.last().unwrap().0;
+        assert!(d > 0);
+        data[..data.len() - 1]
+            .iter()
+            .map(|(v, _)| q(*v, d))
+            .collect()
+    }
+    #[test]
+    #[ignore = "requires CUDA; a joint source/condition keeps shared parameter products and affine anchors"]
+    fn joint_parameters_and_condition_slices_reach_native_residuals() {
+        let readout = ResidentReadout::new().unwrap();
+        let s = ResidentSurface::on(&readout).unwrap();
+        let core = std::sync::Arc::new(BilinearProductCore::new(m(&[&[1]]), m(&[&[1]])).unwrap());
+        let action = core
+            .bind(&BilinearOperator::new(1, 1, m(&[&[1]])).unwrap())
+            .unwrap()
+            .unwrap();
+        let fibre = std::sync::Arc::new(
+            JointBilinearFibre::new(action, m(&[&[1, 0, 0]]), m(&[&[0, 1, 0]]), vec![q(6, 1)])
+                .unwrap(),
+        );
+        let native = ResidentJointBilinearFibre::mount(&s, fibre.clone()).unwrap();
+        for theta in [
+            vec![q(3, 1), q(2, 1)],
+            vec![q(1, 3), q(1, 2)],
+            vec![q(-3, 1), q(-2, 1)],
+        ] {
+            let parameter = s.mount_exact_rational_packet(&theta).unwrap();
+            let before = s.census().section_read_outs;
+            let returned = native.evaluate(&parameter).unwrap();
+            assert_eq!(s.census().section_read_outs, before);
+            assert_eq!(read(&s, returned.output()), fibre.evaluate(&theta).unwrap());
+        }
+        let slice = std::sync::Arc::new(fibre.restrict(&m(&[&[1, 0], &[0, 2], &[0, 1]])).unwrap());
+        let JointPreimageReduction::Affine {
+            particular,
+            directions,
+        } = slice.affine_preimage().unwrap()
+        else {
+            panic!("affine condition slice")
+        };
+        assert!(directions.is_empty());
+        assert_eq!(particular, vec![q(3, 1)]);
+        let native = ResidentJointBilinearFibre::mount(&s, slice).unwrap();
+        let parameter = s.mount_exact_rational_packet(&particular).unwrap();
+        assert_eq!(
+            read(&s, native.evaluate(&parameter).unwrap().output()),
+            vec![q(0, 1)]
+        );
+    }
+    #[test]
+    #[ignore = "requires CUDA; equal marginal families do not erase their joint correlation"]
+    fn correlated_and_opposed_conditions_remain_distinct() {
+        let readout = ResidentReadout::new().unwrap();
+        let s = ResidentSurface::on(&readout).unwrap();
+        let identity = ExactRatMatrix::identity(2).unwrap();
+        let core =
+            std::sync::Arc::new(BilinearProductCore::new(identity.clone(), identity).unwrap());
+        let action = core
+            .bind(&BilinearOperator::new(2, 2, m(&[&[1, 0, 0, 1]])).unwrap())
+            .unwrap()
+            .unwrap();
+        let source = m(&[&[1, 0], &[-1, 1]]);
+        let correlated = std::sync::Arc::new(
+            JointBilinearFibre::new(
+                action.clone(),
+                source.clone(),
+                source.clone(),
+                vec![q(1, 1)],
+            )
+            .unwrap(),
+        );
+        let opposed = std::sync::Arc::new(
+            JointBilinearFibre::new(action, source, m(&[&[-1, 1], &[1, 0]]), vec![q(1, 1)])
+                .unwrap(),
+        );
+        for (model, expected) in [
+            (correlated, vec![q(0, 1), q(-4, 9)]),
+            (opposed, vec![q(-1, 1), q(-5, 9)]),
+        ] {
+            let native = ResidentJointBilinearFibre::mount(&s, model).unwrap();
+            for (theta, want) in [q(0, 1), q(1, 3)].into_iter().zip(expected) {
+                let parameter = s.mount_exact_rational_packet(&[theta]).unwrap();
+                assert_eq!(
+                    read(&s, native.evaluate(&parameter).unwrap().output()),
+                    vec![want]
+                );
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod joined_material_tests {
+    use super::*;
+    use crate::exact_linear::{
+        BilinearOperator, BilinearProductCore, JointBilinearFibre, JointBilinearSystem,
+    };
+    fn q(v: i64) -> Rat {
+        Rat::from_integer(v.into())
+    }
+    fn m(rows: &[&[i64]]) -> ExactRatMatrix {
+        ExactRatMatrix::new(
+            rows.iter()
+                .map(|r| r.iter().map(|&v| q(v)).collect())
+                .collect(),
+        )
+        .unwrap()
+    }
+    #[test]
+    #[ignore = "requires CUDA; variable material cannot hide an invalid source-condition junction"]
+    fn native_shared_junction_preserves_both_constraints() {
+        let readout = ResidentReadout::new().unwrap();
+        let s = ResidentSurface::on(&readout).unwrap();
+        let core = std::sync::Arc::new(BilinearProductCore::new(m(&[&[1]]), m(&[&[1]])).unwrap());
+        let action = core
+            .bind(&BilinearOperator::new(1, 1, m(&[&[1]])).unwrap())
+            .unwrap()
+            .unwrap();
+        let product = std::sync::Arc::new(
+            JointBilinearFibre::with_affine_return(
+                action.clone(),
+                m(&[&[1, 0, 0, 0, 0]]),
+                m(&[&[0, 1, 0, 0, 0]]),
+                m(&[&[0, 0, 1, 0, 0]]),
+            )
+            .unwrap(),
+        );
+        let material = std::sync::Arc::new(
+            JointBilinearFibre::new(
+                action,
+                m(&[&[0, 0, 0, 1, 0]]),
+                m(&[&[0, 0, 1, 0, 0]]),
+                vec![q(24)],
+            )
+            .unwrap(),
+        );
+        let system =
+            std::sync::Arc::new(JointBilinearSystem::new(vec![product, material]).unwrap());
+        let native = ResidentJointBilinearFibre::mount_system(&s, system).unwrap();
+        for (theta, wanted) in [([2, 3, 6, 4], [0, 0]), ([2, 3, 8, 3], [-2, 0])] {
+            let parameters = s.mount_exact_rational_packet(&theta.map(q)).unwrap();
+            let before = s.census().section_read_outs;
+            let result = native.evaluate(&parameters).unwrap();
+            assert_eq!(s.census().section_read_outs, before);
+            let data = s.read_out(result.output()).unwrap();
+            assert_eq!(data.len(), 3);
+            assert!(data.iter().all(|(a, b)| a == b));
+            for i in 0..2 {
+                assert_eq!(Rat::new(data[i].0.into(), data[2].0.into()), q(wanted[i]));
+            }
+        }
     }
 }

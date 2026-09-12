@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 11, 2026. **Current work:** reusable bilinear construction and resident receiver reuse returned; joint family incorporation continues.
+**Currency:** September 11, 2026. **Current work:** joint constraint representation returned; native producing-comparison compilation and incorporation continue.
 **Athena objective:** standing; useful Athena-alpha has not been attained. **Broad native cultivation:** paused while the consuming family/source binding is repaired;
 authorized native implementation continues within the shared programme. The active phases now have names;
 AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -17,11 +17,21 @@ parameters. The 26-test exact-linear filter and four packet tests passed; the st
 native existing-consumer regression also passed. No broad cultivation or native material
 incorporation is claimed.
 
-[definition] Items 1–4 are coupled responsibilities of a complete cycle. Continue the returned
-operator/receiver owners through recurrence/action composition and the actual Eros joint. With
-both source and condition varying, mixed tensor variables must retain their consistency rather
-than become independent coordinates. The consuming family/material transaction remains the
-specific open native boundary; the pure binding is already productive and reused.
+[established-bounded; implemented-exact; formal-checked] The
+[joint-fibre return](research/records/2026-09-11_JOINT_SOURCE_CONDITION_AND_MATERIAL_KEEP_THEIR_PRODUCT_CONSTRAINTS.md)
+retains source/condition/material parameters and intermediate equalities in one executable
+constraint system. Native evaluation preserves the shared parameter packet and has zero
+intermediate readouts. The inspected system derives material 4 from a consistent source cut,
+rejects an inconsistent junction, and uses the derived coefficient natively to return 60 at
+input 15. Four exact reference tests, seven serial packet/joint tests, the application and the
+Framework.Computation Lean build passed. Its affine solve remains exterior; no coupled Athena
+material deposit or broad cultivation is claimed.
+
+[open] Compile the actual pending comparison's resident relation/coefficients into this joint
+chart, retaining the producing source, condition/material association and normal anchor bound.
+Then bind its constitutive consequence to condition/contact/formation and one persisted
+contemporary successor. The missing product-consistency representation now exists; native
+compilation and the consuming update law remain the next work within responsibilities 1–4.
 
 [proved-derived; formal-checked] The latest
 [relative code-cost return](research/records/2026-09-11_RELATIVE_CODE_COST_HAS_AN_ADDRESSED_BOUNDARY_LAW.md)

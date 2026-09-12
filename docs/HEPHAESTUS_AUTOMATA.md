@@ -193,6 +193,22 @@ preserving domain, arithmetic/overflow behavior and complete successor. Search c
 execution cost are measured separately. Native family formation remains required for resident
 HNN conduct.
 
+## Joint inference and constraint-preserving continuation
+
+[established-bounded; implemented-exact; formal-checked] The
+[joint-fibre application](../research/records/2026-09-11_JOINT_SOURCE_CONDITION_AND_MATERIAL_KEEP_THEIR_PRODUCT_CONSTRAINTS.md)
+now represents source, condition, intermediate and material coordinates in one constrained
+parameter family. It keeps `z=x*h` when solving `m*z=v`, so a fitted output cannot hide an
+invalid joining value. The full native residual is evaluated without intermediate host readout.
+Fixing a consistent source cut can yield an exact affine material family; the inspected example
+returns m=4 and a subsequent native output 60 at input 15. An inconsistent cut returns a separator.
+
+[definition] This is reusable exact equation inference and native execution. The affine solve
+remains exterior apparatus. Eros still needs the pending comparison compiled from its actual
+resident source/relation, including anchor constraints, and its constitutive consequence staged
+into one successor. Multiple observations retain separate occurrence coordinates with explicitly
+shared material coordinates; equal dimensions do not establish that association.
+
 ## Relative optimality and boundary cost
 
 [definition] A locally optimal representation admits no improving variation within its declared

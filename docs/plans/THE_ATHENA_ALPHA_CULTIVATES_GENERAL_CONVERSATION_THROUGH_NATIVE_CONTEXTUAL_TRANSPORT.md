@@ -168,6 +168,16 @@ averaging over a supplied measure are different operations. Do not deposit every
 source as if each were actually observed, or invent a probability measure to pick one. Derive
 which family/constraint the existing incorporation owns before implementing its kernel.
 
+[established-bounded; implemented-exact; formal-checked] The
+[joint parameter return](../../research/records/2026-09-11_JOINT_SOURCE_CONDITION_AND_MATERIAL_KEEP_THEIR_PRODUCT_CONSTRAINTS.md)
+now supplies `JointBilinearFibre` and `JointBilinearSystem`. They retain true parameter products
+and affine joining coordinates: `z=x*h` and `m*z=v` can be stored and evaluated together.
+Their native evaluator reads the same parameter packet through all participating ports.
+A parameter restriction is handed to the affine solver only after every quadratic term cancels.
+The actual wave compiler must retain the existing normal anchor bound and source/condition/
+material cuts alongside these equations. The generic equality fibre does not supply those
+attachments or select a material-update law by itself.
+
 [definition] In the affine specialization, use existing coefficient-image and preimage owners
 with their shared parameters. If both source and condition vary and the required product is
 not affine in those parameters, retain the mixed terms in an admitted richer family or return

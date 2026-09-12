@@ -83,7 +83,7 @@ use mount::{
 
 #[path = "resident_section/bilinear.rs"]
 mod bilinear;
-pub use bilinear::{ResidentBilinearMap, ResidentBilinearReturn};
+pub use bilinear::{ResidentBilinearMap, ResidentBilinearReturn, ResidentJointBilinearEvaluation, ResidentJointBilinearFibre};
 
 #[path = "resident_section/geometry.rs"]
 mod geometry;

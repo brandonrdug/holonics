@@ -75,9 +75,11 @@ nested automata that construct, compare and refine further automata.
 [bilinear return](../../research/records/2026-09-11_REUSABLE_GENERATORS_REACH_RESIDENT_RECEIVERS.md)
 now covers reusable target/core/receiver/search, fixed-port source-family preimage and pure
 resident evaluation with changed-receiver product reuse. Continue these owners through
-recurrence/block applications and actual source/material incorporation. The remaining varying
-source/condition relation must keep tensor-product consistency; independent lifted coordinates
-cannot substitute for that joint.
+recurrence/block applications and actual source/material incorporation. The subsequent [joint-fibre return](../../research/records/2026-09-11_JOINT_SOURCE_CONDITION_AND_MATERIAL_KEEP_THEIR_PRODUCT_CONSTRAINTS.md)
+now represents shared source/condition/material constraints and evaluates them natively. Compile
+the actual pending wave comparison into this owner, preserving its anchor and producing cut,
+then connect the defined constitutive consequence to the existing atomic formation transaction.
+The exterior affine material solve does not itself perform that native incorporation.
 
 [definition] The present work joins two responsibilities in phases 1–2. Use the returned reusable
 bilinear owners and extend the needed recurrence/action composition with typed executable

@@ -55,6 +55,64 @@ theorem bilinear_factorization
     _ = ∑ i, ∑ j, T o i j * x i * y j := by
           simp [hT, Finset.sum_mul]
 
+/-! ## Shared-parameter affine pullback
+
+The quadratic block below is a representation of one shared parameter `θ`.  In particular,
+the two affine ports do not receive independent parameter vectors: their mixed block is
+evaluated on the same `θ i * θ j` coordinates.  The statement is an algebraic identity only;
+it does not describe a material update or a successor transaction.
+-/
+
+theorem sharedAffineBilinearExpansion
+    (F : R → R → R)
+    (hleft : ∀ x y z, F (x + y) z = F x z + F y z)
+    (hright : ∀ x y z, F x (y + z) = F x y + F x z)
+    (hleft_smul : ∀ x r z, F (x * r) z = F x z * r)
+    (hright_smul : ∀ x y r, F x (y * r) = F x y * r)
+    (a b c d θ : R) :
+    F (a + b * θ) (c + d * θ) =
+      F a c + (F b c + F a d) * θ + F b d * (θ * θ) := by
+  calc
+    F (a + b * θ) (c + d * θ) =
+        F a (c + d * θ) + F (b * θ) (c + d * θ) := hleft _ _ _
+    _ = F a c + F a (d * θ) + F (b * θ) c + F (b * θ) (d * θ) := by
+      rw [hright, hright]
+      ring
+    _ = F a c + (F b c + F a d) * θ + F b d * (θ * θ) := by
+      simp only [hleft_smul, hright_smul]
+      noncomm_ring
+
+theorem fixedPortAffineBilinearExpansion
+    (F : R → R → R)
+    (hleft : ∀ x y z, F (x + y) z = F x z + F y z)
+    (hleft_smul : ∀ x r z, F (x * r) z = F x z * r)
+    (a b c θ : R) :
+    F (a + b * θ) c = F a c + F b c * θ := by
+  simp only [hleft, hleft_smul]
+
+theorem sharedFiniteAffineBilinearExpansion
+    (F : R →ₗ[R] R →ₗ[R] R)
+    (a c : R) (b d θ : ρ → R) :
+    F (a + ∑ i, θ i * b i) (c + ∑ i, θ i * d i) =
+      F a c
+        + ∑ i, F (b i) c * θ i
+        + ∑ i, (F a (d i) * θ i +
+            (∑ j, F (b i) (d j) * θ j) * θ i) := by
+  simp only [← smul_eq_mul, map_add, map_sum, map_smul,
+    LinearMap.add_apply, LinearMap.sum_apply, LinearMap.smul_apply]
+  simp only [smul_eq_mul, mul_add, Finset.mul_sum, Finset.sum_mul, Finset.sum_add_distrib]
+  rw [Finset.sum_comm]
+  simp only [mul_left_comm, mul_comm]
+
+/- A linear lifted coordinate can satisfy the quadratic evaluation equation while failing the
+   rank-one/shared-parameter consistency equation.  This is the smallest real witness. -/
+theorem spuriousIndependentLift_minus_one :
+    ((1 + (-1 : ℝ) = 0) ∧ ¬ ∃ θ : ℝ, 1 + θ * θ = 0) := by
+  constructor
+  · norm_num
+  · rintro ⟨θ, hθ⟩
+    nlinarith [sq_nonneg θ]
+
 /-- Gauss's three-product formula for complex multiplication in real
 coordinates.  The statement is deliberately over an arbitrary commutative
 ring; it is an exact algebraic identity, not a numerical approximation. -/

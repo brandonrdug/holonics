@@ -1,0 +1,118 @@
+{
+  "affine_material_slice": {
+    "null_directions": [],
+    "particular": [
+      "4"
+    ]
+  },
+  "equations": [
+    "x*h=z",
+    "m*z=24"
+  ],
+  "inconsistent_source_cut": {
+    "equation_separator": [
+      "1",
+      "0"
+    ]
+  },
+  "material_constraint_coefficients": [
+    [
+      "-24",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "1",
+      "0"
+    ]
+  ],
+  "native_athena_material_deposited": false,
+  "native_continuation": {
+    "junction": "15",
+    "output": [
+      "60"
+    ]
+  },
+  "parameter_order": [
+    "x",
+    "h",
+    "z",
+    "m"
+  ],
+  "probes": [
+    {
+      "intermediate_readouts": 0,
+      "material_return_residual": [
+        "0"
+      ],
+      "parameters": [
+        "2",
+        "3",
+        "6",
+        "4"
+      ],
+      "source_junction_residual": [
+        "0"
+      ]
+    },
+    {
+      "intermediate_readouts": 0,
+      "material_return_residual": [
+        "0"
+      ],
+      "parameters": [
+        "2",
+        "3",
+        "8",
+        "3"
+      ],
+      "source_junction_residual": [
+        "-2"
+      ]
+    },
+    {
+      "intermediate_readouts": 0,
+      "material_return_residual": [
+        "0"
+      ],
+      "parameters": [
+        "3",
+        "2",
+        "6",
+        "4"
+      ],
+      "source_junction_residual": [
+        "0"
+      ]
+    }
+  ],
+  "schema": "holonics.hephaestus.joint-fibre.v1",
+  "scope": "exact joint equation representation, exterior affine solve and resident execution; no coupled-wave material transaction",
+  "source_constraint_coefficients": [
+    [
+      "0",
+      "0",
+      "0",
+      "-1",
+      "0",
+      "0",
+      "1",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0"
+    ]
+  ]
+}

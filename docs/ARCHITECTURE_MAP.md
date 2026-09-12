@@ -135,6 +135,16 @@ connects it to the existing addressed causal-length, physical and complexity own
 
 ## Foundation and transport
 
+[definition] `exact_linear/joint_bilinear.rs` owns `JointBilinearFibre` and its conjunctive
+`JointBilinearSystem`: affine source/condition/return maps share one parameter chart, and genuine
+quadratic products remain constrained. Affine restrictions reuse the existing preimage solver.
+`ResidentJointBilinearFibre` in `resident_section/bilinear.rs` evaluates the whole residual system
+using one shared resident parameter packet and the packet contraction's homogeneous-coordinate
+mode. Its evaluation retains the actual borrowed parameter occurrence and complete model.
+`GeneratorFactorization.lean` supplies shared-parameter expansion and independent-lift
+separation laws. The [joint return](../research/records/2026-09-11_JOINT_SOURCE_CONDITION_AND_MATERIAL_KEEP_THEIR_PRODUCT_CONSTRAINTS.md)
+retains actual checks and the unbound producing-comparison/native material transaction.
+
 [definition] `exact_linear/bilinear.rs` owns reusable bilinear operators, immutable product cores,
 streaming support search, receiver families and fixed-port affine-source preimages.
 `ExactRatMatrix::factor_receiver` in `exact_linear/contextual.rs` is their shared exact decoder/

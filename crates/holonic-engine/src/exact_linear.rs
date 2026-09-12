@@ -49,6 +49,8 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 mod bilinear;
+mod joint_bilinear;
+pub use joint_bilinear::{JointBilinearFibre, JointBilinearSystem, JointPreimageReduction};
 mod contextual;
 pub use bilinear::{
     BilinearOperator, BilinearProductCore, BilinearRealization, BilinearSupportReturn,
