@@ -87,6 +87,12 @@ The [continuation repair](../../research/records/2026-09-11_PENDING_RETURNS_KEEP
 now retains the actual intervening maps, after a native separator exposed identical old saved
 states for different source/current joints. Compose the dependent return with that retained word;
 do not reconstruct its joining relation from the separate marginals.
+The [owned generator return](../../research/records/2026-09-11_AN_OWNED_CONSTITUTIVE_GENERATOR_CONTINUES_THROUGH_ITS_NEW_MATERIAL.md)
+now publishes that function and continues through changed material under a declared source-section
+receiver. Its complete native representation persists across process exit. Next bind it into the
+continuing HNN session and compose later material returns, retaining each source parameter and
+the emission/re-entry protocol. Keep its explicit receiver chart distinct from the prior global
+family projection; the isolated native application is not the finished integrated goal.
 The exterior affine material solve does not itself perform that native incorporation.
 
 [definition] The present work joins two responsibilities in phases 1–2. Use the returned reusable

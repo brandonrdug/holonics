@@ -234,6 +234,21 @@ show that separate source/produced/current marginals had lost a real orientation
 The dependent evaluator exposes this word; rest v9 preserves its joins. Use it in complete-family
 incorporation rather than infer the missing correlation from matching endpoints.
 
+[established-bounded; implemented-exact; formal-checked] The
+[owned return](../../research/records/2026-09-11_AN_OWNED_CONSTITUTIVE_GENERATOR_CONTINUES_THROUGH_ITS_NEW_MATERIAL.md)
+now joins the original source assignment through that word, applies new material to contemporary
+current, and owns the resulting generator in `ResidentCoupledConstitutive`. A checked source
+section admits publication while the full function remains available at other assignments.
+The next actual source uses its new material/current, and rest/remount preserves the programme.
+This currently supports one incorporated return and following source operations. It does not
+yet replace the current HNN session body or supply its automatic receiver/code decoder.
+
+[definition] Continue by binding this generator state to the HNN coordinator and its existing
+selection/re-entry cursor, adding the subsequent generating and material-return operations over
+the same owned programme. Further producing cuts must retain their own dependent source parameters
+and joining histories. Preserve the declared source-section receiver as such until its relation
+to the existing whole-family receiver is constructed; do not silently relabel one as the other.
+
 [definition] The family lift must distinguish recorded h_s from a proposed successor condition.
 Use the actual constitutive contact/formation relation over the bounded source parameters;
 retain its joint variation or prove a lawful condensation of its complete return. Never insert

@@ -19,6 +19,18 @@ pub(crate) struct PreparedConstitutiveFormation<'chart> {
     predecessor_occurrences: u64,
     pub(crate) returned: ResidentConstitutiveReturn<'chart>,
 }
+impl<'c> PreparedConstitutiveFormation<'c> {
+    /// Move staged material into one conditional realization; the continuing predecessor
+    /// remains unchanged. No ecology is copied to make this executable material view.
+    pub(crate) fn into_alternative(self)->(ResidentConstitutiveFibre<'c>,ResidentConstitutiveReturn<'c>){
+        let material=ResidentConstitutiveFibre {
+            surface:self.returned.surface,basis:self.basis,basis_owner:self.successor_owner,
+            source_width:self.returned.source_width,target_width:self.returned.target_width,
+            source_chart:self.returned.source_chart,occurrences:self.returned.occurrence,usable:true,
+        };
+        (material,self.returned)
+    }
+}
 
 /// A local relation's receiver result. Only field-qualified queries have a field source;
 /// a relation cut never stands in for an invented source occurrence.
@@ -466,7 +478,7 @@ mod contact_tests;
 mod law_rest_tests;
 
 mod neighborhood;
-pub(crate) use neighborhood::PreparedNeighborhoodConsequence;
+pub(crate) use neighborhood::ResidentNeighborhoodAlternative;
 mod read;
 pub use neighborhood::{
     GeneratorNeighborhoodRest, GeneratorNeighborhoodStep, NeighborhoodEvidence,

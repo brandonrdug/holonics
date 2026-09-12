@@ -2,7 +2,7 @@
 //! substitution retains the SAME theta in x(theta), eta(theta), condition and material return.
 //! The family is a generator of alternatives, never the span/union of their material rows.
 use super::*;
-use crate::native_ecology::constitutive_fibre::resident::PreparedNeighborhoodConsequence;
+use crate::native_ecology::constitutive_fibre::resident::ResidentNeighborhoodAlternative;
 use crate::native_ecology::constitutive_fibre::{
     ConditionContactReading, ConstitutiveFibreReturn, PreparedConditionContact,
 };
@@ -22,8 +22,10 @@ pub struct CoupledConstitutiveAlternative<'p, 'j, 'c> {
     source: ResidentSection<'c>,
     difference: ResidentSection<'c>,
     anchor: ResidentSection<'c>,
-    consequence: PreparedNeighborhoodConsequence<'c>,
-    relation: ResidentWaveRelation<'c>,
+    consequence: ResidentNeighborhoodAlternative<'c>,
+    relation: Rc<ResidentWaveRelation<'c>>,
+    current: Rc<NormalWaveFamily<'c>>,
+    successor: Rc<NormalWaveFamily<'c>>,
 }
 
 impl<'w, 'j, 'c> CoupledConstitutiveFamily<'w, 'j, 'c> {
@@ -36,8 +38,12 @@ impl<'w, 'j, 'c> CoupledConstitutiveFamily<'w, 'j, 'c> {
     /// The actual source-to-current word to which a complete dependent return must be joined.
     /// This keeps intervening incidence available; equal source/current marginals are not used
     /// to infer a missing coupling.
-    pub fn continuation(&self) -> Result<NormalCoupledContinuation<'_, 'c>, ConstitutiveFibreError> {
-        let handle = self.wave.pending_coupled_prediction(self.comparison.prediction_id())?;
+    pub fn continuation(
+        &self,
+    ) -> Result<NormalCoupledContinuation<'_, 'c>, ConstitutiveFibreError> {
+        let handle = self
+            .wave
+            .pending_coupled_prediction(self.comparison.prediction_id())?;
         self.wave.pending_coupled_continuation(&handle)
     }
 
@@ -87,25 +93,51 @@ impl<'w, 'j, 'c> CoupledConstitutiveFamily<'w, 'j, 'c> {
                 result.obstruction
             )));
         }
+        // Condition the actual historic word on this same source assignment. Every later
+        // free output direction is still an affine fibre; no intermediate receiver is read.
+        let mut image = c.source().parameter_section(parameters, &anchor)?;
+        let mut final_map = None;
+        let mut final_coverage = None;
+        for (_, maps) in self.wave.continuation.transport.range(c.prediction_id()..) {
+            for map in maps {
+                let (next, coverage) = if map.is_total_current_map() {
+                    map.read_source_image(&image)?
+                } else {
+                    map.read_image(&image)?.into_output()
+                };
+                image = next;
+                final_coverage = Some(coverage);
+                final_map = Some(Rc::clone(map));
+            }
+        }
+        let current = Rc::new(c.source().parameter_image(
+            image,
+            final_map.ok_or(ConstitutiveFibreError::Shape)?,
+            final_coverage.ok_or(ConstitutiveFibreError::Shape)?,
+            self.wave.current().passages(),
+        ));
         let consequence = self.wave.continuation.neighborhood.prepare_consequence(
             c.member(),
             ResidentConstitutiveCurrent::rational(&source)?,
             Some(ResidentConstitutiveCurrent::rational(&difference)?),
         )?;
-        let relation = self.wave.neighborhood().read_consequence_wave_relation(
+        let relation = Rc::new(self.wave.neighborhood().read_consequence_wave_relation(
             c.member(),
             n,
             c.relation().source_receiver(),
             Some(&consequence),
-        )?;
+        )?);
+        let successor = Rc::new(current.read_through(Rc::clone(&relation))?);
         Ok(CoupledConstitutiveAlternative {
             comparison: c,
             parameters,
             source,
             difference,
             anchor,
-            consequence,
+            consequence: consequence.into_alternative()?,
             relation,
+            current,
+            successor,
         })
     }
 }
@@ -124,22 +156,59 @@ impl<'p, 'j, 'c> CoupledConstitutiveAlternative<'p, 'j, 'c> {
         ResidentConstitutiveCurrent::rational(&self.difference).expect("constructed difference")
     }
     pub fn condition(&self) -> &PreparedConditionContact<'c> {
-        self.consequence
-            .condition()
-            .expect("observed dependent return")
+        &self.consequence.condition
     }
     pub fn prediction(&self) -> &ResidentConstitutiveReturn<'c> {
-        self.consequence.prediction()
+        &self.consequence.prediction
     }
     pub fn formation(&self) -> &ResidentConstitutiveReturn<'c> {
-        self.consequence
-            .formation()
-            .expect("observed dependent return")
+        &self.consequence.formation
     }
     /// This map is conditional on the retained theta. A later use must retain its joining
     /// source/current relation; treating it as the one published material would lose that joint.
     pub fn conditional_relation(&self) -> &ResidentWaveRelation<'c> {
         &self.relation
+    }
+    /// Contemporary current conditional on theta, through the unmodified historical word.
+    pub fn current_section(&self) -> &NormalWaveFamily<'c> {
+        &self.current
+    }
+    /// The proposed contemporary passage through the new conditional material and condition.
+    /// This is a section of the whole successor generator, not a separately published state.
+    pub fn successor_section(&self) -> &NormalWaveFamily<'c> {
+        &self.successor
+    }
+    pub fn read_formed_source(
+        &self,
+        source: ResidentConstitutiveCurrent<'_, 'c>,
+    ) -> Result<ResidentConstitutiveReturn<'c>, ConstitutiveFibreError> {
+        self.consequence
+            .material
+            .read_bilinear(source, self.consequence.condition.successor())
+    }
+    pub(in super::super) fn actuate_source(
+        &mut self,
+        member: usize,
+        other: Option<&ResidentConstitutiveFibre<'c>>,
+        chart: WaveSourceReceiver,
+        source: ResidentConstitutiveCurrent<'_, 'c>,
+    ) -> Result<(), ConstitutiveFibreError> {
+        let law = if member == self.comparison.member() {
+            &self.consequence.material
+        } else {
+            other.ok_or(ConstitutiveFibreError::Shape)?
+        };
+        let relation = law.read_wave_relation_in_chart(
+            self.condition().successor(),
+            self.comparison.relation().roots(),
+            chart,
+        )?;
+        let map = Rc::new(relation.read_source_contact(law, source)?);
+        let next = Rc::new(self.successor.read_through(Rc::clone(&map))?);
+        self.current = Rc::clone(&self.successor);
+        self.successor = next;
+        self.relation = map;
+        Ok(())
     }
     pub fn inspect_condition(&self) -> Result<ConditionContactReading, ConstitutiveFibreError> {
         self.condition().inspect()

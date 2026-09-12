@@ -111,8 +111,9 @@ pub enum ConstitutiveFibreError {
     Resident(#[from] ResidentRefusal),
 }
 
-/// One move-owned local relation. The basis is never copied for a speculative successor:
-/// elimination stages at most one new row, and commits it only after every arithmetic check.
+/// One move-owned local relation. Ordinary elimination stages a new row before its write.
+/// A neighborhood transaction stages the affected member basis in a separate resident section;
+/// this protects compound publication without copying a continuing ecology.
 pub struct ResidentConstitutiveFibre<'chart> {
     basis: ResidentSection<'chart>,
     basis_owner: Rc<()>,

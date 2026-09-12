@@ -1,6 +1,6 @@
 # Construction state
 
-**Currency:** September 11, 2026. **Current work:** dependent constitutive returns and source/current continuation are verified; next is their owned complete-family successor composition and publication.
+**Currency:** September 11, 2026. **Current work:** an owned dependent generator publishes and continues under a declared source-section receiver; continuing HNN-session integration remains active.
 **Athena objective:** standing; useful Athena-alpha has not been attained. **Broad native cultivation:** paused while the consuming family/source binding is repaired;
 authorized native implementation continues within the shared programme. The active phases now have names;
 AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/plans/THE_ROADMAP.md)
@@ -51,12 +51,22 @@ shared word of actual maps for still-pending cuts, including source-field intern
 The two new continuation controls, all 27 coupled-wave checks and five HNN session checks pass,
 including legacy migration and process resume.
 
-[open] The active goal remains the complete native Eros return cycle. The dependent family of
-condition/material consequences must become one contemporary successor; one evaluated alternative
-cannot be installed as that family. Retain its joint with contemporary current and pending sources,
-consume the pending cut once, persist it and inspect subsequent conduct. The source/current
-continuation now supplies an implicit joint instead of relying on separately saved marginals.
-The evaluator and retained word are progress, not completion of a smaller goal.
+[established-bounded; implemented-exact; formal-checked] The
+[owned constitutive generator](research/records/2026-09-11_AN_OWNED_CONSTITUTIVE_GENERATOR_CONTINUES_THROUGH_ITS_NEW_MATERIAL.md)
+retains the full source-dependent condition/material/current function, publishes by ownership
+transfer and excludes its consumed prediction from the active pending set. Under its declared
+source-section receiver, a delayed return reaches `24−4i`; the next actual source gives joint
+`(31/5,0,82/5,−4)`, then `(43/10,0,63/5,−4)` after fresh-process continuation. Other source
+sections remain executable after remount. All 31 coupled controls, six neighborhood controls and
+the additional pending-cut retention control passed; the formal and HNN library builds passed.
+
+[open] The full integrated goal remains active. The current HNN session still owns the affine
+coupled wave and `compare_symbol` remains read-only. Bind the owned generator into the continuing
+session, retaining its emission/re-entry protocol and explicit receiver chart; then compose
+further material returns with their own source parameters and shared chronology. The native
+one-return generator currently takes a caller-declared source-section receiver, not the old
+whole-family receiver. Neither an equivalence between those receivers nor useful Athena-alpha
+is claimed. This executable native piece does not replace the remaining requested integration.
 
 [proved-derived; formal-checked] The latest
 [relative code-cost return](research/records/2026-09-11_RELATIVE_CODE_COST_HAS_AN_ADDRESSED_BOUNDARY_LAW.md)

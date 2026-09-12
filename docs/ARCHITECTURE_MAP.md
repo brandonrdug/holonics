@@ -135,6 +135,16 @@ connects it to the existing addressed causal-length, physical and complexity own
 
 ## Foundation and transport
 
+[definition] `wave/family/section.rs` and `section_coupled_family_section` evaluate a conditional
+source section for the dependent generator. `wave/coupled/comparison/constitutive.rs` now joins
+that section through the actual historical word before applying new material at contemporary
+current. `wave/coupled/dependent.rs` owns `ResidentCoupledConstitutive`, its declared section
+receiver and following source programme. `dependent/rest.rs` encodes this generator over existing
+coupled/point-section frames. Staged material moves through `into_alternative` and
+`ResidentNeighborhoodAlternative`; no conditional matrix replaces the complete function. The
+[owned return](../research/records/2026-09-11_AN_OWNED_CONSTITUTIVE_GENERATOR_CONTINUES_THROUGH_ITS_NEW_MATERIAL.md)
+records checked conduct and the remaining HNN session/iterated-return boundary.
+
 [definition] `wave/coupled/continuation.rs` owns `NormalCoupledContinuation`, the actual ordered
 relation word joining a still-pending source to contemporary current. `NormalWaveCoupled` shares
 one resident-map word across pending cuts, retaining every source-field factor under its public

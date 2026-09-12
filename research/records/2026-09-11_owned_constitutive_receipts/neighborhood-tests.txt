@@ -1,0 +1,17 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.25s
+     Running unittests src/lib.rs (target/debug/deps/holonic_engine-6ae3d245ea632305)
+
+running 6 tests
+test native_ecology::constitutive_fibre::resident::neighborhood::tests::failed_material_return_preserves_the_complete_neighborhood ... ok
+test native_ecology::constitutive_fibre::resident::neighborhood::tests::neighborhood_development_forms_an_independent_local_relation ... ok
+test native_ecology::constitutive_fibre::resident::neighborhood::tests::prepared_contact_rejects_other_and_stale_standing ... ok
+test native_ecology::constitutive_fibre::resident::neighborhood::tests::shared_condition_changes_only_receivers_that_depend_on_the_return ... ok
+test native_ecology::constitutive_fibre::resident::neighborhood::tests::staged_neighborhood_discard_and_stale_publication_keep_the_predecessor ... ok
+test native_ecology::constitutive_fibre::resident::neighborhood::tests::staged_neighborhood_read_only_proposal_is_owner_qualified ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 2415 filtered out; finished in 1.52s
+

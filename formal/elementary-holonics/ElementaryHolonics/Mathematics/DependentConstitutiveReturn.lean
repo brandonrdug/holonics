@@ -40,6 +40,42 @@ theorem pair_reconstruct (u : UpdateFamily Θ X (fun θ => A θ × B θ))
     ((projectPair u).1 θ x, (projectPair u).2 θ x) = u θ x := by
   rfl
 
+/-! ## Ordered evaluation at one shared source parameter -/
+
+def liftedWord {Z : Θ → Type v}
+    (word : List (∀ θ, Z θ → Z θ)) (θ : Θ) (initial : Z θ) : Z θ :=
+  word.foldl (fun state step => step θ state) initial
+
+theorem liftedWord_singleton {Z : Θ → Type v}
+    (step : ∀ θ, Z θ → Z θ) (θ : Θ) (initial : Z θ) :
+    liftedWord [step] θ initial = step θ initial := by
+  rfl
+
+theorem liftedWord_append {Z : Θ → Type v}
+    (word : List (∀ θ, Z θ → Z θ)) (step : ∀ θ, Z θ → Z θ)
+    (θ : Θ) (initial : Z θ) :
+    liftedWord (word ++ [step]) θ initial =
+      step θ (liftedWord word θ initial) := by
+  simp [liftedWord, List.foldl_append]
+
+theorem ordered_word_evaluation_is_pointwise
+    {Z : Θ → Type v} (word : List (∀ θ, Z θ → Z θ))
+    (initial : ∀ θ, Z θ) (θ : Θ) :
+    (word.foldl (fun family step => fun θ => step θ (family θ)) initial) θ =
+      liftedWord word θ (initial θ) := by
+  induction word generalizing initial with
+  | nil => rfl
+  | cons step word ih =>
+    simpa only [List.foldl_cons, liftedWord] using
+      ih (fun θ => step θ (initial θ))
+
+theorem ordered_word_order_separator :
+    liftedWord [fun _ : Unit => fun n : ℕ => n + 1,
+      fun _ : Unit => fun n : ℕ => 2 * n] () 1 = 4 ∧
+      liftedWord [fun _ : Unit => fun n : ℕ => 2 * n,
+        fun _ : Unit => fun n : ℕ => n + 1] () 1 = 3 := by
+  norm_num [liftedWord]
+
 section PairedMaterial
 
 universe uI uV uW
@@ -179,5 +215,15 @@ theorem sourceDependentContact_not_affine_graph :
     (sourceDependentContact (3 / 2)).1 ≠
       ((sourceDependentContact 1 + sourceDependentContact 2) / 2 : ℝ × ℝ).1 := by
   norm_num [sourceDependentContact, unitContact, dot]
+
+/-- Agreement at the declared source receiver does not identify the whole generator. -/
+theorem one_receiver_does_not_determine_generator :
+    sourceDependentContact 1 = (fun _ : ℝ => sourceDependentContact 1) 1 ∧
+      sourceDependentContact ≠ (fun _ : ℝ => sourceDependentContact 1) := by
+  constructor
+  · rfl
+  · intro equal
+    have at_two := congrFun equal 2
+    norm_num [sourceDependentContact, unitContact, dot] at at_two
 
 end Soma.Holonics.Mathematics.DependentConstitutiveReturn

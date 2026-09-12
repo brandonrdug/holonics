@@ -195,6 +195,15 @@ continuation as an ordered word of resident maps. The
 preserves an orientation distinction that the prior saved marginals lost; coupled rest v9
 retains the word and validates its joins. This is a dependency of complete-family incorporation.
 
+[established-bounded; implemented-exact; formal-checked] The native
+[owned constitutive generator](../research/records/2026-09-11_AN_OWNED_CONSTITUTIVE_GENERATOR_CONTINUES_THROUGH_ITS_NEW_MATERIAL.md)
+publishes a source-dependent return by ownership transfer, preserves the complete generator
+beyond its declared receiver section, and uses changed material for following source operations
+across process exit. Its consumed cut becomes a private causal witness, not an active pending
+return. This owner is not yet bound into `NativeCoupledWaveSession`; the session's existing
+comparison remains read-only. Iterated material return and receiver/session integration remain
+active work, and the new section receiver is not asserted equivalent to the old whole-family one.
+
 ## Native-first construction
 
 [definition] [Hephaestus Automata](HEPHAESTUS_AUTOMATA.md) are operator-scoped mathematical

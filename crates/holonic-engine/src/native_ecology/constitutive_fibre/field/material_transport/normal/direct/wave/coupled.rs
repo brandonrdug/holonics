@@ -2,6 +2,8 @@ use super::*;
 pub(super) mod rest;
 mod comparison;
 mod continuation;
+mod dependent;
+pub use dependent::{ResidentCoupledConstitutive,CoupledConstitutiveRefusal,ConstitutiveSourceRefusal,CoupledConstitutiveRest};
 pub use continuation::NormalCoupledContinuation;
 use comparison::CoupledProducingCut;
 pub use comparison::{CoupledConstitutiveFamily, CoupledConstitutiveAlternative, CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading,NormalCoupledProducingHandle,NormalCoupledPrediction,NormalCoupledComparison,NormalFamilyComparisonRow};

@@ -77,6 +77,13 @@ fn dependent_constitutive_return_preserves_source_condition_correlation() {
                 ConstitutiveReading::Plural { .. }
             ));
             assert_eq!(alt.inspect_formation().unwrap().formed_pivot, None);
+            let future=point(&s,&[2,0,3,0,1,0]);
+            let reads=s.census().section_read_outs;
+            let future_return=alt.read_formed_source(current(&future)).unwrap();
+            assert_eq!(s.census().section_read_outs,reads);
+            let ConstitutiveReading::Plural {particular,directions}=future_return.inspect().unwrap().predecessor_reading else {panic!("vertical future fibre was lost")};
+            assert_eq!(particular[1],if i==0 {r(1,1)} else {r(4,5)});
+            assert!(directions.iter().all(|d|d[1]==r(0,1)));
             // Point specialization is exactly the old law, with explicit supplied operands.
             // This comparison does not install the alternative into the continuing wave.
             let mut reference = neighborhood(&s, free_law(&s));
@@ -113,6 +120,38 @@ fn dependent_constitutive_return_preserves_source_condition_correlation() {
     assert_eq!(wave.pending_coupled_predictions(), 1);
     wave.release_coupled_prediction(&prediction.handle).unwrap();
     assert!(wave.read_coupled_constitutive_family(&cmp).is_err());
+}
+
+#[test]
+#[ignore="requires CUDA; a delayed dependent return changes the contemporary passage, not historical transport"]
+fn dependent_constitutive_return_joins_actual_current_before_new_material_acts(){
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
+    let mut wave=body(&s).with_neighborhood(neighborhood(&s,law(&s,false))).unwrap();
+    let contact=wave.admit_contact(0).unwrap();let pending=wave.predict_contact(&contact).unwrap().handle;
+    let observation=point(&s,&[4,3]);
+    let comparison=wave.compare_coupled_prediction(&pending,current(&observation)).unwrap();
+    let next=point(&s,&[10,0]);let contact=wave.admit_contact(0).unwrap();
+    wave.receive_contact_next(&contact,current(&next)).unwrap();
+    let theta=source_parameters_at(&comparison,&[1,0,2,1],&[1,0,2,1]);
+    let packet=s.mount_exact_rational_packet(&theta).unwrap();
+    let before=wave.rest().unwrap();
+    {
+        let mut family=wave.read_coupled_constitutive_family(&comparison).unwrap();
+        let reads=s.census().section_read_outs;
+        let returned=family.evaluate(&packet).unwrap();
+        assert_eq!(s.census().section_read_outs,reads);
+        assert_eq!(returned.inspect_condition().unwrap().successor,vec![r(2,1),r(0,1)]);
+        let current=returned.current_section().read_receiver().unwrap().inspect().unwrap();
+        let successor=returned.successor_section().read_receiver().unwrap().inspect().unwrap();
+        assert_eq!(current.projected_joint,Some(vec![r(3,1),r(2,1),r(10,1),r(0,1)]));
+        assert_eq!(successor.projected_joint,Some(vec![r(10,1),r(0,1),r(24,1),r(-4,1)]));
+        assert_eq!(returned.successor_section().passages(),returned.current_section().passages()+1);
+        returned.current_section().rest().unwrap().validate().unwrap();
+        returned.successor_section().rest().unwrap().validate().unwrap();
+        eprintln!("delayed dependent current={:?}, next={:?}",current.projected_joint,successor.projected_joint);
+    }
+    assert_eq!(wave.rest().unwrap(),before);
+    assert_eq!(wave.pending_coupled_predictions(),1);
 }
 
 #[test]

@@ -5,6 +5,66 @@ use crate::native_ecology::constitutive_fibre::{
 
 impl<'c> ResidentSurface<'c> {
     #[allow(clippy::too_many_arguments)]
+    pub(crate) fn record_coupled_family_section(
+        &self,
+        lane: &Lane<'_, 'c>,
+        family: &ResidentSection<'c>,
+        ps: usize,
+        t: usize,
+        theta: &ResidentSection<'c>,
+        anchor: &ResidentSection<'c>,
+        out: &ResidentSection<'c>,
+    ) -> Result<(), ResidentRefusal> {
+        let fail = || Self::operative_error();
+        let square = t.checked_mul(t).ok_or_else(fail)?;
+        let input = square
+            .checked_add(ps)
+            .and_then(|v| v.checked_add(t)?.checked_add(4))
+            .ok_or_else(fail)?;
+        let output = square
+            .checked_add(t)
+            .and_then(|v| v.checked_add(5))
+            .ok_or_else(fail)?;
+        let shared = u32::try_from(t.checked_mul(16).ok_or_else(fail)?).map_err(|_| fail())?;
+        if t < 10
+            || (t - 2) % 8 != 0
+            || [ps, t, input, output]
+                .iter()
+                .any(|v| *v >= u32::MAX as usize)
+            || shared > self.declaration.max_sectiond_bytes
+            || !self.operative_shape(family, 1, input)
+            || !self.operative_shape(theta, 1, t + 1)
+            || !self.operative_shape(anchor, 1, t + 2)
+            || !self.operative_shape(out, 1, output)
+        {
+            return Err(fail());
+        }
+        let mut p = Params::new();
+        p.ptr(family.lo.device_ptr())
+            .ptr(family.hi.device_ptr())
+            .u32(ps as u32)
+            .u32(t as u32)
+            .ptr(theta.lo.device_ptr())
+            .ptr(theta.hi.device_ptr())
+            .ptr(anchor.lo.device_ptr())
+            .ptr(anchor.hi.device_ptr())
+            .ptr(out.lo.device_ptr())
+            .ptr(out.hi.device_ptr())
+            .ptr(lane.slot)
+            .ptr(lane.census)
+            .ptr(lane.lineage)
+            .u32(lane.lineage_count);
+        self.record_blocks(
+            lane,
+            "section_coupled_family_section",
+            1,
+            self.launch.block_x,
+            shared,
+            &mut p,
+            "coupled-family-section",
+        )
+    }
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn record_coupled_family_operands(
         &self,
         lane: &Lane<'_, 'c>,

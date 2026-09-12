@@ -60,15 +60,17 @@ pub(crate) struct PreparedNeighborhoodConsequence<'c> {
     condition: Option<PreparedConditionContact<'c>>,
     formation: Option<PreparedConstitutiveFormation<'c>>,
 }
+pub(crate) struct ResidentNeighborhoodAlternative<'c> {
+    pub(crate) prediction:ResidentConstitutiveReturn<'c>,
+    pub(crate) condition:PreparedConditionContact<'c>,
+    pub(crate) formation:ResidentConstitutiveReturn<'c>,
+    pub(crate) material:ResidentConstitutiveFibre<'c>,
+}
 impl<'c> PreparedNeighborhoodConsequence<'c> {
-    pub(crate) fn prediction(&self) -> &ResidentConstitutiveReturn<'c> {
-        &self.prediction
-    }
-    pub(crate) fn condition(&self) -> Option<&PreparedConditionContact<'c>> {
-        self.condition.as_ref()
-    }
-    pub(crate) fn formation(&self) -> Option<&ResidentConstitutiveReturn<'c>> {
-        self.formation.as_ref().map(|f| &f.returned)
+    pub(crate) fn into_alternative(self)->Result<ResidentNeighborhoodAlternative<'c>,ConstitutiveFibreError>{
+        let condition=self.condition.ok_or(ConstitutiveFibreError::Shape)?;
+        let (material,formation)=self.formation.ok_or(ConstitutiveFibreError::Shape)?.into_alternative();
+        Ok(ResidentNeighborhoodAlternative {prediction:self.prediction,condition,formation,material})
     }
 }
 impl<'input, 'c> GeneratorNeighborhoodStep<'input, 'c> {

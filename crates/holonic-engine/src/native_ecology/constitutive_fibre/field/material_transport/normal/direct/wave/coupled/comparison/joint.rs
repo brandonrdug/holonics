@@ -255,4 +255,4 @@ impl<'c> ResidentNormalWave<'c, NormalWaveCoupled<'c>> {
 }
 
 #[cfg(test)]
-pub(super) mod tests;
+pub(in super::super) mod tests;
