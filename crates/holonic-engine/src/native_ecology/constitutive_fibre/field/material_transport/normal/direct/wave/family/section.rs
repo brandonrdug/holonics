@@ -159,24 +159,6 @@ impl<'c> NormalWaveFamily<'c> {
         }
         Ok(returned)
     }
-    /// The image and final map come from the actual retained word; source restriction has not
-    /// changed its clock. The caller retains the parameter assignment and complete original domain.
-    pub(in super::super) fn parameter_image(
-        &self,
-        relation: ResidentConstitutiveReturn<'c>,
-        last: Rc<ResidentWaveRelation<'c>>,
-        coverage: ResidentSection<'c>,
-        passages: u64,
-    ) -> Self {
-        Self {
-            origin: Rc::clone(&self.origin),
-            relation,
-            last_relation: Some(last),
-            affine_coverage: Some(coverage),
-            passages,
-        }
-    }
-
     /// Decode a face packet in its original anchor frame. The returned coordinates retain the
     /// complete affine kernel; no unrelated receiver or singleton source is selected.
     pub fn coordinates_of_face(

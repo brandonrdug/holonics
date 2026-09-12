@@ -217,7 +217,8 @@ an actual pending comparison directly on the device. It retains original source/
 anchor, and names the current relation-material cut. Its equation witnesses are coefficients
 in that relation's row span, not learned material weights. The [native return](../../research/records/2026-09-11_ACTUAL_PENDING_COMPARISONS_COMPILE_WITH_THEIR_ANCHORS.md)
 checks both receiver charts, genuine free current directions, non-dyadic inputs and delayed/restored
-cuts without intermediate readout. It is read-only; the consuming work below remains open.
+cuts without intermediate readout. It remains read-only; the distinct consuming generator and
+session path described below now supplies the complete native return.
 
 [established-bounded; implemented-exact; formal-checked] `read_coupled_constitutive_family` now
 lifts the existing neighborhood preimage/contact/formation at a shared source parameter, after
@@ -250,12 +251,18 @@ now adds successive material-return passages with original source-face parameter
 member material, exactly-once consumption and v3 rest. Native and HNN controls include repeated,
 out-of-order and distinct-source-section returns.
 
-[definition] Continue by composing pending source cuts inherited from the original affine
-substrate into that same owned programme. Retain the first root assignment, the earlier/later
-base-cut source assignments and their actual intervening maps; do not restart the returned
-coordinator or programme incorporation. The new source/target pullback is the existing port for
-this constraint transport. Preserve the declared source-section receiver as such until its relation
-to the existing whole-family receiver is constructed; do not silently relabel one as the other.
+[established-bounded; implemented-exact; formal-checked; computational-witness] The
+[complete return](../../research/records/2026-09-12_OLD_AND_NEW_PENDING_SOURCES_RETURN_THROUGH_ONE_GENERATOR.md)
+now also incorporates original affine-base pending cuts. The original root and every added source
+constraint remain at their actual times; an erased intermediate distinction is not inferred from
+final endpoints. V4 rest tags Base/Programme frames and migrates v3. Native and streamed controls
+include old-base returns after restart, repeated/out-of-order returns and executable hidden
+source fibres. The return-cycle binding is returned; continue phase 3's actual applicability
+and source-contact construction, with phase 4's encoding use on the same body.
+
+[definition] Preserve the declared source-section receiver until its relation to another
+receiver is constructed. Do not relabel it as the former whole-family projection or interpret
+the controlled operator result as useful general conversation.
 
 [definition] The family lift must distinguish recorded h_s from a proposed successor condition.
 Use the actual constitutive contact/formation relation over the bounded source parameters;
@@ -263,7 +270,7 @@ retain its joint variation or prove a lawful condensation of its complete return
 each formal source coefficient row as a separately observed sample or use a relation witness
 as a material coefficient. A compatibility calculation alone does not define the update law.
 
-[definition] Extend the distinct consuming preparation/publication path over
+[definition] Reuse the distinct consuming preparation/publication path over
 `NormalCoupledComparison`; preserve inspection as read-only. That path
 uses the producing family and observed receiver, constructs the admitted source/condition
 constraint, prepares condition contact and affected member material, and stages their effect on

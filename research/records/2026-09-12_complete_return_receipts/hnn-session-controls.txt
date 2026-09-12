@@ -1,0 +1,45 @@
+warning: holonic-engine@0.1.0: exact CUDA laws built for compute_89
+   Compiling holonic-engine v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-engine)
+warning: method `record_joined_operative_return_bounds` is never used
+ --> crates/holonic-engine/src/resident_section/surface_operative_map_source.rs:4:19
+  |
+3 | impl<'c> ResidentSurface<'c> {
+  | ---------------------------- method in this implementation
+4 |     pub(crate) fn record_joined_operative_return_bounds(
+  |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `SectionContactMaterial` is never constructed
+   --> crates/holonic-engine/src/native_ecology/../holonic_intelligence/operative_return.rs:239:19
+    |
+239 | pub(super) struct SectionContactMaterial<'a, 'chart> {
+    |                   ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `enact_section_contact` is never used
+   --> crates/holonic-engine/src/native_ecology/../holonic_intelligence/operative_return.rs:335:15
+    |
+335 | pub(super) fn enact_section_contact<'chart>(
+    |               ^^^^^^^^^^^^^^^^^^^^^
+
+   Compiling life v0.0.0 (/home/b/Workspaces/holonics/crates/holonic-life)
+warning: `holonic-engine` (lib) generated 3 warnings
+   Compiling holonics-circulation-abi v0.1.0 (/home/b/Workspaces/holonics/crates/holonic-circulation-abi)
+   Compiling holonics-hna v0.1.0 (/home/b/Workspaces/holonics/crates/holonics-hna)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2m 02s
+     Running unittests src/lib.rs (target/debug/deps/holonics_hna-5dc87c8819cf4508)
+
+running 8 tests
+test native::coupled_wave::tests::coupled_session_generates_and_reenters_without_self_deposition ... ok
+test native::coupled_wave::tests::coupled_session_incorporates_observed_symbol_and_continues ... HNN old="a" returned="b" receiver=declared-source-section
+ok
+test native::coupled_wave::tests::coupled_session_keeps_and_compares_its_producing_family ... ok
+test native::coupled_wave::tests::coupled_session_observed_next_is_distinct_from_unpaired_source_and_correction ... ok
+test native::coupled_wave::tests::coupled_session_pending_phases_retain_the_producing_cut ... ok
+test native::coupled_wave::tests::coupled_session_process_resume_drains_the_pending_emission_once ... ok
+test native::coupled_wave::tests::coupled_session_reads_legacy_affine_frames ... ok
+test native::coupled_wave::tests::coupled_session_returns_original_base_prediction_after_restart ... old base prediction returned after first publication: before="b" after="a"
+ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 67 filtered out; finished in 7.42s
+

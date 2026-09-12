@@ -71,58 +71,39 @@ nested automata that construct, compare and refine further automata.
 
 ## Immediate integrated implementation
 
-[established-bounded; implemented-exact] The
-[bilinear return](../../research/records/2026-09-11_REUSABLE_GENERATORS_REACH_RESIDENT_RECEIVERS.md)
-now covers reusable target/core/receiver/search, fixed-port source-family preimage and pure
-resident evaluation with changed-receiver product reuse. Continue these owners through
-recurrence/block applications and actual source/material incorporation. The subsequent [joint-fibre return](../../research/records/2026-09-11_JOINT_SOURCE_CONDITION_AND_MATERIAL_KEEP_THEIR_PRODUCT_CONSTRAINTS.md)
-now represents shared source/condition/material constraints and evaluates them natively. The [actual pending compiler](../../research/records/2026-09-11_ACTUAL_PENDING_COMPARISONS_COMPILE_WITH_THEIR_ANCHORS.md)
-now constructs those equations directly from resident source and material data with its original
-anchor and producing condition. The [dependent constitutive return](../../research/records/2026-09-11_CONSTITUTIVE_RETURNS_REMAIN_DEPENDENT_ON_THEIR_SOURCE.md)
-now executes the existing contact/formation law under a shared source assignment and demonstrates
-its non-affine condition dependence. Continue by representing its complete family consequence
-with the actual source/current continuation and connecting it to the existing atomic transaction.
-Publishing one evaluated alternative or the span of all alternatives is not that construction.
-The [continuation repair](../../research/records/2026-09-11_PENDING_RETURNS_KEEP_THEIR_ACTUAL_CONTINUATION.md)
-now retains the actual intervening maps, after a native separator exposed identical old saved
-states for different source/current joints. Compose the dependent return with that retained word;
-do not reconstruct its joining relation from the separate marginals.
-The [owned generator return](../../research/records/2026-09-11_AN_OWNED_CONSTITUTIVE_GENERATOR_CONTINUES_THROUGH_ITS_NEW_MATERIAL.md)
-now publishes that function and continues through changed material under a declared source-section
-receiver. Its complete native representation persists across process exit. The
-[HNN stream binding](../../research/records/2026-09-11_THE_HNN_STREAM_USES_ITS_RETURNED_GENERATOR.md)
-now preserves emission/re-entry, later prediction cuts and fresh-process continuation. The
-[repeated programme return](../../research/records/2026-09-12_REPEATED_RETURNS_PRESERVE_ORIGINAL_SOURCE_FRAMES.md)
-now consumes those predictions using their original source-face parameters, including out-of-order
-returns, and continues through previously formed material. Next compose still-pending cuts of
-the original affine substrate, retaining their base-word frames alongside the first root assignment. Keep the declared receiver chart distinct
-from the prior whole-family projection. The original-base pending boundary remains part of this integration.
-The [later-source join](../../research/records/2026-09-11_LATER_SOURCE_CONSTRAINTS_KEEP_THE_JOINED_CONTINUATION.md)
-supplies the checked two-sided affine pullback and its actual-word consumer. Use that retained
-pair/word in the dependent return's source-frame composition.
-Do not reapply a relation to only a supported source projection and discard its target constraint.
-The exterior affine material solve does not itself perform that native incorporation.
+[established-bounded; implemented-exact; formal-checked; computational-witness] The
+[complete native return](../../research/records/2026-09-12_OLD_AND_NEW_PENDING_SOURCES_RETURN_THROUGH_ONE_GENERATOR.md)
+now joins actual pending source comparisons, original bounds/frames, constitutive contact and
+material formation, one successor, exactly-once consumption and subsequent native conduct.
+Original-base and later-programme predictions use the same return path. Source-visible HNN
+controls and full native bodies continue across process exit. The native return-cycle foundation
+is returned; useful Athena-alpha and broad source applicability remain open.
 
-[definition] The present work joins two responsibilities in phases 1–2. Use the returned reusable
-bilinear owners and extend the needed recurrence/action composition with typed executable
-returns; preserve changed receivers and complete source/clock relations. Second, derive and implement the
-producing-family incorporation through existing condition/contact and formation owners. Their
-shared handoff is an admitted source/action/receiver relation with its correlated parameters,
-clock, residual and return—not a JSON result imported as semantic material.
+[definition] Reuse the actual pending compiler, dependent generator, two-sided source/target
+pullback, signed face decoder, resident operator/factor owners and public session. Their dated
+records are linked by CONSTRUCTION_STATE. The first root and later source constraints stay in
+the actual word; equal final endpoints do not replace those joins. The declared section receiver
+is not silently identified with the former whole-family projection.
 
-[definition] Bind those returns to a pure resident mathematical segment as soon as its domain
-law permits, then to the changed material/successor once incorporation is defined. The native
-blueprint names exact owners and checks. Complete source-visible cycles accompany this work;
-inspect the input, compatible/predicted faces, actual output, full difference and successor.
-Continue to applicable constituent formation and encoding on that same body. A host search or
-reference codec does not become the production hot operation by relabeling it.
+[definition] The next native construction joins situated source/part/return binding with phase
+3's applicability work. Identify the actual source/contact relation that cannot express a
+measured distinction, using the existing field, contextual-section, restriction/rebase and
+member-formation owners. Preserve the fixed-condition vertical-collapse counterexample; more
+rows in that unchanged relation cannot repair it. Do not supply a scene classifier, phrase rule
+or externally ranked semantic route. Use the consuming session to inspect complete input,
+prediction, actual return, full residual and changed consequence.
 
-[definition] Native implementation is part of this authorized programme. Broad cultivation
-remains paused while its producing-family transaction and source attachment are repaired; that
-pause does not defer code integration until all mathematical research is complete. Resume
-appropriate native verification when native conduct changes, and developmental exposure when
-the actual changed consumer can receive its returns. No cultivation run occurs merely because
-a planning document was revised.
+[definition] Continue phase 4 alongside that work: reuse retained generators and construct lawful
+condensations for their declared future receivers, carrying source fibres, phase, clock, pending
+returns and decoder/work accounts. Mathematical requests and changed modality receivers should
+use those same owners where their domains match. A new theorem, codec or example is useful when
+it changes this construction or exposes its precise missing relation; it is not another engine.
+
+[definition] Broad cultivation remains paused while broad source/contact applicability is
+repaired. The pause is no longer due to a missing family-incorporation transaction. Resume
+appropriate native exposure through the actual changed consumer and inspect its product;
+mathematical breadth continues within the shared programme. No universal intelligence theorem,
+complete modality product or Millennium solution is a prerequisite to an admitted useful increment.
 
 ## All current plan documents and their roles
 
@@ -201,11 +182,11 @@ details its exact native files, ports, missing relations and verification. Sourc
 persistence and resource accounting accompany usable increments. CONSTRUCTION_STATE identifies
 what has actually returned.
 
-[definition] For native coupled-wave integration, phases 1–2 share the immediate boundary: the read-only family
-comparison and repeated programme condition/material transactions now exist; pending cuts
-of the original affine body must retain their base-word sources through that same composition. Do not restart implemented emission, normal producing comparison, coupled
-ownership or rest. Phase 3 must address the fixed-condition relation's collapse rather than
-append more rows to that unchanged chart. Phase 4 builds on that actual conduct.
+[definition] The native application/return-cycle binding in phases 1–2 is implemented and
+verified for its declared families and receivers. Do not restart emission, comparison, original-base
+or programme incorporation, ownership or rest. Phase 3 now addresses source/contact applicability
+and the fixed-condition relation's collapse; phase 4 develops economical generator continuation
+on that actual conduct. Complete outputs and receiver-qualified differences remain part of each increment.
 
 [definition] Phase 6's source/receiver comparisons can inform earlier phases whenever their
 owners compose. A complete vision/audio product, π tail formalization, general fluid solution

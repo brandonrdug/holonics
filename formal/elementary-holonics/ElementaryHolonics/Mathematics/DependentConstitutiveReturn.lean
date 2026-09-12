@@ -315,6 +315,26 @@ theorem relationalPreimage_serial
   · rintro ⟨y, hR, z, hS, hz⟩
     exact ⟨z, ⟨y, hR, hS⟩, hz⟩
 
+theorem relationalPreimage_serial_joined_middle
+    (R : X → Y → Prop) (S : Y → Z → Prop) (M : Set Y) (H : Set Z) :
+    relationalPreimage (serialRelation R (joinedRelation M S Set.univ)) H =
+      relationalPreimage R (M ∩ relationalPreimage S H) := by
+  ext x
+  constructor
+  · rintro ⟨z, ⟨y, hR, hyM, hS, _, _⟩, hz⟩
+    exact ⟨y, hR, hyM, z, hS, hz⟩
+  · rintro ⟨y, hR, hyM, z, hS, hz⟩
+    exact ⟨z, ⟨y, hR, hyM, hS, Set.mem_univ z⟩, hz⟩
+
+theorem bool_serial_middle_constraint_counterexample :
+    let R : Bool → Bool → Prop := fun x y => x = y
+    let S : Bool → Unit → Prop := fun _ _ => True
+    let M : Set Bool := {false}
+    let H : Set Unit := {()}
+    true ∈ relationalPreimage (serialRelation R S) H ∧
+      true ∉ relationalPreimage (serialRelation R (joinedRelation M S Set.univ)) H := by
+  simp [relationalPreimage, serialRelation, joinedRelation]
+
 /- The converse of a relation can be used as a relational constraint; this
    serial law keeps the direction of time in `R` then `S`. -/
 

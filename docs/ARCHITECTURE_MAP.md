@@ -154,7 +154,12 @@ adds `Return` passages and v3 dependent rest in those same owners. `PreparedCond
 and `ResidentNeighborhoodAlternative` stage following contacts/formations; the programme retains
 original source-face parameters and the affected members' conditional material. Family section
 and coupled-joint kernel owners pack/decode signed anchored faces and check their original bounds.
-The remaining boundary concerns pending cuts of the original affine substrate.
+The [complete return](../research/records/2026-09-12_OLD_AND_NEW_PENDING_SOURCES_RETURN_THROUGH_ONE_GENERATOR.md)
+adds `ConstitutiveSourceFrame::{Base,Programme}` and dependent rest v4, with v3 migration.
+`evaluate_with_base_faces` retains the root and each base source at its actual producing time;
+all pending origins now use the same staged return. The same family-image owner replaces the
+removed private `parameter_image` helper. Following native work concerns source/contact
+applicability and economical generator continuation.
 
 [definition] `resident/wave_relation/pullback.rs::ResidentWavePullback` and
 `section_wave_family_pullback` retain both affine source/target constraints through the actual
@@ -369,7 +374,8 @@ the exact total-map image. `wave/coupled.rs::receive_contact_next` stages that c
 observation under one admitted source cut; its step retains both the predecessor family and
 observed map. Relation rest v4 persists the actual observation and reconstructs the graph.
 `NativeCoupledWaveSession::receive_next_symbol` binds the explicit `receive-next-symbol` stream
-command. This is distinct from delayed observed-symbol material development, which remains open.
+command. Delayed `observe-symbol` material development is a distinct operation through the
+owned dependent return programme; both operations now use the same continuing session.
 
 [definition] `wave/family/basis.rs::NormalFamilyBasisFace` retains the complete producing family
 beside its projected minimum-norm joint receiver. `section_family_basis_face` in
@@ -380,8 +386,10 @@ generation, actual symbol-pair source re-entry, pending phases and complete coup
 that same owner. Pure `project-symbol` reads the current; `emit-symbol` first advances the
 conditional law. `wave/coupled/comparison.rs` now retains producing handles and maps the complete source's
 ordered parameters into paired Ψ/η coefficients through `section_wave_source_family_comparison`.
-Wave rest v8 and coupled session v2 retain those pending cuts and their actual image lineage.
-`compare-symbol` prepares the comparison; producing-family material development remains open.
+Wave rest v9 retains the pending cuts and actual intervening word. Coupled session v3 tags its
+native body, whose dependent v4 rest retains original Base/Programme source frames.
+`compare-symbol` inspects the comparison; `observe-symbol` consumes it through the existing
+condition/contact/material owners and publishes the full returned generator.
 
 [definition] `normal/direct/wave/actuate.rs` owns fixed-material source action. The
 `normal_source_actuation.cuh` source word reuses the learned normal response and the enclosed

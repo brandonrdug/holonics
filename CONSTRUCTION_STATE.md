@@ -1,99 +1,46 @@
 # Construction state
 
-**Currency:** September 12, 2026. **Current work:** repeated programme returns now form and persist their source-dependent generator; composition of pending pre-programme source frames remains active.
-**Athena objective:** standing; useful Athena-alpha has not been attained. **Broad native cultivation:** paused while the consuming family/source binding is repaired;
+**Currency:** September 12, 2026. **Current position:** the complete native return-cycle foundation is implemented and verified; source/contact applicability and productive encoding are the next native work.
+**Athena objective:** standing; useful Athena-alpha has not been attained. **Broad native cultivation:** paused while broad source/contact applicability is repaired;
 authorized native implementation continues within the shared programme. The active phases now have names;
 AC0–AC5 survive only as historical responsibility labels. [The roadmap](docs/plans/THE_ROADMAP.md)
 is the sole order and [the blueprint](docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md)
 names actual code changes and outcomes.
 
-[established-bounded; implemented-exact] The
-[reusable generator return](research/records/2026-09-11_REUSABLE_GENERATORS_REACH_RESIDENT_RECEIVERS.md)
-now connects engine bilinear target/core/receiver/search owners to exact rational GPU execution.
-The inspected application returns complex `(-7,22)` and polynomial `(8,22,15)` faces from the
-same resident product, with zero intermediate readouts. The native output also enters the
-existing constitutive relation directly. Fixed-port affine-source preimages retain correlated
-parameters. The 26-test exact-linear filter and four packet tests passed; the strengthened
-native existing-consumer regression also passed. No broad cultivation or native material
-incorporation is claimed.
+[established-bounded; implemented-exact; formal-checked; computational-witness] The
+[complete native return](research/records/2026-09-12_OLD_AND_NEW_PENDING_SOURCES_RETURN_THROUGH_ONE_GENERATOR.md)
+now incorporates actual pending predictions from both the original affine word and the later
+programme. The original root, source-frame parameters, shared condition/material, joined paths
+and bound remain retained. One staged successor is published, each return is consumed once,
+and following source operations use the returned generator. V4 rest preserves Base/Programme
+frames and reads v1/v2/v3 predecessors. Native and HNN continuation survive process exit.
 
-[established-bounded; implemented-exact; formal-checked] The
-[joint-fibre return](research/records/2026-09-11_JOINT_SOURCE_CONDITION_AND_MATERIAL_KEEP_THEIR_PRODUCT_CONSTRAINTS.md)
-retains source/condition/material parameters and intermediate equalities in one executable
-constraint system. Native evaluation preserves the shared parameter packet and has zero
-intermediate readouts. The inspected system derives material 4 from a consistent source cut,
-rejects an inconsistent junction, and uses the derived coefficient natively to return 60 at
-input 15. Four exact reference tests, seven serial packet/joint tests, the application and the
-Framework.Computation Lean build passed. Its affine solve remains exterior; no coupled Athena
-material deposit or broad cultivation is claimed.
+[established-bounded; computational-witness] The inspected HNN controls return `a → b → a`
+under matched source conditions; an old base prediction received after restart changes `b` to
+`a`. The same observation at two root-compatible earlier source faces yields conditions
+`11/5−2i/5` and `5/2−i/2`. A source incompatible with the retained intermediate root is rejected
+even when later maps erase its difference from the current. All 41 coupled controls, eight
+session controls, the additional source-fibre separator and the focused Lean build pass.
 
-[established-bounded; implemented-exact] The
-[actual pending-compiler return](research/records/2026-09-11_ACTUAL_PENDING_COMPARISONS_COMPILE_WITH_THEIR_ANCHORS.md)
-now builds shared source/condition/relation-witness equations directly on the GPU. It keeps the
-original anchor bound and producing condition while recording the contemporary material cut.
-Four native checks cover both charts, non-dyadic data, free current directions, delayed returns,
-remount and foreign/released handles. Seven packet and two prior comparison regressions passed.
-This is read-only compilation/evaluation; pending returns remain unconsumed and no new material
-or successor is published by it.
+[definition] This completes the native application/return-cycle foundation at the declared
+family and section-receiver scope. It does not establish useful Athena-alpha or equivalence
+between that section receiver and the former whole-family projection. Continue actual
+source/contact applicability and generator/encoding use on this body, with inspected comparisons,
+loss/residual and resource measurements. The fixed-condition conversation collapse remains an
+active source/constraint problem; do not reopen the completed return binding or merely add rows
+to its unchanged relation.
 
-[established-bounded; implemented-exact; formal-checked] The
-[dependent constitutive return](research/records/2026-09-11_CONSTITUTIVE_RETURNS_REMAIN_DEPENDENT_ON_THEIR_SOURCE.md)
-now evaluates the existing condition preimage/contact and staged formation at a shared original
-source parameter. Two native checks return distinct exact conditions `(3/2,1/2)` and `(6/5,2/5)`,
-preserve the vertical output fibre, match the point operation and stage an incompatible-return
-extension without mutating standing. Lean checks the contact law and its non-affine dependence.
-All six neighborhood and 24 coupled-wave checks passed serially, and Framework.Computation built.
-
-[established-bounded; implemented-exact; computational-witness] A native delayed-return
-[separator](research/records/2026-09-11_PENDING_RETURNS_KEEP_THEIR_ACTUAL_CONTINUATION.md) exposed
-equal entire saved states after different source/current transport. The repair retains one
-shared word of actual maps for still-pending cuts, including source-field internal factors.
-The two new continuation controls, all 27 coupled-wave checks and five HNN session checks pass,
-including legacy migration and process resume.
-
-[established-bounded; implemented-exact; formal-checked] The
-[owned constitutive generator](research/records/2026-09-11_AN_OWNED_CONSTITUTIVE_GENERATOR_CONTINUES_THROUGH_ITS_NEW_MATERIAL.md)
-retains the full source-dependent condition/material/current function, publishes by ownership
-transfer and excludes its consumed prediction from the active pending set. Under its declared
-source-section receiver, a delayed return reaches `24−4i`; the next actual source gives joint
-`(31/5,0,82/5,−4)`, then `(43/10,0,63/5,−4)` after fresh-process continuation. Other source
-sections remain executable after remount. All 31 coupled controls, six neighborhood controls and
-the additional pending-cut retention control passed; the formal and HNN library builds passed.
-
-[established-bounded; implemented-exact; computational-witness] The
-[HNN stream return](research/records/2026-09-11_THE_HNN_STREAM_USES_ITS_RETURNED_GENERATOR.md)
-binds the generator into the continuing session. `observe-symbol` incorporates one actual
-return; subsequent emission, re-entry, source input and prediction use that body. The native
-receiver-coordinate decoder retains its kernel and full source. In an exact two-symbol operator
-control with matched complete source, the changed session emits `b` while unchanged material
-emits `a`. Fresh-process continuation agrees, and legacy affine sessions still load. The 33
-coupled checks, strengthened coordinate control, seven session and seven stream controls pass;
-the coordinate-kernel formal build passes.
-
-[established-bounded; implemented-exact; computational-witness] The
-[repeated-return construction](research/records/2026-09-12_REPEATED_RETURNS_PRESERVE_ORIGINAL_SOURCE_FRAMES.md)
-now consumes later programme predictions, including out-of-order returns, through their original
-anchored source faces. Later source parameters remain executable: the same observation yields
-conditions `3/2+4i` and `3/2+2i` under two admitted source sections. The two-return HNN stream
-changes `a` to `b`, then back to `a` under matched sources and survives a fresh process. All 36
-coupled and seven session controls pass, together with the signed-face and distinct-section
-controls. The v1/v2 dependent-frame checks also pass.
-
-[open] The integrated goal remains active. Pending predictions already present in the affine
-substrate when the first generator was published still need their base-word source frames joined
-into the repeated programme. They remain inspectable and persistent, and the session now reports
-that precise boundary. The verified repeated-return construction and its evidence are retained
-in the linked record; continue the original-base source-frame composition. The declared section receiver is not asserted equal to the former
-whole-family projection; useful Athena-alpha remains unestablished.
-
-[established-bounded; implemented-exact; formal-checked] The
-[later-source join](research/records/2026-09-11_LATER_SOURCE_CONSTRAINTS_KEEP_THE_JOINED_CONTINUATION.md)
-now carries both source/target constraints through actual retained factors, preserving the full
-pair, original bounded frames and clocks. Three native family controls and the actual-word
-control pass, as do the HNN check and formal build. This supplies constraint transport for the
-repeated-return composition; it does not yet publish another material return. The declared source-section
-receiver is not asserted equivalent to the former whole-family projection. This controlled
-operator result does not establish useful Athena-alpha.
+[definition] The native evidence chain remains in the
+[resident generator](research/records/2026-09-11_REUSABLE_GENERATORS_REACH_RESIDENT_RECEIVERS.md),
+[joint-fibre](research/records/2026-09-11_JOINT_SOURCE_CONDITION_AND_MATERIAL_KEEP_THEIR_PRODUCT_CONSTRAINTS.md),
+[actual pending compiler](research/records/2026-09-11_ACTUAL_PENDING_COMPARISONS_COMPILE_WITH_THEIR_ANCHORS.md),
+[dependent contact](research/records/2026-09-11_CONSTITUTIVE_RETURNS_REMAIN_DEPENDENT_ON_THEIR_SOURCE.md),
+[actual continuation](research/records/2026-09-11_PENDING_RETURNS_KEEP_THEIR_ACTUAL_CONTINUATION.md),
+[owned generator](research/records/2026-09-11_AN_OWNED_CONSTITUTIVE_GENERATOR_CONTINUES_THROUGH_ITS_NEW_MATERIAL.md),
+[stream binding](research/records/2026-09-11_THE_HNN_STREAM_USES_ITS_RETURNED_GENERATOR.md),
+[later-source join](research/records/2026-09-11_LATER_SOURCE_CONSTRAINTS_KEEP_THE_JOINED_CONTINUATION.md), and
+[repeated programme return](research/records/2026-09-12_REPEATED_RETURNS_PRESERVE_ORIGINAL_SOURCE_FRAMES.md)
+records. They retain their scoped outputs, formal checks and regression history.
 
 [proved-derived; formal-checked] The latest
 [relative code-cost return](research/records/2026-09-11_RELATIVE_CODE_COST_HAS_AN_ADDRESSED_BOUNDARY_LAW.md)
@@ -112,18 +59,11 @@ retains Swing and measured information rates. No native model or GPU operation c
 
 ## Immediate native boundary
 
-[historical] At `9f237c9d`, the coupled wave already owns conditional
-current families, source-field actuation, actual-next-current reception, prediction, resident
-symbol selection, ordinary re-entry and versioned rest. Its producing-family comparison retains
-joint coefficient sections and the observed target, but `NativeCoupledWaveSession::compare_symbol`
-explicitly returns `material_deposited: false`. Inspection remains read-only; the distinct
-`incorporate_symbol` path now consumes the first return. The current text boundary is a supplied unit-symbol
-chart, not a trained autoencoder or general Holonic Encoding faculty.
-
-[open] Extend the returned source/part/continuation cycle to repeated dependent
-condition/preimage and member formation, with one atomic successor per admitted return. The existing neighborhood transaction consumes point sources; the
-family bridge must retain correlations and distinguish compatible alternatives from actual
-observations. Pending comparison inspection, emission and rest are not missing mechanisms.
+[open] Bind broad source/part/continuation relationships to the now-consuming public session
+and address the existing relation's fixed-condition/vertical collapse through actual contextual
+constraints and applicability. Use the standing generator/encoding owners and complete returned
+body; a field/file occurrence is not a semantic identity. The current text boundary remains a
+supplied unit-symbol chart, not an established general Holonic Encoding faculty.
 
 [definition] The next phases are situated reception/visible cycles, conditional relations and
 complete return, applicable constituent organization, Holonic Encoding/reuse, useful conversation,
@@ -146,7 +86,7 @@ on 73 symbols, producing its uniform minimum-norm face. Adding rows to that unch
 cannot shrink the vertical space, and those source constraints keep its condition fixed.
 Its repair is source/applicability/constraint representation, not more exposure or a tie-breaker.
 
-[established-bounded; process-audit] The latest
+[historical] The
 [producing-family return](research/records/2026-09-11_PRODUCING_FAMILIES_KEEP_JOINT_COMPARISON_PARAMETERS.md)
 passed 18 coupled and five session checks serially. The actual pending-family capture is retained;
 its large-model consuming material follow-up has not run. The coupled-wave suite and broad cultivation were not rerun in the pure bilinear return;

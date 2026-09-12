@@ -4,7 +4,7 @@
 use super::*;
 use std::collections::BTreeMap;
 mod coupled;
-pub use coupled::{NormalWaveCoupled,NormalCoupledAttachRefusal,NormalCoupledContact,NormalCoupledStep,NormalCoupledReception, NormalCoupledSourceActuation, NormalCoupledProducingHandle, NormalCoupledPrediction, NormalCoupledComparison, ConstitutiveComparisonSection, ResidentCoupledConstitutive, CoupledConstitutiveRefusal, ConstitutiveSourceRefusal, CoupledConstitutiveRest, NormalCoupledContinuation, NormalContinuationPullback, NormalContinuationJoin, CoupledConstitutiveFamily, CoupledConstitutiveAlternative, CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading, NormalFamilyComparisonRow};
+pub use coupled::{NormalWaveCoupled,NormalCoupledAttachRefusal,NormalCoupledContact,NormalCoupledStep,NormalCoupledReception, NormalCoupledSourceActuation, NormalCoupledProducingHandle, NormalCoupledPrediction, NormalCoupledComparison, ConstitutiveComparisonSection, ConstitutiveSourceFrame, ResidentCoupledConstitutive, CoupledConstitutiveRefusal, ConstitutiveSourceRefusal, CoupledConstitutiveRest, NormalCoupledContinuation, NormalContinuationPullback, NormalContinuationJoin, CoupledConstitutiveFamily, CoupledConstitutiveAlternative, CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading, NormalFamilyComparisonRow};
 mod actuate;
 pub use actuate::NormalSourceActuation;
 mod develop;

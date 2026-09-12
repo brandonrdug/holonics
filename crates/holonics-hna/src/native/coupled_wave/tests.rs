@@ -546,3 +546,54 @@ fn coupled_session_reads_legacy_affine_frames() {
             .unwrap();
     }
 }
+
+#[test]
+#[ignore = "requires CUDA; a base prediction returns through the stream after publication and process exit"]
+fn coupled_session_returns_original_base_prediction_after_restart() {
+    const CHILD:&str="HOLONICS_HNN_BASE_RETURN_RESUME";
+    fn receive_base(session:&mut NativeCoupledWaveSession<'_>,stream:&mut HnaStream,id:u64)->Value {
+        let command=json!({"schema":crate::HNA_STREAM_REQUEST_SCHEMA,"command":{"action":"observe-symbol","source":id,"text":"b"}}).to_string()+"\n";
+        let reads=session.surface.census().section_read_outs;
+        let mut output=Vec::new();
+        stream.pump_coupled_wave(session,&mut std::io::Cursor::new(command),&mut output).unwrap();
+        assert_eq!(session.surface.census().section_read_outs,reads);
+        let event:Value=serde_json::from_slice(&output).unwrap();
+        assert_eq!(event["value"]["return_published"],true,"{event}");
+        assert_eq!(session.wave.pending_coupled_predictions(),0);
+        assert!(session.incorporate_symbol(id,"b").is_err());
+        for text in ["a","b"] {session.receive_next_symbol(text).unwrap();}
+        let emitted=session.next_symbol(true).unwrap();
+        assert_eq!(emitted["text"],"a");
+        json!({"received":event,"emitted":emitted})
+    }
+    if let Some(directory)=std::env::var_os(CHILD) {
+        let directory=std::path::PathBuf::from(directory);
+        NativeCoupledWaveSavedSession::read(directory.join("before.session")).unwrap().with_session(|loaded,stream|{
+            let id=loaded.wave.pending_ids()?.into_iter().next().unwrap();
+            assert_eq!(loaded.compare_symbol(id,"b",Some(0))?["scope"],"dependent-producing-family-section");
+            let result=receive_base(loaded,stream,id);
+            std::fs::write(directory.join("result.json"),serde_json::to_vec(&result)?)?;
+            loaded.checkpoint_stream(directory.join("after.session"),stream.state())?;
+            Ok(())
+        }).unwrap();return;
+    }
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
+    let mut session=session_law(&s,true);let first=session.predict_symbol(false).unwrap();
+    let second=session.predict_symbol(false).unwrap();
+    assert_eq!(first["text"],"a");assert_eq!(second["text"],"b");
+    let root=first["action"]["prediction"].as_u64().unwrap();
+    let remaining=second["action"]["prediction"].as_u64().unwrap();
+    session.incorporate_symbol(root,"b").unwrap();
+    for text in ["a","b"] {session.receive_next_symbol(text).unwrap();}
+    let before=session.next_symbol(true).unwrap();assert_eq!(before["text"],"b");
+    let directory=path("base-return");std::fs::create_dir(&directory).unwrap();
+    let mut stream=HnaStream::new();session.checkpoint_stream(directory.join("before.session"),stream.state()).unwrap();
+    let child=std::process::Command::new(std::env::current_exe().unwrap())
+        .args(["--exact","native::coupled_wave::tests::coupled_session_returns_original_base_prediction_after_restart","--ignored","--test-threads=1"])
+        .env(CHILD,&directory).output().unwrap();
+    assert!(child.status.success(),"{}\n{}",String::from_utf8_lossy(&child.stdout),String::from_utf8_lossy(&child.stderr));
+    let result=receive_base(&mut session,&mut stream,remaining);
+    assert_eq!(serde_json::from_slice::<Value>(&std::fs::read(directory.join("result.json")).unwrap()).unwrap(),result);
+    assert_eq!(NativeCoupledWaveSavedSession::read(directory.join("after.session")).unwrap().rest,session.wave.rest().unwrap());
+    eprintln!("old base prediction returned after first publication: before={} after={}",before["text"],result["emitted"]["text"]);
+}

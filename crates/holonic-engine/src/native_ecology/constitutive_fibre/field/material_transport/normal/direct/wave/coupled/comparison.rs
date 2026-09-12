@@ -3,7 +3,7 @@
 use super::*;
 pub(super) mod joint;
 mod constitutive;
-pub(super) use constitutive::ConstitutiveReturnOperands;
+pub(super) use constitutive::{ConstitutiveReturnOperands,EvaluatedProducingCut};
 pub use constitutive::{CoupledConstitutiveFamily, CoupledConstitutiveAlternative};
 pub use joint::{CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading};
 

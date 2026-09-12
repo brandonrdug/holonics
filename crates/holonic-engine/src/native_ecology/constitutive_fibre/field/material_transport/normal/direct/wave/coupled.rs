@@ -3,7 +3,7 @@ pub(super) mod rest;
 mod comparison;
 mod continuation;
 mod dependent;
-pub use dependent::{ConstitutiveComparisonSection,ResidentCoupledConstitutive,CoupledConstitutiveRefusal,ConstitutiveSourceRefusal,CoupledConstitutiveRest};
+pub use dependent::{ConstitutiveComparisonSection, ConstitutiveSourceFrame,ResidentCoupledConstitutive,CoupledConstitutiveRefusal,ConstitutiveSourceRefusal,CoupledConstitutiveRest};
 pub use continuation::{NormalCoupledContinuation, NormalContinuationPullback, NormalContinuationJoin};
 use comparison::CoupledProducingCut;
 pub use comparison::{CoupledConstitutiveFamily, CoupledConstitutiveAlternative, CompiledCoupledJoint, CoupledJointEvaluation, CoupledJointReading,NormalCoupledProducingHandle,NormalCoupledPrediction,NormalCoupledComparison,NormalFamilyComparisonRow};

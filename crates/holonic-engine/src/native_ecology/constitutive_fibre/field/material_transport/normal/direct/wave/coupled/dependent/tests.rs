@@ -484,3 +484,125 @@ fn repeated_return_reader_keeps_v1_and_v2_source_programmes() {
         assert_eq!(face(&mut resumed),face(&mut model));
     }
 }
+
+#[test]
+#[ignore = "requires CUDA; pending base cuts on either side of the root join later programme returns"]
+fn base_pending_returns_join_the_root_and_later_programme() {
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
+    for root_later in [false,true] {
+        let mut wave=world(&s,false);let contact=wave.admit_contact(0).unwrap();
+        let first=wave.predict_contact(&contact).unwrap().handle;
+        let contact=wave.admit_contact(0).unwrap();let second=wave.predict_contact(&contact).unwrap().handle;
+        let (root,remaining,observed,returned)=if root_later {(&second,&first,[5,4],[5,4])}else{(&first,&second,[4,3],[6,5])};
+        let comparison=wave.compare_coupled_prediction(root,current(&point(&s,&observed))).unwrap();
+        let parameters=comparison.source().receiver_coordinates().unwrap().into_coordinates();
+        let mut model=wave.into_constitutive_continuation(comparison,parameters).unwrap();
+        assert_eq!(face(&mut model),vec![r(4,1),r(3,1),r(6,1),r(5,1)]);
+        let local=model.predict_member(0,WaveSourceReceiver::Direct).unwrap();
+        let reads=s.census().section_read_outs;
+        model.incorporate_prediction(remaining.id(),current(&point(&s,&returned))).unwrap();
+        assert_eq!(s.census().section_read_outs,reads);
+        assert!(!model.has_prediction(remaining.id()));assert!(model.has_prediction(local));
+        assert!(model.pending_prediction(remaining.id()).is_err());
+        assert_eq!(face(&mut model),vec![r(10,1),r(9,1),r(22,1),r(21,1)]);
+        assert!(matches!(model.return_source_receivers().next().unwrap().1,ConstitutiveSourceFrame::Base{..}));
+        let saved=model.rest().unwrap();let mut bytes=Vec::new();saved.write(&mut bytes).unwrap();
+        let mut resumed=CoupledConstitutiveRest::read(&mut bytes.as_slice(),bytes.len() as u64).unwrap().remount(&s).unwrap();
+        assert_eq!(resumed.rest().unwrap(),saved);
+        assert!(!resumed.has_prediction(remaining.id()));
+        for value in [&mut model,&mut resumed] {
+            value.incorporate_prediction(local,current(&point(&s,&[8,7]))).unwrap();
+            assert_eq!(value.material_returns(),3);
+            assert_eq!(face(value),vec![r(22,1),r(21,1),r(34,1),r(33,1)]);
+            value.advance_member(0,WaveSourceReceiver::Direct).unwrap();
+            assert_eq!(face(value),vec![r(34,1),r(33,1),r(46,1),r(45,1)]);
+        }
+        assert_eq!(resumed.rest().unwrap(),model.rest().unwrap());
+    }
+}
+
+#[test]
+#[ignore = "requires CUDA; an erased earlier source distinction cannot contradict the retained intermediate root"]
+fn base_return_keeps_the_root_constraint_after_later_maps_erase_its_source() {
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
+    let mut wave=world(&s,true);let contact=wave.admit_contact(0).unwrap();
+    let first=wave.predict_contact(&contact).unwrap().handle;
+    let contact=wave.admit_contact(0).unwrap();let earlier=wave.predict_contact(&contact).unwrap().handle;
+    let contact=wave.admit_contact(0).unwrap();let root=wave.predict_contact(&contact).unwrap().handle;
+    let comparison=wave.compare_coupled_prediction(&root,current(&point(&s,&[0,5]))).unwrap();
+    let parameters=comparison.source().receiver_coordinates().unwrap().into_coordinates();
+    let mut model=wave.into_constitutive_continuation(comparison,parameters).unwrap();
+    model.incorporate_prediction(earlier.id(),current(&point(&s,&[0,4]))).unwrap();
+    assert!(model.has_prediction(first.id()));assert!(!model.has_prediction(earlier.id()));
+    let root=s.copy_section_device(model.receiver()).unwrap();
+    let packet=model.return_source_receivers().next().unwrap().2;
+    let raw=s.detach_section(packet,64).unwrap();let mut changed=raw.intervals.clone();
+    let denominator=changed.last().unwrap().0;
+    assert_eq!(changed[8].0,0);
+    // This direction is admitted by the old source's affine carrier. It is forbidden by the
+    // separately retained later root: the intervening advance carries c_real into that root's p.
+    // Subsequent vertical maps erase it from the final current, so endpoint matching cannot suffice.
+    changed[8].0+=denominator;changed[8].1+=denominator;
+    let alternate=s.mount_section_rest(&ResidentSectionRest::found(1,raw.width,raw.grain,64,changed).unwrap()).unwrap();
+    let saved=model.rest().unwrap();
+    assert!(model.evaluate_with_return_faces(&root,&[&alternate]).is_err());
+    assert_eq!(model.rest().unwrap(),saved);
+    assert_eq!(model.read_receiver().unwrap().inspect_condition().unwrap().successor,vec![r(2,1),r(0,1)]);
+}
+
+#[test]
+#[ignore = "requires CUDA; tagged source frames retain the previous v3 programme-return wire"]
+fn base_return_reader_migrates_v3_programme_return_frames() {
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
+    let mut wave=world(&s,false);let contact=wave.admit_contact(0).unwrap();
+    let root=wave.predict_contact(&contact).unwrap().handle;
+    let comparison=wave.compare_coupled_prediction(&root,current(&point(&s,&[4,3]))).unwrap();
+    let parameters=comparison.source().receiver_coordinates().unwrap().into_coordinates();
+    let mut model=wave.into_constitutive_continuation(comparison,parameters).unwrap();
+    let local=model.predict_member(0,WaveSourceReceiver::Direct).unwrap();
+    model.incorporate_prediction(local,current(&point(&s,&[7,6]))).unwrap();
+    let saved=model.rest().unwrap();let mut bytes=Vec::new();saved.write(&mut bytes).unwrap();
+    let prefix=b"HOLONIC-COUPLED-CONSTITUTIVE\x04".len();
+    let length=u64::from_le_bytes(bytes[prefix..prefix+8].try_into().unwrap()) as usize;
+    let mut header:serde_json::Value=serde_json::from_slice(&bytes[prefix+8..prefix+8+length]).unwrap();
+    for operation in header["operations"].as_array_mut().unwrap() {
+        if let Some(returned)=operation["returned"].as_object_mut() {
+            returned.get_mut("cut").unwrap().as_object_mut().unwrap().remove("frame");
+        }
+    }
+    let header=serde_json::to_vec(&header).unwrap();
+    let mut legacy=bytes[..prefix].to_vec();legacy[prefix-1]=3;
+    legacy.extend_from_slice(&(header.len() as u64).to_le_bytes());legacy.extend_from_slice(&header);
+    legacy.extend_from_slice(&bytes[prefix+8+length..]);
+    let mut resumed=CoupledConstitutiveRest::read(&mut legacy.as_slice(),legacy.len() as u64).unwrap().remount(&s).unwrap();
+    assert_eq!(resumed.rest().unwrap(),saved);
+    assert_eq!(face(&mut resumed),face(&mut model));
+}
+
+#[test]
+#[ignore = "requires CUDA; a base-source fibre invisible at the root remains a parameter of later reaction"]
+fn base_return_retains_root_invisible_source_parameters() {
+    let ro=ResidentReadout::new().unwrap();let s=ResidentSurface::on(&ro).unwrap();
+    let mut wave=world(&s,true);let contact=wave.admit_contact(0).unwrap();
+    wave.predict_contact(&contact).unwrap();
+    let contact=wave.admit_contact(0).unwrap();let old=wave.predict_contact(&contact).unwrap().handle;
+    let contact=wave.admit_contact(0).unwrap();wave.predict_contact(&contact).unwrap();
+    let contact=wave.admit_contact(0).unwrap();let root=wave.predict_contact(&contact).unwrap().handle;
+    let comparison=wave.compare_coupled_prediction(&root,current(&point(&s,&[0,6]))).unwrap();
+    let parameters=comparison.source().receiver_coordinates().unwrap().into_coordinates();
+    let mut model=wave.into_constitutive_continuation(comparison,parameters).unwrap();
+    model.incorporate_prediction(old.id(),current(&point(&s,&[0,5]))).unwrap();
+    let root=s.copy_section_device(model.receiver()).unwrap();
+    let original=s.copy_section_device(model.return_source_receivers().next().unwrap().2).unwrap();
+    let raw=s.detach_section(&original,64).unwrap();let mut changed=raw.intervals.clone();
+    let denominator=changed.last().unwrap().0;assert_eq!(changed[8].0,0);
+    changed[8].0+=denominator;changed[8].1+=denominator;
+    let alternate=s.mount_section_rest(&ResidentSectionRest::found(1,raw.width,raw.grain,64,changed).unwrap()).unwrap();
+    let saved=model.rest().unwrap();
+    let first=model.evaluate_with_return_faces(&root,&[&original]).unwrap().inspect_condition().unwrap().successor;
+    let second=model.evaluate_with_return_faces(&root,&[&alternate]).unwrap().inspect_condition().unwrap().successor;
+    assert_eq!(first,vec![r(11,5),r(-2,5)]);
+    assert_eq!(second,vec![r(5,2),r(-1,2)]);
+    assert_eq!(model.rest().unwrap(),saved);
+    eprintln!("root-compatible hidden base fibre: h=11/5-2i/5 versus 5/2-i/2");
+}

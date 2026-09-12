@@ -6,12 +6,41 @@ use crate::native_ecology::constitutive_fibre::circulation::rest::{
 use std::io::{Read, Write};
 const MAGIC_V1: &[u8] = b"HOLONIC-COUPLED-CONSTITUTIVE\x01";
 const MAGIC_V2: &[u8] = b"HOLONIC-COUPLED-CONSTITUTIVE\x02";
-const MAGIC: &[u8] = b"HOLONIC-COUPLED-CONSTITUTIVE\x03";
+const MAGIC_V3: &[u8] = b"HOLONIC-COUPLED-CONSTITUTIVE\x03";
+const MAGIC: &[u8] = b"HOLONIC-COUPLED-CONSTITUTIVE\x04";
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 struct ReturnedHeader {
     prediction: u64,
+    cut: ConstitutiveSourceFrame,
+}
+#[derive(Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct LegacyReturnedHeader {
+    prediction: u64,
     cut: ConstitutiveProducingCut,
+}
+#[derive(Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct LegacySourceHeader {
+    member: usize,
+    chart: WaveSourceReceiver,
+    #[serde(default)]
+    kind: ConstitutivePassageKind,
+    #[serde(default)]
+    returned: Option<LegacyReturnedHeader>,
+}
+#[derive(Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+struct LegacyHeader {
+    epoch: u64,
+    prediction: u64,
+    #[serde(alias = "sources")]
+    operations: Vec<LegacySourceHeader>,
+    #[serde(default)]
+    pending: BTreeMap<u64, ConstitutiveProducingCut>,
+    #[serde(default)]
+    released: std::collections::BTreeSet<u64>,
 }
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -58,8 +87,14 @@ impl CoupledConstitutiveRest {
         self.base.coupled_members().unwrap_or(0)
     }
     pub fn has_prediction(&self, id: u64) -> bool {
+        let returned = self
+            .header
+            .operations
+            .iter()
+            .any(|op| op.returned.as_ref().is_some_and(|r| r.prediction == id));
         self.header.pending.contains_key(&id)
-            || (id != self.header.prediction
+            || (!returned
+                && id != self.header.prediction
                 && !self.header.released.contains(&id)
                 && self.base.has_coupled_prediction(id))
     }
@@ -79,9 +114,12 @@ impl CoupledConstitutiveRest {
         blob(out, &base)?;
         for packet in std::iter::once(Some(&self.observation))
             .chain(std::iter::once(Some(&self.receiver)))
-            .chain(self.sources.iter().zip(&self.return_faces).flat_map(|(source, face)| {
-                [source.as_ref(), face.as_ref()]
-            }))
+            .chain(
+                self.sources
+                    .iter()
+                    .zip(&self.return_faces)
+                    .flat_map(|(source, face)| [source.as_ref(), face.as_ref()]),
+            )
             .flatten()
         {
             blob(out, &point_bytes(packet)?)?;
@@ -92,10 +130,34 @@ impl CoupledConstitutiveRest {
         let mut input = input.take(octets);
         let mut magic = vec![0; MAGIC.len()];
         input.read_exact(&mut magic).map_err(invalid)?;
-        if magic != MAGIC && magic != MAGIC_V2 && magic != MAGIC_V1 {
+        if magic != MAGIC && magic != MAGIC_V3 && magic != MAGIC_V2 && magic != MAGIC_V1 {
             return Err(invalid("dependent continuation magic"));
         }
-        let header: Header = serde_json::from_slice(&read_blob(&mut input)?).map_err(invalid)?;
+        let header_bytes = read_blob(&mut input)?;
+        let header: Header = if magic == MAGIC {
+            serde_json::from_slice(&header_bytes).map_err(invalid)?
+        } else {
+            let old: LegacyHeader = serde_json::from_slice(&header_bytes).map_err(invalid)?;
+            Header {
+                epoch: old.epoch,
+                prediction: old.prediction,
+                operations: old
+                    .operations
+                    .into_iter()
+                    .map(|op| SourceHeader {
+                        member: op.member,
+                        chart: op.chart,
+                        kind: op.kind,
+                        returned: op.returned.map(|r| ReturnedHeader {
+                            prediction: r.prediction,
+                            cut: r.cut.into(),
+                        }),
+                    })
+                    .collect(),
+                pending: old.pending,
+                released: old.released,
+            }
+        };
         if magic == MAGIC_V1 && (!header.pending.is_empty() || !header.released.is_empty()) {
             return Err(invalid("pending disposition requires dependent frame v2"));
         }
@@ -105,7 +167,7 @@ impl CoupledConstitutiveRest {
             || header
                 .operations
                 .iter()
-            .filter(|op| op.kind != ConstitutivePassageKind::Advance)
+                .filter(|op| op.kind != ConstitutivePassageKind::Advance)
                 .count() as u64
                 > input.limit() / 8
             || base
@@ -127,8 +189,10 @@ impl CoupledConstitutiveRest {
             if op.kind != ConstitutivePassageKind::Return && op.returned.is_some() {
                 return Err(invalid("return metadata on non-return operation"));
             }
-            if magic != MAGIC && op.kind == ConstitutivePassageKind::Return {
-                return Err(invalid("return operation requires dependent frame v3"));
+            if magic == MAGIC_V1 || magic == MAGIC_V2 {
+                if op.kind == ConstitutivePassageKind::Return {
+                    return Err(invalid("return operation requires dependent frame v4"));
+                }
             }
             if magic == MAGIC_V1 && op.kind != ConstitutivePassageKind::Source {
                 return Err(invalid("operation requires dependent frame v2"));
@@ -142,27 +206,37 @@ impl CoupledConstitutiveRest {
                 let returned = op.returned.as_ref().ok_or(ConstitutiveFibreError::Shape)?;
                 if !returned_predictions.insert(returned.prediction)
                     || returned.prediction == header.prediction
-                    || base.has_coupled_prediction(returned.prediction)
-                    || returned.cut.prefix >= operation_index
-                    || returned.prediction
-                        != base
-                            .epoch()
-                            .checked_add(2)
-                            .and_then(|v| v.checked_add(returned.cut.prefix as u64))
-                            .ok_or(ConstitutiveFibreError::Shape)?
                 {
                     return Err(invalid("dependent return predecessor cut"));
                 }
-                let predecessor = header
-                    .operations
-                    .get(returned.cut.prefix)
-                    .ok_or(ConstitutiveFibreError::Shape)?;
-                if op.member != returned.cut.member || op.chart != returned.cut.chart
-                    || predecessor.kind != ConstitutivePassageKind::Advance
-                    || predecessor.member != returned.cut.member
-                    || predecessor.chart != returned.cut.chart
-                {
-                    return Err(invalid("dependent return does not name its actual operation"));
+                if op.member != returned.cut.member() || op.chart != returned.cut.chart() {
+                    return Err(invalid("dependent return member/chart"));
+                }
+                if let Some(prefix) = returned.cut.prefix() {
+                    if prefix >= operation_index
+                        || returned.prediction
+                            != base
+                                .epoch()
+                                .checked_add(2)
+                                .and_then(|v| v.checked_add(prefix as u64))
+                                .ok_or(ConstitutiveFibreError::Shape)?
+                    {
+                        return Err(invalid("dependent return predecessor cut"));
+                    }
+                    let predecessor = header
+                        .operations
+                        .get(prefix)
+                        .ok_or(ConstitutiveFibreError::Shape)?;
+                    if predecessor.kind != ConstitutivePassageKind::Advance
+                        || predecessor.member != returned.cut.member()
+                        || predecessor.chart != returned.cut.chart()
+                    {
+                        return Err(invalid(
+                            "dependent return does not name its actual operation",
+                        ));
+                    }
+                } else if !base.has_coupled_prediction(returned.prediction) {
+                    return Err(invalid("dependent base return predecessor"));
                 }
                 return_faces.push(Some(read_point(&read_blob(&mut input)?)?));
             } else {
@@ -191,11 +265,11 @@ impl CoupledConstitutiveRest {
                 ));
             }
         }
-        if header
-            .released
-            .iter()
-            .any(|id| *id == header.prediction || !base.has_coupled_prediction(*id))
-        {
+        if header.released.iter().any(|id| {
+            *id == header.prediction
+                || returned_predictions.contains(id)
+                || !base.has_coupled_prediction(*id)
+        }) {
             return Err(invalid("released dependent predecessor cut"));
         }
         if input.limit() != 0 {
@@ -248,34 +322,39 @@ impl CoupledConstitutiveRest {
                 .and_then(|v| v.checked_add(index as u64))
                 .ok_or(ConstitutiveFibreError::Shape)?;
             let retain = header.pending.contains_key(&operation_id)
-                || operation_metadata
-                    .iter()
-                    .skip(index + 1)
-                    .any(|later| later.returned.as_ref().is_some_and(|r| r.cut.prefix == index));
+                || operation_metadata.iter().skip(index + 1).any(|later| {
+                    later.returned.as_ref().and_then(|r| r.cut.prefix()) == Some(index)
+                });
             let source = source
                 .map(|v| {
                     s.mount_section_rest(&v)
                         .map_err(ConstitutiveFibreError::from)
                 })
                 .transpose()?;
-            let returned = meta.returned.map(|r| {
-                let receiver = return_face
-                    .ok_or(ConstitutiveFibreError::Shape)
-                    .and_then(|v| s.mount_section_rest(&v).map_err(ConstitutiveFibreError::from));
-                receiver.map(|receiver| ConstitutiveReturnedSource {
-                    prediction: r.prediction,
-                    cut: r.cut,
-                    receiver,
+            let returned = meta
+                .returned
+                .map(|r| {
+                    let receiver = return_face
+                        .ok_or(ConstitutiveFibreError::Shape)
+                        .and_then(|v| {
+                            s.mount_section_rest(&v)
+                                .map_err(ConstitutiveFibreError::from)
+                        });
+                    receiver.map(|receiver| ConstitutiveReturnedSource {
+                        prediction: r.prediction,
+                        cut: r.cut,
+                        receiver,
+                    })
                 })
-            }).transpose()?;
+                .transpose()?;
             model
                 .append_operation(
                     ConstitutiveSourcePassage {
                         member: meta.member,
                         chart: meta.chart,
-                    kind: meta.kind,
-                    source,
-                    returned,
+                        kind: meta.kind,
+                        source,
+                        returned,
                     },
                     retain,
                 )
@@ -339,7 +418,10 @@ impl<'c> ResidentCoupledConstitutive<'c> {
                 .map(|v| {
                     v.returned
                         .as_ref()
-                        .map(|r| s.detach_section(&r.receiver, 64).map_err(ConstitutiveFibreError::from))
+                        .map(|r| {
+                            s.detach_section(&r.receiver, 64)
+                                .map_err(ConstitutiveFibreError::from)
+                        })
                         .transpose()
                 })
                 .collect::<Result<_, ConstitutiveFibreError>>()?,

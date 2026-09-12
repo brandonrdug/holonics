@@ -303,9 +303,6 @@ impl<'c> NativeCoupledBody<'c> {
                 if !b.has_prediction(id) {
                     return Err(invalid("no available producing comparison"));
                 }
-                if b.pending_prediction(id).is_ok() {
-                    return Err(invalid("the pending source predates this dependent programme; its original base-word frame still requires composition"));
-                }
                 let before=b.epoch();
                 b.incorporate_prediction(id,observed)?;
                 return Ok(json!({"return_published":true,"prediction_consumed":id,
